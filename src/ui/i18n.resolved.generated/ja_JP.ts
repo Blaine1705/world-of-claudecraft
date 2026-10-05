@@ -3946,7 +3946,15 @@ export const ja_JP: EnTranslations = {
         "lingering": "次の花嫁の哀歌で受けるダメージが{pct}%増加：1スタックごとに{per}%、最大{max}スタック。次はランタンの光の中で受けること。",
         "slippery": "すべりやすい氷の上：速度は毎秒最大{grip}ヤード/秒しか変わらないため、走り出しが遅く、止まっても滑り続け、曲がると大きく膨らむ。氷から降りれば足場が戻る。",
         "harmony": "受けるダメージが{pct}%減少：生きている聖歌隊員1人ごとに{per}%。聖歌隊員を先に倒すこと。",
-        "crescendo": "歌が速くなる：虚ろの挽歌は{castNormal}秒ではなく{cast}秒になり、{everyNormal}秒ではなく{every}秒ごとに来る。骨のオルガンは{wavesNormal}波ではなく{waves}波の音符を奏でる。"
+        "crescendo": "歌が速くなる：虚ろの挽歌は{castNormal}秒ではなく{cast}秒になり、{everyNormal}秒ではなく{every}秒ごとに来る。骨のオルガンは{wavesNormal}波ではなく{waves}波の音符を奏でる。",
+        "gorged": "与えるダメージが{pct}%上昇：彼のもとに届いた縛られし魂1つごとに{per}%、現在{stacks}/{max}スタック、戦闘終了まで持続。魂が届くたびに最大体力の{heal}%も回復する。魂の進路に立てば代わりに受け止められる。",
+        "unquietWard": "祭壇で安らがぬ者の儀式を詠唱している間、ダメージを受けない：追憶のろうそく{total}本のうち{lit}本が再点火済み。1本を灯し直すには{channel}秒の詠唱が必要で、その間、灯す者の最大体力の{drain}%（ヒロイックでは{drainHeroic}%）が毎秒吸い取られる。攻撃を受けても中断されないが、動くかスタンで中断される。最後のろうそくで結界が砕ける。ヒロイックでは台帳が告げる順に灯すこと：違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に{wrongMin}～{wrongMax}の闇ダメージ。",
+        "riteBroken": "スタン：砕けた結界のせいで{seconds}秒間行動できない。",
+        "shatteredWard": "{seconds}秒間、受けるダメージが{pct}%上昇：灯し直したろうそくが結界を砕いた。今こそ最大の攻撃を叩き込め。",
+        "graveChill": "安らがぬ者の儀式が続く間、毎秒{bite}の闇ダメージ（ヒロイックでは{biteHeroic}）を受け、{every}秒ごとに{step}（ヒロイックでは{stepHeroic}）ずつ増える。追憶のろうそくを灯し直して終わらせること。",
+        "graspMark": "{fuse}秒後、足元の輪から手が噴き出す：輪が置かれた場所から{radius}ヤード以内の全員が{root}秒間その場に縛られ、{min}～{max}の闇ダメージを受ける。輪から出ること。",
+        "graspRoot": "墓の手に掴まれている：{seconds}秒間移動できない。",
+        "knellAirborne": "儀式の環の上空を飛んでおり、攻撃が届かない。環の半分に{mark}秒間印を付け、その半分に亡霊の炎を浴びせる：中にいる全員に{min}～{max}の火炎ダメージ。1回の飛行で{breaths}回半分を焼き、その後着地する。"
       },
       "sanctum": {
         "lockbound": "受けるダメージが{pct}%減少：まだ残っている鎖1本につき{per}%。封印の枷を壊すとその鎖が外れる。",
@@ -6029,6 +6037,11 @@ export const ja_JP: EnTranslations = {
         "crypt_bone_organ": "骨のオルガン（26秒ごとに骨のオルガンを奏でる：闇の音符が2波、聖歌隊席の床を筋状に炸裂し、ノーマルでは筋の中で100～115のダメージ。2波目は1波目の隙間を埋める）",
         "crypt_crescendo": "クレッシェンド（体力30%未満で挽歌は1.8秒になり11秒ごとに来る。オルガンは3波目を奏でる）",
         "crypt_ilvane_heroic": "ヒロイック：アンコール（もう一方が立っているまま10秒倒れていた聖歌隊員は再び起き上がる。同時に倒すこと）と途切れぬ詩節（3回目ごとの挽歌は中断できない。隠れること）",
+        "crypt_morthen_shadow_pulse": "シャドウパルス（12秒ごとに2秒の詠唱の後、ノーマルでは周囲12ヤード以内の全員に24～30の闇ダメージ。離れること。終の儀式中は9秒ごと）",
+        "crypt_gravecall": "墓呼び（15秒ごとに縛られし魂が次の石棺の壁龕から彼のもとへ漂う。届くと死者の飽食となり、魂1つごとに与えるダメージが10%上昇（最大10スタック）、体力の3%を回復する。進路に立つプレイヤーが代わりに受け止める：ノーマルでは12～16の闇ダメージ）",
+        "crypt_rite_of_the_unquiet": "安らがぬ者の儀式（体力65%で祭壇に戻り、安らがぬ者の結界の中でダメージを受けなくなる。その間、墓の冷気が全員に毎秒3の闇ダメージを与えて5秒ごとに1ずつ増え、壁龕から安らがぬ骨が2体這い出る。追憶のろうそく4本を灯し直すこと：1本ごとに4秒の詠唱で、灯す者の最大体力の6%を毎秒吸い取る。攻撃では中断されないが、動くかスタンで中断される。最後のろうそくで儀式が破れ、8秒間スタンし、受けるダメージが25%上昇する）",
+        "crypt_reap_the_unquiet": "安らがぬ者の刈り取り（体力35%未満で魂は止まり、14秒ごとに2秒の詠唱の後、大鎌を振るう：ノーマルでは前方14ヤード、120度の扇形にいる全員に55～65の闇ダメージ。以後シャドウパルスは9秒ごと）",
+        "crypt_morthen_heroic": "ヒロイック：死者の名を呼べ（台帳がろうそくの順番を告げる。違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に252～288の闇ダメージ。再点火は毎秒8%を吸い取る）、墓の掌握（16秒ごとにプレイヤー2人の足元に4ヤードの輪が現れ、1.5秒後に手が噴き出す：3秒の移動不能と162～198の闇ダメージ）、弔鐘竜の燃える弔鐘（飛び立って環の半分に4.5秒間印を付け、その半分に亡霊の炎を浴びせて1,000～1,120の火炎ダメージ。1回の飛行で3回）",
         "reaping_arc": "リーピングアーク（前方クリーブ）",
         "hallowed_brine": "聖なる潮水（半径9ヤードの暗い聖水の溜まり、ヒロイックは10ヤード：中にいる者は毎秒18ダメージ、ヒロイックは26、彼は中に立つ間ダメージを40パーセント軽減する、外へ引きずり出せ）",
         "rebounding_bulwark": "跳ね返る大盾（盾は最後に当たった者から10ヤード以内の最も近いプレイヤーへ跳ね返る、最大3人、ヒロイックは4人：散開せよ）",
@@ -6228,6 +6241,17 @@ export const ja_JP: EnTranslations = {
       "tollLine": "鐘を鳴らす間はダメージを受けない：鐘の一撃と、それが呼び起こす死者に備えろ",
       "harmonyTitle": "調和",
       "harmonyLine": "聖歌隊員が彼女の受けるダメージを{pct}%減らしている：先に聖歌隊員を倒せ",
+      "knellTitle": "燃える弔鐘！",
+      "knellLine": "バーが尽きると環のこちら側の半分に亡霊の炎が降り注ぐ：反対側の半分へ移動しろ",
+      "graspTitle": "墓の掌握！",
+      "graspLine": "この輪から手が噴き出し、中にいる者を掴む：輪から出ろ",
+      "reapTitle": "安らがぬ者の刈り取り！",
+      "reapLine": "大鎌が彼の前方の地面を薙ぎ払う：背後に回れ",
+      "riteTitle": "安らがぬ者の儀式",
+      "riteLine": "追憶のろうそくを灯し直して結界を砕け：{total}本中{lit}本点灯",
+      "riteNamedLine": "台帳が次に告げるろうそくだけを灯し直せ：{total}本中{lit}本点灯",
+      "soulTitle": "縛られし魂",
+      "soulLine": "魂がモーセンのもとへ漂っている：進路に立ち、彼を肥えさせる前に受け止めろ",
       "timeAria": "残り{seconds}秒"
     },
     "kitUse": {
@@ -6238,6 +6262,13 @@ export const ja_JP: EnTranslations = {
       "toppleFar": "{range}ヤード以内に近づいて蹴り倒せ",
       "toppleAria": "{name}を倒す",
       "usingLine": "動くな：攻撃を受ける、動く、スタンのいずれかで中断される",
+      "relightLine": "詠唱中は毎秒体力を吸い取られる：攻撃では中断されないが、動くかスタンで中断される",
+      "relightKey": "{name}を灯し直す",
+      "relightTap": "ここをタップして{name}を灯し直す",
+      "relightClick": "ここをクリックして{name}を灯し直す",
+      "relightFar": "{range}ヤード以内に近づいて灯し直せ",
+      "relightAria": "{name}を灯し直す",
+      "relightUsingLine": "吸い取られる間も動くな：攻撃では中断されないが、動くかスタンで中断される",
       "timeAria": "残り{seconds}秒"
     },
     "cosmetics": {
@@ -12600,6 +12631,14 @@ export const ja_JP: EnTranslations = {
       "crypt_ilvane_dirge": "虚ろの挽歌",
       "crypt_ilvane_unbroken_dirge": "途切れぬ詩節",
       "crypt_ilvane_bone_organ": "骨のオルガン",
+      "crypt_morthen_shadow_pulse": "シャドウパルス",
+      "crypt_morthen_rite_of_the_unquiet": "安らがぬ者の儀式",
+      "crypt_morthen_reap_the_unquiet": "安らがぬ者の刈り取り",
+      "kituse_crypt_relight_candle": "ろうそくを灯し直す",
+      "crypt_knellwyrm_knell_rise": "燃える弔鐘",
+      "crypt_knellwyrm_knell_mark": "燃える弔鐘",
+      "crypt_knellwyrm_knell_breath": "燃える弔鐘",
+      "crypt_knellwyrm_knell_land": "燃える弔鐘",
       "bastion_brine_mend": "塩水の癒し",
       "bastion_fog_ward": "霧の守り",
       "bastion_halberd_sweep": "ハルバード薙ぎ",
@@ -20268,6 +20307,9 @@ export const ja_JP: EnTranslations = {
       },
       "crypt_knellwyrm": {
         "name": "弔鐘竜"
+      },
+      "crypt_remembrance_candle": {
+        "name": "追憶のろうそく"
       },
       "bastion_revenant": {
         "name": "砦の亡霊"

@@ -1,10 +1,12 @@
-// The Hollow Crypt's wing-boss HUD copy: the encounter alert
-// (src/ui/hud/dungeon/crypt_alert_view.ts), pure and driven from real fights
-// (it reads only the auras the sim sets, so a real Sim drives it exactly as
-// the HUD sees it, offline or mirrored online), the boss-aura tooltips
-// (src/ui/crypt_aura_effect.ts: every number from the encounter tuning, and
-// the heroic numbers from the same factor combat applies), and the Lady's
-// loot display names (the spider placeholder's leftovers renamed, ids frozen).
+// The Hollow Crypt's boss HUD copy: the encounter alert
+// (src/ui/hud/dungeon/crypt_alert_view.ts and its scene scan), pure and driven
+// from real fights (it reads only the auras, bars and encounter objects the
+// sim sets, so a real Sim drives it exactly as the HUD sees it, offline or
+// mirrored online), the boss-aura tooltips (src/ui/crypt_aura_effect.ts: every
+// number from the encounter tuning, and the heroic numbers from the same
+// factor combat applies, checked against the damage combat deals), the relight
+// copy of the use prompt (kit_use_prompt_view.ts), and the Lady's loot display
+// names (the spider placeholder's leftovers renamed, ids frozen).
 
 import { describe, expect, it, vi } from 'vitest';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
@@ -13,12 +15,22 @@ import {
   BELL_YARD,
   BONECHILL_RAVINE,
   CHORISTER_ID,
+  candleBodySpot,
+  cryptDevTrigger,
   GRAVE_LANTERNS,
   ILVANE_CRESCENDO,
   ILVANE_DIRGE_SILENCE,
   ILVANE_HARMONY,
   ILVANE_ID,
   ILVANE_TUNING,
+  inKnellHalf,
+  KNELL_HALF_MARK_TEMPLATE,
+  KNELL_TUNING,
+  KNELLWYRM_AIRBORNE,
+  KNELLWYRM_ID,
+  KNELLWYRM_KNELL_MARK,
+  KNELLWYRM_TUNING,
+  knellHalfYaw,
   LADY_BRIDES_LAMENT,
   LADY_EMBRACE_HOLD,
   LADY_EMBRACED,
@@ -36,18 +48,57 @@ import {
   MARROW_MEASURED,
   MARROW_TOLLING,
   MARROW_TUNING,
+  MORTHEN_CANDLE_ID,
+  MORTHEN_GORGED,
+  MORTHEN_GRASP_MARK,
+  MORTHEN_GRASP_ROOT,
+  MORTHEN_GRASP_TEMPLATE,
+  MORTHEN_GRAVE_CHILL,
+  MORTHEN_ID,
+  MORTHEN_REAP,
+  MORTHEN_RELIGHT_CAST,
+  MORTHEN_RITE_BROKEN,
+  MORTHEN_SHATTERED,
+  MORTHEN_SOUL_TEMPLATE,
+  MORTHEN_SPOT,
+  MORTHEN_TUNING,
+  MORTHEN_UNQUIET_WARD,
+  RITE_CANDLE_DARK,
+  RITE_CANDLE_LIT,
+  RITE_CANDLE_NAMED,
+  RITE_CANDLE_SPOTS,
+  RITE_RING,
 } from '../src/sim/encounters/hollow_crypt';
 import { SLIPPERY_DEFAULT_GRIP, SLIPPERY_GROUND_AURA } from '../src/sim/slippery_ground';
 import { DT, type Entity } from '../src/sim/types';
 import { type AuraEffectInput, auraEffectDescriptor } from '../src/ui/aura_effect';
-import { cryptAuraEffectDescriptor, cryptHeroicAmount } from '../src/ui/crypt_aura_effect';
+import {
+  cryptAuraEffectDescriptor,
+  cryptHeroicAmount,
+  cryptHeroicFactor,
+} from '../src/ui/crypt_aura_effect';
+import {
+  CryptAlertSceneScan,
+  type CryptSceneEntity,
+  type CryptSceneWorld,
+} from '../src/ui/hud/dungeon/crypt_alert_scene_core';
 import {
   buildCryptAlertView,
   CRYPT_ALERT_KINDS,
+  CRYPT_SOFT_ALERT_KINDS,
   type CryptAlertEntity,
   type CryptAlertInput,
+  type CryptAlertScene,
   type CryptAlertView,
+  EMPTY_CRYPT_SCENE,
+  inMarkedHalf,
+  SOUL_ALERT_RADIUS,
 } from '../src/ui/hud/dungeon/crypt_alert_view';
+import {
+  buildKitUsePromptView,
+  KitUseSceneScan,
+  type KitUseSceneWorld,
+} from '../src/ui/hud/dungeon/kit_use_prompt_view';
 import { t } from '../src/ui/i18n';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import { en } from '../src/ui/i18n.resolved.generated/en';
@@ -68,6 +119,9 @@ vi.setConfig({ testTimeout: 90_000 });
 const M = MARROW_TUNING;
 const L = LADY_TUNING;
 const I = ILVANE_TUNING;
+const MT = MORTHEN_TUNING;
+/** The Knellwyrm carries no per-mob override: the crypt's own heroic factor. */
+const WYRM_HEROIC = HEROIC_DUNGEON_TUNING.hollow_crypt?.damageMultiplier ?? 0;
 
 function input(over: Partial<CryptAlertInput>): CryptAlertInput {
   return { auras: [], targetId: null, entity: () => null, ...over };
@@ -181,10 +235,18 @@ describe('the crypt alert view (pure)', () => {
         'lament-sheltered',
         'lament-open',
         'grave',
+        'knell',
+        'grasp',
+        'reap',
         'toll',
         'harmony',
+        'rite',
+        'rite-named',
+        'soul',
       ].sort(),
     );
+    // Only the two reminders give the slot to the use prompt.
+    expect([...CRYPT_SOFT_ALERT_KINDS].sort()).toEqual(['rite', 'rite-named', 'soul']);
   });
 });
 
@@ -485,6 +547,82 @@ describe('the crypt aura tooltips', () => {
         wavesNormal: I.organWaveAt.length,
       },
     },
+    {
+      a: {
+        id: MORTHEN_GORGED,
+        kind: 'buff_dmg_done',
+        value: MT.gorgedPct * 3,
+        stacks: 3,
+      },
+      key: 'gorged',
+      nums: {
+        pct: pct(MT.gorgedPct * 3),
+        per: pct(MT.gorgedPct),
+        stacks: 3,
+        max: MT.gorgedMaxStacks,
+        heal: pct(MT.gorgedHeal),
+      },
+    },
+    {
+      a: { id: MORTHEN_UNQUIET_WARD, kind: 'buff_dr', value: 0, value2: 2 },
+      key: 'unquietWard',
+      nums: {
+        lit: 2,
+        total: RITE_CANDLE_SPOTS.length,
+        channel: MT.relightChannel,
+        drain: pct(MT.relightDrainPct),
+        drainHeroic: pct(MT.relightDrainPctHeroic),
+        wrongMin: heroic(MORTHEN_ID, MT.wrongCandleMin),
+        wrongMax: heroic(MORTHEN_ID, MT.wrongCandleMax),
+      },
+    },
+    {
+      a: { id: MORTHEN_RITE_BROKEN, kind: 'stun', value: 0 },
+      key: 'riteBroken',
+      nums: { seconds: MT.brokenSeconds },
+    },
+    {
+      a: { id: MORTHEN_SHATTERED, kind: 'vulnerability', value: MT.brokenVuln },
+      key: 'shatteredWard',
+      nums: { pct: pct(MT.brokenVuln), seconds: MT.brokenSeconds },
+    },
+    {
+      a: { id: MORTHEN_GRAVE_CHILL, kind: 'slow', value: 1, value2: MT.chillBase + 2 },
+      key: 'graveChill',
+      nums: {
+        bite: MT.chillBase + 2,
+        biteHeroic: heroic(MORTHEN_ID, MT.chillBase + 2),
+        step: MT.chillStep,
+        stepHeroic: heroic(MORTHEN_ID, MT.chillStep),
+        every: MT.chillEvery,
+      },
+    },
+    {
+      a: { id: MORTHEN_GRASP_MARK, kind: 'slow', value: 1, value2: MT.graspRadius },
+      key: 'graspMark',
+      nums: {
+        fuse: MT.graspFuse,
+        radius: MT.graspRadius,
+        root: MT.graspRootSeconds,
+        min: heroic(MORTHEN_ID, MT.graspMin),
+        max: heroic(MORTHEN_ID, MT.graspMax),
+      },
+    },
+    {
+      a: { id: MORTHEN_GRASP_ROOT, kind: 'root', value: 0 },
+      key: 'graspRoot',
+      nums: { seconds: MT.graspRootSeconds },
+    },
+    {
+      a: { id: KNELLWYRM_AIRBORNE, kind: 'buff_dr', value: 0 },
+      key: 'knellAirborne',
+      nums: {
+        mark: KNELL_TUNING.markSeconds,
+        min: Math.round(KNELL_TUNING.fireMin * WYRM_HEROIC),
+        max: Math.round(KNELL_TUNING.fireMax * WYRM_HEROIC),
+        breaths: KNELL_TUNING.breaths,
+      },
+    },
   ];
 
   it.each(cases)('$key states its rule with the live numbers', ({ a, key, nums }) => {
@@ -500,11 +638,17 @@ describe('the crypt aura tooltips', () => {
   });
 
   it('the heroic factor is the one combat stamps on the heroic bosses', () => {
-    for (const mob of [MARROW_ID, LADY_ID, ILVANE_ID]) {
+    for (const mob of [MARROW_ID, LADY_ID, ILVANE_ID, MORTHEN_ID]) {
       const mult = HEROIC_DUNGEON_TUNING.hollow_crypt?.mechanicDamageMultiplierByMob?.[mob];
       expect(mult).toBeGreaterThan(1);
       expect(cryptHeroicAmount(mob, 10)).toBe(Math.round(10 * (mult ?? 0)));
     }
+    // The Knellwyrm has no override of either kind: it rides the dungeon's factor.
+    const crypt = HEROIC_DUNGEON_TUNING.hollow_crypt;
+    expect(crypt?.mechanicDamageMultiplierByMob?.[KNELLWYRM_ID]).toBeUndefined();
+    expect(crypt?.damageMultiplierByMob?.[KNELLWYRM_ID]).toBeUndefined();
+    expect(WYRM_HEROIC).toBeGreaterThan(1);
+    expect(cryptHeroicFactor(KNELLWYRM_ID)).toBe(WYRM_HEROIC);
   });
 
   it('the live per-aura state reads off the aura: blow stacks, Harmony share, the grip', () => {
@@ -552,5 +696,471 @@ describe("the Lady's loot: the spider leftovers carry bridal frost names", () =>
   it('no Hollow Crypt display name keeps the spider words', () => {
     for (const id of Object.keys(RENAMED))
       expect(ITEMS[id]?.name).not.toMatch(/Rimeweb|Carapace|Fang|Hunter/);
+  });
+});
+
+// ---- Morthen's Rite Ring and the Knellwyrm's Burning Knell ------------------------
+
+const sceneOf = (over: Partial<CryptAlertScene>): CryptAlertScene => ({
+  ...EMPTY_CRYPT_SCENE,
+  ...over,
+});
+
+describe('the crypt alert view: the Rite Ring (pure)', () => {
+  const me = { x: 0, z: 0 };
+  const at = (over: Partial<CryptAlertInput>) =>
+    buildCryptAlertView(input({ selfId: 1, selfPos: me, ...over }));
+  const kindAt = (over: Partial<CryptAlertInput>) => {
+    const v = at(over);
+    return v.visible ? v.kind : null;
+  };
+
+  it('a marked half: inside it (the side its facing points to, within reach) only', () => {
+    const half: CryptAlertEntity = {
+      templateId: KNELL_HALF_MARK_TEMPLATE,
+      pos: { x: 0, z: -10 },
+      facing: 0,
+      scale: 20,
+    };
+    // North of the centre is the marked side (yaw 0 faces +z).
+    expect(inMarkedHalf(half, { x: 0, z: -2 })).toBe(true);
+    expect(inMarkedHalf(half, { x: 5, z: -16 })).toBe(false);
+    // Past the reach nothing burns.
+    expect(inMarkedHalf(half, { x: 0, z: 12 })).toBe(false);
+    const wyrm: CryptAlertEntity = {
+      castingAbility: KNELLWYRM_KNELL_MARK,
+      castRemaining: 1.5,
+      castTotal: 4.5,
+    };
+    const v = live(at({ scene: sceneOf({ halves: [half], knellwyrm: wyrm }) }));
+    expect(v.kind).toBe('knell');
+    expect(v.title).toBe(t('hudChrome.cryptAlert.knellTitle'));
+    expect(v.line).toBe(t('hudChrome.cryptAlert.knellLine'));
+    expect(v.progress).toBeCloseTo(1 / 3, 9);
+    expect(v.progressAria).toBe(t('hudChrome.cryptAlert.timeAria', { seconds: '2' }));
+    // Once it burns the warning is gone (the fire's template is not the mark's).
+    const burning = { ...half, templateId: 'crypt_knell_half_fire' };
+    expect(at({ scene: sceneOf({ halves: [burning] }) }).visible).toBe(false);
+  });
+
+  it("a gathering Grasp ring under the player, anyone's: the bar is their own mark", () => {
+    const ring: CryptAlertEntity = {
+      templateId: MORTHEN_GRASP_TEMPLATE,
+      pos: { x: 3, z: 0 },
+      scale: MT.graspRadius,
+    };
+    const mine = live(
+      at({
+        auras: [{ id: MORTHEN_GRASP_MARK, remaining: 0.75, duration: MT.graspFuse }],
+        scene: sceneOf({ grasps: [ring] }),
+      }),
+    );
+    expect(mine.kind).toBe('grasp');
+    expect(mine.line).toBe(t('hudChrome.cryptAlert.graspLine'));
+    expect(mine.progress).toBe(0.5);
+    // Someone else's ring under the player: the same call, no bar of theirs.
+    const theirs = live(at({ scene: sceneOf({ grasps: [ring] }) }));
+    expect(theirs.kind).toBe('grasp');
+    expect(theirs.progress).toBeNull();
+    // Out of the ring (a yard of margin past its radius): nothing, mark or not.
+    const far = { ...ring, pos: { x: MT.graspRadius + 1.5, z: 0 } };
+    expect(
+      at({
+        auras: [{ id: MORTHEN_GRASP_MARK, remaining: 1, duration: MT.graspFuse }],
+        scene: sceneOf({ grasps: [far] }),
+      }).visible,
+    ).toBe(false);
+    // Erupted hands are a root already, not a ring to leave.
+    const hands = { ...ring, templateId: 'crypt_morthen_grasp_hands' };
+    expect(at({ scene: sceneOf({ grasps: [hands] }) }).visible).toBe(false);
+  });
+
+  it('the Reap: in its arc and not its mark; the tank and anyone behind him see nothing', () => {
+    const morthen = (castTargetId: number): CryptAlertEntity => ({
+      templateId: MORTHEN_ID,
+      pos: { x: 0, z: 8 },
+      facing: Math.PI, // toward -z, the player
+      castingAbility: MORTHEN_REAP,
+      castTargetId,
+      castRemaining: 1,
+      castTotal: MT.reapCast,
+    });
+    const v = live(at({ scene: sceneOf({ morthen: morthen(7) }) }));
+    expect(v.kind).toBe('reap');
+    expect(v.line).toBe(t('hudChrome.cryptAlert.reapLine'));
+    expect(v.progress).toBe(0.5);
+    // The sweep's own mark (the tank) cannot step out of it.
+    expect(at({ scene: sceneOf({ morthen: morthen(1) }) }).visible).toBe(false);
+    // Behind him, or past its reach.
+    expect(at({ selfPos: { x: 0, z: 14 }, scene: sceneOf({ morthen: morthen(7) }) }).visible).toBe(
+      false,
+    );
+    expect(
+      at({
+        selfPos: { x: 0, z: 8 - MT.reapRange - 2 },
+        scene: sceneOf({ morthen: morthen(7) }),
+      }).visible,
+    ).toBe(false);
+    // A Shadow Pulse bar is not the Reap.
+    const pulse = { ...morthen(7), castingAbility: 'crypt_morthen_shadow_pulse' };
+    expect(at({ scene: sceneOf({ morthen: pulse }) }).visible).toBe(false);
+  });
+
+  it('the Rite: the candles lit out of all of them; on heroic, the Ledger line', () => {
+    const chill = [{ id: MORTHEN_GRAVE_CHILL, value: 1, value2: 3 }];
+    const candles = (named: boolean): CryptAlertEntity[] => [
+      { templateId: RITE_CANDLE_LIT },
+      { templateId: named ? RITE_CANDLE_NAMED : RITE_CANDLE_DARK },
+      { templateId: RITE_CANDLE_DARK },
+      { templateId: RITE_CANDLE_DARK },
+    ];
+    const normal = live(at({ auras: chill, scene: sceneOf({ candles: candles(false) }) }));
+    expect(normal.kind).toBe('rite');
+    expect(normal.title).toBe(t('hudChrome.cryptAlert.riteTitle'));
+    expect(normal.line).toBe(t('hudChrome.cryptAlert.riteLine', { lit: '1', total: '4' }));
+    expect(normal.progress).toBeNull();
+    const heroic = live(at({ auras: chill, scene: sceneOf({ candles: candles(true) }) }));
+    expect(heroic.kind).toBe('rite-named');
+    expect(heroic.line).toBe(t('hudChrome.cryptAlert.riteNamedLine', { lit: '1', total: '4' }));
+    // No Grave Chill, no Rite readout.
+    expect(at({ scene: sceneOf({ candles: candles(false) }) }).visible).toBe(false);
+  });
+
+  it('a Bound Soul in flight within reach of the call', () => {
+    const soul = (x: number): CryptAlertEntity => ({
+      templateId: MORTHEN_SOUL_TEMPLATE,
+      pos: { x, z: 0 },
+    });
+    const v = live(at({ scene: sceneOf({ souls: [soul(10)] }) }));
+    expect(v.kind).toBe('soul');
+    expect(v.line).toBe(t('hudChrome.cryptAlert.soulLine'));
+    expect(at({ scene: sceneOf({ souls: [soul(SOUL_ALERT_RADIUS + 1)] }) }).visible).toBe(false);
+  });
+
+  it('priority: the floor strikes over the target readouts over the soft reminders', () => {
+    const ring: CryptAlertEntity = {
+      templateId: MORTHEN_GRASP_TEMPLATE,
+      pos: { x: 0, z: 0 },
+      scale: MT.graspRadius,
+    };
+    const half: CryptAlertEntity = {
+      templateId: KNELL_HALF_MARK_TEMPLATE,
+      pos: { x: 0, z: 0 },
+      facing: 0,
+      scale: 20,
+    };
+    const soul: CryptAlertEntity = { templateId: MORTHEN_SOUL_TEMPLATE, pos: { x: 1, z: 1 } };
+    const tolling: CryptAlertEntity = { templateId: MARROW_ID, auras: [{ id: MARROW_TOLLING }] };
+    const chill = [{ id: MORTHEN_GRAVE_CHILL, value: 1, value2: 3 }];
+    const target = { targetId: 9, entity: () => tolling };
+    const all = sceneOf({ halves: [half], grasps: [ring], souls: [soul] });
+    expect(kindAt({ auras: chill, ...target, scene: all })).toBe('knell');
+    expect(kindAt({ auras: chill, ...target, scene: { ...all, halves: [] } })).toBe('grasp');
+    expect(kindAt({ auras: chill, ...target, scene: sceneOf({ souls: [soul] }) })).toBe('toll');
+    expect(kindAt({ auras: chill, scene: sceneOf({ souls: [soul] }) })).toBe('rite');
+    expect(kindAt({ scene: sceneOf({ souls: [soul] }) })).toBe('soul');
+    // A wing-boss mark still outranks the ring.
+    expect(
+      kindAt({ auras: [{ id: MARROW_MEASURED, remaining: 1, duration: 4 }], scene: all }),
+    ).toBe('measured');
+    // Without the player's position the floor reads stay quiet.
+    expect(
+      buildCryptAlertView(input({ scene: sceneOf({ grasps: [ring], halves: [half] }) })).visible,
+    ).toBe(false);
+  });
+
+  it('the scene scan walks the roster only when it changes and reads templates live', () => {
+    const candle = { kind: 'object', templateId: RITE_CANDLE_DARK };
+    const soul = { kind: 'object', templateId: MORTHEN_SOUL_TEMPLATE };
+    const lord = { kind: 'mob', templateId: MORTHEN_ID };
+    const fallen = { kind: 'mob', templateId: MORTHEN_ID, dead: true };
+    const entities = new Map<number, CryptSceneEntity>([
+      [1, candle],
+      [2, soul],
+      [3, fallen],
+      [4, lord],
+    ]);
+    const scan = new CryptAlertSceneScan();
+    const scene = scan.update({ entities, entityRosterVersion: 1 });
+    expect(scene.candles).toEqual([candle]);
+    expect(scene.souls).toEqual([soul]);
+    expect(scene.morthen).toBe(lord);
+    // A candle catching changes its template, not the roster: read live.
+    candle.templateId = RITE_CANDLE_LIT;
+    entities.delete(2);
+    const same = scan.update({ entities, entityRosterVersion: 1 });
+    expect(same).toBe(scene);
+    expect(same.candles[0].templateId).toBe(RITE_CANDLE_LIT);
+    expect(same.souls).toHaveLength(1);
+    // The roster moved: rescanned.
+    expect(scan.update({ entities, entityRosterVersion: 2 }).souls).toHaveLength(0);
+  });
+});
+
+describe('the Rite Ring alert over real fights', () => {
+  function sceneWorld(f: Fight): CryptSceneWorld {
+    return {
+      entities: f.sim.ctx.entities as unknown as CryptSceneWorld['entities'],
+      entityRosterVersion: Number.NaN,
+    };
+  }
+
+  const viewFor = (f: Fight, p: Entity, targetId: number | null = null) =>
+    buildCryptAlertView({
+      selfId: p.id,
+      selfPos: p.pos,
+      auras: p.auras,
+      targetId,
+      entity: (id) => f.sim.ctx.entities.get(id),
+      // A fresh scan each read (no roster version to key on in the bare Sim).
+      scene: new CryptAlertSceneScan().update(sceneWorld(f)),
+    });
+
+  const useViewFor = (f: Fight, p: Entity) =>
+    buildKitUsePromptView({
+      self: p,
+      bodies: new KitUseSceneScan().update({
+        entities: f.sim.ctx.entities as unknown as KitUseSceneWorld['entities'],
+        entityRosterVersion: Number.NaN,
+      }),
+      entity: (id) => f.sim.ctx.entities.get(id),
+      interactKey: 'F',
+      touch: false,
+    });
+
+  function morthenFight(difficulty: 'normal' | 'heroic' = 'normal') {
+    const f = cryptFight(difficulty, 3, new Set([MORTHEN_ID]));
+    cryptDevTrigger(f.sim.ctx, f.inst, 'skip');
+    const m = boss(f, MORTHEN_ID);
+    put(f, m, MORTHEN_SPOT.x, MORTHEN_SPOT.z);
+    put(f, f.tank, MORTHEN_SPOT.x, MORTHEN_SPOT.z - 4);
+    const spots = [
+      [-24, 205],
+      [24, 205],
+      [0, 181],
+    ];
+    for (const [i, p] of f.others.entries()) put(f, p, spots[i][0], spots[i][1]);
+    m.maxHp = 1e6;
+    m.hp = m.maxHp;
+    f.sim.ctx.aggroMob(m, f.tank, false);
+    f.sim.drainEvents();
+    return { f, m };
+  }
+
+  function holdAll(f: Fight): () => void {
+    const hold = [f.tank, ...f.others].map((p) => [p, p.pos.x - f.ox, p.pos.z - f.oz] as const);
+    return () => {
+      for (const [p, x, z] of hold) put(f, p, x, z);
+    };
+  }
+
+  it('the Rite: everyone reads the candle count, a lighter is offered the relight copy', () => {
+    const { f, m } = morthenFight();
+    m.hp = Math.floor(m.maxHp * 0.64);
+    run(f, 1.1);
+    const v = live(viewFor(f, f.others[2]));
+    expect(v.kind).toBe('rite');
+    expect(v.line).toBe(t('hudChrome.cryptAlert.riteLine', { lit: '0', total: '4' }));
+    // The Grave Chill the player wears states the bite they take.
+    const d = cryptAuraEffectDescriptor({
+      id: MORTHEN_GRAVE_CHILL,
+      kind: 'slow',
+      value: 1,
+      value2: aura(f.others[2], MORTHEN_GRAVE_CHILL)?.value2,
+    });
+    expect(d?.nums?.bite).toBe(MT.chillBase);
+    cryptDevTrigger(f.sim.ctx, f.inst, 'candle');
+    run(f, DT);
+    expect(live(viewFor(f, f.others[2])).line).toBe(
+      t('hudChrome.cryptAlert.riteLine', { lit: '1', total: '4' }),
+    );
+    // The ward's tooltip counts the same candle.
+    const ward = cryptAuraEffectDescriptor({
+      id: MORTHEN_UNQUIET_WARD,
+      kind: 'buff_dr',
+      value: 0,
+      value2: aura(m, MORTHEN_UNQUIET_WARD)?.value2,
+    });
+    expect(ward?.nums?.lit).toBe(1);
+    // At a dark candle's foot the use prompt offers the relight, in its own words.
+    const lighter = f.others[0];
+    const spot = candleBodySpot(1);
+    const c = RITE_CANDLE_SPOTS[1];
+    const dl = Math.hypot(spot.x - c.x, spot.z - c.z);
+    const stand = {
+      x: spot.x + ((spot.x - c.x) / dl) * 1.5,
+      z: spot.z + ((spot.z - c.z) / dl) * 1.5,
+    };
+    put(f, lighter, stand.x, stand.z);
+    const offer = useViewFor(f, lighter);
+    if (!offer.visible || offer.kind !== 'use') throw new Error('no relight offer');
+    expect(offer.line).toBe(t('hudChrome.kitUse.relightLine'));
+    expect(f.sim.ctx.entities.get(offer.bodyId)?.templateId).toBe(MORTHEN_CANDLE_ID);
+    const name = t('entities.mobs.crypt_remembrance_candle.name');
+    expect(offer.hint).toBe(t('hudChrome.kitUse.relightKey', { name }));
+    expect(offer.buttonAria).toBe(t('hudChrome.kitUse.relightAria', { name }));
+    // The relight running: its bar and what does (and does not) break it.
+    lighter.targetId = offer.bodyId;
+    f.sim.interact(lighter.id);
+    expect(lighter.castingAbility).toBe(MORTHEN_RELIGHT_CAST);
+    const from = f.hits.length;
+    run(f, 1.1, () => put(f, lighter, stand.x, stand.z));
+    const using = useViewFor(f, lighter);
+    if (!using.visible) throw new Error('no relight bar');
+    expect(using.kind).toBe('using');
+    expect(using.line).toBe(t('hudChrome.kitUse.relightUsingLine'));
+    expect(using.title).toBe(t('abilityUi.cast.kituse_crypt_relight_candle'));
+    // The drain the copy names is the lighter's own share, every second.
+    const bite = Math.round(lighter.maxHp * MT.relightDrainPct);
+    const drains = f.hits
+      .slice(from)
+      .filter((h) => h.targetId === lighter.id && h.ability === "Candle's Price");
+    expect(drains.length).toBeGreaterThanOrEqual(1);
+    for (const h of drains) expect(h.amount).toBe(bite);
+  });
+
+  it('heroic: the Rite names the Ledger, and Grave Chill bites for the heroic number', () => {
+    const { f, m } = morthenFight('heroic');
+    const keep = holdAll(f);
+    m.hp = Math.floor(m.maxHp * 0.64);
+    run(f, DT, keep);
+    const from = f.hits.length;
+    run(f, 1.05, keep);
+    const p = f.others[2];
+    expect(live(viewFor(f, p)).kind).toBe('rite-named');
+    const d = cryptAuraEffectDescriptor({
+      id: MORTHEN_GRAVE_CHILL,
+      kind: 'slow',
+      value: 1,
+      value2: aura(p, MORTHEN_GRAVE_CHILL)?.value2,
+    });
+    const ticks = f.hits
+      .slice(from)
+      .filter((h) => h.targetId === p.id && h.ability === 'Grave Chill');
+    expect(ticks.length).toBeGreaterThanOrEqual(1);
+    for (const h of ticks) expect(h.amount).toBe(d?.nums?.biteHeroic);
+  });
+
+  it('the Reap: the player in its arc is warned and hit; the tank and the one behind are not warned', () => {
+    const { f, m } = morthenFight();
+    const front = f.others[0];
+    const behind = f.others[1];
+    const hold = () => {
+      put(f, f.tank, MORTHEN_SPOT.x, MORTHEN_SPOT.z - 4);
+      put(f, front, MORTHEN_SPOT.x + 2, MORTHEN_SPOT.z - 9);
+      put(f, behind, MORTHEN_SPOT.x, MORTHEN_SPOT.z + 6);
+      put(f, f.others[2], -24, 205);
+    };
+    hold();
+    run(f, DT, hold);
+    expect(cryptDevTrigger(f.sim.ctx, f.inst, 'reap')).toMatch(/begins/);
+    expect(m.castingAbility).toBe(MORTHEN_REAP);
+    run(f, 0.5, hold);
+    const v = live(viewFor(f, front));
+    expect(v.kind).toBe('reap');
+    expect(v.progress).toBeGreaterThan(0);
+    expect(viewFor(f, f.tank).visible).toBe(false);
+    expect(viewFor(f, behind).visible).toBe(false);
+    const from = f.hits.length;
+    run(f, MT.reapCast, hold);
+    const hit = took(f, front, 'Reap the Unquiet', from);
+    expect(hit).toBeGreaterThanOrEqual(MT.reapMin);
+    expect(hit).toBeLessThanOrEqual(MT.reapMax);
+    expect(took(f, behind, 'Reap the Unquiet', from)).toBe(0);
+  });
+
+  it('heroic Grasp: the marked player is told to step out; out of it, the hands miss', () => {
+    const { f } = morthenFight('heroic');
+    const keep = holdAll(f);
+    run(f, DT, keep);
+    expect(cryptDevTrigger(f.sim.ctx, f.inst, 'grasp')).toMatch(/Grasp/);
+    const marked = f.others.filter((p) => aura(p, MORTHEN_GRASP_MARK));
+    expect(marked).toHaveLength(2);
+    const [stays, leaves] = marked;
+    const v = live(viewFor(f, stays));
+    expect(v.kind).toBe('grasp');
+    expect(v.progress).toBeGreaterThan(0.9);
+    // Ten yards on, out of the ring: the call is gone though the mark runs on.
+    const out = { x: leaves.pos.x - f.ox + 10, z: leaves.pos.z - f.oz };
+    const hold = () => {
+      keep();
+      put(f, leaves, out.x, out.z);
+    };
+    hold();
+    expect(aura(leaves, MORTHEN_GRASP_MARK)).toBeDefined();
+    expect(viewFor(f, leaves).visible).toBe(false);
+    const from = f.hits.length;
+    run(f, MT.graspFuse + 0.1, hold);
+    const d = cryptAuraEffectDescriptor({ id: MORTHEN_GRASP_MARK, kind: 'slow', value: 1 });
+    const hit = took(f, stays, 'Grasp of the Grave', from);
+    expect(hit).toBeGreaterThanOrEqual(d?.nums?.min ?? Number.NaN);
+    expect(hit).toBeLessThanOrEqual(d?.nums?.max ?? Number.NaN);
+    expect(aura(stays, MORTHEN_GRASP_ROOT)).toBeDefined();
+    expect(took(f, leaves, 'Grasp of the Grave', from)).toBe(0);
+    // Once the hands hold, the ring's call is over.
+    expect(viewFor(f, stays).visible).toBe(false);
+  });
+
+  it('a Bound Soul on its way is called out', () => {
+    const { f } = morthenFight();
+    const keep = holdAll(f);
+    run(f, DT, keep);
+    cryptDevTrigger(f.sim.ctx, f.inst, 'gravecall');
+    run(f, DT, keep);
+    expect(live(viewFor(f, f.others[0])).kind).toBe('soul');
+  });
+
+  it('heroic Burning Knell: the half it marks is warned and burns; the other half is quiet', () => {
+    const f = cryptFight('heroic', 3, new Set([MORTHEN_ID]));
+    cryptDevTrigger(f.sim.ctx, f.inst, 'skip');
+    const m = boss(f, MORTHEN_ID);
+    for (const p of [f.tank, ...f.others]) put(f, p, 0, 196);
+    run(f, DT);
+    f.sim.ctx.handleDeath(m, f.tank);
+    run(
+      f,
+      KNELLWYRM_TUNING.pyreSeconds +
+        KNELLWYRM_TUNING.arriveSeconds +
+        KNELLWYRM_TUNING.settleSeconds +
+        0.5,
+    );
+    const w = boss(f, KNELLWYRM_ID);
+    w.maxHp = 1e7;
+    w.hp = w.maxHp;
+    f.sim.ctx.aggroMob(w, f.tank, false);
+    run(f, DT);
+    expect(w.mechanicDamageMult).toBe(cryptHeroicFactor(KNELLWYRM_ID));
+    expect(cryptDevTrigger(f.sim.ctx, f.inst, 'knell')).toMatch(/takes wing/);
+    run(f, KNELL_TUNING.riseSeconds + DT);
+    expect(w.castingAbility).toBe(KNELLWYRM_KNELL_MARK);
+    const k = w.knellwyrmFight?.knell;
+    if (!k) throw new Error('no knell');
+    const yaw = knellHalfYaw(k.half);
+    const inside = f.others[0];
+    const safe = f.others[1];
+    const hot = { x: RITE_RING.x + Math.sin(yaw) * 14, z: RITE_RING.z + Math.cos(yaw) * 14 };
+    const hold = () => {
+      put(f, inside, hot.x, hot.z);
+      put(f, safe, RITE_RING.x - Math.sin(yaw) * 14, RITE_RING.z - Math.cos(yaw) * 14);
+      put(f, f.tank, RITE_RING.x - Math.sin(yaw) * 10, RITE_RING.z - Math.cos(yaw) * 10);
+      put(f, f.others[2], RITE_RING.x - Math.sin(yaw) * 6, RITE_RING.z - Math.cos(yaw) * 6);
+    };
+    hold();
+    expect(inKnellHalf(k.half, hot.x, hot.z)).toBe(true);
+    const v = live(viewFor(f, inside));
+    expect(v.kind).toBe('knell');
+    expect(v.progress).toBeGreaterThan(0.9);
+    expect(viewFor(f, safe).visible).toBe(false);
+    expect(viewFor(f, f.tank).visible).toBe(false);
+    // The wyrm's airborne aura states the fire it pours, at its heroic factor.
+    const d = cryptAuraEffectDescriptor({ id: KNELLWYRM_AIRBORNE, kind: 'buff_dr', value: 0 });
+    const from = f.hits.length;
+    run(f, KNELL_TUNING.markSeconds + 0.1, hold);
+    const burn = took(f, inside, 'Burning Knell', from);
+    expect(burn).toBeGreaterThanOrEqual(d?.nums?.min ?? Number.NaN);
+    expect(burn).toBeLessThanOrEqual(d?.nums?.max ?? Number.NaN);
+    expect(took(f, safe, 'Burning Knell', from)).toBe(0);
+    // The half burns now: no warning left to give.
+    expect(viewFor(f, inside).visible).toBe(false);
   });
 });

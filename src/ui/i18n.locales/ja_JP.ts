@@ -20309,4 +20309,62 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '受けるダメージが{pct}%減少：生きている聖歌隊員1人ごとに{per}%。聖歌隊員を先に倒すこと。',
   'hudChrome.auraEffect.crypt.crescendo':
     '歌が速くなる：虚ろの挽歌は{castNormal}秒ではなく{cast}秒になり、{everyNormal}秒ではなく{every}秒ごとに来る。骨のオルガンは{wavesNormal}波ではなく{waves}波の音符を奏でる。',
+  // Morthen the Gravecaller's Rite and the Knellwyrm's heroic Burning Knell
+  // (M16 non-Latin fills for their new strings).
+  'abilityUi.cast.crypt_morthen_shadow_pulse': 'シャドウパルス',
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': '安らがぬ者の儀式',
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': '安らがぬ者の刈り取り',
+  'abilityUi.cast.kituse_crypt_relight_candle': 'ろうそくを灯し直す',
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': '燃える弔鐘',
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': '燃える弔鐘',
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': '燃える弔鐘',
+  'abilityUi.cast.crypt_knellwyrm_knell_land': '燃える弔鐘',
+  'entities.mobs.crypt_remembrance_candle.name': '追憶のろうそく',
+  'hudChrome.auraEffect.crypt.gorged':
+    '与えるダメージが{pct}%上昇：彼のもとに届いた縛られし魂1つごとに{per}%、現在{stacks}/{max}スタック、戦闘終了まで持続。魂が届くたびに最大体力の{heal}%も回復する。魂の進路に立てば代わりに受け止められる。',
+  'hudChrome.auraEffect.crypt.unquietWard':
+    '祭壇で安らがぬ者の儀式を詠唱している間、ダメージを受けない：追憶のろうそく{total}本のうち{lit}本が再点火済み。1本を灯し直すには{channel}秒の詠唱が必要で、その間、灯す者の最大体力の{drain}%（ヒロイックでは{drainHeroic}%）が毎秒吸い取られる。攻撃を受けても中断されないが、動くかスタンで中断される。最後のろうそくで結界が砕ける。ヒロイックでは台帳が告げる順に灯すこと：違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に{wrongMin}～{wrongMax}の闇ダメージ。',
+  'hudChrome.auraEffect.crypt.riteBroken': 'スタン：砕けた結界のせいで{seconds}秒間行動できない。',
+  'hudChrome.auraEffect.crypt.shatteredWard':
+    '{seconds}秒間、受けるダメージが{pct}%上昇：灯し直したろうそくが結界を砕いた。今こそ最大の攻撃を叩き込め。',
+  'hudChrome.auraEffect.crypt.graveChill':
+    '安らがぬ者の儀式が続く間、毎秒{bite}の闇ダメージ（ヒロイックでは{biteHeroic}）を受け、{every}秒ごとに{step}（ヒロイックでは{stepHeroic}）ずつ増える。追憶のろうそくを灯し直して終わらせること。',
+  'hudChrome.auraEffect.crypt.graspMark':
+    '{fuse}秒後、足元の輪から手が噴き出す：輪が置かれた場所から{radius}ヤード以内の全員が{root}秒間その場に縛られ、{min}～{max}の闇ダメージを受ける。輪から出ること。',
+  'hudChrome.auraEffect.crypt.graspRoot': '墓の手に掴まれている：{seconds}秒間移動できない。',
+  'hudChrome.auraEffect.crypt.knellAirborne':
+    '儀式の環の上空を飛んでおり、攻撃が届かない。環の半分に{mark}秒間印を付け、その半分に亡霊の炎を浴びせる：中にいる全員に{min}～{max}の火炎ダメージ。1回の飛行で{breaths}回半分を焼き、その後着地する。',
+  'hudChrome.finder.mech.crypt_morthen_shadow_pulse':
+    'シャドウパルス（12秒ごとに2秒の詠唱の後、ノーマルでは周囲12ヤード以内の全員に24～30の闇ダメージ。離れること。終の儀式中は9秒ごと）',
+  'hudChrome.finder.mech.crypt_gravecall':
+    '墓呼び（15秒ごとに縛られし魂が次の石棺の壁龕から彼のもとへ漂う。届くと死者の飽食となり、魂1つごとに与えるダメージが10%上昇（最大10スタック）、体力の3%を回復する。進路に立つプレイヤーが代わりに受け止める：ノーマルでは12～16の闇ダメージ）',
+  'hudChrome.finder.mech.crypt_rite_of_the_unquiet':
+    '安らがぬ者の儀式（体力65%で祭壇に戻り、安らがぬ者の結界の中でダメージを受けなくなる。その間、墓の冷気が全員に毎秒3の闇ダメージを与えて5秒ごとに1ずつ増え、壁龕から安らがぬ骨が2体這い出る。追憶のろうそく4本を灯し直すこと：1本ごとに4秒の詠唱で、灯す者の最大体力の6%を毎秒吸い取る。攻撃では中断されないが、動くかスタンで中断される。最後のろうそくで儀式が破れ、8秒間スタンし、受けるダメージが25%上昇する）',
+  'hudChrome.finder.mech.crypt_reap_the_unquiet':
+    '安らがぬ者の刈り取り（体力35%未満で魂は止まり、14秒ごとに2秒の詠唱の後、大鎌を振るう：ノーマルでは前方14ヤード、120度の扇形にいる全員に55～65の闇ダメージ。以後シャドウパルスは9秒ごと）',
+  'hudChrome.finder.mech.crypt_morthen_heroic':
+    'ヒロイック：死者の名を呼べ（台帳がろうそくの順番を告げる。違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に252～288の闇ダメージ。再点火は毎秒8%を吸い取る）、墓の掌握（16秒ごとにプレイヤー2人の足元に4ヤードの輪が現れ、1.5秒後に手が噴き出す：3秒の移動不能と162～198の闇ダメージ）、弔鐘竜の燃える弔鐘（飛び立って環の半分に4.5秒間印を付け、その半分に亡霊の炎を浴びせて1,000～1,120の火炎ダメージ。1回の飛行で3回）',
+  'hudChrome.cryptAlert.knellTitle': '燃える弔鐘！',
+  'hudChrome.cryptAlert.knellLine':
+    'バーが尽きると環のこちら側の半分に亡霊の炎が降り注ぐ：反対側の半分へ移動しろ',
+  'hudChrome.cryptAlert.graspTitle': '墓の掌握！',
+  'hudChrome.cryptAlert.graspLine': 'この輪から手が噴き出し、中にいる者を掴む：輪から出ろ',
+  'hudChrome.cryptAlert.reapTitle': '安らがぬ者の刈り取り！',
+  'hudChrome.cryptAlert.reapLine': '大鎌が彼の前方の地面を薙ぎ払う：背後に回れ',
+  'hudChrome.cryptAlert.riteTitle': '安らがぬ者の儀式',
+  'hudChrome.cryptAlert.riteLine': '追憶のろうそくを灯し直して結界を砕け：{total}本中{lit}本点灯',
+  'hudChrome.cryptAlert.riteNamedLine':
+    '台帳が次に告げるろうそくだけを灯し直せ：{total}本中{lit}本点灯',
+  'hudChrome.cryptAlert.soulTitle': '縛られし魂',
+  'hudChrome.cryptAlert.soulLine':
+    '魂がモーセンのもとへ漂っている：進路に立ち、彼を肥えさせる前に受け止めろ',
+  'hudChrome.kitUse.relightLine':
+    '詠唱中は毎秒体力を吸い取られる：攻撃では中断されないが、動くかスタンで中断される',
+  'hudChrome.kitUse.relightKey': '{name}を灯し直す',
+  'hudChrome.kitUse.relightTap': 'ここをタップして{name}を灯し直す',
+  'hudChrome.kitUse.relightClick': 'ここをクリックして{name}を灯し直す',
+  'hudChrome.kitUse.relightFar': '{range}ヤード以内に近づいて灯し直せ',
+  'hudChrome.kitUse.relightAria': '{name}を灯し直す',
+  'hudChrome.kitUse.relightUsingLine':
+    '吸い取られる間も動くな：攻撃では中断されないが、動くかスタンで中断される',
 };

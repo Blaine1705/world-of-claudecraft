@@ -19301,4 +19301,57 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '受到的伤害降低{pct}%：她每有一名存活的唱诗者就降低{per}%。先杀死唱诗者。',
   'hudChrome.auraEffect.crypt.crescendo':
     '唱得更快：空洞挽歌只需{cast}秒（原为{castNormal}秒），每{every}秒一次（原为{everyNormal}秒），骨管风琴会奏出{waves}波音符（原为{wavesNormal}波）。',
+  // Morthen the Gravecaller's Rite and the Knellwyrm's heroic Burning Knell
+  // (M16 non-Latin fills for their new strings).
+  'abilityUi.cast.crypt_morthen_shadow_pulse': '暗影脉冲',
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': '不宁者仪式',
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': '收割不宁者',
+  'abilityUi.cast.kituse_crypt_relight_candle': '重燃蜡烛',
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': '燃烧丧钟',
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': '燃烧丧钟',
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': '燃烧丧钟',
+  'abilityUi.cast.crypt_knellwyrm_knell_land': '燃烧丧钟',
+  'entities.mobs.crypt_remembrance_candle.name': '追思蜡烛',
+  'hudChrome.auraEffect.crypt.gorged':
+    '造成的伤害提高{pct}%：每个抵达他身边的缚魂提高{per}%，当前{stacks}/{max}层，持续到战斗结束。每个抵达的灵魂还会为他恢复{heal}%的最大生命值。站到灵魂的路径上，就能由你代为承受。',
+  'hudChrome.auraEffect.crypt.unquietWard':
+    '他在祭坛引导不宁者仪式时免疫伤害：已重燃{lit}/{total}根追思蜡烛。重燃一根需要引导{channel}秒，期间每秒吸取点燃者{drain}%的最大生命值（英雄难度{drainHeroic}%）；受到攻击不会打断，移动或昏迷会打断。最后一根蜡烛会击碎结界。英雄难度下，须按名册点出的顺序点燃：点错蜡烛会熄灭最后点燃的那根，并对点燃者造成{wrongMin}到{wrongMax}点暗影伤害。',
+  'hudChrome.auraEffect.crypt.riteBroken': '昏迷：破碎的结界让他{seconds}秒内无法行动。',
+  'hudChrome.auraEffect.crypt.shatteredWard':
+    '{seconds}秒内受到的伤害提高{pct}%：重燃的蜡烛击碎了他的结界。现在就打出最强的攻击。',
+  'hudChrome.auraEffect.crypt.graveChill':
+    '不宁者仪式持续期间，每秒受到{bite}点暗影伤害（英雄难度{biteHeroic}点），每{every}秒提高{step}点（英雄难度{stepHeroic}点）。重燃追思蜡烛来终结它。',
+  'hudChrome.auraEffect.crypt.graspMark':
+    '{fuse}秒后，你脚下的法环中会伸出鬼手：法环落下处{radius}码内的所有人被定身{root}秒，并受到{min}到{max}点暗影伤害。离开法环。',
+  'hudChrome.auraEffect.crypt.graspRoot': '被坟墓之手抓住：{seconds}秒内无法移动。',
+  'hudChrome.auraEffect.crypt.knellAirborne':
+    '在仪式之环上空飞行，无法触及。它会标记半个法环{mark}秒，然后向那一半倾泻幽魂之火：对其中所有人造成{min}到{max}点火焰伤害。每次飞行焚烧{breaths}个半区，然后降落。',
+  'hudChrome.finder.mech.crypt_morthen_shadow_pulse':
+    '暗影脉冲（每12秒施法2秒，然后在普通难度下对他周围12码内所有人造成24到30点暗影伤害，所以要走开；在他的终末仪式中每9秒一次）',
+  'hudChrome.finder.mech.crypt_gravecall':
+    '唤墓（每15秒，一个缚魂从下一个石棺壁龛飘向他；抵达后他获得饱食亡者，每个灵魂使他造成的伤害提高10%，最多10层，并恢复3%的生命值。挡在路径上的玩家会代为承受：普通难度下12到16点暗影伤害）',
+  'hudChrome.finder.mech.crypt_rite_of_the_unquiet':
+    '不宁者仪式（生命值降到65%时，他回到祭坛，在不宁结界中免疫伤害，同时墓穴寒意每秒对所有人造成3点暗影伤害，每5秒提高1点，还有2具不安之骨从壁龛中爬出。重燃4根追思蜡烛：每根需要引导4秒，每秒吸取点燃者6%的最大生命值，受到攻击不会打断，移动或昏迷会打断。最后一根蜡烛会打破仪式：他昏迷8秒，受到的伤害提高25%）',
+  'hudChrome.finder.mech.crypt_reap_the_unquiet':
+    '收割不宁者（生命值低于35%时灵魂停止出现；每14秒施法2秒后挥动镰刀：普通难度下对他前方14码、120度扇形内的所有人造成55到65点暗影伤害。此后暗影脉冲每9秒一次）',
+  'hudChrome.finder.mech.crypt_morthen_heroic':
+    '英雄难度：点名亡者（名册点出蜡烛的顺序：点错蜡烛会熄灭最后点燃的那根，并对点燃者造成252到288点暗影伤害，每次重燃每秒吸取8%），坟墓之握（每16秒2名玩家脚下出现4码法环；1.5秒后鬼手破土而出：定身3秒并造成162到198点暗影伤害），以及丧钟巨龙的燃烧丧钟（它飞上天空，标记半个法环4.5秒，然后向那一半倾泻幽魂之火，造成1,000到1,120点火焰伤害，每次飞行3个半区）',
+  'hudChrome.cryptAlert.knellTitle': '燃烧丧钟！',
+  'hudChrome.cryptAlert.knellLine': '计时条耗尽时，幽魂之火会倾泻到法环的这一半：去另一半',
+  'hudChrome.cryptAlert.graspTitle': '坟墓之握！',
+  'hudChrome.cryptAlert.graspLine': '鬼手会从这个法环中伸出，抓住站在里面的人：离开',
+  'hudChrome.cryptAlert.reapTitle': '收割不宁者！',
+  'hudChrome.cryptAlert.reapLine': '他的镰刀横扫面前的地面：绕到他身后',
+  'hudChrome.cryptAlert.riteTitle': '不宁者仪式',
+  'hudChrome.cryptAlert.riteLine': '重燃追思蜡烛以击碎他的结界：已点燃{lit}/{total}',
+  'hudChrome.cryptAlert.riteNamedLine': '只重燃名册接下来点出的蜡烛：已点燃{lit}/{total}',
+  'hudChrome.cryptAlert.soulTitle': '缚魂',
+  'hudChrome.cryptAlert.soulLine': '一个灵魂正飘向莫森：站到它的路径上，在它喂饱他之前接住它',
+  'hudChrome.kitUse.relightLine': '引导时每秒吸取你的生命值：受到攻击不会打断，移动或昏迷会打断',
+  'hudChrome.kitUse.relightKey': '重燃{name}',
+  'hudChrome.kitUse.relightTap': '点击这里重燃{name}',
+  'hudChrome.kitUse.relightClick': '单击这里重燃{name}',
+  'hudChrome.kitUse.relightFar': '靠近到{range}码内才能重燃它',
+  'hudChrome.kitUse.relightAria': '重燃{name}',
+  'hudChrome.kitUse.relightUsingLine': '在它吸取你时保持不动：受到攻击不会打断，移动或昏迷会打断',
 };

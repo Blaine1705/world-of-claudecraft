@@ -103,6 +103,15 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.crypt_ilvane_dirge': true,
   'abilityUi.cast.crypt_ilvane_unbroken_dirge': true,
   'abilityUi.cast.crypt_ilvane_bone_organ': true,
+  // Morthen the Gravecaller's Rite, the relight bar and the heroic Burning Knell.
+  'abilityUi.cast.crypt_morthen_shadow_pulse': true,
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': true,
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': true,
+  'abilityUi.cast.kituse_crypt_relight_candle': true,
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': true,
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': true,
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': true,
+  'abilityUi.cast.crypt_knellwyrm_knell_land': true,
   // The Sunken Bastion trash kit and boss casts.
   'abilityUi.cast.bastion_brine_mend': true,
   'abilityUi.cast.bastion_fog_ward': true,

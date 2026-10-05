@@ -936,6 +936,35 @@ since the spider placeholder and pinned by `tests/hollow_crypt_alert.test.ts`).
 | Rimeweb Fang | RENAMED before the rework shipped (theme) | The committed icon is a pale curved ice blade, not a fang. Now Bride's Icicle (`rimeweb_fang`, and its generated heroic twin, which reads the base name). No match on either wiki. |
 | Rimesilk | kept | A bride's silk: Rimesilk Mantle and Rimesilk Hood keep their names. |
 
+### Morthen's Rite and the Knellwyrm's Burning Knell (PENDING a manual web check, 2026-10-05)
+
+The new player-visible names of Morthen the Gravecaller's three-act rite
+(`src/sim/encounters/hollow_crypt/morthen_ids.ts` and its siblings), the Knellwyrm's heroic
+flight (`knellwyrm_knell.ts`) and the rite's deed (`dgn_morthen_candlelight` in
+`src/sim/content/deeds.ts`). The web search was not available in the authoring session, so
+NONE of these has had the exact-phrase and coined-token searches yet: every row below is
+recorded as pending, to be checked against the major game wikis (warcraft.wiki.gg full text,
+the Guild Wars wiki, the FFXIV wiki) before the change ships. A collision found then is fixed
+display-only (the ids stay frozen) and pinned in `tests/originality_renames.test.ts`.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Gravecall | the Bound Soul launch (finder copy) | PENDING a manual web check. Builds on this game's own "Gravecall" token (Gravecall Acolyte, Morthen the Gravecaller). |
+| Gorged on the Dead | Morthen's stacking damage buff from the souls | PENDING a manual web check. |
+| Rite of the Unquiet | his act-two channel at the altar | PENDING a manual web check. |
+| Unquiet Ward | his immunity through the Rite | PENDING a manual web check. |
+| Reap the Unquiet | his Last Rites frontal sweep | PENDING a manual web check. |
+| Name the Dead | the heroic candle order (the Ledger) | PENDING a manual web check. |
+| Grasp of the Grave | the heroic rings and their hands | PENDING a manual web check. |
+| Burning Knell | the Knellwyrm's heroic flight | PENDING a manual web check. |
+| By Candlelight | the rite's deed | PENDING a manual web check (a common English phrase; a song and book title in the wider world, so check it against game achievement lists). |
+| Bound Soul | the soul itself | PENDING a manual web check. Reuses this game's own mob name (`bound_soul`), likely GENERIC. |
+| Grave Chill | the Rite's rising shadow damage | PENDING a manual web check; likely GENERIC vocabulary. |
+| Remembrance Candle | the four candles and their usable bodies | PENDING a manual web check; likely GENERIC vocabulary (a real-world memorial candle). |
+| Candle's Price | the relight's health drain (a damage name) | PENDING a manual web check; likely GENERIC vocabulary. |
+| Rite Broken, Shattered Ward | the stun and the vulnerability when the fourth candle catches | PENDING a manual web check; likely GENERIC vocabulary. |
+| Shadow Pulse, Relight the Candle, the Ledger | the pulse (already shipped on him as GENERIC), the relight bar, the book that names the order | GENERIC. Plain English. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

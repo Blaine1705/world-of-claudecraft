@@ -20301,4 +20301,65 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '받는 피해가 {pct}% 감소합니다: 살아 있는 성가대원 한 명마다 {per}%. 성가대원을 먼저 처치하세요.',
   'hudChrome.auraEffect.crypt.crescendo':
     '더 빠르게 노래합니다: 공허의 만가가 {castNormal}초 대신 {cast}초 걸리고 {everyNormal}초 대신 {every}초마다 오며, 뼈 오르간이 {wavesNormal}파도 대신 {waves}파도의 음표를 연주합니다.',
+  // Morthen the Gravecaller's Rite and the Knellwyrm's heroic Burning Knell
+  // (M16 non-Latin fills for their new strings).
+  'abilityUi.cast.crypt_morthen_shadow_pulse': '어둠의 파동',
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': '불안한 자들의 의식',
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': '불안한 자들의 수확',
+  'abilityUi.cast.kituse_crypt_relight_candle': '촛불 다시 밝히기',
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': '불타는 조종',
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': '불타는 조종',
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': '불타는 조종',
+  'abilityUi.cast.crypt_knellwyrm_knell_land': '불타는 조종',
+  'entities.mobs.crypt_remembrance_candle.name': '추모의 양초',
+  'hudChrome.auraEffect.crypt.gorged':
+    '주는 피해 {pct}% 증가: 그에게 도달한 속박된 영혼 하나마다 {per}%, 현재 {stacks}/{max}중첩이며 전투가 끝날 때까지 지속됩니다. 영혼이 도달할 때마다 최대 생명력의 {heal}%도 회복합니다. 영혼의 경로에 들어서면 대신 받아낼 수 있습니다.',
+  'hudChrome.auraEffect.crypt.unquietWard':
+    '제단에서 불안한 자들의 의식을 시전하는 동안 피해 면역: 추모의 양초 {total}개 중 {lit}개를 다시 밝혔습니다. 하나를 다시 밝히려면 {channel}초 동안 정신 집중해야 하며, 그동안 밝히는 사람의 최대 생명력 {drain}%(영웅 난이도 {drainHeroic}%)를 매초 빨아들입니다. 공격을 받아도 끊기지 않지만 움직이거나 기절하면 끊깁니다. 마지막 양초가 결계를 부숩니다. 영웅 난이도에서는 명부가 부르는 순서대로 밝히세요: 다른 양초를 밝히면 마지막으로 밝힌 양초가 꺼지고 밝힌 사람에게 {wrongMin}~{wrongMax} 암흑 피해를 줍니다.',
+  'hudChrome.auraEffect.crypt.riteBroken':
+    '기절: 부서진 결계 때문에 {seconds}초 동안 행동할 수 없습니다.',
+  'hudChrome.auraEffect.crypt.shatteredWard':
+    '{seconds}초 동안 받는 피해 {pct}% 증가: 다시 밝힌 양초들이 그의 결계를 부쉈습니다. 지금 가장 강한 공격을 퍼부으세요.',
+  'hudChrome.auraEffect.crypt.graveChill':
+    '불안한 자들의 의식이 이어지는 동안 매초 {bite} 암흑 피해(영웅 난이도 {biteHeroic})를 받으며, {every}초마다 {step}(영웅 난이도 {stepHeroic})씩 늘어납니다. 추모의 양초를 다시 밝혀 끝내세요.',
+  'hudChrome.auraEffect.crypt.graspMark':
+    '{fuse}초 후 발밑의 고리에서 손이 솟아오릅니다: 고리가 놓인 곳에서 {radius}야드 안의 모두가 {root}초 동안 묶이고 {min}~{max} 암흑 피해를 받습니다. 고리에서 나오세요.',
+  'hudChrome.auraEffect.crypt.graspRoot':
+    '무덤의 손에 붙잡힘: {seconds}초 동안 움직일 수 없습니다.',
+  'hudChrome.auraEffect.crypt.knellAirborne':
+    '의식의 고리 위를 날고 있어 공격이 닿지 않습니다. 고리의 절반에 {mark}초 동안 표식을 남긴 뒤 그 절반에 유령불을 쏟아붓습니다: 그 안의 모두에게 {min}~{max} 화염 피해. 한 번 날 때마다 절반을 {breaths}번 태운 뒤 내려앉습니다.',
+  'hudChrome.finder.mech.crypt_morthen_shadow_pulse':
+    '어둠의 파동(12초마다 2초 시전 후, 일반 난이도 기준 그에게서 12야드 안의 모두에게 24~30 암흑 피해: 떨어지세요. 최후의 의식 중에는 9초마다)',
+  'hudChrome.finder.mech.crypt_gravecall':
+    '무덤부름(15초마다 속박된 영혼이 다음 석관 벽감에서 그에게로 떠갑니다. 도달하면 망자 포식 상태가 되어 영혼 하나마다 주는 피해가 10% 증가하고(최대 10중첩) 생명력의 3%를 회복합니다. 경로에 선 플레이어가 대신 받아냅니다: 일반 난이도 기준 12~16 암흑 피해)',
+  'hudChrome.finder.mech.crypt_rite_of_the_unquiet':
+    '불안한 자들의 의식(생명력 65%에서 제단으로 돌아가 불안한 자들의 결계 안에서 피해 면역이 됩니다. 그동안 무덤의 냉기가 모두에게 매초 3 암흑 피해를 주고 5초마다 1씩 늘어나며, 벽감에서 불안한 뼈무더기 2개가 기어 나옵니다. 추모의 양초 4개를 다시 밝히세요: 하나마다 4초 정신 집중이며 밝히는 사람의 최대 생명력 6%를 매초 빨아들입니다. 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다. 마지막 양초가 의식을 깨뜨립니다: 8초 동안 기절하고 받는 피해가 25% 증가합니다)',
+  'hudChrome.finder.mech.crypt_reap_the_unquiet':
+    '불안한 자들의 수확(생명력 35% 미만에서 영혼이 멈추고, 14초마다 2초 시전 후 낫을 휘두릅니다: 일반 난이도 기준 앞쪽 14야드, 120도 부채꼴 안의 모두에게 55~65 암흑 피해. 이후 어둠의 파동은 9초마다 옵니다)',
+  'hudChrome.finder.mech.crypt_morthen_heroic':
+    '영웅 난이도: 망자의 이름(명부가 양초의 순서를 부릅니다. 다른 양초를 밝히면 마지막으로 밝힌 양초가 꺼지고 밝힌 사람에게 252~288 암흑 피해를 주며, 다시 밝히기는 매초 8%를 빨아들입니다), 무덤의 손아귀(16초마다 플레이어 2명 발밑에 4야드 고리가 생기고 1.5초 후 손이 솟아오릅니다: 3초 이동 불가와 162~198 암흑 피해), 조종룡의 불타는 조종(날아올라 고리의 절반에 4.5초 동안 표식을 남긴 뒤 그 절반에 유령불을 쏟아 1,000~1,120 화염 피해, 한 번 날 때마다 3번)',
+  'hudChrome.cryptAlert.knellTitle': '불타는 조종!',
+  'hudChrome.cryptAlert.knellLine':
+    '바가 다 줄어들면 고리의 이쪽 절반에 유령불이 쏟아집니다: 반대쪽 절반으로 가세요',
+  'hudChrome.cryptAlert.graspTitle': '무덤의 손아귀!',
+  'hudChrome.cryptAlert.graspLine': '이 고리에서 손이 솟아올라 안에 선 사람을 붙잡습니다: 나오세요',
+  'hudChrome.cryptAlert.reapTitle': '불안한 자들의 수확!',
+  'hudChrome.cryptAlert.reapLine': '그의 낫이 앞쪽 땅을 휩씁니다: 그의 뒤로 가세요',
+  'hudChrome.cryptAlert.riteTitle': '불안한 자들의 의식',
+  'hudChrome.cryptAlert.riteLine':
+    '추모의 양초를 다시 밝혀 결계를 부수세요: {total}개 중 {lit}개 점화',
+  'hudChrome.cryptAlert.riteNamedLine':
+    '명부가 다음에 부르는 양초만 다시 밝히세요: {total}개 중 {lit}개 점화',
+  'hudChrome.cryptAlert.soulTitle': '속박된 영혼',
+  'hudChrome.cryptAlert.soulLine':
+    '영혼이 모르덴에게 떠가고 있습니다: 경로에 들어서서 그가 배를 채우기 전에 받아내세요',
+  'hudChrome.kitUse.relightLine':
+    '정신 집중하는 동안 매초 생명력을 빨아들입니다: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다',
+  'hudChrome.kitUse.relightKey': '{name} 다시 밝히기',
+  'hudChrome.kitUse.relightTap': '여기를 탭해 {name}을(를) 다시 밝히세요',
+  'hudChrome.kitUse.relightClick': '여기를 클릭해 {name}을(를) 다시 밝히세요',
+  'hudChrome.kitUse.relightFar': '{range}야드 안으로 다가가 다시 밝히세요',
+  'hudChrome.kitUse.relightAria': '{name} 다시 밝히기',
+  'hudChrome.kitUse.relightUsingLine':
+    '빨아들이는 동안 가만히 있으세요: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다',
 };

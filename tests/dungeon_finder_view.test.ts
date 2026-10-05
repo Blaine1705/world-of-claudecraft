@@ -126,7 +126,12 @@ describe('dungeon finder view core', () => {
     const boss = view.detail?.encounters.find((e) => e.final);
     expect(boss?.mobId).toBe('morthen');
     expect(boss?.portraitUrl).toBe('/ui/dungeons/morthen.webp');
-    expect(boss?.mechanics).toEqual(['shadow_pulse']);
+    expect(boss?.mechanics).toEqual([
+      'crypt_morthen_shadow_pulse',
+      'crypt_gravecall',
+      'crypt_rite_of_the_unquiet',
+      'crypt_reap_the_unquiet',
+    ]);
     expect(boss?.groups.length).toBeGreaterThan(0);
     // morthen_guaranteed_uncommon partitions a full draw; morthen_bonus sums
     // below 1 and must NOT claim a guaranteed drop.

@@ -16821,7 +16821,7 @@
     min-width: min(420px, calc(100vw - 32px));
   }
 
-  /* ---------- The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the Open Grave) ---------- */
+  /* ---------- The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the Open Grave, Morthen's Rite Ring) ---------- */
   /* Self-mounted by the shared encounter alert painter
      (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/crypt_alert_view.ts.
      It never takes the pointer. The state is carried by the text too: a mark
@@ -16868,13 +16868,25 @@
     width: 0;
     transition: width 80ms linear;
   }
+  /* Morthen's Rite Ring and the Burning Knell: the strikes to leave (the
+     marked half, a Grasp ring, the Reap's arc) throb in the hostile tone too;
+     the Rite's candle count and a Bound Soul on its way stay in gold. */
   #crypt-alert.is-measured,
-  #crypt-alert.is-grave {
+  #crypt-alert.is-grave,
+  #crypt-alert.is-knell,
+  #crypt-alert.is-grasp,
+  #crypt-alert.is-reap {
     border-color: var(--color-hostile);
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
   #crypt-alert.is-measured .fa-title,
   #crypt-alert.is-measured .fa-fill,
+  #crypt-alert.is-knell .fa-title,
+  #crypt-alert.is-knell .fa-fill,
+  #crypt-alert.is-grasp .fa-title,
+  #crypt-alert.is-grasp .fa-fill,
+  #crypt-alert.is-reap .fa-title,
+  #crypt-alert.is-reap .fa-fill,
   #crypt-alert.is-grave .fa-title {
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);

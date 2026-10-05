@@ -5,7 +5,17 @@
 
 import { describe, expect, it } from 'vitest';
 import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
-import { ILVANE_TUNING, LADY_TUNING, MARROW_TUNING } from '../src/sim/encounters/hollow_crypt';
+import {
+  ILVANE_TUNING,
+  KNELL_TUNING,
+  KNELLWYRM_ID,
+  LADY_TUNING,
+  MARROW_TUNING,
+  MORTHEN_ID,
+  MORTHEN_TUNING,
+  RITE_CANDLE_SPOTS,
+} from '../src/sim/encounters/hollow_crypt';
+import { cryptHeroicAmount } from '../src/ui/crypt_aura_effect';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 const mech = hudChromeStrings.finder.mech as Record<string, string>;
@@ -28,6 +38,20 @@ describe('Hollow Crypt wing bosses: the finder listing', () => {
     expect(by(normal.encounters, 'rimeweb')).not.toContain('crypt_lady_heroic');
     expect(by(heroic.encounters, 'rimeweb')).toContain('crypt_lady_heroic');
     expect(by(heroic.encounters, 'cantor_ilvane')).toContain('crypt_ilvane_heroic');
+    // Morthen: his three acts on both tiers, the heroic line (with the
+    // Knellwyrm's Burning Knell) on heroic only.
+    const morthen = [
+      'crypt_morthen_shadow_pulse',
+      'crypt_gravecall',
+      'crypt_rite_of_the_unquiet',
+      'crypt_reap_the_unquiet',
+    ];
+    expect(by(normal.encounters, 'morthen')).toEqual(morthen);
+    expect(by(heroic.encounters, 'morthen')).toEqual([...morthen, 'crypt_morthen_heroic']);
+    expect(normal.encounters.find((e) => e.mobId === 'morthen')?.final).toBe(true);
+    expect(heroic.encounters.find((e) => e.mobId === 'morthen')?.final).toBe(true);
+    // The generic pulse label stays in the catalog for any other listing.
+    expect(mech.shadow_pulse).toBeTruthy();
     for (const a of [normal, heroic])
       for (const e of a.encounters) for (const m of e.mechanics) expect(mech[m], m).toBeTruthy();
   });
@@ -111,5 +135,80 @@ describe('Hollow Crypt wing bosses: the finder lines state the tuning', () => {
     expect(T.organWaveAtCrescendo).toHaveLength(3);
     expect(mech.crypt_ilvane_heroic).toContain(`lies dead for ${n(T.encoreSeconds)} seconds`);
     expect(T.unbrokenEvery).toBe(3);
+  });
+});
+
+describe('Morthen the Gravecaller: the finder lines state the tuning', () => {
+  const T = MORTHEN_TUNING;
+  const K = KNELL_TUNING;
+  const big = (v: number) => v.toLocaleString('en-US');
+
+  it('Shadow Pulse', () => {
+    const line = mech.crypt_morthen_shadow_pulse;
+    expect(line).toContain(`every ${n(T.pulseEvery)} seconds a ${n(T.pulseCast)} second cast`);
+    expect(line).toContain(`${n(T.pulseMin)} to ${n(T.pulseMax)} shadow damage on normal`);
+    expect(line).toContain(`within ${n(T.pulseRadius)} yards`);
+    expect(line).toContain(`every ${n(T.pulseEveryLastRites)} seconds in his Last Rites`);
+  });
+
+  it('Gravecall', () => {
+    const line = mech.crypt_gravecall;
+    expect(line).toContain(`every ${n(T.soulEvery)} seconds a Bound Soul`);
+    expect(line).toContain(
+      `${pct(T.gorgedPct)} more damage for each soul up to ${n(T.gorgedMaxStacks)} stacks`,
+    );
+    expect(line).toContain(`heals ${pct(T.gorgedHeal)} of his health`);
+    expect(line).toContain(
+      `${n(T.soulInterceptMin)} to ${n(T.soulInterceptMax)} shadow damage on normal`,
+    );
+  });
+
+  it('the Rite of the Unquiet', () => {
+    const line = mech.crypt_rite_of_the_unquiet;
+    expect(line).toContain(`at ${pct(T.riteAt)} health`);
+    expect(line).toContain(
+      `deals ${n(T.chillBase)} shadow damage a second to everyone, rising by ${n(T.chillStep)} every ${n(T.chillEvery)} seconds`,
+    );
+    expect(line).toContain(`${n(T.riteBones)} Restless Bones`);
+    expect(line).toContain(`Relight the ${n(RITE_CANDLE_SPOTS.length)} Remembrance Candles`);
+    expect(line).toContain(
+      `a ${n(T.relightChannel)} second channel that drains ${pct(T.relightDrainPct)} of the lighter's maximum health every second`,
+    );
+    expect(line).toContain(
+      `stunned for ${n(T.brokenSeconds)} seconds and takes ${pct(T.brokenVuln)} more damage`,
+    );
+  });
+
+  it('Reap the Unquiet', () => {
+    const line = mech.crypt_reap_the_unquiet;
+    expect(line).toContain(`below ${pct(T.lastRitesAt)} health`);
+    expect(line).toContain(`every ${n(T.reapEvery)} seconds`);
+    expect(line).toContain(`after a ${n(T.reapCast)} second cast`);
+    expect(line).toContain(`${n(T.reapMin)} to ${n(T.reapMax)} shadow damage on normal`);
+    expect(line).toContain(
+      `a ${n(T.reapArcDeg)} degree arc ${n(T.reapRange)} yards in front of him`,
+    );
+    expect(line).toContain(`every ${n(T.pulseEveryLastRites)} seconds`);
+  });
+
+  it('the heroic line states the heroic amounts (Morthen at his factor, the wyrm at its own)', () => {
+    const line = mech.crypt_morthen_heroic;
+    const h = (v: number) => n(cryptHeroicAmount(MORTHEN_ID, v));
+    expect(line).toContain(
+      `${h(T.wrongCandleMin)} to ${h(T.wrongCandleMax)} shadow damage to the lighter`,
+    );
+    expect(line).toContain(`drains ${pct(T.relightDrainPctHeroic)} a second`);
+    expect(line).toContain(
+      `every ${n(T.graspEvery)} seconds ${n(T.graspTargets)} players get a ${n(T.graspRadius)} yard ring`,
+    );
+    expect(line).toContain(`${n(T.graspFuse)} seconds later`);
+    expect(line).toContain(
+      `a ${n(T.graspRootSeconds)} second root and ${h(T.graspMin)} to ${h(T.graspMax)} shadow damage`,
+    );
+    expect(line).toContain(`half of the ring for ${n(K.markSeconds)} seconds`);
+    expect(line).toContain(
+      `${big(cryptHeroicAmount(KNELLWYRM_ID, K.fireMin))} to ${big(cryptHeroicAmount(KNELLWYRM_ID, K.fireMax))} fire damage`,
+    );
+    expect(line).toContain(`${n(K.breaths)} halves each flight`);
   });
 });

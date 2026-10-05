@@ -3946,7 +3946,15 @@ export const zh_TW: EnTranslations = {
         "lingering": "你承受的下一次新娘的哀歌傷害提高{pct}%：每層{per}%，最多{max}層。下一次請在墓燈光芒中承受。",
         "slippery": "在光滑的冰面上：你的速度每秒最多改變{grip}碼/秒，所以起步緩慢，停下時會繼續滑行，轉向時會甩出大弧線。離開冰面就能重新站穩。",
         "harmony": "受到的傷害降低{pct}%：她每有一名存活的唱詩者就降低{per}%。先殺死唱詩者。",
-        "crescendo": "唱得更快：空洞輓歌只需{cast}秒（原為{castNormal}秒），每{every}秒一次（原為{everyNormal}秒），骨管風琴會奏出{waves}波音符（原為{wavesNormal}波）。"
+        "crescendo": "唱得更快：空洞輓歌只需{cast}秒（原為{castNormal}秒），每{every}秒一次（原為{everyNormal}秒），骨管風琴會奏出{waves}波音符（原為{wavesNormal}波）。",
+        "gorged": "造成的傷害提高{pct}%：每個抵達他身邊的縛魂提高{per}%，目前{stacks}/{max}層，持續到戰鬥結束。每個抵達的靈魂還會為他恢復{heal}%的最大生命值。站到靈魂的路徑上，就能由你代為承受。",
+        "unquietWard": "他在祭壇引導不寧者儀式時免疫傷害：已重燃{lit}/{total}根追思蠟燭。重燃一根需要引導{channel}秒，期間每秒吸取點燃者{drain}%的最大生命值（英雄難度{drainHeroic}%）；受到攻擊不會打斷，移動或昏迷會打斷。最後一根蠟燭會擊碎結界。英雄難度下，須按名冊點出的順序點燃：點錯蠟燭會熄滅最後點燃的那根，並對點燃者造成{wrongMin}到{wrongMax}點暗影傷害。",
+        "riteBroken": "昏迷：破碎的結界讓他{seconds}秒內無法行動。",
+        "shatteredWard": "{seconds}秒內受到的傷害提高{pct}%：重燃的蠟燭擊碎了他的結界。現在就打出最強的攻擊。",
+        "graveChill": "不寧者儀式持續期間，每秒受到{bite}點暗影傷害（英雄難度{biteHeroic}點），每{every}秒提高{step}點（英雄難度{stepHeroic}點）。重燃追思蠟燭來終結它。",
+        "graspMark": "{fuse}秒後，你腳下的法環中會伸出鬼手：法環落下處{radius}碼內的所有人被定身{root}秒，並受到{min}到{max}點暗影傷害。離開法環。",
+        "graspRoot": "被墳墓之手抓住：{seconds}秒內無法移動。",
+        "knellAirborne": "在儀式之環上空飛行，無法觸及。它會標記半個法環{mark}秒，然後向那一半傾瀉幽魂之火：對其中所有人造成{min}到{max}點火焰傷害。每次飛行焚燒{breaths}個半區，然後降落。"
       },
       "sanctum": {
         "lockbound": "受到的傷害降低{pct}%：每條仍然完好的鎖鏈提供{per}%。打破一個封印鐐銬即可讓其鎖鏈脫落。",
@@ -6029,6 +6037,11 @@ export const zh_TW: EnTranslations = {
         "crypt_bone_organ": "骨管風琴（每26秒她彈奏骨管風琴：兩波暗影音符沿著唱詩樓的通道爆發，普通難度下通道內造成100到115點傷害，第二波會填滿第一波的空隙）",
         "crypt_crescendo": "漸強（生命值低於30%時，她的輓歌只需1.8秒且每11秒一次，風琴還會多奏一波）",
         "crypt_ilvane_heroic": "英雄：安可（一名唱詩者倒下10秒而另一名仍站著時，它會再次站起，所以同時殺掉它們）以及不斷之詩（每第三首輓歌無法被打斷：躲開它）",
+        "crypt_morthen_shadow_pulse": "暗影脈衝（每12秒施法2秒，然後在普通難度下對他周圍12碼內所有人造成24到30點暗影傷害，所以要走開；在他的終末儀式中每9秒一次）",
+        "crypt_gravecall": "喚墓（每15秒，一個縛魂從下一個石棺壁龕飄向他；抵達後他獲得飽食亡者，每個靈魂使他造成的傷害提高10%，最多10層，並恢復3%的生命值。擋在路徑上的玩家會代為承受：普通難度下12到16點暗影傷害）",
+        "crypt_rite_of_the_unquiet": "不寧者儀式（生命值降到65%時，他回到祭壇，在不寧結界中免疫傷害，同時墓穴寒意每秒對所有人造成3點暗影傷害，每5秒提高1點，還有2具不安之骨從壁龕中爬出。重燃4根追思蠟燭：每根需要引導4秒，每秒吸取點燃者6%的最大生命值，受到攻擊不會打斷，移動或昏迷會打斷。最後一根蠟燭會打破儀式：他昏迷8秒，受到的傷害提高25%）",
+        "crypt_reap_the_unquiet": "收割不寧者（生命值低於35%時靈魂停止出現；每14秒施法2秒後揮動鐮刀：普通難度下對他前方14碼、120度扇形內的所有人造成55到65點暗影傷害。此後暗影脈衝每9秒一次）",
+        "crypt_morthen_heroic": "英雄難度：點名亡者（名冊點出蠟燭的順序：點錯蠟燭會熄滅最後點燃的那根，並對點燃者造成252到288點暗影傷害，每次重燃每秒吸取8%），墳墓之握（每16秒2名玩家腳下出現4碼法環；1.5秒後鬼手破土而出：定身3秒並造成162到198點暗影傷害），以及喪鐘巨龍的燃燒喪鐘（它飛上天空，標記半個法環4.5秒，然後向那一半傾瀉幽魂之火，造成1,000到1,120點火焰傷害，每次飛行3個半區）",
         "reaping_arc": "收割之弧（正面順劈）",
         "hallowed_brine": "聖化鹹水（半徑9碼的暗色聖水池，英雄難度10碼：池中每秒受到18點傷害，英雄難度26點，他站在池中時受到的傷害降低40%，把他拖出去）",
         "rebounding_bulwark": "回彈壁盾（盾牌彈向上一個被擊中者10碼內最近的玩家，最多3人，英雄4人：散開）",
@@ -6228,6 +6241,17 @@ export const zh_TW: EnTranslations = {
       "tollLine": "他搖鐘時無法受到傷害：準備承受喪鐘和它喚起的亡者",
       "harmonyTitle": "和聲",
       "harmonyLine": "她的唱詩者使她受到的傷害降低{pct}%：先殺死它們",
+      "knellTitle": "燃燒喪鐘！",
+      "knellLine": "計時條耗盡時，幽魂之火會傾瀉到法環的這一半：去另一半",
+      "graspTitle": "墳墓之握！",
+      "graspLine": "鬼手會從這個法環中伸出，抓住站在裡面的人：離開",
+      "reapTitle": "收割不寧者！",
+      "reapLine": "他的鐮刀橫掃面前的地面：繞到他身後",
+      "riteTitle": "不寧者儀式",
+      "riteLine": "重燃追思蠟燭以擊碎他的結界：已點燃{lit}/{total}",
+      "riteNamedLine": "只重燃名冊接下來點出的蠟燭：已點燃{lit}/{total}",
+      "soulTitle": "縛魂",
+      "soulLine": "一個靈魂正飄向莫森：站到它的路徑上，在它餵飽他之前接住它",
       "timeAria": "剩餘{seconds}秒"
     },
     "kitUse": {
@@ -6238,6 +6262,13 @@ export const zh_TW: EnTranslations = {
       "toppleFar": "靠近到{range}碼內才能把它踢倒",
       "toppleAria": "推倒{name}",
       "usingLine": "保持不動：受到攻擊、移動或昏迷都會打斷它",
+      "relightLine": "引導時每秒吸取你的生命值：受到攻擊不會打斷，移動或昏迷會打斷",
+      "relightKey": "重燃{name}",
+      "relightTap": "點擊這裡重燃{name}",
+      "relightClick": "點選這裡重燃{name}",
+      "relightFar": "靠近到{range}碼內才能重燃它",
+      "relightAria": "重燃{name}",
+      "relightUsingLine": "在它吸取你時保持不動：受到攻擊不會打斷，移動或昏迷會打斷",
       "timeAria": "剩餘{seconds}秒"
     },
     "cosmetics": {
@@ -12600,6 +12631,14 @@ export const zh_TW: EnTranslations = {
       "crypt_ilvane_dirge": "空洞輓歌",
       "crypt_ilvane_unbroken_dirge": "不斷之詩",
       "crypt_ilvane_bone_organ": "骨管風琴",
+      "crypt_morthen_shadow_pulse": "暗影脈衝",
+      "crypt_morthen_rite_of_the_unquiet": "不寧者儀式",
+      "crypt_morthen_reap_the_unquiet": "收割不寧者",
+      "kituse_crypt_relight_candle": "重燃蠟燭",
+      "crypt_knellwyrm_knell_rise": "燃燒喪鐘",
+      "crypt_knellwyrm_knell_mark": "燃燒喪鐘",
+      "crypt_knellwyrm_knell_breath": "燃燒喪鐘",
+      "crypt_knellwyrm_knell_land": "燃燒喪鐘",
       "bastion_brine_mend": "鹽水癒合",
       "bastion_fog_ward": "霧之護佑",
       "bastion_halberd_sweep": "戟之橫掃",
@@ -20268,6 +20307,9 @@ export const zh_TW: EnTranslations = {
       },
       "crypt_knellwyrm": {
         "name": "喪鐘巨龍"
+      },
+      "crypt_remembrance_candle": {
+        "name": "追思蠟燭"
       },
       "bastion_revenant": {
         "name": "堡壘亡魂"

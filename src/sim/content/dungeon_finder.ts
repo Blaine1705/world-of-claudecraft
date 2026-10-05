@@ -134,11 +134,22 @@ const HOLLOW_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
       'crypt_crescendo',
     ],
   },
-  { mobId: 'morthen', final: true, mechanics: ['shadow_pulse'] },
+  // Morthen's three-act rite (encounters/hollow_crypt/morthen*.ts).
+  {
+    mobId: 'morthen',
+    final: true,
+    mechanics: [
+      'crypt_morthen_shadow_pulse',
+      'crypt_gravecall',
+      'crypt_rite_of_the_unquiet',
+      'crypt_reap_the_unquiet',
+    ],
+  },
 ];
 
-// The heroic tier adds each wing boss's heroic twists (its own array, so the
-// normal preview never carries them).
+// The heroic tier adds each boss's heroic twists (its own array, so the
+// normal preview never carries them); Morthen's line also carries the
+// Knellwyrm's heroic Burning Knell (the wyrm has no finder row of its own).
 const HOLLOW_CRYPT_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
   {
     mobId: 'sexton_marrow',
@@ -152,7 +163,10 @@ const HOLLOW_CRYPT_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
     mobId: 'cantor_ilvane',
     mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[2].mechanics, 'crypt_ilvane_heroic'],
   },
-  HOLLOW_CRYPT_ENCOUNTERS[3],
+  {
+    ...HOLLOW_CRYPT_ENCOUNTERS[3],
+    mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[3].mechanics, 'crypt_morthen_heroic'],
+  },
 ];
 
 const SUNKEN_BASTION_ENCOUNTERS: readonly FinderEncounter[] = [

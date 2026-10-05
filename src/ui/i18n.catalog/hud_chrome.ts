@@ -5194,6 +5194,21 @@ export const hudChromeStrings = {
         'Takes {pct}% less damage: {per}% for each of her living Choristers. Kill the Choristers first.',
       crescendo:
         'Sings faster: the Dirge of the Hollow takes {cast} sec instead of {castNormal} sec and comes every {every} sec instead of {everyNormal} sec, and the Bone Organ plays {waves} waves of notes instead of {wavesNormal}.',
+      // Morthen the Gravecaller and the Knellwyrm (morthen_ids.ts, ids.ts).
+      gorged:
+        "Deals {pct}% more damage: {per}% for each Bound Soul that reached him, {stacks} of {max} now, for the rest of the fight. Each soul that reaches him also heals him for {heal}% of his maximum health. Step into a soul's path to take it instead.",
+      unquietWard:
+        "Immune to damage while he channels the Rite of the Unquiet at the altar: {lit} of {total} Remembrance Candles relit. Relighting one is a {channel} sec channel that drains {drain}% of the lighter's maximum health every second ({drainHeroic}% on Heroic); hits do not break it, a step or a stun does. The last candle shatters the ward. On Heroic, light them in the order the Ledger names: a wrong candle snuffs the last one lit and deals {wrongMin} to {wrongMax} Shadow damage to the lighter.",
+      riteBroken: 'Stunned: the shattered ward leaves him unable to act for {seconds} sec.',
+      shatteredWard:
+        'Takes {pct}% more damage for {seconds} sec: the relit candles broke his ward. Spend your strongest attacks now.',
+      graveChill:
+        'Takes {bite} Shadow damage every second ({biteHeroic} on Heroic) while the Rite of the Unquiet holds, rising by {step} ({stepHeroic} on Heroic) every {every} sec. Relight the Remembrance Candles to end it.',
+      graspMark:
+        'Hands erupt from the ring under you in {fuse} sec: everyone within {radius} yd of where it was laid is rooted for {root} sec and takes {min} to {max} Shadow damage. Step out of the ring.',
+      graspRoot: "Held by the grave's hands: unable to move for {seconds} sec.",
+      knellAirborne:
+        'On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands.',
     },
     // The Gravewyrm Sanctum's boss auras (src/ui/sanctum_aura_effect.ts).
     sanctum: {
@@ -8844,6 +8859,18 @@ export const hudChromeStrings = {
         'Crescendo (below 30 percent health her Dirge takes 1.8 seconds and comes every 11 seconds, and the organ plays a third wave)',
       crypt_ilvane_heroic:
         'Heroic: Encore (a Chorister that lies dead for 10 seconds while the other still stands rises again, so kill them together) and Unbroken Verse (every third Dirge cannot be interrupted: hide from it)',
+      // Morthen the Gravecaller (encounters/hollow_crypt/morthen*.ts) and, on
+      // heroic, the Knellwyrm's Burning Knell (knellwyrm_knell.ts).
+      crypt_morthen_shadow_pulse:
+        'Shadow Pulse (every 12 seconds a 2 second cast, then 24 to 30 shadow damage on normal to everyone within 12 yards of him, so step away; every 9 seconds in his Last Rites)',
+      crypt_gravecall:
+        'Gravecall (every 15 seconds a Bound Soul drifts from the next sarcophagus alcove toward him; when it reaches him he is Gorged on the Dead, 10 percent more damage for each soul up to 10 stacks, and heals 3 percent of his health. A player in its path takes it instead: 12 to 16 shadow damage on normal)',
+      crypt_rite_of_the_unquiet:
+        "Rite of the Unquiet (at 65 percent health he returns to the altar, immune inside the Unquiet Ward, while Grave Chill deals 3 shadow damage a second to everyone, rising by 1 every 5 seconds, and 2 Restless Bones climb out of the alcoves. Relight the 4 Remembrance Candles: each is a 4 second channel that drains 6 percent of the lighter's maximum health every second, which hits do not break but a step or a stun does. The last candle breaks the Rite: he is stunned for 8 seconds and takes 25 percent more damage)",
+      crypt_reap_the_unquiet:
+        'Reap the Unquiet (below 35 percent health the souls stop; every 14 seconds he sweeps his scythe after a 2 second cast: 55 to 65 shadow damage on normal to everyone in a 120 degree arc 14 yards in front of him. Shadow Pulse then comes every 9 seconds)',
+      crypt_morthen_heroic:
+        "Heroic: Name the Dead (the Ledger names the order of the candles: a wrong candle snuffs the last one lit and deals 252 to 288 shadow damage to the lighter, and each relight drains 8 percent a second), Grasp of the Grave (every 16 seconds 2 players get a 4 yard ring; 1.5 seconds later hands erupt in it: a 3 second root and 162 to 198 shadow damage) and the Knellwyrm's Burning Knell (it takes flight and marks half of the ring for 4.5 seconds, then pours ghost fire over that half for 1,000 to 1,120 fire damage, 3 halves each flight)",
       reaping_arc: 'Reaping Arc (frontal cleave)',
       hallowed_brine:
         'Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)',
@@ -9092,6 +9119,19 @@ export const hudChromeStrings = {
       'He cannot be hurt while he rings the bell: brace for the Toll and the dead it raises',
     harmonyTitle: 'Harmony',
     harmonyLine: 'Her Choristers take {pct}% off the damage she takes: kill them first',
+    // Morthen's Rite Ring and the Knellwyrm's heroic Burning Knell.
+    knellTitle: 'Burning Knell!',
+    knellLine:
+      'Ghost fire pours over this half of the ring when the bar runs out: get to the other half',
+    graspTitle: 'Grasp of the Grave!',
+    graspLine: 'Hands erupt from this ring and hold whoever stands in it: step out',
+    reapTitle: 'Reap the Unquiet!',
+    reapLine: 'His scythe sweeps the ground in front of him: get behind him',
+    riteTitle: 'Rite of the Unquiet',
+    riteLine: 'Relight the Remembrance Candles to shatter his ward: {lit} of {total} lit',
+    riteNamedLine: 'Relight only the candle the Ledger names next: {lit} of {total} lit',
+    soulTitle: 'Bound Soul',
+    soulLine: 'A soul drifts toward Morthen: step into its path to take it before it feeds him',
     timeAria: '{seconds} seconds left',
   },
   // The trash engine's use prompt (src/ui/hud/dungeon/kit_use_prompt_view.ts):
@@ -9105,6 +9145,16 @@ export const hudChromeStrings = {
     toppleFar: 'Get within {range} yd to kick it over',
     toppleAria: 'Topple the {name}',
     usingLine: 'Hold still: a hit, a step or a stun breaks it',
+    // The 'relight' use (a Remembrance Candle in Morthen's Rite): a channel
+    // that drains the lighter, kept through hits.
+    relightLine:
+      'It drains your health every second you channel: hits do not break it, a step or a stun does',
+    relightKey: 'Relight the {name}',
+    relightTap: 'Tap here to relight the {name}',
+    relightClick: 'Click here to relight the {name}',
+    relightFar: 'Get within {range} yd to relight it',
+    relightAria: 'Relight the {name}',
+    relightUsingLine: 'Hold still while it drains you: hits do not break it, a step or a stun does',
     timeAria: '{seconds} seconds left',
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,

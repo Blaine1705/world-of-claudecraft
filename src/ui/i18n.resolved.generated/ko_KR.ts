@@ -3946,7 +3946,15 @@ export const ko_KR: EnTranslations = {
         "lingering": "다음 신부의 애가로 받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 최대 {max}중첩. 다음 애가는 등불 빛 안에서 받으세요.",
         "slippery": "미끄러운 얼음 위: 속도가 매초 최대 {grip}미터/초씩만 바뀌므로 출발이 느리고, 멈추면 계속 미끄러지며, 방향을 틀면 크게 돌아갑니다. 얼음에서 벗어나면 다시 중심을 잡을 수 있습니다.",
         "harmony": "받는 피해가 {pct}% 감소합니다: 살아 있는 성가대원 한 명마다 {per}%. 성가대원을 먼저 처치하세요.",
-        "crescendo": "더 빠르게 노래합니다: 공허의 만가가 {castNormal}초 대신 {cast}초 걸리고 {everyNormal}초 대신 {every}초마다 오며, 뼈 오르간이 {wavesNormal}파도 대신 {waves}파도의 음표를 연주합니다."
+        "crescendo": "더 빠르게 노래합니다: 공허의 만가가 {castNormal}초 대신 {cast}초 걸리고 {everyNormal}초 대신 {every}초마다 오며, 뼈 오르간이 {wavesNormal}파도 대신 {waves}파도의 음표를 연주합니다.",
+        "gorged": "주는 피해 {pct}% 증가: 그에게 도달한 속박된 영혼 하나마다 {per}%, 현재 {stacks}/{max}중첩이며 전투가 끝날 때까지 지속됩니다. 영혼이 도달할 때마다 최대 생명력의 {heal}%도 회복합니다. 영혼의 경로에 들어서면 대신 받아낼 수 있습니다.",
+        "unquietWard": "제단에서 불안한 자들의 의식을 시전하는 동안 피해 면역: 추모의 양초 {total}개 중 {lit}개를 다시 밝혔습니다. 하나를 다시 밝히려면 {channel}초 동안 정신 집중해야 하며, 그동안 밝히는 사람의 최대 생명력 {drain}%(영웅 난이도 {drainHeroic}%)를 매초 빨아들입니다. 공격을 받아도 끊기지 않지만 움직이거나 기절하면 끊깁니다. 마지막 양초가 결계를 부숩니다. 영웅 난이도에서는 명부가 부르는 순서대로 밝히세요: 다른 양초를 밝히면 마지막으로 밝힌 양초가 꺼지고 밝힌 사람에게 {wrongMin}~{wrongMax} 암흑 피해를 줍니다.",
+        "riteBroken": "기절: 부서진 결계 때문에 {seconds}초 동안 행동할 수 없습니다.",
+        "shatteredWard": "{seconds}초 동안 받는 피해 {pct}% 증가: 다시 밝힌 양초들이 그의 결계를 부쉈습니다. 지금 가장 강한 공격을 퍼부으세요.",
+        "graveChill": "불안한 자들의 의식이 이어지는 동안 매초 {bite} 암흑 피해(영웅 난이도 {biteHeroic})를 받으며, {every}초마다 {step}(영웅 난이도 {stepHeroic})씩 늘어납니다. 추모의 양초를 다시 밝혀 끝내세요.",
+        "graspMark": "{fuse}초 후 발밑의 고리에서 손이 솟아오릅니다: 고리가 놓인 곳에서 {radius}야드 안의 모두가 {root}초 동안 묶이고 {min}~{max} 암흑 피해를 받습니다. 고리에서 나오세요.",
+        "graspRoot": "무덤의 손에 붙잡힘: {seconds}초 동안 움직일 수 없습니다.",
+        "knellAirborne": "의식의 고리 위를 날고 있어 공격이 닿지 않습니다. 고리의 절반에 {mark}초 동안 표식을 남긴 뒤 그 절반에 유령불을 쏟아붓습니다: 그 안의 모두에게 {min}~{max} 화염 피해. 한 번 날 때마다 절반을 {breaths}번 태운 뒤 내려앉습니다."
       },
       "sanctum": {
         "lockbound": "받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.",
@@ -6029,6 +6037,11 @@ export const ko_KR: EnTranslations = {
         "crypt_bone_organ": "뼈 오르간(26초마다 뼈 오르간을 연주: 암흑 음표 두 파도가 성가대석 바닥의 줄을 따라 터지며 일반 난이도 기준 줄 안에서 100~115 피해, 두 번째 파도는 첫 번째의 빈틈을 메웁니다)",
         "crypt_crescendo": "크레셴도(생명력 30% 미만에서 만가가 1.8초로 짧아지고 11초마다 오며, 오르간이 세 번째 파도를 연주합니다)",
         "crypt_ilvane_heroic": "영웅: 앙코르(다른 한 명이 서 있는 동안 10초 쓰러져 있던 성가대원은 다시 일어남: 둘을 함께 처치하세요)와 끊기지 않는 구절(세 번째 만가마다 차단할 수 없음: 숨으세요)",
+        "crypt_morthen_shadow_pulse": "어둠의 파동(12초마다 2초 시전 후, 일반 난이도 기준 그에게서 12야드 안의 모두에게 24~30 암흑 피해: 떨어지세요. 최후의 의식 중에는 9초마다)",
+        "crypt_gravecall": "무덤부름(15초마다 속박된 영혼이 다음 석관 벽감에서 그에게로 떠갑니다. 도달하면 망자 포식 상태가 되어 영혼 하나마다 주는 피해가 10% 증가하고(최대 10중첩) 생명력의 3%를 회복합니다. 경로에 선 플레이어가 대신 받아냅니다: 일반 난이도 기준 12~16 암흑 피해)",
+        "crypt_rite_of_the_unquiet": "불안한 자들의 의식(생명력 65%에서 제단으로 돌아가 불안한 자들의 결계 안에서 피해 면역이 됩니다. 그동안 무덤의 냉기가 모두에게 매초 3 암흑 피해를 주고 5초마다 1씩 늘어나며, 벽감에서 불안한 뼈무더기 2개가 기어 나옵니다. 추모의 양초 4개를 다시 밝히세요: 하나마다 4초 정신 집중이며 밝히는 사람의 최대 생명력 6%를 매초 빨아들입니다. 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다. 마지막 양초가 의식을 깨뜨립니다: 8초 동안 기절하고 받는 피해가 25% 증가합니다)",
+        "crypt_reap_the_unquiet": "불안한 자들의 수확(생명력 35% 미만에서 영혼이 멈추고, 14초마다 2초 시전 후 낫을 휘두릅니다: 일반 난이도 기준 앞쪽 14야드, 120도 부채꼴 안의 모두에게 55~65 암흑 피해. 이후 어둠의 파동은 9초마다 옵니다)",
+        "crypt_morthen_heroic": "영웅 난이도: 망자의 이름(명부가 양초의 순서를 부릅니다. 다른 양초를 밝히면 마지막으로 밝힌 양초가 꺼지고 밝힌 사람에게 252~288 암흑 피해를 주며, 다시 밝히기는 매초 8%를 빨아들입니다), 무덤의 손아귀(16초마다 플레이어 2명 발밑에 4야드 고리가 생기고 1.5초 후 손이 솟아오릅니다: 3초 이동 불가와 162~198 암흑 피해), 조종룡의 불타는 조종(날아올라 고리의 절반에 4.5초 동안 표식을 남긴 뒤 그 절반에 유령불을 쏟아 1,000~1,120 화염 피해, 한 번 날 때마다 3번)",
         "reaping_arc": "수확의 호(전방 휩쓸기)",
         "hallowed_brine": "성스러운 바닷물 (반경 9야드의 어두운 성수 웅덩이, 영웅은 10야드: 안에 있으면 매초 18 피해, 영웅은 26, 그가 안에 서 있는 동안 받는 피해 40퍼센트 감소, 밖으로 끌어내세요)",
         "rebounding_bulwark": "튕겨 나오는 방패 (마지막으로 맞은 대상으로부터 10미터 이내의 가장 가까운 플레이어에게 튕김, 최대 3명, 영웅 4명: 흩어지세요)",
@@ -6228,6 +6241,17 @@ export const ko_KR: EnTranslations = {
       "tollLine": "종을 울리는 동안 그는 피해를 받지 않습니다: 종소리와 그것이 일으키는 망자에 대비하세요",
       "harmonyTitle": "화음",
       "harmonyLine": "성가대원들이 그녀가 받는 피해를 {pct}% 줄이고 있습니다: 성가대원을 먼저 처치하세요",
+      "knellTitle": "불타는 조종!",
+      "knellLine": "바가 다 줄어들면 고리의 이쪽 절반에 유령불이 쏟아집니다: 반대쪽 절반으로 가세요",
+      "graspTitle": "무덤의 손아귀!",
+      "graspLine": "이 고리에서 손이 솟아올라 안에 선 사람을 붙잡습니다: 나오세요",
+      "reapTitle": "불안한 자들의 수확!",
+      "reapLine": "그의 낫이 앞쪽 땅을 휩씁니다: 그의 뒤로 가세요",
+      "riteTitle": "불안한 자들의 의식",
+      "riteLine": "추모의 양초를 다시 밝혀 결계를 부수세요: {total}개 중 {lit}개 점화",
+      "riteNamedLine": "명부가 다음에 부르는 양초만 다시 밝히세요: {total}개 중 {lit}개 점화",
+      "soulTitle": "속박된 영혼",
+      "soulLine": "영혼이 모르덴에게 떠가고 있습니다: 경로에 들어서서 그가 배를 채우기 전에 받아내세요",
       "timeAria": "{seconds}초 남음"
     },
     "kitUse": {
@@ -6238,6 +6262,13 @@ export const ko_KR: EnTranslations = {
       "toppleFar": "{range}야드 안으로 다가가 걷어차세요",
       "toppleAria": "{name} 넘어뜨리기",
       "usingLine": "가만히 있으세요: 공격을 받거나 움직이거나 기절하면 끊깁니다",
+      "relightLine": "정신 집중하는 동안 매초 생명력을 빨아들입니다: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다",
+      "relightKey": "{name} 다시 밝히기",
+      "relightTap": "여기를 탭해 {name}을(를) 다시 밝히세요",
+      "relightClick": "여기를 클릭해 {name}을(를) 다시 밝히세요",
+      "relightFar": "{range}야드 안으로 다가가 다시 밝히세요",
+      "relightAria": "{name} 다시 밝히기",
+      "relightUsingLine": "빨아들이는 동안 가만히 있으세요: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다",
       "timeAria": "{seconds}초 남음"
     },
     "cosmetics": {
@@ -12600,6 +12631,14 @@ export const ko_KR: EnTranslations = {
       "crypt_ilvane_dirge": "공허의 만가",
       "crypt_ilvane_unbroken_dirge": "끊기지 않는 구절",
       "crypt_ilvane_bone_organ": "뼈 오르간",
+      "crypt_morthen_shadow_pulse": "어둠의 파동",
+      "crypt_morthen_rite_of_the_unquiet": "불안한 자들의 의식",
+      "crypt_morthen_reap_the_unquiet": "불안한 자들의 수확",
+      "kituse_crypt_relight_candle": "촛불 다시 밝히기",
+      "crypt_knellwyrm_knell_rise": "불타는 조종",
+      "crypt_knellwyrm_knell_mark": "불타는 조종",
+      "crypt_knellwyrm_knell_breath": "불타는 조종",
+      "crypt_knellwyrm_knell_land": "불타는 조종",
       "bastion_brine_mend": "소금물 치유",
       "bastion_fog_ward": "안개 보호막",
       "bastion_halberd_sweep": "미늘창 휩쓸기",
@@ -20268,6 +20307,9 @@ export const ko_KR: EnTranslations = {
       },
       "crypt_knellwyrm": {
         "name": "조종룡"
+      },
+      "crypt_remembrance_candle": {
+        "name": "추모의 양초"
       },
       "bastion_revenant": {
         "name": "요새 망령"
