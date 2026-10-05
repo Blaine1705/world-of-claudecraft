@@ -855,6 +855,7 @@ const RENDER_PURE_CORES = [
   'src/render/sunken_bastion/bastion_vael_stage_core.ts',
   'src/render/sunken_bastion/bastion_shade_ghost_core.ts',
   'src/render/sunken_bastion/bastion_trash_fx_core.ts',
+  'src/render/sunken_bastion/bastion_order_fx_core.ts',
   // Olen the fallen paladin's visuals: the brine, the shield, the Sentence, the Oath.
   'src/render/sunken_bastion/bastion_olen_fx_core.ts',
   // The Drowning Yard's Mooring Post lamps: lit, dark, kindling, the flare, the ring.
@@ -944,6 +945,7 @@ const RENDER_PURE_CORES = [
   // The Temple trash mechanics pass: the vigil bubble, the oath, the echo,
   // the gaze eye and veil, the whirlpool, the spark's arcs and the swell.
   'src/render/drowned_temple/temple_trash_fx_core.ts',
+  'src/render/drowned_temple/temple_lure_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
   'src/render/ambience_state_core.ts',

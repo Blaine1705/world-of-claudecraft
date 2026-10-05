@@ -132,6 +132,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // rim and the floor waves under the kit's rings, and the bubbles, threads,
   // eyes and arcs in the air above every floor mark, all on the encounter band.
   { file: 'src/render/drowned_temple/temple_trash_fx.ts', layer: 'encounter', strict: true },
+  // The trash pass's second wave: the Siren's tether, ring and halo, and the
+  // Sergeant's crosshair, aiming lines and bolts, all on the encounter band.
+  { file: 'src/render/drowned_temple/temple_lure_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/sunken_bastion/bastion_order_fx.ts', layer: 'encounter', strict: true },
   // The Mere Hydra's Combined Breath: the frozen lane, the wall's frosted foot
   // and lee shimmer, the venom arrows and the rime crystals' rings lie on the
   // floor in the encounter band (they are actionable: where not to stand,

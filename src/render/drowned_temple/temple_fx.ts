@@ -68,6 +68,7 @@ import {
 } from './temple_fx_core';
 import { TempleHydra } from './temple_hydra';
 import { TempleHydraComboFx } from './temple_hydra_combo_fx';
+import { TempleLureFx } from './temple_lure_fx';
 import { TempleMantaFx } from './temple_manta_fx';
 import { TempleMoonFx } from './temple_moon_fx';
 import { TempleMoonbridgeFx } from './temple_moonbridge_fx';
@@ -139,6 +140,7 @@ export class TempleFx {
   private readonly manta: TempleMantaFx;
   private readonly bridge: TempleMoonbridgeFx;
   private readonly trash: TempleTrashFx;
+  private readonly lure: TempleLureFx;
   private readonly flashesOn: boolean;
   /** Each living Pearlguard Sentinel's shell stance and when it changed. */
   private readonly shellStance = new Map<number, TempleShellTrack>();
@@ -207,6 +209,7 @@ export class TempleFx {
     this.manta = new TempleMantaFx(this.root, world, groundY, on, kit, shake, calm);
     this.bridge = new TempleMoonbridgeFx(this.root, world, groundY, on, kit, shake, calm);
     this.trash = new TempleTrashFx(this.root, world, groundY, on, kit, shake, calm);
+    this.lure = new TempleLureFx(this.root, world, groundY, on, kit, calm);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {
         // Linked: the caster and fracture layers may sleep while idle now.
@@ -217,6 +220,7 @@ export class TempleFx {
         this.manta.markGated();
         this.bridge.markGated();
         this.trash.markGated();
+        this.lure.markGated();
       })
       .catch(() => {});
   }
@@ -230,7 +234,7 @@ export class TempleFx {
     if (this.selthe.handleEvent(ev) || this.fracture.handleEvent(ev)) return true;
     if (this.combo.handleEvent(ev) || this.moon.handleEvent(ev)) return true;
     if (this.manta.handleEvent(ev) || this.bridge.handleEvent(ev)) return true;
-    if (this.trash.handleEvent(ev)) return true;
+    if (this.trash.handleEvent(ev) || this.lure.handleEvent(ev)) return true;
     if (ev.type === 'spellfx') {
       const source = this.world?.entities.get(ev.sourceId);
       // Claimed only when the Frenzy can actually play (a host without the
@@ -267,6 +271,7 @@ export class TempleFx {
     this.manta.update(dt, this.clock);
     this.bridge.update(dt, this.clock);
     this.trash.update(dt, this.clock);
+    this.lure.update(dt, this.clock);
     for (const slot of this.casts) {
       if (slot.casterId < 0) continue;
       const caster = world.entities.get(slot.casterId);
@@ -585,6 +590,7 @@ export class TempleFx {
     this.manta.dispose();
     this.bridge.dispose();
     this.trash.dispose();
+    this.lure.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
     for (const t of this.tethers) t.geometry.dispose();

@@ -59,6 +59,7 @@ import {
   TURNKEY_RAW_HEIGHT,
 } from './bastion_creature_fx_core';
 import { BastionDrownedFx } from './bastion_drowned_fx';
+import { BastionOrderFx } from './bastion_order_fx';
 import { BastionTrashFx } from './bastion_trash_fx';
 
 const BOLT_SLOTS = 8;
@@ -316,6 +317,8 @@ export class BastionCreatureFx {
   private readonly drowned: BastionDrownedFx;
   /** The trash mechanics' visuals (bastion_trash_fx.ts), on these same draws. */
   private readonly trash: BastionTrashFx;
+  /** The Drowned Sergeant's Loose on My Mark (bastion_order_fx.ts). */
+  private readonly order: BastionOrderFx;
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly tmp = { x: 0, y: 0, z: 0 };
@@ -392,6 +395,7 @@ export class BastionCreatureFx {
       reducedMotion,
       playGesture,
     );
+    this.order = new BastionOrderFx(root, world, this.glow, this.mist, this.density, reducedMotion);
     for (const m of root.children) tagVfxSubtree(m);
   }
 
@@ -522,6 +526,8 @@ export class BastionCreatureFx {
 
   handleEvent(ev: SimEvent): boolean {
     this.drowned.observe(ev, this.clock);
+    // A marked bolt is the sergeant's volley, never a Piercing Bolt down a lane.
+    if (this.order.handleEvent(ev, this.clock)) return true;
     if (this.trash.handleEvent(ev, this.clock)) return true;
     if (ev.type !== 'spellfx' || !this.world) return false;
     const source = this.world.entities.get(ev.sourceId);
@@ -841,6 +847,7 @@ export class BastionCreatureFx {
     }
     this.drowned.update(now);
     this.trash.update(now, dt);
+    this.order.update(now, dt);
     this.glow.update(now);
     this.mist.update(now);
   }
@@ -950,6 +957,7 @@ export class BastionCreatureFx {
 
   dispose(): void {
     this.trash.dispose();
+    this.order.dispose();
     this.glow.dispose();
     this.mist.dispose();
     for (const g of this.geometries) g.dispose();
