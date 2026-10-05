@@ -20,6 +20,13 @@
 //   /dev crypt wyrm                    skip the entrance and slay Morthen: the
 //                                      Knellwyrm finale starts (pyre, flight in)
 //   /dev crypt trigger <strafe|bellow> fire an engaged Knellwyrm's mechanic now
+//   /dev crypt pull <marrow|lady|ilvane> open the gates, stand in the boss's
+//                                      arena and pull it (a wing-boss playtest)
+//   /dev crypt trigger <shovel|grave|blow|toll>       Sexton Marrow now
+//   /dev crypt trigger <lament|embrace|freeze>        the Lady of the Bonechill
+//   /dev crypt trigger <dirge|organ|crescendo>        Cantor Ilvane
+//   /dev crypt hp <percent>            set every engaged wing boss to a share of
+//                                      its health (66, 50, 33, 29: the phases)
 //
 // Areas: landing, cloister, grille, processional, yard, bellyard (marrow),
 // gallery, rim, web (rimeweb), choir, loft (ilvane), stair, bonestair, ring
@@ -54,6 +61,7 @@ export const HOLLOW_CRYPT_DEV_AREAS: Readonly<Record<string, { x: number; z: num
   rim: { x: 105, z: 40 },
   web: { x: 80, z: 98 },
   rimeweb: { x: 80, z: 98 },
+  lady: { x: 80, z: 98 },
   choir: { x: 0, z: 122 },
   loft: { x: 0, z: 152 },
   ilvane: { x: 0, z: 152 },
@@ -66,6 +74,7 @@ export const HOLLOW_CRYPT_DEV_AREAS: Readonly<Record<string, { x: number; z: num
 const BOSS_ALIASES: Readonly<Record<string, string>> = {
   marrow: 'sexton_marrow',
   rimeweb: 'rimeweb',
+  lady: 'rimeweb',
   ilvane: 'cantor_ilvane',
   morthen: 'morthen',
 };
@@ -85,7 +94,7 @@ export const HOLLOW_CRYPT_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <c1..c4|p1|drake|p2|w1..w4|e1..e3|q1|q2|s1|marrow|rimeweb|ilvane|morthen|all> | pack <id> | spawn <warrior|adept|cutthroat|necromancer|minion|brute|gargoyle|caller|crow|drake> | rise [skip] | wyrm | trigger <strafe|bellow> | reset';
+  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <c1..c4|p1|drake|p2|w1..w4|e1..e3|q1|q2|s1|marrow|rimeweb|ilvane|morthen|all> | pack <id> | spawn <warrior|adept|cutthroat|necromancer|minion|brute|gargoyle|caller|crow|drake> | pull <marrow|lady|ilvane> | hp <percent> | rise [skip] | wyrm | trigger <strafe|bellow|shovel|grave|blow|toll|lament|embrace|freeze|dirge|organ|crescendo> | reset';
 
 /** Raise one trash mob ahead of the player, pulled at once (a gargoyle starts
  *  on a perch and a drake high in the sky, so both show their descent). */
@@ -248,6 +257,53 @@ export function handleHollowCryptDevChat(ctx: SimContext, raw: string, pid: numb
       return true;
     }
     log(ctx, pid, `[dev] ${cryptDevTrigger(ctx, inst, arg)}`);
+    return true;
+  }
+  if (verb === 'pull') {
+    const bossId = BOSS_ALIASES[arg];
+    const area = HOLLOW_CRYPT_DEV_AREAS[arg];
+    if (!bossId || !area || bossId === 'morthen') {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    const inst = ensureInside(ctx, pid);
+    const me = ctx.entities.get(pid);
+    if (!inst || !me) return true;
+    setDungeonGatesDevOpen(inst, true);
+    const o = instanceOrigin(DUNGEONS[DUNGEON_ID].index, inst.slot);
+    displacePlayerForDev(ctx, me, o.x + area.x, o.z + area.z);
+    const boss = inst.mobIds
+      .map((id) => ctx.entities.get(id))
+      .find((e) => e?.templateId === bossId && !e.dead);
+    if (!boss) {
+      log(ctx, pid, `[dev] ${arg} is already dead: /dev crypt reset for a fresh run.`);
+      return true;
+    }
+    ctx.aggroMob(boss, me, false);
+    log(ctx, pid, `[dev] Pulled ${MOBS[bossId].name}.`);
+    return true;
+  }
+  if (verb === 'hp') {
+    const pct = Number(arg);
+    const inst = claimFor(ctx, pid);
+    if (!inst || !Number.isFinite(pct) || pct <= 0 || pct > 100) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    let n = 0;
+    for (const id of inst.mobIds) {
+      const e = ctx.entities.get(id);
+      if (!e || e.dead || !e.inCombat) continue;
+      if (
+        e.templateId !== 'sexton_marrow' &&
+        e.templateId !== 'rimeweb' &&
+        e.templateId !== 'cantor_ilvane'
+      )
+        continue;
+      e.hp = Math.max(1, Math.floor((e.maxHp * pct) / 100));
+      n++;
+    }
+    log(ctx, pid, `[dev] Set ${n} engaged wing boss${n === 1 ? '' : 'es'} to ${pct}% health.`);
     return true;
   }
   if (verb === 'reset') {
