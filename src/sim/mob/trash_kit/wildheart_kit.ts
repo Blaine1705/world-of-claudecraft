@@ -12,6 +12,10 @@
 //               is an encounter object the client mirrors (scale = radius), so
 //               the floor shows exactly where not to stand.
 //
+// The Basin's own key block (trashKit.wildheart: the Quarry Mark, the War
+// Roar, the Toad Hex, the alternating totems, the Rattling Dread, the Snaring
+// Tongue) runs through the driver's extension seam (wildheart_extension.ts).
+//
 // Zero rng in every pick (allies in roster order, players in the claim's
 // order); the only draws are the cloud's damage rolls, in roster order.
 
@@ -39,7 +43,7 @@ function pulseAllies(ctx: SimContext, inst: InstanceSlot, from: Entity, radius: 
 }
 
 /** Is the mob that summoned `add` (its owner in the claim) still alive? */
-function livingSummoner(ctx: SimContext, inst: InstanceSlot, add: Entity): boolean {
+export function livingSummoner(ctx: SimContext, inst: InstanceSlot, add: Entity): boolean {
   for (const id of inst.mobIds) {
     const e = ctx.entities.get(id);
     if (e && !e.dead && e.hp > 0 && e.summonedIds.includes(add.id)) return true;

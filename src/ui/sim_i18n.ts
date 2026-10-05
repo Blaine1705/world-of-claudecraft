@@ -1349,6 +1349,16 @@ const baseEnTable = {
   'aura.templePleniluneWard': 'Plenilune Ward',
   'aura.templeEclipsed': 'Eclipsed',
   'aura.templeMoonborneMight': 'Moonborne Might',
+  // The Temple trash mechanics pass: the choir's wards and the lagoon's new
+  // moves (mob/trash_kit/temple_choir.ts, temple_tide.ts, content/temple.ts,
+  // content/drowned_temple.ts).
+  'mechanic.templeLullabyEcho': 'Lullaby Echo',
+  'mechanic.templePrismGlare': 'Prism Glare',
+  'mechanic.templeSpiralWhirlpool': 'Spiral Whirlpool',
+  'mechanic.templeArcingSpark': 'Arcing Spark',
+  'aura.templeShrineVigil': 'Shrine Vigil',
+  'aura.templeMoonsetOath': 'Moonset Oath',
+  'aura.templeSwollenTide': 'Swollen Tide',
   // The Wildheart Basin rework's gates (sim/content/wildheart.ts openText),
   // the Great Saurian's howdah line, and the trash-kit and Saurian mechanic
   // and aura names (mob/trash_kit/wildheart_kit.ts, encounters/wildheart_basin).
@@ -1375,6 +1385,14 @@ const baseEnTable = {
   'mechanic.wildheartEarthshakingStomp': 'Earthshaking Stomp',
   'aura.wildheartKnockedDown': 'Knocked Down',
   'aura.wildheartEnrage': 'Enrage',
+  // The Wildheart trash mechanics pass (mob/trash_kit/wildheart_hunt.ts,
+  // content/wildheart.ts).
+  'mechanic.wildheartQuarryMark': 'Quarry Mark',
+  'mechanic.wildheartWarRoar': 'War Roar',
+  'mechanic.wildheartToadHex': 'Toad Hex',
+  'mechanic.wildheartRattlingDread': 'Rattling Dread',
+  'mechanic.wildheartSnaringTongue': 'Snaring Tongue',
+  'mechanic.wildheartSnarlbark': 'Snarlbark',
   // The Gravewyrm Sanctum rework's gates (sim/content/gravewyrm_sanctum.ts
   // openText), the Sledge Tusker's spill line, and the trash-kit and Tusker
   // mechanic and aura names (mob/trash_kit/sanctum_kit.ts,
@@ -17928,6 +17946,14 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Plenilune Ward': 'aura.templePleniluneWard',
   Eclipsed: 'aura.templeEclipsed',
   'Moonborne Might': 'aura.templeMoonborneMight',
+  // The Temple trash mechanics pass (trash_kit/temple_choir.ts, temple_tide.ts).
+  'Lullaby Echo': 'mechanic.templeLullabyEcho',
+  'Prism Glare': 'mechanic.templePrismGlare',
+  'Spiral Whirlpool': 'mechanic.templeSpiralWhirlpool',
+  'Arcing Spark': 'mechanic.templeArcingSpark',
+  'Shrine Vigil': 'aura.templeShrineVigil',
+  'Moonset Oath': 'aura.templeMoonsetOath',
+  'Swollen Tide': 'aura.templeSwollenTide',
   // The Wildheart Basin rework (mob/trash_kit/wildheart_kit.ts, encounters/wildheart_basin).
   'Ancestral Sap': 'mechanic.wildheartAncestralSap',
   'Plant Totem': 'mechanic.wildheartPlantTotem',
@@ -17938,6 +17964,13 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Earthshaking Stomp': 'mechanic.wildheartEarthshakingStomp',
   'Knocked Down': 'aura.wildheartKnockedDown',
   Enrage: 'aura.wildheartEnrage',
+  // The Wildheart trash mechanics pass (trash_kit/wildheart_hunt.ts, content/wildheart.ts).
+  'Quarry Mark': 'mechanic.wildheartQuarryMark',
+  'War Roar': 'mechanic.wildheartWarRoar',
+  'Toad Hex': 'mechanic.wildheartToadHex',
+  'Rattling Dread': 'mechanic.wildheartRattlingDread',
+  'Snaring Tongue': 'mechanic.wildheartSnaringTongue',
+  Snarlbark: 'mechanic.wildheartSnarlbark',
   // The Gravewyrm Sanctum rework (mob/trash_kit/sanctum_kit.ts, encounters/gravewyrm_sanctum).
   // Its Soul Brazier's Soulfire, Knocked Down and Enrage share the keys above.
   'Cinder Breath': 'mechanic.sanctumCinderBreath',

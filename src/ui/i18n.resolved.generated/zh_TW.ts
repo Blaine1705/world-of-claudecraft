@@ -12605,11 +12605,18 @@ export const zh_TW: EnTranslations = {
       "temple_toxic_rime": "劇毒霜晶",
       "temple_beckoning_moon": "喚月",
       "temple_falling_moon": "墜月",
+      "temple_prism_glare": "稜鏡凝視",
+      "temple_arcing_spark": "弧光火花",
       "wildheart_ancestral_sap": "先祖樹汁",
       "wildheart_plant_totem": "安置圖騰",
       "wildheart_entangling_lash": "纏繞鞭笞",
       "wildheart_saurian_tail_swipe": "甩尾",
       "wildheart_saurian_stomp": "撼地踐踏",
+      "wildheart_quarry_mark": "獵物印記",
+      "wildheart_war_roar": "戰爭咆哮",
+      "wildheart_toad_hex": "蟾蜍妖術",
+      "wildheart_rattling_dread": "骨鳴恐懼",
+      "wildheart_snaring_tongue": "套索之舌",
       "wildheart_beast_pit_quake": "獸坑震盪",
       "wildheart_jaguar_heel": "回來！",
       "wildheart_gorgebloom_seed_rain": "種子雨",
@@ -20847,6 +20854,9 @@ export const zh_TW: EnTranslations = {
       },
       "sunbone_totem": {
         "name": "日骨圖騰"
+      },
+      "sunbone_dread_totem": {
+        "name": "日骨恐懼圖騰"
       },
       "basin_raptor": {
         "name": "盆地迅猛龍"

@@ -234,6 +234,8 @@ const AUTHORED_ATLAS_DEFS = [
   'wildheart_thorn_sprout',
   'wildheart_fanglord_jaguar',
   'wildheart_sunbone_totem',
+  // its Dread Totem: the same carved post re-tinted (wildheart_creature_looks.ts)
+  'wildheart_sunbone_dread_totem',
   // the rework's re-tints of a flagged body, which inherit the flag with the
   // spread base def (characters/sanctum_creature_looks.ts)
   'sanctum_boneguard',

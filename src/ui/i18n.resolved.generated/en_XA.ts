@@ -12605,11 +12605,18 @@ export const en_XA: EnTranslations = {
       "temple_toxic_rime": "[Ţóẋíç Ŕíɱé]",
       "temple_beckoning_moon": "[Ɓéçķóñíñĝ Ɱóóñ]",
       "temple_falling_moon": "[Ƒáļļíñĝ Ɱóóñ]",
+      "temple_prism_glare": "[Þŕíšɱ Ĝļáŕé]",
+      "temple_arcing_spark": "[Áŕçíñĝ Šþáŕķ]",
       "wildheart_ancestral_sap": "[Áñçéšţŕáļ Šáþ]",
       "wildheart_plant_totem": "[Þļáñţ Ţóţéɱ]",
       "wildheart_entangling_lash": "[Éñţáñĝļíñĝ Ļášĥ]",
       "wildheart_saurian_tail_swipe": "[Ţáíļ Šŵíþé]",
       "wildheart_saurian_stomp": "[Éáŕţĥšĥáķíñĝ Šţóɱþ]",
+      "wildheart_quarry_mark": "[Ɋúáŕŕý Ɱáŕķ]",
+      "wildheart_war_roar": "[Ŵáŕ Ŕóáŕ]",
+      "wildheart_toad_hex": "[Ţóáð Ĥéẋ]",
+      "wildheart_rattling_dread": "[Ŕáţţļíñĝ Ðŕéáð]",
+      "wildheart_snaring_tongue": "[Šñáŕíñĝ Ţóñĝúé]",
       "wildheart_beast_pit_quake": "[Ɓéášţ Þíţ Ɋúáķé]",
       "wildheart_jaguar_heel": "[Ĥééļ!]",
       "wildheart_gorgebloom_seed_rain": "[Šééð Ŕáíñ]",
@@ -20847,6 +20854,9 @@ export const en_XA: EnTranslations = {
       },
       "sunbone_totem": {
         "name": "[Šúñƀóñé Ţóţéɱ]"
+      },
+      "sunbone_dread_totem": {
+        "name": "[Šúñƀóñé Ðŕéáð Ţóţéɱ]"
       },
       "basin_raptor": {
         "name": "[Ɓášíñ Ŕáþţóŕ]"

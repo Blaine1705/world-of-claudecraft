@@ -172,6 +172,14 @@ describe('Wildheart Basin premature boss pull', () => {
     sim.aggroMob(boss, player, false);
     // 100 yards at chase speed is about 14 seconds; 60 leaves real headroom.
     tickWithImmortalPuller(sim, player, 20 * 60);
+    // The Basin trash moves its quarry (a Spore Toad's Snaring Tongue reels
+    // the puller up to about 1.8 s, a Dread Totem's fear runs them 2 s), so
+    // the pack can be mid-step on any one tick: give it up to 5 s to settle
+    // back onto the puller before reading the snapshot.
+    for (let i = 0; i < 20 * 5; i++) {
+      if (northOf(instance, others).every((m) => m.aiState === 'attack')) break;
+      tickWithImmortalPuller(sim, player, 1);
+    }
 
     const north = northOf(instance, others);
     expect(north.length).toBeGreaterThanOrEqual(15);

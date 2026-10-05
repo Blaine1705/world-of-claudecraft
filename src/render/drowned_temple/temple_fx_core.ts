@@ -38,12 +38,14 @@ import {
   YSOLEI_UNDERTOW,
 } from '../../sim/encounters/drowned_temple/ids';
 import {
+  TEMPLE_ARCING_SPARK,
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_GLIMMER_VENOM,
   TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
   TEMPLE_PEARL_SLAM,
+  TEMPLE_PRISM_GLARE,
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
@@ -67,6 +69,13 @@ export interface TempleTelegraphSpec {
   /** The element accent of the motes and the fill front. */
   accent?: number;
 }
+
+/** The Lagoon Eel's coil on the floor (yards from its centre, at its
+ *  template scale): the coiled body covers the floor out to this, so a glyph
+ *  under the eel must reach past it or the eel's own body hides it. Measured
+ *  off the live rig's skinned vertices under 1.5 yd (99th percentile 2.89;
+ *  only the tail tip reaches further). */
+export const TEMPLE_EEL_COIL_RADIUS = 2.9;
 
 /** The temple's own element accents: moonlight, the choir's gold, the prism's
  *  violet, the eel's lightning. */
@@ -128,6 +137,24 @@ export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphS
       arcDeg: 360,
       color: TELEGRAPH_THREAT_COLORS.interrupt,
       accent: TEMPLE_ACCENTS.venom,
+    },
+    // The trash mechanics pass: a kick glyph under the Eel's Arcing Spark,
+    // and a glyph under the Lurker's Prism Glare (a gaze, never a kick: the
+    // eye over it and its reach rim are temple_trash_fx.ts's). The spark's
+    // glyph rings the eel's coil: drawn inside it, the body covered it whole.
+    [TEMPLE_ARCING_SPARK]: {
+      shape: 'sigil',
+      range: TEMPLE_EEL_COIL_RADIUS + 0.5,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TEMPLE_ACCENTS.storm,
+    },
+    [TEMPLE_PRISM_GLARE]: {
+      shape: 'sigil',
+      range: 3,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.control,
+      accent: TEMPLE_ACCENTS.prism,
     },
     [HYDRA_CRUSHING_TORRENT]: {
       shape: 'lane',

@@ -38,7 +38,12 @@ export function isPlantedCast(
     kit?.cone?.castId === castId ||
     kit?.nova?.castId === castId ||
     (kit?.nova?.unstoppableCastId !== undefined && kit.nova.unstoppableCastId === castId) ||
-    kit?.hook?.castId === castId
+    kit?.hook?.castId === castId ||
+    // The dungeons' own area casts (kit_extension.ts): the Prism Glare gaze,
+    // the Snaring Tongue lane and the Rattling Dread ring.
+    kit?.temple?.gaze?.castId === castId ||
+    kit?.wildheart?.tongue?.castId === castId ||
+    kit?.wildheart?.dread?.castId === castId
   );
 }
 

@@ -22,6 +22,9 @@ export const RAVAGER_ID = 'wildheart_ravager';
 export const HEXCALLER_ID = 'wildheart_hexcaller';
 export const TOTEM_BINDER_ID = 'sunbone_totem_binder';
 export const SUNBONE_TOTEM_ID = 'sunbone_totem';
+/** The Totem-Binder's second totem: a bone post under a red skull whose
+ *  Rattling Dread sends everyone near it fleeing (the trash mechanics pass). */
+export const SUNBONE_DREAD_TOTEM_ID = 'sunbone_dread_totem';
 export const BASIN_RAPTOR_ID = 'basin_raptor';
 export const SPORE_TOAD_ID = 'spore_toad';
 export const VINE_LASHER_ID = 'vine_lasher';

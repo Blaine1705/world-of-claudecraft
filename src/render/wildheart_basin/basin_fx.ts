@@ -92,6 +92,7 @@ import type { BasinFxHost } from './basin_fx_host';
 import { setBasinJaguarEyesBurn } from './basin_kit';
 import { BasinSplash } from './basin_splash';
 import { BasinThorns } from './basin_thorns';
+import { BasinTrashFx } from './basin_trash_fx';
 import { BASIN_WATER_WADERS } from './basin_water';
 import { GorgebloomFx } from './gorgebloom_fx';
 import { LasherFx } from './lasher_fx';
@@ -213,6 +214,8 @@ export class WildheartFx {
   private readonly trails = new Map<number, number>();
   private readonly kit: TelegraphKit;
   private readonly boss: BasinBossFx | null;
+  /** The trash's hunt: frenzies, the quarry mark, the hex, the dread, the tongue. */
+  private readonly trash: BasinTrashFx | null;
   /** The Great Saurian's body: its water, its howdah, its clips. */
   private readonly saurian: SaurianFx | null;
   /** The Gorgebloom's body: its maw, sacs, lash and death, its clips' gestures. */
@@ -420,6 +423,7 @@ export class WildheartFx {
     );
     // The three bosses: built under this root before the gated attach.
     this.boss = world ? new BasinBossFx(this.bossHost(), world) : null;
+    this.trash = world ? new BasinTrashFx(this.bossHost(), world) : null;
     this.saurian = world ? new SaurianFx(this.bossHost(), world, playGesture) : null;
     this.lasher = new LasherFx(this.bossHost());
     const boss = this.boss;
@@ -528,7 +532,9 @@ export class WildheartFx {
   /** True when the event is one of the basin's own (the renderer then skips
    *  its generic draw of it). */
   handleEvent(ev: SimEvent): boolean {
-    if (ev.type !== 'spellfx' || !this.world || this.disposed) return false;
+    if (!this.world || this.disposed) return false;
+    if (this.trash?.handleEvent(ev)) return true;
+    if (ev.type !== 'spellfx') return false;
     const ability = ev.ability;
     if (!ability) return false;
     const src = this.world.entities.get(ev.sourceId);
@@ -614,6 +620,7 @@ export class WildheartFx {
       if (this.bossShown) {
         this.bossShown = false;
         this.boss?.hideAll();
+        this.trash?.hideAll();
         this.saurian?.hideAll();
         this.gorgebloom?.hideAll();
         this.lasher.hideAll();
@@ -640,6 +647,7 @@ export class WildheartFx {
     this.paintWaders();
     this.bossShown = true;
     this.boss?.update(dt, this.clock);
+    this.trash?.update(dt, this.clock);
     this.saurian?.update(dt, this.clock);
     this.gorgebloom?.update(dt, this.clock);
     this.lasher.update(this.clock);
@@ -915,10 +923,12 @@ export class WildheartFx {
     let zulgar: 'idle' | 'fight' | 'hunt' = 'idle';
     let maw = false;
     this.boss?.beginScan();
+    this.trash?.beginScan();
     this.saurian?.beginScan();
     this.gorgebloom?.beginScan();
     for (const e of world.entities.values()) {
       if (this.boss?.scanEntity(e)) basin = true;
+      if (this.trash?.scanEntity(e)) basin = true;
       if (e.kind === 'player') {
         if (vineRooted(e)) this.claimVine(e);
         continue;
@@ -970,6 +980,7 @@ export class WildheartFx {
       slot.group.visible = true;
     }
     this.saurian?.endScan();
+    this.trash?.endScan();
     this.gorgebloom?.endScan();
     this.mawOpen = maw;
     this.inBasin =
@@ -977,6 +988,7 @@ export class WildheartFx {
       maw ||
       this.clouds.some((c) => c.objectId >= 0) ||
       this.lasher.busy() ||
+      (this.trash?.busy() ?? false) ||
       this.thorns.busy();
     this.zulgarState = zulgar;
   }
@@ -1050,6 +1062,10 @@ export class WildheartFx {
     if (this.boss) {
       const boss = this.boss;
       attempt(() => boss.dispose());
+    }
+    if (this.trash) {
+      const trash = this.trash;
+      attempt(() => trash.dispose());
     }
     if (this.saurian) {
       const saurian = this.saurian;

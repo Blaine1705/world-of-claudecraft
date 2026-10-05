@@ -12605,11 +12605,18 @@ export const ja_JP: EnTranslations = {
       "temple_toxic_rime": "毒の霧氷",
       "temple_beckoning_moon": "月招き",
       "temple_falling_moon": "落ちる月",
+      "temple_prism_glare": "プリズムの眼光",
+      "temple_arcing_spark": "弧光の火花",
       "wildheart_ancestral_sap": "祖霊の樹液",
       "wildheart_plant_totem": "トーテム設置",
       "wildheart_entangling_lash": "絡みつく鞭",
       "wildheart_saurian_tail_swipe": "尾の薙ぎ払い",
       "wildheart_saurian_stomp": "大地を揺るがす踏みつけ",
+      "wildheart_quarry_mark": "獲物の印",
+      "wildheart_war_roar": "戦の咆哮",
+      "wildheart_toad_hex": "ヒキガエルの呪い",
+      "wildheart_rattling_dread": "骨鳴りの恐怖",
+      "wildheart_snaring_tongue": "絡め取る舌",
       "wildheart_beast_pit_quake": "獣穴の地震",
       "wildheart_jaguar_heel": "戻れ！",
       "wildheart_gorgebloom_seed_rain": "種の雨",
@@ -20847,6 +20854,9 @@ export const ja_JP: EnTranslations = {
       },
       "sunbone_totem": {
         "name": "陽骨のトーテム"
+      },
+      "sunbone_dread_totem": {
+        "name": "陽骨の恐怖トーテム"
       },
       "basin_raptor": {
         "name": "盆地のラプトル"

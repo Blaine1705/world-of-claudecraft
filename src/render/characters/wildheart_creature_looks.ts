@@ -26,7 +26,14 @@ import {
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
 } from '../../sim/encounters/wildheart_basin/ids';
-import { WILDHEART_ENTANGLING_LASH } from '../../sim/mob/trash_kit/wildheart_cast_ids';
+import {
+  WILDHEART_ENTANGLING_LASH,
+  WILDHEART_QUARRY_MARK,
+  WILDHEART_SNARING_TONGUE,
+  WILDHEART_TOAD_HEX,
+  WILDHEART_WAR_ROAR,
+} from '../../sim/mob/trash_kit/wildheart_cast_ids';
+import { TRASH_CAST_CLIPS, trashCastClipRate } from '../wildheart_basin/basin_trash_fx_core';
 import {
   GORGE_RATE,
   GORGEBLOOM_GLOW,
@@ -285,6 +292,35 @@ const ROWS: Record<string, PlaceholderRow> = {
   wildheart_howdah_hexcaller: ['mob_wildheart_hexcaller', 0xa3322a, 0.22, 1],
 };
 
+/** A rig taught the hunt's casts (the trash mechanics pass): each cast id plays
+ *  its existing clip (basin_trash_fx_core.ts TRASH_CAST_CLIPS), a fitted clip
+ *  at the rate that plays it once over the sim's bar. */
+function withHuntCasts(def: VisualDef | undefined, castIds: readonly string[]): VisualDef | null {
+  if (!def) return null;
+  const castByAbility = { ...def.clips.castByAbility };
+  const castTimeScaleByAbility = { ...def.clips.castTimeScaleByAbility };
+  for (const id of castIds) {
+    const c = TRASH_CAST_CLIPS[id];
+    if (!c) continue;
+    castByAbility[id] = c.clip;
+    castTimeScaleByAbility[id] = trashCastClipRate(id);
+  }
+  return { ...def, clips: { ...def.clips, castByAbility, castTimeScaleByAbility } };
+}
+
+/** Each hunting rig and the casts it learns. */
+const HUNT_CAST_RIGS: Readonly<Record<string, readonly string[]>> = {
+  mob_wildheart_stalker: [WILDHEART_QUARRY_MARK],
+  mob_wildheart_ravager: [WILDHEART_WAR_ROAR],
+  mob_wildheart_hexcaller: [WILDHEART_TOAD_HEX],
+  wildheart_spore_toad: [WILDHEART_SNARING_TONGUE],
+};
+
+/** The Toad Hex's toad (the polymorph slot's other animal,
+ *  characters/form_visual_selection_core.ts): the Spore Toad's warty frog rig
+ *  in its olive, shrunk to a squat thing at a player's knee. */
+const TOAD_FORM_HEIGHT = 1.3;
+
 /** Zulgar vanishes (heroic Ambush): his whole model hides, then returns. */
 export const ZULGAR_HIDE_GESTURE = 'wildheart_zulgar_hide';
 export const ZULGAR_SHOW_GESTURE = 'wildheart_zulgar_show';
@@ -344,6 +380,20 @@ export function wildheartPlaceholderLooks(
   out.wildheart_vine_lasher = WILDHEART_VINE_LASHER_LOOK;
   out.wildheart_thorn_sprout = WILDHEART_THORN_SPROUT_LOOK;
   out.wildheart_fanglord_jaguar = WILDHEART_GREAT_JAGUAR_LOOK;
+  // The hunt's casts on their rigs (the base rigs and the Spore Toad above).
+  for (const [key, casts] of Object.entries(HUNT_CAST_RIGS)) {
+    const taught = withHuntCasts(out[key] ?? visuals[key], casts);
+    if (taught) out[key] = taught;
+  }
+  const frog = visuals.mob_murloc;
+  if (frog)
+    out.form_toad = {
+      ...frog,
+      height: TOAD_FORM_HEIGHT,
+      tint: 0x7f8a34,
+      tintStrength: 0.7,
+      selfIllumination: 0.08,
+    };
   // Zulgar keeps his shipped body; it learns to vanish for the Ambush.
   const zulgar = visuals.mob_wildheart_high_priest;
   if (zulgar)
@@ -376,6 +426,15 @@ export function wildheartPlaceholderLooks(
     selfIllumination: 0.18,
     clickRadius: 1.4,
   };
+  // The Sunbone Dread Totem: the same carved post washed in old blood, its
+  // bone darkened and its paint glowing red (the fx crown it with the
+  // red-painted skull, basin_trash_fx.ts).
+  out.wildheart_sunbone_dread_totem = {
+    ...out.wildheart_sunbone_totem,
+    tint: 0x7a1c16,
+    tintStrength: 0.42,
+    selfIllumination: 0.3,
+  };
   return out;
 }
 
@@ -387,6 +446,7 @@ export const WILDHEART_MOB_KEYS: Readonly<Record<string, string>> = {
   thorn_sprout: 'wildheart_thorn_sprout',
   sunbone_totem_binder: 'wildheart_totem_binder',
   sunbone_totem: 'wildheart_sunbone_totem',
+  sunbone_dread_totem: 'wildheart_sunbone_dread_totem',
   howdah_hexcaller: 'wildheart_howdah_hexcaller',
   fanglord_jaguar: 'wildheart_fanglord_jaguar',
   the_gorgebloom: 'wildheart_gorgebloom',

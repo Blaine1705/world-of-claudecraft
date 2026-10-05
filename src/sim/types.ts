@@ -16,6 +16,8 @@ import type { VelkharFightState } from './encounters/gravewyrm_sanctum/velkhar_s
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { WispMazeState } from './minigames/wisp_maze';
+import type { TempleKitDef, TempleKitState } from './mob/trash_kit/temple_kit_types';
+import type { WildheartKitDef, WildheartKitState } from './mob/trash_kit/wildheart_kit_types';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
 import type {
@@ -4339,6 +4341,9 @@ export interface TrashKitDef {
     max: number;
     name: string;
     school: TrashKitCast['school'];
+    /** A slow on everyone the burst catches: `mult` of their run speed for
+     *  `seconds` (the Tidewisp's chill). */
+    slow?: { mult: number; seconds: number };
   };
   // ---- The trash engine pieces (mob/trash_kit/CLAUDE.md "Engine pieces"):
   // generic, data-driven keys any dungeon's trash may carry. ----
@@ -4539,6 +4544,10 @@ export interface TrashKitDef {
    *  and no longer hostile, it kneels for `seconds` and leaves the fight (the
    *  Shackled Prisoner's Snapped Fetters). */
   unshackle?: { name: string; belowHpPct: number; seconds: number };
+  /** The Drowned Temple trash's own keys (mob/trash_kit/temple_kit_types.ts). */
+  temple?: TempleKitDef;
+  /** The Wildheart Basin trash's own keys (mob/trash_kit/wildheart_kit_types.ts). */
+  wildheart?: WildheartKitDef;
 }
 
 /** Trash kit state that outlives a pull's TrashKitState (Entity.trashLife;
@@ -4718,6 +4727,10 @@ export interface TrashKitState {
   fog?: { x: number; z: number; remaining: number; objectId: number | null; laid: boolean };
   /** Brine Column: the victim held while the channel runs. */
   column?: { victimId: number; tick: number };
+  /** The Drowned Temple keys' per-pull state. */
+  temple?: TempleKitState;
+  /** The Wildheart Basin keys' per-pull state. */
+  wildheart?: WildheartKitState;
 }
 
 /** Per-fight state of a Sunken Bastion boss (encounters/sunken_bastion),

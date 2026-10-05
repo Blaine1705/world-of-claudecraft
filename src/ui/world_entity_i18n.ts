@@ -330,6 +330,8 @@ const MOB_IDS = [
   // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md).
   'sunbone_totem_binder',
   'sunbone_totem',
+  // The Wildheart trash mechanics pass: the Totem-Binder's fear totem.
+  'sunbone_dread_totem',
   'basin_raptor',
   'spore_toad',
   'vine_lasher',

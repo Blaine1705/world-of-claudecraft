@@ -820,6 +820,19 @@ authoring, for the trash kit's new names (`src/sim/mob/trash_kit/crypt_kit.ts`,
 | Fall Back | the Arbalest's leap back | KEEP. A generic military order across many properties; none is a backward self leap. |
 | Fog Bank | the Mist Chanter's patch | KEEP. A weather term; the Magic: The Gathering card is shared dictionary English in another medium. |
 | Splinter Burst, Torn Tendon, Carrion Glut, Snapped Fetters, Gouging Beak | the replacements | KEEP. No match on any of the wikis or on Wowhead. |
+### The Temple and Wildheart trash mechanics (wiki-verified 2026-10-04)
+
+The general web search budget was exhausted, so this check ran against the wikis' own search: the Wowhead database search and a warcraft.wiki.gg full-text exact-phrase search for every name, plus RuneScape, Guild Wars 2, FFXIV, Hearthstone, League of Legends and Liquipedia Dota 2 for the coined tokens and the flagged names (UESP, poewiki, the Diablo fandom and Scryfall refused the fetch, so ESO, Path of Exile, Diablo and Magic: The Gathering are not covered).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Leaping Spark | REJECTED before shipping | A World of Warcraft boss ability (Geezle's Leaping Sparks). The lagoon eel's chain lightning is the Arcing Spark. |
+| Bloodmane Roar | REJECTED before shipping | "Bloodmane" is a World of Warcraft tribe name (the Bloodmane saberon of the Spires of Arak). The shipped Bloodmane names stay as the maintainer kept them, but the token is not extended: the ravager's pack enrage is the War Roar. |
+| Tongue Lash | considered, not used | A World of Warcraft battle pet ability and NPC spell. The giant toad's pull is the Snaring Tongue. |
+| Shrine Vigil, Moonset Oath, Lullaby Echo, Prism Glare, Spiral Whirlpool, Arcing Spark, Swollen Tide | the Drowned Temple trash (pilgrim-warded singer, heroic guard link, heroic sleep spread, mantis shrimp gaze, nautilus pull, eel chain lightning, heroic wisp merge) | KEEP. No match for the full names; plain English ("moonset" is an English word). |
+| Quarry Mark, War Roar, Toad Hex, Rattling Dread, Snaring Tongue | the Wildheart Basin trash (raptor prey mark, ravager pack enrage, hexer polymorph, totem fear pulse, toad pull) | KEEP. No match for the full names; plain English ("Hex" alone is shared vocabulary). |
+| Sunbone Dread Totem | the Sunbone fear totem | KEEP. No match; "Sunbone" is this game's own coined token (Sunbone Hexcaller). |
+| Snarlbark | the vine creature's thorns | KEEP. No match; pairs with this game's own Snarlvine. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 

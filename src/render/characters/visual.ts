@@ -491,6 +491,11 @@ export class CharacterVisual {
     return this.look;
   }
 
+  /** The VISUALS key this rig was built from (a shared form slot's look). */
+  get assetKey(): string {
+    return this.key;
+  }
+
   /** Move the face/body sliders on the LIVE body: morph influences are
    *  per-instance over shared geometry, so a slider drag repaints without the
    *  dispose-and-recompose a geometry change needs (which is why the sliders
