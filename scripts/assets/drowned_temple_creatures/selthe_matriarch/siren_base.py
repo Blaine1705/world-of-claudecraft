@@ -34,7 +34,7 @@ ELBOW = np.array((0.52, 0.1, 3.27))
 WRIST = np.array((0.62, 0.02, 2.76))
 HAND_TIP = np.array((0.665, -0.05, 2.49))
 HEAD_PIVOT = np.array((0.0, 0.02, 4.26))
-HEAD_SCALE = 1.2
+HEAD_SCALE = 1.36   # the matriarch's head: larger, in the game's stylized proportions
 
 
 def hs(p):
@@ -399,10 +399,10 @@ def head_paint(obj):
         for a, b in zip(pts, pts[1:]):
             dd, _ = X.seg_dist(x, y, z, a, b)
             d = np.minimum(d, dd)
-        lash = np.maximum(lash, np.clip((0.009 - d) / 0.003, 0, 1) * front)
+        lash = np.maximum(lash, np.clip((0.012 - d) / 0.003, 0, 1) * front)
         bx = (x * s - 0.072) / 0.052
         bz = z - (4.548 + 0.016 * (1 - bx * bx) + 0.01 * bx)
-        brow = np.maximum(brow, np.clip((1 - bx * bx) * 3, 0, 1) * np.clip((0.0055 - np.abs(bz)) / 0.002, 0, 1)
+        brow = np.maximum(brow, np.clip((1 - bx * bx) * 3, 0, 1) * np.clip((0.009 - np.abs(bz)) / 0.003, 0, 1)
                           * front)
         ex, ez = (x * s - 0.07) / 0.046, (z - 4.5) / 0.024
         lid = np.maximum(lid, np.clip((1 - (ex * ex + ez * ez)) / 0.4, 0, 1) * front)

@@ -16,20 +16,23 @@
 No rust, no barnacles, no grey fog: even the shadows lean teal."""
 from surface import NT, srgb
 
-KINDS = ('mantle', 'mantle_tail', 'glass', 'eye', 'silver', 'pearl')
+KINDS = ('mantle', 'mantle_tail', 'glass', 'eye', 'silver', 'pearl', 'heart')
 GLOWS = {
-    'glow_pearl': ((0.78, 0.95, 1.0), 3.4, 'MantaHeartPearl'),
     'glow_rim': ((0.42, 0.96, 1.0), 3.4, 'MantaWingLight'),
+    # the heart pearl gone dark as it dies: a flat dull pearl (never baked:
+    # it sits inside the living pearl, which would bake onto it)
+    'glow_darkpearl': ((0.36, 0.42, 0.48), 0.15, 'MantaDarkPearl'),
     'glow_eye': ((0.72, 1.0, 1.0), 4.2, 'MantaEyeSlit'),
 }
 EMIT_STRENGTH = 4.0
 CYAN = (0.35, 0.95, 1.0)
-TOP_A = (0.95, 0.93, 0.9)       # pearl white
-TOP_B = (0.86, 0.92, 0.97)      # silver-blue
-TOP_C = (0.97, 0.9, 0.93)       # rose nacre
+TOP_A = (0.07, 0.24, 0.36)      # the moonlit deep: night-sea blue
+TOP_B = (0.04, 0.17, 0.3)       # darker, toward the spine
+TOP_C = (0.1, 0.3, 0.42)        # lighter turquoise drift
 BELLY_A = (0.03, 0.24, 0.31)    # deep turquoise
 BELLY_B = (0.07, 0.38, 0.44)
-CLEAR = (0.62, 0.94, 0.96)      # the clear edge
+BELLY_PEARL = (0.78, 0.88, 0.9)  # the pale pearl heart of the belly
+CLEAR = (0.16, 0.76, 0.9)       # the clear edge
 
 
 def uv_boost(obj, c):
@@ -65,9 +68,9 @@ def _pearl_top(t, span):
     drift = t.noise(t.scale_vec(1.0, 1.0, 1.0), scale=0.9, detail=2, w=1.3)
     base = t.ramp(drift, [(0.3, srgb(TOP_B)), (0.5, srgb(TOP_A)), (0.72, srgb(TOP_C))])
     lines = t.noise(t.scale_vec(1.0, 7.0, 1.0), scale=3.0, detail=3, dist=0.6)
-    base = t.mix(t.math('MULTIPLY', t.smooth(lines, 0.45, 0.62), 0.18), base, srgb((0.8, 0.9, 0.98)))
-    # the sheen deepens a little toward the wingtips (thinner, more silver)
-    base = t.mix(t.math('MULTIPLY', span, 0.35), base, srgb((0.82, 0.9, 0.98)))
+    base = t.mix(t.math('MULTIPLY', t.smooth(lines, 0.45, 0.62), 0.22), base, srgb((0.3, 0.52, 0.64)))
+    # the wings lighten toward their tips into turquoise, then the clear edge
+    base = t.mix(t.math('MULTIPLY', t.smooth(span, 0.35, 0.95), 0.75), base, srgb((0.12, 0.46, 0.56)))
     return base
 
 
@@ -93,9 +96,12 @@ def shade(mat, k):
         rays = t.smooth(t.voronoi(t.scale_vec(0.35, 4.0, 1.0), scale=2.2, feature='DISTANCE_TO_EDGE'), 0.05, 0.0)
         rays = t.math('MULTIPLY', rays, t.math('MULTIPLY', t.smooth(span, 0.15, 0.4), 0.6))
         # cooler silver-blue toward the leading edges and the tips, warm pearl at the heart
-        cool = t.math('MULTIPLY', t.smooth(span, 0.2, 0.9), 0.55)
-        topc = t.mix(cool, topc, srgb((0.76, 0.86, 0.96)))
-        topc = t.mix(rays, topc, srgb((0.68, 0.8, 0.92)))
+        # pearl-silver chevrons on the shoulders, a manta's bright patches
+        # made moonlight, framing the arc of plates
+        chev = t.math('MULTIPLY', t.smooth(t.math('ABSOLUTE', t.math('SUBTRACT', t.math('ABSOLUTE', t.px), 0.75)),
+                                           0.3, 0.12), t.smooth(t.math('ABSOLUTE', t.math('ADD', t.py, 0.55)), 0.45, 0.2))
+        topc = t.mix(t.math('MULTIPLY', chev, 0.55), topc, srgb((0.62, 0.78, 0.86)))
+        topc = t.mix(rays, topc, srgb((0.36, 0.62, 0.74)))
         topc = t.mix(plate, topc, nac)
         topc = t.mix(ring, topc, srgb((0.96, 0.98, 1.0)))
         # each moon: its dark part the night sea, its lit part moonlight
@@ -106,6 +112,8 @@ def shade(mat, k):
         mott = t.noise(scale=2.2, detail=3)
         belly = t.ramp(mott, [(0.35, srgb(BELLY_A)), (0.65, srgb(BELLY_B))])
         belly = t.mix(t.math('MULTIPLY', span, 0.5), belly, srgb((0.1, 0.46, 0.52)))
+        pale = t.math('MULTIPLY', t.smooth(span, 0.42, 0.12), t.smooth(t.math('ABSOLUTE', t.math('ADD', t.py, 0.2)), 1.1, 0.5))
+        belly = t.mix(pale, belly, srgb(BELLY_PEARL))
         st1 = t.smooth(t.voronoi(scale=11.0, feature='F1'), 0.06, 0.018)
         pick1 = t.smooth(t.voronoi(scale=11.0, feature='F1', out='Color'), 0.55, 0.62)
         st2 = t.smooth(t.voronoi(scale=27.0, feature='F1'), 0.07, 0.02)
@@ -115,18 +123,24 @@ def shade(mat, k):
         belly = t.mix(stars, belly, srgb((0.8, 1.0, 1.0)))
         color = t.mix(top, belly, topc)
         # the clear edge, like water: aqua over both faces
-        clear = t.math('MULTIPLY', t.math('POWER', rim, 1.3), 0.92)
+        clear = t.math('MULTIPLY', t.math('POWER', rim, 1.1), 0.95)
         color = t.mix(clear, color, srgb(CLEAR))
-        color = t.mix(lobe, color, srgb((0.9, 0.94, 1.0)))
+        color = t.mix(t.math('MULTIPLY', t.math('POWER', rim, 3.0), 0.35), color, srgb((0.45, 0.92, 1.0)))
+        silver = t.ramp(t.noise(scale=7.0, detail=2), [(0.3, srgb((0.56, 0.62, 0.74))), (0.7, srgb((0.7, 0.76, 0.86)))])
+        color = t.mix(lobe, color, silver)
+        # the line engraved round the crescent holds a thread of moonlight
+        etch = t.math('MULTIPLY', lobe, t.smooth(t.point, 0.485, 0.45))
+        color = t.mix(etch, color, srgb((0.45, 0.9, 1.0)))
         color = t.mix(mouth, color, srgb((0.02, 0.11, 0.15)))
-        color = t.mix(gill, color, srgb((0.03, 0.16, 0.2)))
+        color = t.mix(gill, color, srgb((0.01, 0.08, 0.12)))
         color = _teal_cavity(t, color)
-        emit = t.mix(t.math('MULTIPLY', t.math('POWER', rim, 2.2), 0.85), (0, 0, 0, 1), srgb(CYAN))
+        emit = t.mix(t.math('MULTIPLY', t.math('POWER', rim, 1.6), 0.9), (0, 0, 0, 1), srgb(CYAN))
         emit = t.mix(moon, emit, srgb((0.62, 0.92, 1.0)))
-        emit = t.mix(t.math('MULTIPLY', lobe, 0.14), emit, srgb((0.7, 0.92, 1.0)))
+        emit = t.mix(t.math('MULTIPLY', lobe, 0.06), emit, srgb((0.7, 0.92, 1.0)))
+        emit = t.mix(etch, emit, srgb((0.35, 0.9, 1.0)))
         emit = t.mix(t.math('MULTIPLY', ring, 0.16), emit, srgb((0.6, 0.9, 1.0)))
         emit = t.mix(stars, emit, srgb((0.62, 1.0, 1.0)))
-        metal = t.math('MAXIMUM', t.math('MULTIPLY', lobe, 0.25), t.math('MULTIPLY', ring, 0.4))
+        metal = t.math('MAXIMUM', t.math('MULTIPLY', lobe, 0.45), t.math('MULTIPLY', ring, 0.4))
         rough = t.fmix(plate, 0.34, 0.14)
         rough = t.fmix(rim, rough, 0.08)
         rough = t.fmix(lobe, rough, 0.22)
@@ -166,6 +180,18 @@ def shade(mat, k):
     elif k == 'pearl':
         base = t.ramp(t.noise(scale=30, detail=2), [(0.3, srgb((0.94, 0.9, 0.98))), (0.7, srgb((0.88, 0.97, 0.98)))])
         t.finish(base, 0.12, 0.0, None, emit=srgb((0.18, 0.22, 0.26)))
+    elif k == 'heart':
+        # a pearl with moonlight inside it: the face toward you glows
+        # cyan-white from its core, the rim is pearl with a rose and aqua lustre
+        front = t.smooth(_attr(t, 'RegFront'), 0.15, 0.95)
+        lustre = t.ramp(t.noise(t.N, scale=1.2, detail=1), [(0.3, srgb((0.96, 0.86, 0.94))), (0.5, srgb((0.95, 0.96, 0.98))),
+                                                            (0.7, srgb((0.78, 0.96, 0.98)))])
+        color = t.mix(front, lustre, srgb((0.62, 0.94, 1.0)))
+        groove = t.smooth(t.point, 0.48, 0.43)
+        color = t.mix(t.math('MULTIPLY', groove, 0.7), color, srgb((0.3, 0.7, 0.86)))
+        emit = t.mix(front, srgb((0.16, 0.24, 0.32)), srgb((0.3, 0.86, 0.98)))
+        emit = t.mix(t.math('MULTIPLY', groove, 0.8), emit, srgb((0.45, 0.95, 1.0)))
+        t.finish(color, 0.1, 0.0, None, emit=emit)
     else:
         raise ValueError(k)
     return mat

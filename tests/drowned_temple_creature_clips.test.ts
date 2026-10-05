@@ -64,6 +64,28 @@ function clipsOf(path: string): string[] {
   return (json.animations ?? []).map((a) => a.name);
 }
 
+interface GlbJson {
+  materials?: { name?: string; emissiveTexture?: unknown }[];
+  meshes?: { primitives: { indices?: number }[] }[];
+  accessors?: { count: number }[];
+}
+
+function glbJson(path: string): GlbJson {
+  const buf = readFileSync(path);
+  const len = buf.readUInt32LE(12);
+  return JSON.parse(buf.subarray(20, 20 + len).toString('utf8')) as GlbJson;
+}
+
+/** Triangles the GLB draws (every indexed primitive of every mesh). */
+function trianglesOf(path: string): number {
+  const j = glbJson(path);
+  let n = 0;
+  for (const m of j.meshes ?? [])
+    for (const p of m.primitives)
+      if (p.indices !== undefined) n += (j.accessors?.[p.indices]?.count ?? 0) / 3;
+  return n;
+}
+
 function visualOf(templateId: string) {
   return VISUALS[visualKeyFor({ kind: 'mob', templateId } as never)];
 }
@@ -115,13 +137,26 @@ describe('the Lagoon Eel and the Colossus', () => {
     expect(c.castByAbility?.[TEMPLE_STATIC_COIL]).toBe('Coil');
   });
 
-  it('the walking Colossus is drawn at its old size under its larger reach', () => {
+  it('the walking Colossus keeps its body at the old size under its larger reach', () => {
     const v = visualOf('tideglass_colossus');
     expect(clipsOf('public/models/creatures/temple_colossus.glb')).toEqual(
       expect.arrayContaining(['Walk', 'Run']),
     );
     expect(v.clips.walk).toBe('Walk');
-    expect(v.height * (MOBS.tideglass_colossus.scale ?? 1)).toBeCloseTo(15, 3);
+    // the body is still the 15-unit giant; the pointed spires of the recut
+    // rise past it, so the drawn bounds (spire tips included) are 16.7
+    expect(v.height * (MOBS.tideglass_colossus.scale ?? 1)).toBeCloseTo(16.7, 3);
+  });
+
+  it('the recut sea-glass Colossus ships its glowing seams and glossy facets in budget', () => {
+    const path = 'public/models/creatures/temple_colossus.glb';
+    const body = glbJson(path).materials?.find((m) => m.name === 'TideglassColossusBody');
+    // the seams, cracks, slits and prism glow through the baked emissive map
+    expect(body?.emissiveTexture).toBeDefined();
+    // the env boost the Reflections' glass uses runs the light across its facets
+    expect(visualOf('tideglass_colossus').envMapIntensity).toBe(2.2);
+    expect(trianglesOf(path)).toBeGreaterThan(30000);
+    expect(trianglesOf(path)).toBeLessThan(42000);
   });
 
   it('the rebuilt sea-glass Colossus answers each of its bars with its own clip', () => {
@@ -350,6 +385,16 @@ describe('the Glimmerscale Lurker: the sacred mantis shrimp', () => {
     expect(v.height * (MOBS.glimmerscale_lurker.scale ?? 1)).toBeCloseTo(4.38, 2);
   });
 
+  it('wears the sculpted armour of round two, baked, in budget', () => {
+    const path = 'public/models/creatures/temple_lurker.glb';
+    const body = glbJson(path).materials?.find((m) => m.name === 'GlimmerscaleLurkerBody');
+    expect(body?.emissiveTexture).toBeDefined();
+    // the keels, pleura, ringed legs and combed claws need a denser body than
+    // the smooth first shell (about 17.8k triangles)
+    expect(trianglesOf(path)).toBeGreaterThan(20000);
+    expect(trianglesOf(path)).toBeLessThan(30000);
+  });
+
   it('pounces in the jump slots and spits Glimmer Venom on its bar', () => {
     const v = visualOf('glimmerscale_lurker');
     const c = v.clips;
@@ -389,10 +434,11 @@ describe('the Pearlguard Sentinel: the Moonmantle Ray', () => {
     expect(v.url).toMatch(/temple_sentinel\.glb$/);
     expect(v.clips.attack).toEqual(['Attack', 'Attack2']);
     expect(v.authoredAtlas).toBe(true);
-    // A floating manta: its Idle bounds (1.4, belly and tail tip a yard up)
-    // sit `hover` over the floor, so the model's floor stays the world's;
-    // drawn 1.6 high at rest at its 1.15 (its wings span 6.8, 2.6 players).
-    expect(v.height * (MOBS.pearlguard_sentinel.scale ?? 1)).toBeCloseTo(1.61, 2);
+    // A floating manta: its Idle bounds (belly and tail tip a yard up) sit
+    // `hover` over the floor, so the model's floor stays the world's; drawn
+    // 1.52 high at rest at its 1.15, its wings still spanning 6.8 (2.6
+    // players): the round-two body is thicker for the same span.
+    expect(v.height * (MOBS.pearlguard_sentinel.scale ?? 1)).toBeCloseTo(1.522, 2);
     expect(v.hover).toBeCloseTo(0.673, 3);
     // no feet to match: the glide speeds its beats are authored for, its
     // wander (about 0.35 of its moveSpeed) and its chase (its moveSpeed)
@@ -401,6 +447,21 @@ describe('the Pearlguard Sentinel: the Moonmantle Ray', () => {
     expect(v.clips.castByAbility?.[TEMPLE_PEARL_SLAM]).toBe('Slam');
     expect(MOBS.pearlguard_sentinel.trashKit?.wingGust?.castTime).toBe(1.5);
     expect(v.castClipSync).toBe(true);
+  });
+
+  it('wears its heart pearl baked into the body, the dark pearl flat, in budget', () => {
+    const path = 'public/models/creatures/temple_sentinel.glb';
+    const names = (glbJson(path).materials ?? []).map((m) => m.name);
+    // the sculpted heart pearl rides the baked atlas (its inner glow is in the
+    // emissive map); only the rim filament and the dying pearl stay flat
+    expect(names).not.toContain('MantaHeartPearl');
+    expect(names).toEqual(
+      expect.arrayContaining(['MoonmantleRayBody', 'MantaWingLight', 'MantaDarkPearl']),
+    );
+    const body = glbJson(path).materials?.find((m) => m.name === 'MoonmantleRayBody');
+    expect(body?.emissiveTexture).toBeDefined();
+    expect(trianglesOf(path)).toBeGreaterThan(18000);
+    expect(trianglesOf(path)).toBeLessThan(32000);
   });
 
   it('shuts its shell while Pearl Carapace holds and opens when it goes', () => {
@@ -486,6 +547,14 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
     expect(v.authoredAtlas).toBe(true);
     // Drawn 9.0 at her 1.15: about 3.5 players.
     expect(v.height * (MOBS.choirmother_selthe.scale ?? 1)).toBeCloseTo(9.0, 1);
+  });
+
+  it('wears her round-two body baked, her bars and eyes in the emissive map, in budget', () => {
+    const path = 'public/models/creatures/temple_selthe.glb';
+    const body = glbJson(path).materials?.find((m) => m.name === 'ChoirmotherSeltheBody');
+    expect(body?.emissiveTexture).toBeDefined();
+    expect(trianglesOf(path)).toBeGreaterThan(45000);
+    expect(trianglesOf(path)).toBeLessThan(60000);
   });
 
   it('casts water on her bars (no hand swings) and answers each mark with its gesture', () => {

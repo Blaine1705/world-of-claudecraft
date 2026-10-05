@@ -23,6 +23,8 @@ from biped import lerp, unit
 from sdf import Ellipsoid, Field, Noise, RoundCone, Sphere
 from sdf_ext import Prism
 
+import gem as G
+
 NAME = 'TideglassColossus'
 PREFIX = 'colossus'
 
@@ -51,11 +53,10 @@ def finger_chain(side, name):
 L = dict(SHOULDER=SHOULDER, ELBOW=ELBOW, WRIST=WRIST, HAND_TIP=HAND_TIP, HIP=HIP, KNEE=KNEE, ANKLE=ANKLE,
          BALL=BALL, TOE=TOE, clav_parent='Spine2', clav_head=np.array((0.36, 0.05, 4.62)))
 PRISM_AT = np.array((0.0, -0.86, 4.0))
-HEAD_C = np.array((0.0, -0.08, 5.45))
 WEAPON_AXIS = (0.0, 0.0, 1.0)
 WEAPON_REF = WEAPON_AXIS
 GRIP_OFFSET_L = (0.0, 0.0, 0.0)
-BAKE_CAGE, BAKE_RAY = 0.03, 0.12
+BAKE_CAGE, BAKE_RAY = 0.05, 0.2
 
 
 def _bones():
@@ -125,52 +126,80 @@ def _geode(F, base, d, r, n, bone, rng, k=0.04, spread=0.5):
 
 
 # ------------------------------------------------------------------ the glass body
+# Every block of the body is a cut gem (gem.py): a convex polytope round an
+# ellipsoid or a cone, so the giant reads as hard faceted sea-glass, never as
+# a soft body. The blocks meet with a tight fillet: those seams are where the
+# light inside it breaks through (RegSeam). The spires stay hexagonal prisms.
+JOIN = 0.035
+BLOCKS = []   # the body's gem blocks (seams are where two of them meet)
+SPIRES = []   # the violet crystal spires
+
+
+def _block(F, prim, k=JOIN):
+    F.add(prim, k)
+    BLOCKS.append(prim)
+
+
+def _spire(F, prim, k=0.012):
+    F.add(prim, k)
+    SPIRES.append(prim)
+
+
 def build_body(voxel):
-    """Tumbled sea-glass cut in broad facets: massive rounded forms worn smooth
-    by the sea, a hunched back, and great sharp crystal spires bursting from
-    the shoulders, the spine, the elbows and the knees."""
-    F = Field((-3.0, -1.6, 0.2), (3.0, 2.3, 7.4), voxel)
+    """Massive cut-glass blocks: a deep barrel chest under a hunched back, a
+    narrower waist, boulder pauldrons, columns of crystal for limbs with
+    forearms heavier than the upper arms, and violet spires bursting from the
+    shoulders, the spine, the elbows and the knees."""
+    BLOCKS.clear()
+    SPIRES.clear()
+    F = Field((-3.0, -1.7, 0.2), (3.0, 2.6, 7.6), voxel)
     rng = np.random.default_rng(3)
-    F.add(Ellipsoid((0, 0.04, 4.12), (1.3, 0.88, 1.0), bone='Spine2'), 0.2)
-    F.add(Ellipsoid((0, 0.0, 3.25), (0.86, 0.64, 0.72), bone='Spine1'), 0.25)
-    F.add(Ellipsoid((0, 0.02, 2.48), (0.9, 0.62, 0.45), bone='Hips'), 0.2)
-    F.add(Ellipsoid((0, 0.44, 4.6), (0.95, 0.62, 0.66), bone='Spine2'), 0.22)
+    _block(F, G.gem_ellipsoid((0, 0.06, 4.15), (1.38, 0.95, 1.02), n=30, seed=1, chip=0.05, bone='Spine2'))
+    _block(F, G.gem_ellipsoid((0, 0.52, 4.72), (1.08, 0.72, 0.72), n=20, seed=2, chip=0.05, bone='Spine2'))
     for s in (1, -1):
-        F.add(Sphere(_m(SHOULDER, s) + np.array((-s * 0.12, 0.02, 0.04)), 0.62, bone=_side('Clavicle', s)), 0.2)
-    F.add(RoundCone((0, 0.05, 4.7), (0, -0.02, 5.2), 0.42, 0.34, bone='Neck'), 0.1)
+        # the pectoral slabs over the prism, a step down to the ribs
+        _block(F, G.gem_ellipsoid((s * 0.62, -0.6, 4.58), (0.58, 0.3, 0.38), n=14, seed=4 + s, chip=0.03,
+                                  bone='Spine2'))
+        _block(F, G.gem_ellipsoid((s * 0.95, -0.25, 3.72), (0.42, 0.5, 0.45), n=12, seed=6 + s, chip=0.03,
+                                  bone='Spine2'))
+    _block(F, G.gem_ellipsoid((0, 0.0, 3.3), (0.8, 0.6, 0.7), n=18, seed=8, bone='Spine1'))
+    _block(F, G.gem_ellipsoid((0, -0.4, 3.42), (0.52, 0.26, 0.3), n=12, seed=9, bone='Spine1'))
+    _block(F, G.gem_ellipsoid((0, -0.36, 2.98), (0.5, 0.24, 0.28), n=12, seed=10, bone='Spine1'))
+    _block(F, G.gem_ellipsoid((0, 0.02, 2.5), (0.96, 0.64, 0.48), n=18, seed=11, bone='Hips'))
+    _block(F, G.gem_column((0, 0.08, 4.7), (0, -0.04, 5.12), 0.42, 0.34, sides=6, seed=12, bone='Neck'))
     for s in (1, -1):
         sh, el, wr = _m(SHOULDER, s), _m(ELBOW, s), _m(WRIST, s)
         hp, kn, an = _m(HIP, s), _m(KNEE, s), _m(ANKLE, s)
-        F.add(RoundCone(sh, el, 0.46, 0.36, bone=_side('UpperArm', s)), 0.1)
-        F.add(Sphere(el, 0.38, bone=_side('ElbowFix', s)), 0.1)
-        F.add(RoundCone(el, wr, 0.4, 0.52, bone=_side('Forearm', s)), 0.1)
-        F.add(Sphere(hp, 0.52, bone=_side('Thigh', s)), 0.12)
-        F.add(RoundCone(hp, kn, 0.54, 0.42, bone=_side('Thigh', s)), 0.1)
-        F.add(Sphere(kn + np.array((0, -0.06, 0)), 0.44, bone=_side('KneeFix', s)), 0.1)
-        F.add(RoundCone(kn, an, 0.44, 0.36, bone=_side('Shin', s)), 0.1)
-    noise = Noise(5)
-
-    def facets(X_, Y_, Z_):
-        # broad flats round the vertical and along the height: cut glass
-        a = np.arctan2(X_, Y_ + 1e-6)
-        tri = np.abs(((a * 7 / math.pi) % 2) - 1) - 0.5
-        tz = np.abs(((Z_ * 1.6) % 2) - 1) - 0.5
-        return 0.06 * tri + 0.03 * tz + 0.012 * noise.fbm(X_ * 2.5, Y_ * 2.5, Z_ * 2.5, octaves=3)
-    F.displace(facets, band=0.1)
-    # the crystal spires (after the facets: they stay sharp)
+        cl = _side('Clavicle', s)
+        # boulder pauldrons, set high so the head sinks between them
+        _block(F, G.gem_ellipsoid(sh + np.array((-s * 0.04, 0.04, 0.16)), (0.74, 0.7, 0.62), n=16, seed=20 + s,
+                                  chip=0.06, bone=cl))
+        _block(F, G.gem_column(sh, el, 0.48, 0.38, sides=7, seed=22 + s, bone=_side('UpperArm', s)))
+        _block(F, G.gem_ellipsoid(el, (0.42, 0.42, 0.4), n=12, seed=24 + s, bone=_side('ElbowFix', s)))
+        _block(F, G.gem_column(el, wr, 0.42, 0.6, sides=8, seed=26 + s, bone=_side('Forearm', s)))
+        _block(F, G.gem_ellipsoid(hp, (0.52, 0.52, 0.5), n=12, seed=28 + s, bone=_side('Thigh', s)))
+        _block(F, G.gem_column(hp, kn, 0.58, 0.45, sides=8, seed=30 + s, bone=_side('Thigh', s)))
+        _block(F, G.gem_ellipsoid(kn + np.array((0, -0.08, 0)), (0.46, 0.46, 0.44), n=12, seed=32 + s,
+                                  bone=_side('KneeFix', s)))
+        _block(F, G.gem_column(kn, an, 0.48, 0.42, sides=7, seed=34 + s, bone=_side('Shin', s)))
+    # the crystal spires (violet): great clusters on the shoulders, a ridge
+    # down the spine, and smaller bursts at the elbows, forearms and knees
     for s in (1, -1):
         sh, el, kn, wr = _m(SHOULDER, s), _m(ELBOW, s), _m(KNEE, s), _m(WRIST, s)
-        _big_spires(F, sh + np.array((s * 0.1, 0.18, 0.4)), (s * 0.4, 0.25, 1.0), _side('Clavicle', s), rng,
-                    n=6, length=(1.4, 2.4), radius=(0.2, 0.32))
-        _big_spires(F, el + np.array((s * 0.2, 0.25, 0.05)), (s * 0.6, 1.0, 0.2), _side('ElbowFix', s), rng,
+        _big_spires(F, sh + np.array((s * 0.3, 0.24, 0.38)), (s * 0.75, 0.35, 1.0), _side('Clavicle', s), rng,
+                    n=7, length=(1.5, 2.6), radius=(0.2, 0.34), spread=0.32)
+        _big_spires(F, el + np.array((s * 0.2, 0.28, 0.05)), (s * 0.6, 1.0, 0.2), _side('ElbowFix', s), rng,
                     n=4, length=(0.7, 1.2), radius=(0.12, 0.2))
-        _big_spires(F, (el + wr) * 0.5 + np.array((s * 0.35, 0.2, 0.0)), (s * 1.0, 0.4, 0.2), _side('Forearm', s), rng,
-                    n=3, length=(0.4, 0.7), radius=(0.09, 0.14))
-        _big_spires(F, kn + np.array((s * 0.05, -0.32, 0.05)), (s * 0.3, -1.0, 0.6), _side('KneeFix', s), rng,
+        _big_spires(F, (el + wr) * 0.5 + np.array((s * 0.4, 0.22, 0.0)), (s * 1.0, 0.4, 0.2), _side('Forearm', s),
+                    rng, n=3, length=(0.45, 0.8), radius=(0.1, 0.15))
+        _big_spires(F, kn + np.array((s * 0.05, -0.34, 0.05)), (s * 0.3, -1.0, 0.6), _side('KneeFix', s), rng,
                     n=3, length=(0.4, 0.7), radius=(0.1, 0.15))
-    for z, n, ln in ((5.0, 6, (1.5, 2.5)), (4.45, 5, (1.2, 2.0)), (3.9, 4, (0.9, 1.4)), (3.4, 3, (0.6, 1.0))):
-        _big_spires(F, np.array((0.0, 0.7 + 0.1 * (z - 3.3), z)), (0.0, 1.0, 0.75), 'Spine2' if z > 3.6 else 'Spine1',
-                    rng, n=n, length=ln, radius=(0.15, 0.26), spread=0.55)
+    # the socket the prism sits in: a cut bowl in the chest, lined with nacre
+    F.sub(G.gem_ellipsoid(PRISM_AT + np.array((0, -0.42, 0.0)), (0.66, 0.5, 0.66), n=18, seed=13, chip=0.0,
+                          bevel=0.01), 0.03)
+    for z, n, ln in ((5.05, 6, (1.6, 2.6)), (4.5, 5, (1.3, 2.1)), (3.95, 4, (0.9, 1.5)), (3.4, 3, (0.6, 1.0))):
+        _big_spires(F, np.array((0.0, 0.78 + 0.12 * (z - 3.3), z)), (0.0, 1.0, 0.75),
+                    'Spine2' if z > 3.6 else 'Spine1', rng, n=n, length=ln, radius=(0.15, 0.26), spread=0.55)
     return F
 
 
@@ -180,183 +209,164 @@ def _big_spires(F, base, d, bone, rng, n=5, length=(0.6, 1.2), radius=(0.12, 0.2
         q = unit(d + rng.normal(0, spread, 3))
         L = rng.uniform(*length)
         rr = rng.uniform(*radius)
-        F.add(Prism(base - q * 0.25, base + q * L, rr, n=6, tip=0.34, tip_a=0.05, rot=rng.uniform(0, 1), bone=bone),
-              0.012)
+        _spire(F, Prism(base - q * 0.25, base + q * L, rr, n=6, tip=0.34, tip_a=0.05, rot=rng.uniform(0, 1),
+                        bone=bone))
 
 
-def _plate_ring(F, a, b, r, n, bone, rng, over=0.9, length=1.05, rad=(0.12, 0.19), splay=0.06, sides=6):
-    """Crystal plates round a limb segment a-b: each a long shard lying along
-    the limb on the core's surface, tips sharp, tilted out a little."""
-    ax = unit(b - a)
-    ref = np.array((0.0, 0.0, 1.0)) if abs(ax[2]) < 0.9 else np.array((1.0, 0.0, 0.0))
-    e1 = unit(np.cross(ax, ref))
-    e2 = np.cross(ax, e1)
-    Lseg = np.linalg.norm(b - a)
-    for i in range(n):
-        ang = 2 * math.pi * (i + rng.uniform(-0.2, 0.2)) / n
-        out = e1 * math.cos(ang) + e2 * math.sin(ang)
-        u0 = rng.uniform(-0.08, 0.12)
-        L = Lseg * length * rng.uniform(0.85, 1.15)
-        p0 = a + ax * (Lseg * u0) + out * r * over
-        p1 = p0 + ax * L + out * L * splay * rng.uniform(0.5, 1.4)
-        rr = rng.uniform(*rad)
-        F.add(Prism(p0, p1, rr, n=sides, tip=0.16, tip_a=0.12, rot=rng.uniform(0, 1), bone=bone), 0.01)
-
-
-def build_shards(voxel):
-    """The tideglass armour: long faceted shards lying along every limb, broad
-    plates over the chest and back, and great crystal spires bursting from the
-    shoulders and the spine."""
-    F = Field((-3.2, -1.7, 0.2), (3.2, 1.9, 6.9), voxel)
-    rng = np.random.default_rng(11)
-    for s in (1, -1):
-        sh, el, wr = _m(SHOULDER, s), _m(ELBOW, s), _m(WRIST, s)
-        hp, kn, an = _m(HIP, s), _m(KNEE, s), _m(ANKLE, s)
-        _plate_ring(F, sh, el, 0.34, 11, _side('UpperArm', s), rng)
-        _plate_ring(F, el, wr, 0.38, 12, _side('Forearm', s), rng, rad=(0.14, 0.22))
-        _plate_ring(F, hp, kn, 0.42, 13, _side('Thigh', s), rng, rad=(0.14, 0.22))
-        _plate_ring(F, kn, an, 0.34, 11, _side('Shin', s), rng)
-        _geode(F, sh + np.array((s * 0.1, 0.12, 0.38)), (s * 0.35, 0.2, 1.0), 0.48, 7, _side('Clavicle', s), rng,
-               k=0.012, spread=0.4)
-        _geode(F, el + np.array((s * 0.2, 0.25, 0.0)), (s * 0.5, 1.0, 0.1), 0.3, 4, _side('ElbowFix', s), rng,
-               k=0.012)
-        _geode(F, kn + np.array((s * 0.05, -0.3, 0.05)), (s * 0.2, -1.0, 0.5), 0.26, 3, _side('KneeFix', s), rng,
-               k=0.012)
-    # the chest: a barrel of upright crystal columns round the core, a gap in
-    # front where the prism sits
-    for i in range(22):
-        a = 2 * math.pi * (i + 0.5) / 22
-        if abs(math.atan2(math.sin(a), -math.cos(a))) < 0.32:
-            continue
-        x, y = 1.02 * math.sin(a), 0.04 - 0.7 * math.cos(a)
-        z0 = 3.25 + rng.uniform(-0.1, 0.15)
-        h = rng.uniform(1.35, 1.9) + (0.25 if abs(x) > 0.7 else 0.0)
-        tilt = np.array((0.12 * math.sin(a), -0.1 * math.cos(a), 1.0))
-        p0 = np.array((x, y, z0))
-        F.add(Prism(p0, p0 + unit(tilt) * h, rng.uniform(0.16, 0.24), n=6, tip=0.2, tip_a=0.1, rot=rng.uniform(0, 1),
-                    bone='Spine2'), 0.01)
-    for i in range(14):
-        a = 2 * math.pi * (i + 0.5) / 14
-        x, y = 0.74 * math.sin(a), 0.0 - 0.52 * math.cos(a)
-        p0 = np.array((x, y, 2.3))
-        F.add(Prism(p0, p0 + np.array((0.05 * math.sin(a), -0.05 * math.cos(a), 1.0)) * rng.uniform(0.9, 1.2),
-                    rng.uniform(0.13, 0.19), n=6, tip=0.2, tip_a=0.12, rot=rng.uniform(0, 1),
-                    bone='Spine1' if i % 2 else 'Hips'), 0.01)
-    for z, w in ((5.05, 0.5), (4.5, 0.46), (3.95, 0.38), (3.4, 0.3)):
-        _geode(F, np.array((0.0, 0.62 + 0.1 * (z - 3.3), z)), (0.0, 1.0, 0.8), w, 5,
-               'Spine2' if z > 3.6 else 'Spine1', rng, k=0.012, spread=0.5)
-    return F
+def _near(prims, P):
+    """Per vertex: distance to the nearest of `prims` and to the second nearest."""
+    if not prims:
+        return np.full(len(P), 9.0), np.full(len(P), 9.0)
+    D = np.stack([p.dist_pts(P) for p in prims])
+    D.sort(axis=0)
+    return D[0], (D[1] if len(prims) > 1 else np.full(len(P), 9.0))
 
 
 def body_paint(obj):
-    """RegCurrent (the currents of light inside the glass, flowing up the
-    limbs and round the chest), RegGeode (the crystal clusters), RegNacre (the
-    nacre plates set in the chest round the prism), RegPearl."""
+    """RegSeam (where two glass blocks meet: the fracture seams, lit from
+    inside), RegGeode (the violet spires), RegNacre (the nacre plates set in
+    the chest round the prism)."""
     from rig import mesh_arrays
     P, _ = mesh_arrays(obj)
-    x, y, z = P[:, 0], P[:, 1], P[:, 2]
-    n = Noise(9)
-    flow = n.fbm(x * 1.2, y * 1.2, z * 0.35, octaves=3)
-    current = np.clip(1 - np.abs(np.sin(flow * 9 + z * 1.4)) / 0.25, 0, 1)
-    geode = np.zeros(len(P))
-    for s in (1, -1):
-        for c, r in ((_m(SHOULDER, s) + np.array((s * 0.4, 0.3, 1.25)), 0.9),
-                     (_m(ELBOW, s) + np.array((s * 0.45, 0.6, 0.15)), 0.5),
-                     (_m(KNEE, s) + np.array((s * 0.1, -0.6, 0.3)), 0.4)):
-            geode = np.maximum(geode, np.clip(1 - np.linalg.norm(P - c, axis=1) / r, 0, 1))
-    spine = np.clip(1 - np.abs(x) / 0.7, 0, 1) * np.clip((y - 0.95) / 0.3, 0, 1) * np.clip((z - 3.3) / 0.3, 0, 1)
-    geode = np.maximum(geode, spine)
-    d = np.linalg.norm((P - PRISM_AT) / np.array((1.0, 1.0, 1.0)), axis=1)
-    nacre = np.clip((0.95 - d) / 0.08, 0, 1) * np.clip((d - 0.42) / 0.06, 0, 1) * (y < -0.55)
-    _write(obj, {'RegCurrent': current, 'RegGeode': np.clip(geode * 2.5, 0, 1), 'RegNacre': nacre})
+    d1, d2 = _near(BLOCKS, P)
+    seam = np.clip(1 - np.abs(d2 - d1) / 0.022, 0, 1) * (d1 < 0.035)
+    s1, _ = _near(SPIRES, P)
+    geode = np.clip(1 - (s1 - 0.005) / 0.03, 0, 1) * (s1 < d1 + 0.02)
+    d = np.linalg.norm(P - PRISM_AT, axis=1)
+    nacre = np.clip((0.86 - d) / 0.06, 0, 1) * np.clip((d - 0.46) / 0.04, 0, 1) * (P[:, 1] < -0.62)
+    _write(obj, {'RegSeam': seam, 'RegGeode': geode, 'RegNacre': nacre})
+
+
+def limb_paint(obj):
+    z = np.zeros(len(obj.data.vertices))
+    _write(obj, {'RegSeam': z, 'RegGeode': z, 'RegNacre': z})
 
 
 def build_fist(side, voxel):
-    """A fist of crystal: a heavy knot of glass bristling with points, the
-    knuckles driven out as a crown of shards."""
+    """A fist of cut glass: a heavy faceted block, the knuckles driven out as
+    a row of violet crystal points, a slab of a thumb."""
     w, down, width, palm = hand_frame(side)
-    c = w + down * 0.42
-    F = Field(c - 1.0, c + 1.0, voxel)
+    c = w + down * 0.44
+    F = Field(c - 1.1, c + 1.1, voxel)
     rng = np.random.default_rng(31 + side)
-    F.add(Ellipsoid(c, (0.42, 0.4, 0.48), np.stack([width, palm, down], axis=1)), 0.1)
-    F.add(RoundCone(w - down * 0.1, c, 0.36, 0.42), 0.1)
-    for i in range(9):
-        q = unit(down * 1.0 + width * rng.normal(0, 0.6) + palm * rng.normal(-0.3, 0.6))
-        b = c + q * 0.28
-        F.add(Prism(b - q * 0.1, b + q * rng.uniform(0.35, 0.6), rng.uniform(0.1, 0.16), n=6, tip=0.4, tip_a=0.1,
-                    rot=i), 0.01)
+    rot = np.stack([width, palm, down], axis=1)
+    F.add(G.gem_ellipsoid(c, (0.46, 0.42, 0.5), n=16, seed=40 + side, rot=rot, chip=0.04), JOIN)
+    F.add(G.gem_column(w - down * 0.12, c, 0.38, 0.42, sides=7, seed=42 + side), JOIN)
+    F.add(G.gem_ellipsoid(c - palm * 0.32 + width * 0.25 * side + down * 0.05, (0.16, 0.14, 0.3), n=10,
+                          seed=44 + side, rot=rot), JOIN)
     for i in range(5):
-        q = unit(-palm * 0.6 + width * rng.normal(0, 0.7) + down * 0.4)
-        b = c + q * 0.3
-        F.add(Prism(b - q * 0.1, b + q * rng.uniform(0.3, 0.5), rng.uniform(0.09, 0.14), n=6, tip=0.4, tip_a=0.1,
-                    rot=i), 0.01)
+        a = (i - 2) / 2.0
+        q = unit(down * 0.85 + width * a * 0.55 - palm * 0.35 + rng.normal(0, 0.08, 3))
+        b = c + q * 0.36
+        F.add(Prism(b - q * 0.12, b + q * rng.uniform(0.32, 0.5), rng.uniform(0.09, 0.13), n=6, tip=0.42,
+                    tip_a=0.1, rot=i), 0.01)
+    for i in range(3):
+        q = unit(palm * 0.7 + width * rng.normal(0, 0.5) + down * 0.2)
+        b = c + q * 0.32
+        F.add(Prism(b - q * 0.1, b + q * rng.uniform(0.26, 0.4), rng.uniform(0.08, 0.12), n=6, tip=0.4,
+                    tip_a=0.1, rot=i), 0.01)
     return F
+
+
+def fist_paint(obj):
+    from rig import mesh_arrays
+    P, _ = mesh_arrays(obj)
+    side = 1 if P[:, 0].mean() > 0 else -1
+    w, down, width, palm = hand_frame(side)
+    c = w + down * 0.44
+    r = np.linalg.norm(P - c, axis=1)
+    geode = np.clip((r - 0.62) / 0.12, 0, 1)
+    z = np.zeros(len(P))
+    _write(obj, {'RegSeam': z, 'RegGeode': geode, 'RegNacre': z})
 
 
 def build_foot(side, voxel):
     an, ba, to = _m(ANKLE, side), _m(BALL, side), _m(TOE, side)
-    F = Field(np.minimum(an, to) - 0.7, np.maximum(an, to) + 0.7, voxel)
-    F.add(Ellipsoid((an + to) * 0.5 + np.array((0, 0.1, -0.14)), (0.48, 0.66, 0.3)), 0.1)
-    F.add(Sphere(an, 0.36), 0.1)
+    F = Field(np.minimum(an, to) - 0.8, np.maximum(an, to) + 0.8, voxel)
+    F.add(G.gem_ellipsoid((an + to) * 0.5 + np.array((0, 0.12, -0.08)), (0.5, 0.6, 0.32), n=16, seed=50 + side,
+                          chip=0.04), JOIN)
+    F.add(G.gem_ellipsoid(an + np.array((0, 0.04, 0.04)), (0.4, 0.4, 0.36), n=12, seed=52 + side), JOIN)
     F.sub(Ellipsoid(np.array((an[0], 0.0, -0.5)), (2.0, 2.0, 0.55)), 0.01)
-    noise = Noise(51 + side)
-    F.displace(lambda X_, Y_, Z_: 0.01 * noise.fbm(X_ * 3, Y_ * 3, Z_ * 3, octaves=3), band=0.05)
     return F
 
 
+HEAD_C = np.array((0.0, -0.3, 5.4))
+
+
+def _slit_pts(s):
+    """An eye slit under the brow, slanting up and out (the scowl)."""
+    out = []
+    for u in np.linspace(0.0, 1.0, 7):
+        x = s * (0.08 + 0.2 * u)
+        z = -0.06 + 0.1 * u
+        y = -0.41 * math.sqrt(max(0.05, 1 - (x / 0.4) ** 2 - (z / 0.42) ** 2))
+        out.append(HEAD_C + np.array((x, y, z)))
+    return out
+
+
 def build_head(voxel):
-    """A small crowned crystal: a faceted dome with a heavy brow over one slit
-    of light, a crown of three crystal points."""
-    F = Field(HEAD_C - 0.7, HEAD_C + 0.9, voxel)
-    F.add(Ellipsoid(HEAD_C, (0.36, 0.36, 0.4)), 0.08)
+    """A low wedge of a head sunk between the pauldrons: a faceted skull, a
+    heavy brow slab over two slanting slits of light, a jaw of glass, and a
+    crown of three crystal horns swept back."""
+    F = Field(HEAD_C - 0.9, HEAD_C + 1.1, voxel)
+    F.add(G.gem_ellipsoid(HEAD_C, (0.44, 0.42, 0.42), n=16, seed=70, chip=0.03), JOIN)
+    F.add(G.gem_ellipsoid(HEAD_C + np.array((0, -0.2, -0.24)), (0.32, 0.28, 0.18), n=12, seed=71), JOIN)
+    for s in (1, -1):
+        # the brow: two slabs meeting low over the nose, a scowl
+        F.add(G.gem_column(HEAD_C + np.array((s * 0.02, -0.4, 0.04)), HEAD_C + np.array((s * 0.44, -0.27, 0.2)),
+                           0.1, 0.09, sides=5, seed=72 + s, rings=((0.0, 1.0),)), 0.02)
     rng = np.random.default_rng(71)
-    for i in range(9):
-        a = math.radians(-150 + 300 * i / 8)
-        d = np.array((math.sin(a), -math.cos(a) * 0.9, 0.55))
+    for dx, h, back, r in ((0.0, 0.8, 0.42, 0.13), (0.24, 0.6, 0.5, 0.11), (-0.24, 0.6, 0.5, 0.11)):
+        b = HEAD_C + np.array((dx, 0.0, 0.28))
+        F.add(Prism(b, b + np.array((dx * 1.2, back, h)), r, n=5, tip=0.5, rot=0.3), 0.03)
+    for i in range(6):
+        a = math.radians(-120 + 240 * i / 5)
+        d = np.array((math.sin(a), 0.4 + 0.6 * abs(math.cos(a)), 0.3))
         b = HEAD_C + d * np.array((0.3, 0.3, 0.2))
-        F.add(Prism(b, b + unit(d + np.array((0, 0, 0.6))) * rng.uniform(0.3, 0.5), 0.1, n=5, tip=0.4, tip_a=0.1,
-                    rot=i), 0.02)
-    F.add(Prism(HEAD_C + np.array((-0.36, -0.28, 0.08)), HEAD_C + np.array((0.36, -0.28, 0.08)), 0.1, n=4, tip=0.2,
-                rot=0.78), 0.04)
-    for dx, h in ((0.0, 0.62), (0.2, 0.42), (-0.2, 0.42)):
-        b = HEAD_C + np.array((dx, 0.05, 0.25))
-        F.add(Prism(b, b + np.array((dx * 0.8, 0.08, h)), 0.09, n=5, tip=0.45, rot=0.3), 0.04)
-    pts = [HEAD_C + np.array((x, -0.37 + 0.2 * x * x, -0.02)) for x in np.linspace(-0.24, 0.24, 9)]
-    F.groove(sdf.Polyline(pts, [0.012] * 9), 0.06, k=0.03)
+        F.add(Prism(b, b + unit(d + np.array((0, 0.3, 0.5))) * rng.uniform(0.2, 0.32), 0.07, n=5, tip=0.45,
+                    tip_a=0.1, rot=i), 0.02)
+    for s in (1, -1):
+        F.groove(sdf.Polyline(_slit_pts(s), [0.02] * 7), 0.06, k=0.034)
     return F
 
 
 def head_paint(obj):
     from rig import mesh_arrays
     P, _ = mesh_arrays(obj)
-    d = P - HEAD_C
-    slit = np.clip(1 - np.abs(d[:, 2] + 0.02) / 0.04, 0, 1) * np.clip((0.26 - np.abs(d[:, 0])) / 0.04, 0, 1) * \
-        (d[:, 1] < -0.24)
-    _write(obj, {'RegSlit': slit})
+    slit = np.zeros(len(P))
+    for s in (1, -1):
+        pts = _slit_pts(s)
+        for a, b in zip(pts[:-1], pts[1:]):
+            ab = b - a
+            t = np.clip(((P - a) @ ab) / (ab @ ab), 0, 1)
+            d = np.linalg.norm(P - (a + t[:, None] * ab), axis=1)
+            slit = np.maximum(slit, np.clip(1 - (d - 0.035) / 0.03, 0, 1))
+    horn = np.clip((P[:, 2] - (HEAD_C[2] + 0.4)) / 0.12, 0, 1)
+    _write(obj, {'RegSlit': slit, 'RegHorn': horn})
 
 
 def build_prism(voxel):
-    """The prism, the eye: a great cut gem of silver and violet, its crown of
-    facets pointing out of the chest."""
+    """The prism, the eye: a great cut gem of silver and violet, a brilliant's
+    crown of facets pointing out of the chest."""
     F = Field(PRISM_AT - 0.8, PRISM_AT + 0.8, voxel)
-    F.add(Prism(PRISM_AT + np.array((0, 0.35, 0)), PRISM_AT + np.array((0, -0.42, 0)), 0.5, n=8, tip=0.5,
-                tip_a=0.08, rot=0.2), 0.01)
+    F.add(Prism(PRISM_AT + np.array((0, 0.35, 0)), PRISM_AT + np.array((0, -0.44, 0)), 0.5, n=10, tip=0.55,
+                tip_a=0.08, rot=0.2), 0.008)
     return F
 
 
 # ------------------------------------------------------------------ the sculpt list
 def fields(k=1.0):
     from build_core import Sculpt
-    S = [Sculpt('Glass', build_body(0.016 * k), 'glass', 18000, tau=0.08, paint=body_paint)]
+    S = [Sculpt('Glass', build_body(0.015 * k), 'glass', 22000, tau=0.08, paint=body_paint)]
     for s, side in ((1, 'L'), (-1, 'R')):
-        S.append(Sculpt(f'{side}_Fist', build_fist(s, 0.016 * k), 'glass', 1600, binding='rigid',
-                        bone=f'{side}_Hand', paint=body_paint))
-        S.append(Sculpt(f'{side}_Sole', build_foot(s, 0.018 * k), 'glass', 1200, binding='rigid',
-                        bone=f'{side}_Foot', paint=body_paint))
-    S.append(Sculpt('CrystalHead', build_head(0.011 * k), 'head', 2000, binding='rigid', bone='Head',
+        S.append(Sculpt(f'{side}_Fist', build_fist(s, 0.014 * k), 'glass', 2000, binding='rigid',
+                        bone=f'{side}_Hand', paint=fist_paint))
+        S.append(Sculpt(f'{side}_Sole', build_foot(s, 0.016 * k), 'glass', 1200, binding='rigid',
+                        bone=f'{side}_Foot', paint=limb_paint))
+    S.append(Sculpt('CrystalHead', build_head(0.01 * k), 'head', 2400, binding='rigid', bone='Head',
                     paint=head_paint))
-    S.append(Sculpt('PrismEye', build_prism(0.01 * k), 'prism', 600, binding='rigid', bone='Prism'))
+    S.append(Sculpt('PrismEye', build_prism(0.009 * k), 'prism', 700, binding='rigid', bone='Prism'))
     return S
 
 
-_ = (lerp, RoundCone, X)
+_ = (lerp, RoundCone, X, Sphere, Noise)

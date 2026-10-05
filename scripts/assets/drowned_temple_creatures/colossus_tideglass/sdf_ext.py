@@ -93,20 +93,20 @@ class Prism(sdf.Prim):
         u = px * self.ax[0] + py * self.ax[1] + pz * self.ax[2]
         x = px * self.e1[0] + py * self.e1[1] + pz * self.e1[2]
         y = px * self.e2[0] + py * self.e2[1] + pz * self.e2[2]
-        d = None
-        for i in range(self.n):
-            a = self.rot + np.pi * 2 * i / self.n
-            di = x * np.cos(a) + y * np.sin(a) - self.r
-            d = di if d is None else np.maximum(d, di)
-        # pyramid caps: the radius shrinks to 0 over `tip` of the length at each end
+        # every side facet, and the pyramid facets that close each end to a
+        # point: the radius shrinks to 0 over `tip` of the length at b and
+        # `tip_a` at a (each pyramid facet is the side facet tilted inward)
         L = self.L
         tb = max(1e-3, self.tip * L)
         ta = max(1e-3, self.tip_a * L)
-        slope_b = self.r / tb
-        slope_a = self.r / ta
-        cap_b = (u - (L - tb)) * slope_b / np.sqrt(1 + slope_b ** 2)
-        cap_a = (ta - u) * slope_a / np.sqrt(1 + slope_a ** 2)
-        d = np.maximum(d, np.maximum(cap_b, cap_a))
+        sb, sa = self.r / tb, self.r / ta
+        nb, na = np.sqrt(1 + sb * sb), np.sqrt(1 + sa * sa)
+        d = None
+        for i in range(self.n):
+            a = self.rot + np.pi * 2 * i / self.n
+            p = x * np.cos(a) + y * np.sin(a)
+            di = np.maximum(p - self.r, np.maximum((p + sb * (u - L)) / nb, (p - sa * u) / na))
+            d = di if d is None else np.maximum(d, di)
         return d
 
 

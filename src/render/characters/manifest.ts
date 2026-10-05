@@ -4920,29 +4920,33 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.08,
   },
   // The Pearlguard Sentinel (pearlguard_sentinel; scripts/assets/
-  // drowned_temple_creatures/sentinel_manta/): the Moonmantle Ray, a giant
-  // sacred manta of moonlight gliding a yard over the flags. Its pearl-white
-  // back carries nine nacre plates carved with the moon's phases (new moon on
-  // its left wingtip to full on its right); the wings thin to edges clear as
-  // water with a filament of cyan light inside; underneath it is deep
-  // turquoise strewn with stars. Its cephalic lobes curl into a silver
-  // crescent round its glowing heart pearl; a whip tail ends in tide-glass.
-  // Idle: a slow wave rolling out along the wings. Walk glides on deep beats,
-  // Run (also its Onrush) darts risen with the wings swept back like an
-  // arrowhead; walkRef/runRef are the glide speeds those beats are authored
-  // for (its wander and its chase). Attack: a cut with the right wing's edge
-  // (CONTACT 0.42); Attack2: the tail arched over its back and lashed down
-  // (0.5). Pearl Slam (1.5 s bar) plays Slam: it rears up on its tail, wings
-  // opened high (about 6 drawn), and drives them down on the bar's end. Pearl
-  // Carapace: temple_fx swaps the rig to its cocoon stance (the wings wrapped
-  // under its belly, moon plates out, ShellClose to enter, ShellOpen bursting
-  // free). Dying, it sinks to the floor and its wing light goes out from the
-  // tips inward, the pearl last. `hover` is its Idle's lowest point (the tail
-  // tip), so the floor of the model stays the floor of the world; drawn 1.6
-  // high at rest and 6.8 wingtip to wingtip at its 1.15 (2.6 players across).
+  // drowned_temple_creatures/sentinel_manta/, reworked in round two): the
+  // Moonmantle Ray, a giant sacred manta of moonlight gliding a yard over the
+  // flags. A thick, muscled disc: its back the deep night-sea blue with pearl
+  // chevrons on the shoulders and nine raised nacre plates carved with the
+  // moon's phases (new moon on its left wingtip to full on its right); the
+  // wings thin to edges of clear cyan with a filament of light inside;
+  // underneath, a pale pearl heart of the belly fading to turquoise strewn
+  // with stars, deep gill slits and a keel. Its cephalic lobes run forward
+  // into one silver crescent moon standing round its heart pearl (a sculpted
+  // pearl lit from within, a crescent carved on its face); a whip tail ends
+  // in pointed tide-glass. Idle: a slow wave rolling out along the wings.
+  // Walk glides on deep beats, Run (also its Onrush) darts risen with the
+  // wings swept back like an arrowhead; walkRef/runRef are the glide speeds
+  // those beats are authored for (its wander and its chase). Attack: a cut
+  // with the right wing's edge (CONTACT 0.42); Attack2: the tail arched over
+  // its back and lashed down (0.5). Pearl Slam (1.5 s bar) plays Slam: it
+  // rears up on its tail, wings opened high, and drives them down on the bar's
+  // end. Pearl Carapace: temple_fx swaps the rig to its cocoon stance (the
+  // wings wrapped under its belly, moon plates out, ShellClose to enter,
+  // ShellOpen bursting free). Dying, it sinks to the floor and its wing light
+  // goes out from the tips inward, the pearl last. `hover` is its Idle's
+  // lowest point (the tail tip), so the floor of the model stays the floor of
+  // the world; drawn 1.52 high at rest and still 6.8 wingtip to wingtip at
+  // its 1.15 (the thicker body makes it a little taller per unit of span).
   temple_sentinel: {
     url: `${CREATURES}/temple_sentinel.glb`,
-    height: 1.4,
+    height: 1.3236,
     hover: 0.673,
     clips: SENTINEL_CLIPS,
     phaseClips: {
@@ -4958,7 +4962,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Glimmerscale Lurker (glimmerscale_lurker; scripts/assets/
   // drowned_temple_creatures/lurker_mantis/): a giant mantis shrimp the
   // moon-water made sacred, long, low and armoured in iridescent plates
-  // (turquoise to violet, pearl rims, a carved crescent on every tergite),
+  // (turquoise to violet, pearl rims, a carved crescent on every tergite;
+  // round two sculpts the armour: keels down every plate, hooked pleura down
+  // its flanks, swimmerets, a ribbed shield and a rostral spine, ringed and
+  // spurred legs, a combed propodus and a hammer-ringed club, a pitted shell),
   // its front half reared, eyes on turning stalks banded in silver, two
   // raptorial arms folded like jackknives, a tail fan of nacre paddles. Its
   // swings snap the arms out (Attack: both, Attack2: one; contact at 0.16).
@@ -4989,7 +4996,11 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // The bosses. Choirmother Selthe (choirmother_selthe; scripts/assets/
   // drowned_temple_creatures/selthe_matriarch/): the siren matriarch, built
-  // on the Moonlit Siren's body but far larger, a vast lionfish fan opening
+  // on the Moonlit Siren's skeleton but broad and heavy in the game's
+  // stylized way (round two: a deep ribcage, strong shoulders and arms, a
+  // thicker coil, a larger head with a heavy scowling brow, glowing slit
+  // eyes, two small fangs and the lionfish's violet bars across her face,
+  // arms and flanks), a vast lionfish fan opening
   // behind her like the pipes of an organ (silver rays, pearl tips, sheer
   // turquoise to violet fins), her tail coiled in the pool of moonlit water
   // she rides, the golden Great Conch on her chest, a jaw that drops too far
@@ -5036,22 +5047,28 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.06,
   },
   // The Tideglass Colossus (tideglass_colossus; scripts/assets/
-  // drowned_temple_creatures/colossus_tideglass/, rebuilt from scratch): a
-  // giant of sea-glass the moon's water hardened, massive forms cut in broad
-  // facets with fractures of light running through it, violet crystal spires
-  // bursting from its shoulders, spine, elbows and knees, silver bands with
-  // moons, and in its chest, held in a silver crescent ringed with pearls, the
-  // prism: the cut gem of silver and violet that casts the Reflections. It
-  // walks its foe down (Walk, Run). Prism Flare (2.0 s bar) plays Flare: arms
-  // flung wide, the prism blazing on the bar's end. Moonlight Lance (2.0 s
-  // bar) plays Lance: the prism levelled along its pointing arm. Resonant Slam
-  // (1.5 s bar) plays Slam: both fists into the floor and a ring of broken
-  // crystal. Heroic's Reflection swap arrives as a windup cue: PrismPulse.
-  // Dying, it kneels, topples and breaks into crystal over a pool of water.
-  // The template's 2.2 scale (its long reach) draws it at 15 world units.
+  // drowned_temple_creatures/colossus_tideglass/, recut in round two): a giant
+  // of hard sea-glass, every block of it a cut gem (the builder's gem.py: flat
+  // facets and sharp edges, each facet its own depth of teal, a bright rim on
+  // every edge), the light inside it breaking out of the seams between the
+  // blocks and along a few long fractures, pointed violet spires bursting from
+  // its shoulders, spine, elbows and knees, a low scowling head with two
+  // slanting slits of light under a crown of crystal horns, silver bands with
+  // moons, and in its chest, in a nacre-lined socket held by a silver crescent
+  // ringed with pearls, the prism: the cut gem of silver and violet that casts
+  // the Reflections. It walks its foe down (Walk, Run). Prism Flare (2.0 s
+  // bar) plays Flare: arms flung wide, the prism blazing on the bar's end.
+  // Moonlight Lance (2.0 s bar) plays Lance: the prism levelled along its
+  // pointing arm. Resonant Slam (1.5 s bar) plays Slam: both fists into the
+  // floor and a ring of broken crystal. Heroic's Reflection swap arrives as a
+  // windup cue: PrismPulse. Dying, it kneels, topples and breaks into crystal
+  // over a pool of water. Its body keeps the old 15-unit scale under the
+  // template's 2.2 (its long reach); the pointed spires now rise past it, so
+  // the drawn bounds are 16.7. The env boost matches its Reflections' glass:
+  // the temple's dim environment runs across its glossy facets.
   temple_colossus: {
     url: `${CREATURES}/temple_colossus.glb`,
-    height: 15 / 2.2,
+    height: 16.7 / 2.2,
     clips: {
       ...TEMPLE_CLIPS,
       castByAbility: {
@@ -5073,6 +5090,7 @@ export const VISUALS: Record<string, VisualDef> = {
     castClipSync: true,
     authoredAtlas: true,
     selfIllumination: 0.06,
+    envMapIntensity: 2.2,
   },
   // The Moonspawn (moonspawn; scripts/assets/drowned_temple_creatures/
   // moonspawn_tide/): Ysolei's summoned add had no body of its own and drew
