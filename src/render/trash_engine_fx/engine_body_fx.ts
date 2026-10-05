@@ -99,7 +99,7 @@ float vnoise(vec3 p) {
     u.z);
 }
 void main() {
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 1.8);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 1.8);
   float frost = vnoise(vLocal * 5.0) * 0.5 + vnoise(vLocal * 11.0) * 0.5;
   float n = vnoise(vLocal * 2.4 + 3.0);
   float crack = (1.0 - smoothstep(0.0, 0.02 + 0.05 * uCrack, abs(n - 0.5))) * uCrack;

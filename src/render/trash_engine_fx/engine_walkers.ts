@@ -74,9 +74,9 @@ void main() {
   float facing = abs(dot(normalize(vN), normalize(vView)));
   float n = vnoise(vLocal * 4.0 + vec3(0.0, -uTime * 3.0, uTime * 1.3));
   float m = vnoise(vLocal * 9.0 - vec3(uTime * 2.0));
-  float heart = pow(facing, 1.6);
+  float heart = pow(max(facing, 0.0), 1.6);
   vec3 col = mix(uColor * 1.4, vec3(1.0, 0.97, 0.9) * 1.8, heart * (0.55 + 0.45 * n));
-  col += uColor * pow(1.0 - facing, 2.0) * 1.2;
+  col += uColor * pow(max(1.0 - facing, 0.0), 2.0) * 1.2;
   float a = (0.55 + 0.45 * heart) * (0.75 + 0.35 * m) * uAlpha;
   gl_FragColor = vec4(col * a, 1.0);
 }

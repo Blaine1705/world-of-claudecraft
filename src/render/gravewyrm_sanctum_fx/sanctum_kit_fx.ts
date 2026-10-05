@@ -122,7 +122,7 @@ void main() {
   float up = 1.0 - smoothstep(0.35, 1.0, vUv.y);
   vec3 green = vec3(0.56, 0.84, 0.63);
   vec3 violet = vec3(0.48, 0.35, 0.72);
-  vec3 col = mix(violet, green, n) * 1.6 + vec3(0.8, 1.0, 0.9) * pow(m, 4.0);
+  vec3 col = mix(violet, green, n) * 1.6 + vec3(0.8, 1.0, 0.9) * pow(max(m, 0.0), 4.0);
   float a = (0.35 + 0.65 * n) * up * uAlpha;
   gl_FragColor = vec4(col * a, 1.0);
 }
@@ -148,7 +148,7 @@ void main() {
   float ang = atan(vP.x, vP.y);
   float s = clamp((ang * uDir + uHalf) / (2.0 * uHalf), 0.0, 1.0);
   if (s > uEdge) discard;
-  float lead = exp(-pow((uEdge - s) * 9.0, 2.0));
+  float lead = exp(-pow(max((uEdge - s) * 9.0, 0.0), 2.0));
   float wake = (1.0 - (uEdge - s)) * 0.35;
   float radial = smoothstep(0.15, 0.4, r) * (1.0 - smoothstep(0.85, 1.0, r));
   vec3 col = mix(vec3(0.62, 0.86, 1.0), vec3(1.0), lead);

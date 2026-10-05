@@ -60,7 +60,7 @@ float vnoise(vec3 p) {
     u.z);
 }
 void main() {
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.2);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 2.2);
   float t = clamp(vLocal.y / uHeight, 0.0, 1.0);
   // Cracks: thin ridges of a noise field, more of them as it strains.
   float n = vnoise(vLocal * 1.6) * 0.65 + vnoise(vLocal * 3.7) * 0.35;

@@ -226,8 +226,8 @@ varying float vSide;
 void main() {
   float x = abs(vSide);
   float core = 1.0 - smoothstep(0.0, 0.45, x);
-  float glow = pow(1.0 - x, 1.6);
-  float bead = pow(0.5 + 0.5 * sin((vT * 5.0 - uTime * 1.8) * 6.28318), 6.0);
+  float glow = pow(max(1.0 - x, 0.0), 1.6);
+  float bead = pow(max(0.5 + 0.5 * sin((vT * 5.0 - uTime * 1.8) * 6.28318), 0.0), 6.0);
   vec3 col = mix(vec3(1.0, 0.84, 0.5), vec3(0.92, 0.95, 1.0), vT);
   col = col * (0.7 + 1.5 * bead) + vec3(1.0) * core * 0.35;
   float ends = smoothstep(0.0, 0.05, vT) * (1.0 - smoothstep(0.95, 1.0, vT));
@@ -256,7 +256,7 @@ void main() {
   float strain = smoothstep(0.6, 1.0, uTension);
   float beat = 0.6 + 0.4 * sin(uTime * 12.0) * uFlicker;
   vec3 col = mix(nacre, vec3(1.0, 0.36, 0.3), strain * beat);
-  float edge = pow(1.0 - x, 1.3);
+  float edge = pow(max(1.0 - x, 0.0), 1.3);
   float a = edge * (0.4 + 0.45 * link) * uAlpha;
   gl_FragColor = vec4(col * (0.75 + 0.6 * link), clamp(a, 0.0, 1.0));
   #include <colorspace_fragment>
@@ -273,7 +273,7 @@ varying float vSide;
 void main() {
   float x = abs(vSide);
   float core = 1.0 - smoothstep(0.0, 0.3, x);
-  float glow = pow(1.0 - x, 2.2);
+  float glow = pow(max(1.0 - x, 0.0), 2.2);
   vec3 col = mix(uColor, vec3(1.0), core) * (1.0 + core);
   gl_FragColor = vec4(col, clamp((glow * 0.6 + core) * uAlpha, 0.0, 1.0));
   #include <colorspace_fragment>
@@ -295,7 +295,7 @@ varying vec3 vView;
 varying vec3 vLocal;
 ${NOISE}
 void main() {
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.4);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 2.4);
   vec3 p = normalize(vLocal);
   float lon = atan(p.z, p.x);
   float lat = asin(clamp(p.y, -1.0, 1.0));
@@ -310,7 +310,7 @@ void main() {
   float cx = (cm + 0.5) / 6.0 * 6.28318 - 3.14159;
   vec2 d = vec2((lon - cx) * 2.2, (lat - 0.15) * 3.0);
   float moon = (1.0 - smoothstep(0.3, 0.34, length(d))) * smoothstep(0.22, 0.27, length(d - vec2(0.13, 0.05)));
-  float ripple = pow(0.5 + 0.5 * sin(lat * 14.0 + uTime * 3.0), 8.0) * 0.45;
+  float ripple = pow(max(0.5 + 0.5 * sin(lat * 14.0 + uTime * 3.0), 0.0), 8.0) * 0.45;
   float n = vnoise(vec2(lon * 4.0, lat * 6.0) + 11.0);
   float crack = (1.0 - smoothstep(0.0, 0.04, abs(n - 0.5))) * uCrack;
   vec3 col = pearl * (0.3 + 0.9 * fres) * (0.55 + 0.6 * uStrength);
@@ -383,7 +383,7 @@ void main() {
   col = mix(col, rainbow, iris);
   col = mix(col, vec3(0.04, 0.02, 0.09), pupil);
   col *= inEye;
-  float rays = pow(0.5 + 0.5 * cos(ang * 12.0 + uTime * 0.8), 10.0);
+  float rays = pow(max(0.5 + 0.5 * cos(ang * 12.0 + uTime * 0.8), 0.0), 10.0);
   rays *= (1.0 - smoothstep(0.45, 1.0, r)) * smoothstep(0.25, 0.5, r) * uBlaze;
   float halo = (1.0 - smoothstep(0.5, 1.0, r)) * 0.35 * uBlaze;
   vec3 outCol = col + hue(fract(ang / 6.28318 + uTime * 0.1)) * rays * 1.4;
@@ -415,7 +415,7 @@ void main() {
   float band = smoothstep(0.92, 0.985, r) * (1.0 - smoothstep(0.985, 1.0, r)) * 0.3;
   vec3 col = hue(fract(a / 6.28318 * 3.0 + uTime * 0.2));
   float dash = step(0.35, fract(a * 48.0 / 6.28318 - uTime * 0.6));
-  float wave = uWave > 0.0 ? exp(-pow((r - uWave) * 30.0, 2.0)) : 0.0;
+  float wave = uWave > 0.0 ? exp(-pow(max((r - uWave) * 30.0, 0.0), 2.0)) : 0.0;
   float body = uWave > 0.0 ? (1.0 - smoothstep(0.0, uWave, r)) * 0.12 * uWave : 0.0;
   float alpha = (rim * (0.45 + 0.55 * dash) + band) * uAlpha + (wave + body) * uAlpha;
   gl_FragColor = vec4(col * (1.15 + wave), clamp(alpha, 0.0, 1.0));
@@ -439,7 +439,7 @@ void main() {
   float r = length(p) * 2.0;
   float a = atan(p.y, p.x);
   float edge = uReach + (vnoise(vec2(a * 5.0, uTime * 2.0)) - 0.5) * 0.03;
-  float crest = exp(-pow((r - edge) * 24.0, 2.0));
+  float crest = exp(-pow(max((r - edge) * 24.0, 0.0), 2.0));
   float body = smoothstep(edge - 0.3, edge, r) * (1.0 - smoothstep(edge, edge + 0.02, r));
   float ripple = 0.5 + 0.5 * sin((r - uTime * 0.5) * 50.0);
   vec3 col = mix(uColor * (0.7 + 0.3 * ripple), uCrest, crest);
@@ -468,7 +468,7 @@ void main() {
   float rr = max(r, 0.02);
   float phase = a * 4.0 + log(rr) * 6.0 + uTime * uSpin * 4.0;
   float arm = 0.5 + 0.5 * sin(phase);
-  float foam = pow(arm, 7.0) * smoothstep(0.08, 0.45, r);
+  float foam = pow(max(arm, 0.0), 7.0) * smoothstep(0.08, 0.45, r);
   float n = vnoise(vec2(a * 3.0 + uTime * uSpin, r * 8.0 - uTime * 2.0));
   vec3 deep = vec3(0.02, 0.1, 0.18);
   vec3 water = vec3(0.12, 0.55, 0.68);
@@ -497,10 +497,10 @@ varying vec3 vView;
 varying vec3 vLocal;
 ${NOISE}
 void main() {
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.0);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 2.0);
   vec3 p = normalize(vLocal);
   float caust = vnoise(p.xz * 5.0 + vec2(uTime * 0.7, -uTime * 0.5)) * vnoise(p.xy * 4.0 - uTime * 0.4);
-  float core = pow(1.0 - fres, 3.0) * uCore;
+  float core = pow(max(1.0 - fres, 0.0), 3.0) * uCore;
   vec3 col = mix(vec3(0.35, 0.85, 0.9), vec3(0.9, 0.97, 1.0), fres) * (0.4 + 0.8 * fres);
   col += vec3(0.85, 0.97, 1.0) * core + vec3(0.8, 1.0, 1.0) * caust * 0.6;
   float a = (0.1 + 0.6 * fres + core * 0.45 + caust * 0.3) * uAlpha;
@@ -520,7 +520,7 @@ varying vec3 vView;
 varying vec3 vLocal;
 ${NOISE}
 void main() {
-  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 1.6);
+  float fres = pow(max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0), 1.6);
   float h = vLocal.y + 0.5;
   float a0 = atan(vLocal.z, vLocal.x);
   float jag = vnoise(vec2(a0 * 4.0, 3.0)) * 0.25;
@@ -529,7 +529,7 @@ void main() {
   float crack = 1.0 - smoothstep(0.0, 0.05, abs(facets - 0.5));
   vec3 ice = mix(vec3(0.55, 0.8, 0.95), vec3(0.92, 0.98, 1.0), fres * 0.7 + facets * 0.3);
   ice += vec3(1.0) * crack * 0.5;
-  float glint = pow(vnoise(vec2(a0 * 20.0, h * 20.0 + uTime * 0.5)), 10.0) * 3.0;
+  float glint = pow(max(vnoise(vec2(a0 * 20.0, h * 20.0 + uTime * 0.5)), 0.0), 10.0) * 3.0;
   float alpha = (0.25 + 0.55 * fres + crack * 0.3 + glint) * top;
   gl_FragColor = vec4(ice + glint, clamp(alpha, 0.0, 1.0));
   #include <colorspace_fragment>

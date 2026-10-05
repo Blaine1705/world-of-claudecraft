@@ -211,6 +211,16 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/wildheart_basin/basin_thorns.ts': 1,
   'src/render/wildheart_basin/basin_water.ts': 4,
   'src/render/wildheart_basin/bond_cord.ts': 2,
+  // The dungeon trash pass: the Temple kit's shells, the Sanctum kit's brazier
+  // and the trash engine's pools, orbs, walls, novas and body marks, every
+  // base wrapped in max(x, 0.0).
+  'src/render/drowned_temple/temple_trash_fx.ts': 14,
+  'src/render/gravewyrm_sanctum_fx/sanctum_kit_fx.ts': 2,
+  'src/render/trash_engine_fx/engine_body_fx.ts': 1,
+  'src/render/trash_engine_fx/engine_hazards.ts': 3,
+  'src/render/trash_engine_fx/engine_nova.ts': 1,
+  'src/render/trash_engine_fx/engine_walkers.ts': 2,
+  'src/render/trash_engine_fx/engine_walls.ts': 1,
 };
 
 // Generated locale bundles are megabytes of prose with no shader in them; a

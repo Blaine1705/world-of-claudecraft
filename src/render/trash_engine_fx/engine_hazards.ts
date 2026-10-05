@@ -50,7 +50,7 @@ void main() {
   // Churning water: two noise layers flowing against each other.
   float n = fbm(w * 0.9 + vec2(uTime * 0.6, -uTime * 0.4) + uSeed);
   float m = fbm(w * 1.7 - vec2(uTime * 0.5, uTime * 0.7));
-  float caustic = pow(1.0 - abs(n - m) * 2.0, 6.0);
+  float caustic = pow(max(1.0 - abs(n - m) * 2.0, 0.0), 6.0);
   vec3 deep = vec3(0.32, 0.62, 0.82);
   vec3 col = mix(deep, uTint, 0.45 + 0.4 * n) + caustic * vec3(0.7, 0.9, 1.0) * 0.8;
   // Rolling boils: a cell grid, each cell a bubble that swells and pops.
@@ -93,13 +93,13 @@ void main() {
   // A slow swirl of burning soul-stuff, veins of green fire through violet.
   vec2 q = vec2(cos(ang + uTime * 0.35 + r * 2.5), sin(ang + uTime * 0.35 + r * 2.5)) * r * 2.4;
   float n = fbm(q + w * 0.6 + uSeed);
-  float vein = pow(1.0 - abs(fbm(w * 1.4 + vec2(0.0, -uTime * 0.8)) - 0.5) * 2.0, 8.0);
+  float vein = pow(max(1.0 - abs(fbm(w * 1.4 + vec2(0.0, -uTime * 0.8)) - 0.5) * 2.0, 0.0), 8.0);
   vec3 col = mix(uTint * 0.55, uTint * 1.4, n);
   col = mix(col, uHot * 1.6, vein * 0.85);
   // Embers: dark coals glowing through.
   float coal = smoothstep(0.62, 0.8, vnoise(w * 3.0 + uSeed * 2.0));
   col = mix(col, vec3(0.08, 0.04, 0.12), coal * 0.6);
-  col += uHot * pow(1.0 - r, 2.0) * 0.6;
+  col += uHot * pow(max(1.0 - r, 0.0), 2.0) * 0.6;
   // A glowing violet-green lip where it eats the ice.
   float lip = smoothstep(0.8, 0.97, r) * (1.0 - smoothstep(0.97, 1.0, r));
   col += mix(uHot, uTint, 0.4) * lip * 1.6;
