@@ -669,7 +669,8 @@ const PROPS: FieldProp[] = [
   { kind: 'gs_moraine_rocks', x: -37, z: -155.5, rot: 0.6, r: 2.4, h: 2.4 },
   { kind: 'gs_moraine_rocks', x: 33, z: -101, rot: -0.4, r: 2.4, h: 2.2 },
   { kind: 'gs_cult_sledge', x: 19, z: -178, rot: 0.4, hw: 1.6, hd: 3.4, h: 1.8 },
-  { kind: 'gs_soul_brazier', x: 16, z: -120, rot: 0, r: 0.9, h: 1.8 },
+  // On the lower bend's inner rim, clear of the Sledge Tusker's two lanes.
+  { kind: 'gs_soul_brazier', x: 17, z: -104, rot: 0, r: 0.9, h: 1.8 },
   // The Fork: the Rime Gate's ice and a cairn of the cult's goad irons.
   { kind: 'gs_goad_rack', x: -22, z: -82, rot: 0.2, hw: 1.8, hd: 0.5, h: 2.2 },
   // Thornpeak boulders on the terrace rims (clear of the walk): solid, so a

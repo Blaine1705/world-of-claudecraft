@@ -129,7 +129,12 @@ import {
 } from './mob_cast_bars';
 import { separateEngagedMob } from './mob_separation';
 import { packBreathStagger } from './pack_cast_stagger';
-import { flierSightRadius, flierWaitingAloft, updateMobPatrol } from './patrol';
+import {
+  flierSightRadius,
+  flierWaitingAloft,
+  patrolEvadeWaypoint,
+  updateMobPatrol,
+} from './patrol';
 import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
@@ -801,13 +806,17 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // step works again. Phasing always makes progress, so arrival is the
       // backstop: worst case it phases the rest of the way home.
       const phasing = mob.evadeStall >= EVADE_STALL_TIMEOUT;
-      const distBefore = dist2d(mob.pos, mob.spawnPos);
-      const arrived = ctx.moveToward(mob, mob.spawnPos, mob.moveSpeed * EVADE_SPEED_MULT, phasing);
+      // A ground patroller walks home along its loop (mob/patrol.ts), never
+      // straight across the gap between two legs of its road.
+      const home = patrolEvadeWaypoint(ctx, mob) ?? mob.spawnPos;
+      const distBefore = dist2d(mob.pos, home);
+      const reached = ctx.moveToward(mob, home, mob.moveSpeed * EVADE_SPEED_MULT, phasing);
+      const arrived = home === mob.spawnPos ? reached : false;
       if (arrived) {
         resetEvadingMob(ctx, mob);
       } else if (phasing) {
-        if (!blockedTowardSpawn(ctx, mob, mob.spawnPos)) mob.evadeStall = 0; // cleared the obstacle
-      } else if (dist2d(mob.pos, mob.spawnPos) < distBefore - 1e-3) {
+        if (!blockedTowardSpawn(ctx, mob, home)) mob.evadeStall = 0; // cleared the obstacle
+      } else if (dist2d(mob.pos, home) < distBefore - 1e-3) {
         mob.evadeStall = 0; // walking home fine
       } else {
         mob.evadeStall += DT; // pinned on something

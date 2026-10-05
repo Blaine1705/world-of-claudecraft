@@ -8,17 +8,30 @@
 // Routed by the idle arm of mob/locomotion.ts after the aggro scan, so a
 // patrol still notices players the way any idle mob does, and its pack pulls
 // together through the ordinary packId social pull.
+//
+// The point travels the loop, never the straight line between: a ground
+// patroller spawns ON its point for the claim's clock (placeOnPatrolPoint),
+// and one that finds itself off it (a shove, the walk home from an evade)
+// walks back ALONG its loop (mob/patrol_route.ts), so a loop laid on a zigzag
+// road never sends a body across the void between two of its legs; the evade
+// home rides the loop the same way (patrolEvadeWaypoint).
 
 import { DUNGEON_FLOOR_Y } from '../data';
 import type { SimContext } from '../sim_context';
-import { DT, type DungeonSpawnPatrol, type Entity } from '../types';
+import { DT, type DungeonSpawnPatrol, type Entity, type Vec3 } from '../types';
 import { MAX_AGGRO_RADIUS } from './aggro_ranges';
+import { LOOP_ROUTE_LOOKAHEAD, loopRouteTarget, projectOntoLoop } from './patrol_route';
 
 /** A loop's default pace: a stroll at 40 percent of the mob's run speed. */
 export const PATROL_DEFAULT_PACE = 0.4;
 /** A mob this far behind its patrol point hurries to rejoin it. */
 const CATCH_UP_DISTANCE = 1.5;
 const CATCH_UP_MULT = 1.6;
+/** A ground patroller this far from its patrol point (a claim made long after
+ *  the sim clock started, a return from an evade, a knockback) walks back to
+ *  it ALONG its loop instead of straight at it: a straight chase across a
+ *  zigzag road runs off a terrace edge into the cliff wall (mob/patrol_route.ts). */
+export const PATROL_REJOIN_DISTANCE = 4;
 
 /** World-space patrol stamp for a spawn placed at instance origin (ox, oz). */
 export function stampDungeonPatrol(
@@ -87,9 +100,56 @@ export function updateMobPatrol(ctx: SimContext, mob: Entity): boolean {
   }
   const dest = ctx.groundPos(target.x, target.z);
   const behind = Math.hypot(dest.x - mob.pos.x, dest.z - mob.pos.z);
+  if (behind > PATROL_REJOIN_DISTANCE) {
+    const s = ctx.time * speed + patrol.offset;
+    const via = loopRouteTarget(patrol.points, mob.pos.x, mob.pos.z, s);
+    ctx.moveToward(mob, ctx.groundPos(via.x, via.z), speed * CATCH_UP_MULT);
+    return true;
+  }
   const step = behind > CATCH_UP_DISTANCE ? speed * CATCH_UP_MULT : speed;
   if (ctx.moveToward(mob, dest, step)) mob.facing = target.facing;
   return true;
+}
+
+/**
+ * Stand a freshly spawned GROUND patroller on its patrol point for the
+ * current sim clock (the claim's spawn pass, instances/dungeons.ts), facing
+ * along its loop, so it starts walking instead of chasing a point that the
+ * clock has carried round the loop. Its spawn point (the evade home) is that
+ * spot. A flier keeps its placement: it reaches its point in a straight line
+ * over any gap.
+ */
+export function placeOnPatrolPoint(ctx: SimContext, mob: Entity): void {
+  const patrol = mob.dungeonPatrol;
+  if (!patrol || patrol.flightY !== undefined || patrol.points.length === 0) return;
+  if (mob.moveSpeed <= 0) return;
+  const target = patrolPointAt(
+    patrol.points,
+    ctx.time * mob.moveSpeed * patrol.pace + patrol.offset,
+  );
+  const at = ctx.groundPos(target.x, target.z);
+  mob.pos = { ...at };
+  mob.prevPos = { ...at };
+  mob.spawnPos = { ...at };
+  mob.fallStartY = at.y;
+  mob.facing = target.facing;
+  mob.prevFacing = target.facing;
+}
+
+/**
+ * Where an evading GROUND patroller steers to walk home: along its loop to
+ * its spawn point while it is more than LOOP_ROUTE_LOOKAHEAD away, so the walk
+ * home follows the road it was pulled from. Null for any other mob, or once
+ * home is in reach (the caller then walks straight to its spawn point).
+ */
+export function patrolEvadeWaypoint(ctx: SimContext, mob: Entity): Vec3 | null {
+  const patrol = mob.dungeonPatrol;
+  if (!patrol || patrol.flightY !== undefined || patrol.points.length < 2) return null;
+  const home = mob.spawnPos;
+  if (Math.hypot(home.x - mob.pos.x, home.z - mob.pos.z) <= LOOP_ROUTE_LOOKAHEAD) return null;
+  const goal = projectOntoLoop(patrol.points, home.x, home.z);
+  const via = loopRouteTarget(patrol.points, mob.pos.x, mob.pos.z, goal.s);
+  return ctx.groundPos(via.x, via.z);
 }
 
 /** A flier this far over the floor is out of every ground attack's reach. */
