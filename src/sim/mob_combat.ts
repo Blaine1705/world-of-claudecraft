@@ -104,6 +104,15 @@ function buildCombatProfileForMob(templateId: string, scale: number): MobCombatP
       meleeRange: scaledDefaultMobMeleeRange(scale),
       desiredRange: 4.5,
     };
+  // The Drowned Temple's Tidewisp bursts only within its detonate reach
+  // (2.2 yd, trashKit.detonate): on the stock profile it settled at 4 yd and
+  // pawed a standing player forever, never bursting. A seeker closes to touch.
+  if (templateId === 'tidewisp')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: 3,
+      desiredRange: 1.2,
+    };
   if (templateId === 'wildheart_ravager')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,

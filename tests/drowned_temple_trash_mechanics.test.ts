@@ -470,6 +470,23 @@ describe('the Tidewisp: a chilling burst, and the heroic Swollen Tide', () => {
     expect([chill?.value, chill?.duration]).toEqual([0.5, 2]);
   });
 
+  it('the live mob AI closes a wisp on a standing player until it bursts', () => {
+    const r = room();
+    const wisp = engage(r, 'tidewisp', 6, 0);
+    r.sim.aggroMob(wisp, r.me, false);
+    let burst = false;
+    for (let i = 0; i < 20 * 4 && !burst; i++) {
+      r.sim.tick();
+      r.events.push(...r.sim.drainEvents());
+      burst = !r.sim.ctx.entities.has(wisp.id);
+    }
+    expect(burst).toBe(true);
+    // It burst on reaching me (its chill is the burst's mark), never by
+    // dying to a swing.
+    expect(wisp.dead).toBe(false);
+    expect(r.me.auras.some((a) => a.id === TEMPLE_TIDEWISP_CHILL)).toBe(true);
+  });
+
   it('two wisps that touch merge on heroic: pooled health, one swell, a wider burst', () => {
     const r = room('heroic');
     const a = engage(r, 'tidewisp', 8, 0);
