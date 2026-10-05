@@ -571,7 +571,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       // Morthen at 9 (hollow_crypt.md 5.4): Shadow Pulse 216 to 270 (about 19
       // percent, avoidable), a soul taken about 10, Grave Chill 27 a second
       // rising by 9 every 5 s, the Reap 495 to 585 (about 43, the tank's), a
-      // wrong candle about 22, Grasp of the Grave about 16 and a root.
+      // wrong candle about 22, Grasp of the Grave 13 to 16 and a root.
       morthen: 9,
     },
     armorMultiplier: 1.3,

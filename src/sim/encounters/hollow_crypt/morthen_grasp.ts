@@ -101,6 +101,7 @@ function erupt(
   for (const p of claimPlayers(ctx, inst)) {
     const at = localOf(ctx, inst, p);
     if (!inGraspRing(g.x, g.z, at.x, at.z)) continue;
+    if (obj && p.pos.y < obj.pos.y - T.floorBand) continue;
     ctx.dealDamage(
       boss,
       p,

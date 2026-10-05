@@ -188,6 +188,23 @@ describe('Morthen: the Calling', () => {
     expect(took(f, far, 'Shadow Pulse', from)).toBe(0);
   });
 
+  it('Shadow Pulse spares a player far under the ring (the loft below the south rim)', () => {
+    const { f, m } = morthenFight();
+    // Morthen near the south rim; a player on the Choir Loft below, 7 yd away on the map.
+    const hold = () => {
+      put(f, m, 0, 180);
+      put(f, f.others[0], 0, 173);
+    };
+    hold();
+    expect(f.others[0].pos.y).toBeLessThan(m.pos.y - 10);
+    expect(until(f, () => m.castingAbility === MORTHEN_SHADOW_PULSE, T.pulseFirst + 1, hold)).toBe(
+      true,
+    );
+    const from = f.hits.length;
+    run(f, T.pulseCast + 0.2, hold);
+    expect(took(f, f.others[0], 'Shadow Pulse', from)).toBe(0);
+  });
+
   it('Gravecall: a Bound Soul leaves the first alcove and gorges him on arrival, stacking, with a heal', () => {
     const { f, m } = morthenFight();
     m.hp = m.maxHp * 0.9;

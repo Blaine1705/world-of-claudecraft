@@ -197,6 +197,8 @@ function landBar(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: MorthenF
     ability: BAR_ID[bar.what],
   });
   for (const p of claimPlayers(ctx, inst)) {
+    // The crag top only (the loft under the south rim is in reach on the map).
+    if (p.pos.y < boss.pos.y - T.floorBand) continue;
     if (bar.what === 'pulse') {
       if (dist2d(p.pos, boss.pos) > T.pulseRadius) continue;
       ctx.dealDamage(

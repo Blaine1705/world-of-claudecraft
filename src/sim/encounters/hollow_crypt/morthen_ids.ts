@@ -204,6 +204,10 @@ export const MORTHEN_TUNING = {
   reapArcDeg: 120,
   reapMin: 55,
   reapMax: 65,
+  /** Only players within this many yards under his floor are struck by his
+   *  floor mechanics (the crag top: the Choir Loft lies far under the south
+   *  rim, inside his reach on the map). */
+  floorBand: 3,
   // Heroic.
   /** Name the Dead: shadow on whoever lights the wrong candle. */
   wrongCandleMin: 28,
