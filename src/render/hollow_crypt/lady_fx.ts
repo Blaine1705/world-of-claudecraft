@@ -83,7 +83,7 @@ void main() {
   vec3 warm = vec3(1.0, 0.72, 0.36);
   vec3 cold = vec3(0.45, 0.58, 0.75);
   vec3 col = warm * (0.55 + 0.6 * pool) * (0.9 + 0.1 * sin(uTime * 7.0 + uSeed));
-  float alpha = pool * 0.42 + rim * (0.25 + 0.75 * uLit);
+  float alpha = pool * 0.62 + rim * (0.35 + 0.65 * uLit);
   col = mix(cold * dash, col, step(0.05, uLit));
   alpha = mix(rim * dash * 0.35, alpha, step(0.05, uLit));
   gl_FragColor = vec4(col, alpha);
@@ -110,7 +110,7 @@ float cracks(vec2 p) {
     float d = length(g + o - f);
     if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) { d2 = d; }
   }
-  return 1.0 - smoothstep(0.0, 0.06, d2 - d1);
+  return 1.0 - smoothstep(0.0, 0.035, d2 - d1);
 }
 void main() {
   vec2 d = vUv - 0.5;
@@ -119,8 +119,8 @@ void main() {
   float c = cracks(p) * 0.8 + cracks(p * 2.3) * 0.35;
   float sheen = pow(max(0.0, sin((d.x + d.y) * uScale * 0.35 - uTime * 0.6)), 24.0);
   float body = 1.0 - smoothstep(0.82, 1.0, r);
-  vec3 col = mix(vec3(0.55, 0.72, 0.86), vec3(0.92, 0.98, 1.0), c) + sheen * 0.6;
-  gl_FragColor = vec4(col, body * uAlpha * (0.32 + 0.38 * c + 0.3 * sheen));
+  vec3 col = mix(vec3(0.36, 0.55, 0.74), vec3(0.82, 0.94, 1.0), c) + sheen * 0.45;
+  gl_FragColor = vec4(col, body * uAlpha * (0.2 + 0.32 * c + 0.22 * sheen));
 }
 `;
 
@@ -675,7 +675,7 @@ export class LadyFx implements CryptBossPainter {
     const h = this.host;
     const r = obj.scale > 0 ? obj.scale : 20;
     this.floor.position.set(obj.pos.x, h.groundY(obj.pos.x, obj.pos.z) + 0.03, obj.pos.z);
-    this.floor.scale.setScalar(r / 0.88);
+    this.floor.scale.setScalar(r / 0.95);
     this.floorMat.uniforms.uAlpha.value = fadeIn(h.clock() - this.floorBorn, 1.1);
     this.floorMat.uniforms.uScale.value = r * 1.6;
     this.floor.visible = true;

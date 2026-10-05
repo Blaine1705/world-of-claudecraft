@@ -52,7 +52,7 @@ const SCAN_SEC = 0.1;
 const PITS = T.graveCap + 2;
 const MARKS = 3;
 const SHELLS = 4;
-const EARTH = { r: 0.32, g: 0.24, b: 0.17 };
+const EARTH = { r: 0.17, g: 0.13, b: 0.1 };
 const GRAVE_GLOW = { r: 0.55, g: 0.42, b: 0.95 };
 const SOUL = { r: 0.62, g: 1, b: 0.72 };
 
@@ -154,9 +154,9 @@ function moundGeometry(): THREE.BufferGeometry {
     const lump = 1 + 0.35 * Math.sin(a * 5) * Math.sin(a * 3 + 1.3) + 0.2 * Math.sin(a * 11);
     pos.setY(i, Math.max(0, pos.getY(i)) * lump * 1.4);
     const k = 0.75 + 0.25 * Math.sin(a * 7 + x * 3);
-    colors[i * 3] = 0.27 * k;
-    colors[i * 3 + 1] = 0.19 * k;
-    colors[i * 3 + 2] = 0.13 * k;
+    colors[i * 3] = 0.15 * k;
+    colors[i * 3 + 1] = 0.105 * k;
+    colors[i * 3 + 2] = 0.075 * k;
   }
   g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   g.computeVertexNormals();
@@ -294,13 +294,13 @@ export class MarrowFx implements CryptBossPainter {
         life: clod ? 0.9 + h.rand() * 0.3 : 1.2 + h.rand() * 0.6,
         drag: clod ? 0.4 : 1.6,
         floor: gy + 0.1,
-        size0: clod ? 0.35 : 0.9,
-        size1: clod ? 0.3 : 3.2 + h.rand() * 1.5,
+        size0: clod ? 0.35 : 0.7,
+        size1: clod ? 0.3 : 2.2 + h.rand(),
         spin: (h.rand() - 0.5) * 2,
         r: clod ? 0.16 : EARTH.r,
         g: clod ? 0.11 : EARTH.g,
         b: clod ? 0.07 : EARTH.b,
-        a: clod ? 1 : 0.7,
+        a: clod ? 1 : 0.55,
       });
     }
     h.shakeAt(e.pos.x, e.pos.z, 0.3);
@@ -326,12 +326,12 @@ export class MarrowFx implements CryptBossPainter {
         life: 1 + h.rand() * 0.7,
         drag: up ? 0.5 : 2,
         floor: gy + 0.1,
-        size0: up ? 0.4 : 1.2,
-        size1: up ? 0.35 : 4,
+        size0: up ? 0.4 : 0.9,
+        size1: up ? 0.35 : 2.4,
         r: EARTH.r,
         g: EARTH.g,
         b: EARTH.b,
-        a: up ? 1 : 0.65,
+        a: up ? 1 : 0.5,
       });
     }
     for (let i = 0; i < Math.round(30 * h.density); i++) {
@@ -658,7 +658,7 @@ export class MarrowFx implements CryptBossPainter {
         continue;
       }
       s.mesh.scale.setScalar(s.reach * (1 - (1 - k) ** 2.5) + 0.5);
-      s.mat.uniforms.uAlpha.value = pulse(now - s.born, s.span) * 0.75;
+      s.mat.uniforms.uAlpha.value = pulse(now - s.born, s.span) * 0.45;
     }
   }
 

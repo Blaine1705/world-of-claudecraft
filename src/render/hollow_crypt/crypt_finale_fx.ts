@@ -30,7 +30,6 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
-  CRYPT_OBJECT_TEMPLATES,
   KNELL_LANE_MARK_TEMPLATE,
   KNELL_LANE_TEMPLATE,
   KNELL_PYRE_TEMPLATE,
@@ -74,6 +73,13 @@ import {
 } from './crypt_fx_particles';
 
 export const CRYPT_RITE_VFX_URL = '/models/props/crypt_rite_vfx.glb';
+
+/** The finale's own encounter objects (the pyre and the strafe lanes). */
+const FINALE_OBJECT_TEMPLATES: ReadonlySet<string> = new Set([
+  KNELL_PYRE_TEMPLATE,
+  KNELL_LANE_MARK_TEMPLATE,
+  KNELL_LANE_TEMPLATE,
+]);
 
 const SCAN_SEC = 0.1;
 const SPOT_RING_RADIUS = 9;
@@ -686,7 +692,9 @@ export class CryptFinaleFx {
         else if (e.templateId === KNELLWYRM_ID && !e.dead) this.wyrmId = e.id;
         continue;
       }
-      if (e.kind !== 'object' || !CRYPT_OBJECT_TEMPLATES.has(e.templateId)) continue;
+      // Only the finale's own objects: the wing bosses' graves, lanterns,
+      // rime and note lanes share CRYPT_OBJECT_TEMPLATES (crypt_boss_fx.ts).
+      if (e.kind !== 'object' || !FINALE_OBJECT_TEMPLATES.has(e.templateId)) continue;
       live.add(e.id);
       if (!this.objectsSeen.has(e.id)) this.objectsSeen.set(e.id, this.clock);
       if (e.templateId === KNELL_PYRE_TEMPLATE) {
