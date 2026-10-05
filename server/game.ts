@@ -8400,7 +8400,13 @@ export class GameServer {
     // stringified every tick. Delta-guarded like the rest of this record; the
     // reconciliation-critical fields above stay unconditional since they change
     // on most combat ticks. The cohort lives in server/self_scalar_wire.ts.
-    emitSelfScalarKeys(maybe, meta, p, this.sim.dungeonDifficulty(anchorSession.pid));
+    emitSelfScalarKeys(
+      maybe,
+      meta,
+      p,
+      this.sim.dungeonDifficulty(anchorSession.pid),
+      this.sim.activeDungeonDifficulty(anchorSession.pid),
+    );
     // The viewer's OWN authored look. It cannot come from the entity list (the
     // broadcast loop skips `e.id === anchorEntity.id`), and it is exactly what
     // `maybeRaw` is for: heavy, already serialized once (appearanceWireJson),

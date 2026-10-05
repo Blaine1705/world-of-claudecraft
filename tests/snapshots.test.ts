@@ -76,6 +76,7 @@ import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS, WORLD_QUESTS } from '../src/sim/data';
 import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createGroundObject, createMob } from '../src/sim/entity';
+import { enterDungeon } from '../src/sim/instances/dungeons';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
@@ -1263,7 +1264,7 @@ describe('combat ratings over the wire', () => {
 });
 
 // The static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
-// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) used to ride the unconditional
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff/adiff) used to ride the unconditional
 // base self object every tick for every player, unlike every other heavy field
 // on the same record. They now go through the same `maybe(...)` delta gate
 // (server/game.ts), so an unchanged value elides from the wire entirely; the
@@ -1287,6 +1288,7 @@ describe('static combat-rating/progression scalars ride the delta gate', () => {
     'prk',
     'copper',
     'ddiff',
+    'adiff',
   ] as const;
 
   it('rides the first snapshot, elides once quiet, and resends only the field that actually moved', () => {
@@ -2651,6 +2653,24 @@ describe('dungeon difficulty wire', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.dungeonDifficulty()).toBe('heroic');
+  });
+
+  it('ships active instance difficulty separately from the selected preference', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hero');
+    expect(enterDungeon(server.sim.ctx, 'hollow_crypt', session.pid)).toBe(true);
+    server.sim.setDungeonDifficulty('heroic', session.pid);
+
+    broadcast(server);
+
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ddiff).toBe('heroic');
+    expect(snap.self.adiff).toBe('normal');
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.dungeonDifficulty()).toBe('heroic');
+    expect(client.activeDungeonDifficulty()).toBe('normal');
   });
 
   it('dispatches set_dungeon_difficulty through the wire and rejects invalid values', () => {
@@ -5675,8 +5695,8 @@ describe('online mount command and race-event transport', () => {
 // look changes), and `wba` reuses one realm-wide world-boss liveness fragment
 // across every viewer in the broadcast pass. The count is the union of the
 // release's realm-readout keys, the procedural-dungeon branch's rift delta keys,
-// and the 16 static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
-// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present self
+// and the 17 static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff/adiff) moved off the always-present self
 // record and behind this same delta gate, since they change far less often than
 // the reconciliation-critical fields (resource, gcd, swing, combo, target...)
 // that stay unconditional.
@@ -5685,6 +5705,7 @@ const ALL_DELTA_KEYS = [
   'acct',
   'achg',
   'achr',
+  'adiff',
   'ap',
   'app',
   'arena',
@@ -5832,6 +5853,7 @@ const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app' && key !==
 const TERSE_TO_IWORLD: Record<string, string> = {
   aborder: 'activeBorder',
   achg: 'abilityCharges',
+  adiff: 'activeDungeonDifficulty',
   ap: 'attackPower',
   arena: 'arenaInfo',
   atitle: 'activeTitle',
@@ -7151,13 +7173,13 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 113 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 114 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
     // combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/crat/
-    // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
+    // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff/adiff) moved off the always-present
     // self record and behind this same delta gate, for 83, then +1 reliq
     // (Reliquary Phase 3 sparse blob), +1 aborder (the Book of Deeds nameplate
     // border echo, atitle's sibling), and +1 `app` (the release's authored
@@ -7209,8 +7231,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
-    expect(ALL_DELTA_KEYS).toHaveLength(113);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(113);
+    expect(ALL_DELTA_KEYS).toHaveLength(114);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(114);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7356,9 +7378,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
     // for 65, this branch's commission order board key corder
     // (issue #1298) for 66, and the character sheet's lifetime played-time
-    // key ptime for 67, then the 16 static combat-rating/progression scalars
-    // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
-    // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
+    // key ptime for 67, then the 17 static combat-rating/progression scalars
+    // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff/adiff)
+    // for 84, then reliq (Reliquary Phase 3 sparse blob) for 85, the nameplate
     // border echo aborder for 85, and the authored modular look `app` for 86.
     // The Vale Cup retirement then removes sport/vcup/vcupb, for 83, and the
     // healPower seam adds the derived Healing Power scalar hpw for 84. Bank
@@ -7380,7 +7402,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(113);
+    expect(scraped.size).toBe(114);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

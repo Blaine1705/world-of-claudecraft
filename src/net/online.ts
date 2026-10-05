@@ -1240,6 +1240,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // field (pet state lives on the owned-mob entity wire). ---
   partyInfo: PartyInfo | null = null;
   private selectedDungeonDifficulty: DungeonDifficulty = 'normal';
+  private activeInstanceDungeonDifficulty: DungeonDifficulty | null = null;
   // --- IWorldTrade: active trade-window state, mirrored from the snapshot self
   // (`s.trade`, delta-omitted). ---
   tradeInfo: TradeInfo | null = null;
@@ -3214,6 +3215,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
       if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
+      if (s.adiff === 'normal' || s.adiff === 'heroic')
+        this.activeInstanceDungeonDifficulty = s.adiff;
+      else if (s.adiff === null) this.activeInstanceDungeonDifficulty = null;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       const restoreSessionPreferences = this.spectateExitPending;
       const arena = s.arena !== undefined ? s.arena : this.arenaInfo;
@@ -4846,7 +4850,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     return this.selectedDungeonDifficulty ?? 'normal';
   }
   activeDungeonDifficulty(): DungeonDifficulty | null {
-    return null;
+    return this.activeInstanceDungeonDifficulty ?? null;
   }
   setDungeonDifficulty(difficulty: DungeonDifficulty): void {
     this.selectedDungeonDifficulty = difficulty;

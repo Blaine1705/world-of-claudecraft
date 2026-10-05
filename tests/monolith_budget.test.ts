@@ -1726,7 +1726,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 9840 -> 9831 by the rift-floor fix for moderation moves: the
     // jail / visit / cage-gate teleport body and its revive branches moved to
     // server/moderation_moves.ts (wc -l after biome). Exact count, zero slack.
-    ceiling: 9831,
+    // Re-pinned 9831 -> 9835 for v0.45.0 active instance difficulty wire
+    // (adiff): thin self-snapshot wiring only, measured with wc -l after biome.
+    // Exact count, zero slack.
+    ceiling: 9835,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1909,7 +1912,10 @@ const MONOLITHS: MonolithRow[] = [
     // its collision-region swap moved to src/net/rift_floor_mirror.ts, which the
     // event arm, the spectate frame, the reconnect, and endSession now share
     // (wc -l after biome). Exact count, zero slack.
-    ceiling: 5328,
+    // Re-pinned 5328 -> 5332 for v0.45.0 active instance difficulty mirror
+    // (adiff): thin ClientWorld decode/read only, measured with wc -l after biome.
+    // Exact count, zero slack.
+    ceiling: 5332,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
