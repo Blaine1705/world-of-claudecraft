@@ -18,6 +18,13 @@ export function livingInReach(players: readonly Entity[], from: Vec3, range: num
   return players.filter((p) => !p.dead && dist2d(p.pos, from) <= range).sort((a, b) => a.id - b.id);
 }
 
+/** Is any living player within `range` of `from`? (No allocation: the
+ *  ready checks ask it every tick while a cooldown waits on it.) */
+export function anyLivingInReach(players: readonly Entity[], from: Vec3, range: number): boolean {
+  for (const p of players) if (!p.dead && dist2d(p.pos, from) <= range) return true;
+  return false;
+}
+
 /** The bolt's victim: one living player in reach, picked by hash. */
 export function pickHashedTarget(
   players: readonly Entity[],

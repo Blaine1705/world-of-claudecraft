@@ -12,7 +12,7 @@
 
 import type { SimContext } from '../../sim_context';
 import type { Entity, TrashKitDef } from '../../types';
-import { livingInReach } from './targets';
+import { anyLivingInReach, livingInReach } from './targets';
 
 /** The silence aura id a nova leaves (its look keys on the nova's cast id). */
 export const KIT_NOVA_SILENCE = 'trash_kit_nova_silence';
@@ -29,7 +29,7 @@ export function novaCastIdFor(def: NonNullable<TrashKitDef['nova']>, novasCast: 
 /** Can the nova start now? Only when a living player stands in its radius. */
 export function novaReady(mob: Entity, kit: TrashKitDef, players: readonly Entity[]): boolean {
   const def = kit.nova;
-  return !!def && livingInReach(players, mob.pos, def.radius).length > 0;
+  return !!def && anyLivingInReach(players, mob.pos, def.radius);
 }
 
 /** The players a landing nova strikes: in its radius and in the caster's

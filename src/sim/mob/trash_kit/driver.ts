@@ -135,11 +135,19 @@ const EXTENSIONS: readonly TrashKitExtension[] = [
   BASTION_KIT_EXTENSION,
 ];
 
+/** Each extension cast key's owner, built once (the driver asks per key,
+ *  per engaged mob, per tick). */
+const EXTENSION_OF_KEY: ReadonlyMap<string, TrashKitExtension> = new Map(
+  EXTENSIONS.flatMap((ext) => ext.castKeys.map((key) => [key, ext] as const)),
+);
+
 /** The extension that owns cast key `key`, if any. */
 function extensionOf(key: string): TrashKitExtension | undefined {
-  for (const ext of EXTENSIONS) if (ext.castKeys.includes(key)) return ext;
-  return undefined;
+  return EXTENSION_OF_KEY.get(key);
 }
+
+/** A bar-launched walker's cast record, derived once per walker def. */
+const WALKER_CASTS = new WeakMap<object, TrashKitCast>();
 
 /** Every cast key the driver runs: its own, then each extension's, in order. */
 const ALL_CAST_KEYS: readonly string[] = [
@@ -180,14 +188,19 @@ function castDef(kit: TrashKitDef, key: string): TrashKitCast | undefined {
     // A walker launched by a bar (its death launch has no bar).
     const w = kit.walker;
     if (!w || w.launch !== 'cast') return undefined;
-    return {
-      castId: w.castId,
-      name: w.name,
-      castTime: w.castTime ?? 1.5,
-      every: w.every ?? 15,
-      first: w.first ?? 6,
-      school: w.school,
-    };
+    let cast = WALKER_CASTS.get(w);
+    if (!cast) {
+      cast = {
+        castId: w.castId,
+        name: w.name,
+        castTime: w.castTime ?? 1.5,
+        every: w.every ?? 15,
+        first: w.first ?? 6,
+        school: w.school,
+      };
+      WALKER_CASTS.set(w, cast);
+    }
+    return cast;
   }
   return kit[key as Exclude<CastKey, 'walker'>];
 }

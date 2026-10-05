@@ -82,16 +82,20 @@ export function stepLure(
     breakSong(ctx, mob, victim);
     return 'broken';
   }
-  ctx.applyAura(victim, {
-    id: TEMPLE_SHALLOWS_DRAW,
-    name: def.name,
-    kind: 'slow',
-    remaining: DRAW_HOLD,
-    duration: DRAW_HOLD,
-    value: SHALLOWS_DRAW_SLOW,
-    sourceId: mob.id,
-    school: def.school,
-  });
+  // Laid once, then only its clock is wound: no aura event every tick.
+  const draw = victim.auras.find((a) => a.id === TEMPLE_SHALLOWS_DRAW && a.sourceId === mob.id);
+  if (draw) draw.remaining = DRAW_HOLD;
+  else
+    ctx.applyAura(victim, {
+      id: TEMPLE_SHALLOWS_DRAW,
+      name: def.name,
+      kind: 'slow',
+      remaining: DRAW_HOLD,
+      duration: DRAW_HOLD,
+      value: SHALLOWS_DRAW_SLOW,
+      sourceId: mob.id,
+      school: def.school,
+    });
   const pull = heroic ? def.heroicPull : def.pull;
   pullToward(ctx, victim, mob.pos.x, mob.pos.z, pull * DT, def.reach);
   if (dist2d(victim.pos, mob.pos) <= def.reach + 0.05) {
