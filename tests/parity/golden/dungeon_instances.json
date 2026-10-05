@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1096,
-      "state": "5ff3cef3",
+      "state": "febb7aa9",
       "events": "b65f80d4",
       "rng": {
         "draws": 76,
@@ -3662,7 +3662,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "encounterHeld": true,
-          "fallStartY": 24.4,
+          "fallStartY": 24,
           "fiveSecondRule": 99,
           "hp": 1191,
           "id": 1083,
@@ -3677,14 +3677,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 100300,
-            "y": 17.4,
+            "y": 17,
             "z": -1038
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": 100300,
-            "y": 24.4,
+            "y": 24,
             "z": -1038
           },
           "stats": {
@@ -4188,7 +4188,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1096,
-      "state": "1e3a4e30",
+      "state": "7a133932",
       "events": "eb3dd672",
       "rng": {
         "draws": 76,
@@ -7822,7 +7822,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "encounterHeld": true,
-          "fallStartY": 24.4,
+          "fallStartY": 24,
           "fiveSecondRule": 99,
           "hp": 1191,
           "id": 1083,
@@ -7837,14 +7837,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 100300,
-            "y": 17.4,
+            "y": 17,
             "z": -1038
           },
           "potionCooldownUntil": -1,
           "pulseTimer": 10,
           "spawnPos": {
             "x": 100300,
-            "y": 24.4,
+            "y": 24,
             "z": -1038
           },
           "stats": {
@@ -8348,7 +8348,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1096,
-      "state": "98c5bc59",
+      "state": "84372b73",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8359,7 +8359,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1096,
-      "state": "7ccdb15a",
+      "state": "45851ac0",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8370,7 +8370,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1096,
-      "state": "96e66cd0",
+      "state": "ddde9252",
       "events": "741638a5",
       "rng": {
         "draws": 76,
