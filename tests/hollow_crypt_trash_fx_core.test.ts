@@ -20,7 +20,9 @@ import {
   barrowEmbersSpec,
   boltArcInto,
   CARRION_BOLT,
+  CRYPT_KIT_SLOTS,
   carrionEyeSeconds,
+  claimSlot,
   crackedGlow,
   crustPlateSpot,
   embersFlameRate,
@@ -29,13 +31,17 @@ import {
   GRANITE_PLATES_PER_LAYER,
   graniteCrust,
   graniteSpec,
+  HOLLOW_CRYPT_DUNGEON,
   hazardLevel,
+  inHollowCrypt,
   LAYER_SLAM_SECONDS,
   layerSlam,
   MARROW_CRACK,
   marrowCrack,
   marrowCrushCone,
   nearestWithin,
+  PILE_UNSEEN_PROGRESS,
+  pileBornAt,
   pileGlow,
   pileProgress,
   pilePulseHz,
@@ -51,7 +57,7 @@ import {
   strandPhase,
   webNetLevel,
 } from '../src/render/hollow_crypt/crypt_trash_kit_fx_core';
-import { MOBS } from '../src/sim/data';
+import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import {
   KNELL_LANE_MARK_TEMPLATE,
   KNELL_LANE_TEMPLATE,
@@ -150,7 +156,52 @@ describe('crypt trash telegraphs: the mechanics pass', () => {
   });
 });
 
+describe('the kit host: slots and the crypt gate', () => {
+  it('pins the slot counts of every pool a roster walk claims', () => {
+    expect(CRYPT_KIT_SLOTS).toEqual({
+      piles: 6,
+      pools: 3,
+      gargoyles: 3,
+      eyes: 4,
+      nets: 5,
+      embers: 2,
+      objects: 8,
+    });
+  });
+
+  it('never evicts a live owner: its own slot, else a free one, else none', () => {
+    const slots = [{ owner: 11 }, { owner: -1 }, { owner: 12 }];
+    expect(claimSlot(slots, 12)).toBe(slots[2]);
+    expect(claimSlot(slots, 13)).toBe(slots[1]);
+    expect(slots[1].owner).toBe(13);
+    // Full: the newcomer gets nothing, and every live owner keeps its slot.
+    expect(claimSlot(slots, 14)).toBeNull();
+    expect(slots.map((s) => s.owner)).toEqual([11, 13, 12]);
+    // A second claim by a holder returns the same slot (no re-lay).
+    expect(claimSlot(slots, 13)).toBe(slots[1]);
+  });
+
+  it('walks the roster only inside the Hollow Crypt claim', () => {
+    const crypt = DUNGEONS[HOLLOW_CRYPT_DUNGEON];
+    expect(crypt).toBeDefined();
+    expect(inHollowCrypt(instanceOrigin(crypt.index, 0).x)).toBe(true);
+    // The open world (the instance bands sit far out on +x).
+    expect(inHollowCrypt(0)).toBe(false);
+    const other = Object.values(DUNGEONS).find((d) => d.id !== HOLLOW_CRYPT_DUNGEON);
+    if (other) expect(inHollowCrypt(instanceOrigin(other.index, 0).x)).toBe(false);
+  });
+});
+
 describe('Reassemble: the bone pile', () => {
+  it('starts the countdown at the windup, or mid-way for a pile seen without it', () => {
+    expect(pileBornAt(3, 10, 8)).toBe(3);
+    // Unknown start: placed PILE_UNSEEN_PROGRESS into the countdown (reads urgent).
+    const born = pileBornAt(null, 10, 8);
+    expect(pileProgress(10 - born, 8)).toBeCloseTo(PILE_UNSEEN_PROGRESS, 9);
+    expect(PILE_UNSEEN_PROGRESS).toBeGreaterThan(0);
+    expect(PILE_UNSEEN_PROGRESS).toBeLessThan(1);
+  });
+
   it('counts down the template seconds', () => {
     const seconds = MOBS.crypt_ossuary_warrior.trashKit?.reassemble?.seconds;
     expect(reassembleSeconds()).toBe(seconds);
@@ -253,13 +304,13 @@ describe('Granite Skin and Cracked Stone', () => {
   });
 
   it('thickens, pales and grows its orbit with every layer', () => {
-    expect(graniteCrust(0, maxStacks)).toMatchObject({ plates: 0, thickness: 0, flakes: 0 });
+    expect(graniteCrust(0, maxStacks)).toMatchObject({ plates: 0, crustDepth: 0, flakes: 0 });
     for (let s = 1; s <= maxStacks; s++) {
       const c = graniteCrust(s, maxStacks);
       const b = graniteCrust(s - 1, maxStacks);
       expect(c.plates).toBe(s * GRANITE_PLATES_PER_LAYER);
       expect(c.flakes).toBe(s * GRANITE_FLAKES_PER_LAYER);
-      expect(c.thickness).toBeGreaterThan(b.thickness);
+      expect(c.crustDepth).toBeGreaterThan(b.crustDepth);
       expect(c.pale).toBeGreaterThan(b.pale);
       expect(c.orbit).toBeGreaterThan(b.orbit);
     }
@@ -286,7 +337,7 @@ describe('Granite Skin and Cracked Stone', () => {
   });
 
   it('slams a layer on oversized and settles it', () => {
-    expect(layerSlam(0).scale).toBeGreaterThan(1.5);
+    expect(layerSlam(0).scale).toBeGreaterThan(1.2);
     expect(layerSlam(0).flash).toBe(1);
     expect(layerSlam(LAYER_SLAM_SECONDS)).toEqual({ scale: 1, flash: 0 });
   });

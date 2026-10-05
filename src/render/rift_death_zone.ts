@@ -353,6 +353,12 @@ export class RiftDeathZoneVisuals {
     this.hoardPresentation.dispose();
   }
 
+  /** The drawn scale multiplier of a body (a fed Bastion Barnacle Crawler
+   *  swells; 1 for every other body). O(1); the renderer asks it per body. */
+  bodySwell(id: number): number {
+    return this.bastionFx.bodySwell(id);
+  }
+
   /** True when a dungeon effect claimed the event outright (the renderer
    *  then skips its generic draw of it). */
   handleEvent(event: SimEvent): boolean {

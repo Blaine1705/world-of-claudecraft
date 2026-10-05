@@ -194,6 +194,12 @@ export class BastionFx {
     return this.specs[castId] ?? extraSpecs.get(castId);
   }
 
+  /** The drawn swell of a fed Barnacle Crawler (bastion_trash_fx.ts), 1 for
+   *  every other body. */
+  bodySwell(id: number): number {
+    return this.disposed ? 1 : this.creatures.bodySwell(id);
+  }
+
   /** A landing strike's flash (cosmetic; the damage already has its number).
    *  True when a creature effect CLAIMED the event (the arbalest's bolt, the
    *  Turnkey's lantern), so the generic projectile or nova is not drawn too. */

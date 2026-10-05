@@ -52,7 +52,12 @@ import {
   telegraphYaw,
 } from './crypt_trash_fx_core';
 import { CryptTrashKitFx } from './crypt_trash_kit_fx';
-import { hazardLevel, ruptureRingFill, ruptureSpec } from './crypt_trash_kit_fx_core';
+import {
+  hazardLevel,
+  inHollowCrypt,
+  ruptureRingFill,
+  ruptureSpec,
+} from './crypt_trash_kit_fx_core';
 
 const TELEGRAPH_SLOTS = 10;
 const BURST_SLOTS = 8;
@@ -216,7 +221,8 @@ export class CryptTrashFx {
     this.scan -= dt;
     if (this.scan <= 0) {
       this.scan = SCAN_SEC;
-      this.scanWorld(world);
+      // Nothing of the crypt to find outside its claim: skip the roster walk.
+      if (inHollowCrypt(world.player.pos.x)) this.scanWorld(world);
     }
     for (const slot of this.telegraphs) {
       if (slot.casterId < 0) continue;

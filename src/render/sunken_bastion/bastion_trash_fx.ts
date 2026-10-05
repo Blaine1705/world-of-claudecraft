@@ -11,7 +11,7 @@
 //  Fall Back (Fogbound Arbalest): a push-off of dust and sea spray, a short
 //    spray trail along the leap and a puff where it lands.
 //  Carrion Glut (Barnacle Crawler): every stack swells the body (drawn through
-//    bastionSwell, held on the corpse until it bursts) with a gulp, and its
+//    swellOf, held on the corpse until it bursts) with a gulp, and its
 //    brine sacs burn brighter, pulsing hard on a fed corpse before it bursts.
 //  Pack Frenzy (Bastion Warhound): the hound throws its head back and howls
 //    (its Howl clip through the gesture hook), a shock ring runs out over the
@@ -58,7 +58,6 @@ import {
   CRAWLER,
   CRAWLER_RAW_HEIGHT,
   CRAWLER_SACS,
-  clearBastionSwell,
   FALL_TRAIL_INTERVAL,
   FRENZY_EMBER_INTERVAL,
   fallBackSeconds,
@@ -68,6 +67,7 @@ import {
   glutSwell,
   HOWL_RING_RADIUS,
   HOWL_RING_SEC,
+  inBastionClaim,
   PACK_FRENZY_AURA,
   PRISONER,
   PRISONER_EYES,
@@ -76,7 +76,9 @@ import {
   PRISONER_RAW_HEIGHT,
   RELEASE_SEC,
   releaseEnvelope,
-  setBastionSwell,
+  SWELL_EPSILON,
+  stableSlots,
+  TRASH_FX_SLOTS,
   WARHOUND,
   WARHOUND_EYES,
   WARHOUND_THROAT,
@@ -93,10 +95,6 @@ import {
   TrashFxKit,
 } from './bastion_trash_fx_kit';
 
-const WARD_SLOTS = 6;
-const BAND_SLOTS = 4;
-const SOUL_SLOTS = 2;
-const SHROUD_MAX = 6;
 const SCAN_SEC = 0.1;
 const WARD_TEAL = new THREE.Color(0.32, 0.95, 0.86);
 const SOUL = new THREE.Color(0.78, 0.9, 1.0);
@@ -169,11 +167,20 @@ export class BastionTrashFx {
   private readonly hounds = new Map<number, number>();
   private readonly freed = new Map<number, FreedState>();
   private readonly leaps: LeapState[] = [];
+  /** The drawn swell of each fed crawler (entity id to scale), read by the
+   *  renderer through `swellOf` (this instance's own, never module state). */
+  private readonly swell = new Map<number, number>();
   /** The scan's picks (reused arrays, refilled every scan). */
   private readonly wallIds: number[] = [];
+  private readonly shroudIds: number[] = [];
+  /** The warded watchmen alive this frame, and the body each ward slot shows
+   *  (stableSlots: a body keeps its slot, a full pool drops a newcomer). */
+  private readonly wallLive: number[] = [];
+  private readonly wardIds: number[] = new Array(TRASH_FX_SLOTS.wards).fill(-1);
   private readonly wallBodies: { id: number; x: number; z: number }[] = [];
   private readonly pairs: number[] = [];
-  private readonly shroudIds: number[] = [];
+  /** Whether the local player stood in a Bastion claim at the last scan. */
+  private inside = false;
   private readonly wallReach = wallRadius();
   private readonly leapSec = fallBackSeconds();
   private readonly at = { x: 0, y: 0, z: 0 };
@@ -205,11 +212,11 @@ export class BastionTrashFx {
     sleeve.translate(0, 0.5, 0);
     const band = crossedBand();
     kit.geometries.push(ward, sleeve, band);
-    for (let i = 0; i < WARD_SLOTS; i++)
+    for (let i = 0; i < TRASH_FX_SLOTS.wards; i++)
       this.wards.push(kit.shellSlot(group, ward, SHELL_MODE.ward, WARD_TEAL, true));
-    for (let i = 0; i < BAND_SLOTS; i++)
+    for (let i = 0; i < TRASH_FX_SLOTS.bands; i++)
       this.bands.push(kit.shellSlot(group, band, SHELL_MODE.band, WARD_TEAL, true));
-    for (let i = 0; i < SOUL_SLOTS; i++) {
+    for (let i = 0; i < TRASH_FX_SLOTS.souls; i++) {
       const soul = kit.shellSlot(group, sleeve, SHELL_MODE.soul, SOUL, true);
       this.releases.push({ alive: false, x: 0, y: 0, z: 0, k: 1, start: 0, nextWisp: 0, soul });
     }
@@ -405,7 +412,8 @@ export class BastionTrashFx {
     const at = this.freed.get(prisonerId);
     if (!at) return;
     this.freed.delete(prisonerId);
-    const slot = this.releases.find((r) => !r.alive) ?? this.releases[0];
+    // A full pool drops the newcomer: a fading release is never cut short.
+    const slot = this.releases.find((r) => !r.alive);
     if (!slot) return;
     slot.alive = true;
     slot.x = at.x;
@@ -493,8 +501,7 @@ export class BastionTrashFx {
       if (e.dead) continue;
       for (const a of e.auras) {
         if (a.id === BASTION_FOG_SHROUD) {
-          if (this.shroudIds.length < SHROUD_MAX && !this.shroudIds.includes(e.id))
-            this.shroudIds.push(e.id);
+          if (!this.shroudIds.includes(e.id)) this.shroudIds.push(e.id);
         } else if (a.id === BASTION_HALBERD_WALL && e.templateId === WATCHMAN) {
           this.wallIds.push(e.id);
         }
@@ -516,8 +523,26 @@ export class BastionTrashFx {
     for (const id of this.crawlers.keys()) {
       if (world.entities.has(id)) continue;
       this.crawlers.delete(id);
-      setBastionSwell(id, 1);
+      this.swell.delete(id);
     }
+  }
+
+  /** Leaving the Bastion: forget its bodies so every ward, shroud, swell and
+   *  glow fades or drops (the parts still in flight finish on their own). */
+  private leftClaim(): void {
+    this.wallIds.length = 0;
+    this.shroudIds.length = 0;
+    this.crawlers.clear();
+    this.swell.clear();
+    this.hounds.clear();
+    this.freed.clear();
+  }
+
+  /** The drawn scale multiplier of a body: 1 for every body that is not a fed
+   *  Barnacle Crawler. O(1), allocation-free; the renderer asks it per body. */
+  swellOf(id: number): number {
+    if (this.swell.size === 0) return 1;
+    return this.swell.get(id) ?? 1;
   }
 
   // -------------------------------------------------------------- frame
@@ -531,7 +556,12 @@ export class BastionTrashFx {
     this.scanIn -= dt;
     if (this.scanIn <= 0) {
       this.scanIn = SCAN_SEC;
-      this.scanWorld(world);
+      // The roster scan (and its aura walks) runs only inside a Bastion claim.
+      const inside = inBastionClaim(world.player.pos.x);
+      if (inside) this.scanWorld(world);
+      else if (this.inside) this.leftClaim();
+      else this.columns.scan(world);
+      this.inside = inside;
     }
     this.hooks.update(world);
     this.fog.update(world, this.shroudIds, dt);
@@ -547,25 +577,31 @@ export class BastionTrashFx {
 
   private updateWalls(world: IWorld): void {
     const kit = this.kit;
-    // The warded watchmen this scan saw, at their live positions.
-    let count = 0;
+    // The warded watchmen this scan saw and still alive, each kept on its
+    // ward slot (a newcomer takes a free one; a full pool drops it).
+    this.wallLive.length = 0;
     for (const id of this.wallIds) {
-      if (count >= WARD_SLOTS) break;
       const e = world.entities.get(id);
-      if (!e || e.dead) continue;
-      let body = this.wallBodies[count];
-      if (!body) {
-        body = { id: 0, x: 0, z: 0 };
-        this.wallBodies[count] = body;
-      }
-      body.id = id;
-      body.x = e.pos.x;
-      body.z = e.pos.z;
-      count++;
+      if (e && !e.dead) this.wallLive.push(id);
     }
-    for (let i = 0; i < WARD_SLOTS; i++) {
+    stableSlots(this.wardIds, this.wallLive, this.wallLive.length);
+    let count = 0;
+    for (let i = 0; i < this.wards.length; i++) {
       const slot = this.wards[i];
-      const e = i < count ? world.entities.get(this.wallBodies[i].id) : undefined;
+      const id = this.wardIds[i];
+      const e = id >= 0 ? world.entities.get(id) : undefined;
+      if (e) {
+        // The seated bodies the partner links run between.
+        let body = this.wallBodies[count];
+        if (!body) {
+          body = { id: 0, x: 0, z: 0 };
+          this.wallBodies[count] = body;
+        }
+        body.id = e.id;
+        body.x = e.pos.x;
+        body.z = e.pos.z;
+        count++;
+      }
       if (!e) {
         slot.alpha = Math.max(0, slot.alpha - 0.08);
         slot.u.uAlpha.value = slot.alpha;
@@ -584,8 +620,8 @@ export class BastionTrashFx {
       slot.u.uAlpha.value = slot.alpha * (0.8 + 0.2 * Math.sin(kit.now * 4 + i));
       slot.mesh.visible = true;
     }
-    const pairs = wallPairs(this.wallBodies, count, this.wallReach, this.pairs, BAND_SLOTS);
-    for (let i = 0; i < BAND_SLOTS; i++) {
+    const pairs = wallPairs(this.wallBodies, count, this.wallReach, this.pairs, this.bands.length);
+    for (let i = 0; i < this.bands.length; i++) {
       const band = this.bands[i];
       const ia = this.pairs[i * 2];
       const ib = this.pairs[i * 2 + 1];
@@ -653,7 +689,8 @@ export class BastionTrashFx {
       // A corpse keeps the swell it died with (the sim strips its auras).
       const target = glutSwell(st.stacks, kit.now - st.gulpAt);
       st.drawn += (target - st.drawn) * Math.min(1, dt * 12);
-      setBastionSwell(id, st.drawn);
+      if (st.drawn <= SWELL_EPSILON) this.swell.delete(id);
+      else this.swell.set(id, st.drawn);
       if (st.stacks <= 0 || kit.now < st.nextGlow || !kit.near(e.pos.x, e.pos.z)) continue;
       const glow = glutGlow(st.stacks);
       // A fed corpse pulses hard before it bursts.
@@ -763,7 +800,8 @@ export class BastionTrashFx {
   }
 
   dispose(): void {
-    clearBastionSwell();
+    this.swell.clear();
+    this.hooks.dispose();
     this.kit.dispose();
   }
 }

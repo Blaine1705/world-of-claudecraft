@@ -22,7 +22,7 @@
 //
 // Presentation only. Three-free, DOM-free, deterministic.
 
-import { MOBS } from '../../sim/data';
+import { dungeonAt, MOBS } from '../../sim/data';
 import type { ModelPoint } from './bastion_creature_fx_core';
 
 export const WATCHMAN = 'drowned_watchman';
@@ -41,6 +41,74 @@ export const BASTION_PACK_HOWL_GESTURE = 'bastion_pack_howl';
 /** The gesture the renderer plays when a prisoner's chains snap (its VISUALS
  *  row maps it to the Kneel clip; the KneelLoop holds while the aura lasts). */
 export const BASTION_FETTERS_KNEEL_GESTURE = 'bastion_fetters_kneel';
+
+// ---------------------------------------------------------------- pools
+
+/** Every pool the trash painters draw from. A pool never evicts a live read:
+ *  a full pool drops the newcomer (the scan retries it while it lasts), and
+ *  each count covers the most a Bastion pull can put up at once. */
+export const TRASH_FX_SLOTS = {
+  /** Boathooks in flight or dragging (one per watchman throw). */
+  hooks: 4,
+  /** Fog Bank patches (one per Mist Chanter at a time). */
+  fogs: 4,
+  /** Shrouded allies standing in the fog. */
+  shrouds: 8,
+  /** Brine Columns (one per Tidebound Acolyte channel). */
+  columns: 4,
+  /** Warded watchmen holding the Halberd Wall. */
+  wards: 8,
+  /** Partner links between them (every pair of four, and some). */
+  bands: 8,
+  /** Released prisoners fading from the world. */
+  souls: 3,
+  /** Cosmetic shock rings on the floor (howls, splashes, landings). */
+  rings: 12,
+} as const;
+
+/** The dungeon interior these visuals belong to. */
+export const BASTION_INTERIOR = 'sunken_bastion';
+
+/** Whether a body at `x` stands inside a Sunken Bastion claim (the instance
+ *  band's own lookup): the trash visuals scan the roster only there. */
+export function inBastionClaim(x: number): boolean {
+  return dungeonAt(x)?.interior === BASTION_INTERIOR;
+}
+
+/**
+ * Which body each slot of a pool shows, keeping every body already on a slot
+ * where it is (no flicker, never an eviction) and filling free slots with the
+ * newcomers in order. `slotIds` holds each slot's current body (-1 free) and
+ * is rewritten in place; `wanted` lists the bodies to show, its first
+ * `count` used. Bodies past the free slots are dropped. Returns how many
+ * slots show a body. Allocation-free.
+ */
+export function stableSlots(slotIds: number[], wanted: readonly number[], count: number): number {
+  // Free every slot whose body is no longer wanted.
+  for (let s = 0; s < slotIds.length; s++) {
+    const id = slotIds[s];
+    if (id < 0) continue;
+    let keep = false;
+    for (let i = 0; i < count; i++) {
+      if (wanted[i] === id) {
+        keep = true;
+        break;
+      }
+    }
+    if (!keep) slotIds[s] = -1;
+  }
+  // Seat each newcomer in the first free slot.
+  for (let i = 0; i < count; i++) {
+    const id = wanted[i];
+    if (slotIds.includes(id)) continue;
+    const free = slotIds.indexOf(-1);
+    if (free < 0) break;
+    slotIds[free] = id;
+  }
+  let used = 0;
+  for (const id of slotIds) if (id >= 0) used++;
+  return used;
+}
 
 // ---------------------------------------------------------------- Boathook
 
@@ -224,27 +292,12 @@ export function glutGlow(stacks: number): number {
   return Math.max(0, Math.min(1, stacks / GLUT_MAX_STACKS));
 }
 
-/** The drawn swell of each crawler (entity id to scale multiplier). The trash
- *  painter writes it (it holds a fed corpse's swell after the sim strips its
- *  auras at death, so the body never shrinks back before it bursts); the
- *  renderer reads it through `bastionSwell` for every body it draws. */
-const swell = new Map<number, number>();
-
-export function setBastionSwell(id: number, k: number): void {
-  if (k <= 1.0005) swell.delete(id);
-  else swell.set(id, k);
-}
-
-export function clearBastionSwell(): void {
-  swell.clear();
-}
-
-/** The scale multiplier the renderer draws a body at (1 for every body that
- *  is not a fed Barnacle Crawler). Allocation-free; runs per body per frame. */
-export function bastionSwell(e: { id: number }): number {
-  if (swell.size === 0) return 1;
-  return swell.get(e.id) ?? 1;
-}
+/** The drawn swell a fed crawler keeps: the painter (bastion_trash_fx.ts)
+ *  holds one per crawler on its own instance (a fed corpse keeps its swell
+ *  after the sim strips its auras at death, so the body never shrinks back
+ *  before it bursts) and the renderer reads it through rift_death_zone.ts's
+ *  bodySwell; at or under this it is dropped (drawn at 1). */
+export const SWELL_EPSILON = 1.0005;
 
 // ---------------------------------------------------------------- Pack Frenzy
 

@@ -25,6 +25,7 @@ import {
   columnPhase,
   columnShape,
   streamPoint,
+  TRASH_FX_SLOTS,
 } from './bastion_trash_fx_core';
 import {
   LOOK,
@@ -36,7 +37,6 @@ import {
   type TrashFxKit,
 } from './bastion_trash_fx_kit';
 
-const COLUMN_SLOTS = 3;
 const STREAM_SEGMENTS = 22;
 /** Seconds a column waits for its landing cue once its root vanished before
  *  it reads the channel as broken. */
@@ -102,7 +102,7 @@ export class BastionBrineColumnFx {
   ) {
     const foamGeo = softRing(64);
     kit.geometries.push(foamGeo);
-    for (let i = 0; i < COLUMN_SLOTS; i++) {
+    for (let i = 0; i < TRASH_FX_SLOTS.columns; i++) {
       const group = new THREE.Group();
       group.name = 'bastion-brine-column';
       group.visible = false;
@@ -177,6 +177,8 @@ export class BastionBrineColumnFx {
       live.missingSince = -1;
       return;
     }
+    // Never takes a standing column; a full pool leaves the newcomer to the
+    // next scan (claim is asked every scan while the root holds).
     const slot = this.slots.find((c) => c.victimId < 0);
     if (!slot) return;
     slot.victimId = victim.id;

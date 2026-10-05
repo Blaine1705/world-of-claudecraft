@@ -22,12 +22,11 @@ import {
   hookFlightSeconds,
   hookPhase,
   hookSpec,
+  TRASH_FX_SLOTS,
   WATCHMAN_HOOK_HAND,
   WATCHMAN_RAW_HEIGHT,
 } from './bastion_trash_fx_core';
 import { LOOK, SEA, type TrashFxKit } from './bastion_trash_fx_kit';
-
-const HOOK_SLOTS = 3;
 
 interface HookSlot {
   group: THREE.Group;
@@ -91,7 +90,7 @@ export class BastionBoathookFx {
       depthWrite: false,
     });
     kit.materials.push(rust, iron, glintMat);
-    for (let i = 0; i < HOOK_SLOTS; i++) {
+    for (let i = 0; i < TRASH_FX_SLOTS.hooks; i++) {
       const group = new THREE.Group();
       group.name = 'bastion-boathook';
       group.visible = false;
@@ -131,7 +130,8 @@ export class BastionBoathookFx {
     const kit = this.kit;
     const w = kit.world?.entities.get(watchmanId);
     if (!w) return;
-    const slot = this.slots.find((h) => !h.alive) ?? this.slots[0];
+    // A full pool drops the newcomer: a hook dragging someone is never cut.
+    const slot = this.slots.find((h) => !h.alive);
     if (!slot) return;
     const victim = targetId !== watchmanId ? kit.world?.entities.get(targetId) : undefined;
     const hand = kit.point(w, kit.scaleOf(w, WATCHMAN_RAW_HEIGHT), WATCHMAN_HOOK_HAND, this.hand);
@@ -238,5 +238,11 @@ export class BastionBoathookFx {
     }
     slot.chain.count = n;
     slot.chain.instanceMatrix.needsUpdate = true;
+  }
+
+  /** Frees each chain's instance buffer (the shared geometries and materials
+   *  are the kit's to dispose). */
+  dispose(): void {
+    for (const slot of this.slots) slot.chain.dispose();
   }
 }

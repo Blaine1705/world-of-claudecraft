@@ -37,18 +37,21 @@ import {
 import type { Entity, SimEvent } from '../../sim/types';
 import { coneSpot, shockwave } from './crypt_creature_fx_core';
 import { drapePolar, HALO_FRAG, NOISE_GLSL, SHOCK_FRAG } from './crypt_fx_floor';
-import type { CryptKitHost, KitBeam, KitGlyph, KitPatch } from './crypt_trash_kit_fx';
+import type { CryptKitHost, CryptKitPart, KitBeam, KitGlyph, KitPatch } from './crypt_trash_kit_fx';
 import { KIT_STEPS } from './crypt_trash_kit_fx';
 import {
   BONE_WHITE,
   CRUMBLE,
   CRYPT_KIT_MOBS,
+  CRYPT_KIT_SLOTS,
+  claimSlot,
   hazardLevel,
   MARROW_CRACK,
   marrowCrack,
   marrowCrushCone,
   nearestWithin,
   PILE_TETHER_REACH,
+  pileBornAt,
   pileGlow,
   pileProgress,
   pilePulseHz,
@@ -62,13 +65,12 @@ import {
   splinterReach,
 } from './crypt_trash_kit_fx_core';
 
-const PILE_SLOTS = 6;
-const POOL_SLOTS = 3;
+const PILE_SLOTS = CRYPT_KIT_SLOTS.piles;
+const POOL_SLOTS = CRYPT_KIT_SLOTS.pools;
 const SCORCH_SLOTS = 3;
 const CRACK_SLOTS = 2;
 const SHOCK_SLOTS = 8;
 const FLASH_SLOTS = 6;
-const SCAN_SEC = 0.1;
 /** A pile's tether is drawn from the necromancer's chest. */
 const CHEST = 2.1;
 
@@ -234,7 +236,7 @@ interface Flash {
   size: number;
 }
 
-export class CryptBoneFx {
+export class CryptBoneFx implements CryptKitPart {
   private readonly piles: Pile[] = [];
   private readonly pileRings: KitPatch[] = [];
   private readonly tethers: KitBeam[] = [];
@@ -250,7 +252,9 @@ export class CryptBoneFx {
   private readonly rupture = ruptureSpec();
   private readonly crush = marrowCrushCone();
   private readonly splinter = splinterReach();
-  private scan = 0;
+  /** When each pile's windup arrived (its countdown's exact start), kept
+   *  until the pile goes, so a pile laid once a slot frees still counts true. */
+  private readonly windups = new Map<number, number>();
   private boil = 0;
   private bubble = 0;
 
@@ -339,6 +343,8 @@ export class CryptBoneFx {
     if (ev.type !== 'spellfx') return false;
     const world = this.host.world;
     if (ev.fx === 'windup' && ev.ability === CRYPT_REASSEMBLE) {
+      if (this.windups.size >= 32) this.windups.clear();
+      this.windups.set(ev.sourceId, this.host.now());
       const at = world.entities.get(ev.sourceId) ?? world.entities.get(ev.targetId);
       if (at) this.layPile(ev.sourceId, ev.targetId, at);
       return true;
@@ -387,20 +393,23 @@ export class CryptBoneFx {
       if (corpseId >= 0) pile.corpseId = corpseId;
       return pile;
     }
+    // Never evict a pile that still lies (the next walk would re-lay it, its
+    // clock and flash restarting): only a fading one gives its slot up early.
     if (this.piles.length >= PILE_SLOTS) {
-      const oldest = this.piles.find((p) => p.dying >= 0) ?? this.piles[0];
-      this.release(oldest);
+      const fading = this.piles.find((p) => p.dying >= 0);
+      if (!fading) return null;
+      this.release(fading);
     }
     const h = this.host;
     const x = at.pos.x;
     const z = at.pos.z;
     const y = h.groundY(x, z);
-    const patch = this.pileRings.find((p) => p.owner < 0) ?? null;
-    const tether = this.tethers.find((t) => t.owner < 0) ?? null;
+    const patch = claimSlot(this.pileRings, id);
+    const tether = claimSlot(this.tethers, id);
     pile = {
       id,
       corpseId,
-      born: h.now(),
+      born: pileBornAt(this.windups.get(id) ?? null, h.now(), this.seconds),
       phase: 0,
       spin: 0,
       x,
@@ -414,12 +423,10 @@ export class CryptBoneFx {
       tether,
     };
     if (patch) {
-      patch.owner = id;
       patch.born = h.now();
       drapePolar(patch.mesh, h.groundY, x, z, 2.3, 0.06);
       patch.mesh.visible = true;
     }
-    if (tether) tether.owner = id;
     this.piles.push(pile);
     // The bones stir as the pile is laid: a puff of grave dust and a gasp of light.
     this.flash(x, y + 0.6, z, 2.6, 0.35, SOUL_GREEN);
@@ -447,6 +454,7 @@ export class CryptBoneFx {
       pile.tether.owner = -1;
       pile.tether.mesh.visible = false;
     }
+    this.windups.delete(pile.id);
     const i = this.piles.indexOf(pile);
     if (i >= 0) this.piles.splice(i, 1);
   }
@@ -470,39 +478,22 @@ export class CryptBoneFx {
       const ty = y + 0.6 + h.rand() * 1.8;
       const tz = z + (h.rand() - 0.5) * 0.6;
       const life = g.seconds * (0.75 + 0.25 * h.rand());
-      h.shards.emit(now + h.rand() * 0.08, {
-        x: sx,
-        y: sy,
-        z: sz,
-        vx: (tx - sx) / life,
-        vy: (ty - sy) / life,
-        vz: (tz - sz) / life,
-        life,
-        size0: 0.34 + h.rand() * 0.22,
-        size1: 0.18,
-        spin: (h.rand() - 0.5) * 14,
-        r: BONE_WHITE[0],
-        g: BONE_WHITE[1],
-        b: BONE_WHITE[2],
-        a: 1,
-      });
+      h.brush
+        .at(sx, sy, sz)
+        .vel((tx - sx) / life, (ty - sy) / life, (tz - sz) / life)
+        .life(life)
+        .size(0.34 + h.rand() * 0.22, 0.18, (h.rand() - 0.5) * 14)
+        .rgba(BONE_WHITE[0], BONE_WHITE[1], BONE_WHITE[2], 1)
+        .emit(h.shards, now + h.rand() * 0.08);
       // A thread of soul light trailing each shard home.
       if (i % 2 === 0) {
-        h.glow.emit(now, {
-          x: sx,
-          y: sy,
-          z: sz,
-          vx: (tx - sx) / life,
-          vy: (ty - sy) / life,
-          vz: (tz - sz) / life,
-          life,
-          size0: 0.5,
-          size1: 0.2,
-          r: SOUL_GREEN[0],
-          g: SOUL_GREEN[1],
-          b: SOUL_GREEN[2],
-          a: 0.8,
-        });
+        h.brush
+          .at(sx, sy, sz)
+          .vel((tx - sx) / life, (ty - sy) / life, (tz - sz) / life)
+          .life(life)
+          .size(0.5, 0.2)
+          .rgba(SOUL_GREEN[0], SOUL_GREEN[1], SOUL_GREEN[2], 0.8)
+          .emit(h.glow, now);
       }
     }
     // The column of soul fire it rises out of, as the shards arrive.
@@ -510,43 +501,25 @@ export class CryptBoneFx {
     for (let i = 0; i < flames; i++) {
       const a = h.rand() * Math.PI * 2;
       const r = 0.3 + h.rand() * 1.3;
-      h.fire.emit(now + g.seconds * 0.6 + h.rand() * 0.55, {
-        x: x + Math.sin(a) * r,
-        y: y + 0.1,
-        z: z + Math.cos(a) * r,
-        vx: Math.sin(a) * 0.4,
-        vy: 2.8 + h.rand() * 3.2,
-        vz: Math.cos(a) * 0.4,
-        ay: 2,
-        life: 0.7 + h.rand() * 0.5,
-        drag: 0.8,
-        size0: 0.9 + h.rand() * 0.7,
-        size1: 2.2 + h.rand() * 1.8,
-        r: 0.9 + h.rand() * 0.3,
-        g: 0,
-        b: 0,
-        a: 0.9,
-      });
+      h.brush
+        .at(x + Math.sin(a) * r, y + 0.1, z + Math.cos(a) * r)
+        .vel(Math.sin(a) * 0.4, 2.8 + h.rand() * 3.2, Math.cos(a) * 0.4)
+        .acc(0, 2, 0)
+        .life(0.7 + h.rand() * 0.5, 0.8)
+        .size(0.9 + h.rand() * 0.7, 2.2 + h.rand() * 1.8)
+        .rgba(0.9 + h.rand() * 0.3, 0, 0, 0.9)
+        .emit(h.fire, now + g.seconds * 0.6 + h.rand() * 0.55);
     }
     for (let i = 0; i < Math.round(50 * h.density); i++) {
       const a = h.rand() * Math.PI * 2;
-      h.glow.emit(now + g.seconds * 0.7 + h.rand() * 0.6, {
-        x: x + Math.sin(a) * 0.8,
-        y: y + 0.4,
-        z: z + Math.cos(a) * 0.8,
-        vx: Math.cos(a) * 2.2,
-        vy: 4 + h.rand() * 4,
-        vz: -Math.sin(a) * 2.2,
-        ay: -1,
-        life: 1 + h.rand() * 0.8,
-        drag: 1.2,
-        size0: 0.22,
-        size1: 0.06,
-        r: SOUL_GREEN[0],
-        g: SOUL_GREEN[1],
-        b: SOUL_GREEN[2],
-        a: 1,
-      });
+      h.brush
+        .at(x + Math.sin(a) * 0.8, y + 0.4, z + Math.cos(a) * 0.8)
+        .vel(Math.cos(a) * 2.2, 4 + h.rand() * 4, -Math.sin(a) * 2.2)
+        .acc(0, -1, 0)
+        .life(1 + h.rand() * 0.8, 1.2)
+        .size(0.22, 0.06)
+        .rgba(SOUL_GREEN[0], SOUL_GREEN[1], SOUL_GREEN[2], 1)
+        .emit(h.glow, now + g.seconds * 0.7 + h.rand() * 0.6);
     }
     this.shock(x, z, 4.6, 0.55, SOUL_GREEN, g.seconds * 0.7);
     this.flash(x, y + 1.6, z, 5.5, 0.6, SOUL_GREEN, g.seconds * 0.65);
@@ -561,46 +534,25 @@ export class CryptBoneFx {
     for (let i = 0; i < n; i++) {
       const a = h.rand() * Math.PI * 2;
       const sp = CRUMBLE.speed * (0.4 + h.rand() * 0.8);
-      h.shards.emit(now, {
-        x: x + Math.sin(a) * 0.5,
-        y: y + 0.3 + h.rand() * 0.4,
-        z: z + Math.cos(a) * 0.5,
-        vx: Math.sin(a) * sp,
-        vy: 2 + h.rand() * 4,
-        vz: Math.cos(a) * sp,
-        ay: -19,
-        life: 1.2 + h.rand() * 0.5,
-        floor: y + 0.06,
-        size0: 0.3 + h.rand() * 0.25,
-        size1: 0.26,
-        spin: (h.rand() - 0.5) * 12,
-        r: BONE_WHITE[0] * 0.9,
-        g: BONE_WHITE[1] * 0.9,
-        b: BONE_WHITE[2] * 0.9,
-        a: 1,
-      });
+      h.brush
+        .at(x + Math.sin(a) * 0.5, y + 0.3 + h.rand() * 0.4, z + Math.cos(a) * 0.5)
+        .vel(Math.sin(a) * sp, 2 + h.rand() * 4, Math.cos(a) * sp)
+        .acc(0, -19, 0)
+        .life(1.2 + h.rand() * 0.5, 0.001, y + 0.06)
+        .size(0.3 + h.rand() * 0.25, 0.26, (h.rand() - 0.5) * 12)
+        .rgba(BONE_WHITE[0] * 0.9, BONE_WHITE[1] * 0.9, BONE_WHITE[2] * 0.9, 1)
+        .emit(h.shards, now);
     }
     for (let i = 0; i < Math.round(26 * h.density); i++) {
       const a = (i / 26) * Math.PI * 2;
       const sp = 2.5 + h.rand() * 2;
-      h.dust.emit(now + h.rand() * 0.05, {
-        x,
-        y: y + 0.3,
-        z,
-        vx: Math.sin(a) * sp,
-        vy: 0.6 + h.rand(),
-        vz: Math.cos(a) * sp,
-        life: 1.4 + h.rand() * 0.6,
-        drag: 2,
-        floor: y + 0.15,
-        size0: 0.9,
-        size1: 2.8 + h.rand(),
-        spin: (h.rand() - 0.5) * 0.6,
-        r: 0.5,
-        g: 0.49,
-        b: 0.44,
-        a: 0.55,
-      });
+      h.brush
+        .at(x, y + 0.3, z)
+        .vel(Math.sin(a) * sp, 0.6 + h.rand(), Math.cos(a) * sp)
+        .life(1.4 + h.rand() * 0.6, 2, y + 0.15)
+        .size(0.9, 2.8 + h.rand(), (h.rand() - 0.5) * 0.6)
+        .rgba(0.5, 0.49, 0.44, 0.55)
+        .emit(h.dust, now + h.rand() * 0.05);
     }
     // The last of the soul light escaping the bones.
     for (let i = 0; i < Math.round(14 * h.density); i++) this.wispAt(x, y, z, 1, 0);
@@ -618,94 +570,55 @@ export class CryptBoneFx {
     for (let i = 0; i < flames; i++) {
       const a = h.rand() * Math.PI * 2;
       const sp = 2 + h.rand() * 7;
-      h.fire.emit(now + h.rand() * 0.06, {
-        x: x + Math.sin(a) * 0.4,
-        y: y + 0.3 + h.rand() * 0.8,
-        z: z + Math.cos(a) * 0.4,
-        vx: Math.sin(a) * sp,
-        vy: 2 + h.rand() * 6,
-        vz: Math.cos(a) * sp,
-        ay: 2.5,
-        life: 0.55 + h.rand() * 0.5,
-        drag: 2.2,
-        size0: 1 + h.rand() * 0.8,
-        size1: 2.6 + h.rand() * 2.4,
-        r: 1 + h.rand() * 0.3,
-        g: 0,
-        b: 0,
-        a: 0.95,
-      });
+      h.brush
+        .at(x + Math.sin(a) * 0.4, y + 0.3 + h.rand() * 0.8, z + Math.cos(a) * 0.4)
+        .vel(Math.sin(a) * sp, 2 + h.rand() * 6, Math.cos(a) * sp)
+        .acc(0, 2.5, 0)
+        .life(0.55 + h.rand() * 0.5, 2.2)
+        .size(1 + h.rand() * 0.8, 2.6 + h.rand() * 2.4)
+        .rgba(1 + h.rand() * 0.3, 0, 0, 0.95)
+        .emit(h.fire, now + h.rand() * 0.06);
     }
     // Bone shards flung out of the corpse.
     const shards = Math.round(80 * h.density);
     for (let i = 0; i < shards; i++) {
       const a = h.rand() * Math.PI * 2;
       const sp = 8 + h.rand() * 12;
-      h.shards.emit(now, {
-        x,
-        y: y + 0.5 + h.rand() * 0.5,
-        z,
-        vx: Math.sin(a) * sp,
-        vy: 4 + h.rand() * 8,
-        vz: Math.cos(a) * sp,
-        ay: -24,
-        life: 1.1 + h.rand() * 0.6,
-        drag: 0.7,
-        floor: y + 0.06,
-        size0: 0.32 + h.rand() * 0.3,
-        size1: 0.28,
-        spin: (h.rand() - 0.5) * 18,
-        r: BONE_WHITE[0],
-        g: BONE_WHITE[1],
-        b: BONE_WHITE[2],
-        a: 1,
-      });
+      h.brush
+        .at(x, y + 0.5 + h.rand() * 0.5, z)
+        .vel(Math.sin(a) * sp, 4 + h.rand() * 8, Math.cos(a) * sp)
+        .acc(0, -24, 0)
+        .life(1.1 + h.rand() * 0.6, 0.7, y + 0.06)
+        .size(0.32 + h.rand() * 0.3, 0.28, (h.rand() - 0.5) * 18)
+        .rgba(BONE_WHITE[0], BONE_WHITE[1], BONE_WHITE[2], 1)
+        .emit(h.shards, now);
     }
     // Dark necrotic smoke rolling up after it.
     for (let i = 0; i < Math.round(44 * h.density); i++) {
       const a = h.rand() * Math.PI * 2;
       const sp = 1.5 + h.rand() * 3.5;
-      h.dust.emit(now + 0.05 + h.rand() * 0.2, {
-        x: x + Math.sin(a) * 0.8,
-        y: y + 0.6,
-        z: z + Math.cos(a) * 0.8,
-        vx: Math.sin(a) * sp,
-        vy: 1.5 + h.rand() * 2.5,
-        vz: Math.cos(a) * sp,
-        ay: 0.6,
-        life: 1.6 + h.rand() * 0.9,
-        drag: 1.4,
-        size0: 1.6,
-        size1: 4.4 + h.rand() * 2,
-        spin: (h.rand() - 0.5) * 0.5,
-        r: 0.05,
-        g: 0.09,
-        b: 0.05,
-        a: 0.6,
-      });
+      h.brush
+        .at(x + Math.sin(a) * 0.8, y + 0.6, z + Math.cos(a) * 0.8)
+        .vel(Math.sin(a) * sp, 1.5 + h.rand() * 2.5, Math.cos(a) * sp)
+        .acc(0, 0.6, 0)
+        .life(1.6 + h.rand() * 0.9, 1.4)
+        .size(1.6, 4.4 + h.rand() * 2, (h.rand() - 0.5) * 0.5)
+        .rgba(0.05, 0.09, 0.05, 0.6)
+        .emit(h.dust, now + 0.05 + h.rand() * 0.2);
     }
     // Sickly sparks.
     for (let i = 0; i < Math.round(90 * h.density); i++) {
       const a = h.rand() * Math.PI * 2;
       const up = h.rand();
       const sp = 6 + h.rand() * 10;
-      h.glow.emit(now, {
-        x,
-        y: y + 0.8,
-        z,
-        vx: Math.sin(a) * sp * (1 - up * 0.5),
-        vy: 3 + up * 9,
-        vz: Math.cos(a) * sp * (1 - up * 0.5),
-        ay: -9,
-        life: 0.7 + h.rand() * 0.6,
-        drag: 1.6,
-        size0: 0.2,
-        size1: 0.05,
-        r: 0.7,
-        g: 1,
-        b: 0.55,
-        a: 1,
-      });
+      h.brush
+        .at(x, y + 0.8, z)
+        .vel(Math.sin(a) * sp * (1 - up * 0.5), 3 + up * 9, Math.cos(a) * sp * (1 - up * 0.5))
+        .acc(0, -9, 0)
+        .life(0.7 + h.rand() * 0.6, 1.6)
+        .size(0.2, 0.05)
+        .rgba(0.7, 1, 0.55, 1)
+        .emit(h.glow, now);
     }
     this.shock(x, z, reach * 1.08, 0.5, SOUL_GREEN);
     this.shock(x, z, reach * 0.72, 0.36, [0.92, 1, 0.86]);
@@ -728,42 +641,22 @@ export class CryptBoneFx {
     for (let i = 0; i < n; i++) {
       const a = (i / n) * Math.PI * 2 + h.rand() * 0.2;
       const sp = 10 + h.rand() * 11;
-      h.shards.emit(now, {
-        x,
-        y: y + 0.7 + h.rand() * 0.6,
-        z,
-        vx: Math.sin(a) * sp,
-        vy: 1.5 + h.rand() * 3.5,
-        vz: Math.cos(a) * sp,
-        ay: -16,
-        life: 0.9 + h.rand() * 0.4,
-        drag: 1.1,
-        floor: y + 0.06,
-        size0: 0.42 + h.rand() * 0.3,
-        size1: 0.34,
-        spin: (h.rand() - 0.5) * 22,
-        r: BONE_WHITE[0],
-        g: BONE_WHITE[1],
-        b: BONE_WHITE[2],
-        a: 1,
-      });
+      h.brush
+        .at(x, y + 0.7 + h.rand() * 0.6, z)
+        .vel(Math.sin(a) * sp, 1.5 + h.rand() * 3.5, Math.cos(a) * sp)
+        .acc(0, -16, 0)
+        .life(0.9 + h.rand() * 0.4, 1.1, y + 0.06)
+        .size(0.42 + h.rand() * 0.3, 0.34, (h.rand() - 0.5) * 22)
+        .rgba(BONE_WHITE[0], BONE_WHITE[1], BONE_WHITE[2], 1)
+        .emit(h.shards, now);
       if (i % 2 === 0) {
-        h.glow.emit(now, {
-          x,
-          y: y + 0.9,
-          z,
-          vx: Math.sin(a) * sp * 1.1,
-          vy: 1 + h.rand() * 2,
-          vz: Math.cos(a) * sp * 1.1,
-          life: 0.35 + h.rand() * 0.2,
-          drag: 2.6,
-          size0: 0.3,
-          size1: 0.08,
-          r: 1,
-          g: 0.95,
-          b: 0.82,
-          a: 0.9,
-        });
+        h.brush
+          .at(x, y + 0.9, z)
+          .vel(Math.sin(a) * sp * 1.1, 1 + h.rand() * 2, Math.cos(a) * sp * 1.1)
+          .life(0.35 + h.rand() * 0.2, 2.6)
+          .size(0.3, 0.08)
+          .rgba(1, 0.95, 0.82, 0.9)
+          .emit(h.glow, now);
       }
     }
     this.shock(x, z, (this.splinter || 3.5) * 1.1, 0.4, BONE_WHITE);
@@ -791,44 +684,27 @@ export class CryptBoneFx {
       const wz = e.pos.z - spot.x * s + spot.z * c;
       const gy = h.groundY(wx, wz);
       const delay = (spot.r / range) * MARROW_CRACK.tear;
-      h.dust.emit(now + delay, {
-        x: wx,
-        y: gy + 0.2,
-        z: wz,
-        vx: Math.sin(e.facing) * 2 + (h.rand() - 0.5) * 1.5,
-        vy: 2 + h.rand() * 2.5,
-        vz: Math.cos(e.facing) * 2 + (h.rand() - 0.5) * 1.5,
-        ay: -1.2,
-        life: 1.1 + h.rand() * 0.6,
-        drag: 2,
-        floor: gy + 0.15,
-        size0: 1,
-        size1: 3 + h.rand() * 1.4,
-        spin: (h.rand() - 0.5) * 0.6,
-        r: 0.55,
-        g: 0.52,
-        b: 0.47,
-        a: 0.6,
-      });
+      h.brush
+        .at(wx, gy + 0.2, wz)
+        .vel(
+          Math.sin(e.facing) * 2 + (h.rand() - 0.5) * 1.5,
+          2 + h.rand() * 2.5,
+          Math.cos(e.facing) * 2 + (h.rand() - 0.5) * 1.5,
+        )
+        .acc(0, -1.2, 0)
+        .life(1.1 + h.rand() * 0.6, 2, gy + 0.15)
+        .size(1, 3 + h.rand() * 1.4, (h.rand() - 0.5) * 0.6)
+        .rgba(0.55, 0.52, 0.47, 0.6)
+        .emit(h.dust, now + delay);
       if (i % 2 === 0) {
-        h.shards.emit(now + delay, {
-          x: wx,
-          y: gy + 0.15,
-          z: wz,
-          vx: (h.rand() - 0.5) * 3,
-          vy: 4 + h.rand() * 5,
-          vz: (h.rand() - 0.5) * 3,
-          ay: -22,
-          life: 1,
-          floor: gy + 0.05,
-          size0: 0.28 + h.rand() * 0.22,
-          size1: 0.24,
-          spin: (h.rand() - 0.5) * 12,
-          r: 0.42,
-          g: 0.4,
-          b: 0.37,
-          a: 1,
-        });
+        h.brush
+          .at(wx, gy + 0.15, wz)
+          .vel((h.rand() - 0.5) * 3, 4 + h.rand() * 5, (h.rand() - 0.5) * 3)
+          .acc(0, -22, 0)
+          .life(1, 0.001, gy + 0.05)
+          .size(0.28 + h.rand() * 0.22, 0.24, (h.rand() - 0.5) * 12)
+          .rgba(0.42, 0.4, 0.37, 1)
+          .emit(h.shards, now + delay);
       }
     }
     h.shakeAt(e.pos.x, e.pos.z, 0.45);
@@ -840,23 +716,14 @@ export class CryptBoneFx {
     const h = this.host;
     const a = h.rand() * Math.PI * 2;
     const r = h.rand() * spread;
-    h.glow.emit(h.now() + delay, {
-      x: x + Math.sin(a) * r,
-      y: y + 0.2,
-      z: z + Math.cos(a) * r,
-      vx: Math.cos(a) * 0.5,
-      vy: 1.2 + h.rand() * 1.4,
-      vz: -Math.sin(a) * 0.5,
-      ay: 0.4,
-      life: 1.2 + h.rand() * 0.9,
-      drag: 0.6,
-      size0: 0.32 + h.rand() * 0.2,
-      size1: 0.08,
-      r: SOUL_GREEN[0],
-      g: SOUL_GREEN[1],
-      b: SOUL_GREEN[2],
-      a: 0.85,
-    });
+    h.brush
+      .at(x + Math.sin(a) * r, y + 0.2, z + Math.cos(a) * r)
+      .vel(Math.cos(a) * 0.5, 1.2 + h.rand() * 1.4, -Math.sin(a) * 0.5)
+      .acc(0, 0.4, 0)
+      .life(1.2 + h.rand() * 0.9, 0.6)
+      .size(0.32 + h.rand() * 0.2, 0.08)
+      .rgba(SOUL_GREEN[0], SOUL_GREEN[1], SOUL_GREEN[2], 0.85)
+      .emit(h.glow, h.now() + delay);
   }
 
   private shock(
@@ -906,11 +773,6 @@ export class CryptBoneFx {
     const h = this.host;
     const world = h.world;
     const now = h.now();
-    this.scan -= dt;
-    if (this.scan <= 0) {
-      this.scan = SCAN_SEC;
-      this.scanWorld();
-    }
     for (let i = this.piles.length - 1; i >= 0; i--) this.stepPile(this.piles[i], dt);
     // The rupture's marked corpse boils with soul light over the bar.
     this.boil += dt * 22 * h.density;
@@ -939,22 +801,13 @@ export class CryptBoneFx {
         const a = h.rand() * Math.PI * 2;
         const px = pool.mesh.position.x + Math.sin(a) * r;
         const pz = pool.mesh.position.z + Math.cos(a) * r;
-        h.glow.emit(now, {
-          x: px,
-          y: h.groundY(px, pz) + 0.1,
-          z: pz,
-          vx: 0,
-          vy: 0.9 + h.rand() * 1.2,
-          vz: 0,
-          life: 0.8 + h.rand() * 0.6,
-          drag: 0.8,
-          size0: 0.3,
-          size1: 0.7,
-          r: 0.4,
-          g: 0.9,
-          b: 0.3,
-          a: 0.55,
-        });
+        h.brush
+          .at(px, h.groundY(px, pz) + 0.1, pz)
+          .vel(0, 0.9 + h.rand() * 1.2, 0)
+          .life(0.8 + h.rand() * 0.6, 0.8)
+          .size(0.3, 0.7)
+          .rgba(0.4, 0.9, 0.3, 0.55)
+          .emit(h.glow, now);
       }
     }
     this.bubble -= Math.floor(this.bubble);
@@ -1058,24 +911,18 @@ export class CryptBoneFx {
       pile.rattle -= 1;
       const a = h.rand() * Math.PI * 2;
       const r = h.rand() * 1.2;
-      h.shards.emit(now, {
-        x: pile.x + Math.sin(a) * r,
-        y: pile.y + 0.12,
-        z: pile.z + Math.cos(a) * r,
-        vx: (h.rand() - 0.5) * 1.4,
-        vy: 1.5 + h.rand() * (1.5 + 2.5 * progress),
-        vz: (h.rand() - 0.5) * 1.4,
-        ay: -20,
-        life: 0.5 + h.rand() * 0.3,
-        floor: pile.y + 0.05,
-        size0: 0.2 + h.rand() * 0.14,
-        size1: 0.18,
-        spin: (h.rand() - 0.5) * 16,
-        r: BONE_WHITE[0],
-        g: BONE_WHITE[1],
-        b: BONE_WHITE[2],
-        a: 1,
-      });
+      h.brush
+        .at(pile.x + Math.sin(a) * r, pile.y + 0.12, pile.z + Math.cos(a) * r)
+        .vel(
+          (h.rand() - 0.5) * 1.4,
+          1.5 + h.rand() * (1.5 + 2.5 * progress),
+          (h.rand() - 0.5) * 1.4,
+        )
+        .acc(0, -20, 0)
+        .life(0.5 + h.rand() * 0.3, 0.001, pile.y + 0.05)
+        .size(0.2 + h.rand() * 0.14, 0.18, (h.rand() - 0.5) * 16)
+        .rgba(BONE_WHITE[0], BONE_WHITE[1], BONE_WHITE[2], 1)
+        .emit(h.shards, now);
     }
     pile.wisp += dt * (5 + 14 * progress) * h.density;
     while (pile.wisp >= 1) {
@@ -1086,51 +933,51 @@ export class CryptBoneFx {
     if (necro && !necro.dead && h.rand() < dt * 9 * h.density) {
       const ny = h.groundY(necro.pos.x, necro.pos.z) + CHEST * (necro.scale || 1);
       const life = 0.7;
-      h.glow.emit(now, {
-        x: necro.pos.x,
-        y: ny,
-        z: necro.pos.z,
-        vx: (pile.x - necro.pos.x) / life,
-        vy: (pile.y + 0.4 - ny) / life,
-        vz: (pile.z - necro.pos.z) / life,
-        life,
-        size0: 0.4,
-        size1: 0.2,
-        r: SOUL_GREEN[0],
-        g: SOUL_GREEN[1],
-        b: SOUL_GREEN[2],
-        a: 0.9,
-      });
+      h.brush
+        .at(necro.pos.x, ny, necro.pos.z)
+        .vel(
+          (pile.x - necro.pos.x) / life,
+          (pile.y + 0.4 - ny) / life,
+          (pile.z - necro.pos.z) / life,
+        )
+        .life(life)
+        .size(0.4, 0.2)
+        .rgba(SOUL_GREEN[0], SOUL_GREEN[1], SOUL_GREEN[2], 0.9)
+        .emit(h.glow, now);
     }
   }
 
-  private scanWorld(): void {
+  beginScan(): void {
+    this.necroCount = 0;
+    this.rings.clear();
+  }
+
+  see(e: Entity): void {
+    if (e.kind === 'object') {
+      if (e.templateId === CRYPT_RUPTURE_RING) this.rings.add(e.id);
+      else if (e.templateId === CRYPT_RUPTURE_POOL) this.holdPool(e);
+      return;
+    }
+    if (e.kind !== 'mob' || e.dead) return;
+    if (e.templateId === CRYPT_BONE_PILE) {
+      const pile = this.layPile(e.id, -1, e);
+      if (pile && pile.dying < 0) {
+        pile.x = e.pos.x;
+        pile.z = e.pos.z;
+      }
+    } else if (e.templateId === CRYPT_KIT_MOBS.necromancer) {
+      if (this.necroCount >= this.necros.length) this.necros.push({ id: 0, x: 0, z: 0 });
+      const slot = this.necros[this.necroCount++];
+      slot.id = e.id;
+      slot.x = e.pos.x;
+      slot.z = e.pos.z;
+    }
+  }
+
+  endScan(): void {
     const h = this.host;
     const world = h.world;
     const now = h.now();
-    this.necroCount = 0;
-    this.rings.clear();
-    for (const e of world.entities.values()) {
-      if (e.kind === 'object') {
-        if (e.templateId === CRYPT_RUPTURE_RING) this.rings.add(e.id);
-        else if (e.templateId === CRYPT_RUPTURE_POOL) this.holdPool(e);
-        continue;
-      }
-      if (e.kind !== 'mob' || e.dead) continue;
-      if (e.templateId === CRYPT_BONE_PILE) {
-        const pile = this.layPile(e.id, -1, e);
-        if (pile && pile.dying < 0) {
-          pile.x = e.pos.x;
-          pile.z = e.pos.z;
-        }
-      } else if (e.templateId === CRYPT_KIT_MOBS.necromancer) {
-        if (this.necroCount >= this.necros.length) this.necros.push({ id: 0, x: 0, z: 0 });
-        const slot = this.necros[this.necroCount++];
-        slot.id = e.id;
-        slot.x = e.pos.x;
-        slot.z = e.pos.z;
-      }
-    }
     for (const pile of this.piles) {
       if (pile.dying >= 0) continue;
       const e = world.entities.get(pile.id);
@@ -1149,10 +996,9 @@ export class CryptBoneFx {
 
   private holdPool(e: Entity): void {
     if (this.pools.some((p) => p.owner === e.id)) return;
-    const slot = this.pools.find((p) => p.owner < 0);
+    const slot = claimSlot(this.pools, e.id);
     if (!slot) return;
     const h = this.host;
-    slot.owner = e.id;
     slot.born = h.now();
     slot.goneAt = -1;
     drapePolar(slot.mesh, h.groundY, e.pos.x, e.pos.z, e.scale || this.rupture.radius || 5, 0.05);

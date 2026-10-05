@@ -13,7 +13,7 @@
 //
 // Three-free, DOM-free, deterministic.
 
-import { MOBS } from '../../sim/data';
+import { dungeonAt, MOBS } from '../../sim/data';
 import { type CreatureAnchor, fxHash } from './crypt_creature_fx_core';
 
 /** The templates the trash kit's effects key on. */
@@ -28,6 +28,52 @@ export const CRYPT_KIT_MOBS = {
   drake: 'crypt_ossuary_drake',
   widow: 'bonechill_widow',
 } as const;
+
+// ---------------------------------------------------------------- the host
+
+/** The crypt's dungeon id. The kit's roster walks run only while the local
+ *  player stands in its claim (an instance x-band, `dungeonAt`): everywhere
+ *  else there is nothing of it to find, so the walk is skipped outright. */
+export const HOLLOW_CRYPT_DUNGEON = 'hollow_crypt';
+export function inHollowCrypt(x: number): boolean {
+  return dungeonAt(x)?.id === HOLLOW_CRYPT_DUNGEON;
+}
+
+/** How often (seconds) the host walks the roster for the parts. */
+export const KIT_SCAN_SECONDS = 0.1;
+
+/** Slots of the pools a roster walk claims (one per live owner). A crypt pack
+ *  holds at most three Ossuary Warriors and one gargoyle, so a double pull
+ *  fits; a newcomer past the cap simply goes undrawn until a slot frees. */
+export const CRYPT_KIT_SLOTS = {
+  piles: 6,
+  pools: 3,
+  gargoyles: 3,
+  eyes: 4,
+  nets: 5,
+  embers: 2,
+  objects: 8,
+} as const;
+
+/**
+ * The slot `owner` holds, else a free one (claimed for it), else null. A slot
+ * whose owner still lives is NEVER taken: evicting a live owner made the next
+ * walk re-lay it, restarting its clock and flash every scan. One-shot effects
+ * (bolts, strands, shockwaves, flashes) recycle their oldest instead; they are
+ * fired by events, never re-claimed by a walk.
+ */
+export function claimSlot<T extends { owner: number }>(
+  slots: readonly T[],
+  owner: number,
+): T | null {
+  let free: T | null = null;
+  for (const s of slots) {
+    if (s.owner === owner) return s;
+    if (free === null && s.owner < 0) free = s;
+  }
+  if (free) free.owner = owner;
+  return free;
+}
 
 /** Linear RGB triples of the kit's elements (the shaders and particles read
  *  these; HDR multipliers are applied by the painter). */
@@ -85,6 +131,20 @@ export function pileGlow(phase: number, progress: number): { ring: number; core:
 export function pileRattleRate(progress: number): number {
   const k = Math.min(1, Math.max(0, progress));
   return 3 + 22 * k * k;
+}
+
+/**
+ * When a pile's countdown began, on the painter's clock. The sim keeps the
+ * pile's own clock (Entity.trashLife) off the wire, so the windup spellfx it
+ * sends as the pile is laid is the exact start. A pile first seen without it
+ * (laid out of this client's interest, or before it joined) is placed
+ * PILE_UNSEEN_PROGRESS into its countdown: its beat then reads too urgent
+ * rather than too calm, which is the safe error for "it stands soon".
+ */
+export const PILE_UNSEEN_PROGRESS = 0.5;
+export function pileBornAt(windupAt: number | null, firstSeen: number, seconds: number): number {
+  if (windupAt !== null) return windupAt;
+  return firstSeen - Math.max(0, seconds) * PILE_UNSEEN_PROGRESS;
 }
 
 /** The index of the point nearest (x, z) within `reach`, or -1. Ties go to
@@ -224,13 +284,13 @@ export const GRANITE_FLAKES_PER_LAYER = 4;
 export function graniteCrust(
   stacks: number,
   maxStacks: number,
-): { plates: number; thickness: number; pale: number; flakes: number; orbit: number } {
+): { plates: number; crustDepth: number; pale: number; flakes: number; orbit: number } {
   const cap = Math.max(1, maxStacks);
   const s = Math.min(cap, Math.max(0, Math.floor(stacks)));
   const k = s / cap;
   return {
     plates: s * GRANITE_PLATES_PER_LAYER,
-    thickness: s > 0 ? 0.55 + 0.45 * k : 0,
+    crustDepth: s > 0 ? 0.55 + 0.45 * k : 0,
     pale: k,
     flakes: s * GRANITE_FLAKES_PER_LAYER,
     orbit: 0.6 + 0.9 * k,
@@ -259,7 +319,7 @@ export function crustPlateSpot(
     x: Math.sin(a) * r,
     y,
     z: Math.cos(a) * r,
-    size: 0.3 + 0.22 * fxHash(j * 1.7 + 0.3),
+    size: 0.2 + 0.14 * fxHash(j * 1.7 + 0.3),
   };
 }
 
@@ -279,7 +339,7 @@ export const LAYER_SLAM_SECONDS = 0.38;
 export function layerSlam(age: number): { scale: number; flash: number } {
   if (age < 0 || age >= LAYER_SLAM_SECONDS) return { scale: 1, flash: 0 };
   const k = age / LAYER_SLAM_SECONDS;
-  return { scale: 1 + 0.75 * (1 - k) * (1 - k), flash: 1 - k };
+  return { scale: 1 + 0.3 * (1 - k) * (1 - k), flash: 1 - k };
 }
 
 /** Cracked Stone's glow on the body: it flares in at the shatter, flickers

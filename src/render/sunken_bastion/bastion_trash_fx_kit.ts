@@ -16,12 +16,12 @@ import { VISUALS, visualKeyFor } from '../characters/manifest';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { type ModelPoint, modelPointWorld, modelScale } from './bastion_creature_fx_core';
 import type { DrownedParticle, DrownedParticleSink } from './bastion_drowned_fx';
+import { TRASH_FX_SLOTS } from './bastion_trash_fx_core';
 
 export type TrashBody = IWorld['entities'] extends Map<number, infer E> ? E : never;
 
 /** Bodies farther than this from the player shed their ambient glows. */
 const AMBIENT_RANGE = 60;
-const RING_SLOTS = 10;
 
 export const SEA = new THREE.Color(0.45, 1.0, 0.85);
 
@@ -276,7 +276,7 @@ export class TrashFxKit {
   ) {
     const geo = softRing(96);
     this.geometries.push(geo);
-    for (let i = 0; i < RING_SLOTS; i++) {
+    for (let i = 0; i < TRASH_FX_SLOTS.rings; i++) {
       const mat = new THREE.MeshBasicMaterial({
         color: SEA,
         vertexColors: true,
@@ -455,7 +455,8 @@ export class TrashFxKit {
     sec: number,
     peak: number,
   ): void {
-    const slot = this.rings.find((r) => !r.alive) ?? this.rings[0];
+    // Cosmetic: a full pool drops the newcomer, never cuts a ring short.
+    const slot = this.rings.find((r) => !r.alive);
     if (!slot) return;
     slot.alive = true;
     slot.start = this.now;

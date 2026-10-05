@@ -33,7 +33,7 @@ import type { Entity, SimEvent } from '../../sim/types';
 import { anchorWorld, coneSpot, shockwave } from './crypt_creature_fx_core';
 import { drapePolar, HALO_FRAG, NOISE_GLSL, SHOCK_FRAG } from './crypt_fx_floor';
 import { GHOST_RAMP } from './crypt_fx_particles';
-import type { CryptKitHost, KitBeam, KitGlyph, KitPatch } from './crypt_trash_kit_fx';
+import type { CryptKitHost, CryptKitPart, KitBeam, KitGlyph, KitPatch } from './crypt_trash_kit_fx';
 import { KIT_STEPS } from './crypt_trash_kit_fx';
 import {
   barrowEmbersSpec,
@@ -43,6 +43,8 @@ import {
   CRACK_AMBER,
   CRACK_SPRITES,
   CRYPT_KIT_MOBS,
+  CRYPT_KIT_SLOTS,
+  claimSlot,
   crackedGlow,
   crustPlateSpot,
   EYE_LIFT,
@@ -65,14 +67,13 @@ import {
   webNetLevel,
 } from './crypt_trash_kit_fx_core';
 
-const GARGOYLE_SLOTS = 3;
-const EYE_SLOTS = 4;
+const GARGOYLE_SLOTS = CRYPT_KIT_SLOTS.gargoyles;
+const EYE_SLOTS = CRYPT_KIT_SLOTS.eyes;
 const STREAK_SLOTS = 10;
 const BOLT_SLOTS = 3;
 const STRAND_SLOTS = 3;
-const NET_SLOTS = 5;
-const EMBER_SLOTS = 2;
-const SCAN_SEC = 0.1;
+const NET_SLOTS = CRYPT_KIT_SLOTS.nets;
+const EMBER_SLOTS = CRYPT_KIT_SLOTS.embers;
 const ROOT_AURA = `${CRYPT_RIMESILK_SPIT}_root`;
 /** Where a player's head and chest stand over their feet (a player is 2.6). */
 const HEAD = 2.5;
@@ -101,7 +102,6 @@ void main() {
 const STONE_FRAG = /* glsl */ `
 uniform float uPale;
 uniform float uFlash;
-uniform float uLight;
 varying vec3 vW;
 varying vec3 vObj;
 ${NOISE_GLSL}
@@ -109,13 +109,26 @@ void main() {
   vec3 c = cross(dFdx(vW), dFdy(vW));
   float l = length(c);
   vec3 n = l > 1e-10 ? c / l : vec3(0.0, 1.0, 0.0);
-  float diff = 0.38 + 0.62 * max(dot(n, normalize(vec3(0.35, 0.9, 0.25))), 0.0);
-  float rim = 0.18 * max(dot(n, normalize(vec3(-0.6, 0.2, -0.7))), 0.0);
-  float speck = vnoise(vObj.xz * 9.0 + vObj.y * 5.0) * 0.6 + vnoise(vObj.xy * 23.0) * 0.4;
-  vec3 dark = vec3(0.36, 0.35, 0.33);
-  vec3 pale = vec3(0.8, 0.78, 0.73);
-  vec3 col = mix(dark, pale, 0.3 + 0.7 * uPale) * (0.78 + 0.34 * speck) * (diff + rim) * uLight;
-  col += vec3(0.92, 0.92, 0.88) * uFlash;
+  vec3 toCam = cameraPosition - vW;
+  float tl = length(toCam);
+  vec3 v = tl > 1e-6 ? toCam / tl : vec3(0.0, 1.0, 0.0);
+  n = dot(n, v) < 0.0 ? -n : n;
+  // A fixed key and a cool fill (no scene light enters the program): the
+  // facets read as carved rock, lit on top and dark beneath.
+  float key = max(dot(n, normalize(vec3(0.35, 0.9, 0.25))), 0.0);
+  float fill = max(dot(n, normalize(vec3(-0.5, 0.3, -0.6))), 0.0);
+  float diff = 0.2 + 0.66 * key + 0.14 * fill;
+  float ndv = clamp(dot(n, v), 0.0, 1.0);
+  float rim = 1.0 - ndv;
+  rim = rim * rim * rim;
+  float grain = vnoise(vObj.xz * 7.0 + vObj.y * 4.0) * 0.55 + vnoise(vObj.xy * 19.0) * 0.45;
+  float pit = smoothstep(0.62, 0.8, vnoise(vObj.zy * 11.0 + 3.0));
+  // Linear granite grey: dark weathered stone that pales as the ward thickens.
+  vec3 dark = vec3(0.05, 0.048, 0.045);
+  vec3 granite = vec3(0.16, 0.155, 0.145);
+  vec3 base = mix(dark, granite, 0.3 + 0.7 * uPale) * (0.7 + 0.5 * grain) * (1.0 - 0.45 * pit);
+  vec3 col = base * diff + vec3(0.26, 0.25, 0.235) * rim * (0.3 + 0.7 * uPale);
+  col += vec3(0.22, 0.22, 0.2) * uFlash;
   gl_FragColor = vec4(col, 1.0);
 }
 `;
@@ -324,7 +337,7 @@ const scratchNormal = new THREE.Vector3();
 const UP = new THREE.Vector3(0, 1, 0);
 const scratchPoint = { x: 0, y: 0, z: 0 };
 
-export class CryptMarkFx {
+export class CryptMarkFx implements CryptKitPart {
   private readonly gargoyles: GargoyleSlot[] = [];
   private readonly eyes: KitGlyph[] = [];
   private readonly streaks: KitBeam[] = [];
@@ -341,19 +354,21 @@ export class CryptMarkFx {
   private readonly lane = rimesilkLane();
   private readonly embersSpec = barrowEmbersSpec();
   private readonly plateSpots: { x: number; y: number; z: number; size: number }[] = [];
-  private scan = 0;
 
   constructor(private readonly host: CryptKitHost) {
     const h = host;
     this.plateCap = Math.max(1, this.granite.maxStacks) * GRANITE_PLATES_PER_LAYER;
     for (let i = 0; i < this.plateCap; i++) this.plateSpots.push(crustPlateSpot(i, this.plateCap));
-    const plateGeo = h.own(new THREE.DodecahedronGeometry(1, 0));
-    plateGeo.scale(1, 0.4, 0.85);
+    // A chunk of rock, not a card: a jittered icosahedron squashed along its
+    // local up (the body's normal), so each plate stands as a slab of stone.
+    const plateGeo = h.own(new THREE.IcosahedronGeometry(1, 0));
+    jitterRock(plateGeo);
+    plateGeo.scale(1, 0.62, 0.86);
     const flakeGeo = h.own(new THREE.TetrahedronGeometry(1, 0));
     const stoneMat = () =>
       h.own(
         new THREE.ShaderMaterial({
-          uniforms: { uPale: { value: 0 }, uFlash: { value: 0 }, uLight: { value: 0.62 } },
+          uniforms: { uPale: { value: 0 }, uFlash: { value: 0 } },
           vertexShader: STONE_VERT,
           fragmentShader: STONE_FRAG,
         }),
@@ -518,9 +533,8 @@ export class CryptMarkFx {
   private slotFor(id: number, claim: boolean): GargoyleSlot | null {
     const own = this.gargoyles.find((g) => g.owner === id);
     if (own || !claim) return own ?? null;
-    const free = this.gargoyles.find((g) => g.owner < 0);
+    const free = claimSlot(this.gargoyles, id);
     if (!free) return null;
-    free.owner = id;
     free.laid = 0;
     free.stacks = 0;
     free.crackedSince = -1;
@@ -551,25 +565,18 @@ export class CryptMarkFx {
     for (let i = 0; i < n; i++) {
       const a = h.rand() * Math.PI * 2;
       const r = GARGOYLE_BODY.rx * scale * (0.8 + 0.3 * h.rand());
-      h.dust.emit(h.now() + h.rand() * 0.1, {
-        x: c.x + Math.sin(a) * r,
-        y: c.y + (h.rand() - 0.3) * GARGOYLE_BODY.ry * scale,
-        z: c.z + Math.cos(a) * r,
-        vx: Math.sin(a) * 1.2,
-        vy: -0.4 - h.rand(),
-        vz: Math.cos(a) * 1.2,
-        ay: -1.5,
-        life: 1.1 + h.rand() * 0.5,
-        drag: 1.5,
-        floor: gy + 0.1,
-        size0: 0.6,
-        size1: 1.8 + h.rand(),
-        spin: (h.rand() - 0.5) * 0.5,
-        r: GRANITE_PALE[0],
-        g: GRANITE_PALE[1],
-        b: GRANITE_PALE[2],
-        a: 0.42,
-      });
+      h.brush
+        .at(
+          c.x + Math.sin(a) * r,
+          c.y + (h.rand() - 0.3) * GARGOYLE_BODY.ry * scale,
+          c.z + Math.cos(a) * r,
+        )
+        .vel(Math.sin(a) * 1.2, -0.4 - h.rand(), Math.cos(a) * 1.2)
+        .acc(0, -1.5, 0)
+        .life(1.1 + h.rand() * 0.5, 1.5, gy + 0.1)
+        .size(0.6, 1.8 + h.rand(), (h.rand() - 0.5) * 0.5)
+        .rgba(GRANITE_PALE[0], GRANITE_PALE[1], GRANITE_PALE[2], 0.42)
+        .emit(h.dust, h.now() + h.rand() * 0.1);
     }
   }
 
@@ -596,68 +603,45 @@ export class CryptMarkFx {
       const up = h.rand() * 2 - 0.6;
       const big = i % 3 === 0;
       const sp = (big ? 6 : 9) + h.rand() * 7;
-      h.shards.emit(now + h.rand() * 0.04, {
-        x: c.x + Math.sin(a) * GARGOYLE_BODY.rx * scale * 0.8,
-        y: c.y + up * GARGOYLE_BODY.ry * scale * 0.5,
-        z: c.z + Math.cos(a) * GARGOYLE_BODY.rz * scale * 0.8,
-        vx: Math.sin(a) * sp,
-        vy: 3 + h.rand() * 6,
-        vz: Math.cos(a) * sp,
-        ay: -24,
-        life: 1.2 + h.rand() * 0.6,
-        drag: 0.6,
-        floor: gy + 0.08,
-        size0: big ? 0.9 + h.rand() * 0.5 : 0.35 + h.rand() * 0.25,
-        size1: big ? 0.8 : 0.3,
-        spin: (h.rand() - 0.5) * 10,
-        r: GRANITE_PALE[0],
-        g: GRANITE_PALE[1],
-        b: GRANITE_PALE[2],
-        a: 1,
-      });
+      h.brush
+        .at(
+          c.x + Math.sin(a) * GARGOYLE_BODY.rx * scale * 0.8,
+          c.y + up * GARGOYLE_BODY.ry * scale * 0.5,
+          c.z + Math.cos(a) * GARGOYLE_BODY.rz * scale * 0.8,
+        )
+        .vel(Math.sin(a) * sp, 3 + h.rand() * 6, Math.cos(a) * sp)
+        .acc(0, -24, 0)
+        .life(1.2 + h.rand() * 0.6, 0.6, gy + 0.08)
+        .size(
+          big ? 0.9 + h.rand() * 0.5 : 0.35 + h.rand() * 0.25,
+          big ? 0.8 : 0.3,
+          (h.rand() - 0.5) * 10,
+        )
+        .rgba(GRANITE_PALE[0], GRANITE_PALE[1], GRANITE_PALE[2], 1)
+        .emit(h.shards, now + h.rand() * 0.04);
     }
     for (let i = 0; i < Math.round(60 * h.density); i++) {
       const a = h.rand() * Math.PI * 2;
       const sp = 7 + h.rand() * 9;
-      h.glow.emit(now, {
-        x: c.x,
-        y: c.y,
-        z: c.z,
-        vx: Math.sin(a) * sp,
-        vy: 1 + h.rand() * 6,
-        vz: Math.cos(a) * sp,
-        ay: -10,
-        life: 0.6 + h.rand() * 0.5,
-        drag: 1.8,
-        size0: 0.22,
-        size1: 0.05,
-        r: CRACK_AMBER[0],
-        g: CRACK_AMBER[1],
-        b: CRACK_AMBER[2],
-        a: 1,
-      });
+      h.brush
+        .at(c.x, c.y, c.z)
+        .vel(Math.sin(a) * sp, 1 + h.rand() * 6, Math.cos(a) * sp)
+        .acc(0, -10, 0)
+        .life(0.6 + h.rand() * 0.5, 1.8)
+        .size(0.22, 0.05)
+        .rgba(CRACK_AMBER[0], CRACK_AMBER[1], CRACK_AMBER[2], 1)
+        .emit(h.glow, now);
     }
     for (let i = 0; i < Math.round(30 * h.density); i++) {
       const a = (i / 30) * Math.PI * 2;
       const sp = 3 + h.rand() * 3;
-      h.dust.emit(now + h.rand() * 0.08, {
-        x: c.x + Math.sin(a),
-        y: c.y - GARGOYLE_BODY.up * scale * 0.4,
-        z: c.z + Math.cos(a),
-        vx: Math.sin(a) * sp,
-        vy: 0.5 + h.rand() * 1.5,
-        vz: Math.cos(a) * sp,
-        life: 1.6 + h.rand() * 0.6,
-        drag: 1.8,
-        floor: gy + 0.2,
-        size0: 1.4,
-        size1: 4 + h.rand() * 1.5,
-        spin: (h.rand() - 0.5) * 0.6,
-        r: 0.6,
-        g: 0.58,
-        b: 0.54,
-        a: 0.55,
-      });
+      h.brush
+        .at(c.x + Math.sin(a), c.y - GARGOYLE_BODY.up * scale * 0.4, c.z + Math.cos(a))
+        .vel(Math.sin(a) * sp, 0.5 + h.rand() * 1.5, Math.cos(a) * sp)
+        .life(1.6 + h.rand() * 0.6, 1.8, gy + 0.2)
+        .size(1.4, 4 + h.rand() * 1.5, (h.rand() - 0.5) * 0.6)
+        .rgba(0.6, 0.58, 0.54, 0.55)
+        .emit(h.dust, now + h.rand() * 0.08);
     }
     const ring = this.shocks.find((s) => s.patch.owner < 0) ?? this.shocks[0];
     drapePolar(ring.patch.mesh, h.groundY, e.pos.x, e.pos.z, 6 * scale, 0.05);
@@ -683,18 +667,16 @@ export class CryptMarkFx {
       const s = this.plateSpots[i];
       const inSlam = i >= slamFrom && i < slamTo;
       const k = inSlam ? slam.scale : 1;
-      // On the body shell, set a little inside so each plate beds into the stone.
-      scratchPos.set(
-        s.x * b.rx * 0.86 * k,
-        b.up + s.y * b.ry * 0.86 * k,
-        b.forward + s.z * b.rz * 0.86 * k,
-      );
+      // Bedded into the body (well inside the shell): the plates hug the stone,
+      // standing a little prouder as the crust deepens.
+      const shell = (0.7 + 0.08 * crustScale) * k;
+      scratchPos.set(s.x * b.rx * shell, b.up + s.y * b.ry * shell, b.forward + s.z * b.rz * shell);
       scratchNormal.set(s.x / b.rx, s.y / b.ry, s.z / b.rz).normalize();
       scratchQuat.setFromUnitVectors(UP, scratchNormal);
       scratchSpin.setFromAxisAngle(UP, s.size * 17);
       scratchQuat.multiply(scratchSpin);
-      const size = s.size * crustScale;
-      scratchScale.set(size, size * (0.8 + 0.4 * crustScale), size);
+      const size = s.size * (0.75 + 0.35 * crustScale);
+      scratchScale.set(size, size * (0.5 + 0.6 * crustScale), size);
       scratchMatrix.compose(scratchPos, scratchQuat, scratchScale);
       slot.crust.setMatrixAt(i, scratchMatrix);
     }
@@ -740,7 +722,7 @@ export class CryptMarkFx {
     if (stacks !== slot.stacks || slamming) {
       if (stacks < slot.stacks) slot.laid = 0;
       slot.stacks = stacks;
-      this.layPlates(slot, crust.plates, crust.thickness);
+      this.layPlates(slot, crust.plates, crust.crustDepth);
       this.layFlakes(slot, crust.flakes);
     }
     const on = crust.plates > 0;
@@ -754,7 +736,7 @@ export class CryptMarkFx {
       slot.orbit.scale.setScalar(scale);
       slot.orbit.rotation.y += dt * crust.orbit;
       slot.crustMat.uniforms.uPale.value = crust.pale;
-      slot.crustMat.uniforms.uFlash.value = layerSlam(now - slot.slamAt).flash * 0.6;
+      slot.crustMat.uniforms.uFlash.value = layerSlam(now - slot.slamAt).flash;
     }
     // The crust pulse halo, then (while cracked) the beating heat halo.
     const c = scratchPoint;
@@ -794,23 +776,18 @@ export class CryptMarkFx {
       // Embers spitting out of the cracks.
       if (h.rand() < dt * 14 * h.density) {
         const a = h.rand() * Math.PI * 2;
-        h.glow.emit(now, {
-          x: c.x + Math.sin(a) * GARGOYLE_BODY.rx * scale * 0.8,
-          y: c.y + (h.rand() - 0.5) * GARGOYLE_BODY.ry * scale,
-          z: c.z + Math.cos(a) * GARGOYLE_BODY.rz * scale * 0.8,
-          vx: Math.sin(a) * 1.5,
-          vy: 1 + h.rand() * 2,
-          vz: Math.cos(a) * 1.5,
-          ay: -3,
-          life: 0.6 + h.rand() * 0.4,
-          drag: 1,
-          size0: 0.16,
-          size1: 0.04,
-          r: CRACK_AMBER[0],
-          g: CRACK_AMBER[1],
-          b: CRACK_AMBER[2],
-          a: 1,
-        });
+        h.brush
+          .at(
+            c.x + Math.sin(a) * GARGOYLE_BODY.rx * scale * 0.8,
+            c.y + (h.rand() - 0.5) * GARGOYLE_BODY.ry * scale,
+            c.z + Math.cos(a) * GARGOYLE_BODY.rz * scale * 0.8,
+          )
+          .vel(Math.sin(a) * 1.5, 1 + h.rand() * 2, Math.cos(a) * 1.5)
+          .acc(0, -3, 0)
+          .life(0.6 + h.rand() * 0.4, 1)
+          .size(0.16, 0.04)
+          .rgba(CRACK_AMBER[0], CRACK_AMBER[1], CRACK_AMBER[2], 1)
+          .emit(h.glow, now);
       }
     } else {
       slot.crackedSince = -1;
@@ -864,22 +841,13 @@ export class CryptMarkFx {
     // The staff's burst of carrion light as it lets fly.
     for (let i = 0; i < Math.round(18 * h.density); i++) {
       const a = h.rand() * Math.PI * 2;
-      h.glow.emit(h.now(), {
-        x: slot.ax,
-        y: slot.ay,
-        z: slot.az,
-        vx: Math.sin(a) * 3,
-        vy: (h.rand() - 0.3) * 3,
-        vz: Math.cos(a) * 3,
-        life: 0.4,
-        drag: 3,
-        size0: 0.4,
-        size1: 0.1,
-        r: CARRION_VIOLET[0],
-        g: CARRION_VIOLET[1],
-        b: CARRION_VIOLET[2],
-        a: 1,
-      });
+      h.brush
+        .at(slot.ax, slot.ay, slot.az)
+        .vel(Math.sin(a) * 3, (h.rand() - 0.3) * 3, Math.cos(a) * 3)
+        .life(0.4, 3)
+        .size(0.4, 0.1)
+        .rgba(CARRION_VIOLET[0], CARRION_VIOLET[1], CARRION_VIOLET[2], 1)
+        .emit(h.glow, h.now());
     }
   }
 
@@ -907,40 +875,25 @@ export class CryptMarkFx {
     while (b.trail >= 1) {
       b.trail -= 1;
       if (h.rand() < 0.5) {
-        h.dust.emit(now, {
-          x: p.x + (h.rand() - 0.5) * 0.3,
-          y: p.y + (h.rand() - 0.5) * 0.3,
-          z: p.z + (h.rand() - 0.5) * 0.3,
-          vx: (h.rand() - 0.5) * 0.8,
-          vy: 0.3 + h.rand() * 0.6,
-          vz: (h.rand() - 0.5) * 0.8,
-          life: 0.55 + h.rand() * 0.3,
-          drag: 1.5,
-          size0: 0.5,
-          size1: 1.3,
-          spin: (h.rand() - 0.5) * 0.8,
-          r: 0.1,
-          g: 0.03,
-          b: 0.14,
-          a: 0.65,
-        });
+        h.brush
+          .at(
+            p.x + (h.rand() - 0.5) * 0.3,
+            p.y + (h.rand() - 0.5) * 0.3,
+            p.z + (h.rand() - 0.5) * 0.3,
+          )
+          .vel((h.rand() - 0.5) * 0.8, 0.3 + h.rand() * 0.6, (h.rand() - 0.5) * 0.8)
+          .life(0.55 + h.rand() * 0.3, 1.5)
+          .size(0.5, 1.3, (h.rand() - 0.5) * 0.8)
+          .rgba(0.1, 0.03, 0.14, 0.65)
+          .emit(h.dust, now);
       } else {
-        h.glow.emit(now, {
-          x: p.x,
-          y: p.y,
-          z: p.z,
-          vx: (h.rand() - 0.5) * 1.5,
-          vy: (h.rand() - 0.5) * 1.5,
-          vz: (h.rand() - 0.5) * 1.5,
-          life: 0.35 + h.rand() * 0.2,
-          drag: 2,
-          size0: 0.45,
-          size1: 0.1,
-          r: CARRION_VIOLET[0],
-          g: CARRION_VIOLET[1],
-          b: CARRION_VIOLET[2],
-          a: 0.9,
-        });
+        h.brush
+          .at(p.x, p.y, p.z)
+          .vel((h.rand() - 0.5) * 1.5, (h.rand() - 0.5) * 1.5, (h.rand() - 0.5) * 1.5)
+          .life(0.35 + h.rand() * 0.2, 2)
+          .size(0.45, 0.1)
+          .rgba(CARRION_VIOLET[0], CARRION_VIOLET[1], CARRION_VIOLET[2], 0.9)
+          .emit(h.glow, now);
       }
     }
   }
@@ -952,62 +905,53 @@ export class CryptMarkFx {
       const a = h.rand() * Math.PI * 2;
       const up = h.rand() * 2 - 1;
       const sp = 4 + h.rand() * 5;
-      h.glow.emit(now, {
-        x,
-        y,
-        z,
-        vx: Math.sin(a) * sp * Math.sqrt(1 - up * up),
-        vy: up * sp,
-        vz: Math.cos(a) * sp * Math.sqrt(1 - up * up),
-        life: 0.45 + h.rand() * 0.3,
-        drag: 3,
-        size0: 0.4,
-        size1: 0.08,
-        r: CARRION_VIOLET[0],
-        g: CARRION_VIOLET[1],
-        b: CARRION_VIOLET[2],
-        a: 1,
-      });
+      h.brush
+        .at(x, y, z)
+        .vel(
+          Math.sin(a) * sp * Math.sqrt(1 - up * up),
+          up * sp,
+          Math.cos(a) * sp * Math.sqrt(1 - up * up),
+        )
+        .life(0.45 + h.rand() * 0.3, 3)
+        .size(0.4, 0.08)
+        .rgba(CARRION_VIOLET[0], CARRION_VIOLET[1], CARRION_VIOLET[2], 1)
+        .emit(h.glow, now);
     }
     // Black feathers drifting down off the strike.
     for (let i = 0; i < Math.round(14 * h.density); i++) {
       const a = h.rand() * Math.PI * 2;
-      h.shards.emit(now, {
-        x,
-        y: y + 0.3,
-        z,
-        vx: Math.sin(a) * (1 + h.rand() * 2),
-        vy: 1 + h.rand() * 2,
-        vz: Math.cos(a) * (1 + h.rand() * 2),
-        ay: -2.5,
-        life: 1.6 + h.rand() * 0.8,
-        drag: 2.4,
-        floor: h.groundY(x, z) + 0.05,
-        size0: 0.4 + h.rand() * 0.2,
-        size1: 0.36,
-        spin: (h.rand() - 0.5) * 5,
-        r: 0.08,
-        g: 0.04,
-        b: 0.11,
-        a: 1,
-      });
+      h.brush
+        .at(x, y + 0.3, z)
+        .vel(Math.sin(a) * (1 + h.rand() * 2), 1 + h.rand() * 2, Math.cos(a) * (1 + h.rand() * 2))
+        .acc(0, -2.5, 0)
+        .life(1.6 + h.rand() * 0.8, 2.4, h.groundY(x, z) + 0.05)
+        .size(0.4 + h.rand() * 0.2, 0.36, (h.rand() - 0.5) * 5)
+        .rgba(0.08, 0.04, 0.11, 1)
+        .emit(h.shards, now);
     }
   }
 
   private stepEyes(): void {
     const h = this.host;
     const now = h.now();
-    let used = 0;
+    // Let go of eyes whose mark ended, then keep one eye per marked player
+    // (its slot held for the whole mark, never handed to another).
+    for (const slot of this.eyes) {
+      if (slot.owner < 0) continue;
+      const e = h.world.entities.get(slot.owner);
+      if (!e || e.dead || !auraOf(e, CRYPT_CARRION_EYE)) {
+        slot.owner = -1;
+        slot.mesh.visible = false;
+      }
+    }
     for (const id of this.marked) {
-      if (used >= this.eyes.length) break;
       const e = h.world.entities.get(id);
       const aura = e ? auraOf(e, CRYPT_CARRION_EYE) : undefined;
       if (!e || e.dead || !aura) continue;
-      const slot = this.eyes[used++];
-      if (slot.owner !== id) {
-        slot.owner = id;
-        slot.born = now - Math.max(0, aura.duration - aura.remaining);
-      }
+      const held = this.eyes.some((x) => x.owner === id);
+      const slot = claimSlot(this.eyes, id);
+      if (!slot) continue;
+      if (!held) slot.born = now - Math.max(0, aura.duration - aura.remaining);
       const g = eyeGlyph(now - slot.born, aura.remaining, now);
       const gy = h.groundY(e.pos.x, e.pos.z);
       slot.mesh.position.set(e.pos.x, gy + EYE_LIFT * (e.scale || 1) + g.bob, e.pos.z);
@@ -1015,10 +959,6 @@ export class CryptMarkFx {
       slot.mat.uniforms.uAlpha.value = g.alpha;
       slot.mat.uniforms.uOpen.value = g.open;
       slot.mesh.visible = g.alpha > 0.002;
-    }
-    for (let i = used; i < this.eyes.length; i++) {
-      this.eyes[i].owner = -1;
-      this.eyes[i].mesh.visible = false;
     }
     // Every living crow's streak to its mark (the nearest marked player).
     let s = 0;
@@ -1094,42 +1034,23 @@ export class CryptMarkFx {
       const x = slot.ax + (slot.bx - slot.ax) * k;
       const z = slot.az + (slot.bz - slot.az) * k;
       const y = slot.ay + (slot.by - slot.ay) * k;
-      h.glow.emit(h.now() + k * STRAND.shoot, {
-        x,
-        y,
-        z,
-        vx: (h.rand() - 0.5) * 1.2,
-        vy: -0.3 + h.rand() * 0.8,
-        vz: (h.rand() - 0.5) * 1.2,
-        life: 0.6 + h.rand() * 0.5,
-        drag: 1.6,
-        size0: 0.3,
-        size1: 0.06,
-        r: RIME_WHITE[0],
-        g: RIME_WHITE[1],
-        b: RIME_WHITE[2],
-        a: 0.9,
-      });
+      h.brush
+        .at(x, y, z)
+        .vel((h.rand() - 0.5) * 1.2, -0.3 + h.rand() * 0.8, (h.rand() - 0.5) * 1.2)
+        .life(0.6 + h.rand() * 0.5, 1.6)
+        .size(0.3, 0.06)
+        .rgba(RIME_WHITE[0], RIME_WHITE[1], RIME_WHITE[2], 0.9)
+        .emit(h.glow, h.now() + k * STRAND.shoot);
     }
     for (let i = 0; i < Math.round(18 * h.density); i++) {
       const a = h.rand() * Math.PI * 2;
-      h.dust.emit(h.now() + STRAND.shoot, {
-        x: slot.bx,
-        y: slot.by,
-        z: slot.bz,
-        vx: Math.sin(a) * 2.5,
-        vy: 0.4 + h.rand(),
-        vz: Math.cos(a) * 2.5,
-        life: 1 + h.rand() * 0.5,
-        drag: 2,
-        size0: 0.6,
-        size1: 1.8,
-        spin: (h.rand() - 0.5) * 0.5,
-        r: 0.82,
-        g: 0.92,
-        b: 1,
-        a: 0.4,
-      });
+      h.brush
+        .at(slot.bx, slot.by, slot.bz)
+        .vel(Math.sin(a) * 2.5, 0.4 + h.rand(), Math.cos(a) * 2.5)
+        .life(1 + h.rand() * 0.5, 2)
+        .size(0.6, 1.8, (h.rand() - 0.5) * 0.5)
+        .rgba(0.82, 0.92, 1, 0.4)
+        .emit(h.dust, h.now() + STRAND.shoot);
     }
   }
 
@@ -1173,11 +1094,10 @@ export class CryptMarkFx {
       const e = h.world.entities.get(id);
       const aura = e ? auraOf(e, ROOT_AURA) : undefined;
       if (!e || e.dead || !aura) continue;
-      let net = this.nets.find((n) => n.owner === e.id);
-      if (!net) {
-        net = this.nets.find((n) => n.owner < 0);
-        if (!net) continue;
-        net.owner = e.id;
+      const held = this.nets.some((n) => n.owner === e.id);
+      const net = claimSlot(this.nets, e.id);
+      if (!net) continue;
+      if (!held) {
         net.born = now - Math.max(0, aura.duration - aura.remaining);
         drapePolar(net.mesh, h.groundY, e.pos.x, e.pos.z, WEB_NET_RADIUS, 0.06);
         net.mesh.visible = true;
@@ -1238,41 +1158,23 @@ export class CryptMarkFx {
       const wx = m.x + spot.x * c + spot.z * s + (h.rand() - 0.5) * 0.7;
       const wz = m.z - spot.x * s + spot.z * c + (h.rand() - 0.5) * 0.7;
       const gy = h.groundY(wx, wz);
-      h.fire.emit(now, {
-        x: wx,
-        y: gy + 0.08,
-        z: wz,
-        vx: 0,
-        vy: 1.2 + h.rand() * 1.4,
-        vz: 0,
-        ay: 1.2,
-        life: 0.6 + h.rand() * 0.5,
-        drag: 0.8,
-        size0: 0.7 + h.rand() * 0.6,
-        size1: 1.6 + h.rand() * 1.6,
-        r: 0.75 + h.rand() * 0.3,
-        g: 0,
-        b: 0,
-        a: 0.85 * level,
-      });
+      h.brush
+        .at(wx, gy + 0.08, wz)
+        .vel(0, 1.2 + h.rand() * 1.4, 0)
+        .acc(0, 1.2, 0)
+        .life(0.6 + h.rand() * 0.5, 0.8)
+        .size(0.7 + h.rand() * 0.6, 1.6 + h.rand() * 1.6)
+        .rgba(0.75 + h.rand() * 0.3, 0, 0, 0.85 * level)
+        .emit(h.fire, now);
       if (h.rand() < 0.25) {
-        h.glow.emit(now, {
-          x: wx,
-          y: gy + 0.3,
-          z: wz,
-          vx: (h.rand() - 0.5) * 1.4,
-          vy: 2.2 + h.rand() * 2.5,
-          vz: (h.rand() - 0.5) * 1.4,
-          ay: 0.6,
-          life: 1 + h.rand(),
-          drag: 0.7,
-          size0: 0.14,
-          size1: 0.05,
-          r: 0.78,
-          g: 1,
-          b: 0.42,
-          a: level,
-        });
+        h.brush
+          .at(wx, gy + 0.3, wz)
+          .vel((h.rand() - 0.5) * 1.4, 2.2 + h.rand() * 2.5, (h.rand() - 0.5) * 1.4)
+          .acc(0, 0.6, 0)
+          .life(1 + h.rand(), 0.7)
+          .size(0.14, 0.05)
+          .rgba(0.78, 1, 0.42, level)
+          .emit(h.glow, now);
       }
     }
   }
@@ -1281,11 +1183,6 @@ export class CryptMarkFx {
 
   update(dt: number): void {
     const h = this.host;
-    this.scan -= dt;
-    if (this.scan <= 0) {
-      this.scan = SCAN_SEC;
-      this.scanWorld();
-    }
     for (const g of this.gargoyles) if (g.owner >= 0) this.stepGargoyle(g, dt);
     for (const b of this.bolts) if (b.live) this.stepBolt(b, dt);
     for (const s of this.strands) this.stepStrand(s);
@@ -1306,36 +1203,67 @@ export class CryptMarkFx {
     }
   }
 
-  private scanWorld(): void {
-    const h = this.host;
-    const now = h.now();
+  beginScan(): void {
     this.marked.length = 0;
     this.crows.length = 0;
     this.rooted.length = 0;
-    for (const e of h.world.entities.values()) {
-      if (e.kind === 'object') {
-        if (e.templateId === CRYPT_BARROW_EMBERS) this.holdEmbers(e);
-        continue;
-      }
-      if (e.dead) continue;
-      if (e.kind === 'mob') {
-        if (e.templateId === CRYPT_KIT_MOBS.crow) this.crows.push(e.id);
-        else if (e.templateId === CRYPT_KIT_MOBS.gargoyle) {
-          const stone = auraOf(e, CRYPT_GRANITE_SKIN);
-          const cracked = auraOf(e, CRYPT_CRACKED_STONE);
-          if ((stone && (stone.stacks ?? 0) > 0) || cracked) this.slotFor(e.id, true);
-        }
-      }
-      for (const a of e.auras) {
-        if (a.id === CRYPT_CARRION_EYE && a.remaining > 0) this.marked.push(e.id);
-        else if (a.id === ROOT_AURA && a.remaining > 0) this.rooted.push(e.id);
-      }
+  }
+
+  see(e: Entity): void {
+    if (e.kind === 'object') {
+      if (e.templateId === CRYPT_BARROW_EMBERS) this.holdEmbers(e);
+      return;
     }
+    if (e.dead) return;
+    if (e.kind === 'mob') {
+      if (e.templateId === CRYPT_KIT_MOBS.crow) this.crows.push(e.id);
+      else if (e.templateId === CRYPT_KIT_MOBS.gargoyle) {
+        const stone = auraOf(e, CRYPT_GRANITE_SKIN);
+        const cracked = auraOf(e, CRYPT_CRACKED_STONE);
+        if ((stone && (stone.stacks ?? 0) > 0) || cracked) this.slotFor(e.id, true);
+      }
+      return;
+    }
+    // The marks land only on players: only their auras are walked.
+    if (e.kind !== 'player') return;
+    for (const a of e.auras) {
+      if (a.id === CRYPT_CARRION_EYE && a.remaining > 0) this.marked.push(e.id);
+      else if (a.id === ROOT_AURA && a.remaining > 0) this.rooted.push(e.id);
+    }
+  }
+
+  endScan(): void {
+    const h = this.host;
+    const now = h.now();
     for (const m of this.embers) {
       if (m.patch.owner < 0 || m.patch.goneAt >= 0) continue;
       if (!h.world.entities.has(m.patch.owner)) m.patch.goneAt = now;
     }
   }
+
+  /** The instanced crust and flakes own their instance buffers (the host
+   *  disposes the shared geometry and material). */
+  dispose(): void {
+    for (const g of this.gargoyles) {
+      g.crust.dispose();
+      g.flakes?.dispose();
+    }
+  }
+}
+
+/** Nudge each corner of a rock by a hash of its position (shared corners move
+ *  together, so the faces stay closed): no two facets alike. */
+function jitterRock(geo: THREE.BufferGeometry): void {
+  const pos = geo.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+    const h = Math.sin(x * 12.9898 + y * 78.233 + z * 37.719) * 43758.5453;
+    const k = 0.82 + 0.3 * (h - Math.floor(h));
+    pos.setXYZ(i, x * k, y * k, z * k);
+  }
+  pos.needsUpdate = true;
 }
 
 function auraOf(

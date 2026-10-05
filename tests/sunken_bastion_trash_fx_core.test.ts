@@ -6,6 +6,8 @@
 // collapses on its cue and bursts when it broke, and the rigs carry the clips
 // the cues play (the watchman's thrust on the hook's bar, the warhound's Howl,
 // the prisoner's Kneel held while its fetters' aura lasts).
+
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { auraHeldClip, stunIdleClip } from '../src/render/characters/stun_idle_core';
@@ -17,11 +19,9 @@ import {
 import { TELEGRAPH_ACCENTS } from '../src/render/floor_telegraph/telegraph_look_core';
 import * as fxCore from '../src/render/sunken_bastion/bastion_fx_core';
 import { bastionTelegraphSpecs } from '../src/render/sunken_bastion/bastion_fx_core';
-import { bastionSwell as rendererSwell } from '../src/render/sunken_bastion/bastion_shade_ghost_core';
 import {
   BASTION_FETTERS_KNEEL_GESTURE,
   BASTION_PACK_HOWL_GESTURE,
-  bastionSwell,
   CHAIN_MAX_LINKS,
   COLUMN_BURST,
   COLUMN_COLLAPSE,
@@ -29,7 +29,6 @@ import {
   chainDrop,
   chainLinkCount,
   chainSag,
-  clearBastionSwell,
   columnPhase,
   columnShape,
   FOG_LIFT,
@@ -49,15 +48,17 @@ import {
   hookFlightSeconds,
   hookPhase,
   hookSpec,
+  inBastionClaim,
   PACK_FRENZY_AURA,
   RELEASE_SEC,
   releaseEnvelope,
-  setBastionSwell,
+  stableSlots,
   streamPoint,
+  TRASH_FX_SLOTS,
   wallPairs,
   wallRadius,
 } from '../src/render/sunken_bastion/bastion_trash_fx_core';
-import { MOBS } from '../src/sim/data';
+import { dungeonByIndex, instanceOriginX, MOBS } from '../src/sim/data';
 import {
   BASTION_BOATHOOK,
   BASTION_BRINE_COLUMN,
@@ -187,16 +188,17 @@ describe('Carrion Glut', () => {
     expect(glutGlow(GLUT_MAX_STACKS)).toBe(1);
   });
 
-  it('draws the swell through the renderer read, and forgets it', () => {
-    clearBastionSwell();
-    expect(bastionSwell({ id: 7 })).toBe(1);
-    setBastionSwell(7, 1.14);
-    expect(bastionSwell({ id: 7 })).toBe(1.14);
-    expect(rendererSwell({ id: 7 })).toBe(1.14);
-    expect(bastionSwell({ id: 8 })).toBe(1);
-    setBastionSwell(7, 1);
-    expect(bastionSwell({ id: 7 })).toBe(1);
-    clearBastionSwell();
+  it('keeps the swell on the painter instance, never in the pure core', () => {
+    // A second renderer (the editor) must never share one map of swells: the
+    // core holds no module-scope state and exports no swell setter.
+    const core = readFileSync('src/render/sunken_bastion/bastion_trash_fx_core.ts', 'utf8');
+    expect(core).not.toMatch(/^(const|let) \w+ = new (Map|Set)\b/m);
+    expect(core).not.toMatch(/export function (set|clear)BastionSwell/);
+    const painter = readFileSync('src/render/sunken_bastion/bastion_trash_fx.ts', 'utf8');
+    expect(painter).toMatch(/private readonly swell = new Map<number, number>\(\)/);
+    // The renderer reads it through the dungeon visuals, O(1) per body.
+    const renderer = readFileSync('src/render/renderer.ts', 'utf8');
+    expect(renderer).toContain('e.scale * (this.riftDeathZoneVisuals?.bodySwell(e.id) ?? 1)');
   });
 
   it('keeps the brine look on the crawler ring and drops the old second ring', () => {
@@ -286,5 +288,69 @@ describe('Snapped Fetters', () => {
     expect(releaseEnvelope(0.45)).toBe(1);
     expect(releaseEnvelope(RELEASE_SEC * 0.9)).toBeLessThan(0.3);
     expect(releaseEnvelope(RELEASE_SEC + 0.1)).toBe(0);
+  });
+});
+
+describe('the trash fx pools', () => {
+  it('pins every pool size', () => {
+    expect(TRASH_FX_SLOTS).toEqual({
+      hooks: 4,
+      fogs: 4,
+      shrouds: 8,
+      columns: 4,
+      wards: 8,
+      bands: 8,
+      souls: 3,
+      rings: 12,
+    });
+    // Four warded watchmen side by side link every pair (six bands).
+    expect(TRASH_FX_SLOTS.bands).toBeGreaterThanOrEqual((4 * 3) / 2);
+  });
+
+  it('keeps every seated body on its slot and never evicts one for a newcomer', () => {
+    const slots = [-1, -1, -1];
+    expect(stableSlots(slots, [10, 11], 2)).toBe(2);
+    expect(slots).toEqual([10, 11, -1]);
+    // A new body takes the free slot; the seated ones stay put, in any order.
+    expect(stableSlots(slots, [12, 11, 10], 3)).toBe(3);
+    expect(slots).toEqual([10, 11, 12]);
+    // Over-subscribed: the newcomer is dropped, no live read is evicted.
+    expect(stableSlots(slots, [13, 10, 11, 12], 4)).toBe(3);
+    expect(slots).toEqual([10, 11, 12]);
+    // A body gone frees its slot for the waiting newcomer.
+    expect(stableSlots(slots, [13, 10, 12], 3)).toBe(3);
+    expect(slots).toEqual([10, 13, 12]);
+    // Only the first `count` wanted bodies count.
+    expect(stableSlots(slots, [10, 99, 99], 1)).toBe(1);
+    expect(slots).toEqual([10, -1, -1]);
+  });
+
+  it('does not take a live slot in any painter (a full pool drops the newcomer)', () => {
+    for (const file of [
+      'bastion_boathook_fx.ts',
+      'bastion_brine_column_fx.ts',
+      'bastion_trash_fx.ts',
+      'bastion_trash_fx_kit.ts',
+    ]) {
+      const src = readFileSync(`src/render/sunken_bastion/${file}`, 'utf8');
+      expect(src, file).not.toMatch(/\?\? this\.\w+\[0\]/);
+    }
+  });
+});
+
+describe('the claim gate', () => {
+  it('scans only inside a Sunken Bastion claim', () => {
+    let index = -1;
+    for (let i = 0; i < 64; i++) {
+      if (dungeonByIndex(i)?.interior === 'sunken_bastion') {
+        index = i;
+        break;
+      }
+    }
+    expect(index).toBeGreaterThanOrEqual(0);
+    const x = instanceOriginX(index);
+    expect(inBastionClaim(x)).toBe(true);
+    expect(inBastionClaim(0)).toBe(false);
+    expect(inBastionClaim(instanceOriginX(index === 0 ? 1 : 0))).toBe(false);
   });
 });

@@ -19,6 +19,8 @@ import {
   FOG_FEATHER,
   FOG_LIFT,
   fogAlpha,
+  stableSlots,
+  TRASH_FX_SLOTS,
 } from './bastion_trash_fx_core';
 import {
   LOOK,
@@ -29,8 +31,6 @@ import {
   type TrashFxKit,
 } from './bastion_trash_fx_kit';
 
-const FOG_SLOTS = 3;
-const SHROUD_SLOTS = 6;
 const FOG_GREY = new THREE.Color(0.62, 0.7, 0.65);
 const FOG_RIM = new THREE.Color(0.82, 0.96, 0.88);
 
@@ -123,12 +123,16 @@ interface FogSlot {
 export class BastionFogBankFx {
   private readonly fogs: FogSlot[] = [];
   private readonly shrouds: ShellSlot[] = [];
+  /** The live shrouded bodies this frame, and the body each shroud slot shows
+   *  (stableSlots: a body keeps its slot, a full pool drops a newcomer). */
+  private readonly live: number[] = [];
+  private readonly seats: number[] = new Array(TRASH_FX_SLOTS.shrouds).fill(-1);
 
   constructor(
     private readonly kit: TrashFxKit,
     sleeve: THREE.BufferGeometry,
   ) {
-    for (let i = 0; i < FOG_SLOTS; i++) {
+    for (let i = 0; i < TRASH_FX_SLOTS.fogs; i++) {
       const geo = fogDisc();
       kit.geometries.push(geo);
       const alpha = { value: 0 };
@@ -168,7 +172,7 @@ export class BastionFogBankFx {
         nextPuff: 0,
       });
     }
-    for (let i = 0; i < SHROUD_SLOTS; i++)
+    for (let i = 0; i < TRASH_FX_SLOTS.shrouds; i++)
       this.shrouds.push(kit.shellSlot(kit.root, sleeve, SHELL_MODE.shroud, FOG_GREY, false));
   }
 
@@ -176,6 +180,8 @@ export class BastionFogBankFx {
   claim(obj: TrashBody): void {
     const kit = this.kit;
     if (this.fogs.some((f) => f.objectId === obj.id)) return;
+    // A free slot, else one only lifting (its object is gone): a standing
+    // patch is never taken; a full pool leaves the newcomer to the next scan.
     const slot = this.fogs.find((f) => f.objectId < 0) ?? this.fogs.find((f) => f.lifting >= 0);
     if (!slot) return;
     slot.objectId = obj.id;
@@ -248,10 +254,17 @@ export class BastionFogBankFx {
 
   private updateShrouds(world: IWorld, ids: readonly number[], dt: number): void {
     const kit = this.kit;
-    for (let i = 0; i < SHROUD_SLOTS; i++) {
+    this.live.length = 0;
+    for (const id of ids) {
+      const e = world.entities.get(id);
+      if (e && !e.dead) this.live.push(id);
+    }
+    stableSlots(this.seats, this.live, this.live.length);
+    for (let i = 0; i < this.shrouds.length; i++) {
       const slot = this.shrouds[i];
-      const e = i < ids.length ? world.entities.get(ids[i]) : undefined;
-      if (!e || e.dead) {
+      const id = this.seats[i];
+      const e = id >= 0 ? world.entities.get(id) : undefined;
+      if (!e) {
         slot.alpha = Math.max(0, slot.alpha - dt * 3);
         slot.u.uAlpha.value = slot.alpha;
         if (slot.alpha <= 0) {

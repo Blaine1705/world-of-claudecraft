@@ -24,7 +24,7 @@
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
-import type { SimEvent } from '../../sim/types';
+import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -47,8 +47,106 @@ import {
   GLOW_FRAG,
   PARTICLE_VERT,
   ParticlePool,
+  type ParticleSpec,
 } from './crypt_fx_particles';
 import { CryptMarkFx } from './crypt_mark_fx';
+import { inHollowCrypt, KIT_SCAN_SECONDS } from './crypt_trash_kit_fx_core';
+
+/**
+ * One reused particle spec, written through a chain and handed to a pool
+ * (which copies it into its buffers at once): a particle costs no object.
+ * `at` starts a particle and resets every optional field to the pool's
+ * default (no acceleration, the minimum drag, no floor, no spin).
+ */
+export class ParticleBrush {
+  private readonly p: ParticleSpec = {
+    x: 0,
+    y: 0,
+    z: 0,
+    vx: 0,
+    vy: 0,
+    vz: 0,
+    ax: 0,
+    ay: 0,
+    az: 0,
+    life: 1,
+    drag: 0.001,
+    floor: -1e6,
+    size0: 1,
+    size1: 1,
+    spin: 0,
+    r: 1,
+    g: 1,
+    b: 1,
+    a: 1,
+  };
+
+  at(x: number, y: number, z: number): this {
+    const p = this.p;
+    p.x = x;
+    p.y = y;
+    p.z = z;
+    p.vx = 0;
+    p.vy = 0;
+    p.vz = 0;
+    p.ax = 0;
+    p.ay = 0;
+    p.az = 0;
+    p.drag = 0.001;
+    p.floor = -1e6;
+    p.spin = 0;
+    return this;
+  }
+
+  vel(vx: number, vy: number, vz: number): this {
+    this.p.vx = vx;
+    this.p.vy = vy;
+    this.p.vz = vz;
+    return this;
+  }
+
+  acc(ax: number, ay: number, az: number): this {
+    this.p.ax = ax;
+    this.p.ay = ay;
+    this.p.az = az;
+    return this;
+  }
+
+  life(life: number, drag = 0.001, floor = -1e6): this {
+    this.p.life = life;
+    this.p.drag = drag;
+    this.p.floor = floor;
+    return this;
+  }
+
+  size(size0: number, size1: number, spin = 0): this {
+    this.p.size0 = size0;
+    this.p.size1 = size1;
+    this.p.spin = spin;
+    return this;
+  }
+
+  rgba(r: number, g: number, b: number, a: number): this {
+    this.p.r = r;
+    this.p.g = g;
+    this.p.b = b;
+    this.p.a = a;
+    return this;
+  }
+
+  emit(pool: ParticlePool, at: number): void {
+    pool.emit(at, this.p);
+  }
+}
+
+/** A part of the kit fed by the host's one roster walk (10 Hz, only inside
+ *  the crypt's claim): `beginScan`, then `see` for every entity, then
+ *  `endScan` (which runs even when the walk is skipped, to let go of owners). */
+export interface CryptKitPart {
+  beginScan(): void;
+  see(e: Entity): void;
+  endScan(): void;
+}
 
 /** A pooled floor patch (a draped disc or cone) and its life. */
 export interface KitPatch {
@@ -86,6 +184,8 @@ export interface CryptKitHost {
   readonly fire: ParticlePool;
   /** Bone splinters and stone flakes (solid, spun slivers). */
   readonly shards: ParticlePool;
+  /** The one reused particle spec every emit is written through. */
+  readonly brush: ParticleBrush;
   /** Particle budget multiplier: 1, or under half on the low effects tier. */
   readonly density: number;
   /** Purely cosmetic flourishes on (off on the low effects tier). */
@@ -142,6 +242,7 @@ export class CryptTrashKitFx implements CryptKitHost {
   readonly dust: ParticlePool;
   readonly fire: ParticlePool;
   readonly shards: ParticlePool;
+  readonly brush = new ParticleBrush();
   readonly density: number;
   readonly detail: boolean;
   readonly uTime = { value: 0 };
@@ -152,6 +253,7 @@ export class CryptTrashKitFx implements CryptKitHost {
   private readonly glyphGeo: THREE.BufferGeometry;
   private readonly beamGeo: THREE.BufferGeometry;
   private clock = 0;
+  private scan = 0;
   private seed = 0x7a5c;
   private disposed = false;
 
@@ -340,6 +442,11 @@ export class CryptTrashKitFx implements CryptKitHost {
     if (this.disposed) return;
     this.clock += dt;
     this.uTime.value = this.clock;
+    this.scan -= dt;
+    if (this.scan <= 0) {
+      this.scan = KIT_SCAN_SECONDS;
+      this.walk();
+    }
     this.bones.update(dt);
     this.marks.update(dt);
     this.dust.update(this.clock);
@@ -348,10 +455,25 @@ export class CryptTrashKitFx implements CryptKitHost {
     this.glow.update(this.clock);
   }
 
+  /** One roster walk feeds both parts, and only inside the crypt's claim. */
+  private walk(): void {
+    this.bones.beginScan();
+    this.marks.beginScan();
+    if (inHollowCrypt(this.world.player.pos.x)) {
+      for (const e of this.world.entities.values()) {
+        this.bones.see(e);
+        this.marks.see(e);
+      }
+    }
+    this.bones.endScan();
+    this.marks.endScan();
+  }
+
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
+    this.marks.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
   }

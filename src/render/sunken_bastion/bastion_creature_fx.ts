@@ -515,6 +515,11 @@ export class BastionCreatureFx {
   }
 
   /** Claims an arbalest's shot or the Turnkey's call; true when it drew it. */
+  /** The drawn swell of a fed Barnacle Crawler, 1 for every other body. */
+  bodySwell(id: number): number {
+    return this.trash.swellOf(id);
+  }
+
   handleEvent(ev: SimEvent): boolean {
     this.drowned.observe(ev, this.clock);
     if (this.trash.handleEvent(ev, this.clock)) return true;
