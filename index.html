@@ -198,10 +198,17 @@
      here is scoped to the splash or to body.boot-pending, so none outlives the boot.
      Colors mirror --website-ink-deep, --website-gold and --website-gold-bright. */
   body.boot-pending {
+    margin: 0;
     overflow: hidden;
   }
+  /* Clipped to the screen as well as hidden: unstyled media under the splash (the
+     1536px video poster, the 978px logos) would otherwise widen the layout viewport,
+     and a phone then zooms out and centers the splash off screen. */
   body.boot-pending > :not(#boot-splash) {
     visibility: hidden;
+    max-width: 100vw;
+    overflow: hidden;
+    overflow: clip;
   }
   #boot-splash {
     position: fixed;
