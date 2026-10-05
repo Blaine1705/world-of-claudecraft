@@ -1415,7 +1415,10 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // was retaken.
   // Re-minted for the v0.45 release batch after entity-view policy moved.
   // No capture was retaken.
-  '8cfdd156514577ab604c3c5edeb34f7460960816f565a8a3b8364f40ff2f2a27';
+  // Re-minted for PR #4379 on top of that v0.45 batch: the renderer leaf now
+  // carries the dungeon/arena static interior retry tracker beside the batch's
+  // spirit-veil and Spell Effects imports. No capture was retaken.
+  '29a005395830ad9001b4367b628726fb7d55f6947fc0c0de05223a0d7a9095fb';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1458,7 +1461,10 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // was retaken.
   // Re-minted for the v0.45 release batch after entity-view policy moved.
   // No capture was retaken.
-  '68d48dd165e6d7e304df2356d3a4d7c5ab3d998a9eb643b8d258198e5a33693b';
+  // Re-minted for PR #4379 on top of that v0.45 batch: the renderer leaf now
+  // carries the dungeon/arena static interior retry tracker beside the batch's
+  // spirit-veil and Spell Effects imports. No capture was retaken.
+  '87cea55aa3fa76ab984d6d9663be5c9a288dafe403e795717ed822db0889c21f';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2859,7 +2865,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // retaken.
       // v0.45 release batch entity-view policy move: recomputed LAST over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('82e7531cb7c5813cbafba4633f8e39b040cb9091ba21d43fd8f2d5ba2418336f');
+      // PR #4379 dungeon/arena static interior retry merge on top of the v0.45
+      // batch: recomputed LAST over the re-swept evidence. No capture was
+      // retaken.
+    ).toBe('57ef3aa341ef7b0586da69bd0dd49395eede5146b1d5fe4b484da94ddc6ffeea');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

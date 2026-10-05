@@ -720,7 +720,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // was retaken.
   // Re-minted for the v0.45 release batch after entity-view policy moved.
   // No capture was retaken.
-  '68d48dd165e6d7e304df2356d3a4d7c5ab3d998a9eb643b8d258198e5a33693b';
+  // Re-minted for PR #4379 on top of that v0.45 batch: the renderer leaf now
+  // carries the dungeon/arena static interior retry tracker beside the batch's
+  // spirit-veil and Spell Effects imports. No capture was retaken.
+  '87cea55aa3fa76ab984d6d9663be5c9a288dafe403e795717ed822db0889c21f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

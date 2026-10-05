@@ -1026,7 +1026,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12637 -> 12625 by PR #4279 on top of the v0.45 candidate:
     // Spell Effects keeps the event-scope wrapper while extracting world cue
     // arms from renderer.ts. Exact count, zero slack.
-    ceiling: 12625,
+    // LOWERED 12625 -> 12620 by this v0.45.0 PR #4379 merge: dungeon/arena
+    // async build tracking stays extracted in static_interior_tracker.ts while
+    // the release batch's spirit-veil and Spell Effects extractions remain.
+    // Exact count measured with wc -l on the resolved tree. Zero slack.
+    ceiling: 12620,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
