@@ -486,8 +486,10 @@ export type BodyAnchorName =
   | 'breath'
   /** Where the jaws are through a breath's bar (the embers drawn in). */
   | 'breathDraw'
-  /** The Thawcaller's soul lantern (its censer smoke, the rite's tether). */
+  /** The Thawcaller's soul lantern (its censer smoke, the Warming Rite's beam). */
   | 'censer'
+  /** The lantern swung low over a corpse through Thaw the Held (its tether). */
+  | 'riteCenser'
   /** The Goadsmith's red-hot iron tip at rest. */
   | 'ironTip'
   /** The iron tip thrust out on a Goad or a Branding Iron (the spark stream). */
@@ -507,7 +509,14 @@ export const SANCTUM_BODY_ANCHORS: Readonly<
     // Its head reared back over the bar, the throat swelling.
     [SCALEGUARD_ID]: [0.08, 0, 0.88],
   },
-  censer: {},
+  censer: {
+    // The soul lantern hangs off its crook, out past its right hand.
+    [THAWCALLER_ID]: [0.12, -0.32, 0.59],
+  },
+  riteCenser: {
+    // Bowed over the corpse, the lantern swung out low in front of it.
+    [THAWCALLER_ID]: [0.25, -0.25, 0.44],
+  },
   ironTip: {},
   ironThrust: {},
   yoke: {},
@@ -518,6 +527,7 @@ const DEFAULT_ANCHORS: Readonly<Record<BodyAnchorName, BodyAnchor>> = {
   breath: [0.3, 0, 0.5],
   breathDraw: [0.3, 0, 0.5],
   censer: [0.2, 0, 0.45],
+  riteCenser: [0.2, 0, 0.45],
   ironTip: [0.28, -0.12, 0.55],
   ironThrust: [0.42, 0, 0.5],
   yoke: [-0.05, 0.2, 0.76],

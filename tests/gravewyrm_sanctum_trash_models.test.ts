@@ -12,6 +12,8 @@ import {
   barRate,
   SCALEGUARD_BODY,
   SCALEGUARD_CLIP,
+  THAWCALLER_BODY,
+  THAWCALLER_CLIP,
   trashModelScale,
 } from '../src/render/characters/sanctum_trash_looks';
 import {
@@ -25,6 +27,8 @@ import { MOBS } from '../src/sim/data';
 import {
   SANCTUM_CINDER_BREATH,
   SANCTUM_COUNTERWEIGHT_LASH,
+  SANCTUM_THAW_THE_HELD,
+  SANCTUM_WARMING_RITE,
 } from '../src/sim/mob/trash_kit/sanctum_cast_ids';
 
 type GlbJson = {
@@ -177,5 +181,53 @@ describe('the Sanctum Scaleguard', () => {
     expect(sanctumAnchor('breathDraw', 'sanctum_drakonid')[2]).toBeGreaterThan(0.8);
     // A body without its own row keeps the generic placement.
     expect(sanctumAnchor('breath', 'no_such_mob')).toEqual([0.3, 0, 0.5]);
+  });
+});
+
+describe('the Broodsworn Thawcaller', () => {
+  it('ships its own body with a clip for both rites', () => {
+    expect(clipsOf(`public/${THAWCALLER_BODY.url}`)).toEqual(
+      [
+        'Attack',
+        'Attack2',
+        'Cast',
+        'Death',
+        'Hit',
+        'Idle',
+        'Run',
+        'ThawTheHeld',
+        'Walk',
+        'WarmingRite',
+      ].sort(),
+    );
+    expectShipped(THAWCALLER_BODY.url);
+    expect(visualOf('broodsworn_thawcaller').url).toBe(THAWCALLER_BODY.url);
+    expectDrawnAtRow('broodsworn_thawcaller');
+  });
+
+  it('lands both rites on their bars: the heal and the raising', () => {
+    const v = visualOf('broodsworn_thawcaller');
+    const kit = MOBS.broodsworn_thawcaller?.trashKit;
+    expect(v.castClipSync).toBe(true);
+    expect(v.clips.castByAbility?.[SANCTUM_WARMING_RITE]).toBe('WarmingRite');
+    expect(v.clips.castByAbility?.[SANCTUM_THAW_THE_HELD]).toBe('ThawTheHeld');
+    expect(kit?.mend?.castTime).toBe(2.5);
+    expect(kit?.reanimate?.castTime).toBe(3);
+    expect(v.clips.castTimeScaleByAbility?.[SANCTUM_WARMING_RITE]).toBeCloseTo(
+      THAWCALLER_CLIP.warmingRite / 2.5,
+      9,
+    );
+    expect(v.clips.castTimeScaleByAbility?.[SANCTUM_THAW_THE_HELD]).toBeCloseTo(
+      THAWCALLER_CLIP.thawTheHeld / 3,
+      9,
+    );
+    expect(v.clips.castPlayOut).toEqual(['WarmingRite', 'ThawTheHeld']);
+  });
+
+  it('draws its soul smoke and tethers from the lantern at its right hand', () => {
+    const censer = sanctumAnchor('censer', 'broodsworn_thawcaller');
+    // Out past its right hand (negative = its right), at the lantern's height.
+    expect(censer[1]).toBeLessThan(-0.25);
+    expect(sanctumAnchor('riteCenser', 'broodsworn_thawcaller')[2]).toBeLessThan(censer[2]);
   });
 });

@@ -237,6 +237,7 @@ const AUTHORED_ATLAS_DEFS = [
   'sanctum_boneguard',
   'sanctum_raised_bonewalker',
   'sanctum_scaleguard',
+  'sanctum_thawcaller',
   'wildheart_great_saurian',
   'wildheart_gorgebloom',
   'wildheart_vine_lasher',

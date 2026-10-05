@@ -142,25 +142,6 @@ const STATIC_PROP_CLIPS: ClipMap = {
 type PlaceholderRow = [string, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, [string, PlaceholderRow]> = {
-  // Broodsworn Thawcaller: a hooded cultist in furs, its soul lantern swung on
-  // a crook like a censer on a chain (the mist chanter's first rig, kept as its
-  // own file when the Bastion's Mist Chanter got her sculpted body, warmed to
-  // fur brown; its lantern glows and the fx trail soul-smoke off it).
-  sanctum_thawcaller: [
-    THAWCALLER_ID,
-    [
-      'bastion_mistweaver',
-      0xc49a74,
-      0.24,
-      {
-        url: 'models/creatures/mist_chanter_thawcaller.glb',
-        authoredAtlas: undefined,
-        walkRef: undefined,
-        runRef: undefined,
-        selfIllumination: 0.08,
-      },
-    ],
-  ],
   // Broodsworn Goadsmith: a burly cultist in a bear-fur hood and a leather
   // apron, a long goad iron in his fist (the fx heat its tip).
   sanctum_goadsmith: [

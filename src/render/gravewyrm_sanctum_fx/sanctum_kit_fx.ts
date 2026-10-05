@@ -812,7 +812,7 @@ export class SanctumKitFx {
       const hc = sanctumDrawnHeight(caster.templateId, caster.scale);
       const from = this.tmpA;
       anchorPoint(
-        sanctumAnchor(thaw ? 'censer' : 'ironThrust', caster.templateId),
+        sanctumAnchor(thaw ? 'riteCenser' : 'ironThrust', caster.templateId),
         caster.pos.x,
         caster.pos.z,
         h.groundY(caster.pos.x, caster.pos.z),

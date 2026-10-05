@@ -15,6 +15,12 @@ authoring tooling: nothing here runs in the build or the game.
   and its Raised Bonewalker variant (`--variant bonewalker`,
   `sanctum_raised_bonewalker.glb`): one rig and ten clips, Thaw the entrance.
 
+- `thawcaller/cultistas/`: the Broodsworn Thawcaller (`sanctum_thawcaller.glb`), a Codex-built
+  cultist (its own frozen builder: analytic two-bone poses baked on a 30 fps half-frame
+  timeline, ten skinned material parts). `reclip.py` bakes named clips onto the delivered
+  .blend and re-exports the raw GLB (`ThawTheHeld` was added this way); ship with
+  `kit/ship.mjs`. `kit/clip_sheet30.py` renders its review frames.
+
 Build (Blender 5.2, absolute output paths; keep one Blender job at a time):
 
     blender -b --factory-startup --python <builder>/build.py -- <abs>/<key>_raw.glb \

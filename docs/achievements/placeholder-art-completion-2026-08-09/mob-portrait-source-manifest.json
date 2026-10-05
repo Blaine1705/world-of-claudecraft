@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "74735101d6ca7d718fe8c463ca89a8f804ab4cd079a98c2420f87e0f81243c44",
+  "rendererFingerprint": "d67268162b924ff9c56f6bbd611756826d970bfd0b818ebb30f7cfe9b5de6067",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5504916,
-      "sha256": "cbb7bacb5e3008ed37315901600515d90591355e7bada3b696bbaae00aa6d568",
+      "bytes": 5504906,
+      "sha256": "e38c53d1842549d690ca5c293b05373217dd6d534306c16b79561bda42fb0ec8",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -921,10 +921,10 @@
       "visualKey": "sanctum_thawcaller",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/mist_chanter_thawcaller.glb",
-          "path": "public/models/creatures/mist_chanter_thawcaller.glb",
-          "bytes": 718832,
-          "sha256": "52292a56aff636442aa9b6d73038c152298ac4cbec61809b68387cc1059310e8"
+          "url": "models/creatures/sanctum_thawcaller.glb",
+          "path": "public/models/creatures/sanctum_thawcaller.glb",
+          "bytes": 870900,
+          "sha256": "4a0b35c1aeac03b5ccb1165dc85be8c1743132d6ac169c5d304ad9bbca01a2b0"
         },
         "idle": "Idle",
         "height": 2.75,
@@ -933,19 +933,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.24
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#c49a74",
-        "resolved": "#c49a74",
-        "strength": 0.24
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "f8a75cd79566d409fce6734a7a2342f814015fcaeecf34be76527bd232183aa3",
+      "sourceFingerprint": "461379c6b03d30639e523107c17ded0b3f1331bdba1baa7b0930b3eacee0c757",
       "output": {
         "path": "public/ui/mobs/broodsworn_thawcaller.webp",
-        "bytes": 1920,
-        "sha256": "b420b0d5d7f943e82a7c7d5cab0d5d47c67e512a78b9fdfe9249fa87fd373d26"
+        "bytes": 2438,
+        "sha256": "db37b8447f54e72f0365566fa837fabf36382f4858e5557b15f8738f62ed11fd"
       }
     },
     {

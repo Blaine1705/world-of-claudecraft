@@ -41,8 +41,8 @@ nothing here runs in the build or the game.
   fishing net (`net` surface), weed-hair (`hair_weights`), a rag bodice, a shell necklace, skirts to
   the ankles (`tabard_weights`, the front following the thighs) and the driftwood staff with its
   lure of sea light (a `glow_lure` part); `clips.py` has Idle, Walk, Run, Attack, Attack2, Cast,
-  Ward (a loop), Hit, Death. Her first rig is kept as `mist_chanter_thawcaller.glb` for the
-  Gravewyrm Sanctum's Thawcaller placeholder.
+  Ward (a loop), Hit, Death. (Her first rig served the Gravewyrm Sanctum's Thawcaller
+  placeholder until that cultist got its own body, `../gravewyrm_sanctum_trash/`.)
 - `acolyte/`: the Tidebound Acolyte (`public/models/creatures/tidebound_acolyte.glb`), grown from the
   Chanter's builder: an upright living cultist, the cowl and a tall finned mitre, robes to the feet
   with wide sleeves (`build_sleeve`), gill slits, the coral-crowned staff with its pearl of sea light

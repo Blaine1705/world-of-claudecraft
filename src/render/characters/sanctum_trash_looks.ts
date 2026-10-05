@@ -16,10 +16,13 @@ import {
   BONEGUARD_ID,
   BONEWALKER_ID,
   SCALEGUARD_ID,
+  THAWCALLER_ID,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import {
   SANCTUM_CINDER_BREATH,
   SANCTUM_COUNTERWEIGHT_LASH,
+  SANCTUM_THAW_THE_HELD,
+  SANCTUM_WARMING_RITE,
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
 import {
   BONEWALKER_RISE_GESTURE,
@@ -114,6 +117,24 @@ export const SCALEGUARD_CLIP = { cinderBreath: 2.0, counterweightLash: 1.0 } as 
 
 const scaleguard = MOBS[SCALEGUARD_ID];
 
+// ---- the Broodsworn cultists ----------------------------------------------------------
+
+/** The Broodsworn Thawcaller: a Gravecaller in a quilted fur-collared robe and
+ *  a deep hood, swinging a caged soul lantern on a shepherd's crook (26 bones,
+ *  ten skinned material parts, a 30 fps timeline). */
+export const THAWCALLER_BODY: SanctumTrashBody = {
+  url: `${CREATURES}/sanctum_thawcaller.glb`,
+  idleHeight: 4.4957,
+  walkRef: 1.125,
+  runRef: 4.5,
+};
+
+/** Its rites' contact frames (seconds at 1x): the Warming Rite's soulfire
+ *  leaves the lantern; Thaw the Held's soul is ripped up out of the corpse. */
+export const THAWCALLER_CLIP = { warmingRite: 2.5, thawTheHeld: 3.0 } as const;
+
+const thawcaller = MOBS[THAWCALLER_ID];
+
 export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
   // 4.6 yd to the helm's peak at its 1.15.
   sanctum_boneguard: {
@@ -179,5 +200,42 @@ export const SANCTUM_TRASH_LOOKS: Record<string, VisualDef> = {
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.06,
+  },
+  // 4.4 yd at its 1.6. The Warming Rite raises the lantern over a hurt ally;
+  // Thaw the Held bows it low over the Boneguard's corpse, the lantern
+  // circling, the free hand clawing at the ice, and rips the soul up on the 3 s
+  // bar's end. Both land on their bars and play their follow-through out.
+  sanctum_thawcaller: {
+    ...sized(THAWCALLER_BODY, THAWCALLER_ID),
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [SANCTUM_WARMING_RITE]: 'WarmingRite',
+        [SANCTUM_THAW_THE_HELD]: 'ThawTheHeld',
+      },
+      castTimeScaleByAbility: {
+        [SANCTUM_WARMING_RITE]: barRate(
+          THAWCALLER_CLIP.warmingRite,
+          thawcaller?.trashKit?.mend?.castTime,
+        ),
+        [SANCTUM_THAW_THE_HELD]: barRate(
+          THAWCALLER_CLIP.thawTheHeld,
+          thawcaller?.trashKit?.reanimate?.castTime,
+        ),
+      },
+      castPlayOut: ['WarmingRite', 'ThawTheHeld'],
+    },
+    castClipSync: true,
+    castPlayOutHoldsAttacks: true,
+    attackTimeScale: 1,
+    deathTimeScale: 1,
+    authoredAtlas: true,
+    selfIllumination: 0.05,
   },
 };
