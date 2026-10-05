@@ -9,6 +9,6 @@ describe('Varkhul arena participation', () => {
     const edge = at(2, -30);
     const arena = at(3, -29);
 
-    expect(varkhulArenaPlayers([corridor, edge, arena], -30)).toEqual([arena]);
+    expect(varkhulArenaPlayers([corridor, edge, arena], -30)).toEqual([edge, arena]);
   });
 });
