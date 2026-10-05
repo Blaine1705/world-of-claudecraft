@@ -770,8 +770,10 @@ function across(dx: number, dz: number): number {
 }
 
 /** Both wings: the two Chain Stairs rise together once BOTH are clear (the
- *  terrace is entered only with both stairs open, design section 4). */
-const BOTH_WINGS = ['g4', 'g5', 'pb', 'g6', 'g7'] as const;
+ *  terrace is entered only with both stairs open, design section 4). Korgath
+ *  shouts down at the group as these fall (encounters/gravewyrm_sanctum/
+ *  korgath_barks.ts). */
+export const SANCTUM_WING_PACKS = ['g4', 'g5', 'pb', 'g6', 'g7'] as const;
 
 export const GRAVEWYRM_SANCTUM_GATES: DungeonGateDef[] = [
   {
@@ -793,7 +795,7 @@ export const GRAVEWYRM_SANCTUM_GATES: DungeonGateDef[] = [
     z: -25.5,
     hw: 5.6,
     rot: across(32, 7),
-    packs: [...BOTH_WINGS],
+    packs: [...SANCTUM_WING_PACKS],
     sealWhileEngaged: 'korgath_the_bound',
     openText: 'Both wings fall silent. The grates of the Chain Stairs rise on groaning chains.',
   },
@@ -805,7 +807,7 @@ export const GRAVEWYRM_SANCTUM_GATES: DungeonGateDef[] = [
     z: -25.5,
     hw: 5.6,
     rot: across(-32, 7),
-    packs: [...BOTH_WINGS],
+    packs: [...SANCTUM_WING_PACKS],
     sealWhileEngaged: 'korgath_the_bound',
   },
   {
