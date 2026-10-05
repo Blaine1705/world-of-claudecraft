@@ -936,33 +936,31 @@ since the spider placeholder and pinned by `tests/hollow_crypt_alert.test.ts`).
 | Rimeweb Fang | RENAMED before the rework shipped (theme) | The committed icon is a pale curved ice blade, not a fang. Now Bride's Icicle (`rimeweb_fang`, and its generated heroic twin, which reads the base name). No match on either wiki. |
 | Rimesilk | kept | A bride's silk: Rimesilk Mantle and Rimesilk Hood keep their names. |
 
-### Morthen's Rite and the Knellwyrm's Burning Knell (PENDING a manual web check, 2026-10-05)
+### Morthen's Rite and the Knellwyrm's Burning Knell (web-checked 2026-10-05)
 
 The new player-visible names of Morthen the Gravecaller's three-act rite
 (`src/sim/encounters/hollow_crypt/morthen_ids.ts` and its siblings), the Knellwyrm's heroic
 flight (`knellwyrm_knell.ts`) and the rite's deed (`dgn_morthen_candlelight` in
-`src/sim/content/deeds.ts`). The web search was not available in the authoring session, so
-NONE of these has had the exact-phrase and coined-token searches yet: every row below is
-recorded as pending, to be checked against the major game wikis (warcraft.wiki.gg full text,
-the Guild Wars wiki, the FFXIV wiki) before the change ships. A collision found then is fixed
-display-only (the ids stay frozen) and pinned in `tests/originality_renames.test.ts`.
+`src/sim/content/deeds.ts`). The authoring session had no web search, so the exact-phrase
+and coined-token searches ran in a follow-up session on the same day, before the change
+shipped. One collision was found and renamed before shipping (the id stays frozen).
 
 | Name | Where | Verdict |
 |---|---|---|
-| Gravecall | the Bound Soul launch (finder copy) | PENDING a manual web check. Builds on this game's own "Gravecall" token (Gravecall Acolyte, Morthen the Gravecaller). |
+| Gravecall | the Bound Soul launch (finder copy) | KEEP. Builds on this game's own shipped "Gravecall" token (Gravecall Acolyte, Morthen the Gravecaller). Elsewhere only as a minor compound (an EverQuest II sword "Gravecall, Sword of Culling", an Age of Wonders 4 staff); not distinctive to one game. |
 | Gorged on the Dead | Morthen's stacking damage buff from the souls | Chosen in the crypt rework's 2026-09-29 naming pass to replace the rejected "Soul Tithe" (`docs/design/dungeon-rework/hollow_crypt.md` section 10); re-confirm with the rest of this table. |
 | Rite of the Unquiet | his act-two channel at the altar | Chosen in the same 2026-09-29 pass to replace the rejected "Rite of Unmaking" (section 10); re-confirm with the rest of this table. |
-| Unquiet Ward | his immunity through the Rite | PENDING a manual web check. |
-| Reap the Unquiet | his Last Rites frontal sweep | PENDING a manual web check. |
-| Name the Dead | the heroic candle order (the Ledger) | PENDING a manual web check. |
-| Grasp of the Grave | the heroic rings and their hands | PENDING a manual web check. |
-| Burning Knell | the Knellwyrm's heroic flight | PENDING a manual web check. |
-| By Candlelight | the rite's deed | PENDING a manual web check (a common English phrase; a song and book title in the wider world, so check it against game achievement lists). |
-| Bound Soul | the soul itself | PENDING a manual web check. Reuses this game's own mob name (`bound_soul`), likely GENERIC. |
-| Grave Chill | the Rite's rising shadow damage | PENDING a manual web check; likely GENERIC vocabulary. |
-| Remembrance Candle | the four candles and their usable bodies | PENDING a manual web check; likely GENERIC vocabulary (a real-world memorial candle). |
-| Candle's Price | the relight's health drain (a damage name) | PENDING a manual web check; likely GENERIC vocabulary. |
-| Rite Broken, Shattered Ward | the stun and the vulnerability when the fourth candle catches | PENDING a manual web check; likely GENERIC vocabulary. |
+| Unquiet Ward | his immunity through the Rite | CLEAR. No match for the full name (only The Elder Scrolls Online quest "The Unquiet Dead" shares the common word). |
+| Reap the Unquiet | his Last Rites frontal sweep | CLEAR. No match. |
+| Name the Dead | the heroic candle order (the Ledger) | CLEAR. No match on the WoW, Guild Wars or FFXIV wikis. |
+| Grasp of the Grave | the heroic rings and their hands | GENERIC. No match on the WoW, Guild Wars, FFXIV or PoE wikis; the phrase is a stock tabletop necromancy spell name (D&D 4e, several d20 publishers, GemStone IV), shared generic fantasy English. |
+| Burning Knell | the Knellwyrm's heroic flight | CLEAR. No match. |
+| By Candlelight | RENAMED before shipping | COLLISION: the exact title of a World of Warcraft storyline (The War Within). The deed ships as Every Candle Lit (`dgn_morthen_candlelight`); no match for that name. |
+| Bound Soul | the soul itself | GENERIC. Reuses this game's own mob name (`bound_soul`). |
+| Grave Chill | the Rite's rising shadow damage | GENERIC, as already recorded for Wraithbinder Maldrec's pulse (this audit's mechanic table). An exact World of Warcraft spell name exists (a Shadowlands zone hazard), but the two words are plain English and the name already shipped here. |
+| Remembrance Candle | the four candles and their usable bodies | GENERIC. A real-world memorial candle; no game match. |
+| Candle's Price | the relight's health drain (a damage name) | CLEAR. No match. |
+| Rite Broken, Shattered Ward | the stun and the vulnerability when the fourth candle catches | GENERIC. Plain English. |
 | Shadow Pulse, Relight the Candle, the Ledger | the pulse (already shipped on him as GENERIC), the relight bar, the book that names the order | GENERIC. Plain English. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)

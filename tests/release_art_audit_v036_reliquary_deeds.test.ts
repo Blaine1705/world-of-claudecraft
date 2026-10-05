@@ -294,7 +294,7 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // five-dungeon rework's 19 encounter deeds, all pending: still 289 painted.
     // 339 with the Drowned Temple lore guide's deed, pending: still 289.
     // 342 with the Hollow Crypt wing bosses' three, pending: still 289.
-    // 343 with Morthen's By Candlelight, pending: still 289.
+    // 343 with Morthen's Every Candle Lit, pending: still 289.
     expect(DEED_ORDER).toHaveLength(343);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);

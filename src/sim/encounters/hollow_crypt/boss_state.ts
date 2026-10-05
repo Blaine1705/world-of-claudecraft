@@ -148,7 +148,7 @@ export interface MorthenFightState {
    *  elapsed seconds when last seen (a smaller one is a new channel). */
   channels: { playerId: number; drains: number; seen: number }[];
   /** fightT when the ward rose (the deed's clock), and whether all four were
-   *  relit in time (By Candlelight). */
+   *  relit in time (Every Candle Lit). */
   riteAt: number;
   candlelight: boolean;
   /** Heroic Grasp of the Grave: the rings on the floor (instance-local), the

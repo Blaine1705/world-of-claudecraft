@@ -116,7 +116,7 @@ describe('deed_i18n English resolution', () => {
     // 308 with the Drowned Temple rework's four. 310 with the Knellwyrm and
     // the Gaol Turnkey deeds. 314 with the Wildheart Basin's four. 319 with
     // the Gravewyrm Sanctum's five. 320 with the Drowned Temple lore guide's.
-    // 323 with the Hollow Crypt wing bosses' three. 324 with By Candlelight.
+    // 323 with the Hollow Crypt wing bosses' three. 324 with Every Candle Lit.
     expect(manifest.filter((row) => row.field === 'desc').length).toBe(324);
     // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
     // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
@@ -126,7 +126,7 @@ describe('deed_i18n English resolution', () => {
     // 698 with the Wildheart Basin's four; 708 with the Gravewyrm Sanctum's
     // five; 711 with the Drowned Temple lore guide's name, desc and title
     // (Witness of the Choir); 717 with the Hollow Crypt wing bosses' three (a
-    // name and a desc each); 719 with Morthen's By Candlelight.
+    // name and a desc each); 719 with Morthen's Every Candle Lit.
     expect(manifest.length).toBe(719);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(52);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([

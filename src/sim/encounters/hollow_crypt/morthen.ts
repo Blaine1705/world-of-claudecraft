@@ -391,7 +391,7 @@ export function resetMorthen(ctx: SimContext, inst: InstanceSlot, boss: Entity):
   boss.cryptBossFight = undefined;
 }
 
-/** Morthen was slain: the deed (By Candlelight), then the tidy-up. */
+/** Morthen was slain: the deed (Every Candle Lit), then the tidy-up. */
 function concludeMorthen(
   ctx: SimContext,
   inst: InstanceSlot,

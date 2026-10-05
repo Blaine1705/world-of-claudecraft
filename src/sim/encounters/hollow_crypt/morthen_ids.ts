@@ -222,7 +222,7 @@ export const MORTHEN_TUNING = {
   graspRootSeconds: 3,
   graspMin: 18,
   graspMax: 22,
-  /** The deed (By Candlelight): all four candles relit within this many
+  /** The deed (Every Candle Lit): all four candles relit within this many
    *  seconds of the ward rising. */
   candlelightSeconds: 20,
 } as const;

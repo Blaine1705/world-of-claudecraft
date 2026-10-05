@@ -6169,7 +6169,7 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "dgn_morthen_candlelight",
-    "name": "By Candlelight",
+    "name": "Every Candle Lit",
     "category": "dungeon",
     "renown": 10,
     "feat": false

@@ -6,7 +6,7 @@
 // G3 use kept through hits, healable, completing, uncheesable), the ward
 // shattering (stun and vulnerability), his Last Rites at 35 percent (Reap the
 // Unquiet), the heroic Name the Dead and Grasp of the Grave, the wipe reset,
-// the By Candlelight deed and determinism. Full Sim ticks in a real claimed
+// the Every Candle Lit deed and determinism. Full Sim ticks in a real claimed
 // Hollow Crypt.
 
 import { describe, expect, it, vi } from 'vitest';
@@ -587,7 +587,7 @@ describe('Morthen: the end of the fight', () => {
       expect(objectsOf(f, t)).toHaveLength(0);
   });
 
-  it('By Candlelight: all four relit within 20 s of the ward earns the deed at the kill', () => {
+  it('Every Candle Lit: all four relit within 20 s of the ward earns the deed at the kill', () => {
     const { f, m } = morthenFight();
     toShare(f, m, 0.64);
     for (let i = 0; i < 4; i++) cryptDevTrigger(f.sim.ctx, f.inst, 'candle');

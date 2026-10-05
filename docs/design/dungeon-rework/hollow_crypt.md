@@ -316,7 +316,7 @@ measured with the meters harness before shipping, like the wing bosses.
 | | Shadow Pulse | every 9 s | as above |
 | Heroic | Name the Dead | the Ledger names the candle order (a hashed permutation, the named candle's object glows); lighting another candle snuffs the last one lit (its body back) and burns the lighter; the wrong candle stays dark | 28 to 32 shadow at the heroic factor |
 | | Grasp of the Grave | every 16 s (first 10 s), in every act, two hashed players get a 4 yd ring locked under them; after 1.5 s hands erupt inside it | a 3 s root and 18 to 22 shadow at the heroic factor |
-| Deed | By Candlelight (`dgn_morthen_candlelight`) | all four candles relit within 20 s of the ward rising, granted at the kill | |
+| Deed | Every Candle Lit (`dgn_morthen_candlelight`) | all four candles relit within 20 s of the ward rising, granted at the kill | |
 
 **Heroic mechanic damage** rides `mechanicDamageMultiplierByMob.morthen` 9 on heroic
 cloth of about 1,250: Shadow Pulse 216 to 270 (about 19, avoidable), a soul taken
@@ -342,12 +342,11 @@ it flies.
 **Dev.** `/dev crypt pull morthen`, `/dev crypt hp <percent>` (Morthen and the
 Knellwyrm too), `/dev crypt trigger <pulse|gravecall|rite|candle|reap|grasp|knell>`.
 
-**Names pending a manual web check.** The session's web search budget ran out:
-Gravecall, Bound Soul, Unquiet Ward, Grave Chill, Remembrance Candle, Candle's
-Price, Rite Broken, Shattered Ward, Reap the Unquiet, Name the Dead, Grasp of the
-Grave, By Candlelight and Burning Knell are recorded as pending in
-`docs/design/naming-audit.md` (Gorged on the Dead and Rite of the Unquiet were
-cleared on 2026-09-29, section 10).
+**Names web-checked (2026-10-05).** Every new name of the rite, the Knellwyrm's
+flight and the deed was searched against the major game wikis; verdicts are in
+`docs/design/naming-audit.md`. The deed first drafted as "By Candlelight" (a World
+of Warcraft storyline title) ships as Every Candle Lit; every other name is kept
+(Gorged on the Dead and Rite of the Unquiet were cleared on 2026-09-29, section 10).
 
 Unique core per boss: placed graves that become adds (Marrow), shelter in the
 lanterns and free the embraced (the Lady of the Bonechill), interrupt or break line of sight (Ilvane), intercept walkers
@@ -488,7 +487,7 @@ epics in each partition, the trinket on Ilvane, Bastion Sigil on Morthen).
     Bonechill without her ever dropping anyone from her Frozen Embrace (built).
   - `dgn_ilvane_hush`: "Hush Now": defeat Cantor Ilvane without her Dirge of the
     Hollow ever striking anyone (built).
-  - `dgn_morthen_candlelight`: "By Candlelight": defeat Morthen after relighting
+  - `dgn_morthen_candlelight`: "Every Candle Lit": defeat Morthen after relighting
     all four Remembrance Candles within 20 s of his Unquiet Ward rising (built).
   - The shipped `dgn_hollow_crypt`, `_heroic`, `dgn_morthen_flawless` and
     `dgn_morthen_trio` stay as they are.
