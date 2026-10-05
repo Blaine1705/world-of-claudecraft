@@ -412,8 +412,10 @@ function extractModule(name: string, pack: Pack, gltf: LoadedGltf): void {
 }
 
 function loadModuleAsset(name: string, pack: Pack): Promise<void> {
+  if (moduleAssets.has(name)) return Promise.resolve();
   const url = `models/dungeon/${name}.glb`;
   return loadGltf(url).then((g) => {
+    if (moduleAssets.has(name)) return;
     extractModule(name, pack, g);
     releaseGltf(url);
   });
@@ -423,7 +425,12 @@ export function ensureDungeonAssets(): Promise<void> {
   dungeonAssetsPromise ??= Promise.all([
     ...KIT_MODELS.map((name) => loadModuleAsset(name, 'kit')),
     ...BITS_MODELS.map((name) => loadModuleAsset(name, 'bits')),
-  ]).then(() => undefined);
+  ])
+    .then(() => undefined)
+    .catch((error) => {
+      dungeonAssetsPromise = null;
+      throw error;
+    });
   return dungeonAssetsPromise;
 }
 
