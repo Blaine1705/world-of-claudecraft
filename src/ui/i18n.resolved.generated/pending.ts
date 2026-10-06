@@ -34,30 +34,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dungeonDifficulty.queuedCancelled",
     "hudChrome.dungeonDifficulty.queuedOccupied"
   ],
-  "zh_CN": [
-    "hudChrome.dungeonDifficulty.queuedCancelled",
-    "hudChrome.dungeonDifficulty.queuedOccupied"
-  ],
-  "zh_TW": [
-    "hudChrome.dungeonDifficulty.queuedCancelled",
-    "hudChrome.dungeonDifficulty.queuedOccupied"
-  ],
-  "ko_KR": [
-    "hudChrome.dungeonDifficulty.queuedCancelled",
-    "hudChrome.dungeonDifficulty.queuedOccupied"
-  ],
-  "ja_JP": [
-    "hudChrome.dungeonDifficulty.queuedCancelled",
-    "hudChrome.dungeonDifficulty.queuedOccupied"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.dungeonDifficulty.queuedCancelled",
     "hudChrome.dungeonDifficulty.queuedOccupied"
   ],
-  "ru_RU": [
-    "hudChrome.dungeonDifficulty.queuedCancelled",
-    "hudChrome.dungeonDifficulty.queuedOccupied"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.dungeonDifficulty.queuedCancelled",
     "hudChrome.dungeonDifficulty.queuedOccupied"
