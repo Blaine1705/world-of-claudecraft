@@ -15,15 +15,15 @@
 
 import * as THREE from 'three';
 import { RITUAL_VAULT, THAW_POOLS } from '../../sim/content/gravewyrm_sanctum_layout';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { sanctumGround } from './sanctum_plan_core';
-
 /** How far the water's top stands over the vault floor (yards). */
 export const VAULT_POOL_LIFT = 0.05;
 
-const VERT = /* glsl */ `
+const VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vLocal;
 varying vec3 vWorld;
 #include <fog_pars_vertex>
@@ -33,7 +33,7 @@ void main() {
   vLocal = position.xz;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

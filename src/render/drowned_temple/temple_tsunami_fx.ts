@@ -29,6 +29,7 @@
 
 import * as THREE from 'three';
 import { HYDRA_TUNING } from '../../sim/encounters/drowned_temple/ids';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
   DUST_FRAG,
@@ -76,7 +77,7 @@ const glf = (n: number) => n.toFixed(4);
 // One mesh, two strips: the FRONT face (toe, concave face, crest, the lip that
 // throws and curls) read from the core's profile table, and the convex BACK
 // slope from its foot up to the crest, so a side view has body and depth.
-const WAVE_VERT = /* glsl */ `
+const WAVE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aProf; // v (0 foot, 1 top of the strip), side (0 face, 1 back), u across
 uniform vec3 uProf[${PN}];
 uniform vec3 uSoft[${PN}];
@@ -136,7 +137,7 @@ void main() {
   vWorld = w.xyz;
   vN = normalize(mat3(modelMatrix) * vec3(0.0, nzy.y, nzy.x));
   vProf = vec4(v, side, u, h01);
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 
@@ -209,7 +210,7 @@ void main() {
 // The lingering foam: flat lace patches lying on the floor and the pool's
 // water, on the Crypt kit's launch attributes (ParticlePool), drifting a hand
 // along the heading and opening into holes as they thin away.
-const FOAM_VERT = /* glsl */ `
+const FOAM_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 attribute vec3 aPos0;
 attribute vec3 aVel;
@@ -234,7 +235,7 @@ void main() {
   float size = mix(aShape.x, aShape.y, t);
   float c = cos(aShape.z), s = sin(aShape.z);
   vec2 q = vec2(position.x * c - position.y * s, position.x * s + position.y * c) * size;
-  gl_Position = projectionMatrix * viewMatrix * vec4(p.x + q.x, p.y, p.z + q.y, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(vec3(p.x + q.x, p.y, p.z + q.y));
 }
 `;
 

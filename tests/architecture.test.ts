@@ -825,6 +825,8 @@ const RENDER_PURE_CORES = [
   'src/render/far_lod_latch_core.ts',
   // The Hollow Crypt finale's effect plan (Morthen's entrance, the Knellwyrm).
   'src/render/hollow_crypt/crypt_boss_fx_core.ts',
+  // Cantor Ilvane's Dirge plan (swell, voices, the shock of sound, the marks).
+  'src/render/hollow_crypt/ilvane_dirge_fx_core.ts',
   'src/render/hollow_crypt/crypt_finale_fx_core.ts',
   // Morthen the Lich Bishop's stance latch, body anchors and effect timings.
   'src/render/hollow_crypt/morthen_fx_core.ts',
@@ -917,6 +919,8 @@ const RENDER_PURE_CORES = [
   // looks, the wall box, the nova's sight reach and wave, the use hint, the
   // freeze and encase timelines, the quench pools' placement.
   'src/render/trash_engine_fx/trash_engine_fx_core.ts',
+  // The line-of-sight field's dense draped layout (shared by the nova and the Dirge).
+  'src/render/trash_engine_fx/sight_field_core.ts',
   'src/render/characters/turn_in_place_core.ts',
   'src/render/characters/glow_pulse_core.ts',
   // Creased smooth normals for a faceted rig (VisualDef.smoothNormals).

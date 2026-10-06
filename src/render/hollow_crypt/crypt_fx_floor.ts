@@ -9,6 +9,7 @@
 
 import * as THREE from 'three';
 
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 /** Polar floor patch vertex: `aPolar` carries (normalized radius, angle
  *  fraction); the noise reads the patch's local frame (instance bands sit far
  *  out, past where a float hash stays smooth). */
@@ -54,7 +55,7 @@ void main() {
  * from A (0) to B (1). Degenerate ends (A on B, or the ribbon pointing at the
  * camera) fall back to a fixed side so no NaN reaches the bloom.
  */
-export const BEAM_VERT = /* glsl */ `
+export const BEAM_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform vec3 uA;
 uniform vec3 uB;
 uniform float uWidth;
@@ -78,12 +79,12 @@ void main() {
   p += side * sin(t * 9.0 - uTime * 6.0) * uWave * 4.0 * t * (1.0 - t);
   p += side * position.x * uWidth;
   vUv = vec2(position.x + 0.5, t);
-  gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(p);
 }
 `;
 
 /** A camera-facing quad of the mesh's scale at its position. */
-export const GLYPH_VERT = /* glsl */ `
+export const GLYPH_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 void main() {
   vUv = uv;
@@ -92,7 +93,7 @@ void main() {
   vec3 camRight = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
   vec3 camUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
   vec3 w = c.xyz + (camRight * position.x + camUp * position.y) * s;
-  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
 

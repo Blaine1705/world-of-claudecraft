@@ -9,12 +9,13 @@
 // sun in the shader (no light). Cosmetic: the lanes' telegraphs are the kit's.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { BASIN_SUN_DIRECTION } from './basin_plan_core';
 import { type ThornGrowth, thornGrowthInto } from './basin_thorns_core';
 
 const THORN_SLOTS = 96;
 
-const THORN_VERT = /* glsl */ `
+const THORN_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute float aV;
 varying float vV;
 varying vec3 vN;
@@ -26,7 +27,7 @@ void main() {
   mat3 im = mat3(instanceMatrix);
   vec3 s2 = vec3(dot(im[0], im[0]), dot(im[1], im[1]), dot(im[2], im[2]));
   vN = normalize(mat3(modelMatrix) * (im * (normal / max(s2, vec3(1e-6)))));
-  gl_Position = projectionMatrix * viewMatrix * m * vec4(position, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView((m * vec4(position, 1.0)).xyz);
 }
 `;
 

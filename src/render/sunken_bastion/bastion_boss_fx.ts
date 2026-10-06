@@ -40,6 +40,7 @@ import {
 } from '../../sim/encounters/sunken_bastion';
 import { TRASH_WITHDRAW_AURA } from '../../sim/mob/trash_kit/support';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
@@ -106,14 +107,14 @@ function auraOf(e: EntityView, id: string): EntityView['auras'][number] | undefi
 
 // ---- shaders ---------------------------------------------------------------------
 
-const WATER_VERT = /* glsl */ `
+const WATER_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vWorld;
 void main() {
   vUv = uv;
   vec4 w = modelMatrix * vec4(position, 1.0);
   vWorld = w.xyz;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 
@@ -152,14 +153,14 @@ void main() {
 `;
 
 // The Hermit's withdraw dome: a barnacle-sheened fresnel shell.
-const DOME_VERT = /* glsl */ `
+const DOME_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vNormalW;
 varying vec3 vWorld;
 void main() {
   vec4 w = modelMatrix * vec4(position, 1.0);
   vWorld = w.xyz;
   vNormalW = normalize(mat3(modelMatrix) * normal);
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 

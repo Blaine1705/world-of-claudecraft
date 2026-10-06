@@ -22,6 +22,7 @@
 // Zero rng in every pick (pickMarkTargets hashes the victims); the only draws
 // are the damage rolls, in claim-player order.
 
+import { beginCastHold, endCastHold, keepCastHold } from '../../mob/trash_kit/cast_hold';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
 import { inCone } from '../../mob/trash_kit/targets';
 import type { InstanceSlot } from '../../sim';
@@ -163,6 +164,9 @@ export function startMarrowBar(
   boss.facing = yaw;
   st.bar = { what, targetId: target.id, yaw };
   startBar(boss, BAR_ID[what], BAR_SECONDS[what], target.id);
+  // He works planted: the spot and the aim the bar began with, however his
+  // foe moves (mob/trash_kit/cast_hold.ts).
+  beginCastHold(boss, BAR_ID[what]);
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,
@@ -183,6 +187,7 @@ function landBar(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: MarrowFi
   if (!bar) return;
   st.bar = null;
   clearCastIf(boss, BAR_ID[bar.what]);
+  endCastHold(boss);
   const target = ctx.entities.get(bar.targetId);
   if (bar.what === 'shovel') {
     ctx.emit({
@@ -408,6 +413,7 @@ export function beginToll(
   if (st.toll) return false;
   if (st.bar) clearCastIf(boss, BAR_ID[st.bar.what]);
   st.bar = null;
+  endCastHold(boss);
   st.tolls++;
   st.toll = { phase: 'stride', t: 0, peals: 0 };
   boss.damageImmune = true;
@@ -521,6 +527,7 @@ export function resetMarrow(ctx: SimContext, inst: InstanceSlot, boss: Entity): 
     if (st.bar) clearCastIf(boss, BAR_ID[st.bar.what]);
     if (st.toll) endToll(boss, st);
   }
+  endCastHold(boss);
   boss.damageImmune = false;
   boss.auras = boss.auras.filter((a) => a.id !== MARROW_TOLLING && a.id !== MARROW_GRAVE_VIGOR);
   clearMarks(ctx, inst);
@@ -583,10 +590,14 @@ export function tickMarrow(
     const bar = st.bar;
     if (boss.castingAbility !== BAR_ID[bar.what]) {
       st.bar = null;
+      endCastHold(boss);
       return;
     }
-    const at = localOf(ctx, inst, boss);
-    holdAt(ctx, inst, boss, at.x, at.z);
+    // The mob AI walked and turned him this tick: stand him back on the spot
+    // and the facing the bar began with (never where the chase left him).
+    keepCastHold(boss, BAR_ID[bar.what]);
+    boss.swingTimer = Math.max(boss.swingTimer, 0.6);
+    ctx.grid.update(boss);
     // The cone's aim is locked; a mark bar keeps turning to its victim.
     if (bar.what === 'shovel') boss.facing = bar.yaw;
     else {

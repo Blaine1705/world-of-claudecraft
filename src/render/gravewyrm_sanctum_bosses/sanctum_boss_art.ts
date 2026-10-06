@@ -9,6 +9,8 @@
 
 import * as THREE from 'three';
 
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
+
 const NOISE = /* glsl */ `
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 vec2 h22(vec2 p) {
@@ -363,14 +365,14 @@ export function chainMaterial(uTime: { value: number }) {
 
 // ---- the Held statue's ice ----------------------------------------------------------
 
-const ICE_VERT = /* glsl */ `
+const ICE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
 varying vec3 vV;
 void main() {
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vN = normalize(mat3(modelMatrix) * normal);
   vV = normalize(cameraPosition - wp.xyz);
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 const ICE_FRAG = /* glsl */ `
@@ -519,7 +521,7 @@ void main() {
   gl_FragColor = vec4(col, 1.0);
 }
 `;
-const IRON_VERT = /* glsl */ `
+const IRON_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
 varying vec3 vV;
 varying vec3 vL;
@@ -528,7 +530,7 @@ void main() {
   vN = normalize(mat3(modelMatrix) * normal);
   vV = normalize(cameraPosition - wp.xyz);
   vL = position;
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 

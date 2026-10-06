@@ -9,6 +9,7 @@
 
 import * as THREE from 'three';
 import { PRISM_TERRACE } from '../../sim/content/drowned_temple_layout';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { templeGateOpenness } from './temple_gates';
 import { MOON_COLUMN, POOL_WATER, PRISM_TOWER, templeHash } from './temple_plan_core';
@@ -190,7 +191,7 @@ void main() {
 }
 `;
 
-const POOL_VERT = /* glsl */ `
+const POOL_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vWorld;
 #include <fog_pars_vertex>
@@ -198,7 +199,7 @@ void main() {
   vUv = uv;
   vec4 w = modelMatrix * vec4(position, 1.0);
   vWorld = w.xyz;
-  vec4 mvPosition = viewMatrix * w;
+  vec4 mvPosition = wocCamRelView(w.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

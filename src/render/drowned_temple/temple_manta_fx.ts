@@ -27,6 +27,7 @@ import { TEMPLE_PEARL_CARAPACE, TEMPLE_PEARL_SLAM } from '../../sim/mob/trash_ki
 import { TEMPLE_CARAPACE_AURA } from '../../sim/mob/trash_kit/temple_kit';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import type { TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
@@ -101,7 +102,7 @@ void main() {
 
 // The Nacre Cocoon: pearl light with a nacre sheen, the moon's eight phases
 // round its belt, cracks of light opening as the ward is spent.
-const SHELL_VERT = /* glsl */ `
+const SHELL_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
 varying vec3 vView;
 varying vec3 vLocal;
@@ -110,7 +111,7 @@ void main() {
   vec4 world = modelMatrix * vec4(position, 1.0);
   vN = normalize(mat3(modelMatrix) * normal);
   vView = normalize(cameraPosition - world.xyz);
-  gl_Position = projectionMatrix * viewMatrix * world;
+  gl_Position = projectionMatrix * wocCamRelView(world.xyz);
 }
 `;
 

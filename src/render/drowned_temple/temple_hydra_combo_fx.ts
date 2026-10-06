@@ -53,6 +53,7 @@ import {
 } from '../../sim/encounters/drowned_temple/ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import type { TelegraphKit, TelegraphLane } from '../floor_telegraph';
 import { TELEGRAPH_ACCENTS, TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -170,7 +171,7 @@ void main() {
 }
 `;
 
-const SOLID_VERT = /* glsl */ `
+const SOLID_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
 varying vec3 vW;
 varying float vH;
@@ -179,7 +180,7 @@ void main() {
   vW = w.xyz;
   vH = position.y;
   vN = normalize(mat3(modelMatrix) * normal);
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 

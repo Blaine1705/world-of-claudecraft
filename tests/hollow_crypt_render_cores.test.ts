@@ -31,11 +31,7 @@ import {
   telegraphFill,
   telegraphYaw,
 } from '../src/render/hollow_crypt/crypt_trash_fx_core';
-import {
-  HOLLOW_CRYPT_FIELD,
-  HOLLOW_CRYPT_RING,
-  RITE_DAIS,
-} from '../src/sim/content/hollow_crypt_layout';
+import { HOLLOW_CRYPT_FIELD, HOLLOW_CRYPT_RING } from '../src/sim/content/hollow_crypt_layout';
 import { MOBS } from '../src/sim/data';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 import {
@@ -108,8 +104,8 @@ describe('authored field terrain plan', () => {
       flare: 0.2,
     });
     const ys = cliffs.positions.filter((_, i) => i % 3 === 1);
-    // The Rite dais's rim (the raised floor where Morthen stands) tops them.
-    expect(Math.max(...ys)).toBeCloseTo(HOLLOW_CRYPT_RING.h + RITE_DAIS.rise, 5);
+    // The Rite Ring's rim (the crag top, the highest floor) tops them.
+    expect(Math.max(...ys)).toBeCloseTo(HOLLOW_CRYPT_RING.h, 5);
     expect(Math.min(...ys)).toBeCloseTo(-65, 5);
     expect(cliffs.indices.length % 3).toBe(0);
   });

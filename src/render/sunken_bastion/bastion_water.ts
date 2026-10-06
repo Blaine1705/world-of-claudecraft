@@ -12,11 +12,12 @@ import {
   DROWNING_WINCH,
   DROWNING_YARD,
 } from '../../sim/content/sunken_bastion_layout';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { SUNKEN_BASTION_SUN_DIRECTION } from '../interior_light_rig';
 import { bastionHash } from './bastion_plan_core';
 
-const WATER_VERT = /* glsl */ `
+const WATER_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 varying vec3 vWorld;
 varying vec2 vUv;
 #include <fog_pars_vertex>
@@ -24,7 +25,7 @@ void main() {
   vUv = uv;
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
-  vec4 mvPosition = viewMatrix * world;
+  vec4 mvPosition = wocCamRelView(world.xyz);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

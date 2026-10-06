@@ -1,7 +1,8 @@
 // The Hollow Crypt wing bosses' pure effect plan (src/render/hollow_crypt/
-// crypt_boss_fx_core.ts): the pillar shadows agree with the sim's line of
-// sight, the lantern looks follow the sim's lantern states, the bell rope and
-// its swing, the grave opening and the slot origin.
+// crypt_boss_fx_core.ts): the lantern looks follow the sim's lantern states,
+// the bell rope and its swing, the grave opening and the slot origin. (The
+// Dirge's pillar shadows are the shared sight field now:
+// tests/ilvane_dirge_fx_core.test.ts.)
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -13,46 +14,10 @@ import {
   graveOpening,
   lanternLook,
   noteRun,
-  pillarShadow,
   pulse,
   ropePull,
 } from '../src/render/hollow_crypt/crypt_boss_fx_core';
-import { HOLLOW_CRYPT_FIELD } from '../src/sim/content/hollow_crypt_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
-
-/** Is (x, z) inside the convex quad (any winding)? */
-function inQuad(q: [number, number][], x: number, z: number): boolean {
-  let sign = 0;
-  for (let i = 0; i < q.length; i++) {
-    const [ax, az] = q[i];
-    const [bx, bz] = q[(i + 1) % q.length];
-    const c = (bx - ax) * (z - az) - (bz - az) * (x - ax);
-    if (Math.abs(c) < 1e-9) continue;
-    const s = Math.sign(c);
-    if (sign === 0) sign = s;
-    else if (s !== sign) return false;
-  }
-  return true;
-}
-
-describe('crypt boss fx core: the pillar shadows', () => {
-  it('covers the spot the Ilvane suite hides behind the (8, 158) pillar, not the open one', () => {
-    const q = pillarShadow(0, 163, 8, 158, 1.4, 30);
-    expect(q).not.toBeNull();
-    if (!q) return;
-    expect(inQuad(q, 14, 154.25)).toBe(true);
-    expect(inQuad(q, -4, 155)).toBe(false);
-    // Never in front of the pillar (between her and it).
-    expect(inQuad(q, 4, 160.5)).toBe(false);
-  });
-
-  it('has none when she stands inside the pillar, and one per choir pillar otherwise', () => {
-    expect(pillarShadow(8, 158, 8, 158, 1.4, 30)).toBeNull();
-    const pillars = HOLLOW_CRYPT_FIELD.props.filter((p) => p.kind === 'hc_choir_pillar');
-    expect(pillars).toHaveLength(6);
-    for (const p of pillars) expect(pillarShadow(0, 163, p.x, p.z, p.r ?? 1.4, 30)).not.toBeNull();
-  });
-});
 
 describe('crypt boss fx core: the lanterns, the bell, the graves', () => {
   it('draws the shelter pool only for a lit lantern, a weak stutter while kindling', () => {

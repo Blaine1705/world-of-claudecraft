@@ -30,6 +30,7 @@ import { DROWNED_TEMPLE_WATER_LEVEL } from '../../sim/content/drowned_temple_lay
 import { dungeonAt } from '../../sim/data';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { GLOW_FRAG, PARTICLE_VERT, ParticlePool } from '../hollow_crypt/crypt_fx_particles';
 import {
@@ -205,7 +206,7 @@ void main() {
 
 // A fallen body's glow on the stones (instanced): the outline kindles, the
 // body fills with light, then it breaks up from the edges in and is gone.
-const BODY_VERT = /* glsl */ `
+const BODY_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 attribute vec4 aBody;  // x, y, z, yaw
 attribute vec4 aDims;  // length, width, start, seed
@@ -223,7 +224,7 @@ void main() {
   float c = cos(aBody.w), s = sin(aBody.w);
   // A hand over the stones, so a body fallen on a stair still shows its outline.
   vec3 w = vec3(aBody.x + l.x * c - l.y * s, aBody.y + 0.22, aBody.z + l.x * s + l.y * c);
-  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
 
@@ -253,7 +254,7 @@ void main() {
 
 // A stream of light climbing to the moon (instanced ribbons): its head climbs
 // the sky, its tail follows off the ground, a sway along it, light flowing up.
-const STREAM_VERT = /* glsl */ `
+const STREAM_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 uniform vec2 uMoon;
 attribute vec4 aOrigin;  // x, y, z, start
@@ -279,8 +280,8 @@ void main() {
   float head = clamp(age / (life * 0.6), 0.0, 1.0);
   float tail = clamp((age - life * 0.3) / (life * 0.7), 0.0, 1.0);
   float ss = mix(tail, head, s);
-  vec4 v = viewMatrix * vec4(streamPath(ss), 1.0);
-  vec4 v2 = viewMatrix * vec4(streamPath(ss + 0.01), 1.0);
+  vec4 v = wocCamRelView(streamPath(ss));
+  vec4 v2 = wocCamRelView(streamPath(ss + 0.01));
   vec2 dir = v2.xy - v.xy;
   dir = dir / max(length(dir), 1e-5);
   float w = aShape.w * mix(1.0, 0.55, ss);

@@ -146,6 +146,50 @@ describe('Cantor Ilvane: Dirge of the Hollow', () => {
     expect(f.cues.slice(cues).some((c) => c.ability === ILVANE_DIRGE_CUT)).toBe(false);
   });
 
+  it('she stays planted for the whole bar, facing her choir, while her tank backs away', () => {
+    const { f, ilvane, choir } = ilvaneFight();
+    // Everyone held but her and her tank: the tank backs off down the loft
+    // every tick, so a boss that chased would walk after him mid-song.
+    const keep = holdAll(f, choir);
+    // Her tank at her side (east), so the mob AI turns her off the choir.
+    put(f, f.tank, HER.x + 2.5, HER.z);
+    const keepAll = holdAll(f, [ilvane, ...choir]);
+    run(f, 0.5, keepAll);
+    expect(Math.abs(ilvane.facing - Math.PI)).toBeGreaterThan(0.5);
+    const s = st(ilvane);
+    quiet(s);
+    s.dirgeTimer = 0;
+    expect(until(f, () => ilvane.castingAbility === ILVANE_DIRGE, 1, keepAll)).toBe(true);
+    const at = { x: ilvane.pos.x, y: ilvane.pos.y, z: ilvane.pos.z };
+    const facing = ilvane.facing;
+    // She turns to the choir she sings to (the Choristers at the rail).
+    const cx = (choir[0].pos.x + choir[1].pos.x) / 2;
+    const cz = (choir[0].pos.z + choir[1].pos.z) / 2;
+    expect(facing).toBeCloseTo(Math.atan2(cx - at.x, cz - at.z), 5);
+    let step = 0;
+    let moved = 0;
+    let turned = 0;
+    const from = f.hits.length;
+    const landed = until(
+      f,
+      () => ilvane.castingAbility === null,
+      T.dirgeCast + 0.2,
+      () => {
+        keep();
+        step++;
+        put(f, f.tank, HER.x + 9 + step * 0.2, HER.z - 8);
+        moved = Math.max(moved, Math.hypot(ilvane.pos.x - at.x, ilvane.pos.z - at.z));
+        if (Math.abs(ilvane.facing - facing) > 1e-9) turned++;
+      },
+    );
+    expect(landed).toBe(true);
+    expect(moved).toBeLessThan(1e-6);
+    expect(ilvane.pos.y).toBeCloseTo(at.y, 6);
+    expect(turned).toBe(0);
+    // Planted, she still lands it on who can see her.
+    expect(took(f, f.others[0], 'Dirge of the Hollow', from)).toBeGreaterThan(0);
+  });
+
   it('a real Pummel cuts it: nothing lands, and she falls quiet', () => {
     const { f, ilvane, choir } = ilvaneFight();
     const keep = holdAll(f, [ilvane, ...choir]);

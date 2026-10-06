@@ -1,8 +1,8 @@
 // PURE: the Hollow Crypt wing bosses' effect plan (crypt_boss_fx.ts and its
 // painters marrow_fx.ts, lady_fx.ts, ilvane_fx.ts). Three-free, DOM-free,
-// deterministic: the curves, the lantern looks, the bell's height and the
-// line-of-sight shadows the choir pillars throw, so a Vitest pins them
-// directly (tests/crypt_boss_fx_core.test.ts).
+// deterministic: the curves, the lantern looks and the bell's height, so a
+// Vitest pins them directly (tests/crypt_boss_fx_core.test.ts). The Dirge's
+// plan is its own core (ilvane_dirge_fx_core.ts).
 //
 // Presentation only: every timing a player reacts to is the sim's (cast bars,
 // aura clocks, encounter objects); this decides only how bright and where.
@@ -74,42 +74,6 @@ export function bellSwing(ringT: number): number {
   const peals = Math.min(3, Math.floor(ringT) + 1);
   const amp = 0.18 + 0.1 * peals;
   return Math.sin(ringT * Math.PI * 2) * amp * Math.exp(-0.15 * (ringT % 1));
-}
-
-/**
- * The shadow a round pillar throws from a singer's voice: the quad on the
- * floor (instance or world coordinates alike) behind the pillar, from the
- * pillar's two tangent points out to `reach` yards from the singer. A player
- * standing in it cannot be seen (the sim's line of sight agrees for a pillar
- * as tall as the choir's). Returns null when the singer stands inside the
- * pillar. Points in order: near-left, near-right, far-right, far-left.
- */
-export function pillarShadow(
-  sx: number,
-  sz: number,
-  px: number,
-  pz: number,
-  r: number,
-  reach: number,
-): [number, number][] | null {
-  const dx = px - sx;
-  const dz = pz - sz;
-  const d = Math.hypot(dx, dz);
-  if (d <= r + 0.05) return null;
-  const base = Math.atan2(dx, dz);
-  const half = Math.asin(Math.min(1, r / d));
-  const tangent = Math.sqrt(Math.max(0, d * d - r * r));
-  const far = Math.max(reach, d + r + 1);
-  const out: [number, number][] = [];
-  for (const [ang, len] of [
-    [base - half, tangent],
-    [base + half, tangent],
-    [base + half, far],
-    [base - half, far],
-  ] as const) {
-    out.push([sx + Math.sin(ang) * len, sz + Math.cos(ang) * len]);
-  }
-  return out;
 }
 
 /** The Frozen Embrace's frost spiral: point `k` of `n` round the held, at

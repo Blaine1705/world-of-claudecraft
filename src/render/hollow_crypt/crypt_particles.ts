@@ -11,10 +11,11 @@
 import * as THREE from 'three';
 import { HOLLOW_CRYPT_FIELD } from '../../sim/content/hollow_crypt_layout';
 import { surfaceOutline } from '../../sim/instances/authored_field';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { sharedUniforms } from '../gfx';
 import { CRYPT_EMITTER_STYLE, HOLLOW_CRYPT_EMITTERS } from './crypt_plan_core';
 
-const PARTICLE_VERT = /* glsl */ `
+const PARTICLE_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aOrigin;
 attribute vec4 aSeed;
 attribute vec4 aStyle;   // rise, life, size, swirl
@@ -28,7 +29,7 @@ void main() {
   float r = aSeed.w * (1.0 - 0.35 * life);
   vec3 p = aOrigin + vec3(cos(ang) * r, life * aStyle.x, sin(ang) * r);
   p.y += sin(uTime * 1.7 + aSeed.x * 20.0) * 0.15;
-  vec4 mv = viewMatrix * vec4(p, 1.0);
+  vec4 mv = wocCamRelView(p);
   gl_Position = projectionMatrix * mv;
   gl_PointSize = min(18.0, aStyle.z * 90.0 / max(1.0, -mv.z));
   float twinkle = 0.65 + 0.35 * sin(uTime * (3.0 + aSeed.z * 5.0) + aSeed.y * 30.0);
@@ -111,7 +112,7 @@ export function buildCryptParticles(
 
 // ---- chasm mist puffs ---------------------------------------------------------------
 
-const PUFF_VERT = /* glsl */ `
+const PUFF_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
 attribute vec3 aCenter;
 attribute vec3 aPuff;   // size, phase, drift
 uniform float uTime;
@@ -122,7 +123,7 @@ void main() {
   vUv = position.xy + 0.5;
   vPhase = aPuff.y;
   vec3 c = aCenter + vec3(sin(uTime * 0.05 + aPuff.y * 6.0) * aPuff.z, sin(uTime * 0.11 + aPuff.y * 9.0) * 0.8, cos(uTime * 0.04 + aPuff.y * 4.0) * aPuff.z);
-  vec4 mvCenter = viewMatrix * vec4(c, 1.0);
+  vec4 mvCenter = wocCamRelView(c);
   vec4 mvPosition = mvCenter + vec4(position.xy * aPuff.x, 0.0, 0.0);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
