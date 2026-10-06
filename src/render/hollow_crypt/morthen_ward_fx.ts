@@ -31,6 +31,7 @@ import {
 } from '../../sim/encounters/hollow_crypt/morthen_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { cryptSlotOrigin } from './crypt_boss_fx_core';
 import { MORTHEN_MITRE_EYE, MORTHEN_RIBS, morthenAnchor, morthenBodyY } from './morthen_fx_core';
@@ -178,6 +179,7 @@ mat3 rot(vec3 axis, float ang) {
               oc * axis.x * axis.y - axis.z * s, oc * axis.y * axis.y + c, oc * axis.y * axis.z + axis.x * s,
               oc * axis.z * axis.x + axis.y * s, oc * axis.y * axis.z - axis.x * s, oc * axis.z * axis.z + c);
 }
+${CAMERA_RELATIVE_GLSL}
 void main() {
   float t = uTime - uBurst;
   vT = t / ${SHATTER_SEC.toFixed(2)};
@@ -185,7 +187,7 @@ void main() {
   mat3 R = rot(aSpin.xyz + vec3(0.01), aSpin.w * t);
   vN = R * vec3(0.0, 0.0, 1.0);
   vec3 w = p + R * (position * uScale);
-  gl_Position = (t >= 0.0 && vT < 1.0) ? projectionMatrix * viewMatrix * vec4(w, 1.0) : vec4(2.0, 2.0, 2.0, 1.0);
+  gl_Position = (t >= 0.0 && vT < 1.0) ? projectionMatrix * wocCamRelView(w) : vec4(2.0, 2.0, 2.0, 1.0);
 }
 `;
 const SHARD_FRAG = /* glsl */ `

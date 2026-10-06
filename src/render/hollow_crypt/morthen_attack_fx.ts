@@ -26,6 +26,7 @@ import {
 } from '../../sim/encounters/hollow_crypt/morthen_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, telegraphFillOf } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
@@ -96,11 +97,12 @@ void main() {
 const HAND_VERT = /* glsl */ `
 varying vec3 vN;
 varying float vY;
+${CAMERA_RELATIVE_GLSL}
 void main() {
   vY = position.y;
   vec4 w = modelMatrix * instanceMatrix * vec4(position, 1.0);
   vN = normalize(mat3(modelMatrix) * mat3(instanceMatrix) * normal);
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 const HAND_FRAG = /* glsl */ `

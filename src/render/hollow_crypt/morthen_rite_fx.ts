@@ -49,6 +49,7 @@ import {
 } from '../../sim/encounters/hollow_crypt/morthen_ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -105,6 +106,7 @@ void main() {
 /** A soft camera-facing glow (a flash, a candle's guide, a soul's heart). */
 const HALO_VERT = /* glsl */ `
 varying vec2 vUv;
+${CAMERA_RELATIVE_GLSL}
 void main() {
   vUv = uv;
   vec4 c = modelMatrix * vec4(0.0, 0.0, 0.0, 1.0);
@@ -112,7 +114,7 @@ void main() {
   vec3 camRight = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
   vec3 camUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
   vec3 w = c.xyz + (camRight * position.x + camUp * position.y) * s;
-  gl_Position = projectionMatrix * viewMatrix * vec4(w, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
 const HALO_FRAG = /* glsl */ `
