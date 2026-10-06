@@ -3599,6 +3599,8 @@ export const ja_JP: EnTranslations = {
       "resetDone": "すべてのインスタンスをリセットしました。",
       "resetNone": "リセットできるインスタンスがありません。",
       "resetOccupied": "中にプレイヤーがいる間はインスタンスをリセットできません。",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "インスタンスをリセットする前にダンジョン難易度を変更してください。空のインスタンスは5分後に自動的にリセットされます。",
       "resetLoot": "中に戦利品が残っている間はインスタンスをリセットできません。",
       "resetConfirmTitle": "すべてのインスタンスをリセットしますか？",

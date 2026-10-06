@@ -3599,6 +3599,8 @@ export const ko_KR: EnTranslations = {
       "resetDone": "모든 인스턴스가 초기화되었습니다.",
       "resetNone": "초기화할 인스턴스가 없습니다.",
       "resetOccupied": "아직 안에 플레이어가 있으면 인스턴스를 초기화할 수 없습니다.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "인스턴스를 초기화하기 전에 던전 난이도를 변경하세요. 비어 있는 인스턴스는 5분 후 자동으로 초기화됩니다.",
       "resetLoot": "안에 전리품이 남아 있으면 인스턴스를 초기화할 수 없습니다.",
       "resetConfirmTitle": "모든 인스턴스를 초기화할까요?",

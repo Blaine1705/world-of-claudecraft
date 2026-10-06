@@ -3599,6 +3599,8 @@ export const ru_RU: EnTranslations = {
       "resetDone": "Все подземелья сброшены.",
       "resetNone": "Нет подземелий для сброса.",
       "resetOccupied": "Нельзя сбросить подземелья, пока внутри кто-то находится.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.",
       "resetLoot": "Нельзя сбросить подземелья, пока внутри остаётся добыча.",
       "resetConfirmTitle": "Сбросить все подземелья?",
