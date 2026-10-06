@@ -10715,6 +10715,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.discord.voice.title'
   | 'hudChrome.dungeonDifficulty.entryMismatchHeroic'
   | 'hudChrome.dungeonDifficulty.entryMismatchNormal'
+  | 'hudChrome.dungeonDifficulty.queuedCancelled'
+  | 'hudChrome.dungeonDifficulty.queuedOccupied'
   | 'hudChrome.dungeonDifficulty.resetAll'
   | 'hudChrome.dungeonDifficulty.resetConfirm'
   | 'hudChrome.dungeonDifficulty.resetConfirmBody'

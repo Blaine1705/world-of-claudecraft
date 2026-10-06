@@ -1244,8 +1244,9 @@ const MONOLITHS: MonolithRow[] = [
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
     // Re-pinned at the v0.45.0 release batch after the active instance difficulty
     // IWorld method landed to make PR #4357's badge read the claim difficulty.
+    // PR #4387 then moved difficulty selection behind its SimContext sibling.
     // Exact count measured on the merged tree after biome. Zero slack.
-    ceiling: 11643,
+    ceiling: 11629,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

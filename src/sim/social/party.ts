@@ -16,6 +16,7 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { cancelPendingDifficultyChange } from '../instances/difficulty_selection';
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
@@ -199,6 +200,7 @@ export class PartyMachine {
         ...(dungeonDifficulty ? { dungeonDifficulty } : {}),
       };
       this.parties.set(party.id, party);
+      cancelPendingDifficultyChange(this.ctx, invite.fromPid);
       this.partyByPid.set(invite.fromPid, party.id);
       this.ctx.hillPartyJoin(invite.fromPid);
     }
@@ -209,6 +211,8 @@ export class PartyMachine {
     const raidGroup = this.nextRaidGroupFor(party);
     party.members.push(r.meta.entityId);
     party.raidGroups.set(r.meta.entityId, raidGroup);
+    if (!created) cancelPendingDifficultyChange(this.ctx, party.leader);
+    cancelPendingDifficultyChange(this.ctx, r.meta.entityId);
     this.partyByPid.set(r.meta.entityId, party.id);
     this.ctx.hillPartyJoin(r.meta.entityId);
     rememberSoulwellPartyEligibility(this.ctx, party);
@@ -284,6 +288,7 @@ export class PartyMachine {
       party.leader,
       party.members,
     );
+    cancelPendingDifficultyChange(this.ctx, party.leader);
     party.leader = targetPid;
     const newLeader = this.ctx.players.get(targetPid);
     for (const mPid of party.members) {
@@ -471,6 +476,7 @@ export class PartyMachine {
         ...(dungeonDifficulty ? { dungeonDifficulty } : {}),
       };
       this.parties.set(party.id, party);
+      cancelPendingDifficultyChange(this.ctx, baseUnit.leaderPid);
       this.partyByPid.set(baseUnit.leaderPid, party.id);
       this.ctx.hillPartyJoin(baseUnit.leaderPid);
       // Same deed credit the invite path grants (acceptInvite): a finder group is a
@@ -502,6 +508,7 @@ export class PartyMachine {
         const raidGroup = this.nextRaidGroupFor(party);
         party.members.push(pid);
         party.raidGroups.set(pid, raidGroup);
+        cancelPendingDifficultyChange(this.ctx, pid);
         this.partyByPid.set(pid, party.id);
         this.ctx.hillPartyJoin(pid);
         rememberSoulwellPartyEligibility(this.ctx, party);
@@ -566,6 +573,7 @@ export class PartyMachine {
   }
 
   removeFromParty(pid: number, verb: string): void {
+    cancelPendingDifficultyChange(this.ctx, pid);
     const party = this.partyOf(pid);
     if (!party) return;
     // Revoke any pending master-loot curate-phase assign authority the departing
@@ -582,6 +590,8 @@ export class PartyMachine {
     party.members = party.members.filter((m) => m !== pid);
     party.raidGroups.delete(pid);
     this.partyByPid.delete(pid);
+    if (party.members.length > 1 && party.leader !== pid)
+      cancelPendingDifficultyChange(this.ctx, party.leader);
     // Paladin auras are tied to the party relationship. Keep the caster's own
     // aura intact, but remove paladin auras across the broken relationship in
     // both directions.
@@ -608,6 +618,7 @@ export class PartyMachine {
         this.ctx.hillPartyDisband(party.id, party.members[0]);
       }
       for (const mPid of party.members) {
+        cancelPendingDifficultyChange(this.ctx, mPid);
         this.partyByPid.delete(mPid);
         // The members left behind lose their group too, so any curate-phase roll
         // they still master is orphaned: without this it would sit invisible to
