@@ -10,8 +10,11 @@
 // interact is unbound; the panel itself is then a button doing the same
 // target and interact), and a little farther out (KIT_USE_PROMPT_RADIUS) it
 // says how close to come. While the local player's own use runs, it shows the
-// use's bar and what breaks it. The painter is the shared encounter alert's
-// (encounter_alert_painter.ts), mounted by DungeonPrompts.
+// use's bar and what breaks it. The copy follows the use's effect: a 'topple'
+// (a Soul Brazier kicked over onto the pack) or a 'relight' (a Remembrance
+// Candle in Morthen's Rite: a channel that drains the lighter every second and
+// that a hit does not break, only a step or a stun). The painter is the shared
+// encounter alert's (encounter_alert_painter.ts), mounted by DungeonPrompts.
 
 import { MOBS } from '../../../sim/data';
 import { isKitUseCast, type KitUseDef } from '../../../sim/types';
@@ -78,6 +81,57 @@ function usableNow(body: KitUseBody): boolean {
   return !body.dead && (body.hp ?? 1) > 0 && kitUseDefOf(body) !== null;
 }
 
+/** The prompt's copy for one use effect (every key a t() leaf). */
+interface UseCopy {
+  line: 'hudChrome.kitUse.toppleLine' | 'hudChrome.kitUse.relightLine';
+  key: 'hudChrome.kitUse.toppleKey' | 'hudChrome.kitUse.relightKey';
+  tap: 'hudChrome.kitUse.toppleTap' | 'hudChrome.kitUse.relightTap';
+  click: 'hudChrome.kitUse.toppleClick' | 'hudChrome.kitUse.relightClick';
+  far: 'hudChrome.kitUse.toppleFar' | 'hudChrome.kitUse.relightFar';
+  aria: 'hudChrome.kitUse.toppleAria' | 'hudChrome.kitUse.relightAria';
+  using: 'hudChrome.kitUse.usingLine' | 'hudChrome.kitUse.relightUsingLine';
+}
+
+const TOPPLE_COPY: UseCopy = {
+  line: 'hudChrome.kitUse.toppleLine',
+  key: 'hudChrome.kitUse.toppleKey',
+  tap: 'hudChrome.kitUse.toppleTap',
+  click: 'hudChrome.kitUse.toppleClick',
+  far: 'hudChrome.kitUse.toppleFar',
+  aria: 'hudChrome.kitUse.toppleAria',
+  using: 'hudChrome.kitUse.usingLine',
+};
+
+const RELIGHT_COPY: UseCopy = {
+  line: 'hudChrome.kitUse.relightLine',
+  key: 'hudChrome.kitUse.relightKey',
+  tap: 'hudChrome.kitUse.relightTap',
+  click: 'hudChrome.kitUse.relightClick',
+  far: 'hudChrome.kitUse.relightFar',
+  aria: 'hudChrome.kitUse.relightAria',
+  using: 'hudChrome.kitUse.relightUsingLine',
+};
+
+/** The copy family for a use (keyed on its effect kind). */
+export function kitUseCopy(def: KitUseDef | null | undefined): UseCopy {
+  return def?.effect.kind === 'relight' ? RELIGHT_COPY : TOPPLE_COPY;
+}
+
+let useByCast: Map<string, KitUseDef> | null = null;
+
+/** The use a running use bar belongs to (swept once from the content's kits),
+ *  for when its body is out of view. */
+function kitUseDefByCast(castId: string): KitUseDef | null {
+  if (!useByCast) {
+    useByCast = new Map();
+    for (const tpl of Object.values(MOBS)) {
+      const use = tpl.trashKit?.usable;
+      if (use) useByCast.set(use.castId, use);
+    }
+  }
+  return useByCast.get(castId) ?? null;
+}
+
 function nameOf(body: KitUseBody): string {
   return tEntity({ kind: 'mob', id: body.templateId, field: 'name' });
 }
@@ -119,17 +173,18 @@ export function buildKitUsePromptView(input: KitUsePromptInput): KitUsePromptVie
     const target = self.castTargetId !== null && self.castTargetId !== undefined;
     const body = target ? input.entity(self.castTargetId as number) : null;
     const title = castDisplayName(castId);
+    const copy = kitUseCopy(kitUseDefOf(body) ?? kitUseDefByCast(castId));
     return {
       visible: true,
       kind: 'using',
       title,
-      line: t('hudChrome.kitUse.usingLine'),
+      line: t(copy.using),
       hint: '',
       key: '',
       progress: total > 0 ? Math.max(0, Math.min(1, 1 - remaining / total)) : null,
       progressAria: timeAria(remaining),
       pressable: false,
-      buttonAria: body ? t('hudChrome.kitUse.toppleAria', { name: nameOf(body) }) : title,
+      buttonAria: body ? t(copy.aria, { name: nameOf(body) }) : title,
       bodyId: -1,
     };
   }
@@ -139,7 +194,8 @@ export function buildKitUsePromptView(input: KitUsePromptInput): KitUsePromptVie
   const { body, def, distance } = pick;
   const name = nameOf(body);
   const title = name;
-  const buttonAria = t('hudChrome.kitUse.toppleAria', { name });
+  const copy = kitUseCopy(def);
+  const buttonAria = t(copy.aria, { name });
   // Out of the use's reach: say how close to come; the panel takes no press
   // (the sim would only answer "Too far away.").
   if (distance > def.range) {
@@ -147,7 +203,7 @@ export function buildKitUsePromptView(input: KitUsePromptInput): KitUsePromptVie
       visible: true,
       kind: 'use-far',
       title,
-      line: t('hudChrome.kitUse.toppleFar', {
+      line: t(copy.far, {
         range: formatNumber(def.range, { maximumFractionDigits: 1 }),
       }),
       hint: '',
@@ -161,15 +217,15 @@ export function buildKitUsePromptView(input: KitUsePromptInput): KitUsePromptVie
   }
   const key = input.touch ? '' : input.interactKey;
   const hint = input.touch
-    ? t('hudChrome.kitUse.toppleTap', { name })
+    ? t(copy.tap, { name })
     : key
-      ? t('hudChrome.kitUse.toppleKey', { name })
-      : t('hudChrome.kitUse.toppleClick', { name });
+      ? t(copy.key, { name })
+      : t(copy.click, { name });
   return {
     visible: true,
     kind: 'use',
     title,
-    line: t('hudChrome.kitUse.toppleLine'),
+    line: t(copy.line),
     hint,
     key,
     progress: null,

@@ -3934,7 +3934,27 @@ export const ko_KR: EnTranslations = {
       },
       "crypt": {
         "carrionEye": "전투 중인 모든 까마귀가 {seconds}초 동안 당신을 노립니다. 탱커에게 달려가 무리를 한꺼번에 처치하세요.",
-        "graniteSkin": "받는 피해가 {pct}% 감소하며, 돌이 {every}초마다 두꺼워집니다(최대 {max}겹). 기절시키면 부서져 {seconds}초 동안 받는 피해가 {cracked}% 증가합니다."
+        "graniteSkin": "받는 피해가 {pct}% 감소하며, 돌이 {every}초마다 두꺼워집니다(최대 {max}겹). 기절시키면 부서져 {seconds}초 동안 받는 피해가 {cracked}% 증가합니다.",
+        "measured": "이 효과가 끝나면 서 있는 자리에 열린 무덤이 무너져 {radius}미터 안의 모두에게 {min}~{max} 피해를 줍니다(영웅 난이도 {heroicMin}~{heroicMax}). 무덤은 전투 내내 남으므로 표식을 파티에서 떨어진 묘지 가장자리로 옮기세요.",
+        "graveDirt": "열린 무덤 안에 서 있음: 이동 속도 {slow}% 감소, 매초 {damage} 암흑 피해(영웅 난이도 {heroic}). 영웅 난이도에서는 무덤 안에 {linger}초 머물면 불안한 뼈무더기가 일어납니다. 무덤에서 나오세요.",
+        "dirtInEyes": "이동 속도가 {pct}% 감소합니다. 한 삽의 무덤흙은 성구지기 매로우 앞의 모두를 맞힙니다: 그의 뒤에 서세요.",
+        "blow": "받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 현재 {stacks}/{max}중첩. 무덤꾼의 일격마다 중첩이 쌓이고 지속 시간이 {seconds}초로 초기화됩니다.",
+        "graveVigor": "열린 무덤 안에 서 있는 동안 공격 속도가 {pct}% 증가합니다. 그를 무덤 밖에 두세요.",
+        "tolling": "종 밧줄로 걸어가 장례의 종을 울리는 동안 피해 면역입니다. 종소리가 끝나면 모두에게 {min}~{max} 암흑 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 열린 무덤마다 불안한 뼈무더기가 일어납니다.",
+        "embraced": "귀부인의 품에 안겨 공중에 떠 있음: 행동할 수 없고 매초 {tick} 냉기 피해(영웅 난이도 {tickHeroic})를 받습니다. 파티가 그녀의 최대 생명력 {share}%를 깎으면 부드럽게 내려놓지만, 높은 곳에서 {hold}초 동안 붙잡고 있으면 얼음 위로 떨어뜨려 {min}~{max} 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.",
+        "lament": "신부의 애가가 끝나면 켜진 무덤 등불에서 {radius}미터 안에 없는 모두에게 {min}~{max} 냉기 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 등불은 가장 가까운 {cap}명만 보호한 뒤 꺼져 다음 애가를 놓칩니다.",
+        "lingering": "다음 신부의 애가로 받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 최대 {max}중첩. 다음 애가는 등불 빛 안에서 받으세요.",
+        "slippery": "미끄러운 얼음 위: 속도가 매초 최대 {grip}미터/초씩만 바뀌므로 출발이 느리고, 멈추면 계속 미끄러지며, 방향을 틀면 크게 돌아갑니다. 얼음에서 벗어나면 다시 중심을 잡을 수 있습니다.",
+        "harmony": "받는 피해가 {pct}% 감소합니다: 살아 있는 성가대원 한 명마다 {per}%. 성가대원을 먼저 처치하세요.",
+        "crescendo": "더 빠르게 노래합니다: 공허의 만가가 {castNormal}초 대신 {cast}초 걸리고 {everyNormal}초 대신 {every}초마다 오며, 뼈 오르간이 {wavesNormal}파도 대신 {waves}파도의 음표를 연주합니다.",
+        "gorged": "주는 피해 {pct}% 증가: 그에게 도달한 속박된 영혼 하나마다 {per}%, 현재 {stacks}/{max}중첩이며 전투가 끝날 때까지 지속됩니다. 영혼이 도달할 때마다 최대 생명력의 {heal}%도 회복합니다. 영혼의 경로에 들어서면 대신 받아낼 수 있습니다.",
+        "unquietWard": "제단에서 불안한 자들의 의식을 시전하는 동안 피해 면역: 추모의 양초 {total}개 중 {lit}개를 다시 밝혔습니다. 하나를 다시 밝히려면 {channel}초 동안 정신 집중해야 하며, 그동안 밝히는 사람의 최대 생명력 {drain}%(영웅 난이도 {drainHeroic}%)를 매초 빨아들입니다. 공격을 받아도 끊기지 않지만 움직이거나 기절하면 끊깁니다. 마지막 양초가 결계를 부숩니다. 영웅 난이도에서는 명부가 부르는 순서대로 밝히세요: 다른 양초를 밝히면 마지막으로 밝힌 양초가 꺼지고 밝힌 사람에게 {wrongMin}~{wrongMax} 암흑 피해를 줍니다.",
+        "riteBroken": "기절: 부서진 결계 때문에 {seconds}초 동안 행동할 수 없습니다.",
+        "shatteredWard": "{seconds}초 동안 받는 피해 {pct}% 증가: 다시 밝힌 양초들이 그의 결계를 부쉈습니다. 지금 가장 강한 공격을 퍼부으세요.",
+        "graveChill": "불안한 자들의 의식이 이어지는 동안 매초 {bite} 암흑 피해(영웅 난이도 {biteHeroic})를 받으며, {every}초마다 {step}(영웅 난이도 {stepHeroic})씩 늘어납니다. 추모의 양초를 다시 밝혀 끝내세요.",
+        "graspMark": "{fuse}초 후 발밑의 고리에서 손이 솟아오릅니다: 고리가 놓인 곳에서 {radius}야드 안의 모두가 {root}초 동안 묶이고 {min}~{max} 암흑 피해를 받습니다. 고리에서 나오세요.",
+        "graspRoot": "무덤의 손에 붙잡힘: {seconds}초 동안 움직일 수 없습니다.",
+        "knellAirborne": "의식의 고리 위를 날고 있어 공격이 닿지 않습니다. 고리의 절반에 {mark}초 동안 표식을 남긴 뒤 그 절반에 유령불을 쏟아붓습니다: 그 안의 모두에게 {min}~{max} 화염 피해. 한 번 날 때마다 절반을 {breaths}번 태운 뒤 내려앉습니다."
       },
       "sanctum": {
         "lockbound": "받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.",
@@ -6003,6 +6023,25 @@ export const ko_KR: EnTranslations = {
       "tagFastRun": "빠른 공략",
       "mech": {
         "shadow_pulse": "어둠의 파동(주기적 광역 피해)",
+        "crypt_shovelful": "한 삽의 무덤흙(11초마다 앞쪽 8미터 부채꼴에 무덤흙을 뿌림: 평타의 1.5배 피해와 6초 동안 이동 속도 50% 감소. 그의 뒤에 서세요)",
+        "crypt_measured_for_the_grave": "무덤 치수 재기(15초마다 탱커가 아닌 플레이어를 표시. 4초 후 그 발밑에 열린 무덤이 무너져 일반 난이도 기준 3미터 안에 42~52 피해. 구덩이는 전투 내내 남아 안에 있으면 초당 9 피해와 이동 속도 40% 감소. 무덤은 묘지 가장자리에 만드세요)",
+        "crypt_burial_toll": "장례의 종소리(생명력 66%와 33%에서 종 밧줄로 성큼 걸어가 피해 면역 상태로 3초 동안 종을 울림: 일반 난이도 기준 모두에게 30~38 암흑 피해, 열린 무덤마다 불안한 뼈무더기가 일어남)",
+        "crypt_marrow_heroic": "영웅: 무덤꾼의 일격이 9초마다 탱커를 타격(중첩당 받는 피해 6% 증가, 20초, 최대 6중첩), 무덤의 활력(무덤 안에 서 있으면 공격 속도 30% 증가), 불안한 대지(무덤 안에 2초 머물면 그 자리에서 불안한 뼈무더기가 일어남)",
+        "crypt_brides_lament": "신부의 애가(22초마다 3초 동안 통곡: 일반 난이도 기준 켜진 무덤 등불의 빛 밖에 있는 모두에게 60~75 냉기 피해, 이미 받은 남은 애가 중첩마다 절반씩 증가. 등불 하나는 최대 2명만 보호하며 누군가를 보호하면 28초 동안 꺼집니다. 흩어져서 교대로 쓰세요)",
+        "crypt_frozen_embrace": "얼어붙은 포옹(30초마다 탱커가 아닌 플레이어를 붙잡아 함께 5미터 높이로 떠오름, 초당 6 냉기 피해: 8초 안에 그녀의 생명력 6%를 깎으면 내려놓지만, 아니면 떨어뜨려 일반 난이도 기준 150~180 피해)",
+        "crypt_rime_path": "서리길(그녀가 지나간 자리에 25초 동안 미끄러운 서리가 남음: 그 위에서는 천천히 가속하고 멈추거나 방향을 틀 때 계속 미끄러집니다)",
+        "crypt_bridal_freeze": "신부의 결빙(생명력이 절반이 되면 협곡 바닥 전체가 얼어붙어 남은 전투 내내 미끄러운 얼음이 됩니다)",
+        "crypt_lady_heroic": "영웅: 켜진 등불은 30초가 지나면 저절로 꺼져 10초 동안 어두워지고, 얼어붙은 포옹은 두 명을 붙잡습니다",
+        "crypt_dirge_of_the_hollow": "공허의 만가(16초마다 차단 가능한 2.5초 노래: 끝까지 부르면 일반 난이도 기준 45미터 안에서 그녀가 보이는 모두에게 105~125 암흑 피해와 4초 침묵. 차단하거나 성가대 기둥 뒤에 숨으세요)",
+        "crypt_harmony": "화음(살아 있는 성가대원 한 명마다 그녀가 받는 피해가 30% 감소: 성가대원을 먼저 처치하세요)",
+        "crypt_bone_organ": "뼈 오르간(26초마다 뼈 오르간을 연주: 암흑 음표 두 파도가 성가대석 바닥의 줄을 따라 터지며 일반 난이도 기준 줄 안에서 100~115 피해, 두 번째 파도는 첫 번째의 빈틈을 메웁니다)",
+        "crypt_crescendo": "크레셴도(생명력 30% 미만에서 만가가 1.8초로 짧아지고 11초마다 오며, 오르간이 세 번째 파도를 연주합니다)",
+        "crypt_ilvane_heroic": "영웅: 앙코르(다른 한 명이 서 있는 동안 10초 쓰러져 있던 성가대원은 다시 일어남: 둘을 함께 처치하세요)와 끊기지 않는 구절(세 번째 만가마다 차단할 수 없음: 숨으세요)",
+        "crypt_morthen_shadow_pulse": "어둠의 파동(12초마다 2초 시전 후, 일반 난이도 기준 그에게서 12야드 안의 모두에게 24~30 암흑 피해: 떨어지세요. 최후의 의식 중에는 9초마다)",
+        "crypt_gravecall": "무덤부름(15초마다 속박된 영혼이 다음 석관 벽감에서 그에게로 떠갑니다. 도달하면 망자 포식 상태가 되어 영혼 하나마다 주는 피해가 10% 증가하고(최대 10중첩) 생명력의 3%를 회복합니다. 경로에 선 플레이어가 대신 받아냅니다: 일반 난이도 기준 12~16 암흑 피해)",
+        "crypt_rite_of_the_unquiet": "불안한 자들의 의식(생명력 65%에서 제단으로 돌아가 불안한 자들의 결계 안에서 피해 면역이 됩니다. 그동안 무덤의 냉기가 모두에게 매초 3 암흑 피해를 주고 5초마다 1씩 늘어나며, 벽감에서 불안한 뼈무더기 2개가 기어 나옵니다. 추모의 양초 4개를 다시 밝히세요: 하나마다 4초 정신 집중이며 밝히는 사람의 최대 생명력 6%를 매초 빨아들입니다. 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다. 마지막 양초가 의식을 깨뜨립니다: 8초 동안 기절하고 받는 피해가 25% 증가합니다)",
+        "crypt_reap_the_unquiet": "불안한 자들의 수확(생명력 35% 미만에서 영혼이 멈추고, 14초마다 2초 시전 후 낫을 휘두릅니다: 일반 난이도 기준 앞쪽 14야드, 120도 부채꼴 안의 모두에게 55~65 암흑 피해. 이후 어둠의 파동은 9초마다 옵니다)",
+        "crypt_morthen_heroic": "영웅 난이도: 망자의 이름(명부가 양초의 순서를 부릅니다. 다른 양초를 밝히면 마지막으로 밝힌 양초가 꺼지고 밝힌 사람에게 252~288 암흑 피해를 주며, 다시 밝히기는 매초 8%를 빨아들입니다), 무덤의 손아귀(16초마다 플레이어 2명 발밑에 4야드 고리가 생기고 1.5초 후 손이 솟아오릅니다: 3초 이동 불가와 162~198 암흑 피해), 조종룡의 불타는 조종(날아올라 고리의 절반에 4.5초 동안 표식을 남긴 뒤 그 절반에 유령불을 쏟아 1,000~1,120 화염 피해, 한 번 날 때마다 3번)",
         "reaping_arc": "수확의 호(전방 휩쓸기)",
         "hallowed_brine": "성스러운 바닷물 (반경 9야드의 어두운 성수 웅덩이, 영웅은 10야드: 안에 있으면 매초 18 피해, 영웅은 26, 그가 안에 서 있는 동안 받는 피해 40퍼센트 감소, 밖으로 끌어내세요)",
         "rebounding_bulwark": "튕겨 나오는 방패 (마지막으로 맞은 대상으로부터 10미터 이내의 가장 가까운 플레이어에게 튕김, 최대 3명, 영웅 4명: 흩어지세요)",
@@ -6188,6 +6227,33 @@ export const ko_KR: EnTranslations = {
       "rimeTitle": "스며드는 서리!",
       "rimeLine": "스며드는 서리 {stacks}/{max}: 새끼용의 숨결에서 벗어나세요"
     },
+    "cryptAlert": {
+      "measuredTitle": "무덤 치수 재기!",
+      "measuredLine": "바가 다 떨어지면 발밑에 무덤이 무너집니다: 묘지 가장자리로 옮기세요",
+      "embracedTitle": "얼어붙은 포옹!",
+      "embracedLine": "그녀가 당신을 공중에 들어 올렸습니다: 파티가 그녀에게 피해를 줘야 내려놓습니다",
+      "lamentTitle": "신부의 애가!",
+      "lamentShelteredLine": "켜진 등불의 빛 안에 당신의 자리가 있습니다: 가만히 있으세요",
+      "lamentOpenLine": "통곡이 닥치기 전에 켜진 등불의 빛 안으로 들어가세요: 등불 하나에 두 명",
+      "graveTitle": "열린 무덤 안에 있습니다!",
+      "graveLine": "무덤흙이 당신을 태우고 느리게 합니다: 무덤에서 나오세요",
+      "tollTitle": "장례의 종소리!",
+      "tollLine": "종을 울리는 동안 그는 피해를 받지 않습니다: 종소리와 그것이 일으키는 망자에 대비하세요",
+      "harmonyTitle": "화음",
+      "harmonyLine": "성가대원들이 그녀가 받는 피해를 {pct}% 줄이고 있습니다: 성가대원을 먼저 처치하세요",
+      "knellTitle": "불타는 조종!",
+      "knellLine": "바가 다 줄어들면 고리의 이쪽 절반에 유령불이 쏟아집니다: 반대쪽 절반으로 가세요",
+      "graspTitle": "무덤의 손아귀!",
+      "graspLine": "이 고리에서 손이 솟아올라 안에 선 사람을 붙잡습니다: 나오세요",
+      "reapTitle": "불안한 자들의 수확!",
+      "reapLine": "그의 낫이 앞쪽 땅을 휩씁니다: 그의 뒤로 가세요",
+      "riteTitle": "불안한 자들의 의식",
+      "riteLine": "추모의 양초를 다시 밝혀 결계를 부수세요: {total}개 중 {lit}개 점화",
+      "riteNamedLine": "명부가 다음에 부르는 양초만 다시 밝히세요: {total}개 중 {lit}개 점화",
+      "soulTitle": "속박된 영혼",
+      "soulLine": "영혼이 모르덴에게 떠가고 있습니다: 경로에 들어서서 그가 배를 채우기 전에 받아내세요",
+      "timeAria": "{seconds}초 남음"
+    },
     "kitUse": {
       "toppleLine": "무리 위로 걷어차 넘어뜨리세요: 쏟아진 불길이 그들을 태웁니다",
       "toppleKey": "{name}을(를) 그들 위로 넘어뜨리기",
@@ -6196,6 +6262,13 @@ export const ko_KR: EnTranslations = {
       "toppleFar": "{range}야드 안으로 다가가 걷어차세요",
       "toppleAria": "{name} 넘어뜨리기",
       "usingLine": "가만히 있으세요: 공격을 받거나 움직이거나 기절하면 끊깁니다",
+      "relightLine": "정신 집중하는 동안 매초 생명력을 빨아들입니다: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다",
+      "relightKey": "{name} 다시 밝히기",
+      "relightTap": "여기를 탭해 {name}을(를) 다시 밝히세요",
+      "relightClick": "여기를 클릭해 {name}을(를) 다시 밝히세요",
+      "relightFar": "{range}야드 안으로 다가가 다시 밝히세요",
+      "relightAria": "{name} 다시 밝히기",
+      "relightUsingLine": "빨아들이는 동안 가만히 있으세요: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다",
       "timeAria": "{seconds}초 남음"
     },
     "cosmetics": {
@@ -12547,6 +12620,25 @@ export const ko_KR: EnTranslations = {
       "crypt_knellwyrm_pyre_strafe": "화장의 강습",
       "crypt_knellwyrm_strafe_run": "강습 비행",
       "crypt_knellwyrm_dread_bellow": "공포의 포효",
+      "crypt_marrow_shovelful": "한 삽의 무덤흙",
+      "crypt_marrow_measure": "무덤 치수 재기",
+      "crypt_marrow_burial_toll": "장례의 종소리",
+      "crypt_marrow_gravediggers_blow": "무덤꾼의 일격",
+      "crypt_lady_brides_lament": "신부의 애가",
+      "crypt_lady_frozen_embrace": "얼어붙은 포옹",
+      "crypt_lady_embrace_hold": "얼어붙은 포옹",
+      "crypt_lady_bridal_freeze": "신부의 결빙",
+      "crypt_ilvane_dirge": "공허의 만가",
+      "crypt_ilvane_unbroken_dirge": "끊기지 않는 구절",
+      "crypt_ilvane_bone_organ": "뼈 오르간",
+      "crypt_morthen_shadow_pulse": "어둠의 파동",
+      "crypt_morthen_rite_of_the_unquiet": "불안한 자들의 의식",
+      "crypt_morthen_reap_the_unquiet": "불안한 자들의 수확",
+      "kituse_crypt_relight_candle": "촛불 다시 밝히기",
+      "crypt_knellwyrm_knell_rise": "불타는 조종",
+      "crypt_knellwyrm_knell_mark": "불타는 조종",
+      "crypt_knellwyrm_knell_breath": "불타는 조종",
+      "crypt_knellwyrm_knell_land": "불타는 조종",
       "bastion_brine_mend": "소금물 치유",
       "bastion_fog_ward": "안개 보호막",
       "bastion_halberd_sweep": "미늘창 휩쓸기",
@@ -18880,13 +18972,13 @@ export const ko_KR: EnTranslations = {
         "name": "서리비단 어깨망토"
       },
       "bonechill_carapace_vest": {
-        "name": "뼈서리 갑각 조끼"
+        "name": "뼈서리 사슬갑옷"
       },
       "rimeweb_hunters_leggings": {
-        "name": "서리거미줄 사냥꾼 다리보호구"
+        "name": "서리끈 다리보호구"
       },
       "rimeweb_fang": {
-        "name": "서리거미줄 송곳니"
+        "name": "신부의 고드름"
       },
       "cantors_cassock": {
         "name": "성가대장의 사제복"
@@ -20030,6 +20122,9 @@ export const ko_KR: EnTranslations = {
       "restless_bones": {
         "name": "불안한 뼈무더기"
       },
+      "marrow_restless_bones": {
+        "name": "불안한 뼈무더기"
+      },
       "gorrak": {
         "name": "무자비한 고라크"
       },
@@ -20172,7 +20267,7 @@ export const ko_KR: EnTranslations = {
         "name": "속박된 영혼"
       },
       "rimeweb": {
-        "name": "림웹"
+        "name": "뼈서리의 귀부인"
       },
       "cantor_ilvane": {
         "name": "성가대장 일베인"
@@ -20212,6 +20307,9 @@ export const ko_KR: EnTranslations = {
       },
       "crypt_knellwyrm": {
         "name": "조종룡"
+      },
+      "crypt_remembrance_candle": {
+        "name": "추모의 양초"
       },
       "bastion_revenant": {
         "name": "요새 망령"

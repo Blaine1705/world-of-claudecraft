@@ -24,6 +24,10 @@ import {
 import {
   KNELLWYRM_ARRIVE,
   KNELLWYRM_DREAD_BELLOW,
+  KNELLWYRM_KNELL_BREATH,
+  KNELLWYRM_KNELL_LAND,
+  KNELLWYRM_KNELL_MARK,
+  KNELLWYRM_KNELL_RISE,
   KNELLWYRM_PYRE_STRAFE,
   KNELLWYRM_STRAFE_RUN,
   MORTHEN_DESCEND,
@@ -31,6 +35,26 @@ import {
   MORTHEN_RISE,
   MORTHEN_RITE_WAKES,
 } from '../../sim/encounters/hollow_crypt/ids';
+import {
+  ILVANE_BONE_ORGAN,
+  ILVANE_DIRGE,
+  ILVANE_UNBROKEN_DIRGE,
+} from '../../sim/encounters/hollow_crypt/ilvane_ids';
+import {
+  LADY_BRIDAL_FREEZE,
+  LADY_BRIDES_LAMENT,
+  LADY_EMBRACE_DROPPED,
+  LADY_EMBRACE_HOLD,
+  LADY_EMBRACE_RELEASED,
+  LADY_FROZEN_EMBRACE,
+} from '../../sim/encounters/hollow_crypt/lady_ids';
+import {
+  MARROW_BURIAL_TOLL,
+  MARROW_GRAVEDIGGERS_BLOW,
+  MARROW_MEASURE,
+  MARROW_SHOVELFUL,
+} from '../../sim/encounters/hollow_crypt/marrow_ids';
+import { MORTHEN_REAP, MORTHEN_RITE } from '../../sim/encounters/hollow_crypt/morthen_ids';
 import {
   OLEN_HALLOWED_BRINE,
   OLEN_OATH_KNEEL,
@@ -147,11 +171,15 @@ import {
   HOARD_GESTURE_ICE_AGE_RELEASE,
 } from '../hoard_boss_gestures_core';
 import {
+  MORTHEN_DEATH_LIFT,
+  MORTHEN_HOVER,
+  MORTHEN_REAP_SWEEP,
   MORTHEN_SCYTHE_HELD,
   MORTHEN_SCYTHE_UNFOLD,
   MORTHEN_STAFF_HELD,
   MORTHEN_TOLL,
 } from '../hollow_crypt/morthen_fx_core';
+import { KNELL_GESTURE_POUR, KNELL_GESTURE_SKY_ROAR } from '../hollow_crypt/morthen_rite_fx_core';
 import type { LocoGaitThresholds } from '../locomotion';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import {
@@ -461,6 +489,11 @@ export interface VisualDef {
    *  normalized feet anchor. CharacterVisual eases it in only over the final
    *  quarter of the Death clip and restores the base offset on revive. */
   deathGroundOffset?: number;
+  /** The opposite of deathGroundOffset, for a body drawn SUNK into the floor
+   *  in life (a negative `hover`): its model is lifted by `yards` (model-local)
+   *  eased over [from, to] of the Death clip (death_grounding_core.ts
+   *  deathLiftOffset), so the authored death pose rests on the floor. */
+  deathLift?: { yards: number; from: number; to: number };
   /** Hold the idle base state frozen on the FIRST frame of its clip instead of
    *  looping it: a downed/dormant look (the forge mech lies still on the ground
    *  on crawl frame 0 until it moves). Walk/run still play the clip normally, so
@@ -1812,6 +1845,8 @@ const MORTHEN_STAFF_CLIPS: ClipMap = {
     [MORTHEN_RISE]: 'Rise',
     [MORTHEN_PROCLAIM]: 'SummonSouls',
     [MORTHEN_DESCEND]: 'ShieldRitual',
+    // The Rite of the Unquiet: the staff held level before him, the ward up.
+    [MORTHEN_RITE]: 'ShieldRitual',
   },
   castTimeScaleByAbility: { [MORTHEN_RISE]: 1, [MORTHEN_PROCLAIM]: 1, [MORTHEN_DESCEND]: 1 },
 };
@@ -1820,11 +1855,15 @@ const MORTHEN_SCYTHE_CLIPS: ClipMap = {
   walk: 'ScytheWalk',
   run: 'ScytheRun',
   attack: ['ScytheSweep', 'ScytheSweep2'],
-  attackByAbility: { [MORTHEN_TOLL]: 'ScytheToll' },
-  attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1 },
+  // Reap the Unquiet: the bar winds the blade up (ScytheSummon, the scythe
+  // raised over the souls), the landing brings it round in the flat sweep, fast
+  // (its cut at frame 14 lands about 0.3 s after the hit).
+  attackByAbility: { [MORTHEN_TOLL]: 'ScytheToll', [MORTHEN_REAP_SWEEP]: 'ScytheSweep' },
+  attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1, [MORTHEN_REAP_SWEEP]: 1.9 },
   hit: ['ScytheHit'],
   death: 'ScytheDeath',
   cast: 'ScytheSummon',
+  castByAbility: { [MORTHEN_REAP]: 'ScytheSummon' },
 };
 
 export const VISUALS: Record<string, VisualDef> = {
@@ -3922,6 +3961,26 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 2,
   },
+  // A Remembrance Candle's usable body (crypt_remembrance_candle, Morthen's
+  // Rite: encounters/hollow_crypt/morthen_candles.ts) stands at its pillar's
+  // foot: the pillar is the kit's and the flame the crypt's own painter
+  // (hollow_crypt/morthen_candle_fx.ts), so this draws no body. Its click
+  // capsule, nameplate and bar stay, raised to the candle's height so the
+  // relight is easy to target; bound off the bone pile's rig (never seen).
+  crypt_rite_candle_body: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    height: 3.6,
+    clips: {
+      idle: 'Lie_Idle',
+      walk: 'Lie_Idle',
+      run: 'Lie_Idle',
+      attack: [],
+      hit: ['Hit_A'],
+      death: 'Death_A',
+    },
+    bodyless: true,
+    clickRadius: 2.2,
+  },
   crypt_skel_adept: {
     url: `${ENEMIES}/skeleton_mage.glb`,
     animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
@@ -3991,22 +4050,93 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.25,
   },
+  // Sexton Marrow (scripts/assets/hollow_crypt_creatures/build_marrow.py): the
+  // parish gravedigger raised and still digging, sculpted on the Bastion kit at
+  // full size (template scale 1): a stooped skeleton about twice a player's
+  // height under a peaked cowl of grave cloth, a leather apron, a hooded tin
+  // lantern at his hip and the long spade. At rest he digs (Idle); every bar
+  // clip is locked to its bar and plays its recovery out: Shovelful flings the
+  // earth at 1.0 of its 1.2 s bar, Measure levels the spade at the mark from 0.5,
+  // GravediggersBlow lands at 0.7 of 0.8. BellRing is a 1.0 s loop (the haul
+  // bottoming at 0.9, in step with ropePull) with his fists on his own axis,
+  // the spade stood in the earth beside him.
   crypt_skel_sexton: {
-    url: `${ENEMIES}/skeleton_mage.glb`,
-    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
-    height: 3.4,
-    clips: skeletonClips(['2H_Melee_Attack_Chop']),
-    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.25,
+    url: `${CREATURES}/crypt_sexton_marrow.glb`,
+    // The build's IDLE_HEIGHT and MINZ, half a second into Idle (as the game measures).
+    height: 5.783,
+    hover: -0.038,
+    clips: {
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Measure',
+      castByAbility: {
+        [MARROW_SHOVELFUL]: 'Shovelful',
+        [MARROW_MEASURE]: 'Measure',
+        [MARROW_BURIAL_TOLL]: 'BellRing',
+        [MARROW_GRAVEDIGGERS_BLOW]: 'GravediggersBlow',
+      },
+      castTimeScaleByAbility: {
+        [MARROW_SHOVELFUL]: 1,
+        [MARROW_MEASURE]: 1,
+        [MARROW_BURIAL_TOLL]: 1,
+        [MARROW_GRAVEDIGGERS_BLOW]: 1,
+      },
+      castPlayOut: ['Shovelful', 'Measure', 'GravediggersBlow'],
+    },
+    // The one-shot bars follow the bar; the bell loops for as long as it rings.
+    castClipSync: [MARROW_SHOVELFUL, MARROW_MEASURE, MARROW_GRAVEDIGGERS_BLOW],
+    castPlayOutHoldsAttacks: true,
+    walkRef: 1.671,
+    runRef: 6.109,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
+    clickRadius: 2.2,
   },
+  // Cantor Ilvane (scripts/assets/hollow_crypt_creatures/build_cantor.py): a tall
+  // skeletal choir mistress in a faded violet cassock and a torn surplice, a great
+  // pleated ruff, a black lace veil under a crown of silver organ pipes, the hymnal
+  // open in her left hand and a finger-bone baton with a violet light in her right.
+  // Her song glows violet (the eyes, the voice in her open jaw, the baton, the notes).
+  // Sing is the Dirge: bar-locked, its peak reached by 1.75 s (the Crescendo's 1.8 s
+  // bar) and held, climbing, to the 2.5 s bar's end. PlayOrgan loops at the Bone
+  // Organ's keys (the hymnal hangs open over them); Conduct is her flourish.
   crypt_skel_cantor: {
-    url: `${ENEMIES}/skeleton_mage.glb`,
-    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
-    height: 3.2,
-    clips: skeletonClips(['2H_Melee_Attack_Chop']),
-    tint: 'entity',
-    tintStrength: 0.35,
+    url: `${CREATURES}/crypt_cantor_ilvane.glb`,
+    // The build's IDLE_HEIGHT (feet to the crown's tallest pipe, half a second into
+    // Idle); her template's 1.1 draws her about 6.5 yd, two and a half players.
+    height: 5.964,
+    clips: {
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Conduct',
+      castByAbility: {
+        [ILVANE_DIRGE]: 'Sing',
+        [ILVANE_UNBROKEN_DIRGE]: 'Sing',
+        [ILVANE_BONE_ORGAN]: 'PlayOrgan',
+      },
+      castTimeScaleByAbility: {
+        [ILVANE_DIRGE]: 1,
+        [ILVANE_UNBROKEN_DIRGE]: 1,
+        [ILVANE_BONE_ORGAN]: 1,
+      },
+    },
+    // The Dirge follows its bar (normal or Crescendo); the organ loops while she plays.
+    castClipSync: [ILVANE_DIRGE, ILVANE_UNBROKEN_DIRGE],
+    walkRef: 2.2,
+    runRef: 6.34,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
+    clickRadius: 2.2,
   },
   crypt_skel_chorister: {
     url: `${ENEMIES}/necromancer.glb`,
@@ -4017,11 +4147,15 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
   // Morthen, the Lich Bishop (the clip sets above): about three players tall
-  // at his template's 1.35, hovering on his smoke a hand over the flags.
+  // at his template's 1.35, floating on his soul smoke, the smoke funnel sunk
+  // into the ring floor (morthen_fx_core.ts MORTHEN_HOVER) so his whole body
+  // and face read from the default camera; his corpse is lifted back onto the
+  // flags as he falls (MORTHEN_DEATH_LIFT).
   crypt_morthen_lich: {
     url: `${CREATURES}/crypt_morthen_lich.glb`,
     height: 6.994,
-    hover: 0.122,
+    hover: MORTHEN_HOVER,
+    deathLift: MORTHEN_DEATH_LIFT,
     clips: MORTHEN_STAFF_CLIPS,
     phaseClips: {
       [MORTHEN_STAFF_HELD]: { clips: MORTHEN_STAFF_CLIPS },
@@ -4030,6 +4164,48 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     authoredAtlas: true,
     selfIllumination: 0.08,
+    clickRadius: 2.2,
+  },
+  // The Lady of the Bonechill (scripts/assets/hollow_crypt_creatures/build_lady.py),
+  // the ghost of a bride buried in the ravine's ice: authored at size (`height`
+  // and `hover` are the build's IDLE_HEIGHT and MINZ half a second into Idle,
+  // the ice crown on top), floating half a yard over the ice. Her gown, veil and
+  // sleeves are one alpha-blended material whose translucency lives in the baked
+  // atlas (it survives the far-LOD bake); the face and hands stay solid. The
+  // Lament and the Bridal Freeze play the Wail on their bars (the Freeze's 2.5 s
+  // bar at 1.2, so the scream peaks as either lands); the Embrace's reach closes
+  // on its bar's end, and the hold loops while the sim lifts her aloft.
+  crypt_lady_bonechill: {
+    url: `${CREATURES}/crypt_lady_bonechill.glb`,
+    height: 6.749,
+    hover: 0.544,
+    clips: {
+      idle: 'Idle',
+      combatIdle: 'CombatIdle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      // Letting go (gently or not): the arms open.
+      attackByAbility: { [LADY_EMBRACE_RELEASED]: 'Release', [LADY_EMBRACE_DROPPED]: 'Release' },
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Wail',
+      castByAbility: {
+        [LADY_BRIDES_LAMENT]: 'Wail',
+        [LADY_BRIDAL_FREEZE]: 'Wail',
+        [LADY_FROZEN_EMBRACE]: 'EmbraceReach',
+        [LADY_EMBRACE_HOLD]: 'EmbraceHold',
+      },
+      castTimeScaleByAbility: {
+        [LADY_BRIDES_LAMENT]: 1,
+        [LADY_BRIDAL_FREEZE]: 1.2,
+        [LADY_FROZEN_EMBRACE]: 1,
+      },
+    },
+    // The scream and the reach follow their bars; the hold just loops.
+    castClipSync: [LADY_BRIDES_LAMENT, LADY_BRIDAL_FREEZE, LADY_FROZEN_EMBRACE],
+    authoredAtlas: true,
+    selfIllumination: 0.3,
     clickRadius: 2.2,
   },
   mob_crypt_rimeweb: {
@@ -4180,6 +4356,13 @@ export const VISUALS: Record<string, VisualDef> = {
         [KNELLWYRM_PYRE_STRAFE]: 'TakeWing',
         [KNELLWYRM_STRAFE_RUN]: 'Strafe',
         [KNELLWYRM_DREAD_BELLOW]: 'Bellow',
+        // Heroic Burning Knell. Aloft, a flier's `jump` (Fly) owns the rig and
+        // these play only on the frames it reads grounded (the take-off, the
+        // touchdown); the mark and the pour also ride one-shots below.
+        [KNELLWYRM_KNELL_RISE]: 'TakeWing',
+        [KNELLWYRM_KNELL_MARK]: 'SkyRoar',
+        [KNELLWYRM_KNELL_BREATH]: 'Strafe',
+        [KNELLWYRM_KNELL_LAND]: 'Glide',
       },
       castTimeScaleByAbility: {
         [CRYPT_BARROWFLAME_BREATH]: 1,
@@ -4187,7 +4370,14 @@ export const VISUALS: Record<string, VisualDef> = {
         [CRYPT_WING_GUST]: 1,
         [KNELLWYRM_PYRE_STRAFE]: 1,
         [KNELLWYRM_DREAD_BELLOW]: 1,
+        // TakeWing is authored on the 2.5 s rise (60 frames at 24 fps).
+        [KNELLWYRM_KNELL_RISE]: 1,
       },
+      // The Knell's beats aloft (morthen_rite_fx_core.ts): it roars the fire
+      // down over the marked half, then dives into the pour (Strafe's 33
+      // frames are the 1.4 s breath at rate 1).
+      attackByAbility: { [KNELL_GESTURE_SKY_ROAR]: 'SkyRoar', [KNELL_GESTURE_POUR]: 'Strafe' },
+      attackTimeScaleByAbility: { [KNELL_GESTURE_SKY_ROAR]: 1, [KNELL_GESTURE_POUR]: 1 },
       castPlayOut: ['Breath', 'TailSweep', 'WingBuffet', 'Bellow'],
       flourish: 'Roar',
     },
@@ -4920,29 +5110,33 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.08,
   },
   // The Pearlguard Sentinel (pearlguard_sentinel; scripts/assets/
-  // drowned_temple_creatures/sentinel_manta/): the Moonmantle Ray, a giant
-  // sacred manta of moonlight gliding a yard over the flags. Its pearl-white
-  // back carries nine nacre plates carved with the moon's phases (new moon on
-  // its left wingtip to full on its right); the wings thin to edges clear as
-  // water with a filament of cyan light inside; underneath it is deep
-  // turquoise strewn with stars. Its cephalic lobes curl into a silver
-  // crescent round its glowing heart pearl; a whip tail ends in tide-glass.
-  // Idle: a slow wave rolling out along the wings. Walk glides on deep beats,
-  // Run (also its Onrush) darts risen with the wings swept back like an
-  // arrowhead; walkRef/runRef are the glide speeds those beats are authored
-  // for (its wander and its chase). Attack: a cut with the right wing's edge
-  // (CONTACT 0.42); Attack2: the tail arched over its back and lashed down
-  // (0.5). Pearl Slam (1.5 s bar) plays Slam: it rears up on its tail, wings
-  // opened high (about 6 drawn), and drives them down on the bar's end. Pearl
-  // Carapace: temple_fx swaps the rig to its cocoon stance (the wings wrapped
-  // under its belly, moon plates out, ShellClose to enter, ShellOpen bursting
-  // free). Dying, it sinks to the floor and its wing light goes out from the
-  // tips inward, the pearl last. `hover` is its Idle's lowest point (the tail
-  // tip), so the floor of the model stays the floor of the world; drawn 1.6
-  // high at rest and 6.8 wingtip to wingtip at its 1.15 (2.6 players across).
+  // drowned_temple_creatures/sentinel_manta/, reworked in round two): the
+  // Moonmantle Ray, a giant sacred manta of moonlight gliding a yard over the
+  // flags. A thick, muscled disc: its back the deep night-sea blue with pearl
+  // chevrons on the shoulders and nine raised nacre plates carved with the
+  // moon's phases (new moon on its left wingtip to full on its right); the
+  // wings thin to edges of clear cyan with a filament of light inside;
+  // underneath, a pale pearl heart of the belly fading to turquoise strewn
+  // with stars, deep gill slits and a keel. Its cephalic lobes run forward
+  // into one silver crescent moon standing round its heart pearl (a sculpted
+  // pearl lit from within, a crescent carved on its face); a whip tail ends
+  // in pointed tide-glass. Idle: a slow wave rolling out along the wings.
+  // Walk glides on deep beats, Run (also its Onrush) darts risen with the
+  // wings swept back like an arrowhead; walkRef/runRef are the glide speeds
+  // those beats are authored for (its wander and its chase). Attack: a cut
+  // with the right wing's edge (CONTACT 0.42); Attack2: the tail arched over
+  // its back and lashed down (0.5). Pearl Slam (1.5 s bar) plays Slam: it
+  // rears up on its tail, wings opened high, and drives them down on the bar's
+  // end. Pearl Carapace: temple_fx swaps the rig to its cocoon stance (the
+  // wings wrapped under its belly, moon plates out, ShellClose to enter,
+  // ShellOpen bursting free). Dying, it sinks to the floor and its wing light
+  // goes out from the tips inward, the pearl last. `hover` is its Idle's
+  // lowest point (the tail tip), so the floor of the model stays the floor of
+  // the world; drawn 1.52 high at rest and still 6.8 wingtip to wingtip at
+  // its 1.15 (the thicker body makes it a little taller per unit of span).
   temple_sentinel: {
     url: `${CREATURES}/temple_sentinel.glb`,
-    height: 1.4,
+    height: 1.3236,
     hover: 0.673,
     clips: SENTINEL_CLIPS,
     phaseClips: {
@@ -4958,7 +5152,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Glimmerscale Lurker (glimmerscale_lurker; scripts/assets/
   // drowned_temple_creatures/lurker_mantis/): a giant mantis shrimp the
   // moon-water made sacred, long, low and armoured in iridescent plates
-  // (turquoise to violet, pearl rims, a carved crescent on every tergite),
+  // (turquoise to violet, pearl rims, a carved crescent on every tergite;
+  // round two sculpts the armour: keels down every plate, hooked pleura down
+  // its flanks, swimmerets, a ribbed shield and a rostral spine, ringed and
+  // spurred legs, a combed propodus and a hammer-ringed club, a pitted shell),
   // its front half reared, eyes on turning stalks banded in silver, two
   // raptorial arms folded like jackknives, a tail fan of nacre paddles. Its
   // swings snap the arms out (Attack: both, Attack2: one; contact at 0.16).
@@ -4989,7 +5186,11 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // The bosses. Choirmother Selthe (choirmother_selthe; scripts/assets/
   // drowned_temple_creatures/selthe_matriarch/): the siren matriarch, built
-  // on the Moonlit Siren's body but far larger, a vast lionfish fan opening
+  // on the Moonlit Siren's skeleton but broad and heavy in the game's
+  // stylized way (round two: a deep ribcage, strong shoulders and arms, a
+  // thicker coil, a larger head with a heavy scowling brow, glowing slit
+  // eyes, two small fangs and the lionfish's violet bars across her face,
+  // arms and flanks), a vast lionfish fan opening
   // behind her like the pipes of an organ (silver rays, pearl tips, sheer
   // turquoise to violet fins), her tail coiled in the pool of moonlit water
   // she rides, the golden Great Conch on her chest, a jaw that drops too far
@@ -5036,22 +5237,28 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.06,
   },
   // The Tideglass Colossus (tideglass_colossus; scripts/assets/
-  // drowned_temple_creatures/colossus_tideglass/, rebuilt from scratch): a
-  // giant of sea-glass the moon's water hardened, massive forms cut in broad
-  // facets with fractures of light running through it, violet crystal spires
-  // bursting from its shoulders, spine, elbows and knees, silver bands with
-  // moons, and in its chest, held in a silver crescent ringed with pearls, the
-  // prism: the cut gem of silver and violet that casts the Reflections. It
-  // walks its foe down (Walk, Run). Prism Flare (2.0 s bar) plays Flare: arms
-  // flung wide, the prism blazing on the bar's end. Moonlight Lance (2.0 s
-  // bar) plays Lance: the prism levelled along its pointing arm. Resonant Slam
-  // (1.5 s bar) plays Slam: both fists into the floor and a ring of broken
-  // crystal. Heroic's Reflection swap arrives as a windup cue: PrismPulse.
-  // Dying, it kneels, topples and breaks into crystal over a pool of water.
-  // The template's 2.2 scale (its long reach) draws it at 15 world units.
+  // drowned_temple_creatures/colossus_tideglass/, recut in round two): a giant
+  // of hard sea-glass, every block of it a cut gem (the builder's gem.py: flat
+  // facets and sharp edges, each facet its own depth of teal, a bright rim on
+  // every edge), the light inside it breaking out of the seams between the
+  // blocks and along a few long fractures, pointed violet spires bursting from
+  // its shoulders, spine, elbows and knees, a low scowling head with two
+  // slanting slits of light under a crown of crystal horns, silver bands with
+  // moons, and in its chest, in a nacre-lined socket held by a silver crescent
+  // ringed with pearls, the prism: the cut gem of silver and violet that casts
+  // the Reflections. It walks its foe down (Walk, Run). Prism Flare (2.0 s
+  // bar) plays Flare: arms flung wide, the prism blazing on the bar's end.
+  // Moonlight Lance (2.0 s bar) plays Lance: the prism levelled along its
+  // pointing arm. Resonant Slam (1.5 s bar) plays Slam: both fists into the
+  // floor and a ring of broken crystal. Heroic's Reflection swap arrives as a
+  // windup cue: PrismPulse. Dying, it kneels, topples and breaks into crystal
+  // over a pool of water. Its body keeps the old 15-unit scale under the
+  // template's 2.2 (its long reach); the pointed spires now rise past it, so
+  // the drawn bounds are 16.7. The env boost matches its Reflections' glass:
+  // the temple's dim environment runs across its glossy facets.
   temple_colossus: {
     url: `${CREATURES}/temple_colossus.glb`,
-    height: 15 / 2.2,
+    height: 16.7 / 2.2,
     clips: {
       ...TEMPLE_CLIPS,
       castByAbility: {
@@ -5073,6 +5280,7 @@ export const VISUALS: Record<string, VisualDef> = {
     castClipSync: true,
     authoredAtlas: true,
     selfIllumination: 0.06,
+    envMapIntensity: 2.2,
   },
   // The Moonspawn (moonspawn; scripts/assets/drowned_temple_creatures/
   // moonspawn_tide/): Ysolei's summoned add had no body of its own and drew
@@ -6050,7 +6258,7 @@ for (const cls of ALL_CLASSES) {
 // The Wildheart Basin's placeholder creatures (wildheart_creature_looks.ts).
 Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 // The Gravewyrm Sanctum's creatures: the Sledge Tusker's Blender body and the
-// re-tinted trash placeholders (sanctum_creature_looks.ts).
+// trash's own bodies (sanctum_creature_looks.ts, sanctum_trash_looks.ts).
 Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 // The Gravewyrm Sanctum's three bosses (sanctum_boss_looks.ts).
 Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
@@ -6273,11 +6481,12 @@ const MOB_KEYS: Record<string, string> = {
   morthen: 'crypt_morthen_lich',
   cantor_ilvane: 'crypt_skel_cantor',
   hollow_chorister: 'crypt_skel_chorister',
-  rimeweb: 'mob_crypt_rimeweb',
+  rimeweb: 'crypt_lady_bonechill',
   crypt_shambler: 'skel_rogue',
   // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
   crypt_ossuary_warrior: 'crypt_skel_warrior',
   crypt_bone_pile: 'crypt_skel_bone_pile',
+  crypt_remembrance_candle: 'crypt_rite_candle_body',
   crypt_gravecaller_adept: 'crypt_skel_adept',
   crypt_ossuary_cutthroat: 'crypt_skel_cutthroat',
   crypt_gravecaller_necromancer: 'crypt_skel_necromancer',

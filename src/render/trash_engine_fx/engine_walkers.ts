@@ -32,6 +32,7 @@ import {
   rgbOf,
   SCHOOL_TINT,
   walkerHover,
+  walkerSize,
   walkerTint,
 } from './trash_engine_fx_core';
 import type { TrashEngineHost } from './trash_engine_host';
@@ -564,12 +565,13 @@ export class EngineWalkers {
       while (dh < -Math.PI) dh += Math.PI * 2;
       slot.heading += dh * k;
       slot.group.position.set(slot.x, slot.y, slot.z);
+      const size = walkerSize(slot.def);
       const pulse = 0.92 + 0.12 * Math.sin(clock * 9 + slot.seed);
-      slot.group.scale.setScalar(pulse);
+      slot.group.scale.setScalar(pulse * size);
       slot.halo.scale.setScalar(2.6 + 0.3 * Math.sin(clock * 5 + slot.seed));
       const gy = h.groundY(slot.x, slot.z);
       slot.floor.position.set(slot.x, gy + 0.1, slot.z);
-      slot.floor.scale.set(2.2, 1, 2.2);
+      slot.floor.scale.set(2.2 * size, 1, 2.2 * size);
       slot.floorMat.opacity = 0.55;
       slot.chevron.position.set(slot.x, gy + 0.09, slot.z);
       slot.chevron.rotation.y = slot.heading;

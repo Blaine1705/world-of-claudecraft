@@ -25,7 +25,11 @@
 // allocation.
 
 import * as THREE from 'three';
-import { SOUL_BRAZIER_ID } from '../../sim/encounters/gravewyrm_sanctum/ids';
+import {
+  BONEWALKER_ID,
+  SOUL_BRAZIER_ID,
+  VELKHAR_ID,
+} from '../../sim/encounters/gravewyrm_sanctum/ids';
 import {
   SANCTUM_BRANDING_IRON,
   SANCTUM_COUNTERWEIGHT_LASH,
@@ -40,6 +44,12 @@ import { BRAZIER_TOPPLED_GESTURE } from '../characters/sanctum_creature_looks';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { surfaceMat } from '../gfx';
 import {
+  anchorPoint,
+  BONEWALKER_RISE_GESTURE,
+  BONEWALKER_RISE_WINDOW,
+  bonewalkerRisesOnSight,
+  brandIronAnchor,
+  breathReachShare,
   ERUPTION_SECONDS,
   eruption,
   FLAME_HEAT,
@@ -47,6 +57,10 @@ import {
   lashSweep,
   rgb,
   SANCTUM_PALETTE,
+  SPLINTER_COPY_GESTURE,
+  SPLINTER_COPY_WINDOW,
+  SPLINTER_FRACTURE_GESTURE,
+  sanctumAnchor,
   sanctumDrawnHeight,
   sanctumTelegraphSpecs,
   toppleTilt,
@@ -287,7 +301,14 @@ export class SanctumKitFx {
   private readonly rimeHalf: number;
   private readonly tmpA = new THREE.Vector3();
   private readonly tmpB = new THREE.Vector3();
+  private readonly anchorTmp: [number, number, number] = [0, 0, 0];
   private readonly up = new THREE.Vector3(0, 1, 0);
+  /** The Raised Bonewalkers the scan has already seen (each judged once). */
+  private readonly walkersSeen = new Set<number>();
+  /** Entrances on offer: entity id to its gesture and until when (a view or a
+   *  first-loaded GLB may land a frame or two after the cue; the rig plays an
+   *  entrance once, so re-offering is safe). */
+  private readonly entrances = new Map<number, { gesture: string; until: number }>();
   private clock = 0;
 
   constructor(
@@ -480,6 +501,9 @@ export class SanctumKitFx {
     switch (ev.ability) {
       case SANCTUM_THAW_THE_HELD:
         this.erupt(src.pos.x, src.pos.z);
+        // The risen soldier (the event's target) climbs out of the ice.
+        if (ev.targetId !== undefined && ev.targetId !== null)
+          this.offerEntrance(ev.targetId, BONEWALKER_RISE_GESTURE, BONEWALKER_RISE_WINDOW);
         return true;
       case SANCTUM_COUNTERWEIGHT_LASH:
         this.lash(src);
@@ -626,18 +650,21 @@ export class SanctumKitFx {
     const h = this.host;
     const gy = h.groundY(src.pos.x, src.pos.z);
     const bh = sanctumDrawnHeight(src.templateId, src.scale);
-    const fx = Math.sin(src.facing);
-    const fz = Math.cos(src.facing);
-    const mx = src.pos.x + fx * bh * 0.3;
-    const mz = src.pos.z + fz * bh * 0.3;
-    const my = gy + bh * 0.5;
+    const m = this.tmpA;
+    const mouth = sanctumAnchor('breath', src.templateId);
+    anchorPoint(mouth, src.pos.x, src.pos.z, gy, src.facing, bh, m);
+    const mx = m.x;
+    const mz = m.z;
+    const my = m.y;
+    // The puff starts at the jaws but stops where the sim's cone does.
+    const reach = this.rimeRange * breathReachShare(this.rimeRange, mouth[0] * bh);
     const n = 26;
     for (let i = 0; i < n; i++) {
       const a = src.facing + (h.rand() * 2 - 1) * this.rimeHalf;
       const dx = Math.sin(a);
       const dz = Math.cos(a);
       h.puff(mx, my, mz, 1, {
-        speed: this.rimeRange * 2.4,
+        speed: reach * 2.4,
         up: -0.4,
         life: 0.55,
         size: [0.5, 2.2],
@@ -649,7 +676,7 @@ export class SanctumKitFx {
       });
       if (i % 2 === 0)
         h.puff(mx, my, mz, 1, {
-          speed: this.rimeRange * 2.6,
+          speed: reach * 2.6,
           life: 0.5,
           size: [0.16, 0.04],
           color: rgb(SANCTUM_PALETTE.rime),
@@ -669,6 +696,10 @@ export class SanctumKitFx {
     const x = copy ? (src.pos.x + copy.pos.x) / 2 : src.pos.x;
     const z = copy ? (src.pos.z + copy.pos.z) / 2 : src.pos.z;
     const heading = copy ? Math.atan2(copy.pos.x - src.pos.x, copy.pos.z - src.pos.z) : src.facing;
+    // Both halves stagger as the crack runs through them: the original at
+    // once, the copy as its entrance (offered until its view exists).
+    h.gesture(src.id, SPLINTER_FRACTURE_GESTURE);
+    if (copy) this.offerEntrance(copy.id, SPLINTER_COPY_GESTURE, SPLINTER_COPY_WINDOW);
     // The body splits along a seam: ice and rune-iron thrown both ways.
     for (const side of [0, Math.PI]) {
       h.shards.burst(x, gy + bh * 0.55, z, 28, {
@@ -744,8 +775,10 @@ export class SanctumKitFx {
 
   // ------------------------------------------------------------------- scans
 
-  /** A mob seen by the scan: claim its Thaw or Branding Iron tether. */
+  /** A mob seen by the scan: offer a fresh Bonewalker its rise, and claim a
+   *  Thaw or Branding Iron tether. */
   scanMob(e: Entity): void {
+    if (e.templateId === BONEWALKER_ID) this.offerRise(e);
     if (e.dead) return;
     const cast = e.castingAbility;
     if (cast !== SANCTUM_THAW_THE_HELD && cast !== SANCTUM_BRANDING_IRON) return;
@@ -756,10 +789,39 @@ export class SanctumKitFx {
     t.castId = cast;
   }
 
+  /** A Bonewalker seen for the first time: one of Velkhar's adds climbing
+   *  out while he fights rises (Thaw the Held's walkers rise off their own
+   *  landing event, handleEvent). */
+  private offerRise(e: Entity): void {
+    if (this.walkersSeen.has(e.id)) return;
+    this.walkersSeen.add(e.id);
+    // Forget the bodies that left the world (bounded by the live walkers).
+    for (const id of this.walkersSeen)
+      if (!this.world.entities.has(id)) this.walkersSeen.delete(id);
+    if (bonewalkerRisesOnSight(e.templateId, e.dead, this.velkharFighting()))
+      this.offerEntrance(e.id, BONEWALKER_RISE_GESTURE, BONEWALKER_RISE_WINDOW);
+  }
+
+  /** True while a living Velkhar is in his fight (judged once per walker). */
+  private velkharFighting(): boolean {
+    for (const m of this.world.entities.values())
+      if (m.templateId === VELKHAR_ID && !m.dead && m.inCombat) return true;
+    return false;
+  }
+
+  private offerEntrance(id: number, gesture: string, window: number): void {
+    this.entrances.set(id, { gesture, until: this.clock + window });
+    this.host.gesture(id, gesture);
+  }
+
   // ------------------------------------------------------------------- frame
 
   update(dt: number, clock: number): void {
     this.clock = clock;
+    for (const [id, e] of this.entrances) {
+      if (clock > e.until) this.entrances.delete(id);
+      else this.host.gesture(id, e.gesture);
+    }
     this.paintTethers(dt);
     this.paintColumns();
     this.paintSweeps(dt);
@@ -779,13 +841,21 @@ export class SanctumKitFx {
       }
       const thaw = t.castId === SANCTUM_THAW_THE_HELD;
       const hc = sanctumDrawnHeight(caster.templateId, caster.scale);
-      const fx = Math.sin(caster.facing);
-      const fz = Math.cos(caster.facing);
-      const reach = thaw ? 0.2 : 0.42;
-      const from = this.tmpA.set(
-        caster.pos.x + fx * hc * reach,
-        h.groundY(caster.pos.x, caster.pos.z) + hc * (thaw ? 0.45 : 0.5),
-        caster.pos.z + fz * hc * reach,
+      const from = this.tmpA;
+      const barFill =
+        caster.castTotal > 0
+          ? Math.min(1, Math.max(0, 1 - caster.castRemaining / caster.castTotal))
+          : 1;
+      anchorPoint(
+        thaw
+          ? sanctumAnchor('riteCenser', caster.templateId)
+          : brandIronAnchor(caster.templateId, barFill, this.anchorTmp),
+        caster.pos.x,
+        caster.pos.z,
+        h.groundY(caster.pos.x, caster.pos.z),
+        caster.facing,
+        hc,
+        from,
       );
       const tgy = h.groundY(target.pos.x, target.pos.z);
       // A corpse lies on the ice; a living victim takes it in the chest.
@@ -795,10 +865,7 @@ export class SanctumKitFx {
         target.pos.z,
       );
       const len = from.distanceTo(to);
-      const fill =
-        caster.castTotal > 0
-          ? Math.min(1, Math.max(0, 1 - caster.castRemaining / caster.castTotal))
-          : 1;
+      const fill = barFill;
       const mesh = thaw ? t.thaw : t.spark;
       const mat = thaw ? t.thawMat : t.sparkMat;
       (thaw ? t.spark : t.thaw).visible = false;

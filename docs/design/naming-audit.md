@@ -915,6 +915,54 @@ bg3.wiki and the Forgotten Realms wiki, plus exact-phrase web searches for the c
 | Nacre Mantle | the group shield for taking the pearl | KEEP. Only biology papers (nacre is laid by the mollusc mantle). |
 | Rusted Bolt | the arbalests' bolt on the mark | KEEP. The arbalest's shipped petSpell name, reused. |
 
+### The Hollow Crypt wing-boss rework (web-verified 2026-10-05)
+
+Exact-phrase and coined-token searches at authoring (warcraft.wiki.gg full text, the Guild Wars
+wiki, and for the encounter names also the FFXIV wiki), for the three reworked wing bosses
+(`src/sim/encounters/hollow_crypt/marrow_ids.ts`, `lady_ids.ts`, `ilvane_ids.ts`) and the
+Lady's renamed loot (`src/sim/content/hollow_crypt_items.ts`; display only, the ids are frozen
+since the spider placeholder and pinned by `tests/hollow_crypt_alert.test.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Lady of the Bonechill | the second boss (display name of `rimeweb`) | KEEP. No match for the full name; "Bonechill" is already a GENERIC token in this game (Bonechill Cord, Striders, Widow). |
+| Bride's Lament, Frozen Embrace, Rime Path, Bridal Freeze, Lingering Lament, Shattering Fall, Rime-Slick | her kit and the ice | KEEP. No match for any full name; generic English. |
+| Earthbound | REJECTED before shipping | A game title (Nintendo's EarthBound). Marrow's heroic haste in a grave is Grave Vigor. |
+| Grave Vigor, Shovelful, Gravedigger's Blow, Unquiet Earth, Measured for the Grave | Sexton Marrow's kit | KEEP. No match for any full name; generic English. |
+| Bone Organ, Unbroken Verse | Cantor Ilvane's organ and her heroic uninterruptible Dirge | KEEP. No match. |
+| Open Grave, Grave Dirt, Dirt in the Eyes, Harmony, Crescendo, Encore, Grave Lantern, Frozen Ravine | mechanics, auras and places | GENERIC. Plain English. |
+| Bonechill Carapace Vest | RENAMED before the rework shipped (theme, not a collision) | The spider word. Now Bonechill Hauberk (`bonechill_carapace_vest`): a mail chest, which is what the committed icon paints. No match for the full name on either wiki; "Bonechill" is GENERIC here (WoW's Bonechill Hammer and Magus Bonechill share only the common compound). |
+| Rimeweb Hunter's Leggings | RENAMED before the rework shipped (theme) | The spider's web and its hunter. Now Rime-Laced Leggings (`rimeweb_hunters_leggings`), after the frosted lacing on the committed icon. No match for the full name or for "Rime-laced" on either wiki. |
+| Rimeweb Fang | RENAMED before the rework shipped (theme) | The committed icon is a pale curved ice blade, not a fang. Now Bride's Icicle (`rimeweb_fang`, and its generated heroic twin, which reads the base name). No match on either wiki. |
+| Rimesilk | kept | A bride's silk: Rimesilk Mantle and Rimesilk Hood keep their names. |
+
+### Morthen's Rite and the Knellwyrm's Burning Knell (web-checked 2026-10-05)
+
+The new player-visible names of Morthen the Gravecaller's three-act rite
+(`src/sim/encounters/hollow_crypt/morthen_ids.ts` and its siblings), the Knellwyrm's heroic
+flight (`knellwyrm_knell.ts`) and the rite's deed (`dgn_morthen_candlelight` in
+`src/sim/content/deeds.ts`). The authoring session had no web search, so the exact-phrase
+and coined-token searches ran in a follow-up session on the same day, before the change
+shipped. One collision was found and renamed before shipping (the id stays frozen).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Gravecall | the Bound Soul launch (finder copy) | KEEP. Builds on this game's own shipped "Gravecall" token (Gravecall Acolyte, Morthen the Gravecaller). Elsewhere only as a minor compound (an EverQuest II sword "Gravecall, Sword of Culling", an Age of Wonders 4 staff); not distinctive to one game. |
+| Gorged on the Dead | Morthen's stacking damage buff from the souls | Chosen in the crypt rework's 2026-09-29 naming pass to replace the rejected "Soul Tithe" (`docs/design/dungeon-rework/hollow_crypt.md` section 10); re-confirm with the rest of this table. |
+| Rite of the Unquiet | his act-two channel at the altar | Chosen in the same 2026-09-29 pass to replace the rejected "Rite of Unmaking" (section 10); re-confirm with the rest of this table. |
+| Unquiet Ward | his immunity through the Rite | CLEAR. No match for the full name (only The Elder Scrolls Online quest "The Unquiet Dead" shares the common word). |
+| Reap the Unquiet | his Last Rites frontal sweep | CLEAR. No match. |
+| Name the Dead | the heroic candle order (the Ledger) | CLEAR. No match on the WoW, Guild Wars or FFXIV wikis. |
+| Grasp of the Grave | the heroic rings and their hands | GENERIC. No match on the WoW, Guild Wars, FFXIV or PoE wikis; the phrase is a stock tabletop necromancy spell name (D&D 4e, several d20 publishers, GemStone IV), shared generic fantasy English. |
+| Burning Knell | the Knellwyrm's heroic flight | CLEAR. No match. |
+| By Candlelight | RENAMED before shipping | COLLISION: the exact title of a World of Warcraft storyline (The War Within). The deed ships as Every Candle Lit (`dgn_morthen_candlelight`); no match for that name. |
+| Bound Soul | the soul itself | GENERIC. Reuses this game's own mob name (`bound_soul`). |
+| Grave Chill | the Rite's rising shadow damage | GENERIC, as already recorded for Wraithbinder Maldrec's pulse (this audit's mechanic table). An exact World of Warcraft spell name exists (a Shadowlands zone hazard), but the two words are plain English and the name already shipped here. |
+| Remembrance Candle | the four candles and their usable bodies | GENERIC. A real-world memorial candle; no game match. |
+| Candle's Price | the relight's health drain (a damage name) | CLEAR. No match. |
+| Rite Broken, Shattered Ward | the stun and the vulnerability when the fourth candle catches | GENERIC. Plain English. |
+| Shadow Pulse, Relight the Candle, the Ledger | the pulse (already shipped on him as GENERIC), the relight bar, the book that names the order | GENERIC. Plain English. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

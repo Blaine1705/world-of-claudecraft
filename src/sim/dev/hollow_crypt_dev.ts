@@ -21,7 +21,21 @@
 //                                      he stands ready at the altar)
 //   /dev crypt wyrm                    skip the entrance and slay Morthen: the
 //                                      Knellwyrm finale starts (pyre, flight in)
-//   /dev crypt trigger <strafe|bellow> fire an engaged Knellwyrm's mechanic now
+//   /dev crypt trigger <strafe|bellow|knell> fire an engaged Knellwyrm's mechanic
+//                                      now (knell: the heroic Burning Knell flight)
+//   /dev crypt pull <marrow|lady|ilvane|morthen> open the gates, stand in the
+//                                      boss's arena and pull it (Morthen skips
+//                                      his entrance first)
+//   /dev crypt trigger <shovel|grave|blow|toll>       Sexton Marrow now
+//   /dev crypt trigger <lament|embrace|freeze>        the Lady of the Bonechill
+//   /dev crypt trigger <dirge|organ|crescendo>        Cantor Ilvane
+//   /dev crypt trigger <pulse|gravecall|rite|candle|reap|grasp>  Morthen (rite:
+//                                      the Rite of the Unquiet now; candle: relight
+//                                      the next candle; reap: his Last Rites sweep;
+//                                      grasp: Grasp of the Grave)
+//   /dev crypt hp <percent>            set every engaged boss to a share of its
+//                                      health (66, 50, 33, 29: the phases; Morthen
+//                                      64 for the Rite, 34 for his Last Rites)
 //
 // Areas: landing, cloister, grille, processional, yard, bellyard (marrow),
 // gallery, rim, web (rimeweb), choir, loft (ilvane), stair, bonestair, ring
@@ -56,6 +70,7 @@ export const HOLLOW_CRYPT_DEV_AREAS: Readonly<Record<string, { x: number; z: num
   rim: { x: 105, z: 40 },
   web: { x: 80, z: 98 },
   rimeweb: { x: 80, z: 98 },
+  lady: { x: 80, z: 98 },
   choir: { x: 0, z: 122 },
   loft: { x: 0, z: 152 },
   ilvane: { x: 0, z: 152 },
@@ -68,6 +83,7 @@ export const HOLLOW_CRYPT_DEV_AREAS: Readonly<Record<string, { x: number; z: num
 const BOSS_ALIASES: Readonly<Record<string, string>> = {
   marrow: 'sexton_marrow',
   rimeweb: 'rimeweb',
+  lady: 'rimeweb',
   ilvane: 'cantor_ilvane',
   morthen: 'morthen',
 };
@@ -88,7 +104,7 @@ export const HOLLOW_CRYPT_DEV_MOBS: Readonly<Record<string, string>> = {
 };
 
 const HELP =
-  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <c1..c4|p1|drake|p2|w1..w4|e1..e3|q1|q2|s1|marrow|rimeweb|ilvane|morthen|all> | pack <id> | spawn <warrior|adept|cutthroat|necromancer|minion|brute|gargoyle|caller|crow|drake|widow> | rise [skip] | wyrm | trigger <strafe|bellow> | reset';
+  '[dev] /dev crypt enter [normal|heroic] | tp <landing|cloister|grille|processional|yard|bellyard|gallery|rim|web|choir|loft|stair|bonestair|ring> | gates | kill <c1..c4|p1|drake|p2|w1..w4|e1..e3|q1|q2|s1|marrow|rimeweb|ilvane|morthen|all> | pack <id> | spawn <warrior|adept|cutthroat|necromancer|minion|brute|gargoyle|caller|crow|drake|widow> | pull <marrow|lady|ilvane|morthen> | hp <percent> | rise [skip] | wyrm | trigger <shovel|grave|blow|toll|lament|embrace|freeze|dirge|organ|crescendo|pulse|gravecall|rite|candle|reap|grasp|strafe|bellow|knell> | reset';
 
 /** Raise one trash mob ahead of the player, pulled at once (a gargoyle starts
  *  on a perch and a drake high in the sky, so both show their descent). */
@@ -254,6 +270,59 @@ export function handleHollowCryptDevChat(ctx: SimContext, raw: string, pid: numb
       return true;
     }
     log(ctx, pid, `[dev] ${cryptDevTrigger(ctx, inst, arg)}`);
+    return true;
+  }
+  if (verb === 'pull') {
+    const bossId = BOSS_ALIASES[arg];
+    const area = HOLLOW_CRYPT_DEV_AREAS[arg];
+    if (!bossId || !area) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    const inst = ensureInside(ctx, pid);
+    const me = ctx.entities.get(pid);
+    if (!inst || !me) return true;
+    setDungeonGatesDevOpen(inst, true);
+    const o = instanceOrigin(DUNGEONS[DUNGEON_ID].index, inst.slot);
+    // Morthen: skip his entrance (he stands ready at the altar), then step in
+    // south of him, inside the ring.
+    if (bossId === 'morthen') cryptDevTrigger(ctx, inst, 'skip');
+    const at = bossId === 'morthen' ? { x: 0, z: 200 } : area;
+    displacePlayerForDev(ctx, me, o.x + at.x, o.z + at.z);
+    const boss = inst.mobIds
+      .map((id) => ctx.entities.get(id))
+      .find((e) => e?.templateId === bossId && !e.dead);
+    if (!boss) {
+      log(ctx, pid, `[dev] ${arg} is already dead: /dev crypt reset for a fresh run.`);
+      return true;
+    }
+    ctx.aggroMob(boss, me, false);
+    log(ctx, pid, `[dev] Pulled ${MOBS[bossId].name}.`);
+    return true;
+  }
+  if (verb === 'hp') {
+    const pct = Number(arg);
+    const inst = claimFor(ctx, pid);
+    if (!inst || !Number.isFinite(pct) || pct <= 0 || pct > 100) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    let n = 0;
+    for (const id of inst.mobIds) {
+      const e = ctx.entities.get(id);
+      if (!e || e.dead || !e.inCombat) continue;
+      if (
+        e.templateId !== 'sexton_marrow' &&
+        e.templateId !== 'rimeweb' &&
+        e.templateId !== 'cantor_ilvane' &&
+        e.templateId !== 'morthen' &&
+        e.templateId !== 'crypt_knellwyrm'
+      )
+        continue;
+      e.hp = Math.max(1, Math.floor((e.maxHp * pct) / 100));
+      n++;
+    }
+    log(ctx, pid, `[dev] Set ${n} engaged boss${n === 1 ? '' : 'es'} to ${pct}% health.`);
     return true;
   }
   if (verb === 'reset') {

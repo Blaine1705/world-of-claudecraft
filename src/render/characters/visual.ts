@@ -75,7 +75,7 @@ import {
   tintedFarMaterials,
 } from './assets';
 import { BoneDials } from './bone_dials';
-import { deathGroundingOffset } from './death_grounding_core';
+import { deathGroundingOffset, deathLiftOffset } from './death_grounding_core';
 import {
   createGhostEffectMaterial,
   createMoonkinEffectMaterial,
@@ -1391,7 +1391,9 @@ export class CharacterVisual {
     this.harvestRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
     this.warriorBody.applyContactRecoil(this.poseWrap, dt, reducedMotion || s.dead);
 
-    // distant corpses show the static idle far mesh, tip it over
+    // distant corpses show the static idle far mesh, tip it over (laid on its
+    // side from the pivot, so a body sunk in life by a negative hover needs no
+    // deathLift here: the rig's lift above is what rests the near corpse)
     if (this.farMesh?.visible) {
       if (s.dead) {
         this.farMesh.rotation.z = Math.PI / 2;
@@ -1455,11 +1457,15 @@ export class CharacterVisual {
 
   private syncDeathGrounding(dead: boolean): void {
     const finalOffset = this.def.deathGroundOffset ?? 0;
-    if (finalOffset <= 0) return;
+    const lift = this.def.deathLift;
+    if (finalOffset <= 0 && !lift) return;
     const death = this.action(this.def.clips.death);
+    const time = death?.time ?? 0;
+    const duration = death?.getClip().duration ?? 0;
     this.modelWrap.position.y =
       this.modelWrapGroundY -
-      deathGroundingOffset(dead, death?.time ?? 0, death?.getClip().duration ?? 0, finalOffset);
+      deathGroundingOffset(dead, time, duration, finalOffset) +
+      (lift ? deathLiftOffset(dead, time, duration, lift.yards, lift.from, lift.to) : 0);
   }
 
   private updateMetamorphWings(dt: number, s: AnimState, reducedMotion: boolean): void {

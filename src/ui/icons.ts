@@ -5636,6 +5636,12 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // The Drowned Temple's lore guide deed (The Last Verse): the dungeon crest
   // until its painting is commissioned.
   'dgn_drowned_temple_cantor',
+  // The Hollow Crypt's wing-boss deeds: the dungeon crest until their paintings
+  // are commissioned.
+  'dgn_marrow_tidy',
+  'dgn_lady_nobody_hanging',
+  'dgn_ilvane_hush',
+  'dgn_morthen_candlelight',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

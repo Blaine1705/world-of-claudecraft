@@ -151,18 +151,19 @@ describe('the Sunken Bastion creature roster', () => {
       expect(nodes.has(bone), bone).toBe(true);
   });
 
-  it("keeps the Sanctum Thawcaller on the sea hag's first rig when the Chanter changed", () => {
-    // The Gravewyrm Sanctum's Thawcaller placeholder is a re-tint spread from
-    // the Mist Chanter's row; it keeps the first hag GLB (its own file) so the
-    // Bastion's sculpted Chanter never changes another dungeon's look.
+  it('leaves the Sanctum Thawcaller its own body when the Chanter changed', () => {
+    // The Gravewyrm Sanctum's Thawcaller used to be a re-tint spread from the
+    // Mist Chanter's row; it now wears its own Blender body
+    // (characters/sanctum_trash_looks.ts), so the Bastion's sculpted Chanter
+    // never changes another dungeon's look.
     const chanter = VISUALS[keyOf('mistweaver')];
     const thaw = VISUALS.sanctum_thawcaller;
     expect(chanter.url).toBe('models/creatures/mist_chanter.glb');
     expect(chanter.authoredAtlas).toBe(true);
-    expect(thaw.url).toBe('models/creatures/mist_chanter_thawcaller.glb');
-    expect(thaw.authoredAtlas).toBeUndefined();
+    expect(thaw.url).toBe('models/creatures/sanctum_thawcaller.glb');
+    expect(thaw.authoredAtlas).toBe(true);
     const clips = glbClips(thaw.url);
-    for (const clip of ['Idle', 'Walk', 'Run', 'Attack', 'Attack2', 'Hit', 'Death', 'Cast', 'Ward'])
+    for (const clip of ['Idle', 'Walk', 'Run', 'Attack', 'Hit', 'Death', 'WarmingRite'])
       expect(clips.has(clip), clip).toBe(true);
   });
 

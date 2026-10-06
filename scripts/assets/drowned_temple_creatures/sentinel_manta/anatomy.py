@@ -35,18 +35,24 @@ WING_X = (0.5, 1.05, 1.6, 2.12, 2.6, S)   # the wing joints, root to tip
 N_WING = len(WING_X) - 1
 EDGE_CHORD = 0.42             # the wing bones run along this chord fraction
 PLATE_N = 9
-PEARL_AT = np.array((0.0, -1.74, Z0 + 0.46))
+PEARL_AT = np.array((0.0, -1.5, Z0 + 0.54))
 PEARL_R = 0.24
-CRESCENT_R = 0.39             # the pearl's cradle and the lobes' inner arcs share this circle
-LOBE = [np.array(p) for p in ((0.42, -1.22, Z0 + 0.02), (0.45, -1.52, Z0 + 0.1), (0.4, -1.76, Z0 + 0.36),
-                              (0.31, -1.79, Z0 + 0.72), (0.12, -1.77, Z0 + 0.87))]
-LOBE_W = (0.12, 0.11, 0.09, 0.065, 0.018)     # each blade's width across its curve
-LOBE_T = (0.06, 0.05, 0.04, 0.03, 0.01)       # and its thickness
+HEART_K = 1.08                # the sculpted pearl's radius over PEARL_R
+CRESCENT_R = 0.36             # the pearl's cradle and the lobes' inner arcs share this circle
+# the lobes run forward from the head's corners, then sweep up round the
+# pearl as the two horns of a crescent moon, the tips flicking out at about
+# the pearl's crown (never closing over it); the silver cradle under the
+# pearl (CRADLE) joins them into one crescent seen from the front
+LOBE = [np.array(p) for p in ((0.42, -1.2, Z0 + 0.02), (0.45, -1.38, Z0 + 0.12), (0.42, -1.43, Z0 + 0.3),
+                              (0.39, -1.43, Z0 + 0.62), (0.31, -1.44, Z0 + 0.84))]
+LOBE_W = (0.12, 0.14, 0.15, 0.1, 0.014)       # each blade's width across its curve
+LOBE_T = (0.05, 0.042, 0.036, 0.03, 0.01)     # and its thickness: flat blades
 EYE_AT = np.array((0.5, -1.12, Z0 + 0.19))
 EYE_R = 0.075
 TAIL = [np.array((0.0, 1.0 + 0.56 * i, Z0 - 0.04 - 0.012 * i)) for i in range(7)]
 TAIL_R = (0.1, 0.075, 0.058, 0.046, 0.036, 0.028, 0.022)
 CRYSTAL_LEN = 0.5
+GILL_Y0, GILL_DY, GILL_X = -0.86, 0.15, (0.26, 0.6)
 BAKE_CAGE, BAKE_RAY = 0.012, 0.045
 
 
@@ -120,11 +126,14 @@ def surfaces(x, y):
     le, te = y_le(u), y_te(u)
     c = np.clip((y - le) / np.maximum(te - le, 1e-4), 0, 1)
     af = np.sqrt(c) * (1 - c) / 0.385
-    wt = np.maximum((0.1 * (1 - u) ** 1.4 + 0.011) * af, 0.013)
+    wt = np.maximum((0.13 * (1 - u) ** 1.3 + 0.012) * af, 0.013)
     by = np.clip(1 - ((y + 0.12) / 1.42) ** 2, 0, 1) ** 0.55
-    B = np.exp(-(x / 0.66) ** 2) * by
+    B = np.exp(-(x / 0.7) ** 2) * by
+    # the shoulders: a broad muscle mass either side of the spine behind the
+    # head, where the wings' great strokes are driven from
+    sh = np.exp(-((np.abs(x) - 0.62) / 0.3) ** 2) * np.exp(-((y + 0.42) / 0.5) ** 2)
     zc = zc_of(x)
-    return zc + wt + 0.46 * B, zc - 0.75 * wt - 0.27 * B
+    return zc + wt + 0.56 * B + 0.1 * sh, zc - 0.8 * wt - 0.34 * B - 0.03 * sh
 
 
 # ------------------------------------------------------------------ bones
@@ -277,6 +286,53 @@ def lobe_stations(s):
     return out
 
 
+def cradle_stations():
+    """(centre, frame, half width, half thickness, half length) of the silver
+    crescent under the pearl: an arc in the plane just behind the pearl's
+    centre, broadest at the bottom, narrowing up each side into the lobes."""
+    out = []
+    c0 = PEARL_AT + np.array((0.0, 0.05, 0.0))
+    for a in np.linspace(math.radians(208), math.radians(332), 15):
+        f = math.sin(math.pi * (a - math.radians(208)) / math.radians(124))
+        rad = np.array((math.cos(a), 0.0, math.sin(a)))
+        tg = np.array((-math.sin(a), 0.0, math.cos(a)))
+        fwd = np.array((0.0, -1.0, 0.0))
+        w = 0.05 + 0.06 * f
+        R = np.stack([rad, tg, fwd], axis=1)
+        out.append((c0 + rad * (CRESCENT_R - 0.01 + w * 0.6), R, w, 0.04, 0.07))
+    return out
+
+
+# the crescent: the band between an outer circle and an inner one set higher,
+# in the plane just behind the pearl's centre; its horns close at about the
+# pearl's crown and sweep back toward the body
+CRESCENT_RO, CRESCENT_OZ = 0.5, -0.08       # outer circle radius, its centre's height over the pearl's
+CRESCENT_RI, CRESCENT_IZ = 0.36, 0.14       # inner circle
+CRESCENT_TH = 0.045                         # half thickness at its belly (thinner toward the horns)
+CRESCENT_BEND = 0.32                        # the horns' sweep back
+
+
+class Crescent(sdf.Prim):
+    def __init__(self):
+        self.bone = None
+        self.c = PEARL_AT + np.array((0.0, 0.03, 0.0))
+        self.lo = self.c - np.array((CRESCENT_RO + 0.1, 0.3, CRESCENT_RO + 0.2))
+        self.hi = self.c + np.array((CRESCENT_RO + 0.1, 0.3, CRESCENT_RO + 0.1))
+
+    def front_y(self, x):
+        return self.c[1] + CRESCENT_BEND * x * x - CRESCENT_TH
+
+    def dist(self, X_, Y_, Z_):
+        x = X_ - self.c[0]
+        z = Z_ - self.c[2]
+        y = Y_ - (self.c[1] + CRESCENT_BEND * x * x)
+        d_out = np.sqrt(x * x + (z - CRESCENT_OZ) ** 2) - CRESCENT_RO
+        d_in = CRESCENT_RI - np.sqrt(x * x + (z - CRESCENT_IZ) ** 2)
+        d2 = _smax(d_out, d_in, 0.025)
+        th = CRESCENT_TH * (0.45 + 0.55 * np.clip((0.25 - z) / 0.6, 0, 1))
+        return _smax(d2, np.abs(y) - th, 0.018)
+
+
 # ------------------------------------------------------------------ the moon plates
 def plates():
     """(centre xy, radius, phase) of the nine plates, left tip (new moon) to
@@ -309,6 +365,9 @@ def moon_masks(P2, centre, r, phase):
     return plate, lit, np.clip(ring, 0, 1), disc
 
 
+CRESCENT = Crescent()
+
+
 # ------------------------------------------------------------------ the disc (one skinned body)
 def build_body(voxel):
     lo = np.array((-S - 0.12, -2.08, Z0 - 0.45))
@@ -333,7 +392,7 @@ def build_body(voxel):
         tp, bt = surfaces(c[0], c[1])
         tp, bt = float(tp), float(bt)
         th = tp - bt
-        h = min(0.05, 0.42 * th)
+        h = min(0.08, 0.45 * th)
         eps = 0.02
         gx = (float(surfaces(c[0] + eps, c[1])[0]) - float(surfaces(c[0] - eps, c[1])[0])) / (2 * eps)
         gy = (float(surfaces(c[0], c[1] + eps)[0]) - float(surfaces(c[0], c[1] - eps)[0])) / (2 * eps)
@@ -342,28 +401,66 @@ def build_body(voxel):
         R = frame_from(n, up=(0, 1, 0))
         cen = np.array((c[0], c[1], tp)) - n * h * 0.45
         F.add(Ellipsoid(cen, (r, r * 0.9, h), R), 0.012, weight=False)
-        for rad, depth in ((0.92 * r, 0.01), (0.62 * r, 0.008)):
+        for rad, depth in ((0.92 * r, 0.018), (0.62 * r, 0.014)):
             ring = [np.array((c[0], c[1], 0.0)) + R[:, 0] * rad * math.cos(a) + R[:, 1] * rad * 0.9 * math.sin(a)
                     for a in np.linspace(0, math.tau, 41)]
             ring = [p + np.array((0, 0, float(surfaces(p[0], p[1])[0]) + h * 0.5)) for p in ring]
-            F.groove(sdf.Polyline(ring, [0.006] * len(ring)), depth, k=0.011)
+            F.groove(sdf.Polyline(ring, [0.008] * len(ring)), depth, k=0.013)
+        # eight carved ticks round the rim: the temple's hours of the tide
+        for j in range(8):
+            a = math.tau * (j + 0.5) / 8
+            pa = np.array((c[0], c[1], 0.0)) + R[:, 0] * 0.7 * r * math.cos(a) + R[:, 1] * 0.7 * r * 0.9 * math.sin(a)
+            pb = np.array((c[0], c[1], 0.0)) + R[:, 0] * 0.86 * r * math.cos(a) + R[:, 1] * 0.86 * r * 0.9 * math.sin(a)
+            seg = [q + np.array((0, 0, float(surfaces(q[0], q[1])[0]) + h * 0.5)) for q in (pa, pb)]
+            F.groove(sdf.Polyline(seg, [0.006, 0.006]), 0.012, k=0.01)
     # the mouth: a wide slot across the blunt front of the head
     F.sub(RoundBox((0.0, -1.32, Z0 - 0.04), (0.34, 0.09, 0.028), radius=0.02), 0.03)
     # gill slits under the head, five a side
     for s in (1, -1):
         for j in range(5):
-            y = -0.78 + 0.13 * j
+            y = GILL_Y0 + GILL_DY * j
             pts = []
-            for x in np.linspace(0.3, 0.5, 6):
-                pts.append(np.array((s * x, y + 0.05 * (x - 0.3), float(surfaces(x, y)[1]) - 0.004)))
-            F.groove(sdf.Polyline(pts, [0.006] * len(pts)), 0.016, k=0.012)
+            for x in np.linspace(GILL_X[0], GILL_X[1], 8):
+                pts.append(np.array((s * x, y + 0.08 * (x - GILL_X[0]), float(surfaces(x, y)[1]) - 0.004)))
+            F.groove(sdf.Polyline(pts, [0.012] * len(pts)), 0.04, k=0.016)
+            if j < 4:
+                bar = [q + np.array((0, GILL_DY * 0.5, -0.002)) for q in pts]
+                F.ridge(sdf.Polyline(bar, [0.01] * len(bar)), 0.012, k=0.014)
+    # the belly: a shallow keel down the middle and the paired ridges of the
+    # pectoral girdle
+    keel = [np.array((0.0, y, float(surfaces(0.0, y)[1]) + 0.002)) for y in np.linspace(-0.9, 0.6, 12)]
+    F.ridge(sdf.Polyline(keel, [0.02] * 12), 0.02, k=0.03)
+    for s in (1, -1):
+        rib = [np.array((s * x, -0.25 + 0.25 * x * x, float(surfaces(s * x, -0.25 + 0.25 * x * x)[1]) + 0.002))
+               for x in np.linspace(0.12, 0.62, 8)]
+        F.ridge(sdf.Polyline(rib, [0.016] * 8), 0.016, k=0.025)
         # the eye socket
         F.sub(Sphere(_m(EYE_AT, s), EYE_R * 0.9), 0.02)
-    # the cephalic lobes, curled up and in like the horns of a crescent moon
+    # the cephalic lobes: two short flat stalks from the head's corners run
+    # forward into one great silver crescent moon standing round the pearl,
+    # its horns swept back. The crescent is one cut blade (Crescent); the
+    # lobe and cradle stations under it still carry its skin weights (the
+    # horns ride the Lobe bones, its belly the head) but are not meshed.
     for s, side in ((1, 'L'), (-1, 'R')):
         for j, (c, R, w, t, al) in enumerate(lobe_stations(s)):
             bone = f'{side}_Lobe1' if j < len(LOBE_STATIONS) // 2 else f'{side}_Lobe2'
-            F.add(Ellipsoid(c, (w, al, t), R, bone=bone), 0.06 if j < 2 else 0.045)
+            prim = Ellipsoid(c, (w, al, t), R, bone=bone)
+            if j < 5:
+                F.add(prim, 0.06 if j < 2 else 0.045)
+            else:
+                F.prims.append((prim, 0.0))
+    for c, R, w, t, al in cradle_stations():
+        F.prims.append((Ellipsoid(c, (w, al, t), R, bone='Head'), 0.0))
+    F.add(CRESCENT, 0.03, weight=False)
+    # a line engraved round the crescent's face, between its edges
+    arc = []
+    for a in np.linspace(math.radians(28), math.radians(-208), 47):
+        rr = 0.5 * (CRESCENT_RO + CRESCENT_RI)
+        x, z = rr * math.cos(a), rr * math.sin(a) + 0.5 * (CRESCENT_OZ + CRESCENT_IZ)
+        if (x * x + (z - CRESCENT_IZ) ** 2) < (CRESCENT_RI + 0.035) ** 2:
+            continue
+        arc.append(np.array((x, CRESCENT.front_y(x) - 0.002, PEARL_AT[2] + z)))
+    F.groove(sdf.Polyline(arc, [0.006] * len(arc)), 0.012, k=0.01)
     # the dorsal fin at the root of the tail, and the pelvic fins either side
     R = sdf.rot_matrix(rx=-0.5)
     F.add(Ellipsoid((0.0, 1.08, Z0 + 0.16), (0.022, 0.2, 0.13), R, bone='Hip'), 0.04)
@@ -415,14 +512,15 @@ def body_paint(obj):
         for c, R, w, t, al in lobe_stations(s):
             dd = np.linalg.norm(P - c, axis=1)
             lobe = np.maximum(lobe, np.clip((w + 0.06 - dd) / 0.05, 0, 1) * (y < -1.24))
+    lobe = np.maximum(lobe, np.clip(1 - (CRESCENT.dist_pts(P) - 0.004) / 0.02, 0, 1))
     mouth = (np.abs(x) < 0.36) * (y < -1.2) * np.clip(1 - np.abs(z - (Z0 - 0.04)) / 0.06, 0, 1)
     mouth = mouth * X.ramp(-y, 1.22, 1.3)
     gill = np.zeros(len(P))
     for s in (1, -1):
         for j in range(5):
-            yy = -0.78 + 0.13 * j
-            on = (np.abs(x) > 0.28) & (np.abs(x) < 0.52) & (z < (top + bot) * 0.5)
-            gill = np.maximum(gill, np.clip(1 - np.abs(y - (yy + 0.05 * (np.abs(x) - 0.3))) / 0.02, 0, 1) * on)
+            yy = GILL_Y0 + GILL_DY * j
+            on = (np.abs(x) > GILL_X[0] - 0.02) & (np.abs(x) < GILL_X[1] + 0.02) & (z < (top + bot) * 0.5)
+            gill = np.maximum(gill, np.clip(1 - np.abs(y - (yy + 0.08 * (np.abs(x) - GILL_X[0]))) / 0.028, 0, 1) * on)
     _write(obj, {'RegRim': rim, 'RegPlate': plate, 'RegMoon': lit, 'RegRing': ring, 'RegDisc': disc, 'RegLobe': lobe,
                  'RegMouth': mouth, 'RegGill': gill, 'RegSpan': np.clip(np.abs(x) / S, 0, 1)})
 
@@ -470,13 +568,43 @@ def crystal_paint(obj):
     _write(obj, {'RegAlong': np.clip(u, 0, 1)})
 
 
+# ------------------------------------------------------------------ the heart pearl
+def build_heart(voxel):
+    """The heart pearl: a great pearl with the growth lines of its nacre
+    sculpted round it and a crescent carved on its face."""
+    r = PEARL_R * HEART_K
+    F = Field(PEARL_AT - r - 0.1, PEARL_AT + r + 0.1, voxel)
+    F.add(Sphere(PEARL_AT, r), 0.0, weight=False)
+    for dz in (-0.55, -0.15, 0.3):
+        rr = r * math.sqrt(1 - dz * dz)
+        ring = [PEARL_AT + np.array((rr * math.cos(a), rr * math.sin(a), dz * r)) for a in np.linspace(0, math.tau, 49)]
+        F.groove(sdf.Polyline(ring, [0.003] * len(ring)), 0.004, k=0.006)
+    arc = []
+    for a in np.linspace(math.radians(120), math.radians(420), 25):
+        q = np.array((0.42 * r * math.cos(a), 0.0, 0.42 * r * math.sin(a) - 0.06 * r))
+        q[1] = -math.sqrt(max(0.0, r * r - q[0] ** 2 - q[2] ** 2))
+        arc.append(PEARL_AT + q)
+    F.groove(sdf.Polyline(arc[:13], [0.006] * 13), 0.008, k=0.008)
+    return F
+
+
+def heart_paint(obj):
+    from rig import mesh_arrays
+    P, _ = mesh_arrays(obj)
+    d = P - PEARL_AT
+    d /= np.linalg.norm(d, axis=1, keepdims=True)
+    _write(obj, {'RegFront': np.clip(-d[:, 1], 0, 1)})
+
+
 # ------------------------------------------------------------------ the sculpt list
 def fields(k=1.0):
     from build_core import Sculpt
     head_c = (0.0, -1.3, Z0 + 0.2)
     S_ = [Sculpt('Body', build_body(0.016 * k), 'mantle', 17000, tau=0.09, relax=5, paint=body_paint,
-                 spots=[(head_c, 0.55, 0.9), (tuple(_m(EYE_AT, 1)), 0.15, 0.8), (tuple(_m(EYE_AT, -1)), 0.15, 0.8)]),
+                 spots=[(head_c, 0.55, 0.9), (tuple(PEARL_AT), 0.62, 0.9), (tuple(_m(EYE_AT, 1)), 0.15, 0.8), (tuple(_m(EYE_AT, -1)), 0.15, 0.8)]),
           Sculpt('Tail', build_tail(0.007 * k), 'mantle_tail', 1600, tau=0.12, relax=3),
+          Sculpt('HeartPearl', build_heart(0.005 * k), 'heart', 1400, binding='rigid', bone='Pearl',
+                 paint=heart_paint),
           Sculpt('TideGlass', build_crystal(0.005 * k), 'glass', 500, binding='rigid', bone='Tail6',
                  paint=crystal_paint)]
     return S_

@@ -18,6 +18,7 @@ import {
   HOLLOW_CRYPT_LIGHTS,
   lightFlamePosition,
 } from './crypt_plan_core';
+import { tagRiteCandleLamp } from './rite_candle_decor';
 
 export interface CryptLightDeps {
   lowGfx: boolean;
@@ -99,8 +100,10 @@ export function buildCryptLights(
     // a pillar niche), never in mid-air.
     const [fx, y, fz] = lightFlamePosition(spot, ground);
     const gy = ground(fx, fz);
+    let flame: THREE.Mesh | null = null;
+    let halo: THREE.Sprite | null = null;
     if (CRYPT_FLAME_KINDS.has(spot.kind)) {
-      const flame = new THREE.Mesh(flameGeometry, flameMaterial(spot.kind));
+      flame = new THREE.Mesh(flameGeometry, flameMaterial(spot.kind));
       // A lantern's flame sits inside its cage; a bowl or wick flame rises off it.
       flame.position.set(fx, y + (spot.kind === 'lantern' ? 0 : 0.3), fz);
       const s =
@@ -114,7 +117,7 @@ export function buildCryptLights(
       deps.flames.push(flame);
     }
     if (spot.kind !== 'soul') {
-      const halo = new THREE.Sprite(haloMaterial(spot.kind));
+      halo = new THREE.Sprite(haloMaterial(spot.kind));
       halo.position.set(fx, y + 0.35, fz);
       const hs =
         spot.kind === 'brazier' || spot.kind === 'violet'
@@ -135,6 +138,10 @@ export function buildCryptLights(
     light.position.set(fx, y + 1, fz);
     group.add(light);
     deps.fireLights.push(light);
+    // Morthen's Rite gutters the Remembrance Candles and the group relights
+    // them: its painter finds this lamp by its tag (rite_candle_decor.ts).
+    if (spot.holder === 'Kit_RemembranceCandle')
+      tagRiteCandleLamp(spot.x, spot.z, flame, halo, light);
     // No floor pool for a glow hung over the chasm (the Great Web's heart).
     if (!deps.lowGfx && gy > HOLLOW_CRYPT_VOID_HEIGHT + 1) {
       const glow = new THREE.Mesh(glowGeometry, glowMaterial(spot.kind));

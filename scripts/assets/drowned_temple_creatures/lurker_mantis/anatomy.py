@@ -20,6 +20,8 @@ import sdf
 import sdf_ext as X
 from sdf import Ellipsoid, Field, Noise, RoundCone, Sphere, rot_matrix
 
+import gem as G
+
 NAME = 'GlimmerscaleLurker'
 PREFIX = 'lurker'
 
@@ -192,7 +194,8 @@ def build_body(voxel):
         c = a + (b - a) * 0.55
         R = _seg_frame(a, b)
         L = np.linalg.norm(b - a)
-        F.add(Ellipsoid(c, (ABD_W[i], L * 0.74, ABD_H[i]), R, bone=f'Abd{i + 1}'), 0.025)
+        F.add(G.gem_ellipsoid(c, (ABD_W[i], L * 0.74, ABD_H[i]), n=16, seed=60 + i, rot=R, bevel=0.025, chip=0.012,
+                              bone=f'Abd{i + 1}'), 0.025)
         # the tergite's back lip, standing proud over the next plate
         lip = [b + np.array((x * ABD_W[i] * 0.95, -0.03, ABD_H[i] * (0.82 - 0.55 * x * x))) for x in
                np.linspace(-1, 1, 11)]
@@ -200,7 +203,7 @@ def build_body(voxel):
         if i < 5:
             gr = [b + np.array((x * ABD_W[i] * 0.9, 0.03, ABD_H[i] * (0.7 - 0.5 * x * x))) for x in
                   np.linspace(-1, 1, 11)]
-            F.groove(sdf.Polyline(gr, [0.01] * 11), 0.03, k=0.02)
+            F.groove(sdf.Polyline(gr, [0.012] * 11), 0.045, k=0.022)
         for s in (1, -1):
             # the plate's back corner drawn out into a short spine
             k0 = b + np.array((s * ABD_W[i] * 0.86, -0.12, -ABD_H[i] * 0.05))
@@ -209,19 +212,54 @@ def build_body(voxel):
         # the dorsal keel, a low ridge down the middle of each plate
         F.ridge(sdf.Polyline([a + np.array((0, 0.06, ABD_H[i] * 0.96)), b + np.array((0, -0.02, ABD_H[i] * 0.9))],
                              [0.012, 0.012]), 0.025, k=0.03)
+        for s in (1, -1):
+            # the carinae: two more keels a side, running the plate's length
+            for fx in (0.38, 0.72):
+                zt = ABD_H[i] * math.sqrt(max(0.0, 1 - fx * fx)) * 0.97
+                F.ridge(sdf.Polyline([a + np.array((s * fx * ABD_W[i], 0.1, zt)),
+                                      b + np.array((s * fx * ABD_W[i] * 0.97, -0.04, zt * 0.92))], [0.01, 0.01]),
+                        0.02, k=0.022)
+            # the pleuron: a plate hanging down the flank, its back corner
+            # drawn into a hook, a groove along its upper edge
+            pc = a + (b - a) * 0.55 + np.array((s * ABD_W[i] * 0.93, 0.0, -ABD_H[i] * 0.42))
+            F.add(Ellipsoid(pc, (0.07, L * 0.46, ABD_H[i] * 0.5), rot_matrix(ry=-0.3 * s), bone=f'Abd{i + 1}'), 0.02)
+            F.add(RoundCone(pc + np.array((s * 0.02, L * 0.3, -ABD_H[i] * 0.3)),
+                            pc + np.array((s * 0.05, L * 0.55, -ABD_H[i] * 0.6)), 0.035, 0.006, bone=f'Abd{i + 1}'),
+                  0.02)
+            F.groove(sdf.Polyline([pc + np.array((s * 0.05, -L * 0.42, ABD_H[i] * 0.42)),
+                                   pc + np.array((s * 0.05, L * 0.42, ABD_H[i] * 0.42))], [0.008, 0.008]), 0.02,
+                     k=0.016)
+            # a swimmeret folded under the belly
+            sw = a + (b - a) * 0.5 + np.array((s * 0.16, 0.0, -ABD_H[i] * 0.95))
+            F.add(Ellipsoid(sw, (0.1, 0.05, 0.025), rot_matrix(rx=0.5), bone=f'Abd{i + 1}'), 0.02)
     # the belly under the abdomen, softer
     F.add(RoundCone(ABD[0] + np.array((0, 0, -0.1)), ABD[6] + np.array((0, 0, -0.06)), 0.22, 0.14, bone='Abd3'), 0.08)
     # the thorax and the reared carapace
-    F.add(Ellipsoid((0, 0.28, 0.56), (0.56, 0.42, 0.28), bone='Body'), 0.1)
+    F.add(G.gem_ellipsoid((0, 0.28, 0.56), (0.56, 0.42, 0.28), n=18, seed=70, bevel=0.025, chip=0.015, bone='Body'), 0.06)
     Rc = _seg_frame(CHEST[0], CHEST[1])
-    F.add(Ellipsoid((CHEST[0] + CHEST[1]) * 0.5, (0.5, 0.5, 0.36), Rc, bone='Chest'), 0.12)
+    F.add(G.gem_ellipsoid((CHEST[0] + CHEST[1]) * 0.5, (0.5, 0.5, 0.36), n=20, seed=71, rot=Rc, bevel=0.025, chip=0.015,
+                          bone='Chest'), 0.06)
     # the carapace shield: a broad plate over the chest, its rim standing proud
     sh_c = (CHEST[0] + CHEST[1]) * 0.5 + Rc[:, 2] * 0.12
-    F.add(Ellipsoid(sh_c, (0.55, 0.56, 0.22), Rc, bone='Chest'), 0.05)
+    F.add(G.gem_ellipsoid(sh_c, (0.55, 0.56, 0.22), n=22, seed=72, rot=Rc, bevel=0.025, chip=0.012, bone='Chest'), 0.03)
+    # the shield's carinae and the groove round its rim
+    for fx in (-0.5, -0.22, 0.0, 0.22, 0.5):
+        pts = []
+        for v in np.linspace(-0.85, 0.85, 9):
+            zz = 0.22 * math.sqrt(max(0.0, 1 - fx * fx * 0.9 - v * v * 0.9))
+            pts.append(sh_c + Rc @ np.array((fx * 0.55, v * 0.56, zz * 0.97)))
+        F.ridge(sdf.Polyline(pts, [0.01] * 9), 0.02, k=0.02)
+    rim = [sh_c + Rc @ np.array((0.53 * math.cos(t_), 0.54 * math.sin(t_), -0.02))
+           for t_ in np.linspace(0, math.tau, 41)]
+    F.groove(sdf.Polyline(rim, [0.01] * 41), 0.03, k=0.02)
     # the head: a narrow front, the rostral plate between the eyes
     Rh = _seg_frame(HEAD[0], HEAD[1])
-    F.add(Ellipsoid((HEAD[0] + HEAD[1]) * 0.5, (0.3, 0.3, 0.24), Rh, bone='Head'), 0.08)
+    F.add(G.gem_ellipsoid((HEAD[0] + HEAD[1]) * 0.5, (0.3, 0.3, 0.24), n=16, seed=73, rot=Rh, bevel=0.025, chip=0.012,
+                          bone='Head'), 0.05)
     F.add(Ellipsoid(HEAD[1] + np.array((0, -0.02, -0.06)), (0.15, 0.12, 0.08), Rh, bone='Head'), 0.05)
+    # the rostrum: a short keeled spine pointing forward between the eyes
+    F.add(X.Prism(HEAD[1] + np.array((0, 0.06, 0.0)), HEAD[1] + np.array((0, -0.24, -0.05)), 0.05, n=4, tip=0.6,
+                  tip_a=0.2, rot=0.785, bone='Head'), 0.02)
     # the mouth: a cleft under the head, the maxillipeds folded round it
     for s in (1, -1):
         F.add(RoundCone(_m((0.1, -0.56, 1.42), s), _m((0.12, -0.74, 1.3), s), 0.045, 0.03, bone='Head'), 0.03)
@@ -232,21 +270,51 @@ def build_body(voxel):
         sh, kn, wr, tp = _m(SHOULDER, s), _m(KNEE, s), _m(WRIST, s), _m(CLAW_TIP, s)
         side = 'L_' if s > 0 else 'R_'
         F.add(Sphere(sh, 0.12, bone=side + 'Merus'), 0.05)
-        F.add(RoundCone(sh, kn, 0.11, 0.1, bone=side + 'Merus'), 0.04)
+        F.add(G.gem_column(sh, kn, 0.11, 0.1, sides=6, seed=80 + s, bevel=0.025, chip=0.01, bone=side + 'Merus'), 0.03)
         F.add(Ellipsoid(kn + (sh - kn) * 0.45 + np.array((s * 0.02, -0.03, 0)), (0.11, 0.13, 0.22),
                         rot_matrix(rx=0.35), bone=side + 'Merus'), 0.06)
-        F.add(RoundCone(kn, wr, 0.085, 0.075, bone=side + 'Propodus'), 0.03)
+        F.add(G.gem_column(kn, wr, 0.085, 0.075, sides=6, seed=82 + s, bevel=0.02, chip=0.008,
+                           bone=side + 'Propodus'), 0.025)
         # the club: a heavy rounded heel at the bend, tapering to a hooked tip
         F.add(Sphere(wr + (tp - wr) * 0.15 + np.array((0, -0.04, 0.02)), 0.11, bone=side + 'Dactyl'), 0.04)
-        F.add(RoundCone(wr, tp, 0.095, 0.035, bone=side + 'Dactyl'), 0.04)
+        F.add(G.gem_column(wr, tp, 0.095, 0.035, sides=6, seed=84 + s, bevel=0.02, chip=0.008,
+                           bone=side + 'Dactyl'), 0.03)
         F.add(RoundCone(tp, tp + np.array((0, 0.06, -0.08)), 0.035, 0.012, bone=side + 'Dactyl'), 0.02)
+        # the joints ringed in plate: the shoulder, the knee (the carpus knob)
+        F.add(sdf.Torus(sh + (kn - sh) * 0.12, tuple(kn - sh), 0.11, 0.022, bone=side + 'Merus'), 0.015)
+        F.add(Sphere(kn + np.array((s * 0.03, -0.04, -0.02)), 0.095, bone=side + 'Propodus'), 0.03)
+        F.add(sdf.Torus(kn + (wr - kn) * 0.12, tuple(wr - kn), 0.082, 0.018, bone=side + 'Propodus'), 0.012)
+        # the groove in the merus the folded propodus lies in, and its outer keel
+        mg = [sh + (kn - sh) * u + np.array((0, -0.1, 0.0)) for u in np.linspace(0.18, 0.9, 6)]
+        F.groove(sdf.Polyline(mg, [0.012] * 6), 0.03, k=0.02)
+        mk = [sh + (kn - sh) * u + np.array((s * 0.1, 0.02, 0.0)) for u in np.linspace(0.12, 0.88, 6)]
+        F.ridge(sdf.Polyline(mk, [0.012] * 6), 0.025, k=0.02)
+        # the comb of the propodus: a row of short spines down its inner edge
+        for u in np.linspace(0.22, 0.86, 5):
+            c0 = kn + (wr - kn) * u + np.array((-s * 0.03, -0.06, 0.0))
+            F.add(RoundCone(c0, c0 + np.array((-s * 0.02, -0.07, -0.02)), 0.018, 0.004, bone=side + 'Propodus'),
+                  0.01)
+        # the heel of the smasher club: ringed like the face of a hammer
+        hh = wr + (tp - wr) * 0.15 + np.array((0, -0.04, 0.02))
+        hd = np.array((0.0, -0.75, -0.35))
+        F.ridge(sdf.Torus(hh + hd * 0.08, tuple(hd), 0.07, 0.006), 0.012, k=0.012)
+        F.ridge(sdf.Torus(hh + hd * 0.1, tuple(hd), 0.035, 0.006), 0.012, k=0.012)
         # the walking legs: short, jointed, tucked under the thorax
         for i in range(3):
             b, k, f = leg_points(i)
             b, k, f = _m(b, s), _m(k, s), _m(f, s)
-            F.add(RoundCone(b, k, 0.085, 0.065, bone=f'{side}Leg{i + 1}a'), 0.04)
-            F.add(Sphere(k, 0.06, bone=f'{side}Leg{i + 1}b'), 0.02)
-            F.add(RoundCone(k, f, 0.062, 0.028, bone=f'{side}Leg{i + 1}b'), 0.03)
+            F.add(Sphere(b, 0.09, bone=f'{side}Leg{i + 1}a'), 0.03)
+            F.add(G.gem_column(b, k, 0.08, 0.06, sides=5, seed=90 + i, bevel=0.015, chip=0.006,
+                               bone=f'{side}Leg{i + 1}a'), 0.02)
+            F.add(sdf.Torus(b + (k - b) * 0.55, tuple(k - b), 0.07, 0.012, bone=f'{side}Leg{i + 1}a'), 0.01)
+            F.add(Sphere(k, 0.066, bone=f'{side}Leg{i + 1}b'), 0.015)
+            F.add(G.gem_column(k, k + (f - k) * 0.55, 0.058, 0.045, sides=5, seed=93 + i, bevel=0.012, chip=0.005,
+                               bone=f'{side}Leg{i + 1}b'), 0.012)
+            F.add(Sphere(k + (f - k) * 0.55, 0.048, bone=f'{side}Leg{i + 1}b'), 0.012)
+            F.add(RoundCone(k + (f - k) * 0.55, f, 0.044, 0.012, bone=f'{side}Leg{i + 1}b'), 0.012)
+            # a spur at the knee
+            F.add(RoundCone(k + np.array((s * 0.03, 0.0, 0.03)), k + np.array((s * 0.1, 0.04, 0.08)), 0.02, 0.004,
+                            bone=f'{side}Leg{i + 1}a'), 0.01)
     # the tail fan: a keeled telson with marginal spines, two paddles a side
     t0, t1 = TAIL
     F.add(Ellipsoid(t0 + (t1 - t0) * 0.6, (0.3, 0.42, 0.065), bone='Tail'), 0.04)
@@ -264,7 +332,9 @@ def build_body(voxel):
             c = t0 + np.array((s * 0.12, 0.05, 0.0)) + d * ln * 0.5
             R = np.stack([np.cross(d, (0, 0, 1)), d, (0, 0, 1)], axis=1)
             F.add(Ellipsoid(c, (w, ln * 0.5, 0.045), R, bone='Tail'), 0.03)
-    F.displace(lambda X_, Y_, Z_: 0.002 * noise.fbm(X_ * 14, Y_ * 14, Z_ * 14, octaves=2), band=0.04)
+    pit = Noise(23)
+    F.displace(lambda X_, Y_, Z_: 0.002 * noise.fbm(X_ * 14, Y_ * 14, Z_ * 14, octaves=2)
+               + 0.0035 * np.abs(pit.fbm(X_ * 38, Y_ * 38, Z_ * 38, octaves=2)), band=0.04)
     return F
 
 
@@ -353,7 +423,7 @@ def eye_paint(side):
 # ------------------------------------------------------------------ the sculpt list
 def fields(k=1.0):
     from build_core import Sculpt
-    S = [Sculpt('Body', build_body(0.013 * k), 'shell', 11000, tau=0.035, paint=body_paint,
+    S = [Sculpt('Body', build_body(0.011 * k), 'shell', 17000, tau=0.035, paint=body_paint,
                 spots=[(tuple((HEAD[0] + HEAD[1]) * 0.5), 0.35, 0.8)])]
     for s, side in ((1, 'L'), (-1, 'R')):
         S.append(Sculpt(f'{side}_EyeMesh', build_eye(s, 0.007 * k), 'eye', 1300, binding='rigid', bone=f'{side}_Eye',

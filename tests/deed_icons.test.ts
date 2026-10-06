@@ -382,11 +382,13 @@ describe('Book of Deeds webp icons', () => {
     // crest beside the ferry round trip: 319 live, still 289 painted.
     // The five-dungeon rework's 19 encounter deeds join the pending set on the
     // dungeon crest: 338 live, still 289 painted. The Drowned Temple lore
-    // guide's The Last Verse joins it the same way: 339 live, still 289.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(339);
+    // guide's The Last Verse joins it the same way: 339 live, still 289. The
+    // Hollow Crypt wing bosses' three join it too: 342 live, still 289.
+    // Morthen's Every Candle Lit joins it: 343 live, still 289.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(343);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(50);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('dgn_drowned_temple_cantor');
+    expect(DEED_ART_PENDING_IDS).toHaveLength(54);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('dgn_morthen_candlelight');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

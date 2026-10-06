@@ -11,12 +11,20 @@ import type { Entity } from '../../types';
 export { clearCastOf, startCast } from '../drowned_temple/claim';
 export {
   bossEngaged,
+  bossTarget,
   claimBoss,
+  claimObjectAt,
   claimPlayers,
+  clearCastIf,
+  dropAuraById,
+  dropEncounterBody,
   dropEncounterObject,
   grantClaimDeed,
+  heavySwing,
   localOf,
   mechanicDamage,
+  pickMarkTargets,
+  startBar,
 } from '../sunken_bastion/claim';
 
 export const CRYPT_DUNGEON = 'hollow_crypt';

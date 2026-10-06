@@ -349,6 +349,29 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
   // (about 18,000), and the Mere Hydra's three heads about 2,000 each (55 s
   // for the three). Everything else keeps its raw template, so the mechanics
   // land at their authored normal numbers.
+  // The Hollow Crypt's wing bosses (docs/design/dungeon-rework/hollow_crypt.md
+  // 5.1 to 5.3): a health-only record. The pools come from target fight length
+  // x planning party DPS (45 at level 8, 50 at 9): Sexton Marrow 70 s (about
+  // 3,150 on his 639 template pool), the Lady of the Bonechill 80 s (about
+  // 4,000 on her 754), Cantor Ilvane 80 s for the whole fight, of which about
+  // 16 s go to her two Choristers (391 each, kept) first, so about 64 s on her
+  // own (about 3,200 on her 695). Every mechanic lands at its authored normal
+  // number (the encounter modules' tuning blocks), the trash keeps its template.
+  hollow_crypt: {
+    id: 'hollow_crypt',
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    healthMultiplierByMob: {
+      sexton_marrow: 4.93,
+      rimeweb: 5.3,
+      cantor_ilvane: 4.6,
+      // Morthen the Gravecaller (encounters/hollow_crypt/morthen.ts): 150 s with
+      // his immune Rite, about 125 s of damage at 55 (level 10): about 6,800 on
+      // his 1,191 template pool.
+      morthen: 5.7,
+    },
+    damageMultiplierByMob: {},
+  },
   drowned_temple: {
     id: 'drowned_temple',
     difficulty: 'normal',
@@ -499,9 +522,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     level: 22,
     healthMultiplier: 3.8,
     damageMultiplier: 20,
-    // The rework's wing bosses summon non-elite adds (Sexton Marrow's
-    // restless_bones at his Burial Toll, Rimeweb's hatchlings at her Brood
-    // Call): lifted onto the shared 150 summoned-add floor with the other
+    // The rework's wing bosses summon adds (Sexton Marrow's Restless Bones
+    // from his Open Graves, Cantor Ilvane's Choristers risen by her heroic
+    // Encore): lifted onto the shared 150 summoned-add floor with the other
     // heroics (tests/heroic_difficulty_floors.test.ts).
     addDamageMultiplier: 9.5,
     // Spawn-list trash below the 500 heroic mob floor on the shared factor is
@@ -514,6 +537,20 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       crypt_ossuary_cutthroat: 23,
       crypt_carrion_crow: 66,
     },
+    // The wing bosses' pools from target fight length x heroic party DPS
+    // (about 230) on their level-22 templates: Sexton Marrow 70 s (about
+    // 16,100 on 1,412), the Lady of the Bonechill 80 s (about 18,400 on
+    // 1,532), Cantor Ilvane about 64 s on her own (about 14,700 on 1,412)
+    // after her two Choristers, held to about 8 s each (about 1,840 on 971).
+    healthMultiplierByMob: {
+      sexton_marrow: 11.4,
+      rimeweb: 12,
+      cantor_ilvane: 10.4,
+      hollow_chorister: 1.9,
+      // Morthen: about 125 s of damage at about 230 beside his immune Rite
+      // (about 28,800 on his 2,074 level-22 template pool).
+      morthen: 13.9,
+    },
     // Avoidable trash mechanics priced apart from the tank-swing floor (the
     // dungeon trash pass's balance audit): the necromancer's Grave Rupture
     // rode its x24 melee lift to 528 to 720 plus a 432 to 720 pool, a
@@ -521,8 +558,21 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // a second (hollow_crypt_trash.ts). The adept keeps its x24 (its Grave
     // Bolt was priced on it before this pass; its volley's base is set for
     // it).
+    // The wing bosses' mechanics are priced apart from the melee floor (the Bastion's
+    // bands, cloth about 1,250 at 20 heroic): Marrow's Toll about 15 percent
+    // and a cave-in about 22; an unsheltered Lament about 27 (Lingering
+    // Lament stacks half again), her drop about 66; Ilvane's completed Dirge
+    // or a note lane about 70 (a fumbled core all but kills).
     mechanicDamageMultiplierByMob: {
       crypt_gravecaller_necromancer: 12,
+      sexton_marrow: 6,
+      rimeweb: 5,
+      cantor_ilvane: 8,
+      // Morthen at 9 (hollow_crypt.md 5.4): Shadow Pulse 216 to 270 (about 19
+      // percent, avoidable), a soul taken about 10, Grave Chill 27 a second
+      // rising by 9 every 5 s, the Reap 495 to 585 (about 43, the tank's), a
+      // wrong candle about 22, Grasp of the Grave 13 to 16 and a root.
+      morthen: 9,
     },
     armorMultiplier: 1.3,
     finalBossId: 'morthen',

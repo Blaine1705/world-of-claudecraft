@@ -24,6 +24,13 @@ import { rgbOf, SCHOOL_TINT, USE_HINT_RANGE, type UseHint, useHint } from './tra
 import type { TrashEngineHost } from './trash_engine_host';
 
 const SLOTS = 6;
+
+type KitUseSchool = keyof typeof SCHOOL_TINT;
+
+/** The school a use's beats are tinted in (a topple's spill, else its own). */
+function useSchool(def: KitUseDef): KitUseSchool {
+  return def.effect.kind === 'topple' ? def.effect.hazard.school : def.effect.school;
+}
 const MINT = 0x9dffcf;
 
 const RING_VERT = /* glsl */ `
@@ -188,7 +195,7 @@ export class EngineUse {
       dx = (body.pos.x - user.pos.x) / len;
       dz = (body.pos.z - user.pos.z) / len;
     }
-    const color = SCHOOL_TINT[def.effect.hazard.school] ?? SCHOOL_TINT.shadow;
+    const color = SCHOOL_TINT[useSchool(def)] ?? SCHOOL_TINT.shadow;
     h.shockRing(body.pos.x, body.pos.z, 0xf0f4f6, 3, 0.35);
     h.puff(body.pos.x, gy + 0.3, body.pos.z, 26, {
       speed: 4.5,
@@ -288,7 +295,7 @@ export class EngineUse {
               up: 1.2,
               life: 0.5,
               size: [0.16, 0.04],
-              color: rgbOf(SCHOOL_TINT[def.effect.hazard.school] ?? SCHOOL_TINT.shadow),
+              color: rgbOf(SCHOOL_TINT[useSchool(def)] ?? SCHOOL_TINT.shadow),
               alpha: 1,
               pool: 'glow',
               radius: bh * 0.2,

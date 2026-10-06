@@ -30,6 +30,7 @@ const MOB_IDS = [
   'willowfen_remedy_caravan',
   'frostveil_supply_caravan',
   'restless_bones',
+  'marrow_restless_bones',
   'gorrak',
   'mire_prowler',
   'deepfen_murloc',
@@ -98,6 +99,8 @@ const MOB_IDS = [
   'crypt_ossuary_drake',
   // The Hollow Crypt finale (sim/content/hollow_crypt.ts).
   'crypt_knellwyrm',
+  // Morthen's Rite: the usable body at each candle's foot (the relight).
+  'crypt_remembrance_candle',
   'bastion_revenant',
   'tidebound_acolyte',
   'drowned_thrall',

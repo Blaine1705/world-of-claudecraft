@@ -604,6 +604,31 @@ const mergeStringsEn = {
       crypt_knellwyrm_pyre_strafe: 'Pyre Strafe',
       crypt_knellwyrm_strafe_run: 'Strafing Run',
       crypt_knellwyrm_dread_bellow: 'Dread Bellow',
+      // The Hollow Crypt's wing bosses (encounters/hollow_crypt). The Dirge can
+      // be kicked; the Unbroken Verse (heroic) and the rest cannot.
+      crypt_marrow_shovelful: 'Shovelful',
+      crypt_marrow_measure: 'Measured for the Grave',
+      crypt_marrow_burial_toll: 'Burial Toll',
+      crypt_marrow_gravediggers_blow: "Gravedigger's Blow",
+      crypt_lady_brides_lament: "Bride's Lament",
+      crypt_lady_frozen_embrace: 'Frozen Embrace',
+      crypt_lady_embrace_hold: 'Frozen Embrace',
+      crypt_lady_bridal_freeze: 'Bridal Freeze',
+      crypt_ilvane_dirge: 'Dirge of the Hollow',
+      crypt_ilvane_unbroken_dirge: 'Unbroken Verse',
+      crypt_ilvane_bone_organ: 'Bone Organ',
+      // Morthen the Gravecaller's bars (encounters/hollow_crypt/morthen_ids.ts),
+      // the players' own relight bar on a Remembrance Candle, and the
+      // Knellwyrm's heroic Burning Knell flight (every phase reads as the
+      // mechanic). None can be kicked.
+      crypt_morthen_shadow_pulse: 'Shadow Pulse',
+      crypt_morthen_rite_of_the_unquiet: 'Rite of the Unquiet',
+      crypt_morthen_reap_the_unquiet: 'Reap the Unquiet',
+      kituse_crypt_relight_candle: 'Relight the Candle',
+      crypt_knellwyrm_knell_rise: 'Burning Knell',
+      crypt_knellwyrm_knell_mark: 'Burning Knell',
+      crypt_knellwyrm_knell_breath: 'Burning Knell',
+      crypt_knellwyrm_knell_land: 'Burning Knell',
       // The Sunken Bastion trash kit and boss casts (trash_kit/bastion_cast_ids.ts,
       // encounters/sunken_bastion/ids.ts). The Mend and the Ward can be kicked.
       bastion_brine_mend: 'Brine Mend',

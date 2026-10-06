@@ -121,8 +121,9 @@ describe('mob portrait source manifest', () => {
     // Korgath's four Seal Shackles (hammer, tongs, anvil, bellows). The
     // Stormbrass Foundry's seventeen bodies left with the parked dungeon.
     // 347: the dungeon trash pass's two new bodies (the Hollow Crypt's
-    // Stirring Bones and the Sunbone Dread Totem).
-    expect(liveIds).toHaveLength(347);
+    // Stirring Bones and the Sunbone Dread Totem). 348: Sexton Marrow's
+    // Restless Bones (marrow_restless_bones), raised from his Open Graves.
+    expect(liveIds).toHaveLength(348);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

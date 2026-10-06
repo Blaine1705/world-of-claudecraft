@@ -1,9 +1,10 @@
 // The Wildheart Basin's creature looks (docs/design/dungeon-rework/
-// wildheart_basin.md section 4). Most are PLACEHOLDERS: shipped rigs re-tinted
-// for the jungle so every new creature of the reworked basin is visible and
-// animated from day one, until the art phase gives each its own body. The
-// Great Saurian, the Great Jaguar and the Gorgebloom have their own Blender
-// bodies (WILDHEART_GREAT_SAURIAN_LOOK and its siblings). Every
+// wildheart_basin.md section 4). The rest are PLACEHOLDERS: shipped rigs
+// re-tinted for the jungle so every new creature of the reworked basin is
+// visible and animated from day one, until the art phase gives each its own
+// body. The Great Saurian, the Great Jaguar, the Gorgebloom, the Lasher, the
+// Sprout and the Basin Raptor have their own Blender bodies
+// (WILDHEART_GREAT_SAURIAN_LOOK and its siblings). Every
 // key keeps the mob id and the visual key, so a swap is a def change.
 // manifest.ts merges these over its VISUALS and maps the templates through
 // MOB_KEYS (WILDHEART_MOB_KEYS).
@@ -13,8 +14,13 @@
 // reach (the owner's rule: imposing, never toy-like). Heights below are the
 // drawn height at the template's scale.
 
+import { MOBS } from '../../sim/data';
 import {
+  BASIN_RAPTOR_ID,
+  BEAST_CALL_OF_THE_HUNT,
   BEAST_HEEL,
+  BEAST_PIT_QUAKE,
+  BEAST_THICKHIDE_WARD,
   BEAST_TUNING,
   BLOOM_GORGE,
   BLOOM_POLLINATE,
@@ -28,12 +34,42 @@ import {
 } from '../../sim/encounters/wildheart_basin/ids';
 import {
   WILDHEART_ENTANGLING_LASH,
+  WILDHEART_PLANT_TOTEM,
+  WILDHEART_POUNCE,
   WILDHEART_QUARRY_MARK,
+  WILDHEART_RATTLING_DREAD,
   WILDHEART_SNARING_TONGUE,
   WILDHEART_TOAD_HEX,
+  WILDHEART_TOTEM_PULSE,
   WILDHEART_WAR_ROAR,
 } from '../../sim/mob/trash_kit/wildheart_cast_ids';
-import { TRASH_CAST_CLIPS, trashCastClipRate } from '../wildheart_basin/basin_trash_fx_core';
+import {
+  RAPTOR_FRENZY_GESTURE,
+  TOTEM_RISE_GESTURE,
+  TRASH_CAST_CLIPS,
+  trashCastClipRate,
+  trashCastSeconds,
+} from '../wildheart_basin/basin_trash_fx_core';
+import {
+  BEASTMASTER_MODEL,
+  BEASTMASTER_SIM_SCALE,
+  BINDER_MODEL,
+  BINDER_SIM_SCALE,
+  beastmasterQuakeRate,
+  binderPlantRate,
+  DREAD_TOTEM_MODEL,
+  dreadRattleRate,
+  RAPTOR_MODEL,
+  RAPTOR_SIM_SCALE,
+  raptorPounceRate,
+  SUN_TOTEM_MODEL,
+  TOAD_CLIP,
+  TOAD_MODEL,
+  TOAD_SIM_SCALE,
+  TOTEM_SIM_SCALE,
+  trashLookHeight,
+  trashLookHover,
+} from '../wildheart_basin/basin_trash_model_core';
 import {
   GORGE_RATE,
   GORGEBLOOM_GLOW,
@@ -266,28 +302,227 @@ export const WILDHEART_THORN_SPROUT_LOOK: VisualDef = {
   clickRadius: 1.2,
 };
 
-/** A carved prop that never moves: every clip lookup misses harmlessly. */
-const STATIC_TOTEM_CLIPS: ClipMap = {
+/** The Basin Raptor (scripts/assets/wildheart_basin_raptor, built in Blender):
+ *  one sculpted hide in moss and ochre under dark tiger stripes, a big
+ *  scowling saurian head, the red quill crest of the Sunbone's pack beasts,
+ *  their bone-plated collar and fang charm, a great sickle on each inner toe.
+ *  Drawn at its authored size, 4.4 yd to the skull (4.9 to the crest's tips)
+ *  at its 1.7. Its leap (the trash kit's Pounce, flown by the sim from the
+ *  windup's tick) plays Pounce at once, landing its feet on the flight's last
+ *  frame; a packmate's death drives it screaming into its Pack Frenzy
+ *  (Screech, a gesture off basin_trash_fx.ts). It swings a bite and a
+ *  sickle slash. */
+export const WILDHEART_BASIN_RAPTOR_LOOK: VisualDef = {
+  url: RAPTOR_MODEL.url,
+  height: trashLookHeight(RAPTOR_MODEL, RAPTOR_SIM_SCALE),
+  hover: trashLookHover(RAPTOR_MODEL, RAPTOR_SIM_SCALE),
+  clips: {
+    idle: 'Idle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Bite', 'Slash'],
+    attackByAbility: { [WILDHEART_POUNCE]: 'Pounce', [RAPTOR_FRENZY_GESTURE]: 'Screech' },
+    attackTimeScaleByAbility: {
+      [WILDHEART_POUNCE]: raptorPounceRate(MOBS[BASIN_RAPTOR_ID]?.trashKit?.leap?.seconds ?? 0),
+      [RAPTOR_FRENZY_GESTURE]: 1,
+    },
+    hit: ['Hit'],
+    death: 'Death',
+    flourish: 'Screech',
+  },
+  oneShotsHoldAttacks: ['Pounce'],
+  walkRef: RAPTOR_MODEL.walkRef,
+  runRef: RAPTOR_MODEL.runRef,
+  attackTimeScale: 1.1,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.6,
+};
+
+/** The Spore Toad's death rate: its puffballs burst 0.6 s after it falls. */
+const TOAD_DEATH_RATE = TOAD_CLIP.burst / 0.6;
+
+/** The Spore Toad's clips (its body and the Toad Hex's toad share them). */
+const SPORE_TOAD_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Bite', 'Slam'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
+/** The Spore Toad (scripts/assets/wildheart_spore_toad, built in Blender): a
+ *  squat warty swamp toad bigger than a boar, its back crusted with glowing
+ *  puffballs, mushrooms and spore pods (its own emissive map), great gold eyes
+ *  on top, a mouth from ear to ear. Drawn at its authored size, 3.5 yd to the
+ *  eyes at its 2.4. The Snaring Tongue plays Tongue from the bar's start (the
+ *  rate its jaws fly open on the bar's end, TRASH_CAST_CLIPS), the throat
+ *  swelling through the bar, and finishes the reel as a play-out; the death
+ *  bloats it and bursts its puffballs into the Spore Burst's cloud. */
+export const WILDHEART_SPORE_TOAD_LOOK: VisualDef = {
+  url: TOAD_MODEL.url,
+  height: trashLookHeight(TOAD_MODEL, TOAD_SIM_SCALE),
+  hover: trashLookHover(TOAD_MODEL, TOAD_SIM_SCALE),
+  clips: {
+    ...SPORE_TOAD_CLIPS,
+    cast: 'Tongue',
+    castByAbility: { [WILDHEART_SNARING_TONGUE]: 'Tongue' },
+    castTimeScaleByAbility: {
+      [WILDHEART_SNARING_TONGUE]: trashCastClipRate(WILDHEART_SNARING_TONGUE),
+    },
+    castPlayOut: ['Tongue'],
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  walkRef: TOAD_MODEL.walkRef,
+  runRef: TOAD_MODEL.runRef,
+  attackTimeScale: 1.1,
+  // The puffballs burst about 0.6 s after it falls, as its spore cloud rises.
+  deathTimeScale: TOAD_DEATH_RATE,
+  authoredAtlas: true,
+  clickRadius: 2.2,
+};
+
+/** The Sunbone Totem-Binder (scripts/assets/wildheart_totem_binder, built in
+ *  Blender): a hunched, long-armed jungle troll in teal hide and Sunbone paint
+ *  under a jaguar-skull mask and red plumes, a bundle of carved stakes on his
+ *  back, the Binder's Staff (a jaguar crown under a bone sun) in his fist.
+ *  Drawn at its authored size, 5.9 yd to the plumes at its 1.95. The Plant
+ *  Totem bar plays PlantTotem from its start at 1x: the staff raised high and
+ *  driven butt first into the earth on the bar's end, where the totem rises. */
+export const WILDHEART_TOTEM_BINDER_LOOK: VisualDef = {
+  url: BINDER_MODEL.url,
+  height: trashLookHeight(BINDER_MODEL, BINDER_SIM_SCALE),
+  hover: trashLookHover(BINDER_MODEL, BINDER_SIM_SCALE),
+  clips: {
+    idle: 'Idle',
+    combatIdle: 'CombatIdle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Attack', 'Attack2'],
+    hit: ['Hit'],
+    death: 'Death',
+    cast: 'Cast',
+    castByAbility: { [WILDHEART_PLANT_TOTEM]: 'PlantTotem' },
+    castTimeScaleByAbility: {
+      [WILDHEART_PLANT_TOTEM]: binderPlantRate(trashCastSeconds(WILDHEART_PLANT_TOTEM)),
+    },
+    castPlayOut: ['PlantTotem'],
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  walkRef: BINDER_MODEL.walkRef,
+  runRef: BINDER_MODEL.runRef,
+  attackTimeScale: 1.1,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.4,
+};
+
+/** The Fanglord Beastmaster (scripts/assets/wildheart_beastmaster, built in
+ *  Blender on the Totem-Binder's troll body, bigger): a scarred jungle troll
+ *  under a jaguar-head hood, the pelt hanging down his back as a cloak and its
+ *  forelegs knotted across his chest, bone pauldrons, the Beastspear in his
+ *  fist. 6.3 yd to the hood's ears at his 2.35, a head over his jaguar. The
+ *  Beast Pit Quake plays Quake over its bar (the spear and his stamp strike the
+ *  pit floor on its end); Call of the Hunt and Thickhide Ward play WarCry and
+ *  Ward (gestures off their spellfx, basin_fx.ts). */
+export const WILDHEART_BEASTMASTER_LOOK: VisualDef = {
+  url: BEASTMASTER_MODEL.url,
+  height: trashLookHeight(BEASTMASTER_MODEL, BEASTMASTER_SIM_SCALE),
+  hover: trashLookHover(BEASTMASTER_MODEL, BEASTMASTER_SIM_SCALE),
+  clips: {
+    idle: 'Idle',
+    combatIdle: 'CombatIdle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Attack', 'Attack2'],
+    attackByAbility: { [BEAST_CALL_OF_THE_HUNT]: 'WarCry', [BEAST_THICKHIDE_WARD]: 'Ward' },
+    attackTimeScaleByAbility: { [BEAST_CALL_OF_THE_HUNT]: 1, [BEAST_THICKHIDE_WARD]: 1 },
+    hit: ['Hit'],
+    death: 'Death',
+    cast: 'Cast',
+    castByAbility: { [BEAST_PIT_QUAKE]: 'Quake' },
+    castTimeScaleByAbility: { [BEAST_PIT_QUAKE]: beastmasterQuakeRate(BEAST_TUNING.quakeCast) },
+    castPlayOut: ['Quake'],
+    flourish: 'WarCry',
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  oneShotsHoldAttacks: ['WarCry', 'Ward'],
+  walkRef: BEASTMASTER_MODEL.walkRef,
+  runRef: BEASTMASTER_MODEL.runRef,
+  attackTimeScale: 1.1,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.8,
+};
+
+/** A totem never walks: its gaits stand creaking in place. */
+const TOTEM_CLIPS: ClipMap = {
   idle: 'Idle',
   walk: 'Idle',
   run: 'Idle',
-  attack: ['Idle'],
-  death: 'Idle',
+  attack: ['Hit'],
+  hit: ['Hit'],
+  death: 'Death',
+  entrance: 'Rise',
+};
+
+/** The Sunbone Totem (scripts/assets/wildheart_sunbone_totem, built in
+ *  Blender): a carved ironwood post of stacked jaguar faces on a root-bound
+ *  basalt plinth, crowned by a bone sun with a jaguar skull whose eyes burn
+ *  green-gold (its own emissive map), bone charms swinging from its crossbar.
+ *  6.6 yd at its 1.6. It rises out of the ground when the Binder plants it
+ *  (Rise, a gesture off basin_trash_fx.ts), flares on every mending pulse
+ *  (Pulse, off basin_fx.ts) and topples into the earth with its Binder. */
+export const WILDHEART_SUNBONE_TOTEM_LOOK: VisualDef = {
+  url: SUN_TOTEM_MODEL.url,
+  height: trashLookHeight(SUN_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  hover: trashLookHover(SUN_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  clips: {
+    ...TOTEM_CLIPS,
+    attackByAbility: { [WILDHEART_TOTEM_PULSE]: 'Pulse' },
+    attackTimeScaleByAbility: { [WILDHEART_TOTEM_PULSE]: 1 },
+  },
+  entranceGesture: TOTEM_RISE_GESTURE,
+  oneShotsHoldAttacks: ['Rise'],
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.4,
+};
+
+/** The Sunbone Dread Totem: the same post under a great tusked troll skull
+ *  washed in old blood, red light in its sockets, bone rattles on its bar.
+ *  6.4 yd at its 1.6. Its Rattling Dread plays Rattle over the 2 s bar (the
+ *  jaw chattering harder and harder, the scream landing on the bar's end). */
+export const WILDHEART_SUNBONE_DREAD_TOTEM_LOOK: VisualDef = {
+  url: DREAD_TOTEM_MODEL.url,
+  height: trashLookHeight(DREAD_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  hover: trashLookHover(DREAD_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  clips: {
+    ...TOTEM_CLIPS,
+    cast: 'Rattle',
+    castByAbility: { [WILDHEART_RATTLING_DREAD]: 'Rattle' },
+    castTimeScaleByAbility: {
+      [WILDHEART_RATTLING_DREAD]: dreadRattleRate(trashCastSeconds(WILDHEART_RATTLING_DREAD)),
+    },
+    castPlayOut: ['Rattle'],
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  entranceGesture: TOTEM_RISE_GESTURE,
+  oneShotsHoldAttacks: ['Rise'],
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.4,
 };
 
 /** [base visual key, tint, tint strength, height factor over the base, extra]. */
 type PlaceholderRow = [string, number, number, number, Partial<VisualDef>?];
 
 const ROWS: Record<string, PlaceholderRow> = {
-  // Basin Raptor: the velociraptor in jungle olive; about 3.8 yd at its 1.7.
-  // A 1,248-triangle low-poly rig flat-shaded per facet: at this size every
-  // facet read as a hard polygon, so its normals are creased smooth (60
-  // degrees: the body and tail blend, the claws, teeth and jaw stay crisp).
-  wildheart_basin_raptor: ['mob_spearjaw', 0x6f7a3a, 0.6, 1.25, { smoothNormals: 60 }],
-  // Spore Toad: the frog rig, warty olive and as big as a boar (4.5 yd at 2.4).
-  wildheart_spore_toad: ['mob_murloc', 0x7f8a34, 0.7, 1.1, { selfIllumination: 0.08 }],
-  // Sunbone Totem-Binder: the Hexcaller under a bone-ochre wash.
-  wildheart_totem_binder: ['mob_wildheart_hexcaller', 0xd9b26a, 0.3, 1.05],
   // The Howdah Hexcaller: the Hexcaller in the howdah's war red.
   wildheart_howdah_hexcaller: ['mob_wildheart_hexcaller', 0xa3322a, 0.22, 1],
 };
@@ -313,12 +548,11 @@ const HUNT_CAST_RIGS: Readonly<Record<string, readonly string[]>> = {
   mob_wildheart_stalker: [WILDHEART_QUARRY_MARK],
   mob_wildheart_ravager: [WILDHEART_WAR_ROAR],
   mob_wildheart_hexcaller: [WILDHEART_TOAD_HEX],
-  wildheart_spore_toad: [WILDHEART_SNARING_TONGUE],
 };
 
 /** The Toad Hex's toad (the polymorph slot's other animal,
- *  characters/form_visual_selection_core.ts): the Spore Toad's warty frog rig
- *  in its olive, shrunk to a squat thing at a player's knee. */
+ *  characters/form_visual_selection_core.ts): the Spore Toad's own body,
+ *  shrunk to a squat thing at a player's knee. */
 const TOAD_FORM_HEIGHT = 1.3;
 
 /** Zulgar vanishes (heroic Ambush): his whole model hides, then returns. */
@@ -380,20 +614,22 @@ export function wildheartPlaceholderLooks(
   out.wildheart_vine_lasher = WILDHEART_VINE_LASHER_LOOK;
   out.wildheart_thorn_sprout = WILDHEART_THORN_SPROUT_LOOK;
   out.wildheart_fanglord_jaguar = WILDHEART_GREAT_JAGUAR_LOOK;
-  // The hunt's casts on their rigs (the base rigs and the Spore Toad above).
+  out.wildheart_basin_raptor = WILDHEART_BASIN_RAPTOR_LOOK;
+  out.wildheart_spore_toad = WILDHEART_SPORE_TOAD_LOOK;
+  // The hunt's casts on the shipped troll rigs.
   for (const [key, casts] of Object.entries(HUNT_CAST_RIGS)) {
     const taught = withHuntCasts(out[key] ?? visuals[key], casts);
     if (taught) out[key] = taught;
   }
-  const frog = visuals.mob_murloc;
-  if (frog)
-    out.form_toad = {
-      ...frog,
-      height: TOAD_FORM_HEIGHT,
-      tint: 0x7f8a34,
-      tintStrength: 0.7,
-      selfIllumination: 0.08,
-    };
+  // The Toad Hex's toad: the Spore Toad's own body shrunk to a player's knee.
+  out.form_toad = {
+    url: TOAD_MODEL.url,
+    height: TOAD_FORM_HEIGHT,
+    clips: SPORE_TOAD_CLIPS,
+    walkRef: TOAD_MODEL.walkRef * (TOAD_FORM_HEIGHT / (TOAD_MODEL.idleTop - TOAD_MODEL.idleMin)),
+    runRef: TOAD_MODEL.runRef * (TOAD_FORM_HEIGHT / (TOAD_MODEL.idleTop - TOAD_MODEL.idleMin)),
+    authoredAtlas: true,
+  };
   // Zulgar keeps his shipped body; it learns to vanish for the Ambush.
   const zulgar = visuals.mob_wildheart_high_priest;
   if (zulgar)
@@ -416,25 +652,11 @@ export function wildheartPlaceholderLooks(
     attackTimeScale: 1.15,
     clickRadius: 1.4,
   };
-  // The Sunbone Totem: the shipped carved mask totem as a stationary prop
-  // (about 6.4 yd at its 1.6), its bone and ochre kept, a faint inner glow.
-  out.wildheart_sunbone_totem = {
-    url: 'models/props/wildheart_mask_totem.glb',
-    height: 4,
-    clips: STATIC_TOTEM_CLIPS,
-    authoredAtlas: true,
-    selfIllumination: 0.18,
-    clickRadius: 1.4,
-  };
-  // The Sunbone Dread Totem: the same carved post washed in old blood, its
-  // bone darkened and its paint glowing red (the fx crown it with the
-  // red-painted skull, basin_trash_fx.ts).
-  out.wildheart_sunbone_dread_totem = {
-    ...out.wildheart_sunbone_totem,
-    tint: 0x7a1c16,
-    tintStrength: 0.42,
-    selfIllumination: 0.3,
-  };
+  out.wildheart_totem_binder = WILDHEART_TOTEM_BINDER_LOOK;
+  // The Fanglord Beastmaster trades his shipped body for his Blender one.
+  out.mob_wildheart_beastmaster = WILDHEART_BEASTMASTER_LOOK;
+  out.wildheart_sunbone_totem = WILDHEART_SUNBONE_TOTEM_LOOK;
+  out.wildheart_sunbone_dread_totem = WILDHEART_SUNBONE_DREAD_TOTEM_LOOK;
   return out;
 }
 

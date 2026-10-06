@@ -273,6 +273,12 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_sledge_tusker',
       // The Drowned Temple lore guide's deed rides the dungeon crest too.
       'dgn_drowned_temple_cantor',
+      // The Hollow Crypt wing bosses' encounter deeds.
+      'dgn_marrow_tidy',
+      'dgn_lady_nobody_hanging',
+      'dgn_ilvane_hush',
+      // Morthen the Gravecaller's Rite.
+      'dgn_morthen_candlelight',
     ]);
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
     // 300 live (counted directly off the resolved src/sim/content/deeds.ts
@@ -287,7 +293,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // catch (2026-09-28 merge), also pending: still 289 painted. 338 with the
     // five-dungeon rework's 19 encounter deeds, all pending: still 289 painted.
     // 339 with the Drowned Temple lore guide's deed, pending: still 289.
-    expect(DEED_ORDER).toHaveLength(339);
+    // 342 with the Hollow Crypt wing bosses' three, pending: still 289.
+    // 343 with Morthen's Every Candle Lit, pending: still 289.
+    expect(DEED_ORDER).toHaveLength(343);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

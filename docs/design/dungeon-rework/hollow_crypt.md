@@ -199,168 +199,157 @@ existing `mechanicDamageMult` of the heroic transform. Every telegraph rides G1
 and stamps the mechanic spacing lock (`mob/mechanic_spacing.ts`), so no two
 mechanics land on one tick.
 
-### 5.1 Boss 1: Sexton Marrow (kept, promoted from miniboss)
+### 5.1 to 5.3 The wing bosses as built (co-designed with the owner, 2026-10-05)
 
-- **Id:** `sexton_marrow` (kept). Level 8 (was 9). Planning health about 3,150
-  (70 s at 45 DPS).
-- **Fantasy:** the parish gravedigger, raised and still digging. He measures
-  the living for their graves and rings the burial bell to call the dead up.
-- **Model:** new hunched skeletal gravedigger with a long spade and a hooded
-  lantern (asset pipeline, Tripo on the KayKit skeleton rig; two-hand attacks use
-  only the 2H chop clip). Fallback: current `skel_mage` look with a spade prop.
-- **Arena: the Sexton's Yard.** An underground graveyard cavern about 56 by 48
-  yd; soft earth floor, crooked headstones along the walls (no collision in the
-  middle), roots hanging from the roof, the Burial Bell (a 3 m bronze bell on a
-  chain in a shaft) above a stone bell pit at the north end.
-- **Core gimmick: graves you place, dead you raise.**
-  - *Measured for the Grave:* every 14 s (first at 8 s) Marrow marks a random
-    non-tank player: a 3 yd ring follows them for 4 s. When it ends, an Open Grave
-    (3 yd pit) opens where the player STANDS and deals 18 to 24 physical to anyone
-    inside it. Graves persist for the fight (cap 8; the oldest collapses). Standing
-    in a grave: Grave Dirt, 4 shadow per second and 40 percent slow. (G4)
-  - *Burial Toll:* at 66 and 33 percent health Marrow walks to the bell pit and
-    rings the bell (3 s cast bar, immune while ringing): 10 to 14 shadow to
-    everyone, and every Open Grave raises one Restless Bones (the shipped
-    `restless_bones` template, level 7, non-elite). (`summonAdds`-style thresholds,
-    spawn points taken from the live graves.)
-- **Counterplay:** the marked player walks to the room's edge or into a chosen
-  "grave corner" before the fuse ends, so the raised dead come from one place the
-  tank can collect. Graves under the melee turn the Toll into chaos.
-- **Role checks:** tank gathers each raised wave; healer covers the Toll burst
-  and any Grave Dirt; damage dealers place their graves well and clean up adds.
-- **Heroic extras:**
-  1. *Gravedigger's Blow* (the P1 tank-stack sketch of
-     `docs/prd/dungeon-mechanic-primitives.md`): every 3rd melee applies +12
-     percent damage taken for 12 s, up to 5 stacks; plus *Earthbound*: while Marrow
-     stands in an Open Grave his attacks are 25 percent faster. The tank must keep
-     him off the graves.
-  2. *Unquiet Earth:* a player who stays in an Open Grave for 2 s raises a
-     Restless Bones from it on the spot, between Tolls.
+The three wing bosses replaced their placeholder kits with full encounter modules
+(`src/sim/encounters/hollow_crypt/`: `marrow.ts`, `lady*.ts`, `ilvane*.ts`; the
+tuning blocks `MARROW_TUNING`, `LADY_TUNING`, `ILVANE_TUNING` are the source of
+truth for every number below). Tests: `tests/hollow_crypt_marrow.test.ts`,
+`tests/hollow_crypt_lady.test.ts`, `tests/hollow_crypt_ilvane.test.ts`, the copy
+pins in `tests/hollow_crypt_boss_copy.test.ts` and `tests/hollow_crypt_alert.test.ts`.
 
-### 5.2 Boss 2: Rimeweb, Mother of the Bonechill (new)
+**Numbers basis.** Cloth reference health is measured, not the old 190: a mage at
+level 8 has 245 and at 9 has 280 in starter gear (the 2026-09-11 class table,
+`docs/design/class-health-table-2026-09-11.md`), so about 270 and 310 in the
+dungeon's own greens; a warrior tank 366 to 404 before gear. The bands of
+`README.md` section 7 apply: a raid-wide pulse 8 to 15 percent, a must-avoid hit
+35 to 45, a fumbled core 50 to 70 (never a one-shot from full on normal).
 
-- **Id:** `rimeweb` (new). Level 9, spider family. Planning health about 3,750
-  (75 s at 50 DPS).
-- **Fantasy:** the frost spider matriarch whose brood crept up into the chapel
-  yard. Her silk is rime-cold and she keeps her prey alive.
-- **Model:** reuse the Broodmother Vysska spider GLB from the Buried Hoard nest
-  room, rime-white material, larger scale; fallback the Bonechill Widow rig at
-  about 2x.
-- **Arena: the Great Web.** A collapsed catacomb cathedral about 50 yd across:
-  the lower floor, a raised rim walkway reached by a ramp, and the hero piece, a
-  colossal rime-white web strung between two broken columns at the north wall.
-  Egg sacs cluster along the side walls.
-- **Core gimmick: rescue the cocooned.**
-  - *Silk Shroud:* every 20 s (first at 12 s), a 1.5 s cast wraps a random non-tank
-    player in a Silk Cocoon: the victim is stunned and takes 5 frost per second.
-    The cocoon is an attackable object with health equal to 12 percent of
-    Rimeweb's (about 450). If it is not broken in 12 s the victim is Drained
-    (loses half their current health and pops free) and Rimeweb heals 5 percent.
-    (reuse `rift/hoard_cocoon*.ts` behind G1)
-  - *Silk Lines:* every 25 s (first at 18 s), three strands fan out from her
-    facing (30 degrees apart, 30 yd long, 2 yd wide) after a 1.5 s warning; each
-    strip persists 10 s: first contact roots for 2 s, then 50 percent slow.
-    (reuse `rift/hoard_silk_snare.ts`)
-  - *Bonechill Venom:* her bites stack a frost slow (10 percent per stack, up to
-    3, 9 s; the `stackPoison` affix).
-  - *Brood Call:* at 50 and 25 percent, 3 Rimeweb Hatchlings drop from the web
-    and pounce the healer or a damage dealer (`summonAdds` plus `broodWhelp`).
-- **Counterplay:** switch to the cocoon at once, and path to it around the silk.
-- **Role checks:** damage dealers switch targets; tank peels hatchlings and faces
-  Rimeweb so her lines cross empty floor; healer carries the cocoon victim and the
-  venom stacks.
-- **Heroic extras:**
-  1. *Twin Shroud:* each Silk Shroud cocoons two players; both must be freed.
-  2. *Rimebound Egg Sacs:* a Silk Line that crosses a wall egg sac hatches it (2
-     hatchlings). The tank must turn her so her lines point away from the walls.
+**Health.** Planning health is fight length x planning party DPS (45 at level 8,
+50 at 9), set through `NormalDungeonTuning.healthMultiplierByMob.hollow_crypt`
+(normal) and `HeroicDungeonTuning.healthMultiplierByMob` (heroic, party DPS about
+230 on the level-22 templates):
 
-### 5.3 Boss 3: Cantor Ilvane and the Hollow Choir (new)
+| Boss | Template pool (normal / heroic) | Target | Multiplier normal / heroic | Pool normal / heroic |
+|---|---|---|---|---|
+| Sexton Marrow | 639 / 1,412 | 70 s | 4.93 / 11.4 | about 3,150 / 16,100 |
+| Lady of the Bonechill | 754 / 1,532 | 80 s | 5.3 / 12 | about 4,000 / 18,400 |
+| Cantor Ilvane | 695 / 1,412 | 64 s on her own (80 s with her Choristers) | 4.6 / 10.4 | about 3,200 / 14,700 |
+| Hollow Chorister | 391 / 971 | about 8 s each | 1 / 1.9 | 391 / about 1,840 |
 
-- **Ids:** `cantor_ilvane` (boss) and `hollow_chorister` (two adds in the arena,
-  the same template as the P8 trash). Ilvane level 9, planning health about
-  3,000; each Chorister about 750 (together about 80 s at 50 DPS).
-- **Fantasy:** the parish cantor who sang the dead to rest. Morthen made her
-  choir sing them awake.
-- **Model:** new skeletal cantor in a tattered cassock, hymnal in hand (asset
-  pipeline, caster clips); Choristers are the `skel_mage` look with hoods.
-- **Arena: the Choir Loft.** A tall ossuary chapel. The group enters on the lower
-  floor; Ilvane stands on the raised loft terrace (+4 yd), reached by two side
-  ramps. Six thick bone-clad pillars stand on the loft (line-of-sight cover); the
-  hero piece is the Bone Organ with femur pipes on the back wall; a rear window
-  looks down into the Rite Nave.
-- **Core gimmick: interrupt it or hide from it.**
-  - *Dirge of the Hollow:* every 12 s (first at 6 s), a 2.5 s interruptible cast
-    (shadow school). On completion: 28 to 36 shadow to every player within 40 yd
-    who has LINE OF SIGHT to Ilvane, and Hushed (4 s silence). Counters: an
-    interrupt, a stun (breaks the cast), or a pillar between you and her. (G6)
-  - *Harmony:* the two Choristers stand at the loft balustrade channeling on her;
-    each living Chorister reduces her damage taken by 30 percent and her Dirge
-    cast time to 2.0 s. Choristers cast a weak Discord bolt.
-  - *Crescendo:* below 30 percent, the Dirge comes every 8 s.
-- **Counterplay:** kill the Choristers first; rotate interrupts; anyone without
-  an interrupt steps behind a pillar at the cast bar.
-- **Role checks:** damage dealers and tank interrupt and kill in order; healer
-  plays line of sight (a silenced healer is the real danger). At levels 8 to 9
-  some groups have no interrupt yet (warrior Pummel at 8 and mage Counterspell at
-  4 are the early ones), so the uninterrupted Dirge costs about a fifth of a cloth
-  wearer's health, never a wipe on normal.
-- **Heroic extras:**
-  1. *Encore:* a Chorister killed more than 10 s before its partner rises again
-     at half health (once each). Kill them together.
-  2. *Unbroken Verse:* every third Dirge cannot be interrupted (shield motif on the
-     cast bar) and silences for 6 s: pillars only.
+**Heroic mechanic damage** rides `mechanicDamageMultiplierByMob` (Marrow 6, the Lady
+5, Ilvane 8) on heroic cloth of about 1,250: the Toll about 15 percent, a cave-in
+about 22, an unsheltered Lament about 27, the drop about 66, a completed Dirge or a
+note lane about 70 (a fumbled core all but kills).
 
-### 5.4 Boss 4: Morthen the Gravecaller (kept, rebuilt)
+#### Sexton Marrow (the Bell Yard)
 
-- **Id:** `morthen` (kept). Level 10. Planning health about 6,600 (120 s of
-  damage at 55 DPS, plus the immune phase: about 150 s total).
-- **Fantasy:** the Gravecaller at the bottom of the Vale, holding the rite that
-  calls every name in the ledger out of the earth.
-- **Model:** keep `skel_boss`; phase 3 adds a great bone scythe (reuse the Bonelord
-  Xarreth scythe asset, `docs/design/bone-reaper/`).
-- **Arena: the Rite Nave.** A circular nave about 40 yd in radius. A raised dais
-  (10 yd) holds the altar and the Ledger of Names on a lectern (hero piece, ties
-  to the shipped `morthen_grimoire`). Four Remembrance Candles (3 m tallow pillars)
-  stand at north, east, south and west on the floor ring, 24 yd from the center;
-  four sarcophagus alcoves sit in the walls between them. A bone rose window above
-  pours the soul-light column seen from the Choir Loft.
-- **Core gimmick: a three-act rite you must break.**
-  - **Phase 1, The Calling (100 to 65 percent).**
-    - *Shadow Pulse* (kept name, now telegraphed): every 12 s a 2 s cast, then 16
-      to 22 shadow within 12 yd. Melee steps out at the bar. (`bigCast`)
-    - *Gravecall:* every 15 s (first at 6 s) a Bound Soul (non-elite, level 8,
-      about 70 hp, slow walker, can be rooted, slowed, feared or stunned) rises
-      from the next alcove in clockwise order and walks to Morthen. On arrival he
-      is Gorged on the Dead: +10 percent damage and he heals 3 percent, stacking
-      for the fight. (G5)
-  - **Phase 2, the Rite of the Unquiet (at 65 percent).** Morthen climbs to the
-    altar inside the Unquiet Ward (immune) and channels; the four candles gutter
-    out. Grave Chill pulses 4 shadow per second on everyone, rising by 1 every 5 s.
-    Two Unmade Sentinels (elite, level 9) climb the dais steps. Any player can
-    relight a candle with a 2 s channel, broken by damage taken from an enemy (the
-    Grave Chill ticks never break it) (G3). Each lit candle cracks the ward by a
-    quarter; the fourth shatters it: the Rite Broken, Morthen stunned for 8 s and
-    taking 25 percent more damage during it. (G2)
-  - **Phase 3, Last Rites (at 35 percent).** Gravecall stops. *Reap the Unquiet:*
-    every 14 s a 2 s cast, then a 90 degree, 12 yd frontal sweep for 45 to 55
-    shadow (`breathCone`); the tank takes it facing away from the group. Shadow
-    Pulse every 9 s.
-- **Counterplay:** kill or control every soul before it arrives; in phase 2 the
-  tank holds the Sentinels on the dais while the others spread to the candles;
-  in phase 3 nobody but the tank stands in front.
-- **Role checks:** everyone intercepts (class crowd control pays off); tank holds
-  adds away from the runners and later faces the Reap; healer rides the rising
-  Grave Chill; damage dealers relight fast and burn the 8 s window.
-- **Heroic extras:**
-  1. *Name the Dead:* in phase 2 the Ledger names the candles in an order (the
-     next one glows). Lighting the wrong candle snuffs the last lit one and deals
-     30 shadow to the lighter.
-  2. *Grasp of the Grave:* in every phase, every 16 s two random players get a 1.5
-     s, 4 yd ring; hands erupt: 3 s root and 20 shadow. Not persistent (unlike
-     Marrow's graves); in phase 3 a rooted player in front of the Reap dies.
+| Mechanic | Rule | Normal numbers (percent of cloth 270) |
+|---|---|---|
+| Shovelful | every 11 s, a 1.2 s bar, aim locked: an 8 yd, 80 degree cone of grave dirt | 1.5 of his melee roll through armor, and 50 percent slower movement for 6 s |
+| Measured for the Grave | every 15 s a 1 s bar marks a non-tank; 4 s later an Open Grave caves in where they stand and stays for the fight (eight at most, the oldest fills) | cave-in 42 to 52 within 3 yd (about 17); Grave Dirt 9 a second (about 3) and 40 percent slower inside |
+| Burial Toll | at 66 and 33 percent: he strides to the bell rope (immune), rings 3 s (three peals), the Toll | 30 to 38 shadow to everyone (about 13); every Open Grave raises a Restless Bones (level 8, no loot) |
+| Heroic | Gravedigger's Blow every 9 s on the tank (6 percent more damage taken per stack, 20 s, six stacks); Grave Vigor (30 percent faster swings while he stands in a grave); Unquiet Earth (2 s in a grave raises a Restless Bones, then the grave rests 8 s) | |
+| Deed | A Tidy Churchyard: every grave opened at the yard's edge (7 yd of the rim) | |
 
-Unique core per boss: placed graves that become adds (Marrow), rescue the
-cocooned (Rimeweb), interrupt or break line of sight (Ilvane), intercept walkers
+#### The Lady of the Bonechill (the frost ravine floor; boss id `rimeweb`, frozen)
+
+The ghost of a bride buried in the ravine's ice. The Great Web, its egg clutch and
+the spider kit (Bonechill Venom, Brood Call) are gone; the floor holds three grave
+lanterns and her frozen bridal grave. The gallery's egg sacs and hatchlings (trash)
+are untouched.
+
+| Mechanic | Rule | Normal numbers (percent of cloth 310) |
+|---|---|---|
+| Bride's Lament | every 22 s a 3 s wail; when it lands, everyone not sheltered by a lit lantern takes it. A lantern shelters two (nearest first) and goes dark 28 s after sheltering anyone (it misses the next Lament; kindling over the last 4) | 60 to 75 frost (about 22), half again per Lingering Lament stack (45 s, three stacks): the group splits across the lanterns and takes turns in the dark |
+| Frozen Embrace | every 30 s a 1.2 s bar on a non-tank; she rises 5 yd with them for up to 8 s (the held are stunned and carried) | 6 frost a second; 6 percent of her health dealt in time and she sets them down, else she drops them for 150 to 180 (about 53) |
+| Rime Path | a slick patch every 2.5 yd she drifts (25 s, 14 at most) | slippery ground: momentum at 8 yd/s per second of grip |
+| Bridal Freeze | at half health a 2.5 s wail, then the whole ravine floor is ice for the rest of the fight | |
+| Heroic | each lantern also burns out on its own 30 s after it is lit (dark 10 s); the Embrace takes two | |
+| Deed | Nobody Left Hanging: nobody dropped from her Embrace | |
+
+Two shared sim pieces carry her: `src/sim/slippery_ground.ts` (grounded momentum in
+the shared motion kernel, keyed on an aura; online it counts as a movement override,
+because the slide's velocity is not on the reconcile wire) and `src/sim/carried_body.ts`
+(an exclusive movement mode for a held body, let go when its carrier is gone or out
+of reach).
+
+#### Cantor Ilvane and the Hollow Choir (the Choir Loft and the Bone Organ)
+
+| Mechanic | Rule | Normal numbers (percent of cloth 310) |
+|---|---|---|
+| Dirge of the Hollow | every 16 s a 2.5 s bar a kick cuts (then 3 s of quiet); completed, it strikes everyone within 45 yd who can SEE her: the six choir pillars break her sight. The line-of-sight blast is the trash engine's G6 nova (`mob/trash_kit/kit_nova.ts` `novaVictims`) | 105 to 125 shadow (about 37) and a 4 s silence |
+| Harmony | each living Chorister takes 30 percent off the damage she takes | |
+| Bone Organ | every 26 s she walks to the organ's keys and plays: two waves of note lanes down the loft (3.5 yd wide, 18 long), the second filling the first one's gaps, each gathering 1.6 s | 100 to 115 shadow in a lane (about 35) |
+| Crescendo | below 30 percent: a 1.8 s Dirge every 11 s, a third wave, a 1.2 s gather | |
+| Heroic | Encore (a Chorister dead 10 s while its partner stands rises again); Unbroken Verse (every third Dirge runs under a cast id no interrupt table knows) | |
+| Deed | Hush Now: no Dirge ever strikes anyone | |
+
+### 5.4 Morthen the Gravecaller as built (co-designed with the owner, 2026-10-05)
+
+The draft's three acts are built as one encounter module set
+(`src/sim/encounters/hollow_crypt/`: `morthen.ts`, `morthen_gravecall.ts`,
+`morthen_candles.ts`, `morthen_grasp.ts`, the leaf `morthen_ids.ts` whose
+`MORTHEN_TUNING` is the source of truth for every number below), after his
+entrance (`morthen_rise.ts`) and before the Knellwyrm (`knellwyrm.ts`, its heroic
+`knellwyrm_knell.ts`). The owner's binding changes to the draft: relighting a
+candle is a CHANNEL that drains the lighter's health every second and is NOT
+broken by enemy damage (the healer heals them through it), and the Knellwyrm gains
+a heroic flight that breathes over half the ring. Tests:
+`tests/hollow_crypt_morthen.test.ts`, `tests/hollow_crypt_knell.test.ts`.
+
+- **Id:** `morthen` (kept). Level 10. Arena: the Rite Ring (radius 28), the altar
+  dais, the four Remembrance Candles on their pillars at north, east, south and
+  west (20 yd out), the four sarcophagus alcoves between them.
+- **Fantasy:** the Gravecaller holding the rite that calls every name in the
+  ledger out of the earth.
+
+**Numbers basis.** Cloth reference at level 10 is about 340 in the dungeon's greens
+(a mage has about 315 in starter gear, the 2026-09-11 class table); a warrior tank
+about 450. Heroic cloth about 1,250. The bands of `README.md` section 7 apply.
+
+**Health.** Fight length x planning party DPS. Target 150 s with his immune Rite
+(about 25 s), so about 125 s of damage: 125 x 55 (level 10) = about 6,800 normal on
+his 1,191 template pool (`healthMultiplierByMob.morthen` 5.7: 6,791), and 125 x 230
+(heroic) = about 28,800 on his 2,074 level-22 template pool (13.9: 28,837). To be
+measured with the meters harness before shipping, like the wing bosses.
+
+| Act | Mechanic | Rule | Normal numbers (percent of cloth 340) |
+|---|---|---|---|
+| 1, the Calling (100 to 65) | Shadow Pulse | every 12 s (first 8 s) a 2 s bar planted on his spot (the ring telegraph), then shadow on everyone within 12 yd | 24 to 30 (about 8; step out) |
+| | Gravecall | every 15 s (first 6 s) a Bound Soul rises from the next alcove clockwise and drifts to him at 3.2 yd/s (the trash engine's G5 walker, an 'event' launch rolling to Morthen alone) | on arrival Gorged on the Dead: +10 percent damage done per stack (ten at most, for the fight) and a 3 percent heal; a player within 1.6 yd of its path takes it instead for 12 to 16 shadow (about 4) |
+| 2, the Rite of the Unquiet (at 65) | the ward | he never drops below 65 percent first; he glides back to the altar inside the Unquiet Ward (immune) and channels the Rite; the candles gutter out; two Restless Bones (Sexton Marrow's level-8 add) climb out of the alcoves after hashed non-tanks | |
+| | Grave Chill | a bite a second on everyone through the Rite, 3 rising by 1 every 5 s | about 1 to 2 percent a second, rising |
+| | Relight a candle | a player targets the candle's usable body and presses interact: the G3 use (server-validated at the press, every tick and at the end), a 4 s channel kept through hits (`KitUseDef.holdsThroughHits`); a step, a stun or death breaks it and the next try pays again | the drain: 6 percent of the lighter's own maximum health at 0.5, 1.5, 2.5 and 3.5 s (24 percent a candle; 8 percent, 32, on heroic). A player the drain cannot touch (stasis, immunity) has the channel cancelled |
+| | The Rite Broken | the fourth candle shatters the ward | an 8 s stun (laid by the encounter: his control immunity guards him from players, never from his own broken rite) and 25 percent more damage taken for its length |
+| 3, Last Rites (at 35) | Reap the Unquiet | Gravecall stops; every 14 s (first 4 s) a 2 s bar, aim locked at its start, then a 120 degree, 14 yd sweep in front of him | 55 to 65 shadow (about 18 on cloth, the tank's) |
+| | Shadow Pulse | every 9 s | as above |
+| Heroic | Name the Dead | the Ledger names the candle order (a hashed permutation, the named candle's object glows); lighting another candle snuffs the last one lit (its body back) and burns the lighter; the wrong candle stays dark | 28 to 32 shadow at the heroic factor |
+| | Grasp of the Grave | every 16 s (first 10 s), in every act, two hashed players get a 4 yd ring locked under them; after 1.5 s hands erupt inside it | a 3 s root and 18 to 22 shadow at the heroic factor |
+| Deed | Every Candle Lit (`dgn_morthen_candlelight`) | all four candles relit within 20 s of the ward rising, granted at the kill | |
+
+**Heroic mechanic damage** rides `mechanicDamageMultiplierByMob.morthen` 9 on heroic
+cloth of about 1,250: Shadow Pulse 216 to 270 (about 19, avoidable), a soul taken
+108 to 144 (about 10), Grave Chill 27 a second rising by 9 every 5 s (about 65
+percent spread over a 20 s Rite, the healer's load), the Reap 495 to 585 (about 43,
+the tank's), a wrong candle 252 to 288 (about 22), Grasp of the Grave 162 to 198
+(13 to 16) and a root. No single avoidable mechanic passes 60 percent of a
+full-health cloth wearer; a player rooted by the Grasp in front of the Reap is lost
+(the draft's intent).
+
+**The Knellwyrm (normal kit unchanged), heroic Burning Knell.** Every 55 s (first
+30 s into its fight) it takes wing from where it stands (2.5 s, out of reach:
+nobody's target, immune), hangs 16 yd over the ring's centre and marks HALF the
+ring in red (a 4.5 s bar), then its ghost fire lands on that half (a 1.4 s pour):
+50 to 56 fire at its heroic factor 20 is 1,000 to 1,120, 80 to 90 percent of heroic
+cloth, the long-telegraphed wipe check the balance rule allows above 60 percent (a
+player on the far rim crosses the diameter inside the mark). Three halves a
+flight, each a different quarter of the compass from the last, drawn from `ctx.rng`
+in a fixed order (one draw at each mark, before that mark's damage rolls); then it
+glides back down where it took wing (2.5 s). Its strafe and bellow clocks wait while
+it flies.
+
+**Dev.** `/dev crypt pull morthen`, `/dev crypt hp <percent>` (Morthen and the
+Knellwyrm too), `/dev crypt trigger <pulse|gravecall|rite|candle|reap|grasp|knell>`.
+
+**Names web-checked (2026-10-05).** Every new name of the rite, the Knellwyrm's
+flight and the deed was searched against the major game wikis; verdicts are in
+`docs/design/naming-audit.md`. The deed first drafted as "By Candlelight" (a World
+of Warcraft storyline title) ships as Every Candle Lit; every other name is kept
+(Gorged on the Dead and Rite of the Unquiet were cleared on 2026-09-29, section 10).
+
+Unique core per boss: placed graves that become adds (Marrow), shelter in the
+lanterns and free the embraced (the Lady of the Bonechill), interrupt or break line of sight (Ilvane), intercept walkers
 then break the rite with the room's candles (Morthen). No core repeats.
 
 ## 6. Pacing to 15 minutes
@@ -438,9 +427,9 @@ paladin, shaman), Agile (rogue, hunter), Caster (mage, priest, warlock, druid).
 | | Bellrope Girdle (`bellrope_girdle`) | waist, cloth, Caster | uncommon, 9 | int 1, spi 1, sta 1 (2) | 0.25 group |
 | | Sexton's Spadehaft (`sextons_spadehaft`) | two-hand, Heavy | rare, 11 | str 5, sta 3 (8); 30 to 46, speed 3.3 (11.5 DPS) | 0.10 |
 | Rimeweb (9) | Rimesilk Mantle (`rimesilk_mantle`) | shoulder, cloth, Caster | uncommon, 10 | int 2, spi 1, sta 1 (3) | 0.34 group |
-| | Bonechill Carapace Vest (`bonechill_carapace_vest`) | chest, mail, Heavy | uncommon, 10 | str 2, sta 2 (4) | 0.33 group |
-| | Rimeweb Hunter's Leggings (`rimeweb_hunters_leggings`) | legs, leather, Agile | uncommon, 10 | agi 2, sta 1 (3) | 0.33 group |
-| | Rimeweb Fang (`rimeweb_fang`) | dagger, Agile | rare, 12 | agi 4, sta 3 (7); 14 to 21, speed 1.7 (10.3 DPS) | 0.10 |
+| | Bonechill Hauberk (`bonechill_carapace_vest`) | chest, mail, Heavy | uncommon, 10 | str 2, sta 2 (4) | 0.33 group |
+| | Rime-Laced Leggings (`rimeweb_hunters_leggings`) | legs, leather, Agile | uncommon, 10 | agi 2, sta 1 (3) | 0.33 group |
+| | Bride's Icicle (`rimeweb_fang`) | dagger, Agile | rare, 12 | agi 4, sta 3 (7); 14 to 21, speed 1.7 (10.3 DPS) | 0.10 |
 | Ilvane (9) | Cantor's Cassock (`cantors_cassock`) | chest, cloth, Caster | uncommon, 10 | int 3, spi 1, sta 1 (4) | 0.34 group |
 | | Choirward Leggings (`choirward_leggings`) | legs, mail, Heavy | uncommon, 10 | str 2, sta 1 (3) | 0.33 group |
 | | Chorister's Gloves (`choristers_gloves`) | gloves, leather, Agile | uncommon, 10 | agi 2, sta 1 (3) | 0.33 group |
@@ -464,7 +453,7 @@ finale ladder of `docs/design/dungeon-gold.md` (2500c normal, 100000c heroic).
 | Boss | Partition (weights) |
 |---|---|
 | Marrow | Sexton's Burial Spade (`sextons_burial_spade`, new epic two-hand, Heavy, ilvl 31: str 17, sta 12, 50 to 75 at speed 3.4, the five-man heroic weapon rating) 0.30; Cryptplate Helm (shipped, moved from Morthen) 0.30; Quilted Trousers 0.15; Oiled Leather Boots 0.15; Heroic Sexton's Spadehaft (generated) 0.10 |
-| Rimeweb | Rimesilk Hood (`rimesilk_hood`, new epic cloth helmet, Caster, ilvl 31: int 11, spi 7, sta 6, the five-man armor rating) 0.35; Bonechill Striders (shipped, moved) 0.25; Bonechill Cord (shipped, moved) 0.25; Heroic Rimeweb Fang (generated) 0.15 |
+| Rimeweb | Rimesilk Hood (`rimesilk_hood`, new epic cloth helmet, Caster, ilvl 31: int 11, spi 7, sta 6, the five-man armor rating) 0.35; Bonechill Striders (shipped, moved) 0.25; Bonechill Cord (shipped, moved) 0.25; Heroic Bride's Icicle (generated) 0.15 |
 | Ilvane | Shadowpulse Handwraps (shipped, moved) 0.50; Choirward Leggings 0.35; Heroic Cantor's Hymnal (generated) 0.15. Vigil Taper deferred to the encounter pass (it needs a new trinket effect kind) |
 | Morthen | Morthen's Cryptforged Hauberk, Shadowpulse Slippers, Lunarward Cinch, Bastion Sigil 0.18 each; Cryptbone Greaves, Greyjaw Hide Boots, Cryptbone Helm, Cryptbone Pauldrons 0.07 each (the shipped Reliquary page keeps paying on Heroic). Unchanged outside the partition: Gravewoven Bag 0.20, the Stormfeather Griffin reins chance, the heroic farm pattern rows, heroic finale gold, Heroic Marks |
 
@@ -482,7 +471,7 @@ rewards the healer who plays Ilvane's pillars well.
 | Archetype | Marrow | Rimeweb | Ilvane | Morthen |
 |---|---|---|---|---|
 | Heavy | Gravedirt Treads, Spadehaft | Carapace Vest | Choirward Leggings | Cryptbone Greaves |
-| Agile | Oiled Leather Boots | Hunter's Leggings, Rimeweb Fang | Chorister's Gloves | Unquiet Stalker's Hood |
+| Agile | Oiled Leather Boots | Rime-Laced Leggings, Bride's Icicle | Chorister's Gloves | Unquiet Stalker's Hood |
 | Caster | Quilted Trousers, Bellrope Girdle | Rimesilk Mantle | Cantor's Cassock, Hymnal | Gravecaller's Vestments |
 
 Heroic covers the same three archetypes on every boss (Heavy, Agile and Caster
@@ -492,18 +481,18 @@ epics in each partition, the trinket on Ilvane, Bastion Sigil on Morthen).
 
 - **Deeds** (appended at the end of `DEEDS`, `manual` triggers granted by the
   encounter modules, cosmetic only):
-  - `dgn_marrow_tidy`: "A Tidy Churchyard": defeat Sexton Marrow with no more than
-    four Open Graves at his second Burial Toll.
-  - `dgn_rimeweb_rescue`: "Nobody Left Hanging": defeat Rimeweb without any player
-    being Drained.
-  - `dgn_ilvane_hush`: "Hush Now": defeat Cantor Ilvane without any Dirge of the
-    Hollow landing on a player.
-  - `dgn_morthen_candles`: "By Candlelight": relight all four Remembrance Candles
-    within 20 s of the Rite of the Unquiet.
+  - `dgn_marrow_tidy`: "A Tidy Churchyard": defeat Sexton Marrow with every Open
+    Grave laid at the edge of the Bell Yard (built).
+  - `dgn_lady_nobody_hanging`: "Nobody Left Hanging": defeat the Lady of the
+    Bonechill without her ever dropping anyone from her Frozen Embrace (built).
+  - `dgn_ilvane_hush`: "Hush Now": defeat Cantor Ilvane without her Dirge of the
+    Hollow ever striking anyone (built).
+  - `dgn_morthen_candlelight`: "Every Candle Lit": defeat Morthen after relighting
+    all four Remembrance Candles within 20 s of his Unquiet Ward rising (built).
   - The shipped `dgn_hollow_crypt`, `_heroic`, `dgn_morthen_flawless` and
     `dgn_morthen_trio` stay as they are.
 - **Reliquary:** the shipped pages stay (append-only). The rare chase items
-  (Sexton's Spadehaft, Rimeweb Fang, Cantor's Hymnal) and the new heroic epics
+  (Sexton's Spadehaft, Bride's Icicle, Cantor's Hymnal) and the new heroic epics
   (Sexton's Burial Spade, Rimesilk Hood, Vigil Taper) need relic slots, and every
   moved relic needs a per-boss source hint instead of `fromBoss('morthen')`.
   Whether they extend the shipped pages or go on a new appended page is a

@@ -86,7 +86,6 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mob_spider_egg_sac',
   'mob_tolling_bell',
   'mob_training_dummy',
-  'mob_wildheart_beastmaster',
   'mob_wildheart_hexcaller',
   'mob_wildheart_high_priest',
   'mob_wildheart_ravager',
@@ -104,11 +103,10 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mount_terrorspark_groundshaker',
   'mount_thunderstrut_gobbler',
   // The five-dungeon rework's re-tints of a legacy body above: they spread the
-  // base def (the Wildheart Basin's Totem-Binder and Howdah Hexcaller over
-  // mob_wildheart_hexcaller), so they keep the floor their shared GLB was
+  // base def (the Wildheart Basin's Howdah Hexcaller over
+  // mob_wildheart_hexcaller), so it keeps the floor its shared GLB was
   // tuned under.
   'wildheart_howdah_hexcaller',
-  'wildheart_totem_binder',
 ]);
 
 /** Held ITEM models with authored materials that still take the kit polish
@@ -189,13 +187,20 @@ const AUTHORED_ATLAS_DEFS = [
   'bastion_acolyte',
   'bastion_prisoner',
   'bastion_gaol_cage',
-  'bastion_drowned_anchor',
-  'bastion_turnkey',
-  // the Bastion's Blender Knight-Commander Olen (the fallen paladin) and
-  // Ossick (the drowned harbourmaster)
+  // the Sunken Bastion's Blender bosses Olen and Ossick, and Laverock, the
+  // Drowned Temple's lore guide (flagged in manifest.ts, listed here late)
   'bastion_olen',
   'bastion_ossick',
+  'npc_laverock',
+  'bastion_drowned_anchor',
+  'bastion_turnkey',
   'crypt_morthen_lich',
+  // the Hollow Crypt's Blender Sexton Marrow (the skeletal gravedigger)
+  'crypt_skel_sexton',
+  // the Hollow Crypt's Lady of the Bonechill (the frozen bride's ghost)
+  'crypt_lady_bonechill',
+  // the Hollow Crypt's Blender Cantor Ilvane (the skeletal choir mistress)
+  'crypt_skel_cantor',
   // the Gravewyrm Sanctum's three Blender bosses (characters/sanctum_boss_looks.ts)
   'sanctum_korgath',
   'sanctum_velkhar',
@@ -230,26 +235,35 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_colossus',
   // the Drowned Temple's Blender Moonspawn (the moon spirit of water)
   'temple_moonspawn',
-  // the Drowned Temple's optional lore guide, Laverock (Blender NPC body)
-  'npc_laverock',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
+  // the Gravewyrm Sanctum trash's Blender bodies (sanctum_trash_looks.ts)
+  'sanctum_boneguard',
+  'sanctum_raised_bonewalker',
+  'sanctum_scaleguard',
+  'sanctum_thawcaller',
+  'sanctum_goadsmith',
+  'sanctum_pyre_tender',
+  'sanctum_rime_whelp',
+  'sanctum_sledge_hauler',
+  'sanctum_glacier_splinter',
   'wildheart_great_saurian',
   'wildheart_gorgebloom',
   'wildheart_vine_lasher',
   'wildheart_thorn_sprout',
   'wildheart_fanglord_jaguar',
+  // the Blender Basin Raptor (scripts/assets/wildheart_basin_raptor)
+  'wildheart_basin_raptor',
+  // the Blender Spore Toad (scripts/assets/wildheart_spore_toad) and the Toad Hex's toad on it
+  'wildheart_spore_toad',
+  'form_toad',
+  // the Blender Sunbone Totem-Binder (scripts/assets/wildheart_totem_binder)
+  'wildheart_totem_binder',
+  // the Fanglord Beastmaster's Blender body (scripts/assets/wildheart_beastmaster)
+  'mob_wildheart_beastmaster',
   'wildheart_sunbone_totem',
-  // its Dread Totem: the same carved post re-tinted (wildheart_creature_looks.ts)
+  // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
   'wildheart_sunbone_dread_totem',
-  // the rework's re-tints of a flagged body, which inherit the flag with the
-  // spread base def (characters/sanctum_creature_looks.ts)
-  'sanctum_boneguard',
-  'sanctum_raised_bonewalker',
-  'sanctum_pyre_tender',
-  'sanctum_rime_whelp',
-  'sanctum_sledge_hauler',
-  'sanctum_glacier_splinter',
 ];
 
 describe('authored surfaces', () => {

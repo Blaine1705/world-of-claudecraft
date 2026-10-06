@@ -20,10 +20,17 @@
 // KIT_USE_CAST_PREFIX, types.ts isKitUseCast), with castTargetId on the body.
 // Zero rng here; a toppled body's spill draws its rolls on its own beats
 // (kit_hazard.ts).
+//
+// Two effects: 'topple' (the body dies and spills a hazard) and 'relight'
+// (the body stays; its dungeon module reads `Entity.kitUseCompletedBy` on its
+// next pass and decides what was lit: the Hollow Crypt's Remembrance Candles,
+// encounters/hollow_crypt/morthen_candles.ts). A def with `holdsThroughHits`
+// is not broken by a landed hit (combat/damage.ts asks kitUseHoldsThroughHits);
+// a step, a stun, death or drifting out of reach still break it.
 
 import { claimedInstanceAt } from '../../instances/dungeons';
 import type { SimContext } from '../../sim_context';
-import { dist2d, type Entity, isKitUseCast, type KitUseDef } from '../../types';
+import { type Aura, dist2d, type Entity, isKitUseCast, type KitUseDef } from '../../types';
 import { spawnKitHazard } from './kit_hazard';
 import { kitOf } from './kit_of';
 
@@ -31,6 +38,19 @@ import { kitOf } from './kit_of';
 export function kitUseOf(e: Entity | undefined | null): KitUseDef | null {
   if (!e || e.kind !== 'mob') return null;
   return kitOf(e)?.usable ?? null;
+}
+
+/** The school a use's beats are drawn in (its spill's, or a relight's own). */
+export function kitUseSchool(def: KitUseDef): Aura['school'] {
+  return def.effect.kind === 'topple' ? def.effect.hazard.school : def.effect.school;
+}
+
+/** Does the use `p` is channelling hold through a hit that lands on them?
+ *  (combat/damage.ts: a landed hit breaks every other non-spell cast.) */
+export function kitUseHoldsThroughHits(ctx: SimContext, p: Entity): boolean {
+  if (!isKitUseCast(p.castingAbility) || p.castTargetId === null) return false;
+  const def = kitUseOf(ctx.entities.get(p.castTargetId));
+  return !!def && def.castId === p.castingAbility && def.holdsThroughHits === true;
 }
 
 /** Is `body` usable right now by anyone (alive, in the world)? */
@@ -80,7 +100,7 @@ export function tryStartKitUse(ctx: SimContext, body: Entity, p: Entity): boolea
     type: 'spellfx',
     sourceId: p.id,
     targetId: body.id,
-    school: def.effect.hazard.school,
+    school: kitUseSchool(def),
     fx: 'windup',
     ability: def.castId,
   });
@@ -113,10 +133,15 @@ export function completeKitUse(ctx: SimContext, p: Entity, castId: string, bodyI
     type: 'spellfx',
     sourceId: p.id,
     targetId: body.id,
-    school: def.effect.hazard.school,
+    school: kitUseSchool(def),
     fx: 'nova',
     ability: def.castId,
   });
+  if (def.effect.kind === 'relight') {
+    // The body stays: its dungeon module reads the completion on its pass.
+    body.kitUseCompletedBy = p.id;
+    return true;
+  }
   // Topple: the spill lands `ahead` yards past the body, away from the user.
   const dx = body.pos.x - p.pos.x;
   const dz = body.pos.z - p.pos.z;

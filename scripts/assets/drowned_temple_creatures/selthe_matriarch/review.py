@@ -79,6 +79,7 @@ if mode in ('views', 'closeup', 'sheet', 'frames', 'video'):
     knight_at = (float(opt('--kx', ref_x)), float(opt('--ky', 0.0)), 0.0)
     cam = stage.setup(knight=opt('--knight'), engine='CYCLES' if '+cycles' in rest else 'EEVEE',
                       res=(int(opt('--w', 1280)), int(opt('--h', 960))), ref_at=knight_at,
+                      ref_height=2.6 * H / float(opt('--drawn')) if opt('--drawn') else 2.6,
                       sky=(0.16, 0.2, 0.26))
     if '+cycles' in rest:
         scene.cycles.samples = int(opt('--samples', 48))

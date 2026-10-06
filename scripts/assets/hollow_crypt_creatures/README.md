@@ -50,6 +50,47 @@ sheet. The effects that ride these clips (the breath torrent, the shockwaves) li
 in `src/render/hollow_crypt/crypt_creature_fx.ts`, anchored on the jaw and head
 positions measured off these clips (`crypt_creature_fx_core.ts`).
 
+## Sexton Marrow, the gravedigger
+
+`build_marrow.py` builds the crypt's first boss with the Sunken Bastion's sculpt
+kit (`../sunken_bastion_drowned/kit`, unchanged; the creature modules are in
+`marrow/`: `anatomy.py`, `dressing.py`, `shading.py`, `clips.py`): a stooped
+skeleton about twice a player's height, every bone a signed-distance sculpt bound
+rigid to the bone it rides; a big grim skull grown 1.16x about the neck (soul-green
+light deep in the sockets on the `Eyes` bone), the deep peaked cowl and ragged
+capelet of grave cloth, knee breeches, the leather apron on its spring chain
+(`ApronF1`, `ApronF2`), earth-caked boots, a rope belt with the ring of church
+keys, and the hooded tin lantern on its own spring bone (`Lantern`) at the hip,
+its tallow light a flat glow material. The spade rides the never-keyed `Weapon`
+bone in the right fist, the left fist closing on the haft by the kit's grip
+solver; `BLADE_ROLL` turns the blade round the haft so the dish bites forward,
+carries up and flings up and forward (tuned on probes of the posed spade). Two
+twins are shown by keyed scales: the shovelful of earth on the blade (`Dirt`, in
+Idle's dig and Shovelful, flung away on the release frame) and the spade planted
+in the yard while he rings the bell (`SpadeStuck`, under `Root`, its root motion
+cancelled by a keyed offset so it stands still on the flags).
+
+```
+blender -b --factory-startup --python build_marrow.py -- <abs>/marrow_raw.glb --bake 2048 --tex <abs>/tex --blend <abs>/marrow.blend --stats <abs>/stats.json --work <abs>/work
+cp <abs>/marrow_raw.glb public/models/creatures/crypt_sexton_marrow.glb
+node scripts/assets/hollow_crypt_creatures/optimize.mjs public/models/creatures/crypt_sexton_marrow.glb
+KTX_BIN=<KTX-Software bin> node scripts/assets/compress_glb_textures.mjs public/models/creatures/crypt_sexton_marrow.glb
+node scripts/build_media_manifest.mjs generate
+```
+
+`--k 1.6 --nobake` gives a quick clay build; the kit's `reclip.py` re-keys the
+clips on a built .blend and `review.py` renders the views, sheets and objective
+checks (`--builder <abs>/marrow`). The `crypt_skel_sexton` VISUALS row maps the
+clips; its `height` and `hover` are the build's printed `IDLE_HEIGHT` and `MINZ`.
+Clips (24 fps): Idle (the dig, a 4.4 s loop: the shovelful flung off at 3.1),
+CombatIdle, Walk, Run (also his stride to the bell rope), Attack (contact 0.6),
+Attack2 (0.55), Hit, Death (down 1.25, the eyes out by 2.0), and the bar-locked
+casts of `src/sim/encounters/hollow_crypt/marrow.ts`: Shovelful (1.2 s bar, the
+earth flung at 1.0), Measure (1.0 s bar, the spade levelled at the mark from 0.5),
+GravediggersBlow (0.8 s bar, impact 0.7), and BellRing (a 1.0 s loop played three
+times, both fists on the rope on his own axis, the haul bottoming at 0.9 on
+`ropePull`).
+
 ## Morthen, the Lich Bishop
 
 `build_morthen.py` builds the crypt's last boss on the organic kit, in the
@@ -94,3 +135,86 @@ smoke below the torn alb is a translucent `CreatureSmoke` material (vertex alpha
 Debugging aids: `--nobake` skips the Cycles bake (fast pose checks), `--solo
 Part,Part` builds only the named parts, `-` as the output skips the export, and
 `--sheet dir --clips A,B --frames N` renders chosen clips.
+
+## The Lady of the Bonechill
+
+`build_lady.py` builds the crypt's second boss (the sim's `rimeweb`, frozen from
+the spider placeholder): the ghost of a bride buried in the ravine's ice, about
+6.5 yd from the frozen hem to the ice crown, floating half a yard over the floor.
+Her flesh (head, neck, bodice, arms, clawed hands) is SCULPTED as signed-distance
+fields with the Sunken Bastion drowned kit (`../sunken_bastion_drowned/kit/sdf.py`,
+meshed through OpenVDB): a body field, finer head and hand fields cut under a
+frozen choker and inside the lace cuffs, skin weights from the sculpt's own
+primitives so the jaw, elbows and fingers bend as flesh. The gown, underskirt,
+veil, blusher, sleeves and their angel tails are organic-kit membranes on hanging
+spar bones that carry a per-vertex ALPHA; the bake (`bake_ghost`) folds it into
+the albedo's alpha channel, so the ghost cloth ships as one alpha-BLENDED,
+double-sided image material (`CreatureGhostVeil`: no transmission, no runtime
+vertex alpha, so the far-LOD bake keeps it) while the face and hands stay solid
+(`CreatureBody`). The eyes, frozen tears, the cracked heart and the crown's gem are
+on `CreatureGlow`, cold white-blue. AO is folded in with its shadows pushed toward
+violet; the head and hands are grown before the unwrap so they take a larger
+share of the atlas.
+
+```
+blender -b --factory-startup --python build_lady.py -- public/models/creatures/crypt_lady_bonechill.glb [--blend out.blend] [--work dir] [--fast] [--nobake]
+node scripts/assets/hollow_crypt_creatures/optimize.mjs public/models/creatures/crypt_lady_bonechill.glb
+KTX_BIN=<ktx>/bin node scripts/assets/compress_glb_textures.mjs public/models/creatures/crypt_lady_bonechill.glb
+node scripts/build_media_manifest.mjs generate
+```
+
+Clips (24 fps, keyed from time 0; the one-shots start and end on `CombatIdle`): Idle, CombatIdle,
+Walk, Run (a glide: no steps), Attack (the right claw raked across, contact at 0.54 s),
+Attack2 (both claws raked down from overhead, contact at 0.58 s), Hit, Death (a silent
+scream, then she rises and shrinks to nothing as the gown scatters; the game adds
+the snow), Wail (3 s: Bride's Lament, and the Bridal Freeze at 1.2), EmbraceReach
+(the Frozen Embrace's 1.2 s bar: the hands close round the victim's spot, 1.5 yd
+ahead and about 3 yd up, on its last frame), EmbraceHold (a 2 s loop cradling the
+held body while the sim lifts her) and Release (0.6 s, the arms open). The cloth
+bones are aimed in world space every key (their rest hang, streamed back, floated
+up, flared and rippled by a travelling wave), and every bone's quaternion keys keep
+one hemisphere (Morthen's fix). The build prints `IDLE_HEIGHT` and `MINZ` (the
+`crypt_lady_bonechill` row's `height` and `hover`), `EMBRACE` (the hands in the
+hold) and any IK overreach (`REACH`).
+
+## Cantor Ilvane
+
+`build_cantor.py` builds the crypt's third boss (`cantor_ilvane`, the
+`crypt_skel_cantor` VISUALS row) on the organic kit, Morthen's way: a tall
+skeletal choir mistress, about 6 yd authored and drawn at her template's 1.1
+(about 6.5 in game). A long cassock of faded violet blackening to soot at its torn
+hem; a torn white surplice over it with bell sleeves that hang from the forearms
+(their spar bones are aimed toward the floor every key, so they fall back when she
+lifts her arms); a pleated millstone ruff; a deep violet stole stitched with silver
+staves and violet notes; a long fine skull (`skull_point`, Morthen's sculpt made
+finer, grown 1.32x about the neck) with violet flames in its sockets and a violet
+`Voice` in its throat that swells when she sings; a black lace veil and her long
+pale hair falling from a crown of seven silver organ pipes. In the left hand the
+hymnal (`Hymnal`, its covers on `PageA` and `PageB`, so it shuts and falls open), in
+the right fist the baton, a long finger bone with a violet light (`BatonLight`).
+The song is violet everywhere, never Morthen's green.
+
+```
+blender -b --factory-startup --python build_cantor.py -- public/models/creatures/crypt_cantor_ilvane.glb [--sheet dir] [--blend out.blend] [--fast] [--nobake]
+node scripts/assets/hollow_crypt_creatures/optimize.mjs public/models/creatures/crypt_cantor_ilvane.glb
+KTX_BIN=<ktx>/bin node scripts/assets/compress_glb_textures.mjs public/models/creatures/crypt_cantor_ilvane.glb
+node scripts/build_media_manifest.mjs generate
+```
+
+The pose language is Morthen's `RollRig` plus three pieces: hands placed in the
+chest's frame and turned by their frame (the baton across the right fist, the palm
+under the hymnal; the build prints the worst wrist bend per clip, `WRIST`), cloth
+that follows the legs (the cassock and surplice spars turn with the thighs and
+shins) with a floor guard that swings any hem a pose pushes under the flags out
+until it clears (so the robe pools when she kneels), and a keyed bone offset so the
+hymnal can leave her hand (it hangs over the organ's keys in PlayOrgan and falls
+open on the floor in Death). Every bone's quaternion keys keep one hemisphere.
+
+Clips (24 fps; the one-shots start and end on `CombatIdle`): Idle (head bowed over
+the hymnal), CombatIdle, Walk, Run, Attack (the baton slash, contact f12), Attack2
+(the hymnal backhand, shut on impact at f13), Hit, Death, Sing (the Dirge, 60
+frames: the peak lands at f43, 1.75 s, inside the Crescendo's 1.8 s bar, and is
+held, climbing, to the 2.5 s bar's end; bar-locked), Conduct (a 2 s bar of four
+beats, looping) and PlayOrgan (a 100 frame loop at the keys, facing the pipes).
+The build prints `IDLE_HEIGHT` and `MINZ` (the row's `height`) and the lowest
+vertex per clip (`MINZ_CLIP`).

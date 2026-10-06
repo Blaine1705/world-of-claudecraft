@@ -249,6 +249,41 @@ const SHOTS = [
     landFrames: 3,
     cam: { yaw: 1.4, pitch: 0.35, dist: 18 },
   },
+  // The Blender bodies (feature/wildheart-models): the raptor's leap, the
+  // Binder planting a totem, the Sunbone Totem rising and mending, the spore
+  // toad bursting.
+  {
+    phase: 'wildheart_normal',
+    id: 'raptor_salto',
+    spawn: [['raptor', 0, 14]],
+    stage: 'cast:basin_raptor:leap',
+    frames: [120, 320, 560, 1000],
+    cam: { yaw: 1.3, pitch: 0.25, dist: 16 },
+  },
+  {
+    phase: 'wildheart_normal',
+    id: 'atador_totem',
+    spawn: [['binder', 0, 6]],
+    stage: 'cast:sunbone_totem_binder:totems',
+    frames: [700, 1350, 1650, 2300, 3200],
+    cam: { yaw: 0.9, pitch: 0.3, dist: 16 },
+  },
+  {
+    phase: 'wildheart_normal',
+    id: 'totem_sol',
+    spawn: [['totem', 0, 6]],
+    stage: 'tank',
+    frames: [250, 700, 1600, 2300],
+    cam: { yaw: 0.5, pitch: 0.3, dist: 16 },
+  },
+  {
+    phase: 'wildheart_normal',
+    id: 'sapo_revienta',
+    spawn: [['toad', 0, 6]],
+    stage: 'kill:spore_toad',
+    frames: [250, 650, 1100, 2000],
+    cam: { yaw: 0.8, pitch: 0.3, dist: 15 },
+  },
   {
     phase: 'wildheart_normal',
     id: 'corteza_espinosa',

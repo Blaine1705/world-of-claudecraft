@@ -330,7 +330,7 @@ def death():
               tailUp=(6, 4, 2, 0, 0, 0), lobe=10)
     sink = P(REST, pelvis=(0.0, 0.0, -0.55), pitch=-4.0, head=-3.0, flapL=(-2, -3, -3, -3, -2),
              flapR=(-2, -3, -3, -3, -2), tailUp=(-4, -3, -2, 0, 0, 0), lobe=-6)
-    down = P(REST, pelvis=(0.0, 0.05, -(A.Z0 - 0.37)), pitch=-1.0, head=-4.0, flapL=(-2, -2, -1, 0, 1),
+    down = P(REST, pelvis=(0.0, 0.05, -(A.Z0 - 0.45)), pitch=-1.0, head=-4.0, flapL=(-2, -2, -1, 0, 1),
              flapR=(-2, -2, -1, 0, 1), tailUp=(-10, 8, 2, 1, 0, 0), tailSide=(2, 4, 6, 6, 4, 2), lobe=-14,
              lobeUp=-6)
     seq = keyed([(0.0, REST, 'out'), (0.35, flare, 'inout'), (1.6, sink, 'inout'), (2.7, down, 'out'),

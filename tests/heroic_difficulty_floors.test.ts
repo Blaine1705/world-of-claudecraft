@@ -143,6 +143,16 @@ describe('heroic five-man floors', () => {
     }
   });
 
+  it('the adds an encounter module raises swing in the add band too', () => {
+    // Sexton Marrow's Restless Bones (encounters/hollow_crypt/marrow.ts) rise
+    // from his graves through spawnKitAdd as summoned adds, not a summonAdds row.
+    for (const [dungeonId, add] of [['hollow_crypt', 'marrow_restless_bones']] as const) {
+      const swing = minSwing(add, dungeonId, 'heroic', { summonedAdd: true });
+      expect(swing, `${dungeonId}/${add}`).toBeGreaterThanOrEqual(SUMMONED_ADD_FLOOR);
+      expect(swing, `${dungeonId}/${add} above the mob line`).toBeLessThan(HEROIC_MOB_FLOOR);
+    }
+  });
+
   it('keeps heroic Sanctum bosses above the retuned normal Sanctum bosses', () => {
     for (const bossId of [
       'korgath_the_bound',
@@ -160,7 +170,9 @@ describe('heroic five-man doubled health', () => {
   it('pins representative heroic health to exactly double the pre-retune values', () => {
     // pre-retune heroic values in comments (health multipliers 1.9/2.0/2.6/2.0).
     expect(maxHpAt('crypt_shambler', 'hollow_crypt', 'heroic')).toBe(4108); // was 2054
-    expect(maxHpAt('morthen', 'hollow_crypt', 'heroic')).toBe(7883); // was 3942
+    // The crypt rework prices Morthen from fight length x heroic DPS (about
+    // 125 s of damage beside his immune Rite, dungeon_difficulty.ts).
+    expect(maxHpAt('morthen', 'hollow_crypt', 'heroic')).toBe(28837);
     expect(maxHpAt('bastion_revenant', 'sunken_bastion', 'heroic')).toBe(4554); // was 2277
     // The Sunken Bastion rework prices Vael's pool per boss (150 s at heroic
     // party DPS, dungeon_difficulty.ts healthMultiplierByMob), off the doubling.

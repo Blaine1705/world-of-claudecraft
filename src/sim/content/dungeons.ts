@@ -535,8 +535,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   sexton_marrow: {
     id: 'sexton_marrow',
     name: 'Sexton Marrow',
-    // Level 8 in the rework (boss 1 of 4); the Burial Toll waves below are the
-    // placeholder for his graves-and-bell encounter module.
+    // Level 8 in the rework (boss 1 of 4). His kit is the Bell Yard encounter
+    // module (encounters/hollow_crypt/marrow.ts): Shovelful, Measured for the
+    // Grave and the Burial Toll; nothing on the template but his melee.
     minLevel: 8,
     maxLevel: 8,
     family: 'undead',
@@ -553,16 +554,6 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 22,
     moveSpeed: 7,
     aggroRadius: 14,
-    charge: {
-      minRange: 5,
-      maxRange: 30,
-      cooldown: 12,
-      stunDuration: 0.5,
-      name: 'Onrush',
-      school: 'physical',
-    },
-    summonAdds: { mobId: 'restless_bones', count: 2, atHpPct: [0.66, 0.33] },
-    yells: { summon: 'The bell tolls, and the graves give up their dead!' },
     // The rework's per-boss table (hollow_crypt.md 8.1): one guaranteed piece,
     // one armor archetype each, plus the Spadehaft chase row. Heroic rides
     // HEROIC_BOSS_LOOT.sexton_marrow.
@@ -584,7 +575,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'bellrope_girdle', chance: 0.25, rollGroup: 'marrow_guaranteed', normalOnly: true },
       { itemId: 'sextons_spadehaft', chance: 0.1, normalOnly: true },
     ],
-    scale: 1.2,
+    // His Blender body is authored at full size (crypt_skel_sexton's height).
+    scale: 1,
     color: 0x839192,
   },
   morthen: {
@@ -610,7 +602,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 26,
     moveSpeed: 7,
     aggroRadius: 16,
-    aoePulse: { min: 12, max: 18, radius: 12, every: 10, name: 'Shadow Pulse' },
+    // His whole kit is the Rite Ring encounter module (encounters/hollow_crypt/
+    // morthen.ts): the telegraphed Shadow Pulse, Gravecall, the Rite of the
+    // Unquiet and its candles, Reap the Unquiet; nothing on the template but
+    // his melee (the old untelegraphed aoePulse is gone).
     loot: [
       { copper: 2500, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
       {

@@ -151,7 +151,7 @@ describe('the sim English the trash pass emits localizes through the matcher', (
     expect(BRAND?.auraName).toBe('Branded');
     expect(RIME?.name).toBe('Creeping Rime');
     expect(RIME?.freezeName).toBe('Iced Over');
-    expect(USE?.effect.hazard.name).toBe('Spilled Soulfire');
+    expect(USE?.effect.kind === 'topple' && USE.effect.hazard.name).toBe('Spilled Soulfire');
     expect(DUNGEON_MOBS.sanctum_drakonid?.trashKit?.breathPool?.hazard.name).toBe(
       'Boiling Meltwater',
     );

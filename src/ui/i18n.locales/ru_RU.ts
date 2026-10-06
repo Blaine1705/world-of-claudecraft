@@ -5759,6 +5759,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willowfen_remedy_caravan.name': 'Караван лекарств Ивовой Топи',
   'entities.mobs.frostveil_supply_caravan.name': 'Караван припасов Морозного Предела',
   'entities.mobs.restless_bones.name': 'Беспокойные кости',
+  'entities.mobs.marrow_restless_bones.name': 'Беспокойные кости',
   'entities.mobs.gorrak.name': 'Горрак Безжалостный',
   'entities.mobs.mire_prowler.name': 'Болотный хищник',
   'entities.mobs.deepfen_murloc.name': 'Глубинный щелкун',
@@ -13089,6 +13090,34 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagLearning': 'Новичкам рады',
   'hudChrome.finder.tagFastRun': 'Быстрый заход',
   'hudChrome.finder.mech.shadow_pulse': 'Пульс тьмы (периодический урон по области)',
+  'hudChrome.finder.mech.crypt_shovelful':
+    'Полная лопата (каждые 11 секунд он швыряет могильную землю конусом на 8 ярдов перед собой: полтора его удара и замедление на 50% на 6 секунд, так что стойте у него за спиной)',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    'Мерка для могилы (каждые 15 секунд он метит игрока, не танка; через 4 секунды под ним обрушивается Открытая могила, 42–52 урона в радиусе 3 ярдов на обычной сложности, и яма остаётся до конца боя: 9 урона в секунду и замедление на 40% внутри, так что оставляйте могилы у края двора)',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    'Погребальный звон (на 66 и 33 процентах здоровья он шагает к колокольной верёвке, неуязвимый, и звонит 3 секунды: 30–38 урона от тьмы всем на обычной сложности, и из каждой Открытой могилы встают Беспокойные кости)',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    'Героический: Удар могильщика каждые 9 секунд по танку (каждый заряд увеличивает получаемый урон на 6% на 20 секунд, до 6 зарядов), Могильная сила (стоя в могиле, он бьёт на 30% быстрее) и Неспокойная земля (кто пробудет в могиле 2 секунды, поднимает там Беспокойные кости)',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    'Плач невесты (каждые 22 секунды 3-секундный вопль: 60–75 урона от холода на обычной сложности всем вне света горящего могильного фонаря, и ещё половина за каждый заряд Затяжного плача от уже пережитых Плачей. Фонарь укрывает не больше двух игроков и гаснет на 28 секунд, укрыв кого-то, так что разделяйтесь и чередуйтесь)',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    'Ледяные объятия (каждые 30 секунд она хватает игрока, не танка, и поднимается с ним на 5 ярдов в воздух, 6 урона от холода в секунду: снимите 6% её здоровья за 8 секунд, и она опустит его, иначе она его уронит, 150–180 урона на обычной сложности)',
+  'hudChrome.finder.mech.crypt_rime_path':
+    'Инеистая тропа (там, где она проплывает, на 25 секунд остаётся скользкий иней: на нём разгоняешься медленно и продолжаешь скользить, когда останавливаешься или поворачиваешь)',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    'Свадебная стужа (на половине здоровья весь пол ущелья замерзает: скользкий лёд до конца боя)',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    'Героический: каждый горящий фонарь ещё и сам гаснет через 30 секунд на 10 секунд, а Ледяные объятия хватают двух игроков',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    'Погребальная песнь Пустоты (каждые 16 секунд 2,5-секундная песнь, которую можно прервать: если она её допоёт, 105–125 урона от тьмы на обычной сложности и немота на 4 секунды всем в пределах 45 ярдов, кто её видит, так что прерывайте или прячьтесь за колоннами хора)',
+  'hudChrome.finder.mech.crypt_harmony':
+    'Гармония (каждый живой Хорист уменьшает получаемый ею урон на 30%: сначала убейте Хористов)',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    'Костяной орган (каждые 26 секунд она играет на Костяном органе: две волны теневых нот взрываются полосами по полу хоров, 100–115 урона в полосе на обычной сложности, вторая волна заполняет промежутки первой)',
+  'hudChrome.finder.mech.crypt_crescendo':
+    'Крещендо (ниже 30 процентов здоровья её Песнь длится 1,8 секунды и звучит каждые 11 секунд, а орган играет третью волну)',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    'Героический: Бис (Хорист, пролежавший мёртвым 10 секунд, пока второй ещё стоит, поднимается снова, так что убивайте их вместе) и Непрерывный стих (каждую третью Песнь нельзя прервать: прячьтесь)',
   'hudChrome.finder.mech.reaping_arc': 'Жатвенная дуга (рассекающий удар спереди)',
   'hudChrome.finder.mech.mist_surge': 'Волна тумана (периодический урон по области)',
   'hudChrome.finder.mech.summons_adds': 'Призывает подкрепления',
@@ -20049,9 +20078,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.bellrope_girdle.name': 'Пояс из колокольной верёвки',
   'entities.items.sextons_spadehaft.name': 'Черенок лопаты пономаря',
   'entities.items.rimesilk_mantle.name': 'Наплечье из инейного шёлка',
-  'entities.items.bonechill_carapace_vest.name': 'Жилет из ледяного хитина',
-  'entities.items.rimeweb_hunters_leggings.name': 'Поножи охотника Инеистой Паутины',
-  'entities.items.rimeweb_fang.name': 'Клык Инеистой Паутины',
+  'entities.items.bonechill_carapace_vest.name': 'Кольчуга костяного холода',
+  'entities.items.rimeweb_hunters_leggings.name': 'Поножи с инеистой шнуровкой',
+  'entities.items.rimeweb_fang.name': 'Сосулька невесты',
   'entities.items.cantors_cassock.name': 'Ряса кантора',
   'entities.items.choirward_leggings.name': 'Поножи хорового стража',
   'entities.items.choristers_gloves.name': 'Перчатки хориста',
@@ -20090,7 +20119,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.candlewright_acolyte.name': 'Послушник-свечник',
   'entities.mobs.hollow_chorister.name': 'Хорист Пустоты',
   'entities.mobs.bound_soul.name': 'Связанная душа',
-  'entities.mobs.rimeweb.name': 'Инеистая Паутина',
+  'entities.mobs.rimeweb.name': 'Госпожа Костяного Холода',
   'entities.mobs.cantor_ilvane.name': 'Кантор Ильвейн',
   'entities.mobs.rime_egg_sac.name': 'Инеистый кокон с яйцами',
   // The Hollow Crypt trash (M16 non-Latin fills for its new names).
@@ -20175,6 +20204,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_knellwyrm_pyre_strafe': 'Погребальный налёт',
   'abilityUi.cast.crypt_knellwyrm_strafe_run': 'Огненный заход',
   'abilityUi.cast.crypt_knellwyrm_dread_bellow': 'Жуткий рёв',
+  'abilityUi.cast.crypt_marrow_shovelful': 'Полная лопата',
+  'abilityUi.cast.crypt_marrow_measure': 'Мерка для могилы',
+  'abilityUi.cast.crypt_marrow_burial_toll': 'Погребальный звон',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': 'Удар могильщика',
+  'abilityUi.cast.crypt_lady_brides_lament': 'Плач невесты',
+  'abilityUi.cast.crypt_lady_frozen_embrace': 'Ледяные объятия',
+  'abilityUi.cast.crypt_lady_embrace_hold': 'Ледяные объятия',
+  'abilityUi.cast.crypt_lady_bridal_freeze': 'Свадебная стужа',
+  'abilityUi.cast.crypt_ilvane_dirge': 'Погребальная песнь Пустоты',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': 'Непрерывный стих',
+  'abilityUi.cast.crypt_ilvane_bone_organ': 'Костяной орган',
   'entities.mobs.crypt_knellwyrm.name': 'Погребальный змий',
   // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
   'abilityUi.cast.bastion_iron_cage': 'Железная клетка',
@@ -20618,4 +20658,109 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cantor_laverock.title': 'Последний кантор Бледного хора',
   'entities.npcs.cantor_laverock.greeting':
     'Я был самым юным голосом Бледного хора. В ночь обряда я не выпил и сбежал. С тех пор каждое полнолуние я слышу, как они поют под водой. Я должен увидеть её, прежде чем умру. Позвольте мне идти позади вас. Я не стану сражаться и не задержу вас.',
+  'hudChrome.cryptAlert.measuredTitle': 'Мерка для могилы!',
+  'hudChrome.cryptAlert.measuredLine':
+    'Когда полоса истечёт, под вами обрушится могила: отнесите её к краю двора',
+  'hudChrome.cryptAlert.embracedTitle': 'Ледяные объятия!',
+  'hudChrome.cryptAlert.embracedLine':
+    'Она держит вас в воздухе: группа должна ранить её, чтобы она вас опустила',
+  'hudChrome.cryptAlert.lamentTitle': 'Плач невесты!',
+  'hudChrome.cryptAlert.lamentShelteredLine':
+    'Вы в свете горящего фонаря, и для вас есть место: стойте на месте',
+  'hudChrome.cryptAlert.lamentOpenLine':
+    'Встаньте в свет горящего фонаря, пока не прозвучал вопль: по двое на фонарь',
+  'hudChrome.cryptAlert.graveTitle': 'Вы в Открытой могиле!',
+  'hudChrome.cryptAlert.graveLine': 'Могильная земля жжёт и замедляет вас: выйдите из неё',
+  'hudChrome.cryptAlert.tollTitle': 'Погребальный звон!',
+  'hudChrome.cryptAlert.tollLine':
+    'Пока он звонит в колокол, его нельзя ранить: готовьтесь к Звону и к мертвецам, которых он поднимет',
+  'hudChrome.cryptAlert.harmonyTitle': 'Гармония',
+  'hudChrome.cryptAlert.harmonyLine':
+    'Её Хористы снимают {pct}% получаемого ею урона: сначала убейте их',
+  'hudChrome.cryptAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.crypt.measured':
+    'Когда эффект закончится, там, где вы стоите, обрушится Открытая могила: от {min} до {max} урона (от {heroicMin} до {heroicMax} на героической сложности) всем в радиусе {radius} ярдов. Могила остаётся до конца боя, так что отнесите метку к краю двора, подальше от группы.',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    'Вы стоите в Открытой могиле: скорость передвижения снижена на {slow}%, и каждую секунду вы получаете {damage} урона от тьмы ({heroic} на героической сложности). На героической сложности, если пробыть в могиле {linger} сек., из неё встают Беспокойные кости. Выйдите из могилы.',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    'Скорость передвижения снижена на {pct}%. Полная лопата бьёт всех перед Пономарём Марроу: стойте у него за спиной.',
+  'hudChrome.auraEffect.crypt.blow':
+    'Получаемый урон увеличен на {pct}%: {per}% за каждый заряд, сейчас {stacks} из {max}. Каждый Удар могильщика добавляет заряд и обновляет длительность до {seconds} сек.',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    'Атакует на {pct}% быстрее, пока стоит в Открытой могиле. Не давайте ему стоять в могилах.',
+  'hudChrome.auraEffect.crypt.tolling':
+    'Неуязвим, пока идёт к колокольной верёвке и звонит в Погребальный колокол. Когда звон стихнет, Погребальный звон наносит от {min} до {max} урона от тьмы (от {heroicMin} до {heroicMax} на героической сложности) всем, и из каждой Открытой могилы встают Беспокойные кости.',
+  'hudChrome.auraEffect.crypt.embraced':
+    'Госпожа держит вас в воздухе: вы не можете действовать и каждую секунду получаете {tick} урона от холода ({tickHeroic} на героической сложности). Если группа снимет {share}% её максимального здоровья, она бережно опустит вас; если она продержит вас наверху {hold} сек., то уронит на лёд: от {min} до {max} урона (от {heroicMin} до {heroicMax} на героической сложности).',
+  'hudChrome.auraEffect.crypt.lament':
+    'Когда Плач невесты закончится, он наносит от {min} до {max} урона от холода (от {heroicMin} до {heroicMax} на героической сложности) всем, кто не находится в пределах {radius} ярдов от горящего могильного фонаря. Фонарь укрывает {cap} ближайших к нему игроков, затем гаснет и пропускает следующий Плач.',
+  'hudChrome.auraEffect.crypt.lingering':
+    'Следующий Плач невесты нанесёт вам на {pct}% больше урона: {per}% за каждый заряд, не больше {max} зарядов. Встретьте следующий в свете фонаря.',
+  'hudChrome.auraEffect.crypt.slippery':
+    'Вы на скользком льду: ваша скорость меняется не больше чем на {grip} ярд/сек. за секунду, поэтому вы медленно разгоняетесь, скользите дальше, когда останавливаетесь, и вас заносит на поворотах. Сойдите со льда, чтобы снова твёрдо стоять на ногах.',
+  'hudChrome.auraEffect.crypt.harmony':
+    'Получает на {pct}% меньше урона: {per}% за каждого живого Хориста. Сначала убейте Хористов.',
+  'hudChrome.auraEffect.crypt.crescendo':
+    'Поёт быстрее: Погребальная песнь Пустоты длится {cast} сек. вместо {castNormal} сек. и звучит каждые {every} сек. вместо {everyNormal} сек., а Костяной орган играет {waves} волны нот вместо {wavesNormal}.',
+  // Morthen the Gravecaller's Rite and the Knellwyrm's heroic Burning Knell
+  // (M16 non-Latin fills for their new strings).
+  'abilityUi.cast.crypt_morthen_shadow_pulse': 'Пульс тьмы',
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': 'Обряд неупокоенных',
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': 'Жатва неупокоенных',
+  'abilityUi.cast.kituse_crypt_relight_candle': 'Зажечь свечу',
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': 'Пылающий звон',
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': 'Пылающий звон',
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': 'Пылающий звон',
+  'abilityUi.cast.crypt_knellwyrm_knell_land': 'Пылающий звон',
+  'entities.mobs.crypt_remembrance_candle.name': 'Поминальная свеча',
+  'hudChrome.auraEffect.crypt.gorged':
+    'Наносит на {pct}% больше урона: {per}% за каждую Связанную душу, достигшую его, сейчас {stacks} из {max}, до конца боя. Каждая дошедшая душа также исцеляет его на {heal}% максимального здоровья. Встаньте на пути души, чтобы принять её на себя.',
+  'hudChrome.auraEffect.crypt.unquietWard':
+    'Неуязвим, пока творит Обряд неупокоенных у алтаря: зажжено поминальных свечей: {lit} из {total}. Зажечь свечу заново: поддерживаемое действие на {channel} сек., которое каждую секунду отнимает {drain}% максимального здоровья зажигающего ({drainHeroic}% на героической сложности); удары его не прерывают, а шаг или оглушение прерывают. Последняя свеча разбивает оберег. На героической сложности зажигайте их в порядке, который называет Реестр: неверная свеча гасит последнюю зажжённую и наносит зажигающему от {wrongMin} до {wrongMax} урона от тьмы.',
+  'hudChrome.auraEffect.crypt.riteBroken':
+    'Оглушён: разбитый оберег лишает его возможности действовать на {seconds} сек.',
+  'hudChrome.auraEffect.crypt.shatteredWard':
+    'Получает на {pct}% больше урона в течение {seconds} сек.: зажжённые свечи разбили его оберег. Бейте сильнейшими атаками сейчас.',
+  'hudChrome.auraEffect.crypt.graveChill':
+    'Каждую секунду вы получаете {bite} урона от тьмы ({biteHeroic} на героической сложности), пока длится Обряд неупокоенных, и урон растёт на {step} ({stepHeroic} на героической сложности) каждые {every} сек. Зажгите поминальные свечи, чтобы прекратить его.',
+  'hudChrome.auraEffect.crypt.graspMark':
+    'Через {fuse} сек. из круга под вами вырвутся руки: все в пределах {radius} м от места, где он появился, будут обездвижены на {root} сек. и получат от {min} до {max} урона от тьмы. Выйдите из круга.',
+  'hudChrome.auraEffect.crypt.graspRoot':
+    'Вас держат руки могилы: вы не можете двигаться {seconds} сек.',
+  'hudChrome.auraEffect.crypt.knellAirborne':
+    'Парит над Кругом обряда, вне досягаемости. Отмечает половину круга на {mark} сек., затем заливает её призрачным огнём: от {min} до {max} урона от огня всем внутри. За один полёт выжигает половину круга столько раз: {breaths}, затем приземляется.',
+  'hudChrome.finder.mech.crypt_morthen_shadow_pulse':
+    'Пульс тьмы (каждые 12 секунд заклинание на 2 секунды, затем от 24 до 30 урона от тьмы на обычной сложности всем в пределах 12 м от него, так что отойдите; в его Последнем обряде каждые 9 секунд)',
+  'hudChrome.finder.mech.crypt_gravecall':
+    'Могильный зов (каждые 15 секунд Связанная душа плывёт к нему из следующей ниши с саркофагом; дойдя до него, она даёт ему Пресыщение мёртвыми: на 10 процентов больше урона за каждую душу, до 10 стопок, и исцеление на 3 процента здоровья. Игрок на её пути принимает её на себя: от 12 до 16 урона от тьмы на обычной сложности)',
+  'hudChrome.finder.mech.crypt_rite_of_the_unquiet':
+    'Обряд неупокоенных (на 65 процентах здоровья он возвращается к алтарю, неуязвимый внутри Оберега неупокоенных, а Могильный холод наносит всем 3 урона от тьмы в секунду, растущие на 1 каждые 5 секунд, и из ниш выбираются 2 Беспокойные кости. Зажгите заново 4 Поминальные свечи: каждая требует 4 секунды поддержания и каждую секунду отнимает 6 процентов максимального здоровья зажигающего; удары не прерывают, а шаг или оглушение прерывают. Последняя свеча ломает Обряд: он оглушён на 8 секунд и получает на 25 процентов больше урона)',
+  'hudChrome.finder.mech.crypt_reap_the_unquiet':
+    'Жатва неупокоенных (ниже 35 процентов здоровья души перестают идти; каждые 14 секунд после заклинания на 2 секунды он взмахивает косой: от 55 до 65 урона от тьмы на обычной сложности всем в дуге 120 градусов на 14 м перед ним. Пульс тьмы тогда приходит каждые 9 секунд)',
+  'hudChrome.finder.mech.crypt_morthen_heroic':
+    'Героическая сложность: Назови мёртвых (Реестр называет порядок свечей: неверная свеча гасит последнюю зажжённую и наносит зажигающему от 252 до 288 урона от тьмы, а каждое зажигание отнимает 8 процентов здоровья в секунду), Хватка могилы (каждые 16 секунд у 2 игроков появляется круг радиусом 4 м; через 1,5 секунды из него вырываются руки: обездвиживание на 3 секунды и от 162 до 198 урона от тьмы) и Пылающий звон Погребального змия (он взлетает, отмечает половину круга на 4,5 секунды и заливает её призрачным огнём: от 1000 до 1120 урона от огня, 3 половины за полёт)',
+  'hudChrome.cryptAlert.knellTitle': 'Пылающий звон!',
+  'hudChrome.cryptAlert.knellLine':
+    'Когда полоса иссякнет, на эту половину круга обрушится призрачный огонь: перейдите на другую половину',
+  'hudChrome.cryptAlert.graspTitle': 'Хватка могилы!',
+  'hudChrome.cryptAlert.graspLine': 'Из этого круга вырвутся руки и схватят всех внутри: выйдите',
+  'hudChrome.cryptAlert.reapTitle': 'Жатва неупокоенных!',
+  'hudChrome.cryptAlert.reapLine': 'Его коса сметает всё перед ним: зайдите ему за спину',
+  'hudChrome.cryptAlert.riteTitle': 'Обряд неупокоенных',
+  'hudChrome.cryptAlert.riteLine':
+    'Зажгите заново Поминальные свечи, чтобы разбить его оберег: зажжено {lit} из {total}',
+  'hudChrome.cryptAlert.riteNamedLine':
+    'Зажигайте только свечу, которую Реестр называет следующей: зажжено {lit} из {total}',
+  'hudChrome.cryptAlert.soulTitle': 'Связанная душа',
+  'hudChrome.cryptAlert.soulLine':
+    'Душа плывёт к Мортену: встаньте на её пути и примите её, пока она его не напитала',
+  'hudChrome.kitUse.relightLine':
+    'Пока вы поддерживаете действие, оно каждую секунду отнимает здоровье: удары не прерывают его, а шаг или оглушение прерывают',
+  'hudChrome.kitUse.relightKey': 'Зажечь заново: {name}',
+  'hudChrome.kitUse.relightTap': 'Нажмите здесь, чтобы зажечь заново: {name}',
+  'hudChrome.kitUse.relightClick': 'Щёлкните здесь, чтобы зажечь заново: {name}',
+  'hudChrome.kitUse.relightFar': 'Подойдите ближе чем на {range} м, чтобы зажечь её',
+  'hudChrome.kitUse.relightAria': 'Зажечь заново: {name}',
+  'hudChrome.kitUse.relightUsingLine':
+    'Не двигайтесь, пока оно вытягивает здоровье: удары не прерывают, а шаг или оглушение прерывают',
 };

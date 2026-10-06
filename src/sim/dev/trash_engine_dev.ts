@@ -108,9 +108,12 @@ export function handleTrashEngineDevChat(ctx: SimContext, raw: string, pid: numb
     case 'pool': {
       const at = ahead(me, 5);
       const kind = arg.toLowerCase();
+      const spill = MOBS.soul_brazier?.trashKit?.usable?.effect;
       const def =
         kind === 'soulfire'
-          ? MOBS.soul_brazier?.trashKit?.usable?.effect.hazard
+          ? spill?.kind === 'topple'
+            ? spill.hazard
+            : undefined
           : MOBS.sanctum_drakonid?.trashKit?.breathPool?.hazard;
       if (!def) break;
       spawnKitHazard(ctx, inst, me, def, at.x, at.z);

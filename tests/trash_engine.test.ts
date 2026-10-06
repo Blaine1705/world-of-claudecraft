@@ -258,7 +258,8 @@ describe('G3: a usable encounter body (the Soul Brazier)', () => {
 
   it('a pool turned on the mobs never burns a boss or a control-immune great body', () => {
     const r = room();
-    const def = MOBS.soul_brazier.trashKit?.usable?.effect.hazard as KitHazardDef;
+    const spill = MOBS.soul_brazier.trashKit?.usable?.effect;
+    const def = (spill?.kind === 'topple' ? spill.hazard : undefined) as KitHazardDef;
     const tusker = engage(r, 'sledge_tusker', 4, 0);
     const splinter = engage(r, 'glacier_splinter', 5, 1);
     spawnKitHazard(r.sim.ctx, r.inst, r.me, def, r.me.pos.x + 4.5, r.me.pos.z);

@@ -215,10 +215,10 @@ export const HOLLOW_CRYPT_LIGHTS: readonly CryptLightSpot[] = [
   H('lantern', 'Kit_LanternPost', -92, 20, 0, false),
   H('lantern', 'Kit_LanternPost', -70, 100, 0, false),
   H('lantern', 'Kit_LanternPost', -94, 100, 0, false),
-  // Widow's Gallery: the glowing egg clutches and the Great Web's frost heart.
+  // Widow's Gallery: the glowing egg clutches (the ravine floor's grave
+  // lanterns are the Lady of the Bonechill's, lit by lady_fx.ts).
   H('frost', 'Kit_EggCluster', 58, 40, 0.5, false),
   H('frost', 'Kit_EggCluster', 92, 54, 2.2, false),
-  H('frost', 'Kit_GreatWeb', 80, 133, Math.PI, false),
   // Choir Ruin: violet braziers on the loft and the organ's violet throat.
   H('violet', 'Kit_Brazier', -26, 166),
   H('violet', 'Kit_Brazier', 26, 166),

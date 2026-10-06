@@ -146,7 +146,12 @@ describe('claimDifficultyForDungeon', () => {
 
 describe('mobTemplateForDungeonDifficulty', () => {
   it('returns the SAME template untouched for normal difficulty', () => {
-    expect(mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'normal')).toBe(SYNTHETIC);
+    // A dungeon with no normal tuning record (the Hollow Crypt gained one for
+    // its wing bosses' pools, so it no longer serves here).
+    expect(mobTemplateForDungeonDifficulty(SYNTHETIC, 'the_last_keep', 'normal')).toBe(SYNTHETIC);
+    // A dungeon WITH a health-only normal record still leaves an unlisted mob's
+    // numbers untouched (a copy, every field equal).
+    expect(mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'normal')).toEqual(SYNTHETIC);
     expect(mobTemplateForDungeonDifficulty(SYNTHETIC, 'no_such_dungeon', 'heroic')).toBe(SYNTHETIC);
   });
 
@@ -178,7 +183,7 @@ describe('mobTemplateForDungeonDifficulty', () => {
     const add = mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'heroic', {
       summonedAdd: true,
     });
-    // hollow_crypt addDamageMultiplier is 9.5 (Marrow and Rimeweb summon).
+    // hollow_crypt addDamageMultiplier is 9.5 (Marrow's Restless Bones, Ilvane's Encore).
     expect(add.dmgBase).toBeCloseTo(190, 10);
     expect(add.dmgPerLevel).toBeCloseTo(19, 10);
     // Health, armor, level, and the speed floor stay on the dungeon-wide tuning.
@@ -190,7 +195,7 @@ describe('mobTemplateForDungeonDifficulty', () => {
     // The role flag does nothing outside heroic.
     expect(
       mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'normal', { summonedAdd: true }),
-    ).toBe(SYNTHETIC);
+    ).toEqual(SYNTHETIC);
   });
 });
 

@@ -20,6 +20,11 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { isEntombed, MORTHEN_ID } from '../../sim/encounters/hollow_crypt/ids';
+import {
+  MORTHEN_GORGED,
+  MORTHEN_RITE_BROKEN,
+  MORTHEN_SHADOW_PULSE,
+} from '../../sim/encounters/hollow_crypt/morthen_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -49,6 +54,8 @@ import {
   MORTHEN_TOLL,
   type MorthenStance,
   morthenAnchor,
+  morthenBodyY,
+  morthenEmitY,
   morthenStance,
   morthenStanceGesture,
   STAFF_STRIKE_SEC,
@@ -57,6 +64,7 @@ import {
   TRANSFORM_SLAM_SEC,
   TRANSFORM_UNFOLD_SEC,
 } from './morthen_fx_core';
+import { gorgedFire } from './morthen_rite_fx_core';
 
 const SCAN_SEC = 0.1;
 const TRAIL_SEGMENTS = 40;
@@ -323,7 +331,12 @@ export class MorthenFx {
     if (this.disposed || !this.world) return;
     const m = this.morthen();
     if (!m || m.dead) return;
-    if (ev.type === 'spellfx' && ev.sourceId === m.id && ev.fx === 'nova' && !ev.ability) {
+    if (
+      ev.type === 'spellfx' &&
+      ev.sourceId === m.id &&
+      ev.fx === 'nova' &&
+      ev.ability === MORTHEN_SHADOW_PULSE
+    ) {
       // The Shadow Pulse: he tolls the bell (or raises the scythe) and it rings out.
       this.playGesture?.(m.id, MORTHEN_TOLL);
       this.toll(m);
@@ -377,7 +390,7 @@ export class MorthenFx {
     t.alive = true;
     t.born = this.clock;
     const flip = this.swingCount++ % 2 === 1;
-    t.mesh.position.set(m.pos.x, m.pos.y + 3.3 * s, m.pos.z);
+    t.mesh.position.set(m.pos.x, morthenBodyY(m.pos.y, 3.3, s), m.pos.z);
     t.mesh.scale.setScalar(MORTHEN_SCYTHE_REACH * s);
     // The flat sweep, then the rising diagonal reap brought down across him.
     t.mesh.rotation.set(0, m.facing, flip ? -0.5 : 0.12, 'YXZ');
@@ -472,12 +485,23 @@ export class MorthenFx {
         this.playGesture?.(m.id, morthenStanceGesture(null, next));
       }
     }
-    const rites = this.stance === 'scythe' ? 1.7 : 1;
+    // Gorged on the Dead deepens his soul fire, stack by stack; the Rite
+    // Broken gutters it (he hangs stunned in the shattered ward).
+    let stacks = 0;
+    let broken = false;
+    for (const a of m.auras) {
+      if (a.id === MORTHEN_GORGED) stacks = a.stacks ?? 1;
+      else if (a.id === MORTHEN_RITE_BROKEN) broken = true;
+    }
+    const gorged = gorgedFire(stacks);
+    const rites = (this.stance === 'scythe' ? 1.7 : 1) * gorged * (broken ? 0.3 : 1);
     const d = this.density;
     this.stepSouls(m, dt, s);
-    // The soul smoke trailing from where his legs should be.
+    // The soul smoke trailing from where his legs should be: the funnel's
+    // base is under the ring floor (the sink), so it boils out at the flags.
     const base = morthenAnchor(m.pos, m.facing, s, MORTHEN_SMOKE_BASE);
     const gy = this.groundY(m.pos.x, m.pos.z);
+    base.y = morthenEmitY(base.y, gy, s);
     for (let n = 0; n < Math.floor(26 * d * dt + this.rand()); n++) {
       const a = this.rand() * Math.PI * 2;
       const r = this.rand() * 0.7 * s;
@@ -537,8 +561,8 @@ export class MorthenFx {
         ay: 1,
         life: 0.55 + this.rand() * 0.3,
         drag: 0.8,
-        size0: 0.35 * s,
-        size1: (0.7 + this.rand() * 0.4) * s * (rites > 1 ? 1.3 : 1),
+        size0: 0.35 * s * Math.sqrt(gorged),
+        size1: (0.7 + this.rand() * 0.4) * s * (this.stance === 'scythe' ? 1.3 : 1) * gorged,
         r: 0.95 + this.rand() * 0.2,
         g: 0,
         b: 0,
@@ -584,7 +608,7 @@ export class MorthenFx {
       const o = soulOrbitInto(this.soulOff, k, this.clock, casting, rites);
       // morthenAnchor, into a scratch point
       at.x = m.pos.x + (o.x * cos + o.z * sin) * s;
-      at.y = m.pos.y + o.y * s;
+      at.y = morthenBodyY(m.pos.y, o.y, s);
       at.z = m.pos.z + (-o.x * sin + o.z * cos) * s;
       const flick = 0.85 + 0.3 * this.rand();
       // the core: a soft, bright soul light, laid down at a steady rate as it flies
@@ -867,7 +891,7 @@ export class MorthenFx {
       // The arc rides the body while it cuts.
       if (m && !m.dead) {
         const s = m.scale || 1;
-        t.mesh.position.set(m.pos.x, m.pos.y + 3.3 * s, m.pos.z);
+        t.mesh.position.set(m.pos.x, morthenBodyY(m.pos.y, 3.3, s), m.pos.z);
       }
       t.mesh.visible = true;
       t.mat.uniforms.uHead.value = plan.head;

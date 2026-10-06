@@ -5705,6 +5705,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willowfen_remedy_caravan.name': 'ウィローフェン薬品隊商',
   'entities.mobs.frostveil_supply_caravan.name': 'フロストヴェイル補給隊商',
   'entities.mobs.restless_bones.name': '安らがぬ骨',
+  'entities.mobs.marrow_restless_bones.name': '安らがぬ骨',
   'entities.mobs.gorrak.name': '無慈悲なるゴラック',
   'entities.mobs.mire_prowler.name': '沼の徘徊者',
   'entities.mobs.deepfen_murloc.name': 'ディープフェンのスナッパー',
@@ -12902,6 +12903,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagLearning': '初心者歓迎',
   'hudChrome.finder.tagFastRun': '高速周回',
   'hudChrome.finder.mech.shadow_pulse': 'シャドウパルス（周期的な範囲ダメージ）',
+  'hudChrome.finder.mech.crypt_shovelful':
+    'ひとすくいの墓土（11秒ごとに前方8ヤードの扇形に墓土を浴びせる：通常攻撃の1.5倍のダメージと6秒間の移動速度50%低下。背後に立つこと）',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    '墓の採寸（15秒ごとにタンク以外のプレイヤーに印を付ける。4秒後その足元に開いた墓が崩れ落ち、ノーマルでは3ヤード以内に42～52のダメージ。穴は戦闘中ずっと残り、中にいると毎秒9ダメージと移動速度40%低下。墓は墓地の端に作ること）',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    '埋葬の鐘（体力66%と33%で鐘の綱へ歩み寄り、ダメージ無効のまま3秒間鐘を鳴らす：ノーマルでは全員に30～38の闇ダメージ、さらに開いた墓すべてから安らがぬ骨が這い出る）',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    'ヒロイック：墓掘りの一撃が9秒ごとにタンクを襲う（1スタックごとに受けるダメージ6%上昇、20秒、最大6スタック）、墓の活力（墓の中に立つと攻撃速度30%上昇）、安らがぬ大地（墓の中に2秒留まるとそこから安らがぬ骨が這い出る）',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    '花嫁の哀歌（22秒ごとに3秒の慟哭：ノーマルでは灯った墓のランタンの光の外にいる全員に60～75の冷気ダメージ、すでに受けた哀歌の名残1スタックごとに半分ずつ増加。ランタン1つが守れるのは2人まで、誰かを守ると28秒間消える。分かれて交代で使うこと）',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    '凍てつく抱擁（30秒ごとにタンク以外のプレイヤーを捕らえ、5ヤードの高さまで共に浮かび上がる。毎秒6の冷気ダメージ。8秒以内に彼女の体力の6%を削れば静かに降ろすが、さもなくば落とし、ノーマルで150～180のダメージ）',
+  'hudChrome.finder.mech.crypt_rime_path':
+    '霜の道（彼女が漂った跡に25秒間すべりやすい霜が残る。その上では加速が遅く、止まったり曲がったりしても滑り続ける）',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    '花嫁の凍結（体力が半分になると峡谷の床全体が凍りつき、戦闘の残りはずっとすべる氷になる）',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    'ヒロイック：灯ったランタンは30秒経つと自然に消えて10秒間暗くなり、凍てつく抱擁は2人を捕らえる',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    '虚ろの挽歌（16秒ごとに中断できる2.5秒の歌：歌い切ると、ノーマルでは45ヤード以内で彼女が見える全員に105～125の闇ダメージと4秒の沈黙。中断するか聖歌隊の柱の陰に隠れること）',
+  'hudChrome.finder.mech.crypt_harmony':
+    '調和（生きている聖歌隊員1人ごとに彼女の受けるダメージが30%減る：聖歌隊員を先に倒すこと）',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    '骨のオルガン（26秒ごとに骨のオルガンを奏でる：闇の音符が2波、聖歌隊席の床を筋状に炸裂し、ノーマルでは筋の中で100～115のダメージ。2波目は1波目の隙間を埋める）',
+  'hudChrome.finder.mech.crypt_crescendo':
+    'クレッシェンド（体力30%未満で挽歌は1.8秒になり11秒ごとに来る。オルガンは3波目を奏でる）',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    'ヒロイック：アンコール（もう一方が立っているまま10秒倒れていた聖歌隊員は再び起き上がる。同時に倒すこと）と途切れぬ詩節（3回目ごとの挽歌は中断できない。隠れること）',
   'hudChrome.finder.mech.reaping_arc': 'リーピングアーク（前方クリーブ）',
   'hudChrome.finder.mech.mist_surge': 'ミストサージ（周期的な範囲ダメージ）',
   'hudChrome.finder.mech.summons_adds': '増援を召喚',
@@ -19683,9 +19712,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.bellrope_girdle.name': '鐘縄の帯',
   'entities.items.sextons_spadehaft.name': '墓守の鋤柄',
   'entities.items.rimesilk_mantle.name': '霜絹のマントル',
-  'entities.items.bonechill_carapace_vest.name': '骨冷えの甲殻ベスト',
-  'entities.items.rimeweb_hunters_leggings.name': '霜網の狩人のレギンス',
-  'entities.items.rimeweb_fang.name': '霜網の牙',
+  'entities.items.bonechill_carapace_vest.name': 'ボーンチルのホーバーク',
+  'entities.items.rimeweb_hunters_leggings.name': '霜綴りのレギンス',
+  'entities.items.rimeweb_fang.name': '花嫁の氷柱',
   'entities.items.cantors_cassock.name': '聖歌隊長の法衣',
   'entities.items.choirward_leggings.name': '聖歌守りのレギンス',
   'entities.items.choristers_gloves.name': '聖歌隊員の手袋',
@@ -19723,7 +19752,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.candlewright_acolyte.name': '蝋燭職人の侍祭',
   'entities.mobs.hollow_chorister.name': '虚ろの聖歌隊員',
   'entities.mobs.bound_soul.name': '縛られし魂',
-  'entities.mobs.rimeweb.name': 'リムウェブ',
+  'entities.mobs.rimeweb.name': '骨冷えの貴婦人',
   'entities.mobs.cantor_ilvane.name': '聖歌隊長イルヴェイン',
   'entities.mobs.rime_egg_sac.name': '霜の卵嚢',
   // The Hollow Crypt trash (M16 non-Latin fills for its new names).
@@ -19808,6 +19837,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.crypt_knellwyrm_pyre_strafe': '火葬の掃射',
   'abilityUi.cast.crypt_knellwyrm_strafe_run': '掃射飛行',
   'abilityUi.cast.crypt_knellwyrm_dread_bellow': '恐怖の咆哮',
+  'abilityUi.cast.crypt_marrow_shovelful': 'ひとすくいの墓土',
+  'abilityUi.cast.crypt_marrow_measure': '墓の採寸',
+  'abilityUi.cast.crypt_marrow_burial_toll': '埋葬の鐘',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': '墓掘りの一撃',
+  'abilityUi.cast.crypt_lady_brides_lament': '花嫁の哀歌',
+  'abilityUi.cast.crypt_lady_frozen_embrace': '凍てつく抱擁',
+  'abilityUi.cast.crypt_lady_embrace_hold': '凍てつく抱擁',
+  'abilityUi.cast.crypt_lady_bridal_freeze': '花嫁の凍結',
+  'abilityUi.cast.crypt_ilvane_dirge': '虚ろの挽歌',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': '途切れぬ詩節',
+  'abilityUi.cast.crypt_ilvane_bone_organ': '骨のオルガン',
   'entities.mobs.crypt_knellwyrm.name': '弔鐘竜',
   // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
   'abilityUi.cast.bastion_iron_cage': '鉄の檻',
@@ -20227,4 +20267,104 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cantor_laverock.title': '蒼白聖歌隊最後の詠唱者',
   'entities.npcs.cantor_laverock.greeting':
     'わしは蒼白聖歌隊でいちばん若い声だった。儀式の夜、わしは飲まずに逃げた。それ以来、満月のたびに水の下で皆が歌うのが聞こえる。死ぬ前に、あの方をこの目で見なければならん。後ろを歩かせてくれ。戦いはせんし、足手まといにもならん。',
+  'hudChrome.cryptAlert.measuredTitle': '墓の採寸！',
+  'hudChrome.cryptAlert.measuredLine': 'バーが尽きると足元に墓が崩れ落ちる：墓地の端まで運べ',
+  'hudChrome.cryptAlert.embracedTitle': '凍てつく抱擁！',
+  'hudChrome.cryptAlert.embracedLine':
+    '宙に抱え上げられている：仲間が彼女を攻撃すれば降ろしてもらえる',
+  'hudChrome.cryptAlert.lamentTitle': '花嫁の哀歌！',
+  'hudChrome.cryptAlert.lamentShelteredLine': '灯ったランタンの光の中に君の居場所がある：動くな',
+  'hudChrome.cryptAlert.lamentOpenLine':
+    '慟哭が届く前に灯ったランタンの光に入れ：1つのランタンに2人まで',
+  'hudChrome.cryptAlert.graveTitle': '開いた墓の中にいる！',
+  'hudChrome.cryptAlert.graveLine': '墓土が君を焼き、足を鈍らせる：墓から出ろ',
+  'hudChrome.cryptAlert.tollTitle': '埋葬の鐘！',
+  'hudChrome.cryptAlert.tollLine':
+    '鐘を鳴らす間はダメージを受けない：鐘の一撃と、それが呼び起こす死者に備えろ',
+  'hudChrome.cryptAlert.harmonyTitle': '調和',
+  'hudChrome.cryptAlert.harmonyLine':
+    '聖歌隊員が彼女の受けるダメージを{pct}%減らしている：先に聖歌隊員を倒せ',
+  'hudChrome.cryptAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.crypt.measured':
+    'これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    '開いた墓の中に立っている：移動速度が{slow}%低下し、毎秒{damage}の闇ダメージ（ヒロイックでは{heroic}）。ヒロイックでは墓の中に{linger}秒留まると安らがぬ骨が這い出る。墓から出ること。',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    '移動速度が{pct}%低下。ひとすくいの墓土は墓守マロウの前方にいる全員に当たる：背後に立つこと。',
+  'hudChrome.auraEffect.crypt.blow':
+    '受けるダメージが{pct}%上昇：1スタックごとに{per}%、現在{stacks}/{max}スタック。墓掘りの一撃のたびにスタックが増え、効果時間が{seconds}秒に戻る。',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    '開いた墓の中に立っている間、攻撃速度が{pct}%上昇。墓から引き離すこと。',
+  'hudChrome.auraEffect.crypt.tolling':
+    '鐘の綱へ歩み寄り埋葬の鐘を鳴らしている間、ダメージを受けない。鳴らし終えると全員に{min}～{max}の闇ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、開いた墓すべてから安らがぬ骨が這い出る。',
+  'hudChrome.auraEffect.crypt.embraced':
+    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
+  'hudChrome.auraEffect.crypt.lament':
+    '花嫁の哀歌が終わると、灯った墓のランタンから{radius}ヤード以内にいない全員に{min}～{max}の冷気ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。ランタンが守るのは最も近い{cap}人だけで、その後は消えて次の哀歌を守れない。',
+  'hudChrome.auraEffect.crypt.lingering':
+    '次の花嫁の哀歌で受けるダメージが{pct}%増加：1スタックごとに{per}%、最大{max}スタック。次はランタンの光の中で受けること。',
+  'hudChrome.auraEffect.crypt.slippery':
+    'すべりやすい氷の上：速度は毎秒最大{grip}ヤード/秒しか変わらないため、走り出しが遅く、止まっても滑り続け、曲がると大きく膨らむ。氷から降りれば足場が戻る。',
+  'hudChrome.auraEffect.crypt.harmony':
+    '受けるダメージが{pct}%減少：生きている聖歌隊員1人ごとに{per}%。聖歌隊員を先に倒すこと。',
+  'hudChrome.auraEffect.crypt.crescendo':
+    '歌が速くなる：虚ろの挽歌は{castNormal}秒ではなく{cast}秒になり、{everyNormal}秒ではなく{every}秒ごとに来る。骨のオルガンは{wavesNormal}波ではなく{waves}波の音符を奏でる。',
+  // Morthen the Gravecaller's Rite and the Knellwyrm's heroic Burning Knell
+  // (M16 non-Latin fills for their new strings).
+  'abilityUi.cast.crypt_morthen_shadow_pulse': 'シャドウパルス',
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': '安らがぬ者の儀式',
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': '安らがぬ者の刈り取り',
+  'abilityUi.cast.kituse_crypt_relight_candle': 'ろうそくを灯し直す',
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': '燃える弔鐘',
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': '燃える弔鐘',
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': '燃える弔鐘',
+  'abilityUi.cast.crypt_knellwyrm_knell_land': '燃える弔鐘',
+  'entities.mobs.crypt_remembrance_candle.name': '追憶のろうそく',
+  'hudChrome.auraEffect.crypt.gorged':
+    '与えるダメージが{pct}%上昇：彼のもとに届いた縛られし魂1つごとに{per}%、現在{stacks}/{max}スタック、戦闘終了まで持続。魂が届くたびに最大体力の{heal}%も回復する。魂の進路に立てば代わりに受け止められる。',
+  'hudChrome.auraEffect.crypt.unquietWard':
+    '祭壇で安らがぬ者の儀式を詠唱している間、ダメージを受けない：追憶のろうそく{total}本のうち{lit}本が再点火済み。1本を灯し直すには{channel}秒の詠唱が必要で、その間、灯す者の最大体力の{drain}%（ヒロイックでは{drainHeroic}%）が毎秒吸い取られる。攻撃を受けても中断されないが、動くかスタンで中断される。最後のろうそくで結界が砕ける。ヒロイックでは台帳が告げる順に灯すこと：違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に{wrongMin}～{wrongMax}の闇ダメージ。',
+  'hudChrome.auraEffect.crypt.riteBroken': 'スタン：砕けた結界のせいで{seconds}秒間行動できない。',
+  'hudChrome.auraEffect.crypt.shatteredWard':
+    '{seconds}秒間、受けるダメージが{pct}%上昇：灯し直したろうそくが結界を砕いた。今こそ最大の攻撃を叩き込め。',
+  'hudChrome.auraEffect.crypt.graveChill':
+    '安らがぬ者の儀式が続く間、毎秒{bite}の闇ダメージ（ヒロイックでは{biteHeroic}）を受け、{every}秒ごとに{step}（ヒロイックでは{stepHeroic}）ずつ増える。追憶のろうそくを灯し直して終わらせること。',
+  'hudChrome.auraEffect.crypt.graspMark':
+    '{fuse}秒後、足元の輪から手が噴き出す：輪が置かれた場所から{radius}ヤード以内の全員が{root}秒間その場に縛られ、{min}～{max}の闇ダメージを受ける。輪から出ること。',
+  'hudChrome.auraEffect.crypt.graspRoot': '墓の手に掴まれている：{seconds}秒間移動できない。',
+  'hudChrome.auraEffect.crypt.knellAirborne':
+    '儀式の環の上空を飛んでおり、攻撃が届かない。環の半分に{mark}秒間印を付け、その半分に亡霊の炎を浴びせる：中にいる全員に{min}～{max}の火炎ダメージ。1回の飛行で{breaths}回半分を焼き、その後着地する。',
+  'hudChrome.finder.mech.crypt_morthen_shadow_pulse':
+    'シャドウパルス（12秒ごとに2秒の詠唱の後、ノーマルでは周囲12ヤード以内の全員に24～30の闇ダメージ。離れること。終の儀式中は9秒ごと）',
+  'hudChrome.finder.mech.crypt_gravecall':
+    '墓呼び（15秒ごとに縛られし魂が次の石棺の壁龕から彼のもとへ漂う。届くと死者の飽食となり、魂1つごとに与えるダメージが10%上昇（最大10スタック）、体力の3%を回復する。進路に立つプレイヤーが代わりに受け止める：ノーマルでは12～16の闇ダメージ）',
+  'hudChrome.finder.mech.crypt_rite_of_the_unquiet':
+    '安らがぬ者の儀式（体力65%で祭壇に戻り、安らがぬ者の結界の中でダメージを受けなくなる。その間、墓の冷気が全員に毎秒3の闇ダメージを与えて5秒ごとに1ずつ増え、壁龕から安らがぬ骨が2体這い出る。追憶のろうそく4本を灯し直すこと：1本ごとに4秒の詠唱で、灯す者の最大体力の6%を毎秒吸い取る。攻撃では中断されないが、動くかスタンで中断される。最後のろうそくで儀式が破れ、8秒間スタンし、受けるダメージが25%上昇する）',
+  'hudChrome.finder.mech.crypt_reap_the_unquiet':
+    '安らがぬ者の刈り取り（体力35%未満で魂は止まり、14秒ごとに2秒の詠唱の後、大鎌を振るう：ノーマルでは前方14ヤード、120度の扇形にいる全員に55～65の闇ダメージ。以後シャドウパルスは9秒ごと）',
+  'hudChrome.finder.mech.crypt_morthen_heroic':
+    'ヒロイック：死者の名を呼べ（台帳がろうそくの順番を告げる。違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に252～288の闇ダメージ。再点火は毎秒8%を吸い取る）、墓の掌握（16秒ごとにプレイヤー2人の足元に4ヤードの輪が現れ、1.5秒後に手が噴き出す：3秒の移動不能と162～198の闇ダメージ）、弔鐘竜の燃える弔鐘（飛び立って環の半分に4.5秒間印を付け、その半分に亡霊の炎を浴びせて1,000～1,120の火炎ダメージ。1回の飛行で3回）',
+  'hudChrome.cryptAlert.knellTitle': '燃える弔鐘！',
+  'hudChrome.cryptAlert.knellLine':
+    'バーが尽きると環のこちら側の半分に亡霊の炎が降り注ぐ：反対側の半分へ移動しろ',
+  'hudChrome.cryptAlert.graspTitle': '墓の掌握！',
+  'hudChrome.cryptAlert.graspLine': 'この輪から手が噴き出し、中にいる者を掴む：輪から出ろ',
+  'hudChrome.cryptAlert.reapTitle': '安らがぬ者の刈り取り！',
+  'hudChrome.cryptAlert.reapLine': '大鎌が彼の前方の地面を薙ぎ払う：背後に回れ',
+  'hudChrome.cryptAlert.riteTitle': '安らがぬ者の儀式',
+  'hudChrome.cryptAlert.riteLine': '追憶のろうそくを灯し直して結界を砕け：{total}本中{lit}本点灯',
+  'hudChrome.cryptAlert.riteNamedLine':
+    '台帳が次に告げるろうそくだけを灯し直せ：{total}本中{lit}本点灯',
+  'hudChrome.cryptAlert.soulTitle': '縛られし魂',
+  'hudChrome.cryptAlert.soulLine':
+    '魂がモーセンのもとへ漂っている：進路に立ち、彼を肥えさせる前に受け止めろ',
+  'hudChrome.kitUse.relightLine':
+    '詠唱中は毎秒体力を吸い取られる：攻撃では中断されないが、動くかスタンで中断される',
+  'hudChrome.kitUse.relightKey': '{name}を灯し直す',
+  'hudChrome.kitUse.relightTap': 'ここをタップして{name}を灯し直す',
+  'hudChrome.kitUse.relightClick': 'ここをクリックして{name}を灯し直す',
+  'hudChrome.kitUse.relightFar': '{range}ヤード以内に近づいて灯し直せ',
+  'hudChrome.kitUse.relightAria': '{name}を灯し直す',
+  'hudChrome.kitUse.relightUsingLine':
+    '吸い取られる間も動くな：攻撃では中断されないが、動くかスタンで中断される',
 };

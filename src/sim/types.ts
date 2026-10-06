@@ -13,6 +13,10 @@ import type { DungeonGuideRun } from './dungeon_guide/types';
 import type { KorgathFightState } from './encounters/gravewyrm_sanctum/korgath_state';
 import type { KorzulFightState } from './encounters/gravewyrm_sanctum/korzul_state';
 import type { VelkharFightState } from './encounters/gravewyrm_sanctum/velkhar_state';
+import type {
+  CryptBossFightState,
+  KnellwyrmKnellState,
+} from './encounters/hollow_crypt/boss_state';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { WispMazeState } from './minigames/wisp_maze';
@@ -4625,8 +4629,17 @@ export interface KitUseDef {
   range: number;
   /** What completing the use does. 'topple': the body is destroyed (it dies,
    *  credited to the user) and a hazard spills `ahead` yards past it, away
-   *  from the user. */
-  effect: { kind: 'topple'; ahead: number; hazard: KitHazardDef };
+   *  from the user. 'relight': the body's dungeon module reads the completion
+   *  off the body (`Entity.kitUseCompletedBy`) and decides what it lights
+   *  (the Hollow Crypt's Remembrance Candles, encounters/hollow_crypt/
+   *  morthen_candles.ts). */
+  effect:
+    | { kind: 'topple'; ahead: number; hazard: KitHazardDef }
+    | { kind: 'relight'; school: Aura['school'] };
+  /** The use is NOT broken by a hit that lands on the user (a step, a stun,
+   *  death or drifting out of reach still break it): the candle's channel
+   *  drains its lighter's health and the healer heals them through it. */
+  holdsThroughHits?: boolean;
 }
 
 /** A G5 walker (TrashKitDef.walker). */
@@ -4676,6 +4689,10 @@ export interface KitWalkerDef {
      *  so a def never both shields and arms (tests/dungeon_trash_wave2.test.ts
      *  pins it). */
     shieldPct?: number;
+    /** The damage-done aura STACKS: every arrival adds one (its value is
+     *  `damagePct` per stack), up to this many (Morthen's Gorged on the Dead,
+     *  encounters/hollow_crypt/morthen_gravecall.ts). Absent: it refreshes. */
+    maxStacks?: number;
   };
   /** What an interception does to the player who took it: a roll of damage,
    *  and optionally the same empower turned on them. */
@@ -5342,6 +5359,12 @@ export interface KnellwyrmFightState {
   casts: number;
   /** Someone was burned by a Pyre Strafe this fight (the deed reads it). */
   burned: boolean;
+  /** Heroic Burning Knell (encounters/hollow_crypt/knellwyrm_knell.ts):
+   *  seconds to the next flight, and the flight in progress. */
+  knellTimer?: number;
+  knell?: KnellwyrmKnellState | null;
+  /** Burning Knells flown (the half pick's draw order). */
+  knells?: number;
 }
 
 /** What an in-dungeon gate looks like (render-only pick; collision is one box). */
@@ -5428,6 +5451,9 @@ export interface DungeonObjectSpawn {
     | 'bastion_buttress_intact'
     | 'bastion_beacon_lamp'
     | 'bastion_mooring_lit'
+    // The Hollow Crypt's grave lanterns (encounters/hollow_crypt/
+    // lady_lanterns.ts): lit, dark or kindling rides the template id.
+    | 'crypt_lady_lantern_lit'
     // The Gravewyrm Sanctum's story markers (encounters/gravewyrm_sanctum/
     // story.ts): the Calving Face's crack step rides the template id.
     | 'sanctum_story_0';
@@ -7352,6 +7378,18 @@ export interface Entity extends ClientMirroredEntityFields {
   cryptRite?: CryptRiteState;
   /** The Knellwyrm's fight state (encounters/hollow_crypt/knellwyrm.ts). */
   knellwyrmFight?: KnellwyrmFightState;
+  /** Per-fight state of a Hollow Crypt wing boss (encounters/hollow_crypt:
+   *  Sexton Marrow, the Lady of the Bonechill, Cantor Ilvane). Sim authority
+   *  only; the client reads casts, auras and the encounter objects. */
+  cryptBossFight?: CryptBossFightState;
+  /** A 'relight' G3 use completed on this body (mob/trash_kit/encounter_use.ts):
+   *  the user's entity id, read and cleared by the dungeon module that owns
+   *  the body on its next pass. Sim authority only. */
+  kitUseCompletedBy?: number;
+  /** An encounter carries this player in the air and moves them itself (the
+   *  Lady of the Bonechill's Frozen Embrace): the carrier's entity id. The
+   *  walking kernel stands down (carried_body.ts). Sim authority only. */
+  carriedBy?: number;
   /** An encounter's scripted entrance owns this mob (Morthen rising, the
    *  Knellwyrm flying in): inert, non-hostile and out of combat, the mob AI
    *  skips it and the encounter moves it, until the script hands it back. */
