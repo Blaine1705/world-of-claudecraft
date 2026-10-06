@@ -147,8 +147,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 318 / 3535 with the release's Eastbrook ferry round trip
     // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
     // 320 / 3595 with the sixth lifetime-XP rung (prog_titan at renown 50).
-    expect(DEED_ORDER.length).toBe(320);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3595);
+    // 325 / 3695 with the five World PvP title deeds (+100 Renown).
+    expect(DEED_ORDER.length).toBe(325);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3695);
   });
 
   it('ships the audited per-category counts', () => {
@@ -183,7 +184,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release side added independently. UNION MERGE: base plus both deltas.
       collection: 41,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
-      pvp: 35,
+      pvp: 40,
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
@@ -413,6 +414,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'exp_harbor_to_harbor',
       // The sixth lifetime-XP rung (10,000,000 lifetime XP, the Titan title).
       'prog_titan',
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -809,12 +815,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // the 2026-08-30 release/v0.41.0 sync merge) one more, and the three
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
-    // one more, and the sixth lifetime-XP rung (Titan) one more.
-    expect(titles.length).toBe(52);
+    // one more, the sixth lifetime-XP rung (Titan) one more, and the five
+    // World PvP titles five more.
+    expect(titles.length).toBe(57);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(52);
+    expect(new Set(titleTexts).size).toBe(57);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1044,9 +1051,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // shipped trigger or renown value was touched.
   // Re-baselined at the 2026-09-28 release merge into feature/buried-hoards: one NEW
   // deed (cmb_coinsack_caught) joins; no existing trigger or renown changed.
-  // Re-minted for the sixth lifetime-XP rung: one NEW deed (prog_titan)
-  // appends at the tail; no existing trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '8374823cbde2d38781e7d1d90a10bb75713a4e3efff51772f37ca20ec6396b4a';
+  // Re-minted for the sixth lifetime-XP rung plus five World PvP title deeds:
+  // six NEW deeds append at the tail; no existing trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '7a65668e503ea5acecb9487d5963740b5ed59cb50c73dfec788e1cad3967f308';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1114,22 +1121,29 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
   // and stripping the one id must reproduce it exactly.
   //
-  // The sixth lifetime-XP rung appends prog_titan after
-  // exp_harbor_to_harbor; the previous mint is the 765c2ea1... literal
-  // (rotated down here), and stripping the one id must reproduce it exactly.
+  // The sixth lifetime-XP rung and five World PvP title deeds now append after
+  // the Coinsack and ferry pair. Stripping those six reproduces the previous
+  // 319-deed mint.
   const PRE_APPEND_CATALOG_SHA256 =
     '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
-  const APPENDED_SINCE: readonly string[] = ['prog_titan'];
+  const APPENDED_SINCE: readonly string[] = [
+    'prog_titan',
+    'pvp_flag_1h',
+    'pvp_flag_3h',
+    'pvp_flag_6h',
+    'pvp_flag_24h',
+    'pvp_flag_168h',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The Titan rung sits at the true tail after the Coinsack catch and the
-    // ferry round trip. Pin its two predecessors too: this is an append into
-    // a known seat, never a scattered insert or a retro-edit (the digest
-    // below proves it).
+    // The Titan rung and World PvP title ladder sit at the true tail after
+    // the Coinsack and ferry pair. Pin their two predecessors too: this is an
+    // append into a known seat, never a scattered insert or a retro-edit (the
+    // digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
       'cmb_coinsack_caught',
       'exp_harbor_to_harbor',
@@ -1351,9 +1365,9 @@ describe('table shape', () => {
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
-    // Clue Scroll casket pair, then the release's ferry round trip, then the
-    // sixth lifetime-XP rung (prog_titan) as the final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_titan');
+    // Clue Scroll casket pair, then the Coinsack and ferry deeds, then the
+    // sixth lifetime-XP rung and five World PvP titles ending in Indomitable.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('pvp_flag_168h');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

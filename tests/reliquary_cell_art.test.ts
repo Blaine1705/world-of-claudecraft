@@ -205,6 +205,11 @@ describe('title relics resolve the deed crest', () => {
       'prog_automatons_champion',
       'exp_clue_ten_caskets',
       'prog_titan',
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
     ]);
     for (const id of pending) expect(DEED_ART_PENDING.has(id), id).toBe(true);
     for (const id of RELIQUARY_HORIZON_TITLES) {

@@ -5613,6 +5613,12 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'exp_harbor_to_harbor',
   // The sixth lifetime-XP rung (prog_titan): procedural progression crest until commissioned.
   'prog_titan',
+  // World PvP streak titles use the PvP category crest until commissioned.
+  'pvp_flag_1h',
+  'pvp_flag_3h',
+  'pvp_flag_6h',
+  'pvp_flag_24h',
+  'pvp_flag_168h',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

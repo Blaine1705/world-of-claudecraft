@@ -2250,6 +2250,29 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       },
     };
     const counterfactualBytes = Buffer.byteLength(JSON.stringify(withoutFieldKit), 'utf8');
+    // The five World PvP deed dates add only 138 bytes: three 27-byte rows,
+    // one 28-byte row and one 29-byte row. The timer is unarmed in this fixture.
+    const pvpTitleDeedIds = [
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
+    ] as const;
+    const withoutPvpTitleDeeds = JSON.parse(JSON.stringify(withoutFieldKit)) as CharacterState;
+    for (const id of pvpTitleDeedIds) {
+      expect(withoutFieldKit.deeds?.[id]).toBe('2026-08-08');
+      delete withoutPvpTitleDeeds.deeds?.[id];
+    }
+    expect(fieldBytes(withoutFieldKit, 'deeds') - fieldBytes(withoutPvpTitleDeeds, 'deeds')).toBe(
+      138,
+    );
+    expect(
+      counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutPvpTitleDeeds), 'utf8'),
+    ).toBe(138);
+    for (const key of Object.keys(withoutFieldKit) as (keyof CharacterState)[]) {
+      if (key !== 'deeds') expect(withoutPvpTitleDeeds[key], key).toEqual(withoutFieldKit[key]);
+    }
     expect(bytes - counterfactualBytes, 'field_kit contributes exactly one array entry').toBe(12);
 
     // The one-time hammer recipe/proof content adds against the pre-hammer,
@@ -2452,7 +2475,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // Plus 26 for the sixth lifetime-XP rung: prog_titan in the deeds row
         // (10 characters of id plus 16 bytes of quoting, colon, date and comma),
         // earned by this maximal fixture. MEASURED (77,204 to 77,230).
-        26,
+        26 +
+        // The five World PvP title dates, isolated above without any other field change.
+        138,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2494,8 +2519,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       knownRecipes: 411,
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
-      // (the +154 above). deeds 743 -> 769 with prog_titan (the +26 above).
-      deeds: 769,
+      // (the +154 above). deeds 743 -> 769 with prog_titan (the +26 above),
+      // then -> 907 with the five World PvP title dates (the +138 above).
+      deeds: 907,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // +19 for the World PvP trophy skull id (attributed above).
@@ -2540,7 +2566,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // +42 for the World PvP trophy skull (deedStats id and Materials Vault row),
       // which this counterfactual keeps.
       // 231,729 -> 231,755 with prog_titan in the deeds row (+26, kept here).
-    ).toBe(231797);
+      // Five World PvP title dates add +138, also kept here.
+    ).toBe(231935);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2570,7 +2597,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
       // +42 for the World PvP trophy skull, which this baseline keeps.
       // 233,348 -> 233,374 with prog_titan in the deeds row (+26, kept).
-    ).toBe(233416);
+      // Five World PvP title dates add +138, also kept here.
+    ).toBe(233554);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2670,10 +2698,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // of quoting, colon, date and comma), attributed in the growth equation
     // above; no container or ceiling changed shape. Floor at measurement minus
     // 380, edge at measurement plus one: 233006..233387.
-    // Together they measure 233,428 bytes. Floor at measurement minus 380, edge
-    // at measurement plus one: 233048..233429.
-    expect(bytes, reMint).toBeGreaterThan(233048);
-    expect(bytes, reMint).toBeLessThan(233429);
+    // World PvP deed dates add the measured 138 bytes, retaining the same
+    // 381-byte tracking band and the unchanged character warning threshold.
+    // Together they measure 233,566 bytes. Floor at measurement minus 380,
+    // edge at measurement plus one: 233186..233567.
+    expect(bytes, reMint).toBeGreaterThan(233186);
+    expect(bytes, reMint).toBeLessThan(233567);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

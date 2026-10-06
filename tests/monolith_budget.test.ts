@@ -1732,8 +1732,10 @@ const MONOLITHS: MonolithRow[] = [
     // server/moderation_moves.ts (wc -l after biome). Exact count, zero slack.
     // Re-pinned 9831 -> 9835 for v0.45.0 active instance difficulty wire
     // (adiff): thin self-snapshot wiring only, measured with wc -l after biome.
-    // Exact count, zero slack.
-    ceiling: 9835,
+    // PvP played-time rewards: pet reconnect reconciliation moved to the
+    // disconnected-player helper alongside the transient timer pause marker.
+    // Combined merge measures 9834 lines, exact count and zero slack.
+    ceiling: 9834,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
