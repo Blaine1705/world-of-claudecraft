@@ -6225,7 +6225,9 @@ export const zh_CN: EnTranslations = {
       "brandedTitle": "烙印！",
       "brandedLine": "烙印会一直灼烧到结束：到融水池里将它浇灭",
       "rimeTitle": "蔓延霜凇！",
-      "rimeLine": "蔓延霜凇 {stacks}/{max}：离开幼龙的吐息"
+      "rimeLine": "蔓延霜凇 {stacks}/{max}：离开幼龙的吐息",
+      "slabTitle": "冰块",
+      "slabLine": "坚冰：它会阻挡视线。躲到它后面，避开施法者的法术"
     },
     "cryptAlert": {
       "measuredTitle": "量身定墓！",

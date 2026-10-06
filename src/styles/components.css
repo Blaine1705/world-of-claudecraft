@@ -16812,6 +16812,15 @@
     color: var(--color-debuff-frost);
     --bar-color: var(--color-debuff-frost);
   }
+  /* The Ice Slab's cover hint: calm, never a warning (it is shelter). */
+  #sanctum-alert.is-slab {
+    border-color: var(--color-friendly);
+  }
+  #sanctum-alert.is-slab .fa-title,
+  #sanctum-alert.is-slab .fa-fill {
+    color: var(--color-friendly);
+    --bar-color: var(--color-friendly);
+  }
   @media (prefers-reduced-motion: reduce) {
     #sanctum-alert {
       animation: none;

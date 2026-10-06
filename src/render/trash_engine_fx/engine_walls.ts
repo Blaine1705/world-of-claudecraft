@@ -40,8 +40,10 @@ void main() {
   gl_Position = projectionMatrix * mv;
 }
 `;
-/** The cold light inside the ice: a fresnel rim, a glow from the core, and
- *  crack lines that blaze up as the wall strains toward its shatter. */
+/** The cold light inside the ice: a faint fresnel rim, a low glow from the
+ *  core, and crack lines that blaze up as the wall strains toward its
+ *  shatter. Kept low while it stands, so the block reads as SOLID cover (a
+ *  bright glassy glow read as a spell or as scenery in the playtest). */
 const SHELL_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uStrain;
@@ -67,8 +69,8 @@ void main() {
   float width = 0.025 + 0.05 * uStrain;
   float crack = 1.0 - smoothstep(0.0, width, abs(n - 0.5));
   float pulse = 0.75 + 0.25 * sin(uTime * (3.0 + uStrain * 14.0) + n * 9.0);
-  vec3 core = vec3(0.35, 0.72, 1.0) * (0.22 + 0.18 * (1.0 - t));
-  vec3 rim = vec3(0.75, 0.93, 1.0) * fres * 0.75;
+  vec3 core = vec3(0.35, 0.72, 1.0) * (0.07 + 0.06 * (1.0 - t));
+  vec3 rim = vec3(0.75, 0.93, 1.0) * fres * 0.4;
   vec3 cracks = vec3(0.7, 0.92, 1.0) * crack * (0.25 + 1.6 * uStrain) * pulse;
   gl_FragColor = vec4((core + rim + cracks) * uFade, 1.0);
 }

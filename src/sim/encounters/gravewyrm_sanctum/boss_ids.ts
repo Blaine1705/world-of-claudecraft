@@ -80,7 +80,9 @@ export const KORGATH_TUNING = {
   leashRadius: 10,
   maulEvery: 10,
   maulFirst: 4,
-  maulCast: 1.2,
+  /** The frontal cleave's bar: long enough to read the half-circle and walk
+   *  out of it (a playtest found 1.2 s too short to react to). */
+  maulCast: 1.6,
   maulRange: 8,
   maulArcDeg: 180,
   /** Maul Arc lands this many times his melee swing. */
@@ -127,6 +129,23 @@ export const KORGATH_TUNING = {
    *  channels this long at its pillar. */
   rerivetDelay: 25,
   rerivetChannel: 6,
+  /** After any of his strikes lands (a bar's end, or the charge's run) he
+   *  takes this long before the next bar starts: no frontal ever chains
+   *  straight into another. */
+  barGap: 1,
+} as const;
+
+/** Korgath's drawn body radius: every strike of his reaches from his edge. */
+export const KORGATH_BODY = 2.5;
+
+/** How far each of Korgath's floor strikes truly reaches from his centre
+ *  (yards): what the sim hits and what the floor telegraph draws, so the
+ *  shape on the floor is the whole danger from the bar's first frame. */
+export const KORGATH_REACH = {
+  maul: KORGATH_TUNING.maulRange + KORGATH_BODY,
+  stomp: KORGATH_TUNING.stompRadius + KORGATH_BODY,
+  flail: KORGATH_TUNING.flailLength + KORGATH_BODY,
+  charge: KORGATH_TUNING.chargeLength + KORGATH_BODY,
 } as const;
 
 // ---- Grand Necromancer Velkhar (design 6.2): where the dead fall ----------------
@@ -332,6 +351,17 @@ export const KORZUL_TUNING = {
   /** The height he hovers at over the lake (yards). */
   flightAltitude: 14,
   enrageAtHpPct: 0.3,
+} as const;
+
+/** Korzul's drawn body radius (the template's bodyRadius): his cones reach
+ *  from its edge. */
+export const KORZUL_BODY_RADIUS = 5;
+
+/** How far his cones truly reach from his centre (yards): what the sim hits
+ *  and what the floor telegraph draws. */
+export const KORZUL_REACH = {
+  breath: KORZUL_TUNING.breathRange + KORZUL_BODY_RADIUS,
+  tail: KORZUL_TUNING.tailRange + KORZUL_BODY_RADIUS,
 } as const;
 
 /** Every boss-fight object template the Sanctum draws itself. */

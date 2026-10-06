@@ -8,6 +8,7 @@
 // Sanctum (the trash test's shape: the mob AI never runs here).
 
 import { describe, expect, it } from 'vitest';
+import { SANCTUM_CAST_SPECS } from '../src/render/gravewyrm_sanctum_bosses/boss_fx_core';
 import { KORGATH_SPOT, SEAL_PILLARS } from '../src/sim/content/gravewyrm_sanctum_layout';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { handleGravewyrmSanctumDevChat } from '../src/sim/dev/gravewyrm_sanctum_dev';
@@ -20,6 +21,7 @@ import {
   KORGATH_ID,
   KORGATH_LOCKBOUND,
   KORGATH_MAUL_ARC,
+  KORGATH_REACH,
   KORGATH_STOMP,
   KORGATH_STRAIN,
   KORGATH_THRESHOLD_CHARGE,
@@ -678,5 +680,142 @@ describe('Korgath the Bound: the live sim (mob AI on)', () => {
     const st = korgathState(r.boss) as KorgathFightState;
     expect(st.engaged).toBe(true);
     expect(st.chains.filter((c) => c.broken)).toHaveLength(0);
+  });
+});
+
+describe('Korgath the Bound: every strike leaves time to react (the playtest)', () => {
+  /** Each bar's dev verb and the chain that frees it (none: kept kit). */
+  const BARS: readonly [string, string, SealTool | null][] = [
+    ['maul', KORGATH_MAUL_ARC, 'hammer'],
+    ['flail', KORGATH_CHAIN_FLAIL, 'tongs'],
+    ['charge', KORGATH_THRESHOLD_CHARGE, 'anvil'],
+    ['bellow', KORGATH_BELLOW, 'bellows'],
+    ['stomp', KORGATH_STOMP, null],
+    ['strain', KORGATH_STRAIN, null],
+  ];
+
+  it('every bar runs at least 1.5 s on normal and never under 1.2 s on heroic', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const floor = difficulty === 'normal' ? 1.5 : 1.2;
+      for (const [verb, castId, tool] of BARS) {
+        const r = room(difficulty);
+        const st = pull(r);
+        if (tool) breakChain(r.sim.ctx, r.inst, r.boss, st, tool);
+        r.sim.chat(`/dev sanctum trigger ${verb}`, r.me.id);
+        expect(r.boss.castingAbility, `${difficulty} ${verb}`).toBe(castId);
+        expect(r.boss.castTotal, `${difficulty} ${verb}`).toBeGreaterThanOrEqual(floor);
+        expect(r.boss.castRemaining).toBe(r.boss.castTotal);
+      }
+    }
+    // The cleave that was too quick in the playtest.
+    expect(T.maulCast).toBeGreaterThanOrEqual(1.5);
+  });
+
+  it('the floor shape is the whole danger: a body inside the drawn reach is struck, one past it is not', () => {
+    for (const [verb, castId] of [
+      ['maul', KORGATH_MAUL_ARC],
+      ['stomp', KORGATH_STOMP],
+    ] as const) {
+      const r = room();
+      const st = pull(r);
+      breakChain(r.sim.ctx, r.inst, r.boss, st, 'hammer');
+      const reach = SANCTUM_CAST_SPECS[castId].range;
+      expect(reach).toBe(verb === 'maul' ? KORGATH_REACH.maul : KORGATH_REACH.stomp);
+      // Straight ahead of him (his facing is +z here), just inside and just
+      // outside the drawn edge.
+      r.boss.facing = 0;
+      const inside = addPlayer(r, KORGATH_SPOT.x, KORGATH_SPOT.z + reach - 0.4);
+      const outside = addPlayer(r, KORGATH_SPOT.x + 1, KORGATH_SPOT.z + reach + 0.6);
+      r.me.pos = at(r, KORGATH_SPOT.x - 1, KORGATH_SPOT.z + 2);
+      r.sim.chat(`/dev sanctum trigger ${verb}`, r.me.id);
+      const hp = { in: inside.hp, out: outside.hp };
+      tick(r, r.boss.castTotal + DT);
+      expect(inside.hp, `${verb} inside`).toBeLessThan(hp.in);
+      expect(outside.hp, `${verb} outside`).toBe(hp.out);
+    }
+  });
+
+  it('his feet and facing lock the moment a frontal bar starts, whatever the tank does (the live AI)', () => {
+    for (const [verb, castId, tool] of BARS.slice(0, 2)) {
+      const r = room();
+      const sim = r.sim;
+      const st = pull(r);
+      sim.ctx.aggroMob(r.boss, r.me, false);
+      if (tool) breakChain(sim.ctx, r.inst, r.boss, st, tool);
+      // A second player for the flail's lane to take.
+      if (verb === 'flail') addPlayer(r, KORGATH_SPOT.x + 6, KORGATH_SPOT.z - 12);
+      for (let i = 0; i < 4; i++) sim.tick();
+      sim.chat(`/dev sanctum trigger ${verb}`, r.me.id);
+      expect(r.boss.castingAbility).toBe(castId);
+      const yaw = r.boss.facing;
+      const pos = { ...r.boss.pos };
+      let held = 0;
+      let angle = 0;
+      // The tank circles him through the whole bar; the mob AI turns him to
+      // the tank every tick, the hold puts him back.
+      while (r.boss.castingAbility === castId) {
+        angle += 0.25;
+        r.me.pos = sim.ctx.groundPos(
+          r.boss.pos.x + Math.sin(yaw + angle) * 3,
+          r.boss.pos.z + Math.cos(yaw + angle) * 3,
+        );
+        r.me.prevPos = { ...r.me.pos };
+        r.me.hp = r.me.maxHp;
+        sim.ctx.rebucket(r.me);
+        sim.tick();
+        if (r.boss.castingAbility !== castId) break;
+        expect(r.boss.facing, `${verb} tick ${held}`).toBeCloseTo(yaw, 9);
+        expect(r.boss.pos.x).toBeCloseTo(pos.x, 9);
+        expect(r.boss.pos.z).toBeCloseTo(pos.z, 9);
+        held++;
+      }
+      expect(held * DT).toBeGreaterThan(1.4);
+      // Decisive: with the bar gone the AI turns him to the tank again.
+      let turned = false;
+      for (let i = 0; i < 10 && !turned; i++) {
+        sim.tick();
+        turned = Math.abs(r.boss.facing - yaw) > 0.2;
+      }
+      expect(turned, `${verb} turns again after the bar`).toBe(true);
+    }
+  }, 60_000);
+
+  it('no strike chains straight into another: at least barGap of plain melee between bars', () => {
+    const r = room();
+    const st = pull(r);
+    for (const tool of SEAL_TOOLS) breakChain(r.sim.ctx, r.inst, r.boss, st, tool);
+    addPlayer(r, KORGATH_SPOT.x + 8, KORGATH_SPOT.z - 14);
+    // Every clock due at once: the worst case for a chain of strikes.
+    st.maulTimer = 0;
+    st.flailTimer = 0;
+    st.chargeTimer = 0;
+    st.bellowTimer = 0;
+    st.stompTimer = 0;
+    const busy: boolean[] = [];
+    for (let i = 0; i < Math.round(30 / DT); i++) {
+      tick(r, DT);
+      r.me.hp = r.me.maxHp;
+      busy.push(r.boss.castingAbility !== null || st.charge !== null);
+    }
+    // Every idle run between two strikes lasts at least the gap.
+    const runs: number[] = [];
+    let idle = -1;
+    for (const b of busy) {
+      if (b) {
+        if (idle > 0) runs.push(idle);
+        idle = 0;
+      } else if (idle >= 0) idle++;
+    }
+    expect(runs.length).toBeGreaterThanOrEqual(4);
+    for (const n of runs) expect(n * DT).toBeGreaterThanOrEqual(T.barGap - 1e-6);
+    expect(T.barGap).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('Korgath the Bound: the cast hold stays his', () => {
+  it('carries no trash kit, breath cone or perch, so the trash pass never clears his hold', () => {
+    const t = MOBS[KORGATH_ID];
+    expect(t.trashKit).toBeUndefined();
+    expect(t.breathCone).toBeUndefined();
   });
 });

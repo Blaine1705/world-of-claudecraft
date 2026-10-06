@@ -13,6 +13,7 @@ import type { Entity } from '../../types';
 import { bossEngaged, claimBoss, sanctumClaims } from './claim';
 import { KORGATH_ID, KORZUL_ID, SLEDGE_TUSKER_ID, VELKHAR_ID } from './ids';
 import { tickKorgath } from './korgath';
+import { tickKorgathBarks } from './korgath_barks';
 import { tickKorzul } from './korzul';
 import { tickRuneWallLore } from './rune_wall';
 import { stepPatches, tickTusker } from './sledge_tusker';
@@ -21,6 +22,12 @@ import { tickVelkhar } from './velkhar';
 
 export * from './ids';
 export { korgathDevTrigger } from './korgath';
+export {
+  KORGATH_BARK_RANGE,
+  KORGATH_BARKS,
+  tickKorgathBarks,
+  wingPacksDown,
+} from './korgath_barks';
 export { korzulDevTrigger } from './korzul';
 export { inRuneWallReadZone, RUNE_WALL_LORE_LOG } from './rune_wall';
 export {
@@ -59,6 +66,7 @@ export function tickSanctumEncounters(ctx: SimContext): void {
     // The three bosses (phase B), in route order. A paused fight holds.
     const korgath = claimBoss(ctx, inst, KORGATH_ID);
     if (korgath && !paused(korgath)) tickKorgath(ctx, inst, korgath, bossEngaged(korgath));
+    tickKorgathBarks(ctx, inst, korgath);
     const velkhar = claimBoss(ctx, inst, VELKHAR_ID);
     if (velkhar && !paused(velkhar)) tickVelkhar(ctx, inst, velkhar, bossEngaged(velkhar));
     const korzul = claimBoss(ctx, inst, KORZUL_ID);

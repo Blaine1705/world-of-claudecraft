@@ -44,6 +44,7 @@
 
 import { KORGATH_SPOT, LOCK_TERRACE, SEAL_PILLARS } from '../../content/gravewyrm_sanctum_layout';
 import { applyKnockback } from '../../knockback';
+import { restoreCastHold } from '../../mob/trash_kit/cast_hold';
 import { inLane } from '../../mob/trash_kit/lane';
 import { spawnKitAdd } from '../../mob/trash_kit/spawn';
 import { inCone } from '../../mob/trash_kit/targets';
@@ -73,6 +74,7 @@ import {
   KORGATH_ENRAGE,
   KORGATH_LOCKBOUND,
   KORGATH_MAUL_ARC,
+  KORGATH_REACH,
   KORGATH_RERIVETED,
   KORGATH_STOMP,
   KORGATH_STRAIN,
@@ -105,8 +107,6 @@ const CHAIN_LINES: Readonly<Record<number, KorgathLine>> = {
   4: 'free',
 };
 
-/** His drawn body radius: the cleave and the stomp reach from his edge. */
-const BODY = 2.5;
 /** The bar ids he runs himself. */
 const BARS: readonly string[] = [
   KORGATH_MAUL_ARC,
@@ -146,7 +146,7 @@ function freshState(): KorgathFightState {
     maulYaw: null,
     lane: null,
     charge: null,
-    plantedAt: null,
+    recover: 0,
     lines: [],
     enraged: false,
     casts: 0,
@@ -476,6 +476,12 @@ function farthest(players: readonly Entity[], from: Entity, not: number | null):
   return best ?? players.find((p) => !p.dead) ?? null;
 }
 
+/** Start one of his bars. His feet and his facing lock where the bar began
+ *  (the cast hold seam, mob/trash_kit/cast_hold.ts): the shape on the floor
+ *  never moves with the tank, so stepping out of it is the counterplay. */
+// (Korgath carries no trashKit, breathCone or perch: the trash kit's own
+// hold pass, which clears a hold it does not own, never steps him. Pinned in
+// tests/gravewyrm_korgath.test.ts.)
 function begin(
   boss: Entity,
   st: KorgathFightState,
@@ -484,7 +490,7 @@ function begin(
   target: number | null,
 ): void {
   st.casts++;
-  st.plantedAt = { ...boss.pos };
+  boss.castHold = { castId, x: boss.pos.x, y: boss.pos.y, z: boss.pos.z, facing: boss.facing };
   startBar(boss, castId, seconds, target);
 }
 
@@ -649,7 +655,7 @@ function landMaulArc(
   nova(ctx, boss, KORGATH_MAUL_ARC);
   let n = 0;
   for (const p of claimPlayers(ctx, inst)) {
-    if (p.dead || !inCone(boss.pos, yaw, p.pos, T.maulRange + BODY, T.maulArcDeg)) continue;
+    if (p.dead || !inCone(boss.pos, yaw, p.pos, KORGATH_REACH.maul, T.maulArcDeg)) continue;
     const swing = ctx.rng.range(boss.weapon.min, boss.weapon.max) * T.maulMeleeMult;
     const landed = Math.max(1, Math.round(swing * (1 - armorReduction(p.stats.armor, boss.level))));
     ctx.dealDamage(boss, p, landed, false, 'physical', 'Maul Arc', 'hit', true);
@@ -678,7 +684,8 @@ function landLane(
     if (p.dead) continue;
     const px = p.pos.x - o.x;
     const pz = p.pos.z - o.z;
-    if (!inLane(lane.x, lane.z, lane.yaw, lane.length + BODY, lane.halfWidth, px, pz)) continue;
+    const reach = charge ? KORGATH_REACH.charge : KORGATH_REACH.flail;
+    if (!inLane(lane.x, lane.z, lane.yaw, reach, lane.halfWidth, px, pz)) continue;
     if (charge) hit(ctx, boss, p, T.chargeMin, T.chargeMax, 'Threshold Charge');
     else hit(ctx, boss, p, T.flailMin, T.flailMax, 'Chain Flail');
     if (charge && !p.dead) applyKnockback(ctx, boss, p, T.chargeKnockback);
@@ -722,7 +729,9 @@ function stepCharge(
   );
   boss.facing = c.yaw;
   boss.swingTimer = Math.max(boss.swingTimer, 0.6);
-  if (k >= 1) st.charge = null;
+  if (k < 1) return;
+  st.charge = null;
+  st.recover = T.barGap;
 }
 
 /** Foreman's Bellow: everyone hit and shoved away from him. */
@@ -768,7 +777,7 @@ function landStomp(ctx: SimContext, inst: InstanceSlot, boss: Entity): number {
   nova(ctx, boss, KORGATH_STOMP);
   let n = 0;
   for (const p of claimPlayers(ctx, inst)) {
-    if (p.dead || dist2d(p.pos, boss.pos) > T.stompRadius + BODY) continue;
+    if (p.dead || dist2d(p.pos, boss.pos) > KORGATH_REACH.stomp) continue;
     hit(ctx, boss, p, T.stompMin, T.stompMax, 'Shuddering Stomp');
     n++;
   }
@@ -816,6 +825,7 @@ function endKorgathFight(
   st: KorgathFightState,
 ): void {
   clearCastIf(boss, ...BARS);
+  boss.castHold = undefined;
   for (const chain of st.chains) {
     if (chain.rivet) dropEncounterBody(ctx, inst, boss, chain.rivet.goadsmithId);
     if (chain.objectId !== null) dropEncounterObject(ctx, inst, chain.objectId);
@@ -912,6 +922,7 @@ export function tickKorgath(
   if (freed(st, 'tongs')) st.flailTimer -= DT;
   if (freed(st, 'anvil')) st.chargeTimer -= DT;
   if (freed(st, 'bellows')) st.bellowTimer -= DT;
+  st.recover = Math.max(0, st.recover - DT);
   if (st.charge) {
     stepCharge(ctx, inst, boss, st);
     return;
@@ -919,15 +930,15 @@ export function tickKorgath(
   leash(ctx, inst, boss, st);
   const bar = boss.castingAbility;
   if (bar !== null && BARS.includes(bar)) {
-    if (st.plantedAt) holdPlanted(ctx, boss, st.plantedAt);
-    if (bar === KORGATH_MAUL_ARC && st.maulYaw !== null) boss.facing = st.maulYaw;
-    if ((bar === KORGATH_CHAIN_FLAIL || bar === KORGATH_THRESHOLD_CHARGE) && st.lane)
-      boss.facing = st.lane.yaw;
+    // Planted and facing where the bar began (the mob AI turned him to the
+    // tank this tick; the hold puts him back).
+    if (restoreCastHold(boss)) ctx.rebucket(boss);
     boss.swingTimer = Math.max(boss.swingTimer, 0.6);
     boss.castRemaining = Math.max(0, boss.castRemaining - DT);
     if (boss.castRemaining > 0) return;
     clearCastIf(boss, bar);
-    st.plantedAt = null;
+    boss.castHold = undefined;
+    st.recover = T.barGap;
     if (bar === KORGATH_MAUL_ARC) landMaulArc(ctx, inst, boss, st);
     else if (bar === KORGATH_CHAIN_FLAIL || bar === KORGATH_THRESHOLD_CHARGE)
       landLane(ctx, inst, boss, st, bar);
@@ -937,7 +948,8 @@ export function tickKorgath(
     return;
   }
   if (bar !== null || ctx.isStunned(boss)) return;
-  st.plantedAt = null;
+  // A breath between strikes: nothing chains straight into the next bar.
+  if (st.recover > 0) return;
   // One bar at a time, the most dangerous first when several are due.
   if (st.strainTimer <= 0 && chainsDown(st) < st.chains.length) startStrain(inst, boss, st);
   else if (freed(st, 'anvil') && st.chargeTimer <= 0) startThresholdCharge(ctx, inst, boss, st);

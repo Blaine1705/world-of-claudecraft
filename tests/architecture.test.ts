@@ -2885,6 +2885,10 @@ const UI_DOM_MODULES = [
   'src/ui/host_diag_section_controller.ts',
   'src/ui/options_main_menu_controller.ts',
   'src/ui/hud/talking_head/talking_head_controller.ts',
+  // Composes the dungeon prompt painters (they mount the DOM) and reads the UI
+  // clock once a frame for the Sanctum's Ice Slab cover hint; the decisions
+  // stay in the registered pure cores (sanctum_alert_view, its scene scan).
+  'src/ui/hud/dungeon/dungeon_prompts.ts',
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
   'src/ui/charselect_news.ts',

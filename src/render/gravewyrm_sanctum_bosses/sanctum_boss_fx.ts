@@ -33,6 +33,7 @@ import {
   KORGATH_ENRAGE,
   KORGATH_ID,
   KORGATH_MAUL_ARC,
+  KORGATH_REACH,
   KORGATH_RERIVETED,
   KORGATH_STOMP,
   KORGATH_STRAIN,
@@ -766,8 +767,8 @@ export class SanctumBossFx {
       }
       case KORGATH_STOMP:
         if (ev.fx !== 'nova') return false;
-        this.ring(x, z, SANCTUM_COLORS.frost, 1, KORGATH_TUNING.stompRadius + 1, 0.7, 0.16);
-        this.ring(x, z, SANCTUM_COLORS.smithBlue, 0.5, KORGATH_TUNING.stompRadius, 1.1, 0.06);
+        this.ring(x, z, SANCTUM_COLORS.frost, 1, KORGATH_REACH.stomp + 1, 0.7, 0.16);
+        this.ring(x, z, SANCTUM_COLORS.smithBlue, 0.5, KORGATH_REACH.stomp, 1.1, 0.06);
         this.spray(this.mist, 60, x, gy + 0.3, z, {
           speed: 12,
           up: 1.5,
@@ -2213,9 +2214,10 @@ export class SanctumBossFx {
       else this.playGesture?.(z.id, KORZUL_EMERGE_LAND_GESTURE);
     }
     e.last = t;
-    // Over: landed, a wipe, or his fight already begun (a dev skip, then a bar).
+    // Over: landed, or his fight already begun (a dev skip, then a bar). The
+    // wake plays OUT of combat (korzul_emerge.ts), so combat never gates it.
     const fighting = z.castingAbility !== null && z.castingAbility !== KORZUL_BREAK_FREE;
-    if (t > KORZUL_EMERGE_SECONDS + 1 || z.dead || !z.inCombat || fighting) this.emerge = null;
+    if (t > KORZUL_EMERGE_SECONDS + 1 || z.dead || fighting) this.emerge = null;
   }
 
   dispose(): void {

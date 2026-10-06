@@ -9,11 +9,13 @@
 import {
   KORGATH_CHAIN_FLAIL,
   KORGATH_MAUL_ARC,
+  KORGATH_REACH,
   KORGATH_STOMP,
   KORGATH_THRESHOLD_CHARGE,
   KORGATH_TUNING,
   KORZUL_GRAVE_BREATH,
   KORZUL_GRAVE_INFERNO,
+  KORZUL_REACH,
   KORZUL_TAIL_SWEEP,
   KORZUL_TUNING,
   type PlateState,
@@ -67,12 +69,15 @@ const Z = KORZUL_TUNING;
 
 /** Every boss bar that lays a shape on the floor under its caster, by cast
  *  id. (Strain's rings stand at the pillars, the trench at its lane object,
- *  the Plunging Fire and the landing on their plate objects: drawn apart.) */
+ *  the Plunging Fire and the landing on their plate objects: drawn apart.)
+ *  A strike that reaches from the boss's body edge draws its TRUE reach
+ *  (KORGATH_REACH, KORZUL_REACH): the floor shape is the whole danger from
+ *  the bar's first frame, never a few yards short of where it hits. */
 export const SANCTUM_CAST_SPECS: Readonly<Record<string, SanctumCastSpec>> = {
   [KORGATH_STOMP]: {
     shape: 'fan',
     arcDeg: 360,
-    range: K.stompRadius,
+    range: KORGATH_REACH.stomp,
     half: 0,
     threat: 'danger',
     accent: TELEGRAPH_ACCENTS.frost,
@@ -81,7 +86,7 @@ export const SANCTUM_CAST_SPECS: Readonly<Record<string, SanctumCastSpec>> = {
   [KORGATH_MAUL_ARC]: {
     shape: 'fan',
     arcDeg: K.maulArcDeg,
-    range: K.maulRange,
+    range: KORGATH_REACH.maul,
     half: 0,
     threat: 'danger',
     accent: TELEGRAPH_ACCENTS.physical,
@@ -90,7 +95,7 @@ export const SANCTUM_CAST_SPECS: Readonly<Record<string, SanctumCastSpec>> = {
   [KORGATH_CHAIN_FLAIL]: {
     shape: 'lane',
     arcDeg: 0,
-    range: K.flailLength,
+    range: KORGATH_REACH.flail,
     half: K.flailHalfWidth,
     threat: 'danger',
     accent: TELEGRAPH_ACCENTS.frost,
@@ -99,7 +104,7 @@ export const SANCTUM_CAST_SPECS: Readonly<Record<string, SanctumCastSpec>> = {
   [KORGATH_THRESHOLD_CHARGE]: {
     shape: 'lane',
     arcDeg: 0,
-    range: K.chargeLength,
+    range: KORGATH_REACH.charge,
     half: K.chargeHalfWidth,
     threat: 'control',
     accent: TELEGRAPH_ACCENTS.physical,
@@ -108,7 +113,7 @@ export const SANCTUM_CAST_SPECS: Readonly<Record<string, SanctumCastSpec>> = {
   [KORZUL_GRAVE_BREATH]: {
     shape: 'fan',
     arcDeg: Z.breathArcDeg,
-    range: Z.breathRange,
+    range: KORZUL_REACH.breath,
     half: 0,
     threat: 'lethal',
     accent: SANCTUM_COLORS.wyrmFire,
@@ -117,7 +122,7 @@ export const SANCTUM_CAST_SPECS: Readonly<Record<string, SanctumCastSpec>> = {
   [KORZUL_TAIL_SWEEP]: {
     shape: 'fan',
     arcDeg: Z.tailArcDeg,
-    range: Z.tailRange,
+    range: KORZUL_REACH.tail,
     half: 0,
     threat: 'danger',
     accent: TELEGRAPH_ACCENTS.physical,
@@ -230,7 +235,7 @@ export function breathPlates(
   z: number,
   yaw: number,
   plates: readonly PlateSpot[],
-  range = KORZUL_TUNING.breathRange,
+  range = KORZUL_REACH.breath,
   arcDeg = KORZUL_TUNING.breathArcDeg,
   max = KORZUL_TUNING.breathPlates,
 ): number[] {

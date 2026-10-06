@@ -172,13 +172,16 @@ export class DungeonPrompts {
     this.bastion.paint(bastion);
     const wildheart = buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity });
     this.wildheart.paint(wildheart);
+    // The UI clock (seconds): an Ice Slab's cover hint shows for its first moments.
+    const now = performance.now() / 1000;
     const sanctum = buildSanctumAlertView({
       selfId: p.id,
       selfPos: p.pos,
       auras: p.auras,
       targetId: p.targetId,
       entity,
-      scene: this.sanctumScene.update(f.world),
+      scene: this.sanctumScene.update(f.world, now),
+      now,
     });
     this.sanctum.paint(sanctum);
     let crypt: CryptAlertView = buildCryptAlertView({

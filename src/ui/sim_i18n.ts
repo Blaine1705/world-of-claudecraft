@@ -1481,6 +1481,15 @@ const baseEnTable = {
   'log.sanctumKorgathChain2': 'The quench. Does it hold?',
   'log.sanctumKorgathChain3': 'I remember the forge... I remember the seal...',
   'log.sanctumKorgathFree': 'The lock is open. Maker, forgive your foreman.',
+  // His shouts down at the wings before his pull (encounters/gravewyrm_sanctum/
+  // korgath_barks.ts KORGATH_BARKS, EXACT), one per wing pack that falls.
+  'log.sanctumKorgathBark1': 'Who walks the ledges? The foreman hears your little hammers.',
+  'log.sanctumKorgathBark2': 'Four chains the Smith laid on me. Four! Do you hear them sing?',
+  'log.sanctumKorgathBark3':
+    'Strike them, then. Strike the chains, mortals... and see what they hold back!',
+  'log.sanctumKorgathBark4': 'A thousand winters I have kept this lock. Unchain me! Unchain me!',
+  'log.sanctumKorgathBark5':
+    'The grates rise. Climb to the terrace and break me loose, if your arms can bear it!',
   'mechanic.sanctumMaulArc': 'Maul Arc',
   'mechanic.sanctumChainFlail': 'Chain Flail',
   'mechanic.sanctumThresholdCharge': 'Threshold Charge',

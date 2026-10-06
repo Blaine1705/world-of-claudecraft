@@ -44,6 +44,7 @@ import {
   VELKHAR_TUNING,
   VELKHAR_TWICE_WOKEN,
 } from '../src/sim/encounters/gravewyrm_sanctum/ids';
+import { SANCTUM_BRANDED, SANCTUM_ICE_SLAB } from '../src/sim/mob/trash_kit/sanctum_cast_ids';
 import type { AuraKind } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import {
@@ -57,6 +58,8 @@ import {
   type SanctumAlertEntity,
   type SanctumAlertInput,
   type SanctumAlertScene,
+  SLAB_HINT_RANGE,
+  SLAB_HINT_SECONDS,
 } from '../src/ui/hud/dungeon/sanctum_alert_view';
 import { setLanguage, t } from '../src/ui/i18n';
 
@@ -440,5 +443,52 @@ describe('the Sanctum boss aura tooltips say the live rule', () => {
       const text = t(d?.key as Parameters<typeof t>[0], d?.nums as Record<string, number>);
       expect(text).not.toMatch(/\{[a-zA-Z]+\}/);
     }
+  });
+});
+
+describe("the Ice Slab cover hint (the playtest: what is the ogre's block for?)", () => {
+  const slab = (id: number, x: number, z: number) => ({
+    id,
+    kind: 'object',
+    templateId: SANCTUM_ICE_SLAB,
+    pos: { x, z },
+  });
+
+  it('a fresh slab near you says it blocks line of sight, for its first seconds only', () => {
+    const entities = new Map<number, SanctumSceneEntity>();
+    entities.set(7, slab(7, 6, 0));
+    const scan = new SanctumAlertSceneScan();
+    const scene = scan.update({ entities, entityRosterVersion: 1 }, 100);
+    expect(scene.slabs).toHaveLength(1);
+    expect(scene.slabBorn).toEqual([100]);
+    const v = buildSanctumAlertView(input({ now: 101 }, scene));
+    expect(v.visible && v.kind).toBe('slab');
+    if (!v.visible) throw new Error('hidden');
+    expect(v.title).toBe(t('hudChrome.sanctumAlert.slabTitle'));
+    expect(v.line).toBe(t('hudChrome.sanctumAlert.slabLine'));
+    expect(v.line.toLowerCase()).toContain('line of sight');
+    expect(v.progress).toBeCloseTo(1 - 1 / SLAB_HINT_SECONDS, 6);
+    // Past its moment, out of reach, or with no clock: quiet.
+    expect(kind({ now: 100 + SLAB_HINT_SECONDS + 0.1 }, scene)).toBe('hidden');
+    expect(kind({ now: 101, selfPos: { x: SLAB_HINT_RANGE + 7, z: 0 } }, scene)).toBe('hidden');
+    expect(kind({}, scene)).toBe('hidden');
+    // The stamp is the slab's first sight: a later roster change keeps it.
+    entities.set(8, slab(8, -4, 2));
+    const later = scan.update({ entities, entityRosterVersion: 2 }, 103);
+    expect(later.slabBorn).toEqual([100, 103]);
+    // A shattered slab is forgotten.
+    entities.delete(7);
+    expect(scan.update({ entities, entityRosterVersion: 3 }, 104).slabBorn).toEqual([103]);
+  });
+
+  it('every danger outranks it (it is a hint, never a warning)', () => {
+    const entities = new Map<number, SanctumSceneEntity>();
+    entities.set(7, slab(7, 3, 0));
+    const scene = new SanctumAlertSceneScan().update({ entities, entityRosterVersion: 1 }, 50);
+    expect(kind({ now: 51 }, scene)).toBe('slab');
+    expect(
+      kind({ now: 51, auras: [{ id: SANCTUM_BRANDED, remaining: 5, duration: 9 }] }, scene),
+    ).toBe('branded');
+    expect(SANCTUM_ALERT_KINDS).toContain('slab');
   });
 });

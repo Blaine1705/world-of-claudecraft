@@ -19150,6 +19150,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.sanctumAlert.brandedLine': '烙印會一直灼燒到結束：到融水池裡將它澆熄',
   'hudChrome.sanctumAlert.rimeTitle': '蔓延霜凇！',
   'hudChrome.sanctumAlert.rimeLine': '蔓延霜凇 {stacks}/{max}：離開幼龍的吐息',
+  'hudChrome.sanctumAlert.slabTitle': '冰塊',
+  'hudChrome.sanctumAlert.slabLine': '堅冰：它會阻擋視線。躲到它後面，避開施法者的法術',
   'hudChrome.kitUse.toppleLine': '把它踢倒在敵群上：灑出的火焰會灼燒它們',
   'hudChrome.kitUse.toppleKey': '把{name}推倒在它們身上',
   'hudChrome.kitUse.toppleTap': '點擊這裡把{name}推倒在它們身上',

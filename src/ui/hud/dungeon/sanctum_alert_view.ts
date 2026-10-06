@@ -17,9 +17,11 @@
 // readout on a targeted Korgath; then, below every boss alert, the trash
 // debuffs (the trash mechanics pass, mob/trash_kit/sanctum_cast_ids.ts): a
 // Goadsmith's brand burning on you, then Creeping Rime at 3 or 4 stacks (the
-// next Rime Breath freezes you). Every bar is the threat's own time left (the
-// caster's bar or the mark). The painter is the shared encounter alert's
-// (encounter_alert_painter.ts).
+// next Rime Breath freezes you); last, a hint: an Ice Slab the Ogre
+// Sledge-Hauler just threw down near you is solid cover (it blocks line of
+// sight), shown for its first SLAB_HINT_SECONDS. Every bar is the threat's own
+// time left (the caster's bar or the mark; the hint's own seconds). The
+// painter is the shared encounter alert's (encounter_alert_painter.ts).
 
 import { GRAVEWYRM_SANCTUM_MOBS } from '../../../sim/content/gravewyrm_sanctum';
 import { SEAL_PILLARS } from '../../../sim/content/gravewyrm_sanctum_layout';
@@ -30,6 +32,7 @@ import {
   KORGATH_ID,
   KORGATH_LOCKBOUND,
   KORGATH_MAUL_ARC,
+  KORGATH_REACH,
   KORGATH_STOMP,
   KORGATH_STRAIN,
   KORGATH_THRESHOLD_CHARGE,
@@ -40,6 +43,7 @@ import {
   KORZUL_GRAVE_INFERNO,
   KORZUL_ID,
   KORZUL_PLUNGING_FIRE,
+  KORZUL_REACH,
   KORZUL_TAIL_SWEEP,
   KORZUL_TUNING,
   KORZUL_WYRMS_EYE,
@@ -83,7 +87,8 @@ export type SanctumAlertKind =
   | 'flight'
   | 'lockbound'
   | 'branded'
-  | 'rime';
+  | 'rime'
+  | 'slab';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const SANCTUM_ALERT_KINDS: readonly SanctumAlertKind[] = [
@@ -108,6 +113,7 @@ export const SANCTUM_ALERT_KINDS: readonly SanctumAlertKind[] = [
   'lockbound',
   'branded',
   'rime',
+  'slab',
 ];
 
 export type SanctumAlertLive = Omit<EncounterAlertLive, 'kind'> & { kind: SanctumAlertKind };
@@ -125,6 +131,11 @@ const REACH_MARGIN = 2;
 export const RIME_FREEZE_STACKS =
   GRAVEWYRM_SANCTUM_MOBS.rime_whelp?.trashKit?.cone?.freezeStack?.maxStacks ?? 5;
 export const RIME_WARN_STACKS = RIME_FREEZE_STACKS - 2;
+
+/** An Ice Slab's cover hint: shown this long after the slab is first seen,
+ *  while the player stands within SLAB_HINT_RANGE of it. */
+export const SLAB_HINT_SECONDS = 5;
+export const SLAB_HINT_RANGE = 25;
 
 interface AlertAura {
   id: string;
@@ -166,6 +177,10 @@ export interface SanctumAlertScene {
   shadows: readonly SanctumAlertEntity[];
   trenches: readonly SanctumAlertEntity[];
   bonewalkers: readonly SanctumAlertEntity[];
+  /** The standing Ice Slabs, and (same order) the clock each was first seen
+   *  at (the scene scan's `now`). */
+  slabs: readonly SanctumAlertEntity[];
+  slabBorn: readonly number[];
 }
 
 export interface SanctumAlertInput {
@@ -175,6 +190,9 @@ export interface SanctumAlertInput {
   targetId: number | null | undefined;
   entity: (id: number) => SanctumAlertEntity | null | undefined;
   scene: SanctumAlertScene;
+  /** The caller's clock in seconds (the same one the scene scan stamps the
+   *  slabs with); without it the slab hint never shows. */
+  now?: number;
 }
 
 export const EMPTY_SANCTUM_SCENE: SanctumAlertScene = {
@@ -187,6 +205,8 @@ export const EMPTY_SANCTUM_SCENE: SanctumAlertScene = {
   shadows: [],
   trenches: [],
   bonewalkers: [],
+  slabs: [],
+  slabBorn: [],
 };
 
 // ---- small pure geometry ------------------------------------------------------
@@ -328,6 +348,8 @@ function titleOf(kind: SanctumAlertKind): string {
       return t('hudChrome.sanctumAlert.brandedTitle');
     case 'rime':
       return t('hudChrome.sanctumAlert.rimeTitle');
+    case 'slab':
+      return t('hudChrome.sanctumAlert.slabTitle');
   }
 }
 
@@ -427,13 +449,8 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
   // 5. The lanes: aimed at you, or you stand in one.
   if (korgath && korgath.pos) {
     const lanes = [
-      [KORGATH_CHAIN_FLAIL, 'flail', KORGATH_TUNING.flailLength, KORGATH_TUNING.flailHalfWidth],
-      [
-        KORGATH_THRESHOLD_CHARGE,
-        'charge',
-        KORGATH_TUNING.chargeLength,
-        KORGATH_TUNING.chargeHalfWidth,
-      ],
+      [KORGATH_CHAIN_FLAIL, 'flail', KORGATH_REACH.flail, KORGATH_TUNING.flailHalfWidth],
+      [KORGATH_THRESHOLD_CHARGE, 'charge', KORGATH_REACH.charge, KORGATH_TUNING.chargeHalfWidth],
     ] as const;
     for (const [id, kind, length, half] of lanes) {
       if (korgath.castingAbility !== id) continue;
@@ -493,7 +510,7 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
   if (
     casting(korgath, KORGATH_STOMP) &&
     korgath.pos &&
-    dist(korgath.pos, me) <= KORGATH_TUNING.stompRadius + REACH_MARGIN
+    dist(korgath.pos, me) <= KORGATH_REACH.stomp + REACH_MARGIN
   )
     return fromBar('stomp', t('hudChrome.sanctumAlert.stompLine'), korgath);
 
@@ -506,7 +523,7 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
       korzul.pos,
       korzul.facing ?? 0,
       me,
-      KORZUL_TUNING.breathRange + REACH_MARGIN,
+      KORZUL_REACH.breath + REACH_MARGIN,
       KORZUL_TUNING.breathArcDeg,
     )
   )
@@ -522,7 +539,7 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
       korgath.pos,
       korgath.facing ?? 0,
       me,
-      KORGATH_TUNING.maulRange + REACH_MARGIN + 2,
+      KORGATH_REACH.maul + REACH_MARGIN,
       KORGATH_TUNING.maulArcDeg,
     )
   )
@@ -536,7 +553,7 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
       korzul.pos,
       (korzul.facing ?? 0) + Math.PI,
       me,
-      KORZUL_TUNING.tailRange + REACH_MARGIN + 3,
+      KORZUL_REACH.tail + REACH_MARGIN,
       KORZUL_TUNING.tailArcDeg,
     )
   )
@@ -618,6 +635,23 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
       markShare(rime),
       rime.remaining ?? null,
     );
+
+  // 18. An Ice Slab just thrown down near you: it is cover from the casters.
+  const now = input.now;
+  if (now !== undefined) {
+    for (let i = 0; i < scene.slabs.length; i++) {
+      const slab = scene.slabs[i];
+      const age = now - (scene.slabBorn[i] ?? now);
+      if (slab.dead || !slab.pos || age < 0 || age > SLAB_HINT_SECONDS) continue;
+      if (dist(slab.pos, me) > SLAB_HINT_RANGE) continue;
+      return live(
+        'slab',
+        t('hudChrome.sanctumAlert.slabLine'),
+        1 - age / SLAB_HINT_SECONDS,
+        SLAB_HINT_SECONDS - age,
+      );
+    }
+  }
   return HIDDEN;
 }
 

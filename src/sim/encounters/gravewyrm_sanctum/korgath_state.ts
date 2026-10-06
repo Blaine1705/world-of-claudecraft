@@ -49,8 +49,9 @@ export interface KorgathFightState {
   lane: { x: number; z: number; yaw: number; length: number; halfWidth: number } | null;
   /** The Threshold Charge in flight (instance-local), `t` seconds into the run. */
   charge: { x: number; z: number; yaw: number; length: number; t: number } | null;
-  /** Where he braced his feet for the bar in flight (world coordinates). */
-  plantedAt: { x: number; y: number; z: number } | null;
+  /** Seconds before his next bar may start (KORGATH_TUNING.barGap after a
+   *  strike lands); his melee carries on through it. */
+  recover: number;
   /** Which voice lines he has spoken this pull (KORGATH_LINES keys). */
   lines: string[];
   enraged: boolean;

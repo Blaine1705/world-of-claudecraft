@@ -6225,7 +6225,9 @@ export const ko_KR: EnTranslations = {
       "brandedTitle": "낙인!",
       "brandedLine": "낙인은 끝날 때까지 타오릅니다: 녹은 물웅덩이에서 끄세요",
       "rimeTitle": "스며드는 서리!",
-      "rimeLine": "스며드는 서리 {stacks}/{max}: 새끼용의 숨결에서 벗어나세요"
+      "rimeLine": "스며드는 서리 {stacks}/{max}: 새끼용의 숨결에서 벗어나세요",
+      "slabTitle": "얼음 덩어리",
+      "slabLine": "단단한 얼음: 시야를 가립니다. 뒤에 숨어 시전자의 주문을 피하세요"
     },
     "cryptAlert": {
       "measuredTitle": "무덤 치수 재기!",

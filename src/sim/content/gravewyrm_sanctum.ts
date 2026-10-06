@@ -62,6 +62,7 @@ import {
   SEAL_TOOLS,
   type SealTool,
 } from '../encounters/gravewyrm_sanctum/ids';
+import { shuttleLoop } from '../mob/patrol_route';
 import {
   SANCTUM_BRANDED,
   SANCTUM_BRANDING_IRON,
@@ -586,14 +587,21 @@ function patrolling(
 // Pack ids read as g<n> for the twelve groups (route order) and pa pb pc pd
 // for the patrols (pa is the Sledge Tusker).
 
-/** Patrol A: the Sledge Tusker up and down the haul road, from the court's
- *  foot to the lower bend and back (the bends are the road's turns). */
-export const TUSKER_ROAD = [
-  { x: -12, z: -164 },
-  { x: -36, z: -144 },
-  { x: 26, z: -110 },
-  { x: -36, z: -144 },
+/** Patrol A's centre line: the haul road from the court's foot, round the
+ *  upper bend, to the lower bend (the bends are the road's turns). */
+export const TUSKER_ROAD_LINE = [
+  { x: -13, z: -163.25 },
+  { x: -37, z: -144 },
+  { x: 21, z: -113.6 },
 ] as const;
+/** Patrol A: the Sledge Tusker up and down the haul road as one closed loop.
+ *  Down one lane and back up the other, 2 yd either side of the centre line,
+ *  a U-turn at each end and an arc round the upper bend's pad, so the
+ *  house-sized beast and its sledge turn round instead of flipping on the
+ *  spot, and its coat (2.6 yd either side of its walk) stays on the road,
+ *  clear of the crevasse lips between the road's legs and of every prop
+ *  (tests/gravewyrm_sanctum_tusker_patrol.test.ts). */
+export const TUSKER_ROAD = shuttleLoop(TUSKER_ROAD_LINE, 2, 4.5, 0.5);
 /** Patrol B: a loop round the Serac Field's upper shelf. */
 const SERAC_LOOP = [
   { x: -72, z: -96 },
@@ -762,8 +770,10 @@ function across(dx: number, dz: number): number {
 }
 
 /** Both wings: the two Chain Stairs rise together once BOTH are clear (the
- *  terrace is entered only with both stairs open, design section 4). */
-const BOTH_WINGS = ['g4', 'g5', 'pb', 'g6', 'g7'] as const;
+ *  terrace is entered only with both stairs open, design section 4). Korgath
+ *  shouts down at the group as these fall (encounters/gravewyrm_sanctum/
+ *  korgath_barks.ts). */
+export const SANCTUM_WING_PACKS = ['g4', 'g5', 'pb', 'g6', 'g7'] as const;
 
 export const GRAVEWYRM_SANCTUM_GATES: DungeonGateDef[] = [
   {
@@ -785,7 +795,7 @@ export const GRAVEWYRM_SANCTUM_GATES: DungeonGateDef[] = [
     z: -25.5,
     hw: 5.6,
     rot: across(32, 7),
-    packs: [...BOTH_WINGS],
+    packs: [...SANCTUM_WING_PACKS],
     sealWhileEngaged: 'korgath_the_bound',
     openText: 'Both wings fall silent. The grates of the Chain Stairs rise on groaning chains.',
   },
@@ -797,7 +807,7 @@ export const GRAVEWYRM_SANCTUM_GATES: DungeonGateDef[] = [
     z: -25.5,
     hw: 5.6,
     rot: across(-32, 7),
-    packs: [...BOTH_WINGS],
+    packs: [...SANCTUM_WING_PACKS],
     sealWhileEngaged: 'korgath_the_bound',
   },
   {

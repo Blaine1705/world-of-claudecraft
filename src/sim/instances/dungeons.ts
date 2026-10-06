@@ -49,7 +49,7 @@ import {
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { updateIgnivarRaidProgression } from '../ignivar_raid_progression';
-import { stampDungeonPatrol } from '../mob/patrol';
+import { placeOnPatrolPoint, stampDungeonPatrol } from '../mob/patrol';
 import { tickTrashKits } from '../mob/trash_kit';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
@@ -1002,7 +1002,11 @@ function claimInstance(
     mob.facing = spawn.facing ?? Math.PI; // most packs face the entrance; authored set-pieces may override
     mob.prevFacing = mob.facing;
     if (spawn.idleStationary) mob.idleStationary = true; // hand-placed pack holds formation
-    if (spawn.patrol) mob.dungeonPatrol = stampDungeonPatrol(spawn.patrol, origin.x, origin.z);
+    if (spawn.patrol) {
+      mob.dungeonPatrol = stampDungeonPatrol(spawn.patrol, origin.x, origin.z);
+      // A ground patroller starts on its patrol point for the claim's clock.
+      placeOnPatrolPoint(ctx, mob);
+    }
     // A perched placement waits on its perch (mob/trash_kit): on it from the start.
     if (spawn.perch) {
       const perchY = DUNGEON_FLOOR_Y + spawn.perch.y;
