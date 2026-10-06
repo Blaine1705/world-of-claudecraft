@@ -1564,9 +1564,6 @@ export function runEffects(
       }
       case 'hot': {
         const hotTarget = target ?? p;
-        const plantsHot = !hotTarget.auras.some(
-          (aura) => aura.kind === 'hot' && aura.id === ability.id && aura.sourceId === p.id,
-        );
         // A HoT that RIDES a direct heal (Regrowth-style) does NOT also scale here:
         // the direct component already took the cast-time coefficient, so scaling the
         // rider too would double-dip. Only pure HoTs (Rejuvenation) take the rider.
@@ -1604,7 +1601,8 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
-        if (plantsHot) druidEngineOnHotPlanted(ctx, p, ability.id);
+        // A refresh of the caster's own ticking bloom banks Verdance too.
+        druidEngineOnHotPlanted(ctx, p, ability.id);
         break;
       }
       case 'absorb': {
