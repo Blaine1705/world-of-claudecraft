@@ -14,13 +14,16 @@ import {
   verdanceWildmendCastTime,
   WILDMEND_ID,
 } from '../src/sim/combat/druid_engines';
+import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { spellHasteMult } from '../src/sim/combat/spell_combat';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
 import { moveSpeedMult } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
+import { directHealBonus } from '../src/sim/spell_scaling';
 import type { Aura, Entity } from '../src/sim/types';
+import { abilityDamageBonus } from '../src/ui/ability_damage';
 
 function rig(spec: 'balance' | 'feral' | 'restoration', rows: Record<number, string> = {}) {
   const sim = new Sim({ seed: 29, playerClass: 'druid', autoEquip: true });
@@ -513,6 +516,49 @@ describe('Groveheart engine', () => {
     sim.castAbility('swiftmend');
     expect(player.auras.some((aura) => aura.id === VERDANCE_ID)).toBe(false);
     expect(sim.resolvedAbility(WILDMEND_ID)?.castTime).toBe(baseCast);
+  });
+
+  it("keeps Wildmend's full Spell Power rider while Verdance speeds the cast", () => {
+    // One Wildmend heal through the real combat arm, with and without 3
+    // Verdance. Same seed and no ticks in between, so both draw the identical
+    // roll (and crit roll): any difference is the Spell Power rider alone.
+    const healOnce = (banked: number) => {
+      const { sim, player } = rig('restoration');
+      for (let stage = 0; stage < banked; stage++) {
+        druidEngineOnHotPlanted(ctx(sim), player, 'rejuvenation');
+      }
+      player.healPower = 400;
+      player.hp = 1;
+      const res = sim.resolvedAbility(WILDMEND_ID);
+      if (!res) throw new Error('Wildmend not known');
+      const meta = ctx(sim).players.get(player.id);
+      if (!meta) throw new Error('missing meta');
+      sim.drainEvents();
+      runEffects(ctx(sim), player, meta, player, res);
+      const heal = sim
+        .drainEvents()
+        .find((event) => event.type === 'heal2' && event.ability === 'Wildmend');
+      const tooltipBonus = abilityDamageBonus(res, res.effects[0], {
+        spellPower: player.spellPower,
+        healPower: player.healPower,
+        rangedPower: player.rangedPower,
+        attackPower: player.attackPower,
+      });
+      return {
+        castTime: res.castTime,
+        heal: heal && 'amount' in heal ? heal.amount : -1,
+        tooltipBonus,
+      };
+    };
+    const plain = healOnce(0);
+    const banked = healOnce(VERDANCE_STAGES);
+    expect(plain.castTime).toBeCloseTo(2.52, 10);
+    expect(banked.castTime).toBe(1.5);
+    expect(plain.heal).toBeGreaterThan(0);
+    expect(banked.heal).toBe(plain.heal);
+    expect(banked.tooltipBonus).toBe(plain.tooltipBonus);
+    // Decisive: reading the sped-up cast time would have cut the rider.
+    expect(directHealBonus(400, 1.5)).toBeLessThan(directHealBonus(400, 2.52));
   });
 
   it('reads Verdance from the aura list alone and never stretches a faster cast', () => {

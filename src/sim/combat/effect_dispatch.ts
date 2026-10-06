@@ -54,6 +54,7 @@ import { primaryHealingMultiplier } from '../spec_output_tuning';
 import {
   abilityScalingPower,
   absorbBonus,
+  coefficientCastTime,
   directHealBonus,
   directHitBonus,
   dotTickBonus,
@@ -1370,7 +1371,8 @@ export function runEffects(
         const rolledAmount = ctx.rng.range(eff.min, eff.max);
         const baseHealAmount =
           eff.casterMaxHpPct === undefined
-            ? rolledAmount + directHealBonus(p.healPower, res.castTime, false, talentHealMult)
+            ? rolledAmount +
+              directHealBonus(p.healPower, coefficientCastTime(res), false, talentHealMult)
             : Math.round(p.maxHp * eff.casterMaxHpPct);
         // The cast-scoped multiplier (see the runEffects parameter note): the
         // === 1 guard keeps every unmarked cast's arithmetic byte-identical.
