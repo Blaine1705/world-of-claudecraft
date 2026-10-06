@@ -61,8 +61,13 @@ export function resolveAbilityChain(
     mods,
   );
   // Banked Verdance speeds Wildmend (combat/druid_engines.ts); identity
-  // for every other ability and for a druid with no Verdance.
+  // for every other ability and for a druid with no Verdance. Only the cast
+  // gets faster: scalingCastTime keeps the heal's Spell Power coefficient on
+  // the cast time from before the speed-up.
   const castTime = verdanceWildmendCastTime(actor, known.def.id, resonanceCastTime);
+  if (castTime !== resonanceCastTime) {
+    return { ...ascensionResolved, castTime, scalingCastTime: resonanceCastTime };
+  }
   return castTime === ascensionResolved.castTime
     ? ascensionResolved
     : { ...ascensionResolved, castTime };
