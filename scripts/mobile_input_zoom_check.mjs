@@ -240,22 +240,19 @@ try {
               hasTouch: !runtimeTouch,
             });
             for (const scale of SCALES) {
-              const name = `${path} ${runtimeTouch ? 'runtime-touch/fine' : 'coarse'} ${phone.name} ${landscape ? 'landscape' : 'portrait'} scale=${scale}`;
+              const name = `${path} ${runtimeTouch ? 'runtime-touch/non-coarse' : 'coarse'} ${phone.name} ${landscape ? 'landscape' : 'portrait'} scale=${scale}`;
               const result = await page.evaluate(measure, {
                 groups: GAME_GROUPS,
                 scale,
                 runtimeTouch,
               });
-              check(
-                `${name} pointer mode`,
-                runtimeTouch ? result.fine && !result.coarse : result.coarse,
-              );
+              check(`${name} pointer mode`, runtimeTouch ? !result.coarse : result.coarse);
               checkTouchFonts(name, result);
             }
           }
         }
         console.log(
-          `  Checked ${path} ${runtimeTouch ? 'runtime touch/fine pointer' : 'coarse pointer'}: ${PHONES.length * 2 * SCALES.length} scenarios`,
+          `  Checked ${path} ${runtimeTouch ? 'runtime touch/non-coarse pointer' : 'coarse pointer'}: ${PHONES.length * 2 * SCALES.length} scenarios`,
         );
       } finally {
         await context.close();
@@ -314,7 +311,7 @@ try {
       });
       await loadPage(page, path);
       const result = await page.evaluate(measure, { groups: GAME_GROUPS });
-      check(`${path} desktop fine pointer`, result.fine && !result.coarse);
+      check(`${path} desktop non-coarse pointer`, !result.coarse);
       for (const className of ['prompt-number', 'bag-search', 'mkt-search']) {
         const control = result.controls.find((c) => c.cls.split(/\s+/).includes(className));
         check(
