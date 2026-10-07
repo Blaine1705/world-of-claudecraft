@@ -2315,18 +2315,20 @@ export class MetersPanel {
     }
 
     const stats = abilityDetailStats(entry);
+    // Exact counts: fmtNum would compact an all-time hit count to "10.0k".
+    const count = (n: number) => formatNumber(n, { maximumFractionDigits: 0, useGrouping: false });
     this.subEl.textContent =
       this.tab === 'heal'
         ? t('hudChrome.meters.detailHealSubtitle', {
             effective: fmtNum(stats.effective),
             overheal: fmtNum(stats.overheal),
             overhealPercent: fmtPercent(stats.overhealShare),
-            hits: fmtNum(stats.hits),
+            hits: count(stats.hits),
             critPercent: fmtPercent(stats.critShare),
           })
         : t('hudChrome.meters.detailHitSubtitle', {
-            hits: fmtNum(stats.hits),
-            crits: fmtNum(stats.crits),
+            hits: count(stats.hits),
+            crits: count(stats.crits),
             critPercent: fmtPercent(stats.critShare),
             average: fmtNum(stats.avg),
             min: fmtNum(stats.minHit),

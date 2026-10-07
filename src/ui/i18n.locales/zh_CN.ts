@@ -633,9 +633,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.noDeathEvents': '死亡前没有记录到任何事件',
   'hudChrome.meters.noDetailedData': '没有详细数据',
   'hudChrome.meters.detailHealSubtitle':
-    '有效：{effective} | 过量治疗：{overheal}（{overhealPercent}） | 次数：{hits}（{critPercent} 暴击）',
+    '有效：{effective} | 过量治疗：{overheal}（{overhealPercent}） | 命中：{hits}（{critPercent} 暴击）',
   'hudChrome.meters.detailHitSubtitle':
-    '次数：{hits} | 暴击：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}',
+    '命中：{hits} | 暴击：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}',
   'hudChrome.meters.noTargetData': '没有该目标的玩家数据',
   'hudChrome.meters.numCompact': '数字：缩写（k/M）',
   'hudChrome.meters.numDetailed': '数字：详细',

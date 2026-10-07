@@ -669,9 +669,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.noDeathEvents': 'Перед гибелью не записано событий',
   'hudChrome.meters.noDetailedData': 'Нет подробных данных',
   'hudChrome.meters.detailHealSubtitle':
-    'Эффективно: {effective} | Избыточно: {overheal} ({overhealPercent}) | Попаданий: {hits} ({critPercent} крит.)',
+    'Эффективное исцеление: {effective} | Избыточное исцеление: {overheal} ({overhealPercent}) | Попаданий: {hits} ({critPercent} крит.)',
   'hudChrome.meters.detailHitSubtitle':
-    'Попаданий: {hits} | Критов: {crits} ({critPercent}) | Среднее: {average} | Мин./макс.: {min} / {max}',
+    'Попаданий: {hits} | Крит. ударов: {crits} ({critPercent}) | Среднее: {average} | Мин./макс.: {min} / {max}',
   'hudChrome.meters.noTargetData': 'Нет данных об игроках по этой цели',
   'hudChrome.meters.numCompact': 'Числа: сокращённые (тыс./млн)',
   'hudChrome.meters.numDetailed': 'Числа: подробные',
