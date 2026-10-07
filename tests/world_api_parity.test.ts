@@ -939,9 +939,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(425);
+    // Plus the Weekly Vault loot-focus surface at the v0.45 release batch:
+    // 426/126/300.
+    expect(IWORLD_MEMBERS.length).toBe(426);
     expect(DATA_MEMBERS.length).toBe(126);
-    expect(METHOD_MEMBERS.length).toBe(299);
+    expect(METHOD_MEMBERS.length).toBe(300);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -2629,8 +2631,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(425);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(425);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(426);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(426);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
