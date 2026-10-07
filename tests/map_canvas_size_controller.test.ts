@@ -2,7 +2,11 @@
 // a sized desktop window gets a backing store that follows the displayed box
 // (with one repaint per real change), anything else keeps the shipped 560.
 import { afterEach, describe, expect, it } from 'vitest';
-import { MapCanvasSizeController } from '../src/ui/hud/map/map_canvas_size_controller';
+import {
+  MapCanvasSizeController,
+  mapWindowPlayerSized,
+  mapWindowSizeIsStale,
+} from '../src/ui/hud/map/map_canvas_size_controller';
 
 type ObserverCallback = (
   entries: { contentBoxSize: { inlineSize: number; blockSize: number }[] }[],
@@ -30,10 +34,14 @@ function rig(sized: boolean) {
       disconnected = true;
     }
   };
-  const state = { sized, repaints: 0 };
+  const state = { sized, resizing: false, releases: 0, repaints: 0 };
   const controller = new MapCanvasSizeController({
     canvas,
     sized: () => state.sized,
+    resizing: () => state.resizing,
+    releaseStaleSize: () => {
+      state.releases += 1;
+    },
     repaint: () => {
       state.repaints += 1;
     },
@@ -87,7 +95,55 @@ describe('MapCanvasSizeController', () => {
     expect(r.disconnected()).toBe(true);
     g.ResizeObserver = undefined;
     const canvas = { width: 560, height: 560 } as HTMLCanvasElement;
-    new MapCanvasSizeController({ canvas, sized: () => true, repaint: () => {} }).install();
+    new MapCanvasSizeController({
+      canvas,
+      sized: () => true,
+      resizing: () => false,
+      releaseStaleSize: () => {},
+      repaint: () => {},
+    }).install();
     expect(canvas.width).toBe(560);
+  });
+
+  it('defers the backing write during a live resize drag, then applies the last box once', () => {
+    const r = rig(true);
+    r.state.resizing = true;
+    r.deliver(700, 700);
+    r.deliver(820, 820);
+    r.deliver(900, 900);
+    expect(r.canvas.width).toBe(560);
+    expect(r.state.repaints).toBe(0);
+    r.controller.flush(); // still dragging: nothing yet
+    expect(r.state.repaints).toBe(0);
+    r.state.resizing = false;
+    r.controller.flush();
+    expect([r.canvas.width, r.canvas.height]).toEqual([900, 900]);
+    expect(r.state.repaints).toBe(1);
+    r.controller.flush(); // nothing left to apply
+    expect(r.state.repaints).toBe(1);
+  });
+
+  it('offers a stale desktop size for release before every size decision', () => {
+    const r = rig(true);
+    r.deliver(700, 700);
+    r.state.resizing = true;
+    r.deliver(800, 800);
+    expect(r.state.releases).toBe(2);
+  });
+});
+
+describe('map window size flags', () => {
+  it('a player-sized map is a sized window on the desktop layout only', () => {
+    expect(mapWindowPlayerSized({ windowSized: true, touch: false })).toBe(true);
+    expect(mapWindowPlayerSized({ windowSized: true, touch: true })).toBe(false);
+    expect(mapWindowPlayerSized({ windowSized: false, touch: false })).toBe(false);
+    expect(mapWindowPlayerSized({ windowSized: false, touch: true })).toBe(false);
+  });
+
+  it('a desktop size is stale once the HUD is in the touch layout', () => {
+    expect(mapWindowSizeIsStale({ windowSized: true, touch: true })).toBe(true);
+    expect(mapWindowSizeIsStale({ windowSized: true, touch: false })).toBe(false);
+    expect(mapWindowSizeIsStale({ windowSized: false, touch: true })).toBe(false);
+    expect(mapWindowSizeIsStale({ windowSized: false, touch: false })).toBe(false);
   });
 });

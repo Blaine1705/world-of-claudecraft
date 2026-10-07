@@ -455,9 +455,10 @@ describe('map window: the pad band stays the drag handle', () => {
 
   it('insets the stage by the pad, its left edge past the rail and the gutter', () => {
     const value = inset('.map-atlas-stage');
-    // top / right / bottom are the bare pad; left clears the 300px rail + 12px gutter.
+    // top / right / bottom are the bare pad; left clears the rail (300px
+    // shipped, --map-rail-width once the divider moves it) + the 12px gutter.
     expect(value).toBe(
-      'var(--window-pad) var(--window-pad) var(--window-pad) calc(var(--window-pad) + 300px + 12px)',
+      'var(--window-pad) var(--window-pad) var(--window-pad) calc(var(--window-pad) + var(--map-rail-width) + 12px)',
     );
     expect(value).not.toContain(' 312px');
   });

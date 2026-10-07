@@ -8,7 +8,7 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page as browserPage } from 'vitest/browser';
-import { installMapCanvasSize, type MapCanvasSizeController } from '../../src/ui/hud/map';
+import { installMapWindowSizing } from '../../src/ui/hud/map';
 import { installWindowDrag, type WindowDragController } from '../../src/ui/window_drag';
 import { isWindowDragHandle } from '../../src/ui/window_drag_handle';
 import { installWindowResize } from '../../src/ui/window_resize';
@@ -19,8 +19,8 @@ const VIEWPORT = { width: 1600, height: 1100 };
 
 let teardownResize: (() => void) | null = null;
 let drag: WindowDragController | null = null;
-let sizer: MapCanvasSizeController | null = null;
 let repaints = 0;
+let storedRailWidth: number | null = null;
 
 beforeEach(async () => {
   await browserPage.viewport(VIEWPORT.width, VIEWPORT.height);
@@ -28,6 +28,7 @@ beforeEach(async () => {
   document.documentElement.style.setProperty('--app-vh', `${VIEWPORT.height}px`);
   document.documentElement.style.setProperty('--ui-scale', '1');
   repaints = 0;
+  storedRailWidth = null;
 });
 
 afterEach(() => {
@@ -35,8 +36,6 @@ afterEach(() => {
   teardownResize = null;
   drag?.destroy();
   drag = null;
-  sizer?.dispose();
-  sizer = null;
   document.body.classList.remove('mobile-touch');
   cleanup();
   document.documentElement.style.removeProperty('--app-vw');
@@ -57,6 +56,7 @@ function openMap(): HTMLElement {
   win.className = 'window panel ui-window';
   win.innerHTML = `
     <aside id="map-sidebar" class="map-atlas-sidebar ui-panel-strong"><div>Rail</div></aside>
+    <div class="map-atlas-splitter" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Map sidebar width"></div>
     <div class="map-atlas-stage">
       <button type="button" class="x-btn ui-x-btn" id="map-close" aria-label="Close map"></button>
       <button type="button" class="ui-btn" id="map-level-toggle">World map</button>
@@ -86,9 +86,20 @@ function openMap(): HTMLElement {
     pinWindow: pin,
     isCoarsePointer: () => false,
   });
-  sizer = installMapCanvasSize(canvasOf(win), () => {
-    repaints += 1;
-  });
+  installMapWindowSizing(
+    canvasOf(win),
+    () => {
+      repaints += 1;
+    },
+    () => ({
+      settings: {
+        get: () => storedRailWidth ?? 300,
+        set: (_key, value) => {
+          storedRailWidth = value;
+        },
+      },
+    }),
+  );
   return win;
 }
 
@@ -206,5 +217,95 @@ describe('resizable world map', () => {
     expect(win.classList.contains('window-sized')).toBe(false);
     expect(win.style.width).toBe('');
     expect(canvasOf(win).width).toBe(560);
+  });
+
+  it('dropping to the touch layout releases a desktop size so the sheet sizes itself', async () => {
+    const win = openMap();
+    await settle();
+    dragCorner(win, 300, 200);
+    await settle();
+    expect(win.classList.contains('window-sized')).toBe(true);
+    document.body.classList.add('mobile-touch');
+    await settle();
+    await settle();
+    expect(win.classList.contains('window-sized')).toBe(false);
+    expect(win.style.width).toBe('');
+    expect(win.style.height).toBe('');
+    expect(canvasOf(win).width).toBe(560);
+  });
+});
+
+describe('atlas rail divider', () => {
+  function dragDivider(win: HTMLElement, dx: number): void {
+    const divider = win.querySelector<HTMLElement>('.map-atlas-splitter')!;
+    const r = divider.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    const fire = (type: string, cx: number, buttons: number): void => {
+      divider.dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          clientX: cx,
+          clientY: y,
+          pointerId: 2,
+          pointerType: 'mouse',
+          button: 0,
+          buttons,
+        }),
+      );
+    };
+    fire('pointerdown', x, 1);
+    fire('pointermove', x + dx, 1);
+    fire('pointerup', x + dx, 0);
+  }
+
+  it('sits in the gutter between the rail and the stage', async () => {
+    const win = openMap();
+    await settle();
+    const rail = win.querySelector<HTMLElement>('.map-atlas-sidebar')!.getBoundingClientRect();
+    const stage = win.querySelector<HTMLElement>('.map-atlas-stage')!.getBoundingClientRect();
+    const divider = win.querySelector<HTMLElement>('.map-atlas-splitter')!.getBoundingClientRect();
+    expect(rail.width).toBe(300);
+    expect(divider.left).toBeCloseTo(rail.right, 0);
+    expect(divider.right).toBeCloseTo(stage.left, 0);
+  });
+
+  it('widens the rail and grows an unsized window, so the map keeps its size', async () => {
+    const win = openMap();
+    await settle();
+    const before = win.getBoundingClientRect().width;
+    dragDivider(win, 140);
+    await settle();
+    const rail = win.querySelector<HTMLElement>('.map-atlas-sidebar')!.getBoundingClientRect();
+    expect(rail.width).toBe(440);
+    expect(win.getBoundingClientRect().width).toBeCloseTo(before + 140, 0);
+    expect(canvasOf(win).clientWidth).toBe(560);
+    expect(canvasOf(win).width).toBe(560);
+    expect(storedRailWidth).toBe(440);
+  });
+
+  it('in a player-sized window the map yields to a wider rail and stays crisp', async () => {
+    const win = openMap();
+    await settle();
+    dragCorner(win, 300, 200);
+    await settle();
+    const sizedWidth = win.getBoundingClientRect().width;
+    const faceBefore = canvasOf(win).clientWidth;
+    dragDivider(win, 200);
+    await settle();
+    expect(win.getBoundingClientRect().width).toBeCloseTo(sizedWidth, 0);
+    const stage = win.querySelector<HTMLElement>('.map-atlas-stage')!;
+    expect(canvasOf(win).clientWidth).toBe(Math.min(stage.clientWidth, stage.clientHeight) - 4);
+    expect(canvasOf(win).clientWidth).toBeLessThanOrEqual(faceBefore);
+    expect(canvasOf(win).width).toBe(canvasOf(win).clientWidth);
+  });
+
+  it('hides while the rail is collapsed', async () => {
+    const win = openMap();
+    win.querySelector('.map-atlas-sidebar')!.classList.add('is-collapsed');
+    await settle();
+    const divider = win.querySelector<HTMLElement>('.map-atlas-splitter')!;
+    expect(getComputedStyle(divider).display).toBe('none');
   });
 });

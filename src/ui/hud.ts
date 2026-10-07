@@ -472,7 +472,7 @@ import { LootWindowController } from './hud/loot/loot_window_controller';
 import { LootExplorerWindow } from './hud/loot_explorer/loot_explorer_window';
 import {
   bindMinimapObjectiveTap,
-  installMapCanvasSize,
+  installMapWindowSizing,
   MapMarkerInteractionController,
   MapMarkerTooltipContent,
 } from './hud/map';
@@ -2962,7 +2962,7 @@ export class Hud {
       this.syncAnyWindowOpenState();
     });
     const mapCanvas = $('#map-canvas') as unknown as HTMLCanvasElement;
-    installMapCanvasSize(mapCanvas, () => this.repaintOpenMap());
+    installMapWindowSizing(mapCanvas, this.repaintOpenMap.bind(this), () => this.optionsHooks);
     mapCanvas.addEventListener(
       'wheel',
       (ev) => {

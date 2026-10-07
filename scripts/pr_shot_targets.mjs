@@ -6907,6 +6907,44 @@ export const TARGETS = [
     },
   },
   {
+    key: 'world-map-rail-divider',
+    label: 'World map atlas rail widened with its divider',
+    when: ['ui/hud/map/map_rail', 'ui/hud/map/map_window_sizing'],
+    // Desktop only: the divider (like the whole rail) is hidden on the touch
+    // layout.
+    variants: [{ key: 'desktop', beforeLoad: lowGraphicsSeed }],
+    // Open the map, then drag the rail divider 180px to the right with real
+    // mouse input. A build without the divider has nothing to grab, so the
+    // press lands on the stage and the shot is the shipped 300px rail.
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      if (!(await pollForSize(page, '#map-window'))) return {};
+      const grip = await page.evaluate(() => {
+        const divider = document.querySelector('#map-window .map-atlas-splitter');
+        const stage = document.querySelector('#map-window .map-atlas-stage');
+        const r = (divider ?? stage)?.getBoundingClientRect();
+        if (!r) return null;
+        return divider
+          ? { x: r.left + r.width / 2, y: r.top + r.height / 2 }
+          : { x: r.left + 6, y: r.top + r.height / 2 };
+      });
+      if (grip) {
+        await page.mouse.move(grip.x, grip.y);
+        await page.mouse.down();
+        await page.mouse.move(grip.x + 180, grip.y, { steps: 12 });
+        await page.mouse.up();
+      }
+      await wait(800);
+      await sweepOverlays(page, 4);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'map-atlas-sidebar-collapse',
     label: 'World map atlas rail collapse toggle',
     when: ['ui/map_sidebar_controller', 'ui/map_sidebar_view', 'ui/tracker_collapse_settings'],
