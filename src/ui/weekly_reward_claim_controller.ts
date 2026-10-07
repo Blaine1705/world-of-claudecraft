@@ -451,7 +451,7 @@ export class WeeklyRewardClaimController {
           if (this.submitted || !host.contains(confirm)) return;
           if (!this.current(key) || !this.allOpened()) return refresh();
           this.submitted = true;
-          this.deps.world().claimWeeklyReward(batch.resetAtMs + ':' + index);
+          this.deps.world().claimWeeklyReward(`${batch.resetAtMs}:${index}`);
           // Only the host can consume the completed week's rewards.
           refresh('weekly-cancel-claim');
           this.deps.onInventoryChanged();
@@ -465,7 +465,7 @@ export class WeeklyRewardClaimController {
         () => {
           this.selected = null;
           this.submitted = false;
-          refresh('weekly-inspect:' + index);
+          refresh(`weekly-inspect:${index}`);
         },
       );
       const actions = document.createElement('div');

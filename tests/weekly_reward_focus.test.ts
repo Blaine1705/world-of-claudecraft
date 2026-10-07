@@ -248,9 +248,9 @@ describe('Weekly Vault loot focus integration', () => {
     expect(h.state.vaults).toHaveLength(1);
     expect(h.sim.ctx.countItem('forgefathers_temper', h.pid)).toBe(0);
     h.sim.setWeeklyLootSpec(null, h.pid);
-    expect(weeklyRewardTableOptions(focusEmpty!, focusEmpty!.choices[1], 'warrior', 20)).not.toEqual(
-      [],
-    );
+    expect(
+      weeklyRewardTableOptions(focusEmpty!, focusEmpty!.choices[1], 'warrior', 20),
+    ).not.toEqual([]);
   });
 
   it('persists current focus separately from a fixed reward and retries failed saves without rerolling', () => {
