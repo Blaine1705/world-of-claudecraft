@@ -125352,7 +125352,7 @@ Adopt Marten&apos;s Guise, increasing your dodge chance by 8% for 30 min.
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="448">== Description ==
-Adopt Courser&apos;s Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).
+Adopt Courser&apos;s Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 2 sec (each hit refreshes the daze).
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -125616,8 +125616,8 @@ For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 y
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="371">== Description ==
-Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.
+      <text xml:space="preserve" bytes="414">== Description ==
+Leap 25 yards backward and break free of roots and movement slows. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -125632,7 +125632,7 @@ Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entr
 | 0
 |-
 ! Cooldown
-| 15s
+| 20s
 |-
 ! Range
 | Melee/self
@@ -129890,8 +129890,8 @@ Roots the target in place for up to 12 sec.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="526">== Description ==
-Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.
+      <text xml:space="preserve" bytes="616">== Description ==
+Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -130499,8 +130499,8 @@ Sweep your claws through nearby enemies for $d damage. Causes extra threat. Brui
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="415">== Description ==
-Heals a friendly target for $d and an additional amount over 21 sec.
+      <text xml:space="preserve" bytes="520">== Description ==
+Heals a friendly target for $d and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -132967,8 +132967,8 @@ Unleash a primal surge. In Cat Form, Energy regeneration is increased by 100% fo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="568">== Description ==
-Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)
+      <text xml:space="preserve" bytes="582">== Description ==
+Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -133158,8 +133158,8 @@ Spends your 3 Old Blood: strike for $d, instantly deal all the damage your Flens
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="469">== Description ==
-Spends your 3 Old Blood for a heavy, high-threat strike of $d damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.
+      <text xml:space="preserve" bytes="457">== Description ==
+Spends your 3 Old Blood for a heavy, high-threat strike of $d damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -133204,7 +133204,7 @@ Spends your 3 Old Blood for a heavy, high-threat strike of $d damage. Below half
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="470">== Description ==
-Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.
+Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -134491,7 +134491,7 @@ Places a frost trap at your feet that arms after 1.5 sec. The first enemy to tou
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="404">== Description ==
-Loose a spread at the target area, dealing $d Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)
+Loose a spread at the target area, dealing $d Physical damage to enemies within 8 yd. Cannot be aimed within 4 yd of you. (Hunter talent)
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -136134,7 +136134,7 @@ Increases attack power by 70 for 15 sec. (Druid talent)
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="376">== Description ==
+      <text xml:space="preserve" bytes="375">== Description ==
 Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)
 
 == Facts ==
@@ -136147,10 +136147,10 @@ Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 
 | 10
 |-
 ! Cost
-| 120
+| 240
 |-
 ! Cooldown
-| 300s
+| 60s
 |-
 ! Range
 | Melee/self

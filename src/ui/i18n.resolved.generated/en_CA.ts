@@ -13186,7 +13186,7 @@ export const en_CA: EnTranslations = {
       },
       "trailbreak": {
         "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "description": "Leap 25 yards backward and break free of roots and movement slows. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
       },
       "wildheart": {
         "name": "Wildheart",
@@ -13753,7 +13753,7 @@ export const en_CA: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Courser's Guise",
-        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze)."
+        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 2 sec (each hit refreshes the daze)."
       },
       "aimed_shot": {
         "name": "Long Draw",
@@ -14689,7 +14689,7 @@ export const en_CA: EnTranslations = {
       },
       "multi_shot": {
         "name": "Splitshot",
-        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)"
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 4 yd of you. (Hunter talent)"
       },
       "prayer_of_healing": {
         "name": "Choirmend",
