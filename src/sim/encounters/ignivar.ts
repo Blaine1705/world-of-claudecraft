@@ -650,6 +650,9 @@ function updateForgeJudgment(
 
 function castBrandOfThePyre(ctx: SimContext, boss: Entity, players: readonly Entity[]): void {
   const tanks = committedTankIds(ctx);
+  // The player Ignivar is attacking is never branded, even out of a tank
+  // form or posture (a Feral main tank who drops Bruin Form).
+  if (boss.aggroTargetId !== null) tanks.add(boss.aggroTargetId);
   const livingCount = players.filter((player) => !player.dead).length;
   const candidates = players.filter((player) => !player.dead && !tanks.has(player.id));
   const drawSlots = Math.min(IGNIVAR_BRAND_TARGETS_NORMAL, livingCount);

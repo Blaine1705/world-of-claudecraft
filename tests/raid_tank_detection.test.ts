@@ -189,6 +189,56 @@ describe('Ignivar Brand of the Pyre tank exclusion', () => {
     // One draw per living target slot, unchanged by the eligibility rule.
     expect(draws).toBe(IGNIVAR_BRAND_TARGETS_NORMAL);
   });
+
+  // The player Ignivar is attacking is never branded, even when the committed
+  // rule says they are not a tank right now: a Feral main tank who drops Bruin
+  // Form, or a Warspirit main tank whose Stonebound imbue has lapsed.
+  const FERAL_CASTER: Build = { cls: 'druid', spec: 'feral' };
+  it.each([
+    ['a Feral druid out of Bruin Form', FERAL_CASTER],
+    ['an Enhancement shaman without Stonebound', BARE_SHAMAN],
+  ])('never brands the main tank holding aggro as %s', (_label, mainTankBuild) => {
+    const sim = new Sim({ seed: 4243, playerClass: mainTankBuild.cls, devCommands: true });
+    expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', sim.player.id, true)).toBe(true);
+    const boss = [...sim.entities.values()].find((e) => e.templateId === IGNIVAR_BOSS_ID);
+    if (!boss) throw new Error('Ignivar did not spawn');
+    const mainTank = equip(sim, sim.player.id, mainTankBuild);
+    mainTank.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z + 2 };
+    mainTank.prevPos = { ...mainTank.pos };
+    const catPid = sim.addPlayer(CAT_DRUID.cls, 'cat-druid');
+    const cat = equip(sim, catPid, CAT_DRUID);
+    cat.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z + 2 };
+    cat.prevPos = { ...cat.pos };
+    // Neither player is a committed tank, so only aggro can spare the main tank.
+    expect(committedTankIds(sim.ctx).size).toBe(0);
+    boss.inCombat = true;
+    boss.aiState = 'attack';
+    boss.aggroTargetId = mainTank.id;
+    boss.swingTimer = 999;
+    updateIgnivarEncounter(sim.ctx, boss);
+    const st = boss.ignivar;
+    if (!st) throw new Error('Ignivar state was not initialized');
+    st.frontalTimer = 999;
+    st.skyfireTimer = 999;
+    st.rotatingRaysTimer = 999;
+    st.forgeWaveTimer = 999;
+    st.forgeStrikeTimer = 999;
+    st.overlapTimer = 999;
+    st.meteorTimer = 999;
+    st.soakTimer = 999;
+    st.forgeChainsTimer = 999;
+    st.brandTimer = 0;
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+
+    updateIgnivarEncounter(sim.ctx, boss);
+    sim.rng.setObserver(null);
+
+    expect(mainTank.auras.some((a) => a.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);
+    expect(cat.auras.some((a) => a.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
+    // Two living raiders, two slots: the excluded main tank still costs a draw.
+    expect(draws).toBe(2);
+  });
 });
 
 describe('Varkhul non-tank mechanic exclusion', () => {

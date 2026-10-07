@@ -175,6 +175,16 @@ function addEncounterPlayer(
   return player;
 }
 
+// Brand never targets the player Ignivar is attacking, so a test that wants
+// the local player branded hands aggro to a stand-in main tank first.
+function handAggroToStandInTank(sim: Sim, boss: Entity): Entity {
+  const tank = addEncounterPlayer(sim, boss, 'Stand-in Tank', 'warrior');
+  tank.devGod = true;
+  boss.aggroTargetId = tank.id;
+  boss.threat.set(tank.id, 1e9);
+  return tank;
+}
+
 function applyIgnivarBrand(player: Entity, boss: Entity): void {
   player.auras.push({
     id: IGNIVAR_BRAND_AURA_ID,
@@ -1796,6 +1806,7 @@ describe('Ignivar encounter', () => {
 
   it('ramps each uncleansed Brand tick from one to three stacks without exceeding the cap', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
@@ -1829,6 +1840,7 @@ describe('Ignivar encounter', () => {
 
   it('does not reset an uncleansed Brand when that player is selected again', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
@@ -2302,6 +2314,7 @@ describe('Ignivar encounter', () => {
 
   it('runs the encounter through the production mob tick dispatcher', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     sim.player.devGod = true;
 
     for (let i = 0; i < 45; i++) sim.tick();
@@ -2956,6 +2969,7 @@ describe('Ignivar encounter', () => {
 
   it('removes encounter-owned player auras immediately when leaving the development raid', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
@@ -3769,6 +3783,7 @@ describe('Ignivar encounter', () => {
 
   it('keeps the Apocalypse add stationary and non-attacking while Ignivar stays active', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     sim.player.devGod = true;
     boss.hp = Math.floor(boss.maxHp * IGNIVAR_APOCALYPSE_HP_THRESHOLD);
     updateIgnivarEncounter(sim.ctx, boss);
