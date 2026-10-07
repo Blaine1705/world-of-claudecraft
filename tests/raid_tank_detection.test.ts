@@ -134,6 +134,9 @@ describe('Ignivar Brand of the Pyre tank exclusion', () => {
     if (!boss) throw new Error('Ignivar did not spawn');
     const roster = new Map<Build, Entity>();
     roster.set(PROT_WARRIOR, equip(sim, sim.player.id, PROT_WARRIOR));
+    // Every raider stands on the boss, so all seven are in the encounter.
+    sim.player.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z + 2 };
+    sim.player.prevPos = { ...sim.player.pos };
     for (const build of [
       PROT_PALADIN,
       BRUIN_DRUID,
@@ -189,11 +192,15 @@ describe('Ignivar Brand of the Pyre tank exclusion', () => {
 });
 
 describe('Varkhul non-tank mechanic exclusion', () => {
-  function varkhulWith(builds: readonly Build[]): { sim: Sim; boss: Entity; added: Entity[] } {
+  function varkhulWith(
+    builds: readonly Build[],
+    heroic = false,
+  ): { sim: Sim; boss: Entity; added: Entity[] } {
     const sim = new Sim({ seed: 9417, playerClass: 'warrior', devCommands: true });
     expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id, true)).toBe(true);
     const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
     if (!instance) throw new Error('Inner Crucible instance missing');
+    instance.difficulty = heroic ? 'heroic' : 'normal';
     const boss = instance.mobIds
       .map((id) => sim.entities.get(id))
       .find((entity) => entity?.templateId === VARKHUL_BOSS_ID);
@@ -246,5 +253,30 @@ describe('Varkhul non-tank mechanic exclusion', () => {
   it('targets the unimbued shaman over a Protection paladin off tank', () => {
     const { sim, boss, added } = varkhulWith([PROT_PALADIN, BARE_SHAMAN]);
     expect(temperingRayTarget(sim, boss)).toBe(added[1].id);
+  });
+
+  // Master's Assembly hands every spawned add to the highest-threat committed
+  // tank. The spec-role rule would pick the Cat druid (role tank, top threat);
+  // the committed-tank rule skips it and finds the Stonebound shaman above the
+  // Protection warrior.
+  it("sends Master's Assembly adds to the top committed tank, not the Cat druid", () => {
+    const { sim, boss, added } = varkhulWith([STONEBOUND_SHAMAN, CAT_DRUID], true);
+    const [stonebound, cat] = added;
+    boss.threat.set(sim.player.id, 100);
+    boss.threat.set(stonebound.id, 1_000);
+    boss.threat.set(cat.id, 5_000);
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    expect(state.assemblyPhase).toBe('adds');
+    state.assemblyForgeBeamWarmupRemaining = DT;
+    for (const pending of state.assemblyPortalSpawns) pending.remaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    const adds = state.assemblyAddIds.map((id) => sim.entities.get(id)).filter(Boolean) as Entity[];
+    expect(adds.length).toBeGreaterThan(0);
+    expect(adds.every((add) => add.aggroTargetId === stonebound.id)).toBe(true);
   });
 });
