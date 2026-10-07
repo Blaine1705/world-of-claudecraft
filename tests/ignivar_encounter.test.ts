@@ -1723,10 +1723,12 @@ describe('Ignivar encounter', () => {
     const activeTankMeta = sim.players.get(sim.player.id);
     if (!activeTankMeta) throw new Error('Active tank metadata is missing');
     activeTankMeta.talentMods.role = 'tank';
+    activeTankMeta.talentMods.spec = 'prot';
     const offTank = addEncounterPlayer(sim, boss, 'Off Tank', 'paladin');
     const offTankMeta = sim.players.get(offTank.id);
     if (!offTankMeta) throw new Error('Off tank metadata is missing');
     offTankMeta.talentMods.role = 'tank';
+    offTankMeta.talentMods.spec = 'protection';
     const firstNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate One');
     const secondNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate Two', 'mage');
     updateIgnivarEncounter(sim.ctx, boss);
@@ -1764,6 +1766,7 @@ describe('Ignivar encounter', () => {
       const activeTankMeta = sim.players.get(sim.player.id);
       if (!activeTankMeta) throw new Error('Active tank metadata is missing');
       activeTankMeta.talentMods.role = 'tank';
+      activeTankMeta.talentMods.spec = 'prot';
       const eligible = Array.from({ length: nonTankCount }, (_, index) =>
         addEncounterPlayer(sim, boss, `Brand RNG Candidate ${index}`, 'mage'),
       );
