@@ -6292,7 +6292,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       // (combat/druid_engines.ts), pinned to this note by
       // tests/druid_engines.test.ts.
       restoration:
-        'Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3.',
+        "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3. Nature's Boon makes it instant, free, and 25% stronger.",
     },
   },
   mark_of_the_wild: {
@@ -6498,7 +6498,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_bear', value: 0.65, duration: 3600 }],
     description:
-      'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+      'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
   },
   bear_charge: {
     id: 'bear_charge',
@@ -6775,7 +6775,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [
       { type: 'heal', min: 52, max: 62 },
-      { type: 'hot', total: 49, duration: 21, interval: 3 },
+      { type: 'hot', total: 49, duration: 15, interval: 3, closingHealFromDirect: true },
     ],
     ranks: [
       {
@@ -6784,11 +6784,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 72,
         effects: [
           { type: 'heal', min: 75, max: 90 },
-          { type: 'hot', total: 71, duration: 21, interval: 3 },
+          { type: 'hot', total: 71, duration: 15, interval: 3, closingHealFromDirect: true },
         ],
       },
     ],
-    description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
+    description:
+      'Heals a friendly target for $d and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.',
     specNotes: {
       restoration:
         'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',

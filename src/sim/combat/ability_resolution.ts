@@ -20,6 +20,7 @@ import type { Entity, PlayerClass } from '../types';
 import { resolveActionReplacement } from './action_replacement';
 import { aetherSurgeCostMult } from './chronomancy';
 import { bruinRushMakesCatFormFree, verdanceWildmendCastTime } from './druid_engines';
+import { naturesBoonCastTime } from './druid_natures_boon';
 import { resolveColdsightAbilityForSpec } from './hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from './hunter_shared';
 import { radiantResonanceCastTime } from './paladin_radiant_resonance';
@@ -64,7 +65,14 @@ export function resolveAbilityChain(
   // for every other ability and for a druid with no Verdance. Only the cast
   // gets faster: scalingCastTime keeps the heal's Spell Power coefficient on
   // the cast time from before the speed-up.
-  const castTime = verdanceWildmendCastTime(actor, known.def.id, resonanceCastTime);
+  // An armed Groveheart Nature's Boon makes Wildmend instant on top
+  // (combat/druid_natures_boon.ts). The heal still scales off the cast time
+  // from before both speed-ups.
+  const castTime = naturesBoonCastTime(
+    actor.auras,
+    known.def.id,
+    verdanceWildmendCastTime(actor, known.def.id, resonanceCastTime),
+  );
   if (castTime !== resonanceCastTime) {
     return { ...ascensionResolved, castTime, scalingCastTime: resonanceCastTime };
   }

@@ -185,7 +185,8 @@ and finisher share of the feral profile.
 
 Deliberate scope decisions, made with the standardization:
 
-- Bruin Form keeps weapon-speed swings; only `form_cat` standardizes.
+- Bruin Form swings at half its weapon's speed since the Groveheart rework pass 2
+  (see that section below); only `form_cat` uses the fixed paw cadence.
 - Cat weaponStrike specials (Rendclaw, Flense) keep their RAW weapon roll,
   the classic non-normalized special shape: only the auto arm rescales its
   roll. Their attack-power-per-swing term follows the shared
@@ -202,3 +203,33 @@ Deliberate scope decisions, made with the standardization:
 Pinned by `tests/form_swing.test.ts` (cadence, normalization closed forms,
 the special arm, the Requital rescale) and the `cat_form_auto_swing` parity
 scenario (the swing cadence in the deterministic golden net).
+
+## Groveheart rework pass 2
+
+- Nature's Boon (Wildfang) procs at about 4 per minute in every form: the
+  per-swing chance is `NATURES_BOON_PPM` times the swing's base interval over
+  60 (`naturesBoonChanceAt`), so Cat Form's 1.0 sec swing keeps its 1 in 15 and
+  Bruin Form's faster swing rolls a matching smaller chance. Every proc also
+  clears Oakhide's cooldown, so a window that lands while Oakhide is cooling
+  down can still be spent on it.
+- Bruin Form swings twice as fast (`BEAR_FORM_SWING_MULT`) for half the damage
+  per swing (`BEAR_FORM_AUTO_DAMAGE_MULT`, with the attack power term following
+  the new cadence), and each white swing mints double rage
+  (`BEAR_FORM_AUTO_RAGE_MULT`). White damage and white threat are unchanged;
+  rage per second doubles. Weapon-enchant procs per minute read the real Bruin
+  cadence (`combat/equip_procs.ts`), so the faster swing does not double them.
+- Groveheart gets its own Nature's Boon: each tick of a heal-over-time effect
+  the druid owns has a `GROVEHEART_BOON_TICK_CHANCE` (10%) chance, behind a
+  `GROVEHEART_BOON_ICD` (10 sec) internal cooldown, to arm a 10 sec window in
+  which Wildmend is instant, free, 25% stronger, and castable in any form. The
+  heal still scales off the pre-boon cast time (`scalingCastTime`).
+- Second Bloom heals the same HoT total over 15 sec (was 21). If the HoT runs
+  its full duration it heals the target again for the amount the opening heal
+  produced (`closingHealFromDirect`, `combat/druid_second_bloom.ts`). A
+  Fleetmend consume, an Overbloom harvest, a dispel, or a recast ends it early
+  and pays no closing heal.
+- A Bonecrush queued on the next swing still lands as Bonecrush when Old Blood
+  fills before the swing (the button turning into Marrowbreak no longer drops
+  the parked strike).
+
+Pinned by `tests/groveheart_rework_pass2.test.ts`.

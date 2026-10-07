@@ -19,6 +19,7 @@ import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scalin
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
 import { LUNGE_ID, startLunge } from './druid_lunge';
+import { GROVEHEART_BOON_ICD_KEY } from './druid_natures_boon';
 import {
   BRUIN_RUSH_WINDOW_ID,
   BRUIN_RUSH_WINDOW_SECONDS,
@@ -667,7 +668,10 @@ export function cleanDruidEngineState(
     player.auras.splice(index, 1);
     ctx.emit({ type: 'aura', targetId: player.id, name: aura.name, gained: false });
   }
-  if (player.procState) delete player.procState.icds[LOPING_STRIDE_ICD_KEY];
+  if (player.procState) {
+    delete player.procState.icds[LOPING_STRIDE_ICD_KEY];
+    delete player.procState.icds[GROVEHEART_BOON_ICD_KEY];
+  }
 }
 
 export type DruidEngineMeta = PlayerMeta;

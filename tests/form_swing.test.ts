@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  BEAR_FORM_AUTO_DAMAGE_MULT,
+  BEAR_FORM_SWING_MULT,
   baseSwingSpeed,
   CAT_FORM_DAMAGE_MULT,
   CAT_FORM_LEGACY_SWING_SPEED,
@@ -61,13 +63,14 @@ describe('Cat Form swing speed', () => {
     expect(baseSwingSpeed(druid)).toBe(druid.weapon.speed);
   });
 
-  it('Bruin Form keeps weapon-speed swings (out of the cat cadence scope)', () => {
+  it('Bruin Form swings twice as fast as its weapon (Groveheart rework pass 2)', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('druid', 'Heth');
     sim.tick();
     const druid = sim.entities.get(a)!;
     giveForm(sim, a, 'form_bear', 'Bruin Form');
-    expect(baseSwingSpeed(druid)).toBe(druid.weapon.speed);
+    expect(BEAR_FORM_SWING_MULT).toBe(0.5);
+    expect(baseSwingSpeed(druid)).toBe(druid.weapon.speed * BEAR_FORM_SWING_MULT);
   });
 
   it('a rogue is unaffected (no form aura): own weapon speed', () => {
@@ -143,7 +146,7 @@ describe('Cat Form swing speed', () => {
     const cat = firstWhiteHit(sim, a);
 
     // The control druid on the same staff in BEAR form: a melee shapeshift that
-    // keeps the weapon cadence, so its AP is normalized by the slow staff. (It
+    // swings at half the staff's speed, so its AP is normalized by that. (It
     // used to be an un-shifted druid, but a caster-form druid now auto-attacks
     // with the class wand at any range, wand-style, so it never lands a melee
     // white hit; bear form preserves the staff-speed control this test needs.)
@@ -155,9 +158,9 @@ describe('Cat Form swing speed', () => {
     const staff = firstWhiteHit(sim2, b);
 
     // Cat Form's per-swing AP uses the fixed cat cadence (1.0) and the feral
-    // form damage multiplier; the bear druid's uses the staff, no multiplier.
+    // form damage multiplier; the bear druid's uses its half-staff cadence.
     expect(cat.amount).toBe(expectAt(cat.ap, CAT_FORM_SWING_SPEED, cat.dr, CAT_FORM_DAMAGE_MULT));
-    expect(staff.amount).toBe(expectAt(staff.ap, staffSpeed, staff.dr));
+    expect(staff.amount).toBe(expectAt(staff.ap, staffSpeed * BEAR_FORM_SWING_MULT, staff.dr));
     // The bug would have been Cat Form normalizing by the slow staff instead: prove
     // the fixed cadence value is genuinely smaller, so a faster swing hits softer.
     expect(staffSpeed).toBeGreaterThan(CAT_FORM_SWING_SPEED);
@@ -356,16 +359,22 @@ describe('Cat Form swing speed', () => {
     throw new Error('Rendclaw never landed');
   });
 
-  it('a non-cat auto swing keeps the raw per-swing roll (no normalization)', () => {
-    // A bear on a slow 3.0-speed weapon authored at 60 per swing: the raw
-    // per-swing contract (auto_attack.ts header) means the roll lands as
-    // written, and the AP term uses the real weapon speed.
+  it('a Bruin Form auto swing halves both the roll and the AP term (DPS-neutral)', () => {
+    // A bear on a slow 3.0-speed weapon authored at 60 per swing swings every
+    // 1.5 sec for half the roll, and the AP term follows the 1.5 sec cadence,
+    // so per-second white damage matches the old 3.0 sec swing.
     const sim = makeWorld();
     const a = sim.addPlayer('druid', 'Claw');
     sim.setPlayerLevel(20, a);
     sim.tick();
     giveForm(sim, a, 'form_bear', 'Bruin Form');
     const hit = firstWhiteHit(sim, a, { min: 60, max: 60, speed: 3.0 });
-    expect(hit.amount).toBe(Math.max(1, Math.round((60 + (hit.ap / 14) * 3.0) * (1 - hit.dr))));
+    const cadence = 3.0 * BEAR_FORM_SWING_MULT;
+    expect(hit.amount).toBe(
+      Math.max(
+        1,
+        Math.round((60 * BEAR_FORM_AUTO_DAMAGE_MULT + (hit.ap / 14) * cadence) * (1 - hit.dr)),
+      ),
+    );
   });
 });
