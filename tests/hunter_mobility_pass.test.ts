@@ -1,12 +1,17 @@
 // Hunter mobility pass: Trailbreak leaps 25 yards on a 20 sec cooldown and,
 // for every hunter (not only Tactical Retreat), breaks ordinary roots and
-// movement slows; encounter-owned unbreakable control is left alone.
+// movement slows; encounter-owned unbreakable control is left alone. The
+// hunter abilities' minimum range is 4 yards (was 8); Auto Shot keeps 8.
 import { describe, expect, it } from 'vitest';
+import { applyCourserDaze, COURSER_DAZE_AURA_ID } from '../src/sim/combat/hunter_shared';
+import { ABILITIES, CLASSES, MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import type { SimContext } from '../src/sim/sim_context';
+import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
-type TestSim = Sim & { nextId: number; addEntity(entity: Entity): void };
+type TestSim = Sim & { nextId: number; addEntity(entity: Entity): void; ctx: SimContext };
 
 function hunter(seed: number): TestSim {
   const sim = new Sim({
@@ -61,6 +66,18 @@ describe('Trailbreak', () => {
     expect(sim.player.cooldowns.has('trailbreak')).toBe(true);
   });
 
+  it("clears the hunter's own Courser's Guise daze", () => {
+    const sim = hunter(4505);
+    sim.castAbility('aspect_of_the_cheetah');
+    sim.player.gcdRemaining = 0;
+    applyCourserDaze(sim.ctx, sim.player);
+    expect(sim.player.auras.some((aura) => aura.id === COURSER_DAZE_AURA_ID)).toBe(true);
+
+    sim.castAbility('trailbreak');
+
+    expect(sim.player.auras.some((aura) => aura.id === COURSER_DAZE_AURA_ID)).toBe(false);
+  });
+
   it('leaves an unbreakable encounter slow in place', () => {
     const sim = hunter(4503);
     sim.player.auras.push(control('encounter_slow', 'slow', true), control('test_slow', 'slow'));
@@ -80,5 +97,60 @@ describe('Trailbreak', () => {
 
     expect(sim.player.auras.map((aura) => aura.id)).toContain('encounter_root');
     expect(sim.player.cooldowns.has('trailbreak')).toBe(false);
+  });
+});
+
+describe('hunter minimum ranges', () => {
+  it('every hunter ability that had 8 yards now has 4, and Auto Shot keeps 8', () => {
+    const withMin = Object.values(ABILITIES).filter(
+      (def) => def.class === 'hunter' && def.minRange !== undefined,
+    );
+    expect(withMin.map((def) => def.id).sort()).toEqual(
+      [
+        'aimed_shot',
+        'arcane_shot',
+        'bloodhook',
+        'concussive_shot',
+        'counter_shot',
+        'measured_shot',
+        'multi_shot',
+        'rapid_fire',
+        'serpent_sting',
+        'startle_shot',
+        'wyvern_sting',
+      ].sort(),
+    );
+    for (const def of withMin) expect(def.minRange, def.id).toBe(4);
+    expect(CLASSES.hunter.ranged?.minRange).toBe(8);
+  });
+
+  it('Fell Shot fires at 5 yards and is refused at 3', () => {
+    const run = (distance: number, seed: number) => {
+      const sim = hunter(seed);
+      const player = sim.player;
+      const target = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+        x: player.pos.x,
+        y: player.pos.y,
+        z: player.pos.z + distance,
+      });
+      target.hostile = true;
+      target.maxHp = target.hp = 500_000;
+      sim.addEntity(target);
+      player.facing = 0;
+      player.resource = player.maxResource;
+      sim.targetEntity(target.id);
+      sim.drainEvents();
+      sim.castAbility('arcane_shot');
+      const events: SimEvent[] = [];
+      for (let i = 0; i < 20 * 2; i++) events.push(...sim.tick());
+      return {
+        hit: events.some((e) => e.type === 'damage' && e.ability === 'Fell Shot' && e.amount > 0),
+        cooled: player.cooldowns.has('arcane_shot'),
+      };
+    };
+    expect(run(5, 4506).hit).toBe(true);
+    const close = run(3, 4507);
+    expect(close.hit).toBe(false);
+    expect(close.cooled).toBe(false);
   });
 });

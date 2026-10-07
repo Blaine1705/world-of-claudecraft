@@ -470,6 +470,11 @@ An owner retune of the shared Hunter movement kit, applied on top of the design 
   (`onHunterTrailbreak`); encounter-owned unbreakable control is untouched, and an unbreakable root
   still refuses the cast. Tactical Retreat keeps its second charge, and the Farsight 2-piece's
   4-second cut now reads 20 to 16.
+- Every Hunter ability that had an 8-yard minimum range now has 4 yards: Measured Shot, Fell Shot,
+  Venom Barb, Rattling Shot, Long Draw, Fevered Draw, Splitshot, Startle Shot, Bloodhook, Drakesting,
+  and Hushing Shot. Auto Shot, the ranged auto-attack, keeps its 8-yard dead zone
+  (`CLASSES.hunter.ranged.minRange`), and the row sweep (`scripts/lib/sweep_engagement.mjs`)
+  stations a Hunter outside it.
 
 Pinned by `tests/hunter_mobility_pass.test.ts`, `tests/cheetah_daze.test.ts`, and
 `tests/hunter_trailbreak_terrain.test.ts`.
