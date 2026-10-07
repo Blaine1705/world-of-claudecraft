@@ -481,3 +481,27 @@ describe('Bonecrush queued before Old Blood fills', () => {
     expect(player.queuedOnSwing).toBeNull();
   });
 });
+
+describe("Nature's Boon windows end on a specialization change", () => {
+  it('a Groveheart Wildmend window does not survive a respec out of Groveheart', () => {
+    const { sim, player } = rig('restoration');
+    vi.spyOn(ctxOf(sim).rng, 'chance').mockReturnValueOnce(true);
+    naturesBoonOnHotTick(ctxOf(sim), player, ownHot(player));
+    vi.restoreAllMocks();
+    expect(sim.resolvedAbility('healing_touch')?.castTime).toBe(0);
+    expect(sim.applyTalents({ spec: 'feral', rows: {} })).toBe(true);
+    expect(boonAura(player)).toBeUndefined();
+    expect(sim.resolvedAbility('healing_touch')?.castTime).toBeGreaterThan(0);
+    expect(player.procState?.icds[GROVEHEART_BOON_ICD_KEY]).toBeUndefined();
+  });
+
+  it('a Wildfang window does not survive a respec into Groveheart', () => {
+    const { sim, player } = rig('feral');
+    vi.spyOn(ctxOf(sim).rng, 'chance').mockReturnValueOnce(true);
+    naturesBoonOnAutoAttack(ctxOf(sim), player);
+    vi.restoreAllMocks();
+    expect(boonAura(player)?.empowerAbilities).toEqual(['rejuvenation', 'barkskin']);
+    expect(sim.applyTalents({ spec: 'restoration', rows: {} })).toBe(true);
+    expect(boonAura(player)).toBeUndefined();
+  });
+});
