@@ -42,6 +42,7 @@ import { iconDataUrl } from './icons';
 import { PlayerActivityTracker } from './meters_activity';
 import { AuraUptimeTracker } from './meters_auras';
 import {
+  abilityDetailStats,
   type BreakdownEntry,
   type BreakdownGroup,
   type BreakdownRow,
@@ -2313,19 +2314,24 @@ export class MetersPanel {
       return;
     }
 
-    const hits = entry.hits ?? 1;
-    const crits = entry.crits ?? 0;
-    const critPct = hits > 0 ? Math.round((crits / hits) * 100) : 0;
-    const avg = hits > 0 ? Math.round(entry.amount / hits) : entry.amount;
-
-    if (this.tab === 'heal') {
-      const over = entry.overheal ?? 0;
-      const eff = Math.max(0, entry.amount - over);
-      const overPct = entry.amount > 0 ? Math.round((over / entry.amount) * 100) : 0;
-      this.subEl.textContent = `Efectiva: ${fmtNum(eff)} | Sobrecuración: ${fmtNum(over)} (${overPct}%) | Hits: ${hits} (${critPct}% crit)`;
-    } else {
-      this.subEl.textContent = `Hits: ${hits} | Crits: ${crits} (${critPct}%) | Media: ${fmtNum(avg)} | Mín/Máx: ${fmtNum(entry.minHit ?? avg)} / ${fmtNum(entry.maxHit ?? avg)}`;
-    }
+    const stats = abilityDetailStats(entry);
+    this.subEl.textContent =
+      this.tab === 'heal'
+        ? t('hudChrome.meters.detailHealSubtitle', {
+            effective: fmtNum(stats.effective),
+            overheal: fmtNum(stats.overheal),
+            overhealPercent: fmtPercent(stats.overhealShare),
+            hits: fmtNum(stats.hits),
+            critPercent: fmtPercent(stats.critShare),
+          })
+        : t('hudChrome.meters.detailHitSubtitle', {
+            hits: fmtNum(stats.hits),
+            crits: fmtNum(stats.crits),
+            critPercent: fmtPercent(stats.critShare),
+            average: fmtNum(stats.avg),
+            min: fmtNum(stats.minHit),
+            max: fmtNum(stats.maxHit),
+          });
 
     interface DetailRowItem {
       label: string;
