@@ -1245,7 +1245,8 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the v0.45.0 release batch after the active instance difficulty
     // IWorld method landed to make PR #4357's badge read the claim difficulty.
     // PR #4387 then moved difficulty selection behind its SimContext sibling.
-    // Exact count measured on the merged tree after biome. Zero slack.
+    // Weekly loot focus composes with that release candidate and keeps the
+    // resolved sim.ts at the exact merged count after biome. Zero slack.
     ceiling: 11629,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
@@ -1735,8 +1736,10 @@ const MONOLITHS: MonolithRow[] = [
     // (adiff): thin self-snapshot wiring only, measured with wc -l after biome.
     // PvP played-time rewards: pet reconnect reconciliation moved to the
     // disconnected-player helper alongside the transient timer pause marker.
-    // Combined merge measures 9834 lines, exact count and zero slack.
-    ceiling: 9834,
+    // Bank and vault commands share admission and save scheduling in
+    // bank_storage_command. Combined merge measures 9816 lines, exact count
+    // and zero slack.
+    ceiling: 9816,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1921,8 +1924,9 @@ const MONOLITHS: MonolithRow[] = [
     // (wc -l after biome). Exact count, zero slack.
     // Re-pinned 5328 -> 5332 for v0.45.0 active instance difficulty mirror
     // (adiff): thin ClientWorld decode/read only, measured with wc -l after biome.
-    // Exact count, zero slack.
-    ceiling: 5332,
+    // Weekly Vault self-decode joins the bank_snapshot_wire owner-only cohort.
+    // Combined merge measures 5330 lines, exact count and zero slack.
+    ceiling: 5330,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

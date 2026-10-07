@@ -21,7 +21,12 @@ import {
   NYTHRAXIS_BOSS_ID,
   type PlayerClass,
 } from './types';
-import { weeklyChoiceExhausted } from './weekly_reward_availability';
+import {
+  sanitizeWeeklyLootSpec,
+  weeklyLootSpecFitsItem,
+  weeklyLootSpecForClass,
+} from './weekly_loot_spec';
+import { weeklyChoiceResolvedForClaim } from './weekly_reward_availability';
 import { weeklyRewardFitsClass, weeklyRewardItemAllowed } from './weekly_reward_eligibility';
 import { weeklyTableSource } from './weekly_reward_options';
 import {
@@ -68,6 +73,8 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export const WEEKLY_BACKLOG_LIMIT = 520;
 export interface WeeklyChoice {
   pool: WeeklyPoolId;
+  /** Focus captured with the fixed item; absent means all class gear. */
+  lootSpec?: string;
   tableId?: string;
   /** Owner-view hint for a legacy fixed roll whose boss source was not recorded. */
   fixed?: true;
@@ -85,6 +92,8 @@ export interface WeeklyVaultBatch {
 }
 export interface WeeklyRewardState {
   resetAtMs: number;
+  /** Independent of equipped talents. Absent means all class gear. */
+  lootSpec?: string;
   claimSequence: number;
   raids: number[];
   dungeons: number[];
@@ -123,11 +132,16 @@ function bounded(n: unknown, max: number): number {
 export function sanitizeWeeklyRewards(
   raw: unknown,
   publicView = false,
+  cls?: PlayerClass,
 ): WeeklyRewardState | undefined {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
   const r = raw as Record<string, unknown>;
   const state = emptyWeeklyRewards(bounded(r.resetAtMs, Number.MAX_SAFE_INTEGER));
   state.claimSequence = bounded(r.claimSequence, Number.MAX_SAFE_INTEGER);
+  const lootSpec = cls
+    ? weeklyLootSpecForClass(cls, r.lootSpec)
+    : sanitizeWeeklyLootSpec(r.lootSpec);
+  if (lootSpec) state.lootSpec = lootSpec;
   state.raids = state.raids.map((_, i) => bounded(Array.isArray(r.raids) ? r.raids[i] : 0, 2));
   state.dungeons = Array.isArray(r.dungeons)
     ? r.dungeons
@@ -157,11 +171,17 @@ export function sanitizeWeeklyRewards(
         const table = weeklyTableSource(choice.tableId);
         const tableFields = table ? { tableId: table.id } : {};
         const fixedFields = publicView && choice.fixed === true ? { fixed: true as const } : {};
+        const capturedSpec = sanitizeWeeklyLootSpec(choice.lootSpec);
+        const focusFields =
+          capturedSpec && (choice.itemId !== undefined || choice.fixed === true)
+            ? { lootSpec: capturedSpec }
+            : {};
         if (choice.itemId === undefined || (publicView && choice.opened !== true)) {
           choices.push({
             pool: choice.pool,
             ...tableFields,
             ...fixedFields,
+            ...focusFields,
             ...(publicView && choice.opening === true ? { opening: true } : {}),
           });
           continue;
@@ -173,6 +193,7 @@ export function sanitizeWeeklyRewards(
             pool: choice.pool,
             ...tableFields,
             ...fixedFields,
+            ...focusFields,
             itemId: choice.itemId,
             ...(choice.opened === true ? { opened: true as const } : {}),
           });
@@ -241,6 +262,7 @@ export function advanceWeeklyRewards(
 export function stateFor(ctx: SimContext, meta: PlayerMeta): WeeklyRewardState {
   meta.weeklyRewards ??= emptyWeeklyRewards();
   const state = meta.weeklyRewards;
+  if (state.lootSpec && !weeklyLootSpecForClass(meta.cls, state.lootSpec)) delete state.lootSpec;
   if (!state.bossUnlocks) {
     state.bossUnlocks = historicalWeeklyBossUnlocks(meta);
     for (const [index, bossId] of WEEKLY_RAID_BOSSES.entries()) {
@@ -295,6 +317,7 @@ export function weeklyRewardInfoFor(ctx: SimContext, pid: number): WeeklyRewardI
     state: {
       resetAtMs: state.resetAtMs,
       claimSequence: state.claimSequence,
+      ...(state.lootSpec ? { lootSpec: state.lootSpec } : {}),
       world: state.world,
       pvp: state.pvp,
       overflowed: state.overflowed,
@@ -309,6 +332,7 @@ export function weeklyRewardInfoFor(ctx: SimContext, pid: number): WeeklyRewardI
         bossUnlocks: { ...(batch.bossUnlocks ?? state.bossUnlocks) },
         choices: batch.choices.map((choice) => ({
           pool: choice.pool,
+          ...(choice.itemId && choice.lootSpec ? { lootSpec: choice.lootSpec } : {}),
           ...(choice.itemId && (!choice.opened || choice.pendingSave)
             ? { fixed: true as const }
             : {}),
@@ -413,6 +437,7 @@ export function weeklyLootPool(
   pool: WeeklyPoolId,
   playerClass: PlayerClass,
   raidUnlocks?: readonly number[],
+  lootSpec?: string,
 ): string[] {
   const ids = new Set<string>();
   if (pool === 'pvp') for (const id of FURY_STOCK) ids.add(id);
@@ -446,7 +471,8 @@ export function weeklyLootPool(
       return (
         item &&
         weeklyRewardItemAllowed(item, pool, false) &&
-        weeklyRewardFitsClass(playerClass, item)
+        weeklyRewardFitsClass(playerClass, item) &&
+        weeklyLootSpecFitsItem(playerClass, lootSpec, item)
       );
     })
     .sort();
@@ -473,7 +499,13 @@ export function claimWeeklyReward(
       (choice) =>
         choice.pendingSave ||
         ((!choice.opened || !choice.itemId) &&
-          !weeklyChoiceExhausted(eligibleBatch, choice, r.meta.cls, r.e.level)),
+          !weeklyChoiceResolvedForClaim(
+            eligibleBatch,
+            choice,
+            r.meta.cls,
+            r.e.level,
+            state.lootSpec,
+          )),
     )
   )
     return;
@@ -501,6 +533,7 @@ export function spawnWeeklyKeeper(ctx: SimContext, def: NpcDef | undefined): voi
   ctx.addEntity(createNpc(id, def, ctx.groundPos(def.pos.x, def.pos.z)));
 }
 
+export { setWeeklyLootSpec } from './weekly_reward_focus';
 export {
   finishWeeklyRewardOpen,
   isWeeklyRewardOpeningCurrent,

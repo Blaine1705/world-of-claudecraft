@@ -374,6 +374,7 @@ export const IWORLD_MEMBERS = [
   { name: 'weeklyRewardInfo', kind: 'data' },
   { name: 'claimWeeklyReward', kind: 'method' },
   { name: 'openWeeklyReward', kind: 'method' },
+  { name: 'setWeeklyLootSpec', kind: 'method' },
   { name: 'vaultInfo', kind: 'data' },
   { name: 'vaultDeposit', kind: 'method' },
   { name: 'vaultWithdraw', kind: 'method' },
@@ -1303,6 +1304,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
       'slotToolEffect',
@@ -1765,6 +1767,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
       'slotToolEffect',
@@ -2256,6 +2259,7 @@ const FACET_BANK = [
   'weeklyRewardInfo',
   'claimWeeklyReward',
   'openWeeklyReward',
+  'setWeeklyLootSpec',
   'bankInfo',
   'bankPurchasedSlots',
   'bankDeposit',
@@ -2623,7 +2627,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
     expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(425);
     expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(425);
