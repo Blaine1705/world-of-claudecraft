@@ -7834,7 +7834,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Trong 3 giây sau đó, Hình Sói miễn phí và ghim mục tiêu, làm chậm nó 50% trong 4 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.bear_charge.name': 'Cú Lao Bruin',
   'entities.abilities.bear_form.description':
-    'Biến hình thành gấu: giáp +110%, máu tối đa +30%, tăng mạnh sức mạnh tấn công, các đòn đánh của bạn tích Thịnh Nộ và tạo ra 30% thù hận nhiều hơn. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn. Thi triển lại để trở về hình dạng thi triển phép.',
+    'Biến hình thành gấu: giáp +110%, máu tối đa +30%, tăng mạnh sức mạnh tấn công, các đòn đánh của bạn tích Thịnh Nộ và tạo ra 30% thù hận nhiều hơn. Bạn đánh nhanh gấp đôi với một nửa sát thương mỗi đòn, và mỗi đòn tích gấp đôi Thịnh Nộ. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn. Thi triển lại để trở về hình dạng thi triển phép.',
   'entities.abilities.bear_form.name': 'Hình Bruin',
   'entities.abilities.berserker_rage.description':
     'Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)',
@@ -8001,7 +8001,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heal.name': 'Lời Nguyện Trang Nghiêm',
   'entities.abilities.healing_touch.description': 'Trị liệu cho đồng minh {damage} máu.',
   'entities.abilities.healing_touch.specNote_restoration':
-    'Mỗi lần thi triển hoàn tất thêm 1 Sắc Xanh (tối đa 3). Sắc Xanh tích lũy rút ngắn thời gian thi triển phép này: 2,2 giây ở 1 Sắc Xanh, 1,9 giây ở 2 và 1,5 giây ở 3.',
+    'Mỗi lần thi triển hoàn tất thêm 1 Sắc Xanh (tối đa 3). Sắc Xanh tích lũy rút ngắn thời gian thi triển phép này: 2,2 giây ở 1 Sắc Xanh, 1,9 giây ở 2 và 1,5 giây ở 3. Ân Huệ Tự Nhiên khiến phép này thi triển tức thì, miễn phí và mạnh hơn 25%.',
   'entities.abilities.healing_touch.name': 'Hàn Gắn Hoang Dã',
   'entities.abilities.healing_wave.description':
     'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật. Phục Hồi: cất 50% lượng hồi đầy đủ trước khi hồi thừa thành Dòng Chữa Lành trong 12 giây, tối đa 30% máu tối đa của mục tiêu.',
@@ -15980,7 +15980,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Đoạn Tủy',
   'entities.abilities.marrowbreak.description':
-    'Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó tạo lá chắn bằng 18% máu tối đa của bạn trong 8 giây và hoàn lại 15 nộ.',
+    'Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó hồi cho bạn 18% máu tối đa và hoàn lại 15 nộ.',
   'entities.abilities.moonlash.name': 'Nguyệt Trào',
   'entities.abilities.moonlash.description':
     'Tiêu 3 Triều Nguyệt của bạn cho một đòn đánh nặng gây {damage} sát thương Bí Thuật: lựa chọn sát thương. Vệt Dương cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một.',
@@ -16463,7 +16463,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Một đòn tấn công nghiền nát làm tăng sát thương cận chiến thêm {damage} và gây lượng thù hận lớn. Kích hoạt ở đòn đánh kế tiếp của bạn. Chỉ dùng được ở Hình Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó khiên cho bạn 18% máu tối đa và hoàn lại 15 nộ khí.',
+    'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó hồi cho bạn 18% máu tối đa và hoàn lại 15 nộ khí.',
   'entities.abilities.moonfire.description':
     'Thiêu đốt kẻ địch bằng lửa trăng gây {damage} sát thương Bí Thuật cộng thêm sát thương theo thời gian.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16496,7 +16496,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tiêu hao 2 Mảnh Linh Hồn để ra lệnh cho mọi thuộc hạ Bất Tử đồng loạt tấn công. Vệ Mộ khiêu khích và gồng mình, Chiến Binh ghim chặt, Pháp Sư Xương phơi bày phòng ngự phép, và Cánh Mộ xé toạc mọi kẻ địch bị đánh trúng.',
   'entities.abilities.reaping_command.name': 'Mệnh Lệnh Gặt Hái',
   'entities.abilities.regrowth.description':
-    'Hồi máu cho mục tiêu đồng minh {damage} và thêm một lượng hồi máu nữa trong 21 giây.',
+    'Hồi máu cho mục tiêu đồng minh {damage} và thêm một lượng hồi máu nữa trong 15 giây. Nếu hiệu ứng kéo dài hết thời gian, nó hồi máu cho mục tiêu thêm một lần bằng lượng hồi máu ban đầu.',
   'entities.abilities.regrowth.specNote_restoration':
     'Mỗi lần thi triển thêm 1 Sắc Xanh (tối đa 3), kể cả khi làm mới một chồi hoa đang còn hiệu lực.',
   'entities.abilities.rejuvenation.description': 'Hồi máu cho mục tiêu {damage} trong 12 giây.',

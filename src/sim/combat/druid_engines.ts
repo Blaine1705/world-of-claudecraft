@@ -19,6 +19,7 @@ import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scalin
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
 import { LUNGE_ID, startLunge } from './druid_lunge';
+import { GROVEHEART_BOON_ICD_KEY, NATURES_BOON_ID } from './druid_natures_boon';
 import {
   BRUIN_RUSH_WINDOW_ID,
   BRUIN_RUSH_WINDOW_SECONDS,
@@ -666,11 +667,17 @@ export function cleanDruidEngineState(
 ): void {
   for (let index = player.auras.length - 1; index >= 0; index--) {
     const aura = player.auras[index];
-    if (aura.sourceId !== player.id || !ENGINE_AURA_IDS.has(aura.id)) continue;
+    // A Nature's Boon window is spec-scoped too (Wildfang: Wildbloom or Oakhide;
+    // Groveheart: Wildmend), so it ends with the specialization that armed it.
+    if (aura.sourceId !== player.id) continue;
+    if (!ENGINE_AURA_IDS.has(aura.id) && aura.id !== NATURES_BOON_ID) continue;
     player.auras.splice(index, 1);
     ctx.emit({ type: 'aura', targetId: player.id, name: aura.name, gained: false });
   }
-  if (player.procState) delete player.procState.icds[LOPING_STRIDE_ICD_KEY];
+  if (player.procState) {
+    delete player.procState.icds[LOPING_STRIDE_ICD_KEY];
+    delete player.procState.icds[GROVEHEART_BOON_ICD_KEY];
+  }
 }
 
 export type DruidEngineMeta = PlayerMeta;

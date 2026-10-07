@@ -107,9 +107,9 @@ nearly full bleeds.
 Bruin loop: keep Craven Roar up and maintain threat with Sweeping Claws and
 Bonecrush. Old Blood is shared with Wolf, so a bank built before shifting
 remains available. At three stages Bonecrush becomes Marrowbreak. Above half
-health it must deal its burst and snap threat without an absorb. Below half
-health it must deal no burst or snap threat and instead grant the absorb and
-rage refund.
+health it must deal its burst and snap threat without a heal. Below half
+health it must deal no burst or snap threat and instead heal for 18% of maximum
+health and refund rage.
 
 ## Groveheart
 

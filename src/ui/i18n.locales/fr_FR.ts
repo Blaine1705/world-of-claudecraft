@@ -10120,7 +10120,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.name': 'Soin sauvage',
   'entities.abilities.healing_touch.description': 'Rend {damage} points de vie à une cible alliée.',
   'entities.abilities.healing_touch.specNote_restoration':
-    'Chaque incantation achevée ajoute 1 Verdoyance (maximum 3). La Verdoyance accumulée raccourcit cette incantation : 2,2 s à 1 Verdoyance, 1,9 s à 2 et 1,5 s à 3.',
+    'Chaque incantation achevée ajoute 1 Verdoyance (maximum 3). La Verdoyance accumulée raccourcit cette incantation : 2,2 s à 1 Verdoyance, 1,9 s à 2 et 1,5 s à 3. Bienfait de la nature le rend instantané, gratuit et 25% plus puissant.',
   'entities.abilities.mark_of_the_wild.name': 'Garde sauvage',
   'entities.abilities.mark_of_the_wild.description':
     'Place le Wildward sur une cible alliée et augmente son armure de {buff} pendant 30 min.',
@@ -10134,7 +10134,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Enracine la cible sur place pendant un maximum de 12 s.',
   'entities.abilities.bear_form.name': 'Forme de Bruin',
   'entities.abilities.bear_form.description':
-    "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Relancez pour reprendre votre forme de lanceur.",
+    "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Vous frappez deux fois plus vite pour moitié moins de dégâts par coup, et chaque coup génère deux fois plus de rage. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Relancez pour reprendre votre forme de lanceur.",
   'entities.abilities.maul.name': 'Brise-os',
   'entities.abilities.growl.name': 'Menacer',
   'entities.abilities.growl.description':
@@ -16799,7 +16799,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Brise-moelle',
   'entities.abilities.marrowbreak.description':
-    "Consomme vos 3 Sang ancien pour une frappe lourde à haute menace de {damage} points de dégâts. Sous la moitié des points de vie, vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum pendant 8 s et rembourse 15 points de rage.",
+    'Consomme vos 3 Sang ancien pour une frappe lourde à haute menace de {damage} points de dégâts. Sous la moitié des points de vie, vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 points de rage.',
   'entities.abilities.moonlash.name': 'Déferlante lunaire',
   'entities.abilities.moonlash.description':
     "Consomme vos 3 Marée lunaire pour une frappe lourde de {damage} points de dégâts d'Arcane : le choix des dégâts. Sillage solaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un.",
@@ -16997,7 +16997,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     "Une attaque brutale qui augmente les dégâts de mêlée de {damage} et cause une forte menace. S'active à votre prochain coup. Forme de Bruin uniquement.",
   'entities.abilities.maul.specNote_feral':
-    "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une frappe de 78 à 96 dégâts à forte menace ; sous la moitié des points de vie, elle vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum et rembourse 15 rage.",
+    'Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une frappe de 78 à 96 dégâts à forte menace ; sous la moitié des points de vie, elle vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 rage.',
   'entities.abilities.moonfire.description':
     "Brûle l'ennemi avec le feu lunaire pour {damage} points de dégâts d'Arcane plus des dégâts sur la durée.",
   'entities.abilities.moonfire.specNote_balance':
@@ -17030,7 +17030,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés.",
   'entities.abilities.reaping_command.name': 'Commandement de la moisson',
   'entities.abilities.regrowth.description':
-    "Soigne une cible alliée de {damage} et d'un montant supplémentaire sur 21 s.",
+    "Soigne une cible alliée de {damage} et d'un montant supplémentaire sur 15 s. Si l'effet arrive à son terme, il soigne de nouveau la cible du même montant que le soin initial.",
   'entities.abilities.regrowth.specNote_restoration':
     "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active.",
   'entities.abilities.rejuvenation.description': 'Soigne la cible de {damage} sur 12 s.',

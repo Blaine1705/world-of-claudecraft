@@ -13975,7 +13975,7 @@ export const en: EnTranslations = {
       "healing_touch": {
         "name": "Wildmend",
         "description": "Heals a friendly target for {damage}.",
-        "specNote_restoration": "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3."
+        "specNote_restoration": "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3. Nature's Boon makes it instant, free, and 25% stronger."
       },
       "mark_of_the_wild": {
         "name": "Wildward",
@@ -14005,12 +14005,12 @@ export const en: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",
         "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "Menace",
@@ -14046,7 +14046,7 @@ export const en: EnTranslations = {
       },
       "regrowth": {
         "name": "Second Bloom",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
+        "description": "Heals a friendly target for {damage} and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.",
         "specNote_restoration": "Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const en: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Marrowbreak",
-        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage."
       },
       "wildwake": {
         "name": "Wildwake",

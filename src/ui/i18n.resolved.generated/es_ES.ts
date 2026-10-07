@@ -13975,7 +13975,7 @@ export const es_ES: EnTranslations = {
       "healing_touch": {
         "name": "Cura Silvestre",
         "description": "Sana a un objetivo amistoso por {damage}.",
-        "specNote_restoration": "Cada lanzamiento completado añade 1 de Verdor (máx. 3). El Verdor acumulado acorta este lanzamiento: 2,2 s con 1 de Verdor, 1,9 s con 2 y 1,5 s con 3."
+        "specNote_restoration": "Cada lanzamiento completado añade 1 de Verdor (máx. 3). El Verdor acumulado acorta este lanzamiento: 2,2 s con 1 de Verdor, 1,9 s con 2 y 1,5 s con 3. Bendición de la Naturaleza lo vuelve instantáneo, gratuito y un 25% más fuerte."
       },
       "mark_of_the_wild": {
         "name": "Resguardo Silvestre",
@@ -14005,12 +14005,12 @@ export const es_ES: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
+        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Golpeas el doble de rápido con la mitad de daño por golpe, y cada golpe genera el doble de ira. Lánzala de nuevo para volver a forma de taumaturgo."
       },
       "maul": {
         "name": "Rompehuesos",
         "description": "Un ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa una gran cantidad de amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin.",
-        "specNote_feral": "Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te protege con un escudo equivalente al 18% de tu salud máxima y te devuelve 15 de ira."
+        "specNote_feral": "Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te sana el equivalente al 18% de tu salud máxima y te devuelve 15 de ira."
       },
       "growl": {
         "name": "Amenazar",
@@ -14046,7 +14046,7 @@ export const es_ES: EnTranslations = {
       },
       "regrowth": {
         "name": "Segundo Florecer",
-        "description": "Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 21 s.",
+        "description": "Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 15 s. Si el efecto dura todo su tiempo, vuelve a sanar al objetivo por la misma cantidad que la sanación inicial.",
         "specNote_restoration": "Cada lanzamiento añade 1 de Verdor (máx. 3), incluso si renueva una floración que ya está activa."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const es_ES: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Quiebramédula",
-        "description": "Consume tus 3 de Sangre Antigua para un golpe pesado de alta amenaza que inflige {damage} de daño. Por debajo de la mitad de salud, en su lugar te protege con un escudo del 18% de tu salud máxima durante 8 s y te devuelve 15 de ira."
+        "description": "Consume tus 3 de Sangre Antigua para un golpe pesado de alta amenaza que inflige {damage} de daño. Por debajo de la mitad de salud, en su lugar te sana un 18% de tu salud máxima y te devuelve 15 de ira."
       },
       "wildwake": {
         "name": "Despertar Silvestre",

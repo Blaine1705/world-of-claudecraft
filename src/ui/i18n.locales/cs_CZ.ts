@@ -10209,7 +10209,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.battle_shout.name': 'Železný řev',
   'entities.abilities.bear_charge.name': 'Medvědí výpad',
   'entities.abilities.bear_form.description':
-    'Proměníš se v medvěda: zbroj +110 %, maximální zdraví +30 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Proměna do jakékoli podoby udělí Pružný krok, krátký nával rychlosti pohybu. Sesláním znovu se vrátíš do podoby sesilatele.',
+    'Proměníš se v medvěda: zbroj +110 %, maximální zdraví +30 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Útočíš dvakrát rychleji za polovinu poškození na úder a každý úder buduje dvojnásobek vzteku. Proměna do jakékoli podoby udělí Pružný krok, krátký nával rychlosti pohybu. Sesláním znovu se vrátíš do podoby sesilatele.',
   'entities.abilities.bear_form.name': 'Medvědí podoba',
   'entities.abilities.berserker_rage.description':
     'Vstoupíš do vroucí zuřivosti a získáš 20 vzteku. (Talent válečníka)',
@@ -10363,7 +10363,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heal.name': 'Slavnostní modlitba',
   'entities.abilities.healing_touch.description': 'Vyléčí spojenecký cíl za {damage}.',
   'entities.abilities.healing_touch.specNote_restoration':
-    'Každé dokončené seslání přidá 1 Zeleň (max 3). Nastřádaná Zeleň zkracuje toto seslání: 2,2 s při 1 Zeleni, 1,9 s při 2 a 1,5 s při 3.',
+    'Každé dokončené seslání přidá 1 Zeleň (max 3). Nastřádaná Zeleň zkracuje toto seslání: 2,2 s při 1 Zeleni, 1,9 s při 2 a 1,5 s při 3. Dar přírody ho učiní okamžitým, zdarma a o 25 % silnějším.',
   'entities.abilities.healing_touch.name': 'Divoké zhojení',
   'entities.abilities.healing_wave.description':
     'Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel. Zhojení duchem: uloží 50 % plného léčení před přeléčením jako Léčivý proud na 12 s, až do 30 % maximálního zdraví cíle.',
@@ -16011,7 +16011,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Lámání morku',
   'entities.abilities.marrowbreak.description':
-    'Spotřebuje 3 Staré krve na těžký úder s vysokou hrozbou za {damage} poškození. Pod polovinou zdraví tě místo toho chrání štítem za 18% maximálního zdraví na 8 s a vrátí 15 zuřivosti.',
+    'Spotřebuje 3 Staré krve na těžký úder s vysokou hrozbou za {damage} poškození. Pod polovinou zdraví tě místo toho vyléčí o 18% maximálního zdraví a vrátí 15 zuřivosti.',
   'entities.abilities.moonlash.name': 'Měsíční vzedmutí',
   'entities.abilities.moonlash.description':
     'Spotřebuje 3 Měsíčního přílivu na těžký úder za {damage} tajemného poškození: volba poškození. Sluneční brázda spotřebuje tytéž 3 Měsíčního přílivu, vyber si tedy jednu.',
@@ -16305,7 +16305,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Drtivý útok, který zvýší poškození na blízko o {damage} a způsobí vysokou hrozbu. Aktivuje se při tvém příštím úderu. Pouze v medvědí podobě.',
   'entities.abilities.maul.specNote_feral':
-    'Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Lámání morku: úder za 78 až 96 poškození s vysokou hrozbou; pod polovinou zdraví tě místo toho ochrání štítem za 18 % tvého maximálního zdraví a vrátí 15 vzteku.',
+    'Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Lámání morku: úder za 78 až 96 poškození s vysokou hrozbou; pod polovinou zdraví tě místo toho vyléčí o 18 % tvého maximálního zdraví a vrátí 15 vzteku.',
   'entities.abilities.moonfire.description':
     'Spálí nepřítele měsíčním ohněm za {damage} arkánního poškození plus poškození v čase.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16338,7 +16338,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Spotřebuje 2 Úlomky duše a přikáže všem nemrtvým služebníkům udeřit společně. Hrobové stráže provokují a připraví se, Bojovníci připoutají, Kostění mágové odhalí magické obrany a Hrobové křídlo roztrhá všechny zasažené nepřátele.',
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Vyléčí přátelský cíl za {damage} a další množství po dobu 21 s.',
+    'Vyléčí přátelský cíl za {damage} a další množství po dobu 15 s. Pokud efekt vydrží celou dobu, vyléčí cíl znovu o stejnou hodnotu jako počáteční léčení.',
   'entities.abilities.regrowth.specNote_restoration':
     'Každé seslání přidá 1 Zeleň (max 3), i když jen obnoví květ, který už působí.',
   'entities.abilities.rejuvenation.description': 'Vyléčí cíl za {damage} po dobu 12 s.',

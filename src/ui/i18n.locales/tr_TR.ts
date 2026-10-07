@@ -7752,7 +7752,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. Sonraki 3 saniye boyunca Kurt Formu ücretsizdir ve hedefi sabitleyerek 4 saniye boyunca %50 yavaşlatır. 8-25 yarda menzil. Yalnızca Bruin Formu.',
   'entities.abilities.bear_charge.name': 'Bruin Hücumu',
   'entities.abilities.bear_form.description':
-    'Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır. Büyücü formuna dönmek için tekrar kullan.',
+    'Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. İki kat hızlı vurursun ama vuruş başına hasar yarıya iner ve her vuruş iki kat öfke biriktirir. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır. Büyücü formuna dönmek için tekrar kullan.',
   'entities.abilities.bear_form.name': 'Bruin Formu',
   'entities.abilities.berserker_rage.description':
     'Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)',
@@ -7918,7 +7918,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heal.name': 'Vakur Dua',
   'entities.abilities.healing_touch.description': 'Dost bir hedefi {damage} iyileştirir.',
   'entities.abilities.healing_touch.specNote_restoration':
-    "Tamamlanan her kullanım 1 Yeşillik ekler (en fazla 3). Biriken Yeşillik bu büyünün süresini kısaltır: 1 Yeşillikte 2,2 sn, 2'de 1,9 sn, 3'te 1,5 sn.",
+    "Tamamlanan her kullanım 1 Yeşillik ekler (en fazla 3). Biriken Yeşillik bu büyünün süresini kısaltır: 1 Yeşillikte 2,2 sn, 2'de 1,9 sn, 3'te 1,5 sn. Dogain Nimetleri onu anında, ücretsiz ve %25 daha güçlü yapar.",
   'entities.abilities.healing_touch.name': 'Yaban Şifası',
   'entities.abilities.healing_wave.description':
     "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar. Onarım: tam iyileştirmenin %50'sini aşırı iyileştirmeden önce 12 sn boyunca Onaran Akım olarak saklar, hedefin azami canının %30'una kadar.",
@@ -16105,7 +16105,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'İlik Kıran',
   'entities.abilities.marrowbreak.description':
-    '3 Kadim Kanı yüksek tehditli, {damage} hasar veren ağır bir vuruş için tüketir. Canın yarısının altındayken bunun yerine 8 sn boyunca azami canının %18 kadarı değerinde bir kalkanla seni korur ve 15 öfke iade eder.',
+    '3 Kadim Kanı yüksek tehditli, {damage} hasar veren ağır bir vuruş için tüketir. Canın yarısının altındayken bunun yerine azami canının %18 kadarı seni iyileştirir ve 15 öfke iade eder.',
   'entities.abilities.moonlash.name': 'Ay Kabarışı',
   'entities.abilities.moonlash.description':
     '3 Ay Gelgitini {damage} Gizem hasarı veren ağır bir vuruş için tüketir: hasar seçimi. Güneş İzi de aynı 3 Ay Gelgitini tüketir, o yüzden birini seç.',
@@ -16403,7 +16403,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Yakın dövüş hasarını {damage} artıran ve yüksek miktarda tehdit yaratan bir parçalama saldırısı. Bir sonraki vuruşunda etkinleşir. Yalnızca Bruin Formu.',
   'entities.abilities.maul.specNote_feral':
-    "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme İlik Kırana dönüşür: yüksek tehditle 78 ila 96 hasar veren bir vuruş; can yarısının altındayken bunun yerine azami canının %18'i kadar seni kalkanlar ve 15 öfke geri kazandırır.",
+    "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme İlik Kırana dönüşür: yüksek tehditle 78 ila 96 hasar veren bir vuruş; can yarısının altındayken bunun yerine azami canının %18'i kadar seni iyileştirir ve 15 öfke geri kazandırır.",
   'entities.abilities.moonfire.description':
     'Düşmanı ay ateşiyle yakarak {damage} Gizemli hasar artı zamana yayılı hasar verir.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16436,7 +16436,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '2 Ruh Parçası harcayarak tüm ölü hizmetkarlara birlikte vurma emri verir. Mezar Muhafızları kışkırtır ve hazırlanır, Savaşçılar sabitler, Kemik Büyücüler büyü savunmalarını açığa çıkarır ve Mezar Kanadı vurduğu tüm düşmanları parçalar.',
   'entities.abilities.reaping_command.name': 'Hasat Emri',
   'entities.abilities.regrowth.description':
-    'Dost bir hedefi {damage} ve 21 sn boyunca ek bir miktar iyileştirir.',
+    'Dost bir hedefi {damage} ve 15 sn boyunca ek bir miktar iyileştirir. Etki süresinin sonuna kadar sürerse, hedefi ilk iyileştirmeyle aynı miktarda yeniden iyileştirir.',
   'entities.abilities.regrowth.specNote_restoration':
     'Her kullanım 1 Yeşillik ekler (en fazla 3); zaten etkide olan bir çiçeği yenilemek de buna dahildir.',
   'entities.abilities.rejuvenation.description': 'Hedefi 12 sn boyunca {damage} iyileştirir.',

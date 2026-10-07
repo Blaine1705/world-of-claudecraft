@@ -13975,7 +13975,7 @@ export const vi_VN: EnTranslations = {
       "healing_touch": {
         "name": "Hàn Gắn Hoang Dã",
         "description": "Trị liệu cho đồng minh {damage} máu.",
-        "specNote_restoration": "Mỗi lần thi triển hoàn tất thêm 1 Sắc Xanh (tối đa 3). Sắc Xanh tích lũy rút ngắn thời gian thi triển phép này: 2,2 giây ở 1 Sắc Xanh, 1,9 giây ở 2 và 1,5 giây ở 3."
+        "specNote_restoration": "Mỗi lần thi triển hoàn tất thêm 1 Sắc Xanh (tối đa 3). Sắc Xanh tích lũy rút ngắn thời gian thi triển phép này: 2,2 giây ở 1 Sắc Xanh, 1,9 giây ở 2 và 1,5 giây ở 3. Ân Huệ Tự Nhiên khiến phép này thi triển tức thì, miễn phí và mạnh hơn 25%."
       },
       "mark_of_the_wild": {
         "name": "Hộ Vệ Hoang Dã",
@@ -14005,12 +14005,12 @@ export const vi_VN: EnTranslations = {
       },
       "bear_form": {
         "name": "Hình Bruin",
-        "description": "Biến hình thành gấu: giáp +110%, máu tối đa +30%, tăng mạnh sức mạnh tấn công, các đòn đánh của bạn tích Thịnh Nộ và tạo ra 30% thù hận nhiều hơn. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn. Thi triển lại để trở về hình dạng thi triển phép."
+        "description": "Biến hình thành gấu: giáp +110%, máu tối đa +30%, tăng mạnh sức mạnh tấn công, các đòn đánh của bạn tích Thịnh Nộ và tạo ra 30% thù hận nhiều hơn. Bạn đánh nhanh gấp đôi với một nửa sát thương mỗi đòn, và mỗi đòn tích gấp đôi Thịnh Nộ. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn. Thi triển lại để trở về hình dạng thi triển phép."
       },
       "maul": {
         "name": "Nghiền Xương",
         "description": "Một đòn tấn công nghiền nát làm tăng sát thương cận chiến thêm {damage} và gây lượng thù hận lớn. Kích hoạt ở đòn đánh kế tiếp của bạn. Chỉ dùng được ở Hình Bruin.",
-        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó khiên cho bạn 18% máu tối đa và hoàn lại 15 nộ khí."
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó hồi cho bạn 18% máu tối đa và hoàn lại 15 nộ khí."
       },
       "growl": {
         "name": "Hăm Dọa",
@@ -14046,7 +14046,7 @@ export const vi_VN: EnTranslations = {
       },
       "regrowth": {
         "name": "Nở Hoa Lần Hai",
-        "description": "Hồi máu cho mục tiêu đồng minh {damage} và thêm một lượng hồi máu nữa trong 21 giây.",
+        "description": "Hồi máu cho mục tiêu đồng minh {damage} và thêm một lượng hồi máu nữa trong 15 giây. Nếu hiệu ứng kéo dài hết thời gian, nó hồi máu cho mục tiêu thêm một lần bằng lượng hồi máu ban đầu.",
         "specNote_restoration": "Mỗi lần thi triển thêm 1 Sắc Xanh (tối đa 3), kể cả khi làm mới một chồi hoa đang còn hiệu lực."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const vi_VN: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Đoạn Tủy",
-        "description": "Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó tạo lá chắn bằng 18% máu tối đa của bạn trong 8 giây và hoàn lại 15 nộ."
+        "description": "Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó hồi cho bạn 18% máu tối đa và hoàn lại 15 nộ."
       },
       "wildwake": {
         "name": "Bừng Nở Hoang Dã",

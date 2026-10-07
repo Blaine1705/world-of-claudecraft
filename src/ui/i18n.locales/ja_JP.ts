@@ -5236,7 +5236,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.name': '野生の癒し',
   'entities.abilities.healing_touch.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.healing_touch.specNote_restoration':
-    '詠唱を完了するたびに翠成が1段階進む（最大3）。蓄えた翠成がこの詠唱を短縮する：翠成1で2.2秒、2で1.9秒、3で1.5秒。',
+    '詠唱を完了するたびに翠成が1段階進む（最大3）。蓄えた翠成がこの詠唱を短縮する：翠成1で2.2秒、2で1.9秒、3で1.5秒。自然の恵みにより、詠唱が即時・無料になり、効果が25%上昇する。',
   'entities.abilities.mark_of_the_wild.name': 'ワイルドワード',
   'entities.abilities.mark_of_the_wild.description':
     '味方対象にワイルドワードを付与し、30分間アーマーを{buff}増加させます。',
@@ -5252,7 +5252,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '対象を最大12秒間その場に根付かせます。',
   'entities.abilities.bear_form.name': 'ブルーインフォーム',
   'entities.abilities.bear_form.description':
-    '熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再度使用すると術者形態に戻ります。',
+    '熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。攻撃速度が2倍になる代わりに1回あたりのダメージは半分になり、各攻撃が生成する怒りは2倍になります。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再度使用すると術者形態に戻ります。',
   'entities.abilities.maul.name': '骨砕き',
   'entities.abilities.maul.description':
     '近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。',
@@ -5279,7 +5279,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ブルーインフォーム専用。',
   'entities.abilities.regrowth.name': '二度目の開花',
   'entities.abilities.regrowth.description':
-    '味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。',
+    '味方対象の体力を {damage} 回復し、さらに15秒間追加で回復します。効果が最後まで持続すると、最初の回復と同じ量だけ対象を再び回復します。',
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
     '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
@@ -15884,12 +15884,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。',
   'entities.abilities.maledict_gaze.name': '呪眼の凝視',
   'entities.abilities.marrowbreak.description':
-    '古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を8秒間得て、怒りを15回復する。',
+    '古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を回復し、怒りを15回復する。',
   'entities.abilities.marrowbreak.name': '骨髄砕き',
   'entities.abilities.martyrs_aegis.description': '味方1体が受けるダメージを8秒間40%軽減する。',
   'entities.abilities.martyrs_aegis.name': '殉教者の盾',
   'entities.abilities.maul.specNote_feral':
-    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を得て、怒りを15回復する。',
+    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を回復し、怒りを15回復する。',
   'entities.abilities.measured_shot.description':
     '慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。',
   'entities.abilities.measured_shot.name': '精密射撃',

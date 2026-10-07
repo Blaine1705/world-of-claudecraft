@@ -326,7 +326,7 @@ describe('Wildfang engine', () => {
     expect(player.auras.some((aura) => aura.id === OLD_BLOOD_ID)).toBe(false);
   });
 
-  it('converts Marrowbreak into an absorb and rage refund below half health', () => {
+  it('converts Marrowbreak into a heal and rage refund below half health', () => {
     const { sim, player } = rig('feral');
     const mob = targetMob(sim);
     player.auras.push(formAura(player, 'form_bear'));
@@ -337,14 +337,14 @@ describe('Wildfang engine', () => {
     druidEngineOnLandedStrike(ctx(sim), player, 'rake');
     druidEngineOnLandedStrike(ctx(sim), player, 'swipe');
 
+    const hpBefore = player.hp;
     sim.castAbility('maul');
 
     expect(mob.hp).toBe(mob.maxHp);
     expect(mob.threat.get(player.id)).toBeUndefined();
-    expect(player.auras.find((aura) => aura.id === 'marrowbreak_guard')).toMatchObject({
-      kind: 'absorb',
-      value: Math.round(player.maxHp * 0.18),
-    });
+    // An instant heal for 18% of maximum health; no shield is left behind.
+    expect(player.hp).toBe(hpBefore + Math.round(player.maxHp * 0.18));
+    expect(player.auras.some((aura) => aura.kind === 'absorb')).toBe(false);
     expect(player.resource).toBe(20);
     expect(player.auras.some((aura) => aura.id === OLD_BLOOD_ID)).toBe(false);
   });

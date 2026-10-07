@@ -13975,7 +13975,7 @@ export const da_DK: EnTranslations = {
       "healing_touch": {
         "name": "Vildlægning",
         "description": "Helbreder et venligt mål for {damage}.",
-        "specNote_restoration": "Hver fuldført kastning giver 1 Grønske (maks. 3). Opsparet Grønske forkorter denne kastning: 2,2 sek. ved 1 Grønske, 1,9 sek. ved 2 og 1,5 sek. ved 3."
+        "specNote_restoration": "Hver fuldført kastning giver 1 Grønske (maks. 3). Opsparet Grønske forkorter denne kastning: 2,2 sek. ved 1 Grønske, 1,9 sek. ved 2 og 1,5 sek. ved 3. Naturens velsignelse gør den øjeblikkelig, gratis og 25% stærkere."
       },
       "mark_of_the_wild": {
         "name": "Vildværn",
@@ -14005,12 +14005,12 @@ export const da_DK: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-form",
-        "description": "Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Ethvert formskifte giver Fjedrende Skridt, et kort ryk i bevægelseshastighed. Kast igen for at vende tilbage til besværgerform."
+        "description": "Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Du slår dobbelt så hurtigt for halv skade pr. slag, og hvert slag opbygger dobbelt raseri. Ethvert formskifte giver Fjedrende Skridt, et kort ryk i bevægelseshastighed. Kast igen for at vende tilbage til besværgerform."
       },
       "maul": {
         "name": "Knogleknus",
         "description": "Et knusende angreb, der øger nærkampsskaden med {damage} og forårsager en stor mængde trussel. Aktiveres ved dit næste sving. Kun i Bruin-form.",
-        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et slag for 78 til 96 skade med høj trussel; under halvt helbred beskytter det dig i stedet med et skjold på 18% af dit maksimale helbred og refunderer 15 raseri."
+        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Marvbrækker: et slag for 78 til 96 skade med høj trussel; under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri."
       },
       "growl": {
         "name": "Trussel",
@@ -14046,7 +14046,7 @@ export const da_DK: EnTranslations = {
       },
       "regrowth": {
         "name": "Anden Blomstring",
-        "description": "Helbreder et venligt mål for {damage} og en yderligere mængde over 21 sek.",
+        "description": "Helbreder et venligt mål for {damage} og en yderligere mængde over 15 sek. Hvis effekten varer hele sin varighed, helbreder den målet igen for samme mængde som den første helbredelse.",
         "specNote_restoration": "Hver kastning giver 1 Grønske (maks. 3), også når den fornyer en blomstring, der allerede virker."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const da_DK: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Marvbrækker",
-        "description": "Forbruger dine 3 Gammelt Blod til et tungt slag med høj trussel og {damage} skade. Under halvt helbred beskytter det dig i stedet med et skjold på 18% af dit maksimale helbred i 8 sek. og refunderer 15 raseri."
+        "description": "Forbruger dine 3 Gammelt Blod til et tungt slag med høj trussel og {damage} skade. Under halvt helbred helbreder det dig i stedet for 18% af dit maksimale helbred og refunderer 15 raseri."
       },
       "wildwake": {
         "name": "Vildopvågnen",

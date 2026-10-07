@@ -13975,7 +13975,7 @@ export const id_ID: EnTranslations = {
       "healing_touch": {
         "name": "Penyembuhan Liar",
         "description": "Menyembuhkan target sekutu sebesar {damage}.",
-        "specNote_restoration": "Setiap rapalan yang selesai menambah 1 Kehijauan (maks 3). Kehijauan yang tersimpan mempersingkat rapalan ini: 2,2 dtk pada 1 Kehijauan, 1,9 dtk pada 2, dan 1,5 dtk pada 3."
+        "specNote_restoration": "Setiap rapalan yang selesai menambah 1 Kehijauan (maks 3). Kehijauan yang tersimpan mempersingkat rapalan ini: 2,2 dtk pada 1 Kehijauan, 1,9 dtk pada 2, dan 1,5 dtk pada 3. Karunia Alam membuatnya instan, gratis, dan 25% lebih kuat."
       },
       "mark_of_the_wild": {
         "name": "Naungan Liar",
@@ -14005,12 +14005,12 @@ export const id_ID: EnTranslations = {
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Berubah menjadi wujud apa pun memberikan Langkah Berderap, ledakan singkat kecepatan gerak. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Kamu menyerang dua kali lebih cepat dengan setengah kerusakan per ayunan, dan setiap ayunan membangun amarah dua kali lipat. Berubah menjadi wujud apa pun memberikan Langkah Berderap, ledakan singkat kecepatan gerak. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Remuk Tulang",
         "description": "Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman besar. Aktif pada ayunanmu berikutnya. Hanya dalam Wujud Bruin.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan sebesar 78 hingga 96 kerusakan dengan ancaman besar; di bawah setengah nyawa, ia justru melindungimu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah."
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan sebesar 78 hingga 96 kerusakan dengan ancaman besar; di bawah setengah nyawa, ia justru menyembuhkanmu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah."
       },
       "growl": {
         "name": "Gertakan",
@@ -14046,7 +14046,7 @@ export const id_ID: EnTranslations = {
       },
       "regrowth": {
         "name": "Mekar Kedua",
-        "description": "Menyembuhkan target kawan sebesar {damage} dan jumlah tambahan selama 21 detik.",
+        "description": "Menyembuhkan target kawan sebesar {damage} dan jumlah tambahan selama 15 detik. Jika efek berlangsung penuh, efek itu menyembuhkan target lagi sebesar jumlah penyembuhan awal.",
         "specNote_restoration": "Setiap rapalan menambah 1 Kehijauan (maks 3), termasuk saat menyegarkan kuntum yang masih aktif."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const id_ID: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Pematah Sumsum",
-        "description": "Menghabiskan 3 Darah Tua milikmu untuk serangan berat berancaman tinggi sebesar {damage} kerusakan. Di bawah setengah nyawa, sebagai gantinya melindungimu dengan perisai sebesar 18% nyawa maksimum selama 8 dtk dan mengembalikan 15 amarah."
+        "description": "Menghabiskan 3 Darah Tua milikmu untuk serangan berat berancaman tinggi sebesar {damage} kerusakan. Di bawah setengah nyawa, sebagai gantinya menyembuhkanmu sebesar 18% nyawa maksimum dan mengembalikan 15 amarah."
       },
       "wildwake": {
         "name": "Bangkit Liar",

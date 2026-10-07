@@ -13975,7 +13975,7 @@ export const de_DE: EnTranslations = {
       "healing_touch": {
         "name": "Wildheilung",
         "description": "Heilt ein freundliches Ziel um {damage}.",
-        "specNote_restoration": "Jeder abgeschlossene Zauber fügt 1 Grünkraft hinzu (max. 3). Gesammelte Grünkraft verkürzt diesen Zauber: 2,2 Sek. bei 1 Grünkraft, 1,9 Sek. bei 2 und 1,5 Sek. bei 3."
+        "specNote_restoration": "Jeder abgeschlossene Zauber fügt 1 Grünkraft hinzu (max. 3). Gesammelte Grünkraft verkürzt diesen Zauber: 2,2 Sek. bei 1 Grünkraft, 1,9 Sek. bei 2 und 1,5 Sek. bei 3. Segen der Natur macht ihn sofort, kostenlos und 25% stärker."
       },
       "mark_of_the_wild": {
         "name": "Wildwacht",
@@ -14005,12 +14005,12 @@ export const de_DE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-Gestalt",
-        "description": "Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo. Erneut wirken, um zur Zauberergestalt zurückzukehren."
+        "description": "Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Ihr schlagt doppelt so schnell für den halben Schaden pro Schlag, und jeder Schlag erzeugt doppelt so viel Wut. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo. Erneut wirken, um zur Zauberergestalt zurückzukehren."
       },
       "maul": {
         "name": "Knochenmalmer",
         "description": "Ein malmender Angriff, der den Nahkampfschaden um {damage} erhöht und hohe Bedrohung verursacht. Aktiviert sich bei Eurem nächsten Schwung. Nur in Bruin-Gestalt.",
-        "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein Schlag für 78 bis 96 Schaden bei hoher Bedrohung; unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück."
+        "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein Schlag für 78 bis 96 Schaden bei hoher Bedrohung; unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück."
       },
       "growl": {
         "name": "Bedrohen",
@@ -14046,7 +14046,7 @@ export const de_DE: EnTranslations = {
       },
       "regrowth": {
         "name": "Zweite Blüte",
-        "description": "Heilt ein freundliches Ziel um {damage} und einen zusätzlichen Betrag über 21 Sek.",
+        "description": "Heilt ein freundliches Ziel um {damage} und einen zusätzlichen Betrag über 15 Sek. Läuft der Effekt seine volle Dauer, heilt er das Ziel erneut um denselben Betrag wie die anfängliche Heilung.",
         "specNote_restoration": "Jeder Zauber fügt 1 Grünkraft hinzu (max. 3), auch wenn er eine bereits wirkende Blüte erneuert."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const de_DE: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Markbrecher",
-        "description": "Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit für 8 Sek. und erstattet 15 Wut zurück."
+        "description": "Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück."
       },
       "wildwake": {
         "name": "Wildwecken",

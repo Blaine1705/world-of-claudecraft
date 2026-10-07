@@ -13975,7 +13975,7 @@ export const pl_PL: EnTranslations = {
       "healing_touch": {
         "name": "Dzikie ukojenie",
         "description": "Leczy sprzymierzony cel o {damage}.",
-        "specNote_restoration": "Każde ukończone rzucenie dodaje 1 Zieleń (maks. 3). Zgromadzona Zieleń skraca to rzucenie: 2,2 s przy 1 Zieleni, 1,9 s przy 2 i 1,5 s przy 3."
+        "specNote_restoration": "Każde ukończone rzucenie dodaje 1 Zieleń (maks. 3). Zgromadzona Zieleń skraca to rzucenie: 2,2 s przy 1 Zieleni, 1,9 s przy 2 i 1,5 s przy 3. Dar przyrody czyni je natychmiastowym, darmowym i o 25% silniejszym."
       },
       "mark_of_the_wild": {
         "name": "Dzika osłona",
@@ -14005,12 +14005,12 @@ export const pl_PL: EnTranslations = {
       },
       "bear_form": {
         "name": "Postać Bruina",
-        "description": "Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do postaci rzucającego."
+        "description": "Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Atakujesz dwa razy szybciej za połowę obrażeń na cios, a każdy cios buduje podwójną wściekłość. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do postaci rzucającego."
       },
       "maul": {
         "name": "Kruszenie kości",
         "description": "Miażdżący atak, który zwiększa obrażenia w walce wręcz o {damage} i wzbudza wysokie zagrożenie. Aktywuje się przy twoim następnym zamachu. Tylko w Postaci Bruina.",
-        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: cios zadający od 78 do 96 obrażeń przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego osłania cię tarczą równą 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości."
+        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Łamacz szpiku: cios zadający od 78 do 96 obrażeń przy wysokim zagrożeniu; poniżej połowy zdrowia zamiast tego leczy cię o 18% twojego maksymalnego zdrowia i zwraca 15 wściekłości."
       },
       "growl": {
         "name": "Groźba",
@@ -14046,7 +14046,7 @@ export const pl_PL: EnTranslations = {
       },
       "regrowth": {
         "name": "Drugi rozkwit",
-        "description": "Leczy przyjazny cel za {damage} oraz dodatkową ilość w ciągu 21 sekund.",
+        "description": "Leczy przyjazny cel za {damage} oraz dodatkową ilość w ciągu 15 sekund. Jeśli efekt utrzyma się przez pełny czas, ponownie leczy cel o tę samą wartość co początkowe leczenie.",
         "specNote_restoration": "Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const pl_PL: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Łamacz szpiku",
-        "description": "Zużywa twoje 3 Starej Krwi na ciężki cios o wysokim zagrożeniu, zadający {damage} obrażeń. Poniżej połowy zdrowia zamiast tego osłania cię tarczą równą 18% maksymalnego zdrowia na 8 s i zwraca 15 szału."
+        "description": "Zużywa twoje 3 Starej Krwi na ciężki cios o wysokim zagrożeniu, zadający {damage} obrażeń. Poniżej połowy zdrowia zamiast tego leczy cię o 18% maksymalnego zdrowia i zwraca 15 szału."
       },
       "wildwake": {
         "name": "Dzikie Przebudzenie",

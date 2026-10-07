@@ -5200,7 +5200,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.name': '야생 치유',
   'entities.abilities.healing_touch.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.healing_touch.specNote_restoration':
-    '시전을 완료할 때마다 푸른 생장이 1단계 쌓입니다(최대 3단계). 쌓인 푸른 생장이 이 주문의 시전 시간을 줄입니다: 1단계 2.2초, 2단계 1.9초, 3단계 1.5초.',
+    '시전을 완료할 때마다 푸른 생장이 1단계 쌓입니다(최대 3단계). 쌓인 푸른 생장이 이 주문의 시전 시간을 줄입니다: 1단계 2.2초, 2단계 1.9초, 3단계 1.5초. 자연의 은총이 이 주문을 즉시 시전, 무료로 만들고 효과를 25% 높입니다.',
   'entities.abilities.mark_of_the_wild.name': '야생의 수호',
   'entities.abilities.mark_of_the_wild.description':
     '아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
@@ -5217,7 +5217,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '대상을 최대 12초 동안 제자리에 묶습니다.',
   'entities.abilities.bear_form.name': '큰곰 변신',
   'entities.abilities.bear_form.description':
-    "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 시전자 형태로 돌아갑니다.",
+    "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 공격 속도가 두 배가 되는 대신 타격당 피해가 절반이 되며, 각 타격은 두 배의 분노를 생성합니다. 어떤 형상으로 변신하든 짧은 이동 속도 증가 효과인 '성큼걸음'을 얻습니다. 다시 시전하면 시전자 형태로 돌아갑니다.",
   'entities.abilities.maul.name': '뼈 분쇄',
   'entities.abilities.maul.description':
     '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
@@ -5244,7 +5244,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 큰곰 변신 전용.',
   'entities.abilities.regrowth.name': '두 번째 개화',
   'entities.abilities.regrowth.description':
-    '아군 대상의 생명력을 {damage}만큼 회복시키고 21초에 걸쳐 추가로 회복시킵니다.',
+    '아군 대상의 생명력을 {damage}만큼 회복시키고 15초에 걸쳐 추가로 회복시킵니다. 효과가 끝까지 지속되면 처음 치유와 같은 양만큼 대상을 다시 치유합니다.',
   'entities.abilities.barkskin.name': '참나무 가죽',
   'entities.abilities.barkskin.description':
     '피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다.',
@@ -15842,13 +15842,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '저주의 눈이 선택한 주 사안 대상을 2.5초마다 공격해 암흑 피해를 줍니다. 사안 빙의 중에는 공격 속도가 두 배가 됩니다.',
   'entities.abilities.maledict_gaze.name': '저주의 응시',
   'entities.abilities.marrowbreak.description':
-    '오랜 피 3단계를 소모해 {damage}의 피해를 입히는 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 8초 동안 최대 생명력의 18%를 흡수하는 보호막을 얻고 분노 15를 돌려받습니다.',
+    '오랜 피 3단계를 소모해 {damage}의 피해를 입히는 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 최대 생명력의 18%를 회복하고 분노 15를 돌려받습니다.',
   'entities.abilities.marrowbreak.name': '골수분쇄',
   'entities.abilities.martyrs_aegis.description':
     '아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다.',
   'entities.abilities.martyrs_aegis.name': '순교자의 방패',
   'entities.abilities.maul.specNote_feral':
-    '적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 골수분쇄로 변합니다: 78에서 96의 피해를 입히는 높은 위협 수준의 강타이며, 생명력이 절반 미만이면 대신 최대 생명력의 18%를 흡수하는 보호막을 얻고 분노 15를 돌려받습니다.',
+    '적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 골수분쇄로 변합니다: 78에서 96의 피해를 입히는 높은 위협 수준의 강타이며, 생명력이 절반 미만이면 대신 최대 생명력의 18%를 회복하고 분노 15를 돌려받습니다.',
   'entities.abilities.measured_shot.description':
     '신중하게 조준한 사격으로 {damage}의 물리 피해를 주고, 적중 시 집중 20을 얻습니다.',
   'entities.abilities.measured_shot.name': '정밀 사격',

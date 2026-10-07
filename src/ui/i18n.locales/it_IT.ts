@@ -9545,7 +9545,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.name': 'Rammendo Selvaggio',
   'entities.abilities.healing_touch.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.healing_touch.specNote_restoration':
-    'Ogni lancio completato aggiunge 1 Verzura (massimo 3). La Verzura accumulata accorcia questo lancio: 2,2 s con 1 Verzura, 1,9 s con 2 e 1,5 s con 3.',
+    'Ogni lancio completato aggiunge 1 Verzura (massimo 3). La Verzura accumulata accorcia questo lancio: 2,2 s con 1 Verzura, 1,9 s con 2 e 1,5 s con 3. Favore della Natura lo rende istantaneo, gratuito e più forte del 25%.',
   'entities.abilities.mark_of_the_wild.name': 'Custodia Selvaggia',
   'entities.abilities.mark_of_the_wild.description':
     "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min.",
@@ -9559,7 +9559,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Radica il bersaglio sul posto per un massimo di 12 s.',
   'entities.abilities.bear_form.name': 'Forma di Bruin',
   'entities.abilities.bear_form.description':
-    "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore.",
+    "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Colpisci il doppio più velocemente con metà danni per colpo, e ogni colpo genera il doppio della rabbia. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.maul.name': 'Frantumaossa',
   'entities.abilities.growl.name': 'Intimidazione',
   'entities.abilities.growl.description':
@@ -16450,7 +16450,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Spezzamidollo',
   'entities.abilities.marrowbreak.description':
-    'Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti protegge invece con uno scudo pari al 18% della tua salute massima per 8 sec e rimborsa 15 rabbia.',
+    'Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia.',
   'entities.abilities.moonlash.name': 'Ondata Lunare',
   'entities.abilities.moonlash.description':
     'Consuma 3 Marea Lunare per un colpo pesante da {damage} danni Arcani: la scelta del danno. Scia Solare consuma le stesse 3 Marea Lunare, quindi scegline una.',
@@ -17314,7 +17314,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     "Un attacco lacerante che aumenta i danni in mischia di {damage} e causa un'elevata quantità di minaccia. Si attiva al tuo prossimo colpo. Solo Forma di Bruin.",
   'entities.abilities.maul.specNote_feral':
-    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti protegge invece con uno scudo pari al 18% della tua salute massima e rimborsa 15 rabbia.',
+    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia.',
   'entities.abilities.moonfire.description':
     'Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.',
   'entities.abilities.moonfire.specNote_balance':
@@ -17348,7 +17348,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Spende 2 Frammenti d'Anima per comandare ogni servitore non morto a colpire all'unisono. I Guardiani Sepolcrali provocano e si preparano, i Guerrieri bloccano, i Maghi d'Ossa espongono le difese magiche, e l'Ala Sepolcrale lacera tutti i nemici colpiti.",
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 21 s.',
+    "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 15 s. Se l'effetto dura per tutta la sua durata, cura di nuovo il bersaglio della stessa quantità della cura iniziale.",
   'entities.abilities.regrowth.specNote_restoration':
     'Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva.',
   'entities.abilities.rejuvenation.description': 'Cura il bersaglio di {damage} in 12 s.',

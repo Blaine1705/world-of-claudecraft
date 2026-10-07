@@ -13975,7 +13975,7 @@ export const it_IT: EnTranslations = {
       "healing_touch": {
         "name": "Rammendo Selvaggio",
         "description": "Cura un bersaglio alleato di {damage}.",
-        "specNote_restoration": "Ogni lancio completato aggiunge 1 Verzura (massimo 3). La Verzura accumulata accorcia questo lancio: 2,2 s con 1 Verzura, 1,9 s con 2 e 1,5 s con 3."
+        "specNote_restoration": "Ogni lancio completato aggiunge 1 Verzura (massimo 3). La Verzura accumulata accorcia questo lancio: 2,2 s con 1 Verzura, 1,9 s con 2 e 1,5 s con 3. Favore della Natura lo rende istantaneo, gratuito e più forte del 25%."
       },
       "mark_of_the_wild": {
         "name": "Custodia Selvaggia",
@@ -14005,12 +14005,12 @@ export const it_IT: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma di Bruin",
-        "description": "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore."
+        "description": "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Colpisci il doppio più velocemente con metà danni per colpo, e ogni colpo genera il doppio della rabbia. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore."
       },
       "maul": {
         "name": "Frantumaossa",
         "description": "Un attacco lacerante che aumenta i danni in mischia di {damage} e causa un'elevata quantità di minaccia. Si attiva al tuo prossimo colpo. Solo Forma di Bruin.",
-        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti protegge invece con uno scudo pari al 18% della tua salute massima e rimborsa 15 rabbia."
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia."
       },
       "growl": {
         "name": "Intimidazione",
@@ -14046,7 +14046,7 @@ export const it_IT: EnTranslations = {
       },
       "regrowth": {
         "name": "Seconda Fioritura",
-        "description": "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 21 s.",
+        "description": "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 15 s. Se l'effetto dura per tutta la sua durata, cura di nuovo il bersaglio della stessa quantità della cura iniziale.",
         "specNote_restoration": "Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const it_IT: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Spezzamidollo",
-        "description": "Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti protegge invece con uno scudo pari al 18% della tua salute massima per 8 sec e rimborsa 15 rabbia."
+        "description": "Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia."
       },
       "wildwake": {
         "name": "Risveglio Selvaggio",

@@ -13975,7 +13975,7 @@ export const sv_SE: EnTranslations = {
       "healing_touch": {
         "name": "Vildläkning",
         "description": "Läker ett vänligt mål för {damage}.",
-        "specNote_restoration": "Varje fullbordad kastning ger 1 Grönska (max 3). Samlad Grönska förkortar denna kastning: 2,2 sek vid 1 Grönska, 1,9 sek vid 2 och 1,5 sek vid 3."
+        "specNote_restoration": "Varje fullbordad kastning ger 1 Grönska (max 3). Samlad Grönska förkortar denna kastning: 2,2 sek vid 1 Grönska, 1,9 sek vid 2 och 1,5 sek vid 3. Naturens gåva gör den omedelbar, gratis och 25 % starkare."
       },
       "mark_of_the_wild": {
         "name": "Vildvärn",
@@ -14005,12 +14005,12 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Du slår dubbelt så snabbt för halva skadan per slag, och varje slag bygger dubbelt så mycket raseri. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",
         "description": "En krossande attack som ökar närstridsskadan med {damage} och orsakar stort hot. Aktiveras vid ditt nästa slag. Endast i Bruinform.",
-        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa och återbetalar 15 raseri."
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri."
       },
       "growl": {
         "name": "Hota",
@@ -14046,7 +14046,7 @@ export const sv_SE: EnTranslations = {
       },
       "regrowth": {
         "name": "Andra blomningen",
-        "description": "Läker ett vänligt mål för {damage} och ytterligare en mängd under 21 sek.",
+        "description": "Läker ett vänligt mål för {damage} och ytterligare en mängd under 15 sek. Om effekten varar hela sin tid läker den målet igen för samma mängd som den första läkningen.",
         "specNote_restoration": "Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const sv_SE: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Märgbräckare",
-        "description": "Förbrukar dina 3 Gammalt Blod för ett tungt slag med högt hot som ger {damage} skada. Under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa i 8 sek och återbetalar 15 raseri."
+        "description": "Förbrukar dina 3 Gammalt Blod för ett tungt slag med högt hot som ger {damage} skada. Under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri."
       },
       "wildwake": {
         "name": "Vildväckelse",

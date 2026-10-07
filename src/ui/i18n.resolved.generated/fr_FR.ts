@@ -13975,7 +13975,7 @@ export const fr_FR: EnTranslations = {
       "healing_touch": {
         "name": "Soin sauvage",
         "description": "Rend {damage} points de vie à une cible alliée.",
-        "specNote_restoration": "Chaque incantation achevée ajoute 1 Verdoyance (maximum 3). La Verdoyance accumulée raccourcit cette incantation : 2,2 s à 1 Verdoyance, 1,9 s à 2 et 1,5 s à 3."
+        "specNote_restoration": "Chaque incantation achevée ajoute 1 Verdoyance (maximum 3). La Verdoyance accumulée raccourcit cette incantation : 2,2 s à 1 Verdoyance, 1,9 s à 2 et 1,5 s à 3. Bienfait de la nature le rend instantané, gratuit et 25% plus puissant."
       },
       "mark_of_the_wild": {
         "name": "Garde sauvage",
@@ -14005,12 +14005,12 @@ export const fr_FR: EnTranslations = {
       },
       "bear_form": {
         "name": "Forme de Bruin",
-        "description": "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Relancez pour reprendre votre forme de lanceur."
+        "description": "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Vous frappez deux fois plus vite pour moitié moins de dégâts par coup, et chaque coup génère deux fois plus de rage. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Relancez pour reprendre votre forme de lanceur."
       },
       "maul": {
         "name": "Brise-os",
         "description": "Une attaque brutale qui augmente les dégâts de mêlée de {damage} et cause une forte menace. S'active à votre prochain coup. Forme de Bruin uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une frappe de 78 à 96 dégâts à forte menace ; sous la moitié des points de vie, elle vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum et rembourse 15 rage."
+        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une frappe de 78 à 96 dégâts à forte menace ; sous la moitié des points de vie, elle vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 rage."
       },
       "growl": {
         "name": "Menacer",
@@ -14046,7 +14046,7 @@ export const fr_FR: EnTranslations = {
       },
       "regrowth": {
         "name": "Seconde floraison",
-        "description": "Soigne une cible alliée de {damage} et d'un montant supplémentaire sur 21 s.",
+        "description": "Soigne une cible alliée de {damage} et d'un montant supplémentaire sur 15 s. Si l'effet arrive à son terme, il soigne de nouveau la cible du même montant que le soin initial.",
         "specNote_restoration": "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active."
       },
       "barkskin": {
@@ -14333,7 +14333,7 @@ export const fr_FR: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Brise-moelle",
-        "description": "Consomme vos 3 Sang ancien pour une frappe lourde à haute menace de {damage} points de dégâts. Sous la moitié des points de vie, vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum pendant 8 s et rembourse 15 points de rage."
+        "description": "Consomme vos 3 Sang ancien pour une frappe lourde à haute menace de {damage} points de dégâts. Sous la moitié des points de vie, vous soigne à la place de 18% de vos points de vie maximum et rembourse 15 points de rage."
       },
       "wildwake": {
         "name": "Éveil sauvage",

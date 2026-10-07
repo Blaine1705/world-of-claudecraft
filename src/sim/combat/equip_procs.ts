@@ -20,7 +20,7 @@ import { meetsLevelRequirement } from '../item_level_req';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import type { AbilityDef, Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
-import { baseSwingSpeed, isCatForm } from './form_swing';
+import { baseSwingSpeed, isBearForm, isCatForm } from './form_swing';
 import { runTrinketTrigger } from './trinkets';
 
 // Roll every proc on the wielder's equipped mainhand that matches `trigger`, and
@@ -81,14 +81,13 @@ export function runWeaponProcs(
 }
 
 // The weapon speed a melee enchant's per-hit chance reads (chance = ppm * speed
-// / 60, the classic procs-per-minute shape). Cat Form swings its auto-attacks
-// at the fixed 1.0 sec paw cadence (combat/form_swing.ts), so a cat AUTO rolls
-// at that cadence: rolling the carried stat stick's slow speed on every fast
-// paw swing would multiply the enchant's frequency. A SPECIAL is different: its
-// rate is gated by energy and the global cooldown, never by swing speed, so it
+// / 60, the classic procs-per-minute shape). Cat Form and Bruin Form autos roll
+// at their real natural cadences, so fast form swings do not multiply a slow
+// carried stat stick's proc frequency. A SPECIAL is different: its rate is
+// gated by energy/rage and the global cooldown, never by swing speed, so it
 // rolls at the carried weapon's own speed exactly like every other class's
 // specials (a Bloodrush warrior's Twinstrike rolls at its greatsword's speed).
-// Rolling feral specials at the paw speed too was the Zeal uptime gap: a
+// Rolling feral specials at the form speed too was the Zeal uptime gap: a
 // third the chance per Flense of a same-weapon warrior strike.
 export function meleeEnchantRollSpeed(
   wielder: Entity,
@@ -96,7 +95,7 @@ export function meleeEnchantRollSpeed(
   weaponSpeed: number,
   autoAttack: boolean,
 ): number {
-  return meleeHand === 'mainhand' && autoAttack && isCatForm(wielder)
+  return meleeHand === 'mainhand' && autoAttack && (isCatForm(wielder) || isBearForm(wielder))
     ? baseSwingSpeed(wielder)
     : weaponSpeed;
 }

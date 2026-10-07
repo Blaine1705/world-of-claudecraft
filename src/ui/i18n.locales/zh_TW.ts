@@ -5018,7 +5018,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.name': '荒野癒合',
   'entities.abilities.healing_touch.description': '為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.healing_touch.specNote_restoration':
-    '每次完成施放累積 1 層繁茂（最多 3 層）。已累積的繁茂會縮短此法術的施法時間：1 層時 2.2 秒，2 層時 1.9 秒，3 層時 1.5 秒。',
+    '每次完成施放累積 1 層繁茂（最多 3 層）。已累積的繁茂會縮短此法術的施法時間：1 層時 2.2 秒，2 層時 1.9 秒，3 層時 1.5 秒。自然恩惠使其變為瞬發、免費，且效果提高 25%。',
   'entities.abilities.mark_of_the_wild.name': '野性守護',
   'entities.abilities.mark_of_the_wild.description':
     '為一個友方目標施加野性守護，使護甲提高 {buff}，持續 30 分鐘。',
@@ -5033,7 +5033,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '將目標纏繞在原地，最多持續 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形態',
   'entities.abilities.bear_form.description':
-    '變形為熊：護甲 +110%，最大生命值 +30%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。變形為任何形態時都會獲得「輕捷步伐」，短暫提升移動速度。再次施放可返回施法者形態。',
+    '變形為熊：護甲 +110%，最大生命值 +30%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。攻擊速度提高一倍，但每次攻擊的傷害減半，每次攻擊產生的怒氣加倍。變形為任何形態時都會獲得「輕捷步伐」，短暫提升移動速度。再次施放可返回施法者形態。',
   'entities.abilities.maul.name': '碎骨擊',
   'entities.abilities.maul.description':
     '一次猛擊攻擊，使近戰傷害提高 {damage}，並產生大量威脅值。在你的下一次揮擊時觸發。僅限巨熊形態。',
@@ -5059,7 +5059,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '橫掃附近敵人，造成 {damage} 點傷害。造成額外威脅值。僅限巨熊形態。',
   'entities.abilities.regrowth.name': '再度綻放',
   'entities.abilities.regrowth.description':
-    '為一個友方目標恢復 {damage} 點生命值，並在 21 秒內額外恢復一定生命值。',
+    '為一個友方目標恢復 {damage} 點生命值，並在 15 秒內額外恢復一定生命值。若該效果持續到結束，會再次為目標恢復與初始治療相同的生命值。',
   'entities.abilities.barkskin.name': '橡樹皮術',
   'entities.abilities.barkskin.description': '你的皮膚硬化如樹皮，使護甲提高 150，持續 15 秒。',
   'entities.abilities.sacred_bulwark.name': '神聖壁壘',
@@ -15145,12 +15145,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你的咒眼每2.5秒攻擊所選的主要邪眼目標，造成暗影傷害。附身邪眼會使其攻擊速度加倍。',
   'entities.abilities.maledict_gaze.name': '咒眼凝視',
   'entities.abilities.marrowbreak.description':
-    '消耗3層古血，造成{damage}點高威脅的重擊。生命值低於一半時，改為吸收相當於最大生命值18%的傷害，持續8秒，並恢復15點怒氣。',
+    '消耗3層古血，造成{damage}點高威脅的重擊。生命值低於一半時，改為恢復相當於最大生命值18%的生命值，並恢復15點怒氣。',
   'entities.abilities.marrowbreak.name': '碎髓',
   'entities.abilities.martyrs_aegis.description': '使一名盟友受到的傷害降低 40%，持續 8 秒。',
   'entities.abilities.martyrs_aegis.name': '殉道者聖盾',
   'entities.abilities.maul.specNote_feral':
-    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為碎髓：造成 78 至 96 點高威脅傷害；生命值低於一半時，改為吸收相當於最大生命值 18% 的傷害，並恢復 15 點怒氣。',
+    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為碎髓：造成 78 至 96 點高威脅傷害；生命值低於一半時，改為恢復相當於最大生命值 18% 的生命值，並恢復 15 點怒氣。',
   'entities.abilities.measured_shot.description':
     '一記從容瞄準的射擊，造成 {damage} 點物理傷害，並在命中時產生 20 點集中值。',
   'entities.abilities.measured_shot.name': '審慎射擊',
