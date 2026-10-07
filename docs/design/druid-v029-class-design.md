@@ -81,8 +81,9 @@ locks out is a dead button). The bleeds run long (Flense 18 sec, Bloodrift
 24 sec, totals unchanged) so building a point or two before detonating no
 longer forfeits the first bleed. In Bruin Form, Bonecrush becomes
 Marrowbreak. Above half health, Marrowbreak deals a burst with snap threat.
-Below half health, it instead converts the bank into an absorb based on maximum
-health and restores rage.
+Below half health, it instead converts the bank into an instant heal for 18% of
+maximum health and restores rage (an 8 sec absorb before the Groveheart rework
+pass 2).
 
 Wildfang may select either tank or damage in Dungeon Finder. Bruin remains the
 tank form and Cat has a full damage budget.
@@ -128,8 +129,8 @@ Nature's Echo seeds the next engine cycle with one stage. Wild Apex increases
 every engine payoff by 25%. Quickening restores the resource matching the
 Druid's current form whenever an engine stage is banked.
 
-Wild Apex scales the Marrowbreak guard absorb too (18% of maximum health
-becomes 22.5% with the capstone). The absorb IS the payoff in the guard arm,
+Wild Apex scales the Marrowbreak guard heal too (18% of maximum health
+becomes 22.5% with the capstone). The heal IS the payoff in the guard arm,
 and a capstone that serves all three engines cannot go dead for the tank half
 of Wildfang; the direction PDF's 15 to 20% band describes the base value, and
 the tank profile probe owns whether the scaled value holds up.
@@ -228,6 +229,12 @@ scenario (the swing cadence in the deterministic golden net).
   produced (`closingHealFromDirect`, `combat/druid_second_bloom.ts`). A
   Fleetmend consume, an Overbloom harvest, a dispel, or a recast ends it early
   and pays no closing heal.
+- Marrowbreak's below-half-health guard heals for 18% of maximum health
+  (`healPctMaxHp`) instead of raising an 8 sec absorb; it cannot critically
+  strike, so it draws no rng.
+- Bruin Form halves only its WHITE swings: a queued Bonecrush (or any strike
+  riding the swing) keeps the full weapon roll and the weapon-speed Attack
+  Power term.
 - A Bonecrush queued on the next swing still lands as Bonecrush when Old Blood
   fills before the swing (the button turning into Marrowbreak no longer drops
   the parked strike).

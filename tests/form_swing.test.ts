@@ -92,6 +92,9 @@ describe('Cat Form swing speed', () => {
     sim: Sim,
     pid: number,
     weaponRoll: { min: number; max: number; speed: number } | null = { min: 0, max: 0, speed: 0 },
+    // Optional on-next-swing strike to queue first (Bonecrush), and the hit name
+    // to wait for (null: a white hit).
+    queued: { abilityId: string; name: string } | null = null,
   ): { amount: number; ap: number; dr: number } {
     const p = sim.entities.get(pid)!;
     p.critChance = 0;
@@ -112,6 +115,12 @@ describe('Cat Form swing speed', () => {
     p.pos.y = dummy.pos.y;
     p.prevPos = { ...p.pos };
     p.targetId = dummy.id;
+    if (queued) {
+      p.resource = p.maxResource;
+      p.gcdRemaining = 0;
+      sim.castAbility(queued.abilityId, pid);
+      expect(p.queuedOnSwing).toBe(queued.abilityId);
+    }
     sim.startAutoAttack(pid);
     for (let i = 0; i < 400; i++) {
       dummy.hp = dummy.maxHp = 1e9;
@@ -121,7 +130,11 @@ describe('Cat Form swing speed', () => {
       p.facing = Math.atan2(dummy.pos.x - p.pos.x, dummy.pos.z - p.pos.z);
       const evs = sim.tick();
       const hit = evs.find(
-        (e) => e.type === 'damage' && e.sourceId === pid && e.ability == null && e.kind === 'hit',
+        (e) =>
+          e.type === 'damage' &&
+          e.sourceId === pid &&
+          (e.ability ?? null) === (queued?.name ?? null) &&
+          e.kind === 'hit',
       );
       if (hit && hit.type === 'damage') {
         // biome-ignore lint/suspicious/noExplicitAny: reach private helpers for an exact expectation
@@ -375,6 +388,35 @@ describe('Cat Form swing speed', () => {
         1,
         Math.round((60 * BEAR_FORM_AUTO_DAMAGE_MULT + (hit.ap / 14) * cadence) * (1 - hit.dr)),
       ),
+    );
+  });
+
+  it('a queued Bonecrush in Bruin Form keeps the full roll and the weapon-speed AP term', () => {
+    // Only WHITE bear swings are halved: the strike riding the swing still rolls
+    // the whole weapon and normalizes Attack Power by the weapon's own speed.
+    const sim = makeWorld();
+    const a = sim.addPlayer('druid', 'Maul');
+    sim.setPlayerLevel(20, a);
+    sim.tick();
+    giveForm(sim, a, 'form_bear', 'Bruin Form');
+    const druid = sim.entities.get(a)!;
+    druid.resourceType = 'rage';
+    druid.maxResource = 100;
+    const maul = sim.resolvedAbility('maul', a);
+    const bonusEff = maul?.effects.find((e) => e.type === 'weaponDamage');
+    const bonus = bonusEff && bonusEff.type === 'weaponDamage' ? bonusEff.bonus : -1;
+    expect(bonus).toBeGreaterThan(0);
+    const hit = firstWhiteHit(
+      sim,
+      a,
+      { min: 60, max: 60, speed: 3.0 },
+      {
+        abilityId: 'maul',
+        name: 'Bonecrush',
+      },
+    );
+    expect(hit.amount).toBe(
+      Math.max(1, Math.round((60 + (hit.ap / 14) * 3.0 + bonus) * (1 - hit.dr))),
     );
   });
 });

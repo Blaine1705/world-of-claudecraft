@@ -3377,10 +3377,10 @@ export type AbilityEffect =
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
   | { type: 'consumeDot'; dot: string }
   // Wildfang Marrowbreak (combat/druid_engines.ts): the bear cash-out's
-  // survival arm. Below the health fraction, the spent bank raises an absorb
-  // of absorbPctMaxHp and refunds rage instead of striking; above it the strike
+  // survival arm. Below the health fraction, the spent bank heals the druid for
+  // healPctMaxHp of maximum health and refunds rage instead of striking; above it the strike
   // alone carries the payoff. Deterministic, druid-only.
-  | { type: 'druidMarrowbreakGuard'; belowFrac: number; absorbPctMaxHp: number; rage: number }
+  | { type: 'druidMarrowbreakGuard'; belowFrac: number; healPctMaxHp: number; rage: number }
   // Groveheart Overbloom (combat/druid_engines.ts): harvest every HoT the
   // caster owns for harvestPct of its remaining healing, then replant a
   // Wildbloom on the cast target (or on every harvested ally with the

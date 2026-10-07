@@ -2192,16 +2192,17 @@ export function runEffects(
       case 'druidMarrowbreakGuard': {
         if (!druidMarrowbreakUsesGuard(p, eff.belowFrac)) break;
         const mult = druidApexPayoffMult(ctx, p, ability.id);
-        ctx.applyAura(p, {
-          id: 'marrowbreak_guard',
-          name: ability.name,
-          kind: 'absorb',
-          remaining: 8,
-          duration: 8,
-          value: Math.round(p.maxHp * eff.absorbPctMaxHp * mult),
-          sourceId: p.id,
-          school: 'nature',
-        });
+        // An instant self-heal for a slice of maximum health (it used to be an
+        // 8 sec absorb). It cannot critically strike, so it draws no rng.
+        ctx.applyHeal(
+          p,
+          p,
+          Math.round(p.maxHp * eff.healPctMaxHp * mult),
+          ability.name,
+          ability.id,
+          false,
+          false,
+        );
         if (p.resourceType === 'rage') {
           p.resource = Math.min(p.maxResource, p.resource + eff.rage);
         }

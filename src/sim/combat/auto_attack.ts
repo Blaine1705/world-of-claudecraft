@@ -69,6 +69,7 @@ import {
   baseSwingSpeed,
   catAutoWeaponRollMult,
   catFormDamageMult,
+  isBearForm,
   normalizedInstantSpeed,
   rangedAutoProfile,
 } from './form_swing';
@@ -637,14 +638,22 @@ export function meleeSwing(
   // roll is rescaled to that cadence (catAutoWeaponRollMult, the same shape as
   // the instant rescale above) and white DPS equals the weapon's authored dps
   // whatever its speed. Every other auto keeps the raw per-swing contract.
+  const bearStrike = isBearForm(attacker) && !(opts.autoAttack === true && !opts.abilityId);
   const weaponRollMult =
     opts.autoAttackHand === undefined
       ? normSpeed !== undefined
         ? normSpeed / Math.max(0.1, weapon.speed)
         : 1
       : autoAttackWeaponDamageMult(opts.autoAttackHand) *
-        (opts.autoAttackHand === 'mainhand' ? catAutoWeaponRollMult(attacker, weapon) : 1);
-  const apSwingSpeed = opts.apSwingSpeed ?? normSpeed ?? baseSwingSpeed(attacker);
+        (opts.autoAttackHand === 'mainhand' && !bearStrike
+          ? catAutoWeaponRollMult(attacker, weapon)
+          : 1);
+  // Bruin Form halves only its WHITE swings (form_swing.ts): a strike riding
+  // the swing (Bonecrush) or a bear weapon special keeps the full weapon roll
+  // and the Attack Power term at the weapon's own speed, as before the faster
+  // bear cadence.
+  const apSwingSpeed =
+    opts.apSwingSpeed ?? normSpeed ?? (bearStrike ? weapon.speed : baseSwingSpeed(attacker));
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
