@@ -141,7 +141,7 @@ The first two reproduce identically against an untouched source archive of
 failed under the full-suite load passes in isolation. Harvest component tags,
 item mappings and persistence were not changed. The Varkhul cases were not
 rerun or declared resolved. Overall merge verdict: **NOT READY** until the
-existing gate failures and unstaged-artifact requirement are addressed; the
+existing gate failures are addressed; the
 ghost encounter's focused and browser verification is green.
 
 Coordinator commands for focused verification (Windows `.cmd` wrappers omitted):
@@ -158,3 +158,10 @@ The first command matched eight existing files (330 passes); its extra
 core suite is included in the second command (60 passes). The wire check passed
 its single selected regression. The final command is the isolated global-failure
 diagnostic, with three failures and one pass, not an encounter acceptance check.
+
+Publication check: generated artifacts are now committed. A fresh
+`node scripts/gate_select.mjs` passed artifact freshness, security and changed-file
+lint, then entered the full suite. That run was interrupted when discovery
+included the temporary baseline source archive; the archive has been moved
+outside the repository. This attempt is not counted as a full gate pass.
+The remote Morthen music commit is preserved in the publication merge.
