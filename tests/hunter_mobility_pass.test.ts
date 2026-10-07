@@ -1,7 +1,7 @@
 // Hunter mobility pass: Trailbreak leaps 25 yards on a 20 sec cooldown and,
 // for every hunter (not only Tactical Retreat), breaks ordinary roots and
 // movement slows; encounter-owned unbreakable control is left alone. The
-// hunter abilities' minimum range is 4 yards (was 8); Auto Shot keeps 8.
+// hunter abilities' minimum range and Auto Shot's dead zone are 4 yards (were 8).
 import { describe, expect, it } from 'vitest';
 import { applyCourserDaze, COURSER_DAZE_AURA_ID } from '../src/sim/combat/hunter_shared';
 import { ABILITIES, CLASSES, MOBS } from '../src/sim/data';
@@ -101,7 +101,7 @@ describe('Trailbreak', () => {
 });
 
 describe('hunter minimum ranges', () => {
-  it('every hunter ability that had 8 yards now has 4, and Auto Shot keeps 8', () => {
+  it('every hunter ability that had 8 yards now has 4, and so does Auto Shot', () => {
     const withMin = Object.values(ABILITIES).filter(
       (def) => def.class === 'hunter' && def.minRange !== undefined,
     );
@@ -121,7 +121,7 @@ describe('hunter minimum ranges', () => {
       ].sort(),
     );
     for (const def of withMin) expect(def.minRange, def.id).toBe(4);
-    expect(CLASSES.hunter.ranged?.minRange).toBe(8);
+    expect(CLASSES.hunter.ranged?.minRange).toBe(4);
   });
 
   it('Fell Shot fires at 5 yards and is refused at 3', () => {
@@ -152,5 +152,37 @@ describe('hunter minimum ranges', () => {
     const close = run(3, 4507);
     expect(close.hit).toBe(false);
     expect(close.cooled).toBe(false);
+  });
+});
+
+describe('Auto Shot dead zone', () => {
+  // Auto Shot resolves before the melee swing: outside its 4 yard dead zone the
+  // hunter shoots, inside it the hunter swings its melee weapon.
+  function autoAttackDamage(distance: number, seed: number): SimEvent[] {
+    const sim = hunter(seed);
+    const player = sim.player;
+    const target = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+      x: player.pos.x,
+      y: player.pos.y,
+      z: player.pos.z + distance,
+    });
+    target.hostile = true;
+    target.maxHp = target.hp = 500_000;
+    sim.addEntity(target);
+    player.facing = 0;
+    sim.targetEntity(target.id);
+    sim.startAutoAttack();
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 3; i++) events.push(...sim.tick());
+    return events.filter((event) => event.type === 'damage' && event.sourceId === player.id);
+  }
+
+  it('shoots at 4.5 yards and swings in melee at 3', () => {
+    const shot = autoAttackDamage(4.5, 4508);
+    expect(shot.length).toBeGreaterThan(0);
+    expect(shot.every((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
+    const melee = autoAttackDamage(3, 4509);
+    expect(melee.length).toBeGreaterThan(0);
+    expect(melee.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(false);
   });
 });

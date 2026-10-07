@@ -61,7 +61,7 @@ export interface ClassDef {
   // Consumables in a fresh character's bags: every class carries food; the
   // mana classes also carry water. Saved characters load their own bags.
   startItems: { itemId: string; count: number }[];
-  // hunters: auto shot (8yd deadzone). casters: wand (wand:true → no deadzone,
+  // hunters: auto shot (4yd deadzone). casters: wand (wand:true → no deadzone,
   // fires a magic-school bolt so they don't run into melee to auto-attack, #94)
   ranged?: WeaponInfo & {
     maxRange: number;
@@ -364,7 +364,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS,
-    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 8 },
+    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 4 },
     abilities: [
       'raptor_strike',
       'pack_command',
