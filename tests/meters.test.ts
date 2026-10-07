@@ -101,6 +101,55 @@ describe('combat meters', () => {
     expect(m.current!.tallies.get(50)).toBeUndefined();
   });
 
+  // A direct heal on a full-health target lands as amount 0 with the whole heal
+  // in `overheal` (src/sim/combat/heal.ts). It healed nothing, so it adds no
+  // healing, hit, or crit, but its overheal still counts toward the ability.
+  it('counts the overheal of a heal that landed entirely as overheal', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const key = breakdownKey(null, 'Flash Heal');
+    m.onEvent(
+      { ...(heal(2, 1, 600, 'Flash Heal') as object), overheal: 200 } as SimEvent,
+      w,
+      party,
+      1000,
+    );
+    m.onEvent(
+      { ...(heal(2, 1, 0, 'Flash Heal') as object), overheal: 450, crit: true } as SimEvent,
+      w,
+      party,
+      1500,
+    );
+    for (const enc of [m.current!, m.allTime]) {
+      const t = enc.tallies.get(2)!;
+      const entry = t.healByAbility.get(key)!;
+      expect(entry.overheal).toBe(650);
+      expect(entry.amount).toBe(600);
+      expect(entry.hits).toBe(1);
+      expect(entry.crits ?? 0).toBe(0);
+      expect(entry.minHit).toBe(600);
+      expect(t.heal).toBe(600);
+      expect(t.hits).toBe(1);
+      expect(t.crits).toBe(0);
+    }
+  });
+
+  it('records overheal for an ability whose only heals were full overheals, without a heal value', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent({ ...(heal(2, 1, 0, 'Renew') as object), overheal: 90 } as SimEvent, w, party, 1000);
+    const t = m.current!.tallies.get(2)!;
+    expect(t.healByAbility.get(breakdownKey(null, 'Renew'))?.overheal).toBe(90);
+    expect(t.healByAbility.get(breakdownKey(null, 'Renew'))?.amount).toBe(0);
+    expect(t.heal).toBe(0);
+    expect(t.hits).toBe(0);
+    // An outsider's full overheal is not party healing.
+    m.onEvent({ ...(heal(99, 1, 0, 'Renew') as object), overheal: 90 } as SimEvent, w, party, 1100);
+    expect(m.current!.tallies.has(99)).toBe(false);
+  });
+
   it('ignores a cueOnly heal2 (the HoT-application sound cue): no encounter opens, no tally, no lastActivity bump', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);
