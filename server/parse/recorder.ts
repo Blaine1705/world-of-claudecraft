@@ -295,15 +295,18 @@ export class ParseRecorder {
     const match = bySource ?? this.fightFor(ev.targetId);
     if (match === null) return;
     const { fight } = match;
-    this.ensureParticipant(fight, ev.sourceId, tick);
-    this.ensureParticipant(fight, ev.targetId, tick);
+    // A periodic tick that landed as pure overheal (a HoT rolling on a full-health
+    // target after the pull) is logged and rolls up its overheal, but it is not
+    // combat: it never enrolls a participant, keeps a trash segment open, or
+    // counts as active time.
+    const passive = ev.hot === true && ev.amount === 0 && (ev.absorbed ?? 0) === 0;
+    if (!passive) {
+      this.ensureParticipant(fight, ev.sourceId, tick);
+      this.ensureParticipant(fight, ev.targetId, tick);
+    }
     const sourceOwnerId = bySource?.ownerId ?? null;
     const enrichment: EventEnrichment | undefined =
       sourceOwnerId !== null ? { ownerId: sourceOwnerId } : undefined;
-    // A periodic tick that landed as pure overheal (a HoT rolling on a full-health
-    // target after the pull) is logged and rolls up its overheal, but it is not
-    // combat: it neither keeps a trash segment open nor counts as active time.
-    const passive = ev.hot === true && ev.amount === 0 && (ev.absorbed ?? 0) === 0;
     fight.recordEvent(tick, ev as Record<string, unknown>, enrichment, passive);
     const creditSource = sourceOwnerId ?? ev.sourceId;
     fight.noteHeal(tick, creditSource, ev.amount, ev.overheal ?? 0, passive);

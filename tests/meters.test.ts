@@ -544,6 +544,23 @@ describe('combat meters', () => {
     expect(healer.healByAbility.get(breakdownKey(null, 'Renew'))?.overheal).toBe(80);
   });
 
+  // The death recap keeps only the last few events, so a "+0" row per HoT tick
+  // on a topped-off player would push out the damage that explains the death.
+  it('keeps fully overhealed HoT ticks out of the death recap', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(50, 1, 40, 'Bite'), w, party, 1000);
+    const tick = { ...(heal(2, 1, 0, 'Renew', false, true) as object), overheal: 40 } as SimEvent;
+    m.onEvent(tick, w, party, 1500);
+    m.onEvent(heal(2, 1, 25, 'Renew', false, true), w, party, 2000);
+    const recap = m.deathRecapBuffer.getRecentEvents(1);
+    expect(recap.map((e) => [e.ability, e.amount])).toEqual([
+      ['Bite', 40],
+      ['Renew', 25],
+    ]);
+  });
+
   it('a lone HoT tick with no open segment does not spawn a phantom combat segment', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);

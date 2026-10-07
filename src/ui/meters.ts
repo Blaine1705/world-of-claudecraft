@@ -838,7 +838,12 @@ export class MeterData {
       const targetEntity = world.entities.get(ev.targetId);
       const targetName = targetEntity?.name ?? `#${ev.targetId}`;
 
-      if (targetInParty) {
+      // A periodic tick that landed as pure overheal (a HoT on a full-health
+      // target) would only add a "+0" row that pushes real damage out of the
+      // short death recap, so it stays out.
+      const passiveOverhealTick =
+        ev.type === 'heal2' && ev.hot === true && ev.amount === 0 && !(ev.absorbed ?? 0);
+      if (targetInParty && !passiveOverhealTick) {
         const hpBefore = targetEntity?.hp;
         const maxHp = targetEntity?.maxHp;
         const hpAfter = Math.min(maxHp ?? (hpBefore ?? 0) + ev.amount, (hpBefore ?? 0) + ev.amount);
