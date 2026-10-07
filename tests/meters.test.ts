@@ -524,6 +524,26 @@ describe('combat meters', () => {
     expect(m.history[0].tallies.get(2)!.heal).toBe(30);
   });
 
+  // A HoT rolling on a full-health tank after the kill ticks as pure overheal
+  // (amount 0, hot): its overheal counts, but like any tick it is passive.
+  it('a fully overhealed HoT tick adds its overheal without holding the segment open', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(1, 50, 10), w, party, 1000);
+    (w.entities.get(50) as any).dead = true;
+    (w.entities.get(50) as any).aggroTargetId = null;
+    (w.entities.get(51) as any).aggroTargetId = null;
+    const tick = { ...(heal(2, 1, 0, 'Renew', false, true) as object), overheal: 40 } as SimEvent;
+    m.onEvent(tick, w, party, 3000);
+    m.onEvent(tick, w, party, 5000);
+    m.update(w, party, 6001);
+    expect(m.current).toBeNull();
+    const healer = m.history[0].tallies.get(2)!;
+    expect(healer.heal).toBe(0);
+    expect(healer.healByAbility.get(breakdownKey(null, 'Renew'))?.overheal).toBe(80);
+  });
+
   it('a lone HoT tick with no open segment does not spawn a phantom combat segment', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);

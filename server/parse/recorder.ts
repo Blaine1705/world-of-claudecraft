@@ -300,9 +300,13 @@ export class ParseRecorder {
     const sourceOwnerId = bySource?.ownerId ?? null;
     const enrichment: EventEnrichment | undefined =
       sourceOwnerId !== null ? { ownerId: sourceOwnerId } : undefined;
-    fight.recordEvent(tick, ev as Record<string, unknown>, enrichment);
+    // A periodic tick that landed as pure overheal (a HoT rolling on a full-health
+    // target after the pull) is logged and rolls up its overheal, but it is not
+    // combat: it neither keeps a trash segment open nor counts as active time.
+    const passive = ev.hot === true && ev.amount === 0 && (ev.absorbed ?? 0) === 0;
+    fight.recordEvent(tick, ev as Record<string, unknown>, enrichment, passive);
     const creditSource = sourceOwnerId ?? ev.sourceId;
-    fight.noteHeal(tick, creditSource, ev.amount, ev.overheal ?? 0);
+    fight.noteHeal(tick, creditSource, ev.amount, ev.overheal ?? 0, passive);
   }
 
   // An absorb credit is healing done by the shielder: it lands in the fight's

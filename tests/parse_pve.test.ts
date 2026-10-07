@@ -198,6 +198,50 @@ describe('DungeonSegmenter via ParseRecorder', () => {
     expect(records.find((r) => r.t === 'fight_close')).toMatchObject({ outcome: 'clear' });
   });
 
+  // A HoT still rolling on a topped-off party after the pull ticks as pure
+  // overheal (amount 0, hot). It is logged and its overheal rolls up, but it is
+  // passive: it must not hold the trash segment open or count as active time.
+  test('a fully overhealed HoT tick is recorded but never holds a trash segment open', () => {
+    const sim = fakeSim();
+    seedDungeon(sim);
+    const { recorder, records } = makeRecorder(sim);
+    const overhealTick = (): SimEvent => ({
+      type: 'heal2',
+      sourceId: 6,
+      targetId: 5,
+      amount: 0,
+      overheal: 50,
+      crit: false,
+      ability: 'Renew',
+      abilityId: 'renew',
+      hot: true,
+    });
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 501, 60)]);
+    for (const tick of [40, 80, 110]) {
+      sim.tickCount = tick;
+      recorder.observe([overhealTick()]);
+    }
+    sim.tickCount = 112;
+    recorder.observe([]);
+
+    const close = records.find((r) => r.t === 'fight_close') as Record<string, unknown>;
+    expect(close).toMatchObject({ outcome: 'clear' });
+    const healer = (
+      close.rollup as {
+        perParticipant: Record<string, { healing: number; overheal: number; activeMs: number }>;
+      }
+    ).perParticipant['1006'];
+    expect(healer).toMatchObject({ healing: 0, overheal: 150, activeMs: 0 });
+    const ticks = records.filter(
+      (r) => r.t === 'ev' && (r.ev as { type: string }).type === 'heal2',
+    );
+    expect(ticks).toHaveLength(3);
+  });
+
   test('a boss pull during trash closes the trash segment and opens the boss fight', () => {
     const sim = fakeSim();
     seedDungeon(sim);
