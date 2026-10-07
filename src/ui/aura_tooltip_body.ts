@@ -14,14 +14,22 @@ export function resolvedAuraTooltipBodyHtml(
   effectHtml: (aura: AuraEffectInput & { id?: string }) => string,
 ): string {
   if (!aura.id) return effectHtml(aura);
-  return renderAuraTooltipBodyHtml(aura as AuraEffectInput & { id: string }, {
-    abilityDescription: (id) => {
-      const ability = resolve(id);
-      if (!ability) return null;
-      const scaling = abilityScalingOf(player);
-      return abilityDisplayDescription(ability, abilityEffectText(ability, scaling), scaling, aura);
+  return renderAuraTooltipBodyHtml<AuraEffectInput & { id: string }>(
+    aura as AuraEffectInput & { id: string },
+    {
+      abilityDescription: (id) => {
+        const ability = resolve(id);
+        if (!ability) return null;
+        const scaling = abilityScalingOf(player);
+        return abilityDisplayDescription(
+          ability,
+          abilityEffectText(ability, scaling),
+          scaling,
+          aura,
+        );
+      },
+      effectHtml,
+      escapeHtml: esc,
     },
-    effectHtml,
-    escapeHtml: esc,
-  });
+  );
 }
