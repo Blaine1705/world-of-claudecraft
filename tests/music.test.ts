@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { BossLoopTrack } from '../src/game/boss_music_loop';
 import {
   buildMusicThemes,
   dungeonMusicZoneForDungeon,
@@ -433,8 +434,10 @@ describe('dungeon music entry reset', () => {
     const el = internals(director).zoneStreams.dungeon_hollow_crypt?.el;
     if (!el) throw new Error('dungeon stream element missing');
     el.currentTime = 19;
-    const bossElement = { currentTime: 19 };
-    (director as unknown as { bossElement: typeof bossElement }).bossElement = bossElement;
+    const bossLoop = (director as unknown as { bossLoop: BossLoopTrack }).bossLoop;
+    const bossElement = bossLoop.element();
+    if (!bossElement) throw new Error('boss loop element missing');
+    bossElement.currentTime = 19;
 
     director.resetForDungeonEntry('nythraxis_boss_arena');
 

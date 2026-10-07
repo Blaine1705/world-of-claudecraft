@@ -1917,7 +1917,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 4850 -> 4720: the world quest minigame layer's three director
     // hooks were paid for by moving the note-event primitives (the Inst union,
     // NoteEvent/Theme, and the push* composition helpers) to music_notes.ts.
-    ceiling: 4720,
+    // Lowered 4720 -> 4672: the boss-fight loop's asset handling moved to
+    // src/game/boss_music_loop.ts with the per-boss fight tracks.
+    ceiling: 4672,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
