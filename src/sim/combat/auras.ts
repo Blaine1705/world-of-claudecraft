@@ -421,7 +421,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               const intended = Math.round(tickDamage * a.leechPct * ctx.healingTakenMult(src));
               const landing = consumeHealAbsorb(ctx, src, intended);
               const absorbed = intended - landing;
-              const healed = Math.min(landing, src.maxHp - src.hp);
+              const healed = Math.min(landing, Math.max(0, src.maxHp - src.hp));
               onCraftedCollectionHeal(ctx, src, src, landing - healed);
               const overheal = landing - healed;
               if (healed > 0 || absorbed > 0 || overheal > 0) {
@@ -459,7 +459,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           const intended = Math.round(a.value * ctx.healingTakenMult(e));
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;
-          const healed = Math.min(landing, e.maxHp - e.hp);
+          const healed = Math.min(landing, Math.max(0, e.maxHp - e.hp));
           const healer = ctx.entities.get(a.sourceId);
           if (healer) onCraftedCollectionHeal(ctx, healer, e, landing - healed);
           const overheal = landing - healed;

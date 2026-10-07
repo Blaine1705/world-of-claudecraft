@@ -124,8 +124,9 @@ never fans a whole snapshot into the shipper on the world-loop thread.
   sourceId/abilityId/stacks; the many scattered FADE emit sites elsewhere in
   the sim are not yet widened, so fades enrich only via the best-effort
   state-join fallback in `recorder.ts`.
-- Overheal: a periodic tick that fully overheals emits heal2 with amount 0 and
-  `hot: true`. `routeHeal2` logs it and rolls its overheal up to a healer who
+- Overheal: a HoT or DoT-leech tick that fully overheals emits heal2 with
+  amount 0 and `hot: true` (Temporal Hourglass, Demon Heal, and Drain Life
+  ticks still emit nothing in that case, so they still undercount). `routeHeal2` logs it and rolls its overheal up to a healer who
   is already a participant, but treats it as passive: it enrolls nobody, never
   refreshes `lastRoutedTick`, and adds no active time, so a HoT rolling on a
   topped-off party never holds a trash segment open. A healer whose only
