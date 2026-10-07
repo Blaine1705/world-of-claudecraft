@@ -22957,6 +22957,7 @@
   }
   .weekly-choice-status {
     font-size: 13px;
+    margin: 0;
   }
   .weekly-tracks {
     display: flex;
@@ -23185,6 +23186,10 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-sm);
+  }
+  .weekly-vault-toolbar .weekly-choice-status {
+    flex: 999 1 260px;
+    min-width: min(100%, 220px);
   }
   .weekly-loot-focus {
     display: flex;
@@ -24440,15 +24445,28 @@
     .weekly-reset strong {
       font-size: 16px;
     }
-    /* The loot button rides in flow at the right end of the status line's row
-       (the status pulls up by the button's 30px plus the panel gap; its 165px
-       right padding keeps the text clear), so it scrolls with the panel and
-       follows a header that wraps taller at a high UI scale. Lifted above the
-       status so the status box never swallows its clicks. */
+    /* The loot controls and status share one flex row, so the button scrolls
+       with the panel and follows a header that wraps taller at high UI scale.
+       Lifted above the status text so the row never swallows its clicks. */
     .weekly-vault-toolbar {
       position: relative;
       z-index: 2;
-      align-self: flex-end;
+      align-self: stretch;
+      justify-content: flex-end;
+    }
+    .weekly-vault-toolbar .weekly-choice-status {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      box-sizing: border-box;
+      padding-right: min(56%, 560px);
+      min-height: 48px;
+      pointer-events: none;
+    }
+    .weekly-vault-toolbar .weekly-loot-focus {
+      flex: 0 1 430px;
+      margin-left: auto;
     }
     .weekly-possible-loot-button {
       min-height: 30px;
@@ -24459,9 +24477,6 @@
       padding: 3px 0;
       font-size: 12px;
       min-height: 30px;
-    }
-    .weekly-possible-loot[hidden] + .weekly-choice-status {
-      margin-top: -36px;
     }
     .weekly-saved-rewards {
       flex: none;

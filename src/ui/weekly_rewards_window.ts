@@ -132,11 +132,6 @@ export class WeeklyRewardsTab {
       if (allPools.hidden) this.expanded.delete('all-loot');
       else this.expanded.add('all-loot');
     });
-    const toolbar = document.createElement('div');
-    toolbar.className = 'weekly-vault-toolbar';
-    appendWeeklyLootFocus(toolbar, world);
-    toolbar.appendChild(lootButton);
-    panel.append(toolbar, allPools);
     const status = document.createElement('p');
     status.className = 'weekly-choice-status';
     status.tabIndex = -1;
@@ -146,7 +141,12 @@ export class WeeklyRewardsTab {
       info.readyWeeks ? 'hudChrome.weeklyRewards.readyWeeks' : 'hudChrome.weeklyRewards.waiting',
       { count: formatNumber(info.readyWeeks) },
     );
-    panel.appendChild(status);
+    const toolbar = document.createElement('div');
+    toolbar.className = 'weekly-vault-toolbar';
+    toolbar.appendChild(status);
+    appendWeeklyLootFocus(toolbar, world);
+    toolbar.appendChild(lootButton);
+    panel.append(toolbar, allPools);
     if (info.state.overflowed || info.readyWeeks >= WEEKLY_BACKLOG_LIMIT) {
       const warning = document.createElement('p');
       warning.textContent = t('hudChrome.weeklyRewards.backlogFull');
