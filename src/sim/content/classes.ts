@@ -4163,7 +4163,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.3, duration: 1800 }],
     description:
-      "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).",
+      "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 2 sec (each hit refreshes the daze).",
   },
   pack_rally: {
     id: 'pack_rally',
@@ -4278,14 +4278,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 4,
     cost: 0,
     castTime: 0,
-    cooldown: 15,
+    cooldown: 20,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'hunterTrailbreak', distance: 12 }],
+    effects: [{ type: 'hunterTrailbreak', distance: 25 }],
     description:
-      'Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
+      'Leap 25 yards backward and break free of roots and movement slows. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
   },
   wildheart: {
     id: 'wildheart',
