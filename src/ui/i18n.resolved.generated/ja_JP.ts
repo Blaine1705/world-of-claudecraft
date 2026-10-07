@@ -3928,7 +3928,7 @@ export const ja_JP: EnTranslations = {
         "brineColumn": "海水の柱に捕らわれ、{tick}秒ごとに{min}～{max}の自然ダメージを最大{seconds}秒間受ける。潮縛りの侍祭を妨害するかスタンさせれば抜け出せる。",
         "halberdWall": "{radius}ヤード以内に別の溺れた見張り番がいる間、受けるダメージが{pct}%減少する。引き離せ。",
         "fogShroud": "霧の帳の中にいる間、受けるダメージが{pct}%減少する。霧の外へ引きずり出せ。",
-        "carrionGlut": "死者を貪った（{stacks}/{max}）：スタックごとに塩水の破裂が{radius}ヤード広がり、{pct}%強くなる。",
+        "carrionGlut": "死者を貪った（{stacks}/{max}）：スタックごとに魂の解放の範囲が{radius}ヤード広がり、ダメージが{pct}%増加する。",
         "snappedFetters": "鎖が断ち切られた。もう戦わず、傷つけられず、まもなく去っていく。",
         "anchored": "溺死の錨に繋がれている：動くことはできるが巻き上げ機から離れることはできず、溺死の穴へと巻き寄せられる。引っ掛けられた場所から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入れば鎖を係留できる（その柱は{dark}秒間消える）、または仲間が{links}回の攻撃で鎖を断つ（ヒロイックは{linksHeroic}回）。穴に落ちると最大体力の{pit}%を失う（ヒロイックは{pitHeroic}%）。"
       },
@@ -12647,6 +12647,9 @@ export const ja_JP: EnTranslations = {
       "bastion_piercing_bolt": "貫通の矢",
       "bastion_claw_sweep": "爪の薙ぎ払い",
       "bastion_shell_slam": "甲羅叩きつけ",
+      "ghost_captain_broadside": "幽霊船の一斉砲撃",
+      "ghost_captain_anchor": "呪いの錨",
+      "ghost_captain_boarding": "幻影の斬り込み",
       "bastion_boathook": "鉤竿引き",
       "bastion_fog_bank": "霧の帳",
       "bastion_brine_column": "塩水の柱",
@@ -20335,7 +20338,7 @@ export const ja_JP: EnTranslations = {
         "name": "霧縛りの弩兵"
       },
       "barnacle_crawler": {
-        "name": "フジツボガニ"
+        "name": "難破船に縛られた船員"
       },
       "bastion_warhound": {
         "name": "砦の軍用犬"
@@ -20353,7 +20356,7 @@ export const ja_JP: EnTranslations = {
         "name": "牢の鍵番"
       },
       "turretback_hermit": {
-        "name": "塔背負いのヤドカリ"
+        "name": "難破船の船長"
       },
       "vael_fog_shade": {
         "name": "フォグバインダーのヴァエル"

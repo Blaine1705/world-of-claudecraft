@@ -6,7 +6,7 @@
 //    slack when it caught nobody.
 //  - Halberd Wall (heroic): the linked ward two watchmen side by side share.
 //  - Fall Back (Fogbound Arbalest): the push-off, the spray trail, the landing.
-//  - Carrion Glut (Barnacle Crawler): the body swelling with every stack.
+//  - Soul Hunger (Wreckbound Sailor): the soul swelling with every stack.
 //  - Pack Frenzy (Bastion Warhound): the howl and the sea light in its eyes.
 //  - Fog Bank (Mist Chanter): the fog patch on the floor and the shroud on the
 //    allies standing in it.
@@ -248,17 +248,16 @@ export function fallBackSeconds(): number {
 /** Seconds between two spray bursts along the leap's trail. */
 export const FALL_TRAIL_INTERVAL = 0.035;
 
-// ---------------------------------------------------------------- Carrion Glut
+// ---------------------------------------------------------------- Soul Hunger
 
-/** The crawler GLB's bind-pose height (model units; the accessor bounds of
- *  public/models/creatures/bastion_crawler.glb). */
-export const CRAWLER_RAW_HEIGHT = 3.11;
-/** The three brine sacs grown into its crust (crawler.py `sacs`, the head at
- *  the model's -Y: side = x, up = z, fwd = -y). */
-export const CRAWLER_SACS: readonly ModelPoint[] = [
-  { side: 0, up: 2.62, fwd: -0.75 },
-  { side: 0.8, up: 2.45, fwd: -0.05 },
-  { side: -0.8, up: 2.45, fwd: -0.05 },
+/** Wreckbound Sailor's measured Idle height in model units. The stable mob
+ *  id remains barnacle_crawler, but its authored model is a naval spirit. */
+export const CRAWLER_RAW_HEIGHT = 4.131697;
+/** Soul lights at the sailor's chest and ribs (glTF model coordinates). */
+export const CRAWLER_SOUL_ANCHORS: readonly ModelPoint[] = [
+  { side: 0, up: 3.1, fwd: 0.42 },
+  { side: 0.24, up: 2.85, fwd: 0.38 },
+  { side: -0.24, up: 2.85, fwd: 0.38 },
 ];
 /** How much bigger the body draws per stack fed (three stacks, about a fifth). */
 export const GLUT_SWELL_PER_STACK = 0.07;
@@ -287,7 +286,7 @@ export function glutSwell(stacks: number, sinceGulp: number): number {
   return base + GLUT_GULP * Math.sin(Math.PI * Math.min(1, u * 1.6)) * (1 - u);
 }
 
-/** How bright the sacs burn at `stacks` (0 dim, 1 at full glut). */
+/** How bright the soul lights burn at `stacks` (0 dim, 1 at full hunger). */
 export function glutGlow(stacks: number): number {
   return Math.max(0, Math.min(1, stacks / GLUT_MAX_STACKS));
 }

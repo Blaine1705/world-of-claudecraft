@@ -1,7 +1,7 @@
 // The Sunken Bastion trash (src/sim/content/sunken_bastion.ts) on the trash
 // kit's support and lane casts (src/sim/mob/trash_kit/support.ts): Brine Mend,
 // Fog Ward, the Piercing Bolt lane, the Warhound's Lunge stun, and the
-// Turretback Hermit's Shell Slam, Barnacle Brood and Withdraw. Driven through
+// Shipwreck Captain's summoned crew. Driven through
 // tickTrashKits inside a real claimed Bastion (the crypt kit test's shape).
 
 import { describe, expect, it } from 'vitest';
@@ -14,18 +14,12 @@ import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
 import { tickTrashKits } from '../src/sim/mob/trash_kit';
 import {
   BASTION_BRINE_MEND,
-  BASTION_CLAW_SWEEP,
   BASTION_FOG_WARD,
   BASTION_HALBERD_SWEEP,
   BASTION_PIERCING_BOLT,
-  BASTION_SHELL_SLAM,
 } from '../src/sim/mob/trash_kit/bastion_cast_ids';
 import { inLane, laneSide } from '../src/sim/mob/trash_kit/lane';
-import {
-  TRASH_WARD_AURA,
-  TRASH_WITHDRAW_AURA,
-  TRASH_WITHDRAW_WARD,
-} from '../src/sim/mob/trash_kit/support';
+import { TRASH_WARD_AURA } from '../src/sim/mob/trash_kit/support';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
@@ -96,12 +90,7 @@ describe('Bastion trash: the cast table', () => {
   it('kicks the heal and the shield, never the sweeps, the slam or the lane', () => {
     expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[BASTION_BRINE_MEND]?.school).toBe('nature');
     expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[BASTION_FOG_WARD]?.school).toBe('frost');
-    for (const id of [
-      BASTION_HALBERD_SWEEP,
-      BASTION_PIERCING_BOLT,
-      BASTION_CLAW_SWEEP,
-      BASTION_SHELL_SLAM,
-    ])
+    for (const id of [BASTION_HALBERD_SWEEP, BASTION_PIERCING_BOLT])
       expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[id], id).toBeUndefined();
   });
 
@@ -112,7 +101,7 @@ describe('Bastion trash: the cast table', () => {
     expect(MOBS.fogbound_arbalest.trashKit?.line?.castId).toBe(BASTION_PIERCING_BOLT);
     // The trash mechanics pass moved Brine Burst onto the kit's death burst
     // (it grows with Carrion Glut: tests/sunken_bastion_trash_mechanics.test.ts).
-    expect(MOBS.barnacle_crawler.trashKit?.deathBurst?.name).toBe('Brine Burst');
+    expect(MOBS.barnacle_crawler.trashKit?.deathBurst?.name).toBe('Soul Release');
     expect(MOBS.barnacle_crawler.deathThroes).toBeUndefined();
     expect(MOBS.bastion_warhound.trashKit?.leap?.stun).toBe(1);
     expect(MOBS.mistweaver.trashKit?.ward?.castId).toBe(BASTION_FOG_WARD);
@@ -124,9 +113,9 @@ describe('Bastion trash: the cast table', () => {
       atHpPct: [0.5],
     });
     const hermit = MOBS.turretback_hermit;
-    expect(hermit.breathCone?.castId).toBe(BASTION_CLAW_SWEEP);
-    expect(hermit.trashKit?.wingGust?.castId).toBe(BASTION_SHELL_SLAM);
-    expect(hermit.trashKit?.withdraw?.belowHpPct).toBe(0.25);
+    expect(hermit.breathCone).toBeUndefined();
+    expect(hermit.trashKit?.wingGust).toBeUndefined();
+    expect(hermit.trashKit?.withdraw).toBeUndefined();
     expect(hermit.summonAdds?.atHpPct).toEqual([0.6, 0.3]);
     expect(hermit.ccImmune).toBe(true);
   });
@@ -289,46 +278,10 @@ describe('Bastion trash: Bastion Warhound, Lunge', () => {
   });
 });
 
-describe('Bastion trash: the Turretback Hermit', () => {
-  it('Shell Slam hits and throws back everyone close, and only them', () => {
-    const r = room();
-    const hermit = engage(r, 'turretback_hermit', 4, 0);
-    const far = addPlayer(r, 'priest', 24, 0);
-    const def = MOBS.turretback_hermit.trashKit?.wingGust;
-    if (!def) throw new Error('slam');
-    const start = { ...r.me.pos };
-    const meBefore = r.me.hp;
-    run(r, def.first + def.castTime + DT * 2, [hermit]);
-    expect(r.me.hp).toBeLessThan(meBefore);
-    expect(Math.hypot(r.me.pos.x - start.x, r.me.pos.z - start.z)).toBeGreaterThan(1);
-    expect(far.hp).toBe(far.maxHp);
-  });
-
-  it('withdraws into its tower once, under a quarter: no casts, far less damage', () => {
-    const r = room();
-    const hermit = engage(r, 'turretback_hermit', 4, 0);
-    run(r, 1, [hermit]);
-    hermit.hp = Math.round(hermit.maxHp * 0.24);
-    run(r, DT, [hermit]);
-    const shelter = hermit.auras.find((a) => a.id === TRASH_WITHDRAW_AURA);
-    const ward = hermit.auras.find((a) => a.id === TRASH_WITHDRAW_WARD);
-    expect(shelter?.kind).toBe('stun');
-    expect(ward?.kind).toBe('shield_wall');
-    expect(ward?.value).toBe(0.6);
-    expect(hermit.castingAbility).toBeNull();
-    // Damage through the ward is cut.
-    const hp = hermit.hp;
-    r.sim.dealDamage(r.me, hermit, 100, false, 'physical', 'Strike', 'hit', true);
-    expect(hp - hermit.hp).toBe(40);
-    // It never withdraws twice in one pull.
-    for (const a of hermit.auras) if (a.id === TRASH_WITHDRAW_AURA) a.remaining = 0;
-    hermit.auras = hermit.auras.filter((a) => a.id !== TRASH_WITHDRAW_AURA);
-    hermit.hp = Math.round(hermit.maxHp * 0.1);
-    run(r, DT * 2, [hermit]);
-    expect(hermit.auras.some((a) => a.id === TRASH_WITHDRAW_AURA)).toBe(false);
-  });
-
-  it('drops a Barnacle Brood at 60 and 30 percent', () => {
+describe("Bastion trash: the Shipwreck Captain's crew", () => {
+  // Captain mechanics, damage geometry and lifecycle are covered by
+  // sunken_bastion_ghost_captain.test.ts through real Sim ticks.
+  it('summons its spectral crew at 60 and 30 percent', () => {
     const r = room();
     const hermit = engage(r, 'turretback_hermit', 4, 0);
     const crawlers = () =>

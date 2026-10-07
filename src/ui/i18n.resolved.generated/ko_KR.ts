@@ -3928,7 +3928,7 @@ export const ko_KR: EnTranslations = {
         "brineColumn": "바닷물 기둥에 갇혔습니다: {tick}초마다 {min}~{max}의 자연 피해를 최대 {seconds}초 동안 받습니다. 조수결속 수행사제를 차단하거나 기절시키면 풀려납니다.",
         "halberdWall": "다른 익사한 파수꾼이 {radius}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 둘을 떼어 놓으세요.",
         "fogShroud": "안개 장막 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 안개 밖으로 끌어내세요.",
-        "carrionGlut": "시체를 먹었습니다({stacks}/{max}): 중첩마다 소금물 폭발 범위가 {radius}야드 넓어지고 {pct}% 강해집니다.",
+        "carrionGlut": "죽은 자를 흡수했습니다({stacks}/{max}중첩). 중첩마다 영혼 방출의 범위가 {radius}야드 넓어지고 피해가 {pct}% 증가합니다.",
         "snappedFetters": "사슬이 끊어졌습니다. 더 이상 싸우지 않고, 피해를 입지 않으며, 곧 떠납니다.",
         "anchored": "익사의 닻에 묶임: 움직일 수는 있지만 권양기에서 더 멀어질 수는 없으며, 익사의 구덩이로 감겨 갑니다. 걸린 곳에서 {run}야드 이상 떨어진 불 켜진 계류 기둥 {reach}야드 이내로 가면 사슬을 묶을 수 있습니다(그 기둥은 {dark}초 동안 꺼집니다). 아니면 파티가 {links}번 공격해 사슬을 끊어야 합니다(영웅은 {linksHeroic}번). 구덩이에 빠지면 최대 생명력의 {pit}%를 잃습니다(영웅은 {pitHeroic}%)."
       },
@@ -12647,6 +12647,9 @@ export const ko_KR: EnTranslations = {
       "bastion_piercing_bolt": "관통 화살",
       "bastion_claw_sweep": "집게 휩쓸기",
       "bastion_shell_slam": "껍질 내려찍기",
+      "ghost_captain_broadside": "유령선 일제 포격",
+      "ghost_captain_anchor": "저주받은 닻",
+      "ghost_captain_boarding": "환영의 승선",
       "bastion_boathook": "갈고리 끌기",
       "bastion_fog_bank": "안개 장막",
       "bastion_brine_column": "소금물 기둥",
@@ -20335,7 +20338,7 @@ export const ko_KR: EnTranslations = {
         "name": "안개에 묶인 쇠뇌병"
       },
       "barnacle_crawler": {
-        "name": "따개비 게"
+        "name": "난파선에 묶인 선원"
       },
       "bastion_warhound": {
         "name": "요새 전투견"
@@ -20353,7 +20356,7 @@ export const ko_KR: EnTranslations = {
         "name": "감옥 열쇠지기"
       },
       "turretback_hermit": {
-        "name": "탑을 진 소라게"
+        "name": "난파선 선장"
       },
       "vael_fog_shade": {
         "name": "안개엮는자 바엘"

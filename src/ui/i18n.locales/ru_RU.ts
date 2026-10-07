@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.cast.ghost_captain_boarding': 'Призрачный абордаж',
+  'abilityUi.cast.ghost_captain_anchor': 'Проклятый якорь',
+  'abilityUi.cast.ghost_captain_broadside': 'Призрачный бортовой залп',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -5813,13 +5816,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vael_the_mistcaller.name': 'Ваэль Вязатель Тумана',
   'entities.mobs.drowned_watchman.name': 'Утонувший дозорный',
   'entities.mobs.fogbound_arbalest.name': 'Скованный туманом арбалетчик',
-  'entities.mobs.barnacle_crawler.name': 'Ракушечный краб',
+  'entities.mobs.barnacle_crawler.name': 'Матрос, связанный с остовом',
   'entities.mobs.bastion_warhound.name': 'Боевой пёс бастиона',
   'entities.mobs.mistweaver.name': 'Певчий тумана',
   'entities.mobs.drowned_sergeant.name': 'Утонувший сержант',
   'entities.mobs.shackled_prisoner.name': 'Закованный узник',
   'entities.mobs.gaol_turnkey.name': 'Тюремный ключник',
-  'entities.mobs.turretback_hermit.name': 'Башнеспинный отшельник',
+  'entities.mobs.turretback_hermit.name': 'Капитан затонувшего корабля',
   'entities.mobs.vael_fog_shade.name': 'Ваэль Вязатель Тумана',
   'entities.mobs.gaoler_ossick.name': 'Тюремщик Оссик',
   'entities.mobs.lagoon_snapper.name': 'Лагунная кусачая черепаха',
@@ -20277,7 +20280,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.bastion.fogShroud':
     'Получает на {pct}% меньше урона, пока стоит в полосе тумана. Вытащите его из тумана.',
   'hudChrome.auraEffect.bastion.carrionGlut':
-    'Насытился мертвецами ({stacks} из {max}): каждый заряд делает его взрыв рассола на {radius} ярд. шире и на {pct}% сильнее.',
+    'Поглотил мертвецов ({stacks} из {max}): каждый заряд увеличивает радиус высвобождения душ на {radius} ярд. и урон на {pct}%.',
   'hudChrome.auraEffect.bastion.snappedFetters':
     'Его цепи разорваны. Он больше не сражается, неуязвим и скоро уйдёт.',
   'hudChrome.auraEffect.crypt.carrionEye':

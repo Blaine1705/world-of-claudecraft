@@ -56,6 +56,11 @@ import {
 } from '../../sim/encounters/hollow_crypt/marrow_ids';
 import { MORTHEN_REAP, MORTHEN_RITE } from '../../sim/encounters/hollow_crypt/morthen_ids';
 import {
+  GHOST_CAPTAIN_ANCHOR,
+  GHOST_CAPTAIN_BOARDING,
+  GHOST_CAPTAIN_BROADSIDE,
+} from '../../sim/encounters/sunken_bastion/ghost_captain_ids';
+import {
   OLEN_HALLOWED_BRINE,
   OLEN_OATH_KNEEL,
   OLEN_OATH_VIGIL,
@@ -90,12 +95,10 @@ import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import {
   BASTION_BOATHOOK,
   BASTION_BRINE_MEND,
-  BASTION_CLAW_SWEEP,
   BASTION_FOG_WARD,
   BASTION_HALBERD_SWEEP,
   BASTION_LOOSE_ON_MY_MARK,
   BASTION_PIERCING_BOLT,
-  BASTION_SHELL_SLAM,
   BASTION_SNAPPED_FETTERS,
 } from '../../sim/mob/trash_kit/bastion_cast_ids';
 import {
@@ -4761,18 +4764,12 @@ export const VISUALS: Record<string, VisualDef> = {
     clickRadius: 2.2,
   },
 
-  // The Bastion's beasts and gaol bodies, scaled well past the player.
-  // The Barnacle Crawler: a barnacled rock crab with a face (stalked amber
-  // eyes, hooked mandibles round a toothed maw) and three brine sacs in its
-  // crust. Its Death swells the sacs and BURSTS them at 1.5 s, on the Brine
-  // Burst's own fuse; Attack2 is its lunge bite.
-  // The Barnacle Crawler, toned down for the Bastion's fog: a wet stone-grey
-  // carapace crusted with pale barnacles, dull red-brown legs, small dark eyes
-  // with a pinpoint of sea light; its brine sacs stay the brightest thing on it
-  // (they swell before it bursts).
+  // The Wreckbound Sailor keeps the stable crawler visual key. Custom Blender
+  // sculpt, ragged naval clothes and a spectral wake; no crab geometry remains.
   bastion_crawler: {
-    url: `${CREATURES}/bastion_crawler.glb`,
-    height: 3.2,
+    url: `${CREATURES}/bastion_ghost_sailor.glb`,
+    height: 2.8,
+    hover: 0.2,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4782,7 +4779,9 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Death',
       cast: 'Cast',
     },
-    selfIllumination: 0.12,
+    authoredAtlas: true,
+    selfIllumination: 0.2,
+    deathTimeScale: 1,
   },
   // The Bastion Warhound: one of the garrison's war mastiffs, drowned with its
   // handlers and risen with them (scripts/assets/sunken_bastion_drowned/
@@ -4915,14 +4914,12 @@ export const VISUALS: Record<string, VisualDef> = {
     clickRadius: 1.8,
   },
 
-  // The Turretback Hermit, the Bastion's showpiece (scripts/assets/
-  // sunken_bastion_creatures/build_creature.py): a colossal hermit crab
-  // wearing a fallen watchtower turret, the tower swaying on its back. Its
-  // casts play their own clips: the great claw drawn back and raked across
-  // its front (Claw Sweep), and the rear-and-slam of the tower (Shell Slam).
+  // Shipwreck Captain: authored naval apparition, with gestures timed to the
+  // authoritative encounter bars. Stable key preserves existing consumers.
   mob_turretback: {
-    url: `${CREATURES}/turretback_hermit.glb`,
-    height: 15,
+    url: `${CREATURES}/bastion_ghost_captain.glb`,
+    height: 7.5,
+    hover: 0.3,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -4931,10 +4928,21 @@ export const VISUALS: Record<string, VisualDef> = {
       hit: ['Hit'],
       death: 'Death',
       cast: 'Cast',
-      castByAbility: { [BASTION_CLAW_SWEEP]: 'ClawSweep', [BASTION_SHELL_SLAM]: 'ShellSlam' },
-      castTimeScaleByAbility: { [BASTION_CLAW_SWEEP]: 1, [BASTION_SHELL_SLAM]: 1 },
+      castByAbility: {
+        [GHOST_CAPTAIN_BROADSIDE]: 'Broadside',
+        [GHOST_CAPTAIN_ANCHOR]: 'Anchor',
+        [GHOST_CAPTAIN_BOARDING]: 'Boarding',
+      },
+      castTimeScaleByAbility: {
+        [GHOST_CAPTAIN_BROADSIDE]: 1,
+        [GHOST_CAPTAIN_ANCHOR]: 1,
+        [GHOST_CAPTAIN_BOARDING]: 1,
+      },
     },
-    selfIllumination: 0.12,
+    authoredAtlas: true,
+    selfIllumination: 0.2,
+    deathTimeScale: 1,
+    clickRadius: 2.25,
   },
 
   // -- the Drowned Temple (sim/content/drowned_temple.ts, temple.ts) ----------

@@ -4958,18 +4958,30 @@ export interface VaelIntroState {
   t: number;
 }
 
-/** The Turretback Hermit's pull, watched for the Eviction Notice deed. */
-export interface HermitFightState {
-  kind: 'hermit';
-  /** It pulled into its tower this pull. */
-  withdrew: boolean;
+/** Captain state is server-only; lane objects and cast bars carry its public tells. */
+export interface GhostCaptainFightState {
+  kind: 'ghostCaptain';
+  next: number;
+  timer: number;
+  struck: boolean;
+  action: {
+    move: 'broadside' | 'anchor' | 'boarding';
+    stage: 'warning' | 'active';
+    elapsed: number;
+    seconds: number;
+    x: number;
+    z: number;
+    yaw: number;
+    objects: number[];
+    hit: number[];
+  } | null;
 }
 
 export type BastionFightState =
   | OlenFightState
   | OssickFightState
   | VaelFightState
-  | HermitFightState
+  | GhostCaptainFightState
   | TurnkeyFightState
   | GaolCageState;
 

@@ -7,8 +7,8 @@
 
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import type { Entity } from '../../types';
-import { bastionClaims, bossEngaged, claimBoss, grantClaimDeed } from './claim';
+import { bastionClaims, bossEngaged, claimBoss } from './claim';
+import { tickGhostCaptain } from './ghost_captain';
 import { OLEN_ID, OSSICK_ID, TURNKEY_ID, TURRETBACK_ID, VAEL_ID } from './ids';
 import { beginOath, startOlenBar, tickOlen } from './olen';
 import { startDrownedAnchor, startShacklePair, tickOssick } from './ossick';
@@ -18,6 +18,8 @@ import { buryVael, finishVaelIntro } from './vael_intro';
 import { startVeilGather } from './vael_veil_gather';
 
 export { pickMarkTargets } from './claim';
+export { startGhostCaptainMove, TURRETBACK_DEED } from './ghost_captain';
+export * from './ghost_captain_ids';
 export * from './ids';
 export { OLEN_DEED, OLEN_VIGIL_MAX } from './olen';
 export { cagedBy, tryCageStruggle } from './turnkey';
@@ -37,31 +39,9 @@ export function tickBastionEncounters(ctx: SimContext): void {
     if (ossick) tickOssick(ctx, inst, ossick, bossEngaged(ossick));
     const vael = claimBoss(ctx, inst, VAEL_ID);
     if (vael) tickVael(ctx, inst, vael, bossEngaged(vael));
-    const hermit = claimBoss(ctx, inst, TURRETBACK_ID);
-    if (hermit) watchHermit(ctx, inst, hermit);
+    const captain = claimBoss(ctx, inst, TURRETBACK_ID);
+    if (captain) tickGhostCaptain(ctx, inst, captain, bossEngaged(captain));
   }
-}
-
-export const TURRETBACK_DEED = 'dgn_turretback';
-
-/** The Turretback Hermit: note a withdraw this pull; slain without one, the
- *  Eviction Notice deed goes to the claim. */
-function watchHermit(ctx: SimContext, inst: InstanceSlot, hermit: Entity): void {
-  const st = hermit.bastionFight?.kind === 'hermit' ? hermit.bastionFight : null;
-  if (hermit.dead) {
-    if (st) {
-      if (!st.withdrew) grantClaimDeed(ctx, inst, TURRETBACK_DEED);
-      hermit.bastionFight = undefined;
-    }
-    return;
-  }
-  if (!bossEngaged(hermit)) {
-    if (st) hermit.bastionFight = undefined;
-    return;
-  }
-  const withdrew = hermit.trashKit?.withdrawn === true;
-  if (!st) hermit.bastionFight = { kind: 'hermit', withdrew };
-  else if (withdrew) st.withdrew = true;
 }
 
 /** `/dev bastion trigger <brine|bulwark|sentence|oath|cage|anchor|shackle|veil|

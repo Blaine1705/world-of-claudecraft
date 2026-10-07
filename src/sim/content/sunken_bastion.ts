@@ -1,5 +1,5 @@
 // The Sunken Bastion rework (docs/design/dungeon-rework/sunken_bastion.md): the
-// new trash, the Turretback Hermit and Gaoler Ossick, the packs placed on the
+// new trash, the Shipwreck Captain and Gaoler Ossick, the packs placed on the
 // open-air sea fortress (sunken_bastion_layout.ts), the patrols, and the gates
 // and encounter seals that make every pack mandatory. The shipped Bastion
 // templates (Bastion Revenant, Tidebound Acolyte, Drowned Thrall,
@@ -14,7 +14,7 @@
 //   Tidebound Acolyte   Brine Mend: an interruptible heal on a hurt ally. Kick it.
 //   Drowned Watchman    Halberd Sweep: a telegraphed frontal. Step out.
 //   Fogbound Arbalest   Piercing Bolt: a lane shot at one player. Step aside.
-//   Barnacle Crawler    Brine Burst: bursts where it dies. Move off the corpse.
+//   Wreckbound Sailor   Soul Release: bursts where it dies. Move off the corpse.
 //   Bastion Warhound    Lunge: leaps onto the farthest caster and stuns them.
 //   Mistweaver          Fog Ward: an interruptible shield on an ally. Kick it.
 //   Drowned Sergeant    Rally the Watch (haste to its pack), enrages when low.
@@ -28,7 +28,7 @@
 //                       Heroic Halberd Wall: two side by side take less damage.
 //   Fogbound Arbalest   Fall Back: leaps back from a melee; a stun, root or
 //                       slow holds it.
-//   Barnacle Crawler    Carrion Glut: feeds beside a corpse; its Brine Burst
+//   Wreckbound Sailor   Soul Hunger: gathers beside a corpse; its Soul Release
 //                       grows with every stack. Kill it early, or pull it off.
 //   Bastion Warhound    Pack Frenzy: a fallen hound quickens the hounds round
 //                       it. Bring them down together.
@@ -56,13 +56,11 @@ import {
   BASTION_BRINE_BURST,
   BASTION_BRINE_COLUMN,
   BASTION_BRINE_MEND,
-  BASTION_CLAW_SWEEP,
   BASTION_FOG_BANK,
   BASTION_FOG_WARD,
   BASTION_HALBERD_SWEEP,
   BASTION_LOOSE_ON_MY_MARK,
   BASTION_PIERCING_BOLT,
-  BASTION_SHELL_SLAM,
 } from '../mob/trash_kit/bastion_cast_ids';
 import type {
   DungeonGateDef,
@@ -230,14 +228,14 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
   },
   barnacle_crawler: {
     id: 'barnacle_crawler',
-    name: 'Barnacle Crawler',
+    name: 'Wreckbound Sailor',
     minLevel: 11,
     maxLevel: 11,
-    family: 'beast',
+    family: 'undead',
     hpBase: 40,
     hpPerLevel: 10,
-    // Priced so ONE template serves both roles on heroic: a pack crawler at the
-    // 18x trash line clears the 500 floor, the Hermit's summoned crawler at the
+    // Priced so ONE template serves both roles on heroic: a pack sailor at the
+    // 18x trash line clears the 500 floor, the Captain's summoned sailor at the
     // 9.75x add line stays between the 150 add floor and 500. Normal damps it
     // back to its fodder swing (dungeon_difficulty.ts, the normal row).
     dmgBase: 14.5,
@@ -248,30 +246,30 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 10,
     untameable: true,
     trashKit: {
-      // Burst where it dies: move off the shell before the brine goes up. A
+      // Burst where it dies: move off the spirit before its soul erupts. A
       // ring object paints the floor at the radius it bursts with (the trash
-      // kit's death burst), so a fed crawler's bigger ring shows.
+      // kit's death burst), so an empowered sailor's bigger ring shows.
       deathBurst: {
         castId: BASTION_BRINE_BURST,
-        name: 'Brine Burst',
+        name: 'Soul Release',
         delay: 1.5,
         radius: 4,
         min: 30,
         max: 40,
         school: 'frost',
-        // Carrion Glut: each stack 1.25 yards wider and 25 percent harder;
+        // Soul Hunger: each stack 1.25 yards wider and 25 percent harder;
         // three stacks burst 7.75 yards for 1.75 times the roll. Math, landed
         // raw: normal 30 to 40 (7 to 9 percent of a level 13 cloth wearer's
         // 430), fully fed 53 to 70 (12 to 16 percent). Heroic x8 (the
-        // crawler's mechanic factor, newly reached now that the burst rides
+        // sailor's mechanic factor, newly reached now that the burst rides
         // the trash kit): 240 to 320 (19 to 26 percent of ~1,250), fully fed
         // 420 to 560 (34 to 45 percent; at 40 percent a stack it was 528 to
         // 704, past the 40 percent missed-dodge line).
         perStack: { radius: 1.25, damage: 0.25 },
       },
-      // Carrion Glut: within 3 yards of a corpse it feeds, a stack every 3 s
+      // Soul Hunger: within 3 yards of a corpse it gathers souls, a stack every 3 s
       // up to three. Kill it early, or keep the fight off the dead.
-      gorge: { name: 'Carrion Glut', every: 3, reach: 3, maxStacks: 3 },
+      gorge: { name: 'Soul Hunger', every: 3, reach: 3, maxStacks: 3 },
     },
     loot: [{ copper: 30, chance: 1 }],
     scale: 1.2,
@@ -441,7 +439,7 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     family: 'undead',
     hpBase: 30,
     hpPerLevel: 9,
-    // Same two-role pricing as the Barnacle Crawler (pack prisoner and the
+    // Same two-role pricing as the Wreckbound Sailor (pack prisoner and the
     // Turnkey's released prisoners share the template).
     dmgBase: 11.6,
     dmgPerLevel: 3.77,
@@ -550,14 +548,14 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     scale: 1,
     color: 0x4a5250,
   },
-  // The showpiece: a colossal hermit crab that took a fallen watchtower turret
-  // for its shell and walks the moat ring round the Drowned Chapel.
+  // The haunted captain patrols the moat. Stable id preserves existing rewards.
+  // Mechanics live in encounters/sunken_bastion/ghost_captain.ts.
   turretback_hermit: {
     id: 'turretback_hermit',
-    name: 'The Turretback Hermit',
+    name: 'Shipwreck Captain',
     minLevel: 13,
     maxLevel: 13,
-    family: 'beast',
+    family: 'undead',
     elite: true,
     ccImmune: true,
     slowImmune: true,
@@ -572,42 +570,10 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 30,
     moveSpeed: 5,
     aggroRadius: 11,
-    // The crab is drawn 8.6 yd wide under its 15 yd tower: melee reaches it
-    // from 7.5 yd (bodyRadius + 3) instead of from under the shell, still
-    // inside the Shell Slam's 8, and its own claws reach 8.5.
-    bodyRadius: 4.5,
-    // Claw Sweep: a wide frontal. The tank turns it away from the group.
-    breathCone: {
-      castId: BASTION_CLAW_SWEEP,
-      name: 'Claw Sweep',
-      castTime: 2,
-      every: 12,
-      range: 10,
-      arcDeg: 120,
-      min: 90,
-      max: 110,
-      school: 'physical',
-    },
-    trashKit: {
-      // Shell Slam: the tower comes down round it and throws the close ones back.
-      wingGust: {
-        castId: BASTION_SHELL_SLAM,
-        name: 'Shell Slam',
-        castTime: 1.5,
-        every: 16,
-        first: 8,
-        school: 'physical',
-        radius: 8,
-        knockback: 6,
-        min: 50,
-        max: 60,
-      },
-      // Withdraw: once, under a quarter, it pulls into the tower for six seconds.
-      withdraw: { belowHpPct: 0.25, seconds: 6, reduction: 0.6, name: 'Withdraw' },
-    },
-    // Barnacle Brood: crawlers drop off the shell at 60 and 30 percent.
+    // A tall humanoid silhouette, no longer the old shell's oversized hitbox.
+    bodyRadius: 1.5,
+    // His lost crew boards at the existing health thresholds.
     summonAdds: { mobId: 'barnacle_crawler', count: 2, atHpPct: [0.6, 0.3] },
-    yells: { summon: 'Barnacles rain from the swaying tower!' },
     loot: [
       { copper: 600, chance: 1 },
       { itemId: 'bone_fragments', chance: 1 },
@@ -726,7 +692,7 @@ function patrolling(
 
 // Pack ids read as <area><n>: f the flats, b the bailey, r the ramparts, g
 // the gaol, k the keep. Seven patrols: fa the watch on the flats, fb the
-// tideline hunters, hermit the Turretback round the moat, bc the bailey watch,
+// tideline hunters, hermit the captain round the moat, bc the bailey watch,
 // rc the arbalests on the wall-walk, gd the gaol yard's round, kc the court
 // hounds. The Gaol Turnkey, the gaol's miniboss, holds its own pull.
 
@@ -737,7 +703,7 @@ const FLATS_LOOP = [
   { x: 24, z: -192 },
   { x: -32, z: -192 },
 ];
-/** The Turretback Hermit's walk round the moat ring (clockwise from the south). */
+/** The Shipwreck Captain's patrol round the moat ring (clockwise from the south). */
 const MOAT_LOOP = Array.from({ length: 12 }, (_, i) => {
   const a = Math.PI + (i / 12) * Math.PI * 2;
   const r = (BAILEY_CHAPEL.island + BAILEY_CHAPEL.moat) / 2;
@@ -817,7 +783,7 @@ export const SUNKEN_BASTION_SPAWNS: DungeonSpawn[] = [
   held('tidebound_acolyte', 58, -94, 'b2', FACE_WEST),
   held('bastion_warhound', 52, -84, 'b2', FACE_WEST),
   held('bastion_warhound', 52, -96, 'b2', FACE_WEST),
-  // Patrol B: the Turretback Hermit, round the moat.
+  // Patrol B: the Shipwreck Captain, round the moat.
   patrolling('turretback_hermit', MOAT_LOOP, 'hermit', 0, 0.35),
   // Patrol F: the bailey watch, a watchman, an arbalest and a revenant.
   patrolling('drowned_watchman', BAILEY_WATCH, 'bc', 0),

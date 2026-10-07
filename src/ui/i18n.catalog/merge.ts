@@ -637,6 +637,9 @@ const mergeStringsEn = {
       bastion_piercing_bolt: 'Piercing Bolt',
       bastion_claw_sweep: 'Claw Sweep',
       bastion_shell_slam: 'Shell Slam',
+      ghost_captain_broadside: 'Spectral Broadside',
+      ghost_captain_anchor: 'Cursed Anchor',
+      ghost_captain_boarding: 'Phantom Boarding',
       // The Bastion trash mechanics pass (trash_kit/bastion_kit.ts): the fog and
       // the column can be kicked; the hook is dodged.
       bastion_boathook: 'Boathook Drag',

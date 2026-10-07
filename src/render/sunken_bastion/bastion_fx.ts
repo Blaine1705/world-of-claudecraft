@@ -47,6 +47,8 @@ import {
   bastionTelegraphSpecs,
 } from './bastion_fx_core';
 import { BastionGaolFx } from './bastion_gaol_fx';
+import { BastionGhostFx } from './bastion_ghost_fx';
+import { BastionGhostShip } from './bastion_ghost_ship';
 import { BastionMooringFx } from './bastion_mooring_fx';
 import { BastionOlenFx } from './bastion_olen_fx';
 import { BastionReaperFx } from './bastion_reaper_fx';
@@ -108,6 +110,8 @@ export class BastionFx {
   private readonly reaper: BastionReaperFx;
   private readonly vaelStage: BastionVaelStageFx;
   private readonly olen: BastionOlenFx;
+  private readonly ghosts: BastionGhostFx;
+  private readonly ghostShip: BastionGhostShip;
   private scan = 0;
   private clock = 0;
   private disposed = false;
@@ -177,6 +181,8 @@ export class BastionFx {
       reducedMotion,
       playGesture,
     );
+    this.ghosts = new BastionGhostFx(this.root, groundY, world, this.flashesOn, reducedMotion);
+    this.ghostShip = new BastionGhostShip(scene, world, reducedMotion, compileGate);
     const B = BASTION_BOSS_TELEGRAPHS;
     registerBastionTelegraph(B.surge, {
       shape: 'ring',
@@ -242,6 +248,8 @@ export class BastionFx {
     this.reaper.update(dt);
     this.vaelStage.update(dt);
     this.olen.update(dt);
+    this.ghosts.update(dt);
+    this.ghostShip.update(dt);
     this.scan -= dt;
     if (this.scan <= 0) {
       this.scan = SCAN_SEC;
@@ -344,6 +352,8 @@ export class BastionFx {
     this.reaper.dispose();
     this.vaelStage.dispose();
     this.olen.dispose();
+    this.ghosts.dispose();
+    this.ghostShip.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
   }

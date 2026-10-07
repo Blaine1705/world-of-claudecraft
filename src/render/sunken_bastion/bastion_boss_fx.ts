@@ -13,12 +13,11 @@
 //    shadow and a gold flare on the REAL Vael when the beam finds him (light
 //    pours through a fog shade in a green shimmer instead), and the crown
 //    flooding as the Drowning Hymn rises;
-//  - the Turretback Hermit: a shimmering barnacle dome while it withdraws.
 //
 // Rules (src/render/CLAUDE.md): pooled meshes and materials built once under
 // the telegraph root (compile-gated by BastionFx), no per-frame allocation.
 // Everything a player acts on (lanes, rings, the beam and its reveal, the
-// flood, the dome) draws on every tier;
+// flood) draws on every tier;
 // only the dust, debris and smoke shed on the low effects tier.
 
 import * as THREE from 'three';
@@ -31,14 +30,12 @@ import {
   OLEN_ID,
   OLEN_OATHBOUND_CHARGE,
   OLEN_UNBROKEN_OATH,
-  TURRETBACK_ID,
   UNDERTOW_TEMPLATE,
   VAEL_FOG_VEIL,
   VAEL_ID,
   VAEL_MIST_SURGE,
   VAEL_TUNING,
 } from '../../sim/encounters/sunken_bastion';
-import { TRASH_WITHDRAW_AURA } from '../../sim/mob/trash_kit/support';
 import type { IWorld } from '../../world_api';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -87,7 +84,6 @@ const REVEAL_SLOTS = 4;
 const PUFF_SLOTS = 24;
 const DEBRIS = 18;
 const LIFT = 0.08;
-const DOME_R = 9.5;
 
 let glowTex: THREE.Texture | null = null;
 function glow(): THREE.Texture {
@@ -148,36 +144,6 @@ void main() {
   col = mix(col, uEdge, edge);
   float a = (0.72 + 0.25 * foam + 0.3 * edge) * uAlpha;
   gl_FragColor = vec4(col, min(1.0, a));
-  #include <colorspace_fragment>
-}
-`;
-
-// The Hermit's withdraw dome: a barnacle-sheened fresnel shell.
-const DOME_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
-varying vec3 vNormalW;
-varying vec3 vWorld;
-void main() {
-  vec4 w = modelMatrix * vec4(position, 1.0);
-  vWorld = w.xyz;
-  vNormalW = normalize(mat3(modelMatrix) * normal);
-  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
-}
-`;
-
-const DOME_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-varying vec3 vNormalW;
-varying vec3 vWorld;
-${NOISE}
-void main() {
-  vec3 view = normalize(cameraPosition - vWorld);
-  float fres = pow(max(1.0 - abs(dot(view, vNormalW)), 0.0), 2.2);
-  float cells = noise(vWorld.xz * 1.6 + vWorld.y * 0.9 + uTime * 0.4);
-  float web = smoothstep(0.42, 0.5, cells) - smoothstep(0.5, 0.58, cells);
-  vec3 col = mix(vec3(0.2, 0.75, 0.7), vec3(0.8, 1.0, 0.95), web);
-  float a = (0.12 + fres * 0.75 + web * 0.35) * uAlpha;
-  gl_FragColor = vec4(col * (0.7 + fres), a);
   #include <colorspace_fragment>
 }
 `;
@@ -286,7 +252,6 @@ export class BastionBossFx {
   private readonly flood: BastionCrownFlood;
   private readonly beamPool: THREE.Mesh;
   private readonly beamPoolMat: THREE.MeshBasicMaterial;
-  private readonly domes: { mesh: THREE.Mesh; mat: THREE.ShaderMaterial; entityId: number }[] = [];
   /** Standing buttress ids per slot (Olen's lane resolver reads it). */
   private readonly standing = new Map<number, Set<string>>();
   private readonly deadShades = new Set<number>();
@@ -296,7 +261,6 @@ export class BastionBossFx {
   private olenId = -1;
   private vaelId = -1;
   private lampId = -1;
-  private hermitIds: number[] = [];
   private lampSample = 0;
   private lampSampleAge = 0;
   private beamSlot: { x: number; z: number } | null = null;
@@ -306,9 +270,7 @@ export class BastionBossFx {
   private clock = 0;
   private readonly m4 = new THREE.Matrix4();
   private readonly q = new THREE.Quaternion();
-  private readonly v = new THREE.Vector3();
   private readonly s = new THREE.Vector3();
-  private readonly c = new THREE.Color();
 
   constructor(
     parent: THREE.Group,
@@ -426,28 +388,6 @@ export class BastionBossFx {
         kind: null,
         k: 0,
       });
-    }
-    // The Hermit's dome.
-    const domeGeo = this.geo(
-      new THREE.SphereGeometry(DOME_R, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
-    );
-    for (let i = 0; i < 2; i++) {
-      const mat = new THREE.ShaderMaterial({
-        name: 'sunkenBastionHermitDome',
-        vertexShader: DOME_VERT,
-        fragmentShader: DOME_FRAG,
-        uniforms: { uTime: sharedUniforms.uTime, uAlpha: { value: 0 } },
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        side: THREE.DoubleSide,
-        fog: false,
-      });
-      this.materials.push(mat);
-      const mesh = new THREE.Mesh(domeGeo, mat);
-      mesh.visible = false;
-      this.root.add(mesh);
-      this.domes.push({ mesh, mat, entityId: -1 });
     }
     // Cosmetic dust, smoke and debris.
     if (cosmetic) {
@@ -591,7 +531,6 @@ export class BastionBossFx {
     this.updateOlen(world);
     this.updateWakes(world, dt);
     this.updateVael(world, dt);
-    this.updateHermits(world);
     this.updatePuffs(dt);
   }
 
@@ -599,7 +538,6 @@ export class BastionBossFx {
     this.buttressIds.length = 0;
     this.wakeIds.length = 0;
     this.veilIds.length = 0;
-    this.hermitIds = [];
     this.olenId = -1;
     this.vaelId = -1;
     const vaels: VeilCandidate[] = [];
@@ -647,8 +585,7 @@ export class BastionBossFx {
           // both popped it in and told it from him.
           figures.push({ id: e.id, slot: bastionSlotOrigin(e.pos.x, e.pos.z).slot });
         }
-      } else if (t === TURRETBACK_ID && !e.dead && hasAura(e, TRASH_WITHDRAW_AURA))
-        this.hermitIds.push(e.id);
+      }
     }
     for (const [slot, list] of perSlot) this.standing.set(slot, standingButtressIds(list));
     // Several claims in the world (offline): follow the veiled (else nearest)
@@ -936,35 +873,6 @@ export class BastionBossFx {
             0.9,
             1.6,
           );
-      }
-    }
-  }
-
-  // ---- the Hermit ------------------------------------------------------------------------
-
-  private updateHermits(world: IWorld): void {
-    for (const d of this.domes) {
-      if (d.entityId >= 0 && !this.hermitIds.includes(d.entityId)) {
-        d.entityId = -1;
-      }
-    }
-    for (const id of this.hermitIds) {
-      if (this.domes.some((d) => d.entityId === id)) continue;
-      const d = this.domes.find((s) => s.entityId < 0);
-      if (d) {
-        d.entityId = id;
-        d.mat.uniforms.uAlpha.value = 0;
-      }
-    }
-    for (const d of this.domes) {
-      const e = d.entityId >= 0 ? world.entities.get(d.entityId) : undefined;
-      const alpha = d.mat.uniforms.uAlpha.value as number;
-      const next = e ? Math.min(1, alpha + 0.08) : Math.max(0, alpha - 0.05);
-      d.mat.uniforms.uAlpha.value = next;
-      d.mesh.visible = next > 0.01;
-      if (e) {
-        d.mesh.position.set(e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
-        d.mesh.scale.setScalar(e.scale * (0.94 + 0.06 * next));
       }
     }
   }

@@ -10,9 +10,9 @@
 //    so "split them" reads at a glance.
 //  Fall Back (Fogbound Arbalest): a push-off of dust and sea spray, a short
 //    spray trail along the leap and a puff where it lands.
-//  Carrion Glut (Barnacle Crawler): every stack swells the body (drawn through
+//  Soul Hunger (Wreckbound Sailor): every stack swells the body (drawn through
 //    swellOf, held on the corpse until it bursts) with a gulp, and its
-//    brine sacs burn brighter, pulsing hard on a fed corpse before it bursts.
+//    soul lights burn brighter, pulsing before the spirit dissolves.
 //  Pack Frenzy (Bastion Warhound): the hound throws its head back and howls
 //    (its Howl clip through the gesture hook), a shock ring runs out over the
 //    floor, and sea light streams from its eyes and throat while it lasts.
@@ -57,7 +57,7 @@ import {
   CHANTER,
   CRAWLER,
   CRAWLER_RAW_HEIGHT,
-  CRAWLER_SACS,
+  CRAWLER_SOUL_ANCHORS,
   FALL_TRAIL_INTERVAL,
   FRENZY_EMBER_INTERVAL,
   fallBackSeconds,
@@ -108,6 +108,7 @@ interface CrawlerState {
   gulpAt: number;
   drawn: number;
   nextGlow: number;
+  diedAt: number;
 }
 
 interface LeapState {
@@ -322,12 +323,12 @@ export class BastionTrashFx {
     const st = this.crawlerState(crawlerId);
     st.gulpAt = kit.now;
     st.stacks = Math.max(st.stacks, glutStacks(c.auras, BASTION_CARRION_GLUT));
-    // The gulp: the sacs flare and brine slops off them.
+    // Soul Hunger: the chest flares and spirits rise through the coat.
     const k = kit.scaleOf(c, CRAWLER_RAW_HEIGHT) * st.drawn;
-    for (const sac of CRAWLER_SACS) {
-      const p = kit.point(c, k, sac, this.at);
+    for (const anchor of CRAWLER_SOUL_ANCHORS) {
+      const p = kit.point(c, k, anchor, this.at);
       kit.emit(kit.glow, LOOK.bloom, p.x, p.y, p.z, 0, 0.4, 0, 0.45, 1.3 * k);
-      kit.splash(p.x, p.y, p.z, 5, 2.5, 1);
+      kit.emit(kit.glow, LOOK.wisp, p.x, p.y, p.z, 0, 1.5, 0, 0.8, 1.2 * k);
     }
   }
 
@@ -460,7 +461,7 @@ export class BastionTrashFx {
   private crawlerState(id: number): CrawlerState {
     let st = this.crawlers.get(id);
     if (!st) {
-      st = { stacks: 0, gulpAt: -10, drawn: 1, nextGlow: 0 };
+      st = { stacks: 0, gulpAt: -10, drawn: 1, nextGlow: 0, diedAt: -1 };
       this.crawlers.set(id, st);
     }
     return st;
@@ -686,12 +687,22 @@ export class BastionTrashFx {
     for (const [id, st] of this.crawlers) {
       const e = world.entities.get(id);
       if (!e) continue;
+      if (e.dead && st.diedAt < 0) st.diedAt = kit.now;
+      else if (!e.dead) st.diedAt = -1;
       // A corpse keeps the swell it died with (the sim strips its auras).
       const target = glutSwell(st.stacks, kit.now - st.gulpAt);
       st.drawn += (target - st.drawn) * Math.min(1, dt * 12);
       if (st.drawn <= SWELL_EPSILON) this.swell.delete(id);
       else this.swell.set(id, st.drawn);
-      if (st.stacks <= 0 || kit.now < st.nextGlow || !kit.near(e.pos.x, e.pos.z)) continue;
+      // The authored body starts dissolving at 1.1s. Its moving soul ribbons
+      // then take over; fixed chest glows must not outlive the vanished body.
+      if (
+        st.stacks <= 0 ||
+        (st.diedAt >= 0 && kit.now - st.diedAt >= 1.1) ||
+        kit.now < st.nextGlow ||
+        !kit.near(e.pos.x, e.pos.z)
+      )
+        continue;
       const glow = glutGlow(st.stacks);
       // A fed corpse pulses hard before it bursts.
       const fuse = e.dead ? 0.5 + 0.5 * Math.sin(kit.now * 18) : 0;
@@ -699,8 +710,8 @@ export class BastionTrashFx {
       const k = kit.scaleOf(e, CRAWLER_RAW_HEIGHT) * st.drawn;
       const size = (0.55 + 0.45 * glow + 0.4 * fuse) * k * 0.6;
       const alpha = 0.35 + 0.4 * glow + 0.3 * fuse;
-      for (const sac of CRAWLER_SACS) {
-        const p = kit.point(e, k, sac, this.at);
+      for (const anchor of CRAWLER_SOUL_ANCHORS) {
+        const p = kit.point(e, k, anchor, this.at);
         kit.emit(kit.glow, LOOK.bloom, p.x, p.y, p.z, 0, 0.1, 0, 0.16, size, alpha);
       }
     }

@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.cast.ghost_captain_boarding': '환영의 승선',
+  'abilityUi.cast.ghost_captain_anchor': '저주받은 닻',
+  'abilityUi.cast.ghost_captain_broadside': '유령선 일제 포격',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}분',
   'abilityUi.cast.hoard_cast_rime_beam': '상고대 광선',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -5724,13 +5727,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vael_the_mistcaller.name': '안개엮는자 바엘',
   'entities.mobs.drowned_watchman.name': '익사한 파수꾼',
   'entities.mobs.fogbound_arbalest.name': '안개에 묶인 쇠뇌병',
-  'entities.mobs.barnacle_crawler.name': '따개비 게',
+  'entities.mobs.barnacle_crawler.name': '난파선에 묶인 선원',
   'entities.mobs.bastion_warhound.name': '요새 전투견',
   'entities.mobs.mistweaver.name': '안개 영창자',
   'entities.mobs.drowned_sergeant.name': '익사한 부사관',
   'entities.mobs.shackled_prisoner.name': '족쇄 찬 죄수',
   'entities.mobs.gaol_turnkey.name': '감옥 열쇠지기',
-  'entities.mobs.turretback_hermit.name': '탑을 진 소라게',
+  'entities.mobs.turretback_hermit.name': '난파선 선장',
   'entities.mobs.vael_fog_shade.name': '안개엮는자 바엘',
   'entities.mobs.gaoler_ossick.name': '간수 오시크',
   'entities.mobs.lagoon_snapper.name': '석호 늑대거북',
@@ -19894,7 +19897,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.bastion.fogShroud':
     '안개 장막 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 안개 밖으로 끌어내세요.',
   'hudChrome.auraEffect.bastion.carrionGlut':
-    '시체를 먹었습니다({stacks}/{max}): 중첩마다 소금물 폭발 범위가 {radius}야드 넓어지고 {pct}% 강해집니다.',
+    '죽은 자를 흡수했습니다({stacks}/{max}중첩). 중첩마다 영혼 방출의 범위가 {radius}야드 넓어지고 피해가 {pct}% 증가합니다.',
   'hudChrome.auraEffect.bastion.snappedFetters':
     '사슬이 끊어졌습니다. 더 이상 싸우지 않고, 피해를 입지 않으며, 곧 떠납니다.',
   'hudChrome.auraEffect.crypt.carrionEye':

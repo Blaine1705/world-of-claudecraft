@@ -21,6 +21,7 @@ the tick.
 | `vael_veil_gather.ts` | The breath before each Fog Veil: he stills and speaks the beam warning while the fog gathers (untouchable), sinks, then the four figures rise. |
 | `vael_lines.ts` | His lines (sim English, re-localized by the EXACT matcher in `src/ui/sim_i18n.ts`). |
 | `ward_hits.ts` | Pure: the cage and the anchor take fixed points per player or pet hit (asked by `combat/damage.ts` dealDamage). |
+| `ghost_captain.ts` / `ghost_captain_ids.ts` | Shipwreck Captain (stable `turretback_hermit` id): parallel Spectral Broadside lanes with safe gaps, Cursed Anchor hauled down its locked lane, and Phantom Boarding. Every tell and impact rides an encounter object with start position, facing, length in scale and remaining/total time. Death, evade, wipe and cancelled casts remove owned objects. The preserved `dgn_turretback` deed now requires nobody being hit by a broadside; already-earned unlocks stay earned. Damage rolls and difficulty stamps are inherited from the retired crab kit. |
 
 Rules:
 - Deterministic: randomness only through `ctx.rng` (most picks use `kitHash`, zero

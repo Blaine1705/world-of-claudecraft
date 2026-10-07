@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.cast.ghost_captain_boarding': '幻影の斬り込み',
+  'abilityUi.cast.ghost_captain_anchor': '呪いの錨',
+  'abilityUi.cast.ghost_captain_broadside': '幽霊船の一斉砲撃',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分',
   'abilityUi.cast.hoard_cast_rime_beam': '霜光線',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount}{currency}',
@@ -5759,13 +5762,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vael_the_mistcaller.name': 'フォグバインダーのヴァエル',
   'entities.mobs.drowned_watchman.name': '溺れた見張り番',
   'entities.mobs.fogbound_arbalest.name': '霧縛りの弩兵',
-  'entities.mobs.barnacle_crawler.name': 'フジツボガニ',
+  'entities.mobs.barnacle_crawler.name': '難破船に縛られた船員',
   'entities.mobs.bastion_warhound.name': '砦の軍用犬',
   'entities.mobs.mistweaver.name': '霧の詠唱者',
   'entities.mobs.drowned_sergeant.name': '溺れた軍曹',
   'entities.mobs.shackled_prisoner.name': '枷の囚人',
   'entities.mobs.gaol_turnkey.name': '牢の鍵番',
-  'entities.mobs.turretback_hermit.name': '塔背負いのヤドカリ',
+  'entities.mobs.turretback_hermit.name': '難破船の船長',
   'entities.mobs.vael_fog_shade.name': 'フォグバインダーのヴァエル',
   'entities.mobs.gaoler_ossick.name': '牢番オシック',
   'entities.mobs.lagoon_snapper.name': '潟湖のスナッパー',
@@ -19908,7 +19911,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.bastion.fogShroud':
     '霧の帳の中にいる間、受けるダメージが{pct}%減少する。霧の外へ引きずり出せ。',
   'hudChrome.auraEffect.bastion.carrionGlut':
-    '死者を貪った（{stacks}/{max}）：スタックごとに塩水の破裂が{radius}ヤード広がり、{pct}%強くなる。',
+    '死者を貪った（{stacks}/{max}）：スタックごとに魂の解放の範囲が{radius}ヤード広がり、ダメージが{pct}%増加する。',
   'hudChrome.auraEffect.bastion.snappedFetters':
     '鎖が断ち切られた。もう戦わず、傷つけられず、まもなく去っていく。',
   'hudChrome.auraEffect.crypt.carrionEye':

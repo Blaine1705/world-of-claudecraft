@@ -5158,7 +5158,7 @@ export const hudChromeStrings = {
       fogShroud:
         'Takes {pct}% less damage while it stands in the Fog Bank. Drag it out of the fog.',
       carrionGlut:
-        'Fed on the dead ({stacks} of {max}): each stack makes its Brine Burst {radius} yd wider and {pct}% stronger.',
+        'Fed on the dead ({stacks} of {max}): each stack makes its Soul Release {radius} yd wider and {pct}% stronger.',
       snappedFetters:
         'Its chains are broken. It no longer fights, cannot be harmed, and soon leaves.',
       anchored:

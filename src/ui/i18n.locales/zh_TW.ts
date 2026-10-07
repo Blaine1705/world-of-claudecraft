@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.cast.ghost_captain_boarding': '幻影登船',
+  'abilityUi.cast.ghost_captain_anchor': '詛咒之錨',
+  'abilityUi.cast.ghost_captain_broadside': '幽靈舷炮齊射',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分鐘',
   'abilityUi.cast.hoard_cast_rime_beam': '白霜射束',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -5539,13 +5542,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vael_the_mistcaller.name': '縛霧者維爾',
   'entities.mobs.drowned_watchman.name': '溺亡守望者',
   'entities.mobs.fogbound_arbalest.name': '縛霧弩手',
-  'entities.mobs.barnacle_crawler.name': '藤壺爬蟹',
+  'entities.mobs.barnacle_crawler.name': '縛骸水手',
   'entities.mobs.bastion_warhound.name': '堡壘戰犬',
   'entities.mobs.mistweaver.name': '霧之吟唱者',
   'entities.mobs.drowned_sergeant.name': '溺亡軍士',
   'entities.mobs.shackled_prisoner.name': '戴鐐囚徒',
   'entities.mobs.gaol_turnkey.name': '牢獄鑰匙官',
-  'entities.mobs.turretback_hermit.name': '背塔寄居蟹',
+  'entities.mobs.turretback_hermit.name': '海難船長',
   'entities.mobs.vael_fog_shade.name': '縛霧者維爾',
   'entities.mobs.gaoler_ossick.name': '獄卒奧西克',
   'entities.mobs.lagoon_snapper.name': '潟湖鱷龜',
@@ -18951,7 +18954,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '另一名溺亡守望者在{radius}碼內時，受到的傷害降低{pct}%。把它們分開。',
   'hudChrome.auraEffect.bastion.fogShroud': '站在霧堤中時，受到的傷害降低{pct}%。把它拖出霧中。',
   'hudChrome.auraEffect.bastion.carrionGlut':
-    '以死者為食（{stacks}/{max}）：每層使其鹽水爆裂範圍擴大{radius}碼，傷害提高{pct}%。',
+    '吞噬死者（{stacks}/{max}層）：每層使靈魂釋放的範圍擴大{radius}碼，傷害提高{pct}%。',
   'hudChrome.auraEffect.bastion.snappedFetters':
     '它的鎖鏈已斷。它不再戰鬥，無法被傷害，並很快離開。',
   'hudChrome.auraEffect.crypt.carrionEye':

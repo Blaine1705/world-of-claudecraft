@@ -3629,7 +3629,7 @@ export const DEEDS: Record<string, DeedDef> = {
   dgn_turretback: {
     id: 'dgn_turretback',
     name: 'Eviction Notice',
-    desc: 'Defeat the Turretback Hermit before it withdraws into its shell.',
+    desc: 'Defeat the Shipwreck Captain without anyone being hit by Spectral Broadside.',
     category: 'dungeon',
     renown: 10,
     trigger: { kind: 'manual' },

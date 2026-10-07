@@ -3928,7 +3928,7 @@ export const zh_CN: EnTranslations = {
         "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}点自然伤害，最多持续{seconds}秒。打断或击晕潮缚侍僧即可挣脱。",
         "halberdWall": "另一名溺亡守望者在{radius}码内时，受到的伤害降低{pct}%。把它们分开。",
         "fogShroud": "站在雾堤中时，受到的伤害降低{pct}%。把它拖出雾中。",
-        "carrionGlut": "以死者为食（{stacks}/{max}）：每层使其盐水爆裂范围扩大{radius}码，伤害提高{pct}%。",
+        "carrionGlut": "吞噬死者（{stacks}/{max}层）：每层使灵魂释放的范围扩大{radius}码，伤害提高{pct}%。",
         "snappedFetters": "它的锁链已断。它不再战斗，无法被伤害，并很快离开。",
         "anchored": "被锁在溺亡之锚上：你可以移动，但无法远离绞盘，它会把你绞向溺亡深坑。走到距被钩住处至少{run}码的点亮系泊柱{reach}码以内即可系住锁链（该柱熄灭{dark}秒），或者让队友用{links}次攻击砸断锁链（英雄难度{linksHeroic}次）。掉进深坑会损失{pit}%的最大生命值（英雄难度{pitHeroic}%）。"
       },
@@ -12647,6 +12647,9 @@ export const zh_CN: EnTranslations = {
       "bastion_piercing_bolt": "穿刺弩矢",
       "bastion_claw_sweep": "巨钳横扫",
       "bastion_shell_slam": "壳塔重击",
+      "ghost_captain_broadside": "幽灵舷炮齐射",
+      "ghost_captain_anchor": "诅咒之锚",
+      "ghost_captain_boarding": "幻影登船",
       "bastion_boathook": "船钩拖拽",
       "bastion_fog_bank": "雾堤",
       "bastion_brine_column": "盐水之柱",
@@ -20335,7 +20338,7 @@ export const zh_CN: EnTranslations = {
         "name": "缚雾弩手"
       },
       "barnacle_crawler": {
-        "name": "藤壶爬蟹"
+        "name": "缚骸水手"
       },
       "bastion_warhound": {
         "name": "堡垒战犬"
@@ -20353,7 +20356,7 @@ export const zh_CN: EnTranslations = {
         "name": "牢狱钥匙官"
       },
       "turretback_hermit": {
-        "name": "背塔寄居蟹"
+        "name": "海难船长"
       },
       "vael_fog_shade": {
         "name": "缚雾者维尔"
