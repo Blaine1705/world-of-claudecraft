@@ -1,3 +1,4 @@
+export { installMapCanvasSize, MapCanvasSizeController } from './map_canvas_size_controller';
 export { MapMarkerInteractionController } from './map_marker_interaction_controller';
 export { MapMarkerTooltipContent } from './map_marker_tooltip_content';
 export {

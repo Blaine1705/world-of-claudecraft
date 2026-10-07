@@ -6869,6 +6869,44 @@ export const TARGETS = [
     },
   },
   {
+    key: 'world-map-resize',
+    label: 'World map resized by its corner grip',
+    when: ['ui/hud/map/map_canvas_size', 'ui/window_drag_handle'],
+    // Desktop only: the touch sheet stands the grip down by design, so a
+    // mobile shot would match the plain world-map one.
+    variants: [{ key: 'desktop', beforeLoad: lowGraphicsSeed }],
+    // Open the map where the character stands, then drag its SE corner with
+    // real mouse input, the way a player resizes it. On a build without the
+    // feature the press lands on the drag band instead, which is the honest
+    // "before". Clips the whole HUD so the new size reads in context.
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      if (!(await pollForSize(page, '#map-window'))) return {};
+      const corner = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        const r = w.getBoundingClientRect();
+        const z = r.width / Math.max(1, w.offsetWidth);
+        return {
+          x: r.left + (w.clientLeft + w.clientWidth) * z - 4,
+          y: r.top + (w.clientTop + w.clientHeight) * z - 4,
+        };
+      });
+      await page.mouse.move(corner.x, corner.y);
+      await page.mouse.down();
+      await page.mouse.move(corner.x + 8, corner.y + 8, { steps: 2 });
+      await page.mouse.move(corner.x + 380, corner.y + 220, { steps: 12 });
+      await page.mouse.up();
+      await wait(800);
+      await sweepOverlays(page, 4);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'map-atlas-sidebar-collapse',
     label: 'World map atlas rail collapse toggle',
     when: ['ui/map_sidebar_controller', 'ui/map_sidebar_view', 'ui/tracker_collapse_settings'],

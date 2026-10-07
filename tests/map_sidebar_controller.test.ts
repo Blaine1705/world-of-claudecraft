@@ -294,7 +294,7 @@ describe('map sidebar controller: rail collapse toggle', () => {
 });
 
 // The headerless map window has exactly ONE drag surface: the --window-pad band
-// around its two panes (Hud.isWindowDragHandle returns true only for
+// around its two panes (src/ui/window_drag_handle.ts returns true only for
 // `target === win`). Both panes are absolutely positioned, and an absolutely
 // positioned child resolves against the PADDING box, so an `inset: 0` pane
 // covers that band and the window stops being draggable at all. jsdom has no

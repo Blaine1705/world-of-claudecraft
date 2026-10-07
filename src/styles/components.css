@@ -14529,9 +14529,10 @@
   /* The atlas: a 300px plated rail beside the map stage. An absolutely
      positioned child resolves against the PADDING box, so inset: 0 would cover
      the --window-pad band, and that band is the only drag handle a headerless
-     map window has (Hud.isWindowDragHandle grabs #map-window itself). Both
-     panes therefore inset by --window-pad on every edge they touch, and the
-     stage's left edge is that pad plus the 300px rail plus the 12px gutter. */
+     map window has (src/ui/window_drag_handle.ts grabs #map-window itself).
+     Both panes therefore inset by --window-pad on every edge they touch, and
+     the stage's left edge is that pad plus the 300px rail plus the 12px
+     gutter. The resize corner overlaps that band; a press there resizes. */
   #map-window {
     width: 924px;
     max-width: calc(100vw - 24px);
@@ -14615,6 +14616,58 @@
   body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar.is-collapsed) .map-atlas-stage {
     inset: var(--window-pad) var(--window-pad) var(--window-pad)
       calc(var(--window-pad) + 44px + 12px);
+  }
+  /* A player-resized map (the shared corner grip, src/ui/window_resize.ts,
+     stamps .window-sized and writes an inline width and height). The stage
+     becomes a size container and the canvas grows into the largest square it
+     fits, while map_canvas_size_controller.ts resizes the backing store to
+     match so the map stays crisp. The overlay controls are pinned to that
+     square face rather than the stage corners, through the face offsets
+     below; the unregistered custom properties substitute their tokens at each
+     child, so the container units resolve against the stage. The minimum
+     sizes keep a usable face beside the rail in each rail state. Unsized, the
+     shipped 560px layout above is untouched. Desktop only: the touch sheet
+     never takes the grip. */
+  body:not(.mobile-touch) #map-window.window-sized {
+    min-width: 640px;
+    min-height: 360px;
+  }
+  body:not(.mobile-touch) #map-window.window-sized:has(> .map-atlas-sidebar.is-collapsed) {
+    min-width: 384px;
+  }
+  body:not(.mobile-touch) #map-window.window-sized:has(> .map-atlas-sidebar:empty) {
+    min-width: 328px;
+  }
+  body:not(.mobile-touch) #map-window.window-sized .map-atlas-stage {
+    container-type: size;
+    --map-face: min(100cqw, 100cqh);
+    --map-face-x: calc((100cqw - var(--map-face)) / 2);
+    --map-face-y: calc((100cqh - var(--map-face)) / 2);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-canvas {
+    width: calc(var(--map-face) - 4px);
+    height: calc(var(--map-face) - 4px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-close {
+    top: calc(var(--map-face-y) + 8px);
+    right: calc(var(--map-face-x) + 8px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-level-toggle {
+    top: calc(var(--map-face-y) + 8px);
+    left: calc(var(--map-face-x) + 8px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized #map-zoom {
+    right: calc(var(--map-face-x) + 22px);
+    bottom: calc(var(--map-face-y) + 22px);
+  }
+  body:not(.mobile-touch) #map-window.window-sized .map-atlas-compass {
+    top: calc(var(--map-face-y) + 52px);
+    right: calc(var(--map-face-x) + 14px);
+  }
+  /* The touch sheet stands the grip down (window_resize.ts), so it drops the
+     grip layer too and keeps the plain panel background. */
+  body.mobile-touch #map-window.window-resizable {
+    background: var(--panel-bg);
   }
   /* Touch keeps the shipped single-pane map: the rail and the map-face chrome
      the atlas adds have no room on a 330px sheet (W13 owns the touch rail). */
