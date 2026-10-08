@@ -550,7 +550,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18164 -> 18156: the death-screen surface decisions (Release
     // overlay, ghost hint, corpse prompt) moved to src/ui/death_screen_view.ts
     // together with the Release input hold. Exact merged count, zero slack.
-    ceiling: 18156,
+    // Ferry announcement history moved to zone_announcement_core; the map
+    // keeps tracking physical zone changes while notices wait for docking.
+    // Exact merged count after #4413 composed with the current release batch.
+    ceiling: 18146,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

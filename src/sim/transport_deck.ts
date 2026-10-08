@@ -17,8 +17,8 @@
 //
 // Under way the gangplank is stowed and the gangway's side step shipped with
 // it, so the port gangway opening is a sheer drop. Rails and gangway bars
-// share the low-fence jump rule, letting a passenger jump off either side.
-// A body that leaves the hull's
+// share the low-fence jump rule: walking stays aboard, while a deliberate
+// jump can clear either side or the closed starboard bar. A body that leaves the hull's
 // footprint is simply no longer carried: it falls into the sea where it is
 // and swims, and the ship sails on. Nothing boards a ship under way from the
 // water: the hull's sides stand taller than any swimmer can hop.
@@ -29,7 +29,12 @@
 
 import type { Collider } from './colliders';
 import { angleDelta, type TransportPose } from './transport_schedule';
-import type { ShipHullLayout, ShipPose, ShipVolume } from './transport_ship';
+import {
+  type ShipHullLayout,
+  type ShipPose,
+  type ShipVolume,
+  shipVolumeMoveTop,
+} from './transport_ship';
 import { type Entity, normAngle } from './types';
 
 /** Feet this far below the main deck still count as aboard (a stair tread,
@@ -184,7 +189,7 @@ export class DeckPlatform {
       const v = this.volumes[i];
       const c = this.colliders[i];
       deckToWorld(pose, v.x, v.z, c);
-      c.moveTopY = baseY + v.top;
+      c.moveTopY = baseY + shipVolumeMoveTop(this.hull, v);
       c.cameraTopY = baseY + (v.sightTop ?? v.top);
       if (v.standable) c.standable = true;
       if (c.type === 'obb') c.rot = pose.rot + (v.rot ?? 0);
