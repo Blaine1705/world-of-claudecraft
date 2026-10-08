@@ -46,10 +46,10 @@ const C_POOL_QUALITIES: ReadonlySet<ItemDef['quality']> = new Set(['rare', 'epic
 let normalPool: readonly string[] | null = null;
 let heroicPool: readonly string[] | null = null;
 
-/** Every equippable rare/epic that the level-20 NORMAL five-man dungeons drop.
- *  This is the C-rank clear payout: "whatever a normal dungeon could drop". */
 const RELOCATED_RAID_BASES: ReadonlySet<string> = new Set(NYTHRAXIS_RELOCATED_ITEM_IDS);
 
+/** Every equippable rare/epic that the level-20 NORMAL five-man dungeons drop.
+ *  This is the C-rank clear payout: "whatever a normal dungeon could drop". */
 export function riftNormalClearPool(): readonly string[] {
   if (normalPool) return normalPool;
   const ids = new Set<string>();

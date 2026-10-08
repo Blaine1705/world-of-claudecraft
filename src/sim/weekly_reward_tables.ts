@@ -94,6 +94,24 @@ export function addRelocatedRaidShelf(ids: Set<string>, heroic: boolean): void {
   if (heroic) for (const id of NYTHRAXIS_RELOCATED_TRINKET_IDS) ids.add(id);
 }
 
+let relocatedRaidIds: ReadonlySet<string> | null = null;
+
+/**
+ * Whether an id is one of those relocated raid pieces (either copy) or trinkets.
+ * They stay off the five-man weekly shelves even though five-man bosses drop them
+ * now: the relocation changed where they drop, not which weekly shelf offers them
+ * (the rift clear pools keep them out the same way, rift/loot_pools.ts).
+ */
+export function isRelocatedRaidPiece(id: string): boolean {
+  if (!relocatedRaidIds) {
+    const ids = new Set<string>();
+    addRelocatedRaidShelf(ids, false);
+    addRelocatedRaidShelf(ids, true);
+    relocatedRaidIds = ids;
+  }
+  return relocatedRaidIds.has(id);
+}
+
 export function weeklyBossLootPool(bossId: string, pool: WeeklyPoolId, cls: PlayerClass): string[] {
   const table = weeklyBossTable(bossId);
   if (!table || !needsWeeklyBossTable(pool) || !pool.startsWith(table.category)) return [];
@@ -108,6 +126,8 @@ export function weeklyBossLootPool(bossId: string, pool: WeeklyPoolId, cls: Play
       if (entry.itemId && !entry.questId && entry.chance > 0) ids.add(entry.itemId);
   }
   if (bossId === NYTHRAXIS_RAID_BOSS_ID) addRelocatedRaidShelf(ids, heroic);
+  else if (table.category === 'dungeon')
+    for (const id of ids) if (isRelocatedRaidPiece(id)) ids.delete(id);
   return [...ids]
     .filter((id) => {
       const item = ITEMS[id];

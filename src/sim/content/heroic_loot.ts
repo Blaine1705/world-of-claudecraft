@@ -901,7 +901,9 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
         ['mistforged_pauldrons', 0.2],
         ['heroic_knight_commanders_longsword', 0.15],
         ['heroic_tideguard_greaves', 0.05],
-        ['heroic_tideguard_sabatons', 0.05],
+        // Each Bastion blue's Heroic copy follows its Normal boss (2026-10-08):
+        // the Prayer Leggings came here from Vael, the Sabatons went to him.
+        ['heroic_drowned_prayer_leggings', 0.05],
         ['heroic_eelscale_leggings', 0.05],
       ]),
     ]).map(preserveBaseLootSource),
@@ -917,6 +919,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
         ['gaolers_iron_key', 0.25],
         ['sash_of_the_sunken_court', 0.25],
         ['heroic_gaolyard_cudgel', 0.2],
+        // The Tidescale Vest's Heroic copy follows its Normal drop off Vael.
+        ['heroic_tidescale_vest', 0.1],
       ]),
     ]).map(preserveBaseLootSource),
   ],
@@ -1077,8 +1081,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
         ['marshstrider_boots', 0.33],
         ['fenmist_robe', 0.33],
         ['eelskin_tunic', 0.2],
-        ['heroic_tidescale_vest', 0.1],
-        ['heroic_drowned_prayer_leggings', 0.1],
+        // The Tideguard Sabatons' Heroic copy came with its Normal drop off Olen.
+        ['heroic_tideguard_sabatons', 0.1],
         ['heroic_drowned_prayer_sandals', 0.1],
         ['heroic_eelscale_treads', 0.1],
         ['mistveil_cord', 0.12],

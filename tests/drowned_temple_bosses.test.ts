@@ -375,6 +375,30 @@ describe('the Mere Hydra: three heads, one moon pool', () => {
     expect(centre.loot).toBe(first);
     expect(centre.lootable).toBe(true);
   });
+
+  it('a wipe keeps the centre head held loot for the attempt that kills the Hydra', () => {
+    const { f, heads } = hydraFight();
+    run(f, 0.2);
+    const [left, centre, right] = heads;
+    f.sim.ctx.handleDeath(centre, f.tank);
+    const first = centre.loot;
+    expect(first).toBeTruthy();
+    // The group falls back: the fight resets and the fallen centre head grows
+    // back whole, holding the loot it already rolled.
+    wipe(f, left);
+    wipe(f, right);
+    run(f, 3);
+    expect(centre.dead).toBe(false);
+    expect(centre.lootable).toBe(false);
+    expect(centre.loot).toBe(first);
+    // The next attempt brings all three down: the held loot comes back.
+    for (const h of heads) engage(f, h);
+    run(f, 0.2);
+    for (const h of [centre, left, right]) f.sim.ctx.handleDeath(h, f.tank);
+    run(f, 0.2);
+    expect(centre.loot).toBe(first);
+    expect(centre.lootable).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------

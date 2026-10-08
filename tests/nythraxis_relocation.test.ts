@@ -15,6 +15,8 @@ import {
 import { ITEMS, MOBS } from '../src/sim/data';
 import { itemFromHeroicRaid, itemLevel } from '../src/sim/item_level';
 import type { LootEntry } from '../src/sim/types';
+import { weeklyBossLootPool } from '../src/sim/weekly_reward_tables';
+import { weeklyLootPool } from '../src/sim/weekly_rewards';
 
 const SANCTUM = ['korgath_the_bound', 'grand_necromancer_velkhar', 'korzul_the_gravewyrm'];
 const BASIN = ['wildheart_beastmaster', 'the_gorgebloom', 'wildheart_high_priest'];
@@ -130,4 +132,25 @@ describe('every moved piece keeps the raid tier it shipped at', () => {
       expect(itemFromHeroicRaid(id)).toBe(true);
     },
   );
+});
+
+describe('the weekly shelves keep the relocated pieces raid-only', () => {
+  // The relocation changed where the pieces drop, not which weekly shelf offers
+  // them: the raid shelves keep them, the five-man shelves never show them.
+  it('the raid shelves offer them and the five-man shelves do not', () => {
+    expect(weeklyLootPool('raid', 'warrior')).toContain('bonewrought_greatsword');
+    expect(weeklyLootPool('raid_heroic', 'warrior')).toContain('heroic_bonewrought_greatsword');
+    expect(weeklyLootPool('world', 'warrior')).toContain('bonewrought_greatsword');
+    expect(weeklyLootPool('dungeon', 'warrior')).not.toContain('bonewrought_greatsword');
+    expect(weeklyLootPool('dungeon_heroic', 'warrior')).not.toContain(
+      'heroic_bonewrought_greatsword',
+    );
+    // The home boss's own shelf and the raid boss's shelf, through the boss tables.
+    expect(weeklyBossLootPool('korgath_the_bound', 'dungeon', 'warrior')).not.toContain(
+      'bonewrought_greatsword',
+    );
+    expect(weeklyBossLootPool(NYTHRAXIS_RAID_BOSS_ID, 'raid', 'warrior')).toContain(
+      'bonewrought_greatsword',
+    );
+  });
 });

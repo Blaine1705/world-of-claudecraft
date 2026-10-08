@@ -122,18 +122,18 @@ const BASELINE = {
   knight_commander_olen: {
     gearIds: [
       'drowned_commanders_breastplate',
+      'heroic_drowned_prayer_leggings',
       'heroic_eelscale_leggings',
       'heroic_knight_commanders_longsword',
       'heroic_stormhymn_chain_grips',
       'heroic_tideguard_greaves',
-      'heroic_tideguard_sabatons',
       'mistforged_pauldrons',
       'tideguard_faceguard',
     ],
     // Re-minted when the Longsword chase row joined Olen's shipped olen_bonus
     // group (same 0.1 chance), so a kill pays at most one rare.
     normalDigest: '4debee8849928cb91609f6a0c5d986ddeff42fb58b6f725c91a4288ed3670cea',
-    gearDigest: '383ea02ed3a13ef13cf2cddda04a94bfbd5141d5b17aa8368c0b1a19cb94ca02',
+    gearDigest: 'bb215f084605abb3a4f7c325e615602878279f43c79690fb866d26480faf079a',
   },
   gaoler_ossick: {
     gearIds: [
@@ -143,11 +143,12 @@ const BASELINE = {
       'heroic_brinewarden_robe',
       'heroic_gaolyard_cudgel',
       'heroic_gaolyard_jerkin',
+      'heroic_tidescale_vest',
       'mooring_stone',
       'sash_of_the_sunken_court',
     ],
     normalDigest: '9176140d149844688d4907a14694610d3ad6f475b52e0a130132325eae9de291',
-    gearDigest: '6345aa8af01bdc80aec790d3a4c88ea336dcdf7ded902ddb72dd8bc6354867d4',
+    gearDigest: 'c9d8b2f1852d0e51b6b9f9ba70b2bb3e58044a0231bafd3ef5efe95169f725d2',
   },
   vael_the_mistcaller: {
     gearIds: [
@@ -155,11 +156,10 @@ const BASELINE = {
       'fenmist_robe',
       'heroic_bramblehide_treads',
       'heroic_direfang_quiver',
-      'heroic_drowned_prayer_leggings',
       'heroic_drowned_prayer_sandals',
       'heroic_eelscale_treads',
       'heroic_fogbinders_rod',
-      'heroic_tidescale_vest',
+      'heroic_tideguard_sabatons',
       'marshstrider_boots',
       'mistcallers_fang',
       'mistveil_cord',
@@ -169,7 +169,7 @@ const BASELINE = {
       'trollhide_leggings',
     ],
     normalDigest: '8917391dfc5e9fcd2da06099477d6b7b9a1444246f616b0aaf694276619c25fa',
-    gearDigest: 'c42aa6251ef60d8fa87fb155ccc8ce86039cda32d77c35fe5fbdb3d564122bad',
+    gearDigest: 'b9211c53b38de7e19a0b8c5d1879e1f4f05a5dd63fc59b33cf1f02728ce37a55',
   },
   // Re-minted for the Drowned Temple rework (docs/design/dungeon-rework/
   // drowned_temple.md section 8): Selthe's normal table gains a guaranteed

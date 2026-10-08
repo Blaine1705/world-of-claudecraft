@@ -27,6 +27,7 @@ import { weeklyTableSource } from './weekly_reward_options';
 import {
   addRelocatedRaidShelf,
   historicalWeeklyBossUnlocks,
+  isRelocatedRaidPiece,
   needsWeeklyBossTable,
   sanitizeWeeklyBossUnlocks,
   type WeeklyBossUnlocks,
@@ -392,6 +393,12 @@ function collectInstanceLoot(
   difficulty: 'normal' | 'heroic',
   ids: Set<string>,
 ): void {
+  // A five-man shelf never offers the raid pieces relocated onto its bosses
+  // (weekly_reward_tables.ts isRelocatedRaidPiece); the raid shelf keeps them.
+  const fiveMan = (dungeon.suggestedPlayers ?? 0) < RAID_MIN_PLAYERS;
+  const add = (id: string) => {
+    if (!(fiveMan && isRelocatedRaidPiece(id))) ids.add(id);
+  };
   for (const spawn of dungeon.spawns) {
     for (const entry of MOBS[spawn.mobId]?.loot ?? []) {
       if (
@@ -400,11 +407,11 @@ function collectInstanceLoot(
         entry.chance > 0 &&
         !(difficulty === 'heroic' && entry.normalOnly)
       )
-        ids.add(heroicLootItemId(entry.itemId, difficulty === 'heroic'));
+        add(heroicLootItemId(entry.itemId, difficulty === 'heroic'));
     }
     if (difficulty === 'heroic')
       for (const entry of HEROIC_BOSS_LOOT[spawn.mobId] ?? []) {
-        if (entry.itemId && !entry.questId && entry.chance > 0) ids.add(entry.itemId);
+        if (entry.itemId && !entry.questId && entry.chance > 0) add(entry.itemId);
       }
     if (spawn.mobId === NYTHRAXIS_BOSS_ID) addRelocatedRaidShelf(ids, difficulty === 'heroic');
   }
