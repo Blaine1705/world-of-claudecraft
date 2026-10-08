@@ -19948,4 +19948,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Trafienia: {hits} | Krytyczne: {crits} ({critPercent}) | Średnia: {average} | Min./maks.: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Głośność otoczenia',
+  'hudChrome.mapAtlas.resizeRailAria': 'Szerokość panelu bocznego mapy',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Przeciągnij, aby zmienić szerokość panelu bocznego mapy. Kliknij dwukrotnie, aby zresetować.',
 };

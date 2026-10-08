@@ -19786,4 +19786,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'İsabet: {hits} | Kritik: {crits} ({critPercent}) | Ortalama: {average} | Min./maks.: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Ortam ses düzeyi',
+  'hudChrome.mapAtlas.resizeRailAria': 'Harita kenar çubuğu genişliği',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Harita kenar çubuğunu yeniden boyutlandırmak için sürükle. Sıfırlamak için çift tıkla.',
 };

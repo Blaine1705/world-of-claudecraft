@@ -20195,4 +20195,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Colpi: {hits} | Critici: {crits} ({critPercent}) | Media: {average} | Min/max: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Volume ambiente',
+  'hudChrome.mapAtlas.resizeRailAria': 'Larghezza della barra laterale della mappa',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Trascina per ridimensionare la barra laterale della mappa. Fai doppio clic per reimpostare.',
 };

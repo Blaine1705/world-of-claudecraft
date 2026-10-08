@@ -20222,4 +20222,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Treffer: {hits} | Kritisch: {crits} ({critPercent}) | Durchschnitt: {average} | Min./max.: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Ambiente-Lautstärke',
+  'hudChrome.mapAtlas.resizeRailAria': 'Breite der Karten-Seitenleiste',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Ziehen, um die Karten-Seitenleiste zu vergrößern oder zu verkleinern. Doppelklick setzt zurück.',
 };

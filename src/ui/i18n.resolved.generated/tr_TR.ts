@@ -6357,7 +6357,9 @@ export const tr_TR: EnTranslations = {
         "passage": "Geçit"
       },
       "collapseHint": "Harita kenar çubuğunu daralt",
-      "expandHint": "Harita kenar çubuğunu genişlet"
+      "expandHint": "Harita kenar çubuğunu genişlet",
+      "resizeRailAria": "Harita kenar çubuğu genişliği",
+      "resizeRailHint": "Harita kenar çubuğunu yeniden boyutlandırmak için sürükle. Sıfırlamak için çift tıkla."
     },
     "arenaGate": {
       "minLevelNote": "Seviye {level} gerektirir"

@@ -6357,7 +6357,9 @@ export const it_IT: EnTranslations = {
         "passage": "Passaggio"
       },
       "collapseHint": "Comprimi la barra laterale della mappa",
-      "expandHint": "Espandi la barra laterale della mappa"
+      "expandHint": "Espandi la barra laterale della mappa",
+      "resizeRailAria": "Larghezza della barra laterale della mappa",
+      "resizeRailHint": "Trascina per ridimensionare la barra laterale della mappa. Fai doppio clic per reimpostare."
     },
     "arenaGate": {
       "minLevelNote": "Richiede il livello {level}"

@@ -6357,7 +6357,9 @@ export const sv_SE: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Minimera kartsidobalken",
-      "expandHint": "Expandera kartsidobalken"
+      "expandHint": "Expandera kartsidobalken",
+      "resizeRailAria": "Kartans sidopanelsbredd",
+      "resizeRailHint": "Dra för att ändra storlek på kartans sidopanel. Dubbelklicka för att återställa."
     },
     "arenaGate": {
       "minLevelNote": "Kräver nivå {level}"

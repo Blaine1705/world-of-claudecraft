@@ -19865,4 +19865,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Lượt: {hits} | Chí mạng: {crits} ({critPercent}) | Trung bình: {average} | Nhỏ/lớn nhất: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Âm lượng môi trường',
+  'hudChrome.mapAtlas.resizeRailAria': 'Chiều rộng thanh bên bản đồ',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Kéo để đổi kích thước thanh bên bản đồ. Nhấp đúp để đặt lại.',
 };

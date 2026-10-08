@@ -6357,7 +6357,9 @@ export const id_ID: EnTranslations = {
         "passage": "Jalan"
       },
       "collapseHint": "Tutup bilah peta",
-      "expandHint": "Buka bilah peta"
+      "expandHint": "Buka bilah peta",
+      "resizeRailAria": "Lebar bilah sisi peta",
+      "resizeRailHint": "Seret untuk mengubah ukuran bilah sisi peta. Klik dua kali untuk mengatur ulang."
     },
     "arenaGate": {
       "minLevelNote": "Membutuhkan Level {level}"

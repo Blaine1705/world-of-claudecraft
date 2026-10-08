@@ -20287,4 +20287,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Touches : {hits} | Critiques : {crits} ({critPercent}) | Moyenne : {average} | Min./max. : {min} / {max}',
   'hudChrome.options.ambienceVolume': "Volume de l'ambiance",
+  'hudChrome.mapAtlas.resizeRailAria': 'Largeur de la barre latérale de la carte',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Faites glisser pour redimensionner la barre latérale de la carte. Double-cliquez pour réinitialiser.',
 };

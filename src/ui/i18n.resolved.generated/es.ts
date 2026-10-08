@@ -6357,7 +6357,9 @@ export const es: EnTranslations = {
         "passage": "Paso"
       },
       "collapseHint": "Contraer la barra lateral del mapa",
-      "expandHint": "Expandir la barra lateral del mapa"
+      "expandHint": "Expandir la barra lateral del mapa",
+      "resizeRailAria": "Ancho de la barra lateral del mapa",
+      "resizeRailHint": "Arrastra para cambiar el tamaño de la barra lateral del mapa. Haz doble clic para restablecer."
     },
     "arenaGate": {
       "minLevelNote": "Requiere nivel {level}"

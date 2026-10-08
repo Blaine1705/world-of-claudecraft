@@ -19778,4 +19778,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Træffere: {hits} | Kritiske: {crits} ({critPercent}) | Gennemsnit: {average} | Min./maks.: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Omgivelseslydstyrke',
+  'hudChrome.mapAtlas.resizeRailAria': 'Kortets sidebjælkebredde',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Træk for at ændre størrelsen på kortets sidebjælke. Dobbeltklik for at nulstille.',
 };

@@ -19796,4 +19796,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Träffar: {hits} | Kritiska: {crits} ({critPercent}) | Snitt: {average} | Min/max: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Omgivningsvolym',
+  'hudChrome.mapAtlas.resizeRailAria': 'Kartans sidopanelsbredd',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Dra för att ändra storlek på kartans sidopanel. Dubbelklicka för att återställa.',
 };

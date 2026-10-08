@@ -6357,7 +6357,9 @@ export const nl_NL: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Zijbalk kaart samenvouwen",
-      "expandHint": "Zijbalk kaart uitvouwen"
+      "expandHint": "Zijbalk kaart uitvouwen",
+      "resizeRailAria": "Breedte van kaartzijbalk",
+      "resizeRailHint": "Sleep om de kaartzijbalk te vergroten of te verkleinen. Dubbelklik om te resetten."
     },
     "arenaGate": {
       "minLevelNote": "Vereist niveau {level}"

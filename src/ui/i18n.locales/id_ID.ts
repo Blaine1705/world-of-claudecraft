@@ -20024,4 +20024,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Kena: {hits} | Kritis: {crits} ({critPercent}) | Rata-rata: {average} | Min/maks: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Volume ambience',
+  'hudChrome.mapAtlas.resizeRailAria': 'Lebar bilah sisi peta',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Seret untuk mengubah ukuran bilah sisi peta. Klik dua kali untuk mengatur ulang.',
 };

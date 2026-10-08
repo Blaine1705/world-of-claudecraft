@@ -6357,7 +6357,9 @@ export const fr_CA: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Réduire la barre latérale de la carte",
-      "expandHint": "Déployer la barre latérale de la carte"
+      "expandHint": "Déployer la barre latérale de la carte",
+      "resizeRailAria": "Largeur de la barre latérale de la carte",
+      "resizeRailHint": "Faites glisser pour redimensionner la barre latérale de la carte. Double-cliquez pour réinitialiser."
     },
     "arenaGate": {
       "minLevelNote": "Niveau requis : {level}"

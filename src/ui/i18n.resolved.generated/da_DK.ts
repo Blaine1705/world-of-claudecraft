@@ -6357,7 +6357,9 @@ export const da_DK: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Skjul kortsidepanel",
-      "expandHint": "Udvid kortsidepanel"
+      "expandHint": "Udvid kortsidepanel",
+      "resizeRailAria": "Kortets sidebjælkebredde",
+      "resizeRailHint": "Træk for at ændre størrelsen på kortets sidebjælke. Dobbeltklik for at nulstille."
     },
     "arenaGate": {
       "minLevelNote": "Kræver niveau {level}"

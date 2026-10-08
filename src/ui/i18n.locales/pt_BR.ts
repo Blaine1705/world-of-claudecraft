@@ -20047,4 +20047,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Acertos: {hits} | Críticos: {crits} ({critPercent}) | Média: {average} | Mín./máx.: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Volume do ambiente',
+  'hudChrome.mapAtlas.resizeRailAria': 'Largura da barra lateral do mapa',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Arraste para redimensionar a barra lateral do mapa. Clique duas vezes para redefinir.',
 };

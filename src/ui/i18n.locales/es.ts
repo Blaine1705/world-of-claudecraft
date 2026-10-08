@@ -20219,4 +20219,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.meters.detailHitSubtitle':
     'Golpes: {hits} | Críticos: {crits} ({critPercent}) | Promedio: {average} | Mín./máx.: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Volumen de ambiente',
+  'hudChrome.mapAtlas.resizeRailAria': 'Ancho de la barra lateral del mapa',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Arrastra para cambiar el tamaño de la barra lateral del mapa. Haz doble clic para restablecer.',
 };

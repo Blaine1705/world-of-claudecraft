@@ -6357,7 +6357,9 @@ export const vi_VN: EnTranslations = {
         "passage": "lối đi; ngõ; hành lang đi qua"
       },
       "collapseHint": "Thu gọn thanh bên bản đồ",
-      "expandHint": "Mở rộng thanh bên bản đồ"
+      "expandHint": "Mở rộng thanh bên bản đồ",
+      "resizeRailAria": "Chiều rộng thanh bên bản đồ",
+      "resizeRailHint": "Kéo để đổi kích thước thanh bên bản đồ. Nhấp đúp để đặt lại."
     },
     "arenaGate": {
       "minLevelNote": "Yêu cầu Cấp {level}"

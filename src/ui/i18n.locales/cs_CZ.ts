@@ -19696,4 +19696,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.detailHitSubtitle':
     'Zásahy: {hits} | Kritické: {crits} ({critPercent}) | Průměr: {average} | Min./max.: {min} / {max}',
   'hudChrome.options.ambienceVolume': 'Hlasitost prostředí',
+  'hudChrome.mapAtlas.resizeRailAria': 'Šířka postranního panelu mapy',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Tažením změníte šířku postranního panelu mapy. Dvojklikem ji resetujete.',
 };

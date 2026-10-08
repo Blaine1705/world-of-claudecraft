@@ -543,7 +543,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the v0.45.0 release batch after approved PR #4357 added the
     // instance difficulty badge wiring to the coordinator. Exact count measured
     // on the merged tree after the release integration repair (wc -l after biome).
-    ceiling: 18178,
+    // Lowered from 18178 by the resizable world map: the window drag-handle
+    // predicate moved out to src/ui/window_drag_handle.ts and the map canvas
+    // sizing landed as src/ui/hud/map/map_canvas_size_controller.ts behind a
+    // one-line install. Exact merged count after the release batch, zero slack.
+    ceiling: 18164,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1247,7 +1251,11 @@ const MONOLITHS: MonolithRow[] = [
     // PR #4387 then moved difficulty selection behind its SimContext sibling.
     // Weekly loot focus composes with that release candidate and keeps the
     // resolved sim.ts at the exact merged count after biome. Zero slack.
-    ceiling: 11629,
+    // Re-pinned at the continued v0.45.0 release batch after the approved PRs
+    // already on this line composed with the weekly loot focus candidate; no
+    // new sim logic lands in this resizable-map merge. Exact merged count, zero
+    // slack.
+    ceiling: 11631,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
