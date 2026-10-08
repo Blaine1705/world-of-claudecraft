@@ -203,14 +203,15 @@ describe('Wildheart Basin rework: heroic partitions', () => {
     const gear = gearOf(HEROIC_BOSS_LOOT.wildheart_high_priest);
     expect(gear.reduce((sum, entry) => sum + entry.chance, 0)).toBe(1);
     // The shipped weights summed to 3.43; without the two moved epics (0.33
-    // each) the rest sum to 2.77 and keep their proportions inside the 0.82 the
-    // relocated Nythraxis pieces leave (the Harness 0.1, two home pieces 0.04).
+    // each) and the uncommon trio (1.0, Normal only since 2026-10-09) the rest
+    // sum to 1.77 and keep their proportions inside the 0.82 the relocated
+    // Nythraxis pieces leave (the Harness 0.1, two home pieces 0.04).
     const chance = (id: string) => gear.find((entry) => entry.itemId === id)?.chance ?? 0;
     expect(chance('heroic_bramblehide_harness')).toBeCloseTo(0.1, 9);
     expect(chance('heroic_bramblehide_legguards')).toBeCloseTo(0.04, 9);
     expect(chance('heroic_thornpeak_moonhide_cowl')).toBeCloseTo(0.04, 9);
-    expect(chance('basin_stalkers_tunic')).toBeCloseTo((0.34 / 2.77) * 0.82, 9);
-    expect(chance('heroic_wildheart_tuskblade')).toBeCloseTo((0.06 / 2.77) * 0.82, 9);
+    expect(chance('basin_stalkers_tunic')).toBeCloseTo((0.34 / 1.77) * 0.82, 9);
+    expect(chance('heroic_wildheart_tuskblade')).toBeCloseTo((0.06 / 1.77) * 0.82, 9);
     expect(
       HEROIC_BOSS_LOOT.wildheart_high_priest
         .filter((e) => e.rollGroup === FARM_HEROIC_PATTERN_GROUP)

@@ -1046,10 +1046,10 @@ function freezePageTable(pages: ReliquaryPageDef[]): readonly ReliquaryPageDef[]
 
 export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
   // ---- Five-man dungeons: normal chase uniques ----
-  // Clear meters on these pages read BOTH difficulties ('any'): every relic
-  // below also drops on the Heroic claim (HEROIC_BOSS_LOOT pays the base id or
-  // a heroic_<base> variant that folds back to it), so a Heroic run is a run
-  // at the page's spoils and counts. The heroic-only epic pages keep their
+  // Clear meters on these pages read BOTH difficulties ('any') unless noted:
+  // every relic below also drops on the Heroic claim (HEROIC_BOSS_LOOT pays the
+  // base id or a heroic_<base> variant that folds back to it), so a Heroic run
+  // is a run at the page's spoils and counts. The heroic-only epic pages keep their
   // 'heroic' filter, and the Crucible raid pages keep 'normal' because their
   // Normal tables hold normalOnly rows Heroic never pays. Derived and pinned by
   // tests/reliquary_content.test.ts ("count every difficulty that pays").
@@ -1058,7 +1058,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'The Hollow Crypt',
     desc: 'Signature spoils claimed from Morthen and the Hollow Crypt.',
-    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'any' },
+    // Normal clears only (2026-10-09): Morthen's four uncommon brand pieces
+    // drop on Normal alone (a Heroic kill pays no uncommon gear), so Heroic
+    // cannot pay the whole page; Heroic runs count on the Heroic page below.
+    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'normal' },
     // Four bosses pay the page since every boss's blue roll joined it
     // (2026-10-08), so every row names its own; the first five are Morthen's.
     // The rework's three rare chase rows (Spadehaft, Fang, Hymnal) join this

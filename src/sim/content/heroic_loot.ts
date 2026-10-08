@@ -737,16 +737,6 @@ const PRESERVED_BASE_LOOT_SOURCES = new Set([
   'heroic_spadeworn_gauntlets',
   'heroic_tideglass_gauntlets',
   'heroic_turnkeys_shank',
-  'bloodmane_warleggings',
-  'boneplate_vest',
-  'cryptbone_greaves',
-  'cryptbone_helm',
-  'cryptbone_pauldrons',
-  'cultist_flayer',
-  'eelskin_tunic',
-  'emberwood_staff',
-  'fenmist_robe',
-  'greyjaw_hide_boots',
   'heroic_boneguard_breastplate',
   'heroic_cantors_hymnal',
   'heroic_rimeweb_fang',
@@ -801,18 +791,6 @@ const PRESERVED_BASE_LOOT_SOURCES = new Set([
   'heroic_wyrmshadow_talongrips',
   'heroic_wyrmshadow_treads',
   'heroic_ysols_pearl_greaves',
-  'choirward_leggings',
-  'marshstrider_boots',
-  'mistveil_cord',
-  'mistveil_grips',
-  'nightwalk_jerkin',
-  'oiled_boots',
-  'quilted_trousers',
-  'revenant_silk_robe',
-  'sunbone_ritual_sarong',
-  'trollhide_leggings',
-  'vineclaw_stalking_breeches',
-  'zealotsbane_blade',
 ]);
 
 const preserveBaseLootSource = (entry: LootEntry): LootEntry =>
@@ -838,6 +816,9 @@ const THORNPEAK_HOME_SHARE = 0.04;
 // level 25, PRESERVED_BASE_LOOT_SOURCES), a small slice beside the epics.
 const BLUE_COPY_SHARE = 0.04;
 
+// A Heroic table pays heroic-tier gear only (2026-10-09): every dungeon's
+// uncommon pieces drop on Normal, never on a Heroic kill, so each boss's one
+// Heroic item is an epic, a raid piece or a Heroic copy.
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   // The Hollow Crypt rework (hollow_crypt.md 8.2): one equipment item per boss
   // kill; four shipped epics moved off Morthen onto the new wing and choir bosses.
@@ -850,8 +831,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ...sharedPartition(1 - THORNPEAK_SHARE - 3 * BLUE_COPY_SHARE, [
         ['sextons_burial_spade', 0.3],
         ['cryptplate_helm', 0.3],
-        ['quilted_trousers', 0.15],
-        ['oiled_boots', 0.15],
         ['heroic_sextons_spadehaft', 0.1],
       ]),
     ]).map(preserveBaseLootSource),
@@ -885,7 +864,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ...sharedPartition(1 - THORNPEAK_SHARE - 3 * BLUE_COPY_SHARE, [
         ['shadowpulse_handwraps', 0.35],
         ['shadowpulse_slippers', 0.3],
-        ['choirward_leggings', 0.2],
         ['heroic_cantors_hymnal', 0.15],
       ]),
     ]).map(preserveBaseLootSource),
@@ -999,10 +977,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['heroic_bonewrought_greatsword', THORNPEAK_HOME_SHARE],
       ['heroic_thornpeak_wardblade', THORNPEAK_HOME_SHARE],
       ...sharedPartition(0.26 - 2 * THORNPEAK_HOME_SHARE, [
-        ['boneplate_vest', 0.34],
-        ['revenant_silk_robe', 0.33],
-        ['nightwalk_jerkin', 0.33],
-        ['zealotsbane_blade', 0.19],
         ['heroic_korgaths_chainwraps', 0.1],
         ['heroic_staff_of_velkhar', 0.1],
         ['heroic_shadowmeld_tunic', 0.1],
@@ -1030,10 +1004,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['heroic_votive_ward_of_the_deathless_court', THORNPEAK_HOME_SHARE],
       ['heroic_courtiers_bonefang', THORNPEAK_HOME_SHARE],
       ...sharedPartition(0.26 - 2 * THORNPEAK_HOME_SHARE, [
-        ['boneplate_vest', 0.34],
-        ['revenant_silk_robe', 0.33],
-        ['nightwalk_jerkin', 0.33],
-        ['emberwood_staff', 0.2],
         ['heroic_boneguard_breastplate', 0.1],
         ['heroic_shadowmeld_tunic', 0.1],
         ['heroic_staff_of_velkhar', 0.1],
@@ -1061,10 +1031,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
         ['morthens_cryptforged_hauberk', 0.18],
         ['lunarward_cinch', 0.18],
         ['bastion_sigil', 0.18],
-        ['cryptbone_greaves', 0.07],
-        ['greyjaw_hide_boots', 0.07],
-        ['cryptbone_helm', 0.07],
-        ['cryptbone_pauldrons', 0.07],
       ]),
     ]).map(preserveBaseLootSource),
     { itemId: 'gravewoven_bag', chance: 0.2, preserveSourceTier: true },
@@ -1077,16 +1043,10 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['heroic_bramblehide_treads', THORNPEAK_SHARE],
       ['heroic_fogbinders_rod', BLUE_COPY_SHARE],
       ...sharedPartition(1 - 2 * THORNPEAK_SHARE - 1 * BLUE_COPY_SHARE, [
-        ['trollhide_leggings', 0.34],
-        ['marshstrider_boots', 0.33],
-        ['fenmist_robe', 0.33],
-        ['eelskin_tunic', 0.2],
         // The Tideguard Sabatons' Heroic copy came with its Normal drop off Olen.
         ['heroic_tideguard_sabatons', 0.1],
         ['heroic_drowned_prayer_sandals', 0.1],
         ['heroic_eelscale_treads', 0.1],
-        ['mistveil_cord', 0.12],
-        ['mistveil_grips', 0.12],
         ['mistcallers_fang', 0.34],
         ['tidebound_spaulders', 0.33],
         ['stormjar', 0.25],
@@ -1122,10 +1082,6 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
       ['heroic_stormhymn_chain_grips', THORNPEAK_HOME_SHARE],
       ['heroic_stormhymn_chain_treads', THORNPEAK_HOME_SHARE],
       ...sharedPartition(0.24 - 2 * THORNPEAK_HOME_SHARE, [
-        ['boneplate_vest', 0.34],
-        ['revenant_silk_robe', 0.33],
-        ['nightwalk_jerkin', 0.33],
-        ['cultist_flayer', 0.1],
         ['heroic_fang_of_korzul', 0.05],
         ['heroic_wyrmshadow_harness', 0.05],
         ['heroic_wyrmshadow_talongrips', 0.04],
@@ -1181,17 +1137,15 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     ]).map(preserveBaseLootSource),
   ],
   // Zulgar keeps his shipped partition minus the two epics the rework moved to
-  // the Beastmaster and the Gorgebloom; weightedLootGroup renormalizes the
-  // remaining weights. Mount reins and the farm pattern rows are unchanged.
+  // the Beastmaster and the Gorgebloom and minus his uncommon trio (Normal
+  // only); weightedLootGroup renormalizes the remaining weights. Mount reins
+  // and the farm pattern rows are unchanged.
   wildheart_high_priest: [
     ...weightedLootGroup('wildheart_heroic', [
       ['heroic_bramblehide_harness', THORNPEAK_SHARE],
       ['heroic_bramblehide_legguards', THORNPEAK_HOME_SHARE],
       ['heroic_thornpeak_moonhide_cowl', THORNPEAK_HOME_SHARE],
       ...sharedPartition(1 - THORNPEAK_SHARE - 2 * THORNPEAK_HOME_SHARE, [
-        ['bloodmane_warleggings', 0.34],
-        ['vineclaw_stalking_breeches', 0.33],
-        ['sunbone_ritual_sarong', 0.33],
         ['heroic_wildheart_tuskblade', 0.06],
         ['heroic_wildheart_hexwood_staff', 0.06],
         ['heroic_wildheart_fangknife', 0.06],

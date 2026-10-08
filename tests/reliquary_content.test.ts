@@ -680,7 +680,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(page.clearSource).toEqual({
       kind: 'dungeon',
       dungeonId: 'hollow_crypt',
-      difficulty: 'any',
+      difficulty: 'normal',
     });
     const relics = itemRelicIds(page);
     expect(relics).toContain('cryptbone_helm');
@@ -973,9 +973,12 @@ describe('Reliquary dungeon clear meters count every difficulty that pays the pa
     }
   });
 
-  it('the five-man and Nythraxis pages count both difficulties; the Crucible raid pages keep the Normal filter', () => {
+  it('the five-man and Nythraxis pages count both difficulties; the Crucible raid pages and the Hollow Crypt keep the Normal filter', () => {
     const byId = Object.fromEntries(dungeonPages.map((d) => [d.page.id, d.difficulty]));
-    expect(byId.conquerors_hollow_crypt).toBe('any');
+    // Morthen's four uncommon brand pieces drop on Normal alone since Heroic
+    // stopped paying uncommon gear (2026-10-09); Heroic runs count on the
+    // Heroic Hollow Crypt page instead.
+    expect(byId.conquerors_hollow_crypt).toBe('normal');
     expect(byId.conquerors_sunken_bastion).toBe('any');
     expect(byId.conquerors_drowned_temple).toBe('any');
     expect(byId.conquerors_gravewyrm_sanctum).toBe('any');

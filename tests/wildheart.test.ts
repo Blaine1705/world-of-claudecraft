@@ -479,8 +479,18 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // less the two epics the rework moved to the Beastmaster (Bloodmane
     // War-Legguards) and the Gorgebloom (Sunbone Oracle's Crown):
     // tests/wildheart_loot.test.ts pins them there. The three Heroic copies of
-    // his relocated Nythraxis pieces joined on 2026-10-08: 14.
-    expect(gear).toHaveLength(14);
+    // his relocated Nythraxis pieces joined on 2026-10-08, and his uncommon
+    // trio left on 2026-10-09 (Normal only): 11.
+    expect(gear).toHaveLength(11);
+    for (const id of [
+      'bloodmane_warleggings',
+      'vineclaw_stalking_breeches',
+      'sunbone_ritual_sarong',
+    ])
+      expect(
+        gear.some((entry) => entry.itemId === id),
+        id,
+      ).toBe(false);
     expect(gear.some((entry) => entry.itemId === 'bloodmane_war_legguards')).toBe(false);
     expect(gear.some((entry) => entry.itemId === 'sunbone_oracles_crown')).toBe(false);
     expect(gear.some((entry) => entry.itemId === 'paired_talons')).toBe(true);

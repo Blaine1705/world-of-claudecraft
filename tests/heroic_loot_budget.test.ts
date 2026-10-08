@@ -4,6 +4,8 @@ import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { itemLevel, itemSourceLevel } from '../src/sim/item_level';
+import { heroicLootItemId } from '../src/sim/loot/heroic_item';
+import { lootEntryRollsOnClaim } from '../src/sim/loot/loot_difficulty_gate';
 import { rollLoot } from '../src/sim/loot/loot_roll';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -37,6 +39,10 @@ import { Sim } from '../src/sim/sim';
 // every boss's PREVIOUS gearIds still hashed to its previous gearDigest
 // against the re-minted defs, so no item definition or level moved; only
 // which items each boss pays changed.
+// Re-minted 2026-10-09 when the dungeons' uncommon pieces left the Heroic
+// tables (they drop on Normal only): eight bosses lost their greens from
+// gearIds. Receipt: each boss's previous gearIds still hashed to its previous
+// gearDigest against the current defs, so no item definition or level moved.
 const BASELINE = {
   // Re-minted for the Hollow Crypt rework (docs/design/dungeon-rework/hollow_crypt.md
   // 8.1 and 8.2): every boss now carries its own table. Four shipped heroic epics
@@ -51,15 +57,10 @@ const BASELINE = {
       'heroic_gravedirt_grips',
       'heroic_sextons_spadehaft',
       'heroic_spadeworn_gauntlets',
-      'oiled_boots',
-      'quilted_trousers',
       'sextons_burial_spade',
     ],
     normalDigest: 'f07e48d99b1c384c50ed260a5d8b5951c5fd44b7eb81135bf2a3bb2330f7e6ab',
-    // Re-minted when the Quilted Trousers kept their shipped source tier
-    // (item_level.ts, the rework's preserved source levels): item level 11, as
-    // shipped, not the 9 the move to level-8 Marrow would have derived.
-    gearDigest: '2a39873ca2bdc6a8023424c59bed252385c0081051e753ce9d7fb69f1bc45013',
+    gearDigest: '3f9c75d6579d1c9e0a4b9fad3ca29fc5daebd6d839ef73fdee2fe5d25a18507a',
   },
   rimeweb: {
     gearIds: [
@@ -82,7 +83,6 @@ const BASELINE = {
   },
   cantor_ilvane: {
     gearIds: [
-      'choirward_leggings',
       'heroic_cantors_hymnal',
       'heroic_cantors_stole',
       'heroic_choirward_pauldrons',
@@ -92,15 +92,11 @@ const BASELINE = {
       'shadowpulse_slippers',
     ],
     normalDigest: 'bd8086f86a2eb33fcd96aa481a389a19286ed2536a8082279565594bf0162460',
-    gearDigest: 'b2d45d18c9019a5cdd2309fc21b1c8eca2d01fc69cb9554047b889e03844db0f',
+    gearDigest: '1842301c7e8371500253d2e9d055d622549e9b4785649c972d91be5a66c86584',
   },
   morthen: {
     gearIds: [
       'bastion_sigil',
-      'cryptbone_greaves',
-      'cryptbone_helm',
-      'cryptbone_pauldrons',
-      'greyjaw_hide_boots',
       'heroic_candlewatch_jerkin',
       'heroic_gravecallers_rod',
       'heroic_knellbound_hauberk',
@@ -110,7 +106,7 @@ const BASELINE = {
       'morthens_cryptforged_hauberk',
     ],
     normalDigest: '5d6ae5399615ed65d1a72890bdec2dec6be1d1c0e4afa111a5418e21fb217bd7',
-    gearDigest: '5f47d4760a4f9af5e8acc92de437d5b1193b6ca44db6c752e3b5f23a68a7c936',
+    gearDigest: '2ecc80d8fbc40be313d72e79a03910874ea56e316e678a4ca1b890552ff060c7',
   },
   // Re-minted for the Sunken Bastion rework (docs/design/dungeon-rework/
   // sunken_bastion.md 8.1 and 8.2): Olen's normal table gains the Longsword row
@@ -152,24 +148,18 @@ const BASELINE = {
   },
   vael_the_mistcaller: {
     gearIds: [
-      'eelskin_tunic',
-      'fenmist_robe',
       'heroic_bramblehide_treads',
       'heroic_direfang_quiver',
       'heroic_drowned_prayer_sandals',
       'heroic_eelscale_treads',
       'heroic_fogbinders_rod',
       'heroic_tideguard_sabatons',
-      'marshstrider_boots',
       'mistcallers_fang',
-      'mistveil_cord',
-      'mistveil_grips',
       'stormjar',
       'tidebound_spaulders',
-      'trollhide_leggings',
     ],
     normalDigest: '8917391dfc5e9fcd2da06099477d6b7b9a1444246f616b0aaf694276619c25fa',
-    gearDigest: 'b9211c53b38de7e19a0b8c5d1879e1f4f05a5dd63fc59b33cf1f02728ce37a55',
+    gearDigest: 'b885ac64a58cca05122e3ce0d20082f5e57c4943f0ce893365b3b600bed5faab',
   },
   // Re-minted for the Drowned Temple rework (docs/design/dungeon-rework/
   // drowned_temple.md section 8): Selthe's normal table gains a guaranteed
@@ -228,7 +218,6 @@ const BASELINE = {
   // the shipped rows keeping their ratios. No existing item def changed.
   korgath_the_bound: {
     gearIds: [
-      'boneplate_vest',
       'foremans_last_link',
       'gravescale_girdle',
       'gravewyrm_claws',
@@ -250,17 +239,12 @@ const BASELINE = {
       'heroic_wyrmcult_soulsteps',
       'heroic_wyrmfang_greatblade',
       'heroic_wyrmshadow_treads',
-      'nightwalk_jerkin',
-      'revenant_silk_robe',
-      'zealotsbane_blade',
     ],
     normalDigest: 'a0d9dfeea48e421978c3c1a27aa11c1aad7dc6d568cbf5d517c79bc85e663dbc',
-    gearDigest: '7e51c8be1aefe904cb92873dcbbd1da4ba43356a0d776253cee7dac8de856327',
+    gearDigest: '14ad38be49a5f4495f3c4f0670ee5007b5d5cf71b73e223d943929c394a57ff6',
   },
   grand_necromancer_velkhar: {
     gearIds: [
-      'boneplate_vest',
-      'emberwood_staff',
       'heroic_boneguard_breastplate',
       'heroic_courtiers_bonefang',
       'heroic_deathlord_legguards',
@@ -276,20 +260,16 @@ const BASELINE = {
       'heroic_wildgrowth_leggings',
       'heroic_wraithfire_orb',
       'heroic_wyrmshadow_legguards',
-      'nightwalk_jerkin',
       'phial_of_the_tithe',
-      'revenant_silk_robe',
       'sanctum_prowlers_grips',
       'vestments_of_the_waking_rite',
       'wyrmchoir_handwraps',
     ],
     normalDigest: '859a210340367eb11461edcb9857aa0b9937bbf25c81f99d2b4ec947eed83302',
-    gearDigest: '2388b82d45a7881fd6adecbff609b59233aaec7466cb92880415a2b1f359415e',
+    gearDigest: '5742740a4b9d149b8a5af5f0b4745dde1efb2cad38c19d1553f0f3ffaf7958bc',
   },
   korzul_the_gravewyrm: {
     gearIds: [
-      'boneplate_vest',
-      'cultist_flayer',
       'gravewyrm_cleaver',
       'heroic_fang_of_korzul',
       'heroic_gravecourt_hewer',
@@ -300,14 +280,12 @@ const BASELINE = {
       'heroic_verdant_walkers',
       'heroic_wyrmshadow_harness',
       'heroic_wyrmshadow_talongrips',
-      'nightwalk_jerkin',
       'quenchwater_flask',
-      'revenant_silk_robe',
       'shroud_of_the_gravewyrm',
       'wildsoul_maul',
     ],
     normalDigest: '4aed8727dccd1d8ad7f7e1027b40145472b282246b10dc3963772e95056a6b8d',
-    gearDigest: '6123b946d71356acf3375efd934f3e7453602f80ebeee5a5d3e907ea460e91f1',
+    gearDigest: '5ada5de88b43c548d305ed10bce03b31b02c8fb63f3ec740c9df2990404944dc',
   },
   // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
   // 8.1 and 8.2): the promoted Fanglord Beastmaster and the Gorgebloom carry
@@ -353,7 +331,6 @@ const BASELINE = {
   wildheart_high_priest: {
     gearIds: [
       'basin_stalkers_tunic',
-      'bloodmane_warleggings',
       'greatfang_of_the_basin',
       'heroic_bramblehide_harness',
       'heroic_bramblehide_legguards',
@@ -363,12 +340,10 @@ const BASELINE = {
       'heroic_wildheart_tuskblade',
       'paired_talons',
       'sunbone_ritual_hauberk',
-      'sunbone_ritual_sarong',
       'verdant_heart_vestment',
-      'vineclaw_stalking_breeches',
     ],
     normalDigest: 'a75b69d4c5bebc4bfd9990229e494df00a53aaa8b3372aa56e803f7b5d5fd224',
-    gearDigest: 'f3d17a7873084c072e9fd2ffc43a8a1db9c6500b1c544a2f2cafabe506bcc1b4',
+    gearDigest: 'f1272ee3496342b19cb27e7e2b5695c462762ace475de0691237ba0b41c0d986',
   },
   // The Gaol Turnkey gained a heroic roll on 2026-10-08 (two of Vael's epics,
   // its relocated Nythraxis piece, its blue roll's rare copies).
@@ -433,6 +408,17 @@ describe('heroic five-player equipment budget', () => {
       expect(MOBS[bossId].loot.find((row) => row.itemId === itemId)?.normalOnly).toBe(true);
     }
   });
+
+  // Every equipment id any mob's own (Normal) table pays.
+  const normalGearIds = new Set(
+    Object.values(MOBS).flatMap((mob) =>
+      (mob.loot ?? []).flatMap((entry) =>
+        entry.itemId && ITEMS[entry.itemId]?.slot && ITEMS[entry.itemId]?.kind !== 'bag'
+          ? [entry.itemId]
+          : [],
+      ),
+    ),
+  );
 
   let sim: Sim;
   beforeAll(() => {
@@ -509,6 +495,26 @@ describe('heroic five-player equipment budget', () => {
         baseline.gearIds.map((id) => [id, { def: ITEMS[id], level: itemLevel(ITEMS[id]) }]),
       );
       expect(digest(definitions)).toBe(baseline.gearDigest);
+    });
+
+    it(bossId + ' pays no Normal gear on a Heroic kill', () => {
+      // Every row a Heroic claim can roll: the base rows that are not
+      // normalOnly, as the roller upgrades them, plus the Heroic table. None
+      // may be uncommon, nor the same item a Normal table pays anywhere.
+      const claimIds = [
+        ...MOBS[bossId].loot
+          .filter((entry) => entry.itemId && lootEntryRollsOnClaim(entry, true))
+          .map((entry) => heroicLootItemId(entry.itemId!, true)),
+        ...(HEROIC_BOSS_LOOT[bossId] ?? []).flatMap((entry) =>
+          entry.itemId ? [entry.itemId] : [],
+        ),
+      ];
+      const gear = claimIds.filter((id) => ITEMS[id]?.slot && ITEMS[id]?.kind !== 'bag');
+      expect(gear.length).toBeGreaterThan(0);
+      for (const id of gear) {
+        expect(ITEMS[id].quality, id).toMatch(/^(rare|epic|legendary)$/);
+        expect(normalGearIds.has(id), id + ' also drops on Normal').toBe(false);
+      }
     });
 
     it(bossId + ' preserves the complete Normal loot table and probabilities', () => {

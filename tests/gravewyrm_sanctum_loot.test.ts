@@ -52,7 +52,7 @@ const HEROIC = {
       heroic_thornpeak_wardblade: 0.04,
     },
     shipped: 0.18,
-    anchor: ['boneplate_vest', 'zealotsbane_blade'],
+    anchor: ['heroic_korgaths_chainwraps', 'heroic_wyrmshadow_treads'],
   },
   grand_necromancer_velkhar: {
     group: 'grand_necromancer_velkhar_heroic',
@@ -66,7 +66,7 @@ const HEROIC = {
       heroic_courtiers_bonefang: 0.04,
     },
     shipped: 0.18,
-    anchor: ['boneplate_vest', 'emberwood_staff'],
+    anchor: ['heroic_boneguard_breastplate', 'heroic_deathlord_legguards'],
   },
   korzul_the_gravewyrm: {
     group: 'korzul_heroic',
@@ -80,7 +80,7 @@ const HEROIC = {
       heroic_stormhymn_chain_treads: 0.04,
     },
     shipped: 0.16,
-    anchor: ['boneplate_vest', 'cultist_flayer'],
+    anchor: ['heroic_fang_of_korzul', 'heroic_wyrmshadow_talongrips'],
   },
 } as const;
 
@@ -140,9 +140,9 @@ describe('Gravewyrm Sanctum rework: heroic partitions', () => {
       // The shipped ratio between two of its rows is unchanged.
       const [a, b] = anchor;
       const shippedRatio: Record<string, number> = {
-        korgath_the_bound: 0.34 / 0.19,
-        grand_necromancer_velkhar: 0.34 / 0.2,
-        korzul_the_gravewyrm: 0.34 / 0.1,
+        korgath_the_bound: 0.1 / 0.05,
+        grand_necromancer_velkhar: 0.1 / 0.05,
+        korzul_the_gravewyrm: 0.05 / 0.04,
       };
       expect(chance(a) / chance(b)).toBeCloseTo(shippedRatio[bossId], 9);
     },

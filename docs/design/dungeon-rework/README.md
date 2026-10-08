@@ -235,6 +235,13 @@ diluting, and final bosses were carrying most of each dungeon's heroic epics.
   Turnkey, two of Ysolei's to the Mere Hydra's center head (the head that carries
   the fight's one roll), and Morthen's Shadowpulse Slippers to Cantor Ilvane
   beside their Handwraps.
+- **Heroic pays heroic gear only (2026-10-09).** A Heroic kill never pays a piece
+  of gear that also drops on Normal: the dungeons' uncommon pieces left every
+  heroic roll and drop on Normal alone, and each roll's other rows keep their
+  ratios over the freed share, still one item per kill. Pinned per boss by
+  `tests/heroic_loot_budget.test.ts` ("pays no Normal gear on a Heroic kill").
+  The Hollow Crypt Reliquary page keeps Morthen's four uncommon brand pieces, so
+  its clear meter counts Normal clears; Heroic runs count on the Heroic page.
 
 ## 8. Content obligations checklist (every dungeon)
 
