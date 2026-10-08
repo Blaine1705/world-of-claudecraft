@@ -701,7 +701,7 @@ export const YSOLEI_TUNING = {
   lunarFirst: 5,
   lunarEvery: 10,
   lunarCast: 1.5,
-  lunarRadius: 13,
+  lunarRadius: 15,
   lunarMin: 60,
   lunarMax: 80,
   undertowFirst: 15,
@@ -711,7 +711,7 @@ export const YSOLEI_TUNING = {
   undertowPull: 3.5,
   /** The pull reaches everyone on the island and a little beyond. */
   undertowReach: 45,
-  crashRadius: 12,
+  crashRadius: 14,
   crashMin: 250,
   crashMax: 300,
   /** The Rising Tide starts under this share of her health. */

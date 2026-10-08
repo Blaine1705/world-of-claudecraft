@@ -122,12 +122,12 @@ export const MOON_ALTAR = { x: -30, z: 206, r: 26, h: 12 } as const;
 /** The altar stone in the island's centre (under the silver column). */
 export const ALTAR_STONE = { x: -30, z: 206, r: 3 } as const;
 /** Ysolei's dais: a raised ring floor round her coil, sized to her (her
- *  bodyRadius 8 plus the melee ring standing on its rim), centred where she
+ *  bodyRadius 10 plus the melee ring standing on its rim), centred where she
  *  coils against the altar stone's east face. */
 export const YSOLEI_DAIS = {
   x: ALTAR_STONE.x + ALTAR_STONE.r + 0.6,
   z: 206,
-  r: 11.5,
+  r: 13.5,
   rise: 0.4,
 } as const;
 
@@ -608,7 +608,11 @@ const PROPS: FieldProp[] = [
   { kind: 'dt_brazier', x: 22, z: 196, rot: 0, r: 0.8, h: 2 },
   { kind: 'dt_brazier', x: 22, z: 218, rot: 0, r: 0.8, h: 2 },
   // The Moon Altar in the island's centre, and its ring of standing stones.
-  { kind: 'dt_moon_altar', x: ALTAR_STONE.x, z: ALTAR_STONE.z, rot: 0, r: ALTAR_STONE.r, h: 3 },
+  // The altar is drawn only (no footprint): an interior collider walls sight at
+  // any height (colliders.ts sightBlockedAt), and the stone sits wholly inside
+  // Ysolei's body (her bodyRadius round her pivot on its east face), so a
+  // footprint only ever hid her from the casters behind it (playtest).
+  { kind: 'dt_moon_altar', x: ALTAR_STONE.x, z: ALTAR_STONE.z, rot: 0 },
   ...ring('dt_standing_stone', MOON_ALTAR.x, MOON_ALTAR.z, 23.5, [30, 150, 210, 330], {
     r: 1.1,
     h: 7,
