@@ -511,12 +511,12 @@ export const ko_KR: EnTranslations = {
       "castingOff": "{dest}행 여객선이 출항하고 있습니다",
       "boardHint": "출항할 때 갑판 위에 서 있으면 함께 떠납니다. 운임은 무료입니다.",
       "sailing": "{dest}(으)로 항해 중",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "{port} 출발, {dest}행 여객선",
+      "portTitle": "{port} 여객선 선착장",
+      "destination": "목적지: {dest}",
+      "boardNow": "지금 승선 가능",
+      "arrivesIn": "여객선 도착까지 {time}",
+      "scheduleUnavailable": "여객선 운항 시간표를 확인할 수 없습니다."
     },
     "materialStackSelectionUnavailable": "해당 재료 선택을 더 이상 사용할 수 없습니다.",
     "vehicle": {

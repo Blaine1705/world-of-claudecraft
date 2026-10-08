@@ -58,38 +58,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.ferry.portTitle",
     "hudChrome.ferry.scheduleUnavailable"
   ],
-  "zh_CN": [
-    "hudChrome.ferry.arrivesIn",
-    "hudChrome.ferry.boardNow",
-    "hudChrome.ferry.destination",
-    "hudChrome.ferry.portLabel",
-    "hudChrome.ferry.portTitle",
-    "hudChrome.ferry.scheduleUnavailable"
-  ],
-  "zh_TW": [
-    "hudChrome.ferry.arrivesIn",
-    "hudChrome.ferry.boardNow",
-    "hudChrome.ferry.destination",
-    "hudChrome.ferry.portLabel",
-    "hudChrome.ferry.portTitle",
-    "hudChrome.ferry.scheduleUnavailable"
-  ],
-  "ko_KR": [
-    "hudChrome.ferry.arrivesIn",
-    "hudChrome.ferry.boardNow",
-    "hudChrome.ferry.destination",
-    "hudChrome.ferry.portLabel",
-    "hudChrome.ferry.portTitle",
-    "hudChrome.ferry.scheduleUnavailable"
-  ],
-  "ja_JP": [
-    "hudChrome.ferry.arrivesIn",
-    "hudChrome.ferry.boardNow",
-    "hudChrome.ferry.destination",
-    "hudChrome.ferry.portLabel",
-    "hudChrome.ferry.portTitle",
-    "hudChrome.ferry.scheduleUnavailable"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.ferry.arrivesIn",
     "hudChrome.ferry.boardNow",
@@ -98,14 +70,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.ferry.portTitle",
     "hudChrome.ferry.scheduleUnavailable"
   ],
-  "ru_RU": [
-    "hudChrome.ferry.arrivesIn",
-    "hudChrome.ferry.boardNow",
-    "hudChrome.ferry.destination",
-    "hudChrome.ferry.portLabel",
-    "hudChrome.ferry.portTitle",
-    "hudChrome.ferry.scheduleUnavailable"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.ferry.arrivesIn",
     "hudChrome.ferry.boardNow",

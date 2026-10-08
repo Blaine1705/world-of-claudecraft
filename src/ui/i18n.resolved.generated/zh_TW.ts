@@ -511,12 +511,12 @@ export const zh_TW: EnTranslations = {
       "castingOff": "前往{dest}的渡船正在啟航",
       "boardHint": "啟航時站在甲板上即可隨船出發。渡船免費。",
       "sailing": "正在駛往{dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "從{port}前往{dest}的渡船",
+      "portTitle": "{port}渡船碼頭",
+      "destination": "目的地：{dest}",
+      "boardNow": "現在登船",
+      "arrivesIn": "渡船將於{time}後抵達",
+      "scheduleUnavailable": "渡船時刻表暫時無法取得。"
     },
     "materialStackSelectionUnavailable": "此素材選擇已失效。",
     "vehicle": {
