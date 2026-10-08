@@ -9,10 +9,9 @@ vi.mock('../src/render/characters', () => inertCharacters.barrel());
 vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
 vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
 
-// This suite drives the quest dialog DOM, not WebGL portraits. char_window pulls in
-// the real portrait chip, whose renderer starts GLB fetches that can outlive
-// happy-dom teardown and throw Three FileLoader ProgressEvent rejections after
-// otherwise green assertions (the inspect_window.test.ts recipe).
+// This suite drives the quest dialog DOM, not WebGL portraits. char_window and
+// craft-name helpers can reach the portrait chip; keep that unrelated renderer
+// boundary inert so asset loads cannot outlive happy-dom teardown.
 vi.mock('../src/ui/portrait_chip', () => ({
   crestUrl: () => '',
   hydrateComposedChips: () => undefined,
@@ -39,20 +38,6 @@ import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
 import { ensureLocaleLoaded, setLanguage, supportedLanguages, t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
-
-// The controller reaches the portrait chip through char_window, and the real
-// chip starts 3D portrait GLB loads that outlive happy-dom teardown; Three's
-// FileLoader then throws "ProgressEvent is not defined" as an unhandled
-// rejection (a CI shard failure, not a test failure). This suite asserts the
-// dialog DOM only, so keep the portrait boundary inert (the inspect_window and
-// talking_head suites stub it for the same reason).
-vi.mock('../src/ui/portrait_chip', () => ({
-  hydratePortraits: () => undefined,
-  isComposedPortraitKey: () => false,
-  modularLookFor: () => null,
-  onPortraitUpdate: () => undefined,
-  portraitChipHtml: () => '',
-}));
 
 function npc(id: number, templateId: string, x = 0): Entity {
   return {
