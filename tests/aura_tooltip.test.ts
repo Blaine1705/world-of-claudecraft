@@ -17,9 +17,9 @@ const aura = (overrides: Partial<AuraInput> = {}): AuraInput => ({
 
 describe('renderAuraTooltipBodyHtml', () => {
   it('resolves known ability prose with the current character power', () => {
-    const ability = abilitiesKnownAt('druid', MAX_LEVEL).find((entry) => entry.def.id === 'rake');
-    if (!ability) throw new Error('missing rake fixture');
-    const effect = aura({ id: 'rake', kind: 'dot', value: 0 });
+    const ability = abilitiesKnownAt('priest', MAX_LEVEL).find((entry) => entry.def.id === 'renew');
+    if (!ability) throw new Error('missing renew fixture');
+    const effect = aura({ id: 'renew', kind: 'hot', value: 0 });
     const player = {
       spellPower: 0,
       healPower: 0,
@@ -35,7 +35,7 @@ describe('renderAuraTooltipBodyHtml', () => {
         () => '<div class="tt-effect">Effect</div>',
       );
     const lowPower = render();
-    player.attackPower = 500;
+    player.healPower = 500;
     const highPower = render();
     expect(lowPower).toContain('tt-desc');
     expect(highPower).toContain('<div class="tt-effect">Effect</div>');
