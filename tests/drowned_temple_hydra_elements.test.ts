@@ -311,13 +311,17 @@ describe('the Mere Hydra: a fallen head grows back', () => {
     run(f, 0.2, hold(f));
     f.sim.ctx.handleDeath(heads[2], f.tank);
     expect(heads[2].lootable || heads[2].loot !== null).toBe(true);
+    const first = heads[2].loot;
     run(f, 0.2, hold(f));
     regrowIn(heads, 2, 0);
     run(f, 0.2, hold(f));
     expect(heads[2].dead).toBe(false);
     const xp = f.sim.players.get(f.tank.id)?.xp;
     f.sim.ctx.handleDeath(heads[2], f.tank);
-    expect(heads[2].loot).toBeNull();
+    // No second roll: the head still carries only its FIRST loot, held
+    // (unlootable) until the kill hands it back (hydra_regrowth.ts).
+    expect(heads[2].loot).toBe(first);
+    expect(heads[2].lootable).toBe(false);
     expect(f.sim.players.get(f.tank.id)?.xp).toBe(xp);
     // Nor is its corpse harvestable a second time.
     expect(heads[2].corpseHarvestState).toBeUndefined();

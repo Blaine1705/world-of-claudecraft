@@ -27,9 +27,13 @@ export function regrowHead(ctx: SimContext, head: Entity, share: number): void {
   head.dead = false;
   head.regrown = true;
   head.hp = Math.max(1, Math.round(head.maxHp * share));
+  // The loot this head rolled on its first death is HELD while it stands, not
+  // dropped (the reassemble recipe, mob/trash_kit/crypt_kit.ts standBodyUp): the
+  // centre head carries the fight's one boss roll, and releaseHeldHeadLoot hands
+  // it back with the corpse when the last head falls.
+  head.trashLife ??= {};
+  head.trashLife.lootHeld = head.trashLife.lootHeld === true || head.lootable;
   head.lootable = false;
-  head.loot = null;
-  head.lootRecipientIds = undefined;
   head.harvestClaimedBy = null;
   head.tappedById = null;
   head.bossDamagers.clear();
@@ -45,6 +49,13 @@ export function regrowHead(ctx: SimContext, head: Entity, share: number): void {
   head.pos = { ...head.spawnPos, y: ctx.groundPos(head.spawnPos.x, head.spawnPos.z).y };
   head.prevPos = { ...head.pos };
   ctx.rebucket(head);
+}
+
+/** The kill: a head that grew back hands back the loot it held while it stood. */
+export function releaseHeldHeadLoot(head: Entity | null): void {
+  if (!head?.trashLife?.lootHeld) return;
+  head.lootable = true;
+  head.trashLife.lootHeld = false;
 }
 
 /** Grow back every head that has lain long enough while another lives.

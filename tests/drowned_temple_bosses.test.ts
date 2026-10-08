@@ -353,6 +353,28 @@ describe('the Mere Hydra: three heads, one moon pool', () => {
     });
     expect(breathed).toBe(true);
   });
+
+  it('holds the centre head first loot through a regrowth and pays it at the kill', () => {
+    // The centre head carries the fight's one boss roll (content/drowned_temple.ts,
+    // content/heroic_loot.ts). Felled first, it grows back while a sibling lives;
+    // the loot it rolled must survive that (held, unlootable while it stands) and
+    // come back with its corpse when the last head falls.
+    const { f, heads } = hydraFight();
+    run(f, 0.2);
+    const [left, centre, right] = heads;
+    f.sim.ctx.handleDeath(centre, f.tank);
+    const first = centre.loot;
+    expect(first).toBeTruthy();
+    expect(centre.lootable).toBe(true);
+    run(f, HYDRA_TUNING.regrowAfter + 0.5);
+    expect(centre.dead).toBe(false);
+    expect(centre.lootable).toBe(false);
+    expect(centre.loot).toBe(first);
+    for (const h of [centre, left, right]) f.sim.ctx.handleDeath(h, f.tank);
+    run(f, 0.2);
+    expect(centre.loot).toBe(first);
+    expect(centre.lootable).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------

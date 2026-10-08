@@ -42,7 +42,7 @@ import {
   stepTorrent,
   stepVenom,
 } from './hydra_elements';
-import { regrowHead, stepRegrowth } from './hydra_regrowth';
+import { regrowHead, releaseHeldHeadLoot, stepRegrowth } from './hydra_regrowth';
 import { clearTsunami, startTsunami, stepTsunami } from './hydra_tsunami';
 import {
   HYDRA_CRUSHING_TORRENT,
@@ -183,6 +183,7 @@ export function tickMereHydra(ctx: SimContext, inst: InstanceSlot): void {
   const anyState = heads.find((h) => h?.templeFight?.kind === 'hydra')?.templeFight;
   const found = anyState?.kind === 'hydra' ? anyState : null;
   if (living.length === 0) {
+    for (const h of heads) releaseHeldHeadLoot(h);
     if (found) {
       const d = found.diedAt.map((t) => t ?? ctx.time);
       if (Math.max(...d) - Math.min(...d) <= T.deedWindow) grantClaimDeed(ctx, inst, HYDRA_DEED);
