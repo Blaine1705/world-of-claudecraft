@@ -20019,4 +20019,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Efektif: {effective} | Overheal: {overheal} ({overhealPercent}) | Kena: {hits} ({critPercent} krit.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Kena: {hits} | Kritis: {crits} ({critPercent}) | Rata-rata: {average} | Min/maks: {min} / {max}',
 };

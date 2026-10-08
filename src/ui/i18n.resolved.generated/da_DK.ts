@@ -1876,6 +1876,8 @@ export const da_DK: EnTranslations = {
       "reportSent": "Rapport kopieret og sendt til chat",
       "reportNoData": "Ingen data registreret.",
       "noDetailedData": "Ingen detaljerede data",
+      "detailHealSubtitle": "Effektiv: {effective} | Overhealing: {overheal} ({overhealPercent}) | Træffere: {hits} ({critPercent} krit.)",
+      "detailHitSubtitle": "Træffere: {hits} | Kritiske: {crits} ({critPercent}) | Gennemsnit: {average} | Min./maks.: {min} / {max}",
       "noDeathEvents": "Ingen begivenheder logget før død",
       "killedBy": "Dræbt af {killer} ({ability})",
       "lethalHit": "Dødeligtslag",

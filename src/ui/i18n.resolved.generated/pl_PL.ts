@@ -1876,6 +1876,8 @@ export const pl_PL: EnTranslations = {
       "reportSent": "Raport skopiowany i wysłany do czatu",
       "reportNoData": "Brak nagranych danych.",
       "noDetailedData": "Brak szczegółowych danych",
+      "detailHealSubtitle": "Efektywne: {effective} | Nadleczenie: {overheal} ({overhealPercent}) | Trafienia: {hits} ({critPercent} kryt.)",
+      "detailHitSubtitle": "Trafienia: {hits} | Krytyczne: {crits} ({critPercent}) | Średnia: {average} | Min./maks.: {min} / {max}",
       "noDeathEvents": "Brak zarejestrowanych zdarzeń przed śmiercią",
       "killedBy": "Zabity przez {killer} ({ability})",
       "lethalHit": "Cios śmiertelny",

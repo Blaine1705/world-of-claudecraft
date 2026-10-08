@@ -11854,6 +11854,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.meters.deleteProfile'
   | 'hudChrome.meters.densityCompact'
   | 'hudChrome.meters.densityStandard'
+  | 'hudChrome.meters.detailHealSubtitle'
+  | 'hudChrome.meters.detailHitSubtitle'
   | 'hudChrome.meters.dock'
   | 'hudChrome.meters.duplicate'
   | 'hudChrome.meters.errEmptyProfile'

@@ -1876,6 +1876,8 @@ export const tr_TR: EnTranslations = {
       "reportSent": "Rapor kopyalandı ve sohbete gönderildi",
       "reportNoData": "Kayıtlı veri yok.",
       "noDetailedData": "Ayrıntılı veri yok",
+      "detailHealSubtitle": "Etkili: {effective} | Aşırı iyileştirme: {overheal} ({overhealPercent}) | İsabet: {hits} ({critPercent} kritik)",
+      "detailHitSubtitle": "İsabet: {hits} | Kritik: {crits} ({critPercent}) | Ortalama: {average} | Min./maks.: {min} / {max}",
       "noDeathEvents": "Ölümden önce hiçbir olay kaydedilmedi",
       "killedBy": "{killer} tarafından öldürüldü ({ability})",
       "lethalHit": "Ölümcül Vuruş",

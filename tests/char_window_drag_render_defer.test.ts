@@ -32,7 +32,7 @@ vi.mock('../src/ui/portrait_chip', () => ({
   hydratePortraits: vi.fn(),
   isComposedPortraitKey: () => false,
   modularLookFor: () => null,
-  onPortraitUpdate: vi.fn(),
+  onPortraitUpdate: () => () => undefined,
   portraitChipHtml: () => '',
 }));
 

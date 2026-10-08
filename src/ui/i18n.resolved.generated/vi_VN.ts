@@ -1876,6 +1876,8 @@ export const vi_VN: EnTranslations = {
       "reportSent": "Báo cáo đã được sao chép và gửi đến trò chuyện",
       "reportNoData": "Không có dữ liệu được ghi lại.",
       "noDetailedData": "Không có dữ liệu chi tiết",
+      "detailHealSubtitle": "Hiệu quả: {effective} | Hồi dư: {overheal} ({overhealPercent}) | Lượt: {hits} ({critPercent} chí mạng)",
+      "detailHitSubtitle": "Lượt: {hits} | Chí mạng: {crits} ({critPercent}) | Trung bình: {average} | Nhỏ/lớn nhất: {min} / {max}",
       "noDeathEvents": "Không có sự kiện nào được ghi lại trước khi chết",
       "killedBy": "Bị giết bởi {killer} ({ability})",
       "lethalHit": "Cú Đánh Chí Mệnh",
