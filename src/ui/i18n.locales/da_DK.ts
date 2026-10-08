@@ -19777,4 +19777,5 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Effektiv: {effective} | Overhealing: {overheal} ({overhealPercent}) | Træffere: {hits} ({critPercent} krit.)',
   'hudChrome.meters.detailHitSubtitle':
     'Træffere: {hits} | Kritiske: {crits} ({critPercent}) | Gennemsnit: {average} | Min./maks.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Omgivelseslydstyrke',
 };

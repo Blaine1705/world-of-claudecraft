@@ -19795,4 +19795,5 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Effektivt: {effective} | Överläkning: {overheal} ({overhealPercent}) | Träffar: {hits} ({critPercent} krit.)',
   'hudChrome.meters.detailHitSubtitle':
     'Träffar: {hits} | Kritiska: {crits} ({critPercent}) | Snitt: {average} | Min/max: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Omgivningsvolym',
 };

@@ -19695,4 +19695,5 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Efektivní: {effective} | Přeléčení: {overheal} ({overhealPercent}) | Zásahy: {hits} ({critPercent} krit.)',
   'hudChrome.meters.detailHitSubtitle':
     'Zásahy: {hits} | Kritické: {crits} ({critPercent}) | Průměr: {average} | Min./max.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Hlasitost prostředí',
 };

@@ -19864,4 +19864,5 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hiệu quả: {effective} | Hồi dư: {overheal} ({overhealPercent}) | Lượt: {hits} ({critPercent} chí mạng)',
   'hudChrome.meters.detailHitSubtitle':
     'Lượt: {hits} | Chí mạng: {crits} ({critPercent}) | Trung bình: {average} | Nhỏ/lớn nhất: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Âm lượng môi trường',
 };

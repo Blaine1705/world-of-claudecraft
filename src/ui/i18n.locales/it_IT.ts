@@ -20194,4 +20194,5 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Effettive: {effective} | Sovracura: {overheal} ({overhealPercent}) | Colpi: {hits} ({critPercent} crit.)',
   'hudChrome.meters.detailHitSubtitle':
     'Colpi: {hits} | Critici: {crits} ({critPercent}) | Media: {average} | Min/max: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Volume ambiente',
 };

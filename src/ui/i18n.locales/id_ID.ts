@@ -20023,4 +20023,5 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Efektif: {effective} | Overheal: {overheal} ({overhealPercent}) | Kena: {hits} ({critPercent} krit.)',
   'hudChrome.meters.detailHitSubtitle':
     'Kena: {hits} | Kritis: {crits} ({critPercent}) | Rata-rata: {average} | Min/maks: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Volume ambience',
 };

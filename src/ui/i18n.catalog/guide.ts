@@ -489,7 +489,7 @@ export const guideStrings = {
     // Non-graphics options: the Audio tab and the live language picker.
     audioTitle: 'Sound and language',
     audioBody:
-      "The options window is not all pixels. Audio holds three volume sliders, for sound effects, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
+      "The options window is not all pixels. Audio holds four volume sliders, for sound effects, ambience, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
     autolootBody:
       "Prefer not to click every corpse? Walk-by Autoloot, on the Interface panel's Combat tab and off by default, scoops the loot from your own kills as you walk past them.",
     // The two panels the tables do not cover (Auras, Performance Overlay), named

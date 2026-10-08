@@ -755,6 +755,7 @@ describe('options_view: audio dispatch matrix (cluster 4)', () => {
     const controls = buildAudioControls(makeSource());
     expect(keysOf(controls)).toEqual([
       'sfxVolume',
+      'ambientVolume',
       'musicVolume',
       'voiceVolume',
       'musicToggle',
@@ -764,6 +765,10 @@ describe('options_view: audio dispatch matrix (cluster 4)', () => {
       'clickFeedback',
     ]);
     expect(find(controls, 'sfxVolume')).toMatchObject({ control: 'slider' });
+    expect(find(controls, 'ambientVolume')).toMatchObject({
+      control: 'slider',
+      labelKey: 'hudChrome.options.ambienceVolume',
+    });
     expect(find(controls, 'voiceEnabled')).toMatchObject({ control: 'boolToggle' });
   });
 });
@@ -839,6 +844,7 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
     expect(keys).not.toContain('musicToggle');
     expect(keys).toEqual([
       'sfxVolume',
+      'ambientVolume',
       'musicVolume',
       'voiceVolume',
       'voiceEnabled',

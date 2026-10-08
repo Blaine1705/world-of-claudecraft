@@ -12170,6 +12170,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.actionCamShoulderLeft'
   | 'hudChrome.options.actionCamShoulderRight'
   | 'hudChrome.options.alwaysShowAllBuffs'
+  | 'hudChrome.options.ambienceVolume'
   | 'hudChrome.options.auraBarBelowFrame'
   | 'hudChrome.options.aurasOnPlayerFrame'
   | 'hudChrome.options.browserEffects'

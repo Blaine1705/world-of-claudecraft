@@ -20046,4 +20046,5 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Efetiva: {effective} | Sobrecura: {overheal} ({overhealPercent}) | Acertos: {hits} ({critPercent} crítico)',
   'hudChrome.meters.detailHitSubtitle':
     'Acertos: {hits} | Críticos: {crits} ({critPercent}) | Média: {average} | Mín./máx.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Volume do ambiente',
 };

@@ -19785,4 +19785,5 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Etkili: {effective} | Aşırı iyileştirme: {overheal} ({overhealPercent}) | İsabet: {hits} ({critPercent} kritik)',
   'hudChrome.meters.detailHitSubtitle':
     'İsabet: {hits} | Kritik: {crits} ({critPercent}) | Ortalama: {average} | Min./maks.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Ortam ses düzeyi',
 };

@@ -20286,4 +20286,5 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Effectif : {effective} | Sursoin : {overheal} ({overhealPercent}) | Touches : {hits} ({critPercent} crit.)',
   'hudChrome.meters.detailHitSubtitle':
     'Touches : {hits} | Critiques : {crits} ({critPercent}) | Moyenne : {average} | Min./max. : {min} / {max}',
+  'hudChrome.options.ambienceVolume': "Volume de l'ambiance",
 };

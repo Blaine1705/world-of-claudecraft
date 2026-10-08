@@ -20221,4 +20221,5 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Effektiv: {effective} | Überheilung: {overheal} ({overhealPercent}) | Treffer: {hits} ({critPercent} Krit.)',
   'hudChrome.meters.detailHitSubtitle':
     'Treffer: {hits} | Kritisch: {crits} ({critPercent}) | Durchschnitt: {average} | Min./max.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Ambiente-Lautstärke',
 };

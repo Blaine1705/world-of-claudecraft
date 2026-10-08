@@ -20218,4 +20218,5 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Efectivo: {effective} | Sobrecuración: {overheal} ({overhealPercent}) | Golpes: {hits} ({critPercent} crítico)',
   'hudChrome.meters.detailHitSubtitle':
     'Golpes: {hits} | Críticos: {crits} ({critPercent}) | Promedio: {average} | Mín./máx.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Volumen de ambiente',
 };

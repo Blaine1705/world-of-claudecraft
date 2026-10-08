@@ -20040,4 +20040,5 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Effectief: {effective} | Overhealing: {overheal} ({overhealPercent}) | Treffers: {hits} ({critPercent} crit.)',
   'hudChrome.meters.detailHitSubtitle':
     'Treffers: {hits} | Kritiek: {crits} ({critPercent}) | Gemiddeld: {average} | Min./max.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Omgevingsvolume',
 };
