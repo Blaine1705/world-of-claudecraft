@@ -151,11 +151,6 @@ export class InstanceMusicController {
       this.bossTrack = null;
     }
     this.lastInstanceId = decision.instanceId;
-    if (decision.crucibleFloor !== null) {
-      this.music.update(decision.zone, decision.musicCombat, decision.crucibleFloor);
-    } else {
-      this.music.update(decision.zone, decision.musicCombat);
-    }
     if (decision.bossTrackUrl !== null) {
       this.bossTrack = { url: decision.bossTrackUrl, seenAt: input.now };
     } else if (this.bossTrack && input.now - this.bossTrack.seenAt >= RECENT_BOSS_COMBAT_MS) {
@@ -163,6 +158,12 @@ export class InstanceMusicController {
     }
     if (this.bossTrack) this.music.setBossCombat(true, this.bossTrack.url);
     else this.music.setBossCombat(decision.bossEngaged);
+    // Give the boss cue ownership before the normal combat score can start.
+    if (decision.crucibleFloor !== null) {
+      this.music.update(decision.zone, decision.musicCombat, decision.crucibleFloor);
+    } else {
+      this.music.update(decision.zone, decision.musicCombat);
+    }
     return decision;
   }
 }
