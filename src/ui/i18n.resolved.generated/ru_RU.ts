@@ -510,7 +510,13 @@ export const ru_RU: EnTranslations = {
       "departsIn": "Паром на {dest}: отправление через {time}",
       "castingOff": "Паром на {dest} отчаливает",
       "boardHint": "Стойте на палубе в момент отплытия. Переправа бесплатна.",
-      "sailing": "Курс на {dest}"
+      "sailing": "Курс на {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Этот выбор материалов больше недоступен.",
     "vehicle": {
