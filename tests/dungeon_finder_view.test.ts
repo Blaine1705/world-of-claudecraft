@@ -224,17 +224,16 @@ describe('dungeon finder view core', () => {
         guaranteed: true,
         // The relocated Nythraxis piece (0.1) and the blue roll's three rare
         // copies (0.04 each, 2026-10-08) come first; the shipped rows keep their
-        // ratios in the remaining 0.78.
+        // ratios in the remaining 0.78. The two uncommon rows left on 2026-10-09
+        // (Heroic pays no uncommon gear), so 0.7 of weight shares the 0.78.
         items: [
           { itemId: 'heroic_bonewrought_greatsword', chance: expect.closeTo(0.1, 9) },
           { itemId: 'heroic_spadeworn_gauntlets', chance: expect.closeTo(0.04, 9) },
           { itemId: 'heroic_gravedirt_grips', chance: expect.closeTo(0.04, 9) },
           { itemId: 'heroic_bellrope_mitts', chance: expect.closeTo(0.04, 9) },
-          { itemId: 'sextons_burial_spade', chance: expect.closeTo(0.3 * 0.78, 9) },
-          { itemId: 'cryptplate_helm', chance: expect.closeTo(0.3 * 0.78, 9) },
-          { itemId: 'quilted_trousers', chance: expect.closeTo(0.15 * 0.78, 9) },
-          { itemId: 'oiled_boots', chance: expect.closeTo(0.15 * 0.78, 9) },
-          { itemId: 'heroic_sextons_spadehaft', chance: expect.closeTo(0.1 * 0.78, 9) },
+          { itemId: 'sextons_burial_spade', chance: expect.closeTo((0.3 / 0.7) * 0.78, 9) },
+          { itemId: 'cryptplate_helm', chance: expect.closeTo((0.3 / 0.7) * 0.78, 9) },
+          { itemId: 'heroic_sextons_spadehaft', chance: expect.closeTo((0.1 / 0.7) * 0.78, 9) },
         ],
       },
     ]);
