@@ -547,7 +547,10 @@ const MONOLITHS: MonolithRow[] = [
     // predicate moved out to src/ui/window_drag_handle.ts and the map canvas
     // sizing landed as src/ui/hud/map/map_canvas_size_controller.ts behind a
     // one-line install. Exact merged count after the release batch, zero slack.
-    ceiling: 18164,
+    // LOWERED 18164 -> 18156: the death-screen surface decisions (Release
+    // overlay, ghost hint, corpse prompt) moved to src/ui/death_screen_view.ts
+    // together with the Release input hold. Exact merged count, zero slack.
+    ceiling: 18156,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
