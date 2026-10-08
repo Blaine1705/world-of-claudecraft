@@ -3,8 +3,8 @@
 // (with one repaint per real change), anything else keeps the shipped 560.
 import { afterEach, describe, expect, it } from 'vitest';
 import {
-  MapCanvasSizeController,
   installMapCanvasSize,
+  MapCanvasSizeController,
   mapWindowPlayerSized,
   mapWindowSizeIsStale,
 } from '../src/ui/hud/map/map_canvas_size_controller';
@@ -148,7 +148,9 @@ describe('MapCanvasSizeController', () => {
     const canvas = {
       width: 560,
       height: 560,
-      ownerDocument: { body: { classList: { contains: (name: string) => name === 'mobile-touch' } } },
+      ownerDocument: {
+        body: { classList: { contains: (name: string) => name === 'mobile-touch' } },
+      },
       closest: (selector: string) => (selector === '#map-window' ? win : null),
     } as unknown as HTMLCanvasElement;
 
