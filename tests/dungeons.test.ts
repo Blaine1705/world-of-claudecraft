@@ -1645,9 +1645,10 @@ describe('dungeons: heroic boss drops', () => {
     // The table now also carries the two blue mount reins as independent
     // sub-1% draws (the mount drop matrix); the weapon contract applies to the
     // roll-grouped entries only.
-    // The trinket slot added the four raid trinkets (content/trinkets.ts) to
-    // the same group: weapons share half the group, trinkets the other half,
-    // and a kill still pays exactly one heroic-only exclusive.
+    // The trinket slot once added the four raid trinkets (content/trinkets.ts) to
+    // the same group; they moved to heroic five-man bosses on 2026-10-08
+    // (content/nythraxis_loot.ts), so the three weapons fill the group again and
+    // a kill still pays exactly one heroic-only exclusive.
     const exclusiveEntries = heroicTable.filter((e) => e.rollGroup !== undefined);
     const mountEntries = heroicTable.filter((e) => e.rollGroup === undefined);
     const exclusiveIds = exclusiveEntries.flatMap((e) => (e.itemId ? [e.itemId] : []));
@@ -1655,21 +1656,15 @@ describe('dungeons: heroic boss drops', () => {
     const trinketIds = exclusiveIds.filter((id) => ITEMS[id]?.slot === 'trinket');
     const groups = new Set(exclusiveEntries.map((e) => e.rollGroup));
     expect(groups.size).toBe(1);
-    expect(new Set(exclusiveIds).size).toBe(7);
+    expect(new Set(exclusiveIds).size).toBe(3);
     expect(new Set(weaponIds).size).toBe(3);
-    expect(trinketIds.sort()).toEqual([
-      'echoing_lens',
-      'hunters_tally',
-      'mooring_stone',
-      'wellspring_seed',
-    ]);
+    expect(trinketIds).toEqual([]);
     expect(exclusiveEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
     const groupShare = (ids: string[]) =>
       exclusiveEntries
         .filter((e) => e.itemId && ids.includes(e.itemId))
         .reduce((sum, e) => sum + e.chance, 0);
-    expect(groupShare(weaponIds)).toBeCloseTo(0.5, 10);
-    expect(groupShare(trinketIds)).toBeCloseTo(0.5, 10);
+    expect(groupShare(weaponIds)).toBeCloseTo(1, 10);
     // The heroic raid carries the two RARE mounts and the two UNCOMMON ones. The
     // hover-cycle is deliberately absent: it is epic now, and epic mounts are rift
     // S-clear exclusive, so the raid must not be a back door to one.
@@ -1720,9 +1715,8 @@ describe('dungeons: heroic boss drops', () => {
       for (const s of items)
         if (String(s.itemId).startsWith('heroic_')) droppedVariants.add(s.itemId);
     }
-    // Over eight kills both halves of the group show up, and the set-piece swap is live.
+    // Over eight kills a weapon shows up, and the set-piece swap is live.
     expect([...droppedExclusives].some((id) => weaponIds.includes(id))).toBe(true);
-    expect([...droppedExclusives].some((id) => trinketIds.includes(id))).toBe(true);
     expect(droppedVariants.size).toBeGreaterThan(2);
   });
 });

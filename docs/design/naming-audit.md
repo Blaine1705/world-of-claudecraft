@@ -963,6 +963,25 @@ shipped. One collision was found and renamed before shipping (the id stays froze
 | Rite Broken, Shattered Ward | the stun and the vulnerability when the fourth candle catches | GENERIC. Plain English. |
 | Shadow Pulse, Relight the Candle, the Ledger | the pulse (already shipped on him as GENERIC), the relight bar, the book that names the order | GENERIC. Plain English. |
 
+### The lower dungeons' normal blues (web-checked 2026-10-08)
+
+The thirty new rare names of the Hollow Crypt, Sunken Bastion and Drowned Temple normal
+blue groups (`src/sim/content/hollow_crypt_items.ts`, `sunken_bastion_items.ts`,
+`drowned_temple_items.ts`). Method: quoted exact-phrase web searches for every full name
+and the coined tokens alone (Spadeworn, Rimewreath, Knellbound, Candlewatch, Lanternwick,
+Cellwatch, Brinewarden, Merecleaver, Mereskin, Merecrest, Hydracrest, Moonwrack), in
+batched OR queries through a general web search engine; no per-wiki search (the WoW,
+Guild Wars, FFXIV and PoE wikis were not queried one by one this session). Three
+candidates collided and were replaced before shipping; the ids never shipped under them.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Bonechill Veil | REJECTED before shipping | An armor piece in Klei's Rotwood (its ArmorList, found at a "Bonechill Quarry"). The Lady's cloth helm ships as the Lamenting Veil (`lamenting_veil`); no match for that name. |
+| Gravecall Scepter | REJECTED before shipping | "Gravecall" is the title of a trading card game (gravecall.com), the Earthbound rule. Morthen's rod ships as the Gravecaller's Rod (`gravecallers_rod`), built on this game's shipped Gravecaller's Vestments; D&D 5e's "Staff of the Gravecaller" is a different full name. |
+| Venomtide Cowl | REJECTED before shipping | "Venomtide" surfaced as a World of Warcraft mount token. The Hydra's cloth helm ships as the Merewater Cowl (`merewater_cowl`). |
+| Spadeworn Gauntlets, Rimewreath Coif, Knellbound Hauberk, Candlewatch Jerkin, Lanternwick Sash, Cellwatch Belt, Portcullis Girdle, Brinewarden Robe, Merecleaver, Mereskin Hood, Mere-Crested Helm, Merewater Cowl, Lamenting Veil, Robe of the Unquiet Rite, Turnkey's Shank | the new names with a coined or distinctive token | CLEAR. No match for any full name or coined token. |
+| Bellrope Mitts, Gravedirt Grips, Rime-Laced Hood, Cantor's Stole, Chorister's Spaulders, Choirward Pauldrons, Gaolyard Jerkin, Fogbinder's Rod, Pale Chorus Slippers, Conchplate Sabatons, Prism-Etched Handwraps, Moonburn Grips, Tideglass Gauntlets, Moonwrack Stave, Gravecaller's Rod | built on this game's own shipped tokens (Bellrope, Gravedirt, Rime-Laced, Cantor, Chorister, Choirward, Gaolyard, Fogbinder, Pale Chorus, Conchplate, Prism-Etched, Moonburn, Tideglass, Moonwrack, Gravecaller) | CLEAR. No match for any full name; the tokens are already recorded GENERIC or CLEAR in this audit's rework tables. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

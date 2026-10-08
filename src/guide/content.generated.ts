@@ -6201,6 +6201,58 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Gravewoven Bag"
+      },
+      {
+        "kind": "item",
+        "name": "Spadeworn Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Gravedirt Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Bellrope Mitts"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewreath Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Rime-Laced Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Lamenting Veil"
+      },
+      {
+        "kind": "item",
+        "name": "Choirward Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Chorister's Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Cantor's Stole"
+      },
+      {
+        "kind": "item",
+        "name": "Knellbound Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Candlewatch Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Robe of the Unquiet Rite"
+      },
+      {
+        "kind": "item",
+        "name": "Gravecaller's Rod"
       }
     ]
   },
@@ -6287,6 +6339,34 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Gaolyard Cudgel"
+      },
+      {
+        "kind": "item",
+        "name": "Portcullis Girdle"
+      },
+      {
+        "kind": "item",
+        "name": "Cellwatch Belt"
+      },
+      {
+        "kind": "item",
+        "name": "Lanternwick Sash"
+      },
+      {
+        "kind": "item",
+        "name": "Turnkey's Shank"
+      },
+      {
+        "kind": "item",
+        "name": "Gaolyard Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Brinewarden Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Fogbinder's Rod"
       }
     ]
   },
@@ -6338,6 +6418,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Gaoler's Iron Key"
+      },
+      {
+        "kind": "item",
+        "name": "Mooring Stone"
       }
     ]
   },
@@ -6373,6 +6457,46 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Tideglass Shiv"
+      },
+      {
+        "kind": "item",
+        "name": "Conchplate Sabatons"
+      },
+      {
+        "kind": "item",
+        "name": "Pale Chorus Slippers"
+      },
+      {
+        "kind": "item",
+        "name": "Tideglass Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Moonburn Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Prism-Etched Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Mere-Crested Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Mereskin Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Merewater Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Merecleaver"
+      },
+      {
+        "kind": "item",
+        "name": "Moonwrack Stave"
       }
     ]
   },
@@ -6420,6 +6544,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Tideglass Warmaul"
+      },
+      {
+        "kind": "item",
+        "name": "Echoing Lens"
       }
     ]
   },
@@ -6555,6 +6683,42 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Gravewyrm Bone Quiver"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Greatsword"
+      },
+      {
+        "kind": "item",
+        "name": "Bonewrought Bulwark"
+      },
+      {
+        "kind": "item",
+        "name": "Thornpeak Wardblade"
+      },
+      {
+        "kind": "item",
+        "name": "Votive Ward of the Deathless Court"
+      },
+      {
+        "kind": "item",
+        "name": "Wraithfire Orb"
+      },
+      {
+        "kind": "item",
+        "name": "Courtier's Bonefang"
+      },
+      {
+        "kind": "item",
+        "name": "Gravecourt Hewer"
+      },
+      {
+        "kind": "item",
+        "name": "Stormhymn Chain Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Stormhymn Chain Treads"
       }
     ]
   },
@@ -6641,6 +6805,46 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Falls-Blessed Staff"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Greatblade"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Quiver"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Treads"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Cinch"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Harness"
+      },
+      {
+        "kind": "item",
+        "name": "Roots' Bramblehide Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Thornpeak Moonhide Cowl"
       }
     ]
   },
@@ -6692,6 +6896,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Thorncrowned Greathelm"
+      },
+      {
+        "kind": "item",
+        "name": "Hunter's Tally"
+      },
+      {
+        "kind": "item",
+        "name": "Wellspring Seed"
       }
     ]
   },
@@ -6707,22 +6919,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Thronebane, Last Oath of Thornpeak"
-      },
-      {
-        "kind": "item",
-        "name": "Bonewrought Greatsword"
-      },
-      {
-        "kind": "item",
-        "name": "Bonewrought Bulwark"
-      },
-      {
-        "kind": "item",
-        "name": "Direfang Greatblade"
-      },
-      {
-        "kind": "item",
-        "name": "Wraithfire Orb"
       },
       {
         "kind": "item",
@@ -6759,66 +6955,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Galecall Spaulders"
-      },
-      {
-        "kind": "item",
-        "name": "Direfang Quiver"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Crown"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Mantle"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Harness"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Cinch"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Legguards"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Grips"
-      },
-      {
-        "kind": "item",
-        "name": "Roots' Bramblehide Treads"
-      },
-      {
-        "kind": "item",
-        "name": "Courtier's Bonefang"
-      },
-      {
-        "kind": "item",
-        "name": "Thornpeak Wardblade"
-      },
-      {
-        "kind": "item",
-        "name": "Gravecourt Hewer"
-      },
-      {
-        "kind": "item",
-        "name": "Votive Ward of the Deathless Court"
-      },
-      {
-        "kind": "item",
-        "name": "Thornpeak Moonhide Cowl"
-      },
-      {
-        "kind": "item",
-        "name": "Stormhymn Chain Grips"
-      },
-      {
-        "kind": "item",
-        "name": "Stormhymn Chain Treads"
       }
     ]
   },
@@ -6838,22 +6974,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Stormcaller's Focus"
-      },
-      {
-        "kind": "item",
-        "name": "Mooring Stone"
-      },
-      {
-        "kind": "item",
-        "name": "Wellspring Seed"
-      },
-      {
-        "kind": "item",
-        "name": "Hunter's Tally"
-      },
-      {
-        "kind": "item",
-        "name": "Echoing Lens"
       }
     ]
   },

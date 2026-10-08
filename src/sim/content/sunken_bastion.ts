@@ -486,9 +486,35 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
     // One guaranteed piece per archetype group, like the bosses, a tier under.
     loot: [
       { copper: 600, chance: 1 },
-      { itemId: 'jailers_iron_gauntlets', chance: 0.34, rollGroup: 'turnkey_guaranteed' },
-      { itemId: 'turnkeys_keyring_belt', chance: 0.33, rollGroup: 'turnkey_guaranteed' },
-      { itemId: 'turnkeys_lantern_cowl', chance: 0.33, rollGroup: 'turnkey_guaranteed' },
+      {
+        itemId: 'jailers_iron_gauntlets',
+        chance: 0.34,
+        rollGroup: 'turnkey_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'turnkeys_keyring_belt',
+        chance: 0.33,
+        rollGroup: 'turnkey_guaranteed',
+        normalOnly: true,
+      },
+      {
+        itemId: 'turnkeys_lantern_cowl',
+        chance: 0.33,
+        rollGroup: 'turnkey_guaranteed',
+        normalOnly: true,
+      },
+      // The normal blue (sunken_bastion_items.ts): one draw, 35 percent in
+      // equal shares, the waist trio and the Turnkey's Shank.
+      {
+        itemId: 'portcullis_girdle',
+        chance: 0.0875,
+        rollGroup: 'turnkey_blue',
+        normalOnly: true,
+      },
+      { itemId: 'cellwatch_belt', chance: 0.0875, rollGroup: 'turnkey_blue', normalOnly: true },
+      { itemId: 'lanternwick_sash', chance: 0.0875, rollGroup: 'turnkey_blue', normalOnly: true },
+      { itemId: 'turnkeys_shank', chance: 0.0875, rollGroup: 'turnkey_blue', normalOnly: true },
     ],
     // The body's gameplay scale (reach, collision) stays the trash turnkey's;
     // the miniboss presence is its drawn height (the VISUALS row).
@@ -649,7 +675,13 @@ export const SUNKEN_BASTION_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'ossick_guaranteed',
         normalOnly: true,
       },
-      { itemId: 'gaolyard_cudgel', chance: 0.1, normalOnly: true },
+      // The normal blue (sunken_bastion_items.ts): one draw, 35 percent in
+      // equal shares, the chest trio (the Tidescale Vest moved here from
+      // Vael) and the Gaolyard Cudgel (once its own 0.10 row).
+      { itemId: 'tidescale_vest', chance: 0.0875, rollGroup: 'ossick_blue', normalOnly: true },
+      { itemId: 'gaolyard_jerkin', chance: 0.0875, rollGroup: 'ossick_blue', normalOnly: true },
+      { itemId: 'brinewarden_robe', chance: 0.0875, rollGroup: 'ossick_blue', normalOnly: true },
+      { itemId: 'gaolyard_cudgel', chance: 0.0875, rollGroup: 'ossick_blue', normalOnly: true },
     ],
     scale: 1.4,
     color: 0x6f6252,

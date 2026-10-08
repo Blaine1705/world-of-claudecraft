@@ -3359,8 +3359,9 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'the Unscorched' },
   },
-  // Roots' Bramblehide, the feral druid's Strength leather family off the
-  // Nythraxis raid (zone3.ts). Appended at the END per the append-only
+  // Roots' Bramblehide, the feral druid's Strength leather family (zone3.ts),
+  // shipped off the Nythraxis raid and relocated to the Wildheart Basin bosses on
+  // 2026-10-08 (content/nythraxis_loot.ts). Appended at the END per the append-only
   // contract; col_seven_regalia keeps its shipped seven-family trigger (rule
   // 9: never retro-edit an existing trigger), so this family is not part of
   // that meta.

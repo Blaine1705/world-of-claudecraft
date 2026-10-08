@@ -165,10 +165,12 @@ const UNTIERED_WITH_PROXY_FLOOR = 77;
 // 119 and 86 with the dungeon rework's eight generated Heroic variants (the
 // Spadehaft, Bride's Icicle (rimeweb_fang), Cantor's Hymnal, Knight-Commander's Longsword,
 // Gaolyard Cudgel, Chorus Conch, Tideglass Shiv and Falls-Blessed Staff).
-const GENERATED_ITEM_COUNT = 119;
+// 149 and 116 with the lower dungeons' normal blues' 30 generated Heroic
+// variants (tests/lower_dungeon_blues.test.ts names the base pieces).
+const GENERATED_ITEM_COUNT = 149;
 const WARFARE_STOCK_COUNT = 47;
 const SEASON2_STOCK_COUNT = 139;
-const HEROIC_VARIANT_COUNT = 86;
+const HEROIC_VARIANT_COUNT = 116;
 
 // Items with no derivable source (vendor, starter and quest oddities) have no
 // tier to price against; their floor is taken from their own authored line, the

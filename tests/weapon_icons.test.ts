@@ -67,7 +67,10 @@ describe('painted weapon inventory icons', () => {
     // dungeon's batch (asserted in the registry test below), the Hollow
     // Crypt's three (sextons_spadehaft, sextons_burial_spade, rimeweb_fang)
     // in hollow-crypt-icons-2026-10-03.
-    expect(baseWeapons).toHaveLength(154);
+    // 154 -> 159: the lower dungeons' normal blues' five weapons
+    // (gravecallers_rod, turnkeys_shank, fogbinders_rod, merecleaver,
+    // moonwrack_stave), painted in lower-dungeon-blues-icons-2026-10-08.
+    expect(baseWeapons).toHaveLength(159);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -82,8 +85,9 @@ describe('painted weapon inventory icons', () => {
     );
     // 16 with heroic_duskwhisper (aliases the duskwhisper base painting); 19
     // with the three Nythraxis gap-fill one-handers' raid-tier variants.
-    // 25 with the dungeon rework's six generated Heroic weapons.
-    expect(heroics).toHaveLength(25);
+    // 25 with the dungeon rework's six generated Heroic weapons, 30 with the
+    // lower dungeons' normal blues' five.
+    expect(heroics).toHaveLength(30);
     for (const heroic of heroics) {
       expect(WEAPON_IMAGE_IDS.has(heroic.id), heroic.id).toBe(false);
       expect(weaponIconUrl(heroic.id), heroic.id).toBe(
@@ -114,8 +118,9 @@ describe('painted weapon inventory icons', () => {
     // with the Warfare Season 2 weapons (warfare-season2-weapons-2026-09-25).
     // Thirteen with the dungeon rework's four icon batches (Sunken Bastion,
     // Drowned Temple, Wildheart Basin, Gravewyrm Sanctum), fourteen with the
-    // Hollow Crypt's, asserted below as `reworkWeaponIds`.
-    expect(weaponBatches).toHaveLength(14);
+    // Hollow Crypt's, asserted below as `reworkWeaponIds`; fifteen with the
+    // lower dungeons' normal blues (lower-dungeon-blues-icons-2026-10-08).
+    expect(weaponBatches).toHaveLength(15);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -259,6 +264,7 @@ describe('painted weapon inventory icons', () => {
       'wildheart-basin-icons-2026-10-02',
       'gravewyrm-sanctum-icons-2026-10-03',
       'hollow-crypt-icons-2026-10-03',
+      'lower-dungeon-blues-icons-2026-10-08',
     ];
     for (const batchId of reworkBatchIds) {
       expect(
@@ -272,14 +278,19 @@ describe('painted weapon inventory icons', () => {
       .sort();
     expect(reworkWeaponIds).toEqual([
       'falls_blessed_staff',
+      'fogbinders_rod',
       'gaolyard_cudgel',
+      'gravecallers_rod',
       'hammer_of_the_open_lock',
       'knight_commanders_longsword',
+      'merecleaver',
+      'moonwrack_stave',
       'rimeweb_fang',
       'sextons_burial_spade',
       'sextons_spadehaft',
       'tideglass_shiv',
       'tideglass_warmaul',
+      'turnkeys_shank',
     ]);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(

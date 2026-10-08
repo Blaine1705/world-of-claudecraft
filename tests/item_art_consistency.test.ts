@@ -855,7 +855,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
     // The five-dungeon rework's 58 base items and its eight generated Heroic
     // variants: 1,683 (the same live count the Field Kit test below pins).
-    expect(Object.keys(ITEMS)).toHaveLength(1683);
+    // The lower dungeons' normal blues' 30 base items and their 30 generated
+    // Heroic variants (lower-dungeon-blues-icons-2026-10-08): 1,743.
+    expect(Object.keys(ITEMS)).toHaveLength(1743);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -880,7 +882,6 @@ describe('item-art consistency accepted-art provenance', () => {
       ([id, item]) =>
         'heroicOf' in item && typeof item.heroicOf === 'string' && !ITEM_ART_PENDING.has(id),
     );
-    const datedIdSet = new Set(datedIds);
     // Membership against the CURRENT mapping owners, not the dated snapshot: the
     // release's Bramblehide wave ships its own heroic art (own mapping owner),
     // while its three Nythraxis gap-fill weapons alias their base weapon's art
@@ -892,9 +893,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // the six Heroic weapons alias their base weapon's art. 86 / 61 / 25 once
     // the Heroic Cantor's Hymnal leaves the art-pending ledger with its own
     // painting (hollow-crypt-icons-2026-10-03).
-    expect(generatedHeroics).toHaveLength(86);
-    expect(heroicWithOwnWebp).toHaveLength(61);
-    expect(heroicArtAliases).toHaveLength(25);
+    // 116 / 86 / 30 with the lower dungeons' normal blues: 25 Heroic armour
+    // clones with their own painting (lower-dungeon-blues-icons-2026-10-08) and five
+    // Heroic weapons aliasing their base painting.
+    expect(generatedHeroics).toHaveLength(116);
+    expect(heroicWithOwnWebp).toHaveLength(86);
+    expect(heroicArtAliases).toHaveLength(30);
     expect(heroicArtAliases.every(([, item]) => item.kind === 'weapon')).toBe(true);
     // The 14 new heroic defs the release's gap-fill and Bramblehide waves add
     // are named additions, never a silent side effect of widening the
@@ -935,10 +939,30 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of [...expectedNewHeroicIds, ...reworkHeroicIds]) {
       expect(heroicIdSet.has(id), `${id} is a live heroic def`).toBe(true);
     }
+    // The lower dungeons' normal blues add 30 more, named by their batch the
+    // same way: its 25 own-art Heroic armour clones plus the generated Heroic
+    // copies of its five weapons, which alias their base painting.
+    const bluesBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === 'lower-dungeon-blues-icons-2026-10-08',
+    );
+    const blueHeroicIds = [
+      ...(bluesBatch?.itemIds.filter((id) => id.startsWith('heroic_')) ?? []),
+      ...(bluesBatch?.itemIds
+        .filter((id) => ITEMS[id]?.kind === 'weapon')
+        .map((id) => heroicVariantId(id)) ?? []),
+    ];
+    expect(blueHeroicIds).toHaveLength(30);
+    for (const id of blueHeroicIds) {
+      expect(heroicIdSet.has(id), `${id} is a live heroic def`).toBe(true);
+    }
     // Everything else in the current heroic set is the dated 64: this proves
     // the release's 14 heroic defs and the rework's eight are exactly the
     // additive ones, not a silent expansion of what was already there.
-    const expectedNewHeroicIdSet = new Set([...expectedNewHeroicIds, ...reworkHeroicIds]);
+    const expectedNewHeroicIdSet = new Set([
+      ...expectedNewHeroicIds,
+      ...reworkHeroicIds,
+      ...blueHeroicIds,
+    ]);
     const preReleaseHeroics = generatedHeroics.filter(([id]) => !expectedNewHeroicIdSet.has(id));
     expect(preReleaseHeroics).toHaveLength(64);
 
@@ -1049,12 +1073,15 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Wildheart Basin rework's 11 loot icons (wildheart-basin-icons-2026-10-02): 1,497.
     // The Gravewyrm Sanctum rework's 11 loot icons (gravewyrm-sanctum-icons-2026-10-03): 1,508.
     // The Hollow Crypt rework's 16 loot icons (hollow-crypt-icons-2026-10-03): 1,524.
-    expect(new Set(currentOwnerIds).size).toBe(1524);
-    expect(shippingIds).toHaveLength(1524);
+    // The lower dungeons' normal blues' 55 icons (lower-dungeon-blues-icons-2026-10-08): 1,579.
+    expect(new Set(currentOwnerIds).size).toBe(1579);
+    expect(shippingIds).toHaveLength(1579);
     // 1,660 + the Wildheart Basin rework's 11 definitions and its one
     // generated heroic rare (the Heroic Falls-Blessed Staff) = 1,672.
     // + the Gravewyrm Sanctum rework's 11 definitions = 1,683.
-    expect(Object.keys(ITEMS)).toHaveLength(1683);
+    // + the lower dungeons' normal blues' 30 definitions and their 30
+    // generated Heroic variants = 1,743.
+    expect(Object.keys(ITEMS)).toHaveLength(1743);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1226,6 +1253,7 @@ describe('item-art consistency accepted-art provenance', () => {
               'wildheart-basin-icons-2026-10-02',
               'gravewyrm-sanctum-icons-2026-10-03',
               'hollow-crypt-icons-2026-10-03',
+              'lower-dungeon-blues-icons-2026-10-08',
             ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1401,8 +1429,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // the Drowned Temple rework's (drowned-temple-icons-2026-09-30) another,
     // and the Wildheart Basin rework's (wildheart-basin-icons-2026-10-02) another.
     // and the Gravewyrm Sanctum rework's (gravewyrm-sanctum-icons-2026-10-03) another,
-    // and the Hollow Crypt rework's (hollow-crypt-icons-2026-10-03) another.
-    expect(mapping.generatedBatches).toHaveLength(46);
+    // and the Hollow Crypt rework's (hollow-crypt-icons-2026-10-03) another,
+    // and the lower dungeons' normal blues (lower-dungeon-blues-icons-2026-10-08) another.
+    expect(mapping.generatedBatches).toHaveLength(47);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1478,15 +1507,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Wildheart Basin loot batch (wildheart-basin-icons-2026-10-02) adds 11: 967.
     // The Gravewyrm Sanctum loot batch (gravewyrm-sanctum-icons-2026-10-03) adds 11: 978.
     // The Hollow Crypt loot batch (hollow-crypt-icons-2026-10-03) adds 16: 994.
-    expect(priorGeneratedIds).toHaveLength(994);
+    // The lower dungeons' normal blues (lower-dungeon-blues-icons-2026-10-08) add 55: 1,049.
+    expect(priorGeneratedIds).toHaveLength(1049);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // + the Wildheart Basin's 11 = 1,497. + the Gravewyrm Sanctum's 11 = 1,508.
-    // + the Hollow Crypt's 16 = 1,524.
-    expect(allCurrentOwnerIds).toHaveLength(1524);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1524);
+    // + the Hollow Crypt's 16 = 1,524. + the lower dungeons' normal blues' 55 = 1,579.
+    expect(allCurrentOwnerIds).toHaveLength(1579);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1579);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1506,7 +1536,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Wildheart Basin rework's 11 loot icons = 967.
       // + the Gravewyrm Sanctum rework's 11 loot icons = 978.
       // + the Hollow Crypt rework's 16 loot icons = 994.
-      priorGenerated: 994,
+      // + the lower dungeons' normal blues' 55 icons = 1,049.
+      priorGenerated: 1049,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1594,6 +1625,8 @@ describe('item-art consistency accepted-art provenance', () => {
                 'gravewyrm-sanctum-icons-2026-10-03',
                 // The Hollow Crypt rework's loot.
                 'hollow-crypt-icons-2026-10-03',
+                // The lower dungeons' normal blues.
+                'lower-dungeon-blues-icons-2026-10-08',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1744,9 +1777,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the Sunken Bastion rework's 8 loot icons = 1472. Plus the Drowned Temple rework's 11 loot icons = 1483. Plus the Gaol Turnkey's 3 (the Bastion fifth pass) = 1486. Plus the Wildheart Basin rework's 11 loot icons = 1497. Plus the Gravewyrm Sanctum rework's 11 loot icons = 1508. Plus the Hollow Crypt rework's 16 loot icons = 1524.
-    if (ownerIds.length !== 1524)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1524`);
-    if (fileIds.length !== 1524) violations.push(`shipping WebP count: ${fileIds.length} != 1524`);
+    // Plus the lower dungeons' normal blues' 55 icons (lower-dungeon-blues-icons-2026-10-08) = 1579.
+    if (ownerIds.length !== 1579)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1579`);
+    if (fileIds.length !== 1579) violations.push(`shipping WebP count: ${fileIds.length} != 1579`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

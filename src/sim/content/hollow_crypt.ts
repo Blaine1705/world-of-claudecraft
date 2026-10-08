@@ -338,7 +338,12 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'rimeweb_guaranteed',
         normalOnly: true,
       },
-      { itemId: 'rimeweb_fang', chance: 0.1, normalOnly: true },
+      // The normal blue (hollow_crypt_items.ts): one draw, 35 percent in equal
+      // shares, the helm trio and the Bride's Icicle (once its own 0.10 row).
+      { itemId: 'rimewreath_coif', chance: 0.0875, rollGroup: 'rimeweb_blue', normalOnly: true },
+      { itemId: 'rime_laced_hood', chance: 0.0875, rollGroup: 'rimeweb_blue', normalOnly: true },
+      { itemId: 'lamenting_veil', chance: 0.0875, rollGroup: 'rimeweb_blue', normalOnly: true },
+      { itemId: 'rimeweb_fang', chance: 0.0875, rollGroup: 'rimeweb_blue', normalOnly: true },
     ],
     scale: 1,
     color: 0xd8ecff,
@@ -378,7 +383,22 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'ilvane_guaranteed',
         normalOnly: true,
       },
-      { itemId: 'cantors_hymnal', chance: 0.1, normalOnly: true },
+      // The normal blue (hollow_crypt_items.ts): one draw, 35 percent in equal
+      // shares, the shoulder trio and the Cantor's Hymnal (once its own row).
+      {
+        itemId: 'choirward_pauldrons',
+        chance: 0.0875,
+        rollGroup: 'ilvane_blue',
+        normalOnly: true,
+      },
+      {
+        itemId: 'choristers_spaulders',
+        chance: 0.0875,
+        rollGroup: 'ilvane_blue',
+        normalOnly: true,
+      },
+      { itemId: 'cantors_stole', chance: 0.0875, rollGroup: 'ilvane_blue', normalOnly: true },
+      { itemId: 'cantors_hymnal', chance: 0.0875, rollGroup: 'ilvane_blue', normalOnly: true },
     ],
     scale: 1.1,
     color: 0x9d6cd0,

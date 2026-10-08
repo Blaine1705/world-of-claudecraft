@@ -19120,6 +19120,96 @@ export const ru_RU: EnTranslations = {
       "vestments_of_the_waking_rite": {
         "name": "Облачение обряда пробуждения"
       },
+      "spadeworn_gauntlets": {
+        "name": "Рукавицы, стёртые лопатой"
+      },
+      "gravedirt_grips": {
+        "name": "Перчатки могильной земли"
+      },
+      "bellrope_mitts": {
+        "name": "Митенки колокольной верёвки"
+      },
+      "rimewreath_coif": {
+        "name": "Кольчужный капюшон инейного венца"
+      },
+      "rime_laced_hood": {
+        "name": "Капюшон с инеистой шнуровкой"
+      },
+      "lamenting_veil": {
+        "name": "Скорбная вуаль"
+      },
+      "choirward_pauldrons": {
+        "name": "Наплечники хорового стража"
+      },
+      "choristers_spaulders": {
+        "name": "Наплечники хориста"
+      },
+      "cantors_stole": {
+        "name": "Стола кантора"
+      },
+      "knellbound_hauberk": {
+        "name": "Кольчуга погребального звона"
+      },
+      "candlewatch_jerkin": {
+        "name": "Куртка свечного дозора"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "Одеяние Неупокоенного обряда"
+      },
+      "gravecallers_rod": {
+        "name": "Жезл Могильного Зова"
+      },
+      "portcullis_girdle": {
+        "name": "Пояс опускной решётки"
+      },
+      "cellwatch_belt": {
+        "name": "Пояс тюремного дозора"
+      },
+      "lanternwick_sash": {
+        "name": "Кушак фонарного фитиля"
+      },
+      "turnkeys_shank": {
+        "name": "Тюремный нож надзирателя"
+      },
+      "gaolyard_jerkin": {
+        "name": "Куртка тюремного двора"
+      },
+      "brinewarden_robe": {
+        "name": "Одеяние стража солёных вод"
+      },
+      "fogbinders_rod": {
+        "name": "Жезл Вязателя Тумана"
+      },
+      "conchplate_sabatons": {
+        "name": "Сабатоны из раковинных пластин"
+      },
+      "pale_chorus_slippers": {
+        "name": "Туфли Бледного хора"
+      },
+      "tideglass_gauntlets": {
+        "name": "Рукавицы Приливного стекла"
+      },
+      "moonburn_grips": {
+        "name": "Перчатки лунного ожога"
+      },
+      "prism_etched_handwraps": {
+        "name": "Обмотки с призменной гравировкой"
+      },
+      "mere_crested_helm": {
+        "name": "Шлем с озёрным гребнем"
+      },
+      "mereskin_hood": {
+        "name": "Капюшон из озёрной шкуры"
+      },
+      "merewater_cowl": {
+        "name": "Капюшон озёрной воды"
+      },
+      "merecleaver": {
+        "name": "Озёрный секач"
+      },
+      "moonwrack_stave": {
+        "name": "Посох Лунной погибели"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

@@ -125,21 +125,26 @@ describe('The Drowned Temple', () => {
     expect(isBlocked(seed, o.x - 18, o.z + 206)).toBe(false);
   });
 
-  it("Ysolei's blue drop table is an exclusive one-of-three and resolves to real items", () => {
+  it("Ysolei's blue drop table is an exclusive one-of-four and resolves to real items", () => {
     const ysolei = MOBS.ysolei;
     const group = ysolei.loot.filter((l) => l.rollGroup === 'ysolei_blue');
-    expect(group.length).toBe(3);
+    // The lower dungeons' normal blues (tests/lower_dungeon_blues.test.ts):
+    // her three Moonwrack chests and the Moonwrack Stave, guaranteed.
+    expect(group.length).toBe(4);
     const sum = group.reduce((s, l) => s + l.chance, 0);
     expect(sum).toBeCloseTo(1.0, 5);
     for (const l of ysolei.loot) {
       if (l.itemId) expect(ITEMS[l.itemId], `loot item ${l.itemId}`).toBeTruthy();
     }
-    // each rollGroup blue is a rare chest, one per archetype
-    for (const l of group) {
-      const item = ITEMS[l.itemId!];
-      expect(item.quality).toBe('rare');
-      expect(item.slot).toBe('chest');
-    }
+    // every rollGroup blue is rare: a chest per archetype plus the stave
+    for (const l of group) expect(ITEMS[l.itemId!].quality).toBe('rare');
+    const chests = group.filter((l) => ITEMS[l.itemId!].slot === 'chest');
+    expect(new Set(chests.map((l) => ITEMS[l.itemId!].armorType))).toEqual(
+      new Set(['mail', 'leather', 'cloth']),
+    );
+    expect(group.map((l) => l.itemId).filter((id) => ITEMS[id!].kind === 'weapon')).toEqual([
+      'moonwrack_stave',
+    ]);
   });
 
   it('the Tidewatcher offers a self-contained chain ending at the 5-player finale', () => {

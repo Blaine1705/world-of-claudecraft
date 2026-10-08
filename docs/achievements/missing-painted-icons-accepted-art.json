@@ -8,14 +8,14 @@
     "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
   },
   "scope": {
-    "targetRows": 219,
+    "targetRows": 224,
     "rasterPaintings": 194,
     "abilities": 90,
     "items": 101,
     "deeds": 3,
-    "heroicWeaponResolvers": 25,
+    "heroicWeaponResolvers": 30,
     "originalInventoryRows": 197,
-    "supplementalCurrentHeadRows": 21
+    "supplementalCurrentHeadRows": 26
   },
   "contracts": {
     "ability": {
@@ -331,6 +331,17 @@
         "validationStatus": "implemented and focused tests passing"
       },
       {
+        "id": "heroic_fogbinders_rod",
+        "baseId": "fogbinders_rod",
+        "variant": "wand_b",
+        "bagIconUrl": "/ui/weapons/wand_b.jpg",
+        "portraitPath": "public/ui/weapons/wand_b.jpg",
+        "heldModelPath": "public/models/weapons/wand_b.glb",
+        "canonicalDisplayName": "Fogbinder's Rod",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Fogbinder's Rod; inherits base visual variant wand_b.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
         "id": "heroic_gaolyard_cudgel",
         "baseId": "gaolyard_cudgel",
         "variant": "hammer_b",
@@ -339,6 +350,17 @@
         "heldModelPath": "public/models/weapons/hammer_b.glb",
         "canonicalDisplayName": "Gaolyard Cudgel",
         "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Gaolyard Cudgel; inherits base visual variant hammer_b.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_gravecallers_rod",
+        "baseId": "gravecallers_rod",
+        "variant": "wand_a",
+        "bagIconUrl": "/ui/weapons/wand_a.jpg",
+        "portraitPath": "public/ui/weapons/wand_a.jpg",
+        "heldModelPath": "public/models/weapons/wand_a.glb",
+        "canonicalDisplayName": "Gravecaller's Rod",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Gravecaller's Rod; inherits base visual variant wand_a.",
         "validationStatus": "implemented and focused tests passing"
       },
       {
@@ -394,6 +416,28 @@
         "heldModelPath": "public/models/weapons/hammer_d.glb",
         "canonicalDisplayName": "Maul of the Scourged Wilds",
         "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Maul of the Scourged Wilds; inherits base visual variant hammer_d.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_merecleaver",
+        "baseId": "merecleaver",
+        "variant": "adv_axe_2handed",
+        "bagIconUrl": "/ui/weapons/adv_axe_2handed.jpg",
+        "portraitPath": "public/ui/weapons/adv_axe_2handed.jpg",
+        "heldModelPath": "public/models/weapons/adv_axe_2handed.glb",
+        "canonicalDisplayName": "Merecleaver",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Merecleaver; inherits base visual variant adv_axe_2handed.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_moonwrack_stave",
+        "baseId": "moonwrack_stave",
+        "variant": "adv_staff",
+        "bagIconUrl": "/ui/weapons/adv_staff.jpg",
+        "portraitPath": "public/ui/weapons/adv_staff.jpg",
+        "heldModelPath": "public/models/weapons/adv_staff.glb",
+        "canonicalDisplayName": "Moonwrack Stave",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Moonwrack Stave; inherits base visual variant adv_staff.",
         "validationStatus": "implemented and focused tests passing"
       },
       {
@@ -471,6 +515,17 @@
         "heldModelPath": "public/models/weapons/dagger_c.glb",
         "canonicalDisplayName": "Tideglass Shiv",
         "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Tideglass Shiv; inherits base visual variant dagger_c.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_turnkeys_shank",
+        "baseId": "turnkeys_shank",
+        "variant": "dagger_c",
+        "bagIconUrl": "/ui/weapons/dagger_c.jpg",
+        "portraitPath": "public/ui/weapons/dagger_c.jpg",
+        "heldModelPath": "public/models/weapons/dagger_c.glb",
+        "canonicalDisplayName": "Turnkey's Shank",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Turnkey's Shank; inherits base visual variant dagger_c.",
         "validationStatus": "implemented and focused tests passing"
       },
       {

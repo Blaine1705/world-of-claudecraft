@@ -19120,6 +19120,96 @@ export const ko_KR: EnTranslations = {
       "vestments_of_the_waking_rite": {
         "name": "깨움 의식의 예복"
       },
+      "spadeworn_gauntlets": {
+        "name": "삽에 닳은 건틀릿"
+      },
+      "gravedirt_grips": {
+        "name": "무덤흙 장갑"
+      },
+      "bellrope_mitts": {
+        "name": "종줄 벙어리장갑"
+      },
+      "rimewreath_coif": {
+        "name": "서리화관 사슬두건"
+      },
+      "rime_laced_hood": {
+        "name": "서리끈 두건"
+      },
+      "lamenting_veil": {
+        "name": "애도의 면사포"
+      },
+      "choirward_pauldrons": {
+        "name": "성가수호 어깨갑옷"
+      },
+      "choristers_spaulders": {
+        "name": "성가대원의 어깨보호구"
+      },
+      "cantors_stole": {
+        "name": "성가대장의 영대"
+      },
+      "knellbound_hauberk": {
+        "name": "조종에 묶인 사슬갑옷"
+      },
+      "candlewatch_jerkin": {
+        "name": "촛불지기 가죽조끼"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "불안한 의식의 로브"
+      },
+      "gravecallers_rod": {
+        "name": "무덤부름의 홀"
+      },
+      "portcullis_girdle": {
+        "name": "쇠창살문 허리띠"
+      },
+      "cellwatch_belt": {
+        "name": "감방 감시 허리띠"
+      },
+      "lanternwick_sash": {
+        "name": "등불심지 장식띠"
+      },
+      "turnkeys_shank": {
+        "name": "옥지기의 수제 칼"
+      },
+      "gaolyard_jerkin": {
+        "name": "감옥 뜰의 가죽조끼"
+      },
+      "brinewarden_robe": {
+        "name": "짠물 감시자의 로브"
+      },
+      "fogbinders_rod": {
+        "name": "안개엮는자의 홀"
+      },
+      "conchplate_sabatons": {
+        "name": "소라판 쇠장화"
+      },
+      "pale_chorus_slippers": {
+        "name": "창백한 합창 덧신"
+      },
+      "tideglass_gauntlets": {
+        "name": "조수유리 건틀릿"
+      },
+      "moonburn_grips": {
+        "name": "달그을림 장갑"
+      },
+      "prism_etched_handwraps": {
+        "name": "프리즘 새김 손싸개"
+      },
+      "mere_crested_helm": {
+        "name": "호수볏 투구"
+      },
+      "mereskin_hood": {
+        "name": "호수뱀가죽 두건"
+      },
+      "merewater_cowl": {
+        "name": "호숫물 두건"
+      },
+      "merecleaver": {
+        "name": "호수가르개 대도끼"
+      },
+      "moonwrack_stave": {
+        "name": "달파멸 지팡이"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

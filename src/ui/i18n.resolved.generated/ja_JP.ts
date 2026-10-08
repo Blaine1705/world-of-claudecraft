@@ -19120,6 +19120,96 @@ export const ja_JP: EnTranslations = {
       "vestments_of_the_waking_rite": {
         "name": "目覚めの儀の祭服"
       },
+      "spadeworn_gauntlets": {
+        "name": "鋤擦れの籠手"
+      },
+      "gravedirt_grips": {
+        "name": "墓土のグリップ"
+      },
+      "bellrope_mitts": {
+        "name": "鐘縄のミトン"
+      },
+      "rimewreath_coif": {
+        "name": "霜花冠の鎖頭巾"
+      },
+      "rime_laced_hood": {
+        "name": "霜綴りのフード"
+      },
+      "lamenting_veil": {
+        "name": "嘆きのヴェール"
+      },
+      "choirward_pauldrons": {
+        "name": "聖歌守りの肩鎧"
+      },
+      "choristers_spaulders": {
+        "name": "聖歌隊員の肩当て"
+      },
+      "cantors_stole": {
+        "name": "聖歌隊長のストール"
+      },
+      "knellbound_hauberk": {
+        "name": "弔鐘縛りのホーバーク"
+      },
+      "candlewatch_jerkin": {
+        "name": "灯守りの胴着"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "安らがぬ儀式のローブ"
+      },
+      "gravecallers_rod": {
+        "name": "墓呼びのロッド"
+      },
+      "portcullis_girdle": {
+        "name": "落とし格子の腰帯"
+      },
+      "cellwatch_belt": {
+        "name": "牢見張りのベルト"
+      },
+      "lanternwick_sash": {
+        "name": "ランタン芯の飾り帯"
+      },
+      "turnkeys_shank": {
+        "name": "牢番の隠し刃"
+      },
+      "gaolyard_jerkin": {
+        "name": "牢獄庭の胴着"
+      },
+      "brinewarden_robe": {
+        "name": "潮看守のローブ"
+      },
+      "fogbinders_rod": {
+        "name": "フォグバインダーのロッド"
+      },
+      "conchplate_sabatons": {
+        "name": "巻貝板のサバトン"
+      },
+      "pale_chorus_slippers": {
+        "name": "蒼白聖歌のスリッパ"
+      },
+      "tideglass_gauntlets": {
+        "name": "潮硝子の籠手"
+      },
+      "moonburn_grips": {
+        "name": "月焼けのグリップ"
+      },
+      "prism_etched_handwraps": {
+        "name": "プリズム刻みのハンドラップ"
+      },
+      "mere_crested_helm": {
+        "name": "湖冠の兜"
+      },
+      "mereskin_hood": {
+        "name": "湖竜皮のフード"
+      },
+      "merewater_cowl": {
+        "name": "湖水の頭巾"
+      },
+      "merecleaver": {
+        "name": "湖断ちの大斧"
+      },
+      "moonwrack_stave": {
+        "name": "ムーンラックの杖"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

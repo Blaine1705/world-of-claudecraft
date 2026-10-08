@@ -315,16 +315,19 @@ describe('missing painted icon accepted-art manifest', () => {
     // (heroic_falls_blessed_staff, heroic_gaolyard_cudgel,
     // heroic_knight_commanders_longsword, heroic_rimeweb_fang,
     // heroic_sextons_spadehaft, heroic_tideglass_shiv) add their resolvers the
-    // same way: 213/19/15 become 219/25/21.
+    // same way: 213/19/15 become 219/25/21. The lower dungeons' normal blues'
+    // five (heroic_gravecallers_rod, heroic_turnkeys_shank,
+    // heroic_fogbinders_rod, heroic_merecleaver, heroic_moonwrack_stave):
+    // 219/25/21 become 224/30/26.
     expect(accepted.scope).toEqual({
-      targetRows: 219,
+      targetRows: 224,
       rasterPaintings: 194,
       abilities: 90,
       items: 101,
       deeds: 3,
-      heroicWeaponResolvers: 25,
+      heroicWeaponResolvers: 30,
       originalInventoryRows: 197,
-      supplementalCurrentHeadRows: 21,
+      supplementalCurrentHeadRows: 26,
     });
     expect(accepted.assets).toHaveLength(194);
     expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(90);
@@ -341,7 +344,7 @@ describe('missing painted icon accepted-art manifest', () => {
         accepted.assets.filter((asset) => asset.kind === kind).map((asset) => asset.id),
       ).toEqual(ids);
     }
-    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(25);
+    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(30);
     expect(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id)).toEqual(
       sorted(new Set(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id))),
     );

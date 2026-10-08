@@ -803,8 +803,37 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       { copper: 2500, chance: 1 },
       // Guaranteed troll trophy junk: the Grubjaw rare convention (zone2.ts).
       { itemId: 'chipped_tusk', chance: 1 },
-      { itemId: 'fanglords_beastspear', chance: 0.12, normalOnly: true },
-      { itemId: 'duskwhisper', chance: 0.12, normalOnly: true },
+      // One bonus roll: the two chase weapons keep 0.12 each and the relocated
+      // Nythraxis raid pieces join them (content/nythraxis_loot.ts), so a kill
+      // pays at most one of them.
+      {
+        itemId: 'fanglords_beastspear',
+        chance: 0.12,
+        rollGroup: 'beastmaster_bonus',
+        normalOnly: true,
+      },
+      { itemId: 'duskwhisper', chance: 0.12, rollGroup: 'beastmaster_bonus', normalOnly: true },
+      // Relocated Nythraxis raid pieces (content/nythraxis_loot.ts): item level 29,
+      // 4% each inside this one bonus roll, so a kill never pays an extra item.
+      {
+        itemId: 'direfang_greatblade',
+        chance: 0.04,
+        rollGroup: 'beastmaster_bonus',
+        normalOnly: true,
+      },
+      { itemId: 'direfang_quiver', chance: 0.04, rollGroup: 'beastmaster_bonus', normalOnly: true },
+      {
+        itemId: 'bramblehide_grips',
+        chance: 0.04,
+        rollGroup: 'beastmaster_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'bramblehide_treads',
+        chance: 0.04,
+        rollGroup: 'beastmaster_bonus',
+        normalOnly: true,
+      },
       {
         itemId: 'beastpit_warbelt',
         chance: 0.34,
@@ -906,7 +935,34 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'gorgebloom_guaranteed',
         normalOnly: true,
       },
-      { itemId: 'falls_blessed_staff', chance: 0.1, normalOnly: true },
+      // One bonus roll: the chase staff keeps 0.1 and the relocated Nythraxis raid
+      // pieces join it (content/nythraxis_loot.ts).
+      {
+        itemId: 'falls_blessed_staff',
+        chance: 0.1,
+        rollGroup: 'gorgebloom_bonus',
+        normalOnly: true,
+      },
+      // Relocated Nythraxis raid pieces (content/nythraxis_loot.ts): item level 29,
+      // 4% each inside this one bonus roll, so a kill never pays an extra item.
+      {
+        itemId: 'bramblehide_crown',
+        chance: 0.04,
+        rollGroup: 'gorgebloom_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'bramblehide_mantle',
+        chance: 0.04,
+        rollGroup: 'gorgebloom_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'bramblehide_cinch',
+        chance: 0.04,
+        rollGroup: 'gorgebloom_bonus',
+        normalOnly: true,
+      },
     ],
     scale: 2.8,
     color: 0xa3322a,
@@ -983,6 +1039,26 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       {
         itemId: 'wildheart_fangknife',
         chance: 0.06,
+        rollGroup: 'wildheart_bonus',
+        normalOnly: true,
+      },
+      // Relocated Nythraxis raid pieces (content/nythraxis_loot.ts): item level 29,
+      // 4% each inside this one bonus roll, so a kill never pays an extra item.
+      {
+        itemId: 'bramblehide_harness',
+        chance: 0.04,
+        rollGroup: 'wildheart_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'bramblehide_legguards',
+        chance: 0.04,
+        rollGroup: 'wildheart_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'thornpeak_moonhide_cowl',
+        chance: 0.04,
         rollGroup: 'wildheart_bonus',
         normalOnly: true,
       },

@@ -329,8 +329,10 @@ describe('item webp icons', () => {
     // Wildheart Basin rework's Falls-Blessed Staff: 150, plus the Gravewyrm
     // Sanctum rework's Hammer of the Open Lock: 151, plus the Hollow Crypt
     // rework's three (sextons_spadehaft, sextons_burial_spade, rimeweb_fang;
-    // hollow-crypt-icons-2026-10-03): 154.
-    expect(WEAPON_IMAGE_IDS.size).toBe(154);
+    // hollow-crypt-icons-2026-10-03): 154, plus the lower dungeons' normal
+    // blues' five (gravecallers_rod, turnkeys_shank, fogbinders_rod,
+    // merecleaver, moonwrack_stave; lower-dungeon-blues-icons-2026-10-08): 159.
+    expect(WEAPON_IMAGE_IDS.size).toBe(159);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

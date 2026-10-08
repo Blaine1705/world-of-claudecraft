@@ -192,7 +192,10 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // 25 additions only, no existing shelf row moved: six heroic trinkets, ten
     // heroic epics, the Falls-Blessed Staff (a level-20 boss rare) and eight
     // generated Heroic variants of the rework's chase rares.
-    expect(shelf.length).toBe(793);
+    // Re-pinned 793 -> 823 by the lower dungeons' normal blues: 30 additions
+    // only, the generated Heroic variants of the 30 new rares (source 22, the
+    // level-20 gate); the base pieces gate at 8 to 18 and stay off the shelf.
+    expect(shelf.length).toBe(823);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

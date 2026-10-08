@@ -435,7 +435,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     ).toBeLessThan(0.3);
   });
 
-  it("pins Zulgar's roll groups: guaranteed uncommon sums to 1.0, wildheart_bonus to 0.18", () => {
+  it("pins Zulgar's roll groups: guaranteed uncommon sums to 1.0, wildheart_bonus to 0.30", () => {
     const loot = MOBS.wildheart_high_priest.loot ?? [];
     const groupSum = (group: string) =>
       loot.filter((e) => e.rollGroup === group).reduce((a, e) => a + e.chance, 0);
@@ -445,10 +445,12 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // each across a 13-item group; a 3-item pool matches the per-item rate, not
     // the group's total mass). Pinned per item, not only as the group sum: a
     // non-uniform re-tune (0.10/0.05/0.03) keeps the sum but breaks the rate.
+    // The three relocated Nythraxis pieces join the same roll at 0.04 each
+    // (2026-10-08, content/nythraxis_loot.ts).
     expect(loot.filter((e) => e.rollGroup === 'wildheart_bonus').map((e) => e.chance)).toEqual([
-      0.06, 0.06, 0.06,
+      0.06, 0.06, 0.06, 0.04, 0.04, 0.04,
     ]);
-    expect(groupSum('wildheart_bonus')).toBeCloseTo(0.18, 9);
+    expect(groupSum('wildheart_bonus')).toBeCloseTo(0.3, 9);
     expect(loot.some((e) => e.copper === 15000 && e.chance === 1)).toBe(true);
     expect(loot.some((e) => e.itemId === 'bone_fragments' && e.chance === 0.8)).toBe(true);
   });
@@ -476,8 +478,9 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // Twelve former acquisitions plus the Paired Talons trinket (content/trinkets.ts),
     // less the two epics the rework moved to the Beastmaster (Bloodmane
     // War-Legguards) and the Gorgebloom (Sunbone Oracle's Crown):
-    // tests/wildheart_loot.test.ts pins them there.
-    expect(gear).toHaveLength(11);
+    // tests/wildheart_loot.test.ts pins them there. The three Heroic copies of
+    // his relocated Nythraxis pieces joined on 2026-10-08: 14.
+    expect(gear).toHaveLength(14);
     expect(gear.some((entry) => entry.itemId === 'bloodmane_war_legguards')).toBe(false);
     expect(gear.some((entry) => entry.itemId === 'sunbone_oracles_crown')).toBe(false);
     expect(gear.some((entry) => entry.itemId === 'paired_talons')).toBe(true);

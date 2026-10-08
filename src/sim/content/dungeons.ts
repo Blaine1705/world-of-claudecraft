@@ -573,7 +573,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
         normalOnly: true,
       },
       { itemId: 'bellrope_girdle', chance: 0.25, rollGroup: 'marrow_guaranteed', normalOnly: true },
-      { itemId: 'sextons_spadehaft', chance: 0.1, normalOnly: true },
+      // The normal blue (hollow_crypt_items.ts): one draw, 35 percent in equal
+      // shares, the gloves trio and the Spadehaft (once its own 0.10 row).
+      { itemId: 'spadeworn_gauntlets', chance: 0.0875, rollGroup: 'marrow_blue', normalOnly: true },
+      { itemId: 'gravedirt_grips', chance: 0.0875, rollGroup: 'marrow_blue', normalOnly: true },
+      { itemId: 'bellrope_mitts', chance: 0.0875, rollGroup: 'marrow_blue', normalOnly: true },
+      { itemId: 'sextons_spadehaft', chance: 0.0875, rollGroup: 'marrow_blue', normalOnly: true },
     ],
     // His Blender body is authored at full size (crypt_skel_sexton's height).
     scale: 1,
@@ -632,6 +637,17 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'gravewoven_bag', chance: 0.2, rollGroup: 'morthen_bonus', normalOnly: true },
       { itemId: 'cryptbone_helm', chance: 0.18, rollGroup: 'morthen_bonus', normalOnly: true },
       { itemId: 'cryptbone_pauldrons', chance: 0.18, rollGroup: 'morthen_bonus', normalOnly: true },
+      // The normal blue (hollow_crypt_items.ts): guaranteed on the final boss,
+      // the chest trio and the Gravecaller's Rod in equal shares.
+      { itemId: 'knellbound_hauberk', chance: 0.25, rollGroup: 'morthen_blue', normalOnly: true },
+      { itemId: 'candlewatch_jerkin', chance: 0.25, rollGroup: 'morthen_blue', normalOnly: true },
+      {
+        itemId: 'robe_of_the_unquiet_rite',
+        chance: 0.25,
+        rollGroup: 'morthen_blue',
+        normalOnly: true,
+      },
+      { itemId: 'gravecallers_rod', chance: 0.25, rollGroup: 'morthen_blue', normalOnly: true },
     ],
     scale: 1.35,
     color: 0x4a235a,
@@ -802,15 +818,24 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'olen_guaranteed_uncommon',
         normalOnly: true,
       },
+      // The normal blue (sunken_bastion_items.ts): one draw, 35 percent in
+      // equal shares. The old one-of-four bonus row became the legs trio and
+      // the Longsword: the Drowned Prayer Leggings moved here from Vael and
+      // the Tideguard Sabatons moved to Vael's feet trio.
+      { itemId: 'tideguard_greaves', chance: 0.0875, rollGroup: 'olen_blue', normalOnly: true },
+      { itemId: 'eelscale_leggings', chance: 0.0875, rollGroup: 'olen_blue', normalOnly: true },
       {
-        itemId: 'knight_commanders_longsword',
-        chance: 0.1,
-        rollGroup: 'olen_bonus',
+        itemId: 'drowned_prayer_leggings',
+        chance: 0.0875,
+        rollGroup: 'olen_blue',
         normalOnly: true,
       },
-      { itemId: 'tideguard_greaves', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
-      { itemId: 'tideguard_sabatons', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
-      { itemId: 'eelscale_leggings', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
+      {
+        itemId: 'knight_commanders_longsword',
+        chance: 0.0875,
+        rollGroup: 'olen_blue',
+        normalOnly: true,
+      },
     ], // his greaves are Maren's quest reward, not a drop
     scale: 1.2,
     color: 0x95a5a6,
@@ -859,14 +884,19 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
         normalOnly: true,
       },
       { itemId: 'deepfen_pearl', chance: 1 },
+      // The bonus group keeps its uncommons and the Duffel at their shipped
+      // chances; its four rares left for the blue groups (the Vest to Ossick,
+      // the Prayer Leggings to Olen, the Sandals and Treads below).
       { itemId: 'eelskin_tunic', chance: 0.2, rollGroup: 'vael_bonus', normalOnly: true },
-      { itemId: 'tidescale_vest', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
-      { itemId: 'drowned_prayer_leggings', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
-      { itemId: 'drowned_prayer_sandals', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
-      { itemId: 'eelscale_treads', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
       { itemId: 'mistveil_cord', chance: 0.12, rollGroup: 'vael_bonus', normalOnly: true },
       { itemId: 'mistveil_grips', chance: 0.12, rollGroup: 'vael_bonus', normalOnly: true },
       { itemId: 'mistcallers_duffel', chance: 0.1, rollGroup: 'vael_bonus', normalOnly: true },
+      // The normal blue (sunken_bastion_items.ts): guaranteed on the final
+      // boss, the feet trio (the Sabatons from Olen) and the Fogbinder's Rod.
+      { itemId: 'tideguard_sabatons', chance: 0.25, rollGroup: 'vael_blue', normalOnly: true },
+      { itemId: 'eelscale_treads', chance: 0.25, rollGroup: 'vael_blue', normalOnly: true },
+      { itemId: 'drowned_prayer_sandals', chance: 0.25, rollGroup: 'vael_blue', normalOnly: true },
+      { itemId: 'fogbinders_rod', chance: 0.25, rollGroup: 'vael_blue', normalOnly: true },
     ],
     scale: 1.35,
     color: 0x48c9b0,
@@ -1052,7 +1082,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'korgath_guaranteed_uncommon',
         normalOnly: true,
       },
-      { itemId: 'zealotsbane_blade', chance: 0.19, rollGroup: 'korgath_bonus', normalOnly: true },
+      // The uncommon filler gives up 0.12 of the roll to the relocated raid pieces.
+      { itemId: 'zealotsbane_blade', chance: 0.07, rollGroup: 'korgath_bonus', normalOnly: true },
       { itemId: 'korgaths_chainwraps', chance: 0.1, rollGroup: 'korgath_bonus', normalOnly: true },
       { itemId: 'staff_of_velkhar', chance: 0.1, rollGroup: 'korgath_bonus', normalOnly: true },
       { itemId: 'shadowmeld_tunic', chance: 0.1, rollGroup: 'korgath_bonus', normalOnly: true },
@@ -1062,6 +1093,16 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'wyrmshadow_treads', chance: 0.05, rollGroup: 'korgath_bonus', normalOnly: true },
       { itemId: 'boundstone_helm', chance: 0.08, rollGroup: 'korgath_bonus', normalOnly: true },
       { itemId: 'gravewyrm_mantle', chance: 0.08, rollGroup: 'korgath_bonus', normalOnly: true },
+      // Relocated Nythraxis raid pieces (content/nythraxis_loot.ts): item level 29,
+      // 4% each inside this one bonus roll, so a kill never pays an extra item.
+      {
+        itemId: 'bonewrought_greatsword',
+        chance: 0.04,
+        rollGroup: 'korgath_bonus',
+        normalOnly: true,
+      },
+      { itemId: 'bonewrought_bulwark', chance: 0.04, rollGroup: 'korgath_bonus', normalOnly: true },
+      { itemId: 'thornpeak_wardblade', chance: 0.04, rollGroup: 'korgath_bonus', normalOnly: true },
     ],
     scale: 1.5,
     color: 0x8f6f46,
@@ -1107,7 +1148,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'velkhar_guaranteed_uncommon',
         normalOnly: true,
       },
-      { itemId: 'emberwood_staff', chance: 0.2, rollGroup: 'velkhar_bonus', normalOnly: true },
+      // The uncommon filler gives up 0.12 of the roll to the relocated raid pieces.
+      { itemId: 'emberwood_staff', chance: 0.08, rollGroup: 'velkhar_bonus', normalOnly: true },
       {
         itemId: 'boneguard_breastplate',
         chance: 0.1,
@@ -1135,6 +1177,16 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'velkhar_bonus',
         normalOnly: true,
       },
+      // Relocated Nythraxis raid pieces (content/nythraxis_loot.ts): item level 29,
+      // 4% each inside this one bonus roll, so a kill never pays an extra item.
+      {
+        itemId: 'votive_ward_of_the_deathless_court',
+        chance: 0.04,
+        rollGroup: 'velkhar_bonus',
+        normalOnly: true,
+      },
+      { itemId: 'wraithfire_orb', chance: 0.04, rollGroup: 'velkhar_bonus', normalOnly: true },
+      { itemId: 'courtiers_bonefang', chance: 0.04, rollGroup: 'velkhar_bonus', normalOnly: true },
       // The dungeon rung of the materials-satchel ladder, same shape and rate
       // as the Gravewoven Bag on Morthen. Velkhar is the one Sanctum boss with
       // room for it: velkhar_bonus sums to 0.75, so a 0.2 row lands fully
@@ -1258,6 +1310,21 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       {
         itemId: 'gravewyrm_bone_quiver',
         chance: 0.05,
+        rollGroup: 'korzul_bonus',
+        normalOnly: true,
+      },
+      // Relocated Nythraxis raid pieces (content/nythraxis_loot.ts): item level 29,
+      // 4% each inside this one bonus roll, so a kill never pays an extra item.
+      { itemId: 'gravecourt_hewer', chance: 0.04, rollGroup: 'korzul_bonus', normalOnly: true },
+      {
+        itemId: 'stormhymn_chain_grips',
+        chance: 0.04,
+        rollGroup: 'korzul_bonus',
+        normalOnly: true,
+      },
+      {
+        itemId: 'stormhymn_chain_treads',
+        chance: 0.04,
         rollGroup: 'korzul_bonus',
         normalOnly: true,
       },

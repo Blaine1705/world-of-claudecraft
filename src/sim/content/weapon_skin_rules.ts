@@ -182,6 +182,13 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   tideglass_warmaul: 'mace',
   falls_blessed_staff: 'staff',
   hammer_of_the_open_lock: 'mace',
+  // The lower dungeons' normal blues (the same *_items.ts modules): the two
+  // caster rods read as wands, the shank as a dagger.
+  gravecallers_rod: 'wand',
+  turnkeys_shank: 'dagger',
+  fogbinders_rod: 'wand',
+  merecleaver: 'axe',
+  moonwrack_stave: 'staff',
 };
 
 /**

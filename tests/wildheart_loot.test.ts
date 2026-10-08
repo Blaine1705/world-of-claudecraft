@@ -72,8 +72,41 @@ describe('Wildheart Basin rework: normal boss tables', () => {
     expect(row(MOBS.the_gorgebloom.loot, 'falls_blessed_staff')).toEqual({
       itemId: 'falls_blessed_staff',
       chance: 0.1,
+      rollGroup: 'gorgebloom_bonus',
       normalOnly: true,
     });
+  });
+
+  it('carries the relocated Nythraxis raid pieces inside one bonus roll per boss', () => {
+    // content/nythraxis_loot.ts: each relocated piece sits on one Basin boss at
+    // 0.04, in the same roll as that boss's shipped chase rows, so a normal kill
+    // still pays at most one of them.
+    const bonus = (bossId: string, group: string) =>
+      MOBS[bossId].loot
+        .filter((e) => e.rollGroup === group)
+        .map((e) => [e.itemId, e.chance, e.normalOnly]);
+    expect(bonus('wildheart_beastmaster', 'beastmaster_bonus')).toEqual([
+      ['fanglords_beastspear', 0.12, true],
+      ['duskwhisper', 0.12, true],
+      ['direfang_greatblade', 0.04, true],
+      ['direfang_quiver', 0.04, true],
+      ['bramblehide_grips', 0.04, true],
+      ['bramblehide_treads', 0.04, true],
+    ]);
+    expect(bonus('the_gorgebloom', 'gorgebloom_bonus')).toEqual([
+      ['falls_blessed_staff', 0.1, true],
+      ['bramblehide_crown', 0.04, true],
+      ['bramblehide_mantle', 0.04, true],
+      ['bramblehide_cinch', 0.04, true],
+    ]);
+    expect(bonus('wildheart_high_priest', 'wildheart_bonus')).toEqual([
+      ['wildheart_tuskblade', 0.06, true],
+      ['wildheart_hexwood_staff', 0.06, true],
+      ['wildheart_fangknife', 0.06, true],
+      ['bramblehide_harness', 0.04, true],
+      ['bramblehide_legguards', 0.04, true],
+      ['thornpeak_moonhide_cowl', 0.04, true],
+    ]);
   });
 
   it('pays exactly one archetype piece per normal kill through the real loot roller', () => {
@@ -133,18 +166,31 @@ describe('Wildheart Basin rework: heroic partitions', () => {
     // The design's Heroic Duskwhisper 0.20 is shared with the Heroic
     // Fanglord's Beastspear (0.10 each): its base row is normalOnly now, and
     // the Basin page counts both difficulties (heroic_loot.ts).
+    // The relocated Nythraxis pieces and raid trinkets (2026-10-08) take their
+    // shares first: the home piece with no second heroic boss and the trinket at
+    // 0.1, the home pieces that also drop elsewhere at 0.04; the design table
+    // keeps its ratios in the rest (0.68 and 0.72).
     expect(weights('wildheart_beastmaster')).toEqual([
-      ['fanglords_whistle', 0.25],
-      ['fanglords_hide_mantle', 0.3],
-      ['heroic_duskwhisper', 0.1],
-      ['heroic_fanglords_beastspear', 0.1],
-      ['bloodmane_war_legguards', 0.25],
+      ['heroic_direfang_greatblade', 0.1],
+      ['hunters_tally', 0.1],
+      ['heroic_direfang_quiver', 0.04],
+      ['heroic_bramblehide_grips', 0.04],
+      ['heroic_bramblehide_treads', 0.04],
+      ['fanglords_whistle', 0.17],
+      ['fanglords_hide_mantle', 0.204],
+      ['heroic_duskwhisper', 0.068],
+      ['heroic_fanglords_beastspear', 0.068],
+      ['bloodmane_war_legguards', 0.17],
     ]);
     expect(weights('the_gorgebloom')).toEqual([
-      ['gorgebloom_seedpod', 0.25],
-      ['thornroot_greathelm', 0.3],
-      ['sunbone_oracles_crown', 0.25],
-      ['heroic_falls_blessed_staff', 0.2],
+      ['heroic_bramblehide_crown', 0.1],
+      ['wellspring_seed', 0.1],
+      ['heroic_bramblehide_mantle', 0.04],
+      ['heroic_bramblehide_cinch', 0.04],
+      ['gorgebloom_seedpod', 0.18],
+      ['thornroot_greathelm', 0.216],
+      ['sunbone_oracles_crown', 0.18],
+      ['heroic_falls_blessed_staff', 0.144],
     ]);
     for (const bossId of ['wildheart_beastmaster', 'the_gorgebloom']) {
       const gear = gearOf(HEROIC_BOSS_LOOT[bossId]);
@@ -157,10 +203,14 @@ describe('Wildheart Basin rework: heroic partitions', () => {
     const gear = gearOf(HEROIC_BOSS_LOOT.wildheart_high_priest);
     expect(gear.reduce((sum, entry) => sum + entry.chance, 0)).toBe(1);
     // The shipped weights summed to 3.43; without the two moved epics (0.33
-    // each) the rest sum to 2.77 and keep their proportions.
+    // each) the rest sum to 2.77 and keep their proportions inside the 0.82 the
+    // relocated Nythraxis pieces leave (the Harness 0.1, two home pieces 0.04).
     const chance = (id: string) => gear.find((entry) => entry.itemId === id)?.chance ?? 0;
-    expect(chance('basin_stalkers_tunic')).toBeCloseTo(0.34 / 2.77, 9);
-    expect(chance('heroic_wildheart_tuskblade')).toBeCloseTo(0.06 / 2.77, 9);
+    expect(chance('heroic_bramblehide_harness')).toBeCloseTo(0.1, 9);
+    expect(chance('heroic_bramblehide_legguards')).toBeCloseTo(0.04, 9);
+    expect(chance('heroic_thornpeak_moonhide_cowl')).toBeCloseTo(0.04, 9);
+    expect(chance('basin_stalkers_tunic')).toBeCloseTo((0.34 / 2.77) * 0.82, 9);
+    expect(chance('heroic_wildheart_tuskblade')).toBeCloseTo((0.06 / 2.77) * 0.82, 9);
     expect(
       HEROIC_BOSS_LOOT.wildheart_high_priest
         .filter((e) => e.rollGroup === FARM_HEROIC_PATTERN_GROUP)

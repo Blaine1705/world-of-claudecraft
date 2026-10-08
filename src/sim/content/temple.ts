@@ -492,7 +492,6 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     // rides HEROIC_BOSS_LOOT.choirmother_selthe.
     loot: [
       { copper: 700, chance: 1 },
-      { itemId: 'selthes_seastriders', chance: 0.4, normalOnly: true },
       { itemId: 'briny_idol', chance: 0.5 },
       {
         itemId: 'conchplate_girdle',
@@ -512,7 +511,28 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'selthe_guaranteed',
         normalOnly: true,
       },
-      { itemId: 'chorus_conch', chance: 0.1, normalOnly: true },
+      // The normal blue (drowned_temple_items.ts): one draw, 35 percent in
+      // equal shares, the feet trio around her Sea-Striders (once their own
+      // 0.40 row) and the Chorus Conch (once its own 0.10 row).
+      {
+        itemId: 'conchplate_sabatons',
+        chance: 0.0875,
+        rollGroup: 'selthe_blue',
+        normalOnly: true,
+      },
+      {
+        itemId: 'selthes_seastriders',
+        chance: 0.0875,
+        rollGroup: 'selthe_blue',
+        normalOnly: true,
+      },
+      {
+        itemId: 'pale_chorus_slippers',
+        chance: 0.0875,
+        rollGroup: 'selthe_blue',
+        normalOnly: true,
+      },
+      { itemId: 'chorus_conch', chance: 0.0875, rollGroup: 'selthe_blue', normalOnly: true },
     ],
     scale: 1.15,
     color: 0x6f8fae,
@@ -570,16 +590,20 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     enrage: { belowHpPct: 0.3, dmgMult: 1.4, hasteMult: 1.3 },
     loot: [
       { copper: 6000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
+      // Her own Pearl Greaves keep their independent row: a mail legs piece
+      // named for her completes no other boss's trio.
       { itemId: 'ysols_pearl_greaves', chance: 0.5, normalOnly: true },
-      // exclusive "one of three" blue chests (weights sum to 1.0)
+      // The normal blue (drowned_temple_items.ts): guaranteed on the final
+      // boss, her Moonwrack chests and the Moonwrack Stave in equal shares.
       {
         itemId: 'moonshroud_breastplate',
-        chance: 0.34,
+        chance: 0.25,
         rollGroup: 'ysolei_blue',
         normalOnly: true,
       },
-      { itemId: 'moonshroud_robe', chance: 0.33, rollGroup: 'ysolei_blue', normalOnly: true },
-      { itemId: 'moonshroud_tunic', chance: 0.33, rollGroup: 'ysolei_blue', normalOnly: true },
+      { itemId: 'moonshroud_tunic', chance: 0.25, rollGroup: 'ysolei_blue', normalOnly: true },
+      { itemId: 'moonshroud_robe', chance: 0.25, rollGroup: 'ysolei_blue', normalOnly: true },
+      { itemId: 'moonwrack_stave', chance: 0.25, rollGroup: 'ysolei_blue', normalOnly: true },
     ],
     scale: 2.5,
     color: 0xbcd2ec,

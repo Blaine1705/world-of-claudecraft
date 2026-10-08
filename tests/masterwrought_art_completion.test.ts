@@ -827,7 +827,8 @@ describe('Masterwrought art completion evidence', () => {
     // + the five-dungeon rework's four loot batches (Sunken Bastion, Drowned
     // Temple, Wildheart Basin, Gravewyrm Sanctum; 11 each): 1,508.
     // + the Hollow Crypt's 16 (hollow-crypt-icons-2026-10-03): 1,524.
-    expect(currentOwnerIds).toHaveLength(1524);
+    // + the lower dungeons' normal blues' 55 (lower-dungeon-blues-icons-2026-10-08): 1,579.
+    expect(currentOwnerIds).toHaveLength(1579);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -971,15 +972,17 @@ describe('Masterwrought art completion evidence', () => {
       'wildheart-basin-icons-2026-10-02',
       'gravewyrm-sanctum-icons-2026-10-03',
       'hollow-crypt-icons-2026-10-03',
+      // The lower dungeons' normal blues: 55 more ids, 115 in all.
+      'lower-dungeon-blues-icons-2026-10-08',
     ];
     const dungeonReworkIds = new Set(
       mapping.generatedBatches
         .filter(({ batchId }) => dungeonReworkBatchIds.includes(batchId))
         .flatMap(({ itemIds }) => itemIds),
     );
-    expect(dungeonReworkIds.size).toBe(60);
+    expect(dungeonReworkIds.size).toBe(115);
     expect(datedIds.filter((id) => dungeonReworkIds.has(id))).toEqual([]);
-    expect(currentOwnerIds.filter((id) => dungeonReworkIds.has(id))).toHaveLength(60);
+    expect(currentOwnerIds.filter((id) => dungeonReworkIds.has(id))).toHaveLength(115);
 
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,

@@ -19120,6 +19120,96 @@ export const en_CA: EnTranslations = {
       "vestments_of_the_waking_rite": {
         "name": "Vestments of the Waking Rite"
       },
+      "spadeworn_gauntlets": {
+        "name": "Spadeworn Gauntlets"
+      },
+      "gravedirt_grips": {
+        "name": "Gravedirt Grips"
+      },
+      "bellrope_mitts": {
+        "name": "Bellrope Mitts"
+      },
+      "rimewreath_coif": {
+        "name": "Rimewreath Coif"
+      },
+      "rime_laced_hood": {
+        "name": "Rime-Laced Hood"
+      },
+      "lamenting_veil": {
+        "name": "Lamenting Veil"
+      },
+      "choirward_pauldrons": {
+        "name": "Choirward Pauldrons"
+      },
+      "choristers_spaulders": {
+        "name": "Chorister's Spaulders"
+      },
+      "cantors_stole": {
+        "name": "Cantor's Stole"
+      },
+      "knellbound_hauberk": {
+        "name": "Knellbound Hauberk"
+      },
+      "candlewatch_jerkin": {
+        "name": "Candlewatch Jerkin"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "Robe of the Unquiet Rite"
+      },
+      "gravecallers_rod": {
+        "name": "Gravecaller's Rod"
+      },
+      "portcullis_girdle": {
+        "name": "Portcullis Girdle"
+      },
+      "cellwatch_belt": {
+        "name": "Cellwatch Belt"
+      },
+      "lanternwick_sash": {
+        "name": "Lanternwick Sash"
+      },
+      "turnkeys_shank": {
+        "name": "Turnkey's Shank"
+      },
+      "gaolyard_jerkin": {
+        "name": "Gaolyard Jerkin"
+      },
+      "brinewarden_robe": {
+        "name": "Brinewarden Robe"
+      },
+      "fogbinders_rod": {
+        "name": "Fogbinder's Rod"
+      },
+      "conchplate_sabatons": {
+        "name": "Conchplate Sabatons"
+      },
+      "pale_chorus_slippers": {
+        "name": "Pale Chorus Slippers"
+      },
+      "tideglass_gauntlets": {
+        "name": "Tideglass Gauntlets"
+      },
+      "moonburn_grips": {
+        "name": "Moonburn Grips"
+      },
+      "prism_etched_handwraps": {
+        "name": "Prism-Etched Handwraps"
+      },
+      "mere_crested_helm": {
+        "name": "Mere-Crested Helm"
+      },
+      "mereskin_hood": {
+        "name": "Mereskin Hood"
+      },
+      "merewater_cowl": {
+        "name": "Merewater Cowl"
+      },
+      "merecleaver": {
+        "name": "Merecleaver"
+      },
+      "moonwrack_stave": {
+        "name": "Moonwrack Stave"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },

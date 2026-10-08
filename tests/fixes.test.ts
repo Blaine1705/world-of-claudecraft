@@ -785,10 +785,14 @@ describe('boss loot and encounter resets', () => {
     for (const [bossId, groupId, exactlyOne] of [
       ['morthen', 'morthen_guaranteed_uncommon', true],
       ['morthen', 'morthen_bonus', false],
+      // The lower dungeons' normal blues (tests/lower_dungeon_blues.test.ts):
+      // one rare group per boss, guaranteed on the final bosses.
+      ['morthen', 'morthen_blue', true],
       ['knight_commander_olen', 'olen_guaranteed_uncommon', true],
-      ['knight_commander_olen', 'olen_bonus', false],
+      ['knight_commander_olen', 'olen_blue', false],
       ['vael_the_mistcaller', 'vael_guaranteed_uncommon', true],
       ['vael_the_mistcaller', 'vael_bonus', false],
+      ['vael_the_mistcaller', 'vael_blue', true],
       ['korgath_the_bound', 'korgath_guaranteed_uncommon', true],
       ['korgath_the_bound', 'korgath_bonus', false],
       ['grand_necromancer_velkhar', 'velkhar_guaranteed_uncommon', true],
@@ -832,15 +836,27 @@ describe('boss loot and encounter resets', () => {
       'korzul_the_gravewyrm',
     ]) {
       const template = MOBS[bossId];
+      // A boss's normal blue group (`<boss>_blue`, the lower dungeons' ruling
+      // of 2026-10-08) is its own slot, capped at one piece a kill and
+      // guaranteed where the group sums to 1; the bonus caps below cover the
+      // rest of the table.
+      const blueRows = template.loot.filter((l) => l.rollGroup?.endsWith('_blue'));
+      const blueIds = new Set(blueRows.map((l) => l.itemId));
+      const blueGuaranteed =
+        blueRows.length > 0 && Math.abs(blueRows.reduce((s, l) => s + l.chance, 0) - 1) < 1e-9;
       const mob = createMob(900010, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       for (let i = 0; i < 300; i++) {
         mob.loot = null;
         asHarness(sim).rollLoot(mob, meta);
+        const blues = (lootOf(mob)?.items ?? []).filter((s) => blueIds.has(s.itemId));
+        expect(blues.length, `${bossId} blue`).toBeLessThanOrEqual(1);
+        if (blueGuaranteed) expect(blues.length, `${bossId} blue`).toBe(1);
         // Gear only: a collectible mount reins (kind 'mount') rides its own
         // independent drop and is exempt from the bonus-gear caps.
         const gear = (lootOf(mob)?.items ?? []).filter((s) => {
           const def = ITEMS[s.itemId];
           if (def?.kind === 'mount') return false;
+          if (blueIds.has(s.itemId)) return false;
           const q = def?.quality;
           return q === 'uncommon' || q === 'rare' || q === 'epic';
         });

@@ -55,6 +55,7 @@ import {
   type DungeonGateDef,
   type DungeonObjectSpawn,
   type DungeonSpawn,
+  type LootEntry,
   type MobTemplate,
 } from '../types';
 import { HYDRA_HEADS, PRISM_PLINTH, YSOLEI_DAIS } from './drowned_temple_layout';
@@ -66,7 +67,24 @@ export const MERE_HYDRA_HEAD_IDS = [
   'mere_hydra_head_right',
 ] as const;
 
-function hydraHead(id: string, name: string, color: number): MobTemplate {
+/** The Mere Hydra's normal blue (drowned_temple_items.ts): the helm trio and
+ *  the Merecleaver, 35 percent in equal shares. Each head pays its own table
+ *  once, on its first death (hydra_regrowth.ts: a regrown head pays nothing),
+ *  and all three die for a kill, so only the centre head carries it: one roll
+ *  per kill. The left and right heads keep their copper alone. */
+const HYDRA_BLUE: LootEntry[] = [
+  { itemId: 'mere_crested_helm', chance: 0.0875, rollGroup: 'hydra_blue', normalOnly: true },
+  { itemId: 'mereskin_hood', chance: 0.0875, rollGroup: 'hydra_blue', normalOnly: true },
+  { itemId: 'merewater_cowl', chance: 0.0875, rollGroup: 'hydra_blue', normalOnly: true },
+  { itemId: 'merecleaver', chance: 0.0875, rollGroup: 'hydra_blue', normalOnly: true },
+];
+
+function hydraHead(
+  id: string,
+  name: string,
+  color: number,
+  bossLoot: readonly LootEntry[] = [],
+): MobTemplate {
   return {
     id,
     name,
@@ -97,7 +115,7 @@ function hydraHead(id: string, name: string, color: number): MobTemplate {
     // 6 yd (bodyRadius + 3), off the body's edge in the pool. The Snap keeps
     // its 8 yd.
     bodyRadius: 3,
-    loot: [{ copper: 400, chance: 1 }],
+    loot: [{ copper: 400, chance: 1 }, ...bossLoot],
     // A long neck: the body's scale sets the Snap's reach (8 yd); the renderer
     // draws the one Hydra model at its own size.
     scale: 2,
@@ -393,7 +411,7 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
     color: 0x8f9a94,
   },
   mere_hydra_head_left: hydraHead('mere_hydra_head_left', 'Mere Hydra', 0xd9e6e2),
-  mere_hydra_head_center: hydraHead('mere_hydra_head_center', 'Mere Hydra', 0xe6efe9),
+  mere_hydra_head_center: hydraHead('mere_hydra_head_center', 'Mere Hydra', 0xe6efe9, HYDRA_BLUE),
   mere_hydra_head_right: hydraHead('mere_hydra_head_right', 'Mere Hydra', 0xd2e1e6),
   // Boss 2: the Tideglass Colossus on the Prism Terrace (encounter module:
   // src/sim/encounters/drowned_temple/tideglass_colossus.ts).
@@ -441,7 +459,23 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'colossus_guaranteed',
         normalOnly: true,
       },
-      { itemId: 'tideglass_shiv', chance: 0.1, normalOnly: true },
+      // The normal blue (drowned_temple_items.ts): one draw, 35 percent in
+      // equal shares, the gloves trio and the Tideglass Shiv (once its own
+      // 0.10 row).
+      {
+        itemId: 'tideglass_gauntlets',
+        chance: 0.0875,
+        rollGroup: 'colossus_blue',
+        normalOnly: true,
+      },
+      { itemId: 'moonburn_grips', chance: 0.0875, rollGroup: 'colossus_blue', normalOnly: true },
+      {
+        itemId: 'prism_etched_handwraps',
+        chance: 0.0875,
+        rollGroup: 'colossus_blue',
+        normalOnly: true,
+      },
+      { itemId: 'tideglass_shiv', chance: 0.0875, rollGroup: 'colossus_blue', normalOnly: true },
     ],
     // A giant's reach: the body's scale sets its melee reach (about 8.6 yd),
     // so it swings from beyond its own bulk; the renderer's height allows for it.

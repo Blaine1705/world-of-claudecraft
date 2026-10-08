@@ -9,9 +9,14 @@
 // retained source: re-running it reproduces every file byte for byte. It never
 // touches mapping.json; the generated batch entry there is hand-authored
 // (batch sunken-bastion-icons-2026-09-29) with its provenance README under
-// docs/achievements/sunken-bastion-icons-2026-09-29/.
+// docs/achievements/sunken-bastion-icons-2026-09-29/. The lower dungeons'
+// normal blues (BASTION_BLUES: five rare armour pieces, the Turnkey's Shank, the
+// Fogbinder's Rod and each armour piece's generated Heroic clone) ride the
+// separate batch lower-dungeon-blues-icons-2026-10-08 (docs/achievements/
+// lower-dungeon-blues-icons-2026-10-08/).
 //
-// Usage: node scripts/generate_sunken_bastion_item_icons.mjs
+// Usage: node scripts/generate_sunken_bastion_item_icons.mjs [item-id ...]
+// (no ids renders the whole batch).
 
 import path from 'node:path';
 import sharp from 'sharp';
@@ -98,6 +103,282 @@ function chain(x0, y0, x1, y1, n, w, fill = 'url(#iron)') {
   }
   return out;
 }
+
+/** A four-point glint star. */
+function glint(x, y, s = 1, color = '#ffffff') {
+  return `<path d="M ${x} ${y - 5 * s} Q ${x + 0.8 * s} ${y - 0.8 * s} ${x + 5 * s} ${y} Q ${x + 0.8 * s} ${y + 0.8 * s} ${x} ${y + 5 * s} Q ${x - 0.8 * s} ${y + 0.8 * s} ${x - 5 * s} ${y} Q ${x - 0.8 * s} ${y - 0.8 * s} ${x} ${y - 5 * s} Z" fill="${color}" opacity="0.95" />`;
+}
+
+/** A path's soft drop shadow, offset down-right (the cool shadow side). */
+function shadow(d) {
+  return `<path d="${d}" fill="#000" opacity="0.35" transform="translate(4 4)" />`;
+}
+
+/** The generated Heroic clone of a base piece (content/heroic_variants.ts),
+ *  the heroic_chorus_conch recipe: the same piece under a deeper ground with
+ *  a halo of sea light behind it and a few extra glints on it. */
+function heroicClone(base, { bgDark, bgMid, bgGlow, glints }) {
+  return {
+    id: `heroic_${base.id}`,
+    bgDark,
+    bgMid,
+    bgGlow,
+    scale: base.scale,
+    svgArt: `
+      <circle cx="64" cy="62" r="52" fill="url(#seaglow)" opacity="0.5" />
+      ${base.svgArt}
+      ${glints.map(([x, y, s]) => glint(x, y, s)).join('')}
+    `,
+  };
+}
+
+/** A belt band seen from the front, gently curved. */
+const BELT = 'M 14 58 Q 64 42 114 58 L 112 76 Q 64 60 16 76 Z';
+/** A sleeveless jerkin with a high collar. */
+const JERKIN =
+  'M 40 16 L 52 14 Q 64 22 76 14 L 88 16 L 100 30 L 96 58 L 98 108 L 30 108 L 32 58 L 28 30 Z';
+/** A long-sleeved robe with a wide hem. */
+const ROBE =
+  'M 46 12 L 82 12 L 98 24 L 116 58 L 104 64 L 94 50 L 104 112 L 24 112 L 34 50 L 24 64 L 12 58 L 30 24 Z';
+
+// The lower dungeons' normal blues (batch lower-dungeon-blues-icons-2026-10-08):
+// the Bastion's five new rare armour pieces, its two new weapons, and the
+// generated Heroic clone of each armour piece (heroicClone above; the weapons'
+// Heroic copies keep their base painting like every Heroic weapon).
+const BASTION_BLUES = [
+  // ---- The Gaol Turnkey: waist and the shank ----
+  {
+    id: 'portcullis_girdle',
+    bgDark: '#070809',
+    bgMid: '#161b1d',
+    bgGlow: '#323a3c',
+    svgArt: `
+      <!-- A heavy mail girdle whose buckle is a small iron portcullis, its
+           bars spiked at the foot, rust streaking down from the rivets -->
+      <ellipse cx="66" cy="72" rx="48" ry="20" fill="#000" opacity="0.35" />
+      ${shadow(BELT)}
+      <path d="${BELT}" fill="url(#iron)" stroke="#111" stroke-width="1.6" />
+      ${chain(18, 63, 110, 63, 13, 3.6, '#b7bfc2')}
+      ${chain(20, 71, 108, 71, 12, 3, '#7d878b')}
+      <rect x="46" y="44" width="36" height="40" rx="2" fill="#0c0e0f" stroke="#050606" stroke-width="2" />
+      ${[52, 60, 68, 76]
+        .map(
+          (x) =>
+            `<path d="M ${x} 46 L ${x} 82 L ${x - 2} 86 L ${x} 90 L ${x + 2} 86 L ${x} 82" fill="url(#iron)" stroke="url(#iron)" stroke-width="3" />`,
+        )
+        .join('')}
+      ${[54, 66, 78].map((y) => `<path d="M 48 ${y} L 80 ${y}" stroke="url(#steel)" stroke-width="2.6" />`).join('')}
+      <path d="M 48 46 L 80 46" stroke="#e8eef0" stroke-width="1.2" opacity="0.7" />
+      <path d="M 30 60 q 1 8 -1 14 M 98 60 q -1 8 1 14" stroke="url(#rust)" stroke-width="2" fill="none" opacity="0.8" />
+      ${barnacles(102, 70, 4, 2)}
+    `,
+    heroic: {
+      bgDark: '#050a0a',
+      bgMid: '#10201e',
+      bgGlow: '#24483e',
+      glints: [
+        [64, 44, 0.8],
+        [26, 60, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'cellwatch_belt',
+    bgDark: '#080706',
+    bgMid: '#1c1610',
+    bgGlow: '#3c2e20',
+    svgArt: `
+      <!-- A gaol warder's leather belt: an iron spyhole plate for a buckle,
+           a row of studs, and three notched tally sticks hanging from it -->
+      <ellipse cx="66" cy="72" rx="48" ry="20" fill="#000" opacity="0.35" />
+      ${shadow(BELT)}
+      <path d="${BELT}" fill="url(#leather)" stroke="#1a0e06" stroke-width="1.6" />
+      <path d="M 18 62 Q 64 46 110 62" stroke="#e0b888" stroke-width="0.9" stroke-dasharray="2 2" fill="none" opacity="0.6" />
+      ${[24, 34, 44, 84, 94, 104]
+        .map(
+          (x) =>
+            `<circle cx="${x}" cy="${(66 - Math.sin(((x - 14) / 100) * Math.PI) * 8).toFixed(1)}" r="2.2" fill="url(#steel)" stroke="#1c2022" stroke-width="0.6" />`,
+        )
+        .join('')}
+      <rect x="50" y="48" width="28" height="28" rx="4" fill="url(#iron)" stroke="#0c0e0f" stroke-width="2" />
+      <rect x="55" y="59" width="18" height="5" rx="2" fill="#050606" />
+      <path d="M 56 58 L 72 58" stroke="#ffd27a" stroke-width="1" opacity="0.55" />
+      ${[
+        [54, 52],
+        [74, 52],
+        [54, 72],
+        [74, 72],
+      ]
+        .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#dfe6e8" />`)
+        .join('')}
+      ${[
+        [36, 74, -8],
+        [44, 72, 4],
+        [90, 72, -4],
+      ]
+        .map(
+          ([x, y, r]) =>
+            `<g transform="rotate(${r} ${x} ${y})"><path d="M ${x} ${y} L ${x} ${y + 30}" stroke="#3a2410" stroke-width="5" stroke-linecap="round" /><path d="M ${x} ${y} L ${x} ${y + 30}" stroke="url(#wood)" stroke-width="3.6" stroke-linecap="round" /><path d="M ${x - 2} ${y + 10} l 4 0 M ${x - 2} ${y + 15} l 4 0 M ${x - 2} ${y + 20} l 4 0" stroke="#1a0e04" stroke-width="1" /></g>`,
+        )
+        .join('')}
+    `,
+    heroic: {
+      bgDark: '#060908',
+      bgMid: '#162018',
+      bgGlow: '#2e4836',
+      glints: [
+        [64, 46, 0.8],
+        [104, 58, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'lanternwick_sash',
+    bgDark: '#05090a',
+    bgMid: '#10201e',
+    bgGlow: '#24443e',
+    svgArt: `
+      <!-- A sea-green cloth sash knotted at the hip, a small iron gaol lantern
+           hanging from the knot, its wick burning amber -->
+      <ellipse cx="66" cy="70" rx="48" ry="18" fill="#000" opacity="0.35" />
+      ${shadow(BELT)}
+      <path d="${BELT}" fill="url(#seacloth)" stroke="#0a1c18" stroke-width="1.6" />
+      <path d="M 18 64 Q 64 48 110 64 M 18 70 Q 64 54 110 70" stroke="#bff0e2" stroke-width="0.8" fill="none" opacity="0.4" />
+      <path d="M 30 56 Q 64 42 98 56" stroke="url(#gold)" stroke-width="1.6" fill="none" />
+      <path d="M 76 52 q 8 -2 12 6 q -6 6 -12 2 Z" fill="url(#seacloth)" stroke="#0a1c18" stroke-width="1.4" />
+      <path d="M 80 60 Q 84 76 78 90 M 86 60 Q 94 74 92 86" stroke="#2c7a6c" stroke-width="6" fill="none" stroke-linecap="round" />
+      <path d="M 80 60 Q 84 76 78 90 M 86 60 Q 94 74 92 86" stroke="#0a1c18" stroke-width="1" fill="none" opacity="0.6" />
+      <circle cx="66" cy="92" r="16" fill="#ffb040" opacity="0.18" />
+      <path d="M 66 62 L 66 72" stroke="url(#iron)" stroke-width="1.6" />
+      <circle cx="66" cy="74" r="3" fill="none" stroke="url(#iron)" stroke-width="1.6" />
+      <path d="M 58 78 L 74 78 L 72 100 L 60 100 Z" fill="#ffd27a" opacity="0.85" />
+      <path d="M 58 78 L 74 78 L 72 100 L 60 100 Z M 66 78 L 66 100 M 59 89 L 73 89" fill="none" stroke="url(#iron)" stroke-width="2" />
+      <path d="M 66 96 q -3 -4 0 -9 q 3 5 0 9 Z" fill="#fff4c0" />
+      <path d="M 56 100 L 76 100 L 74 104 L 58 104 Z" fill="url(#iron)" />
+    `,
+    heroic: {
+      bgDark: '#040a0c',
+      bgMid: '#0c2228',
+      bgGlow: '#1e4a52',
+      glints: [
+        [66, 88, 0.8],
+        [30, 58, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'turnkeys_shank',
+    bgDark: '#070707',
+    bgMid: '#181818',
+    bgGlow: '#363434',
+    svgArt: `
+      <!-- A gaol shank on a diagonal: an iron bar ground to a point, its grip
+           bound in torn sea-cloth rag, a cell key's ring for a pommel -->
+      <path d="M 30 104 L 100 26" stroke="#000" stroke-width="12" opacity="0.35" stroke-linecap="round" transform="translate(4 4)" />
+      <path d="M 52 78 L 94 30 L 104 22 L 100 34 L 58 82 Z" fill="url(#steel)" stroke="#1e2626" stroke-width="1.6" />
+      <path d="M 56 80 L 98 30" stroke="#ffffff" stroke-width="1.2" opacity="0.6" />
+      <path d="M 66 66 l 3 -1 M 78 52 l 3 -1" stroke="url(#rust)" stroke-width="2.2" stroke-linecap="round" />
+      <path d="M 40 92 L 58 72" stroke="#0f2e2a" stroke-width="12" stroke-linecap="round" />
+      <path d="M 40 92 L 58 72" stroke="url(#seacloth)" stroke-width="9" stroke-linecap="round" />
+      <path d="M 44 82 l 8 6 M 48 78 l 8 6 M 52 74 l 6 5" stroke="#0f2e2a" stroke-width="1.4" />
+      <path d="M 56 76 q 8 2 10 10" stroke="url(#seacloth)" stroke-width="2.4" fill="none" />
+      <circle cx="32" cy="100" r="9" fill="none" stroke="url(#iron)" stroke-width="4" />
+      <circle cx="32" cy="100" r="9" fill="none" stroke="#c7cfd2" stroke-width="0.9" opacity="0.6" />
+      <path d="M 36 94 L 42 88" stroke="url(#iron)" stroke-width="4" stroke-linecap="round" />
+      ${glint(100, 26, 0.8)}
+    `,
+  },
+  // ---- Gaoler Ossick: chests ----
+  {
+    id: 'gaolyard_jerkin',
+    bgDark: '#080706',
+    bgMid: '#1e1710',
+    bgGlow: '#40301e',
+    svgArt: `
+      <!-- A sea-stained leather jerkin closed with iron shackle rings, a
+           broken length of gaol chain hanging from one shoulder -->
+      ${shadow(JERKIN)}
+      <path d="${JERKIN}" fill="url(#leather)" stroke="#1a0e06" stroke-width="1.8" />
+      <path d="M 64 22 L 64 108" stroke="#1a0e06" stroke-width="1.6" />
+      <path d="M 32 96 Q 64 102 96 96 L 98 108 L 30 108 Z" fill="#2c7a6c" opacity="0.35" />
+      ${[44, 62, 80]
+        .map(
+          (y) =>
+            `<circle cx="64" cy="${y}" r="5.5" fill="none" stroke="url(#iron)" stroke-width="3" /><path d="M 56 ${y} L 72 ${y}" stroke="#dfe6e8" stroke-width="1" opacity="0.5" />`,
+        )
+        .join('')}
+      <path d="M 40 34 L 40 100 M 88 34 L 88 100" stroke="#e0b888" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.5" />
+      ${chain(92, 22, 106, 52, 5, 3, '#9aa0a2')}
+      <path d="M 104 54 l 4 4 l -3 2" stroke="url(#rust)" stroke-width="2" fill="none" />
+      ${barnacles(36, 100, 3, 2)}
+    `,
+    heroic: {
+      bgDark: '#060908',
+      bgMid: '#14201a',
+      bgGlow: '#2c4a3a',
+      glints: [
+        [64, 44, 0.7],
+        [104, 34, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'brinewarden_robe',
+    bgDark: '#050a0b',
+    bgMid: '#0f2224',
+    bgGlow: '#1f4644',
+    svgArt: `
+      <!-- A drowned warden's sea-green robe trimmed in tarnished gold, a
+           warden's key worked on the breast, kelp and barnacles at the hem -->
+      ${shadow(ROBE)}
+      <path d="${ROBE}" fill="url(#seacloth)" stroke="#0a1c18" stroke-width="1.8" />
+      <path d="M 54 12 L 64 30 L 74 12" stroke="url(#gold)" stroke-width="2" fill="none" />
+      <path d="M 64 30 L 64 112" stroke="url(#gold)" stroke-width="2" />
+      <path d="M 26 106 Q 64 100 102 106" stroke="url(#gold)" stroke-width="2" fill="none" />
+      <circle cx="54" cy="50" r="5" fill="none" stroke="url(#gold)" stroke-width="2.4" />
+      <path d="M 57 54 L 74 72 M 70 68 l 4 -4 M 72 72 l 3 -3" stroke="url(#gold)" stroke-width="2.4" stroke-linecap="round" />
+      <path d="M 34 108 q 4 -12 0 -20 M 46 110 q -4 -10 2 -18 M 86 110 q 4 -10 -2 -18 M 96 108 q -4 -12 0 -20" stroke="#3f8f78" stroke-width="2.6" fill="none" stroke-linecap="round" />
+      ${barnacles(40, 104, 4, 2)}
+      ${barnacles(90, 104, 3, 2)}
+    `,
+    heroic: {
+      bgDark: '#030a0c',
+      bgMid: '#0a2428',
+      bgGlow: '#1a5052',
+      glints: [
+        [60, 58, 0.8],
+        [30, 40, 0.6],
+      ],
+    },
+  },
+  // ---- Vael the Fogbinder: the rod ----
+  {
+    id: 'fogbinders_rod',
+    bgDark: '#06090b',
+    bgMid: '#122024',
+    bgGlow: '#2a4448',
+    svgArt: `
+      <!-- Vael's fog rod on a diagonal: grey driftwood bound in verdigris
+           copper wire, a sea-glass orb at its head wreathed in fog -->
+      <path d="M 26 106 L 86 40" stroke="#000" stroke-width="10" opacity="0.35" stroke-linecap="round" transform="translate(4 4)" />
+      <path d="M 26 106 L 86 40" stroke="#2a2a26" stroke-width="9" stroke-linecap="round" />
+      <path d="M 26 106 L 86 40" stroke="url(#wood)" stroke-width="7" stroke-linecap="round" />
+      <path d="M 30 100 L 82 44" stroke="#d8d0c0" stroke-width="1" opacity="0.4" />
+      ${[0, 1, 2, 3, 4, 5]
+        .map((i) => {
+          const x = 40 + i * 5;
+          const y = 92 - i * 5.5;
+          return `<path d="M ${x - 4} ${y - 3} L ${x + 4} ${y + 3}" stroke="url(#verdigris)" stroke-width="2" />`;
+        })
+        .join('')}
+      <circle cx="92" cy="34" r="22" fill="url(#seaglow)" opacity="0.7" />
+      <circle cx="92" cy="34" r="12" fill="url(#seacloth)" stroke="#0a1c18" stroke-width="1.4" opacity="0.9" />
+      <circle cx="88" cy="30" r="4" fill="#e8fff6" opacity="0.8" />
+      <path d="M 70 30 Q 80 22 92 26 Q 104 30 112 22 M 72 44 Q 84 50 96 44 Q 106 40 114 46 M 78 18 Q 90 12 100 18" stroke="#e8f4f2" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.6" />
+      <path d="M 82 44 L 88 40 L 86 48 Z" fill="url(#gold)" />
+    `,
+  },
+];
 
 const ITEMS_TO_GENERATE = [
   {
@@ -320,6 +601,8 @@ const ITEMS_TO_GENERATE = [
       ${chain(28, 86, 36, 54, 4, 2.2, '#7d878b')}
     `,
   },
+  ...BASTION_BLUES,
+  ...BASTION_BLUES.filter((item) => item.heroic).map((item) => heroicClone(item, item.heroic)),
 ];
 
 function composeSvg(item, px) {
@@ -351,8 +634,12 @@ function composeSvg(item, px) {
 }
 
 async function main() {
-  console.log(`Generating ${ITEMS_TO_GENERATE.length} Sunken Bastion WebP icons...`);
-  for (const item of ITEMS_TO_GENERATE) {
+  const onlyIds = process.argv.slice(2);
+  const items = onlyIds.length
+    ? ITEMS_TO_GENERATE.filter(({ id }) => onlyIds.includes(id))
+    : ITEMS_TO_GENERATE;
+  console.log(`Generating ${items.length} Sunken Bastion WebP icons...`);
+  for (const item of items) {
     const destFile = path.join(itemsDir, `${item.id}.webp`);
     // Rasterize at the 512 master size, then downscale to the shipping 128.
     await sharp(Buffer.from(composeSvg(item, MASTER_PX)))

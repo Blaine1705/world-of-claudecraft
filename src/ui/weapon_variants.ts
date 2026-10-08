@@ -188,6 +188,15 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // Held model reuses a shipped GLB.
   hammer_of_the_open_lock: 'hammer_c', // heroic epic: the Smith's forge hammer
 
+  // ---- The lower dungeons' normal blues (hollow_crypt_items.ts,
+  // sunken_bastion_items.ts, drowned_temple_items.ts) ---------------------------
+  // Held models reuse shipped GLBs (the heroic clones ride heroicOf).
+  gravecallers_rod: 'wand_a', // Morthen's rite rod, the Corpse Candle Focus's wand
+  turnkeys_shank: 'dagger_c', // a gaol shank rides the shiv model
+  fogbinders_rod: 'wand_b', // Vael's fog rod
+  merecleaver: 'adv_axe_2handed', // the Mere Hydra's two-hand axe
+  moonwrack_stave: 'adv_staff', // Ysolei's stave, the Lunar Tide Greatstaff's model
+
   // ---- Crucible of the Last Spring raid weapons (ignivar_loot.ts) -------------
   // Held models reuse shipped GLBs.
   forgefathers_warhammer: 'hammer_c',

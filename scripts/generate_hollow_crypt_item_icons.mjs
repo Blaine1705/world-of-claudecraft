@@ -18,7 +18,11 @@
 // re-running it reproduces every file byte for byte. It never touches
 // mapping.json; the generated batch entry there is hand-authored (batch
 // hollow-crypt-icons-2026-10-03) with its provenance README under
-// docs/achievements/hollow-crypt-icons-2026-10-03/.
+// docs/achievements/hollow-crypt-icons-2026-10-03/. The lower dungeons'
+// normal blues (CRYPT_BLUES: the twelve rare armour pieces, the Gravecaller's
+// Rod and each armour piece's generated Heroic clone) ride the separate batch
+// lower-dungeon-blues-icons-2026-10-08 (docs/achievements/
+// lower-dungeon-blues-icons-2026-10-08/).
 //
 // Usage: node scripts/generate_hollow_crypt_item_icons.mjs [item-id ...]
 // (no ids renders the whole batch).
@@ -326,6 +330,635 @@ const RIME_HOOD_OPENING = 'M 64 34 Q 88 40 88 68 Q 86 94 64 102 Q 42 94 40 68 Q 
 
 /** The burial spade's pointed blade with foot treads at the shoulders. */
 const BURIAL_BLADE = 'M 43 8 Q 64 1 85 8 L 85 44 L 90 46 L 90 52 L 38 52 L 38 46 L 43 44 Z';
+
+/** A gloved hand, back view, fingers up (the choristers_gloves outline). */
+const GLOVE =
+  'M 26 92 L 28 50 Q 28 44 32 44 L 32 22 Q 32 18 36 18 Q 40 18 40 22 L 40 40 L 42 16 Q 42 12 46 12 Q 50 12 50 16 L 50 40 L 52 18 Q 52 14 56 14 Q 60 14 60 18 L 60 44 L 62 28 Q 62 24 66 24 Q 70 24 70 28 L 68 70 L 64 92 Z';
+/** Its cuff band. */
+const GLOVE_CUFF = 'M 22 82 L 68 82 L 66 104 L 24 104 Z';
+
+/** A mail coif: a close hood of mail falling to the shoulders, its face opening. */
+const COIF =
+  'M 64 10 Q 92 12 98 42 L 100 72 Q 110 84 116 100 L 12 100 Q 18 84 28 72 L 30 42 Q 36 12 64 10 Z';
+const COIF_FACE = 'M 64 34 Q 82 36 82 58 Q 80 78 64 84 Q 48 78 46 58 Q 46 36 64 34 Z';
+
+/** A peaked leather hood with a laced front and a short cape. */
+const LACED_HOOD =
+  'M 60 8 Q 98 18 102 60 L 100 88 Q 112 96 118 108 L 10 108 Q 16 96 28 88 L 26 60 Q 28 22 60 8 Z';
+const LACED_HOOD_FACE = 'M 64 32 Q 84 38 84 62 Q 82 80 64 86 Q 46 80 44 62 Q 44 38 64 32 Z';
+
+/** A short-sleeved mail hauberk (the bonechill_carapace_vest outline). */
+const HAUBERK =
+  'M 30 22 L 48 16 Q 64 24 80 16 L 98 22 L 110 42 L 100 54 L 96 108 L 32 108 L 28 54 L 18 42 Z';
+
+/** A sleeveless leather jerkin with a high collar. */
+const JERKIN =
+  'M 40 16 L 52 14 Q 64 22 76 14 L 88 16 L 100 30 L 96 58 L 98 108 L 30 108 L 32 58 L 28 30 Z';
+
+/** A wide-sleeved rite robe with a hooded collar and a long hem. */
+const RITE_ROBE =
+  'M 46 12 L 82 12 L 98 24 L 118 58 L 106 66 L 94 50 L 104 114 L 24 114 L 34 50 L 22 66 L 10 58 L 30 24 Z';
+
+/** The generated Heroic clone of a base piece (content/heroic_variants.ts),
+ *  the heroic_chorus_conch recipe: the same piece under a deeper ground with
+ *  a halo of its boss's light behind it and a few extra glints on it. */
+function heroicClone(base, { bgDark, bgMid, bgGlow, halo, glints }) {
+  return {
+    id: `heroic_${base.id}`,
+    bgDark,
+    bgMid,
+    bgGlow,
+    scale: base.scale,
+    svgArt: `
+      <circle cx="64" cy="62" r="52" fill="url(#${halo})" opacity="0.6" />
+      ${base.svgArt}
+      ${glints.map(([x, y, s]) => glint(x, y, s)).join('')}
+    `,
+  };
+}
+
+// The lower dungeons' normal blues (batch lower-dungeon-blues-icons-2026-10-08):
+// the Crypt's twelve new rare armour pieces, the Gravecaller's Rod, and the
+// generated Heroic clone of each armour piece (heroicClone above; the rod's
+// Heroic copy keeps its base painting like every Heroic weapon).
+const CRYPT_BLUES = [
+  // ---- Sexton Marrow: gloves ----
+  {
+    id: 'spadeworn_gauntlets',
+    bgDark: '#070504',
+    bgMid: '#1d150e',
+    bgGlow: '#463420',
+    svgArt: `
+      <!-- A pair of mail gauntlets over a dirt-crusted spade haft, the palms
+           worn bright by the haft, iron knuckle plates, leather cuffs -->
+      ${ground(64, 110, 50, 7, 0.55)}
+      ${vol('M 12 100 L 104 22 L 112 30 L 20 108 Z', 'url(#wood)', '#1a0e04', 1.4)}
+      <path d="M 16 100 L 106 25" stroke="#e0c090" stroke-width="1" opacity="0.5" />
+      ${dirt([
+        [96, 34, 1],
+        [104, 28, 0.8],
+      ])}
+      <g transform="rotate(-12 44 64)">
+        ${drop(GLOVE)}
+        ${vol(GLOVE, 'url(#mail)', '#0c0e10', 1.6)}
+        <path d="${GLOVE}" fill="url(#mailpat)" />
+        <path d="${GLOVE}" fill="#05060a" opacity="0.3" />
+        ${vol('M 30 40 L 62 42 L 62 50 L 30 48 Z', 'url(#iron)', '#0a0c0e', 1.2)}
+        ${rivets([
+          [36, 45],
+          [46, 45.5],
+          [56, 46],
+        ])}
+        ${vol(GLOVE_CUFF, 'url(#leather)', '#140a04', 1.4)}
+        <path d="M 26 88 L 64 88" stroke="#f0d0a0" stroke-width="0.9" stroke-dasharray="2 2" opacity="0.7" />
+      </g>
+      <g transform="translate(44 6) rotate(10 44 64)">
+        ${drop(GLOVE)}
+        ${vol(GLOVE, 'url(#mail)', '#0c0e10', 1.8)}
+        <path d="${GLOVE}" fill="url(#mailpat)" />
+        <path d="M 34 56 Q 46 62 62 58" stroke="#f4f8fc" stroke-width="3" fill="none" opacity="0.45" />
+        ${vol('M 30 40 L 62 42 L 62 50 L 30 48 Z', 'url(#iron)', '#0a0c0e', 1.2)}
+        ${rivets([
+          [36, 45],
+          [46, 45.5],
+          [56, 46],
+        ])}
+        ${vol(GLOVE_CUFF, 'url(#leather)', '#140a04', 1.4)}
+        ${dirt([
+          [30, 98, 1.1],
+          [44, 101, 0.9],
+          [60, 98, 1],
+          [36, 20, 0.6],
+        ])}
+      </g>
+    `,
+    heroic: {
+      bgDark: '#080503',
+      bgMid: '#2a1808',
+      bgGlow: '#6a4416',
+      halo: 'tallow',
+      glints: [
+        [86, 52, 0.9],
+        [42, 38, 0.7],
+      ],
+    },
+  },
+  {
+    id: 'gravedirt_grips',
+    bgDark: '#060504',
+    bgMid: '#1a120c',
+    bgGlow: '#3e2c1c',
+    svgArt: `
+      <!-- A pair of dark leather grips with the fingertips cut away for a
+           sure hold on the spade, the knuckles caked in grave earth, a bone
+           toggle at each wrist strap -->
+      ${ground(64, 110, 46, 6, 0.5)}
+      <g transform="rotate(-8 44 64)">
+        ${drop(GLOVE)}
+        ${vol(GLOVE, 'url(#darkleather)', '#0a0604', 1.6)}
+        <path d="M 32 26 L 40 26 M 42 20 L 50 20 M 52 22 L 60 22 M 62 32 L 70 32" stroke="#c8a888" stroke-width="1.4" opacity="0.7" />
+        <path d="M 40 40 L 40 52 M 50 40 L 50 52 M 60 44 L 60 54" stroke="#0a0604" stroke-width="1" />
+        ${vol(GLOVE_CUFF, 'url(#leather)', '#140a04', 1.4)}
+        ${vol('M 22 90 L 68 90 L 68 96 L 22 96 Z', 'url(#darkleather)', '#0a0604', 1)}
+        ${vol('M 62 89 L 72 89 L 72 97 L 62 97 Z', 'url(#bone)', '#3a3020', 0.8)}
+        ${dirt([
+          [36, 46, 0.9],
+          [48, 44, 0.8],
+          [58, 48, 0.9],
+        ])}
+      </g>
+      <g transform="translate(40 4) rotate(12 44 64)">
+        ${drop(GLOVE)}
+        ${vol(GLOVE, 'url(#darkleather)', '#0a0604', 1.8)}
+        <path d="M 32 26 L 40 26 M 42 20 L 50 20 M 52 22 L 60 22 M 62 32 L 70 32" stroke="#c8a888" stroke-width="1.4" opacity="0.7" />
+        <path d="M 36 28 L 36 44 M 46 22 L 46 42 M 56 24 L 56 44" stroke="#a88a72" stroke-width="0.9" opacity="0.5" />
+        ${vol(GLOVE_CUFF, 'url(#leather)', '#140a04', 1.4)}
+        ${vol('M 22 90 L 68 90 L 68 96 L 22 96 Z', 'url(#darkleather)', '#0a0604', 1)}
+        ${vol('M 62 89 L 72 89 L 72 97 L 62 97 Z', 'url(#bone)', '#3a3020', 0.8)}
+        ${dirt([
+          [34, 46, 1.1],
+          [46, 44, 1],
+          [58, 47, 1.1],
+          [66, 52, 0.8],
+          [28, 100, 0.9],
+        ])}
+      </g>
+    `,
+    heroic: {
+      bgDark: '#070402',
+      bgMid: '#24160a',
+      bgGlow: '#5e3e18',
+      halo: 'tallow',
+      glints: [
+        [94, 40, 0.8],
+        [30, 58, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'bellrope_mitts',
+    bgDark: '#060407',
+    bgMid: '#1e1420',
+    bgGlow: '#4a3446',
+    svgArt: `
+      <!-- A pair of faded violet cloth mitts, the fingers bare, the wrists
+           wound round with old bell rope, a small bronze bell on one tail -->
+      ${ground(64, 110, 44, 6, 0.5)}
+      <g transform="rotate(-10 44 64)">
+        ${drop('M 26 92 L 28 50 Q 28 40 40 38 L 62 38 Q 70 40 70 50 L 68 70 L 64 92 Z')}
+        ${vol('M 26 92 L 28 50 Q 28 40 40 38 L 62 38 Q 70 40 70 50 L 68 70 L 64 92 Z', 'url(#plum)', '#0c060e', 1.6)}
+        <path d="M 26 92 L 28 50 Q 28 40 40 38 L 62 38 Q 70 40 70 50 L 68 70 L 64 92 Z" fill="url(#weave)" />
+        ${vol('M 34 38 L 34 28 Q 36 24 40 26 L 40 38 Z M 44 38 L 44 24 Q 46 20 50 22 L 50 38 Z M 54 38 L 54 26 Q 56 22 60 24 L 60 38 Z', 'url(#bone)', '#4a3e28', 1)}
+        ${rope('M 24 80 L 70 76', 5)}
+        ${rope('M 24 88 L 70 84', 5)}
+      </g>
+      <g transform="translate(40 6) rotate(12 44 64)">
+        ${drop('M 26 92 L 28 50 Q 28 40 40 38 L 62 38 Q 70 40 70 50 L 68 70 L 64 92 Z')}
+        ${vol('M 26 92 L 28 50 Q 28 40 40 38 L 62 38 Q 70 40 70 50 L 68 70 L 64 92 Z', 'url(#plum)', '#0c060e', 1.8)}
+        <path d="M 26 92 L 28 50 Q 28 40 40 38 L 62 38 Q 70 40 70 50 L 68 70 L 64 92 Z" fill="url(#weave)" />
+        <path d="M 32 56 Q 48 50 64 56" stroke="#b89ac0" stroke-width="0.9" fill="none" opacity="0.5" />
+        ${vol('M 34 38 L 34 28 Q 36 24 40 26 L 40 38 Z M 44 38 L 44 24 Q 46 20 50 22 L 50 38 Z M 54 38 L 54 26 Q 56 22 60 24 L 60 38 Z', 'url(#bone)', '#4a3e28', 1)}
+        ${rope('M 24 80 L 70 76', 5)}
+        ${rope('M 24 88 L 70 84', 5)}
+        ${rope('M 66 86 Q 72 94 70 100', 3.6)}
+      </g>
+      ${bell(102, 98, 0.75)}
+      <circle cx="102" cy="108" r="11" fill="url(#tallow)" opacity="0.25" />
+    `,
+    heroic: {
+      bgDark: '#07030a',
+      bgMid: '#26102c',
+      bgGlow: '#5e3060',
+      halo: 'violetglow',
+      glints: [
+        [102, 100, 0.8],
+        [34, 40, 0.6],
+      ],
+    },
+  },
+  // ---- The Lady of the Bonechill: helms ----
+  {
+    id: 'rimewreath_coif',
+    bgDark: '#05070a',
+    bgMid: '#121a24',
+    bgGlow: '#2c4258',
+    svgArt: `
+      <!-- A mail coif falling to the shoulders, crowned with a bridal wreath
+           of ice crystals across the brow -->
+      ${ground(64, 108, 48, 6, 0.5)}
+      ${drop(COIF)}
+      ${vol(COIF, 'url(#mail)', '#0c1014', 1.8)}
+      <path d="${COIF}" fill="url(#mailpat)" />
+      <path d="M 28 72 Q 64 90 100 72" stroke="#0c1014" stroke-width="1.4" fill="none" opacity="0.6" />
+      ${vol(COIF_FACE, '#0a0e14', '#0a0e14', 1.2)}
+      <circle cx="64" cy="60" r="16" fill="url(#frostglow)" opacity="0.35" />
+      <path d="M 30 34 Q 64 16 98 34" stroke="#cfe8f6" stroke-width="3" fill="none" />
+      ${[
+        [34, 31, 0.9],
+        [44, 25, 1.1],
+        [54, 21, 1],
+        [64, 19, 1.4],
+        [74, 21, 1],
+        [84, 25, 1.1],
+        [94, 31, 0.9],
+      ]
+        .map(
+          ([x, y, s]) =>
+            `<path d="M ${x} ${y - 10 * s} L ${x + 3 * s} ${y} L ${x} ${y + 3 * s} L ${x - 3 * s} ${y} Z" fill="url(#chitin)" stroke="#1a3040" stroke-width="0.6" />`,
+        )
+        .join('')}
+      ${rime([
+        [30, 94, 0.8],
+        [98, 94, 0.8],
+        [64, 98, 0.7],
+      ])}
+      ${glint(64, 10, 0.9)}
+    `,
+    heroic: {
+      bgDark: '#03060c',
+      bgMid: '#0e1e34',
+      bgGlow: '#2a5a86',
+      halo: 'frostglow',
+      glints: [
+        [40, 22, 0.7],
+        [90, 26, 0.7],
+      ],
+    },
+  },
+  {
+    id: 'rime_laced_hood',
+    bgDark: '#05060a',
+    bgMid: '#141a22',
+    bgGlow: '#30404e',
+    svgArt: `
+      <!-- A peaked leather hood with a short cape, its front laced shut with
+           frost-white cord, rime crusting the peak -->
+      ${ground(64, 112, 50, 6, 0.5)}
+      ${drop(LACED_HOOD)}
+      ${vol(LACED_HOOD, 'url(#darkleather)', '#0a0604', 1.8)}
+      <path d="M 28 88 Q 64 100 100 88" stroke="#0a0604" stroke-width="1.4" fill="none" opacity="0.6" />
+      ${vol(LACED_HOOD_FACE, '#07080c', '#07080c', 1.2)}
+      <path d="M 54 88 L 74 96 M 74 88 L 54 96 M 54 98 L 74 106 M 74 98 L 54 106" stroke="#eaf6ff" stroke-width="2" stroke-linecap="round" />
+      ${rivets(
+        [
+          [54, 88],
+          [74, 88],
+          [54, 98],
+          [74, 98],
+          [54, 106],
+          [74, 106],
+        ],
+        1.2,
+      )}
+      <path d="M 40 30 Q 54 14 64 10" stroke="#c8a888" stroke-width="1.2" fill="none" opacity="0.5" />
+      ${rime([
+        [58, 12, 0.9],
+        [66, 10, 1.1],
+        [74, 14, 0.8],
+        [34, 40, 0.7],
+        [94, 44, 0.7],
+      ])}
+      <circle cx="64" cy="60" r="12" fill="url(#frostglow)" opacity="0.3" />
+    `,
+    heroic: {
+      bgDark: '#03050a',
+      bgMid: '#10202e',
+      bgGlow: '#2c5270',
+      halo: 'frostglow',
+      glints: [
+        [66, 8, 0.8],
+        [100, 62, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'lamenting_veil',
+    bgDark: '#06060c',
+    bgMid: '#16182a',
+    bgGlow: '#3a3e60',
+    svgArt: `
+      <!-- A silver bridal circlet set with a pale stone over the shadow of a
+           bowed head, a long rime-silk veil falling from it in soft folds,
+           frozen tears beaded along its scalloped hem -->
+      ${ground(64, 112, 46, 6, 0.45)}
+      ${drop('M 42 30 Q 64 24 86 30 Q 88 52 100 72 Q 110 88 112 100 Q 96 110 80 103 Q 64 112 48 103 Q 32 110 16 100 Q 18 88 28 72 Q 40 52 42 30 Z')}
+      ${vol('M 42 30 Q 64 24 86 30 Q 88 52 100 72 Q 110 88 112 100 Q 96 110 80 103 Q 64 112 48 103 Q 32 110 16 100 Q 18 88 28 72 Q 40 52 42 30 Z', 'url(#rimesilk)', '#3a5a70', 1.2, 'opacity="0.8"')}
+      <ellipse cx="64" cy="56" rx="17" ry="23" fill="#0a1424" opacity="0.4" />
+      <path d="M 50 74 Q 64 86 78 74" stroke="#0a1424" stroke-width="3" fill="none" opacity="0.25" />
+      <path d="M 42 34 Q 36 70 26 102 M 54 32 Q 52 70 50 104 M 74 32 Q 76 70 78 104 M 86 34 Q 92 70 102 102" stroke="#ffffff" stroke-width="1.1" fill="none" opacity="0.5" />
+      ${web(64, 66, 26, 8, 3, 0, '#ffffff', 0.22, 0.5)}
+      <ellipse cx="64" cy="30" rx="23" ry="6" fill="none" stroke="#1a1c24" stroke-width="5.4" />
+      <ellipse cx="64" cy="30" rx="23" ry="6" fill="none" stroke="url(#silver)" stroke-width="3.6" />
+      <path d="M 64 14 L 70 24 L 64 30 L 58 24 Z" fill="url(#chitin)" stroke="#1a3040" stroke-width="1" />
+      <circle cx="64" cy="23" r="6" fill="url(#frostglow)" opacity="0.7" />
+      ${[20, 34, 48, 64, 80, 94, 108]
+        .map(
+          (x, i) =>
+            `<path d="M ${x} ${101 + (i % 2) * 4} q -2.4 4 0 6 q 2.4 -2 0 -6 Z" fill="#9ad8ff" stroke="#e8f8ff" stroke-width="0.5" />`,
+        )
+        .join('')}
+      ${glint(70, 18, 0.8)}
+    `,
+    heroic: {
+      bgDark: '#04040e',
+      bgMid: '#141a3c',
+      bgGlow: '#34407a',
+      halo: 'frostglow',
+      glints: [
+        [30, 60, 0.6],
+        [98, 70, 0.6],
+      ],
+    },
+  },
+  // ---- Cantor Ilvane: shoulders ----
+  {
+    id: 'choirward_pauldrons',
+    bgDark: '#070509',
+    bgMid: '#1a1222',
+    bgGlow: '#3e2c50',
+    svgArt: `
+      <!-- A pair of mail pauldrons with silver-edged steel lames, a violet
+           tabard flap hanging between them embroidered with a silver bell -->
+      ${ground(64, 106, 52, 6, 0.5)}
+      ${vol('M 48 50 L 80 50 L 84 104 L 64 96 L 44 104 Z', 'url(#cassock)', '#0a040e', 1.6)}
+      <path d="M 64 62 q -6 0 -6 8 l -3 4 l 18 0 l -3 -4 q 0 -8 -6 -8 Z" fill="url(#silver)" stroke="#1a1c24" stroke-width="0.9" />
+      <circle cx="64" cy="77" r="1.8" fill="url(#silver)" />
+      ${[0, 1]
+        .map(
+          (side) => `<g transform="${side ? 'translate(128 0) scale(-1 1)' : ''}">
+        ${drop('M 8 66 Q 6 30 36 22 Q 56 18 62 34 L 62 56 Q 36 52 8 66 Z')}
+        ${vol('M 8 66 Q 6 30 36 22 Q 56 18 62 34 L 62 56 Q 36 52 8 66 Z', 'url(#mail)', '#0c0e10', 1.8)}
+        <path d="M 8 66 Q 6 30 36 22 Q 56 18 62 34 L 62 56 Q 36 52 8 66 Z" fill="url(#mailpat)" />
+        ${vol('M 6 70 Q 36 56 62 60 L 60 68 Q 36 64 8 78 Z', 'url(#steel)', '#1a1c20', 1.3)}
+        ${vol('M 8 82 Q 36 68 60 72 L 58 80 Q 36 76 10 90 Z', 'url(#steel)', '#1a1c20', 1.3)}
+        <path d="M 8 71 Q 36 58 60 62 M 10 83 Q 36 70 58 74" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.7" />
+        ${rivets([
+          [20, 70],
+          [46, 63],
+        ])}
+      </g>`,
+        )
+        .join('')}
+      ${notes([[64, 30, 0.7, 0.8]], '#efe4ff')}
+    `,
+    heroic: {
+      bgDark: '#06030c',
+      bgMid: '#22103a',
+      bgGlow: '#523080',
+      halo: 'violetglow',
+      glints: [
+        [40, 30, 0.8],
+        [64, 66, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'choristers_spaulders',
+    bgDark: '#070608',
+    bgMid: '#1c1418',
+    bgGlow: '#42323c',
+    svgArt: `
+      <!-- A pair of rounded dark leather spaulders joined by a violet strap,
+           each stitched with a stave of silver notes -->
+      ${ground(64, 104, 52, 6, 0.5)}
+      ${vol('M 34 58 Q 64 46 94 58 L 94 66 Q 64 54 34 66 Z', 'url(#plum)', '#0a040e', 1.2)}
+      <g transform="translate(-26 4)">
+        ${drop('M 30 74 Q 30 38 60 34 Q 84 36 86 64 Q 60 56 30 74 Z')}
+        ${vol('M 30 74 Q 30 38 60 34 Q 84 36 86 64 Q 60 56 30 74 Z', 'url(#darkleather)', '#0a0604', 1.6)}
+        ${vol('M 30 74 Q 58 58 86 64 L 84 72 Q 58 66 32 82 Z', 'url(#leather)', '#140a04', 1.2)}
+        <path d="M 38 56 Q 58 46 78 52 M 38 62 Q 58 52 78 58" stroke="#c8ccd8" stroke-width="0.6" fill="none" opacity="0.6" />
+        ${notes(
+          [
+            [46, 56, 0.5, 0.95],
+            [58, 52, 0.5, 0.95],
+            [70, 53, 0.5, 0.95],
+          ],
+          '#eef0f8',
+        )}
+      </g>
+      <g transform="translate(118 4) scale(-1 1) translate(-26 0)">
+        ${drop('M 30 74 Q 30 38 60 34 Q 84 36 86 64 Q 60 56 30 74 Z')}
+        ${vol('M 30 74 Q 30 38 60 34 Q 84 36 86 64 Q 60 56 30 74 Z', 'url(#darkleather)', '#0a0604', 1.6)}
+        ${vol('M 30 74 Q 58 58 86 64 L 84 72 Q 58 66 32 82 Z', 'url(#leather)', '#140a04', 1.2)}
+        <path d="M 38 56 Q 58 46 78 52 M 38 62 Q 58 52 78 58" stroke="#c8ccd8" stroke-width="0.6" fill="none" opacity="0.6" />
+        ${notes(
+          [
+            [46, 56, 0.5, 0.95],
+            [58, 52, 0.5, 0.95],
+            [70, 53, 0.5, 0.95],
+          ],
+          '#eef0f8',
+        )}
+      </g>
+      <path d="M 64 60 L 64 76" stroke="#c03a3a" stroke-width="2" />
+      <path d="M 64 74 q -4 4 -4 9 l 8 0 q 0 -5 -4 -9 Z" fill="url(#silver)" stroke="#1a1c24" stroke-width="0.8" />
+    `,
+    heroic: {
+      bgDark: '#06040a',
+      bgMid: '#24142a',
+      bgGlow: '#56385e',
+      halo: 'violetglow',
+      glints: [
+        [64, 82, 0.7],
+        [28, 48, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'cantors_stole',
+    bgDark: '#06040a',
+    bgMid: '#1c1028',
+    bgGlow: '#46305e',
+    svgArt: `
+      <!-- A cantor's choir stole draped in a U over unseen shoulders: dark
+           violet silk, gold-worked bells at its two falls, fringed ends -->
+      ${ground(64, 112, 44, 6, 0.5)}
+      ${drop('M 28 20 Q 64 44 100 20 L 98 30 L 86 106 L 70 106 L 78 40 Q 64 48 50 40 L 58 106 L 42 106 L 30 30 Z')}
+      ${vol('M 28 20 Q 64 44 100 20 L 98 30 L 86 106 L 70 106 L 78 40 Q 64 48 50 40 L 58 106 L 42 106 L 30 30 Z', 'url(#cassock)', '#0a040e', 1.8)}
+      <path d="M 32 26 Q 64 48 96 26" stroke="#e0a858" stroke-width="1.6" fill="none" opacity="0.8" />
+      <path d="M 34 34 L 44 102 M 54 42 L 56 102 M 94 34 L 84 102 M 74 42 L 72 102" stroke="#e0a858" stroke-width="1.1" opacity="0.7" />
+      ${[
+        [49, 76],
+        [79, 76],
+      ]
+        .map(
+          ([x, y]) =>
+            `<path d="M ${x} ${y - 9} q -7 0 -7 10 l -3 4 l 20 0 l -3 -4 q 0 -10 -7 -10 Z" fill="url(#bronze)" stroke="#2a1806" stroke-width="1" /><circle cx="${x}" cy="${y + 7}" r="2" fill="url(#bronze)" />`,
+        )
+        .join('')}
+      ${[44, 48, 52, 56, 72, 76, 80, 84]
+        .map((x) => `<path d="M ${x} 106 L ${x} 114" stroke="#e8c070" stroke-width="1.4" />`)
+        .join('')}
+      <circle cx="64" cy="30" r="10" fill="url(#violetglow)" opacity="0.5" />
+      ${notes(
+        [
+          [58, 26, 0.7, 0.85],
+          [70, 22, 0.6, 0.8],
+        ],
+        '#efe4ff',
+      )}
+    `,
+    heroic: {
+      bgDark: '#05020c',
+      bgMid: '#22103e',
+      bgGlow: '#56348a',
+      halo: 'violetglow',
+      glints: [
+        [49, 70, 0.7],
+        [79, 70, 0.7],
+      ],
+    },
+  },
+  // ---- Morthen the Gravecaller: chests and the rod ----
+  {
+    id: 'knellbound_hauberk',
+    bgDark: '#06050a',
+    bgMid: '#181420',
+    bgGlow: '#3a2e4a',
+    svgArt: `
+      <!-- A grave-dark mail hauberk with a bronze knell bell bound to the
+           breast by crossed chains, a black-iron belt, soul light in the
+           links -->
+      ${ground(64, 112, 44, 6, 0.5)}
+      ${drop(HAUBERK)}
+      ${vol(HAUBERK, 'url(#gravesteel)', '#0c0a10', 1.8)}
+      <path d="${HAUBERK}" fill="url(#mailpat)" />
+      <path d="M 18 42 L 30 22 L 40 30 L 28 54 Z M 110 42 L 98 22 L 88 30 L 100 54 Z" fill="#000" opacity="0.25" />
+      ${vol('M 30 84 L 98 84 L 98 94 L 30 94 Z', 'url(#blackiron)', '#06060a', 1.4)}
+      ${vol('M 58 82 L 70 82 L 70 96 L 58 96 Z', 'url(#bronze)', '#2a1806', 1)}
+      <path d="M 36 30 L 92 76 M 92 30 L 36 76" stroke="#1a1820" stroke-width="5" />
+      <path d="M 36 30 L 92 76 M 92 30 L 36 76" stroke="url(#iron)" stroke-width="3" stroke-dasharray="4 2" />
+      ${bell(64, 38, 1.3)}
+      <circle cx="64" cy="66" r="16" fill="url(#soul)" opacity="0.35" />
+      ${glint(56, 46, 0.6)}
+    `,
+    heroic: {
+      bgDark: '#04060a',
+      bgMid: '#10201c',
+      bgGlow: '#2a5040',
+      halo: 'soul',
+      glints: [
+        [36, 30, 0.6],
+        [92, 30, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'candlewatch_jerkin',
+    bgDark: '#070504',
+    bgMid: '#1e140c',
+    bgGlow: '#4a321c',
+    svgArt: `
+      <!-- A dark leather jerkin with a high collar and side buckles, a
+           bandolier of three lit tallow candles across the chest -->
+      ${ground(64, 112, 42, 6, 0.5)}
+      ${drop(JERKIN)}
+      ${vol(JERKIN, 'url(#darkleather)', '#0a0604', 1.8)}
+      <path d="M 64 22 L 64 108" stroke="#0a0604" stroke-width="1.4" />
+      <path d="M 40 40 L 40 100 M 88 40 L 88 100" stroke="#a88a72" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.5" />
+      ${[52, 68, 84]
+        .map(
+          (y) =>
+            `<rect x="30" y="${y}" width="8" height="5" fill="url(#silver)" stroke="#1a1c24" stroke-width="0.6" /><rect x="90" y="${y}" width="8" height="5" fill="url(#silver)" stroke="#1a1c24" stroke-width="0.6" />`,
+        )
+        .join('')}
+      ${vol('M 32 30 L 40 26 L 98 94 L 90 100 Z', 'url(#leather)', '#140a04', 1.2)}
+      ${[
+        [48, 44],
+        [64, 62],
+        [80, 80],
+      ]
+        .map(
+          ([x, y]) =>
+            `<circle cx="${x}" cy="${y - 14}" r="9" fill="url(#tallow)" opacity="0.6" />${vol(`M ${x - 4} ${y} L ${x - 4} ${y - 12} Q ${x} ${y - 14} ${x + 4} ${y - 12} L ${x + 4} ${y} Z`, 'url(#linen)', '#5a4e3a', 0.8)}<path d="M ${x} ${y - 13} q -3 -4 0 -9 q 3 5 0 9 Z" fill="#ffd27a" />`,
+        )
+        .join('')}
+    `,
+    heroic: {
+      bgDark: '#080402',
+      bgMid: '#2c1808',
+      bgGlow: '#6e4414',
+      halo: 'tallow',
+      glints: [
+        [48, 26, 0.7],
+        [80, 62, 0.7],
+      ],
+    },
+  },
+  {
+    id: 'robe_of_the_unquiet_rite',
+    bgDark: '#05040a',
+    bgMid: '#16102a',
+    bgGlow: '#3a2860',
+    svgArt: `
+      <!-- A wide-sleeved violet-black rite robe, the Rite Ring worked on its
+           breast in silver with four candle flames at its quarters, the hem
+           lit soul-green -->
+      ${ground(64, 114, 46, 6, 0.5)}
+      ${drop(RITE_ROBE)}
+      ${vol(RITE_ROBE, 'url(#cassock)', '#0a040e', 1.8)}
+      <path d="M 56 12 L 64 30 L 72 12" stroke="#0a040e" stroke-width="1.6" fill="none" />
+      <path d="M 26 108 Q 64 100 102 108" stroke="#8cf0a8" stroke-width="2" fill="none" opacity="0.6" />
+      <ellipse cx="64" cy="112" rx="40" ry="5" fill="url(#soul)" opacity="0.5" />
+      <circle cx="64" cy="58" r="17" fill="none" stroke="url(#silver)" stroke-width="2" />
+      <circle cx="64" cy="58" r="11" fill="url(#violetglow)" opacity="0.6" />
+      <path d="M 64 50 L 68 58 L 64 66 L 60 58 Z" fill="#e8dcff" opacity="0.85" />
+      ${[
+        [64, 41],
+        [81, 58],
+        [64, 75],
+        [47, 58],
+      ]
+        .map(
+          ([x, y]) =>
+            `<circle cx="${x}" cy="${y}" r="4.5" fill="url(#tallow)" /><path d="M ${x} ${y + 1.5} q -1.8 -2.6 0 -5.4 q 1.8 2.8 0 5.4 Z" fill="#fff0c0" />`,
+        )
+        .join('')}
+    `,
+    heroic: {
+      bgDark: '#03060a',
+      bgMid: '#0c201c',
+      bgGlow: '#245040',
+      halo: 'soul',
+      glints: [
+        [64, 36, 0.7],
+        [30, 60, 0.6],
+      ],
+    },
+  },
+  {
+    id: 'gravecallers_rod',
+    bgDark: '#050608',
+    bgMid: '#121a16',
+    bgGlow: '#2a4234',
+    svgArt: `
+      <!-- The Gravecaller's rod on a diagonal: a black-iron shaft with a
+           bone-wrapped grip, crowned by a cage of finger bones holding a
+           soul-green flame -->
+      ${ground(64, 110, 40, 5, 0.45)}
+      ${drop('M 26 108 L 84 38 L 90 44 L 32 114 Z')}
+      ${vol('M 26 108 L 84 38 L 90 44 L 32 114 Z', 'url(#blackiron)', '#06060a', 1.4)}
+      ${vol('M 30 96 L 46 78 L 52 84 L 36 102 Z', 'url(#bone)', '#3a3020', 1)}
+      <path d="M 34 96 L 48 80 M 38 99 L 51 83" stroke="#4a3e28" stroke-width="0.9" />
+      ${vol('M 20 112 Q 22 104 30 106 Q 32 114 24 116 Z', 'url(#bone)', '#3a3020', 1)}
+      <circle cx="92" cy="34" r="20" fill="url(#soul)" opacity="0.8" />
+      <path d="M 92 44 q -8 -10 -2 -22 q 2 8 6 4 q 4 10 -4 18 Z" fill="#c8ffd8" opacity="0.9" />
+      ${[
+        'M 84 44 Q 76 30 86 16',
+        'M 90 46 Q 86 26 94 12',
+        'M 98 44 Q 106 30 100 16',
+        'M 102 40 Q 112 30 106 20',
+      ]
+        .map(
+          (d) =>
+            `<path d="${d}" stroke="#3a3020" stroke-width="4" fill="none" stroke-linecap="round" /><path d="${d}" stroke="url(#bone)" stroke-width="2.4" fill="none" stroke-linecap="round" />`,
+        )
+        .join('')}
+      ${vol('M 80 42 L 104 40 L 102 48 L 82 50 Z', 'url(#bronze)', '#2a1806', 1)}
+      ${glint(88, 24, 0.8, '#eaffef')}
+    `,
+  },
+];
 
 const ITEMS_TO_GENERATE = [
   // ---- Sexton Marrow ----
@@ -947,6 +1580,8 @@ const ITEMS_TO_GENERATE = [
       ${glint(64, 22, 1.1)}
     `,
   },
+  ...CRYPT_BLUES,
+  ...CRYPT_BLUES.filter((item) => item.heroic).map((item) => heroicClone(item, item.heroic)),
 ];
 
 function composeSvg(item, px) {

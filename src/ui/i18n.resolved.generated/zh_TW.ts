@@ -19120,6 +19120,96 @@ export const zh_TW: EnTranslations = {
       "vestments_of_the_waking_rite": {
         "name": "甦醒儀式法衣"
       },
+      "spadeworn_gauntlets": {
+        "name": "鍬磨鐵護手"
+      },
+      "gravedirt_grips": {
+        "name": "墓土護手"
+      },
+      "bellrope_mitts": {
+        "name": "鐘繩手套"
+      },
+      "rimewreath_coif": {
+        "name": "霜冠鎖帽"
+      },
+      "rime_laced_hood": {
+        "name": "綴霜兜帽"
+      },
+      "lamenting_veil": {
+        "name": "哀悼面紗"
+      },
+      "choirward_pauldrons": {
+        "name": "聖詠守衛肩鎧"
+      },
+      "choristers_spaulders": {
+        "name": "唱詩者的肩甲"
+      },
+      "cantors_stole": {
+        "name": "領唱者的聖帶"
+      },
+      "knellbound_hauberk": {
+        "name": "喪鐘縛鎖甲"
+      },
+      "candlewatch_jerkin": {
+        "name": "守燭皮甲"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "不安儀式長袍"
+      },
+      "gravecallers_rod": {
+        "name": "喚墓者的短杖"
+      },
+      "portcullis_girdle": {
+        "name": "閘門腰帶"
+      },
+      "cellwatch_belt": {
+        "name": "守牢腰帶"
+      },
+      "lanternwick_sash": {
+        "name": "燈芯飾帶"
+      },
+      "turnkeys_shank": {
+        "name": "牢頭的私刃"
+      },
+      "gaolyard_jerkin": {
+        "name": "獄庭皮甲"
+      },
+      "brinewarden_robe": {
+        "name": "鹹潮看守長袍"
+      },
+      "fogbinders_rod": {
+        "name": "縛霧者短杖"
+      },
+      "conchplate_sabatons": {
+        "name": "螺甲戰靴"
+      },
+      "pale_chorus_slippers": {
+        "name": "蒼白合唱便鞋"
+      },
+      "tideglass_gauntlets": {
+        "name": "潮鏡鐵護手"
+      },
+      "moonburn_grips": {
+        "name": "月灼護手"
+      },
+      "prism_etched_handwraps": {
+        "name": "稜鏡蝕刻裹手"
+      },
+      "mere_crested_helm": {
+        "name": "湖冠頭盔"
+      },
+      "mereskin_hood": {
+        "name": "湖蛇皮兜帽"
+      },
+      "merewater_cowl": {
+        "name": "湖水兜帽"
+      },
+      "merecleaver": {
+        "name": "斷湖巨斧"
+      },
+      "moonwrack_stave": {
+        "name": "月殤法杖"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

@@ -32,23 +32,54 @@ const TRIOS = {
 
 /** The design weights (9.2) of the new heroic rows, and the share the shipped
  *  partition keeps. */
+//
+// Re-weighted 2026-10-08 when Korzul's heroic epics spread over the dungeon: two
+// moved to Korgath (the Claws and the Girdle) and two to Velkhar (the Prowler's
+// Grips and the Wyrmchoir Handwraps), each boss took its relocated Nythraxis
+// raid pieces (content/nythraxis_loot.ts: 0.1 for the piece with no second
+// heroic boss, 0.04 for the two that also drop elsewhere), and the shipped
+// heroic copies split across the three bosses.
 const HEROIC = {
   korgath_the_bound: {
     group: 'korgath_the_bound_heroic',
-    fresh: { foremans_last_link: 0.2, hammer_of_the_open_lock: 0.25 },
-    shipped: 0.55,
+    fresh: {
+      foremans_last_link: 0.18,
+      hammer_of_the_open_lock: 0.18,
+      gravewyrm_claws: 0.14,
+      gravescale_girdle: 0.14,
+      heroic_bonewrought_bulwark: 0.1,
+      heroic_bonewrought_greatsword: 0.04,
+      heroic_thornpeak_wardblade: 0.04,
+    },
+    shipped: 0.18,
     anchor: ['boneplate_vest', 'zealotsbane_blade'],
   },
   grand_necromancer_velkhar: {
     group: 'grand_necromancer_velkhar_heroic',
-    fresh: { phial_of_the_tithe: 0.2, vestments_of_the_waking_rite: 0.25 },
-    shipped: 0.55,
+    fresh: {
+      phial_of_the_tithe: 0.18,
+      vestments_of_the_waking_rite: 0.18,
+      sanctum_prowlers_grips: 0.14,
+      wyrmchoir_handwraps: 0.14,
+      heroic_wraithfire_orb: 0.1,
+      heroic_votive_ward_of_the_deathless_court: 0.04,
+      heroic_courtiers_bonefang: 0.04,
+    },
+    shipped: 0.18,
     anchor: ['boneplate_vest', 'emberwood_staff'],
   },
   korzul_the_gravewyrm: {
     group: 'korzul_heroic',
-    fresh: { quenchwater_flask: 0.15 },
-    shipped: 0.85,
+    fresh: {
+      quenchwater_flask: 0.15,
+      gravewyrm_cleaver: 0.17,
+      shroud_of_the_gravewyrm: 0.17,
+      wildsoul_maul: 0.17,
+      heroic_gravecourt_hewer: 0.1,
+      heroic_stormhymn_chain_grips: 0.04,
+      heroic_stormhymn_chain_treads: 0.04,
+    },
+    shipped: 0.16,
     anchor: ['boneplate_vest', 'cultist_flayer'],
   },
 } as const;

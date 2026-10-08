@@ -14,6 +14,21 @@
 //
 // Icon art: scripts/generate_sunken_bastion_item_icons.mjs (the mapping.json
 // batch sunken-bastion-icons-2026-09-29), the Iron Key included.
+//
+// The normal blues (maintainer ruling, 2026-10-08; the full rule and the
+// armour derivation are in hollow_crypt_items.ts): every boss and the Gaol
+// Turnkey pay ONE normalOnly rare group (`<boss>_blue`), a cloth, leather and
+// mail version of one slot plus a weapon. The Bastion's shipped rares already
+// held two whole slots, split across two bosses, so they MOVE between bosses
+// by loot-table edits (dungeon-rework README section 7) instead of new pieces
+// being minted: Olen pays the legs (Tideguard Greaves, Eelscale Leggings and
+// the Drowned Prayer Leggings from Vael), Vael the feet (Drowned Prayer
+// Sandals, Eelscale Treads and the Tideguard Sabatons from Olen), Ossick the
+// chest (the Tidescale Vest from Vael plus the two pieces below), and the
+// Turnkey the waist. Every shipped piece keeps its item level 16
+// (item_level.ts preserved source levels). New pieces read item level 16
+// (boss level 13 plus the rare bump): rare waist 6, chest 9, one-hand 9.
+// Their icons: batch lower-dungeon-blues-icons-2026-10-08.
 
 import type { ItemDef } from '../types';
 import { ARMOR_RATING } from './heroic_loot';
@@ -80,6 +95,43 @@ export const SUNKEN_BASTION_ITEMS: Record<string, ItemDef> = {
     sellValue: 950,
     requiredClass: HEAVY,
   },
+  // Ossick's blue chests beside the Tidescale Vest (item level 16, budget 9;
+  // armour 86 / 48).
+  gaolyard_jerkin: {
+    id: 'gaolyard_jerkin',
+    name: 'Gaolyard Jerkin',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'rare',
+    stats: { armor: 86, agi: 6, sta: 3 },
+    sellValue: 1100,
+    requiredClass: AGILE,
+  },
+  brinewarden_robe: {
+    id: 'brinewarden_robe',
+    name: 'Brinewarden Robe',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'chest',
+    quality: 'rare',
+    stats: { armor: 48, int: 6, spi: 3, sta: 3 },
+    sellValue: 1100,
+    requiredClass: CASTER,
+  },
+  // ---- Vael the Fogbinder (level 13): his blue rod (item level 16, budget 9,
+  // weaponDpsBudget(16) 11.5 DPS) ----
+  fogbinders_rod: {
+    id: 'fogbinders_rod',
+    name: "Fogbinder's Rod",
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'rare',
+    weapon: { min: 26, max: 43, speed: 3.0 },
+    stats: { int: 6, spi: 3, sta: 3 },
+    sellValue: 1100,
+    requiredClass: CASTER,
+  },
   // ---- The Gaol Turnkey, the gaol's miniboss (level 13) ----
   jailers_iron_gauntlets: {
     id: 'jailers_iron_gauntlets',
@@ -113,6 +165,52 @@ export const SUNKEN_BASTION_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 26, int: 4, spi: 1, sta: 2 },
     sellValue: 150,
     requiredClass: CASTER,
+  },
+  // The Turnkey's blue belts and shank (item level 16, budget 6; armour
+  // 69 / 47 / 26; the shank at weaponDpsBudget(16), 11.5 DPS).
+  portcullis_girdle: {
+    id: 'portcullis_girdle',
+    name: 'Portcullis Girdle',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'waist',
+    quality: 'rare',
+    stats: { armor: 69, str: 4, sta: 2 },
+    sellValue: 1100,
+    requiredClass: HEAVY,
+  },
+  cellwatch_belt: {
+    id: 'cellwatch_belt',
+    name: 'Cellwatch Belt',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'waist',
+    quality: 'rare',
+    stats: { armor: 47, agi: 4, sta: 2 },
+    sellValue: 1100,
+    requiredClass: AGILE,
+  },
+  lanternwick_sash: {
+    id: 'lanternwick_sash',
+    name: 'Lanternwick Sash',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'waist',
+    quality: 'rare',
+    stats: { armor: 26, int: 4, spi: 2, sta: 2 },
+    sellValue: 1100,
+    requiredClass: CASTER,
+  },
+  turnkeys_shank: {
+    id: 'turnkeys_shank',
+    name: "Turnkey's Shank",
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'rare',
+    weapon: { min: 15, max: 24, speed: 1.7, dagger: true },
+    stats: { agi: 6, sta: 3 },
+    sellValue: 1100,
+    requiredClass: AGILE,
   },
   // ---- Heroic epics (source level 25, item level 31) ----
   drowned_commanders_breastplate: {

@@ -481,7 +481,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // The Gravewyrm Sanctum rework adds five (two heroic epics, three
     // trinkets): 514.
     // The Drowned Temple lore guide's Witness of the Choir title adds one: 515.
-    expect(full).toEqual({ owned: 515, total: 515 });
+    // The lower dungeons' blue rolls (2026-10-08) add thirty: 545. The relocated
+    // Nythraxis pieces and raid trinkets only change page, so they add none.
+    expect(full).toEqual({ owned: 545, total: 545 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -517,8 +519,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 471 with the Sunken Bastion rework's five new relics; 475 with the Drowned
     // Temple rework's four; 480 with the Wildheart Basin rework's five.
     // 485 with the Gravewyrm Sanctum rework's five. 486 with the Drowned Temple
-    // lore guide's Witness of the Choir title slot.
-    expect(character).toEqual({ owned: 486, total: 486 });
+    // lore guide's Witness of the Choir title slot. 516 with the lower dungeons'
+    // thirty blue-roll relics (2026-10-08).
+    expect(character).toEqual({ owned: 516, total: 516 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -587,7 +590,9 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +5: the Wildheart Basin rework's new relics on its two pages: 696.
       // +5: the Gravewyrm Sanctum rework's new relics on its heroic page: 701.
       // +1: the Drowned Temple lore guide's title on horizons_titles: 702.
-    ).toBe(702);
+      // +30: the lower dungeons' blue rolls on their three normal pages; the
+      // relocated Nythraxis pieces and trinkets only change page: 732.
+    ).toBe(732);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -826,7 +831,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // +4: the Drowned Temple rework's new relics: 530.
     // +5: the Wildheart Basin rework's new relics: 535.
     // +5: the Gravewyrm Sanctum rework's new relics: 540.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(540);
+    // +30: the lower dungeons' blue rolls (2026-10-08): 570.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(570);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1089,13 +1095,17 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     rimeweb: 'conquerors_hollow_crypt_heroic',
     cantor_ilvane: 'conquerors_hollow_crypt_heroic',
     morthen: 'conquerors_hollow_crypt_heroic',
-    // The Sunken Bastion rework: three bosses, one shared heroic page.
+    // The Sunken Bastion rework: four bosses, one shared heroic page (the Gaol
+    // Turnkey took two of Vael's heroic epics on 2026-10-08).
     knight_commander_olen: 'conquerors_sunken_bastion_heroic',
     gaoler_ossick: 'conquerors_sunken_bastion_heroic',
+    gaol_turnkey: 'conquerors_sunken_bastion_heroic',
     vael_the_mistcaller: 'conquerors_sunken_bastion_heroic',
-    // The Drowned Temple rework: three bosses, one shared heroic page.
+    // The Drowned Temple rework: four bosses, one shared heroic page (the Mere
+    // Hydra's center head took two of Ysolei's heroic epics on 2026-10-08).
     choirmother_selthe: 'conquerors_drowned_temple_heroic',
     tideglass_colossus: 'conquerors_drowned_temple_heroic',
+    mere_hydra_head_center: 'conquerors_drowned_temple_heroic',
     ysolei: 'conquerors_drowned_temple_heroic',
     korzul_the_gravewyrm: 'conquerors_gravewyrm_sanctum_heroic',
     // The Wildheart Basin rework: three bosses, one shared heroic page.
@@ -1944,9 +1954,11 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
 const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   sunken_bastion: { pageId: 'conquerors_sunken_bastion', floor: 8 },
   drowned_temple: { pageId: 'conquerors_drowned_temple', floor: 5 },
-  gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 32 },
-  wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 4 },
-  nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 16 },
+  // Sanctum and Basin grew by the relocated Nythraxis raid pieces (9 and 10,
+  // content/nythraxis_loot.ts); the raid page shrank by the same nineteen.
+  gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 41 },
+  wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 14 },
+  nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 11 },
   // The Crucible raid rooms (per-boss pages). The derivation excludes the
   // sigil redemption tokens by kind; the token-liveness arm below proves the
   // filter excludes something real.
@@ -3218,13 +3230,16 @@ function slotKey(pageId: string, slotId: string): string {
  *  even while every surviving hint still validates. Update deliberately with
  *  the authoring, the same regime as the totals pins above. */
 const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
-  conquerors_hollow_crypt: 1,
+  // Four since every Crypt boss's blue roll joined the page (2026-10-08).
+  conquerors_hollow_crypt: 4,
   // The Hollow Crypt rework: four bosses pay the heroic page.
   conquerors_hollow_crypt_heroic: 4,
-  conquerors_sunken_bastion: 3,
-  conquerors_sunken_bastion_heroic: 3,
-  conquerors_drowned_temple: 3,
-  conquerors_drowned_temple_heroic: 3,
+  // Four since the Gaol Turnkey's blue roll joined the page (2026-10-08).
+  conquerors_sunken_bastion: 4,
+  conquerors_sunken_bastion_heroic: 4,
+  // Four since the Mere Hydra's blue roll joined the page (2026-10-08).
+  conquerors_drowned_temple: 4,
+  conquerors_drowned_temple_heroic: 4,
   // NINE since Masterwrought phase 11l: the trophy recipe route added
   // fromProfession('leatherworking') beside the quiver's korzul hint.
   conquerors_gravewyrm_sanctum: 9,
@@ -3252,8 +3267,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_set_nighttalon: 2,
   conquerors_set_soulflame: 2,
   conquerors_set_stormcallers: 2,
-  // Roots' Bramblehide: the whole family drops from the one raid boss.
-  conquerors_set_bramblehide: 1,
+  // Roots' Bramblehide: three since the family moved off the raid boss onto
+  // the three Wildheart Basin bosses (2026-10-08).
+  conquerors_set_bramblehide: 3,
   // 8 = activity (masterworkFirst) + the seven gear-capable craft
   // professions (engineering hinted since masterwrought Phase 11o un-pended
   // it; the count read 7 while its mark rode SOURCE_PENDING_RULING
@@ -4827,7 +4843,9 @@ describe('Reliquary source hint coverage', () => {
     // did the same with its three: 12. The Wildheart Basin heroic page did the
     // same with its three: 11.
     // The Gravewyrm Sanctum heroic page did the same with its three: 10.
-    expect(defaults).toBe(10);
+    // The Hollow Crypt normal page dropped its Morthen default when every boss's
+    // blue roll joined it (2026-10-08): 9.
+    expect(defaults).toBe(9);
   });
 });
 

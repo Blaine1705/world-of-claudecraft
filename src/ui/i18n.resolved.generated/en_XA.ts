@@ -19120,6 +19120,96 @@ export const en_XA: EnTranslations = {
       "vestments_of_the_waking_rite": {
         "name": "[Ʋéšţɱéñţš óƒ ţĥé Ŵáķíñĝ Ŕíţé]"
       },
+      "spadeworn_gauntlets": {
+        "name": "[Šþáðéŵóŕñ Ĝáúñţļéţš]"
+      },
+      "gravedirt_grips": {
+        "name": "[Ĝŕáʋéðíŕţ Ĝŕíþš]"
+      },
+      "bellrope_mitts": {
+        "name": "[Ɓéļļŕóþé Ɱíţţš]"
+      },
+      "rimewreath_coif": {
+        "name": "[Ŕíɱéŵŕéáţĥ Çóíƒ]"
+      },
+      "rime_laced_hood": {
+        "name": "[Ŕíɱé-Ļáçéð Ĥóóð]"
+      },
+      "lamenting_veil": {
+        "name": "[Ļáɱéñţíñĝ Ʋéíļ]"
+      },
+      "choirward_pauldrons": {
+        "name": "[Çĥóíŕŵáŕð Þáúļðŕóñš]"
+      },
+      "choristers_spaulders": {
+        "name": "[Çĥóŕíšţéŕ'š Šþáúļðéŕš]"
+      },
+      "cantors_stole": {
+        "name": "[Çáñţóŕ'š Šţóļé]"
+      },
+      "knellbound_hauberk": {
+        "name": "[Ķñéļļƀóúñð Ĥáúƀéŕķ]"
+      },
+      "candlewatch_jerkin": {
+        "name": "[Çáñðļéŵáţçĥ Ĵéŕķíñ]"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "[Ŕóƀé óƒ ţĥé Úñɋúíéţ Ŕíţé]"
+      },
+      "gravecallers_rod": {
+        "name": "[Ĝŕáʋéçáļļéŕ'š Ŕóð]"
+      },
+      "portcullis_girdle": {
+        "name": "[Þóŕţçúļļíš Ĝíŕðļé]"
+      },
+      "cellwatch_belt": {
+        "name": "[Çéļļŵáţçĥ Ɓéļţ]"
+      },
+      "lanternwick_sash": {
+        "name": "[Ļáñţéŕñŵíçķ Šášĥ]"
+      },
+      "turnkeys_shank": {
+        "name": "[Ţúŕñķéý'š Šĥáñķ]"
+      },
+      "gaolyard_jerkin": {
+        "name": "[Ĝáóļýáŕð Ĵéŕķíñ]"
+      },
+      "brinewarden_robe": {
+        "name": "[Ɓŕíñéŵáŕðéñ Ŕóƀé]"
+      },
+      "fogbinders_rod": {
+        "name": "[Ƒóĝƀíñðéŕ'š Ŕóð]"
+      },
+      "conchplate_sabatons": {
+        "name": "[Çóñçĥþļáţé Šáƀáţóñš]"
+      },
+      "pale_chorus_slippers": {
+        "name": "[Þáļé Çĥóŕúš Šļíþþéŕš]"
+      },
+      "tideglass_gauntlets": {
+        "name": "[Ţíðéĝļášš Ĝáúñţļéţš]"
+      },
+      "moonburn_grips": {
+        "name": "[Ɱóóñƀúŕñ Ĝŕíþš]"
+      },
+      "prism_etched_handwraps": {
+        "name": "[Þŕíšɱ-Éţçĥéð Ĥáñðŵŕáþš]"
+      },
+      "mere_crested_helm": {
+        "name": "[Ɱéŕé-Çŕéšţéð Ĥéļɱ]"
+      },
+      "mereskin_hood": {
+        "name": "[Ɱéŕéšķíñ Ĥóóð]"
+      },
+      "merewater_cowl": {
+        "name": "[Ɱéŕéŵáţéŕ Çóŵļ]"
+      },
+      "merecleaver": {
+        "name": "[Ɱéŕéçļéáʋéŕ]"
+      },
+      "moonwrack_stave": {
+        "name": "[Ɱóóñŵŕáçķ Šţáʋé]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

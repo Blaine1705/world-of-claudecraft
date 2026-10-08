@@ -25,6 +25,7 @@ import { weeklyChoiceExhausted } from './weekly_reward_availability';
 import { weeklyRewardFitsClass } from './weekly_reward_eligibility';
 import { weeklyTableSource } from './weekly_reward_options';
 import {
+  addRelocatedRaidShelf,
   historicalWeeklyBossUnlocks,
   needsWeeklyBossTable,
   sanitizeWeeklyBossUnlocks,
@@ -405,6 +406,7 @@ function collectInstanceLoot(
       for (const entry of HEROIC_BOSS_LOOT[spawn.mobId] ?? []) {
         if (entry.itemId && !entry.questId && entry.chance > 0) ids.add(entry.itemId);
       }
+    if (spawn.mobId === NYTHRAXIS_BOSS_ID) addRelocatedRaidShelf(ids, difficulty === 'heroic');
   }
 }
 // Exact catalog shared by preview and claim. Each eligible item is equally likely;

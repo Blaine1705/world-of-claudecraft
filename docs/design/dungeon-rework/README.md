@@ -205,6 +205,37 @@ guessed.
 - **Never delete a shipped item id.** Items move between bosses by editing loot
   tables; nothing is removed from `ITEMS`.
 
+### 7.1 Loot redistribution (maintainer ruling, 2026-10-08)
+
+The reworked dungeons have enough bosses to carry loot the raid table was
+diluting, and final bosses were carrying most of each dungeon's heroic epics.
+
+- **Nythraxis keeps a short table.** The raid's shared roll keeps the two
+  legendaries (still exactly 3% each) and its common pieces; its low-weight pieces
+  (`NYTHRAXIS_RELOCATED_ITEM_IDS` in `src/sim/content/nythraxis_loot.ts`) moved to
+  the dungeons, and its four class trinkets (`NYTHRAXIS_RELOCATED_TRINKET_IDS`)
+  left the heroic raid roll, which now pays only the bespoke heroic weapons.
+- **Each relocated piece has one home boss** in the Gravewyrm Sanctum or the
+  Wildheart Basin. Its Normal copy rides that boss's one bonus roll (so a kill
+  never pays an extra item) and its Heroic copy drops from the same boss's heroic
+  roll, which keeps the Reliquary rule that a dungeon page's relics are paid on
+  both difficulties. Most pieces also drop as their Heroic copy from one Hollow
+  Crypt, Sunken Bastion or Drowned Temple heroic boss (`THORNPEAK_SHARE` there,
+  `THORNPEAK_HOME_SHARE` at home; `src/sim/content/heroic_loot.ts`). The trinkets
+  went to the heroic bosses whose fights they echo (the Mooring Stone to Gaoler
+  Ossick, the Echoing Lens to the Tideglass Colossus, the Hunter's Tally to the
+  Wildheart Beastmaster, the Wellspring Seed to the Gorgebloom).
+- **Moved pieces keep their raid tier.** `item_level.ts` (`buildSourceIndex`,
+  the heroic-raid index) and `heroic_variants.ts` anchor the relocated ids at the
+  raid source, so every owned copy keeps its item level, stats and Sundering
+  standing. Pinned by `tests/nythraxis_relocation.test.ts`.
+- **Final bosses no longer hoard the heroic epics.** Each heroic roll stays one
+  item per kill, but the epics spread over the dungeon: Korzul's moved to Korgath
+  and Velkhar (`tests/gravewyrm_sanctum_loot.test.ts`), two of Vael's to the Gaol
+  Turnkey, two of Ysolei's to the Mere Hydra's center head (the head that carries
+  the fight's one roll), and Morthen's Shadowpulse Slippers to Cantor Ilvane
+  beside their Handwraps.
+
 ## 8. Content obligations checklist (every dungeon)
 
 - Deeds: new records APPENDED at the end of `DEEDS` (`src/sim/content/deeds.ts`),

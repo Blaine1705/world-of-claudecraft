@@ -723,13 +723,13 @@ const SET_MEMBER_SOURCES: Readonly<
   stormcallers_waistguard: fromBoss('thunzharr_waking_peak'),
   stormcallers_crown: fromBoss('nythraxis_scourge_of_thornpeak'),
   stormcallers_spaulders: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_crown: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_mantle: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_harness: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_cinch: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_legguards: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_grips: fromBoss('nythraxis_scourge_of_thornpeak'),
-  bramblehide_treads: fromBoss('nythraxis_scourge_of_thornpeak'),
+  bramblehide_crown: fromBoss('the_gorgebloom'),
+  bramblehide_mantle: fromBoss('the_gorgebloom'),
+  bramblehide_harness: fromBoss('wildheart_high_priest'),
+  bramblehide_cinch: fromBoss('the_gorgebloom'),
+  bramblehide_legguards: fromBoss('wildheart_high_priest'),
+  bramblehide_grips: fromBoss('wildheart_beastmaster'),
+  bramblehide_treads: fromBoss('wildheart_beastmaster'),
 };
 
 /** Set-page members carrying their SET_MEMBER_SOURCES hint. A member with no
@@ -762,13 +762,9 @@ export const RELIQUARY_HEROIC_GEAR = {
   // (hollow_crypt.md 8.2); they share the one shipped heroic page.
   sexton_marrow: ['cryptplate_helm'],
   rimeweb: ['bonechill_striders', 'bonechill_cord'],
-  cantor_ilvane: ['shadowpulse_handwraps'],
-  morthen: [
-    'morthens_cryptforged_hauberk',
-    'lunarward_cinch',
-    'shadowpulse_slippers',
-    'bastion_sigil',
-  ],
+  // The Slippers moved here off Morthen to join their Handwraps (2026-10-08).
+  cantor_ilvane: ['shadowpulse_handwraps', 'shadowpulse_slippers'],
+  morthen: ['morthens_cryptforged_hauberk', 'lunarward_cinch', 'bastion_sigil'],
   // The Sunken Bastion rework moved three of Vael's heroic epics onto Olen and
   // the new Gaoler Ossick (sunken_bastion.md 8.2); they share the one heroic page.
   knight_commander_olen: [
@@ -776,14 +772,16 @@ export const RELIQUARY_HEROIC_GEAR = {
     'mistforged_pauldrons',
     'tideguard_faceguard',
   ],
-  gaoler_ossick: ['gaolyard_striders', 'sash_of_the_sunken_court', 'gaolers_iron_key'],
-  vael_the_mistcaller: [
-    'mistcallers_fang',
-    'tidebound_spaulders',
-    'sunken_court_mantle',
-    'dreamroot_boots',
-    'stormjar',
+  // The Mooring Stone came off the heroic Nythraxis raid (2026-10-08).
+  gaoler_ossick: [
+    'gaolyard_striders',
+    'sash_of_the_sunken_court',
+    'gaolers_iron_key',
+    'mooring_stone',
   ],
+  // The Gaol Turnkey takes two of Vael's heroic epics (2026-10-08).
+  gaol_turnkey: ['sunken_court_mantle', 'dreamroot_boots'],
+  vael_the_mistcaller: ['mistcallers_fang', 'tidebound_spaulders', 'stormjar'],
   // The Drowned Temple rework moved four of Ysolei's heroic pieces onto
   // Choirmother Selthe and the new Tideglass Colossus (drowned_temple.md 8.2)
   // and gave each a new heroic epic; they share the one heroic page.
@@ -793,20 +791,15 @@ export const RELIQUARY_HEROIC_GEAR = {
     'lunar_choir_leggings',
     'tideworn_warboots',
     'tideglass_warmaul',
+    // The Echoing Lens came off the heroic Nythraxis raid (2026-10-08).
+    'echoing_lens',
   ],
-  ysolei: [
-    'lunar_tide_greatstaff',
-    'stormbark_mantle',
-    'choir_blessed_spaulders',
-    'menders_hourglass',
-  ],
+  // The Mere Hydra takes two of Ysolei's heroic epics (2026-10-08).
+  mere_hydra_head_center: ['stormbark_mantle', 'choir_blessed_spaulders'],
+  ysolei: ['lunar_tide_greatstaff', 'menders_hourglass'],
   korzul_the_gravewyrm: [
     'gravewyrm_cleaver',
     'shroud_of_the_gravewyrm',
-    'sanctum_prowlers_grips',
-    'gravewyrm_claws',
-    'gravescale_girdle',
-    'wyrmchoir_handwraps',
     'wildsoul_maul',
     // The Gravewyrm Sanctum rework's Quenchwater Flask (gravewyrm_sanctum.md 9.2).
     'quenchwater_flask',
@@ -814,13 +807,37 @@ export const RELIQUARY_HEROIC_GEAR = {
   // The Gravewyrm Sanctum rework (gravewyrm_sanctum.md 9.2): Korgath and
   // Velkhar each pay a new epic and a trinket, Korzul a trinket; all three
   // share the one heroic page.
-  korgath_the_bound: ['foremans_last_link', 'hammer_of_the_open_lock'],
-  grand_necromancer_velkhar: ['phial_of_the_tithe', 'vestments_of_the_waking_rite'],
+  // Korzul's heroic epics spread over the Sanctum (2026-10-08): two each to
+  // Korgath and Velkhar.
+  korgath_the_bound: [
+    'foremans_last_link',
+    'hammer_of_the_open_lock',
+    'gravewyrm_claws',
+    'gravescale_girdle',
+  ],
+  grand_necromancer_velkhar: [
+    'phial_of_the_tithe',
+    'vestments_of_the_waking_rite',
+    'sanctum_prowlers_grips',
+    'wyrmchoir_handwraps',
+  ],
   // The Wildheart Basin rework moved two of Zulgar's heroic epics onto the
   // promoted Fanglord Beastmaster and the Gorgebloom (wildheart_basin.md 8.2)
   // and gave each a new epic and a trinket; they share the one heroic page.
-  wildheart_beastmaster: ['bloodmane_war_legguards', 'fanglords_whistle', 'fanglords_hide_mantle'],
-  the_gorgebloom: ['sunbone_oracles_crown', 'gorgebloom_seedpod', 'thornroot_greathelm'],
+  // The Hunter's Tally and the Wellspring Seed came off the heroic Nythraxis
+  // raid (2026-10-08).
+  wildheart_beastmaster: [
+    'bloodmane_war_legguards',
+    'fanglords_whistle',
+    'fanglords_hide_mantle',
+    'hunters_tally',
+  ],
+  the_gorgebloom: [
+    'sunbone_oracles_crown',
+    'gorgebloom_seedpod',
+    'thornroot_greathelm',
+    'wellspring_seed',
+  ],
   wildheart_high_priest: [
     'basin_stalkers_tunic',
     'verdant_heart_vestment',
@@ -828,14 +845,11 @@ export const RELIQUARY_HEROIC_GEAR = {
     'greatfang_of_the_basin',
     'paired_talons',
   ],
+  // The four raid trinkets moved to heroic five-man bosses (2026-10-08).
   nythraxis_scourge_of_thornpeak: [
     'deathless_greatblade',
     'scepter_of_the_deathless_court',
     'stormcallers_focus',
-    'mooring_stone',
-    'wellspring_seed',
-    'hunters_tally',
-    'echoing_lens',
   ],
   // Crucible of the Last Spring: the heroic-only weapon, shield and trinket
   // appends.
@@ -1045,16 +1059,31 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'The Hollow Crypt',
     desc: 'Signature spoils claimed from Morthen and the Hollow Crypt.',
     clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'any' },
-    // Morthen is the only Crypt mob that drops any of these five. The rework's
-    // three new rare chase rows (Spadehaft, Fang, Hymnal) join this page with
-    // their painted art (the dark-card rule), not before.
-    sourceDefault: fromBoss('morthen'),
+    // Four bosses pay the page since every boss's blue roll joined it
+    // (2026-10-08), so every row names its own; the first five are Morthen's.
+    // The rework's three rare chase rows (Spadehaft, Fang, Hymnal) join this
+    // page with their painted art (the dark-card rule), not before.
     relics: items(
-      'cryptbone_greaves',
-      'cryptbone_helm',
-      'cryptbone_pauldrons',
-      'greyjaw_hide_boots',
-      'gravewoven_bag',
+      ['cryptbone_greaves', fromBoss('morthen')],
+      ['cryptbone_helm', fromBoss('morthen')],
+      ['cryptbone_pauldrons', fromBoss('morthen')],
+      ['greyjaw_hide_boots', fromBoss('morthen')],
+      ['gravewoven_bag', fromBoss('morthen')],
+      // Every boss's Normal blue roll (2026-10-08): a cloth, leather and mail
+      // piece of one slot plus a weapon, each paid on Heroic by its rare copy.
+      ['spadeworn_gauntlets', fromBoss('sexton_marrow')],
+      ['gravedirt_grips', fromBoss('sexton_marrow')],
+      ['bellrope_mitts', fromBoss('sexton_marrow')],
+      ['rimewreath_coif', fromBoss('rimeweb')],
+      ['rime_laced_hood', fromBoss('rimeweb')],
+      ['lamenting_veil', fromBoss('rimeweb')],
+      ['choirward_pauldrons', fromBoss('cantor_ilvane')],
+      ['choristers_spaulders', fromBoss('cantor_ilvane')],
+      ['cantors_stole', fromBoss('cantor_ilvane')],
+      ['knellbound_hauberk', fromBoss('morthen')],
+      ['candlewatch_jerkin', fromBoss('morthen')],
+      ['robe_of_the_unquiet_rite', fromBoss('morthen')],
+      ['gravecallers_rod', fromBoss('morthen')],
     ),
   },
   {
@@ -1072,7 +1101,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['bonechill_striders', fromBoss('rimeweb')],
       ['lunarward_cinch', fromBoss('morthen')],
       ['cryptplate_helm', fromBoss('sexton_marrow')],
-      ['shadowpulse_slippers', fromBoss('morthen')],
+      ['shadowpulse_slippers', fromBoss('cantor_ilvane')],
       ['bonechill_cord', fromBoss('rimeweb')],
       ['bastion_sigil', fromBoss('morthen')],
     ),
@@ -1088,15 +1117,24 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // weapons append after the shipped slots.
     relics: items(
       ['tideguard_greaves', fromBoss('knight_commander_olen')],
-      ['tideguard_sabatons', fromBoss('knight_commander_olen')],
+      ['tideguard_sabatons', fromBoss('vael_the_mistcaller')],
       ['eelscale_leggings', fromBoss('knight_commander_olen')],
-      ['tidescale_vest', fromBoss('vael_the_mistcaller')],
-      ['drowned_prayer_leggings', fromBoss('vael_the_mistcaller')],
+      ['tidescale_vest', fromBoss('gaoler_ossick')],
+      ['drowned_prayer_leggings', fromBoss('knight_commander_olen')],
       ['drowned_prayer_sandals', fromBoss('vael_the_mistcaller')],
       ['eelscale_treads', fromBoss('vael_the_mistcaller')],
       ['mistcallers_duffel', fromBoss('vael_the_mistcaller')],
       ['knight_commanders_longsword', fromBoss('knight_commander_olen')],
       ['gaolyard_cudgel', fromBoss('gaoler_ossick')],
+      // Every boss's Normal blue roll (2026-10-08): a cloth, leather and mail
+      // piece of one slot plus a weapon, each paid on Heroic by its rare copy.
+      ['portcullis_girdle', fromBoss('gaol_turnkey')],
+      ['cellwatch_belt', fromBoss('gaol_turnkey')],
+      ['lanternwick_sash', fromBoss('gaol_turnkey')],
+      ['turnkeys_shank', fromBoss('gaol_turnkey')],
+      ['gaolyard_jerkin', fromBoss('gaoler_ossick')],
+      ['brinewarden_robe', fromBoss('gaoler_ossick')],
+      ['fogbinders_rod', fromBoss('vael_the_mistcaller')],
     ),
   },
   {
@@ -1114,12 +1152,13 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['sash_of_the_sunken_court', fromBoss('gaoler_ossick')],
       ['mistforged_pauldrons', fromBoss('knight_commander_olen')],
       ['tideguard_faceguard', fromBoss('knight_commander_olen')],
-      ['sunken_court_mantle', fromBoss('vael_the_mistcaller')],
-      ['dreamroot_boots', fromBoss('vael_the_mistcaller')],
+      ['sunken_court_mantle', fromBoss('gaol_turnkey')],
+      ['dreamroot_boots', fromBoss('gaol_turnkey')],
       ['stormjar', fromBoss('vael_the_mistcaller')],
       ['drowned_commanders_breastplate', fromBoss('knight_commander_olen')],
       ['gaolyard_striders', fromBoss('gaoler_ossick')],
       ['gaolers_iron_key', fromBoss('gaoler_ossick')],
+      ['mooring_stone', fromBoss('gaoler_ossick')],
     ),
   },
   {
@@ -1138,6 +1177,18 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['selthes_seastriders', fromBoss('choirmother_selthe')],
       ['chorus_conch', fromBoss('choirmother_selthe')],
       ['tideglass_shiv', fromBoss('tideglass_colossus')],
+      // Every boss's Normal blue roll (2026-10-08): a cloth, leather and mail
+      // piece of one slot plus a weapon, each paid on Heroic by its rare copy.
+      ['conchplate_sabatons', fromBoss('choirmother_selthe')],
+      ['pale_chorus_slippers', fromBoss('choirmother_selthe')],
+      ['tideglass_gauntlets', fromBoss('tideglass_colossus')],
+      ['moonburn_grips', fromBoss('tideglass_colossus')],
+      ['prism_etched_handwraps', fromBoss('tideglass_colossus')],
+      ['mere_crested_helm', fromBoss('mere_hydra_head_center')],
+      ['mereskin_hood', fromBoss('mere_hydra_head_center')],
+      ['merewater_cowl', fromBoss('mere_hydra_head_center')],
+      ['merecleaver', fromBoss('mere_hydra_head_center')],
+      ['moonwrack_stave', fromBoss('ysolei')],
     ),
   },
   {
@@ -1152,13 +1203,14 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['lunar_tide_greatstaff', fromBoss('ysolei')],
       ['tidewoven_trousers', fromBoss('tideglass_colossus')],
       ['choirmothers_casque', fromBoss('choirmother_selthe')],
-      ['stormbark_mantle', fromBoss('ysolei')],
+      ['stormbark_mantle', fromBoss('mere_hydra_head_center')],
       ['lunar_choir_leggings', fromBoss('tideglass_colossus')],
-      ['choir_blessed_spaulders', fromBoss('ysolei')],
+      ['choir_blessed_spaulders', fromBoss('mere_hydra_head_center')],
       ['tideworn_warboots', fromBoss('tideglass_colossus')],
       ['menders_hourglass', fromBoss('ysolei')],
       ['pale_chorus_vestment', fromBoss('choirmother_selthe')],
       ['tideglass_warmaul', fromBoss('tideglass_colossus')],
+      ['echoing_lens', fromBoss('tideglass_colossus')],
     ),
   },
   {
@@ -1251,6 +1303,18 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
         'gravewyrm_bone_quiver',
         [fromBoss('korzul_the_gravewyrm'), fromProfession('leatherworking')],
       ],
+      // The raid pieces relocated off Nythraxis (content/nythraxis_loot.ts),
+      // each on its home boss: Normal from its bonus roll, Heroic as its
+      // raid-tier copy from the same boss (content/heroic_loot.ts).
+      ['bonewrought_greatsword', fromBoss('korgath_the_bound')],
+      ['bonewrought_bulwark', fromBoss('korgath_the_bound')],
+      ['thornpeak_wardblade', fromBoss('korgath_the_bound')],
+      ['votive_ward_of_the_deathless_court', fromBoss('grand_necromancer_velkhar')],
+      ['wraithfire_orb', fromBoss('grand_necromancer_velkhar')],
+      ['courtiers_bonefang', fromBoss('grand_necromancer_velkhar')],
+      ['gravecourt_hewer', fromBoss('korzul_the_gravewyrm')],
+      ['stormhymn_chain_grips', fromBoss('korzul_the_gravewyrm')],
+      ['stormhymn_chain_treads', fromBoss('korzul_the_gravewyrm')],
     ),
   },
   {
@@ -1263,9 +1327,16 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // sanctum.md section 10) appends Korzul's Quenchwater Flask, then Korgath's
     // and Velkhar's new epics and trinkets, each hinted to its boss.
     relics: items(
-      ...RELIQUARY_HEROIC_GEAR.korzul_the_gravewyrm.map(
-        (id) => [id, fromBoss('korzul_the_gravewyrm')] as const,
-      ),
+      // The shipped slots keep their order; four of Korzul's epics now name
+      // Korgath and Velkhar (2026-10-08).
+      ['gravewyrm_cleaver', fromBoss('korzul_the_gravewyrm')],
+      ['shroud_of_the_gravewyrm', fromBoss('korzul_the_gravewyrm')],
+      ['sanctum_prowlers_grips', fromBoss('grand_necromancer_velkhar')],
+      ['gravewyrm_claws', fromBoss('korgath_the_bound')],
+      ['gravescale_girdle', fromBoss('korgath_the_bound')],
+      ['wyrmchoir_handwraps', fromBoss('grand_necromancer_velkhar')],
+      ['wildsoul_maul', fromBoss('korzul_the_gravewyrm')],
+      ['quenchwater_flask', fromBoss('korzul_the_gravewyrm')],
       ['hammer_of_the_open_lock', fromBoss('korgath_the_bound')],
       ['vestments_of_the_waking_rite', fromBoss('grand_necromancer_velkhar')],
       ['foremans_last_link', fromBoss('korgath_the_bound')],
@@ -1288,6 +1359,19 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['wildheart_hexwood_staff', fromBoss('wildheart_high_priest')],
       ['wildheart_fangknife', fromBoss('wildheart_high_priest')],
       ['falls_blessed_staff', fromBoss('the_gorgebloom')],
+      // The raid pieces relocated off Nythraxis (content/nythraxis_loot.ts),
+      // each on its home boss: Normal from its bonus roll, Heroic as its
+      // raid-tier copy from the same boss (content/heroic_loot.ts).
+      ['direfang_greatblade', fromBoss('wildheart_beastmaster')],
+      ['direfang_quiver', fromBoss('wildheart_beastmaster')],
+      ['bramblehide_grips', fromBoss('wildheart_beastmaster')],
+      ['bramblehide_treads', fromBoss('wildheart_beastmaster')],
+      ['bramblehide_crown', fromBoss('the_gorgebloom')],
+      ['bramblehide_mantle', fromBoss('the_gorgebloom')],
+      ['bramblehide_cinch', fromBoss('the_gorgebloom')],
+      ['bramblehide_harness', fromBoss('wildheart_high_priest')],
+      ['bramblehide_legguards', fromBoss('wildheart_high_priest')],
+      ['thornpeak_moonhide_cowl', fromBoss('wildheart_high_priest')],
     ),
   },
   {
@@ -1311,6 +1395,8 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['fanglords_hide_mantle', fromBoss('wildheart_beastmaster')],
       ['gorgebloom_seedpod', fromBoss('the_gorgebloom')],
       ['thornroot_greathelm', fromBoss('the_gorgebloom')],
+      ['hunters_tally', fromBoss('wildheart_beastmaster')],
+      ['wellspring_seed', fromBoss('the_gorgebloom')],
     ),
   },
   // ---- Raid ----
@@ -1329,10 +1415,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     relics: items(
       'deathless_heartwood',
       'kingsbane_last_oath',
-      'bonewrought_greatsword',
-      'bonewrought_bulwark',
-      'direfang_greatblade',
-      'wraithfire_orb',
       'maul_of_the_scourged_wilds',
       'crownforged_dreadhelm',
       'crownforged_warspaulders',
@@ -1342,21 +1424,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'soulflame_mantle',
       'stormcallers_crown',
       'stormcallers_spaulders',
-      'direfang_quiver',
-      'bramblehide_crown',
-      'bramblehide_mantle',
-      'bramblehide_harness',
-      'bramblehide_cinch',
-      'bramblehide_legguards',
-      'bramblehide_grips',
-      'bramblehide_treads',
-      'courtiers_bonefang',
-      'thornpeak_wardblade',
-      'gravecourt_hewer',
-      'votive_ward_of_the_deathless_court',
-      'thornpeak_moonhide_cowl',
-      'stormhymn_chain_grips',
-      'stormhymn_chain_treads',
     ),
   },
   {
