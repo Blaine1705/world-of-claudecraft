@@ -202,7 +202,9 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // reliquary_content.test.ts's pair.
     // 486 with the Witness of the Choir title's slot on the Horizons titles
     // page (the Drowned Temple lore guide's deed, The Last Verse).
-    expect(catalogTotal).toBe(486);
+    // 516 with the lower dungeons' thirty blue-roll relics (2026-10-08), the same
+    // +30 as reliquary_content.test.ts's pair.
+    expect(catalogTotal).toBe(516);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });
