@@ -758,7 +758,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1120,
-      "state": "a228318a",
+      "state": "33a4376e",
       "events": "fa033675",
       "rng": {
         "draws": 69,
@@ -2075,7 +2075,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "cultist_flayer"
+                "itemId": "shroud_of_the_gravewyrm"
               }
             ]
           },
@@ -2210,7 +2210,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1120,
-      "state": "a228318a",
+      "state": "33a4376e",
       "events": "741638a5",
       "rng": {
         "draws": 69,
@@ -3527,7 +3527,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "cultist_flayer"
+                "itemId": "shroud_of_the_gravewyrm"
               }
             ]
           },
