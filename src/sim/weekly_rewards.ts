@@ -432,7 +432,7 @@ function collectInstanceLoot(
   }
 }
 // Exact catalog shared by preview and claim. Each eligible item is equally likely;
-// Class locks are respected; only equipment, the Crucible core, and authored sigils qualify.
+// Class locks are respected; sigils and raid-only Crucible cores also qualify.
 export function weeklyLootPool(
   pool: WeeklyPoolId,
   playerClass: PlayerClass,

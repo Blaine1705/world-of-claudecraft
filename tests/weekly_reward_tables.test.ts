@@ -102,6 +102,7 @@ describe('weekly boss-table eligibility', () => {
     'preserves a %s core through opening, reload and claim',
     (pool) => {
       const { sim, pid, meta, state, batch } = setup();
+      state.lootSpec = 'fire';
       batch.bossUnlocks = { [VARKHUL_BOSS_ID]: 2 };
       batch.choices = [{ pool }];
       const pick = vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => {
@@ -127,6 +128,7 @@ describe('weekly boss-table eligibility', () => {
         tableId: VARKHUL_BOSS_ID,
         itemId: 'lastflame_core',
         opened: true,
+        lootSpec: 'fire',
       });
       meta.weeklyRewards = restored;
       sim.claimWeeklyReward('1000:0', pid);

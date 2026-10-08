@@ -49,6 +49,10 @@ describe('Weekly Vault redemption sigils', () => {
       for (const heroic of [false, true]) {
         const pool = heroic ? 'raid_heroic' : 'raid';
         const chest = heroic ? ['chest'] : [];
+        for (const boss of [IGNIVAR_BOSS_ID, VARKHUL_BOSS_ID]) {
+          expect(weeklyBossLootPool(boss, pool, cls, spec)).toContain('lastflame_core');
+        }
+        expect(weeklyLootPool(pool, cls, [0, 2, 2], spec)).toContain('lastflame_core');
         expect(sigils(weeklyBossLootPool(IGNIVAR_BOSS_ID, pool, cls, spec))).toEqual(
           expected(group, ['shoulder', 'gloves', ...chest]),
         );

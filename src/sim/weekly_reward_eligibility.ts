@@ -4,7 +4,7 @@ import { trinketLootFitsClass } from './trinket_loot_eligibility';
 import type { ItemDef, PlayerClass } from './types';
 import type { WeeklyPoolId } from './weekly_rewards';
 
-/** The Crucible core and authored sigils are the only non-equipment rewards. */
+/** Shared pool/save policy: equipment, authored sigils, and raid-only Crucible cores. */
 export function weeklyRewardItemAllowed(
   item: ItemDef,
   pool: WeeklyPoolId,
@@ -14,14 +14,14 @@ export function weeklyRewardItemAllowed(
   if (item.kind === 'tool' && Object.hasOwn(IGNIVAR_SIGIL_ITEMS, item.id))
     return pool === 'raid' || pool === 'raid_heroic';
   return (
-    ['weapon', 'armor', 'held_offhand'].includes(item.kind) &&
+    weeklyRewardKindAllowed(item) &&
     (item.quality === 'rare' ||
       item.quality === 'epic' ||
       (allowUncommon && item.quality === 'uncommon'))
   );
 }
 
-/** Only equipment and authored raid redemption sigils may enter or survive a Vault. */
+/** Equipment and exact authored sigils; the core exception also needs a raid pool. */
 export function weeklyRewardKindAllowed(item: ItemDef): boolean {
   return (
     item.kind === 'weapon' ||

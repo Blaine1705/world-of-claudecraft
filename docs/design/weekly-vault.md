@@ -50,7 +50,9 @@ Each remaining eligible item has equal probability within its pool. A later week
 can roll the same item again. Existing saved rewards stay unchanged, including
 duplicates rolled before this rule. Equipment must be usable by the character's class.
 Legendary chase drops, quest items and non-equipment other than the authored
-Crucible redemption sigils are excluded.
+Crucible redemption sigils and Core of the Last Flame are excluded. The core
+remains confined to Normal and Heroic Ignivar/Varkhul raid rewards and fits every
+class and specialization. Other materials, recipes and tools remain excluded.
 
 Crucible sigils use their existing class groups: Anvil for Warrior, Druid and Mage;
 Ember for Paladin, Hunter and Priest; Tempest for Shaman, Rogue and Warlock. Every
@@ -61,9 +63,9 @@ versions of either boss additionally supply chest sigils. Level limits, boss
 unlocks and weekly duplicate reservations still apply. This is an explicit sigil
 allowlist, not permission for other tools, recipes or crafting materials.
 
-The shared saved-ledger and client decoder accept these sigils too. Deploy the
+The shared saved-ledger and client decoder accept these sigils and raid cores too. Deploy the
 server and client update together and refresh older clients before claiming sigil
-rewards. Older code rejects fixed sigil choices during decoding or save loading;
+rewards. Older code rejects these fixed non-equipment choices during decoding or save loading;
 rolling back requires preserving affected weekly ledgers before an older server
 can load and resave them.
 

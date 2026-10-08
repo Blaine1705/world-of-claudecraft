@@ -337,10 +337,9 @@ describe('weekly vault choices', () => {
           // test above proves that exhausting this shelf still permits a claim.
           // Warlocks exclude Healing Power gear, leaving fewer heroic raid items;
           // the regression below pins a successful claim after that pool exhausts.
-          // Rogues' Varkhul heroic shelf is the two Crucible trinkets and the
-          // core, all also on the Normal shelf, so the Varkhul-only
-          // heroic unlock beside three Normal clears cannot cover the overlap
-          // either; the same exhaustion regression covers it.
+          // Rogues share their two Crucible trinkets, core, helmet and leg sigils
+          // between difficulties. Only the chest sigil is Heroic-only, so the
+          // same exhaustion regression covers the overlap between these shelves.
           expect(pool.ids.length, `${cls} ${unlocks} ${pool.pool}`).toBeGreaterThanOrEqual(
             (cls === 'warlock' || cls === 'rogue') && pool.pool === 'raid_heroic'
               ? 1
@@ -353,9 +352,8 @@ describe('weekly vault choices', () => {
   });
 
   it('can claim a Rogue heroic raid reward after class filtering exhausts another slot', () => {
-    // Varkhul offers Rogues two trinkets, the Crucible core, and three Tempest
-    // sigils. A synthetic seven-choice ledger exercises exhaustion after all six
-    // unique items roll.
+    // Varkhul offers Rogues two trinkets, three Tempest sigils and the core. A
+    // synthetic seven-choice ledger exhausts all six unique rewards.
     // This tests claim recovery, not the separate activity-slot earning limits.
     const { sim, pid, meta } = make(42, true, 'rogue');
     const state = emptyWeeklyRewards(WEEK);
