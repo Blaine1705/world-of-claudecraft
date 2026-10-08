@@ -727,12 +727,21 @@ describe('the balance audit: heroic avoidables never one-shot a cloth wearer', (
     const r = room('hollow_crypt', 'heroic');
     const necro = engage(r, 'crypt_gravecaller_necromancer', 0, 8);
     expect(necro.mechanicDamageMult).toBe(12);
-    // Its melee lift is untouched (the tank-swing floor): the template
-    // transform still scales its weapon by x24.
+    // Its melee is priced apart (the heroic pack budget scaled its old x24
+    // floor lift to x10.8); the rupture keeps its own x12.
     const crypt = HEROIC_DUNGEON_TUNING.hollow_crypt;
-    expect(crypt.damageMultiplierByMob?.crypt_gravecaller_necromancer).toBe(24);
-    // The wing bosses' own mechanic factors sit beside it (crypt bosses).
+    expect(crypt.damageMultiplierByMob?.crypt_gravecaller_necromancer).toBe(10.8);
+    // The wing bosses' own mechanic factors sit beside it (crypt bosses), with
+    // the trash kits the pack budget held at their pre-budget factors.
     expect(crypt.mechanicDamageMultiplierByMob).toEqual({
+      crypt_ossuary_warrior: 20,
+      crypt_gravecaller_adept: 24,
+      crypt_chapel_gargoyle: 20,
+      crypt_ossuary_cutthroat: 23,
+      crypt_ossuary_drake: 20,
+      bonechill_widow: 20,
+      crypt_crow_caller: 24,
+      crypt_carrion_crow: 66,
       crypt_gravecaller_necromancer: 12,
       sexton_marrow: 6,
       rimeweb: 5,

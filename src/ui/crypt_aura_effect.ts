@@ -72,7 +72,7 @@ const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
 /** A crypt boss's heroic mechanic factor: the same mechanicDamageMult the sim
  *  stamps on its heroic spawn (instances/difficulty.ts: the per-mob mechanic
  *  override, else its per-mob damage factor, else the dungeon's own; the
- *  Knellwyrm rides the dungeon's). */
+ *  Knellwyrm rides its per-mob boss entry). */
 export function cryptHeroicFactor(mobId: string): number {
   const tuning = HEROIC_DUNGEON_TUNING.hollow_crypt;
   if (!tuning) return 1;

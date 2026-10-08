@@ -120,8 +120,9 @@ const M = MARROW_TUNING;
 const L = LADY_TUNING;
 const I = ILVANE_TUNING;
 const MT = MORTHEN_TUNING;
-/** The Knellwyrm carries no per-mob override: the crypt's own heroic factor. */
-const WYRM_HEROIC = HEROIC_DUNGEON_TUNING.hollow_crypt?.damageMultiplier ?? 0;
+/** The Knellwyrm carries no MECHANIC override: its kit rides its own boss
+ *  melee entry (the heroic pack budget moved the trash-wide factor off it). */
+const WYRM_HEROIC = HEROIC_DUNGEON_TUNING.hollow_crypt?.damageMultiplierByMob?.crypt_knellwyrm ?? 0;
 
 function input(over: Partial<CryptAlertInput>): CryptAlertInput {
   return { auras: [], targetId: null, entity: () => null, ...over };
@@ -643,11 +644,14 @@ describe('the crypt aura tooltips', () => {
       expect(mult).toBeGreaterThan(1);
       expect(cryptHeroicAmount(mob, 10)).toBe(Math.round(10 * (mult ?? 0)));
     }
-    // The Knellwyrm has no override of either kind: it rides the dungeon's factor.
+    // The Knellwyrm has no mechanic override: its kit rides its per-mob boss
+    // entry, held at the pre-retune 20 when the heroic pack budget lowered the
+    // trash-wide factor (it spawns with no add role, so without the entry it
+    // would have fallen to the trash value).
     const crypt = HEROIC_DUNGEON_TUNING.hollow_crypt;
     expect(crypt?.mechanicDamageMultiplierByMob?.[KNELLWYRM_ID]).toBeUndefined();
-    expect(crypt?.damageMultiplierByMob?.[KNELLWYRM_ID]).toBeUndefined();
-    expect(WYRM_HEROIC).toBeGreaterThan(1);
+    expect(crypt?.damageMultiplierByMob?.[KNELLWYRM_ID]).toBe(20);
+    expect(WYRM_HEROIC).toBe(20);
     expect(cryptHeroicFactor(KNELLWYRM_ID)).toBe(WYRM_HEROIC);
   });
 

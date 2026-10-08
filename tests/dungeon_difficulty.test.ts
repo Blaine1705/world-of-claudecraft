@@ -87,18 +87,18 @@ describe('heroic tuning data contract', () => {
     });
   });
 
-  it('pins the floor-calibrated heroic multipliers per dungeon', () => {
-    // Economy retune: the damageMultiplier per dungeon is set so the MINIMUM
-    // non-crit swing of the dungeon's weakest spawn-list mob lands at least
-    // 500 post-mitigation on the maximum-mitigation reference warrior at the
-    // level-22 pin, and health is DOUBLED versus the previous calibration
-    // (1.9/2.0/2.6/2.0/1.6 became 3.8/4.0/5.2/4.0/3.2). The ladder still
-    // inverts because harder dungeons carry bigger base weapon damage.
-    // Boss-summoned add waves floor well below the mob line (wave pressure,
-    // not extra bosses): the 2026-07 retune halved them to 250, and the v0.30
-    // pass cut another 40% to the 150 floor, so addDamageMultiplier sits far
-    // BELOW the trash value. Exact literals so an accidental retune reddens
-    // deliberately; the floors themselves are pinned by
+  it('pins the pack-budget heroic multipliers per dungeon', () => {
+    // The five-mans' damageMultiplier prices their TRASH per pull (the heroic
+    // pack budget, 2026-10-08: an average pull about 250 DTPS and the heaviest
+    // about 450 on the real-sim best-in-slot tank; it was the economy
+    // retune's per-mob 500 floor, 20/18/16.5/15.5/17.25). Bosses and solo
+    // minibosses no longer read it: each carries a damageMultiplierByMob entry
+    // at its pre-budget factor. Health stays DOUBLED versus the calibration
+    // before the economy retune (1.9/2.0/2.6/2.0/1.6 became
+    // 3.8/4.0/5.2/4.0/3.2). Boss-summoned add waves keep their own factor
+    // (the 2026-07 retune halved them to 250, the v0.30 pass cut another 40%
+    // to the 150 floor). Exact literals so an accidental retune reddens
+    // deliberately; the budget itself is pinned by
     // tests/heroic_difficulty_floors.test.ts.
     expect(
       Object.fromEntries(
@@ -110,11 +110,11 @@ describe('heroic tuning data contract', () => {
     ).toEqual({
       // The rework's summoned adds (Marrow's bones, Rimeweb's hatchlings) are
       // floored at 9.5 (tests/heroic_difficulty_floors.test.ts).
-      hollow_crypt: [3.8, 20, 9.5, 1.3],
-      sunken_bastion: [4.0, 18, 9.75, 1.3],
-      drowned_temple: [5.2, 16.5, 9.15, 1.25],
-      gravewyrm_sanctum: [4.0, 15.5, 8.55, 1.2],
-      wildheart_basin: [4.0, 17.25, 8.625, 1.2],
+      hollow_crypt: [3.8, 9, 9.5, 1.3],
+      sunken_bastion: [4.0, 6.9, 9.75, 1.3],
+      drowned_temple: [5.2, 6.4, 9.15, 1.25],
+      gravewyrm_sanctum: [4.0, 5.1, 8.55, 1.2],
+      wildheart_basin: [4.0, 7.5, 8.625, 1.2],
       // The raid multiplier is smaller in RELATIVE terms because normal
       // Nythraxis already lands the game's hardest hits; the heroic boss
       // floors at 1200 through the dungeon-wide value while the encounter
@@ -158,14 +158,14 @@ describe('mobTemplateForDungeonDifficulty', () => {
   it('produces an exact heroic transform without mutating the base template', () => {
     const before = JSON.stringify(SYNTHETIC);
     const heroic = mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'heroic');
-    // hollow_crypt tuning: health x3.8, damage x20, armor x1.3, level 22.
+    // hollow_crypt tuning: health x3.8, damage x9, armor x1.3, level 22.
     expect(heroic).not.toBe(SYNTHETIC);
     expect(heroic.minLevel).toBe(22);
     expect(heroic.maxLevel).toBe(22);
     expect(heroic.hpBase).toBeCloseTo(380, 10);
     expect(heroic.hpPerLevel).toBeCloseTo(38, 10);
-    expect(heroic.dmgBase).toBeCloseTo(400, 10);
-    expect(heroic.dmgPerLevel).toBeCloseTo(40, 10);
+    expect(heroic.dmgBase).toBeCloseTo(180, 10);
+    expect(heroic.dmgPerLevel).toBeCloseTo(18, 10);
     expect(heroic.armorPerLevel).toBeCloseTo(5.2, 10);
     // Every heroic mob is floored to the anti-kite speed (player RUN_SPEED is
     // 7); a template already at or above the floor keeps its own speed.
@@ -183,7 +183,7 @@ describe('mobTemplateForDungeonDifficulty', () => {
     const add = mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'heroic', {
       summonedAdd: true,
     });
-    // hollow_crypt addDamageMultiplier is 9.5 (Marrow's Restless Bones, Ilvane's Encore).
+    // hollow_crypt addDamageMultiplier is 9.5 (Marrow's Restless Bones).
     expect(add.dmgBase).toBeCloseTo(190, 10);
     expect(add.dmgPerLevel).toBeCloseTo(19, 10);
     // Health, armor, level, and the speed floor stay on the dungeon-wide tuning.

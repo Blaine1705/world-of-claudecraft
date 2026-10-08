@@ -25,18 +25,19 @@ export interface HeroicDungeonTuning {
   healthMultiplier: number;
   damageMultiplier: number;
   // Boss-SUMMONED add waves (MobTemplate.summonAdds, spawned through
-  // spawnBossAdds) use this damage multiplier instead of the dungeon-wide one.
-  // Summoned adds are NON-ELITE (no 1.5x elite swing multiplier), so hitting
-  // the same 500 per-swing floor as elite trash needs a LARGER multiplier
-  // here, not a softer one. Trash spawned from the dungeon spawn list
-  // (including the guards flanking a boss) stays on damageMultiplier.
+  // spawnBossAdds, and the kit adds spawned with the summoned-add role) use
+  // this damage multiplier instead of the dungeon-wide one. Summoned adds are
+  // NON-ELITE (no 1.5x elite swing multiplier), so the five-mans' 150 add
+  // floor is solved on the bare swing. Trash spawned from the dungeon spawn
+  // list (including the guards flanking a boss) stays on damageMultiplier.
   addDamageMultiplier: number;
   // Per-mob overrides, taking precedence over both multipliers above (and
-  // over mechanicDamageMult stamping). Used where one dungeon-wide value
-  // cannot hit each mob's floor without wild overshoot elsewhere: the Sanctum
-  // bosses (which must out-hit the retuned NORMAL Sanctum bosses) and the
-  // Nythraxis encounter-script adds (spawned with NO summonedAdd role, and
-  // spanning a 2x spread in base weapon damage).
+  // over mechanicDamageMult stamping). On the five-mans: every boss and solo
+  // miniboss (held at its own melee while damageMultiplier prices the trash
+  // pack budget; the Sanctum bosses must also out-hit the retuned NORMAL
+  // Sanctum bosses) and the trash templates whose base swing sits far off
+  // their roster's. On the raid: the Nythraxis encounter-script adds (spawned
+  // with NO summonedAdd role, and spanning a 2x spread in base weapon damage).
   damageMultiplierByMob?: Record<string, number>;
   // Optional per-mob overrides for encounter mechanics that must be decoupled
   // from melee after the level-22 transform.
@@ -57,30 +58,52 @@ export interface HeroicDungeonTuning {
 
 export type HeroicMobTuning = Omit<HeroicDungeonTuning, 'finalBossId' | 'marksPerParticipant'>;
 
-// Tuning model (economy retune, 2026-07): every heroic mob is pinned to LEVEL
-// 22 (two above the level-20 player cap). The calibration target is a FLOOR,
-// not an average: the minimum non-crit swing of EVERY heroic mob (spawn-list
-// trash, boss-summoned adds, and the Nythraxis encounter waves) lands at
-// least 500 post-mitigation on the maximum-mitigation reference warrior, a
-// level-20 prot in the max-armor kit (full heroic plate + shield, prot
-// mastery: 2861 armor) standing in Defensive Stance (takes 10% less), who
-// receives ~39.8% of a raw level-22 swing. Health is DOUBLED versus the
-// previous heroic calibration across the board. Solving the 500 floor at each
-// dungeon's WEAKEST spawn-list mob inverts the multiplier ladder (harder
-// dungeons carry bigger base weapon damage, so hollow_crypt needs the largest
-// multiplier and gravewyrm_sanctum the smallest); bosses ride the same
-// dungeon-wide multiplier and land their natural premium above trash.
-// Exceptions via damageMultiplierByMob: the three Sanctum bosses are lifted
-// so heroic Sanctum out-hits its retuned NORMAL mode (which floors bosses at
-// 600), and the Nythraxis raid boss instead rides its own calibration (see
-// the per-mob comment on nythraxis_boss_arena below) with its add waves held
-// to the 500 line per mob. Mechanic damage lands RAW (no armor step; see
-// aoePulse/stomp in ../mob/locomotion.ts) and scales with the mob's own
-// multiplier via mechanicDamageMult; support heals scale with
-// mechanicHealMult (= healthMultiplier); both wired in
-// ../instances/difficulty.ts. Gravebreaker (the raid boss frontal) derives
-// from boss.weapon, so it scales through the template transform on its own.
-// Floors are pinned by tests/heroic_difficulty_floors.test.ts.
+// Tuning model (heroic pack budget, 2026-10-08): every heroic mob is pinned
+// to LEVEL 22 (two above the level-20 player cap) on the economy retune's
+// DOUBLED health. Damage is priced per PULL. The five-mans' trash comes in
+// authored packs of three to six (DungeonSpawn.packId: aggroDungeonPackmates
+// pulls the whole pack), so the economy retune's per-mob floor (the minimum
+// non-crit swing of EVERY spawn-list mob at least 500 on the reference warrior
+// below) stacked into pulls of three to seven times one healer's sustained
+// output. The budget, a maintainer decision, is a
+// REAL-SIM number on the level-20 best-in-slot prot warrior (4,081 armor,
+// 3,312 health buffed, Defensive Stance; the pull threat-pinned around it in
+// melee, trash kits inert: the intake bench of scripts/healing_montecarlo.ts):
+// a dungeon's AVERAGE trash pull lands about 250 DTPS and its HEAVIEST about
+// 450 or less, the pull that wants a crowd control or a cooldown. One healer
+// sustains about 150 to 205 HPS on the same bench (burst 209 to 316).
+// Measured after this retune on the PR 4352 spawn lists (every trash pull, 4
+// runs of 90 s each, the p50 per pull), mean pull then heaviest pull: Hollow
+// Crypt 262 and 421 (five Carrion Crows), Sunken Bastion 252 and 356, Drowned
+// Temple 257 and 344, Wildheart Basin 245 and 417 (a stalker and four
+// raptors), Gravewyrm Sanctum 248 and 451 (two Scaleguards and four Rime
+// Whelps). The same bench read 561 to 775 mean and 904 to 1,411 heaviest on
+// the per-mob floor. A melee pull converts at about 0.6 to 0.75 of its
+// formula DTPS on the 2861 reference below (one mob alone about 0.55: a
+// surrounding pull is parried and blocked less), which is why the floor's
+// per-mob view undercounted packs.
+// The dungeon-wide damageMultiplier now carries the TRASH only. The trash
+// per-mob overrides (the softer casters, the non-elite crows, raptors and
+// whelps, once lifted onto the old floor on their own) kept their lift in
+// proportion, and the three templates that dominated a heavy pull (the
+// Carrion Crows, the basin raptors, the Rime Whelps) took a little more off.
+// Every boss and solo miniboss carries a damageMultiplierByMob entry at its
+// pre-budget factor, so its melee did not move, and boss-summoned adds keep
+// addDamageMultiplier. Mechanic damage lands RAW (no armor step; see
+// aoePulse/stomp in ../mob/locomotion.ts) and scales by mechanicDamageMult,
+// which a mob with no mechanic entry takes from its MELEE factor, so every
+// kit-carrying trash mob whose melee moved carries a
+// mechanicDamageMultiplierByMob entry at its old factor: its kit lands what it
+// did before. Support heals scale with mechanicHealMult (= healthMultiplier);
+// both wired in ../instances/difficulty.ts. The Nythraxis raid arena keeps its
+// own calibration (the per-mob comment on nythraxis_boss_arena below), and
+// Gravebreaker (its frontal) derives from boss.weapon, so it scales through
+// the template transform on its own. The formula image of the budget (pull
+// DTPS on the 2861 reference warrior, per dungeon) and the bosses' 500 line
+// are pinned by tests/heroic_difficulty_floors.test.ts.
+// Reference warrior: a level-20 prot in the max-armor kit (full heroic plate
+// and shield, prot mastery: 2861 armor) in Defensive Stance (takes 10% less),
+// who receives ~39.8% of a raw level-22 swing.
 // Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
 // PINNED constant, not a live measurement of the catalog. The committed
 // max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
@@ -521,21 +544,34 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 3.8,
-    damageMultiplier: 20,
-    // The rework's wing bosses summon adds (Sexton Marrow's Restless Bones
-    // from his Open Graves, Cantor Ilvane's Choristers risen by her heroic
-    // Encore): lifted onto the shared 150 summoned-add floor with the other
-    // heroics (tests/heroic_difficulty_floors.test.ts).
+    // The trash pack budget (the tuning model above): was 20, the 500 floor.
+    damageMultiplier: 9,
+    // Marrow's Restless Bones from his Open Graves, on the shared 150
+    // summoned-add floor with the other heroics
+    // (tests/heroic_difficulty_floors.test.ts).
     addDamageMultiplier: 9.5,
-    // Spawn-list trash below the 500 heroic mob floor on the shared factor is
-    // lifted onto it on its own: the lighter-swinging casters and cutthroat,
-    // and the NON-elite Carrion Crows (no 1.5x elite swing) of the flocks.
     damageMultiplierByMob: {
-      crypt_gravecaller_adept: 24,
-      crypt_gravecaller_necromancer: 24,
-      crypt_crow_caller: 24,
-      crypt_ossuary_cutthroat: 23,
-      crypt_carrion_crow: 66,
+      // The bosses keep their melee: the pre-budget dungeon-wide 20. The
+      // Knellwyrm Morthen's rite raises spawns with no add role, so it needs
+      // the entry too. Ilvane's two Choristers (and the ones her heroic
+      // Encore raises again, spawned as copies with no add role) are her
+      // trash-like adds: they ride the trash value above, which takes her
+      // opening pull from about 570 to about 360 on the budget's bench.
+      sexton_marrow: 20,
+      rimeweb: 20,
+      cantor_ilvane: 20,
+      morthen: 20,
+      crypt_knellwyrm: 20,
+      // The lighter casters and the cutthroat were lifted onto the old floor
+      // on their own (24, 24, 24, 23); they keep that lift in proportion. The
+      // NON-elite Carrion Crows (no 1.5x elite swing; 66 on the old floor)
+      // take a further tenth off: a flock of five is the dungeon's heaviest
+      // pull, and a Crow Caller's flock call adds more of the same mid-fight.
+      crypt_gravecaller_adept: 10.8,
+      crypt_gravecaller_necromancer: 10.8,
+      crypt_crow_caller: 10.8,
+      crypt_ossuary_cutthroat: 10.35,
+      crypt_carrion_crow: 26.7,
     },
     // The wing bosses' pools from target fight length x heroic party DPS
     // (about 230) on their level-22 templates: Sexton Marrow 70 s (about
@@ -563,7 +599,19 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // and a cave-in about 22; an unsheltered Lament about 27 (Lingering
     // Lament stacks half again), her drop about 66; Ilvane's completed Dirge
     // or a note lane about 70 (a fumbled core all but kills).
+    // The pack budget lowered the trash melee factors under every trash kit
+    // (a mob with no mechanic entry stamps its melee factor as
+    // mechanicDamageMult), so each kit-carrying trash mob keeps its
+    // pre-budget factor here and lands exactly what it did before.
     mechanicDamageMultiplierByMob: {
+      crypt_ossuary_warrior: 20,
+      crypt_gravecaller_adept: 24,
+      crypt_chapel_gargoyle: 20,
+      crypt_ossuary_cutthroat: 23,
+      crypt_ossuary_drake: 20,
+      bonechill_widow: 20,
+      crypt_crow_caller: 24,
+      crypt_carrion_crow: 66,
       crypt_gravecaller_necromancer: 12,
       sexton_marrow: 6,
       rimeweb: 5,
@@ -583,7 +631,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 4.0,
-    damageMultiplier: 18,
+    // The trash pack budget (the tuning model above): was 18, the 500 floor.
+    damageMultiplier: 6.9,
     // Vael's drowned_thrall summons are non-elite. v0.30: boss-summoned adds
     // hit 40% softer across every heroic five-man (the 250 floor drops to
     // 150); a tanked triple wave stacked on the boss was still overwhelming
@@ -599,17 +648,33 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       turretback_hermit: 7.3,
       gaol_turnkey: 5.84,
     },
-    // The light trash (the warhound, the ranged arbalest and the ward-casting
-    // mistweaver) carry softer templates; lift them to the 500 heroic floor.
     damageMultiplierByMob: {
-      bastion_warhound: 19.6,
-      fogbound_arbalest: 21.6,
-      mistweaver: 21.6,
+      // The bosses and the two solo minibosses keep their melee: the
+      // pre-budget dungeon-wide 18.
+      knight_commander_olen: 18,
+      gaoler_ossick: 18,
+      vael_the_mistcaller: 18,
+      turretback_hermit: 18,
+      gaol_turnkey: 18,
+      // The light trash (the warhound, the ranged arbalest and the
+      // ward-casting mistweaver) carry softer templates and were lifted onto
+      // the old floor on their own (19.6, 21.6, 21.6); they keep that lift
+      // in proportion.
+      bastion_warhound: 7.5,
+      fogbound_arbalest: 8.3,
+      mistweaver: 8.3,
     },
     // Avoidable mechanics priced apart from the tank-swing floor: a missed
     // trash dodge costs a cloth wearer about 40 percent (1,250 at level 20
     // heroic), a fumbled boss core is lethal, an unavoidable pulse 15 percent.
+    // The pack budget's melee cut leaves every trash kit where it was: the
+    // revenant's intercept and the mistweaver's kit keep their pre-budget
+    // factors. The Drowned Sergeant needs no entry: its one damage kit (Loose
+    // on My Mark) lands the ARBALESTS' bolts at their own x8, and an entry
+    // would also move Olen's summoned soldiers (the same template).
     mechanicDamageMultiplierByMob: {
+      bastion_revenant: 18,
+      mistweaver: 21.6,
       drowned_watchman: 8,
       fogbound_arbalest: 8,
       barnacle_crawler: 8,
@@ -633,7 +698,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 5.2,
-    damageMultiplier: 16.5,
+    // The trash pack budget (the tuning model above): was 16.5, the 500 floor.
+    damageMultiplier: 6.4,
     // Ysolei's moonspawn summons are non-elite; 40% add nerf (v0.30), the
     // summoned floor drops from 250 to 150.
     addDamageMultiplier: 9.15,
@@ -649,16 +715,35 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       mere_hydra_head_center: 2.4,
       mere_hydra_head_right: 2.4,
     },
-    // The fodder pilgrims and the ranged siren carry softer templates; lift
-    // them to the 500 heroic floor.
     damageMultiplierByMob: {
-      drowned_pilgrim: 27,
-      moonlit_siren: 17.5,
+      // The bosses keep their melee: the pre-budget dungeon-wide 16.5, the
+      // Mere Hydra's three heads included (all three can reach a tank who
+      // holds the pool's front: each Snap reaches 8 yd).
+      choirmother_selthe: 16.5,
+      mere_hydra_head_left: 16.5,
+      mere_hydra_head_center: 16.5,
+      mere_hydra_head_right: 16.5,
+      tideglass_colossus: 16.5,
+      ysolei: 16.5,
+      // The fodder pilgrims and the ranged siren carry softer templates and
+      // were lifted onto the old floor on their own (27, 17.5); they keep
+      // that lift in proportion.
+      drowned_pilgrim: 10.5,
+      moonlit_siren: 6.8,
     },
     // Avoidable mechanics priced apart from the tank-swing floor: a missed
     // trash dodge costs a cloth wearer about 40 percent (1,250 at level 20
     // heroic), a fumbled boss core is lethal, an unavoidable pulse 15 percent.
+    // The pack budget's melee cut leaves the trash kits where they were: the
+    // acolyte and the siren keep their pre-budget factors. The Moonmantle
+    // Ray (pearlguard_sentinel) is the one deliberate move: it had NO entry,
+    // so its Pearl Slam (Tidal Wingbeat, 7 yd around it) rode its x16.5 melee
+    // lift (825 to 990, 66 to 79 percent of heroic cloth) while every sibling
+    // trash kit sits on x5.5; it joins them (275 to 330).
     mechanicDamageMultiplierByMob: {
+      pale_choir_acolyte: 16.5,
+      moonlit_siren: 17.5,
+      pearlguard_sentinel: 5.5,
       drowned_templeguard: 5.5,
       lagoon_snapper: 5.5,
       lagoon_eel: 5.5,
@@ -680,7 +765,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 4.0,
-    damageMultiplier: 15.5,
+    // The trash pack budget (the tuning model above): was 15.5, the 500 floor.
+    damageMultiplier: 5.1,
     // Velkhar's raised_bonewalker summons are non-elite; 40% add nerf
     // (v0.30), the summoned floor drops from 250 to 150.
     addDamageMultiplier: 8.55,
@@ -705,15 +791,22 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       korgath_the_bound: 19,
       grand_necromancer_velkhar: 19,
       korzul_the_gravewyrm: 19,
-      // The lighter-swinging cultists and the NON-elite Rime Whelps are lifted
-      // onto the 500 floor on their own.
-      broodsworn_thawcaller: 16.6,
-      broodsworn_pyre_tender: 16.6,
-      rime_whelp: 30.5,
+      // The solo miniboss keeps its melee: the pre-budget dungeon-wide 15.5.
+      sledge_tusker: 15.5,
+      // The lighter-swinging cultists and the NON-elite Rime Whelps were
+      // lifted onto the old floor on their own (16.6, 16.6, 30.5); they keep
+      // that lift in proportion, and the whelps take a further eighth off:
+      // they come in fours, and every one of the dungeon's four heaviest
+      // pulls is a whelp clutch.
+      broodsworn_thawcaller: 5.5,
+      broodsworn_pyre_tender: 5.5,
+      rime_whelp: 8.8,
     },
     // Avoidable mechanics priced apart from the tank-swing floor: a missed
     // trash dodge costs a heroic cloth wearer about 40 percent, the Tusker's
-    // avoidables about 45 percent (the five-man heroic convention).
+    // avoidables about 45 percent (the five-man heroic convention). The pack
+    // budget's melee cut moves no Sanctum kit: every kit-carrying trash mob
+    // already has its entry here (the boneguard carries no kit).
     mechanicDamageMultiplierByMob: {
       sanctum_drakonid: 3,
       broodsworn_thawcaller: 3,
@@ -744,13 +837,12 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 4.0,
-    // Solved at the basin's weakest spawn-list mob (wildheart_hexcaller,
-    // 455 post-mitigation at 15.5x): the open-field roster sits between
-    // Orkadia's casters and the Sanctum band.
-    damageMultiplier: 17.25,
+    // The trash pack budget (the tuning model above): was 17.25, the old
+    // 500 floor solved at the basin's weakest spawn-list mob.
+    damageMultiplier: 7.5,
     // The kit adds (the Sunbone Totems, the Howdah Hexcaller, the Gorgebloom's
     // Thorn Sprouts) ride the trash kit's spawner, never summonAdds; kept at
-    // the half convention.
+    // the half convention (half the pre-budget 17.25).
     addDamageMultiplier: 8.625,
     // The rework's pools from target fight length x heroic party DPS (about
     // 230): the Saurian 65 s, the Beastmaster and his jaguar 100 s on one
@@ -762,15 +854,31 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       the_gorgebloom: 12.05,
       wildheart_high_priest: 9.98,
     },
-    // The non-elite raptors are lifted onto the 500 floor on their own.
     damageMultiplierByMob: {
-      basin_raptor: 30.5,
+      // The bosses, the Beastmaster's jaguar and the solo Great Saurian keep
+      // their melee: the pre-budget dungeon-wide 17.25. The Beastmaster and
+      // his jaguar measured about 445 together on the budget's bench, inside
+      // the heaviest-pull line, so the jaguar is not cut.
+      wildheart_beastmaster: 17.25,
+      fanglord_jaguar: 17.25,
+      the_gorgebloom: 17.25,
+      wildheart_high_priest: 17.25,
+      great_saurian: 17.25,
+      // The NON-elite raptors were lifted onto the old floor on their own
+      // (30.5); they keep that lift in proportion less a further seventh: a
+      // stalker and four raptors is the heaviest pull, twice over.
+      basin_raptor: 11.4,
     },
     // Avoidable mechanics priced apart from the tank-swing floor: a missed
     // trash dodge costs a heroic cloth wearer about 40 percent, the Saurian's
     // and the three bosses' avoidables about 45 percent (the five-man heroic
     // convention): their mechanics are stated landed on normal, so 2.5x here.
+    // The pack budget's melee cut leaves the trash kits where they were: the
+    // stalker, ravager and hexcaller kits keep their pre-budget factor.
     mechanicDamageMultiplierByMob: {
+      wildheart_stalker: 17.25,
+      wildheart_ravager: 17.25,
+      wildheart_hexcaller: 17.25,
       sunbone_totem_binder: 3,
       sunbone_totem: 3,
       sunbone_dread_totem: 3,

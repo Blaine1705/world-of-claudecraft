@@ -489,7 +489,8 @@ describe('a really claimed normal instance spawns the retuned roster', () => {
 describe('heroic Wildheart Basin keeps its own shipped calibration', () => {
   it('pins the heroic transform literals, untouched by the normal retune', () => {
     // Base template x heroic tuning (health 4.0, Zulgar's own pool 9.98 from the
-    // rework, damage 17.25, armor 1.2, level 22). If the normal retune had been
+    // rework, armor 1.2, level 22; damage 17.25 on Zulgar's own boss entry and
+    // 7.5 on the trash, the heroic pack budget). If the normal retune had been
     // implemented by editing base templates instead of adding a tuning record,
     // these would redden.
     const heroic = mobTemplateForDungeonDifficulty(MOBS.wildheart_high_priest, BASIN, 'heroic');
@@ -502,7 +503,7 @@ describe('heroic Wildheart Basin keeps its own shipped calibration', () => {
     expect(heroic.moveSpeed).toBe(8);
 
     const trash = mobTemplateForDungeonDifficulty(MOBS.wildheart_hexcaller, BASIN, 'heroic');
-    expect(trash.dmgBase).toBeCloseTo(189.75, 10);
+    expect(trash.dmgBase).toBeCloseTo(82.5, 10);
     expect(trash.hpBase).toBeCloseTo(240, 10);
   });
 

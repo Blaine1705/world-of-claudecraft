@@ -289,10 +289,10 @@ describe('normal Gravewyrm Sanctum mechanic scaling', () => {
 
 describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () => {
   // Deliberate heroic literals: base template x heroic tuning (health 4.0,
-  // trash damage 15.5, bosses 19 via damageMultiplierByMob, adds 8.55, armor
-  // 1.2, level 22; see tests/heroic_difficulty_floors.test.ts for the
-  // floors). If a base template is edited instead of a tuning table, these
-  // redden.
+  // trash damage 5.1 since the heroic pack budget, bosses 19 via
+  // damageMultiplierByMob, adds 8.55, armor 1.2, level 22; see
+  // tests/heroic_difficulty_floors.test.ts for the budget). If a base
+  // template is edited instead of a tuning table, these redden.
   const HEROIC_PINS: Record<
     string,
     {
@@ -304,15 +304,15 @@ describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () =
     }
   > = {
     sanctum_boneguard: {
-      dmgBase: 186,
-      dmgPerLevel: 41.85,
+      dmgBase: 61.2,
+      dmgPerLevel: 13.77,
       hpBase: 256,
       hpPerLevel: 92,
       armorPerLevel: 26.4,
     },
     sanctum_drakonid: {
-      dmgBase: 201.5,
-      dmgPerLevel: 43.4,
+      dmgBase: 66.3,
+      dmgPerLevel: 14.28,
       hpBase: 272,
       hpPerLevel: 96,
       armorPerLevel: 31.2,
