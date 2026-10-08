@@ -27,7 +27,7 @@ import {
   weeklyLootSpecForClass,
 } from './weekly_loot_spec';
 import { weeklyChoiceExhausted } from './weekly_reward_availability';
-import { weeklyRewardFitsClass } from './weekly_reward_eligibility';
+import { weeklyRewardFitsClass, weeklyRewardKindAllowed } from './weekly_reward_eligibility';
 import { weeklyTableSource } from './weekly_reward_options';
 import {
   historicalWeeklyBossUnlocks,
@@ -190,7 +190,7 @@ export function sanitizeWeeklyRewards(
         const item = ITEMS[choice.itemId];
         if (
           item &&
-          ['weapon', 'armor', 'held_offhand'].includes(item.kind) &&
+          weeklyRewardKindAllowed(item) &&
           (item.quality === 'uncommon' || item.quality === 'rare' || item.quality === 'epic')
         )
           choices.push({
@@ -432,7 +432,7 @@ function collectInstanceLoot(
   }
 }
 // Exact catalog shared by preview and claim. Each eligible item is equally likely;
-// class locks are respected, chase legendaries and non-equipment are excluded.
+// Class locks are respected; only equipment and authored redemption sigils qualify.
 export function weeklyLootPool(
   pool: WeeklyPoolId,
   playerClass: PlayerClass,
@@ -470,7 +470,7 @@ export function weeklyLootPool(
       const item = ITEMS[id];
       return (
         item &&
-        (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'held_offhand') &&
+        weeklyRewardKindAllowed(item) &&
         (item.quality === 'rare' || item.quality === 'epic') &&
         weeklyRewardFitsClass(playerClass, item) &&
         weeklyLootSpecFitsItem(playerClass, lootSpec, item)

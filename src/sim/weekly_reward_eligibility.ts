@@ -1,6 +1,17 @@
+import { IGNIVAR_SIGIL_ITEMS } from './content/ignivar_loot';
 import { canEquipItem } from './equipment_rules';
 import { trinketLootFitsClass } from './trinket_loot_eligibility';
 import type { ItemDef, PlayerClass } from './types';
+
+/** Only equipment and authored raid redemption sigils may enter or survive a Vault. */
+export function weeklyRewardKindAllowed(item: ItemDef): boolean {
+  return (
+    item.kind === 'weapon' ||
+    item.kind === 'armor' ||
+    item.kind === 'held_offhand' ||
+    (item.kind === 'tool' && Object.hasOwn(IGNIVAR_SIGIL_ITEMS, item.id))
+  );
+}
 
 /** Class and stat restrictions shared by vault catalogs and new authoritative rolls. */
 export function weeklyRewardFitsClass(cls: PlayerClass, item: ItemDef): boolean {
