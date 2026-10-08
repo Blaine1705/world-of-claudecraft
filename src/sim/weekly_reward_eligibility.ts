@@ -2,8 +2,24 @@ import { IGNIVAR_SIGIL_ITEMS } from './content/ignivar_loot';
 import { canEquipItem } from './equipment_rules';
 import { trinketLootFitsClass } from './trinket_loot_eligibility';
 import type { ItemDef, PlayerClass } from './types';
+import type { WeeklyPoolId } from './weekly_rewards';
 
-/** Only equipment and authored raid redemption sigils may enter or survive a Vault. */
+/** Shared pool/save policy: equipment, authored sigils, and raid-only Crucible cores. */
+export function weeklyRewardItemAllowed(
+  item: ItemDef,
+  pool: WeeklyPoolId,
+  allowUncommon = true,
+): boolean {
+  if (item.id === 'lastflame_core') return pool === 'raid' || pool === 'raid_heroic';
+  return (
+    weeklyRewardKindAllowed(item) &&
+    (item.quality === 'rare' ||
+      item.quality === 'epic' ||
+      (allowUncommon && item.quality === 'uncommon'))
+  );
+}
+
+/** Equipment and exact authored sigils; the core exception also needs a raid pool. */
 export function weeklyRewardKindAllowed(item: ItemDef): boolean {
   return (
     item.kind === 'weapon' ||

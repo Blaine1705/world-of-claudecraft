@@ -337,10 +337,9 @@ describe('weekly vault choices', () => {
           // test above proves that exhausting this shelf still permits a claim.
           // Warlocks exclude Healing Power gear, leaving fewer heroic raid items;
           // the regression below pins a successful claim after that pool exhausts.
-          // Rogues' Varkhul heroic shelf is the two Crucible trinkets (PR 4173,
-          // the trinket slot), both also on the Normal shelf, so the Varkhul-only
-          // heroic unlock beside three Normal clears cannot cover the overlap
-          // either; the same exhaustion regression covers it.
+          // Rogues share their two Crucible trinkets, core, helmet and leg sigils
+          // between difficulties. Only the chest sigil is Heroic-only, so the
+          // same exhaustion regression covers the overlap between these shelves.
           expect(pool.ids.length, `${cls} ${unlocks} ${pool.pool}`).toBeGreaterThanOrEqual(
             (cls === 'warlock' || cls === 'rogue') && pool.pool === 'raid_heroic'
               ? 1
@@ -353,8 +352,8 @@ describe('weekly vault choices', () => {
   });
 
   it('can claim a Rogue heroic raid reward after class filtering exhausts another slot', () => {
-    // Varkhul offers Rogues two trinkets plus three Tempest sigils. A synthetic
-    // six-choice ledger exercises exhaustion after all five unique items roll.
+    // Varkhul offers Rogues two trinkets, three Tempest sigils and the core. A
+    // synthetic seven-choice ledger exhausts all six unique rewards.
     // This tests claim recovery, not the separate activity-slot earning limits.
     const { sim, pid, meta } = make(42, true, 'rogue');
     const state = emptyWeeklyRewards(WEEK);
@@ -363,7 +362,7 @@ describe('weekly vault choices', () => {
       {
         resetAtMs: 1000,
         bossUnlocks: { ...state.bossUnlocks },
-        choices: Array.from({ length: 6 }, () => ({ pool: 'raid_heroic' as const })),
+        choices: Array.from({ length: 7 }, () => ({ pool: 'raid_heroic' as const })),
       },
     ];
     meta.weeklyRewards = state;
@@ -372,18 +371,19 @@ describe('weekly vault choices', () => {
     const itemId = batch.choices[0].itemId;
     expect(itemId).toBeDefined();
     if (!itemId) throw new Error('Missing filtered Rogue reward');
-    for (let i = 1; i < 6; i++) openSelected(sim, `1000:${i}`, pid);
-    expect(new Set(batch.choices.slice(0, 5).map((choice) => choice.itemId))).toEqual(
+    for (let i = 1; i < 7; i++) openSelected(sim, `1000:${i}`, pid);
+    expect(new Set(batch.choices.slice(0, 6).map((choice) => choice.itemId))).toEqual(
       new Set([
         'forgefathers_temper',
         'heart_of_the_crucible',
         'sigil_tempest_helmet',
         'sigil_tempest_legs',
         'sigil_tempest_chest',
+        'lastflame_core',
       ]),
     );
-    expect(batch.choices[5].itemId).toBeUndefined();
-    expect(weeklyChoiceExhausted(batch, batch.choices[5], 'rogue', 20)).toBe(true);
+    expect(batch.choices[6].itemId).toBeUndefined();
+    expect(weeklyChoiceExhausted(batch, batch.choices[6], 'rogue', 20)).toBe(true);
     const before = sim.ctx.countItem(itemId, pid);
     sim.claimWeeklyReward('1000:0', pid);
     expect(state.vaults).toHaveLength(0);

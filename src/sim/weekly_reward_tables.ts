@@ -8,7 +8,7 @@ import { heroicLootItemId } from './loot/heroic_item';
 import type { PlayerMeta } from './sim';
 import type { PlayerClass } from './types';
 import { weeklyLootSpecFitsItem } from './weekly_loot_spec';
-import { weeklyRewardFitsClass, weeklyRewardKindAllowed } from './weekly_reward_eligibility';
+import { weeklyRewardFitsClass, weeklyRewardItemAllowed } from './weekly_reward_eligibility';
 import type { WeeklyChoice, WeeklyPoolId, WeeklyVaultBatch } from './weekly_rewards';
 
 /** Highest recorded clear: 1 normal, 2 heroic (also unlocks normal loot). */
@@ -102,8 +102,7 @@ export function weeklyBossLootPool(
       const item = ITEMS[id];
       return (
         item &&
-        weeklyRewardKindAllowed(item) &&
-        (item.quality === 'uncommon' || item.quality === 'rare' || item.quality === 'epic') &&
+        weeklyRewardItemAllowed(item, pool) &&
         weeklyRewardFitsClass(cls, item) &&
         weeklyLootSpecFitsItem(cls, lootSpec, item)
       );
