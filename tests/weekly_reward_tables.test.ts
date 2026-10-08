@@ -28,6 +28,18 @@ import {
   weeklyRewardInfoFor,
 } from '../src/sim/weekly_rewards';
 
+const SIGIL_GROUP_BY_CLASS = {
+  warrior: 'anvil',
+  druid: 'anvil',
+  mage: 'anvil',
+  paladin: 'ember',
+  hunter: 'ember',
+  priest: 'ember',
+  shaman: 'tempest',
+  rogue: 'tempest',
+  warlock: 'tempest',
+} as const;
+
 function setup() {
   const sim = new Sim({
     seed: 42,
@@ -63,15 +75,18 @@ function setup() {
 
 describe('weekly boss-table eligibility', () => {
   it.each(ALL_CLASSES)(
-    'offers one Crucible core per boss table at either difficulty for %s',
+    'offers the Crucible core and class-matched sigils per boss table for %s',
     (cls) => {
       for (const pool of ['raid', 'raid_heroic'] as const) {
         for (const bossId of [IGNIVAR_BOSS_ID, VARKHUL_BOSS_ID]) {
           const items = weeklyBossLootPool(bossId, pool, cls);
+          const group = SIGIL_GROUP_BY_CLASS[cls];
+          const slots = bossId === IGNIVAR_BOSS_ID ? ['shoulder', 'gloves'] : ['helmet', 'legs'];
+          if (pool === 'raid_heroic') slots.push('chest');
           expect(items.filter((id) => id === 'lastflame_core')).toHaveLength(1);
           expect(
             items.filter((id) => !['weapon', 'armor', 'held_offhand'].includes(ITEMS[id].kind)),
-          ).toEqual(['lastflame_core']);
+          ).toEqual(['lastflame_core', ...slots.map((slot) => `sigil_${group}_${slot}`)].sort());
         }
         expect(weeklyLootPool(pool, cls)).toContain('lastflame_core');
       }
