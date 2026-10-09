@@ -269,8 +269,6 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
       cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
     }
-    // multiplier, not a speed, so the constant is what rides the max.
-    if (a.kind === 'form_cat') speed = Math.max(speed, CAT_FORM_MOVE_MULT);
     // Groveheart's Sporemender Form walks 20% slower. A form penalty, not a
     // snare: slow immunity never lifts it, and it scales the final speed so a
     // Loping Stride burst or a slow still applies on top of the slower pace.

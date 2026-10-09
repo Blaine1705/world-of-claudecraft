@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4079,
-    "harvestedFiles": 3948,
+    "files": 4821,
+    "harvestedFiles": 4690,
     "carried": {
       "tests/action_bar_spectate.test.ts": {
         "ms": 14,
@@ -6044,11 +6044,8 @@
   "tests/zone_transition.test.ts": 5,
   "tests/zone_warm_tracker.test.ts": 26,
   "tests/zones_command.test.ts": 2999,
-  "tests/character_effect_prewarm.test.ts": 18,
   "tests/druid_sporemender.test.ts": 2123,
   "tests/form_visual_slots_core.test.ts": 12,
   "tests/self_spirit_prewarm.test.ts": 29,
-  "tests/self_spirit_warm.test.ts": 13,
-  "tests/soul_rend_overlay.test.ts": 8,
-  "tests/soul_rend_prewarm_core.test.ts": 8
+  "tests/self_spirit_warm.test.ts": 13
 }
