@@ -14676,7 +14676,7 @@ export const cs_CZ: EnTranslations = {
       },
       "overbloom": {
         "name": "Překvět",
-        "description": "Spotřebuje 3 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ.",
+        "description": "Spotřebuje 3 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Sporemending.",
         "specNote_0": "S",
         "specNote_1": "p",
         "specNote_2": "e",

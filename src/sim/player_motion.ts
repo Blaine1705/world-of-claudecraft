@@ -246,7 +246,7 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   let slow = 1,
     speed = 1,
     cargo = 1,
-    formPassive = 1;
+    formPassive = 1,
     formPace = 1;
   const slowImmune =
     isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
@@ -287,8 +287,7 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
-  return slow * speed * cargo;
-  return slow * speed * formPace;
+  return slow * speed * cargo * formPace;
 }
 
 // Fiesta "Moon Boots" power-up: a buff_jump aura multiplies jump height.

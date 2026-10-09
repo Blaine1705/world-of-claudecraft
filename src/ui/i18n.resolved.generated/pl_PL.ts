@@ -14676,7 +14676,7 @@ export const pl_PL: EnTranslations = {
       },
       "overbloom": {
         "name": "Nadrozkwit",
-        "description": "Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu.",
+        "description": "Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Sporemending na celu.",
         "specNote_0": "S",
         "specNote_1": "p",
         "specNote_2": "e",

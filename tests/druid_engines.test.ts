@@ -439,8 +439,7 @@ describe('Groveheart engine', () => {
     expect(player.auras.some((aura) => aura.id === VERDANCE_ID)).toBe(false);
   });
 
-  it('grows Verdance when Wildbloom refreshes an existing owned HoT', () => {
-  it('does not grow Verdance when Sporemending refreshes an existing owned HoT', () => {
+  it('grows Verdance when Sporemending refreshes an existing owned HoT', () => {
     const { sim, player } = rig('restoration');
     sim.castAbility('rejuvenation');
     expect(stacks(player, VERDANCE_ID)).toBe(1);
