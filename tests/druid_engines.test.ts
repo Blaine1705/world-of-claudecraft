@@ -405,7 +405,7 @@ describe('Wildfang engine', () => {
 });
 
 describe('Groveheart engine', () => {
-  it('counts planted HoTs and Overbloom harvests then replants Wildbloom', () => {
+  it('counts planted HoTs and Overbloom harvests then replants Sporemending', () => {
     const { sim, player } = rig('restoration');
     expect(VERDANCE_STAGES).toBe(3);
     for (let cast = 0; cast < 5; cast++) {
@@ -440,6 +440,7 @@ describe('Groveheart engine', () => {
   });
 
   it('grows Verdance when Wildbloom refreshes an existing owned HoT', () => {
+  it('does not grow Verdance when Sporemending refreshes an existing owned HoT', () => {
     const { sim, player } = rig('restoration');
     sim.castAbility('rejuvenation');
     expect(stacks(player, VERDANCE_ID)).toBe(1);
@@ -597,7 +598,7 @@ describe('Groveheart engine', () => {
     const { sim, player } = rig('restoration');
     const selfHot = (): Aura => ({
       id: 'rejuvenation',
-      name: 'Wildbloom',
+      name: 'Sporemending',
       kind: 'hot',
       remaining: 12,
       duration: 15,

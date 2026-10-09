@@ -4039,6 +4039,7 @@ export const tr_TR: EnTranslations = {
       "moontide": "Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar",
       "oldBlood": "Kadim Kan: aşama {stacks} / {max}. İsabet eden Kedi ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür",
       "verdance": "Yeşillik: aşama {stacks} / {max}. Kullandığın her Yaban Çiçeği, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Uygun bir sonraki infaz yeteneğin hiçbir şeye mal olmaz",
       "resourceSap": "Her {interval} sn'de mevcut kaynağının {value} kadarını geri kazandırır",
       "nextAttackCrit": "Bir sonraki saldırın garanti kritik vurur",
@@ -4140,6 +4141,7 @@ export const tr_TR: EnTranslations = {
       "formTravel": "Fleet Formu: hareket hızı {pct}% artar",
       "formFireball": "Kor Formu: hareket hızı {pct}% artırıldı; saldırılar ve büyüler devre dışı",
       "formMoonkin": "Aykuşu Formu: büyü hasarı {pct}% ve zırh {armorPct}% artar",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Gölgeperde Formu: Gölge hasarı {pct}% artar",
       "resourceCount": "{value} / {max}",
       "formLich": "Ruh Mızrağı ayrıca yakındaki en fazla {targets} düşmana {pct}% hasarla vurur",
@@ -7839,13 +7841,15 @@ export const tr_TR: EnTranslations = {
       "formLine": {
         "form_bear": "Tank şekli: ağır bir post, mana yerine öfke ve düşmanların sana vurmaya devam etmesini sağlayan ekstra tehdit.",
         "form_cat": "Yakın dövüş hasarı şekli: bir hırsız gibi enerji ve kombo puanları, ve çok daha az tehdit.",
-        "form_travel": "Yolculuk şekli: yerde çok daha hızlı, ama şekilden çıkana kadar başka bir yeteneğin yok."
+        "form_travel": "Yolculuk şekli: yerde çok daha hızlı, ama şekilden çıkana kadar başka bir yeteneğin yok.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Elementali yanına çağıran ve onu hedefine yönlendiren bir Ayaz büyüsü.",
       "formName": {
         "form_bear": "Bruin Formu",
         "form_cat": "Kedi Formu",
-        "form_travel": "Fleet Formu"
+        "form_travel": "Fleet Formu",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const tr_TR: EnTranslations = {
       "formBear": "Bruin Formu",
       "formCat": "Kedi Formu",
       "formTravel": "Fleet Formu",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Yaratıklar",
       "groupPets": "Karabüyücü İblisleri",
       "pickerLabel": "Görüntülenecek bir model seç",
@@ -13996,7 +14001,7 @@ export const tr_TR: EnTranslations = {
         "description": "Yalnızca Aykuşu Formunda. {damage} Gizem hasarı vurur, bir Ay Gelgiti aşaması ekler ve Ay Fırtınanı 6 sn uzatır, uygulama başına en fazla {duration} sn. Ay Gelgiti doluyken Ay Tohumu, Ay Kabarışına dönüşür."
       },
       "rejuvenation": {
-        "name": "Yaban Çiçeği",
+        "name": "Sporemending",
         "description": "Hedefi 12 sn boyunca {damage} iyileştirir.",
         "specNote_restoration": "Her kullanım 1 Yeşillik ekler (en fazla 3); zaten etkide olan bir çiçeği yenilemek de buna dahildir. 3 Yeşillikte, Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür."
       },
@@ -14323,6 +14328,7 @@ export const tr_TR: EnTranslations = {
       "swiftmend": {
         "name": "Hızlı İyileştirme",
         "description": "Dost bir hedefteki zamana yayılı bir iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. Yaban Çiçeği, İkinci Çiçeklenme ve Yaban Şifası'nın her kullanımı 1 Yeşillik ekler; 3 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılı iyileştirme etkilerini taşıyan her müttefiki, o etkilerin kalanının %60'ı kadar anında iyileştirir. (Groveheart motoru)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Ay Kabarışı",
@@ -14348,9 +14354,14 @@ export const tr_TR: EnTranslations = {
         "name": "Koru Uyanışı",
         "description": "Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Koru Yüreği)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Taşkın Çiçeklenme",
         "description": "3 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Yaban Çiçeği eker."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Emberkin Çağırma",
@@ -24144,7 +24155,7 @@ export const tr_TR: EnTranslations = {
       },
       "grovespring": {
         "name": "Koruluk Pınarı Giysisi",
-        "bonus2": "Çabuk İyileştirme önce kendi Yaban Çiçeğini veya İkinci Çiçeklenmeni tüketir ve %25 daha fazla iyileştirir. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Aşırı Çiçeklenme kalan etkilerinin %75'ini hasat eder ve ardından 1 Yeşerme depolar."
       },
       "hexthread": {

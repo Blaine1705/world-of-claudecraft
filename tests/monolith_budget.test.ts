@@ -1041,6 +1041,11 @@ const MONOLITHS: MonolithRow[] = [
     // the release batch's spirit-veil and Spell Effects extractions remain.
     // Exact count measured with wc -l on the resolved tree. Zero slack.
     ceiling: 12620,
+    // gained its assets line). Exact count. LOWERED 12789 -> 12786 when the
+    // Sporemender Form rig slot landed: the per-slot shadow, far, proxy-shadow,
+    // dispose and active-rig lines moved into
+    // src/render/characters/form_visual_slots_core.ts. Exact count.
+    ceiling: 12786,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

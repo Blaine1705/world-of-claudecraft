@@ -4039,6 +4039,7 @@ export const en_CA: EnTranslations = {
       "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
       "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form",
       "verdance": "Verdance {stacks}/{max}. Each Wildbloom, Second Bloom, or Wildmend you cast adds 1, and each one shortens Wildmend's cast. At {max}, Fleetmend becomes Overbloom",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Your next eligible execute ability costs nothing",
       "resourceSap": "Restores {value} of your current resource every {interval} sec",
       "nextAttackCrit": "Your next attack is guaranteed to critically strike",
@@ -4140,6 +4141,7 @@ export const en_CA: EnTranslations = {
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
       "resourceCount": "{value} of {max}",
       "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
@@ -7834,18 +7836,20 @@ export const en_CA: EnTranslations = {
       "formsHeading": "Shapeshifting",
       "formsNote": "A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.",
       "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
-      "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.",
+      "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. Like the Groveheart Sporemender Form, it keeps your spells, and your wand works only in those two shapes or your normal caster form.",
       "formsWolfEngage": "A Cat opens a fight with Bruin Rush, shifts straight into Cat Form to Pin the target, closes the gap with Lunge when it is not stalking, and holds an enemy still with Takedown.",
       "formLine": {
         "form_bear": "The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.",
         "form_cat": "The melee damage shape: energy and combo points, like a rogue, and much less threat.",
-        "form_travel": "The travelling shape: far quicker across the ground, but no other abilities until you shift out."
+        "form_travel": "The travelling shape: far quicker across the ground, but no other abilities until you shift out.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "A Frost spell that calls the elemental to your side and sets it on your target.",
       "formName": {
         "form_bear": "Bruin Form",
         "form_cat": "Cat Form",
-        "form_travel": "Fleet Form"
+        "form_travel": "Fleet Form",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const en_CA: EnTranslations = {
       "formBear": "Bruin Form",
       "formCat": "Cat Form",
       "formTravel": "Fleet Form",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Creatures",
       "groupPets": "Warlock Demons",
       "pickerLabel": "Choose a model to view",
@@ -13996,7 +14001,7 @@ export const en_CA: EnTranslations = {
         "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3."
       },
       "rejuvenation": {
-        "name": "Wildbloom",
+        "name": "Sporemending",
         "description": "Heals the target for {damage} over 12 sec.",
         "specNote_restoration": "Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom."
       },
@@ -14323,6 +14328,7 @@ export const en_CA: EnTranslations = {
       "swiftmend": {
         "name": "Fleetmend",
         "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Moonsurge",
@@ -14348,9 +14354,14 @@ export const en_CA: EnTranslations = {
         "name": "Grove Awakening",
         "description": "Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Overbloom",
         "description": "Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Summon Emberkin",
@@ -24144,7 +24155,7 @@ export const en_CA: EnTranslations = {
       },
       "grovespring": {
         "name": "Grovespring Raiment",
-        "bonus2": "Fleetmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
       },
       "hexthread": {

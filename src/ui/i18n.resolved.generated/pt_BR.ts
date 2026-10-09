@@ -4039,6 +4039,7 @@ export const pt_BR: EnTranslations = {
       "moontide": "Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta",
       "oldBlood": "Sangue Antigo: estágio {stacks} de {max}. Golpes conectados de Gato e Bruin compartilham este banco; com {max}, Mordida Sanguinária ou Esmaga-Ossos se transforma",
       "verdance": "Verdor {stacks}/{max}. Cada Florescer Selvagem, Segundo Florescer ou Cura Selvagem que você lançar adiciona 1, e cada ponto encurta o lançamento de Cura Selvagem. Com {max}, Recuperação Rápida vira Superflorescência",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Sua próxima habilidade de execução elegível não custa nada",
       "resourceSap": "Restaura {value} do seu recurso atual a cada {interval} s",
       "nextAttackCrit": "Seu próximo ataque é garantidamente um acerto crítico",
@@ -4140,6 +4141,7 @@ export const pt_BR: EnTranslations = {
       "formTravel": "Forma de Fleet: velocidade de movimento aumentada em {pct}%",
       "formFireball": "Forma de Brasa: velocidade de movimento aumentada em {pct}%; ataques e feitiços desativados",
       "formMoonkin": "Forma de Luniscante: dano de feitiço aumentado em {pct}% e armadura aumentada em {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Forma de Sombra: dano das Sombras aumentado em {pct}%",
       "resourceCount": "{value} de {max}",
       "formLich": "Soul Lance também atinge até {targets} inimigos próximos por {pct}% de dano",
@@ -7839,13 +7841,15 @@ export const pt_BR: EnTranslations = {
       "formLine": {
         "form_bear": "A forma de tanque: uma pele grossa, raiva em vez de mana, e ameaça extra para que os inimigos continuem batendo em você.",
         "form_cat": "A forma de dano corpo a corpo: energia e pontos de combo, como um ladino, e muito menos ameaça.",
-        "form_travel": "A forma de viagem: muito mais rápida em terra, mas sem outras habilidades até você sair da forma."
+        "form_travel": "A forma de viagem: muito mais rápida em terra, mas sem outras habilidades até você sair da forma.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Uma magia de Gelo que chama o elemental para o seu lado e o coloca no seu alvo.",
       "formName": {
         "form_bear": "Forma de Bruin",
         "form_cat": "Forma de Gato",
-        "form_travel": "Forma de Fleet"
+        "form_travel": "Forma de Fleet",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const pt_BR: EnTranslations = {
       "formBear": "Forma de Bruin",
       "formCat": "Forma de Gato",
       "formTravel": "Forma de Fleet",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Criaturas",
       "groupPets": "Demônios do Bruxo",
       "pickerLabel": "Escolha um modelo para visualizar",
@@ -13996,7 +14001,7 @@ export const pt_BR: EnTranslations = {
         "description": "Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até {duration} s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar."
       },
       "rejuvenation": {
-        "name": "Florescer Selvagem",
+        "name": "Sporemending",
         "description": "Cura o alvo em {damage} ao longo de 12 s.",
         "specNote_restoration": "Cada lançamento adiciona 1 de Verdor (máx. 3), inclusive ao renovar uma floração que já está ativa. Com 3 de Verdor, Recuperação Rápida se torna Superflorescência."
       },
@@ -14323,6 +14328,7 @@ export const pt_BR: EnTranslations = {
       "swiftmend": {
         "name": "Recuperação Rápida",
         "description": "Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. Cada lançamento de Florescer Selvagem, Segundo Florescer e Cura Selvagem adiciona 1 de Verdor; com 3 de Verdor, este botão se torna Superflorescência, que cura instantaneamente cada aliado portando seus efeitos de cura ao longo do tempo em 60% do que restava desses efeitos. (assinatura de Coração do Bosque)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Onda Lunar",
@@ -14348,9 +14354,14 @@ export const pt_BR: EnTranslations = {
         "name": "Despertar do Bosque",
         "description": "Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Coração do Bosque)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Superflorescência",
         "description": "Consome 3 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Invocar Emberkin",
@@ -24144,7 +24155,7 @@ export const pt_BR: EnTranslations = {
       },
       "grovespring": {
         "name": "Paramento da Nascente do Bosque",
-        "bonus2": "Cura Rápida consome primeiro sua própria Florescência Selvagem ou Segunda Florescência e cura 25% a mais. Dano sofrido não atrasa mais suas conjurações.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Florescência Excedente colhe 75% dos seus efeitos restantes e armazena 1 Verdância depois."
       },
       "hexthread": {

@@ -4039,6 +4039,7 @@ export const pl_PL: EnTranslations = {
       "moontide": "Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają",
       "oldBlood": "Stara Krew: stopień {stacks} z {max}. Trafione ciosy kota i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości",
       "verdance": "Zieleń {stacks}/{max}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu lub Dzikiego ukojenia dodaje 1, a każdy punkt skraca czas rzucania Dzikiego ukojenia. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Twoja następna dostępna zdolność dobijająca nic nie kosztuje",
       "resourceSap": "Przywraca {value} twojego obecnego zasobu co {interval} s",
       "nextAttackCrit": "Twój następny atak na pewno będzie trafieniem krytycznym",
@@ -4140,6 +4141,7 @@ export const pl_PL: EnTranslations = {
       "formTravel": "Postać Fleet: prędkość ruchu zwiększona o {pct}%",
       "formFireball": "Postać Żaru: prędkość ruchu zwiększona o {pct}%; ataki i czary są wyłączone",
       "formMoonkin": "Postać księżycowej sowy: obrażenia zaklęć zwiększone o {pct}%, a pancerz o {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Postać cienia: obrażenia od Cienia zwiększone o {pct}%",
       "resourceCount": "{value} z {max}",
       "formLich": "Soul Lance trafia też do {targets} pobliskich wrogów, zadając {pct}% obrażeń",
@@ -7839,13 +7841,15 @@ export const pl_PL: EnTranslations = {
       "formLine": {
         "form_bear": "Postać do tankowania: gruba skóra, wściekłość zamiast many i dodatkowe zagrożenie, dzięki któremu wrogowie wciąż atakują ciebie.",
         "form_cat": "Postać do obrażeń w zwarciu: energia i punkty kombinacji, jak u łotrzyka, oraz znacznie mniej zagrożenia.",
-        "form_travel": "Postać do podróżowania: znacznie szybsza po lądzie, ale bez innych zdolności, dopóki z niej nie wyjdziesz."
+        "form_travel": "Postać do podróżowania: znacznie szybsza po lądzie, ale bez innych zdolności, dopóki z niej nie wyjdziesz.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Zaklęcie Mrozu, które przyzywa żywiołaka do twojego boku i kieruje go na twój cel.",
       "formName": {
         "form_bear": "Postać Bruina",
         "form_cat": "Postać kota",
-        "form_travel": "Postać Fleet"
+        "form_travel": "Postać Fleet",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const pl_PL: EnTranslations = {
       "formBear": "Postać Bruina",
       "formCat": "Postać kota",
       "formTravel": "Postać Fleet",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Stworzenia",
       "groupPets": "Demony Czarnoksiężnika",
       "pickerLabel": "Wybierz model do obejrzenia",
@@ -13996,7 +14001,7 @@ export const pl_PL: EnTranslations = {
         "description": "Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do {duration} s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem."
       },
       "rejuvenation": {
-        "name": "Dziki rozkwit",
+        "name": "Sporemending",
         "description": "Leczy cel za {damage} w ciągu 12 sekund.",
         "specNote_restoration": "Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa. Przy 3 Zieleni Szybkie uzdrowienie zmienia się w Nadrozkwit."
       },
@@ -14323,6 +14328,7 @@ export const pl_PL: EnTranslations = {
       "swiftmend": {
         "name": "Szybkie uzdrowienie",
         "description": "Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu i Dzikiego ukojenia dodaje 1 Zieleń; przy 3 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Serca Gaju)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Księżycowy przybór",
@@ -14348,9 +14354,14 @@ export const pl_PL: EnTranslations = {
         "name": "Przebudzenie Gaju",
         "description": "Przywraca do życia u twojego boku każdego poległego członka twojej drużyny lub rajdu w promieniu 40 jardów i w zasięgu wzroku, z 30% zdrowia i many. Nie można rzucić w walce. (Serce Gaju)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Nadrozkwit",
         "description": "Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Przywołanie Emberkina",
@@ -24144,7 +24155,7 @@ export const pl_PL: EnTranslations = {
       },
       "grovespring": {
         "name": "Strój Gajowego Źródła",
-        "bonus2": "Szybkie Uzdrowienie najpierw zużywa twój własny Dzikokwiat lub Drugi Rozkwit i leczy o 25 procent więcej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Nadrozkwit zbiera 75 procent twoich pozostałych efektów, a następnie zachowuje 1 punkt Zieloności."
       },
       "hexthread": {

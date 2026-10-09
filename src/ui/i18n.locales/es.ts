@@ -9418,7 +9418,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Coloca la Wildward sobre un objetivo amistoso y aumenta su armadura en {buff} durante 30 min.',
   'entities.abilities.moonfire.name': 'Tempestad Lunar',
-  'entities.abilities.rejuvenation.name': 'Floración Silvestre',
   'entities.abilities.thorns.name': 'Guardia de Zarzas',
   'entities.abilities.thorns.description':
     'Brotan espinas del objetivo: los atacantes cuerpo a cuerpo reciben {buff} de daño de Naturaleza.',
@@ -16595,6 +16594,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma',
   'hudChrome.auraEffect.verdance':
     'Verdor {stacks}/{max}. Cada Floración Silvestre, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración',
+    'Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de gato y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma',
   'hudChrome.riftTracker.title': 'Brecha',
   'hudChrome.riftTracker.floor': 'Piso {current} de {total}',
   'hudChrome.riftTracker.closesIn': 'Se cierra en {time}',
@@ -17771,8 +17771,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Los golpes unísonos de Comando de Siega infligen un 25% más de daño.',
   'entities.itemSets.gravebrand.name': 'Regalia de Marca Sepulcral',
-  'entities.itemSets.grovespring.bonus2':
-    'Sanación Rápida consume primero tu Floración Salvaje o Segunda Floración y sana un 25% más. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.grovespring.bonus4':
     'Sobrefloración cosecha el 75% de tus efectos restantes y almacena 1 Verdancia después.',
   'entities.itemSets.grovespring.name': 'Atuendo de Fuente del Bosque',

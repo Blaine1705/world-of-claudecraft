@@ -151,6 +151,7 @@ import {
   addCharacterEffectAura,
   CHARACTER_EFFECT_RECKLESSNESS,
   CHARACTER_EFFECT_SOUL_REND,
+  characterSporeAura,
   hasCharacterEffect,
 } from './character_effects_core';
 import {
@@ -196,6 +197,7 @@ import {
 import { damageEventStartsAttackAnimation } from './characters/damage_attack_animation';
 import {
   activeCharacterFormVisual,
+  type CharacterFormKey,
   characterFormMaskForAura,
   characterFormReadyMask,
   characterFormShadowPlan,
@@ -204,6 +206,14 @@ import {
   resolvedCharacterForm,
 } from './characters/form_visual_selection_core';
 import { installSpiritVeil } from './characters/ghost_veil';
+import {
+  disposeFormRigs,
+  type FormVisualSlot,
+  setFormRigsFar,
+  setFormRigsProxyShadow,
+  setFormRigsShadow,
+  visibleFormRig,
+} from './characters/form_visual_slots_core';
 import { visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
@@ -1174,6 +1184,7 @@ export interface EntityView extends RickshawMountViewState, WorldQuestCarryViewS
   /** Display-only jump attitude; see mount_jump_attitude. */
   mountJumpPitch: number;
   metamorphVisual: CharacterVisual | null; // Necromancy Lich Form, built lazily
+  sporemenderVisual: CharacterVisual | null; // druid Sporemender Form, built lazily
   fireballTravelVisual: FireballTravelVisual | null; // Mage travel form, built lazily
   iceBlockVisual: IceBlockVisual | null; // Ice Block shell, built lazily on first stasis
   temporalHourglassVisual: TemporalHourglassVisual | null;
@@ -4818,7 +4829,7 @@ export class Renderer {
   private createCharacterVisualWithRetry(
     e: Entity,
     slot: string,
-    formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
+    formKey?: CharacterFormKey,
     opts?: AssembleOptions,
   ): CharacterVisual | null {
     const now = performance.now();
@@ -4851,8 +4862,8 @@ export class Renderer {
   private buildFormVisual(
     e: Entity,
     v: EntityView,
-    formKey: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
-    slot: 'sheepVisual' | 'bearVisual' | 'catVisual' | 'travelVisual' | 'metamorphVisual',
+    formKey: CharacterFormKey,
+    slot: FormVisualSlot,
     gateCompile: boolean,
   ): void {
     const built = this.createCharacterVisualWithRetry(e, formKey, formKey);
@@ -8063,6 +8074,7 @@ export class Renderer {
       mountJumpPitch: 0,
       riderAnchor,
       metamorphVisual: null,
+      sporemenderVisual: null,
       fireballTravelVisual: null,
       iceBlockVisual: null,
       temporalHourglassVisual: null,
@@ -8361,12 +8373,7 @@ export class Renderer {
 
   /** The visual the player currently sees (form swaps hide the base rig). */
   private activeVisual(v: EntityView): CharacterVisual | null {
-    if (v.sheepVisual?.root.visible) return v.sheepVisual;
-    if (v.bearVisual?.root.visible) return v.bearVisual;
-    if (v.catVisual?.root.visible) return v.catVisual;
-    if (v.travelVisual?.root.visible) return v.travelVisual;
-    if (v.metamorphVisual?.root.visible) return v.metamorphVisual;
-    return v.visual;
+    return visibleFormRig(v) ?? v.visual;
   }
 
   private updateBaseVisual(e: Entity, v: EntityView): void {
@@ -9520,12 +9527,8 @@ export class Renderer {
       // survive interest churn, dispose only per-instance mixer bindings.
       if (!terminal && v.visualPoolKey) this.pooledVisuals.store(v.visualPoolKey, v.visual);
       else v.visual.dispose();
-      v.sheepVisual?.dispose();
-      v.bearVisual?.dispose();
-      v.catVisual?.dispose();
-      v.travelVisual?.dispose();
+      disposeFormRigs(v);
       disposeMountView(v);
-      v.metamorphVisual?.dispose();
       v.fireballTravelVisual?.dispose();
     } else {
       v.freightCaravanVisual?.dispose();
@@ -9886,9 +9889,10 @@ export class Renderer {
       const travel = requestedForm === 'travel';
       const fireballForm = requestedForm === 'fireball';
       const metamorphForm = requestedForm === 'metamorph';
-      const _stealthed = hasStealth;
+      const sporemenderForm = requestedForm === 'sporemender';
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
+      const spores = characterSporeAura(characterEffects, this.reducedMotion());
       const displayScale = e.scale;
       if (displayScale !== v.liveScale) {
         v.liveScale = displayScale;
@@ -9976,17 +9980,14 @@ export class Renderer {
               !travel &&
               !v.mountVisual &&
               !fireballForm &&
-              !metamorphForm,
+              !metamorphForm &&
+              !sporemenderForm,
           );
           // sheep/forms keep articulated shadows through the whole proxy band:
           // a frozen humanoid proxy silhouette would be wrong under a form
           const wantFormShadow = wantShadow || inProxyBand;
-          v.sheepVisual?.setShadow(wantFormShadow);
-          v.bearVisual?.setShadow(wantFormShadow);
-          v.catVisual?.setShadow(wantFormShadow);
-          v.travelVisual?.setShadow(wantFormShadow);
+          setFormRigsShadow(v, wantFormShadow);
           v.mountVisual?.setShadow(wantFormShadow);
-          v.metamorphVisual?.setShadow(wantFormShadow);
           if (wantShadow !== v.shadowOn) {
             v.shadowOn = wantShadow;
             for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
@@ -10400,6 +10401,9 @@ export class Renderer {
       if (metamorphForm && !v.metamorphVisual) {
         this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false);
       }
+      if (sporemenderForm && !v.sporemenderVisual) {
+        this.buildFormVisual(e, v, 'form_sporemender', 'sporemenderVisual', true);
+      }
       // A form rig that is still linking is NOT ready: the mask holds the
       // resolved form at 'base', so the BODY stands in and a polymorphed target
       // turns into a sheep a few frames late instead of vanishing for the whole
@@ -10410,6 +10414,7 @@ export class Renderer {
         v.catVisual,
         v.travelVisual,
         v.metamorphVisual,
+        v.sporemenderVisual,
         v.formCompilePending,
       );
       const resolvedForm = resolvedCharacterForm(requestedForm, formReadyMask);
@@ -10448,6 +10453,7 @@ export class Renderer {
         v.catVisual,
         v.travelVisual,
         v.metamorphVisual,
+        v.sporemenderVisual,
       );
       if (!e.templateId.startsWith('vision_')) {
         active.clickProxy.userData.entityId = e.id;
@@ -10504,11 +10510,7 @@ export class Renderer {
       }
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && resolvedForm !== 'fireball');
-      v.sheepVisual?.setFar(v.isFar && active === v.sheepVisual);
-      v.bearVisual?.setFar(v.isFar && active === v.bearVisual);
-      v.catVisual?.setFar(v.isFar && active === v.catVisual);
-      v.travelVisual?.setFar(v.isFar && active === v.travelVisual);
-      v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);
+      setFormRigsFar(v, active, v.isFar);
       const shadowPlan = characterFormShadowPlan(resolvedForm, {
         isSelf,
         nearShadow: wantShadow,
@@ -10517,11 +10519,7 @@ export class Renderer {
       });
       active.setShadow(shadowPlan.activeArticulated);
       v.visual.setProxyShadow(shadowPlan.baseProxy);
-      v.sheepVisual?.setProxyShadow(shadowPlan.formProxy && active === v.sheepVisual);
-      v.bearVisual?.setProxyShadow(shadowPlan.formProxy && active === v.bearVisual);
-      v.catVisual?.setProxyShadow(shadowPlan.formProxy && active === v.catVisual);
-      v.travelVisual?.setProxyShadow(shadowPlan.formProxy && active === v.travelVisual);
-      v.metamorphVisual?.setProxyShadow(shadowPlan.formProxy && active === v.metamorphVisual);
+      setFormRigsProxyShadow(v, active, shadowPlan.formProxy);
 
       // animation state machine inputs, derived from render-space motion with
       // hysteresis so a one-frame speed dip can't reset the walk clip.
@@ -11160,15 +11158,14 @@ export class Renderer {
             this.recklessSkulls.spawn(v.riderAnchor, active.height * e.scale, e.id);
           }
         }
-        // Shapeshift-form particle auras riding the tints above: metamorph fire,
-        // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
-        // (the auras themselves drop, but a corpse must not smolder for a frame).
+        // Particle auras (forms, healing spores); never on a corpse, whose auras drop late.
         if (!e.dead) {
           if (hasLegacyMetamorphAura) this.vfx.formAura(e.id, 'metamorph', dt);
           else if (hasLichAura && !this.reducedMotion()) {
             this.vfx.lichAura(e.id, dt, soulFragments);
           } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
           else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
+          if (spores) this.vfx.formAura(e.id, spores, dt);
           // orange worn-gear motes: STATIC-preset-gated sheddable prestige
           if (e.kind === 'player' && gfxTierAtLeast(GFX.effectsTier, 'medium')) {
             if (v.legendaryRegaliaRef !== e.equippedInstances) {

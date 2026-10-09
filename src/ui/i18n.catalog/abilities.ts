@@ -1200,7 +1200,7 @@ const classAbilityNamesEn = {
       ],
       [
         'rejuvenation',
-        'Wildbloom',
+        'Sporemending',
         'Heals the target for {damage} over 12 sec.',
         {
           restoration:
@@ -1602,6 +1602,7 @@ const classAbilityNamesEn = {
         'swiftmend',
         'Fleetmend',
         'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
       ],
       [
         'moonlash',
@@ -1634,9 +1635,15 @@ const classAbilityNamesEn = {
         'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)',
       ],
       [
+        'sporemender_form',
+        'Sporemender Form',
+        'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
+      ],
+      [
         'overbloom',
         'Overbloom',
         'Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending.',
       ],
       [
         'summon_imp',

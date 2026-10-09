@@ -7915,7 +7915,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Slår for 10% våbenskade plus {damage}. Et træf genopretter 15 Fokus og giver 1 Jagtfart. Skaden stiger med angrebsstyrke gennem våbenskaden.',
   'entities.abilities.raptor_strike.name': 'Sprættende Slag',
   'entities.abilities.regrowth.name': 'Anden Blomstring',
-  'entities.abilities.rejuvenation.name': 'Vildblomst',
   'entities.abilities.renew.description':
     'Helbreder målet for {damage} over 15 sek., én gang hvert 3. sek. Helbredelsen stiger med Besværgelseskraft.',
   'entities.abilities.renew.name': 'Dvælende Nåde',
@@ -17520,8 +17519,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Reaping Commands unisone angreb giver 25 procent mere skade.',
   'entities.itemSets.gravebrand.name': 'Gravebrand-regalier',
-  'entities.itemSets.grovespring.bonus2':
-    'Hurtig heling forbruger først din egen Wildbloom eller Second Bloom og heler 25 procent mere. Modtaget skade forsinker ikke længere dine besværgelser.',
   'entities.itemSets.grovespring.bonus4':
     'Overbloom høster 75 procent af dine resterende effekter og oplagrer derefter 1 Verdance.',
   'entities.itemSets.grovespring.name': 'Grovespring-dragt',

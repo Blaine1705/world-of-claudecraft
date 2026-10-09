@@ -10476,7 +10476,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Udeří za 10 % poškození zbraně plus {damage}. Zásah obnoví 15 Soustředění a udělí 1 Lovecký spád. Poškození roste s útočnou silou skrze poškození zbraně.',
   'entities.abilities.raptor_strike.name': 'Párací úder',
   'entities.abilities.regrowth.name': 'Druhý květ',
-  'entities.abilities.rejuvenation.name': 'Divoký květ',
   'entities.abilities.renew.description':
     'Vyléčí cíl o {damage} během 15 s, jednou za 3 s. Léčení roste se silou kouzel.',
   'entities.abilities.renew.name': 'Přetrvávající milost',
@@ -17456,8 +17455,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Sjednocené údery Příkazu sklizně způsobují o 25 procent vyšší poškození.',
   'entities.itemSets.gravebrand.name': 'Klenoty Hroboznaku',
-  'entities.itemSets.grovespring.bonus2':
-    'Rychlé léčení nejprve spotřebuje tvůj vlastní Divoký květ nebo Druhý květ a léčí o 25 procent více. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.grovespring.bonus4':
     'Překvetení sklidí 75 procent tvých zbývajících účinků a poté uloží 1 Verdanci.',
   'entities.itemSets.grovespring.name': 'Roucho Hájového pramene',

@@ -4039,6 +4039,7 @@ export const id_ID: EnTranslations = {
       "moontide": "Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya",
       "oldBlood": "Darah Tua: tahap {stacks} dari {max}. Serangan Kucing dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi",
       "verdance": "Kehijauan: tahap {stacks} dari {max}. Setiap Mekar Liar, Mekar Kedua, atau Penyembuhan Liar yang kamu rapal menambah 1, dan setiap tahap mempersingkat rapalan Penyembuhan Liar. Pada {max}, Pemulihan Cepat menjadi Mekar Raya",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Kemampuan eksekusi berikutnya yang memenuhi syarat tidak memakan biaya apa pun",
       "resourceSap": "Memulihkan {value} dari sumber dayamu saat ini setiap {interval} dtk",
       "nextAttackCrit": "Seranganmu berikutnya dijamin akan menjadi pukulan kritis",
@@ -4140,6 +4141,7 @@ export const id_ID: EnTranslations = {
       "formTravel": "Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%",
       "formFireball": "Ember Form: kecepatan gerak meningkat {pct}%; serangan dan mantra dinonaktifkan",
       "formMoonkin": "Wujud Burung Bulan: kerusakan sihir meningkat {pct}% dan zirah meningkat {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Wujud Bayangan: kerusakan Bayangan meningkat {pct}%",
       "resourceCount": "{value} dari {max}",
       "formLich": "Soul Lance juga menghantam hingga {targets} musuh terdekat sebesar {pct}% kerusakan",
@@ -7839,13 +7841,15 @@ export const id_ID: EnTranslations = {
       "formLine": {
         "form_bear": "Wujud tank: kulit tebal, Amarah alih-alih mana, dan ancaman ekstra agar musuh terus menyerangmu.",
         "form_cat": "Wujud kerusakan jarak dekat: Energi dan poin combo, seperti penyamun, dan ancaman yang jauh lebih sedikit.",
-        "form_travel": "Wujud jelajah: jauh lebih cepat melintasi daratan, tetapi tak ada kemampuan lain sampai kamu keluar dari wujud ini."
+        "form_travel": "Wujud jelajah: jauh lebih cepat melintasi daratan, tetapi tak ada kemampuan lain sampai kamu keluar dari wujud ini.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Sebuah mantra Beku yang memanggil elemental itu ke sisimu dan mengarahkannya pada targetmu.",
       "formName": {
         "form_bear": "Wujud Bruin",
         "form_cat": "Wujud Kucing",
-        "form_travel": "Wujud Fleet"
+        "form_travel": "Wujud Fleet",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const id_ID: EnTranslations = {
       "formBear": "Wujud Bruin",
       "formCat": "Wujud Kucing",
       "formTravel": "Wujud Fleet",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Makhluk",
       "groupPets": "Iblis Penyihir Iblis",
       "pickerLabel": "Pilih model untuk dilihat",
@@ -13996,7 +14001,7 @@ export const id_ID: EnTranslations = {
         "description": "Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga {duration} dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan."
       },
       "rejuvenation": {
-        "name": "Mekar Liar",
+        "name": "Sporemending",
         "description": "Menyembuhkan target sebesar {damage} selama 12 detik.",
         "specNote_restoration": "Setiap rapalan menambah 1 Kehijauan (maks 3), termasuk saat menyegarkan kuntum yang masih aktif. Pada 3 Kehijauan, Pemulihan Cepat berubah menjadi Mekar Raya."
       },
@@ -14323,6 +14328,7 @@ export const id_ID: EnTranslations = {
       "swiftmend": {
         "name": "Pemulihan Cepat",
         "description": "Mengonsumsi efek penyembuhan seiring waktu pada target kawan untuk menyembuhkannya sebesar {damage}. Setiap rapalan Mekar Liar, Mekar Kedua, dan Penyembuhan Liar menambah 1 Kehijauan; pada 3 Kehijauan tombol ini berubah menjadi Mekar Raya, yang seketika menyembuhkan setiap sekutu yang menyandang efek penyembuhan seiring waktumu sebesar 60% dari sisa efek tersebut. (mesin Groveheart)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Gelombang Rembulan",
@@ -14348,9 +14354,14 @@ export const id_ID: EnTranslations = {
         "name": "Kebangkitan Rimba",
         "description": "Memanggil kembali ke sisimu setiap anggota kelompok atau serbuanmu yang gugur dalam 40 m dan dalam garis pandangmu, dengan 30% nyawa dan mana. Tidak dapat dirapal dalam pertempuran. (Groveheart)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Mekar Raya",
         "description": "Menghabiskan 3 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Panggil Emberkin",
@@ -24144,7 +24155,7 @@ export const id_ID: EnTranslations = {
       },
       "grovespring": {
         "name": "Busana Mata Air Rimba",
-        "bonus2": "Sembuh Kilat terlebih dahulu mengonsumsi Mekar Liar atau Mekar Kedua milik Anda dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Mekar Berlebih memanen 75 persen efek Anda yang tersisa dan setelahnya menyimpan 1 Verdansi."
       },
       "hexthread": {

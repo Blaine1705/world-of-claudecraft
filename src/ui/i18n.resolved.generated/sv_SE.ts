@@ -4039,6 +4039,7 @@ export const sv_SE: EnTranslations = {
       "moontide": "Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den",
       "oldBlood": "Gammalt Blod: steg {stacks} av {max}. Träffande Katt- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross",
       "verdance": "Grönska {stacks}/{max}. Varje Vildblomning, Andra blomningen eller Vildläkning du kastar ger 1, och varje Grönska förkortar Vildläknings kasttid. Vid {max} blir Snabb läkning Överblomning",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Din nästa kvalificerade avrättningsförmåga kostar ingenting",
       "resourceSap": "Återställer {value} av din nuvarande resurs var {interval}:e sek",
       "nextAttackCrit": "Din nästa attack blir garanterat en kritisk träff",
@@ -4140,6 +4141,7 @@ export const sv_SE: EnTranslations = {
       "formTravel": "Fleetform: förflyttningshastighet ökad med {pct}%",
       "formFireball": "Ember Form: rörelsehastigheten ökad med {pct}%; attacker och besvärjelser är inaktiverade",
       "formMoonkin": "Månugglaform: besvärjelseskada ökad med {pct}% och rustning ökad med {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Dunkelslöja: skuggskada ökad med {pct}%",
       "resourceCount": "{value} av {max}",
       "formLich": "Soul Lance träffar även upp till {targets} närliggande fiender för {pct}% skada",
@@ -7839,13 +7841,15 @@ export const sv_SE: EnTranslations = {
       "formLine": {
         "form_bear": "Tankformen: en tjock hud, Raseri i stället för mana, och extra hot så att fiender fortsätter slå på dig.",
         "form_cat": "Närstridsskadeformen: Energi och kombopoäng, precis som en Skurk, och betydligt mindre hot.",
-        "form_travel": "Reseformen: betydligt snabbare över mark, men inga andra förmågor förrän du skiftar ur."
+        "form_travel": "Reseformen: betydligt snabbare över mark, men inga andra förmågor förrän du skiftar ur.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "En Frost-besvärjelse som kallar elementaren till din sida och sätter den på ditt mål.",
       "formName": {
         "form_bear": "Bruinform",
         "form_cat": "Kattform",
-        "form_travel": "Fleetform"
+        "form_travel": "Fleetform",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const sv_SE: EnTranslations = {
       "formBear": "Bruinform",
       "formCat": "Kattform",
       "formTravel": "Fleetform",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Varelser",
       "groupPets": "Häxmästardemoner",
       "pickerLabel": "Välj en modell att visa",
@@ -13996,7 +14001,7 @@ export const sv_SE: EnTranslations = {
         "description": "Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till {duration} sek per användning. Vid full Månflod blir Månfrö Månsvall."
       },
       "rejuvenation": {
-        "name": "Vildblomning",
+        "name": "Sporemending",
         "description": "Läker målet för {damage} under 12 sek.",
         "specNote_restoration": "Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar. Vid 3 Grönska blir Snabb läkning Överblomning."
       },
@@ -14323,6 +14328,7 @@ export const sv_SE: EnTranslations = {
       "swiftmend": {
         "name": "Snabb läkning",
         "description": "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Varje kastning av Vildblomning, Andra blomningen och Vildläkning ger 1 Grönska; vid 3 Grönska blir denna knapp Överblomning, som omedelbart läker varje allierad som bär dina läkning över tid-effekter för 60% av vad de effekterna hade kvar. (Groveheart-motorn)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Månsvall",
@@ -14348,9 +14354,14 @@ export const sv_SE: EnTranslations = {
         "name": "Lundens uppvaknande",
         "description": "Kallar varje fallen medlem i din grupp eller räd, inom 40 meter och inom synhåll, tillbaka till din sida med 30% hälsa och mana. Kan inte kastas i strid. (Lundhjärta)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Överblomning",
         "description": "Förbrukar 3 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Frammana Emberkin",
@@ -24144,7 +24155,7 @@ export const sv_SE: EnTranslations = {
       },
       "grovespring": {
         "name": "Lundkällans dräkt",
-        "bonus2": "Snabbläkning förbrukar din egen Vildblomma eller Andra blomning först och helar 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Överblomning skördar 75 procent av dina återstående effekter och lagrar därefter 1 Grönska."
       },
       "hexthread": {

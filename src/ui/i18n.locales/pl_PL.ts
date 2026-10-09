@@ -8130,7 +8130,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Uderza za 10% obrażeń broni plus {damage}. Trafienie przywraca 15 Skupienia i daje 1 Rozpęd Łowów. Obrażenia rosną z mocą ataku poprzez obrażenia broni.',
   'entities.abilities.raptor_strike.name': 'Patroszące uderzenie',
   'entities.abilities.regrowth.name': 'Drugi rozkwit',
-  'entities.abilities.rejuvenation.name': 'Dziki rozkwit',
   'entities.abilities.renew.description':
     'Leczy cel o {damage} przez 15 s, raz na 3 s. Leczenie rośnie z mocą zaklęć.',
   'entities.abilities.renew.name': 'Trwająca łaska',
@@ -17756,8 +17755,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Zjednoczone trafienia Rozkazu Żniw zadają o 25 procent większe obrażenia.',
   'entities.itemSets.gravebrand.name': 'Regalia Grobowego Znaku',
-  'entities.itemSets.grovespring.bonus2':
-    'Szybkie Uzdrowienie najpierw zużywa twój własny Dzikokwiat lub Drugi Rozkwit i leczy o 25 procent więcej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.grovespring.bonus4':
     'Nadrozkwit zbiera 75 procent twoich pozostałych efektów, a następnie zachowuje 1 punkt Zieloności.',
   'entities.itemSets.grovespring.name': 'Strój Gajowego Źródła',

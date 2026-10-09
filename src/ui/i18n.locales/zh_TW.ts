@@ -5032,7 +5032,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.name': '月光風暴',
   'entities.abilities.moonfire.description':
     '以月火灼燒敵人，造成 {damage} 點秘法傷害，並附加持續傷害。',
-  'entities.abilities.rejuvenation.name': '野性綻放',
+  'entities.abilities.rejuvenation.name': '孢癒術',
   'entities.abilities.rejuvenation.description': '在 12 秒內為目標恢復 {damage} 點生命值。',
   'entities.abilities.thorns.name': '荊棘守衛',
   'entities.abilities.thorns.description': '目標身上長出荊棘：近戰攻擊者受到 {buff} 點自然傷害。',
@@ -5218,6 +5218,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.name': '迅癒',
   'entities.abilities.swiftmend.description':
     '消耗友方目標身上的一個持續治療效果，治療其 {damage} 點生命。每次施放野性綻放、再度綻放或荒野癒合累積 1 層繁茂；在 3 層繁茂時，此按鈕會變為盛放，立即為每一位帶有你持續治療效果的盟友治療這些效果所剩餘量的 60%。（恢復標誌技能）',
+    '消耗友方目標身上的一個持續治療效果，治療其 {damage} 點生命。孢癒術與再度綻放的播撒會累加青翠；在 5 層青翠時，此按鈕會變為盛放，立即為每一位帶有你持續治療效果的盟友治療這些效果所剩餘量的 60%。（恢復標誌技能）',
   'entities.abilities.crusader_strike.name': '十字軍聖擊',
   'entities.abilities.crusader_strike.description':
     '打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）',
@@ -9907,7 +9908,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.cinderbark.bonus4': '碎髓造成的傷害提高 30%，且其緊急護盾不再取代這次打擊。',
   'entities.itemSets.grovespring.name': '林泉法衣',
   'entities.itemSets.grovespring.bonus2':
-    '迅癒優先消耗你自己的野性綻放或再度綻放，治療效果提高 25%。受到傷害不再延遲你的施法。',
+    '迅癒優先消耗你自己的孢癒術或再度綻放，治療效果提高 25%。受到傷害不再延遲你的施法。',
   'entities.itemSets.grovespring.bonus4': '盛放收割你剩餘治療效果的 75%，隨後累積 1 層繁茂。',
   'entities.items.lastflame_core.name': '末焰之核',
   'entities.itemSets.slagbreaker.name': '碎渣戰甲',
@@ -12609,6 +12610,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': '巨熊形態',
   'guide.models.formCat': '貓形態',
   'guide.models.formTravel': '迅捷形態',
+  'guide.models.formSporemender': '孢癒者形態',
   'guide.models.groupForms': '德魯伊形態',
   'guide.nav.sidebarLabel': '指南主題',
   'guide.professions.craftHowTitle': '製作視窗',
@@ -15182,6 +15184,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ossuary_mark.name': '骸骨印記',
   'entities.abilities.overbloom.description':
     '消耗3層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的{buff}%立即治療，移除這些效果，並在目標身上種下一次新的野性綻放。',
+    '消耗5層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的{buff}%立即治療，移除這些效果，並在目標身上種下一次新的孢癒術。',
   'entities.abilities.overbloom.name': '盛放',
   'entities.abilities.pack_command.description':
     '命令你的活體寵物發動攻擊。命中後產生 20 點集中值和一層獸群兇性。',
@@ -15425,11 +15428,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '近戰輸出型態：像盜賊那樣使用能量與連擊點，威脅值則低上許多。',
   'guide.classPage.formLine.form_travel':
     '趕路型態：在地面上快得多，但在你變回來之前無法使用其他技能。',
+  'guide.classPage.formLine.form_sporemender':
+    '恢復德魯伊的治療型態：外皮更堅韌、治療更強但步伐更慢，並保留你的所有法術與法力。',
   'guide.classPage.formName.form_bear': '巨熊形態',
   'guide.classPage.formName.form_travel': '迅捷形態',
+  'guide.classPage.formName.form_sporemender': '孢癒者形態',
   'guide.classPage.formsHeading': '變形',
   'guide.classPage.formsMoonwing':
-    '平衡專精的德魯伊會多獲得一種形態：梟獸形態，那是平衡德魯伊作戰時所處的施法形態。它是唯一保留你法術的動物形態，而你的魔杖也只有在它或你平常的施法形態下才能使用。',
+    '平衡專精的德魯伊會多獲得一種形態：梟獸形態，那是平衡德魯伊作戰時所處的施法形態。它和恢復專精的孢癒者形態一樣保留你的法術，而你的魔杖只有在這兩種形態或你平常的施法形態下才能使用。',
   'guide.classPage.formsWolfEngage':
     '狼以巨熊衝鋒開戰，隨即變為狼形態釘制目標，未隱匿時用撲擊拉近距離，再用撲倒把敵人定在原地。',
   'guide.classPage.formsAutoUnshift':
@@ -16264,6 +16270,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formLich': '靈魂長槍還會對附近最多 {targets} 個敵人造成 {pct}% 傷害',
   'hudChrome.auraEffect.formMetamorph': '惡魔形態：體型增大 {pct}%；其他加成由獨立增益提供',
   'hudChrome.auraEffect.formMoonkin': '月翼形態：法術傷害提高 {pct}%，護甲提高 {armorPct}%',
+  'hudChrome.auraEffect.formSporemender':
+    '孢癒者形態：造成的治療提高 {pct}%，護甲提高 {armorPct}%，移動速度降低 {slowPct}%',
   'hudChrome.auraEffect.formShadow': '幽幕形態：暗影傷害提高 {pct}%',
   'hudChrome.auraEffect.freeExecute': '下一個符合條件的斬殺技能不消耗資源',
   'hudChrome.auraEffect.funeralHarvestLock': '葬禮收割暫時無法再次產生靈魂碎片',
@@ -16325,6 +16333,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '毒祭：第{stacks}/{max}層。怯懦突刺、邪惡揮斬與毒鏢各累積1層。達到{max}層時，入土長眠變為蝕毒撕裂',
   'hudChrome.auraEffect.verdance':
     '繁茂：第{stacks}/{max}層。每施放一次野性綻放、再度綻放或荒野癒合累積1層，每層都會縮短荒野癒合的施法時間。達到{max}層時，迅癒變為盛放',
+    '繁茂：第{stacks}/{max}層。每種下一個全新的孢癒術或再度綻放累積1層。達到{max}層時，迅癒變為盛放',
   'hudChrome.auraEffect.warlockAnchor': '在 {range} 碼內再次施放可返回此處並消耗錨點',
   'hudChrome.auraEffect.wintersChill': '剩餘 {charges} 層：符合條件的法術視此目標為凍結狀態',
   'hudChrome.paladin.ascensionLastAnnouncement': '昇華的最後一次充能',
@@ -18004,6 +18013,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     '呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（恢復）',
   'entities.abilities.grove_awakening.name': '林地覺醒',
+  'entities.abilities.sporemender_form.name': '孢癒者形態',
+  'entities.abilities.sporemender_form.description':
+    '變形為孢癒者，使你造成的治療提高20%，護甲提高40%，但移動速度降低20%。你在普通形態下的所有法術仍可施放。持續到你切換形態為止。變形為任何形態時都會獲得「輕捷步伐」，短暫提升移動速度。再次施放可返回普通形態。（恢復標誌技能）',
   'entities.abilities.prayer_of_returning.description':
     '呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（聖光與戒律）',
   'entities.abilities.prayer_of_returning.name': '歸返祈禱',

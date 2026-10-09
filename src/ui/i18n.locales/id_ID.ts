@@ -8117,7 +8117,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memukul sebesar 10% kerusakan senjata ditambah {damage}. Sebuah pukulan telak memulihkan 15 Fokus dan memberi 1 Momentum Berburu. Kerusakan meningkat dengan daya serang melalui kerusakan senjata.',
   'entities.abilities.raptor_strike.name': 'Serangan Cabik Perut',
   'entities.abilities.regrowth.name': 'Mekar Kedua',
-  'entities.abilities.rejuvenation.name': 'Mekar Liar',
   'entities.abilities.renew.description':
     'Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.renew.name': 'Rahmat Berlanjut',
@@ -17828,8 +17827,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Serangan serempak Perintah Penuai menghasilkan kerusakan 25 persen lebih besar.',
   'entities.itemSets.gravebrand.name': 'Regalia Tanda Kubur',
-  'entities.itemSets.grovespring.bonus2':
-    'Sembuh Kilat terlebih dahulu mengonsumsi Mekar Liar atau Mekar Kedua milik Anda dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.grovespring.bonus4':
     'Mekar Berlebih memanen 75 persen efek Anda yang tersisa dan setelahnya menyimpan 1 Verdansi.',
   'entities.itemSets.grovespring.name': 'Busana Mata Air Rimba',

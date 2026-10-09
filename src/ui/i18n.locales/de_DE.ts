@@ -9581,7 +9581,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.moonfire.name': 'Mondsturm',
-  'entities.abilities.rejuvenation.name': 'Wildblüte',
   'entities.abilities.thorns.name': 'Dornenwacht',
   'entities.abilities.thorns.description':
     'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden {buff} Naturschaden.',
@@ -17939,8 +17938,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Die gemeinsamen Treffer von Erntebefehl verursachen 25 Prozent mehr Schaden.',
   'entities.itemSets.gravebrand.name': 'Insignien des Grabmals',
-  'entities.itemSets.grovespring.bonus2':
-    'Schnellheilung verbraucht zuerst deine Wildblüte oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.grovespring.bonus4':
     'Überblüte erntet 75 Prozent deiner verbleibenden Effekte und speichert danach 1 Üppigkeit.',
   'entities.itemSets.grovespring.name': 'Gewand der Hainquelle',

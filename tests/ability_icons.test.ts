@@ -131,10 +131,14 @@ describe('ability icons', () => {
     // release/v0.44.0 merge into feature/buried-hoards).
     // 474: plus the Scratch glyph (the Cat Form sweep builder).
     expect(ids).toHaveLength(474);
+    // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite);
+    // 473: plus Groveheart's Sporemender Form (sporemender_form).
+    expect(ids).toHaveLength(473);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
     expect(hash).toBe('13a833e557cfdfef50e465d9eaf547ff8e1e1245494b02e3d503fcc0d0aa37bd');
+    expect(hash).toBe('f302c52fcb4361f7b8adf7dc86642a87e295d50ba3fd3d8f789cc7334533458f');
   });
 });

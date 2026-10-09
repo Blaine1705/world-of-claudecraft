@@ -4039,6 +4039,7 @@ export const cs_CZ: EnTranslations = {
       "moontide": "Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá",
       "oldBlood": "Stará krev: stupeň {stacks} z {max}. Zasažené kočičí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí",
       "verdance": "Zeleň {stacks}/{max}. Každé seslání Divokého květu, Druhého květu nebo Divokého zhojení přidá 1 a každá Zeleň zkrátí seslání Divokého zhojení. Při {max} se Rychlé zhojení mění v Překvět",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Tvá příští způsobilá dorážecí schopnost nic nestojí",
       "resourceSap": "Obnoví {value} tvého aktuálního zdroje každých {interval} s",
       "nextAttackCrit": "Tvůj příští útok je zaručeně kritický zásah",
@@ -4140,6 +4141,7 @@ export const cs_CZ: EnTranslations = {
       "formTravel": "Cestovní podoba: rychlost pohybu zvýšena o {pct} %",
       "formFireball": "Žárová podoba: rychlost pohybu zvýšena o {pct} %; útoky a kouzla jsou zakázány",
       "formMoonkin": "Podoba měsíčního křídla: poškození kouzel zvýšeno o {pct} % a brnění zvýšeno o {armorPct} %",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Podoba šerého závoje: stínové poškození zvýšeno o {pct} %",
       "resourceCount": "{value} z {max}",
       "formLich": "Soul Lance navíc zasáhne až {targets} blízké nepřátele za {pct} % poškození",
@@ -7839,13 +7841,15 @@ export const cs_CZ: EnTranslations = {
       "formLine": {
         "form_bear": "Tankovací podoba: silná kůže, vztek místo many a navíc hrozba, aby po tobě nepřátelé dál sekali.",
         "form_cat": "Podoba pro poškození na blízko: energie a combo body jako u tuláka a mnohem menší hrozba.",
-        "form_travel": "Cestovní podoba: mnohem rychlejší po zemi, ale žádné jiné schopnosti, dokud se nezměníš zpět."
+        "form_travel": "Cestovní podoba: mnohem rychlejší po zemi, ale žádné jiné schopnosti, dokud se nezměníš zpět.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Kouzlo Mrazivé magie, které přivolá elementála po tvůj bok a nasadí ho na tvůj cíl.",
       "formName": {
         "form_bear": "Medvědí podoba",
         "form_cat": "Kočičí podoba",
-        "form_travel": "Svižná podoba"
+        "form_travel": "Svižná podoba",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const cs_CZ: EnTranslations = {
       "formBear": "Medvědí podoba",
       "formCat": "Kočičí podoba",
       "formTravel": "Svižná podoba",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Bytosti",
       "groupPets": "Démoni černokněžníka",
       "pickerLabel": "Vyber model k zobrazení",
@@ -13996,7 +14001,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Pouze v Podobě měsíčního křídla. Zasáhne za {damage} tajemného poškození, přidá jeden stupeň Měsíčního přílivu a prodlouží tvou Měsíční bouři o 6 s, až o {duration} s na použití. Při plném Měsíčním přílivu se Měsíční semeno mění v Měsíční vzedmutí."
       },
       "rejuvenation": {
-        "name": "Divoký květ",
+        "name": "Sporemending",
         "description": "Vyléčí cíl za {damage} po dobu 12 s.",
         "specNote_restoration": "Každé seslání přidá 1 Zeleň (max 3), i když jen obnoví květ, který už působí. Při 3 Zeleni se Rychlé zhojení změní na Překvět."
       },
@@ -14323,6 +14328,7 @@ export const cs_CZ: EnTranslations = {
       "swiftmend": {
         "name": "Rychlé zhojení",
         "description": "Spotřebuje na spřáteleném cíli léčivý efekt v čase a vyléčí ho o {damage}. Každé seslání Divokého květu, Druhého květu a Divokého zhojení přidá 1 Zeleň; při 3 Zeleni se z tohoto tlačítka stane Překvět, který okamžitě vyléčí každého spojence nesoucího tvé léčivé efekty v čase o 60 % toho, co těmto efektům zbývalo. (Charakteristika Srdce háje)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Měsíční vzedmutí",
@@ -14348,9 +14354,14 @@ export const cs_CZ: EnTranslations = {
         "name": "Probuzení háje",
         "description": "Povolá zpět k životu po tvém boku každého padlého člena tvé skupiny nebo výpravy do 40 yardů a na dohled s 30% zdraví a many. Nelze seslat v boji. (Srdce háje)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Překvět",
         "description": "Spotřebuje 3 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Vyvolat Žhavorozeného",
@@ -24144,7 +24155,7 @@ export const cs_CZ: EnTranslations = {
       },
       "grovespring": {
         "name": "Roucho Hájového pramene",
-        "bonus2": "Rychlé léčení nejprve spotřebuje tvůj vlastní Divoký květ nebo Druhý květ a léčí o 25 procent více. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Překvetení sklidí 75 procent tvých zbývajících účinků a poté uloží 1 Verdanci."
       },
       "hexthread": {

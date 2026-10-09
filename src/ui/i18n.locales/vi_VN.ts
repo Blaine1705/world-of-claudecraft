@@ -8110,7 +8110,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đánh một đòn bằng 10% sát thương vũ khí cộng {damage}. Một cú trúng hồi 15 Tập Trung và ban 1 Đà Săn. Sát thương tăng theo sức tấn công thông qua sát thương vũ khí.',
   'entities.abilities.raptor_strike.name': 'Đòn Moi Ruột',
   'entities.abilities.regrowth.name': 'Nở Hoa Lần Hai',
-  'entities.abilities.rejuvenation.name': 'Hoa Nở Hoang Dã',
   'entities.abilities.renew.description':
     'Hồi {damage} máu cho mục tiêu trong 15 giây, mỗi 3 giây một lần. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
   'entities.abilities.renew.name': 'Ân Điển Vương Vấn',
@@ -17725,8 +17724,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Các đòn hợp xướng của Reaping Command gây thêm 25% sát thương.',
   'entities.itemSets.gravebrand.name': 'Lễ Phục Dấu Mộ',
-  'entities.itemSets.grovespring.bonus2':
-    'Hồi Phục Nhanh ưu tiên tiêu thụ Wildbloom hoặc Second Bloom của bạn trước và hồi thêm 25% máu. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.grovespring.bonus4':
     'Overbloom thu hoạch 75% các hiệu ứng còn lại của bạn và tích trữ 1 Verdance sau đó.',
   'entities.itemSets.grovespring.name': 'Phục Trang Suối Rừng',

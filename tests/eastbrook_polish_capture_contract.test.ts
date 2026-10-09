@@ -724,6 +724,12 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // carries the dungeon/arena static interior retry tracker beside the batch's
   // spirit-veil and Spell Effects imports. No capture was retaken.
   '87cea55aa3fa76ab984d6d9663be5c9a288dafe403e795717ed822db0889c21f';
+  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
+  // Re-minted for Sporemender Form: the renderer leaf gained the Sporemender form-rig slot and the form-slot loops. No capture was retaken.
+  // Re-minted for the Sporemender spores: the renderer leaf gained the Sporemender particle-aura call. No capture was retaken.
+  // Re-minted for the Sporemender rework: the renderer leaf moved the spores onto a character-effect flag (form or Wildbloom HoT). No capture was retaken.
+  // Re-minted for the spore drift split: the renderer leaf picks the form or the sparser HoT drift through characterSporeAura. No capture was retaken.
+  'ac6ad89f898446350680c6eb35708a0bf3b097dd33902ff7780c3f00d1004d60';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -10126,7 +10126,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Place le Wildward sur une cible alliée et augmente son armure de {buff} pendant 30 min.',
   'entities.abilities.moonfire.name': 'Tempête lunaire',
-  'entities.abilities.rejuvenation.name': 'Floraison sauvage',
   'entities.abilities.thorns.name': 'Garde de ronces',
   'entities.abilities.thorns.description':
     'Des épines jaillissent de la cible: les assaillants en mêlée subissent {buff} points de dégâts de Nature.',
@@ -18064,8 +18063,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Les frappes à l’unisson de Commandement faucheur infligent 25 % de dégâts supplémentaires.',
   'entities.itemSets.gravebrand.name': 'Régalia de la marque funèbre',
-  'entities.itemSets.grovespring.bonus2':
-    'Rétablissement rapide consomme d’abord votre Floraison sauvage ou Seconde floraison et soigne 25 % davantage. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.grovespring.bonus4':
     'Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdure.',
   'entities.itemSets.grovespring.name': 'Habillement de la Source sylvestre',

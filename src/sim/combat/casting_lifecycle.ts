@@ -1382,7 +1382,7 @@ export function castAbility(
     // An armed Nature's Boon window is a form exemption for exactly the two
     // spells it names (combat/druid_natures_boon.ts). Checked here rather than
     // folded into usableInForm because it is aura state, not a property of the
-    // button: with no window armed, Wildbloom refuses and auto-unshifts exactly
+    // button: with no window armed, Sporemending refuses and auto-unshifts exactly
     // as it always has (Oakhide is usableInForm and never reaches this arm).
     !naturesBoonArmedFor(p.auras, ability.id)
   ) {
@@ -1908,7 +1908,7 @@ export function castAbility(
     return;
   }
   p.castTargetId = target?.id ?? null;
-  // Nature's Boon makes its spell stronger (Wildbloom 50%, Oakhide 25%). Scaled on a COPY here, BEFORE
+  // Nature's Boon makes its spell stronger (Sporemending 25%, Oakhide 25%). Scaled on a COPY here, BEFORE
   // the block below spends the window: the instant arm consumes the aura and
   // only then calls applyAbility, so a multiplier read any later is always 1.
   res = scaleNaturesBoonPower(p, res);

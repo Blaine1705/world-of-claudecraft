@@ -459,6 +459,10 @@ export type AuraKind =
   | 'form_travel'
   | 'form_fireball'
   | 'form_moonkin'
+  // Groveheart's Sporemender Form: a caster form that keeps the full kit and
+  // mana bar (+20% healing done, +40% armor, 20% slower movement;
+  // combat/druid_sporemender.ts).
+  | 'form_sporemender'
   | 'form_shadow'
   // Necromancy secondary resource and signature transformation.
   | 'soul_fragments'
@@ -699,6 +703,7 @@ export const FORM_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'form_travel',
   'form_fireball',
   'form_moonkin',
+  'form_sporemender',
   'form_shadow',
   'form_lich',
 ]);
@@ -3387,7 +3392,7 @@ export type AbilityEffect =
   | { type: 'druidMarrowbreakGuard'; belowFrac: number; healPctMaxHp: number; rage: number }
   // Groveheart Overbloom (combat/druid_engines.ts): harvest every HoT the
   // caster owns for harvestPct of its remaining healing, then replant a
-  // Wildbloom on the cast target (or on every harvested ally with the
+  // Sporemending on the cast target (or on every harvested ally with the
   // Seedspread row lean).
   | { type: 'druidOverbloom'; harvestPct: number }
   | { type: 'slow'; mult: number; duration: number }

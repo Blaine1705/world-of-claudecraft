@@ -4039,6 +4039,7 @@ export const it_IT: EnTranslations = {
       "moontide": "Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono",
       "oldBlood": "Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Gatto e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma",
       "verdance": "Verzura {stacks}/{max}. Ogni Fioritura Selvaggia, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "La tua prossima abilità di esecuzione idonea non costa nulla",
       "resourceSap": "Ripristina {value} della tua risorsa attuale ogni {interval} sec",
       "nextAttackCrit": "Il tuo prossimo attacco è garantito come colpo critico",
@@ -4140,6 +4141,7 @@ export const it_IT: EnTranslations = {
       "formTravel": "Forma di Fleet: velocità di movimento aumentata del {pct}%",
       "formFireball": "Forma Brace: velocità di movimento aumentata del {pct}%; attacchi e incantesimi disabilitati",
       "formMoonkin": "Forma di Lunagufo: danni degli incantesimi aumentati del {pct}% e armatura aumentata del {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Forma d'Ombra: danni da Ombra aumentati del {pct}%",
       "resourceCount": "{value} su {max}",
       "formLich": "Soul Lance colpisce anche fino a {targets} nemici vicini per il {pct}% dei danni",
@@ -7839,13 +7841,15 @@ export const it_IT: EnTranslations = {
       "formLine": {
         "form_bear": "La forma da tank: una pelle spessa, rabbia al posto del mana, e minaccia extra così i nemici continuano ad attaccarti.",
         "form_cat": "La forma da danno in mischia: energia e punti combo, come un ladro, e molta meno minaccia.",
-        "form_travel": "La forma da viaggio: molto più veloce sul terreno, ma nessun'altra abilità finché non ne esci."
+        "form_travel": "La forma da viaggio: molto più veloce sul terreno, ma nessun'altra abilità finché non ne esci.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Un incantesimo di Gelo che richiama l'elementale al tuo fianco e lo indirizza contro il tuo bersaglio.",
       "formName": {
         "form_bear": "Forma di Bruin",
         "form_cat": "Forma del Gatto",
-        "form_travel": "Forma di Fleet"
+        "form_travel": "Forma di Fleet",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const it_IT: EnTranslations = {
       "formBear": "Forma di Bruin",
       "formCat": "Forma del Gatto",
       "formTravel": "Forma di Fleet",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Creature",
       "groupPets": "Demoni dello Stregone",
       "pickerLabel": "Scegli un modello da visualizzare",
@@ -13996,7 +14001,7 @@ export const it_IT: EnTranslations = {
         "description": "Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a {duration} sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare."
       },
       "rejuvenation": {
-        "name": "Fioritura Selvaggia",
+        "name": "Sporemending",
         "description": "Cura il bersaglio di {damage} in 12 s.",
         "specNote_restoration": "Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva. A 3 Verzura, Rapidità di Guarigione diventa Sovrafioritura."
       },
@@ -14323,6 +14328,7 @@ export const it_IT: EnTranslations = {
       "swiftmend": {
         "name": "Rapidità di Guarigione",
         "description": "Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Ogni lancio di Fioritura Selvaggia, Seconda Fioritura e Rammendo Selvaggio aggiunge 1 Verzura; a 3 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Ondata Lunare",
@@ -14348,9 +14354,14 @@ export const it_IT: EnTranslations = {
         "name": "Risveglio del Bosco",
         "description": "Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Groveheart)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Sovrafioritura",
         "description": "Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Evoca Emberkin",
@@ -24144,7 +24155,7 @@ export const it_IT: EnTranslations = {
       },
       "grovespring": {
         "name": "Paramento Grovespring",
-        "bonus2": "Cura Rapida consuma prima la tua Fioritura Selvatica o Seconda Fioritura e cura il 25 percento in più. I danni subiti non ritardano più il lancio degli incantesimi.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Rigoglio."
       },
       "hexthread": {

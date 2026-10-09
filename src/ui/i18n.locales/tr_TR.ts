@@ -8021,7 +8021,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Silah hasarının %10'u artı {damage} vurur. İsabet 15 Odak yeniler ve 1 Av İvmesi verir. Hasar, silah hasarı üzerinden saldırı gücüyle artar.",
   'entities.abilities.raptor_strike.name': 'Deşen Darbe',
   'entities.abilities.regrowth.name': 'İkinci Çiçeklenme',
-  'entities.abilities.rejuvenation.name': 'Yaban Çiçeği',
   'entities.abilities.renew.description':
     "Hedefi 15 sn boyunca {damage} iyileştirir, her 3 sn'de bir kez. İyileştirme Büyü Gücü ile artar.",
   'entities.abilities.renew.name': 'Kalıcı Lütuf',
@@ -17610,8 +17609,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Biçim Emrinin birlik vuruşları %25 daha fazla hasar verir.',
   'entities.itemSets.gravebrand.name': 'Mezar Damgası Asaleti',
-  'entities.itemSets.grovespring.bonus2':
-    'Çabuk İyileştirme önce kendi Yaban Çiçeğini veya İkinci Çiçeklenmeni tüketir ve %25 daha fazla iyileştirir. Alınan hasar artık büyü yapmanı geciktirmez.',
   'entities.itemSets.grovespring.bonus4':
     "Aşırı Çiçeklenme kalan etkilerinin %75'ini hasat eder ve ardından 1 Yeşerme depolar.",
   'entities.itemSets.grovespring.name': 'Koruluk Pınarı Giysisi',

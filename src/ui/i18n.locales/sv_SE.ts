@@ -7917,7 +7917,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Slår för 10% vapenskada plus {damage}. En träff återställer 15 Fokus och ger 1 Jaktfart. Skadan ökar med anfallskraft via vapenskadan.',
   'entities.abilities.raptor_strike.name': 'Uppsprättande hugg',
   'entities.abilities.regrowth.name': 'Andra blomningen',
-  'entities.abilities.rejuvenation.name': 'Vildblomning',
   'entities.abilities.renew.description':
     'Läker målet för {damage} under 15 sek, en gång var 3 sek. Läkningen ökar med Besvärjelsekraft.',
   'entities.abilities.renew.name': 'Dröjande nåd',
@@ -17608,8 +17607,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Skördekommandots samstämmiga slag orsakar 25 procent mer skada.',
   'entities.itemSets.gravebrand.name': 'Gravmärkt regalia',
-  'entities.itemSets.grovespring.bonus2':
-    'Snabbläkning förbrukar din egen Vildblomma eller Andra blomning först och helar 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.grovespring.bonus4':
     'Överblomning skördar 75 procent av dina återstående effekter och lagrar därefter 1 Grönska.',
   'entities.itemSets.grovespring.name': 'Lundkällans dräkt',

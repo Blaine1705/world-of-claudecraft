@@ -9553,7 +9553,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.moonfire.name': 'Tempesta Lunare',
-  'entities.abilities.rejuvenation.name': 'Fioritura Selvaggia',
   'entities.abilities.thorns.name': 'Guardia di Rovi',
   'entities.abilities.thorns.description':
     'Dal bersaglio spuntano spine: gli assalitori in mischia subiscono {buff} danni da Natura.',
@@ -18512,8 +18511,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'I colpi all’unisono del Comando della Mietitura infliggono il 25 percento di danni in più.',
   'entities.itemSets.gravebrand.name': 'Regalia del Marchio Sepolcrale',
-  'entities.itemSets.grovespring.bonus2':
-    'Cura Rapida consuma prima la tua Fioritura Selvatica o Seconda Fioritura e cura il 25 percento in più. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.grovespring.bonus4':
     'Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Rigoglio.',
   'entities.itemSets.grovespring.name': 'Paramento Grovespring',

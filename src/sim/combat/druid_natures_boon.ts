@@ -16,6 +16,11 @@
 // holds near 2 per minute however many HoTs are out) to arm Wildmend alone:
 // instant (combat/ability_resolution.ts reads naturesBoonArmedFor), free, and
 // 25% stronger, castable in any form.
+// Every LANDED melee auto-attack a committed feral druid makes has a 1-in-15
+// chance to arm one free spell for 10 seconds, which at Cat Form's fixed 1.0
+// sec swing reads as about one proc every 15 seconds. The armed window covers
+// BOTH members at once and the player chooses which to spend it on: whichever
+// of Sporemending or Oakhide is cast first consumes it, and the other reverts.
 //
 // Two things make the window worth having in a form, and both are deliberate:
 //
@@ -78,7 +83,7 @@ export const NATURES_BOON_WILDBLOOM_POWER = 1.5;
 /** How long the armed window lasts, in seconds. */
 export const NATURES_BOON_DURATION = 10;
 
-/** The spells the window pays for: Wildbloom (`rejuvenation`) in any form, and
+/** The spells the window pays for: Sporemending (`rejuvenation`) in any form, and
  *  Oakhide (`barkskin`) in Bruin Form only. Both are armed together and the
  *  first one cast wins, so the window is a choice between a heal and a
  *  mitigation cooldown rather than a free nuke. Both are authored instant, so
@@ -134,6 +139,7 @@ export function naturesBoonFormAllows(
  *  shape in combat/casting_lifecycle.ts). 1 when no window covers this cast, so
  *  an ordinary Wildbloom or Oakhide is untouched. Wildbloom takes its own
  *  stronger multiplier; every other member takes the base power. */
+ *  an ordinary Sporemending or Oakhide is untouched. */
 export function naturesBoonPowerFor(auras: readonly BoonAura[], abilityId: string): number {
   if (!naturesBoonArmedFor(auras, abilityId)) return 1;
   return abilityId === 'rejuvenation' ? NATURES_BOON_WILDBLOOM_POWER : NATURES_BOON_POWER;

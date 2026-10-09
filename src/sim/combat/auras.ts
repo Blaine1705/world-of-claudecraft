@@ -57,6 +57,7 @@ import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
 import { naturesBoonOnHotTick } from './druid_natures_boon';
 import { secondBloomOnHotExpired } from './druid_second_bloom';
+import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
 import { isColdsightInternalMarkerAuraId } from './hunter_coldsight_read';
@@ -458,11 +459,17 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
           }
         } else if (a.kind === 'hot' && !tickMendingCurrent(ctx, e, a)) {
-          const intended = Math.round(a.value * ctx.healingTakenMult(e));
+          const healer = ctx.entities.get(a.sourceId);
+          // Sporemender Form scales its wearer's HoT ticks live (exactly 1 for
+          // every other healer, so their tick arithmetic is unchanged).
+          const intended = Math.round(
+            a.value * sporemenderHealingDoneMult(healer) * ctx.healingTakenMult(e),
+          );
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;
           const healed = Math.min(landing, Math.max(0, e.maxHp - e.hp));
           const healer = ctx.entities.get(a.sourceId);
+          const healed = Math.min(landing, e.maxHp - e.hp);
           if (healer) onCraftedCollectionHeal(ctx, healer, e, landing - healed);
           const overheal = landing - healed;
           // A tick on a full-health target emits too (amount 0, the whole tick as

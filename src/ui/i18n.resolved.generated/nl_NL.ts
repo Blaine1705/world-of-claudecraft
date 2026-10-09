@@ -4039,6 +4039,7 @@ export const nl_NL: EnTranslations = {
       "moontide": "Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit",
       "oldBlood": "Oud Bloed: stadium {stacks} van {max}. Gelande Kat- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen",
       "verdance": "Groenkracht: stadium {stacks} van {max}. Elke Wildbloei, Tweede Bloei of Wildheling die je uitspreekt voegt 1 toe, en elk stadium verkort de spreektijd van Wildheling; bij {max} wordt Snelle genezing Overbloei",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Je volgende in aanmerking komende afmaakvaardigheid kost niets",
       "resourceSap": "Herstelt {value} van je huidige hulpbron elke {interval} sec",
       "nextAttackCrit": "Je volgende aanval is gegarandeerd een kritieke treffer",
@@ -4140,6 +4141,7 @@ export const nl_NL: EnTranslations = {
       "formTravel": "Fleetgedaante: bewegingssnelheid verhoogd met {pct}%",
       "formFireball": "Ember Form: bewegingssnelheid verhoogd met {pct}%; aanvallen en spreuken zijn uitgeschakeld",
       "formMoonkin": "Maanuilvorm: spreukschade verhoogd met {pct}% en pantser verhoogd met {armorPct}%",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Schaduwvorm: Schaduwschade verhoogd met {pct}%",
       "resourceCount": "{value} van {max}",
       "formLich": "Soul Lance treft ook tot {targets} nabije vijanden voor {pct}% schade",
@@ -7839,13 +7841,15 @@ export const nl_NL: EnTranslations = {
       "formLine": {
         "form_bear": "De tankgedaante: een zware huid, Woede in plaats van mana, en extra dreiging zodat vijanden jou blijven aanvallen.",
         "form_cat": "De gedaante voor melee-schade: Energie en combopunten, zoals een Schurk, en veel minder dreiging.",
-        "form_travel": "De reisgedaante: veel sneller over de grond, maar geen andere vaardigheden totdat je terugverandert."
+        "form_travel": "De reisgedaante: veel sneller over de grond, maar geen andere vaardigheden totdat je terugverandert.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Een Vorst-spreuk die de elementaal naar je zijde roept en op je doelwit afstuurt.",
       "formName": {
         "form_bear": "Bruingedaante",
         "form_cat": "Katgedaante",
-        "form_travel": "Fleetgedaante"
+        "form_travel": "Fleetgedaante",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const nl_NL: EnTranslations = {
       "formBear": "Bruingedaante",
       "formCat": "Katgedaante",
       "formTravel": "Fleetgedaante",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Wezens",
       "groupPets": "Heksenmeester-Demonen",
       "pickerLabel": "Kies een model om te bekijken",
@@ -13996,7 +14001,7 @@ export const nl_NL: EnTranslations = {
         "description": "Alleen in Maanuilvorm. Slaat toe voor {damage} Arcane-schade, voegt een Maanvloed-stadium toe en verlengt je Maanstorm met 6 sec, tot {duration} sec per toepassing. Bij volle Maanvloed wordt Maanzaad Maangolf."
       },
       "rejuvenation": {
-        "name": "Wildbloei",
+        "name": "Sporemending",
         "description": "Geneest het doelwit voor {damage} over 12 sec.",
         "specNote_restoration": "Elke spreuk voegt 1 Groenkracht toe (max 3), ook als hij een bloei vernieuwt die al actief is. Bij 3 Groenkracht wordt Snelle genezing Overbloei."
       },
@@ -14323,6 +14328,7 @@ export const nl_NL: EnTranslations = {
       "swiftmend": {
         "name": "Snelle genezing",
         "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het te genezen voor {damage}. Elke spreuk van Wildbloei, Tweede Bloei en Wildheling voegt 1 Groenkracht toe; bij 3 Groenkracht wordt deze knop Overbloei, die onmiddellijk elke bondgenoot met jouw genezing-over-tijd-effecten geneest voor 60% van wat die effecten nog over hadden. (Boshart-kenmerk)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Maangolf",
@@ -14348,9 +14354,14 @@ export const nl_NL: EnTranslations = {
         "name": "Woudontwaken",
         "description": "Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Herstel)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Overbloei",
         "description": "Verbruikt 3 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Emberkin Oproepen",
@@ -24144,7 +24155,7 @@ export const nl_NL: EnTranslations = {
       },
       "grovespring": {
         "name": "Bosbron-Kledij",
-        "bonus2": "Snelle genezing verbruikt eerst je eigen Wildbloom of Second Bloom en geneest 25 procent meer. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Overbloom oogst 75 procent van je resterende effecten en slaat daarna 1 Verdance op."
       },
       "hexthread": {

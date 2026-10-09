@@ -4039,6 +4039,7 @@ export const de_DE: EnTranslations = {
       "moontide": "Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr",
       "oldBlood": "Altes Blut: Stufe {stacks} von {max}. Gelandete Katzen- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer",
       "verdance": "Grünkraft: Stufe {stacks} von {max}. Jede Wildblüte, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Sporemending or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Eure nächste berechtigte Hinrichtungsfähigkeit kostet nichts",
       "resourceSap": "Stellt alle {interval} Sek. {value} Eurer aktuellen Ressource wieder her",
       "nextAttackCrit": "Euer nächster Angriff trifft garantiert kritisch",
@@ -4140,6 +4141,7 @@ export const de_DE: EnTranslations = {
       "formTravel": "Fleet Form: Bewegungstempo um {pct}% erhöht",
       "formFireball": "Glutgestalt: Bewegungsgeschwindigkeit um {pct}% erhöht; Angriffe und Zauber deaktiviert",
       "formMoonkin": "Mondkingestalt: Zauberschaden um {pct}% und Rüstung um {armorPct}% erhöht",
+      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
       "formShadow": "Schattenform: Schattenschaden um {pct}% erhöht",
       "resourceCount": "{value} von {max}",
       "formLich": "Soul Lance trifft zusätzlich bis zu {targets} nahe Gegner für {pct}% Schaden",
@@ -7839,13 +7841,15 @@ export const de_DE: EnTranslations = {
       "formLine": {
         "form_bear": "Die Tank-Gestalt: ein dickes Fell, Wut statt Mana und zusätzliche Bedrohung, damit Gegner weiter auf dich einschlagen.",
         "form_cat": "Die Nahkampf-Schadensgestalt: Energie und Combopunkte wie ein Schurke, dazu deutlich weniger Bedrohung.",
-        "form_travel": "Die Reisegestalt: deutlich schneller am Boden unterwegs, aber ohne andere Fähigkeiten, bis du zurückwechselst."
+        "form_travel": "Die Reisegestalt: deutlich schneller am Boden unterwegs, aber ohne andere Fähigkeiten, bis du zurückwechselst.",
+        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
       },
       "mageEleSummon": "Ein Frost-Zauber, der den Elementar an deine Seite ruft und auf dein Ziel hetzt.",
       "formName": {
         "form_bear": "Bruin-Gestalt",
         "form_cat": "Katzengestalt",
-        "form_travel": "Fleet-Gestalt"
+        "form_travel": "Fleet-Gestalt",
+        "form_sporemender": "Sporemender Form"
       }
     },
     "classHook": {
@@ -8547,6 +8551,7 @@ export const de_DE: EnTranslations = {
       "formBear": "Bruin Form",
       "formCat": "Katzengestalt",
       "formTravel": "Fleet Form",
+      "formSporemender": "Sporemender Form",
       "groupCreatures": "Kreaturen",
       "groupPets": "Dämonen des Hexenmeisters",
       "pickerLabel": "Wähle ein Modell zum Ansehen",
@@ -13996,7 +14001,7 @@ export const de_DE: EnTranslations = {
         "description": "Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu {duration} Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge."
       },
       "rejuvenation": {
-        "name": "Wildblüte",
+        "name": "Sporemending",
         "description": "Heilt das Ziel über 12 Sek. um {damage}.",
         "specNote_restoration": "Jeder Zauber fügt 1 Grünkraft hinzu (max. 3), auch wenn er eine bereits wirkende Blüte erneuert. Bei 3 Grünkraft wird Rasche Heilung zu Überblüte."
       },
@@ -14323,6 +14328,7 @@ export const de_DE: EnTranslations = {
       "swiftmend": {
         "name": "Rasche Heilung",
         "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Jeder Zauber von Wildblüte, Zweite Blüte und Wildheilung fügt 1 Grünkraft hinzu; bei 3 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Hainherz-Signatur)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Mondwoge",
@@ -14348,9 +14354,14 @@ export const de_DE: EnTranslations = {
         "name": "Erwachen des Hains",
         "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Hainherz)"
       },
+      "sporemender_form": {
+        "name": "Sporemender Form",
+        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+      },
       "overbloom": {
         "name": "Überblüte",
         "description": "Verbraucht 3 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
       },
       "summon_imp": {
         "name": "Emberkin beschwören",
@@ -24144,7 +24155,7 @@ export const de_DE: EnTranslations = {
       },
       "grovespring": {
         "name": "Gewand der Hainquelle",
-        "bonus2": "Schnellheilung verbraucht zuerst deine Wildblüte oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
         "bonus4": "Überblüte erntet 75 Prozent deiner verbleibenden Effekte und speichert danach 1 Üppigkeit."
       },
       "hexthread": {

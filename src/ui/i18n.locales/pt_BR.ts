@@ -9471,7 +9471,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Coloca o Wildward em um alvo aliado, aumentando a armadura em {buff} por 30 min.',
   'entities.abilities.moonfire.name': 'Tempestade Lunar',
-  'entities.abilities.rejuvenation.name': 'Florescer Selvagem',
   'entities.abilities.thorns.name': 'Guarda de Espinhos',
   'entities.abilities.thorns.description':
     'Espinhos brotam do alvo: atacantes corpo a corpo sofrem {buff} de dano de Natureza.',
@@ -18395,8 +18394,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Os golpes uníssonos do Comando Ceifador causam 25% a mais de dano.',
   'entities.itemSets.gravebrand.name': 'Regalia da Marca Tumular',
-  'entities.itemSets.grovespring.bonus2':
-    'Cura Rápida consome primeiro sua própria Florescência Selvagem ou Segunda Florescência e cura 25% a mais. Dano sofrido não atrasa mais suas conjurações.',
   'entities.itemSets.grovespring.bonus4':
     'Florescência Excedente colhe 75% dos seus efeitos restantes e armazena 1 Verdância depois.',
   'entities.itemSets.grovespring.name': 'Paramento da Nascente do Bosque',
