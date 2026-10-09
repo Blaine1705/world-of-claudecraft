@@ -2083,9 +2083,6 @@ export class Vfx {
   // Shapeshift-form aura (continuous, called per frame while the form aura is
   // on). Each form reads distinctly at a glance: metamorph = flame tongues +
   // stray embers, moonkin = drifting star motes, shadowform = gloom wisps +
-  // smoke curls.
-  formAura(entityId: number, form: 'metamorph' | 'moonkin' | 'shadowform', dt: number): void {
-    if (spellEffectsMuted(entityId)) return;
   // smoke curls, sporemender = tiny spores lifting off the ground into the sky,
   // sporemending = the same spores, sparser, on a Sporemending HoT target.
   formAura(
@@ -2093,6 +2090,7 @@ export class Vfx {
     form: 'metamorph' | 'moonkin' | 'shadowform' | 'sporemender' | 'sporemending',
     dt: number,
   ): void {
+    if (spellEffectsMuted(entityId)) return;
     if (form === 'metamorph') {
       const n = this.emitCount(48, dt);
       if (!n) return;

@@ -60,7 +60,7 @@ describe('PvP risk HUD', () => {
       expect(ring.borderTopColor).toBe('rgb(255, 107, 94)');
       expect(ring.animationName).toBe('minimap-pvp-risk');
       expect(ring.boxShadow).not.toBe('none');
-      expect(getComputedStyle(badge).display).toBe('inline-flex');
+      expect(getComputedStyle(badge).display).toBe('flex');
       expect(getComputedStyle(badge).color).toBe('rgb(255, 255, 255)');
       const rect = badge.getBoundingClientRect();
       const header = el('pf-name-header').getBoundingClientRect();
