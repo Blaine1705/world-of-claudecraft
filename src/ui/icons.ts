@@ -5623,6 +5623,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'pvp_flag_6h',
   'pvp_flag_24h',
   'pvp_flag_168h',
+  // The Hard wisp maze clear: exploration category crest pending art.
+  'exp_wisp_maze_hard',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

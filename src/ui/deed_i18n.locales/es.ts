@@ -1272,4 +1272,8 @@ export const dialects: Record<string, DeedLocaleTable> = {
       desc: 'Tu compañera de Profundidad puso de nuevo en pie a un aliado caído.',
     },
   },
+  exp_wisp_maze_hard: {
+    name: 'Mas brillante que las sombras',
+    desc: 'Recupera las bolsas de monedas robadas y escapa del laberinto de Evergarden en dificultad Hard.',
+  },
 };

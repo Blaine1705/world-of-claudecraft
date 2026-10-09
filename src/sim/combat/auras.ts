@@ -468,8 +468,6 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;
           const healed = Math.min(landing, Math.max(0, e.maxHp - e.hp));
-          const healer = ctx.entities.get(a.sourceId);
-          const healed = Math.min(landing, e.maxHp - e.hp);
           if (healer) onCraftedCollectionHeal(ctx, healer, e, landing - healed);
           const overheal = landing - healed;
           // A tick on a full-health target emits too (amount 0, the whole tick as

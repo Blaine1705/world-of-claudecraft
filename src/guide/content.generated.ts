@@ -6065,6 +6065,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 50,
     "feat": false,
     "rewardTitle": "Indomitable"
+  },
+  {
+    "id": "exp_wisp_maze_hard",
+    "name": "Brighter Than the Shadows",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false
   }
 ];
 

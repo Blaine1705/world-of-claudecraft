@@ -137,9 +137,8 @@ export function naturesBoonFormAllows(
 /** The multiplier an armed window puts on its spell's magnitudes, applied to a
  *  COPY of the resolved ability before its effects resolve (the consumeOverload
  *  shape in combat/casting_lifecycle.ts). 1 when no window covers this cast, so
- *  an ordinary Wildbloom or Oakhide is untouched. Wildbloom takes its own
+ *  an ordinary Sporemending or Oakhide is untouched. Sporemending takes its own
  *  stronger multiplier; every other member takes the base power. */
- *  an ordinary Sporemending or Oakhide is untouched. */
 export function naturesBoonPowerFor(auras: readonly BoonAura[], abilityId: string): number {
   if (!naturesBoonArmedFor(auras, abilityId)) return 1;
   return abilityId === 'rejuvenation' ? NATURES_BOON_WILDBLOOM_POWER : NATURES_BOON_POWER;
