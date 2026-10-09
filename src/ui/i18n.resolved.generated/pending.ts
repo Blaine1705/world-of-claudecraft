@@ -3779,5 +3779,129 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unstuck.helpUnstuckWindow",
     "hudChrome.unstuck.movedToGraveyardFree",
     "hudChrome.unstuck.revivedAtGraveyardFree"
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "es_ES": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "fr_FR": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "fr_CA": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "en_CA": [],
+  "it_IT": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "de_DE": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "ru_RU": [],
+  "cs_CZ": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "nl_NL": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "pl_PL": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "id_ID": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "tr_TR": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "sv_SE": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "vi_VN": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
+  ],
+  "da_DK": [
+    "hudChrome.ferry.arrivesIn",
+    "hudChrome.ferry.boardNow",
+    "hudChrome.ferry.destination",
+    "hudChrome.ferry.portLabel",
+    "hudChrome.ferry.portTitle",
+    "hudChrome.ferry.scheduleUnavailable"
   ]
 };

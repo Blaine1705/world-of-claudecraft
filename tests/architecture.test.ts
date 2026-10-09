@@ -211,6 +211,7 @@ describe('live graphics profile architecture', () => {
 const UI_PURE_CORES = [
   // Whether the "restoring graphics" note shows over the held 3D view.
   'src/ui/graphics_restore_note_view.ts',
+  'src/ui/ferry_port_map_core.ts',
   'src/ui/frame_presets_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
