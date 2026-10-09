@@ -110,7 +110,7 @@ import {
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
-import { OPEN_AIR_FIELDS } from './open_air_fields';
+import { OPEN_AIR_FIELDS, OpenAirFieldRoster } from './open_air_fields';
 import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { riftPlatformSlabs } from './rift_platform_core';
@@ -506,6 +506,7 @@ export class DungeonInteriors {
   private arenaHideables: WallHideable[] = [];
   private wallPropBindings: WallPropBinding[] = [];
   private readonly interiorResources = new Map<THREE.Group, OwnedInteriorResourceRegistry>();
+  readonly openAirFields = new OpenAirFieldRoster();
 
   constructor(
     private scene: THREE.Scene,
@@ -608,9 +609,7 @@ export class DungeonInteriors {
     if (field) {
       // Open-air fields: their own builders, same deps and compile gate.
       const deps = { lowGfx: this.lowGfx, flames: this.flames, fireLights: this.fireLights };
-      const group = await field(deps, ox, oz);
-      group.position.set(ox, 0, oz);
-      group.userData.renderCategory = 'dungeon';
+      const group = await this.openAirFields.build(field, deps, ox, oz);
       await attachSceneGroupGated(this.scene, group, this.compileGate);
       return group;
     }

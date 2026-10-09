@@ -2269,7 +2269,10 @@ const MONOLITHS: MonolithRow[] = [
     // src/render/open_air_fields.ts (the Drowned Temple joined that table).
     // Lowered 2411 -> 2364: the Drowned Temple water sheet's shaders moved to
     // src/render/temple_water_shader.ts with the camera-relative floor fix.
-    ceiling: 2364,
+    // Lowered 2364 -> 2362: the open-air arm's placement moved into the
+    // roster that draws only the field the player stands in
+    // (src/render/open_air_field_visibility_core.ts). Exact count, zero slack.
+    ceiling: 2362,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

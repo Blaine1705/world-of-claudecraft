@@ -2,6 +2,11 @@
 // an open field under its own sky (sim/instances/authored_field) builds its
 // whole interior group here, and dungeon.ts buildInterior attaches it through
 // the compile gate in one shared arm.
+//
+// A built field is never removed, and its sky and backdrop reach far past its
+// own instance: dungeon.ts builds each one through the roster re-exported
+// below, which draws only the field the player stands in
+// (open_air_field_visibility_core.ts).
 
 import type * as THREE from 'three';
 import { buildDrownedTempleInterior } from './drowned_temple';
@@ -10,6 +15,8 @@ import { buildHollowCryptInterior } from './hollow_crypt';
 import type { FireLightSink } from './point_light_budget';
 import { buildSunkenBastionInterior } from './sunken_bastion';
 import { buildWildheartBasinInterior } from './wildheart_basin';
+
+export { OpenAirFieldRoster } from './open_air_field_visibility_core';
 
 export interface OpenAirFieldDeps {
   lowGfx: boolean;

@@ -1026,6 +1026,7 @@ const RENDER_PURE_CORES = [
   'src/render/dais_blocks_core.ts',
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
+  'src/render/open_air_field_visibility_core.ts',
   'src/render/rift_platform_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
   'src/render/nythraxis_bound_cage_core.ts',

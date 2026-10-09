@@ -68,8 +68,12 @@ Rules:
   (`carveFaceBlock`), never by a fragment discard (it would cost the biggest opaque mesh
   its early depth). The sky dome draws after the opaque world (`renderOrder` 1000, depth
   on the far plane), so the aurora's march only runs on open sky.
-- `SANCTUM_SHARD_UNIFORMS` and the peaks' wash are module state: two claimed slots in
-  view at once share the aurora's level (the last driver to run wins).
+- `SANCTUM_SHARD_UNIFORMS` and the peaks' wash are module state shared by every built
+  slot. Only the slot the player stands in draws (`OpenAirFieldRoster`,
+  `../open_air_field_visibility_core.ts`, pinned by
+  `tests/open_air_field_visibility_core.test.ts`: the dome and the cirque reach far past
+  their own instance, and left drawn they stood in the next dungeon's sky), so one driver
+  runs at a time, and none while the player is elsewhere.
 - Swapping the wyrm: drop a new static GLB in the same frame (+Z his front, origin under
   his body) and change `FROZEN_WYRM_URL`; `FROZEN_WYRM` places it, the head, eye and heart
   anchors (`FROZEN_*_LOCAL`) are measured off the pose.

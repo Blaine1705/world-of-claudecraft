@@ -11925,8 +11925,8 @@ export class Renderer {
   // props are built), and one that captured them instead would rank a dead
   // array while numPointLights moves, which is the stall this prevents.
   private budgetFireLights(px: number, pz: number, flicker = false): void {
-    // The pass itself lives in fire_light_registry.ts; the renderer only owns
-    // the registries and the clock it reads from.
+    // Open-air fields settle first: the pass (fire_light_registry.ts) ranks the ancestry it sees.
+    this.dungeons?.openAirFields.sync(px, pz);
     runFireLightBudgetPass({
       rank: this.lightRank,
       rankDirty: this.lightRankDirty,
