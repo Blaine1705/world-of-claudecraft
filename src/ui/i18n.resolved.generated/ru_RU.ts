@@ -14333,7 +14333,7 @@ export const ru_RU: EnTranslations = {
       "swiftmend": {
         "name": "Быстрое восстановление",
         "description": "Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Каждое применение Спороисцеления, Второго расцвета и Дикого заживления добавляет 1 стадию Зелени; при 3 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "specNote_restoration": "Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Спороисцеление и Второй расцвет накапливают Зелень; при 5 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)"
       },
       "moonlash": {
         "name": "Лунный всплеск",
@@ -14366,7 +14366,7 @@ export const ru_RU: EnTranslations = {
       "overbloom": {
         "name": "Сверхцветение",
         "description": "Расходует ваши 3 стадии Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Спороисцеление.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "specNote_restoration": "Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новое Спороисцеление."
       },
       "summon_imp": {
         "name": "Призыв Уголька",

@@ -5224,6 +5224,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.name': '迅癒',
   'entities.abilities.swiftmend.description':
     '消耗友方目標身上的一個持續治療效果，治療其 {damage} 點生命。每次施放孢癒術、再度綻放或荒野癒合累積 1 層繁茂；在 3 層繁茂時，此按鈕會變為盛放，立即為每一位帶有你持續治療效果的盟友治療這些效果所剩餘量的 60%。（恢復標誌技能）',
+  'entities.abilities.swiftmend.specNote_restoration':
+    '消耗友方目標身上的一個持續治療效果，治療其 {damage} 點生命。孢癒術和再度綻放會累積繁茂；在 5 層繁茂時，此按鈕會變為盛放，立即為每一位帶有你持續治療效果的盟友治療這些效果所剩餘量的 60%。（恢復標誌技能）',
   'entities.abilities.crusader_strike.name': '十字軍聖擊',
   'entities.abilities.crusader_strike.description':
     '打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）',
@@ -15189,6 +15191,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ossuary_mark.name': '骸骨印記',
   'entities.abilities.overbloom.description':
     '消耗3層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的{buff}%立即治療，移除這些效果，並在目標身上種下一次新的孢癒術。',
+  'entities.abilities.overbloom.specNote_restoration':
+    '消耗5層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的{buff}%立即治療，移除這些效果，並在目標身上種下一次新的孢癒術。',
   'entities.abilities.overbloom.name': '盛放',
   'entities.abilities.pack_command.description':
     '命令你的活體寵物發動攻擊。命中後產生 20 點集中值和一層獸群兇性。',

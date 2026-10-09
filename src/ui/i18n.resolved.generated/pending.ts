@@ -401,8 +401,6 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.logs.worldQuestRewardMailed"
   ],
   "zh_CN": [
-    "entities.abilities.overbloom.specNote_restoration",
-    "entities.abilities.swiftmend.specNote_restoration",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",
@@ -414,8 +412,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.specRole"
   ],
   "zh_TW": [
-    "entities.abilities.overbloom.specNote_restoration",
-    "entities.abilities.swiftmend.specNote_restoration",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",
@@ -427,8 +423,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.specRole"
   ],
   "ko_KR": [
-    "entities.abilities.overbloom.specNote_restoration",
-    "entities.abilities.swiftmend.specNote_restoration",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",
@@ -440,8 +434,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.weeklyRewards.specRole"
   ],
   "ja_JP": [
-    "entities.abilities.overbloom.specNote_restoration",
-    "entities.abilities.swiftmend.specNote_restoration",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",
@@ -518,8 +510,6 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.logs.worldQuestRewardMailed"
   ],
   "ru_RU": [
-    "entities.abilities.overbloom.specNote_restoration",
-    "entities.abilities.swiftmend.specNote_restoration",
     "hudChrome.graphicsRestore.note",
     "hudChrome.pattern.reagent",
     "hudChrome.pattern.reagents",

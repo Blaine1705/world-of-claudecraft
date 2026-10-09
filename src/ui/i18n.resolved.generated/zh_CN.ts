@@ -14333,7 +14333,7 @@ export const zh_CN: EnTranslations = {
       "swiftmend": {
         "name": "迅捷治愈",
         "description": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。每次施放孢愈术、二度绽放或野性愈合累积1层繁茂；在 3 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "specNote_restoration": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。孢愈术和二度绽放会累积繁茂；在 5 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）"
       },
       "moonlash": {
         "name": "月涌",
@@ -14366,7 +14366,7 @@ export const zh_CN: EnTranslations = {
       "overbloom": {
         "name": "盛放",
         "description": "消耗你的3层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的孢愈术。",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "specNote_restoration": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的孢愈术。"
       },
       "summon_imp": {
         "name": "召唤烬裔",

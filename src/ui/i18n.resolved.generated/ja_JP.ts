@@ -14333,7 +14333,7 @@ export const ja_JP: EnTranslations = {
       "swiftmend": {
         "name": "スウィフトメンド",
         "description": "味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディング、二度目の開花、野生の癒しを詠唱するたびに翠成が1段階進み、翠成3でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "specNote_restoration": "味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディングと二度目の開花は翠成を蓄えます。翠成5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）"
       },
       "moonlash": {
         "name": "ムーンサージ",
@@ -14366,7 +14366,7 @@ export const ja_JP: EnTranslations = {
       "overbloom": {
         "name": "満開",
         "description": "翠成を3消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "specNote_restoration": "翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。"
       },
       "summon_imp": {
         "name": "エンバーキンの召喚",

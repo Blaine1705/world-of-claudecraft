@@ -5450,6 +5450,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
   'entities.abilities.swiftmend.description':
     '味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディング、二度目の開花、野生の癒しを詠唱するたびに翠成が1段階進み、翠成3でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
+  'entities.abilities.swiftmend.specNote_restoration':
+    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディングと二度目の開花は翠成を蓄えます。翠成5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
   'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
   'entities.abilities.crusader_strike.description':
     '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
@@ -15932,6 +15934,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ossuary_mark.name': '納骨の印',
   'entities.abilities.overbloom.description':
     '翠成を3消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。',
+  'entities.abilities.overbloom.specNote_restoration':
+    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。',
   'entities.abilities.overbloom.name': '満開',
   'entities.abilities.pack_command.description':
     '生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。',
