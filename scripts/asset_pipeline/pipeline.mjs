@@ -1141,8 +1141,8 @@ async function cmdSkinmodel() {
  *  KayKit clips for the knight) plus the real handslot bones, at zero Tripo
  *  cost. Assumes a Tripo-style raw mesh (T-pose, facing +X); --pre-rotated
  *  skips the yaw for meshes already facing +Z; --center-torso centres the depth
- *  on the torso rather than the bounds (a tail or snout drags those off). */
- *  skips the yaw for meshes already facing +Z. --rigid-head-from <frac> binds
+ *  on the torso rather than the bounds (a tail or snout drags those off).
+ *  --rigid-head-from <frac> binds
  *  everything above that fraction of the body height to the head joint (an
  *  oversized cap or helm whose rim would otherwise bend with the arms). */
 async function cmdRigManual() {

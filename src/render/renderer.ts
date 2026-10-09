@@ -205,7 +205,6 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from './characters/form_visual_selection_core';
-import { installSpiritVeil } from './characters/ghost_veil';
 import {
   disposeFormRigs,
   type FormVisualSlot,
@@ -214,6 +213,7 @@ import {
   setFormRigsShadow,
   visibleFormRig,
 } from './characters/form_visual_slots_core';
+import { installSpiritVeil } from './characters/ghost_veil';
 import { visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';

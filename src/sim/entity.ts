@@ -1,7 +1,7 @@
 import { parkCatEnergy, takeCatFormEntryEnergy } from './combat/cat_form_energy';
 import { resetCraftedCollectionState } from './combat/crafted_collection_effects';
-import { clearUnequippedBenisonPrayers } from './combat/priest/benison_dawnweave';
 import { SPOREMENDER_ARMOR_MULT } from './combat/druid_sporemender';
+import { clearUnequippedBenisonPrayers } from './combat/priest/benison_dawnweave';
 import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import { crucibleCollectionFamilyForSet } from './content/crucible_collections';
 import type { TalentModifiers } from './content/talents';

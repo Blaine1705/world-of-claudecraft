@@ -1040,12 +1040,9 @@ const MONOLITHS: MonolithRow[] = [
     // async build tracking stays extracted in static_interior_tracker.ts while
     // the release batch's spirit-veil and Spell Effects extractions remain.
     // Exact count measured with wc -l on the resolved tree. Zero slack.
-    ceiling: 12620,
-    // gained its assets line). Exact count. LOWERED 12789 -> 12786 when the
-    // Sporemender Form rig slot landed: the per-slot shadow, far, proxy-shadow,
-    // dispose and active-rig lines moved into
-    // src/render/characters/form_visual_slots_core.ts. Exact count.
-    ceiling: 12786,
+    // LOWERED 12620 -> 12617 after resolving the Sporemender Form rig-slot
+    // extraction with the release batch. Exact count.
+    ceiling: 12617,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

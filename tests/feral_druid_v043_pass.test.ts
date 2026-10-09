@@ -1022,7 +1022,6 @@ describe('13. An armed window makes its spell stronger (Wildbloom 50%, Oakhide 2
     return { sim, player };
   }
 
-  it('scales Wildbloom by half, Spell Power rider included', () => {
   it('scales Sporemending by a quarter, Spell Power rider included', () => {
     const plain = gearedRig();
     plain.sim.castAbility('rejuvenation');

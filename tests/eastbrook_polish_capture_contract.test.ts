@@ -723,7 +723,6 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for PR #4379 on top of that v0.45 batch: the renderer leaf now
   // carries the dungeon/arena static interior retry tracker beside the batch's
   // spirit-veil and Spell Effects imports. No capture was retaken.
-  '87cea55aa3fa76ab984d6d9663be5c9a288dafe403e795717ed822db0889c21f';
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for Sporemender Form: the renderer leaf gained the Sporemender form-rig slot and the form-slot loops. No capture was retaken.
   // Re-minted for the Sporemender spores: the renderer leaf gained the Sporemender particle-aura call. No capture was retaken.

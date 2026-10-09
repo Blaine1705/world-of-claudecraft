@@ -38,7 +38,9 @@ describe('Wildbloom is renamed Sporemending (display-only)', () => {
     expect(ABILITIES.overbloom.description).toContain('a fresh Sporemending');
     expect(en.entities.abilities.swiftmend.description).toContain('Sporemending');
     expect(en.entities.abilities.overbloom.description).toContain('Sporemending');
-    expect(en.hudChrome.auraEffect.verdance).toContain('Each Sporemending, Second Bloom, or Wildmend');
+    expect(en.hudChrome.auraEffect.verdance).toContain(
+      'Each Sporemending, Second Bloom, or Wildmend',
+    );
     expect(ITEM_SETS.grovespring.bonuses.find((bonus) => bonus.pieces === 2)?.text).toContain(
       'your own Sporemending',
     );

@@ -1418,7 +1418,6 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for PR #4379 on top of that v0.45 batch: the renderer leaf now
   // carries the dungeon/arena static interior retry tracker beside the batch's
   // spirit-veil and Spell Effects imports. No capture was retaken.
-  '29a005395830ad9001b4367b628726fb7d55f6947fc0c0de05223a0d7a9095fb';
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for Sporemender Form: the renderer leaf gained the Sporemender form-rig slot and the form-slot loops. No capture was retaken.
   // Re-minted for the Sporemender spores: the renderer leaf gained the Sporemender particle-aura call. No capture was retaken.
@@ -1470,7 +1469,6 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for PR #4379 on top of that v0.45 batch: the renderer leaf now
   // carries the dungeon/arena static interior retry tracker beside the batch's
   // spirit-veil and Spell Effects imports. No capture was retaken.
-  '87cea55aa3fa76ab984d6d9663be5c9a288dafe403e795717ed822db0889c21f';
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
   // Re-minted for Sporemender Form: the renderer leaf gained the Sporemender form-rig slot and the form-slot loops. No capture was retaken.
   // Re-minted for the Sporemender spores: the renderer leaf gained the Sporemender particle-aura call. No capture was retaken.
@@ -2880,7 +2878,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // PR #4379 dungeon/arena static interior retry merge on top of the v0.45
       // batch: recomputed LAST over the re-swept evidence. No capture was
       // retaken.
-    ).toBe('57ef3aa341ef7b0586da69bd0dd49395eede5146b1d5fe4b484da94ddc6ffeea');
       // Frame Rate Limit: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
       // devalue audit floor: recomputed LAST again over the re-swept evidence. No

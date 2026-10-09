@@ -1272,6 +1272,6 @@ export const dialects: Record<string, DeedLocaleTable> = {
   },
   exp_wisp_maze_hard: {
     name: 'Plus brillante que les ombres',
-    desc: 'Recupere les bourses de pieces volees et echappe-toi du labyrinthe d\'Evergarden en difficulte Hard.',
+    desc: "Recupere les bourses de pieces volees et echappe-toi du labyrinthe d'Evergarden en difficulte Hard.",
   },
 };
