@@ -1240,6 +1240,10 @@ export const table: DeedLocaleTable = {
     name: 'Atrapada con las manos en la masa',
     desc: 'Atrapa una Rata de Bolsa de Monedas en un Tesoro Enterrado antes de que escape con el oro.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Mas brillante que las sombras',
+    desc: 'Recupera las bolsas de monedas robadas y escapa del laberinto de Evergarden en dificultad Hard.',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer
@@ -1271,9 +1275,5 @@ export const dialects: Record<string, DeedLocaleTable> = {
       name: 'No mientras ella vigile',
       desc: 'Tu compañera de Profundidad puso de nuevo en pie a un aliado caído.',
     },
-  },
-  exp_wisp_maze_hard: {
-    name: 'Mas brillante que las sombras',
-    desc: 'Recupera las bolsas de monedas robadas y escapa del laberinto de Evergarden en dificultad Hard.',
   },
 };

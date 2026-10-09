@@ -1250,6 +1250,10 @@ export const table: DeedLocaleTable = {
     name: 'Pris en flagrant délit',
     desc: "Capturez un Escroc Sacpiéces dans un Trésor enterré avant qu'il ne s'échappe avec l'or.",
   },
+  exp_wisp_maze_hard: {
+    name: 'Plus brillante que les ombres',
+    desc: "Recupere les bourses de pieces volees et echappe-toi du labyrinthe d'Evergarden en difficulte Hard.",
+  },
 };
 
 // fr_CA rides this base table plus the delve-vocabulary override layer
@@ -1269,9 +1273,5 @@ export const dialects: Record<string, DeedLocaleTable> = {
       desc: "Hisser une compagne d'excavation à son rang le plus élevé.",
     },
     dlv_clears_50: { name: 'Cinquante brasses', desc: 'Terminer 50 excavations.' },
-  },
-  exp_wisp_maze_hard: {
-    name: 'Plus brillante que les ombres',
-    desc: "Recupere les bourses de pieces volees et echappe-toi du labyrinthe d'Evergarden en difficulte Hard.",
   },
 };
