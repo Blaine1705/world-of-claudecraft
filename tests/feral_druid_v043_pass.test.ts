@@ -297,7 +297,7 @@ describe("3. Nature's Boon", () => {
     expect(text).toContain(`about every ${Math.round(1 / NATURES_BOON_CHANCE)} sec`);
     expect(text).toContain(`for ${NATURES_BOON_DURATION} sec`);
     expect(text).toContain(
-      `Wildbloom castable in any form and ${Math.round((NATURES_BOON_WILDBLOOM_POWER - 1) * 100)}% stronger`,
+      `Sporemending castable in any form and ${Math.round((NATURES_BOON_WILDBLOOM_POWER - 1) * 100)}% stronger`,
     );
     expect(text).toContain(
       `Oakhide in Bruin Form and ${Math.round((NATURES_BOON_POWER - 1) * 100)}% stronger`,
