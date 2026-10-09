@@ -1883,7 +1883,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 98 -> 96, none 18 -> 19 after #4411: the death-screen surfaces
       // fold into one three-site setDisplay row fed by death_screen_view, and
       // its Release input hold is one state-only call.
-    ).toEqual({ window: 51, chrome: 97, none: 19 });
+      // chrome 96 -> 97, none 19 -> 20 after the click-move marker gains its
+      // own HUD repaint row while the move-state holder stays state-only.
+    ).toEqual({ window: 51, chrome: 96, none: 20 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

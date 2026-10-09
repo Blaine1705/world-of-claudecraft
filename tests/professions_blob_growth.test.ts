@@ -2477,7 +2477,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // earned by this maximal fixture. MEASURED (77,204 to 77,230).
         26 +
         // The five World PvP title dates, isolated above without any other field change.
-        138,
+        138 +
+        // Plus 34 for the Groveheart deed row that this maximal fixture earns,
+        // measured on the merged v0.45 tree.
+        34,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2521,7 +2524,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
       // (the +154 above). deeds 743 -> 769 with prog_titan (the +26 above),
       // then -> 907 with the five World PvP title dates (the +138 above).
-      deeds: 907,
+      deeds: 941,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // +19 for the World PvP trophy skull id (attributed above).
@@ -2567,7 +2570,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // which this counterfactual keeps.
       // 231,729 -> 231,755 with prog_titan in the deeds row (+26, kept here).
       // Five World PvP title dates add +138, also kept here.
-    ).toBe(231935);
+      // Groveheart's deed row adds +34, also kept here.
+    ).toBe(231969);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2598,7 +2602,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // +42 for the World PvP trophy skull, which this baseline keeps.
       // 233,348 -> 233,374 with prog_titan in the deeds row (+26, kept).
       // Five World PvP title dates add +138, also kept here.
-    ).toBe(233554);
+      // Groveheart's deed row adds +34, also kept here.
+    ).toBe(233588);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2702,8 +2707,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 381-byte tracking band and the unchanged character warning threshold.
     // Together they measure 233,566 bytes. Floor at measurement minus 380,
     // edge at measurement plus one: 233186..233567.
-    expect(bytes, reMint).toBeGreaterThan(233186);
-    expect(bytes, reMint).toBeLessThan(233567);
+    // Groveheart's deed row adds the measured 34 bytes, retaining the same
+    // 381-byte tracking band and the unchanged character warning threshold.
+    // Together they measure 233,600 bytes. Floor at measurement minus 380,
+    // edge at measurement plus one: 233220..233601.
+    expect(bytes, reMint).toBeGreaterThan(233220);
+    expect(bytes, reMint).toBeLessThan(233601);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
