@@ -494,7 +494,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/stone_cantor.glb": "/media/models/creatures/stone_cantor.a207f7ae80be.glb",
   "models/creatures/temple_acolyte.glb": "/media/models/creatures/temple_acolyte.8b8ca9cee5ce.glb",
   "models/creatures/temple_colossus.glb": "/media/models/creatures/temple_colossus.513ebec51de3.glb",
-  "models/creatures/temple_eel.glb": "/media/models/creatures/temple_eel.8c8e3340e56a.glb",
+  "models/creatures/temple_ice_wraith.glb": "/media/models/creatures/temple_ice_wraith.552fc10f49cb.glb",
   "models/creatures/temple_laverock.glb": "/media/models/creatures/temple_laverock.e3e8db5cd240.glb",
   "models/creatures/temple_lurker.glb": "/media/models/creatures/temple_lurker.094faf63a37b.glb",
   "models/creatures/temple_moonspawn.glb": "/media/models/creatures/temple_moonspawn.228c2574b76c.glb",

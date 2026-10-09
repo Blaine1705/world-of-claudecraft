@@ -20463,8 +20463,8 @@ export const ja_JP: EnTranslations = {
       "lagoon_snapper": {
         "name": "潟湖のスナッパー"
       },
-      "lagoon_eel": {
-        "name": "潟湖のウナギ"
+      "ice_wraith": {
+        "name": "氷のレイス"
       },
       "moonlit_siren": {
         "name": "月照らしのセイレーン"

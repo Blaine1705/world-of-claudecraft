@@ -202,7 +202,7 @@ const LINES: GuideLineDef[] = [
     id: 'C09',
     key: 'sight.eel',
     text: 'The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.',
-    trigger: { kind: 'sight', mobIds: ['lagoon_eel'], r: SIGHT },
+    trigger: { kind: 'sight', mobIds: ['ice_wraith'], r: SIGHT },
     priority: 'creature',
   },
   {

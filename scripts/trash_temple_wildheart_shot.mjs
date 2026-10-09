@@ -124,11 +124,11 @@ const SHOTS = [
       ['priest', 2, -3],
       ['warrior', -1, -6],
     ],
-    stage: 'cast:lagoon_eel:spark',
+    stage: 'cast:ice_wraith:spark',
     frames: [900],
     // A screenshot takes about 0.45 s: catch the 0.5 s arcs by polling for
     // the landing and shooting at once.
-    land: 'lagoon_eel',
+    land: 'ice_wraith',
     landFrames: 2,
     cam: { yaw: 0.9, pitch: 0.4, dist: 17 },
   },

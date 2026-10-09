@@ -5552,7 +5552,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vael_fog_shade.name': '縛霧者維爾',
   'entities.mobs.gaoler_ossick.name': '獄卒奧西克',
   'entities.mobs.lagoon_snapper.name': '潟湖鱷龜',
-  'entities.mobs.lagoon_eel.name': '潟湖鰻魚',
+  'entities.mobs.ice_wraith.name': '寒冰怨靈',
   'entities.mobs.moonlit_siren.name': '月光賽壬',
   'entities.mobs.tidewisp.name': '潮汐精魂',
   'entities.mobs.drowned_pilgrim.name': '溺亡朝聖者',

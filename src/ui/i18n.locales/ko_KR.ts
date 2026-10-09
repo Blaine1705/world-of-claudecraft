@@ -5737,7 +5737,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vael_fog_shade.name': '안개엮는자 바엘',
   'entities.mobs.gaoler_ossick.name': '간수 오시크',
   'entities.mobs.lagoon_snapper.name': '석호 늑대거북',
-  'entities.mobs.lagoon_eel.name': '석호 뱀장어',
+  'entities.mobs.ice_wraith.name': '얼음 망령',
   'entities.mobs.moonlit_siren.name': '달빛 세이렌',
   'entities.mobs.tidewisp.name': '조수 정령',
   'entities.mobs.drowned_pilgrim.name': '익사한 순례자',

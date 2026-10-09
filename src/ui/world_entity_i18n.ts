@@ -124,7 +124,7 @@ const MOB_IDS = [
   // The Drowned Temple rework (sim/content/drowned_temple.ts); the per-class
   // Reflections all wear the one name.
   'lagoon_snapper',
-  'lagoon_eel',
+  'ice_wraith',
   'moonlit_siren',
   'tidewisp',
   'drowned_pilgrim',

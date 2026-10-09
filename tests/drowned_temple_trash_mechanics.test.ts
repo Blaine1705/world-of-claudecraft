@@ -131,7 +131,7 @@ describe('Temple trash mechanics: the content', () => {
     expect(MOBS.drowned_templeguard.trashKit?.temple?.guard?.share).toBe(0.5);
     expect(MOBS.glimmerscale_lurker.trashKit?.temple?.gaze?.castId).toBe(TEMPLE_PRISM_GLARE);
     expect(MOBS.lagoon_snapper.trashKit?.temple?.whirlpool?.radius).toBe(8);
-    expect(MOBS.lagoon_eel.trashKit?.temple?.spark?.castId).toBe(TEMPLE_ARCING_SPARK);
+    expect(MOBS.ice_wraith.trashKit?.temple?.spark?.castId).toBe(TEMPLE_ARCING_SPARK);
     expect(MOBS.tidewisp.trashKit?.detonate?.slow).toEqual({ mult: 0.5, seconds: 2 });
     expect(MOBS.tidewisp.trashKit?.temple?.merge?.max).toBe(2);
   });
@@ -425,7 +425,7 @@ describe('Arcing Spark: the lightning leaps through a bunched group', () => {
 
   function spark(spread: number) {
     const r = room();
-    const eel = engage(r, 'lagoon_eel', 0, 12);
+    const eel = engage(r, 'ice_wraith', 0, 12);
     const players = [r.me, ...[1, 2, 3].map((k) => addPlayer(r, 'mage', k * spread, 0))];
     run(r, DT, [eel]);
     const kit = eel.trashKit;
@@ -523,7 +523,7 @@ describe('determinism', () => {
       engage(r, 'drowned_pilgrim', 10, -3),
       engage(r, 'drowned_templeguard', 9, 4),
       engage(r, 'glimmerscale_lurker', -6, 8),
-      engage(r, 'lagoon_eel', 6, 12),
+      engage(r, 'ice_wraith', 6, 12),
       engage(r, 'lagoon_snapper', -4, -6),
     ];
     addPlayer(r, 'mage', -10, 0);

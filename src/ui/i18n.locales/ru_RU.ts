@@ -5826,7 +5826,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vael_fog_shade.name': 'Ваэль Вязатель Тумана',
   'entities.mobs.gaoler_ossick.name': 'Тюремщик Оссик',
   'entities.mobs.lagoon_snapper.name': 'Лагунная кусачая черепаха',
-  'entities.mobs.lagoon_eel.name': 'Лагунный угорь',
+  'entities.mobs.ice_wraith.name': 'Ледяной призрак',
   'entities.mobs.moonlit_siren.name': 'Лунная сирена',
   'entities.mobs.tidewisp.name': 'Приливный огонёк',
   'entities.mobs.drowned_pilgrim.name': 'Утонувший паломник',

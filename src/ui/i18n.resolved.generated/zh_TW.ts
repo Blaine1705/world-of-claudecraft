@@ -20463,8 +20463,8 @@ export const zh_TW: EnTranslations = {
       "lagoon_snapper": {
         "name": "潟湖鱷龜"
       },
-      "lagoon_eel": {
-        "name": "潟湖鰻魚"
+      "ice_wraith": {
+        "name": "寒冰怨靈"
       },
       "moonlit_siren": {
         "name": "月光賽壬"

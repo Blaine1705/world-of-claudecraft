@@ -20463,8 +20463,8 @@ export const ru_RU: EnTranslations = {
       "lagoon_snapper": {
         "name": "Лагунная кусачая черепаха"
       },
-      "lagoon_eel": {
-        "name": "Лагунный угорь"
+      "ice_wraith": {
+        "name": "Ледяной призрак"
       },
       "moonlit_siren": {
         "name": "Лунная сирена"

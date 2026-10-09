@@ -5772,7 +5772,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vael_fog_shade.name': 'フォグバインダーのヴァエル',
   'entities.mobs.gaoler_ossick.name': '牢番オシック',
   'entities.mobs.lagoon_snapper.name': '潟湖のスナッパー',
-  'entities.mobs.lagoon_eel.name': '潟湖のウナギ',
+  'entities.mobs.ice_wraith.name': '氷のレイス',
   'entities.mobs.moonlit_siren.name': '月照らしのセイレーン',
   'entities.mobs.tidewisp.name': '潮の精',
   'entities.mobs.drowned_pilgrim.name': '溺れた巡礼者',

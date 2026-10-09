@@ -235,6 +235,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_colossus',
   // the Drowned Temple's Blender Moonspawn (the moon spirit of water)
   'temple_moonspawn',
+  // the Drowned Temple's Ice Wraith (a Tripo sculpt)
+  'temple_ice_wraith',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   // the Gravewyrm Sanctum trash's Blender bodies (sanctum_trash_looks.ts)

@@ -65,7 +65,7 @@ const SHOTS = [
     cmds: ['/dev temple spawn eel'],
     cmdWait: 1200,
     wait: 800,
-    js: 'calm:lagoon_eel',
+    js: 'calm:ice_wraith',
   },
   // ---- item 1: the trash's second jobs
   {

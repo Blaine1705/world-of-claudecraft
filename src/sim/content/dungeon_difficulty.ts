@@ -746,7 +746,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       pearlguard_sentinel: 5.5,
       drowned_templeguard: 5.5,
       lagoon_snapper: 5.5,
-      lagoon_eel: 5.5,
+      ice_wraith: 5.5,
       glimmerscale_lurker: 5.5,
       tidewisp: 5.5,
       mere_hydra_head_left: 6,

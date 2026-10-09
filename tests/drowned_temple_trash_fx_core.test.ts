@@ -83,7 +83,7 @@ describe('the numbers are the sim’s own', () => {
     const guard = kit('drowned_templeguard')?.guard;
     const gaze = kit('glimmerscale_lurker')?.gaze;
     const whirl = kit('lagoon_snapper')?.whirlpool;
-    const spark = kit('lagoon_eel')?.spark;
+    const spark = kit('ice_wraith')?.spark;
     const merge = kit('tidewisp')?.merge;
     const burst = MOBS.tidewisp?.trashKit?.detonate;
     expect(vigil && echo && guard && gaze && whirl && spark && merge && burst).toBeTruthy();
@@ -179,13 +179,15 @@ describe('the cast glyphs', () => {
     expect(TEMPLE_KIT_CAST_SCHOOLS[TEMPLE_PRISM_GLARE]).toBeUndefined();
   });
 
-  it('gives each new bar an existing creature clip', () => {
+  it('gives each new bar an existing creature clip, or none at all', () => {
     const lurker = visualOf('glimmerscale_lurker');
-    const eel = visualOf('lagoon_eel');
+    const eel = visualOf('ice_wraith');
     expect(lurker.clips.castByAbility?.[TEMPLE_PRISM_GLARE]).toBe('Cast');
-    expect(eel.clips.castByAbility?.[TEMPLE_ARCING_SPARK]).toBe('Spit');
     expect(clipsOf('public/models/creatures/temple_lurker.glb')).toContain('Cast');
-    expect(clipsOf('public/models/creatures/temple_eel.glb')).toContain('Spit');
+    // The Ice Wraith ships no cast clip: the Arcing Spark
+    // runs its bar over the hover, and a clip the file lacks is never named.
+    expect(eel.clips.castByAbility?.[TEMPLE_ARCING_SPARK]).toBeUndefined();
+    expect(eel.clips.cast).toBeUndefined();
   });
 });
 

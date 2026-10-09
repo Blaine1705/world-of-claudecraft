@@ -70,11 +70,11 @@ export interface TempleTelegraphSpec {
   accent?: number;
 }
 
-/** The Lagoon Eel's coil on the floor (yards from its centre, at its
- *  template scale): the coiled body covers the floor out to this, so a glyph
- *  under the eel must reach past it or the eel's own body hides it. Measured
- *  off the live rig's skinned vertices under 1.5 yd (99th percentile 2.89;
- *  only the tail tip reaches further). */
+/** The Ice Wraith's reach over the floor (yards from its centre,
+ *  at its template scale): it hangs its talons out to this, so a glyph under
+ *  it must reach past them or its own body hides it.
+ *  Measured off the live rig's skinned vertices under 1.5 yd across its hover
+ *  (99th percentile 2.4 to 2.8, the widest vertex 2.86). */
 export const TEMPLE_EEL_COIL_RADIUS = 2.9;
 
 /** The temple's own element accents: moonlight, the choir's gold, the prism's
@@ -95,8 +95,8 @@ function cone(templateId: string): { range: number; arcDeg: number } {
 
 /** Every cast that paints the floor while its bar runs, trash and bosses. */
 export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphSpec>> {
-  const coil = MOBS.lagoon_eel?.trashKit?.screech;
-  const spit = MOBS.lagoon_eel?.trashKit?.line;
+  const coil = MOBS.ice_wraith?.trashKit?.screech;
+  const spit = MOBS.ice_wraith?.trashKit?.line;
   const hurl = MOBS.drowned_templeguard?.trashKit?.line;
   const slam = MOBS.pearlguard_sentinel?.trashKit?.wingGust;
   return {

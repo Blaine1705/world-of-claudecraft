@@ -20463,8 +20463,8 @@ export const fr_CA: EnTranslations = {
       "lagoon_snapper": {
         "name": "Lagoon Snapper"
       },
-      "lagoon_eel": {
-        "name": "Lagoon Eel"
+      "ice_wraith": {
+        "name": "Ice Wraith"
       },
       "moonlit_siren": {
         "name": "Moonlit Siren"

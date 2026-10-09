@@ -37,7 +37,7 @@ export const TEMPLE_TRASH_IDS = {
   guard: 'drowned_templeguard',
   lurker: 'glimmerscale_lurker',
   snapper: 'lagoon_snapper',
-  eel: 'lagoon_eel',
+  eel: 'ice_wraith',
   wisp: 'tidewisp',
 } as const;
 
@@ -163,7 +163,7 @@ export const TEMPLE_TRASH_BODY: Readonly<Record<string, { height: number; hover:
   [TEMPLE_TRASH_IDS.guard]: { height: 5.0 * 1.1, hover: 0 },
   [TEMPLE_TRASH_IDS.lurker]: { height: 3.65 * 1.2, hover: 0 },
   [TEMPLE_TRASH_IDS.snapper]: { height: 3.83 * 1.2, hover: 0 },
-  [TEMPLE_TRASH_IDS.eel]: { height: 6.2 * 1.2, hover: 0 },
+  [TEMPLE_TRASH_IDS.eel]: { height: 4.0 * 1.2, hover: 0.3 },
   [TEMPLE_TRASH_IDS.wisp]: { height: 2.75 * 0.8, hover: 0.45 },
 };
 
@@ -396,9 +396,10 @@ export function sparkHopIndex(
   return lastAt >= 0 && now - lastAt <= window ? lastIndex + 1 : 0;
 }
 
-/** Where the eel's spark leaves its jaws (its reared head). */
+/** Where the Ice Wraith's spark leaves it: its face, measured
+ *  off the live rig's head bone over its hover. */
 export function eelJawUp(): number {
-  return templeBodyHeight(TEMPLE_TRASH_IDS.eel) * 0.82;
+  return templeBodyHeight(TEMPLE_TRASH_IDS.eel) * 0.78;
 }
 
 // ---- Tidewisp ---------------------------------------------------------------------------

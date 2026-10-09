@@ -20463,8 +20463,8 @@ export const en_XA: EnTranslations = {
       "lagoon_snapper": {
         "name": "[Ļáĝóóñ Šñáþþéŕ]"
       },
-      "lagoon_eel": {
-        "name": "[Ļáĝóóñ Ééļ]"
+      "ice_wraith": {
+        "name": "[Íçé Ŵŕáíţĥ]"
       },
       "moonlit_siren": {
         "name": "[Ɱóóñļíţ Šíŕéñ]"

@@ -108,7 +108,7 @@ describe('Temple trash: the cast table', () => {
     expect(MOBS.glimmerscale_lurker.trashKit?.leap?.name).toBe('Pounce');
     expect(MOBS.pearlguard_sentinel.trashKit?.carapace?.belowHpPct).toBe(0.3);
     expect(MOBS.lagoon_snapper.breathCone?.castId).toBe(TEMPLE_SNAP);
-    expect(MOBS.lagoon_eel.trashKit?.screech?.castId).toBe(TEMPLE_STATIC_COIL);
+    expect(MOBS.ice_wraith.trashKit?.screech?.castId).toBe(TEMPLE_STATIC_COIL);
     expect(MOBS.moonlit_siren.trashKit?.call?.summon).toBe('tidewisp');
     expect(MOBS.moonlit_siren.trashKit?.call?.count).toBe(3);
     expect(MOBS.tidewisp.trashKit?.detonate?.radius).toBe(3);
@@ -123,7 +123,7 @@ describe('Temple trash: the cast table', () => {
       'glimmerscale_lurker',
       'pearlguard_sentinel',
       'lagoon_snapper',
-      'lagoon_eel',
+      'ice_wraith',
       'moonlit_siren',
       'drowned_pilgrim',
     ])
@@ -228,9 +228,9 @@ describe('the Moonlit Siren and her Tidewisps', () => {
 describe('the Lagoon Eel: Static Coil', () => {
   it('shocks and stuns everyone within 8 yd when the bar runs out', () => {
     const r = room();
-    const eel = engage(r, 'lagoon_eel', 4, 0);
+    const eel = engage(r, 'ice_wraith', 4, 0);
     const far = addPlayer(r, 'mage', -14, 0);
-    const def = MOBS.lagoon_eel.trashKit?.screech;
+    const def = MOBS.ice_wraith.trashKit?.screech;
     if (!def) throw new Error('coil');
     run(r, def.first + def.castTime + 0.1, [eel]);
     expect(r.me.hp).toBeLessThan(1e6);
@@ -246,7 +246,7 @@ describe('Temple trash, sixth pass: a second readable job for every type', () =>
     expect(MOBS.glimmerscale_lurker.trashKit?.bolt?.castId).toBe(TEMPLE_GLIMMER_VENOM);
     expect(MOBS.pearlguard_sentinel.trashKit?.wingGust?.castId).toBe(TEMPLE_PEARL_SLAM);
     expect(MOBS.lagoon_snapper.trashKit?.withdraw?.name).toBe('Shell Up');
-    expect(MOBS.lagoon_eel.trashKit?.line?.castId).toBe(TEMPLE_LIGHTNING_SPIT);
+    expect(MOBS.ice_wraith.trashKit?.line?.castId).toBe(TEMPLE_LIGHTNING_SPIT);
     // Two kicks on two schools (one kick never locks both), three dodges.
     expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[TEMPLE_PALE_MENDING]?.school).toBe('frost');
     expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[TEMPLE_GLIMMER_VENOM]?.school).toBe('nature');
@@ -256,8 +256,8 @@ describe('Temple trash, sixth pass: a second readable job for every type', () =>
 
   it('the Lagoon Eel’s Lightning Spit hits the lane it locked, never a sidestep', () => {
     const r = room();
-    const eel = engage(r, 'lagoon_eel', 4, 0);
-    const def = MOBS.lagoon_eel.trashKit?.line;
+    const eel = engage(r, 'ice_wraith', 4, 0);
+    const def = MOBS.ice_wraith.trashKit?.line;
     if (!def) throw new Error('arc surge');
     let t = 0;
     while (eel.castingAbility !== TEMPLE_LIGHTNING_SPIT && t < def.first + def.every) {

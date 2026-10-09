@@ -116,18 +116,15 @@ import {
   CRYPT_WING_GUST,
 } from '../../sim/mob/trash_kit/cast_ids';
 import {
-  TEMPLE_ARCING_SPARK,
   TEMPLE_CALL_OF_THE_SHALLOWS,
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_GLIMMER_VENOM,
-  TEMPLE_LIGHTNING_SPIT,
   TEMPLE_LULLABY,
   TEMPLE_PALE_MENDING,
   TEMPLE_PEARL_SLAM,
   TEMPLE_PRISM_GLARE,
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
-  TEMPLE_STATIC_COIL,
   TEMPLE_TRIDENT_SWEEP,
 } from '../../sim/mob/trash_kit/temple_cast_ids';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
@@ -5066,30 +5063,35 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.06,
   },
-  // The Lagoon Eel (scripts/assets/drowned_temple_creatures/eel.py): an
-  // S-wave climbs its column with the head held level. A new eel body swaps
-  // in here: keep its clip names (Idle, Walk, Run, Attack, Attack2, Hit,
-  // Death, Cast, Coil, Spit) or remap them in this row.
-  temple_eel: {
-    url: `${CREATURES}/temple_eel.glb`,
-    height: 6.2,
+  // The Ice Wraith (ice_wraith; shipped by
+  // scripts/assets/specs/drowned_temple_ice_wraith.json): a legless spirit of
+  // blue ice hovering on a shard tail under a cloak and halo of loose
+  // crystals, each arm ending in three long talons that reach the floor. It
+  // glides (Walk carries Run too: nothing steps), rakes overhand with its
+  // right claw (Attack), flinches (HitReact) and has its own Death. It ships
+  // no cast clip: Static Coil, Lightning Spit and the Arcing Spark run their
+  // bars over its hover, read from their floor marks and their lightning. A
+  // clip for one of them is a castByAbility entry in this row. Its hover
+  // dips its talons a third of a yard under its rest height, so it is drawn
+  // that much off the floor, and its Death (a heap of shards) settles back
+  // onto it. Drawn 4.8 to its crest at its 1.2 (nearly two players).
+  temple_ice_wraith: {
+    url: `${CREATURES}/temple_ice_wraith.glb`,
+    height: 4.0,
+    hover: 0.3,
+    deathGroundOffset: 0.3,
     clips: {
-      ...TEMPLE_CLIPS,
-      // The trash mechanics pass: the Arcing Spark is drawn back crackling and
-      // spat at its first victim on the bar's end, on the Spit clip.
-      castByAbility: {
-        [TEMPLE_STATIC_COIL]: 'Coil',
-        [TEMPLE_LIGHTNING_SPIT]: 'Spit',
-        [TEMPLE_ARCING_SPARK]: 'Spit',
-      },
-      castTimeScaleByAbility: {
-        [TEMPLE_STATIC_COIL]: 1,
-        [TEMPLE_LIGHTNING_SPIT]: 1,
-        [TEMPLE_ARCING_SPARK]: 1,
-      },
-      castPlayOut: ['Spit'],
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Walk',
+      attack: ['Attack'],
+      hit: ['HitReact'],
+      death: 'Death',
     },
-    selfIllumination: 0.22,
+    walkRef: 2.5,
+    runRef: 7,
+    authoredAtlas: true,
+    selfIllumination: 0.06,
   },
   // The Lagoon Snapper (lagoon_snapper; scripts/assets/
   // drowned_temple_creatures/snapper_nautilus/): a giant sacred nautilus, its
@@ -6523,7 +6525,7 @@ const MOB_KEYS: Record<string, string> = {
   drowned_pilgrim: 'temple_pilgrim',
   pale_choir_acolyte: 'temple_acolyte',
   moonlit_siren: 'temple_siren',
-  lagoon_eel: 'temple_eel',
+  ice_wraith: 'temple_ice_wraith',
   lagoon_snapper: 'temple_snapper',
   pearlguard_sentinel: 'temple_sentinel',
   glimmerscale_lurker: 'temple_lurker',

@@ -20463,8 +20463,8 @@ export const ko_KR: EnTranslations = {
       "lagoon_snapper": {
         "name": "석호 늑대거북"
       },
-      "lagoon_eel": {
-        "name": "석호 뱀장어"
+      "ice_wraith": {
+        "name": "얼음 망령"
       },
       "moonlit_siren": {
         "name": "달빛 세이렌"

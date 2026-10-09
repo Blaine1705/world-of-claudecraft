@@ -1,6 +1,6 @@
 // The Drowned Temple's sixth-pass bodies (src/render/characters/manifest.ts):
 // Ysolei is the Codex-built serpent, every one of her clips riding a real
-// mechanic; the Lagoon Eel ships its Spit clip for Lightning Spit; the
+// mechanic; the Ice Wraith ships five clips, each mapped; the
 // Colossus walks on its own gait. Each row names its clips so a new body is a
 // manifest swap.
 
@@ -65,6 +65,9 @@ function clipsOf(path: string): string[] {
 }
 
 interface GlbJson {
+  extensionsUsed?: string[];
+  images?: { mimeType?: string }[];
+  skins?: { joints: number[] }[];
   materials?: { name?: string; emissiveTexture?: unknown }[];
   meshes?: { primitives: { indices?: number }[] }[];
   accessors?: { count: number }[];
@@ -127,14 +130,47 @@ describe('Ysolei: the Codex serpent on every mechanic', () => {
   });
 });
 
-describe('the Lagoon Eel and the Colossus', () => {
-  it('the eel spits its Lightning Spit on its own clip, and coils for Static Coil', () => {
-    expect(clipsOf('public/models/creatures/temple_eel.glb')).toEqual(
-      expect.arrayContaining(['Idle', 'Walk', 'Run', 'Coil', 'Spit']),
+describe('the Ice Wraith and the Colossus', () => {
+  it('the Ice Wraith runs on the five clips it ships', () => {
+    const path = 'public/models/creatures/temple_ice_wraith.glb';
+    expect(clipsOf(path).sort()).toEqual(['Attack', 'Death', 'HitReact', 'Idle', 'Walk']);
+    const v = visualOf('ice_wraith');
+    expect(v.url).toBe('models/creatures/temple_ice_wraith.glb');
+    // It glides: Walk carries Run, and every mapped clip is one the file has.
+    expect(v.clips).toEqual({
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Walk',
+      attack: ['Attack'],
+      hit: ['HitReact'],
+      death: 'Death',
+    });
+    // No cast clip: Static Coil and Lightning Spit run their bars over its hover.
+    expect(v.clips.castByAbility?.[TEMPLE_LIGHTNING_SPIT]).toBeUndefined();
+    expect(v.clips.castByAbility?.[TEMPLE_STATIC_COIL]).toBeUndefined();
+    expect(v.authoredAtlas).toBe(true);
+    expect(v.tint).toBeUndefined();
+    // Drawn 4.8 to its crest at its 1.2: nearly two of the 2.6 player.
+    expect(v.height * (MOBS.ice_wraith.scale ?? 1)).toBeCloseTo(4.8, 5);
+    // It hovers its talons off the floor, and its heap of shards settles back.
+    expect(v.hover).toBe(0.3);
+    expect(v.deathGroundOffset).toBe(v.hover);
+  });
+
+  it('the ice wraith ships compressed: meshopt geometry and a KTX2 atlas on one rig', () => {
+    const j = glbJson('public/models/creatures/temple_ice_wraith.glb');
+    expect([...(j.extensionsUsed ?? [])].sort()).toEqual([
+      'EXT_meshopt_compression',
+      'KHR_mesh_quantization',
+      'KHR_texture_basisu',
+    ]);
+    expect((j.images ?? []).map((i) => i.mimeType)).toEqual(['image/ktx2']);
+    expect(j.skins?.map((s) => s.joints.length)).toEqual([54]);
+    expect(trianglesOf('public/models/creatures/temple_ice_wraith.glb')).toBe(6316);
+    // The whole body, five clips and the atlas, under the megabyte the eel took.
+    expect(readFileSync('public/models/creatures/temple_ice_wraith.glb').length).toBeLessThan(
+      800_000,
     );
-    const c = visualOf('lagoon_eel').clips;
-    expect(c.castByAbility?.[TEMPLE_LIGHTNING_SPIT]).toBe('Spit');
-    expect(c.castByAbility?.[TEMPLE_STATIC_COIL]).toBe('Coil');
   });
 
   it('the walking Colossus keeps its body at the old size under its larger reach', () => {
@@ -633,7 +669,7 @@ describe('the Moonspawn: a spirit of the Drowned Moon, no longer a murloc', () =
       false,
     );
     expect(templeMoonspawnRises('moonspawn', true, 0)).toBe(false);
-    expect(templeMoonspawnRises('lagoon_eel', false, 0)).toBe(false);
+    expect(templeMoonspawnRises('ice_wraith', false, 0)).toBe(false);
   });
 });
 

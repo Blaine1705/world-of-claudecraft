@@ -25,7 +25,7 @@
 //   Lagoon Snapper       Snap: a telegraphed bite across its front, and it shells
 //                        up once when low, spinning a Spiral Whirlpool that
 //                        drags the group in. Walk out, then burn it.
-//   Lagoon Eel           Static Coil: an interruptible shock round it; Lightning Spit,
+//   Ice Wraith           Static Coil: an interruptible shock round it; Lightning Spit,
 //                        a lane of lightning; Arcing Spark, a kickable bolt that
 //                        leaps between players. Spread out.
 //   Moonlit Siren        Call the Tide: an interruptible song of three Tidewisps.
@@ -191,9 +191,9 @@ export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
     scale: 1.2,
     color: 0x6f8a7a,
   },
-  lagoon_eel: {
-    id: 'lagoon_eel',
-    name: 'Lagoon Eel',
+  ice_wraith: {
+    id: 'ice_wraith',
+    name: 'Ice Wraith',
     minLevel: 16,
     maxLevel: 17,
     family: 'beast',
@@ -596,8 +596,8 @@ export const DROWNED_TEMPLE_SPAWNS: DungeonSpawn[] = [
   held('drowned_pilgrim', 5, -64, 'g4'),
   held('pale_choir_acolyte', 0, -55, 'g4'),
   // g5: the colonnade's end, before the Choir Veil. Two eels and a siren.
-  held('lagoon_eel', -9, -47, 'g5'),
-  held('lagoon_eel', 9, -47, 'g5'),
+  held('ice_wraith', -9, -47, 'g5'),
+  held('ice_wraith', 9, -47, 'g5'),
   held('moonlit_siren', 0, -43, 'g5'),
   // Boss 1: Choirmother Selthe on the Choir Court's stage.
   { mobId: 'choirmother_selthe', x: 0, z: 10, facing: FACE_SOUTH, idleStationary: true },
@@ -621,7 +621,7 @@ export const DROWNED_TEMPLE_SPAWNS: DungeonSpawn[] = [
   held('drowned_pilgrim', 56, 17, 'g8', FACE_WEST),
   // g9: the grotto behind the falls. An eel, a snapper and a sentinel.
   held('pearlguard_sentinel', 80, 64, 'g9'),
-  held('lagoon_eel', 85, 70, 'g9'),
+  held('ice_wraith', 85, 70, 'g9'),
   held('lagoon_snapper', 76, 70, 'g9'),
   // Patrol B: a sentinel and two lurkers pacing behind the curtain of the falls.
   patrolling('pearlguard_sentinel', FALLS_WALK, 'pb', 0),
@@ -671,7 +671,7 @@ export const DROWNED_TEMPLE_SPAWNS: DungeonSpawn[] = [
   held('pearlguard_sentinel', 25, 219, 'g13', FACE_EAST),
   held('moonlit_siren', 19, 221, 'g13', FACE_EAST),
   held('lagoon_snapper', 27, 214, 'g13', FACE_EAST),
-  held('lagoon_eel', 21, 215, 'g13', FACE_EAST),
+  held('ice_wraith', 21, 215, 'g13', FACE_EAST),
   held('pale_choir_acolyte', 16, 218, 'g13', FACE_EAST),
   // Boss 3: Ysolei coiled against the Moon Altar's east face (just clear of
   // the altar stone's collider), on the causeway line, facing the causeway.
