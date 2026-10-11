@@ -813,14 +813,16 @@ function crustGeometry(): THREE.BufferGeometry {
   for (let i = 1; i <= cols; i++) {
     const cur = ring(i);
     for (let k = 0; k < prof.length - 1; k++) {
-      const quad = [prev[k], prev[k + 1], cur[k + 1], prev[k], cur[k + 1], cur[k]];
+      // Wind the ribbon toward the sky: the stone material is FrontSide,
+      // so inward faces hide the walking deck from the camera above it.
+      const quad = [prev[k], cur[k + 1], prev[k + 1], prev[k], cur[k], cur[k + 1]];
       const cols4 = [
         colorAt(i - 1, k),
+        colorAt(i, k + 1),
         colorAt(i - 1, k + 1),
-        colorAt(i, k + 1),
         colorAt(i - 1, k),
-        colorAt(i, k + 1),
         colorAt(i, k),
+        colorAt(i, k + 1),
       ];
       for (let q = 0; q < 6; q++) {
         v.push(...quad[q]);

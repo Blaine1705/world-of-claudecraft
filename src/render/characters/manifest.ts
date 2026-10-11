@@ -5484,16 +5484,17 @@ export const VISUALS: Record<string, VisualDef> = {
   // stands about 2.97 yd, a head over the player. His gestures ride the
   // overhead emotes the guide sets as he speaks (point = Talk, cry = Startle,
   // kneel = Kneel) and the song is his channel cast (cantor_last_verse, the
-  // Sing loop). The Walk's long gliding stride covers 1.25 yd/s at this
-  // scale, so the guide's 3.2 yd/s follow walk plays it about 2.6x with the
-  // feet planted; the 7 yd/s catch-up run caps lower and slides a little.
+  // Sing loop). His original-rig animation bank provides foot-matched Walk
+  // and Run cycles: measured planted-foot speeds at the drawn size keep the
+  // 3.2 yd/s follow and 7 yd/s catch-up inside modest cadence ceilings.
   npc_laverock: {
     url: `${CREATURES}/temple_laverock.glb`,
+    animUrls: [`${CREATURES}/temple_laverock_locomotion.glb`],
     height: 3.75,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
-      run: 'Walk',
+      run: 'Run',
       attack: ['Talk'],
       death: 'Idle',
       cast: 'Sing',
@@ -5504,10 +5505,10 @@ export const VISUALS: Record<string, VisualDef> = {
         kneel: { clips: ['Kneel'] },
       },
     },
-    walkRef: 1.25,
-    runRef: 1.25,
-    walkTimeScaleMax: 2.8,
-    runTimeScaleMax: 3.6,
+    walkRef: 1.848751,
+    runRef: 4.468026,
+    walkTimeScaleMax: 1.8,
+    runTimeScaleMax: 1.6,
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 0.9,

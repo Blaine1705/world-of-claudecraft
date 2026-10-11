@@ -1,0 +1,4378 @@
+{
+  "measuredAt": "2026-10-07T13:29:18.361Z",
+  "source": "createMob + actual difficulty transforms at fixed authored levels",
+  "rows": [
+    {
+      "dungeon": "hollow_crypt",
+      "id": "sexton_marrow",
+      "name": "Sexton Marrow",
+      "difficulty": "normal",
+      "level": 8,
+      "hp": 3152,
+      "weapon": {
+        "min": 32,
+        "max": 50,
+        "speed": 2.2
+      },
+      "armor": 154,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "sexton_marrow",
+        "name": "Sexton Marrow",
+        "minLevel": 8,
+        "maxLevel": 8,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 110,
+        "hpPerLevel": 24,
+        "dmgBase": 9,
+        "dmgPerLevel": 2.5,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 22,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 800,
+            "chance": 1
+          },
+          {
+            "itemId": "quilted_trousers",
+            "chance": 0.25,
+            "rollGroup": "marrow_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "oiled_boots",
+            "chance": 0.25,
+            "rollGroup": "marrow_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravedirt_treads",
+            "chance": 0.25,
+            "rollGroup": "marrow_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "bellrope_girdle",
+            "chance": 0.25,
+            "rollGroup": "marrow_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "sextons_spadehaft",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1,
+        "color": 8622482
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "sexton_marrow",
+      "name": "Sexton Marrow",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 16099,
+      "weapon": {
+        "min": 1476,
+        "max": 2306,
+        "speed": 2.2
+      },
+      "armor": 601,
+      "mechanicMult": 6,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "sexton_marrow",
+        "name": "Sexton Marrow",
+        "minLevel": 8,
+        "maxLevel": 8,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 110,
+        "hpPerLevel": 24,
+        "dmgBase": 9,
+        "dmgPerLevel": 2.5,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 22,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 800,
+            "chance": 1
+          },
+          {
+            "itemId": "quilted_trousers",
+            "chance": 0.25,
+            "rollGroup": "marrow_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "oiled_boots",
+            "chance": 0.25,
+            "rollGroup": "marrow_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravedirt_treads",
+            "chance": 0.25,
+            "rollGroup": "marrow_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "bellrope_girdle",
+            "chance": 0.25,
+            "rollGroup": "marrow_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "sextons_spadehaft",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1,
+        "color": 8622482
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "rimeweb",
+      "name": "Lady of the Bonechill",
+      "difficulty": "normal",
+      "level": 9,
+      "hp": 3998,
+      "weapon": {
+        "min": 35,
+        "max": 54,
+        "speed": 2
+      },
+      "armor": 160,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "rimeweb",
+        "name": "Lady of the Bonechill",
+        "bodyRadius": 2.4,
+        "minLevel": 9,
+        "maxLevel": 9,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 120,
+        "hpPerLevel": 26,
+        "dmgBase": 9,
+        "dmgPerLevel": 2.5,
+        "attackSpeed": 2,
+        "armorPerLevel": 20,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 1000,
+            "chance": 1
+          },
+          {
+            "itemId": "rimesilk_mantle",
+            "chance": 0.34,
+            "rollGroup": "rimeweb_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "bonechill_carapace_vest",
+            "chance": 0.33,
+            "rollGroup": "rimeweb_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "rimeweb_hunters_leggings",
+            "chance": 0.33,
+            "rollGroup": "rimeweb_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "rimeweb_fang",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1,
+        "color": 14216447
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "rimeweb",
+      "name": "Lady of the Bonechill",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 18382,
+      "weapon": {
+        "min": 1476,
+        "max": 2306,
+        "speed": 2
+      },
+      "armor": 546,
+      "mechanicMult": 5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "rimeweb",
+        "name": "Lady of the Bonechill",
+        "bodyRadius": 2.4,
+        "minLevel": 9,
+        "maxLevel": 9,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 120,
+        "hpPerLevel": 26,
+        "dmgBase": 9,
+        "dmgPerLevel": 2.5,
+        "attackSpeed": 2,
+        "armorPerLevel": 20,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 1000,
+            "chance": 1
+          },
+          {
+            "itemId": "rimesilk_mantle",
+            "chance": 0.34,
+            "rollGroup": "rimeweb_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "bonechill_carapace_vest",
+            "chance": 0.33,
+            "rollGroup": "rimeweb_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "rimeweb_hunters_leggings",
+            "chance": 0.33,
+            "rollGroup": "rimeweb_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "rimeweb_fang",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1,
+        "color": 14216447
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "cantor_ilvane",
+      "name": "Cantor Ilvane",
+      "difficulty": "normal",
+      "level": 9,
+      "hp": 3195,
+      "weapon": {
+        "min": 33,
+        "max": 51,
+        "speed": 2.2
+      },
+      "armor": 144,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "cantor_ilvane",
+        "name": "Cantor Ilvane",
+        "minLevel": 9,
+        "maxLevel": 9,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 110,
+        "hpPerLevel": 24,
+        "dmgBase": 8,
+        "dmgPerLevel": 2.4,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 18,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 1000,
+            "chance": 1
+          },
+          {
+            "itemId": "cantors_cassock",
+            "chance": 0.34,
+            "rollGroup": "ilvane_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "choirward_leggings",
+            "chance": 0.33,
+            "rollGroup": "ilvane_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "choristers_gloves",
+            "chance": 0.33,
+            "rollGroup": "ilvane_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "cantors_hymnal",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.1,
+        "color": 10317008
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "cantor_ilvane",
+      "name": "Cantor Ilvane",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 14687,
+      "weapon": {
+        "min": 1402,
+        "max": 2190,
+        "speed": 2.2
+      },
+      "armor": 491,
+      "mechanicMult": 8,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "cantor_ilvane",
+        "name": "Cantor Ilvane",
+        "minLevel": 9,
+        "maxLevel": 9,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 110,
+        "hpPerLevel": 24,
+        "dmgBase": 8,
+        "dmgPerLevel": 2.4,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 18,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 1000,
+            "chance": 1
+          },
+          {
+            "itemId": "cantors_cassock",
+            "chance": 0.34,
+            "rollGroup": "ilvane_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "choirward_leggings",
+            "chance": 0.33,
+            "rollGroup": "ilvane_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "choristers_gloves",
+            "chance": 0.33,
+            "rollGroup": "ilvane_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "cantors_hymnal",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.1,
+        "color": 10317008
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "morthen",
+      "name": "Morthen the Gravecaller",
+      "difficulty": "normal",
+      "level": 10,
+      "hp": 6791,
+      "weapon": {
+        "min": 41,
+        "max": 65,
+        "speed": 2.6
+      },
+      "armor": 234,
+      "mechanicMult": 1,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "morthen",
+        "name": "Morthen the Gravecaller",
+        "bodyRadius": 2.5,
+        "minLevel": 10,
+        "maxLevel": 10,
+        "family": "undead",
+        "elite": true,
+        "boss": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 230,
+        "hpPerLevel": 32,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 26,
+        "moveSpeed": 7,
+        "aggroRadius": 16,
+        "loot": [
+          {
+            "copper": 2500,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "cryptbone_greaves",
+            "chance": 0.34,
+            "rollGroup": "morthen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravecallers_vestments",
+            "chance": 0.33,
+            "rollGroup": "morthen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "unquiet_stalkers_hood",
+            "chance": 0.33,
+            "rollGroup": "morthen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "greyjaw_hide_boots",
+            "chance": 0.25,
+            "rollGroup": "morthen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewoven_bag",
+            "chance": 0.2,
+            "rollGroup": "morthen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "cryptbone_helm",
+            "chance": 0.18,
+            "rollGroup": "morthen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "cryptbone_pauldrons",
+            "chance": 0.18,
+            "rollGroup": "morthen_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.35,
+        "color": 4858714
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "morthen",
+      "name": "Morthen the Gravecaller",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 28837,
+      "weapon": {
+        "min": 1574,
+        "max": 2460,
+        "speed": 2.6
+      },
+      "armor": 710,
+      "mechanicMult": 9,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "morthen",
+        "name": "Morthen the Gravecaller",
+        "bodyRadius": 2.5,
+        "minLevel": 10,
+        "maxLevel": 10,
+        "family": "undead",
+        "elite": true,
+        "boss": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 230,
+        "hpPerLevel": 32,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 26,
+        "moveSpeed": 7,
+        "aggroRadius": 16,
+        "loot": [
+          {
+            "copper": 2500,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "cryptbone_greaves",
+            "chance": 0.34,
+            "rollGroup": "morthen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravecallers_vestments",
+            "chance": 0.33,
+            "rollGroup": "morthen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "unquiet_stalkers_hood",
+            "chance": 0.33,
+            "rollGroup": "morthen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "greyjaw_hide_boots",
+            "chance": 0.25,
+            "rollGroup": "morthen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewoven_bag",
+            "chance": 0.2,
+            "rollGroup": "morthen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "cryptbone_helm",
+            "chance": 0.18,
+            "rollGroup": "morthen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "cryptbone_pauldrons",
+            "chance": 0.18,
+            "rollGroup": "morthen_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.35,
+        "color": 4858714
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "hollow_chorister",
+      "name": "Hollow Chorister",
+      "difficulty": "normal",
+      "level": 8,
+      "hp": 391,
+      "weapon": {
+        "min": 27,
+        "max": 42,
+        "speed": 2.2
+      },
+      "armor": 84,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "hollow_chorister",
+        "name": "Hollow Chorister",
+        "minLevel": 8,
+        "maxLevel": 8,
+        "family": "undead",
+        "elite": true,
+        "hpBase": 44,
+        "hpPerLevel": 18,
+        "dmgBase": 7,
+        "dmgPerLevel": 2.2,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 12,
+        "moveSpeed": 7,
+        "aggroRadius": 12,
+        "loot": [
+          {
+            "copper": 110,
+            "chance": 1
+          },
+          {
+            "itemId": "linen_scrap",
+            "chance": 0.5
+          }
+        ],
+        "scale": 1,
+        "color": 8081312
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "hollow_chorister",
+      "name": "Hollow Chorister",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 1844,
+      "weapon": {
+        "min": 1277,
+        "max": 1995,
+        "speed": 2.2
+      },
+      "armor": 328,
+      "mechanicMult": 20,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "hollow_chorister",
+        "name": "Hollow Chorister",
+        "minLevel": 8,
+        "maxLevel": 8,
+        "family": "undead",
+        "elite": true,
+        "hpBase": 44,
+        "hpPerLevel": 18,
+        "dmgBase": 7,
+        "dmgPerLevel": 2.2,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 12,
+        "moveSpeed": 7,
+        "aggroRadius": 12,
+        "loot": [
+          {
+            "copper": 110,
+            "chance": 1
+          },
+          {
+            "itemId": "linen_scrap",
+            "chance": 0.5
+          }
+        ],
+        "scale": 1,
+        "color": 8081312
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "crypt_knellwyrm",
+      "name": "Knellwyrm",
+      "difficulty": "normal",
+      "level": 10,
+      "hp": 1081,
+      "weapon": {
+        "min": 43,
+        "max": 68,
+        "speed": 2.4
+      },
+      "armor": 234,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "crypt_knellwyrm",
+        "name": "Knellwyrm",
+        "bodyRadius": 5.5,
+        "minLevel": 10,
+        "maxLevel": 10,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 200,
+        "hpPerLevel": 30,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.4,
+        "armorPerLevel": 26,
+        "moveSpeed": 7.5,
+        "aggroRadius": 20,
+        "breathCone": {
+          "castId": "crypt_barrowflame_breath",
+          "name": "Barrowflame Breath",
+          "castTime": 2,
+          "every": 13,
+          "range": 14,
+          "arcDeg": 70,
+          "min": 30,
+          "max": 38,
+          "school": "fire"
+        },
+        "trashKit": {
+          "tailLash": {
+            "castId": "crypt_tail_lash",
+            "name": "Tail Lash",
+            "castTime": 1,
+            "every": 10,
+            "first": 7,
+            "school": "physical",
+            "range": 10,
+            "arcDeg": 120,
+            "min": 20,
+            "max": 28
+          },
+          "wingGust": {
+            "castId": "crypt_wing_gust",
+            "name": "Wing Gust",
+            "castTime": 1.5,
+            "every": 19,
+            "first": 11,
+            "school": "physical",
+            "radius": 10,
+            "knockback": 8,
+            "min": 12,
+            "max": 18
+          }
+        },
+        "loot": [
+          {
+            "copper": 1500,
+            "chance": 1
+          },
+          {
+            "itemId": "bone_fragments",
+            "chance": 1
+          },
+          {
+            "itemId": "arcane_essence",
+            "chance": 0.5
+          }
+        ],
+        "scale": 1.25,
+        "color": 3881524
+      }
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "id": "crypt_knellwyrm",
+      "name": "Knellwyrm",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 7254,
+      "weapon": {
+        "min": 1675,
+        "max": 2618,
+        "speed": 2.4
+      },
+      "armor": 710,
+      "mechanicMult": 20,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "crypt_knellwyrm",
+        "name": "Knellwyrm",
+        "bodyRadius": 5.5,
+        "minLevel": 10,
+        "maxLevel": 10,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 200,
+        "hpPerLevel": 30,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.4,
+        "armorPerLevel": 26,
+        "moveSpeed": 7.5,
+        "aggroRadius": 20,
+        "breathCone": {
+          "castId": "crypt_barrowflame_breath",
+          "name": "Barrowflame Breath",
+          "castTime": 2,
+          "every": 13,
+          "range": 14,
+          "arcDeg": 70,
+          "min": 30,
+          "max": 38,
+          "school": "fire"
+        },
+        "trashKit": {
+          "tailLash": {
+            "castId": "crypt_tail_lash",
+            "name": "Tail Lash",
+            "castTime": 1,
+            "every": 10,
+            "first": 7,
+            "school": "physical",
+            "range": 10,
+            "arcDeg": 120,
+            "min": 20,
+            "max": 28
+          },
+          "wingGust": {
+            "castId": "crypt_wing_gust",
+            "name": "Wing Gust",
+            "castTime": 1.5,
+            "every": 19,
+            "first": 11,
+            "school": "physical",
+            "radius": 10,
+            "knockback": 8,
+            "min": 12,
+            "max": 18
+          }
+        },
+        "loot": [
+          {
+            "copper": 1500,
+            "chance": 1
+          },
+          {
+            "itemId": "bone_fragments",
+            "chance": 1
+          },
+          {
+            "itemId": "arcane_essence",
+            "chance": 0.5
+          }
+        ],
+        "scale": 1.25,
+        "color": 3881524
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "knight_commander_olen",
+      "name": "Knight-Commander Olen",
+      "difficulty": "normal",
+      "level": 12,
+      "hp": 5995,
+      "weapon": {
+        "min": 48,
+        "max": 74,
+        "speed": 2.2
+      },
+      "armor": 264,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "knight_commander_olen",
+        "name": "Knight-Commander Olen",
+        "minLevel": 12,
+        "maxLevel": 12,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 120,
+        "hpPerLevel": 26,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 24,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 800,
+            "chance": 1
+          },
+          {
+            "itemId": "trollhide_leggings",
+            "chance": 0.34,
+            "rollGroup": "olen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "marshstrider_boots",
+            "chance": 0.33,
+            "rollGroup": "olen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "fenmist_robe",
+            "chance": 0.33,
+            "rollGroup": "olen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "knight_commanders_longsword",
+            "chance": 0.1,
+            "rollGroup": "olen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "tideguard_greaves",
+            "chance": 0.1,
+            "rollGroup": "olen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "tideguard_sabatons",
+            "chance": 0.1,
+            "rollGroup": "olen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "eelscale_leggings",
+            "chance": 0.1,
+            "rollGroup": "olen_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.2,
+        "color": 9807270,
+        "cleave": {
+          "radius": 8,
+          "mult": 0.6,
+          "name": "Reaping Arc"
+        }
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "knight_commander_olen",
+      "name": "Knight-Commander Olen",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 18382,
+      "weapon": {
+        "min": 1417,
+        "max": 2214,
+        "speed": 2.2
+      },
+      "armor": 655,
+      "mechanicMult": 6,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "knight_commander_olen",
+        "name": "Knight-Commander Olen",
+        "minLevel": 12,
+        "maxLevel": 12,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 120,
+        "hpPerLevel": 26,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 24,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 800,
+            "chance": 1
+          },
+          {
+            "itemId": "trollhide_leggings",
+            "chance": 0.34,
+            "rollGroup": "olen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "marshstrider_boots",
+            "chance": 0.33,
+            "rollGroup": "olen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "fenmist_robe",
+            "chance": 0.33,
+            "rollGroup": "olen_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "knight_commanders_longsword",
+            "chance": 0.1,
+            "rollGroup": "olen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "tideguard_greaves",
+            "chance": 0.1,
+            "rollGroup": "olen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "tideguard_sabatons",
+            "chance": 0.1,
+            "rollGroup": "olen_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "eelscale_leggings",
+            "chance": 0.1,
+            "rollGroup": "olen_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.2,
+        "color": 9807270,
+        "cleave": {
+          "radius": 8,
+          "mult": 0.6,
+          "name": "Reaping Arc"
+        }
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "gaoler_ossick",
+      "name": "Gaoler Ossick",
+      "difficulty": "normal",
+      "level": 13,
+      "hp": 6796,
+      "weapon": {
+        "min": 51,
+        "max": 79,
+        "speed": 2.4
+      },
+      "armor": 288,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "gaoler_ossick",
+        "name": "Gaoler Ossick",
+        "minLevel": 13,
+        "maxLevel": 13,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 120,
+        "hpPerLevel": 26,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.4,
+        "armorPerLevel": 24,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 1000,
+            "chance": 1
+          },
+          {
+            "itemId": "gaolers_chain_girdle",
+            "chance": 0.34,
+            "rollGroup": "ossick_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "rusted_shackle_grips",
+            "chance": 0.33,
+            "rollGroup": "ossick_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "drowned_wardens_mantle",
+            "chance": 0.33,
+            "rollGroup": "ossick_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gaolyard_cudgel",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.4,
+        "color": 7299666
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "gaoler_ossick",
+      "name": "Gaoler Ossick",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 19530,
+      "weapon": {
+        "min": 1417,
+        "max": 2214,
+        "speed": 2.4
+      },
+      "armor": 655,
+      "mechanicMult": 6,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "gaoler_ossick",
+        "name": "Gaoler Ossick",
+        "minLevel": 13,
+        "maxLevel": 13,
+        "family": "undead",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 120,
+        "hpPerLevel": 26,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.4,
+        "armorPerLevel": 24,
+        "moveSpeed": 7,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 1000,
+            "chance": 1
+          },
+          {
+            "itemId": "gaolers_chain_girdle",
+            "chance": 0.34,
+            "rollGroup": "ossick_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "rusted_shackle_grips",
+            "chance": 0.33,
+            "rollGroup": "ossick_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "drowned_wardens_mantle",
+            "chance": 0.33,
+            "rollGroup": "ossick_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gaolyard_cudgel",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.4,
+        "color": 7299666
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "vael_the_mistcaller",
+      "name": "Vael the Fogbinder",
+      "difficulty": "normal",
+      "level": 13,
+      "hp": 11998,
+      "weapon": {
+        "min": 52,
+        "max": 81,
+        "speed": 2.4
+      },
+      "armor": 312,
+      "mechanicMult": 1,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "vael_the_mistcaller",
+        "name": "Vael the Fogbinder",
+        "minLevel": 13,
+        "maxLevel": 13,
+        "family": "humanoid",
+        "elite": true,
+        "boss": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 240,
+        "hpPerLevel": 34,
+        "dmgBase": 12,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.4,
+        "armorPerLevel": 26,
+        "moveSpeed": 7,
+        "aggroRadius": 16,
+        "summonAdds": {
+          "mobId": "drowned_thrall",
+          "count": 2,
+          "atHpPct": [
+            0.6,
+            0.3
+          ]
+        },
+        "loot": [
+          {
+            "copper": 5000,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "trollhide_leggings",
+            "chance": 0.34,
+            "rollGroup": "vael_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "marshstrider_boots",
+            "chance": 0.33,
+            "rollGroup": "vael_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "fenmist_robe",
+            "chance": 0.33,
+            "rollGroup": "vael_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "deepfen_pearl",
+            "chance": 1
+          },
+          {
+            "itemId": "eelskin_tunic",
+            "chance": 0.2,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "tidescale_vest",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "drowned_prayer_leggings",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "drowned_prayer_sandals",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "eelscale_treads",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "mistveil_cord",
+            "chance": 0.12,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "mistveil_grips",
+            "chance": 0.12,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "mistcallers_duffel",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.35,
+        "color": 4770224
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "vael_the_mistcaller",
+      "name": "Vael the Fogbinder",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 34449,
+      "weapon": {
+        "min": 1439,
+        "max": 2248,
+        "speed": 2.4
+      },
+      "armor": 710,
+      "mechanicMult": 6,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "vael_the_mistcaller",
+        "name": "Vael the Fogbinder",
+        "minLevel": 13,
+        "maxLevel": 13,
+        "family": "humanoid",
+        "elite": true,
+        "boss": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 240,
+        "hpPerLevel": 34,
+        "dmgBase": 12,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.4,
+        "armorPerLevel": 26,
+        "moveSpeed": 7,
+        "aggroRadius": 16,
+        "summonAdds": {
+          "mobId": "drowned_thrall",
+          "count": 2,
+          "atHpPct": [
+            0.6,
+            0.3
+          ]
+        },
+        "loot": [
+          {
+            "copper": 5000,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "trollhide_leggings",
+            "chance": 0.34,
+            "rollGroup": "vael_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "marshstrider_boots",
+            "chance": 0.33,
+            "rollGroup": "vael_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "fenmist_robe",
+            "chance": 0.33,
+            "rollGroup": "vael_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "deepfen_pearl",
+            "chance": 1
+          },
+          {
+            "itemId": "eelskin_tunic",
+            "chance": 0.2,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "tidescale_vest",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "drowned_prayer_leggings",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "drowned_prayer_sandals",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "eelscale_treads",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "mistveil_cord",
+            "chance": 0.12,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "mistveil_grips",
+            "chance": 0.12,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "mistcallers_duffel",
+            "chance": 0.1,
+            "rollGroup": "vael_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.35,
+        "color": 4770224
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "turretback_hermit",
+      "name": "The Turretback Hermit",
+      "difficulty": "normal",
+      "level": 13,
+      "hp": 4495,
+      "weapon": {
+        "min": 55,
+        "max": 85,
+        "speed": 2.8
+      },
+      "armor": 360,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "turretback_hermit",
+        "name": "The Turretback Hermit",
+        "minLevel": 13,
+        "maxLevel": 13,
+        "family": "beast",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 32,
+        "dmgBase": 12,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 5,
+        "aggroRadius": 11,
+        "bodyRadius": 4.5,
+        "breathCone": {
+          "castId": "bastion_claw_sweep",
+          "name": "Claw Sweep",
+          "castTime": 2,
+          "every": 12,
+          "range": 10,
+          "arcDeg": 120,
+          "min": 90,
+          "max": 110,
+          "school": "physical"
+        },
+        "trashKit": {
+          "wingGust": {
+            "castId": "bastion_shell_slam",
+            "name": "Shell Slam",
+            "castTime": 1.5,
+            "every": 16,
+            "first": 8,
+            "school": "physical",
+            "radius": 8,
+            "knockback": 6,
+            "min": 50,
+            "max": 60
+          },
+          "withdraw": {
+            "belowHpPct": 0.25,
+            "seconds": 6,
+            "reduction": 0.6,
+            "name": "Withdraw"
+          }
+        },
+        "summonAdds": {
+          "mobId": "barnacle_crawler",
+          "count": 2,
+          "atHpPct": [
+            0.6,
+            0.3
+          ]
+        },
+        "yells": {
+          "summon": "Barnacles rain from the swaying tower!"
+        },
+        "loot": [
+          {
+            "copper": 600,
+            "chance": 1
+          },
+          {
+            "itemId": "bone_fragments",
+            "chance": 1
+          }
+        ],
+        "scale": 1,
+        "color": 12099704
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "turretback_hermit",
+      "name": "The Turretback Hermit",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 13801,
+      "weapon": {
+        "min": 1529,
+        "max": 2390,
+        "speed": 2.8
+      },
+      "armor": 819,
+      "mechanicMult": 8,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "turretback_hermit",
+        "name": "The Turretback Hermit",
+        "minLevel": 13,
+        "maxLevel": 13,
+        "family": "beast",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 32,
+        "dmgBase": 12,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 5,
+        "aggroRadius": 11,
+        "bodyRadius": 4.5,
+        "breathCone": {
+          "castId": "bastion_claw_sweep",
+          "name": "Claw Sweep",
+          "castTime": 2,
+          "every": 12,
+          "range": 10,
+          "arcDeg": 120,
+          "min": 90,
+          "max": 110,
+          "school": "physical"
+        },
+        "trashKit": {
+          "wingGust": {
+            "castId": "bastion_shell_slam",
+            "name": "Shell Slam",
+            "castTime": 1.5,
+            "every": 16,
+            "first": 8,
+            "school": "physical",
+            "radius": 8,
+            "knockback": 6,
+            "min": 50,
+            "max": 60
+          },
+          "withdraw": {
+            "belowHpPct": 0.25,
+            "seconds": 6,
+            "reduction": 0.6,
+            "name": "Withdraw"
+          }
+        },
+        "summonAdds": {
+          "mobId": "barnacle_crawler",
+          "count": 2,
+          "atHpPct": [
+            0.6,
+            0.3
+          ]
+        },
+        "yells": {
+          "summon": "Barnacles rain from the swaying tower!"
+        },
+        "loot": [
+          {
+            "copper": 600,
+            "chance": 1
+          },
+          {
+            "itemId": "bone_fragments",
+            "chance": 1
+          }
+        ],
+        "scale": 1,
+        "color": 12099704
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "gaol_turnkey",
+      "name": "Gaol Turnkey",
+      "difficulty": "normal",
+      "level": 13,
+      "hp": 3599,
+      "weapon": {
+        "min": 51,
+        "max": 79,
+        "speed": 2.6
+      },
+      "armor": 288,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "gaol_turnkey",
+        "name": "Gaol Turnkey",
+        "minLevel": 13,
+        "maxLevel": 13,
+        "family": "humanoid",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 150,
+        "hpPerLevel": 32,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 24,
+        "moveSpeed": 6.5,
+        "aggroRadius": 12,
+        "summonAdds": {
+          "mobId": "shackled_prisoner",
+          "count": 2,
+          "atHpPct": [
+            0.5
+          ]
+        },
+        "yells": {
+          "summon": "Out, all of you! Out and at them!"
+        },
+        "loot": [
+          {
+            "copper": 600,
+            "chance": 1
+          },
+          {
+            "itemId": "jailers_iron_gauntlets",
+            "chance": 0.34,
+            "rollGroup": "turnkey_guaranteed"
+          },
+          {
+            "itemId": "turnkeys_keyring_belt",
+            "chance": 0.33,
+            "rollGroup": "turnkey_guaranteed"
+          },
+          {
+            "itemId": "turnkeys_lantern_cowl",
+            "chance": 0.33,
+            "rollGroup": "turnkey_guaranteed"
+          }
+        ],
+        "scale": 1.3,
+        "color": 6969928
+      }
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "id": "gaol_turnkey",
+      "name": "Gaol Turnkey",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 11041,
+      "weapon": {
+        "min": 1417,
+        "max": 2214,
+        "speed": 2.6
+      },
+      "armor": 655,
+      "mechanicMult": 6,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "gaol_turnkey",
+        "name": "Gaol Turnkey",
+        "minLevel": 13,
+        "maxLevel": 13,
+        "family": "humanoid",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 150,
+        "hpPerLevel": 32,
+        "dmgBase": 11,
+        "dmgPerLevel": 2.6,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 24,
+        "moveSpeed": 6.5,
+        "aggroRadius": 12,
+        "summonAdds": {
+          "mobId": "shackled_prisoner",
+          "count": 2,
+          "atHpPct": [
+            0.5
+          ]
+        },
+        "yells": {
+          "summon": "Out, all of you! Out and at them!"
+        },
+        "loot": [
+          {
+            "copper": 600,
+            "chance": 1
+          },
+          {
+            "itemId": "jailers_iron_gauntlets",
+            "chance": 0.34,
+            "rollGroup": "turnkey_guaranteed"
+          },
+          {
+            "itemId": "turnkeys_keyring_belt",
+            "chance": 0.33,
+            "rollGroup": "turnkey_guaranteed"
+          },
+          {
+            "itemId": "turnkeys_lantern_cowl",
+            "chance": 0.33,
+            "rollGroup": "turnkey_guaranteed"
+          }
+        ],
+        "scale": 1.3,
+        "color": 6969928
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "choirmother_selthe",
+      "name": "Choirmother Selthe",
+      "difficulty": "normal",
+      "level": 16,
+      "hp": 9899,
+      "weapon": {
+        "min": 63,
+        "max": 98,
+        "speed": 2.2
+      },
+      "armor": 330,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "choirmother_selthe",
+        "name": "Choirmother Selthe",
+        "minLevel": 16,
+        "maxLevel": 16,
+        "family": "humanoid",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 150,
+        "hpPerLevel": 26,
+        "dmgBase": 12,
+        "dmgPerLevel": 2.7,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 22,
+        "moveSpeed": 0,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 700,
+            "chance": 1
+          },
+          {
+            "itemId": "selthes_seastriders",
+            "chance": 0.4,
+            "normalOnly": true
+          },
+          {
+            "itemId": "briny_idol",
+            "chance": 0.5
+          },
+          {
+            "itemId": "conchplate_girdle",
+            "chance": 0.34,
+            "rollGroup": "selthe_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "pale_chorus_leggings",
+            "chance": 0.33,
+            "rollGroup": "selthe_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "refrain_silk_gloves",
+            "chance": 0.33,
+            "rollGroup": "selthe_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "chorus_conch",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.15,
+        "color": 7311278
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "choirmother_selthe",
+      "name": "Choirmother Selthe",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 20650,
+      "weapon": {
+        "min": 1360,
+        "max": 2125,
+        "speed": 2.2
+      },
+      "armor": 578,
+      "mechanicMult": 4.5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "choirmother_selthe",
+        "name": "Choirmother Selthe",
+        "minLevel": 16,
+        "maxLevel": 16,
+        "family": "humanoid",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 150,
+        "hpPerLevel": 26,
+        "dmgBase": 12,
+        "dmgPerLevel": 2.7,
+        "attackSpeed": 2.2,
+        "armorPerLevel": 22,
+        "moveSpeed": 0,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 700,
+            "chance": 1
+          },
+          {
+            "itemId": "selthes_seastriders",
+            "chance": 0.4,
+            "normalOnly": true
+          },
+          {
+            "itemId": "briny_idol",
+            "chance": 0.5
+          },
+          {
+            "itemId": "conchplate_girdle",
+            "chance": 0.34,
+            "rollGroup": "selthe_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "pale_chorus_leggings",
+            "chance": 0.33,
+            "rollGroup": "selthe_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "refrain_silk_gloves",
+            "chance": 0.33,
+            "rollGroup": "selthe_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "chorus_conch",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.15,
+        "color": 7311278
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "tideglass_colossus",
+      "name": "Tideglass Colossus",
+      "difficulty": "normal",
+      "level": 17,
+      "hp": 11495,
+      "weapon": {
+        "min": 69,
+        "max": 108,
+        "speed": 2.8
+      },
+      "armor": 480,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "tideglass_colossus",
+        "name": "Tideglass Colossus",
+        "minLevel": 17,
+        "maxLevel": 17,
+        "family": "elemental",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 200,
+        "hpPerLevel": 30,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 6,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 1200,
+            "chance": 1
+          },
+          {
+            "itemId": "tideglass_pauldrons",
+            "chance": 0.34,
+            "rollGroup": "colossus_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "moonburn_treads",
+            "chance": 0.33,
+            "rollGroup": "colossus_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "prism_etched_cowl",
+            "chance": 0.33,
+            "rollGroup": "colossus_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "tideglass_shiv",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.2,
+        "color": 13625072
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "tideglass_colossus",
+      "name": "Tideglass Colossus",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 23003,
+      "weapon": {
+        "min": 1422,
+        "max": 2221,
+        "speed": 2.8
+      },
+      "armor": 788,
+      "mechanicMult": 5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "tideglass_colossus",
+        "name": "Tideglass Colossus",
+        "minLevel": 17,
+        "maxLevel": 17,
+        "family": "elemental",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 200,
+        "hpPerLevel": 30,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 6,
+        "aggroRadius": 14,
+        "loot": [
+          {
+            "copper": 1200,
+            "chance": 1
+          },
+          {
+            "itemId": "tideglass_pauldrons",
+            "chance": 0.34,
+            "rollGroup": "colossus_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "moonburn_treads",
+            "chance": 0.33,
+            "rollGroup": "colossus_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "prism_etched_cowl",
+            "chance": 0.33,
+            "rollGroup": "colossus_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "tideglass_shiv",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.2,
+        "color": 13625072
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "ysolei",
+      "name": "Ysolei, Avatar of the Drowned Moon",
+      "difficulty": "normal",
+      "level": 18,
+      "hp": 17994,
+      "weapon": {
+        "min": 76,
+        "max": 119,
+        "speed": 2.5
+      },
+      "armor": 476,
+      "mechanicMult": 1,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "ysolei",
+        "name": "Ysolei, Avatar of the Drowned Moon",
+        "minLevel": 18,
+        "maxLevel": 18,
+        "family": "dragonkin",
+        "elite": true,
+        "boss": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 300,
+        "hpPerLevel": 38,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.5,
+        "armorPerLevel": 28,
+        "bodyRadius": 8,
+        "moveSpeed": 0,
+        "idleStationary": true,
+        "aggroRadius": 18,
+        "summonAdds": {
+          "mobId": "moonspawn",
+          "count": 2,
+          "atHpPct": [
+            0.6,
+            0.3
+          ]
+        },
+        "enrage": {
+          "belowHpPct": 0.3,
+          "dmgMult": 1.4,
+          "hasteMult": 1.3
+        },
+        "loot": [
+          {
+            "copper": 6000,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "ysols_pearl_greaves",
+            "chance": 0.5,
+            "normalOnly": true
+          },
+          {
+            "itemId": "moonshroud_breastplate",
+            "chance": 0.34,
+            "rollGroup": "ysolei_blue",
+            "normalOnly": true
+          },
+          {
+            "itemId": "moonshroud_robe",
+            "chance": 0.33,
+            "rollGroup": "ysolei_blue",
+            "normalOnly": true
+          },
+          {
+            "itemId": "moonshroud_tunic",
+            "chance": 0.33,
+            "rollGroup": "ysolei_blue",
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.5,
+        "color": 12374764
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "ysolei",
+      "name": "Ysolei, Avatar of the Drowned Moon",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 34497,
+      "weapon": {
+        "min": 1483,
+        "max": 2317,
+        "speed": 2.5
+      },
+      "armor": 735,
+      "mechanicMult": 5,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "ysolei",
+        "name": "Ysolei, Avatar of the Drowned Moon",
+        "minLevel": 18,
+        "maxLevel": 18,
+        "family": "dragonkin",
+        "elite": true,
+        "boss": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 300,
+        "hpPerLevel": 38,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.5,
+        "armorPerLevel": 28,
+        "bodyRadius": 8,
+        "moveSpeed": 0,
+        "idleStationary": true,
+        "aggroRadius": 18,
+        "summonAdds": {
+          "mobId": "moonspawn",
+          "count": 2,
+          "atHpPct": [
+            0.6,
+            0.3
+          ]
+        },
+        "enrage": {
+          "belowHpPct": 0.3,
+          "dmgMult": 1.4,
+          "hasteMult": 1.3
+        },
+        "loot": [
+          {
+            "copper": 6000,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "ysols_pearl_greaves",
+            "chance": 0.5,
+            "normalOnly": true
+          },
+          {
+            "itemId": "moonshroud_breastplate",
+            "chance": 0.34,
+            "rollGroup": "ysolei_blue",
+            "normalOnly": true
+          },
+          {
+            "itemId": "moonshroud_robe",
+            "chance": 0.33,
+            "rollGroup": "ysolei_blue",
+            "normalOnly": true
+          },
+          {
+            "itemId": "moonshroud_tunic",
+            "chance": 0.33,
+            "rollGroup": "ysolei_blue",
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.5,
+        "color": 12374764
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "mere_hydra_head_left",
+      "name": "Mere Hydra",
+      "difficulty": "normal",
+      "level": 17,
+      "hp": 2000,
+      "weapon": {
+        "min": 69,
+        "max": 108,
+        "speed": 2.6
+      },
+      "armor": 384,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "mere_hydra_head_left",
+        "name": "Mere Hydra",
+        "minLevel": 17,
+        "maxLevel": 17,
+        "family": "dragonkin",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 24,
+        "moveSpeed": 0,
+        "aggroRadius": 16,
+        "idleStationary": true,
+        "bodyRadius": 3,
+        "loot": [
+          {
+            "copper": 400,
+            "chance": 1
+          }
+        ],
+        "scale": 2,
+        "color": 14280418
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "mere_hydra_head_left",
+      "name": "Mere Hydra",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 4306,
+      "weapon": {
+        "min": 1422,
+        "max": 2221,
+        "speed": 2.6
+      },
+      "armor": 630,
+      "mechanicMult": 6,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "mere_hydra_head_left",
+        "name": "Mere Hydra",
+        "minLevel": 17,
+        "maxLevel": 17,
+        "family": "dragonkin",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 24,
+        "moveSpeed": 0,
+        "aggroRadius": 16,
+        "idleStationary": true,
+        "bodyRadius": 3,
+        "loot": [
+          {
+            "copper": 400,
+            "chance": 1
+          }
+        ],
+        "scale": 2,
+        "color": 14280418
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "mere_hydra_head_center",
+      "name": "Mere Hydra",
+      "difficulty": "normal",
+      "level": 17,
+      "hp": 2000,
+      "weapon": {
+        "min": 69,
+        "max": 108,
+        "speed": 2.6
+      },
+      "armor": 384,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "mere_hydra_head_center",
+        "name": "Mere Hydra",
+        "minLevel": 17,
+        "maxLevel": 17,
+        "family": "dragonkin",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 24,
+        "moveSpeed": 0,
+        "aggroRadius": 16,
+        "idleStationary": true,
+        "bodyRadius": 3,
+        "loot": [
+          {
+            "copper": 400,
+            "chance": 1
+          }
+        ],
+        "scale": 2,
+        "color": 15134697
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "mere_hydra_head_center",
+      "name": "Mere Hydra",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 4306,
+      "weapon": {
+        "min": 1422,
+        "max": 2221,
+        "speed": 2.6
+      },
+      "armor": 630,
+      "mechanicMult": 6,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "mere_hydra_head_center",
+        "name": "Mere Hydra",
+        "minLevel": 17,
+        "maxLevel": 17,
+        "family": "dragonkin",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 24,
+        "moveSpeed": 0,
+        "aggroRadius": 16,
+        "idleStationary": true,
+        "bodyRadius": 3,
+        "loot": [
+          {
+            "copper": 400,
+            "chance": 1
+          }
+        ],
+        "scale": 2,
+        "color": 15134697
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "mere_hydra_head_right",
+      "name": "Mere Hydra",
+      "difficulty": "normal",
+      "level": 17,
+      "hp": 2000,
+      "weapon": {
+        "min": 69,
+        "max": 108,
+        "speed": 2.6
+      },
+      "armor": 384,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "mere_hydra_head_right",
+        "name": "Mere Hydra",
+        "minLevel": 17,
+        "maxLevel": 17,
+        "family": "dragonkin",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 24,
+        "moveSpeed": 0,
+        "aggroRadius": 16,
+        "idleStationary": true,
+        "bodyRadius": 3,
+        "loot": [
+          {
+            "copper": 400,
+            "chance": 1
+          }
+        ],
+        "scale": 2,
+        "color": 13820390
+      }
+    },
+    {
+      "dungeon": "drowned_temple",
+      "id": "mere_hydra_head_right",
+      "name": "Mere Hydra",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 4306,
+      "weapon": {
+        "min": 1422,
+        "max": 2221,
+        "speed": 2.6
+      },
+      "armor": 630,
+      "mechanicMult": 6,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "mere_hydra_head_right",
+        "name": "Mere Hydra",
+        "minLevel": 17,
+        "maxLevel": 17,
+        "family": "dragonkin",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 24,
+        "moveSpeed": 0,
+        "aggroRadius": 16,
+        "idleStationary": true,
+        "bodyRadius": 3,
+        "loot": [
+          {
+            "copper": 400,
+            "chance": 1
+          }
+        ],
+        "scale": 2,
+        "color": 13820390
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sledge_tusker",
+      "name": "Sledge Tusker",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 8992,
+      "weapon": {
+        "min": 398,
+        "max": 622,
+        "speed": 2.8
+      },
+      "armor": 570,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "sledge_tusker",
+        "name": "Sledge Tusker",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "beast",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 6,
+        "aggroRadius": 14,
+        "bodyRadius": 3.5,
+        "loot": [
+          {
+            "copper": 1500,
+            "chance": 1
+          }
+        ],
+        "scale": 2.8,
+        "color": 6969928
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sledge_tusker",
+      "name": "Sledge Tusker",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 13796,
+      "weapon": {
+        "min": 1393,
+        "max": 2177,
+        "speed": 2.8
+      },
+      "armor": 756,
+      "mechanicMult": 2.5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "sledge_tusker",
+        "name": "Sledge Tusker",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "beast",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 6,
+        "aggroRadius": 14,
+        "bodyRadius": 3.5,
+        "loot": [
+          {
+            "copper": 1500,
+            "chance": 1
+          }
+        ],
+        "scale": 2.8,
+        "color": 6969928
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "korgath_the_bound",
+      "name": "Korgath the Bound",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 12007,
+      "weapon": {
+        "min": 788,
+        "max": 1231,
+        "speed": 2.8
+      },
+      "armor": 570,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "korgath_the_bound",
+        "name": "Korgath the Bound",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "ogre",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 260,
+        "hpPerLevel": 36,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 7,
+        "aggroRadius": 15,
+        "enrage": {
+          "belowHpPct": 0.3,
+          "dmgMult": 1.5,
+          "hasteMult": 1.3
+        },
+        "loot": [
+          {
+            "copper": 5000,
+            "chance": 1
+          },
+          {
+            "itemId": "foremans_grips",
+            "chance": 0.34,
+            "rollGroup": "korgath_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "serac_stride_boots",
+            "chance": 0.33,
+            "rollGroup": "korgath_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "seal_rune_mantle",
+            "chance": 0.33,
+            "rollGroup": "korgath_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "zealotsbane_blade",
+            "chance": 0.19,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "korgaths_chainwraps",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "staff_of_velkhar",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "shadowmeld_tunic",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmcult_grand_robe",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_sabatons",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmcult_soulsteps",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmshadow_treads",
+            "chance": 0.05,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "boundstone_helm",
+            "chance": 0.08,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_mantle",
+            "chance": 0.08,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.5,
+        "color": 9400134
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "korgath_the_bound",
+      "name": "Korgath the Bound",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 18391,
+      "weapon": {
+        "min": 1708,
+        "max": 2668,
+        "speed": 2.8
+      },
+      "armor": 756,
+      "mechanicMult": 2.5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "korgath_the_bound",
+        "name": "Korgath the Bound",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "ogre",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 260,
+        "hpPerLevel": 36,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 7,
+        "aggroRadius": 15,
+        "enrage": {
+          "belowHpPct": 0.3,
+          "dmgMult": 1.5,
+          "hasteMult": 1.3
+        },
+        "loot": [
+          {
+            "copper": 5000,
+            "chance": 1
+          },
+          {
+            "itemId": "foremans_grips",
+            "chance": 0.34,
+            "rollGroup": "korgath_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "serac_stride_boots",
+            "chance": 0.33,
+            "rollGroup": "korgath_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "seal_rune_mantle",
+            "chance": 0.33,
+            "rollGroup": "korgath_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "zealotsbane_blade",
+            "chance": 0.19,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "korgaths_chainwraps",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "staff_of_velkhar",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "shadowmeld_tunic",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmcult_grand_robe",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_sabatons",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmcult_soulsteps",
+            "chance": 0.1,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmshadow_treads",
+            "chance": 0.05,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "boundstone_helm",
+            "chance": 0.08,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_mantle",
+            "chance": 0.08,
+            "rollGroup": "korgath_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.5,
+        "color": 9400134
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sanctum_shackle_hammer",
+      "name": "Hammer Shackle",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 1500,
+      "weapon": {
+        "min": 0,
+        "max": 0,
+        "speed": 999
+      },
+      "armor": 380,
+      "mechanicMult": 1,
+      "boss": false,
+      "templateAbilities": {
+        "id": "sanctum_shackle_hammer",
+        "name": "Hammer Shackle",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "untameable": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "ignoreTaunt": true,
+        "quietMechanics": true,
+        "xpMult": 0,
+        "hpBase": 750,
+        "hpPerLevel": 0,
+        "dmgBase": 0,
+        "dmgPerLevel": 0,
+        "attackSpeed": 999,
+        "armorPerLevel": 20,
+        "moveSpeed": 0,
+        "aggroRadius": 0,
+        "idleStationary": true,
+        "loot": [],
+        "scale": 1.4,
+        "color": 5995944
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sanctum_shackle_hammer",
+      "name": "Hammer Shackle",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 2303,
+      "weapon": {
+        "min": 0,
+        "max": 0,
+        "speed": 999
+      },
+      "armor": 504,
+      "mechanicMult": 15.5,
+      "boss": false,
+      "templateAbilities": {
+        "id": "sanctum_shackle_hammer",
+        "name": "Hammer Shackle",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "untameable": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "ignoreTaunt": true,
+        "quietMechanics": true,
+        "xpMult": 0,
+        "hpBase": 750,
+        "hpPerLevel": 0,
+        "dmgBase": 0,
+        "dmgPerLevel": 0,
+        "attackSpeed": 999,
+        "armorPerLevel": 20,
+        "moveSpeed": 0,
+        "aggroRadius": 0,
+        "idleStationary": true,
+        "loot": [],
+        "scale": 1.4,
+        "color": 5995944
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sanctum_shackle_tongs",
+      "name": "Tongs Shackle",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 1500,
+      "weapon": {
+        "min": 0,
+        "max": 0,
+        "speed": 999
+      },
+      "armor": 380,
+      "mechanicMult": 1,
+      "boss": false,
+      "templateAbilities": {
+        "id": "sanctum_shackle_tongs",
+        "name": "Tongs Shackle",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "untameable": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "ignoreTaunt": true,
+        "quietMechanics": true,
+        "xpMult": 0,
+        "hpBase": 750,
+        "hpPerLevel": 0,
+        "dmgBase": 0,
+        "dmgPerLevel": 0,
+        "attackSpeed": 999,
+        "armorPerLevel": 20,
+        "moveSpeed": 0,
+        "aggroRadius": 0,
+        "idleStationary": true,
+        "loot": [],
+        "scale": 1.4,
+        "color": 5995944
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sanctum_shackle_tongs",
+      "name": "Tongs Shackle",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 2303,
+      "weapon": {
+        "min": 0,
+        "max": 0,
+        "speed": 999
+      },
+      "armor": 504,
+      "mechanicMult": 15.5,
+      "boss": false,
+      "templateAbilities": {
+        "id": "sanctum_shackle_tongs",
+        "name": "Tongs Shackle",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "untameable": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "ignoreTaunt": true,
+        "quietMechanics": true,
+        "xpMult": 0,
+        "hpBase": 750,
+        "hpPerLevel": 0,
+        "dmgBase": 0,
+        "dmgPerLevel": 0,
+        "attackSpeed": 999,
+        "armorPerLevel": 20,
+        "moveSpeed": 0,
+        "aggroRadius": 0,
+        "idleStationary": true,
+        "loot": [],
+        "scale": 1.4,
+        "color": 5995944
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sanctum_shackle_anvil",
+      "name": "Anvil Shackle",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 1500,
+      "weapon": {
+        "min": 0,
+        "max": 0,
+        "speed": 999
+      },
+      "armor": 380,
+      "mechanicMult": 1,
+      "boss": false,
+      "templateAbilities": {
+        "id": "sanctum_shackle_anvil",
+        "name": "Anvil Shackle",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "untameable": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "ignoreTaunt": true,
+        "quietMechanics": true,
+        "xpMult": 0,
+        "hpBase": 750,
+        "hpPerLevel": 0,
+        "dmgBase": 0,
+        "dmgPerLevel": 0,
+        "attackSpeed": 999,
+        "armorPerLevel": 20,
+        "moveSpeed": 0,
+        "aggroRadius": 0,
+        "idleStationary": true,
+        "loot": [],
+        "scale": 1.4,
+        "color": 5995944
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sanctum_shackle_anvil",
+      "name": "Anvil Shackle",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 2303,
+      "weapon": {
+        "min": 0,
+        "max": 0,
+        "speed": 999
+      },
+      "armor": 504,
+      "mechanicMult": 15.5,
+      "boss": false,
+      "templateAbilities": {
+        "id": "sanctum_shackle_anvil",
+        "name": "Anvil Shackle",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "untameable": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "ignoreTaunt": true,
+        "quietMechanics": true,
+        "xpMult": 0,
+        "hpBase": 750,
+        "hpPerLevel": 0,
+        "dmgBase": 0,
+        "dmgPerLevel": 0,
+        "attackSpeed": 999,
+        "armorPerLevel": 20,
+        "moveSpeed": 0,
+        "aggroRadius": 0,
+        "idleStationary": true,
+        "loot": [],
+        "scale": 1.4,
+        "color": 5995944
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sanctum_shackle_bellows",
+      "name": "Bellows Shackle",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 1500,
+      "weapon": {
+        "min": 0,
+        "max": 0,
+        "speed": 999
+      },
+      "armor": 380,
+      "mechanicMult": 1,
+      "boss": false,
+      "templateAbilities": {
+        "id": "sanctum_shackle_bellows",
+        "name": "Bellows Shackle",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "untameable": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "ignoreTaunt": true,
+        "quietMechanics": true,
+        "xpMult": 0,
+        "hpBase": 750,
+        "hpPerLevel": 0,
+        "dmgBase": 0,
+        "dmgPerLevel": 0,
+        "attackSpeed": 999,
+        "armorPerLevel": 20,
+        "moveSpeed": 0,
+        "aggroRadius": 0,
+        "idleStationary": true,
+        "loot": [],
+        "scale": 1.4,
+        "color": 5995944
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "sanctum_shackle_bellows",
+      "name": "Bellows Shackle",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 2303,
+      "weapon": {
+        "min": 0,
+        "max": 0,
+        "speed": 999
+      },
+      "armor": 504,
+      "mechanicMult": 15.5,
+      "boss": false,
+      "templateAbilities": {
+        "id": "sanctum_shackle_bellows",
+        "name": "Bellows Shackle",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "untameable": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "ignoreTaunt": true,
+        "quietMechanics": true,
+        "xpMult": 0,
+        "hpBase": 750,
+        "hpPerLevel": 0,
+        "dmgBase": 0,
+        "dmgPerLevel": 0,
+        "attackSpeed": 999,
+        "armorPerLevel": 20,
+        "moveSpeed": 0,
+        "aggroRadius": 0,
+        "idleStationary": true,
+        "loot": [],
+        "scale": 1.4,
+        "color": 5995944
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "grand_necromancer_velkhar",
+      "name": "Grand Necromancer Velkhar",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 15000,
+      "weapon": {
+        "min": 524,
+        "max": 819,
+        "speed": 2
+      },
+      "armor": 380,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "grand_necromancer_velkhar",
+        "name": "Grand Necromancer Velkhar",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "humanoid",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 230,
+        "hpPerLevel": 33,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2,
+        "armorPerLevel": 20,
+        "moveSpeed": 7,
+        "aggroRadius": 15,
+        "loot": [
+          {
+            "copper": 5000,
+            "chance": 1
+          },
+          {
+            "itemId": "thawbound_legguards",
+            "chance": 0.34,
+            "rollGroup": "velkhar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "pyre_tenders_hood",
+            "chance": 0.33,
+            "rollGroup": "velkhar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "meltwater_cord",
+            "chance": 0.33,
+            "rollGroup": "velkhar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "emberwood_staff",
+            "chance": 0.2,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "boneguard_breastplate",
+            "chance": 0.1,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "shadowmeld_tunic",
+            "chance": 0.1,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "staff_of_velkhar",
+            "chance": 0.1,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_stalkers_treads",
+            "chance": 0.1,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "deathlord_legguards",
+            "chance": 0.05,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "necromancers_soulsteps",
+            "chance": 0.05,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmshadow_legguards",
+            "chance": 0.05,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "necromancers_reagent_satchel",
+            "chance": 0.2,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.25,
+        "color": 5320287
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "grand_necromancer_velkhar",
+      "name": "Grand Necromancer Velkhar",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 22991,
+      "weapon": {
+        "min": 1637,
+        "max": 2558,
+        "speed": 2
+      },
+      "armor": 504,
+      "mechanicMult": 2.5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "grand_necromancer_velkhar",
+        "name": "Grand Necromancer Velkhar",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "humanoid",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 230,
+        "hpPerLevel": 33,
+        "dmgBase": 13,
+        "dmgPerLevel": 2.8,
+        "attackSpeed": 2,
+        "armorPerLevel": 20,
+        "moveSpeed": 7,
+        "aggroRadius": 15,
+        "loot": [
+          {
+            "copper": 5000,
+            "chance": 1
+          },
+          {
+            "itemId": "thawbound_legguards",
+            "chance": 0.34,
+            "rollGroup": "velkhar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "pyre_tenders_hood",
+            "chance": 0.33,
+            "rollGroup": "velkhar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "meltwater_cord",
+            "chance": 0.33,
+            "rollGroup": "velkhar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "emberwood_staff",
+            "chance": 0.2,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "boneguard_breastplate",
+            "chance": 0.1,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "shadowmeld_tunic",
+            "chance": 0.1,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "staff_of_velkhar",
+            "chance": 0.1,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_stalkers_treads",
+            "chance": 0.1,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "deathlord_legguards",
+            "chance": 0.05,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "necromancers_soulsteps",
+            "chance": 0.05,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmshadow_legguards",
+            "chance": 0.05,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "necromancers_reagent_satchel",
+            "chance": 0.2,
+            "rollGroup": "velkhar_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.25,
+        "color": 5320287
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "korzul_the_gravewyrm",
+      "name": "Korzul the Gravewyrm",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 23988,
+      "weapon": {
+        "min": 734,
+        "max": 1148,
+        "speed": 2.6
+      },
+      "armor": 646,
+      "mechanicMult": 1,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "korzul_the_gravewyrm",
+        "name": "Korzul the Gravewyrm",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "dragonkin",
+        "elite": true,
+        "boss": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 420,
+        "hpPerLevel": 48,
+        "dmgBase": 15,
+        "dmgPerLevel": 3,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 34,
+        "moveSpeed": 7,
+        "aggroRadius": 18,
+        "bodyRadius": 5,
+        "enrage": {
+          "belowHpPct": 0.3,
+          "dmgMult": 1.5,
+          "hasteMult": 1.3
+        },
+        "loot": [
+          {
+            "copper": 15000,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "boneplate_vest",
+            "chance": 0.34,
+            "rollGroup": "korzul_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "revenant_silk_robe",
+            "chance": 0.33,
+            "rollGroup": "korzul_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "nightwalk_jerkin",
+            "chance": 0.33,
+            "rollGroup": "korzul_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "cultist_flayer",
+            "chance": 0.1,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmfang_greatblade",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "staff_of_the_gravewyrm",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "fang_of_korzul",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "deathlord_warplate",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "necromancers_starshroud",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmshadow_harness",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "boundstone_girdle",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_gauntlets",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "deathlords_dread_visage",
+            "chance": 0.04,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "necromancers_soulspire_mantle",
+            "chance": 0.04,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmshadow_talongrips",
+            "chance": 0.04,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "nightfangs_greatstaff",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wildgrowth_leggings",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "grovewardens_grips",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "verdant_walkers",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_bone_quiver",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.8,
+        "color": 4021317
+      }
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "id": "korzul_the_gravewyrm",
+      "name": "Korzul the Gravewyrm",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 36785,
+      "weapon": {
+        "min": 1778,
+        "max": 2779,
+        "speed": 2.6
+      },
+      "armor": 857,
+      "mechanicMult": 2.5,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "korzul_the_gravewyrm",
+        "name": "Korzul the Gravewyrm",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "dragonkin",
+        "elite": true,
+        "boss": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "hpBase": 420,
+        "hpPerLevel": 48,
+        "dmgBase": 15,
+        "dmgPerLevel": 3,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 34,
+        "moveSpeed": 7,
+        "aggroRadius": 18,
+        "bodyRadius": 5,
+        "enrage": {
+          "belowHpPct": 0.3,
+          "dmgMult": 1.5,
+          "hasteMult": 1.3
+        },
+        "loot": [
+          {
+            "copper": 15000,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "boneplate_vest",
+            "chance": 0.34,
+            "rollGroup": "korzul_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "revenant_silk_robe",
+            "chance": 0.33,
+            "rollGroup": "korzul_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "nightwalk_jerkin",
+            "chance": 0.33,
+            "rollGroup": "korzul_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "cultist_flayer",
+            "chance": 0.1,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmfang_greatblade",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "staff_of_the_gravewyrm",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "fang_of_korzul",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "deathlord_warplate",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "necromancers_starshroud",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmshadow_harness",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "boundstone_girdle",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_gauntlets",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "deathlords_dread_visage",
+            "chance": 0.04,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "necromancers_soulspire_mantle",
+            "chance": 0.04,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wyrmshadow_talongrips",
+            "chance": 0.04,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "nightfangs_greatstaff",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wildgrowth_leggings",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "grovewardens_grips",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "verdant_walkers",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "gravewyrm_bone_quiver",
+            "chance": 0.05,
+            "rollGroup": "korzul_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 1.8,
+        "color": 4021317
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "great_saurian",
+      "name": "Great Saurian",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 10002,
+      "weapon": {
+        "min": 398,
+        "max": 622,
+        "speed": 2.8
+      },
+      "armor": 570,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "great_saurian",
+        "name": "Great Saurian",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "beast",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 6,
+        "aggroRadius": 16,
+        "bodyRadius": 4,
+        "componentTags": [
+          "hide"
+        ],
+        "loot": [
+          {
+            "copper": 1500,
+            "chance": 1
+          }
+        ],
+        "scale": 3.2,
+        "color": 7109194
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "great_saurian",
+      "name": "Great Saurian",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 14998,
+      "weapon": {
+        "min": 1550,
+        "max": 2423,
+        "speed": 2.8
+      },
+      "armor": 756,
+      "mechanicMult": 2.5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "great_saurian",
+        "name": "Great Saurian",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "beast",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 30,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.8,
+        "armorPerLevel": 30,
+        "moveSpeed": 6,
+        "aggroRadius": 16,
+        "bodyRadius": 4,
+        "componentTags": [
+          "hide"
+        ],
+        "loot": [
+          {
+            "copper": 1500,
+            "chance": 1
+          }
+        ],
+        "scale": 3.2,
+        "color": 7109194
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "wildheart_beastmaster",
+      "name": "Fanglord Beastmaster",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 15000,
+      "weapon": {
+        "min": 525,
+        "max": 820,
+        "speed": 2.6
+      },
+      "armor": 608,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "wildheart_beastmaster",
+        "name": "Fanglord Beastmaster",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "troll",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 36,
+        "dmgBase": 18,
+        "dmgPerLevel": 3.2,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 32,
+        "moveSpeed": 6.8,
+        "aggroRadius": 17,
+        "componentTags": [
+          "hide",
+          "fang"
+        ],
+        "loot": [
+          {
+            "copper": 2500,
+            "chance": 1
+          },
+          {
+            "itemId": "chipped_tusk",
+            "chance": 1
+          },
+          {
+            "itemId": "fanglords_beastspear",
+            "chance": 0.12,
+            "normalOnly": true
+          },
+          {
+            "itemId": "duskwhisper",
+            "chance": 0.12,
+            "normalOnly": true
+          },
+          {
+            "itemId": "beastpit_warbelt",
+            "chance": 0.34,
+            "rollGroup": "beastmaster_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "jaguar_hide_jerkin",
+            "chance": 0.33,
+            "rollGroup": "beastmaster_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "hexbone_handwraps",
+            "chance": 0.33,
+            "rollGroup": "beastmaster_guaranteed",
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.35,
+        "color": 4741949
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "wildheart_beastmaster",
+      "name": "Fanglord Beastmaster",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 23005,
+      "weapon": {
+        "min": 1764,
+        "max": 2756,
+        "speed": 2.6
+      },
+      "armor": 806,
+      "mechanicMult": 2.5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "wildheart_beastmaster",
+        "name": "Fanglord Beastmaster",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "troll",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 150,
+        "hpPerLevel": 36,
+        "dmgBase": 18,
+        "dmgPerLevel": 3.2,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 32,
+        "moveSpeed": 6.8,
+        "aggroRadius": 17,
+        "componentTags": [
+          "hide",
+          "fang"
+        ],
+        "loot": [
+          {
+            "copper": 2500,
+            "chance": 1
+          },
+          {
+            "itemId": "chipped_tusk",
+            "chance": 1
+          },
+          {
+            "itemId": "fanglords_beastspear",
+            "chance": 0.12,
+            "normalOnly": true
+          },
+          {
+            "itemId": "duskwhisper",
+            "chance": 0.12,
+            "normalOnly": true
+          },
+          {
+            "itemId": "beastpit_warbelt",
+            "chance": 0.34,
+            "rollGroup": "beastmaster_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "jaguar_hide_jerkin",
+            "chance": 0.33,
+            "rollGroup": "beastmaster_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "hexbone_handwraps",
+            "chance": 0.33,
+            "rollGroup": "beastmaster_guaranteed",
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.35,
+        "color": 4741949
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "fanglord_jaguar",
+      "name": "Fanglord's Great Jaguar",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 15013,
+      "weapon": {
+        "min": 397,
+        "max": 621,
+        "speed": 2
+      },
+      "armor": 494,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "fanglord_jaguar",
+        "name": "Fanglord's Great Jaguar",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "beast",
+        "elite": true,
+        "ignoreTaunt": true,
+        "untameable": true,
+        "hpBase": 120,
+        "hpPerLevel": 30,
+        "dmgBase": 15,
+        "dmgPerLevel": 3,
+        "attackSpeed": 2,
+        "armorPerLevel": 26,
+        "moveSpeed": 8,
+        "aggroRadius": 17,
+        "bodyRadius": 1.8,
+        "componentTags": [
+          "hide",
+          "fang"
+        ],
+        "loot": [],
+        "scale": 2.4,
+        "color": 13213760
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "fanglord_jaguar",
+      "name": "Fanglord's Great Jaguar",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 23011,
+      "weapon": {
+        "min": 1615,
+        "max": 2523,
+        "speed": 2
+      },
+      "armor": 655,
+      "mechanicMult": 2.5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "fanglord_jaguar",
+        "name": "Fanglord's Great Jaguar",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "beast",
+        "elite": true,
+        "ignoreTaunt": true,
+        "untameable": true,
+        "hpBase": 120,
+        "hpPerLevel": 30,
+        "dmgBase": 15,
+        "dmgPerLevel": 3,
+        "attackSpeed": 2,
+        "armorPerLevel": 26,
+        "moveSpeed": 8,
+        "aggroRadius": 17,
+        "bodyRadius": 1.8,
+        "componentTags": [
+          "hide",
+          "fang"
+        ],
+        "loot": [],
+        "scale": 2.4,
+        "color": 13213760
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "the_gorgebloom",
+      "name": "The Gorgebloom",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 15000,
+      "weapon": {
+        "min": 531,
+        "max": 829,
+        "speed": 2.6
+      },
+      "armor": 494,
+      "mechanicMult": 1,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "the_gorgebloom",
+        "name": "The Gorgebloom",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 200,
+        "hpPerLevel": 30,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 26,
+        "moveSpeed": 0,
+        "aggroRadius": 16,
+        "idleStationary": true,
+        "bodyRadius": 4.5,
+        "loot": [
+          {
+            "copper": 2500,
+            "chance": 1
+          },
+          {
+            "itemId": "rootbound_sabatons",
+            "chance": 0.34,
+            "rollGroup": "gorgebloom_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "pollen_dusted_leggings",
+            "chance": 0.33,
+            "rollGroup": "gorgebloom_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "bloomsilk_cowl",
+            "chance": 0.33,
+            "rollGroup": "gorgebloom_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "falls_blessed_staff",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.8,
+        "color": 10695210
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "the_gorgebloom",
+      "name": "The Gorgebloom",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 23003,
+      "weapon": {
+        "min": 1550,
+        "max": 2423,
+        "speed": 2.6
+      },
+      "armor": 655,
+      "mechanicMult": 2.5,
+      "boss": false,
+      "elite": true,
+      "templateAbilities": {
+        "id": "the_gorgebloom",
+        "name": "The Gorgebloom",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "elemental",
+        "elite": true,
+        "ccImmune": true,
+        "slowImmune": true,
+        "untameable": true,
+        "hpBase": 200,
+        "hpPerLevel": 30,
+        "dmgBase": 14,
+        "dmgPerLevel": 2.9,
+        "attackSpeed": 2.6,
+        "armorPerLevel": 26,
+        "moveSpeed": 0,
+        "aggroRadius": 16,
+        "idleStationary": true,
+        "bodyRadius": 4.5,
+        "loot": [
+          {
+            "copper": 2500,
+            "chance": 1
+          },
+          {
+            "itemId": "rootbound_sabatons",
+            "chance": 0.34,
+            "rollGroup": "gorgebloom_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "pollen_dusted_leggings",
+            "chance": 0.33,
+            "rollGroup": "gorgebloom_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "bloomsilk_cowl",
+            "chance": 0.33,
+            "rollGroup": "gorgebloom_guaranteed",
+            "normalOnly": true
+          },
+          {
+            "itemId": "falls_blessed_staff",
+            "chance": 0.1,
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.8,
+        "color": 10695210
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "wildheart_high_priest",
+      "name": "Zulgar, Voice of the Basin",
+      "difficulty": "normal",
+      "level": 20,
+      "hp": 24808,
+      "weapon": {
+        "min": 527,
+        "max": 824,
+        "speed": 2.55
+      },
+      "armor": 665,
+      "mechanicMult": 1,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "wildheart_high_priest",
+        "name": "Zulgar, Voice of the Basin",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "troll",
+        "elite": true,
+        "boss": true,
+        "hpBase": 470,
+        "hpPerLevel": 54,
+        "dmgBase": 17,
+        "dmgPerLevel": 3.2,
+        "attackSpeed": 2.55,
+        "armorPerLevel": 35,
+        "moveSpeed": 7,
+        "aggroRadius": 19,
+        "knockback": {
+          "chance": 0.22,
+          "distance": 7,
+          "name": "Jaguar Roar"
+        },
+        "enrage": {
+          "belowHpPct": 0.3,
+          "dmgMult": 1.5,
+          "hasteMult": 1.28
+        },
+        "yells": {
+          "engage": "The basin has teeth. It will remember your blood!",
+          "enrage": "THE WILD HEART BEATS THROUGH ME!"
+        },
+        "loot": [
+          {
+            "copper": 15000,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "bone_fragments",
+            "chance": 0.8
+          },
+          {
+            "itemId": "bloodmane_warleggings",
+            "chance": 0.34,
+            "rollGroup": "zulgar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "vineclaw_stalking_breeches",
+            "chance": 0.33,
+            "rollGroup": "zulgar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "sunbone_ritual_sarong",
+            "chance": 0.33,
+            "rollGroup": "zulgar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wildheart_tuskblade",
+            "chance": 0.06,
+            "rollGroup": "wildheart_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wildheart_hexwood_staff",
+            "chance": 0.06,
+            "rollGroup": "wildheart_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wildheart_fangknife",
+            "chance": 0.06,
+            "rollGroup": "wildheart_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.8,
+        "color": 5664581
+      }
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "id": "wildheart_high_priest",
+      "name": "Zulgar, Voice of the Basin",
+      "difficulty": "heroic",
+      "level": 22,
+      "hp": 36818,
+      "weapon": {
+        "min": 1743,
+        "max": 2723,
+        "speed": 2.55
+      },
+      "armor": 882,
+      "mechanicMult": 2.5,
+      "boss": true,
+      "elite": true,
+      "templateAbilities": {
+        "id": "wildheart_high_priest",
+        "name": "Zulgar, Voice of the Basin",
+        "minLevel": 20,
+        "maxLevel": 20,
+        "family": "troll",
+        "elite": true,
+        "boss": true,
+        "hpBase": 470,
+        "hpPerLevel": 54,
+        "dmgBase": 17,
+        "dmgPerLevel": 3.2,
+        "attackSpeed": 2.55,
+        "armorPerLevel": 35,
+        "moveSpeed": 7,
+        "aggroRadius": 19,
+        "knockback": {
+          "chance": 0.22,
+          "distance": 7,
+          "name": "Jaguar Roar"
+        },
+        "enrage": {
+          "belowHpPct": 0.3,
+          "dmgMult": 1.5,
+          "hasteMult": 1.28
+        },
+        "yells": {
+          "engage": "The basin has teeth. It will remember your blood!",
+          "enrage": "THE WILD HEART BEATS THROUGH ME!"
+        },
+        "loot": [
+          {
+            "copper": 15000,
+            "heroicCopper": 100000,
+            "chance": 1
+          },
+          {
+            "itemId": "bone_fragments",
+            "chance": 0.8
+          },
+          {
+            "itemId": "bloodmane_warleggings",
+            "chance": 0.34,
+            "rollGroup": "zulgar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "vineclaw_stalking_breeches",
+            "chance": 0.33,
+            "rollGroup": "zulgar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "sunbone_ritual_sarong",
+            "chance": 0.33,
+            "rollGroup": "zulgar_guaranteed_uncommon",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wildheart_tuskblade",
+            "chance": 0.06,
+            "rollGroup": "wildheart_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wildheart_hexwood_staff",
+            "chance": 0.06,
+            "rollGroup": "wildheart_bonus",
+            "normalOnly": true
+          },
+          {
+            "itemId": "wildheart_fangknife",
+            "chance": 0.06,
+            "rollGroup": "wildheart_bonus",
+            "normalOnly": true
+          }
+        ],
+        "scale": 2.8,
+        "color": 5664581
+      }
+    }
+  ]
+}

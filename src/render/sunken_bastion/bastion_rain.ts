@@ -12,6 +12,9 @@
 // per-frame JavaScript. Counts shed with the effects tier; everything here is
 // cosmetic. Built with the interior group and attached through its compile
 // gate (the prewarm home of every material here).
+// Ownership reads uPlayerXZ, an alias of sharedUniforms.uCarpetRing: its xy
+// carry player x,z in prewarm and live frames even with carpet radius zero.
+// The orbit camera may leave the slot while its player is still inside.
 
 import * as THREE from 'three';
 import { SUNKEN_BASTION_SEA_LEVEL } from '../../sim/content/sunken_bastion_layout';
@@ -25,10 +28,14 @@ import {
   RAIN_BOX,
   RAIN_GUST_GLSL,
   RAIN_SHUTTER,
+  RAIN_SLOT_CLIP_GLSL,
+  RAIN_SLOT_GLSL,
   RAIN_SPEED,
   RAIN_WIND,
+  SPLASH_CELL_GLSL,
   SPLASH_HEIGHT_RANGE,
   SPLASH_RADIUS,
+  splashLattice,
 } from './bastion_rain_core';
 export interface BastionRainOptions {
   lowGfx: boolean;
@@ -49,6 +56,7 @@ float vnoise(vec2 p) {
 // ---- streaks ---------------------------------------------------------------------------
 
 const STREAK_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
+${RAIN_SLOT_GLSL}
 attribute vec3 aSeed;
 attribute vec2 aCorner;
 uniform float uTime;
@@ -61,6 +69,7 @@ varying vec2 vUv;
 varying float vShade;
 ${RAIN_GUST_GLSL}
 void main() {
+  ${RAIN_SLOT_CLIP_GLSL}
   float gust = rainGust(uTime + aSeed.x * 4.0);
   float speed = mix(uSpeed.x, uSpeed.y, aSeed.y);
   vec2 wind = uWind * (0.55 + 0.9 * gust);
@@ -71,7 +80,8 @@ void main() {
   float fall = mod(aSeed.y * 97.0 - uTime * speed, uBox.y);
   p.y = fall;
   p.xz += wind * (uBox.y - fall) / speed;
-  vec3 rel = mod(p - cameraPosition + uBox * 0.5, uBox) - uBox * 0.5;
+  vec3 cameraLocal = cameraPosition - modelMatrix[3].xyz;
+  vec3 rel = mod(p - cameraLocal + uBox * 0.5, uBox) - uBox * 0.5;
   vec3 head = cameraPosition + rel;
   float len = speed * mix(uShutter.x, uShutter.y, fract(aSeed.z * 7.13));
   vec3 toCam = normalize(cameraPosition - head);
@@ -143,6 +153,7 @@ function buildStreaks(count: number): THREE.Mesh {
     fragmentShader: STREAK_FRAG,
     uniforms: {
       uTime: sharedUniforms.uTime,
+      uPlayerXZ: sharedUniforms.uCarpetRing,
       uBox: { value: new THREE.Vector3(RAIN_BOX.x, RAIN_BOX.y, RAIN_BOX.z) },
       uWind: { value: new THREE.Vector2(RAIN_WIND[0], RAIN_WIND[1]) },
       uSpeed: { value: new THREE.Vector2(RAIN_SPEED.min, RAIN_SPEED.max) },
@@ -164,11 +175,15 @@ function buildStreaks(count: number): THREE.Mesh {
 // ---- splashes ---------------------------------------------------------------------------
 
 const SPLASH_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
+${RAIN_SLOT_GLSL}
+${SPLASH_CELL_GLSL}
 attribute vec3 aSeed;
+attribute vec2 aCell;
 attribute vec2 aCorner;
 attribute float aKind;
 uniform float uTime;
 uniform float uRadius;
+uniform vec2 uLattice;
 uniform sampler2D uHeights;
 uniform vec4 uGrid;
 uniform vec2 uHeightRange;
@@ -177,21 +192,23 @@ varying vec2 vUv;
 varying float vKind;
 ${HASH_GLSL}
 void main() {
+  ${RAIN_SLOT_CLIP_GLSL}
   float rate = 0.9 + aSeed.x * 0.9;
   float c = uTime * rate + aSeed.y * 17.0;
   float cyc = floor(c);
   float ph = fract(c);
   vec2 r2 = vec2(hash(vec2(cyc, aSeed.z * 91.7)), hash(vec2(aSeed.z * 37.3, cyc + 1.7)));
-  vec2 center = cameraPosition.xz + (r2 - 0.5) * 2.0 * uRadius;
-  // The field is laid out in its slot's frame (the interior group's origin).
-  vec2 local = center - modelMatrix[3].xz;
+  // The camera admits cells at the edge, never translates a surviving ring.
+  vec2 cameraLocal = cameraPosition.xz - modelMatrix[3].xz;
+  vec2 local = splashCellCenter(aCell, cameraLocal, r2, uLattice);
+  vec2 center = modelMatrix[3].xz + local;
   vec2 uv = (local - uGrid.xy) * uGrid.zw;
   vec4 texel = texture2D(uHeights, uv);
   float h = uHeightRange.x + (texel.r * 65280.0 + texel.g * 255.0) / 65535.0 * uHeightRange.y;
   float inside = step(0.0, uv.x) * step(uv.x, 1.0) * step(0.0, uv.y) * step(uv.y, 1.0);
   float ok = step(0.5, texel.b) * inside;
-  float distFade = 1.0 - smoothstep(uRadius * 0.55, uRadius, length(center - cameraPosition.xz));
-  vec3 base = vec3(center.x, h + 0.04, center.y);
+  float distFade = 1.0 - smoothstep(uRadius * 0.55, uRadius, length(local - cameraLocal));
+  vec3 base = vec3(center.x, modelMatrix[3].y + h + 0.04, center.y);
   vec3 world;
   if (aKind < 0.5) {
     // The ripple ring: widening and fading on the stone or the water.
@@ -248,6 +265,7 @@ void main() {
 `;
 
 function buildSplashes(count: number): THREE.Mesh {
+  const lattice = splashLattice(count);
   const grid = planSplashHeights(1);
   const tex = new THREE.DataTexture(packSplashHeights(grid), grid.cols, grid.rows);
   tex.magFilter = THREE.NearestFilter;
@@ -257,6 +275,7 @@ function buildSplashes(count: number): THREE.Mesh {
   const seeds = new Float32Array(count * 8 * 3);
   const corners = new Float32Array(count * 8 * 2);
   const kinds = new Float32Array(count * 8);
+  const cells = new Float32Array(count * 8 * 2);
   const index = new Uint32Array(count * 12);
   let s = 23;
   const rnd = () => {
@@ -279,6 +298,7 @@ function buildSplashes(count: number): THREE.Mesh {
         seeds.set([a, b, c], v * 3);
         corners.set(quad[k], v * 2);
         kinds[v] = q;
+        cells.set([i % lattice.side, Math.floor(i / lattice.side)], v * 2);
       }
       const o = i * 8 + q * 4;
       index.set([o, o + 1, o + 2, o + 1, o + 3, o + 2], i * 12 + q * 6);
@@ -289,6 +309,7 @@ function buildSplashes(count: number): THREE.Mesh {
   geo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 3));
   geo.setAttribute('aCorner', new THREE.BufferAttribute(corners, 2));
   geo.setAttribute('aKind', new THREE.BufferAttribute(kinds, 1));
+  geo.setAttribute('aCell', new THREE.BufferAttribute(cells, 2));
   geo.setIndex(new THREE.BufferAttribute(index, 1));
   const material = new THREE.ShaderMaterial({
     name: 'sunkenBastionRainSplashes',
@@ -296,7 +317,9 @@ function buildSplashes(count: number): THREE.Mesh {
     fragmentShader: SPLASH_FRAG,
     uniforms: {
       uTime: sharedUniforms.uTime,
+      uPlayerXZ: sharedUniforms.uCarpetRing,
       uRadius: { value: SPLASH_RADIUS },
+      uLattice: { value: new THREE.Vector2(lattice.side, lattice.cellSize) },
       uHeights: { value: tex },
       uGrid: {
         value: new THREE.Vector4(
@@ -330,6 +353,7 @@ function buildSplashes(count: number): THREE.Mesh {
 // ---- distant sheets --------------------------------------------------------------------
 
 const SHEET_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
+${RAIN_SLOT_GLSL}
 attribute vec3 aSheet; // bearing, radius, seed
 attribute vec2 aCorner; // u across 0..1, v up 0..1
 uniform float uTime;
@@ -339,12 +363,13 @@ varying float vSeed;
 varying float vBearing;
 ${RAIN_GUST_GLSL}
 void main() {
+  ${RAIN_SLOT_CLIP_GLSL}
   // Each sheet drifts slowly round the camera with the wind.
   float bearing = aSheet.x + uTime * 0.004 * (0.5 + aSheet.z);
   float span = 0.5;
   float a = bearing + (aCorner.x - 0.5) * span;
   float radius = aSheet.y;
-  vec3 world = vec3(cameraPosition.x + sin(a) * radius, uSea - 3.0 + aCorner.y * 70.0,
+  vec3 world = vec3(cameraPosition.x + sin(a) * radius, modelMatrix[3].y + uSea - 3.0 + aCorner.y * 70.0,
     cameraPosition.z + cos(a) * radius);
   // The top leans down-wind (the rain slants in the gusts).
   float gust = rainGust(uTime + aSheet.z * 9.0);
@@ -418,6 +443,7 @@ function buildSheets(count: number): THREE.Mesh {
     fragmentShader: SHEET_FRAG,
     uniforms: {
       uTime: sharedUniforms.uTime,
+      uPlayerXZ: sharedUniforms.uCarpetRing,
       uSea: { value: SUNKEN_BASTION_SEA_LEVEL },
       uColor: { value: new THREE.Color(0x9fb0ac) },
     },

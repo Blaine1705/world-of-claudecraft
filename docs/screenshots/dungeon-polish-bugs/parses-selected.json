@@ -1,0 +1,5386 @@
+{
+  "generatedAt": "2026-10-07T13:31:14.666Z",
+  "sources": {
+    "service": "https://parses.worldofclaudecraft.com/mcp",
+    "itemLevel": "src/sim/item_level.ts::itemLevel with current PR4352 item definitions; not a serialized historical parse field",
+    "itemLevelCatalog": "tmp/dungeon-review/item-level-catalog.json"
+  },
+  "methodology": [
+    "Fifteen nominated fights were fetched by recency, difficulty and group size, before computing gear levels. High gear is characterized here by mean known occupied item levels of at least 28; this is a sampling label, not a game balance threshold.",
+    "Average character item level uses all occupied items for which the canonical itemLevel returns a number. Non-tiered starter/cosmetic items and empty slots do not enter the denominator. Unknown item IDs are listed, never inferred. No instance payload is present in participant snapshots, so earned Perfected or dynamic item tiers cannot be reconstructed.",
+    "Party average gives each character equal weight. Missing vanguard focus jewelry makes affected averages partial. The catalog is current local definitions, not a time-versioned production export.",
+    "Boss HP comes from resources maxHp samples. Raw damage source is restricted to that boss with direction=done, source=bossId and pivot=target; the summary keeps only participant entity IDs, excluding pets, trash and adds as sources.",
+    "Observed hit means are post mitigation and absorption. Means including absorbed still retain armor/resistance/stance effects. Never compare these values directly against authored raw damage without fixing the defender.",
+    "Duration is fight duration, not participant active_ms; damage totals can include overkill. These are selected recent examples, not population percentiles or a median estimate.",
+    "Current local rework includes bosses absent from production final-boss parse lists, such as Olen. A direct boss-for-boss production comparison is unavailable for those bosses."
+  ],
+  "excludedNominees": [
+    {
+      "fightId": 152239,
+      "reason": "Nominal party of five has one level-20 high-gear player plus four level-1 starter characters. A boost, not a high-gear five-player party."
+    },
+    {
+      "fightId": 152136,
+      "reason": "Three players level 12 to 14 with mean known item levels about 10.6 to 13.2. Outside the user-requested high-gear cohort."
+    }
+  ],
+  "selected": [
+    {
+      "fightId": 152689,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152689",
+      "key": "hollow_crypt",
+      "difficulty": "normal",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T11:13:22.103Z",
+      "seconds": 4.7,
+      "groupSize": 1,
+      "groupType": "solo",
+      "avgPlayerItemLevelKnown": 30.83,
+      "incompleteItemLevels": false,
+      "boss": {
+        "id": 7093,
+        "name": "Morthen the Gravecaller"
+      },
+      "sampledBossMaxHp": 1191,
+      "bossDamageTakenByParty": 72,
+      "bossDtpsAcrossParty": 15.32,
+      "highestBossDamageRecipient": {
+        "name": "SENAPOYO",
+        "class": "hunter",
+        "spec": "survival",
+        "total": 72,
+        "dtps": 15.32,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 72,
+            "count": 2,
+            "kinds": {
+              "hit": 2
+            },
+            "absorbed": 0,
+            "landedEvents": 2,
+            "meanDamagePerLandedEvent": 36,
+            "meanIncludingAbsorbed": 36
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "62097",
+          "entityId": "6826",
+          "name": "SENAPOYO",
+          "class": "hunter",
+          "spec": "survival",
+          "level": 20,
+          "prestigeRank": 15,
+          "avgEquippedItemLevel": 30.83,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "wyrmshadow_treads",
+              "name": "Nightfang Treads",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "wyrmshadow_legguards",
+              "name": "Nightfang Legguards",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "yumis_keepsake_locket",
+              "name": "Yumi's Keepsake Locket",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "wyrmshadow_harness",
+              "name": "Nightfang Harness",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_of_marked_strikes",
+              "name": "Band of Marked Strikes",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "bonechill_cord",
+              "name": "Bonechill Cord",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "nighttalon_grips",
+              "name": "Direfang Grips",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_direfang_quiver",
+              "name": "Direfang Quiver",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "kingsbane_last_oath",
+              "name": "Thronebane, Last Oath of Thornpeak",
+              "itemLevel": 49,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_nighttalon_shoulderguards",
+              "name": "Direfang Shoulderguards",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 1207,
+          "damageTakenAllSources": 72,
+          "bossDamageTaken": 72,
+          "bossDtps": 15.32,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 72,
+              "count": 2,
+              "kinds": {
+                "hit": 2
+              },
+              "absorbed": 0,
+              "landedEvents": 2,
+              "meanDamagePerLandedEvent": 36,
+              "meanIncludingAbsorbed": 36
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fightId": 152941,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152941",
+      "key": "drowned_temple",
+      "difficulty": "normal",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T13:01:31.652Z",
+      "seconds": 7.95,
+      "groupSize": 1,
+      "groupType": "solo",
+      "avgPlayerItemLevelKnown": 30.58,
+      "incompleteItemLevels": false,
+      "boss": {
+        "id": 10414,
+        "name": "Ysolei, Avatar of the Drowned Moon"
+      },
+      "sampledBossMaxHp": 2176,
+      "bossDamageTakenByParty": 74,
+      "bossDtpsAcrossParty": 9.31,
+      "highestBossDamageRecipient": {
+        "name": "eree",
+        "class": "rogue",
+        "spec": "subtlety",
+        "total": 74,
+        "dtps": 9.31,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 74,
+            "count": 4,
+            "kinds": {
+              "hit": 1,
+              "dodge": 3
+            },
+            "absorbed": 0,
+            "landedEvents": 1,
+            "meanDamagePerLandedEvent": 74,
+            "meanIncludingAbsorbed": 74
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "91875",
+          "entityId": "10396",
+          "name": "eree",
+          "class": "rogue",
+          "spec": "subtlety",
+          "level": 20,
+          "prestigeRank": 20,
+          "avgEquippedItemLevel": 30.58,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "heroic_wyrmshadow_treads",
+              "name": "Nightfang Treads",
+              "itemLevel": 28,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "cinderfang_legs",
+              "name": "Cinderfang Breeches",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "ignivars_ember_choker",
+              "name": "Ignivar's Ember Choker",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "wyrmshadow_harness",
+              "name": "Nightfang Harness",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "nighttalon_waistband",
+              "name": "Direfang Waistband",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "ashveil_gloves",
+              "name": "Ashveil Grips",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_duskwhisper",
+              "name": "Duskwhisper",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_duskwhisper",
+              "name": "Duskwhisper",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "cinderfang_shoulder",
+              "name": "Cinderfang Spaulders",
+              "itemLevel": 35,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 2255,
+          "damageTakenAllSources": 348,
+          "bossDamageTaken": 74,
+          "bossDtps": 9.31,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 74,
+              "count": 4,
+              "kinds": {
+                "hit": 1,
+                "dodge": 3
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 74,
+              "meanIncludingAbsorbed": 74
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fightId": 152950,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152950",
+      "key": "sunken_bastion",
+      "difficulty": "normal",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T13:20:14.909Z",
+      "seconds": 27,
+      "groupSize": 1,
+      "groupType": "solo",
+      "avgPlayerItemLevelKnown": 28.36,
+      "incompleteItemLevels": false,
+      "boss": {
+        "id": 10618,
+        "name": "Vael the Fogbinder"
+      },
+      "sampledBossMaxHp": 1490,
+      "bossDamageTakenByParty": 434,
+      "bossDtpsAcrossParty": 16.07,
+      "highestBossDamageRecipient": {
+        "name": "Kuli Tempur",
+        "class": "warrior",
+        "spec": "prot",
+        "total": 434,
+        "dtps": 16.07,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 392,
+            "count": 11,
+            "kinds": {
+              "hit": 8,
+              "miss": 2,
+              "parry": 1
+            },
+            "absorbed": 0,
+            "landedEvents": 8,
+            "meanDamagePerLandedEvent": 49,
+            "meanIncludingAbsorbed": 49
+          },
+          {
+            "name": "Mist Surge",
+            "total": 42,
+            "count": 2,
+            "kinds": {
+              "hit": 2
+            },
+            "absorbed": 0,
+            "landedEvents": 2,
+            "meanDamagePerLandedEvent": 21,
+            "meanIncludingAbsorbed": 21
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "129367",
+          "entityId": "10570",
+          "name": "Kuli Tempur",
+          "class": "warrior",
+          "spec": "prot",
+          "level": 20,
+          "prestigeRank": 10,
+          "avgEquippedItemLevel": 28.36,
+          "definedLevelSlots": 11,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "deathlord_sabatons",
+              "name": "Barrowlord Sabatons",
+              "itemLevel": 22,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "ashstalker_legguards",
+              "name": "Ashstalker Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "razorwind_torque",
+              "name": "Razorwind Torque",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "sunbone_ritual_hauberk",
+              "name": "Sunbone Ritual Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "oath_of_the_round_table",
+              "name": "Oath of the Round Table",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "oath_of_the_round_table",
+              "name": "Oath of the Round Table",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "crownforged_girdle",
+              "name": "Bonewrought Girdle",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "crownforged_gauntlets",
+              "name": "Bonewrought Gauntlets",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "crownforged_dreadhelm",
+              "name": "Bonewrought Dreadhelm",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "slagrender_cleaver",
+              "name": "Slagrender Cleaver",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "stormcallers_spaulders",
+              "name": "Galecall Spaulders",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 2283,
+          "damageTakenAllSources": 673,
+          "bossDamageTaken": 434,
+          "bossDtps": 16.07,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 392,
+              "count": 11,
+              "kinds": {
+                "hit": 8,
+                "miss": 2,
+                "parry": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 8,
+              "meanDamagePerLandedEvent": 49,
+              "meanIncludingAbsorbed": 49
+            },
+            {
+              "name": "Mist Surge",
+              "total": 42,
+              "count": 2,
+              "kinds": {
+                "hit": 2
+              },
+              "absorbed": 0,
+              "landedEvents": 2,
+              "meanDamagePerLandedEvent": 21,
+              "meanIncludingAbsorbed": 21
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fightId": 151963,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/151963",
+      "key": "gravewyrm_sanctum",
+      "difficulty": "normal",
+      "build": "0.44.4",
+      "startedAt": "2026-10-06T21:48:04.602Z",
+      "seconds": 12.25,
+      "groupSize": 3,
+      "groupType": "party",
+      "avgPlayerItemLevelKnown": 32.08,
+      "incompleteItemLevels": false,
+      "boss": {
+        "id": 45338,
+        "name": "Korzul the Gravewyrm"
+      },
+      "sampledBossMaxHp": 6127,
+      "bossDamageTakenByParty": 1003,
+      "bossDtpsAcrossParty": 81.88,
+      "highestBossDamageRecipient": {
+        "name": "Dealmaker",
+        "class": "hunter",
+        "spec": "survival",
+        "total": 680,
+        "dtps": 55.51,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 574,
+            "count": 1,
+            "kinds": {
+              "hit": 1
+            },
+            "absorbed": 0,
+            "landedEvents": 1,
+            "meanDamagePerLandedEvent": 574,
+            "meanIncludingAbsorbed": 574
+          },
+          {
+            "name": "Grave Inferno",
+            "total": 106,
+            "count": 1,
+            "kinds": {
+              "hit": 1
+            },
+            "absorbed": 0,
+            "landedEvents": 1,
+            "meanDamagePerLandedEvent": 106,
+            "meanIncludingAbsorbed": 106
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "56961",
+          "entityId": "45434",
+          "name": "Roots",
+          "class": "druid",
+          "spec": "feral",
+          "level": 20,
+          "prestigeRank": 27,
+          "avgEquippedItemLevel": 36.17,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "crucible_str_leather_feet",
+              "name": "Crucible Prowler's Boots",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "wildfang_emberhide_legs",
+              "name": "Wildfang Breeches",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "ignivars_ember_choker",
+              "name": "Ignivar's Ember Choker",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "wildfang_emberhide_chest",
+              "name": "Wildfang Tunic",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_of_marked_strikes",
+              "name": "Band of Marked Strikes",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_of_marked_strikes",
+              "name": "Band of Marked Strikes",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "crucible_str_leather_waist",
+              "name": "Crucible Prowler's Belt",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "wildfang_emberhide_gloves",
+              "name": "Wildfang Grips",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "wildfang_emberhide_helmet",
+              "name": "Wildfang Cowl",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "medallion_of_defiance",
+              "name": "Medallion of Defiance",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "varkhul_forgebreaker",
+              "name": "Forgebreaker, Engine of Varkhul",
+              "itemLevel": 55,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_bramblehide_mantle",
+              "name": "Roots' Bramblehide Mantle",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 3858,
+          "damageTakenAllSources": 323,
+          "bossDamageTaken": 323,
+          "bossDtps": 26.37,
+          "bossAbilities": [
+            {
+              "name": "Grave Inferno",
+              "total": 323,
+              "count": 2,
+              "kinds": {
+                "hit": 2
+              },
+              "absorbed": 0,
+              "landedEvents": 2,
+              "meanDamagePerLandedEvent": 161.5,
+              "meanIncludingAbsorbed": 161.5
+            },
+            {
+              "name": "Melee",
+              "total": 0,
+              "count": 1,
+              "kinds": {
+                "dodge": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 0,
+              "meanDamagePerLandedEvent": null,
+              "meanIncludingAbsorbed": null
+            }
+          ]
+        },
+        {
+          "characterId": "119504",
+          "entityId": "45136",
+          "name": "Dealmaker",
+          "class": "hunter",
+          "spec": "survival",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 30.25,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "heroic_wyrmshadow_treads",
+              "name": "Nightfang Treads",
+              "itemLevel": 28,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "wyrmshadow_legguards",
+              "name": "Nightfang Legguards",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "yumis_keepsake_locket",
+              "name": "Yumi's Keepsake Locket",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "basin_stalkers_tunic",
+              "name": "Basin Stalker's Tunic",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "oath_of_the_round_table",
+              "name": "Oath of the Round Table",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "nighttalon_waistband",
+              "name": "Direfang Waistband",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "nighttalon_grips",
+              "name": "Direfang Grips",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_direfang_quiver",
+              "name": "Direfang Quiver",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "kingsbane_last_oath",
+              "name": "Thronebane, Last Oath of Thornpeak",
+              "itemLevel": 49,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_nighttalon_shoulderguards",
+              "name": "Direfang Shoulderguards",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 1621,
+          "damageTakenAllSources": 680,
+          "bossDamageTaken": 680,
+          "bossDtps": 55.51,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 574,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 574,
+              "meanIncludingAbsorbed": 574
+            },
+            {
+              "name": "Grave Inferno",
+              "total": 106,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 106,
+              "meanIncludingAbsorbed": 106
+            }
+          ]
+        },
+        {
+          "characterId": "130894",
+          "entityId": "45317",
+          "name": "Pjiewpjiew",
+          "class": "hunter",
+          "spec": "beast_mastery",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 29.83,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "bonechill_striders",
+              "name": "Bonechill Striders",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "tidewoven_trousers",
+              "name": "Tidewoven Trousers",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "yumis_keepsake_locket",
+              "name": "Yumi's Keepsake Locket",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "basin_stalkers_tunic",
+              "name": "Basin Stalker's Tunic",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "oath_of_the_round_table",
+              "name": "Oath of the Round Table",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "nighttalon_waistband",
+              "name": "Direfang Waistband",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "sanctum_prowlers_grips",
+              "name": "Sanctum Prowler's Grips",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_direfang_quiver",
+              "name": "Direfang Quiver",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_direfang_greatblade",
+              "name": "Direfang Greatblade",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "tidebound_spaulders",
+              "name": "Tidebound Spaulders",
+              "itemLevel": 31,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 748,
+          "damageTakenAllSources": 0,
+          "bossDamageTaken": 0,
+          "bossDtps": 0,
+          "bossAbilities": []
+        }
+      ]
+    },
+    {
+      "fightId": 150161,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/150161",
+      "key": "wildheart_basin",
+      "difficulty": "normal",
+      "build": "0.44.4",
+      "startedAt": "2026-10-06T02:13:37.197Z",
+      "seconds": 39.15,
+      "groupSize": 1,
+      "groupType": "solo",
+      "avgPlayerItemLevelKnown": 31.23,
+      "incompleteItemLevels": false,
+      "boss": {
+        "id": 23064,
+        "name": "Zulgar, Voice of the Basin"
+      },
+      "sampledBossMaxHp": 6882,
+      "bossDamageTakenByParty": 2653,
+      "bossDtpsAcrossParty": 67.77,
+      "highestBossDamageRecipient": {
+        "name": "Nanono",
+        "class": "shaman",
+        "spec": "enhancement",
+        "total": 2653,
+        "dtps": 67.77,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 2496,
+            "count": 16,
+            "kinds": {
+              "hit": 15,
+              "dodge": 1
+            },
+            "absorbed": 1285,
+            "landedEvents": 15,
+            "meanDamagePerLandedEvent": 166.4,
+            "meanIncludingAbsorbed": 252.07
+          },
+          {
+            "name": "Wildheart Pulse",
+            "total": 157,
+            "count": 4,
+            "kinds": {
+              "hit": 4
+            },
+            "absorbed": 497,
+            "landedEvents": 4,
+            "meanDamagePerLandedEvent": 39.25,
+            "meanIncludingAbsorbed": 163.5
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "124523",
+          "entityId": "22941",
+          "name": "Nanono",
+          "class": "shaman",
+          "spec": "enhancement",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 31.23,
+          "definedLevelSlots": 13,
+          "occupiedSlots": 13,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "deathlord_sabatons",
+              "name": "Barrowlord Sabatons",
+              "itemLevel": 22,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "chained_ember_choker",
+              "name": "Chained Ember Choker",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "deathlord_warplate",
+              "name": "Barrowlord Warplate",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "warhewn_signet",
+              "name": "Warhewn Signet",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "warhewn_signet",
+              "name": "Warhewn Signet",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "bramblehide_cinch",
+              "name": "Roots' Bramblehide Cinch",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "crownforged_gauntlets",
+              "name": "Bonewrought Gauntlets",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_crownforged_dreadhelm",
+              "name": "Bonewrought Dreadhelm",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "deathless_heartwood",
+              "name": "Heartwood of the Deathless Crown",
+              "itemLevel": 49,
+              "quality": "legendary"
+            },
+            {
+              "slot": "trinket",
+              "item": "mooring_stone",
+              "name": "Mooring Stone",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "gravewyrm_cleaver",
+              "name": "Gravewyrm Cleaver",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 6982,
+          "damageTakenAllSources": 2653,
+          "bossDamageTaken": 2653,
+          "bossDtps": 67.77,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 2496,
+              "count": 16,
+              "kinds": {
+                "hit": 15,
+                "dodge": 1
+              },
+              "absorbed": 1285,
+              "landedEvents": 15,
+              "meanDamagePerLandedEvent": 166.4,
+              "meanIncludingAbsorbed": 252.07
+            },
+            {
+              "name": "Wildheart Pulse",
+              "total": 157,
+              "count": 4,
+              "kinds": {
+                "hit": 4
+              },
+              "absorbed": 497,
+              "landedEvents": 4,
+              "meanDamagePerLandedEvent": 39.25,
+              "meanIncludingAbsorbed": 163.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fightId": 152244,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152244",
+      "key": "hollow_crypt",
+      "difficulty": "heroic",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T05:16:00.318Z",
+      "seconds": 11.95,
+      "groupSize": 5,
+      "groupType": "party",
+      "avgPlayerItemLevelKnown": 30.03,
+      "incompleteItemLevels": true,
+      "boss": {
+        "id": 1375,
+        "name": "Morthen the Gravecaller"
+      },
+      "sampledBossMaxHp": 7883,
+      "bossDamageTakenByParty": 3671,
+      "bossDtpsAcrossParty": 307.2,
+      "highestBossDamageRecipient": {
+        "name": "kahldrek",
+        "class": "paladin",
+        "spec": "protection",
+        "total": 2454,
+        "dtps": 205.36,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 2194,
+            "count": 5,
+            "kinds": {
+              "hit": 3,
+              "block": 2
+            },
+            "absorbed": 808,
+            "landedEvents": 5,
+            "meanDamagePerLandedEvent": 438.8,
+            "meanIncludingAbsorbed": 600.4
+          },
+          {
+            "name": "Shadow Pulse",
+            "total": 260,
+            "count": 1,
+            "kinds": {
+              "hit": 1
+            },
+            "absorbed": 0,
+            "landedEvents": 1,
+            "meanDamagePerLandedEvent": 260,
+            "meanIncludingAbsorbed": 260
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "120542",
+          "entityId": "1147",
+          "name": "bludlust",
+          "class": "paladin",
+          "spec": "retribution",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 29,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "tideworn_warboots",
+              "name": "Tideworn Warboots",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "medallion_of_endless_profit",
+              "name": "Medallion of Endless Profit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "gravescale_girdle",
+              "name": "Gravescale Girdle",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "crownforged_gauntlets",
+              "name": "Bonewrought Gauntlets",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "crownforged_dreadhelm",
+              "name": "Bonewrought Dreadhelm",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "duskforged_bulwark",
+              "name": "Duskforged Bulwark",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "gravewyrm_cleaver",
+              "name": "Gravewyrm Cleaver",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 3641,
+          "damageTakenAllSources": 250,
+          "bossDamageTaken": 250,
+          "bossDtps": 20.92,
+          "bossAbilities": [
+            {
+              "name": "Shadow Pulse",
+              "total": 250,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 250,
+              "meanIncludingAbsorbed": 250
+            }
+          ]
+        },
+        {
+          "characterId": "80969",
+          "entityId": "1035",
+          "name": "Dathios",
+          "class": "mage",
+          "spec": "fire",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.8,
+          "definedLevelSlots": 10,
+          "occupiedSlots": 12,
+          "unknownItems": [
+            {
+              "slot": "neck",
+              "item": "vanguard_pendant_of_focus"
+            },
+            {
+              "slot": "ring2",
+              "item": "vanguard_band_of_focus"
+            }
+          ],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "cindersoaked_slippers",
+              "name": "Cindersoaked Slippers",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "loop_of_quiet_springs",
+              "name": "Loop of Quiet Springs",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "soulflame_cowl",
+              "name": "Wraithfire Cowl",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "stormjar",
+              "name": "Stormjar",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "wildheart_hexwood_staff",
+              "name": "Hexwood Staff of the Basin",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 2351,
+          "damageTakenAllSources": 330,
+          "bossDamageTaken": 330,
+          "bossDtps": 27.62,
+          "bossAbilities": [
+            {
+              "name": "Shadow Pulse",
+              "total": 330,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 330,
+              "meanIncludingAbsorbed": 330
+            }
+          ]
+        },
+        {
+          "characterId": "117805",
+          "entityId": "1222",
+          "name": "kahldrek",
+          "class": "paladin",
+          "spec": "protection",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 34.85,
+          "definedLevelSlots": 13,
+          "occupiedSlots": 13,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "anvilstance_sabatons",
+              "name": "Anvilstance Sabatons",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "pendant_of_the_first_tempering",
+              "name": "Pendant of the First Tempering",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "warforged_waistguard",
+              "name": "Warforged Waistguard",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "oathpyre_gloves",
+              "name": "Oathpyre Gauntlets",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "oathpyre_helmet",
+              "name": "Oathpyre Helm",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_bonewrought_bulwark",
+              "name": "Bonewrought Bulwark",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "heart_of_the_crucible",
+              "name": "Heart of the Crucible",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_kingsbane_last_oath",
+              "name": "Thronebane, Last Oath of Thornpeak",
+              "itemLevel": 53,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 1895,
+          "damageTakenAllSources": 4090,
+          "bossDamageTaken": 2454,
+          "bossDtps": 205.36,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 2194,
+              "count": 5,
+              "kinds": {
+                "hit": 3,
+                "block": 2
+              },
+              "absorbed": 808,
+              "landedEvents": 5,
+              "meanDamagePerLandedEvent": 438.8,
+              "meanIncludingAbsorbed": 600.4
+            },
+            {
+              "name": "Shadow Pulse",
+              "total": 260,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 260,
+              "meanIncludingAbsorbed": 260
+            }
+          ]
+        },
+        {
+          "characterId": "119599",
+          "entityId": "1083",
+          "name": "Yaxo",
+          "class": "rogue",
+          "spec": "subtlety",
+          "level": 20,
+          "prestigeRank": 20,
+          "avgEquippedItemLevel": 29.17,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "legendary_gale_strider_boots",
+              "name": "Sovereign Gale-Strider Boots",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "heroic_wyrmshadow_legguards",
+              "name": "Nightfang Legguards",
+              "itemLevel": 28,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "yumis_keepsake_locket",
+              "name": "Yumi's Keepsake Locket",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "wyrmshadow_harness",
+              "name": "Nightfang Harness",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "nighttalon_waistband",
+              "name": "Direfang Waistband",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "legendary_riptide_handwraps",
+              "name": "Sovereign Riptide Handwraps",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "marrowpoint",
+              "name": "Marrowpoint",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_duskwhisper",
+              "name": "Duskwhisper",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_nighttalon_shoulderguards",
+              "name": "Direfang Shoulderguards",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 1183,
+          "damageTakenAllSources": 345,
+          "bossDamageTaken": 345,
+          "bossDtps": 28.87,
+          "bossAbilities": [
+            {
+              "name": "Shadow Pulse",
+              "total": 345,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 345,
+              "meanIncludingAbsorbed": 345
+            }
+          ]
+        },
+        {
+          "characterId": "127804",
+          "entityId": "1030",
+          "name": "SHADOW PIZZA",
+          "class": "priest",
+          "spec": "discipline",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.31,
+          "definedLevelSlots": 13,
+          "occupiedSlots": 13,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "necromancers_soulsteps",
+              "name": "Mournweave Soulsteps",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "zense_meridian",
+              "name": "Zense Meridian",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "benison_dawnweave_helmet",
+              "name": "Dawnweave Hood",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "wraithfire_orb",
+              "name": "Wraithfire Orb",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "stormjar",
+              "name": "Stormjar",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "scepter_of_the_deathless_court",
+              "name": "Scepter of the Deathless Court",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 0,
+          "damageTakenAllSources": 292,
+          "bossDamageTaken": 292,
+          "bossDtps": 24.44,
+          "bossAbilities": [
+            {
+              "name": "Shadow Pulse",
+              "total": 292,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 292,
+              "meanIncludingAbsorbed": 292
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fightId": 152234,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152234",
+      "key": "drowned_temple",
+      "difficulty": "heroic",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T05:08:01.704Z",
+      "seconds": 20.35,
+      "groupSize": 5,
+      "groupType": "party",
+      "avgPlayerItemLevelKnown": 29.98,
+      "incompleteItemLevels": true,
+      "boss": {
+        "id": 1304,
+        "name": "Ysolei, Avatar of the Drowned Moon"
+      },
+      "sampledBossMaxHp": 13132,
+      "bossDamageTakenByParty": 6244,
+      "bossDtpsAcrossParty": 306.83,
+      "highestBossDamageRecipient": {
+        "name": "kahldrek",
+        "class": "paladin",
+        "spec": "protection",
+        "total": 4404,
+        "dtps": 216.41,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 3583,
+            "count": 7,
+            "kinds": {
+              "hit": 3,
+              "block": 3,
+              "dodge": 1
+            },
+            "absorbed": 541,
+            "landedEvents": 6,
+            "meanDamagePerLandedEvent": 597.17,
+            "meanIncludingAbsorbed": 687.33
+          },
+          {
+            "name": "Lunar Tide",
+            "total": 821,
+            "count": 2,
+            "kinds": {
+              "hit": 2
+            },
+            "absorbed": 0,
+            "landedEvents": 2,
+            "meanDamagePerLandedEvent": 410.5,
+            "meanIncludingAbsorbed": 410.5
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "120542",
+          "entityId": "1147",
+          "name": "bludlust",
+          "class": "paladin",
+          "spec": "retribution",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 29,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "tideworn_warboots",
+              "name": "Tideworn Warboots",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "medallion_of_endless_profit",
+              "name": "Medallion of Endless Profit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "gravescale_girdle",
+              "name": "Gravescale Girdle",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "crownforged_gauntlets",
+              "name": "Bonewrought Gauntlets",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "crownforged_dreadhelm",
+              "name": "Bonewrought Dreadhelm",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "duskforged_bulwark",
+              "name": "Duskforged Bulwark",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "gravewyrm_cleaver",
+              "name": "Gravewyrm Cleaver",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 5799,
+          "damageTakenAllSources": 20,
+          "bossDamageTaken": 20,
+          "bossDtps": 0.98,
+          "bossAbilities": [
+            {
+              "name": "Lunar Tide",
+              "total": 20,
+              "count": 2,
+              "kinds": {
+                "hit": 2
+              },
+              "absorbed": 822,
+              "landedEvents": 2,
+              "meanDamagePerLandedEvent": 10,
+              "meanIncludingAbsorbed": 421
+            }
+          ]
+        },
+        {
+          "characterId": "117805",
+          "entityId": "1222",
+          "name": "kahldrek",
+          "class": "paladin",
+          "spec": "protection",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 34.85,
+          "definedLevelSlots": 13,
+          "occupiedSlots": 13,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "anvilstance_sabatons",
+              "name": "Anvilstance Sabatons",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "pendant_of_the_first_tempering",
+              "name": "Pendant of the First Tempering",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "warforged_waistguard",
+              "name": "Warforged Waistguard",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "oathpyre_gloves",
+              "name": "Oathpyre Gauntlets",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "oathpyre_helmet",
+              "name": "Oathpyre Helm",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_bonewrought_bulwark",
+              "name": "Bonewrought Bulwark",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "heart_of_the_crucible",
+              "name": "Heart of the Crucible",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_kingsbane_last_oath",
+              "name": "Thronebane, Last Oath of Thornpeak",
+              "itemLevel": 53,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 4353,
+          "damageTakenAllSources": 6233,
+          "bossDamageTaken": 4404,
+          "bossDtps": 216.41,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 3583,
+              "count": 7,
+              "kinds": {
+                "hit": 3,
+                "block": 3,
+                "dodge": 1
+              },
+              "absorbed": 541,
+              "landedEvents": 6,
+              "meanDamagePerLandedEvent": 597.17,
+              "meanIncludingAbsorbed": 687.33
+            },
+            {
+              "name": "Lunar Tide",
+              "total": 821,
+              "count": 2,
+              "kinds": {
+                "hit": 2
+              },
+              "absorbed": 0,
+              "landedEvents": 2,
+              "meanDamagePerLandedEvent": 410.5,
+              "meanIncludingAbsorbed": 410.5
+            }
+          ]
+        },
+        {
+          "characterId": "119599",
+          "entityId": "1083",
+          "name": "Yaxo",
+          "class": "rogue",
+          "spec": "subtlety",
+          "level": 20,
+          "prestigeRank": 20,
+          "avgEquippedItemLevel": 29.17,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "legendary_gale_strider_boots",
+              "name": "Sovereign Gale-Strider Boots",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "heroic_wyrmshadow_legguards",
+              "name": "Nightfang Legguards",
+              "itemLevel": 28,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "yumis_keepsake_locket",
+              "name": "Yumi's Keepsake Locket",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "wyrmshadow_harness",
+              "name": "Nightfang Harness",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "nighttalon_waistband",
+              "name": "Direfang Waistband",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "legendary_riptide_handwraps",
+              "name": "Sovereign Riptide Handwraps",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "marrowpoint",
+              "name": "Marrowpoint",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_duskwhisper",
+              "name": "Duskwhisper",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_nighttalon_shoulderguards",
+              "name": "Direfang Shoulderguards",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 3906,
+          "damageTakenAllSources": 1865,
+          "bossDamageTaken": 905,
+          "bossDtps": 44.47,
+          "bossAbilities": [
+            {
+              "name": "Lunar Tide",
+              "total": 905,
+              "count": 2,
+              "kinds": {
+                "hit": 2
+              },
+              "absorbed": 0,
+              "landedEvents": 2,
+              "meanDamagePerLandedEvent": 452.5,
+              "meanIncludingAbsorbed": 452.5
+            },
+            {
+              "name": "Melee",
+              "total": 0,
+              "count": 2,
+              "kinds": {
+                "dodge": 2
+              },
+              "absorbed": 0,
+              "landedEvents": 0,
+              "meanDamagePerLandedEvent": null,
+              "meanIncludingAbsorbed": null
+            }
+          ]
+        },
+        {
+          "characterId": "80969",
+          "entityId": "1035",
+          "name": "Dathios",
+          "class": "mage",
+          "spec": "fire",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.8,
+          "definedLevelSlots": 10,
+          "occupiedSlots": 12,
+          "unknownItems": [
+            {
+              "slot": "neck",
+              "item": "vanguard_pendant_of_focus"
+            },
+            {
+              "slot": "ring2",
+              "item": "vanguard_band_of_focus"
+            }
+          ],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "cindersoaked_slippers",
+              "name": "Cindersoaked Slippers",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "loop_of_quiet_springs",
+              "name": "Loop of Quiet Springs",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "soulflame_cowl",
+              "name": "Wraithfire Cowl",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "stormjar",
+              "name": "Stormjar",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "wildheart_hexwood_staff",
+              "name": "Hexwood Staff of the Basin",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 2930,
+          "damageTakenAllSources": 915,
+          "bossDamageTaken": 915,
+          "bossDtps": 44.96,
+          "bossAbilities": [
+            {
+              "name": "Lunar Tide",
+              "total": 915,
+              "count": 2,
+              "kinds": {
+                "hit": 2
+              },
+              "absorbed": 0,
+              "landedEvents": 2,
+              "meanDamagePerLandedEvent": 457.5,
+              "meanIncludingAbsorbed": 457.5
+            }
+          ]
+        },
+        {
+          "characterId": "127804",
+          "entityId": "1030",
+          "name": "SHADOW PIZZA",
+          "class": "priest",
+          "spec": "discipline",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.08,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "necromancers_soulsteps",
+              "name": "Mournweave Soulsteps",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "zense_meridian",
+              "name": "Zense Meridian",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "benison_dawnweave_helmet",
+              "name": "Dawnweave Hood",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "wraithfire_orb",
+              "name": "Wraithfire Orb",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "scepter_of_the_deathless_court",
+              "name": "Scepter of the Deathless Court",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 0,
+          "damageTakenAllSources": 0,
+          "bossDamageTaken": 0,
+          "bossDtps": 0,
+          "bossAbilities": []
+        }
+      ]
+    },
+    {
+      "fightId": 152240,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152240",
+      "key": "sunken_bastion",
+      "difficulty": "heroic",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T05:12:15.200Z",
+      "seconds": 16.1,
+      "groupSize": 5,
+      "groupType": "party",
+      "avgPlayerItemLevelKnown": 29.98,
+      "incompleteItemLevels": true,
+      "boss": {
+        "id": 1334,
+        "name": "Vael the Fogbinder"
+      },
+      "sampledBossMaxHp": 8777,
+      "bossDamageTakenByParty": 4372,
+      "bossDtpsAcrossParty": 271.55,
+      "highestBossDamageRecipient": {
+        "name": "kahldrek",
+        "class": "paladin",
+        "spec": "protection",
+        "total": 2314,
+        "dtps": 143.73,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 2011,
+            "count": 5,
+            "kinds": {
+              "hit": 3,
+              "dodge": 1,
+              "block": 1
+            },
+            "absorbed": 348,
+            "landedEvents": 4,
+            "meanDamagePerLandedEvent": 502.75,
+            "meanIncludingAbsorbed": 589.75
+          },
+          {
+            "name": "Mist Surge",
+            "total": 303,
+            "count": 1,
+            "kinds": {
+              "hit": 1
+            },
+            "absorbed": 0,
+            "landedEvents": 1,
+            "meanDamagePerLandedEvent": 303,
+            "meanIncludingAbsorbed": 303
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "120542",
+          "entityId": "1147",
+          "name": "bludlust",
+          "class": "paladin",
+          "spec": "retribution",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 29,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "tideworn_warboots",
+              "name": "Tideworn Warboots",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "medallion_of_endless_profit",
+              "name": "Medallion of Endless Profit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "gravescale_girdle",
+              "name": "Gravescale Girdle",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "crownforged_gauntlets",
+              "name": "Bonewrought Gauntlets",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "crownforged_dreadhelm",
+              "name": "Bonewrought Dreadhelm",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "duskforged_bulwark",
+              "name": "Duskforged Bulwark",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "gravewyrm_cleaver",
+              "name": "Gravewyrm Cleaver",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 1,
+          "damageDoneAllTargets": 4977,
+          "damageTakenAllSources": 3089,
+          "bossDamageTaken": 1327,
+          "bossDtps": 82.42,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 1327,
+              "count": 2,
+              "kinds": {
+                "hit": 2
+              },
+              "absorbed": 257,
+              "landedEvents": 2,
+              "meanDamagePerLandedEvent": 663.5,
+              "meanIncludingAbsorbed": 792
+            },
+            {
+              "name": "Mist Surge",
+              "total": 0,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 425,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 0,
+              "meanIncludingAbsorbed": 425
+            }
+          ]
+        },
+        {
+          "characterId": "119599",
+          "entityId": "1083",
+          "name": "Yaxo",
+          "class": "rogue",
+          "spec": "subtlety",
+          "level": 20,
+          "prestigeRank": 20,
+          "avgEquippedItemLevel": 29.17,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "legendary_gale_strider_boots",
+              "name": "Sovereign Gale-Strider Boots",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "heroic_wyrmshadow_legguards",
+              "name": "Nightfang Legguards",
+              "itemLevel": 28,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "yumis_keepsake_locket",
+              "name": "Yumi's Keepsake Locket",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "wyrmshadow_harness",
+              "name": "Nightfang Harness",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "nighttalon_waistband",
+              "name": "Direfang Waistband",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "legendary_riptide_handwraps",
+              "name": "Sovereign Riptide Handwraps",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "marrowpoint",
+              "name": "Marrowpoint",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_duskwhisper",
+              "name": "Duskwhisper",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_nighttalon_shoulderguards",
+              "name": "Direfang Shoulderguards",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 3281,
+          "damageTakenAllSources": 820,
+          "bossDamageTaken": 311,
+          "bossDtps": 19.32,
+          "bossAbilities": [
+            {
+              "name": "Mist Surge",
+              "total": 311,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 311,
+              "meanIncludingAbsorbed": 311
+            }
+          ]
+        },
+        {
+          "characterId": "117805",
+          "entityId": "1222",
+          "name": "kahldrek",
+          "class": "paladin",
+          "spec": "protection",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 34.85,
+          "definedLevelSlots": 13,
+          "occupiedSlots": 13,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "anvilstance_sabatons",
+              "name": "Anvilstance Sabatons",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "pendant_of_the_first_tempering",
+              "name": "Pendant of the First Tempering",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "warforged_waistguard",
+              "name": "Warforged Waistguard",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "oathpyre_gloves",
+              "name": "Oathpyre Gauntlets",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "oathpyre_helmet",
+              "name": "Oathpyre Helm",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_bonewrought_bulwark",
+              "name": "Bonewrought Bulwark",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "heart_of_the_crucible",
+              "name": "Heart of the Crucible",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_kingsbane_last_oath",
+              "name": "Thronebane, Last Oath of Thornpeak",
+              "itemLevel": 53,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 1,
+          "damageDoneAllTargets": 2129,
+          "damageTakenAllSources": 4431,
+          "bossDamageTaken": 2314,
+          "bossDtps": 143.73,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 2011,
+              "count": 5,
+              "kinds": {
+                "hit": 3,
+                "dodge": 1,
+                "block": 1
+              },
+              "absorbed": 348,
+              "landedEvents": 4,
+              "meanDamagePerLandedEvent": 502.75,
+              "meanIncludingAbsorbed": 589.75
+            },
+            {
+              "name": "Mist Surge",
+              "total": 303,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 303,
+              "meanIncludingAbsorbed": 303
+            }
+          ]
+        },
+        {
+          "characterId": "80969",
+          "entityId": "1035",
+          "name": "Dathios",
+          "class": "mage",
+          "spec": "fire",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.8,
+          "definedLevelSlots": 10,
+          "occupiedSlots": 12,
+          "unknownItems": [
+            {
+              "slot": "neck",
+              "item": "vanguard_pendant_of_focus"
+            },
+            {
+              "slot": "ring2",
+              "item": "vanguard_band_of_focus"
+            }
+          ],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "cindersoaked_slippers",
+              "name": "Cindersoaked Slippers",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "loop_of_quiet_springs",
+              "name": "Loop of Quiet Springs",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "soulflame_cowl",
+              "name": "Wraithfire Cowl",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "stormjar",
+              "name": "Stormjar",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "wildheart_hexwood_staff",
+              "name": "Hexwood Staff of the Basin",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 1739,
+          "damageTakenAllSources": 1184,
+          "bossDamageTaken": 0,
+          "bossDtps": 0,
+          "bossAbilities": []
+        },
+        {
+          "characterId": "127804",
+          "entityId": "1030",
+          "name": "SHADOW PIZZA",
+          "class": "priest",
+          "spec": "discipline",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.08,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "necromancers_soulsteps",
+              "name": "Mournweave Soulsteps",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "zense_meridian",
+              "name": "Zense Meridian",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "benison_dawnweave_helmet",
+              "name": "Dawnweave Hood",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "wraithfire_orb",
+              "name": "Wraithfire Orb",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "scepter_of_the_deathless_court",
+              "name": "Scepter of the Deathless Court",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 1,
+          "damageDoneAllTargets": 0,
+          "damageTakenAllSources": 1887,
+          "bossDamageTaken": 420,
+          "bossDtps": 26.09,
+          "bossAbilities": [
+            {
+              "name": "Mist Surge",
+              "total": 420,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 420,
+              "meanIncludingAbsorbed": 420
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fightId": 152230,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152230",
+      "key": "gravewyrm_sanctum",
+      "difficulty": "heroic",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T05:03:20.769Z",
+      "seconds": 24.3,
+      "groupSize": 5,
+      "groupType": "party",
+      "avgPlayerItemLevelKnown": 29.98,
+      "incompleteItemLevels": true,
+      "boss": {
+        "id": 1217,
+        "name": "Korzul the Gravewyrm"
+      },
+      "sampledBossMaxHp": 13138,
+      "bossDamageTakenByParty": 6828,
+      "bossDtpsAcrossParty": 280.99,
+      "highestBossDamageRecipient": {
+        "name": "kahldrek",
+        "class": "paladin",
+        "spec": "protection",
+        "total": 3245,
+        "dtps": 133.54,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 2603,
+            "count": 6,
+            "kinds": {
+              "block": 5,
+              "hit": 1
+            },
+            "absorbed": 826,
+            "landedEvents": 6,
+            "meanDamagePerLandedEvent": 433.83,
+            "meanIncludingAbsorbed": 571.5
+          },
+          {
+            "name": "Grave Inferno",
+            "total": 642,
+            "count": 4,
+            "kinds": {
+              "hit": 4
+            },
+            "absorbed": 931,
+            "landedEvents": 4,
+            "meanDamagePerLandedEvent": 160.5,
+            "meanIncludingAbsorbed": 393.25
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "80969",
+          "entityId": "1035",
+          "name": "Dathios",
+          "class": "mage",
+          "spec": "fire",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.8,
+          "definedLevelSlots": 10,
+          "occupiedSlots": 12,
+          "unknownItems": [
+            {
+              "slot": "neck",
+              "item": "vanguard_pendant_of_focus"
+            },
+            {
+              "slot": "ring2",
+              "item": "vanguard_band_of_focus"
+            }
+          ],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "cindersoaked_slippers",
+              "name": "Cindersoaked Slippers",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "loop_of_quiet_springs",
+              "name": "Loop of Quiet Springs",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "soulflame_cowl",
+              "name": "Wraithfire Cowl",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "stormjar",
+              "name": "Stormjar",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "wildheart_hexwood_staff",
+              "name": "Hexwood Staff of the Basin",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 4308,
+          "damageTakenAllSources": 859,
+          "bossDamageTaken": 727,
+          "bossDtps": 29.92,
+          "bossAbilities": [
+            {
+              "name": "Grave Inferno",
+              "total": 727,
+              "count": 4,
+              "kinds": {
+                "hit": 4
+              },
+              "absorbed": 204,
+              "landedEvents": 4,
+              "meanDamagePerLandedEvent": 181.75,
+              "meanIncludingAbsorbed": 232.75
+            }
+          ]
+        },
+        {
+          "characterId": "120542",
+          "entityId": "1147",
+          "name": "bludlust",
+          "class": "paladin",
+          "spec": "retribution",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 29,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "tideworn_warboots",
+              "name": "Tideworn Warboots",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "medallion_of_endless_profit",
+              "name": "Medallion of Endless Profit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "gravescale_girdle",
+              "name": "Gravescale Girdle",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "crownforged_gauntlets",
+              "name": "Bonewrought Gauntlets",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "crownforged_dreadhelm",
+              "name": "Bonewrought Dreadhelm",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "duskforged_bulwark",
+              "name": "Duskforged Bulwark",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "gravewyrm_cleaver",
+              "name": "Gravewyrm Cleaver",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 3712,
+          "damageTakenAllSources": 1283,
+          "bossDamageTaken": 1283,
+          "bossDtps": 52.8,
+          "bossAbilities": [
+            {
+              "name": "Grave Inferno",
+              "total": 1283,
+              "count": 4,
+              "kinds": {
+                "hit": 4
+              },
+              "absorbed": 162,
+              "landedEvents": 4,
+              "meanDamagePerLandedEvent": 320.75,
+              "meanIncludingAbsorbed": 361.25
+            }
+          ]
+        },
+        {
+          "characterId": "117805",
+          "entityId": "1222",
+          "name": "kahldrek",
+          "class": "paladin",
+          "spec": "protection",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 34.85,
+          "definedLevelSlots": 13,
+          "occupiedSlots": 13,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "anvilstance_sabatons",
+              "name": "Anvilstance Sabatons",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "pendant_of_the_first_tempering",
+              "name": "Pendant of the First Tempering",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "warforged_waistguard",
+              "name": "Warforged Waistguard",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "oathpyre_gloves",
+              "name": "Oathpyre Gauntlets",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "oathpyre_helmet",
+              "name": "Oathpyre Helm",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_bonewrought_bulwark",
+              "name": "Bonewrought Bulwark",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "heart_of_the_crucible",
+              "name": "Heart of the Crucible",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_kingsbane_last_oath",
+              "name": "Thronebane, Last Oath of Thornpeak",
+              "itemLevel": 53,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 3095,
+          "damageTakenAllSources": 3245,
+          "bossDamageTaken": 3245,
+          "bossDtps": 133.54,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 2603,
+              "count": 6,
+              "kinds": {
+                "block": 5,
+                "hit": 1
+              },
+              "absorbed": 826,
+              "landedEvents": 6,
+              "meanDamagePerLandedEvent": 433.83,
+              "meanIncludingAbsorbed": 571.5
+            },
+            {
+              "name": "Grave Inferno",
+              "total": 642,
+              "count": 4,
+              "kinds": {
+                "hit": 4
+              },
+              "absorbed": 931,
+              "landedEvents": 4,
+              "meanDamagePerLandedEvent": 160.5,
+              "meanIncludingAbsorbed": 393.25
+            }
+          ]
+        },
+        {
+          "characterId": "119599",
+          "entityId": "1083",
+          "name": "Yaxo",
+          "class": "rogue",
+          "spec": "subtlety",
+          "level": 20,
+          "prestigeRank": 20,
+          "avgEquippedItemLevel": 29.17,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "legendary_gale_strider_boots",
+              "name": "Sovereign Gale-Strider Boots",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "heroic_wyrmshadow_legguards",
+              "name": "Nightfang Legguards",
+              "itemLevel": 28,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "yumis_keepsake_locket",
+              "name": "Yumi's Keepsake Locket",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "wyrmshadow_harness",
+              "name": "Nightfang Harness",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "nighttalon_waistband",
+              "name": "Direfang Waistband",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "legendary_riptide_handwraps",
+              "name": "Sovereign Riptide Handwraps",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "marrowpoint",
+              "name": "Marrowpoint",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_duskwhisper",
+              "name": "Duskwhisper",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_nighttalon_shoulderguards",
+              "name": "Direfang Shoulderguards",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 2749,
+          "damageTakenAllSources": 1573,
+          "bossDamageTaken": 1573,
+          "bossDtps": 64.73,
+          "bossAbilities": [
+            {
+              "name": "Grave Inferno",
+              "total": 1573,
+              "count": 4,
+              "kinds": {
+                "hit": 4
+              },
+              "absorbed": 0,
+              "landedEvents": 4,
+              "meanDamagePerLandedEvent": 393.25,
+              "meanIncludingAbsorbed": 393.25
+            }
+          ]
+        },
+        {
+          "characterId": "127804",
+          "entityId": "1030",
+          "name": "SHADOW PIZZA",
+          "class": "priest",
+          "spec": "discipline",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.08,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "necromancers_soulsteps",
+              "name": "Mournweave Soulsteps",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "zense_meridian",
+              "name": "Zense Meridian",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "benison_dawnweave_helmet",
+              "name": "Dawnweave Hood",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "wraithfire_orb",
+              "name": "Wraithfire Orb",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "scepter_of_the_deathless_court",
+              "name": "Scepter of the Deathless Court",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 0,
+          "damageTakenAllSources": 0,
+          "bossDamageTaken": 0,
+          "bossDtps": 0,
+          "bossAbilities": []
+        }
+      ]
+    },
+    {
+      "fightId": 152217,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152217",
+      "key": "wildheart_basin",
+      "difficulty": "heroic",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T04:50:50.412Z",
+      "seconds": 30.1,
+      "groupSize": 5,
+      "groupType": "party",
+      "avgPlayerItemLevelKnown": 29.98,
+      "incompleteItemLevels": true,
+      "boss": {
+        "id": 1112,
+        "name": "Zulgar, Voice of the Basin"
+      },
+      "sampledBossMaxHp": 14757,
+      "bossDamageTakenByParty": 13739,
+      "bossDtpsAcrossParty": 456.45,
+      "highestBossDamageRecipient": {
+        "name": "kahldrek",
+        "class": "paladin",
+        "spec": "protection",
+        "total": 7687,
+        "dtps": 255.38,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 6701,
+            "count": 12,
+            "kinds": {
+              "hit": 6,
+              "block": 4,
+              "dodge": 2
+            },
+            "absorbed": 1677,
+            "landedEvents": 10,
+            "meanDamagePerLandedEvent": 670.1,
+            "meanIncludingAbsorbed": 837.8
+          },
+          {
+            "name": "Wildheart Pulse",
+            "total": 986,
+            "count": 3,
+            "kinds": {
+              "hit": 3
+            },
+            "absorbed": 619,
+            "landedEvents": 3,
+            "meanDamagePerLandedEvent": 328.67,
+            "meanIncludingAbsorbed": 535
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "120542",
+          "entityId": "1147",
+          "name": "bludlust",
+          "class": "paladin",
+          "spec": "retribution",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 29,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "tideworn_warboots",
+              "name": "Tideworn Warboots",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "medallion_of_endless_profit",
+              "name": "Medallion of Endless Profit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "gravescale_girdle",
+              "name": "Gravescale Girdle",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "crownforged_gauntlets",
+              "name": "Bonewrought Gauntlets",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "crownforged_dreadhelm",
+              "name": "Bonewrought Dreadhelm",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "duskforged_bulwark",
+              "name": "Duskforged Bulwark",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "gravewyrm_cleaver",
+              "name": "Gravewyrm Cleaver",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 4707,
+          "damageTakenAllSources": 1041,
+          "bossDamageTaken": 1041,
+          "bossDtps": 34.58,
+          "bossAbilities": [
+            {
+              "name": "Wildheart Pulse",
+              "total": 1041,
+              "count": 3,
+              "kinds": {
+                "hit": 3
+              },
+              "absorbed": 822,
+              "landedEvents": 3,
+              "meanDamagePerLandedEvent": 347,
+              "meanIncludingAbsorbed": 621
+            }
+          ]
+        },
+        {
+          "characterId": "117805",
+          "entityId": "1169",
+          "name": "kahldrek",
+          "class": "paladin",
+          "spec": "protection",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 34.85,
+          "definedLevelSlots": 13,
+          "occupiedSlots": 13,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "anvilstance_sabatons",
+              "name": "Anvilstance Sabatons",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "pendant_of_the_first_tempering",
+              "name": "Pendant of the First Tempering",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_mountains_weight",
+              "name": "Band of the Mountain's Weight",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "warforged_waistguard",
+              "name": "Warforged Waistguard",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "oathpyre_gloves",
+              "name": "Oathpyre Gauntlets",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "oathpyre_helmet",
+              "name": "Oathpyre Helm",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_bonewrought_bulwark",
+              "name": "Bonewrought Bulwark",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "heart_of_the_crucible",
+              "name": "Heart of the Crucible",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_kingsbane_last_oath",
+              "name": "Thronebane, Last Oath of Thornpeak",
+              "itemLevel": 53,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_crownforged_warspaulders",
+              "name": "Bonewrought Warspaulders",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 1,
+          "damageDoneAllTargets": 4387,
+          "damageTakenAllSources": 7687,
+          "bossDamageTaken": 7687,
+          "bossDtps": 255.38,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 6701,
+              "count": 12,
+              "kinds": {
+                "hit": 6,
+                "block": 4,
+                "dodge": 2
+              },
+              "absorbed": 1677,
+              "landedEvents": 10,
+              "meanDamagePerLandedEvent": 670.1,
+              "meanIncludingAbsorbed": 837.8
+            },
+            {
+              "name": "Wildheart Pulse",
+              "total": 986,
+              "count": 3,
+              "kinds": {
+                "hit": 3
+              },
+              "absorbed": 619,
+              "landedEvents": 3,
+              "meanDamagePerLandedEvent": 328.67,
+              "meanIncludingAbsorbed": 535
+            }
+          ]
+        },
+        {
+          "characterId": "119599",
+          "entityId": "1083",
+          "name": "Yaxo",
+          "class": "rogue",
+          "spec": "subtlety",
+          "level": 20,
+          "prestigeRank": 20,
+          "avgEquippedItemLevel": 29.17,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "legendary_gale_strider_boots",
+              "name": "Sovereign Gale-Strider Boots",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "heroic_wyrmshadow_legguards",
+              "name": "Nightfang Legguards",
+              "itemLevel": 28,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "yumis_keepsake_locket",
+              "name": "Yumi's Keepsake Locket",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "wyrmshadow_harness",
+              "name": "Nightfang Harness",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "nighttalon_waistband",
+              "name": "Direfang Waistband",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "legendary_riptide_handwraps",
+              "name": "Sovereign Riptide Handwraps",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "marrowpoint",
+              "name": "Marrowpoint",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_duskwhisper",
+              "name": "Duskwhisper",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_nighttalon_shoulderguards",
+              "name": "Direfang Shoulderguards",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 3420,
+          "damageTakenAllSources": 1936,
+          "bossDamageTaken": 1936,
+          "bossDtps": 64.32,
+          "bossAbilities": [
+            {
+              "name": "Wildheart Pulse",
+              "total": 1936,
+              "count": 3,
+              "kinds": {
+                "hit": 3
+              },
+              "absorbed": 0,
+              "landedEvents": 3,
+              "meanDamagePerLandedEvent": 645.33,
+              "meanIncludingAbsorbed": 645.33
+            }
+          ]
+        },
+        {
+          "characterId": "80969",
+          "entityId": "1035",
+          "name": "Dathios",
+          "class": "mage",
+          "spec": "fire",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.8,
+          "definedLevelSlots": 10,
+          "occupiedSlots": 12,
+          "unknownItems": [
+            {
+              "slot": "neck",
+              "item": "vanguard_pendant_of_focus"
+            },
+            {
+              "slot": "ring2",
+              "item": "vanguard_band_of_focus"
+            }
+          ],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "cindersoaked_slippers",
+              "name": "Cindersoaked Slippers",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "loop_of_quiet_springs",
+              "name": "Loop of Quiet Springs",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "soulflame_cowl",
+              "name": "Wraithfire Cowl",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "stormjar",
+              "name": "Stormjar",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "wildheart_hexwood_staff",
+              "name": "Hexwood Staff of the Basin",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 1951,
+          "damageTakenAllSources": 1801,
+          "bossDamageTaken": 1801,
+          "bossDtps": 59.83,
+          "bossAbilities": [
+            {
+              "name": "Wildheart Pulse",
+              "total": 1801,
+              "count": 3,
+              "kinds": {
+                "hit": 3
+              },
+              "absorbed": 204,
+              "landedEvents": 3,
+              "meanDamagePerLandedEvent": 600.33,
+              "meanIncludingAbsorbed": 668.33
+            }
+          ]
+        },
+        {
+          "characterId": "127804",
+          "entityId": "1030",
+          "name": "SHADOW PIZZA",
+          "class": "priest",
+          "spec": "discipline",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 28.08,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "necromancers_soulsteps",
+              "name": "Mournweave Soulsteps",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "necromancers_legwraps",
+              "name": "Mournweave Legwraps",
+              "itemLevel": 25,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "zense_meridian",
+              "name": "Zense Meridian",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "zyzzs_deathless_signet",
+              "name": "Zyzz's Deathless Signet",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "soulflame_gloves",
+              "name": "Wraithfire Gloves",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "benison_dawnweave_helmet",
+              "name": "Dawnweave Hood",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "wraithfire_orb",
+              "name": "Wraithfire Orb",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "scepter_of_the_deathless_court",
+              "name": "Scepter of the Deathless Court",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 315,
+          "damageTakenAllSources": 1274,
+          "bossDamageTaken": 1274,
+          "bossDtps": 42.33,
+          "bossAbilities": [
+            {
+              "name": "Wildheart Pulse",
+              "total": 1274,
+              "count": 2,
+              "kinds": {
+                "hit": 2
+              },
+              "absorbed": 0,
+              "landedEvents": 2,
+              "meanDamagePerLandedEvent": 637,
+              "meanIncludingAbsorbed": 637
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fightId": 152107,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152107",
+      "key": "drowned_temple",
+      "difficulty": "heroic",
+      "build": "0.44.4",
+      "startedAt": "2026-10-07T00:27:54.540Z",
+      "seconds": 11.9,
+      "groupSize": 5,
+      "groupType": "party",
+      "avgPlayerItemLevelKnown": 32,
+      "incompleteItemLevels": true,
+      "boss": {
+        "id": 47518,
+        "name": "Ysolei, Avatar of the Drowned Moon"
+      },
+      "sampledBossMaxHp": 13132,
+      "bossDamageTakenByParty": 2705,
+      "bossDtpsAcrossParty": 227.31,
+      "highestBossDamageRecipient": {
+        "name": "TriLinkle",
+        "class": "paladin",
+        "spec": "protection",
+        "total": 1517,
+        "dtps": 127.48,
+        "abilities": [
+          {
+            "name": "Melee",
+            "total": 1029,
+            "count": 5,
+            "kinds": {
+              "hit": 3,
+              "block": 1,
+              "dodge": 1
+            },
+            "absorbed": 1232,
+            "landedEvents": 4,
+            "meanDamagePerLandedEvent": 257.25,
+            "meanIncludingAbsorbed": 565.25
+          },
+          {
+            "name": "Lunar Tide",
+            "total": 488,
+            "count": 1,
+            "kinds": {
+              "hit": 1
+            },
+            "absorbed": 0,
+            "landedEvents": 1,
+            "meanDamagePerLandedEvent": 488,
+            "meanIncludingAbsorbed": 488
+          }
+        ]
+      },
+      "players": [
+        {
+          "characterId": "92399",
+          "entityId": "47369",
+          "name": "SirChargeALot",
+          "class": "warrior",
+          "spec": "fury",
+          "level": 20,
+          "prestigeRank": 74,
+          "avgEquippedItemLevel": 35.77,
+          "definedLevelSlots": 13,
+          "occupiedSlots": 13,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "crucible_str_mail_feet",
+              "name": "Crucible Striker's Sabatons",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "ignivars_ember_choker",
+              "name": "Ignivar's Ember Choker",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "emberfury_chest",
+              "name": "Emberfury Hauberk",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_of_marked_strikes",
+              "name": "Band of Marked Strikes",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_of_marked_strikes",
+              "name": "Band of Marked Strikes",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "crucible_str_mail_waist",
+              "name": "Crucible Striker's Girdle",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "emberfury_gloves",
+              "name": "Emberfury Gauntlets",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "emberfury_helmet",
+              "name": "Emberfury Helm",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "slagrender_cleaver",
+              "name": "Slagrender Cleaver",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "forgefathers_temper",
+              "name": "Forgefather's Temper",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "kingsbane_last_oath",
+              "name": "Thronebane, Last Oath of Thornpeak",
+              "itemLevel": 49,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "emberfury_shoulder",
+              "name": "Emberfury Pauldrons",
+              "itemLevel": 35,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 5034,
+          "damageTakenAllSources": 457,
+          "bossDamageTaken": 457,
+          "bossDtps": 38.4,
+          "bossAbilities": [
+            {
+              "name": "Lunar Tide",
+              "total": 457,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 457,
+              "meanIncludingAbsorbed": 457
+            }
+          ]
+        },
+        {
+          "characterId": "130609",
+          "entityId": "46674",
+          "name": "Diablowbolt",
+          "class": "shaman",
+          "spec": "elemental",
+          "level": 20,
+          "prestigeRank": 5,
+          "avgEquippedItemLevel": 32.64,
+          "definedLevelSlots": 11,
+          "occupiedSlots": 13,
+          "unknownItems": [
+            {
+              "slot": "ring1",
+              "item": "vanguard_band_of_focus"
+            },
+            {
+              "slot": "ring2",
+              "item": "vanguard_band_of_focus"
+            }
+          ],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "scorchgrove_striders",
+              "name": "Scorchgrove Striders",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "lunar_choir_leggings",
+              "name": "Lunar Choir Leggings",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "legendary_pendant_continuous_flow",
+              "name": "Sovereign Pendant of Continuous Flow",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "verdant_heart_vestment",
+              "name": "Verdant-Heart Vestment",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "legendary_venom_etched_waistcord",
+              "name": "Sovereign Venom-Etched Waistcord",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "legendary_tempest_strike_grips",
+              "name": "Sovereign Tempest-Strike Grips",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_soulflame_cowl",
+              "name": "Wraithfire Cowl",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "storm_tuned_buckler",
+              "name": "Storm-Tuned Buckler",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "stormjar",
+              "name": "Stormjar",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "wand_of_quenched_sparks",
+              "name": "Wand of Quenched Sparks",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 4446,
+          "damageTakenAllSources": 368,
+          "bossDamageTaken": 368,
+          "bossDtps": 30.92,
+          "bossAbilities": [
+            {
+              "name": "Lunar Tide",
+              "total": 368,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 368,
+              "meanIncludingAbsorbed": 368
+            }
+          ]
+        },
+        {
+          "characterId": "61257",
+          "entityId": "24069",
+          "name": "snipercup",
+          "class": "mage",
+          "spec": "fire",
+          "level": 20,
+          "prestigeRank": 133,
+          "avgEquippedItemLevel": 32.08,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "shadowpulse_slippers",
+              "name": "Shadowpulse Slippers",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "lunar_choir_leggings",
+              "name": "Lunar Choir Leggings",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "locket_of_the_last_flame",
+              "name": "Locket of the Last Flame",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "legendary_cinder_stitched_robes",
+              "name": "Sovereign Cinder-Stitched Robes",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "circle_of_cinders",
+              "name": "Circle of Cinders",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "architects_cornerstone",
+              "name": "The Architect's Cornerstone",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "sash_of_the_sunken_court",
+              "name": "Sash of the Sunken Court",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "shadowpulse_handwraps",
+              "name": "Shadowpulse Handwraps",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_soulflame_cowl",
+              "name": "Wraithfire Cowl",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_wraithfire_orb",
+              "name": "Wraithfire Orb",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "scepter_of_the_deathless_court",
+              "name": "Scepter of the Deathless Court",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 2832,
+          "damageTakenAllSources": 363,
+          "bossDamageTaken": 363,
+          "bossDtps": 30.5,
+          "bossAbilities": [
+            {
+              "name": "Lunar Tide",
+              "total": 363,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 363,
+              "meanIncludingAbsorbed": 363
+            }
+          ]
+        },
+        {
+          "characterId": "113739",
+          "entityId": "46458",
+          "name": "TriLinkle",
+          "class": "paladin",
+          "spec": "protection",
+          "level": 20,
+          "prestigeRank": 69,
+          "avgEquippedItemLevel": 30.33,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "deathlord_sabatons",
+              "name": "Barrowlord Sabatons",
+              "itemLevel": 22,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "bloodmane_war_legguards",
+              "name": "Bloodmane War-Legguards",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "medallion_of_endless_profit",
+              "name": "Medallion of Endless Profit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "morthens_cryptforged_hauberk",
+              "name": "Morthen's Cryptforged Hauberk",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "seal_of_the_nine_oaths",
+              "name": "Seal of the Nine Oaths",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "gravescale_girdle",
+              "name": "Gravescale Girdle",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "zealfire_gloves",
+              "name": "Zealfire Gauntlets",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_crownforged_dreadhelm",
+              "name": "Bonewrought Dreadhelm",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_bonewrought_bulwark",
+              "name": "Bonewrought Bulwark",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "forgefathers_warhammer",
+              "name": "Forgefather's Warhammer",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "zealfire_shoulder",
+              "name": "Zealfire Pauldrons",
+              "itemLevel": 35,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 2412,
+          "damageTakenAllSources": 3455,
+          "bossDamageTaken": 1517,
+          "bossDtps": 127.48,
+          "bossAbilities": [
+            {
+              "name": "Melee",
+              "total": 1029,
+              "count": 5,
+              "kinds": {
+                "hit": 3,
+                "block": 1,
+                "dodge": 1
+              },
+              "absorbed": 1232,
+              "landedEvents": 4,
+              "meanDamagePerLandedEvent": 257.25,
+              "meanIncludingAbsorbed": 565.25
+            },
+            {
+              "name": "Lunar Tide",
+              "total": 488,
+              "count": 1,
+              "kinds": {
+                "hit": 1
+              },
+              "absorbed": 0,
+              "landedEvents": 1,
+              "meanDamagePerLandedEvent": 488,
+              "meanIncludingAbsorbed": 488
+            }
+          ]
+        },
+        {
+          "characterId": "127479",
+          "entityId": "47367",
+          "name": "Bighat",
+          "class": "priest",
+          "spec": "holy",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 29.17,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "necromancers_soulsteps",
+              "name": "Mournweave Soulsteps",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "benison_dawnweave_legs",
+              "name": "Dawnweave Leggings",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "pendant_continuous_flow",
+              "name": "Pendant of Continuous Flow",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "necromancers_starshroud",
+              "name": "Mournweave Starshroud",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "architects_cornerstone",
+              "name": "The Architect's Cornerstone",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "architects_cornerstone",
+              "name": "The Architect's Cornerstone",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "soulflame_cord",
+              "name": "Wraithfire Cord",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "benison_dawnweave_gloves",
+              "name": "Dawnweave Handwraps",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "soulflame_cowl",
+              "name": "Wraithfire Cowl",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "wayfarers_lodestone",
+              "name": "Wayfarer's Lodestone",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "staff_of_the_last_spring",
+              "name": "Staff of the Last Spring",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "soulflame_mantle",
+              "name": "Wraithfire Mantle",
+              "itemLevel": 29,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 0,
+          "damageTakenAllSources": 0,
+          "bossDamageTaken": 0,
+          "bossDtps": 0,
+          "bossAbilities": []
+        }
+      ]
+    },
+    {
+      "fightId": 152632,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152632",
+      "key": "gravewyrm_sanctum",
+      "difficulty": "normal",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T10:37:24.699Z",
+      "seconds": 70.4,
+      "groupSize": 1,
+      "groupType": "solo",
+      "avgPlayerItemLevelKnown": 30.83,
+      "incompleteItemLevels": false,
+      "boss": {
+        "id": 6385,
+        "name": "Korzul the Gravewyrm"
+      },
+      "sampledBossMaxHp": 6127,
+      "bossDamageTakenByParty": 0,
+      "bossDtpsAcrossParty": 0,
+      "highestBossDamageRecipient": {
+        "name": "SENAPOYO",
+        "class": "hunter",
+        "spec": "marksmanship",
+        "total": 0,
+        "dtps": 0,
+        "abilities": []
+      },
+      "players": [
+        {
+          "characterId": "62097",
+          "entityId": "6282",
+          "name": "SENAPOYO",
+          "class": "hunter",
+          "spec": "marksmanship",
+          "level": 20,
+          "prestigeRank": 15,
+          "avgEquippedItemLevel": 30.83,
+          "definedLevelSlots": 12,
+          "occupiedSlots": 12,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "wyrmshadow_treads",
+              "name": "Nightfang Treads",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "wyrmshadow_legguards",
+              "name": "Nightfang Legguards",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "yumis_keepsake_locket",
+              "name": "Yumi's Keepsake Locket",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "wyrmshadow_harness",
+              "name": "Nightfang Harness",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "band_of_marked_strikes",
+              "name": "Band of Marked Strikes",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "bonechill_cord",
+              "name": "Bonechill Cord",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "nighttalon_grips",
+              "name": "Direfang Grips",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "heroic_nighttalon_crown",
+              "name": "Direfang Crown",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "heroic_direfang_quiver",
+              "name": "Direfang Quiver",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "kingsbane_last_oath",
+              "name": "Thronebane, Last Oath of Thornpeak",
+              "itemLevel": 49,
+              "quality": "legendary"
+            },
+            {
+              "slot": "shoulder",
+              "item": "heroic_nighttalon_shoulderguards",
+              "name": "Direfang Shoulderguards",
+              "itemLevel": 33,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 6272,
+          "damageTakenAllSources": 0,
+          "bossDamageTaken": 0,
+          "bossDtps": 0,
+          "bossAbilities": []
+        }
+      ]
+    },
+    {
+      "fightId": 152609,
+      "url": "https://parses.worldofclaudecraft.com/#/fight/152609",
+      "key": "wildheart_basin",
+      "difficulty": "heroic",
+      "build": "0.44.5",
+      "startedAt": "2026-10-07T10:21:52.139Z",
+      "seconds": 204.25,
+      "groupSize": 1,
+      "groupType": "solo",
+      "avgPlayerItemLevelKnown": 29.69,
+      "incompleteItemLevels": false,
+      "boss": {
+        "id": 6358,
+        "name": "Zulgar, Voice of the Basin"
+      },
+      "sampledBossMaxHp": 14757,
+      "bossDamageTakenByParty": 0,
+      "bossDtpsAcrossParty": 0,
+      "highestBossDamageRecipient": {
+        "name": "ZooLat",
+        "class": "hunter",
+        "spec": "beast_mastery",
+        "total": 0,
+        "dtps": 0,
+        "abilities": []
+      },
+      "players": [
+        {
+          "characterId": "126243",
+          "entityId": "6360",
+          "name": "ZooLat",
+          "class": "hunter",
+          "spec": "beast_mastery",
+          "level": 20,
+          "prestigeRank": 0,
+          "avgEquippedItemLevel": 29.69,
+          "definedLevelSlots": 13,
+          "occupiedSlots": 13,
+          "unknownItems": [],
+          "equipmentWithDerivedLevels": [
+            {
+              "slot": "feet",
+              "item": "wyrmshadow_treads",
+              "name": "Nightfang Treads",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "legs",
+              "item": "tidewoven_trousers",
+              "name": "Tidewoven Trousers",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "neck",
+              "item": "ignivars_ember_choker",
+              "name": "Ignivar's Ember Choker",
+              "itemLevel": 35,
+              "quality": "epic"
+            },
+            {
+              "slot": "chest",
+              "item": "basin_stalkers_tunic",
+              "name": "Basin Stalker's Tunic",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "ring",
+              "item": "sutils_gambit",
+              "name": "Sutil's Gambit",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "waist",
+              "item": "nighttalon_waistband",
+              "name": "Direfang Waistband",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "gloves",
+              "item": "rime_crusted_grips",
+              "name": "Rime-Crusted Grips",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "helmet",
+              "item": "tideguard_faceguard",
+              "name": "Tideguard Faceguard",
+              "itemLevel": 31,
+              "quality": "epic"
+            },
+            {
+              "slot": "offhand",
+              "item": "direfang_quiver",
+              "name": "Direfang Quiver",
+              "itemLevel": 29,
+              "quality": "epic"
+            },
+            {
+              "slot": "trinket",
+              "item": "wayfarers_lodestone",
+              "name": "Wayfarer's Lodestone",
+              "itemLevel": 26,
+              "quality": "epic"
+            },
+            {
+              "slot": "mainhand",
+              "item": "heroic_direfang_greatblade",
+              "name": "Direfang Greatblade",
+              "itemLevel": 33,
+              "quality": "epic"
+            },
+            {
+              "slot": "shoulder",
+              "item": "packlord_emberhide_shoulder",
+              "name": "Packlord's Spaulders",
+              "itemLevel": 35,
+              "quality": "epic"
+            }
+          ],
+          "deaths": 0,
+          "damageDoneAllTargets": 14766,
+          "damageTakenAllSources": 0,
+          "bossDamageTaken": 0,
+          "bossDtps": 0,
+          "bossAbilities": []
+        }
+      ]
+    }
+  ]
+}

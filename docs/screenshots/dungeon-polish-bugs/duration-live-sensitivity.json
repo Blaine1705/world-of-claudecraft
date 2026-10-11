@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-10-07T14:23:29.980Z",
+  "source": "duration-live-all044-summary.json",
+  "rows": [
+    {
+      "key": "hollow_crypt",
+      "all": {
+        "n": 13,
+        "median": 12.35,
+        "min": 7.6,
+        "max": 29.3
+      },
+      "completeGear": {
+        "n": 11,
+        "median": 12.35,
+        "min": 7.6,
+        "max": 29.3
+      },
+      "zeroDeaths": {
+        "n": 12,
+        "median": 12.35,
+        "min": 7.6,
+        "max": 29.3
+      }
+    },
+    {
+      "key": "drowned_temple",
+      "all": {
+        "n": 14,
+        "median": 21.225,
+        "min": 11.9,
+        "max": 59.4
+      },
+      "completeGear": {
+        "n": 12,
+        "median": 22.725,
+        "min": 12.4,
+        "max": 59.4
+      },
+      "zeroDeaths": {
+        "n": 11,
+        "median": 19.65,
+        "min": 11.9,
+        "max": 31.05
+      }
+    },
+    {
+      "key": "sunken_bastion",
+      "all": {
+        "n": 14,
+        "median": 16.05,
+        "min": 8,
+        "max": 30.1
+      },
+      "completeGear": {
+        "n": 12,
+        "median": 16.1,
+        "min": 9.3,
+        "max": 30.1
+      },
+      "zeroDeaths": {
+        "n": 11,
+        "median": 16,
+        "min": 8,
+        "max": 30.1
+      }
+    },
+    {
+      "key": "gravewyrm_sanctum",
+      "all": {
+        "n": 14,
+        "median": 20.35,
+        "min": 13.45,
+        "max": 28.5
+      },
+      "completeGear": {
+        "n": 12,
+        "median": 20.35,
+        "min": 15,
+        "max": 28.5
+      },
+      "zeroDeaths": {
+        "n": 13,
+        "median": 20.8,
+        "min": 13.45,
+        "max": 28.5
+      }
+    },
+    {
+      "key": "wildheart_basin",
+      "all": {
+        "n": 11,
+        "median": 18.15,
+        "min": 11.7,
+        "max": 31
+      },
+      "completeGear": {
+        "n": 9,
+        "median": 18.15,
+        "min": 14.95,
+        "max": 31
+      },
+      "zeroDeaths": {
+        "n": 10,
+        "median": 17.6,
+        "min": 11.7,
+        "max": 31
+      }
+    }
+  ]
+}

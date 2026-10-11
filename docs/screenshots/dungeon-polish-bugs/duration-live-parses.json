@@ -1,0 +1,6212 @@
+{
+  "generatedAt": "2026-10-07T14:22:12.920Z",
+  "builds": [
+    "0.44.5",
+    "0.44.4",
+    "0.44.3",
+    "0.44.2",
+    "0.44.1",
+    "0.44.0"
+  ],
+  "maxListedPerDungeon": 200,
+  "primaryGearFilter": "Every participant level20, at least10 defined ilvl slots, and mean known equipped ilvl>=28. No DPS selection. This is an explicit analysis cohort, not a balance target.",
+  "secondaryGearFilter": "Every participant level20, at least10 defined ilvl slots, each known mean>=25, party average>=28.",
+  "caveats": [
+    "Only kills; wipes excluded.",
+    "Maximum100kill listings per difficulty, newest first.",
+    "NM3/4/5participants separated; no solos enter any distribution.",
+    "Item levels derive from current PR4352 canonical definitions; missing item IDs and absent instance payload may make averages partial.",
+    "Repeat kills by the same characters are correlated.",
+    "These are0.44.5/0.44.4/0.44.3/0.44.2/0.44.1/0.44.0 production old-finalboss records, not current0.45rework durations."
+  ],
+  "rows": [
+    {
+      "key": "hollow_crypt",
+      "difficulty": "normal",
+      "size": 5,
+      "candidatesListed": 9,
+      "candidateSize": 2,
+      "n": 0,
+      "medianSeconds": null,
+      "minSeconds": null,
+      "maxSeconds": null,
+      "meanSeconds": null,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 0,
+      "zeroDeathKills": 0,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 0
+      },
+      "oldestAt": null,
+      "newestAt": null,
+      "secondaryThreshold": {
+        "n": 0,
+        "medianSeconds": null,
+        "minSeconds": null,
+        "maxSeconds": null
+      },
+      "eligible": []
+    },
+    {
+      "key": "hollow_crypt",
+      "difficulty": "normal",
+      "size": 3,
+      "candidatesListed": 9,
+      "candidateSize": 7,
+      "n": 1,
+      "medianSeconds": 12.1,
+      "minSeconds": 12.1,
+      "maxSeconds": 12.1,
+      "meanSeconds": 12.1,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 3,
+      "zeroDeathKills": 1,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 1
+      },
+      "oldestAt": "2026-09-28T13:43:13.253Z",
+      "newestAt": "2026-09-28T13:43:13.253Z",
+      "secondaryThreshold": {
+        "n": 1,
+        "medianSeconds": 12.1,
+        "minSeconds": 12.1,
+        "maxSeconds": 12.1
+      },
+      "eligible": [
+        {
+          "id": 133601,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133601",
+          "build": "0.44.0",
+          "at": "2026-09-28T13:43:13.253Z",
+          "seconds": 12.1,
+          "size": 3,
+          "bosses": [
+            "Morthen the Gravecaller",
+            "Crypt Shambler"
+          ],
+          "players": [
+            {
+              "characterId": "119826",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 30.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119601",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.692307692307693,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125428",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "hollow_crypt",
+      "difficulty": "normal",
+      "size": 4,
+      "candidatesListed": 9,
+      "candidateSize": 0,
+      "n": 0,
+      "medianSeconds": null,
+      "minSeconds": null,
+      "maxSeconds": null,
+      "meanSeconds": null,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 0,
+      "zeroDeathKills": 0,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 0
+      },
+      "oldestAt": null,
+      "newestAt": null,
+      "secondaryThreshold": {
+        "n": 0,
+        "medianSeconds": null,
+        "minSeconds": null,
+        "maxSeconds": null
+      },
+      "eligible": []
+    },
+    {
+      "key": "hollow_crypt",
+      "difficulty": "heroic",
+      "size": 5,
+      "candidatesListed": 42,
+      "candidateSize": 42,
+      "n": 13,
+      "medianSeconds": 12.35,
+      "minSeconds": 7.6,
+      "maxSeconds": 29.3,
+      "meanSeconds": 14.646153846153847,
+      "partiallyKnownGearFights": 2,
+      "uniqueCharacters": 50,
+      "zeroDeathKills": 12,
+      "buildCounts": {
+        "0.44.5": 1,
+        "0.44.4": 3,
+        "0.44.3": 3,
+        "0.44.2": 1,
+        "0.44.1": 1,
+        "0.44.0": 4
+      },
+      "oldestAt": "2026-09-28T12:15:32.104Z",
+      "newestAt": "2026-10-07T05:16:00.318Z",
+      "secondaryThreshold": {
+        "n": 28,
+        "medianSeconds": 12.975000000000001,
+        "minSeconds": 7.6,
+        "maxSeconds": 32
+      },
+      "eligible": [
+        {
+          "id": 152244,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152244",
+          "build": "0.44.5",
+          "at": "2026-10-07T05:16:00.318Z",
+          "seconds": 11.95,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller",
+            "Hollow Acolyte"
+          ],
+          "players": [
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 29,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [
+                "vanguard_pendant_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119599",
+              "level": 20,
+              "class": "rogue",
+              "spec": "subtlety",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "127804",
+              "level": 20,
+              "class": "priest",
+              "spec": "discipline",
+              "knownMeanItemLevel": 28.307692307692307,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 0
+        },
+        {
+          "id": 152116,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152116",
+          "build": "0.44.4",
+          "at": "2026-10-07T00:31:37.374Z",
+          "seconds": 10.2,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller",
+            "Crypt Shambler",
+            "Crypt Shambler"
+          ],
+          "players": [
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 32.083333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "92399",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 35.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "113739",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "130609",
+              "level": 20,
+              "class": "shaman",
+              "spec": "elemental",
+              "knownMeanItemLevel": 32.63636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [
+                "vanguard_band_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 1
+            },
+            {
+              "characterId": "127479",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 1
+        },
+        {
+          "id": 150196,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/150196",
+          "build": "0.44.4",
+          "at": "2026-10-06T03:42:19.758Z",
+          "seconds": 12.35,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller",
+            "Hollow Acolyte"
+          ],
+          "players": [
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 30.53846153846154,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 31.23076923076923,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "108600",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 34.27272727272727,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 149234,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/149234",
+          "build": "0.44.4",
+          "at": "2026-10-05T17:28:39.290Z",
+          "seconds": 12.2,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller"
+          ],
+          "players": [
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 30.23076923076923,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "106127",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 30.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124974",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "49939",
+              "level": 20,
+              "class": "druid",
+              "spec": "restoration",
+              "knownMeanItemLevel": 32.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 145848,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/145848",
+          "build": "0.44.3",
+          "at": "2026-10-03T22:14:59.374Z",
+          "seconds": 19.5,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller",
+            "Hollow Acolyte",
+            "Bonechill Widow"
+          ],
+          "players": [
+            {
+              "characterId": "125428",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "82070",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 33.75,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.153846153846153,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 30.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 145698,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/145698",
+          "build": "0.44.3",
+          "at": "2026-10-03T19:13:37.181Z",
+          "seconds": 7.6,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller"
+          ],
+          "players": [
+            {
+              "characterId": "6908",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 34.666666666666664,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "95427",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 35.61538461538461,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121274",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 36,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "103497",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 32.333333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 143904,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143904",
+          "build": "0.44.3",
+          "at": "2026-10-03T05:09:39.525Z",
+          "seconds": 10.1,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller"
+          ],
+          "players": [
+            {
+              "characterId": "114053",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 10,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119085",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "78541",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 31.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 143239,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143239",
+          "build": "0.44.2",
+          "at": "2026-10-02T20:17:31.495Z",
+          "seconds": 15.4,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller",
+            "Hollow Acolyte"
+          ],
+          "players": [
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "73543",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 28,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "122517",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 138846,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/138846",
+          "build": "0.44.1",
+          "at": "2026-09-30T19:05:32.925Z",
+          "seconds": 10.85,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller",
+            "Crypt Shambler"
+          ],
+          "players": [
+            {
+              "characterId": "92817",
+              "level": 20,
+              "class": "rogue",
+              "spec": "assassination",
+              "knownMeanItemLevel": 28.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120154",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 31.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 30.2,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "78921",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 30.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134828,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134828",
+          "build": "0.44.0",
+          "at": "2026-09-28T21:18:36.251Z",
+          "seconds": 12.35,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller"
+          ],
+          "players": [
+            {
+              "characterId": "115208",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "93322",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120199",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.363636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "98196",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 32.3,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134696,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134696",
+          "build": "0.44.0",
+          "at": "2026-09-28T20:32:29.788Z",
+          "seconds": 13.6,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller"
+          ],
+          "players": [
+            {
+              "characterId": "95369",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124974",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "82401",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 33.54545454545455,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.636363636363637,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133450,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133450",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:53:20.532Z",
+          "seconds": 25,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller",
+            "Hollow Acolyte"
+          ],
+          "players": [
+            {
+              "characterId": "124969",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "111019",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 30.4,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117971",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "49939",
+              "level": 20,
+              "class": "druid",
+              "spec": "restoration",
+              "knownMeanItemLevel": 32,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133311,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133311",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:15:32.104Z",
+          "seconds": 29.3,
+          "size": 5,
+          "bosses": [
+            "Morthen the Gravecaller",
+            "Crypt Shambler",
+            "Crypt Shambler"
+          ],
+          "players": [
+            {
+              "characterId": "106206",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.1,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "110487",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.692307692307693,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "35961",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126938",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "112768",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 31.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "drowned_temple",
+      "difficulty": "normal",
+      "size": 5,
+      "candidatesListed": 8,
+      "candidateSize": 0,
+      "n": 0,
+      "medianSeconds": null,
+      "minSeconds": null,
+      "maxSeconds": null,
+      "meanSeconds": null,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 0,
+      "zeroDeathKills": 0,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 0
+      },
+      "oldestAt": null,
+      "newestAt": null,
+      "secondaryThreshold": {
+        "n": 0,
+        "medianSeconds": null,
+        "minSeconds": null,
+        "maxSeconds": null
+      },
+      "eligible": []
+    },
+    {
+      "key": "drowned_temple",
+      "difficulty": "normal",
+      "size": 3,
+      "candidatesListed": 8,
+      "candidateSize": 7,
+      "n": 3,
+      "medianSeconds": 4.6,
+      "minSeconds": 4.1,
+      "maxSeconds": 8.3,
+      "meanSeconds": 5.666666666666667,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 9,
+      "zeroDeathKills": 3,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 3
+      },
+      "oldestAt": "2026-09-28T12:24:05.359Z",
+      "newestAt": "2026-09-28T21:23:48.049Z",
+      "secondaryThreshold": {
+        "n": 3,
+        "medianSeconds": 4.6,
+        "minSeconds": 4.1,
+        "maxSeconds": 8.3
+      },
+      "eligible": [
+        {
+          "id": 134854,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134854",
+          "build": "0.44.0",
+          "at": "2026-09-28T21:23:48.049Z",
+          "seconds": 4.1,
+          "size": 3,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Drowned Templeguard",
+            "Glimmerscale Lurker",
+            "Pale Choir Acolyte",
+            "Drowned Templeguard",
+            "Pearlguard Sentinel",
+            "Drowned Templeguard",
+            "Drowned Templeguard",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "93322",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "115208",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120199",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.363636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134517,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134517",
+          "build": "0.44.0",
+          "at": "2026-09-28T19:26:38.110Z",
+          "seconds": 4.6,
+          "size": 3,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Glimmerscale Lurker",
+            "Pearlguard Sentinel",
+            "Drowned Templeguard",
+            "Glimmerscale Lurker",
+            "Pale Choir Acolyte",
+            "Pale Choir Acolyte",
+            "Drowned Templeguard",
+            "Pearlguard Sentinel",
+            "Choirmother Selthe",
+            "Drowned Templeguard",
+            "Drowned Templeguard",
+            "Drowned Templeguard",
+            "Drowned Templeguard",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "82070",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 33.75,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117959",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 31.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "111759",
+              "level": 20,
+              "class": "paladin",
+              "spec": "holy",
+              "knownMeanItemLevel": 30,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133344,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133344",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:24:05.359Z",
+          "seconds": 8.3,
+          "size": 3,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Choirmother Selthe",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "110487",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.692307692307693,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126938",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "112768",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 31.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "drowned_temple",
+      "difficulty": "normal",
+      "size": 4,
+      "candidatesListed": 8,
+      "candidateSize": 1,
+      "n": 1,
+      "medianSeconds": 3.7,
+      "minSeconds": 3.7,
+      "maxSeconds": 3.7,
+      "meanSeconds": 3.7,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 4,
+      "zeroDeathKills": 1,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 1
+      },
+      "oldestAt": "2026-09-28T20:37:26.148Z",
+      "newestAt": "2026-09-28T20:37:26.148Z",
+      "secondaryThreshold": {
+        "n": 1,
+        "medianSeconds": 3.7,
+        "minSeconds": 3.7,
+        "maxSeconds": 3.7
+      },
+      "eligible": [
+        {
+          "id": 134710,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134710",
+          "build": "0.44.0",
+          "at": "2026-09-28T20:37:26.148Z",
+          "seconds": 3.7,
+          "size": 4,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Drowned Templeguard",
+            "Pale Choir Acolyte",
+            "Choirmother Selthe",
+            "Drowned Templeguard",
+            "Pale Choir Acolyte",
+            "Pearlguard Sentinel",
+            "Drowned Templeguard",
+            "Drowned Templeguard",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Glimmerscale Lurker",
+            "Pearlguard Sentinel",
+            "Drowned Templeguard"
+          ],
+          "players": [
+            {
+              "characterId": "82401",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 35.54545454545455,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "95369",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.636363636363637,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "drowned_temple",
+      "difficulty": "heroic",
+      "size": 5,
+      "candidatesListed": 46,
+      "candidateSize": 46,
+      "n": 14,
+      "medianSeconds": 21.225,
+      "minSeconds": 11.9,
+      "maxSeconds": 59.4,
+      "meanSeconds": 23.964285714285715,
+      "partiallyKnownGearFights": 2,
+      "uniqueCharacters": 54,
+      "zeroDeathKills": 11,
+      "buildCounts": {
+        "0.44.5": 1,
+        "0.44.4": 3,
+        "0.44.3": 4,
+        "0.44.2": 1,
+        "0.44.1": 1,
+        "0.44.0": 4
+      },
+      "oldestAt": "2026-09-28T12:10:38.475Z",
+      "newestAt": "2026-10-07T05:08:01.704Z",
+      "secondaryThreshold": {
+        "n": 31,
+        "medianSeconds": 20.85,
+        "minSeconds": 11.9,
+        "maxSeconds": 59.4
+      },
+      "eligible": [
+        {
+          "id": 152234,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152234",
+          "build": "0.44.5",
+          "at": "2026-10-07T05:08:01.704Z",
+          "seconds": 20.35,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Drowned Templeguard"
+          ],
+          "players": [
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 29,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119599",
+              "level": 20,
+              "class": "rogue",
+              "spec": "subtlety",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [
+                "vanguard_pendant_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 0
+            },
+            {
+              "characterId": "127804",
+              "level": 20,
+              "class": "priest",
+              "spec": "discipline",
+              "knownMeanItemLevel": 28.083333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 0
+        },
+        {
+          "id": 152107,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152107",
+          "build": "0.44.4",
+          "at": "2026-10-07T00:27:54.540Z",
+          "seconds": 11.9,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "92399",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 35.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "130609",
+              "level": 20,
+              "class": "shaman",
+              "spec": "elemental",
+              "knownMeanItemLevel": 32.63636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [
+                "vanguard_band_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 0
+            },
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 32.083333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "113739",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "127479",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 0
+        },
+        {
+          "id": 150186,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/150186",
+          "build": "0.44.4",
+          "at": "2026-10-06T03:35:22.791Z",
+          "seconds": 30.5,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 31.23076923076923,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 30.53846153846154,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 1
+            },
+            {
+              "characterId": "108600",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 34.27272727272727,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 1
+        },
+        {
+          "id": 149215,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/149215",
+          "build": "0.44.4",
+          "at": "2026-10-05T17:22:54.018Z",
+          "seconds": 23.85,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Drowned Templeguard",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 30.53846153846154,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124974",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "106127",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 30.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "49939",
+              "level": 20,
+              "class": "druid",
+              "spec": "restoration",
+              "knownMeanItemLevel": 32.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 147592,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/147592",
+          "build": "0.44.3",
+          "at": "2026-10-04T21:35:00.476Z",
+          "seconds": 22.1,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Drowned Templeguard"
+          ],
+          "players": [
+            {
+              "characterId": "97490",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 31.384615384615383,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128538",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.5,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126405",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 33.583333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.46153846153846,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "109262",
+              "level": 20,
+              "class": "warlock",
+              "spec": "affliction",
+              "knownMeanItemLevel": 31.8,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 2
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 2
+        },
+        {
+          "id": 145842,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/145842",
+          "build": "0.44.3",
+          "at": "2026-10-03T22:10:17.679Z",
+          "seconds": 12.4,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "125428",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "82070",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 33.75,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.153846153846153,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 30.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 145685,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/145685",
+          "build": "0.44.3",
+          "at": "2026-10-03T19:09:14.209Z",
+          "seconds": 19.5,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Pearlguard Sentinel",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "6908",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 34.666666666666664,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "95427",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 35.23076923076923,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121274",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 36,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "103497",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 32.333333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 143891,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143891",
+          "build": "0.44.3",
+          "at": "2026-10-03T05:00:21.253Z",
+          "seconds": 13.25,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "114053",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119085",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 10,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "78541",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 30.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 143221,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143221",
+          "build": "0.44.2",
+          "at": "2026-10-02T20:09:14.202Z",
+          "seconds": 23.35,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "73543",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 28,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "122517",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 138824,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/138824",
+          "build": "0.44.1",
+          "at": "2026-09-30T18:57:53.365Z",
+          "seconds": 19.1,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 31.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120154",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "92817",
+              "level": 20,
+              "class": "rogue",
+              "spec": "assassination",
+              "knownMeanItemLevel": 28.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 30.2,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "78921",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 30.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134811,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134811",
+          "build": "0.44.0",
+          "at": "2026-09-28T21:13:17.446Z",
+          "seconds": 19.65,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "93322",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "115208",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120199",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.363636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "98196",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 32.3,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134676,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134676",
+          "build": "0.44.0",
+          "at": "2026-09-28T20:26:50.677Z",
+          "seconds": 59.4,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Drowned Templeguard",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "95369",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 1
+            },
+            {
+              "characterId": "82401",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 33.54545454545455,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124974",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 1
+            },
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.636363636363637,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 1
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 3
+        },
+        {
+          "id": 133435,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133435",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:49:35.070Z",
+          "seconds": 29.1,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Drowned Templeguard",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "124969",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 30.4,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "111019",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117971",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "49939",
+              "level": 20,
+              "class": "druid",
+              "spec": "restoration",
+              "knownMeanItemLevel": 32,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133294,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133294",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:10:38.475Z",
+          "seconds": 31.05,
+          "size": 5,
+          "bosses": [
+            "Ysolei, Avatar of the Drowned Moon",
+            "Drowned Templeguard",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn",
+            "Moonspawn"
+          ],
+          "players": [
+            {
+              "characterId": "106206",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.1,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "110487",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.692307692307693,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "35961",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126938",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "112768",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 31.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "sunken_bastion",
+      "difficulty": "normal",
+      "size": 5,
+      "candidatesListed": 8,
+      "candidateSize": 0,
+      "n": 0,
+      "medianSeconds": null,
+      "minSeconds": null,
+      "maxSeconds": null,
+      "meanSeconds": null,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 0,
+      "zeroDeathKills": 0,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 0
+      },
+      "oldestAt": null,
+      "newestAt": null,
+      "secondaryThreshold": {
+        "n": 0,
+        "medianSeconds": null,
+        "minSeconds": null,
+        "maxSeconds": null
+      },
+      "eligible": []
+    },
+    {
+      "key": "sunken_bastion",
+      "difficulty": "normal",
+      "size": 3,
+      "candidatesListed": 8,
+      "candidateSize": 8,
+      "n": 2,
+      "medianSeconds": 11.35,
+      "minSeconds": 7.85,
+      "maxSeconds": 14.85,
+      "meanSeconds": 11.35,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 6,
+      "zeroDeathKills": 2,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 2
+      },
+      "oldestAt": "2026-09-28T12:56:17.008Z",
+      "newestAt": "2026-09-28T13:44:32.223Z",
+      "secondaryThreshold": {
+        "n": 2,
+        "medianSeconds": 11.35,
+        "minSeconds": 7.85,
+        "maxSeconds": 14.85
+      },
+      "eligible": [
+        {
+          "id": 133604,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133604",
+          "build": "0.44.0",
+          "at": "2026-09-28T13:44:32.223Z",
+          "seconds": 14.85,
+          "size": 3,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "125428",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119601",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.692307692307693,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119826",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 30.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133457,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133457",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:56:17.008Z",
+          "seconds": 7.85,
+          "size": 3,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "111019",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117971",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124969",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "sunken_bastion",
+      "difficulty": "normal",
+      "size": 4,
+      "candidatesListed": 8,
+      "candidateSize": 0,
+      "n": 0,
+      "medianSeconds": null,
+      "minSeconds": null,
+      "maxSeconds": null,
+      "meanSeconds": null,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 0,
+      "zeroDeathKills": 0,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 0
+      },
+      "oldestAt": null,
+      "newestAt": null,
+      "secondaryThreshold": {
+        "n": 0,
+        "medianSeconds": null,
+        "minSeconds": null,
+        "maxSeconds": null
+      },
+      "eligible": []
+    },
+    {
+      "key": "sunken_bastion",
+      "difficulty": "heroic",
+      "size": 5,
+      "candidatesListed": 45,
+      "candidateSize": 45,
+      "n": 14,
+      "medianSeconds": 16.05,
+      "minSeconds": 8,
+      "maxSeconds": 30.1,
+      "meanSeconds": 16.57857142857143,
+      "partiallyKnownGearFights": 2,
+      "uniqueCharacters": 54,
+      "zeroDeathKills": 11,
+      "buildCounts": {
+        "0.44.5": 1,
+        "0.44.4": 3,
+        "0.44.3": 4,
+        "0.44.2": 1,
+        "0.44.1": 1,
+        "0.44.0": 4
+      },
+      "oldestAt": "2026-09-28T12:13:24.888Z",
+      "newestAt": "2026-10-07T05:12:15.200Z",
+      "secondaryThreshold": {
+        "n": 31,
+        "medianSeconds": 16.1,
+        "minSeconds": 8,
+        "maxSeconds": 37.85
+      },
+      "eligible": [
+        {
+          "id": 152240,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152240",
+          "build": "0.44.5",
+          "at": "2026-10-07T05:12:15.200Z",
+          "seconds": 16.1,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Bastion Revenant",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Tidebound Acolyte",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 29,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 1
+            },
+            {
+              "characterId": "119599",
+              "level": 20,
+              "class": "rogue",
+              "spec": "subtlety",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 1
+            },
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [
+                "vanguard_pendant_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 0
+            },
+            {
+              "characterId": "127804",
+              "level": 20,
+              "class": "priest",
+              "spec": "discipline",
+              "knownMeanItemLevel": 28.083333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 1
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 3
+        },
+        {
+          "id": 152111,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152111",
+          "build": "0.44.4",
+          "at": "2026-10-07T00:29:58.362Z",
+          "seconds": 8,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Bastion Revenant",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "92399",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 35.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "130609",
+              "level": 20,
+              "class": "shaman",
+              "spec": "elemental",
+              "knownMeanItemLevel": 32.63636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [
+                "vanguard_band_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 0
+            },
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 32.083333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "113739",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "127479",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 0
+        },
+        {
+          "id": 150192,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/150192",
+          "build": "0.44.4",
+          "at": "2026-10-06T03:40:01.757Z",
+          "seconds": 15.6,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 31.23076923076923,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 30.53846153846154,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "108600",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 34.27272727272727,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 149223,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/149223",
+          "build": "0.44.4",
+          "at": "2026-10-05T17:25:26.066Z",
+          "seconds": 16,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Tidebound Acolyte",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 30.53846153846154,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124974",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "106127",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 30.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "49939",
+              "level": 20,
+              "class": "druid",
+              "spec": "restoration",
+              "knownMeanItemLevel": 32.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 147601,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/147601",
+          "build": "0.44.3",
+          "at": "2026-10-04T21:37:10.428Z",
+          "seconds": 28.15,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Bastion Revenant",
+            "Tidebound Acolyte",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "97490",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 31.384615384615383,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "109262",
+              "level": 20,
+              "class": "warlock",
+              "spec": "affliction",
+              "knownMeanItemLevel": 31.8,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126405",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 33.583333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128538",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.5,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 1
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.46153846153846,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 1
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 2
+        },
+        {
+          "id": 145845,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/145845",
+          "build": "0.44.3",
+          "at": "2026-10-03T22:12:26.493Z",
+          "seconds": 12,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "125428",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "82070",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 33.75,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.153846153846153,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 30.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 145694,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/145694",
+          "build": "0.44.3",
+          "at": "2026-10-03T19:11:10.026Z",
+          "seconds": 16.2,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "6908",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 34.666666666666664,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "95427",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 35.23076923076923,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "103497",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 32.333333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121274",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 36,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 143898,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143898",
+          "build": "0.44.3",
+          "at": "2026-10-03T05:06:39.552Z",
+          "seconds": 9.3,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "114053",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 10,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119085",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "78541",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 31,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 143226,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143226",
+          "build": "0.44.2",
+          "at": "2026-10-02T20:11:48.791Z",
+          "seconds": 30.1,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Bastion Revenant",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "73543",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 28,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "122517",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 138840,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/138840",
+          "build": "0.44.1",
+          "at": "2026-09-30T19:02:59.715Z",
+          "seconds": 12,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 31.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 1
+            },
+            {
+              "characterId": "92817",
+              "level": 20,
+              "class": "rogue",
+              "spec": "assassination",
+              "knownMeanItemLevel": 28.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120154",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 30.2,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "78921",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 30.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 1
+        },
+        {
+          "id": 134819,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134819",
+          "build": "0.44.0",
+          "at": "2026-09-28T21:16:16.242Z",
+          "seconds": 16.7,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "93322",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120199",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.363636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "115208",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "98196",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 32.3,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134688,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134688",
+          "build": "0.44.0",
+          "at": "2026-09-28T20:30:00.563Z",
+          "seconds": 14.15,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall"
+          ],
+          "players": [
+            {
+              "characterId": "95369",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124974",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "82401",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 33.54545454545455,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.636363636363637,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133444,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133444",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:51:40.940Z",
+          "seconds": 20.25,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Bastion Revenant"
+          ],
+          "players": [
+            {
+              "characterId": "124969",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "111019",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 30.4,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117971",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "49939",
+              "level": 20,
+              "class": "druid",
+              "spec": "restoration",
+              "knownMeanItemLevel": 32,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133303,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133303",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:13:24.888Z",
+          "seconds": 17.55,
+          "size": 5,
+          "bosses": [
+            "Vael the Fogbinder",
+            "Bastion Revenant",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Drowned Thrall",
+            "Tidebound Acolyte"
+          ],
+          "players": [
+            {
+              "characterId": "110487",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.692307692307693,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "106206",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.1,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "35961",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126938",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "112768",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 31.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "gravewyrm_sanctum",
+      "difficulty": "normal",
+      "size": 5,
+      "candidatesListed": 9,
+      "candidateSize": 1,
+      "n": 1,
+      "medianSeconds": 14.7,
+      "minSeconds": 14.7,
+      "maxSeconds": 14.7,
+      "meanSeconds": 14.7,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 5,
+      "zeroDeathKills": 1,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 1
+      },
+      "oldestAt": "2026-09-28T12:58:45.124Z",
+      "newestAt": "2026-09-28T12:58:45.124Z",
+      "secondaryThreshold": {
+        "n": 1,
+        "medianSeconds": 14.7,
+        "minSeconds": 14.7,
+        "maxSeconds": 14.7
+      },
+      "eligible": [
+        {
+          "id": 133461,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133461",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:58:45.124Z",
+          "seconds": 14.7,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm",
+            "Grand Necromancer Velkhar",
+            "Raised Bonewalker",
+            "Raised Bonewalker",
+            "Raised Bonewalker",
+            "Raised Bonewalker",
+            "Raised Bonewalker",
+            "Raised Bonewalker"
+          ],
+          "players": [
+            {
+              "characterId": "111019",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124969",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 30.4,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117971",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "49939",
+              "level": 20,
+              "class": "druid",
+              "spec": "restoration",
+              "knownMeanItemLevel": 32,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "gravewyrm_sanctum",
+      "difficulty": "normal",
+      "size": 3,
+      "candidatesListed": 9,
+      "candidateSize": 6,
+      "n": 1,
+      "medianSeconds": 12.25,
+      "minSeconds": 12.25,
+      "maxSeconds": 12.25,
+      "meanSeconds": 12.25,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 3,
+      "zeroDeathKills": 1,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 1,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 0
+      },
+      "oldestAt": "2026-10-06T21:48:04.602Z",
+      "newestAt": "2026-10-06T21:48:04.602Z",
+      "secondaryThreshold": {
+        "n": 1,
+        "medianSeconds": 12.25,
+        "minSeconds": 12.25,
+        "maxSeconds": 12.25
+      },
+      "eligible": [
+        {
+          "id": 151963,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/151963",
+          "build": "0.44.4",
+          "at": "2026-10-06T21:48:04.602Z",
+          "seconds": 12.25,
+          "size": 3,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "56961",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 36.166666666666664,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119504",
+              "level": 20,
+              "class": "hunter",
+              "spec": "survival",
+              "knownMeanItemLevel": 30.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "130894",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 29.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "gravewyrm_sanctum",
+      "difficulty": "normal",
+      "size": 4,
+      "candidatesListed": 9,
+      "candidateSize": 2,
+      "n": 1,
+      "medianSeconds": 19.4,
+      "minSeconds": 19.4,
+      "maxSeconds": 19.4,
+      "meanSeconds": 19.4,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 4,
+      "zeroDeathKills": 1,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 1
+      },
+      "oldestAt": "2026-09-28T13:47:29.115Z",
+      "newestAt": "2026-09-28T13:47:29.115Z",
+      "secondaryThreshold": {
+        "n": 1,
+        "medianSeconds": 19.4,
+        "minSeconds": 19.4,
+        "maxSeconds": 19.4
+      },
+      "eligible": [
+        {
+          "id": 133617,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133617",
+          "build": "0.44.0",
+          "at": "2026-09-28T13:47:29.115Z",
+          "seconds": 19.4,
+          "size": 4,
+          "bosses": [
+            "Korzul the Gravewyrm",
+            "Sanctum Boneguard",
+            "Sanctum Scaleguard",
+            "Sanctum Scaleguard"
+          ],
+          "players": [
+            {
+              "characterId": "125428",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119601",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.692307692307693,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119826",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 30.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "110457",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 30.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "gravewyrm_sanctum",
+      "difficulty": "heroic",
+      "size": 5,
+      "candidatesListed": 47,
+      "candidateSize": 47,
+      "n": 14,
+      "medianSeconds": 20.35,
+      "minSeconds": 13.45,
+      "maxSeconds": 28.5,
+      "meanSeconds": 20.517857142857142,
+      "partiallyKnownGearFights": 2,
+      "uniqueCharacters": 54,
+      "zeroDeathKills": 13,
+      "buildCounts": {
+        "0.44.5": 1,
+        "0.44.4": 3,
+        "0.44.3": 4,
+        "0.44.2": 1,
+        "0.44.1": 1,
+        "0.44.0": 4
+      },
+      "oldestAt": "2026-09-28T12:06:48.388Z",
+      "newestAt": "2026-10-07T05:03:20.769Z",
+      "secondaryThreshold": {
+        "n": 31,
+        "medianSeconds": 19.9,
+        "minSeconds": 10.35,
+        "maxSeconds": 35.2
+      },
+      "eligible": [
+        {
+          "id": 152230,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152230",
+          "build": "0.44.5",
+          "at": "2026-10-07T05:03:20.769Z",
+          "seconds": 24.3,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [
+                "vanguard_pendant_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 0
+            },
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 29,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119599",
+              "level": 20,
+              "class": "rogue",
+              "spec": "subtlety",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "127804",
+              "level": 20,
+              "class": "priest",
+              "spec": "discipline",
+              "knownMeanItemLevel": 28.083333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 0
+        },
+        {
+          "id": 152102,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152102",
+          "build": "0.44.4",
+          "at": "2026-10-07T00:24:13.773Z",
+          "seconds": 13.45,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "92399",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 35.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "130609",
+              "level": 20,
+              "class": "shaman",
+              "spec": "elemental",
+              "knownMeanItemLevel": 32.63636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [
+                "vanguard_band_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 0
+            },
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 32.083333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "113739",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "127479",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 0
+        },
+        {
+          "id": 150183,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/150183",
+          "build": "0.44.4",
+          "at": "2026-10-06T03:32:07.006Z",
+          "seconds": 19.9,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 30.53846153846154,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 31.23076923076923,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "108600",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 34.27272727272727,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 149207,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/149207",
+          "build": "0.44.4",
+          "at": "2026-10-05T17:19:49.959Z",
+          "seconds": 24.55,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm",
+            "Sanctum Scaleguard"
+          ],
+          "players": [
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 30.53846153846154,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124974",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "106127",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 30.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "49939",
+              "level": 20,
+              "class": "druid",
+              "spec": "restoration",
+              "knownMeanItemLevel": 32.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 147587,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/147587",
+          "build": "0.44.3",
+          "at": "2026-10-04T21:31:46.615Z",
+          "seconds": 24.55,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm",
+            "Sanctum Scaleguard"
+          ],
+          "players": [
+            {
+              "characterId": "97490",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 31.384615384615383,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "109262",
+              "level": 20,
+              "class": "warlock",
+              "spec": "affliction",
+              "knownMeanItemLevel": 31.8,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.46153846153846,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128538",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.5,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126405",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 33.583333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 145838,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/145838",
+          "build": "0.44.3",
+          "at": "2026-10-03T22:07:12.895Z",
+          "seconds": 16.25,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "82070",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 33.75,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125428",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.153846153846153,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 30.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 145671,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/145671",
+          "build": "0.44.3",
+          "at": "2026-10-03T19:06:25.925Z",
+          "seconds": 19.85,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm",
+            "Sanctum Boneguard"
+          ],
+          "players": [
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33.69230769230769,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "6908",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 34.666666666666664,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "95427",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 35.23076923076923,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121274",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 36,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "103497",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 32.333333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 143886,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143886",
+          "build": "0.44.3",
+          "at": "2026-10-03T04:55:53.760Z",
+          "seconds": 15.55,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "119085",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "114053",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 10,
+              "unknownItems": [],
+              "deaths": 1
+            },
+            {
+              "characterId": "78541",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 30.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 1
+        },
+        {
+          "id": 143210,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143210",
+          "build": "0.44.2",
+          "at": "2026-10-02T20:04:54.030Z",
+          "seconds": 28.5,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm",
+            "Sanctum Scaleguard"
+          ],
+          "players": [
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 28,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "73543",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "122517",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 138817,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/138817",
+          "build": "0.44.1",
+          "at": "2026-09-30T18:52:58.567Z",
+          "seconds": 18.5,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 31.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120154",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "92817",
+              "level": 20,
+              "class": "rogue",
+              "spec": "assassination",
+              "knownMeanItemLevel": 28.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 30.2,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "78921",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 30.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134802,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134802",
+          "build": "0.44.0",
+          "at": "2026-09-28T21:07:36.212Z",
+          "seconds": 15,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "93322",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "115208",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120199",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.363636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "98196",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 32.3,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134669,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134669",
+          "build": "0.44.0",
+          "at": "2026-09-28T20:23:37.770Z",
+          "seconds": 24.75,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm",
+            "Sanctum Scaleguard"
+          ],
+          "players": [
+            {
+              "characterId": "95369",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "124974",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "82401",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 33.54545454545455,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.636363636363637,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133422,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133422",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:46:13.516Z",
+          "seconds": 20.8,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "124969",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "111019",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 30.4,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117971",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "49939",
+              "level": 20,
+              "class": "druid",
+              "spec": "restoration",
+              "knownMeanItemLevel": 32,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133291,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133291",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:06:48.388Z",
+          "seconds": 21.3,
+          "size": 5,
+          "bosses": [
+            "Korzul the Gravewyrm"
+          ],
+          "players": [
+            {
+              "characterId": "35961",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "110487",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.692307692307693,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "106206",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.1,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126938",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "112768",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 31.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    },
+    {
+      "key": "wildheart_basin",
+      "difficulty": "normal",
+      "size": 5,
+      "candidatesListed": 0,
+      "candidateSize": 0,
+      "n": 0,
+      "medianSeconds": null,
+      "minSeconds": null,
+      "maxSeconds": null,
+      "meanSeconds": null,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 0,
+      "zeroDeathKills": 0,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 0
+      },
+      "oldestAt": null,
+      "newestAt": null,
+      "secondaryThreshold": {
+        "n": 0,
+        "medianSeconds": null,
+        "minSeconds": null,
+        "maxSeconds": null
+      },
+      "eligible": []
+    },
+    {
+      "key": "wildheart_basin",
+      "difficulty": "normal",
+      "size": 3,
+      "candidatesListed": 0,
+      "candidateSize": 0,
+      "n": 0,
+      "medianSeconds": null,
+      "minSeconds": null,
+      "maxSeconds": null,
+      "meanSeconds": null,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 0,
+      "zeroDeathKills": 0,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 0
+      },
+      "oldestAt": null,
+      "newestAt": null,
+      "secondaryThreshold": {
+        "n": 0,
+        "medianSeconds": null,
+        "minSeconds": null,
+        "maxSeconds": null
+      },
+      "eligible": []
+    },
+    {
+      "key": "wildheart_basin",
+      "difficulty": "normal",
+      "size": 4,
+      "candidatesListed": 0,
+      "candidateSize": 0,
+      "n": 0,
+      "medianSeconds": null,
+      "minSeconds": null,
+      "maxSeconds": null,
+      "meanSeconds": null,
+      "partiallyKnownGearFights": 0,
+      "uniqueCharacters": 0,
+      "zeroDeathKills": 0,
+      "buildCounts": {
+        "0.44.5": 0,
+        "0.44.4": 0,
+        "0.44.3": 0,
+        "0.44.2": 0,
+        "0.44.1": 0,
+        "0.44.0": 0
+      },
+      "oldestAt": null,
+      "newestAt": null,
+      "secondaryThreshold": {
+        "n": 0,
+        "medianSeconds": null,
+        "minSeconds": null,
+        "maxSeconds": null
+      },
+      "eligible": []
+    },
+    {
+      "key": "wildheart_basin",
+      "difficulty": "heroic",
+      "size": 5,
+      "candidatesListed": 39,
+      "candidateSize": 39,
+      "n": 11,
+      "medianSeconds": 18.15,
+      "minSeconds": 11.7,
+      "maxSeconds": 31,
+      "meanSeconds": 20.545454545454547,
+      "partiallyKnownGearFights": 2,
+      "uniqueCharacters": 45,
+      "zeroDeathKills": 10,
+      "buildCounts": {
+        "0.44.5": 1,
+        "0.44.4": 2,
+        "0.44.3": 3,
+        "0.44.2": 1,
+        "0.44.1": 1,
+        "0.44.0": 3
+      },
+      "oldestAt": "2026-09-28T12:01:56.131Z",
+      "newestAt": "2026-10-07T04:50:50.412Z",
+      "secondaryThreshold": {
+        "n": 23,
+        "medianSeconds": 19.95,
+        "minSeconds": 11.7,
+        "maxSeconds": 36.35
+      },
+      "eligible": [
+        {
+          "id": 152217,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152217",
+          "build": "0.44.5",
+          "at": "2026-10-07T04:50:50.412Z",
+          "seconds": 30.1,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 29,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 1
+            },
+            {
+              "characterId": "119599",
+              "level": 20,
+              "class": "rogue",
+              "spec": "subtlety",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [
+                "vanguard_pendant_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 0
+            },
+            {
+              "characterId": "127804",
+              "level": 20,
+              "class": "priest",
+              "spec": "discipline",
+              "knownMeanItemLevel": 28.083333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 1
+        },
+        {
+          "id": 152096,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/152096",
+          "build": "0.44.4",
+          "at": "2026-10-07T00:19:55.317Z",
+          "seconds": 11.7,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "92399",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 35.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "130609",
+              "level": 20,
+              "class": "shaman",
+              "spec": "elemental",
+              "knownMeanItemLevel": 32.63636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [
+                "vanguard_band_of_focus",
+                "vanguard_band_of_focus"
+              ],
+              "deaths": 0
+            },
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 32.083333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "113739",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "127479",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 29.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": true,
+          "deaths": 0
+        },
+        {
+          "id": 150177,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/150177",
+          "build": "0.44.4",
+          "at": "2026-10-06T03:24:54.508Z",
+          "seconds": 18.15,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 30.53846153846154,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120542",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 31.23076923076923,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "retribution",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "108600",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 34.27272727272727,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 147581,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/147581",
+          "build": "0.44.3",
+          "at": "2026-10-04T21:26:37.337Z",
+          "seconds": 19.55,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "97490",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 31.384615384615383,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128538",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.5,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "109262",
+              "level": 20,
+              "class": "warlock",
+              "spec": "affliction",
+              "knownMeanItemLevel": 31.8,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.46153846153846,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126405",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 33.583333333333336,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 145834,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/145834",
+          "build": "0.44.3",
+          "at": "2026-10-03T22:02:00.209Z",
+          "seconds": 17.05,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "125428",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.76923076923077,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "82070",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 33.75,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117805",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 34.84615384615385,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.153846153846153,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 30.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 143874,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143874",
+          "build": "0.44.3",
+          "at": "2026-10-03T04:49:20.843Z",
+          "seconds": 15.45,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "114053",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "119085",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "29985",
+              "level": 20,
+              "class": "paladin",
+              "spec": "protection",
+              "knownMeanItemLevel": 29.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "80969",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 28.8,
+              "knownSlots": 10,
+              "occupiedSlots": 10,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "78541",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 30.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 143189,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/143189",
+          "build": "0.44.2",
+          "at": "2026-10-02T19:56:20.661Z",
+          "seconds": 30.75,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "88077",
+              "level": 20,
+              "class": "priest",
+              "spec": "shadow",
+              "knownMeanItemLevel": 31.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "128198",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 28,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "73543",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.833333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "122517",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 29.615384615384617,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "117302",
+              "level": 20,
+              "class": "shaman",
+              "spec": "restoration",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 138813,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/138813",
+          "build": "0.44.1",
+          "at": "2026-09-30T18:48:00.750Z",
+          "seconds": 21.15,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "92817",
+              "level": 20,
+              "class": "rogue",
+              "spec": "assassination",
+              "knownMeanItemLevel": 28.416666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "61257",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 31.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120154",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "121850",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 30.2,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "78921",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 30.25,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134779,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134779",
+          "build": "0.44.0",
+          "at": "2026-09-28T21:00:26.702Z",
+          "seconds": 14.95,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "93322",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 30.333333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "77445",
+              "level": 20,
+              "class": "mage",
+              "spec": "fire",
+              "knownMeanItemLevel": 33,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "115208",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "120199",
+              "level": 20,
+              "class": "druid",
+              "spec": "feral",
+              "knownMeanItemLevel": 29.363636363636363,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "98196",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 32.3,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 134658,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/134658",
+          "build": "0.44.0",
+          "at": "2026-09-28T20:18:29.249Z",
+          "seconds": 16.15,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "124974",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.583333333333332,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "95369",
+              "level": 20,
+              "class": "shaman",
+              "spec": "enhancement",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126007",
+              "level": 20,
+              "class": "druid",
+              "spec": "balance",
+              "knownMeanItemLevel": 28.916666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "125064",
+              "level": 20,
+              "class": "mage",
+              "spec": "arcane",
+              "knownMeanItemLevel": 30.636363636363637,
+              "knownSlots": 11,
+              "occupiedSlots": 11,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "82401",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 33.54545454545455,
+              "knownSlots": 11,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        },
+        {
+          "id": 133288,
+          "url": "https://parses.worldofclaudecraft.com/#/fight/133288",
+          "build": "0.44.0",
+          "at": "2026-09-28T12:01:56.131Z",
+          "seconds": 31,
+          "size": 5,
+          "bosses": [
+            "Zulgar, Voice of the Basin"
+          ],
+          "players": [
+            {
+              "characterId": "110487",
+              "level": 20,
+              "class": "hunter",
+              "spec": "beast_mastery",
+              "knownMeanItemLevel": 28.692307692307693,
+              "knownSlots": 13,
+              "occupiedSlots": 13,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "106206",
+              "level": 20,
+              "class": "warrior",
+              "spec": "fury",
+              "knownMeanItemLevel": 29.1,
+              "knownSlots": 10,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "126938",
+              "level": 20,
+              "class": "warrior",
+              "spec": "prot",
+              "knownMeanItemLevel": 28.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "35961",
+              "level": 20,
+              "class": "rogue",
+              "spec": "combat",
+              "knownMeanItemLevel": 29.666666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            },
+            {
+              "characterId": "112768",
+              "level": 20,
+              "class": "priest",
+              "spec": "holy",
+              "knownMeanItemLevel": 31.166666666666668,
+              "knownSlots": 12,
+              "occupiedSlots": 12,
+              "unknownItems": [],
+              "deaths": 0
+            }
+          ],
+          "highGear": true,
+          "mildHighGear": true,
+          "partialIlvl": false,
+          "deaths": 0
+        }
+      ]
+    }
+  ]
+}

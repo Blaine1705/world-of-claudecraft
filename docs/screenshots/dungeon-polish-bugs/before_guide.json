@@ -1,0 +1,289 @@
+{
+  "mode": "guide",
+  "errors": [
+    "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+    "character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb"
+  ],
+  "gpuPrep": {
+    "budget": {
+      "frameEmaMs": 22.63,
+      "headroomMs": 7.37,
+      "spentThisFrameMs": 0,
+      "legacy": false,
+      "degrading": false,
+      "kinds": [
+        {
+          "kind": "self-spirit",
+          "emaMs": 165.6,
+          "samples": 1
+        },
+        {
+          "kind": "ability-materials",
+          "emaMs": 14.45,
+          "samples": 2
+        },
+        {
+          "kind": "zone-prewarm-render",
+          "emaMs": 9.38,
+          "samples": 46
+        },
+        {
+          "kind": "guard-upload",
+          "emaMs": 9.1,
+          "samples": 1
+        },
+        {
+          "kind": "fragment-upload",
+          "emaMs": 8.73,
+          "samples": 3
+        },
+        {
+          "kind": "power-0",
+          "emaMs": 8.44,
+          "samples": 4
+        },
+        {
+          "kind": "baked-upload",
+          "emaMs": 8.23,
+          "samples": 10
+        },
+        {
+          "kind": "crest-upload",
+          "emaMs": 7.72,
+          "samples": 27
+        },
+        {
+          "kind": "preview",
+          "emaMs": 6.23,
+          "samples": 14
+        },
+        {
+          "kind": "spirit-hammer",
+          "emaMs": 4.08,
+          "samples": 3
+        },
+        {
+          "kind": "power-1",
+          "emaMs": 3.7,
+          "samples": 4
+        },
+        {
+          "kind": "fury-state-1",
+          "emaMs": 3.17,
+          "samples": 4
+        },
+        {
+          "kind": "power-2",
+          "emaMs": 3,
+          "samples": 4
+        },
+        {
+          "kind": "fury-state-0",
+          "emaMs": 2.86,
+          "samples": 4
+        },
+        {
+          "kind": "guard-compile",
+          "emaMs": 2.7,
+          "samples": 1
+        },
+        {
+          "kind": "props",
+          "emaMs": 2.69,
+          "samples": 16
+        },
+        {
+          "kind": "fury-state-2",
+          "emaMs": 2.46,
+          "samples": 4
+        },
+        {
+          "kind": "farm-prewarm",
+          "emaMs": 2.4,
+          "samples": 1
+        },
+        {
+          "kind": "power-3",
+          "emaMs": 2.25,
+          "samples": 4
+        },
+        {
+          "kind": "mobs",
+          "emaMs": 2.24,
+          "samples": 8
+        },
+        {
+          "kind": "upload-mid",
+          "emaMs": 2.1,
+          "samples": 71
+        },
+        {
+          "kind": "zone-prewarm-color",
+          "emaMs": 1.67,
+          "samples": 46
+        },
+        {
+          "kind": "self-spirit-warm",
+          "emaMs": 1.6,
+          "samples": 1
+        },
+        {
+          "kind": "corpus-read",
+          "emaMs": 1.57,
+          "samples": 61
+        },
+        {
+          "kind": "corpus-gzip",
+          "emaMs": 1.35,
+          "samples": 486
+        },
+        {
+          "kind": "objects",
+          "emaMs": 1.25,
+          "samples": 7
+        },
+        {
+          "kind": "scene",
+          "emaMs": 1.23,
+          "samples": 147
+        },
+        {
+          "kind": "zone-prewarm-shadow",
+          "emaMs": 1.12,
+          "samples": 46
+        },
+        {
+          "kind": "zone-prepare-compile",
+          "emaMs": 1,
+          "samples": 1
+        },
+        {
+          "kind": "players",
+          "emaMs": 0.95,
+          "samples": 6
+        },
+        {
+          "kind": "crest-compile",
+          "emaMs": 0.91,
+          "samples": 27
+        },
+        {
+          "kind": "doors",
+          "emaMs": 0.9,
+          "samples": 1
+        },
+        {
+          "kind": "fragment-compile",
+          "emaMs": 0.85,
+          "samples": 3
+        },
+        {
+          "kind": "guard-touch",
+          "emaMs": 0.8,
+          "samples": 1
+        },
+        {
+          "kind": "program",
+          "emaMs": 0.79,
+          "samples": 63
+        },
+        {
+          "kind": "interiors",
+          "emaMs": 0.74,
+          "samples": 3
+        },
+        {
+          "kind": "baked-compile",
+          "emaMs": 0.69,
+          "samples": 10
+        },
+        {
+          "kind": "npcs",
+          "emaMs": 0.57,
+          "samples": 3
+        },
+        {
+          "kind": "fragment-build",
+          "emaMs": 0.41,
+          "samples": 3
+        },
+        {
+          "kind": "upload-big",
+          "emaMs": 0.37,
+          "samples": 71
+        },
+        {
+          "kind": "reveal-gate",
+          "emaMs": 0.32,
+          "samples": 150
+        },
+        {
+          "kind": "live-gate",
+          "emaMs": 0.29,
+          "samples": 3112
+        },
+        {
+          "kind": "touch",
+          "emaMs": 0.27,
+          "samples": 1032
+        },
+        {
+          "kind": "crest-bind-kit",
+          "emaMs": 0.2,
+          "samples": 1
+        },
+        {
+          "kind": "upload",
+          "emaMs": 0.2,
+          "samples": 92
+        },
+        {
+          "kind": "fragment-touch",
+          "emaMs": 0.15,
+          "samples": 3
+        },
+        {
+          "kind": "guard-bind-steel",
+          "emaMs": 0.1,
+          "samples": 1
+        },
+        {
+          "kind": "pmrem",
+          "emaMs": 0.1,
+          "samples": 1
+        },
+        {
+          "kind": "touch-preview",
+          "emaMs": 0.08,
+          "samples": 10
+        },
+        {
+          "kind": "zone-prewarm-tex",
+          "emaMs": 0.07,
+          "samples": 53
+        },
+        {
+          "kind": "baked-touch",
+          "emaMs": 0.01,
+          "samples": 10
+        }
+      ],
+      "decisions": {
+        "actionable-floor": 0,
+        "fits": 1971,
+        "progress": 91,
+        "starvation": 245,
+        "legacy": 0,
+        "first-sample": 39,
+        "cover": 1345,
+        "no-headroom": 5893,
+        "unknown-cap": 18,
+        "pressure": 0,
+        "cover-not-arrival": 1149
+      }
+    },
+    "livePrograms": 4,
+    "gateTimeouts": 0
+  }
+}

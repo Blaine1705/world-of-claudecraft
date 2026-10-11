@@ -13,7 +13,41 @@ import {
   SUNKEN_BASTION_FIELD,
   SUNKEN_BASTION_SEA_LEVEL,
 } from '../../sim/content/sunken_bastion_layout';
+import { instanceOrigin } from '../../sim/data';
 import { authoredFieldHeight } from '../../sim/instances/authored_field';
+
+// Instance bands, rather than padded field bounds: neighbouring Bastion slots
+// are only 500 yd apart, so a padded field overlaps the next party's terrace.
+export const RAIN_SLOT_HALF_SPAN = {
+  x: (instanceOrigin(1, 0).x - instanceOrigin(0, 0).x) / 2,
+  z: (instanceOrigin(0, 1).z - instanceOrigin(0, 0).z) / 2,
+};
+
+/** Shader twin below: only this retained interior's own player band rains. */
+export function bastionRainInSlot(local: { x: number; z: number }): boolean {
+  return (
+    local.x >= -RAIN_SLOT_HALF_SPAN.x &&
+    local.x < RAIN_SLOT_HALF_SPAN.x &&
+    local.z >= -RAIN_SLOT_HALF_SPAN.z &&
+    local.z < RAIN_SLOT_HALF_SPAN.z
+  );
+}
+
+export const RAIN_SLOT_GLSL = /* glsl */ `
+uniform vec3 uPlayerXZ;
+bool bastionRainInSlot(vec2 local) {
+  return local.x >= -${RAIN_SLOT_HALF_SPAN.x.toFixed(1)} && local.x < ${RAIN_SLOT_HALF_SPAN.x.toFixed(1)} &&
+    local.y >= -${RAIN_SLOT_HALF_SPAN.z.toFixed(1)} && local.y < ${RAIN_SLOT_HALF_SPAN.z.toFixed(1)};
+}
+`;
+
+/** Every vertex is clipped together, before sampling or camera-box wrapping. */
+export const RAIN_SLOT_CLIP_GLSL = /* glsl */ `
+  if (!bastionRainInSlot(uPlayerXZ.xy - modelMatrix[3].xz)) {
+    gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+    return;
+  }
+`;
 
 export interface BastionRainTier {
   /** Falling streaks in the camera box. */
@@ -44,6 +78,35 @@ export const RAIN_SPEED = { min: 24, max: 38 } as const;
 export const RAIN_SHUTTER = { min: 0.035, max: 0.065 } as const;
 /** Radius round the camera the splashes land in (yards). */
 export const SPLASH_RADIUS = 26;
+
+/** A bounded lattice reuses offscreen cells; a surviving ring never slides. */
+export function splashLattice(count: number): { side: number; cellSize: number } {
+  const side = Math.ceil(Math.sqrt(Math.max(1, count)));
+  return { side, cellSize: (2 * SPLASH_RADIUS) / side };
+}
+
+/** CPU twin of the shader's cell placement, with cycle-local jitter in [0, 1]. */
+export function splashCellCenter(
+  cell: { x: number; z: number },
+  cameraLocal: { x: number; z: number },
+  jitter: { x: number; z: number },
+  lattice: { side: number; cellSize: number },
+): { x: number; z: number } {
+  const at = (c: number, camera: number, j: number): number => {
+    const center = (c + 0.5 + (j - 0.5) * 0.8) * lattice.cellSize;
+    const period = lattice.side * lattice.cellSize;
+    return center + period * Math.floor((camera - center + period / 2) / period);
+  };
+  return { x: at(cell.x, cameraLocal.x, jitter.x), z: at(cell.z, cameraLocal.z, jitter.z) };
+}
+
+export const SPLASH_CELL_GLSL = /* glsl */ `
+vec2 splashCellCenter(vec2 cell, vec2 cameraLocal, vec2 jitter, vec2 lattice) {
+  vec2 center = (cell + 0.5 + (jitter - 0.5) * 0.8) * lattice.y;
+  float period = lattice.x * lattice.y;
+  return center + period * floor((cameraLocal - center + period * 0.5) / period);
+}
+`;
 
 /** Gust strength in [0, 1] at `t` seconds: slow swells with quick flurries. */
 export function rainGust(t: number): number {

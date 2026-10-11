@@ -1,0 +1,2094 @@
+{
+  "branchBase": "PR4352 ab3230e6e3d435b983a86c009cb2db74bec2f920",
+  "scope": "Current authored active boss and named miniboss damaging mechanics. No production changes.",
+  "units": "Damage is input to dealDamage before source aura modifiers, target stance/DR/vulnerability and absorbs. Percentages are fractions of target maxHp unless stated bossMaxHp. Heavy attacks expose prearmor bounds separately.",
+  "caveats": [
+    "Nominal every/cast values are not guaranteed observed cast intervals: clocks, overlappingbars, movement, immunity and encounterphase scheduling delay or suppress casts.",
+    "Spell mechanics carry no player spell-power coefficient; their damage uses fixed tuning or the transformed bossweapon.",
+    "Add waves and trash damage are separate sources and are not fully enumerated here.",
+    "Hydra rows group the three heads: Freezing Breath is the left head, Venom Spit the center, Crushing Torrent the right; factors and nominal health are equal.",
+    "Any missed soul, moontear, bond, enrage, vulnerability or stacking mechanic changes output; listed ranges are unstacked baseline.",
+    "Candle drain occurs at channel ages0.5,1.5,2.5,3.5 seconds, not only on integer age.",
+    "No parse provenance inferred here: root compares live service/version/gear/context separately."
+  ],
+  "rows": [
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "sexton_marrow",
+      "bossName": "Sexton Marrow",
+      "ability": "Shovelful",
+      "normal": {
+        "min": 48,
+        "max": 75,
+        "coefficient": 1.5
+      },
+      "heroic": {
+        "min": 2214,
+        "max": 3459,
+        "coefficient": 1.5
+      },
+      "cadence": "every 11s",
+      "castSeconds": 1.2,
+      "school": "physical",
+      "armor": "heavySwing -> mobArmorReduction",
+      "source": "src/sim/encounters/hollow_crypt/marrow.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "sexton_marrow",
+      "bossName": "Sexton Marrow",
+      "ability": "Open Grave",
+      "normal": {
+        "min": 42,
+        "max": 52
+      },
+      "heroic": {
+        "min": 252,
+        "max": 312
+      },
+      "cadence": "mark every 15s; opens after 4s",
+      "castSeconds": 1,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/marrow.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "sexton_marrow",
+      "bossName": "Sexton Marrow",
+      "ability": "Grave Dirt",
+      "normal": {
+        "min": 9,
+        "max": 9
+      },
+      "heroic": {
+        "min": 54,
+        "max": 54
+      },
+      "cadence": "each 1s inside an open grave",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/marrow.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "sexton_marrow",
+      "bossName": "Sexton Marrow",
+      "ability": "Burial Toll",
+      "normal": {
+        "min": 30,
+        "max": 38
+      },
+      "heroic": {
+        "min": 180,
+        "max": 228
+      },
+      "cadence": "at 66% and 33% boss HP; 3 peals, 3s each",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/marrow.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "sexton_marrow",
+      "bossName": "Sexton Marrow",
+      "ability": "Gravedigger's Blow",
+      "normal": null,
+      "heroic": {
+        "min": 1476,
+        "max": 2306,
+        "coefficient": 1
+      },
+      "cadence": "every 9s, heroic only",
+      "castSeconds": 0.8,
+      "school": "physical",
+      "armor": "heavySwing -> mobArmorReduction",
+      "source": "src/sim/encounters/hollow_crypt/marrow.ts",
+      "note": "Adds 6% vulnerability per stack, max 6 stacks, 20s duration."
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "rimeweb",
+      "bossName": "Lady of the Bonechill",
+      "ability": "Bride's Lament",
+      "normal": {
+        "min": 60,
+        "max": 75
+      },
+      "heroic": {
+        "min": 300,
+        "max": 375
+      },
+      "cadence": "every 22s",
+      "castSeconds": 3,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/lady.ts",
+      "note": "Unsheltered targets; each existing Lingering Lament stack adds 50% to this damage, max 3."
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "rimeweb",
+      "bossName": "Lady of the Bonechill",
+      "ability": "Frozen Embrace",
+      "normal": {
+        "min": 6,
+        "max": 6
+      },
+      "heroic": {
+        "min": 30,
+        "max": 30
+      },
+      "cadence": "each 1s during 8s hold; every 30s",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/lady_embrace.ts",
+      "note": "1 victim normal, 2 heroic; break by damaging the boss for 6% max HP."
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "rimeweb",
+      "bossName": "Lady of the Bonechill",
+      "ability": "Shattering Fall",
+      "normal": {
+        "min": 150,
+        "max": 180
+      },
+      "heroic": {
+        "min": 750,
+        "max": 900
+      },
+      "cadence": "if Frozen Embrace is not answered",
+      "castSeconds": null,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/lady_embrace.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "cantor_ilvane",
+      "bossName": "Cantor Ilvane",
+      "ability": "Dirge of the Hollow",
+      "normal": {
+        "min": 105,
+        "max": 125
+      },
+      "heroic": {
+        "min": 840,
+        "max": 1000
+      },
+      "cadence": "every 16s; below30% every11s",
+      "castSeconds": 2.5,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/ilvane.ts",
+      "note": "Kickable; cast becomes 1.8s below30%."
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "cantor_ilvane",
+      "bossName": "Cantor Ilvane",
+      "ability": "Bone Organ",
+      "normal": {
+        "min": 100,
+        "max": 115
+      },
+      "heroic": {
+        "min": 800,
+        "max": 920
+      },
+      "cadence": "every 26s; 2 note waves (3 below30%)",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/ilvane_organ.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "morthen",
+      "bossName": "Morthen the Gravecaller",
+      "ability": "Shadow Pulse",
+      "normal": {
+        "min": 24,
+        "max": 30
+      },
+      "heroic": {
+        "min": 216,
+        "max": 270
+      },
+      "cadence": "every 12s, 9s in Last Rites",
+      "castSeconds": 2,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/morthen.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "morthen",
+      "bossName": "Morthen the Gravecaller",
+      "ability": "Reap the Unquiet",
+      "normal": {
+        "min": 55,
+        "max": 65
+      },
+      "heroic": {
+        "min": 495,
+        "max": 585
+      },
+      "cadence": "every 14s below35%",
+      "castSeconds": 2,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/morthen.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "morthen",
+      "bossName": "Morthen the Gravecaller",
+      "ability": "Grave Chill",
+      "normal": {
+        "perSecond": "3 + floor(ritualSeconds/5)"
+      },
+      "heroic": {
+        "perSecond": "27 + 9*floor(ritualSeconds/5)"
+      },
+      "cadence": "each1s while candle Rite is active",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/morthen.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "morthen",
+      "bossName": "Morthen the Gravecaller",
+      "ability": "Bound Soul interception",
+      "normal": {
+        "min": 12,
+        "max": 16
+      },
+      "heroic": {
+        "min": 108,
+        "max": 144
+      },
+      "cadence": "soul every 15s",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/morthen_gravecall.ts",
+      "note": "Walker snapshots mechanic factor at launch; missed souls heal boss3% and add10% output up to10 stacks."
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "morthen",
+      "bossName": "Morthen the Gravecaller",
+      "ability": "Candle's Price",
+      "normal": {
+        "targetMaxHpFractionPerSecond": 0.06
+      },
+      "heroic": {
+        "targetMaxHpFractionPerSecond": 0.08
+      },
+      "cadence": "each1s during 4s relight channel",
+      "castSeconds": 4,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/morthen_candles.ts",
+      "note": "No mechanic multiplier on percentage."
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "morthen",
+      "bossName": "Morthen the Gravecaller",
+      "ability": "Name the Dead (wrong candle)",
+      "normal": null,
+      "heroic": {
+        "min": 252,
+        "max": 288
+      },
+      "cadence": "wrong relight order, heroic only",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/morthen_candles.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "morthen",
+      "bossName": "Morthen the Gravecaller",
+      "ability": "Grasp of the Grave",
+      "normal": null,
+      "heroic": {
+        "min": 162,
+        "max": 198
+      },
+      "cadence": "every 16s; 1.5s fuse, heroic only",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/morthen_grasp.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "crypt_knellwyrm",
+      "bossName": "Knellwyrm",
+      "ability": "Wyrmcall Pyre (touchdown)",
+      "normal": {
+        "min": 60,
+        "max": 75
+      },
+      "heroic": {
+        "min": 1200,
+        "max": 1500
+      },
+      "cadence": "one touchdown after Morthen falls",
+      "castSeconds": null,
+      "school": "fire",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/knellwyrm.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "crypt_knellwyrm",
+      "bossName": "Knellwyrm",
+      "ability": "Pyre Strafe",
+      "normal": {
+        "min": 35,
+        "max": 45
+      },
+      "heroic": {
+        "min": 700,
+        "max": 900
+      },
+      "cadence": "every 26s, 2.5s marking",
+      "castSeconds": null,
+      "school": "fire",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/knellwyrm.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "crypt_knellwyrm",
+      "bossName": "Knellwyrm",
+      "ability": "Pyre Strafe burning lane",
+      "normal": {
+        "min": 14,
+        "max": 14
+      },
+      "heroic": {
+        "min": 280,
+        "max": 280
+      },
+      "cadence": "each1s for 10s",
+      "castSeconds": null,
+      "school": "fire",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/knellwyrm.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "crypt_knellwyrm",
+      "bossName": "Knellwyrm",
+      "ability": "Dread Bellow",
+      "normal": {
+        "min": 12,
+        "max": 18
+      },
+      "heroic": {
+        "min": 240,
+        "max": 360
+      },
+      "cadence": "every 30s",
+      "castSeconds": 2,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/knellwyrm.ts",
+      "note": "Boss takes25% more damage for8s afterward."
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "crypt_knellwyrm",
+      "bossName": "Knellwyrm",
+      "ability": "Barrowflame Breath",
+      "normal": {
+        "min": 30,
+        "max": 38
+      },
+      "heroic": {
+        "min": 600,
+        "max": 760
+      },
+      "cadence": "every 13s",
+      "castSeconds": 2,
+      "school": "fire",
+      "armor": "none at damage callsite",
+      "source": "src/sim/mob/mob_cast_bars.ts (MOBS.crypt_knellwyrm.breathCone)",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "crypt_knellwyrm",
+      "bossName": "Knellwyrm",
+      "ability": "Tail Lash",
+      "normal": {
+        "min": 20,
+        "max": 28
+      },
+      "heroic": {
+        "min": 400,
+        "max": 560
+      },
+      "cadence": "every10s",
+      "castSeconds": 1,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/content/hollow_crypt.ts (MOBS.crypt_knellwyrm.trashKit)",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "crypt_knellwyrm",
+      "bossName": "Knellwyrm",
+      "ability": "Wing Gust",
+      "normal": {
+        "min": 12,
+        "max": 18
+      },
+      "heroic": {
+        "min": 240,
+        "max": 360
+      },
+      "cadence": "every19s",
+      "castSeconds": 1.5,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/content/hollow_crypt.ts (MOBS.crypt_knellwyrm.trashKit)",
+      "note": ""
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "crypt_knellwyrm",
+      "bossName": "Knellwyrm",
+      "ability": "Burning Knell",
+      "normal": null,
+      "heroic": {
+        "min": 1000,
+        "max": 1120
+      },
+      "cadence": "every55s; 3 breaths; 4.5s marks, heroic only",
+      "castSeconds": null,
+      "school": "fire",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/hollow_crypt/knellwyrm_knell.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "knight_commander_olen",
+      "bossName": "Knight-Commander Olen",
+      "ability": "Rebounding Bulwark",
+      "normal": {
+        "min": 60,
+        "max": 70
+      },
+      "heroic": {
+        "min": 360,
+        "max": 420
+      },
+      "cadence": "every18s",
+      "castSeconds": 1.5,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/olen.ts",
+      "note": "Up to3 victims normal,4heroic; rebounces every0.35s."
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "knight_commander_olen",
+      "bossName": "Knight-Commander Olen",
+      "ability": "Sentence of the Tide",
+      "normal": {
+        "min": 110,
+        "max": 125
+      },
+      "heroic": {
+        "min": 660,
+        "max": 750
+      },
+      "cadence": "every22s; 5s mark",
+      "castSeconds": 1,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/olen.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "knight_commander_olen",
+      "bossName": "Knight-Commander Olen",
+      "ability": "Hallowed Brine",
+      "normal": {
+        "perSecond": 18
+      },
+      "heroic": {
+        "perSecond": 156
+      },
+      "cadence": "every14s, lasts15s",
+      "castSeconds": 1.2,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/olen.ts",
+      "note": "Heroic chooses26 then multiplies6:156/s; Olen has40%DR while in pool."
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "gaoler_ossick",
+      "bossName": "Gaoler Ossick",
+      "ability": "Gaoler's Cudgel",
+      "normal": {
+        "min": 77,
+        "max": 119,
+        "coefficient": 1.5
+      },
+      "heroic": {
+        "min": 2126,
+        "max": 3321,
+        "coefficient": 1.5
+      },
+      "cadence": "every12s",
+      "castSeconds": 1,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/ossick.ts",
+      "note": "Direct weapon coefficient; no mechanic multiplier and no armor call."
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "gaoler_ossick",
+      "bossName": "Gaoler Ossick",
+      "ability": "Anchor Crash",
+      "normal": null,
+      "heroic": {
+        "min": 300,
+        "max": 360
+      },
+      "cadence": "on anchor cast, every24s, heroic only",
+      "castSeconds": 1.8,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/ossick.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "gaoler_ossick",
+      "bossName": "Gaoler Ossick",
+      "ability": "Shackle Strain",
+      "normal": {
+        "min": 40,
+        "max": 50
+      },
+      "heroic": {
+        "min": 240,
+        "max": 300
+      },
+      "cadence": "each1s while too far apart, 12s tether, every28s",
+      "castSeconds": 1.2,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/ossick.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "gaoler_ossick",
+      "bossName": "Gaoler Ossick",
+      "ability": "Drowning Pit",
+      "normal": {
+        "targetMaxHpFraction": 0.6
+      },
+      "heroic": {
+        "targetMaxHpFraction": 0.8
+      },
+      "cadence": "failed anchor rescue, every24s",
+      "castSeconds": 1.8,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/ossick.ts",
+      "note": "Dragged over8s normal/7s heroic. No mechanic multiplier."
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "gaol_turnkey",
+      "bossName": "Gaol Turnkey",
+      "ability": "Crushing Irons",
+      "normal": {
+        "targetMaxHpFraction": 0.3
+      },
+      "heroic": {
+        "targetMaxHpFraction": 0.45
+      },
+      "cadence": "after10s failed cage, cage every24s",
+      "castSeconds": 1.6,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/turnkey.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "gaol_turnkey",
+      "bossName": "Gaol Turnkey",
+      "ability": "Brine Flood",
+      "normal": null,
+      "heroic": {
+        "targetMaxHpFractionPerTick": "0.02 + 0.01*(second-1)"
+      },
+      "cadence": "each1s in heroic cage",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/turnkey.ts",
+      "note": "2%,3%,...,11% over10s if never rescued; no mechanic multiplier."
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "vael_the_mistcaller",
+      "bossName": "Vael the Fogbinder",
+      "ability": "Mist Surge",
+      "normal": {
+        "min": 30,
+        "max": 40
+      },
+      "heroic": {
+        "min": 180,
+        "max": 240
+      },
+      "cadence": "every12s; 8s below25%",
+      "castSeconds": 1.5,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/vael.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "vael_the_mistcaller",
+      "bossName": "Vael the Fogbinder",
+      "ability": "Fogburst",
+      "normal": {
+        "min": 50,
+        "max": 60
+      },
+      "heroic": {
+        "min": 300,
+        "max": 360
+      },
+      "cadence": "wrong shadow struck during veil at70%/40%",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/vael.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "vael_the_mistcaller",
+      "bossName": "Vael the Fogbinder",
+      "ability": "Drowning Hymn",
+      "normal": {
+        "perSecond": "8 + 3*floor(veilElapsed/3)"
+      },
+      "heroic": {
+        "perSecond": "48 + 18*floor(veilElapsed/3)"
+      },
+      "cadence": "each1s in 18s veil",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/vael.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "vael_the_mistcaller",
+      "bossName": "Vael the Fogbinder",
+      "ability": "Reaping Scythe",
+      "normal": {
+        "min": 60,
+        "max": 70
+      },
+      "heroic": {
+        "min": 360,
+        "max": 420
+      },
+      "cadence": "every20s, chain of3",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/vael_shadowstep.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "vael_the_mistcaller",
+      "bossName": "Vael the Fogbinder",
+      "ability": "Grave Shadow",
+      "normal": null,
+      "heroic": {
+        "min": 108,
+        "max": 108
+      },
+      "cadence": "each1s for6s, heroic only",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/sunken_bastion/vael_shadowstep.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "turretback_hermit",
+      "bossName": "The Turretback Hermit",
+      "ability": "Claw Sweep",
+      "normal": {
+        "min": 90,
+        "max": 110
+      },
+      "heroic": {
+        "min": 720,
+        "max": 880
+      },
+      "cadence": "every12s",
+      "castSeconds": 2,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/content/sunken_bastion.ts (MOBS.turretback_hermit)",
+      "note": ""
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "turretback_hermit",
+      "bossName": "The Turretback Hermit",
+      "ability": "Shell Slam",
+      "normal": {
+        "min": 50,
+        "max": 60
+      },
+      "heroic": {
+        "min": 400,
+        "max": 480
+      },
+      "cadence": "every16s",
+      "castSeconds": 1.5,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/content/sunken_bastion.ts (MOBS.turretback_hermit)",
+      "note": "Withdraw at25% cuts taken damage60% for6s; summons2crawlers at60%/30%."
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "choirmother_selthe",
+      "bossName": "Choirmother Selthe",
+      "ability": "Moonwater Bolt",
+      "normal": {
+        "min": 76,
+        "max": 118,
+        "coefficient": 1.2
+      },
+      "heroic": {
+        "min": 1632,
+        "max": 2550,
+        "coefficient": 1.2
+      },
+      "cadence": "repeated 2s cast +0.5s gap",
+      "castSeconds": 2,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/selthe.ts",
+      "note": "Kickable. She never melees; no mechanic multiplier on weapon roll."
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "choirmother_selthe",
+      "bossName": "Choirmother Selthe",
+      "ability": "Sea-Song",
+      "normal": {
+        "min": 35,
+        "max": 45
+      },
+      "heroic": {
+        "min": 158,
+        "max": 203
+      },
+      "cadence": "every10s",
+      "castSeconds": 1.5,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/selthe.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "choirmother_selthe",
+      "bossName": "Choirmother Selthe",
+      "ability": "Mere Surge",
+      "normal": {
+        "min": 110,
+        "max": 130
+      },
+      "heroic": {
+        "min": 495,
+        "max": 585
+      },
+      "cadence": "every18s",
+      "castSeconds": 3,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/selthe.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "choirmother_selthe",
+      "bossName": "Choirmother Selthe",
+      "ability": "Chorus",
+      "normal": {
+        "totalSplitAmongCaught": 400
+      },
+      "heroic": {
+        "totalSplitAmongCaught": 1800
+      },
+      "cadence": "every25s after5s mark",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/selthe.ts",
+      "note": "Each target gets round((400/n)*difficultyFactor), before othermodifiers."
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "choirmother_selthe",
+      "bossName": "Choirmother Selthe",
+      "ability": "Solo",
+      "normal": {
+        "min": 150,
+        "max": 150
+      },
+      "heroic": {
+        "min": 675,
+        "max": 675
+      },
+      "cadence": "every25s, offset12s, after5s mark",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/selthe.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "choirmother_selthe",
+      "bossName": "Choirmother Selthe",
+      "ability": "Drowning Aria",
+      "normal": {
+        "damagePerSecond": [
+          30,
+          40,
+          50,
+          60,
+          70
+        ]
+      },
+      "heroic": {
+        "damagePerSecond": [
+          135,
+          180,
+          225,
+          270,
+          315
+        ]
+      },
+      "cadence": "every22s, 5s channel",
+      "castSeconds": 5,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/selthe.ts",
+      "note": "Resets ramp when a different body catches beam; kick or loss oflineofsight ends."
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "choirmother_selthe",
+      "bossName": "Choirmother Selthe",
+      "ability": "Chorus Echo",
+      "normal": null,
+      "heroic": {
+        "min": 540,
+        "max": 540
+      },
+      "cadence": "after4s, heroic only",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/selthe.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "choirmother_selthe",
+      "bossName": "Choirmother Selthe",
+      "ability": "Solo Echo",
+      "normal": null,
+      "heroic": {
+        "min": 675,
+        "max": 675
+      },
+      "cadence": "after4s, heroic only",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/selthe.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "mere_hydra_head_left",
+      "bossName": "Mere Hydra",
+      "ability": "Freezing Breath",
+      "normal": {
+        "min": 110,
+        "max": 130
+      },
+      "heroic": {
+        "min": 660,
+        "max": 780
+      },
+      "cadence": "every12s",
+      "castSeconds": 2,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/hydra_elements.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "mere_hydra_head_left",
+      "bossName": "Mere Hydra",
+      "ability": "Venom Spit",
+      "normal": {
+        "min": 60,
+        "max": 75
+      },
+      "heroic": {
+        "min": 360,
+        "max": 450
+      },
+      "cadence": "every10s, 3 marks, 1.5s warning",
+      "castSeconds": null,
+      "school": "nature",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/hydra_elements.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "mere_hydra_head_left",
+      "bossName": "Mere Hydra",
+      "ability": "Venom pool",
+      "normal": {
+        "min": 20,
+        "max": 20
+      },
+      "heroic": {
+        "min": 120,
+        "max": 120
+      },
+      "cadence": "each1s for6s",
+      "castSeconds": null,
+      "school": "nature",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/hydra_elements.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "mere_hydra_head_left",
+      "bossName": "Mere Hydra",
+      "ability": "Crushing Torrent",
+      "normal": {
+        "min": 90,
+        "max": 110
+      },
+      "heroic": {
+        "min": 540,
+        "max": 660
+      },
+      "cadence": "every12s",
+      "castSeconds": 2,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/hydra_elements.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "mere_hydra_head_left",
+      "bossName": "Mere Hydra",
+      "ability": "Tsunami",
+      "normal": {
+        "min": 160,
+        "max": 190
+      },
+      "heroic": {
+        "min": 960,
+        "max": 1140
+      },
+      "cadence": "every40s; heroic backwash after3.5s",
+      "castSeconds": 4.5,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/hydra_tsunami.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "mere_hydra_head_left",
+      "bossName": "Mere Hydra",
+      "ability": "Frostlocked Torrent",
+      "normal": {
+        "min": 90,
+        "max": 110
+      },
+      "heroic": {
+        "min": 540,
+        "max": 660
+      },
+      "cadence": "combined breaths between tsunamis",
+      "castSeconds": 2,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/hydra_combo.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "mere_hydra_head_left",
+      "bossName": "Mere Hydra",
+      "ability": "Ice Shards",
+      "normal": {
+        "min": 60,
+        "max": 75
+      },
+      "heroic": {
+        "min": 360,
+        "max": 450
+      },
+      "cadence": "ice wall destroyed by tsunami",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/hydra_combo.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "mere_hydra_head_left",
+      "bossName": "Mere Hydra",
+      "ability": "Venom Current",
+      "normal": {
+        "min": 30,
+        "max": 30
+      },
+      "heroic": {
+        "min": 180,
+        "max": 180
+      },
+      "cadence": "each1s inside sliding current",
+      "castSeconds": null,
+      "school": "nature",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/hydra_combo.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "mere_hydra_head_left",
+      "bossName": "Mere Hydra",
+      "ability": "Toxic Rime",
+      "normal": {
+        "min": 100,
+        "max": 120
+      },
+      "heroic": {
+        "min": 600,
+        "max": 720
+      },
+      "cadence": "after4s crystals",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/hydra_combo.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "tideglass_colossus",
+      "bossName": "Tideglass Colossus",
+      "ability": "Moonlight Lance",
+      "normal": {
+        "min": 90,
+        "max": 110
+      },
+      "heroic": {
+        "min": 450,
+        "max": 550
+      },
+      "cadence": "every12s",
+      "castSeconds": 2,
+      "school": "arcane",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/tideglass_colossus.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "tideglass_colossus",
+      "bossName": "Tideglass Colossus",
+      "ability": "Resonant Slam",
+      "normal": {
+        "min": 70,
+        "max": 90
+      },
+      "heroic": {
+        "min": 350,
+        "max": 450
+      },
+      "cadence": "every14s",
+      "castSeconds": 1.5,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/tideglass_colossus.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "tideglass_colossus",
+      "bossName": "Tideglass Colossus",
+      "ability": "Shattering Glass",
+      "normal": null,
+      "heroic": {
+        "min": 400,
+        "max": 400
+      },
+      "cadence": "reflection death, heroic only",
+      "castSeconds": null,
+      "school": "arcane",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/tideglass_colossus.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "tideglass_colossus",
+      "bossName": "Tideglass Colossus",
+      "ability": "Tideglass Fracture",
+      "normal": {
+        "min": 120,
+        "max": 130
+      },
+      "heroic": {
+        "min": 600,
+        "max": 650
+      },
+      "cadence": "every32s,3 rounds, 2.5s warning N/2s H",
+      "castSeconds": 1.5,
+      "school": "arcane",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/tideglass_fracture.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "ysolei",
+      "bossName": "Ysolei, Avatar of the Drowned Moon",
+      "ability": "Lunar Tide",
+      "normal": {
+        "min": 60,
+        "max": 80
+      },
+      "heroic": {
+        "min": 300,
+        "max": 400
+      },
+      "cadence": "every10s",
+      "castSeconds": 1.5,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/ysolei.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "ysolei",
+      "bossName": "Ysolei, Avatar of the Drowned Moon",
+      "ability": "Tidal Crash",
+      "normal": {
+        "min": 250,
+        "max": 300
+      },
+      "heroic": {
+        "min": 1250,
+        "max": 1500
+      },
+      "cadence": "Undertow every25s, 3s pull",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/ysolei.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "ysolei",
+      "bossName": "Ysolei, Avatar of the Drowned Moon",
+      "ability": "Rising Tide",
+      "normal": {
+        "min": 45,
+        "max": 45
+      },
+      "heroic": {
+        "min": 225,
+        "max": 225
+      },
+      "cadence": "each1s flooded half; flips every30s below66%",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/ysolei.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "ysolei",
+      "bossName": "Ysolei, Avatar of the Drowned Moon",
+      "ability": "Riptide",
+      "normal": null,
+      "heroic": {
+        "min": 200,
+        "max": 200
+      },
+      "cadence": "each1s for10s after Undertow, heroic only",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/ysolei.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "ysolei",
+      "bossName": "Ysolei, Avatar of the Drowned Moon",
+      "ability": "Moonlight Tear",
+      "normal": {
+        "min": 70,
+        "max": 85
+      },
+      "heroic": {
+        "min": 350,
+        "max": 425
+      },
+      "cadence": "75%/45% bossHP;3tears N/4H",
+      "castSeconds": 3,
+      "school": "arcane",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/ysolei_moon.ts",
+      "note": "Moonsear existingstacks multiply damage by1+1.5*stacks. Uncaughttear heals boss2% andadds10%output."
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "ysolei",
+      "bossName": "Ysolei, Avatar of the Drowned Moon",
+      "ability": "Spilled Moonlight",
+      "normal": {
+        "min": 30,
+        "max": 30
+      },
+      "heroic": {
+        "min": 150,
+        "max": 150
+      },
+      "cadence": "each1s for8s",
+      "castSeconds": null,
+      "school": "arcane",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/ysolei_moon.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "ysolei",
+      "bossName": "Ysolei, Avatar of the Drowned Moon",
+      "ability": "Falling Moon",
+      "normal": {
+        "min": 300,
+        "max": 340
+      },
+      "heroic": {
+        "min": 1500,
+        "max": 1700
+      },
+      "cadence": "20%HP if ward notbroken within12sN/10sH",
+      "castSeconds": 12,
+      "school": "arcane",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/drowned_temple/ysolei_moon.ts",
+      "note": "Heroic10scast; ward6%bossmaxHP; successfulbreak5sstun+25%vulnerability."
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "sledge_tusker",
+      "bossName": "Sledge Tusker",
+      "ability": "Tusk Sweep",
+      "normal": {
+        "min": 180,
+        "max": 220
+      },
+      "heroic": {
+        "min": 450,
+        "max": 550
+      },
+      "cadence": "every12s",
+      "castSeconds": 1.5,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/sledge_tusker.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "sledge_tusker",
+      "bossName": "Sledge Tusker",
+      "ability": "Trample",
+      "normal": {
+        "min": 200,
+        "max": 240
+      },
+      "heroic": {
+        "min": 500,
+        "max": 600
+      },
+      "cadence": "every16s",
+      "castSeconds": 2,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/sledge_tusker.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "sledge_tusker",
+      "bossName": "Sledge Tusker",
+      "ability": "Spilled Braziers",
+      "normal": {
+        "min": 36,
+        "max": 44
+      },
+      "heroic": {
+        "min": 90,
+        "max": 110
+      },
+      "cadence": "each1s for10s at50%HP",
+      "castSeconds": null,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/sledge_tusker.ts",
+      "note": "At20%HP,30%damagebuff affects all output."
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korgath_the_bound",
+      "bossName": "Korgath the Bound",
+      "ability": "Maul Arc",
+      "normal": {
+        "min": 1024,
+        "max": 1600,
+        "coefficient": 1.3
+      },
+      "heroic": {
+        "min": 2220,
+        "max": 3468,
+        "coefficient": 1.3
+      },
+      "cadence": "every10s after hammer chain breaks",
+      "castSeconds": 1.6,
+      "school": "physical",
+      "armor": "armorReduction(p.stats.armor,boss.level), not effectiveArmorOf/mobArmorReduction",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korgath.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korgath_the_bound",
+      "bossName": "Korgath the Bound",
+      "ability": "Chain Flail",
+      "normal": {
+        "min": 200,
+        "max": 240
+      },
+      "heroic": {
+        "min": 500,
+        "max": 600
+      },
+      "cadence": "every14s aftertongsbreak",
+      "castSeconds": 2,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korgath.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korgath_the_bound",
+      "bossName": "Korgath the Bound",
+      "ability": "Threshold Charge",
+      "normal": {
+        "min": 180,
+        "max": 220
+      },
+      "heroic": {
+        "min": 450,
+        "max": 550
+      },
+      "cadence": "every18s afteranvilbreak",
+      "castSeconds": 2,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korgath.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korgath_the_bound",
+      "bossName": "Korgath the Bound",
+      "ability": "Foreman's Bellow",
+      "normal": {
+        "min": 100,
+        "max": 120
+      },
+      "heroic": {
+        "min": 250,
+        "max": 300
+      },
+      "cadence": "every20s afterbellowsbreak",
+      "castSeconds": 2,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korgath.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korgath_the_bound",
+      "bossName": "Korgath the Bound",
+      "ability": "Strain",
+      "normal": {
+        "min": 180,
+        "max": 220
+      },
+      "heroic": {
+        "min": 450,
+        "max": 550
+      },
+      "cadence": "every20s; heroic1chainleft every10s",
+      "castSeconds": 2,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korgath.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korgath_the_bound",
+      "bossName": "Korgath the Bound",
+      "ability": "Shuddering Stomp",
+      "normal": {
+        "min": 190,
+        "max": 285
+      },
+      "heroic": {
+        "min": 475,
+        "max": 713
+      },
+      "cadence": "every12s",
+      "castSeconds": 1.5,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korgath.ts",
+      "note": "Melee enragebelow30%:1.5damage,1.3haste; doesnot multiply these scripted min/max."
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "grand_necromancer_velkhar",
+      "bossName": "Grand Necromancer Velkhar",
+      "ability": "Soulfire Trench",
+      "normal": {
+        "min": 200,
+        "max": 240
+      },
+      "heroic": {
+        "min": 500,
+        "max": 600
+      },
+      "cadence": "every18s",
+      "castSeconds": 2,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/velkhar.ts",
+      "note": "Damage on castlanding in meltedzones; persistentstrip itself has no timed damage call."
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "grand_necromancer_velkhar",
+      "bossName": "Grand Necromancer Velkhar",
+      "ability": "Shadow Volley",
+      "normal": {
+        "min": 90,
+        "max": 110
+      },
+      "heroic": {
+        "min": 225,
+        "max": 275
+      },
+      "cadence": "every12s",
+      "castSeconds": 1.5,
+      "school": "shadow",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/velkhar.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "grand_necromancer_velkhar",
+      "bossName": "Grand Necromancer Velkhar",
+      "ability": "Unquenched Tithe (boss heal)",
+      "normal": {
+        "bossMaxHpFraction": 0.02
+      },
+      "heroic": {
+        "bossMaxHpFraction": 0.02
+      },
+      "cadence": "each unquenchedBonewalker re-rises after4s",
+      "castSeconds": null,
+      "school": "heal",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/velkhar.ts",
+      "note": "Normal raisedat60%HP; heroicfullHP+25%damage. Grasp increases addoutput30% inwater; WarmHands createswater after3sstill."
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korzul_the_gravewyrm",
+      "bossName": "Korzul the Gravewyrm",
+      "ability": "Grave Breath",
+      "normal": {
+        "min": 250,
+        "max": 300
+      },
+      "heroic": {
+        "min": 625,
+        "max": 750
+      },
+      "cadence": "every15s;12s lastphase",
+      "castSeconds": 2,
+      "school": "fire",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korzul.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korzul_the_gravewyrm",
+      "bossName": "Korzul the Gravewyrm",
+      "ability": "Tail Sweep",
+      "normal": {
+        "min": 200,
+        "max": 240
+      },
+      "heroic": {
+        "min": 500,
+        "max": 600
+      },
+      "cadence": "every12s",
+      "castSeconds": 1.2,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korzul.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korzul_the_gravewyrm",
+      "bossName": "Korzul the Gravewyrm",
+      "ability": "Grave Inferno",
+      "normal": {
+        "pulses": [
+          [
+            70,
+            90
+          ],
+          [
+            140,
+            180
+          ],
+          [
+            210,
+            270
+          ],
+          [
+            280,
+            360
+          ]
+        ],
+        "total": [
+          700,
+          900
+        ]
+      },
+      "heroic": {
+        "pulses": [
+          [
+            175,
+            225
+          ],
+          [
+            350,
+            450
+          ],
+          [
+            525,
+            675
+          ],
+          [
+            700,
+            900
+          ]
+        ],
+        "total": [
+          1750,
+          2250
+        ]
+      },
+      "cadence": "every30s +50%HP;4pulses every2s",
+      "castSeconds": 8,
+      "school": "fire",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korzul.ts",
+      "note": "Doused if ownplatebreaks; channel has no melee."
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korzul_the_gravewyrm",
+      "bossName": "Korzul the Gravewyrm",
+      "ability": "Quench-Water",
+      "normal": {
+        "min": 60,
+        "max": 60
+      },
+      "heroic": {
+        "min": 150,
+        "max": 150
+      },
+      "cadence": "each1s onbrokenplate",
+      "castSeconds": null,
+      "school": "frost",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korzul.ts",
+      "note": "Actual codeuses60*mechanicMult=>N60/H150; quenchPerSecondHeroic150constantunused."
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korzul_the_gravewyrm",
+      "bossName": "Korzul the Gravewyrm",
+      "ability": "Plunging Fire",
+      "normal": {
+        "min": 300,
+        "max": 350
+      },
+      "heroic": {
+        "min": 750,
+        "max": 875
+      },
+      "cadence": "during24sflights at70%/40%;3swarning",
+      "castSeconds": null,
+      "school": "fire",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korzul.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "korzul_the_gravewyrm",
+      "bossName": "Korzul the Gravewyrm",
+      "ability": "Crashing Descent",
+      "normal": {
+        "min": 250,
+        "max": 300
+      },
+      "heroic": {
+        "min": 625,
+        "max": 750
+      },
+      "cadence": "endofflight;3swarning",
+      "castSeconds": null,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/gravewyrm_sanctum/korzul.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "great_saurian",
+      "bossName": "Great Saurian",
+      "ability": "Tail Swipe",
+      "normal": {
+        "min": 180,
+        "max": 220
+      },
+      "heroic": {
+        "min": 450,
+        "max": 550
+      },
+      "cadence": "every12s",
+      "castSeconds": 1,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/great_saurian.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "great_saurian",
+      "bossName": "Great Saurian",
+      "ability": "Earthshaking Stomp",
+      "normal": {
+        "min": 160,
+        "max": 200
+      },
+      "heroic": {
+        "min": 400,
+        "max": 500
+      },
+      "cadence": "every16s",
+      "castSeconds": 2,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/great_saurian.ts",
+      "note": "20%HPenrageadds30%alloutput;50%HPspawnsHowdahHexcaller."
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "wildheart_beastmaster",
+      "bossName": "Fanglord Beastmaster",
+      "ability": "Beast Pit Quake",
+      "normal": {
+        "min": 180,
+        "max": 220
+      },
+      "heroic": {
+        "min": 450,
+        "max": 550
+      },
+      "cadence": "every13s",
+      "castSeconds": 1.5,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/beastmaster.ts",
+      "note": "PackBondadds20%output and50%DR whilepairwithin15ydN/20ydH."
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "fanglord_jaguar",
+      "bossName": "Fanglord's Great Jaguar",
+      "ability": "Jaguar Bite",
+      "normal": {
+        "min": 120,
+        "max": 150
+      },
+      "heroic": {
+        "min": 300,
+        "max": 375
+      },
+      "cadence": "every2s during10s fixate",
+      "castSeconds": null,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/beastmaster.ts",
+      "note": "Jaguar ordinaryautos suppressed by swingTimer>=0.5 in stepStalk; this scriptedbite isactual attack."
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "fanglord_jaguar",
+      "bossName": "Fanglord's Great Jaguar",
+      "ability": "Rending Bite",
+      "normal": {
+        "min": 20,
+        "max": 20
+      },
+      "heroic": {
+        "min": 50,
+        "max": 50
+      },
+      "cadence": "each2s for6s",
+      "castSeconds": null,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/beastmaster.ts",
+      "note": "20damage N/50H per2stick; bleedarmorignored; sourcebuffsandbleedvulnerability mayraise."
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "the_gorgebloom",
+      "bossName": "The Gorgebloom",
+      "ability": "Vine Lash",
+      "normal": {
+        "min": 180,
+        "max": 220
+      },
+      "heroic": {
+        "min": 450,
+        "max": 550
+      },
+      "cadence": "every10s",
+      "castSeconds": 1.5,
+      "school": "nature",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/gorgebloom.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "the_gorgebloom",
+      "bossName": "The Gorgebloom",
+      "ability": "Gorge",
+      "normal": {
+        "min": 1062,
+        "max": 1658,
+        "coefficient": 2
+      },
+      "heroic": {
+        "min": 3100,
+        "max": 4846,
+        "coefficient": 2
+      },
+      "cadence": "every15s",
+      "castSeconds": 1.5,
+      "school": "physical",
+      "armor": "heavySwing -> mobArmorReduction",
+      "source": "src/sim/encounters/wildheart_basin/gorgebloom.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "the_gorgebloom",
+      "bossName": "The Gorgebloom",
+      "ability": "Digesting",
+      "normal": {
+        "min": 40,
+        "max": 40
+      },
+      "heroic": {
+        "min": 100,
+        "max": 100
+      },
+      "cadence": "each1s for6s",
+      "castSeconds": null,
+      "school": "nature",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/gorgebloom.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "the_gorgebloom",
+      "bossName": "The Gorgebloom",
+      "ability": "Bloom Spit",
+      "normal": {
+        "min": 140,
+        "max": 170
+      },
+      "heroic": {
+        "min": 350,
+        "max": 425
+      },
+      "cadence": "every2s aftertargetoutofreach1.5s",
+      "castSeconds": null,
+      "school": "nature",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/gorgebloom.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "wildheart_high_priest",
+      "bossName": "Zulgar, Voice of the Basin",
+      "ability": "Wildheart Pulse",
+      "normal": {
+        "min": 170,
+        "max": 243
+      },
+      "heroic": {
+        "min": 425,
+        "max": 608
+      },
+      "cadence": "every12s",
+      "castSeconds": 1.5,
+      "school": "nature",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/zulgar.ts",
+      "note": ""
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "wildheart_high_priest",
+      "bossName": "Zulgar, Voice of the Basin",
+      "ability": "Mauled",
+      "normal": {
+        "min": 500,
+        "max": 500
+      },
+      "heroic": {
+        "min": 1250,
+        "max": 1250
+      },
+      "cadence": "caughtduring20shunts at70%/40%HP",
+      "castSeconds": null,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/zulgar.ts",
+      "note": "1spauseaftercatch;5sPreyrespite; normal500/H1250 beforemods."
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "wildheart_high_priest",
+      "bossName": "Zulgar, Voice of the Basin",
+      "ability": "Ambush",
+      "normal": null,
+      "heroic": {
+        "min": 625,
+        "max": 750
+      },
+      "cadence": "heroichunt;1.5s floorwarning",
+      "castSeconds": null,
+      "school": "physical",
+      "armor": "none at damage callsite",
+      "source": "src/sim/encounters/wildheart_basin/zulgar.ts",
+      "note": ""
+    }
+  ],
+  "hpChecks": [
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "rimeweb",
+      "name": "Frozen Embrace release damage",
+      "bossMaxHpFraction": 0.06,
+      "normal": 240,
+      "heroic": 1103,
+      "source": "src/sim/encounters/hollow_crypt/lady_embrace.ts",
+      "note": "",
+      "rounding": "ceil requiredinteger damage"
+    },
+    {
+      "dungeon": "hollow_crypt",
+      "bossId": "morthen",
+      "name": "Gorged soul bossheal",
+      "bossMaxHpFraction": 0.03,
+      "normal": 204,
+      "heroic": 865,
+      "source": "src/sim/encounters/hollow_crypt/morthen_gravecall.ts",
+      "note": "",
+      "rounding": "Math.round"
+    },
+    {
+      "dungeon": "sunken_bastion",
+      "bossId": "vael_the_mistcaller",
+      "name": "Fog Veil break damage",
+      "bossMaxHpFraction": 0.05,
+      "normal": 600,
+      "heroic": 1723,
+      "source": "src/sim/encounters/sunken_bastion/vael.ts",
+      "note": "",
+      "rounding": "ceil requiredinteger damage"
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "tideglass_colossus",
+      "name": "Reflection maxHP",
+      "bossMaxHpFraction": 0.08,
+      "normal": 920,
+      "heroic": 1840,
+      "source": "src/sim/encounters/drowned_temple/tideglass_colossus.ts",
+      "note": "One reflection perpresentplayer on75%/50%/25% flare; ownercannotdamage ownreflection.",
+      "rounding": "Math.round"
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "ysolei",
+      "name": "Plenilune Ward absorb",
+      "bossMaxHpFraction": 0.06,
+      "normal": 1080,
+      "heroic": 2070,
+      "source": "src/sim/encounters/drowned_temple/ysolei_moon.ts",
+      "note": "",
+      "rounding": "Math.round"
+    },
+    {
+      "dungeon": "drowned_temple",
+      "bossId": "ysolei",
+      "name": "Moonswell missedtear bossheal",
+      "bossMaxHpFraction": 0.02,
+      "normal": 360,
+      "heroic": 690,
+      "source": "src/sim/encounters/drowned_temple/ysolei_moon.ts",
+      "note": "",
+      "rounding": "Math.round"
+    },
+    {
+      "dungeon": "gravewyrm_sanctum",
+      "bossId": "grand_necromancer_velkhar",
+      "name": "Unquenched Tithe heal",
+      "bossMaxHpFraction": 0.02,
+      "normal": 300,
+      "heroic": 460,
+      "source": "src/sim/encounters/gravewyrm_sanctum/velkhar.ts",
+      "note": "",
+      "rounding": "Math.round"
+    },
+    {
+      "dungeon": "wildheart_basin",
+      "bossId": "wildheart_beastmaster",
+      "name": "Thickhide Ward absorb",
+      "normal": 600,
+      "heroic": 900,
+      "every": 18,
+      "seconds": 8,
+      "source": "src/sim/encounters/wildheart_basin/beastmaster.ts",
+      "note": "Explicit authored difficulty amounts; nohealth multiplier."
+    }
+  ]
+}
