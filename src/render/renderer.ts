@@ -576,7 +576,6 @@ import {
 } from './paladin_sun_verdict_visual';
 import { projectionScalePixels } from './perceptual_lod_core';
 import { buildPickOnlyObjectBody, isPickOnlyObjectTemplate } from './pick_only_objects';
-import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
 import { type RankedPointLight, reconcileViewPointLights } from './point_light_budget';
@@ -865,6 +864,7 @@ import { precipForBiome } from './weather_field_core';
 import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_fallback';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
 import { WorldBossLayer } from './world_boss_layer';
+import { resolveWorldDirectPick } from './world_direct_pick';
 import { WorldGuidance } from './world_guidance';
 import { syncWorldQuestCarryView, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
@@ -12370,15 +12370,15 @@ export class Renderer {
     return result;
   }
 
-  pick(clientX: number, clientY: number): number | null {
-    const direct = this.pickDirect(clientX, clientY);
+  pick(clientX: number, clientY: number, attackIntent = false): number | null {
+    const direct = this.pickDirect(clientX, clientY, attackIntent);
     if (direct !== null) return direct;
     return this.pickSloppy(clientX, clientY);
   }
 
   // The direct half of pick(): a visible nameplate health bar or an entity mesh.
   // Split out so gather-node callers can slot their raycast before pickSloppy.
-  pickDirect(clientX: number, clientY: number): number | null {
+  pickDirect(clientX: number, clientY: number, attackIntent = false): number | null {
     const nameplate = this.nameplatePainter.pickEntityAt(clientX, clientY);
     if (nameplate !== null) return nameplate;
     this.raycastNdc.set(
@@ -12414,7 +12414,7 @@ export class Renderer {
     }
     hits.length = 0;
     if (directHitIds.length === 0) return null;
-    return resolveDirectPickEntityId(directHitIds, this.sim.entities, this.sim.player.targetId);
+    return resolveWorldDirectPick(directHitIds, this.sim, attackIntent);
   }
 
   // The forgiving-assist half of pick(): snap to the nearest targetable
