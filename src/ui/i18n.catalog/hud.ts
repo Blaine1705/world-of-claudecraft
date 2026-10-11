@@ -37,6 +37,12 @@ const hudStringsEn = {
       deathRecapCrit: 'Crit',
       deathRecapDamage: 'Damage',
       deathRecapHeal: 'Healing',
+      deathRecapRaidDeaths: 'Raid Deaths ({count})',
+      deathRecapAllDeaths: 'All Deaths',
+      deathRecapOrder: '#{order}',
+      deathRecapViewCards: 'Details',
+      deathRecapBackToOverview: 'Back to Overview',
+      deathRecapFirstDeath: 'First Death',
       chatTab: 'Chat',
       combatLogTab: 'Combat Log',
       // Lists the slash-command legend AND, since issue #1230, a plain-language

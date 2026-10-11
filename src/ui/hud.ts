@@ -2225,6 +2225,7 @@ export class Hud {
     this.deathRecapDialog = new DeathRecapDialog({
       root: () => $('#death-recap-dialog'),
       getLatestRecap: () => this.meters.getLatestDeathRecap(this.sim.playerId),
+      getRaidDeaths: () => this.meters.getRaidDeaths(),
       attachTooltip: (el, html) => this.attachTooltip(el, html),
       hideTooltip: () => this.hideTooltip(),
       previewResolvedAbility: (id) => this.previewResolvedAbility(id),

@@ -7531,6 +7531,13 @@
     padding: 1px 4px;
     line-height: 1.5;
   }
+  #tooltip .mt-tip-time {
+    position: relative;
+    font-size: 10px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
   #tooltip .mt-tip-icon {
     position: relative;
     width: 16px;
@@ -9690,6 +9697,97 @@
     position: static;
     margin: 0;
   }
+  .death-recap-roster-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #141820;
+    border-bottom: 1px solid #282f3d;
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .death-recap-roster-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    background: #1c222e;
+    border: 1px solid #333d4f;
+    border-radius: 4px;
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background 0.15s,
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .death-recap-roster-tab:hover {
+    background: #252e3d;
+    border-color: #4b586e;
+    color: #f8fafc;
+  }
+  .death-recap-roster-tab.active {
+    background: #2a3547;
+    border-color: #d4af37;
+    color: #ffd700;
+    box-shadow: 0 0 6px #d4af3733;
+  }
+  .death-recap-roster-sep {
+    width: 1px;
+    height: 16px;
+    background: #2d3545;
+    flex-shrink: 0;
+    margin: 0 2px;
+  }
+  .death-recap-roster-players {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    overflow-x: auto;
+  }
+  .death-recap-player-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: #181d26;
+    border: 1px solid #2e3646;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background 0.15s,
+      border-color 0.15s;
+    border-left: 3px solid var(--class-color, #888);
+  }
+  .death-recap-player-chip:hover {
+    background: #212836;
+    border-color: #48546b;
+  }
+  .death-recap-player-chip.active {
+    background: #273142;
+    border-color: #d4af37;
+    box-shadow: 0 0 6px #d4af3722;
+  }
+  .death-recap-player-chip .chip-order {
+    color: #8c96a8;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .death-recap-player-chip .chip-name {
+    font-weight: 600;
+  }
+  .death-recap-player-chip .chip-time {
+    color: #94a3b8;
+    font-size: 10px;
+    margin-left: 2px;
+  }
   .death-recap-subbar {
     padding: 8px 14px;
     background: #151820;
@@ -9740,6 +9838,111 @@
     color: #7d8594;
     font-style: italic;
     font-size: 13px;
+  }
+  .death-recap-overview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .overview-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #181d26;
+    border: 1px solid #2d3340;
+    border-radius: 4px;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      border-color 0.15s;
+  }
+  .overview-row:hover {
+    background: #222a38;
+    border-color: #4a566d;
+  }
+  .overview-row.overview-first-death {
+    border-left: 3px solid #ff4444;
+  }
+  .overview-row-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+  .overview-order-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #232936;
+    border: 1px solid #3c4659;
+    font-size: 11px;
+    font-weight: 700;
+    color: #cbd5e1;
+    flex-shrink: 0;
+  }
+  .overview-row.overview-first-death .overview-order-badge {
+    background: #3b181b;
+    border-color: #b53232;
+    color: #ff6b6b;
+  }
+  .overview-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .overview-player-line {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .overview-player-name {
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .overview-first-tag {
+    font-size: 10px;
+    color: #ff6b6b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .overview-killer-line {
+    font-size: 11.5px;
+    color: #94a3b8;
+  }
+  .overview-killer-line strong {
+    color: #f1f5f9;
+  }
+  .overview-row-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .overview-time {
+    font-size: 12px;
+    font-weight: 600;
+    color: #cbd5e1;
+  }
+  .overview-inspect-btn {
+    padding: 3px 10px;
+    font-size: 11px;
+    background: #252d3d;
+    border: 1px solid #3d4a61;
+    border-radius: 3px;
+    color: #e2e8f0;
+    cursor: pointer;
+  }
+  .overview-inspect-btn:hover {
+    background: #313c52;
+    border-color: #d4af37;
+    color: #ffd700;
   }
   .death-recap-list {
     display: flex;
@@ -9944,6 +10147,10 @@
   .death-recap-footer-close {
     min-width: 80px;
     padding: 4px 12px;
+  }
+  .death-recap-footer-back {
+    padding: 4px 12px;
+    font-size: 12px;
   }
   /* Ghost resurrect prompt: a small, NON-BLOCKING panel shown only when a spirit is in
      reach of its corpse or a Spirit Healer. pointer-events:none on the panel so a ghost
