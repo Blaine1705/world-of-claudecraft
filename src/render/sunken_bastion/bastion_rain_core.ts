@@ -45,6 +45,35 @@ export const RAIN_SHUTTER = { min: 0.035, max: 0.065 } as const;
 /** Radius round the camera the splashes land in (yards). */
 export const SPLASH_RADIUS = 26;
 
+/** A bounded lattice reuses offscreen cells; a surviving ring never slides. */
+export function splashLattice(count: number): { side: number; cellSize: number } {
+  const side = Math.ceil(Math.sqrt(Math.max(1, count)));
+  return { side, cellSize: (2 * SPLASH_RADIUS) / side };
+}
+
+/** CPU twin of the shader's cell placement, with cycle-local jitter in [0, 1]. */
+export function splashCellCenter(
+  cell: { x: number; z: number },
+  cameraLocal: { x: number; z: number },
+  jitter: { x: number; z: number },
+  lattice: { side: number; cellSize: number },
+): { x: number; z: number } {
+  const at = (c: number, camera: number, j: number): number => {
+    const center = (c + 0.5 + (j - 0.5) * 0.8) * lattice.cellSize;
+    const period = lattice.side * lattice.cellSize;
+    return center + period * Math.floor((camera - center + period / 2) / period);
+  };
+  return { x: at(cell.x, cameraLocal.x, jitter.x), z: at(cell.z, cameraLocal.z, jitter.z) };
+}
+
+export const SPLASH_CELL_GLSL = /* glsl */ `
+vec2 splashCellCenter(vec2 cell, vec2 cameraLocal, vec2 jitter, vec2 lattice) {
+  vec2 center = (cell + 0.5 + (jitter - 0.5) * 0.8) * lattice.y;
+  float period = lattice.x * lattice.y;
+  return center + period * floor((cameraLocal - center + period * 0.5) / period);
+}
+`;
+
 /** Gust strength in [0, 1] at `t` seconds: slow swells with quick flurries. */
 export function rainGust(t: number): number {
   const slow = Math.sin(t * 0.13) * 0.5 + Math.sin(t * 0.071 + 1.7) * 0.3;
