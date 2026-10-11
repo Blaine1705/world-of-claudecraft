@@ -12676,6 +12676,7 @@ export const ko_KR: EnTranslations = {
       "cantor_last_verse": "마지막 소절",
       "temple_call_the_tide": "조수의 부름",
       "temple_static_coil": "정전기 똬리",
+      "temple_tidemarked_surge": "Tidal Surge",
       "temple_snapper_snap": "물어뜯기",
       "temple_trident_sweep": "삼지창 휩쓸기",
       "temple_sea_song": "바다의 노래",
@@ -20375,6 +20376,15 @@ export const ko_KR: EnTranslations = {
       },
       "lagoon_eel": {
         "name": "석호 뱀장어"
+      },
+      "temple_tidemarked_trident": {
+        "name": "Drowned Temple Warden: Trident"
+      },
+      "temple_tidemarked_tide": {
+        "name": "Drowned Temple Warden: Tide"
+      },
+      "temple_abyssal_lurker": {
+        "name": "Temple Amphibian"
       },
       "moonlit_siren": {
         "name": "달빛 세이렌"

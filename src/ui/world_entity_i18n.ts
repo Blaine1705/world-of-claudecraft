@@ -125,6 +125,9 @@ const MOB_IDS = [
   // Reflections all wear the one name.
   'lagoon_snapper',
   'lagoon_eel',
+  'temple_tidemarked_trident',
+  'temple_tidemarked_tide',
+  'temple_abyssal_lurker',
   'moonlit_siren',
   'tidewisp',
   'drowned_pilgrim',

@@ -123,7 +123,9 @@ describe('Temple trash: the cast table', () => {
       'glimmerscale_lurker',
       'pearlguard_sentinel',
       'lagoon_snapper',
-      'lagoon_eel',
+      'temple_tidemarked_trident',
+      'temple_tidemarked_tide',
+      'temple_abyssal_lurker',
       'moonlit_siren',
       'drowned_pilgrim',
     ])

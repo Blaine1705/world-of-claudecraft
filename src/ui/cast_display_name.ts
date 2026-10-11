@@ -150,6 +150,7 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.temple_lullaby': true,
   'abilityUi.cast.temple_call_the_tide': true,
   'abilityUi.cast.temple_static_coil': true,
+  'abilityUi.cast.temple_tidemarked_surge': true,
   'abilityUi.cast.temple_snapper_snap': true,
   'abilityUi.cast.temple_trident_sweep': true,
   'abilityUi.cast.temple_sea_song': true,

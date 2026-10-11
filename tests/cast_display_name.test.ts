@@ -11,10 +11,11 @@ import { setLanguage, t } from '../src/ui/i18n';
 
 describe('castDisplayName', () => {
   it.each([
+    ['temple_tidemarked_surge', 'Tidal Surge'],
     ['ghost_captain_broadside', 'Spectral Broadside'],
     ['ghost_captain_anchor', 'Cursed Anchor'],
     ['ghost_captain_boarding', 'Phantom Boarding'],
-  ])('names the captain cast %s on both bars', (id, name) => {
+  ])('names the scripted cast %s on both bars', (id, name) => {
     setLanguage('en');
     expect(castDisplayName(id)).toBe(name);
     expect(targetCastDisplayName(id)).toBe(name);

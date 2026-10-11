@@ -678,6 +678,7 @@ const mergeStringsEn = {
       cantor_last_verse: 'The Last Verse',
       temple_call_the_tide: 'Call the Tide',
       temple_static_coil: 'Static Coil',
+      temple_tidemarked_surge: 'Tidal Surge',
       temple_snapper_snap: 'Snap',
       temple_trident_sweep: 'Trident Sweep',
       temple_sea_song: 'Sea-Song',

@@ -42,6 +42,8 @@ MODULES = {
     'acolyte': 'choir_folk:acolyte',
     'selthe': 'choir_folk:selthe',
     'colossus': 'colossus',
+    'tidemarked_sentinel': 'tidemarked_sentinel',
+    'abyssal_lurker': 'abyssal_lurker',
 }
 
 

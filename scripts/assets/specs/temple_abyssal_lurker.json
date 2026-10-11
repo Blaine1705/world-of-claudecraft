@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/temple_abyssal_lurker.glb",
+      "out": "models/creatures/temple_abyssal_lurker.glb",
+      "type": "character",
+      "keepExtras": true,
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Attack2",
+        "Hit",
+        "Death",
+        "Cast",
+        "Spit",
+        "Leap"
+      ]
+    }
+  ]
+}

@@ -1400,7 +1400,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // renderer leaf moved again). No capture was retaken.
   // Re-minted for the dungeon trash pass (the renderer leaf moved again: the
   // trash engine and the dungeon trash visuals). No capture was retaken.
-  'f6a2a8ca8ba7c8d3dba868e1a6cc69b84b1b2824a7b0d0b6c7340bc22f3d20e8';
+  'd0f2ef36a616b4b0161cde31cad45ac502a4213e9a06b3c35e48b2b981d980b1';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1429,7 +1429,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // renderer leaf moved again). No capture was retaken.
   // Re-minted for the dungeon trash pass (the renderer leaf moved again: the
   // trash engine and the dungeon trash visuals). No capture was retaken.
-  '32e8545d816989e99d16a079200f78d77ca95071e66a6a99d89cb7c74ff0ef05';
+  '5f8934f35d6566d962c926cccdb524479d14387cf6e65a5f28da8c21c32260d6';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2814,7 +2814,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Five-dungeon rework (feature/drowned-temple-rework): recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('2f96d471bf39ea5001b98aa4d0ac60351e425b4c5a4b955c3c5db50d636fbcaa');
+    ).toBe('51f34f353d87f6f71fe0a57a09dde1348bac73209239de7e79da97ee2542a71e');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

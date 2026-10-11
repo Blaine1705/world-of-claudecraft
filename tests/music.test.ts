@@ -344,6 +344,22 @@ describe('MusicDirector stream keeper', () => {
     expect(el.play).toHaveBeenCalledTimes(1);
   });
 
+  it('stops the default combat track immediately when a boss cue takes over', () => {
+    director.update('dungeon_hollow_crypt', true);
+    const inner = internals(director);
+    const combat = inner.combatStreams.find((stream) => stream.target === 1);
+    if (!combat?.el) throw new Error('combat stream element missing');
+    expect(combat.el.paused).toBe(false);
+
+    director.setBossCombat(true, '/audio/music/boss_sexton_marrow.mp3');
+
+    expect(combat.el.paused).toBe(true);
+    expect(FakeAudio.instances.at(-1)?.src).toBe('/audio/music/boss_sexton_marrow.mp3');
+    expect(FakeAudio.instances.at(-1)?.paused).toBe(false);
+    inner.streamKeeper();
+    expect(combat.el.paused).toBe(true);
+  });
+
   it('pauses streams at volume zero and revives when the slider comes back', () => {
     director.update('vale', false);
     const inner = internals(director);

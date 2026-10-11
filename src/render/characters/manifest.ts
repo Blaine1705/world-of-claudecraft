@@ -128,6 +128,7 @@ import {
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
+  TEMPLE_TIDEMARKED_SURGE,
   TEMPLE_TRIDENT_SWEEP,
 } from '../../sim/mob/trash_kit/temple_cast_ids';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
@@ -5066,6 +5067,50 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.06,
   },
+  // Blender-authored gate guardians share the rigid stone body. The trident
+  // contact is frame 15 at 24 fps; its recovery plays after the 1.8 s bar.
+  temple_tidemarked_sentinel: {
+    url: `${CREATURES}/temple_tidemarked_sentinel.glb`,
+    // Includes the trident: normalization plus the mob's 1.5 entity scale
+    // gives a 5.2-yard crown-to-sole body, twice the player humanoid height.
+    height: 4.027,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: {
+        [TEMPLE_SKEWERING_TRIDENT]: 'Attack',
+        [TEMPLE_TIDEMARKED_SURGE]: 'Cast',
+      },
+      castTimeScaleByAbility: {
+        [TEMPLE_SKEWERING_TRIDENT]: 14 / 24 / 1.8,
+        [TEMPLE_TIDEMARKED_SURGE]: 1,
+      },
+      castPlayOut: ['Attack'],
+    },
+    castClipSync: [TEMPLE_SKEWERING_TRIDENT],
+    castPlayOutHoldsAttacks: true,
+    walkRef: 2.5,
+    runRef: 6,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
+  },
+  temple_abyssal_lurker: {
+    url: `${CREATURES}/temple_abyssal_lurker.glb`,
+    height: 2.4,
+    clips: {
+      ...TEMPLE_CLIPS,
+      jump: 'Leap',
+      castByAbility: { [TEMPLE_SNAP]: 'Attack' },
+      // The jaw closes at frame 12; lock that contact to the 1.5 s Snap bar.
+      castTimeScaleByAbility: { [TEMPLE_SNAP]: 11 / 24 / 1.5 },
+      castPlayOut: ['Attack'],
+    },
+    castClipSync: [TEMPLE_SNAP],
+    castPlayOutHoldsAttacks: true,
+    walkRef: 3,
+    runRef: 8,
+    authoredAtlas: true,
+    selfIllumination: 0.1,
+  },
   // The Lagoon Eel (scripts/assets/drowned_temple_creatures/eel.py): an
   // S-wave climbs its column with the head held level. A new eel body swaps
   // in here: keep its clip names (Idle, Walk, Run, Attack, Attack2, Hit,
@@ -6523,6 +6568,9 @@ const MOB_KEYS: Record<string, string> = {
   drowned_pilgrim: 'temple_pilgrim',
   pale_choir_acolyte: 'temple_acolyte',
   moonlit_siren: 'temple_siren',
+  temple_tidemarked_trident: 'temple_tidemarked_sentinel',
+  temple_tidemarked_tide: 'temple_tidemarked_sentinel',
+  temple_abyssal_lurker: 'temple_abyssal_lurker',
   lagoon_eel: 'temple_eel',
   lagoon_snapper: 'temple_snapper',
   pearlguard_sentinel: 'temple_sentinel',

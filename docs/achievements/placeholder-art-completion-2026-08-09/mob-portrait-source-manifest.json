@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "43f49cb23c1577cf4f5b3faf1aabbbd3566d1b3d71fba0fa6300cf865907c642",
+  "rendererFingerprint": "45c4b0ba819670e386542d984743e9646b1c02c2889810581228fb1da978acd6",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -14,7 +14,7 @@
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "154",
-    "browserVersion": "Edg/154.0.4258.53",
+    "browserVersion": "Edg/154.0.4258.62",
     "requestedBackend": "swiftshader",
     "fingerprint": "04a5c1851d9e9c277dd6de4cae5e56afae22c5cc793b00f37e35af4536bdd2f4"
   },
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5534929,
-      "sha256": "bfa817b79415e21569fb0681b1fa3bca100ce4c798e7d6f83054a17bde8cb7e2",
+      "bytes": 5553362,
+      "sha256": "7688a5d07f25d5bf681961a8313ccff39c6f4ffc4a9bdd55990165bc63c43e7f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 347,
+  "portraitCount": 352,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -289,20 +289,20 @@
     },
     {
       "id": "barnacle_crawler",
-      "family": "beast",
+      "family": "undead",
       "finderEncounter": false,
       "visualKey": "bastion_crawler",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/bastion_crawler.glb",
-          "path": "public/models/creatures/bastion_crawler.glb",
-          "bytes": 1517456,
-          "sha256": "98f7e856382c68f0dc2710c95c27b36228fe4bc3d15541cfdbe945affc333fda"
+          "url": "models/creatures/bastion_ghost_sailor.glb",
+          "path": "public/models/creatures/bastion_ghost_sailor.glb",
+          "bytes": 2176272,
+          "sha256": "007aaa1e67bf2b952befeb58e9c34d86c1731129bdded2b461732244c960b2f3"
         },
         "idle": "Idle",
-        "height": 3.2,
+        "height": 2.8,
         "yaw": null,
-        "hover": null,
+        "hover": 0.2,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -314,11 +314,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "a0687199014781fd82da90998cad66fa191a775be4af1b00df7510a43a0f36c9",
+      "sourceFingerprint": "7c51c54d6e75c8091edb6d6f0895bde75ef54e042fe25a088d7003935537225e",
       "output": {
         "path": "public/ui/mobs/barnacle_crawler.webp",
-        "bytes": 2122,
-        "sha256": "970ffc8734e4dd2a2fe1c3cff88594b00dc11ae49bde9959fbb4e872008b2ac1"
+        "bytes": 2316,
+        "sha256": "2b22f4890af23ac79c5a6878c6af3d0021ac4c73441efd7626e7b8e740304c87"
       }
     },
     {
@@ -396,31 +396,31 @@
       "visualKey": "wildheart_basin_raptor",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/velociraptor.glb",
-          "path": "public/models/creatures/velociraptor.glb",
-          "bytes": 111044,
-          "sha256": "3385fbba757a7d923a981c997bfa340065837836ed069892c3600ff14bae9749"
+          "url": "models/creatures/wildheart_basin_raptor.glb",
+          "path": "public/models/creatures/wildheart_basin_raptor.glb",
+          "bytes": 2184872,
+          "sha256": "7a0bdf97e10517eff08df4a5b82a733f8742c40a35404bf1345878550200a9d9"
         },
-        "idle": "Velociraptor_Idle",
-        "height": 2.25,
+        "idle": "Idle",
+        "height": 3.0405882352941176,
         "yaw": null,
-        "hover": null,
+        "hover": -0.0011764705882352942,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.6
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6f7a3a",
-        "resolved": "#6f7a3a",
-        "strength": 0.6
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "d9cdf7e8e56be1f575fd3f960d9e2ca59bd539d56208bdb9a76dccf5f994c6da",
+      "sourceFingerprint": "dd1f316d9e37ea35da7ff74dc19fb712ad8063d2d616c8f78d0b8bd9bc178e29",
       "output": {
         "path": "public/ui/mobs/basin_raptor.webp",
-        "bytes": 1670,
-        "sha256": "28500a5c045421244bda5a036d3ed1d00c68900222dbd474b386365f73192f5b"
+        "bytes": 2310,
+        "sha256": "5c3821b9e59c3090e46d8cb7317cfd6037fc126ec14a8feac3c19bf13f520519"
       }
     },
     {
@@ -838,46 +838,31 @@
       "visualKey": "sanctum_goadsmith",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/barbarian.glb",
-          "path": "public/models/chars/players/barbarian.glb",
-          "bytes": 444244,
-          "sha256": "2fb8d32c29d2b5c4b9b4b54ec502c3778f3d4d0da0e55cd1d4ed2b7c1e8d0abb"
+          "url": "models/creatures/sanctum_goadsmith.glb",
+          "path": "public/models/creatures/sanctum_goadsmith.glb",
+          "bytes": 653576,
+          "sha256": "4643ea429aedab697ff118ab6faf853f5b1e0649fbf593b63ec12bc9b1bcff1a"
         },
         "idle": "Idle",
         "height": 2.6285714285714286,
         "yaw": null,
         "hover": null,
-        "show": [
-          "Barbarian_BearHat"
-        ],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/spear_a.glb",
-              "path": "public/models/weapons/spear_a.glb",
-              "bytes": 78552,
-              "sha256": "27e7969ec3efdd8ba59f2530ceb2ffddefe9bfd247c462dc2e916f47292aa2af"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "show": null,
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.38
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6e4a32",
-        "resolved": "#6e4a32",
-        "strength": 0.38
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "c14780e39a2bede3fc53a3ab2c89528d5547d2868f916bf115bfd561d8114fd4",
+      "sourceFingerprint": "7232d279b204b7d3ee58f757de61326723056e7b9d7f7d6fa6dc7c24cf474157",
       "output": {
         "path": "public/ui/mobs/broodsworn_goadsmith.webp",
-        "bytes": 2130,
-        "sha256": "521226d349db2d5d4309d2fc627308d820f915a310061f0de0f73cc8d6879003"
+        "bytes": 1824,
+        "sha256": "a2c664ae74d86ded347c57f2f23c7407b260a912e3e7d390c0889c0a389c5df9"
       }
     },
     {
@@ -887,10 +872,10 @@
       "visualKey": "sanctum_pyre_tender",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_void_acolyte.glb",
-          "path": "public/models/creatures/hoard_void_acolyte.glb",
-          "bytes": 1986904,
-          "sha256": "9465f25cb1e7ae7bde5f5f1e43cd8453d2beea0362e60ddebdfe84ca167a5b4f"
+          "url": "models/creatures/sanctum_pyre_tender.glb",
+          "path": "public/models/creatures/sanctum_pyre_tender.glb",
+          "bytes": 704688,
+          "sha256": "178e9fb3e342bc5e323f4622668ed2bca40c8efcc15ac1f70da160b3342a51c2"
         },
         "idle": "Idle",
         "height": 2.666666666666667,
@@ -899,19 +884,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#c0743c",
-        "resolved": "#c0743c",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "768009ae7f87f45b75481ee01a68b6427ae699f4b9d5cfa6fb4083843b3c3839",
+      "sourceFingerprint": "18a86f9fe5613b0ddc2d8f76af2a0abcd434ea58f38bb06348cf8ee333e8bb14",
       "output": {
         "path": "public/ui/mobs/broodsworn_pyre_tender.webp",
-        "bytes": 1998,
-        "sha256": "7d3a5d5599b1de9381b483b9f9ce2303b73f9294c69dfc639ddcce962c917a4d"
+        "bytes": 2302,
+        "sha256": "544603b68506dc2d6a7de55bf6e384273daf2bde6636358c4f1bd1832e2e6cf3"
       }
     },
     {
@@ -921,10 +906,10 @@
       "visualKey": "sanctum_thawcaller",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/mist_chanter_thawcaller.glb",
-          "path": "public/models/creatures/mist_chanter_thawcaller.glb",
-          "bytes": 718832,
-          "sha256": "52292a56aff636442aa9b6d73038c152298ac4cbec61809b68387cc1059310e8"
+          "url": "models/creatures/sanctum_thawcaller.glb",
+          "path": "public/models/creatures/sanctum_thawcaller.glb",
+          "bytes": 870900,
+          "sha256": "4a0b35c1aeac03b5ccb1165dc85be8c1743132d6ac169c5d304ad9bbca01a2b0"
         },
         "idle": "Idle",
         "height": 2.75,
@@ -933,19 +918,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.24
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#c49a74",
-        "resolved": "#c49a74",
-        "strength": 0.24
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "f8a75cd79566d409fce6734a7a2342f814015fcaeecf34be76527bd232183aa3",
+      "sourceFingerprint": "461379c6b03d30639e523107c17ded0b3f1331bdba1baa7b0930b3eacee0c757",
       "output": {
         "path": "public/ui/mobs/broodsworn_thawcaller.webp",
-        "bytes": 1920,
-        "sha256": "b420b0d5d7f943e82a7c7d5cab0d5d47c67e512a78b9fdfe9249fa87fd373d26"
+        "bytes": 2438,
+        "sha256": "db37b8447f54e72f0365566fa837fabf36382f4858e5557b15f8738f62ed11fd"
       }
     },
     {
@@ -1057,31 +1042,31 @@
       "visualKey": "crypt_skel_cantor",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_mage.glb",
-          "path": "public/models/chars/enemies/skeleton_mage.glb",
-          "bytes": 802628,
-          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+          "url": "models/creatures/crypt_cantor_ilvane.glb",
+          "path": "public/models/creatures/crypt_cantor_ilvane.glb",
+          "bytes": 3040532,
+          "sha256": "6965eaae050feb4a39082a39b5142df7aa25b5e13bcc4f994aeceb011a7cc04a"
         },
-        "idle": "Idle_Combat",
-        "height": 3.2,
+        "idle": "Idle",
+        "height": 5.964,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9d6cd0",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "5658d5b36e5c9fdc00cf75c27c255ad03ff95931afcc2497a524707a5730bb7a",
+      "sourceFingerprint": "0d18a35c34ebb6ae7c0a9db8d3ba73eaa3f74ccbd3c2925942ac4641ad372d88",
       "output": {
         "path": "public/ui/mobs/cantor_ilvane.webp",
-        "bytes": 2318,
-        "sha256": "02a3f8f0d1add620da348ccfe2c6ac4e23c4dad7bbffc5097059bc268d1e6b4f"
+        "bytes": 2780,
+        "sha256": "3d338714e802fb46cddb91ec94bf5e9ce753b7f6384c7a31277a1853aded89ac"
       }
     },
     {
@@ -1195,8 +1180,8 @@
         "model": {
           "url": "models/creatures/temple_selthe.glb",
           "path": "public/models/creatures/temple_selthe.glb",
-          "bytes": 3623988,
-          "sha256": "caeb8baf71ae568277fd3f45b9834738ed45d2eba14bb29743bdeddeaf7f8ba5"
+          "bytes": 3651184,
+          "sha256": "d3fb538d4b73a7963013d0aa356352c20e63867957512e21281e0e0876127ecb"
         },
         "idle": "Idle",
         "height": 7.83,
@@ -1213,11 +1198,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "20b65c9615e0614e943eb9ca4063c29a111bca2217ccd975acabcb9116f5279b",
+      "sourceFingerprint": "01c787c5ef48a45d1673b315a0d3db62b92f2defd0a5d6c38ebae6813734f6f8",
       "output": {
         "path": "public/ui/mobs/choirmother_selthe.webp",
-        "bytes": 3684,
-        "sha256": "63627bebb8d142136c5a4d7a0e2e86de640b40c2e69617b2234642e6c921cdba"
+        "bytes": 3600,
+        "sha256": "abe2f47ba0f1d8d9d61c76274f33021c87526505141e6490663df6d0e381fe1d"
       }
     },
     {
@@ -1759,6 +1744,40 @@
         "path": "public/ui/mobs/crypt_ossuary_warrior.webp",
         "bytes": 2314,
         "sha256": "aa6343297951a3fdf7601a61650b5253bc923d9a94cdc7d11e3a762d90f285a2"
+      }
+    },
+    {
+      "id": "crypt_remembrance_candle",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "crypt_rite_candle_body",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_warrior.glb",
+          "path": "public/models/chars/enemies/skeleton_warrior.glb",
+          "bytes": 523236,
+          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+        },
+        "idle": "Lie_Idle",
+        "height": 3.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "cbc4f323da1b1e02e73385cda5de94f49b2488348d0ae9d30e7c86c6268ca1d9",
+      "output": {
+        "path": "public/ui/mobs/crypt_remembrance_candle.webp",
+        "bytes": 2774,
+        "sha256": "9b8b7a78fe2c5c5f28c5b881dc09097094a1802f9408adba708d27fc9f1706ea"
       }
     },
     {
@@ -3404,31 +3423,31 @@
       "visualKey": "sanctum_glacier_splinter",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_rime_elemental.glb",
-          "path": "public/models/creatures/hoard_rime_elemental.glb",
-          "bytes": 794868,
-          "sha256": "d358238863159c91c58b8e81086b1954c8ad6f4d0f3931358acb825599259c5e"
+          "url": "models/creatures/sanctum_glacier_splinter.glb",
+          "path": "public/models/creatures/sanctum_glacier_splinter.glb",
+          "bytes": 1947596,
+          "sha256": "6527188b56ed28712856763d2a3db41b1153f2bc289a333cddb20d19f0333ff3"
         },
         "idle": "Idle",
         "height": 2.842105263157895,
-        "yaw": -1.5707963267948966,
+        "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.5
+        "tintStrength": 0.45
       },
       "tint": {
         "source": "fixed",
-        "authored": "#86c8ec",
-        "resolved": "#86c8ec",
-        "strength": 0.5
+        "authored": "#6aaee6",
+        "resolved": "#6aaee6",
+        "strength": 0.45
       },
-      "sourceFingerprint": "5d7f535f4744a293dd719ba35092bd3bf6c458007114780fb520064d1fc3839d",
+      "sourceFingerprint": "2786d995e215b95fb45be48aff4e188109638dad9bfd552a453570bfe97d756b",
       "output": {
         "path": "public/ui/mobs/glacier_splinter.webp",
-        "bytes": 1914,
-        "sha256": "4224e5fdaebb9d35770ff30c5cb2eb4707ad5553b435af19539b418299b6b426"
+        "bytes": 3560,
+        "sha256": "e62ee77e601473cc9362c11bf0d5177f59728ed15894ae1b0cf81832fb650280"
       }
     },
     {
@@ -3508,8 +3527,8 @@
         "model": {
           "url": "models/creatures/temple_lurker.glb",
           "path": "public/models/creatures/temple_lurker.glb",
-          "bytes": 2169424,
-          "sha256": "01030724213d02075e517f9d9685742a8023cd863d4f46b49d0e2972a68f5d36"
+          "bytes": 2380548,
+          "sha256": "094faf63a37b8f5b27d4ad0a437b0d145e2be7be496672c5397d3bf8d213b872"
         },
         "idle": "Idle",
         "height": 3.65,
@@ -3526,11 +3545,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "a46f29ba8c32a5908c1e2e285e108ac2e8382c186d0a27a9776016300b44c3f5",
+      "sourceFingerprint": "af2fd351526b7817b618ce14cbfecc85819ef5a1832568c7861cb7a2a54e6e81",
       "output": {
         "path": "public/ui/mobs/glimmerscale_lurker.webp",
-        "bytes": 1782,
-        "sha256": "817617f5d5391737d5f251bc41aed3367c8d70ffc9bd28c518bf2421318eef82"
+        "bytes": 1820,
+        "sha256": "1aeda2f014fc67ad3bcfe04f6965ef6cafb38a36ac4734e2bdff6ba65e0ce2d6"
       }
     },
     {
@@ -5103,8 +5122,8 @@
         "model": {
           "url": "models/creatures/wildheart_hexcaller.glb",
           "path": "public/models/creatures/wildheart_hexcaller.glb",
-          "bytes": 1056052,
-          "sha256": "f25e9ea2acad458b9761183277258e5c650137de93a512de2aa59cb8c9a9036e"
+          "bytes": 1070600,
+          "sha256": "ccb788bc8f09456a2119d2e35037ac8702d9e3ca48d4e6a7c7af219319220b0d"
         },
         "idle": "Idle",
         "height": 2.5,
@@ -5121,7 +5140,7 @@
         "resolved": "#a3322a",
         "strength": 0.22
       },
-      "sourceFingerprint": "288049247f3d0c62d24d8d0a72653c67e8e0d4704e0b5f04799d4319423e0a95",
+      "sourceFingerprint": "8d9a4c93fdffee049ef86494ae1ac4a128b0e40b092f4bb3106b6345044c1bc2",
       "output": {
         "path": "public/ui/mobs/howdah_hexcaller.webp",
         "bytes": 3160,
@@ -5709,6 +5728,40 @@
         "path": "public/ui/mobs/lily_wisp.webp",
         "bytes": 1730,
         "sha256": "11d2e8f9cdb7da6389f5e9665e59c973897e17aa8aeaba2dc1751ea443b443fc"
+      }
+    },
+    {
+      "id": "marrow_restless_bones",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d5dbdb",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "7545d7ee4dac26300ea916a4bde2f0900bcc44d16a408dd90085cfdc939e0fe3",
+      "output": {
+        "path": "public/ui/mobs/marrow_restless_bones.webp",
+        "bytes": 2824,
+        "sha256": "23eef46230cb81625896e76c42e92aa5f4dbd665a481b3354890d0dafd730605"
       }
     },
     {
@@ -6412,7 +6465,7 @@
         "idle": "Idle",
         "height": 6.994,
         "yaw": null,
-        "hover": 0.122,
+        "hover": -1.178,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -6424,11 +6477,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "d74f5eeb65789839a436f080861e15f2a1c46d415c722df082e6b6c35b5525bf",
+      "sourceFingerprint": "b3ea439a1061f5eb3de36cb041b4f9f68c8945cc4234af5ba3d115fe8b3cbf26",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
-        "bytes": 2362,
-        "sha256": "f25ca69b5dc22ecd3b59d26513f590f9fce2e4df19c081ce86497c5d98646ec3"
+        "bytes": 2360,
+        "sha256": "7e87af9f76c6572356a696ea89c25a1d5b88132eba25239b505aef87c99f153b"
       }
     },
     {
@@ -6991,10 +7044,10 @@
       "visualKey": "sanctum_sledge_hauler",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/ogre.glb",
-          "path": "public/models/creatures/ogre.glb",
-          "bytes": 494060,
-          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
+          "url": "models/creatures/sanctum_sledge_hauler.glb",
+          "path": "public/models/creatures/sanctum_sledge_hauler.glb",
+          "bytes": 2748068,
+          "sha256": "c82d225ff3ddd3149dc531bb428786a30f4f8cfaf473604a92a74cb527d88946"
         },
         "idle": "Idle",
         "height": 2.761904761904762,
@@ -7003,19 +7056,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.36
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#7a6248",
-        "resolved": "#7a6248",
-        "strength": 0.36
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "8ce2bb642f11341f1a3a967b38014fd50f44f63acc23271f40d10bc34de6efb9",
+      "sourceFingerprint": "386acd868da6ead8571262ce8e102e672b8c61f873b480d3a26a19dded1b79e2",
       "output": {
         "path": "public/ui/mobs/ogre_sledge_hauler.webp",
-        "bytes": 2244,
-        "sha256": "183e0b70bc5286dca13a1abc9e4fb71b888e1b10f627bf4854e0995d61db5d7a"
+        "bytes": 3292,
+        "sha256": "730b7ff817f0c13e44ab7f65b0b1c822846143e07fccb3de6a936892458b127e"
       }
     },
     {
@@ -7265,11 +7318,11 @@
         "model": {
           "url": "models/creatures/temple_sentinel.glb",
           "path": "public/models/creatures/temple_sentinel.glb",
-          "bytes": 1957888,
-          "sha256": "90289367e30646b7390f676db8b87427eab8126b0796a90a18b0cfeed8799f22"
+          "bytes": 2104228,
+          "sha256": "7c2a067ceb1e3df9cc8e77f97dbc1ab7776eecf0fd8e8fb9714ddc14ff251c62"
         },
         "idle": "Idle",
-        "height": 1.4,
+        "height": 1.3236,
         "yaw": null,
         "hover": 0.673,
         "show": null,
@@ -7283,11 +7336,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7f6d0ac54ad2c1c7d496e3f664e21e2a3a21119f02426c840235f05299728910",
+      "sourceFingerprint": "35f4fd65f6ca63a3dc1bf9831db4f7a796dad8f5e95b30fc31090471b8c242e3",
       "output": {
         "path": "public/ui/mobs/pearlguard_sentinel.webp",
-        "bytes": 2408,
-        "sha256": "3eaf680ef4d4ef1f6220e6c57e8f5d8e6fc8eaf62d54bfa03d3f6a2d63c71021"
+        "bytes": 2146,
+        "sha256": "aab42314731f70e74c8557f202df5b289d39436a30d8be37aa0cd45cc9df8e5a"
       }
     },
     {
@@ -7331,10 +7384,10 @@
       "visualKey": "sanctum_raised_bonewalker",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_frost_revenant.glb",
-          "path": "public/models/creatures/hoard_frost_revenant.glb",
-          "bytes": 2579768,
-          "sha256": "de8ccda356e5ed496c9cd9393393a59a249779280eb8e9071fa4bc5e80e96a04"
+          "url": "models/creatures/sanctum_raised_bonewalker.glb",
+          "path": "public/models/creatures/sanctum_raised_bonewalker.glb",
+          "bytes": 2673492,
+          "sha256": "4a83c58b9507c68e91f431eeb5bfd24835462809249d1899f90a2592e740a760"
         },
         "idle": "Idle",
         "height": 3.7,
@@ -7343,19 +7396,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#aebdb4",
-        "resolved": "#aebdb4",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "3be7a80cad46b39e8e0ecad0cdb9d0139c42900a8f80c7ae44b498531e23b4ee",
+      "sourceFingerprint": "cb77a564fa1dc66b589659ec5bc17e661cc51586b715abb39fa3608a1785912a",
       "output": {
         "path": "public/ui/mobs/raised_bonewalker.webp",
-        "bytes": 2256,
-        "sha256": "4aa045272023ac7d8359c7446cbe47f2bc38edbf1151a8d00802bc6d4b22ddd0"
+        "bytes": 2660,
+        "sha256": "600c9d14934d4efc80a7bf15d2023824ee869260583ae771747fc7f5d1a10694"
       }
     },
     {
@@ -8845,65 +8898,65 @@
       "visualKey": "sanctum_rime_whelp",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_stormscale_drake.glb",
-          "path": "public/models/creatures/hoard_stormscale_drake.glb",
-          "bytes": 1126964,
-          "sha256": "39078b78f1da88222301cda15578309f0d8305f3d2b21fa3c4452d34b8d20dbe"
+          "url": "models/creatures/sanctum_rime_whelp.glb",
+          "path": "public/models/creatures/sanctum_rime_whelp.glb",
+          "bytes": 2774136,
+          "sha256": "bc18a63bc995f78dd70cd98dc32849829dc9e997b8b36216654cb66434c4f81f"
         },
         "idle": "Idle",
-        "height": 2,
-        "yaw": -1.5707963267948966,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.7
-      },
-      "tint": {
-        "source": "fixed",
-        "authored": "#e4f4ff",
-        "resolved": "#e4f4ff",
-        "strength": 0.7
-      },
-      "sourceFingerprint": "147d8fc34c7194d303cf4d16c955c04a9b84f1331e50c19e1c083e9cfcdaddf1",
-      "output": {
-        "path": "public/ui/mobs/rime_whelp.webp",
-        "bytes": 2004,
-        "sha256": "0348744ab80e7dbd874a6242b2eda7aecc3da2a5b3a1e515db8fa328989748ee"
-      }
-    },
-    {
-      "id": "rimeweb",
-      "family": "spider",
-      "finderEncounter": true,
-      "visualKey": "mob_crypt_rimeweb",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/spider.glb",
-          "path": "public/models/creatures/spider.glb",
-          "bytes": 130436,
-          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
-        },
-        "idle": "Spider_Idle",
-        "height": 2.7,
+        "height": 2.25,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#e8f4ff",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "5548184b0491baaad77ff432bd84a3cba506fa75412907cff8e694dcd2cf58c7",
+      "sourceFingerprint": "1648f0ec6ba9db4bc60307bca3f2519c35781b39bd17d18474dbe516c63fab63",
+      "output": {
+        "path": "public/ui/mobs/rime_whelp.webp",
+        "bytes": 2466,
+        "sha256": "759fd0745b46b969d3e15c5fcbc7d3ada40077c8d52f9d284168776f6c3fe440"
+      }
+    },
+    {
+      "id": "rimeweb",
+      "family": "undead",
+      "finderEncounter": true,
+      "visualKey": "crypt_lady_bonechill",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_lady_bonechill.glb",
+          "path": "public/models/creatures/crypt_lady_bonechill.glb",
+          "bytes": 2790900,
+          "sha256": "ded31e9ecd95dcf092ed07464e7f787e8fd82bec0629e5454bf31518e1bb71cf"
+        },
+        "idle": "Idle",
+        "height": 6.749,
+        "yaw": null,
+        "hover": 0.544,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "47d8bfcfeaf1babf8b8777f4b411aeb3280d8a5d4fdb84fe5dc1fbadfa7fe25f",
       "output": {
         "path": "public/ui/mobs/rimeweb.webp",
-        "bytes": 1792,
-        "sha256": "7a9972761989831d63044ef074b1a9cb85508f681e108632ee63269bc4081e6a"
+        "bytes": 2078,
+        "sha256": "bd8a59537122686f420d3eacc09f6d10e7b6ef0490c649a4b0a2cf17ebec3112"
       }
     },
     {
@@ -8981,10 +9034,10 @@
       "visualKey": "sanctum_boneguard",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/hoard_frost_revenant.glb",
-          "path": "public/models/creatures/hoard_frost_revenant.glb",
-          "bytes": 2579768,
-          "sha256": "de8ccda356e5ed496c9cd9393393a59a249779280eb8e9071fa4bc5e80e96a04"
+          "url": "models/creatures/sanctum_boneguard.glb",
+          "path": "public/models/creatures/sanctum_boneguard.glb",
+          "bytes": 2802012,
+          "sha256": "f5b2f800686188740ffa9eda94e7efcadf5f918b0929d2c291485c3176bdf10f"
         },
         "idle": "Idle",
         "height": 4,
@@ -8993,19 +9046,19 @@
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.42
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#c4d3dc",
-        "resolved": "#c4d3dc",
-        "strength": 0.42
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "95197d805672845f77c1cadb499071d2cf876e3f8189447df380406f84fdd503",
+      "sourceFingerprint": "10406e38e1d0ec058b9f77b0123653e7deccd38b4dbd31085263eae59464f611",
       "output": {
         "path": "public/ui/mobs/sanctum_boneguard.webp",
-        "bytes": 2268,
-        "sha256": "894e1abfaea8ee1bfe78a5cc280d213614504103b1bf48cb624698fe14065cab"
+        "bytes": 2588,
+        "sha256": "4b04728c992a2b31e379a8de26a1e610426f8e19bbfe486d981403b15839eeb4"
       }
     },
     {
@@ -9015,31 +9068,31 @@
       "visualKey": "sanctum_scaleguard",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/dragonevolved.glb",
-          "path": "public/models/creatures/dragonevolved.glb",
-          "bytes": 138560,
-          "sha256": "ade414f75155e43ac9de2ed3a3fd5685455d010d7161473acf016bcd18056066"
+          "url": "models/creatures/sanctum_scaleguard.glb",
+          "path": "public/models/creatures/sanctum_scaleguard.glb",
+          "bytes": 2516288,
+          "sha256": "14fb543b2f5886811006ac332810f9422c5cd1b8ebdd81a5735d0a23dafc18bb"
         },
-        "idle": "Flying_Idle",
-        "height": 3.03448275862069,
+        "idle": "Idle",
+        "height": 3.241379310344828,
         "yaw": null,
-        "hover": 0.31609195402298856,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.34
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#9cc8c4",
-        "resolved": "#9cc8c4",
-        "strength": 0.34
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "c4ea70e4f36953500cba02f728746d5b5b33a1b95ece64aa6d0fbdd6324f2531",
+      "sourceFingerprint": "4ec890e505c7effb1ec09bfd15c0d8c536284a56021993a56df07324b3f0fd16",
       "output": {
         "path": "public/ui/mobs/sanctum_drakonid.webp",
-        "bytes": 2096,
-        "sha256": "3c24a0c54b9cf61175046a4337112f24214b2c87b3f2cbda0e0d71dd49e5d172"
+        "bytes": 2280,
+        "sha256": "4d71524d468e15221f89909bc624799b36da7f7193530ac500f349b2d71b7170"
       }
     },
     {
@@ -9219,44 +9272,31 @@
       "visualKey": "crypt_skel_sexton",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_mage.glb",
-          "path": "public/models/chars/enemies/skeleton_mage.glb",
-          "bytes": 802628,
-          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+          "url": "models/creatures/crypt_sexton_marrow.glb",
+          "path": "public/models/creatures/crypt_sexton_marrow.glb",
+          "bytes": 2998000,
+          "sha256": "0267ad5663dae8b2afbed02321e5cd2572a82de664b183086cd21799771b3870"
         },
-        "idle": "Idle_Combat",
-        "height": 3.4,
+        "idle": "Idle",
+        "height": 5.783,
         "yaw": null,
-        "hover": null,
+        "hover": -0.038,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/skeleton_staff.glb",
-              "path": "public/models/weapons/skeleton_staff.glb",
-              "bytes": 51660,
-              "sha256": "75147e92b25e4d88a5edaf35b55b0eb6b2e2fe538694995507ecbb651072a78e"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#839192",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "814d6117e918ceca1f0a400139683e5357d9de19ab91e7fd2662d53f77b66d2e",
+      "sourceFingerprint": "246ce277297008e314821b4dee303f3fdca1f540ea3cdee0e1dfee86146ecadd",
       "output": {
         "path": "public/ui/mobs/sexton_marrow.webp",
-        "bytes": 2224,
-        "sha256": "15b604cb9281e7bc5bf604db51abef6188afde8887fa848185a878c8eb35adb8"
+        "bytes": 2392,
+        "sha256": "6624dcc15368572becaf96d403e9eb031387a7acaf043bb505f07d7be9b59589"
       }
     },
     {
@@ -9704,31 +9744,31 @@
       "visualKey": "wildheart_spore_toad",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/frog.glb",
-          "path": "public/models/creatures/frog.glb",
-          "bytes": 140836,
-          "sha256": "0d77a9e6b9a741bca8fb231a85eab7c7f894ea38099048a4696bd6f2edf3afef"
+          "url": "models/creatures/wildheart_spore_toad.glb",
+          "path": "public/models/creatures/wildheart_spore_toad.glb",
+          "bytes": 2230208,
+          "sha256": "5ca3ab3b4d041118c89ac68ce4171965f720bdfaf207aea4151b392e0512db5e"
         },
         "idle": "Idle",
-        "height": 1.87,
+        "height": 1.6208333333333333,
         "yaw": null,
-        "hover": null,
+        "hover": -0.044583333333333336,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.7
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#7f8a34",
-        "resolved": "#7f8a34",
-        "strength": 0.7
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "4c4af78d7e60d7c1a96200f5816154dee3ced905157852a096f81a665a2b4446",
+      "sourceFingerprint": "2f08ec1085d43ea371897f413c65946d2f06ce3bc0873be4459d7a0def116cbc",
       "output": {
         "path": "public/ui/mobs/spore_toad.webp",
-        "bytes": 1694,
-        "sha256": "b0e8ef7f9027d20561b6cbffe260ff3b86e74df1a97a517f1a18fa60c8686e14"
+        "bytes": 2598,
+        "sha256": "05135b8ed34c028f6834a01c8348f4658c5cf6e07ad4d1d1dbd458a6041afb9a"
       }
     },
     {
@@ -9874,49 +9914,15 @@
       "visualKey": "wildheart_sunbone_dread_totem",
       "renderSpec": {
         "model": {
-          "url": "models/props/wildheart_mask_totem.glb",
-          "path": "public/models/props/wildheart_mask_totem.glb",
-          "bytes": 165356,
-          "sha256": "cb050cc8251438135e979e6c3d28ab82be947cdfc78a0e245dd5da4d27f63299"
+          "url": "models/creatures/wildheart_sunbone_dread_totem.glb",
+          "path": "public/models/creatures/wildheart_sunbone_dread_totem.glb",
+          "bytes": 1852908,
+          "sha256": "5bc1133fc0d5f82c8754ede5b6c92f5beadd65c7846b25df81a3d7fa8b27ac66"
         },
         "idle": "Idle",
-        "height": 4,
+        "height": 3.9856249999999998,
         "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.42
-      },
-      "tint": {
-        "source": "fixed",
-        "authored": "#7a1c16",
-        "resolved": "#7a1c16",
-        "strength": 0.42
-      },
-      "sourceFingerprint": "62867b189dc1b36eed7080406ba73754737d2e24d750301c83cf1822689411eb",
-      "output": {
-        "path": "public/ui/mobs/sunbone_dread_totem.webp",
-        "bytes": 1934,
-        "sha256": "818e036374c60a26d147d504c1fbc9e0c8dcfaa607ddb8cecf82b43c30f24f40"
-      }
-    },
-    {
-      "id": "sunbone_totem",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "wildheart_sunbone_totem",
-      "renderSpec": {
-        "model": {
-          "url": "models/props/wildheart_mask_totem.glb",
-          "path": "public/models/props/wildheart_mask_totem.glb",
-          "bytes": 165356,
-          "sha256": "cb050cc8251438135e979e6c3d28ab82be947cdfc78a0e245dd5da4d27f63299"
-        },
-        "idle": "Idle",
-        "height": 4,
-        "yaw": null,
-        "hover": null,
+        "hover": -0.008124999999999999,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -9928,11 +9934,45 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "681952d66dfdc00c334fef92ff4633c7bbef510e38a3b75b33ff12a7b12f2d0f",
+      "sourceFingerprint": "f3150988e12fab02760205fe96ce05dee8da108247426d2d6c4542587cbb781f",
+      "output": {
+        "path": "public/ui/mobs/sunbone_dread_totem.webp",
+        "bytes": 2528,
+        "sha256": "e35a52527f9b7a4e977a962cc2718b53c90496f828ed25a832851210c5a47af9"
+      }
+    },
+    {
+      "id": "sunbone_totem",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "wildheart_sunbone_totem",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_sunbone_totem.glb",
+          "path": "public/models/creatures/wildheart_sunbone_totem.glb",
+          "bytes": 1887784,
+          "sha256": "e04fce1afdacf36669ad30bad95c6b33ae08bb502c5c8fe8318db1069418ba61"
+        },
+        "idle": "Idle",
+        "height": 4.138125,
+        "yaw": null,
+        "hover": -0.008124999999999999,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "37b443acdafa6383c3dab3a4c1eb20f7976fe03db915502f55c6813f3ce68ef4",
       "output": {
         "path": "public/ui/mobs/sunbone_totem.webp",
-        "bytes": 2062,
-        "sha256": "c6c360223b2f6ed721d5fd66f8c4b65bcb6d3d1f2606f3b813b73f6718cc1d91"
+        "bytes": 2556,
+        "sha256": "044d3084cbe96ab752df1797a0f34224560d542382b7e8c55a2a1cd39895ab21"
       }
     },
     {
@@ -9942,31 +9982,31 @@
       "visualKey": "wildheart_totem_binder",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wildheart_hexcaller.glb",
-          "path": "public/models/creatures/wildheart_hexcaller.glb",
-          "bytes": 1056052,
-          "sha256": "f25e9ea2acad458b9761183277258e5c650137de93a512de2aa59cb8c9a9036e"
+          "url": "models/creatures/wildheart_totem_binder.glb",
+          "path": "public/models/creatures/wildheart_totem_binder.glb",
+          "bytes": 2496928,
+          "sha256": "3e618443b27be0db3c1886e363d4f80a42647419386235962951a038dda9fd4b"
         },
         "idle": "Idle",
-        "height": 2.625,
-        "yaw": -1.5707963267948966,
-        "hover": null,
+        "height": 3.101538461538462,
+        "yaw": null,
+        "hover": 0,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#d9b26a",
-        "resolved": "#d9b26a",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "f06bcc8060f87c6d9672aa10ee40415e4a84dc1773ce303623a92dcf755b94f4",
+      "sourceFingerprint": "187f41af9a1c1ee9fde09f8b8485b841708342fd1e3b62cbf1671865287df643",
       "output": {
         "path": "public/ui/mobs/sunbone_totem_binder.webp",
-        "bytes": 3246,
-        "sha256": "5a7ff2b1b11b2c67d666e119ef43ade7f84e33f003eb1e6d28353fe724ca6efa"
+        "bytes": 2984,
+        "sha256": "fe09ff14dfa882d912a2e66b996d40ab8ca7d771151421bb48311819d1b36940"
       }
     },
     {
@@ -10001,6 +10041,108 @@
         "path": "public/ui/mobs/sundered_horror.webp",
         "bytes": 2408,
         "sha256": "eb020421881252b1f90e647dd880c6bd04c62df6853c81b5672cea92f692e49a"
+      }
+    },
+    {
+      "id": "temple_abyssal_lurker",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "temple_abyssal_lurker",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_abyssal_lurker.glb",
+          "path": "public/models/creatures/temple_abyssal_lurker.glb",
+          "bytes": 144604,
+          "sha256": "533e4c6ece6f07b384396c5ee32a74750b636a951d5598a8131a2a91f6315ad9"
+        },
+        "idle": "Idle",
+        "height": 2.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "0a44d7972196daf46f450d0a4b3212857252396fd946990af9ba7991c5081c58",
+      "output": {
+        "path": "public/ui/mobs/temple_abyssal_lurker.webp",
+        "bytes": 2262,
+        "sha256": "26d07bceee04df28bb724fc7b8bf67f9adc86fd7918527d68bde2e62b1a6fd70"
+      }
+    },
+    {
+      "id": "temple_tidemarked_tide",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "temple_tidemarked_sentinel",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_tidemarked_sentinel.glb",
+          "path": "public/models/creatures/temple_tidemarked_sentinel.glb",
+          "bytes": 133972,
+          "sha256": "51ed098fa1bd5eec7c4a7fd049698bd6f76bae299f04d5260e0d7b714685b3dc"
+        },
+        "idle": "Idle",
+        "height": 4.027,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "1cb13911935c3699334a586070a675d456b654b0230be966842aded2c7a8afed",
+      "output": {
+        "path": "public/ui/mobs/temple_tidemarked_tide.webp",
+        "bytes": 3220,
+        "sha256": "b95dd5124a60c5bdc02977acd2772fd2aa31d653ff1bdc1ef5aa1dc26763758b"
+      }
+    },
+    {
+      "id": "temple_tidemarked_trident",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "temple_tidemarked_sentinel",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_tidemarked_sentinel.glb",
+          "path": "public/models/creatures/temple_tidemarked_sentinel.glb",
+          "bytes": 133972,
+          "sha256": "51ed098fa1bd5eec7c4a7fd049698bd6f76bae299f04d5260e0d7b714685b3dc"
+        },
+        "idle": "Idle",
+        "height": 4.027,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "1cb13911935c3699334a586070a675d456b654b0230be966842aded2c7a8afed",
+      "output": {
+        "path": "public/ui/mobs/temple_tidemarked_trident.webp",
+        "bytes": 3220,
+        "sha256": "b95dd5124a60c5bdc02977acd2772fd2aa31d653ff1bdc1ef5aa1dc26763758b"
       }
     },
     {
@@ -10494,11 +10636,11 @@
         "model": {
           "url": "models/creatures/temple_colossus.glb",
           "path": "public/models/creatures/temple_colossus.glb",
-          "bytes": 2779028,
-          "sha256": "96ad826c1964710b74f594fd5f25b5a4d4154889d86e2115dee99ccabce71a0c"
+          "bytes": 2853232,
+          "sha256": "513ebec51de376ea81c05faba0e35ce7fcac75d15e0e163a6011581e608db9ec"
         },
         "idle": "Idle",
-        "height": 6.8181818181818175,
+        "height": 7.59090909090909,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -10512,11 +10654,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "0d2689cde6c38094b7e57fc929004f93753bab43580e48a735725ca53124d893",
+      "sourceFingerprint": "80bb3a30af1023bc99b5db42c2236b0e4eb418f9291dc1fe7499e5f9ecd07664",
       "output": {
         "path": "public/ui/mobs/tideglass_colossus.webp",
-        "bytes": 4674,
-        "sha256": "db59e59160a216126bd92226cfafa8f8708554e7baf8cb33ab8361fc9c178a4c"
+        "bytes": 4296,
+        "sha256": "ef80213d3fce35f67798eba65b20660e6928ffb925fcba224d29e20b0d562a38"
       }
     },
     {
@@ -11383,20 +11525,20 @@
     },
     {
       "id": "turretback_hermit",
-      "family": "beast",
+      "family": "undead",
       "finderEncounter": false,
       "visualKey": "mob_turretback",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/turretback_hermit.glb",
-          "path": "public/models/creatures/turretback_hermit.glb",
-          "bytes": 1517668,
-          "sha256": "1fd4c47ceed66d5581ec8c910a6780a79168e2ae8742375caca286d82e9a67e4"
+          "url": "models/creatures/bastion_ghost_captain.glb",
+          "path": "public/models/creatures/bastion_ghost_captain.glb",
+          "bytes": 2212432,
+          "sha256": "3965105de5c534565cef2f738b28e7706170182c3e527ba3af6241cdd800cb2f"
         },
         "idle": "Idle",
-        "height": 15,
+        "height": 7.5,
         "yaw": null,
-        "hover": null,
+        "hover": 0.3,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -11408,11 +11550,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "4f913eaceaed2c594a37f4aebeceacdd363c7539bd994c7d7063cc51b258bf93",
+      "sourceFingerprint": "37350f0b78476aeea63b923dd96d4ad9d5674e96fdc3e6d78796bbfb3a6d5050",
       "output": {
         "path": "public/ui/mobs/turretback_hermit.webp",
-        "bytes": 1784,
-        "sha256": "94eb200be88c13b44d0d02c5165fe7e8c2b8d7424182a22bffe703ec19312294"
+        "bytes": 2226,
+        "sha256": "885ca6291460e6b78723062d343619c21b90d64f9866705255b5d51d4ecb1767"
       }
     },
     {
@@ -12282,31 +12424,31 @@
       "visualKey": "mob_wildheart_beastmaster",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wildheart_beastmaster.glb",
-          "path": "public/models/creatures/wildheart_beastmaster.glb",
-          "bytes": 1342220,
-          "sha256": "399c39ab6c959dfe8c553fca418e5f26fbd612495797ffacfa9c11cf891eb6a1"
+          "url": "models/creatures/wildheart_beastmaster_blender.glb",
+          "path": "public/models/creatures/wildheart_beastmaster_blender.glb",
+          "bytes": 2569776,
+          "sha256": "8eba2421ee8b34c8c396243bcfb3cf8d9f432d42a125a93ddc2a2337beb2d25f"
         },
         "idle": "Idle",
-        "height": 3,
-        "yaw": -1.5707963267948966,
-        "hover": null,
+        "height": 2.678723404255319,
+        "yaw": null,
+        "hover": 0,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.03
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#485b3d",
-        "strength": 0.03
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "3c3b9c0c15aa5b1061dd6ebccde693527bd9c86c45be51cd26da658de0e0ff7e",
+      "sourceFingerprint": "03eb6f68b1fea7b4e263fde7cb5965a3f16f2bc6d309b22c8171f47001423659",
       "output": {
         "path": "public/ui/mobs/wildheart_beastmaster.webp",
-        "bytes": 3228,
-        "sha256": "bc40fa803ab1690d649e8bf3470a6a90003f0aeccecf94720fd5d533d55a63df"
+        "bytes": 3168,
+        "sha256": "994e3d3eae86a8962cee9ee09fc4b1cc9999a53163414267dccd94c5a32f0759"
       }
     },
     {
@@ -12318,8 +12460,8 @@
         "model": {
           "url": "models/creatures/wildheart_hexcaller.glb",
           "path": "public/models/creatures/wildheart_hexcaller.glb",
-          "bytes": 1056052,
-          "sha256": "f25e9ea2acad458b9761183277258e5c650137de93a512de2aa59cb8c9a9036e"
+          "bytes": 1070600,
+          "sha256": "ccb788bc8f09456a2119d2e35037ac8702d9e3ca48d4e6a7c7af219319220b0d"
         },
         "idle": "Idle",
         "height": 2.5,
@@ -12336,11 +12478,11 @@
         "resolved": "#688057",
         "strength": 0.04
       },
-      "sourceFingerprint": "429116bbd70dc6c987264887d3677dd52cb3ed503d364ebc5da64e4b869e2360",
+      "sourceFingerprint": "ec7f5711c307c50a1f0b4dda4aca83821f7f729c0e13ff3d7fe3db7bab3ea93a",
       "output": {
         "path": "public/ui/mobs/wildheart_hexcaller.webp",
-        "bytes": 3246,
-        "sha256": "30a33ff1b8dbc0b8f180724f17880582d45861108241ec02d4f554eb36852885"
+        "bytes": 3210,
+        "sha256": "cba8ce6ea945f281bab01c3defcd94290bd8756ac0cbad14a6df41524b330ce6"
       }
     },
     {
@@ -12352,8 +12494,8 @@
         "model": {
           "url": "models/creatures/wildheart_high_priest.glb",
           "path": "public/models/creatures/wildheart_high_priest.glb",
-          "bytes": 1260468,
-          "sha256": "a43393cb43b91cecb5e4dc4d6f362c8e7b72b3e12ba5985051a5067350338511"
+          "bytes": 1275016,
+          "sha256": "698b171c54c3326835dadce26d1a478dcb77eeda3c031caad3cdde7a2def2fe8"
         },
         "idle": "Idle",
         "height": 3.2,
@@ -12370,11 +12512,11 @@
         "resolved": "#566f45",
         "strength": 0.03
       },
-      "sourceFingerprint": "119fe85f7e322bd33f8a8dfe2aa8447ca8ff6a9422ed7841d286bdda21cd85dd",
+      "sourceFingerprint": "d97de450f9c43e84cb4fc8a00883d0796e95d0b63656da5a7181f6afbc824a9c",
       "output": {
         "path": "public/ui/mobs/wildheart_high_priest.webp",
-        "bytes": 3528,
-        "sha256": "7c303aeb8232008a15d839a61a51de9f45f65c5a5e2b3e7c2ee64aa877ef17cc"
+        "bytes": 3550,
+        "sha256": "a751b06c76da4080623185c3c9ca148f6884be4dc771bb9b6d4bcfe8aa5681a2"
       }
     },
     {
@@ -12386,8 +12528,8 @@
         "model": {
           "url": "models/creatures/wildheart_ravager.glb",
           "path": "public/models/creatures/wildheart_ravager.glb",
-          "bytes": 1257032,
-          "sha256": "1d07968792a6a60f8b0fb49445cdc355769dcc9e864cbcbff302bacb5fc81636"
+          "bytes": 1271584,
+          "sha256": "e242f827c2d29ce7b315116a37e08ae001fc7d531614715b19d2979c888c1fca"
         },
         "idle": "Idle",
         "height": 2.7,
@@ -12404,11 +12546,11 @@
         "resolved": "#78513f",
         "strength": 0.04
       },
-      "sourceFingerprint": "157004661e66d007f69d190081688b8b4f8a2c5934b97905e5fd1280698c6bad",
+      "sourceFingerprint": "70adf6c60e0748300f6d795ec70621f83fae004b26382e91a4463e7013477071",
       "output": {
         "path": "public/ui/mobs/wildheart_ravager.webp",
-        "bytes": 3430,
-        "sha256": "02cb1ba9dc9490f04c87ba41aa9d14845e03a874494a33fd8836eadcd206aab9"
+        "bytes": 3432,
+        "sha256": "de2170e747407445c8fdbbcd1848ed46f8f64b8447e291ed36175783804d16be"
       }
     },
     {
@@ -12420,8 +12562,8 @@
         "model": {
           "url": "models/creatures/wildheart_stalker.glb",
           "path": "public/models/creatures/wildheart_stalker.glb",
-          "bytes": 1199520,
-          "sha256": "7b999b51c99b55cc128abb51ec79e95a1f379ed3ee1ee942f76ae1536ed9dade"
+          "bytes": 1214060,
+          "sha256": "f8b599a94afc8186395dbc632359c0c4501ad75cc19426f6f95f55d27e6314d4"
         },
         "idle": "Idle",
         "height": 2.5,
@@ -12438,11 +12580,11 @@
         "resolved": "#4f7651",
         "strength": 0.04
       },
-      "sourceFingerprint": "8566b5949a1b9a4f6cfe84d3f07a6d78a8bc35220e964b9080cbf5e797c1dbed",
+      "sourceFingerprint": "2a5e06d90013d2a4d20f26eb7b0ba05af879962856b7b5edb53ae2a1df58225b",
       "output": {
         "path": "public/ui/mobs/wildheart_stalker.webp",
         "bytes": 2124,
-        "sha256": "74cd3d7553f07790c7f964b6714445dfbe37e1bcdab1a8a338aca925c2314c52"
+        "sha256": "b1e2e308fb24fd8749cd6e5caab52dbe2d0c9fd463ed3c11db3c560595eae23b"
       }
     },
     {

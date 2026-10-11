@@ -11,6 +11,8 @@ export const TEMPLE_LULLABY = 'temple_lullaby';
 export const TEMPLE_CALL_THE_TIDE = 'temple_call_the_tide';
 /** Lagoon Eel: an interruptible charge of the coils that shocks everyone near. */
 export const TEMPLE_STATIC_COIL = 'temple_static_coil';
+/** Tide sentinel: an interruptible frost nova, blocked by line of sight. */
+export const TEMPLE_TIDEMARKED_SURGE = 'temple_tidemarked_surge';
 /** Lagoon Snapper: a telegraphed bite across its front (breathCone). */
 export const TEMPLE_SNAP = 'temple_snapper_snap';
 /** Drowned Templeguard: a telegraphed trident sweep across its front (breathCone). */
@@ -95,6 +97,7 @@ export const TEMPLE_KIT_CAST_SCHOOLS: Readonly<Record<string, { school: Aura['sc
   [TEMPLE_LULLABY]: { school: 'arcane' },
   [TEMPLE_CALL_THE_TIDE]: { school: 'frost' },
   [TEMPLE_STATIC_COIL]: { school: 'nature' },
+  [TEMPLE_TIDEMARKED_SURGE]: { school: 'frost' },
   [TEMPLE_PALE_MENDING]: { school: 'frost' },
   [TEMPLE_GLIMMER_VENOM]: { school: 'nature' },
   [TEMPLE_ARCING_SPARK]: { school: 'nature' },

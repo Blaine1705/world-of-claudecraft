@@ -49,6 +49,7 @@ import {
   TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
+  TEMPLE_TIDEMARKED_SURGE,
   TEMPLE_TRIDENT_SWEEP,
 } from '../../sim/mob/trash_kit/temple_cast_ids';
 import { TEMPLE_CARAPACE_AURA } from '../../sim/mob/trash_kit/temple_kit';
@@ -99,7 +100,15 @@ export function templeTelegraphSpecs(): Readonly<Record<string, TempleTelegraphS
   const spit = MOBS.lagoon_eel?.trashKit?.line;
   const hurl = MOBS.drowned_templeguard?.trashKit?.line;
   const slam = MOBS.pearlguard_sentinel?.trashKit?.wingGust;
+  const guardianSurge = MOBS.temple_tidemarked_tide?.trashKit?.nova;
   return {
+    [TEMPLE_TIDEMARKED_SURGE]: {
+      shape: 'ring',
+      range: guardianSurge?.radius ?? 0,
+      arcDeg: 360,
+      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      accent: TEMPLE_ACCENTS.tide,
+    },
     // The sixth pass: the trash's second jobs and the Hydra's water lane.
     [TEMPLE_SKEWERING_TRIDENT]: {
       shape: 'lane',

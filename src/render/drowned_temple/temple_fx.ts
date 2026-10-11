@@ -66,6 +66,7 @@ import {
   templeTimedFill,
   tideLook,
 } from './temple_fx_core';
+import { TempleGuardianFx } from './temple_guardian_fx';
 import { TempleHydra } from './temple_hydra';
 import { TempleHydraComboFx } from './temple_hydra_combo_fx';
 import { TempleLureFx } from './temple_lure_fx';
@@ -141,6 +142,7 @@ export class TempleFx {
   private readonly bridge: TempleMoonbridgeFx;
   private readonly trash: TempleTrashFx;
   private readonly lure: TempleLureFx;
+  private readonly guardians: TempleGuardianFx;
   private readonly flashesOn: boolean;
   /** Each living Pearlguard Sentinel's shell stance and when it changed. */
   private readonly shellStance = new Map<number, TempleShellTrack>();
@@ -210,6 +212,7 @@ export class TempleFx {
     this.bridge = new TempleMoonbridgeFx(this.root, world, groundY, on, kit, shake, calm);
     this.trash = new TempleTrashFx(this.root, world, groundY, on, kit, shake, calm);
     this.lure = new TempleLureFx(this.root, world, groundY, on, kit, calm);
+    this.guardians = new TempleGuardianFx(this.root, world, groundY, on, calm);
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {
         // Linked: the caster and fracture layers may sleep while idle now.
@@ -221,6 +224,7 @@ export class TempleFx {
         this.bridge.markGated();
         this.trash.markGated();
         this.lure.markGated();
+        this.guardians.markGated();
       })
       .catch(() => {});
   }
@@ -235,6 +239,7 @@ export class TempleFx {
     if (this.combo.handleEvent(ev) || this.moon.handleEvent(ev)) return true;
     if (this.manta.handleEvent(ev) || this.bridge.handleEvent(ev)) return true;
     if (this.trash.handleEvent(ev) || this.lure.handleEvent(ev)) return true;
+    if (this.guardians.handleEvent(ev)) return true;
     if (ev.type === 'spellfx') {
       const source = this.world?.entities.get(ev.sourceId);
       // Claimed only when the Frenzy can actually play (a host without the
@@ -272,6 +277,7 @@ export class TempleFx {
     this.bridge.update(dt, this.clock);
     this.trash.update(dt, this.clock);
     this.lure.update(dt, this.clock);
+    this.guardians.update(dt);
     for (const slot of this.casts) {
       if (slot.casterId < 0) continue;
       const caster = world.entities.get(slot.casterId);
@@ -507,6 +513,7 @@ export class TempleFx {
       if (this.playGesture && e.templateId === 'moonspawn')
         this.offerMoonspawnRise(e.id, e.templateId, e.dead);
       if (e.dead) continue;
+      this.guardians.observeCaster(e);
       if (e.templateId.startsWith(REFLECTION_ID) && e.forcedTargetId !== null) {
         const have = this.tetherPairs.findIndex(([r]) => r === e.id);
         if (have >= 0) this.tetherPairs[have][1] = e.forcedTargetId;
@@ -591,6 +598,7 @@ export class TempleFx {
     this.bridge.dispose();
     this.trash.dispose();
     this.lure.dispose();
+    this.guardians.dispose();
     this.root.removeFromParent();
     this.kit.dispose();
     for (const t of this.tethers) t.geometry.dispose();

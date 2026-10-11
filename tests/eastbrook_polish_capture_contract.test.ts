@@ -706,7 +706,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // renderer leaf moved again). No capture was retaken.
   // Re-minted for the dungeon trash pass (the renderer leaf moved again: the
   // trash engine and the dungeon trash visuals). No capture was retaken.
-  '32e8545d816989e99d16a079200f78d77ca95071e66a6a99d89cb7c74ff0ef05';
+  '5f8934f35d6566d962c926cccdb524479d14387cf6e65a5f28da8c21c32260d6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

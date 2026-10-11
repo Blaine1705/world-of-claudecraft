@@ -201,8 +201,8 @@ const LINES: GuideLineDef[] = [
   {
     id: 'C09',
     key: 'sight.eel',
-    text: 'The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.',
-    trigger: { kind: 'sight', mobIds: ['lagoon_eel'], r: SIGHT },
+    text: 'Those lurkers hunt from the shallows. They leap at distant prey. When one opens its jaws, step behind it to avoid the bite.',
+    trigger: { kind: 'sight', mobIds: ['temple_abyssal_lurker'], r: SIGHT },
     priority: 'creature',
   },
   {

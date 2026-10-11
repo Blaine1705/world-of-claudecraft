@@ -12676,6 +12676,7 @@ export const ru_RU: EnTranslations = {
       "cantor_last_verse": "Последний стих",
       "temple_call_the_tide": "Зов прилива",
       "temple_static_coil": "Статический виток",
+      "temple_tidemarked_surge": "Tidal Surge",
       "temple_snapper_snap": "Укус",
       "temple_trident_sweep": "Взмах трезубца",
       "temple_sea_song": "Песнь моря",
@@ -20375,6 +20376,15 @@ export const ru_RU: EnTranslations = {
       },
       "lagoon_eel": {
         "name": "Лагунный угорь"
+      },
+      "temple_tidemarked_trident": {
+        "name": "Drowned Temple Warden: Trident"
+      },
+      "temple_tidemarked_tide": {
+        "name": "Drowned Temple Warden: Tide"
+      },
+      "temple_abyssal_lurker": {
+        "name": "Temple Amphibian"
       },
       "moonlit_siren": {
         "name": "Лунная сирена"

@@ -12676,6 +12676,7 @@ export const ja_JP: EnTranslations = {
       "cantor_last_verse": "最後の一節",
       "temple_call_the_tide": "潮の呼び声",
       "temple_static_coil": "静電のとぐろ",
+      "temple_tidemarked_surge": "Tidal Surge",
       "temple_snapper_snap": "噛みつき",
       "temple_trident_sweep": "三叉槍の薙ぎ払い",
       "temple_sea_song": "海の歌",
@@ -20375,6 +20376,15 @@ export const ja_JP: EnTranslations = {
       },
       "lagoon_eel": {
         "name": "潟湖のウナギ"
+      },
+      "temple_tidemarked_trident": {
+        "name": "Drowned Temple Warden: Trident"
+      },
+      "temple_tidemarked_tide": {
+        "name": "Drowned Temple Warden: Tide"
+      },
+      "temple_abyssal_lurker": {
+        "name": "Temple Amphibian"
       },
       "moonlit_siren": {
         "name": "月照らしのセイレーン"

@@ -4340,7 +4340,7 @@ export class MusicDirector {
   /** Engage/disengage the dedicated boss-fight loop. Idempotent; called every
    *  frame by the HUD. Ducks the procedural score while active. */
   setBossCombat(on: boolean, url = DEFAULT_BOSS_TRACK_URL): void {
-    this.bossLoop.retarget(url);
+    this.bossLoop.retarget(url, on && !this.bossActive ? this.allStreams() : null);
     if (on === this.bossActive) {
       if (on) this.applyBossPlayback();
       return;

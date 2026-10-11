@@ -12676,6 +12676,7 @@ export const zh_TW: EnTranslations = {
       "cantor_last_verse": "最後一節",
       "temple_call_the_tide": "潮汐召喚",
       "temple_static_coil": "靜電盤繞",
+      "temple_tidemarked_surge": "Tidal Surge",
       "temple_snapper_snap": "猛咬",
       "temple_trident_sweep": "三叉戟橫掃",
       "temple_sea_song": "海之歌",
@@ -20375,6 +20376,15 @@ export const zh_TW: EnTranslations = {
       },
       "lagoon_eel": {
         "name": "潟湖鰻魚"
+      },
+      "temple_tidemarked_trident": {
+        "name": "Drowned Temple Warden: Trident"
+      },
+      "temple_tidemarked_tide": {
+        "name": "Drowned Temple Warden: Tide"
+      },
+      "temple_abyssal_lurker": {
+        "name": "Temple Amphibian"
       },
       "moonlit_siren": {
         "name": "月光賽壬"

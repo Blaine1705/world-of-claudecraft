@@ -377,6 +377,8 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     difficulty: 'normal',
     healthMultiplier: 1,
     healthMultiplierByMob: {
+      temple_tidemarked_trident: 1.5,
+      temple_tidemarked_tide: 1.5,
       choirmother_selthe: 7.97,
       tideglass_colossus: 7.35,
       ysolei: 8.27,
@@ -642,6 +644,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // 230): Selthe 90 s, the Colossus 100 s, Ysolei 150 s, the Hydra's heads
     // 55 s for the three.
     healthMultiplierByMob: {
+      // Same 1.5x durability premium over ordinary heroic Temple trash (5.2).
+      temple_tidemarked_trident: 7.8,
+      temple_tidemarked_tide: 7.8,
       choirmother_selthe: 12.9,
       tideglass_colossus: 12.05,
       ysolei: 13.66,
@@ -659,6 +664,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // trash dodge costs a cloth wearer about 40 percent (1,250 at level 20
     // heroic), a fumbled boss core is lethal, an unavoidable pulse 15 percent.
     mechanicDamageMultiplierByMob: {
+      temple_tidemarked_trident: 5.5,
+      temple_tidemarked_tide: 5.5,
+      temple_abyssal_lurker: 5.5,
       drowned_templeguard: 5.5,
       lagoon_snapper: 5.5,
       lagoon_eel: 5.5,

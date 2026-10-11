@@ -47,8 +47,10 @@ import {
   TEMPLE_CALL_OF_THE_SHALLOWS,
   TEMPLE_CALL_THE_TIDE,
   TEMPLE_LIGHTNING_SPIT,
+  TEMPLE_SKEWERING_TRIDENT,
   TEMPLE_SNAP,
   TEMPLE_STATIC_COIL,
+  TEMPLE_TIDEMARKED_SURGE,
 } from '../mob/trash_kit/temple_cast_ids';
 import {
   ALL_CLASSES,
@@ -112,7 +114,116 @@ export function reflectionTemplateFor(playerClass: string): string {
   return `tideglass_reflection_${playerClass}`;
 }
 
+// Door guardians keep the Templeguard's level-16 elite baseline. The difficulty
+// table gives each 1.5 times its health: together 2,678 normal HP, about 24 s
+// at the Temple's 110 party DPS planning baseline, before the accompanying Siren.
+// They remain trash elites: no boss completion, marks, or unique boss loot.
+const TIDEMARKED_SENTINEL_BASE = {
+  minLevel: 16,
+  maxLevel: 16,
+  family: 'humanoid',
+  elite: true,
+  hpBase: 58,
+  hpPerLevel: 22,
+  dmgBase: 11,
+  dmgPerLevel: 2.6,
+  attackSpeed: 2.3,
+  armorPerLevel: 20,
+  moveSpeed: 6.5,
+  aggroRadius: 12,
+  idleStationary: true,
+  scale: 1.5,
+  color: 0x73bdbe,
+  loot: [
+    { copper: 200, chance: 1 },
+    { itemId: 'pale_pearl', chance: 0.4 },
+  ],
+} satisfies Partial<MobTemplate>;
+
 export const DROWNED_TEMPLE_MOBS: Record<string, MobTemplate> = {
+  temple_tidemarked_trident: {
+    ...TIDEMARKED_SENTINEL_BASE,
+    id: 'temple_tidemarked_trident',
+    name: 'Drowned Temple Warden: Trident',
+    trashKit: {
+      line: {
+        castId: TEMPLE_SKEWERING_TRIDENT,
+        name: 'Skewering Trident',
+        castTime: 1.8,
+        every: 14,
+        first: 7,
+        school: 'physical',
+        length: 22,
+        halfWidth: 1.3,
+        min: 60,
+        max: 70,
+      },
+    },
+  },
+  temple_tidemarked_tide: {
+    ...TIDEMARKED_SENTINEL_BASE,
+    id: 'temple_tidemarked_tide',
+    name: 'Drowned Temple Warden: Tide',
+    trashKit: {
+      nova: {
+        castId: TEMPLE_TIDEMARKED_SURGE,
+        name: 'Tidal Surge',
+        castTime: 2,
+        every: 13,
+        first: 5,
+        school: 'frost',
+        radius: 8,
+        min: 45,
+        max: 55,
+      },
+    },
+  },
+  temple_abyssal_lurker: {
+    id: 'temple_abyssal_lurker',
+    name: 'Temple Amphibian',
+    minLevel: 16,
+    maxLevel: 17,
+    family: 'beast',
+    elite: true,
+    untameable: true,
+    // The Glimmerscale Lurker's ordinary elite baseline, below the guardians.
+    hpBase: 56,
+    hpPerLevel: 21,
+    dmgBase: 11,
+    dmgPerLevel: 2.7,
+    attackSpeed: 1.8,
+    armorPerLevel: 16,
+    moveSpeed: 8,
+    aggroRadius: 13,
+    breathCone: {
+      castId: TEMPLE_SNAP,
+      name: 'Snap',
+      castTime: 1.5,
+      every: 10,
+      range: 6,
+      arcDeg: 90,
+      min: 80,
+      max: 100,
+      school: 'physical',
+    },
+    trashKit: {
+      leap: {
+        name: 'Pounce',
+        every: 14,
+        first: 3,
+        minRange: 8,
+        maxRange: 12,
+        seconds: 0.6,
+        fixate: 3,
+      },
+    },
+    loot: [
+      { copper: 180, chance: 1 },
+      { itemId: 'moonpale_scale', chance: 0.5 },
+    ],
+    scale: 1.2,
+    color: 0x2f6f78,
+  },
   lagoon_snapper: {
     id: 'lagoon_snapper',
     name: 'Lagoon Snapper',
@@ -561,9 +672,9 @@ export const DROWNED_TEMPLE_SPAWNS: DungeonSpawn[] = [
   held('drowned_pilgrim', -5, -64, 'g4'),
   held('drowned_pilgrim', 5, -64, 'g4'),
   held('pale_choir_acolyte', 0, -55, 'g4'),
-  // g5: the colonnade's end, before the Choir Veil. Two eels and a siren.
-  held('lagoon_eel', -9, -47, 'g5'),
-  held('lagoon_eel', 9, -47, 'g5'),
+  // g5: the Choir Veil's two complementary door guardians and their Siren.
+  held('temple_tidemarked_trident', -9, -47, 'g5'),
+  held('temple_tidemarked_tide', 9, -47, 'g5'),
   held('moonlit_siren', 0, -43, 'g5'),
   // Boss 1: Choirmother Selthe on the Choir Court's stage.
   { mobId: 'choirmother_selthe', x: 0, z: 10, facing: FACE_SOUTH, idleStationary: true },
@@ -587,7 +698,7 @@ export const DROWNED_TEMPLE_SPAWNS: DungeonSpawn[] = [
   held('drowned_pilgrim', 56, 17, 'g8', FACE_WEST),
   // g9: the grotto behind the falls. An eel, a snapper and a sentinel.
   held('pearlguard_sentinel', 80, 64, 'g9'),
-  held('lagoon_eel', 85, 70, 'g9'),
+  held('temple_abyssal_lurker', 85, 70, 'g9'),
   held('lagoon_snapper', 76, 70, 'g9'),
   // Patrol B: a sentinel and two lurkers pacing behind the curtain of the falls.
   patrolling('pearlguard_sentinel', FALLS_WALK, 'pb', 0),
@@ -637,7 +748,7 @@ export const DROWNED_TEMPLE_SPAWNS: DungeonSpawn[] = [
   held('pearlguard_sentinel', 25, 219, 'g13', FACE_EAST),
   held('moonlit_siren', 19, 221, 'g13', FACE_EAST),
   held('lagoon_snapper', 27, 214, 'g13', FACE_EAST),
-  held('lagoon_eel', 21, 215, 'g13', FACE_EAST),
+  held('temple_abyssal_lurker', 21, 215, 'g13', FACE_EAST),
   held('pale_choir_acolyte', 16, 218, 'g13', FACE_EAST),
   // Boss 3: Ysolei coiled against the Moon Altar's east face (just clear of
   // the altar stone's collider), on the causeway line, facing the causeway.

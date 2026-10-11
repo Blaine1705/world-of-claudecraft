@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   type DriftManifest,
@@ -123,7 +123,8 @@ describe('mob portrait source manifest', () => {
     // 347: the dungeon trash pass's two new bodies (the Hollow Crypt's
     // Stirring Bones and the Sunbone Dread Totem). 348: Sexton Marrow's
     // Restless Bones (marrow_restless_bones), raised from his Open Graves.
-    expect(liveIds).toHaveLength(348);
+    // Add the remembrance candle and the three Temple guardian/amphibian templates.
+    expect(liveIds).toHaveLength(352);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
@@ -393,7 +394,7 @@ describe('mob portrait source manifest', () => {
   it('derives the renderer fingerprint independently of the launch directory', () => {
     const probe = `
       import { buildPortraitRendererContract, portraitRendererFingerprint } from ${JSON.stringify(
-        join(repoRoot, 'scripts/lib/mob_portrait_jobs.mjs'),
+        pathToFileURL(join(repoRoot, 'scripts/lib/mob_portrait_jobs.mjs')).href,
       )};
       const contract = await buildPortraitRendererContract(${JSON.stringify(repoRoot)});
       process.stdout.write(portraitRendererFingerprint(contract));

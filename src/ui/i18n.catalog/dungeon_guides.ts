@@ -72,7 +72,7 @@ export const dungeonGuideStrings = {
         'That is the moon-water itself, the draught we were meant to drink. Do not let it touch you.',
       sentinel:
         'The moon rays of the gate pools. As novices we fed them pearls at moonrise. Now they keep the doors, and wear our pearls as hearts.',
-      eel: 'The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.',
+      eel: 'Those lurkers hunt from the shallows. They leap at distant prey. When one opens its jaws, step behind it to avoid the bite.',
       reflection: 'It shows you what the water would make of you. Break it!',
       moonspawn: 'Those were never my people. They are hers, made of nothing but moonlight.',
     },

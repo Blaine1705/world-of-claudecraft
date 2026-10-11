@@ -1,0 +1,10 @@
+{
+  "tier": "low",
+  "reduceMotionSetting": true,
+  "osReduced": true,
+  "nameplatesHidden": true,
+  "material": "sanctum-exit:vortex:low",
+  "rotationBefore": 0,
+  "rotationAfter": 0,
+  "visible": true
+}
