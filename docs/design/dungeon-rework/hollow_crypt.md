@@ -103,10 +103,27 @@ seen from the first step.
 
 **Gates and seals (no skipping, G7).** Gate state is derived every tick from the
 claim roster (`src/sim/instances/dungeon_gates.ts`): a gate is closed until its
-packs and bosses are dead, sealed while its `sealWhileEngaged` boss is alive and
-engaged, open otherwise. A wipe clears the seal and never re-closes a cleared
+packs and bosses are dead, sealed once its `sealWhileEngaged` boss has fought for
+the seal delay, open otherwise. A wipe clears the seal and never re-closes a cleared
 gate, so a corpse run always has a path. `bossChainPull` stays on. Kinds:
 portcullis, bone barrier, frost-web curtain, warded arch, rite ward.
+
+**The seal delay (owner playtest, 2026-10-12).** A boss room does not shut at the
+pull: it seals `BOSS_ROOM_SEAL_DELAY_SECONDS` (10 s) into the fight, so a group
+caught on the threshold gets in. One rule for every sealing gate of every dungeon,
+counted in sim ticks (`tests/dungeon_gate_seal_delay.test.ts`):
+
+- While the seal is pending the gate is open, to collision, to every reader of
+  `dungeonGateState` and on the wire (the gate's closing animation plays when the
+  seal lands, not at the pull).
+- A boss that dies, goes home, or is walking home when the delay runs out (a wipe
+  inside the window) cancels the seal: the door never shuts on an empty room, and
+  the next pull gets the whole delay again.
+- A boss walked to its own doorway inside the window seals the room at once, with
+  the boss still inside (`BOSS_ROOM_DOORWAY_REACH`): the open door is for the group
+  to come in, never for the boss to be dragged out of its arena.
+- Once landed, the seal holds as before (while the boss is in combat or walking
+  home) and whoever is outside is locked out until the boss dies or resets.
 
 ## 4. Trash (owner direction, 2026-09-29)
 
