@@ -1,7 +1,7 @@
 // The renderer's direct-pick entry: the pure stack resolver (pick_resolution.ts)
 // fed with what the live world and the static content tables know about each
 // hit. Renderer.pickDirect raycasts the click capsules and hands the hit ids,
-// nearest first, to resolveWorldDirectPick.
+// nearest first, and the pick ray itself to resolveWorldDirectPick.
 //
 // The one fact it adds is the USE-ONLY body: a mob the local player can use
 // right now and cannot attack (the Hollow Crypt's Remembrance Candle while
@@ -10,6 +10,16 @@
 // ray reached before it, so a boss capsule standing between the camera and the
 // candle no longer swallows every click on it; the resolver's overlap cycling
 // then reaches the boss on the next click.
+//
+// It wins only a click AIMED at it. The body's click capsule is far wider than
+// the candle (2.2 yd against a pillar under a yard in radius), and a click on a
+// skeleton standing beside the pillar crosses that capsule too: that click is
+// the skeleton's. So the body is promoted only when the pick ray comes within
+// its visual's `aimCore` (characters/manifest.ts; the geometry is
+// pick_aim_core.ts): the narrow column of what the player sees. Outside the
+// core plain ray order stands, exactly as if the rule did not exist, and with
+// nothing nearer under the cursor the whole capsule still selects the body. A
+// use-only body whose visual declares no aim core is never promoted.
 //
 // "Usable right now" is the sim's own rule (encounter_use.ts kitUsableNow: a
 // living mob whose kit carries a `usable`), the one the interact press reads
@@ -30,6 +40,8 @@
 
 import { kitUsableNow } from '../sim/mob/trash_kit/encounter_use';
 import type { Entity } from '../sim/types';
+import { VISUALS, visualKeyFor } from './characters/manifest';
+import { type PickRay, rayAimsAtCore } from './pick_aim_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 
 /** The slice of the world a direct pick reads (IWorld satisfies it). */
@@ -44,17 +56,27 @@ export function isUseOnlyBody(e: Entity): boolean {
   return !e.hostile && kitUsableNow(e);
 }
 
-/** Resolve a raycast's hit ids (nearest first) to the entity a click selects. */
+/** Was the pick ray aimed at what the player sees of `e` (its visual's aim
+ *  core)? False for a visual that declares none. */
+export function isAimedAt(e: Entity, ray: PickRay): boolean {
+  const core = VISUALS[visualKeyFor(e)]?.aimCore;
+  return !!core && rayAimsAtCore(ray, e, core);
+}
+
+/** Resolve a raycast's hit ids (nearest first) to the entity a click selects.
+ *  `ray` is the ray that produced them. */
 export function resolveWorldDirectPick(
   hitEntityIds: readonly number[],
   world: DirectPickWorld,
+  ray: PickRay,
   attackIntent = false,
 ): number | null {
   const player = world.player;
+  const promotes = !!player && !player.dead && !attackIntent;
   return resolveDirectPickEntityId(
     hitEntityIds,
     world.entities,
     player?.targetId ?? null,
-    player && !player.dead && !attackIntent ? isUseOnlyBody : null,
+    promotes ? (e) => isUseOnlyBody(e) && isAimedAt(e, ray) : null,
   );
 }

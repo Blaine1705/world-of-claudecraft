@@ -16,9 +16,10 @@ function isLiveTargetable(e: PickEntity): boolean {
 }
 
 // The order a click walks the live hits in: ray order (nearest first), except
-// that a USE-ONLY body (a live mob the caller says the local player can use
-// and cannot attack: the Hollow Crypt's Remembrance Candle during Morthen's
-// Rite, see world_direct_pick.ts) moves ahead of every other live hit. A boss
+// that a USE-ONLY body (a live mob the caller says the local player can use,
+// cannot attack and AIMED this click at: the Hollow Crypt's Remembrance Candle
+// during Morthen's Rite, see world_direct_pick.ts; the predicate is all this
+// file knows of it) moves ahead of every other live hit. A boss
 // whose wide click capsule stands between the camera and the candle used to
 // take every click on it; now the candle is the first pick and the overlap
 // cycling below reaches the boss on the next click. One exception keeps a

@@ -1,8 +1,23 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { VISUALS } from '../src/render/characters/manifest';
+import {
+  CANDLE_TALLOW_RADIUS,
+  CANDLE_WICK_Y,
+} from '../src/render/hollow_crypt/morthen_rite_fx_core';
+import {
+  type PickRay,
+  rayAimsAtCore,
+  rayDistanceToVerticalSegment,
+} from '../src/render/pick_aim_core';
 import { resolveDirectPickEntityId } from '../src/render/pick_resolution';
-import { isUseOnlyBody, resolveWorldDirectPick } from '../src/render/world_direct_pick';
+import { isAimedAt, isUseOnlyBody, resolveWorldDirectPick } from '../src/render/world_direct_pick';
 import { MOBS } from '../src/sim/data';
+import {
+  candleBodySpot,
+  RITE_CANDLE_RADIUS,
+  RITE_CANDLE_SPOTS,
+} from '../src/sim/encounters/hollow_crypt/morthen_ids';
 import { createMob, createPlayer } from '../src/sim/entity';
 import type { Entity } from '../src/sim/types';
 
@@ -409,10 +424,127 @@ describe('resolveDirectPickEntityId', () => {
   });
 });
 
+const rayFrom = (
+  from: { x: number; y: number; z: number },
+  to: { x: number; y: number; z: number },
+): PickRay => ({
+  origin: from,
+  direction: { x: to.x - from.x, y: to.y - from.y, z: to.z - from.z },
+});
+
+// The geometry under "was the click aimed at it" (pick_aim_core.ts): the
+// distance from a pick ray to the vertical segment of what the player sees.
+describe('rayDistanceToVerticalSegment', () => {
+  // A segment at the origin, 4 yd tall.
+  const dist = (ray: PickRay): number => rayDistanceToVerticalSegment(ray, 0, 0, 0, 4);
+  const level = (x: number, y: number): PickRay => ({
+    origin: { x, y, z: 10 },
+    direction: { x: 0, y: 0, z: -1 },
+  });
+
+  it('measures a level ray beside the segment in plan', () => {
+    expect(dist(level(0, 2))).toBe(0);
+    expect(dist(level(1.5, 2))).toBe(1.5);
+    expect(dist(level(-2.25, 0.5))).toBe(2.25);
+    // The direction's length is not part of the answer.
+    expect(dist({ origin: { x: 1.5, y: 2, z: 10 }, direction: { x: 0, y: 0, z: -7 } })).toBe(1.5);
+  });
+
+  it('measures to the top when the ray passes over the segment', () => {
+    // Straight over the axis, 2 yd above the top: an endless axis would call
+    // that a direct hit.
+    expect(dist(level(0, 6))).toBe(2);
+    expect(dist(level(1.5, 6))).toBeCloseTo(2.5, 12);
+    // A rising ray that crosses the axis 2 yd over the top.
+    const rising = rayFrom({ x: 0, y: 1, z: 10 }, { x: 0, y: 6, z: 0 });
+    expect(dist(rising)).toBeCloseTo(20 / Math.sqrt(125), 12);
+  });
+
+  it('holds for a camera looking steeply down', () => {
+    const down = (x: number, z: number): PickRay => ({
+      origin: { x, y: 30, z },
+      direction: { x: 0, y: -1, z: 0 },
+    });
+    // Straight down the axis, and straight down beside it.
+    expect(dist(down(0, 0))).toBe(0);
+    expect(dist(down(2, 0))).toBe(2);
+    expect(dist(down(0, -3))).toBe(3);
+    // A steep click on the floor 3 yd in front of the foot. Carried on under
+    // the floor that ray crosses the axis itself, 90 yd down.
+    expect(dist(rayFrom({ x: 0, y: 30, z: -4 }, { x: 0, y: 0, z: -3 }))).toBeCloseTo(3, 9);
+  });
+
+  it('stops at the floor: the ground in front of the foot is not the foot', () => {
+    // A shallow camera, a click on the floor 5 yd short of the segment. Under
+    // the floor the same ray would pass 0.9 yd below the foot.
+    const short = rayFrom({ x: 0, y: 3, z: 20 }, { x: 0, y: 0, z: 5 });
+    expect(dist(short)).toBeCloseTo(5, 9);
+    // A click on the floor 1 yd in front of the foot is 1 yd from it.
+    expect(dist(rayFrom({ x: 0, y: 3, z: 20 }, { x: 0, y: 0, z: 1 }))).toBeCloseTo(1, 9);
+    // A ray that starts under the floor and runs down never reaches it.
+    expect(dist({ origin: { x: 0, y: -2, z: 3 }, direction: { x: 0, y: -1, z: -1 } })).toBeCloseTo(
+      Math.hypot(2, 3),
+      12,
+    );
+  });
+
+  it('does not look behind the camera', () => {
+    expect(dist({ origin: { x: 0, y: 2, z: -5 }, direction: { x: 0, y: 0, z: -1 } })).toBe(5);
+  });
+});
+
+describe('rayAimsAtCore', () => {
+  const core = { back: 2, radius: 1.25, height: 4 };
+
+  it('stands the core behind the body along its facing', () => {
+    const down = (x: number, z: number): PickRay => ({
+      origin: { x, y: 50, z },
+      direction: { x: 0, y: -1, z: 0 },
+    });
+    const pos = { x: 10, y: 5, z: 20 };
+    // Facing +z: the core is 2 yd toward -z. Facing +x: 2 yd toward -x.
+    expect(rayAimsAtCore(down(10, 18), { pos, facing: 0 }, core)).toBe(true);
+    expect(rayAimsAtCore(down(10, 22), { pos, facing: 0 }, core)).toBe(false);
+    expect(rayAimsAtCore(down(8, 20), { pos, facing: Math.PI / 2 }, core)).toBe(true);
+    expect(rayAimsAtCore(down(12, 20), { pos, facing: Math.PI / 2 }, core)).toBe(false);
+    // The body's own axis is 2 yd from the core: outside a 1.25 yd radius.
+    expect(rayAimsAtCore(down(10, 20), { pos, facing: 0 }, core)).toBe(false);
+    expect(rayAimsAtCore(down(10, 20), { pos, facing: 0 }, { ...core, back: 0 })).toBe(true);
+  });
+
+  it('counts the radius itself and nothing past it', () => {
+    const body = { pos: { x: 0, y: 0, z: 0 }, facing: 0 };
+    const onAxis = { ...core, back: 0 };
+    const level = (x: number, y: number): PickRay => ({
+      origin: { x, y, z: 10 },
+      direction: { x: 0, y: 0, z: -1 },
+    });
+    expect(rayAimsAtCore(level(1.25, 2), body, onAxis)).toBe(true);
+    expect(rayAimsAtCore(level(1.2500001, 2), body, onAxis)).toBe(false);
+    expect(rayAimsAtCore(level(-1.25, 2), body, onAxis)).toBe(true);
+    // Over the top the core is rounded: the radius counts from the top end.
+    expect(rayAimsAtCore(level(0, 5.25), body, onAxis)).toBe(true);
+    expect(rayAimsAtCore(level(0, 5.2500001), body, onAxis)).toBe(false);
+    // The core starts at the body's feet, wherever the body stands.
+    const raised = { pos: { x: 0, y: 100, z: 0 }, facing: 0 };
+    expect(rayAimsAtCore(level(0, 102), raised, onAxis)).toBe(true);
+    expect(rayAimsAtCore(level(0, 2), raised, onAxis)).toBe(false);
+  });
+});
+
 // The renderer's entry (world_direct_pick.ts): the same resolver fed from the
-// live world and the real content tables.
+// live world, the real content tables and the pick ray.
 describe('resolveWorldDirectPick', () => {
   const at = { x: 0, y: 0, z: 0 };
+  // The candle body stands at the origin facing +z (toward the ring's centre),
+  // so its pillar, what the player sees, is 1.9 yd behind it at z = -1.9.
+  const PILLAR = { x: 0, z: -1.9 };
+  const CAMERA = { x: 0.5, y: 7, z: 14 };
+  /** A click on the pillar's tallow, chest high. */
+  const AT_PILLAR = rayFrom(CAMERA, { x: PILLAR.x, y: 1.8, z: PILLAR.z });
+  /** A click a yard and a half to the side of the pillar: still inside the
+   *  body's 2.2 yd click capsule, but on whatever stands beside the candle. */
+  const BESIDE_PILLAR = rayFrom(CAMERA, { x: PILLAR.x + 1.5, y: 1.2, z: PILLAR.z });
 
   function mob(id: number, templateId: string): Entity {
     const template = MOBS[templateId];
@@ -424,7 +556,14 @@ describe('resolveWorldDirectPick', () => {
   function candleBody(id: number): Entity {
     const body = mob(id, 'crypt_remembrance_candle');
     body.hostile = false;
+    body.facing = 0;
     return body;
+  }
+
+  function candleCore() {
+    const core = VISUALS.crypt_rite_candle_body?.aimCore;
+    if (!core) throw new Error('the candle body declares no aim core');
+    return core;
   }
 
   function world(list: Entity[], targetId: number | null = null) {
@@ -433,17 +572,132 @@ describe('resolveWorldDirectPick', () => {
     return { player: player as Entity | null, entities: new Map(list.map((e) => [e.id, e])) };
   }
 
-  it('the Remembrance Candle wins the first click through Morthen, then cycles to him', () => {
+  it('the Remembrance Candle wins a click aimed at its pillar through Morthen', () => {
     const morthen = mob(40, 'morthen');
     const bones = mob(41, 'marrow_restless_bones');
     const candle = candleBody(42);
     expect(morthen.hostile).toBe(true);
     expect(isUseOnlyBody(candle)).toBe(true);
     expect(isUseOnlyBody(morthen)).toBe(false);
-    expect(resolveWorldDirectPick([40, 42], world([morthen, candle]))).toBe(42);
-    expect(resolveWorldDirectPick([41, 40, 42], world([morthen, bones, candle]))).toBe(42);
-    expect(resolveWorldDirectPick([40, 42], world([morthen, candle], 42))).toBe(40);
-    expect(resolveWorldDirectPick([40, 42], world([morthen, candle], 40))).toBe(42);
+    expect(isAimedAt(candle, AT_PILLAR)).toBe(true);
+    expect(resolveWorldDirectPick([40, 42], world([morthen, candle]), AT_PILLAR)).toBe(42);
+    expect(resolveWorldDirectPick([41, 40, 42], world([morthen, bones, candle]), AT_PILLAR)).toBe(
+      42,
+    );
+    // The same spot again: on to the boss, and round to the candle.
+    expect(resolveWorldDirectPick([40, 42], world([morthen, candle], 42), AT_PILLAR)).toBe(40);
+    expect(resolveWorldDirectPick([40, 42], world([morthen, candle], 40), AT_PILLAR)).toBe(42);
+  });
+
+  it('a click beside the pillar keeps ray order though it crosses the candle capsule', () => {
+    const morthen = mob(40, 'morthen');
+    const bones = mob(41, 'marrow_restless_bones');
+    const candle = candleBody(42);
+    // The ray really is inside the body's click capsule (radius 2.2, height
+    // 3.6 at the body's own axis) and really is off the candle.
+    expect(rayDistanceToVerticalSegment(BESIDE_PILLAR, 0, 0, 0, 3.6)).toBeLessThan(2.2);
+    expect(
+      rayDistanceToVerticalSegment(BESIDE_PILLAR, PILLAR.x, PILLAR.z, 0, candleCore().height),
+    ).toBeGreaterThan(candleCore().radius);
+    expect(isAimedAt(candle, BESIDE_PILLAR)).toBe(false);
+    // The skeleton or the boss under the cursor is what the click selects.
+    expect(resolveWorldDirectPick([41, 42], world([bones, candle]), BESIDE_PILLAR)).toBe(41);
+    expect(resolveWorldDirectPick([40, 42], world([morthen, candle]), BESIDE_PILLAR)).toBe(40);
+    expect(
+      resolveWorldDirectPick([41, 40, 42], world([morthen, bones, candle]), BESIDE_PILLAR),
+    ).toBe(41);
+    // And the ring there is plain ray order: add, boss, candle, add.
+    const stack = [41, 40, 42];
+    const all = [morthen, bones, candle];
+    expect(resolveWorldDirectPick(stack, world(all, 41), BESIDE_PILLAR)).toBe(40);
+    expect(resolveWorldDirectPick(stack, world(all, 40), BESIDE_PILLAR)).toBe(42);
+    expect(resolveWorldDirectPick(stack, world(all, 42), BESIDE_PILLAR)).toBe(41);
+  });
+
+  it('with nothing nearer under the cursor the whole capsule still selects the candle', () => {
+    const morthen = mob(40, 'morthen');
+    const candle = candleBody(42);
+    expect(resolveWorldDirectPick([42], world([candle]), BESIDE_PILLAR)).toBe(42);
+    // The boss BEHIND the candle on the ray does not change that.
+    expect(resolveWorldDirectPick([42, 40], world([morthen, candle]), BESIDE_PILLAR)).toBe(42);
+  });
+
+  it('promotes at the core radius and not a hair past it', () => {
+    const morthen = mob(40, 'morthen');
+    const candle = candleBody(42);
+    const { radius, height } = candleCore();
+    const pick = (ray: PickRay) => resolveWorldDirectPick([40, 42], world([morthen, candle]), ray);
+    // A level ray down the -z axis, passing the pillar's axis at `x`, `y` up.
+    const level = (x: number, y: number): PickRay => ({
+      origin: { x: PILLAR.x + x, y, z: 14 },
+      direction: { x: 0, y: 0, z: -1 },
+    });
+    expect(pick(level(radius, 1.8))).toBe(42);
+    expect(pick(level(radius + 1e-6, 1.8))).toBe(40);
+    expect(pick(level(-radius, 1.8))).toBe(42);
+    expect(pick(level(-radius - 1e-6, 1.8))).toBe(40);
+    // Over the wick: the core's rounded top.
+    expect(pick(level(0, height + radius - 1e-6))).toBe(42);
+    expect(pick(level(0, height + radius + 1e-6))).toBe(40);
+  });
+
+  it('follows the pillar, not the body, from any side', () => {
+    const morthen = mob(40, 'morthen');
+    const candle = candleBody(42);
+    const pick = (ray: PickRay) => resolveWorldDirectPick([40, 42], world([morthen, candle]), ray);
+    // A camera off to the side, looking along -x.
+    const fromSide = (z: number): PickRay => ({
+      origin: { x: 14, y: 1.8, z },
+      direction: { x: -1, y: 0, z: 0 },
+    });
+    expect(pick(fromSide(PILLAR.z))).toBe(42);
+    // Through the BODY's own axis, 1.9 yd in front of the pillar: not the candle.
+    expect(pick(fromSide(0))).toBe(40);
+    // The body turned to face +x: its pillar is now 1.9 yd toward -x.
+    candle.facing = Math.PI / 2;
+    const down = (x: number, z: number): PickRay => ({
+      origin: { x, y: 40, z },
+      direction: { x: 0, y: -1, z: 0 },
+    });
+    expect(pick(down(-1.9, 0))).toBe(42);
+    expect(pick(down(0, -1.9))).toBe(40);
+  });
+
+  it('holds for a camera looking steeply down, and for clicks on the floor', () => {
+    const morthen = mob(40, 'morthen');
+    const candle = candleBody(42);
+    const pick = (ray: PickRay) => resolveWorldDirectPick([40, 42], world([morthen, candle]), ray);
+    const steep = { x: 0.3, y: 30, z: 2 };
+    // Down onto the wick, and down onto the pillar's foot.
+    expect(pick(rayFrom(steep, { x: PILLAR.x, y: 3.55, z: PILLAR.z }))).toBe(42);
+    expect(pick(rayFrom(steep, { x: PILLAR.x, y: 0, z: PILLAR.z }))).toBe(42);
+    // Down onto the floor at the body's feet, 1.9 yd in front of the pillar.
+    expect(pick(rayFrom(steep, { x: 0, y: 0, z: 0 }))).toBe(40);
+    // A shallow camera, a click on the floor 5 yd short of the pillar: the ray
+    // would pass under the pillar's foot if the floor were not there.
+    const shallow = { x: 0, y: 3, z: 20 };
+    expect(pick(rayFrom(shallow, { x: 0, y: 0, z: PILLAR.z + 5 }))).toBe(40);
+    expect(pick(rayFrom(shallow, { x: 0, y: 0, z: PILLAR.z + 1 }))).toBe(42);
+  });
+
+  it('the candle body declares its pillar as the aim core', () => {
+    const core = candleCore();
+    // Each body stands where the Rite puts it and faces away from its pillar
+    // (morthen_candles.ts spawnCandleBody): the core lands on the pillar.
+    RITE_CANDLE_SPOTS.forEach((pillar, i) => {
+      const spot = candleBodySpot(i);
+      const facing = Math.atan2(spot.x - pillar.x, spot.z - pillar.z);
+      expect(spot.x - Math.sin(facing) * core.back).toBeCloseTo(pillar.x, 9);
+      expect(spot.z - Math.cos(facing) * core.back).toBeCloseTo(pillar.z, 9);
+    });
+    // As tall as the wick; wider than the tallow column, narrower than the
+    // pillar's collider (no mob can stand inside the core).
+    expect(core.height).toBe(CANDLE_WICK_Y);
+    expect(core.radius).toBeGreaterThan(CANDLE_TALLOW_RADIUS);
+    expect(core.radius).toBeLessThan(RITE_CANDLE_RADIUS);
+    // The dark candle's glow, measured in the running game: 0.75 yd either
+    // side of the wick, up to 4.4 yd. The core's rounded top covers it.
+    expect(Math.hypot(0.75, 4.4 - core.height)).toBeLessThanOrEqual(core.radius);
   });
 
   it('a candle that cannot be used right now does not win', () => {
@@ -451,15 +705,15 @@ describe('resolveWorldDirectPick', () => {
     const spent = candleBody(42);
     spent.hp = 0;
     expect(isUseOnlyBody(spent)).toBe(false);
-    expect(resolveWorldDirectPick([40, 42], world([morthen, spent]))).toBe(40);
+    expect(resolveWorldDirectPick([40, 42], world([morthen, spent]), AT_PILLAR)).toBe(40);
     // A dead local player can use nothing: the nearest live hit stands.
     const dead = world([morthen, candleBody(43)]);
     if (dead.player) dead.player.dead = true;
-    expect(resolveWorldDirectPick([40, 43], dead)).toBe(40);
+    expect(resolveWorldDirectPick([40, 43], dead, AT_PILLAR)).toBe(40);
     // No local player yet (a world still booting): plain ray order, no throw.
     const booting = world([morthen, candleBody(43)]);
     booting.player = null;
-    expect(resolveWorldDirectPick([40, 43], booting)).toBe(40);
+    expect(resolveWorldDirectPick([40, 43], booting, AT_PILLAR)).toBe(40);
   });
 
   it('being non-hostile is not enough: the body must carry a use', () => {
@@ -470,14 +724,23 @@ describe('resolveWorldDirectPick', () => {
     friendly.hostile = false;
     expect(MOBS.marrow_restless_bones?.trashKit?.usable).toBeUndefined();
     expect(isUseOnlyBody(friendly)).toBe(false);
-    expect(resolveWorldDirectPick([40, 44], world([morthen, friendly]))).toBe(40);
+    // Even wearing the candle's look (so an aim core is declared and aimed at).
+    friendly.templateId = 'crypt_remembrance_candle';
+    friendly.devTrashKit = {};
+    expect(isAimedAt(friendly, AT_PILLAR)).toBe(true);
+    expect(isUseOnlyBody(friendly)).toBe(false);
+    expect(resolveWorldDirectPick([40, 44], world([morthen, friendly]), AT_PILLAR)).toBe(40);
   });
 
-  it('a pick made to attack keeps plain ray order (the Attack Move key)', () => {
+  it('a use-only body whose visual declares no aim core is never promoted', () => {
     const morthen = mob(40, 'morthen');
-    const candle = candleBody(42);
-    expect(resolveWorldDirectPick([40, 42], world([morthen, candle]), true)).toBe(40);
-    expect(resolveWorldDirectPick([40, 42], world([morthen, candle]), false)).toBe(42);
+    const lent = mob(44, 'marrow_restless_bones');
+    lent.hostile = false;
+    lent.devTrashKit = { usable: MOBS.crypt_remembrance_candle?.trashKit?.usable };
+    expect(isUseOnlyBody(lent)).toBe(true);
+    const throughIt: PickRay = { origin: { x: 0, y: 1, z: 14 }, direction: { x: 0, y: 0, z: -1 } };
+    expect(isAimedAt(lent, throughIt)).toBe(false);
+    expect(resolveWorldDirectPick([40, 44], world([morthen, lent]), throughIt)).toBe(40);
   });
 
   it('a usable body the player can also attack (the Soul Brazier) competes nearest first', () => {
@@ -490,8 +753,15 @@ describe('resolveWorldDirectPick', () => {
     expect(brazier.hostile).toBe(true);
     expect(MOBS.soul_brazier?.trashKit?.usable).toBeDefined();
     expect(isUseOnlyBody(brazier)).toBe(false);
-    expect(resolveWorldDirectPick([40, 42], world([tender, brazier]))).toBe(40);
-    expect(resolveWorldDirectPick([40, 42], world([tender, brazier], 40))).toBe(42);
+    expect(resolveWorldDirectPick([40, 42], world([tender, brazier]), AT_PILLAR)).toBe(40);
+    expect(resolveWorldDirectPick([40, 42], world([tender, brazier], 40), AT_PILLAR)).toBe(42);
+  });
+
+  it('a pick made to attack keeps plain ray order (the Attack Move key)', () => {
+    const morthen = mob(40, 'morthen');
+    const candle = candleBody(42);
+    expect(resolveWorldDirectPick([40, 42], world([morthen, candle]), AT_PILLAR, true)).toBe(40);
+    expect(resolveWorldDirectPick([40, 42], world([morthen, candle]), AT_PILLAR, false)).toBe(42);
   });
 
   it('Attack Move is the one caller that asks with attack intent', () => {
@@ -504,5 +774,21 @@ describe('resolveWorldDirectPick', () => {
     // The click, the hover and the tooltip all ask without it.
     expect(main.split('renderer.pick(x, y, true)').length).toBe(2);
     expect(main).toContain('let id = renderer.pickDirect(x, y);');
+  });
+
+  it('the renderer hands over the very ray it raycast the capsules with', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const pickDirect = renderer.indexOf('pickDirect(clientX: number, clientY: number,');
+    const cast = renderer.indexOf(
+      'this.raycaster.intersectObjects(this.clickTargets, true, this.raycastHits);',
+      pickDirect,
+    );
+    const resolve = renderer.indexOf(
+      'resolveWorldDirectPick(directHitIds, this.sim, this.raycaster.ray, attackIntent)',
+      cast,
+    );
+    expect(pickDirect).toBeGreaterThanOrEqual(0);
+    expect(cast).toBeGreaterThan(pickDirect);
+    expect(resolve).toBeGreaterThan(cast);
   });
 });

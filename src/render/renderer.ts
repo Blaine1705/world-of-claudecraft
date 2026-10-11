@@ -12414,7 +12414,7 @@ export class Renderer {
     }
     hits.length = 0;
     if (directHitIds.length === 0) return null;
-    return resolveWorldDirectPick(directHitIds, this.sim, attackIntent);
+    return resolveWorldDirectPick(directHitIds, this.sim, this.raycaster.ray, attackIntent);
   }
 
   // The forgiving-assist half of pick(): snap to the nearest targetable

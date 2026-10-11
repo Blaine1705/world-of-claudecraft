@@ -183,6 +183,7 @@ import {
 } from '../hollow_crypt/morthen_fx_core';
 import { KNELL_GESTURE_POUR, KNELL_GESTURE_SKY_ROAR } from '../hollow_crypt/morthen_rite_fx_core';
 import type { LocoGaitThresholds } from '../locomotion';
+import type { AimCoreDef } from '../pick_aim_core';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import {
   OSSICK_ANCHOR_AWAY_GESTURE,
@@ -585,6 +586,13 @@ export interface VisualDef {
    *  stay): a part of a larger creature drawn once by its dungeon's own
    *  visuals (the Mere Hydra's heads). */
   bodyless?: boolean;
+  /** Where a click on this entity is AIMED, when the click capsule is wider
+   *  than (or stands beside) what the player sees of it: a narrow vertical
+   *  core the direct pick tests the pick ray against (pick_aim_core.ts) before
+   *  it lets a use-only body win a click over a nearer live hit
+   *  (world_direct_pick.ts). Presentation-side targeting help only, like
+   *  `clickRadius`: the sim never reads it. */
+  aimCore?: AimCoreDef;
   /** Material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -4655,6 +4663,16 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     bodyless: true,
     clickRadius: 2.2,
+    // What the player sees is the kit's pillar, not this body: the body stands
+    // at the pillar's foot facing away from it, 1.9 yd out from the pillar's
+    // axis (morthen_ids.ts candleBodySpot). Measured in the running game: the
+    // pillar's stone is 3.55 yd tall (its wick) on a plinth 1.4 yd in radius,
+    // the tallow column 0.95 (hollow_crypt/morthen_rite_fx_core.ts), the dark
+    // candle's glow 0.75 either side of the wick up to 4.4. The core is the
+    // tallow column with a quarter yard of slack, kept inside the pillar's
+    // 1.3 yd collider so it never reaches where a mob can stand beside it;
+    // its rounded top covers the glow (tests/pick_resolution.test.ts pins it).
+    aimCore: { back: 1.9, radius: 1.2, height: 3.55 },
   },
   // The Gravecaller Adept: a novice of the cult in a violet hooded robe split over its
   // legs, a violet staff in its right hand. Cast is the conjuring loop (Grave Spark).
