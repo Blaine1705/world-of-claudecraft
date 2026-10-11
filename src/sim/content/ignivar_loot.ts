@@ -16,7 +16,9 @@
 // 60-point primary and a 25-point secondary rating; jewelry, shields, and
 // held offhands carry a single 25. Hit appears exactly where the plan's Hit
 // program says: the elective waists at 60 and the physical neck/ring plus
-// the spell-damage ring at 25.
+// the spell-damage ring at 25. Healer pieces (Healing Power) never carry Hit,
+// since heals are not resisted: their elective rating is Crit at the same
+// amount.
 //
 // The five-piece sets are class-locked and carry `set:` tags; their
 // ITEM_SETS entries (the 2/4-piece engine bonuses of
@@ -2668,7 +2670,7 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 75, int: 9, spi: 8, sta: 6 },
     healPower: 8,
     hasteRating: 25,
-    hitRating: 60,
+    critRating: 60,
     sellValue: 10000,
     requiredClass: ['mage', 'priest'],
   },
@@ -2788,7 +2790,7 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 150, int: 9, spi: 8, sta: 6 },
     healPower: 8,
     hasteRating: 25,
-    hitRating: 60,
+    critRating: 60,
     sellValue: 10000,
     requiredClass: ['druid'],
   },
@@ -2908,7 +2910,7 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 270, int: 9, spi: 8, sta: 6 },
     healPower: 8,
     hasteRating: 25,
-    hitRating: 60,
+    critRating: 60,
     sellValue: 10000,
     requiredClass: ['paladin', 'shaman'],
   },
@@ -3028,7 +3030,7 @@ export const IGNIVAR_JEWELRY_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     stats: { int: 8, spi: 7, sta: 5 },
     healPower: 8,
-    hitRating: 25,
+    critRating: 25,
     sellValue: 8000,
   },
 };
@@ -3187,7 +3189,7 @@ export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
     stats: { int: 17, spi: 16, sta: 11 },
     healPower: 68,
     hasteRating: 70,
-    hitRating: 30,
+    critRating: 30,
     sellValue: 16000,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
@@ -3218,7 +3220,7 @@ export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
     stats: { int: 13, spi: 12, sta: 8 },
     healPower: 40,
     hasteRating: 70,
-    hitRating: 30,
+    critRating: 30,
     sellValue: 14000,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },

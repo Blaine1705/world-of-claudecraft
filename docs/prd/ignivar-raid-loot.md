@@ -571,6 +571,17 @@ budget-neutral swap of the piece's minor rating). The guaranteed floor
 class; pinned by the cap-coverage describe in tests/ignivar_loot.test.ts.
 The scarcity POLICY holds: set pieces still carry no Hit.
 
+AMENDED (2026-10-12, healer Crit): the full-coverage widening above had
+also seeded Hit on the healer electives (the three Healing Power waists,
+Loop of Quiet Springs, Staff of the Last Spring, Springtouched Crozier),
+contradicting the ratings-ladder rule that healer-facing pieces never
+carry Hit. Heals are not resisted, so that Hit was dead weight. Each of
+those pieces now carries the same amount as Crit instead (60 waist, 25
+ring, 30 weapon), and the cap floor is computed over the non-healer lanes
+only (healers have no window). Pinned by the healer-Crit case in
+tests/ignivar_loot.test.ts, which also holds that no shipped item with
+Healing Power carries Hit.
+
 ### The sets
 
 UNDER REDESIGN (2026-08-28): the maintainer-directed adversarial review
