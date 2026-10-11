@@ -33,9 +33,10 @@ boost groups. Existing manually created groups and physical dungeon entry rules 
 
 ### Roles
 
-- At level 10 and above, selected roles must match the active talent specialization. A character
-  without an active specialization cannot queue or apply.
-- Below level 10, compatible roles come from a fixed class capability table:
+- At every level, players select roles from their class capabilities independently of their
+  active specialization. Selecting a role never changes talents or equipment, and does not
+  require choosing or changing a specialization first.
+- Compatible roles come from a fixed class capability table:
   - Tank: warrior, paladin, druid.
   - Healer: paladin, priest, shaman, druid.
   - DPS: every class.
@@ -62,9 +63,19 @@ boost groups. Existing manually created groups and physical dungeon entry rules 
 
 - A party leader creates one listing for one activity and difficulty.
 - A listing advertises its current roster, assigned or compatible roles, and missing role slots.
-- It uses localized structured tags instead of free-form text: first run, quest run, full clear,
+- The Finder board uses localized structured tags: first run, quest run, full clear,
   learning welcome, and fast run.
+- The bell supports pre-entry recruitment through a compact dungeon, difficulty, role, and
+  group-goal form. An optional moderated note is limited to 120 characters. A live preview
+  shows the listing before publication; only an authoritative listing confirms success.
+- Bell publication sends the chosen role and listing details atomically. Rejected requests
+  preserve existing roles, queues, applications, and listings. Unconfirmed publication retains
+  the draft and offers a retry after ten seconds.
+- Other Groups includes both pre-entry listings and running expeditions. Pre-entry listings
+  show Forming Group instead of boss progress; publishing or accepting never teleports players.
 - Eligible solo players apply with one or more compatible roles.
+- Bell applications select one compatible role, revalidated at acceptance and retained in the
+  resulting group roster. Legacy Finder applications retain their multi-role behavior.
 - The leader accepts or declines each application. Acceptance directly adds the applicant through
   the authoritative party machine after revalidating capacity, level, role fit, online state, and
   party state.
@@ -156,7 +167,7 @@ money, and counts use locale-aware formatters.
 ### Pure and simulation tests
 
 - Activity level boundaries, including every minimum and maximum.
-- Pre-level-10 class role compatibility and level-10 specialization enforcement.
+- Class role compatibility independent of level or active specialization; unsupported roles rejected.
 - Exact 1/1/3 and 2/2/6 role assignment, multi-role selection, and impossible compositions.
 - FIFO deterministic activity intersection and partial-party preservation.
 - Proposal accept, decline, timeout, cooldown, and original-join-time restoration.

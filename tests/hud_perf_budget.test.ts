@@ -1196,7 +1196,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   { file: 'reliquary_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/cosmetics/cosmetics_window.ts', reflowAllow: {}, driverAllow: {} },
-  { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // Cold rebuild only, after the unchanged-signature return: preserve the rail
+  // and detail scroll positions while changing loot-preview class/spec filters.
+  { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
+  // The expedition tray preserves its horizontal seat only on a cold rebuild.
+  {
+    file: 'hud/expeditions/expedition_controller.ts',
+    reflowAllow: { '.scrollLeft': 2 },
+    driverAllow: {},
+  },
   // The lockpick clock: a 100ms tick that repaints the remaining-time bar for the duration
   // of one attempt, generation-guarded and cleared on stop. The fastest module-owned driver
   // in the bucket, and the reason setInterval is counted rather than banned.

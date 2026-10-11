@@ -134,6 +134,9 @@
 
     /* --gold is the single source of truth for the primary accent */
     --color-primary: var(--gold);
+    --color-queue-bell-bronze: #c98c55;
+    --color-queue-bell-silver: #ccd2d6;
+    --color-queue-bell-gold: #e5c15a;
     --color-primary-dim: var(--gold-dim);
     --color-primary-glow: rgba(255, 209, 0, 0.2);
     --color-primary-glow-heavy: rgba(255, 209, 0, 0.4);
