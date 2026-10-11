@@ -237,9 +237,15 @@ with the pool, from about 1,103 to about 1,500 dealt between the seize and the e
 of the hold (a 1.5 s rise plus an 8 s hold); the share itself was not retuned.
 
 **Heroic mechanic damage** rides `mechanicDamageMultiplierByMob` (Marrow 6, the Lady
-5, Ilvane 8) on heroic cloth of about 1,250: the Toll about 15 percent, a cave-in
-about 22, an unsheltered Lament about 27, the drop about 66, a completed Dirge or a
-note lane about 70 (a fumbled core all but kills).
+5, Ilvane 8) on heroic cloth of about 1,250: the Toll about 18 percent (see below), a
+cave-in about 22, an unsheltered Lament about 27, the drop about 66, a completed
+Dirge or a note lane about 70 (a fumbled core all but kills).
+
+**The Burial Toll on heroic (owner playtest, 2026-10-12).** The Toll alone carries a
+heroic factor of its own on top of Marrow's shared 6 (`MARROW_TUNING.tollHeroicMult`
+1.1, read through `tollDamageRange`): 198 to 251 shadow on everyone, 16 to 20 percent
+of heroic cloth, where it was 180 to 228 (14 to 18 percent). Normal stays 30 to 38,
+and Shovelful, the cave-in, Grave Dirt and Gravedigger's Blow do not read the factor.
 
 #### Sexton Marrow (the Bell Yard)
 
@@ -247,7 +253,7 @@ note lane about 70 (a fumbled core all but kills).
 |---|---|---|
 | Shovelful | every 11 s, a 1.2 s bar, aim locked: an 8 yd, 80 degree cone of grave dirt | 1.5 of his melee roll through armor, and 50 percent slower movement for 6 s |
 | Measured for the Grave | every 15 s a 1 s bar marks a non-tank; 4 s later an Open Grave caves in where they stand and stays for the fight (eight at most, the oldest fills) | cave-in 42 to 52 within 3 yd (about 17); Grave Dirt 9 a second (about 3) and 40 percent slower inside |
-| Burial Toll | at 66 and 33 percent: he strides to the bell rope (immune), rings 3 s (three peals), the Toll | 30 to 38 shadow to everyone (about 13); every Open Grave raises a Restless Bones (level 8, no loot) |
+| Burial Toll | at 66 and 33 percent: he strides to the bell rope (immune), rings 3 s (three peals), the Toll | 30 to 38 shadow to everyone (about 13; a tenth more on heroic before its transform: 198 to 251); every Open Grave raises a Restless Bones (level 8, no loot) |
 | Heroic | Gravedigger's Blow every 9 s on the tank (6 percent more damage taken per stack, 20 s, six stacks); Grave Vigor (30 percent faster swings while he stands in a grave); Unquiet Earth (2 s in a grave raises a Restless Bones, then the grave rests 8 s) | |
 | Deed | A Tidy Churchyard: every grave opened at the yard's edge (7 yd of the rim) | |
 

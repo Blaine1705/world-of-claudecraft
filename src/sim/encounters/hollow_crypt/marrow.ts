@@ -13,8 +13,9 @@
 //                           slow inside. Eight graves at most (the oldest fills).
 //   Burial Toll             at 66 and 33 percent he strides to the bell rope
 //                           (immune), rings for 3 s, and the Toll lands: 30 to
-//                           38 shadow on everyone, and every Open Grave gives up
-//                           a Restless Bones.
+//                           38 shadow on everyone (a tenth more on heroic,
+//                           before its transform), and every Open Grave gives
+//                           up a Restless Bones.
 //   Heroic                  Gravedigger's Blow (a stacking strike on the tank),
 //                           Grave Vigor (faster swings in a grave), Unquiet
 //                           Earth (lingering 2 s in a grave raises the dead).
@@ -63,6 +64,7 @@ import {
   MARROW_SHOVELFUL,
   MARROW_TOLLING,
   MARROW_TUNING,
+  tollDamageRange,
 } from './marrow_ids';
 
 const T = MARROW_TUNING;
@@ -489,11 +491,14 @@ function stepToll(ctx: SimContext, inst: InstanceSlot, boss: Entity, st: MarrowF
     });
   }
   if (toll.t < T.tollRing - 1e-6) return;
+  // One roll a player, as before: the heroic factor widens the range, never
+  // the number of draws.
+  const tollRoll = tollDamageRange(heroicOf(inst));
   for (const p of claimPlayers(ctx, inst)) {
     ctx.dealDamage(
       boss,
       p,
-      mechanicDamage(ctx, boss, T.tollMin, T.tollMax),
+      mechanicDamage(ctx, boss, tollRoll.min, tollRoll.max),
       false,
       'shadow',
       'Burial Toll',

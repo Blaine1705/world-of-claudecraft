@@ -600,10 +600,13 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // Bolt was priced on it before this pass; its volley's base is set for
     // it).
     // The wing bosses' mechanics are priced apart from the melee floor (the Bastion's
-    // bands, cloth about 1,250 at 20 heroic): Marrow's Toll about 15 percent
-    // and a cave-in about 22; an unsheltered Lament about 27 (Lingering
-    // Lament stacks half again), her drop about 66; Ilvane's completed Dirge
-    // or a note lane about 70 (a fumbled core all but kills).
+    // bands, cloth about 1,250 at 20 heroic): Marrow's Toll about 18 percent
+    // (198 to 251: this factor times the Toll's own heroic tenth,
+    // MARROW_TUNING.tollHeroicMult, set by the owner's playtest of 2026-10-12;
+    // it was 180 to 228, about 16) and a cave-in about 22; an unsheltered
+    // Lament about 27 (Lingering Lament stacks half again), her drop about
+    // 66; Ilvane's completed Dirge or a note lane about 70 (a fumbled core
+    // all but kills).
     // The pack budget lowered the trash melee factors under every trash kit
     // (a mob with no mechanic entry stamps its melee factor as
     // mechanicDamageMult), so each kit-carrying trash mob keeps its
