@@ -228,7 +228,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
     const strider = reinsFor('avian_strider')[0];
     expect(strider.id).toBe('reins_avian_strider');
     expect(strider.buyValue).toBe(0);
-    expect(FACTION_VENDOR_GATES.reins_avian_strider.currencyCost).toBeGreaterThan(0);
+    expect(FACTION_VENDOR_GATES.reins_avian_strider.currencyCost).toBe(200);
     for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed' && k !== 'avian_strider')) {
       expect(reinsFor(key)[0].buyValue).toBeUndefined();
     }
