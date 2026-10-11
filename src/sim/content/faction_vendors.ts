@@ -44,8 +44,8 @@
 //
 // PRICE. Every row is bought with the selling faction's marks (earned from its
 // World Quests), never coin: buyValue is 0 and the gate carries the mark cost
-// (the one exception is the Valestrider reins, which keep their classic coin
-// price in content/items.ts),
+// (the Valestrider reins included: their def lives in content/items.ts with
+// buyValue 0, and they cost the Champion figure like the rest of that tier),
 // one figure per standing tier (MARKS below), formulas and recipes a step
 // under the gear of their tier. The allied rows (Cartographer's Ink, the
 // Allied Hearthstone and the Vanguard Duffel) carry no faction: every
@@ -108,8 +108,8 @@ export const FACTION_VENDOR_GATES: Readonly<Record<string, FactionVendorGate>> =
   riftwarden_voidblade: gate('rift_watch', 'vanguard'),
   champion_rift_band: gate('rift_watch', 'champion'),
   riftwardens_pendant: gate('rift_watch', 'champion'),
-  // The mount keeps its classic 100 gold coin price (content/items.ts), no marks.
-  reins_avian_strider: gate('rift_watch', 'champion', 0),
+  // The mount is bought with marks like every other row, at the Champion figure.
+  reins_avian_strider: gate('rift_watch', 'champion'),
 
   // Church Order
   order_prayer_beads: gate('church_order', 'recognized'),

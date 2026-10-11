@@ -91,13 +91,9 @@ describe('Faction Vendors & Reroll NPC content', () => {
         // An allied row carries no faction: every quartermaster sells it.
         if (gate.factionId !== undefined) expect(gate.factionId, id).toBe(factionId);
         expect(ITEMS[id], id).toBeDefined();
-        if (id === 'reins_avian_strider') {
-          expect(ITEMS[id].buyValue, id).toBeGreaterThan(0);
-          expect(gate.currencyCost, id).toBe(0);
-        } else {
-          expect(ITEMS[id].buyValue, id).toBe(0);
-          expect(gate.currencyCost, id).toBeGreaterThan(0);
-        }
+        // Every row, the mount included, costs marks and never coin.
+        expect(ITEMS[id].buyValue, id).toBe(0);
+        expect(gate.currencyCost, id).toBeGreaterThan(0);
         // Formulas are bind-on-pickup knowledge and mount reins never vendor
         // back (the mount contract in tests/mounts.test.ts); every other row sells.
         if (ITEMS[id].kind === 'recipe' || ITEMS[id].kind === 'mount') {
@@ -181,7 +177,7 @@ describe('Faction Vendors & Reroll NPC content', () => {
     }
   });
 
-  it('prices every row in marks on the tier scale; gear sells back for coin; the reins keep 100 gold', () => {
+  it('prices every row in marks on the tier scale, the reins included; gear sells back for coin', () => {
     const MARKS = { recognized: 15, trusted: 35, proven: 75, vanguard: 150, champion: 200 };
     const SELL = {
       recognized: 1_250,
@@ -191,7 +187,6 @@ describe('Faction Vendors & Reroll NPC content', () => {
       champion: 37_500,
     };
     for (const [id, gate] of Object.entries(FACTION_VENDOR_GATES)) {
-      if (id === 'reins_avian_strider') continue;
       const def = ITEMS[id];
       const tier = gate.standingTier as keyof typeof MARKS;
       expect(def.buyValue, id).toBe(0);
@@ -205,10 +200,15 @@ describe('Faction Vendors & Reroll NPC content', () => {
     expect(FACTION_VENDOR_GATES.cartographers_ink.currencyCost).toBe(60);
     expect(FACTION_VENDOR_GATES.allied_hearthstone.currencyCost).toBe(100);
     expect(FACTION_VENDOR_GATES.allied_vanguard_duffel.currencyCost).toBe(120);
-    // The mount: ten times the Valorsteed's 10 gold (the classic epic-mount
-    // ratio), an ordinary player reins that never vendor-sells back.
+    // The mount: the Champion figure in Rift Watch marks, no coin, an
+    // ordinary player reins that never vendor-sells back.
     const reins = ITEMS.reins_avian_strider;
-    expect(reins.buyValue).toBe((ITEMS.reins_valorsteed.buyValue ?? 0) * 10);
+    expect(FACTION_VENDOR_GATES.reins_avian_strider).toMatchObject({
+      factionId: 'rift_watch',
+      standingTier: 'champion',
+      currencyCost: 200,
+    });
+    expect(reins.buyValue).toBe(0);
     expect(reins.sellValue).toBe(0);
     expect(reins.noVendorSell).toBe(true);
     expect(reins.soulbound).toBeFalsy();
@@ -481,13 +481,14 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     expect(meta.copper).toBe(100_000);
   });
 
-  it('sells the Valestrider reins at Champion behind the riding and one-per-account gates', () => {
+  it('sells the Valestrider reins for marks at Champion behind the riding and one-per-account gates', () => {
     const sim = new Sim({ seed: 779, playerClass: 'rogue', autoEquip: false });
     sim.setPlayerLevel(20);
     const pid = sim.playerId;
     const meta = sim.meta(pid);
     if (!meta) throw new Error('fixture player missing');
     meta.copper = 2_500_000;
+    meta.factionCurrencies.rift_watch = 199;
     meta.ridingTrained = true;
     const qm = [...sim.entities.values()].find(
       (e) => e.templateId === 'npc_rift_watch_quartermaster',
@@ -509,9 +510,21 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     sim.buyItem(qm.id, 'reins_avian_strider');
     expect(sim.countItem('reins_avian_strider', pid)).toBe(0);
     meta.ridingTrained = true;
+    // One mark short of the Champion figure: refused, and coin cannot cover it.
+    sim.drainEvents();
+    sim.buyItem(qm.id, 'reins_avian_strider');
+    expect(
+      sim.drainEvents().some((e) => e.type === 'error' && e.text.startsWith('You need 200 ')),
+    ).toBe(true);
+    expect(sim.countItem('reins_avian_strider', pid)).toBe(0);
+    expect(meta.factionCurrencies.rift_watch).toBe(199);
+    expect(meta.copper).toBe(2_500_000);
+    // Enough marks: the purchase spends exactly 200 of them and no coin.
+    meta.factionCurrencies.rift_watch = 250;
     sim.buyItem(qm.id, 'reins_avian_strider');
     expect(sim.countItem('reins_avian_strider', pid)).toBe(1);
-    expect(meta.copper).toBe(1_500_000);
+    expect(meta.factionCurrencies.rift_watch).toBe(50);
+    expect(meta.copper).toBe(2_500_000);
     // One per account: owning the reins IS owning the mount.
     sim.drainEvents();
     sim.buyItem(qm.id, 'reins_avian_strider');
@@ -519,7 +532,8 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
       sim.drainEvents().some((e) => e.type === 'error' && e.text.includes('already own')),
     ).toBe(true);
     expect(sim.countItem('reins_avian_strider', pid)).toBe(1);
-    expect(meta.copper).toBe(1_500_000);
+    expect(meta.factionCurrencies.rift_watch).toBe(50);
+    expect(meta.copper).toBe(2_500_000);
   });
 
   it('a bought formula teaches its enchant once the buyer holds Enchanting 100', () => {
