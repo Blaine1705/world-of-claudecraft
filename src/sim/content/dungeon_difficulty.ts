@@ -575,12 +575,17 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     },
     // The wing bosses' pools from target fight length x heroic party DPS
     // (about 230) on their level-22 templates: Sexton Marrow 70 s (about
-    // 16,100 on 1,412), the Lady of the Bonechill 80 s (about 18,400 on
-    // 1,532), Cantor Ilvane about 64 s on her own (about 14,700 on 1,412)
-    // after her two Choristers, held to about 8 s each (about 1,840 on 971).
+    // 16,100 on 1,412), Cantor Ilvane about 64 s on her own (about 14,700 on
+    // 1,412) after her two Choristers, held to about 8 s each (about 1,840
+    // on 971). The Lady of the Bonechill was priced the same way (80 s, 12,
+    // about 18,400 on 1,532) until the owner's heroic playtest of 2026-10-12
+    // ("she lasted almost nothing"): she now carries about 25,000 (24,999),
+    // about 109 s at the planning 230. Her Frozen Embrace breaks on a share
+    // of her pool (LADY_TUNING.embraceBreakShare), so its threshold rose
+    // with it, from about 1,103 to about 1,500.
     healthMultiplierByMob: {
       sexton_marrow: 11.4,
-      rimeweb: 12,
+      rimeweb: 16.32,
       cantor_ilvane: 10.4,
       hollow_chorister: 1.9,
       // Morthen: about 125 s of damage at about 230 beside his immune Rite

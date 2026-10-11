@@ -223,9 +223,18 @@ dungeon's own greens; a warrior tank 366 to 404 before gear. The bands of
 | Boss | Template pool (normal / heroic) | Target | Multiplier normal / heroic | Pool normal / heroic |
 |---|---|---|---|---|
 | Sexton Marrow | 639 / 1,412 | 70 s | 4.93 / 11.4 | about 3,150 / 16,100 |
-| Lady of the Bonechill | 754 / 1,532 | 80 s | 5.3 / 12 | about 4,000 / 18,400 |
+| Lady of the Bonechill | 754 / 1,532 | 80 s (heroic about 109 s, see below) | 5.3 / 16.32 | about 4,000 / 25,000 |
 | Cantor Ilvane | 695 / 1,412 | 64 s on her own (80 s with her Choristers) | 4.6 / 10.4 | about 3,200 / 14,700 |
 | Hollow Chorister | 391 / 971 | about 8 s each | 1 / 1.9 | 391 / about 1,840 |
+
+**The Lady's heroic pool (owner playtest, 2026-10-12).** Her heroic pool was first
+priced like the others (80 s x 230: multiplier 12, about 18,400). A well-geared
+level 20 party killed her far faster than that ("she lasted almost nothing"), so
+the owner set her at about 25,000 (multiplier 16.32: 24,999, about 109 s at the
+planning 230). Normal is untouched. Her Frozen Embrace breaks on a share of her
+pool (`LADY_TUNING.embraceBreakShare`, 6 percent), so its heroic threshold rose
+with the pool, from about 1,103 to about 1,500 dealt between the seize and the end
+of the hold (a 1.5 s rise plus an 8 s hold); the share itself was not retuned.
 
 **Heroic mechanic damage** rides `mechanicDamageMultiplierByMob` (Marrow 6, the Lady
 5, Ilvane 8) on heroic cloth of about 1,250: the Toll about 15 percent, a cave-in
