@@ -350,9 +350,16 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       knight_commander_olen: 6.42,
       gaoler_ossick: 6.84,
       vael_the_mistcaller: 8.05,
-      turretback_hermit: 3.66,
-      // The gaol's miniboss: 50 s (about 3,600) on the Hermit's template pool.
-      gaol_turnkey: 2.93,
+      // The two minibosses (the Shipwreck Captain, id turretback_hermit, a
+      // solo elite outside the Finder's encounter list, and the Gaol Turnkey,
+      // in the list but the gaol's miniboss by its own content) were priced at
+      // 60 s (3.66, about 4,500) and 50 s (2.93, about 3,600). The owner's
+      // heroic bands (2026-10-12, the heroic record below) raise them there,
+      // and a miniboss takes the same factor on normal while it stays under
+      // the weakest boss (Olen, 5,995): the Captain x1.23 (5,539), the
+      // Turnkey x1.45 (5,214). Normal BOSS pools are untouched.
+      turretback_hermit: 4.51,
+      gaol_turnkey: 4.245,
     },
     // The crawler and the prisoner carry a heroic-priced base swing (see
     // their templates); normal damps it back to the fodder line.
@@ -684,12 +691,25 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // The rework (docs/design/dungeon-rework/sunken_bastion.md): the bosses'
     // pools set per boss from target fight length x heroic party DPS (about
     // 230): Olen 80 s, Ossick 85 s, Vael 150 s; the Turretback Hermit 60 s.
+    // The owner's heroic health bands (2026-10-12) then replaced the lengths
+    // of everything but the final boss: a non-final boss carries about
+    // 25,000 and a miniboss sits in 15,000 to 20,000, clearly under them
+    // (the Finder's encounter list says which is which). Olen (12, 18,382)
+    // and Ossick (12.75, 19,530) carry 24,999, about 109 s at the planning
+    // 230; the Shipwreck Captain (7.3, 13,801), a miniboss, about 17,000
+    // (74 s); the Gaol Turnkey (5.84, 11,041), the gaol's miniboss, about
+    // 16,000 (70 s). Vael is untouched. Health only. None of the four has a
+    // check sized by a share of its pool (the Iron Cage and the Drowned
+    // Anchor break on hit counts, Olen's Oath and the cells are phases), and
+    // none has an enrage, so nothing was compensated: the longer fights
+    // bring more casts on the same clocks. Pinned by
+    // tests/sunken_bastion_health_bands.test.ts.
     healthMultiplierByMob: {
-      knight_commander_olen: 12,
-      gaoler_ossick: 12.75,
+      knight_commander_olen: 16.32,
+      gaoler_ossick: 16.32,
       vael_the_mistcaller: 15.7,
-      turretback_hermit: 7.3,
-      gaol_turnkey: 5.84,
+      turretback_hermit: 8.99,
+      gaol_turnkey: 8.46,
     },
     damageMultiplierByMob: {
       // The bosses and the two solo minibosses keep their melee: the
