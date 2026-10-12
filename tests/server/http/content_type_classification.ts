@@ -133,6 +133,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/daily-rewards/spin': PROBLEM_JSON,
   '/api/daily-rewards/history': PROBLEM_JSON,
   '/api/claudium/stripe/webhook': PROBLEM_JSON,
+  '/api/claudium/membership/stripe/webhook': PROBLEM_JSON,
   '/api/claudium/balance': PROBLEM_JSON,
   '/api/claudium/price/:rail': PROBLEM_JSON,
   '/api/claudium/skus': PROBLEM_JSON,

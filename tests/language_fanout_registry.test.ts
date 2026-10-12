@@ -144,6 +144,7 @@ const FANOUT_ARMS: readonly string[] = [
   // BEFORE the quest tracker's arm in the fan-out, which reads that page.
   'this.dungeonTracker.relocalize|',
   'this.questTracker.relocalize|',
+  'this.referralCards.relocalize|',
   'this.delveTracker.relocalize|',
   'this.riftTracker.relocalize|',
   // The gathering goal tracker (Intentional Gathering PR4): its repaint
@@ -1774,8 +1775,10 @@ function builderOwnedClasses(armCall: string): Set<string> {
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
   const hud = strippedHudSource;
   const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
-  if (!assigned) return owned;
-  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  // Both composition forms retain a real source-owned builder: direct factory
+  // assignment and a member returned from a previously built component family.
+  const direct = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  const built = assigned ? new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud) : direct;
   if (!built) return owned;
   for (const { source } of uiSources) {
     if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;

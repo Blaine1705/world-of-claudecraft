@@ -392,6 +392,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // ladder twin: registry-only, so every arm is asserted here. price/:rail is a
     // public enum param (publicRead), not an account-owned resource.
     { method: 'POST', path: '/api/claudium/stripe/webhook' },
+    { method: 'POST', path: '/api/claudium/membership/stripe/webhook' },
     { method: 'GET', path: '/api/claudium/balance' },
     { method: 'GET', path: '/api/claudium/price/:rail' },
     { method: 'GET', path: '/api/claudium/skus' },

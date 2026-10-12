@@ -13,6 +13,7 @@
 // session and never per tick; the WeakMap lets a freed claim's view go.
 
 import { dungeonRunForPlayer } from '../src/sim/instances/dungeon_run';
+import type { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { DungeonRunView } from '../src/world_api/dungeons';
 
@@ -28,4 +29,21 @@ export function dungeonRunWireJson(ctx: SimContext, pid: number): string {
     serialized.set(view, json);
   }
   return json;
+}
+
+/** The run readouts of the self record, in their wire order: the delve run
+ *  (`drun`), the group dungeon run (`dgrun`), the delve companion
+ *  (`dcompanion`) and the delve marks (`dmarks`). The emission moved here from
+ *  selfWireJson (server/game.ts) under the monolith ratchet; the keys and their
+ *  order are unchanged (ALL_DELTA_KEYS, tests/snapshots.test.ts). */
+export function appendRunSelfWire(
+  sim: Pick<Sim, 'ctx' | 'delveRunWire' | 'delveCompanionWire' | 'delveMarksFor'>,
+  pid: number,
+  maybe: (key: string, value: unknown) => void,
+  maybeSerialized: (key: string, serialized: string) => void,
+): void {
+  maybe('drun', sim.delveRunWire(pid));
+  maybeSerialized('dgrun', dungeonRunWireJson(sim.ctx, pid));
+  maybe('dcompanion', sim.delveCompanionWire(pid));
+  maybe('dmarks', sim.delveMarksFor(pid));
 }

@@ -20,62 +20,62 @@ const CORRECTED_PORTRAITS = {
   bogtoad: [
     'mob_murloc',
     'models/creatures/frog.glb',
-    'c74d58d2b282328f588d9d51b1b66eb123a963b047410ab95b017518a33794bb',
+    'b5ecbb01a36f1aa03094efd54b79962ba3985d8ec8b5bc70f42bc159b0c80f7d',
   ],
   drowsy_croaker: [
     'mob_murloc',
     'models/creatures/frog.glb',
-    '994a349fdcb47bfbbfe2af7f92eb7a6feaa95f38a1998147723fb585e240167a',
+    '46570e1af656c3b9e9428ee39ebac2682ed063e52bef25513a918f0d8cda2baf',
   ],
   mere_lurker: [
     'mob_murloc',
     'models/creatures/frog.glb',
-    'dd958843a504ea6f07e97f92f0e5a477faa6eff52647e8c4af7e2ad5a02a4d0d',
+    '5ea2fe8f6953714463a3438cbf20299d1eeac480557c1c8311603eeea44eb567',
   ],
   the_meredark: [
     'mob_murloc',
     'models/creatures/frog.glb',
-    '9317cb96146327564f5dbb821fed757b628e47ace76df133fd3f2acc91df4d0e',
+    'b14db6ec964ea25c6de9b588ade5da44e702b93fa5a270751751322170e8a616',
   ],
   breach_wretch: [
     'mob_kobold',
     'models/creatures/goblin.glb',
-    '7a472425d553051ade36fab448f8cb0091f2bb76a555e93b535ed21ea1a6f427',
+    'b6fdd777507a714fe00dd6635535f38dde194c3d7d4c1fead226b7e8d68e21e9',
   ],
   fen_sprite: [
     'mob_kobold',
     'models/creatures/goblin.glb',
-    '27e20641545265cb933edf9220a7262ef69cd7b5fb9f8ea4ca943417b243303a',
+    '3f1c378547f3a490f673583a82981efdb22f066823e4f7936089b2e3d9a3ee07',
   ],
   harvest_sprite: [
     'mob_kobold',
     'models/creatures/goblin.glb',
-    '91acea51e4a36630146eb55e2b48a980405083aaa997e6325162722e77842c78',
+    '5168f406c69e6470249d7bdbbd9c3742b603d497aac9719754d147df977937bd',
   ],
   hedge_gnome: [
     'mob_kobold',
     'models/creatures/goblin.glb',
-    'b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d',
+    '8aae9d814e1047bf7c038d18483fb836b323ee445cc7b00eabe1b3d917a21e1c',
   ],
   willow_sprite: [
     'mob_kobold',
     'models/creatures/goblin.glb',
-    'c1dc29dbb2a2f33a65306af3f7747a6f431d2af9961075fcb6d63a8bdcdebaa3',
+    'b766e56fd7817a91616c6832f76d565a30fbda2c879a76f5e55a4957ef773eb2',
   ],
   downs_bandit: [
     'mob_kobold',
     'models/creatures/goblin.glb',
-    'b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d',
+    '8aae9d814e1047bf7c038d18483fb836b323ee445cc7b00eabe1b3d917a21e1c',
   ],
   wreck_thief: [
     'mob_kobold',
     'models/creatures/goblin.glb',
-    'b35c370fbdbee7c8e60c79c6db28cf0eee8a88cda629aa6235f8642de6fb540d',
+    '8aae9d814e1047bf7c038d18483fb836b323ee445cc7b00eabe1b3d917a21e1c',
   ],
   training_dummy: [
     'mob_training_dummy',
     'models/creatures/training_dummy.glb',
-    'ff36c52017c5e7361602e61e9c1ea224519ed2d90f77cc911cffe2b71e3914ba',
+    '3d2b84687d58cab79f273735154816cd1cc870b02f76ee9d852f3d7d3d8dc55a',
   ],
 } as const;
 
@@ -92,29 +92,29 @@ const CLASS_BODY_PORTRAITS = {
   apprentice_wren: [
     'player_mage_female',
     'models/chars/players/woc/base_female.glb',
-    'a7666ba1f82ab975aee8a4f583b4deb88ac79b3471784f8df78b90e03dcec125',
+    '53ef1d9667513542999485680c0ce0abcf5c9f177456e48e849560387e2be69f',
   ],
   castaway_navigator: [
     'player_rogue',
     'models/chars/players/woc/base_male.glb',
-    '1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1',
+    '4613747a1d7e35c1501d487d2555201c5fddbeffca2398228f01730ad4f9f6ec',
   ],
   fisher_bram: [
     'player_rogue',
     'models/chars/players/woc/base_male.glb',
-    '1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1',
+    '4613747a1d7e35c1501d487d2555201c5fddbeffca2398228f01730ad4f9f6ec',
   ],
   gravedigger_mosley: [
     'player_rogue',
     'models/chars/players/woc/base_male.glb',
-    '1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1',
+    '4613747a1d7e35c1501d487d2555201c5fddbeffca2398228f01730ad4f9f6ec',
   ],
   // the one enemy whose old portrait was pinned (a tinted barbarian stand-in): now on
   // the warrior's class body with the rest of the humanoid enemies
   the_wreck_warden: [
     'player_warrior',
     'models/chars/players/woc/base_male.glb',
-    '3f83e55ce408fc82ae8de4af2252e349da02977c2876900458909e604bb61634',
+    '8d55ef633a86b34d12b6651ff3d3654438b3aaafe40db9ca4b07fc6c9aa7e1de',
   ],
 } as const;
 
@@ -127,14 +127,14 @@ const CORRECTED_TINTED_PORTRAITS = {
     'models/creatures/dragonkin_elite.glb',
     0xf0b040,
     0.12,
-    '39bafb97c82172605678ebc755f420536c26b91c5f388d992f5359c4a877a15c',
+    'd557b16d20c41285ecda9da867a183342f9f3f19d3622f451bebfbf35b4f74dd',
   ],
   grubjaw: [
     'mob_grubjaw',
     'models/creatures/grubjaw.glb',
     0x145a32,
     0.04,
-    'de48a90c28d1fa473856186aba8119eb2458e4cc99cc0f3ebd5aedc606704a69',
+    '0fc867ac1c3e9f0fb012472143c9a5258793348d1060750be159d593539d0455',
   ],
 } as const;
 
