@@ -9301,7 +9301,7 @@ export const hudChromeStrings = {
       crypt_brides_lament:
         "Bride's Lament (every 22 seconds a 3 second wail: 60 to 75 frost damage on normal to everyone outside the light of a lit grave lantern, half again for every Lingering Lament stack from the Laments you already took. A lantern shelters two players at most and goes dark for 28 seconds after it shelters anyone, so split up and take turns)",
       crypt_frozen_embrace:
-        'Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 3 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)',
+        'Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)',
       crypt_rime_path:
         'Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)',
       crypt_bridal_freeze:

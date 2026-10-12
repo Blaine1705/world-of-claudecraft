@@ -10,7 +10,7 @@
 //                    Each lantern that sheltered anyone goes dark for 28 s.
 //   Frozen Embrace   every 30 s (first at 24 s) a 1.2 s bar on a non-tank (two
 //                    on heroic); she rises 5 yd with them for up to 8 s
-//                    (lady_embrace.ts). 3 percent of her health dealt while she
+//                    (lady_embrace.ts). 6 percent of her health dealt while she
 //                    hangs there breaks it; otherwise she drops them (150 to
 //                    180 when they hit the ice).
 //   Rime Path        slick rime wherever she drifts (lady_ice.ts).
