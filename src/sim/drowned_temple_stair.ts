@@ -5,8 +5,13 @@
 // terrain: it lives in groundHeight through walk_lifts.ts as an ABSOLUTE
 // surface (the Forgefather stair ramps' idiom, a max with the ground, so the
 // flight runs out into the bed and the dais into the bank with no step), never
-// in terrainHeight. Pure leaf: no imports, deterministic, no rng. The models
-// and what collides are src/sim/drowned_temple_entrance.ts.
+// in terrainHeight. The gully it is fitted to is the SHIPPED world's (the
+// ground here is not stamped, so every other seed carves a different one):
+// off WORLD_SEED the surface adds nothing, and a test world or the headless
+// env keeps its own natural ground at the door. Pure leaf: deterministic, no
+// rng, one import (the seed, itself a leaf). The models and what collides are
+// src/sim/drowned_temple_entrance.ts.
+import { WORLD_SEED } from './world_seed';
 //
 // Local coordinates are door-relative: lx = x - door.x (+x is WEST), lz =
 // z - door.z (+z is NORTH), heights above the door's own terrain height.
@@ -75,8 +80,10 @@ export function drownedTempleStairLocalSurface(lx: number, lz: number): number {
 }
 
 /** The ABSOLUTE walk surface at a world point, or -Infinity outside the set
- *  piece (the walk_lifts max then leaves the ground untouched). */
-export function drownedTempleStairSurface(x: number, z: number): number {
+ *  piece and on every seed but the shipped one (the walk_lifts max then leaves
+ *  the ground untouched). */
+export function drownedTempleStairSurface(x: number, z: number, seed: number): number {
+  if (seed !== WORLD_SEED) return Number.NEGATIVE_INFINITY;
   const lx = x - DROWNED_TEMPLE_STAIR_DOOR.x;
   if (lx < -14 || lx > 14) return Number.NEGATIVE_INFINITY;
   const local = drownedTempleStairLocalSurface(lx, z - DROWNED_TEMPLE_STAIR_DOOR.z);

@@ -18,7 +18,7 @@ import { drownedTempleStairSurface } from './drowned_temple_stair';
 // (The glider flight tower's deck used to fold in here as an absolute surface;
 // the launch now uses the existing mountain and a plank wharf on the
 // deck_surfaces.ts arm, like the harbor piers.)
-export function overworldWalkSurface(x: number, z: number, terrain: number): number {
+export function overworldWalkSurface(x: number, z: number, terrain: number, seed: number): number {
   const lifted = terrain + beaconSpiralLift(x, z) + dawnholdLift(x, z);
-  return Math.max(lifted, forgefatherStairSurface(x, z), drownedTempleStairSurface(x, z));
+  return Math.max(lifted, forgefatherStairSurface(x, z), drownedTempleStairSurface(x, z, seed));
 }

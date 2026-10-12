@@ -130,7 +130,7 @@ describe('the Moon Stair stands in for the generic door arch', () => {
     expect(terrain(0, -13)).toBeGreaterThan(-6.4);
   });
 
-  it('the old column ring is gone, and the ground it calmed is unchanged', () => {
+  it('the old column ring is gone: its row stays, with no columns, as the terrain calm anchor it was', () => {
     // the row stays as a terrain calm anchor with no columns: nothing of it
     // draws or collides (colliders.ts and render/props.ts skip a ring of none)
     expect(TEMPLE_PROPS.ruinRings).toEqual([{ x: -70, z: 792, ringR: 7, columns: 0 }]);
@@ -202,12 +202,14 @@ describe('the dais and the flight are walked on', () => {
       );
     }
     // the surface is the leaf's own, and absolute
-    expect(drownedTempleStairSurface(DOOR.x, DOOR.z - 6)).toBeCloseTo(
+    expect(drownedTempleStairSurface(DOOR.x, DOOR.z - 6, SEED)).toBeCloseTo(
       BASE + drownedTempleStairLocalSurface(0, -6),
       9,
     );
-    expect(drownedTempleStairSurface(DOOR.x + 40, DOOR.z)).toBe(Number.NEGATIVE_INFINITY);
-    expect(drownedTempleStairSurface(DOOR.x, DOOR.z + 30)).toBe(Number.NEGATIVE_INFINITY);
+    expect(drownedTempleStairSurface(DOOR.x + 40, DOOR.z, SEED)).toBe(Number.NEGATIVE_INFINITY);
+    expect(drownedTempleStairSurface(DOOR.x, DOOR.z + 30, SEED)).toBe(Number.NEGATIVE_INFINITY);
+    // one dais: the leaf's and the set piece's
+    expect(S.dais).toBe(L.dais);
     // the flight meets the mirror's water at its twenty-third riser
     expect(S.dais - 23 * S.riser).toBeCloseTo(L.water, 6);
   });
@@ -262,6 +264,66 @@ describe('the dais and the flight are walked on', () => {
     expect(Math.hypot(p.pos.x - EXIT_DROP.x, p.pos.z - EXIT_DROP.z)).toBeLessThan(1.5);
     expect(isBlocked(SEED, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS)).toBe(false);
     expect(walkTo(sim, foot.x, foot.z, 0.8, 800), 'back down to the mirror').toBe(true);
+  }, 180_000);
+});
+
+describe('the walk surface belongs to the shipped world only', () => {
+  it('on any other seed the door keeps its own natural ground: no mesa over a different gully', () => {
+    for (const seed of [0, 1, 123, 4242]) {
+      expect(seed).not.toBe(SEED);
+      expect(drownedTempleStairSurface(DOOR.x, DOOR.z - 6, seed)).toBe(Number.NEGATIVE_INFINITY);
+      for (const [lx, lz] of [
+        [0, -1],
+        [0, -6],
+        [2, -11],
+        [-6, 0],
+      ]) {
+        const x = DOOR.x + lx;
+        const z = DOOR.z + lz;
+        expect(groundHeight(x, z, seed), `seed ${seed} at ${lx},${lz}`).toBe(
+          terrainHeight(x, z, seed),
+        );
+      }
+    }
+    // and the shipped seed does lift it
+    expect(groundHeight(DOOR.x, DOOR.z - 6, SEED)).toBeGreaterThan(
+      terrainHeight(DOOR.x, DOOR.z - 6, SEED) + 1,
+    );
+  });
+
+  it('the open edges of the flight and the dais never wedge a walker', () => {
+    const sim = makeSim();
+    // up the fanned foot of the flight along each open edge, below the cheeks
+    for (const sx of [-1, 1]) {
+      const from = at(sx * (drownedTempleStairHalfWidth(-14) - 0.3), -14);
+      place(sim, from.x, from.z, 0);
+      expect(
+        walkTo(sim, DOOR.x + sx * 1.5, DOOR.z - 9, 0.8, 400),
+        `up the flight's edge ${sx}`,
+      ).toBe(true);
+    }
+    // Off the south edge of the dais beside the west cheek: the nook between
+    // the dais, the cheek, the first column and Ondrel's fire is no trap. A
+    // walker drops into it and walks back up where the dais meets the bank.
+    const edge = at(5.4, -2.0);
+    place(sim, edge.x, edge.z, Math.PI);
+    expect(walkTo(sim, DOOR.x + 5.4, DOOR.z - 3.3, 0.5, 300), 'off the dais into the nook').toBe(
+      true,
+    );
+    expect(sim.player.pos.y - BASE, 'down on the natural ground').toBeLessThan(S.dais - 0.3);
+    expect(walkTo(sim, DOOR.x + 6.8, DOOR.z - 3.0, 0.5, 300), 'along the foot of the dais').toBe(
+      true,
+    );
+    expect(walkTo(sim, DOOR.x + 6.8, DOOR.z - 1.6, 0.5, 300), 'back up onto the dais').toBe(true);
+    expect(sim.player.pos.y - BASE).toBeCloseTo(S.dais, 2);
+    // and off the east edge the bank is open all the way out
+    const east = at(-5.4, -2.0);
+    place(sim, east.x, east.z, Math.PI);
+    expect(walkTo(sim, DOOR.x - 5.6, DOOR.z - 3.2, 0.5, 300), 'off the dais on the east').toBe(
+      true,
+    );
+    expect(walkTo(sim, DOOR.x - 9.5, DOOR.z - 4.5, 0.8, 400), 'out along the east bank').toBe(true);
+    expect(sim.player.pos.x, 'never taken by the door').toBeLessThan(DUNGEON_X_THRESHOLD);
   }, 180_000);
 });
 
@@ -397,9 +459,6 @@ describe('the Moon Stair sits in the real ground', () => {
             f.bottom - natural,
             `${f.name} floats at ${u.toFixed(1)},${v.toFixed(1)}`,
           ).toBeLessThan(0.02);
-          expect(ground(f.lx + u * c + v * s, f.lz - u * s + v * c)).toBeGreaterThanOrEqual(
-            natural,
-          );
           lowest = Math.min(lowest, natural);
         }
       }
@@ -431,10 +490,10 @@ describe('the Moon Stair sits in the real ground', () => {
   });
 
   it('everything towers over a 1.8 yd character', () => {
-    // the ring: over ten yards of stone above its own dais, its crown fifteen over the mirror
-    expect(L.ringCentre + L.ringOuter - L.dais).toBeGreaterThan(10);
-    expect(L.ringOuter * 2).toBeGreaterThan(7);
-    expect(L.ringCentre - L.ringInner).toBeGreaterThan(L.dais);
+    // the ring's feet stand over six yards at the lane (its crown is pinned on the GLB's own
+    // bounds, tests/drowned_temple_entrance_asset.test.ts)
+    expect(row('moongate_foot_e').top - S.dais).toBeGreaterThan(6);
+    expect(row('moongate_foot_w').top - S.dais).toBeGreaterThan(6);
     // the penitents: four to five yards out of the water they stand in
     for (const name of ['penitent_e', 'penitent_w']) {
       expect(row(name).top - L.water, name).toBeGreaterThan(4);

@@ -160,7 +160,8 @@ function inlayMaterial(): THREE.MeshBasicMaterial {
 #endif
 float tGlow = templeRune(tOrder, templeRise());
 diffuseColor.rgb = (diffuseColor.rgb * 0.5 + vec3(0.36, 0.5, 0.66)) * (0.16 + 1.7 * tGlow);
-diffuseColor.a = 1.0;`,
+// the colour alpha was the inlay's order, never its opacity: the ghost's fade still applies
+diffuseColor.a = opacity;`,
       );
   };
   material.customProgramCacheKey = () => TEMPLE_INLAY_PROGRAM_CACHE_KEY;
@@ -195,9 +196,10 @@ function seat(source: THREE.Group, castShadow: boolean): THREE.Group {
   return model;
 }
 
-/** Pre-load and headless stand-in: the ring's two feet, its crown, the stair's
- *  cheeks and the penitents as plain blocks, so the colliders are never
- *  invisible walls if a GLB is missing. */
+/** Pre-load and headless stand-in: the ring's two feet, its crown, the dais,
+ *  the flight (one slab on its slope), its cheeks and the penitents as plain
+ *  blocks, so neither the colliders nor the walk surface is ever invisible if
+ *  a GLB is missing. */
 function fallbackGate(): THREE.Group {
   const root = new THREE.Group();
   const stone = surfaceMat({ color: 0xb9b6ad, roughness: 0.9 });
@@ -217,6 +219,18 @@ function fallbackGate(): THREE.Group {
     mesh.scale.set(w, h, d);
     root.add(mesh);
   }
+  const dais = new THREE.Mesh(box, stone);
+  dais.position.set(0, g.dais - 1.5, -0.1);
+  dais.scale.set(14.4, 3, 5);
+  root.add(dais);
+  // the flight: from the dais edge down to the water, a yard thick under its nosings
+  const run = 23 * 0.46;
+  const fall = g.dais - g.water;
+  const flight = new THREE.Mesh(box, stone);
+  flight.scale.set(6, 1, Math.hypot(run, fall));
+  flight.rotation.x = -Math.atan2(fall, run);
+  flight.position.set(0, (g.dais + g.water) / 2 - 0.5, -2.6 - run / 2);
+  root.add(flight);
   return root;
 }
 
@@ -262,11 +276,11 @@ float tFilmLayer(vec2 fp, vec2 slide, float depth, float spin, float grain, floa
   vec2 q = fp + slide * depth;
   float r = length(q);
   // a slow whirl: the light is drawn out along the turn, tighter toward the heart
-  float ang = atan(q.y, q.x) + spin * tm + 1.9 * log(r + 0.35);
+  float ang = atan(q.y, q.x + 1.0e-5) + spin * tm + 1.9 * log(r + 0.35);
   vec2 w = vec2(ang * 1.6, r * grain * 2.4 - spin * tm * 2.0);
   float warp = tNoise(vec2(cos(ang), sin(ang)) * 1.7 + r * grain + tm * 0.02);
   float band = sin(w.x * 2.0 + warp * 5.0 + r * grain * 6.0);
-  float thread = pow(1.0 - abs(band), 5.0);
+  float thread = pow(max(1.0 - abs(band), 0.0), 5.0);
   return thread * (0.35 + 0.65 * tNoise(q * grain * 2.2 + 3.0)) + 0.18 * warp;
 }
 vec4 templeMoonwater() {
@@ -298,7 +312,7 @@ vec4 templeMoonwater() {
     col = vec3(0.006, 0.013, 0.034) + vec3(0.012, 0.026, 0.06) * exp(-md * 0.25) + moon + vec3(0.75, 0.85, 1.0) * star * 0.8 * (1.0 - disc);
     // the surface: the sky lies on it at a glancing eye, a slow ring crosses it, the kerb shades its edge
     float ring = sin(rr * 26.0 - tm * 0.9) * exp(-rr * 2.4) * 0.03;
-    float fres = 0.03 + 0.97 * pow(1.0 - max(-dir.y, 0.0), 5.0);
+    float fres = 0.03 + 0.97 * pow(clamp(1.0 + min(dir.y, 0.0), 0.0, 1.0), 5.0);
     col = mix(col, tSky(reflect(dir, vec3(0.0, 1.0, 0.0))), clamp(fres * 0.3 + ring, 0.0, 1.0));
     col *= 1.0 - 0.62 * smoothstep(0.78, 1.0, rr);
   } else if (vTempleK.x < 1.5) {
@@ -372,7 +386,7 @@ vec4 templeMoonwater() {
     // the gate's light lies down the water toward the eye
     vec3 toGate = normalize(vec3(0.0, T_C, 0.0) - vTempleP);
     float spec = pow(max(dot(reflect(dir, normalize(vec3(g.x * 2.6, 1.0, g.y * 2.6))), toGate), 0.0), 36.0);
-    col += vec3(0.6, 0.78, 1.0) * spec * (0.12 + 0.5 * rise.z) * (0.35 + 0.65 * night);
+    col += vec3(0.6, 0.78, 1.0) * spec * (0.1 + 0.28 * rise.z) * (0.35 + 0.65 * night);
     col += (vec3(0.5, 0.6, 0.68) * day + vec3(0.3, 0.45, 0.8) * rise.z * 0.5) * crests * 0.3;
     // the shore: the water thins to nothing on the bed
     alpha = smoothstep(0.0, 0.1, depth) * (0.9 + 0.1 * fres);
