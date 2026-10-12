@@ -22,6 +22,7 @@ import {
   MORTHEN_ID,
   MORTHEN_SPOT,
 } from '../src/sim/encounters/hollow_crypt';
+import { BOSS_CORPSE_HOLD_SECONDS } from '../src/sim/mob/boss_corpse_hold';
 import {
   CRYPT_BARROWFLAME_BREATH,
   CRYPT_TAIL_LASH,
@@ -106,6 +107,9 @@ for (const difficulty of ['normal', 'heroic'] as const) {
       }
       const seconds = ticks * DT;
       expect(wyrm.dead).toBe(true);
+      // Its purse waits on the body for the boss hold, not the trash minute.
+      expect(wyrm.lootable).toBe(true);
+      expect(wyrm.corpseTimer).toBeGreaterThan(BOSS_CORPSE_HOLD_SECONDS - 5);
       // A finale, not a formality: over a minute, and done inside the budget
       // (heroic adds its Burning Knell, flown out of reach).
       expect(seconds).toBeGreaterThan(60);

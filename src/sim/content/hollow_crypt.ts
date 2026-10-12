@@ -427,6 +427,8 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
     elite: true,
     ccImmune: true,
     slowImmune: true,
+    // The finale's purse lies on its body: the corpse holds like a boss's.
+    bossCorpseHold: true,
     hpBase: 200,
     hpPerLevel: 30,
     dmgBase: 11,
