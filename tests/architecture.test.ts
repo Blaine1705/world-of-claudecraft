@@ -1011,6 +1011,9 @@ const RENDER_PURE_CORES = [
   'src/render/hoard_entrance_core.ts',
   // The Gravewyrm Sanctum Seal Gate's cosmetic plan (mist flow, rime fan).
   'src/render/sanctum_seal_gate_core.ts',
+  // The Sunken Bastion's Drowned Gate Tower: the Fogbeacon's turn, the flooded
+  // passage's trace, the marsh fog's puffs and the gate sprites.
+  'src/render/sunken_bastion_entrance_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',

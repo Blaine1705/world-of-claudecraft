@@ -47,6 +47,7 @@ import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { sanctumSealGatePreloadInternalsForTest } from '../src/render/sanctum_seal_gate';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
+import { sunkenBastionEntrancePreloadInternalsForTest } from '../src/render/sunken_bastion_entrance';
 import { transportShipInternalsForTest } from '../src/render/transport_ship';
 import { wickharborHarborInternalsForTest } from '../src/render/wickharbor_harbor';
 import { wickharborWharfInternalsForTest } from '../src/render/wickharbor_wharf';
@@ -504,6 +505,10 @@ async function expectArmouryGlbContract(
 describe('GLB-replacement asset preload sets resolve to real, manifested files', () => {
   it('Gravewyrm Sanctum Seal Gate assets', () => {
     for (const url of sanctumSealGatePreloadInternalsForTest.urls)
+      expectAssetExistsAndManifested(url);
+  });
+  it('Sunken Bastion Drowned Gate Tower assets', () => {
+    for (const url of sunkenBastionEntrancePreloadInternalsForTest.urls)
       expectAssetExistsAndManifested(url);
   });
   it('buried hoard entrance asset', () => {
