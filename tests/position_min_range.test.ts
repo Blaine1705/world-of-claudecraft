@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { ABILITIES, MOBS } from '../src/sim/data';
@@ -50,13 +50,35 @@ function damageEvents(events: SimEvent[], ability: string) {
   );
 }
 
-// 4 yards since the v0.45 hunter pass (8 before). Read from the def so the
-// edge cases below always sit on the shipped boundary.
-const SPLITSHOT_MIN_RANGE = ABILITIES.multi_shot.minRange ?? 0;
+describe('shipped Splitshot', () => {
+  it('has no minimum range since the v0.45 hunter pass (8 yards before)', () => {
+    expect(ABILITIES.multi_shot.minRange).toBeUndefined();
+  });
+
+  it('fires point blank', () => {
+    const sim = makeHunter();
+    const target = addTargetAt(sim, 1);
+    sim.drainEvents();
+
+    sim.castAbility('multi_shot', sim.playerId, { x: target.pos.x, z: target.pos.z });
+    const events = sim.tick();
+
+    expect(events).not.toContainEqual({ type: 'error', pid: sim.playerId, text: 'Too close!' });
+    expect(damageEvents(events, 'Splitshot')).toHaveLength(1);
+  });
+});
+
+// No shipped position ability authors a minimum range any more, so the engine
+// path is pinned on Splitshot with a fixture minimum (removed after the suite)
+// to keep it guarded for the next ability that ships one.
+const SPLITSHOT_MIN_RANGE = 4;
 
 describe('position ability minimum range', () => {
-  it('ships Splitshot with a 4 yard minimum range', () => {
-    expect(SPLITSHOT_MIN_RANGE).toBe(4);
+  beforeAll(() => {
+    ABILITIES.multi_shot.minRange = SPLITSHOT_MIN_RANGE;
+  });
+  afterAll(() => {
+    delete ABILITIES.multi_shot.minRange;
   });
 
   it('refuses Splitshot inside its minimum range without dealing area damage', () => {

@@ -2,10 +2,11 @@
 //
 // The row-build sweep used to walk EVERY class to melee reach. That is harmless
 // for a caster (no damaging spell in the game has a minimum range) but it silently
-// broke the hunter, whose ranged kit refuses to fire point blank: Auto Shot's dead
-// zone and the shots' minimum range (Fell Shot, Venom Barb, Long Draw, Splitshot,
-// Hushing Shot, ...) were eight yards then and are four now, so the sweep was
-// measuring a hunter as a bad melee class and reporting the result as its DPS.
+// broke the hunter, whose ranged kit then refused to fire point blank: Auto Shot's
+// dead zone and the shots' minimum range (Fell Shot, Venom Barb, Long Draw,
+// Splitshot, Hushing Shot, ...) were eight yards, so the sweep was measuring a
+// hunter as a bad melee class and reporting the result as its DPS. Since v0.45 the
+// hunter has no minimum range at all, so it stands at melee reach too.
 //
 // The rule below is deliberately narrow: a class stands at melee reach unless its
 // own damaging kit, or its non-wand ranged auto-attack, declares a minimum range,
