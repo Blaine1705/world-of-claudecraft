@@ -987,6 +987,10 @@ export function doorArchAuthoredElsewhere(
   // The Gravewyrm Sanctum's Seal Gate (sanctum_seal_gate.ts) is the door: its
   // pylons frame the walk-in lane and its cold mist film is the portal look.
   if (dungeonId === 'gravewyrm_sanctum') return true;
+  // The Hollow Crypt's Fallen Chapel (hollow_crypt_entrance.ts) is the door:
+  // its stair-house portal frames the walk-in lane and the stair it draws
+  // behind the arch is the portal look.
+  if (dungeonId === 'hollow_crypt') return true;
   // The raid family's overworld door belongs to its chain HEAD (the
   // Forge-Lift since the lift became the first room; the Halls id stays
   // covered so a chain reshuffle can never resurrect the generic arch

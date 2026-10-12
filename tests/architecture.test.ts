@@ -1011,6 +1011,9 @@ const RENDER_PURE_CORES = [
   'src/render/hoard_entrance_core.ts',
   // The Gravewyrm Sanctum Seal Gate's cosmetic plan (mist flow, rime fan).
   'src/render/sanctum_seal_gate_core.ts',
+  // The Hollow Crypt's Fallen Chapel: the virtual stair trace, the grave
+  // mist's puffs and the spirit sprites (flames, motes, wisps, rose glow).
+  'src/render/hollow_crypt_entrance_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',
