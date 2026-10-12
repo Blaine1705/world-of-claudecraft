@@ -10,6 +10,7 @@ import { buildSanctumSealGate } from './sanctum_seal_gate';
 import { clearSetPieceOccluders } from './set_piece_occluders';
 import { buildSunkenBastionEntrance } from './sunken_bastion_entrance';
 import { buildWaterFlora } from './water_flora';
+import { buildWildheartBasinEntrance } from './wildheart_basin_entrance';
 
 // The set pieces register what they put between the camera and the character
 // (set_piece_occluders.ts); the renderer drives the pass through this module.
@@ -25,5 +26,6 @@ export function buildStaticWorldFeatures(seed: number) {
     buildSunkenBastionEntrance(seed),
     buildHollowCryptEntrance(seed),
     buildDrownedTempleEntrance(seed),
+    buildWildheartBasinEntrance(seed),
   ];
 }

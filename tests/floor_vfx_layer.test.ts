@@ -113,6 +113,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Moon Stair's liquid moonlight, mist and moonrise sprites at the
   // Drowned Temple's door: the world's own marks, under every telegraph.
   { file: 'src/render/drowned_temple_entrance.ts', layer: 'ground', strict: true },
+  // The Jaguar Maw's mist and sprites at the Wildheart Basin's door: the
+  // world's own marks, under every telegraph.
+  { file: 'src/render/wildheart_basin_entrance.ts', layer: 'ground', strict: true },
   // A Buried Hoard boss room's additive floor light under its kit props, kept on
   // the order it shipped with (2, the ground band's second rung).
   { file: 'src/render/hoard_room_kit.ts', layer: 'ground', strict: true },

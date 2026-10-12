@@ -1024,6 +1024,9 @@ const RENDER_PURE_CORES = [
   // The Drowned Temple's Moon Stair: the moonrise's clock, the pool's moon and
   // its parallax, the mirror's sight of the gate, the mist and the sprites.
   'src/render/drowned_temple_entrance_core.ts',
+  // The Wildheart Basin's Jaguar Maw: the idol's breath, the flooded throat's
+  // trace, the mist's puffs and the maw's sprites.
+  'src/render/wildheart_basin_entrance_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',

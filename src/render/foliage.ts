@@ -44,6 +44,7 @@ import {
   insideDressingExclusion,
   insideEastbrookGrassExclusion,
   insideGrassHubExclusion,
+  insidePavedGrassExclusion,
 } from './foliage_core';
 import { survivesLeanDecimation } from './foliage_decimation_core';
 import { FOLIAGE_MODEL_DIR as MODEL_DIR, treeUrl } from './foliage_field_models';
@@ -3039,7 +3040,7 @@ function buildGrassRing(
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
         if (insideGrassHubExclusion(activeContent.zones, x, z)) continue;
-        if (roadDistance(x, z) < 3.2) continue;
+        if (roadDistance(x, z) < 3.2 || insidePavedGrassExclusion(x, z)) continue;
         if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
         // the stable yard is worked dirt; deck planks grow nothing through
         if (tuftBiome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;

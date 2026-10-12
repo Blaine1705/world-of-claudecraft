@@ -524,6 +524,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the Drowned Gate Tower pulse light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/drowned_temple_entrance.ts':
     'the Moon Stair gate light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/wildheart_basin_entrance.ts':
+    'the Jaguar Maw breath light and its two fire bowls, static zone feature glowLights lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/realm_flora.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/soulwell.ts':
@@ -654,6 +656,9 @@ describe('every point-light producer is a carrier source', () => {
       // vine bridges weaving, the thorn walls sinking, the wards failing),
       // never a scene.
       'render/wildheart_basin/basin_gates.ts: m',
+      // The Jaguar Maw's mist: a mesh hook writing the time of day, the
+      // reduced-motion switch and the breath light's base, never a scene.
+      'render/wildheart_basin_entrance.ts: mesh',
     ]);
 
     expect(sourceOf('render/light_pulses.ts')).toContain('markPointLightSource(light);');

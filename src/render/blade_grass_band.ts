@@ -28,7 +28,7 @@ import { clusterGeometry, clusterPlacementPad, mulberry32 } from './blade_grass'
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
 import { GRASS_BIOME_DENSITY } from './foliage';
-import { insideGrassHubExclusion } from './foliage_core';
+import { insideGrassHubExclusion, insidePavedGrassExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { GFX, sharedUniforms } from './gfx';
 import { getGrassGroundBake } from './grass_ground_bake';
@@ -190,6 +190,7 @@ export function buildBladeGrassBand(
       ok = r1 < (0.44 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
       if (ok) ok = roadDistance(x, z) > 2.4;
       if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
+      if (ok) ok = !insidePavedGrassExclusion(x, z);
       if (ok) {
         const h = terrainHeight(x, z, seed);
         ok = h > WATER_LEVEL + 1.4;

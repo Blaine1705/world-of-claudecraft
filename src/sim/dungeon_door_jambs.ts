@@ -25,6 +25,10 @@ import {
   SUNKEN_BASTION_ENTRANCE_DUNGEON_ID,
   sunkenBastionEntranceColliders,
 } from './sunken_bastion_entrance';
+import {
+  WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
+  wildheartBasinEntranceColliders,
+} from './wildheart_basin_entrance';
 
 export function dungeonDoorJambColliders(
   seed: number,
@@ -52,6 +56,10 @@ export function dungeonDoorJambColliders(
     }
     if (dungeon.id === DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID) {
       out.push(...drownedTempleEntranceColliders(seed, dungeon.doorPos));
+      continue;
+    }
+    if (dungeon.id === WILDHEART_BASIN_ENTRANCE_DUNGEON_ID) {
+      out.push(...wildheartBasinEntranceColliders(seed, dungeon.doorPos));
       continue;
     }
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {

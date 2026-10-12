@@ -999,6 +999,10 @@ export function doorArchAuthoredElsewhere(
   // its moongate ring frames the walk-in lane and the film of cold moonlight
   // it draws in the ring is the portal look.
   if (dungeonId === 'drowned_temple') return true;
+  // The Wildheart Basin's Jaguar Maw (wildheart_basin_entrance.ts) is the
+  // door: its muzzle frames the walk-in lane and the flooded throat it draws
+  // behind the fangs is the portal look.
+  if (dungeonId === 'wildheart_basin') return true;
   // The raid family's overworld door belongs to its chain HEAD (the
   // Forge-Lift since the lift became the first room; the Halls id stays
   // covered so a chain reshuffle can never resurrect the generic arch
