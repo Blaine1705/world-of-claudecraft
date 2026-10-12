@@ -6,19 +6,31 @@ import { authoredFieldHeight, authoredFieldSurfaceAt } from '../../sim/instances
 import { sanctumHash } from './sanctum_plan_core';
 
 export interface SanctumSurfaceWear {
-  family: 'snow' | 'ice';
-  positions: number[];
-  colors: number[];
-  uvs: number[];
+  readonly family: 'snow' | 'ice';
+  readonly positions: readonly number[];
+  readonly colors: readonly number[];
+  readonly uvs: readonly number[];
 }
 
-export function planSanctumSurfaceWear(): SanctumSurfaceWear[] {
+// The plan takes no input: it is a pure function of the authored field, in
+// the instance's own frame, so every claimed slot wears the same fractures.
+// Planned once per session and shared, read-only, by every slot's terrain
+// build (about five hundred lattice cells, each walking the field several
+// hundred times, is not work to repeat per slot).
+let planned: readonly SanctumSurfaceWear[] | null = null;
+
+export function planSanctumSurfaceWear(): readonly SanctumSurfaceWear[] {
+  planned ??= computeSanctumSurfaceWear();
+  return planned;
+}
+
+function computeSanctumSurfaceWear(): SanctumSurfaceWear[] {
   const field = GRAVEWYRM_SANCTUM_FIELD;
-  const batches: SanctumSurfaceWear[] = ['snow', 'ice'].map((family) => ({
-    family: family as 'snow' | 'ice',
-    positions: [],
-    colors: [],
-    uvs: [],
+  const batches = (['snow', 'ice'] as const).map((family) => ({
+    family,
+    positions: [] as number[],
+    colors: [] as number[],
+    uvs: [] as number[],
   }));
   // A jittered field breaks the regular rectangular terraces at a scale
   // visible from the chase camera, without an expensive per-fragment shader.

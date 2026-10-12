@@ -31,6 +31,41 @@ describe('Sanctum terrace frost wear', () => {
     material.dispose();
   });
 
+  it('plans once per session: a second slot gets the same plan without recomputing', () => {
+    // The plan has no input, so every claimed slot shares one. Identity (not
+    // equality) is the pin: an equal but freshly walked plan would pass a
+    // deep comparison while paying the whole field walk again.
+    const first = planSanctumSurfaceWear();
+    const second = planSanctumSurfaceWear();
+    expect(second).toBe(first);
+    for (let i = 0; i < first.length; i++) {
+      expect(second[i].positions).toBe(first[i].positions);
+      expect(second[i].colors).toBe(first[i].colors);
+      expect(second[i].uvs).toBe(first[i].uvs);
+    }
+    // Two terrains built off it leave the shared plan untouched.
+    const before = first.map((wear) => wear.positions.length);
+    for (let slot = 0; slot < 2; slot++) {
+      const terrain = new THREE.Group();
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute(
+        'position',
+        new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, 1, 1, 0, 0], 3),
+      );
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(Array(9).fill(1), 3));
+      geometry.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 0, 1, 1, 0], 2));
+      geometry.computeVertexNormals();
+      const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
+      mesh.name = 'fieldTop:ice';
+      terrain.add(mesh);
+      addSanctumSurfaceWear(terrain);
+      expect(mesh.geometry.getAttribute('position').count).toBe(3 + before[1] / 3);
+      mesh.geometry.dispose();
+      mesh.material.dispose();
+    }
+    expect(planSanctumSurfaceWear().map((wear) => wear.positions.length)).toEqual(before);
+  });
+
   it('places deterministic shallow fractures on snow and ice, never over a gap or boss lake', () => {
     const plan = planSanctumSurfaceWear();
     expect(plan).toEqual(planSanctumSurfaceWear());
