@@ -23,22 +23,22 @@ const ROOT = path.join(__dirname, '..');
 
 const PINS: Record<string, { sha: string; bytes: number; triangles: number; maxBytes: number }> = {
   'public/models/props/sunken_bastion_entrance.glb': {
-    sha: '0405526f7ada5a7af2dc81c2dd30567fbbc6e8701f9c611f638b7c56c8350b7f',
-    bytes: 460652,
-    triangles: 27022,
+    sha: '17d8f74d830bd2b2d4bda48f1984726e9575b5caa9dec1b1a04fc7830732321b',
+    bytes: 476212,
+    triangles: 28172,
     maxBytes: 560 * 1024,
   },
   'public/models/props/sunken_bastion_entrance_ruins.glb': {
-    sha: 'e2c1366ca648feae4a87d17f28330bba91ea10eb3aa2b5abcb4fc86cef01f7e5',
-    bytes: 139676,
-    triangles: 6410,
+    sha: 'd01c78b22b15891fd2b60d15d8194d81356252e7b6a21ff889f81a53095eb598',
+    bytes: 141212,
+    triangles: 6488,
     maxBytes: 190 * 1024,
   },
   'public/models/props/sunken_bastion_entrance_growth.glb': {
-    sha: '2014006d5e9187f557f1b51f1bb7dbfb043548a02326fd72305748b911f843f2',
-    bytes: 149272,
-    triangles: 8882,
-    maxBytes: 200 * 1024,
+    sha: '4947bbc6bb476335a2cb79eea2dc1b26e450b87ad969b17f51c8c89f4cc1bfaf',
+    bytes: 241536,
+    triangles: 14422,
+    maxBytes: 280 * 1024,
   },
 };
 

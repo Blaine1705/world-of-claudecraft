@@ -66,8 +66,8 @@ export const BASTION_BEACON = {
   lz: 44,
   pitch: 0.3,
   length: 170,
-  width0: 3,
-  width1: 20,
+  width0: 1.6,
+  width1: 9,
 } as const;
 
 /** The beam's bearing at a time (radians, 0 pointing SOUTH down the road at
@@ -114,8 +114,8 @@ export const BASTION_PULSE_LIGHT = {
   y: 1.9,
   lz: -0.75,
   color: 0x4dff9a,
-  rest: 1.1,
-  crest: 7.5,
+  rest: 3,
+  crest: 9.5,
   distance: 15,
 } as const;
 
@@ -154,7 +154,25 @@ export const BASTION_PASSAGE = {
   barHalf: 0.055,
   /** The window mesh reaches this far into the masonry round the opening. */
   margin: 0.3,
+  /** The eye the passage is drawn for never stands lower than this over the
+   *  kerb: the door is at the top of a steep road, and from below the water
+   *  would be hidden behind its own sill. A viewer under it sees the passage
+   *  as if it ran a little downhill, with the waterline across its lower third. */
+  eye: 1.25,
+  /** The far light never goes out: its level between turns. */
+  restGlow: 0.34,
 } as const;
+
+/** The height (door-local) the passage's rays are cast from for a camera at camY. */
+export function bastionPassageEye(camY: number): number {
+  return Math.max(camY, BASTION_PASSAGE.kerb + BASTION_PASSAGE.eye);
+}
+
+/** How bright the far light stands for a gate pulse: a steady dim glow at
+ *  rest (the water always has something to mirror), full at the crest. */
+export function bastionPassageLight(pulse: number): number {
+  return BASTION_PASSAGE.restGlow + (1 - BASTION_PASSAGE.restGlow) * pulse;
+}
 
 export type BastionPassageHitKind = 'water' | 'wall' | 'vault' | 'far' | 'grille';
 
@@ -468,13 +486,35 @@ export interface BastionSprite {
   /** Kind-specific reach: a drip's fall, a shaft's length, a light's wander,
    *  a glow's share of the night (0 the same by day, 1 only after dark). */
   range: number;
-  /** A shaft's direction, or a ground sprite's slope (dy/dx, 0, dy/dz). */
+  /** A shaft's direction, or a ground sprite's slope (dy/dx, 0, dy/dz); for a
+   *  glow, dx is the share of it that stands between turns. */
   dx: number;
   dy: number;
   dz: number;
   /** A shaft's width at its tip; a glow's rays (0 a plain glow, 1 rayed). */
   spread: number;
 }
+
+/** The gate shafts: yaw off south (negative east, the way the road falls),
+ *  pitch, length, width at the foot and at the tip, and the foot's lx. Uneven
+ *  on purpose, and fanned off the road's own line so a climber sees them from
+ *  the side, as shafts in the haze, never as a disc of rays. */
+export const BASTION_GATE_SHAFTS: readonly (readonly [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+])[] = [
+  [-0.58, -0.3, 11, 1.1, 2.6, -0.5],
+  [-0.4, -0.42, 13, 1.5, 3.6, -0.2],
+  [-0.22, -0.22, 9, 0.9, 2.2, 0.1],
+  [-0.06, -0.5, 12, 1.3, 3.2, -0.3],
+  [0.12, -0.3, 8, 1.0, 2.4, 0.4],
+  [0.34, -0.44, 10.5, 1.4, 3.0, 0.2],
+  [0.52, -0.36, 7, 1.2, 2.8, 0],
+];
 
 /** The rosette (lx, y, lz of its face, radius), from the Blender build. */
 export const BASTION_ROSETTE = { lx: 0, y: 6.95, lz: -3.75, radius: 1.0 } as const;
@@ -546,7 +586,7 @@ export function bastionSprites(
     dz: (ground(lx, lz + 0.4) - ground(lx, lz - 0.4)) / 0.8,
   });
   const r = BASTION_ROSETTE;
-  out.push({ ...base, kind: K.roseCore, x: r.lx, y: r.y, z: r.lz - 0.15, size: 2.3, phase: 0.3 });
+  out.push({ ...base, kind: K.roseCore, x: r.lx, y: r.y, z: r.lz - 0.15, size: 1.5, phase: 0.3 });
   // The door's mouth and the wet threshold in front of it.
   const p = BASTION_PASSAGE;
   out.push({
@@ -555,10 +595,22 @@ export function bastionSprites(
     x: 0,
     y: 2.3,
     z: -2.6,
-    size: 6.4,
+    size: 5.6,
     phase: 0.1,
     range: 0.3,
-    spread: 1,
+  });
+  // The court never goes quite dark: a low glow behind the portcullis, so
+  // its bars and the arch stand against it from the road between turns.
+  out.push({
+    ...base,
+    kind: K.mouth,
+    x: 0,
+    y: 1.3,
+    z: -1.5,
+    size: 5.4,
+    phase: 0.4,
+    range: 0.75,
+    dx: 0.5,
   });
   const s0 = slope(0, -1.5);
   out.push({
@@ -573,27 +625,21 @@ export function bastionSprites(
   });
   // The gate shaft: from the door's mouth out under the portcullis and down
   // the road, three shafts fanned a little.
-  for (let i = 0; i < 3; i++) {
-    const a = (i - 1) * 0.1;
-    const tx = -4.2 + Math.sin(a) * 12;
-    const tz = -12.5;
-    const ty = ground(tx, tz) + 1.0;
-    const ox = 0;
-    const oy = p.kerb + 1.25;
-    const oz = -0.4;
-    const len = Math.hypot(tx - ox, ty - oy, tz - oz);
+  for (let i = 0; i < BASTION_GATE_SHAFTS.length; i++) {
+    const [yaw, pitch, length, foot, tip, ox] = BASTION_GATE_SHAFTS[i];
+    const cp = Math.cos(pitch);
     out.push({
       ...base,
       kind: K.gateShaft,
       x: ox,
-      y: oy,
-      z: oz,
-      size: 1.5,
-      spread: 3.4,
-      range: len,
-      dx: (tx - ox) / len,
-      dy: (ty - oy) / len,
-      dz: (tz - oz) / len,
+      y: p.kerb + 1.25,
+      z: -0.4,
+      size: foot,
+      spread: tip,
+      range: length,
+      dx: Math.sin(yaw) * cp,
+      dy: Math.sin(pitch),
+      dz: -Math.cos(yaw) * cp,
       phase: fract(i * 0.61803398875 + 0.2),
     });
   }
@@ -637,7 +683,7 @@ export function bastionSprites(
       x: BASTION_BEACON.lx,
       y: 9,
       z: 16,
-      size: 46,
+      size: 26,
       phase: 0.6,
       range: 0.85,
       spread: 0,
@@ -651,7 +697,7 @@ export function bastionSprites(
     const fall = Math.max(0.3, y - g);
     const phase = fract(i * 0.61803398875 + 0.37);
     const speed = 1 / (2.6 + fract(i * 0.75487766625) * 3.4);
-    out.push({ ...base, kind: K.drip, x, y, z, size: 0.07, phase, speed, range: fall });
+    out.push({ ...base, kind: K.drip, x, y, z, size: 0.045, phase, speed, range: fall });
     // every third drop is heavy enough to leave a ring on the wet stone
     if (i % (3 * step) !== 0) continue;
     const sl = slope(x, z);
@@ -735,11 +781,11 @@ export function bastionSpritePose(
   switch (s.kind) {
     case K.roseCore:
       out.alpha =
-        (0.2 + 0.6 * night) * (0.86 + 0.14 * Math.sin(tm * 0.8 + s.phase * TAU)) +
-        0.25 * pulse * pulse;
+        (0.14 + 0.2 * night) * (0.86 + 0.14 * Math.sin(tm * 0.8 + s.phase * TAU)) +
+        0.2 * pulse * pulse;
       break;
     case K.mouth:
-      out.alpha = pulse * pulse * (1 + (night - 1) * s.range);
+      out.alpha = (s.dx + (1 - s.dx) * pulse * pulse) * (1 + (night - 1) * s.range);
       break;
     case K.pool:
       out.alpha = pulse * (0.5 + 0.5 * night);

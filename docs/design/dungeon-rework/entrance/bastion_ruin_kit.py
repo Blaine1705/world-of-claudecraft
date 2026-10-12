@@ -52,11 +52,11 @@ COURT_DARK = (0.255, 0.30, 0.345)
 COURT_PALE = (0.50, 0.555, 0.58)
 COURT_WARM = (0.42, 0.435, 0.415)
 COURT_GREEN = (0.33, 0.42, 0.40)
-CORE = (0.085, 0.085, 0.09)
+CORE = (0.12, 0.135, 0.13)
 WETC = (0.07, 0.095, 0.095)
 SLIME = (0.12, 0.21, 0.11)
 SLIME_BRIGHT = (0.27, 0.36, 0.14)
-BARNACLE = (0.70, 0.68, 0.59)
+BARNACLE = (0.78, 0.76, 0.66)
 BARNACLE_DARK = (0.45, 0.44, 0.38)
 SALT = (0.72, 0.75, 0.74)
 LICHEN_PALE = (0.64, 0.69, 0.62)
@@ -79,6 +79,7 @@ REED_DRY = (0.60, 0.53, 0.33)
 SEDGE = ((0.22, 0.33, 0.15), (0.28, 0.38, 0.17), (0.18, 0.27, 0.13))
 WEED = ((0.10, 0.17, 0.08), (0.14, 0.22, 0.09), (0.19, 0.24, 0.10), (0.24, 0.21, 0.09))
 STEM = (0.16, 0.14, 0.09)
+KELP = ((0.20, 0.25, 0.10), (0.27, 0.29, 0.12), (0.16, 0.22, 0.11), (0.30, 0.26, 0.11))
 
 
 def srgb_to_linear(c):
@@ -188,17 +189,20 @@ class Ruin(hckit.Piece):
         r = self.rng.random()
         drift = fbm(u * 0.21 + 3.1, y * 0.27 - 1.7, 0.5)
         base = mix(COURT, COURT_COOL, max(0.0, drift * 1.6 - 0.5))
+        odd = None
         if r < 0.10:
-            base = COURT_COOL
+            odd = COURT_COOL
         elif r < 0.22:
-            base = COURT_DARK
+            odd = COURT_DARK
         elif r < 0.30:
-            base = COURT_PALE
+            odd = COURT_PALE
         elif r < 0.35:
-            base = COURT_WARM
+            odd = COURT_WARM
         elif r < 0.41:
-            base = COURT_GREEN
-        return self.vary(base, 0.06)
+            odd = COURT_GREEN
+        if odd is not None:
+            base = mix(base, odd, 0.5)
+        return self.vary(base, 0.035)
 
     def quad(self, pts, color, mat=STONE, cols=None, want=None):
         """A face from points (Blender space), wound as given, or flipped to
@@ -306,23 +310,29 @@ class Ruin(hckit.Piece):
             self.collect.extend(vs)
         edge = scale(color, 0.84 + 0.06 * rng.random())
         face = scale(color, 1.06)
+        foot = scale(edge, 0.76)
+        chipped = rng.randrange(8) if rng.random() < 0.4 else -1
         for (quad, mid) in (((0, 1, 5, 4), 8), ((2, 3, 7, 6), 9)):
             for k in range(4):
-                f = self.bm.faces.new((vs[quad[k]], vs[quad[(k + 1) % 4]], vs[mid]))
+                i0, i1 = quad[k], quad[(k + 1) % 4]
+                f = self.bm.faces.new((vs[i0], vs[i1], vs[mid]))
                 f.material_index = STONE
                 f[self.kindL] = self.kind
                 ls = f.loops
-                ls[0][self.col] = (*edge, 1.0)
-                ls[1][self.col] = (*edge, 1.0)
+                for (loop, i) in ((ls[0], i0), (ls[1], i1)):
+                    c = scale(color, 1.3) if i == chipped else (foot if i < 4 else edge)
+                    loop[self.col] = (*c, 1.0)
                 ls[2][self.col] = (*face, 1.0)
-        side = scale(color, 0.92)
-        quads = ([(1, 2, 6, 5), (3, 0, 4, 7)] if ends else []) + [(4, 5, 6, 7)] + ([(3, 2, 1, 0)] if bottom else [])
-        for quad in quads:
+        top = scale(color, 0.9)
+        joint = scale(color, 0.4)
+        quads = ([((1, 2, 6, 5), joint), ((3, 0, 4, 7), joint)] if ends else []) + [((4, 5, 6, 7), top)] + \
+            ([((3, 2, 1, 0), joint)] if bottom else [])
+        for (quad, c) in quads:
             f = self.bm.faces.new([vs[i] for i in quad])
             f.material_index = STONE
             f[self.kindL] = self.kind
             for loop in f.loops:
-                loop[self.col] = (*side, 1.0)
+                loop[self.col] = (*c, 1.0)
 
     # --------------------------------------------------------------- walls
     def wall(self, a, b, depth, y0, top_fn, holes=(), course=(0.40, 0.66), unit=(1.2, 2.8), deform=None,
@@ -383,7 +393,7 @@ class Ruin(hckit.Piece):
                             continue
                         runs_row.append((r0, r1, hh))
                         is_top = top - (y + hh) < 0.2
-                        if row > 1 and not is_top and rng.random() < missing:
+                        if row > 1 and not is_top and rng.random() < missing * 0.35:
                             continue
                         bh = hh - 0.02
                         if is_top:
@@ -488,7 +498,7 @@ class Ruin(hckit.Piece):
                                 g_ = M @ g_
                             if g_.z < ground(g_.x, g_.y) - 0.15:
                                 continue
-                        if not band and not is_top and y > y0 + 1.0 and rng.random() < missing:
+                        if not band and not is_top and y > y0 + 1.0 and rng.random() < missing * 0.35:
                             continue
                         bh = hh - 0.02
                         if is_top:
@@ -586,11 +596,15 @@ class Ruin(hckit.Piece):
             for loop, c in zip(f.loops, cols):
                 loop[self.col] = (*c, 1.0)
 
-        poly(((0, 1, 0), (1, 1, 0), (1, 1, 1), (0, 1, 1)), (edge, face, face, edge))
-        poly(((1, 1, 0), (2, 1, 0), (2, 1, 1), (1, 1, 1)), (face, edge, edge, face))
+        foot, low = scale(edge, 0.76), scale(face, 0.86)
+        chip_a = scale(color, 1.3) if rng.random() < 0.2 else edge
+        chip_b = scale(color, 1.3) if rng.random() < 0.2 else edge
+        joint = scale(color, 0.4)
+        poly(((0, 1, 0), (1, 1, 0), (1, 1, 1), (0, 1, 1)), (foot, low, face, chip_a))
+        poly(((1, 1, 0), (2, 1, 0), (2, 1, 1), (1, 1, 1)), (low, foot, chip_b, face))
         poly(((0, 1, 1), (1, 1, 1), (2, 1, 1), (2, 0, 1), (1, 0, 1), (0, 0, 1)), (side,) * 6)
-        poly(((0, 0, 0), (0, 1, 0), (0, 1, 1), (0, 0, 1)), (side,) * 4)
-        poly(((2, 1, 0), (2, 0, 0), (2, 0, 1), (2, 1, 1)), (side,) * 4)
+        poly(((0, 0, 0), (0, 1, 0), (0, 1, 1), (0, 0, 1)), (joint,) * 4)
+        poly(((2, 1, 0), (2, 0, 0), (2, 0, 1), (2, 1, 1)), (joint,) * 4)
         if bottom:
             poly(((0, 0, 0), (1, 0, 0), (2, 0, 0), (2, 1, 0), (1, 1, 0), (0, 1, 0)), (scale(color, 0.7),) * 6)
         if inner:
@@ -823,6 +837,40 @@ class Ruin(hckit.Piece):
                     for k4, loop in enumerate(f.loops):
                         loop[self.col] = (*scale(cc, 0.62 if k4 == 0 else (1.2 if k4 == 2 else 0.95)), 1.0)
 
+    def kelp(self, top, length, out, width=0.6, blades=7, blade=0.11):
+        """A curtain of kelp: long limp ribbons hanging from `top` down a face
+        whose outward normal is `out`, twisting a little, narrowing to a tip."""
+        rng = self.rng
+        top = Vector(top)
+        out = Vector(out).normalized()
+        side = Vector((0, 0, 1)).cross(out)
+        if side.length < 1e-3:
+            side = Vector((1, 0, 0))
+        side.normalize()
+        for b in range(blades):
+            a = top + side * (rng.random() - 0.5) * width + out * (0.03 + rng.random() * 0.06) + Vector((0, 0, rng.random() * 0.12))
+            ln = length * (0.45 + 0.55 * rng.random())
+            sway = (rng.random() - 0.5) * 0.3
+            w0 = blade * (0.7 + 0.6 * rng.random())
+            tw = rng.uniform(-1.2, 1.2)
+            c = self.vary(KELP[rng.randrange(len(KELP))], 0.14)
+            prev = None
+            for i in range(4):
+                t = i / 3
+                p = a + Vector((0, 0, -ln * t)) + side * sway * ln * t * t + out * (0.05 * math.sin(t * 3.0 + b))
+                d = side * math.cos(tw * t) + out * math.sin(tw * t)
+                w = w0 * (1 - 0.6 * t * t)
+                cur = (p - d * w, p + d * w, scale(c, 0.78 + 0.45 * t))
+                if prev is not None:
+                    pts = (prev[0], prev[1], p) if i == 3 else (prev[0], prev[1], cur[1], cur[0])
+                    cols = (prev[2], prev[2], cur[2]) if i == 3 else (prev[2], prev[2], cur[2], cur[2])
+                    f = self.bm.faces.new([self.bm.verts.new(q) for q in pts])
+                    f.material_index = LEAF
+                    f[self.kindL] = K_LEAF
+                    for loop, cc in zip(f.loops, cols):
+                        loop[self.col] = (*cc, 1.0)
+                prev = cur
+
     def moss_mat(self, pos, radius, color=None, normal=(0, 0, 1), height=0.07, lobes=5):
         """A moss mat: a low many-lobed cushion lying on a surface."""
         rng = self.rng
@@ -925,20 +973,21 @@ class Ruin(hckit.Piece):
                         streak = 0.90 + 0.16 * fbm(p.x * 2.3 + 7.1, p.y * 2.3 - 3.3, p.z * 0.2)
                         c = scale(c, drift * streak)
                     # Under the line: dark wet stone, slime, the barnacle crust at the line.
-                    c = mix(c, mix(scale(c, 0.72), WETC, 0.2), wet * (0.55 if kind == K_CRUST else 1.0) * (1 - 0.8 * deep))
+                    c = mix(c, mix(scale(c, 0.52), WETC, 0.36), wet * (0.55 if kind == K_CRUST else 1.0) * (1 - 0.4 * deep))
                     if deep > 0 and kind == K_STONE:
                         c = mix(c, scale(SILT, 0.8 + 0.4 * fbm(p.x * 1.1, p.y * 1.1, p.z * 0.4)),
-                                deep * (0.38 + 0.4 * fbm(p.x * 0.6 + 4.0, p.y * 0.6, p.z * 1.4)))
+                                deep * (0.1 + 0.3 * fbm(p.x * 0.6 + 4.0, p.y * 0.6, p.z * 1.4)))
                     if kind == K_STONE:
-                        sl = wet * (1 - 0.6 * deep) * max(0.0, fbm(p.x * 0.9 + 5.0, p.y * 0.9, p.z * 0.6 + 2.0) * 2.3 - 0.66) * \
+                        sl = wet * (1 - 0.5 * deep) * max(0.0, fbm(p.x * 0.9 + 5.0, p.y * 0.9, p.z * 0.6 + 2.0) * 2.3 - 0.5) * \
                             (0.6 + 0.5 * north + 0.6 * up)
                         if sl > 0:
                             c = mix(c, mix(SLIME, SLIME_BRIGHT, fbm(p.x * 2.3, p.y * 2.3, p.z * 2.3) * smooth(-2.5, -0.2, d)),
                                     min(0.86, sl))
-                        band = smooth(-1.0, -0.3, d) * smooth(0.14, -0.04, d) + 0.45 * smooth(-3.2, -1.0, d) * smooth(-0.2, -0.9, d)
-                        cr = band * max(0.0, fbm(p.x * 3.1 + 9.0, p.y * 3.1, p.z * 3.1) * 2.1 - 0.5)
+                        grain = max(0.0, min(1.0, fbm(p.x * 3.1 + 9.0, p.y * 3.1, p.z * 3.1) * 2.1 - 0.5))
+                        band = smooth(-1.2, -0.5, d) * smooth(0.22, 0.02, d)
+                        cr = band * (0.52 + 0.48 * grain) + 0.3 * smooth(-3.2, -1.2, d) * smooth(-0.4, -1.1, d) * grain
                         if cr > 0:
-                            c = mix(c, mix(BARNACLE_DARK, BARNACLE, fbm(p.x * 5.0, p.y * 5.0, p.z * 5.0)), min(0.9, cr * 1.4))
+                            c = mix(c, mix(BARNACLE_DARK, BARNACLE, 0.35 + 0.65 * fbm(p.x * 5.0, p.y * 5.0, p.z * 5.0)), min(0.9, cr * 1.3))
                         salt = smooth(-0.02, 0.1, d) * smooth(1.0, 0.15, d) * \
                             max(0.0, fbm(p.x * 1.7, p.y * 1.7 + 20.0, p.z * 0.9) * 1.9 - 0.55)
                         if salt > 0:

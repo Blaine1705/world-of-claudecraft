@@ -22,6 +22,7 @@ import {
   BASTION_BEACON,
   BASTION_DRIP_SOURCES,
   BASTION_FOG_FIELDS,
+  BASTION_GATE_SHAFTS,
   BASTION_MARSH_FIELDS,
   BASTION_PASSAGE,
   BASTION_PUDDLES,
@@ -42,7 +43,9 @@ import {
   bastionGatePulse,
   bastionGrilleSolid,
   bastionNightAmount,
+  bastionPassageEye,
   bastionPassageGlow,
+  bastionPassageLight,
   bastionPassageTrace,
   bastionPulseLightIntensity,
   bastionSpritePose,
@@ -141,7 +144,9 @@ describe("the Fogbeacon's turn", () => {
     }
     expect(bastionPulseLightIntensity(0)).toBe(BASTION_PULSE_LIGHT.rest);
     expect(bastionPulseLightIntensity(1)).toBe(BASTION_PULSE_LIGHT.crest);
-    expect(BASTION_PULSE_LIGHT.crest).toBeGreaterThan(BASTION_PULSE_LIGHT.rest * 4);
+    // the rest level is a real uplight on the court at night, the crest three times it
+    expect(BASTION_PULSE_LIGHT.rest).toBeGreaterThan(1.5);
+    expect(BASTION_PULSE_LIGHT.crest).toBeGreaterThan(BASTION_PULSE_LIGHT.rest * 3);
     // the light stands in the gate court, in front of the door, inside the lane
     expect(BASTION_PULSE_LIGHT.lz).toBeLessThan(0);
     expect(BASTION_PULSE_LIGHT.lz).toBeGreaterThan(-2.4);
@@ -241,6 +246,30 @@ describe('the flooded passage behind the door', () => {
     expect(bastionPassageTrace(P.barPitch / 2, 1.2, P.z, 0, 0, 1, true, hit).kind).toBe('far');
   });
 
+  it('the passage is drawn for an eye that never stands under the sill, and its light never goes out', () => {
+    const floor = P.kerb + P.eye;
+    // a climber far down the road, a rider, and a camera over the gate
+    expect(bastionPassageEye(-6)).toBe(floor);
+    expect(bastionPassageEye(floor - 0.01)).toBe(floor);
+    expect(bastionPassageEye(3.4)).toBe(3.4);
+    // from the floor eye, ten yards off, the waterline falls in the lower third of the opening
+    const sill = P.kerb;
+    const crown = P.spring + P.half;
+    let waterline: number = sill;
+    for (let y = sill + 0.02; y < crown; y += 0.02) {
+      const d = norm(0, y - floor, 10.5);
+      if (bastionPassageTrace(0.21, y, P.z, ...d, true, hit).kind !== 'water') break;
+      waterline = y;
+    }
+    const share = (waterline - sill) / (crown - sill);
+    expect(share).toBeGreaterThan(0.2);
+    expect(share).toBeLessThan(0.4);
+    expect(bastionPassageLight(0)).toBe(P.restGlow);
+    expect(bastionPassageLight(1)).toBeCloseTo(1, 9);
+    expect(P.restGlow).toBeGreaterThan(0.25);
+    expect(P.restGlow).toBeLessThan(0.5);
+  });
+
   it("the beacon's light on the passage falls with the distance from its far end and scales with the pulse", () => {
     expect(bastionPassageGlow(P.far, 1)).toBeCloseTo(1.6, 9);
     expect(bastionPassageGlow(P.far - 10, 1)).toBeLessThan(bastionPassageGlow(P.far, 1));
@@ -322,7 +351,7 @@ describe('the gate sprites', () => {
     for (const tier of TIERS) {
       expect(kindCount(tier, K.roseCore), tier).toBe(1);
       expect(kindCount(tier, K.pool), tier).toBe(1);
-      expect(kindCount(tier, K.gateShaft), tier).toBe(3);
+      expect(kindCount(tier, K.gateShaft), tier).toBe(BASTION_GATE_SHAFTS.length);
       expect(kindCount(tier, K.mouth), tier).toBeGreaterThanOrEqual(1);
       expect(kindCount(tier, K.drip), tier).toBeGreaterThanOrEqual(3);
     }
@@ -330,10 +359,10 @@ describe('the gate sprites', () => {
     expect(kindCount('low', K.skyBeam)).toBe(0);
     expect(kindCount('low', K.roseShaft)).toBe(0);
     expect(kindCount('low', K.marshLight)).toBe(0);
-    expect(kindCount('low', K.mouth)).toBe(1);
+    expect(kindCount('low', K.mouth)).toBe(2);
     expect(kindCount('ultra', K.skyBeam)).toBe(1);
     expect(kindCount('ultra', K.roseShaft)).toBe(3);
-    expect(kindCount('ultra', K.mouth)).toBe(2);
+    expect(kindCount('ultra', K.mouth)).toBe(3);
     expect(TIERS.map((t) => kindCount(t, K.marshLight))).toEqual([0, 5, 9, 13]);
     expect(kindCount('ultra', K.drip)).toBe(BASTION_DRIP_SOURCES.length);
     expect(kindCount('medium', K.drip)).toBeLessThan(kindCount('ultra', K.drip));
@@ -421,8 +450,17 @@ describe('the gate sprites', () => {
     expect(bastionSpritePose(sky, 3, 1, 1, 1, pose).alpha).toBeCloseTo(1, 9);
     expect(bastionSpritePose(mouth, 3, 0, 1, 1, pose).alpha).toBeGreaterThan(0.6);
     // the rosette's core never goes out; its shafts and the marsh lights are the night's
+    // (a small one: the glass itself carries the colour, the core only crowns it)
     expect(bastionSpritePose(one(K.roseCore), 3, 0, 1, 0.14, pose).alpha).toBeGreaterThan(0.1);
-    expect(bastionSpritePose(one(K.roseCore), 3, 1, 1, 0.14, pose).alpha).toBeGreaterThan(0.5);
+    expect(bastionSpritePose(one(K.roseCore), 3, 1, 1, 0.14, pose).alpha).toBeGreaterThan(0.2);
+    expect(bastionSpritePose(one(K.roseCore), 3, 1, 1, 0.14, pose).alpha).toBeLessThan(0.45);
+    // the court's own glow stands between turns at night, behind the portcullis
+    const court = glows.find((s) => s.dx > 0);
+    if (!court) throw new Error('no court glow');
+    expect(court.z).toBeGreaterThan(-3);
+    expect(court.z).toBeLessThan(0);
+    expect(bastionSpritePose(court, 3, 1, 1, 0.14, pose).alpha).toBeGreaterThan(0.4);
+    expect(bastionSpritePose(court, 3, 0, 1, 0.14, pose).alpha).toBeLessThan(0.2);
     expect(bastionSpritePose(one(K.roseShaft), 3, 0, 1, 1, pose).alpha).toBe(0);
     expect(bastionSpritePose(one(K.roseShaft), 3, 1, 1, 1, pose).alpha).toBeGreaterThan(0.3);
     const lights = sprites.filter((s) => s.kind === K.marshLight);
@@ -450,9 +488,9 @@ describe('the gate sprites', () => {
     const sprites = bastionSprites('ultra', slope);
     for (const s of sprites.filter((sp) => sp.kind === K.gateShaft)) {
       expect(Math.hypot(s.dx, s.dy, s.dz)).toBeCloseTo(1, 9);
-      expect(s.dz).toBeLessThan(-0.8);
+      expect(s.dz).toBeLessThan(-0.5);
       expect(s.dy).toBeLessThan(0);
-      expect(s.range).toBeGreaterThan(8);
+      expect(s.range).toBeGreaterThan(6);
       expect(s.spread).toBeGreaterThan(s.size);
       // it starts in the door's mouth
       expect(Math.abs(s.x)).toBeLessThan(P.half);
@@ -465,7 +503,14 @@ describe('the gate sprites', () => {
       expect(s.dz).toBeLessThan(0);
       expect(s.range).toBeLessThan(6);
     }
+    // uneven and off the road's own line: no two alike, most of them to the east of south
+    const shafts = sprites.filter((sp) => sp.kind === K.gateShaft);
+    expect(new Set(shafts.map((s) => s.range)).size).toBe(shafts.length);
+    expect(new Set(shafts.map((s) => s.dx.toFixed(3))).size).toBe(shafts.length);
+    expect(shafts.filter((s) => s.dx < 0).length).toBeGreaterThan(shafts.length / 2);
     const beam = sprites.find((sp) => sp.kind === K.skyBeam);
+    // a beam, not a wedge
+    expect(BASTION_BEACON.width1).toBeLessThan(12);
     expect(beam?.range).toBe(BASTION_BEACON.length);
     expect(beam?.z).toBe(BASTION_BEACON.lz);
   });
@@ -554,7 +599,17 @@ describe('the Drowned Gate Tower painter', () => {
     expect((win.geometry.getIndex()?.count ?? 0) / 3).toBeLessThan(20);
     // the shader is cut from the core's own numbers
     const glsl = sunkenBastionEntranceInternalsForTest.passageCommon;
-    for (const value of [P.half, P.z, P.kerb, P.water, P.spring, P.far, P.grille, P.grilleRise]) {
+    for (const value of [
+      P.half,
+      P.z,
+      P.kerb,
+      P.water,
+      P.spring,
+      P.far,
+      P.grille,
+      P.grilleRise,
+      P.restGlow,
+    ]) {
       expect(glsl).toContain(value.toFixed(4));
     }
     const pulse = sunkenBastionEntranceInternalsForTest.pulseGlsl;
@@ -686,7 +741,7 @@ describe('the Drowned Gate Tower painter', () => {
     expect(light.userData.baseIntensity).toBeCloseTo(BASTION_PULSE_LIGHT.crest, 5);
     sharedUniforms.uTime.value = BASTION_BEACON.period * 3.5;
     run();
-    expect(light.userData.baseIntensity).toBeLessThan(BASTION_PULSE_LIGHT.crest * 0.3);
+    expect(light.userData.baseIntensity).toBeLessThan(BASTION_PULSE_LIGHT.crest * 0.5);
     sharedUniforms.uTime.value = time;
   });
 });

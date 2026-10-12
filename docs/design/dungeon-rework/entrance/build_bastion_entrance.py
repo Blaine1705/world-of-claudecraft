@@ -395,8 +395,8 @@ def rosette(p, south):
                 shard(d, e2, c, STAR_DEEP)
             else:
                 grime = 0.7 + 0.3 * smooth(-1.0, 0.6, math.sin(Q_[k]))
-                p.quad([c, b, e0, e1], scale(p.vary(STAR_DEEP, 0.1), grime), mat=WET, want=S)
-                p.quad([c, e1, e2, d], scale(p.vary(STAR_DEEP, 0.1), grime * 0.85), mat=WET, want=S)
+                p.quad([c, b, e0, e1], scale(p.vary(STAR_DEEP, 0.1), 0.62 * grime), mat=GLOW, want=S)
+                p.quad([c, e1, e2, d], scale(p.vary(STAR_DEEP, 0.1), 0.5 * grime), mat=GLOW, want=S)
     # The tracery: stone bars along the star and out to the ring, the boss.
     for k in range(8):
         kn = (k + 1) % 8
@@ -888,22 +888,60 @@ def growth():
         if abs(x) < ARCH['half'] + 0.1:
             continue
         if rng.random() < 0.85:
-            p.weed((x + rng.uniform(-0.1, 0.1), south + 0.05, TIDE + rng.uniform(-0.35, 0.05)), rng.uniform(0.8, 1.9), S,
+            p.weed((x + rng.uniform(-0.1, 0.1), south + 0.05, TIDE - rng.uniform(0.9, 1.25)), rng.uniform(0.8, 1.9), S,
                    width=0.6, strands=rng.randrange(3, 6))
     for key, arc in (('w', (0.6, 2.8)), ('e', (0.4, 2.6))):
         a = arc[0]
         while a < arc[1]:
             if rng.random() < 0.8:
-                q, n = tower_point(key, a, TIDE + rng.uniform(-0.35, 0.05), out=0.06)
+                q, n = tower_point(key, a, TIDE - rng.uniform(0.9, 1.25), out=0.06)
                 p.weed(q, rng.uniform(0.9, 2.4 if key == 'w' else 1.5), n, width=0.7, strands=3, leaf=0.19, density=0.8)
             a += 0.3
+    # kelp curtains: from the line on the gate front and the towers' road
+    # faces, from the portcullis' bottom rail, in the court
+    for x in [-4.4 + 0.5 * i for i in range(19)]:
+        if abs(x) < ARCH['half'] + 0.15:
+            continue
+        p.kelp((x + rng.uniform(-0.1, 0.1), south + 0.04, TIDE - rng.uniform(0.95, 1.25)), rng.uniform(1.2, 2.6), S, width=0.6,
+               blades=rng.randrange(6, 10))
+    for key, arc in (('w', (0.5, 2.9)), ('e', (0.4, 2.7))):
+        a = arc[0]
+        while a < arc[1]:
+            q, n = tower_point(key, a, TIDE - rng.uniform(0.95, 1.25), out=0.05)
+            p.kelp(q, rng.uniform(1.4, 3.0 if key == 'w' else 2.0), n, width=0.8, blades=rng.randrange(6, 9), blade=0.13)
+            a += 0.26
+    for i, d in enumerate(SOCKETS['drips']):
+        p.kelp(B(d[0] + 0.2, d[2] - 0.02, d[1] + 0.7), rng.uniform(0.6, 1.3), S, width=0.42, blades=rng.randrange(3, 6), blade=0.07)
+    for sx in (-1, 1):
+        for z in (-2.2, -1.7, -1.2, -0.8):
+            p.kelp(B(sx * (COURT_X - 0.47), z, TIDE - rng.uniform(0.95, 1.2)), rng.uniform(0.8, 1.5), Vector((-sx, 0, 0)),
+                   width=0.5, blades=rng.randrange(4, 7), blade=0.09)
+        for z in (-3.5, -3.0, -2.6):
+            p.kelp(B(sx * (ARCH['half'] - 0.02), z, TIDE - rng.uniform(0.95, 1.2)), rng.uniform(0.8, 1.6), Vector((-sx, 0, 0)),
+                   width=0.4, blades=rng.randrange(4, 7), blade=0.09)
+        p.kelp(B(sx * (INNER['half'] + 0.7), -INNER_D / 2 - 0.03, TIDE - rng.uniform(0.95, 1.2)), rng.uniform(0.8, 1.4), S,
+               width=1.2, blades=8, blade=0.09)
+    # moss pads on every ledge the damp reaches: imposts, string courses, the sill's ends
+    for sx in (-1, 1):
+        p.moss_mat(B(sx * (ARCH['half'] + 0.45), FRONT_Z - WALL_D / 2 - 0.02, ARCH['spring'] + 0.02), 0.34)
+        p.moss_mat(B(sx * (INNER['half'] + 0.3), -INNER_D / 2 - 0.02, INNER['spring'] + 0.02), 0.26)
+        p.moss_mat(B(sx * (INNER['half'] - 0.15), 0.25, KERB['top'] + 0.01), 0.24)
+    for key, band_y in (('w', 6.06), ('w', -0.56), ('e', 5.26)):
+        for a in [0.3 + 0.37 * i for i in range(8)]:
+            if rng.random() < 0.75:
+                q, n = tower_point(key, a, band_y, out=0.1)
+                p.moss_mat(q, rng.uniform(0.2, 0.34), normal=(n + Vector((0, 0, 1.6))).normalized())
+    for _ in range(12):
+        a, dd = rng.random() * TAU, rng.random() * 1.7
+        x, z = -10.6 + math.cos(a) * dd, -8.6 + math.sin(a) * dd
+        p.moss_mat(B(x, z, gh(x, z) + 0.55 + rng.random() * 0.5), rng.uniform(0.2, 0.36))
     # in the court and on the door's arch
     for sx in (-1, 1):
         for z in (-2.0, -1.4, -0.85):
             if rng.random() < 0.85:
-                p.weed(B(sx * (COURT_X - 0.47), z, TIDE + rng.uniform(-0.3, 0.0)), rng.uniform(0.5, 1.2), Vector((-sx, 0, 0)),
+                p.weed(B(sx * (COURT_X - 0.47), z, TIDE - rng.uniform(0.9, 1.2)), rng.uniform(0.5, 1.2), Vector((-sx, 0, 0)),
                        width=0.5, strands=3)
-        p.weed(B(sx * (INNER['half'] + 0.6), -INNER_D / 2 - 0.03, TIDE + rng.uniform(-0.2, 0.0)), rng.uniform(0.6, 1.2), S,
+        p.weed(B(sx * (INNER['half'] + 0.6), -INNER_D / 2 - 0.03, TIDE - rng.uniform(0.9, 1.2)), rng.uniform(0.6, 1.2), S,
                width=0.9, strands=4)
     # weed caught on the portcullis and trailing from the arches
     for d in SOCKETS['drips'][::2]:
@@ -929,8 +967,8 @@ def growth():
         while a < arc[1]:
             if rng.random() < 0.6:
                 q, n = tower_point(key, a, TIDE - rng.uniform(0.1, 0.8), out=0.03)
-                p.barnacles(q, n, radius=0.3, count=rng.randrange(3, 6))
-            a += 0.26
+                p.barnacles(q, n, radius=0.3, count=rng.randrange(3, 5))
+            a += 0.4
     # moss on the broken tops, the fallen blocks, the roof slabs
     for (pos, w) in TOPS:
         if pos.z > TIDE + 0.6 and rng.random() < 0.3:
@@ -960,11 +998,17 @@ def growth():
                             (10.4, -5.6, 6, 2.2), (-13.0, 1.0, 6, 1.5), (-17.5, 4.6, 6, 1.6), (-20.6, 7.6, 6, 1.8),
                             (3.6, 3.6, 4, 1.0), (-3.2, 3.2, 5, 1.2), (0.0, 6.6, 6, 2.2), (9.4, 3.2, 5, 1.2), (-1.7, -1.6, 2, 0.3)):
         foot(lx, lz, n, s_)
-    for (lx, lz, n, s_) in ((-4.3, -5.0, 2, 0.5), (4.3, -5.4, 2, 0.6), (-11.8, -4.6, 2, 0.6), (11.2, -3.4, 3, 1.2),
-                            (9.8, 3.8, 2, 0.7), (-12.4, -9.6, 2, 1.0), (6.4, -7.6, 2, 0.8)):
+    # reed beds and bulrush: at both towers' downhill feet, at the gate
+    # front's foot and along the lane's edges, where the water would lie
+    for (lx, lz, n, s_) in ((-4.3, -5.0, 4, 0.7), (4.3, -5.4, 4, 0.8), (-11.8, -4.6, 3, 0.7), (10.8, -4.2, 6, 1.5),
+                            (8.2, -5.6, 5, 1.2), (9.8, 3.8, 3, 0.8), (-12.4, -9.6, 3, 1.0), (6.4, -7.6, 3, 0.9),
+                            (-7.4, -5.2, 5, 1.2), (-5.2, -5.6, 3, 0.7), (2.9, -7.4, 3, 0.5), (-3.2, -7.0, 3, 0.5),
+                            (3.4, -10.0, 3, 0.6), (-4.6, -10.2, 3, 0.6)):
         for _ in range(n):
             x, z = lx + rng.uniform(-s_, s_), lz + rng.uniform(-s_, s_)
-            p.reeds(B(x, z, gh(x, z)), radius=0.34, stems=rng.randrange(5, 9), height=rng.uniform(1.2, 1.7))
+            if any(math.hypot(x - wx, z - wz) < 1.0 for (wx, wz) in WARD_STONES) or (abs(x - 0.555 * z) < 2.1 and -14 < z < 0.2):
+                continue
+            p.reeds(B(x, z, gh(x, z)), radius=0.36, stems=rng.randrange(6, 10), height=rng.uniform(1.2, 1.9), heads=0.7)
     return p
 
 

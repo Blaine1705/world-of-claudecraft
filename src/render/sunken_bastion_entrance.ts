@@ -113,7 +113,7 @@ function kitMaterial(name: string): THREE.Material {
   if (name === 'KitGlow') {
     if (!glassMat) {
       const m = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(1.5, 1.6, 1.7),
+        color: new THREE.Color(1.15, 1.3, 1.5),
         vertexColors: true,
       });
       m.name = 'SunkenBastionStarGlass';
@@ -268,6 +268,8 @@ vec3 bastShade(vec3 p, float kind, float pulse) {
 }
 vec3 bastPassage(vec3 o, vec3 d) {
   float pulse = bastPulse();
+  // the far light never goes out (bastionPassageLight)
+  float lit = ${fx(ps.restGlow)} + ${fx(1 - ps.restGlow)} * pulse;
   float tm = uTime * uBastion.y;
   float night = uBastion.x;
   float kind;
@@ -279,8 +281,9 @@ vec3 bastPassage(vec3 o, vec3 d) {
     // black water: slow swell, the rings of three drips, and what it mirrors
     vec2 w = p.xz;
     vec2 g = vec2(
-      0.045 * sin(w.x * 3.1 + tm * 0.9 + sin(w.y * 1.3)) + 0.028 * sin(w.x * 7.3 - w.y * 2.1 + tm * 1.3),
-      0.045 * sin(w.y * 2.3 - tm * 0.7 + sin(w.x * 1.7)) + 0.028 * sin(w.y * 5.9 + w.x * 3.3 - tm * 1.1));
+      0.06 * sin(w.x * 3.1 + tm * 0.9 + sin(w.y * 1.3)) + 0.034 * sin(w.x * 7.3 - w.y * 2.1 + tm * 1.3),
+      0.06 * sin(w.y * 2.3 - tm * 0.7 + sin(w.x * 1.7)) + 0.034 * sin(w.y * 5.9 + w.x * 3.3 - tm * 1.1));
+    float crest = 0.0;
     for (int i = 0; i < 3; i++) {
       float fi = float(i);
       vec2 c = vec2(0.55 - fi * 0.5, B_Z0 + 0.8 + fi * 1.5);
@@ -290,7 +293,8 @@ vec3 bastPassage(vec3 o, vec3 d) {
       float r = length(dv) + 1.0e-4;
       float front = r - age * 0.85;
       float ring = sin(front * 15.0) * exp(-abs(front) * 3.2) * exp(-age * 0.8);
-      g += dv / r * ring * 0.2;
+      g += dv / r * ring * 0.34;
+      crest += max(ring, 0.0);
     }
     vec3 n = normalize(vec3(g.x, 1.0, g.y));
     vec3 r = reflect(d, n);
@@ -298,24 +302,30 @@ vec3 bastPassage(vec3 o, vec3 d) {
     r = normalize(r);
     float k2;
     float t2 = bastTrace(p, r, 0.0, k2);
-    vec3 mirror = bastShade(p + r * min(t2, 60.0), k2, pulse);
+    vec3 mirror = bastShade(p + r * min(t2, 60.0), k2, lit);
     float fres = 0.05 + 0.95 * pow(clamp(1.0 - dot(-d, n), 0.0, 1.0), 4.0);
     float into = max(0.0, p.z - B_Z0);
     float day = exp(-into * 0.95) * (1.0 - 0.9 * night);
-    vec3 murk = vec3(0.004, 0.02, 0.015) * (0.3 + day * 2.2) + B_GREEN * pulse * 0.012;
-    col = mix(murk, mirror, fres);
+    vec3 murk = vec3(0.004, 0.02, 0.015) * (0.3 + day * 2.2) + B_GREEN * lit * 0.014;
+    // by day the water at the door mirrors the bright arch it lies under
+    col = mix(murk, mirror + vec3(0.1, 0.13, 0.12) * day, fres);
+    // the far light lies down the middle of the water in one soft streak...
+    float lane = exp(-p.x * p.x * 2.6) * pow(max(dot(reflect(d, n), normalize(vec3(0.0, 1.6, B_FAR) - p)), 0.0), 10.0);
+    col += B_GREEN * lit * lane * 0.4;
+    // ...and every ring's crest catches it
+    col += (B_GREEN * lit * 0.6 + vec3(0.14, 0.18, 0.17) * day) * crest;
     // the far light lying on the water as a broken path toward the eye
     vec2 g2 = g * 3.2 + 0.1 * vec2(bastNoise(w * 6.0 + tm * 0.3) - 0.5, bastNoise(w * 6.0 - tm * 0.25 + 7.0) - 0.5);
     vec3 n2 = normalize(vec3(g2.x, 1.0, g2.y));
     vec3 toLight = normalize(vec3(0.0, 1.6, B_FAR) - p);
-    float spec = pow(max(dot(reflect(d, n2), toLight), 0.0), 90.0);
-    col += (B_GREEN + vec3(0.3, 0.0, 0.25)) * pulse * spec * 2.4;
+    float spec = pow(max(dot(reflect(d, n2), toLight), 0.0), 60.0);
+    col += (B_GREEN + vec3(0.3, 0.0, 0.25)) * lit * spec * 3.4;
   } else {
-    col = bastShade(p, kind, pulse);
+    col = bastShade(p, kind, lit);
   }
   // the fog standing in the passage takes the light along the whole ray
   float ahead = 0.3 + 0.7 * pow(max(d.z, 0.0), 3.0);
-  col += B_GREEN * pulse * pulse * (1.0 - exp(-tt * 0.032)) * 0.3 * ahead;
+  col += B_GREEN * (0.05 + pulse * pulse) * (1.0 - exp(-tt * 0.032)) * 0.3 * ahead;
   return col;
 }`;
 
@@ -337,7 +347,10 @@ function passageMaterial(): THREE.MeshBasicMaterial {
       .replace('#include <common>', `#include <common>\n${PASSAGE_COMMON}`)
       .replace(
         '#include <map_fragment>',
-        `diffuseColor.rgb = bastPassage(vBastP, normalize(vBastP - vBastC));
+        `vec3 bEye = vBastC;
+// the eye never stands under the sill (bastionPassageEye)
+bEye.y = max(bEye.y, B_KERB + ${fx(ps.eye)});
+diffuseColor.rgb = bastPassage(vBastP, normalize(vBastP - bEye));
 {
   // the opening's own shadow: the dark meets the stone with no hard edge
   float ex = B_HW - abs(vBastP.x);
@@ -573,7 +586,7 @@ if (bK > 0.5 && bK < 3.5) {
 } else {
   vec2 sz = vec2(aS.w);
   if (bK < 0.5) {
-    bA = (0.2 + 0.6 * bN) * (0.86 + 0.14 * sin(bTm * 0.8 + aK.x * 6.2831853)) + 0.25 * bPulse * bPulse;
+    bA = (0.14 + 0.2 * bN) * (0.86 + 0.14 * sin(bTm * 0.8 + aK.x * 6.2831853)) + 0.2 * bPulse * bPulse;
   } else if (bK < 4.5) {
     float cycle = fract(aK.x + bTm * aK.y) / aK.y;
     float fall = sqrt(2.0 * max(0.05, aK.w) / ${fx(BASTION_DRIP_GRAVITY)});
@@ -589,14 +602,14 @@ if (bK > 0.5 && bK < 3.5) {
     bC.z += cos(a * 0.8 + aK.x * 4.0) * aK.w;
     bA = bN * (0.55 + 0.45 * sin(uTime * 0.6 + aK.x * 11.0));
   } else {
-    bA = bPulse * bPulse * mix(1.0, bN, aK.w);
+    bA = (aD.x + (1.0 - aD.x) * bPulse * bPulse) * mix(1.0, bN, aK.w);
   }
   mvPosition = modelViewMatrix * vec4(bC, 1.0);
   if (bK > 7.5) bA *= smoothstep(4.0, 15.0, -mvPosition.z);
   mvPosition.xy += bQ * sz;
 }
 vBastQ = bQ;
-vBastS = vec3(bK, bA, aD.w);
+vBastS = vec3(bK, bA, bTm);
 gl_Position = projectionMatrix * mvPosition;`;
 
 const SPRITE_FRAGMENT = `vec2 bQ = vBastQ;
@@ -608,23 +621,28 @@ if (bKind > 0.5 && bKind < 3.5) {
   float across = max(1.0 - 4.0 * vBastU.x * vBastU.x, 0.0);
   float v = vBastU.y;
   if (bKind < 1.5) {
-    bCol = vec3(0.55, 0.75, 1.0) * 0.26;
+    bCol = vec3(0.32, 0.58, 1.0) * 0.2;
     bAl = across * across * smoothstep(0.0, 0.1, v) * pow(max(1.0 - v, 0.0), 1.6);
   } else if (bKind < 2.5) {
     // the portcullis bars stand in the light: their shadows ride the shaft
-    float bars = 0.5 + 0.5 * smoothstep(0.1, 0.34, abs(fract(vBastU.x * 5.0 + 0.5) - 0.5));
-    bCol = vec3(0.2, 1.0, 0.5) * 0.5;
-    bAl = across * across * bars * smoothstep(0.0, 0.12, v) * pow(max(1.0 - v, 0.0), 1.5);
+    // a shaft in the haze: no edge, thick at its heart, uneven down its
+    // length, gone well before its tip (the real bars in front of it cut it)
+    float haze = 0.7 + 0.3 * sin(v * 9.0 + vBastS.z * 0.8 + vBastU.x * 3.0);
+    bCol = vec3(0.2, 1.0, 0.5) * 0.7;
+    bAl = across * across * across * haze * smoothstep(0.0, 0.2, v) * pow(max(1.0 - v, 0.0), 2.0);
   } else {
-    bCol = vec3(0.16, 1.0, 0.5) * 0.5;
-    bAl = (0.3 * across * across + 0.7 * pow(across, 7.0)) * smoothstep(0.0, 0.05, v) * pow(max(1.0 - v, 0.0), 1.1);
+    // a lighthouse beam through marsh haze: no edge, thinning to nothing,
+    // the dust in it drifting down its length
+    float dust = 0.72 + 0.28 * sin(v * 34.0 - vBastS.z * 0.7 + vBastU.x * 5.0) * sin(v * 9.0 + vBastS.z * 0.23);
+    bCol = vec3(0.16, 1.0, 0.5) * 0.42;
+    bAl = across * across * across * dust * smoothstep(0.0, 0.1, v) * pow(max(1.0 - v, 0.0), 2.2);
   }
 } else if (bKind < 0.5) {
   float heart = clamp(1.0 - length(bQ) * 6.0, 0.0, 1.0);
-  bCol = vec3(0.62, 0.82, 1.0) * (0.5 + 2.6 * heart * heart);
+  bCol = vec3(0.36, 0.62, 1.0) * (0.4 + 1.0 * heart * heart);
   bAl = bR * bR;
 } else if (bKind < 4.5) {
-  bCol = vec3(0.6, 0.85, 0.8) * 1.3;
+  bCol = vec3(0.6, 0.85, 0.8) * 0.6;
   bAl = clamp(1.0 - abs(bQ.x) * 2.0, 0.0, 1.0) * clamp(1.0 - abs(bQ.y) * 2.0, 0.0, 1.0);
 } else if (bKind < 5.5) {
   float rr = length(bQ) * 2.0;
@@ -640,10 +658,9 @@ if (bKind > 0.5 && bKind < 3.5) {
   bCol = vec3(0.12, 1.0, 0.4) * 0.5;
   bAl = bR * bR;
 } else {
-  // the light seen down its own length: a glow, and the bars' shadows as rays
-  float rays = 0.72 + 0.28 * cos(atan(bQ.y, bQ.x) * 14.0 + 1.3);
-  bCol = vec3(0.14, 1.0, 0.44) * 0.5;
-  bAl = bR * bR * mix(1.0, rays * rays, vBastS.z);
+  // the light seen down its own length: a soft glow with no rays and no edge
+  bCol = vec3(0.14, 1.0, 0.44) * 0.36;
+  bAl = bR * bR * bR;
 }
 diffuseColor = vec4(bCol, bAl * vBastS.y);`;
 
