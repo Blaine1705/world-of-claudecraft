@@ -231,7 +231,13 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     difficulty: 'normal',
     healthMultiplier: 2.0,
     healthMultiplierByMob: {
-      sledge_tusker: 5.43,
+      // The Sledge Tusker is the Sanctum's miniboss (a solo elite outside the
+      // Finder's encounter list). It was 5.43 (about 9,000); the owner's
+      // heroic bands (2026-10-12, the heroic record below) raise it x1.16
+      // there, and a miniboss takes the same factor on normal while it stays
+      // under the weakest boss (Korgath, 12,007): 10,433. Normal BOSS pools
+      // are untouched.
+      sledge_tusker: 6.3,
       // Korgath's body about 12,000 (80 s), plus his four Seal Shackles at
       // about 1,500 each (encounters/gravewyrm_sanctum/korgath.ts): about 105 s
       // with all four broken, longer the more chains the group leaves on.
@@ -861,10 +867,23 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // The Ice Tomb rework's pools from target fight length x heroic party DPS
     // (about 230): the Sledge Tusker 60 s, Korgath 105 s, Velkhar 100 s,
     // Korzul 160 s on the ground (phase B retunes them with their cores).
+    // The owner's heroic health bands (2026-10-12) then replaced the lengths
+    // of everything but the final boss: a non-final boss carries about
+    // 25,000 and a miniboss sits in 15,000 to 20,000 (the Finder's encounter
+    // list says which is which). Korgath's body (7.87, 18,391) carries
+    // 25,004, about 109 s at the planning 230 with every chain broken; his
+    // four shackles keep their pools. The Sledge Tusker, the miniboss (7.69,
+    // 13,796), carries 16,002 (70 s). Velkhar (22,991) already sits beside
+    // the band and Korzul is untouched. Health only. Neither has a check
+    // sized by a share of its pool, and their enrages are phases (the Tusker
+    // under 20 percent, Korgath under 30), not clocks, so nothing was
+    // compensated. Korgath's Lockbound still takes 20 percent off per chain
+    // left on, so a group that leaves chains on feels the larger body more.
+    // Pinned by tests/gravewyrm_sanctum_health_bands.test.ts.
     healthMultiplierByMob: {
-      sledge_tusker: 7.69,
-      // Korgath's body 80 s (about 18,400) plus four shackles of about 2,300.
-      korgath_the_bound: 7.87,
+      sledge_tusker: 8.92,
+      // Korgath's body about 25,000 plus four shackles of about 2,300.
+      korgath_the_bound: 10.7,
       sanctum_shackle_hammer: 3.07,
       sanctum_shackle_tongs: 3.07,
       sanctum_shackle_anvil: 3.07,
