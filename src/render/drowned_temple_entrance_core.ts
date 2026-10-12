@@ -418,7 +418,9 @@ export function templeFilmMoonHeight(crest: number): number {
  * above the door's terrain height): its centre's offset from the ring's
  * centre. The SAME projection the fragment shader runs a fragment at a time
  * (its `slide` is the eye's ray through that fragment): the point where the
- * line from the eye to the moon crosses the ring's plane.
+ * line from the eye to the moon crosses the ring's plane. One limit: the
+ * shader holds `slide` at a ray 0.14 off the plane (about eight degrees), so
+ * for an eye grazing the film its moon stops sliding and this does not.
  */
 export function templeFilmMoonSeen(
   eyeX: number,
@@ -755,6 +757,13 @@ export interface TempleSprite {
   hung: number;
 }
 
+// The works are ONE fading unit though they stand in two places, the weir
+// south of the mirror and the pool's kerb and stelae north of the gate: a
+// camera that ghosts a stela also takes the weir's falls, foam and glints some
+// forty yards behind it, and the other way round. A fifth set was not worth
+// it: the two are never on screen in one occlusion (the gate and the whole
+// flight lie between them), and each set is another veil, another fade record
+// and another program probe for nothing a player could see.
 const HUNG = { none: 0, gate: 1, works: 4 } as const;
 /** The halo lists templeSprites takes, in order: the stair's treads never
  *  ghost, the ring's runes are the gate's, the pool's kerb is the works'. */

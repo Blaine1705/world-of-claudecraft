@@ -27,9 +27,10 @@
 // attaches through the renderer's gated attach (its programs link before its
 // first visible frame), freezes its matrices and culls with the fog sweep.
 // Everything moves on the shared uTime clock in its vertex or fragment shader;
-// the only per-frame CPU is the mist's onBeforeRender: three uniform writes
-// (the time of day, the reduced-motion switch, the gate's ghost) and the
-// light's base.
+// the only per-frame CPU is the mist's onBeforeRender: two uniform writes (the
+// time of day, the reduced-motion switch) and the light's base. The camera's
+// ghost is not per frame: each fading unit's onFade writes its component of
+// uTempleGhost on the frames its fade changes (set_piece_occluders.ts).
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
 import { DUNGEONS } from '../sim/data';
@@ -111,7 +112,10 @@ export interface DrownedTempleEntranceView {
  *  reduced motion). uTempleGhost: how much of what hangs on each fading unit
  *  shows (x the gate, y and z the east and west flanks, w the works; 1 while
  *  the unit is solid, 0 while it is the camera's ghost: templeGhostShown),
- *  written by the units' own onFade. Shared by every effect program. */
+ *  written by the units' own onFade. uTemple is shared by every effect
+ *  program; uTempleGhost by the two that draw what hangs on a unit (the
+ *  moonwater's film and the sprites). No sprite hangs on a flank today, so
+ *  the y and z components are written and not yet read. */
 const templeUniforms = {
   uTemple: { value: new THREE.Vector2(0, 1) },
   uTempleGhost: { value: new THREE.Vector4(1, 1, 1, 1) },
@@ -143,13 +147,34 @@ float templeRune(float order, vec3 rise) {
 
 // ---- materials (module-lifetime, shared) ------------------------------------------
 
+/**
+ * The inlay's material keeps its moonrise through a clone. Material.clone()
+ * copies every declared property and DROPS onBeforeCompile and the program
+ * key, and the camera occluder registry clones every material under a fading
+ * unit (set_piece_occluders.ts: the family fades per structure): a bare clone
+ * drew the gate's, the flanks' and the works' inlays as plain vertex colour,
+ * at one brightness all through the moonrise, with only the treads' (no unit)
+ * alive. Copying the two hooks as own properties also lets the dithered ghost
+ * (occluder_dither_fade.ts) chain onto them and onto this key.
+ */
+class TempleInlayMaterial extends THREE.MeshBasicMaterial {
+  override copy(source: THREE.MeshBasicMaterial): this {
+    super.copy(source);
+    this.onBeforeCompile = source.onBeforeCompile;
+    if (Object.hasOwn(source, 'customProgramCacheKey')) {
+      this.customProgramCacheKey = source.customProgramCacheKey;
+    }
+    return this;
+  }
+}
+
 let inlayMat: THREE.MeshBasicMaterial | null = null;
 
 /** The silver inlays: unlit, their light the moonrise's. A glowing face's
  *  colour ALPHA is its place in the moonrise (the Blender build writes it). */
 function inlayMaterial(): THREE.MeshBasicMaterial {
   if (inlayMat) return inlayMat;
-  const material = new THREE.MeshBasicMaterial({ color: 0xffffff, vertexColors: true });
+  const material = new TempleInlayMaterial({ color: 0xffffff, vertexColors: true });
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = sharedUniforms.uTime;
     shader.uniforms.uTemple = templeUniforms.uTemple;
@@ -251,8 +276,8 @@ const filmLayer = (i: number): string => {
 };
 const drip = (i: number, k: number) => fx(TEMPLE_DRIPS[i]?.[k] ?? 0);
 
-// Mirrors templePoolTrace, templeFilmMoonHeight, templeFilmLight and
-// templeMirrorSight.
+// Mirrors templePoolTrace, templeFilmMoonHeight, templeFilmMoonSeen,
+// templeFilmWhirl, templeFilmLight and templeMirrorSight.
 const MOONWATER_COMMON = `
 ${RISE_GLSL}
 uniform vec4 uTempleGhost;
@@ -883,11 +908,12 @@ export function buildDrownedTempleEntrance(seed: number): DrownedTempleEntranceV
       onFade: (alpha) => ghost.setComponent(i, templeGhostShown(alpha)),
     }),
   );
-  // The player's static effects tier (the preset, lowered by the Advanced
-  // Effects dial), never the frame governor: cosmetic richness only.
+  // The player's static effects tier (GFX.effectsTier: the preset, already
+  // lowered by the Advanced Effects dial), never the frame governor: cosmetic
+  // richness only. (effectsQuality is read for the 'advanced' label alone.)
   const tier = resolveUiEffectsProfile({
     presetLabel: GFX.effectsTier,
-    effectsQuality: GFX.effectsTier === 'low' ? 0 : 1,
+    effectsQuality: 1,
     reduceMotion: false,
   }).tier;
   const light = new THREE.PointLight(
@@ -927,10 +953,19 @@ export const drownedTempleEntranceInternalsForTest = {
   mistFieldCount: TEMPLE_MIST_FIELDS.length,
   occluderHandles: (): readonly SetPieceOccluderHandle[] => occluderHandles,
   uniforms: templeUniforms,
+  /** Stand a model in for a GLB (null takes it away again). */
+  setSourceForTest(url: string, scene: THREE.Group | null): void {
+    if (scene) sources.set(url, scene);
+    else sources.delete(url);
+  },
+  urls: { main: MAIN_URL, works: WORKS_URL, growth: GROWTH_URL },
   resetCaches(): void {
     inlayMat = moonwaterMat = mistMat = spriteMat = null;
     puffTex = null;
     lastMotionCheck = -10;
+    // the last build's sets go with it: nothing of a torn-down renderer stays reachable here
+    for (const handle of occluderHandles) handle.dispose();
+    occluderHandles = [];
     templeUniforms.uTempleGhost.value.set(1, 1, 1, 1);
   },
 };

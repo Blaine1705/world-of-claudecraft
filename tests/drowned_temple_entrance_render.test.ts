@@ -7,8 +7,10 @@
 // and the painter's contract: three effect draws, three effect programs and
 // the inlays' own, one budgeted point light, the world's floor-mark layers,
 // one fading unit per side of the set piece.
+import { createHash } from 'node:crypto';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { resolveUiEffectsProfile } from '../src/game/ui_effects_profile';
 import {
   buildDrownedTempleEntrance,
   drownedTempleEntranceInternalsForTest as painter,
@@ -67,6 +69,8 @@ import {
   templeSprites,
 } from '../src/render/drowned_temple_entrance_core';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
+import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
+import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   clearSetPieceOccluders,
@@ -467,14 +471,12 @@ describe('the film is one unbroken sheet of light', () => {
         for (const time of [0, 7.3, 191]) {
           const above = templeFilmWhirl(layer, -r, 1e-9, time);
           const below = templeFilmWhirl(layer, -r, -1e-9, time);
-          // the wrap is `arms` whole turns of the phase: nothing steps across the line
-          expect((above - below) / (2 * Math.PI)).toBeCloseTo(arms, 6);
+          // nothing steps across the line: the thread the shader draws is the same either side
+          // (whole arms make the wrap whole turns; 3.2 arms left a 0.4 pi step here)
           expect(Math.sin(above)).toBeCloseTo(Math.sin(below), 6);
           expect(Math.cos(above)).toBeCloseTo(Math.cos(below), 6);
         }
       }
-      // (a fraction would not: the tear this pins against)
-      expect(Math.sin(3.2 * Math.PI)).not.toBeCloseTo(Math.sin(-3.2 * Math.PI), 2);
     }
   });
 
@@ -493,9 +495,12 @@ describe('the film is one unbroken sheet of light', () => {
       water.indexOf('vec4 templeMoonwater'),
     );
     expect(layer.match(/\bang\b/g)).toHaveLength(4);
-    expect(layer).toContain('float ang = atan(');
+    expect(layer).toContain(
+      `float ang = atan(q.y, q.x + 1.0e-5) + spin * tm + ${fx4(TEMPLE_FILM_LOOK.twist)} * log(r + 0.35);`,
+    );
     expect(layer).toContain('vec2(cos(ang), sin(ang))');
-    // no floor, fract or mod anywhere in the film: nothing is quantised by rows
+    // the film's own branch quantises nothing by rows (its layers' noise does floor and
+    // fract, on the angle's sine and cosine and on the radius, never on the angle)
     const film = water.slice(water.indexOf('THE FILM'), water.indexOf('THE MIRROR'));
     expect(film).not.toMatch(/\b(floor|fract|mod)\(/);
     // the moon and the threads are the core's look
@@ -515,6 +520,34 @@ describe('the film is one unbroken sheet of light', () => {
     const S = DROWNED_TEMPLE_STAIR;
     const seen = { x: 0, y: 0 };
     const reach = TEMPLE_GATE.inner - TEMPLE_FILM_MOON.radius;
+    // the sill cuts the film's foot: the disc must clear it too
+    const foot = TEMPLE_GATE.sill - TEMPLE_GATE.centre + TEMPLE_FILM_MOON.radius;
+    expect(foot).toBeGreaterThan(-reach);
+    // The shader's own line, a fragment at the point the core names: the eye's ray through it,
+    // its slide, and the moon's offset mq, which is zero at the disc's centre.
+    const shaderMq = (ex: number, ey: number, ez: number, crest: number) => {
+      const at = templeFilmMoonSeen(ex, ey, ez, crest, { x: 0, y: 0 });
+      const dx = at.x - ex;
+      const dy = TEMPLE_GATE.centre + at.y - ey;
+      const dz = -ez;
+      const len = Math.hypot(dx, dy, dz);
+      const along = Math.max(Math.abs(dz / len), 0.14);
+      const m = TEMPLE_FILM_MOON;
+      return Math.hypot(
+        at.x + (dx / len / along) * m.depth,
+        at.y + (dy / len / along) * m.depth + m.restDrop * (1 - crest) - m.lift,
+      );
+    };
+    for (const [ex, ey, ez] of [
+      [0, -4.15, -12.95],
+      [0, 2.2, -2.83],
+      [3, 0, -9],
+      [-6, -3.9, -25],
+      [2.5, 4.5, -11.3],
+      [-1, 6, 9],
+    ]) {
+      for (const crest of [0, 0.4, 1]) expect(shaderMq(ex, ey, ez, crest)).toBeLessThan(1e-9);
+    }
     // On the flight's line, from the foot of the dry treads to the stair's head: a walker's own
     // eye, and the camera that follows a character (behind it and over its head).
     for (let tread = 22; tread >= 0; tread -= 2) {
@@ -527,8 +560,9 @@ describe('the film is one unbroken sheet of light', () => {
         for (const crest of [0, 1]) {
           templeFilmMoonSeen(0, y, z, crest, seen);
           expect(seen.x).toBeCloseTo(0, 9);
-          // the whole disc inside the ring's mouth
+          // the whole disc inside the ring's mouth, clear of the sill
           expect(Math.abs(seen.y), `tread ${tread} ${who} crest ${crest}`).toBeLessThan(reach);
+          expect(seen.y, `tread ${tread} ${who} crest ${crest}`).toBeGreaterThan(foot);
         }
       }
     }
@@ -752,15 +786,30 @@ describe('the camera never loses the character behind the set piece', () => {
     const packed = mesh.geometry.getAttribute('aK');
     expect(packed.count).toBe(mesh.count);
     const hung = new Map<number, number>();
+    // the shader's own decoding, every step rounded to the float the GPU holds
+    const f = Math.fround;
+    const decode = (v: number) => {
+      const kind = Math.floor(f(v + f(0.02)));
+      return { kind, on: Math.floor(f(f(f(v - kind) * 10) + 0.5)) };
+    };
+    // every kind with every unit: the packing reads back exactly
+    for (let kind = 0; kind <= K.glow; kind++) {
+      for (let on = 0; on <= TEMPLE_GHOST_SETS.length; on++) {
+        expect(decode(f(kind + on * 0.1)), `kind ${kind} hung ${on}`).toEqual({ kind, on });
+      }
+    }
+    // each instance is its own sprite of the tier the painter resolved
+    const tier = resolveUiEffectsProfile({
+      presetLabel: GFX.effectsTier,
+      effectsQuality: 1,
+      reduceMotion: false,
+    }).tier;
+    const list = templeSprites(tier, ground);
+    expect(packed.count).toBe(list.length);
     for (let i = 0; i < packed.count; i++) {
-      const v = packed.getZ(i);
-      // the shader's own decoding
-      const kind = Math.floor(v + 0.02);
-      const on = Math.floor((v - kind) * 10 + 0.5);
-      expect(kind).toBeGreaterThanOrEqual(0);
-      expect(kind).toBeLessThanOrEqual(K.glow);
-      expect(on).toBeLessThanOrEqual(TEMPLE_GHOST_SETS.length);
-      hung.set(on, (hung.get(on) ?? 0) + 1);
+      const got = decode(packed.getZ(i));
+      expect(got, `sprite ${i}`).toEqual({ kind: list[i].kind, on: list[i].hung });
+      hung.set(got.on, (hung.get(got.on) ?? 0) + 1);
     }
     // some of each: what stays, what is the gate's, what is the works'
     expect(hung.get(0)).toBeGreaterThan(0);
@@ -769,6 +818,128 @@ describe('the camera never loses the character behind the set piece', () => {
       TEMPLE_POOL_RUNES.length + TEMPLE_FALLS.length,
     );
     clearSetPieceOccluders();
+  });
+});
+
+describe('the silver inlays keep their moonrise on every fading unit', () => {
+  const inlayUnit = () => {
+    // a stand-in for the gate's GLB: one inlaid face under the node the gate unit fades
+    const scene = new THREE.Group();
+    const gate = new THREE.Group();
+    gate.name = 'Entrance_Moongate';
+    const inlay = new THREE.Mesh(
+      new THREE.PlaneGeometry(1, 1),
+      new THREE.MeshBasicMaterial({ name: 'KitGlow' }),
+    );
+    inlay.name = 'inlay';
+    gate.add(inlay);
+    scene.add(gate);
+    return scene;
+  };
+  const shaderOf = (material: THREE.Material) =>
+    compile(material, '#include <common>', '#include <common>\n#include <color_fragment>');
+
+  it('a clone of the inlay material is still the inlay: its hook, its key', () => {
+    painter.resetCaches();
+    const inlay = painter.inlayMaterial();
+    const clone = inlay.clone();
+    expect(clone).not.toBe(inlay);
+    expect(clone.customProgramCacheKey()).toBe(TEMPLE_INLAY_PROGRAM_CACHE_KEY);
+    expect(shaderOf(clone).fragmentShader).toBe(shaderOf(inlay).fragmentShader);
+    expect(shaderOf(clone).fragmentShader).toContain('templeRune(tOrder, templeRise())');
+    // and a clone of a clone (the fade twin the registry may take from it)
+    expect(clone.clone().customProgramCacheKey()).toBe(TEMPLE_INLAY_PROGRAM_CACHE_KEY);
+  });
+
+  it('the registry own copy under a fading unit draws the moonrise, blended ghost or dithered', () => {
+    for (const dither of [false, true]) {
+      setDitherFadeEnabledForTest(dither);
+      clearSetPieceOccluders();
+      painter.resetCaches();
+      painter.setSourceForTest(painter.urls.main, inlayUnit());
+      try {
+        const view = buildDrownedTempleEntrance(WORLD_SEED);
+        const mesh = view.group.getObjectByName('inlay') as THREE.Mesh;
+        const drawn = mesh.material as THREE.Material;
+        // the unit fades its own copy, never the shared material
+        expect(drawn, `dither ${dither}`).not.toBe(painter.inlayMaterial());
+        expect(drawn.name).toBe('DrownedTempleSilverInlay');
+        const key = drawn.customProgramCacheKey();
+        expect(key.startsWith(TEMPLE_INLAY_PROGRAM_CACHE_KEY), `dither ${dither}: ${key}`).toBe(
+          true,
+        );
+        expect(key === TEMPLE_INLAY_PROGRAM_CACHE_KEY).toBe(!dither);
+        const shader = shaderOf(drawn);
+        expect(shader.fragmentShader).toContain('templeRune(tOrder, templeRise())');
+        expect(shader.fragmentShader).toContain('diffuseColor.a = opacity;');
+        expect(shader.uniforms.uTemple).toBe(painter.uniforms.uTemple);
+        // an inlay casts no shadow of its own
+        expect(mesh.castShadow).toBe(false);
+      } finally {
+        painter.setSourceForTest(painter.urls.main, null);
+        setDitherFadeEnabledForTest(null);
+        clearSetPieceOccluders();
+        painter.resetCaches();
+      }
+    }
+  });
+});
+
+describe('the program keys', () => {
+  it('each key is pinned to the text it names: change a shader, bump its key and its pin here', () => {
+    painter.resetCaches();
+    const digest = (material: THREE.Material) => {
+      const shader = compile(
+        material,
+        '#include <common>\n#include <begin_vertex>\n#include <project_vertex>',
+        '#include <common>\n#include <color_fragment>\n#include <map_fragment>',
+      );
+      return createHash('sha256')
+        .update(shader.vertexShader)
+        .update(shader.fragmentShader)
+        .digest('hex')
+        .slice(0, 12);
+    };
+    // (three keys a program on customProgramCacheKey, not on the text: a text that changed
+    // under an unchanged key is one program for two shaders in a page that hot reloads)
+    expect({
+      [painter.inlayMaterial().customProgramCacheKey()]: digest(painter.inlayMaterial()),
+      [painter.moonwaterMaterial().customProgramCacheKey()]: digest(painter.moonwaterMaterial()),
+      [painter.mistMaterial().customProgramCacheKey()]: digest(painter.mistMaterial()),
+      [painter.spriteMaterial().customProgramCacheKey()]: digest(painter.spriteMaterial()),
+    }).toEqual({
+      'drowned-temple-silver-inlay-v1': 'a409268aa222',
+      'drowned-temple-moonwater-v2': '1bf48208ba0c',
+      'drowned-temple-mere-mist-v1': '3002659c30f1',
+      'drowned-temple-moonrise-sprites-v2': '47e25896f567',
+    });
+  });
+});
+
+describe('the effects tier is the static preset', () => {
+  it('the mist and the sprites are counted from GFX.effectsTier, whatever the graphics tier is', () => {
+    const original = getActiveGfxProfile();
+    const counts = new Set<number>();
+    try {
+      for (const effectsTier of ['low', 'ultra'] as const satisfies readonly GfxTier[]) {
+        // the graphics tier held at high: only the effects tier moves
+        activateGfxProfile({ ...original, settings: { ...GFX, tier: 'high', effectsTier } });
+        clearSetPieceOccluders();
+        painter.resetCaches();
+        const view = buildDrownedTempleEntrance(WORLD_SEED);
+        const mist = view.group.getObjectByName('drownedTempleMist') as THREE.InstancedMesh;
+        const sprites = view.group.getObjectByName('drownedTempleSprites') as THREE.InstancedMesh;
+        expect(mist.count, effectsTier).toBe(templeMistPuffCount(effectsTier));
+        expect(sprites.count, effectsTier).toBe(templeSprites(effectsTier, ground).length);
+        counts.add(mist.count);
+      }
+      // the two tiers really differ, so the pin can tell them apart
+      expect(counts.size).toBe(2);
+    } finally {
+      activateGfxProfile(original);
+      clearSetPieceOccluders();
+      painter.resetCaches();
+    }
   });
 });
 
