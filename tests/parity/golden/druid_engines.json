@@ -31,7 +31,7 @@
       "time": 1,
       "nextId": 1014,
       "state": "def4d7f8",
-      "events": "f76ae6cd",
+      "events": "47b7424f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1836,8 +1836,8 @@
       "tick": 1020,
       "time": 51,
       "nextId": 1014,
-      "state": "46fc5f36",
-      "events": "7331d2f6",
+      "state": "fb92c2ae",
+      "events": "845ec1ba",
       "rng": {
         "draws": 8909,
         "digest": "0960cb1e"
@@ -1847,7 +1847,7 @@
       "tick": 1040,
       "time": 52,
       "nextId": 1014,
-      "state": "a8068b73",
+      "state": "eca3fa3b",
       "events": "52610379",
       "rng": {
         "draws": 9099,
@@ -1858,7 +1858,7 @@
       "tick": 1060,
       "time": 53,
       "nextId": 1014,
-      "state": "a0dad211",
+      "state": "e944aedf",
       "events": "ab57bca9",
       "rng": {
         "draws": 9293,
@@ -1869,8 +1869,8 @@
       "tick": 1080,
       "time": 54,
       "nextId": 1014,
-      "state": "8f7d3088",
-      "events": "e4333285",
+      "state": "a2a5965c",
+      "events": "871efa9b",
       "rng": {
         "draws": 9455,
         "digest": "b6861768"
@@ -1880,7 +1880,7 @@
       "tick": 1100,
       "time": 55,
       "nextId": 1014,
-      "state": "7a653cc7",
+      "state": "d5fffd35",
       "events": "49cdb0db",
       "rng": {
         "draws": 9596,
@@ -1891,8 +1891,8 @@
       "tick": 1120,
       "time": 56,
       "nextId": 1014,
-      "state": "6deaa44c",
-      "events": "8a500c1f",
+      "state": "0ee9a152",
+      "events": "1ab96e6b",
       "rng": {
         "draws": 9769,
         "digest": "90e913fb"
@@ -1902,8 +1902,8 @@
       "tick": 1140,
       "time": 57,
       "nextId": 1014,
-      "state": "5488d685",
-      "events": "390d7b51",
+      "state": "65d28ab1",
+      "events": "8fbbf693",
       "rng": {
         "draws": 9953,
         "digest": "f24b2c21"
@@ -1913,8 +1913,8 @@
       "tick": 1160,
       "time": 58,
       "nextId": 1014,
-      "state": "7fba4622",
-      "events": "5bf0bbf7",
+      "state": "a4769762",
+      "events": "059403a9",
       "rng": {
         "draws": 10144,
         "digest": "456cbe85"
@@ -1924,7 +1924,7 @@
       "tick": 1180,
       "time": 59,
       "nextId": 1014,
-      "state": "ad22a41f",
+      "state": "2901aa51",
       "events": "ed572663",
       "rng": {
         "draws": 10315,
@@ -1935,8 +1935,8 @@
       "tick": 1200,
       "time": 60,
       "nextId": 1014,
-      "state": "2c704405",
-      "events": "3cc970d1",
+      "state": "d773f053",
+      "events": "4370567b",
       "rng": {
         "draws": 10499,
         "digest": "47487796"
@@ -1946,8 +1946,8 @@
       "tick": 1220,
       "time": 61,
       "nextId": 1014,
-      "state": "46cbae57",
-      "events": "5cef8f2b",
+      "state": "f6df4609",
+      "events": "5bb89951",
       "rng": {
         "draws": 10694,
         "digest": "b4582545"
@@ -1957,8 +1957,8 @@
       "tick": 1225,
       "time": 61.25,
       "nextId": 1014,
-      "state": "96c64675",
-      "events": "a9c46f8d",
+      "state": "be0b0d53",
+      "events": "74831869",
       "rng": {
         "draws": 10727,
         "digest": "b73c70df"
@@ -2486,7 +2486,7 @@
               "duration": 12,
               "id": "rejuvenation",
               "kind": "hot",
-              "name": "Wildbloom",
+              "name": "Sporemending",
               "remaining": 11.75,
               "school": "nature",
               "sourceId": 1012,
@@ -2600,7 +2600,7 @@
       "tick": 1225,
       "time": 61.25,
       "nextId": 1014,
-      "state": "96c64675",
+      "state": "be0b0d53",
       "events": "741638a5",
       "rng": {
         "draws": 10727,
@@ -3129,7 +3129,7 @@
               "duration": 12,
               "id": "rejuvenation",
               "kind": "hot",
-              "name": "Wildbloom",
+              "name": "Sporemending",
               "remaining": 11.75,
               "school": "nature",
               "sourceId": 1012,
