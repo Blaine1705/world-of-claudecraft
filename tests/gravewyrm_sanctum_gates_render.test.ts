@@ -42,6 +42,18 @@ function area(poly: [number, number][]): number {
 }
 
 describe('gravewyrm sanctum gate rigs', () => {
+  it('snaps an already-open gate on first observation after drawing its unknown closed state', () => {
+    const clock = new SanctumGateClock(SANCTUM_GATE_SECONDS.chainBridge);
+    expect(clock.step(0, 999, false, false)).toBe(0);
+    // The distant structure drew before its gate entity entered interest.
+    // Arriving at a bridge opened earlier must reveal its ice immediately.
+    expect(clock.step(1, 0.01, true, false)).toBe(1);
+    expect(clock.played).toBe(false);
+    // A genuinely observed re-seal still plays from the open pose.
+    expect(clock.step(0.7, 0.1, false, true)).toBeGreaterThan(0);
+    expect(clock.played).toBe(true);
+  });
+
   it('gives every Sanctum gate kind a rig', () => {
     const kinds = new Set(GRAVEWYRM_SANCTUM_GATES.map((g) => g.kind));
     expect([...kinds].sort()).toEqual(['chain_bridge', 'chain_gate', 'ice_wall', 'rite_ward']);

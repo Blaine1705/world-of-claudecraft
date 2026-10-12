@@ -334,7 +334,7 @@ def chain_anchor():
     size of a house: 10 x 8, 7 tall): black seal stone banded and strapped
     in his iron, set into the ledge with slate heaped round it; on its front
     a forged staple holds a great ring, and the first mast-thick links run
-    out from it toward the gulf (-Y), rising. Runes along its brow."""
+    out over the lip (-Y), then hang under their own weight. Runes along its brow."""
     p = P('ChainAnchor', frost=0.6, seed=47)
     p.box((0, 0, 3.5), (10, 8, 7), SEAL_STONE, bevel=0.3, taper=0.9)
     p.box((0, 0, 7.25), (8.6, 6.8, 0.6), SEAL_EDGE, bevel=0.15)
@@ -349,11 +349,16 @@ def chain_anchor():
         loop_tube(p, [Vector((math.cos(a) * 2.3, -6.4, 3.3 + math.sin(a) * 2.3)) for a in
                       [TAU * i / 22 for i in range(22)]], 0.62, CHAIN, sides=10)
     q = Vector((0, -6.4, 3.3 - 2.3))
-    u = Vector((0, -1, 0.32)).normalized()
-    for i in range(3):
-        c = q + u * (3.9 + i * 6.2)
+    # The first link rests on the lip; each following interlocked link turns
+    # downward until the loose end hangs vertically in the crevasse.
+    directions = [(0, -1, 0), (0, -0.72, -0.69), (0, -0.24, -0.97), (0, 0, -1)]
+    c, previous = q, None
+    for i, direction in enumerate(directions):
+        u = Vector(direction).normalized()
+        c = c + u * 3.9 if previous is None else c + (previous + u) * 3.1
         v = Vector((1, 0, 0)) if i % 2 == 0 else u.cross(Vector((1, 0, 0))).normalized()
         chain_link(p, c, u, v, 1.6, 1.8, 0.62, sides=10)
+        previous = u
     for k in range(12):
         with p.as_kind(PAINT):
             p.box((-3.9 + k * 0.7, -4.05, 6.55), (0.16, 0.05, 0.42), RUNE_DIM, mat=GLOW)

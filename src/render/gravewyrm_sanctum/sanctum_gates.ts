@@ -29,10 +29,12 @@
 import * as THREE from 'three';
 import { GRAVEWYRM_SANCTUM_GATES } from '../../sim/content/gravewyrm_sanctum';
 import type { DungeonGateDef } from '../../sim/types';
-import { sharedUniforms } from '../gfx';
+import { iceDetail } from '../authored_field/field_textures';
+import { GFX, sharedUniforms, surfaceMat } from '../gfx';
 import { gateMemoryKey, gateView } from '../hollow_crypt/crypt_gate_state_core';
 import { markSharedMaterial } from '../shared_resource';
 import { radialGlowTexture } from '../textures';
+import { chainBridgeCrustGeometry } from './sanctum_bridge_geometry';
 import {
   CHAIN_BRIDGE_DECK,
   CHAIN_BRIDGE_LAND,
@@ -83,7 +85,7 @@ interface GateRig {
   /** True when the rig places itself in the instance frame (the bridge). */
   absolute?: boolean;
   /** Called once per rendered frame with the gate memory's view. */
-  apply(openness: number, seal: number, since: number, open: boolean): void;
+  apply(openness: number, seal: number, since: number, open: boolean, changed: boolean): void;
 }
 
 /** Push a node's own matrix and its descendants' world matrices (the rigs
@@ -599,8 +601,8 @@ function iceWall(gate: DungeonGateDef): GateRig {
   return {
     root,
     driver: front,
-    apply(openness, seal, since, open) {
-      const k = clock.step(openness, since, open);
+    apply(openness, seal, since, open, changed) {
+      const k = clock.step(openness, since, open, changed);
       u.uCrack.value = iceWallCracks(k);
       u.uSeal.value = seal;
       u.uAlpha.value = Math.max(0, 1 - Math.max(0, k - ICE_WALL_FALL_START) * 4);
@@ -749,8 +751,8 @@ function chainGate(gate: DungeonGateDef): GateRig {
   return {
     root,
     driver: runes,
-    apply(openness, seal, since, open) {
-      const k = clock.step(openness, since, open);
+    apply(openness, seal, since, open, changed) {
+      const k = clock.step(openness, since, open, changed);
       const lift = chainGateLift(k) * CHAIN_GATE.travel;
       u.uSeal.value = seal;
       // Frost shakes off the bars as the hoist takes the weight; a seal's
@@ -765,76 +767,10 @@ function chainGate(gate: DungeonGateDef): GateRig {
 
 // ---- the chain bridge ----------------------------------------------------------------------
 
-/** The rime crust frozen over the taut chain: a ribbon along the sim's own
- *  walkway, its top exactly on the path (a hair proud where it meets the
- *  rims), lumpy flanks spilling past the links, the standing links' worn
- *  tops showing through it as strips of iron. */
-const CRUST_LIFT = 0.04;
-
-function crustGeometry(): THREE.BufferGeometry {
-  const L = chainBridgeLength();
-  const cols = 64;
-  const W = CHAIN_BRIDGE_DECK.crustHalfWidth;
-  // Cross-section across x: (x, drop below the top).
-  const prof: [number, number][] = [
-    [-W - 0.7, 2.4],
-    [-W - 0.4, 0.9],
-    [-W, 0.12],
-    [-W + 0.5, 0],
-    [-0.8, 0],
-    [0.8, 0],
-    [W - 0.5, 0],
-    [W, 0.12],
-    [W + 0.4, 0.9],
-    [W + 0.7, 2.4],
-  ];
-  const v: number[] = [];
-  const c: number[] = [];
-  const ring = (i: number): [number, number, number][] => {
-    const s = (i / cols) * L;
-    const p = chainBridgeDeckAt(s);
-    const top = p.y + CRUST_LIFT;
-    return prof.map(([x, drop], k) => {
-      const lump = k === 0 || k === prof.length - 1 ? (sanctumHash(i, k) - 0.5) * 1.2 : 0;
-      const side = k === 1 || k === prof.length - 2 ? (sanctumHash(i, k + 7) - 0.5) * 0.5 : 0;
-      return [x + side * Math.sign(x), top - drop - lump, p.z];
-    });
-  };
-  const colorAt = (i: number, k: number): Rgb => {
-    // The standing links run through the deck every other pitch.
-    const s = (i / cols) * L;
-    const inLink = Math.floor(s / CHAIN_BRIDGE_DECK.pitch) % 2 === 1;
-    if ((k === 4 || k === 5) && inLink) return IRON_WORN;
-    if (k <= 1 || k >= prof.length - 2) return [0.36, 0.56, 0.72];
-    const n = sanctumHash(i * 3.1, k);
-    return [0.74 + n * 0.08, 0.81 + n * 0.07, 0.9 + n * 0.05];
-  };
-  let prev = ring(0);
-  for (let i = 1; i <= cols; i++) {
-    const cur = ring(i);
-    for (let k = 0; k < prof.length - 1; k++) {
-      const quad = [prev[k], prev[k + 1], cur[k + 1], prev[k], cur[k + 1], cur[k]];
-      const cols4 = [
-        colorAt(i - 1, k),
-        colorAt(i - 1, k + 1),
-        colorAt(i, k + 1),
-        colorAt(i - 1, k),
-        colorAt(i, k + 1),
-        colorAt(i, k),
-      ];
-      for (let q = 0; q < 6; q++) {
-        v.push(...quad[q]);
-        c.push(...cols4[q]);
-      }
-    }
-    prev = cur;
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3));
-  g.setAttribute('color', new THREE.Float32BufferAttribute(c, 3));
-  g.computeVertexNormals();
-  return g;
-}
+// The rime crust frozen over the taut chain is built in
+// sanctum_bridge_geometry.ts: a ribbon along the sim's own walkway, its top
+// exactly on the path (a hair proud where it meets the rims), lumpy flanks
+// spilling past the links.
 
 function chainBridge(): GateRig {
   const clock = new SanctumGateClock(SANCTUM_GATE_SECONDS.chainBridge);
@@ -855,7 +791,19 @@ function chainBridge(): GateRig {
     root.add(m);
     links.push(m);
   }
-  const crust = new THREE.Mesh(crustGeometry(), sanctumSlotMaterial('stone'));
+  // Same shared glacier detail and material recipe as the field's ice tops;
+  // built before the interior's compile gate, including while hidden/shut.
+  const ice = iceDetail();
+  const crust = new THREE.Mesh(
+    chainBridgeCrustGeometry(),
+    surfaceMat({
+      map: ice.map,
+      normalMap: GFX.standardMaterials ? ice.normalMap : undefined,
+      vertexColors: true,
+      roughness: 0.46,
+      metalness: 0.04,
+    }),
+  );
   crust.name = 'sanctumChainBridgeCrust';
   crust.receiveShadow = true;
   crust.castShadow = true;
@@ -922,8 +870,8 @@ function chainBridge(): GateRig {
     root,
     driver: links[0],
     absolute: true,
-    apply(openness, _seal, since, open) {
-      const k = clock.step(openness, since, open);
+    apply(openness, _seal, since, open, changed) {
+      const k = clock.step(openness, since, open, changed);
       // The rime freezes up through the links once the chain is taut.
       const crustK = chainBridgeCrust(k);
       crust.visible = crustK > 0;
@@ -1032,8 +980,8 @@ function riteWard(gate: DungeonGateDef): GateRig {
   return {
     root,
     driver: sheet,
-    apply(openness, seal, since, open) {
-      const k = clock.step(openness, since, open);
+    apply(openness, seal, since, open, changed) {
+      const k = clock.step(openness, since, open, changed);
       const charge = Math.max(riteWardCharge(k, sharedUniforms.uTime.value), seal > 0 ? 1 : 0);
       u.uCharge.value = charge;
       u.uSeal.value = seal;
@@ -1077,7 +1025,7 @@ function buildGates(ox: number, oz: number, ground: (x: number, z: number) => nu
       stamp = now;
       const view = gateView(key, now);
       const seal = view.state === 'sealed' ? 0.7 + 0.3 * Math.sin(now * 5) : 0;
-      rig.apply(view.openness, seal, view.since, view.state === 'open');
+      rig.apply(view.openness, seal, view.since, view.state === 'open', view.changed);
     };
     // (No paint before the first frame: each rig is built in its shut pose,
     // and its clock's first sight must come from the gate memory.)
