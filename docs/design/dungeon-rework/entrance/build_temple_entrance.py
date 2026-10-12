@@ -1,7 +1,11 @@
 """The Drowned Temple world entrance: the Moon Stair, the moongate and the moon pool.
 
   blender -b --factory-startup --python build_temple_entrance.py -- --out DIR --terrain DIR
-          [--renders none|quick|all|maps] [--tag rondas_revision/rN] [--no-ao]
+          [--renders none|quick|all|maps] [--tag rondas_revision/rN] [--no-ao] [--blend-name FILE.blend]
+
+Every stone here sits on what carries it and shows no open rim: after a
+change, run support_check.py (beside this file) on the saved .blend; it must
+list nothing floating and no open rim before the GLBs ship.
 
 A scrying house of the Court on the Glimmermere (door (-70, 792), Thornpeak
 Heights). The door stands at the head of a steep gully that falls six yards to
@@ -33,9 +37,11 @@ the stair descends toward Blender +Y. Every glowing inlay carries its place
 in the moonrise (0 the stair's drowned foot, 1 the gate's crown) in its colour
 alpha: src/render/drowned_temple_entrance.ts lights them in that order.
 """
+import contextlib
 import json
 import math
 import os
+import random
 import sys
 
 import bpy
@@ -61,6 +67,7 @@ OUT = arg('--out', os.path.join(HERE, 'out'))
 TERRAIN = arg('--terrain', os.path.join(OUT, 'terreno'))
 RENDERS = arg('--renders', 'none')
 TAG = arg('--tag', '')
+BLEND = arg('--blend-name', 'drowned_temple_entrance.blend')
 os.makedirs(OUT, exist_ok=True)
 GR = ec.Ground(os.path.join(TERRAIN, 'temple_heightgrid.json'))
 SURR = json.load(open(os.path.join(TERRAIN, 'temple_surroundings.json')))
@@ -71,6 +78,8 @@ D = 0.8                # the dais floor
 RING_C = D + 4.8       # the ring's centre: the full circle shows, its foot bedded in the dais
 RING_R, R_IN, R_OUT, RING_Y = 5.2, 4.55, 5.85, 0.8
 BLOCKS = 28
+JOINT = 0.004          # half a ring joint, radians: a finger's width between the voussoirs
+CORE_IN, CORE_Y = 0.12, 0.2    # how far the ring's core stands back from its radii and from its two faces
 WATER = -5.85          # the mirror: the water the weir still holds on the shelf
 TIDE = -3.95           # the old tide line, from when the mere stood full
 ST_Z0 = -2.6           # the stair's head (lz), the dais' south edge
@@ -89,10 +98,17 @@ NOTCHES = [(4, 0.55, 1.15), (7, 0.5, 0.9)]      # (segment, where along it, widt
 PIERS = (0, 8, 16)                               # the cheek stages that are piers (their first tread)
 STATUES = [(-6.7, -15.7, 'offering'), (6.7, -15.7, 'veil')]
 BREACH = (4, 10)                                 # the west cheek is down beside these treads (Ondrel's way)
+TAIL = 0.12                                      # how far a tread's end is built into the cheek wall
+SUNK_TREADS = {(12, 1): (0.05, 0.02), (18, 0): (0.045, -0.025)}   # (tread, stone) -> (sunk, tilt); never a rune tread
 # The colonnade stands on the gully's shoulders, outside the cheeks and inside the ring's own width.
 COLUMNS = [(5.2, -4.6, 'whole'), (-5.2, -4.6, 'whole'), (5.2, -8.6, 'whole'), (-5.2, -8.6, 'broken'),
            (5.2, -12.4, 'stump'), (-5.2, -12.4, 'fallen')]
 FLANKS = {}                                      # side (-1 east, 1 west) -> the flank's piece
+RING_FACES = {}                                  # voussoir -> (half depth, slip along Y, extrados): what grows on the ring lies on these
+COPINGS = {}                                     # weir segment -> [(along, half length)] of the coping stones still there
+STATUE_M = {}                                    # (lx, lz) -> a penitent's placement, for what grows on it
+SHAFTS = {}                                      # (lx, lz) -> a column's standing drums' offsets and where moss sits on its top
+MISSING_COPINGS = ((1, 2), (-1, 12), (-1, 6))    # (side, stage): the cheek copings that have slid off
 COLLIDERS = []
 FOOTINGS = []
 SOCKETS = {'stair_runes': [], 'ring_runes': [], 'pool_runes': [], 'glints': [], 'falls': [], 'lilies': [],
@@ -155,6 +171,17 @@ def RZ(a):
     return Matrix.Rotation(a, 4, 'Z')
 
 
+@contextlib.contextmanager
+def own_stream(p, key):
+    """Build with a random stream of its own: a stone added later leaves every
+    stone already placed exactly where it was."""
+    was, p.rng = p.rng, random.Random(key)
+    try:
+        yield
+    finally:
+        p.rng = was
+
+
 # ================================================================= the moongate
 def ring_angle(k):
     """Centre angle of voussoir k: the keystone (k 7) at the crown."""
@@ -180,14 +207,16 @@ def moongate():
         col = p.tone(k * 1.7, 4.0)
         if key:
             col = mix(col, mk.PEARL_PALE, 0.5)
-        p.wedge(cb, r0, r1, a0, a1, -y1, y1, col, shift=slipped.get(k, (0, 0, 0)), pillow=0.012, knock=0.2)
+        p.wedge(cb, r0, r1, a0, a1, -y1, y1, col, shift=slipped.get(k, (0, 0, 0)), pillow=0.012, knock=0.2, gap=JOINT,
+                true_faces=k % 2 == 1, sound=True)
         sh = slipped.get(k, (0, 0, 0))
+        RING_FACES[k] = (y1, sh[1], r1 + sh[0])
         for (sgn, yy) in ((1, y1 + sh[1]), (-1, -y1 + sh[1])):
             # the two archivolt mouldings on each face
             p.arc_band(cb, r0 + 0.07 + sh[0], r0 + 0.31 + sh[0], a0 + 0.014 + sh[2], a1 - 0.014 + sh[2], yy, sgn * 0.075,
-                       scale(col, 1.03))
+                       scale(col, 1.03), sink=0.07, steps=1)
             p.arc_band(cb, r1 - 0.30 + sh[0], r1 - 0.06 + sh[0], a0 + 0.014 + sh[2], a1 - 0.014 + sh[2], yy, sgn * 0.06,
-                       scale(col, 0.98))
+                       scale(col, 0.98), sink=0.07, steps=1)
         if k % 2 == 1:
             # the rune: the moon's phase, waxing up the east side to the full
             # moon on the keystone and waning down the west
@@ -200,11 +229,27 @@ def moongate():
             up = Vector((math.cos(am), 0, math.sin(am)))
             ctr = cb + up * rr
             for sgn in (1, -1):
-                p.phase_disc(ctr + Vector((0, sgn * (y1 + sh[1] + 0.012), 0)), (0, sgn, 0), up, rad, phase, order,
+                # (a finger proud of the true face: clear of the face's pillowed heart)
+                p.phase_disc(ctr + Vector((0, sgn * y1 + sh[1] + sgn * 0.02, 0)), (0, sgn, 0), up, rad, phase, order,
                              live=live, waning=(k > 7) == (sgn > 0))
             if live:
                 SOCKETS['ring_runes'].append([round(ctr.x, 3), round(ctr.z, 3), round(-(y1 + 0.03), 3), round(order, 3),
                                               round(rad, 3)])
+    # the ring's core: the rubble heart the voussoirs face. It closes every
+    # joint a hand deep, so an open joint shows dark stone and never the sky,
+    # and it is what ties the ring's stones to one another and to the dais.
+    core = scale(mk.PEARL_DARK, 0.4)
+    ca, cbr, cy = R_IN + CORE_IN, R_OUT - CORE_IN, RING_Y - CORE_Y
+    seg = BLOCKS * 2
+    for i in range(seg):
+        a0, a1 = TAU * i / seg, TAU * (i + 1) / seg
+        q = [[cb + Vector((math.cos(a) * r, y, math.sin(a) * r)) for (r, y) in ((ca, cy), (cbr, cy), (cbr, -cy), (ca, -cy))]
+             for a in (a0, a1)]
+        am = (a0 + a1) / 2
+        out = Vector((math.cos(am), 0, math.sin(am)))
+        for (e, want) in ((0, (0, 1, 0)), (1, out), (2, (0, -1, 0)), (3, -out)):
+            f = (e + 1) % 4
+            p.face((q[0][e], q[0][f], q[1][f], q[1][e]), core, want=want)
     # the crescent horns on the crown: the interior ring's own silhouette
     for s in (-1, 1):
         base = cb + Vector((s * 1.25, 0, R_OUT - 0.25))
@@ -232,8 +277,8 @@ def moongate():
                        smooth_face=False, alpha=1.0)
             SOCKETS['horn_tip'] = [round(tip.x, 3), round(tip.z, 3), 0.0]
         # the horn's seat: stepped blocks on the crown either side of the keystone
-        p.block(cb + Vector((s * 1.25, 0, R_OUT + 0.12)), (1.5, 1.5, 0.5), p.tone(s * 3.0, 9.0), skip=(5,), pillow=0.02)
-        p.block(cb + Vector((s * 1.3, 0, R_OUT + 0.55)), (1.05, 1.2, 0.42), p.tone(s * 4.0, 10.0), skip=(5,), pillow=0.02)
+        p.block(cb + Vector((s * 1.25, 0, R_OUT + 0.12)), (1.5, 1.5, 0.5), p.tone(s * 3.0, 9.0), skip=(5,), bed=True, pillow=0.02)
+        p.block(cb + Vector((s * 1.3, 0, R_OUT + 0.55)), (1.05, 1.2, 0.42), p.tone(s * 4.0, 10.0), skip=(5,), bed=True, pillow=0.02)
     # the fallen horn tip lies on the dais
     m = p.mark()
     p.loft([[Vector((math.cos(TAU * j / 6) * r, math.sin(TAU * j / 6) * r * 0.8, z)) for j in range(6)]
@@ -241,14 +286,15 @@ def moongate():
     p.turn(m, Matrix.Translation(B(-5.3, -1.5, D + 0.13)) @ Matrix.Rotation(1.45, 4, 'X') @ RZ(0.7))
     # the cradle: stepped blocks hugging the ring where it rises out of the dais
     for s in (-1, 1):
-        p.block(B(s * 3.95, 0, D + 0.47), (2.1, 2.4, 0.94), p.tone(s * 2.0, 0.0), chip=0.04, skip=(5,), pillow=0.012)
-        p.block(B(s * 4.95, 0, D + 1.32), (1.3, 2.1, 0.78), p.tone(s * 2.0, 1.0), chip=0.05, skip=(5,), pillow=0.012)
-        p.block(B(s * 2.95, 0, D + 1.0), (0.34, 2.52, 0.13), mk.PEARL_PALE, chip=0.03, skip=(5,), pillow=0.0)
+        p.block(B(s * 3.95, 0, D + 0.42), (2.1, 2.4, 1.04), p.tone(s * 2.0, 0.0), chip=0.04, skip=(5,), bed=True, pillow=0.012)
+        p.block(B(s * 4.95, 0, D + 1.32), (1.3, 2.1, 0.78), p.tone(s * 2.0, 1.0), chip=0.05, skip=(5,), bed=True, pillow=0.012)
+        # (the cradle's lip: a pale fillet along its inner arris, wholly on the block that carries it)
+        p.block(B(s * 3.09, 0, D + 1.0), (0.34, 2.34, 0.13), mk.PEARL_PALE, chip=0.03, skip=(5,), pillow=0.0, bed=True)
         collider_obb(f'moongate_foot_{"w" if s > 0 else "e"}', s * 3.75, 0, 2.2, 1.15, 0.0, RING_C + 2.0)
     # the threshold: the sill that fills the circle's foot, a step up to it on either side
-    p.block(B(0, 0, D + 0.25), (3.0, 2.0, 0.5), mix(p.tone(0, 0), mk.PEARL_PALE, 0.5), chip=0.03, skip=(5,), pillow=0.0)
+    p.block(B(0, 0, D + 0.2), (3.0, 2.0, 0.6), mix(p.tone(0, 0), mk.PEARL_PALE, 0.5), chip=0.03, skip=(5,), bed=True, pillow=0.0)
     for sz in (-1, 1):
-        p.block(B(0, sz * 1.27, D + 0.125), (3.5, 0.56, 0.25), p.tone(sz, 0.0), chip=0.04, skip=(5,), pillow=0.0)
+        p.block(B(0, sz * 1.27, D + 0.085), (3.5, 0.56, 0.33), p.tone(sz, 0.0), chip=0.04, skip=(5,), bed=True, pillow=0.0)
     p.inlay(B(-1.3, -0.72, D + 0.504), B(1.3, -0.72, D + 0.504), 0.07, (0, 0, 1), 0.5, live=False)
     p.phase_disc(B(0, 0, D + 0.506), (0, 0, 1), (0, -1, 0), 0.36, 0.5, 0.5, live=True)
     SOCKETS['ring_runes'].append([0.0, round(D + 0.55, 3), 0.0, 0.5, 0.36])
@@ -269,7 +315,7 @@ def moongate():
                     continue              # behind the stair's head
                 if y + hc / 2 > gh(x + ln / 2, face_z) - 0.25:
                     p.block(B(x + ln / 2, face_z + (0.34 if face == 0 else -0.34), y), (ln, 0.72, hc), p.tone(x, y),
-                            skip=(5,), joint=(1, 3), pillow=0.02)
+                            skip=(5,), bed=True, joint=(1, 3), pillow=0.02)
                 x += ln
         for s in (-1, 1):
             z = z0 + (0.35 if j % 2 else 0.0)
@@ -277,7 +323,7 @@ def moongate():
                 ln = min(z1 - z, 0.95 + rng.random() * 0.8)
                 if y + hc / 2 > gh(s * hw, z + ln / 2) - 0.25:
                     p.block(B(s * (hw - 0.34), z + ln / 2, y), (ln, 0.72, hc), p.tone(z, y), rot=RZ(math.pi / 2),
-                            skip=(5,), joint=(1, 3), pillow=0.02)
+                            skip=(5,), bed=True, joint=(1, 3), pillow=0.02)
                 z += ln
     # the cornice under the paving, all round
     for (a, b) in (((-hw - 0.06, z0 - 0.06), (hw + 0.06, z0 - 0.06)), ((-hw - 0.06, z1 + 0.06), (hw + 0.06, z1 + 0.06))):
@@ -288,13 +334,27 @@ def moongate():
             if a[1] < 0 and abs((x0 + x1) / 2) < HS + CHEEK:
                 continue
             p.block(B((x0 + x1) / 2, a[1] + (0.2 if a[1] < 0 else -0.2), D - 0.15), (x1 - x0, 0.56, 0.2),
-                    scale(mk.PEARL_PALE, 0.97), chip=0.04, skip=(5,), joint=(1, 3), pillow=0.0)
+                    scale(mk.PEARL_PALE, 0.97), chip=0.04, skip=(5,), joint=(1, 3), pillow=0.0, bed=True)
     for s in (-1, 1):
         for i in range(4):
             za = z0 + (z1 - z0) * i / 4
             zb = z0 + (z1 - z0) * (i + 1) / 4
             p.block(B(s * (hw - 0.14), (za + zb) / 2, D - 0.15), (zb - za, 0.56, 0.2), scale(mk.PEARL_PALE, 0.97),
-                    rot=RZ(math.pi / 2), chip=0.04, skip=(5,), joint=(1, 3), pillow=0.0)
+                    rot=RZ(math.pi / 2), chip=0.04, skip=(5,), joint=(1, 3), pillow=0.0, bed=True)
+    # the bedding course under the ring's band of the floor (the ring, its
+    # cradle and its sill stand on it; no slab is laid there), and the sill
+    # the paving's edge lies on at the stair's head, which is the top riser
+    bedc = scale(mk.PEARL_DARK, 0.62)
+    p.face((B(-hw + 0.3, -0.97, D - 0.03), B(hw - 0.3, -0.97, D - 0.03), B(hw - 0.3, 0.97, D - 0.03),
+            B(-hw + 0.3, 0.97, D - 0.03)), bedc, want=(0, 0, 1))
+    for sz in (-1, 1):
+        p.face((B(-hw + 0.3, sz * 0.97, D - 0.03), B(hw - 0.3, sz * 0.97, D - 0.03), B(hw - 0.3, sz * 0.97, D - 0.21),
+                B(-hw + 0.3, sz * 0.97, D - 0.21)), scale(bedc, 0.8), want=(0, -sz, 0))
+    p.face((B(-hw + 0.2, z0 + 0.1, D - 0.21), B(hw - 0.2, z0 + 0.1, D - 0.21), B(hw - 0.2, z1 - 0.1, D - 0.21),
+            B(-hw + 0.2, z1 - 0.1, D - 0.21)), scale(bedc, 0.7), want=(0, 0, 1))
+    with own_stream(p, 'stair head sill'):
+        p.block(B(0, z0 + 0.27, D - 0.365), (2 * HS + 0.2, 0.5, 0.3), p.tone(0.0, 5.0), chip=0.02, skip=(5,), bed=True,
+                pillow=0.0, knock=0.0)
     # the paving: big slabs in three bands, a few sunk, one cracked away to earth
     bands = [(z0 + 0.02, -0.95), (-0.95, 0.95), (0.95, z1 - 0.02)]
     sunk = {(0, 3): (0.05, 0.02), (2, 5): (0.07, -0.03), (0, 8): (0.04, 0.03), (1, 1): (0.03, -0.02)}
@@ -336,24 +396,36 @@ def moon_stair():
         flared = lzf < FLARE_Z
         last = k == N_ALL - 1
         gmin = min(gh(x, lzf) for x in (-half, 0.0, half))
-        bottom = (gmin - 0.5) if last else top - RISER - 0.02
+        bottom = (gmin - 0.5) if last else top - RISER - 0.17
         cuts = sorted([-half, half] + [(-half + 2 * half * (i + 1) / 3) + (rng.random() - 0.5) * 1.1 for i in range(2)])
         if rng.random() < 0.3:
             cuts.pop(1)
         breach = BREACH[0] <= k < BREACH[1]
         for i in range(len(cuts) - 1):
-            x0, x1 = cuts[i] + 0.012, cuts[i + 1] - 0.012
+            x0, x1 = cuts[i], cuts[i + 1]          # (the stones butt: a tread shows no slit into the flight's hollow)
             c = p.tone(k * 0.9 + i * 2.3, k * 0.4)
             sink = 0.0
             tilt = 0.0
             if (k, i) in ((6, 0), (13, 1), (19, 0), (21, 1)):
                 sink, tilt = 0.035 + 0.03 * rng.random(), (rng.random() - 0.5) * 0.07
+            rune = k % 3 == 1
+            if rune:
+                sink, tilt = 0.0, 0.0           # a rune tread is kept true: its silver lies in the stone
+            elif (k, i) in SUNK_TREADS:
+                sink, tilt = SUNK_TREADS[(k, i)]
             lastx = i == len(cuts) - 2
-            ends = (flared and i == 0, (flared or breach) and lastx)
-            p.tread(x0, x1 + (0.9 if breach and lastx else 0.0), yf, TREAD + 0.05, top, bottom, c,
-                    segs=max(2, int((x1 - x0) / 0.6)), ends=ends, sink=sink, tilt=tilt,
+            # a tread with a sunk stone shows the ends of its stones at the step between them
+            stepped = k in (6, 21) or any(kk == k for (kk, _i) in SUNK_TREADS)
+            ends = (stepped or (flared and i == 0), stepped or ((flared or breach) and lastx))
+            # between the cheeks a tread's two ends are built a hand into the walls (no slit beside
+            # it where a wall stone has lost a corner); in the breach it runs out past the fallen wall
+            segs = max(2, int((x1 - x0 - 0.024) / 0.6))
+            xa = x0 - (TAIL if i == 0 and not flared else 0.0)
+            xb = x1 + (0.9 if breach and lastx else TAIL if lastx and not flared else 0.0)
+            p.tread(xa, xb, yf, TREAD + 0.03, top, bottom, c, segs=segs, ends=ends, sink=sink, tilt=tilt,
                     end_bottom=min(gh(x0, lzf), gh(x1 + 1.0, lzf), gh(x0, lzf + TREAD)) - 0.5,
-                    wear=0.04 if not flared else 0.02)
+                    wear=0.006 if rune else (0.04 if not flared else 0.02),
+                    back=flared or (breach and lastx and k == BREACH[0]))
         # a lunar phase in silver on every third tread, waxing as the flight climbs
         if k % 3 == 1:
             idx = (k - 1) // 3                     # 0 the top rune ... 8 the drowned one
@@ -404,15 +476,15 @@ def moon_stair():
                 spans = [(zs2, zs2 + cut), (zs2 + cut, zn2)] if cut else [(zs2, zn2)]
                 for (a, b) in spans:
                     p.block(B(cx, (a + b) / 2, yb + hc / 2), (b - a - 0.02, x1 - x0, hc - 0.012), p.tone(a * 1.3, yb),
-                            rot=RZ(math.pi / 2), skip=(5,), pillow=0.022, chip=0.05, knock=0.5 if gap else 0.12)
+                            rot=RZ(math.pi / 2), skip=(5,), bed=True, pillow=0.022, chip=0.05, knock=0.5 if gap else 0.12)
             if gap:
                 continue
-            missing = (s, k) in ((1, 2), (-1, 12), (-1, 6))
+            missing = (s, k) in MISSING_COPINGS
             if not missing:
                 cc = mix(p.tone(k, 9.0), mk.PEARL_PALE, 0.35)
                 tl = (rng.random() - 0.5) * (0.05 if not pier else 0.0)
                 p.block(B(cx, cz, top - cap / 2), (zn2 - zs2 + 0.1, x1 - x0 + 0.12, cap), cc, rot=RZ(math.pi / 2) @
-                        Matrix.Rotation(tl, 4, 'X'), skip=(5,), pillow=0.0, chip=0.05)
+                        Matrix.Rotation(tl, 4, 'X'), skip=(5,), pillow=0.0, chip=0.05, bed=True)
             else:
                 # the coping stone has slid off and lies on the bank
                 ox = s * (x1 + 0.75)
@@ -454,15 +526,20 @@ def shaft_r(t, r0=0.47):
     return r0 * (1.0 + 0.045 * math.sin(min(1.0, t / 0.36) * math.pi / 2) - 0.2 * max(0.0, t - 0.2) ** 1.25)
 
 
-def drum(p, c, z0, z1, t0, t1, col, flutes=12, ph=0.0, r0=0.47, M=None, cap=(False, False)):
-    rings = [drum_ring(c, shaft_r(t0, r0) * 0.985, flutes, z0 + 0.012, ph),
+def drum(p, c, z0, z1, t0, t1, col, flutes=12, ph=0.0, r0=0.47, M=None, cap=(False, False), bedded=0.0):
+    """One drum of a shaft. `bedded` carries its two ends that far past its
+    joints, so a standing drum is set in the one under it: no open slit at
+    the joint, and its closed ends hide where the flutes do not line up."""
+    rings = [drum_ring(c, shaft_r(t0, r0) * 0.985, flutes, z0 + 0.012 - bedded, ph),
              drum_ring(c, shaft_r(t0, r0), flutes, z0 + 0.04, ph),
              drum_ring(c, shaft_r(t1, r0), flutes, z1 - 0.04, ph),
-             drum_ring(c, shaft_r(t1, r0) * 0.985, flutes, z1 - 0.012, ph)]
+             drum_ring(c, shaft_r(t1, r0) * 0.985, flutes, z1 - 0.012 + bedded, ph)]
     if M is not None:
         rings = [[M @ q for q in ring] for ring in rings]
     n = flutes * 2
-    p.loft(rings, col, smooth_face=False, cap0=cap[0], cap1=cap[1],
+    # (a standing drum's two beds lie in the joint: dark, so the sliver of one that shows
+    # where the flutes of two drums do not line up reads as the joint's shadow)
+    p.loft(rings, col, smooth_face=False, cap0=cap[0], cap1=cap[1], cap_color=scale(col, 0.4) if bedded else None,
            cols=lambda i, kk: scale(col, (1.04 if kk % 2 == 0 else 0.80) * (0.9 if i in (0, 3) else 1.0)))
     return n
 
@@ -481,12 +558,13 @@ def column(p, lx, lz, state):
     col0 = mix(mk.PEARL, mk.PEARL_PALE, 0.3)
     base_y = hi + 0.62
     # the plinth: a bedded footing course, the die, a moulded cap
-    p.block(B(lx, lz, (lo + hi + 0.12) / 2), (1.9, 1.9, hi + 0.12 - lo), p.tone(lx, 1.0), skip=(5,), pillow=0.012, chip=0.04)
-    p.block(B(lx, lz, hi + 0.33), (1.5, 1.5, 0.44), p.tone(lx, 2.0), skip=(5,), pillow=0.02, chip=0.045)
-    p.block(B(lx, lz, base_y - 0.05), (1.66, 1.66, 0.14), mk.PEARL_PALE, skip=(5,), pillow=0.0, chip=0.04, knock=0.4)
+    p.block(B(lx, lz, (lo + hi + 0.12) / 2), (1.9, 1.9, hi + 0.12 - lo), p.tone(lx, 1.0), skip=(5,), bed=True, pillow=0.012, chip=0.04)
+    p.block(B(lx, lz, hi + 0.27), (1.5, 1.5, 0.56), p.tone(lx, 2.0), skip=(5,), bed=True, pillow=0.02, chip=0.045)
+    p.block(B(lx, lz, base_y - 0.05), (1.66, 1.66, 0.14), mk.PEARL_PALE, skip=(5,), pillow=0.0, chip=0.04, knock=0.4,
+            bed=True)
     p.phase_disc(B(lx, lz, 0) + Vector((0, 0.755, hi + 0.33)), (0, 1, 0), (0, 0, 1), 0.13, 0.5, 0.2, live=False)
     # the attic base: plinth, torus, scotia, torus
-    p.block(B(lx, lz, base_y + 0.1), (1.2, 1.2, 0.2), p.tone(lx, 3.0), skip=(5,), pillow=0.0, chip=0.04)
+    p.block(B(lx, lz, base_y + 0.1), (1.2, 1.2, 0.2), p.tone(lx, 3.0), skip=(5,), bed=True, pillow=0.0, chip=0.04)
     p.lathe((c.x, c.y, base_y + 0.2), [(0.58, 0), (0.62, 0.06), (0.58, 0.13), (0.51, 0.17), (0.51, 0.22), (0.55, 0.27),
                                        (0.51, 0.33), (0.48, 0.35)], 16, col0, smooth=True)
     z = base_y + 0.55
@@ -496,32 +574,39 @@ def column(p, lx, lz, state):
     n_stand = {'whole': 5, 'broken': 2, 'stump': 3, 'fallen': 0}[state]
     lean = {'stump': (0.03, 0.02)}.get(state, (0, 0))
     top = z
+    shaft = SHAFTS[(lx, lz)] = {'z': z, 'dh': dh, 'offs': [], 'moss': None}
     for i in range(n_stand):
         cc = mix(p.tone(lx + i, lz), col0, 0.5)
         off = Vector(((rng.random() - 0.5) * 0.03 + lean[0] * i, (rng.random() - 0.5) * 0.03 + lean[1] * i, 0))
+        shaft['offs'].append(off)
         last_broken = state in ('broken', 'stump') and i == n_stand - 1
         z1 = z + dh * (i + 1)
         if last_broken:
             # the break: a ragged top
-            rings = [drum_ring(c + off, shaft_r(i / drums), 12, z + dh * i + 0.03, 0.2 * i)]
+            rings = [drum_ring(c + off, shaft_r(i / drums), 12, z + dh * i - 0.006, 0.2 * i)]
             rag = [q + Vector((0, 0, dh * (0.35 + 0.6 * rng.random()))) for q in
                    drum_ring(c + off, shaft_r((i + 0.6) / drums), 12, z + dh * i, 0.2 * i)]
             rings.append(rag)
-            p.loft(rings, cc, smooth_face=False, cols=lambda ii, kk, cc=cc: scale(cc, 1.04 if kk % 2 == 0 else 0.8))
+            p.loft(rings, cc, smooth_face=False, cap0=True, cap_color=scale(cc, 0.4),
+                   cols=lambda ii, kk, cc=cc: scale(cc, 1.04 if kk % 2 == 0 else 0.8))
             ctr = c + off + Vector((0, 0, z + dh * (i + 0.42)))
             for kk in range(len(rag)):
                 p.face((rag[kk], rag[(kk + 1) % len(rag)], ctr), scale(mk.PEARL_PALE, 0.92), want=(0, 0, 1))
+            shaft['moss'] = (ctr, 0.14)
             top = z + dh * (i + 0.9)
         else:
             drum(p, c + off, z + dh * i, z1, i / drums, (i + 1) / drums, cc, ph=0.2 * i + 0.1 * rng.random(),
-                 cap=(False, i == n_stand - 1 and state != 'whole'))
+                 cap=(True, True), bedded=0.018)
             top = z1
     if state == 'whole':
         # the capital: necking, echinus, abacus, and the crescent the Court set on it
-        p.lathe((c.x, c.y, top), [(0.385, 0), (0.41, 0.05), (0.385, 0.1), (0.45, 0.2), (0.62, 0.36), (0.66, 0.42)], 16,
-                mix(col0, mk.PEARL_WARM, 0.5), smooth=True)
+        # (the echinus runs a finger into the abacus, whose bed lies on it: seen
+        # from the stair below, the slab rests on the bell all the way round)
+        p.lathe((c.x, c.y, top - 0.004), [(0.385, 0), (0.41, 0.054), (0.385, 0.104), (0.45, 0.204), (0.62, 0.364),
+                                          (0.66, 0.44)], 16, mix(col0, mk.PEARL_WARM, 0.5), smooth=True)
         p.block(Vector((c.x, c.y, top + 0.52)), (1.36, 1.36, 0.2), mk.PEARL_PALE, skip=(5,), pillow=0.0, chip=0.06,
-                knock=0.5)
+                knock=0.5, bed=True)
+        shaft['moss'] = (Vector((c.x + 0.3, c.y + 0.3, top + 0.616)), 0.2)
         for s2 in (-1, 1):
             pts = p.bezier(Vector((c.x + s2 * 0.2, c.y, top + 0.62)), Vector((c.x + s2 * 0.66, c.y, top + 0.98)),
                            Vector((c.x + s2 * 0.3, c.y, top + 1.4)), steps=4)
@@ -547,9 +632,9 @@ def column(p, lx, lz, state):
                 p.turn(m, M)
         collider_circle('fallen_drums', -10.3, -14.7, 1.5, WATER + 1.1)
         # the plinth keeps the broken foot of its shaft
-        rings = [drum_ring(c, shaft_r(0), 12, z + 0.03),
+        rings = [drum_ring(c, shaft_r(0), 12, z - 0.006),
                  [q + Vector((0, 0, 0.25 + 0.4 * rng.random())) for q in drum_ring(c, shaft_r(0.05), 12, z)]]
-        p.loft(rings, col0, smooth_face=False, cols=lambda ii, kk: scale(col0, 1.04 if kk % 2 == 0 else 0.8))
+        p.loft(rings, col0, smooth_face=False, cap0=True, cols=lambda ii, kk: scale(col0, 1.04 if kk % 2 == 0 else 0.8))
         for kk in range(24):
             p.face((rings[1][kk], rings[1][(kk + 1) % 24], c + Vector((0, 0, z + 0.3))), scale(mk.PEARL_PALE, 0.9),
                    want=(0, 0, 1))
@@ -559,6 +644,11 @@ def column(p, lx, lz, state):
 
 
 # ================================================================ the penitents
+def penitent_lean(z):
+    """How far a penitent's figure leans forward at height z over its plinth."""
+    return 0.0 if z < 2.45 else 0.55 * ((z - 2.45) / 1.15) ** 1.35
+
+
 def penitent(p, lx, lz, pose, yaw, lean):
     """A penitent of the Pale Choir in pearl stone: robed, cowled, the head
     bowed; 'offering' holds a silver crescent in both hands under the bowed
@@ -572,8 +662,7 @@ def penitent(p, lx, lz, pose, yaw, lean):
     famp = [0.6 + 0.8 * rng.random() for _ in range(folds)]
     ftop = [1.6 + 1.6 * rng.random() for _ in range(folds)]      # where each fold dies out
 
-    def lean_y(z):
-        return 0.0 if z < 2.45 else 0.55 * ((z - 2.45) / 1.15) ** 1.35
+    lean_y = penitent_lean
 
     def fold(i, z, amp):
         """How far the cloth stands out at vertex i of a ring at height z."""
@@ -594,7 +683,7 @@ def penitent(p, lx, lz, pose, yaw, lean):
                                 z + hem * (0.5 + 0.5 * math.cos(math.pi * 2 * folds * i / seg + 0.7)))))
         return ring
 
-    prof = [(0.0, 1.10, 1.0, 0.2, 0.09), (0.28, 1.05, 0.95, 0.2, 0.02), (0.7, 0.98, 0.87, 0.18, 0), (1.2, 0.9, 0.78, 0.16, 0),
+    prof = [(-0.13, 1.10, 1.0, 0.2, 0.09), (0.28, 1.05, 0.95, 0.2, 0.02), (0.7, 0.98, 0.87, 0.18, 0), (1.2, 0.9, 0.78, 0.16, 0),
             (1.7, 0.81, 0.69, 0.13, 0), (2.1, 0.72, 0.6, 0.1, 0), (2.36, 0.65, 0.53, 0.06, 0), (2.5, 0.63, 0.5, 0.03, 0),
             (2.66, 0.69, 0.52, 0.04, 0), (2.9, 0.8, 0.56, 0.045, 0), (3.15, 0.9, 0.58, 0.04, 0), (3.36, 0.96, 0.55, 0.03, 0),
             (3.52, 0.9, 0.5, 0.02, 0), (3.66, 0.6, 0.4, 0.0, 0), (3.74, 0.34, 0.3, 0.0, 0)]
@@ -611,7 +700,7 @@ def penitent(p, lx, lz, pose, yaw, lean):
     gz = 2.5
     for dz in (-0.07, 0.07):
         cord = [[Vector((q.x * kx, (q.y - lean_y(gz)) * kx + lean_y(gz), gz + dz + dd)) for q in robe_ring(gz, 0.66, 0.53, 0.0)]
-                for (kx, dd) in ((1.0, -0.055), (1.07, -0.03), (1.07, 0.03), (1.0, 0.055))]
+                for (kx, dd) in ((0.94, -0.055), (1.07, -0.03), (1.07, 0.03), (0.94, 0.055))]
         p.loft(cord, scale(col, 0.86), smooth_face=True)
     for s in (-1, 1):
         x = s * 0.1
@@ -622,14 +711,16 @@ def penitent(p, lx, lz, pose, yaw, lean):
     p.rock(Vector((0, 0.62, gz)), (0.34, 0.26, 0.26), scale(col, 0.86), jitter=0.12, subdivisions=1)
     # the mantle of the cowl over the shoulders: a rolled, scalloped edge
     mant = []
-    for (z, rx, ry, sc) in ((3.02, 1.04, 0.68, 0.07), (3.1, 1.1, 0.72, 0.07), (3.34, 1.06, 0.68, 0.0), (3.58, 0.84, 0.6, 0.0),
+    # (its first ring is inside the robe: the underside of the rolled edge)
+    for (z, rx, ry, sc) in ((3.08, 0.84, 0.54, 0.0), (3.02, 1.04, 0.68, 0.07), (3.1, 1.1, 0.72, 0.07), (3.34, 1.06, 0.68, 0.0), (3.58, 0.84, 0.6, 0.0),
                             (3.78, 0.56, 0.48, 0.0), (3.92, 0.4, 0.4, 0.0)):
         mant.append([Vector((math.cos(TAU * i / seg) * rx * (1 + 0.045 * math.cos(7 * TAU * i / seg + 1.0)),
                              math.sin(TAU * i / seg) * ry + lean_y(z) + 0.03,
                              z + sc * math.cos(9 * TAU * i / seg + 0.4) - 0.12 * max(0.0, math.sin(TAU * i / seg)) * (z < 3.2)))
                      for i in range(seg)])
-    p.loft(mant, scale(col, 1.04),
-           cols=lambda i, kk: scale(col, (0.72 if i == 0 else 0.92) + 0.16 * (0.5 + 0.5 * math.cos(7 * TAU * kk / seg + 1.0))))
+    p.loft(mant, scale(col, 1.04), cap1=True,
+           cols=lambda i, kk: scale(col, (0.5 if i == 0 else 0.72 if i == 1 else 0.92) +
+                                    0.16 * (0.5 + 0.5 * math.cos(7 * TAU * kk / seg + 1.0))))
     # the hooded head, bowed: a deep cowl with a rolled rim, its peak fallen back
     bow = 0.66 if pose == 'offering' else 0.86
     hm = p.mark()
@@ -663,7 +754,7 @@ def penitent(p, lx, lz, pose, yaw, lean):
             return scale(col, 0.34)
         return scale(col, 1.08 if oval < 1.9 else 0.96)
 
-    p.loft(head, col, cols=head_col, cap1=True)
+    p.loft(head, col, cols=head_col, cap0=True, cap1=True)
     # the face in the cowl's shadow: brow, nose, cheeks and chin, no more than hinted
     fc = scale(col, 0.6)
     p.rock(Vector((0, 0.27, 0.56)), (0.56, 0.3, 0.66), scale(fc, 0.9), jitter=0.05, subdivisions=2)
@@ -701,11 +792,18 @@ def penitent(p, lx, lz, pose, yaw, lean):
                 droop = (1.0 + 0.85 * t * t) if sn < 0 else 1.0
                 ring.append(q + (e1 * math.cos(a) + e2 * sn * droop) * r)
             srings.append(ring)
-        p.loft(srings, scale(col, 0.97), cols=lambda i, kk: scale(col, 0.8 + 0.22 * ((kk + i) % 2)))
+        p.loft(srings, scale(col, 0.97), cap0=True, cols=lambda i, kk: scale(col, 0.8 + 0.22 * ((kk + i) % 2)))
         # the dark of the sleeve's mouth
         p.face(list(reversed(srings[-1])), scale(col, 0.45), want=(path[-1] - path[-2]))
         wrist = path[-1]
-        hand = wrist + (path[-1] - path[-2]).normalized() * 0.2 + Vector((-s * 0.05, 0, 0.02))
+        reach = (path[-1] - path[-2]).normalized()
+        hand = wrist + reach * 0.2 + Vector((-s * 0.05, 0, 0.02))
+        # the forearm: out of the sleeve's dark and into the hand (its own
+        # stream, so the flank's stones stay where they were)
+        own, p.rng = p.rng, random.Random(f'forearm {lx} {s}')
+        p.block(wrist + (hand - wrist) * 0.42, (0.15, 0.13, 0.34), scale(col, 0.92), chip=0.12, pillow=0.0, knock=0.0,
+                rot=(hand - wrist).to_track_quat('Z', 'Y').to_matrix().to_4x4())
+        p.rng = own
         rot = Matrix.Rotation(-0.75 if pose == 'offering' else -0.2, 4, 'X') @ Matrix.Rotation(-s * 0.3, 4, 'Y')
         p.block(hand, (0.22, 0.34, 0.14) if pose == 'offering' else (0.24, 0.14, 0.4), scale(col, 1.05), chip=0.14, pillow=0.0,
                 rot=rot)
@@ -719,7 +817,7 @@ def penitent(p, lx, lz, pose, yaw, lean):
         hands.append(hand)
     if pose == 'offering':
         # the crescent offered up in both hands: tarnished silver, its inner limb still alight
-        cc = (hands[0] + hands[1]) / 2 + Vector((0, 0.16, 0.2))
+        cc = (hands[0] + hands[1]) / 2 + Vector((0, 0.16, 0.13))       # (its bow lies in the two palms)
         arc = [math.pi * (1.1 + 0.8 * i / 10) for i in range(11)]
         outer = [cc + Vector((math.cos(a) * 0.46, 0.0, math.sin(a) * 0.46 + 0.24)) for a in arc]
         inner = [cc + Vector((math.cos(a) * 0.37, 0.0, math.sin(a) * 0.29 + 0.27)) for a in arc]
@@ -731,6 +829,13 @@ def penitent(p, lx, lz, pose, yaw, lean):
                            want=(0, wn, 0))
                 p.face((outer[i] + Vector((0, 0.07, 0)), outer[i + 1] + Vector((0, 0.07, 0)), outer[i + 1] - Vector((0, 0.07, 0)),
                         outer[i] - Vector((0, 0.07, 0))), scale(mk.SILVER_TARN, 1.2), want=(outer[i] - cc - Vector((0, 0, 0.24))))
+            # (the bow is a solid bar: its inner limb under the light, and its two tips)
+            o = Vector((0, 0.07, 0))
+            for i in (0, 9):
+                p.face((inner[i] + o, inner[i + 1] + o, inner[i + 1] - o, inner[i] - o), scale(mk.SILVER_TARN, 0.9),
+                       want=(0, 0, 1))
+            for (i, sgn) in ((0, -1), (10, 1)):
+                p.face((outer[i] + o, outer[i] - o, inner[i] - o, inner[i] + o), scale(mk.SILVER_TARN, 1.1), want=(sgn, 0, 0.4))
         with p.as_kind(K_GLOW):
             for i in range(1, 9):
                 p.face((inner[i] + Vector((0, 0.085, 0)), inner[i + 1] + Vector((0, 0.085, 0)), inner[i + 1] - Vector((0, 0.085, 0)),
@@ -738,6 +843,7 @@ def penitent(p, lx, lz, pose, yaw, lean):
     # the stepped plinth, drowned
     base = WATER + 0.42
     M = Matrix.Translation(B(lx, lz, base)) @ RZ(yaw) @ Matrix.Rotation(lean, 4, 'X')
+    STATUE_M[(lx, lz)] = M
     p.turn(m, M)
     lo = footing(f'penitent_{"w" if lx > 0 else "e"}', lx, lz, 1.15, 1.15, 0.0, 0.6)
     pc = B(lx, lz, 0)
@@ -807,7 +913,7 @@ def weir():
                     proud = (rng.random() - 0.5) * 0.06
                     cc = p.tone(x * 0.7 + i * 5, yb)
                     q = c0 + n * (proud + batter / 2)
-                    p.block(B(q.x, q.y, (yt + yb) / 2), (ln - 0.02, th + batter, hc - 0.012), cc, rot=rot, skip=(5,), joint=(1, 3),
+                    p.block(B(q.x, q.y, (yt + yb) / 2), (ln - 0.02, th + batter, hc - 0.012), cc, rot=rot, skip=(5,), bed=True, joint=(1, 3),
                             pillow=0.022, chip=0.06, knock=0.15)
                 x += ln
         # the coping
@@ -823,7 +929,8 @@ def weir():
             if not in_notch and not gone:
                 p.block(B(c0.x, c0.y, top - cap / 2 + (rng.random() - 0.5) * 0.02), (ln - 0.025, th + 0.16, cap),
                         mix(p.tone(x + i * 3, 0.0), mk.PEARL_PALE, 0.3), rot=rot @ Matrix.Rotation((rng.random() - 0.5) * 0.04, 4, 'X'),
-                        skip=(5,), pillow=0.0, chip=0.05, knock=0.25)
+                        skip=(5,), pillow=0.0, chip=0.05, knock=0.25, bed=True)
+                COPINGS.setdefault(i, []).append((x + ln / 2, ln / 2))
                 if rng.random() < 0.3:
                     SOCKETS['glints'].append([round(c0.x, 3), round(top + 0.01, 3), round(c0.y, 3)])
             x += ln
@@ -832,7 +939,8 @@ def weir():
             # the spill: a lip stone standing out of the wall, a green wet run under it
             c0 = a + d * (L * tn[0])
             lip = c0 + n * (th / 2 + 0.22)
-            p.block(B(lip.x, lip.y, WATER - 0.16), (tn[1] + 0.2, 0.7, 0.2), mk.PEARL_DARK, rot=rot, pillow=0.0, chip=0.05)
+            # (it lies on the course under the notch, its tail built into the wall)
+            p.block(B(lip.x, lip.y, WATER - 0.235), (tn[1] + 0.2, 0.7, 0.35), mk.PEARL_DARK, rot=rot, pillow=0.0, chip=0.03)
             g = gh(*(c0 + n * (th / 2 + 0.85)))
             edge = c0 + n * (th / 2 + 0.55)
             p.streaks.append((B(edge.x - n.x * 0.5, edge.y - n.y * 0.5, WATER - 0.1), tn[1] * 1.3, WATER - g + 0.6, 0.95))
@@ -850,6 +958,18 @@ def weir():
         p.lathe((lx, -lz, lo), [(0.8, 0), (0.74, ht - lo - 0.3), (0.74, ht - lo - 0.2), (0.82, ht - lo - 0.16), (0.82, ht - lo - 0.07),
                                 (0.6, ht - lo), (0.0, ht - lo + 0.1)], 8, p.tone(i * 3.0, 0.0), phase=TAU / 16 + i, smooth=False)
     return p
+
+
+def on_coping(i, along, L):
+    """Where along weir segment i a thing set at `along` lands on a coping
+    stone that is still there, clear of the bollards at the wall's two turns;
+    None when the segment has no such stone."""
+    spans = [(max(1.1, c - hl + 0.15), min(L - 1.1, c + hl - 0.15)) for (c, hl) in COPINGS.get(i, [])]
+    spans = [sp for sp in spans if sp[1] > sp[0]]
+    if not spans:
+        return None
+    a0, a1 = min(spans, key=lambda sp: max(sp[0] - along, along - sp[1], 0.0))
+    return max(a0, min(a1, along))
 
 
 def inside_weir(lx, lz, margin=0.0):
@@ -874,14 +994,21 @@ def inside_weir(lx, lz, margin=0.0):
 
 
 # =============================================================== the moon pool
-def ring_stone(p, c, r0, r1, a0, a1, z0, z1, color, **kw):
+def ring_stone(p, c, r0, r1, a0, a1, z0, z1, color, level=False, **kw):
+    """A stone of a round course. `level` keeps its top true (a kerb that
+    carries an inlay); otherwise each top corner is worn down a little."""
     cs = []
     for z in (z0, z1):
         for (r, a) in ((r1, a0), (r1, a1), (r0, a1), (r0, a0)):
             q = 0.03 * p.rng.random()
             cs.append(Vector((c[0] + math.cos(a) * (r - q if r == r1 else r + q), c[1] + math.sin(a) * (r - q if r == r1 else r + q),
-                              z - (q if z == z1 else 0))))
-    return p._hewn(cs, color, joint=(1, 3), skip=(5,), **kw)
+                              z - (q if z == z1 and not level else 0))))
+    return p._hewn(cs, color, joint=(1, 3), skip=(5,), level=level, **kw)
+
+
+def pool_step_sink(i):
+    """How far stone i (of 20) of the pool's outer step has sunk."""
+    return 0.09 if i in (3, 9, 14) else (0.03 if i % 4 == 1 else 0.0)
 
 
 def moon_pool():
@@ -897,7 +1024,7 @@ def moon_pool():
     n = 20
     for i in range(n):
         a0, a1 = TAU * i / n + 0.012, TAU * (i + 1) / n - 0.012
-        sink = 0.09 if i in (3, 9, 14) else (0.03 if i % 4 == 1 else 0.0)
+        sink = pool_step_sink(i)
         ring_stone(p, c, r + 0.98, r + 1.62, a0, a1, lo, rim - 0.36 - sink, scale(p.tone(i * 2.1, 1.0), 0.96), pillow=0.02,
                    pillows=(0,))
     # the kerb, the lunar month inlaid round it
@@ -910,12 +1037,12 @@ def moon_pool():
         col = p.tone(i * 1.9, 2.0)
         if i == 9:
             continue                      # one kerb stone is gone
-        ring_stone(p, c, r + 0.3 + out, r + 1.04 + out, a0, a1, rim - 0.7, rim - 0.02 - (0.06 if i in slipped else 0.0), col,
-                   pillow=0.015, pillows=(0,))
+        ring_stone(p, c, r + 0.3 + out, r + 1.04 + out, a0, a1, lo, rim - 0.02 - (0.06 if i in slipped else 0.0), col,
+                   level=True, pillow=0.015, pillows=(0,))
         nrm = Vector((math.cos(am), math.sin(am), 0))
         ph = 0.5 - 0.5 * math.cos(TAU * i / n)
         live = i % 3 == 0
-        q = c + nrm * (r + 0.67 + out) + Vector((0, 0, rim - 0.012 - (0.06 if i in slipped else 0.0)))
+        q = c + nrm * (r + 0.67 + out) + Vector((0, 0, rim - 0.014 - (0.06 if i in slipped else 0.0)))
         p.phase_disc(q, (0, 0, 1), nrm, 0.16, ph, 0.985, live=live, waning=i > n / 2)
         if live:
             SOCKETS['pool_runes'].append([round(q.x, 3), round(q.z, 3), round(-q.y, 3), 0.985, 0.16])
@@ -925,7 +1052,7 @@ def moon_pool():
         if 14 <= i <= 15:
             continue
         a0, a1 = TAU * i / n + 0.01, TAU * (i + 1) / n - 0.01
-        ring_stone(p, c, r - 0.02, r + 0.32, a0, a1, rim - 0.7, rim + 0.07, mix(p.tone(i * 1.3, 3.0), mk.PEARL_PALE, 0.4),
+        ring_stone(p, c, r - 0.02, r + 0.32, a0, a1, lo, rim + 0.07, mix(p.tone(i * 1.3, 3.0), mk.PEARL_PALE, 0.4),
                    pillow=0.03, pillows=(0, 2, 4))
     # three stelae of the Court behind the pool, one broken
     for (a, h, tilt, broken) in ((1.12, 3.9, 0.05, False), (1.62, 4.9, -0.03, False), (2.14, 2.2, 0.09, True)):
@@ -935,8 +1062,8 @@ def moon_pool():
         m = p.mark()
         col = p.tone(a * 5.0, 1.0)
         stela(p, h, 1.5, 1.14, 0.5, col, broken=broken)
-        p.block(Vector((0, 0, 0.14)), (2.0, 0.95, 0.5), scale(col, 0.95), chip=0.05, pillow=0.012, skip=(5,))
-        p.block(Vector((0, 0, 0.47)), (1.72, 0.74, 0.16), mk.PEARL_PALE, chip=0.05, pillow=0.0, skip=(5,))
+        p.block(Vector((0, 0, 0.14)), (2.0, 0.95, 0.5), scale(col, 0.95), chip=0.05, pillow=0.012, skip=(5,), bed=True)
+        p.block(Vector((0, 0, 0.47)), (1.72, 0.74, 0.16), mk.PEARL_PALE, chip=0.05, pillow=0.0, skip=(5,), bed=True)
         if not broken:
             for s in (-1, 1):
                 with p.as_kind(K_SILVER):
@@ -986,24 +1113,31 @@ def growth():
         am = ring_angle(k)
         if math.sin(am) > 0.3 and rng.random() < 0.55:
             a = am + (rng.random() - 0.5) * 0.2
-            q = cb + Vector((math.cos(a), 0, math.sin(a))) * (R_OUT + 0.03) + Vector((0, (rng.random() - 0.5) * 1.3, 0))
+            q = cb + Vector((math.cos(a), 0, math.sin(a))) * (RING_FACES[k][2] * math.cos(TAU / BLOCKS / 2) / math.cos(a - am) + 0.006) + \
+                Vector((0, (rng.random() - 0.5) * 1.3 + RING_FACES[k][1], 0))
             gate.moss(q, 0.24 + 0.22 * rng.random(), normal=(math.cos(a), 0, math.sin(a)), height=0.07)
     for s in (-1, 1):
         for _ in range(3):
-            gate.moss(B(s * (3.0 + rng.random() * 1.8), (rng.random() - 0.5) * 2.0, D + 0.96), 0.25 + 0.2 * rng.random())
+            # on the cradle's lower step, clear of the ring and of the step over it
+            u, v = rng.random(), rng.random() - 0.5
+            gate.moss(B(s * (3.0 + u * 1.26), math.copysign(0.92 + abs(v) * 0.3, v), D + 0.945),
+                      0.16 + 0.12 * rng.random())
         for _ in range(2):
-            gate.moss(B(s * (4.4 + rng.random() * 1.0), (rng.random() - 0.5) * 1.8, D + 1.71), 0.22 + 0.2 * rng.random())
+            # on the upper step, in the crevice at the ring's foot
+            u, v = rng.random(), rng.random() - 0.5
+            gate.moss(B(s * (5.05 + u * 0.4), v * 1.7, D + 1.715), 0.16 + 0.14 * rng.random())
     for (a_from, a_to, y, wob) in ((math.pi * 1.2, math.pi * 0.66, RING_Y + 0.11, 0.2), (math.pi * 1.16, math.pi * 0.84, RING_Y + 0.1, 0.28),
                                    (-0.22, 0.24, RING_Y + 0.1, 0.25), (math.pi * 1.2, math.pi * 0.8, -RING_Y - 0.1, 0.3),
                                    (-0.2, 0.42, -RING_Y - 0.1, 0.26)):
         pts = []
         n = 24
+        sg = 1 if y > 0 else -1
         for i in range(n + 1):
             t = i / n
             a = a_from + (a_to - a_from) * t
-            rr = RING_R + math.sin(t * 9.0 + y) * wob * 1.6
-            pts.append(cb + Vector((math.cos(a) * rr, y, math.sin(a) * rr)))
-        sg = 1 if y > 0 else -1
+            rr = RING_R + math.sin(t * 9.0 + y) * wob         # (between the two archivolt mouldings)
+            y1, slip, _r1 = RING_FACES.get((round((a - math.pi / 2) / (TAU / BLOCKS)) + 7) % BLOCKS, (RING_Y, 0.0, R_OUT))
+            pts.append(cb + Vector((math.cos(a) * rr, sg * (y1 + 0.03) + slip, math.sin(a) * rr)))
         gate.creeper(pts, leaf=0.19, every=0.2, flowers=0.2, normals=lambda i, sg=sg: (0, sg, 0))
     for _ in range(16):
         x, z = (rng.random() - 0.5) * 2 * (DAIS['hw'] - 0.4), DAIS['z0'] + rng.random() * (DAIS['z1'] - DAIS['z0'])
@@ -1041,26 +1175,36 @@ def growth():
             if s > 0 and BREACH[0] <= k < BREACH[1]:
                 continue
             if not pier and rng.random() < 0.8:
-                stair.moss(B(s * (HS + 0.1 + rng.random() * (CHEEK - 0.15)), zn - rng.random() * 0.9, top + 0.004),
+                bare = 0.226 if (s, k) in MISSING_COPINGS else 0.0
+                stair.moss(B(s * (HS + 0.1 + rng.random() * (CHEEK - 0.15)), zn - rng.random() * 0.9, top + 0.004 - bare),
                            0.16 + 0.18 * rng.random(), height=0.06)
     for (cx, cz, base, top, state) in SOCKETS.get('columns', []):
         stair = flank[1 if cx > 0 else -1]
         if state == 'fallen':
             continue
+        shaft = SHAFTS[(cx, cz)]
         turns = 1.9 if state == 'whole' else 0.9
-        h = (top - base) - (1.5 if state == 'whole' else 0.3)
+        # (it climbs to the necking of a whole column, and stops under the break of a broken one)
+        h = (top - base) - (1.5 if state == 'whole' else 0.3 + 0.6 * shaft['dh'])
         n = int(20 * turns)
         ph = rng.random() * TAU
-        pts = []
+        pts, axis = [], []
         for i in range(n + 1):
             t = i / n
             a = ph + turns * TAU * t
-            rr = 0.5 if t > 0.1 else 0.64
-            pts.append(B(cx, cz, 0) + Vector((math.cos(a) * rr, math.sin(a) * rr, base + 0.1 + h * t)))
-        c0 = B(cx, cz, 0)
+            zz = base + 0.1 + h * t
+            ts = (zz - shaft['z']) / (shaft['dh'] * 5)
+            if ts > 0:
+                # on the shaft: its own drum's axis and the entasis' radius
+                c0 = B(cx, cz, 0) + shaft['offs'][min(len(shaft['offs']) - 1, int(ts * 5))]
+                rr = shaft_r(min(1.0, ts)) + 0.012
+            else:
+                c0, rr = B(cx, cz, 0), 0.64                     # over the attic base
+            axis.append(c0)
+            pts.append(c0 + Vector((math.cos(a) * rr, math.sin(a) * rr, zz)))
         stair.creeper(pts, leaf=0.2, every=0.2, flowers=0.22,
-                      normals=lambda i, pts=pts, c0=c0: (pts[i].x - c0.x, pts[i].y - c0.y, 0))
-        stair.moss(B(cx, cz, top + 0.01), 0.3, height=0.08)
+                      normals=lambda i, pts=pts, axis=axis: (pts[i].x - axis[i].x, pts[i].y - axis[i].y, 0))
+        stair.moss(shaft['moss'][0] + Vector((0, 0, 0.005)), shaft['moss'][1], height=0.08)
         for _ in range(3):
             a = rng.random() * TAU
             g = gh(cx + math.cos(a) * 1.2, cz + math.sin(a) * 1.2)
@@ -1086,10 +1230,15 @@ def growth():
             n = Vector((math.cos(a), math.sin(a), 0))
             stair.weed(B(lx, lz, 0) + n * 1.38 + Vector((0, 0, WATER + 0.28)), 0.3 + 0.12 * rng.random(), n, width=0.8, blades=5,
                        blade=0.03)
+        M = STATUE_M[(lx, lz)]
         for _ in range(5):
             a = rng.random() * TAU
-            stair.moss(B(lx, lz, 0) + Vector((math.cos(a) * 0.7, math.sin(a) * 0.4, base + 3.44 + rng.random() * 0.2)),
-                       0.2 + 0.15 * rng.random(), height=0.06)
+            z = 3.36 + rng.random() * 0.2
+            u = (z - 3.34) / 0.24                          # between the mantle's shoulder ring and the next
+            q = Vector((math.cos(a) * (1.06 - 0.22 * u) * (1 + 0.045 * math.cos(7 * a + 1.0)),
+                        math.sin(a) * (0.68 - 0.08 * u) + penitent_lean(z) + 0.03, z))
+            stair.moss(M @ q, 0.2 + 0.15 * rng.random(), normal=M.to_3x3() @ Vector((math.cos(a) * 0.6, math.sin(a) * 0.6, 0.8)),
+                       height=0.06)
     # ---- the works: lilies on the mirror, reed beds against the weir and the shores, moss on the pool
     rng = works.rng
     beds = [(-1.5, -17.6, 2.4, 13), (3.0, -18.2, 1.6, 7), (-9.5, -18.0, 2.2, 9), (9.0, -19.0, 1.0, 3),
@@ -1126,9 +1275,14 @@ def growth():
                 continue
             works.reeds(B(q.x, q.y, gh(q.x, q.y)), radius=0.45, stems=5 + rng.randrange(3), height=1.7 + rng.random() * 1.0)
         for _ in range(int(L / 1.6)):
-            q = a + d * (L * rng.random())
-            works.moss(B(q.x + (rng.random() - 0.5) * 0.6, q.y + (rng.random() - 0.5) * 0.6, WATER + 0.245),
-                       0.18 + 0.2 * rng.random(), height=0.06)
+            along = L * rng.random()
+            dx, dz = (rng.random() - 0.5) * 0.6, (rng.random() - 0.5) * 0.6
+            rad = 0.18 + 0.2 * rng.random()
+            seat = on_coping(i, along, L)
+            # (on a coping stone that is still there; where a whole run is gone, on the bare course under it)
+            q = a + d * (along if seat is None else seat)
+            side = max(-0.3, min(0.3, Vector((dx, dz)).dot(n)))
+            works.moss(B(q.x + n.x * side, q.y + n.y * side, WATER + (0.245 if seat is not None else 0.045)), rad, height=0.06)
     for (lx, lz, n, sp) in ((-21.0, -20.0, 5, 2.6), (-20.0, -15.5, 4, 2.2), (11.5, -14.6, 4, 1.8), (-13.5, -12.6, 4, 2.0)):
         for _ in range(n):
             x, z = lx + (rng.random() - 0.5) * 2 * sp, lz + (rng.random() - 0.5) * 2 * sp
@@ -1150,8 +1304,15 @@ def growth():
     for i in range(22):
         a = rng.random() * TAU
         rr = pool['r'] + 0.36 + rng.random() * 1.2
-        works.moss(pc + Vector((math.cos(a) * rr, math.sin(a) * rr, pool['rim'] - 0.016 - (0.34 if rr > pool['r'] + 1.0 else 0))),
-                   0.16 + 0.2 * rng.random(), height=0.06)
+        q = pc + Vector((math.cos(a) * rr, math.sin(a) * rr, pool['rim'] - 0.016))
+        if rr > pool['r'] + 1.0:
+            q.z -= 0.36 + pool_step_sink(int(a / (TAU / 20)))      # down on the outer step, sunk as its stone is
+        kerb = int(a / (TAU / 24))
+        if kerb == 9 and rr < pool['r'] + 1.0:
+            q.z = gb(q.x, q.y) + 0.01                      # the kerb stone that is gone: the moss is on the earth it left
+        elif kerb in (5, 15) and rr < pool['r'] + 1.0:
+            q.z -= 0.06                                    # the two kerb stones that have slipped and sunk
+        works.moss(q, 0.16 + 0.2 * rng.random(), height=0.06)
     for i in range(14):
         a = rng.random() * TAU
         rr = pool['r'] + 1.8 + rng.random() * 1.3
@@ -1161,7 +1322,7 @@ def growth():
         if rng.random() < 0.6:
             for _ in range(3):
                 q = B(x + (rng.random() - 0.5) * 0.5, z + (rng.random() - 0.5) * 0.5, g + 0.24 + rng.random() * 0.2)
-                works.blade(q - Vector((0, 0, 0.27)), q, 0.012, mk.STEM)
+                works.blade(Vector((q.x, q.y, gb(q.x, q.y) - 0.04)), q, 0.012, mk.STEM)
                 works.moonflower(q, (rng.random() - 0.5, rng.random() - 0.5, 1.0), size=0.12)
     return [gate, treads, flank[-1], flank[1], works]
 
@@ -1290,7 +1451,7 @@ def main():
     ec.build_terrain(GR, 'thornpeak', paths=[])
     import temple_renders
     temple_renders.dress(GR, stats, walk)
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, 'drowned_temple_entrance_v2.blend'))
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, BLEND))
     if RENDERS != 'none':
         temple_renders.run(OUT, GR, SURR, COLLIDERS, RENDERS, walk, TAG)
 

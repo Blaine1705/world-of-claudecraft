@@ -23,21 +23,21 @@ const ROOT = path.join(__dirname, '..');
 
 const PINS: Record<string, { sha: string; bytes: number; triangles: number; maxBytes: number }> = {
   'public/models/props/drowned_temple_entrance.glb': {
-    sha: '2bcb18e7ce633d58d04f2aa32234d6d601e33e3f4cc2c25b12fc94995ed4610d',
-    bytes: 484536,
-    triangles: 24676,
+    sha: '18ce9695c3a71844243496a9508827ee2cd1c16af11f90f23f1d41205bddf18f',
+    bytes: 510152,
+    triangles: 26879,
     maxBytes: 560 * 1024,
   },
   'public/models/props/drowned_temple_entrance_works.glb': {
-    sha: '69ac6c27ba330dbbb12c497a07090ac4290dc503d495198bc1cd825639b54c4a',
-    bytes: 109524,
-    triangles: 5532,
+    sha: 'f5ce3c05506d501dff95bd15665e1395001e6bfaca3f6b0621c8dd9329dc34ef',
+    bytes: 112944,
+    triangles: 5792,
     maxBytes: 170 * 1024,
   },
   'public/models/props/drowned_temple_entrance_growth.glb': {
-    sha: '9555e94706b97c2c1b11ac64139d7053b03199446e3a578799c2d960d26749f4',
-    bytes: 250468,
-    triangles: 12615,
+    sha: '9be43c8bf322c80b0612099e6076779385f70e03cf8a728357cdc00c96c4c188',
+    bytes: 261416,
+    triangles: 13106,
     maxBytes: 290 * 1024,
   },
 };

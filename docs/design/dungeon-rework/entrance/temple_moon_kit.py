@@ -86,7 +86,9 @@ PETAL = (0.93, 0.92, 0.88)
 PETAL_BLUSH = (0.92, 0.80, 0.84)
 PETAL_MOON = (0.80, 0.86, 0.97)
 STAMEN = (0.90, 0.74, 0.30)
-VINE = ((0.17, 0.27, 0.15), (0.21, 0.32, 0.17), (0.14, 0.23, 0.15), (0.26, 0.33, 0.19))
+# The creeper's leaf: a dark blue-green, the mere's own colour, kept light
+# enough to read as a leaf against pale stone by day and under the moon.
+VINE = ((0.17, 0.42, 0.37), (0.21, 0.48, 0.39), (0.15, 0.37, 0.36), (0.26, 0.50, 0.38))
 STEM = (0.17, 0.15, 0.10)
 
 
@@ -211,18 +213,40 @@ class Moon(hckit.Piece):
         return self._outward(super().prism(*a, **kw))
 
     # ------------------------------------------------------------- blocks
-    def _hewn(self, cs, color, pillow=0.03, pillows=(0, 1, 2, 3, 4, 5), skip=(), joint=(), knock=0.12):
+    def _hewn(self, cs, color, pillow=0.03, pillows=(0, 1, 2, 3, 4, 5), skip=(), joint=(), knock=0.12, bed=False,
+              level=False, keep=None):
         """Faces of a hexahedron from its 8 corners (bottom ring 0..3, top
         ring 4..7, both counter-clockwise from above). Face ids: 0 south
         (0,1,5,4), 1 east (1,2,6,5), 2 north (2,3,7,6), 3 west (3,0,4,7),
         4 top, 5 bottom. Pillowed faces get a raised centre and four facets;
-        joint faces are dark."""
+        joint faces are dark. A knocked bed corner breaks off in plan only, so
+        the bed stays flat and the stone still sits on what carries it. `bed`
+        gives a stone whose bottom is skipped a flat, shadowed bed face: for
+        every stone that oversails its support, where a player below would
+        otherwise look up into a hollow shell. `level` keeps the top true the
+        same way (a stone that carries an inlay), and `keep` (a unit vector)
+        keeps a knocked corner where it was along that axis: the corner breaks
+        off round a face that carries an inlay, never back from it ('all' keeps
+        the corner whole: a stone that carries mouldings to its very arris)."""
         rng = self.rng
         cs = [Vector(c) for c in cs]
         ctr = sum(cs, Vector()) / 8
         if rng.random() < knock:
             i = rng.choice((4, 5, 6, 7, 4, 5, 6, 7, 0, 1, 2, 3))
-            cs[i] = ctr + (cs[i] - ctr) * (0.72 + 0.16 * rng.random())
+            k = 0.72 + 0.16 * rng.random()
+            was = cs[i].copy()
+            if i < 4:
+                low = sum(cs[:4], Vector()) / 4
+                cs[i] = low + (cs[i] - low) * k
+            elif level:
+                high = sum(cs[4:], Vector()) / 4
+                cs[i] = high + (cs[i] - high) * k
+            else:
+                cs[i] = ctr + (cs[i] - ctr) * k
+            if keep == 'all':
+                cs[i] = was
+            elif keep is not None:
+                cs[i] += Vector(keep) * (was - cs[i]).dot(Vector(keep))
         m = min((cs[1] - cs[0]).length, (cs[3] - cs[0]).length, (cs[4] - cs[0]).length)
         quads = ((0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7), (4, 5, 6, 7), (3, 2, 1, 0))
         edge = scale(color, 0.86 + 0.06 * rng.random())
@@ -232,6 +256,8 @@ class Moon(hckit.Piece):
         made = []
         for fi, quad in enumerate(quads):
             if fi in skip:
+                if fi == 5 and bed:
+                    made.append(self.face([cs[i] for i in quad], scale(color, 0.6), centre=ctr))
                 continue
             if fi in joint:
                 jc = scale(color, 0.42)
@@ -280,12 +306,16 @@ class Moon(hckit.Piece):
             cs.append(M @ p if M is not None else p)
         return self._hewn(cs, color, **kw)
 
-    def wedge(self, centre, r0, r1, a0, a1, y0, y1, color, chip=0.05, gap=0.012, shift=(0.0, 0.0, 0.0), **kw):
+    def wedge(self, centre, r0, r1, a0, a1, y0, y1, color, chip=0.05, gap=0.012, shift=(0.0, 0.0, 0.0), true_faces=False,
+              sound=False, **kw):
         """A voussoir of a ring standing in the XZ plane about `centre`
         (Blender X across, Z up), from angle a0 to a1 (0 = +X, anticlockwise
         seen from -Y... the ring's south face is +Y), radii r0 to r1, depth
         y0 to y1 (Blender Y offsets from the centre). shift = (radial, along
-        Y, twist): a slipped stone."""
+        Y, twist): a slipped stone. true_faces keeps its two faces (the
+        planes Y = y0 and y1) true: no chip back from them, and a knocked
+        corner breaks round the face (a voussoir whose face carries an inlay).
+        sound keeps every corner whole (one that carries mouldings)."""
         rng = self.rng
         cx, cy, cz = centre
         am = (a0 + a1) / 2
@@ -296,23 +326,31 @@ class Moon(hckit.Piece):
             for (a, y) in ((a0 + gap, y1), (a1 - gap, y1), (a1 - gap, y0), (a0 + gap, y0)):
                 rr = r + (q if r == r0 else -q) * rng.random() ** 2 + shift[0]
                 aa = a + (am - a) * (q / max(0.2, r * abs(a1 - a0))) * rng.random() ** 2 + shift[2]
-                yy = y - math.copysign(q * rng.random() ** 2, y - (y0 + y1) / 2) + shift[1]
+                back = math.copysign(q * rng.random() ** 2, y - (y0 + y1) / 2)
+                yy = y - (0.0 if true_faces else back) + shift[1]
                 cs.append(Vector((cx + math.cos(aa) * rr, cy + yy, cz + math.sin(aa) * rr)))
         # _hewn face ids for this corner order: 0 = +Y face (south), 2 = -Y
         # face (north), 1 and 3 the joints, 4 the extrados, 5 the intrados.
-        return self._hewn(cs, color, joint=(1, 3), **kw)
+        return self._hewn(cs, color, joint=(1, 3), keep='all' if sound else (0, 1, 0) if true_faces else None, **kw)
 
-    def arc_band(self, centre, r0, r1, a0, a1, y, out, color, steps=2, mat=STONE, alpha=1.0):
+    def arc_band(self, centre, r0, r1, a0, a1, y, out, color, steps=2, mat=STONE, alpha=1.0, sink=0.0):
         """A raised moulding strip on a ring face: from radius r0 to r1 on
-        the plane Y = y, standing `out` proud (signed along Y), chamfered."""
+        the plane Y = y, standing `out` proud (signed along Y), chamfered. Its
+        two feet go `sink` into the stone, so a chipped face never leaves it
+        standing off the wall."""
         cx, cy, cz = centre
         ch = min(abs(out), (r1 - r0) * 0.3)
+        foot = y - math.copysign(sink, out)
         prev = None
         for i in range(steps + 1):
             a = a0 + (a1 - a0) * i / steps
             c, s = math.cos(a), math.sin(a)
             cur = [Vector((cx + c * r, cy + yy, cz + s * r)) for (r, yy) in
-                   ((r0, y), (r0 + ch, y + out), (r1 - ch, y + out), (r1, y))]
+                   ((r0, foot), (r0 + ch, y + out), (r1 - ch, y + out), (r1, foot))]
+            if i in (0, steps):
+                # the strip's two ends are closed: a moulding is a solid bar, seen end on too
+                d = -1 if i == 0 else 1
+                self.face(cur, scale(color, 0.78), mat=mat, want=(-s * d, 0, c * d), alpha=alpha)
             if prev is not None:
                 for k in range(3):
                     shade = (0.82, 1.06, 0.9)[k]
@@ -321,10 +359,12 @@ class Moon(hckit.Piece):
             prev = cur
 
     def tread(self, x0, x1, yf, depth, top, bottom, color, segs=4, wear=0.035, nose=0.05, chips=1, ends=(True, True),
-              tilt=0.0, sink=0.0, end_bottom=None):
+              tilt=0.0, sink=0.0, end_bottom=None, back=False):
         """A stair stone: its top from the back (Blender y = yf - depth) to
         the nosing at yf, a rolled nosing, and the riser down to `bottom`.
-        x0..x1 across the stair. The walking line (the middle) is worn."""
+        x0..x1 across the stair. The walking line (the middle) is worn.
+        `back` closes its back down to the ends' foot: a stone that stands
+        out past the tread over it, where its back shows."""
         rng = self.rng
         st = []
         for i in range(segs + 1):
@@ -337,7 +377,8 @@ class Moon(hckit.Piece):
             notch = 0.0
             if chips and 0 < i < segs and rng.random() < 0.22 * chips:
                 notch = 0.03 + 0.05 * rng.random()
-            st.append((x, [Vector((x, yf - depth, t + 0.004 * (rng.random() - 0.5))),
+            # (the back's small unevenness dies out at the stone's two ends: stones laid end to end meet)
+            st.append((x, [Vector((x, yf - depth, t + 0.004 * (rng.random() - 0.5) * (0 < i < segs))),
                            Vector((x, yf - 0.02 - notch, t)),
                            Vector((x, yf + nz - notch, t - 0.028 - notch * 0.6)),
                            Vector((x, yf + nz - notch * 0.5, t - 0.088)),
@@ -353,6 +394,10 @@ class Moon(hckit.Piece):
                 foot = 0.72 if k == 4 else 1.0
                 self.face((pa[k], pb[k], pb[k + 1], pa[k + 1]), color, cols=(ca, cb, scale(cb, foot), scale(ca, foot)),
                           want=((0, 0.02, 1), (0, 0.5, 1), (0, 1, 0.2), (0, 1, -0.6), (0, 1, 0))[k])
+        if back:
+            eb = bottom if end_bottom is None else end_bottom
+            self.face([p[0] for (_x, p, _m) in st] + [Vector((x1, yf - depth, eb)), Vector((x0, yf - depth, eb))],
+                      scale(color, 0.6), want=(0, -1, 0))
         for (flag, (x, p, _m), sgn) in ((ends[0], st[0], -1), (ends[1], st[-1], 1)):
             if flag:
                 eb = bottom if end_bottom is None else end_bottom
@@ -360,9 +405,10 @@ class Moon(hckit.Piece):
                           scale(color, 0.62), want=(sgn, 0, 0))
 
     def loft(self, rings, color, closed=True, cap0=False, cap1=False, smooth_face=True, mat=STONE, cols=None,
-             alpha=1.0):
+             alpha=1.0, cap_color=None):
         """A skin over cross-section rings (lists of points, all the same
-        length). cols(i, k) may give a per-vertex colour."""
+        length). cols(i, k) may give a per-vertex colour; cap_color is the
+        caps' own (a bed that lies in a joint's shadow)."""
         vr = [[self.bm.verts.new(Vector(p)) for p in ring] for ring in rings]
         n = len(rings[0])
         cents = [sum((Vector(p) for p in ring), Vector()) / n for ring in rings]
@@ -394,8 +440,9 @@ class Moon(hckit.Piece):
                     f.normal_flip()
                 f.material_index = mat
                 f[self.kindL] = self.kind
+                cc = cap_color or color
                 for loop in f.loops:
-                    loop[self.col] = (color[0], color[1], color[2], alpha)
+                    loop[self.col] = (cc[0], cc[1], cc[2], alpha)
                 made.append(f)
         return made
 
@@ -683,9 +730,20 @@ class Moon(hckit.Piece):
                 w = n.cross(out).normalized() * sz * 0.42
                 c = self.vary(VINE[rng.randrange(len(VINE))], 0.14)
                 base = q + n * 0.025
-                self._leaf((base, base + out * sz * 0.4 + w + n * 0.02, base + out * sz - n * 0.01,
-                            base + out * sz * 0.4 - w + n * 0.02),
-                           (scale(c, 0.6), c, scale(c, 1.2), c))
+                # a heart leaf folded on its midrib: two halves, their lobes
+                # broad by the stalk and drawn to a point, the edges a touch
+                # lower than the rib so the two halves take the light apart
+                tip = base + out * sz + n * 0.004
+                rib = (scale(c, 0.8), scale(c, 1.2))
+                for (side, shade) in ((1, 1.0), (-1, 0.88)):
+                    lobe = base + out * sz * 0.16 + w * side * 1.05 - n * 0.012
+                    waist = base + out * sz * 0.62 + w * side * 0.72 - n * 0.012
+                    f = self._leaf((base, lobe, waist, tip) if side > 0 else (base, tip, waist, lobe),
+                                   (rib[0], scale(c, shade), scale(c, shade * 1.06), rib[1]) if side > 0 else
+                                   (rib[0], rib[1], scale(c, shade * 1.06), scale(c, shade)))
+                    f.normal_update()
+                    if f.normal.dot(n) < 0:
+                        f.normal_flip()
                 if rng.random() < flowers:
                     self.moonflower(q + out * sz * 0.5, n, size=leaf * (0.8 + 0.5 * rng.random()))
 

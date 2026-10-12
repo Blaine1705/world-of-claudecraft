@@ -13,6 +13,7 @@
 //
 //   npx tsx docs/design/dungeon-rework/entrance/probe.mts temple -70 792 tmp/asset_src/drowned_temple_entrance/terreno 44 120
 //   "<blender>" -b --factory-startup --python docs/design/dungeon-rework/entrance/build_temple_entrance.py -- //     --out tmp/asset_src/drowned_temple_entrance --terrain tmp/asset_src/drowned_temple_entrance/terreno --renders none
+//   "<blender>" -b --factory-startup --python docs/design/dungeon-rework/entrance/support_check.py -- //     --blend tmp/asset_src/drowned_temple_entrance/drowned_temple_entrance.blend //     --terrain tmp/asset_src/drowned_temple_entrance/terreno/temple_heightgrid.json --water -5.85 --rims
 //   node scripts/assets/drowned_temple_entrance/build.mjs
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
