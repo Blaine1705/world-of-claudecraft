@@ -971,6 +971,7 @@ export function reachPalmSpots(seed: number): ReachPalm[] {
     return reachDeckClear(x, z, 1.5);
   };
   const push = (x: number, z: number, y: number, sizeF: number): void => {
+    if (isExcludedDecoration(x, z)) return; // an authored clearing (decoration_exclusions.ts)
     const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
     const scale = (PALM_TARGET_H / PALM_NATIVE_H[variant]) * sizeF;
     spots.push({

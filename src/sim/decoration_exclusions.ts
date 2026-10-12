@@ -28,6 +28,10 @@ const EXCLUSIONS = [
   { x: 370.69166315346956, z: 1915.294014248997 },
   { x: 375.35517376009375, z: 1926.9491909733042 },
   { x: 373.5998047152534, z: 1939.6218792777508 },
+  // The Wildheart Basin's Jaguar Maw: a palm in the walk-in lane, under the
+  // fangs, and one against the idol's east cheek whose crown stood in the stone.
+  { x: -230.27577486773953, z: 1110.0866696499288 },
+  { x: -243.16279729665257, z: 1118.9681632742286 },
 ];
 
 export function isExcludedDecoration(x: number, z: number): boolean {
