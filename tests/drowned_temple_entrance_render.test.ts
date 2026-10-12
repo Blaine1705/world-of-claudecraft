@@ -20,9 +20,13 @@ import {
 import {
   TEMPLE_DRIPS,
   TEMPLE_FALLS,
+  TEMPLE_FILM_LAYERS,
+  TEMPLE_FILM_LOOK,
+  TEMPLE_FILM_MOON,
   TEMPLE_FILM_OCCLUDER,
   TEMPLE_GATE,
   TEMPLE_GATE_LIGHT,
+  TEMPLE_GHOST_SETS,
   TEMPLE_GLINTS,
   TEMPLE_HORN_TIP,
   TEMPLE_MIRROR_RUNS,
@@ -40,7 +44,10 @@ import {
   type TempleMoonrise,
   templeFilmLight,
   templeFilmMoonHeight,
+  templeFilmMoonSeen,
+  templeFilmWhirl,
   templeGateLightIntensity,
+  templeGhostShown,
   templeMirrorCells,
   templeMirrorCovers,
   templeMirrorGrid,
@@ -60,9 +67,11 @@ import {
   templeSprites,
 } from '../src/render/drowned_temple_entrance_core';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
+import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   clearSetPieceOccluders,
   setPieceOccludersInternalsForTest,
+  updateSetPieceOccluders,
 } from '../src/render/set_piece_occluders';
 import { DUNGEONS } from '../src/sim/data';
 import {
@@ -81,6 +90,13 @@ const ground = (lx: number, lz: number) =>
 const rise = (time: number, motion = 1): TempleMoonrise =>
   templeMoonrise(time, motion, { front: 0, glow: 0, crest: 0 });
 const M = TEMPLE_MOONRISE;
+const fx4 = (v: number) => v.toFixed(4);
+type Shader = Parameters<THREE.Material['onBeforeCompile']>[0];
+const compile = (material: THREE.Material, vertexShader: string, fragmentShader: string) => {
+  const shader = { uniforms: {} as Record<string, unknown>, vertexShader, fragmentShader };
+  material.onBeforeCompile(shader as unknown as Shader, null as unknown as THREE.WebGLRenderer);
+  return shader;
+};
 
 describe('the moonrise is one clock', () => {
   it('rests, climbs from the stair to the crown, crests and fades, once a period', () => {
@@ -155,8 +171,12 @@ describe('the moonrise is one clock', () => {
     expect(templeFilmLight(0)).toBeGreaterThan(0.5);
     expect(templeFilmLight(1)).toBeGreaterThan(templeFilmLight(0));
     // the moon in the film rises to the ring's centre with the crest
-    expect(templeFilmMoonHeight(1)).toBe(TEMPLE_GATE.centre);
-    expect(templeFilmMoonHeight(0)).toBeLessThan(TEMPLE_GATE.centre - 2);
+    expect(templeFilmMoonHeight(1)).toBe(TEMPLE_GATE.centre + TEMPLE_FILM_MOON.lift);
+    expect(templeFilmMoonHeight(0)).toBeCloseTo(
+      templeFilmMoonHeight(1) - TEMPLE_FILM_MOON.restDrop,
+      9,
+    );
+    expect(TEMPLE_FILM_MOON.restDrop).toBeGreaterThan(1);
     expect(templeNightAmount(0)).toBeGreaterThan(0.9);
     expect(templeNightAmount(0.5)).toBe(0);
   });
@@ -435,6 +455,118 @@ describe('the sprites', () => {
   });
 });
 
+describe('the film is one unbroken sheet of light', () => {
+  it('every layer whirls on a whole number of arms, so its phase closes round the circle', () => {
+    expect(TEMPLE_FILM_LAYERS).toHaveLength(3);
+    for (let layer = 0; layer < TEMPLE_FILM_LAYERS.length; layer++) {
+      const arms = TEMPLE_FILM_LAYERS[layer][3];
+      expect(Number.isInteger(arms), `layer ${layer}`).toBe(true);
+      expect(arms, `layer ${layer}`).toBeGreaterThanOrEqual(1);
+      // either side of the line where the angle wraps, west of the layer's heart
+      for (const r of [0.2, 1.3, 3.1, 4.5, 9]) {
+        for (const time of [0, 7.3, 191]) {
+          const above = templeFilmWhirl(layer, -r, 1e-9, time);
+          const below = templeFilmWhirl(layer, -r, -1e-9, time);
+          // the wrap is `arms` whole turns of the phase: nothing steps across the line
+          expect((above - below) / (2 * Math.PI)).toBeCloseTo(arms, 6);
+          expect(Math.sin(above)).toBeCloseTo(Math.sin(below), 6);
+          expect(Math.cos(above)).toBeCloseTo(Math.cos(below), 6);
+        }
+      }
+      // (a fraction would not: the tear this pins against)
+      expect(Math.sin(3.2 * Math.PI)).not.toBeCloseTo(Math.sin(-3.2 * Math.PI), 2);
+    }
+  });
+
+  it('the shader draws each layer with the core numbers and takes the wrapped angle through nothing else', () => {
+    const water = painter.moonwaterCommon;
+    for (const [depth, spin, grain, arms] of TEMPLE_FILM_LAYERS) {
+      expect(water).toContain(
+        `tFilmLayer(fp, slide, ${fx4(depth)}, ${fx4(spin)}, ${fx4(grain)}, ${arms.toFixed(1)}, tm)`,
+      );
+    }
+    expect(water).toContain('float band = sin(arms * ang + warp * 5.0 + r * grain * 6.0);');
+    expect(water).toContain(`${fx4(TEMPLE_FILM_LOOK.twist)} * log(r + 0.35)`);
+    // the wrapped angle's only uses: whole arms of it, and its own sine and cosine
+    const layer = water.slice(
+      water.indexOf('float tFilmLayer'),
+      water.indexOf('vec4 templeMoonwater'),
+    );
+    expect(layer.match(/\bang\b/g)).toHaveLength(4);
+    expect(layer).toContain('float ang = atan(');
+    expect(layer).toContain('vec2(cos(ang), sin(ang))');
+    // no floor, fract or mod anywhere in the film: nothing is quantised by rows
+    const film = water.slice(water.indexOf('THE FILM'), water.indexOf('THE MIRROR'));
+    expect(film).not.toMatch(/\b(floor|fract|mod)\(/);
+    // the moon and the threads are the core's look
+    expect(film).toContain(
+      `(${fx4(TEMPLE_FILM_MOON.rest)} + ${fx4(TEMPLE_FILM_MOON.crest)} * rise.z)`,
+    );
+    expect(film).toContain(
+      `light * ${fx4(TEMPLE_FILM_LOOK.threads)} * (1.0 - ${fx4(TEMPLE_FILM_LOOK.moonVeil)} * disc)`,
+    );
+    expect(film).toContain(`slide * ${fx4(TEMPLE_FILM_MOON.depth)}`);
+    expect(film).toContain(`${fx4(TEMPLE_FILM_MOON.restDrop)} * (1.0 - rise.z)`);
+    // a layer's threads fade in away from its heart: the whirl shows no eye
+    expect(water).toContain(`smoothstep(0.25, ${fx4(TEMPLE_FILM_LOOK.calm)}, r)`);
+  });
+
+  it('the moon stands whole in the ring for every eye on the way up, from the far shore to the dais', () => {
+    const S = DROWNED_TEMPLE_STAIR;
+    const seen = { x: 0, y: 0 };
+    const reach = TEMPLE_GATE.inner - TEMPLE_FILM_MOON.radius;
+    // On the flight's line, from the foot of the dry treads to the stair's head: a walker's own
+    // eye, and the camera that follows a character (behind it and over its head).
+    for (let tread = 22; tread >= 0; tread -= 2) {
+      const lz = S.daisZ0 - (tread + 0.5) * S.tread;
+      const eyeY = S.dais - (tread + 1) * S.riser + 1.7;
+      for (const [y, z, who] of [
+        [eyeY, lz, 'eye'],
+        [eyeY + 2, lz - 9.8, 'camera'],
+      ] as const) {
+        for (const crest of [0, 1]) {
+          templeFilmMoonSeen(0, y, z, crest, seen);
+          expect(seen.x).toBeCloseTo(0, 9);
+          // the whole disc inside the ring's mouth
+          expect(Math.abs(seen.y), `tread ${tread} ${who} crest ${crest}`).toBeLessThan(reach);
+        }
+      }
+    }
+    // what lies behind a window sinks in it as the eye goes lower
+    expect(templeFilmMoonSeen(0, -4, -12, 0, seen).y).toBeLessThan(
+      templeFilmMoonSeen(0, 2, -12, 0, { x: 0, y: 0 }).y,
+    );
+    // the follow camera on the dais
+    expect(Math.abs(templeFilmMoonSeen(0, S.dais + 3.7, -11.3, 1, seen).y)).toBeLessThan(reach);
+    // on the dais before the ring, and from the far shore of the mere, at rest
+    expect(Math.abs(templeFilmMoonSeen(0, S.dais + 1.7, -1.5, 0, seen).y)).toBeLessThan(reach);
+    expect(Math.abs(templeFilmMoonSeen(0, TEMPLE_GATE.water + 1.9, -25, 0, seen).y)).toBeLessThan(
+      reach,
+    );
+    // an eye off the axis sees it slide the same way
+    expect(templeFilmMoonSeen(3, 0, -9, 0, seen).x).toBeCloseTo(
+      (3 * TEMPLE_FILM_MOON.depth) / (9 + TEMPLE_FILM_MOON.depth),
+      9,
+    );
+    // the crest lifts it by its drop, as that drop is seen from where the eye stands
+    const rest = templeFilmMoonSeen(0, -3, -12, 0, { x: 0, y: 0 }).y;
+    expect(templeFilmMoonSeen(0, -3, -12, 1, seen).y - rest).toBeCloseTo(
+      (TEMPLE_FILM_MOON.restDrop * 12) / (12 + TEMPLE_FILM_MOON.depth),
+      9,
+    );
+    // and it is the far side's moon too: the same from the pool's terrace
+    expect(templeFilmMoonSeen(0, 0.8, 9, 0, seen).y).toBeCloseTo(
+      templeFilmMoonSeen(0, 0.8, -9, 0, { x: 0, y: 0 }).y,
+      9,
+    );
+    // the shader hangs it by the same two numbers
+    const water = painter.moonwaterCommon;
+    expect(water).toContain(
+      `${fx4(TEMPLE_FILM_MOON.restDrop)} * (1.0 - rise.z) - ${fx4(TEMPLE_FILM_MOON.lift)});`,
+    );
+  });
+});
+
 describe('the camera never loses the character behind the set piece', () => {
   it('every collider row belongs to one fading unit, and the film ghosts with the gate', () => {
     const units = new Map<string, number>();
@@ -461,6 +593,181 @@ describe('the camera never loses the character behind the set piece', () => {
       DROWNED_TEMPLE_ENTRANCE_COLLIDERS.length + 1,
     );
     expect(setPieceOccludersInternalsForTest.setCount()).toBe(4);
+    // the painter keeps its handles, one a unit, and a rebuild in the same page
+    // retires the last build's sets instead of leaving them registered beside the new
+    const first = painter.occluderHandles();
+    expect(first).toHaveLength(TEMPLE_GHOST_SETS.length);
+    buildDrownedTempleEntrance(WORLD_SEED);
+    expect(setPieceOccludersInternalsForTest.setCount()).toBe(4);
+    expect(setPieceOccludersInternalsForTest.boxCount()).toBe(
+      DROWNED_TEMPLE_ENTRANCE_COLLIDERS.length + 1,
+    );
+    const second = painter.occluderHandles();
+    expect(second).toHaveLength(TEMPLE_GHOST_SETS.length);
+    for (let i = 0; i < first.length; i++) expect(second[i]).not.toBe(first[i]);
+    // the units the rows name are the units the ghost uniform carries
+    expect(
+      [
+        ...new Set(DROWNED_TEMPLE_ENTRANCE_COLLIDERS.map((row) => templeOccluderSet(row.name))),
+      ].sort(),
+    ).toEqual([...TEMPLE_GHOST_SETS].sort());
+    clearSetPieceOccluders();
+  });
+
+  it('what hangs on a unit goes with it while it is the ghost, and returns with it', () => {
+    // the plan: all of it while the unit is solid, none at the ghost's alpha
+    expect(templeGhostShown(1)).toBe(1);
+    expect(templeGhostShown(OCCLUDER_FADE_ALPHA)).toBe(0);
+    expect(templeGhostShown(0)).toBe(0);
+    expect(templeGhostShown((1 + OCCLUDER_FADE_ALPHA) / 2)).toBeCloseTo(0.5, 9);
+    let previous = 0;
+    for (let a = OCCLUDER_FADE_ALPHA; a <= 1; a += 0.05) {
+      expect(templeGhostShown(a)).toBeGreaterThanOrEqual(previous);
+      previous = templeGhostShown(a);
+    }
+    clearSetPieceOccluders();
+    painter.resetCaches();
+    const view = buildDrownedTempleEntrance(WORLD_SEED);
+    const ghost = painter.uniforms.uTempleGhost.value;
+    expect(ghost.toArray()).toEqual([1, 1, 1, 1]);
+    const [gate] = painter.occluderHandles();
+    // a character on the dais south of the ring; the camera north of it looks back through the ring
+    const eye = [DOOR.x, BASE + TEMPLE_GATE.dais + 1.6, DOOR.z - 1.6] as const;
+    const through = () =>
+      updateSetPieceOccluders(DOOR.x, BASE + TEMPLE_GATE.centre, DOOR.z + 6, ...eye, 1 / 60, true);
+    const behind = () =>
+      updateSetPieceOccluders(DOOR.x, eye[1] + 3, eye[2] - 9, ...eye, 1 / 60, true);
+    behind();
+    expect(gate.alpha()).toBe(1);
+    expect(ghost.x).toBe(1);
+    through();
+    expect(gate.alpha()).toBe(OCCLUDER_FADE_ALPHA);
+    // the film and the gate's lights are not drawn at all: nothing stands in the empty ring
+    expect(ghost.x).toBe(0);
+    // only the unit in the way goes
+    expect([ghost.y, ghost.z, ghost.w]).toEqual([1, 1, 1]);
+    behind();
+    expect(gate.alpha()).toBe(1);
+    expect(ghost.x).toBe(1);
+    // a rebuild while the gate is the ghost starts solid again
+    through();
+    expect(ghost.x).toBe(0);
+    buildDrownedTempleEntrance(WORLD_SEED);
+    expect(ghost.toArray()).toEqual([1, 1, 1, 1]);
+    // the old handle is retired: it no longer answers the camera
+    through();
+    expect(gate.alpha()).toBe(1);
+    expect(painter.occluderHandles()[0].alpha()).toBe(OCCLUDER_FADE_ALPHA);
+    behind();
+    // the film: the same uniform, dropped before any of its light is traced
+    const water = view.group.getObjectByName('drownedTempleMoonwater') as THREE.Mesh;
+    const filmShader = compile(
+      water.material as THREE.Material,
+      '#include <common>\n#include <begin_vertex>',
+      '#include <common>\n#include <map_fragment>',
+    );
+    expect(filmShader.uniforms.uTempleGhost).toBe(painter.uniforms.uTempleGhost);
+    expect(filmShader.fragmentShader).toContain('uniform vec4 uTempleGhost;');
+    const film = filmShader.fragmentShader.slice(
+      filmShader.fragmentShader.indexOf('THE FILM'),
+      filmShader.fragmentShader.indexOf('THE MIRROR'),
+    );
+    expect(film).toContain('if (uTempleGhost.x <= 0.004) discard;');
+    expect(film).toContain('alpha = uTempleGhost.x;');
+    expect(film.indexOf('discard')).toBeLessThan(film.indexOf('tFilmLayer('));
+    // the pool and the mirror hang on nothing that fades
+    expect(filmShader.fragmentShader.match(/uTempleGhost\./g)).toHaveLength(2);
+    // the sprites: each carries the unit it hangs on beside its kind, and follows that unit
+    const sprites = view.group.getObjectByName('drownedTempleSprites') as THREE.InstancedMesh;
+    const spriteShader = compile(
+      sprites.material as THREE.Material,
+      '#include <common>\n#include <project_vertex>',
+      '#include <common>\n#include <map_fragment>',
+    );
+    expect(spriteShader.uniforms.uTempleGhost).toBe(painter.uniforms.uTempleGhost);
+    expect(spriteShader.vertexShader).toContain('uniform vec4 uTempleGhost;');
+    expect(spriteShader.vertexShader).toContain('float tK = floor(aK.z + 0.02);');
+    expect(spriteShader.vertexShader).toContain('float tHung = floor((aK.z - tK) * 10.0 + 0.5);');
+    expect(spriteShader.vertexShader).toContain(
+      'if (tHung > 0.5) tA *= tHung < 1.5 ? uTempleGhost.x : (tHung < 2.5 ? uTempleGhost.y : (tHung < 3.5 ? uTempleGhost.z : uTempleGhost.w));',
+    );
+    clearSetPieceOccluders();
+  });
+
+  it('every sprite knows the unit it hangs on, and the painter packs it beside the kind', () => {
+    const K = TEMPLE_SPRITE_KIND;
+    const unit = (name: (typeof TEMPLE_GHOST_SETS)[number]) => TEMPLE_GHOST_SETS.indexOf(name) + 1;
+    const flightEnd =
+      DROWNED_TEMPLE_STAIR.daisZ0 - DROWNED_TEMPLE_STAIR.treads * DROWNED_TEMPLE_STAIR.tread;
+    for (const tier of TIERS) {
+      const list = templeSprites(tier, ground);
+      const halos = list.filter((s) => s.kind === K.halo);
+      // the lists in order: the stair's treads never ghost, the ring is the gate's, the kerb the works'
+      const stair = halos.slice(0, TEMPLE_STAIR_RUNES.length);
+      const gate = halos.slice(
+        TEMPLE_STAIR_RUNES.length,
+        TEMPLE_STAIR_RUNES.length + TEMPLE_RING_RUNES.length,
+      );
+      const pool = halos.slice(TEMPLE_STAIR_RUNES.length + TEMPLE_RING_RUNES.length);
+      expect(
+        stair.every((s) => s.hung === 0),
+        tier,
+      ).toBe(true);
+      expect(gate).toHaveLength(TEMPLE_RING_RUNES.length);
+      expect(
+        gate.every((s) => s.hung === unit('gate')),
+        tier,
+      ).toBe(true);
+      expect(pool).toHaveLength(TEMPLE_POOL_RUNES.length);
+      expect(
+        pool.every((s) => s.hung === unit('works')),
+        tier,
+      ).toBe(true);
+      for (const s of list) {
+        if (s.kind === K.flare || s.kind === K.shaft) expect(s.hung, tier).toBe(unit('gate'));
+        // the glow in the gate's mouth goes with the gate; the one over the pool's water stays
+        if (s.kind === K.glow) expect(s.hung, tier).toBe(s.z < 5 ? unit('gate') : 0);
+        if (s.kind === K.mote) expect(s.hung, tier).toBe(0);
+        if (s.kind === K.fall || s.kind === K.foam) expect(s.hung, tier).toBe(unit('works'));
+        // a glint off the flight lies on the weir's coping
+        if (s.kind === K.glint)
+          expect(s.hung, `${tier} ${s.z}`).toBe(s.z < flightEnd ? unit('works') : 0);
+        expect(Number.isInteger(s.hung) && s.hung >= 0 && s.hung <= TEMPLE_GHOST_SETS.length).toBe(
+          true,
+        );
+      }
+      expect(
+        list.some((s) => s.kind === K.glint && s.hung === 0),
+        tier,
+      ).toBe(true);
+      expect(
+        list.some((s) => s.kind === K.glint && s.hung === unit('works')),
+        tier,
+      ).toBe(true);
+    }
+    clearSetPieceOccluders();
+    painter.resetCaches();
+    const view = buildDrownedTempleEntrance(WORLD_SEED);
+    const mesh = view.group.getObjectByName('drownedTempleSprites') as THREE.InstancedMesh;
+    const packed = mesh.geometry.getAttribute('aK');
+    expect(packed.count).toBe(mesh.count);
+    const hung = new Map<number, number>();
+    for (let i = 0; i < packed.count; i++) {
+      const v = packed.getZ(i);
+      // the shader's own decoding
+      const kind = Math.floor(v + 0.02);
+      const on = Math.floor((v - kind) * 10 + 0.5);
+      expect(kind).toBeGreaterThanOrEqual(0);
+      expect(kind).toBeLessThanOrEqual(K.glow);
+      expect(on).toBeLessThanOrEqual(TEMPLE_GHOST_SETS.length);
+      hung.set(on, (hung.get(on) ?? 0) + 1);
+    }
+    // some of each: what stays, what is the gate's, what is the works'
+    expect(hung.get(0)).toBeGreaterThan(0);
+    expect(hung.get(unit('gate'))).toBeGreaterThanOrEqual(TEMPLE_RING_RUNES.length + 3);
+    expect(hung.get(unit('works'))).toBeGreaterThanOrEqual(
+      TEMPLE_POOL_RUNES.length + TEMPLE_FALLS.length,
+    );
     clearSetPieceOccluders();
   });
 });

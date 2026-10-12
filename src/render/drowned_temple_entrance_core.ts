@@ -22,6 +22,7 @@
 // telegraph, the door stays a click box and a nameplate on every tier, and
 // the effects tier only thins the mist, the motes, the glints and the falls.
 import { globalDayness } from './day_night_core';
+import { OCCLUDER_FADE_ALPHA } from './occluder_fade_core';
 
 /** The static effects tier (src/game/ui_effects_profile.ts resolves it). */
 export type TempleEffectsTier = 'low' | 'medium' | 'high' | 'ultra';
@@ -100,13 +101,13 @@ export const TEMPLE_RING_RUNES: readonly TempleRune[] = [
 ];
 
 export const TEMPLE_POOL_RUNES: readonly TempleRune[] = [
-  [3.936, 4.682, 13.082, 0.985, 0.16],
-  [2.417, 4.682, 10.45, 0.985, 0.16],
-  [-0.518, 4.682, 9.664, 0.985, 0.16],
-  [-3.936, 4.682, 14.118, 0.985, 0.16],
-  [-2.49, 4.622, 16.845, 0.985, 0.16],
-  [0.518, 4.682, 17.536, 0.985, 0.16],
-  [3.15, 4.682, 16.017, 0.985, 0.16],
+  [3.936, 4.68, 13.082, 0.985, 0.16],
+  [2.417, 4.68, 10.45, 0.985, 0.16],
+  [-0.518, 4.68, 9.664, 0.985, 0.16],
+  [-3.936, 4.68, 14.118, 0.985, 0.16],
+  [-2.49, 4.62, 16.845, 0.985, 0.16],
+  [0.518, 4.68, 17.536, 0.985, 0.16],
+  [3.15, 4.68, 16.017, 0.985, 0.16],
 ];
 
 /** Where the wet stone by the water catches the light (lx, y, lz). */
@@ -251,10 +252,26 @@ export function templeRuneGlow(order: number, rise: TempleMoonrise): number {
  *  cheek wall, its columns and its penitent), or the works (the weir and the
  *  pool's stelae). The treads themselves are no solid and never ghost. Every
  *  row belongs to one unit, so every solid is an occluder. */
-export function templeOccluderSet(rowName: string): 'gate' | 'east' | 'west' | 'works' {
+export function templeOccluderSet(rowName: string): TempleGhostSet {
   if (rowName.startsWith('moongate_')) return 'gate';
   if (rowName.startsWith('weir_') || rowName.startsWith('stela_')) return 'works';
   return /_w(_|$)/.test(rowName) ? 'west' : 'east';
+}
+
+/** The fading units, in the order the painter's ghost uniform carries them
+ *  (x, y, z, w). A sprite says which one it hangs on by this order plus one;
+ *  zero hangs on nothing that fades. */
+export const TEMPLE_GHOST_SETS = ['gate', 'east', 'west', 'works'] as const;
+export type TempleGhostSet = (typeof TEMPLE_GHOST_SETS)[number];
+
+/** How much of what hangs on a fading unit shows for the alpha that unit is
+ *  drawn at (the registry's onFade): all of it while the unit is solid, none
+ *  once it is the camera's ghost, so no film stands in an empty ring and no
+ *  halo burns in the air where a stone was; it returns with the stone. */
+export function templeGhostShown(alpha: number): number {
+  if (!(alpha < 1)) return 1;
+  const t = (alpha - OCCLUDER_FADE_ALPHA) / (1 - OCCLUDER_FADE_ALPHA);
+  return t <= 0 ? 0 : t;
 }
 
 /** The film is a solid to the camera too: a thin box across the ring's mouth
@@ -341,20 +358,84 @@ export function templePoolTrace(
 }
 
 /** The film's layers of turning light: how deep each lies behind the ring's
- *  plane, how fast it turns (radians a second) and how fine its grain is. */
-export const TEMPLE_FILM_LAYERS: readonly (readonly [number, number, number])[] = [
-  [0.5, 0.05, 0.42],
-  [2.0, -0.032, 0.3],
-  [4.6, 0.02, 0.2],
+ *  plane, how fast it turns (radians a second), how fine its grain is, and
+ *  how many arms its whirl has. The arms are a WHOLE number: the whirl is
+ *  drawn on the angle about the layer's own heart, and only a whole number
+ *  of turns of its phase round the circle closes on itself. (A fraction
+ *  leaves a seam along the line where the angle wraps, one a layer, each at
+ *  its own height once the eye is off the ring's axis: straight horizontal
+ *  tears across the film.) */
+export const TEMPLE_FILM_LAYERS: readonly (readonly [number, number, number, number])[] = [
+  [0.5, 0.03, 0.42, 2],
+  [2.0, -0.02, 0.3, 1],
+  [4.6, 0.012, 0.2, 1],
 ];
 
+/** The film's look: how tightly the whirl winds toward its heart (little: it
+ *  is light lying in still water, not a drain), how strong its silver threads
+ *  are, how much of them the moon's own disc hides, and how far from a
+ *  layer's heart its threads have faded in (so no layer shows an eye). */
+export const TEMPLE_FILM_LOOK = { twist: 0.8, threads: 0.8, moonVeil: 0.8, calm: 1.8 } as const;
+
+/**
+ * The phase a layer's threads are drawn on at a point `(qx, qy)` from the
+ * layer's heart: the SAME expression the fragment shader takes the sine of
+ * (before its noise warp). Whole arms make it differ by a whole number of
+ * turns across the angle's wrap.
+ */
+export function templeFilmWhirl(layer: number, qx: number, qy: number, time: number): number {
+  const [, spin, grain, arms] = TEMPLE_FILM_LAYERS[layer];
+  const r = Math.hypot(qx, qy);
+  const ang = Math.atan2(qy, qx) + spin * time + TEMPLE_FILM_LOOK.twist * Math.log(r + 0.35);
+  return arms * ang + r * grain * 6;
+}
+
 /** The moon seen deep in the film: its depth behind the plane, its radius,
- *  and how far under the ring's centre it hangs at rest (it rises to the
- *  centre with the crest). */
-export const TEMPLE_FILM_MOON = { depth: 11, radius: 2.1, restDrop: 2.6 } as const;
+ *  how far over the ring's centre it stands at the crest (`lift`) and how far
+ *  under that it hangs at rest, and how bright it is at rest and how much the
+ *  crest adds. The ring stands at the head of a climb, so every eye looks UP
+ *  through it, and what lies behind a window sinks in it as the eye goes
+ *  lower: a moon hung at the ring's own height, and deep, had dropped out of
+ *  the ring's foot before the first tread. Hung over the centre and no deeper
+ *  than this, it stands whole in the ring from the far shore to the dais, for
+ *  a walker's own eye and for the camera that follows a character. */
+export const TEMPLE_FILM_MOON = {
+  depth: 5,
+  radius: 2.1,
+  restDrop: 1.6,
+  lift: 3.1,
+  rest: 0.58,
+  crest: 0.7,
+} as const;
 
 export function templeFilmMoonHeight(crest: number): number {
-  return TEMPLE_GATE.centre - TEMPLE_FILM_MOON.restDrop * (1 - crest);
+  const m = TEMPLE_FILM_MOON;
+  return TEMPLE_GATE.centre + m.lift - m.restDrop * (1 - crest);
+}
+
+/**
+ * Where the film's moon stands in the ring's mouth for an eye (door-local, y
+ * above the door's terrain height): its centre's offset from the ring's
+ * centre. The SAME projection the fragment shader runs a fragment at a time
+ * (its `slide` is the eye's ray through that fragment): the point where the
+ * line from the eye to the moon crosses the ring's plane.
+ */
+export function templeFilmMoonSeen(
+  eyeX: number,
+  eyeY: number,
+  eyeZ: number,
+  crest: number,
+  out: { x: number; y: number },
+): { x: number; y: number } {
+  const depth = TEMPLE_FILM_MOON.depth;
+  const away = Math.abs(eyeZ);
+  const k = away + depth;
+  out.x = (eyeX * depth) / k;
+  out.y =
+    ((eyeY - TEMPLE_GATE.centre) * depth +
+      (templeFilmMoonHeight(crest) - TEMPLE_GATE.centre) * away) /
+    k;
+  return out;
 }
 
 /** The film's own brightness: it never goes out (it must read at noon from
@@ -669,7 +750,17 @@ export interface TempleSprite {
   dz: number;
   /** A shaft's width at its tip; a fall's spread across its notch. */
   spread: number;
+  /** The fading unit it hangs on (its place in TEMPLE_GHOST_SETS plus one), so
+   *  it goes with that unit when the camera ghosts it; 0 hangs on none. */
+  hung: number;
 }
+
+const HUNG = { none: 0, gate: 1, works: 4 } as const;
+/** The halo lists templeSprites takes, in order: the stair's treads never
+ *  ghost, the ring's runes are the gate's, the pool's kerb is the works'. */
+const RUNE_LIST_HUNG = [HUNG.none, HUNG.gate, HUNG.works] as const;
+/** South of this (lz) a glint lies on the weir's coping, not on a wet tread. */
+const WEIR_GLINTS_SOUTH_OF = -15.3;
 
 /** Where the motes rise: over the mirror round the stair's foot, up the
  *  flight, round the gate and over the pool (door-local boxes, base height). */
@@ -707,13 +798,14 @@ export function templeSprites(
   const rank = tierRank(tier);
   const K = TEMPLE_SPRITE_KIND;
   const out: TempleSprite[] = [];
-  const base = { phase: 0, speed: 1, range: 0, dx: 0, dy: 0, dz: 0, spread: 0 };
+  const base = { phase: 0, speed: 1, range: 0, dx: 0, dy: 0, dz: 0, spread: 0, hung: HUNG.none };
   let n = 0;
-  for (const list of runes) {
-    for (const [x, y, z, order, radius] of list) {
+  for (let li = 0; li < runes.length; li++) {
+    for (const [x, y, z, order, radius] of runes[li]) {
       out.push({
         ...base,
         kind: K.halo,
+        hung: RUNE_LIST_HUNG[li] ?? HUNG.none,
         x,
         y: y + 0.05,
         z: z - 0.05,
@@ -725,10 +817,21 @@ export function templeSprites(
   }
   const g = TEMPLE_GATE;
   // the gate's mouth never goes dark, and the horns cradle the flare
-  out.push({ ...base, kind: K.glow, x: 0, y: g.centre, z: -1.1, size: 13, range: 0.4, phase: 0.2 });
+  out.push({
+    ...base,
+    kind: K.glow,
+    hung: HUNG.gate,
+    x: 0,
+    y: g.centre,
+    z: -1.1,
+    size: 13,
+    range: 0.4,
+    phase: 0.2,
+  });
   out.push({
     ...base,
     kind: K.flare,
+    hung: HUNG.gate,
     x: 0,
     y: g.centre + g.outer + 2.1,
     z: 0,
@@ -738,6 +841,7 @@ export function templeSprites(
   out.push({
     ...base,
     kind: K.shaft,
+    hung: HUNG.gate,
     x: 0,
     y: g.centre + g.outer + 0.6,
     z: 0,
@@ -750,6 +854,7 @@ export function templeSprites(
     out.push({
       ...base,
       kind: K.shaft,
+      hung: HUNG.gate,
       x: 0,
       y: g.centre + g.outer + 0.2,
       z: 0,
@@ -793,6 +898,7 @@ export function templeSprites(
     out.push({
       ...base,
       kind: K.glint,
+      hung: z < WEIR_GLINTS_SOUTH_OF ? HUNG.works : HUNG.none,
       x,
       y: y + 0.03,
       z,
@@ -807,6 +913,7 @@ export function templeSprites(
       out.push({
         ...base,
         kind: K.fall,
+        hung: HUNG.works,
         x,
         y,
         z,
@@ -824,6 +931,7 @@ export function templeSprites(
     out.push({
       ...base,
       kind: K.foam,
+      hung: HUNG.works,
       x: fx,
       y: y - fall + 0.1,
       z: fz,

@@ -45,20 +45,24 @@ import { currentDayNightPhase } from './day_night_clock';
 import {
   TEMPLE_DRIPS,
   TEMPLE_FILM_LAYERS,
+  TEMPLE_FILM_LOOK,
   TEMPLE_FILM_MOON,
   TEMPLE_FILM_OCCLUDER,
   TEMPLE_GATE,
   TEMPLE_GATE_LIGHT,
+  TEMPLE_GHOST_SETS,
   TEMPLE_MIST_FIELDS,
   TEMPLE_MOONRISE,
   TEMPLE_POOL,
   TEMPLE_POOL_MOON,
   TEMPLE_WATER_KIND,
   type TempleEffectsTier,
+  type TempleGhostSet,
   type TempleMistPose,
   type TempleMoonrise,
   templeFilmLight,
   templeGateLightIntensity,
+  templeGhostShown,
   templeMirrorGrid,
   templeMistPose,
   templeMistPuff,
@@ -92,10 +96,10 @@ if (typeof window !== 'undefined') {
 }
 export const drownedTempleEntrancePreloadInternalsForTest = { urls: [...URLS] };
 
-export const TEMPLE_MOONWATER_PROGRAM_CACHE_KEY = 'drowned-temple-moonwater-v1';
+export const TEMPLE_MOONWATER_PROGRAM_CACHE_KEY = 'drowned-temple-moonwater-v2';
 export const TEMPLE_INLAY_PROGRAM_CACHE_KEY = 'drowned-temple-silver-inlay-v1';
 export const TEMPLE_MIST_PROGRAM_CACHE_KEY = 'drowned-temple-mere-mist-v1';
-export const TEMPLE_SPRITE_PROGRAM_CACHE_KEY = 'drowned-temple-moonrise-sprites-v1';
+export const TEMPLE_SPRITE_PROGRAM_CACHE_KEY = 'drowned-temple-moonrise-sprites-v2';
 
 export interface DrownedTempleEntranceView {
   group: THREE.Group;
@@ -104,11 +108,13 @@ export interface DrownedTempleEntranceView {
 }
 
 /** uTemple x: the night amount (0 day, 1 night); y: motion (1, or 0 under
- *  reduced motion). uTempleGhost: the gate's fade when it stands between the
- *  camera and the character (1 solid). Shared by every effect program. */
+ *  reduced motion). uTempleGhost: how much of what hangs on each fading unit
+ *  shows (x the gate, y and z the east and west flanks, w the works; 1 while
+ *  the unit is solid, 0 while it is the camera's ghost: templeGhostShown),
+ *  written by the units' own onFade. Shared by every effect program. */
 const templeUniforms = {
   uTemple: { value: new THREE.Vector2(0, 1) },
-  uTempleGhost: { value: 1 },
+  uTempleGhost: { value: new THREE.Vector4(1, 1, 1, 1) },
 };
 
 const fx = (v: number) => v.toFixed(4);
@@ -238,13 +244,18 @@ function fallbackGate(): THREE.Group {
 
 const pm = TEMPLE_POOL_MOON;
 const fm = TEMPLE_FILM_MOON;
+/** One layer's call, its numbers the core's (the arms a whole number there). */
+const filmLayer = (i: number): string => {
+  const [depth, spin, grain, arms] = TEMPLE_FILM_LAYERS[i];
+  return `tFilmLayer(fp, slide, ${fx(depth)}, ${fx(spin)}, ${fx(grain)}, ${arms.toFixed(1)}, tm)`;
+};
 const drip = (i: number, k: number) => fx(TEMPLE_DRIPS[i]?.[k] ?? 0);
 
 // Mirrors templePoolTrace, templeFilmMoonHeight, templeFilmLight and
 // templeMirrorSight.
 const MOONWATER_COMMON = `
 ${RISE_GLSL}
-uniform float uTempleGhost;
+uniform vec4 uTempleGhost;
 varying vec3 vTempleP;
 varying vec3 vTempleC;
 varying vec2 vTempleK;
@@ -271,16 +282,19 @@ vec3 tSky(vec3 r) {
   return mix(bank, sky, smoothstep(0.03, 0.2, r.y));
 }
 float tFilmLight(float crest) { return ${fx(templeFilmLight(0))} + ${fx(templeFilmLight(1) - templeFilmLight(0))} * crest; }
-// One layer of the film's turning light, seen at its own depth behind the ring.
-float tFilmLayer(vec2 fp, vec2 slide, float depth, float spin, float grain, float tm) {
+// One layer of the film's turning light, seen at its own depth behind the
+// ring (templeFilmWhirl). The angle wraps along the line west of the layer's
+// heart: it only ever enters through a WHOLE number of arms or through its
+// own sine and cosine, so nothing steps across that line.
+float tFilmLayer(vec2 fp, vec2 slide, float depth, float spin, float grain, float arms, float tm) {
   vec2 q = fp + slide * depth;
   float r = length(q);
   // a slow whirl: the light is drawn out along the turn, tighter toward the heart
-  float ang = atan(q.y, q.x + 1.0e-5) + spin * tm + 1.9 * log(r + 0.35);
-  vec2 w = vec2(ang * 1.6, r * grain * 2.4 - spin * tm * 2.0);
+  float ang = atan(q.y, q.x + 1.0e-5) + spin * tm + ${fx(TEMPLE_FILM_LOOK.twist)} * log(r + 0.35);
   float warp = tNoise(vec2(cos(ang), sin(ang)) * 1.7 + r * grain + tm * 0.02);
-  float band = sin(w.x * 2.0 + warp * 5.0 + r * grain * 6.0);
-  float thread = pow(max(1.0 - abs(band), 0.0), 5.0);
+  float band = sin(arms * ang + warp * 5.0 + r * grain * 6.0);
+  // (a layer's threads fade in away from its heart: no eye, no drain)
+  float thread = pow(max(1.0 - abs(band), 0.0), 5.0) * smoothstep(0.25, ${fx(TEMPLE_FILM_LOOK.calm)}, r);
   return thread * (0.35 + 0.65 * tNoise(q * grain * 2.2 + 3.0)) + 0.18 * warp;
 }
 vec4 templeMoonwater() {
@@ -316,28 +330,30 @@ vec4 templeMoonwater() {
     col = mix(col, tSky(reflect(dir, vec3(0.0, 1.0, 0.0))), clamp(fres * 0.3 + ring, 0.0, 1.0));
     col *= 1.0 - 0.62 * smoothstep(0.78, 1.0, rr);
   } else if (vTempleK.x < 1.5) {
-    // THE FILM: cold liquid moonlight standing in the ring, the moon deep in it
+    // THE FILM: cold liquid moonlight standing in the ring, the moon deep in it.
+    // It hangs on the gate: gone with it while the gate is the camera's ghost.
+    if (uTempleGhost.x <= 0.004) discard;
     vec2 fp = vTempleP.xy - vec2(0.0, T_C);
     float fr = length(fp) / T_IN;
     vec2 slide = dir.xy / max(abs(dir.z), 0.14);
     float light = tFilmLight(rise.z);
-    float v = tFilmLayer(fp, slide, ${fx(TEMPLE_FILM_LAYERS[0][0])}, ${fx(TEMPLE_FILM_LAYERS[0][1])}, ${fx(TEMPLE_FILM_LAYERS[0][2])}, tm) * 0.4
-            + tFilmLayer(fp, slide, ${fx(TEMPLE_FILM_LAYERS[1][0])}, ${fx(TEMPLE_FILM_LAYERS[1][1])}, ${fx(TEMPLE_FILM_LAYERS[1][2])}, tm) * 0.35
-            + tFilmLayer(fp, slide, ${fx(TEMPLE_FILM_LAYERS[2][0])}, ${fx(TEMPLE_FILM_LAYERS[2][1])}, ${fx(TEMPLE_FILM_LAYERS[2][2])}, tm) * 0.25;
-    vec2 mq = fp + slide * ${fx(fm.depth)} + vec2(0.0, ${fx(fm.restDrop)} * (1.0 - rise.z));
+    float v = ${filmLayer(0)} * 0.4
+            + ${filmLayer(1)} * 0.35
+            + ${filmLayer(2)} * 0.25;
+    vec2 mq = fp + slide * ${fx(fm.depth)} + vec2(0.0, ${fx(fm.restDrop)} * (1.0 - rise.z) - ${fx(fm.lift)});
     float md = length(mq) / ${fx(fm.radius)};
     float disc = 1.0 - smoothstep(0.9, 1.03, md);
-    float maria = 0.82 + 0.18 * tNoise(mq * 1.3 + 3.0) - 0.16 * smoothstep(0.4, 0.7, tNoise(mq * 0.62 + 9.0));
+    float maria = 0.76 + 0.24 * tNoise(mq * 1.3 + 3.0) - 0.26 * smoothstep(0.4, 0.7, tNoise(mq * 0.62 + 9.0));
     float halo = exp(-max(md - 1.0, 0.0) * 1.5) * 0.4;
     // a night standing in the ring at any hour: deep blue, lighter toward the stone
     col = mix(vec3(0.012, 0.03, 0.1), vec3(0.05, 0.12, 0.34), smoothstep(0.1, 1.0, fr)) * (0.7 + 0.6 * light);
-    col += vec3(0.9, 0.95, 1.0) * (disc * maria + halo * (1.0 - disc)) * (0.62 + 0.75 * rise.z);
+    col += vec3(0.8, 0.9, 1.0) * (disc * maria + halo * (1.0 - disc)) * (${fx(fm.rest)} + ${fx(fm.crest)} * rise.z);
     // the silver threads of the light turning in front of it
-    col += vec3(0.62, 0.8, 1.0) * v * (0.5 + 0.5 * fr) * light * 0.9 * (1.0 - 0.55 * disc);
+    col += vec3(0.62, 0.8, 1.0) * v * (0.5 + 0.5 * fr) * light * ${fx(TEMPLE_FILM_LOOK.threads)} * (1.0 - ${fx(TEMPLE_FILM_LOOK.moonVeil)} * disc);
     // the light pools against the stone, and slow rings cross it
     col += vec3(0.45, 0.66, 1.0) * pow(smoothstep(0.72, 1.0, fr), 2.0) * 0.75 * light;
     col *= 1.0 + 0.05 * sin(fr * 22.0 - tm * 0.7);
-    alpha = uTempleGhost;
+    alpha = uTempleGhost.x;
   } else {
     // THE MIRROR: the still water the weir holds at the stair's foot
     float depth = vTempleK.y;
@@ -581,7 +597,6 @@ function mereMist(
   tier: TempleEffectsTier,
   ground: (lx: number, lz: number) => number,
   light: THREE.PointLight,
-  ghost: () => number,
 ): THREE.InstancedMesh {
   const count = templeMistPuffCount(tier);
   const geometry = new THREE.PlaneGeometry(1, 1);
@@ -620,7 +635,6 @@ function mereMist(
     u.x = templeNightAmount(currentDayNightPhase());
     const time = sharedUniforms.uTime.value;
     motionNow(time);
-    templeUniforms.uTempleGhost.value = ghost();
     // The fire-light budget flickers a source about its own base: the moonrise
     // moves the base, the budget's shimmer rides on it.
     light.userData.baseIntensity = templeGateLightIntensity(templeMoonrise(time, u.y, rise).crest);
@@ -634,7 +648,9 @@ let spriteMat: THREE.MeshBasicMaterial | null = null;
 
 // Mirrors templeSpritePose. Kinds: 0 halo, 1 flare, 2 shaft, 3 mote, 4 glint,
 // 5 fall, 6 foam, 7 glow.
-const SPRITE_VERTEX = `float tK = aK.z;
+const SPRITE_VERTEX = `// aK.z is the kind, plus a tenth for each step of the fading unit it hangs on
+float tK = floor(aK.z + 0.02);
+float tHung = floor((aK.z - tK) * 10.0 + 0.5);
 float tTm = uTime * uTemple.y;
 float tN = uTemple.x;
 vec3 tRise = templeRise();
@@ -689,6 +705,8 @@ if (tK > 1.5 && tK < 2.5) {
   mvPosition = modelViewMatrix * vec4(tC, 1.0);
   mvPosition.xy += tQ * aS.w;
 }
+// what hangs on a fading unit goes with it while that unit is the camera's ghost
+if (tHung > 0.5) tA *= tHung < 1.5 ? uTempleGhost.x : (tHung < 2.5 ? uTempleGhost.y : (tHung < 3.5 ? uTempleGhost.z : uTempleGhost.w));
 vTempleQ = tQ;
 vTempleS = vec2(tK, tA);
 gl_Position = projectionMatrix * mvPosition;`;
@@ -747,10 +765,11 @@ function spriteMaterial(): THREE.MeshBasicMaterial {
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = sharedUniforms.uTime;
     shader.uniforms.uTemple = templeUniforms.uTemple;
+    shader.uniforms.uTempleGhost = templeUniforms.uTempleGhost;
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
-        `#include <common>\nattribute vec4 aS;\nattribute vec4 aK;\nattribute vec4 aD;\nvarying vec2 vTempleQ;\nvarying vec2 vTempleS;\nvarying vec2 vTempleU;\n${RISE_GLSL}`,
+        `#include <common>\nuniform vec4 uTempleGhost;\nattribute vec4 aS;\nattribute vec4 aK;\nattribute vec4 aD;\nvarying vec2 vTempleQ;\nvarying vec2 vTempleS;\nvarying vec2 vTempleU;\n${RISE_GLSL}`,
       )
       .replace('#include <project_vertex>', SPRITE_VERTEX);
     shader.fragmentShader = shader.fragmentShader
@@ -779,7 +798,7 @@ function moonriseSprites(
   const m = new THREE.Matrix4();
   sprites.forEach((sp, i) => {
     s.set([sp.x, sp.y, sp.z, sp.size], i * 4);
-    k.set([sp.phase, sp.speed, sp.kind, sp.range], i * 4);
+    k.set([sp.phase, sp.speed, sp.kind + sp.hung * 0.1, sp.range], i * 4);
     d.set([sp.dx, sp.dy, sp.dz, sp.spread], i * 4);
     m.makeTranslation(sp.x, sp.y, sp.z);
     mesh.setMatrixAt(i, m);
@@ -847,22 +866,28 @@ export function buildDrownedTempleEntrance(seed: number): DrownedTempleEntranceV
   const gateRoots = mainSource
     ? [...node(main, 'Entrance_Moongate'), ...node(growth, 'Growth_Gate')]
     : [main];
-  const gateHandle: SetPieceOccluderHandle = registerSetPieceOccluders(solids.gate, gateRoots);
-  registerSetPieceOccluders(solids.east, [
-    ...node(main, 'Entrance_FlankEast'),
-    ...node(growth, 'Growth_FlankEast'),
-  ]);
-  registerSetPieceOccluders(solids.west, [
-    ...node(main, 'Entrance_FlankWest'),
-    ...node(growth, 'Growth_FlankWest'),
-  ]);
-  registerSetPieceOccluders(solids.works, [
-    ...(works ? [works] : []),
-    ...node(growth, 'Growth_Works'),
-  ]);
+  const roots: Record<TempleGhostSet, THREE.Object3D[]> = {
+    gate: gateRoots,
+    east: [...node(main, 'Entrance_FlankEast'), ...node(growth, 'Growth_FlankEast')],
+    west: [...node(main, 'Entrance_FlankWest'), ...node(growth, 'Growth_FlankWest')],
+    works: [...(works ? [works] : []), ...node(growth, 'Growth_Works')],
+  };
+  // One entrance per world: a rebuild in the same page retires the last one's.
+  for (const handle of occluderHandles) handle.dispose();
+  const ghost = templeUniforms.uTempleGhost.value;
+  ghost.set(1, 1, 1, 1);
+  occluderHandles = TEMPLE_GHOST_SETS.map((unit, i) =>
+    registerSetPieceOccluders(solids[unit], roots[unit], {
+      // the film, the halos, the flare, the shafts and the falls are no models:
+      // each follows the unit it hangs on (uTempleGhost's component i)
+      onFade: (alpha) => ghost.setComponent(i, templeGhostShown(alpha)),
+    }),
+  );
+  // The player's static effects tier (the preset, lowered by the Advanced
+  // Effects dial), never the frame governor: cosmetic richness only.
   const tier = resolveUiEffectsProfile({
-    presetLabel: GFX.tier,
-    effectsQuality: 1,
+    presetLabel: GFX.effectsTier,
+    effectsQuality: GFX.effectsTier === 'low' ? 0 : 1,
     reduceMotion: false,
   }).tier;
   const light = new THREE.PointLight(
@@ -878,12 +903,15 @@ export function buildDrownedTempleEntrance(seed: number): DrownedTempleEntranceV
     door.z + TEMPLE_GATE_LIGHT.lz,
   );
   body.add(moonwater(ground));
-  body.add(mereMist(tier, ground, light, () => gateHandle.alpha()));
+  body.add(mereMist(tier, ground, light));
   body.add(moonriseSprites(tier, ground));
   group.add(body);
   group.add(light);
   return { group, glowLights: [light], cullGroups: [body] };
 }
+
+/** The camera occluder sets of the entrance last built, in TEMPLE_GHOST_SETS' order. */
+let occluderHandles: SetPieceOccluderHandle[] = [];
 
 export const drownedTempleEntranceInternalsForTest = {
   kitMaterial,
@@ -897,10 +925,12 @@ export const drownedTempleEntranceInternalsForTest = {
   mistVertex: MIST_VERTEX,
   spriteVertex: SPRITE_VERTEX,
   mistFieldCount: TEMPLE_MIST_FIELDS.length,
+  occluderHandles: (): readonly SetPieceOccluderHandle[] => occluderHandles,
   uniforms: templeUniforms,
   resetCaches(): void {
     inlayMat = moonwaterMat = mistMat = spriteMat = null;
     puffTex = null;
     lastMotionCheck = -10;
+    templeUniforms.uTempleGhost.value.set(1, 1, 1, 1);
   },
 };
