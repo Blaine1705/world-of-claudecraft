@@ -53,9 +53,12 @@ function ladyFight(
   difficulty: 'normal' | 'heroic' = 'normal',
   extra = 3,
   seed = 23,
-): { f: Fight; lady: Entity } {
+): { f: Fight; lady: Entity; pool: number } {
   const f = cryptFight(difficulty, extra, KEEP, seed);
   const lady = boss(f, LADY_ID);
+  // Her real health in this claim, as the live spawn was tuned, before the
+  // rig below gives her a million to stand through the scripted beats.
+  const pool = lady.maxHp;
   put(f, lady, MID.x, MID.z);
   put(f, f.tank, MID.x, MID.z - 2.5);
   const spots = [
@@ -67,7 +70,7 @@ function ladyFight(
   lady.maxHp = 1e6;
   lady.hp = lady.maxHp;
   f.sim.ctx.aggroMob(lady, f.tank, false);
-  return { f, lady };
+  return { f, lady, pool };
 }
 
 function holdAll(f: Fight, skip: ReadonlySet<number> = new Set()): () => void {
@@ -250,15 +253,22 @@ describe('the Lady of the Bonechill: the Frozen Embrace', () => {
   // heroic pool was raised (dungeon_difficulty.ts): 6 percent of 18,382 was
   // 1,103 damage, and her heroic share of 24,999 is 1,103 still. Normal keeps
   // its 6 percent of 3,998.
+  //
+  // The pool is read from the LIVE spawn of each difficulty, never written
+  // here by hand: a later retune of her heroic health multiplier moves the
+  // damage the Embrace asks for, and the band below is what catches it (the
+  // share must then be retuned with it, lady_ids.ts embraceBreakShareHeroic).
   it.each([
-    ['normal', 3998, 240],
-    ['heroic', 24999, 1103],
+    ['normal', 235, 245],
+    ['heroic', 1090, 1115],
   ] as const)(
-    'on %s she lets go at exactly the damage the share asks of her real pool',
-    (difficulty, pool, needed) => {
+    'on %s she lets go at exactly the damage the share asks of her live pool (between %i and %i)',
+    (difficulty, least, most) => {
       const heroic = difficulty === 'heroic';
-      expect(Math.ceil(embraceBreakShare(heroic) * pool - 1e-6)).toBe(needed);
-      const { f, lady } = ladyFight(difficulty);
+      const { f, lady, pool } = ladyFight(difficulty);
+      const needed = Math.ceil(embraceBreakShare(heroic) * pool - 1e-6);
+      expect(needed).toBeGreaterThanOrEqual(least);
+      expect(needed).toBeLessThanOrEqual(most);
       // Her real pool for the difficulty (the rig's own is a million).
       lady.maxHp = pool;
       lady.hp = pool;
