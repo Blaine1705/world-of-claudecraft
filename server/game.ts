@@ -357,6 +357,7 @@ import {
   applyMobScanTick,
   createMobScanTickStats,
   resetMobScanCaptureAccumulators,
+  routeSightCaptureTotals,
 } from './mob_scan_tick_stats';
 import { parseModerationChatCommand } from './moderation_commands';
 import {
@@ -2535,12 +2536,7 @@ export class GameServer {
             // latest-tick values feed the heartbeat, and an in-flight capture sums and
             // peaks them across its window.
             const scan = this.sim.mobScanCounters;
-            applyMobScanTick(
-              this.mobScanTickStats,
-              scan.aggroScanPlayerVisits,
-              scan.threatEntryVisits,
-              this.perfCaptureDeadlineNs !== null,
-            );
+            applyMobScanTick(this.mobScanTickStats, scan, this.perfCaptureDeadlineNs !== null);
             this.recordBattlegroundOutcomes();
             this.enforceJailStates();
             // Parse capture observes the full drained batch BEFORE routeEvents:
@@ -5296,6 +5292,7 @@ export class GameServer {
       aggroVisitsMaxPerTick: this.mobScanTickStats.aggroVisitsMaxPerTick,
       threatVisitsTotal: this.mobScanTickStats.threatVisitsTotal,
       threatVisitsMaxPerTick: this.mobScanTickStats.threatVisitsMaxPerTick,
+      ...routeSightCaptureTotals(this.mobScanTickStats),
       ...this.movementTimelineTickStats.captureTotals(),
       profile: this.tickProfiler.profile(),
     };
