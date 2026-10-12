@@ -1400,7 +1400,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  '40dd2a98a0991696e90cb6f102cbc073a5a0cc38cf37bb5ab1519526b49f9bf7';
+  // Re-minted for the direct pick's aim rule (pickDirect hands the pick ray to
+  // world_direct_pick.ts, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
+  '20efbbffb6cd681ac3f30597c15207ac9cdd3f69f9e40dfaae0f0fac3281d6b7';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1426,7 +1428,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  '16d24d35e308ac6bc78c0b6ac73fe1e3e8bc725ca098f1b910af1847a67e8b7a';
+  // Re-minted for the direct pick's aim rule (pickDirect hands the pick ray to
+  // world_direct_pick.ts, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
+  '2bda6ff74975a68c397ab72f5835449bddec8da128867bc107d9ad3282f58ae9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2813,7 +2817,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // + the character pack + the five-dungeon rework): recomputed LAST again over the
       // re-swept evidence. No
       // capture was retaken.
-    ).toBe('06c9651b39dba0df948f0155f39d1b47ed8a7d4c20f5c4d8ef8b65424278714a');
+      // Re-minted for the direct pick's aim rule (pickDirect hands the pick ray to
+      // world_direct_pick.ts, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
+    ).toBe('9ac58ee3d8bb093d5a1a4cf2240cb7638cd04a51e3deea6d0fc2e92df746f681');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

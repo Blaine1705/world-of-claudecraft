@@ -706,7 +706,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  '16d24d35e308ac6bc78c0b6ac73fe1e3e8bc725ca098f1b910af1847a67e8b7a';
+  // Re-minted for the direct pick's aim rule (pickDirect hands the pick ray to
+  // world_direct_pick.ts, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
+  '2bda6ff74975a68c397ab72f5835449bddec8da128867bc107d9ad3282f58ae9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
