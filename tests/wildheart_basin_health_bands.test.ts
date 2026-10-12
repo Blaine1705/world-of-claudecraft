@@ -13,11 +13,11 @@ describe('Wildheart Basin heroic pools, unchanged by the bands', () => {
   const heroic = livePools('wildheart_basin', 'heroic');
   const normal = livePools('wildheart_basin', 'normal');
 
-  it('holds the Great Saurian at the miniboss band it already met', () => {
+  it('leaves the Great Saurian at its exact pool, two under the miniboss floor', () => {
+    // 14,998: two points UNDER the band's 15,000 floor. The owner's call was
+    // "Wildheart unchanged", so the pool is pinned as it is, not nudged in.
     expect(heroic.great_saurian.hp).toBe(14998);
-    // Two points under the band's floor to the template's rounding: "about 15,000".
-    expect(heroic.great_saurian.hp).toBeGreaterThanOrEqual(HEROIC_MINIBOSS_BAND.min - 5);
-    expect(heroic.great_saurian.hp).toBeLessThanOrEqual(HEROIC_MINIBOSS_BAND.max);
+    expect(HEROIC_MINIBOSS_BAND.min - heroic.great_saurian.hp).toBe(2);
   });
 
   it('leaves the three bosses and every normal pool where they were', () => {

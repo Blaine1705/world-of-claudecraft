@@ -14,7 +14,6 @@ import {
   HYDRA_LEFT_ID,
   HYDRA_RIGHT_ID,
   HYDRA_TUNING,
-  hydraRegrowShare,
   POOL,
 } from '../src/sim/encounters/drowned_temple';
 import { HEROIC_BOSS_BAND, type LivePool, livePools } from './helpers/dungeon_pools';
@@ -96,10 +95,9 @@ for (const difficulty of ['normal', 'heroic'] as const) {
       run(f, 0.7, hold);
       expect(heads[2].dead).toBe(false);
       // Half of 2,000 on normal; on heroic the half of the 4,306 a head had.
+      // Literals on purpose: a retune of the heroic head pool or of
+      // HYDRA_TUNING.regrowShareHeroic that moves this number has to move it here.
       expect(heads[2].hp).toBe(difficulty === 'heroic' ? 2153 : 1000);
-      expect(heads[2].hp).toBe(
-        Math.max(1, Math.round(pool * hydraRegrowShare(difficulty === 'heroic'))),
-      );
     });
   });
 }

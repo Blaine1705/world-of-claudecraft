@@ -16,6 +16,7 @@ import { HOLLOW_CRYPT_GATES, HOLLOW_CRYPT_SPAWNS } from '../src/sim/content/holl
 import { MOBS } from '../src/sim/data';
 import { embraceBreakShare, LADY_ID } from '../src/sim/encounters/hollow_crypt';
 import { boss, cryptFight } from './helpers/crypt_boss_fight';
+import { HEROIC_BOSS_BAND, HEROIC_MINIBOSS_BAND } from './helpers/dungeon_pools';
 
 vi.setConfig({ testTimeout: 300_000 });
 
@@ -53,8 +54,6 @@ const POOLS: Record<'normal' | 'heroic', Record<string, Row>> = {
   },
 };
 
-const HEROIC_BOSS_BAND = { min: 24_000, max: 30_000 };
-const HEROIC_MINIBOSS_BAND = { min: 15_000, max: 20_000 };
 /** What the Drake shipped with, and the factor both difficulties took. */
 const DRAKE_SHIPPED = { normal: 1040, heroic: 7936 };
 const DRAKE_FACTOR = 2;
