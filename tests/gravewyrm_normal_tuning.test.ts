@@ -162,10 +162,10 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       grand_necromancer_velkhar: 1,
       korzul_the_gravewyrm: 1,
     });
-    // The bosses' pools from fight length x 150 party DPS; the Tusker, the
-    // miniboss, took its heroic band factor (1.16 on its 5.43) on normal too.
+    // The bosses' pools, and the Tusker's (the miniboss), from fight length x
+    // 150 party DPS.
     expect(tuning.healthMultiplierByMob).toEqual({
-      sledge_tusker: 6.3,
+      sledge_tusker: 5.43,
       korgath_the_bound: 5.53,
       sanctum_shackle_hammer: 2,
       sanctum_shackle_tongs: 2,
@@ -188,7 +188,7 @@ describe('normal Gravewyrm Sanctum health', () => {
     expect(normalMaxHp('korgath_the_bound', 20)).toBe(12007); // was 4342
     expect(normalMaxHp('grand_necromancer_velkhar', 20)).toBe(15000); // was 3942
     expect(normalMaxHp('korzul_the_gravewyrm', 20)).toBe(23988); // was 6127
-    expect(normalMaxHp('sledge_tusker', 20)).toBe(10433); // was 8992 before the bands
+    expect(normalMaxHp('sledge_tusker', 20)).toBe(8992);
     // The new trash doubles like the shipped trash.
     expect(normalMaxHp('broodsworn_thawcaller', 20)).toBe(2093);
     expect(normalMaxHp('rime_whelp', 18)).toBe(522);

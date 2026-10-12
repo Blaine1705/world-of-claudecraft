@@ -3,9 +3,10 @@
 // 15,000 to 20,000, clearly under them. Korgath the Bound's body goes to about
 // 25,000 (his four Seal Shackles keep their pools) and the Sledge Tusker, the
 // miniboss, to about 16,000; Velkhar (22,991) already sits beside the band and
-// Korzul, the final boss, is untouched. The Tusker takes its heroic factor
-// (1.16) on normal too, where it stays under the weakest boss; every normal
-// boss pool is unchanged. Health only. Read from live spawns in a real claim.
+// Korzul, the final boss, is untouched. On normal the Tusker keeps its designed
+// pool, clearly under the bosses: at most three quarters of the weakest (the
+// owner's rule, 2026-10-12); every normal boss pool is unchanged. Health only.
+// Read from live spawns in a real claim.
 
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -13,6 +14,7 @@ import {
   HEROIC_MINIBOSS_BAND,
   type LivePool,
   livePools,
+  NORMAL_MINIBOSS_SHARE,
 } from './helpers/dungeon_pools';
 
 vi.setConfig({ testTimeout: 300_000 });
@@ -28,8 +30,8 @@ const HEROIC: Record<string, LivePool> = {
 };
 
 const NORMAL: Record<string, LivePool> = {
-  // The miniboss: was 8,992; the same 1.16 it took on heroic.
-  sledge_tusker: { hp: 10433, weapon: [398, 622], mech: 1, armor: 570 },
+  // The miniboss: its designed 60 s (it briefly carried 10,433 here).
+  sledge_tusker: { hp: 8992, weapon: [398, 622], mech: 1, armor: 570 },
   korgath_the_bound: { hp: 12007, weapon: [788, 1231], mech: 1, armor: 570 },
   grand_necromancer_velkhar: { hp: 15000, weapon: [524, 819], mech: 1, armor: 380 },
   korzul_the_gravewyrm: { hp: 23988, weapon: [734, 1148], mech: 1, armor: 646 },
@@ -56,16 +58,13 @@ describe('Gravewyrm Sanctum pools read from live spawns', () => {
     expect(heroic.korzul_the_gravewyrm.hp).toBeGreaterThan(HEROIC_BOSS_BAND.max);
   });
 
-  it('raises the Tusker by one factor on both difficulties, under the weakest normal boss', () => {
-    const heroicFactor = heroic.sledge_tusker.hp / 13796;
-    const normalFactor = normal.sledge_tusker.hp / 8992;
-    expect(Math.abs(heroicFactor - normalFactor)).toBeLessThan(0.001);
+  it('keeps the normal Tusker at three quarters of the weakest normal boss or less', () => {
     const weakest = Math.min(
       normal.korgath_the_bound.hp,
       normal.grand_necromancer_velkhar.hp,
       normal.korzul_the_gravewyrm.hp,
     );
     expect(weakest).toBe(12007);
-    expect(normal.sledge_tusker.hp).toBeLessThan(weakest);
+    expect(normal.sledge_tusker.hp).toBeLessThanOrEqual(weakest * NORMAL_MINIBOSS_SHARE);
   });
 });

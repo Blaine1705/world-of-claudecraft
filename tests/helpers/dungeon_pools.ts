@@ -17,6 +17,9 @@ export interface LivePool {
  *  minibosses 15,000 to 20,000, clearly under the bosses. */
 export const HEROIC_BOSS_BAND = { min: 24_000, max: 30_000 } as const;
 export const HEROIC_MINIBOSS_BAND = { min: 15_000, max: 20_000 } as const;
+/** The owner's normal rule (2026-10-12): a miniboss carries clearly less than
+ *  every boss of its dungeon, at most this share of the weakest one's pool. */
+export const NORMAL_MINIBOSS_SHARE = 0.75;
 
 /** Every spawn-list template of a claimed dungeon, by id (the first spawn of
  *  each template: bosses stand once). */

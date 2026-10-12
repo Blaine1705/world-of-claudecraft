@@ -4,10 +4,11 @@
 // every normal BOSS pool. The Dungeon Finder's encounter list says which is
 // which: Olen and Ossick are bosses; the Shipwreck Captain (template id
 // turretback_hermit, a solo elite outside the list) and the Gaol Turnkey (in
-// the list, but the gaol's miniboss by its own content) are minibosses. A
-// miniboss takes its heroic factor on normal too, where it stays under the
-// weakest boss. Health only: melee, mechanic factors and armor are the shipped
-// numbers. Read from live spawns in a real claim.
+// the list, but the gaol's miniboss by its own content) are minibosses. On
+// normal a miniboss keeps its designed pool, clearly under the bosses: at most
+// three quarters of the weakest (the owner's rule, 2026-10-12). Health only:
+// melee, mechanic factors and armor are the shipped numbers. Read from live
+// spawns in a real claim.
 
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -15,6 +16,7 @@ import {
   HEROIC_MINIBOSS_BAND,
   type LivePool,
   livePools,
+  NORMAL_MINIBOSS_SHARE,
 } from './helpers/dungeon_pools';
 
 vi.setConfig({ testTimeout: 300_000 });
@@ -33,12 +35,12 @@ const HEROIC: Record<string, LivePool> = {
 };
 
 const NORMAL: Record<string, LivePool> = {
-  // The Captain: was 4,495; the same 1.23 he took on heroic.
-  turretback_hermit: { hp: 5539, weapon: [55, 85], mech: undefined, armor: 360 },
+  // The Captain: his designed 60 s (he briefly carried 5,539 here).
+  turretback_hermit: { hp: 4495, weapon: [55, 85], mech: undefined, armor: 360 },
   knight_commander_olen: { hp: 5995, weapon: [48, 74], mech: undefined, armor: 264 },
   gaoler_ossick: { hp: 6796, weapon: [51, 79], mech: undefined, armor: 288 },
-  // The Turnkey: was 3,599; the same 1.45 it took on heroic.
-  gaol_turnkey: { hp: 5214, weapon: [51, 79], mech: undefined, armor: 288 },
+  // The Turnkey: its designed 50 s (it briefly carried 5,214 here).
+  gaol_turnkey: { hp: 3599, weapon: [51, 79], mech: undefined, armor: 288 },
   vael_the_mistcaller: { hp: 11998, weapon: [52, 81], mech: undefined, armor: 312 },
 };
 
@@ -67,22 +69,15 @@ describe('Sunken Bastion pools read from live spawns', () => {
     expect(heroic.vael_the_mistcaller.hp).toBeGreaterThan(HEROIC_BOSS_BAND.max);
   });
 
-  it('raises each miniboss by one factor on both difficulties, under the weakest normal boss', () => {
-    const was = {
-      turretback_hermit: { heroic: 13801, normal: 4495 },
-      gaol_turnkey: { heroic: 11041, normal: 3599 },
-    };
+  it('keeps each normal miniboss at three quarters of the weakest normal boss or less', () => {
     const weakest = Math.min(
       normal.knight_commander_olen.hp,
       normal.gaoler_ossick.hp,
       normal.vael_the_mistcaller.hp,
     );
     expect(weakest).toBe(5995);
-    for (const [id, old] of Object.entries(was)) {
-      const heroicFactor = heroic[id].hp / old.heroic;
-      const normalFactor = normal[id].hp / old.normal;
-      expect(Math.abs(heroicFactor - normalFactor), id).toBeLessThan(0.002);
-      expect(normal[id].hp, id).toBeLessThan(weakest);
+    for (const id of ['turretback_hermit', 'gaol_turnkey']) {
+      expect(normal[id].hp, id).toBeLessThanOrEqual(weakest * NORMAL_MINIBOSS_SHARE);
     }
   });
 });

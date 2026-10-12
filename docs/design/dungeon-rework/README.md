@@ -198,8 +198,12 @@ solo elite outside it is a miniboss, EXCEPT that the Gaol Turnkey is listed but 
 the gaol's miniboss by its own content, and the Mere Hydra is a boss by the
 owner's ruling of 2026-10-12 although the list on this branch has no row for it
 (the row lands with the tracker branch `fix/dungeon-tracker-hydra-boss`). Normal
-BOSS pools keep their designed lengths; a miniboss raised on heroic takes the same
-factor on normal while it stays under its dungeon's weakest boss. Health only:
+BOSS pools keep their designed lengths. On normal the owner's rule (2026-10-12) is
+that a miniboss carries clearly less than every boss of its dungeon: at most three
+quarters of the weakest one's pool. The designed miniboss pools already sat there,
+so they stand; the heroic band factors are NOT carried to normal (a first pass did,
+and left the Captain, the Turnkey and the Tusker at about 90 percent of their
+weakest boss). Health only:
 melee and mechanic factors do not move, and a check sized by a share of the pool
 keeps the absolute damage it asked for (the Lady's Frozen Embrace, the Mere Hydra's
 regrown head).
@@ -213,13 +217,13 @@ there were three. Enraged Hydra counts the heads lying dead (two at most), so it
 level cannot pass the design, but a group that kills head by head now fights under
 it for about 133 s where it was 67 s.
 
-| Dungeon | Bosses at about 25,000 (was) | Minibosses in 15,000 to 20,000 (was) | Normal change |
+| Dungeon | Bosses at about 25,000 (was) | Minibosses in 15,000 to 20,000 (was) | Normal minibosses (share of the weakest normal boss) |
 |---|---|---|---|
-| Hollow Crypt | Sexton Marrow 24,996 (16,099), Lady of the Bonechill 24,999 (18,382), Cantor Ilvane 24,996 (14,687) | Ossuary Drake 15,872 (7,936), Knellwyrm 18,403 (7,254) | Drake 2,079 (1,040); Knellwyrm 4,400 (1,081), above Marrow's 3,152 and PENDING the owner's call |
-| Sunken Bastion | Knight-Commander Olen 24,999 (18,382), Gaoler Ossick 24,999 (19,530) | Shipwreck Captain 16,996 (13,801), Gaol Turnkey 15,994 (11,041) | Captain 5,539 (4,495), Turnkey 5,214 (3,599) |
+| Hollow Crypt | Sexton Marrow 24,996 (16,099), Lady of the Bonechill 24,999 (18,382), Cantor Ilvane 24,996 (14,687) | Ossuary Drake 15,872 (7,936), Knellwyrm 18,403 (7,254) | Drake 2,079 (was 1,040) and Knellwyrm 2,357 (was 1,081): 66 and 75 percent of Marrow's 3,152 |
+| Sunken Bastion | Knight-Commander Olen 24,999 (18,382), Gaoler Ossick 24,999 (19,530) | Shipwreck Captain 16,996 (13,801), Gaol Turnkey 15,994 (11,041) | Captain 4,495 and Turnkey 3,599, unchanged: 75 and 60 percent of Olen's 5,995 |
 | Drowned Temple | Choirmother Selthe 25,004 (20,650); Mere Hydra 8,333 a head, 24,999 in all (4,306 a head); Tideglass Colossus 23,003 unchanged | none | none |
-| Wildheart Basin | Beastmaster and jaguar 23,005, Gorgebloom 23,003, all unchanged | Great Saurian 14,998 unchanged | none |
-| Gravewyrm Sanctum | Korgath the Bound 25,004 (18,391), shackles unchanged; Velkhar 22,991 unchanged | Sledge Tusker 16,002 (13,796) | Tusker 10,433 (8,992) |
+| Wildheart Basin | Beastmaster and jaguar 23,005, Gorgebloom 23,003, all unchanged | Great Saurian 14,998 unchanged | Great Saurian about 10,000, unchanged: about two thirds of the 15,000 bosses |
+| Gravewyrm Sanctum | Korgath the Bound 25,004 (18,391), shackles unchanged; Velkhar 22,991 unchanged | Sledge Tusker 16,002 (13,796) | Tusker 8,992, unchanged: 75 percent of Korgath's 12,007 |
 
 Pinned from live spawns by `tests/hollow_crypt_boss_pools.test.ts`,
 `tests/hollow_crypt_knellwyrm_pool.test.ts` and the four

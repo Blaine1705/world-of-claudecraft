@@ -232,12 +232,13 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     healthMultiplier: 2.0,
     healthMultiplierByMob: {
       // The Sledge Tusker is the Sanctum's miniboss (a solo elite outside the
-      // Finder's encounter list). It was 5.43 (about 9,000); the owner's
-      // heroic bands (2026-10-12, the heroic record below) raise it x1.16
-      // there, and a miniboss takes the same factor on normal while it stays
-      // under the weakest boss (Korgath, 12,007): 10,433. Normal BOSS pools
-      // are untouched.
-      sledge_tusker: 6.3,
+      // Finder's encounter list): its designed 60 s, 8,992. The owner's rule
+      // for normal (2026-10-12): a miniboss carries clearly less than every
+      // boss of its dungeon, at most three quarters of the weakest (Korgath,
+      // 12,007). The heroic band factor it briefly took here (6.3, 10,433)
+      // put it at 87 percent, so normal is back on the design; the heroic
+      // record below keeps its band.
+      sledge_tusker: 5.43,
       // Korgath's body about 12,000 (80 s), plus his four Seal Shackles at
       // about 1,500 each (encounters/gravewyrm_sanctum/korgath.ts): about 105 s
       // with all four broken, longer the more chains the group leaves on.
@@ -358,14 +359,15 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       vael_the_mistcaller: 8.05,
       // The two minibosses (the Shipwreck Captain, id turretback_hermit, a
       // solo elite outside the Finder's encounter list, and the Gaol Turnkey,
-      // in the list but the gaol's miniboss by its own content) were priced at
-      // 60 s (3.66, about 4,500) and 50 s (2.93, about 3,600). The owner's
-      // heroic bands (2026-10-12, the heroic record below) raise them there,
-      // and a miniboss takes the same factor on normal while it stays under
-      // the weakest boss (Olen, 5,995): the Captain x1.23 (5,539), the
-      // Turnkey x1.45 (5,214). Normal BOSS pools are untouched.
-      turretback_hermit: 4.51,
-      gaol_turnkey: 4.245,
+      // in the list but the gaol's miniboss by its own content) are priced at
+      // 60 s (3.66, 4,495) and 50 s (2.93, 3,599). The owner's rule for
+      // normal (2026-10-12): a miniboss carries clearly less than every boss
+      // of its dungeon, at most three quarters of the weakest (Olen, 5,995).
+      // The heroic band factors they briefly took here (5,539 and 5,214) put
+      // them at 92 and 87 percent, so normal is back on the design; the
+      // heroic record below keeps its bands.
+      turretback_hermit: 3.66,
+      gaol_turnkey: 2.93,
     },
     // The crawler and the prisoner carry a heroic-priced base swing (see
     // their templates); normal damps it back to the fodder line.
@@ -408,19 +410,23 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       // The Knellwyrm his dying rite summons (encounters/hollow_crypt/
       // knellwyrm.ts) spawned on its bare template (1,081: dead in about
       // 20 s, before its first Dread Bellow at 24 s; the manager's playtest
-      // of 2026-10-12). Priced like the wing bosses: 80 s (the Lady's and
-      // Ilvane's budget) at 55 (level 10) is 4,400 on that pool. Its clocks
-      // fit: Pyre Strafe at 14 s, Dread Bellow at 24 s and again at 54 s, and
-      // a party at twice the planning DPS still meets each once in its 40 s.
-      crypt_knellwyrm: 4.07,
+      // of 2026-10-12). It is a miniboss, and the owner's rule for normal
+      // (2026-10-12) is that a miniboss carries clearly less than every boss
+      // of its dungeon: at most three quarters of the weakest (Marrow,
+      // 3,152). So 2.18, 2,357 on that pool (it was first priced at 4.07,
+      // 4,400, above Marrow and the Lady). About 43 s at the planning 55
+      // (level 10): Pyre Strafe at 14 s and the Dread Bellow at 24 s both
+      // come round. A party well over the planning pace kills it before the
+      // Bellow lands; the rule outranks that.
+      crypt_knellwyrm: 2.18,
       // The Crypt's one spawn-list miniboss, the Ossuary Drake (a solo elite
       // that holds the Processional's 'drake' pull alone and is no gate's
       // boss). The manager's playtest of 2026-10-12 asked for double health
       // on the minibosses; the owner's rule is the heroic band (15,000 to
-      // 20,000, the heroic record below) and the same factor on normal while
-      // it stays under the weakest wing boss (Marrow, 3,152): twice its
-      // template pool, 2,079 where it had 1,040. Health only: its bite and
-      // its breath, lash and gust land what they did.
+      // 20,000, the heroic record below) and, on normal, at most three
+      // quarters of the weakest boss (Marrow, 3,152): twice its template
+      // pool, 2,079 where it had 1,040, two thirds of Marrow. Health only:
+      // its bite and its breath, lash and gust land what they did.
       crypt_ossuary_drake: 2,
     },
     damageMultiplierByMob: {},

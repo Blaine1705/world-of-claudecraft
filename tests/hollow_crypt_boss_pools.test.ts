@@ -16,7 +16,11 @@ import { HOLLOW_CRYPT_GATES, HOLLOW_CRYPT_SPAWNS } from '../src/sim/content/holl
 import { MOBS } from '../src/sim/data';
 import { embraceBreakShare, LADY_ID } from '../src/sim/encounters/hollow_crypt';
 import { boss, cryptFight } from './helpers/crypt_boss_fight';
-import { HEROIC_BOSS_BAND, HEROIC_MINIBOSS_BAND } from './helpers/dungeon_pools';
+import {
+  HEROIC_BOSS_BAND,
+  HEROIC_MINIBOSS_BAND,
+  NORMAL_MINIBOSS_SHARE,
+} from './helpers/dungeon_pools';
 
 vi.setConfig({ testTimeout: 300_000 });
 
@@ -118,12 +122,12 @@ for (const difficulty of ['normal', 'heroic'] as const) {
         for (const id of BOSSES) expect(drake, id).toBeLessThan(boss(f, id).maxHp - 4000);
       });
     } else {
-      it('keeps the miniboss under the weakest wing boss on normal', () => {
+      it('keeps the miniboss at three quarters of the weakest wing boss or less on normal', () => {
         const weakest = Math.min(
           ...['sexton_marrow', 'rimeweb', 'cantor_ilvane'].map((id) => boss(f, id).maxHp),
         );
         expect(weakest).toBe(3152);
-        expect(boss(f, DRAKE).maxHp).toBeLessThan(weakest);
+        expect(boss(f, DRAKE).maxHp).toBeLessThanOrEqual(weakest * NORMAL_MINIBOSS_SHARE);
       });
     }
 

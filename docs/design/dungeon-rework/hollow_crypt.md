@@ -204,17 +204,16 @@ it in seconds) take it to about 6.5. The four bosses are about 6.3 minutes (70,
 80, 80 and 150 s), walking about 2: about 15 minutes. To be measured with the
 meters harness before shipping, like the boss health.
 
-**The normal budget after the playtest pools (2026-10-12): about 16.5 minutes.**
+**The normal budget after the playtest pools (2026-10-12): about 16 minutes.**
 Two pools moved on normal. The Ossuary Drake, the miniboss, doubled (1,040 to
 2,079): it is a single target, so its extra 1,040 costs about 23 s at 45 and the
 trash goes from about 6.5 to about 6.9 minutes (about 25,000 trash health, about
-9.3 minutes single target). The Knellwyrm (1,081 to 4,400) sits OUTSIDE Morthen's
+9.3 minutes single target). The Knellwyrm (1,081 to 2,357) sits OUTSIDE Morthen's
 150 s: it arrives after he falls (the pyre, the flight in and the landing, about
-11 s) and then fights about 70 s at the planning 55 (80 s on paper, less its
-Bared Ribs windows), about 80 s more where the bare template gave about 30. So:
-trash 6.9, the four bosses 6.3, the Knellwyrm 1.35, walking 2, about 16.5 minutes
-against the 15 the design set. The wing bosses and Morthen keep their normal
-lengths. The Knellwyrm's normal 4,400 is pending the owner's call (section 5.4).
+11 s) and then fights about 37 s at the planning 55 (43 s on paper, less its
+Bared Ribs window), about 30 s more than the bare template gave. So: trash 6.9,
+the four bosses 6.3, the Knellwyrm 0.8, walking 2, about 16 minutes against the 15
+the design set. The wing bosses and Morthen keep their normal lengths.
 
 ### 4.1 Trash mechanics pass (2026-10-04)
 
@@ -422,20 +421,20 @@ full-health cloth wearer; a player rooted by the Grasp in front of the Reap is l
 
 **The Knellwyrm's health (2026-10-12).** It spawned on its bare template (1,081
 normal, 7,254 heroic: dead in about 20 s on normal, before its first Dread Bellow at
-24 s; the manager's playtest: "Dragon Morthen had 700 hp?"). It is now priced like
-every Crypt boss, fight length x planning party DPS: 80 s (the Lady's and Ilvane's
-budget) x 55 = 4,400 normal (`healthMultiplierByMob.crypt_knellwyrm` 4.07 on its
-1,081 pool) and 80 s x 230 = 18,400 heroic (9.64 on its 1,909 level-22 pool), about
-two thirds of Morthen's own pool. Its clocks fit that length (Pyre Strafe at 14 s,
-Dread Bellow at 24 s and 54 s, the heroic Burning Knell at 30 s), and a party at
-twice the planning DPS still meets each once. Its melee and mechanic numbers are
-untouched. Pinned by `tests/hollow_crypt_knellwyrm_pool.test.ts`. As a miniboss its
-heroic 18,403 sits inside the 15,000 to 20,000 band. Its normal 4,400 is ABOVE the
-weakest wing boss (Marrow, 3,152): the heroic factor (2.54 on the bare 7,254) would
-give about 2,740 on normal, about 45 s at the planning 55. It is left at 4,400
-pending the owner's call, because its first Dread Bellow comes at 24 s and lands at
-26 s: a pool under 3,152 still shows it at the planning 55 (about 50 s), but a party
-at twice that pace would kill a 2,740 wyrm in about 25 s, before the Bellow lands.
+24 s; the manager's playtest: "Dragon Morthen had 700 hp?"). On heroic it is priced
+like every Crypt boss, fight length x planning party DPS: 80 s x 230 = 18,400 (9.64
+on its 1,909 level-22 pool), about two thirds of Morthen's own pool and inside the
+miniboss band (15,000 to 20,000). Its heroic clocks fit that length (Pyre Strafe at
+14 s, Dread Bellow at 24 s and 54 s, the Burning Knell at 30 s), and a heroic party
+at twice the planning DPS still meets each once. On normal it follows the owner's
+rule for minibosses (2026-10-12): clearly less than every boss of its dungeon, at
+most three quarters of the weakest (Marrow, 3,152). So 2,357
+(`healthMultiplierByMob.crypt_knellwyrm` 2.18 on its 1,081 pool; a first pass priced
+it at 80 s x 55 = 4,400, above Marrow and the Lady). At the planning 55 that is a
+37 s fight in which the Pyre Strafe and the Dread Bellow (it lands at 26 s) both
+come round; a party at twice that pace kills it in about 21 s, after the Strafe and
+before the Bellow. The rule outranks the Bellow there. Its melee and mechanic
+numbers are untouched. Pinned by `tests/hollow_crypt_knellwyrm_pool.test.ts`.
 
 **The Knellwyrm (normal kit unchanged), heroic Burning Knell.** Every 55 s (first
 30 s into its fight) it takes wing from where it stands (2.5 s, out of reach:

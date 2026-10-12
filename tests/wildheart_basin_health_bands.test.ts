@@ -5,7 +5,7 @@
 // are. Read from live spawns so a later retune has to move this pin on purpose.
 
 import { describe, expect, it, vi } from 'vitest';
-import { HEROIC_MINIBOSS_BAND, livePools } from './helpers/dungeon_pools';
+import { HEROIC_MINIBOSS_BAND, livePools, NORMAL_MINIBOSS_SHARE } from './helpers/dungeon_pools';
 
 vi.setConfig({ testTimeout: 300_000 });
 
@@ -30,5 +30,16 @@ describe('Wildheart Basin heroic pools, unchanged by the bands', () => {
     expect(normal.fanglord_jaguar.hp).toBe(15013);
     expect(normal.the_gorgebloom.hp).toBe(15000);
     expect(normal.wildheart_high_priest.hp).toBe(24808);
+  });
+
+  it('keeps the normal Great Saurian at three quarters of the weakest normal boss or less', () => {
+    const weakest = Math.min(
+      normal.wildheart_beastmaster.hp,
+      normal.fanglord_jaguar.hp,
+      normal.the_gorgebloom.hp,
+      normal.wildheart_high_priest.hp,
+    );
+    expect(weakest).toBe(15000);
+    expect(normal.great_saurian.hp).toBeLessThanOrEqual(weakest * NORMAL_MINIBOSS_SHARE);
   });
 });

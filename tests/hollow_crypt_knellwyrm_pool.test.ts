@@ -1,10 +1,12 @@
 // The Knellwyrm's health (playtest, 2026-10-12: "Dragon Morthen had 700 hp?").
 // The finale spawned on its bare template (1,081 on normal, 7,254 on heroic):
-// dead in about 20 s on normal, before its first Dread Bellow. Its pool is now
-// set the way every Crypt boss's is, fight length x planning party DPS
-// (dungeon_difficulty.ts): 80 s x 55 on normal, 80 s x 230 on heroic. Read from
-// the live summon in a real claimed crypt, then fought for real at the
-// planning DPS: every one of its mechanics comes round before it falls.
+// dead in about 20 s on normal, before its first Dread Bellow. On heroic its
+// pool is set the way every Crypt boss's is, fight length x planning party DPS
+// (dungeon_difficulty.ts): 80 s x 230. On normal it follows the owner's rule
+// for minibosses (2026-10-12): clearly less than every boss of its dungeon, at
+// most three quarters of the weakest (Sexton Marrow). Read from the live
+// summon in a real claimed crypt, then fought for real at the planning DPS:
+// every one of its mechanics comes round before it falls.
 
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -24,14 +26,15 @@ import {
 } from '../src/sim/mob/trash_kit/cast_ids';
 import { DT, type Entity } from '../src/sim/types';
 import { boss, cryptFight, type Fight, put, run, tick } from './helpers/crypt_boss_fight';
+import { livePools, NORMAL_MINIBOSS_SHARE } from './helpers/dungeon_pools';
 
 vi.setConfig({ testTimeout: 300_000 });
 
-/** The planning numbers the pool is derived from. */
-const FIGHT_SECONDS = 80;
+/** The planning numbers: the party's pace, and the heroic pool's length. */
+const HEROIC_FIGHT_SECONDS = 80;
 const PARTY_DPS = { normal: 55, heroic: 230 } as const;
-/** The live pool that gives (dungeon_difficulty.ts 4.07 and 9.64). */
-const POOL = { normal: 4400, heroic: 18403 } as const;
+/** The live pool (dungeon_difficulty.ts 2.18 and 9.64). */
+const POOL = { normal: 2357, heroic: 18403 } as const;
 /** What it spawned with before: its bare template. */
 const BARE = { normal: 1081, heroic: 7254 } as const;
 /** Its melee and mechanic factor, untouched. */
@@ -123,15 +126,21 @@ for (const difficulty of ['normal', 'heroic'] as const) {
     it('lands with its derived pool and fights a whole fight at the planning DPS', () => {
       const fought = fight(difficulty, 1);
       const { wyrm, seconds } = fought;
-      // The pool: 80 s of the planning party's damage, to the template's rounding.
       expect(wyrm.maxHp).toBe(POOL[difficulty]);
-      const planned = FIGHT_SECONDS * PARTY_DPS[difficulty];
-      expect(Math.abs(wyrm.maxHp - planned) / planned).toBeLessThan(0.005);
-      expect(wyrm.maxHp).toBeGreaterThan(BARE[difficulty] * 2.5);
-      // A miniboss: on heroic inside 15,000 to 20,000, under the bosses' 25,000.
+      // More than the doubling the playtest asked of the minibosses.
+      expect(wyrm.maxHp).toBeGreaterThan(BARE[difficulty] * 2);
       if (difficulty === 'heroic') {
+        // 80 s of the planning party's damage, to the template's rounding...
+        const planned = HEROIC_FIGHT_SECONDS * PARTY_DPS.heroic;
+        expect(Math.abs(wyrm.maxHp - planned) / planned).toBeLessThan(0.005);
+        // ...which is a miniboss's: inside 15,000 to 20,000, under the bosses' 25,000.
         expect(wyrm.maxHp).toBeGreaterThanOrEqual(15_000);
         expect(wyrm.maxHp).toBeLessThanOrEqual(20_000);
+      } else {
+        // A miniboss: three quarters of the Crypt's weakest boss or less.
+        const marrow = livePools('hollow_crypt', 'normal').sexton_marrow.hp;
+        expect(marrow).toBe(3152);
+        expect(wyrm.maxHp).toBeLessThanOrEqual(marrow * NORMAL_MINIBOSS_SHARE);
       }
       // Health only: its melee and its mechanic factor are the shipped ones.
       expect([wyrm.weapon?.min, wyrm.weapon?.max]).toEqual(DAMAGE[difficulty].weapon);
@@ -139,19 +148,33 @@ for (const difficulty of ['normal', 'heroic'] as const) {
       // Its purse waits on the body for the boss hold, not the trash minute.
       expect(wyrm.lootable).toBe(true);
       expect(wyrm.corpseTimer).toBeGreaterThan(BOSS_CORPSE_HOLD_SECONDS - 5);
-      // A finale, not a formality: over a minute, and done inside the budget
-      // (heroic adds its Burning Knell, flown out of reach).
-      expect(seconds).toBeGreaterThan(60);
-      expect(seconds).toBeLessThan(difficulty === 'heroic' ? 150 : 110);
+      // A finale, not a formality, and done inside the budget: over a minute
+      // on heroic (its Burning Knell is flown out of reach), and on normal
+      // long enough for the Dread Bellow to land (26 s) with time to spare.
+      expect(seconds).toBeGreaterThan(difficulty === 'heroic' ? 60 : 32);
+      expect(seconds).toBeLessThan(difficulty === 'heroic' ? 150 : 50);
       expectWholeKit(fought, difficulty);
     });
 
-    it('still shows every mechanic to a party at twice the planning DPS', () => {
+    it('meets a party at twice the planning DPS with what its pool allows', () => {
       const fought = fight(difficulty, 2);
-      // Half the fight on the ground (the heroic Knell flies on top of it).
-      expect(fought.seconds).toBeGreaterThan(26);
-      expect(fought.seconds).toBeLessThan(difficulty === 'heroic' ? 80 : 50);
-      expectWholeKit(fought, difficulty);
+      if (difficulty === 'heroic') {
+        // Half the fight on the ground (the Knell flies on top of it): every
+        // mechanic still comes round.
+        expect(fought.seconds).toBeGreaterThan(26);
+        expect(fought.seconds).toBeLessThan(80);
+        expectWholeKit(fought, difficulty);
+        return;
+      }
+      // Normal: a miniboss's pool does not promise the Dread Bellow (it lands
+      // at 26 s) at twice the pace. The drake kit and the Pyre Strafe (marked
+      // at 14 s) still come round.
+      expect(fought.seconds).toBeGreaterThan(18);
+      expect(fought.seconds).toBeLessThan(26);
+      expect(fought.casts).toContain(CRYPT_BARROWFLAME_BREATH);
+      expect(fought.casts).toContain(CRYPT_TAIL_LASH);
+      expect(fought.casts).toContain(CRYPT_WING_GUST);
+      expect(fought.casts).toContain(KNELLWYRM_PYRE_STRAFE);
     });
   });
 }
