@@ -1264,6 +1264,35 @@ describe('apply-enchant draws carried-then-vault, grade-blind', () => {
     expect(enchanted?.count).toBe(1);
   });
 
+  it("draws the enchanter's OWN signed vault dust, never another player's", () => {
+    const own = makeSim();
+    const ownPid = own.playerId;
+    grant(own, SWORD, 1, ownPid);
+    const ownMeta = metaOf(own, ownPid);
+    ownMeta.vault.special.push({
+      itemId: 'arcane_dust',
+      count: 5,
+      instance: { signer: ownMeta.name },
+    });
+
+    expect(resolveApplyEnchant(own.ctx, ownPid, SWORD, ENCHANT).ok).toBe(true);
+    expect(ownMeta.vault.special).toEqual([]);
+
+    const foreign = makeSim();
+    const foreignPid = foreign.playerId;
+    grant(foreign, SWORD, 1, foreignPid);
+    const foreignMeta = metaOf(foreign, foreignPid);
+    foreignMeta.vault.special.push({
+      itemId: 'arcane_dust',
+      count: 5,
+      instance: { signer: 'Ada' },
+    });
+    const before = structuredClone(foreignMeta.vault);
+
+    expect(resolveApplyEnchant(foreign.ctx, foreignPid, SWORD, ENCHANT).ok).toBe(false);
+    expect(foreignMeta.vault).toEqual(before);
+  });
+
   it('emits the vaultCraftConsume ledger event for what left the vault', () => {
     // THE PERMANENT AUDIT RECORD. A vault draw resolves inside sim.tick(),
     // several ticks after its command dispatch, so the server has no

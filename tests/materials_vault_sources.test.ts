@@ -20,6 +20,7 @@
 //   boundary value that cannot mint or double-draw.
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD } from '../src/sim/data';
+import { materialItemIds } from '../src/sim/material_ids';
 import {
   canonicalMaterialComposition,
   type MaterialComposition,
@@ -40,6 +41,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, WorldContent } from '../src/sim/types';
 import { vaultDrawBlocked, vaultDrawStock } from '../src/sim/vault_craft_gate';
+import { splitVaultTakesBySigner } from '../src/sim/vault_material_sources';
 import { placeInDungeon, placeInOpenWorld } from './helpers/instanced_contexts';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -603,6 +605,89 @@ describe('units signed by the crafter themself are drawable from the vault', () 
     expect(craftVaultStockFor(sim.ctx, sim.playerId)).toEqual({ copper_ore: 4 });
     expect(consumePlayerVaultStock(meta, 'copper_ore', 4)).toBe(true);
     expect(storedUnits(sim, 'copper_ore')).toBe(0);
+  });
+
+  it("spends recorded-gatherer plain units before the crafter's own signed ones", () => {
+    const sim = openWorldSim();
+    const meta = metaOf(sim);
+    const self: MaterialSource = { gatherer: ANA, signer: meta.name };
+    meta.vault.special.push({
+      itemId: 'copper_ore',
+      count: 6,
+      materialSources: composition([
+        { source: unknownSource, count: 1 },
+        { source: anaSource, count: 2 },
+        { source: self, count: 3 },
+      ]),
+    });
+
+    expect(consumePlayerVaultStock(meta, 'copper_ore', 4)).toBe(true);
+    expect(buckets(meta.vault.special[0].materialSources)).toEqual({
+      [materialSourceKey(self)]: 2,
+    });
+  });
+
+  it('refuses an over-ask that self-signed units would only partly cover, mutating nothing', () => {
+    const { sim } = selfMixedSim();
+    const meta = metaOf(sim);
+    const before = structuredClone(meta.vault);
+
+    expect(consumePlayerVaultStock(meta, 'copper_ore', 6)).toBe(false);
+    expect(meta.vault).toEqual(before);
+  });
+
+  it("reads the DRAWING player's name: units signed by someone else stay theirs", () => {
+    const sim = openWorldSim();
+    const signer = metaOf(sim).name;
+    const otherPid = sim.addPlayer('warrior', 'Vaultkeeper Bru', { autoEquip: false });
+    placeInOpenWorld(sim, otherPid);
+    const other = metaOf(sim, otherPid);
+    other.vault.upgrades = 1;
+    const row: InvSlot = { itemId: 'copper_ore', count: 3, instance: { signer } };
+    other.vault.special.push(structuredClone(row));
+    const before = structuredClone(other.vault);
+
+    expect(craftVaultStockFor(sim.ctx, otherPid)).toEqual({});
+    expect(consumePlayerVaultStock(other, 'copper_ore', 1)).toBe(false);
+    expect(other.vault).toEqual(before);
+
+    // Control: the same row in the signer's own vault is theirs to draw.
+    metaOf(sim).vault.special.push(structuredClone(row));
+    expect(craftVaultStockFor(sim.ctx, sim.playerId)).toEqual({ copper_ore: 3 });
+  });
+
+  it('splits a planned take list so only the self-signed share carries the signer', () => {
+    const { sim } = selfMixedSim();
+    const meta = metaOf(sim);
+    const ids = materialItemIds();
+    const split = (takes: { itemId: string; count: number }[], signer?: string) =>
+      splitVaultTakesBySigner(takes, meta.vault.stock, meta.vault.special, ids, signer);
+
+    // 2 plain units cover the first take; the second take's 3 are all self-signed.
+    expect(
+      split(
+        [
+          { itemId: 'copper_ore', count: 2 },
+          { itemId: 'copper_ore', count: 3 },
+        ],
+        meta.name,
+      ),
+    ).toEqual([
+      { itemId: 'copper_ore', count: 2 },
+      { itemId: 'copper_ore', count: 3, signer: meta.name },
+    ]);
+    // One take straddling the boundary splits into a pooled and a signed part.
+    expect(split([{ itemId: 'copper_ore', count: 4 }], meta.name)).toEqual([
+      { itemId: 'copper_ore', count: 2 },
+      { itemId: 'copper_ore', count: 2, signer: meta.name },
+    ]);
+    // Plain-only draws and unnamed callers pass through untouched.
+    expect(split([{ itemId: 'copper_ore', count: 2 }], meta.name)).toEqual([
+      { itemId: 'copper_ore', count: 2 },
+    ]);
+    expect(split([{ itemId: 'copper_ore', count: 4 }])).toEqual([
+      { itemId: 'copper_ore', count: 4 },
+    ]);
   });
 
   it('the bare primitive with no crafter named still refuses every signed unit', () => {

@@ -53,7 +53,7 @@
 import { isMaterialItemId, materialItemIds } from '../src/sim/material_ids';
 import type { MaterialSourceDelta } from '../src/sim/material_sources';
 import { normalizeMaterialStack } from '../src/sim/material_stack';
-import type { ItemInstancePayload } from '../src/sim/types';
+import type { ItemInstancePayload, VaultConsumptionTake } from '../src/sim/types';
 import type { BankInfo, GuildBankInfo, VaultInfo } from '../src/world_api';
 import { BankLedgerGrowthLimitExceeded } from './bank_ledger_growth_budget';
 import { type BankLedgerRow, insertBankLedgerRow, insertBankLedgerRows } from './db';
@@ -988,7 +988,7 @@ export function buildVaultLedgerRows(
  *  canonically sorted takes, and the rung it sampled. */
 export interface VaultCraftConsumption {
   who: { characterId: number; accountId: number };
-  takes: readonly { itemId: string; count: number }[];
+  takes: readonly VaultConsumptionTake[];
   upgrades: number;
 }
 
@@ -1005,7 +1005,13 @@ export function buildVaultCraftConsumeLedgerRows(
       op: 'craft_consume',
       itemId: take.itemId,
       count: take.count,
-      instance: null,
+      // A signer-carrying take drew the crafter's OWN signed units, which the
+      // count ledger keys exactly as vaultCountGroups keys that bucket; every
+      // other take is ordinary pooled stock.
+      instance:
+        take.signer === undefined
+          ? null
+          : vaultCountLedgerIdentity(effectiveCountPayload(undefined, take.signer), null),
       copperDelta: 0,
       purchasedSlotsAfter: c.upgrades,
       container: 'vault',

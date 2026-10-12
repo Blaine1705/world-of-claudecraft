@@ -29,9 +29,11 @@
 // because every one was premium, rolled, bound, locked or recipe-marked;
 // plainly gathered material is none of those, so it stays drawable now that its
 // representation moved, and a premium bucket stays undrawable inside a mixed
-// row rather than refusing the row whole. Recording a gatherer grants no
-// benefit and unlocks no unit. The read and the spend take their per-id total
-// from the same helper, so they agree by construction.
+// row rather than refusing the row whole, with ONE exception: units signed with
+// the drawing crafter's own name are theirs to spend, after every plain unit
+// (vault_material_sources.ts autoDrawableSource). Recording a gatherer grants
+// no benefit and unlocks no unit. The read and the spend take their per-id
+// total from the same helper, so they agree by construction.
 //
 // Shape follows bank.ts exactly: free functions `fn(ctx, ...)` behind
 // SimContext, backing state on PlayerMeta.vault (persisted INSIDE the character
@@ -832,8 +834,9 @@ export function drawableCounterFor(
  *  provenance, no identity row was auto-drawable, because every one was
  *  premium, rolled, bound, locked or recipe-marked. Plainly gathered material is
  *  none of those, so it stays spendable now that its representation moved; a
- *  premium bucket stays unspendable, including inside a mixed row, and a row
- *  keeping any per-copy identity contributes nothing. `planVaultDraw` refuses
+ *  premium bucket stays unspendable, including inside a mixed row, unless
+ *  `selfSigner` names its own signer (the crafter spending units they signed),
+ *  and a row keeping any per-copy identity contributes nothing. `planVaultDraw` refuses
  *  anything past the SAME per-id total the projection publishes, which is what
  *  makes read and spend agree by construction rather than by review.
  *

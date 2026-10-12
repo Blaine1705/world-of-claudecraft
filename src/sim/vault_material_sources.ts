@@ -77,7 +77,7 @@ import {
   materialSourceKey,
 } from './material_sources';
 import { type MaterialStackSlot, normalizeMaterialStack } from './material_stack';
-import type { InvSlot } from './types';
+import type { InvSlot, VaultConsumptionTake } from './types';
 
 /**
  * The fields every routing and eligibility rule below reads off a stack, and
@@ -475,6 +475,67 @@ export function planVaultDraw(
   // short take would spend real units for a draw the caller reports as whole.
   if (plan.value.takenCount !== owed) return null;
   return { fromStock, fromRows: plan.value };
+}
+
+/** The drawable total for one id under the STRICT rule (no crafter named, so no
+ *  signed unit counts), combined exactly the way `planVaultDraw` combines it. */
+function strictDrawableUnits(
+  stock: Readonly<Record<string, number>>,
+  special: readonly InvSlot[],
+  itemId: string,
+  materialIds: ReadonlySet<string>,
+): number {
+  const stockUnits = Object.hasOwn(stock, itemId) ? drawableStockUnits(stock[itemId]) : 0;
+  const rows = readSourceRows(special, itemId, materialIds);
+  const identityUnits = rows === null ? 0 : identityDrawableUnits(rows, undefined);
+  return identityUnits === null ? 0 : combineDrawable(stockUnits, identityUnits);
+}
+
+/**
+ * Split a planned vault take list so every unit an automatic draw by
+ * `selfSigner` will take out of their OWN signed buckets becomes its own take
+ * carrying `signer`, while the rest stay identity-free pooled takes.
+ *
+ * WHY: the custody ledger keys a signed vault unit by its signer
+ * (server/bank_ledger.ts vaultCountGroups), so a craft_consume row has to name
+ * the identity it really removed, or the bank audit reads a pooled shortfall
+ * and a signed surplus that never existed.
+ *
+ * EXACT, not estimated, because the spend order is fixed: the compact record
+ * and every plain bucket pay before any self-signed unit
+ * (`chooseDrawableUnits`), so for one item the self-signed share of the whole
+ * draw is precisely what the strict drawable total cannot cover. Within one
+ * item, earlier takes in list order are attributed to pooled stock first. Pure:
+ * reads the vault and writes nothing. With no crafter named, or nothing
+ * self-signed reached, every take comes back as it was, in the same order.
+ */
+export function splitVaultTakesBySigner(
+  takes: readonly VaultConsumptionTake[],
+  stock: Readonly<Record<string, number>>,
+  special: readonly InvSlot[],
+  materialIds: ReadonlySet<string>,
+  selfSigner?: string,
+): VaultConsumptionTake[] {
+  if (selfSigner === undefined || selfSigner.length === 0) return [...takes];
+  const pooledLeft = new Map<string, number>();
+  for (const take of takes) {
+    if (!pooledLeft.has(take.itemId)) {
+      pooledLeft.set(take.itemId, strictDrawableUnits(stock, special, take.itemId, materialIds));
+    }
+  }
+  const out: VaultConsumptionTake[] = [];
+  for (const take of takes) {
+    const left = pooledLeft.get(take.itemId) ?? 0;
+    const pooled = Math.max(0, Math.min(take.count, left));
+    pooledLeft.set(take.itemId, left - pooled);
+    if (pooled === take.count) {
+      out.push(take);
+      continue;
+    }
+    if (pooled > 0) out.push({ itemId: take.itemId, count: pooled });
+    out.push({ itemId: take.itemId, count: take.count - pooled, signer: selfSigner });
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------

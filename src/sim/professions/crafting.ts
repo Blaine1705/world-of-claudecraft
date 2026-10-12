@@ -911,8 +911,10 @@ export function resolveCraftForRecipe(
   // The masterwork signed-reagent input: a holding check over the recipe's
   // reagents BEFORE consumption (removeItem consumes end-backward, so the
   // signed copy itself may be what gets consumed), any signer counting.
-  // Deliberately still an INVENTORY-only check: drawable vault stock excludes
-  // identity-bearing special rows, so nothing it can spend carries a signer.
+  // Deliberately still an INVENTORY-only check, like the #1145 discount: the
+  // signed bonus is keyed on HOLDING a signed copy in the bags. A vault draw
+  // may spend the crafter's OWN signed units (vault_material_sources.ts), but
+  // those feed neither this flag nor the discount.
   let signedReagentUsed = false;
   // Apply the plans decided above, one per reagent in reagent order. The two
   // flags are read off the SAME reagent this plan belongs to (the planner
@@ -1408,11 +1410,11 @@ export function maxCraftCountForRecipe(
       (reagent) =>
         requiredReagentCountFor(
           // Inventory-only, and it stays that way: the discount is keyed on
-          // HOLDING a signed instance, and drawable vault stock excludes every
-          // identity-bearing special row, so the discount can never derive
-          // from the vault. Re-derived per
-          // iteration because the hold expires when the last signed copy is
-          // consumed mid-batch.
+          // HOLDING a signed instance in the bags. The vault may pay with the
+          // crafter's OWN signed units, but holding them there never earns
+          // the discount (tests/craft_from_vault.test.ts pins bags-only).
+          // Re-derived per iteration because the hold expires when the last
+          // signed copy is consumed mid-batch.
           materialGradeIds(reagent.itemId).some((gradeId) =>
             holdsSelfSignedInstance(scratch, meta.name, gradeId),
           ),
