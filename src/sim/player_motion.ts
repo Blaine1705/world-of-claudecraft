@@ -467,7 +467,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Air control: held keys steer the airborne velocity toward the wish vector.
   // Also what lets a jump STARTED in place drift forward, and a fall off a
   // ledge stay steerable, instead of the old frozen-at-takeoff trajectory.
-  const airSteering = moving && !p.onGround && !swimming;
+  // A hostile airborne knockback (combat/knockback_launch.ts) flies its
+  // straight line unsteered: held keys cannot curl the throw back to a ledge.
+  const airSteering = moving && !p.onGround && !swimming && !p.launchedBy;
   const slide = steepSlide;
   if (slide || movingOnGround || airSteering || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
     if (slide && p.castingAbility) deps.cancelCast(p);
@@ -555,6 +557,16 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   }
 
   verticalPass(deps, p, inp, wishX, wishZ, wishSpeed, swimming, steepGround, mountLocked, platform);
+  // The throw ends on the first landing on walkable ground, AFTER the vertical
+  // pass has dealt and credited any fall damage it owed. A landing on an
+  // unwalkable slope keeps it: the slide off the lip is still the throw.
+  if (
+    p.launchedBy &&
+    p.onGround &&
+    terrainSteepnessAt(p.pos.x, p.pos.z, deps.seed) <= MAX_CLIMB_SLOPE
+  ) {
+    p.launchedBy = undefined;
+  }
   standoffPass(deps, p, stepStartX, stepStartZ, wishX, wishZ, wishSpeed, movingOnGround, platform);
   // Backstop for the NaN freeze class (finite_pose_guard.ts): whatever the
   // step did, the pose it hands to the rest of the tick is finite.

@@ -837,6 +837,7 @@ export interface DamageBreakBudget {
 export type CrowdControlDrCategory =
   | 'root'
   | 'incapacitate'
+  | 'sleep'
   | 'polymorph'
   | 'fear'
   | 'lockout'
@@ -5305,6 +5306,11 @@ export interface Entity extends ClientMirroredEntityFields {
   // Lets a jump clear fences for the whole arc, independent of slope.
   jumping: boolean;
   fallStartY: number;
+  // Set while a hostile airborne knockback (Typhoon) has the body in flight
+  // (combat/knockback_launch.ts): who threw it, and the sim time until which a
+  // fall still credits them. The movement kernel turns air steering off while
+  // it is set and clears it on the first landing. Sim-side only, never wired.
+  launchedBy?: { sourceId: number; until: number };
   // Seconds of held underwater travel. Ramps the dive speed from its slow
   // opening pace to the cruise across one stroke (see player_motion.ts
   // swimSpeedMult); zero whenever the body is not submerged.
