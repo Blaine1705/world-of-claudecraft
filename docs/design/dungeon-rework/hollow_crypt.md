@@ -335,6 +335,17 @@ the tank's), a wrong candle 252 to 288 (about 22), Grasp of the Grave 162 to 198
 full-health cloth wearer; a player rooted by the Grasp in front of the Reap is lost
 (the draft's intent).
 
+**The Knellwyrm's health (2026-10-12).** It spawned on its bare template (1,081
+normal, 7,254 heroic: dead in about 20 s on normal, before its first Dread Bellow at
+24 s; the manager's playtest: "Dragon Morthen had 700 hp?"). It is now priced like
+every Crypt boss, fight length x planning party DPS: 80 s (the Lady's and Ilvane's
+budget) x 55 = 4,400 normal (`healthMultiplierByMob.crypt_knellwyrm` 4.07 on its
+1,081 pool) and 80 s x 230 = 18,400 heroic (9.64 on its 1,909 level-22 pool), about
+two thirds of Morthen's own pool. Its clocks fit that length (Pyre Strafe at 14 s,
+Dread Bellow at 24 s and 54 s, the heroic Burning Knell at 30 s), and a party at
+twice the planning DPS still meets each once. Its melee and mechanic numbers are
+untouched. Pinned by `tests/hollow_crypt_knellwyrm_pool.test.ts`.
+
 **The Knellwyrm (normal kit unchanged), heroic Burning Knell.** Every 55 s (first
 30 s into its fight) it takes wing from where it stands (2.5 s, out of reach:
 nobody's target, immune), hangs 16 yd over the ring's centre and marks HALF the

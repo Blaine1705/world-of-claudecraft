@@ -400,6 +400,14 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       // his immune Rite, about 125 s of damage at 55 (level 10): about 6,800 on
       // his 1,191 template pool.
       morthen: 5.7,
+      // The Knellwyrm his dying rite summons (encounters/hollow_crypt/
+      // knellwyrm.ts) spawned on its bare template (1,081: dead in about
+      // 20 s, before its first Dread Bellow at 24 s; the manager's playtest
+      // of 2026-10-12). Priced like the wing bosses: 80 s (the Lady's and
+      // Ilvane's budget) at 55 (level 10) is 4,400 on that pool. Its clocks
+      // fit: Pyre Strafe at 14 s, Dread Bellow at 24 s and again at 54 s, and
+      // a party at twice the planning DPS still meets each once in its 40 s.
+      crypt_knellwyrm: 4.07,
     },
     damageMultiplierByMob: {},
   },
@@ -597,6 +605,11 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       // Morthen: about 125 s of damage at about 230 beside his immune Rite
       // (about 28,800 on his 2,074 level-22 template pool).
       morthen: 13.9,
+      // The Knellwyrm: the same 80 s at about 230 is 18,400 on its 1,909
+      // level-22 template pool (it rode the dungeon-wide 3.8: 7,254, about
+      // 32 s, its first Burning Knell due at 30 s). The Knell flies out of
+      // reach for about 23 s on top, so the heroic finale runs about 100 s.
+      crypt_knellwyrm: 9.64,
     },
     // Avoidable trash mechanics priced apart from the tank-swing floor (the
     // dungeon trash pass's balance audit): the necromancer's Grave Rupture
