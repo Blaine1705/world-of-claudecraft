@@ -400,6 +400,15 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       // fit: Pyre Strafe at 14 s, Dread Bellow at 24 s and again at 54 s, and
       // a party at twice the planning DPS still meets each once in its 40 s.
       crypt_knellwyrm: 4.07,
+      // The Crypt's one spawn-list miniboss, the Ossuary Drake (a solo elite
+      // that holds the Processional's 'drake' pull alone and is no gate's
+      // boss). The manager's playtest of 2026-10-12 asked for double health
+      // on the minibosses; the owner's rule is the heroic band (15,000 to
+      // 20,000, the heroic record below) and the same factor on normal while
+      // it stays under the weakest wing boss (Marrow, 3,152): twice its
+      // template pool, 2,079 where it had 1,040. Health only: its bite and
+      // its breath, lash and gust land what they did.
+      crypt_ossuary_drake: 2,
     },
     damageMultiplierByMob: {},
   },
@@ -581,21 +590,27 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       crypt_ossuary_cutthroat: 10.35,
       crypt_carrion_crow: 26.7,
     },
-    // The wing bosses' pools from target fight length x heroic party DPS
-    // (about 230) on their level-22 templates: Sexton Marrow 70 s (about
-    // 16,100 on 1,412), Cantor Ilvane about 64 s on her own (about 14,700 on
-    // 1,412) after her two Choristers, held to about 8 s each (about 1,840
-    // on 971). The Lady of the Bonechill was priced the same way (80 s, 12,
-    // about 18,400 on 1,532) until the owner's heroic playtest of 2026-10-12
-    // ("she lasted almost nothing"): she now carries about 25,000 (24,999),
-    // about 109 s at the planning 230. Her Frozen Embrace breaks on a share
-    // of her pool, and heroic carries its own (LADY_TUNING
-    // .embraceBreakShareHeroic) so the damage that frees the held stays the
-    // 1,103 it was: more health was asked for, not a harder Embrace.
+    // The wing bosses were priced from target fight length x heroic party DPS
+    // (about 230) on their level-22 templates: Sexton Marrow 70 s (11.4,
+    // about 16,100 on 1,412), the Lady of the Bonechill 80 s (12, about
+    // 18,400 on 1,532), Cantor Ilvane about 64 s on her own (10.4, about
+    // 14,700 on 1,412) after her two Choristers, held to about 8 s each
+    // (about 1,840 on 971). The owner's heroic playtest of 2026-10-12 ("she
+    // lasted almost nothing", and the bosses should sit around 25,000 to
+    // 30,000) replaced the three lengths with one pool: each wing boss
+    // carries about 25,000 (the Lady 24,999, Marrow and Ilvane 24,996),
+    // about 109 s at the planning 230, under Morthen's 28,800. The Choristers
+    // keep their pool. The Lady's Frozen Embrace breaks on a share of her
+    // pool, and heroic carries its own (LADY_TUNING.embraceBreakShareHeroic)
+    // so the damage that frees the held stays the 1,103 it was: more health
+    // was asked for, not a harder Embrace. Marrow and Ilvane have no such
+    // share: his Tolls (66 and 33 percent) and her Crescendo (30 percent) are
+    // phases of the fight and stretch with it (hollow_crypt.md 5 has what the
+    // longer fights change). Pinned by tests/hollow_crypt_boss_pools.test.ts.
     healthMultiplierByMob: {
-      sexton_marrow: 11.4,
+      sexton_marrow: 17.7,
       rimeweb: 16.32,
-      cantor_ilvane: 10.4,
+      cantor_ilvane: 17.7,
       hollow_chorister: 1.9,
       // Morthen: about 125 s of damage at about 230 beside his immune Rite
       // (about 28,800 on his 2,074 level-22 template pool).
@@ -605,6 +620,12 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       // 32 s, its first Burning Knell due at 30 s). The Knell flies out of
       // reach for about 23 s on top, so the heroic finale runs about 100 s.
       crypt_knellwyrm: 9.64,
+      // The Ossuary Drake, the Crypt's spawn-list miniboss. Heroic minibosses
+      // sit in 15,000 to 20,000, clearly under the bosses' 25,000 (the owner,
+      // 2026-10-12): twice the dungeon-wide 3.8 lands inside the band (15,872
+      // where it had 7,936), so the plain doubling stands. The Knellwyrm
+      // above (18,403) is the Crypt's other miniboss, already in the band.
+      crypt_ossuary_drake: 3.8 * 2,
     },
     // Avoidable trash mechanics priced apart from the tank-swing floor (the
     // dungeon trash pass's balance audit): the necromancer's Grave Rupture

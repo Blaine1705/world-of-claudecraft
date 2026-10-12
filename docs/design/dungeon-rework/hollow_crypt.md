@@ -197,7 +197,7 @@ on p1, the drake and p2 (and both wing bosses), the Choir Door on q1 and q2 (and
 Ilvane), the Bone Stair Gate on s1 (`tests/hollow_crypt_route.test.ts`).
 
 **Why this count fits 15 minutes.** About 24,000 trash health at level 8 to 9
-(49 elites at about 370 to 600, the drake about 1,040, 12 crows at about 60). At
+(49 elites at about 370 to 600, the drake about 1,040 then, doubled to about 2,080 since as the Crypt's miniboss, 12 crows at about 60). At
 the planning party DPS of 45 that is about 8.9 minutes single target; the
 cleave and area damage a group brings on packs of 3 to 5 (and crows dying to
 it in seconds) take it to about 6.5. The four bosses are about 6.3 minutes (70,
@@ -257,10 +257,36 @@ dungeon's own greens; a warrior tank 366 to 404 before gear. The bands of
 
 | Boss | Template pool (normal / heroic) | Target | Multiplier normal / heroic | Pool normal / heroic |
 |---|---|---|---|---|
-| Sexton Marrow | 639 / 1,412 | 70 s | 4.93 / 11.4 | about 3,150 / 16,100 |
+| Sexton Marrow | 639 / 1,412 | 70 s (heroic about 109 s, see below) | 4.93 / 17.7 | about 3,150 / 25,000 |
 | Lady of the Bonechill | 754 / 1,532 | 80 s (heroic about 109 s, see below) | 5.3 / 16.32 | about 4,000 / 25,000 |
-| Cantor Ilvane | 695 / 1,412 | 64 s on her own (80 s with her Choristers) | 4.6 / 10.4 | about 3,200 / 14,700 |
+| Cantor Ilvane | 695 / 1,412 | 64 s on her own (80 s with her Choristers; heroic about 109 s on her own, see below) | 4.6 / 17.7 | about 3,200 / 25,000 |
 | Hollow Chorister | 391 / 971 | about 8 s each | 1 / 1.9 | 391 / about 1,840 |
+
+**Heroic health bands (owner, 2026-10-12).** The manager's playtest read the heroic
+bosses as too short and asked for double health on the minibosses. The owner's
+ruling: on heroic every boss sits at about 25,000 to 30,000 and every miniboss at
+15,000 to 20,000, clearly under the bosses; normal boss pools stay at their design
+values. So Sexton Marrow (was 16,099) and Cantor Ilvane (was 14,687) carry 24,996
+beside the Lady's 24,999 (below), under Morthen's 28,837; the Choristers keep 1,844.
+A miniboss, in the content's own terms, is a solo elite that is no gate's boss: in
+the Crypt the Ossuary Drake (the one spawn-list elite that holds a pull alone:
+doubled, 7,936 to 15,872 on heroic and, by the same factor, 1,040 to 2,079 on
+normal) and the Knellwyrm (below). The gargoyles, the Bone Brute and every other
+elite fight in packs and are trash. Health only: melee, mechanic factors and armor
+are untouched. Pinned by `tests/hollow_crypt_boss_pools.test.ts`.
+
+What the longer heroic fights bring, measured in real fights at the planning 230
+with nobody interrupting or stepping out (old pool, then new):
+
+| Boss | Kill | What scales with the length |
+|---|---|---|
+| Sexton Marrow | 82 s, then 121 s | Shovelfuls 6 then 10; Open Graves 5 then 7 (so each Toll raises one or two more Restless Bones: about 6 then 8 from the two Tolls); Gravedigger's Blows 7 then 12, the tank at the six-stack cap (36 percent more damage taken) for 17 s then 62 s. Still two Tolls: 66 and 33 percent are phases of the fight |
+| Cantor Ilvane | 81 s, then 126 s (her Choristers 17 s of it both times) | Dirges 5 then 8, of which Unbroken Verse 1 then 2; Bone Organ 3 then 5; Crescendo (the last 30 percent) 19 s then 33 s. Harmony and Encore ride the Choristers, whose pool did not move |
+
+Neither has a damage-to-break threshold sized by a share of the pool (the Lady's
+Embrace is the only one in the Crypt), no enrage and no soft timer, so nothing was
+compensated: the longer fight is the intended cost. The one to watch in playtest is
+the tank's time at six Gravedigger's Blow stacks.
 
 **The Lady's heroic pool (owner playtest, 2026-10-12).** Her heroic pool was first
 priced like the others (80 s x 230: multiplier 12, about 18,400). A well-geared
@@ -390,7 +416,13 @@ budget) x 55 = 4,400 normal (`healthMultiplierByMob.crypt_knellwyrm` 4.07 on its
 two thirds of Morthen's own pool. Its clocks fit that length (Pyre Strafe at 14 s,
 Dread Bellow at 24 s and 54 s, the heroic Burning Knell at 30 s), and a party at
 twice the planning DPS still meets each once. Its melee and mechanic numbers are
-untouched. Pinned by `tests/hollow_crypt_knellwyrm_pool.test.ts`.
+untouched. Pinned by `tests/hollow_crypt_knellwyrm_pool.test.ts`. As a miniboss its
+heroic 18,403 sits inside the 15,000 to 20,000 band. Its normal 4,400 is ABOVE the
+weakest wing boss (Marrow, 3,152): the heroic factor (2.54 on the bare 7,254) would
+give about 2,740 on normal, about 45 s at the planning 55. It is left at 4,400
+pending the owner's call, because its first Dread Bellow comes at 24 s and lands at
+26 s: a pool under 3,152 still shows it at the planning 55 (about 50 s), but a party
+at twice that pace would kill a 2,740 wyrm in about 25 s, before the Bellow lands.
 
 **The Knellwyrm (normal kit unchanged), heroic Burning Knell.** Every 55 s (first
 30 s into its fight) it takes wing from where it stands (2.5 s, out of reach:
