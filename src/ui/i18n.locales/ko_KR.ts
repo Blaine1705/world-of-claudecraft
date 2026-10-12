@@ -68,7 +68,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.treasureMap.upgradeMaxed': '어떤 지도 제작자도 이 지도를 더 낫게 만들 수 없습니다.',
   'hudChrome.treasureMap.inkPickerTitle': '지도 제작자의 잉크를 어느 지도에 사용하시겠습니까?',
   'hudChrome.treasureMap.inkPickerHeld': '지도 제작자의 잉크를 {held}개 보유하고 있습니다.',
-  'hudChrome.treasureMap.inkPickerRead': '추적 중: X는 {zone}에 있습니다. X의 위치는 바뀌지 않습니다.',
+  'hudChrome.treasureMap.inkPickerRead':
+    '추적 중: X는 {zone}에 있습니다. X의 위치는 바뀌지 않습니다.',
   'hudChrome.treasureMap.inkPickerUnread': '읽지 않음(보유: {count})',
   'hudChrome.treasureMap.inkPickerCost': '잉크 {inks}개로 {rarity} 지도로 다시 그리기',
   'hudChrome.treasureMap.inkPickerCancel': '취소',

@@ -44,9 +44,9 @@ export function nextTreasureMapRarity(rarity: TreasureMapRarity): TreasureMapRar
 }
 
 /** Cartographer's Ink: sold by every faction quartermaster for their own
- *  currency (src/sim/content/faction_vendors.ts); using it redraws the READ map
- *  one rarity finer. A higher-band world quest pays 10 currency, so a full day
- *  is about 140: two inks. */
+ *  currency (src/sim/content/faction_vendors.ts); using it redraws a held map
+ *  the player picks one rarity finer. A higher-band world quest pays 10
+ *  currency, so a full day is about 140: two inks. */
 export const CARTOGRAPHERS_INK_ITEM_ID = 'cartographers_ink';
 export const CARTOGRAPHERS_INK_CURRENCY_COST = 60;
 /** Inks one redraw spends, by the map's CURRENT rarity. Epic to legendary is the
