@@ -135,8 +135,11 @@ export const LADY_TUNING = {
   embraceHeight: 5,
   /** The longest hold before she drops them. */
   embraceHold: 8,
-  /** The share of her max health dealt during the hold that makes her let go. */
-  embraceBreakShare: 0.06,
+  /** The share of her max health dealt during the hold that makes her let go.
+   *  Halved (it was 0.06) when her pool doubled on the playtest of 2026-10-12,
+   *  so the damage that frees the held is what it was: about 240 on normal,
+   *  about 1,100 on heroic (tests/hollow_crypt_miniboss_health.test.ts). */
+  embraceBreakShare: 0.03,
   /** Frost a second on the held. */
   embracePerSecond: 6,
   /** The gentle release (seconds to set them down). */

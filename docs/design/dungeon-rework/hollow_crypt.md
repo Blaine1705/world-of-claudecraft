@@ -222,10 +222,18 @@ dungeon's own greens; a warrior tank 366 to 404 before gear. The bands of
 
 | Boss | Template pool (normal / heroic) | Target | Multiplier normal / heroic | Pool normal / heroic |
 |---|---|---|---|---|
-| Sexton Marrow | 639 / 1,412 | 70 s | 4.93 / 11.4 | about 3,150 / 16,100 |
-| Lady of the Bonechill | 754 / 1,532 | 80 s | 5.3 / 12 | about 4,000 / 18,400 |
-| Cantor Ilvane | 695 / 1,412 | 64 s on her own (80 s with her Choristers) | 4.6 / 10.4 | about 3,200 / 14,700 |
+| Sexton Marrow | 639 / 1,412 | 70 s, doubled | 9.86 / 22.8 | about 6,300 / 32,200 |
+| Lady of the Bonechill | 754 / 1,532 | 80 s, doubled | 10.6 / 24 | about 8,000 / 36,800 |
+| Cantor Ilvane | 695 / 1,412 | 64 s on her own (80 s with her Choristers), doubled | 9.2 / 20.8 | about 6,400 / 29,400 |
 | Hollow Chorister | 391 / 971 | about 8 s each | 1 / 1.9 | 391 / about 1,840 |
+
+**Doubled on the manager's playtest (2026-10-12).** "All minibosses need double the
+HP": the three bosses before Morthen carry twice the pool the target lengths give
+(they were about 3,150 / 16,100, 4,000 / 18,400 and 3,200 / 14,700), on both
+difficulties. Health only: their melee, their mechanic numbers and their heroic
+factors are untouched, and the Frozen Embrace breaks on the same damage as before
+(its share halved to 3 percent). Morthen and the Choristers keep their pools. Pinned
+by `tests/hollow_crypt_miniboss_health.test.ts`.
 
 **Heroic mechanic damage** rides `mechanicDamageMultiplierByMob` (Marrow 6, the Lady
 5, Ilvane 8) on heroic cloth of about 1,250: the Toll about 15 percent, a cave-in
@@ -252,7 +260,7 @@ are untouched.
 | Mechanic | Rule | Normal numbers (percent of cloth 310) |
 |---|---|---|
 | Bride's Lament | every 22 s a 3 s wail; when it lands, everyone not sheltered by a lit lantern takes it. A lantern shelters two (nearest first) and goes dark 28 s after sheltering anyone (it misses the next Lament; kindling over the last 4) | 60 to 75 frost (about 22), half again per Lingering Lament stack (45 s, three stacks): the group splits across the lanterns and takes turns in the dark |
-| Frozen Embrace | every 30 s a 1.2 s bar on a non-tank; she rises 5 yd with them for up to 8 s (the held are stunned and carried) | 6 frost a second; 6 percent of her health dealt in time and she sets them down, else she drops them for 150 to 180 (about 53) |
+| Frozen Embrace | every 30 s a 1.2 s bar on a non-tank; she rises 5 yd with them for up to 8 s (the held are stunned and carried) | 6 frost a second; 3 percent of her health dealt in time (about 240 on normal) and she sets them down, else she drops them for 150 to 180 (about 53) |
 | Rime Path | a slick patch every 2.5 yd she drifts (25 s, 14 at most) | slippery ground: momentum at 8 yd/s per second of grip |
 | Bridal Freeze | at half health a 2.5 s wail, then the whole ravine floor is ice for the rest of the fight | |
 | Heroic | each lantern also burns out on its own 30 s after it is lit (dark 10 s); the Embrace takes two | |

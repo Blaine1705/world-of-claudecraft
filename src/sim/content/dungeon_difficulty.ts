@@ -380,14 +380,22 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
   // 16 s go to her two Choristers (391 each, kept) first, so about 64 s on her
   // own (about 3,200 on her 695). Every mechanic lands at its authored normal
   // number (the encounter modules' tuning blocks), the trash keeps its template.
+  // DOUBLED on the manager's playtest of 2026-10-12 ("all minibosses need
+  // double the HP"): the three bosses before Morthen carry twice the planned
+  // pool (Marrow about 6,300, the Lady about 8,000, Ilvane about 6,400), so
+  // each fight runs twice its planned length at the planning DPS. Health
+  // only: their melee and every mechanic number are untouched, and the Lady's
+  // Frozen Embrace breaks on the same damage (LADY_TUNING.embraceBreakShare
+  // halved with her pool doubled). Pinned by
+  // tests/hollow_crypt_miniboss_health.test.ts.
   hollow_crypt: {
     id: 'hollow_crypt',
     difficulty: 'normal',
     healthMultiplier: 1,
     healthMultiplierByMob: {
-      sexton_marrow: 4.93,
-      rimeweb: 5.3,
-      cantor_ilvane: 4.6,
+      sexton_marrow: 4.93 * 2,
+      rimeweb: 5.3 * 2,
+      cantor_ilvane: 4.6 * 2,
       // Morthen the Gravecaller (encounters/hollow_crypt/morthen.ts): 150 s with
       // his immune Rite, about 125 s of damage at 55 (level 10): about 6,800 on
       // his 1,191 template pool.
@@ -578,10 +586,13 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // 16,100 on 1,412), the Lady of the Bonechill 80 s (about 18,400 on
     // 1,532), Cantor Ilvane about 64 s on her own (about 14,700 on 1,412)
     // after her two Choristers, held to about 8 s each (about 1,840 on 971).
+    // DOUBLED for the three of them on the manager's playtest of 2026-10-12
+    // (the normal record above has the note): about 32,200, 36,800 and
+    // 29,400. The Choristers and Morthen keep their pools.
     healthMultiplierByMob: {
-      sexton_marrow: 11.4,
-      rimeweb: 12,
-      cantor_ilvane: 10.4,
+      sexton_marrow: 11.4 * 2,
+      rimeweb: 12 * 2,
+      cantor_ilvane: 10.4 * 2,
       hollow_chorister: 1.9,
       // Morthen: about 125 s of damage at about 230 beside his immune Rite
       // (about 28,800 on his 2,074 level-22 template pool).

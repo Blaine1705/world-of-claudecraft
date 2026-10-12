@@ -12846,7 +12846,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.crypt_brides_lament':
     '新娘的哀歌（每22秒一次3秒的哀嚎：普通难度下对所有不在点亮的墓灯光芒中的人造成60到75点冰霜伤害，你已承受的每层萦绕哀歌再提高一半。每盏灯最多庇护两名玩家，庇护过任何人后会熄灭28秒，所以分散开轮流使用）',
   'hudChrome.finder.mech.crypt_frozen_embrace':
-    '冰封之拥（每30秒她抓住一名非坦克玩家，带着对方升到空中5码高，每秒造成6点冰霜伤害：在8秒内打掉她6%的生命值她就会把人放下，否则她会把人扔下，普通难度下造成150到180点伤害）',
+    '冰封之拥（每30秒她抓住一名非坦克玩家，带着对方升到空中5码高，每秒造成6点冰霜伤害：在8秒内打掉她3%的生命值她就会把人放下，否则她会把人扔下，普通难度下造成150到180点伤害）',
   'hudChrome.finder.mech.crypt_rime_path':
     '霜径（她飘过的地方会留下光滑的白霜，持续25秒：在上面你加速缓慢，停下或转向时会继续滑行）',
   'hudChrome.finder.mech.crypt_bridal_freeze':
