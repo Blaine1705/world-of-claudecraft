@@ -74,6 +74,14 @@ const PROFESSION_SCROLL_IDS = [
   'formula_lastflame_zeal',
 ];
 
+// The three healer waists whose cut Crit was reallocated into Int/Spi, and by
+// how many points each line sits over its ilvl-35 budget on purpose.
+const HEALER_WAIST_OVER_BUDGET: Record<string, number> = {
+  springbinder_sash: 10,
+  grovetender_belt: 10,
+  tidebinder_links: 10,
+};
+
 const gearItems = (): ItemDef[] =>
   Object.values(IGNIVAR_LOOT_ITEMS).filter((item) => item.kind !== 'tool');
 
@@ -141,7 +149,27 @@ describe('ignivar loot: every gear piece is item level 35 and budget-exact', () 
       expect(want, `${item.id} has a derivable budget`).toBe(
         expectedStatTotal(line, statIdentity(item.stats)),
       );
-      expect(primaryStatSum(item), `${item.id} stat sum == budget`).toBe(want);
+      const over = HEALER_WAIST_OVER_BUDGET[item.id] ?? 0;
+      expect(primaryStatSum(item), `${item.id} stat sum == budget`).toBe((want ?? 0) + over);
+    }
+  });
+
+  it('the healer waists carry their reallocated Crit as Int/Spi, deliberately over the line', () => {
+    // 60 Crit became 30 Crit plus +6 Int / +4 Spi: the cut 30 rating priced at
+    // the dev-kit healer weights (rating 0.3, Int 1, Spi 0.7), so the line
+    // stays 10 over the ilvl-35 waist budget by design. Asserted against the
+    // live budget so a well-meaning re-budget reads as the nerf it would be.
+    for (const id of Object.keys(HEALER_WAIST_OVER_BUDGET)) {
+      const item = ITEMS[id];
+      expect(item.stats?.int, id).toBe(15);
+      expect(item.stats?.spi, id).toBe(12);
+      expect(item.stats?.sta, id).toBe(6);
+      expect(item.critRating, id).toBe(30);
+      expect(item.hasteRating, id).toBe(25);
+      expect(item.hitRating ?? 0, id).toBe(0);
+      expect(primaryStatSum(item), `${id} over the live budget`).toBe(
+        (expectedStatBudget(item) ?? Number.NaN) + 10,
+      );
     }
   });
 });
@@ -378,7 +406,8 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
     // (the Hit-scarcity policy holds: hit lives on the elective lanes), and
     // the cap-coverage describe below proves the lanes reach the heroic caps.
     // Healer pieces (Healing Power) are the one exception: heals are not
-    // resisted, so their lane amount is Crit instead of Hit.
+    // resisted, so their lane amount is Crit instead of Hit (halved on the
+    // waists, whose other 30 moved into Int/Spi).
     for (const item of Object.values(IGNIVAR_LOOT_ITEMS)) {
       const want =
         item.slot === 'waist'
@@ -390,7 +419,9 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
               : 0;
       if ((item.healPower ?? 0) > 0) {
         expect(item.hitRating ?? 0, item.id).toBe(0);
-        if (want > 0) expect(item.critRating, `${item.id} lane Crit`).toBe(want);
+        // The healer waists halved theirs (60 to 30) into Int/Spi.
+        const crit = item.slot === 'waist' ? 30 : want;
+        if (want > 0) expect(item.critRating, `${item.id} lane Crit`).toBe(crit);
         continue;
       }
       expect(item.hitRating ?? 0, item.id).toBe(want);
@@ -399,11 +430,12 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
 
   it('healer pieces carry Crit in place of Hit, and no healer gear anywhere carries Hit', () => {
     // Named, so a field-predicate drift cannot silently drop a piece: the six
-    // Crucible healer electives took their old Hit amount as Crit.
+    // Crucible healer electives took their old Hit amount as Crit, the waists
+    // then halving theirs into Int/Spi.
     const healerElectives: Array<[string, number]> = [
-      ['springbinder_sash', 60],
-      ['grovetender_belt', 60],
-      ['tidebinder_links', 60],
+      ['springbinder_sash', 30],
+      ['grovetender_belt', 30],
+      ['tidebinder_links', 30],
       ['loop_of_quiet_springs', 25],
       ['staff_of_the_last_spring', 30],
       ['springtouched_crozier', 30],

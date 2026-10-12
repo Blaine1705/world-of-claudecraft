@@ -575,12 +575,19 @@ AMENDED (2026-10-12, healer Crit): the full-coverage widening above had
 also seeded Hit on the healer electives (the three Healing Power waists,
 Loop of Quiet Springs, Staff of the Last Spring, Springtouched Crozier),
 contradicting the ratings-ladder rule that healer-facing pieces never
-carry Hit. Heals are not resisted, so that Hit was dead weight. Each of
-those pieces now carries the same amount as Crit instead (60 waist, 25
-ring, 30 weapon), and the cap floor is computed over the non-healer lanes
-only (healers have no window). Pinned by the healer-Crit case in
-tests/ignivar_loot.test.ts, which also holds that no shipped item with
-Healing Power carries Hit.
+carry Hit. Heals are not resisted, so that Hit was dead weight. The ring
+and weapons carry the same amount as Crit instead (25 ring, 30 weapon).
+The three waists carry Crit 30, and the other 30 rating moved into the
+primary line as +6 Int / +4 Spi (Int 15, Spi 12), priced at the dev-kit
+healer weights (rating 0.3, Int 1, Spi 0.7). That leaves each waist 10
+over its ilvl-35 line by design, exempted in
+tests/item_stamina_baseline.test.ts. The cap floor is computed over the
+non-healer lanes only (healers have no window). Because the bigger line
+would win the line-only /dev bis picker for damage casters, that picker
+(src/sim/dev/bis_gear.ts) now skips Healing Power pieces for non-healer
+specs, the rule dev_kit.ts already follows. Pinned by the healer-Crit
+cases in tests/ignivar_loot.test.ts, which also hold that no shipped item
+with Healing Power carries Hit.
 
 ### The sets
 

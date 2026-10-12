@@ -17,8 +17,8 @@
 // held offhands carry a single 25. Hit appears exactly where the plan's Hit
 // program says: the elective waists at 60 and the physical neck/ring plus
 // the spell-damage ring at 25. Healer pieces (Healing Power) never carry Hit,
-// since heals are not resisted: their elective rating is Crit at the same
-// amount.
+// since heals are not resisted: their elective rating is Crit (25 ring, 30
+// weapon, and 30 on the healer waists, whose other 30 moved into Int/Spi).
 //
 // The five-piece sets are class-locked and carry `set:` tags; their
 // ITEM_SETS entries (the 2/4-piece engine bonuses of
@@ -2667,10 +2667,13 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 75, int: 9, spi: 8, sta: 6 },
+    // Int 15 / Spi 12 is 10 points over the ilvl-35 waist line on purpose:
+    // the 30 Crit cut (60 to 30) was reallocated at the dev-kit healer
+    // weights (rating 0.3, Int 1, Spi 0.7: 30 x 0.3 = 9 ~ 6 + 4 x 0.7).
+    stats: { armor: 75, int: 15, spi: 12, sta: 6 },
     healPower: 8,
     hasteRating: 25,
-    critRating: 60,
+    critRating: 30,
     sellValue: 10000,
     requiredClass: ['mage', 'priest'],
   },
@@ -2787,10 +2790,11 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 150, int: 9, spi: 8, sta: 6 },
+    // Over the waist line on purpose: see springbinder_sash.
+    stats: { armor: 150, int: 15, spi: 12, sta: 6 },
     healPower: 8,
     hasteRating: 25,
-    critRating: 60,
+    critRating: 30,
     sellValue: 10000,
     requiredClass: ['druid'],
   },
@@ -2907,10 +2911,11 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 270, int: 9, spi: 8, sta: 6 },
+    // Over the waist line on purpose: see springbinder_sash.
+    stats: { armor: 270, int: 15, spi: 12, sta: 6 },
     healPower: 8,
     hasteRating: 25,
-    critRating: 60,
+    critRating: 30,
     sellValue: 10000,
     requiredClass: ['paladin', 'shaman'],
   },
