@@ -116,12 +116,18 @@ counted in sim ticks (`tests/dungeon_gate_seal_delay.test.ts`):
 - While the seal is pending the gate is open, to collision, to every reader of
   `dungeonGateState` and on the wire (the gate's closing animation plays when the
   seal lands, not at the pull).
-- A boss that dies, goes home, or is walking home when the delay runs out (a wipe
-  inside the window) cancels the seal: the door never shuts on an empty room, and
-  the next pull gets the whole delay again.
+- A pending seal is cancelled the moment the boss stops fighting (it dies, or
+  drops the pull and turns for home: a wipe inside the window): the door never
+  shuts on an empty room, and every pull gets the whole delay, one taken up again
+  before the boss stands idle included.
 - A boss walked to its own doorway inside the window seals the room at once, with
   the boss still inside (`BOSS_ROOM_DOORWAY_REACH`): the open door is for the group
   to come in, never for the boss to be dragged out of its arena.
+- A seal lands only with the boss on its own side of the gate's line. A boss
+  thrown past it inside the window (a charge, a leap, a knockback) is never
+  sealed out of its room: the seal waits and lands on the first tick it is back.
+  "Its side" is the half of the floor its spawn lies on; the suite floods every
+  sealed arena to prove each lies wholly on that half.
 - Once landed, the seal holds as before (while the boss is in combat or walking
   home) and whoever is outside is locked out until the boss dies or resets.
 

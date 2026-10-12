@@ -7709,10 +7709,11 @@ export interface Entity extends ClientMirroredEntityFields {
   evadeInPlace?: number;
   // On an in-dungeon gate OBJECT that seals for a boss: the sim tick its
   // pending seal lands, stamped when the boss starts fighting and cleared when
-  // the boss dies, resets or goes idle (instances/dungeon_gates.ts). Undefined
-  // on everything else and whenever no seal is pending or landed (never
-  // deleted). Session state of the claim; never on the wire, the gate's
-  // template id is what the client mirrors.
+  // the boss dies, drops the pull or goes idle (instances/dungeon_gates.ts);
+  // Infinity while a due seal waits for a boss thrown past the gate's line.
+  // Undefined on everything else and whenever no seal is pending or landed
+  // (never deleted). Session state of the claim; never on the wire, the
+  // gate's template id is what the client mirrors.
   gateSealTick?: number;
   fleeTimer: number; // seconds left in a low-HP panic flee; counts down in the 'flee' state
   fleeReturnTimer: number; // grace after a panic flee hits leash edge, letting it run back before normal leash reset resumes

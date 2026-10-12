@@ -22,15 +22,24 @@
 // sealing gate of every dungeon:
 //   - the clock starts on the first tick the boss is fighting and lands
 //     BOSS_ROOM_SEAL_DELAY_SECONDS later, counted in sim ticks;
-//   - a boss that dies, goes home idle, or is walking home when the delay
-//     runs out (a wipe inside the window) cancels the pending seal, so a door
-//     never shuts on an empty room, and the next pull gets the whole delay;
+//   - a pending seal is cancelled the moment the boss stops fighting (it
+//     dies, or drops the pull and turns for home: a wipe inside the window),
+//     so a door never shuts on an empty room and EVERY pull gets the whole
+//     delay, a pull taken up again before the boss stands idle included;
 //   - a boss that reaches its own doorway inside the window seals at once:
 //     the open door is for the group to come in, never for the boss to be
 //     walked out (an instance mob never leashes home, so without this a tank
 //     could drag the fight out of its arena for the length of the window);
+//   - a seal lands only with the boss on ITS side of the gate's line. One
+//     thrown past it inside the window (a charge, a leap, a knockback, a
+//     scripted plant) is never sealed out of its own room: the seal waits,
+//     due, and lands on the first tick the boss is back inside;
 //   - a seal that has landed holds exactly as before: while the boss is in
 //     combat or walking home, open again once it stands idle.
+// "Its side" is the half of the floor its spawn lies on, cut by the gate's
+// line. Every sealed arena of every dungeon lies wholly on that half
+// (tests/dungeon_gate_seal_delay.test.ts floods each one to prove it), so the
+// half plane is exact for the content that ships.
 // Whoever is outside when it lands is locked out until the boss dies or
 // resets, as they were when the seal landed at the pull.
 //
@@ -60,11 +69,12 @@ export const BOSS_ROOM_SEAL_DELAY_TICKS = Math.round(BOSS_ROOM_SEAL_DELAY_SECOND
  *  fastest mob dash plus the gate box, so the seal always lands with the boss
  *  still inside. */
 export const BOSS_ROOM_DOORWAY_REACH = 3;
-/** How far past the gate's line the doorway still counts (the gate box and a
- *  body) and how far beside the passage. A boss thrown clean through is no
- *  longer in it: no seal shuts it out, it walks back in through the open door. */
-const DOORWAY_BEYOND = 1.5;
+/** How far beside the passage the doorway still counts. */
 const DOORWAY_BESIDE = 1;
+/** The stamp of a seal that is due but held open because a body of the boss
+ *  is past the gate's line: no tick ever reaches it, so every reader sees the
+ *  gate open until the boss is back on its side. */
+const SEAL_AWAITS_BOSS = Number.POSITIVE_INFINITY;
 
 export const DUNGEON_GATE_TEMPLATES: Readonly<Record<DungeonGateState, string>> = {
   closed: 'dungeon_gate_closed',
@@ -145,7 +155,7 @@ function isEngaged(mob: Entity): boolean {
 }
 
 /** Fighting: engaged and not walking home. Only a fight starts the seal
- *  clock, and only on a fighting boss does a pending seal land. */
+ *  clock or keeps a pending seal alive. */
 function isFighting(mob: Entity): boolean {
   return isEngaged(mob) && mob.aiState !== 'evade';
 }
@@ -160,21 +170,34 @@ function bossEngaged(ctx: SimContext, inst: InstanceSlot, templateId: string): b
 }
 
 /**
- * Is a point in a gate's doorway, seen from the side `home` lies on? Both in
- * the gate's own frame (instance-local): across the passage within its width,
- * and along it from BOSS_ROOM_DOORWAY_REACH short of the line to a little
- * past it. Pure.
+ * How far a point stands on the `home` side of a gate's line, in yards along
+ * the passage (instance-local): positive on the side `home` lies on, negative
+ * past the line. Pure.
+ */
+export function gateInward(
+  gate: DungeonGateDef,
+  home: { x: number; z: number },
+  at: { x: number; z: number },
+): number {
+  const homeSide = rotY(home.x - gate.x, home.z - gate.z, -gate.rot).z < 0 ? -1 : 1;
+  return rotY(at.x - gate.x, at.z - gate.z, -gate.rot).z * homeSide;
+}
+
+/**
+ * Is a point in a gate's doorway, seen from the side `home` lies on? In the
+ * gate's own frame (instance-local): across the passage within its width, and
+ * along it within BOSS_ROOM_DOORWAY_REACH short of the line, never past it (a
+ * body past the line would be shut OUT by a seal). Pure.
  */
 export function inGateDoorway(
   gate: DungeonGateDef,
   home: { x: number; z: number },
   at: { x: number; z: number },
 ): boolean {
-  const homeSide = rotY(home.x - gate.x, home.z - gate.z, -gate.rot).z < 0 ? -1 : 1;
-  const local = rotY(at.x - gate.x, at.z - gate.z, -gate.rot);
-  if (Math.abs(local.x) > gate.hw + DOORWAY_BESIDE) return false;
-  const inward = local.z * homeSide;
-  return inward <= BOSS_ROOM_DOORWAY_REACH && inward >= -DOORWAY_BEYOND;
+  const across = rotY(at.x - gate.x, at.z - gate.z, -gate.rot).x;
+  if (Math.abs(across) > gate.hw + DOORWAY_BESIDE) return false;
+  const inward = gateInward(gate, home, at);
+  return inward > 0 && inward <= BOSS_ROOM_DOORWAY_REACH;
 }
 
 /** Has the seal stamped on a gate entity landed by now? */
@@ -281,46 +304,52 @@ function tickBossSeal(
   ox: number,
   oz: number,
 ): void {
+  const now = ctx.tickCount;
   // The earliest stamp any of its gates carries is the boss's clock.
   let at: number | undefined;
   for (let i = 0; i < gates.length; i++) {
     const stamp = gates[i].sealWhileEngaged === bossId ? entities[i]?.gateSealTick : undefined;
     if (stamp !== undefined && (at === undefined || stamp < at)) at = stamp;
   }
+  // Landed on an earlier tick: from here it only holds or lifts.
+  const landed = at !== undefined && now > at;
   let engaged = false;
   let fighting = false;
   let atDoor = false;
+  let allHome = true;
   for (const r of indexFor(DUNGEONS[inst.dungeonId]).byTemplate.get(bossId) ?? []) {
     const boss = rosterMob(ctx, inst, r);
-    if (!boss || !isEngaged(boss)) continue;
-    engaged = true;
-    if (!isFighting(boss)) continue;
-    fighting = true;
-    // Only a pending seal asks where the boss stands.
-    if (at === undefined || ctx.tickCount >= at || atDoor) continue;
+    if (!boss || boss.dead) continue;
+    if (isEngaged(boss)) engaged = true;
+    if (isFighting(boss)) fighting = true;
+    // Only a seal still to land asks where the boss's bodies stand.
+    if (landed) continue;
     const home = { x: boss.spawnPos.x - ox, z: boss.spawnPos.z - oz };
     const here = { x: boss.pos.x - ox, z: boss.pos.z - oz };
     for (const gate of gates) {
-      if (gate.sealWhileEngaged === bossId && inGateDoorway(gate, home, here)) atDoor = true;
+      if (gate.sealWhileEngaged !== bossId) continue;
+      if (gateInward(gate, home, here) <= 0) allHome = false;
+      else if (isFighting(boss) && inGateDoorway(gate, home, here)) atDoor = true;
     }
   }
-  const now = ctx.tickCount;
   if (!engaged) {
     // Dead, or home and idle: no seal, pending or landed.
     at = undefined;
-  } else if (at === undefined) {
-    // A boss walking home starts no clock; the first fighting tick does.
-    if (fighting) at = now + BOSS_ROOM_SEAL_DELAY_TICKS;
-  } else if (now < at) {
-    // Pending: a boss at its own door shuts it now, with the boss still inside.
-    if (fighting && atDoor) at = now;
-  } else if (now === at && !fighting) {
-    // Due this tick, but the pull was dropped inside the window (a wipe: the
-    // boss is walking home): the seal is cancelled, never landed on an empty
-    // room. Judged at the landing tick, not on the first homeward step, so an
-    // encounter that reads as walking home for a tick mid-fight (Sexton
-    // Marrow's stride to the bell rope) does not restart the clock.
-    at = undefined;
+  } else if (!landed) {
+    if (!fighting) {
+      // Walking home: a boss walking home starts no clock, and a pending seal
+      // is cancelled the moment the pull is dropped, so the next pull,
+      // however soon, gets the whole delay.
+      at = undefined;
+    } else {
+      // The first fighting tick starts the clock; a boss at its own door
+      // shuts it now, with the boss still inside.
+      if (at === undefined) at = now + BOSS_ROOM_SEAL_DELAY_TICKS;
+      if (atDoor) at = now;
+      // Due, but a body of the boss is past the gate's line: the seal waits
+      // for it rather than shut it out of its own room.
+      if (now >= at || at === SEAL_AWAITS_BOSS) at = allHome ? now : SEAL_AWAITS_BOSS;
+    }
   }
   // Written as undefined, never deleted (the Entity shape stays stable).
   for (let i = 0; i < gates.length; i++) {

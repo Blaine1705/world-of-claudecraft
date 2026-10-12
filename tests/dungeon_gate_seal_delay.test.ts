@@ -6,7 +6,7 @@
 // second half walks every sealing gate of every dungeon through the one rule.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { rotY } from '../src/sim/collider_pushout';
+import { syncClientDungeonGates } from '../src/net/dungeon_gate_wire';
 import { isBlocked } from '../src/sim/colliders';
 import { HOLLOW_CRYPT_GATES } from '../src/sim/content/hollow_crypt';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -19,6 +19,7 @@ import {
   DUNGEON_GATE_TEMPLATES,
   dungeonGateEntity,
   dungeonGateState,
+  gateInward,
   inGateDoorway,
   tickDungeonGates,
 } from '../src/sim/instances/dungeon_gates';
@@ -26,6 +27,7 @@ import { enterDungeon } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type DungeonGateDef, type Entity, type WorldContent } from '../src/sim/types';
+import { WORLD_SEED } from '../src/sim/world_seed';
 import { boss, cryptFight, type Fight, put, run, tick } from './helpers/crypt_boss_fight';
 
 vi.setConfig({ testTimeout: 120_000 });
@@ -52,9 +54,22 @@ function walled(f: Fight): boolean {
 /** Marrow's distance along the passage on his own side of the gate's line
  *  (positive inside his yard, negative once he is through the door). */
 function inward(f: Fight, mob: Entity): number {
-  const home = rotY(mob.spawnPos.x - f.ox - YARD.x, mob.spawnPos.z - f.oz - YARD.z, -YARD.rot);
-  const at = rotY(mob.pos.x - f.ox - YARD.x, mob.pos.z - f.oz - YARD.z, -YARD.rot);
-  return at.z * (home.z < 0 ? -1 : 1);
+  return gateInward(
+    YARD,
+    { x: mob.spawnPos.x - f.ox, z: mob.spawnPos.z - f.oz },
+    { x: mob.pos.x - f.ox, z: mob.pos.z - f.oz },
+  );
+}
+
+/** What the online client would wall from the gate entities it mirrors: the
+ *  collision view rebuilt from scratch by its own sync (net/dungeon_gate_wire). */
+function clientWalled(f: Fight): boolean {
+  clearDungeonGateStateForTest();
+  syncClientDungeonGates({ entities: f.sim.ctx.entities, player: f.tank });
+  const walledForClient = walled(f);
+  // Hand the view back to the authoritative world.
+  tickDungeonGates(f.sim.ctx);
+  return walledForClient;
 }
 
 /** A claimed crypt with every mob but Marrow dead, so the Bone Barrier is open. */
@@ -95,9 +110,13 @@ describe('the boss-room seal delay: the one shared rule', () => {
     expect(
       inGateDoorway(YARD, home, { x: YARD.x, z: YARD.z + BOSS_ROOM_DOORWAY_REACH + 0.1 }),
     ).toBe(false);
-    expect(inGateDoorway(YARD, home, { x: YARD.x, z: YARD.z - 1 })).toBe(true);
-    // Far past the line, or beside the passage, is not the doorway.
+    // On the line or past it is never the doorway: a seal landing there would
+    // shut the boss out of its own room.
+    expect(inGateDoorway(YARD, home, { x: YARD.x, z: YARD.z })).toBe(false);
+    expect(inGateDoorway(YARD, home, { x: YARD.x, z: YARD.z - 1 })).toBe(false);
     expect(inGateDoorway(YARD, home, { x: YARD.x, z: YARD.z - 12 })).toBe(false);
+    expect(gateInward(YARD, home, { x: YARD.x + 3, z: YARD.z + 4 })).toBeCloseTo(4, 9);
+    expect(gateInward(YARD, home, { x: YARD.x - 3, z: YARD.z - 5 })).toBeCloseTo(-5, 9);
     expect(inGateDoorway(YARD, home, { x: YARD.x + YARD.hw + 3, z: YARD.z + 1 })).toBe(false);
     // The same gate seen from a boss living on the other side mirrors it.
     const other = { x: YARD.x, z: YARD.z - 29 };
@@ -140,6 +159,22 @@ describe('the boss-room seal delay: Sexton Marrow and the Bone Barrier', () => {
     run(f, 3, keep);
     expect(state(f)).toBe('sealed');
     expect(walled(f)).toBe(true);
+  });
+
+  it('the client mirror walls nothing through the window and walls the gate when it lands', () => {
+    const { f, marrow } = yard();
+    const keep = holder(f);
+    f.sim.ctx.aggroMob(marrow, f.tank, false);
+    run(f, 5, keep);
+    // Pending: the entity the client mirrors still reads open, so its own
+    // collision view (rebuilt from the mirrored entities alone) is open too.
+    expect(state(f)).toBe('open');
+    expect(gateEntity(f).templateId).toBe(DUNGEON_GATE_TEMPLATES.open);
+    expect(clientWalled(f)).toBe(false);
+    run(f, BOSS_ROOM_SEAL_DELAY_SECONDS - 5 + 0.5, keep);
+    expect(state(f)).toBe('sealed');
+    expect(gateEntity(f).templateId).toBe(DUNGEON_GATE_TEMPLATES.sealed);
+    expect(clientWalled(f)).toBe(true);
   });
 
   it('locks out whoever is outside when it lands, until the boss resets', () => {
@@ -210,6 +245,99 @@ describe('the boss-room seal delay: Sexton Marrow and the Bone Barrier', () => {
     expect(state(f)).toBe('open');
     run(f, 1, again);
     expect(state(f)).toBe('sealed');
+  });
+
+  it('a pull taken up again before he stands idle starts the delay afresh', () => {
+    // Two players: the tank pulls and falls at 3 s; the other, who never
+    // touched him, is standing beside his spot when he turns for home.
+    const { f, marrow } = yard(1);
+    const second = f.others[0];
+    put(f, second, MID.x + 3, MID.z + 2);
+    const keep = holder(f);
+    f.sim.ctx.aggroMob(marrow, f.tank, false);
+    tick(f, keep);
+    const firstPull = f.sim.tickCount;
+    run(f, 3, keep);
+    expect(gateEntity(f).gateSealTick).toBe(firstPull + BOSS_ROOM_SEAL_DELAY_TICKS);
+    f.sim.ctx.handleDeath(f.tank, marrow);
+    // From here the fallen tank is left alone: the survivor is held and healed.
+    const step = (): void => {
+      keep();
+      second.hp = second.maxHp;
+      f.sim.tick();
+    };
+    // He drops the pull: the pending seal is gone on that very tick.
+    let dropped = false;
+    let secondPull = -1;
+    for (let i = 0; i < 8 / DT && secondPull < 0; i++) {
+      step();
+      if (marrow.aiState === 'evade') {
+        dropped = true;
+        expect(gateEntity(f).gateSealTick).toBeUndefined();
+      }
+      // Home again he is pulled at once by the player standing on his spot.
+      if (dropped && marrow.aiState === 'idle') f.sim.ctx.aggroMob(marrow, second, false);
+      if (dropped && marrow.inCombat && marrow.aggroTargetId === second.id)
+        secondPull = f.sim.tickCount;
+    }
+    expect(dropped).toBe(true);
+    expect(secondPull).toBeGreaterThan(firstPull);
+    step();
+    const lands = gateEntity(f).gateSealTick as number;
+    // The whole delay from the second pull, not what was left of the first.
+    expect(lands).toBeGreaterThanOrEqual(secondPull + BOSS_ROOM_SEAL_DELAY_TICKS - 1);
+    expect(lands).toBeGreaterThan(firstPull + BOSS_ROOM_SEAL_DELAY_TICKS + 20);
+    // Open when the first pull's ten seconds would have run out.
+    while (f.sim.tickCount < firstPull + BOSS_ROOM_SEAL_DELAY_TICKS + 5) step();
+    expect(state(f)).toBe('open');
+    expect(walled(f)).toBe(false);
+    while (f.sim.tickCount < lands) step();
+    expect(state(f)).toBe('sealed');
+  });
+
+  it('thrown past his own gate inside the window, he is never sealed out: the seal waits for him', () => {
+    const { f, marrow } = yard();
+    const keep = holder(f);
+    f.sim.ctx.aggroMob(marrow, f.tank, false);
+    tick(f, keep);
+    const lands = gateEntity(f).gateSealTick as number;
+    run(f, 4, keep);
+    // A knockback, a leap or a scripted plant puts him 5 yd past the line.
+    const out = (): void => put(f, marrow, YARD.x, YARD.z - 5);
+    const held = (): void => {
+      keep();
+      out();
+    };
+    out();
+    expect(inward(f, marrow)).toBeLessThan(-4.5);
+    // Held there past the end of the window: due, and still open.
+    while (f.sim.tickCount < lands + 40) {
+      tick(f, held);
+      expect(state(f)).toBe('open');
+      expect(gateEntity(f).templateId).toBe(DUNGEON_GATE_TEMPLATES.open);
+      expect(walled(f)).toBe(false);
+    }
+    expect(f.sim.tickCount).toBeGreaterThan(lands);
+    expect(marrow.inCombat).toBe(true);
+    // Let go, he walks back in to his target, and the seal lands on the
+    // first tick he is on his own side of the line.
+    let sealedAt = -1;
+    for (let i = 0; i < 10 / DT && sealedAt < 0; i++) {
+      const before = inward(f, marrow);
+      tick(f, keep);
+      if (state(f) === 'sealed') {
+        sealedAt = i;
+        expect(before).toBeLessThanOrEqual(0.6);
+        expect(inward(f, marrow)).toBeGreaterThan(0);
+      } else {
+        expect(inward(f, marrow)).toBeLessThanOrEqual(0);
+      }
+    }
+    expect(sealedAt).toBeGreaterThanOrEqual(0);
+    expect(walled(f)).toBe(true);
+    // Sealed with him inside: the collider did not shove him back out.
+    run(f, 1, keep);
+    expect(inward(f, marrow)).toBeGreaterThan(0);
   });
 
   it('a boss that dies inside the window never seals its room', () => {
@@ -340,6 +468,111 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
     (sim as unknown as { tickCount: number }).tickCount++;
     tickDungeonGates(sim.ctx);
   }
+
+  it("Korgath's two Chain Stairs share one clock and land on the same tick", () => {
+    const { sim, inst } = claim('gravewyrm_sanctum');
+    const def = DUNGEONS.gravewyrm_sanctum;
+    const stairs = (def.gates ?? []).filter((g) => g.sealWhileEngaged === 'korgath_the_bound');
+    expect(stairs.map((g) => g.id).sort()).toEqual(['east_chain_stair', 'west_chain_stair']);
+    let korgath: Entity | null = null;
+    def.spawns.forEach((s, i) => {
+      const mob = sim.ctx.entities.get(inst.mobIds[i]) as Entity;
+      if (s.mobId === 'korgath_the_bound') {
+        korgath = mob;
+        return;
+      }
+      mob.hp = 0;
+      mob.dead = true;
+      mob.aiState = 'dead';
+      mob.inCombat = false;
+    });
+    const boss = korgath as Entity | null;
+    if (!boss) throw new Error('no Korgath');
+    boss.aiState = 'chase';
+    boss.inCombat = true;
+    step(sim);
+    const stamps = (): (number | undefined)[] =>
+      stairs.map((g) => dungeonGateEntity(sim.ctx, inst, g)?.gateSealTick);
+    const first = stamps();
+    expect(first[0]).toBeDefined();
+    expect(first[1]).toBe(first[0]);
+    let landedTogether = false;
+    for (let i = 0; i <= BOSS_ROOM_SEAL_DELAY_TICKS; i++) {
+      const states = stairs.map((g) => dungeonGateState(sim.ctx, inst, g));
+      // Never one stair shut and the other open.
+      expect(states[0]).toBe(states[1]);
+      expect(stamps()[1]).toBe(stamps()[0]);
+      if (states[0] === 'sealed') {
+        landedTogether = true;
+        expect(i).toBe(BOSS_ROOM_SEAL_DELAY_TICKS);
+      }
+      step(sim);
+    }
+    expect(landedTogether).toBe(true);
+    // Walked to ONE stair's doorway on a fresh pull, he shuts both at once.
+    boss.aiState = 'idle';
+    boss.inCombat = false;
+    step(sim);
+    expect(stamps()).toEqual([undefined, undefined]);
+    boss.aiState = 'chase';
+    boss.inCombat = true;
+    step(sim);
+    const o = instanceOrigin(def.index, inst.slot);
+    const west = stairs.find((g) => g.id === 'west_chain_stair') as DungeonGateDef;
+    // Two yards inside the west stair's line, on the side his spawn lies on.
+    const home = { x: boss.spawnPos.x - o.x, z: boss.spawnPos.z - o.z };
+    const toHome = Math.hypot(home.x - west.x, home.z - west.z);
+    boss.pos.x = o.x + west.x + ((home.x - west.x) / toHome) * 2;
+    boss.pos.z = o.z + west.z + ((home.z - west.z) / toHome) * 2;
+    expect(inGateDoorway(west, home, { x: boss.pos.x - o.x, z: boss.pos.z - o.z })).toBe(true);
+    step(sim);
+    expect(stairs.map((g) => dungeonGateState(sim.ctx, inst, g))).toEqual(['sealed', 'sealed']);
+  });
+
+  // The seal judges "inside" by the half of the floor the boss's spawn lies
+  // on. That is exact only while every sealed arena lies wholly on that half:
+  // flood each room from its boss's spawn with every gate shut and prove it.
+  it.each(SEALING)(
+    '%s / %s: the sealed room lies wholly on the boss side of the line',
+    (dungeonId, gateId) => {
+      clearDungeonGateStateForTest();
+      const def = DUNGEONS[dungeonId];
+      const gate = (def.gates ?? []).find((g) => g.id === gateId) as DungeonGateDef;
+      const spawn = def.spawns.find((s) => s.mobId === gate.sealWhileEngaged);
+      if (!spawn) throw new Error(`${gate.sealWhileEngaged} has no spawn`);
+      // Slot 0 of a world that claimed nothing: every gate collider stands.
+      const o = instanceOrigin(def.index, 0);
+      const home = { x: spawn.x, z: spawn.z };
+      const seen = new Set<number>();
+      const key = (x: number, z: number): number => (x + 2048) * 4096 + (z + 2048);
+      const queue: [number, number][] = [[Math.round(spawn.x), Math.round(spawn.z)]];
+      seen.add(key(queue[0][0], queue[0][1]));
+      let least = Infinity;
+      let cells = 0;
+      while (queue.length > 0) {
+        const [x, z] = queue.pop() as [number, number];
+        cells++;
+        least = Math.min(least, gateInward(gate, home, { x, z }));
+        for (const [dx, dz] of [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ]) {
+          const nx = x + dx;
+          const nz = z + dz;
+          if (Math.abs(nx) > 400 || Math.abs(nz) > 500 || seen.has(key(nx, nz))) continue;
+          seen.add(key(nx, nz));
+          if (!isBlocked(WORLD_SEED, o.x + nx, o.z + nz, 0.5)) queue.push([nx, nz]);
+        }
+      }
+      // A real room, sealed (the flood did not leak into the dungeon), and no
+      // floor of it past the line: a body can stand a yard inside at the least.
+      expect(cells).toBeGreaterThan(500);
+      expect(cells).toBeLessThan(12000);
+      expect(least).toBeGreaterThan(1);
+    },
+  );
 
   it.each(SEALING)('%s / %s: open for the window, sealed when it runs out', (dungeonId, gateId) => {
     const { sim, inst } = claim(dungeonId);
