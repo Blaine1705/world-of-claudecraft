@@ -49,6 +49,7 @@ import {
   MARROW_MEASURED,
   MARROW_TOLLING,
   MARROW_TUNING,
+  tollDamageRange,
 } from '../sim/encounters/hollow_crypt/marrow_ids';
 import {
   MORTHEN_GORGED,
@@ -136,8 +137,20 @@ export function cryptAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
       };
     case MARROW_GRAVE_VIGOR:
       return { key: `${KEY}.graveVigor`, nums: { pct: pct(M.graveVigorHaste - 1) } };
-    case MARROW_TOLLING:
-      return { key: `${KEY}.tolling`, nums: range(MARROW_ID, M.tollMin, M.tollMax) };
+    case MARROW_TOLLING: {
+      // The Toll carries a heroic factor of its own on top of his shared one
+      // (marrow_ids.ts tollDamageRange): the heroic side reads the heroic base.
+      const toll = tollDamageRange(true);
+      return {
+        key: `${KEY}.tolling`,
+        nums: {
+          min: M.tollMin,
+          max: M.tollMax,
+          heroicMin: cryptHeroicAmount(MARROW_ID, toll.min),
+          heroicMax: cryptHeroicAmount(MARROW_ID, toll.max),
+        },
+      };
+    }
     case LADY_EMBRACED:
       return {
         key: `${KEY}.embraced`,

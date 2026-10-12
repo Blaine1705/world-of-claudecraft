@@ -485,8 +485,10 @@ describe('the crypt aura tooltips', () => {
       nums: {
         min: M.tollMin,
         max: M.tollMax,
-        heroicMin: heroic(MARROW_ID, M.tollMin),
-        heroicMax: heroic(MARROW_ID, M.tollMax),
+        // The Toll's own heroic tenth on top of his shared factor
+        // (marrow_ids.ts tollDamageRange): 198 to 251, never 180 to 228.
+        heroicMin: 198,
+        heroicMax: 251,
       },
     },
     {
