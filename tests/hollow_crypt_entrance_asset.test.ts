@@ -23,26 +23,26 @@ const ROOT = path.join(__dirname, '..');
 
 const PINS: Record<string, { sha: string; bytes: number; triangles: number; maxBytes: number }> = {
   'public/models/props/hollow_crypt_entrance.glb': {
-    sha: '836e65bddae35af6cef2596e8b09aa32eae88249467c59e8eaf7ebe96c520c67',
-    bytes: 454796,
-    triangles: 23740,
+    sha: 'c8e93bc63e0f2695fa6c63f491a1c9a5022d45ba898f082d9175c306083beecb',
+    bytes: 475560,
+    triangles: 24740,
     maxBytes: 480 * 1024,
   },
   'public/models/props/hollow_crypt_entrance_walls.glb': {
-    sha: '506686ffca047e09ed0ee89bc7e9d2e4d02d1c87ebce0061979385847839b26a',
-    bytes: 219104,
-    triangles: 10065,
+    sha: 'b834314b5a8a7d1d2f1f4d8035837d25d7f53b7749c77bbcf63acb0a9b095e42',
+    bytes: 208176,
+    triangles: 9605,
     maxBytes: 240 * 1024,
   },
   'public/models/props/hollow_crypt_entrance_props.glb': {
-    sha: '1513c3d40ec26a09ed5ffc157041d22881b6c76543d3458ff683340edb9ead7e',
-    bytes: 102188,
-    triangles: 6008,
+    sha: 'ecc3ee3ea99fdc07664ef1ff813ce7fdf73cd5b43c3ec27f68cdfeb62458c0fb',
+    bytes: 104104,
+    triangles: 6134,
     maxBytes: 130 * 1024,
   },
   'public/models/props/hollow_crypt_entrance_growth.glb': {
-    sha: '5c10e0f3ab12b575950e2b4853a7ca8c899602169b89b20de3d363704703892d',
-    bytes: 132320,
+    sha: 'd24dac1186a3674131a18e838d99b1b89cbfdf1564a5c959d90ed3fa808c86be',
+    bytes: 132100,
     triangles: 10197,
     maxBytes: 160 * 1024,
   },

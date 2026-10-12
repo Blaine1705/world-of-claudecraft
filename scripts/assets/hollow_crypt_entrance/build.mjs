@@ -12,7 +12,13 @@
 //   npx tsx docs/design/dungeon-rework/entrance/probe.mts crypt 80 90 tmp/asset_src/hollow_crypt_entrance/terrain 40 120
 //   "<blender>" -b --factory-startup --python docs/design/dungeon-rework/entrance/build_crypt_entrance.py -- \
 //     --out tmp/asset_src/hollow_crypt_entrance --terrain tmp/asset_src/hollow_crypt_entrance/terrain --renders none
+//   "<blender>" -b --factory-startup tmp/asset_src/hollow_crypt_entrance/hollow_crypt_entrance_v2.blend \
+//     --python docs/design/dungeon-rework/entrance/support_audit.py -- \
+//     --terrain tmp/asset_src/hollow_crypt_entrance/terrain --out tmp/asset_src/hollow_crypt_entrance/audit
 //   node scripts/assets/hollow_crypt_entrance/build.mjs
+//
+// The second Blender step is the support audit: it lists every piece of the
+// built model that hangs in the air. Ship only when that list is empty.
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';

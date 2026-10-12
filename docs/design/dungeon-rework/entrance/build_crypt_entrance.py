@@ -14,7 +14,15 @@ headstones, the lychgate and the stepping flags of the approach.
 Run from the repo: --out tmp/asset_src/hollow_crypt_entrance --terrain <dir of
 the probe's crypt_heightgrid.json and crypt_surroundings.json> (probe.mts
 beside this file writes them: `npx tsx probe.mts crypt 80 90 <dir> 40 120`),
-then node scripts/assets/hollow_crypt_entrance/build.mjs.
+then support_audit.py on the saved .blend (it lists every piece that hangs in
+the air: the list must be empty), then
+node scripts/assets/hollow_crypt_entrance/build.mjs.
+
+Nothing here may float. Walls settle themselves (crypt_ruin_kit.Ruin.wall);
+fallen stones are laid on what is under them (lie()); a coping lies on stones
+cut to its rake; slates lie on battens; and a part that was rebuilt after the
+model was approved keeps its first version inside ghost(), run only for its
+random draws, so everything the piece builds afterwards is unchanged.
 
 Local game coords via ec.B(lx, lz, y): lx = x - 80 (+ WEST), lz = z - 90
 (+ NORTH), y = y - terrainHeight(80, 90). In Blender that is X = lx, Y = -lz
@@ -198,22 +206,56 @@ def candle_cluster(p, lx, lz, y, n, spread=0.3, tall=0.5):
     p.soot.append((Vector(B(lx, lz, y + 0.4)), 1.5, 0.5))
 
 
+LIE = 0.45      # how much of its tumble a fallen stone keeps once it has come to rest
+
+
+def lie(p, x, z, rot, dims, reach=0.0, sink=0.03):
+    """The centre height at which a fallen stone at local game (x, z) comes to
+    rest. On the ground: bedded, every corner of its bed under the turf. With
+    reach > 0 (how far above the ground a heap may already stand there): on
+    whatever of this piece lies under it, two of its bed's four corners sunk
+    in that, never lower than its bed in the ground."""
+    c = B(x, z, 0)
+    bed = [rot @ Vector((i * dims[0] / 2, j * dims[1] / 2, -dims[2] / 2)) for (i, j) in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+    ground = min(gb(c.x + q.x, c.y + q.y) - q.z for q in bed) - sink
+    if reach <= 0:
+        return ground
+    on = sorted(p.surface(c.x + q.x, c.y + q.y, gb(c.x + q.x, c.y + q.y) + reach, gb(c.x + q.x, c.y + q.y)) - q.z
+                for q in bed)
+    return max(ground, (on[1] + on[2]) / 2 - sink - 0.06)
+
+
 def rubble(p, lx, lz, radius, count, size=(0.25, 0.7), lift=0.0):
-    """Fallen walling stones and broken lumps, half sunk in the ground."""
+    """Fallen walling stones and broken lumps, half sunk in the ground. With
+    lift, a heap: each stone comes to rest on the ones that fell before it
+    (lift is how high the heap may stand), never held up by nothing."""
     rng = p.rng
+    reach = 2 * lift + 1.0 if lift > 0 else 0.0
     for _ in range(count):
         a = rng.random() * TAU
         r = radius * math.sqrt(rng.random())
         x, z = lx + math.cos(a) * r, lz + math.sin(a) * r
         s = rng.uniform(*size)
-        g = gh(x, z) + lift * max(0.0, 1 - r / radius)
-        if rng.random() < 0.65:
-            rot = Matrix.Rotation(rng.random() * TAU, 3, 'Z') @ Matrix.Rotation(rng.uniform(-0.35, 0.35), 3, 'X') @ \
-                Matrix.Rotation(rng.uniform(-0.3, 0.3), 3, 'Y')
-            p.stone(B(x, z, g + s * 0.22), (s * rng.uniform(1.2, 1.9), s * rng.uniform(0.8, 1.2), s * rng.uniform(0.55, 0.8)),
-                    p.tone(x, z), rot=rot, chip=0.12, knock=0.5, bottom=False)
-        else:
-            p.rock(B(x, z, g + s * 0.15), (s * 1.3, s, s * 0.7), p.tone(x, z), jitter=0.3, subdivisions=1)
+        # One that would land inside standing masonry is not there (its draws
+        # are still made, so the rest of the piece comes out as before).
+        g, c = gh(x, z), B(x, z, 0)
+        buried = p.surface(c.x, c.y, g + 14.0, g) > g + max(reach, 0.9) + 0.4
+        with (p.ghost() if buried else p.as_kind(p.kind)):
+            if rng.random() < 0.65:
+                rot = Matrix.Rotation(rng.random() * TAU, 3, 'Z') @ \
+                    Matrix.Rotation(rng.uniform(-0.35, 0.35) * LIE, 3, 'X') @ Matrix.Rotation(rng.uniform(-0.3, 0.3) * LIE, 3, 'Y')
+                dims = (s * rng.uniform(1.2, 1.9), s * rng.uniform(0.8, 1.2), s * rng.uniform(0.55, 0.8))
+                col = p.tone(x, z)
+                seat = lie(p, x, z, rot, dims, reach)
+                # (one lifted onto the heap shows its bed from below: close it)
+                p.stone(B(x, z, seat), dims, col, rot=rot, chip=0.12, knock=0.5,
+                        bottom=seat > lie(p, x, z, rot, dims) + 0.01)
+            else:
+                col = p.tone(x, z)
+                dims = (s * 1.3, s, s * 0.7)
+                seat = lie(p, x, z, Matrix.Identity(3), (dims[0] * 0.6, dims[1] * 0.6, 0.0), reach, sink=0.0)
+                # (on a heap a lump beds deeper: its underside is a point)
+                p.rock(B(x, z, seat + s * (0.04 if reach > 0 else 0.15)), dims, col, jitter=0.3, subdivisions=1)
 
 
 def earth_skirt(p, a, b, width=1.0, step=1.7):
@@ -260,8 +302,10 @@ def sunk_blocks(p, a, b, count, off=1.1):
         z = a[1] + dz * t + dx / L * side
         sz = rng.uniform(0.3, 0.62)
         rot = Matrix.Rotation(rng.random() * TAU, 3, 'Z') @ Matrix.Rotation(rng.uniform(-0.4, 0.4), 3, 'X')
-        p.stone(B(x, z, gh(x, z) + sz * 0.12), (sz * rng.uniform(1.3, 2.0), sz * rng.uniform(0.9, 1.3), sz * 0.75), p.tone(x, z),
-                rot=rot, chip=0.14, knock=0.6)
+        dims = (sz * rng.uniform(1.3, 2.0), sz * rng.uniform(0.9, 1.3), sz * 0.75)
+        col = p.tone(x, z)
+        # (its tilted bed never shows a corner over the turf)
+        p.stone(B(x, z, min(gh(x, z) + sz * 0.12, lie(p, x, z, rot, dims))), dims, col, rot=rot, chip=0.14, knock=0.6)
 
 
 def moss_pad(p, pos, size):
@@ -273,6 +317,50 @@ def moss_pad(p, pos, size):
 
 
 # ================================================================ the gable
+def bellcote(p, by, half):
+    """The empty bellcote, one coursed mass standing on the gable's squared
+    apex: the base slab, the two piers and the spandrels over the pointed
+    opening built as a single wall, the impost band, the arch ring, the west
+    rake of its little gable still under its coping (the east rake has fallen
+    away in steps), the bare iron yoke let into the jambs and a frayed end of
+    rope. No bell: it lies cracked beside the crypt stair."""
+    M = south_plane(GABLE_Z)
+    hw = half - 0.12
+    spring, rise, open_ = by + 2.3, 0.85, 0.66      # (the ring stands a full course under the little gable)
+    crown = by + 4.22
+    p.hewn(B(0, GABLE_Z, by + 0.22), (2 * half, 1.5, 0.52), LIME_PALE, bevel=0.08)      # (bedded a little into the apex)
+
+    def line(u):
+        x = u - hw
+        if x >= -0.25:
+            return crown - 0.7 * max(0.0, x)
+        return crown - 0.3 - 1.2 * rk.smooth(-0.25, -1.45, x)
+
+    p.wall((-hw, GABLE_Z), (hw, GABLE_Z), 1.3, by + 0.48, lambda t: line(t * 2 * hw),
+           holes=(arch_hole(open_, spring, rise, hw),), course=(0.48, 0.66), unit=(1.0, 1.9), missing=0.0, ragged=0.0,
+           dress=((hw - 0.25, 2 * hw, line, (hw,)),), open_ends=(True, True))
+    for sx in (-1, 1):
+        p.hewn(B(sx * 1.1, GABLE_Z, spring - 0.1), (1.06, 1.44, 0.22), LIME_PALE, bevel=0.06)
+    bp = [(x, spring + z) for (x, z) in arch_points(open_, rise, 3)]
+    p.arch(bp, 0.4, 1.4, LIME_PALE, M, bevel=0.04, chip=0.04)
+    # The west rake's coping: two stones bedded on the cut masonry, and the saddle.
+    for k in range(2):
+        x0, x1 = 0.22 + (hw - 0.22) * k / 2, 0.22 + (hw - 0.22) * (k + 1) / 2
+        z0, z1 = line(hw + x0), line(hw + x1)
+        ln = math.hypot(x1 - x0, z1 - z0)
+        up = Vector((-(z1 - z0), 0, x1 - x0)) / ln
+        up = up if up.z > 0 else -up
+        p.hewn(Vector(B((x0 + x1) / 2, GABLE_Z, (z0 + z1) / 2)) + up * 0.1, (ln - 0.03, 1.46, 0.22),
+               p.vary(LIME_PALE, 0.05), roll=-math.atan2(z1 - z0, x1 - x0), bevel=0.05)
+    q = B(-0.02, GABLE_Z, 0)
+    p.hewn(B(-0.02, GABLE_Z, p.surface(q.x, q.y, crown + 1.0, by) + 0.13), (0.5, 1.5, 0.34), LIME_PALE, bevel=0.06, roll=0.04)
+    with p.as_kind(K_METAL):
+        p.sweep([M @ Vector((-0.7, 0, spring + 0.16)), M @ Vector((0.7, 0, spring + 0.16))], 0.07, 0.07, IRON, sides=5)
+    with p.as_kind(K_CLOTH):
+        p.sweep([M @ Vector((0.0, 0, spring + 0.1)), M @ Vector((0.04, 0.03, spring - 0.5)),
+                 M @ Vector((-0.07, 0.07, spring - 1.15))], 0.04, 0.06, (0.42, 0.37, 0.27), sides=4)
+
+
 def gable():
     p = P('Gable', moss=1.0)
     L = 2 * NAVE_X + 1.2
@@ -308,8 +396,18 @@ def gable():
         k = rk.smooth(-2.0, -8.5, x) * max(0.0, y - 2.0)
         return (0.0, 0.022 * k, -0.012 * k * rk.smooth(-5.0, -8.5, x))
 
+    # Where the gable still wears its coping (the whole west rake, the top of
+    # the east one) its stones are cut to the rake, and under the bellcote the
+    # apex is built up square to carry it: nothing lies on a stepped edge.
+    by = apex - 0.1
+    cote = 1.7      # half width of the bellcote's base
+
+    def rake_line(u):
+        x = u - L / 2
+        return by if abs(x) <= cote else eave + (apex - eave) * (1 - abs(x) / (L / 2))
+
     TOPS.extend(p.wall(a, b, 1.15, y0 + 0.5, top_fn, holes=(holes,), course=(0.45, 0.78), unit=(1.1, 2.7), deform=lean,
-                       missing=0.03))
+                       missing=0.03, dress=((L / 2 - 3.3, L, rake_line, (L / 2 - cote, L / 2 + cote)),)))
     # The plinth course, proud of both faces.
     x = -L / 2
     while x < L / 2 - 0.2:
@@ -358,7 +456,7 @@ def gable():
                 p.sweep([rp(a0, ra), rp(a0, rb)], 0.12, 0.1, p.vary(LIME_PALE if k not in snapped else LIME, 0.05), sides=6)
             am = a0 + TAU / 16
             if k not in (1, 2, 5):      # a small oculus between two spokes, out by the ring
-                rc, ro = rose_r * 0.67, rose_r * 0.2
+                rc, ro = rose_r * 0.696, rose_r * 0.21      # (bedded in the ring, fused to the spokes beside it)
                 ring = [M @ Vector((math.cos(am) * rc + math.cos(b) * ro, 0, rose_y + math.sin(am) * rc + math.sin(b) * ro))
                         for b in (TAU * i / 8 for i in range(9))]
                 p.sweep(ring, 0.07, 0.07, p.vary(LIME_PALE, 0.05), sides=4, cap=False)
@@ -372,39 +470,61 @@ def gable():
         if x > -3.6 and not (abs(x + w / 2) < 0.2):
             p.hewn(B(x + w / 2, GABLE_Z - 0.04, eave - 0.05), (w - 0.04, 1.36, 0.2), LIME_PALE, bevel=0.05)
         x += w
-    # Coping on the rakes (whole on the west, three stones left on the east).
-    for s in (-1, 1):
-        for k in range(9):
-            t0, t1 = k / 9, (k + 1) / 9
-            x0, x1 = s * (L / 2) * (1 - t0), s * (L / 2) * (1 - t1)
-            z0 = eave + (apex - eave) * t0
-            z1 = eave + (apex - eave) * t1
-            if s < 0 and k < 6:
-                continue
-            if s > 0 and k == 5:
-                continue
-            p.hewn(B((x0 + x1) / 2, GABLE_Z, (z0 + z1) / 2 + 0.2), (abs(x1 - x0) * 1.1, 1.5, 0.3), p.vary(LIME_PALE, 0.05),
-                   roll=-math.atan2(z1 - z0, x1 - x0), bevel=0.06)
-    p.hewn(B(L / 2 - 0.1, GABLE_Z, eave + 0.05), (1.1, 1.6, 0.5), LIME_PALE, bevel=0.07)
-    # The empty bellcote: two thick piers, a heavy pointed arch, what is left of
-    # its little gable, the bare iron yoke and a frayed end of rope. No bell:
-    # it lies cracked beside the crypt stair.
-    by = apex - 0.1
-    p.hewn(B(0, GABLE_Z, by + 0.24), (3.4, 1.5, 0.48), LIME_PALE, bevel=0.08)
-    for sx in (-1, 1):
-        pier(p, sx * 1.12, GABLE_Z, 0.9, 1.3, by + 0.48, by + 2.5, course=(0.4, 0.6))
-        p.hewn(B(sx * 1.1, GABLE_Z, by + 2.6), (1.06, 1.44, 0.22), LIME_PALE, bevel=0.06)
-    bp = [(x, by + 2.7 + z) for (x, z) in arch_points(0.66, 0.85, 3)]
-    p.arch(bp, 0.5, 1.3, LIME_PALE, M, bevel=0.05, chip=0.07)
-    p.hewn(B(0.92, GABLE_Z, by + 3.72), (1.75, 1.46, 0.4), p.vary(LIME, 0.05), roll=0.72, bevel=0.06, chip=0.12)
-    p.hewn(B(-1.2, GABLE_Z, by + 3.3), (0.95, 1.4, 0.4), p.vary(LIME, 0.05), roll=-0.72, bevel=0.06, chip=0.16)
-    p.stone(B(-0.5, GABLE_Z, by + 3.8), (0.7, 1.2, 0.45), p.tone(0, by), chip=0.14, knock=0.7, bottom=True,
-            rot=Matrix.Rotation(-0.5, 3, 'Y'))
-    with p.as_kind(K_METAL):
-        p.sweep([M @ Vector((-0.7, 0, by + 2.86)), M @ Vector((0.7, 0, by + 2.86))], 0.07, 0.07, IRON, sides=5)
-    with p.as_kind(K_CLOTH):
-        p.sweep([M @ Vector((0.0, 0, by + 2.8)), M @ Vector((0.04, 0.03, by + 2.2)), M @ Vector((-0.07, 0.07, by + 1.55))],
-                0.04, 0.06, (0.42, 0.37, 0.27), sides=4)
+    # The coping and the bellcote were rebuilt to sit on the masonry; their
+    # first version still runs, unseen, for its random draws (ghost()), so the
+    # buttresses, the earth and the rubble below come out as they were.
+    with p.ghost():
+        # Coping on the rakes (whole on the west, three stones left on the east).
+        for s in (-1, 1):
+            for k in range(9):
+                t0, t1 = k / 9, (k + 1) / 9
+                x0, x1 = s * (L / 2) * (1 - t0), s * (L / 2) * (1 - t1)
+                z0 = eave + (apex - eave) * t0
+                z1 = eave + (apex - eave) * t1
+                if s < 0 and k < 6:
+                    continue
+                if s > 0 and k == 5:
+                    continue
+                p.hewn(B((x0 + x1) / 2, GABLE_Z, (z0 + z1) / 2 + 0.2), (abs(x1 - x0) * 1.1, 1.5, 0.3), p.vary(LIME_PALE, 0.05),
+                       roll=-math.atan2(z1 - z0, x1 - x0), bevel=0.06)
+        p.hewn(B(L / 2 - 0.1, GABLE_Z, eave + 0.05), (1.1, 1.6, 0.5), LIME_PALE, bevel=0.07)
+        # The empty bellcote: two thick piers, a heavy pointed arch, what is left of
+        # its little gable, the bare iron yoke and a frayed end of rope. No bell:
+        # it lies cracked beside the crypt stair.
+        p.hewn(B(0, GABLE_Z, by + 0.24), (3.4, 1.5, 0.48), LIME_PALE, bevel=0.08)
+        for sx in (-1, 1):
+            pier(p, sx * 1.12, GABLE_Z, 0.9, 1.3, by + 0.48, by + 2.5, course=(0.4, 0.6))
+            p.hewn(B(sx * 1.1, GABLE_Z, by + 2.6), (1.06, 1.44, 0.22), LIME_PALE, bevel=0.06)
+        bp = [(x, by + 2.7 + z) for (x, z) in arch_points(0.66, 0.85, 3)]
+        p.arch(bp, 0.5, 1.3, LIME_PALE, M, bevel=0.05, chip=0.07)
+        p.hewn(B(0.92, GABLE_Z, by + 3.72), (1.75, 1.46, 0.4), p.vary(LIME, 0.05), roll=0.72, bevel=0.06, chip=0.12)
+        p.hewn(B(-1.2, GABLE_Z, by + 3.3), (0.95, 1.4, 0.4), p.vary(LIME, 0.05), roll=-0.72, bevel=0.06, chip=0.16)
+        p.stone(B(-0.5, GABLE_Z, by + 3.8), (0.7, 1.2, 0.45), p.tone(0, by), chip=0.14, knock=0.7, bottom=True,
+                rot=Matrix.Rotation(-0.5, 3, 'Y'))
+        with p.as_kind(K_METAL):
+            p.sweep([M @ Vector((-0.7, 0, by + 2.86)), M @ Vector((0.7, 0, by + 2.86))], 0.07, 0.07, IRON, sides=5)
+        with p.as_kind(K_CLOTH):
+            p.sweep([M @ Vector((0.0, 0, by + 2.8)), M @ Vector((0.04, 0.03, by + 2.2)), M @ Vector((-0.07, 0.07, by + 1.55))],
+                    0.04, 0.06, (0.42, 0.37, 0.27), sides=4)
+    with p.side('coping'):
+        # Coping on the rakes (whole on the west but one stone, the top two left
+        # on the east): each stone as long as its stretch of the rake, bedded on
+        # the cut stones, dying against the bellcote's base.
+        for s in (-1, 1):
+            for k in range(8):
+                if (s < 0 and k < 6) or (s > 0 and k == 5):
+                    continue
+                x0 = s * (L / 2) * (1 - k / 9)
+                x1 = s * max(cote + 0.02, (L / 2) * (1 - (k + 1) / 9))
+                z0, z1 = rake_line(L / 2 + x0), eave + (apex - eave) * (1 - abs(x1) / (L / 2))
+                ln = math.hypot(x1 - x0, z1 - z0)
+                up = Vector((-(z1 - z0), 0, x1 - x0)) / ln
+                up = up if up.z > 0 else -up
+                p.hewn(Vector(B((x0 + x1) / 2, GABLE_Z, (z0 + z1) / 2)) + up * 0.135, (ln - 0.03, 1.5, 0.3),
+                       p.vary(LIME_PALE, 0.05), roll=-math.atan2(z1 - z0, x1 - x0), bevel=0.06)
+        p.hewn(B(L / 2 - 0.1, GABLE_Z, eave + 0.05), (1.1, 1.6, 0.5), LIME_PALE, bevel=0.07)
+    with p.side('bellcote'):
+        bellcote(p, by, cote)
     # Corner buttresses: three stages with weathered offsets; the east one broke.
     for sx in (-1, 1):
         x = sx * (NAVE_X + 0.25)
@@ -445,11 +565,25 @@ def gable():
 
 
 # ================================================================== the nave
-def lancet(p, M, u, sill, spring, rise, half, depth, head=True):
+def lancet(p, M, u, sill, spring, rise, half, depth, head=True, stands=(True, True), ledge=(True, True)):
+    """A lancet's head and sill. stands: whether the wall still stands to the
+    springing on its low-u and its high-u side; the half of the head over a
+    jamb that fell is gone with it (half an arch does not hang from its crown).
+    ledge: whether the wall still comes up under each end of the sill; an end
+    with nothing under it is broken off at the jamb."""
     if head:
         lp = [(u + x, spring + z) for (x, z) in arch_points(half, rise, 3)]
-        p.arch(lp, 0.26, depth + 0.1, LIME_PALE, M, bevel=0.0)
-    p.hewn(Vector((u, 0, sill - 0.1)), (half * 2 + 0.6, depth + 0.16, 0.2), LIME_PALE, bevel=0.05, M=M)
+        if all(stands):
+            p.arch(lp, 0.26, depth + 0.1, LIME_PALE, M, bevel=0.0)
+        else:
+            with p.ghost():      # the whole head, for its random draws
+                p.arch(lp, 0.26, depth + 0.1, LIME_PALE, M, bevel=0.0)
+            n = len(lp) - 1
+            with p.side(f'lancet {u:.2f}'):
+                p.arch(lp, 0.26, depth + 0.1, LIME_PALE, M, bevel=0.0,
+                       skip=tuple(i for i in range(n) if not stands[0 if i < n / 2 else 1]))
+    lo, hi = (half + (0.3 if on else 0.02) for on in ledge)
+    p.hewn(Vector((u + (hi - lo) / 2, 0, sill - 0.1)), (lo + hi, depth + 0.16, 0.2), LIME_PALE, bevel=0.05, M=M)
 
 
 def nave():
@@ -487,11 +621,23 @@ def nave():
             out = -1.0 if sx < 0 else 1.0     # local +Y is west
             return (0.0, out * 0.03 * k * max(0.0, y - 0.8), -0.09 * k * min(1.0, y / 2.0))
 
+        heads = [top_fn(w) > 6.0 for w in wins]
+        # A window's head carries masonry only over a jamb that still stands: the
+        # wall keeps the springing's height for a good stone's length beyond it.
+        stands = [tuple(min(top_fn(w + e * (0.5 + d) / L) for d in (0.1, 0.5, 0.9, 1.3)) >= 4.7 for e in (-1, 1))
+                  for w in wins]
+
+        def headed(u, y, hs=hs, heads=heads, stands=stands, wins=wins, L=L):
+            return y > 2.3 and any(h(u, y) and head and st[0 if u < w * L else 1]
+                                   for (h, head, st, w) in zip(hs, heads, stands, wins))
+
         TOPS.extend(p.wall(a, b, 0.98, y0, top_fn, holes=(holes,), course=(0.48, 0.84), unit=(1.1, 2.7), deform=bend,
-                           missing=0.035))
+                           missing=0.035, bridge=(headed,), open_ends=(True, False)))      # (its south end tops the gable)
         Mw = Matrix.Translation(B(x, a[1], 0)) @ Matrix.Rotation(-math.pi / 2, 4, 'Z')
-        for w in wins:
-            lancet(p, Mw, w * L, 2.3, 4.5, 1.0, 0.5, 0.98, head=top_fn(w) > 6.0)
+        for (w, head, st) in zip(wins, heads, stands):
+            # (does the built wall come up to the sill a little beyond each jamb?)
+            ledge = tuple(p.surface(x, -(a[1] + w * L + e * 0.72), 20.0, 0.0) >= 2.3 - 0.35 for e in (-1, 1))
+            lancet(p, Mw, w * L, 2.3, 4.5, 1.0, 0.5, 0.98, head=head, stands=st, ledge=ledge)
         # Buttresses outside, between the breaches.
         for t in (0.2, 0.62, 0.96):
             if any(b0 - 0.05 < t < b1 + 0.05 for (b0, b1) in breaches):
@@ -563,9 +709,9 @@ def nave():
         hgt = heights[k]
         Lk = math.hypot(pb[0] - pa[0], pb[1] - pa[1])
         hole = arch_hole(0.45, 3.9, 0.95, Lk / 2) if k in (2, 3) else None
-        TOPS.extend(p.wall(pa, pb, 0.9, y0, lambda t, h=hgt, k=k: h + 0.5 * math.sin(t * 7 + k * 2.1),
-                           holes=((lambda u, y, hole=hole: y > 2.2 and hole(u, y)),) if hole else (),
-                           course=(0.48, 0.82), unit=(1.0, 2.2), missing=0.03))
+        cut = ((lambda u, y, hole=hole: y > 2.2 and hole(u, y)),) if hole else ()
+        TOPS.extend(p.wall(pa, pb, 0.9, y0, lambda t, h=hgt, k=k: h + 0.5 * math.sin(t * 7 + k * 2.1), holes=cut,
+                           course=(0.48, 0.82), unit=(1.0, 2.2), missing=0.03, bridge=cut if k == 2 else ()))
         if hole:
             ang = math.atan2(-(pb[1] - pa[1]), pb[0] - pa[0])
             Mk = Matrix.Translation(B(pa[0], pa[1], 0)) @ Matrix.Rotation(ang, 4, 'Z')
@@ -646,8 +792,12 @@ def stair_house():
         return top
 
     hole = arch_hole(LANE + 0.3, spring, rise + 0.1, hw)
+
+    def rake_line(u):      # the surviving rake, cut to its line under the coping
+        return eave + (apex - eave) * max(0.0, 1 - abs(u - hw) / hw)
+
     TOPS.extend(p.wall((-hw, front_z), (hw, front_z), 1.3, y0, front_top, holes=(hole,), course=(0.46, 0.8),
-                       unit=(1.0, 2.3), missing=0.02))
+                       unit=(1.0, 2.3), missing=0.02, dress=((hw - 1.2, 2 * hw, rake_line, (hw,)),)))
     # Side walls, falling toward the back; the back wall is a stump under rubble.
     for sx in (-1, 1):
         def side_top(t, sx=sx):
@@ -687,16 +837,32 @@ def stair_house():
         x = -2.6 + 5.2 * k / 6
         p.streaks.append((M @ Vector((x, 0.66, 6.0 + 0.5 * p.rng.random())), 0.28 + 0.2 * p.rng.random(),
                           2.0 + 2.4 * p.rng.random(), 0.7))
-    # Coping on the surviving west rake and a kneeler.
-    for k in range(4):
-        t0, t1 = k / 4, (k + 1) / 4
-        x0, x1 = hw * (1 - t0), hw * (1 - t1)
-        zz0, zz1 = eave + (apex - eave) * t0, eave + (apex - eave) * t1
-        if k == 2:
-            continue
-        p.hewn(B((x0 + x1) / 2, front_z, (zz0 + zz1) / 2 + 0.18), (abs(x1 - x0) * 1.1, 1.6, 0.26), p.vary(LIME_PALE, 0.05),
-               roll=-math.atan2(zz1 - zz0, x1 - x0), bevel=0.06)
-    p.hewn(B(0.1, front_z, apex + 0.1), (0.6, 1.5, 0.5), LIME_PALE, bevel=0.06, roll=0.06)
+    # Coping on the surviving west rake and a kneeler. (First version, kept
+    # unseen for its random draws: see ghost().)
+    with p.ghost():
+        for k in range(4):
+            t0, t1 = k / 4, (k + 1) / 4
+            x0, x1 = hw * (1 - t0), hw * (1 - t1)
+            zz0, zz1 = eave + (apex - eave) * t0, eave + (apex - eave) * t1
+            if k == 2:
+                continue
+            p.hewn(B((x0 + x1) / 2, front_z, (zz0 + zz1) / 2 + 0.18), (abs(x1 - x0) * 1.1, 1.6, 0.26),
+                   p.vary(LIME_PALE, 0.05), roll=-math.atan2(zz1 - zz0, x1 - x0), bevel=0.06)
+        p.hewn(B(0.1, front_z, apex + 0.1), (0.6, 1.5, 0.5), LIME_PALE, bevel=0.06, roll=0.06)
+    with p.side('coping'):
+        # Each stone as long as its stretch of the rake and bedded on the cut
+        # masonry (one is gone); the saddle stone sits astride the apex.
+        for k in range(4):
+            if k == 2:
+                continue
+            x0, x1 = hw * (1 - k / 4), max(0.32, hw * (1 - (k + 1) / 4))
+            zz0, zz1 = rake_line(hw + x0), rake_line(hw + x1)
+            ln = math.hypot(x1 - x0, zz1 - zz0)
+            up = Vector((-(zz1 - zz0), 0, x1 - x0)) / ln
+            up = up if up.z > 0 else -up
+            p.hewn(Vector(B((x0 + x1) / 2, front_z, (zz0 + zz1) / 2)) + up * 0.115, (ln - 0.03, 1.6, 0.26),
+                   p.vary(LIME_PALE, 0.05), roll=-math.atan2(zz1 - zz0, x1 - x0), bevel=0.06)
+        p.hewn(B(0.02, front_z, apex + 0.06), (0.62, 1.5, 0.5), LIME_PALE, bevel=0.06, roll=0.04)
     # The stair's own barrel vault still stands (it is why the stair can be
     # used): rings of voussoir slabs on the cheeks, closed at the back by an
     # end wall under the fallen chancel's rubble. What collapsed is everything
@@ -710,9 +876,13 @@ def stair_house():
         p.arch(rp, 0.36, (vz1 - vz0) / rings - 0.02, LIME if i % 2 else LIME_COOL, south_plane(lz), bevel=0.0, chip=0.07,
                tone=0.09, depth_jit=0.0)
     vault = arch_hole(v_half + 0.3, v_spring, v_rise + 0.34, hw - 1.1)
+
+    def end_line(u):      # the end wall closes the vault to its point: cut to that line
+        return v_spring + 0.2 + (v_rise + 0.25) * max(0.0, 1 - abs(u / (2 * hw - 2.2) - 0.5) * 2) ** 0.8
+
     TOPS.extend(p.wall((-hw + 1.1, z1 - 0.2), (hw - 1.1, z1 - 0.2), 0.7, y0,
                        lambda t: v_spring + 0.2 + (v_rise + 0.25) * max(0.0, 1 - abs(t - 0.5) * 2) ** 0.8, unit=(1.0, 2.2),
-                       missing=0.0))
+                       missing=0.0, dress=((0.0, 2 * hw - 2.2, end_line, (hw - 1.1,)),)))
     del vault
     # The chancel arch's west respond still climbs from the corner and throws
     # three voussoirs at the sky; its east twin is a stump under the yew.
@@ -726,11 +896,17 @@ def stair_house():
     for (lx, lz, y, s) in ((2.3, 2.4, 4.9, 0.8), (-2.3, 1.5, 5.1, 0.7), (2.2, 4.2, 4.3, 0.9), (-2.1, 4.0, 4.1, 0.8),
                            (0.5, 3.2, 5.75, 0.8), (-0.6, 4.4, 5.3, 0.9), (3.0, 0.9, 5.3, 0.6), (0.2, 1.6, 5.9, 0.6),
                            (1.2, 4.9, 4.6, 0.8), (-1.3, 2.6, 5.5, 0.6)):
+        # (y is only where to look from: each lump lies on what is under it)
         if p.rng.random() < 0.45:
-            p.rock(B(lx, lz, y), (s * 1.4, s, s * 0.7), p.tone(lx, lz), jitter=0.28, subdivisions=1)
+            col = p.tone(lx, lz)
+            seat = lie(p, lx, lz, Matrix.Identity(3), (s * 0.8, s * 0.6, 0.0), reach=y + 1.2 - gh(lx, lz), sink=0.0)
+            p.rock(B(lx, lz, seat + s * 0.18), (s * 1.4, s, s * 0.7), col, jitter=0.28, subdivisions=1)
         else:
-            p.stone(B(lx, lz, y), (s * 1.5, s * 0.9, s * 0.6), p.tone(lx, lz), chip=0.12, knock=0.6, bottom=True,
-                    rot=Matrix.Rotation(p.rng.random() * 3, 3, 'Z') @ Matrix.Rotation(0.3, 3, 'X'))
+            col = p.tone(lx, lz)
+            rot = Matrix.Rotation(p.rng.random() * 3, 3, 'Z') @ Matrix.Rotation(0.3 * LIE, 3, 'X')
+            dims = (s * 1.5, s * 0.9, s * 0.6)
+            p.stone(B(lx, lz, lie(p, lx, lz, rot, dims, reach=y + 1.2 - gh(lx, lz))), dims, col, chip=0.12, knock=0.6,
+                    bottom=True, rot=rot)
     with p.as_kind(K_EARTH):
         for (lx, lz, sx_, sy_, sz_) in ((0.4, z1 + 0.9, 5.6, 3.4, 2.6), (-2.2, z1 + 0.3, 3.2, 3.0, 2.0),
                                         (2.6, z1 + 0.5, 3.0, 2.6, 1.7), (0.0, z1 + 1.3, 3.6, 2.2, 3.0)):
@@ -974,7 +1150,8 @@ def yew(p, lx, lz):
                 tips.append(t0 + td)
     for tip in tips[::3][:9]:
         for _ in range(8):
-            q = tip + Vector((rng.uniform(-0.6, 0.6), rng.uniform(-0.6, 0.6), rng.uniform(-0.5, 0.2)))
+            # (close on the twig's end: a spray two hands off its twig hangs in the air)
+            q = tip + Vector((rng.uniform(-0.6, 0.6), rng.uniform(-0.6, 0.6), rng.uniform(-0.5, 0.2))) * 0.2
             p.leaf(q, Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.5)), rng.uniform(0.3, 0.5),
                    p.vary(YEW[rng.randrange(3)], 0.1), spin=rng.random() * TAU, droop=0.35, n=3)
     collider_circle('yew', lx, lz, 0.85, 9.5)
@@ -1023,30 +1200,55 @@ def outside():
                 p.box(B(lx0 + sx * 2.3, lz0 + sz * 1.05, g + 2.55), (0.3, 0.3, 2.1), TIMBER, bevel=0.04,
                       roll=sx * 0.02 * sz)
             p.box(B(lx0 + sx * 2.3, lz0, g + 3.62), (0.3, 2.9, 0.26), TIMBER, bevel=0.03)
+            # the pole plate over the tie beams' ends: the rafters' feet bear on it
+            p.box(B(lx0 + sx * 2.3, lz0, g + 3.87), (0.22, 3.1, 0.24), TIMBER_GREY, bottom=False)
             for sz in (-1, 1):   # braces
                 p.box(B(lx0 + sx * 1.78, lz0 + sz * 1.05, g + 3.25), (1.1, 0.16, 0.16), TIMBER_GREY, roll=sx * 0.8)
         for sz in (-1, 0, 1):
             p.box(B(lx0, lz0 + sz * 1.05, g + 3.78), (5.0, 0.24, 0.24), TIMBER, bevel=0.03, roll=0.012 * sz)
         ridge = g + 5.25
-        for sz in (-1.2, -0.4, 0.4, 1.2):
+        pitch = 0.52
+        # Four pairs of rafters (the outer pairs under the roof's ends), and
+        # the slating battens nailed across them: an eaves fillet and one
+        # batten under the head of each course of slates.
+        for sz in (-1.38, -0.46, 0.46, 1.38):
             for sx in (-1, 1):
-                p.box(B(lx0 + sx * 1.42, lz0 + sz, (g + 3.9 + ridge) / 2), (3.2, 0.14, 0.18), TIMBER_GREY, roll=sx * 0.52)
+                p.box(B(lx0 + sx * 1.42, lz0 + sz, (g + 3.9 + ridge) / 2), (3.2, 0.14, 0.18), TIMBER_GREY, roll=sx * pitch)
         p.box(B(lx0, lz0, ridge + 0.02), (0.22, 3.4, 0.22), TIMBER, bevel=0.03, pitch=0.012)
+
+        def on_roof(across, lift):
+            """Height of a point `lift` above the rafters' backs, `across` from the ridge line."""
+            return (g + 3.9 + ridge) / 2 + (1.42 - across) * math.tan(pitch) + (0.09 + lift) / math.cos(pitch)
+
+        LATH = 0.045
+        heads = [2.95 - 2.85 * (r + 0.5) / 5 - 0.32 * math.cos(pitch) for r in range(5)]      # each course's head batten
+        for sx in (-1, 1):
+            for across in [2.76] + heads:
+                p.box(B(lx0 + sx * across, lz0, on_roof(across, LATH / 2)), (0.075, 3.34, LATH), TIMBER_GREY,
+                      roll=sx * pitch)      # (a batten shows its underside from the path: all six faces)
     # What is left of the slates: the eaves course and a few strays (an open
-    # roof: the approach camera looks straight through the rafters).
+    # roof: the approach camera looks straight through the rafters). Every
+    # slate hangs from its head batten and lies on the batten below, or on the
+    # head of the slate under it where that one is still there.
     for sx in (-1, 1):
+        below = []
         for r in range(5):
             t = (r + 0.5) / 5
-            xx = lx0 + sx * (2.95 - 2.85 * t)
-            yy = g + 3.86 + (ridge - g - 3.86) * t + 0.12
+            across = 2.95 - 2.85 * t
             zz = lz0 - 1.7
+            course = []
             while zz < lz0 + 1.7:
                 w = rng.uniform(0.42, 0.62)
                 if rng.random() < (0.7 if r == 0 else (0.2 if sx > 0 else 0.1)):
-                    sag = -0.1 * math.sin(math.pi * (zz + w / 2 - lz0 + 1.7) / 3.4)
-                    p.box(B(xx, zz + w / 2, yy + sag), (0.74, w - 0.03, 0.05), p.vary(SLATE, 0.14),
-                          roll=sx * 0.52 + (rng.random() - 0.5) * 0.06, yaw=(rng.random() - 0.5) * 0.05, bottom=True)
+                    col = p.vary(SLATE, 0.14)
+                    jit, yaw = (rng.random() - 0.5) * 0.02, (rng.random() - 0.5) * 0.05
+                    lapped = any(min(z1, zz + w) - max(z0, zz) > 0.08 for (z0, z1) in below)
+                    tilt = math.atan2(0.055, 0.66) if lapped else 0.0      # its tail up on the slate below
+                    p.box(B(lx0 + sx * across, zz + w / 2, on_roof(across, LATH + 0.026) + 0.37 * math.sin(tilt)),
+                          (0.74, w - 0.03, 0.05), col, roll=sx * (pitch - tilt + jit), yaw=yaw, bottom=True)
+                    course.append((zz, zz + w))
                 zz += w
+            below = course
     p.hewn(B(lx0, lz0 - 1.55, ridge + 0.5), (0.14, 0.14, 0.8), LIME_PALE, bevel=0.03)
     p.hewn(B(lx0, lz0 - 1.55, ridge + 0.62), (0.5, 0.14, 0.14), LIME_PALE, bevel=0.03)
     # The churchyard wall: tumbled runs either side of the lychgate.
@@ -1086,9 +1288,13 @@ def outside():
 
 
 # ================================================================ the growth
-def growth(sill):
+def growth(sill, furnishings, walls, stair):
     """Everything green and fallen: one render-only GLB on the leaf material
-    (plus stems and moss pads in stone), so the engine can shed it whole."""
+    (plus stems and moss pads in stone), so the engine can shed it whole.
+    `furnishings` is the details piece (the bell and the altar slab the moss
+    pads grow on); `walls` and `stair` are the nave and the stair-house (a
+    curtain of ivy hangs from where a broken top really is, not from the air
+    over it)."""
     p = P('Growth')
     rng = p.rng
     S = Vector((0, 1, 0))     # south
@@ -1099,22 +1305,25 @@ def growth(sill):
     p.ivy((6.6, gy + 0.03, gh(6.6, GABLE_Z - 0.6)), S, 9.4, 4.6, stems=7, density=2.2, mass=1)
     p.ivy((-6.2, gy + 0.03, gh(-6.2, GABLE_Z - 0.6)), S, 5.2, 4.4, stems=6, density=1.8, mass=1)
     p.ivy((-1.2, gy + 0.08, 14.1), S, 5.0, 3.8, stems=7, density=2.3, hang=True, lean=0.15, mass=2, size=0.2)
-    p.ivy((2.2, gy + 0.08, 13.2), S, 2.6, 1.6, stems=5, density=2.1, hang=True, mass=2, size=0.2)
+    p.ivy((2.2, gy + 0.08, 14.05), S, 2.6, 1.6, stems=5, density=2.1, hang=True, mass=2, size=0.2)
     p.ivy((1.2, -GABLE_Z - 0.62, 13.9), N, 4.6, 3.4, stems=6, density=1.8, hang=True)
     p.ivy((-5.6, -GABLE_Z - 0.62, gh(-5.6, GABLE_Z + 0.7)), N, 4.4, 3.6, stems=4, density=1.8)
     # The stair-house: ivy on its west cheek and over the front's broken rake.
     fz = SH['z0'] + 0.65
     p.ivy((2.9, -(fz - 0.68), gh(2.9, fz - 0.7)), S, 5.6, 1.5, stems=5, density=2.2, lean=-0.15, mass=1)
-    p.ivy((-2.6, -(fz - 0.68), 4.9), S, 3.0, 1.7, stems=5, density=1.8, hang=True)
-    p.ivy((0.2, -(fz - 0.82), 6.5), S, 2.3, 3.4, stems=7, density=2.2, hang=True, mass=2, size=0.2)
-    p.ivy((1.4, -(fz - 0.82), 7.4), S, 2.0, 1.4, stems=4, density=2.0, hang=True, mass=2, size=0.2)
+    def front_top(q):      # the stair-house front's own top, a hand under it
+        return stair.surface(q.x, q.y - 0.5, 20.0, 0.0) - 0.15
+
+    p.ivy((-2.6, -(fz - 0.68), 4.9), S, 3.0, 1.7, stems=5, density=1.8, hang=True, top=front_top)
+    p.ivy((0.2, -(fz - 0.82), 6.5), S, 2.3, 3.4, stems=7, density=2.2, hang=True, mass=2, size=0.2, top=front_top)
+    p.ivy((1.4, -(fz - 0.82), 7.4), S, 2.0, 1.4, stems=4, density=2.0, hang=True, mass=2, size=0.2, top=front_top)
     p.ivy((SH['hw'] + 0.03, -3.0, gh(SH['hw'], 3.0)), Vector((1, 0, 0)), 4.2, 3.2, stems=4, density=1.8)
     p.ivy((-SH['hw'] - 0.03, -2.2, 4.6), Vector((-1, 0, 0)), 3.2, 3.0, stems=3, density=1.8, hang=True)
     # The nave walls: a curtain on the east wall's tall end, tufts at every foot.
     p.ivy((-(NAVE_X - 0.5) - 0.52, -(GABLE_Z + 3.4), gh(-9.0, GABLE_Z + 3.4)), Vector((-1, 0, 0)), 5.8, 4.6, stems=6,
           density=1.8)
     p.ivy(((NAVE_X - 0.5) - 0.52, -(GABLE_Z + 4.6), 6.4), Vector((-1, 0, 0)), 4.6, 3.8, stems=4, density=1.8,
-          hang=True)
+          hang=True, top=lambda q: walls.surface(q.x + 0.45, q.y, 20.0, 0.0) - 0.2)
     p.ivy((-2.5 + 2.35 + 0.38, 31.0, gh(0, -31) + 0.1), Vector((1, 0, 0)), 2.3, 2.2, stems=3, density=1.8, size=0.3)
     # Grass and weeds on every broken wall top, with moss pads and loose stones.
     for (pos, w) in TOPS:
@@ -1161,8 +1370,9 @@ def growth(sill):
     p.litter((2.5, 31.0), 2.2, 18, gb, LITTER)
     p.litter((4.9, -4.5), 1.6, 12, gb, LITTER)
     # Moss on the bell's upturned flank, the altar slab and the sill ends.
-    moss_pad(p, B(4.7, 4.9, 1.25), (0.9, 0.7, 0.2))
-    moss_pad(p, B(-4.7, 4.9, gh(-4.7, 4.9) + 0.72), (0.8, 1.0, 0.16))
+    for (lx, lz, size) in ((4.7, 4.9, (0.9, 0.7, 0.2)), (-4.7, 4.9, (0.8, 1.0, 0.16))):
+        q = B(lx, lz, 0)
+        moss_pad(p, B(lx, lz, furnishings.surface(q.x, q.y, gh(lx, lz) + 3.0, gh(lx, lz))), size)
     return p
 
 
@@ -1204,8 +1414,9 @@ def main():
     mats = rk.make_materials()
     sh, sill = stair_house()
     pieces = {'main': [gable(), sh, details(sill)], 'walls': [nave()], 'props': [outside()]}
-    pieces['growth'] = [growth(sill)]
+    pieces['growth'] = [growth(sill, pieces['main'][2], pieces['walls'][0], sh)]
     allp = [p for group in pieces.values() for p in group]
+    print('SETTLED', json.dumps({p.name: p.settled for p in allp}))
     bvh = None if '--no-ao' in argv else rk.occluder(allp, GR)
     roots = {'main': 'CryptEntrance_ROOT', 'walls': 'CryptEntranceWalls_ROOT', 'props': 'CryptEntranceProps_ROOT',
              'growth': 'CryptEntranceGrowth_ROOT'}
