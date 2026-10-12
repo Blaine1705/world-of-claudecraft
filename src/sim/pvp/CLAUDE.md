@@ -142,7 +142,9 @@ ratings.
   only, so a raid member does not; any level does), the group key (`hillGroupKey`: a party, or a lone
   player as a group of one; null for a raid), the strict-maximum leader
   (`hillLeader`, null on a tie), the majority verdict (`hillChallengeStands`),
-  the contest clock (`hillContestStep`), the spot probe (`hillSpotIsOpen` over a
+  the per-group contest clocks (`hillProgressStep`: a rival only pauses a clock,
+  nobody counted inside drops it), the key a hold or a clock follows across a
+  group change (`hillSuccessorKey`), the spot probe (`hillSpotIsOpen` over a
   `HillSpotProbe` the sim binds to the terrain, the water bodies, the collider
   grid and the static zones), the three-hour schedule (`hillWindowAt`,
   `hillTimes` from a window and a warning offset, `hillMinutesUntil`) and the
@@ -161,7 +163,9 @@ ratings.
   levers (`spawnHillNow`, `riseHillNow`, `endHillNow`, `warnNextHillNow`; their
   argument grammar is the pure `hill_dev.ts`), the once-a-second `updateHill` pass (the
   phases warning, risen, fallen, each announced to the realm; then, only while
-  risen, presence by party, contest, payouts through `grantHonor` with reason
+  risen, presence by party, the holder following its roster across a group
+  change (`reconcileHolder`) and clocks following theirs (`carryProgress`),
+  contest, payouts through `grantHonor` with reason
   `hill_hold`), the readout (`hillInfoFor`, live fields only for a viewer in the
   hill's zone while it is risen, so the self wire elides it elsewhere), the
   `/hill` readout line, and the notice lines the client matcher re-localizes

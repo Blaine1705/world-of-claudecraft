@@ -178,6 +178,12 @@ export const hudChromeStrings = {
     pvpResurrect: 'PvP Resurrect',
     pvpResurrectTitle:
       "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
+    // The button and the panel line while the PvP Resurrect wait runs, then once it
+    // is over ({seconds} is a durationText value from PVP_RESURRECT_WAIT_SECONDS).
+    pvpResurrectWaitButton: 'PvP Resurrect ({seconds})',
+    pvpResurrectWaitNote:
+      'You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.',
+    pvpResurrectReadyNote: 'PvP Resurrect is ready: you will rise at the nearest graveyard.',
     // RETIRED in place: the ghost prompt's Pale Keeper button is gone (the ghost
     // talks to the Keeper instead). The key stays, already filled in all 20
     // locales, per the hud.core.mobileTarget retired-but-translated precedent.
@@ -3434,6 +3440,10 @@ export const hudChromeStrings = {
     countsHolding: 'Inside: you {yours}, rival {theirs}',
     contestYou: 'Taking the hill: {seconds} of {total}',
     contestOther: 'Losing the hill: {seconds} of {total}',
+    // The clock while its group is inside but not leading (src/sim/pvp/hill_rules.ts
+    // hillProgressStep): a rival only pauses a capture, it never resets it.
+    contestYouPaused: 'Paused at {seconds} of {total}: outnumber every rival to resume',
+    contestOtherPaused: "A rival's capture is paused at {seconds} of {total}",
     contestNone: 'Hold a majority inside for {total} to take it',
     inside: 'You are inside the circle',
     distance: '{yards} yd to the circle',
