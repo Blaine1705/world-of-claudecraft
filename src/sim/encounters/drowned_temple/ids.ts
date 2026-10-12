@@ -346,7 +346,11 @@ export const HYDRA_TUNING = {
   leeHalfWidth: 2,
   // Regrowth: a fallen head grows back while another head lives.
   regrowAfter: 20,
-  regrowShare: 0.5,
+  // Lowered from 0.5 when the heads' pools rose x1.39 on both difficulties
+  // (the heroic health bands, 2026-10-12): a regrown head stands up with the
+  // health it always had, 1,000 on normal and 2,153 on heroic
+  // (tests/drowned_temple_health_bands.test.ts).
+  regrowShare: 0.3588,
   /** Enraged Hydra: damage done per fallen head. */
   enragePerHead: 0.15,
   /** The deed: all three heads within this many seconds. */
