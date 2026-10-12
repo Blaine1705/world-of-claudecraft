@@ -82,7 +82,7 @@ export const sunkenBastionEntrancePreloadInternalsForTest = { urls: [...URLS] };
 
 export const BASTION_PASSAGE_PROGRAM_CACHE_KEY = 'sunken-bastion-flooded-passage-v2';
 export const BASTION_FOG_PROGRAM_CACHE_KEY = 'sunken-bastion-marsh-fog-v2';
-export const BASTION_SPRITE_PROGRAM_CACHE_KEY = 'sunken-bastion-gate-sprites-v3';
+export const BASTION_SPRITE_PROGRAM_CACHE_KEY = 'sunken-bastion-gate-sprites-v4';
 
 export interface SunkenBastionEntranceView {
   group: THREE.Group;
@@ -592,8 +592,10 @@ if (bK > 0.5 && bK < 3.5) {
   vec3 side = cross(dir, toEye);
   float sl = length(side);
   side = sl > 1.0e-3 ? side / sl : vec3(1.0, 0.0, 0.0);
-  vec3 wp = foot + dir * (aK.w * u) + side * (bQ.x * mix(aS.w, aD.w, u));
-  mvPosition = viewMatrix * vec4(wp, 1.0);
+  // the foot goes through modelViewMatrix and the offset turns as a direction:
+  // the point viewMatrix * world names, with no world point built first
+  mvPosition = modelViewMatrix * vec4(bC, 1.0);
+  mvPosition.xyz += mat3(viewMatrix) * (dir * (aK.w * u) + side * (bQ.x * mix(aS.w, aD.w, u)));
   if (bK < 1.5) bA = bN * (0.7 + 0.3 * sin(bTm * 0.5 + aK.x * 6.2831853));
   else if (bK < 2.5) bA = bPulse * bPulse * bPulse * (0.55 + 0.45 * bN);
   else bA = 0.3 + 0.7 * bN;

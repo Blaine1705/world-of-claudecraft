@@ -86,7 +86,7 @@ export const wildheartBasinEntrancePreloadInternalsForTest = { urls: [...URLS] }
 
 export const WILDHEART_THROAT_PROGRAM_CACHE_KEY = 'wildheart-basin-flooded-throat-v1';
 export const WILDHEART_MIST_PROGRAM_CACHE_KEY = 'wildheart-basin-maw-mist-v1';
-export const WILDHEART_SPRITE_PROGRAM_CACHE_KEY = 'wildheart-basin-maw-sprites-v1';
+export const WILDHEART_SPRITE_PROGRAM_CACHE_KEY = 'wildheart-basin-maw-sprites-v2';
 
 export interface WildheartBasinEntranceView {
   group: THREE.Group;
@@ -582,8 +582,10 @@ if (wK > 0.5 && wK < 2.5) {
   vec3 side = cross(dir, toEye);
   float sl = length(side);
   side = sl > 1.0e-3 ? side / sl : vec3(1.0, 0.0, 0.0);
-  vec3 wp = foot + dir * (aK.w * u) + side * (wQ.x * mix(aS.w, aD.w, u));
-  mvPosition = viewMatrix * vec4(wp, 1.0);
+  // the foot goes through modelViewMatrix and the offset turns as a direction:
+  // the point viewMatrix * world names, with no world point built first
+  mvPosition = modelViewMatrix * vec4(wC, 1.0);
+  mvPosition.xyz += mat3(viewMatrix) * (dir * (aK.w * u) + side * (wQ.x * mix(aS.w, aD.w, u)));
   if (wK < 1.5) wA = wPulse * wPulse * (0.35 + 0.65 * wN);
   else wA = wPulse * wPulse * wPulse * (0.55 + 0.45 * wN);
   // seen end on a shaft has no side to show: it fades instead of folding;

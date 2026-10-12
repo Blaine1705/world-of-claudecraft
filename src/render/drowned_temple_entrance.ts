@@ -100,7 +100,7 @@ export const drownedTempleEntrancePreloadInternalsForTest = { urls: [...URLS] };
 export const TEMPLE_MOONWATER_PROGRAM_CACHE_KEY = 'drowned-temple-moonwater-v2';
 export const TEMPLE_INLAY_PROGRAM_CACHE_KEY = 'drowned-temple-silver-inlay-v1';
 export const TEMPLE_MIST_PROGRAM_CACHE_KEY = 'drowned-temple-mere-mist-v1';
-export const TEMPLE_SPRITE_PROGRAM_CACHE_KEY = 'drowned-temple-moonrise-sprites-v2';
+export const TEMPLE_SPRITE_PROGRAM_CACHE_KEY = 'drowned-temple-moonrise-sprites-v3';
 
 export interface DrownedTempleEntranceView {
   group: THREE.Group;
@@ -693,8 +693,10 @@ if (tK > 1.5 && tK < 2.5) {
   vec3 side = cross(dir, toEye);
   float sl = length(side);
   side = sl > 1.0e-3 ? side / sl : vec3(1.0, 0.0, 0.0);
-  vec3 wp = foot + dir * (aK.w * u) + side * (tQ.x * mix(aS.w, aD.w, u));
-  mvPosition = viewMatrix * vec4(wp, 1.0);
+  // the foot goes through modelViewMatrix and the offset turns as a direction:
+  // the point viewMatrix * world names, with no world point built first
+  mvPosition = modelViewMatrix * vec4(tC, 1.0);
+  mvPosition.xyz += mat3(viewMatrix) * (dir * (aK.w * u) + side * (tQ.x * mix(aS.w, aD.w, u)));
   tA = tRise.z * tRise.z * (0.45 + 0.55 * tN) * smoothstep(0.06, 0.45, sl);
 } else if (tK > 4.5 && tK < 5.5) {
   // a thread of the fall: drawn out as it gathers speed

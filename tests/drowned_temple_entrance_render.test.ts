@@ -911,7 +911,7 @@ describe('the program keys', () => {
       'drowned-temple-silver-inlay-v1': 'a409268aa222',
       'drowned-temple-moonwater-v2': '1bf48208ba0c',
       'drowned-temple-mere-mist-v1': '3002659c30f1',
-      'drowned-temple-moonrise-sprites-v2': '47e25896f567',
+      'drowned-temple-moonrise-sprites-v3': '9321e2015d71',
     });
   });
 });
