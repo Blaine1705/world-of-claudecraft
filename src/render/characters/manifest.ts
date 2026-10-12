@@ -590,8 +590,11 @@ export interface VisualDef {
    *  than (or stands beside) what the player sees of it: a narrow vertical
    *  core the direct pick tests the pick ray against (pick_aim_core.ts) before
    *  it lets a use-only body win a click over a nearer live hit
-   *  (world_direct_pick.ts). Presentation-side targeting help only, like
-   *  `clickRadius`: the sim never reads it. */
+   *  (world_direct_pick.ts). In WORLD yards from the entity's own position
+   *  and facing: unlike the click capsule it is NOT multiplied by the
+   *  entity's scale, so author it for the size the entity is drawn at.
+   *  Presentation-side targeting help only, like `clickRadius`: the sim never
+   *  reads it. */
   aimCore?: AimCoreDef;
   /** Material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';

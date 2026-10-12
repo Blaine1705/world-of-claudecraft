@@ -6,10 +6,10 @@
 // The one fact it adds is the USE-ONLY body: a mob the local player can use
 // right now and cannot attack (the Hollow Crypt's Remembrance Candle while
 // Morthen's Rite runs: a held, non-hostile body whose only meaning for a click
-// is "relight this"). Such a body wins the first click over the live mobs the
-// ray reached before it, so a boss capsule standing between the camera and the
-// candle no longer swallows every click on it; the resolver's overlap cycling
-// then reaches the boss on the next click.
+// is "relight this"). A click aimed at such a body selects it, whatever the ray
+// reached before it and whatever the player holds as target, so a boss capsule
+// standing between the camera and the candle no longer swallows the click; a
+// repeat click keeps the candle (pick_resolution.ts has the whole rule).
 //
 // It wins only a click AIMED at it. The body's click capsule is far wider than
 // the candle (2.2 yd against a pillar under a yard in radius), and a click on a
@@ -17,9 +17,15 @@
 // the skeleton's. So the body is promoted only when the pick ray comes within
 // its visual's `aimCore` (characters/manifest.ts; the geometry is
 // pick_aim_core.ts): the narrow column of what the player sees. Outside the
-// core plain ray order stands, exactly as if the rule did not exist, and with
-// nothing nearer under the cursor the whole capsule still selects the body. A
-// use-only body whose visual declares no aim core is never promoted.
+// core plain ray order and the old overlap cycling stand, exactly as if the
+// rule did not exist, and with nothing nearer under the cursor the whole
+// capsule still selects the body. A use-only body whose visual declares no aim
+// core is never promoted.
+//
+// The local player's own capsule is never among the hits (Renderer.pickDirect
+// drops it), so the resolver's "nearest live hit is a player" exception only
+// ever means ANOTHER player: standing between the camera and the candle, your
+// own body does not take the candle's click.
 //
 // "Usable right now" is the sim's own rule (encounter_use.ts kitUsableNow: a
 // living mob whose kit carries a `usable`), the one the interact press reads

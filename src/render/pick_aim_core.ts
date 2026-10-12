@@ -26,7 +26,9 @@ export interface PickVec {
   z: number;
 }
 
-/** A pick ray (THREE.Ray satisfies it). `direction` need not be unit length. */
+/** A pick ray (THREE.Ray satisfies it, and passes a unit direction). The
+ *  direction may be any practical length: only one shorter than a millionth of
+ *  a yard is read as no direction at all, the ray then being its origin. */
 export interface PickRay {
   origin: PickVec;
   direction: PickVec;

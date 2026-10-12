@@ -12,14 +12,18 @@ import {
 } from '../src/render/pick_aim_core';
 import { resolveDirectPickEntityId } from '../src/render/pick_resolution';
 import { isAimedAt, isUseOnlyBody, resolveWorldDirectPick } from '../src/render/world_direct_pick';
+import { HOLLOW_CRYPT_RING } from '../src/sim/content/hollow_crypt_layout';
 import { MOBS } from '../src/sim/data';
 import {
-  candleBodySpot,
+  cryptDevTrigger,
+  MORTHEN_ID,
+  MORTHEN_SPOT,
   RITE_CANDLE_RADIUS,
   RITE_CANDLE_SPOTS,
-} from '../src/sim/encounters/hollow_crypt/morthen_ids';
+} from '../src/sim/encounters/hollow_crypt';
 import { createMob, createPlayer } from '../src/sim/entity';
 import type { Entity } from '../src/sim/types';
+import { boss, cryptFight, put, run } from './helpers/crypt_boss_fight';
 
 type TestPickEntity = {
   id: number;
@@ -235,8 +239,10 @@ describe('resolveDirectPickEntityId', () => {
   // The Hollow Crypt's Rite of the Unquiet: Morthen stands at the altar with a
   // click capsule far wider than his body, on the line a player walks up to the
   // north Remembrance Candle from, so the ray reached him first and every click
-  // on that candle selected the boss. A body the local player can only USE wins
-  // the first click over the live mobs in front of it.
+  // on that candle selected the boss. A body the local player can only USE, and
+  // AIMED this click at, is what the click selects, whatever stands in front
+  // of it and whatever is targeted. (`useOnly` on a test entity stands for the
+  // caller's whole predicate: use-only and aimed at.)
   describe('use-only encounter bodies', () => {
     const useOnly = (e: TestPickEntity): boolean => e.useOnly === true;
     const BOSS = 40;
@@ -262,39 +268,55 @@ describe('resolveDirectPickEntityId', () => {
       expect(resolveDirectPickEntityId([ADD, BOSS, CANDLE], map, null, useOnly)).toBe(CANDLE);
     });
 
-    it('cycles on to the next live target once the usable body is the current target', () => {
+    it('is selected before any cycling, whatever the player holds as target', () => {
       const map = entities([
         { id: ADD, kind: 'mob' },
         { id: BOSS, kind: 'mob' },
         { id: CANDLE, kind: 'mob', useOnly: true },
       ]);
-      // The ring is the body first, then the rest in ray order. With the body
-      // BETWEEN two mobs on the ray that is a different ring from plain ray
-      // order, so every step here would differ without the rule.
-      expect(resolveDirectPickEntityId([BOSS, CANDLE, ADD], map, null, useOnly)).toBe(CANDLE);
-      expect(resolveDirectPickEntityId([BOSS, CANDLE, ADD], map, CANDLE, useOnly)).toBe(BOSS);
-      expect(resolveDirectPickEntityId([BOSS, CANDLE, ADD], map, BOSS, useOnly)).toBe(ADD);
-      expect(resolveDirectPickEntityId([BOSS, CANDLE, ADD], map, ADD, useOnly)).toBe(CANDLE);
-      // Without the rule the same clicks walk the ray: boss, candle, add.
-      expect(resolveDirectPickEntityId([BOSS, CANDLE, ADD], map, CANDLE)).toBe(ADD);
+      // Holding the boss is the normal state when the Rite begins. With a third
+      // live hit in the stack, overlap cycling used to step past the candle.
+      expect(resolveDirectPickEntityId([BOSS, CANDLE, ADD], map, BOSS, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([BOSS, ADD, CANDLE], map, BOSS, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([ADD, BOSS, CANDLE], map, ADD, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([ADD, BOSS, CANDLE], map, BOSS, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([BOSS, CANDLE], map, BOSS, useOnly)).toBe(CANDLE);
+      // The same clicks without the rule walk the ray from the held target.
       expect(resolveDirectPickEntityId([BOSS, CANDLE, ADD], map, BOSS)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([BOSS, ADD, CANDLE], map, BOSS)).toBe(ADD);
+      expect(resolveDirectPickEntityId([ADD, BOSS, CANDLE], map, ADD)).toBe(BOSS);
     });
 
-    it('steps through the ring as before when the current target is itself in the stack', () => {
-      // Not a first click: the player already holds a mob of this stack, so the
-      // click means "the next one", exactly as overlap cycling always read it.
-      // With the body last on the ray the ring is the old one rotated, so these
-      // steps are unchanged; the body is reached when the ring comes round.
+    it('a repeat click on the body keeps the body: no step to the next hit', () => {
       const map = entities([
         { id: ADD, kind: 'mob' },
         { id: BOSS, kind: 'mob' },
         { id: CANDLE, kind: 'mob', useOnly: true },
       ]);
-      expect(resolveDirectPickEntityId([ADD, BOSS, CANDLE], map, CANDLE, useOnly)).toBe(ADD);
-      expect(resolveDirectPickEntityId([ADD, BOSS, CANDLE], map, ADD, useOnly)).toBe(BOSS);
-      expect(resolveDirectPickEntityId([ADD, BOSS, CANDLE], map, BOSS, useOnly)).toBe(CANDLE);
-      expect(resolveDirectPickEntityId([CANDLE, BOSS], map, CANDLE, useOnly)).toBe(BOSS);
-      expect(resolveDirectPickEntityId([CANDLE, BOSS], map, BOSS, useOnly)).toBe(CANDLE);
+      // A double click, or a spammed right click, must not alternate between
+      // the candle and the boss in front of it.
+      expect(resolveDirectPickEntityId([BOSS, CANDLE], map, CANDLE, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([CANDLE, BOSS], map, CANDLE, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([ADD, BOSS, CANDLE], map, CANDLE, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([BOSS, CANDLE, ADD], map, CANDLE, useOnly)).toBe(CANDLE);
+      // Without the rule the repeat click steps on.
+      expect(resolveDirectPickEntityId([BOSS, CANDLE], map, CANDLE)).toBe(BOSS);
+    });
+
+    it('a click that is not aimed at the body cycles the live hits exactly as before', () => {
+      // The body is in the stack (its wide capsule was crossed) but the caller's
+      // predicate says no: plain ray order, first pick and ring alike.
+      const map = entities([
+        { id: ADD, kind: 'mob' },
+        { id: BOSS, kind: 'mob' },
+        { id: CANDLE, kind: 'mob', useOnly: false },
+      ]);
+      const stack = [ADD, BOSS, CANDLE];
+      expect(resolveDirectPickEntityId(stack, map, null, useOnly)).toBe(ADD);
+      expect(resolveDirectPickEntityId(stack, map, ADD, useOnly)).toBe(BOSS);
+      expect(resolveDirectPickEntityId(stack, map, BOSS, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId(stack, map, CANDLE, useOnly)).toBe(ADD);
+      expect(resolveDirectPickEntityId(stack, map, 99, useOnly)).toBe(ADD);
     });
 
     it('wins over a leading lootable corpse and over the live mob behind that corpse', () => {
@@ -306,7 +328,11 @@ describe('resolveDirectPickEntityId', () => {
       expect(resolveDirectPickEntityId([9, CANDLE], map, null, useOnly)).toBe(CANDLE);
       expect(resolveDirectPickEntityId([CANDLE, 9], map, null, useOnly)).toBe(CANDLE);
       expect(resolveDirectPickEntityId([9, BOSS, CANDLE], map, null, useOnly)).toBe(CANDLE);
-      expect(resolveDirectPickEntityId([9, BOSS, CANDLE], map, CANDLE, useOnly)).toBe(BOSS);
+      expect(resolveDirectPickEntityId([9, BOSS, CANDLE], map, BOSS, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([9, BOSS, CANDLE], map, CANDLE, useOnly)).toBe(CANDLE);
+      // A stack of corpses alone has no live hit to ask about: loot as ever.
+      expect(resolveDirectPickEntityId([9], map, null, useOnly)).toBe(9);
+      expect(resolveDirectPickEntityId([9], map, CANDLE, useOnly)).toBe(9);
       // With the body the only live hit it keeps the click (the #2787 rule):
       // a repeat click does not fall through to the corpse.
       expect(resolveDirectPickEntityId([9, CANDLE], map, CANDLE, useOnly)).toBe(CANDLE);
@@ -318,20 +344,24 @@ describe('resolveDirectPickEntityId', () => {
       expect(resolveDirectPickEntityId([CANDLE], map, CANDLE, useOnly)).toBe(CANDLE);
     });
 
-    it('keeps two usable bodies in ray order ahead of the mobs', () => {
+    it('two aimed bodies in one stack: nearest first, a repeat click alternates those two', () => {
       const map = entities([
         { id: BOSS, kind: 'mob' },
         { id: CANDLE, kind: 'mob', useOnly: true },
         { id: 43, kind: 'mob', useOnly: true },
       ]);
       expect(resolveDirectPickEntityId([BOSS, CANDLE, 43], map, null, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([BOSS, CANDLE, 43], map, BOSS, useOnly)).toBe(CANDLE);
       expect(resolveDirectPickEntityId([BOSS, CANDLE, 43], map, CANDLE, useOnly)).toBe(43);
-      expect(resolveDirectPickEntityId([BOSS, CANDLE, 43], map, 43, useOnly)).toBe(BOSS);
-      // A mob between the two bodies on the ray: both bodies still come first
-      // (plain ray order would step from the first body to the boss).
+      // Back to the first body, never on to the boss.
+      expect(resolveDirectPickEntityId([BOSS, CANDLE, 43], map, 43, useOnly)).toBe(CANDLE);
+      // A mob between the two bodies on the ray changes nothing.
+      expect(resolveDirectPickEntityId([CANDLE, BOSS, 43], map, null, useOnly)).toBe(CANDLE);
       expect(resolveDirectPickEntityId([CANDLE, BOSS, 43], map, CANDLE, useOnly)).toBe(43);
-      expect(resolveDirectPickEntityId([CANDLE, BOSS, 43], map, 43, useOnly)).toBe(BOSS);
-      expect(resolveDirectPickEntityId([CANDLE, BOSS, 43], map, CANDLE)).toBe(BOSS);
+      expect(resolveDirectPickEntityId([CANDLE, BOSS, 43], map, 43, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([CANDLE, BOSS, 43], map, BOSS, useOnly)).toBe(CANDLE);
+      // Ray order decides which of the two is "nearest".
+      expect(resolveDirectPickEntityId([43, BOSS, CANDLE], map, null, useOnly)).toBe(43);
     });
 
     it('leaves the click with a live player who is the nearest hit', () => {
@@ -355,10 +385,12 @@ describe('resolveDirectPickEntityId', () => {
         { id: CANDLE, kind: 'mob', useOnly: true },
       ]);
       expect(resolveDirectPickEntityId([9, 50, CANDLE], withCorpse, null, useOnly)).toBe(50);
-      // A player BEHIND the boss is not what the click landed on: the body wins.
+      // A player BEHIND the boss is not what the click landed on: the body wins,
+      // and keeps winning.
       expect(resolveDirectPickEntityId([BOSS, 50, CANDLE], map, null, useOnly)).toBe(CANDLE);
-      expect(resolveDirectPickEntityId([BOSS, 50, CANDLE], map, CANDLE, useOnly)).toBe(BOSS);
-      expect(resolveDirectPickEntityId([BOSS, 50, CANDLE], map, BOSS, useOnly)).toBe(50);
+      expect(resolveDirectPickEntityId([BOSS, 50, CANDLE], map, CANDLE, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([BOSS, 50, CANDLE], map, BOSS, useOnly)).toBe(CANDLE);
+      expect(resolveDirectPickEntityId([BOSS, 50, CANDLE], map, 50, useOnly)).toBe(CANDLE);
     });
 
     it('a dead body no longer wins anything, lootable or not', () => {
@@ -584,9 +616,25 @@ describe('resolveWorldDirectPick', () => {
     expect(resolveWorldDirectPick([41, 40, 42], world([morthen, bones, candle]), AT_PILLAR)).toBe(
       42,
     );
-    // The same spot again: on to the boss, and round to the candle.
-    expect(resolveWorldDirectPick([40, 42], world([morthen, candle], 42), AT_PILLAR)).toBe(40);
-    expect(resolveWorldDirectPick([40, 42], world([morthen, candle], 40), AT_PILLAR)).toBe(42);
+  });
+
+  it('holding Morthen (or an add) as target does not cost the aimed candle its click', () => {
+    const morthen = mob(40, 'morthen');
+    const bones = mob(41, 'marrow_restless_bones');
+    const candle = candleBody(42);
+    const all = [morthen, bones, candle];
+    // The reviewer's three probes of the old ring: each returned the add or the boss.
+    expect(resolveWorldDirectPick([40, 42, 41], world(all, 40), AT_PILLAR)).toBe(42);
+    expect(resolveWorldDirectPick([40, 41, 42], world(all, 40), AT_PILLAR)).toBe(42);
+    expect(resolveWorldDirectPick([41, 40, 42], world(all, 41), AT_PILLAR)).toBe(42);
+    // The same spot again, and again: still the candle.
+    expect(resolveWorldDirectPick([40, 42], world(all, 42), AT_PILLAR)).toBe(42);
+    expect(resolveWorldDirectPick([41, 40, 42], world(all, 42), AT_PILLAR)).toBe(42);
+    // Off the pillar the held candle steps on to the mob under the cursor, and
+    // the ring among the live hits is the old one.
+    expect(resolveWorldDirectPick([40, 42], world(all, 42), BESIDE_PILLAR)).toBe(40);
+    expect(resolveWorldDirectPick([41, 40, 42], world(all, 42), BESIDE_PILLAR)).toBe(41);
+    expect(resolveWorldDirectPick([41, 40, 42], world(all, 41), BESIDE_PILLAR)).toBe(40);
   });
 
   it('a click beside the pillar keeps ray order though it crosses the candle capsule', () => {
@@ -680,16 +728,8 @@ describe('resolveWorldDirectPick', () => {
     expect(pick(rayFrom(shallow, { x: 0, y: 0, z: PILLAR.z + 1 }))).toBe(42);
   });
 
-  it('the candle body declares its pillar as the aim core', () => {
+  it('the candle body declares a core the size of its pillar', () => {
     const core = candleCore();
-    // Each body stands where the Rite puts it and faces away from its pillar
-    // (morthen_candles.ts spawnCandleBody): the core lands on the pillar.
-    RITE_CANDLE_SPOTS.forEach((pillar, i) => {
-      const spot = candleBodySpot(i);
-      const facing = Math.atan2(spot.x - pillar.x, spot.z - pillar.z);
-      expect(spot.x - Math.sin(facing) * core.back).toBeCloseTo(pillar.x, 9);
-      expect(spot.z - Math.cos(facing) * core.back).toBeCloseTo(pillar.z, 9);
-    });
     // As tall as the wick; wider than the tallow column, narrower than the
     // pillar's collider (no mob can stand inside the core).
     expect(core.height).toBe(CANDLE_WICK_Y);
@@ -699,6 +739,53 @@ describe('resolveWorldDirectPick', () => {
     // side of the wick, up to 4.4 yd. The core's rounded top covers it.
     expect(Math.hypot(0.75, 4.4 - core.height)).toBeLessThanOrEqual(core.radius);
   });
+
+  it('the core lands on the pillar of every body the Rite really spawns', () => {
+    // A real claimed Hollow Crypt with Morthen brought to his Rite: the four
+    // bodies are the ones morthen_candles.ts stands, where it stands them and
+    // facing the way it turns them. A change to either fails here.
+    const f = cryptFight('normal', 0, new Set([MORTHEN_ID]));
+    cryptDevTrigger(f.sim.ctx, f.inst, 'skip');
+    const morthen = boss(f, MORTHEN_ID);
+    put(f, morthen, MORTHEN_SPOT.x, MORTHEN_SPOT.z);
+    put(f, f.tank, MORTHEN_SPOT.x, MORTHEN_SPOT.z - 4);
+    morthen.maxHp = 1e6;
+    morthen.hp = Math.floor(morthen.maxHp * 0.64);
+    f.sim.ctx.aggroMob(morthen, f.tank, false);
+    // Into the Rite, and a few seconds on: a held body must not turn.
+    run(f, 3);
+    const st = morthen.cryptBossFight;
+    if (st?.kind !== 'morthen') throw new Error('no morthen fight');
+    expect(st.candles.length).toBe(RITE_CANDLE_SPOTS.length);
+    const down = (x: number, z: number): PickRay => ({
+      origin: { x, y: 500, z },
+      direction: { x: 0, y: -1, z: 0 },
+    });
+    const picks = { entities: f.sim.ctx.entities, player: f.tank };
+    st.candles.forEach((candle, i) => {
+      const body = f.sim.ctx.entities.get(candle.bodyId ?? -1);
+      if (!body) throw new Error(`no body at candle ${i}`);
+      expect(isUseOnlyBody(body)).toBe(true);
+      const pillar = { x: f.ox + RITE_CANDLE_SPOTS[i].x, z: f.oz + RITE_CANDLE_SPOTS[i].z };
+      // Straight down the pillar: aimed. Straight down the body's own spot, a
+      // yard and nine tenths in front of the pillar: not.
+      expect(isAimedAt(body, down(pillar.x, pillar.z))).toBe(true);
+      expect(isAimedAt(body, down(body.pos.x, body.pos.z))).toBe(false);
+      // A level click from the ring's centre onto the tallow, chest high.
+      const fromRing: PickRay = rayFrom(
+        { x: f.ox + HOLLOW_CRYPT_RING.x, y: body.pos.y + 1.8, z: f.oz + HOLLOW_CRYPT_RING.z },
+        { x: pillar.x, y: body.pos.y + 1.8, z: pillar.z },
+      );
+      expect(isAimedAt(body, fromRing)).toBe(true);
+      // And through Morthen, held as target, that click is the candle's.
+      f.tank.targetId = morthen.id;
+      expect(resolveWorldDirectPick([morthen.id, body.id], picks, fromRing)).toBe(body.id);
+      // Off the pillar, with nothing held, it is Morthen's.
+      f.tank.targetId = null;
+      const offPillar = down(body.pos.x, body.pos.z);
+      expect(resolveWorldDirectPick([morthen.id, body.id], picks, offPillar)).toBe(morthen.id);
+    });
+  }, 90_000);
 
   it('a candle that cannot be used right now does not win', () => {
     const morthen = mob(40, 'morthen');
@@ -771,24 +858,48 @@ describe('resolveWorldDirectPick', () => {
     const pick = main.indexOf('renderer.pick(x, y, true)', attackMove);
     expect(pick).toBeGreaterThan(attackMove);
     expect(pick - attackMove).toBeLessThan(200);
-    // The click, the hover and the tooltip all ask without it.
     expect(main.split('renderer.pick(x, y, true)').length).toBe(2);
+    // The click, the hover cursor and the gather tooltip's entity probe ask without it.
     expect(main).toContain('let id = renderer.pickDirect(x, y);');
+    expect(main).toContain('hoverPickedId = renderer.pick(input.hoverX, input.hoverY);');
+    expect(main).toContain('(x, y) => renderer.pick(x, y),');
   });
 
-  it('the renderer hands over the very ray it raycast the capsules with', () => {
+  it('the renderer carries the intent, the ray and no hit on the local player', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    // pick() forwards the caller's intent to its direct half: without this
+    // Attack Move would be promoted onto the candle with every other test green.
+    const pick = renderer.indexOf(
+      'pick(clientX: number, clientY: number, attackIntent = false): number | null {',
+    );
+    const forward = renderer.indexOf(
+      'const direct = this.pickDirect(clientX, clientY, attackIntent);',
+      pick,
+    );
+    expect(pick).toBeGreaterThanOrEqual(0);
+    expect(forward).toBeGreaterThan(pick);
+    expect(forward - pick).toBeLessThan(120);
     const pickDirect = renderer.indexOf('pickDirect(clientX: number, clientY: number,');
     const cast = renderer.indexOf(
       'this.raycaster.intersectObjects(this.clickTargets, true, this.raycastHits);',
       pickDirect,
     );
+    // The local player's own capsule is raycast like any other and dropped
+    // here, so the "nearest live hit is a player" exception only ever sees
+    // OTHER players: standing between the camera and the candle, your own body
+    // does not take the candle's click.
+    const dropSelf = renderer.indexOf('o.userData.entityId !== this.sim.playerId', cast);
+    const push = renderer.indexOf('directHitIds.push(id);', dropSelf);
+    // The very ray that produced the hits goes to the resolver with them.
     const resolve = renderer.indexOf(
       'resolveWorldDirectPick(directHitIds, this.sim, this.raycaster.ray, attackIntent)',
-      cast,
+      push,
     );
     expect(pickDirect).toBeGreaterThanOrEqual(0);
     expect(cast).toBeGreaterThan(pickDirect);
-    expect(resolve).toBeGreaterThan(cast);
+    expect(dropSelf).toBeGreaterThan(cast);
+    expect(push).toBeGreaterThan(dropSelf);
+    expect(resolve).toBeGreaterThan(push);
+    expect(resolve - pickDirect).toBeLessThan(2500);
   });
 });
