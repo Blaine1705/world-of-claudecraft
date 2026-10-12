@@ -274,7 +274,9 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       rogue: [],
       priest: [],
       mage: [],
-      warlock: [],
+      // No Healing Power pieces for a non-healer spec, so the warlock chest is
+      // the caster collection piece rather than a healer chest.
+      warlock: ['chest:crucible_caster_cloth_chest'],
       druid: ['chest:crucible_caster_leather_chest', 'waist:crucible_caster_leather_waist'],
     };
     const flaggedFrom = (picks: Partial<Record<EquipSlot, string>>): string[] =>
