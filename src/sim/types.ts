@@ -6248,8 +6248,9 @@ export interface ZonePropsDef {
   campfires: [number, number][];
   mudHuts: [number, number][];
   /** `omit` drops columns by index (prop_layout.ts ruinRingColumns); a `bare`
-   *  ring draws and collides nothing (a set piece dresses its site) and stays
-   *  in the table only for its terrain pad and clearings. */
+   *  ring, or one with `columns: 0`, draws and collides nothing (a set piece
+   *  dresses its site) and stays in the table only for its terrain pad and
+   *  clearings. */
   ruinRings: {
     x: number;
     z: number;
@@ -6258,7 +6259,6 @@ export interface ZonePropsDef {
     omit?: readonly number[];
     bare?: boolean;
   }[];
-  ruinRings: { x: number; z: number; ringR: number; columns: number }[]; // columns 0: a terrain calm anchor only
   // kind 'stone': the low scalloped KayKit stone wall (garden/path walls);
   // kind 'palisade': the spiked KayKit log wall (raider camps); both keep
   // the wood rail's run geometry and the same jumpable OBB

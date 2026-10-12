@@ -2033,15 +2033,9 @@ export function buildProps(
 
   // ---- ruin rings: weathered monolith columns at the exact collider angles -
   for (const r of getActiveWorldContent().props.ruinRings) {
-    if (r.bare) continue;
+    if (r.bare || r.columns <= 0) continue;
     for (const col of ruinRingColumns(r)) {
       const { index: i, x, z, intact, scaleY: sy } = col;
-  for (const r of getActiveWorldContent().props.ruinRings.filter((q) => q.columns > 0)) {
-    for (let i = 0; i < r.columns; i++) {
-      const ang = (i / r.columns) * Math.PI * 2;
-      const x = r.x + Math.sin(ang) * r.ringR,
-        z = r.z + Math.cos(ang) * r.ringR;
-      const intact = i % 4 === 1;
       const kind: PropKey = intact ? 'column' : 'columnBroken';
       const y = ground(x, z);
       const g = new THREE.Group();

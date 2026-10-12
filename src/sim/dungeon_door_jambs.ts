@@ -4,12 +4,17 @@
 // share one doorway, so dedupe by position. A door whose facade is a built
 // set piece hands that set piece's own colliders instead of the jambs: the
 // Gravewyrm Sanctum's Seal Gate (sanctum_seal_gate.ts), whose pylons ARE the
-// jambs, and the Sunken Bastion's Drowned Gate Tower
-// (sunken_bastion_entrance.ts), whose inner arch is the door. Extracted from
-// colliders.ts under the monolith ratchet; the caller passes its camera-top
-// resolver.
+// jambs, and the four built entrances, each its own door: the Sunken
+// Bastion's Drowned Gate Tower, the Hollow Crypt's Fallen Chapel, the Drowned
+// Temple's Moon Stair and the Wildheart Basin's Jaguar Maw (the
+// *_entrance.ts modules beside this one). Extracted from colliders.ts under
+// the monolith ratchet; the caller passes its camera-top resolver.
 import type { Collider } from './colliders';
 import { DUNGEON_LIST } from './data';
+import {
+  DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID,
+  drownedTempleEntranceColliders,
+} from './drowned_temple_entrance';
 import {
   HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID,
   hollowCryptEntranceColliders,
