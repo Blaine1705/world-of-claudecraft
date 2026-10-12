@@ -43,7 +43,10 @@ import {
   until,
 } from './helpers/crypt_boss_fight';
 
-vi.setConfig({ testTimeout: 60_000 });
+// The determinism case plays two 52 s fights: about 40 s on a quiet machine,
+// past 60 s under load on the base commit too, so the budget matches the real
+// kill suites beside it (tests/hollow_crypt_marrow_pace.test.ts).
+vi.setConfig({ testTimeout: 240_000 });
 
 const T = MARROW_TUNING;
 const KEEP = new Set([MARROW_ID]);
