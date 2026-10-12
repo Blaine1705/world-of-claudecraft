@@ -7822,14 +7822,24 @@ function bopPartyTradeEligibility(): Scenario {
 // Everything the route keeps is on the sampled Adept (Entity.chaseRoute: the
 // waypoints, the plan clock, the tries), so a reordered search, a moved plan
 // slot or a changed budget turns this golden red.
+//
+// Two more legs pin the cast that FAILS. The target hides while a Grave Spark
+// windup is committed: the windup runs out, nothing lands and nothing is drawn
+// from the rng across its release tick. Then the Adept is lent its own Grave
+// Bolt (a kit cast bar; heroic-only on its template, and this claim is
+// normal) and its victim hides while the bar runs: the bar ends, nothing
+// lands, and the cast is handed back.
 const SIGHT_ROUTE_SPELL = 'Grave Spark';
+const SIGHT_ROUTE_BAR = 'Grave Bolt';
 function mobCastSightRoute(): Scenario {
   return {
     name: 'mob_cast_sight_route',
     coverage: [
       'a petSpell caster in spell range with no line of sight begins no cast (mob/cast_sight.ts casterSightBlocked on its staggered recheck)',
-      'chaseAroundObstacles: the plan slot, searchRoute round a collider and the waypoint walk (mob/chase_route.ts, mob/route_search.ts)',
+      'followChaseRoute for a caster with no sight line: the plan slot, searchRoute round a collider and the waypoint walk (mob/chase_route.ts, mob/route_search.ts)',
       'the cast resumes from the spot that sees the target, and a target that hides again is walked round again',
+      'petSpellSightVerdict at the release tick: a committed windup whose target hid fails with no damage and no rng draw (mob/cast_sight.ts)',
+      'the trash kit driver at the end of a bar: a Grave Bolt whose victim hid is dropped for sight and handed back (mob/trash_kit/driver.ts, kit_cast_sight.ts)',
     ],
     sampleEvery: 5,
     build: () => new Sim({ seed: 4471, playerClass: 'warrior', noPlayer: true }),
@@ -7916,14 +7926,89 @@ function mobCastSightRoute(): Scenario {
 
       // The target steps to the far side of the monument from where the
       // caster now stands: out of sight again, the other way round.
-      const dx = monument.x - adept.pos.x;
-      const dz = monument.z - adept.pos.z;
-      const d = Math.hypot(dx, dz);
-      stand(monument.x + (dx / d) * 12, monument.z + (dz / d) * 12);
-      rec.notes.hiddenAgain = !sim.ctx.hasLineOfSight(adept, p);
+      const hide = (): boolean => {
+        const dx = monument.x - adept.pos.x;
+        const dz = monument.z - adept.pos.z;
+        const d = Math.hypot(dx, dz);
+        stand(monument.x + (dx / d) * 12, monument.z + (dz / d) * 12);
+        return !sim.ctx.hasLineOfSight(adept, p);
+      };
+      rec.notes.hiddenAgain = hide();
       rec.snapshot('target-hides-again');
       rec.notes.second = leg(240);
       rec.snapshot('walked-into-sight-again');
+
+      // Ticks until `done`, at most `cap`; the damage events of `ability`
+      // that landed on the player meanwhile. `each` runs before every tick
+      // (the fizzle legs keep the player behind the monument with it, wherever
+      // the caster walks).
+      const until = (done: () => boolean, cap: number, ability: string, each?: () => void) => {
+        let landed = 0;
+        let thrown = 0;
+        let ticks = 0;
+        while (!done() && ticks < cap) {
+          topUp();
+          each?.();
+          for (const ev of rec.tick(1)) {
+            if (ev.type === 'damage' && ev.targetId === pid && ev.ability === ability) landed++;
+            // The projectile cue is the first thing a cast that RESOLVES does,
+            // before its resist roll: none thrown, nothing rolled.
+            if (ev.type === 'spellfx' && ev.sourceId === adept.id && ev.fx === 'projectile')
+              thrown++;
+          }
+          ticks++;
+        }
+        return { landed, thrown, ticks, done: done() };
+      };
+
+      // THE WINDUP THAT FAILS. No kit bars for this leg (an empty lent kit), so
+      // the only cast in the room is the Spark and the only rng it could draw
+      // is the Spark's own.
+      adept.devTrashKit = {};
+      const windup = until(() => adept.rangedWindupReleaseTick != null, 200, SIGHT_ROUTE_SPELL);
+      const release = adept.rangedWindupReleaseTick ?? -1;
+      const windupHidden = hide();
+      rec.snapshot('windup-target-hides');
+      const fizzle = until(() => sim.tickCount > release, 60, SIGHT_ROUTE_SPELL, hide);
+      rec.notes.windup = {
+        committed: windup.done,
+        hidden: windupHidden,
+        ranOut: fizzle.done,
+        landed: fizzle.landed,
+        thrown: fizzle.thrown,
+        cleared: adept.rangedWindupReleaseTick == null,
+      };
+      rec.snapshot('windup-fizzled');
+
+      // THE BAR THAT FAILS. The Adept's own Grave Bolt, lent without its
+      // heroic-only mark; the caster walks round to see its target, begins the
+      // bar, and the victim hides while it runs.
+      const bolt = requireValue(
+        MOBS.crypt_gravecaller_adept.trashKit?.bolt,
+        'parity scenario sight-route Grave Bolt',
+      );
+      adept.devTrashKit = { bolt: { ...bolt, heroicOnly: false } };
+      const casting = () => adept.castingAbility === bolt.castId;
+      const bar = until(casting, 600, SIGHT_ROUTE_BAR);
+      const barVictim = adept.castTargetId;
+      const barHidden = hide();
+      rec.snapshot('bar-target-hides');
+      const ended = until(
+        () => !casting(),
+        Math.round(bolt.castTime / DT) + 20,
+        SIGHT_ROUTE_BAR,
+        hide,
+      );
+      rec.notes.bar = {
+        begun: bar.done,
+        victim: barVictim,
+        hidden: barHidden,
+        ended: ended.done,
+        ranItsLength: ended.ticks,
+        landed: ended.landed,
+        timer: adept.trashKit?.timers.bolt ?? null,
+      };
+      rec.snapshot('bar-fizzled');
     },
   };
 }
