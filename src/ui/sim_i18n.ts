@@ -680,6 +680,13 @@ const baseEnTable = {
     'You defeat {victim} and take {money} from their purse (split {count} ways).',
   // The killing blow's spoils dropped on the body (src/sim/pvp/world_pvp_spoils.ts).
   'worldPvp.spoilsOnBody': "Loot {victim}'s body to claim your spoils.",
+  // The forfeit lines (src/sim/pvp/world_pvp.ts worldPvpForfeitKillLine and
+  // src/sim/pvp/world_pvp_payouts.ts worldPvpForfeitPayoutLine): an opponent
+  // who left the world mid-fight dies on the spot and the gold lands later.
+  'worldPvp.forfeitKillPlain': '{victim} left the fight and is defeated.',
+  'worldPvp.forfeitKillTake':
+    '{victim} left the fight and is defeated: {money} from their purse reaches you in {minutes} minutes.',
+  'worldPvp.forfeitPaid': 'Forfeit paid: {money} from {victim}.',
   'worldPvp.defeatedPlain': '{killer} defeats you.',
   'worldPvp.defeatedTake': '{killer} defeats you and takes {money} from your purse.',
   'worldPvp.defeatedPairPlain': '{killer} and 1 other defeat you.',
@@ -21537,6 +21544,24 @@ const RULES: Rule[] = [
   {
     re: /^You must be at least level (\d+) to enable World PvP\.$/,
     build: (m) => tSim('worldPvp.minLevel', { level: formatNumber(Number(m[1])) }),
+  },
+  {
+    re: /^(.+) left the fight and is defeated: (.+) from their purse reaches you in (\d+) minutes\.$/,
+    build: (m) =>
+      tSim('worldPvp.forfeitKillTake', {
+        victim: m[1],
+        money: localizeSimMoneyText(m[2]),
+        minutes: formatNumber(Number(m[3])),
+      }),
+  },
+  {
+    re: /^(.+) left the fight and is defeated\.$/,
+    build: (m) => tSim('worldPvp.forfeitKillPlain', { victim: m[1] }),
+  },
+  {
+    re: /^Forfeit paid: (.+) from (.+)\.$/,
+    build: (m) =>
+      tSim('worldPvp.forfeitPaid', { money: localizeSimMoneyText(m[1]), victim: m[2] }),
   },
   {
     re: /^You defeat (.+) and take (.+) from their purse \(split (\d+) ways\)\.$/,

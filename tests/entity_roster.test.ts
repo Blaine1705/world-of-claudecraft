@@ -167,6 +167,8 @@ function makeCtx() {
       nextDisarmAt: Number.POSITIVE_INFINITY,
       zonePassTick: Number.NEGATIVE_INFINITY,
       sweptAtTick: 0,
+      nextPayoutAt: Number.POSITIVE_INFINITY,
+      forfeitVictim: null,
     },
     bgBusySlots: new Set(),
     bgOutcomes: [],
