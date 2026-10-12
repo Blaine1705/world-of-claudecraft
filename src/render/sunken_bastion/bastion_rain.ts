@@ -30,6 +30,7 @@ import {
   SPLASH_CELL_GLSL,
   SPLASH_HEIGHT_RANGE,
   SPLASH_RADIUS,
+  splashCells,
   splashLattice,
 } from './bastion_rain_core';
 export interface BastionRainOptions {
@@ -266,6 +267,7 @@ function buildSplashes(count: number): THREE.Mesh {
   const corners = new Float32Array(count * 8 * 2);
   const kinds = new Float32Array(count * 8);
   const cells = new Float32Array(count * 8 * 2);
+  const cellOf = splashCells(count);
   const index = new Uint32Array(count * 12);
   let s = 23;
   const rnd = () => {
@@ -288,7 +290,7 @@ function buildSplashes(count: number): THREE.Mesh {
         seeds.set([a, b, c], v * 3);
         corners.set(quad[k], v * 2);
         kinds[v] = q;
-        cells.set([i % lattice.side, Math.floor(i / lattice.side)], v * 2);
+        cells.set([cellOf[i].x, cellOf[i].z], v * 2);
       }
       const o = i * 8 + q * 4;
       index.set([o, o + 1, o + 2, o + 1, o + 3, o + 2], i * 12 + q * 6);

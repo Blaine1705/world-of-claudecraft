@@ -45,13 +45,54 @@ export const RAIN_SHUTTER = { min: 0.035, max: 0.065 } as const;
 /** Radius round the camera the splashes land in (yards). */
 export const SPLASH_RADIUS = 26;
 
-/** A bounded lattice reuses offscreen cells; a surviving ring never slides. */
+/**
+ * The ground lattice the splashes land on: a bounded square of cells, one
+ * period wide, that reuses its offscreen cells, so a surviving ring never
+ * slides. The side is rounded DOWN, so every cell holds a splash: a lattice
+ * rounded up leaves the square's last cells unused, and on anchored ground
+ * those are fixed dry bands that repeat every period.
+ */
 export function splashLattice(count: number): { side: number; cellSize: number } {
-  const side = Math.ceil(Math.sqrt(Math.max(1, count)));
+  const side = Math.max(1, Math.floor(Math.sqrt(Math.max(1, count))));
   return { side, cellSize: (2 * SPLASH_RADIUS) / side };
 }
 
-/** CPU twin of the shader's cell placement, with cycle-local jitter in [0, 1]. */
+// The R2 low-discrepancy sequence (the plastic number's two inverse powers):
+// successive points keep well apart, and so do their rows and columns.
+const R2_X = 0.7548776662466927;
+const R2_Z = 0.5698402909980532;
+
+/**
+ * The lattice cell of each of `count` splashes. The first side * side take
+ * the cells in order, one each, so no cell is ever dry; the few the square
+ * leaves over share a cell with one of those, on cells spread by the R2
+ * sequence so the doubled cells never line up into a row, a column or a
+ * clump.
+ */
+export function splashCells(count: number): { x: number; z: number }[] {
+  const { side } = splashLattice(count);
+  const full = side * side;
+  const cells: { x: number; z: number }[] = [];
+  for (let i = 0; i < count; i++) {
+    if (i < full) {
+      cells.push({ x: i % side, z: Math.floor(i / side) });
+      continue;
+    }
+    const k = i - full + 1;
+    cells.push({
+      x: Math.floor(((0.5 + k * R2_X) % 1) * side),
+      z: Math.floor(((0.5 + k * R2_Z) % 1) * side),
+    });
+  }
+  return cells;
+}
+
+/**
+ * CPU twin of the shader's cell placement, with cycle-local jitter in [0, 1).
+ * The jitter spans the WHOLE cell: a splash kept to the cell's middle leaves
+ * a gutter along every cell edge that never rains, and the lattice shows
+ * through as a grid on the stone.
+ */
 export function splashCellCenter(
   cell: { x: number; z: number },
   cameraLocal: { x: number; z: number },
@@ -59,7 +100,7 @@ export function splashCellCenter(
   lattice: { side: number; cellSize: number },
 ): { x: number; z: number } {
   const at = (c: number, camera: number, j: number): number => {
-    const center = (c + 0.5 + (j - 0.5) * 0.8) * lattice.cellSize;
+    const center = (c + j) * lattice.cellSize;
     const period = lattice.side * lattice.cellSize;
     return center + period * Math.floor((camera - center + period / 2) / period);
   };
@@ -68,7 +109,7 @@ export function splashCellCenter(
 
 export const SPLASH_CELL_GLSL = /* glsl */ `
 vec2 splashCellCenter(vec2 cell, vec2 cameraLocal, vec2 jitter, vec2 lattice) {
-  vec2 center = (cell + 0.5 + (jitter - 0.5) * 0.8) * lattice.y;
+  vec2 center = (cell + jitter) * lattice.y;
   float period = lattice.x * lattice.y;
   return center + period * floor((cameraLocal - center + period * 0.5) / period);
 }

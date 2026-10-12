@@ -17,7 +17,9 @@ import {
   rainStreakLength,
   rainWind,
   SPLASH_CELL_GLSL,
+  SPLASH_RADIUS,
   splashCellCenter,
+  splashCells,
   splashLattice,
   unpackSplashHeight,
 } from '../src/render/sunken_bastion/bastion_rain_core';
@@ -63,7 +65,9 @@ describe('the retained Bastion rain meshes', () => {
     expect(mesh.geometry.getAttribute('aCell')).toBeDefined();
     expect(mesh.material.vertexShader).toContain(SPLASH_CELL_GLSL);
     const shader = mesh.material.vertexShader.replace(/\s+/g, ' ');
-    expect(shader).toContain('vec2 center = (cell + 0.5 + (jitter - 0.5) * 0.8) * lattice.y;');
+    // The jitter spans the whole cell: no gutter is left along the cell edges.
+    expect(shader).toContain('vec2 center = (cell + jitter) * lattice.y;');
+    expect(shader).not.toContain('(jitter - 0.5)');
     expect(shader).toContain('float period = lattice.x * lattice.y;');
     expect(shader).toContain(
       'return center + period * floor((cameraLocal - center + period * 0.5) / period);',
@@ -86,6 +90,104 @@ describe('the retained Bastion rain meshes', () => {
         expect(cells.getY(i + k)).toBe(cells.getY(i));
       }
     }
+  });
+});
+
+// The lattice is anchored to the ground and repeats every 52 yd, so any cell
+// that never rains is a fixed dry patch a player can walk up to. The counts are
+// the ones the tiers ship: full density, the middle effects tier, and a spread
+// of others so the rule is not an accident of two numbers.
+describe('the Bastion splash lattice leaves no dry structure', () => {
+  const shipped = [bastionRainTier(false, 1).splashes, bastionRainTier(false, 0.6).splashes];
+  const counts = [...shipped, 1, 2, 3, 7, 24, 100, 197, 360, 361, 362, 575, 576, 577];
+
+  it('ships the two counts the reviewed dry bands came from', () => {
+    expect(shipped).toEqual([560, 336]);
+  });
+
+  it.each(counts)('puts a splash on every cell of the lattice at count %i', (count) => {
+    const { side, cellSize } = splashLattice(count);
+    const cells = splashCells(count);
+    expect(cells).toHaveLength(count);
+    // The square never outgrows the splashes that have to fill it.
+    expect(side * side).toBeLessThanOrEqual(count);
+    expect((side + 1) * (side + 1)).toBeGreaterThan(count);
+    expect(side * cellSize).toBeCloseTo(2 * SPLASH_RADIUS, 10);
+    const perCell = new Array<number>(side * side).fill(0);
+    for (const cell of cells) {
+      expect(Number.isInteger(cell.x) && Number.isInteger(cell.z)).toBe(true);
+      expect(cell.x).toBeGreaterThanOrEqual(0);
+      expect(cell.x).toBeLessThan(side);
+      expect(cell.z).toBeGreaterThanOrEqual(0);
+      expect(cell.z).toBeLessThan(side);
+      perCell[cell.z * side + cell.x]++;
+    }
+    // No empty cell at all, so no empty row, column or band.
+    expect(perCell.filter((n) => n === 0)).toHaveLength(0);
+    for (let k = 0; k < side; k++) {
+      const row = perCell.slice(k * side, (k + 1) * side);
+      const column = perCell.filter((_, i) => i % side === k);
+      expect(Math.min(...row), `row ${k}`).toBeGreaterThanOrEqual(1);
+      expect(Math.min(...column), `column ${k}`).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it.each(shipped)('spreads the doubled cells at count %i, never a wet band either', (count) => {
+    const { side } = splashLattice(count);
+    const perCell = new Array<number>(side * side).fill(0);
+    for (const cell of splashCells(count)) perCell[cell.z * side + cell.x]++;
+    const doubled = count - side * side;
+    expect(doubled).toBeGreaterThan(0);
+    expect(perCell.reduce((n, c) => n + (c - 1), 0)).toBe(doubled);
+    // A cell takes at most one extra, and no row or column collects them.
+    expect(Math.max(...perCell)).toBe(2);
+    const fair = Math.ceil(doubled / side);
+    for (let k = 0; k < side; k++) {
+      const row = perCell.slice(k * side, (k + 1) * side).reduce((n, c) => n + (c - 1), 0);
+      const column = perCell.filter((_, i) => i % side === k).reduce((n, c) => n + (c - 1), 0);
+      expect(row, `row ${k}`).toBeLessThanOrEqual(fair + 2);
+      expect(column, `column ${k}`).toBeLessThanOrEqual(fair + 2);
+    }
+  });
+
+  it('lands a splash anywhere in its cell, edge to edge, and nowhere outside it', () => {
+    const lattice = splashLattice(560);
+    const cell = { x: 5, z: 9 };
+    const camera = { x: 5.5 * lattice.cellSize, z: 9.5 * lattice.cellSize };
+    const at = (jx: number, jz: number) =>
+      splashCellCenter(cell, camera, { x: jx, z: jz }, lattice);
+    // The cell's own corner and the far corner: the whole cell is reachable,
+    // so neighbouring cells meet with no gutter between them.
+    expect(at(0, 0).x).toBeCloseTo(5 * lattice.cellSize, 10);
+    expect(at(0, 0).z).toBeCloseTo(9 * lattice.cellSize, 10);
+    expect(at(0.999999, 0.999999).x).toBeCloseTo(6 * lattice.cellSize, 4);
+    expect(at(0.999999, 0.999999).z).toBeCloseTo(10 * lattice.cellSize, 4);
+    for (const j of [0, 0.1, 0.5, 0.9, 0.999999]) {
+      const p = at(j, 1 - j);
+      expect(Math.floor(p.x / lattice.cellSize + 1e-9)).toBe(5);
+      expect(Math.floor(p.z / lattice.cellSize - 1e-9)).toBe(9);
+    }
+  });
+
+  it('gives the painter exactly these cells, crown and ring together', () => {
+    const count = bastionRainTier(false, 0.6).splashes;
+    const mesh = buildBastionRain({ lowGfx: false, density: 0.6 }).getObjectByName(
+      'sunkenBastionRainSplashes',
+    ) as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
+    const attribute = mesh.geometry.getAttribute('aCell');
+    expect(attribute.count).toBe(count * 8);
+    const cells = splashCells(count);
+    for (let i = 0; i < count; i++) {
+      for (let k = 0; k < 8; k++) {
+        expect(attribute.getX(i * 8 + k)).toBe(cells[i].x);
+        expect(attribute.getY(i * 8 + k)).toBe(cells[i].z);
+      }
+    }
+    const lattice = splashLattice(count);
+    expect(mesh.material.uniforms.uLattice.value.toArray()).toEqual([
+      lattice.side,
+      lattice.cellSize,
+    ]);
   });
 });
 
