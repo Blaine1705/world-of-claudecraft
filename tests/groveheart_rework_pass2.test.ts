@@ -8,10 +8,12 @@ import {
   GROVEHEART_BOON_ICD,
   GROVEHEART_BOON_ICD_KEY,
   GROVEHEART_BOON_TICK_CHANCE,
+  MOONGROVE_BOON_ICD_KEY,
   NATURES_BOON_CHANCE,
   NATURES_BOON_ID,
   naturesBoonChanceAt,
   naturesBoonOnAutoAttack,
+  naturesBoonOnCast,
   naturesBoonOnHotTick,
   OAKHIDE_ID,
 } from '../src/sim/combat/druid_natures_boon';
@@ -456,5 +458,17 @@ describe("Nature's Boon windows end on a specialization change", () => {
     expect(boonAura(player)?.empowerAbilities).toEqual(['rejuvenation', 'barkskin']);
     expect(sim.applyTalents({ spec: 'restoration', rows: {} })).toBe(true);
     expect(boonAura(player)).toBeUndefined();
+  });
+
+  it('a Moongrove Spore Burst window and cooldown do not survive a respec', () => {
+    const { sim, player } = rig('balance');
+    vi.spyOn(ctxOf(sim).rng, 'chance').mockReturnValueOnce(true);
+    naturesBoonOnCast(ctxOf(sim), player, 'wrath');
+    vi.restoreAllMocks();
+    expect(boonAura(player)?.empowerAbilities).toEqual(['spore_burst']);
+    expect(player.procState?.icds[MOONGROVE_BOON_ICD_KEY]).toBeDefined();
+    expect(sim.applyTalents({ spec: 'restoration', rows: {} })).toBe(true);
+    expect(boonAura(player)).toBeUndefined();
+    expect(player.procState?.icds[MOONGROVE_BOON_ICD_KEY]).toBeUndefined();
   });
 });

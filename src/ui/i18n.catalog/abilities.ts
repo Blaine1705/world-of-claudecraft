@@ -1179,7 +1179,7 @@ const classAbilityNamesEn = {
         'Heals a friendly target for {damage}.',
         {
           restoration:
-            "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3. Nature's Boon makes it instant, free, and 25% stronger.",
+            'Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3.',
         },
       ],
       [
