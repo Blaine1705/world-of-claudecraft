@@ -8,8 +8,14 @@
 //     walkability had to be worked out, the search's whole cost), so a search
 //     that finds nothing costs no more than one that does;
 //   - it reuses one set of scratch buffers and a flat numeric heap, and its
-//     helpers are module functions, not per-call closures: a search allocates
-//     nothing but its short result path;
+//     helpers are module functions, not per-call closures: the search's own
+//     bookkeeping allocates nothing but its short result path. Judging a cell
+//     still does: it asks colliders.ts isBlocked, which resolves the point (a
+//     push-out and a few short-lived objects a cell, so a capped search makes
+//     a few thousand). A direct overlap test was tried and dropped: isBlocked
+//     reads a cell squeezed between two abutting walls as free (the second
+//     wall pushes the point back where it began), the mover agrees with
+//     isBlocked, and the search must judge as the mover does;
 //   - it straightens its path with a capped look-ahead over the cells it has
 //     already judged, never by re-sampling the world.
 //
@@ -84,6 +90,10 @@ export interface RouteSearchOpts {
 }
 
 export interface RouteSearchResult {
+  /** The search ran. False when it was refused outright (the pair is too far
+   *  apart for the window): nothing was judged and nothing was learned, so the
+   *  caller must not count it as a search that failed. */
+  attempted: boolean;
   /** A way was found (false: none inside the window, or the cap was hit). */
   found: boolean;
   /** Cells judged: the search's cost, for the caller's budget. */
@@ -208,7 +218,7 @@ export function searchRoute(
   sW = Math.ceil(Math.max(from.x, to.x) + opts.margin) - sMinX;
   const H = Math.ceil(Math.max(from.z, to.z) + opts.margin) - sMinZ;
   if (sW > ROUTE_SEARCH_SPAN || H > ROUTE_SEARCH_SPAN || opts.maxNodes <= 0)
-    return { found: false, nodes: 0, path: [] };
+    return { attempted: false, found: false, nodes: 0, path: [] };
   generation = (generation + 1) >>> 0;
   if (generation === 0) {
     // The counter wrapped: no stale stamp may read as this search's.
@@ -257,12 +267,13 @@ export function searchRoute(
         if (g < cellG[next]) {
           cellG[next] = g;
           cellFrom[next] = cur;
-          if (!push(g + toGoal(next), next)) return { found: false, nodes: sNodes, path: [] };
+          if (!push(g + toGoal(next), next))
+            return { attempted: true, found: false, nodes: sNodes, path: [] };
         }
       }
     }
   }
-  if (goal < 0) return { found: false, nodes: sNodes, path: [] };
+  if (goal < 0) return { attempted: true, found: false, nodes: sNodes, path: [] };
   // Found with cells to spare or not, the straightening below spends only
   // what is left of the cap: a leg it cannot afford to check stays as walked.
 
@@ -282,7 +293,7 @@ export function searchRoute(
   // The straight line may already be clear (the caller was stopped by
   // something that has since moved): one waypoint, no route to walk.
   if (legClear(px, pz, 0, last))
-    return { found: true, nodes: sNodes, path: [{ x: to.x, z: to.z }] };
+    return { attempted: true, found: true, nodes: sNodes, path: [{ x: to.x, z: to.z }] };
   const path: { x: number; z: number }[] = [];
   let anchor = 0;
   while (anchor < last) {
@@ -291,5 +302,5 @@ export function searchRoute(
     path.push({ x: px[next], z: pz[next] });
     anchor = next;
   }
-  return { found: true, nodes: sNodes, path };
+  return { attempted: true, found: true, nodes: sNodes, path };
 }

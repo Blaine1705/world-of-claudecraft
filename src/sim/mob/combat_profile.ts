@@ -123,7 +123,9 @@ export function updateMobCombatProfile(
     mob.autoAttack = false;
     // No target, no pin: a mob that lost its fight never keeps the immune stance.
     releasePin(mob);
-    endChaseRoute(mob);
+    // Its path goes with the target; its route throttle stays for whoever it
+    // turns on next (mob/chase_route.ts), and ends with the pull.
+    restChaseRoute(mob);
     retargetMob(ctx, mob);
     return 'done';
   }
@@ -398,7 +400,10 @@ function updateCasterCombat(
   profile: MobCombatProfile,
   spell: Parameters<SimContext['updateRangedPetAttack']>[2],
   // Does this caster obey the sight rule (cast_sight.ts casterObeysSight)? One
-  // that does not runs the old loop below, untouched.
+  // that does not (a boss, a pet, a canLeash-false script) asks for no line of
+  // sight and plans no route: every branch below that `sight` gates is skipped
+  // and what is left is the loop as it was, the straight ctx.moveToward chase
+  // included.
   sight: boolean,
 ): MobCombatProfileResult {
   const d = dist2d(mob.pos, target.pos);
@@ -417,7 +422,9 @@ function updateCasterCombat(
         mob.aiState = 'chase';
         return 'done';
       }
-      if (verdict === 'failed') return 'done';
+      // A failed cast is over; one whose start must wait for the tick's
+      // sight budget begins next tick. Neither runs the attack this tick.
+      if (verdict === 'failed' || verdict === 'wait') return 'done';
     }
     ctx.updateRangedPetAttack(mob, target, spell);
     return 'done';
@@ -439,7 +446,8 @@ function updateCasterCombat(
     // only out of range, or there is no route to take) the ordinary chase
     // step: straight at it, unless the mob is still walking a route it began
     // or has stopped dead on geometry (chaseAroundObstacles).
-    if (!(blocked && followChaseRoute(ctx, mob, target, speed))) {
+    if (!sight) ctx.moveToward(mob, target.pos, speed);
+    else if (!(blocked && followChaseRoute(ctx, mob, target, speed))) {
       chaseAroundObstacles(ctx, mob, target, speed);
     }
   } else {
@@ -463,14 +471,12 @@ function updatePursuitProfileCombat(
 
   if (dist2d(mob.pos, target.pos) > profile.desiredRange) {
     if (!ctx.isRooted(mob)) {
-      // Straight at the target, and round a wall the straight chase has stopped
-      // dead on (mob/chase_route.ts) instead of standing against it.
-      chaseAroundObstacles(
-        ctx,
-        mob,
-        target,
-        mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob),
-      );
+      // Straight at the target, and (a mob that leashes; chase_route.ts
+      // leaves bosses and pets out itself) round a wall the straight chase has
+      // stopped dead on instead of standing against it.
+      const speed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
+      if (profile.canLeash) chaseAroundObstacles(ctx, mob, target, speed);
+      else ctx.moveToward(mob, target.pos, speed);
     } else {
       mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
     }

@@ -26,7 +26,9 @@ import { isPinnedInPlace, PIN_PHASE_SECONDS } from '../src/sim/instances/instanc
 import {
   CAST_SIGHT_RETRY_SECONDS,
   casterObeysSight,
+  casterSightBlocked,
   lastSightBlocked,
+  SIGHT_QUERIES_PER_TICK,
   SIGHT_RECHECK_TICKS,
 } from '../src/sim/mob/cast_sight';
 import {
@@ -40,15 +42,17 @@ import { BASTION_KIT_EXTENSION } from '../src/sim/mob/trash_kit/bastion_extensio
 import { CRYPT_GRAVE_BOLT, CRYPT_GRAVESPARK_VOLLEY } from '../src/sim/mob/trash_kit/cast_ids';
 import {
   KIT_SIGHT_KEYS,
+  KIT_SIGHT_REDRAWS,
   KIT_SIGHT_RETRY,
   kitSightRetry,
+  pickSeenVictim,
 } from '../src/sim/mob/trash_kit/kit_cast_sight';
 import { TEMPLE_LULLABY_SLEEP } from '../src/sim/mob/trash_kit/temple_cast_ids';
 import { TEMPLE_KIT_EXTENSION } from '../src/sim/mob/trash_kit/temple_extension';
 import { WILDHEART_KIT_EXTENSION } from '../src/sim/mob/trash_kit/wildheart_extension';
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
-import { DT, type Entity, LEASH_DISTANCE } from '../src/sim/types';
+import { DT, dist2d, type Entity, LEASH_DISTANCE } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { boss, cryptFight, type Fight, put, tick } from './helpers/crypt_boss_fight';
 
@@ -591,6 +595,49 @@ describe('the hold and the leash still rule a caster no route reaches', () => {
     expect(Math.hypot(later.x - at.x, later.z - at.z)).toBeLessThan(0.5);
   });
 
+  // The decision this pins (review round 3): a caster no route brings to a
+  // sight line does NOT stand in spell range casting through the wall, as it
+  // did before the sight rule. It falls to the instance hold melee has always
+  // had there: pinned and immune for the stall's own time, then through the
+  // geometry to its target, and only then does it cast.
+  it('in spell range of a target behind a sealed gate: nothing is cast through it, and the hold takes over on its usual clock', () => {
+    const s = scene({ x: 18, z: 30 }, { x: 18, z: 12 }, new Set(['crypt_gravecaller_necromancer']));
+    s.f.tank.devNoAggro = true;
+    const spell = MOBS[ADEPT].petSpell;
+    if (!spell) throw new Error('the Adept has no petSpell');
+    // In spell range from the first tick, the shut grille between them.
+    expect(dist2d(s.adept.pos, s.f.tank.pos)).toBeLessThan(spell.range);
+    expect(sees(s)).toBe(false);
+    const landed = (): number => hits(s, SPARK) + hits(s, BOLT) + hits(s, VOLLEY);
+    let pinnedAt = -1;
+    let firstHitAt = -1;
+    let sawAtFirstHit = false;
+    for (let t = 0; t < CHASE_STALL_TIMEOUT + PIN_PHASE_SECONDS + 16 && firstHitAt < 0; t += DT) {
+      step(s);
+      if (pinnedAt < 0 && isPinnedInPlace(s.adept)) pinnedAt = t;
+      // Until the hold has taken it, it stands north of the wall and nothing
+      // of its has landed on the far side.
+      if (pinnedAt < 0) {
+        expect(landed()).toBe(0);
+        expect(local(s, s.adept).z).toBeGreaterThan(21);
+        expect(s.adept.aiState).not.toBe('evade');
+      }
+      if (landed() > 0) {
+        firstHitAt = t;
+        sawAtFirstHit = sees(s);
+      }
+    }
+    // The hold, on the stall's own clock: no sooner than the timeout, and no
+    // later than that plus its walk to the wall and the bars it stood through
+    // on the way (a caster planted by its own bar is not counted as stalled).
+    expect(pinnedAt).toBeGreaterThanOrEqual(CHASE_STALL_TIMEOUT - DT);
+    expect(pinnedAt).toBeLessThan(CHASE_STALL_TIMEOUT + 8);
+    // Nothing landed while it was held: the first cast comes only after the
+    // hold's own grace, from a spot that sees its target.
+    expect(firstHitAt).toBeGreaterThan(pinnedAt + PIN_PHASE_SECONDS - 0.5);
+    expect(sawAtFirstHit).toBe(true);
+  });
+
   it('a wipe still sends it home', () => {
     const s = scene(CASTER_SPOT, HIDDEN);
     expect(until(s, () => (s.adept.chaseRoute?.path.length ?? 0) > 1, 4)).toBe(true);
@@ -905,4 +952,175 @@ describe('every driver cast at one player rides the same gate', () => {
       expect(hits(s, BOLT, 0, seen)).toBeGreaterThanOrEqual(2);
     },
   );
+});
+
+describe('the re-draw of a hidden pick always ends', () => {
+  it('pickSeenVictim: a pick that ignores its pool ends the attempt instead of spinning', () => {
+    const s = scene(CASTER_SPOT, HIDDEN, new Set(), 1);
+    const ctx = s.f.sim.ctx;
+    const other = s.f.others[0];
+    put(s.f, other, SEEN.x, SEEN.z);
+    const players = [s.f.tank, other];
+    const tally = s.f.sim.mobScanCounters as { sightQueries: number };
+    expect(ctx.hasLineOfSight(s.adept, s.f.tank)).toBe(false);
+    expect(ctx.hasLineOfSight(s.adept, other)).toBe(true);
+    // An honest pick: the hidden first pick is set aside, the one in sight taken.
+    tally.sightQueries = 0;
+    let draws = 0;
+    expect(
+      pickSeenVictim(ctx, s.adept, s.f.tank, players, (pool) => {
+        draws++;
+        return pool[0];
+      }),
+    ).toBe(other);
+    expect(draws).toBe(1);
+    expect(tally.sightQueries).toBe(2);
+    // A pick that hands the same hidden player back whatever pool it is given.
+    tally.sightQueries = 0;
+    draws = 0;
+    expect(
+      pickSeenVictim(ctx, s.adept, s.f.tank, players, () => {
+        draws++;
+        return s.f.tank;
+      }),
+    ).toBeNull();
+    expect(draws).toBe(1);
+    expect(tally.sightQueries).toBe(1);
+    // A first pick that was never among the players it is drawn from.
+    const stranger = { ...s.f.tank, id: s.f.tank.id + 9000 } as Entity;
+    tally.sightQueries = 0;
+    draws = 0;
+    expect(
+      pickSeenVictim(ctx, s.adept, stranger, [other], () => {
+        draws++;
+        return stranger;
+      }),
+    ).toBeNull();
+    expect(draws).toBe(0);
+    // An ally or a corpse is not a sight-bound victim: handed back unasked.
+    tally.sightQueries = 0;
+    expect(pickSeenVictim(ctx, s.adept, s.adept, players, () => null)).toBe(s.adept);
+    expect(tally.sightQueries).toBe(0);
+  });
+
+  it('pickSeenVictim: a room full of hidden players is not looked through whole', () => {
+    const s = scene(CASTER_SPOT, HIDDEN);
+    const ctx = s.f.sim.ctx;
+    // Forty raiders, every one of them behind the monument with the tank.
+    const raid: Entity[] = [];
+    for (let i = 0; i < 40; i++) raid.push({ ...s.f.tank, id: s.f.tank.id + 100 + i } as Entity);
+    const tally = s.f.sim.mobScanCounters as { sightQueries: number };
+    tally.sightQueries = 0;
+    let draws = 0;
+    expect(
+      pickSeenVictim(ctx, s.adept, raid[0], raid, (pool) => {
+        draws++;
+        return pool[0];
+      }),
+    ).toBeNull();
+    expect(draws).toBe(KIT_SIGHT_REDRAWS);
+    expect(tally.sightQueries).toBe(KIT_SIGHT_REDRAWS + 1);
+  });
+
+  it('the driver: an extension whose pick ignores its pool leaves the tick running and the cast waiting', () => {
+    // The Temple's Spark is an extension's cast (TEMPLE_KIT_EXTENSION owns its
+    // readiness), bound by sight through the extension's sightKeys.
+    expect(TEMPLE_KIT_EXTENSION.sightKeys).toContain('spark');
+    const spark = Object.values(MOBS).find((t) => t.trashKit?.temple?.spark !== undefined)?.trashKit
+      ?.temple?.spark;
+    if (!spark) throw new Error('no Temple Spark in content');
+    const s = scene(CASTER_SPOT, HIDDEN, new Set(), 1);
+    const other = s.f.others[0];
+    s.adept.devTrashKit = { temple: { spark } };
+    const pin = (): void => {
+      put(s.f, s.adept, CASTER_SPOT.x, CASTER_SPOT.z);
+      put(s.f, other, SEEN.x, SEEN.z);
+    };
+    pin();
+    // The Spark's own readiness is replaced by one that always names the
+    // hidden tank, whoever it is asked to choose among.
+    let asked = 0;
+    const ready = vi.spyOn(TEMPLE_KIT_EXTENSION, 'ready').mockImplementation(() => {
+      asked++;
+      return { ok: true, target: s.f.tank };
+    });
+    try {
+      let worst = 0;
+      run(s, spark.first + 4, () => {
+        pin();
+        worst = Math.max(worst, s.f.sim.mobScanCounters.sightQueries);
+        // Never begun: its only pick is out of sight.
+        expect(s.adept.castingAbility).not.toBe(spark.castId);
+      });
+      // Every tick came back (this line is reached), the cast was really
+      // tried, and each try cost one look and one re-draw, not a spin.
+      expect(asked).toBeGreaterThan(2);
+      expect(worst).toBeLessThanOrEqual(2);
+      expect(s.adept.trashKit?.timers.spark).toBeLessThanOrEqual(kitSightRetry(s.adept));
+    } finally {
+      ready.mockRestore();
+    }
+  });
+});
+
+describe("the tick's sight budget", () => {
+  it('a pack whose casts all fall due on one tick begins them over several, and no cast is lost', () => {
+    const s = scene(CASTER_SPOT, SEEN);
+    const ctx = s.f.sim.ctx;
+    const spell = MOBS[ADEPT].petSpell;
+    if (!spell) throw new Error('the Adept has no petSpell');
+    // Thirty Adepts in plain sight of the tank, every one standing to cast
+    // with its next cast due on the very next tick. No kit bars: only the
+    // Sparks ask for sight here.
+    const pack: Entity[] = [s.adept];
+    for (let i = 1; i < 30; i++) {
+      pack.push(spawn(s.f, ADEPT, 8 + (i % 6) * 2.2, -46 + Math.floor(i / 6) * 2.2));
+    }
+    const spots = pack.map((m) => ({ x: m.pos.x - s.f.ox, z: m.pos.z - s.f.oz }));
+    const hold = (): void => {
+      for (let i = 0; i < pack.length; i++) put(s.f, pack[i], spots[i].x, spots[i].z);
+    };
+    for (const m of pack) {
+      m.maxHp = 1e7;
+      m.hp = 1e7;
+      m.devTrashKit = {};
+      engage(m, s.f.tank);
+      m.aiState = 'attack';
+      m.swingTimer = DT;
+      m.rangedWindupReleaseTick = null;
+      expect(ctx.hasLineOfSight(m, s.f.tank)).toBe(true);
+      expect(dist2d(m.pos, s.f.tank.pos)).toBeLessThan(spell.range);
+    }
+    const begun = (): number =>
+      pack.filter((m) => m.rangedWindupReleaseTick != null || m.swingTimer > 1).length;
+    expect(begun()).toBe(0);
+    // The first tick: the budget's worth begin, the rest wait.
+    step(s, hold);
+    expect(s.f.sim.mobScanCounters.sightQueries).toBe(SIGHT_QUERIES_PER_TICK);
+    expect(begun()).toBe(SIGHT_QUERIES_PER_TICK);
+    // The next: the rest begin. Nobody was skipped, nobody charged a cadence.
+    step(s, hold);
+    expect(s.f.sim.mobScanCounters.sightQueries).toBeLessThanOrEqual(SIGHT_QUERIES_PER_TICK);
+    expect(begun()).toBe(pack.length);
+    // And every one of those casts lands.
+    const from = s.f.hits.length;
+    run(s, (spell.windup ?? 0) + 0.5, hold);
+    expect(hits(s, SPARK, from)).toBeGreaterThanOrEqual(pack.length - 2);
+  });
+
+  it('a caster on the move keeps its last answer once the budget is spent', () => {
+    const s = scene(CASTER_SPOT, HIDDEN);
+    const ctx = s.f.sim.ctx;
+    const tally = s.f.sim.mobScanCounters as { sightQueries: number };
+    // On its own recheck tick, with the budget already spent by others.
+    const clock = s.f.sim as unknown as { tickCount: number };
+    while ((clock.tickCount + s.adept.id) % SIGHT_RECHECK_TICKS !== 0) clock.tickCount++;
+    tally.sightQueries = SIGHT_QUERIES_PER_TICK;
+    expect(casterSightBlocked(ctx, s.adept, s.f.tank, 30)).toBe(false);
+    expect(tally.sightQueries).toBe(SIGHT_QUERIES_PER_TICK);
+    // With budget left it asks, and learns it is blocked.
+    tally.sightQueries = 0;
+    expect(casterSightBlocked(ctx, s.adept, s.f.tank, 30)).toBe(true);
+    expect(tally.sightQueries).toBe(1);
+  });
 });

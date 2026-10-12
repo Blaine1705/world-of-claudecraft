@@ -24,11 +24,15 @@
 // Cost: no query while a cast waits on its cooldown or on its own readiness;
 // one when a bar would begin, one when it ends, and, only when the first pick
 // was hidden, one more per further pick until a player in sight is found (the
-// re-draw stops at the first). A cast with nobody in sight waits
-// KIT_SIGHT_RETRY plus a slot of its caster's id, so a pack whose target hides
-// does not all look again on one tick. Every query is tallied on the sim's
-// per-tick counters (mobScanCounters.sightQueries). Draws no rng; the hashed
-// picks are unchanged whenever everyone is in sight.
+// re-draw stops at the first, and at KIT_SIGHT_REDRAWS draws whatever the
+// room holds: a raid room does not fan out). A cast with nobody in sight
+// waits KIT_SIGHT_RETRY plus a slot of its caster's id, so a pack whose target
+// hides does not all look again on one tick; a pack's FIRST casts are already
+// spread by its pull order (mob/pack_cast_stagger.ts). Every query is tallied
+// on the sim's per-tick counters (mobScanCounters.sightQueries), and a bar
+// that would BEGIN once the tick's sight budget is spent waits a tick
+// (cast_sight.ts SIGHT_QUERIES_PER_TICK); a bar that ENDS is always judged.
+// Draws no rng; the hashed picks are unchanged whenever everyone is in sight.
 //
 // A fizzle is a bar that was begun: it keeps its place in the caster's cast
 // count (TrashKitState.casts, the salt of the hashed picks), so the pick after
@@ -36,6 +40,7 @@
 
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
+import { sightBudgetSpent } from '../cast_sight';
 
 /** The driver's own keys that are a cast at one player. */
 export const KIT_SIGHT_KEYS: ReadonlySet<string> = new Set(['bolt', 'eye', 'column', 'lullaby']);
@@ -63,4 +68,50 @@ export function kitVictimHidden(
   if (!target || target.kind !== 'player' || target.dead) return false;
   ctx.mobScanCounters.sightQueries++;
   return !ctx.hasLineOfSight(mob, target);
+}
+
+/** The most re-draws one attempt makes after a hidden first pick: a five-man
+ *  party is looked through whole, a raid room is not. */
+export const KIT_SIGHT_REDRAWS = 4;
+/** pickSeenVictim's answer when the tick's sight budget is spent: try again
+ *  next tick, with nothing changed. */
+export const KIT_SIGHT_WAIT = 'wait';
+
+/**
+ * The victim a sight-bound cast may begin at, given its first pick: that pick
+ * when the caster sees it, otherwise the cast's own pick drawn again (`redraw`)
+ * from the players not yet found hidden, one sight query a draw, stopping at
+ * the first in sight. Null when nobody it may pick is in sight (the caller
+ * waits kitSightRetry), KIT_SIGHT_WAIT when the tick's sight budget is spent.
+ *
+ * Always returns: every round either answers or sets one more player aside,
+ * the rounds are capped at KIT_SIGHT_REDRAWS, and a `redraw` that hands back
+ * the player just set aside, or anyone outside the pool it was given, ends
+ * the attempt (a pick that ignores its pool must never spin the tick).
+ */
+export function pickSeenVictim(
+  ctx: SimContext,
+  mob: Entity,
+  first: Entity,
+  players: readonly Entity[],
+  redraw: (pool: readonly Entity[]) => Entity | null,
+): Entity | null | typeof KIT_SIGHT_WAIT {
+  let target = first;
+  let pool = players;
+  for (let draws = 0; ; draws++) {
+    // An ally, a corpse: not a sight-bound victim, and no query.
+    if (target.kind !== 'player' || target.dead) return target;
+    if (sightBudgetSpent(ctx)) return KIT_SIGHT_WAIT;
+    if (!kitVictimHidden(ctx, mob, target)) return target;
+    if (draws >= KIT_SIGHT_REDRAWS) return null;
+    const hidden = target;
+    const rest = pool.filter((p) => p !== hidden);
+    // The hidden pick was never in the pool it was drawn from: nothing was
+    // set aside, so drawing again could only hand it back.
+    if (rest.length === pool.length || rest.length === 0) return null;
+    pool = rest;
+    const again = redraw(pool);
+    if (again === null || !pool.includes(again)) return null;
+    target = again;
+  }
 }

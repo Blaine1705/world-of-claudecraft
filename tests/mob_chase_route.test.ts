@@ -13,7 +13,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { MOBS } from '../src/sim/data';
+import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { DAWNHOLD, DAWNHOLD_GATES } from '../src/sim/dawnhold_layout';
 import { createMob } from '../src/sim/entity';
 import {
@@ -21,6 +21,7 @@ import {
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from '../src/sim/instances/difficulty';
+import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import {
   isPinnedInPlace,
   PIN_PHASE_SECONDS,
@@ -37,8 +38,11 @@ import {
   ROUTE_REPLAN_TICKS,
   ROUTE_STUCK_TICKS,
   ROUTE_TRY_FORGIVE_TICKS,
+  routeSearchOpts,
   routesHere,
 } from '../src/sim/mob/chase_route';
+import { startEvadeHome } from '../src/sim/mob/combat_profile';
+import { isBossTemplate, isEncounterBody } from '../src/sim/mob/encounter_body';
 import { CHASE_STALL_TIMEOUT } from '../src/sim/mob/reachability';
 import { searchRoute } from '../src/sim/mob/route_search';
 import { resetMobScanCounters } from '../src/sim/mob/scan_counters';
@@ -323,7 +327,10 @@ describe('the search itself', () => {
     expect(perch.found).toBe(false);
     // A window wider than the search accepts is refused before a cell is judged.
     const wide = searchRoute(at({ x: 0, z: -100 }), at({ x: 0, z: 0 }), opts);
-    expect(wide).toEqual({ found: false, nodes: 0, path: [] });
+    expect(wide).toEqual({ attempted: false, found: false, nodes: 0, path: [] });
+    // Every search that ran says so, found or not.
+    expect(shut.attempted).toBe(true);
+    expect(perch.attempted).toBe(true);
     // And a clear straight line is one waypoint: nothing to walk round.
     const clear = searchRoute(at({ x: 13, z: -44 }), at({ x: 13, z: -20 }), opts);
     expect(clear.found).toBe(true);
@@ -532,5 +539,335 @@ describe('the route guards', () => {
     expect(s.mob.chaseRoute?.path).toEqual([]);
     // The throttle is not forgiven by the hold.
     expect(s.mob.chaseRoute?.tries).toBe(tries);
+  });
+});
+
+describe('what the players cannot buy back', () => {
+  it('a mob that changes target keeps its plan clock, its spent tries and its failures', () => {
+    const s = scene();
+    const ctx = s.f.sim.ctx;
+    const route = chaseRouteFor(ctx, s.mob, s.f.tank);
+    route.tries = 3;
+    route.triesAt = s.f.sim.tickCount;
+    route.fails = 2;
+    route.planAt = s.f.sim.tickCount + 500;
+    route.path = [
+      { x: 1, y: 0, z: 1 },
+      { x: 2, y: 0, z: 2 },
+    ];
+    route.sightClear = false;
+    route.stuckDist = 4;
+    const other = { ...s.f.tank, id: s.f.tank.id + 5000 } as Entity;
+    const carried = chaseRouteFor(ctx, s.mob, other);
+    // The same record, pointed at the new target.
+    expect(carried).toBe(route);
+    expect(carried.targetId).toBe(other.id);
+    // The throttle is the mob's, not the target's.
+    expect(carried.tries).toBe(3);
+    expect(carried.fails).toBe(2);
+    expect(carried.planAt).toBe(s.f.sim.tickCount + 500);
+    // What belonged to the old target is gone.
+    expect(carried.path).toEqual([]);
+    expect(carried.sightClear).toBe(true);
+    expect(carried.stuckDist).toBe(Infinity);
+    // And back again: still nothing handed back.
+    expect(chaseRouteFor(ctx, s.mob, s.f.tank).tries).toBe(3);
+  });
+
+  it('a target that drops off the threat table for a moment hands back nothing', () => {
+    const f = cryptFight('heroic', 1, new Set(['morthen']));
+    put(f, f.tank, SOUTH.x, SOUTH.z);
+    put(f, f.others[0], SOUTH.x + 3, SOUTH.z);
+    tick(f);
+    const mob = spawn(f, WARRIOR, NORTH);
+    addThreat(mob, f.others[0].id, 50);
+    const route = chaseRouteFor(f.sim.ctx, mob, f.tank);
+    route.tries = 3;
+    route.triesAt = f.sim.tickCount;
+    route.fails = 2;
+    // Its target is gone from the fight for a tick (a Vanish, a feigned death).
+    f.tank.dead = true;
+    tick(f);
+    f.tank.dead = false;
+    expect(mob.aggroTargetId).toBe(f.others[0].id);
+    expect(mob.aiState).not.toBe('evade');
+    // The record lived through the tick with no target, throttle and all.
+    expect(mob.chaseRoute).toBe(route);
+    expect(mob.chaseRoute?.tries).toBe(3);
+    expect(mob.chaseRoute?.fails).toBe(2);
+    // Only the end of the pull drops it.
+    startEvadeHome(mob);
+    expect(mob.chaseRoute).toBeUndefined();
+  });
+
+  it('with its tries spent, a route whose end the target has left is dropped, and it closes on a target in plain sight', () => {
+    const s = scene();
+    // Let it reach the wall, plan its way to the doorway and set off.
+    for (let i = 0; i < 10 / DT && (s.mob.chaseRoute?.path.length ?? 0) <= 1; i++) step(s);
+    const route = s.mob.chaseRoute;
+    if (!route || route.path.length <= 1) throw new Error('no route was planned');
+    const plans = s.plans;
+    // No plan left, and none coming back for ten seconds.
+    route.tries = ROUTE_MAX_TRIES;
+    route.triesAt = s.f.sim.tickCount;
+    // The target comes round to the mob's own side of the wall, in the open.
+    const here = local(s);
+    const open = { x: here.x - 7, z: here.z + 5 };
+    s.keep = () => put(s.f, s.f.tank, open.x, open.z);
+    s.keep();
+    expect(s.f.sim.ctx.hasLineOfSight(s.mob, s.f.tank)).toBe(true);
+    let nearest = dist2d(s.mob.pos, s.f.tank.pos);
+    for (let i = 0; i < 6 / DT && meleeHits(s) === 0; i++) {
+      step(s);
+      const d = dist2d(s.mob.pos, s.f.tank.pos);
+      // Never walked away from it along the old route.
+      expect(d).toBeLessThan(nearest + 0.2);
+      nearest = Math.min(nearest, d);
+    }
+    expect(meleeHits(s)).toBeGreaterThan(0);
+    // The stale path was thrown away, and nothing was searched to replace it.
+    expect(s.plans).toBe(plans);
+    expect(s.mob.chaseRoute?.path ?? []).toEqual([]);
+  });
+
+  it('a search refused because the pair is too far apart costs nothing', () => {
+    // Fifty yards apart along the nave: wider than the search window.
+    const s = scene(new Set(), { x: 13, z: -44 }, { x: 13, z: 6 });
+    const ctx = s.f.sim.ctx;
+    const opts = routeSearchOpts(ctx, s.mob);
+    const refused = searchRoute(s.mob.pos, s.f.tank.pos, opts);
+    expect(refused).toEqual({ attempted: false, found: false, nodes: 0, path: [] });
+    toPlanTick(s);
+    s.f.tank.routeDenied = undefined;
+    const now = s.f.sim.tickCount;
+    expect(followChaseRoute(ctx, s.mob, s.f.tank, 7)).toBe(false);
+    const tally = s.f.sim.mobScanCounters;
+    expect(tally.routePlans).toBe(0);
+    expect(tally.routeNodes).toBe(0);
+    expect(tally.routeFailed).toBe(0);
+    // No try spent, no backoff, and nobody is told there is no route.
+    expect(s.mob.chaseRoute?.tries).toBe(0);
+    expect(s.mob.chaseRoute?.fails).toBe(0);
+    expect(s.f.tank.routeDenied).toBeUndefined();
+    // It asks again one period on, on its own slot.
+    const wait = (s.mob.chaseRoute?.planAt ?? 0) - now;
+    expect(wait).toBeGreaterThanOrEqual(ROUTE_REPLAN_TICKS);
+    expect(wait).toBeLessThan(ROUTE_REPLAN_TICKS * 2);
+  });
+
+  it("the word of a mob that moves another way, or one from a tick that has not come, is nobody's proof", () => {
+    const s = scene(new Set(['crypt_gravecaller_necromancer']));
+    const ctx = s.f.sim.ctx;
+    // How this mob moves: a word counts only from a mob that moves the same way.
+    const mine = routeSearchOpts(ctx, s.mob).swim;
+    const word = (over: Partial<NonNullable<Entity['routeDenied']>>) => ({
+      tick: s.f.sim.tickCount,
+      x: s.f.tank.pos.x,
+      z: s.f.tank.pos.z,
+      fromX: s.mob.pos.x,
+      fromZ: s.mob.pos.z,
+      swim: mine,
+      ...over,
+    });
+    // A fresh word from a mob like it, beside it: taken, nothing searched.
+    toPlanTick(s);
+    s.f.tank.routeDenied = word({});
+    followChaseRoute(ctx, s.mob, s.f.tank, 7);
+    expect(s.f.sim.mobScanCounters.routePlans).toBe(0);
+    expect(s.mob.chaseRoute?.fails).toBe(1);
+    // From a mob that moves the other way: it searches for itself.
+    toPlanTick(s);
+    s.f.tank.routeDenied = word({ swim: !mine });
+    followChaseRoute(ctx, s.mob, s.f.tank, 7);
+    expect(s.f.sim.mobScanCounters.routePlans).toBe(1);
+    // One stamped with a tick that has not come: it searches for itself.
+    toPlanTick(s);
+    s.f.tank.routeDenied = word({ tick: s.f.sim.tickCount + 5 });
+    followChaseRoute(ctx, s.mob, s.f.tank, 7);
+    expect(s.f.sim.mobScanCounters.routePlans).toBe(1);
+  });
+});
+
+describe('who plans a route at all', () => {
+  it('not a boss, a mid-boss, a scripted great body or a pet', () => {
+    const s = scene();
+    const ctx = s.f.sim.ctx;
+    const as = (templateId: string): Entity => ({ ...s.mob, templateId }) as Entity;
+    expect(routesHere(ctx, s.mob, s.f.tank)).toBe(true);
+    // A flagged final boss.
+    expect(MOBS.morthen.boss).toBe(true);
+    expect(routesHere(ctx, as('morthen'), s.f.tank)).toBe(false);
+    // The mid-bosses carry no boss flag; their gate's roster names them.
+    expect(MOBS.sexton_marrow.boss).not.toBe(true);
+    expect(isBossTemplate('sexton_marrow')).toBe(true);
+    expect(routesHere(ctx, as('sexton_marrow'), s.f.tank)).toBe(false);
+    expect(routesHere(ctx, as('rimeweb'), s.f.tank)).toBe(false);
+    expect(routesHere(ctx, as('fanglord_jaguar'), s.f.tank)).toBe(false);
+    // A scripted great body that is no boss.
+    expect(isBossTemplate('sledge_tusker')).toBe(false);
+    expect(isEncounterBody('sledge_tusker')).toBe(true);
+    expect(routesHere(ctx, as('sledge_tusker'), s.f.tank)).toBe(false);
+    // Somebody's pet.
+    expect(routesHere(ctx, { ...s.mob, ownerId: s.f.tank.id } as Entity, s.f.tank)).toBe(false);
+    // Ordinary trash, melee and caster.
+    expect(isEncounterBody(WARRIOR)).toBe(false);
+    expect(isEncounterBody(ADEPT)).toBe(false);
+  });
+
+  it('a boss walled off from its target searches nothing and falls to the hold, as before', () => {
+    // A boss of another dungeon, so no crypt encounter script owns it: the
+    // gate shut, its target across the wall.
+    const bossId = Object.keys(MOBS).find(
+      (id) => MOBS[id].boss === true && !MOBS[id].worldBoss && !MOBS[id].petSpell,
+    );
+    if (!bossId) throw new Error('no plain boss template in content');
+    const s = scene(new Set(['crypt_gravecaller_necromancer']), NORTH, SOUTH, bossId);
+    expect(isBossTemplate(s.mob.templateId)).toBe(true);
+    let pinnedAt = -1;
+    for (let i = 0; i < (CHASE_STALL_TIMEOUT + 6) / DT && pinnedAt < 0; i++) {
+      step(s);
+      expect(s.f.sim.mobScanCounters.routePlans).toBe(0);
+      expect(s.f.sim.mobScanCounters.routeDeferred).toBe(0);
+      if (isPinnedInPlace(s.mob)) pinnedAt = i * DT;
+    }
+    // No search, no route record: the straight chase, the stall, the hold.
+    expect(s.plans).toBe(0);
+    expect(s.mob.chaseRoute).toBeUndefined();
+    expect(pinnedAt).toBeGreaterThan(CHASE_STALL_TIMEOUT - 0.5);
+    expect(local(s).z).toBeGreaterThan(WALL_NORTH_FACE - 1);
+  });
+});
+
+describe("the tick's route budget is shared fairly", () => {
+  it('two mobs due on one tick: the first in entity order is served, the second goes to its own next slot', () => {
+    const s = scene(new Set(['crypt_gravecaller_necromancer']));
+    const ctx = s.f.sim.ctx;
+    // Far enough along the wall that neither takes the other's word.
+    const far = spawn(s.f, WARRIOR, { x: NORTH.x + 20, z: NORTH.z });
+    expect(far.id).toBeGreaterThan(s.mob.id);
+    const clock = s.f.sim as unknown as { tickCount: number };
+    clock.tickCount += ROUTE_REPLAN_TICKS * 2;
+    const now = clock.tickCount;
+    for (const mob of [s.mob, far]) chaseRouteFor(ctx, mob, s.f.tank).planAt = now;
+    s.f.tank.routeDenied = undefined;
+    resetMobScanCounters(s.f.sim.mobScanCounters as never);
+    followChaseRoute(ctx, s.mob, s.f.tank, 7);
+    followChaseRoute(ctx, far, s.f.tank, 7);
+    const tally = s.f.sim.mobScanCounters;
+    // One capped search, and the second mob put off.
+    expect(tally.routePlans).toBe(1);
+    expect(tally.routeNodes).toBe(ROUTE_NODES_PER_PLAN);
+    expect(tally.routeDeferred).toBe(1);
+    expect(s.mob.chaseRoute?.tries).toBe(1);
+    // Put off, not charged: no try, no failure, and not back next tick but on
+    // its own slot of the next period.
+    expect(far.chaseRoute?.tries).toBe(0);
+    expect(far.chaseRoute?.fails).toBe(0);
+    const wait = (far.chaseRoute?.planAt ?? 0) - now;
+    expect(wait).toBeGreaterThan(1);
+    expect(wait).toBeLessThanOrEqual(ROUTE_REPLAN_TICKS);
+    expect(Math.abs(((far.chaseRoute?.planAt ?? 0) - far.id) % ROUTE_REPLAN_TICKS)).toBe(0);
+    // Asked again on the very next tick, it is not even counted as deferred.
+    clock.tickCount += 1;
+    resetMobScanCounters(s.f.sim.mobScanCounters as never);
+    followChaseRoute(ctx, far, s.f.tank, 7);
+    expect(s.f.sim.mobScanCounters.routePlans).toBe(0);
+    expect(s.f.sim.mobScanCounters.routeDeferred).toBe(0);
+  });
+
+  it('a forty-mob blocked pull in one instance does not starve a mob in another', () => {
+    // Instance A: the gate shut, forty warriors along the wall, none with a way.
+    const s = scene(new Set(['crypt_gravecaller_necromancer']));
+    const sim = s.f.sim;
+    for (let i = 1; i < 40; i++) {
+      spawn(s.f, WARRIOR, { x: 9 + (i % 20) * 1.8, z: NORTH.z + Math.floor(i / 20) * 2 });
+    }
+    // Instance B: a second party of one, its crypt cleared (the gate open), one
+    // warrior with the doorway between it and its target. It is the newest
+    // entity in the sim: last in entity order, the worst place in the queue.
+    const pid = sim.addPlayer('mage', 'Elsewhere');
+    sim.chat('/dev level 20', pid);
+    enterDungeon(sim.ctx, 'hollow_crypt', pid);
+    const visitor = sim.ctx.entities.get(pid) as Entity;
+    const instB = claimedInstanceAt(sim.ctx, visitor.pos);
+    if (!instB || instB === s.f.inst) throw new Error('no second claim');
+    for (const id of instB.mobIds) {
+      const e = sim.ctx.entities.get(id);
+      if (e && !e.dead && e.templateId !== 'morthen') sim.ctx.handleDeath(e, visitor);
+    }
+    const o = instanceOrigin(DUNGEONS.hollow_crypt.index, instB.slot);
+    const b: Fight = { ...s.f, inst: instB, ox: o.x, oz: o.z, tank: visitor, others: [] };
+    visitor.maxHp = 1e7;
+    visitor.hp = 1e7;
+    visitor.devNoAggro = true;
+    const holdB = (): void => put(b, visitor, SOUTH.x, SOUTH.z);
+    holdB();
+    tick(s.f, () => {
+      s.keep();
+      holdB();
+    });
+    const lone = spawn(b, WARRIOR, NORTH);
+    let askedAt = -1;
+    let servedAt = -1;
+    let deferred = 0;
+    for (let i = 0; i < 20 / DT && servedAt < 0; i++) {
+      visitor.hp = 1e7;
+      tick(s.f, () => {
+        s.keep();
+        holdB();
+      });
+      const c = sim.mobScanCounters;
+      deferred += c.routeDeferred;
+      // The budget, every tick, with both instances asking.
+      expect(c.routeNodes).toBeLessThanOrEqual(ROUTE_NODES_PER_TICK);
+      if (askedAt < 0 && lone.chaseRoute !== undefined) askedAt = i;
+      if ((lone.chaseRoute?.path.length ?? 0) > 1) servedAt = i;
+    }
+    expect(askedAt).toBeGreaterThanOrEqual(0);
+    expect(servedAt).toBeGreaterThanOrEqual(askedAt);
+    // Served within a bounded wait of first asking: at worst its own slot,
+    // then a slot or two lost to mobs of the other instance due on it.
+    expect(servedAt - askedAt).toBeLessThanOrEqual(ROUTE_REPLAN_TICKS * 3);
+    // And it walks its doorway while the other instance is still stuck.
+    let through = false;
+    for (let i = 0; i < 20 / DT && !through; i++) {
+      visitor.hp = 1e7;
+      tick(s.f, () => {
+        s.keep();
+        holdB();
+      });
+      deferred += sim.mobScanCounters.routeDeferred;
+      expect(sim.mobScanCounters.routeNodes).toBeLessThanOrEqual(ROUTE_NODES_PER_TICK);
+      through = lone.pos.z - o.z < WALL_SOUTH_FACE;
+    }
+    expect(through).toBe(true);
+    expect(isBlocked(sim.cfg.seed, lone.pos.x, lone.pos.z, 0.35)).toBe(false);
+  });
+});
+
+describe('the watchdog and a mob that is only slow', () => {
+  it('a route walked at a crawl is not called wedged', () => {
+    const s = scene(new Set(), { x: 13, z: -44 }, { x: 13, z: -20 });
+    const ctx = s.f.sim.ctx;
+    const clock = s.f.sim as unknown as { tickCount: number };
+    const route = chaseRouteFor(ctx, s.mob, s.f.tank);
+    const o = { x: s.f.ox, z: s.f.oz };
+    // A real leg of open floor ahead of it, and no re-plan to muddy the watch.
+    route.path = [
+      { x: o.x + 13, y: 0, z: o.z - 36 },
+      { x: s.f.tank.pos.x, y: 0, z: s.f.tank.pos.z },
+    ];
+    route.planAt = clock.tickCount + 100000;
+    const start = dist2d(s.mob.pos, route.path[0]);
+    // A twentieth of a yard a second: half the watch's own yardstick, so an
+    // unguarded watch would call it wedged at its first deadline.
+    for (let i = 0; i < ROUTE_STUCK_TICKS * 6; i++) {
+      clock.tickCount += 1;
+      expect(followChaseRoute(ctx, s.mob, s.f.tank, 0.05)).toBe(true);
+    }
+    expect(route.fails).toBe(0);
+    expect(route.path).toHaveLength(2);
+    // It did creep forward the whole time.
+    expect(dist2d(s.mob.pos, route.path[0])).toBeLessThan(start);
   });
 });

@@ -7731,10 +7731,18 @@ export interface Entity extends ClientMirroredEntityFields {
   // deleted). Server-local: never on the wire.
   chaseRoute?: MobChaseRoute;
   // On a TARGET: the last route search toward it that found nothing, for the
-  // rest of the pack (mob/chase_route.ts): the tick, where the target stood
-  // and where the search began. A few seconds old at most when it is read;
-  // never cleared, only overwritten. Server-local: never on the wire.
-  routeDenied?: { tick: number; x: number; z: number; fromX: number; fromZ: number };
+  // rest of the pack (mob/chase_route.ts): the tick, where the target stood,
+  // where the search began and whether the asker swims. A few seconds old at
+  // most when it is read; never cleared, only overwritten. Server-local: never
+  // on the wire.
+  routeDenied?: {
+    tick: number;
+    x: number;
+    z: number;
+    fromX: number;
+    fromZ: number;
+    swim: boolean;
+  };
   chaseStall: number; // seconds an engaged mob has been pinned unable to close on its target; at CHASE_STALL_TIMEOUT (mob/reachability.ts) it evades home like a leash break
   evadeEpoch: number; // bumped every full evade-home reset (resetEvadingMob): a test-observable count of pulls this mob has walked home from
   chainPullInbound: boolean; // woken by a boss chain pull and still crossing to the puller; suspends the soft leash until it arrives (mob/chain_pull_transit.ts)

@@ -2220,8 +2220,8 @@ export class Sim {
   deedRuntime: DeedRuntime = createDeedRuntime();
   // Mob-AI per-tick tallies (mob/scan_counters.ts): reset at the top of each
   // tick, incremented in place through ctx, read by the host after tick(). Not
-  // persisted. The visit counts are observability only; routeNodes is also the
-  // tick's route-search budget (deterministic: only the sim resets the holder).
+  // persisted. The visit counts are observability only; routeNodes and sightQueries
+  // are also the tick's two budgets (deterministic: only the sim resets the holder).
   private readonly _mobScanCounters = createMobScanCounters();
   // World-boss scheduler, one slot per WORLD_BOSSES entry. `nextAt` is the next
   // sim-time (seconds) a boss is due to rise; `entityId` is the live boss entity
@@ -5967,9 +5967,9 @@ export class Sim {
     // The mob loop additionally passes the mob it just updated as a sub-phase tag so
     // the host can split mob.update per zone; every other call omits it.
     const lap = this.cfg.perfLap;
-    // Zero the mob-AI scan visit counters for this tick before any tick work runs, so
-    // the getter reads this tick's totals once tick() returns (observability only,
-    // draws no rng, mutates no gameplay state).
+    // Zero the mob-AI per-tick tallies before any tick work runs, so the getter reads
+    // this tick's totals once tick() returns. Draws no rng. Two of them are also the
+    // tick's budgets (routeNodes, sightQueries: mob/scan_counters.ts): only the sim resets.
     resetMobScanCounters(this._mobScanCounters);
     this.updatePendingMobRespawns();
     lap?.('respawns');

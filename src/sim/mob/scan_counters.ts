@@ -8,13 +8,15 @@
 // The route and sight tallies (mob/chase_route.ts, mob/cast_sight.ts,
 // mob/trash_kit/kit_cast_sight.ts) ride the same holder because it is the one
 // per-tick tally the sim already owns and resets itself: route searches made
-// this tick, cells they judged, searches that found nothing, and line-of-sight
-// queries mob casts asked for. ONE of them is more than a readout:
-// `routeNodes` is also the tick's route budget (chase_route.ts refuses a new
-// search once ROUTE_NODES_PER_TICK cells have been judged). That is sound, and
-// deterministic on every host, only because the SIM resets this holder at the
-// top of its own tick() (never the host) and serves mobs in entity order; a
-// host that zeroed it mid-tick would hand mobs searches another host refused.
+// this tick, cells they judged, searches that found nothing, mobs the route
+// budget put off, and line-of-sight queries mob casts asked for. TWO of them
+// are more than a readout: `routeNodes` is also the tick's route budget
+// (chase_route.ts refuses a new search once ROUTE_NODES_PER_TICK cells have
+// been judged) and `sightQueries` the tick's sight budget (cast_sight.ts: past
+// SIGHT_QUERIES_PER_TICK a cast that would begin waits a tick). That is sound,
+// and deterministic on every host, only because the SIM resets this holder at
+// the top of its own tick() (never the host) and serves mobs in entity order;
+// a host that zeroed it mid-tick would hand mobs work another host refused.
 // The host reads them like the rest (Sim.mobScanCounters) after tick().
 
 export interface MobScanCounters {
@@ -26,7 +28,10 @@ export interface MobScanCounters {
   routeNodes: number;
   /** Searches this tick that found no route (none exists, or the cap). */
   routeFailed: number;
-  /** Line-of-sight queries mob casts asked for this tick. */
+  /** Mobs the tick's route budget put back to their next plan slot. */
+  routeDeferred: number;
+  /** Line-of-sight queries mob casts asked for this tick, and the tick's
+   *  sight budget. */
   sightQueries: number;
 }
 
@@ -37,6 +42,7 @@ export function createMobScanCounters(): MobScanCounters {
     routePlans: 0,
     routeNodes: 0,
     routeFailed: 0,
+    routeDeferred: 0,
     sightQueries: 0,
   };
 }
@@ -47,5 +53,6 @@ export function resetMobScanCounters(c: MobScanCounters): void {
   c.routePlans = 0;
   c.routeNodes = 0;
   c.routeFailed = 0;
+  c.routeDeferred = 0;
   c.sightQueries = 0;
 }

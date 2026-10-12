@@ -69,7 +69,14 @@ import {
 import { stepDeathBurst } from './death_burst';
 import { callDownLastFlier } from './flier_call';
 import { applyFreezeStack } from './freeze_stacks';
-import { KIT_SIGHT_KEYS, KIT_SIGHT_RETRY, kitSightRetry, kitVictimHidden } from './kit_cast_sight';
+import {
+  KIT_SIGHT_KEYS,
+  KIT_SIGHT_RETRY,
+  KIT_SIGHT_WAIT,
+  kitSightRetry,
+  kitVictimHidden,
+  pickSeenVictim,
+} from './kit_cast_sight';
 import type { KitCastDropReason, KitCastPick, TrashKitExtension } from './kit_extension';
 import { stepKitHazard } from './kit_hazard';
 import { landNova, novaCastIdFor, novaReady } from './kit_nova';
@@ -770,23 +777,23 @@ function tryStartCast(
     if (!first.ok) continue;
     let target = first.target;
     // A cast at one player begins only at a player the caster can see
-    // (kit_cast_sight.ts). A hidden pick is set aside and the cast's own pick
-    // is drawn again from the rest (so its rules still hold: never the tank
-    // while another stands there), one sight query a draw, stopping at the
-    // first player in sight; with nobody in sight the cast waits and looks
-    // again. The picks are pure, so drawing twice changes nothing else.
+    // (kit_cast_sight.ts pickSeenVictim). A hidden pick is set aside and the
+    // cast's own pick is drawn again from the rest (so its rules still hold:
+    // never the tank while another stands there), a bounded number of times;
+    // with nobody in sight the cast waits and looks again, and with the
+    // tick's sight budget spent it simply tries next tick. The picks are
+    // pure, so drawing twice changes nothing else.
     if (needsSight(key) && target !== null) {
-      let pool: readonly Entity[] = players;
-      while (target !== null && kitVictimHidden(ctx, mob, target)) {
-        const hidden = target;
-        pool = pool.filter((p) => p !== hidden);
-        const again = pool.length > 0 ? readyPick(ctx, inst, mob, kit, key, st, pool) : null;
-        target = again?.ok ? again.target : null;
-      }
-      if (target === null) {
+      const seen = pickSeenVictim(ctx, mob, target, players, (pool) => {
+        const again = readyPick(ctx, inst, mob, kit, key, st, pool);
+        return again.ok ? again.target : null;
+      });
+      if (seen === KIT_SIGHT_WAIT) return;
+      if (seen === null) {
         st.timers[key] = kitSightRetry(mob);
         continue;
       }
+      target = seen;
     }
     st.timers[key] = def.every;
     st.casts++;

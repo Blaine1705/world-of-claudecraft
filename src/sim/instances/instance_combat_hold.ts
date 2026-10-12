@@ -19,6 +19,16 @@
 // the pull nor chip a pinned mob down for free, and a perch only buys a few
 // seconds, which is what a kited chain pull was being farmed for.
 //
+// CASTERS TOO, by decision. A petSpell caster that obeys the sight rule
+// (mob/cast_sight.ts) is "in reach" at spell range only while it SEES its
+// target. In spell range of a target behind a sealed gate it used to stand and
+// cast through the wall; now it closes, finds no route, stalls and is held
+// here exactly like a melee mob, then comes through and casts from the far
+// side. It is the same anti-exploit fallback melee has always had in a slot,
+// and it happens only when no route exists. Bosses are not swept in: they
+// obey neither the sight rule nor the route planner (mob/encounter_body.ts).
+// Pinned by tests/mob_cast_line_of_sight.test.ts.
+//
 // Scope: the dungeon and raid slots in ctx.instances. Rifts and delves keep
 // their own instance records and the open-world rules (the hate-table reach in
 // threat.ts THREAT_DROP_RANGE, the leashes, the evade-home stall).
