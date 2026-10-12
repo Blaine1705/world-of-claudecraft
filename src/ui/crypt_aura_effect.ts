@@ -34,6 +34,7 @@ import {
   ILVANE_TUNING,
 } from '../sim/encounters/hollow_crypt/ilvane_ids';
 import {
+  embraceBreakShare,
   LADY_EMBRACED,
   LADY_ID,
   LADY_LAMENT_DREAD,
@@ -158,6 +159,9 @@ export function cryptAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
           tick: L.embracePerSecond,
           tickHeroic: cryptHeroicAmount(LADY_ID, L.embracePerSecond),
           share: pct(L.embraceBreakShare),
+          // Her heroic pool is larger, so its share is smaller (one decimal:
+          // the damage it asks for is the same as before the pool was raised).
+          shareHeroic: Math.round(embraceBreakShare(true) * 1000) / 10,
           hold: L.embraceHold,
           ...range(LADY_ID, L.dropMin, L.dropMax),
         },

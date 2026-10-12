@@ -12,6 +12,7 @@ import { MOBS } from '../src/sim/data';
 import {
   BONECHILL_RAVINE,
   EMBRACE_LIFT,
+  embraceBreakShare,
   GRAVE_LANTERNS,
   LADY_BRIDAL_FREEZE,
   LADY_BRIDES_LAMENT,
@@ -243,6 +244,54 @@ describe('the Lady of the Bonechill: the Frozen Embrace', () => {
     expect(took(f, victim, 'Shattering Fall', from)).toBe(0);
     expect(st(lady).embrace).toBeNull();
     expect(st(lady).dropped).toBe(false);
+  });
+
+  // The Embrace's absolute difficulty on heroic is what it was before her
+  // heroic pool was raised (dungeon_difficulty.ts): 6 percent of 18,382 was
+  // 1,103 damage, and her heroic share of 24,999 is 1,103 still. Normal keeps
+  // its 6 percent of 3,998.
+  it.each([
+    ['normal', 3998, 240],
+    ['heroic', 24999, 1103],
+  ] as const)(
+    'on %s she lets go at exactly the damage the share asks of her real pool',
+    (difficulty, pool, needed) => {
+      const heroic = difficulty === 'heroic';
+      expect(Math.ceil(embraceBreakShare(heroic) * pool - 1e-6)).toBe(needed);
+      const { f, lady } = ladyFight(difficulty);
+      // Her real pool for the difficulty (the rig's own is a million).
+      lady.maxHp = pool;
+      lady.hp = pool;
+      const keep = holdAll(f);
+      run(f, DT, keep);
+      const s = st(lady);
+      s.lamentTimer = 999;
+      s.embraceTimer = 0;
+      expect(
+        until(f, () => lady.castingAbility === LADY_EMBRACE_HOLD, T.embraceCast + 1.2, keep),
+      ).toBe(true);
+      run(f, T.embraceRise + 0.1, keep);
+      const held = f.others.filter((p) => p.carriedBy === lady.id);
+      expect(held).toHaveLength(heroic ? T.embraceVictimsHeroic : T.embraceVictims);
+      // One point short of the share: she holds on.
+      lady.hp = pool - (needed - 1);
+      run(f, 0.5, keep);
+      expect(held.every((p) => p.carriedBy === lady.id)).toBe(true);
+      // The last point: she sets them down, and nobody is dropped.
+      lady.hp = pool - needed;
+      run(f, T.embraceSetDown + 0.3, keep);
+      expect(held.every((p) => p.carriedBy === undefined)).toBe(true);
+      expect(st(lady).dropped).toBe(false);
+    },
+  );
+
+  it('keeps the heroic share apart from the normal one', () => {
+    expect(T.embraceBreakShare).toBe(0.06);
+    expect(T.embraceBreakShareHeroic).toBe(0.0441);
+    expect(embraceBreakShare(false)).toBe(T.embraceBreakShare);
+    expect(embraceBreakShare(true)).toBe(T.embraceBreakShareHeroic);
+    // What the old heroic pool asked for under the one share.
+    expect(Math.ceil(T.embraceBreakShare * 18382 - 1e-6)).toBe(1103);
   });
 
   it('drops them onto the ice when the hold runs out, and the impact lands as they land', () => {

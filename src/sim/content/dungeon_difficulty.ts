@@ -581,8 +581,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // about 18,400 on 1,532) until the owner's heroic playtest of 2026-10-12
     // ("she lasted almost nothing"): she now carries about 25,000 (24,999),
     // about 109 s at the planning 230. Her Frozen Embrace breaks on a share
-    // of her pool (LADY_TUNING.embraceBreakShare), so its threshold rose
-    // with it, from about 1,103 to about 1,500.
+    // of her pool, and heroic carries its own (LADY_TUNING
+    // .embraceBreakShareHeroic) so the damage that frees the held stays the
+    // 1,103 it was: more health was asked for, not a harder Embrace.
     healthMultiplierByMob: {
       sexton_marrow: 11.4,
       rimeweb: 16.32,

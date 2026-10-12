@@ -498,6 +498,7 @@ describe('the crypt aura tooltips', () => {
         tick: L.embracePerSecond,
         tickHeroic: heroic(LADY_ID, L.embracePerSecond),
         share: pct(L.embraceBreakShare),
+        shareHeroic: 4.4,
         hold: L.embraceHold,
         min: L.dropMin,
         max: L.dropMax,

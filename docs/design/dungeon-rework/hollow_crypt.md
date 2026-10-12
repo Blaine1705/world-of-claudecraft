@@ -249,9 +249,13 @@ priced like the others (80 s x 230: multiplier 12, about 18,400). A well-geared
 level 20 party killed her far faster than that ("she lasted almost nothing"), so
 the owner set her at about 25,000 (multiplier 16.32: 24,999, about 109 s at the
 planning 230). Normal is untouched. Her Frozen Embrace breaks on a share of her
-pool (`LADY_TUNING.embraceBreakShare`, 6 percent), so its heroic threshold rose
-with the pool, from about 1,103 to about 1,500 dealt between the seize and the end
-of the hold (a 1.5 s rise plus an 8 s hold); the share itself was not retuned.
+pool, and the owner asked for more health, not a harder Embrace, so heroic carries
+its own share (`LADY_TUNING.embraceBreakShareHeroic`, 4.41 percent, read through
+`embraceBreakShare`): the damage that frees the held stays the 1,103 it was (6
+percent of the old 18,382), dealt between the seize and the end of the hold (a
+1.5 s rise plus an 8 s hold). Normal keeps 6 percent of 3,998 (240). What the
+longer fight does bring is its intended cost: at the planning 230 a third Embrace
+(one every 30 s from 24 s) and a fifth Lament (one every 22 s) inside the 109 s.
 
 **Heroic mechanic damage** rides `mechanicDamageMultiplierByMob` (Marrow 6, the Lady
 5, Ilvane 8) on heroic cloth of about 1,250: the Toll about 18 percent (see below), a
@@ -284,7 +288,7 @@ are untouched.
 | Mechanic | Rule | Normal numbers (percent of cloth 310) |
 |---|---|---|
 | Bride's Lament | every 22 s a 3 s wail; when it lands, everyone not sheltered by a lit lantern takes it. A lantern shelters two (nearest first) and goes dark 28 s after sheltering anyone (it misses the next Lament; kindling over the last 4) | 60 to 75 frost (about 22), half again per Lingering Lament stack (45 s, three stacks): the group splits across the lanterns and takes turns in the dark |
-| Frozen Embrace | every 30 s a 1.2 s bar on a non-tank; she rises 5 yd with them for up to 8 s (the held are stunned and carried) | 6 frost a second; 6 percent of her health dealt in time and she sets them down, else she drops them for 150 to 180 (about 53) |
+| Frozen Embrace | every 30 s a 1.2 s bar on a non-tank; she rises 5 yd with them for up to 8 s (the held are stunned and carried) | 6 frost a second; 6 percent of her health dealt in time (4.41 percent on heroic, the same 1,103 damage as before her heroic pool was raised) and she sets them down, else she drops them for 150 to 180 (about 53) |
 | Rime Path | a slick patch every 2.5 yd she drifts (25 s, 14 at most) | slippery ground: momentum at 8 yd/s per second of grip |
 | Bridal Freeze | at half health a 2.5 s wail, then the whole ravine floor is ice for the rest of the fight | |
 | Heroic | each lantern also burns out on its own 30 s after it is lit (dark 10 s); the Embrace takes two | |
