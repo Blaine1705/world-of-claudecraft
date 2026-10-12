@@ -11,7 +11,9 @@ warrior, three tracked quests (eight in the long-list shot), `/dev crypt enter`,
 boss kills through `/dev crypt kill <boss>`. The finished run goes through `/dev crypt wyrm`
 and the Knellwyrm that follows, because Morthen's row waits for the finale.
 
-Desktop is 1920 x 1080 unless the name says otherwise; the phone is 874 x 402 landscape.
+Desktop is 1920 x 1080 unless the name says otherwise. The phone shots are landscape:
+the before at 874 x 402, and the after at 844 x 390 from the shot target below (software
+rendering, so its camera sits differently; the HUD is what the pair compares).
 
 | View | Before | After |
 | --- | --- | --- |
@@ -29,7 +31,8 @@ After only (the base has nothing to show for these):
 
 On the phone the right stack's seat sits on the action ring, so the plate stands down and
 the run is a page of the top-band quest strip instead (the dungeon as the title, each boss
-a counted line).
+a counted line). The page sits after the tracked quests, so with three quests it is page
+4 of 4, and stepping into the dungeon brings the strip to it.
 
 To reshoot: `scripts/pr_shot_targets.mjs` carries the `dungeon-objectives-tracker` target
 (entry, a boss down, a finished heroic run, and the phone), which `scripts/pr_screenshots.mjs`

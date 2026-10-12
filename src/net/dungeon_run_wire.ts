@@ -21,6 +21,29 @@ function record(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+/** Do two runs say the same thing, row for row? */
+export function sameDungeonRun(a: DungeonRunView, b: DungeonRunView): boolean {
+  if (a.dungeonId !== b.dungeonId || a.difficulty !== b.difficulty) return false;
+  if (a.bosses.length !== b.bosses.length) return false;
+  for (let i = 0; i < a.bosses.length; i++) {
+    const x = a.bosses[i];
+    const y = b.bosses[i];
+    if (x.mobId !== y.mobId || x.defeated !== y.defeated) return false;
+  }
+  return true;
+}
+
+/**
+ * The mirror after one `dgrun` frame: the decoded run, except that a frame
+ * repeating the run already held (the server re-sends every key to a session
+ * whose delta cache it reset) keeps the object already held, which is what
+ * makes the mirror reference-stable the way the seam promises.
+ */
+export function nextDungeonRun(held: DungeonRunView | null, value: unknown): DungeonRunView | null {
+  const decoded = decodeDungeonRun(value);
+  return held && decoded && sameDungeonRun(held, decoded) ? held : decoded;
+}
+
 /** The decoded run, or null for an absent, cleared or malformed frame. */
 export function decodeDungeonRun(value: unknown): DungeonRunView | null {
   if (!record(value)) return null;

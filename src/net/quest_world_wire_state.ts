@@ -12,7 +12,7 @@ import type {
 import type { ActivityChoice } from '../sim/world_quest_activity';
 import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
 import type { DungeonRunView, HoardBossCueView } from '../world_api/dungeons';
-import { decodeDungeonRun } from './dungeon_run_wire';
+import { nextDungeonRun } from './dungeon_run_wire';
 import { HoardBossCueMirror } from './hoard_boss_cue_mirror';
 import { applyQuestSelfWire } from './quest_snapshot_wire';
 import { decodeVehicleSession } from './vehicle_session_wire';
@@ -104,7 +104,7 @@ export class QuestWorldWireState {
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
     if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
     // Delta key: absent means unchanged, an explicit null means the run ended.
-    if (self.dgrun !== undefined) this.dungeonRun = decodeDungeonRun(self.dgrun);
+    if (self.dgrun !== undefined) this.dungeonRun = nextDungeonRun(this.dungeonRun, self.dgrun);
   }
 
   enterVehicle(stationId: string): void {

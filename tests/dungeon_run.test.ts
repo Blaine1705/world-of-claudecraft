@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
 import { DUNGEONS, MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { dungeonGateBossIds } from '../src/sim/instances/dungeon_gates';
 import {
   dungeonRunForClaim,
@@ -325,9 +326,9 @@ describe('dungeon run (live claim)', () => {
 });
 
 describe("dungeon run: the Hollow Crypt's finale belongs to Morthen's row", () => {
-  function atTheFinale() {
+  function atTheFinale(difficulty: DungeonDifficulty = 'normal') {
     const sim = makeSim();
-    const inst = enter(sim, 'hollow_crypt');
+    const inst = enter(sim, 'hollow_crypt', difficulty);
     for (const boss of ['sexton_marrow', 'rimeweb', 'cantor_ilvane']) kill(sim, inst, boss);
     // The dev shortcut a playtest uses: skip his entrance, then slay him, which
     // is the only way he can die (he is immune until he lands).
@@ -347,23 +348,47 @@ describe("dungeon run: the Hollow Crypt's finale belongs to Morthen's row", () =
     expect(rows(sim)?.[3]).toEqual(['morthen', false]);
   });
 
-  it('stays open through the whole finale and closes when the Knellwyrm dies', () => {
-    const { sim, wyrm } = atTheFinale();
+  it.each(['normal', 'heroic'] as const)(
+    'stays open through the whole %s finale and closes when the Knellwyrm dies',
+    (difficulty) => {
+      const { sim, wyrm } = atTheFinale(difficulty);
+      expect(sim.dungeonRun?.difficulty).toBe(difficulty);
+      for (let i = 0; i < 20 * 3 && !wyrm(); i++) sim.tick();
+      const body = wyrm();
+      expect(body, 'the encounter summoned the Knellwyrm').toBeDefined();
+      expect(body?.dead).toBe(false);
+      const during = sim.dungeonRun;
+      expect(rows(sim)).toEqual([
+        ['sexton_marrow', true],
+        ['rimeweb', true],
+        ['cantor_ilvane', true],
+        ['morthen', false],
+      ]);
+      for (let i = 0; i < 20 * 5; i++) sim.tick();
+      expect(sim.dungeonRun).toBe(during);
+      sim.ctx.handleDeath(body as Entity, sim.player);
+      expect(sim.dungeonRun?.bosses.every((b) => b.defeated)).toBe(true);
+    },
+  );
+
+  it('never answers for a finale body that is gone: a re-summoned one is read afresh', () => {
+    // No encounter drops and re-summons the Knellwyrm today, but one that did
+    // must not leave the row answering for the body it remembered.
+    const { sim, inst, wyrm } = atTheFinale();
     for (let i = 0; i < 20 * 3 && !wyrm(); i++) sim.tick();
-    const body = wyrm();
-    expect(body, 'the encounter summoned the Knellwyrm').toBeDefined();
-    expect(body?.dead).toBe(false);
-    const during = sim.dungeonRun;
-    expect(rows(sim)).toEqual([
-      ['sexton_marrow', true],
-      ['rimeweb', true],
-      ['cantor_ilvane', true],
-      ['morthen', false],
-    ]);
-    for (let i = 0; i < 20 * 5; i++) sim.tick();
-    expect(sim.dungeonRun).toBe(during);
-    sim.ctx.handleDeath(body as Entity, sim.player);
-    expect(sim.dungeonRun?.bosses.every((b) => b.defeated)).toBe(true);
+    const first = wyrm() as Entity;
+    expect(rows(sim)?.[3]).toEqual(['morthen', false]);
+    // The first body leaves the world alive (never a kill).
+    inst.mobIds.splice(inst.mobIds.indexOf(first.id), 1);
+    sim.ctx.dropEntity(first.id);
+    expect(rows(sim)?.[3]).toEqual(['morthen', false]);
+    // A second one is summoned in its place and then really dies.
+    const second = createMob(sim.ctx.nextId++, MOBS.crypt_knellwyrm, 10, { ...first.pos });
+    sim.ctx.addEntity(second);
+    inst.mobIds.push(second.id);
+    expect(rows(sim)?.[3]).toEqual(['morthen', false]);
+    sim.ctx.handleDeath(second, sim.player);
+    expect(rows(sim)?.[3]).toEqual(['morthen', true]);
   });
 
   it('a new claim never reads the last run`s dead Knellwyrm', () => {

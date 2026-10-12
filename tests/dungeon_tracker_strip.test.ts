@@ -1,8 +1,9 @@
 // The dungeon run on TOUCH: there the right-anchored trackers give way to the
 // top-band quest strip, so the run rides the strip as a page of its own
 // (QuestTrackerController hands it over through its dungeonRow dep). Pinned
-// here: the page leads the strip, takes it once on first sight, never reaches
-// the desktop tracker, and the real strip core then shows every boss.
+// here: the page trails the quests so nothing shifts under the selection, takes
+// the strip once on first sight, never reaches the desktop tracker, and the
+// real strip core then shows every boss.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
@@ -133,17 +134,17 @@ describe('dungeon run on the touch quest strip', () => {
     expect(stripFocus(r)).toBeUndefined();
   });
 
-  it('leads the strip inside a dungeon and takes it once, on first sight', () => {
+  it('joins the strip after the quests and takes it once, on first sight', () => {
     const r = rig(true);
     r.controller.update(0);
     r.world.dungeonRun = run();
     r.controller.update(1);
-    expect(stripIds(r)).toEqual(['dungeon:hollow_crypt:normal', 'q_wolves']);
+    expect(stripIds(r)).toEqual(['q_wolves', 'dungeon:hollow_crypt:normal']);
     expect(stripFocus(r)).toBe('dungeon:hollow_crypt:normal');
     // Every later tick leaves the selection alone, so the player can cycle away.
     for (const now of [2, 3, 4]) {
       r.controller.update(now);
-      expect(stripIds(r)).toEqual(['dungeon:hollow_crypt:normal', 'q_wolves']);
+      expect(stripIds(r)).toEqual(['q_wolves', 'dungeon:hollow_crypt:normal']);
       expect(stripFocus(r)).toBeUndefined();
     }
   });
@@ -152,7 +153,7 @@ describe('dungeon run on the touch quest strip', () => {
     const r = rig(true);
     r.world.dungeonRun = run(['sexton_marrow', 'rimeweb'], 'heroic');
     r.controller.update(0);
-    const page = stripQuests(r)[0];
+    const page = stripQuests(r)[1];
     expect(page).toMatchObject({
       id: 'dungeon:hollow_crypt:heroic',
       title: 'hollow_crypt (H)',
@@ -213,18 +214,26 @@ describe('dungeon run on the touch quest strip', () => {
 });
 
 describe('the real strip core over the dungeon page', () => {
-  const pages = (defeated: readonly string[]): TrackedQuest[] => {
+  const pages = (defeated: readonly string[], wolvesSlain = 0): TrackedQuest[] => {
     const page = dungeonStripQuest({ dungeonRun: run(defeated) }, TEXT);
     if (!page) throw new Error('no page');
-    return [page, { id: 'q_wolves', number: 1, title: 'Wolves', complete: false, objectives: [] }];
+    const wolves = {
+      id: 'q_wolves',
+      number: 1,
+      title: 'Wolves',
+      complete: false,
+      objectives: [{ label: 'Wolf', current: wolvesSlain, total: 8 }],
+    };
+    // The order the controller hands the strip: the quests, then the run.
+    return [wolves, page];
   };
 
   it('shows all four bosses of the page without trimming any', () => {
-    const view = questStripView(pages(['rimeweb']), 0);
+    const view = questStripView(pages(['rimeweb']), 1);
     expect(view.title).toBe('hollow_crypt');
     expect(view.hiddenObjectives).toBe(0);
     expect(view.objectives.map((o) => o.done)).toEqual([false, true, false, false]);
-    expect(view.counter).toMatchObject({ position: 1, total: 2, visible: true });
+    expect(view.counter).toMatchObject({ position: 2, total: 2, visible: true });
   });
 
   it('a boss falling brings the strip back to the dungeon page', () => {
@@ -236,11 +245,35 @@ describe('the real strip core over the dungeon page', () => {
       now: 60_000,
       lastCycleAt: 0,
     });
+    expect(jump).toBe(1);
+  });
+
+  it('a quest that progressed on the same tick as the kill keeps the strip', () => {
+    // "Slay the boss" quests complete on the very tick the boss falls: the
+    // quest is what the player is being given credit for, and it is listed
+    // first, so it wins the tie.
+    const jump = questStripProgressJump({
+      previous: pages([], 0),
+      next: pages(['sexton_marrow'], 1),
+      now: 60_000,
+      lastCycleAt: 0,
+    });
     expect(jump).toBe(0);
   });
 
+  it('coming and going never moves the quests under the selection', () => {
+    // The selection is positional. The page sits after the quests, so a quest
+    // keeps its index when the page appears and when it leaves.
+    const without = pages([]).slice(0, 1);
+    const withPage = pages([]);
+    expect(withPage.findIndex((quest) => quest.id === 'q_wolves')).toBe(
+      without.findIndex((quest) => quest.id === 'q_wolves'),
+    );
+    expect(withPage[withPage.length - 1].id).toBe('dungeon:hollow_crypt:normal');
+  });
+
   it('marks the page complete when the last boss falls', () => {
-    expect(questStripView(pages([...CRYPT]), 0).complete).toBe(true);
-    expect(questStripView(pages(['morthen']), 0).complete).toBe(false);
+    expect(questStripView(pages([...CRYPT]), 1).complete).toBe(true);
+    expect(questStripView(pages(['morthen']), 1).complete).toBe(false);
   });
 });

@@ -287,13 +287,16 @@ export class QuestTrackerController {
     // On touch the strip IS the tracker: the right-anchored markup is hidden in
     // hud.mobile.css, so rendering it would be a string build a phone never sees.
     if (this.strip?.active() === true) {
-      // The dungeon run leads the strip as a page of its own. It takes the
-      // strip ONCE, on the tick it first appears (stepping into the dungeon),
-      // and is an ordinary page after that: the player can cycle away, and a
-      // boss falling brings it back through the strip's own progress jump.
+      // The dungeon run joins the strip as a page of its own, AFTER the quests:
+      // the selection is positional, so a page that came and went at the front
+      // would shift every quest under the player's thumb. It takes the strip
+      // ONCE, on the tick it first appears (stepping into the dungeon), and is
+      // an ordinary page after that: the player can cycle away, and a boss
+      // falling brings it back through the strip's own progress jump (which a
+      // quest that progressed on the same tick still wins, being listed first).
       const dungeon = this.deps.dungeonRow?.() ?? null;
       if (dungeon) {
-        quests.unshift(dungeon);
+        quests.push(dungeon);
         if (dungeon.id !== this.lastDungeonRowId) focusQuestId ??= dungeon.id;
       }
       this.lastDungeonRowId = dungeon ? dungeon.id : null;

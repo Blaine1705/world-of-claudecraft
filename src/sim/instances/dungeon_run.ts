@@ -44,7 +44,11 @@ export interface DungeonRunPlanRow {
   finaleId: string | null;
 }
 
-const plans = new Map<string, readonly DungeonRunPlanRow[] | null>();
+// Per difficulty, then per dungeon id: a lookup builds no key string.
+const plans: Record<DungeonDifficulty, Map<string, readonly DungeonRunPlanRow[] | null>> = {
+  normal: new Map(),
+  heroic: new Map(),
+};
 
 /**
  * The boss rows of a dungeon at a difficulty, in route order, or null for a
@@ -55,11 +59,11 @@ export function dungeonRunPlan(
   dungeonId: string,
   difficulty: DungeonDifficulty,
 ): readonly DungeonRunPlanRow[] | null {
-  // The catalogue's stable activity id (content/dungeon_finder.ts).
-  const key = `${dungeonId}_${difficulty}`;
-  const cached = plans.get(key);
+  const byDungeon = plans[difficulty];
+  const cached = byDungeon.get(dungeonId);
   if (cached !== undefined) return cached;
-  const activity = finderActivity(key);
+  // The catalogue's stable activity id (content/dungeon_finder.ts).
+  const activity = finderActivity(`${dungeonId}_${difficulty}`);
   const dungeon = DUNGEONS[dungeonId];
   let plan: readonly DungeonRunPlanRow[] | null = null;
   if (activity && dungeon && activity.kind === 'dungeon' && activity.encounters.length > 0) {
@@ -70,7 +74,7 @@ export function dungeonRunPlan(
         encounter.final === true && after !== undefined && after !== encounter.mobId ? after : null,
     }));
   }
-  plans.set(key, plan);
+  byDungeon.set(dungeonId, plan);
   return plan;
 }
 
@@ -83,7 +87,11 @@ const finaleBodies = new WeakMap<InstanceSlot, { claimId: number; mobId: number 
 function finaleDead(ctx: SimContext, inst: InstanceSlot, templateId: string): boolean {
   const known = finaleBodies.get(inst);
   if (known && known.claimId === inst.exitId) {
-    return ctx.entities.get(known.mobId)?.dead ?? true;
+    const body = ctx.entities.get(known.mobId);
+    if (body) return body.dead;
+    // The remembered body is gone (an encounter that drops and re-summons its
+    // finale): forget it and look again, never answer for a missing body.
+    finaleBodies.delete(inst);
   }
   // An encounter appends what it summons AFTER the placed roster (one mob per
   // DungeonSpawn, in order: claimInstance), so only that tail is searched, and
