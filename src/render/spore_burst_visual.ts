@@ -28,6 +28,10 @@ const TIMER_GAP = 0.45;
  *  nameplate), so it reads at any range: this is its height as a fraction of
  *  the viewport. */
 const TIMER_SCREEN_HEIGHT = 0.05;
+/** The countdown floats above the mushroom, off the floor ladder: like a
+ *  nameplate it draws after every floor band (depthTest off), so no telegraph
+ *  can cover the number. */
+const TIMER_RENDER_ORDER = 1000;
 const RING_WIDTH = 0.14;
 const RING_SEGMENTS = 64;
 const GROUND_LIFT = 0.06;
@@ -219,7 +223,7 @@ export class SporeBurstVisuals {
         TIMER_SCREEN_HEIGHT,
         1,
       );
-      sprite.renderOrder = 1000;
+      sprite.renderOrder = TIMER_RENDER_ORDER;
       root.add(sprite);
       visual.timer = sprite;
       visual.timerMaterial = material;
