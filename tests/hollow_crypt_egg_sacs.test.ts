@@ -51,31 +51,50 @@ describe('heroic move-speed floor', () => {
     );
   });
 
-  it('never mobilizes an immobile template in any heroic dungeon', () => {
-    // Every template authored immobile, placed or summoned by an encounter
-    // (cages, anchors, shackles, totems, hydra heads, the sacs), through every
-    // heroic transform.
+  it('never mobilizes an immobile template in any heroic dungeon or raid', () => {
+    // Every template authored immobile, placed or summoned by an encounter,
+    // through every heroic record (the five-mans and the raid rooms).
     const immobile = Object.values(MOBS).filter((m) => m.moveSpeed <= 0);
-    expect(immobile.map((m) => m.id)).toContain(EGG);
-    expect(immobile.length).toBeGreaterThan(10);
-    for (const dungeonId of HEROIC_DUNGEON_IDS) {
+    const ids = new Set(immobile.map((m) => m.id));
+    // One of each kind the shared floor used to set walking: the sacs, a
+    // summoned totem, a rooted boss and its parts, shackles, a cage, raid
+    // set pieces.
+    for (const id of [
+      EGG,
+      'sunbone_totem',
+      'the_gorgebloom',
+      'ysolei',
+      'choirmother_selthe',
+      'mere_hydra_head_center',
+      'sanctum_shackle_hammer',
+      'bastion_gaol_cage',
+      'crypt_bone_pile',
+      'nythraxis_bone_spike',
+      'ignivar_heart_of_the_end',
+    ])
+      expect(ids.has(id), id).toBe(true);
+    const heroicIds = [...HEROIC_DUNGEON_IDS].filter((id) => DUNGEONS[id] !== undefined);
+    expect(heroicIds).toEqual(
+      expect.arrayContaining([
+        'hollow_crypt',
+        'sunken_bastion',
+        'drowned_temple',
+        'wildheart_basin',
+        'gravewyrm_sanctum',
+        'nythraxis_boss_arena',
+      ]),
+    );
+    for (const dungeonId of heroicIds) {
       for (const base of immobile) {
         const heroic = mobTemplateForDungeonDifficulty(base, dungeonId, 'heroic');
         expect(heroic.moveSpeed, `${dungeonId} ${base.id}`).toBe(base.moveSpeed);
       }
-    }
-    // And every placed walker of the five-mans still gets the floor.
-    for (const dungeonId of [
-      'hollow_crypt',
-      'sunken_bastion',
-      'drowned_temple',
-      'wildheart_basin',
-      'gravewyrm_sanctum',
-    ]) {
+      // And every placed walker of that dungeon or raid room still gets the floor.
       for (const spawn of DUNGEONS[dungeonId].spawns) {
         const base = MOBS[spawn.mobId];
         if (base.moveSpeed <= 0) continue;
         const heroic = mobTemplateForDungeonDifficulty(base, dungeonId, 'heroic');
+        if (heroic === base) continue; // a room with no heroic record of its own
         expect(heroic.moveSpeed, `${dungeonId} ${spawn.mobId}`).toBeGreaterThanOrEqual(
           HEROIC_MIN_MOVE_SPEED,
         );

@@ -8,17 +8,11 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import {
-  HEROIC_DUNGEON_TUNING,
-  NORMAL_DUNGEON_TUNING,
-} from '../src/sim/content/dungeon_difficulty';
-import {
-  KNELL_TUNING,
   KNELLWYRM_BARED_RIBS,
   KNELLWYRM_DREAD_BELLOW,
   KNELLWYRM_ID,
   KNELLWYRM_KNELL_MARK,
   KNELLWYRM_PYRE_STRAFE,
-  KNELLWYRM_TUNING,
   MORTHEN_ID,
   MORTHEN_SPOT,
 } from '../src/sim/encounters/hollow_crypt';
@@ -36,6 +30,8 @@ vi.setConfig({ testTimeout: 300_000 });
 /** The planning numbers the pool is derived from. */
 const FIGHT_SECONDS = 80;
 const PARTY_DPS = { normal: 55, heroic: 230 } as const;
+/** The live pool that gives (dungeon_difficulty.ts 4.07 and 9.64). */
+const POOL = { normal: 4400, heroic: 18403 } as const;
 /** What it spawned with before: its bare template. */
 const BARE = { normal: 1081, heroic: 7254 } as const;
 /** Its melee and mechanic factor, untouched. */
@@ -73,40 +69,73 @@ function summon(difficulty: 'normal' | 'heroic'): { f: Fight; wyrm: Entity; hold
   return { f, wyrm, hold };
 }
 
+interface Fought {
+  f: Fight;
+  wyrm: Entity;
+  seconds: number;
+  casts: Set<string>;
+  bared: boolean;
+}
+
+/** A real kill: the party deals `pace` times the planning DPS through the
+ *  damage path, twice a second, until it falls. */
+function fight(difficulty: 'normal' | 'heroic', pace: number): Fought {
+  const { f, wyrm, hold } = summon(difficulty);
+  const party = [f.tank, ...f.others];
+  const chunk = (PARTY_DPS[difficulty] * pace * 0.5) / party.length;
+  const casts = new Set<string>();
+  let bared = false;
+  let ticks = 0;
+  for (; ticks < 200 / DT && !wyrm.dead; ticks++) {
+    if (ticks % 10 === 0) {
+      for (const p of party) {
+        if (wyrm.dead) break;
+        f.sim.ctx.dealDamage(p, wyrm, chunk, false, 'physical', null, 'hit', false, {
+          mult: p === f.tank ? 8 : 1,
+        });
+      }
+    }
+    tick(f, hold);
+    if (wyrm.castingAbility) casts.add(wyrm.castingAbility);
+    if (wyrm.auras.some((a) => a.id === KNELLWYRM_BARED_RIBS)) bared = true;
+  }
+  expect(wyrm.dead).toBe(true);
+  return { f, wyrm, seconds: ticks * DT, casts, bared };
+}
+
+/** Every mechanic came round at least once. */
+function expectWholeKit(fought: Fought, difficulty: 'normal' | 'heroic'): void {
+  const { casts, bared } = fought;
+  // The drake kit on its template...
+  expect(casts).toContain(CRYPT_BARROWFLAME_BREATH);
+  expect(casts).toContain(CRYPT_TAIL_LASH);
+  expect(casts).toContain(CRYPT_WING_GUST);
+  // ...its own Pyre Strafe and Dread Bellow (and the Bared Ribs window)...
+  expect(casts).toContain(KNELLWYRM_PYRE_STRAFE);
+  expect(casts).toContain(KNELLWYRM_DREAD_BELLOW);
+  expect(bared).toBe(true);
+  // ...and on heroic the Burning Knell.
+  expect(casts.has(KNELLWYRM_KNELL_MARK)).toBe(difficulty === 'heroic');
+}
+
 for (const difficulty of ['normal', 'heroic'] as const) {
   describe(`the Knellwyrm (${difficulty})`, () => {
     it('lands with its derived pool and fights a whole fight at the planning DPS', () => {
-      const { f, wyrm, hold } = summon(difficulty);
-      const party = [f.tank, ...f.others];
-      // The pool: 80 s of the planning party's damage.
+      const fought = fight(difficulty, 1);
+      const { wyrm, seconds } = fought;
+      // The pool: 80 s of the planning party's damage, to the template's rounding.
+      expect(wyrm.maxHp).toBe(POOL[difficulty]);
       const planned = FIGHT_SECONDS * PARTY_DPS[difficulty];
       expect(Math.abs(wyrm.maxHp - planned) / planned).toBeLessThan(0.005);
       expect(wyrm.maxHp).toBeGreaterThan(BARE[difficulty] * 2.5);
+      // A miniboss: on heroic inside 15,000 to 20,000, under the bosses' 25,000.
+      if (difficulty === 'heroic') {
+        expect(wyrm.maxHp).toBeGreaterThanOrEqual(15_000);
+        expect(wyrm.maxHp).toBeLessThanOrEqual(20_000);
+      }
       // Health only: its melee and its mechanic factor are the shipped ones.
       expect([wyrm.weapon?.min, wyrm.weapon?.max]).toEqual(DAMAGE[difficulty].weapon);
       expect(wyrm.mechanicDamageMult).toBe(DAMAGE[difficulty].mech);
-
-      // The real fight: the party deals the planning DPS through the damage
-      // path, twice a second.
-      const chunk = (PARTY_DPS[difficulty] * 0.5) / party.length;
-      const casts = new Set<string>();
-      let bared = false;
-      let ticks = 0;
-      for (; ticks < 200 / DT && !wyrm.dead; ticks++) {
-        if (ticks % 10 === 0) {
-          for (const p of party) {
-            if (wyrm.dead) break;
-            f.sim.ctx.dealDamage(p, wyrm, chunk, false, 'physical', null, 'hit', false, {
-              mult: p === f.tank ? 8 : 1,
-            });
-          }
-        }
-        tick(f, hold);
-        if (wyrm.castingAbility) casts.add(wyrm.castingAbility);
-        if (wyrm.auras.some((a) => a.id === KNELLWYRM_BARED_RIBS)) bared = true;
-      }
-      const seconds = ticks * DT;
-      expect(wyrm.dead).toBe(true);
       // Its purse waits on the body for the boss hold, not the trash minute.
       expect(wyrm.lootable).toBe(true);
       expect(wyrm.corpseTimer).toBeGreaterThan(BOSS_CORPSE_HOLD_SECONDS - 5);
@@ -114,34 +143,15 @@ for (const difficulty of ['normal', 'heroic'] as const) {
       // (heroic adds its Burning Knell, flown out of reach).
       expect(seconds).toBeGreaterThan(60);
       expect(seconds).toBeLessThan(difficulty === 'heroic' ? 150 : 110);
-      // Every mechanic came round: the drake kit on its template...
-      expect(casts).toContain(CRYPT_BARROWFLAME_BREATH);
-      expect(casts).toContain(CRYPT_TAIL_LASH);
-      expect(casts).toContain(CRYPT_WING_GUST);
-      // ...its own Pyre Strafe and Dread Bellow (and the Bared Ribs window)...
-      expect(casts).toContain(KNELLWYRM_PYRE_STRAFE);
-      expect(casts).toContain(KNELLWYRM_DREAD_BELLOW);
-      expect(bared).toBe(true);
-      // ...and on heroic the Burning Knell.
-      expect(casts.has(KNELLWYRM_KNELL_MARK)).toBe(difficulty === 'heroic');
+      expectWholeKit(fought, difficulty);
+    });
+
+    it('still shows every mechanic to a party at twice the planning DPS', () => {
+      const fought = fight(difficulty, 2);
+      // Half the fight on the ground (the heroic Knell flies on top of it).
+      expect(fought.seconds).toBeGreaterThan(26);
+      expect(fought.seconds).toBeLessThan(difficulty === 'heroic' ? 80 : 50);
+      expectWholeKit(fought, difficulty);
     });
   });
 }
-
-describe('the Knellwyrm: its clocks fit its fight', () => {
-  it('fires each mechanic at least once inside 80 s, even at twice the planning DPS', () => {
-    // Twice the planned damage halves the fight: 40 s on the ground.
-    const fast = FIGHT_SECONDS / 2;
-    expect(KNELLWYRM_TUNING.strafeFirst).toBeLessThan(fast);
-    expect(KNELLWYRM_TUNING.bellowFirst + KNELLWYRM_TUNING.bellowCast).toBeLessThan(fast);
-    expect(KNELL_TUNING.first).toBeLessThan(fast);
-    // And at the planning DPS the slowest clock comes round twice.
-    expect(KNELLWYRM_TUNING.bellowFirst + KNELLWYRM_TUNING.bellowEvery).toBeLessThan(FIGHT_SECONDS);
-  });
-
-  it('carries a health factor on both difficulties and keeps its heroic melee', () => {
-    expect(NORMAL_DUNGEON_TUNING.hollow_crypt.healthMultiplierByMob?.[KNELLWYRM_ID]).toBeDefined();
-    expect(HEROIC_DUNGEON_TUNING.hollow_crypt.healthMultiplierByMob?.[KNELLWYRM_ID]).toBeDefined();
-    expect(HEROIC_DUNGEON_TUNING.hollow_crypt.damageMultiplierByMob?.[KNELLWYRM_ID]).toBe(20);
-  });
-});
