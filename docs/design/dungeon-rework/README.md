@@ -81,7 +81,7 @@ every heroic is level 20 entry with mobs rebased to level 22
 | Pack pull identity | `DungeonSpawn.packId`, `mob/dungeon_pack_aggro.ts` | Also the key for gates (G7) |
 | Premature boss pull punish | `instances/boss_chain_pull.ts` | Kept on every reworked dungeon |
 | Gate-tagged colliders (open/closed per gate id) | `colliders.ts` `setColliderGateOpen`, `transport_gates.ts` | The primitive under dungeon gates (G7) |
-| Line of sight vs colliders | `Sim.hasLineOfSight`, `entityLineOfSightClear` | LOS-break mechanics behind pillars. Ordinary mob casts at a target obey it too (`src/sim/mob/cast_sight.ts`, the kit's bars through `mob/trash_kit/kit_cast_sight.ts`): no cast begins or lands without a line of sight, and a caster without one walks round the wall to get it (`mob/chase_route.ts`), as a melee mob stopped by a wall does |
+| Line of sight vs colliders | `Sim.hasLineOfSight`, `entityLineOfSightClear` | LOS-break mechanics behind pillars. Ordinary mob casts at a target obey it too (`src/sim/mob/cast_sight.ts`, the kit's bars through `mob/trash_kit/kit_cast_sight.ts`): no cast begins or lands without a line of sight, and inside an instance a caster without one walks round the wall to get it (`mob/chase_route.ts`, a bounded and budgeted search), as a melee mob stopped by a wall does |
 | Heroic transform (level 22, health/damage multipliers, `mechanicDamageMult`) | `src/sim/instances/difficulty.ts` | Heroic numbers ride this unchanged |
 | Weighted loot partitions | `src/sim/loot/weighted_loot_group.ts`, `HEROIC_BOSS_LOOT` | Per-boss tables |
 
