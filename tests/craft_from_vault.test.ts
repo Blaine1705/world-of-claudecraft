@@ -864,6 +864,21 @@ describe('batch crafting counts the vault', () => {
     expect(meta.vault.special).toEqual(before);
   });
 
+  it("draws the crafter's OWN signed vault units for Create All and the craft", () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = metaOf(sim, pid);
+    meta.vault.special.push({ itemId: 'spider_leg', count: 2, instance: { signer: meta.name } });
+    const recipe = recipeById(JERKY);
+    if (!recipe) throw new Error(`missing recipe ${JERKY}`);
+
+    expect(maxCraftCountForRecipe(sim.ctx, recipe, pid)).toBe(2);
+    expect(resolveCraft(sim.ctx, pid, JERKY).ok).toBe(true);
+
+    expect(sim.countItem('tough_jerky', pid)).toBe(1);
+    expect(meta.vault.special.reduce((sum, slot) => sum + slot.count, 0)).toBe(1);
+  });
+
   it('promises only the carried crafts inside a blocked context', () => {
     // Same holdings, different place: the vault is invisible, so the promise
     // drops to what the bags alone can pay.

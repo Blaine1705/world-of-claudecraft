@@ -862,6 +862,7 @@ export function consumeVaultStock(
   vault: MaterialsVaultState,
   itemId: string,
   count: number,
+  selfSigner?: string,
 ): boolean {
   const held = drawableVaultCount(vault.stock, itemId);
   // The WHOLE draw is planned before a single write, across BOTH stores: the
@@ -870,7 +871,14 @@ export function consumeVaultStock(
   // the eligible identity rows, where premium buckets stay untouched. A plan
   // that cannot be paid in full answers null and nothing moves, which is the
   // all-or-nothing contract this function has always had.
-  const plan = planVaultDraw(vault.stock, vault.special, itemId, count, vaultMaterialIds());
+  const plan = planVaultDraw(
+    vault.stock,
+    vault.special,
+    itemId,
+    count,
+    vaultMaterialIds(),
+    selfSigner,
+  );
   if (plan === null) return false;
   // Byte-for-byte `vaultWithdraw`'s write shape (delete at zero, else
   // decrement), and that is a requirement rather than a coincidence: it is the
@@ -894,9 +902,11 @@ export function consumeVaultStock(
 
 /** Apply a planned draw to a LIVE player vault and advance its wire revision
  *  immediately after the decrement. Scratch batch simulation keeps calling
- *  consumeVaultStock directly, so planning remains side-effect free. */
+ *  consumeVaultStock directly, so planning remains side-effect free. The
+ *  player's own name rides along so units they signed themself are spendable,
+ *  exactly as `vaultDrawStock` projected them. */
 export function consumePlayerVaultStock(meta: PlayerMeta, itemId: string, count: number): boolean {
-  if (!consumeVaultStock(meta.vault, itemId, count)) return false;
+  if (!consumeVaultStock(meta.vault, itemId, count, meta.name)) return false;
   bumpVaultWireRev(meta);
   return true;
 }

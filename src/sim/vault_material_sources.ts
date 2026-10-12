@@ -32,6 +32,16 @@
 // gatherer therefore grants no new benefit and unlocks no new units; it is
 // provenance, not power.
 //
+// THE ONE PREMIUM EXCEPTION: the crafter's OWN signature. A player who
+// rare-gathers their own herbs and banks them is not stockpiling someone else's
+// premium goods, so a bucket whose signer IS the drawing crafter is spendable
+// by that crafter (and by nobody else). It still spends LAST, after every plain
+// unit (`compareMaterialSpendOrder` keeps premium at the back), so a vault
+// holding both never burns the signed units first. Callers that name no crafter
+// (`selfSigner` undefined or empty) keep the strict rule: no signed unit moves.
+// A rename rewrites the vault's own signatures to the new name
+// (material_signatures.ts), so the match follows the character.
+//
 // THE LOAD PATH IS NOT HERE, deliberately. An earlier cut of this module owned
 // its own tolerant reader that RETAINED an unreadable composition as dormant
 // data. That was a second policy for one corruption: `material_slot_load.ts` is
@@ -170,13 +180,23 @@ export function autoDrawableRow(normalized: MaterialStackFacets): boolean {
   return normalized.instance === undefined && normalized.craftedRecipeId === undefined;
 }
 
-/** Units of a NORMALIZED row an automatic draw may spend: every non-premium
- *  bucket, or none at all when the row keeps per-copy identity. */
-export function autoDrawableUnits(normalized: MaterialStackFacets): number {
+/** True when an automatic draw by `selfSigner` may spend units of this source:
+ *  every non-premium source, plus a premium one signed by the drawing crafter
+ *  themself. An undefined or empty `selfSigner` names nobody, so every premium
+ *  source stays refused (the strict rule the bare primitives keep). */
+export function autoDrawableSource(source: MaterialSource, selfSigner?: string): boolean {
+  if (!isPremiumMaterialSource(source)) return true;
+  return selfSigner !== undefined && selfSigner.length > 0 && source.signer === selfSigner;
+}
+
+/** Units of a NORMALIZED row an automatic draw by `selfSigner` may spend: every
+ *  bucket `autoDrawableSource` admits, or none at all when the row keeps
+ *  per-copy identity. */
+export function autoDrawableUnits(normalized: MaterialStackFacets, selfSigner?: string): number {
   if (!autoDrawableRow(normalized)) return 0;
   let units = 0;
   for (const bucket of normalized.materialSources ?? []) {
-    if (isPremiumMaterialSource(bucket.source)) continue;
+    if (!autoDrawableSource(bucket.source, selfSigner)) continue;
     units = combineDrawable(units, bucket.count);
   }
   return units;
@@ -219,6 +239,7 @@ export function readSourceRows(
 export function sourceRowDrawableUnits(
   special: readonly InvSlot[],
   materialIds: ReadonlySet<string>,
+  selfSigner?: string,
 ): ReadonlyMap<string, number> {
   const totals = new Map<string, number>();
   const refused = new Set<string>();
@@ -231,7 +252,7 @@ export function sourceRowDrawableUnits(
       totals.delete(itemId);
       continue;
     }
-    const units = autoDrawableUnits(normalized.value);
+    const units = autoDrawableUnits(normalized.value, selfSigner);
     if (units <= 0) continue;
     const next = (totals.get(itemId) ?? 0) + units;
     // An unsafe running total REFUSES the id outright rather than folding to
@@ -252,10 +273,13 @@ export function sourceRowDrawableUnits(
  *  (an unreadable same-item row, or a total that leaves the safe range). The
  *  spend side's ceiling, computed exactly the way the projection above computes
  *  its per-id entry, so the two cannot drift. */
-function identityDrawableUnits(rows: readonly MaterialStackSlot[]): number | null {
+function identityDrawableUnits(
+  rows: readonly MaterialStackSlot[],
+  selfSigner: string | undefined,
+): number | null {
   let units = 0;
   for (const row of rows) {
-    const next = units + autoDrawableUnits(row);
+    const next = units + autoDrawableUnits(row, selfSigner);
     if (!Number.isSafeInteger(next)) return null;
     units = next;
   }
@@ -276,8 +300,9 @@ export function drawableVaultProjection(
   stock: Readonly<Record<string, number>>,
   special: readonly InvSlot[],
   materialIds: ReadonlySet<string>,
+  selfSigner?: string,
 ): Record<string, number> {
-  const fromRows = sourceRowDrawableUnits(special, materialIds);
+  const fromRows = sourceRowDrawableUnits(special, materialIds, selfSigner);
   const rows: [string, number][] = [];
   for (const itemId of Object.keys(stock)) {
     if (!Object.hasOwn(stock, itemId)) continue;
@@ -347,24 +372,26 @@ export interface VaultDrawPlan {
 }
 
 /**
- * The explicit non-premium selection an automatic draw spends, coalesced by
- * descriptor: unrecorded material first, then other plain material, premium
- * NEVER. Null when the eligible buckets cannot cover `owed`.
+ * The explicit selection an automatic draw spends, coalesced by descriptor:
+ * unrecorded material first, then other plain material, then the crafter's OWN
+ * signed units last; another player's signature NEVER. Null when the eligible
+ * buckets cannot cover `owed`.
  *
  * The selection names descriptors and counts, never rows, which is exactly
  * right: two rows holding the same descriptor are interchangeable for
  * conservation, and the planner satisfies each descriptor from its own
  * deterministic candidate order.
  */
-function chooseNonPremiumUnits(
+function chooseDrawableUnits(
   rows: readonly MaterialStackSlot[],
   owed: number,
+  selfSigner: string | undefined,
 ): MaterialSourceCount[] | null {
   const candidates: { source: MaterialSource; count: number }[] = [];
   for (const row of rows) {
     if (!autoDrawableRow(row)) continue;
     for (const bucket of row.materialSources ?? []) {
-      if (isPremiumMaterialSource(bucket.source)) continue;
+      if (!autoDrawableSource(bucket.source, selfSigner)) continue;
       candidates.push({ source: bucket.source, count: bucket.count });
     }
   }
@@ -390,7 +417,8 @@ function chooseNonPremiumUnits(
  * The compact record pays FIRST, because its units ARE unrecorded stock and the
  * shared spend order puts unrecorded material ahead of everything else. Only
  * the remainder reaches the identity collection, where the selection above
- * keeps premium buckets untouched.
+ * keeps every other player's premium bucket untouched and spends the crafter's
+ * own signed units only after the plain ones.
  *
  * THE CEILING IS THE PROJECTION'S OWN ANSWER, not an independently argued one:
  * the same compact rule and the same per-id identity total the projection
@@ -410,6 +438,7 @@ export function planVaultDraw(
   itemId: string,
   count: number,
   materialIds: ReadonlySet<string>,
+  selfSigner?: string,
 ): VaultDrawPlan | null {
   if (!Number.isSafeInteger(count) || count <= 0) return null;
   const stockUnits = Object.hasOwn(stock, itemId) ? drawableStockUnits(stock[itemId]) : 0;
@@ -417,7 +446,7 @@ export function planVaultDraw(
   // Both contribute nothing from the identity collection in the projection, so
   // both contribute nothing here; the compact row keeps paying either way.
   const rows = readSourceRows(special, itemId, materialIds);
-  const identityUnits = rows === null ? 0 : identityDrawableUnits(rows);
+  const identityUnits = rows === null ? 0 : identityDrawableUnits(rows, selfSigner);
   const drawable = identityUnits === null ? 0 : combineDrawable(stockUnits, identityUnits);
   if (count > drawable) return null;
 
@@ -426,7 +455,7 @@ export function planVaultDraw(
   if (owed === 0) return { fromStock, fromRows: null };
 
   if (rows === null) return null;
-  const selection = chooseNonPremiumUnits(rows, owed);
+  const selection = chooseDrawableUnits(rows, owed, selfSigner);
   if (selection === null) return null;
   const plan = planMaterialInventoryTake({
     inventory: special,

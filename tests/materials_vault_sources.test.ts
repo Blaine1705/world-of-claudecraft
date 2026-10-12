@@ -29,6 +29,7 @@ import {
   totalMaterialCount,
 } from '../src/sim/material_sources';
 import {
+  consumePlayerVaultStock,
   consumeVaultStock,
   craftVaultStockFor,
   sanitizeVaultState,
@@ -541,6 +542,76 @@ describe('automatic craft eligibility survives the representation change', () =>
     expect(Object.hasOwn(meta.vault.stock, 'copper_ore')).toBe(false);
     expect(meta.vault.special[0].count).toBe(8);
     expect(storedUnits(sim, 'copper_ore')).toBe(8);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The crafter's OWN signature is drawable; anyone else's stays premium
+// ---------------------------------------------------------------------------
+
+describe('units signed by the crafter themself are drawable from the vault', () => {
+  // A player who rare-gathered their own herbs and banked them used to see the
+  // recipe report x0 while the vault showed the stack (the Goldleaf Herb
+  // report). Their own signature is theirs to spend; a signature bought from
+  // another player stays premium and is never auto-drawn.
+  function selfMixedSim(): { sim: Sim; selfKey: string } {
+    const sim = openWorldSim();
+    const self: MaterialSource = { gatherer: ANA, signer: metaOf(sim).name };
+    metaOf(sim).vault.special.push({
+      itemId: 'copper_ore',
+      count: 9,
+      materialSources: composition([
+        { source: unknownSource, count: 2 },
+        { source: self, count: 3 },
+        { source: premiumSource, count: 4 },
+      ]),
+    });
+    return { sim, selfKey: materialSourceKey(self) };
+  }
+
+  it("projects the crafter's own signed units and never another player's", () => {
+    const { sim } = selfMixedSim();
+
+    // 2 unrecorded + 3 self-signed; Cyn's 4 stay invisible.
+    expect(craftVaultStockFor(sim.ctx, sim.playerId)).toEqual({ copper_ore: 5 });
+  });
+
+  it('spends plain units first, then self-signed, and leaves foreign signatures whole', () => {
+    const { sim, selfKey } = selfMixedSim();
+    const meta = metaOf(sim);
+
+    expect(consumePlayerVaultStock(meta, 'copper_ore', 3)).toBe(true);
+    expect(buckets(meta.vault.special[0].materialSources)).toEqual({
+      [selfKey]: 2,
+      [PREMIUM_KEY]: 4,
+    });
+
+    expect(consumePlayerVaultStock(meta, 'copper_ore', 2)).toBe(true);
+    expect(buckets(meta.vault.special[0].materialSources)).toEqual({ [PREMIUM_KEY]: 4 });
+
+    const before = structuredClone(meta.vault);
+    expect(consumePlayerVaultStock(meta, 'copper_ore', 1)).toBe(false);
+    expect(meta.vault).toEqual(before);
+    expect(storedUnits(sim, 'copper_ore')).toBe(4);
+  });
+
+  it('a legacy row signed by the crafter is drawable too', () => {
+    const sim = openWorldSim();
+    const meta = metaOf(sim);
+    meta.vault.special.push({ itemId: 'copper_ore', count: 4, instance: { signer: meta.name } });
+
+    expect(craftVaultStockFor(sim.ctx, sim.playerId)).toEqual({ copper_ore: 4 });
+    expect(consumePlayerVaultStock(meta, 'copper_ore', 4)).toBe(true);
+    expect(storedUnits(sim, 'copper_ore')).toBe(0);
+  });
+
+  it('the bare primitive with no crafter named still refuses every signed unit', () => {
+    const { sim } = selfMixedSim();
+    const meta = metaOf(sim);
+    const before = structuredClone(meta.vault);
+
+    expect(consumeVaultStock(meta.vault, 'copper_ore', 3)).toBe(false);
+    expect(meta.vault).toEqual(before);
   });
 });
 
