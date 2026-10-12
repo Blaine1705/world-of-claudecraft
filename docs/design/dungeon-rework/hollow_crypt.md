@@ -389,7 +389,9 @@ Open air at dusk turning to night. The render lives in `src/render/hollow_crypt/
     a tracery window framing the Rite Ring beyond.
   - Bone Stair: a spiral path up the crag, wisp rivers flowing up it.
   - Rite Ring: the roofless ritual circle, engraved glyph rings, four
-    Remembrance Candles on pillars, altar, the soul column visible from afar.
+    Remembrance Candles (fat tallow pillars on plinths of names, each in an
+    iron reliquary cage about two and a half players tall), altar, the soul
+    column visible from afar.
 - **Signature moments.** First vista; bell tower against the moon; the light
   column seen from every terrace; layered ground mist and chasm mist; soul-wisp
   rivers flowing toward the ring; gate reveals (a barrier crumbles, a web

@@ -1029,14 +1029,242 @@ def candelabrum():
 
 
 # =============================================================== the rite ring
+def _flame(p, base, height, radius, sides=8):
+    """A flame as a teardrop of light: white-hot at the wick, amber through its
+    belly, ember-red at the tip (the glow slot is unlit, so the colour is all
+    of it)."""
+    x, y, z = base
+    profile = ((0.0, 0.28), (0.07, 0.86), (0.2, 1.0), (0.36, 0.9), (0.55, 0.62), (0.76, 0.3), (0.92, 0.1))
+    hot, belly, tip = (1.0, 0.93, 0.7), AMBER, (0.95, 0.36, 0.1)
+    rings = []
+    for t, k in profile:
+        lean = 0.07 * radius * math.sin(t * 2.6)
+        rings.append([p.bm.verts.new(Vector((x + lean + math.cos(math.tau * i / sides) * radius * k,
+                                             y + math.sin(math.tau * i / sides) * radius * k, z + height * t)))
+                      for i in range(sides)])
+    apex = p.bm.verts.new(Vector((x + 0.05 * radius, y, z + height)))
+
+    def tone(t):
+        if t < 0.3:
+            return tuple(a + (b - a) * (t / 0.3) for a, b in zip(hot, belly))
+        return tuple(a + (b - a) * min(1.0, (t - 0.3) / 0.6) for a, b in zip(belly, tip))
+
+    faces = []
+    for k in range(len(rings) - 1):
+        for i in range(sides):
+            faces.append((p.bm.faces.new((rings[k][i], rings[k][(i + 1) % sides], rings[k + 1][(i + 1) % sides],
+                                          rings[k + 1][i])), (profile[k][0], profile[k][0], profile[k + 1][0],
+                                                              profile[k + 1][0])))
+    for i in range(sides):
+        faces.append((p.bm.faces.new((rings[-1][i], rings[-1][(i + 1) % sides], apex)),
+                      (profile[-1][0], profile[-1][0], 1.0)))
+    faces.append((p.bm.faces.new(list(reversed(rings[0]))), (0.0,) * sides))
+    for face, ts in faces:
+        face.material_index = GLOW
+        face.smooth = True
+        for loop, t in zip(face.loops, ts):
+            loop[p.col] = (*tone(t), 1.0)
+
+
+def _hoop(p, z, radius, bar, color, segments=24, sides=4):
+    """A wrought-iron hoop round the candle's axis."""
+    ring = [(math.cos(math.tau * i / segments) * radius, math.sin(math.tau * i / segments) * radius, z)
+            for i in range(segments + 1)]
+    p.sweep(ring, bar, bar, color, sides=sides, cap=False)
+
+
+def _wax(p, faces):
+    for face in faces:
+        face.smooth = True
+
+
+def _wax_run(p, top, end, thick, color, bulge):
+    """A run of wax down the pillar: a soft rivulet thickening to the bead it
+    ends in (smooth shaded: wax has no arrises)."""
+    mid = top.lerp(end, 0.55) + bulge
+    pts = p.bezier(top, mid, end, 3)
+    _wax(p, p.sweep(pts, thick * 0.8, thick, color, sides=6))
+    _wax(p, p.rock(end - Vector((0, 0, thick * 0.2)), (thick * 2.1, thick * 2.1, thick * 2.7), color, jitter=0.03,
+                   subdivisions=1))
+
+
 def remembrance_candle():
-    """A 3.5 yd tallow pillar on an iron ring, drips down its flanks."""
-    p = P('RemembranceCandle')
-    p.lathe((0, 0, 0), [(1.4, 0), (1.35, 0.3), (1.15, 0.45)], 12, IRON)
-    p.candle((0, 0, 0.45), 3.1, 0.95, flame=True, drips=9)
+    """A Remembrance Candle of the Rite Ring: a fat tallow pillar run with wax
+    on a carved plinth of names, standing in a wrought-iron reliquary cage
+    whose ribs close over the flame in a pointed crown, 6.5 yd to its finial
+    (a player stands 2.6). Votive ribbons are tied round its ribs and little
+    votive lights burn at its foot.
+
+    What the runtime reads off it (src/render/hollow_crypt/morthen_rite_fx_core.ts,
+    crypt_plan_core.ts KIT_FLAME_SOCKETS): the wick at 3.55 yd on the axis, the
+    flame's tip at 5.22, the tallow 0.95 yd in radius. EVERYTHING on the glow
+    slot (the flame, the molten well, the names, the votive lights) is one
+    batch instance the Rite hides when it gutters the candle, so a dark candle
+    is iron, cold wax and blank names on every graphics tier.
+    """
+    p = P('RemembranceCandle', lichen=0.12)
+    # Wrought iron, a shade lifted: black iron is lost against the night sky.
+    iron = (0.31, 0.3, 0.33)
+    iron_worn = (0.42, 0.4, 0.42)
+    # ---- the plinth: a step, a die carved with the names, a wax-pooled cap.
+    p.prism((0, 0, 0), 8, 1.42, 1.36, 0.2, p.vary(STONE_PALE, 0.07), phase=math.pi / 8)
+    p.prism((0, 0, 0.2), 8, 1.2, 1.14, 0.5, p.vary(STONE_PALE, 0.04), phase=math.pi / 8)
+    p.prism((0, 0, 0.7), 8, 1.27, 1.2, 0.1, p.vary(STONE_PALE, 0.04), phase=math.pi / 8)
+    apothem = 1.17 * math.cos(math.pi / 8)
+    for i in range(8):
+        a = math.tau * i / 8
+        out = Vector((math.cos(a), math.sin(a), 0))
+        side = Vector((-math.sin(a), math.cos(a), 0))
+        face = out * apothem
+        if i % 2 == 0:
+            # A dark slate tablet, and the names cut in it: pale in the stone,
+            # and (on the glow slot, a hair proud) alight while the candle burns.
+            p.box(face + out * 0.02 + Vector((0, 0, 0.45)), (0.6, 0.05, 0.34), p.vary(SLATE, 0.05), yaw=a + math.pi / 2,
+                  bevel=0.015)
+            for row in range(3):
+                width = (0.46, 0.38, 0.3)[(row + i) % 3]
+                zz = 0.56 - row * 0.11
+                p.box(face + out * 0.05 + Vector((0, 0, zz)) + side * (0.03 * (row - 1)), (width, 0.012, 0.035),
+                      (0.62, 0.6, 0.56), yaw=a + math.pi / 2)
+                p.box(face + out * 0.062 + Vector((0, 0, zz)) + side * (0.03 * (row - 1)), (width * 0.94, 0.008, 0.022),
+                      AMBER, mat=GLOW, yaw=a + math.pi / 2)
+        else:
+            # A niche with a skull of the remembered, every other face.
+            p.box(face + out * 0.005 + Vector((0, 0, 0.44)), (0.36, 0.05, 0.36), (0.09, 0.085, 0.1), yaw=a + math.pi / 2)
+            mark = p.mark()
+            p.skull((0, 0, 0), 0.19)
+            p.turn(mark, Matrix.Translation(face + out * 0.09 + Vector((0, 0, 0.29))) @ Matrix.Rotation(a + math.pi / 2, 4, 'Z'))
+    # ---- the tallow: a fat pillar, waisted by years of burning, its crown
+    # melted into a well round the wick.
+    foot = 0.8
+    wick = 3.55
+    tall = wick - foot
+    tallow = (0.95, 0.9, 0.74)
+    tallow_run = (0.97, 0.93, 0.8)
+    tallow_aged = (0.88, 0.8, 0.6)
+    p.lathe((0, 0, foot), [(1.0, 0.0), (0.97, 0.12), (0.93, 0.4), (0.9, tall * 0.55), (0.88, tall * 0.9),
+                           (0.9, tall * 0.97), (0.84, tall + 0.02), (0.62, tall - 0.06), (0.2, tall - 0.12),
+                           (0.0001, tall - 0.12)], 16, p.vary(tallow, 0.02))
+    p.box((0, 0, wick - 0.02), (0.07, 0.07, 0.22), (0.07, 0.06, 0.05), roll=0.18)
+    # The rim: melted unevenly, slumped where the wax ran over.
+    for i in range(8):
+        a = math.tau * i / 8 + p.rng.uniform(-0.15, 0.15)
+        s = p.rng.uniform(0.26, 0.4)
+        _wax(p, p.rock((math.cos(a) * 0.82, math.sin(a) * 0.82, wick - 0.02 + p.rng.uniform(-0.03, 0.05)),
+                       (s * 1.3, s * 1.3, s * 0.75), p.vary(tallow_run, 0.03), jitter=0.05, subdivisions=1))
+    # Wax runs: long rivulets down the flanks, each ending in a bead.
+    for i in range(11):
+        a = math.tau * i / 11 + p.rng.uniform(-0.2, 0.2)
+        # Short fat drips and long thin runs.
+        long_run = i % 3 != 1
+        length = tall * (p.rng.uniform(0.45, 0.92) if long_run else p.rng.uniform(0.14, 0.3))
+        thick = p.rng.uniform(0.06, 0.09) if long_run else p.rng.uniform(0.1, 0.14)
+        out = Vector((math.cos(a), math.sin(a), 0))
+        top = out * 0.86 + Vector((0, 0, wick - 0.03))
+        drift = p.rng.uniform(-0.06, 0.06)
+        end = Vector((math.cos(a + drift) * 0.93, math.sin(a + drift) * 0.93, wick - length))
+        _wax_run(p, top, end, thick, p.vary(tallow_run if i % 3 else tallow_aged, 0.03), out * 0.03)
+    # The melt gathered on the cap in soft folds, and the drips hanging off its lip.
+    for i in range(9):
+        a = math.tau * i / 9 + p.rng.uniform(-0.2, 0.2)
+        r = p.rng.uniform(0.96, 1.12)
+        s = p.rng.uniform(0.2, 0.36)
+        _wax(p, p.rock((math.cos(a) * r, math.sin(a) * r, 0.81), (s * 1.6, s * 1.6, s * 0.55), p.vary(tallow_aged, 0.05),
+                       jitter=0.06, subdivisions=1))
+        if i % 3 == 0:
+            lip = Vector((math.cos(a) * 1.24, math.sin(a) * 1.24, 0.8))
+            _wax_run(p, lip, lip - Vector((0, 0, 0.16 + 0.5 * s)), 0.04, p.vary(tallow_aged, 0.05), Vector((0, 0, 0)))
+    # ---- the reliquary cage: four iron ribs up from the plinth, closing over
+    # the flame in a pointed crown; two hoops hold them and the candle.
+    spring = 4.55
+    crown = 6.02
+    for i in range(4):
+        a = math.pi / 4 + math.tau * i / 4
+        out = Vector((math.cos(a), math.sin(a), 0))
+        post = [out * 1.3 + Vector((0, 0, 0.78)), out * 1.34 + Vector((0, 0, 2.6)), out * 1.3 + Vector((0, 0, spring))]
+        arch = p.bezier(out * 1.3 + Vector((0, 0, spring)), out * 1.22 + Vector((0, 0, 5.75)),
+                        out * 0.3 + Vector((0, 0, crown)), 8)
+        p.sweep(p.bezier(post[0], post[1], post[2], 6) + arch[1:], 0.09, 0.065, iron, sides=4)
+        # A forged foot on the cap, and a collar where the rib springs.
+        p.box(out * 1.3 + Vector((0, 0, 0.84)), (0.24, 0.2, 0.1), iron_worn, yaw=a, bevel=0.02)
+        p.box(out * 1.3 + Vector((0, 0, spring)), (0.2, 0.2, 0.12), iron_worn, yaw=a, bevel=0.02)
+        # A thorn on the rib's shoulder (the crown's crockets).
+        p.spike(out * 1.24 + Vector((0, 0, 5.35)), 0.06, 0.42, iron, sides=4, lean=(out.x * 0.2, out.y * 0.2))
+    _hoop(p, 1.55, 1.31, 0.065, iron)
+    _hoop(p, spring, 1.3, 0.075, iron)
+    _hoop(p, crown, 0.3, 0.06, iron_worn, segments=12)
+    # Pointed arches between the ribs, under the crown: the cage's windows.
+    for i in range(4):
+        a0 = math.pi / 4 + math.tau * i / 4
+        a1 = a0 + math.tau / 4
+        am = (a0 + a1) / 2
+        apex = Vector((math.cos(am) * 1.22, math.sin(am) * 1.22, spring + 0.78))
+        for an in (a0, a1):
+            start = Vector((math.cos(an) * 1.3, math.sin(an) * 1.3, spring))
+            turn = an + (am - an) * 0.45
+            bend = Vector((math.cos(turn) * 1.34, math.sin(turn) * 1.34, spring + 0.62))
+            p.sweep(p.bezier(start, bend, apex, 5), 0.045, 0.04, iron, sides=4)
+        p.spike(apex - Vector((0, 0, 0.02)), 0.045, 0.3, iron, sides=4)
+        # A thorn hanging in each window off the lower hoop too.
+        low = Vector((math.cos(am) * 1.31, math.sin(am) * 1.31, 1.55))
+        p.prism(low - Vector((0, 0, 0.26)), 4, 0.0001, 0.05, 0.26, iron)
+    # The finial: a collar, a long spike, four barbs.
+    p.prism((0, 0, crown - 0.04), 6, 0.2, 0.14, 0.2, iron_worn)
+    p.spike((0, 0, crown + 0.14), 0.1, 0.56, iron, sides=4)
+    for i in range(4):
+        a = math.tau * i / 4
+        p.spike((math.cos(a) * 0.12, math.sin(a) * 0.12, crown + 0.1), 0.045, 0.3, iron, sides=4,
+                lean=(math.cos(a) * 0.22, math.sin(a) * 0.22))
+    # ---- the remembrances: ribbons tied to the ribs, a bone tablet on a chain.
+    # Tied round the ribs, below the flame: nothing hangs across the light a
+    # player has to read. Plum, not violet: under the crypt's blue moon a
+    # violet cloth turns plain blue.
+    linen = (0.8, 0.76, 0.66)
+    mourning = (0.46, 0.25, 0.34)
+    quarter = math.tau / 4
+    ribbons = ((math.pi / 4 + 0.07, mourning, 1.45, 3.3), (math.pi / 4 - 0.09, linen, 1.0, 3.05),
+               (math.pi / 4 + quarter - 0.06, linen, 1.35, 3.25), (math.pi / 4 + 2 * quarter + 0.08, mourning, 1.1, 3.4),
+               (math.pi / 4 + 2 * quarter - 0.08, linen, 1.5, 3.15), (math.pi / 4 + 3 * quarter + 0.05, mourning, 1.3, 3.2),
+               (math.pi / 4 + 3 * quarter - 0.1, linen, 0.9, 2.9))
+    for a, color, length, tied in ribbons:
+        out = Vector((math.cos(a), math.sin(a), 0))
+        side = Vector((-math.sin(a), math.cos(a), 0))
+        # The knot sits on the rib and the cloth sways along it, never out from
+        # it: the whole candle stays inside the plinth (the collider, 1.3 yd, and
+        # a step: tests/hollow_crypt_remembrance_candle.test.ts pins the reach).
+        top = out * 1.38 + Vector((0, 0, tied))
+        p.box(top, (0.22, 0.14, 0.12), p.vary(color, 0.06), yaw=a + math.pi / 2)
+        segments = 6
+        drift = p.rng.uniform(-0.12, 0.12)
+        for k in range(segments):
+            t0, t1 = k / segments, (k + 1) / segments
+            sway0 = math.sin(t0 * 3.1) * 0.05
+            sway1 = math.sin(t1 * 3.1) * 0.05
+            w0 = 0.1 * (1 - 0.3 * t0)
+            w1 = 0.1 * (1 - 0.3 * t1)
+            c0 = top - Vector((0, 0, length * t0)) + out * sway0 + side * drift * t0
+            c1 = top - Vector((0, 0, length * t1)) + out * sway1 + side * drift * t1
+            tone = p.vary(color, 0.08)
+            p.plane((c0 - side * w0, c0 + side * w0, c1 + side * w1, c1 - side * w1), tone)
+            p.plane((c0 + side * w0 - out * 0.012, c0 - side * w0 - out * 0.012, c1 - side * w1 - out * 0.012,
+                     c1 + side * w1 - out * 0.012), tone)
+    for a in (1.55, 4.15):
+        out = Vector((math.cos(a), math.sin(a), 0))
+        hang = out * 1.33 + Vector((0, 0, spring - 0.04))
+        p.sweep([hang, hang - Vector((0, 0, 0.55))], 0.018, 0.018, iron_worn, sides=4)
+        p.box(hang - Vector((0, 0, 0.78)), (0.28, 0.035, 0.42), p.vary(BONE_OLD, 0.05), yaw=a + math.pi / 2, bevel=0.012)
+        for row in range(3):
+            p.box(hang - Vector((0, 0, 0.66 + row * 0.1)) + out * 0.022, (0.18, 0.008, 0.025), (0.2, 0.17, 0.14),
+                  yaw=a + math.pi / 2)
+    # ---- the votive lights left at its foot (their flames go out with the candle).
     for i in range(6):
-        a = math.tau * i / 6
-        p.spike((math.cos(a) * 1.3, math.sin(a) * 1.3, 0.4), 0.1, 0.6, IRON, sides=4)
+        a = math.tau * i / 6 + p.rng.uniform(-0.25, 0.25)
+        r = p.rng.uniform(1.24, 1.33)
+        h = p.rng.uniform(0.16, 0.42)
+        p.candle((math.cos(a) * r, math.sin(a) * r, 0.2), h, 0.06, drips=2)
+    # ---- the light (all on the glow slot): the flame, and the molten well it stands in.
+    p.prism((0, 0, wick - 0.07), 12, 0.4, 0.4, 0.012, (1.0, 0.7, 0.34), mat=GLOW)
+    _flame(p, (0, 0, wick), 1.67, 0.46, sides=10)
     return p
 
 
