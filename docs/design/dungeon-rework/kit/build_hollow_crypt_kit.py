@@ -14,11 +14,12 @@ import math
 import os
 import sys
 
+import bmesh
 from mathutils import Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hckit import (  # noqa: E402
-    AMBER, BONE, BONE_OLD, CLOTH, GLOW, IRON, MOSS, RIME, SILK, SLATE, SOUL, STONE_BLUE,
+    AMBER, BONE, BONE_OLD, CLOTH, GLOW, IRON, MOSS, RIME, SILK, SLATE, SOUL, STONE, STONE_BLUE,
     STONE_DARK, STONE_MID, STONE_PALE, TALLOW, TIMBER, UMBER, VIOLET, Piece, build_kit, export_kit,
 )
 
@@ -79,6 +80,279 @@ def rubble():
         p.box((p.rng.uniform(-1.6, 1.6), p.rng.uniform(-0.3, 0.3), s * 0.35), (s * 1.3, s, s * 0.7),
               p.vary(STONE_MID, 0.15), bevel=0.05, yaw=p.rng.random() * 3, roll=p.rng.uniform(-0.3, 0.3))
     p.rock((0.4, 0.1, 0.2), (1.1, 0.8, 0.5), STONE_DARK)
+    return p
+
+
+# =============================================================== the gargoyle's rubble
+# What is left of a Chapel Gargoyle (src/render/hollow_crypt/crypt_gargoyle_crumble_fx.ts):
+# a low heap, well under a player's knee, and the two blocks that rain down to
+# make it. Carved stone, so every break shows a flat, paler face.
+# Warm greys: the crypt's moon and sky are blue, so a neutral grey reads as ice.
+GARGOYLE_SKIN = (0.74, 0.71, 0.66)
+GARGOYLE_SHADE = (0.58, 0.56, 0.53)
+GARGOYLE_BREAK = (0.86, 0.83, 0.77)
+GARGOYLE_HORN = (0.56, 0.53, 0.5)
+GARGOYLE_TALON = (0.44, 0.42, 0.4)
+
+
+def _scratch(p):
+    """A scratch piece that draws on `p`'s random stream: cut it freely, then
+    `_absorb` it (a plane cut on the shared mesh would slice its neighbours)."""
+    scratch = Piece('scratch')
+    scratch.rng = p.rng
+    return scratch
+
+
+def _absorb(p, scratch, matrix):
+    """Move a scratch piece's geometry into `p` under `matrix`."""
+    scratch.bm.verts.index_update()
+    made = {}
+    for face in scratch.bm.faces:
+        verts = []
+        for v in face.verts:
+            if v.index not in made:
+                made[v.index] = p.bm.verts.new(matrix @ v.co)
+            verts.append(made[v.index])
+        try:
+            copy = p.bm.faces.new(verts)
+        except ValueError:
+            continue
+        copy.material_index = face.material_index
+        copy.smooth = face.smooth
+        for loop, source in zip(copy.loops, face.loops):
+            loop[p.col] = source[scratch.col]
+    scratch.bm.free()
+
+
+def _slice(scratch, normal, offset, break_color):
+    """Cut everything beyond a plane off a scratch piece; the break is one flat face."""
+    bm = scratch.bm
+    cut = bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], dist=1e-5,
+                                 plane_co=normal * offset, plane_no=normal, clear_outer=True)
+    rim = [e for e in cut['geom_cut'] if isinstance(e, bmesh.types.BMEdge)]
+    if len(rim) >= 3:
+        filled = bmesh.ops.holes_fill(bm, edges=rim, sides=0)
+        scratch._paint(filled['faces'], break_color, STONE)
+
+
+def _fractured(p, center, size, color, cuts=3, jitter=0.2, subdivisions=1, yaw=0.0, pitch=0.0, roll=0.0,
+               break_color=GARGOYLE_BREAK, deep=(0.3, 0.43), slab=False):
+    """A broken block: a jittered boulder (or, `slab`, a dressed block with its
+    chamfered arrises) sliced by `cuts` planes. The weathered skin keeps its
+    colour; each fresh break is one flat, paler face."""
+    scratch = _scratch(p)
+    if slab:
+        made = bmesh.ops.create_cube(scratch.bm, size=0.8)
+        for v in made['verts']:
+            v.co = Vector((v.co.x * (1 + (p.rng.random() - 0.5) * jitter),
+                           v.co.y * (1 + (p.rng.random() - 0.5) * jitter),
+                           v.co.z * (1 + (p.rng.random() - 0.5) * jitter)))
+        bmesh.ops.bevel(scratch.bm, geom=scratch.bm.edges[:], offset=0.05, segments=1, affect='EDGES')
+    else:
+        made = bmesh.ops.create_icosphere(scratch.bm, subdivisions=subdivisions, radius=0.5)
+        for v in made['verts']:
+            v.co = v.co * (1 + (p.rng.random() - 0.5) * 2 * jitter)
+    scratch._paint(scratch.bm.faces[:], color, STONE)
+    for _ in range(cuts):
+        normal = Vector((p.rng.uniform(-1, 1), p.rng.uniform(-1, 1), p.rng.uniform(-1, 1)))
+        if normal.length < 1e-3:
+            normal = Vector((0, 0, 1))
+        offset = p.rng.uniform(*deep) * (0.72 if slab else 1.0)
+        _slice(scratch, normal.normalized(), offset, p.vary(break_color, 0.05))
+    _absorb(p, scratch, Matrix.Translation(Vector(center)) @ Matrix.Rotation(yaw, 4, 'Z')
+            @ Matrix.Rotation(pitch, 4, 'X') @ Matrix.Rotation(roll, 4, 'Y')
+            @ Matrix.Diagonal((size[0], size[1], size[2], 1.0)))
+
+
+def _gargoyle_horn(p, matrix, length=1.0, color=GARGOYLE_HORN, broken=True):
+    """A ram horn: a ribbed curl, snapped off at the root with a pale break."""
+    h = _scratch(p)
+    pts = []
+    for i in range(11):
+        t = i / 10
+        a = t * math.radians(215)
+        r = 0.5 * (1 - 0.28 * t)
+        pts.append(Vector((math.cos(a) * r - 0.5, t * 0.22, math.sin(a) * r)) * length)
+    h.sweep(pts, 0.17 * length, 0.025 * length, color, sides=7)
+    # The growth rings a ram horn carries, raised.
+    for i in range(1, 8):
+        t = i / 10
+        ahead = (pts[i + 1] - pts[i - 1]).normalized()
+        r = 0.19 * length * (1 - 0.72 * t)
+        h.prism(pts[i] - ahead * 0.02 * length, 7, r, r, 0.04 * length, h.vary(color, 0.06), axis=ahead)
+    if broken:
+        back = (pts[0] - pts[1]).normalized()
+        h.prism(pts[0] - back * 0.001, 7, 0.165 * length, 0.165 * length, 0.012, GARGOYLE_BREAK, axis=back)
+    _absorb(p, h, matrix)
+
+
+def _gargoyle_head(p, matrix):
+    """Half the gargoyle's face, split from the crown down through the jaw: a
+    heavy brow over one blind eye socket, the muzzle with a fang still in the
+    lip, and the ram horn of that side still curled against the skull."""
+    h = _scratch(p)
+    skin = h.vary(GARGOYLE_SKIN, 0.04)
+    # Skull, heavy brow ridge, the muzzle, its lip and chin.
+    h.rock((0, 0.05, 0.0), (0.95, 1.05, 0.82), skin, jitter=0.06, subdivisions=2)
+    h.box((0, -0.4, 0.2), (0.9, 0.3, 0.2), h.vary(GARGOYLE_SHADE, 0.04), bevel=0.05, pitch=-0.3)
+    h.box((0, -0.66, -0.06), (0.52, 0.6, 0.36), skin, bevel=0.08, taper=0.78, pitch=0.12)
+    h.box((0, -0.72, -0.28), (0.46, 0.46, 0.12), h.vary(GARGOYLE_SHADE, 0.05), bevel=0.03)
+    h.box((0, -0.9, -0.02), (0.2, 0.1, 0.14), h.vary(GARGOYLE_SHADE, 0.05), bevel=0.02)
+    for sx in (-1, 1):
+        # The socket (its ember out) under the brow, and the cheek ridge.
+        h.box((sx * 0.23, -0.5, 0.07), (0.2, 0.14, 0.13), (0.06, 0.055, 0.06))
+        h.box((sx * 0.38, -0.3, -0.08), (0.14, 0.44, 0.18), h.vary(GARGOYLE_SKIN, 0.05), bevel=0.04, yaw=sx * 0.35)
+        h.spike((sx * 0.17, -0.86, -0.24), 0.055, 0.22, (0.86, 0.84, 0.78), sides=4)
+        h.spike((sx * 0.08, -0.92, -0.24), 0.035, 0.12, (0.86, 0.84, 0.78), sides=4)
+    # A ridge of spurs over the crown.
+    for k in range(3):
+        h.prism((0.0, 0.05 + k * 0.2, 0.36 - k * 0.05), 5, 0.09, 0.02, 0.17, h.vary(GARGOYLE_SHADE), lean=(0, 0.08))
+    # Split it: everything on one side of a slanted plane falls away.
+    _slice(h, Vector((1.0, 0.12, 0.25)).normalized(), 0.13, GARGOYLE_BREAK)
+    _absorb(p, h, matrix)
+    # The horn of the side that is left, curling back and down round the ear.
+    _gargoyle_horn(p, matrix @ Matrix.Translation((-0.42, 0.12, 0.2)) @ Matrix.Rotation(math.radians(100), 4, 'Z')
+                   @ Matrix.Rotation(math.radians(74), 4, 'X') @ Matrix.Translation((0.5, 0, -0.5)), length=0.95,
+                   broken=False)
+
+
+def _gargoyle_hand(p, matrix):
+    """A taloned hand broken off at the wrist, its fingers still hooked."""
+    mark = p.mark()
+    skin = p.vary(GARGOYLE_SKIN, 0.04)
+    _fractured(p, (0, 0.02, 0.0), (0.5, 0.62, 0.3), skin, cuts=1, jitter=0.1, subdivisions=2, deep=(0.36, 0.44))
+    p.prism((0, 0.27, 0), 7, 0.19, 0.17, 0.16, p.vary(GARGOYLE_SHADE), axis=(0, 1, 0))
+    p.prism((0, 0.42, 0), 7, 0.165, 0.15, 0.03, GARGOYLE_BREAK, axis=(0, 1, 0))
+    for x, reach in ((-0.17, 0.92), (0.0, 1.0), (0.17, 0.9)):
+        knuckle = Vector((x, -0.22, 0.05))
+        mid = Vector((x * 1.3, -0.22 - 0.26 * reach, 0.2))
+        tip = Vector((x * 1.4, -0.22 - 0.44 * reach, 0.07))
+        p.rock(knuckle, (0.17, 0.17, 0.15), p.vary(GARGOYLE_SHADE), jitter=0.05, subdivisions=1)
+        p.sweep([knuckle, mid], 0.085, 0.07, skin, sides=6)
+        p.rock(mid, (0.16, 0.16, 0.15), p.vary(GARGOYLE_SHADE), jitter=0.05, subdivisions=1)
+        p.sweep([mid, tip], 0.07, 0.055, skin, sides=6)
+        p.sweep(p.bezier(tip, tip + Vector((0, -0.13, -0.01)), tip + Vector((0, -0.17, -0.15)), 4), 0.055, 0.006,
+                GARGOYLE_TALON, sides=5)
+    thumb = Vector((0.22, -0.02, 0.02))
+    bend = thumb + Vector((0.2, -0.14, 0.1))
+    end = thumb + Vector((0.27, -0.3, 0.0))
+    p.sweep([thumb, bend], 0.085, 0.065, skin, sides=6)
+    p.sweep([bend, end], 0.065, 0.05, skin, sides=6)
+    p.sweep(p.bezier(end, end + Vector((0.02, -0.1, -0.02)), end + Vector((0.0, -0.15, -0.13)), 4), 0.05, 0.006,
+            GARGOYLE_TALON, sides=5)
+    p.turn(mark, matrix)
+
+
+def _gargoyle_wing(p, matrix):
+    """A span of wing: three stone finger ribs fanned from the wrist, knuckled
+    and bowed, and the web between them, scalloped along its trailing edge and
+    torn through."""
+    mark = p.mark()
+    root = Vector((0, 0, 0.07))
+    tips = (Vector((1.6, -0.25, 0.03)), Vector((1.5, 0.7, 0.03)), Vector((0.85, 1.35, 0.03)))
+    for tip in tips:
+        side = Vector((-(tip.y - root.y), tip.x - root.x, 0)).normalized()
+        knuckle = root.lerp(tip, 0.52) + Vector((0, 0, 0.11)) + side * 0.09
+        p.sweep(p.bezier(root, root.lerp(knuckle, 0.5) + Vector((0, 0, 0.05)), knuckle, 4), 0.1, 0.07,
+                p.vary(GARGOYLE_SHADE, 0.05), sides=6)
+        p.rock(knuckle, (0.22, 0.22, 0.17), p.vary(GARGOYLE_SHADE, 0.05), jitter=0.06, subdivisions=1)
+        p.sweep(p.bezier(knuckle, knuckle.lerp(tip, 0.5) - side * 0.05, tip, 4), 0.065, 0.02,
+                p.vary(GARGOYLE_SHADE, 0.05), sides=6)
+    web = p.vary(GARGOYLE_SKIN, 0.05)
+    for k in range(2):
+        a, b = tips[k], tips[k + 1]
+        edge = []
+        for i in range(7):
+            t = i / 6
+            # The scallop of a bat wing: the web sags back toward the wrist between two ribs.
+            sag = 1 - 0.3 * math.sin(math.pi * t)
+            if k == 1 and i in (2, 3):
+                sag -= 0.24  # the tear
+            edge.append(root.lerp(a.lerp(b, t), 0.95 * sag))
+        lower = [Vector((v.x, v.y, 0.03)) for v in [root] + edge]
+        upper = [Vector((v.x, v.y, 0.06)) for v in [root] + edge]
+        for i in range(1, len(lower) - 1):
+            p.plane((upper[0], upper[i], upper[i + 1]), web)
+            p.plane((lower[0], lower[i + 1], lower[i]), web)
+            p.plane((lower[i], lower[i + 1], upper[i + 1], upper[i]), GARGOYLE_BREAK)
+    _fractured(p, root, (0.42, 0.4, 0.3), p.vary(GARGOYLE_SKIN), cuts=2)
+    p.turn(mark, matrix)
+
+
+def gargoyle_rubble():
+    """The heap a Chapel Gargoyle crumbles into: broken blocks in a low mound
+    (0.6 yd at its highest, a player's knee is higher) inside a 2.2 yd scatter,
+    with what can still be told apart lying on it: half the horned face, the
+    other horn, a taloned hand, a span of wing."""
+    p = P('GargoyleRubble', lichen=0.08, weather=0.4)
+    # The core of the mound: big blocks leaning on each other, half sunk in grit.
+    core = (
+        ((-0.35, 0.3, 0.2), (1.35, 1.1, 0.6), 0.4, 0.15, -0.1, False),
+        ((0.7, 0.4, 0.19), (1.1, 1.2, 0.56), 1.7, -0.2, 0.12, True),
+        ((0.3, -0.7, 0.17), (1.15, 0.95, 0.5), 2.6, 0.1, 0.2, False),
+        ((-0.95, -0.4, 0.16), (1.0, 0.95, 0.5), 0.9, 0.2, -0.15, True),
+        ((-0.75, 1.0, 0.15), (1.0, 0.85, 0.46), 2.1, -0.12, 0.1, False),
+        ((1.0, -0.5, 0.14), (0.9, 0.8, 0.44), 0.2, 0.18, 0.16, True),
+        ((0.1, 0.5, 0.36), (0.85, 0.72, 0.4), 1.1, -0.1, 0.25, True),
+        ((-0.2, -0.15, 0.34), (0.8, 0.7, 0.36), 2.0, 0.2, -0.2, False),
+        ((1.25, 0.55, 0.13), (0.8, 0.7, 0.4), 0.7, -0.15, 0.1, True),
+        ((-1.35, 0.35, 0.13), (0.8, 0.72, 0.4), 2.9, 0.12, 0.18, False),
+    )
+    for center, size, yaw, pitch, roll, slab in core:
+        _fractured(p, center, size, p.vary(GARGOYLE_SKIN, 0.07), cuts=3 if slab else 4, yaw=yaw, pitch=pitch,
+                   roll=roll, slab=slab)
+    # The ring round it: smaller blocks that rolled a little way.
+    for i in range(14):
+        a = math.tau * i / 14 + p.rng.uniform(-0.2, 0.2)
+        r = p.rng.uniform(1.45, 2.0)
+        s = p.rng.uniform(0.32, 0.58)
+        tone = GARGOYLE_SHADE if i % 3 == 0 else GARGOYLE_SKIN
+        _fractured(p, (math.cos(a) * r, math.sin(a) * r, s * 0.24), (s * 1.25, s, s * 0.72), p.vary(tone, 0.08),
+                   cuts=3, yaw=p.rng.uniform(0, 3.1), pitch=p.rng.uniform(-0.25, 0.25),
+                   roll=p.rng.uniform(-0.25, 0.25), slab=i % 2 == 0)
+    # Scree out to the edge of the scatter, and grit between the blocks.
+    for i in range(40):
+        a = p.rng.uniform(0, math.tau)
+        r = math.sqrt(p.rng.random()) * 2.3
+        s = p.rng.uniform(0.1, 0.24) * (1.2 if r < 1.2 else 1.0)
+        _fractured(p, (math.cos(a) * r, math.sin(a) * r, s * 0.3), (s * 1.3, s, s * 0.75),
+                   p.vary(GARGOYLE_SKIN if i % 2 else GARGOYLE_BREAK, 0.1), cuts=2, yaw=p.rng.uniform(0, 3.1),
+                   roll=p.rng.uniform(-0.4, 0.4), slab=i % 3 == 0)
+    # What is still a gargoyle. The face lies on its broken side on top of the
+    # mound, looking up past whoever comes to loot it.
+    _gargoyle_head(p, Matrix.Translation((0.05, -0.3, 0.42)) @ Matrix.Rotation(0.5, 4, 'Z')
+                   @ Matrix.Rotation(-1.15, 4, 'X') @ Matrix.Rotation(-0.3, 4, 'Y')
+                   @ Matrix.Diagonal((0.52, 0.52, 0.52, 1)))
+    _gargoyle_horn(p, Matrix.Translation((-1.45, -1.25, 0.17)) @ Matrix.Rotation(2.4, 4, 'Z')
+                   @ Matrix.Rotation(math.pi / 2 - 0.12, 4, 'X') @ Matrix.Translation((0.5, 0, 0)), length=0.8)
+    _gargoyle_hand(p, Matrix.Translation((1.55, -1.3, 0.15)) @ Matrix.Rotation(-0.9, 4, 'Z')
+                   @ Matrix.Rotation(0.12, 4, 'Y') @ Matrix.Diagonal((0.82, 0.82, 0.82, 1)))
+    _gargoyle_wing(p, Matrix.Translation((0.45, 1.25, 0.02)) @ Matrix.Rotation(0.8, 4, 'Z'))
+    # Settled: nothing stands over 0.6 yd (the runtime pins it, GARGOYLE_RUBBLE.height).
+    top = max(v.co.z for v in p.bm.verts)
+    if top > 0.6:
+        for v in p.bm.verts:
+            v.co.z *= 0.6 / top
+    return p
+
+
+def gargoyle_chunk():
+    """One falling block of the gargoyle (drawn many times, scaled and turned):
+    about a yard across, centred on its own middle so it tumbles true."""
+    p = P('GargoyleChunk', lichen=0.0, weather=0.35)
+    _fractured(p, (0, 0, 0), (1.25, 1.05, 0.9), GARGOYLE_SKIN, cuts=4, jitter=0.3, slab=True)
+    return p
+
+
+def gargoyle_shard():
+    """One falling splinter (a wing rib, a horn, a talon): long and tapered,
+    centred on its own middle."""
+    p = P('GargoyleShard', lichen=0.0, weather=0.35)
+    pts = p.bezier((-0.75, 0, -0.05), (0.0, 0, 0.2), (0.75, 0, -0.08), 6)
+    p.sweep(pts, 0.2, 0.035, GARGOYLE_SHADE, sides=6)
+    back = (pts[0] - pts[1]).normalized()
+    p.prism(pts[0], 6, 0.2, 0.2, 0.012, GARGOYLE_BREAK, axis=back)
+    _fractured(p, (-0.5, 0.0, 0.0), (0.5, 0.42, 0.4), GARGOYLE_SKIN, cuts=3, deep=(0.18, 0.3))
     return p
 
 
@@ -861,7 +1135,7 @@ def distant_spire():
 
 
 BUILDERS = (
-    balustrade, parapet, bone_rail, rubble,
+    balustrade, parapet, bone_rail, rubble, gargoyle_rubble, gargoyle_chunk, gargoyle_shard,
     lambda: curtain_wall(False), lambda: curtain_wall(True),
     lychgate, mourner_statue, chapel_ruin, rock_pillar, candle_cluster, brazier, skull_pile, coffin_stack,
     lambda: cloister_column(False), lambda: cloister_column(True),
