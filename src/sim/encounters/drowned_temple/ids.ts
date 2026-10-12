@@ -350,7 +350,10 @@ export const HYDRA_TUNING = {
   /** Heroic: its own share, so a regrown head stands up with the health it had
    *  before the heads' heroic pools were raised (the heroic health bands,
    *  2026-10-12: 2,153 of 8,333, as half was of the 4,306 a head had). Read
-   *  through hydraRegrowShare(). */
+   *  through hydraRegrowShare(). COUPLED to the heroic head pool
+   *  (dungeon_difficulty.ts mere_hydra_head_* 4.645): retune either and the
+   *  other must follow, or the literal 2,153 in
+   *  tests/drowned_temple_health_bands.test.ts (a real heroic regrowth) fails. */
   regrowShareHeroic: 0.2584,
   /** Enraged Hydra: damage done per fallen head. */
   enragePerHead: 0.15,

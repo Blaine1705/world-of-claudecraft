@@ -794,8 +794,10 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // regrown head still stands up with the 2,153 it had. Its Enraged stacks
     // count the heads lying dead (two at most), not time, so the larger pool
     // cannot raise them past the design; what it does bring is a second
-    // Tsunami and more Combined Breaths on the same clocks (the Temple suite
-    // has the measured fights). Pinned by
+    // Tsunami and more Combined Breaths on the same clocks (measured once by
+    // hand in real fights at 230 DPS and recorded in docs/design/
+    // dungeon-rework/README.md section 6; no suite replays those fights). The
+    // pools and the regrown head's 2,153 are pinned by
     // tests/drowned_temple_health_bands.test.ts.
     healthMultiplierByMob: {
       choirmother_selthe: 15.62,
