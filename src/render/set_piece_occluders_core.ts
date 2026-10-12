@@ -82,6 +82,42 @@ export function setPieceBoxesBlock(
   return false;
 }
 
+/** The reach of a set of boxes from `centre`: no point of any footprint lies
+ *  farther out. With setPieceSegmentWithin it is the per-frame early-out: a
+ *  segment that stays outside the circle cannot touch a box. */
+export function setPieceBoxesRadius(
+  boxes: readonly SetPieceOccluderBox[],
+  centre: { readonly x: number; readonly z: number },
+): number {
+  let radius = 0;
+  for (const b of boxes) {
+    const reach = Math.hypot(b.x - centre.x, b.z - centre.z) + Math.hypot(b.hw, b.hd);
+    if (reach > radius) radius = reach;
+  }
+  return radius;
+}
+
+/** Whether the ground segment a to b comes within `radius` of (cx, cz). Plain
+ *  arithmetic, no allocation: it runs for every set on every frame. */
+export function setPieceSegmentWithin(
+  cx: number,
+  cz: number,
+  radius: number,
+  ax: number,
+  az: number,
+  bx: number,
+  bz: number,
+): boolean {
+  const dx = bx - ax;
+  const dz = bz - az;
+  const len2 = dx * dx + dz * dz;
+  let t = len2 > 0 ? ((cx - ax) * dx + (cz - az) * dz) / len2 : 0;
+  t = t < 0 ? 0 : t > 1 ? 1 : t;
+  const px = ax + dx * t - cx;
+  const pz = az + dz * t - cz;
+  return px * px + pz * pz <= radius * radius;
+}
+
 /** The middle of a set of boxes: where its fade programs are asked for ahead
  *  of the first occlusion (the family's prefetch radius is measured from it). */
 export function setPieceBoxesCentre(
