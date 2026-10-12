@@ -159,7 +159,12 @@ function everyBoss(dungeonId: string, difficulty: DungeonDifficulty): Watch {
       expect(rows()?.[rowIndex], `${row.mobId} row open until the finale dies`).toBe(false);
       sim.ctx.handleDeath(body, sim.player);
     } else {
-      sim.ctx.handleDeath(boss, sim.player);
+      // A boss of several bodies (the Mere Hydra) is down only when every one
+      // of them is: the row stays open until the last falls.
+      row.bodyIds.forEach((bodyId, n) => {
+        expect(rows()?.[rowIndex], `${row.mobId} row open before body ${n + 1}`).toBe(false);
+        sim.ctx.handleDeath(placedBody(sim, inst, bodyId), sim.player);
+      });
     }
     // The tracker's read, which is what the stable prefix protects: this
     // boss, and only the bosses killed so far, read defeated.

@@ -72,8 +72,10 @@ export interface HoardBossCueView {
 export interface DungeonRunBossView {
   /** The boss's mob template id: the row's stable identity and its name key. */
   mobId: string;
-  /** True once this encounter is over in this run (dead bosses stay dead until
-   *  the claim is freed, so a row never goes back). */
+  /** True while this encounter is over in this run. Dead bosses stay dead
+   *  until the claim is freed, so in play a finished row stays finished. A
+   *  boss of several bodies (the Mere Hydra's three heads) is over only while
+   *  ALL of them lie dead: one or two fallen heads leave the row open. */
   defeated: boolean;
 }
 

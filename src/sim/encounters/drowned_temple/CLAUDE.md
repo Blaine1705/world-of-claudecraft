@@ -32,6 +32,15 @@ Rules:
   client mirrors it with no wire or IWorld change.
 - Reset on evade and wipe clears the marks, the Reflections, the pools and dries
   the island.
+- The Mere Hydra is ONE boss to every list that counts bosses. The Dungeon Finder
+  catalogue lists it once, keyed on the centre head (its name, portrait and loot
+  tables) with the other two heads as `otherBodyIds`
+  (`content/dungeon_finder.ts`); the run's objectives row
+  (`instances/dungeon_run.ts`) and the weekly boss table (`weekly_rewards.ts`
+  `recordWeeklyBossKill`) wait for all three heads, so a head that falls and
+  grows back counts for nothing. Pinned by `tests/dungeon_run_hydra.test.ts`
+  (the row), `tests/weekly_reward_tables.test.ts` (the table) and
+  `tests/drowned_temple_hydra_finder.test.ts` (the Finder lines against the tuning).
 - Tests: `tests/drowned_temple_bosses.test.ts`, `tests/drowned_temple_hydra_elements.test.ts`,
   `tests/drowned_temple_colossus_chase.test.ts`, `tests/drowned_temple_ysolei_pass6.test.ts`,
   `tests/drowned_temple_selthe_caster.test.ts`, `tests/drowned_temple_colossus_fracture.test.ts`,

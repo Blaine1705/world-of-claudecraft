@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "22de8303c152258aceac599051819b4f7062f84ec932311868b9f06d565405bb",
+  "rendererFingerprint": "daad335573c05a13176d01923e8971f1a170eedc32b8b37e950fe61036dd44c6",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 6079620,
-      "sha256": "59a59d38815d9634fe53658dc46ba3b8eb1c4bd7cbd021e9df65fb100b8eb4d7",
+      "sha256": "c5c95e9e6cb3cf36551cb120886b8aca2bad1992288b53dd1a3091c21d1cf29c",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6422,7 +6422,7 @@
     {
       "id": "mere_hydra_head_center",
       "family": "dragonkin",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "temple_hydra_head",
       "renderSpec": {
         "model": {

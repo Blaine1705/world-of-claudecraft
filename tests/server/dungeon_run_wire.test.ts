@@ -44,7 +44,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { dungeonRunWireJson } from '../../server/dungeon_run_wire';
 import { GameServer } from '../../server/game';
 import { decodeDungeonRun, nextDungeonRun, sameDungeonRun } from '../../src/net/dungeon_run_wire';
+import { MERE_HYDRA_HEAD_IDS } from '../../src/sim/content/drowned_temple';
 import { DUNGEONS } from '../../src/sim/data';
+import { regrowHead } from '../../src/sim/encounters/drowned_temple/hydra_regrowth';
 import { dungeonRunForPlayer } from '../../src/sim/instances/dungeon_run';
 import { claimedInstanceAt, enterDungeon, leaveDungeon } from '../../src/sim/instances/dungeons';
 import type { Entity } from '../../src/sim/types';
@@ -174,7 +176,7 @@ describe('dgrun: the dungeon run on the wire', () => {
     killPlaced('choirmother_selthe');
     pass();
     const flags = () => client.dungeonRun?.bosses.map((boss) => boss.defeated);
-    expect(flags()).toEqual([true, false, false]);
+    expect(flags()).toEqual([true, false, false, false]);
     // Settled: the server has nothing more to say about the run.
     expect(pass().self).not.toHaveProperty('dgrun');
 
@@ -199,6 +201,7 @@ describe('dgrun: the dungeon run on the wire', () => {
       difficulty: 'normal',
       bosses: [
         { mobId: 'choirmother_selthe', defeated: true },
+        { mobId: 'mere_hydra_head_center', defeated: false },
         { mobId: 'tideglass_colossus', defeated: false },
         { mobId: 'ysolei', defeated: false },
       ],
@@ -206,7 +209,81 @@ describe('dgrun: the dungeon run on the wire', () => {
     // biome-ignore lint/suspicious/noExplicitAny: applySnapshot is ClientWorld's private decode door
     (client as any).applySnapshot(snap);
     expect(client.dungeonRun).toEqual(dungeonRunForPlayer(sim.ctx, session.pid));
-    expect(flags()).toEqual([true, false, false]);
+    expect(flags()).toEqual([true, false, false, false]);
+  });
+
+  it('ships the Mere Hydra as one row, and only when its third head falls', () => {
+    // A boss of three placed bodies is still one row on the wire, keyed on the
+    // centre head (whose mob name is the boss's). The server decides when it
+    // is down, so the mirror needs no notion of the other two heads, and a
+    // head falling short of the kill moves nothing and ships nothing.
+    const { sim, session, client, pass, killPlaced } = rig(306, 'Poolwader');
+    pass();
+    sim.setDungeonDifficulty('heroic', session.pid);
+    expect(enterDungeon(sim.ctx, 'drowned_temple', session.pid, true)).toBe(true);
+    const entered = pass();
+    expect(entered.self.dgrun).toEqual({
+      dungeonId: 'drowned_temple',
+      difficulty: 'heroic',
+      bosses: [
+        { mobId: 'choirmother_selthe', defeated: false },
+        { mobId: 'mere_hydra_head_center', defeated: false },
+        { mobId: 'tideglass_colossus', defeated: false },
+        { mobId: 'ysolei', defeated: false },
+      ],
+    });
+    // Row count and order are the sim's own, on both hosts.
+    expect(client.dungeonRun).toEqual(dungeonRunForPlayer(sim.ctx, session.pid));
+    const mirrored = client.dungeonRun;
+    const flags = () => client.dungeonRun?.bosses.map((boss) => boss.defeated);
+
+    // The centre head (the row's own id) and then a second head: no frame.
+    for (const head of ['mere_hydra_head_center', 'mere_hydra_head_left']) {
+      killPlaced(head);
+      expect(pass().self, head).not.toHaveProperty('dgrun');
+      expect(client.dungeonRun, head).toBe(mirrored);
+      expect(flags(), head).toEqual([false, false, false, false]);
+    }
+
+    killPlaced('mere_hydra_head_right');
+    const afterKill = pass();
+    expect(afterKill.self.dgrun.bosses[1]).toEqual({
+      mobId: 'mere_hydra_head_center',
+      defeated: true,
+    });
+    expect(flags()).toEqual([false, true, false, false]);
+    expect(client.dungeonRun).toEqual(dungeonRunForPlayer(sim.ctx, session.pid));
+    expect(pass().self).not.toHaveProperty('dgrun');
+  });
+
+  it('a Hydra row that reopens ships again and the mirror follows it back', () => {
+    // The row is a live read (a head standing again reopens it), so the wire
+    // must carry a row going back to open exactly like one closing.
+    const { sim, session, client, pass, killPlaced } = rig(307, 'Rimewader');
+    expect(enterDungeon(sim.ctx, 'drowned_temple', session.pid, true)).toBe(true);
+    pass();
+    for (const head of MERE_HYDRA_HEAD_IDS) killPlaced(head);
+    pass();
+    expect(client.dungeonRun?.bosses[1].defeated).toBe(true);
+    const player = sim.entities.get(session.pid) as Entity;
+    const inst = claimedInstanceAt(sim.ctx, player.pos);
+    if (!inst) throw new Error('no claim');
+    const index = DUNGEONS.drowned_temple.spawns.findIndex(
+      (s) => s.mobId === 'mere_hydra_head_left',
+    );
+    regrowHead(sim.ctx, sim.ctx.entities.get(inst.mobIds[index]) as Entity, 1);
+    const reopened = pass();
+    expect(reopened.self.dgrun.bosses[1]).toEqual({
+      mobId: 'mere_hydra_head_center',
+      defeated: false,
+    });
+    expect(client.dungeonRun?.bosses.map((boss) => boss.defeated)).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
+    expect(client.dungeonRun).toEqual(dungeonRunForPlayer(sim.ctx, session.pid));
   });
 });
 

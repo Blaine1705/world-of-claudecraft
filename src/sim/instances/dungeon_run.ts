@@ -13,6 +13,10 @@
 // are summoned by its relics, so neither is "one room's roster" and each needs
 // a design of its own.
 //
+// A boss made of several placed bodies is content too: the encounter lists its
+// further bodies (FinderEncounter.otherBodyIds, the Mere Hydra's other two
+// heads) and is still ONE row, named for the encounter's own mob id.
+//
 // WHEN A ROW IS DONE is the claim's own roster, like the gates
 // (dungeon_gates.ts): dead instance mobs stay dead until the claim is freed,
 // so a boss's corpse IS the progress and nothing is stored, saved or ticked.
@@ -22,12 +26,20 @@
 // belongs to the final boss's row, so the row waits for it, and the list never
 // reads complete while the last fight is still running.
 //
+// A several-bodied row is done only while EVERY body lies dead at once. The
+// Hydra's heads grow back while another lives, and a wipe stands every fallen
+// head up again (encounters/drowned_temple/hydra_regrowth.ts), so one or two
+// fallen heads are never progress and the row stays open through all of it.
+// Once the last head falls nothing regrows, so a finished row stays finished.
+// The read is live all the same and never latched: a body that did stand
+// again would reopen its row at once.
+//
 // Draws NO rng and mutates no sim state. The two WeakMaps are derived read
 // caches keyed by the claim's slot record (one per world), so every caller in
 // a tick, and every member of a party, is handed the same frozen view.
 
 import type { DungeonRunBossView, DungeonRunView } from '../../world_api/dungeons';
-import { finderActivity } from '../content/dungeon_finder';
+import { finderActivity, finderEncounterBodyIds } from '../content/dungeon_finder';
 import { DUNGEONS } from '../data';
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -39,6 +51,9 @@ import { claimedInstanceAt } from './dungeons';
 export interface DungeonRunPlanRow {
   /** The boss the row is named for (a mob the dungeon places). */
   mobId: string;
+  /** Every placed body the row waits on: the boss itself first, then the
+   *  further bodies of a several-bodied boss. All of them must be dead. */
+  bodyIds: readonly string[];
   /** The summoned body whose death ends the encounter, when that is not the
    *  boss itself; null for every ordinary boss. */
   finaleId: string | null;
@@ -70,6 +85,7 @@ export function dungeonRunPlan(
     const after = dungeon.bossExitPortal?.after;
     plan = activity.encounters.map((encounter) => ({
       mobId: encounter.mobId,
+      bodyIds: finderEncounterBodyIds(encounter),
       finaleId:
         encounter.final === true && after !== undefined && after !== encounter.mobId ? after : null,
     }));
@@ -107,7 +123,9 @@ function finaleDead(ctx: SimContext, inst: InstanceSlot, templateId: string): bo
 }
 
 function rowDefeated(ctx: SimContext, inst: InstanceSlot, row: DungeonRunPlanRow): boolean {
-  if (!dungeonPlacedBossDead(ctx, inst, row.mobId)) return false;
+  for (const bodyId of row.bodyIds) {
+    if (!dungeonPlacedBossDead(ctx, inst, bodyId)) return false;
+  }
   return row.finaleId === null || finaleDead(ctx, inst, row.finaleId);
 }
 
