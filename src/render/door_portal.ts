@@ -6,6 +6,7 @@ import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { buildSanctumExitPortal } from './sanctum_exit_portal';
 import { markOwnedMaterial, markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { applyWornStone } from './worn_stone';
 
@@ -1020,6 +1021,9 @@ export function buildDoorBody(
   dungeonId: string | null | undefined,
   lowGfx: boolean,
 ): { body: THREE.Group; portal?: THREE.Mesh } {
+  if (!entering && dungeonId === 'gravewyrm_sanctum') {
+    return buildSanctumExitPortal(lowGfx, riftPortalTexture());
+  }
   const body = new THREE.Group();
   // Doors whose visible arch is authored elsewhere render only an invisible
   // click-box: the Nythraxis crypt arch is baked into that dungeon's

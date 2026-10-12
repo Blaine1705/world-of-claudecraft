@@ -109,7 +109,8 @@ describe('buildDoorBody: the Gravewyrm Sanctum Seal Gate', () => {
 
   it('only the entering side yields: the exit inside the instance keeps its portal', () => {
     const { body, portal } = buildDoorBody(false, 'gravewyrm_sanctum', false);
-    expect(meshes(body).length).toBe(5);
+    expect(body.name).toBe('sanctum-exit');
+    expect(body.getObjectByName('frost-opening')).toBeDefined();
     expect(portal).toBeDefined();
   });
 });
