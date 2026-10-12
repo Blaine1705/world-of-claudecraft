@@ -3,11 +3,21 @@
 // the fade family's own segment test) and the registry
 // (set_piece_occluders.ts: a set's meshes get their own material clones at
 // registration, the per-frame pass fades the blocking set only and restores
-// it when the view clears, a blended ghost draws behind its own depth veil,
-// dispose and clear unregister). Three.js runs headless in Node; both ghost
-// styles (the blend and the low-tier dither) are forced in turn.
+// it when the view clears, a set the camera is nowhere near is not tested at
+// all, a blended ghost draws behind its own depth veil, dispose and clear
+// unregister and leave the set as authored). Three.js runs headless in Node;
+// both ghost styles (the blend and the low-tier dither) are forced in turn.
+// The last block pins what the veil's fairness rests on: everything a player
+// acts on draws below the veil's render order.
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import {
+  FLOOR_VFX_LAYERS,
+  floorVfxLayerTopOrder,
+  floorVfxRenderOrder,
+} from '../src/render/floor_vfx_layer';
 import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
@@ -26,7 +36,9 @@ import {
   type SetPieceSolid,
   setPieceBoxesBlock,
   setPieceBoxesCentre,
+  setPieceBoxesRadius,
   setPieceOccluderBox,
+  setPieceSegmentWithin,
 } from '../src/render/set_piece_occluders_core';
 import { isSharedMaterial, markSharedMaterial } from '../src/render/shared_resource';
 
@@ -83,6 +95,42 @@ describe('the occluder boxes of a set piece', () => {
     const both = [WALL, TOWER].map(setPieceOccluderBox);
     expect(setPieceBoxesBlock(both, 20, 1.6, -6, 20, 4, 6)).toBe(true);
     expect(setPieceBoxesBlock([], 0, 1.6, -3, 0, 4, 6)).toBe(false);
+  });
+});
+
+describe('the reach of a set piece', () => {
+  it('the radius holds every footprint, corners and far boxes included', () => {
+    const boxes = [WALL, TOWER].map(setPieceOccluderBox);
+    const centre = setPieceBoxesCentre(boxes, { x: 0, z: 0 });
+    const radius = setPieceBoxesRadius(boxes, centre);
+    // the far corner of each box, whatever its rotation
+    expect(radius).toBeCloseTo(10 + Math.hypot(3, 3), 6);
+    for (const b of boxes) {
+      for (const [sx, sz] of [
+        [1, 1],
+        [1, -1],
+        [-1, 1],
+        [-1, -1],
+      ]) {
+        const corner = Math.hypot(b.x + sx * b.hw - centre.x, b.z + sz * b.hd - centre.z);
+        expect(corner).toBeLessThanOrEqual(radius + 1e-9);
+      }
+    }
+    expect(setPieceBoxesRadius([], { x: 0, z: 0 })).toBe(0);
+  });
+
+  it('a segment is near when any point of it is, not only its ends', () => {
+    // both ends outside the circle, the middle through it
+    expect(setPieceSegmentWithin(0, 0, 2, -10, 1, 10, 1)).toBe(true);
+    // the same segment a little farther off passes clear
+    expect(setPieceSegmentWithin(0, 0, 2, -10, 3, 10, 3)).toBe(false);
+    // an end inside
+    expect(setPieceSegmentWithin(0, 0, 2, 1, 0, 30, 0)).toBe(true);
+    // pointing away from the circle: the near end decides
+    expect(setPieceSegmentWithin(0, 0, 2, 5, 0, 30, 0)).toBe(false);
+    // a segment of no length is its point
+    expect(setPieceSegmentWithin(0, 0, 2, 1, 1, 1, 1)).toBe(true);
+    expect(setPieceSegmentWithin(0, 0, 2, 3, 3, 3, 3)).toBe(false);
   });
 });
 
@@ -173,6 +221,57 @@ describe('the set piece occluder registry', () => {
     expect(wall.alpha()).toBe(1);
     expect(wallMat.transparent).toBe(false);
     expect(wallMat.opacity).toBe(1);
+  });
+
+  it('a camera far from a solid set tests none of its boxes; near it, every frame does', () => {
+    const wall = registerSetPieceOccluders(
+      [WALL, TOWER],
+      [model(new THREE.MeshStandardMaterial())],
+    );
+    const tests = () => setPieceOccludersInternalsForTest.boxTests();
+    let before = tests();
+    // anywhere else in the world, for many frames
+    for (let i = 0; i < 200; i++) {
+      updateSetPieceOccluders(500 + i, 4, 300, 505 + i, 1.6, 300, FRAME);
+    }
+    expect(tests()).toBe(before);
+    expect(wall.alpha()).toBe(1);
+    // both ends outside the reach but the segment across it: tested
+    before = tests();
+    updateSetPieceOccluders(10, 4, 40, 10, 1.6, -40, FRAME);
+    expect(tests()).toBe(before + 2);
+    // ghosted, then the camera leaves at once: the restore keeps running to the end
+    blocked();
+    expect(wall.alpha()).toBe(OCCLUDER_FADE_ALPHA);
+    for (let i = 0; i < 600 && wall.alpha() < 1; i++) {
+      updateSetPieceOccluders(500, 4, 300, 505, 1.6, 300, FRAME);
+    }
+    expect(wall.alpha()).toBe(1);
+    // and once it is solid the far camera is free again
+    before = tests();
+    for (let i = 0; i < 50; i++) updateSetPieceOccluders(500, 4, 300, 505, 1.6, 300, FRAME);
+    expect(tests()).toBe(before);
+  });
+
+  it('onFade reports the alpha the set is drawn at, once per change', () => {
+    const seen: number[] = [];
+    const root = model(new THREE.MeshStandardMaterial());
+    const wall = registerSetPieceOccluders([WALL], [root], { onFade: (a) => seen.push(a) });
+    clear();
+    expect(seen).toEqual([]);
+    blocked();
+    blocked();
+    expect(seen).toEqual([OCCLUDER_FADE_ALPHA]);
+    for (let i = 0; i < 600; i++) clear();
+    // it eased back through rising values and ended exactly solid
+    expect(seen.length).toBeGreaterThan(5);
+    for (let i = 1; i < seen.length; i++) expect(seen[i]).toBeGreaterThan(seen[i - 1]);
+    expect(seen[seen.length - 1]).toBe(1);
+    // disposed while ghosted: the painter is told the set is solid again
+    blocked();
+    wall.dispose();
+    expect(seen[seen.length - 1]).toBe(1);
+    expect(seen[seen.length - 2]).toBe(OCCLUDER_FADE_ALPHA);
   });
 
   it('reduced motion restores in one step, as the fade family does', () => {
@@ -290,6 +389,39 @@ describe('the set piece occluder registry', () => {
     expect(veils(root)[0].visible).toBe(true);
   });
 
+  it('no veil is laid while the fade gate still holds the transparent programs', async () => {
+    const compiles: { root: THREE.Object3D; resolve: () => void }[] = [];
+    installOccluderFadeGate({
+      compile: (root: object) =>
+        new Promise<void>((resolve) => {
+          compiles.push({ root: root as THREE.Object3D, resolve });
+        }),
+      schedule: () => () => undefined,
+    });
+    const seen: number[] = [];
+    const root = model(new THREE.MeshStandardMaterial());
+    const wall = registerSetPieceOccluders([WALL], [root], { onFade: (a) => seen.push(a) });
+    clear();
+    // the veil links first; the fade's own transparent twin is still compiling
+    for (const c of compiles) if (c.root.name.startsWith('set-piece-veil|')) c.resolve();
+    await flush();
+    for (let i = 0; i < 5; i++) blocked();
+    // the fade has stepped, but the wall still DRAWS solid...
+    expect(wall.alpha()).toBe(OCCLUDER_FADE_ALPHA);
+    expect(materials(root)[0].transparent).toBe(false);
+    // ...so nothing is laid, reordered or reported for it
+    expect(veils(root)[0].visible).toBe(false);
+    expect(meshes(root)[0].renderOrder).toBe(0);
+    expect(seen).toEqual([]);
+    for (const c of compiles) c.resolve();
+    await flush();
+    blocked();
+    expect(materials(root)[0].transparent).toBe(true);
+    expect(veils(root)[0].visible).toBe(true);
+    expect(meshes(root)[0].renderOrder).toBe(SET_PIECE_GHOST_ORDER);
+    expect(seen).toEqual([OCCLUDER_FADE_ALPHA]);
+  });
+
   it('a set with solids but nothing to fade, and a set with models but no solids, are both inert', () => {
     const root = model(new THREE.MeshStandardMaterial());
     const empty = registerSetPieceOccluders([WALL], []);
@@ -301,7 +433,7 @@ describe('the set piece occluder registry', () => {
     expect(veils(root)[0].visible).toBe(false);
   });
 
-  it('dispose unregisters one set and leaves it solid; clear forgets them all', () => {
+  it('dispose unregisters one set and leaves it as authored; clear disposes them all', () => {
     const wallRoot = model(new THREE.MeshStandardMaterial());
     const wall = registerSetPieceOccluders([WALL], [wallRoot]);
     registerSetPieceOccluders([TOWER], [model(new THREE.MeshStandardMaterial())]);
@@ -315,14 +447,88 @@ describe('the set piece occluder registry', () => {
     expect(wall.alpha()).toBe(1);
     expect(materials(wallRoot)[0].transparent).toBe(false);
     expect(materials(wallRoot)[0].opacity).toBe(1);
-    expect(veils(wallRoot)[0].visible).toBe(false);
     expect(meshes(wallRoot)[0].renderOrder).toBe(0);
+    // its veil twins are taken off its meshes
+    expect(veils(wallRoot)).toHaveLength(0);
+    for (const mesh of meshes(wallRoot)) expect(mesh.children).toHaveLength(0);
     // a disposed set is no longer faded
     for (let i = 0; i < 60; i++) blocked();
     expect(wall.alpha()).toBe(1);
     expect(materials(wallRoot)[0].transparent).toBe(false);
+    // clear is a full dispose of what is left: the other set, ghosted or not
+    const towerRoot = model(new THREE.MeshStandardMaterial());
+    const tower = registerSetPieceOccluders([TOWER], [towerRoot]);
+    updateSetPieceOccluders(20, 4, 6, 20, 1.6, -6, FRAME);
+    expect(tower.alpha()).toBe(OCCLUDER_FADE_ALPHA);
     clearSetPieceOccluders();
     expect(setPieceOccludersInternalsForTest.setCount()).toBe(0);
     expect(setPieceOccludersInternalsForTest.boxCount()).toBe(0);
+    expect(tower.alpha()).toBe(1);
+    expect(materials(towerRoot)[0].transparent).toBe(false);
+    expect(veils(towerRoot)).toHaveLength(0);
+  });
+});
+
+// The veil writes depth at the end of the transparent pass, so a transparent
+// that draws AFTER it and lies behind the ghost is hidden by it. That is only
+// fair while everything a player acts on draws before it. Two pins: the floor
+// VFX ladder (every telegraph, reticle and ground effect) tops out below the
+// veil, and no render module names a render order at or above it except the
+// listed ones, none of which a ghost can hide.
+describe('everything a player acts on draws below the set piece veil', () => {
+  const repoRoot = join(import.meta.dirname, '..');
+
+  it('the floor VFX ladder tops out below the veil', () => {
+    for (const layer of FLOOR_VFX_LAYERS) {
+      expect(floorVfxLayerTopOrder(layer)).toBeLessThan(SET_PIECE_VEIL_ORDER);
+      // a step past the end of a band clamps inside it: no rung can climb there
+      expect(floorVfxRenderOrder(layer, 1e6)).toBe(floorVfxLayerTopOrder(layer));
+    }
+    expect(SET_PIECE_GHOST_ORDER).toBe(SET_PIECE_VEIL_ORDER + 1);
+  });
+
+  /** Why each order at or above the veil cannot be hidden by a ghost. */
+  const AT_OR_ABOVE_THE_VEIL: Readonly<Record<string, RegExp | 'opaque far-depth dome'>> = {
+    // the registry itself
+    'src/render/set_piece_occluders.ts': /SET_PIECE_VEIL_ORDER = 900/,
+    // the two sky domes are OPAQUE at far depth: they draw in the opaque pass,
+    // before any transparent, the veil included
+    'src/render/sky.ts': 'opaque far-depth dome',
+    'src/render/gravewyrm_sanctum/sanctum_sky.ts': 'opaque far-depth dome',
+    // screen overlays and debug lines that never test depth
+    'src/render/fenbridge_town.ts': /depthTest: false/,
+    'src/render/underwater.ts': /depthTest: false/,
+    'src/render/drowned_temple/temple_dazzle_veil.ts': /depthTest: false/,
+  };
+
+  function renderSources(dir: string, out: string[] = []): string[] {
+    for (const entry of readdirSync(join(repoRoot, dir), { withFileTypes: true })) {
+      const path = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) renderSources(path, out);
+      else if (entry.name.endsWith('.ts')) out.push(path);
+    }
+    return out;
+  }
+
+  it('only the listed render modules name an order at or above it', () => {
+    // a literal on a renderOrder, or on a constant named for an order
+    const literal = /(?:renderOrder|ORDER|Order)\b[^=\n;]{0,24}=\s*(\d+)/g;
+    const found = new Set<string>();
+    for (const file of renderSources('src/render')) {
+      const source = readFileSync(join(repoRoot, file), 'utf8');
+      for (const match of source.matchAll(literal)) {
+        if (Number(match[1]) >= SET_PIECE_VEIL_ORDER) found.add(file);
+      }
+    }
+    expect([...found].sort()).toEqual(Object.keys(AT_OR_ABOVE_THE_VEIL).sort());
+    for (const [file, why] of Object.entries(AT_OR_ABOVE_THE_VEIL)) {
+      const source = readFileSync(join(repoRoot, file), 'utf8');
+      if (why === 'opaque far-depth dome') {
+        // the dome is pushed to the far plane and never blends
+        expect(source).toMatch(/gl_Position\.z = gl_Position\.w/);
+      } else {
+        expect(source).toMatch(why);
+      }
+    }
   });
 });

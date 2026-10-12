@@ -6,19 +6,24 @@
 // a gatehouse sat inside its tower. This is the one registry they share:
 //
 //   - a set piece's painter calls registerSetPieceOccluders(solids, roots) at
-//     build: `solids` are its collider rows in world coordinates (one occluder
-//     box each, set_piece_occluders_core.ts), `roots` the models that fade
-//     together when any of them blocks. Every mesh under the roots gets its
-//     own clone of its material (the family fades per structure, never a
-//     shared material), made here, at build, so the clones link behind the
-//     feature's gated attach with the rest of it;
+//     build and keeps the handle: `solids` are its collider rows in world
+//     coordinates (one occluder box each, set_piece_occluders_core.ts),
+//     `roots` the models that fade together when any of them blocks. Every
+//     mesh under the roots gets its own clone of its material (the family
+//     fades per structure, never a shared material), made here, at build, so
+//     the clones link behind the feature's gated attach with the rest of it.
+//     `onFade` tells the painter the alpha its set is drawn at, for the parts
+//     of it that are not plain models (a shader window, a light);
 //   - the renderer calls updateSetPieceOccluders(cam, eye, dt) once a frame,
-//     beside the other fade passes. A blocking set fades through
+//     beside the other fade passes. A set the eye-to-camera segment stays
+//     clear of (its centre and radius, stored at registration) costs one
+//     distance test and nothing else. A blocking set fades through
 //     advanceOccluderFade (the family's own alpha, gate consult and
 //     reduced-motion rule), and its fade programs are asked for ahead of the
 //     first occlusion (prefetchOccluderFadeWithin);
-//   - buildStaticWorldFeatures clears the registry before it builds, so a
-//     rebuilt renderer never fades the meshes of the one before it.
+//   - the renderer's teardown clears the registry beside the fade gate
+//     (renderer_resource_lifecycle.ts), and buildStaticWorldFeatures clears
+//     it before it builds, so no set outlives the renderer that drew it.
 //
 // THE VEIL. A set piece is masonry with real depth: every block is modelled,
 // and a camera turned into a tower looks through a hundred of their faces. The
@@ -28,10 +33,12 @@
 // ghosted set first lays its own depth, colourless (a twin of each mesh on one
 // shared depth-only material), and then draws: only its nearest surface
 // passes, and the whole gatehouse reads as one even veil. Both draws move to
-// the end of the transparent pass for as long as the set is ghosted, so the
-// veil never hides the water or the fog behind it. The veil's program goes
-// through the fade gate like the fade's own twin, and the ghost waits for it.
-// The dithered ghost (the low and medium tiers) stays opaque and needs none.
+// the end of the transparent pass for as long as the set DRAWS ghosted, so
+// the veil never hides the water or the fog behind it; everything a player
+// acts on draws below SET_PIECE_VEIL_ORDER (pinned by the registry's test).
+// The veil's program goes through the fade gate like the fade's own twin, and
+// the ghost waits for it. The dithered ghost (the low and medium tiers) stays
+// opaque and needs none.
 //
 // Nothing here knows which set piece it serves. Cosmetic only, on every tier.
 import * as THREE from 'three';
@@ -52,7 +59,9 @@ import {
   type SetPieceSolid,
   setPieceBoxesBlock,
   setPieceBoxesCentre,
+  setPieceBoxesRadius,
   setPieceOccluderBox,
+  setPieceSegmentWithin,
 } from './set_piece_occluders_core';
 import { markOwnedMaterial, markSharedMaterial } from './shared_resource';
 
@@ -81,13 +90,23 @@ interface SetPieceOccluderSet {
   mats: OccluderFadeMat[];
   veil: SetPieceVeil[];
   probes: SetPieceVeilProbe[];
+  /** Every veil program is linked (true from the start with no veil). */
+  veilLinked: boolean;
+  /** The set is DRAWN ghosted: its veil shows and its meshes draw last. */
   ghosted: boolean;
+  /** The fade as stepped (the gate may still hold the materials at 1). */
   alpha: number;
+  /** The alpha last handed to onFade: what the materials draw at. */
+  drawn: number;
+  onFade: ((alpha: number) => void) | null;
   x: number;
   z: number;
+  radius: number;
 }
 
 const sets: SetPieceOccluderSet[] = [];
+/** Occluder boxes tested since the page loaded, for the early-out's test. */
+let boxTests = 0;
 
 // One depth-only material per face culling, shared by every set for the life
 // of the page: it carries no colour, so it has nothing of a set piece in it.
@@ -137,24 +156,55 @@ function veilReady(set: SetPieceOccluderSet, consult: OccluderFadeConsult): bool
   return ready;
 }
 
-function setGhosted(set: SetPieceOccluderSet, ghosted: boolean): void {
-  if (set.ghosted === ghosted) return;
-  set.ghosted = ghosted;
-  for (let i = 0; i < set.veil.length; i++) {
-    const v = set.veil[i];
-    v.twin.visible = ghosted;
-    v.mesh.renderOrder = ghosted ? SET_PIECE_GHOST_ORDER : v.order;
+/** Follow what the materials DRAW at (never the stepped alpha: while the fade
+ *  gate holds the transparent programs the set still draws solid, and a veil
+ *  laid then would be a draw for nothing). */
+function syncDrawn(set: SetPieceOccluderSet): void {
+  const drawn = set.mats.length > 0 ? set.mats[0].applied : 1;
+  const ghosted = drawn < 1;
+  if (set.ghosted !== ghosted) {
+    set.ghosted = ghosted;
+    for (let i = 0; i < set.veil.length; i++) {
+      const v = set.veil[i];
+      v.twin.visible = ghosted;
+      v.mesh.renderOrder = ghosted ? SET_PIECE_GHOST_ORDER : v.order;
+    }
   }
+  if (set.drawn !== drawn) {
+    set.drawn = drawn;
+    if (set.onFade) set.onFade(drawn);
+  }
+}
+
+function disposeSet(set: SetPieceOccluderSet): void {
+  const i = sets.indexOf(set);
+  if (i < 0) return;
+  sets.splice(i, 1);
+  set.alpha = 1;
+  applyOccluderFade(set.mats, 1);
+  syncDrawn(set);
+  for (const v of set.veil) v.mesh.remove(v.twin);
+  set.veil.length = 0;
+  set.probes.length = 0;
+  set.onFade = null;
 }
 
 function noRaycast(): void {}
 
+export interface SetPieceOccluderOptions {
+  /** Called with the alpha the set is drawn at whenever it changes (1 =
+   *  solid): for the parts of a set piece that are not plain models. */
+  onFade?: (alpha: number) => void;
+}
+
 export interface SetPieceOccluderHandle {
   /** The boxes this set is tested with (one per solid handed in). */
   readonly boxes: readonly SetPieceOccluderBox[];
-  /** The fade last applied to the set (1 = solid). */
+  /** The fade last stepped for the set (1 = solid). */
   alpha(): number;
-  /** Stop testing and fading this set: it is left solid, as authored. */
+  /** Stop testing and fading this set: it is left solid, as authored, with
+   *  its veil twins taken off its meshes (which keep their own material
+   *  clones, theirs to free with the model). */
   dispose(): void;
 }
 
@@ -166,6 +216,7 @@ export interface SetPieceOccluderHandle {
 export function registerSetPieceOccluders(
   solids: readonly SetPieceSolid[],
   roots: readonly THREE.Object3D[],
+  options: SetPieceOccluderOptions = {},
 ): SetPieceOccluderHandle {
   const meshes: THREE.Mesh[] = [];
   for (const root of roots) {
@@ -219,23 +270,20 @@ export function registerSetPieceOccluders(
     mats,
     veil,
     probes,
+    veilLinked: probes.length === 0,
     ghosted: false,
     alpha: 1,
+    drawn: 1,
+    onFade: options.onFade ?? null,
     x: centre.x,
     z: centre.z,
+    radius: setPieceBoxesRadius(boxes, centre),
   };
   sets.push(set);
   return {
     boxes,
     alpha: () => set.alpha,
-    dispose: () => {
-      const i = sets.indexOf(set);
-      if (i < 0) return;
-      sets.splice(i, 1);
-      set.alpha = 1;
-      applyOccluderFade(set.mats, 1);
-      setGhosted(set, false);
-    },
+    dispose: () => disposeSet(set),
   };
 }
 
@@ -254,25 +302,34 @@ export function updateSetPieceOccluders(
   for (let i = 0; i < sets.length; i++) {
     const set = sets[i];
     if (set.mats.length === 0) continue;
-    prefetchOccluderFadeWithin(set.mats, set.x, set.z, camX, camZ);
-    let hide = setPieceBoxesBlock(set.boxes, eyeX, eyeY, eyeZ, camX, camY, camZ);
-    // The ghost waits for its veil (asked for as the camera comes within
-    // reach, like the fade programs): never a frame of stacked panes.
-    if (
-      set.probes.length > 0 &&
-      (hide || withinOccluderFadePrefetch(set.x, set.z, camX, camZ)) &&
-      !veilReady(set, hide ? 'edge' : 'prefetch')
-    ) {
-      hide = false;
+    // Solid, and the eye-to-camera segment nowhere near: no box can be hit,
+    // so none is tested. A set still easing back keeps its restore running.
+    const idle =
+      set.alpha === 1 &&
+      set.drawn === 1 &&
+      !setPieceSegmentWithin(set.x, set.z, set.radius, eyeX, eyeZ, camX, camZ);
+    let hide = false;
+    if (!idle) {
+      boxTests += set.boxes.length;
+      hide = setPieceBoxesBlock(set.boxes, eyeX, eyeY, eyeZ, camX, camY, camZ);
     }
+    // The fade's own programs and the veil's are asked for as the camera comes
+    // within the family's reach, ahead of the first occlusion (each latches).
+    prefetchOccluderFadeWithin(set.mats, set.x, set.z, camX, camZ);
+    if (!set.veilLinked && (hide || withinOccluderFadePrefetch(set.x, set.z, camX, camZ))) {
+      set.veilLinked = veilReady(set, hide ? 'edge' : 'prefetch');
+    }
+    if (idle) continue;
+    // The ghost waits for its veil: never a frame of stacked panes.
+    if (!set.veilLinked) hide = false;
     set.alpha = advanceOccluderFade(set.mats, set.alpha, hide, dt, reducedMotion);
-    setGhosted(set, set.alpha < 1);
+    syncDrawn(set);
   }
 }
 
-/** Forget every set (a new renderer builds its set pieces afresh). */
+/** Dispose every set (a renderer's teardown; a new one builds its own). */
 export function clearSetPieceOccluders(): void {
-  sets.length = 0;
+  while (sets.length > 0) disposeSet(sets[sets.length - 1]);
 }
 
 export const setPieceOccludersInternalsForTest = {
@@ -280,4 +337,5 @@ export const setPieceOccludersInternalsForTest = {
   boxCount: (): number => sets.reduce((n, s) => n + s.boxes.length, 0),
   veilCount: (): number => sets.reduce((n, s) => n + s.veil.length, 0),
   veilProgramKeys: (): string[] => sets.flatMap((s) => s.probes.map((p) => p.key)),
+  boxTests: (): number => boxTests,
 };
