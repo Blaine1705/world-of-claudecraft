@@ -44,6 +44,9 @@ import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import { SanctumAlertSceneScan } from '../src/ui/hud/dungeon/sanctum_alert_scene_core';
+import { buildSanctumAlertView } from '../src/ui/hud/dungeon/sanctum_alert_view';
+import { setLanguage } from '../src/ui/i18n';
 
 const DUNGEON = 'gravewyrm_sanctum';
 
@@ -209,6 +212,59 @@ describe('Velkhar: Waking Thaw and the waves', () => {
 });
 
 describe('Velkhar: where the dead fall (G24)', () => {
+  it('explains the wet-death consequence to the tank and attacker, then clears on dry ice', () => {
+    setLanguage('en');
+    const r = room();
+    engage(r);
+    run(r, 0.1);
+    r.boss.hp = Math.floor(r.boss.maxHp * 0.65);
+    run(r, 0.1);
+    const [w] = walkers(r);
+    const p = poolWorld(r, 0);
+    moveTo(r, w, p.x, p.z);
+    run(r, 0.1);
+    // Isolate this add's instruction from the other two freshly raised adds.
+    for (const other of walkers(r)) other.aggroTargetId = other === w ? r.me.id : -1;
+    const scene = new SanctumAlertSceneScan().update(r.sim);
+    const input = {
+      scene,
+      selfId: r.me.id,
+      selfPos: r.me.pos,
+      auras: r.me.auras,
+      targetId: w.id,
+      entity: (id: number) => r.sim.ctx.entities.get(id) ?? null,
+    };
+    const tank = buildSanctumAlertView(input);
+    expect(tank.visible && tank.kind).toBe('meltwater');
+    expect(tank.visible && tank.line).toMatch(/lure.*dry ice.*before killing/i);
+    expect(tank.visible && tank.line).toMatch(/revives.*heals Velkhar/i);
+    w.aggroTargetId = -1;
+    const attacker = buildSanctumAlertView(input);
+    expect(attacker.visible && attacker.kind).toBe('meltwater-target');
+    expect(attacker.visible && attacker.line).toMatch(/stop attacking.*leaves the water/i);
+    expect(attacker.visible && attacker.line).toMatch(/revives.*heals Velkhar/i);
+    const hpBefore = r.boss.hp;
+    kill(r, w);
+    run(r, T.riseDelay + 0.2);
+    expect(velkharState(r.boss).rises).toBe(1);
+    expect(r.boss.hp - hpBefore).toBe(Math.round(r.boss.maxHp * T.titheHeal));
+
+    const risen = walkers(r).find((e) => e.regrown);
+    expect(risen).toBeDefined();
+    if (!risen) throw new Error('wet Bonewalker did not revive');
+    const dry = coldIce(r);
+    moveTo(r, risen, dry.x, dry.z);
+    run(r, 0.1);
+    input.scene = new SanctumAlertSceneScan().update(r.sim);
+    input.targetId = risen.id;
+    expect(buildSanctumAlertView(input).visible).toBe(false);
+    const healedHp = r.boss.hp;
+    kill(r, risen);
+    run(r, T.riseDelay + 0.2);
+    expect(velkharState(r.boss).rises).toBe(1);
+    expect(r.boss.hp).toBe(healedHp);
+  });
+
   it('a Bonewalker killed on cold ice is Held: a statue, gone for good', () => {
     const r = room();
     engage(r);
