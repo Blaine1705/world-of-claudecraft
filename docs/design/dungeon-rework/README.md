@@ -184,6 +184,31 @@ total 5 to 7 minutes. Boss health is set as target duration times measured party
 DPS at the boss's level (`NormalDungeonTuning.healthMultiplierByMob`), never
 guessed.
 
+**Heroic health bands (owner, 2026-10-12).** On heroic the lengths above gave pools
+a geared level 20 party killed too fast, so the heroic pools sit in bands instead:
+a non-final boss carries about 25,000, a miniboss 15,000 to 20,000 (clearly under
+the bosses), and final bosses keep their own pools (28,800 to 36,800). The Dungeon
+Finder catalogue (`src/sim/content/dungeon_finder.ts`) says which is which: a body
+in its dungeon's encounter list is a boss; a named solo elite outside it is a
+miniboss (the Gaol Turnkey is the one listed miniboss, by its own content). Normal
+BOSS pools keep their designed lengths; a miniboss raised on heroic takes the same
+factor on normal while it stays under its dungeon's weakest boss. Health only:
+melee and mechanic factors do not move, and a check sized by a share of the pool
+keeps the absolute damage it asked for (the Lady's Frozen Embrace, the Mere Hydra's
+regrown head).
+
+| Dungeon | Bosses at about 25,000 (was) | Minibosses in 15,000 to 20,000 (was) | Normal change |
+|---|---|---|---|
+| Hollow Crypt | Sexton Marrow 24,996 (16,099), Lady of the Bonechill 24,999 (18,382), Cantor Ilvane 24,996 (14,687) | Ossuary Drake 15,872 (7,936), Knellwyrm 18,403 (7,254) | Drake 2,079 (1,040), Knellwyrm 4,400 (1,081) |
+| Sunken Bastion | Knight-Commander Olen 24,999 (18,382), Gaoler Ossick 24,999 (19,530) | Shipwreck Captain 16,996 (13,801), Gaol Turnkey 15,994 (11,041) | Captain 5,539 (4,495), Turnkey 5,214 (3,599) |
+| Drowned Temple | Choirmother Selthe 25,004 (20,650); Tideglass Colossus 23,003 unchanged | Mere Hydra 6,001 a head, 18,003 in all (4,306 a head) | Hydra 2,786 a head (2,000) |
+| Wildheart Basin | Beastmaster and jaguar 23,005, Gorgebloom 23,003, all unchanged | Great Saurian 14,998 unchanged | none |
+| Gravewyrm Sanctum | Korgath the Bound 25,004 (18,391), shackles unchanged; Velkhar 22,991 unchanged | Sledge Tusker 16,002 (13,796) | Tusker 10,433 (8,992) |
+
+Pinned from live spawns by `tests/hollow_crypt_boss_pools.test.ts`,
+`tests/hollow_crypt_knellwyrm_pool.test.ts` and the four
+`tests/*_health_bands.test.ts` suites.
+
 ## 7. Loot philosophy
 
 - **Every boss has its own table**, normal and heroic.
