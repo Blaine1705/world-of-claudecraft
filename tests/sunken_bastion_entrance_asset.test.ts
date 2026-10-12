@@ -109,6 +109,39 @@ describe('the Drowned Gate Tower shipping assets', () => {
     });
   }
 
+  it('every primitive of the three GLBs wears one attribute set, and nothing is instanced', async () => {
+    // The camera ghost's depth veil (src/render/set_piece_occluders.ts) keys its
+    // programs on face culling and the mesh variant the fade family reads
+    // (tangent, colour, morphs, instancing), NOT on uv1 to uv3 presence, and it
+    // gives an instanced mesh no veil at all. Both hold for this landmark as
+    // long as its primitives all carry the same attributes and no node is
+    // instanced; a rebuild that adds a second uv set or instancing must meet
+    // this pin before it meets a cold link on the fade's edge frame.
+    await MeshoptDecoder.ready;
+    const sets = new Set<string>();
+    let primitives = 0;
+    for (const asset of SUNKEN_BASTION_ENTRANCE_ASSETS) {
+      const doc = await new NodeIO()
+        .registerExtensions(ALL_EXTENSIONS)
+        .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
+        .readBinary(readFileSync(path.join(ROOT, asset.target)));
+      const root = doc.getRoot();
+      expect(
+        root.listExtensionsUsed().map((e) => e.extensionName),
+        asset.target,
+      ).not.toContain('EXT_mesh_gpu_instancing');
+      for (const mesh of root.listMeshes()) {
+        for (const prim of mesh.listPrimitives()) {
+          primitives++;
+          sets.add(prim.listSemantics().slice().sort().join(','));
+          expect(prim.listTargets(), `${asset.target} ${mesh.getName()}`).toHaveLength(0);
+        }
+      }
+    }
+    expect(primitives).toBeGreaterThanOrEqual(SUNKEN_BASTION_ENTRANCE_ASSETS.length);
+    expect([...sets]).toEqual(['COLOR_0,NORMAL,POSITION']);
+  });
+
   it('the whole landmark stays inside its budget', () => {
     const pins = Object.values(PINS);
     expect(pins.reduce((sum, p) => sum + p.triangles, 0)).toBeLessThanOrEqual(50_000);

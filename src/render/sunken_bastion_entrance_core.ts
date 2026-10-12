@@ -18,6 +18,7 @@
 // a click box and a nameplate on every tier, and the effects tier only thins
 // the fog, the drips and the marsh lights.
 import { globalDayness } from './day_night_core';
+import { OCCLUDER_FADE_ALPHA } from './occluder_fade_core';
 
 /** The static effects tier (src/game/ui_effects_profile.ts resolves it). */
 export type BastionEffectsTier = 'low' | 'medium' | 'high' | 'ultra';
@@ -112,6 +113,16 @@ export function bastionGatePulse(time: number, motion: number): number {
  *  their own. Every row belongs to one, so every solid is an occluder. */
 export function bastionOccluderSet(rowName: string): 'gate' | 'ruins' {
   return rowName.startsWith('curtain_') || rowName === 'fallen_stones' ? 'ruins' : 'gate';
+}
+
+/** How much of the flooded passage shows for the alpha the gatehouse is
+ *  drawn at (the registry's onFade): all of it while the gate is solid, none
+ *  once the gate is the camera's ghost, so no lit window is left standing in
+ *  the air where the wall was; it returns with the wall. */
+export function bastionPassageGhostFade(alpha: number): number {
+  if (!(alpha < 1)) return 1;
+  const t = (alpha - OCCLUDER_FADE_ALPHA) / (1 - OCCLUDER_FADE_ALPHA);
+  return t <= 0 ? 0 : t;
 }
 
 /** The single point light: the beacon's green in the gate court, in front of
@@ -449,6 +460,15 @@ export function bastionFogPose(
   out.scale = puff.size * (0.7 + 1.0 * t);
   out.alpha = smoothstep(0, 0.16, t) * (1 - smoothstep(0.55, 1, t));
   return out;
+}
+
+/** A puff the camera stands in is not fog, it is a stack of full-screen
+ *  quads: it thins from `full` yards of view depth down to nothing at `start`,
+ *  where the painter also collapses its quad. */
+export const BASTION_FOG_NEAR = { start: 3, full: 9 } as const;
+
+export function bastionFogNearFade(viewDepth: number): number {
+  return smoothstep(BASTION_FOG_NEAR.start, BASTION_FOG_NEAR.full, viewDepth);
 }
 
 /** The fog's strength by time of day: it must read at noon from down the
@@ -817,7 +837,7 @@ export function bastionSpritePose(
       out.x = s.x + Math.sin(a) * s.range;
       out.y = s.y + Math.sin(a * 1.7 + s.phase * 9) * 0.35;
       out.z = s.z + Math.cos(a * 0.8 + s.phase * 4) * s.range;
-      out.alpha = night * (0.55 + 0.45 * Math.sin(time * 0.6 + s.phase * 11));
+      out.alpha = night * (0.55 + 0.45 * Math.sin(tm * 0.6 + s.phase * 11));
       break;
     }
     case K.roseShaft:

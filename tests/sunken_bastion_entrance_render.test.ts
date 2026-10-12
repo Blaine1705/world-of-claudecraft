@@ -11,9 +11,11 @@ import { resolveUiEffectsProfile } from '../src/game/ui_effects_profile';
 import { setDayNightPhaseOverride } from '../src/render/day_night_clock';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import { GFX, sharedUniforms } from '../src/render/gfx';
+import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   clearSetPieceOccluders,
   setPieceOccludersInternalsForTest,
+  updateSetPieceOccluders,
 } from '../src/render/set_piece_occluders';
 import {
   BASTION_FOG_PROGRAM_CACHE_KEY,
@@ -26,6 +28,7 @@ import {
   BASTION_BEACON,
   BASTION_DRIP_SOURCES,
   BASTION_FOG_FIELDS,
+  BASTION_FOG_NEAR,
   BASTION_GATE_SHAFTS,
   BASTION_MARSH_FIELDS,
   BASTION_PASSAGE,
@@ -40,6 +43,7 @@ import {
   bastionBeaconBearing,
   bastionBeaconDirection,
   bastionDripFallTime,
+  bastionFogNearFade,
   bastionFogPose,
   bastionFogPuff,
   bastionFogPuffCount,
@@ -49,6 +53,7 @@ import {
   bastionNightAmount,
   bastionOccluderSet,
   bastionPassageEye,
+  bastionPassageGhostFade,
   bastionPassageGlow,
   bastionPassageLight,
   bastionPassageTrace,
@@ -61,6 +66,7 @@ import {
   SUNKEN_BASTION_ENTRANCE_COLLIDERS,
   SUNKEN_BASTION_ENTRANCE_GATE_HALF_WIDTH,
   SUNKEN_BASTION_ENTRANCE_LANE_HALF_WIDTH,
+  sunkenBastionEntranceColliders,
 } from '../src/sim/sunken_bastion_entrance';
 import { terrainHeight } from '../src/sim/world';
 
@@ -522,8 +528,14 @@ describe('the gate sprites', () => {
 });
 
 describe('the Drowned Gate Tower painter', () => {
+  // the painter's own read: the static effects tier (the preset, lowered by
+  // the Advanced Effects dial), never a constant
   const tier = () =>
-    resolveUiEffectsProfile({ presetLabel: GFX.tier, effectsQuality: 1, reduceMotion: false }).tier;
+    resolveUiEffectsProfile({
+      presetLabel: GFX.effectsTier,
+      effectsQuality: GFX.effectsTier === 'low' ? 0 : 1,
+      reduceMotion: false,
+    }).tier;
   const door = DUNGEONS.sunken_bastion.doorPos;
   const base = terrainHeight(door.x, door.z, SEED);
   const ground = (lx: number, lz: number) => terrainHeight(door.x + lx, door.z + lz, SEED) - base;
@@ -575,6 +587,72 @@ describe('the Drowned Gate Tower painter', () => {
     expect((win.material as THREE.Material).side).toBe(THREE.BackSide);
     win.geometry.computeVertexNormals();
     expect(win.geometry.getAttribute('normal').getZ(0)).toBeGreaterThan(0.9);
+    // the painter keeps its two handles, and a rebuild retires the last build's
+    // sets instead of leaving them registered beside the new ones
+    expect(sunkenBastionEntranceInternalsForTest.occluderHandles()).toHaveLength(2);
+    expect(setPieceOccludersInternalsForTest.setCount()).toBe(2);
+    clearSetPieceOccluders();
+  });
+
+  it('the flooded passage goes with the gatehouse when that is the ghost, and returns with it', () => {
+    // the plan: all of it while the gate is solid, none at the ghost's alpha
+    expect(bastionPassageGhostFade(1)).toBe(1);
+    expect(bastionPassageGhostFade(OCCLUDER_FADE_ALPHA)).toBe(0);
+    expect(bastionPassageGhostFade(0)).toBe(0);
+    expect(bastionPassageGhostFade(0.6)).toBeCloseTo(0.5, 9);
+    let previous = 0;
+    for (let a = OCCLUDER_FADE_ALPHA; a <= 1; a += 0.05) {
+      expect(bastionPassageGhostFade(a)).toBeGreaterThanOrEqual(previous);
+      previous = bastionPassageGhostFade(a);
+    }
+    // the painter: the window is a shader, not a model, so it is told
+    clearSetPieceOccluders();
+    sunkenBastionEntranceInternalsForTest.resetCaches();
+    const view = buildSunkenBastionEntrance(SEED);
+    const win = view.group.getObjectByName('sunkenBastionFloodedPassage') as THREE.Mesh;
+    const ghost = sunkenBastionEntranceInternalsForTest.uniforms.uBastGhost;
+    expect(win.visible).toBe(true);
+    expect(ghost.value).toBe(1);
+    // the follow camera turned into the west tower, the character under the portcullis
+    const tower = sunkenBastionEntranceColliders(SEED, door)[0];
+    const eye = [door.x, base + 1.6, door.z - 3.4] as const;
+    const inTower = () =>
+      updateSetPieceOccluders(tower.x, base + 3, tower.z, eye[0], eye[1], eye[2], 1 / 60, true);
+    const behind = () =>
+      updateSetPieceOccluders(eye[0], base + 4, eye[2] - 10, eye[0], eye[1], eye[2], 1 / 60, true);
+    behind();
+    expect(win.visible).toBe(true);
+    inTower();
+    const [gateHandle, ruinsHandle] = sunkenBastionEntranceInternalsForTest.occluderHandles();
+    expect(gateHandle.alpha()).toBe(OCCLUDER_FADE_ALPHA);
+    // only the unit in the way goes
+    expect(ruinsHandle.alpha()).toBe(1);
+    // nothing of the door is left standing in the air: not drawn at all
+    expect(ghost.value).toBe(0);
+    expect(win.visible).toBe(false);
+    behind();
+    expect(gateHandle.alpha()).toBe(1);
+    expect(ghost.value).toBe(1);
+    expect(win.visible).toBe(true);
+    // the window fades on the game's one screen-door pattern, in its own program
+    const shader = {
+      uniforms: {} as Record<string, unknown>,
+      vertexShader: '#include <common>\n#include <begin_vertex>',
+      fragmentShader: '#include <common>\n#include <map_fragment>',
+    };
+    (win.material as THREE.Material).onBeforeCompile(
+      shader as unknown as Parameters<THREE.Material['onBeforeCompile']>[0],
+      null as unknown as THREE.WebGLRenderer,
+    );
+    expect(shader.uniforms.uBastGhost).toBe(ghost);
+    expect(shader.fragmentShader).toContain('uniform float uBastGhost;');
+    expect(shader.fragmentShader).toContain(sunkenBastionEntranceInternalsForTest.passageGhost);
+    expect(sunkenBastionEntranceInternalsForTest.passageGhost).toContain('discard');
+    expect(sunkenBastionEntranceInternalsForTest.passageGhost).toContain('uBastGhost < 1.0');
+    // the drop comes before the passage is traced, so a hidden window costs nothing
+    expect(shader.fragmentShader.indexOf('discard')).toBeLessThan(
+      shader.fragmentShader.indexOf('bastPassage(vBastP'),
+    );
     clearSetPieceOccluders();
   });
 
@@ -685,6 +763,28 @@ describe('the Drowned Gate Tower painter', () => {
     expect(far).toBeGreaterThan(8);
     expect(sunkenBastionEntranceInternalsForTest.fogVertex).toContain('uTime');
     expect(sunkenBastionEntranceInternalsForTest.fogVertex).toContain('uBastion.y');
+    // a puff the camera stands in thins with view depth and collapses its quad:
+    // no stacked full-screen overdraw with the follow camera in the gate fog
+    expect(bastionFogNearFade(0)).toBe(0);
+    expect(bastionFogNearFade(BASTION_FOG_NEAR.start)).toBe(0);
+    expect(bastionFogNearFade(BASTION_FOG_NEAR.full)).toBe(1);
+    expect(bastionFogNearFade(40)).toBe(1);
+    const mid = bastionFogNearFade((BASTION_FOG_NEAR.start + BASTION_FOG_NEAR.full) / 2);
+    expect(mid).toBeGreaterThan(0.3);
+    expect(mid).toBeLessThan(0.7);
+    // the follow camera sits ten yards behind the character: the fog round the
+    // character is untouched, the fog round the camera is gone
+    expect(BASTION_FOG_NEAR.full).toBeLessThan(10);
+    expect(BASTION_FOG_NEAR.start).toBeGreaterThan(1.5);
+    const fogVertex = sunkenBastionEntranceInternalsForTest.fogVertex;
+    expect(fogVertex).toContain(
+      `float bNear = smoothstep(${BASTION_FOG_NEAR.start.toFixed(4)}, ${BASTION_FOG_NEAR.full.toFixed(4)}, -mvPosition.z);`,
+    );
+    // the quad has no size once the puff shows nothing, and the alpha carries the fade
+    expect(fogVertex).toMatch(
+      /mvPosition\.xy \+= position\.xy \* vec2\([^;]+\) \* step\(0\.004, bNear\);/,
+    );
+    expect(fogVertex).toMatch(/vBastPuff = vec3\([^;]*\* bNear,/);
     expect(sunkenBastionEntranceInternalsForTest.fogFieldCount).toBe(BASTION_FOG_FIELDS.length);
   });
 
@@ -708,6 +808,36 @@ describe('the Drowned Gate Tower painter', () => {
     expect(vertex).toContain(BASTION_BEACON.period.toFixed(4));
     expect(vertex).toContain(Math.sin(BASTION_BEACON.pitch).toFixed(4));
     expect(vertex).toContain('uBastion.y');
+  });
+
+  it('every clock in the three effect programs stops under reduced motion', () => {
+    // uBastion.y is the motion switch (0 under reduced motion): a bare uTime
+    // anywhere in the shaders keeps animating when the player asked for none.
+    const internals = sunkenBastionEntranceInternalsForTest;
+    const sources = {
+      pulse: internals.pulseGlsl,
+      passage: internals.passageCommon,
+      fogVertex: internals.fogVertex,
+      fogFragment: internals.fogFragment,
+      spriteVertex: internals.spriteVertex,
+      spriteFragment: internals.spriteFragment,
+    };
+    let clocks = 0;
+    for (const [name, glsl] of Object.entries(sources)) {
+      for (const statement of glsl.split(';')) {
+        if (!statement.includes('uTime') || statement.includes('uniform float uTime')) continue;
+        clocks++;
+        expect(statement, `${name}: ${statement.trim()}`).toContain('uBastion.y');
+      }
+    }
+    expect(clocks).toBeGreaterThan(5);
+    // the mirror agrees: every sprite holds one alpha and one place at motion 0
+    const pose: BastionSpritePose = { x: 0, y: 0, z: 0, alpha: 0 };
+    for (const s of bastionSprites('ultra', ground)) {
+      const a = { ...bastionSpritePose(s, 3, 1, 0, 0.45, pose) };
+      const b = { ...bastionSpritePose(s, 977.3, 1, 0, 0.45, pose) };
+      expect(b, `kind ${s.kind}`).toEqual(a);
+    }
   });
 
   it('the whole cosmetic layer is three draws: the window, the fog, the sprites', () => {

@@ -40,13 +40,15 @@ import { currentDayNightPhase } from './day_night_clock';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
 import { mistNoiseTexture } from './ignivar_mist_gate';
-import { registerSetPieceOccluders } from './set_piece_occluders';
+import { ghostDitherDiscardGlsl } from './occluder_dither_fade';
+import { registerSetPieceOccluders, type SetPieceOccluderHandle } from './set_piece_occluders';
 import type { SetPieceSolid } from './set_piece_occluders_core';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import {
   BASTION_BEACON,
   BASTION_DRIP_GRAVITY,
   BASTION_FOG_FIELDS,
+  BASTION_FOG_NEAR,
   BASTION_PASSAGE,
   BASTION_PULSE_LIGHT,
   type BastionEffectsTier,
@@ -57,6 +59,7 @@ import {
   bastionGatePulse,
   bastionNightAmount,
   bastionOccluderSet,
+  bastionPassageGhostFade,
   bastionPulseLightIntensity,
   bastionSprites,
 } from './sunken_bastion_entrance_core';
@@ -77,9 +80,9 @@ if (typeof window !== 'undefined') {
 }
 export const sunkenBastionEntrancePreloadInternalsForTest = { urls: [...URLS] };
 
-export const BASTION_PASSAGE_PROGRAM_CACHE_KEY = 'sunken-bastion-flooded-passage-v1';
-export const BASTION_FOG_PROGRAM_CACHE_KEY = 'sunken-bastion-marsh-fog-v1';
-export const BASTION_SPRITE_PROGRAM_CACHE_KEY = 'sunken-bastion-gate-sprites-v1';
+export const BASTION_PASSAGE_PROGRAM_CACHE_KEY = 'sunken-bastion-flooded-passage-v2';
+export const BASTION_FOG_PROGRAM_CACHE_KEY = 'sunken-bastion-marsh-fog-v2';
+export const BASTION_SPRITE_PROGRAM_CACHE_KEY = 'sunken-bastion-gate-sprites-v2';
 
 export interface SunkenBastionEntranceView {
   group: THREE.Group;
@@ -88,8 +91,13 @@ export interface SunkenBastionEntranceView {
 }
 
 /** x: the night amount (0 day, 1 night); y: motion (1, or 0 under reduced
- *  motion). One object shared by the three effect programs. */
-const bastionUniforms = { uBastion: { value: new THREE.Vector2(0, 1) } };
+ *  motion). One object shared by the three effect programs. uBastGhost is the
+ *  passage's own: how much of it shows while the gatehouse is the camera's
+ *  ghost (bastionPassageGhostFade). */
+const bastionUniforms = {
+  uBastion: { value: new THREE.Vector2(0, 1) },
+  uBastGhost: { value: 1 },
+};
 
 const fx = (v: number) => v.toFixed(4);
 
@@ -336,6 +344,11 @@ vec3 bastPassage(vec3 o, vec3 d) {
   return col;
 }`;
 
+// The screen-door every dithered ghost in the game drops fragments on, here
+// on the passage's own fade: the material stays opaque (one program, no
+// sorting) on every tier.
+const PASSAGE_GHOST = ghostDitherDiscardGlsl('uBastGhost');
+
 let passageMat: THREE.MeshBasicMaterial | null = null;
 
 function passageMaterial(): THREE.MeshBasicMaterial {
@@ -346,6 +359,7 @@ function passageMaterial(): THREE.MeshBasicMaterial {
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = sharedUniforms.uTime;
     shader.uniforms.uBastion = bastionUniforms.uBastion;
+    shader.uniforms.uBastGhost = bastionUniforms.uBastGhost;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vBastP;\nvarying vec3 vBastC;')
       .replace(
@@ -353,10 +367,14 @@ function passageMaterial(): THREE.MeshBasicMaterial {
         '#include <begin_vertex>\nvBastP = position;\nvBastC = cameraPosition - modelMatrix[3].xyz;',
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\n${PASSAGE_COMMON}`)
+      .replace(
+        '#include <common>',
+        `#include <common>\nuniform float uBastGhost;\n${PASSAGE_COMMON}`,
+      )
       .replace(
         '#include <map_fragment>',
-        `vec3 bEye = vBastC;
+        `// the window goes with the gatehouse when that is the camera's ghost${PASSAGE_GHOST}
+vec3 bEye = vBastC;
 // the eye never stands under the sill (bastionPassageEye)
 bEye.y = max(bEye.y, B_KERB + ${fx(ps.eye)});
 diffuseColor.rgb = bastPassage(vBastP, normalize(vBastP - bEye));
@@ -430,8 +448,12 @@ vec3 bCenter = vec3(
   aA.y + aB.y * bT);
 float bScale = aB.z * (0.7 + 1.0 * bT);
 vec4 mvPosition = modelViewMatrix * vec4(bCenter, 1.0);
-mvPosition.xy += position.xy * vec2(bScale, bScale * 0.46);
-vBastPuff = vec3(smoothstep(0.0, 0.16, bT) * (1.0 - smoothstep(0.55, 1.0, bT)), aA.z, aC.z * bastPulse());
+// a puff the camera stands in is stacked full-screen overdraw, not fog: it
+// thins with view depth (bastionFogNearFade) and its quad collapses once it
+// shows nothing
+float bNear = smoothstep(${fx(BASTION_FOG_NEAR.start)}, ${fx(BASTION_FOG_NEAR.full)}, -mvPosition.z);
+mvPosition.xy += position.xy * vec2(bScale, bScale * 0.46) * step(0.004, bNear);
+vBastPuff = vec3(smoothstep(0.0, 0.16, bT) * (1.0 - smoothstep(0.55, 1.0, bT)) * bNear, aA.z, aC.z * bastPulse());
 gl_Position = projectionMatrix * mvPosition;`;
 
 const FOG_FRAGMENT = `#include <map_fragment>
@@ -609,7 +631,7 @@ if (bK > 0.5 && bK < 3.5) {
     bC.x += sin(a) * aK.w;
     bC.y += sin(a * 1.7 + aK.x * 9.0) * 0.35;
     bC.z += cos(a * 0.8 + aK.x * 4.0) * aK.w;
-    bA = bN * (0.55 + 0.45 * sin(uTime * 0.6 + aK.x * 11.0));
+    bA = bN * (0.55 + 0.45 * sin(bTm * 0.6 + aK.x * 11.0));
   } else {
     bA = (aD.x + (1.0 - aD.x) * bPulse * bPulse) * mix(1.0, bN, aK.w);
   }
@@ -753,7 +775,8 @@ export function buildSunkenBastionEntrance(seed: number): SunkenBastionEntranceV
   const growthSource = sources.get(GROWTH_URL);
   const growth = growthSource ? seat(growthSource, false) : null;
   if (growth) gate.add(growth);
-  gate.add(passageWindow());
+  const passage = passageWindow();
+  gate.add(passage);
   // Camera occlusion: every collider row is an occluder. The gatehouse and
   // the growth on it ghost together; the ruins round it on their own.
   const solids = { gate: [] as SetPieceSolid[], ruins: [] as SetPieceSolid[] };
@@ -764,11 +787,25 @@ export function buildSunkenBastionEntrance(seed: number): SunkenBastionEntranceV
       topY: cameraTopY ?? base,
     });
   });
-  registerSetPieceOccluders(solids.gate, growth ? [gatehouse, growth] : [gatehouse]);
-  registerSetPieceOccluders(solids.ruins, ruins ? [ruins] : []);
+  // One entrance per world: a rebuild in the same page retires the last one's.
+  for (const handle of occluderHandles) handle.dispose();
+  bastionUniforms.uBastGhost.value = 1;
+  occluderHandles = [
+    registerSetPieceOccluders(solids.gate, growth ? [gatehouse, growth] : [gatehouse], {
+      // the flooded passage is a shader window, not a model: it follows its wall
+      onFade: (alpha) => {
+        const shown = bastionPassageGhostFade(alpha);
+        bastionUniforms.uBastGhost.value = shown;
+        passage.visible = shown > 0;
+      },
+    }),
+    registerSetPieceOccluders(solids.ruins, ruins ? [ruins] : []),
+  ];
+  // The player's static effects tier (the preset, lowered by the Advanced
+  // Effects dial), never the frame governor: cosmetic richness only.
   const tier = resolveUiEffectsProfile({
-    presetLabel: GFX.tier,
-    effectsQuality: 1,
+    presetLabel: GFX.effectsTier,
+    effectsQuality: GFX.effectsTier === 'low' ? 0 : 1,
     reduceMotion: false,
   }).tier;
   const light = new THREE.PointLight(
@@ -790,6 +827,9 @@ export function buildSunkenBastionEntrance(seed: number): SunkenBastionEntranceV
   return { group, glowLights: [light], cullGroups: [gate] };
 }
 
+/** The camera occluder sets of the entrance last built (gate, ruins). */
+let occluderHandles: SetPieceOccluderHandle[] = [];
+
 export const sunkenBastionEntranceInternalsForTest = {
   kitMaterial,
   passageMaterial,
@@ -798,12 +838,17 @@ export const sunkenBastionEntranceInternalsForTest = {
   passageCommon: PASSAGE_COMMON,
   pulseGlsl: PULSE_GLSL,
   fogVertex: FOG_VERTEX,
+  fogFragment: FOG_FRAGMENT,
   spriteVertex: SPRITE_VERTEX,
+  spriteFragment: SPRITE_FRAGMENT,
+  passageGhost: PASSAGE_GHOST,
+  occluderHandles: (): readonly SetPieceOccluderHandle[] => occluderHandles,
   fogFieldCount: BASTION_FOG_FIELDS.length,
   uniforms: bastionUniforms,
   resetCaches(): void {
     glassMat = passageMat = fogMat = spriteMat = null;
     puffTex = null;
     lastMotionCheck = -10;
+    bastionUniforms.uBastGhost.value = 1;
   },
 };
