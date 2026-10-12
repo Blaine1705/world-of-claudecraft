@@ -4,6 +4,7 @@ import type {
   ActionBarLayoutProfile,
   ActiveConsecration,
   ActiveFrostRing,
+  ActiveSporeBurst,
   ActiveTemporalHourglass,
   BankBonusSource,
   CivicServicePlacement,
@@ -2171,6 +2172,9 @@ export class Sim {
   }
   get activeConsecrations(): ActiveConsecration[] {
     return groundAoeReadouts.collectActiveConsecrations(this.groundAoEs);
+  }
+  get activeSporeBursts(): ActiveSporeBurst[] {
+    return groundAoeReadouts.collectActiveSporeBursts(this.groundAoEs);
   }
   reactiveAbilityWindowRemaining(abilityId: string): number {
     if (abilityId !== 'mongoose_bite') return 0;

@@ -77,6 +77,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       case 'aoeRoot':
       case 'chainDamage':
       case 'groundAoE':
+      case 'sporeBurst':
       case 'drainTick':
       case 'valkyrsCalling':
       case 'hunterStampede':
@@ -272,11 +273,33 @@ export function abilityDisplayDescription(
   const duration = abilityDurationValue(res);
   const hourglass = abilityTemporalHourglassValues(res);
   const directHeal = res.effects.find((effect) => effect.type === 'heal');
+  // Spore Burst's {healing} is its heal half, shown through the aoeHeal path
+  // so the AoE Healing Power rider and the Groveheart factor read as combat
+  // resolves them (effect_dispatch.ts 'sporeBurst').
+  const sporeBurst = res.effects.find(
+    (effect): effect is Extract<AbilityEffect, { type: 'sporeBurst' }> =>
+      effect.type === 'sporeBurst',
+  );
   const healingText = hourglass
     ? formatAbilityNumber(hourglass.healing)
     : directHeal
       ? abilityEffectText({ ...res, effects: [directHeal] }, scaling)
-      : '';
+      : sporeBurst
+        ? abilityEffectText(
+            {
+              ...res,
+              effects: [
+                {
+                  type: 'aoeHeal',
+                  min: sporeBurst.healMin,
+                  max: sporeBurst.healMax,
+                  radius: sporeBurst.radius,
+                },
+              ],
+            },
+            scaling,
+          )
+        : '';
   // {rage} splices the RESOLVED gainResource total, so a talent that raises the
   // granted amount (Blood Offering on Blood Toll) shows in the tooltip.
   const rageGained = res.effects.reduce(

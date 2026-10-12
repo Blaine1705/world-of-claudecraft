@@ -2129,6 +2129,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "sporemender_form",
         "name": "Sporemender Form"
+      },
+      {
+        "id": "spore_burst",
+        "name": "Spore Burst"
+      },
+      {
+        "id": "natures_boon",
+        "name": "Nature's Boon"
       }
     ],
     "model": "player_druid",

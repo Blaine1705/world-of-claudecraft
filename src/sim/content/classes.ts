@@ -623,6 +623,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'wildwake',
       'grove_awakening',
       'sporemender_form',
+      'spore_burst',
+      'natures_boon',
     ],
     color: 0xff8c1a,
   },
@@ -8023,6 +8025,63 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
   },
+  spore_burst: {
+    id: 'spore_burst',
+    name: 'Spore Burst',
+    class: 'druid',
+    // The splash heal-and-damage both caster specs lacked (owner design
+    // 2026-10-12). Wildfang does not get it.
+    specs: ['balance', 'restoration'],
+    learnLevel: 10,
+    cost: 90,
+    castTime: 0,
+    cooldown: 30,
+    range: 40,
+    school: 'nature',
+    requiresTarget: false,
+    targetMode: 'position',
+    // Placed on the floor with a 5 sec fuse everyone can see, so it hits
+    // harder than an instant heal or nuke: one roll for every ally and enemy
+    // in the 8 yd splash (Galeheart's radius), uncapped
+    // (combat/druid_spore_burst.ts).
+    effects: [
+      { type: 'sporeBurst', min: 250, max: 250, healMin: 250, healMax: 250, radius: 8, fuse: 5 },
+    ],
+    description:
+      'Summons a spore burster onto the target area. After $t sec it bursts, healing allies for $h and dealing $d Nature damage to enemies within 8 yards.',
+    specNotes: {
+      balance: 'At 3 Moontide it is 25% stronger and spends your Moontide.',
+      restoration:
+        'Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance.',
+    },
+  },
+  // Nature's Boon as a spellbook passive: the window itself is armed by
+  // combat/druid_natures_boon.ts; this row only teaches it, per spec.
+  natures_boon: {
+    id: 'natures_boon',
+    name: "Nature's Boon",
+    class: 'druid',
+    specs: ['feral', 'balance', 'restoration'],
+    learnLevel: 10,
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [],
+    description:
+      "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+    specNotes: {
+      feral:
+        'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
+      balance:
+        'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+      restoration:
+        'Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+    },
+  },
   feral_charge: {
     id: 'feral_charge',
     name: 'Primal Surge',
@@ -8939,6 +8998,16 @@ function scaleEffect(
         ...eff,
         min: Math.round(eff.min * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
         max: Math.round(eff.max * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
+      };
+    case 'sporeBurst':
+      // Both halves of the burst: the damage roll takes the damage multiplier
+      // and the heal roll the heal multiplier, as aoeDamage and aoeHeal do.
+      return {
+        ...eff,
+        min: Math.round(eff.min * dmgMult + flat),
+        max: Math.round(eff.max * dmgMult + flat),
+        healMin: Math.round(eff.healMin * healMult + flat),
+        healMax: Math.round(eff.healMax * healMult + flat),
       };
     case 'chainDamage':
       return {

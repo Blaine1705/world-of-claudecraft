@@ -131,11 +131,13 @@ describe('ability icons', () => {
     // release/v0.44.0 merge into feature/buried-hoards).
     // 474: plus the Scratch glyph (the Cat Form sweep builder).
     // 475: plus Groveheart's Sporemender Form (sporemender_form).
-    expect(ids).toHaveLength(475);
+    // 476: plus the druid's Spore Burst (spore_burst).
+    // 477: plus the druid's Nature's Boon passive (natures_boon).
+    expect(ids).toHaveLength(477);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('16ef9940f7812cb46143d59e6bce2cba4284e80687e7b5c08210ea65c31830dc');
+    expect(hash).toBe('43872bc489ca8b69121821f2a3ef9aadde51cfa26a48ecae43739a94c73c9969');
   });
 });

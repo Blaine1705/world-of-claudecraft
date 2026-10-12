@@ -18948,6 +18948,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sporemender_form.name': 'スポアメンダーフォーム',
   'entities.abilities.sporemender_form.description':
     'スポアメンダーになり、与える回復量が20%、アーマーが40%増加しますが、移動速度が20%低下します。通常形態で使える呪文はすべてそのまま使えます。姿を戻すまで持続します。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再び唱えると通常形態に戻ります。（回復の象徴）',
+  'entities.abilities.spore_burst.name': 'スポアバースト',
+  'entities.abilities.spore_burst.description':
+    '対象地点にスポアバースターを召喚します。{duration}秒後に破裂し、8ヤード以内の味方の体力を {healing} 回復し、敵に {damage} の自然ダメージを与えます。',
+  'entities.abilities.spore_burst.specNote_balance':
+    '月潮が3段階のとき、効果が25%上昇し、月潮を消費します。',
+  'entities.abilities.spore_burst.specNote_restoration':
+    '回復した味方それぞれにスポアメンディングも付与します。翠成が最大のとき、効果が25%上昇し、翠成を消費します。',
+  'entities.abilities.natures_boon.name': '自然の恵み',
+  'entities.abilities.natures_boon.description':
+    '呪文が10秒間の自然の恵みを発動させることがあります。指定された呪文は無料になり、効果が25%上昇し、どの姿でも詠唱できます。再発動すると時間が更新されます。',
+  'entities.abilities.natures_boon.specNote_feral':
+    '近接の自動攻撃が命中するたびに1/15の確率で発動し、スポアメンディングが対象になります。ブルーインフォーム中は樫の肌も対象です。',
+  'entities.abilities.natures_boon.specNote_balance':
+    '野生の稲妻または天墜を詠唱するたびに10%の確率で発動し、スポアバーストが対象になります。発動は10秒に1回までです。',
+  'entities.abilities.natures_boon.specNote_restoration':
+    '自分の持続回復効果が回復するたびに10%の確率で発動し、スポアバーストが対象になります。発動は10秒に1回までです。',
   'entities.abilities.prayer_of_returning.description':
     'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（聖なる・ディシプリン）',
   'entities.abilities.prayer_of_returning.name': '帰還の祈り',

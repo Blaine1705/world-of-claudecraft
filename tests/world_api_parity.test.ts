@@ -132,6 +132,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeVarkhulAnvilMeteors', kind: 'data' },
   { name: 'activeVarkhulAssemblies', kind: 'data' },
   { name: 'activeTemporalHourglasses', kind: 'data' },
+  { name: 'activeSporeBursts', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
   { name: 'worldQuestCycle', kind: 'data' },
@@ -941,8 +942,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
     // Plus the Weekly Vault loot-focus surface at the v0.45 release batch:
     // 426/126/300.
-    expect(IWORLD_MEMBERS.length).toBe(426);
-    expect(DATA_MEMBERS.length).toBe(126);
+    // Plus the druid Spore Burst mushrooms activeSporeBursts (+1 data):
+    // 427/127/300.
+    expect(IWORLD_MEMBERS.length).toBe(427);
+    expect(DATA_MEMBERS.length).toBe(127);
     expect(METHOD_MEMBERS.length).toBe(300);
   });
   it('has no duplicate member names', () => {
@@ -979,6 +982,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeNythraxisGraveEruptions',
       'activeNythraxisGraveFlames',
       'activeNythraxisGravefires',
+      'activeSporeBursts',
       'activeTemporalHourglasses',
       'activeTitle',
       'activeVarkhulAnvilMeteors',
@@ -1399,6 +1403,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeNythraxisGraveEruptions',
       'activeNythraxisGraveFlames',
       'activeNythraxisGravefires',
+      'activeSporeBursts',
       'activeTemporalHourglasses',
       'activeTitle',
       'activeVarkhulAnvilMeteors',
@@ -1923,6 +1928,7 @@ const FACET_COMBAT = [
   'activeNythraxisGravefires',
   'activeNythraxisBindingSigils',
   'activeTemporalHourglasses',
+  'activeSporeBursts',
   'activeVarkhulForgestormWarnings',
   'activeVarkhulCinderFires',
   'activeVarkhulCinderOrbProjectiles',
@@ -2631,8 +2637,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(426);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(426);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(427);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(427);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

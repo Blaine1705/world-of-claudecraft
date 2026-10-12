@@ -13,14 +13,11 @@
 //
 // Groveheart: every tick of a heal-over-time effect a committed restoration
 // druid owns has a 10% chance (behind a 10 sec internal cooldown, so the rate
-// holds near 2 per minute however many HoTs are out) to arm Wildmend alone:
-// instant (combat/ability_resolution.ts reads naturesBoonArmedFor), free, and
-// 25% stronger, castable in any form.
-// Every LANDED melee auto-attack a committed feral druid makes has a 1-in-15
-// chance to arm one free spell for 10 seconds, which at Cat Form's fixed 1.0
-// sec swing reads as about one proc every 15 seconds. The armed window covers
-// BOTH members at once and the player chooses which to spend it on: whichever
-// of Sporemending or Oakhide is cast first consumes it, and the other reverts.
+// holds near 2 per minute however many HoTs are out) to arm a caster window
+// covering Spore Burst: free, 25% stronger, and castable in any form.
+//
+// Moongrove: every completed Wildbolt or Skyfall cast has the same 10% chance
+// behind its own 10 sec internal cooldown to arm Spore Burst.
 //
 // Two things make the window worth having in a form, and both are deliberate:
 //
@@ -73,6 +70,14 @@ export const GROVEHEART_BOON_TICK_CHANCE = 0.1;
 export const GROVEHEART_BOON_ICD = 10;
 /** procState.icds key for the Groveheart internal cooldown. */
 export const GROVEHEART_BOON_ICD_KEY = 'dru_grove_natures_boon';
+/** Moongrove: per completed Wildbolt or Skyfall cast. */
+export const MOONGROVE_BOON_CAST_CHANCE = 0.1;
+/** Moongrove: no second proc for this long after one lands. */
+export const MOONGROVE_BOON_ICD = 10;
+/** procState.icds key for the Moongrove internal cooldown. */
+export const MOONGROVE_BOON_ICD_KEY = 'dru_moon_natures_boon';
+/** The casts that roll the Moongrove chance: Wildbolt and Skyfall. */
+const MOONGROVE_BOON_TRIGGER_IDS: ReadonlySet<string> = new Set(['wrath', 'starfire']);
 /** The ability whose cooldown every Wildfang proc clears. */
 export const OAKHIDE_ID = 'barkskin';
 /** An armed window also makes its spell 25% stronger. */
@@ -94,13 +99,17 @@ export const NATURES_BOON_DURATION = 10;
 // the process, which is exactly the module-holds-state trap src/sim/CLAUDE.md
 // warns about.
 export const NATURES_BOON_ABILITIES: readonly string[] = ['rejuvenation', 'barkskin'];
-/** The spell a Groveheart window pays for: Wildmend (`healing_touch`), made
- *  instant as well as free. */
-export const GROVEHEART_BOON_ABILITIES: readonly string[] = ['healing_touch'];
+/** The spell a Groveheart window pays for: Spore Burst. */
+export const GROVEHEART_BOON_ABILITIES: readonly string[] = ['spore_burst'];
+/** The spell a Moongrove window pays for: Spore Burst, already instant. */
+export const MOONGROVE_BOON_ABILITIES: readonly string[] = ['spore_burst'];
 const ANY_BOON_ABILITY: ReadonlySet<string> = new Set([
   ...NATURES_BOON_ABILITIES,
   ...GROVEHEART_BOON_ABILITIES,
+  ...MOONGROVE_BOON_ABILITIES,
 ]);
+/** Every spell any window can pay for (the action bar watches these). */
+export const ALL_NATURES_BOON_ABILITIES: readonly string[] = [...ANY_BOON_ABILITY];
 
 /** Members the window only pays for while the druid is a bear. Oakhide is a
  *  Bruin mitigation cooldown, so a free one out of Bruin Form would be a free
@@ -162,11 +171,10 @@ export function naturesBoonArmedFor(
   );
 }
 
-/** The cast time an armed Groveheart window leaves on its spell: instant for
- *  Wildmend while the window is up, the given cast time otherwise. Read by the
- *  shared resolution chain (combat/ability_resolution.ts), so the tooltip, the
- *  action bar, and the server's cast start agree, and the cast then takes the
- *  instant path where the free window is spent. */
+/** The cast time an armed Groveheart window leaves on its spell. Current
+ *  Groveheart boon spells are already instant, but the shared resolution chain
+ *  keeps this hook so any future cast-time member agrees across tooltip, action
+ *  bar, and server cast start. */
 export function naturesBoonCastTime(
   auras: readonly BoonAura[],
   abilityId: string,
@@ -230,6 +238,39 @@ export function naturesBoonOnAutoAttack(ctx: SimContext, player: Entity): void {
   player.cooldowns.delete(OAKHIDE_ID);
 }
 
+/** Roll a caster spec's chance behind its internal cooldown. The cooldown is
+ *  checked BEFORE the roll, so a druid inside it draws nothing. */
+function rollCasterBoon(
+  ctx: SimContext,
+  player: Entity,
+  icdKey: string,
+  icd: number,
+  chance: number,
+  abilities: readonly string[],
+): void {
+  if (player.procState?.icds[icdKey] !== undefined) return;
+  if (!ctx.rng.chance(chance)) return;
+  if (!player.procState) player.procState = { counters: {}, icds: {} };
+  player.procState.icds[icdKey] = icd;
+  armNaturesBoon(ctx, player, abilities);
+}
+
+/** The completed-cast hook (combat/talent_procs.ts onCastCompleted). A
+ *  committed balance druid's Wildbolt or Skyfall rolls the Moongrove chance;
+ *  every other cast and every other player returns before the rng. */
+export function naturesBoonOnCast(ctx: SimContext, player: Entity, abilityId: string): void {
+  if (!MOONGROVE_BOON_TRIGGER_IDS.has(abilityId)) return;
+  if (!isDruidOfSpec(ctx, player, 'balance')) return;
+  rollCasterBoon(
+    ctx,
+    player,
+    MOONGROVE_BOON_ICD_KEY,
+    MOONGROVE_BOON_ICD,
+    MOONGROVE_BOON_CAST_CHANCE,
+    MOONGROVE_BOON_ABILITIES,
+  );
+}
+
 /** The heal-over-time tick hook (combat/auras.ts). A committed restoration
  *  druid's own HoT tick rolls the Groveheart chance when the internal cooldown
  *  is clear; the gate and the cooldown check both pass BEFORE the roll, so no
@@ -237,9 +278,12 @@ export function naturesBoonOnAutoAttack(ctx: SimContext, player: Entity): void {
 export function naturesBoonOnHotTick(ctx: SimContext, source: Entity | null, aura: Aura): void {
   if (!source || source.dead || aura.kind !== 'hot' || aura.sourceId !== source.id) return;
   if (!isDruidOfSpec(ctx, source, 'restoration')) return;
-  if (source.procState?.icds[GROVEHEART_BOON_ICD_KEY] !== undefined) return;
-  if (!ctx.rng.chance(GROVEHEART_BOON_TICK_CHANCE)) return;
-  if (!source.procState) source.procState = { counters: {}, icds: {} };
-  source.procState.icds[GROVEHEART_BOON_ICD_KEY] = GROVEHEART_BOON_ICD;
-  armNaturesBoon(ctx, source, GROVEHEART_BOON_ABILITIES);
+  rollCasterBoon(
+    ctx,
+    source,
+    GROVEHEART_BOON_ICD_KEY,
+    GROVEHEART_BOON_ICD,
+    GROVEHEART_BOON_TICK_CHANCE,
+    GROVEHEART_BOON_ABILITIES,
+  );
 }

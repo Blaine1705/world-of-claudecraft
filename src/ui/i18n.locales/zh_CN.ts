@@ -18019,6 +18019,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sporemender_form.name': '孢愈者形态',
   'entities.abilities.sporemender_form.description':
     '变形为孢愈者，使你造成的治疗提高20%，护甲提高40%，但移动速度降低20%。你在普通形态下的所有法术仍可施放。持续到你切换形态为止。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回普通形态。（恢复标志技能）',
+  'entities.abilities.spore_burst.name': '孢子爆发',
+  'entities.abilities.spore_burst.description':
+    '在目标区域召唤一株孢子爆裂菇。{duration} 秒后它会爆开，为 8 码内的盟友恢复 {healing} 点生命值，并对敌人造成 {damage} 点自然伤害。',
+  'entities.abilities.spore_burst.specNote_balance':
+    '月潮达到 3 层时，效果提高 25%，并消耗你的月潮。',
+  'entities.abilities.spore_burst.specNote_restoration':
+    '同时为每个被治疗的盟友施加孢愈术。繁茂叠满时，效果提高 25%，并消耗你的繁茂。',
+  'entities.abilities.natures_boon.name': '自然恩惠',
+  'entities.abilities.natures_boon.description':
+    '你的法术可以触发持续 10 秒的自然恩惠：其指定的法术无需消耗、效果提高 25%，且可在任意形态下施放。再次触发会刷新持续时间。',
+  'entities.abilities.natures_boon.specNote_feral':
+    '每次命中的近战自动攻击有 1/15 的几率触发它，作用于孢愈术；处于巨熊形态时也作用于橡树皮。',
+  'entities.abilities.natures_boon.specNote_balance':
+    '每次施放野性弹或天陨有 10% 的几率触发它，作用于孢子爆发，每 10 秒最多触发一次。',
+  'entities.abilities.natures_boon.specNote_restoration':
+    '你的持续治疗效果每次跳动有 10% 的几率触发它，作用于孢子爆发，每 10 秒最多触发一次。',
   'entities.abilities.prayer_of_returning.description':
     '呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（神圣与戒律）',
   'entities.abilities.prayer_of_returning.name': '归返祈祷',
