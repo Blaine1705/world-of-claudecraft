@@ -85,10 +85,13 @@ account refresh. It no longer accepts cosmetic grants.
 
 ## Archived buddies and cosmetics
 
-`archived-features/buddies-and-cosmetics/README.md` describes the restoration
-bundle. It preserves Sapling, all previously removed buddies, their dedicated
-models, copies of shared models/icons, original full-roster definitions, and the
-removed alternate-look implementation and tests.
+The restoration bundle is kept OUT of the release tree, on the
+`feature/buddies-archive` branch (levy-street/world-of-claudecraft#4465), whose
+README describes how to restore it. It preserves Sapling, all previously removed
+buddies, their dedicated models, copies of shared models/icons, original
+full-roster definitions, and the removed alternate-look implementation and
+tests. Nothing in this tree reads it; the same sources are also reachable from
+this branch's git history.
 
 The live game has no buddy look catalog, unlock/equip actions, challenge tracking,
 look rewards, or Looks interface. Old cosmetic wire fields are ignored and the

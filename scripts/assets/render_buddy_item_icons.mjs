@@ -1,5 +1,6 @@
 // Renders the bag-icon WebP for each active buddy whistle from its shipped
-// GLB. Retired batch rows are preserved in archived-features/buddies-and-cosmetics.
+// GLB. Retired batch rows are preserved on the feature/buddies-archive branch
+// (levy-street/world-of-claudecraft#4465), outside the release tree.
 // No text-to-image generation, no internet reference art. Reuses the
 // asset-pipeline's generic headless preview renderer (hero turntable view:
 // auto-framed bounding sphere, no weapon-specific tilt).
