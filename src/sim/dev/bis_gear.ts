@@ -38,7 +38,8 @@ const SEASON2_STOCK_IDS: ReadonlySet<string> = new Set(SEASON2_STOCK);
 // spec-less caller takes the line of the class's FIRST-LISTED spec in
 // DEV_KIT_ROLES (talent-tree order: holy for paladins, elemental for shamans,
 // balance for druids), which is the same pick the raw sum happened to land on
-// for those classes; a deliberate rule, not an accident of the table.
+// for those classes; a deliberate rule, not an accident of the table. The same
+// resolved role decides whether Healing Power pieces are candidates at all.
 const CASTER_LINE = ['int', 'spi', 'sta'] as const;
 const PHYSICAL_LINE = ['str', 'agi', 'sta'] as const;
 function roleFor(cls: string, spec: string | null): DevKitRole | null {
@@ -84,7 +85,8 @@ export function bestEpicGearFor(
       item.quality === 'epic' &&
       // Healing Power never damages (the directionality contract), so a
       // non-healer role never takes a healer piece over its own affix; the
-      // line-only score below cannot see that difference (dev_kit.ts rule).
+      // line-only score below cannot see that difference. (dev_kit.ts scores
+      // Healing Power at zero for the same roles; this picker excludes it.)
       (role?.healer === true || (item.healPower ?? 0) === 0) &&
       (item.kind === 'armor' || item.kind === 'weapon') &&
       // Raid best-in-slot: Warfare Season 2 honor gear is never a pick, so the
