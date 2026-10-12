@@ -1634,7 +1634,7 @@ const classAbilityNamesEn = {
       [
         'natures_boon',
         "Nature's Boon",
-        "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the window.",
+        "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
         {
           feral:
             'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
