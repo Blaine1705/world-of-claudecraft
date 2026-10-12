@@ -1,7 +1,12 @@
 import { isEastbrookGrandArmoury } from '../sim/building_layout';
+import { DUNGEONS } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
+import {
+  onWildheartBasinEntranceCauseway,
+  WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
+} from '../sim/wildheart_basin_entrance';
 
 export type EastbrookGrassExclusion =
   | {
@@ -29,6 +34,16 @@ export function insideGrassHubExclusion(
     if (dx * dx + dz * dz < radiusSq) return true;
   }
   return false;
+}
+
+/** True when a grass candidate falls on a set piece's paving: the meadow does
+ *  not grow through the flagstones of the Jaguar Maw's causeway (the Wildheart
+ *  Basin's world door, src/sim/wildheart_basin_entrance.ts). Every grass
+ *  system asks this (the tuft ring and both blade carpets), so the paving
+ *  reads as paving at every distance. */
+export function insidePavedGrassExclusion(x: number, z: number): boolean {
+  const door = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID]?.doorPos;
+  return door !== undefined && onWildheartBasinEntranceCauseway(door, x, z, 0.3);
 }
 
 /** Hub and camp clearings for bushes/ferns, sourced from the active world only. */

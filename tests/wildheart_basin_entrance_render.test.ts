@@ -4,9 +4,11 @@
 // (src/render/wildheart_basin_entrance.ts: one clock in every program, reduced
 // motion holds it still, the door's own cues on every tier, one occluder per
 // collider row in two fading units, the lights it hands to the fire-light sink).
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { FLOOR_VFX_LAYER_BASE, FLOOR_VFX_LAYER_SPAN } from '../src/render/floor_vfx_layer';
+import { insidePavedGrassExclusion } from '../src/render/foliage_core';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import { clearSetPieceOccluders } from '../src/render/set_piece_occluders';
 import {
@@ -457,6 +459,24 @@ describe('the painter', () => {
       }
     }
     expect(uses).toBeGreaterThan(6);
+  });
+
+  it('the meadow grows no grass through the causeway, in any of the three grass systems', () => {
+    const door = DUNGEONS.wildheart_basin.doorPos;
+    // on the flagstones, and a hand past their edge
+    expect(insidePavedGrassExclusion(door.x, door.z - 4)).toBe(true);
+    expect(insidePavedGrassExclusion(door.x - 1.6, door.z - 14.6)).toBe(true);
+    expect(insidePavedGrassExclusion(door.x + 3.2, door.z - 3.4)).toBe(true);
+    // beside the causeway, at the fire bowls, on the road and far away the grass grows
+    expect(insidePavedGrassExclusion(door.x + 4.4, door.z - 3.4)).toBe(false);
+    expect(insidePavedGrassExclusion(door.x - 8, door.z - 10)).toBe(false);
+    expect(insidePavedGrassExclusion(door.x, door.z - 16)).toBe(false);
+    expect(insidePavedGrassExclusion(-256, 1072)).toBe(false);
+    expect(insidePavedGrassExclusion(0, 0)).toBe(false);
+    for (const file of ['foliage.ts', 'blade_grass.ts', 'blade_grass_band.ts']) {
+      const source = readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
+      expect(source, file).toContain('insidePavedGrassExclusion(x, z)');
+    }
   });
 
   it('the kit slots get lit materials, and only the coals hold their own light', () => {
