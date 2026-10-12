@@ -1270,7 +1270,10 @@ const MONOLITHS: MonolithRow[] = [
     // the sickness save fields moved into src/sim/aura_persist.ts's
     // auraSaveFragment beside the new buff list, while the candidate's
     // rift-safe corpse save path remains in sim.ts. Exact count, zero slack.
-    ceiling: 11629,
+    // Down to 11626 in this v0.45.0 release batch: the class starter-ration
+    // loop moved into src/sim/player_start_items.ts, paying for the held-loot
+    // relog rebind call required by PR #4459. Exact count, zero slack.
+    ceiling: 11626,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

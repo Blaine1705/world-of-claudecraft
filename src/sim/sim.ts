@@ -436,6 +436,7 @@ import {
   stepPlayerMotion,
   swimSurfaceY,
 } from './player_motion';
+import { addClassStartItems } from './player_start_items';
 import { livePlaytimeSeconds } from './playtime';
 import {
   type ArchetypeState,
@@ -2925,13 +2926,7 @@ export class Sim {
       reliquary: freshReliquaryState(),
       accountLedger: opts?.accountLedger ?? freshAccountLedger(),
     };
-    // A fresh character sets out provisioned (class-defined starter rations);
-    // a saved character loads its own bags from savedState below.
-    if (!savedState) {
-      for (const it of classDef.startItems) {
-        meta.inventory.push({ itemId: it.itemId, count: it.count });
-      }
-    }
+    if (!savedState) addClassStartItems(meta.inventory, classDef);
     this.players.set(player.id, meta);
     rebindHeldAwardsOnJoin(this.ctx, player.id); // awards held on a corpse across a relog
     player.skinCatalog = meta.skinCatalog;
