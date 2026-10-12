@@ -9,8 +9,8 @@
     "riftControlSuppressed: guard rolls drawn, effects skipped inside the window",
     "clearRiftBossDeathZones on boss death (riftDeathZoneClear emit + floor claim)"
   ],
-  "draws": 1363,
-  "drawDigest": "772b2184",
+  "draws": 1357,
+  "drawDigest": "415f0173",
   "frames": [
     {
       "tick": 0,
@@ -796,10 +796,10 @@
       "time": 7.25,
       "nextId": 1029,
       "state": "6e9e705c",
-      "events": "741638a5",
+      "events": "fbe2a29e",
       "rng": {
-        "draws": 1118,
-        "digest": "576cb0a0"
+        "draws": 1115,
+        "digest": "da0cb912"
       }
     },
     {
@@ -809,8 +809,8 @@
       "state": "77d18577",
       "events": "832dd83c",
       "rng": {
-        "draws": 1174,
-        "digest": "c9a708f1"
+        "draws": 1171,
+        "digest": "a17dcc89"
       }
     },
     {
@@ -820,8 +820,8 @@
       "state": "77d18577",
       "events": "741638a5",
       "rng": {
-        "draws": 1174,
-        "digest": "c9a708f1"
+        "draws": 1171,
+        "digest": "a17dcc89"
       },
       "label": "detonated",
       "players": [
@@ -1152,8 +1152,8 @@
       "state": "43c1de1e",
       "events": "35447c17",
       "rng": {
-        "draws": 1234,
-        "digest": "9ccee866"
+        "draws": 1231,
+        "digest": "2e9622fb"
       }
     },
     {
@@ -1163,8 +1163,8 @@
       "state": "160f7233",
       "events": "af39ce1a",
       "rng": {
-        "draws": 1289,
-        "digest": "3f26feab"
+        "draws": 1286,
+        "digest": "928fac2c"
       }
     },
     {
@@ -1174,8 +1174,8 @@
       "state": "cdf45e26",
       "events": "741638a5",
       "rng": {
-        "draws": 1343,
-        "digest": "fa8da094"
+        "draws": 1340,
+        "digest": "368a9440"
       }
     },
     {
@@ -1185,8 +1185,8 @@
       "state": "e07acf08",
       "events": "741638a5",
       "rng": {
-        "draws": 1363,
-        "digest": "772b2184"
+        "draws": 1357,
+        "digest": "415f0173"
       },
       "label": "boss-dead-clear",
       "players": [
@@ -1523,8 +1523,8 @@
       "state": "e07acf08",
       "events": "741638a5",
       "rng": {
-        "draws": 1363,
-        "digest": "772b2184"
+        "draws": 1357,
+        "digest": "415f0173"
       },
       "label": "final",
       "players": [

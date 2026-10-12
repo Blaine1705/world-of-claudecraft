@@ -9,8 +9,8 @@
     "victory rush on-kill window + selfHealPctMax",
     "bladestorm self-centered channel ticks"
   ],
-  "draws": 1005,
-  "drawDigest": "ff3076fd",
+  "draws": 1007,
+  "drawDigest": "3af861b9",
   "frames": [
     {
       "tick": 0,
@@ -2504,16 +2504,16 @@
       "state": "c2db2066",
       "events": "741638a5",
       "rng": {
-        "draws": 891,
-        "digest": "daadef22"
+        "draws": 892,
+        "digest": "3dac7eb7"
       }
     },
     {
       "tick": 136,
       "time": 6.8,
       "nextId": 1017,
-      "state": "28092094",
-      "events": "7f28e380",
+      "state": "0f106492",
+      "events": "8ffb0093",
       "rng": {
         "draws": 928,
         "digest": "0d316e79"
@@ -2523,7 +2523,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1017,
-      "state": "5c9e99f0",
+      "state": "558376e6",
       "events": "741638a5",
       "rng": {
         "draws": 972,
@@ -2534,7 +2534,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1017,
-      "state": "5c9e99f0",
+      "state": "558376e6",
       "events": "741638a5",
       "rng": {
         "draws": 972,
@@ -2700,7 +2700,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 3
+            "damageTaken": 2
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -3007,7 +3007,7 @@
           "fallStartY": 4.481729,
           "fiveSecondRule": 105.6,
           "healPower": 12,
-          "hp": 48,
+          "hp": 49,
           "id": 1014,
           "inCombat": true,
           "kind": "player",
@@ -3187,22 +3187,22 @@
       "tick": 144,
       "time": 7.2,
       "nextId": 1017,
-      "state": "a348358b",
-      "events": "152c7004",
+      "state": "519cf023",
+      "events": "bd7696af",
       "rng": {
-        "draws": 1005,
-        "digest": "ff3076fd"
+        "draws": 1007,
+        "digest": "3af861b9"
       }
     },
     {
       "tick": 144,
       "time": 7.2,
       "nextId": 1017,
-      "state": "a348358b",
+      "state": "519cf023",
       "events": "741638a5",
       "rng": {
-        "draws": 1005,
-        "digest": "ff3076fd"
+        "draws": 1007,
+        "digest": "3af861b9"
       },
       "label": "final",
       "players": [
@@ -3234,7 +3234,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 1250,
-            "damageTaken": 34,
+            "damageTaken": 44,
             "kills": 2
           },
           "craftDaily": {},
@@ -3364,7 +3364,7 @@
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 3
+            "damageTaken": 2
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -3453,7 +3453,7 @@
           "channelTickEvery": 1,
           "channelTickTimer": 1,
           "chargeTimeLeft": 2.4,
-          "combatTimer": 1.25,
+          "combatTimer": 0.05,
           "comboUntil": -1,
           "cooldowns": [
             [
@@ -3480,7 +3480,7 @@
           "fallStartY": 6.672031,
           "fiveSecondRule": 106.2,
           "healPower": 5,
-          "hp": 641,
+          "hp": 631,
           "id": 1004,
           "inCombat": true,
           "kind": "player",
@@ -3499,7 +3499,7 @@
             "z": 17.534589
           },
           "potionCooldownUntil": -1,
-          "resource": 80.0875,
+          "resource": 81.4625,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -3671,7 +3671,7 @@
           "fallStartY": 4.481729,
           "fiveSecondRule": 105.8,
           "healPower": 12,
-          "hp": 48,
+          "hp": 49,
           "id": 1014,
           "inCombat": true,
           "kind": "player",
@@ -3791,7 +3791,7 @@
             }
           ],
           "autoAttack": true,
-          "combatTimer": 1.25,
+          "combatTimer": 0.05,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",

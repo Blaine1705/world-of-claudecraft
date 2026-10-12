@@ -219,9 +219,10 @@ describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () =
   });
 
   it('dungeon door jambs block while the mouth stays a walkable trigger lane', () => {
-    // The Sunken Bastion keeps the generic arch (the Hollow Crypt's door is the
-    // Fallen Chapel's stair-house now, src/sim/hollow_crypt_entrance.ts).
-    const door = DUNGEONS.sunken_bastion.doorPos;
+    // Dawnhold Castle keeps the generic arch. The five-man dungeons no longer
+    // do: each door is a built set piece with its own colliders now
+    // (src/sim/dungeon_door_jambs.ts).
+    const door = DUNGEONS.dawnhold_castle.doorPos;
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {
       expect(isBlocked(SEED, door.x + sx, door.z, 0.4), `jamb ${sx}`).toBe(true);
       // a generic jamb is a slim post: a yard further out the ground is open

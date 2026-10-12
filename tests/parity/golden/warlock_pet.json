@@ -9,8 +9,8 @@
     "applyTaunt pet auto-taunt arm (~8110)",
     "applyTaunt pet manual-taunt arm (petTaunt, ~4885)"
   ],
-  "draws": 1885,
-  "drawDigest": "d0492d35",
+  "draws": 1899,
+  "drawDigest": "8f7ab123",
   "frames": [
     {
       "tick": 0,
@@ -246,52 +246,52 @@
       "state": "8da71e8d",
       "events": "722d58c1",
       "rng": {
-        "draws": 1147,
-        "digest": "3f5358b9"
+        "draws": 1146,
+        "digest": "10363d4f"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1014,
-      "state": "fb860764",
-      "events": "289d9672",
+      "state": "8ffb4cca",
+      "events": "b0ab88ef",
       "rng": {
-        "draws": 1423,
-        "digest": "5ff960aa"
+        "draws": 1421,
+        "digest": "303b4f92"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 1014,
-      "state": "45fb7564",
-      "events": "185d02a8",
+      "state": "578065ad",
+      "events": "e4a93971",
       "rng": {
-        "draws": 1691,
-        "digest": "4ab1c4e9"
+        "draws": 1687,
+        "digest": "2487e0ff"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 1014,
-      "state": "a1dd9381",
+      "state": "e0749d19",
       "events": "a2ed18b1",
       "rng": {
-        "draws": 1849,
-        "digest": "2e99426a"
+        "draws": 1860,
+        "digest": "e74c776b"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 1014,
-      "state": "9ee766b0",
+      "state": "ebdb8302",
       "events": "741638a5",
       "rng": {
-        "draws": 1849,
-        "digest": "2e99426a"
+        "draws": 1860,
+        "digest": "e74c776b"
       },
       "label": "pet-taunt",
       "players": [
@@ -322,13 +322,13 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 20
+            "damageDealt": 19
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 20
+              "damageDealt": 19
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -470,7 +470,7 @@
           "facing": 2.077895,
           "fallStartY": -2,
           "fiveSecondRule": 99,
-          "hp": 345,
+          "hp": 342,
           "id": 1012,
           "inCombat": true,
           "kind": "mob",
@@ -521,7 +521,7 @@
           "forcedTargetId": 1012,
           "forcedTargetTimer": 3,
           "hostile": true,
-          "hp": 49959,
+          "hp": 49960,
           "id": 1013,
           "inCombat": true,
           "kind": "mob",
@@ -558,7 +558,7 @@
           "threat": [
             [
               1004,
-              21
+              20
             ],
             [
               1012,
@@ -577,11 +577,11 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 1014,
-      "state": "0ff102e3",
-      "events": "8878d968",
+      "state": "9967fa4d",
+      "events": "95eb2394",
       "rng": {
-        "draws": 1885,
-        "digest": "d0492d35"
+        "draws": 1899,
+        "digest": "8f7ab123"
       },
       "label": "final",
       "players": [
@@ -612,13 +612,13 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 20
+            "damageDealt": 19
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 20
+              "damageDealt": 19
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -761,7 +761,7 @@
           "facing": 1.570796,
           "fallStartY": -2,
           "fiveSecondRule": 99,
-          "hp": 333,
+          "hp": 331,
           "id": 1012,
           "inCombat": true,
           "kind": "mob",
@@ -813,7 +813,7 @@
           "forcedTargetId": 1012,
           "forcedTargetTimer": 2.8,
           "hostile": true,
-          "hp": 49946,
+          "hp": 49948,
           "id": 1013,
           "inCombat": true,
           "kind": "mob",
@@ -850,11 +850,11 @@
           "threat": [
             [
               1004,
-              21
+              20
             ],
             [
               1012,
-              36
+              35
             ]
           ],
           "weapon": {
