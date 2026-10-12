@@ -16,16 +16,16 @@ function mount() {
     '<button id="pvp-resurrect-btn" style="display: none">PvP Resurrect</button>' +
     '<p id="pvp-resurrect-note" style="display: none"></p>';
   const writes: string[] = [];
-  const writers: Pick<PainterHostWriters, 'setAttr' | 'setDisplay' | 'setText'> = {
+  const writers: Pick<PainterHostWriters, 'setAttr' | 'setStyleProp' | 'setText'> = {
     setText: (el, text) => {
       if (el.textContent === text) return;
       el.textContent = text;
       writes.push(`text:${el.id}`);
     },
-    setDisplay: (el, display) => {
-      if (el.style.display === display) return;
-      el.style.display = display;
-      writes.push(`display:${el.id}`);
+    setStyleProp: (el, prop, value) => {
+      if (el.style.getPropertyValue(prop) === value) return;
+      el.style.setProperty(prop, value);
+      writes.push(`style:${el.id}:${prop}`);
     },
     setAttr: (el, name, value) => {
       if (el.getAttribute(name) === value) return;

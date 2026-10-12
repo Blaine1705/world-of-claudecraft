@@ -3,7 +3,8 @@
 // is disabled and counts down, and the note says when the raise opens and that it
 // lands at the nearest graveyard; once the wait is over the button reads plain
 // "PvP Resurrect" and the note says it is ready. Every write rides the PainterHost
-// elided writers, so a frame inside the same second writes nothing. The click is
+// elided writers (visibility through setStyleProp, so it never shares setText's
+// single-slot cache entry), so a frame inside the same second writes nothing. The click is
 // bound here too (the server re-checks the wait, the ghost, the instance and jail).
 
 import { durationText } from '../../duration_text';
@@ -24,7 +25,7 @@ export class PvpResurrectPrompt {
   private waiting = false;
 
   constructor(
-    private readonly writers: Pick<PainterHostWriters, 'setAttr' | 'setDisplay' | 'setText'>,
+    private readonly writers: Pick<PainterHostWriters, 'setAttr' | 'setStyleProp' | 'setText'>,
     onPress: () => void,
     root: Pick<Document, 'getElementById'> = document,
   ) {
@@ -40,8 +41,10 @@ export class PvpResurrectPrompt {
   paint(view: DeathPromptView): void {
     if (!this.button || !this.note) return;
     const w = this.writers;
-    w.setDisplay(this.button, view.pvpResurrect ? '' : 'none');
-    w.setDisplay(this.note, view.pvpResurrect ? '' : 'none');
+    // Visibility rides setStyleProp, its own cache slot: setText on the same
+    // element would otherwise share the single-slot entry and never elide.
+    w.setStyleProp(this.button, 'display', view.pvpResurrect ? '' : 'none');
+    w.setStyleProp(this.note, 'display', view.pvpResurrect ? '' : 'none');
     if (!view.pvpResurrect) return;
     const waiting = view.pvpResurrectWait > 0;
     this.waiting = waiting;
