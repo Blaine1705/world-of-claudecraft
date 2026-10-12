@@ -2282,11 +2282,10 @@ const MONOLITHS: MonolithRow[] = [
     // interior_collider_cells.ts. wc -l. Exact count.
     // Lowered after the ClaudeCraft Studio merge moved its inline code into
     // sibling modules (v0.45.0); exact count.
-    // Studio merge into the v0.45.0 integration: the integration pin 2392 plus
-    // the Studio's own delta (2493 - 2513 = -20) gives 2372; re-measure with wc -l.
     // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
-    // the release/v0.45.0 ceiling both merged PRs were held to.
-    ceiling: 2404,
+    // the release/v0.45.0 ceiling both merged PRs were held to (Studio moved
+    // crossesFence to fence_crossing.ts).
+    ceiling: 2352,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

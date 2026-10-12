@@ -6,7 +6,6 @@
 // Decision logic lives in the pure cores (dungeon_draft_core, writer, validate)
 // so this module stays a thin DOM/three glue layer.
 import * as THREE from 'three';
-import { INFERNAL_DECOR_KEYS } from '../../render/infernal_abyss_dressing';
 import { t } from '../../ui/i18n';
 import { buildDungeonOverlays, disposeDungeonOverlays } from '../3d/dungeon_overlays';
 import type { Editor3DViewport } from '../3d/viewport';
@@ -592,9 +591,8 @@ export class DungeonEditorMode {
   private keyField(value: string, ref: DungeonEntityRef): HTMLLabelElement {
     const { row } = this.fieldRow('key');
     const select = document.createElement('select');
-    const keys = INFERNAL_DECOR_KEYS.includes(value)
-      ? INFERNAL_DECOR_KEYS
-      : [value, ...INFERNAL_DECOR_KEYS];
+    const known = this.entry?.decorKeys ?? [];
+    const keys = known.includes(value) ? known : [value, ...known];
     for (const key of keys) {
       const opt = document.createElement('option');
       opt.value = key;

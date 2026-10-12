@@ -62,16 +62,6 @@ export const TEMPORAL_HOURGLASS_ALLY_COOLDOWN_RATE = 1.75;
 export const RUN_SPEED = 7; // yards/sec, classic run speed
 export const TURN_SPEED = Math.PI; // rad/sec keyboard turning
 export const MELEE_RANGE = 5; // yards
-/** How far Vaelgrath's JAW sits ahead of his entity origin, per point of the
- *  mob's `scale`. His mesh origin is the body CENTRE and the head ends at raw
- *  model X +0.47 on a rig normalised to height 3.0, so the jaw leads the origin
- *  by ~5.2 yards per point of scale (~31yd at scale 6).
- *
- *  Shared here rather than owned by the encounter because THREE systems have to
- *  agree on it: the encounter aims his breath from the jaw, mob_combat.ts sizes
- *  his reach so the HEAD (not his ribcage) is what meets the player, and the
- *  player's own reach against him is measured down the same body axis. */
-export const EMBERWAKE_MOUTH_FORWARD_PER_SCALE = 5.2;
 export const MELEE_ARC = 2.2; // radians half-arc within which melee swings connect
 export const INTERACT_RANGE = 5;
 // /yell broadcast radius and ground-object respawn delay: neutral consts shared by
@@ -6113,8 +6103,7 @@ export interface DungeonDef {
     | 'drowned_temple'
     | 'gravewyrm_sanctum'
     | 'lastkeep'
-    | 'dawnhold'
-    | 'infernal_abyss';
+    | 'dawnhold';
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -7862,28 +7851,12 @@ export interface Entity extends ClientMirroredEntityFields {
   mobChargeTimeLeft?: number; // seconds left in the in-flight dash (undefined/0 = not dashing)
   mobChargeTargetId?: number | null; // dash victim; null/undefined = not dashing
   healedThisPull: boolean; // desperation self-heal already used this pull
-  /** A world-boss SUMMONING FOCUS (world_boss.ts summonCrystal): the channel
-   *  state rides the focus entity itself, so the interaction command can start
-   *  it without reaching into the scheduler and the scheduler can drive it
-   *  without a second lookup table. Present only on those objects. */
-  summonFocus?: WorldBossSummonFocus;
-  nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
-  sandworm?: SandwormEncounterState; // sim-only state for the Dunefather world-boss encounter
-  emberwake?: EmberwakeEncounterState; // sim-only state for the Emberwake dragon world-boss encounter
-  /** The sand worm is underground: a huge absorb rides the state (untargetable
-   *  in effect) and the render layer sinks the body until it erupts. */
-  burrowed?: boolean;
-  /** Vaelgrath has LANDED (encounters/emberwake.ts). Read by the render layer,
-   *  which drops his hover to nothing so his feet reach the dirt and swaps him
-   *  to the wings-still clip set, a dragon that keeps beating his wings while
-   *  standing on the ground reads as a bug, not a boss. Same contract as
-   *  `burrowed` above: sim-owned flag, render-only consumer. */
-  emberwakeGrounded?: boolean;
   // Room-gated Sentinel cast state. Optional so unrelated entities and wire
   // snapshots retain their existing shape.
   ignivarTrashSpellTimer?: number;
   ignivarTrashSpell?: 'cinderLance';
   ignivarTrashCastKey?: number;
+  nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
   ignivar?: IgnivarEncounterState; // sim-only state for the Ignivar raid encounter
   varkhul?: VarkhulEncounterState; // sim-only state for the Varkhul raid encounter
   varkhulAssemblyAttempt?: number; // survives encounter resets so Heroic rune slots reshuffle per pull
@@ -8514,101 +8487,6 @@ export interface NythraxisDialogueCue {
   at: number;
   speaker: 'nythraxis' | 'aldric';
   text: string;
-}
-
-// Dunefather sand-worm world-boss encounter (encounters/sandworm.ts): a
-// surface/burrow state machine layered under HP phases. Timers are seconds.
-export interface SandwormEncounterState {
-  phase: 1 | 2 | 3 | 'dead';
-  state: 'surface' | 'burrowed' | 'leaping' | 'emerging';
-  /** seconds remaining in the current burrowed/emerging state */
-  stateTimer: number;
-  /** until the next dive while surfaced */
-  burrowTimer: number;
-  /** the hate-table target the burrowed worm tunnels toward */
-  burrowTargetId: number | null;
-  /** Scything Sweep cadence (surface) */
-  sweepTimer: number;
-  /** Dunebreaker Slam cadence (surface) */
-  slamTimer: number;
-  /** This dive already spent its breach-leap (the second contact emerges). */
-  leapDone?: boolean;
-  /** The leap's re-entry rock spray fired (one-shot per leap). */
-  leapDiveFx?: boolean;
-  /** The player the airborne worm arch-dives onto, picked at breach time,
-   *  preferring a DIFFERENT victim than the tunnel target. */
-  leapTargetId?: number | null;
-  /** Brood-spew cadence (surface): vomits mini clones from the mouth. */
-  broodTimer?: number;
-  /** Throttle for the choking sand-dust blind pulse (seconds until next). */
-  blindTimer?: number;
-  introSpoken: boolean;
-}
-
-/** Vaelgrath, the Emberwake (encounters/emberwake.ts): the dragon world boss.
- *  Three HP phases over a breath / tail / wing-buffet / ember-rain / bite
- *  rotation, punctuated by the Molten Vents burn windows. */
-export interface EmberwakeEncounterState {
-  phase: 1 | 2 | 3 | 'dead';
-  /** 'winding' is the rear-back telegraph; the gouts fly when it expires. */
-  breathState: 'idle' | 'winding';
-  /** seconds left in the wind-up */
-  breathStateTimer: number;
-  /** the hate-table player the breath is aimed at */
-  breathTargetId: number | null;
-  /** until the next breath */
-  breathTimer: number;
-  /** Ashen Maw (single-target chomp) cadence */
-  biteTimer: number;
-  /** Thunderclap Wings (knockback + downdraft) cadence */
-  buffetTimer: number;
-  /** Thunderclap Wings is telegraphed: the wings sweep BACK ('winding'), and the
-   *  shove lands when the timer expires. Absent on state authored before the
-   *  wind-up existed (treated as 'idle'). */
-  buffetState?: 'idle' | 'winding';
-  /** seconds left in the wing-sweep wind-up */
-  buffetStateTimer?: number;
-  /** Cinder Lash (rear-arc tail sweep) cadence */
-  tailTimer?: number;
-  /** Cinderfall (the ember rain that chases players out of their feet) cadence */
-  cinderTimer?: number;
-  /** The Groundfall stretch: he drops out of the air and hunts on foot, wings
-   *  folded, biting far faster than he can from the wing. 'air' is the normal
-   *  hovering fight. Absent on state authored before the landing existed. */
-  groundState?: 'air' | 'grounded';
-  /** seconds until he next lands ('air'), or seconds left on the ground */
-  groundTimer?: number;
-  /** Pools that have flared their ground WARNING and are counting down to
-   *  ignition (`t` seconds left). Ignited pools become entries in ctx.groundAoEs;
-   *  a reset/evade drops the queue so flame never lights after he disengages. */
-  pendingPools: { x: number; z: number; t: number }[];
-  /** Pools that have IGNITED and are burning: `t` seconds of flame left, `pulse`
-   *  seconds until the next particle emission. Purely cosmetic bookkeeping, the
-   *  damage lives in ctx.groundAoEs; this only keeps violet flame spitting out of
-   *  the ring for as long as it burns. */
-  burningPools: { x: number; z: number; t: number; pulse: number }[];
-  /** Beams currently LANCING OUT. The breath is drawn as a front that races from
-   *  his jaw to full reach over BEAM_SWEEP seconds, emitting a couple of bursts
-   *  per tick. Emitting the whole lane in one frame silently loses it: the
-   *  renderer pools these effects round-robin, so 15 in a single tick recycle
-   *  each other and nothing is visible. */
-  beamSweeps: { ox: number; oz: number; ux: number; uz: number; reach: number; t: number }[];
-  introSpoken: boolean;
-}
-
-/**
- * The live channel on a world-boss summoning focus. `total` is copied off the
- * boss def so the cast bar and the tick agree without either importing the
- * other; `bossIndex` is the WORLD_BOSSES slot this focus calls, so the
- * scheduler knows which boss to raise and which respawn clock to restart.
- */
-export interface WorldBossSummonFocus {
-  bossIndex: number;
-  /** Entity id of the player currently channelling, or null when nobody is. */
-  playerId: number | null;
-  /** Seconds of channel left. Reset to `total` whenever the channel breaks. */
-  remaining: number;
-  total: number;
 }
 
 /** One live Bone Spike: the spike mob and the raider it holds. */
@@ -10075,25 +9953,8 @@ export type SimEvent = { pid?: number } & (
       // the retained-thread verdict visibly stronger than a plain discharge.
       threads?: number;
       // Stable presentation discriminator; renderers must not infer a player
-      // attack animation from school or an English ability label. The worm-*
-      // values map to the sand worm's bespoke GLB clips (Burrow / Emerge /
-      // Attack_Slam / Attack_Sweep) in the render layer.
-      attackAnimation?:
-        | 'ranged-shot'
-        | 'worm-burrow'
-        | 'worm-emerge'
-        | 'worm-slam'
-        | 'worm-sweep'
-        | 'worm-leap'
-        | 'worm-dive'
-        | 'worm-spew'
-        // Vaelgrath's beats (encounters/emberwake.ts -> DRAGON_ANIM_CLIPS).
-        // 'dragon-ground-bite' is the LANDED chomp: same beat, but the clip it
-        // maps to holds the wings folded instead of beating them.
-        | 'dragon-breath'
-        | 'dragon-bite'
-        | 'dragon-ground-bite'
-        | 'dragon-buffet';
+      // attack animation from school or an English ability label.
+      attackAnimation?: 'ranged-shot';
       // True for a wand auto-attack projectile, so combat_sfx.ts can pick the
       // dedicated wand_<school> cue instead of the real-spell proj_<school>
       // one: a passive auto-attack must not sound identical to an actual cast.
@@ -12592,14 +12453,6 @@ export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/cre
 // boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
 // the encounter. Kept here as the neutral shared seam in the meantime.
 export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
-// The Dunefather sand-worm world boss (encounters/sandworm.ts). Shared here so
-// the locomotion dispatch and the render layer key on it without importing the
-// encounter module.
-export const SANDWORM_BOSS_ID = 'sandworm_dunefather';
-// Vaelgrath, the Emberwake, the dragon world boss (encounters/emberwake.ts).
-// Shared here so the locomotion dispatch and the render layer key on it without
-// importing the encounter module.
-export const EMBERWAKE_BOSS_ID = 'emberwake_vaelgrath';
 export const IGNIVAR_BOSS_ID = 'ignivar_herald_of_the_last_flame';
 // The Nythraxis arena room radius (yards from the boss spawn). Shared here so
 // deeds.ts can read it without importing encounters/nythraxis.ts (which itself

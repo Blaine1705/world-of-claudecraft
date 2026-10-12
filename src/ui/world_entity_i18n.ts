@@ -442,16 +442,6 @@ const MOB_IDS = [
   'buddy_forgemaw',
   'buddy_crystal_tide',
   'buddy_phantom',
-  // The Molten Abyss dungeon (src/sim/content/infernal_abyss.ts).
-  'abyssal_legionnaire',
-  'cinder_magus',
-  'molten_hellhound',
-  'flamebound_smith',
-  'abyssal_gladiator',
-  'infernal_cinderling',
-  'forgekeeper',
-  'pyre_golem',
-  'azazel_infernal_lord',
 ] as const;
 
 const NPC_IDS = [
@@ -935,9 +925,6 @@ const QUEST_IDS = [
   // the Eastbrook hub dummy lesson (content/practice_dummies.ts)
   'q_hub_know_your_numbers',
   'q_hub_healing_numbers',
-  'q_infernal_abyss_echoes',
-  'q_infernal_abyss_covenant',
-  'q_infernal_abyss_azazel',
 ] as const;
 
 const ZONE_IDS = [
@@ -973,7 +960,6 @@ const DUNGEON_IDS = [
   'wildheart_basin',
   'the_last_keep',
   'dawnhold_castle',
-  'infernal_abyss',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

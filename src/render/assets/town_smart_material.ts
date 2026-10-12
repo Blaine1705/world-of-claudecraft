@@ -142,6 +142,9 @@ export function applyTownSmart(mat: THREE.Material): boolean {
 
 /** Patch every town-smart material under a freshly parsed glTF scene. */
 export function applyTownSmartToScene(root: THREE.Object3D): number {
+  // A loader stub in a test may hand over a scene with no graph at all (the
+  // same guard its siblings in loadGltf's resolve chain carry).
+  if (typeof root?.traverse !== 'function') return 0;
   let n = 0;
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;

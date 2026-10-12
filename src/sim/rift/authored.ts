@@ -48,8 +48,8 @@ export interface AuthoredDecor {
   z: number;
   yaw: number;
   scale?: number;
-  /** Per-axis scale, for dressing stretched along one axis (the Infernal
-   *  Abyss' lava channels and bridge spans). */
+  /** Per-axis scale, for dressing stretched along one axis (channels and
+   *  bridge spans). */
   scaleX?: number;
   scaleZ?: number;
   /** Inner-to-outer radius ratio for ring-shaped dressing. */

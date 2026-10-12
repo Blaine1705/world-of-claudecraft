@@ -9,7 +9,6 @@
 import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import { GFX } from '../gfx';
 import { applyTextureAnisotropy } from '../texture_anisotropy';
 import { applyFoliageEdgeFade } from './foliage_edge_fade';
@@ -365,52 +364,6 @@ export function releaseGltf(url: string): void {
 export function releaseTexture(url: string, opts: { srgb?: boolean; repeat?: boolean } = {}): void {
   const resolved = assetUrl(url);
   texCache.delete(`${resolved}|${opts.srgb ? 's' : 'l'}|${opts.repeat ? 'r' : 'c'}`);
-}
-
-// ---- FORK DECLARATION (Studio) ---------------------------------------------
-// Upstream removed its Radiance arm at v0.39 (see the header note): the shipped
-// biome skies are KTX2 UASTC HDR now, so nothing in the GAME loads a .hdr. The
-// EDITOR still does, a maker can point the Skybox picker at any .hdr on disk,
-// and that file is whatever they hand us, not a pipeline artefact we control.
-// So this is deliberately the small arm, not upstream's deleted one: no decode
-// worker (hdr_decode_worker.ts went with the upstream removal, and the editor
-// loads one sky on demand rather than streaming them per zone), no PMREM
-// downscale, no retry queue. One promise cache so re-picking a sky is free.
-// If a future upstream ships an HDR path again, delete this and use theirs.
-const hdrCache = new Map<string, Promise<THREE.DataTexture>>();
-
-/** Editor-only: decode a Radiance (.hdr) file for the custom skybox picker. */
-export function loadHdr(url: string): Promise<THREE.DataTexture> {
-  const resolved = assetUrl(url);
-  let p = hdrCache.get(resolved);
-  if (!p) {
-    const startedAt = assetLoadStarted();
-    p = new Promise<THREE.DataTexture>((resolve, reject) => {
-      new HDRLoader().load(
-        resolved,
-        (tex) => {
-          tex.mapping = THREE.EquirectangularReflectionMapping;
-          resolve(tex);
-        },
-        undefined,
-        () => reject(new Error(`hdr load failed: ${url}`)),
-      );
-    }).then(
-      (tex) => {
-        recordAssetLoad('hdr', resolved, startedAt);
-        return tex;
-      },
-      (err: unknown) => {
-        recordAssetLoad('hdr', resolved, startedAt, true);
-        // Evict on failure (the loadGltf precedent): a rejected promise left in
-        // the cache would poison every later pick for the session.
-        if (hdrCache.get(resolved) === p) hdrCache.delete(resolved);
-        throw err;
-      },
-    );
-    hdrCache.set(resolved, p);
-  }
-  return p;
 }
 
 /** Plain image texture (terrain splats, water normals, VFX sprites). */

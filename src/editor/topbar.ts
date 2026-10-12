@@ -49,7 +49,8 @@ export interface TopbarDeps {
   onEvenBuildings(): void;
   onSettings(): void;
   onPlaytest(): void;
-  onDungeonMode(): void;
+  /** Absent while no authored dungeon is registered: the entry is hidden. */
+  onDungeonMode?: () => void;
   onBattlegroundMode(): void;
   /** Write the open REGION map back to its generated module (dev only). */
   onRegionExport(): void;
@@ -441,14 +442,16 @@ export class Topbar {
     workspaceMenu.appendChild(mapWrap);
 
     // Dungeon-layout mode: edits an authored interior instead of the map.
-    workspaceMenu.appendChild(
-      button(
-        t('editor.topbar.dungeon'),
-        deps.onDungeonMode,
-        'ed-dungeon',
-        t('editor.topbar.dungeonTitle'),
-      ),
-    );
+    if (deps.onDungeonMode) {
+      workspaceMenu.appendChild(
+        button(
+          t('editor.topbar.dungeon'),
+          deps.onDungeonMode,
+          'ed-dungeon',
+          t('editor.topbar.dungeonTitle'),
+        ),
+      );
+    }
     // Ravenrift mode: edits the battleground placements instead of the map.
     // Fork-local authoring tool, English-only like the rest of the editor.
     workspaceMenu.appendChild(

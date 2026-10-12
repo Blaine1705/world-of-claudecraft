@@ -4,7 +4,7 @@
 // below-horizon void.
 
 import * as THREE from 'three';
-import { loadHdr } from '../assets/loader';
+import { loadEditorHdr } from './editor_hdr_loader';
 
 export class EditorSkybox {
   private url: string | null = null;
@@ -25,7 +25,7 @@ export class EditorSkybox {
       return;
     }
     const load = url.toLowerCase().endsWith('.hdr')
-      ? loadHdr(url).then((source) => source.clone())
+      ? loadEditorHdr(url).then((source) => source.clone())
       : new THREE.TextureLoader().loadAsync(url);
     void load
       .then((tex) => {

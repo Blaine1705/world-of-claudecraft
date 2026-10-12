@@ -1443,8 +1443,7 @@ export function dungeonByIndex(index: number): DungeonDef | null {
   return DUNGEON_BY_INDEX[index] ?? null;
 }
 
-// Which dungeon a far-off instance position belongs to, by x-band. The arena
-// cuts a finite hole between the Nythraxis and Infernal Abyss bands.
+// Which dungeon a far-off instance position belongs to, by x-band.
 export function dungeonAt(x: number): DungeonDef | null {
   if (x >= DUNGEON_OVERFLOW_X_BASE - 300) {
     const index = DUNGEON_OVERFLOW_INDEX + Math.round((x - DUNGEON_OVERFLOW_X_BASE) / 600);
@@ -1462,9 +1461,11 @@ export function isDungeonEntryTransition(fromX: number, toX: number): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// The Ashen Coliseum, 1v1 ranked arena. Its match instances occupy a finite
-// far-off flat-ground band between dungeon indexes 5 and 6. Like dungeons, x
-// beyond DUNGEON_X_THRESHOLD means flat ground and instance-local collision.
+// The Ashen Coliseum, 1v1 ranked arena. Its match instances live in their own
+// far-off flat-ground x-band, well past the dungeon bands. Like dungeons, x
+// beyond DUNGEON_X_THRESHOLD means flat ground (world.groundHeight) and
+// instance-local collision (sim/colliders.ts); the band split below keeps
+// arena positions from being read as a dungeon.
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = INSTANCE_X_BASE + 4200; // arena instances share this x; slots stack along z
@@ -1485,11 +1486,7 @@ export function arenaOrigin(slot: number): { x: number; z: number } {
 }
 
 export function isArenaPos(x: number): boolean {
-  // The built-in world keeps the release band (the arena runs on to the delve
-  // band). The finite band (ARENA_X_MAX) only exists to cut room for the
-  // Infernal Abyss at index 6, which is Studio content registered while an
-  // authored map is active (studio_content.ts).
-  return x >= ARENA_X_MIN && x < (studioContentActive() ? ARENA_X_MAX : DELVE_BAND_X_MIN);
+  return x >= ARENA_X_MIN && x < DELVE_BAND_X_MIN;
 }
 
 // Nearest arena instance origin to a far-off position, matched by z-band (the
@@ -1537,8 +1534,8 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 // DELVE_X_MIN must stay above the full arena footprint around ARENA_X.
 // ---------------------------------------------------------------------------
 
-// 4800 sits clear of the Infernal Abyss at x=4500 and the arena pit centred at
-// ARENA_X (4200, about 22u half-width). The delve band's
+// 4800 sits clear of the v0.10.0 layout: the widest dungeon ends west of
+// the arena pit centred at ARENA_X (4200, about 22u half-width). The delve band's
 // west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
 export const DELVE_X_MIN = INSTANCE_X_BASE + 4800;
 // Each delve room is centred at DELVE_X_MIN + index*600. Delve modules use wider

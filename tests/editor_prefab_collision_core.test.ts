@@ -92,6 +92,32 @@ const key = (o: Record<string, number>): string =>
     .map((k) => `${k}:${o[k].toFixed(3)}`)
     .join(' ');
 
+/** Exact-up-to-float-noise world-space shape equality. The split re-expresses
+ *  each shape in a piece frame and back, which is exact math but not exact
+ *  floats (about 1e-14 yd of drift), so comparing toFixed(3) strings flips
+ *  whenever a coordinate sits on a rounding boundary (35.3625 vs 35.36250..1).
+ *  Every wanted shape must match a distinct produced shape on EVERY field to
+ *  within EPS, which is far tighter than the old 3-decimal quantization. */
+const EPS = 1e-9;
+function expectSameShapes(
+  got: Record<string, number>[],
+  want: Record<string, number>[],
+  label: string,
+): void {
+  expect(got.length, `${label}: shape count`).toBe(want.length);
+  const used = new Set<number>();
+  for (const w of want) {
+    const i = got.findIndex(
+      (g, gi) =>
+        !used.has(gi) &&
+        Object.keys(w).length === Object.keys(g).length &&
+        Object.keys(w).every((k) => Math.abs(w[k] - g[k]) <= EPS),
+    );
+    expect(i, `${label}: nothing produced for ${key(w)}`).toBeGreaterThanOrEqual(0);
+    used.add(i);
+  }
+}
+
 function authoredOf(assetId: string): PrefabAuthoredCollision | null {
   const o = collisionOverrideFor(assetId);
   if (!o || o.mode !== 'baked' || !o.boxes || o.boxes.length === 0) return null;
@@ -125,17 +151,17 @@ describe('exploding a prefab keeps the building’s collision', () => {
         applyCollisionShare(pieces[k + i] as never, split.pieces[i]);
       }
 
-      const want = authored.boxes.map((x) => key(worldBox(b, x))).sort();
-      const got = pieces
-        .flatMap((p) => (p.hitboxes ?? []).map((x) => key(worldBox(p as Placementish, x))))
-        .sort();
-      expect(got).toEqual(want);
+      const want = authored.boxes.map((x) => worldBox(b, x));
+      const got = pieces.flatMap((p) =>
+        (p.hitboxes ?? []).map((x) => worldBox(p as Placementish, x)),
+      );
+      expectSameShapes(got, want, `${def.assetId} boxes`);
 
-      const wantR = authored.ramps.map((r) => key(worldRamp(b, r))).sort();
-      const gotR = pieces
-        .flatMap((p) => (p.ramps ?? []).map((r) => key(worldRamp(p as Placementish, r))))
-        .sort();
-      expect(gotR).toEqual(wantR);
+      const wantR = authored.ramps.map((r) => worldRamp(b, r));
+      const gotR = pieces.flatMap((p) =>
+        (p.ramps ?? []).map((r) => worldRamp(p as Placementish, r)),
+      );
+      expectSameShapes(gotR, wantR, `${def.assetId} ramps`);
     });
   }
 

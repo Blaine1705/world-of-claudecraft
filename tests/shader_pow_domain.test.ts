@@ -154,7 +154,9 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/deepglass_goal_wave.ts': 2,
   // the crowd cards' card-edge fade and the goal-excite pulse, both clamped
   'src/render/deepglass_crowd_cards.ts': 2,
-  // the bell glass, the goal burst and the orb glow: three fresnel rims, clamped
+  // the bell glass, the goal burst and the orb glow: three fresnel rims, clamped;
+  // the bell's climbing rings and the crown beam's height ramp and core, clamped
+  // or abs() (ClaudeCraft Studio import)
   'src/render/deepglass.ts': 6,
   // the team aura's fresnel rim, used twice (alpha and the white edge lift)
   'src/render/deepglass_aura.ts': 2,

@@ -14823,8 +14823,6 @@ export const ko_KR: EnTranslations = {
       "tool_recharge": "충전",
       "demonHeal": "악마 치유",
       "thunzharrStormcall": "폭풍의 부름",
-      "forgekeepersWrath": "Forgekeeper's Wrath",
-      "azazelApocalypseFlame": "Apocalypse Flame",
       "rift_frost_execution": "빙하의 무덤",
       "rift_frost_strike": "절대 영도",
       "rift_ember_execution": "마그마 우물",
@@ -22839,57 +22837,6 @@ export const ko_KR: EnTranslations = {
       "moonwrack_stave": {
         "name": "달파멸 지팡이"
       },
-      "infernal_slag": {
-        "name": "심연의 광재"
-      },
-      "charred_legion_tablet": {
-        "name": "불탄 군단 석판"
-      },
-      "brands_of_the_first_flame": {
-        "name": "태초의 불꽃 낙인"
-      },
-      "forgekeepers_ledger": {
-        "name": "용광로지기의 장부"
-      },
-      "azazels_broken_covenant": {
-        "name": "아자젤의 깨진 계약"
-      },
-      "emberforged_vambraces": {
-        "name": "잿불로 벼린 완갑"
-      },
-      "cinderthread_mantle": {
-        "name": "잿실 어깨망토"
-      },
-      "hellstalker_boots": {
-        "name": "지옥추적자 장화"
-      },
-      "forgekeepers_warhammer": {
-        "name": "용광로지기의 전쟁망치"
-      },
-      "forgekeepers_runestaff": {
-        "name": "용광로지기의 룬지팡이"
-      },
-      "forgekeepers_fang": {
-        "name": "용광로지기의 송곳니"
-      },
-      "azazels_ruinblade": {
-        "name": "아자젤의 파멸검"
-      },
-      "azazels_soulstaff": {
-        "name": "아자젤의 영혼지팡이"
-      },
-      "azazels_emberfang": {
-        "name": "아자젤의 잿불송곳니"
-      },
-      "hellforged_bulwark": {
-        "name": "지옥벼림 보루"
-      },
-      "cinderseer_raiment": {
-        "name": "잿불예언자의 의복"
-      },
-      "abysswalker_harness": {
-        "name": "심연방랑자 흉갑"
-      },
       "membership_token": {
         "name": "멤버십 토큰 (30일)"
       },
@@ -24976,33 +24923,6 @@ export const ko_KR: EnTranslations = {
       },
       "buddy_phantom": {
         "name": "팬텀"
-      },
-      "abyssal_legionnaire": {
-        "name": "심연의 군단병"
-      },
-      "cinder_magus": {
-        "name": "잿불 마법사"
-      },
-      "molten_hellhound": {
-        "name": "용암 지옥사냥개"
-      },
-      "flamebound_smith": {
-        "name": "불꽃에 속박된 대장장이"
-      },
-      "abyssal_gladiator": {
-        "name": "심연의 검투사"
-      },
-      "infernal_cinderling": {
-        "name": "심연의 잿불꼬마"
-      },
-      "forgekeeper": {
-        "name": "용광로지기"
-      },
-      "pyre_golem": {
-        "name": "장작불 골렘"
-      },
-      "azazel_infernal_lord": {
-        "name": "심연의 군주 아자젤"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"
@@ -28511,42 +28431,6 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
-      "q_infernal_abyss_echoes": {
-        "title": "스톰크래그 아래의 메아리",
-        "text": "스톰크래그는 폭풍에서 태어난 산이 아니네, {playerName}. 가장 오래된 석판에는 세상 밖에서 떨어진 불길을 덮으려고 두드려 만든 뚜껑이라고 적혀 있지. 동쪽 바위산 아래에 새로운 균열이 열렸네. 네 명의 동료와 함께 들어가 군단 석판과 태초의 불꽃 곁에 새겨진 낙인을 가져와 주게.",
-        "completion": "석판에는 스스로 불길 속으로 진군한 대군의 이름이 적혀 있네. 낙인은 그들이 섬긴 힘의 이름을 말해 주지. 아자젤이야. 이곳은 악마가 들어오지 못하게 만든 감옥이 아니었네, {playerName}. 그들의 군주를 들이기 위해 만든 관문이었지.",
-        "objectives": {
-          "0": {
-            "label": "불탄 군단 석판 해독"
-          },
-          "1": {
-            "label": "태초의 불꽃 낙인 조사"
-          }
-        }
-      },
-      "q_infernal_abyss_covenant": {
-        "title": "깨진 계약",
-        "text": "군단의 맹세는 아자젤에게 우리 세계로 들어오는 길을 약속했지만, 모든 계약에는 대가와 허점이 있네. 용암 심연으로 돌아가게. 아가리 근처에서 용광로지기의 장부와 깨진 계약을 찾아 주게. 무엇이 그를 묶었는지 알아내면, 어떻게 죽일 수 있는지도 알게 될지 모르지.",
-        "completion": "허점은 바로 이것이네. 아자젤은 자기 군단의 이름으로 관문을 먹여 살렸어. 하인을 하나씩 삼킬 때마다 강해졌지만, 그 목숨은 아래의 용광로에 묶였지. 그 용광로의 심장부에서 군주를 쓰러뜨리면 관문도 그와 함께 사라질 수밖에 없네.",
-        "objectives": {
-          "0": {
-            "label": "용광로지기의 장부 회수"
-          },
-          "1": {
-            "label": "아자젤의 깨진 계약 읽기"
-          }
-        }
-      },
-      "q_infernal_abyss_azazel": {
-        "title": "용암 심연의 군주",
-        "text": "계약이 우리에게 한 번의 기회를 주었네, {playerName}. 믿을 수 있는 동료들과 함께 용광로와 아가리를 지나 내려가게. 태초의 불꽃이 우리 세계에 닿는 곳에서 아자젤을 마주하고, 그의 군단을 버텨 내게. 스톰크래그가 그를 위한 열린 관문이 되기 전에 심연의 군주를 꺼뜨려야 하네.",
-        "completion": "산이 고요하네. 잠들지도, 기다리지도 않고 그저 고요할 뿐이야. 아자젤은 훔친 이름들로 영원을 쌓았지만, 자네는 필멸자인 자신의 이름 하나로 그것을 끝냈네. 하이워치는 그 이름을 기억할 걸세, {playerName}.",
-        "objectives": {
-          "0": {
-            "label": "심연의 군주 아자젤 처치"
-          }
-        }
-      },
       "q_drowned_choir": {
         "title": "익사한 성가대",
         "text": "물거리들은 홀로 움직이지 않는다네. 그들 사이를 익사한 신도들이 걷고 있지 — 신전과 함께 가라앉은 그 광신도들은, 썩어버린 제의를 여전히 걸친 채 물가 바위에서 부르던 기도를 아직도 노래하고 있네. 그들 중 여덟을 침묵시키고, 그들이 지닌 제물 여섯 개를 내게 가져오게. 그들이 그 여신에게 무엇을 바치려는지 알고 싶네.",
@@ -29149,11 +29033,6 @@ export const ko_KR: EnTranslations = {
         "name": "던홀드 성",
         "enterText": "꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.",
         "leaveText": "햇살 가득한 정원 잔디밭으로 다시 나옵니다."
-      },
-      "infernal_abyss": {
-        "name": "용암 심연",
-        "enterText": "스톰크래그 아래로 내려가 용암 심연에 들어섭니다.",
-        "leaveText": "용광로 같은 어둠에서 기어 나와 산바람을 맞습니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

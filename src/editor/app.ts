@@ -1552,7 +1552,7 @@ export class EditorApp {
         },
       ],
       onPlaytest: () => void this.playtest(),
-      onDungeonMode: () => this.enterDungeonMode(),
+      onDungeonMode: AUTHORED_DUNGEONS.length > 0 ? () => this.enterDungeonMode() : undefined,
       onBattlegroundMode: () => this.enterBattlegroundMode(),
       onRegionExport: () => void this.exportRegionMap(),
       onPublishMap: () => void this.publishMapToRepo(),
@@ -2553,7 +2553,8 @@ export class EditorApp {
   private dungeonMode: DungeonEditorMode | null = null;
 
   private enterDungeonMode(): void {
-    if (this.dungeonMode?.isActive()) return;
+    const entry = AUTHORED_DUNGEONS[0];
+    if (!entry || this.dungeonMode?.isActive()) return;
     if (this.viewMode !== '3d') this.setViewMode('3d');
     const viewport = this.viewport3d;
     if (!viewport) return;
@@ -2569,7 +2570,7 @@ export class EditorApp {
     const tryEnter = (): void => {
       if (this.dungeonMode?.isActive()) return;
       if (viewport.dungeonStagePort()) {
-        this.dungeonMode?.enter(AUTHORED_DUNGEONS[0]);
+        this.dungeonMode?.enter(entry);
         return;
       }
       if (++attempts < 600) requestAnimationFrame(tryEnter);

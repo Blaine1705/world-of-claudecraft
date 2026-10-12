@@ -64,9 +64,12 @@ describe('Bridge_01 deck', () => {
         );
       // Only the two railings collide, and neither is a tall approach blocker:
       // a band this shallow is a rail you brush, not a wall you stop against.
+      // The railings are Collision Master mesh volumes, which build as prisms
+      // (top = moveTopY) rather than banded OBBs (top = hiY); read either.
       const bands = near.map((c) => {
-        const b = c as { baseY?: number; hiY?: number };
-        return b.hiY !== undefined && b.baseY !== undefined ? b.hiY - b.baseY : Infinity;
+        const b = c as { baseY?: number; hiY?: number; moveTopY?: number };
+        const top = b.hiY ?? b.moveTopY;
+        return top !== undefined && b.baseY !== undefined ? top - b.baseY : Infinity;
       });
       expect({ colliders: near.length, tall: bands.filter((h) => h > 2).length }).toEqual({
         colliders: 2,

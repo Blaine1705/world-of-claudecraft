@@ -174,12 +174,23 @@ describe('insane terrain fragment shader', () => {
     expect(fragmentShader).toContain('vec3 wocReliefUnitN = normalize(vWNorm);');
     expect(fragmentShader.match(/normalize\(vWNorm\)/g)).toHaveLength(2);
     expect(fragmentShader).toContain('float wocCamDist = length(pRay);');
-    expect(fragmentShader).toContain('if (upW > 0.55 && pDist < 36.0) {');
+    // Studio gates parallax on the ground-UV plane's dominance (its pDir is a
+    // world-XZ frame). The built-in world keeps the top-down UV with a zero
+    // wocTAN, so `upW >= max(0, 0)` is implied by `upW > 0.55` there and the
+    // shipped guard is unchanged in effect.
+    expect(fragmentShader).toContain('vec3 wocTAN = vec3(0.0); vec2 wocTPlane = vWPos.xz;');
     expect(fragmentShader).toContain(
-      'vec3 alb = grassAlb * vSplatR.x\n' +
-        '                 + dirtAlb * vSplatR.y\n' +
-        '                 + rockAlb * vSplatR.z\n' +
-        '                 + sandAlb * vSplatR.w;',
+      'if (upW >= max(wocTAN.x, wocTAN.z) && upW > 0.55 && pDist < 36.0) {',
+    );
+    // The Studio merge names the splat weights wocHW so authored maps can
+    // height-blend them; in the built-in world nothing runs between the copy
+    // and the sum, so this is the release's plain vSplatR-weighted composite.
+    expect(fragmentShader).toContain(
+      'vec4 wocHW = vSplatR;\n' +
+        '        vec3 alb = grassAlb * wocHW.x\n' +
+        '                 + dirtAlb * wocHW.y\n' +
+        '                 + rockAlb * wocHW.z\n' +
+        '                 + sandAlb * wocHW.w;',
     );
     expect(fragmentShader).toContain(
       'diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;',

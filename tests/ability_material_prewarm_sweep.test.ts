@@ -63,6 +63,11 @@ const EXCLUDED: Record<string, string> = {
     'and colour and are reachable only inside the battleground scene, which builds on entry. ' +
     'src/render/CLAUDE.md: a program only ONE encounter can reach warms at that interior attach, ' +
     'never in the boot manifest.',
+  'city_clutter.ts':
+    'World scenery, not a cast: bakeModels() fills the cache when buildCityClutter first builds ' +
+    'the painted-clutter InstancedMeshes into the group the Renderer constructor adds straight to ' +
+    'the scene (renderer.ts), and it builds nothing at all when GFX.cityClutter is off or on the ' +
+    'built-in world (no stamps). Same ruling as cliff_scree: the boot scene compile unit reaches it.',
   'cliff_scree.ts':
     'World scenery, not a cast: bakeRocks() fills the cache while buildCliffScree assembles the ' +
     'scatter the Renderer constructor adds straight to the scene (renderer.ts), so the boot scene ' +
@@ -270,8 +275,9 @@ describe('the lazy-material sweep', () => {
     // world-boss branch's three (Balgath's ranged kit, his Wake of the Fallen Star and
     // the muster effigy's rig): 21 / 20.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 23, 22.
-    expect(hits.length).toBeGreaterThanOrEqual(23);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(22);
+    // + the ClaudeCraft Studio import's painted city-clutter bake (PR 4479): 24, 23.
+    expect(hits.length).toBeGreaterThanOrEqual(24);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(23);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

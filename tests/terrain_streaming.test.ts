@@ -697,9 +697,13 @@ describe('progressive terrain build', () => {
     const { BUILTIN_WORLD, setActiveWorldContent, zoneAt } = await import('../src/sim/data');
 
     // A blank 800x800 map: wider than the strip (±180) and reaching south of
-    // every built-in zone band.
+    // every built-in zone band. It is a real authored blank slate (what
+    // newFlatCustomMap emits): the terrain grid follows an authored map's own
+    // rect only under a presentation mode (terrain_grid_core.ts), while a plain
+    // `{ ...BUILTIN_WORLD }` variant keeps the shipped grid box.
     const world = {
       ...BUILTIN_WORLD,
+      presentationMode: 'blank' as const,
       worldHalfX: 400,
       zones: [
         {
@@ -720,9 +724,9 @@ describe('progressive terrain build', () => {
     setActiveWorldContent(world);
     try {
       const terrain = buildTerrain(20061);
-      // This margin position sits outside every built-in zone rect. The sim
-      // clamps it to a built-in zone (zoneAt); ensuring THAT zone must now
-      // also build the margin cells it owns.
+      // This margin position sits outside every built-in zone rect. zoneAt
+      // resolves it to the map's own zone; ensuring THAT zone must also build
+      // the cells it owns out there.
       const margin = { x: 380, z: -380 };
       const owner = zoneAt(margin.x, margin.z);
       const task = terrain.ensureZone(owner);

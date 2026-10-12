@@ -1063,7 +1063,7 @@ which is about right for a sphere with bodies in it.
 **Every cue is synthesised, there are no new assets.** The clip pipeline is an
 ElevenLabs generator run (`scripts/gen_sfx.mjs`), which is a poor fit for ten
 short percussive transients and a licensing decision besides, so the bank follows
-the `dragon_audio.ts` / `water_elemental_audio.ts` precedent instead: pure math in
+the `water_elemental_audio.ts` precedent instead: pure math in
 `src/game/deepglass_audio.ts`, baked into buffers at startup beside the Vale Cup's
 procedural crowd (`sfx.ts installProceduralBuffers`) and played through the
 ordinary positional path. A strike across the bell is quiet and behind you, which

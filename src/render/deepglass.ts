@@ -145,7 +145,7 @@ function glassMaterial(): THREE.ShaderMaterial {
         float base = smoothstep(-0.25, -0.86, lat) * (1.0 - smoothstep(-0.86, -0.93, lat));
         // ...and rings of light climbing the WHOLE sphere, not only the
         // lower band the stands hide from every approach
-        float rings = pow(0.5 + 0.5 * sin(lat * 12.0 - uTime * 0.9), 4.0);
+        float rings = pow(clamp(0.5 + 0.5 * sin(lat * 12.0 - uTime * 0.9), 0.0, 1.0), 4.0);
         float inside = step(length(cameraPosition - uCenter), ${DEEPGLASS_RADIUS.toFixed(2)});
         float energy = (base * 0.2 + rings * 0.1 + rings * base * 0.14) * (1.0 - 0.7 * inside);
         float a = clamp(rim * 0.75 + 0.035 + band + energy, 0.0, 0.9);
@@ -430,7 +430,7 @@ function crownBeamMaterial(): THREE.ShaderMaterial {
       varying vec3 vNormalW;
       varying vec3 vViewW;
       void main() {
-        float up = pow(1.0 - vUv.y, 2.2);
+        float up = pow(1.0 - clamp(vUv.y, 0.0, 1.0), 2.2);
         float core = pow(abs(dot(normalize(vNormalW), normalize(vViewW))), 2.5);
         float pulse = 0.78 + 0.22 * sin(uTime * 1.4 - vUv.y * 24.0);
         float a = up * core * pulse * 0.5;
@@ -677,9 +677,13 @@ export function buildDeepglass(): DeepglassView {
   }
   const cageGeo = new THREE.BufferGeometry();
   cageGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(cageSegs), 3));
-  cage.add(new THREE.LineSegments(cageGeo, cageMat));
+  const cageLines = new THREE.LineSegments(cageGeo, cageMat);
+  // On the leaf, never the Group: a Group renderOrder becomes three's groupOrder
+  // and would outrank every leaf order in the scene, not just sit after the
+  // water (10) and under the auras and plumes (12 and up).
+  cageLines.renderOrder = 11;
+  cage.add(cageLines);
   cage.position.copy(glass.position);
-  cage.renderOrder = 11;
   group.add(cage);
 
   const water = new THREE.Mesh(

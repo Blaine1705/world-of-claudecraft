@@ -27,6 +27,9 @@ test (`tests/authored_map_cores.test.ts`) pins the built-in arm too.
 - `zone_atmosphere.ts` (+ core), `map_weather.ts`, `editor_skybox.ts`,
   `editor_lens.ts`, `editor_birds.ts`, `shadow_cache.ts` (+ core),
   `zone_residency_core.ts`: the editor hooks' logic.
+- `editor_hdr_loader.ts`: the custom skybox picker's Radiance (.hdr) decode.
+  It lives here, not in `assets/loader.ts`: the shared loader keeps no .hdr
+  arm (the shipped skies are KTX2, pinned by `tests/sky_ktx2_assets.test.ts`).
 - `placed_frame.ts`: the per-frame placed-asset pass (the built-in world has no
   placed-asset view).
 

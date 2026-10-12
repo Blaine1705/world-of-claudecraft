@@ -155,6 +155,18 @@ export function swapBudgetedLights(
   return held;
 }
 
+/** Steady authored lights (map lamps, non-lava pool glows: `userData.steady`)
+ *  outrank ambient flicker sources when the budget is contended, so a maker's
+ *  placed lamp does not go dark because a few campfires sit slightly closer.
+ *  A steady entry ranks as if twice as near (its squared distance quartered);
+ *  pure distance still orders entries within each class. Ranking only: the
+ *  shine range test below still reads the true d2. */
+const STEADY_RANK_D2_SCALE = 0.25;
+
+function rankDistance(entry: RankedPointLight): number {
+  return entry.light.userData.steady === true ? entry.d2 * STEADY_RANK_D2_SCALE : entry.d2;
+}
+
 /** Apply a fixed-count nearest-light budget without reallocating rank entries.
  *  Returns the number of counted, drawn-eligible lights. */
 export function applyPointLightBudget(
@@ -189,7 +201,9 @@ export function applyPointLightBudget(
   // are skipped by the running counter instead, so a hidden ancestor never
   // forces a per-frame sort of its own (the hot path stays allocation-free).
   if (ranked.length > liveBudget) {
-    ranked.sort((a, b) => Number(!a.eligible) - Number(!b.eligible) || a.d2 - b.d2);
+    ranked.sort(
+      (a, b) => Number(!a.eligible) - Number(!b.eligible) || rankDistance(a) - rankDistance(b),
+    );
   }
   let drawn = 0;
   for (let index = 0; index < ranked.length; index++) {
@@ -223,6 +237,10 @@ export function flickerContributingFireLights(
     const fireIndex = entry.fireIndex;
     if (fireIndex === undefined || entry.d2 >= rangeSq || entry.eligible === false) continue;
     const base = (entry.light.userData.baseIntensity as number | undefined) ?? 11;
-    entry.light.intensity = base + Math.sin(time * 11 + fireIndex * 1.7) * 2.5 * (base / 11);
+    // Steady lights (authored lamps, still pools) hold their base; fires flicker.
+    entry.light.intensity =
+      entry.light.userData.steady === true
+        ? base
+        : base + Math.sin(time * 11 + fireIndex * 1.7) * 2.5 * (base / 11);
   }
 }

@@ -4,12 +4,13 @@
 // (town_install.sh runs it; run it by hand before a live town_gui.py build).
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 
 const KINDS = ['shrub_bloom', 'shrub_heather'];
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../../..');
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const out = path.resolve(process.argv[2] ?? path.join(root, 'tmp/asset_src/tidehold_town/flowers'));
 fs.mkdirSync(out, { recursive: true });
 await MeshoptDecoder.ready;

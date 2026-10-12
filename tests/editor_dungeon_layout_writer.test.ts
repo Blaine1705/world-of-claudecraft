@@ -5,13 +5,13 @@ import {
   formatDungeonLayoutLiteral,
   replaceLayoutConst,
 } from '../src/editor/dungeon/dungeon_layout_writer_core';
-import { INFERNAL_ABYSS_LAYOUT } from '../src/sim/dungeon_layout';
+import { AUTHORED_DUNGEON_FIXTURE } from './fixtures/authored_dungeon_layout';
 
-// The layout serializer: a REAL evaluated round-trip against the authored
-// Infernal Abyss layout, literal style pins, and the brace-aware const
-// replacer applied to the actual src/sim/dungeon_layout.ts source.
+// The layout serializer: a REAL evaluated round-trip against an authored
+// room-graph layout fixture, literal style pins, and the brace-aware const
+// replacer applied to that fixture's actual TypeScript source.
 
-const LAYOUT_SOURCE_PATH = join(process.cwd(), 'src/sim/dungeon_layout.ts');
+const LAYOUT_SOURCE_PATH = join(process.cwd(), 'tests/fixtures/authored_dungeon_layout.ts');
 
 function expectDeepClose(actual: unknown, expected: unknown, path: string): void {
   if (typeof expected === 'number') {
@@ -48,14 +48,14 @@ function expectDeepClose(actual: unknown, expected: unknown, path: string): void
 }
 
 describe('editor dungeon layout writer', () => {
-  it('emits a literal that evaluates back to the exact Infernal Abyss layout', () => {
-    const literal = formatDungeonLayoutLiteral(INFERNAL_ABYSS_LAYOUT);
+  it('emits a literal that evaluates back to the exact authored layout', () => {
+    const literal = formatDungeonLayoutLiteral(AUTHORED_DUNGEON_FIXTURE);
     const evaluated = new Function('Math', `return ${literal}`)(Math);
-    expectDeepClose(evaluated, INFERNAL_ABYSS_LAYOUT, 'layout');
+    expectDeepClose(evaluated, AUTHORED_DUNGEON_FIXTURE, 'layout');
   });
 
   it('pins the authored source style: pretty yaws and one-line room entries', () => {
-    const literal = formatDungeonLayoutLiteral(INFERNAL_ABYSS_LAYOUT);
+    const literal = formatDungeonLayoutLiteral(AUTHORED_DUNGEON_FIXTURE);
     expect(literal).toContain("{ id: 'ashen_descent_entrance', x0: -18, x1: 18, z0: -25, z1: 5 },");
     expect(literal).toContain('yaw: Math.PI / 2');
     expect(literal).toContain('yaw: -Math.PI / 2');
@@ -77,10 +77,12 @@ describe('editor dungeon layout writer', () => {
 
   it('replaces one layout const in the real source file, leaving the rest intact', () => {
     const source = readFileSync(LAYOUT_SOURCE_PATH, 'utf8');
-    const replaced = replaceLayoutConst(source, 'INFERNAL_ABYSS_LAYOUT', '{ zMin: 0 }');
-    expect(replaced).toContain('export const INFERNAL_ABYSS_LAYOUT: DungeonLayout = { zMin: 0 };');
+    const replaced = replaceLayoutConst(source, 'AUTHORED_DUNGEON_FIXTURE', '{ zMin: 0 }');
+    expect(replaced).toContain(
+      'export const AUTHORED_DUNGEON_FIXTURE: DungeonLayout = { zMin: 0 };',
+    );
     // Everything before the const is byte-identical.
-    const constStart = source.indexOf('export const INFERNAL_ABYSS_LAYOUT');
+    const constStart = source.indexOf('export const AUTHORED_DUNGEON_FIXTURE');
     expect(constStart).toBeGreaterThan(0);
     expect(replaced.startsWith(source.slice(0, constStart))).toBe(true);
     // Everything after the original const's semicolon is byte-identical.
@@ -90,21 +92,23 @@ describe('editor dungeon layout writer', () => {
     expect(constEnd).toBeGreaterThan(constStart);
     expect(replaced.endsWith(source.slice(constEnd))).toBe(true);
     // The neighbours survive.
-    expect(replaced).toContain('export const CRYPT_LAYOUT: DungeonLayout = {');
-    expect(replaced).toContain('export const ARENA_LAYOUT: DungeonLayout = {');
-    expect(replaced).toContain('export function layoutColliders(');
+    expect(replaced).toContain(
+      "import type { DungeonLayout } from '../../src/sim/dungeon_layout';",
+    );
+    expect(replaced).toContain('export const AUTHORED_DUNGEON_NEIGHBOUR: DungeonLayout = {');
     // The old literal body is gone.
     expect(replaced).not.toContain("id: 'ashen_descent_entrance'");
   });
 
   it('round-trips the formatted literal through the real source file', () => {
     const source = readFileSync(LAYOUT_SOURCE_PATH, 'utf8');
-    const literal = formatDungeonLayoutLiteral(INFERNAL_ABYSS_LAYOUT);
-    const replaced = replaceLayoutConst(source, 'INFERNAL_ABYSS_LAYOUT', literal);
-    expect(replaced).toContain(`export const INFERNAL_ABYSS_LAYOUT: DungeonLayout = ${literal};`);
+    const literal = formatDungeonLayoutLiteral(AUTHORED_DUNGEON_FIXTURE);
+    const replaced = replaceLayoutConst(source, 'AUTHORED_DUNGEON_FIXTURE', literal);
+    expect(replaced).toContain(
+      `export const AUTHORED_DUNGEON_FIXTURE: DungeonLayout = ${literal};`,
+    );
     // Replacing with a formatted literal keeps the rest of the file intact.
-    expect(replaced).toContain('export const SANCTUM_LAYOUT: DungeonLayout =');
-    expect(replaced).toContain('export const NYTHRAXIS_LAYOUT: DungeonLayout =');
+    expect(replaced).toContain('export const AUTHORED_DUNGEON_NEIGHBOUR: DungeonLayout =');
   });
 
   it('throws when the const does not exist', () => {

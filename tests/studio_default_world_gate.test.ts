@@ -35,8 +35,8 @@ import { traversalBand } from '../src/sim/traversal_band';
 import type { Entity } from '../src/sim/types';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 
-// The release/v0.45.0 dungeon roster, by id and index. Index 6 is a hole there:
-// the Infernal Abyss is Studio content.
+// The release/v0.45.0 dungeon roster, by id and index (index 6 is unused). An
+// authored map registers no dungeon of its own, so the roster never changes.
 const RELEASE_DUNGEONS = [
   'hollow_crypt#0',
   'sunken_bastion#1',
@@ -54,13 +54,9 @@ const RELEASE_DUNGEONS = [
   'ignivar_forge_lift#14',
 ];
 
-const STUDIO_ITEM_IDS = ['emberwake_heartscale', 'emberwake_summon_crystal'];
-const STUDIO_QUEST_IDS = ['q_infernal_abyss_echoes', 'q_sw_arrival'];
-const STUDIO_MOB_IDS = [
-  'azazel_infernal_lord',
-  'sandworm_dunefather',
-  'objective_practice_champion',
-];
+const STUDIO_ITEM_IDS = ['brimming_waterskin', 'duneblade_token'];
+const STUDIO_QUEST_IDS = ['q_sw_arrival'];
+const STUDIO_MOB_IDS = ['duneblade_marauder', 'objective_practice_champion'];
 
 afterEach(() => setActiveWorldContent(null));
 
@@ -69,7 +65,7 @@ describe('the default world reads exactly like the release', () => {
     expect(isBuiltinWorldActive()).toBe(true);
     expect(studioContentActive()).toBe(false);
     expect(DUNGEON_LIST.map((d) => `${d.id}#${d.index}`)).toEqual(RELEASE_DUNGEONS);
-    expect(DUNGEONS.infernal_abyss).toBeUndefined();
+    expect(Object.keys(DUNGEONS)).toHaveLength(RELEASE_DUNGEONS.length);
     expect(dungeonByIndex(6)).toBeNull();
     expect(ZONES.map((z) => z.id)).not.toContain('goldcrest_harbor');
     expect(OVERWORLD_GRAVEYARDS.map((g) => g.id)).not.toContain('gy_goldcrest');
@@ -86,7 +82,6 @@ describe('the default world reads exactly like the release', () => {
     expect(NPCS.deepglass_marshal ?? NPCS.portal_wizard_eastbrook).toBeUndefined();
     expect(MOBS.deepglass_ball).toBeUndefined();
     expect(Object.keys(ABILITIES).some((id) => id.startsWith('dg_'))).toBe(false);
-    expect(NPCS.loremaster_caddis.questIds).not.toContain('q_infernal_abyss_echoes');
   });
 
   it('schedules only the release world bosses', () => {
@@ -129,7 +124,6 @@ describe('an authored map gets the Studio content and band', () => {
     expect(authoredMapActive()).toBe(false);
     expect(studioContentActive()).toBe(false);
     expect(traversalBand()).toBe(0.9);
-    expect(DUNGEONS.infernal_abyss).toBeUndefined();
     // A map document carries a placements list; an authored slate carries a
     // presentation mode. Either one is an authored map.
     setActiveWorldContent({ ...BUILTIN_WORLD, placements: [] });
@@ -139,13 +133,14 @@ describe('an authored map gets the Studio content and band', () => {
   });
 
   it('merges the Studio records in, and strips them again on the way back', () => {
+    const caddisQuests = [...NPCS.loremaster_caddis.questIds];
     setActiveWorldContent({ ...BUILTIN_WORLD, placements: [] });
     expect(studioContentActive()).toBe(true);
-    expect(DUNGEONS.infernal_abyss?.index).toBe(6);
-    expect(dungeonByIndex(6)?.id).toBe('infernal_abyss');
-    expect(DUNGEON_LIST.map((d) => d.index)).toEqual(
-      [...DUNGEON_LIST.map((d) => d.index)].sort((a, b) => a - b),
-    );
+    // No Studio dungeon: the roster, index 6 and the built-in quest givers'
+    // offers are the release's on an authored map too.
+    expect(DUNGEON_LIST.map((d) => `${d.id}#${d.index}`)).toEqual(RELEASE_DUNGEONS);
+    expect(dungeonByIndex(6)).toBeNull();
+    expect(NPCS.loremaster_caddis.questIds).toEqual(caddisQuests);
     for (const id of STUDIO_ITEM_IDS) expect(ITEMS[id], id).toBeDefined();
     for (const id of STUDIO_QUEST_IDS) {
       expect(QUESTS[id], id).toBeDefined();
@@ -156,9 +151,8 @@ describe('an authored map gets the Studio content and band', () => {
     expect(NPCS.portal_wizard_eastbrook).toBeDefined();
     expect(MOBS.deepglass_ball).toBeDefined();
     expect(Object.keys(ABILITIES).some((id) => id.startsWith('dg_'))).toBe(true);
-    expect(NPCS.loremaster_caddis.questIds).toContain('q_infernal_abyss_echoes');
-    // the finite arena band that makes room for the Abyss at index 6
-    expect(isArenaPos(ARENA_X_MAX + 1)).toBe(false);
+    // the release arena band, running on to the delve band
+    expect(isArenaPos(ARENA_X_MAX + 1)).toBe(true);
 
     setActiveWorldContent(null);
     expect(studioContentActive()).toBe(false);
@@ -166,7 +160,7 @@ describe('an authored map gets the Studio content and band', () => {
     expect(dungeonByIndex(6)).toBeNull();
     for (const id of STUDIO_ITEM_IDS) expect(ITEMS[id], id).toBeUndefined();
     for (const id of STUDIO_QUEST_IDS) expect(QUEST_ORDER).not.toContain(id);
-    expect(NPCS.loremaster_caddis.questIds).not.toContain('q_infernal_abyss_echoes');
+    expect(NPCS.loremaster_caddis.questIds).toEqual(caddisQuests);
   });
 
   it('strides, mantles and grabs on the Studio band', () => {
@@ -179,10 +173,8 @@ describe('an authored map gets the Studio content and band', () => {
   it('keeps the overlay idempotent across authored-to-authored swaps', () => {
     setActiveWorldContent({ ...BUILTIN_WORLD, placements: [] });
     setActiveWorldContent({ ...BUILTIN_WORLD, placements: [] });
-    const order = QUEST_ORDER.filter((id) => id === 'q_infernal_abyss_echoes');
+    const order = QUEST_ORDER.filter((id) => id === 'q_sw_arrival');
     expect(order).toHaveLength(1);
-    expect(
-      NPCS.loremaster_caddis.questIds.filter((id) => id === 'q_infernal_abyss_echoes'),
-    ).toHaveLength(1);
+    expect(MOBS.duneblade_marauder).toBeDefined();
   });
 });

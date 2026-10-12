@@ -432,10 +432,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Authored maps only, and read lazily after the memo like the raw-ground
   // clause below: the built-in world's carried bodies are exempted by that
   // clause, exactly as before the Studio map runtime.
-  const onAuthoredFloor = (): boolean =>
-    authoredMapActive() &&
-    groundHeightNear(p.pos.x, p.pos.z, deps.seed, p.pos.y) >
-      terrainHeight(p.pos.x, p.pos.z, deps.seed) + 0.05;
+  const onAuthoredFloor = (): boolean => onAuthoredFloorAt(p.pos.x, p.pos.z, deps.seed, p.pos.y);
   // A body CARRIED ABOVE THE RAW GROUND (feet well over the terrain the memo
   // read: a fortress floor plate, a stair tread, a pier deck, or a walk-lift
   // stair band) is not walking the ground the memo read at all, so the strip
@@ -1044,6 +1041,16 @@ function swimVerticalPass(
   p.fallStartY = p.pos.y;
 }
 
+/** A body standing on an AUTHORED floor over bare terrain (bridge deck, box
+ *  top, ramp): the terrain gradient under it is scenery, never a wall or a
+ *  slide. Authored maps only (data.ts authoredMapActive), so the built-in
+ *  world never pays for the two height samples. */
+function onAuthoredFloorAt(x: number, z: number, seed: number, feetY: number): boolean {
+  return (
+    authoredMapActive() && groundHeightNear(x, z, seed, feetY) > terrainHeight(x, z, seed) + 0.05
+  );
+}
+
 // Ease the body off any terrain wall it now overlaps. The slope gates above
 // block the CENTER from climbing a wall, but nothing keeps the body's WIDTH
 // clear of one, so standing at (or strafing along) a wall foot buries the near
@@ -1059,6 +1066,11 @@ function swimVerticalPass(
 // acceptance gate below can still commit a push onto ground steeper than the
 // climb limit when it strictly improves on the player's current steepness, so
 // a concave wall pocket converges instead of wedging the player forever.
+// A body on an authored floor is exempt like the steep-ground strip above: the
+// standoff reads the WALKED floor, so a designed ramp steeper than the climb
+// limit (a 1.7 deck) would otherwise read as a wall and shove its walker back
+// down every tick. Checked only once a push is proposed, so it costs nothing
+// on open ground.
 function standoffPass(
   deps: PlayerMotionDeps,
   p: Entity,
@@ -1089,7 +1101,10 @@ function standoffPass(
       MAX_CLIMB_SLOPE,
       p.pos.y,
     );
-    if (s.x !== p.pos.x || s.z !== p.pos.z) {
+    if (
+      (s.x !== p.pos.x || s.z !== p.pos.z) &&
+      !onAuthoredFloorAt(p.pos.x, p.pos.z, deps.seed, p.pos.y)
+    ) {
       const resolved = deps.resolveMove(p.pos.x, p.pos.z, s.x, s.z, BODY_RADIUS, p, false);
       let standX = resolved.x;
       let standZ = resolved.z;

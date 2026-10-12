@@ -12,7 +12,13 @@ vi.mock('../src/render/foliage_editor_scope', () => ({
 }));
 vi.mock('../src/render/placed_assets', () => ({ unionRegion: vi.fn() }));
 vi.mock('../src/render/ground_tex_gc', () => ({ gcGroundTextureSets: vi.fn() }));
-vi.mock('../src/sim/sim', () => ({ Sim: class {} }));
+// The stub keeps the real delve-module name table: the viewport's import graph reaches
+// `src/ui/sim_i18n.ts`, which builds its reverse map from `DELVE_MODULE_NAMES` (re-exported
+// by `sim/sim` from `sim/delves/runs`) at module load.
+vi.mock('../src/sim/sim', async () => ({
+  Sim: class {},
+  DELVE_MODULE_NAMES: (await import('../src/sim/delves/runs')).DELVE_MODULE_NAMES,
+}));
 
 import { Editor3DViewport } from '../src/editor/3d/viewport';
 import { newFlatCustomMap } from '../src/editor/custom_map';
