@@ -318,12 +318,12 @@ describe('Gravewyrm Sanctum route contract: every pack is mandatory', () => {
       }
     }
     expect(voidCells).toBe(0);
-    // The boss exit portal stands on the Shore of the Held, on reached floor.
+    // The boss exit portal stands on the lake's permanent rim, on reached floor.
     const portal = DUNGEON.bossExitPortal;
     expect(portal).toBeDefined();
     if (portal) {
       expect(spawnReached(seen, portal.x, portal.z)).toBe(true);
-      expect(authoredFieldHeight(FIELD, portal.x, portal.z)).toBe(GRAVEWYRM_HEIGHTS.shore);
+      expect(authoredFieldHeight(FIELD, portal.x, portal.z)).toBe(GRAVEWYRM_HEIGHTS.lake);
     }
   });
 

@@ -1777,8 +1777,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: GRAVEWYRM_SANCTUM_ANCHORS.entry.x, z: GRAVEWYRM_SANCTUM_ANCHORS.entry.z },
     exitOffset: { x: GRAVEWYRM_SANCTUM_ANCHORS.exit.x, z: GRAVEWYRM_SANCTUM_ANCHORS.exit.z },
     // The Wyrm's Hollow lies 410 yd down the cirque from the gate: a second
-    // exit opens on the Shore of the Held once Korzul falls.
-    bossExitPortal: { x: -14, z: 138 },
+    // exit opens beside the fight on the permanent rock rim once Korzul falls.
+    // Outside the breakable lake plates, inside the shelf's cliff edge.
+    bossExitPortal: { x: -42, z: 192 },
     spawns: GRAVEWYRM_SANCTUM_SPAWNS,
     objects: [...GRAVEWYRM_SANCTUM_GATE_OBJECTS, ...GRAVEWYRM_SANCTUM_STORY_OBJECTS],
     gates: GRAVEWYRM_SANCTUM_GATES,
