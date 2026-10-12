@@ -28,7 +28,11 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
 import { DUNGEONS } from '../sim/data';
-import { SUNKEN_BASTION_ENTRANCE_DUNGEON_ID } from '../sim/sunken_bastion_entrance';
+import {
+  SUNKEN_BASTION_ENTRANCE_COLLIDERS,
+  SUNKEN_BASTION_ENTRANCE_DUNGEON_ID,
+  sunkenBastionEntranceColliders,
+} from '../sim/sunken_bastion_entrance';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
@@ -36,6 +40,8 @@ import { currentDayNightPhase } from './day_night_clock';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
 import { mistNoiseTexture } from './ignivar_mist_gate';
+import { registerSetPieceOccluders } from './set_piece_occluders';
+import type { SetPieceSolid } from './set_piece_occluders_core';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import {
   BASTION_BEACON,
@@ -50,6 +56,7 @@ import {
   bastionFogPuffCount,
   bastionGatePulse,
   bastionNightAmount,
+  bastionOccluderSet,
   bastionPulseLightIntensity,
   bastionSprites,
 } from './sunken_bastion_entrance_core';
@@ -333,7 +340,9 @@ let passageMat: THREE.MeshBasicMaterial | null = null;
 
 function passageMaterial(): THREE.MeshBasicMaterial {
   if (passageMat) return passageMat;
-  const material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+  // (the window's triangles face north: the BACK side is the road's side, so a
+  // camera turned to look out from behind the door never sees a lit panel)
+  const material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.BackSide });
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = sharedUniforms.uTime;
     shader.uniforms.uBastion = bastionUniforms.uBastion;
@@ -736,12 +745,27 @@ export function buildSunkenBastionEntrance(seed: number): SunkenBastionEntranceV
   gate.name = 'sunkenBastionEntranceBody';
   gate.position.set(door.x, base, door.z);
   const main = sources.get(MAIN_URL);
-  gate.add(main ? seat(main, true) : fallbackGate());
-  const ruins = sources.get(RUINS_URL);
-  if (ruins) gate.add(seat(ruins, true));
-  const growth = sources.get(GROWTH_URL);
-  if (growth) gate.add(seat(growth, false));
+  const gatehouse = main ? seat(main, true) : fallbackGate();
+  gate.add(gatehouse);
+  const ruinsSource = sources.get(RUINS_URL);
+  const ruins = ruinsSource ? seat(ruinsSource, true) : null;
+  if (ruins) gate.add(ruins);
+  const growthSource = sources.get(GROWTH_URL);
+  const growth = growthSource ? seat(growthSource, false) : null;
+  if (growth) gate.add(growth);
   gate.add(passageWindow());
+  // Camera occlusion: every collider row is an occluder. The gatehouse and
+  // the growth on it ghost together; the ruins round it on their own.
+  const solids = { gate: [] as SetPieceSolid[], ruins: [] as SetPieceSolid[] };
+  sunkenBastionEntranceColliders(seed, door).forEach((collider, i) => {
+    const { cameraTopY, ...shape } = collider;
+    solids[bastionOccluderSet(SUNKEN_BASTION_ENTRANCE_COLLIDERS[i].name)].push({
+      ...shape,
+      topY: cameraTopY ?? base,
+    });
+  });
+  registerSetPieceOccluders(solids.gate, growth ? [gatehouse, growth] : [gatehouse]);
+  registerSetPieceOccluders(solids.ruins, ruins ? [ruins] : []);
   const tier = resolveUiEffectsProfile({
     presetLabel: GFX.tier,
     effectsQuality: 1,

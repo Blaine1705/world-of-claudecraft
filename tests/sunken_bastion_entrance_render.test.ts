@@ -12,6 +12,10 @@ import { setDayNightPhaseOverride } from '../src/render/day_night_clock';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import { GFX, sharedUniforms } from '../src/render/gfx';
 import {
+  clearSetPieceOccluders,
+  setPieceOccludersInternalsForTest,
+} from '../src/render/set_piece_occluders';
+import {
   BASTION_FOG_PROGRAM_CACHE_KEY,
   BASTION_PASSAGE_PROGRAM_CACHE_KEY,
   BASTION_SPRITE_PROGRAM_CACHE_KEY,
@@ -43,6 +47,7 @@ import {
   bastionGatePulse,
   bastionGrilleSolid,
   bastionNightAmount,
+  bastionOccluderSet,
   bastionPassageEye,
   bastionPassageGlow,
   bastionPassageLight,
@@ -546,6 +551,31 @@ describe('the Drowned Gate Tower painter', () => {
       if ((o as THREE.PointLight).isPointLight) points++;
     });
     expect(points, 'exactly one point light, through the fire-light sink').toBe(1);
+  });
+
+  it('registers one camera occluder per collider row, in two fading units', () => {
+    clearSetPieceOccluders();
+    buildSunkenBastionEntrance(SEED);
+    expect(setPieceOccludersInternalsForTest.setCount()).toBe(2);
+    expect(setPieceOccludersInternalsForTest.boxCount()).toBe(
+      SUNKEN_BASTION_ENTRANCE_COLLIDERS.length,
+    );
+    const ruins = SUNKEN_BASTION_ENTRANCE_COLLIDERS.filter(
+      (row) => bastionOccluderSet(row.name) === 'ruins',
+    ).map((row) => row.name);
+    expect(ruins).toEqual(['curtain_0', 'curtain_1', 'fallen_stones']);
+    // the towers, the gate front and the door belong to the gatehouse
+    for (const name of ['tower_w', 'tower_e', 'front_wall_w', 'door_pier_e', 'flood_sill']) {
+      expect(bastionOccluderSet(name)).toBe('gate');
+    }
+    // the passage shows to the road only: a camera behind the door sees no lit panel
+    const win = buildSunkenBastionEntrance(SEED).group.getObjectByName(
+      'sunkenBastionFloodedPassage',
+    ) as THREE.Mesh;
+    expect((win.material as THREE.Material).side).toBe(THREE.BackSide);
+    win.geometry.computeVertexNormals();
+    expect(win.geometry.getAttribute('normal').getZ(0)).toBeGreaterThan(0.9);
+    clearSetPieceOccluders();
   });
 
   it('with no GLB loaded the stand-in blocks stand where the colliders are and leave the lane open', () => {

@@ -106,6 +106,14 @@ export function bastionGatePulse(time: number, motion: number): number {
   return b.still + (live - b.still) * motion;
 }
 
+/** Which fading unit a collider row of the set piece belongs to
+ *  (set_piece_occluders.ts): the gatehouse with everything on it, or the
+ *  ruins round it (the curtain wall and the fallen blocks), which ghost on
+ *  their own. Every row belongs to one, so every solid is an occluder. */
+export function bastionOccluderSet(rowName: string): 'gate' | 'ruins' {
+  return rowName.startsWith('curtain_') || rowName === 'fallen_stones' ? 'ruins' : 'gate';
+}
+
 /** The single point light: the beacon's green in the gate court, in front of
  *  the door (a fire-light sink source, like every world glow light). Its base
  *  intensity follows the pulse. */
