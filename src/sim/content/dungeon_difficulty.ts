@@ -433,9 +433,10 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       choirmother_selthe: 7.97,
       tideglass_colossus: 7.35,
       ysolei: 8.27,
-      // The Mere Hydra is a boss (the owner's ruling, 2026-10-12; its place
-      // in the Finder's encounter list is being added on another branch), so
-      // its normal pool keeps its designed length: 2,000 a head.
+      // The Mere Hydra is a boss by the owner's ruling of 2026-10-12. The
+      // Finder's encounter list on this branch has no row for it; the row
+      // lands with the tracker branch fix/dungeon-tracker-hydra-boss. A boss's
+      // normal pool keeps its designed length: 2,000 a head.
       mere_hydra_head_left: 1.38,
       mere_hydra_head_center: 1.38,
       mere_hydra_head_right: 1.38,
@@ -782,7 +783,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // The owner's heroic health bands (2026-10-12) then replaced the lengths
     // of everything but the final boss: a non-final boss carries about
     // 25,000 and a miniboss sits in 15,000 to 20,000 (the Finder's encounter
-    // list says which is which). Choirmother Selthe (12.9, 20,650) carries
+    // list says which is which, except for the Hydra: a boss by the owner's
+    // ruling, its row pending). Choirmother Selthe (12.9, 20,650) carries
     // 25,004, about 109 s at the planning 230; the Colossus (23,003) already
     // sits beside the band and Ysolei is untouched. The Mere Hydra, a boss
     // by the owner's ruling, goes from 4,306 a head (2.4) to 8,333, about

@@ -197,12 +197,24 @@ on p1, the drake and p2 (and both wing bosses), the Choir Door on q1 and q2 (and
 Ilvane), the Bone Stair Gate on s1 (`tests/hollow_crypt_route.test.ts`).
 
 **Why this count fits 15 minutes.** About 24,000 trash health at level 8 to 9
-(49 elites at about 370 to 600, the drake about 1,040 then, doubled to about 2,080 since as the Crypt's miniboss, 12 crows at about 60). At
+(49 elites at about 370 to 600, the drake about 1,040, 12 crows at about 60). At
 the planning party DPS of 45 that is about 8.9 minutes single target; the
 cleave and area damage a group brings on packs of 3 to 5 (and crows dying to
 it in seconds) take it to about 6.5. The four bosses are about 6.3 minutes (70,
 80, 80 and 150 s), walking about 2: about 15 minutes. To be measured with the
 meters harness before shipping, like the boss health.
+
+**The normal budget after the playtest pools (2026-10-12): about 16.5 minutes.**
+Two pools moved on normal. The Ossuary Drake, the miniboss, doubled (1,040 to
+2,079): it is a single target, so its extra 1,040 costs about 23 s at 45 and the
+trash goes from about 6.5 to about 6.9 minutes (about 25,000 trash health, about
+9.3 minutes single target). The Knellwyrm (1,081 to 4,400) sits OUTSIDE Morthen's
+150 s: it arrives after he falls (the pyre, the flight in and the landing, about
+11 s) and then fights about 70 s at the planning 55 (80 s on paper, less its
+Bared Ribs windows), about 80 s more where the bare template gave about 30. So:
+trash 6.9, the four bosses 6.3, the Knellwyrm 1.35, walking 2, about 16.5 minutes
+against the 15 the design set. The wing bosses and Morthen keep their normal
+lengths. The Knellwyrm's normal 4,400 is pending the owner's call (section 5.4).
 
 ### 4.1 Trash mechanics pass (2026-10-04)
 
@@ -264,9 +276,10 @@ dungeon's own greens; a warrior tank 366 to 404 before gear. The bands of
 
 **Heroic health bands (owner, 2026-10-12).** The manager's playtest read the heroic
 bosses as too short and asked for double health on the minibosses. The owner's
-ruling: on heroic every boss sits at about 25,000 to 30,000 and every miniboss at
-15,000 to 20,000, clearly under the bosses; normal boss pools stay at their design
-values. So Sexton Marrow (was 16,099) and Cantor Ilvane (was 14,687) carry 24,996
+ruling, in the words of the shared rule (`README.md` section 6): on heroic a
+non-final boss carries about 25,000, a miniboss sits in 15,000 to 20,000, clearly
+under the bosses, and a final boss keeps its own pool (Morthen, 28,837); normal
+boss pools stay at their design values. So Sexton Marrow (was 16,099) and Cantor Ilvane (was 14,687) carry 24,996
 beside the Lady's 24,999 (below), under Morthen's 28,837; the Choristers keep 1,844.
 A miniboss, in the content's own terms, is a solo elite that is no gate's boss: in
 the Crypt the Ossuary Drake (the one spawn-list elite that holds a pull alone:
