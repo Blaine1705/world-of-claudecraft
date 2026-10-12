@@ -1014,6 +1014,9 @@ const RENDER_PURE_CORES = [
   // The Sunken Bastion's Drowned Gate Tower: the Fogbeacon's turn, the flooded
   // passage's trace, the marsh fog's puffs and the gate sprites.
   'src/render/sunken_bastion_entrance_core.ts',
+  // What a built set piece puts between the chase camera and the character:
+  // one occluder box per collider row, tested with the fade family's own test.
+  'src/render/set_piece_occluders_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',
