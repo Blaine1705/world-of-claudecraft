@@ -1768,6 +1768,9 @@ export const da_DK: EnTranslations = {
       "replayAction": "Øv igen",
       "replayTarget": "Vælg den som mål igen"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})"
+    },
     "riftTracker": {
       "title": "Rift",
       "hoardTitle": "Begravet skattkammer",
@@ -4516,6 +4519,7 @@ export const da_DK: EnTranslations = {
         "deedTracker": "Bedriftssporer",
         "delveTracker": "Delve-sporer",
         "riftTracker": "Riftsporer",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Venstre hånd",
         "unitTooltip": "Tooltip"
       },
@@ -8142,6 +8146,7 @@ export const da_DK: EnTranslations = {
       "mapBodyZoneFirst": "M åbner verdenskortet på den zone, du står i, med din egen pil, interessepunkterne omkring dig, opgavegivere med deres mærker og områderne, hvor dine mål ligger, håndværksstationer, postkasser, opslagstavler og havebede, dungeonindgangene og alle indsamlingsnoder i zonen, gråtonede mens de vokser op igen og markerede, når dine værktøjer ikke rækker. Din gruppe vises også. Højreklik på kortet eller tryk på dets Verdenskort-knap, så trækker det sig tilbage til kontinentet med hver zone tegnet og navngivet, og et klik på en zone åbner zonens kort. Gå ind i en udgravning, dungeon, rift eller borg, så skifter kortet til en plantegning over den etage, du står på. Slagmarken i Tornehulemarkerne får sit eget feltkort.\n\nNede i højre side under minikortet holder en stak sporere din aktuelle forretning synlig uden at åbne noget: dine sporede opgaver og deres mål, din bedriftstatus, dine Relikvarium-sider, opskrifter du har fastgjort fra håndværk, udgravningen du er i, og enhver rift du deltager i. Opgavesporeren klapper sammen, når du vil have skærmen tilbage.",
       "gatheringGoalTrackerBody": "En indsamlingsmåls-sporer slutter sig til stakken, når du Sporer en opskrift i håndværksvinduet eller en bestilling på tavlen: Den navngiver opskriften eller bestillingen, du sporer, hvor meget du samler til, og hvor langt dine beholdte og oplagrede materialer bringer dig. Spor erstatter dit nuværende mål, og Ryd fjerner det udtrykkeligt. Ingen af delene ændrer nogensinde din høstpræference.",
       "hubPracticeTrackerBody": "Nær Østbæk-hubben slutter en øvelsessporer sig til stakken, når du tager de guidede øvelseslektioner der: Den holder dine bedste løb mod øvelsesdukkerne synlige. Mens en lektion er aktiv, fører en træningsstribe ved siden af dig gennem lektionens aktuelle trin, fra at åbne skademålerne til at sammenligne et andet løb.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Chatvinduet",
       "chatBody": "Nederst til venstre. Tryk Enter for at begynde at skrive, og Enter igen for at sende.\n\nTo faner er altid der: Chat, den samlede log over alt, der bliver sagt omkring dig, og Kamp, den skriftlige log over din kamp. Plus-knappen tilføjer flere, én pr. kanal: Sig, Råb, Gruppe, Generelt, Verden, LFG, Lav og Officer, samt en Hvisk-fane, der samler hver hvisken, du sender og modtager, ét sted. At skrive i en kanalfane sender til den kanal, uden at du behøver skrive kommandoen igen.\n\nHele vinduet kan trækkes til et andet sted og ændre størrelse, og det husker, hvor du efterlod det.",
       "keyWindowsTitle": "Vinduer, du åbner med en tast",

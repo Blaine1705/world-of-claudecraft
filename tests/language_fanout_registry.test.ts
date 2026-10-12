@@ -723,9 +723,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   },
   {
     file: 'hud/quest/quest_tracker_controller.ts',
-    memos: ['lastHtml'],
+    memos: ['lastDungeonRowId', 'lastHtml'],
     reason:
-      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature.',
+      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature. lastDungeonRowId gates nothing that is drawn: it is the first-sighting edge of the dungeon run on the touch strip, deciding only whether the strip JUMPS to that page on this tick (stepping into a dungeon takes the strip once). It holds a page id (the dungeon id and difficulty), never text; the page itself is re-resolved on every update, and the strip repaints it through its own locale generation.',
   },
   {
     file: 'hud/practice/practice_dps_controller.ts',

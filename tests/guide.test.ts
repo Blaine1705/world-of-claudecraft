@@ -6562,6 +6562,10 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       delveTracker: 'the delve you are in',
       riftTracker: 'any rift you are taking part in',
       gatheringGoalTracker: 'the recipe or commission you are tracking',
+      // The dungeon objectives tracker, named by its own key
+      // (guide.interfacePage.dungeonTrackerBody) beside the two tracker
+      // paragraphs it joined, which is also where the tracker list checks it.
+      dungeonTracker: 'a dungeon tracker takes the top of the stack',
       // The frames the 0.42 round added to the registry with no prior prose,
       // named by guide.interfacePage.framesGovernedExtra.
       petBar: 'the pet action bar beside your pet frame',
@@ -6721,6 +6725,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       'rift-tracker': 'any rift you are taking part in',
       'gathering-goal-tracker': 'the recipe or commission you are tracking',
       'practice-tracker': 'it keeps your best runs against the practice dummies in view',
+      'dungeon-tracker': 'a dungeon tracker takes the top of the stack',
       'hub-lesson-coach': 'walks you through the current step of the lesson',
     };
     expect([...trackerIds].sort()).toEqual(Object.keys(trackerPhrase).sort());

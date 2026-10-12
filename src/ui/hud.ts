@@ -479,6 +479,7 @@ import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
 import { DungeonPrompts, fctAvoidanceText, wardHealthText, wardHitText } from './hud/dungeon';
 import { applyDungeonGuideSpeech } from './hud/dungeon/dungeon_guide_speech';
+import { DungeonTrackerPainter } from './hud/dungeon/dungeon_tracker_painter';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
@@ -2436,6 +2437,7 @@ export class Hud {
       questTitle,
       objectiveLabel: questObjectiveLabel,
       click: () => audio.click(),
+      dungeonRow: () => this.dungeonTracker.stripQuest(),
     });
     this.questDialog = new QuestDialogController({
       element: $('#quest-dialog'),
@@ -5523,6 +5525,13 @@ export class Hud {
   private readonly reliquaryTrackerPainter = new ReliquaryTrackerPainter({
     root: () => $('#reliquary-tracker'),
     writers: this.writerFacet,
+  });
+  private readonly dungeonTracker = new DungeonTrackerPainter({
+    root: () => $('#dungeon-tracker'),
+    writers: this.writerFacet,
+    world: () => this.sim,
+    dungeonName: dungeonDisplayName,
+    mobName: mobDisplayName,
   });
   // Pinned-recipe HUD tracker (#recipe-tracker): the crafting window's pin
   // chips write the per-character store, the slow-band painter reads it and
@@ -9465,6 +9474,7 @@ export class Hud {
         paintRestIndicator($('#pf-rest'), rest, this.writerFacet);
       }
 
+      this.dungeonTracker.update();
       this.updateQuestTracker(now);
       this.updateDelveTracker();
       this.updateRiftTracker();

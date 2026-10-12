@@ -1768,6 +1768,9 @@ export const pl_PL: EnTranslations = {
       "replayAction": "Ćwicz ponownie",
       "replayTarget": "Wybierz go ponownie jako cel"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})"
+    },
     "riftTracker": {
       "title": "Szczelina",
       "hoardTitle": "Zakopane skarby",
@@ -4516,6 +4519,7 @@ export const pl_PL: EnTranslations = {
         "deedTracker": "Śledzenie czynów",
         "delveTracker": "Śledzenie wypraw",
         "riftTracker": "Śledzenie szczeliny",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Lewa ręka",
         "unitTooltip": "Tooltip"
       },
@@ -8142,6 +8146,7 @@ export const pl_PL: EnTranslations = {
       "mapBodyZoneFirst": "M otwiera mapę świata w strefie, w której stoisz, z własną strzałką, pobliskimi punktami zainteresowania, zleceniodawcami z oznaczeniami i obszarami celów, stanowiskami rzemieślniczymi, skrzynkami pocztowymi, tablicami ogłoszeń i grządkami, wejściami do lochów oraz każdym węzłem zbioru w strefie. Węzły są wyszarzone podczas odrastania i oznaczone, gdy twoje narzędzia są za słabe. Widać na niej także twoją drużynę. Kliknij mapę prawym przyciskiem albo naciśnij przycisk Mapy świata, aby oddalić widok do kontynentu, gdzie każda strefa jest narysowana z nazwą, a kliknięcie otwiera jej mapę. Wejdź do wyprawy, lochu, szczeliny albo twierdzy, a mapa przełączy się na plan piętra w miejscu, w którym stoisz; pole bitwy Thornhollow Fields ma własną mapę pola.\n\nPo prawej stronie, pod minimapą, stos śledzików pokazuje bieżące sprawy bez otwierania czegokolwiek: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, przypięte receptury rzemieślnicze, aktywną wyprawę i każdą szczelinę, w której uczestniczysz. Śledzik zadań zwija się, gdy chcesz odzyskać miejsce na ekranie.",
       "gatheringGoalTrackerBody": "Śledzik celu zbierania dołącza do stosu, gdy śledzisz recepturę w oknie rzemiosła albo zlecenie na tablicy: pokazuje śledzoną recepturę lub zlecenie, liczbę potrzebnych sztuk oraz to, jak daleko prowadzą cię materiały trzymane i przechowywane. Śledzenie zastępuje bieżący cel, a Wyczyść usuwa go jawnie; żadna z tych czynności nie zmienia preferencji zbioru.",
       "hubPracticeTrackerBody": "W pobliżu huba Eastbrook śledzik ćwiczeń dołącza do stosu, gdy rozpoczniesz tam prowadzone lekcje: pokazuje najlepsze wyniki przeciw manekinom ćwiczebnym. Gdy lekcja jest aktywna, pasek wskazówek obok prowadzi przez jej bieżący krok, od otwarcia Mierników obrażeń po porównanie drugiego podejścia.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Okno czatu",
       "chatBody": "Lewy dolny róg. Naciśnij Enter, aby zacząć pisać, i ponownie Enter, aby wysłać.\n\nDwie zakładki są tam zawsze: Czat, połączony zapis wszystkiego, co mówi się wokół ciebie, oraz Walka, pisemny zapis twoich starć. Przycisk plusa dodaje kolejne, po jednej na kanał: Mów, Krzycz, Drużyna, Ogólny, Świat, LFG, Gildia i Oficer, a do tego zakładkę Szept, która zbiera w jednym miejscu każdy szept, który wysyłasz i odbierasz. Pisanie w zakładce kanału wysyła wiadomość na ten kanał bez ponownego wpisywania komendy.\n\nCałe okno można przeciągnąć w inne miejsce i zmienić jego rozmiar, a ono zapamiętuje, gdzie je zostawiłeś.",
       "keyWindowsTitle": "Okna otwierane klawiszem",

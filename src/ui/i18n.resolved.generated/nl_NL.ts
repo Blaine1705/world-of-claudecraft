@@ -1768,6 +1768,9 @@ export const nl_NL: EnTranslations = {
       "replayAction": "Opnieuw oefenen",
       "replayTarget": "Opnieuw richten"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})"
+    },
     "riftTracker": {
       "title": "Rift",
       "hoardTitle": "Begraven Schat",
@@ -4516,6 +4519,7 @@ export const nl_NL: EnTranslations = {
         "deedTracker": "Daadvolger",
         "delveTracker": "Delve-volger",
         "riftTracker": "Riftvolger",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Offhand",
         "unitTooltip": "Tooltip"
       },
@@ -8142,6 +8146,7 @@ export const nl_NL: EnTranslations = {
       "mapBodyZoneFirst": "M opent de wereldkaart op de zone waarin je staat, met je eigen pijl erop, de interessante plekken om je heen, de queestgevers met hun markeringen en de gebieden waarin je doelen liggen, de ambachtsstations, brievenbussen, mededelingenborden en tuinbedden, de kerkeringangen en elk verzamelpunt in de zone. Punten die opnieuw groeien zijn grijs en punten waarvoor je gereedschap niet goed genoeg is, gemarkeerd. Je groep staat er ook op. Klik met rechts op de kaart of druk op de knop Wereldkaart om uit te zoomen naar het continent, met elke zone en haar naam. Klik op een zone om haar kaart te openen. Stap een delve, kerker, rift of kasteel in en de kaart verandert in een plattegrond van de plek waar je staat. Het slagveld Doornholte-Velden krijgt zijn eigen veldkaart.\n\nAan de rechterkant, onder de minimap, houdt een stapel trackers je huidige zaken in beeld zonder iets te openen: je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, recepten die je vanuit het ambacht hebt vastgezet, de delve waarin je zit en elke rift waaraan je deelneemt. De queesttracker klapt in wanneer je het scherm terug wilt.",
       "gatheringGoalTrackerBody": "Een tracker voor verzameldoelen komt in de stapel zodra je een recept in het maakvenster of een opdracht op het bord volgt. Hij noemt het recept of de opdracht die je volgt, hoeveel je verzamelt en hoe ver je bewaarde en opgeslagen materialen je brengen. Volgen vervangt je huidige doel en Wissen verwijdert het expliciet. Geen van beide verandert ooit je oogstvoorkeur.",
       "hubPracticeTrackerBody": "Bij de Oostbeek-hub komt een oefentracker in de stapel zodra je daar de begeleide oefenlessen volgt. Hij houdt je beste pogingen tegen de oefenpoppen in beeld. Terwijl een les actief is, leidt een coachingsbalk ernaast je door de huidige stap, van het openen van de Schademeters tot het vergelijken van een tweede poging.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "De chatbox",
       "chatBody": "Linksonder. Druk op Enter om te beginnen met typen en nogmaals op Enter om te versturen.\n\nTwee tabbladen staan er altijd: Chat, het gecombineerde logboek van alles wat er om je heen wordt gezegd, en Gevecht, het geschreven verslag van je strijd. De plusknop voegt er meer toe, een per kanaal: Zeggen, Schreeuwen, Groep, Algemeen, Wereld, LFG, Gilde en Officier, plus een tabblad Fluisteren dat elk fluisterbericht dat je verstuurt en ontvangt op een plek verzamelt. Typen in een kanaaltabblad stuurt naar dat kanaal zonder dat je het commando opnieuw hoeft te typen.\n\nDe hele box kan naar een andere plek worden gesleept en van formaat worden veranderd, en hij onthoudt waar je hem hebt achtergelaten.",
       "keyWindowsTitle": "Vensters die je met een toets opent",

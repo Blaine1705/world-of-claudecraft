@@ -1877,6 +1877,14 @@ export const hudChromeStrings = {
     // key worth naming, like the Proving Shore coach's own "select" ask).
     replayTarget: 'Target it again',
   },
+  // The dungeon objectives tracker (src/ui/hud/dungeon/dungeon_tracker_*). Its
+  // names come from the dungeon and mob entity keys, its counts from
+  // questTracker.objectiveValue and its Heroic chip from finder.heroic; the one
+  // string of its own is the touch strip page's title on a heroic run, which
+  // joins two of those ("The Hollow Crypt (Heroic)").
+  dungeonTracker: {
+    heroicTitle: '{name} ({difficulty})',
+  },
   // In-rift HUD tracker (issue #2655): floor position + a live "closes in"
   // countdown on the rift's backing world event. Digits run through
   // formatNumber; the clock templates are pre-built mm:ss / h:mm:ss so the
@@ -6103,6 +6111,9 @@ export const hudChromeStrings = {
       deedTracker: 'Deed Tracker',
       delveTracker: 'Delve Tracker',
       riftTracker: 'Rift Tracker',
+      // The dungeon objectives tracker (#dungeon-tracker): the frame chip and
+      // the tracker's own accessible name. Wordy (M16, fills in this change).
+      dungeonTracker: 'Dungeon Tracker',
       swingBarOffhand: 'Off Hand',
       // The mouseover unit tooltip's movable seat (#unit-tooltip-anchor), an
       // invisible box in play, so its chip is what names the placeholder.

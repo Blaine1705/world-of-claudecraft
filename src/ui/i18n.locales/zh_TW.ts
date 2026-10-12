@@ -2588,6 +2588,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.deedTracker': '功績追蹤器',
   'hudChrome.interfaceUnlock.frameNames.delveTracker': '秘探追蹤器',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': '裂隙追蹤器',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': '地城追蹤器',
   'hudChrome.interfaceUnlock.frameNames.targetDots': '目標減益',
   'hudChrome.interfaceUnlock.framesMenu': '框體設定',
   'hudChrome.interfaceUnlock.showHideFrames': '顯示或隱藏框體',
@@ -18440,6 +18441,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在製作視窗追蹤一個配方，或在委託公告欄追蹤一個委託後，採集目標追蹤器就會加入這個堆疊：它會顯示你正在追蹤的配方或委託、你要收集的數量，以及你隨身攜帶和倉庫中的材料能滿足多少。追蹤會取代你目前的目標，清除則會明確取消它；兩者都不會改變你的採集偏好。',
   'guide.interfacePage.hubPracticeTrackerBody':
     '在 Eastbrook 樞紐附近，一旦你開始那裡的引導式練習課程，練習追蹤器就會加入這個堆疊：它會讓你隨時看到自己對練習假人的最佳戰績。課程進行中時，它旁邊的指導條會引導你完成目前步驟，從開啟傷害統計到比較第二輪成績。',
+  'guide.interfacePage.dungeonTrackerBody':
+    '在小隊地城內，地城追蹤器會佔據堆疊的頂部：一塊寫有地城名稱的銘牌（英雄難度時會標註「英雄」），帶有一條隨進度填滿的進度條，下方按路線遇到的順序列出該地城的每個首領，在其倒下之前都計為 0 / 1。戰鬥分為兩幕的首領會保持未完成狀態，直到整場戰鬥結束，因此只有在整次挑戰完成時清單才會顯示為完成。你離開時追蹤器也會隨之消失，「編輯框體」會像對待其他追蹤器一樣鬆開它，並顯示它自己的名稱標籤。',
   'guide.interfacePage.mobileBodyTwoPages':
     '觸控操作會自己出現，版面也會依你的螢幕自行調整大小：小手機用緊湊的排法，大手機用標準的排法，平板則用寬鬆一些的排法。\n\n你的技能排成一圈，而不是一排數字鍵：攻擊按鈕旁邊有四顆動作按鈕，還有一顆換頁鈕，讓這一圈在它的 {pages} 頁之間切換，這幾頁合起來便能觸及你全部 {slots} 個技能格位，不論桌機版的額外動作列有沒有開啟。那一圈的第五個弧形位置是你的消耗品座位：點一下就使用座位上放著的東西，或者按住它、或把它向內滑，即可展開一排會自動從你身上帶的東西補上的消耗品。圈的周圍則是觸控玩家最常伸手去按的按鈕：切換目標、使用眼前的東西，以及跳躍。\n\n底部邊緣有一顆「快捷操作」控制鈕，取代了一整排按鈕。它通往其餘的一切：坐騎、聊天、地圖、背包、社交、任務、角色、法術書、遊戲選單，還有一個「更多」項目，收著你其餘的視窗，包括地城搜尋器、PvP、表情，以及這個 wiki。這裡的視窗會填滿整個畫面，而不是浮在畫面上。\n\n移動你的單位框架是桌機才有的事：在觸控裝置上，版面會替你安排好它們的位置。',
   'guide.interfacePage.winMoreBodyNoValeCup':

@@ -2200,6 +2200,7 @@
   #reliquary-tracker.tf-unlocked,
   #delve-tracker.tf-unlocked,
   #rift-tracker.tf-unlocked,
+  #dungeon-tracker.tf-unlocked,
   #practice-tracker.tf-unlocked,
   .gathering-goal-panel.tf-unlocked,
   #swingbar-offhand.tf-unlocked,
@@ -2222,6 +2223,7 @@
   #reliquary-tracker.tf-unlocked,
   #delve-tracker.tf-unlocked,
   #rift-tracker.tf-unlocked,
+  #dungeon-tracker.tf-unlocked,
   #practice-tracker.tf-unlocked,
   #paladin-devotion-frame.tf-unlocked,
   #proc-overlay.tf-unlocked,
@@ -2290,6 +2292,7 @@
   #reliquary-tracker.hud-frame-detached,
   #delve-tracker.hud-frame-detached,
   #rift-tracker.hud-frame-detached,
+  #dungeon-tracker.hud-frame-detached,
   #practice-tracker.hud-frame-detached,
   .gathering-goal-panel.hud-frame-detached {
     position: absolute;
@@ -2304,6 +2307,7 @@
   #reliquary-tracker.hud-frame-detached,
   #delve-tracker.hud-frame-detached,
   #rift-tracker.hud-frame-detached,
+  #dungeon-tracker.hud-frame-detached,
   #practice-tracker.hud-frame-detached,
   .gathering-goal-panel.hud-frame-detached {
     width: var(--tracker-w);
@@ -2325,6 +2329,7 @@
   #reliquary-tracker .tf-move-btn,
   #delve-tracker .tf-move-btn,
   #rift-tracker .tf-move-btn,
+  #dungeon-tracker .tf-move-btn,
   .gathering-goal-panel .tf-move-btn,
   #swingbar-offhand .tf-move-btn,
   #paladin-devotion-frame .tf-move-btn,
@@ -2362,6 +2367,7 @@
   #reliquary-tracker .tf-move-btn:focus-visible,
   #delve-tracker .tf-move-btn:focus-visible,
   #rift-tracker .tf-move-btn:focus-visible,
+  #dungeon-tracker .tf-move-btn:focus-visible,
   .gathering-goal-panel .tf-move-btn:focus-visible,
   #swingbar-offhand .tf-move-btn:focus-visible,
   #paladin-devotion-frame .tf-move-btn:focus-visible,
@@ -2535,6 +2541,7 @@
   body.interface-unlocked #reliquary-tracker.tf-unlocked,
   body.interface-unlocked #delve-tracker.tf-unlocked,
   body.interface-unlocked #rift-tracker.tf-unlocked,
+  body.interface-unlocked #dungeon-tracker.tf-unlocked,
   body.interface-unlocked #practice-tracker.tf-unlocked,
   body.interface-unlocked .gathering-goal-panel.tf-unlocked {
     display: block !important;
@@ -6764,6 +6771,235 @@
   #rift-tracker .rt-obj {
     margin-left: 8px;
     margin-top: 4px;
+  }
+
+  /* ---------- dungeon objectives tracker ---------- */
+  /* The group dungeon a player stands in (src/ui/hud/dungeon/dungeon_tracker_*):
+     a plate naming the dungeon, with a rail that fills as its bosses fall, and
+     under it one row per boss counted 0 of 1. It sits at the TOP of the stack,
+     above the quest tracker, because inside a dungeon it is the business at
+     hand. Actionable progress, so nothing here rides a graphics tier
+     (docs/design/graphics-settings-fairness.md); the two short glows are
+     decoration over counts already on screen and stand down under reduced
+     motion.
+
+     Visibility is one class the painter owns: without .is-live the tracker
+     leaves the stack entirely, so it never spends a gap outside a dungeon.
+     The frame editor force-shows a hidden tracker as a placeholder (display
+     !important, above), and the second rule keeps the empty plate out of it. */
+  #dungeon-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-text-overlay);
+    pointer-events: none;
+  }
+  #dungeon-tracker:not(.is-live) {
+    display: none;
+  }
+  #dungeon-tracker:not(.is-live) > .dgt-plate,
+  #dungeon-tracker:not(.is-live) > .dgt-list {
+    display: none;
+  }
+  /* The plate composes ui-panel-soft (the objective tracker surface, DESIGN.md
+     4.4); only its geometry is set here. The stack outlines its text for the
+     open world behind it, which a plated line does not need. */
+  #dungeon-tracker .dgt-plate {
+    position: relative;
+    padding: 6px 10px 8px;
+    text-shadow: none;
+  }
+  /* The completed edge and its one-time glow live on an overlay, so the
+     primitive's own border and shadow are never re-declared. */
+  #dungeon-tracker .dgt-plate::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--gold-dim);
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-plate.is-complete::after {
+    opacity: 1;
+  }
+  /* The stack paints above the button rail (z-index 20 over 19), and on a
+     short viewport the rail climbs into the stack's span. Text over a rail
+     icon is harmless, which is why every row in the stack hugs the left of
+     the column, but a PLATE would cover the buttons under it. So below the
+     height where the two meet (the rail's top, bottom: 74px and about 438px
+     tall, against the plate's bottom under the minimap column) the plate
+     keeps to the column the rail leaves free: the 70px rail plus its gap. */
+  @media (max-height: 895px) {
+    body:not(.mobile-touch) #dungeon-tracker:not(.hud-frame-detached) .dgt-plate {
+      width: calc(100% - 80px);
+      padding-inline: 9px;
+    }
+    body:not(.mobile-touch) #dungeon-tracker:not(.hud-frame-detached) .dgt-name {
+      font-size: 13px;
+    }
+    /* The rows follow the plate in: a long boss name wraps under itself
+       rather than running across the rail's icons. */
+    body:not(.mobile-touch) #dungeon-tracker:not(.hud-frame-detached) .dgt-list {
+      margin-right: 80px;
+    }
+  }
+  #dungeon-tracker .dgt-plate.is-complete-flash::after {
+    animation: dungeon-tracker-complete 1.4s ease-out;
+  }
+  @keyframes dungeon-tracker-complete {
+    from {
+      box-shadow:
+        0 0 calc(14px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 42%, transparent),
+        inset 0 0 calc(10px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 25%, transparent);
+    }
+    to {
+      box-shadow:
+        0 0 0 transparent,
+        inset 0 0 0 transparent;
+    }
+  }
+  /* A long localized name wraps inside the plate rather than clipping: it is
+     the one thing the plate is for. */
+  #dungeon-tracker .dgt-name {
+    color: var(--color-accent);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    overflow-wrap: anywhere;
+  }
+  #dungeon-tracker .dgt-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+  }
+  #dungeon-tracker .dgt-diff {
+    flex: none;
+    height: 16px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+  #dungeon-tracker .dgt-plate:not(.is-heroic) .dgt-diff {
+    display: none;
+  }
+  #dungeon-tracker .dgt-bar {
+    --bar-color: var(--gold);
+
+    flex: 1 1 auto;
+    height: 5px;
+  }
+  #dungeon-tracker .dgt-bar-fill {
+    display: block;
+    transition:
+      width 0.5s ease-out,
+      background-color var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-plate.is-complete .dgt-bar {
+    --bar-color: var(--color-text-success);
+  }
+  #dungeon-tracker .dgt-tally {
+    flex: none;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 14px;
+    color: var(--color-text-secondary);
+    transition: color var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-plate.is-complete .dgt-tally {
+    color: var(--color-text-success);
+  }
+  #dungeon-tracker .dgt-list {
+    margin: 7px 0 0 10px;
+  }
+  /* Rows are text on the world, like every other line in the stack: no plate,
+     the stack's outline, and click-through. Count first, so the counts form
+     one column and a long boss name wraps under itself. */
+  #dungeon-tracker .dgt-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-top: 3px;
+    line-height: 16px;
+    transition: color var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-row:first-child {
+    margin-top: 0;
+  }
+  #dungeon-tracker .dgt-count {
+    flex: none;
+    color: var(--color-text-light);
+    transition: color var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-boss {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  /* The check is decoration (aria-hidden; the count carries the state) and
+     arrives with the done color. */
+  #dungeon-tracker .dgt-mark {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 11px;
+    height: 16px;
+    opacity: 0;
+    transition: opacity var(--dur-panel) ease-out;
+  }
+  #dungeon-tracker .dgt-mark .ui-icon {
+    width: 11px;
+    height: 11px;
+    filter: drop-shadow(0 1px 1px var(--color-keyline));
+  }
+  #dungeon-tracker .dgt-row.is-done {
+    color: var(--color-text-success);
+  }
+  #dungeon-tracker .dgt-row.is-done .dgt-count {
+    color: inherit;
+  }
+  #dungeon-tracker .dgt-row.is-done .dgt-mark {
+    opacity: 1;
+  }
+  /* A boss that fell in front of the player: its row arrives lit and settles
+     into the done green (the Reliquary tracker's fill flash, same idiom). */
+  #dungeon-tracker .dgt-row.is-flash {
+    animation: dungeon-tracker-kill 1.2s ease-out;
+  }
+  @keyframes dungeon-tracker-kill {
+    from {
+      color: var(--color-text-light);
+      text-shadow:
+        0 0 8px var(--color-text-success),
+        var(--outline-shadow);
+    }
+    to {
+      color: var(--color-text-success);
+      text-shadow: var(--outline-shadow);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #dungeon-tracker .dgt-row.is-flash,
+    #dungeon-tracker .dgt-plate.is-complete-flash::after {
+      animation: none;
+    }
+    #dungeon-tracker .dgt-bar-fill {
+      transition: none;
+    }
+  }
+  body.reduce-motion #dungeon-tracker .dgt-row.is-flash,
+  body.reduce-motion #dungeon-tracker .dgt-plate.is-complete-flash::after {
+    animation: none;
+  }
+  body.reduce-motion #dungeon-tracker .dgt-bar-fill {
+    transition: none;
+  }
+  /* Forced colors drops the green: keep the done state readable as a system
+     color (the count text already says it). */
+  @media (forced-colors: active) {
+    #dungeon-tracker .dgt-row.is-done {
+      color: Highlight;
+    }
   }
 
   /* ---------- practice DPS tracker ---------- */

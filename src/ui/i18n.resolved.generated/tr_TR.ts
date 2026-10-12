@@ -1768,6 +1768,9 @@ export const tr_TR: EnTranslations = {
       "replayAction": "Tekrar pratik yap",
       "replayTarget": "Tekrar hedefle"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})"
+    },
     "riftTracker": {
       "title": "Yarık",
       "hoardTitle": "Gizli Hazine",
@@ -4516,6 +4519,7 @@ export const tr_TR: EnTranslations = {
         "deedTracker": "Edim Takipçisi",
         "delveTracker": "Delve Takipçisi",
         "riftTracker": "Yarık Takipçisi",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Sol El",
         "unitTooltip": "Tooltip"
       },
@@ -8142,6 +8146,7 @@ export const tr_TR: EnTranslations = {
       "mapBodyZoneFirst": "M, üzerinde bulunduğun bölgenin dünya haritasını açar; kendi okun, çevrendeki ilgi noktaları, işaretleri olan görev verenler ve hedeflerinin bulunduğu alanlar, üretim istasyonları, posta kutuları, ilan panoları ve bahçe yatakları, zindan girişleri ve bölgedeki tüm toplama düğümleri görünür. Yenilenirken gri, aletlerin yetersiz kaldığında işaretli olurlar. Grubun da haritada görünür. Haritaya sağ tıkla veya Dünya haritası düğmesine bas; harita kıtaya çekilir, her bölge adıyla çizilir ve bir bölgeye tıklamak onun haritasını açar. Bir delveye, zindana, yarığa veya kale burcuna girdiğinde harita bulunduğun yerin kat planına geçer; Dikenkuyu Tarlaları savaş alanı da kendine ait bir saha haritasına sahip olur.\n\nMini haritanın altında sağ tarafta duran takipçi yığını, hiçbir şey açmadan mevcut işlerini görünür tutar: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, üretimden sabitlediğin tarifler, içinde bulunduğun delve ve katıldığın her yarık. Ekranı geri istediğinde görev takipçisi kapanır.",
       "gatheringGoalTrackerBody": "Üretim penceresinde bir tarifi veya panoda bir komisyonu Takip ettiğinde yığına bir toplama hedef takipçisi katılır: takip ettiğin tarif veya komisyonu, kaç tane topladığını ve yanında veya depoda tuttuğun malzemelerin seni hedefe ne kadar yaklaştırdığını adlandırır. Takip mevcut hedefinin yerini alır, Temizle ise onu açıkça kaldırır; ikisi de hasat tercihini asla değiştirmez.",
       "hubPracticeTrackerBody": "Doğudere merkezi yakınında, rehberli talim derslerini aldıktan sonra yığına bir talim takipçisi katılır: talim mankenlerine karşı en iyi denemelerini görünür tutar. Ders etkinken yanındaki koç şeridi, Hasar Sayaçlarını açmaktan ikinci denemeyi karşılaştırmaya kadar dersin mevcut adımında sana yol gösterir.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Sohbet kutusu",
       "chatBody": "Sol alt köşe. Yazmaya başlamak için Enter'a, göndermek için tekrar Enter'a bas.\n\nHer zaman iki sekme vardır: çevrende söylenen her şeyin birleşik kaydı olan Sohbet ve dövüşünün yazılı kaydı olan Savaş. Artı düğmesi kanal başına bir tane olmak üzere daha fazlasını ekler: Söyle, Bağır, Grup, Genel, Dünya, LFG, Lonca ve Subay; ayrıca gönderdiğin ve aldığın her fısıltıyı tek bir yerde toplayan bir Fısıltı sekmesi. Bir kanal sekmesinde yazmak, komutu yeniden yazmana gerek kalmadan o kanala gönderir.\n\nKutunun tamamı başka bir yere sürüklenebilir ve yeniden boyutlandırılabilir, bıraktığın yeri hatırlar.",
       "keyWindowsTitle": "Bir tuşla açtığın pencereler",

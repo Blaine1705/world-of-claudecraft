@@ -1768,6 +1768,9 @@ export const vi_VN: EnTranslations = {
       "replayAction": "Luyện tập lại",
       "replayTarget": "Nhắm lại mục tiêu"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})"
+    },
     "riftTracker": {
       "title": "Rạn Nứt",
       "hoardTitle": "Hoard",
@@ -4516,6 +4519,7 @@ export const vi_VN: EnTranslations = {
         "deedTracker": "Theo Dõi Chiến Công",
         "delveTracker": "Theo Dõi Delve",
         "riftTracker": "Theo Dõi Khe Nứt",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Tay Phụ",
         "unitTooltip": "Tooltip"
       },
@@ -8142,6 +8146,7 @@ export const vi_VN: EnTranslations = {
       "mapBodyZoneFirst": "M mở bản đồ thế giới tại vùng bạn đang đứng, với mũi tên của riêng bạn trên đó, các điểm quan tâm quanh bạn, những người giao nhiệm vụ cùng dấu hiệu của họ và khu vực chứa mục tiêu của bạn, các trạm chế tác, hòm thư, bảng tin và luống vườn, các cửa hầm ngục, và mọi điểm thu hoạch trong vùng, mờ đi khi đang mọc lại và được đánh dấu khi công cụ của bạn chưa đủ. Nhóm của bạn cũng hiện trên đó. Nhấp chuột phải vào bản đồ, hoặc bấm nút Bản đồ thế giới của nó, bản đồ sẽ lùi về toàn lục địa, mỗi vùng được vẽ cùng tên, và bấm vào một vùng sẽ mở bản đồ của vùng đó. Bước vào một hang sâu, một hầm ngục, một Vết Nứt hay một pháo đài, bản đồ sẽ chuyển sang bản vẽ mặt bằng nơi bạn đang đứng; chiến trường Cánh Đồng Gai Trũng có bản đồ chiến trường riêng của nó.\n\nỞ bên phải, dưới minimap, một cụm theo dõi giữ công việc hiện tại của bạn trong tầm mắt mà không cần mở gì cả: các nhiệm vụ bạn đang theo dõi cùng mục tiêu của chúng, tiến độ kỳ công, các trang Kỳ Trân Các của bạn, các công thức bạn đã ghim từ chế tác, hang sâu bạn đang ở trong, và bất kỳ Vết Nứt nào bạn đang tham gia. Trình theo dõi nhiệm vụ thu gọn lại khi bạn muốn lấy lại màn hình.",
       "gatheringGoalTrackerBody": "Bảng mục tiêu thu thập được thêm vào cụm theo dõi khi bạn chọn Theo Dõi một công thức trong cửa sổ chế tác hoặc một đơn trên bảng đơn đặt chế tác: nó hiện tên công thức hoặc đơn, số lượng cần chuẩn bị và mức đáp ứng của nguyên liệu đang mang cùng nguyên liệu đã cất. Theo Dõi thay mục tiêu hiện tại, còn Xóa chủ động bỏ mục tiêu; cả hai đều không thay đổi ưu tiên thu hoạch.",
       "hubPracticeTrackerBody": "Gần trung tâm Đông Khê, bảng theo dõi luyện tập được thêm vào cụm khi bạn nhận các bài tập hướng dẫn tại đó: nó giữ thành tích tốt nhất với hình nhân tập trong tầm mắt. Khi bài học đang diễn ra, dải hướng dẫn bên cạnh dẫn bạn qua từng bước, từ mở Bảng Thống Kê Sát Thương đến so sánh lượt tập thứ hai.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Khung trò chuyện",
       "chatBody": "Góc dưới bên trái. Nhấn Enter để bắt đầu gõ và Enter lần nữa để gửi.\n\nLuôn có hai tab: Trò Chuyện, nhật ký gộp mọi thứ được nói quanh bạn, và Chiến Đấu, ghi chép bằng văn bản của trận đánh. Nút dấu cộng thêm nhiều tab hơn, mỗi tab cho một kênh: Nói, Hét, Tổ Đội, Chung, Thế Giới, Tìm Đội, Bang Hội, và Sĩ Quan, cùng một tab Nhắn Riêng gom mọi tin nhắn riêng bạn gửi và nhận vào một chỗ. Gõ trong một tab kênh sẽ gửi thẳng đến kênh đó mà bạn không cần gõ lại lệnh.\n\nCả khung có thể được kéo sang chỗ khác và đổi kích thước, và nó sẽ nhớ vị trí bạn để lại.",
       "keyWindowsTitle": "Các cửa sổ bạn mở bằng phím",
