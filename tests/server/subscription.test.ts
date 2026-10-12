@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../server/db', () => ({
@@ -155,5 +156,15 @@ describe('game subscription account API', () => {
     ])(ctx);
     expect((ctx.res as unknown as FakeRes).statusCode).toBe(401);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+// The game reads its membership switch from the container env, and Compose passes through
+// only the variables it names: without this line WOC_SUBSCRIPTIONS_ENABLED=1 in a host's
+// .env never reached the game and the store hid memberships (dev, 2026-10-12).
+describe('game subscription deploy wiring', () => {
+  it('passes WOC_SUBSCRIPTIONS_ENABLED through to the game container, off when unset', () => {
+    const compose = readFileSync(new URL('../../docker-compose.yml', import.meta.url), 'utf8');
+    expect(compose).toContain('WOC_SUBSCRIPTIONS_ENABLED: ${WOC_SUBSCRIPTIONS_ENABLED:-}');
   });
 });

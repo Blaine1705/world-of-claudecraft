@@ -153,6 +153,7 @@ import {
   configureClaudiumRuntime,
   handleClaudiumApi,
   handleClaudiumStripeWebhook,
+  handleMembershipStripeWebhook,
 } from './claudium';
 import { claudiumSpendDetailed } from './claudium_proxy';
 import { configureCommunityTestAccounts } from './community_test_accounts';
@@ -2777,6 +2778,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/claudium/stripe/webhook') {
       return handleClaudiumStripeWebhook(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/claudium/membership/stripe/webhook') {
+      return handleMembershipStripeWebhook(req, res);
     }
     if (url.startsWith('/api/claudium')) {
       const preAuthLimit = claudiumPreAuthMutationRateLimited(req);
