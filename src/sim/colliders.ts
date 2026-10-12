@@ -975,7 +975,7 @@ function staticWorldColliders(seed: number): Collider[] {
     });
   for (const [x, z] of PROPS.mudHuts)
     out.push({ type: 'circle', x, z, r: 1.1, cameraTopY: topY(seed, x, z, 12.5) });
-  for (const ruin of PROPS.ruinRings) {
+  for (const ruin of PROPS.ruinRings.filter((r) => r.columns > 0)) {
     for (let i = 0; i < ruin.columns; i++) {
       const ang = (i / ruin.columns) * Math.PI * 2;
       const x = ruin.x + Math.sin(ang) * ruin.ringR,

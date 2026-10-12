@@ -2031,7 +2031,7 @@ export function buildProps(
   }
 
   // ---- ruin rings: weathered monolith columns at the exact collider angles -
-  for (const r of getActiveWorldContent().props.ruinRings) {
+  for (const r of getActiveWorldContent().props.ruinRings.filter((q) => q.columns > 0)) {
     for (let i = 0; i < r.columns; i++) {
       const ang = (i / r.columns) * Math.PI * 2;
       const x = r.x + Math.sin(ang) * r.ringR,
