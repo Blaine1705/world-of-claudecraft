@@ -8,9 +8,12 @@
 // followed waypoint by waypoint with the ordinary moveToward, so it walks
 // round the wall and never through it.
 //
-// Consumer (mob/combat_profile.ts): a caster with no line of sight to its
-// target walks its route until it sees them (mob/cast_sight.ts decides when;
-// this module is how).
+// Consumers, both in mob/combat_profile.ts:
+//   - a caster with no line of sight to its target walks its route until it
+//     sees them (mob/cast_sight.ts decides when; this module is how);
+//   - a melee mob whose straight chase has stopped dead on geometry takes a
+//     route before the stall detector ever calls it unreachable
+//     (chaseAroundObstacles).
 // The stall, the pin and the phase stay exactly as they were for a target no
 // route reaches (a perch): with no route the mob pushes straight on, commits
 // no movement, and mob/reachability.ts counts it down as before. Two guards
@@ -28,7 +31,7 @@
 // few hundredths of one), which is why it is the thing that is rationed.
 //
 // The route draws no rng. Entity.chaseRoute exists only while something is in
-// the mob's way (a caster's lost line of sight), so a
+// the mob's way (a caster's lost line, a melee chase stopped on a wall), so a
 // fight on open ground leaves no trace of it and the parity goldens of every
 // such fight are untouched; where it does exist the trace samples it like any
 // other mob state.
@@ -64,6 +67,9 @@ export const ROUTE_SPAN = 96;
 export const ROUTE_WAYPOINT_REACHED = 0.75;
 /** A route whose end is this far from where the target now stands is stale. */
 export const ROUTE_STALE_YARDS = 3;
+/** Seconds a melee chase must have stood dead on geometry before it routes:
+ *  past a body block or a one-tick hiccup, far inside the stall window. */
+export const ROUTE_AFTER_STALL_SECONDS = 0.3;
 
 /** The mob's route record for this target, fresh when the target changed. */
 export function chaseRouteFor(mob: Entity, target: Entity): MobChaseRoute {
@@ -88,6 +94,12 @@ export function chaseRouteFor(mob: Entity, target: Entity): MobChaseRoute {
 export function clearChaseRoute(mob: Entity): void {
   // Written as undefined, never deleted (the Entity shape stays stable).
   if (mob.chaseRoute !== undefined) mob.chaseRoute = undefined;
+}
+
+/** Is the mob walking a real route (waypoints before the last straight leg)? */
+export function isRouting(mob: Entity, target: Entity): boolean {
+  const route = mob.chaseRoute;
+  return route !== undefined && route.targetId === target.id && route.path.length > 1;
 }
 
 /**
@@ -159,4 +171,25 @@ export function followChaseRoute(
   if (route.path.length <= 1) return false;
   ctx.moveToward(mob, route.path[0], speed);
   return true;
+}
+
+/**
+ * A melee chase step: straight at the target as always, and round the
+ * obstacle once the straight chase has stood dead on geometry for
+ * ROUTE_AFTER_STALL_SECONDS (Entity.chaseStall, mob/reachability.ts). A mob
+ * with open ground ahead pays one comparison.
+ */
+export function chaseAroundObstacles(
+  ctx: SimContext,
+  mob: Entity,
+  target: Entity,
+  speed: number,
+): void {
+  if (
+    (isRouting(mob, target) || mob.chaseStall >= ROUTE_AFTER_STALL_SECONDS) &&
+    followChaseRoute(ctx, mob, target, speed)
+  ) {
+    return;
+  }
+  ctx.moveToward(mob, target.pos, speed);
 }

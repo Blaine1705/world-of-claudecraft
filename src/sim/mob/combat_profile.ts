@@ -27,7 +27,7 @@ import {
 } from '../types';
 import { casterSightBlocked, lastSightBlocked, petSpellSightVerdict } from './cast_sight';
 import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
-import { clearChaseRoute, followChaseRoute } from './chase_route';
+import { chaseAroundObstacles, clearChaseRoute, followChaseRoute } from './chase_route';
 import { updateDerelictBomber } from './derelict_bomber';
 import { dragonkinEngageShout } from './dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
@@ -409,9 +409,9 @@ function updateCasterCombat(
   if (!ctx.isRooted(mob)) {
     const speed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
     // No line of sight: round the wall by its route. With one (the target is
-    // only out of range), or with no route to take, straight at it as before.
+    // only out of range), or with no route to take, the ordinary chase step.
     if (!(blocked && followChaseRoute(ctx, mob, target, speed))) {
-      ctx.moveToward(mob, target.pos, speed);
+      chaseAroundObstacles(ctx, mob, target, speed);
     }
   } else {
     mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
@@ -434,9 +434,12 @@ function updatePursuitProfileCombat(
 
   if (dist2d(mob.pos, target.pos) > profile.desiredRange) {
     if (!ctx.isRooted(mob)) {
-      ctx.moveToward(
+      // Straight at the target, and round a wall the straight chase has stopped
+      // dead on (mob/chase_route.ts) instead of standing against it.
+      chaseAroundObstacles(
+        ctx,
         mob,
-        target.pos,
+        target,
         mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob),
       );
     } else {
@@ -444,6 +447,8 @@ function updatePursuitProfileCombat(
     }
   } else {
     mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
+    // Where it wants to stand: whatever route brought it here is done with.
+    clearChaseRoute(mob);
   }
 
   if (

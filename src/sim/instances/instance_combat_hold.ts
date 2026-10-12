@@ -4,7 +4,9 @@
 // leave the slot (the exit portal, a room crossing, or any teleport out), die,
 // or escape through stealth. Neither the soft leash nor the hard tether ever
 // sends the mob home, so dragging a pull around the slot resets nothing. A mob
-// that cannot get to its target (pinned by geometry, the unreachable stall)
+// whose straight chase is stopped by geometry first walks a route round it
+// (mob/chase_route.ts); only a mob NO route brings to its target (the
+// unreachable stall: a perch, a sealed room, a way round too far to search)
 // holds in place in an evade stance: immune to damage while it is stuck
 // (combat/damage.ts), no swings, casts, or mechanics (mob/locomotion.ts), aggro
 // intact; it resumes the moment the target is back in reach or the way is open,
