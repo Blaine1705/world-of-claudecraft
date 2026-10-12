@@ -332,8 +332,12 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // feature/world-quests: the playtest move of one Evergarden hedge_knight camp
     // out of the wisp maze (c43178a68c) forks the shared stream, and moving that
     // camp back restores every release literal in this file (verified); the koi
-    // now lands on session index 17.
-    expect(koiSession).toBe(17);
+    // now lands on session index 17. Re-hunted for the four built dungeon
+    // entrances (src/sim/*_entrance.ts): their colliders push the spawn point of
+    // three neighbouring world mobs, the Wildheart Basin door moved and the Idol
+    // Guardian's camp with it, and every world mob's idle wander draws from the
+    // shared stream, so it forks again; the koi now lands on session index 3.
+    expect(koiSession).toBe(3);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -387,19 +391,22 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // reshaped world moves every shared-stream index downstream. Re-recorded in
     // order once more for the release/v0.43.0 merge into feature/world-quests,
     // for the moved Evergarden hedge_knight camp (c43178a68c) named above.
+    // Re-recorded in order, one at a time, for the four built dungeon entrances
+    // named at the koi hunt above (195, 61, 132 to 45, 0, 14). The heartwood's
+    // 0 is a real first-harvest hit of the 1-in-90 event, not a skipped hunt.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 195 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 45 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 61,
+        hitAt: 0,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 132,
+        hitAt: 14,
       },
     ];
     for (const hunt of hunts) {
@@ -469,8 +476,9 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // against the merged tree: combining the real HARVEST_CAST_SECONDS cast
     // (Intentional Gathering PR3) with the release's Eastbrook/Drakelands
     // world-layout re-hunt yields 2; the release/v0.43.0 merge into
-    // feature/world-quests yields 9 (the moved hedge_knight camp, c43178a68c).
-    expect(hitAt).toBe(9);
+    // feature/world-quests yields 9 (the moved hedge_knight camp, c43178a68c);
+    // the four built dungeon entrances (named at the koi hunt above) yield 1.
+    expect(hitAt).toBe(1);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     // The signature rides materialSources, not instance.signer (the two are
     // mutually exclusive; corpse_harvest_grant.test.ts / corpse_harvest_sim.test.ts
