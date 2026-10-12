@@ -14,10 +14,10 @@ import {
   snapCoord,
   updateEntityFields,
 } from '../src/editor/dungeon/dungeon_draft_core';
-import { INFERNAL_ABYSS_LAYOUT } from '../src/sim/dungeon_layout';
+import { AUTHORED_DUNGEON_FIXTURE } from './fixtures/authored_dungeon_layout';
 
-// Pure dungeon-editing model: draft round-trip against the real authored
-// Infernal Abyss layout, deep-clone isolation, hit testing, and mutations.
+// Pure dungeon-editing model: draft round-trip against an authored room-graph
+// layout fixture, deep-clone isolation, hit testing, and mutations.
 
 function smallDraft(): DungeonDraft {
   return {
@@ -37,9 +37,9 @@ function smallDraft(): DungeonDraft {
 }
 
 describe('editor dungeon draft core', () => {
-  it('round-trips the Infernal Abyss layout and recomputes the derived shell', () => {
-    const draft = draftFromLayout(INFERNAL_ABYSS_LAYOUT);
-    const out = draftToLayout(INFERNAL_ABYSS_LAYOUT, draft);
+  it('round-trips an authored layout and recomputes the derived shell', () => {
+    const draft = draftFromLayout(AUTHORED_DUNGEON_FIXTURE);
+    const out = draftToLayout(AUTHORED_DUNGEON_FIXTURE, draft);
     expect(out.zMin).toBe(-25);
     expect(out.zMax).toBe(232);
     expect(out.wallX).toBe(82);
@@ -47,12 +47,12 @@ describe('editor dungeon draft core', () => {
     expect(out.floorHalfX).toBe(82);
     expect(out.sideWallZ).toBe(103.5);
     expect(out.sideWallHd).toBe(128.5);
-    expect(out.rooms).toEqual(INFERNAL_ABYSS_LAYOUT.rooms);
-    expect(out.doors).toEqual(INFERNAL_ABYSS_LAYOUT.doors);
-    expect(out.barriers).toEqual(INFERNAL_ABYSS_LAYOUT.barriers);
-    expect(out.visualOpenings).toEqual(INFERNAL_ABYSS_LAYOUT.visualOpenings);
-    expect(out.decor).toEqual(INFERNAL_ABYSS_LAYOUT.decor);
-    expect(out.dais).toEqual(INFERNAL_ABYSS_LAYOUT.dais);
+    expect(out.rooms).toEqual(AUTHORED_DUNGEON_FIXTURE.rooms);
+    expect(out.doors).toEqual(AUTHORED_DUNGEON_FIXTURE.doors);
+    expect(out.barriers).toEqual(AUTHORED_DUNGEON_FIXTURE.barriers);
+    expect(out.visualOpenings).toEqual(AUTHORED_DUNGEON_FIXTURE.visualOpenings);
+    expect(out.decor).toEqual(AUTHORED_DUNGEON_FIXTURE.decor);
+    expect(out.dais).toEqual(AUTHORED_DUNGEON_FIXTURE.dais);
   });
 
   it('fills missing authored lists with empty arrays', () => {
@@ -74,20 +74,20 @@ describe('editor dungeon draft core', () => {
   });
 
   it('deep-clones so mutations never alias the source layout or snapshot', () => {
-    const draft = draftFromLayout(INFERNAL_ABYSS_LAYOUT);
+    const draft = draftFromLayout(AUTHORED_DUNGEON_FIXTURE);
     const snapshot = cloneDraft(draft);
     moveEntity(draft, { kind: 'room', index: 0 }, 2, 3);
     moveEntity(draft, { kind: 'decor', index: 0 }, 1, 0);
     moveEntity(draft, { kind: 'dais', index: 0 }, 5, 0);
-    expect(INFERNAL_ABYSS_LAYOUT.rooms?.[0]).toEqual({
+    expect(AUTHORED_DUNGEON_FIXTURE.rooms?.[0]).toEqual({
       id: 'ashen_descent_entrance',
       x0: -18,
       x1: 18,
       z0: -25,
       z1: 5,
     });
-    expect(INFERNAL_ABYSS_LAYOUT.decor?.[0].x).toBe(-12);
-    expect(INFERNAL_ABYSS_LAYOUT.dais).toEqual({ x: 0, z: 222, r: 18 });
+    expect(AUTHORED_DUNGEON_FIXTURE.decor?.[0].x).toBe(-12);
+    expect(AUTHORED_DUNGEON_FIXTURE.dais).toEqual({ x: 0, z: 222, r: 18 });
     expect(snapshot.rooms[0]).toEqual({
       id: 'ashen_descent_entrance',
       x0: -18,

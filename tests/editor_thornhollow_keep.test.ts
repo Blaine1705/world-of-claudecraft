@@ -33,7 +33,7 @@ const map = thornhollowMap('Thornhollow', 'keep_test', 1);
 // Mirrors the module's own constants; kept here so a layout change that moves a
 // wall has to move this too rather than silently passing.
 const KEEP_TOP_Y = 11;
-const RAMPART_Y = 5.7;
+const RAMPART_Y = 5.75;
 const PODIUM_Y = 2.5;
 const KEEP_HALF_X = 46;
 const KEEP_FRONT_Z = 135;

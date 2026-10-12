@@ -7,7 +7,8 @@
 // - Collision wireframe: the SIM'S resolved colliders drawn live around the
 //   player (render/collision_debug.ts), the ground truth the editor's
 //   hitbox overlay must agree with.
-// - God mode: hp pinned to max (offline sim only, which playtest always is).
+// - God mode: true invulnerability via Sim.setDevGod (src/sim/authored_world_hooks.ts,
+//   refused outside an authored world); hp pinned to max as the fallback.
 // - Speed x3: wraps sim.moveSpeedMult (the deps bind it late, so the wrap
 //   takes effect immediately and unwraps cleanly).
 // - Dev badges: the renderer's built-in perf/debug badges.
@@ -33,6 +34,8 @@ interface DevGame {
       pos: { x: number; y: number; z: number };
     };
     moveSpeedMult(e: unknown): number;
+    playerId?: number;
+    setDevGod?(on: boolean, pid: number): boolean;
   };
   renderer: { scene: THREE.Group; showDevBadges: boolean };
 }
@@ -140,7 +143,10 @@ export function mountPlaytestDevPanel(): void {
       }
     }),
     row('God mode', (on) => {
-      if (on) {
+      const sim = game()?.sim;
+      // The offline Sim's own hook; false (refused or absent) falls back to the hp pin.
+      const viaSim = sim?.playerId !== undefined && sim.setDevGod?.(on, sim.playerId) === true;
+      if (on && !viaSim) {
         godTimer = window.setInterval(() => {
           const g = game();
           if (g) g.sim.player.hp = g.sim.player.maxHp;

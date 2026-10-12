@@ -2199,7 +2199,9 @@ const MONOLITHS: MonolithRow[] = [
     // decoration collider builder moving out to decoration_collider.ts. wc -l. Exact count.
     // Lowered after the ClaudeCraft Studio merge moved its inline code into
     // sibling modules (v0.45.0); exact count.
-    ceiling: 2493,
+    // Lowered 2493 -> 2441 when crossesFence moved verbatim to fence_crossing.ts
+    // (with the restored Studio fence-placement arm). wc -l, exact count.
+    ceiling: 2441,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

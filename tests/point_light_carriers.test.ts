@@ -479,10 +479,6 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the stadium banner and crown lights, pushed into fireLights by the renderer before the constructor mass hide',
   'render/fluid_surfaces.ts':
     'fluid pool lights, pushed into fireLights at boot and re-adopted through the fireLights adopter on an editor rebuild',
-  'render/infernal_abyss_dressing.ts':
-    'Infernal Abyss lava and prop lights pushed through the fireLights sink its caller hands it, like the dungeon interiors',
-  'render/infernal_door_portal.ts':
-    'the Infernal Abyss gate glows inside the door entity view body (buildDoorBody), view lights marked on reconcile',
   'render/placed_assets.ts':
     'the placed fire-light pool, adoptDynamicBudgetLight into the PlacedLightRegistry (the renderer budgetLights)',
   'render/wizard_portal.ts':

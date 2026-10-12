@@ -18,8 +18,10 @@ import { terrainHeight } from '../src/sim/world';
 
 const SEED = 4242;
 
+// No mob camps: the pools sit near the built-in world's origin, where a nearby
+// Forest Wolf would otherwise aggro, land melee hits and pollute the HP deltas below.
 function world(extra: Partial<WorldContent>): WorldContent {
-  return { ...BUILTIN_WORLD, ...extra };
+  return { ...BUILTIN_WORLD, camps: [], ...extra };
 }
 
 afterEach(() => {

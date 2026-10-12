@@ -1,3 +1,4 @@
+import { applyLinkedMapTerrain, authoredSlateBase, inLinkedMapRect } from './authored_terrain_base';
 import { bgFieldHeightLocal } from './battleground_field';
 import { BORDER_EDGES } from './border_edges';
 import { EMBER_BAYS, EMBER_LAND_LOBES, forgefatherScatterExcluded } from './content/ember_coast';
@@ -2831,6 +2832,7 @@ export function inFatigueFreeWater(x: number, z: number): boolean {
 // is the world's actual end again.
 export function inHollowOpenSea(x: number, z: number): boolean {
   if (x > DUNGEON_X_THRESHOLD) return false;
+  if (inLinkedMapRect(x, z)) return false; // a linked map's rect is ground
   // the Mirrorshallow: enclosed lake water, never open sea
   if (Math.hypot(x - 152, z - 1112) < 42) return false;
   // every designed crossing corridor (the moats, the straits' channel and
@@ -3474,8 +3476,7 @@ function baseHeight(
   return carveSeaChannels(x, z, h, WATER_LEVEL);
 }
 
-// The custom-map edit layer (the sculpt brushes, applyEditLayer) lives in
-// terrain_edit_layer.ts; terrainHeightUnpadded applies it last.
+// The custom-map edit layer (sculpt brushes) lives in terrain_edit_layer.ts.
 export { inAuthoredHeightStamp, invalidateTerrainEditIndex } from './terrain_edit_layer';
 
 // The Highwatch stables paddock plateau (STABLE_FLAT): the worked yard leveled
@@ -4024,6 +4025,8 @@ function borderSeaGate(x: number, z: number): number {
 }
 
 function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = false): number {
+  const slate = authoredSlateBase(x, z, seed, baseHeight); // authored maps only
+  if (slate !== undefined) return skipEdits ? slate : applyEditLayer(x, z, slate);
   const region = terrainRegionAt(x, z);
   let h = baseHeight(x, z, seed, region);
 
@@ -4489,12 +4492,9 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
     ? stableFlattenWeight(x, z)
     : 0;
   if (stable > 0) h = lerp(h, STABLE_FLAT.height, stable);
-  // The custom-map sculpt edits are the LAST word over the finished overworld
-  // height (the editor's height stamps; a no-op for the built-in world, which has
-  // no terrainEdits). Kept in terrainHeight so the render mesh (which samples
-  // terrainHeight) and the sim's groundHeight both see the edited ground.
-  // skipEdits serves terrainHeightSansEdits (the open-sea predicate) alone:
-  // every gameplay and render height keeps the edited ground.
+  // A linked map's terrain in its rect, then the sculpt edits as the LAST word
+  // (no-ops in the built-in world); skipEdits: terrainHeightSansEdits alone.
+  h = applyLinkedMapTerrain(x, z, seed, h, baseHeight);
   return skipEdits ? h : applyEditLayer(x, z, h);
 }
 

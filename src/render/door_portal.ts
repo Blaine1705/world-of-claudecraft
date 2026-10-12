@@ -6,7 +6,6 @@ import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
-import { buildInfernalDoorBody } from './infernal_door_portal';
 import { markOwnedMaterial, markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { applyWornStone } from './worn_stone';
 
@@ -514,7 +513,7 @@ function flameClone(height: number, color: number): THREE.Group {
 export function buildRiftGateBody(
   lowGfx: boolean,
   tier: RiftTier = 'A',
-): { body: THREE.Group; portal?: THREE.Mesh; height?: number } | null {
+): { body: THREE.Group; portal?: THREE.Mesh } | null {
   if (!riftGateGltf) return null;
   const body = new THREE.Group();
   const gate = riftGateGltf.scene.clone(true);
@@ -1017,8 +1016,7 @@ export function buildDoorBody(
   entering: boolean,
   dungeonId: string | null | undefined,
   lowGfx: boolean,
-): { body: THREE.Group; portal?: THREE.Mesh; height?: number } {
-  if (entering && dungeonId === 'infernal_abyss') return buildInfernalDoorBody(lowGfx);
+): { body: THREE.Group; portal?: THREE.Mesh } {
   const body = new THREE.Group();
   // Doors whose visible arch is authored elsewhere render only an invisible
   // click-box: the Nythraxis crypt arch is baked into that dungeon's

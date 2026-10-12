@@ -806,6 +806,11 @@ describe('category policy', () => {
       'battleground',
       'biome',
       'city',
+      // Studio merge: painted ground clutter, baked into world InstancedMeshes
+      'clutter',
+      // Studio merge: the Deepglass venue kit (world renderer only; the crowd
+      // atlas the portrait rig bakes draws character models, never this root)
+      'deepglass',
       // the Drakelands rebuild kit: placer-built world dressing, drawn only
       // by the world renderer through the env-prop template cache
       'drakelands_kit',
@@ -815,10 +820,15 @@ describe('category policy', () => {
       'props',
       'quest',
       'resources',
+      // Studio merge: the Tidehold buildings and their wall kit
+      'tidehold',
+      'tidehold_kit',
       'world_quests',
     ]);
     expect([...KTX2_MIP_EXEMPT_MODEL_ROOTS]).toEqual([
       'chars',
+      // Studio merge: the Brennoch thrustpack rides a character's chest seat
+      'cosmetics',
       'creatures',
       'mounts',
       'tools',

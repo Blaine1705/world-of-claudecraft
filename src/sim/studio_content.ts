@@ -1,15 +1,12 @@
 // Studio fork content that belongs to AUTHORED maps, never to the built-in world.
 //
 // The Studio merge brought the fork's own game content along with the map
-// editor: the Infernal Abyss dungeon and its quest chain, the Scorching Wastes
-// roster, Goldcrest Harbor's Deepglass steward, the Emberwake trophy items,
+// editor: the Scorching Wastes roster, Goldcrest Harbor's Deepglass steward,
 // the map-objectives rehearsal champion and the Deepglass venue's roster (the
 // marshal, the crowd, Tidehold's residents, Baldemar's selves, the Tidesow).
 // Registered in the built-in lookup tables, every one of those changes the
-// default world: the Abyss door and its instance slot take entity ids
-// (shifting every later id), its index-6 band narrows the arena band, the
-// quest and item rows grow every saved character, and every NPC row is ringed
-// by a terrain calm pad. So the built-in tables stay exactly the release's,
+// default world: the quest and item rows grow every saved character, and every
+// NPC row is ringed by a terrain calm pad. So the built-in tables stay exactly the release's,
 // and this overlay is merged into them only while an authored map is the
 // active content (data.ts setActiveWorldContent), then removed again when the
 // built-in world comes back.
@@ -18,15 +15,7 @@
 // and hands them in, so this module never imports data.ts (no value cycle).
 
 import { DEEPGLASS_EVENT_NPCS } from './content/deepglass_event';
-import { EMBERWAKE_ITEMS } from './content/emberwake_items';
 import { GOLDCREST_NPCS, GOLDCREST_ZONE } from './content/goldcrest';
-import {
-  INFERNAL_ABYSS_DUNGEON_DEFS,
-  INFERNAL_ABYSS_ITEMS,
-  INFERNAL_ABYSS_MOBS,
-  INFERNAL_ABYSS_QUEST_ORDER,
-  INFERNAL_ABYSS_QUESTS,
-} from './content/infernal_abyss';
 import { OBJECTIVE_BOT_MOB, OBJECTIVE_BOT_TEMPLATE_ID } from './content/objective_bots';
 import {
   SCORCHING_ITEMS,
@@ -59,12 +48,8 @@ export const STUDIO_CONTENT = {
   // Registered with the venue so the built-in ability inventory stays the
   // release's.
   abilities: { ...DEEPBALL_ABILITIES } as Record<string, AbilityDef>,
-  items: { ...INFERNAL_ABYSS_ITEMS, ...SCORCHING_ITEMS, ...EMBERWAKE_ITEMS } as Record<
-    string,
-    ItemDef
-  >,
+  items: { ...SCORCHING_ITEMS } as Record<string, ItemDef>,
   mobs: {
-    ...INFERNAL_ABYSS_MOBS,
     ...SCORCHING_MOBS,
     [OBJECTIVE_BOT_TEMPLATE_ID]: OBJECTIVE_BOT_MOB,
     // The Deepglass Tidesow: an inert ball entity the match driver spawns.
@@ -84,18 +69,17 @@ export const STUDIO_CONTENT = {
     ...DEEPGLASS_EVENT_NPCS,
     ...TIDEHOLD_NPCS,
   } as Record<string, NpcDef>,
-  quests: { ...INFERNAL_ABYSS_QUESTS, ...SCORCHING_QUESTS } as Record<string, QuestDef>,
-  questOrder: [...INFERNAL_ABYSS_QUEST_ORDER, ...SCORCHING_QUEST_ORDER] as readonly string[],
-  dungeons: { ...INFERNAL_ABYSS_DUNGEON_DEFS } as Record<string, DungeonDef>,
+  quests: { ...SCORCHING_QUESTS } as Record<string, QuestDef>,
+  questOrder: [...SCORCHING_QUEST_ORDER] as readonly string[],
+  // No Studio dungeon is registered today; the slot (and its list/index
+  // bookkeeping below) stays for the next authored-map dungeon.
+  dungeons: {} as Record<string, DungeonDef>,
   // Name lookup only, never merged into ZONES: an authored map carries its
   // own zone list (the Goldcrest map document declares this zone itself), and
   // the built-in ZONES fold the world's bounds and terrain at load.
   zones: [GOLDCREST_ZONE] as readonly ZoneDef[],
-  // Quest ids a built-in NPC also offers on an authored map: the Infernal
-  // Abyss chain starts with Loremaster Caddis in the Thornpeak.
-  npcQuestIds: {
-    loremaster_caddis: [...INFERNAL_ABYSS_QUEST_ORDER],
-  } as Record<string, readonly string[]>,
+  // Quest ids a built-in NPC also offers on an authored map (none today).
+  npcQuestIds: {} as Record<string, readonly string[]>,
 } as const;
 
 /** The live tables the overlay writes into (data.ts passes its own). */

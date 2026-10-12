@@ -8,7 +8,6 @@ import {
   castCueForAbility,
   consumeHealCue,
   dispatchVarkhulCalloutSfx,
-  dragonAttackCue,
   groundTickAbilityCue,
   healAudioPlan,
   impactCueForDamage,
@@ -548,11 +547,7 @@ describe('combat SFX policy', () => {
     // Every other frost spell (Ice Lance, etc.) keeps the shared impact_frost.
     expect(
       impactCueForDamage(
-        damage({
-          school: 'frost',
-          ability: 'Ice Lance',
-          abilityId: 'ice_lance',
-        }),
+        damage({ school: 'frost', ability: 'Ice Lance', abilityId: 'ice_lance' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_frost');
@@ -561,22 +556,14 @@ describe('combat SFX policy', () => {
   it('gives Aether Surge (arcane_surge) the arcane_blast cue instead of the shared impact_arcane', () => {
     expect(
       impactCueForDamage(
-        damage({
-          school: 'arcane',
-          ability: 'Aether Surge',
-          abilityId: 'arcane_surge',
-        }),
+        damage({ school: 'arcane', ability: 'Aether Surge', abilityId: 'arcane_surge' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('arcane_blast');
     // Every other arcane spell keeps the shared impact_arcane.
     expect(
       impactCueForDamage(
-        damage({
-          school: 'arcane',
-          ability: 'Arcane Missiles',
-          abilityId: 'arcane_missiles',
-        }),
+        damage({ school: 'arcane', ability: 'Arcane Missiles', abilityId: 'arcane_missiles' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_arcane');
@@ -600,11 +587,7 @@ describe('combat SFX policy', () => {
     // Every other physical rogue strike keeps the shared material impact.
     expect(
       impactCueForDamage(
-        damage({
-          school: 'physical',
-          ability: 'Mutilate',
-          abilityId: 'mutilate',
-        }),
+        damage({ school: 'physical', ability: 'Mutilate', abilityId: 'mutilate' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_bone');
@@ -617,11 +600,7 @@ describe('combat SFX policy', () => {
     // exactly like the HoT tick-silencing precedent (#2271, heal side).
     expect(
       impactCueForDamage(
-        damage({
-          school: 'physical',
-          ability: 'Bleed Out',
-          abilityId: 'rupture',
-        }),
+        damage({ school: 'physical', ability: 'Bleed Out', abilityId: 'rupture' }),
         target('mob', 'crypt_shambler'),
       ),
     ).toBe('impact_bone');
@@ -708,11 +687,7 @@ describe('combat SFX policy', () => {
     // display-only rename can't silently reintroduce the double cue.
     expect(
       impactCueForDamage(
-        damage({
-          school: 'fire',
-          ability: 'Molten Rift',
-          abilityId: 'rift_hazard_molten',
-        }),
+        damage({ school: 'fire', ability: 'Molten Rift', abilityId: 'rift_hazard_molten' }),
         target('player', 'player'),
       ),
     ).toBeNull();
@@ -890,12 +865,7 @@ describe('combat SFX policy', () => {
   });
 
   it('classifies gained aura polarity and stays silent on removal or missing state', () => {
-    const gained = {
-      type: 'aura',
-      targetId: 1,
-      name: 'Test Aura',
-      gained: true,
-    } as const;
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, aura('buff_ap'))).toBe('buff_apply');
     expect(auraApplyCue(gained, aura('dot'))).toBe('debuff_apply');
     expect(auraApplyCue(gained, aura('buff_ap', -5))).toBe('debuff_apply');
@@ -907,24 +877,14 @@ describe('combat SFX policy', () => {
   });
 
   it('gives Ice Block its own apply cue instead of the shared buff_apply', () => {
-    const gained = {
-      type: 'aura',
-      targetId: 1,
-      name: 'Test Aura',
-      gained: true,
-    } as const;
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, { ...aura('buff_ap'), id: 'ice_block' })).toBe('ice_block');
     // Every other buff keeps the shared chime.
     expect(auraApplyCue(gained, { ...aura('buff_ap'), id: 'ice_barrier' })).toBe('buff_apply');
   });
 
   it('gives Cloak of Shadows its own apply cue too (an absorb aura, same apply path)', () => {
-    const gained = {
-      type: 'aura',
-      targetId: 1,
-      name: 'Test Aura',
-      gained: true,
-    } as const;
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, { ...aura('absorb'), id: 'cloak_of_shadows' })).toBe(
       'cloak_of_shadows',
     );
@@ -933,12 +893,7 @@ describe('combat SFX policy', () => {
   });
 
   it('gives Vanish and Stealth their own apply cue too (toggle stealth selfBuffs, same apply path)', () => {
-    const gained = {
-      type: 'aura',
-      targetId: 1,
-      name: 'Test Aura',
-      gained: true,
-    } as const;
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'vanish' })).toBe('vanish');
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'stealth' })).toBe('stealth');
   });
@@ -949,12 +904,7 @@ describe('combat SFX policy', () => {
     for (const id of ['greater_invisibility', 'prowl', 'shadowform']) {
       expect(ABILITIES[id]?.id).toBe(id);
     }
-    const gained = {
-      type: 'aura',
-      targetId: 1,
-      name: 'Test Aura',
-      gained: true,
-    } as const;
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'greater_invisibility' })).toBe(
       'stealth',
     );
@@ -973,46 +923,6 @@ describe('combat SFX policy', () => {
     expect(weaponSwingCue(druid)).toBe('melee_unarmed');
     druid.auras = [aura('form_cat')];
     expect(weaponSwingCue(druid)).toBe('melee_unarmed');
-  });
-
-  // Vaelgrath (the Emberwake world boss) has his own procedural voice bank
-  // instead of the shared dragonkin barks, see game/dragon_audio.ts.
-  it('routes the Emberwake boss to his own subfamily voice when it is staged', () => {
-    const staged = (key: string) => key.startsWith('mob_dragonkin_vaelgrath_');
-    expect(mobVoiceCue('emberwake_vaelgrath', 'aggro', staged)).toBe(
-      'mob_dragonkin_vaelgrath_aggro',
-    );
-    expect(mobVoiceCue('emberwake_vaelgrath', 'attack', staged)).toBe(
-      'mob_dragonkin_vaelgrath_attack',
-    );
-    expect(mobVoiceCue('emberwake_vaelgrath', 'death', staged)).toBe(
-      'mob_dragonkin_vaelgrath_death',
-    );
-  });
-
-  it('falls back to the shared dragonkin barks when his bank never installed', () => {
-    // A stubbed/limited AudioContext skips procedural synthesis entirely; he
-    // must still make a noise rather than resolving to a silent key.
-    const none = () => false;
-    expect(mobVoiceCue('emberwake_vaelgrath', 'aggro', none)).toBe('mob_dragonkin_aggro');
-    expect(mobVoiceCue('emberwake_vaelgrath', 'attack', none)).toBe('mob_dragonkin_attack');
-  });
-
-  it('maps his typed attack beats to their cues, sharing one key for the chomp', () => {
-    expect(dragonAttackCue('dragon-breath')).toBe('dragon_breath');
-    expect(dragonAttackCue('dragon-buffet')).toBe('dragon_wing');
-    // Both bites resolve to the melee voice key on purpose: the scripted chomp
-    // fires an animation cue AND a damage event, and one shared key lets the
-    // engine's per-key cooldown collapse them into a single bite.
-    expect(dragonAttackCue('dragon-bite')).toBe('mob_dragonkin_vaelgrath_attack');
-    expect(dragonAttackCue('dragon-ground-bite')).toBe('mob_dragonkin_vaelgrath_attack');
-  });
-
-  it('leaves every non-dragon animation cue alone', () => {
-    expect(dragonAttackCue('ranged-shot')).toBeNull();
-    expect(dragonAttackCue('worm-slam')).toBeNull();
-    expect(dragonAttackCue(undefined)).toBeNull();
-    expect(dragonAttackCue(null)).toBeNull();
   });
 
   it('plays attempted physical swings for avoidance but not magic or Auto Shot impact', () => {

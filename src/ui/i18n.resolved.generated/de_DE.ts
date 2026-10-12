@@ -13833,8 +13833,6 @@ export const de_DE: EnTranslations = {
       "tool_recharge": "Aufladen",
       "demonHeal": "Dämonenheilung",
       "thunzharrStormcall": "Sturmruf",
-      "forgekeepersWrath": "Forgekeeper's Wrath",
-      "azazelApocalypseFlame": "Apocalypse Flame",
       "rift_frost_execution": "Gletschergrab",
       "rift_frost_strike": "Absoluter Nullpunkt",
       "rift_ember_execution": "Magmaquelle",
@@ -20088,57 +20086,6 @@ export const de_DE: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Kriegsstab der Vorhut"
       },
-      "infernal_slag": {
-        "name": "Abyssal Slag"
-      },
-      "charred_legion_tablet": {
-        "name": "Charred Legion Tablet"
-      },
-      "brands_of_the_first_flame": {
-        "name": "Brands of the First Flame"
-      },
-      "forgekeepers_ledger": {
-        "name": "Forgekeeper's Ledger"
-      },
-      "azazels_broken_covenant": {
-        "name": "Azazel's Broken Covenant"
-      },
-      "emberforged_vambraces": {
-        "name": "Emberforged Vambraces"
-      },
-      "cinderthread_mantle": {
-        "name": "Cinderthread Mantle"
-      },
-      "hellstalker_boots": {
-        "name": "Hellstalker Boots"
-      },
-      "forgekeepers_warhammer": {
-        "name": "Forgekeeper's Warhammer"
-      },
-      "forgekeepers_runestaff": {
-        "name": "Forgekeeper's Runestaff"
-      },
-      "forgekeepers_fang": {
-        "name": "Forgekeeper's Fang"
-      },
-      "azazels_ruinblade": {
-        "name": "Azazel's Ruinblade"
-      },
-      "azazels_soulstaff": {
-        "name": "Azazel's Soulstaff"
-      },
-      "azazels_emberfang": {
-        "name": "Azazel's Emberfang"
-      },
-      "hellforged_bulwark": {
-        "name": "Hellforged Bulwark"
-      },
-      "cinderseer_raiment": {
-        "name": "Cinderseer Raiment"
-      },
-      "abysswalker_harness": {
-        "name": "Abysswalker Harness"
-      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },
@@ -21790,33 +21737,6 @@ export const de_DE: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "Zulgar, Stimme des Beckens"
-      },
-      "abyssal_legionnaire": {
-        "name": "Abyssal Legionnaire"
-      },
-      "cinder_magus": {
-        "name": "Cinder Magus"
-      },
-      "molten_hellhound": {
-        "name": "Molten Hellhound"
-      },
-      "flamebound_smith": {
-        "name": "Flamebound Smith"
-      },
-      "abyssal_gladiator": {
-        "name": "Abyssal Gladiator"
-      },
-      "infernal_cinderling": {
-        "name": "Abyssal Cinderling"
-      },
-      "forgekeeper": {
-        "name": "The Forgekeeper"
-      },
-      "pyre_golem": {
-        "name": "Pyre Golem"
-      },
-      "azazel_infernal_lord": {
-        "name": "Azazel the Abyssal Lord"
       },
       "ironvein_foreman": {
         "name": "Eisenader-Vorarbeiter"
@@ -25264,42 +25184,6 @@ export const de_DE: EnTranslations = {
           }
         }
       },
-      "q_infernal_abyss_echoes": {
-        "title": "Echoes Beneath Stormcrag",
-        "text": "Stormcrag was not born from a storm, {playerName}. The oldest tablets call it a lid, hammered over a fire that fell from beyond the world. A new fissure has opened beneath the eastern crag. Enter it with four allies and recover the legion tablet and the brands carved beside the first flame.",
-        "completion": "The tablet names a host that marched willingly into the fire. The brands name the power they served: Azazel. This was never a prison built to keep demons out, {playerName}. It was a gate built to let their lord in.",
-        "objectives": {
-          "0": {
-            "label": "Charred Legion Tablet deciphered"
-          },
-          "1": {
-            "label": "Brands of the First Flame studied"
-          }
-        }
-      },
-      "q_infernal_abyss_covenant": {
-        "title": "The Broken Covenant",
-        "text": "The legion's oath promised Azazel a road into our world, but every covenant has a price and a flaw. Return to the Molten Abyss. Find the Forgekeeper's ledger and the broken covenant near the Maw. If we learn what bound him, we may learn how he can be slain.",
-        "completion": "Here is the flaw: Azazel fed the gate with the names of his own legion. Every servant consumed made him stronger, but tied his life to the forge below. Break the lord in the heart of that forge, and the gate must die with him.",
-        "objectives": {
-          "0": {
-            "label": "Forgekeeper's Ledger recovered"
-          },
-          "1": {
-            "label": "Azazel's Broken Covenant read"
-          }
-        }
-      },
-      "q_infernal_abyss_azazel": {
-        "title": "Lord of the Molten Abyss",
-        "text": "The covenant gives us one chance, {playerName}. Descend past the forge and the Maw with companions you trust. Face Azazel where the first flame touches our world, endure his legions, and extinguish the Abyssal Lord before Stormcrag becomes his open gate.",
-        "completion": "The mountain is quiet. Not sleeping, not waiting, simply quiet. Azazel built eternity from stolen names, and you ended it with one mortal name of your own. Highwatch will remember it, {playerName}.",
-        "objectives": {
-          "0": {
-            "label": "Azazel the Abyssal Lord slain"
-          }
-        }
-      },
       "q_drowned_choir": {
         "title": "Der Ertränkte Chor",
         "text": "Die Wäter handeln nicht allein. Unter ihnen wandeln die Ertränkten Andächtigen — der Kult, der mit dem Tempel versank, noch immer in seinen verfaulten Gewändern, noch immer das Gebet von den Uferfelsen singend. Bringe acht von ihnen zum Schweigen und bring mir sechs der Opfergaben, die sie bei sich tragen. Ich will wissen, was sie ihrer Göttin darbringen wollen.",
@@ -25896,11 +25780,6 @@ export const de_DE: EnTranslations = {
         "name": "Schloss Dawnhold",
         "enterText": "Du trittst in die warmen, blumenduftenden Hallen von Schloss Dawnhold ein.",
         "leaveText": "Du schlüpfst wieder hinaus auf den sonnenbeschienenen Gartenrasen."
-      },
-      "infernal_abyss": {
-        "name": "Molten Abyss",
-        "enterText": "You descend beneath Stormcrag into the Molten Abyss.",
-        "leaveText": "You climb from the furnace-dark into the mountain wind."
       },
       "drowned_temple": {
         "name": "Der Ertränkte Tempel",

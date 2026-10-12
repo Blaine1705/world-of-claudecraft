@@ -326,18 +326,12 @@ describe('painted weapon inventory icons', () => {
     }
   });
 
-  // FORK: ten fork weapons (Infernal Abyss, Forgefather, Scorching Wastes) are
-  // authored but not yet painted; the coverage test above reds on them by
-  // design. This shipping-contract sweep reads the painted rest.
+  // FORK: four Scorching Wastes weapons are authored but not yet painted; the
+  // coverage test above reds on them by design. This shipping-contract sweep
+  // reads the painted rest.
   const FORK_UNPAINTED = new Set([
-    'azazels_emberfang',
-    'azazels_ruinblade',
-    'azazels_soulstaff',
     'duneforged_warblade',
     'emberglass_scepter',
-    'forgekeepers_fang',
-    'forgekeepers_runestaff',
-    'forgekeepers_warhammer',
     'glasscut_dirk',
     'sunbleached_staff',
   ]);

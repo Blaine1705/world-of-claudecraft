@@ -68,9 +68,12 @@ const KEEP_HALF_X = 46; // side curtains, outer line
 const CURTAIN_INSET = 5; // inner curtain line, and so the wall's thickness
 const KEEP_TOP_Y = 11; // keep plateau height above the ravine floor
 /** Height of the rampart walk over the plateau: the top of a scale-2.6 wall
- *  module (dungeon/wall bakes 2.21 tall at scale 1), so the walk lands exactly
- *  on the curtain it runs along instead of hovering over it. */
-const RAMPART_Y = 5.7;
+ *  module, so the walk lands on the curtain it runs along instead of hovering
+ *  over it. dungeon/wall's baked collision tops out at 2.209 at scale 1, so the
+ *  curtain's walkable top is 5.743; the deck sits a hair above that (never
+ *  under it), or the stair head meets a 0.04 yd lip on the curtain it cannot
+ *  climb. */
+const RAMPART_Y = 5.75;
 const DECK_W = 4.8; // rampart walk width, and the deck strip's true footprint
 
 // The flag court: the walled hall at the back of each keep.
@@ -1105,15 +1108,35 @@ function keepRampart(sz: -1): MapPlacement[] {
   }
 
   // -- the four stairs -----------------------------------------------------
-  // Each climbs from the courtyard floor straight at the side wall, so its top
-  // edge lands exactly on the side run's inner edge. Its footprint is a stair:
-  // the ground under it rises with it, which is what a stair is.
+  // Each climbs from the courtyard floor straight at the side wall. Its
+  // footprint is a stair: the ground under it rises with it, which is what a
+  // stair is. The inner curtain is solid up to the rampart height across its
+  // whole depth (dungeon/wall bakes 0.191 deep either side of its line at
+  // scale 1, so 0.5 yd at 2.6), so a flight that only topped out at the deck's
+  // edge would still be under the wall top where a body first brushes the
+  // wall's inner face, and the climb would stall at that lip. So each flight
+  // tops out one body clear of that face and a flat landing at rampart height
+  // carries the walk across the wall onto the side run.
   const STAIR_W = 5;
   const STAIR_RUN = 12;
-  const topX = mid - DECK_W / 2; // the deck's inner edge
+  const WALL_HALF_D = 0.5; // the curtain module's half depth at scale 2.6
+  const STAIR_CLEAR = 0.6; // past PLAYER_BODY_RADIUS (0.5)
+  const deckEdgeX = mid - DECK_W / 2; // the side run's inner edge
+  const topX = KEEP_HALF_X - CURTAIN_INSET - WALL_HALF_D - STAIR_CLEAR; // the flight's head
+  const landW = deckEdgeX + 0.5 - topX; // overlapping the side run by half a yard
   for (const sx of [-1, 1]) {
     for (const cz of [sz * 146, sz * 170]) {
       const cx = sx * (topX - STAIR_RUN / 2);
+      out.push(
+        deck(sx * (topX + landW / 2), cz, landW, STAIR_W, RAMPART_Y, 'Rampart landing'),
+        put('dungeon/floor_wood_large', sx * (topX + landW / 2), cz, {
+          scale: (STAIR_W / 2.2) * 1.02,
+          scaleX: landW / STAIR_W,
+          y: RAMPART_Y,
+          ...seated,
+          name: 'Stair landing',
+        }),
+      );
       out.push(
         rampDeck(
           cx,

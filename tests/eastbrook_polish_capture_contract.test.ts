@@ -700,7 +700,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted for the ClaudeCraft Studio import (PR 4479): Studio moved the renderer,
+  // town runtime, civic shader and ground-sample leaves (remint_polish_provenance.mjs
+  // on the merged tree). No Eastbrook capture or measured value changed.
+  'a889cc0e7ee97f1376bbb71cf7e660f55c5a79af6b85f2554df03b5df3db3425';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

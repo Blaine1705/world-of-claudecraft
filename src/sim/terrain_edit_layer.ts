@@ -9,16 +9,12 @@
 // the determinism contract (terrain height feeds the parity goldens).
 
 import { getActiveWorldContent } from './data';
+import { terrainBrushAlpha, terrainBrushWeight } from './terrain_brush';
 import { noiseStampWeight } from './terrain_noise_brush';
 import type { HeightStamp } from './types';
 
-// Byte-identical copies of world.ts's private helpers (same expressions, same
+// A byte-identical copy of world.ts's private helper (same expression, same
 // evaluation order), so a stamp evaluates to the same bits it did in place.
-function smoothstep(edge0: number, edge1: number, x: number): number {
-  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
-  return t * t * (3 - 2 * t);
-}
-
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
@@ -111,8 +107,17 @@ function applyStamp(e: HeightStamp, x: number, z: number, h: number): number {
   const d = Math.sqrt(dx * dx + dz * dz);
   if (d >= e.radius) return h;
   const t = d / e.radius; // 0 at centre, 1 at edge
-  // 'flat' = full delta out to the edge; 'smooth' = eased taper to 0.
-  const w = e.falloff === 'flat' ? 1 : 1 - smoothstep(0, 1, t);
+  // 'flat' = full delta out to the edge (shaped by the brush alpha when one is
+  // set); 'smooth' = the eased taper to 0 outside the brush's solid hardness
+  // core (terrain_brush.ts). A stamp with neither field keeps its original
+  // falloff bit for bit: terrainBrushWeight at hardness 0 is 1 - smoothstep(t).
+  const alphaArgs = e.alpha ? { id: e.alpha, u: dx / e.radius, v: dz / e.radius } : undefined;
+  const w =
+    e.falloff === 'flat'
+      ? alphaArgs
+        ? terrainBrushAlpha(alphaArgs.id, alphaArgs.u, alphaArgs.v)
+        : 1
+      : terrainBrushWeight(t, e.hardness ?? 0, alphaArgs);
   if (e.mode === 'level') {
     // A level target may be a tilted plane (HeightStamp.gx/gz): Smooth uses it
     // to level toward the ground's own local trend, so a slope keeps its slope

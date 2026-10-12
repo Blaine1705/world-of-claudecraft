@@ -151,8 +151,10 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/deepglass_goal_wave.ts': 2,
   // the crowd cards' card-edge fade and the goal-excite pulse, both clamped
   'src/render/deepglass_crowd_cards.ts': 2,
-  // the bell glass, the goal burst and the orb glow: three fresnel rims, clamped
-  'src/render/deepglass.ts': 3,
+  // the bell glass, the goal burst and the orb glow: three fresnel rims, clamped;
+  // the bell's climbing rings and the crown beam's height ramp and core, clamped
+  // or abs() (ClaudeCraft Studio import)
+  'src/render/deepglass.ts': 6,
   // the team aura's fresnel rim, used twice (alpha and the white edge lift)
   'src/render/deepglass_aura.ts': 2,
   // the Tidesow speed shell's fresnel rim
@@ -161,7 +163,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/jet_fire.ts': 2,
   // the brazier flame's taper ramp
   'src/render/placed_assets.ts': 1,
-  'src/render/dungeon.ts': 1,
+  // the Drowned Temple flood water's fresnel sheen (moved out of dungeon.ts)
+  'src/render/dungeon_temple_water.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
   'src/render/hoard_entrance.ts': 3,
   // the Buried Hoard glow cards, sparks, reward-chest rays and column (bases
@@ -178,6 +181,14 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   // (bases clamped with clamp(x, 0, 1) or max(x, 0))
   'src/render/realm_builder_monument_fx.ts': 5,
   'src/render/sky.ts': 1,
+  // ClaudeCraft Studio authored-map surfaces: the arena tide caustics (abs bases),
+  // the carve cavity, triplanar and wall-finish blend weights, and the built-model
+  // triplanar weights (all abs(normal) bases)
+  'src/render/arena_water.ts': 2,
+  'src/render/cut_cavity_mesh.ts': 1,
+  'src/render/triplanar_maps.ts': 1,
+  'src/render/wall_finishes.ts': 1,
+  'src/render/model_gen.ts': 1,
   'src/render/water.ts': 1,
   'src/render/weapon_vfx.ts': 4,
   'src/render/worn_stone.ts': 1,

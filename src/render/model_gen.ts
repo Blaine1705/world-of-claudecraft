@@ -83,8 +83,7 @@ uniform float uLight;
 // Blend weights: the face normal, sharpened so a face that mostly looks along
 // one axis takes almost all of that projection (soft only across true edges).
 vec3 wocTriWeights() {
-  vec3 w = abs( vTriNrm );
-  w = pow( w, vec3( 6.0 ) );
+  vec3 w = pow( abs( vTriNrm ), vec3( 6.0 ) );
   return w / max( w.x + w.y + w.z, 1e-5 );
 }
 vec4 wocTriSample( sampler2D tex, vec3 w ) {

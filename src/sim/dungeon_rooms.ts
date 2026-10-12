@@ -8,7 +8,7 @@ export interface AuthoredRoom {
   z1: number;
   /** Raised-floor height (world units) for the whole room. Omitted = 0 (flat).
    * A door joining rooms of different lift becomes a ramp (authoredLiftAt).
-   * Used by the Rift authored interiors; the Molten Abyss leaves it unset. */
+   * Used by the Rift authored interiors. */
   lift?: number;
 }
 

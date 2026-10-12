@@ -13833,8 +13833,6 @@ export const zh_CN: EnTranslations = {
       "tool_recharge": "充能",
       "demonHeal": "恶魔治疗",
       "thunzharrStormcall": "风暴召唤",
-      "forgekeepersWrath": "Forgekeeper's Wrath",
-      "azazelApocalypseFlame": "Apocalypse Flame",
       "rift_frost_execution": "冰川之墓",
       "rift_frost_strike": "绝对零度",
       "rift_ember_execution": "岩浆泉",
@@ -20088,57 +20086,6 @@ export const zh_CN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先锋之战杖"
       },
-      "infernal_slag": {
-        "name": "深渊熔渣"
-      },
-      "charred_legion_tablet": {
-        "name": "焦黑的军团石板"
-      },
-      "brands_of_the_first_flame": {
-        "name": "初焰烙印"
-      },
-      "forgekeepers_ledger": {
-        "name": "守炉者的账簿"
-      },
-      "azazels_broken_covenant": {
-        "name": "阿扎泽尔的破碎契约"
-      },
-      "emberforged_vambraces": {
-        "name": "余烬铸造护臂"
-      },
-      "cinderthread_mantle": {
-        "name": "灰烬丝线披肩"
-      },
-      "hellstalker_boots": {
-        "name": "狱行者长靴"
-      },
-      "forgekeepers_warhammer": {
-        "name": "守炉者的战锤"
-      },
-      "forgekeepers_runestaff": {
-        "name": "守炉者的符文法杖"
-      },
-      "forgekeepers_fang": {
-        "name": "守炉者之牙"
-      },
-      "azazels_ruinblade": {
-        "name": "阿扎泽尔的毁灭之刃"
-      },
-      "azazels_soulstaff": {
-        "name": "阿扎泽尔的灵魂法杖"
-      },
-      "azazels_emberfang": {
-        "name": "阿扎泽尔的余烬之牙"
-      },
-      "hellforged_bulwark": {
-        "name": "狱铸壁垒"
-      },
-      "cinderseer_raiment": {
-        "name": "灰烬先知法衣"
-      },
-      "abysswalker_harness": {
-        "name": "深渊行者胸甲"
-      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -21790,33 +21737,6 @@ export const zh_CN: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地之声祖尔加"
-      },
-      "abyssal_legionnaire": {
-        "name": "深渊军团士兵"
-      },
-      "cinder_magus": {
-        "name": "灰烬法师"
-      },
-      "molten_hellhound": {
-        "name": "熔岩地狱犬"
-      },
-      "flamebound_smith": {
-        "name": "缚焰铁匠"
-      },
-      "abyssal_gladiator": {
-        "name": "深渊角斗士"
-      },
-      "infernal_cinderling": {
-        "name": "深渊灰烬幼灵"
-      },
-      "forgekeeper": {
-        "name": "守炉者"
-      },
-      "pyre_golem": {
-        "name": "焚火魔像"
-      },
-      "azazel_infernal_lord": {
-        "name": "深渊领主阿扎泽尔"
       },
       "ironvein_foreman": {
         "name": "铁脉工头"
@@ -25264,42 +25184,6 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
-      "q_infernal_abyss_echoes": {
-        "title": "风暴岩下的回声",
-        "text": "风暴岩并非生于风暴，{playerName}。最古老的石板称它是一口盖子，用锤击封住了从世界之外坠落的烈火。东侧峭壁下出现了一道新的裂隙。带上四位盟友进入其中，取回军团石板，以及刻在初焰旁的烙印。",
-        "completion": "石板记载了一支自愿踏入烈火的大军。烙印则揭示了他们侍奉的力量：阿扎泽尔。这里从来不是为了把恶魔挡在外面而建的牢狱，{playerName}。它是一道迎接他们领主降临的大门。",
-        "objectives": {
-          "0": {
-            "label": "破译焦黑的军团石板"
-          },
-          "1": {
-            "label": "研究初焰烙印"
-          }
-        }
-      },
-      "q_infernal_abyss_covenant": {
-        "title": "破碎的契约",
-        "text": "军团的誓言许诺为阿扎泽尔开辟一条通往我们世界的道路，但每份契约都有代价，也都有破绽。返回熔岩深渊，在巨口附近寻找守炉者的账簿和破碎的契约。若能弄清是什么束缚了他，也许就能知道如何将他杀死。",
-        "completion": "破绽就在这里：阿扎泽尔以军团成员的名字供养大门。每吞噬一个仆从，他就变得更强，但他的生命也被系在了下方的熔炉上。在熔炉核心击败这位领主，大门就必将随他一同消亡。",
-        "objectives": {
-          "0": {
-            "label": "取回守炉者的账簿"
-          },
-          "1": {
-            "label": "阅读阿扎泽尔的破碎契约"
-          }
-        }
-      },
-      "q_infernal_abyss_azazel": {
-        "title": "熔岩深渊之主",
-        "text": "契约给了我们一次机会，{playerName}。和你信任的同伴一同深入，穿过熔炉与巨口。在初焰触及我们世界的地方直面阿扎泽尔，抵御他的军团，在风暴岩成为他敞开的大门之前，熄灭这位深渊领主。",
-        "completion": "山安静了。既非沉睡，也非等待，只是安静。阿扎泽尔以窃取的名字筑起永恒，而你以自己一个凡人的名字终结了它。高望会记住这个名字，{playerName}。",
-        "objectives": {
-          "0": {
-            "label": "击杀深渊领主阿扎泽尔"
-          }
-        }
-      },
       "q_drowned_choir": {
         "title": "溺亡唱诗班",
         "text": "那些涉行者并非孤身行动。它们之中游走着溺亡信徒——随神殿一同沉没的邪教徒，至今仍披着腐烂的法衣，仍在岸边礁石上吟唱祷词。让其中八名永远噤声，再为我带回它们随身携带的六件祭品。我想知道它们打算献给女神什么。",
@@ -25896,11 +25780,6 @@ export const zh_CN: EnTranslations = {
         "name": "晨曦堡",
         "enterText": "你走进晨曦堡温暖而花香四溢的厅堂。",
         "leaveText": "你回到阳光洒落的花园草坪上。"
-      },
-      "infernal_abyss": {
-        "name": "熔岩深渊",
-        "enterText": "你深入风暴岩下方，踏入熔岩深渊。",
-        "leaveText": "你从熔炉般的黑暗中爬出，迎上山间的风。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

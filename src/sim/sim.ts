@@ -24,6 +24,7 @@ import type {
 import type { GroundAimPointXZ } from '../world_api/combat';
 import { abilityNeedsLineOfSight } from './ability_line_of_sight';
 import { offlineActionBarRestore } from './action_bar_restore';
+import { playerStartPos, type SpawnSlots, setPlaytestGod } from './authored_world_hooks';
 import { maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {
@@ -711,7 +712,7 @@ export type { MailSave } from './mail/post_office';
 // stays valid now that the type lives in market.ts.
 export type { MarketSave } from './market';
 
-import { updateBreath } from './breath';
+import { updateEnvironmentDamage } from './environment_damage';
 import { updateSwimFatigue } from './fatigue';
 import { personalGliderLeaderboard as gliderRecordsPage } from './glider_personal_records';
 import { spawnStaticWorldObjects } from './ground_object_spawns';
@@ -1873,6 +1874,7 @@ export class Sim {
    * future joins, and spirit release must remain bound to this Sim's world.
    */
   private readonly worldContent: WorldContent;
+  private readonly spawnSlots: SpawnSlots = { next: 0 }; // authored_world_hooks.ts
   /** Validated active-world noticeboards captured for this Sim at construction. */
   readonly noticeboardDefinitions: readonly NoticeboardDef[];
   /** Civic services that this Sim actually spawned, captured at construction. */
@@ -2753,10 +2755,7 @@ export class Sim {
       // while instance/delve exits above retain their established behavior.
       savedPos = this.findSafePos(savedPos.x, savedPos.z, -Infinity, PLAYER_BODY_RADIUS);
     }
-    const playerStart = this.cfg.playerStartOverride ?? this.worldContent.playerStart;
-    const startPos = savedPos
-      ? this.groundPos(savedPos.x, savedPos.z)
-      : this.groundPos(playerStart.x, playerStart.z);
+    const startPos = playerStartPos(this.ctx, savedPos, this.worldContent, this.spawnSlots);
     const savedArena1v1: ArenaStanding = {
       rating: savedState?.arena1v1Rating ?? savedState?.arenaRating ?? arenaMod.ARENA_BASE_RATING,
       wins: savedState?.arena1v1Wins ?? savedState?.arenaWins ?? 0,
@@ -4496,6 +4495,7 @@ export class Sim {
   // address "the" player; these delegate to the primary player.
   // -------------------------------------------------------------------------
 
+  setDevGod = (on: boolean, pid: number): boolean => setPlaytestGod(this.ctx, on, pid);
   get playerId(): number {
     return this.primaryId;
   }
@@ -6069,14 +6069,14 @@ export class Sim {
         updateSpiritRunTriggers(this.ctx, p);
         lap?.('p.move');
       }
-      // Breath runs for DEAD players too, and must: updateBreath's own reset
-      // branch is what starts the corpse run with full lungs, so gating this on
+      // Breath (then fluid pools) runs for DEAD players too, and must: updateBreath's
+      // reset branch is what starts the corpse run with full lungs, so gating this on
       // !p.dead leaves a drowned player's spent breath and drown clock intact
       // and resumes the damage the instant they resurrect at the corpse. Draws
-      // rng only through the drown pulse's dealDamage, which cannot fire for a
-      // dead player (the reset returns first), so the tick-phase draw order is
-      // unchanged for everyone who is not actively drowning.
-      updateBreath(this.ctx, p);
+      // rng only through the drown/fluid pulse's dealDamage, which cannot fire for a
+      // dead player (the reset returns first) and finds no fluid pool in the built-in
+      // world, so the tick-phase draw order is unchanged for everyone not drowning.
+      updateEnvironmentDamage(this.ctx, p);
       // Riding-lesson driver: server-authoritative; tracks the training-steed
       // phase and ends a dead/ghost player's IN_PROGRESS lesson, so death never
       // strands the session. Finishing the race credits success. Draws no rng,

@@ -8,7 +8,7 @@ import type { DungeonLayout } from '../../sim/dungeon_layout';
 
 const LINE_WIDTH = 100;
 
-/** Top-level key order, mirroring the authored INFERNAL_ABYSS_LAYOUT source. */
+/** Top-level key order, mirroring the hand-authored layout source style. */
 const KEY_ORDER = [
   'zMin',
   'zMax',

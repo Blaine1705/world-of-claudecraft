@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { applyDefaultCollision, defaultCollisionForAsset } from '../src/editor/collision_defaults';
 import type { AssetPlacement } from '../src/editor/custom_map';
-import { analyzeBakedFootprint, autoCollideRadius } from '../src/sim/asset_collision';
+import {
+  analyzeBakedFootprint,
+  autoCollideRadius,
+  collisionOverrideFor,
+} from '../src/sim/asset_collision';
 import { collideRadiusFor } from '../src/sim/map_doc';
 
 function placement(assetId: string, collide = true): AssetPlacement {
@@ -33,8 +37,20 @@ describe('defaultCollisionForAsset', () => {
     }
   });
 
+  // The heuristic fixture must have a bake and NO Collision Master override: an
+  // authored override is the maker's word and skips the heuristics entirely
+  // (props/mushroom_red has carried an authored baked override since the Carve port).
+  const ROUND_SOLID = 'props/mushroom_glow_cluster';
+
   it('gives round solids a plain circle', () => {
-    expect(defaultCollisionForAsset('props/mushroom_red').kind).toBe('circle');
+    expect(collisionOverrideFor(ROUND_SOLID)).toBeNull();
+    expect(analyzeBakedFootprint(ROUND_SOLID)).not.toBeNull();
+    expect(defaultCollisionForAsset(ROUND_SOLID).kind).toBe('circle');
+  });
+
+  it('lets a Collision Master override beat the round-solid heuristic', () => {
+    expect(collisionOverrideFor('props/mushroom_red')?.mode).toBe('baked');
+    expect(defaultCollisionForAsset('props/mushroom_red').kind).toBe('baked');
   });
 
   it('never touches non-catalogue ids (imported models keep their bake)', () => {
@@ -51,7 +67,8 @@ describe('defaultCollisionForAsset', () => {
 
 describe('applyDefaultCollision', () => {
   it('stamps circle defaults as basic mode', () => {
-    const p = placement('props/mushroom_red');
+    expect(collisionOverrideFor('props/mushroom_glow_cluster')).toBeNull();
+    const p = placement('props/mushroom_glow_cluster');
     applyDefaultCollision(p);
     expect(p.collisionMode).toBe('basic');
     expect(p.hitboxes).toBeUndefined();

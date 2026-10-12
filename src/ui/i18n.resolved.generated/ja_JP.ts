@@ -13833,8 +13833,6 @@ export const ja_JP: EnTranslations = {
       "tool_recharge": "充填",
       "demonHeal": "悪魔の治癒",
       "thunzharrStormcall": "嵐の呼び声",
-      "forgekeepersWrath": "Forgekeeper's Wrath",
-      "azazelApocalypseFlame": "Apocalypse Flame",
       "rift_frost_execution": "氷河の墓",
       "rift_frost_strike": "絶対零度",
       "rift_ember_execution": "マグマの泉",
@@ -20088,57 +20086,6 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
-      "infernal_slag": {
-        "name": "深淵の鉱滓"
-      },
-      "charred_legion_tablet": {
-        "name": "焦げた軍団の石板"
-      },
-      "brands_of_the_first_flame": {
-        "name": "始まりの炎の刻印"
-      },
-      "forgekeepers_ledger": {
-        "name": "炉守の帳簿"
-      },
-      "azazels_broken_covenant": {
-        "name": "アザゼルの破られた盟約"
-      },
-      "emberforged_vambraces": {
-        "name": "残り火で鍛えた腕甲"
-      },
-      "cinderthread_mantle": {
-        "name": "灰糸の肩衣"
-      },
-      "hellstalker_boots": {
-        "name": "獄の狩人の長靴"
-      },
-      "forgekeepers_warhammer": {
-        "name": "炉守の戦槌"
-      },
-      "forgekeepers_runestaff": {
-        "name": "炉守のルーンの杖"
-      },
-      "forgekeepers_fang": {
-        "name": "炉守の牙"
-      },
-      "azazels_ruinblade": {
-        "name": "アザゼルの破滅の刃"
-      },
-      "azazels_soulstaff": {
-        "name": "アザゼルの魂の杖"
-      },
-      "azazels_emberfang": {
-        "name": "アザゼルの残り火の牙"
-      },
-      "hellforged_bulwark": {
-        "name": "獄で鍛えた防壁"
-      },
-      "cinderseer_raiment": {
-        "name": "灰の予見者の法衣"
-      },
-      "abysswalker_harness": {
-        "name": "深淵を歩む者の胴鎧"
-      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -21790,33 +21737,6 @@ export const ja_JP: EnTranslations = {
       },
       "wildheart_high_priest": {
         "name": "盆地の声ズルガー"
-      },
-      "abyssal_legionnaire": {
-        "name": "深淵の軍団兵"
-      },
-      "cinder_magus": {
-        "name": "灰の魔導師"
-      },
-      "molten_hellhound": {
-        "name": "溶岩の地獄猟犬"
-      },
-      "flamebound_smith": {
-        "name": "炎に縛られた鍛冶師"
-      },
-      "abyssal_gladiator": {
-        "name": "深淵の剣闘士"
-      },
-      "infernal_cinderling": {
-        "name": "深淵の灰の幼精"
-      },
-      "forgekeeper": {
-        "name": "炉守"
-      },
-      "pyre_golem": {
-        "name": "火葬のゴーレム"
-      },
-      "azazel_infernal_lord": {
-        "name": "深淵の王アザゼル"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
@@ -25264,42 +25184,6 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
-      "q_infernal_abyss_echoes": {
-        "title": "ストームクラッグの地下の残響",
-        "text": "ストームクラッグは嵐から生まれたのではない、{playerName}。最古の石板によれば、あれは世界の外から落ちてきた炎を封じるために打ち据えられた蓋だという。東の岩山の下に新たな裂け目が開いた。四人の仲間と入り、軍団の石板と、始まりの炎の傍らに刻まれた刻印を持ち帰ってくれ。",
-        "completion": "石板には、自ら進んで炎へ行軍した大軍の名が記されている。刻印には彼らが仕えた力の名がある。アザゼルだ。ここは悪魔を外に締め出すための牢獄などではなかった、{playerName}。彼らの王を招き入れる門だったのだ。",
-        "objectives": {
-          "0": {
-            "label": "焦げた軍団の石板を解読する"
-          },
-          "1": {
-            "label": "始まりの炎の刻印を調べる"
-          }
-        }
-      },
-      "q_infernal_abyss_covenant": {
-        "title": "破られた盟約",
-        "text": "軍団の誓いは、アザゼルに我々の世界へ至る道を約束した。だが、どんな盟約にも代償と欠陥がある。溶岩の深淵へ戻り、大口の近くで炉守の帳簿と破られた盟約を探してくれ。何が彼を縛ったのか分かれば、倒す方法も見つかるかもしれない。",
-        "completion": "欠陥が見つかった。アザゼルは己の軍団の名を門に与えていたのだ。従者を一人食らうたびに強くなったが、その命は地下の炉につながれた。炉の中心で王を討てば、門も彼と運命を共にする。",
-        "objectives": {
-          "0": {
-            "label": "炉守の帳簿を回収する"
-          },
-          "1": {
-            "label": "アザゼルの破られた盟約を読む"
-          }
-        }
-      },
-      "q_infernal_abyss_azazel": {
-        "title": "溶岩の深淵の王",
-        "text": "盟約が一度だけ機会を与えてくれた、{playerName}。信頼する仲間と炉と大口を越えて下り、始まりの炎が我々の世界に触れる場所でアザゼルと対峙してくれ。彼の軍団を耐え抜き、ストームクラッグが開かれた門となる前に深淵の王を消し去るのだ。",
-        "completion": "山が静かだ。眠っても、待ってもいない。ただ静かなのだ。アザゼルは盗んだ名で永遠を築いたが、君は自らの、たった一人の定命の者の名でそれを終わらせた。ハイウォッチはその名を忘れない、{playerName}。",
-        "objectives": {
-          "0": {
-            "label": "深淵の王アザゼルを倒す"
-          }
-        }
-      },
       "q_drowned_choir": {
         "title": "溺れし聖歌隊",
         "text": "渡り手どもは独りで動いているのではない。その中に溺れし信徒たちが歩いている——神殿とともに沈んだ教団だ。腐った祭服をまとったまま、岸の岩場から祈りを歌い続けている。八体を沈黙させ、奴らが携える供物を六つ持ち帰れ。奴らが女神に何を捧げようとしているのか、私は知りたいのだ。",
@@ -25896,11 +25780,6 @@ export const ja_JP: EnTranslations = {
         "name": "ドーンホールド城",
         "enterText": "花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。",
         "leaveText": "日差しあふれる庭園の芝生へと戻った。"
-      },
-      "infernal_abyss": {
-        "name": "溶岩の深淵",
-        "enterText": "ストームクラッグの地下へ下り、溶岩の深淵に足を踏み入れた。",
-        "leaveText": "炉のような闇から這い上がり、山風に身をさらした。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

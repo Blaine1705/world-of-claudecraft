@@ -331,105 +331,16 @@ function musicEditorSavePlugin() {
   };
 }
 
-// Dev-only in-memory collector for an unattended local diagnostics run. Reports never
-// touch disk and the endpoints do not exist in preview or production builds.
-function diagnosticsCapturePlugin() {
-  let latestReport = '';
-  return {
-    name: 'woc-diagnostics-capture',
-    apply: 'serve' as const,
-    configureServer(server: {
-      middlewares: {
-        use: (
-          fn: (
-            req: {
-              url?: string;
-              method?: string;
-              headers: Record<string, string | string[] | undefined>;
-              socket: { remoteAddress?: string };
-              setEncoding: (encoding: BufferEncoding) => void;
-              on: (event: string, callback: (chunk?: unknown) => void) => void;
-            },
-            res: {
-              statusCode: number;
-              setHeader: (name: string, value: string) => void;
-              end: (body?: string) => void;
-            },
-            next: () => void,
-          ) => void,
-        ) => void;
-      };
-    }) {
-      server.middlewares.use((req, res, next) => {
-        const pathOnly = (req.url ?? '').split('?')[0];
-        const host = Array.isArray(req.headers.host) ? req.headers.host[0] : req.headers.host;
-        if (pathOnly === '/__diagnostics/latest') {
-          if (req.method !== 'GET') {
-            res.statusCode = 405;
-            res.end('GET only');
-            return;
-          }
-          if (!diagnosticsReadAllowed(req.socket.remoteAddress, host)) {
-            res.statusCode = 403;
-            res.end('loopback requests only');
-            return;
-          }
-          res.setHeader('Cache-Control', 'no-store');
-          res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-          res.statusCode = latestReport ? 200 : 404;
-          res.end(latestReport || 'No completed diagnostics capture yet.');
-          return;
-        }
-        if (pathOnly !== '/__diagnostics/capture') {
-          next();
-          return;
-        }
-        if (req.method !== 'POST') {
-          res.statusCode = 405;
-          res.end('POST only');
-          return;
-        }
-        const origin = Array.isArray(req.headers.origin)
-          ? req.headers.origin[0]
-          : req.headers.origin;
-        if (!diagnosticsCaptureAllowed(req.socket.remoteAddress, origin, host)) {
-          res.statusCode = 403;
-          res.end('loopback same-origin requests only');
-          return;
-        }
-        let body = '';
-        let bodyBytes = 0;
-        let rejected = false;
-        req.setEncoding('utf8');
-        req.on('data', (chunk) => {
-          if (rejected) return;
-          const text = typeof chunk === 'string' ? chunk : String(chunk ?? '');
-          bodyBytes += Buffer.byteLength(text, 'utf8');
-          if (bodyBytes > 2_000_000) {
-            rejected = true;
-            res.statusCode = 413;
-            res.end('report too large');
-            return;
-          }
-          body += text;
-        });
-        req.on('end', () => {
-          if (rejected) return;
-          latestReport = body;
-          res.statusCode = 204;
-          res.end();
-        });
-      });
-    },
-  };
-}
 // Dev-only save endpoint for the editor's dungeon mode (/editor, Dungeon
 // button): receives a formatted DungeonLayout literal and splices it over the
 // matching exported const in src/sim/dungeon_layout.ts, so the sim, renderer,
 // colliders, minimap, and tests all pick the edit up via HMR. Same lifecycle
 // as musicEditorSavePlugin: configureServer never runs in a build.
 function dungeonEditorSavePlugin() {
-  const ALLOWED_CONSTS = new Set(['INFERNAL_ABYSS_LAYOUT']);
+  // The layout consts the editor may rewrite: one per AUTHORED_DUNGEONS entry
+  // (src/editor/dungeon/authored_dungeons.ts). Empty while none is registered,
+  // so the endpoint refuses every write.
+  const ALLOWED_CONSTS = new Set<string>();
   // The writer emits only plain data: identifiers, numbers, single-quoted
   // slugs, and Math.PI fractions. Anything else (comments, semicolons,
   // backticks, imports) is rejected so the endpoint cannot inject code.
@@ -455,6 +366,7 @@ function dungeonEditorSavePlugin() {
         }
         let body = '';
         let aborted = false;
+        req.setEncoding('utf8');
         req.on('data', (chunk) => {
           if (aborted) return;
           body += String(chunk);
@@ -558,6 +470,7 @@ function battlegroundEditorSavePlugin() {
         }
         let body = '';
         let aborted = false;
+        req.setEncoding('utf8');
         req.on('data', (chunk) => {
           if (aborted) return;
           body += String(chunk);
@@ -663,6 +576,7 @@ function collisionMasterSavePlugin() {
         const MAX_BODY = 32 * 1024 * 1024;
         let body = '';
         let aborted = false;
+        req.setEncoding('utf8');
         req.on('data', (chunk) => {
           if (aborted) return;
           body += String(chunk);
@@ -762,6 +676,7 @@ function regionMapSavePlugin() {
         const MAX_BODY = 32 * 1024 * 1024;
         let body = '';
         let aborted = false;
+        req.setEncoding('utf8');
         req.on('data', (chunk) => {
           if (aborted) return;
           body += String(chunk);
@@ -910,6 +825,7 @@ export function publishedMapBySlug(slug: string): PublishedMapEntry | undefined 
         const MAX_BODY = 96 * 1024 * 1024;
         let body = '';
         let aborted = false;
+        req.setEncoding('utf8');
         req.on('data', (chunk) => {
           if (aborted) return;
           body += String(chunk);
@@ -981,6 +897,7 @@ export function publishedMapBySlug(slug: string): PublishedMapEntry | undefined 
           return;
         }
         let body = '';
+        req.setEncoding('utf8');
         req.on('data', (chunk) => {
           // A slug is a few dozen bytes; anything larger is not this request.
           if (body.length < 4096) body += String(chunk);
@@ -1127,6 +1044,7 @@ function studioAssetSavePlugin() {
         const MAX_BODY = MAX_BYTES * 2;
         let body = '';
         let aborted = false;
+        req.setEncoding('utf8');
         req.on('data', (chunk) => {
           if (aborted) return;
           body += String(chunk);
@@ -1192,6 +1110,99 @@ function studioAssetSavePlugin() {
             res.statusCode = 400;
             res.end(String(err));
           }
+        });
+      });
+    },
+  };
+}
+
+// Dev-only in-memory collector for an unattended local diagnostics run. Reports never
+// touch disk and the endpoints do not exist in preview or production builds.
+function diagnosticsCapturePlugin() {
+  let latestReport = '';
+  return {
+    name: 'woc-diagnostics-capture',
+    apply: 'serve' as const,
+    configureServer(server: {
+      middlewares: {
+        use: (
+          fn: (
+            req: {
+              url?: string;
+              method?: string;
+              headers: Record<string, string | string[] | undefined>;
+              socket: { remoteAddress?: string };
+              setEncoding: (encoding: BufferEncoding) => void;
+              on: (event: string, callback: (chunk?: unknown) => void) => void;
+            },
+            res: {
+              statusCode: number;
+              setHeader: (name: string, value: string) => void;
+              end: (body?: string) => void;
+            },
+            next: () => void,
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use((req, res, next) => {
+        const pathOnly = (req.url ?? '').split('?')[0];
+        const host = Array.isArray(req.headers.host) ? req.headers.host[0] : req.headers.host;
+        if (pathOnly === '/__diagnostics/latest') {
+          if (req.method !== 'GET') {
+            res.statusCode = 405;
+            res.end('GET only');
+            return;
+          }
+          if (!diagnosticsReadAllowed(req.socket.remoteAddress, host)) {
+            res.statusCode = 403;
+            res.end('loopback requests only');
+            return;
+          }
+          res.setHeader('Cache-Control', 'no-store');
+          res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+          res.statusCode = latestReport ? 200 : 404;
+          res.end(latestReport || 'No completed diagnostics capture yet.');
+          return;
+        }
+        if (pathOnly !== '/__diagnostics/capture') {
+          next();
+          return;
+        }
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        const origin = Array.isArray(req.headers.origin)
+          ? req.headers.origin[0]
+          : req.headers.origin;
+        if (!diagnosticsCaptureAllowed(req.socket.remoteAddress, origin, host)) {
+          res.statusCode = 403;
+          res.end('loopback same-origin requests only');
+          return;
+        }
+        let body = '';
+        let bodyBytes = 0;
+        let rejected = false;
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          if (rejected) return;
+          const text = typeof chunk === 'string' ? chunk : String(chunk ?? '');
+          bodyBytes += Buffer.byteLength(text, 'utf8');
+          if (bodyBytes > 2_000_000) {
+            rejected = true;
+            res.statusCode = 413;
+            res.end('report too large');
+            return;
+          }
+          body += text;
+        });
+        req.on('end', () => {
+          if (rejected) return;
+          latestReport = body;
+          res.statusCode = 204;
+          res.end();
         });
       });
     },

@@ -1,6 +1,6 @@
 // The bell's voice: procedural audio for deepball at the Deepglass.
 //
-// Same approach as dragon_audio.ts and water_elemental_audio.ts, pure math,
+// Same approach as water_elemental_audio.ts, pure math,
 // no clip files, no generator run, because the arena shipped SILENT. A sport
 // played at 26 yd/s with no sound for the strike, the burners or the whistle
 // reads as a physics demo rather than a match, and every cue it needs is a

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { type DungeonDraft, draftFromLayout } from '../src/editor/dungeon/dungeon_draft_core';
 import { validateDraft } from '../src/editor/dungeon/dungeon_validate_core';
-import { INFERNAL_ABYSS_LAYOUT } from '../src/sim/dungeon_layout';
+import { AUTHORED_DUNGEON_FIXTURE } from './fixtures/authored_dungeon_layout';
 
 // Draft validation: room sanity errors, door-graph reachability, floating
-// doors, decor blocking a doorway, and the real Infernal Abyss layout as the
-// zero-error baseline.
+// doors, decor blocking a doorway, and an authored room-graph layout fixture
+// as the zero-error baseline.
 
 function baseDraft(partial: Partial<DungeonDraft>): DungeonDraft {
   return {
@@ -90,7 +90,7 @@ describe('editor dungeon validate core', () => {
     const draft = baseDraft({
       decor: [
         { key: 'lava_brazier', x: 1, z: 20, yaw: 0, r: 0.9 },
-        { key: 'abyss_cracked_obsidian_floor_plate', x: 0, z: 19, yaw: 0 }, // no collision: fine
+        { key: 'floor_plate', x: 0, z: 19, yaw: 0 }, // no collision: fine
       ],
     });
     const found = warnings(draft);
@@ -107,8 +107,8 @@ describe('editor dungeon validate core', () => {
     expect(found).toContain('Dais is outside every room');
   });
 
-  it('accepts the real Infernal Abyss layout with zero errors', () => {
-    const draft = draftFromLayout(INFERNAL_ABYSS_LAYOUT);
+  it('accepts an authored room-graph layout with zero errors', () => {
+    const draft = draftFromLayout(AUTHORED_DUNGEON_FIXTURE);
     expect(errors(draft)).toEqual([]);
   });
 });
