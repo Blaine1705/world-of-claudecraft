@@ -11,30 +11,38 @@
 //
 // While the throw is in flight the body carries `launchedBy`:
 //   - the kernel turns air steering off, so the victim cannot curl the throw
-//     back onto the ledge (the line stays straight), and clears the field on
-//     the first landing on walkable ground (a landing on an unwalkable slope
-//     keeps it: the steep slide off the lip that follows is still the throw);
+//     back onto the ledge (the line stays straight), and clears the field once
+//     the body has stood settled for a step (a touchdown on a steep lip keeps
+//     it: the slide off the edge that follows is still the throw) or after
+//     LAUNCH_FALL_CREDIT_SECONDS of steps; death and teleports clear it too;
 //   - a fall that lands inside the credit window is dealt BY the source
 //     (`launchFallCredit`, read by the Sim's fall-damage binding), so a fatal
 //     fall is the druid's kill: kill credit, the death recap, honor and the
 //     world-PvP gold stake all follow the ordinary killer path in
 //     combat/damage.ts handleDeath.
 //
-// Mobs, pets, swimmers, ferry passengers and bodies already in a scripted
-// movement mode keep the grounded shove: none of them run the player kernel's
-// free-flight arm. Draws no rng.
+// Mobs, pets, swimmers, ferry passengers and bodies already in a scripted or
+// forced movement mode (charge, leap, climb, follow, fear) keep the grounded
+// shove: none of them run the player kernel's free-flight arm. Draws no rng.
+//
+// Online, the field is not wired: the victim's display-only self extrapolator
+// (src/render/self_motion.ts) predicts the throw with steering on and is
+// glided back onto the authoritative straight line, the same correction it
+// applies to every server-driven displacement (charge, knockback).
 
+import { ABILITIES } from '../data';
 import { knockbackDistanceAfterGuards } from '../knockback';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { floorHeightAt } from '../physics';
 import { GRAVITY, isSwimming, JUMP_VELOCITY } from '../player_motion';
 import type { SimContext } from '../sim_context';
 import { type DamageEventKind, DT, type Entity } from '../types';
+import { isFearAura } from './cc';
 import { trailbreakArcFor, trailbreakFlatTicks } from './hunter_trailbreak_arc';
 
-/** Seconds after a launch during which a fall still credits the launcher. A
- *  long drop off a cliff is airborne for a few seconds; past this the body has
- *  long since landed somewhere and any later fall is its own. */
+/** The longest a throw stays live, in seconds of the victim's own movement
+ *  steps: a long drop off a cliff is airborne for a few seconds, so past this
+ *  the body has long since landed somewhere and any later fall is its own. */
 export const LAUNCH_FALL_CREDIT_SECONDS = 10;
 /** Sample spacing and floor margin for the flat-hop clearance check. */
 const LAUNCH_SWEEP_STEP = 0.5;
@@ -46,7 +54,11 @@ function launchable(ctx: SimContext, target: Entity): boolean {
   const meta = ctx.players.get(target.id);
   if (!meta || meta.vehicle) return false;
   if (target.ferryRide || target.leap || target.climb || target.valkyrsCalling) return false;
-  if (target.chargeTargetId !== null) return false;
+  if (target.chargeTargetId !== null || target.followTargetId !== null) return false;
+  // A feared body is walked by the fear driver, never the kernel, so a launch
+  // would sit frozen in it until the fear ended and then fire seconds late.
+  const feared = (abilityId: string) => ABILITIES[abilityId]?.fearDr === true;
+  if (target.auras.some((aura) => isFearAura(aura, feared))) return false;
   return !isSwimming(target, ctx.cfg.seed);
 }
 
@@ -105,7 +117,10 @@ export function applyLaunchKnockback(
   }
   target.jumping = true;
   target.fallStartY = target.pos.y;
-  target.launchedBy = { sourceId: source.id, until: ctx.time + LAUNCH_FALL_CREDIT_SECONDS };
+  target.launchedBy = {
+    sourceId: source.id,
+    ticksLeft: Math.round(LAUNCH_FALL_CREDIT_SECONDS / DT),
+  };
   return arc.distance;
 }
 
@@ -141,7 +156,7 @@ function flatHopClears(
  */
 export function launchFallCredit(ctx: SimContext, target: Entity): Entity | null {
   const launch = target.launchedBy;
-  if (!launch || ctx.time > launch.until) return null;
+  if (!launch || launch.ticksLeft <= 0) return null;
   const source = ctx.entities.get(launch.sourceId);
   if (!source || source.dead || source.id === target.id) return null;
   return ctx.isHostileTo(source, target) ? source : null;
@@ -155,9 +170,15 @@ export function launchFallCredit(ctx: SimContext, target: Entity): Entity | null
  * and the gold stake follow the normal killer path; it is passed as incidental
  * (not direct) damage whose amount is already final, so the launcher's own
  * damage modifiers never scale a fall.
+ *
+ * Deliberately, the credited fall IS the launcher's damage everywhere past
+ * that: the victim's defenses against the launcher (PvP defense, damage
+ * reduction, wards) apply, it holds both in combat, and a duel clamps a
+ * lethal one to the duel's end like any other blow.
  */
 export function dealKernelDamage(
   ctx: SimContext,
+  source: Entity | null,
   target: Entity,
   amount: number,
   crit: boolean,
@@ -166,9 +187,9 @@ export function dealKernelDamage(
   kind: DamageEventKind,
   noRage: boolean,
 ): void {
-  const by = ability === 'Falling' ? launchFallCredit(ctx, target) : null;
+  const by = source === null && ability === 'Falling' ? launchFallCredit(ctx, target) : null;
   if (by === null) {
-    ctx.dealDamage(null, target, amount, crit, school, ability, kind, noRage);
+    ctx.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
     return;
   }
   ctx.dealDamage(

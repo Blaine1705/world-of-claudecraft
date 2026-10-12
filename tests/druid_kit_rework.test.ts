@@ -153,6 +153,7 @@ describe('Typhoon throws enemy players through the air', () => {
       expect(Math.abs(victim.pos.z - start.z)).toBeLessThan(1e-6);
     }
     expect(victim.onGround).toBe(true);
+    sim.tick(); // one settled step ends the throw
     expect(victim.launchedBy).toBeUndefined();
     expect(victim.pos.x - start.x).toBeGreaterThan(14);
     expect(victim.pos.x - start.x).toBeLessThan(17);
@@ -177,6 +178,41 @@ describe('Typhoon throws enemy players through the air', () => {
       sim.tick();
       expect(victim.vx).toBeCloseTo(vx, 9);
     }
+  });
+
+  it('a feared player takes the grounded shove, never a frozen launch', () => {
+    const { sim, druid, victim } = pvpPair();
+    victim.auras.push({
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'incapacitate',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: druid.id,
+      school: 'shadow',
+    });
+    const before = { ...victim.pos };
+    sim.castAbility('typhoon', druid.id);
+    sim.tick();
+    expect(victim.launchedBy).toBeUndefined();
+    expect(victim.onGround).toBe(true);
+    expect(victim.vy).toBe(0);
+    expect(Math.hypot(victim.pos.x - before.x, victim.pos.z - before.z)).toBeGreaterThan(10);
+  });
+
+  it('the throw ends once the victim stands settled, and on death', () => {
+    const { sim, druid, victim } = pvpPair();
+    sim.castAbility('typhoon', druid.id);
+    for (let i = 0; i < 40 && !victim.onGround; i++) sim.tick();
+    expect(victim.onGround).toBe(true);
+    sim.tick();
+    expect(victim.launchedBy).toBeUndefined();
+    // A later jump is steerable again, and a later fall is the victim's own.
+    victim.launchedBy = { sourceId: druid.id, ticksLeft: 200 };
+    sim.ctx.dealDamage(druid, victim, victim.hp + 1000, false, 'physical', 'Test', 'hit');
+    expect(victim.dead).toBe(true);
+    expect(victim.launchedBy).toBeUndefined();
   });
 
   it('a mob takes the grounded 15 yd shove instead', () => {
@@ -205,7 +241,7 @@ describe('a fall off a Typhoon throw credits the druid', () => {
     victim.vy = 0;
     victim.vz = 0;
     victim.fallStartY = victim.pos.y;
-    if (launchedBy) victim.launchedBy = { sourceId: launchedBy.id, until: sim.time + 10 };
+    if (launchedBy) victim.launchedBy = { sourceId: launchedBy.id, ticksLeft: 200 };
     const seen: SimEvent[] = [];
     for (let i = 0; i < 20 * 6 && !victim.onGround; i++) seen.push(...sim.tick());
     return seen;
@@ -228,6 +264,23 @@ describe('a fall off a Typhoon throw credits the druid', () => {
     expect(events.some((e) => e.type === 'honor' && e.pid === druid.id)).toBe(true);
   });
 
+  it('in a duel, a lethal thrown fall ends the duel like any other blow', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'druid', noPlayer: true, world: QUIET_WORLD });
+    const d = sim.addPlayer('druid', 'Gale');
+    const v = sim.addPlayer('warrior', 'Victim');
+    sim.duels.set(d, { a: d, b: v, state: 'active', timer: 0 });
+    sim.duels.set(v, sim.duels.get(d)!);
+    const druid = sim.entities.get(d)!;
+    const victim = sim.entities.get(v)!;
+    place(sim, druid, OPEN.x - 3, OPEN.z);
+    place(sim, victim, OPEN.x, OPEN.z);
+    const events = dropFrom(sim, victim, 60, druid);
+    expect(victim.dead).toBe(false);
+    expect(victim.hp).toBeGreaterThan(0);
+    expect(events.some((e) => e.type === 'playerDeath')).toBe(false);
+    expect(sim.duels.get(v)?.state === 'active').toBe(false);
+  });
+
   it('an ordinary fall stays sourceless', () => {
     const { sim, druid, victim } = pvpPair();
     const events = dropFrom(sim, victim, 60);
@@ -241,13 +294,13 @@ describe('a fall off a Typhoon throw credits the druid', () => {
 
   it('credits nobody once the window lapses, the druid is gone, or they are no longer hostile', () => {
     const { sim, druid, victim } = pvpPair();
-    victim.launchedBy = { sourceId: druid.id, until: sim.time + 10 };
+    victim.launchedBy = { sourceId: druid.id, ticksLeft: 200 };
     expect(launchFallCredit(sim.ctx, victim)).toBe(druid);
-    victim.launchedBy = { sourceId: druid.id, until: sim.time - 0.05 };
+    victim.launchedBy = { sourceId: druid.id, ticksLeft: 0 };
     expect(launchFallCredit(sim.ctx, victim)).toBeNull();
-    victim.launchedBy = { sourceId: 999_999, until: sim.time + 10 };
+    victim.launchedBy = { sourceId: 999_999, ticksLeft: 200 };
     expect(launchFallCredit(sim.ctx, victim)).toBeNull();
-    victim.launchedBy = { sourceId: druid.id, until: sim.time + 10 };
+    victim.launchedBy = { sourceId: druid.id, ticksLeft: 200 };
     druid.dead = true;
     expect(launchFallCredit(sim.ctx, victim)).toBeNull();
   });

@@ -5307,10 +5307,11 @@ export interface Entity extends ClientMirroredEntityFields {
   jumping: boolean;
   fallStartY: number;
   // Set while a hostile airborne knockback (Typhoon) has the body in flight
-  // (combat/knockback_launch.ts): who threw it, and the sim time until which a
-  // fall still credits them. The movement kernel turns air steering off while
-  // it is set and clears it on the first landing. Sim-side only, never wired.
-  launchedBy?: { sourceId: number; until: number };
+  // (combat/knockback_launch.ts): who threw it, and the movement-kernel steps
+  // the throw has left. While set, air steering is off and a fall credits the
+  // thrower. The kernel counts it down and clears it once the body stands
+  // settled (not sliding); death and teleports clear it. Sim-side only.
+  launchedBy?: { sourceId: number; ticksLeft: number };
   // Seconds of held underwater travel. Ramps the dive speed from its slow
   // opening pace to the cruise across one stroke (see player_motion.ts
   // swimSpeedMult); zero whenever the body is not submerged.

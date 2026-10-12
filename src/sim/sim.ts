@@ -2271,7 +2271,7 @@ export class Sim {
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
         const wasAlive = !target.dead;
         // A fall off a hostile launch is credited to the launcher (combat/knockback_launch.ts).
-        dealKernelDamage(this.ctx, target, amount, crit, school, ability, kind, noRage);
+        dealKernelDamage(this.ctx, source, target, amount, crit, school, ability, kind, noRage);
         // Null-source Falling is the kernel sentinel; dead targets no-op, so require transition.
         const isPlayerFall = source === null && ability === 'Falling' && target.kind === 'player';
         if (isPlayerFall && wasAlive && target.dead) {
