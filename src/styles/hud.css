@@ -10640,6 +10640,14 @@
     align-items: center;
     justify-content: center;
   }
+  /* The PvP Resurrect wait and where the raise lands (src/ui/hud/death). */
+  #death-overlay .death-note {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--color-text-muted);
+  }
 
   /* ---------- death recap dialog (WoW-style) ---------- */
   #death-recap-dialog {

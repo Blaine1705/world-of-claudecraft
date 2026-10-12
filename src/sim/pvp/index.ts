@@ -117,10 +117,13 @@ export {
 } from './power';
 export {
   notePvpResurrectAtDeath,
+  PVP_RESURRECT_WAIT_SECONDS,
   PVP_RESURRECT_WINDOW_SECONDS,
   type PvpResurrectDeath,
   pvpResurrectBarred,
   pvpResurrectEarned,
+  pvpResurrectReady,
+  pvpResurrectWaitSeconds,
 } from './pvp_resurrect';
 export { pvpVitalityAppliesTo, updatePvpVitality } from './vitality';
 export {

@@ -1419,7 +1419,10 @@ export function handleDeath(
     // reviveAt left behind (battleground seating, the delve respawn). Only a
     // LIVING player's death resets it, so a second pass over the same corpse
     // keeps the offer this death earned.
-    if (!e.dead) e.pvpResurrect = false;
+    if (!e.dead) {
+      e.pvpResurrect = false;
+      e.pvpResurrectWait = 0;
+    }
   }
   vespersOnEntityDeath(ctx, e);
   afflictionOnDeath(ctx, e);

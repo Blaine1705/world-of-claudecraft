@@ -11,7 +11,7 @@
 // self scalar lands here, not as another inline `maybe(...)` in game.ts. The
 // registry of delta keys is pinned by ALL_DELTA_KEYS in tests/snapshots.test.ts,
 // whose scrape reads this file like every other server emitter.
-import { pvpResurrectBarred } from '../src/sim/pvp/pvp_resurrect';
+import { pvpResurrectBarred, pvpResurrectWaitSeconds } from '../src/sim/pvp/pvp_resurrect';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -38,6 +38,7 @@ export const SELF_SCALAR_KEYS = [
   'cbt',
   'corpse',
   'pvr',
+  'pvrw',
 ] as const;
 
 export type SelfScalarKey = (typeof SELF_SCALAR_KEYS)[number];
@@ -87,5 +88,10 @@ export function emitSelfScalarKeys(
   // jail (the button would show and do nothing). A released ghost keeps the
   // bit; the death screen hides the button for a ghost and the server re-checks
   // everything at the raise. Flips once per PvP death and once at the revive.
-  emit('pvr', p.dead && p.pvpResurrect === true && !pvpResurrectBarred(p) ? 1 : 0);
+  const pvr = p.dead && p.pvpResurrect === true && !pvpResurrectBarred(p);
+  emit('pvr', pvr ? 1 : 0);
+  // Whole seconds left on that offer's wait (PVP_RESURRECT_WAIT_SECONDS at the
+  // death), 0 once it may be taken or when there is no offer: the death screen's
+  // countdown. Changes once a second for the wait only, then sits at 0.
+  emit('pvrw', pvr ? pvpResurrectWaitSeconds(p) : 0);
 }

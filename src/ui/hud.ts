@@ -456,7 +456,7 @@ import {
   crossHotbarResolvers,
   crossHotbarSeedActions,
 } from './hud/cross_hotbar';
-import { createDeathPromptView, updateDeathPromptView } from './hud/death';
+import { createDeathPromptView, PvpResurrectPrompt, updateDeathPromptView } from './hud/death';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
@@ -1647,7 +1647,6 @@ export class Hud {
   private guildInvitePromptEl: HTMLElement | null = null;
   private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
-  private pvpResurrectBtnEl = $('#pvp-resurrect-btn');
   private deathView = createDeathPromptView();
   // The standing top-of-screen ghost line (both ways back); shown for a ghost only.
   private ghostHintEl = $('#ghost-hint');
@@ -2745,7 +2744,6 @@ export class Hud {
       this.deathRecapDialog.toggle();
     });
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
-    bindTouchTap(this.pvpResurrectBtnEl, () => this.sim.pvpResurrect());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
@@ -4510,6 +4508,7 @@ export class Hud {
       this.hotDomSkippedWrites++;
     },
   );
+  private pvpRez = new PvpResurrectPrompt(this.writerFacet, () => this.sim.pvpResurrect());
   // The micro-menu rail's open-window ring and count badges. The view core owns the
   // launcher-to-window table; the painter writes only through the elided facet.
   private readonly microMenuStateView = createMicroMenuStateView((value) =>
@@ -9383,6 +9382,7 @@ export class Hud {
       p.pos,
       p.corpsePos,
       p.pvpResurrect === true,
+      p.pvpResurrectWait ?? 0,
     );
     if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
     if (!p.dead) {
@@ -9391,7 +9391,7 @@ export class Hud {
     }
     document.body.classList.toggle('spirit-mode', death.spiritMode);
     this.setDisplay(this.deathOverlayEl, death.overlay ? 'flex' : 'none');
-    this.setDisplay(this.pvpResurrectBtnEl, death.pvpResurrect ? '' : 'none');
+    this.pvpRez.paint(death);
     this.setDisplay(this.ghostHintEl, death.ghostHint ? 'block' : 'none');
     this.setDisplay(this.ghostPromptEl, death.ghostPrompt ? 'flex' : 'none');
 

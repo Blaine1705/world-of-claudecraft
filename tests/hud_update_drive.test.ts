@@ -847,9 +847,16 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     call: 'this.setDisplay',
     band: 'frame',
     gate: '',
-    sites: 4,
+    sites: 3,
     surface: 'chrome',
-    why: 'the death screens through the elided writer: the full-screen death overlay, its PvP Resurrect button, the standing ghost hint line and the ghost prompt (its one corpse button), each shown or hidden by the pure death view core (src/ui/hud/death; a battleground spirit gets neither ghost surface because the respawn wave is its only way back)',
+    why: 'the death screens through the elided writer: the full-screen death overlay, the standing ghost hint line and the ghost prompt (its one corpse button), each shown or hidden by the pure death view core (src/ui/hud/death; a battleground spirit gets neither ghost surface because the respawn wave is its only way back)',
+  },
+  {
+    call: 'this.pvpRez.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the PvP Resurrect button and its note line (src/ui/hud/death/pvp_resurrect_painter.ts): shown with the offer, disabled and counting down while the PVP_RESURRECT_WAIT_SECONDS wait runs, all through the elided writers',
   },
   {
     call: 'syncDeathControllerHints',
@@ -1860,7 +1867,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // fourth release/v0.44.0 base merge (97 measured on the merged tree).
       // The death screens' four writes folded into one row behind the pure
       // death view core (src/ui/hud/death, PvP Resurrect): two fewer rows, 95.
-    ).toEqual({ window: 51, chrome: 95, none: 18 });
+      // The PvP Resurrect button and note moved to their own painter row
+      // (pvp_resurrect_painter.ts, the 15 s wait countdown): 96.
+    ).toEqual({ window: 51, chrome: 96, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

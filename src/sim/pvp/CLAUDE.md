@@ -120,7 +120,11 @@ ratings.
   to a ghost). A living player's death resets the stamp before deciding it
   (`combat/damage.ts` `handleDeath`), so a revive that skips `reviveAt`
   (battleground seating, the delve respawn) can never carry an offer into a
-  later death; `reviveAt` clears it too. The self record carries it as `pvr`,
+  later death; `reviveAt` clears it too. The raise waits
+  `PVP_RESURRECT_WAIT_SECONDS` (15) from the death (`Entity.pvpResurrectWait`,
+  counted down in `combat/auras.ts` `updateTimers`, which visits corpses; a
+  second death-hook pass never restarts it), shipped on the self record as whole
+  seconds `pvrw`. The self record carries the offer as `pvr`,
   lit only when the raise would be honored (`server/self_scalar_wire.ts`); the death screen's button is
   `src/ui/hud/death`. Imported by path from `world_pvp.ts` and `spirit.ts` (it
   imports neither, so no cycle). Pinned by `tests/pvp_resurrect.test.ts`.
