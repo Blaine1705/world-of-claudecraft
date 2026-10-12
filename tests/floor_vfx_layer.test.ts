@@ -104,6 +104,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Sanctum Seal Gate's rime fan and the cold mist it breathes out over
   // the plaza: the world's own marks, under every telegraph.
   { file: 'src/render/sanctum_seal_gate.ts', layer: 'ground', strict: true },
+  // The Moon Stair's liquid moonlight, mist and moonrise sprites at the
+  // Drowned Temple's door: the world's own marks, under every telegraph.
+  { file: 'src/render/drowned_temple_entrance.ts', layer: 'ground', strict: true },
   // A Buried Hoard boss room's additive floor light under its kit props, kept on
   // the order it shipped with (2, the ground band's second rung).
   { file: 'src/render/hoard_room_kit.ts', layer: 'ground', strict: true },

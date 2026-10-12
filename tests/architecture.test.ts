@@ -1014,6 +1014,9 @@ const RENDER_PURE_CORES = [
   // What a built set piece puts between the chase camera and the character:
   // one occluder box per collider row, tested with the fade family's own test.
   'src/render/set_piece_occluders_core.ts',
+  // The Drowned Temple's Moon Stair: the moonrise's clock, the pool's moon and
+  // its parallax, the mirror's sight of the gate, the mist and the sprites.
+  'src/render/drowned_temple_entrance_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',

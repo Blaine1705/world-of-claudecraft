@@ -32,6 +32,7 @@ import { battlegroundRuneModelPreloadInternalsForTest } from '../src/render/batt
 import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_dressing';
 import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
 import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
+import { drownedTempleEntrancePreloadInternalsForTest } from '../src/render/drowned_temple_entrance';
 import { eastbrookGrandArmouryInternalsForTest } from '../src/render/eastbrook_grand_armoury';
 import { farmPatchesPreloadInternalsForTest } from '../src/render/farm_patches';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
@@ -504,6 +505,10 @@ async function expectArmouryGlbContract(
 describe('GLB-replacement asset preload sets resolve to real, manifested files', () => {
   it('Gravewyrm Sanctum Seal Gate assets', () => {
     for (const url of sanctumSealGatePreloadInternalsForTest.urls)
+      expectAssetExistsAndManifested(url);
+  });
+  it('Drowned Temple Moon Stair assets', () => {
+    for (const url of drownedTempleEntrancePreloadInternalsForTest.urls)
       expectAssetExistsAndManifested(url);
   });
   it('buried hoard entrance asset', () => {
