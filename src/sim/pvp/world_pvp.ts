@@ -56,8 +56,6 @@ import {
   noticeWorldPvpBountyLapsed,
 } from './world_pvp_bounty';
 import { worldPvpBountyHolderMultiplier, worldPvpKillHonorPool } from './world_pvp_bounty_rules';
-import { updateWorldPvpRewards, worldPvpRewardPause } from './world_pvp_rewards';
-import { sanitizeWorldPvpRewardTicks } from './world_pvp_rewards_rules';
 import {
   loadWorldPvpPayouts,
   payDueWorldPvpPayouts,
@@ -66,6 +64,8 @@ import {
   type WorldPvpPendingPayout,
   type WorldPvpSavedPayout,
 } from './world_pvp_payouts';
+import { updateWorldPvpRewards, worldPvpRewardPause } from './world_pvp_rewards';
+import { sanitizeWorldPvpRewardTicks } from './world_pvp_rewards_rules';
 import {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,

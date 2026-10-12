@@ -154,17 +154,6 @@ export {
   worldPvpOnPlayerDeath,
   worldPvpPairRepeats,
 } from './world_pvp';
-export { forfeitWorldPvpFightOnDeparture, worldPvpFightOpponent } from './world_pvp_forfeit';
-export {
-  loadWorldPvpPayouts,
-  payDueWorldPvpPayouts,
-  queueWorldPvpPayout,
-  savedWorldPvpPayouts,
-  WORLD_PVP_PENDING_PAYOUT_LIMIT,
-  type WorldPvpPendingPayout,
-  type WorldPvpSavedPayout,
-  worldPvpForfeitPayoutLine,
-} from './world_pvp_payouts';
 export {
   hasWorldPvpBounty,
   WORLD_PVP_BOUNTY_EARNED_LINE,
@@ -180,6 +169,17 @@ export {
   worldPvpKillHonorPool,
   worldPvpStreakEarnsBounty,
 } from './world_pvp_bounty_rules';
+export { forfeitWorldPvpFightOnDeparture, worldPvpFightOpponent } from './world_pvp_forfeit';
+export {
+  loadWorldPvpPayouts,
+  payDueWorldPvpPayouts,
+  queueWorldPvpPayout,
+  savedWorldPvpPayouts,
+  WORLD_PVP_PENDING_PAYOUT_LIMIT,
+  type WorldPvpPendingPayout,
+  type WorldPvpSavedPayout,
+  worldPvpForfeitPayoutLine,
+} from './world_pvp_payouts';
 export {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
