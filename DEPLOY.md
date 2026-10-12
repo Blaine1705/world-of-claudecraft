@@ -248,6 +248,18 @@ For off-box safety, sync the directory to S3 occasionally:
   rollback across a cap change needs a restore-from-backup plan for professions
   counters. Details: "Rollback erases newer fields" in
   `docs/design/professions-tuning-packet.md`.
+- **Heroic Marks currency rollback (mixed fleet)**: from the release that made Heroic
+  Marks a currency, the balance rides `characters.state.heroicMarks` and a character's
+  first load folds its old `heroic_mark` bag and bank stacks into it
+  (`src/sim/heroic_marks.ts`). `characters.state` is written whole, so a binary that
+  predates the currency autosaves the blob WITHOUT `heroicMarks` and erases that
+  character's whole balance; its quartermaster also counts only bag stacks, so the
+  player sees zero first. Roll the release out to EVERY realm process in one deploy pass.
+  Before rolling back past it, stop every game process and snapshot the balances
+  (`CREATE TABLE heroic_marks_rollback AS SELECT id, (state->>'heroicMarks')::int AS
+  marks FROM characters WHERE state ? 'heroicMarks';`), then either re-inject them as
+  `heroic_mark` inventory stacks of at most 20 before the old binary starts, or accept
+  the loss explicitly in the release notes.
 - **Farming plot deploy order and rollback (mixed fleet)**: `farmPlots` rides
   `characters.state`, which is written whole, so a server binary that predates the
   farming growth-engine release autosaves the blob WITHOUT `farmPlots` and erases

@@ -244,13 +244,22 @@ describe('heroic marks: the online mirror', () => {
   it('applies hmarks through the sanitizer and keeps the mirror when the key is omitted', () => {
     const state = new QuestWorldWireState();
     expect(state.heroicMarks).toBe(0);
-    state.applyQuestSelfSnapshot({ hmarks: 17 });
+    // The return value is the repaint signal: true only on a real balance move.
+    expect(state.applyQuestSelfSnapshot({ hmarks: 17 })).toBe(true);
     expect(state.heroicMarks).toBe(17);
-    state.applyQuestSelfSnapshot({});
+    expect(state.applyQuestSelfSnapshot({})).toBe(false);
+    expect(state.applyQuestSelfSnapshot({ hmarks: 17 })).toBe(false);
     expect(state.heroicMarks).toBe(17);
-    state.applyQuestSelfSnapshot({ hmarks: -5 });
+    expect(state.applyQuestSelfSnapshot({ hmarks: -5 })).toBe(true);
     expect(state.heroicMarks).toBe(0);
-    state.applyQuestSelfSnapshot({ hmarks: 'lots' });
+    expect(state.applyQuestSelfSnapshot({ hmarks: 'lots' })).toBe(false);
+    expect(state.heroicMarks).toBe(0);
+  });
+
+  it('clears the mirrored balance on a reconnect reset', () => {
+    const state = new QuestWorldWireState();
+    state.applyQuestSelfSnapshot({ hmarks: 40 });
+    (state as unknown as { resetQuestWorldWireState(): void }).resetQuestWorldWireState();
     expect(state.heroicMarks).toBe(0);
   });
 });

@@ -88,7 +88,9 @@ export class QuestWorldWireState {
   }
 
   /** The owner-only quest family plus the world-boss, vehicle and Heroic Marks
-   *  mirrors of one self record. */
+   *  mirrors of one self record. Returns true when the Heroic Marks balance
+   *  really moved, so the host can repaint balance-priced windows: a marks
+   *  credit no longer echoes through the inventory the way a bag item did. */
   applyQuestSelfSnapshot(
     self: Parameters<typeof applyQuestSelfWire>[1] & {
       wba?: unknown;
@@ -96,11 +98,15 @@ export class QuestWorldWireState {
       hmarks?: unknown;
     },
     simTime?: unknown,
-  ): void {
+  ): boolean {
     applyQuestSelfWire(this, self, simTime);
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
     if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
-    if (self.hmarks !== undefined) this.heroicMarks = sanitizeHeroicMarks(self.hmarks);
+    if (self.hmarks === undefined) return false;
+    const marks = sanitizeHeroicMarks(self.hmarks);
+    const moved = marks !== this.heroicMarks;
+    this.heroicMarks = marks;
+    return moved;
   }
 
   enterVehicle(stationId: string): void {
@@ -216,6 +222,7 @@ export class QuestWorldWireState {
     this.weeklyQuestResetAtMs = 0;
     this.clueHunt = null;
     this.treasureMap = null;
+    this.heroicMarks = 0;
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

@@ -202,8 +202,9 @@ export function countFit(
   materialSources?: MaterialComposition,
 ): number {
   // A currency id (Heroic Marks) credits a PlayerMeta counter at the hub, never
-  // a slot, so every capacity gate sees it fit whole (heroic_marks.ts).
-  if (isCurrencyGrantId(itemId)) return count;
+  // a slot, so every capacity gate sees it fit whole (heroic_marks.ts). Only a
+  // plain grant: a payload-bearing copy takes the instanced path and a slot.
+  if (!instance && isCurrencyGrantId(itemId)) return count;
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   const freeSlots = freePoolSlots(inventory, pools, itemId, isMaterialItemId);
@@ -323,7 +324,7 @@ export function fitsAll(
       a.materialSources,
     );
     if (fit < a.count) return false;
-    if (isCurrencyGrantId(a.itemId)) continue; // credits a counter, takes no slot
+    if (!a.instance && isCurrencyGrantId(a.itemId)) continue; // a counter credit, no slot
     addStacked(scratch, a.itemId, a.count, a.instance, a.craftedRecipeId, a.materialSources);
   }
   return true;
