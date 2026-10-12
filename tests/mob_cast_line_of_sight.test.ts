@@ -28,8 +28,9 @@ import { KIT_SIGHT_KEYS, KIT_SIGHT_RETRY } from '../src/sim/mob/trash_kit/kit_ca
 import { TEMPLE_LULLABY_SLEEP } from '../src/sim/mob/trash_kit/temple_cast_ids';
 import { TEMPLE_KIT_EXTENSION } from '../src/sim/mob/trash_kit/temple_extension';
 import { WILDHEART_KIT_EXTENSION } from '../src/sim/mob/trash_kit/wildheart_extension';
+import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
-import { DT, type Entity } from '../src/sim/types';
+import { DT, type Entity, LEASH_DISTANCE } from '../src/sim/types';
 import { boss, cryptFight, type Fight, put, tick } from './helpers/crypt_boss_fight';
 
 vi.setConfig({ testTimeout: 240_000 });
@@ -440,6 +441,69 @@ describe('the hold and the leash still rule a caster no route reaches', () => {
     expect(s.adept.chaseRoute).toBeUndefined();
     const home = local(s, s.adept);
     expect(Math.hypot(home.x - CASTER_SPOT.x, home.z - CASTER_SPOT.z)).toBeLessThan(1);
+  });
+});
+
+// The same rule in the open world, on a world caster (Corrupted Priest Malric's
+// Mindfracture, an instant petSpell) with one of the world's own props between
+// him and his target: on this seed something solid stands on the x axis 5 yd
+// east of the origin.
+describe('in the open world', () => {
+  const WORLD_SEED_WITH_PROP = 7788;
+
+  function field(dist: number): { sim: Sim; player: Entity; caster: Entity } {
+    const sim = new Sim({ seed: WORLD_SEED_WITH_PROP, playerClass: 'warrior' });
+    const player = sim.player;
+    player.pos = sim.ctx.groundPos(0, 0);
+    player.prevPos = { ...player.pos };
+    player.maxHp = 1e7;
+    player.hp = 1e7;
+    sim.ctx.rebucket(player);
+    const template = MOBS.corrupted_priest_malric;
+    const caster = createMob(sim.ctx.nextId++, template, 5, sim.ctx.groundPos(dist, 0));
+    caster.hostile = true;
+    caster.maxHp = 1e7;
+    caster.hp = 1e7;
+    sim.ctx.addEntity(caster);
+    engage(caster, player);
+    return { sim, player, caster };
+  }
+
+  it('walks round a world prop to its sight line and casts, with no evade and no stall', () => {
+    const { sim, player, caster } = field(20);
+    expect(sim.ctx.hasLineOfSight(caster, player)).toBe(false);
+    let landed = 0;
+    let landedUnseen = 0;
+    let worstStall = 0;
+    for (let i = 0; i < 12 / DT && landed === 0; i++) {
+      const seen = sim.ctx.hasLineOfSight(caster, player);
+      player.hp = player.maxHp;
+      for (const ev of sim.tick()) {
+        if (ev.type !== 'damage' || ev.sourceId !== caster.id || ev.targetId !== player.id)
+          continue;
+        landed++;
+        if (!seen && !sim.ctx.hasLineOfSight(caster, player)) landedUnseen++;
+      }
+      worstStall = Math.max(worstStall, caster.chaseStall);
+      expect(caster.aiState).not.toBe('evade');
+      expect(isBlocked(WORLD_SEED_WITH_PROP, caster.pos.x, caster.pos.z, 0.35)).toBe(false);
+    }
+    expect(landed).toBeGreaterThan(0);
+    expect(landedUnseen).toBe(0);
+    expect(sim.ctx.hasLineOfSight(caster, player)).toBe(true);
+    expect(worstStall).toBeLessThan(CHASE_STALL_TIMEOUT / 2);
+    expect(caster.aggroTargetId).toBe(player.id);
+  });
+
+  it('the leash still sends a caster home while it is looking for its line', () => {
+    const { sim, caster } = field(20);
+    // Dragged far past its leash: the first engaged tick ends the pull.
+    caster.spawnPos = { x: caster.pos.x + LEASH_DISTANCE + 10, y: caster.pos.y, z: caster.pos.z };
+    caster.leashAnchor = null;
+    sim.tick();
+    expect(caster.aiState).toBe('evade');
+    expect(caster.aggroTargetId).toBeNull();
+    expect(caster.chaseRoute).toBeUndefined();
   });
 });
 
