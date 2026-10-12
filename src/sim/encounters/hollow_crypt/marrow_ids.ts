@@ -95,18 +95,27 @@ export function bellRopeSpot(): { x: number; z: number } {
 // tank's armor; the Grave's cave-in is a must-avoid hit for anyone but its mark (about
 // 15 percent); Grave Dirt about 3 percent a second; the Toll a raid-wide pulse (about
 // 11 percent). The heroic transform (mechanicDamageMult) lifts them all.
+// First uses (playtest, 2026-10-12: "his mechanics didn't go off"): the grave
+// is measured 2 s into the fight (it was 9) and the first Shovelful swings at
+// 4 s (it was 6), so the first Open Grave lies at 7 s, before a strong party
+// brings him to his first Toll, and a kill of under half a minute still shows
+// the whole kit (tests/hollow_crypt_marrow_pace.test.ts). The cadences and
+// every damage number are unchanged.
 export const MARROW_TUNING = {
-  shovelFirst: 6,
+  shovelFirst: 4,
   shovelEvery: 11,
   shovelCast: 1.2,
   shovelRange: 8,
+  /** He only begins the swing with his target this far inside the cone's
+   *  reach (yd), so a step back during the bar is a dodge, not a given. */
+  shovelReachMargin: 2,
   shovelArcDeg: 80,
   /** A multiple of his own melee roll, through armor. */
   shovelMult: 1.5,
   /** Dirt in the Eyes: a movement multiplier and its seconds. */
   shovelSlow: 0.5,
   shovelSlowSeconds: 6,
-  measureFirst: 9,
+  measureFirst: 2,
   measureEvery: 15,
   measureCast: 1,
   /** Seconds the mark runs before the grave caves in under them. */

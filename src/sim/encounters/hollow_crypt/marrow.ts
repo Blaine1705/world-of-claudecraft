@@ -2,11 +2,11 @@
 // digging (docs/design/dungeon-rework/hollow_crypt.md 5.1; tuning and the kit's
 // summary in marrow_ids.ts).
 //
-//   Shovelful               every 11 s (first at 6 s) a 1.2 s bar, aim locked
+//   Shovelful               every 11 s (first at 4 s) a 1.2 s bar, aim locked
 //                           at its start: a cone of grave dirt off the spade
 //                           (8 yd, 80 degrees) for 1.5 of his melee roll and
 //                           Dirt in the Eyes (50 percent slow, 6 s).
-//   Measured for the Grave  every 15 s (first at 9 s) a 1 s bar marks a
+//   Measured for the Grave  every 15 s (first at 2 s) a 1 s bar marks a
 //                           non-tank; 4 s later the grave caves in where they
 //                           stand (42 to 52 physical within 3 yd) and the pit
 //                           stays: Grave Dirt, 9 shadow a second and 40 percent
@@ -14,7 +14,8 @@
 //   Burial Toll             at 66 and 33 percent he strides to the bell rope
 //                           (immune), rings for 3 s, and the Toll lands: 30 to
 //                           38 shadow on everyone, and every Open Grave gives up
-//                           a Restless Bones.
+//                           a Restless Bones. A Toll that comes due while a bar
+//                           runs waits for the bar to land (1.2 s at most).
 //   Heroic                  Gravedigger's Blow (a stacking strike on the tank),
 //                           Grave Vigor (faster swings in a grave), Unquiet
 //                           Earth (lingering 2 s in a grave raises the dead).
@@ -179,6 +180,14 @@ export function startMarrowBar(
   else if (what === 'measure') st.measureTimer = T.measureEvery;
   else st.blowTimer = T.blowEvery;
   return true;
+}
+
+/** Is the one he fights close enough for a Shovelful to be worth swinging? */
+function shovelInReach(ctx: SimContext, boss: Entity): boolean {
+  const target = bossTarget(ctx, boss);
+  if (!target) return false;
+  const d = Math.hypot(target.pos.x - boss.pos.x, target.pos.z - boss.pos.z);
+  return d <= T.shovelRange - T.shovelReachMargin;
 }
 
 /** A bar lands. */
@@ -578,7 +587,10 @@ export function tickMarrow(
     return;
   }
   const share = boss.maxHp > 0 ? boss.hp / boss.maxHp : 1;
-  if (st.tolls < T.tollAt.length && share <= T.tollAt[st.tolls]) {
+  // A Toll that comes due mid-bar waits for the bar to land: cutting it short
+  // threw the Shovelful or the grave away for its whole cadence (the timer
+  // was already reset), which is how a fast kill saw no mechanic but the bell.
+  if (st.tolls < T.tollAt.length && share <= T.tollAt[st.tolls] && !st.bar) {
     beginToll(ctx, inst, boss, st);
     return;
   }
@@ -611,6 +623,11 @@ export function tickMarrow(
   if (ctx.isStunned(boss) || boss.castingAbility !== null) return;
   // One bar at a time: the grave first (it needs its 4 s), then the spade.
   if (st.measureTimer <= 0 && startMarrowBar(ctx, inst, boss, st, 'measure')) return;
-  if (st.shovelTimer <= 0 && startMarrowBar(ctx, inst, boss, st, 'shovel')) return;
+  // The spade waits until the one he fights is inside its cone: a Shovelful
+  // that came due while he rang (his timers wait on the Toll) used to plant
+  // him at the bell rope and fling its dirt at nobody.
+  if (st.shovelTimer <= 0 && shovelInReach(ctx, boss)) {
+    if (startMarrowBar(ctx, inst, boss, st, 'shovel')) return;
+  }
   if (heroicOf(inst) && st.blowTimer <= 0) startMarrowBar(ctx, inst, boss, st, 'blow');
 }

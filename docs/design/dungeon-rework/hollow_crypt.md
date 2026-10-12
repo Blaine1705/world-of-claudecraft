@@ -244,9 +244,9 @@ note lane about 70 (a fumbled core all but kills).
 
 | Mechanic | Rule | Normal numbers (percent of cloth 270) |
 |---|---|---|
-| Shovelful | every 11 s, a 1.2 s bar, aim locked: an 8 yd, 80 degree cone of grave dirt | 1.5 of his melee roll through armor, and 50 percent slower movement for 6 s |
-| Measured for the Grave | every 15 s a 1 s bar marks a non-tank; 4 s later an Open Grave caves in where they stand and stays for the fight (eight at most, the oldest fills) | cave-in 42 to 52 within 3 yd (about 17); Grave Dirt 9 a second (about 3) and 40 percent slower inside |
-| Burial Toll | at 66 and 33 percent: he strides to the bell rope (immune), rings 3 s (three peals), the Toll | 30 to 38 shadow to everyone (about 13); every Open Grave raises a Restless Bones (level 8, no loot) |
+| Shovelful | every 11 s (first at 4 s), a 1.2 s bar, aim locked: an 8 yd, 80 degree cone of grave dirt; he begins it only with his target within 6 yd | 1.5 of his melee roll through armor, and 50 percent slower movement for 6 s |
+| Measured for the Grave | every 15 s (first at 2 s, so the first grave lies at 7 s) a 1 s bar marks a non-tank; 4 s later an Open Grave caves in where they stand and stays for the fight (eight at most, the oldest fills) | cave-in 42 to 52 within 3 yd (about 17); Grave Dirt 9 a second (about 3) and 40 percent slower inside |
+| Burial Toll | at 66 and 33 percent: he strides to the bell rope (immune), rings 3 s (three peals), the Toll; a Toll that comes due mid-bar waits for the bar to land | 30 to 38 shadow to everyone (about 13); every Open Grave raises a Restless Bones (level 8, no loot) |
 | Heroic | Gravedigger's Blow every 9 s on the tank (6 percent more damage taken per stack, 20 s, six stacks); Grave Vigor (30 percent faster swings while he stands in a grave); Unquiet Earth (2 s in a grave raises a Restless Bones, then the grave rests 8 s) | |
 | Deed | A Tidy Churchyard: every grave opened at the yard's edge (7 yd of the rim) | |
 
