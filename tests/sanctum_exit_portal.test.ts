@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { buildSanctumExitPortal } from '../src/render/sanctum_exit_portal';
+import {
+  buildSanctumExitPortal,
+  resetSanctumExitPortalProfileCaches,
+} from '../src/render/sanctum_exit_portal';
 import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resource';
 
 function meshes(root: THREE.Group): THREE.Mesh[] {
@@ -54,6 +57,29 @@ describe('Sanctum return portal', () => {
     expect(mat.depthWrite).toBe(false);
     expect(mat.blending).toBe(THREE.AdditiveBlending);
     expect(b.portal).not.toBe(a.portal);
+  });
+
+  it('drops its tier-baked materials on a graphics-profile switch', () => {
+    const materialsOf = () =>
+      meshes(buildSanctumExitPortal(false, null).body).map((mesh) => mesh.material);
+    const held = materialsOf();
+    // Stable while the profile stands.
+    expect(materialsOf()).toEqual(held);
+    // The resetter the profile switch calls (assets/graphics_profile.ts
+    // RESETTERS; architecture.test.ts fails an unregistered one).
+    resetSanctumExitPortalProfileCaches();
+    const after = materialsOf();
+    expect(after).toHaveLength(held.length);
+    for (let i = 0; i < after.length; i++) expect(after[i]).not.toBe(held[i]);
+    // The fresh set is cached again, not minted per build, and still shared.
+    expect(materialsOf()).toEqual(after);
+    for (const material of after) expect(isSharedMaterial(material as THREE.Material)).toBe(true);
+    // The geometries carry no tier state and survive the switch.
+    const geometries = () =>
+      meshes(buildSanctumExitPortal(false, null).body).map((mesh) => mesh.geometry);
+    const before = geometries();
+    resetSanctumExitPortalProfileCaches();
+    expect(geometries()).toEqual(before);
   });
 
   it('keeps tier colors separate so a later low-tier build does not inherit HDR boost', () => {

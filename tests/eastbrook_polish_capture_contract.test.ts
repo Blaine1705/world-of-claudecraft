@@ -708,7 +708,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // on the merged tree, no capture was retaken).
   // Re-minted for the Sanctum exit portal (the door membrane's spin now honours reduced
   // motion, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
-  'f7b8f965ebd69deca71471bf6dc1e73af49a4b238ec482040be9c2fe63dc4ff5';
+  // Re-minted again for the door prewarm bodies (the Sanctum exit staged at boot: the
+  // renderer's prewarm builder now calls door_portal.ts; no capture was retaken).
+  'de95c87331c4c6f3b10be28b6af05c659b55d1304219ec40837496b758b14094';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

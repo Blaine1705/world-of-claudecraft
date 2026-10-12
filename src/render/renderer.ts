@@ -280,7 +280,12 @@ import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { DelveInteriorTracker } from './delve_interior_tracker';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
-import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
+import {
+  buildDoorBody,
+  buildDoorPrewarmBodies,
+  buildRiftGateBody,
+  buildRiftPuzzleProp,
+} from './door_portal';
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
@@ -7750,13 +7755,7 @@ export class Renderer {
   private sparkleMat: THREE.SpriteMaterial | null = null;
 
   private buildDoorPrewarmGroup(): THREE.Group {
-    const group = new THREE.Group();
-    const entrance = buildDoorBody(true, null, this.lowGfx).body;
-    entrance.position.x = -3;
-    group.add(entrance);
-    const exit = buildDoorBody(false, null, this.lowGfx).body;
-    exit.position.x = 3;
-    group.add(exit);
+    const group = buildDoorPrewarmBodies(this.lowGfx);
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 8);
     setRenderCategory(group, 'entity:object');

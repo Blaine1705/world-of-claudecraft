@@ -1,9 +1,14 @@
 // The dungeon door / exit-portal visual system extracted from renderer.ts.
 // Geometry/material shape, shared-resource tagging, and the Nythraxis click-box
 // special case. Three.js runs headless in Node (no WebGL needed for geometry).
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { buildDoorBody, doorArchAuthoredElsewhere } from '../src/render/door_portal';
+import {
+  buildDoorBody,
+  buildDoorPrewarmBodies,
+  doorArchAuthoredElsewhere,
+} from '../src/render/door_portal';
 import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resource';
 import { DUNGEONS } from '../src/sim/data';
 
@@ -112,6 +117,75 @@ describe('buildDoorBody: the Gravewyrm Sanctum Seal Gate', () => {
     expect(body.name).toBe('sanctum-exit');
     expect(body.getObjectByName('frost-opening')).toBeDefined();
     expect(portal).toBeDefined();
+  });
+});
+
+describe('the boot door prewarm bodies', () => {
+  const drawn = (root: THREE.Object3D): THREE.Mesh[] => {
+    const out: THREE.Mesh[] = [];
+    root.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) out.push(o as THREE.Mesh);
+    });
+    return out;
+  };
+  const materialsOf = (root: THREE.Object3D): Set<THREE.Material> =>
+    new Set(drawn(root).map((mesh) => mesh.material as THREE.Material));
+
+  it.each([false, true])('stages every live door body material on lowGfx=%s', (lowGfx) => {
+    const staged = materialsOf(buildDoorPrewarmBodies(lowGfx));
+    // The same shared instances the live views draw, so the boot compile
+    // links exactly the programs a door view needs later.
+    for (const [entering, dungeonId] of [
+      [true, null],
+      [false, null],
+      [false, 'gravewyrm_sanctum'],
+    ] as const) {
+      const live = materialsOf(buildDoorBody(entering, dungeonId, lowGfx).body);
+      expect(live.size, `${entering}:${dungeonId}`).toBeGreaterThan(0);
+      for (const material of live) {
+        expect(staged.has(material), `${entering}:${dungeonId}:${material.name}`).toBe(true);
+      }
+    }
+  });
+
+  it('stages the Sanctum frost exit, membrane and all, beside the two arches', () => {
+    const group = buildDoorPrewarmBodies(false);
+    expect(group.children).toHaveLength(3);
+    const exit = group.getObjectByName('sanctum-exit');
+    expect(exit).toBeDefined();
+    // The veil and the vortex are the textured additive membranes no other
+    // boot artifact links: both must be drawable meshes under the group.
+    for (const name of ['aurora-veil', 'return-vortex']) {
+      const mesh = group.getObjectByName(name) as THREE.Mesh | undefined;
+      expect(mesh?.isMesh, name).toBe(true);
+      const material = mesh?.material as THREE.MeshBasicMaterial;
+      expect(material.blending, name).toBe(THREE.AdditiveBlending);
+      expect(material.side, name).toBe(THREE.DoubleSide);
+    }
+    // The three bodies stand apart so none hides another from the compile.
+    const xs = group.children.map((body) => body.position.x);
+    expect(new Set(xs).size).toBe(3);
+    // Staging owns nothing: every resource stays shared, so tearing the
+    // group out at world entry disposes no live door's material.
+    for (const mesh of drawn(group)) {
+      expect(isSharedGeometry(mesh.geometry)).toBe(true);
+      expect(isSharedMaterial(mesh.material as THREE.Material)).toBe(true);
+    }
+  });
+
+  it('is what the renderer stages in its required props.dungeon-doors entry', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const start = renderer.indexOf("id: 'props.dungeon-doors'");
+    const entry = renderer.slice(start, renderer.indexOf('      {\n', start + 1));
+    expect(entry).toContain('required: true');
+    expect(entry).toContain('doorPrewarmGroup = this.buildDoorPrewarmGroup();');
+    expect(entry).toContain('this.scene.add(doorPrewarmGroup);');
+    const builder = renderer.slice(
+      renderer.indexOf('private buildDoorPrewarmGroup(): THREE.Group {'),
+    );
+    expect(builder.slice(0, builder.indexOf('\n  }\n'))).toContain(
+      'buildDoorPrewarmBodies(this.lowGfx)',
+    );
   });
 });
 

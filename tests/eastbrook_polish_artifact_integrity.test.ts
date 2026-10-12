@@ -1402,7 +1402,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // on the merged tree, no capture was retaken).
   // Re-minted for the Sanctum exit portal (the door membrane's spin now honours reduced
   // motion, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
-  'e27a470dabca68dbc7d861eecc86d9e994ebf1539092fe2095bffc5f61d2acab';
+  // Re-minted again for the door prewarm bodies (the Sanctum exit staged at boot: the
+  // renderer's prewarm builder now calls door_portal.ts; no capture was retaken).
+  'ca26180f5163c9fd27ceb601ffa582b4d4fc2f06571e8793a0d641d131bc9dbd';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1430,7 +1432,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // on the merged tree, no capture was retaken).
   // Re-minted for the Sanctum exit portal (the door membrane's spin now honours reduced
   // motion, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
-  'f7b8f965ebd69deca71471bf6dc1e73af49a4b238ec482040be9c2fe63dc4ff5';
+  // Re-minted again for the door prewarm bodies (the Sanctum exit staged at boot: the
+  // renderer's prewarm builder now calls door_portal.ts; no capture was retaken).
+  'de95c87331c4c6f3b10be28b6af05c659b55d1304219ec40837496b758b14094';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2819,7 +2823,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // Sanctum exit portal (the door membrane's reduced-motion guard): recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('c2cc2b1381087020c243195bd58fab49c20ca86b7a031d5042fc3e9a71882ee9');
+      // Door prewarm bodies (the Sanctum exit staged at boot): recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+    ).toBe('e80b43f66b74169b040519e8c1461c85be3f9a07b6d85e46cca32838dddd984d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

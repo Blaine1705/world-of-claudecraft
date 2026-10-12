@@ -110,6 +110,9 @@ vi.mock('../src/render/banker_chest', () => ({
 vi.mock('../src/render/door_portal', () => ({
   resetDoorPortalProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/sanctum_exit_portal', () => ({
+  resetSanctumExitPortalProfileCaches: mocks.reset,
+}));
 vi.mock('../src/render/eastbrook_surface_atlas', () => ({
   resetEastbrookSurfaceProfileCaches: mocks.reset,
 }));
@@ -251,6 +254,7 @@ describe('graphics profile derived-cache reset', () => {
       'jail_scene',
       'cliff_scree',
       'door_portal',
+      'sanctum_exit_portal',
       'fireball_travel_visual',
       'frost_nova_root_visual',
       'ice_block_visual',

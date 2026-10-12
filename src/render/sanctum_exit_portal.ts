@@ -1,14 +1,28 @@
 import * as THREE from 'three';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
-// Built inside createView's existing entity preparation gate. Reuses the door
-// family's membrane texture and basic-material programs, with no lights or
-// shader clock. The renderer animates only the returned circular membrane;
-// its stationary oval parent keeps the walk-through opening upright.
+// Built inside createView's existing entity preparation gate, with no lights
+// or shader clock. The untextured rims and anchors share the door family's
+// basic-material program. The veil and the vortex wear the door family's
+// membrane texture, and a textured additive double-sided basic material is a
+// program of its own (the rift gate and the Wildheart door membranes are its
+// only other users, and those exist as live views only), so the boot door
+// prewarm stages this body too (door_portal.ts buildDoorPrewarmBodies): the
+// way out is linked, and its texture uploaded, before Korzul ever falls.
+// The renderer animates only the returned circular membrane; its stationary
+// oval parent keeps the walk-through opening upright.
 let circle: THREE.CircleGeometry | undefined;
 let rim: THREE.TorusGeometry | undefined;
 let crystal: THREE.OctahedronGeometry | undefined;
+// Keyed by role, tier and membrane texture. The colours bake the tier's
+// additive gain, so a graphics-profile switch drops them (a RESETTERS row in
+// assets/graphics_profile.ts, beside the door family's own).
 const materials = new Map<string, THREE.MeshBasicMaterial>();
+
+/** Drop the tier-baked materials on a graphics-profile switch. */
+export function resetSanctumExitPortalProfileCaches(): void {
+  materials.clear();
+}
 
 function glow(
   role: string,
