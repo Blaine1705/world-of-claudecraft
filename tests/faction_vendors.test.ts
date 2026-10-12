@@ -193,6 +193,7 @@ describe('Faction Vendors & Reroll NPC content', () => {
       if (gate.factionId === undefined) continue; // the allied rows, pinned below
       if (def.kind === 'recipe') expect(gate.currencyCost, id).toBe(50);
       else if (def.kind === 'tool') expect(gate.currencyCost, id).toBe(40);
+      else if (def.kind === 'mount') expect(gate.currencyCost, id).toBe(500);
       else expect(gate.currencyCost, id).toBe(MARKS[tier]);
       if (def.kind === 'armor' || def.kind === 'weapon' || def.kind === 'bag')
         expect(def.sellValue, id).toBe(SELL[tier]);
@@ -200,13 +201,13 @@ describe('Faction Vendors & Reroll NPC content', () => {
     expect(FACTION_VENDOR_GATES.cartographers_ink.currencyCost).toBe(60);
     expect(FACTION_VENDOR_GATES.allied_hearthstone.currencyCost).toBe(100);
     expect(FACTION_VENDOR_GATES.allied_vanguard_duffel.currencyCost).toBe(120);
-    // The mount: the Champion figure in Rift Watch marks, no coin, an
-    // ordinary player reins that never vendor-sells back.
+    // The mount: 500 Rift Watch marks, no coin, an ordinary player reins
+    // that never vendor-sells back.
     const reins = ITEMS.reins_avian_strider;
     expect(FACTION_VENDOR_GATES.reins_avian_strider).toMatchObject({
       factionId: 'rift_watch',
       standingTier: 'champion',
-      currencyCost: 200,
+      currencyCost: 500,
     });
     expect(reins.buyValue).toBe(0);
     expect(reins.sellValue).toBe(0);
@@ -488,7 +489,7 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     const meta = sim.meta(pid);
     if (!meta) throw new Error('fixture player missing');
     meta.copper = 2_500_000;
-    meta.factionCurrencies.rift_watch = 199;
+    meta.factionCurrencies.rift_watch = 499;
     meta.ridingTrained = true;
     const qm = [...sim.entities.values()].find(
       (e) => e.templateId === 'npc_rift_watch_quartermaster',
@@ -510,17 +511,17 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     sim.buyItem(qm.id, 'reins_avian_strider');
     expect(sim.countItem('reins_avian_strider', pid)).toBe(0);
     meta.ridingTrained = true;
-    // One mark short of the Champion figure: refused, and coin cannot cover it.
+    // One mark short of the 500-mark price: refused, and coin cannot cover it.
     sim.drainEvents();
     sim.buyItem(qm.id, 'reins_avian_strider');
     expect(
-      sim.drainEvents().some((e) => e.type === 'error' && e.text.startsWith('You need 200 ')),
+      sim.drainEvents().some((e) => e.type === 'error' && e.text.startsWith('You need 500 ')),
     ).toBe(true);
     expect(sim.countItem('reins_avian_strider', pid)).toBe(0);
-    expect(meta.factionCurrencies.rift_watch).toBe(199);
+    expect(meta.factionCurrencies.rift_watch).toBe(499);
     expect(meta.copper).toBe(2_500_000);
-    // Enough marks: the purchase spends exactly 200 of them and no coin.
-    meta.factionCurrencies.rift_watch = 250;
+    // Enough marks: the purchase spends exactly 500 of them and no coin.
+    meta.factionCurrencies.rift_watch = 550;
     sim.buyItem(qm.id, 'reins_avian_strider');
     expect(sim.countItem('reins_avian_strider', pid)).toBe(1);
     expect(meta.factionCurrencies.rift_watch).toBe(50);
