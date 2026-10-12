@@ -653,6 +653,25 @@ describe('the Drowned Gate Tower painter', () => {
     expect(shader.fragmentShader.indexOf('discard')).toBeLessThan(
       shader.fragmentShader.indexOf('bastPassage(vBastP'),
     );
+    // what hangs on the gatehouse goes with it too: the rosette's light, the
+    // shafts in the arch and the drips off the spikes (kinds 0, 1, 2 and 4),
+    // never the ground's rings and pool, the marsh lights or the sky beam
+    const sprites = view.group.getObjectByName('sunkenBastionGateSprites') as THREE.Mesh;
+    const spriteShader = {
+      uniforms: {} as Record<string, unknown>,
+      vertexShader: '#include <common>\n#include <project_vertex>',
+      fragmentShader: '#include <common>\n#include <map_fragment>',
+    };
+    (sprites.material as THREE.Material).onBeforeCompile(
+      spriteShader as unknown as Parameters<THREE.Material['onBeforeCompile']>[0],
+      null as unknown as THREE.WebGLRenderer,
+    );
+    expect(spriteShader.uniforms.uBastGhost).toBe(ghost);
+    expect(spriteShader.vertexShader).toContain('uniform float uBastGhost;');
+    expect(spriteShader.vertexShader).toContain(
+      'if (bK < 2.5 || (bK > 3.5 && bK < 4.5)) bA *= uBastGhost;',
+    );
+    expect([K.roseCore, K.roseShaft, K.gateShaft, K.drip]).toEqual([0, 1, 2, 4]);
     clearSetPieceOccluders();
   });
 

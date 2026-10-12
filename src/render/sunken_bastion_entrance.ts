@@ -82,7 +82,7 @@ export const sunkenBastionEntrancePreloadInternalsForTest = { urls: [...URLS] };
 
 export const BASTION_PASSAGE_PROGRAM_CACHE_KEY = 'sunken-bastion-flooded-passage-v2';
 export const BASTION_FOG_PROGRAM_CACHE_KEY = 'sunken-bastion-marsh-fog-v2';
-export const BASTION_SPRITE_PROGRAM_CACHE_KEY = 'sunken-bastion-gate-sprites-v2';
+export const BASTION_SPRITE_PROGRAM_CACHE_KEY = 'sunken-bastion-gate-sprites-v3';
 
 export interface SunkenBastionEntranceView {
   group: THREE.Group;
@@ -91,9 +91,9 @@ export interface SunkenBastionEntranceView {
 }
 
 /** x: the night amount (0 day, 1 night); y: motion (1, or 0 under reduced
- *  motion). One object shared by the three effect programs. uBastGhost is the
- *  passage's own: how much of it shows while the gatehouse is the camera's
- *  ghost (bastionPassageGhostFade). */
+ *  motion). One object shared by the three effect programs. uBastGhost is how
+ *  much of the passage, and of the lights and drips that hang on the gatehouse,
+ *  shows while the gatehouse is the camera's ghost (bastionPassageGhostFade). */
 const bastionUniforms = {
   uBastion: { value: new THREE.Vector2(0, 1) },
   uBastGhost: { value: 1 },
@@ -639,6 +639,9 @@ if (bK > 0.5 && bK < 3.5) {
   if (bK > 7.5) bA *= smoothstep(4.0, 15.0, -mvPosition.z);
   mvPosition.xy += bQ * sz;
 }
+// what hangs on the gatehouse (the rosette's light, the shafts in the arch,
+// the drips off the spikes) goes with it when it is the camera's ghost
+if (bK < 2.5 || (bK > 3.5 && bK < 4.5)) bA *= uBastGhost;
 vBastQ = bQ;
 vBastS = vec3(bK, bA, bTm);
 gl_Position = projectionMatrix * mvPosition;`;
@@ -709,10 +712,11 @@ function spriteMaterial(): THREE.MeshBasicMaterial {
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = sharedUniforms.uTime;
     shader.uniforms.uBastion = bastionUniforms.uBastion;
+    shader.uniforms.uBastGhost = bastionUniforms.uBastGhost;
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
-        `#include <common>\nattribute vec4 aS;\nattribute vec4 aK;\nattribute vec4 aD;\nvarying vec2 vBastQ;\nvarying vec3 vBastS;\nvarying vec2 vBastU;\n${PULSE_GLSL}`,
+        `#include <common>\nuniform float uBastGhost;\nattribute vec4 aS;\nattribute vec4 aK;\nattribute vec4 aD;\nvarying vec2 vBastQ;\nvarying vec3 vBastS;\nvarying vec2 vBastU;\n${PULSE_GLSL}`,
       )
       .replace('#include <project_vertex>', SPRITE_VERTEX);
     shader.fragmentShader = shader.fragmentShader
