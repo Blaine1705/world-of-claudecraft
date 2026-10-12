@@ -60,14 +60,18 @@ describe('Spore Burst growth', () => {
 });
 
 describe('Spore Burst asset', () => {
-  it('ships the spore burster GLB in the media manifest, meshopt-compressed, under the prop budget', () => {
+  it('ships the spore burster GLB in the media manifest, meshopt-compressed with KTX2 textures', () => {
     const url = sporeBurstVisualPreloadInternalsForTest.modelUrl;
     const rel = url.replace(/^\//, '');
     const file = path.join(publicDir, rel);
     expect(existsSync(file)).toBe(true);
     expect(MEDIA_ASSETS[rel]).toBeDefined();
-    expect(statSync(file).size).toBeLessThanOrEqual(350 * 1024);
-    expect(readFileSync(file).toString('latin1')).toContain('EXT_meshopt_compression');
+    // KTX2 (UASTC normal/ORM, ETC1S colour) is bigger on disk than the
+    // pipeline's WebP build but a fraction of it in GPU memory.
+    expect(statSync(file).size).toBeLessThanOrEqual(512 * 1024);
+    const binary = readFileSync(file).toString('latin1');
+    expect(binary).toContain('EXT_meshopt_compression');
+    expect(binary).toContain('KHR_texture_basisu');
   });
 });
 
