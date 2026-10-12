@@ -627,7 +627,9 @@ function checkRowShape(row, findings) {
   };
   // craft_consume (Bank Storage Phase 04) is an item op with exactly the
   // deposit/withdraw row shape: vault stock consumed in place by a completed
-  // craft, one row per material id, positive count, no copper.
+  // craft, one row per planned take (a take that reaches the crafter's own
+  // signed units writes a signer-keyed row beside its pooled one), positive
+  // count, no copper.
   if (
     row.op === 'deposit' ||
     row.op === 'withdraw' ||

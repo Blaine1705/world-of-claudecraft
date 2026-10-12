@@ -690,6 +690,44 @@ describe('units signed by the crafter themself are drawable from the vault', () 
     ]);
   });
 
+  it('splits across the compact record, identity rows and several ids at once', () => {
+    const sim = openWorldSim();
+    const meta = metaOf(sim);
+    meta.vault.stock.copper_ore = 2;
+    meta.vault.special.push({
+      itemId: 'copper_ore',
+      count: 4,
+      materialSources: composition([
+        { source: anaSource, count: 1 },
+        { source: { signer: meta.name }, count: 3 },
+      ]),
+    });
+    meta.vault.stock.iron_ore = 5;
+    const split = splitVaultTakesBySigner(
+      [
+        { itemId: 'copper_ore', count: 5 },
+        { itemId: 'iron_ore', count: 2 },
+      ],
+      meta.vault.stock,
+      meta.vault.special,
+      materialItemIds(),
+      meta.name,
+    );
+
+    // copper: 2 compact + 1 Ana are pooled, the other 2 are the crafter's own.
+    expect(split).toEqual([
+      { itemId: 'copper_ore', count: 3 },
+      { itemId: 'copper_ore', count: 2, signer: meta.name },
+      { itemId: 'iron_ore', count: 2 },
+    ]);
+    // And that is exactly what the spend removes.
+    expect(consumePlayerVaultStock(meta, 'copper_ore', 5)).toBe(true);
+    expect(Object.hasOwn(meta.vault.stock, 'copper_ore')).toBe(false);
+    expect(buckets(meta.vault.special[0].materialSources)).toEqual({
+      [materialSourceKey({ signer: meta.name })]: 1,
+    });
+  });
+
   it('the bare primitive with no crafter named still refuses every signed unit', () => {
     const { sim } = selfMixedSim();
     const meta = metaOf(sim);

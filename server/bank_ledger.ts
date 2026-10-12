@@ -975,10 +975,12 @@ export function buildVaultLedgerRows(
 // This module keeps only the PURE row builder the journal serializes with.
 //
 // Rows write op 'craft_consume', container 'vault', container_id null,
-// instance null, copper_delta 0; purchased_slots_after carries the rung the
-// reservation sampled at consumption time; one row per material id drawn, in
-// the canonical sorted take order (src/sim/sim_context.ts
-// reservePlannedVaultConsumption). scripts/bank_audit.mjs replays
+// copper_delta 0, and instance null for pooled stock or the signer-only vault
+// identity for the crafter's OWN signed units (the take's `signer`);
+// purchased_slots_after carries the rung the reservation sampled at
+// consumption time; one row per planned take, in the order
+// src/sim/sim_context.ts reservePlannedVaultConsumption offers them (sorted,
+// then split by signer, so one id may carry a pooled and a signed row). scripts/bank_audit.mjs replays
 // 'craft_consume' as a REMOVAL beside deposit/withdraw/admin_purge; without
 // that row every crafting character would reconcile as a permanent
 // ledger_state_mismatch, which is why the row family exists at all.
