@@ -181,3 +181,12 @@ export interface TreasureMapProgress {
    *  upgrade, since the floor count depends on the rank). */
   seed: number;
 }
+
+/** The map one Cartographer's Ink use redraws, as the client's picker names it:
+ *  the READ map (it keeps its dig site and re-seeds its vault) or an unread copy
+ *  in the bags (a plain item swap). Maps of one rarity stack, so the rarity plus
+ *  the read flag is the whole address. */
+export interface InkMapTarget {
+  rarity: TreasureMapRarity;
+  read: boolean;
+}
