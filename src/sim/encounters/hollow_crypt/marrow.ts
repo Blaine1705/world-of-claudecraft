@@ -16,7 +16,9 @@
 //                           38 shadow on everyone (a tenth more on heroic,
 //                           before its transform), and every Open Grave gives
 //                           up a Restless Bones. A Toll that comes due while a
-//                           bar runs waits for the bar to land (1.2 s at most).
+//                           bar runs waits for the bar to land (1.25 s at most:
+//                           the longest bar, then one tick, for the bar lands
+//                           on one tick and the Toll starts on the next).
 //   Heroic                  Gravedigger's Blow (a stacking strike on the tank),
 //                           Grave Vigor (faster swings in a grave), Unquiet
 //                           Earth (lingering 2 s in a grave raises the dead).
@@ -597,6 +599,8 @@ export function tickMarrow(
   // A Toll that comes due mid-bar waits for the bar to land: cutting it short
   // threw the Shovelful or the grave away for its whole cadence (the timer
   // was already reset), which is how a fast kill saw no mechanic but the bell.
+  // He stays hittable for that wait, 1.25 s at most (the 1.2 s Shovelful and
+  // the tick after it lands).
   if (st.tolls < T.tollAt.length && share <= T.tollAt[st.tolls] && !st.bar) {
     beginToll(ctx, inst, boss, st);
     return;
