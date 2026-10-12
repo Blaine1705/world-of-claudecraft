@@ -518,6 +518,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the ground-object glow inside the entity view body, a view light marked on reconcile',
   'render/sanctum_seal_gate.ts':
     'the Seal Gate rune light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/sunken_bastion_entrance.ts':
+    'the Drowned Gate Tower pulse light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/realm_flora.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/soulwell.ts':
@@ -634,6 +636,9 @@ describe('every point-light producer is a carrier source', () => {
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
       // the idle sweep or to Vael's lamp yaw, never a scene.
       'render/sunken_bastion/bastion_beacon.ts: mesh',
+      // The Drowned Gate Tower's marsh fog: a mesh hook writing the time of
+      // day, the reduced-motion switch and the pulse light's base, never a scene.
+      'render/sunken_bastion_entrance.ts: mesh',
       // The Wildheart Basin's gates: mesh hooks reading the gate memory (the
       // vine bridges weaving, the thorn walls sinking, the wards failing),
       // never a scene.

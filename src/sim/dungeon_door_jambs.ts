@@ -4,8 +4,10 @@
 // share one doorway, so dedupe by position. A door whose facade is a built
 // set piece hands that set piece's own colliders instead of the jambs: the
 // Gravewyrm Sanctum's Seal Gate (sanctum_seal_gate.ts), whose pylons ARE the
-// jambs. Extracted from colliders.ts under the monolith ratchet; the caller
-// passes its camera-top resolver.
+// jambs, and the Sunken Bastion's Drowned Gate Tower
+// (sunken_bastion_entrance.ts), whose inner arch is the door. Extracted from
+// colliders.ts under the monolith ratchet; the caller passes its camera-top
+// resolver.
 import type { Collider } from './colliders';
 import { DUNGEON_LIST } from './data';
 import {
@@ -15,6 +17,10 @@ import {
   DOOR_ARCH_JAMB_X,
 } from './prop_layout';
 import { SANCTUM_SEAL_GATE_DUNGEON_ID, sanctumSealGateColliders } from './sanctum_seal_gate';
+import {
+  SUNKEN_BASTION_ENTRANCE_DUNGEON_ID,
+  sunkenBastionEntranceColliders,
+} from './sunken_bastion_entrance';
 
 export function dungeonDoorJambColliders(
   seed: number,
@@ -30,6 +36,10 @@ export function dungeonDoorJambColliders(
     doorSpots.add(key);
     if (dungeon.id === SANCTUM_SEAL_GATE_DUNGEON_ID) {
       out.push(...sanctumSealGateColliders(seed, dungeon.doorPos));
+      continue;
+    }
+    if (dungeon.id === SUNKEN_BASTION_ENTRANCE_DUNGEON_ID) {
+      out.push(...sunkenBastionEntranceColliders(seed, dungeon.doorPos));
       continue;
     }
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {

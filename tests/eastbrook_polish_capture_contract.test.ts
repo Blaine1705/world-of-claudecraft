@@ -679,6 +679,7 @@ interface AttributionTargetFixture {
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  // Re-minted for the set piece occluder hook in renderer.ts (the dungeon entrances fade when they block the camera). No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -706,7 +707,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  '16d24d35e308ac6bc78c0b6ac73fe1e3e8bc725ca098f1b910af1847a67e8b7a';
+  'c19b8c1344289ed627a1e8b7e53fb1cda65c7503beb8746bc12faac2e1997225';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

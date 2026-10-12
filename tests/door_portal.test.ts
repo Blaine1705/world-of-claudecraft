@@ -92,6 +92,17 @@ describe('buildDoorBody: Nythraxis crypt click-box', () => {
   });
 });
 
+describe('buildDoorBody: the Sunken Bastion Drowned Gate Tower', () => {
+  it('the entering Bastion door is only the invisible click box: the gatehouse draws the portal', () => {
+    expect(doorArchAuthoredElsewhere('sunken_bastion')).toBe(true);
+    const { body, portal } = buildDoorBody(true, 'sunken_bastion', false);
+    expect(portal).toBeUndefined();
+    expect(meshes(body).length).toBe(1);
+    // the exit inside the instance keeps the generic arch and its swirl
+    expect(buildDoorBody(false, 'sunken_bastion', false).portal).toBeDefined();
+  });
+});
+
 describe('buildDoorBody: the Gravewyrm Sanctum Seal Gate', () => {
   it('the entering Sanctum door is only the invisible click box: no arch, no swirl disc', () => {
     expect(doorArchAuthoredElsewhere('gravewyrm_sanctum')).toBe(true);

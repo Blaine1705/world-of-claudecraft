@@ -28,6 +28,10 @@ const EXCLUSIONS = [
   { x: 370.69166315346956, z: 1915.294014248997 },
   { x: 375.35517376009375, z: 1926.9491909733042 },
   { x: 373.5998047152534, z: 1939.6218792777508 },
+  // The Sunken Bastion's Drowned Gate Tower: a rock inside the west tower's
+  // drum, and a tree against the east tower whose crown filled its hoarding.
+  { x: 53.64584932429716, z: 511.6929228263907 },
+  { x: 37.96934285759926, z: 518.8265399737284 },
 ];
 
 export function isExcludedDecoration(x: number, z: number): boolean {
