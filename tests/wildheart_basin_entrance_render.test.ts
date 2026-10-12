@@ -21,7 +21,9 @@ import {
   WILDHEART_BREATH,
   WILDHEART_DRIP_SOURCES,
   WILDHEART_EYES,
+  WILDHEART_FIREFLY_FIELDS,
   WILDHEART_LEAN,
+  WILDHEART_MAW_SHAFTS,
   WILDHEART_MIST_FIELDS,
   WILDHEART_SPRITE_KIND,
   WILDHEART_THROAT,
@@ -46,7 +48,12 @@ import {
   wildheartThroatRest,
   wildheartThroatTrace,
 } from '../src/render/wildheart_basin_entrance_core';
-import { WILDHEART_BASIN_ENTRANCE_COLLIDERS } from '../src/sim/wildheart_basin_entrance';
+import { DUNGEONS } from '../src/sim/data';
+import {
+  onWildheartBasinEntranceCauseway,
+  WILDHEART_BASIN_ENTRANCE_COLLIDERS,
+  WILDHEART_BASIN_ENTRANCE_RING,
+} from '../src/sim/wildheart_basin_entrance';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const TIERS: readonly WildheartEffectsTier[] = ['low', 'medium', 'high', 'ultra'];
@@ -168,11 +175,42 @@ describe('the mist', () => {
     const n = wildheartMistPuffCount('ultra');
     for (let i = 0; i < n; i++) used.add(wildheartMistPuff(i, n).field);
     expect(used.size).toBe(WILDHEART_MIST_FIELDS.length);
-    // the breath field is the one that takes the jade whole, and it climbs the stair
+    // the breath field is the one that takes the jade whole, and it pours down the causeway
     const maw = WILDHEART_MIST_FIELDS[0];
     expect(maw.name).toBe('maw');
     expect(maw.lit).toBe(1);
     expect(maw.dz).toBeLessThan(-6);
+    const door = DUNGEONS.wildheart_basin.doorPos;
+    expect(
+      onWildheartBasinEntranceCauseway(door, door.x + maw.ox + maw.dx, door.z + maw.oz + maw.dz),
+    ).toBe(true);
+  });
+
+  it('no mist and no firefly drifts into the ring of columns', () => {
+    const door = DUNGEONS.wildheart_basin.doorPos;
+    const ring = WILDHEART_BASIN_ENTRANCE_RING;
+    const clear = (lx: number, lz: number) =>
+      Math.hypot(door.x + lx - ring.x, door.z + lz - ring.z) - ring.radius;
+    const n = wildheartMistPuffCount('ultra');
+    for (let i = 0; i < n; i++) {
+      const puff = wildheartMistPuff(i, n);
+      for (const t of [0, 0.5, 1]) {
+        expect(clear(puff.ox + puff.dx * t, puff.oz + puff.dz * t), `puff ${i}`).toBeGreaterThan(
+          ring.clear,
+        );
+      }
+    }
+    for (const f of WILDHEART_FIREFLY_FIELDS) {
+      for (const [lx, lz] of [
+        [f.x0, f.z0],
+        [f.x1, f.z0],
+        [f.x0, f.z1],
+        [f.x1, f.z1],
+      ]) {
+        // a firefly wanders a yard and a half off its own place
+        expect(clear(lx, lz) - 1.5).toBeGreaterThan(ring.clear);
+      }
+    }
   });
 
   it('a puff is born and dies unseen, drifts with time and stands still under reduced motion', () => {
@@ -215,6 +253,28 @@ describe('the sprites', () => {
     expect(count('ultra', K.drip)).toBe(WILDHEART_DRIP_SOURCES.length);
     const totals = TIERS.map((tier) => wildheartSprites(tier, flat).length);
     expect(totals).toEqual([...totals].sort((a, b) => a - b));
+  });
+
+  it("the maw's shafts lie near level over the causeway, and a firefly flies over its own ground", () => {
+    // the causeway falls away from the door: a shaft pitched up would leave
+    // the walker under it, one pitched down would bury itself in the rise
+    for (const [, pitch] of WILDHEART_MAW_SHAFTS) expect(Math.abs(pitch)).toBeLessThan(0.2);
+    const shafts = wildheartSprites('ultra', flat).filter((s) => s.kind === K.mawShaft);
+    for (const s of shafts) {
+      expect(s.dz).toBeLessThan(-0.8);
+      // ten yards out it is still over a walker's head on the causeway's foot (two yards down)
+      expect(s.y + s.dy * 10).toBeGreaterThan(0.2);
+      expect(s.y + s.dy * 10).toBeLessThan(3.2);
+    }
+    // the ground the painter hands over is the terrain or the lagoon: a
+    // firefly over the low bank flies a yard over the bank, not over the door
+    const low = (lx: number) => (lx > 2 ? -4.5 : 0);
+    const flies = wildheartSprites('ultra', low).filter((s) => s.kind === K.firefly);
+    expect(flies.length).toBeGreaterThan(10);
+    for (const f of flies) {
+      expect(f.y - low(f.x)).toBeGreaterThan(0.7);
+      expect(f.y - low(f.x)).toBeLessThan(2.5);
+    }
   });
 
   it('every sprite is finite, and what hangs on the idol is marked to go with its ghost', () => {
@@ -315,14 +375,14 @@ describe('the painter', () => {
     expect(view.cullGroups).toHaveLength(1);
     const body = view.cullGroups[0];
     expect(body.name).toBe('wildheartBasinEntranceBody');
-    expect(body.position.x).toBe(-232);
-    expect(body.position.z).toBe(1112);
+    expect(body.position.x).toBe(-237);
+    expect(body.position.z).toBe(1093);
     // the jade in the maw and the two fire bowls, lifted to the feature's root
     expect(view.glowLights).toHaveLength(1 + WILDHEART_BRAZIERS.length);
     for (const light of view.glowLights) {
       expect(light.parent).toBe(view.group);
       expect(light.userData.baseIntensity).toBe(light.intensity);
-      expect(Math.hypot(light.position.x + 232, light.position.z - 1112)).toBeLessThan(6);
+      expect(Math.hypot(light.position.x + 237, light.position.z - 1093)).toBeLessThan(6);
     }
     const throat = body.getObjectByName('wildheartBasinFloodedThroat') as THREE.Mesh;
     const mist = body.getObjectByName('wildheartBasinMawMist') as THREE.InstancedMesh;
@@ -335,13 +395,15 @@ describe('the painter', () => {
     const up = new THREE.Vector3(0, 1, 0).applyQuaternion(lean.quaternion);
     expect(up.x).toBeCloseTo(Math.sin(WILDHEART_LEAN.roll), 3);
     expect(up.z).toBeCloseTo(-Math.sin(WILDHEART_LEAN.pitch), 3);
-    // seen from the stair only: its lit side is its BACK side
+    // seen from the causeway only: its lit side is its BACK side
     expect((throat.material as THREE.Material).side).toBe(THREE.BackSide);
     expect((throat.material as THREE.Material).transparent).toBe(false);
     for (const mesh of [mist, sprites]) {
       expect(mesh.frustumCulled).toBe(false);
       expect(mesh.renderOrder).toBeGreaterThanOrEqual(FLOOR_VFX_LAYER_BASE.ground);
-      expect(mesh.renderOrder).toBeLessThan(FLOOR_VFX_LAYER_BASE.ground + FLOOR_VFX_LAYER_SPAN.ground);
+      expect(mesh.renderOrder).toBeLessThan(
+        FLOOR_VFX_LAYER_BASE.ground + FLOOR_VFX_LAYER_SPAN.ground,
+      );
       expect((mesh.material as THREE.Material).depthWrite).toBe(false);
     }
     expect(TIERS.map(wildheartMistPuffCount)).toContain(mist.count);

@@ -28,10 +28,11 @@ const EXCLUSIONS = [
   { x: 370.69166315346956, z: 1915.294014248997 },
   { x: 375.35517376009375, z: 1926.9491909733042 },
   { x: 373.5998047152534, z: 1939.6218792777508 },
-  // The Wildheart Basin's Jaguar Maw: a palm in the walk-in lane, under the
-  // fangs, and one against the idol's east cheek whose crown stood in the stone.
-  { x: -230.27577486773953, z: 1110.0866696499288 },
-  { x: -243.16279729665257, z: 1118.9681632742286 },
+  // The Wildheart Basin's Jaguar Maw: the great palm that grew on the door
+  // itself, in the walk-in lane under the fangs, and the palm in its forecourt
+  // that stood between the road's end and the maw.
+  { x: -237.19542878307402, z: 1093.0744675970636 },
+  { x: -246.96982042654417, z: 1079.8916892490815 },
 ];
 
 export function isExcludedDecoration(x: number, z: number): boolean {

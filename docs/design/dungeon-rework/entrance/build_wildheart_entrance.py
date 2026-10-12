@@ -3,29 +3,35 @@
   blender -b --factory-startup --python build_wildheart_entrance.py -- --out DIR
       [--terrain DIR] [--renders all|quick|none] [--tag NAME] [--no-ao]
 
-The Sunken Idol of the Palmreach (door (-232, 1112)) opened: a temple front of
-cyclopean limestone carved as a roaring jaguar's face, sunk where the knoll
-drops into the Sapphire Lagoon. The hill has swallowed its east shoulder and
-the lagoon laps its west cheek; the whole mass leans west and forward, over
-whoever comes down to it. The door is its open maw: a ruined stair of heaved
-blocks runs down the knoll between two troll fire bowls and under the upper
-fangs, to black water standing in the throat. Two slanted eyes with jade
-pupils watch over the crest of the knoll; a strangler fig has rooted in the
-crown and poured its roots down the temples and into the water; the Sunbone
-have raised a pair of great tusks hung with war cloth at the stair head.
+The Sunken Idol of the Palmreach (door (-237, 1093)) opened: a round head of
+cyclopean limestone carved as a roaring jaguar, standing on the low rise
+beside the Sunken Idol's ring of columns, where the road comes up from the
+south. The knoll has swallowed its nape; the ground falls away from its west
+cheek down a bank to the Sapphire Lagoon; the whole mass leans west and
+forward, over whoever walks up to it. The door is its open maw: a causeway of
+heaved flagstones climbs the rise between the Sunbone's two great tusks and
+two troll fire bowls, under the upper fangs, to black water standing in the
+throat. Two slanted eyes with jade pupils watch the road; a strangler fig has
+rooted in the crown and poured its roots down the temples, the bank and into
+the water.
+
+The door's own calm pad (src/sim/terrain_calm_anchors.ts) is what raises the
+rise: the terrain within seven yards of a dungeon door is the classic field,
+which domes here. So the height grid must be probed with the door ALREADY at
+its place in src/sim/content/wildheart.ts.
 
 Run from the repo: --out tmp/asset_src/wildheart_basin_entrance --terrain <dir
 of the probe's wildheart_heightgrid.json and wildheart_surroundings.json>
 (probe.mts beside this file writes them:
-`npx tsx probe.mts wildheart -232 1112 <dir> 40 120`), then
+`npx tsx probe.mts wildheart -237 1093 <dir> 40 120`), then
 node scripts/assets/wildheart_basin_entrance/build.mjs.
 
-Local game coords via ec.B(lx, lz, y): lx = x + 232 (+ WEST), lz = z - 1112
-(+ NORTH), y = y - terrainHeight(-232, 1112). In Blender that is X = lx,
+Local game coords via ec.B(lx, lz, y): lx = x + 237 (+ WEST), lz = z - 1093
+(+ NORTH), y = y - terrainHeight(-237, 1093). In Blender that is X = lx,
 Y = -lz (so SOUTH is +Y), Z = y. Three GLBs share ONE origin, the door at its
 terrain height:
   wildheart_basin_entrance.glb         the idol: body, face, fangs, the fig's trunk and roots
-  wildheart_basin_entrance_court.glb   the stair, the fire bowls, the tusks, fallen stone
+  wildheart_basin_entrance_court.glb   the causeway, the fire bowls, the tusks, fallen stone
   wildheart_basin_entrance_growth.glb  the fig's crown, lianas, fern, broadleaf, reed, moss
 Materials: KitStone (lit, vertex colour), KitLeaf (lit, double sided),
 KitGlow (the coals in the fire bowls, unlit), KitWet (lit and glossy: the
@@ -105,12 +111,27 @@ WINDOW_Z = 1.3        # the engine's throat window stands here
 EYE = dict(x=3.9, y=10.5, a=1.45, b=0.82, slant=0.30)
 EAR = dict(x=5.7, y=13.0, half=1.6, rise=2.8)
 LEAN_ROLL = math.radians(2.5)      # the crown toward the WEST (the lagoon)
-LEAN_PITCH = math.radians(2.0)     # and SOUTH, over the stair
+LEAN_PITCH = math.radians(2.0)     # and SOUTH, over the causeway
 LEAN = Matrix.Rotation(LEAN_ROLL, 4, 'Y') @ Matrix.Rotation(-LEAN_PITCH, 4, 'X')
 EXIT_DROP = (0.0, -4.0)
-BRAZIERS = [(3.6, -3.6), (-3.6, -3.6)]
-TUSKS = [(5.4, -6.9), (-5.2, -7.5)]
-STAIR = dict(z0=-9.4, z1=1.1, hw_out=2.5, hw_in=2.3)
+BRAZIERS = [(4.4, -3.4), (-4.4, -3.4)]
+TUSKS = [(3.7, -11.4), (-6.3, -12.2)]
+# The causeway: flagstones from the flat at the rise's foot into the maw. Its
+# foot swings a yard and a half east, off the bank's shoulder and toward the
+# road (APRON_SWING, apron_c).
+APRON = dict(z0=-14.6, z1=1.1, hw_in=2.3, hw_mouth=3.0, hw_far=3.6)
+APRON_SWING = -1.6
+EAR_HEAP = (-6.5, 2.8, 1.5)
+# The Sunken Idol's ring of columns (centre (-256, 1090), radius 8, its
+# guardian's camp inside it): nothing of the entrance stands within four yards.
+RING = (-256.0 - GR.door['x'], 1090.0 - GR.door['z'])
+RING_CLEAR = 12.0
+# The ways in, kept clear of every solid and of the taller growth: up the
+# causeway, from the road's end at (-256, 1072) and from the ring's west gap.
+ROAD_END = (-256.0 - GR.door['x'], 1072.0 - GR.door['z'])
+WAYS = [[(APRON_SWING, APRON['z0']), (-1.0, -10.0), (-0.3, -6.5), (0.0, -4.0), (0.0, 1.0)],
+        [ROAD_END, (-6.5, -17.0), (APRON_SWING, APRON['z0'])],
+        [(RING[0] + 8.0, RING[1]), (-5.6, -7.5), (-0.5, -7.0)]]
 
 
 def gb(x, y):
@@ -120,6 +141,34 @@ def gb(x, y):
 
 def g(v, w):
     return math.exp(-(v / w) ** 2)
+
+
+def ring_clear(x, z, pad=0.0):
+    return math.hypot(x - RING[0], z - RING[1]) >= RING_CLEAR + pad
+
+
+def way_dist(x, z):
+    """Distance from a point to the nearest way in."""
+    best = 1e9
+    for way in WAYS:
+        for (ax, az), (bx, bz) in zip(way, way[1:]):
+            ux, uz = bx - ax, bz - az
+            t = max(0.0, min(1.0, ((x - ax) * ux + (z - az) * uz) / (ux * ux + uz * uz)))
+            best = min(best, math.hypot(x - ax - ux * t, z - az - uz * t))
+    return best
+
+
+def apron_c(z):
+    """The causeway's centre line (lx) at lz."""
+    return APRON_SWING * smooth(-4.5, APRON['z0'], z)
+
+
+def apron_hw(z):
+    """The causeway's half width: narrow between the lower teeth, fanning out
+    to the tusks at its foot."""
+    if z > MUZ_S - 0.2:
+        return APRON['hw_in']
+    return APRON['hw_mouth'] + (APRON['hw_far'] - APRON['hw_mouth']) * smooth(-3.0, -13.0, z)
 
 
 def head_radius(y):
@@ -138,7 +187,7 @@ def f_face(x, y):
 
 
 def f_muzzle(x, y):
-    """The muzzle's relief: the upper jaw pushed out over the stair, and the
+    """The muzzle's relief: the upper jaw pushed out over the causeway, and the
     two whisker pads."""
     jaw = 0.95 * g(x, 3.8) * smooth(3.0, 6.8, y) * (1 - 0.4 * smooth(7.2, 8.4, y)) * (1 - smooth(8.2, 9.2, y))
     pads = 0.34 * g(abs(x) - 2.9, 1.0) * g(y - 6.8, 0.85)
@@ -177,12 +226,11 @@ def collider_circle(name, cx, cz, r, top):
                       'top': round(top, 2)})
 
 
-def footing(name, cx, cz, hw, hd, rot, bury):
+def footing(name, cx, cz, hw, hd, rot, bury, extra=()):
     """Register a footing and return its underside: `bury` under the lowest
-    ground at its centre and four corners (the points the sim test samples)."""
-    c, s = math.cos(rot), math.sin(rot)
-    lo = min(gh(cx + u * c + v * s, cz - u * s + v * c)
-             for (u, v) in ((0, 0), (-hw, -hd), (hw, -hd), (hw, hd), (-hw, hd)))
+    ground anywhere under its box (the sim test samples its centre and four
+    corners) and at the `extra` points (a round foot's own rim)."""
+    lo = min([GR.footprint_range(cx, cz, hw, hd, rot, 0.25)[0]] + [gh(x, z) for (x, z) in extra])
     FOOTINGS.append((name, cx, cz, hw, hd, rot, lo - bury))
     return lo - bury
 
@@ -469,7 +517,11 @@ def slab(p, outline, s0, s1, color, bevel=0.06):
 def head():
     p = P('Head', seed=3, moss=2.0)
     Mh = Matrix.Translation(B(0, HEAD_Z, 0))
-    y0 = footing('head', 0.0, HEAD_Z, R_FACE, R_FACE, 0.0, 0.8)
+    # the drum's own rim: the ground falls four yards from the maw round to
+    # the lagoon side, and the lean lifts the north foot half a yard more
+    rim = [(math.sin(TAU * k / 72) * (R_FACE + 0.6), HEAD_Z + math.cos(TAU * k / 72) * (R_FACE + 0.6))
+           for k in range(72)]
+    y0 = footing('head', 0.0, HEAD_Z, 5.6, 5.6, 0.0, 1.0, extra=rim)
 
     def top(theta):
         x = face_x(theta)
@@ -573,7 +625,8 @@ def muzzle():
     p = P('Muzzle', seed=11, moss=1.7)
     zc = (MUZ_S + FACE_Z) / 2 + 0.2
     depth = FACE_Z - MUZ_S + 0.4          # it runs a little into the drum
-    y0 = footing('muzzle', 0.0, zc, MUZ_HW, depth / 2, 0.0, 0.6)
+    # (the muzzle's wrapped ends reach seven yards out, down the rise's flanks)
+    y0 = footing('muzzle', 0.0, zc, 7.0, depth / 2 + 0.4, 0.0, 0.9)
 
     def hole(u, y):
         return mouth_in(u - MUZ_HW, y, LIP)
@@ -706,16 +759,32 @@ def fig():
     # the roots, poured over the crown and down the head: each a line of
     # (x round the head, y, out of the stone), 0 at the maw, +-24.5 at the back
     top = HEAD_TOP + 0.35
+
+    def to_ground(line):
+        """Carry a root's line on down the stone and into the ground under it
+        (the ground stands at a different height all round the head, and the
+        lean drops the west foot and lifts the east one a third of a yard)."""
+        x, y, s = line[-1]
+        foot = flat(x, s + 0.2, y)
+        under = gb(foot.x, foot.y) - 0.8
+        out = list(line)
+        k = 0
+        while y > under + 0.2:
+            y = max(under, y - 1.5)
+            k += 1
+            out.append((x + (0.35 if k % 2 else -0.3), y, 0.32 + (0.25 if y <= under else 0.0)))
+        return out
+
     roots = [
-        # down the west temple and cheek into the lagoon
+        # down the west temple and cheek, to the bank
         ([(4.0, top, 0.2), (6.9, 12.9, 0.42), (7.6, 11.2, 0.3), (7.9, 8.6, 0.3), (8.5, 5.2, 0.3), (8.0, 2.0, 0.3),
           (9.0, -1.6, 0.5)], 0.44, 0.17),
         # over the forehead, down the east side of the nose, onto the muzzle
         ([(-0.6, top, 0.3), (-1.3, 12.9, 0.45), (-1.35, 11.6, 1.0), (-1.7, 10.1, 0.75)], 0.34, 0.2),
-        # round the broken east ear and down the east cheek into the knoll
+        # round the broken east ear and down the east cheek into the rise
         ([(-4.6, top, 0.2), (-7.6, 12.8, 0.4), (-8.3, 10.6, 0.3), (-8.0, 7.8, 0.3), (-8.9, 5.0, 0.3)], 0.36, 0.14),
         ([(-9.5, top, 0.2), (-11.6, 12.2, 0.4), (-11.2, 9.0, 0.3), (-12.0, 5.6, 0.3), (-11.5, 3.0, 0.3)], 0.42, 0.16),
-        # down the west flank and round the back, into the water
+        # down the west flank and round the back, into the bank and the knoll
         ([(10.0, top, 0.2), (12.4, 12.0, 0.4), (12.0, 8.6, 0.3), (12.9, 5.0, 0.3), (12.3, 1.6, 0.3), (13.2, -1.6, 0.6)],
          0.48, 0.19),
         ([(15.0, top - 1.6, 0.2), (16.8, 9.4, 0.4), (16.2, 5.8, 0.3), (17.2, 2.0, 0.3), (16.8, -1.6, 0.6)], 0.34, 0.13),
@@ -723,7 +792,9 @@ def fig():
         ([(-22.5, top - 3.4, 0.2), (-21.2, 7.6, 0.4), (-22.0, 4.0, 0.3), (-21.0, -1.6, 0.6)], 0.36, 0.14),
         ([(-16.0, top, 0.2), (-17.4, 11.0, 0.4), (-16.6, 7.0, 0.3), (-17.6, 2.6, 0.3), (-17.0, -1.2, 0.5)], 0.3, 0.12),
     ]
-    for (line, r0, r1) in roots:
+    for i, (line, r0, r1) in enumerate(roots):
+        if i != 1:
+            line = to_ground(line)
         pts = [base + Vector((line[0][0] * 0.03, 0.0, 0.1))] + [flat(x, s, y) for (x, y, s) in line]
         path = p.limb(pts, r0, r1, p.vary(BARK, 0.1), sides=5, wobble=0.03)
         for k in (len(path) // 2, 3 * len(path) // 4):
@@ -736,41 +807,106 @@ def fig():
             flat(-4.0, 0.25, 7.2, muzzle=True), flat(-4.5, 0.22, 5.0, muzzle=True), flat(-4.9, 0.2, 2.6, muzzle=True)],
            0.2, 0.09, p.vary(BARK, 0.1), sides=5, wobble=0.03)
     lean_piece(p)
+    # the roots that reach for the lagoon: out of the west cheek's foot and the
+    # nape, down the bank and into the shallows. They lie on the true ground,
+    # so they are laid after the lean.
+    for (arc, tx, tz, r0) in ((9.0, 13.5, 13.8, 0.3), (13.2, 15.8, 17.6, 0.32), (16.8, 9.6, 19.8, 0.26),
+                              (21.8, 5.0, 21.6, 0.28)):
+        th = arc / R_FACE
+        sx, sz = math.sin(th) * (R_FACE + 0.45), HEAD_Z - math.cos(th) * (R_FACE + 0.45)
+        ln = math.hypot(tx - sx, tz - sz)
+        nx, nz = -(tz - sz) / ln, (tx - sx) / ln
+        n = max(4, int(ln / 1.3))
+        ph = rng.uniform(0.0, TAU)
+        pts = []
+        for k in range(n + 1):
+            t = k / n
+            off = 0.7 * math.sin(t * TAU * 1.2 + ph) * math.sin(math.pi * t)
+            x, z = sx + (tx - sx) * t + nx * off, sz + (tz - sz) * t + nz * off
+            pts.append(B(x, z, gh(x, z) + 0.1 - 0.3 * t * t - (0.5 if k == 0 else 0.0)))
+        path = p.limb(pts, r0, 0.06, p.vary(BARK, 0.1), sides=4, wobble=0.04, steps=2)
+        q = path[len(path) // 2]
+        d = Vector((nx * rng.choice((-1, 1)), -nz * rng.choice((-1, 1)), -0.12))
+        p.limb([q, q + d * 0.9, q + d * rng.uniform(1.6, 2.4) + Vector((0, 0, -0.25))], r0 * 0.45, 0.04,
+               p.vary(BARK_DARK, 0.1), sides=4, wobble=0.03)
     return p
 
 
 # ================================================================ the court
+BLOCK_FALLS = [(9.3, -0.6, 3), (10.2, 5.6, 3), (11.6, 11.2, 4), (9.2, 16.2, 3), (14.2, 15.8, 3), (3.2, 19.6, 3),
+               (-9.4, 14.6, 2)]
+GAPS = []
+# The Palmreach's own palms standing by the idol (reachPalmSpots, door-local):
+# no fallen block lies in a trunk.
+PALMS = [(12.4, 6.4), (6.7, 17.1)]
+
+
 def court():
     p = P('Court', seed=8, moss=1.2)
     rng = p.rng
-    # the stair: heaved blocks down the knoll and into the maw, each level on
-    # its own piece of the slope
-    z = STAIR['z0']
-    row = 0
-    while z < STAIR['z1']:
-        hw = STAIR['hw_in'] if z > MUZ_S - 0.2 else STAIR['hw_out'] + 0.5 * smooth(-4.0, -9.0, z)
-        x = -hw + rng.uniform(-0.2, 0.2)
-        while x < hw - 0.3:
-            w = min(rng.uniform(0.85, 1.5), hw - x + 0.2)
-            cx = x + w / 2
-            d = rng.uniform(0.78, 0.98)
-            top = max(gh(cx, z), gh(cx - w * 0.3, z), gh(cx + w * 0.3, z), gh(cx, z - d * 0.3)) + rng.uniform(0.07, 0.17)
-            hh = rng.uniform(0.75, 1.0)
-            with p.as_kind(K_PAVE):
-                p.box(B(cx, z, top - hh / 2), (w - 0.05, d, hh), p.tone(cx, z), chip=0.16,
-                      bevel=rng.uniform(0.04, 0.075), yaw=rng.uniform(-0.07, 0.07),
-                      pitch=rng.uniform(-0.05, 0.05), roll=rng.uniform(-0.05, 0.05), bottom=False)
+    # the causeway: heaved flagstones up the rise and into the maw, each lying
+    # on its own piece of the slope; a few are gone and fern has the gap
+    z = APRON['z0']
+    while z < APRON['z1'] - 0.3:
+        d = min(rng.uniform(1.05, 1.6), APRON['z1'] - z)
+        if APRON['z1'] - (z + d) < 0.5:
+            d = APRON['z1'] - z
+        zc = z + d / 2
+        inside = zc > MUZ_S - 0.2
+        hw = apron_hw(zc) + (0.0 if inside else rng.uniform(-0.25, 0.25))
+        x = -hw
+        while x < hw - 0.35:
+            w = min(rng.uniform(1.15, 2.1), hw - x)
+            if hw - (x + w) < 0.55:
+                w = hw - x
+            edge = not inside and abs(x + w / 2) > hw - 1.3
+            cx = apron_c(zc) + x + w / 2
             x += w
-        z += 0.84
-        row += 1
-    # the two fire bowls: a carved drum, a bronze bowl, the coals
+            if edge and rng.random() < 0.16:
+                GAPS.append((cx, zc))
+                continue
+            hh = rng.uniform(0.36, 0.5)
+            heave = rng.random() < (0.5 if edge else 0.22)
+            lift = rng.uniform(0.05, 0.12) - hh / 2 + (rng.uniform(0.02, 0.08) if heave else 0.0)
+            M = slope_matrix(cx, zc, yaw=rng.uniform(-0.05, 0.05), lift=lift)
+            if heave:
+                M = M @ Matrix.Rotation(rng.uniform(-0.09, 0.09), 4, 'X') @ \
+                    Matrix.Rotation(rng.uniform(-0.08, 0.08), 4, 'Y')
+            with p.as_kind(K_PAVE):
+                p.box((0, 0, 0), (w - 0.07, d - 0.07, hh), p.tone(cx, zc), chip=0.12, bevel=rng.uniform(0.035, 0.06),
+                      M=M, bottom=False)
+        z += d
+    # its kerbs: long stones half sunk along both edges, some fallen outward
+    for sign in (1, -1):
+        z = APRON['z0'] + rng.uniform(0.0, 0.6)
+        while z < MUZ_S - 1.9:
+            ln = rng.uniform(1.3, 2.0)
+            zc = z + ln / 2
+            cx = apron_c(zc) + sign * (apron_hw(zc) + 0.42)
+            z += ln + rng.uniform(0.02, 0.2)
+            if rng.random() < 0.18 or min(math.hypot(cx - bx, zc - bz) for (bx, bz) in BRAZIERS + TUSKS) < 1.5:
+                continue
+            fallen = rng.random() < 0.25
+            hh = rng.uniform(0.5, 0.66)
+            M = slope_matrix(cx + (sign * 0.25 if fallen else 0.0), zc, yaw=rng.uniform(-0.08, 0.08),
+                             lift=rng.uniform(0.16, 0.3) - hh / 2)
+            M = M @ Matrix.Rotation(rng.uniform(-0.05, 0.05), 4, 'X') @ \
+                Matrix.Rotation(sign * (rng.uniform(0.25, 0.5) if fallen else rng.uniform(-0.05, 0.08)), 4, 'Y')
+            with p.as_kind(K_PAVE):
+                p.box((0, 0, 0), (0.5, ln, hh), p.vary(COURT_PALE if rng.random() < 0.4 else COURT, 0.07), chip=0.16,
+                      bevel=0.06, M=M, bottom=False)
+    # the two fire bowls beside the maw: a plinth, a carved drum, a bronze
+    # bowl, the coals. The rise falls away to the west, so the west drum
+    # stands taller: both bowls burn at one height.
+    top = max(gh(bx, bz) for (bx, bz) in BRAZIERS) + 1.9
     for i, (bx, bz) in enumerate(BRAZIERS):
         gy = gh(bx, bz)
-        lo = min(gh(bx + dx, bz + dz) for dx in (-0.6, 0.6) for dz in (-0.6, 0.6))
-        FOOTINGS.append((f'brazier_{"we"[i]}', bx, bz, 0.6, 0.6, 0.0, lo - 0.5))
-        top = gy + 1.55
-        m = p.mark()
-        prof = [(0.74, lo - 0.5 - top), (0.74, gy - top + 0.25), (0.6, gy - top + 0.42), (0.52, -0.62), (0.56, -0.5),
+        lo = GR.footprint_range(bx, bz, 0.8, 0.8, 0.0, 0.2)[0]
+        FOOTINGS.append((f'brazier_{"we"[i]}', bx, bz, 0.8, 0.8, 0.0, lo - 0.5))
+        with p.as_kind(K_PAVE):
+            p.box(B(bx, bz, (lo - 0.5 + gy + 0.34) / 2), (1.5, 1.5, gy + 0.34 - (lo - 0.5)), p.vary(COURT, 0.06),
+                  chip=0.1, bevel=0.07, yaw=0.12 * (1 if i else -1), bottom=False)
+        prof = [(0.74, gy + 0.3 - top), (0.74, gy - top + 0.52), (0.6, gy - top + 0.7), (0.52, -0.62), (0.56, -0.5),
                 (0.68, -0.4), (0.7, -0.22), (0.56, -0.1), (0.5, 0.0), (0.0, 0.0)]
         faces = p.lathe(B(bx, bz, top), prof, 8, p.vary(COURT, 0.06), phase=0.3 + i, smooth=False)
         p.solid(faces)
@@ -784,37 +920,47 @@ def court():
                 p.rock(B(bx + math.cos(a) * d, bz + math.sin(a) * d, top + 0.26), (0.26, 0.26, 0.2),
                        mix(COAL, (0.2, 0.05, 0.02), rng.random() * 0.7), jitter=0.3, subdivisions=1, mat=GLOW)
         p.paint.append((B(bx, bz, top - 0.3), 0.9, WAR_RED, 0.9))
+        p.paint.append((B(bx, bz, (gy + top) / 2), 0.8, WAR_OCHRE, 0.7))
         p.soot.append((B(bx, bz, top - 0.05), 0.8, 0.5))
         SOCKETS['braziers'].append([round(bx, 3), round(top + 0.34, 3), round(bz, 3)])
-        collider_circle(f'brazier_{"we"[i]}', bx, bz, 0.78, top + 0.4)
-    # the Sunbone's tusks at the stair head, leaning in over the way down, hung
-    # with war cloth and the skulls of what the basin has eaten
+        collider_circle(f'brazier_{"we"[i]}', bx, bz, 1.0, top + 0.4)
+    # the Sunbone's tusks at the causeway's foot, leaning in over the way up,
+    # wedged upright with stones, hung with war cloth and the skulls of what
+    # the basin has eaten
     for i, (tx, tz) in enumerate(TUSKS):
         sign = 1 if tx > 0 else -1
         gy = gh(tx, tz)
         FOOTINGS.append((f'tusk_{"we"[i]}', tx, tz, 0.45, 0.45, 0.0, gy - 1.3))
-        h = 6.4 if i == 0 else 5.6
-        pts = [B(tx, tz, gy - 1.3), B(tx + sign * 0.25, tz, gy + h * 0.3), B(tx + sign * 0.1, tz + 0.1, gy + h * 0.62),
-               B(tx - sign * 0.75, tz + 0.2, gy + h * 0.88), B(tx - sign * 1.9, tz + 0.3, gy + h)]
-        path = p.limb(pts, 0.4, 0.06, IVORY, sides=7, kind=K_STONE, steps=4)
+        h = 7.6 if i == 0 else 6.8
+        pts = [B(tx, tz, gy - 1.3), B(tx + sign * 0.28, tz, gy + h * 0.3), B(tx + sign * 0.12, tz + 0.1, gy + h * 0.62),
+               B(tx - sign * 0.85, tz + 0.2, gy + h * 0.88), B(tx - sign * 2.15, tz + 0.3, gy + h)]
+        path = p.limb(pts, 0.46, 0.06, IVORY, sides=7, kind=K_STONE, steps=4)
+        for k in range(5):
+            a = TAU * k / 5 + rng.uniform(-0.3, 0.3)
+            sx, sz = tx + math.cos(a) * 0.52, tz + math.sin(a) * 0.52
+            s = rng.uniform(0.34, 0.5)
+            M = slope_matrix(sx, sz, yaw=-a + rng.uniform(-0.3, 0.3), lift=s * 0.12)
+            M = M @ Matrix.Rotation(rng.uniform(-0.3, 0.3), 4, 'X') @ Matrix.Rotation(rng.uniform(-0.35, 0.35), 4, 'Y')
+            with p.as_kind(K_PAVE):
+                p.box((0, 0, 0), (s * 1.2, s * 0.9, s * 0.8), p.vary(COURT, 0.08), chip=0.22, bevel=0.05, M=M, taper=0.8)
         # the lashing and the cloth
         tie = path[len(path) * 2 // 3]
         with p.as_kind(K_WOOD):
-            p.box(tie, (0.42, 0.42, 0.3), rk.TIMBER_DARK, yaw=0.4, chip=0.2)
+            p.box(tie, (0.46, 0.46, 0.32), rk.TIMBER_DARK, yaw=0.4, chip=0.2)
         for kk in (len(path) // 4, len(path) // 2):
-            p.paint.append((path[kk], 0.62, WAR_RED, 1.4))
+            p.paint.append((path[kk], 0.66, WAR_RED, 1.4))
             p.soot.append((path[kk] + Vector((0, 0, 0.5)), 0.5, 0.35))
         with p.as_kind(K_CLOTH):
             for k in range(4):
-                ox = (k - 1.5) * 0.2
-                ln = rng.uniform(0.9, 2.1)
+                ox = (k - 1.5) * 0.22
+                ln = rng.uniform(1.1, 2.5)
                 col = scale(WAR_RED if k % 2 == 0 else WAR_OCHRE, rng.uniform(0.62, 0.9))
                 sway = rng.uniform(-0.25, 0.25)
                 prev = None
                 for s_ in range(5):
                     t_ = s_ / 4
                     q = tie + Vector((ox + sway * t_ * t_, 0.16 + 0.12 * math.sin(t_ * 5 + k * 1.7), -0.18 - ln * t_))
-                    w = 0.2 * (1 - 0.3 * t_) if s_ < 4 else 0.0
+                    w = 0.22 * (1 - 0.3 * t_) if s_ < 4 else 0.0
                     cur = (q - Vector((w / 2, 0, 0)), q + Vector((w / 2, 0, 0)))
                     if prev is not None:
                         shade = (0.8 if s_ % 2 else 1.05) * (1.0 - 0.25 * t_)
@@ -823,28 +969,39 @@ def court():
                         else:
                             p.quad((prev[0], prev[1], q), scale(col, shade), mat=LEAF)
                     prev = cur
-        p.skull(tie + Vector((-sign * 0.1, 0.34, -0.5)), size=0.42, yaw=0.3 * sign)
-        p.skull(B(tx - sign * 0.5, tz - 0.5, gh(tx - sign * 0.5, tz - 0.5) + 0.02), size=0.4, yaw=-0.6 * sign)
+        p.skull(tie + Vector((-sign * 0.1, 0.36, -0.5)), size=0.46, yaw=0.3 * sign)
+        p.skull(B(tx - sign * 0.75, tz - 0.6, gh(tx - sign * 0.75, tz - 0.6) + 0.02), size=0.42, yaw=-0.6 * sign)
         SOCKETS['tusks'].append([round(tx, 3), round(gy + h, 3), round(tz, 3)])
-        collider_circle(f'tusk_{"we"[i]}', tx, tz, 0.55, gy + h)
-    # the east ear, where it fell on the knoll: its ring's stones in a heap
-    ex, ez = -7.6, -3.6
-    for k in range(7):
-        x, z = ex + rng.uniform(-1.5, 1.5), ez + rng.uniform(-1.3, 1.3)
+        collider_circle(f'tusk_{"we"[i]}', tx, tz, 0.75, gy + h)
+    # the east ear, where it fell: its ring's stones heaped in the corner of
+    # the muzzle and the cheek
+    ex, ez, er_ = EAR_HEAP
+    n = 0
+    while n < 7:
+        x, z = ex + rng.uniform(-1.2, 1.2), ez + rng.uniform(-1.2, 1.2)
+        if math.hypot(x - ex, z - ez) > er_ - 0.3 or not ring_clear(x, z, 0.7):
+            continue
+        n += 1
         s = rng.uniform(0.7, 1.15)
         M = slope_matrix(x, z, yaw=rng.random() * TAU, lift=s * rng.uniform(0.0, 0.2))
         M = M @ Matrix.Rotation(rng.uniform(-0.5, 0.5), 4, 'X') @ Matrix.Rotation(rng.uniform(-0.4, 0.4), 4, 'Y')
         with p.as_kind(K_PAVE):
             p.box((0, 0, 0), (s * 1.5, s * 0.95, s * 0.8), p.vary(COURT_PALE, 0.08), chip=0.22, bevel=0.06, M=M, taper=0.8)
-    FOOTINGS.append(('fallen_ear', ex, ez, 0.6, 0.6, 0.0, gh(ex, ez) - 0.45))
-    collider_circle('fallen_ear', ex, ez, 1.7, gh(ex, ez) + 0.9)
-    # blocks of the breached back wall and the west cheek, lying in the shallows
-    for (x0, z0, n) in ((9.8, 0.2, 4), (1.0, 18.4, 6), (10.6, 12.4, 4)):
+    FOOTINGS.append(('fallen_ear', ex, ez, 0.6, 0.6, 0.0, GR.footprint_range(ex, ez, 0.6, 0.6, 0.0, 0.2)[0] - 0.45))
+    collider_circle('fallen_ear', ex, ez, er_, gh(ex, ez) + 1.0)
+    # blocks of the breached back wall and the west cheek: sunk in the turf
+    # down the bank, lying whole in the lagoon's shallows
+    for (x0, z0, n) in BLOCK_FALLS:
         for k in range(n):
             x, z = x0 + rng.uniform(-1.6, 1.6), z0 + rng.uniform(-1.4, 1.4)
             s = rng.uniform(0.7, 1.25)
-            M = slope_matrix(x, z, yaw=rng.random() * TAU, lift=s * rng.uniform(-0.1, 0.25))
-            M = M @ Matrix.Rotation(rng.uniform(-0.5, 0.5), 4, 'X') @ Matrix.Rotation(rng.uniform(-0.4, 0.4), 4, 'Y')
+            wet = gh(x, z) < WATER_Y + 0.3
+            M = slope_matrix(x, z, yaw=rng.random() * TAU,
+                             lift=s * (rng.uniform(-0.1, 0.25) if wet else rng.uniform(-0.3, -0.12)))
+            M = M @ Matrix.Rotation(rng.uniform(-0.5, 0.5) * (1.0 if wet else 0.5), 4, 'X') @ \
+                Matrix.Rotation(rng.uniform(-0.4, 0.4) * (1.0 if wet else 0.5), 4, 'Y')
+            if min(math.hypot(x - px, z - pz) for (px, pz) in PALMS) < 1.8:
+                continue
             with p.as_kind(K_PAVE):
                 p.box((0, 0, 0), (s * 1.6, s * 0.9, s * 0.8), p.tone(x, z), chip=0.22, bevel=0.05, M=M, taper=0.85)
     return p
@@ -938,23 +1095,29 @@ def growth():
         v = L(warp(Vector((x, -FACE_Z + s, muzzle_top(x) + 0.03))))
         (p.fern if rng.random() < 0.7 else p.broadleaf)(v, 6, rng.uniform(0.8, 1.3), 0.28)
         p.moss_mat(v + Vector((0.5, 0.2, 0.0)), 0.55, height=0.1)
-    # the ground: fern and broadleaf beside the stair, against the head on the
-    # knoll, round the tusks and the fire bowls; reed in the shallows
+    # the ground: fern and broadleaf along the causeway's kerbs, against the
+    # head's foot and up the knoll behind it, round the tusks, the fire bowls
+    # and the fallen blocks, tall leaves at the tusks; reed where the bank
+    # meets the lagoon. Nothing in the ways in, nothing near the ring.
+    def beside(x, z):
+        kerb = abs(abs(x - apron_c(z)) - (apron_hw(z) + 1.2)) if APRON['z0'] < z < MUZ_S else 9.0
+        return min(kerb, abs(math.hypot(x, z - HEAD_Z) - (R_FACE + 1.3)),
+                   min(math.hypot(x - bx, z - bz) for (bx, bz) in BRAZIERS + TUSKS),
+                   min(math.hypot(x - bx, z - bz) - 1.2 for (bx, bz, _n) in BLOCK_FALLS))
+
     spots = []
-    for k in range(260):
-        x, z = rng.uniform(-14.5, 14.5), rng.uniform(-12.0, 19.0)
+    for k in range(190):
+        x, z = rng.uniform(-13.5, 19.0), rng.uniform(-17.0, 23.0)
         d = math.hypot(x, z - HEAD_Z)
         if d < R_FACE + 0.7:
             continue
         if d < R_FACE + 3.4 and abs(math.atan2(x, HEAD_Z - z)) < MUZ_HW / R_FACE + 0.06:
             continue
-        if abs(x) < STAIR['hw_out'] + 0.5 and STAIR['z0'] - 0.5 < z < STAIR['z1']:
+        if abs(x - apron_c(z)) < apron_hw(z) + 0.75 and APRON['z0'] - 0.6 < z < APRON['z1']:
             continue
-        if math.hypot(x - EXIT_DROP[0], z - EXIT_DROP[1]) < 1.6:
+        if not ring_clear(x, z, 1.0) or way_dist(x, z) < 2.0:
             continue
-        near = min(abs(abs(x) - (STAIR['hw_out'] + 1.0)) if STAIR['z0'] < z < MUZ_S else 9, abs(d - (R_FACE + 1.3)),
-                   min(math.hypot(x - bx, z - bz) for (bx, bz) in BRAZIERS + TUSKS))
-        if near > 1.8 and rng.random() < 0.74:
+        if beside(x, z) > 1.8 and rng.random() < 0.8:
             continue
         spots.append((x, z))
     for (x, z) in spots:
@@ -964,6 +1127,9 @@ def growth():
             p.reeds(B(x, z, max(y, WATER_Y - 0.5)), radius=0.5, stems=rng.randrange(6, 11), height=rng.uniform(1.5, 2.5),
                     heads=0.3, dry=0.1)
             continue
+        if y < WATER_Y + 0.9:
+            p.sedge(v, radius=0.34, blades=11, height=rng.uniform(0.7, 1.2), dry=0.05)
+            continue
         r = rng.random()
         if r < 0.5:
             p.fern(v, fronds=rng.randrange(7, 10), length=rng.uniform(0.9, 1.7), width=0.34)
@@ -971,12 +1137,39 @@ def growth():
             p.broadleaf(v, leaves=rng.randrange(5, 8), length=rng.uniform(1.0, 1.8), width=rng.uniform(0.3, 0.46))
         else:
             p.sedge(v, radius=0.3, blades=10, height=rng.uniform(0.6, 1.0), dry=0.05)
-    # moss on the stair's blocks and between them
-    z = STAIR['z0'] + 0.3
-    while z < STAIR['z1'] - 0.4:
+    # fern crowding both kerbs of the causeway, parted where the ring's way
+    # comes in
+    for sign in (1, -1):
+        z = APRON['z0'] + 0.4
+        while z < MUZ_S - 0.6:
+            x = apron_c(z) + sign * (apron_hw(z) + rng.uniform(0.75, 1.25))
+            clear = min(math.hypot(x - bx, z - bz) for (bx, bz) in BRAZIERS + TUSKS) > 1.1
+            if clear and ring_clear(x, z, 1.0) and way_dist(x, z) > 1.7:
+                p.fern(B(x, z, gh(x, z)), fronds=rng.randrange(6, 9), length=rng.uniform(0.8, 1.3), width=0.3)
+            z += rng.uniform(1.3, 1.9)
+    # great ferns standing over a walker at the tusks and behind the fire bowls
+    for (x, z, ln) in ((TUSKS[0][0] + 1.5, TUSKS[0][1] + 0.9, 2.6), (TUSKS[1][0] - 1.5, TUSKS[1][1] + 0.5, 2.8),
+                       (TUSKS[1][0] - 0.4, TUSKS[1][1] - 1.9, 2.2), (BRAZIERS[0][0] + 1.9, BRAZIERS[0][1] + 0.4, 2.4),
+                       (BRAZIERS[1][0] - 1.7, BRAZIERS[1][1] + 0.9, 2.2)):
+        if ring_clear(x, z, 1.5) and way_dist(x, z) > 2.2:
+            p.fern(B(x, z, gh(x, z)), fronds=9, length=ln, width=0.52)
+    # reed standing in the shallows where the bank meets the lagoon
+    reeds = 0
+    for k in range(160):
+        x, z = rng.uniform(0.0, 19.5), rng.uniform(13.0, 23.4)
+        y = gh(x, z)
+        if reeds < 12 and WATER_Y - 0.8 < y < WATER_Y + 0.2 and math.hypot(x, z - HEAD_Z) > R_FACE + 1.5:
+            reeds += 1
+            p.reeds(B(x, z, max(y, WATER_Y - 0.5)), radius=0.55, stems=rng.randrange(6, 11), height=rng.uniform(1.6, 2.7),
+                    heads=0.3, dry=0.1)
+    # fern in the gaps the lost flagstones left, moss on the causeway
+    for (x, z) in GAPS:
+        p.fern(B(x, z, gh(x, z)), fronds=7, length=rng.uniform(0.7, 1.1), width=0.28)
+    z = APRON['z0'] + 0.3
+    while z < APRON['z1'] - 0.4:
         for _ in range(2):
-            x = rng.uniform(-2.3, 2.3)
-            p.moss_mat(B(x, z, gh(x, z) + 0.16), rng.uniform(0.3, 0.6), height=0.07)
+            x = apron_c(z) + rng.uniform(-1.0, 1.0) * (apron_hw(z) - 0.3)
+            p.moss_mat(B(x, z, gh(x, z) + 0.15), rng.uniform(0.3, 0.6), height=0.07)
         z += 0.9
     return p
 
@@ -1026,7 +1219,7 @@ def main():
             objs = [join(objs, names[key])]
         ec.export_glb([root] + objs, os.path.join(raw, files[key]))
     SOCKETS['window'] = {'half': MOUTH['half'], 'spring': MOUTH['spring'], 'rise': MOUTH['rise'], 'z': WINDOW_Z,
-                         'water': round(WATER_Y + 0.22, 3), 'kerb': round(gh(0, WINDOW_Z - 0.3) + 0.2, 3),
+                         'water': round(gh(0, WINDOW_Z - 0.3) - 0.2, 3), 'kerb': round(gh(0, WINDOW_Z - 0.3) + 0.2, 3),
                          'leanRoll': round(LEAN_ROLL, 5), 'leanPitch': round(LEAN_PITCH, 5)}
     stats.update({'sockets': SOCKETS, 'colliders': COLLIDERS, 'footings': ec.gap_report(GR, FOOTINGS), 'door': GR.door,
                   'waterY': round(WATER_Y, 3), 'exitDrop': EXIT_DROP, 'lane': LANE})

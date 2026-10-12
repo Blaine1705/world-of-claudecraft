@@ -3,15 +3,19 @@
 // share one origin, the door at its terrain height: the idol (the round head
 // of coursed limestone with its carved brows, jade eyes and ears, the muzzle
 // with the lip ring and the nose, the fangs, the strangler fig's trunk and
-// roots), the court (the heaved stair, the two fire bowls, the Sunbone's
-// tusks with their war cloth, the fallen ear and the blocks in the shallows),
-// and the render-only growth (the fig's crown, lianas, fern, broadleaf, reed,
-// moss). Never flatten or join: the runtime
+// roots), the court (the heaved flagstone causeway and its kerbs, the two
+// fire bowls, the Sunbone's tusks with their war cloth, the fallen ear and the
+// blocks down the bank and in the shallows), and the render-only growth (the
+// fig's crown, lianas, fern, broadleaf, reed, moss). Never flatten or join:
+// the runtime
 // (src/render/wildheart_basin_entrance.ts) keeps each Entrance_* node and
 // splits it by material (KitStone lit, KitLeaf lit and double sided, KitGlow
 // the unlit coals, KitWet the glossy lit jade).
 //
-//   npx tsx docs/design/dungeon-rework/entrance/probe.mts wildheart -232 1112 tmp/asset_src/wildheart_basin_entrance/terrain 40 120
+// The height grid is probed with the door ALREADY at its place in
+// src/sim/content/wildheart.ts: the door's own calm pad shapes the ground.
+//
+//   npx tsx docs/design/dungeon-rework/entrance/probe.mts wildheart -237 1093 tmp/asset_src/wildheart_basin_entrance/terrain 40 120
 //   "<blender>" -b --factory-startup --python docs/design/dungeon-rework/entrance/build_wildheart_entrance.py -- //     --out tmp/asset_src/wildheart_basin_entrance --terrain tmp/asset_src/wildheart_basin_entrance/terrain --renders none
 //   node scripts/assets/wildheart_basin_entrance/build.mjs
 import { createHash } from 'node:crypto';

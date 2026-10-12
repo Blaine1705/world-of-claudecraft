@@ -23,21 +23,21 @@ const ROOT = path.join(__dirname, '..');
 
 const PINS: Record<string, { sha: string; bytes: number; triangles: number; maxBytes: number }> = {
   'public/models/props/wildheart_basin_entrance.glb': {
-    sha: '10072bb3610998ce6bfe90dea62d6d6cea8b8080b0ae60379f7577215f52196d',
-    bytes: 352436,
-    triangles: 20517,
+    sha: '2a0362cb790de8bd4e95e090b03fc4d15145c82132089f41900404cf12b2e91b',
+    bytes: 380816,
+    triangles: 22323,
     maxBytes: 420 * 1024,
   },
   'public/models/props/wildheart_basin_entrance_court.glb': {
-    sha: '31ffbb5529e1d9f8d0c906bd371d69f655227cfcb85f1f36245e6cfa82feb731',
-    bytes: 85220,
-    triangles: 4364,
+    sha: '0fee4a25f99ab945892ee19f030fc7d4e4a8cb7877aadf0ac34c6df753e3e8b6',
+    bytes: 91504,
+    triangles: 4738,
     maxBytes: 120 * 1024,
   },
   'public/models/props/wildheart_basin_entrance_growth.glb': {
-    sha: '7bceb15e9eb82ae42c855fc5874ad533aa2cc3c2968a7958106f758814ba3b52',
-    bytes: 427604,
-    triangles: 21970,
+    sha: 'd7048a071880db3d077db957ab9bde53604214e60bb3b4cfdcc29f51d0977e8e',
+    bytes: 455084,
+    triangles: 22735,
     maxBytes: 480 * 1024,
   },
 };
@@ -148,7 +148,7 @@ describe('the Jaguar Maw shipping assets', () => {
     expect(pins.reduce((sum, p) => sum + p.bytes, 0)).toBeLessThanOrEqual(1024 * 1024);
   });
 
-  it("the model reaches from the lagoon's bed to the fig's crown and no further than its footprint", async () => {
+  it("the model reaches from under the bank to the fig's crown and no further than its footprint", async () => {
     await MeshoptDecoder.ready;
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
@@ -160,21 +160,28 @@ describe('the Jaguar Maw shipping assets', () => {
       const b = getBounds(doc.getRoot().listScenes()[0]);
       bounds[asset.pieces[0]] = { min: [...b.min], max: [...b.max] };
     }
-    // door-local: x west, y up, z north. The idol's foot is cut under the
-    // lagoon's bed; the fig rooted in its crown carries its limbs (in the idol's
-    // file) and its leaves (the growth) to fifteen character heights over the door.
+    // door-local: x west, y up, z north. The door stands on a rise: the
+    // idol's foot is cut under the bank on its lagoon side, five yards under
+    // the door, and its roots run on down into the shallows, six yards under;
+    // the fig rooted in its crown carries its limbs (in the idol's file) and
+    // its leaves (the growth) to fifteen character heights over the door.
     const idol = bounds.Entrance_Idol;
     expect(idol.max[1]).toBeGreaterThan(24);
     expect(idol.max[1]).toBeLessThan(30);
-    expect(idol.min[1]).toBeLessThan(-1.5);
-    expect(idol.min[1]).toBeGreaterThan(-4);
+    expect(idol.min[1]).toBeLessThan(-5);
+    expect(idol.min[1]).toBeGreaterThan(-7.5);
     const growth = bounds.Entrance_Growth;
     expect(growth.max[1]).toBeGreaterThan(27);
     expect(growth.max[1]).toBeLessThan(34);
+    // the causeway's foot, fifteen yards before the door
+    const court = bounds.Entrance_Court;
+    expect(court.min[2]).toBeLessThan(-14);
     for (const b of Object.values(bounds)) {
-      expect(b.min[0]).toBeGreaterThan(-18);
-      expect(b.max[0]).toBeLessThan(18);
-      expect(b.min[2]).toBeGreaterThan(-14);
+      // east it stops well short of the ring of columns (its edge is eleven
+      // yards east of the door); west and north it reaches the lagoon
+      expect(b.min[0]).toBeGreaterThan(-13);
+      expect(b.max[0]).toBeLessThan(21);
+      expect(b.min[2]).toBeGreaterThan(-19);
       expect(b.max[2]).toBeLessThan(24);
     }
   });

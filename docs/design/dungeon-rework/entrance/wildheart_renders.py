@@ -20,7 +20,8 @@ B = ec.B
 FIGURE_HEIGHT = 1.8     # the game's reference character height, in yards
 # src/render/gfx.ts SUN_ANCHOR (90, 62, 50) in game axes, as a Blender vector.
 GAME_SUN = (0.749, -0.416, 0.516)
-PATH = [(-3.0, -22.0), (-0.5, -9.0), (0.0, 0.0)]
+# the way in: from the road's end at (-256, 1072), door-local for the door at (-237, 1093)
+PATH = [(-19.0, -21.0), (-6.5, -17.0), (-1.6, -14.6), (-1.0, -10.0), (-0.3, -6.5), (0.0, -4.0), (0.0, 0.0)]
 
 
 def figure(gr, lx, lz, yaw_deg, name):
@@ -47,7 +48,7 @@ def scene(gr, water_y, sockets):
     water = bpy.context.active_object
     water.name = 'Scene_Lagoon'
     water.data.materials.append(mat)
-    for (kx, kz, yaw, nm) in ((0.3, -2.6, 0, 'OnStair'), (-0.6, -9.5, 5, 'OnCrest'), (6.5, -6.0, 30, 'OnShore')):
+    for (kx, kz, yaw, nm) in ((0.3, -2.6, 0, 'AtMaw'), (-1.4, -13.0, 5, 'AtTusks'), (11.0, 9.0, 30, 'OnBank')):
         figure(gr, kx, kz, yaw, 'Knight_' + nm)
     w = sockets['window']
     dark = ec.emissive_material('SceneThroat', (0.004, 0.012, 0.01), strength=1.0)
@@ -89,26 +90,26 @@ def scene(gr, water_y, sockets):
 
 
 VIEWS = {
-    'crest': dict(name='desde_la_cresta_camara_de_juego', cam=(-1.5, -16.5, ('eye', 5.2)), target=(0.0, 0.0, 6.5), lens=24),
-    'stair': dict(name='bajando_a_las_fauces', cam=(-0.8, -6.6, ('eye', 2.3)), target=(0.0, 0.5, 4.6), lens=17),
-    'west': dict(name='desde_la_laguna_oeste', cam=(27.0, -13.0, 1.4), target=(0.5, 3.0, 8.5), lens=26),
-    'back': dict(name='por_detras_desde_el_agua', cam=(-17.0, 29.0, 3.0), target=(0.0, 5.0, 9.0), lens=26),
-    'eyes': dict(name='los_ojos_de_cerca', cam=(2.0, -8.5, ('eye', 5.0)), target=(1.2, 1.0, 9.6), lens=30),
-    'maw': dict(name='las_fauces_de_cerca', cam=(1.3, -4.3, ('eye', 1.75)), target=(0.0, 0.8, 2.6), lens=18),
-    'east': dict(name='tres_cuartos_sureste', cam=(-17.0, -15.0, ('eye', 3.0)), target=(0.0, 1.5, 7.5), lens=24),
-    'air': dict(name='vista_aerea', cam=(9.0, -26.0, 30.0), target=(0.0, 3.0, 5.0), lens=28),
-    'far': dict(name='de_lejos_el_arbol_entero', cam=(30.0, -46.0, 6.0), target=(0.0, 6.0, 13.0), lens=30),
-    'dusk': {'name': 'atardecer_referencia_de_efectos', 'cam': (-1.5, -16.5, ('eye', 5.2)), 'target': (0.0, 0.0, 6.5),
-             'lens': 24, 'sky': 'dusk', 'sky_strength': 0.5, 'sun_strength': 1.0, 'sun_color': (1.0, 0.6, 0.4),
+    'road': dict(name='desde_el_camino', cam=(-12.0, -25.0, ('eye', 2.6)), target=(0.0, 0.0, 6.2), lens=22),
+    'apron': dict(name='subiendo_la_calzada', cam=(-0.8, -10.5, ('eye', 2.2)), target=(0.0, 0.5, 5.2), lens=17),
+    'west': dict(name='desde_la_orilla_oeste', cam=(22.0, -5.0, ('eye', 2.0)), target=(0.5, 3.0, 6.5), lens=24),
+    'back': dict(name='por_detras_desde_el_agua', cam=(13.0, 30.0, -4.4), target=(0.0, 6.0, 6.0), lens=26),
+    'eyes': dict(name='los_ojos_de_cerca', cam=(2.0, -9.5, ('eye', 4.0)), target=(1.2, 1.0, 9.6), lens=30),
+    'maw': dict(name='las_fauces_de_cerca', cam=(1.3, -4.6, ('eye', 1.75)), target=(0.0, 0.8, 2.6), lens=18),
+    'ring': dict(name='desde_el_anillo_de_columnas', cam=(-14.0, -8.0, ('eye', 2.2)), target=(0.0, 1.5, 6.0), lens=22),
+    'air': dict(name='vista_aerea', cam=(9.0, -31.0, 31.0), target=(1.0, 2.0, 2.0), lens=28),
+    'far': dict(name='de_lejos_el_arbol_entero', cam=(-14.0, -52.0, ('eye', 3.0)), target=(0.0, 6.0, 12.0), lens=30),
+    'dusk': {'name': 'atardecer_referencia_de_efectos', 'cam': (-12.0, -25.0, ('eye', 2.6)), 'target': (0.0, 0.0, 6.2),
+             'lens': 22, 'sky': 'dusk', 'sky_strength': 0.5, 'sun_strength': 1.0, 'sun_color': (1.0, 0.6, 0.4),
              'sun_dir': (0.85, -0.3, 0.16), 'vfx': True, 'glare': True},
-    'night': {'name': 'noche_referencia_de_efectos', 'cam': (-0.8, -6.6, ('eye', 2.3)), 'target': (0.0, 0.5, 4.6),
+    'night': {'name': 'noche_referencia_de_efectos', 'cam': (-0.8, -10.5, ('eye', 2.2)), 'target': (0.0, 0.5, 5.2),
               'lens': 17, 'sky': 'night', 'sky_strength': 1.6, 'sun_strength': 0.5, 'sun_color': (0.55, 0.65, 1.0),
               'sun_dir': (-0.4, 0.5, 0.6), 'vfx': True, 'glare': True},
 }
 
 
 def run(out, GR, surr, colliders, mode, tag=''):
-    """mode: 'all', 'maps', or a comma list of view keys (crest,stair,west...)."""
+    """mode: 'all', 'maps', or a comma list of view keys (road,apron,west...)."""
     rd = os.path.join(out, 'renders', tag) if tag else os.path.join(out, 'renders')
     day = {'sky': 'day', 'sky_strength': 1.15, 'sun_dir': GAME_SUN, 'sun_strength': 4.2, 'sun_color': (1.0, 0.95, 0.84)}
     keys = list(VIEWS) if mode in ('all', 'maps') else [k for k in mode.split(',') if k in VIEWS]
@@ -121,17 +122,17 @@ def run(out, GR, surr, colliders, mode, tag=''):
         views.append(v)
     cfg = {
         'name': 'wildheart_basin', 'out': out, 'views': views,
-        'map_half': 26, 'map_title': 'Wildheart Basin entrance (the Jaguar Maw): door (-232, 1112)',
+        'map_half': 30, 'map_title': 'Wildheart Basin entrance (the Jaguar Maw): door (-237, 1093)',
         'new_colliders': [dict(c, topLocalY=c['top']) for c in colliders],
         'new_paths': [(PATH, 1.2)], 'exit_drop': (0, -4),
         'extra_labels': [('maw = door', 0, 3.4, (1, 1, 1)), ('exit drop', 0, -4.7, (1, 0.7, 0.2)),
-                         ('fire bowls', 5.6, -3.3, (1, 0.5, 0.5)), ('tusks', 6.4, -7.6, (1, 0.5, 0.5)),
-                         ('fallen ear', -10.4, -3.6, (1, 0.5, 0.5))],
+                         ('fire bowls', 6.6, -3.3, (1, 0.5, 0.5)), ('tusks', 7.0, -11.6, (1, 0.5, 0.5)),
+                         ('fallen ear', -9.6, 2.8, (1, 0.5, 0.5))],
         'sections': [
-            {'name': 'NS_por_las_fauces', 'axis': 'z', 'at': 0.0, 'span': (-20.0, 16.0), 'ylim': (-6.0, 26.0),
-             'labels': [('S', -19.0, 24.0), ('N', 15.0, 24.0)]},
-            {'name': 'EW_por_la_cara', 'axis': 'x', 'at': 1.2, 'span': (-18.0, 18.0), 'ylim': (-6.0, 26.0),
-             'labels': [('E', -17.0, 24.0), ('W', 17.0, 24.0)]},
+            {'name': 'NS_por_las_fauces', 'axis': 'z', 'at': 0.0, 'span': (-24.0, 24.0), 'ylim': (-8.0, 26.0),
+             'labels': [('S', -23.0, 24.0), ('N', 23.0, 24.0)]},
+            {'name': 'EW_por_la_cara', 'axis': 'x', 'at': 1.2, 'span': (-20.0, 22.0), 'ylim': (-8.0, 26.0),
+             'labels': [('E', -19.0, 24.0), ('W', 21.0, 24.0)]},
         ],
     }
     os.makedirs(rd, exist_ok=True)

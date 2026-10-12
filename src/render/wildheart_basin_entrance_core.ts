@@ -1,9 +1,9 @@
 // The Jaguar Maw's cosmetic plan (pure, Three-free): the Wildheart Basin's
-// world entrance (door (-232, 1112), the Palmreach). ONE clock drives
+// world entrance (door (-237, 1093), the Palmreach). ONE clock drives
 // everything: the idol's breath. Once a cycle the jaguar spirit behind the
 // stone roars without a sound: jade fire takes in the two eyes, the black
-// water in the throat lights, a jade breath pours out of the maw and up the
-// stair, the two fire bowls burn jade for a second and the fireflies scatter.
+// water in the throat lights, a jade breath pours out of the maw and down the
+// causeway, the two fire bowls burn jade for a second and the fireflies scatter.
 // Between breaths the idol only smoulders.
 //
 // This module holds: that clock, the virtual flooded throat the door's window
@@ -104,13 +104,13 @@ export function wildheartThroatGhostFade(alpha: number): number {
 }
 
 /** The idol leans (the Blender build's LEAN): its crown toward the WEST
- *  (roll) and SOUTH over the stair (pitch), radians. The throat's window
+ *  (roll) and SOUTH over the causeway (pitch), radians. The throat's window
  *  leans with it. */
 export const WILDHEART_LEAN = { roll: 0.04363, pitch: 0.03491 } as const;
 
 /** The point lights (fire-light sink sources, like every world glow light):
  *  the jade in the maw, whose base intensity follows the breath, and the two
- *  fire bowls beside the stair. */
+ *  fire bowls beside the maw. */
 export const WILDHEART_MAW_LIGHT = {
   lx: 0,
   y: 2.1,
@@ -127,8 +127,8 @@ export function wildheartMawLightIntensity(pulse: number): number {
 
 /** The fire bowls' coals (lx, y, lz), from the Blender build's stats.json. */
 export const WILDHEART_BRAZIERS: readonly (readonly [number, number, number])[] = [
-  [3.6, 2.564, -3.6],
-  [-3.6, 7.054, -3.6],
+  [4.4, 1.214, -3.4],
+  [-4.4, 1.214, -3.4],
 ];
 
 export const WILDHEART_BRAZIER_LIGHT = {
@@ -141,10 +141,10 @@ export const WILDHEART_BRAZIER_LIGHT = {
 // ---- the flooded throat behind the door ------------------------------------------
 //
 // The player never walks past the door (the walk-in trigger takes them on the
-// last steps) and the lagoon behind the idol cannot be cut, so the throat is
+// last steps) and the knoll behind the idol cannot be cut, so the throat is
 // drawn INSIDE one flat window that fills the maw behind the fangs: its shader
-// traces each view ray against a virtual rock-cut throat standing in the
-// lagoon's black water, with a curtain of the fig's roots hanging part way
+// traces each view ray against a virtual rock-cut throat standing in its own
+// black water, with a curtain of the fig's roots hanging part way
 // down it and the basin's light at its far end. Rays that meet the water are
 // reflected and traced once more, so the far light lies on the ripples.
 
@@ -153,9 +153,10 @@ export const WILDHEART_THROAT = {
   half: 2.5,
   /** The window's plane (lz), inside the lips behind the fangs. */
   z: 1.3,
-  /** The last step's top, the water standing just under it. */
-  kerb: -0.2,
-  water: -0.6,
+  /** The last flagstone's top, the water standing just under it (the
+   *  throat holds its own: the lagoon lies six yards below the door). */
+  kerb: 0.33,
+  water: -0.07,
   /** The vault: springing, and a round barrel of the throat's own half width. */
   spring: 3.6,
   /** The far end, where the light is. */
@@ -308,9 +309,10 @@ export interface WildheartMistField {
   readonly lit: number;
 }
 
-/** The idol's breath pours out of the maw and climbs the stair; thinner banks
- *  lie on the lagoon at its west cheek and behind it, at the muzzle's foot on
- *  the shore and in the lee of the knoll. */
+/** The idol's breath pours out of the maw and down the causeway (its foot
+ *  swings east); thinner banks lie on the bank under its west cheek, on the
+ *  lagoon behind it, at the bank's foot below the west fire bowl and in the
+ *  lee of the knoll. None of it drifts into the ring of columns to the east. */
 export const WILDHEART_MIST_FIELDS: readonly WildheartMistField[] = [
   {
     name: 'maw',
@@ -319,22 +321,22 @@ export const WILDHEART_MIST_FIELDS: readonly WildheartMistField[] = [
     oz: -0.4,
     rx: 1.7,
     rz: 0.9,
-    dx: 0,
+    dx: -1,
     dz: -9.5,
-    fan: 4.5,
+    fan: 4,
     y: 0.6,
     size: 3.2,
     lit: 1,
   },
   {
-    name: 'west_shallows',
+    name: 'west_bank',
     share: 0.22,
-    ox: 10.5,
-    oz: 3,
+    ox: 11,
+    oz: 5,
     rx: 3.5,
     rz: 5,
     dx: 3.5,
-    dz: -1.5,
+    dz: 2,
     fan: 0,
     y: 0.45,
     size: 3.9,
@@ -343,8 +345,8 @@ export const WILDHEART_MIST_FIELDS: readonly WildheartMistField[] = [
   {
     name: 'back_water',
     share: 0.18,
-    ox: 0,
-    oz: 19,
+    ox: 5,
+    oz: 22,
     rx: 8,
     rz: 2.5,
     dx: 2.5,
@@ -355,27 +357,27 @@ export const WILDHEART_MIST_FIELDS: readonly WildheartMistField[] = [
     lit: 0.1,
   },
   {
-    name: 'east_knoll',
+    name: 'knoll_lee',
     share: 0.14,
     ox: -9.5,
-    oz: -2.5,
+    oz: 13,
     rx: 3,
     rz: 3,
     dx: -2,
-    dz: -2.2,
+    dz: 2.2,
     fan: 0,
     y: 0.5,
     size: 3.3,
     lit: 0.3,
   },
   {
-    name: 'shore',
+    name: 'bank_foot',
     share: 0.1,
-    ox: 6,
-    oz: -2.2,
+    ox: 7,
+    oz: -3,
     rx: 2.4,
     rz: 1.5,
-    dx: 2,
+    dx: 2.5,
     dz: -2.6,
     fan: 0,
     y: 0.45,
@@ -440,7 +442,7 @@ export function wildheartMistPuff(index: number, count: number): WildheartMistPu
 export interface WildheartMistPose {
   x: number;
   /** Life fraction in [0, 1): the painter rides the ground between the
-   *  puff's birth and its end by it (the knoll is steep). */
+   *  puff's birth and its end by it (the rise falls away from the door). */
   t: number;
   z: number;
   /** Billboard width in yards (the height is 0.46 of it). */
@@ -479,9 +481,9 @@ export function wildheartMistNearFade(viewDepth: number): number {
 export const WILDHEART_SPRITE_KIND = {
   /** The jade in an eye: a soft disc that never quite goes out. */
   eyeGlow: 0,
-  /** A shaft of an eye's light, falling toward the stair on the breath. */
+  /** A shaft of an eye's light, falling toward the causeway on the breath. */
   eyeShaft: 1,
-  /** The breath's light out of the maw, up the stair. */
+  /** The breath's light out of the maw, out over the causeway. */
   mawShaft: 2,
   /** A flame: in a fire bowl (always, jade on the breath) or licking up out
    *  of an eye (an ember between breaths). */
@@ -490,7 +492,7 @@ export const WILDHEART_SPRITE_KIND = {
   drip: 4,
   /** The ring where it lands (lies on the ground). */
   ring: 5,
-  /** A firefly over the knoll and the shallows after dusk. */
+  /** A firefly beside the causeway and over the bank after dusk. */
   firefly: 6,
   /** The jade pool on the wet steps inside the maw (lies on the ground). */
   pool: 7,
@@ -541,9 +543,10 @@ export const WILDHEART_DRIP_SOURCES: readonly (readonly [number, number, number]
   [-1.249, 4.617, -1.184],
 ];
 
-/** The maw's shafts: yaw off south (positive west), pitch (the stair climbs),
+/** The maw's shafts: yaw off south (positive west), pitch (the causeway
+ *  falls away from the door, so they lie near level, over a walker's head),
  *  length, width at the foot and at the tip, and the foot's lx. Uneven on
- *  purpose, fanned so whoever comes down the stair sees them from the side. */
+ *  purpose, fanned so whoever comes up the causeway sees them from the side. */
 export const WILDHEART_MAW_SHAFTS: readonly (readonly [
   number,
   number,
@@ -552,15 +555,16 @@ export const WILDHEART_MAW_SHAFTS: readonly (readonly [
   number,
   number,
 ])[] = [
-  [-0.5, 0.42, 10, 1.2, 2.8, -0.9],
-  [-0.24, 0.56, 12, 1.5, 3.4, -0.4],
-  [0.02, 0.48, 9, 1.1, 2.6, 0.1],
-  [0.26, 0.6, 11, 1.4, 3.2, 0.5],
-  [0.5, 0.4, 8, 1.2, 2.8, 0.9],
+  [-0.5, -0.12, 10, 1.2, 2.8, -0.9],
+  [-0.24, 0.04, 12, 1.5, 3.4, -0.4],
+  [0.02, -0.06, 9, 1.1, 2.6, 0.1],
+  [0.26, 0.08, 11, 1.4, 3.2, 0.5],
+  [0.5, -0.14, 8, 1.2, 2.8, 0.9],
 ];
 
-/** Where the fireflies wander: the knoll either side of the stair and the
- *  shallows at the idol's west cheek (door-local boxes). */
+/** Where the fireflies wander: the bank west of the causeway, the tusk at its
+ *  east foot (clear of the ring of columns) and the bank under the idol's
+ *  west cheek (door-local boxes). */
 export const WILDHEART_FIREFLY_FIELDS: readonly {
   x0: number;
   x1: number;
@@ -568,7 +572,7 @@ export const WILDHEART_FIREFLY_FIELDS: readonly {
   z1: number;
 }[] = [
   { x0: 3, x1: 14, z0: -12, z1: -2 },
-  { x0: -15, x1: -3, z0: -13, z1: -3 },
+  { x0: -7, x1: -3.5, z0: -17, z1: -10.5 },
   { x0: 9, x1: 17, z0: 0, z1: 12 },
 ];
 
@@ -581,9 +585,10 @@ export function wildheartDripFallTime(fall: number): number {
 }
 
 /**
- * The sprite list of a tier. `ground(lx, lz)` is the terrain above the door's
- * own height (the painter passes the sim's terrainHeight), so drops land and
- * rings lie where the ground really is. The door's own cues (the eyes' glow
+ * The sprite list of a tier. `ground(lx, lz)` is the terrain, or the lagoon
+ * where the terrain lies under it, above the door's own height (the painter
+ * passes the sim's terrainHeight and WATER_LEVEL), so drops land, rings lie
+ * and fireflies fly where the ground really is. The door's own cues (the eyes' glow
  * and flames, the maw's glow, pool and shafts, the fire bowls) draw on every
  * tier; the tier thins the drips and the fireflies and drops the eyes' shafts
  * on low.
@@ -622,7 +627,7 @@ export function wildheartSprites(
       });
     }
     if (rank > 0) {
-      // the eye's light on the breath, falling toward whoever stands on the stair
+      // the eye's light on the breath, falling toward whoever stands on the causeway
       const dx = x * 0.05;
       const dy = -0.5;
       const dz = -0.85;
@@ -734,8 +739,7 @@ export function wildheartSprites(
       ...base,
       kind: K.firefly,
       x,
-      y:
-        Math.max(ground(x, z), WILDHEART_THROAT.water) + 0.8 + fract(i * 0.38196601125 + 0.6) * 1.6,
+      y: ground(x, z) + 0.8 + fract(i * 0.38196601125 + 0.6) * 1.6,
       z,
       size: 0.2 + fract(i * 0.56984029099) * 0.1,
       phase: fract(i * 0.56984029099 + 0.71),

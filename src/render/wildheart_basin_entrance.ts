@@ -1,10 +1,10 @@
-// The Jaguar Maw, the Wildheart Basin's world entrance (door (-232, 1112), the
+// The Jaguar Maw, the Wildheart Basin's world entrance (door (-237, 1093), the
 // Palmreach): the three Blender GLBs (the idol, the court before it, the
 // render-only growth) seated on the door's terrain height, plus its cosmetic
 // layer, all on ONE clock, the idol's breath
 // (wildheart_basin_entrance_core.ts):
 //   - the FLOODED THROAT behind the fangs: one flat window in the maw whose
-//     shader traces a virtual rock-cut throat standing in the lagoon's black
+//     shader traces a virtual rock-cut throat standing in its own black
 //     water, a curtain of the fig's roots hanging in it and the basin's light
 //     at its far end, with the water reflecting it. This is the door's portal
 //     look; the door body itself is only the invisible click box
@@ -12,7 +12,7 @@
 //   - the point lights (fire-light sink sources): the jade in the maw, whose
 //     base follows the breath, and the two fire bowls;
 //   - the mist, ONE instanced draw of soft noise-broken puffs: the breath out
-//     of the maw and up the stair, and the banks lying on the lagoon;
+//     of the maw and down the causeway, and the banks lying on the lagoon;
 //   - the sprites, ONE instanced additive draw: the jade in the eyes, the
 //     flames that lick out of them on the breath, the fire bowls' flames, the
 //     shafts out of the maw, the drips off the fangs and their rings, the
@@ -347,7 +347,7 @@ let throatMat: THREE.MeshBasicMaterial | null = null;
 
 function throatMaterial(): THREE.MeshBasicMaterial {
   if (throatMat) return throatMat;
-  // (the window's triangles face north: the BACK side is the stair's side, so a
+  // (the window's triangles face north: the BACK side is the causeway's side, so a
   // camera turned to look out from behind the maw never sees a lit panel)
   const material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.BackSide });
   material.onBeforeCompile = (shader) => {
@@ -767,7 +767,7 @@ export function buildWildheartBasinEntrance(seed: number): WildheartBasinEntranc
   const door = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID].doorPos;
   const base = terrainHeight(door.x, door.z, seed);
   const ground = (lx: number, lz: number) => terrainHeight(door.x + lx, door.z + lz, seed) - base;
-  // the mist lies on the lagoon where the ground is under it
+  // the mist lies, and the fireflies fly, on the lagoon where the ground is under it
   const surface = (lx: number, lz: number) => Math.max(ground(lx, lz), WATER_LEVEL - base);
   const group = new THREE.Group();
   group.name = 'wildheartBasinEntrance';
@@ -842,7 +842,7 @@ export function buildWildheartBasinEntrance(seed: number): WildheartBasinEntranc
     return light;
   });
   maw.add(mawMist(tier, surface, lights[0]));
-  maw.add(mawSprites(tier, ground));
+  maw.add(mawSprites(tier, surface));
   group.add(maw);
   for (const light of lights) group.add(light);
   return { group, glowLights: lights, cullGroups: [maw] };

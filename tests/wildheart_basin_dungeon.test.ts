@@ -81,7 +81,7 @@ describe('the reworked Wildheart Basin record', () => {
     const d = DUNGEONS[ID];
     expect(d.name).toBe('The Wildheart Basin');
     expect(d.index).toBe(7);
-    expect(d.doorPos).toEqual({ x: -232, z: 1112 });
+    expect(d.doorPos).toEqual({ x: -237, z: 1093 });
     expect(d.interior).toBe('wildheart');
     expect(authoredFieldFor('wildheart')?.key).toBe('wildheart');
     expect(d.bossChainPull).toBe(true);
