@@ -2138,6 +2138,14 @@ export interface MobTemplate {
   // via the tag-to-item map in src/sim/content/professions.ts (#1141).
   componentTags?: string[];
   boss?: boolean;
+  /**
+   * A named instance mid-boss that carries boss loot without the `boss` flag
+   * (the Hollow Crypt's wing bosses): its lootable corpse stands for the boss
+   * hold instead of the 60 s trash window (mob/boss_corpse_hold.ts), so a
+   * group that spends a minute on its adds, a resurrection or an unanswered
+   * roll still finds the body. Nothing else a `boss` template gets.
+   */
+  bossCorpseHold?: boolean;
   rare?: boolean;
   // Explicit tame opt-out for ordinary beasts whose encounter lifecycle must
   // not be replaced by the hunter pet respawn lifecycle.

@@ -311,6 +311,8 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
     elite: true,
     ccImmune: true,
     slowImmune: true,
+    // She drops boss loot: her corpse holds like a boss's (boss_corpse_hold.ts).
+    bossCorpseHold: true,
     hpBase: 120,
     hpPerLevel: 26,
     dmgBase: 9,
@@ -361,6 +363,8 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
     elite: true,
     ccImmune: true,
     slowImmune: true,
+    // She drops boss loot: her corpse holds like a boss's (boss_corpse_hold.ts).
+    bossCorpseHold: true,
     hpBase: 110,
     hpPerLevel: 24,
     dmgBase: 8,
