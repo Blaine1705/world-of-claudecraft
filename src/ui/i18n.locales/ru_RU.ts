@@ -2698,6 +2698,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.delveTracker': 'Трекер вылазки',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': 'Трекер разлома',
   'hudChrome.interfaceUnlock.frameNames.dungeonTracker': 'Трекер подземелья',
+  'hudChrome.dungeonTracker.complete': 'Пройдено',
   'hudChrome.interfaceUnlock.frameNames.targetDots': 'Эффекты на целях',
   'hudChrome.interfaceUnlock.framesMenu': 'Настройки фреймов',
   'hudChrome.interfaceUnlock.showHideFrames': 'Показать или скрыть фреймы',

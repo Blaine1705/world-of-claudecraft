@@ -1769,7 +1769,8 @@ export const pl_PL: EnTranslations = {
       "replayTarget": "Wybierz go ponownie jako cel"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Szczelina",

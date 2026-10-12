@@ -7,13 +7,17 @@
 import { describe, expect, it } from 'vitest';
 import { decodeDungeonRun } from '../src/net/dungeon_run_wire';
 import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
+import { QUESTS } from '../src/sim/data';
 import { dungeonRunPlan } from '../src/sim/instances/dungeon_run';
 import {
   buildDungeonTracker,
+  DUNGEON_PLATE_MIN_FRACTION,
+  DUNGEON_PLATE_RAIL_GAP_FRACTION,
   DUNGEON_STRIP_QUEST_PREFIX,
   DUNGEON_TRACKER_FLASH_BUILDS,
   DUNGEON_TRACKER_ROW_CAP,
   type DungeonTrackerModel,
+  dungeonPlateFraction,
   dungeonStripQuest,
   makeDungeonTrackerModel,
 } from '../src/ui/hud/dungeon/dungeon_tracker_view';
@@ -134,14 +138,53 @@ describe('dungeon tracker model', () => {
     expect([model.defeated, model.complete]).toEqual([4, true]);
   });
 
-  it('clamps a boss list longer than the pool instead of running off it', () => {
+  it('never reads complete with a boss alive past the row pool', () => {
+    // A list longer than the pool shows the rows it can, but the tally and the
+    // finished state count EVERY boss: a full pool of dead rows with a boss
+    // still standing behind it must not read Complete.
     const long = Array.from({ length: DUNGEON_TRACKER_ROW_CAP + 3 }, (_, i) => `boss_${i}`);
-    const model = buildDungeonTracker(
-      { dungeonRun: simRun([], 'normal', long) },
-      makeDungeonTrackerModel(),
-    );
+    const pooled = long.slice(0, DUNGEON_TRACKER_ROW_CAP);
+    const model = makeDungeonTrackerModel();
+    buildDungeonTracker({ dungeonRun: simRun(pooled, 'normal', long) }, model);
     expect(model.count).toBe(DUNGEON_TRACKER_ROW_CAP);
-    expect(model.rows).toHaveLength(DUNGEON_TRACKER_ROW_CAP);
+    expect(model.rows.slice(0, model.count).every((row) => row.done)).toBe(true);
+    expect([model.total, model.defeated, model.complete]).toEqual([
+      DUNGEON_TRACKER_ROW_CAP + 3,
+      DUNGEON_TRACKER_ROW_CAP,
+      false,
+    ]);
+    // One of the unpooled bosses falls: the tally moves, still not complete.
+    buildDungeonTracker(
+      { dungeonRun: simRun([...pooled, long[long.length - 1]], 'normal', long) },
+      model,
+    );
+    expect([model.defeated, model.complete]).toEqual([DUNGEON_TRACKER_ROW_CAP + 1, false]);
+    buildDungeonTracker({ dungeonRun: simRun(long, 'normal', long) }, model);
+    expect([model.defeated, model.complete]).toEqual([DUNGEON_TRACKER_ROW_CAP + 3, true]);
+  });
+
+  it('bumps rev exactly when something the painter resolves text from changes', () => {
+    const model = makeDungeonTrackerModel();
+    const revs: number[] = [];
+    const build = (run: DungeonRunView | null) => {
+      buildDungeonTracker({ dungeonRun: run }, model);
+      revs.push(model.rev);
+    };
+    build(simRun()); // first sighting
+    build(simRun()); // nothing
+    build(simRun()); // nothing
+    build(simRun(['rimeweb'])); // a row turns done
+    for (let i = 0; i < DUNGEON_TRACKER_FLASH_BUILDS + 2; i++) build(simRun(['rimeweb'])); // the highlight runs out: no text
+    build(simRun(['rimeweb'], 'heroic')); // the difficulty
+    build(null); // hidden: nothing to resolve
+    build(simRun(['rimeweb'], 'heroic')); // back on screen
+    const steps = revs.map((rev, i) => (i === 0 ? rev : rev - revs[i - 1]));
+    expect(steps[0]).toBeGreaterThan(0);
+    expect(steps.slice(1, 3)).toEqual([0, 0]);
+    expect(steps[3]).toBe(1);
+    expect(steps.slice(4, 4 + DUNGEON_TRACKER_FLASH_BUILDS + 2).every((d) => d === 0)).toBe(true);
+    const tail = steps.slice(4 + DUNGEON_TRACKER_FLASH_BUILDS + 2);
+    expect(tail).toEqual([1, 0, 1]);
   });
 
   it('no authored dungeon comes near the pool, or the strip page cap', () => {
@@ -251,6 +294,73 @@ describe('dungeon tracker kill highlight', () => {
   });
 });
 
+describe('how far the plate may reach before the button rail', () => {
+  // Boxes in one space. The column is 240 wide at x 1000; the stock rail is a
+  // 70 wide strip against its right edge.
+  const box = (left: number, top: number, right: number, bottom: number) => ({
+    left,
+    top,
+    right,
+    bottom,
+  });
+  const column = box(1000, 300, 1240, 440);
+  const plate = box(1000, 300, 1240, 353);
+  const railAt = (top: number) => box(1168, top, 1238, top + 438);
+
+  it('fills the column when there is no rail, or the rail is hidden', () => {
+    expect(dungeonPlateFraction(column, plate, null)).toBe(1);
+    expect(dungeonPlateFraction(column, plate, box(0, 0, 0, 0))).toBe(1);
+  });
+
+  it('fills the column while the rail is below the plate, however close', () => {
+    expect(dungeonPlateFraction(column, plate, railAt(353))).toBe(1);
+    expect(dungeonPlateFraction(column, plate, railAt(600))).toBe(1);
+  });
+
+  it('keeps to the rail-free share once the rail is level with the plate', () => {
+    const fraction = dungeonPlateFraction(column, plate, railAt(352));
+    expect(fraction).toBeCloseTo(168 / 240 - DUNGEON_PLATE_RAIL_GAP_FRACTION, 10);
+    // The plate then ends short of the rail by the gap.
+    expect(column.left + fraction * 240).toBeLessThan(1168);
+  });
+
+  it('gives the same share at every UI scale, since it is a ratio of boxes', () => {
+    const at = (scale: number) => {
+      const s = (b: ReturnType<typeof box>) =>
+        box(b.left * scale, b.top * scale, b.right * scale, b.bottom * scale);
+      return dungeonPlateFraction(s(column), s(plate), s(railAt(250)));
+    };
+    expect(at(1.25)).toBeCloseTo(at(1), 10);
+    expect(at(1.5)).toBeCloseTo(at(1), 10);
+    expect(at(0.75)).toBeCloseTo(at(1), 10);
+    expect(at(1)).toBeLessThan(1);
+  });
+
+  it('fills the column when the rail is beside some other column (a moved rail or tracker)', () => {
+    expect(dungeonPlateFraction(column, plate, box(400, 250, 470, 700))).toBe(1);
+    expect(dungeonPlateFraction(column, plate, box(1240, 250, 1310, 700))).toBe(1);
+    // A horizontal rail that sits under the tracker.
+    expect(dungeonPlateFraction(column, plate, box(900, 500, 1300, 566))).toBe(1);
+  });
+
+  it('never shrinks the plate to a sliver: a rail ACROSS the column is left alone', () => {
+    // A horizontal rail lying over the plate leaves no column to keep to.
+    expect(dungeonPlateFraction(column, plate, box(900, 310, 1300, 376))).toBe(1);
+    const half = column.left + 240 * (DUNGEON_PLATE_MIN_FRACTION + DUNGEON_PLATE_RAIL_GAP_FRACTION);
+    expect(dungeonPlateFraction(column, plate, box(half - 1, 250, half + 69, 700))).toBe(1);
+    expect(dungeonPlateFraction(column, plate, box(half + 1, 250, half + 71, 700))).toBeLessThan(1);
+  });
+
+  it('is sticky the safe way: a narrowed plate that wrapped taller stays narrowed', () => {
+    const rail = railAt(360);
+    // Full width the plate ends above the rail...
+    expect(dungeonPlateFraction(column, plate, rail)).toBe(1);
+    // ...but once narrowed and wrapped past it, it does not widen back into it.
+    const wrapped = box(1000, 300, 1160, 371);
+    expect(dungeonPlateFraction(column, wrapped, rail)).toBeLessThan(1);
+  });
+});
+
 describe('dungeon run as a touch quest strip page', () => {
   const text = {
     title: (dungeonId: string, heroic: boolean) => `<${dungeonId}${heroic ? '+H' : ''}>`,
@@ -283,8 +393,13 @@ describe('dungeon run as a touch quest strip page', () => {
     const heroic = dungeonStripQuest({ dungeonRun: simRun([], 'heroic') }, text);
     expect(normal?.id).not.toBe(heroic?.id);
     expect(normal?.id.startsWith(DUNGEON_STRIP_QUEST_PREFIX)).toBe(true);
-    expect(DUNGEON_STRIP_QUEST_PREFIX).toContain(':');
     expect(normal?.title).toBe('<hollow_crypt>');
+    // No logged quest id and no other synthetic page (the Clue Scroll's
+    // `clue:` row) can be read as the dungeon page.
+    expect(Object.keys(QUESTS).filter((id) => id.startsWith(DUNGEON_STRIP_QUEST_PREFIX))).toEqual(
+      [],
+    );
+    expect('clue:hunt'.startsWith(DUNGEON_STRIP_QUEST_PREFIX)).toBe(false);
   });
 
   it('reads complete once every boss is down', () => {

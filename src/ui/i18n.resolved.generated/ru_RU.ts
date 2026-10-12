@@ -1769,7 +1769,8 @@ export const ru_RU: EnTranslations = {
       "replayTarget": "Снова взять его в цель"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Пройдено"
     },
     "riftTracker": {
       "title": "Разлом",

@@ -1769,7 +1769,8 @@ export const zh_CN: EnTranslations = {
       "replayTarget": "再次将它设为目标"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "已完成"
     },
     "riftTracker": {
       "title": "裂隙",

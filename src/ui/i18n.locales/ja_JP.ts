@@ -2668,6 +2668,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.delveTracker': 'デルヴトラッカー',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': 'リフトトラッカー',
   'hudChrome.interfaceUnlock.frameNames.dungeonTracker': 'ダンジョントラッカー',
+  'hudChrome.dungeonTracker.complete': '完了',
   'hudChrome.interfaceUnlock.frameNames.targetDots': 'ターゲットデバフ',
   'hudChrome.interfaceUnlock.frameNames.chat': 'チャット',
   'hudChrome.interfaceUnlock.frameNames.menu': 'メニュー',

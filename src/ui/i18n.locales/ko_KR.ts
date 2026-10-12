@@ -2663,6 +2663,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.delveTracker': '탐굴 추적기',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': '균열 추적기',
   'hudChrome.interfaceUnlock.frameNames.dungeonTracker': '던전 추적기',
+  'hudChrome.dungeonTracker.complete': '완료',
   'hudChrome.interfaceUnlock.frameNames.targetDots': '대상 디버프',
   'hudChrome.interfaceUnlock.frameNames.chat': '채팅',
   'hudChrome.interfaceUnlock.frameNames.menu': '메뉴',

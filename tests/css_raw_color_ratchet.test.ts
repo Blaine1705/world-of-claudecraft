@@ -179,6 +179,8 @@ const ZERO_LITERAL_SECTIONS = [
   'window shell',
   // tokenized as authored (swatch fills arrive from the painter as --whb-sw)
   'woc face builder',
+  // tokenized as authored (the plate composes ui-panel-soft, ui-chip, ui-bar)
+  'dungeon objectives tracker',
 ];
 
 // A section counts zero when it is tokenized AND when it is empty, so the zero pin

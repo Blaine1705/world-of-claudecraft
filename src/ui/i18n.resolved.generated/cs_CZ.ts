@@ -1769,7 +1769,8 @@ export const cs_CZ: EnTranslations = {
       "replayTarget": "Znovu ji vyber jako cíl"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Trhlina",

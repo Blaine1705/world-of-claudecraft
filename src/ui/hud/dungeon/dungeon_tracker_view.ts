@@ -62,17 +62,27 @@ export interface DungeonTrackerModel {
   /** Live rows: `rows[0 .. count)`; slots past it are stale pool entries. */
   count: number;
   rows: DungeonTrackerRow[];
-  /** How many of the live rows are done. */
+  /** Every boss of the run, including any the row pool could not hold. */
+  total: number;
+  /** How many of those `total` bosses are down. */
   defeated: number;
-  /** Every boss is down: the run reads as finished. */
+  /** Every boss of the run is down (never just the rows the pool holds). */
   complete: boolean;
+  /**
+   * Bumped whenever something the painter RESOLVES TEXT from changes: the
+   * tracker appearing, the dungeon, the difficulty, a boss in a row, a row
+   * turning done, or the tally. The highlight holds do not move it, so the
+   * painter can skip every t() and name lookup on an unchanged poll.
+   */
+  rev: number;
   /** The LAST boss fell while the tracker was up: the plate's one-time glow. */
   completeFlash: boolean;
   completeHold: number;
 }
 
-/** Id prefix of the run's page on the touch quest strip. A quest id never
- *  carries a colon, so the page cannot be mistaken for a logged quest. */
+/** Id prefix of the run's page on the touch quest strip. Logged quests are
+ *  `q_...` ids and the Clue Scroll page is `clue:...`, so the page cannot be
+ *  mistaken for either. */
 export const DUNGEON_STRIP_QUEST_PREFIX = 'dungeon:';
 
 /** The localized text the strip page needs; resolved by the caller. */
@@ -121,11 +131,61 @@ export function makeDungeonTrackerModel(): DungeonTrackerModel {
     heroic: false,
     count: 0,
     rows,
+    total: 0,
     defeated: 0,
     complete: false,
+    rev: 0,
     completeFlash: false,
     completeHold: 0,
   };
+}
+
+/** One measured box, in any one consistent coordinate space. */
+export interface DungeonTrackerBox {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+/** The plate never narrows below this share of its column: past it the rail
+ *  is not beside the tracker but across it, and a sliver of a plate is worse
+ *  than an overlap. */
+export const DUNGEON_PLATE_MIN_FRACTION = 0.5;
+
+/** Clear space kept between the plate and the rail, as a share of the column
+ *  (8px of the stock 240px), so it scales with the HUD like everything else. */
+export const DUNGEON_PLATE_RAIL_GAP_FRACTION = 8 / 240;
+
+/**
+ * How much of its column the plate may fill before it reaches the button
+ * rail: 1 when the rail is nowhere near it, less when the rail stands beside
+ * it. The plate is the one OPAQUE box in the tracker stack, and the stack
+ * paints above the rail, so wherever the two meet the plate would cover
+ * buttons; text rows are harmless there and are not narrowed.
+ *
+ * Pure arithmetic over three measured boxes in the same space, so it is right
+ * at every UI scale, for a horizontal or a moved rail, and for a tracker that
+ * was itself moved or sits in the combined group: nothing here knows where
+ * either one is supposed to be. `column` is the tracker's own box and `plate`
+ * the plate's CURRENT box, narrowed or not; reading the current box makes the
+ * answer sticky in the one direction that matters (a narrowed plate that
+ * wrapped taller stays narrowed), so it cannot flip back and forth.
+ */
+export function dungeonPlateFraction(
+  column: DungeonTrackerBox,
+  plate: DungeonTrackerBox,
+  rail: DungeonTrackerBox | null,
+): number {
+  const width = column.right - column.left;
+  if (!rail || width <= 0) return 1;
+  if (rail.right <= rail.left || rail.bottom <= rail.top) return 1;
+  // Beside the column at all, and level with the plate?
+  if (rail.left >= column.right || rail.right <= column.left) return 1;
+  if (rail.top >= plate.bottom || rail.bottom <= plate.top) return 1;
+  const free = (rail.left - column.left) / width - DUNGEON_PLATE_RAIL_GAP_FRACTION;
+  if (free >= 1) return 1;
+  return free < DUNGEON_PLATE_MIN_FRACTION ? 1 : free;
 }
 
 /**
@@ -144,6 +204,7 @@ export function buildDungeonTracker(
     out.dungeonId = '';
     out.heroic = false;
     out.count = 0;
+    out.total = 0;
     out.defeated = 0;
     out.complete = false;
     out.completeFlash = false;
@@ -161,10 +222,14 @@ export function buildDungeonTracker(
     if (out.rows[i].mobId !== run.bosses[i].mobId) sameRun = false;
   }
   const wasComplete = sameRun && out.complete;
+  // Anything the painter resolves text from: a first sighting, or below, a
+  // row turning done.
+  let changed = !sameRun;
   let defeated = 0;
   for (let i = 0; i < count; i++) {
     const boss = run.bosses[i];
     const row = out.rows[i];
+    if (row.done !== boss.defeated) changed = true;
     let hold = sameRun ? row.flashHold : 0;
     if (sameRun && boss.defeated && !row.done) hold = DUNGEON_TRACKER_FLASH_BUILDS;
     else if (hold > 0) hold--;
@@ -176,7 +241,14 @@ export function buildDungeonTracker(
     row.flash = hold > 0;
     if (boss.defeated) defeated++;
   }
-  const complete = defeated === count;
+  // The tally and the finished state count EVERY boss, also one the pool had
+  // no row for: a plate must never read Complete with a boss still standing.
+  const total = run.bosses.length;
+  for (let i = count; i < total; i++) {
+    if (run.bosses[i].defeated) defeated++;
+  }
+  const complete = defeated === total;
+  if (out.total !== total || out.defeated !== defeated) changed = true;
   let completeHold = sameRun ? out.completeHold : 0;
   if (sameRun && complete && !wasComplete) completeHold = DUNGEON_TRACKER_FLASH_BUILDS;
   else if (completeHold > 0) completeHold--;
@@ -185,8 +257,10 @@ export function buildDungeonTracker(
   out.dungeonId = run.dungeonId;
   out.heroic = heroic;
   out.count = count;
+  out.total = total;
   out.defeated = defeated;
   out.complete = complete;
+  if (changed) out.rev++;
   out.completeHold = completeHold;
   out.completeFlash = completeHold > 0;
   return out;

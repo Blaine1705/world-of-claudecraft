@@ -6802,9 +6802,20 @@
   }
   /* The plate composes ui-panel-soft (the objective tracker surface, DESIGN.md
      4.4); only its geometry is set here. The stack outlines its text for the
-     open world behind it, which a plated line does not need. */
+     open world behind it, which a plated line does not need.
+
+     The plate is the one OPAQUE box in the stack, and the stack paints above
+     the button rail (z-index 20 over 19): wherever the two meet it would cover
+     buttons. Whether they meet depends on the viewport, the UI scale, a
+     horizontal or moved rail and a moved tracker, so no breakpoint can say;
+     the painter measures it and writes the share of the column the plate may
+     fill (--dgt-plate-w, a percentage, so it holds at every scale). Rows are
+     text and stay full width: text over a rail icon is harmless, which is why
+     every row in the stack hugs the left of the column. */
   #dungeon-tracker .dgt-plate {
     position: relative;
+    box-sizing: border-box;
+    width: var(--dgt-plate-w, 100%);
     padding: 6px 10px 8px;
     text-shadow: none;
   }
@@ -6822,27 +6833,6 @@
   }
   #dungeon-tracker .dgt-plate.is-complete::after {
     opacity: 1;
-  }
-  /* The stack paints above the button rail (z-index 20 over 19), and on a
-     short viewport the rail climbs into the stack's span. Text over a rail
-     icon is harmless, which is why every row in the stack hugs the left of
-     the column, but a PLATE would cover the buttons under it. So below the
-     height where the two meet (the rail's top, bottom: 74px and about 438px
-     tall, against the plate's bottom under the minimap column) the plate
-     keeps to the column the rail leaves free: the 70px rail plus its gap. */
-  @media (max-height: 895px) {
-    body:not(.mobile-touch) #dungeon-tracker:not(.hud-frame-detached) .dgt-plate {
-      width: calc(100% - 80px);
-      padding-inline: 9px;
-    }
-    body:not(.mobile-touch) #dungeon-tracker:not(.hud-frame-detached) .dgt-name {
-      font-size: 13px;
-    }
-    /* The rows follow the plate in: a long boss name wraps under itself
-       rather than running across the rail's icons. */
-    body:not(.mobile-touch) #dungeon-tracker:not(.hud-frame-detached) .dgt-list {
-      margin-right: 80px;
-    }
   }
   #dungeon-tracker .dgt-plate.is-complete-flash::after {
     animation: dungeon-tracker-complete 1.4s ease-out;
@@ -6868,10 +6858,25 @@
     line-height: 18px;
     overflow-wrap: anywhere;
   }
+  /* Beside the rail (the painter's .is-narrow) the name sets a size down and
+     the plate gives it a pixel more room, so a name that fit one line still
+     does. The line height holds: narrowing never makes the plate shorter, so
+     the painter's measure cannot flip-flop. */
+  #dungeon-tracker.is-narrow .dgt-plate {
+    padding-inline: 9px;
+  }
+  #dungeon-tracker.is-narrow .dgt-name {
+    font-size: 13px;
+  }
+  /* Chip, rail, tally. On a narrowed plate with a long chip and a long tally
+     (a finished heroic run in German or Russian) the three no longer fit one
+     line: the row wraps and the tally drops under, right aligned, instead of
+     squeezing the rail to nothing. */
   #dungeon-tracker .dgt-progress {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 4px 8px;
     margin-top: 5px;
   }
   #dungeon-tracker .dgt-diff {
@@ -6885,9 +6890,10 @@
   }
   #dungeon-tracker .dgt-bar {
     --bar-color: var(--gold);
+    --bar-h: 5px;
 
-    flex: 1 1 auto;
-    height: 5px;
+    flex: 1 1 28px;
+    min-width: 28px;
   }
   #dungeon-tracker .dgt-bar-fill {
     display: block;
@@ -6900,6 +6906,7 @@
   }
   #dungeon-tracker .dgt-tally {
     flex: none;
+    margin-left: auto;
     font-size: 11px;
     font-weight: 500;
     line-height: 14px;

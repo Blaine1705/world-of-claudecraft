@@ -1769,7 +1769,8 @@ export const fr_FR: EnTranslations = {
       "replayTarget": "Reprendre la cible"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Faille",

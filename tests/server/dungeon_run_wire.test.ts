@@ -167,15 +167,46 @@ describe('dgrun: the dungeon run on the wire', () => {
     expect(client.dungeonRun).toBe(held);
   });
 
-  it('a reconnect clears the stale mirror and the next snapshot restores it', () => {
-    const { sim, session, client, pass } = rig(304, 'Relinker');
+  it('a reconnect clears the stale mirror and the resumed session restores the run', () => {
+    const { server, sim, session, client, pass, killPlaced } = rig(304, 'Relinker');
     expect(enterDungeon(sim.ctx, 'drowned_temple', session.pid, true)).toBe(true);
     pass();
-    expect(client.dungeonRun?.dungeonId).toBe('drowned_temple');
-    // The reconnect path resets every delta-omitted mirror before the fresh
-    // session's first self record lands (ClientWorld's hello handler).
+    killPlaced('choirmother_selthe');
+    pass();
+    const flags = () => client.dungeonRun?.bosses.map((boss) => boss.defeated);
+    expect(flags()).toEqual([true, false, false]);
+    // Settled: the server has nothing more to say about the run.
+    expect(pass().self).not.toHaveProperty('dgrun');
+
+    // The socket drops and the same character joins again: the server's real
+    // resume path (GameServer.resumeSession, which wipes the delta cache).
+    session.linkdead = true;
+    const socket = fakeWs();
+    const resumed = server.join(socket.ws, 304, 304, 'Relinker', 'warrior', null, false, {});
+    if ('error' in resumed) throw new Error(resumed.error);
+    expect(resumed).toBe(session);
+    // The client resets every delta-omitted mirror before the resumed
+    // session's first self record lands (ClientWorld's hello handler)...
     client.resetQuestWorldWireState();
     expect(client.dungeonRun).toBeNull();
+    // ...and that first record carries the run again, kills and all, although
+    // nothing about it changed since the last one the old socket was sent.
+    socket.sent.length = 0;
+    broadcast(server);
+    const snap = lastSnap(socket.sent);
+    expect(snap.self.dgrun).toEqual({
+      dungeonId: 'drowned_temple',
+      difficulty: 'normal',
+      bosses: [
+        { mobId: 'choirmother_selthe', defeated: true },
+        { mobId: 'tideglass_colossus', defeated: false },
+        { mobId: 'ysolei', defeated: false },
+      ],
+    });
+    // biome-ignore lint/suspicious/noExplicitAny: applySnapshot is ClientWorld's private decode door
+    (client as any).applySnapshot(snap);
+    expect(client.dungeonRun).toEqual(dungeonRunForPlayer(sim.ctx, session.pid));
+    expect(flags()).toEqual([true, false, false]);
   });
 });
 

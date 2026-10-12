@@ -1769,7 +1769,8 @@ export const tr_TR: EnTranslations = {
       "replayTarget": "Tekrar hedefle"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Yarık",

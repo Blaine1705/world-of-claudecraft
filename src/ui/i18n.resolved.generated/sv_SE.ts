@@ -1769,7 +1769,8 @@ export const sv_SE: EnTranslations = {
       "replayTarget": "Välj den som mål igen"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Reva",

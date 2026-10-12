@@ -12093,6 +12093,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.dungeonDifficulty.resetUsage'
   | 'hudChrome.dungeonDifficulty.setHeroic'
   | 'hudChrome.dungeonDifficulty.setNormal'
+  | 'hudChrome.dungeonTracker.complete'
   | 'hudChrome.dungeonTracker.heroicTitle'
   | 'hudChrome.emoteEditor.close'
   | 'hudChrome.emoteEditor.done'

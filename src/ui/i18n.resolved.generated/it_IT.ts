@@ -1769,7 +1769,8 @@ export const it_IT: EnTranslations = {
       "replayTarget": "Selezionalo di nuovo"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Squarcio",

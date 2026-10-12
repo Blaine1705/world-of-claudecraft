@@ -1879,11 +1879,15 @@ export const hudChromeStrings = {
   },
   // The dungeon objectives tracker (src/ui/hud/dungeon/dungeon_tracker_*). Its
   // names come from the dungeon and mob entity keys, its counts from
-  // questTracker.objectiveValue and its Heroic chip from finder.heroic; the one
-  // string of its own is the touch strip page's title on a heroic run, which
-  // joins two of those ("The Hollow Crypt (Heroic)").
+  // questTracker.objectiveValue and its Heroic chip from finder.heroic. Its own
+  // strings: the touch strip page's title on a heroic run, which joins two of
+  // those ("The Hollow Crypt (Heroic)"), and the plate's finished state. That
+  // one is NOT questUi.tracker.complete: it says a DUNGEON RUN is complete, and
+  // a gendered locale agrees the quest word with "quest". Wordy (M16): the
+  // five non-Latin fills land in this same change.
   dungeonTracker: {
     heroicTitle: '{name} ({difficulty})',
+    complete: 'Complete',
   },
   // In-rift HUD tracker (issue #2655): floor position + a live "closes in"
   // countdown on the rift's backing world event. Digits run through

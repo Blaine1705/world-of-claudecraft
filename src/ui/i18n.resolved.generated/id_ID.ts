@@ -1769,7 +1769,8 @@ export const id_ID: EnTranslations = {
       "replayTarget": "Targetkan lagi"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Rift",

@@ -1769,7 +1769,8 @@ export const nl_NL: EnTranslations = {
       "replayTarget": "Opnieuw richten"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Rift",

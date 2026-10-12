@@ -1769,7 +1769,8 @@ export const vi_VN: EnTranslations = {
       "replayTarget": "Nhắm lại mục tiêu"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Rạn Nứt",

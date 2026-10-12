@@ -1,7 +1,8 @@
 // The dungeon objectives tracker's seat and stylesheet contracts: the things a
 // behavior test in a Node DOM cannot see (a :not() fold, a media query, the
 // entries' markup) and that nothing else ties together. Each pin names the
-// defect it stands against.
+// defect it stands against. What the painter DOES with that markup is pinned
+// by behavior in dungeon_tracker_painter.test.ts and dungeon_tracker_touch.test.ts.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { HUD_FRAME_GROUPS } from '../src/ui/hud_frame_groups';
@@ -10,7 +11,6 @@ import { HUD_FRAME_SPECS } from '../src/ui/interface_unlock_core';
 const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const hudCss = read('src/styles/hud.css');
 const mobileCss = read('src/styles/hud.mobile.css');
-const hud = read('src/ui/hud.ts');
 
 /** The tracker's own ten-dash section of hud.css. */
 function section(): string {
@@ -32,14 +32,6 @@ describe('dungeon tracker seat (both entries)', () => {
       );
     },
   );
-
-  it('hud.ts paints that element through the shared facet, from IWorld', () => {
-    expect(hud).toMatch(
-      /new DungeonTrackerPainter\(\{\s*root: \(\) => \$\('#dungeon-tracker'\),\s*writers: this\.writerFacet,\s*world: \(\) => this\.sim,\s*dungeonName: dungeonDisplayName,\s*mobName: mobDisplayName,\s*\}\)/,
-    );
-    // And the touch strip is handed the same run as a page.
-    expect(hud).toContain('dungeonRow: () => this.dungeonTracker.stripQuest(),');
-  });
 });
 
 describe('dungeon tracker stylesheet', () => {
@@ -64,24 +56,61 @@ describe('dungeon tracker stylesheet', () => {
     expect(section()).toMatch(/#dungeon-tracker\s*\{[^}]*pointer-events:\s*none;/);
   });
 
-  it('keeps the plate and its rows clear of the button rail on a short viewport', () => {
-    // The plate is the one opaque box in the stack: where the rail climbs into
-    // its span it must keep to the column the rail leaves free, and its rows
-    // follow it in so a long boss name wraps instead of crossing the icons.
+  it('sizes the plate from the painter`s measure, never from a viewport breakpoint', () => {
+    // The plate is the one opaque box in the stack and must keep out from
+    // under the button rail. Both live inside #ui's zoom, the rail can be
+    // horizontal or moved and so can the tracker, so no viewport query can
+    // say when they meet: the painter measures and writes a share of the
+    // column (dungeonPlateFraction, pinned in dungeon_tracker_view.test.ts),
+    // and the stylesheet only reads it. A percentage of a border-box width, so
+    // the same value holds at every UI scale.
     const css = section();
-    expect(css).toMatch(
-      /@media \(max-height: 895px\)\s*\{\s*body:not\(\.mobile-touch\) #dungeon-tracker:not\(\.hud-frame-detached\) \.dgt-plate\s*\{\s*width:\s*calc\(100% - 80px\);/,
+    const plate = /#dungeon-tracker \.dgt-plate\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
+    expect(plate).toMatch(/width:\s*var\(--dgt-plate-w, 100%\);/);
+    expect(plate).toMatch(/box-sizing:\s*border-box;/);
+    // No query on the viewport's size anywhere in the section: the only media
+    // queries left are the preference ones.
+    const queries = [...css.matchAll(/@media\s*\(([^)]*)\)/g)].map((m) => m[1].trim());
+    expect(queries.sort()).toEqual(['forced-colors: active', 'prefers-reduced-motion: reduce']);
+    // The narrowed plate sets its name a size down but keeps the line height,
+    // so narrowing can never make the plate shorter and flip the measure back.
+    expect(css).toMatch(/#dungeon-tracker\.is-narrow \.dgt-name\s*\{\s*font-size:\s*13px;\s*\}/);
+    expect(/#dungeon-tracker \.dgt-name\s*\{([^}]*)\}/.exec(css)?.[1]).toMatch(
+      /line-height:\s*18px;/,
     );
-    expect(css).toMatch(
-      /body:not\(\.mobile-touch\) #dungeon-tracker:not\(\.hud-frame-detached\) \.dgt-list\s*\{\s*margin-right:\s*80px;/,
+    // And nothing exempts a detached frame, because nothing depends on one.
+    expect(css).not.toContain('hud-frame-detached');
+    // The name the painter writes is the name the stylesheet reads.
+    expect(read('src/ui/hud/dungeon/dungeon_tracker_painter.ts')).toContain(
+      "const PLATE_WIDTH_PROP = '--dgt-plate-w';",
     );
+  });
+
+  it('keeps every boss on one line: the rows span the whole column', () => {
+    // Row text over a rail icon is harmless (every row in the stack does it),
+    // so the list takes no margin against the rail: a margin there wrapped
+    // long boss names to two lines exactly where height is scarcest.
+    const list = /#dungeon-tracker \.dgt-list\s*\{([^}]*)\}/.exec(section())?.[1] ?? '';
+    expect(list).toMatch(/margin:\s*7px 0 0 10px;/);
+    expect(list).not.toMatch(/margin-right|width/);
+  });
+
+  it('lets the progress row wrap, so a narrowed plate never squeezes the rail to nothing', () => {
+    // A finished heroic run in a long locale ("Heroisch" + "Abgeschlossen") on
+    // the narrowed plate: the tally drops to its own line, right aligned, and
+    // the rail keeps a floor.
+    const css = section();
+    expect(css).toMatch(/#dungeon-tracker \.dgt-progress\s*\{[^}]*flex-wrap:\s*wrap;/);
+    expect(css).toMatch(/#dungeon-tracker \.dgt-bar\s*\{[^}]*min-width:\s*28px;/);
+    expect(css).toMatch(/#dungeon-tracker \.dgt-tally\s*\{[^}]*margin-left:\s*auto;/);
   });
 
   it('never re-declares the plate primitive`s look', () => {
     // ui-panel-soft owns the fill, border and shadow; the section sets geometry.
     const plate = /#dungeon-tracker \.dgt-plate\s*\{([^}]*)\}/.exec(section())?.[1] ?? '';
     expect(plate).toContain('padding');
-    expect(plate).not.toMatch(/background|border|box-shadow|outline/);
+    // Property names only: `box-sizing: border-box` is geometry.
+    expect(plate).not.toMatch(/(?:^|[\s;])(?:background|border|box-shadow|outline)[\w-]*\s*:/);
   });
 
   it('spells no raw color', () => {

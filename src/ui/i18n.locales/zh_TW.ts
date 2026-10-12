@@ -2589,6 +2589,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.delveTracker': '秘探追蹤器',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': '裂隙追蹤器',
   'hudChrome.interfaceUnlock.frameNames.dungeonTracker': '地城追蹤器',
+  'hudChrome.dungeonTracker.complete': '已完成',
   'hudChrome.interfaceUnlock.frameNames.targetDots': '目標減益',
   'hudChrome.interfaceUnlock.framesMenu': '框體設定',
   'hudChrome.interfaceUnlock.showHideFrames': '顯示或隱藏框體',

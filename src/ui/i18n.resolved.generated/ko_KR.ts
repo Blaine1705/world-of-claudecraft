@@ -1769,7 +1769,8 @@ export const ko_KR: EnTranslations = {
       "replayTarget": "다시 대상으로 삼기"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "완료"
     },
     "riftTracker": {
       "title": "균열",

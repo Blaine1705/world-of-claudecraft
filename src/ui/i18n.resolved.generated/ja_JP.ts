@@ -1769,7 +1769,8 @@ export const ja_JP: EnTranslations = {
       "replayTarget": "もう一度これを標的にしよう"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "完了"
     },
     "riftTracker": {
       "title": "リフト",

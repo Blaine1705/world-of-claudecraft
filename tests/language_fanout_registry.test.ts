@@ -138,6 +138,11 @@ const FANOUT_ARMS: readonly string[] = [
   'this.weeklyQuestsWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
+  // The dungeon objectives tracker: its text gate is the view core's `rev`
+  // (dungeon id, difficulty, boss ids and done flags) and its strip page is
+  // remembered per run object, none of which a locale switch moves. Listed
+  // BEFORE the quest tracker's arm in the fan-out, which reads that page.
+  'this.dungeonTracker.relocalize|',
   'this.questTracker.relocalize|',
   'this.delveTracker.relocalize|',
   'this.riftTracker.relocalize|',
@@ -491,6 +496,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     ],
     answer: 'this.questDialog.relocalize',
     why: "the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it), and a dungeon guide's offer state (an enum, never text)",
+  },
+  {
+    file: 'hud/dungeon/dungeon_tracker_painter.ts',
+    memos: ['lastGeneration', 'lastRev', 'lastStripGeneration', 'lastStripRun'],
+    answer: 'this.dungeonTracker.relocalize',
+    why: "the view core's rev (dungeon id, difficulty, boss ids and done flags) gating every t(), formatter and entity name on the plate, and the run object the touch strip page was built from; relocalize bumps the generation both gates compare, so each re-resolves exactly once and re-latches",
   },
   {
     file: 'hud/rift/rift_floor_tracker_controller.ts',

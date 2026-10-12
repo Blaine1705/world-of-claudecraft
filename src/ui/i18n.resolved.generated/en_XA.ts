@@ -1769,7 +1769,8 @@ export const en_XA: EnTranslations = {
       "replayTarget": "[Ţáŕĝéţ íţ áĝáíñ]"
     },
     "dungeonTracker": {
-      "heroicTitle": "[{name} ({difficulty})]"
+      "heroicTitle": "[{name} ({difficulty})]",
+      "complete": "[Çóɱþļéţé]"
     },
     "riftTracker": {
       "title": "[Ŕíƒţ]",

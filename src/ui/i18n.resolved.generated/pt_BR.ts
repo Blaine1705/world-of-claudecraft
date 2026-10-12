@@ -1769,7 +1769,8 @@ export const pt_BR: EnTranslations = {
       "replayTarget": "Mirar novamente"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})"
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
     },
     "riftTracker": {
       "title": "Fenda",

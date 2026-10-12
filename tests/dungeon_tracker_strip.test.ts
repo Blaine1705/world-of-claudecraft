@@ -192,6 +192,20 @@ describe('dungeon run on the touch quest strip', () => {
     expect(stripFocus(r)).toBe('dungeon:hollow_crypt:heroic');
   });
 
+  it('coming and going never moves a quest under the selection', () => {
+    // The strip's selection is positional, so the page must not shift any quest:
+    // every quest keeps the index the controller gave it before the dungeon.
+    const r = rig(true);
+    r.controller.update(0);
+    const before = stripIds(r);
+    r.world.dungeonRun = run();
+    r.controller.update(1);
+    expect(stripIds(r).slice(0, before.length)).toEqual(before);
+    r.world.dungeonRun = null;
+    r.controller.update(2);
+    expect(stripIds(r)).toEqual(before);
+  });
+
   it('never joins the desktop tracker, which has the plate instead', () => {
     const r = rig(false);
     r.world.dungeonRun = run(['sexton_marrow']);
@@ -259,17 +273,6 @@ describe('the real strip core over the dungeon page', () => {
       lastCycleAt: 0,
     });
     expect(jump).toBe(0);
-  });
-
-  it('coming and going never moves the quests under the selection', () => {
-    // The selection is positional. The page sits after the quests, so a quest
-    // keeps its index when the page appears and when it leaves.
-    const without = pages([]).slice(0, 1);
-    const withPage = pages([]);
-    expect(withPage.findIndex((quest) => quest.id === 'q_wolves')).toBe(
-      without.findIndex((quest) => quest.id === 'q_wolves'),
-    );
-    expect(withPage[withPage.length - 1].id).toBe('dungeon:hollow_crypt:normal');
   });
 
   it('marks the page complete when the last boss falls', () => {
