@@ -10,7 +10,7 @@
 // ground; and nothing around the door, mob spawns included, is walled in.
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { DUNGEON_X_THRESHOLD, DUNGEONS, GATHER_NODES, NPCS, ROADS } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, DUNGEONS, GATHER_NODES, MOBS, NPCS, ROADS } from '../src/sim/data';
 import { isExcludedDecoration } from '../src/sim/decoration_exclusions';
 import { MAX_AGGRO_RADIUS } from '../src/sim/mob/locomotion';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
@@ -593,11 +593,11 @@ describe('the Jaguar Maw walls nothing in', () => {
     expect(mobs).toBeGreaterThanOrEqual(1);
   });
 
-  it('the Idol Guardian still spawns inside its ring, the aggro clamp away from the door', () => {
+  it('the Idol Guardian spawns in the far half of its ring, well off the exit drop', () => {
     // SCOPE: the spawn point only, like tests/dungeon_entry_clearance.test.ts.
-    // The guardian then walks its ring (idle wander), which can bring it
-    // inside its own 14 yd aggro radius of the exit drop: the door is its
-    // neighbour now, by the relocation's own plan.
+    // Its camp sits in the east half of the ring, so it stands its 14 yd
+    // aggro radius plus most of an idle wander (9 yd at most) from where a
+    // party leaves the dungeon.
     const sim = makeSim();
     const ring = WILDHEART_BASIN_ENTRANCE_RING;
     const guardians = [...sim.entities.values()].filter((e) => e.templateId === 'idol_guardian');
@@ -607,5 +607,8 @@ describe('the Jaguar Maw walls nothing in', () => {
       MAX_AGGRO_RADIUS - 1e-6,
     );
     expect(Math.hypot(g.pos.x - ring.x, g.pos.z - ring.z)).toBeLessThan(ring.radius);
+    expect(Math.hypot(g.pos.x - EXIT_DROP.x, g.pos.z - EXIT_DROP.z)).toBeGreaterThanOrEqual(
+      (MOBS.idol_guardian.aggroRadius ?? 0) + 8,
+    );
   });
 });
