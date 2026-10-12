@@ -9,17 +9,19 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   BELL_YARD,
+  MARROW_BLOW_STACKS,
   MARROW_BONES_RISE,
   MARROW_BURIAL_TOLL,
   MARROW_GRAVE_OPENS,
   MARROW_GRAVEDIGGERS_BLOW,
   MARROW_ID,
   MARROW_MEASURE,
+  MARROW_MEASURED,
   MARROW_SHOVELFUL,
   MARROW_TUNING,
 } from '../src/sim/encounters/hollow_crypt';
 import { combatProfileForMob } from '../src/sim/mob_combat';
-import { DT, type Entity } from '../src/sim/types';
+import { DT, type Entity, RUN_SPEED } from '../src/sim/types';
 import {
   boss,
   cryptFight,
@@ -178,27 +180,51 @@ for (const difficulty of ['normal', 'heroic'] as const) {
 }
 
 describe('Sexton Marrow: a Toll that comes due mid-bar', () => {
-  it('lets the bar land first, then strides to the rope', () => {
-    const { f, marrow, hold } = yard('normal');
-    marrow.maxHp = 1e6;
-    marrow.hp = marrow.maxHp;
-    expect(
-      until(f, () => marrow.castingAbility === MARROW_SHOVELFUL, T.shovelFirst + 1, hold),
-    ).toBe(true);
-    const st = marrow.cryptBossFight;
-    if (st?.kind !== 'marrow') throw new Error('no fight');
-    // He drops under two thirds halfway through the swing.
-    run(f, T.shovelCast / 2, hold);
-    marrow.hp = Math.floor(marrow.maxHp * 0.6);
-    const from = f.hits.length;
-    run(f, DT * 2, hold);
-    expect(st.toll).toBeNull();
-    expect(marrow.castingAbility).toBe(MARROW_SHOVELFUL);
-    expect(until(f, () => st.toll !== null, T.shovelCast, hold)).toBe(true);
-    expect(took(f, f.tank, 'Shovelful', from)).toBeGreaterThan(0);
-    expect(st.tolls).toBe(1);
-    expect(marrow.damageImmune).toBe(true);
-  });
+  const BARS = [
+    { what: 'shovel', id: MARROW_SHOVELFUL, cast: T.shovelCast, mode: 'normal' },
+    { what: 'measure', id: MARROW_MEASURE, cast: T.measureCast, mode: 'normal' },
+    { what: 'blow', id: MARROW_GRAVEDIGGERS_BLOW, cast: T.blowCast, mode: 'heroic' },
+  ] as const;
+  for (const bar of BARS) {
+    it(`lets his ${bar.what} bar land first, then strides to the rope`, () => {
+      const { f, marrow, hold } = yard(bar.mode);
+      marrow.maxHp = 1e6;
+      marrow.hp = marrow.maxHp;
+      run(f, DT * 2, hold);
+      const st = marrow.cryptBossFight;
+      if (st?.kind !== 'marrow') throw new Error('no fight');
+      st.shovelTimer = bar.what === 'shovel' ? 0 : 99;
+      st.measureTimer = bar.what === 'measure' ? 0 : 99;
+      st.blowTimer = bar.what === 'blow' ? 0 : 99;
+      expect(until(f, () => marrow.castingAbility === bar.id, 1, hold)).toBe(true);
+      const victimId = marrow.castTargetId;
+      // He drops under two thirds halfway through the bar.
+      run(f, bar.cast / 2, hold);
+      marrow.hp = Math.floor(marrow.maxHp * 0.6);
+      const from = f.hits.length;
+      let waited = 0;
+      run(f, DT * 2, hold);
+      waited += DT * 2;
+      expect(st.toll).toBeNull();
+      expect(marrow.castingAbility).toBe(bar.id);
+      for (; st.toll === null && waited < bar.cast + 0.5; waited += DT) tick(f, hold);
+      expect(st.toll).not.toBeNull();
+      // The Toll waited for the rest of the bar and one tick more (the bar
+      // lands on one tick, the Toll starts on the next), never longer.
+      expect(waited).toBeLessThanOrEqual(bar.cast / 2 + DT * 2 + 1e-6);
+      expect(st.tolls).toBe(1);
+      expect(marrow.damageImmune).toBe(true);
+      // And the bar did land.
+      if (bar.what === 'shovel') expect(took(f, f.tank, 'Shovelful', from)).toBeGreaterThan(0);
+      else if (bar.what === 'blow') {
+        expect(took(f, f.tank, "Gravedigger's Blow", from)).toBeGreaterThan(0);
+        expect(f.tank.auras.find((a) => a.id === MARROW_BLOW_STACKS)?.stacks).toBe(1);
+      } else {
+        const victim = f.others.find((p) => p.id === victimId);
+        expect(victim?.auras.some((a) => a.id === MARROW_MEASURED)).toBe(true);
+      }
+    });
+  }
 });
 
 describe('Sexton Marrow: a Shovelful that came due while he rang', () => {
@@ -299,5 +325,160 @@ describe("Sexton Marrow: the spade's gate covers his melee reach", () => {
     };
     expect(until(f, () => marrow.castingAbility === null, T.shovelCast + 0.2, still)).toBe(true);
     expect(took(f, f.tank, 'Shovelful', from)).toBeGreaterThan(0);
+  });
+});
+
+describe('Sexton Marrow: a tank who keeps just outside his melee', () => {
+  /** Yards the kiter tries to hold from him: outside his 5 yd melee reach,
+   *  inside the Shovelful's 8 yd cone. */
+  const KITE = 6.5;
+
+  for (const difficulty of ['normal', 'heroic'] as const) {
+    it(`standing off at ${KITE} yd does not spare the tank the spade (${difficulty})`, () => {
+      const { f, marrow, hold } = yard(difficulty);
+      marrow.maxHp = 1e6;
+      marrow.hp = marrow.maxHp;
+      const home = { x: marrow.pos.x - f.ox, z: marrow.pos.z - f.oz };
+      const stand = () => {
+        hold();
+        put(f, f.tank, home.x, home.z - KITE);
+      };
+      const from = f.hits.length;
+      expect(
+        until(f, () => marrow.castingAbility === MARROW_SHOVELFUL, T.shovelFirst + 1, stand),
+      ).toBe(true);
+      expect(until(f, () => marrow.castingAbility === null, T.shovelCast + 0.2, stand)).toBe(true);
+      expect(took(f, f.tank, 'Shovelful', from)).toBeGreaterThan(0);
+    });
+
+    it(`circling the yard at a run delays the spade, never suppresses it (${difficulty})`, () => {
+      const { f, marrow, hold } = yard(difficulty);
+      marrow.maxHp = 1e6;
+      marrow.hp = marrow.maxHp;
+      // The widest circle the Bell Yard allows, run at the player run speed,
+      // starting 6.5 yd along it from him: he runs 7 yd a second on normal
+      // (the player's own pace) and 8 on heroic, and cuts the chord.
+      const R = 18;
+      let a = Math.atan2(marrow.pos.x - f.ox - MID.x, marrow.pos.z - f.oz - MID.z) + KITE / R;
+      const circle = () => {
+        hold();
+        a += (RUN_SPEED * DT) / R;
+        put(f, f.tank, MID.x + Math.sin(a) * R, MID.z + Math.cos(a) * R);
+      };
+      const bars = { shovel: 0, blow: 0 };
+      let first = -1;
+      let last: string | null = null;
+      const from = f.hits.length;
+      for (let t = DT; t < 30; t += DT) {
+        tick(f, circle);
+        const cast = marrow.castingAbility;
+        if (cast !== last) {
+          if (cast === MARROW_SHOVELFUL) {
+            bars.shovel++;
+            if (first < 0) first = t;
+          } else if (cast === MARROW_GRAVEDIGGERS_BLOW) bars.blow++;
+          last = cast;
+        }
+      }
+      // Measured: the first Shovelful at 8.7 s on normal and 5.4 s on heroic
+      // (4 s when the tank stands), then on its 11 s clock.
+      expect(first).toBeGreaterThan(0);
+      expect(first).toBeLessThan(difficulty === 'heroic' ? 7 : 11);
+      expect(bars.shovel).toBeGreaterThanOrEqual(2);
+      if (difficulty === 'heroic') expect(bars.blow).toBeGreaterThanOrEqual(2);
+      else expect(bars.blow).toBe(0);
+      // He caught the runner: his melee landed on the way.
+      const melee = f.hits
+        .slice(from)
+        .filter((h) => h.targetId === f.tank.id && h.ability === null);
+      expect(melee.length).toBeGreaterThan(0);
+    });
+
+    it(`kiting him at ${KITE} yd at a run cannot suppress the spade (${difficulty})`, () => {
+      const { f, marrow, hold } = yard(difficulty);
+      marrow.maxHp = 1e6;
+      marrow.hp = marrow.maxHp;
+      // The tank runs at the player run speed, always away from him, sliding
+      // along the yard's rim: the best a kiter can do in the Bell Yard.
+      const at = { x: marrow.pos.x - f.ox, z: marrow.pos.z - f.oz - KITE };
+      const kite = () => {
+        hold();
+        const mx = marrow.pos.x - f.ox;
+        const mz = marrow.pos.z - f.oz;
+        let dx = at.x - mx;
+        let dz = at.z - mz;
+        const d = Math.hypot(dx, dz) || 1;
+        dx /= d;
+        dz /= d;
+        const want = { x: mx + dx * KITE, z: mz + dz * KITE };
+        const sx = want.x - at.x;
+        const sz = want.z - at.z;
+        const s = Math.hypot(sx, sz);
+        const step = Math.min(s, RUN_SPEED * DT);
+        if (s > 1e-9) {
+          at.x += (sx / s) * step;
+          at.z += (sz / s) * step;
+        }
+        // Keep to the yard's floor.
+        const rx = at.x - MID.x;
+        const rz = at.z - MID.z;
+        const r = Math.hypot(rx, rz);
+        const rim = BELL_YARD.r - 2;
+        if (r > rim) {
+          at.x = MID.x + (rx / r) * rim;
+          at.z = MID.z + (rz / r) * rim;
+        }
+        put(f, f.tank, at.x, at.z);
+      };
+      const casts = new Set<string>();
+      let first = -1;
+      for (let t = DT; t < 30; t += DT) {
+        tick(f, kite);
+        if (marrow.castingAbility) casts.add(marrow.castingAbility);
+        if (first < 0 && marrow.castingAbility === MARROW_SHOVELFUL) first = t;
+      }
+      // The first Shovelful still comes on its clock, and on heroic the Blow too.
+      expect(first).toBeGreaterThan(0);
+      expect(first).toBeLessThan(T.shovelFirst + 2);
+      expect(casts.has(MARROW_GRAVEDIGGERS_BLOW)).toBe(difficulty === 'heroic');
+    });
+  }
+});
+
+describe('Sexton Marrow on heroic at the planning party DPS', () => {
+  /** The heroic planning number his 24,996 pool was sized against. */
+  const PARTY_DPS = 230;
+
+  it('lasts about two minutes: seven graves, and the tank a minute at the Blow cap', () => {
+    const { f, marrow, hold } = yard('heroic');
+    const party = [f.tank, ...f.others];
+    expect(marrow.maxHp).toBe(24996);
+    const chunk = (PARTY_DPS * 0.5) / party.length;
+    let capSeconds = 0;
+    let ticks = 0;
+    for (; ticks < 300 / DT && !marrow.dead; ticks++) {
+      if (ticks % 10 === 0) {
+        for (const p of party) {
+          if (marrow.dead) break;
+          f.sim.ctx.dealDamage(p, marrow, chunk, false, 'physical', null, 'hit', false, {
+            mult: p === f.tank ? 8 : 1,
+          });
+        }
+      }
+      tick(f, hold);
+      const stacks = f.tank.auras.find((a) => a.id === MARROW_BLOW_STACKS)?.stacks ?? 0;
+      if (stacks >= T.blowMaxStacks) capSeconds += DT;
+    }
+    expect(marrow.dead).toBe(true);
+    const seconds = ticks * DT;
+    const graves = f.cues.filter((c) => c.ability === MARROW_GRAVE_OPENS).length;
+    // Measured 121.1 s, 7 Open Graves and 62.5 s at six stacks (it was 82.1 s,
+    // 5 and 17.4 s on the 16,099 he shipped with). Nobody steps out of a
+    // grave or drops the stacks here: the upper bound of what the pool asks.
+    expect(seconds).toBeGreaterThan(112);
+    expect(seconds).toBeLessThan(130);
+    expect(graves).toBe(7);
+    expect(capSeconds).toBeGreaterThan(55);
+    expect(capSeconds).toBeLessThan(70);
   });
 });
