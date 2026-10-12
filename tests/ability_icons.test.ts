@@ -126,13 +126,15 @@ describe('ability icons', () => {
     const ids = abilityRecipeIds();
     expect(ids).toEqual([...new Set(ids)].sort((left, right) => left.localeCompare(right)));
     // 464: 450 plus the fourteen Nythraxis Raid Boss Guide mechanic recipes;
-    // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite);
-    // 473: plus Groveheart's Sporemender Form (sporemender_form).
-    expect(ids).toHaveLength(473);
+    // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite).
+    // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
+    // release/v0.44.0 merge into feature/buried-hoards).
+    // 474: plus Groveheart's Sporemender Form (sporemender_form).
+    expect(ids).toHaveLength(474);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('f302c52fcb4361f7b8adf7dc86642a87e295d50ba3fd3d8f789cc7334533458f');
+    expect(hash).toBe('26f4664ed0b8bcc0a69213a87fc16b447840fb56401a615cd46b35a3fa20cac2');
   });
 });

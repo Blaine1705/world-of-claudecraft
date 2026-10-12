@@ -1373,7 +1373,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1382,14 +1382,22 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for Sporemender Form: the renderer leaf gained the Sporemender form-rig slot and the form-slot loops. No capture was retaken.
-  // Re-minted for the Sporemender spores: the renderer leaf gained the Sporemender particle-aura call. No capture was retaken.
-  // Re-minted for the Sporemender rework: the renderer leaf moved the spores onto a character-effect flag (form or Wildbloom HoT). No capture was retaken.
-  // Re-minted for the spore drift split: the renderer leaf picks the form or the sparser HoT drift through characterSporeAura. No capture was retaken.
-  'fe4097b5c7f47a073a0a723f74adc03a317056882e943517f81d3d9996fbb06a';
+  // Re-minted at the third release/v0.43.0 merge into feature/world-quests
+  // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
+  // No capture was retaken.
+  // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+  // branch: the town runtime leaf composes the stone vault hall and the
+  // authoritative layout gains the weeklyVault site. No capture was retaken.
+  // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
+  // No Eastbrook capture or measured value changed.
+  // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
+  // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
+  // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  // Re-minted at the release/v0.45.0 merge into feature/sporemender-form (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  '2fee551b0180b7e995c59e4e2dff55cd43f1876d3445b78b79d13129bca6e53e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
+  // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
@@ -1398,12 +1406,20 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for Sporemender Form: the renderer leaf gained the Sporemender form-rig slot and the form-slot loops. No capture was retaken.
-  // Re-minted for the Sporemender spores: the renderer leaf gained the Sporemender particle-aura call. No capture was retaken.
-  // Re-minted for the Sporemender rework: the renderer leaf moved the spores onto a character-effect flag (form or Wildbloom HoT). No capture was retaken.
-  // Re-minted for the spore drift split: the renderer leaf picks the form or the sparser HoT drift through characterSporeAura. No capture was retaken.
-  'ac6ad89f898446350680c6eb35708a0bf3b097dd33902ff7780c3f00d1004d60';
+  // Re-minted at the third release/v0.43.0 merge into feature/world-quests
+  // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
+  // No capture was retaken.
+  // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+  // branch: the town runtime leaf composes the stone vault hall and the
+  // authoritative layout gains the weeklyVault site. No capture was retaken.
+  // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
+  // No Eastbrook capture or measured value changed.
+  // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
+  // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
+  // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  // Re-minted at the release/v0.45.0 merge into feature/sporemender-form (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  '53028058afefb5516f0e4533245d7ddaf00d174fba5727e622c2bf28687c1b81';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2776,19 +2792,19 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // was retaken.
       // v0.42.2 hotfix line forward merge into release/v0.43.0: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-      // Frame Rate Limit: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // devalue audit floor: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // Sporemender Form: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // Sporemender spores: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // Sporemender rework: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // Spore drift split: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-    ).toBe('4cad101295d3451dbe2ceaff165a8437495603ac37d0dbdf73c0174f88128efb');
+      // Third release/v0.43.0 merge into feature/world-quests: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+      // Weekly Vault (PR 4052) landing on the quests integration branch:
+      // recomputed LAST again over the re-swept evidence. No capture was retaken.
+      // Re-minted for the shipwreck salvage landing over the re-sealed
+      // provenance. No capture or measured value changed.
+      // Fourth release/v0.44.0 base merge (the Eastbrook ferry, PR 4225): recomputed
+      // LAST again over the re-swept evidence. No capture was retaken.
+      // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // release/v0.45.0 merge into feature/sporemender-form: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+    ).toBe('b3149bcb4f0dda026f4b5ea648c35d03fafb871c51a840f7e131c04904868d94');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

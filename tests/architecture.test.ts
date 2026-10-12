@@ -213,6 +213,10 @@ const UI_PURE_CORES = [
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
   'src/ui/item_combat_tooltip_view.ts',
+  'src/ui/trinket_tooltip_view.ts',
+  // The trinket auras' tooltip descriptor and their item-icon art map.
+  'src/ui/trinket_aura_effect.ts',
+  'src/ui/trinket_aura_art.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
   // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
   'src/ui/zone_entry_line_core.ts',
@@ -227,6 +231,7 @@ const UI_PURE_CORES = [
   // hint strip so a printed glyph and its colour can never disagree.
   'src/ui/micro_menu_state_view.ts',
   'src/ui/ability_tooltip_lines.ts',
+  'src/ui/dawnreaver_damage_tooltip_core.ts',
   'src/ui/proc_ready_glow_core.ts',
   'src/ui/reticle_ticks_core.ts',
   'src/ui/aura_watchlist_core.ts',
@@ -236,14 +241,57 @@ const UI_PURE_CORES = [
   'src/ui/collection_actions_core.ts',
   'src/ui/hud/cosmetics/cosmetics_cards_view.ts',
   'src/ui/hud/cosmetics/cosmetics_view.ts',
+  'src/ui/hud/faction_reward_tooltip_view.ts',
+  'src/ui/hud/treasure/treasure_map_view.ts',
+  'src/ui/hud/vehicle/vehicle_aim_core.ts',
+  'src/ui/hud/vehicle/vehicle_action_bar_view.ts',
+  'src/ui/hud/vehicle/glider_action_bar_view.ts',
+  'src/ui/hud/vehicle/cannon_feedback_core.ts',
+  'src/ui/hud/vehicle/cannon_tactics_view.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
+  'src/ui/map_poi_label_clearance_core.ts',
   'src/ui/map_marker_semantics_core.ts',
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/map_surface_core.ts',
   'src/ui/map_pan_core.ts',
   'src/ui/mouseover_cast_core.ts',
+  'src/ui/world_quest_view.ts',
+  'src/ui/world_quest_trace_view.ts',
+  // The Reputation tab's rows and day summary (src/ui/hud/reputation/).
+  'src/ui/hud/reputation/faction_tier_celebration_view.ts',
+  'src/ui/hud/reputation/reputation_view.ts',
+  // The Currencies tab's balances (src/ui/hud/currencies/).
+  'src/ui/hud/currencies/currencies_view.ts',
+  // The map rail's world-quest section: the character's board, the shared
+  // selection and the daily replacement's availability (src/ui/hud/map/).
+  'src/ui/hud/map/world_quest_rail_view.ts',
+  // The world quest hover card model (title, faction, time left, objective, and
+  // the standing / currency / money / XP / item rewards); world_quest_tooltip_html
+  // paints it into the shared #tooltip.
+  'src/ui/hud/map/world_quest_tooltip_view.ts',
+  // Which zone the overworld map frames (dungeon door, frozen last zone,
+  // committed zone, override), lifted out of Hud.updateMapWindow.
+  'src/ui/hud/map/map_zone_focus_core.ts',
+  'src/ui/world_quest_forge_view.ts',
+  'src/ui/world_quest_leaderboard_view.ts',
+  'src/ui/leaderboard_podium_view.ts',
+  'src/ui/leaderboard_podium_html.ts',
+  'src/ui/leaderboard_board_html.ts',
+  'src/ui/weekly_quests_view.ts',
+  'src/ui/world_quest_wisp_maze_view.ts',
+  'src/ui/world_quest_shadow_view.ts',
+  'src/ui/world_quest_investigation_view.ts',
+  'src/ui/world_quest_glider_view.ts',
+  'src/ui/world_quest_puzzle_view.ts',
+  'src/ui/world_quest_match3_view.ts',
+  'src/ui/world_quest_confection_view.ts',
+  'src/ui/world_quest_confection_fx_view.ts',
+  'src/ui/world_quest_ley_view.ts',
+  'src/ui/world_quest_ley_fx_view.ts',
+  'src/ui/world_quest_instructor_view.ts',
+  'src/ui/quest_event_view.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
   'src/ui/aura_strip_order_core.ts',
@@ -265,15 +313,21 @@ const UI_PURE_CORES = [
   'src/ui/chat_ignore_core.ts',
   'src/ui/daily_rewards_chrome_view.ts',
   'src/ui/daily_rewards_launcher_core.ts',
+  'src/ui/death_recap_view.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/empower_hold_core.ts',
   'src/ui/equip_drop_core.ts',
   'src/ui/error_text_i18n_core.ts',
+  'src/ui/held_loot_warning_view.ts',
+  'src/ui/loot_roll_win_view.ts',
   'src/ui/system_text_i18n.ts',
   'src/ui/general_chat_quota_view.ts',
   'src/ui/known_item.ts',
   'src/ui/log_event_route.ts',
   'src/ui/mob_idle_sfx.ts',
+  // The weekly vault opening choreography (timeline + per-element ray / star /
+  // streak / ring layout): the reveal controller maps it onto --vault-* vars.
+  'src/ui/weekly_vault_burst_core.ts',
   'src/ui/unit_portrait.ts',
   // Which body a player entity's frame shows (mech, composed, stock) and the
   // matching rule for a landed portrait; unit_portrait_painter.ts draws it.
@@ -295,13 +349,18 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/quest_strip_core.ts',
   'src/ui/hud/action_bar/item_bags_line_core.ts',
+  'src/ui/hud/quest/clue_talk_row_core.ts',
+  'src/ui/hud/action_bar/trinket_slot_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
+  'src/ui/hud/quest/clue_step_row_view.ts',
   'src/ui/hud/pet_bar_core.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',
   'src/ui/hud/aura_tracks/aura_track_catalog.ts',
   'src/ui/hud/aura_tracks/aura_track_descriptors.ts',
   'src/ui/hud/aura_tracks/aura_track_view.ts',
   'src/ui/hud/quest/master_craft_core.ts',
+  // The world quest entry banner model (the #banner 'worldQuest' plate).
+  'src/ui/hud/quest/world_quest_banner_view.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/rift/rift_map_core.ts',
@@ -332,12 +391,15 @@ const UI_PURE_CORES = [
   'src/ui/meters_frame_core.ts',
   'src/ui/meters_menu_view.ts',
   'src/ui/meters_rows_view.ts',
+  'src/ui/meters_dev_view.ts',
+  'src/ui/mouseover_cast_core.ts',
   'src/ui/threat_subject_core.ts',
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
   'src/ui/preview_prewarm_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
+  'src/ui/guild_ranks_view.ts',
   'src/ui/who_tab_view.ts',
   'src/ui/tab_strip_view.ts',
   'src/ui/bag_filter.ts',
@@ -362,6 +424,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/feast_tooltip_view.ts',
   'src/ui/stack_size_tooltip_view.ts',
   'src/ui/hud/professions/craft_name_view.ts',
+  'src/ui/hud/professions/station_name_view.ts',
   'src/ui/hud/professions/cooking_catch_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
   'src/ui/item_instance_glyph_mark.ts',
@@ -386,6 +449,9 @@ const UI_PURE_CORES = [
   'src/ui/bank_socket_purchase_core.ts',
   'src/ui/storage_rung_echo_core.ts',
   'src/ui/vault_view.ts',
+  'src/ui/weekly_rewards_view.ts',
+  'src/ui/bank_tabs_view.ts',
+  'src/ui/vault_search.ts',
   'src/ui/guild_bank_log_view.ts',
   'src/ui/guild_bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
@@ -509,6 +575,8 @@ const UI_PURE_CORES = [
   'src/ui/bank_item_name_core.ts',
   'src/ui/market_buy_confirm_core.ts',
   'src/ui/market_sweep_core.ts',
+  // The Wanted tab's rows, place-form validity, and item-picker search.
+  'src/ui/market_orders_core.ts',
   'src/ui/usd_text.ts',
   'src/ui/woc_tokens_text.ts',
   'src/ui/woc_log_tones.ts',
@@ -535,6 +603,8 @@ const UI_PURE_CORES = [
   'src/ui/char_view.ts',
   'src/ui/masterwrought_cap_view.ts',
   'src/ui/char_stats_view.ts',
+  // The live world -> stat-sheet model bridge (extracted from Hud.statModel).
+  'src/ui/char_stat_model_core.ts',
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
@@ -556,10 +626,13 @@ const UI_PURE_CORES = [
   'src/ui/arena_window_view.ts',
   'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
+  'src/ui/pvp_hostile_core.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
+  'src/ui/hud/world_pvp/world_pvp_window_view.ts',
+  'src/ui/hud/hill/hill_bar_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',
@@ -661,6 +734,7 @@ const UI_PURE_CORES = [
   'src/ui/host_diag_view.ts',
   'src/ui/dpad_nav_core.ts',
   'src/game/graphics_rebuild_core.ts',
+  'src/game/hoard_mechanic_audio_core.ts',
   'src/game/presentation_gate.ts',
   'src/game/stale_chrome_focus.ts',
   'src/game/perf_diagnosis_core.ts',
@@ -669,6 +743,7 @@ const UI_PURE_CORES = [
   'src/game/post_entry_warmups_core.ts',
   'src/game/perf_shader_warm_core.ts',
   'src/game/ui_effects_profile.ts',
+  'src/game/glider_pitch_input.ts',
   'src/game/ui_tier_knobs.ts',
   // Warrior audio cue tables shared by game, render and ui (PR 4139): pure data
   // plus event discriminators, no DOM, no Three.
@@ -683,6 +758,8 @@ const UI_PURE_CORES = [
   'src/ui/trade_view.ts',
   'src/ui/trade_woc_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
+  'src/ui/hud/transport/ferry_hud_view.ts',
+  'src/ui/raid_marker_labels_view.ts',
   'src/ui/hud/practice/practice_dps_view.ts',
   'src/ui/hud/practice/hub_lesson_view.ts',
   'src/ui/hud/talking_head/talking_head_core.ts',
@@ -715,6 +792,9 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/action_cam_core.ts',
+  'src/render/ambience_state_core.ts',
+  'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
   'src/render/ability_vfx/signature_core.ts',
   'src/render/ability_vfx/warrior_attention_core.ts',
@@ -724,8 +804,50 @@ const RENDER_PURE_CORES = [
   'src/render/warrior_fury_state_core.ts',
   'src/render/warrior_power_core.ts',
   'src/render/warrior_readiness_core.ts',
+  'src/render/hoard_orbital_lightning_core.ts',
+  'src/render/hoard_bone_reaper_core.ts',
+  'src/render/hoard_ice_age_core.ts',
+  'src/render/hoard_pulsars_core.ts',
+  'src/render/hoard_forge_hammer_core.ts',
+  'src/render/hoard_tentacles_core.ts',
+  'src/render/hoard_boulder_core.ts',
+  'src/render/hoard_cocoon_core.ts',
+  'src/render/hoard_goblin_coins_core.ts',
+  'src/render/hoard_mimic_coins_core.ts',
+  'src/render/hoard_boss_dressing_core.ts',
+  'src/render/hoard_cliff_mass_core.ts',
+  'src/render/hoard_encounter_accents_core.ts',
+  'src/render/hoard_reward_chest_core.ts',
+  'src/render/hoard_spell_fx_core.ts',
+  'src/render/hoard_boss_fx_core.ts',
+  'src/render/hoard_boss_gestures_core.ts',
+  'src/render/hoard_forge_gate_core.ts',
+  'src/render/hoard_room_kit_core.ts',
+  'src/render/hoard_room_themes_core.ts',
+  'src/render/hoard_tide_wave_fx_core.ts',
+  'src/render/hoard_entrance_core.ts',
+  'src/render/hoard_valley_core.ts',
+  'src/render/hoard_cavern_core.ts',
+  'src/render/hoard_cavern_ground_core.ts',
+  'src/render/hoard_cavern_foliage_core.ts',
   'src/render/tree_hide_index_core.ts',
+  'src/render/transport_ship_core.ts',
+  'src/render/harbor_route_marker_core.ts',
+  'src/render/wyrmwatch_harbor_core.ts',
+  'src/render/wickharbor_wharf_core.ts',
+  'src/render/wickharbor_harbor_core.ts',
+  'src/render/wyrmwatch_harbor_house_core.ts',
+  'src/render/ship_wake_core.ts',
+  'src/render/water_approach_core.ts',
   'src/render/view_candidate_scan_core.ts',
+  'src/render/wisp_maze_core.ts',
+  // the maze kit's dressing plan (hedge piece per wall cell, gates, lanterns)
+  'src/render/wisp_maze_kit_core.ts',
+  'src/render/glider_course_core.ts',
+  'src/render/glider_flight_pose_core.ts',
+  'src/render/shadow_detection_core.ts',
+  'src/render/world_quest_public_trace_core.ts',
+  'src/render/world_quest_trace_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/outdoor_light_rig_core.ts',
   'src/render/wall_backface_cull_core.ts',
@@ -737,6 +859,7 @@ const RENDER_PURE_CORES = [
   'src/render/nythraxis_bound_cage_core.ts',
   'src/render/nythraxis_grave_core.ts',
   'src/render/nythraxis_gravefire_core.ts',
+  'src/render/nythraxis_hazard_palette_core.ts',
   'src/render/nythraxis_sigil_core.ts',
   'src/render/nythraxis_soft_fire_core.ts',
   'src/render/nythraxis_soul_rend_marker_core.ts',
@@ -749,6 +872,7 @@ const RENDER_PURE_CORES = [
   'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
+  'src/render/trinket_relics_core.ts',
   'src/render/arrival_event_core.ts',
   'src/render/build_lane_core.ts',
   'src/render/build_ledger_core.ts',
@@ -757,6 +881,8 @@ const RENDER_PURE_CORES = [
   'src/render/character_cull_core.ts',
   'src/render/characters/anim_state_entity_core.ts',
   'src/render/characters/death_grounding_core.ts',
+  'src/render/characters/stonebound_shell_core.ts',
+  'src/render/characters/form_adornment_core.ts',
   'src/render/entry_detail_horizon_core.ts',
   'src/render/gather_batch_reach_core.ts',
   'src/render/zone_feature_cells_core.ts',
@@ -812,6 +938,7 @@ const RENDER_PURE_CORES = [
   'src/render/link_piece_core.ts',
   'src/render/program_variant_settle_core.ts',
   'src/render/camera_director_core.ts',
+  'src/render/vehicle_camera_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',
@@ -823,6 +950,8 @@ const RENDER_PURE_CORES = [
   'src/render/dashed_ring_core.ts',
   'src/render/detail_horizon_core.ts',
   'src/render/drape_lod_core.ts',
+  'src/render/floor_vfx_layer_core.ts',
+  'src/render/draw_program_signature_core.ts',
   'src/render/legendary_regalia_core.ts',
   'src/render/draped_bounds_core.ts',
   'src/render/vfx_screen_bounds_core.ts',
@@ -867,6 +996,7 @@ const RENDER_PURE_CORES = [
   'src/render/varkhul_encounter_core.ts',
   'src/render/ignivar_judgment_fire_core.ts',
   'src/render/stations_core.ts',
+  'src/render/mobile_stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/drain_channel_visual_core.ts',
   'src/render/env_prefilter_core.ts',
@@ -880,6 +1010,7 @@ const RENDER_PURE_CORES = [
   'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
+  'src/render/point_light_carriers_core.ts',
   'src/render/final_color_nan_guard_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
@@ -922,6 +1053,7 @@ const RENDER_PURE_CORES = [
   'src/render/race_line_core.ts',
   'src/render/renderer_frame_telemetry_core.ts',
   'src/render/rift_death_zone_core.ts',
+  'src/render/hill_ring_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/self_prediction_core.ts',
@@ -989,6 +1121,8 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/ui/trinket_aura_effect.ts',
+  'src/ui/trinket_aura_art.ts',
   'src/ui/ability_tooltip_lines.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_instance_glyph_mark.ts',
@@ -1020,6 +1154,7 @@ const BARE_NAMED = [
   'src/render/frame_present.ts',
   'src/render/self_motion_rift_lift.ts',
   'src/game/presentation_gate.ts',
+  'src/game/glider_pitch_input.ts',
   'src/game/stale_chrome_focus.ts',
   'src/render/compile_gate.ts',
   'src/render/link_rate_budget.ts',
@@ -1054,6 +1189,7 @@ const BARE_NAMED = [
   'src/ui/bag_filter.ts',
   'src/ui/bag_item_context_menu.ts',
   'src/ui/bank_filter.ts',
+  'src/ui/vault_search.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/quest_marker_tags.ts',
@@ -1367,15 +1503,15 @@ describe('Reliquary sparse-state writes stay inside their owning module', () => 
     ).toEqual([]);
   });
 
-  it('noteRelicObtain is called from exactly the two grant hubs (caller-set pin)', () => {
+  it('noteRelicObtain is called from the grant hubs and the atomic vault-save projector', () => {
     // The tally writer takes `meta` directly (no SimContext hop), so a NEW
     // caller adopts whatever movement policy it likes with no seam forcing
     // the question, and the line-regex ban above cannot see it (the write
     // happens inside the owning module on the caller's behalf). Pin the
-    // caller set AND the call text: both call sites must be the hub line
-    // with its movement gate intact, so a dropped `!opts?.movement` prefix,
-    // a changed copies argument, or a replacement arm elsewhere in sim.ts
-    // all red here, not just a third file. A new caller is not banned, it is
+    // caller set AND call text: both grant hubs keep their movement gate.
+    // The vault projector is the third approved caller: it commits world-sourced
+    // finds in the same transaction as the immutable direct claim marker.
+    // A new caller is not banned, it is
     // a REVIEW ITEM: extend this pin only after classifying the new site
     // against the movement rule. Scope: all of src/ (ClientWorld and the UI
     // import from the owning module already, so a caller there is one import
@@ -1392,10 +1528,15 @@ describe('Reliquary sparse-state writes stay inside their owning module', () => 
     const callers = scanLines(callerScanned, /\bnoteRelicObtain\s*\(/);
     const files = [...new Set(callers.map((v) => v.split(':')[0]))].sort();
     expect(files, `unexpected noteRelicObtain callers:\n${callers.join('\n')}`).toEqual([
+      relative(repoRoot, join(simRoot, 'rift', 'hoard_reward_save.ts')),
       relative(repoRoot, join(simRoot, 'sim.ts')),
     ]);
     const texts = callers.map((v) => v.slice(v.indexOf('  ') + 2));
-    expect(texts, 'both hub arms carry the movement gate and per-copy count').toEqual([
+    expect(
+      texts,
+      'the projector is world-sourced; both hub arms retain their movement gate',
+    ).toEqual([
+      'noteRelicObtain(meta, item.itemId, item.count);',
       'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
       'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
     ]);
@@ -2082,6 +2223,7 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
 // allowlist, so a synchronized delete leaves BARE_NAMED disagreeing with THIS list
 // instead of only agreeing with itself.
 const EXPECTED_BARE_NAMED = [
+  'src/game/glider_pitch_input.ts',
   'src/game/nameplate_view_prefs.ts',
   'src/game/presentation_gate.ts',
   'src/game/stale_chrome_focus.ts',
@@ -2167,9 +2309,12 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/target_frame_pos.ts',
   'src/ui/terms_link.ts',
   'src/ui/tool_effect_tooltip.ts',
+  'src/ui/trinket_aura_art.ts',
+  'src/ui/trinket_aura_effect.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/usd_text.ts',
+  'src/ui/vault_search.ts',
   'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/woc_balance_chip.ts',
   'src/ui/woc_log_tones.ts',
@@ -2503,6 +2648,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/error_toast_controller.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',
   'src/ui/frame_presets_controls.ts',
@@ -2513,6 +2659,11 @@ const UI_DOM_MODULES = [
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',
   'src/ui/mobile_frame_long_press.ts',
+  'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
+  'src/ui/hud/map/minimap_objective_tap.ts',
+  'src/ui/hud/treasure/treasure_map_window.ts',
+  'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
+  'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   // Owns browser state on purpose: it mints the reticle tick ring's root and
@@ -2538,9 +2689,11 @@ const UI_DOM_MODULES = [
   'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_status_line.ts',
   'src/ui/bank_window.ts',
+  'src/ui/bank_window_focus.ts',
   'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
   'src/ui/hud/action_bar/action_bar_bind_banner.ts',
+  'src/ui/weekly_quests_window.ts',
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
@@ -2566,6 +2719,7 @@ const UI_DOM_MODULES = [
   'src/ui/char_window.ts',
   'src/ui/charselect_news.ts',
   'src/ui/charselect_redesign.ts',
+  'src/ui/charselect_woc_market_panel.ts',
   'src/ui/chat_command_menu.ts',
   'src/ui/claudium_window.ts',
   'src/ui/continent_art.ts',
@@ -2621,7 +2775,13 @@ const UI_DOM_MODULES = [
   'src/ui/hud/player_card/player_card_controller.ts',
   'src/ui/hud/quest/quest_dialog_controller.ts',
   'src/ui/hud/quest/quest_tracker_controller.ts',
+  'src/ui/hud/quest/wisp_maze_hud_controller.ts',
   'src/ui/hud/quest/questlog_window.ts',
+  'src/ui/world_quest_puzzle_window.ts',
+  'src/ui/world_quest_confection_window.ts',
+  'src/ui/world_quest_confection_fx_controller.ts',
+  'src/ui/world_quest_ley_window.ts',
+  'src/ui/world_quest_ley_fx_controller.ts',
   'src/ui/hud/vendor/buy_quantity_prompt_window.ts',
   'src/ui/hud/vendor/heroic_vendor_window.ts',
   'src/ui/hud/vendor/crucible_vendor_window.ts',
@@ -2653,12 +2813,15 @@ const UI_DOM_MODULES = [
   // so the focused chip or quest row survives that swap.
   'src/ui/map_sidebar_controller.ts',
   'src/ui/market_sweep_panel.ts',
+  'src/ui/market_orders_panel.ts',
   'src/ui/market_window.ts',
   'src/ui/woc_market_window.ts',
   'src/ui/material_sources_dialog.ts',
   'src/ui/personal_bank_item_cell.ts',
   'src/ui/meters.ts',
   'src/ui/meters_frame.ts',
+  'src/ui/meters_options_dialog.ts',
+  'src/ui/death_recap_dialog.ts',
   'src/ui/hud/practice/hub_lesson_controller.ts',
   'src/ui/minimap_gilded_ornament.ts',
   'src/ui/mobile_wallet_launcher.ts',
@@ -2730,6 +2893,10 @@ const UI_DOM_MODULES = [
   'src/ui/steam_link.ts',
   'src/ui/steam_wishlist.ts',
   'src/ui/store_decision_prompt.ts',
+  // Resolves and mints the body-level host a Store decision takes while an
+  // inspect overlay is up (document lookups and a body append; the rule is in
+  // its header).
+  'src/ui/store_prompt_host.ts',
   'src/ui/store_stack_diag.ts',
   'src/ui/swing_timer_bars.ts',
   'src/ui/talents_window.ts',
@@ -2757,6 +2924,12 @@ const UI_DOM_MODULES = [
   'src/ui/ui_icons.ts',
   'src/ui/ui_scale.ts',
   'src/ui/vault_window.ts',
+  'src/ui/weekly_rewards_window.ts',
+  'src/ui/weekly_reward_claim_controller.ts',
+  'src/ui/weekly_reward_table_picker_controller.ts',
+  'src/ui/weekly_reward_loot_catalog_controller.ts',
+  'src/ui/weekly_rewards_ready_prompt.ts',
+  'src/ui/weekly_vault_reveal_controller.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
   'src/ui/window_open_state.ts',

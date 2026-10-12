@@ -19,6 +19,7 @@
 
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf, stackSizeOf } from '../sim/bags';
+import { getItemCooldownDuration } from '../sim/content/item_cooldowns';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
@@ -73,6 +74,7 @@ import {
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { hasOpenBankSocket } from './bank_view';
+import { DeferredDragRender } from './deferred_drag_render';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import {
@@ -297,6 +299,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  handler consumed the use (nearest matching node + autorun stop); false
    *  falls back to the plain useItem command. */
   useGatherTool(item: ItemDef): boolean;
+  /** Arm ground targeting for ground-aimable consumables (e.g. shock bomb). */
+  startGroundAimForItem?(itemId: string): boolean;
   // Hotbar drag plumbing (cross-window drag state lives on the HUD).
   isHotbarItemId(itemId: string): boolean;
   setDragAction(action: { type: 'item'; id: string } | null): void;
@@ -333,7 +337,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  `runDefault` runs the exact classic left-click action for the clicked
    *  slot, so the menu's first row stays byte-identical to a plain click.
    *  `vendorSellCount` is every copy of this item held across the bags,
-   *  supplied only when it should show the vendor row set instead. */
+   *  supplied only when it should show the vendor row set instead.
+   *  `runDestroy` (touch HUD only) adds the Destroy row. */
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
@@ -345,6 +350,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     vendorSellCount?: number,
     runSellAll?: () => void,
     materialSources?: MaterialComposition,
+    runDestroy?: () => void,
   ): void;
 }
 
@@ -377,8 +383,9 @@ export class BagsWindow {
   // Set when render() or refreshGrid() skipped a rebuild because a bag row was
   // mid-drag (see render()'s own comment). Flushed by flushDeferredRender(),
   // called from the dragged row's own end-of-drag handlers once the drag
-  // concludes.
-  private renderDeferredForDrag = false;
+  // concludes. Shared shape (also used by spellbook_window.ts and
+  // char_window.ts): see deferred_drag_render.ts.
+  private readonly dragRenderGate = new DeferredDragRender();
 
   // Native HTML5 drop fires before dragend. A bag-cell drop consumes dragState
   // in the drop handler, but the source row still needs to survive until its
@@ -514,7 +521,7 @@ export class BagsWindow {
     // instead of tearing the dragged row out from under it; the row's own dragend
     // (or the touch drag's onEnd) flushes it once the drag actually concludes.
     const drag = this.deps.dragState.get();
-    if (drag || this.nativeBagCellDropAwaitingDragEnd) {
+    if (this.dragRenderGate.shouldDefer(!!drag || this.nativeBagCellDropAwaitingDragEnd)) {
       // Inventory snapshots still have one small paint obligation while the
       // grid rebuild is deferred: keep the paperdoll promise tied to the exact
       // dragged copy. This covers desktop and touch alike without polling from
@@ -524,7 +531,6 @@ export class BagsWindow {
         if (named === null) this.deps.markEquipDropTargets(null);
         else this.deps.markEquipDropTargets(drag.itemId, named);
       }
-      this.renderDeferredForDrag = true;
       return;
     }
     // Rebuild tears down hovered cells without mouseleave; drop any tracker glow.
@@ -618,10 +624,10 @@ export class BagsWindow {
    *  dragend/onEnd teardown runs first), so this only needs to check the latch,
    *  not the live drag state again. */
   private flushDeferredRender(): void {
-    if (!this.renderDeferredForDrag) return;
-    this.renderDeferredForDrag = false;
-    this.nativeBagCellDropAwaitingDragEnd = false;
-    this.render();
+    this.dragRenderGate.flush(() => {
+      this.nativeBagCellDropAwaitingDragEnd = false;
+      this.render();
+    });
   }
 
   // The classic bag bar: the implicit backpack, the 4 equip sockets, and the
@@ -1121,20 +1127,29 @@ export class BagsWindow {
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
       const lockSeal = lockMarkHtml(locked);
       row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
-      // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
-      // 5s throw pacing is visible in the bag. The bag is a cold window with no
-      // per-frame driver, so the sweep is a self-contained CSS animation seeded from
-      // the wired remaining seconds (world.player.firebottleCdRemaining), not a
-      // per-frame-repainted --cd-fill like the action bar. Appended after the
-      // innerHTML build so the quest seal markup above is not overwritten.
-      if (item.id === FIREBOTTLE_ITEM_ID && world.player.firebottleCdRemaining > 0) {
-        const remaining = world.player.firebottleCdRemaining;
+      // An item mid-cooldown (the firebottle's 5s throw pacing, the faction
+      // quartermaster goods in ITEM_BASE_COOLDOWNS) paints a draining curtain on
+      // its slot. The bag is a cold window with no per-frame driver, so the sweep
+      // is a self-contained CSS animation seeded from the wired remaining seconds,
+      // not a per-frame-repainted --cd-fill like the action bar. Only an item
+      // with a cooldown reads the player's timers, so an ordinary stack never
+      // touches world.player.
+      const itemTotalCd =
+        getItemCooldownDuration(item.id) ||
+        (item.id === FIREBOTTLE_ITEM_ID ? FIREBOTTLE_COOLDOWN_SECS : 0);
+      const itemCd =
+        itemTotalCd > 0
+          ? (world.player.cooldowns.get(item.id) ??
+            (item.id === FIREBOTTLE_ITEM_ID ? world.player.firebottleCdRemaining : 0))
+          : 0;
+      if (itemCd > 0 && itemTotalCd > 0) {
+        const remaining = itemCd;
         const curtain = document.createElement('span');
         curtain.className = 'bag-cd-curtain';
         curtain.setAttribute('aria-hidden', 'true');
         curtain.style.setProperty(
           '--cd-start',
-          `${Math.min(100, (remaining / FIREBOTTLE_COOLDOWN_SECS) * 100)}%`,
+          `${Math.min(100, (remaining / itemTotalCd) * 100)}%`,
         );
         curtain.style.setProperty('--cd-dur', `${remaining}s`);
         row.appendChild(curtain);
@@ -1180,7 +1195,8 @@ export class BagsWindow {
         // is unavailable (itemMenuAvailable excludes it, same as every other
         // special mode), so a sellable item falls into the vendor row set
         // instead: touch has no shift-click either, so this is its only way
-        // to reach Sell all.
+        // to reach Sell all. The touch menu also ends in Destroy (the drag out
+        // to the world has almost no world to land on under the bags sheet).
         if (this.deps.isTouchHud()) {
           if (this.itemMenuAvailable(item, s.itemId, s.instance, materialSourcesForDisplay(s))) {
             this.openItemMenuFor(item, s, ev);
@@ -1268,8 +1284,9 @@ export class BagsWindow {
         }
         ev.preventDefault();
         // The action menu opens, whose FIRST row is the classic left-click
-        // action so that binding survives (right-click never destroys;
-        // destroying is the drag-out-to-world gesture). Every item now offers
+        // action so that binding survives (right-click never destroys; on the
+        // desktop HUD destroying is the drag-out-to-world gesture, while the
+        // touch HUD's menu adds a Destroy row). Every item now offers
         // at least Lock/Unlock (issue 3042), so this always opens the menu;
         // left-click is unchanged (still runs the classic action instantly).
         if (this.itemMenuAvailable(item, s.itemId, s.instance, materialSourcesForDisplay(s))) {
@@ -1658,7 +1675,7 @@ export class BagsWindow {
       const from = drag.index;
       this.deps.dragState.end();
       this.nativeBagCellDropAwaitingDragEnd = true;
-      this.renderDeferredForDrag = true;
+      this.dragRenderGate.arm();
       this.dropOnBagCell(from, cell);
     });
   }
@@ -1938,6 +1955,10 @@ export class BagsWindow {
         break;
       }
       case 'use': {
+        if (this.deps.startGroundAimForItem?.(s.itemId)) {
+          this.deps.hideTooltip();
+          break;
+        }
         // Gathering tools (#2343) route through the interact-style handler
         // (nearest matching node + autorun stop) when main.ts has wired it;
         // everything else, and any unwired host, keeps the plain useItem.
@@ -2055,8 +2076,11 @@ export class BagsWindow {
     // Same hazard as render() (see its comment): an innerHTML wipe here would tear a
     // mid-drag row out of the document just as easily. Defer to the same latch; the
     // eventual flush runs a full render(), a strict superset of a grid-only refresh.
-    if (this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd) {
-      this.renderDeferredForDrag = true;
+    if (
+      this.dragRenderGate.shouldDefer(
+        !!this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd,
+      )
+    ) {
       return;
     }
     // Grid rebuild tears down hovered cells without mouseleave.
@@ -2170,6 +2194,30 @@ export class BagsWindow {
     const x = ev.clientX || rect?.left || 0;
     const y = ev.clientY || rect?.top || 0;
     const index = bagStackIndex(this.deps.world().inventory, s);
+    // Touch has no world to drop a stack on while the bags sheet covers the
+    // screen, so the menu carries the destroy prompt the drag opens on desktop,
+    // behind the same gate. The menu can stay open across a bag change, so the
+    // tapped copy is re-resolved (and its live count read) when the row runs,
+    // refusing like the Lock row when it is gone; focus goes back to the cell
+    // first so the prompt's Cancel returns there, not to the hidden menu row.
+    const opener = ev.currentTarget as HTMLElement | null;
+    const runDestroy =
+      vendorSellCount === undefined &&
+      this.deps.isTouchHud() &&
+      this.destroyAction(s.itemId) === 'discard'
+        ? () => {
+            const at = bagStackIndex(this.deps.world().inventory, s);
+            if (at < 0) {
+              this.deps.showError(tSim('error.noItem'));
+              return;
+            }
+            opener?.focus({ preventScroll: true });
+            this.promptDestroy(s.itemId, Math.max(1, Math.floor(s.count)), {
+              index: at,
+              copyPin: itemCopyPin(s),
+            });
+          }
+        : undefined;
     this.deps.openItemActionMenu(
       item,
       s.itemId,
@@ -2191,6 +2239,7 @@ export class BagsWindow {
         ? undefined
         : () => this.sellAllBagItem(item, s, vendorSellCount),
       materialSourcesForDisplay(s),
+      runDestroy,
     );
   }
 

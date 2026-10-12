@@ -72,7 +72,7 @@ function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
       potionCdRemaining: 0,
       queuedOnSwing: null,
       pos: { x: 0, y: 0, z: 0 },
-      auras: [],
+      auras: [{ kind: 'form_cat' }],
     },
     target: null,
     inventory: [],
@@ -267,6 +267,7 @@ describe('CooldownManagerController', () => {
       fateThreads: 0,
       entities: [],
       activeAimSlot: null,
+      wornTrinketId: null,
     };
     const refreshed = Object.keys(sample).filter((key) => key !== 'entities');
     expect([...COOLDOWN_WORLD_FIELDS].sort()).toEqual(refreshed.sort());
