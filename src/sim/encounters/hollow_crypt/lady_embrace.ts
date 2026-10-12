@@ -25,6 +25,7 @@ import {
   startBar,
 } from './claim';
 import {
+  embraceBreakShare,
   LADY_EMBRACE_DROPPED,
   LADY_EMBRACE_HOLD,
   LADY_EMBRACE_RELEASED,
@@ -231,7 +232,7 @@ export function stepEmbrace(
       }
     }
     const dealt = e.hpAt - boss.hp;
-    const broken = dealt >= T.embraceBreakShare * boss.maxHp - 1e-6;
+    const broken = dealt >= embraceBreakShare(inst.difficulty === 'heroic') * boss.maxHp - 1e-6;
     if (e.phase === 'rise') {
       pin(ctx, inst, boss, st, embraceHeight('rise', e.t, 0));
       if (e.t >= T.embraceRise - 1e-6) {

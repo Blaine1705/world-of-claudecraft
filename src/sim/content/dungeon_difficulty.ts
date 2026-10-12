@@ -583,12 +583,18 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     },
     // The wing bosses' pools from target fight length x heroic party DPS
     // (about 230) on their level-22 templates: Sexton Marrow 70 s (about
-    // 16,100 on 1,412), the Lady of the Bonechill 80 s (about 18,400 on
-    // 1,532), Cantor Ilvane about 64 s on her own (about 14,700 on 1,412)
-    // after her two Choristers, held to about 8 s each (about 1,840 on 971).
+    // 16,100 on 1,412), Cantor Ilvane about 64 s on her own (about 14,700 on
+    // 1,412) after her two Choristers, held to about 8 s each (about 1,840
+    // on 971). The Lady of the Bonechill was priced the same way (80 s, 12,
+    // about 18,400 on 1,532) until the owner's heroic playtest of 2026-10-12
+    // ("she lasted almost nothing"): she now carries about 25,000 (24,999),
+    // about 109 s at the planning 230. Her Frozen Embrace breaks on a share
+    // of her pool, and heroic carries its own (LADY_TUNING
+    // .embraceBreakShareHeroic) so the damage that frees the held stays the
+    // 1,103 it was: more health was asked for, not a harder Embrace.
     healthMultiplierByMob: {
       sexton_marrow: 11.4,
-      rimeweb: 12,
+      rimeweb: 16.32,
       cantor_ilvane: 10.4,
       hollow_chorister: 1.9,
       // Morthen: about 125 s of damage at about 230 beside his immune Rite
@@ -608,10 +614,13 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // Bolt was priced on it before this pass; its volley's base is set for
     // it).
     // The wing bosses' mechanics are priced apart from the melee floor (the Bastion's
-    // bands, cloth about 1,250 at 20 heroic): Marrow's Toll about 15 percent
-    // and a cave-in about 22; an unsheltered Lament about 27 (Lingering
-    // Lament stacks half again), her drop about 66; Ilvane's completed Dirge
-    // or a note lane about 70 (a fumbled core all but kills).
+    // bands, cloth about 1,250 at 20 heroic): Marrow's Toll about 18 percent
+    // (198 to 251: this factor times the Toll's own heroic tenth,
+    // MARROW_TUNING.tollHeroicMult, set by the owner's playtest of 2026-10-12;
+    // it was 180 to 228, about 16) and a cave-in about 22; an unsheltered
+    // Lament about 27 (Lingering Lament stacks half again), her drop about
+    // 66; Ilvane's completed Dirge or a note lane about 70 (a fumbled core
+    // all but kills).
     // The pack budget lowered the trash melee factors under every trash kit
     // (a mob with no mechanic entry stamps its melee factor as
     // mechanicDamageMult), so each kit-carrying trash mob keeps its

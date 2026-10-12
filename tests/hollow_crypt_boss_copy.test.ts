@@ -112,6 +112,10 @@ describe('Hollow Crypt wing bosses: the finder lines state the tuning', () => {
       `after ${n(T.lanternLitHeroic)} seconds and stays dark for ${n(T.lanternGutter)}`,
     );
     expect(T.embraceVictimsHeroic).toBe(2);
+    // Heroic lets go at its own share of her larger pool (lady_ids.ts).
+    expect(mech.crypt_lady_heroic).toContain(
+      `lets go at ${Math.round(T.embraceBreakShareHeroic * 1000) / 10} percent of her health`,
+    );
   });
 
   it('Cantor Ilvane', () => {
