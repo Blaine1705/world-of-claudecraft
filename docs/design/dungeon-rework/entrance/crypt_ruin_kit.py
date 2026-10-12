@@ -466,7 +466,8 @@ class Ruin(hckit.Piece):
             for i, loop in enumerate(f.loops):
                 loop[self.col] = (*scale(c, 0.72 if i == 0 else (1.12 if i in (2, 3) else 0.95)), 1.0)
 
-    def ivy(self, base, out, height, width, stems=4, density=7.0, size=0.17, alive=None, lean=0.0, hang=False):
+    def ivy(self, base, out, height, width, stems=4, density=7.0, size=0.17, alive=None, lean=0.0, hang=False,
+            mass=0):
         """Ivy climbing from `base` (Blender space) up a face whose outward
         normal is `out` (or hanging down it): wandering stems, leaves along
         them, thick low and thinning toward the tips."""
@@ -500,7 +501,7 @@ class Ruin(hckit.Piece):
                 t = i / (len(pts) - 1)
                 # A cluster hugging the stem: leaves alternate off it, pointing down
                 # and out (their weight), thick low and thinner toward the tip.
-                for j in range(max(1, int(density * 0.5 * (1.3 - 0.75 * t) + rng.random()))):
+                for j in range(max(1, mass + int(density * 0.5 * (1.3 - 0.75 * t) + rng.random()))):
                     lp = q + side * (rng.random() - 0.5) * 0.3 * (1.15 - 0.4 * t) + \
                         Vector((0, 0, (rng.random() - 0.5) * 0.26)) + out * (0.03 + rng.random() * 0.07)
                     c = IVY[rng.randrange(len(IVY))] if rng.random() > 0.06 else IVY_TURN[rng.randrange(2)]

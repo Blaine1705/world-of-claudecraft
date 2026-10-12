@@ -278,8 +278,8 @@ def gable():
     L = 2 * NAVE_X + 1.2
     a, b = (-L / 2, GABLE_Z), (L / 2, GABLE_Z)
     y0 = base_y([(x, GABLE_Z) for x in range(-10, 11)])
-    eave, apex = 6.4, 13.9
-    rose_y, rose_r = 9.0, 2.42
+    eave, apex = 7.6, 17.6
+    rose_y, rose_r = 11.2, 2.8
     door_hw, door_spring, door_rise = 1.75, 3.1, 2.3
     M = south_plane(GABLE_Z)
 
@@ -288,7 +288,7 @@ def gable():
         rake = eave + (apex - eave) * max(0.0, 1 - abs(x) / (L / 2))
         if -9.05 < x < -3.5:      # the east shoulder has fallen in
             k = math.sin(math.pi * (x + 9.05) / 5.55) ** 0.6
-            rake -= 0.5 + 2.9 * k
+            rake -= 0.5 + 4.4 * k
         if x <= -9.05:
             rake = 5.1
         return rake
@@ -345,27 +345,26 @@ def gable():
              rose_y + math.sin(math.pi * (1.08 - 1.16 * i / 14)) * (rose_r + 0.72)) for i in range(15)]
     p.roll(hood, 0.1, p.vary(LIME_PALE, 0.04), M, y_off=0.66)
     with p.as_kind(K_STONE):
-        p.prism(M @ Vector((0, -0.24, rose_y)), 8, 0.42, 0.42, 0.48, LIME_PALE, axis=(0, 1, 0))
-        keep = (1, 1, 0, 1, 0, 0, 1, 1)
+        p.prism(M @ Vector((0, -0.24, rose_y)), 8, 0.5, 0.5, 0.48, LIME_PALE, axis=(0, 1, 0))
+        snapped = (2, 5)
+
+        def rp(ang, rad):
+            return M @ Vector((math.cos(ang) * rad, 0, rose_y + math.sin(ang) * rad))
+
         for k in range(8):
             a0 = TAU * k / 8 + 0.39
-            r1 = (rose_r - 0.18) if keep[k] else 0.0
-            if keep[k]:
-                p.sweep([M @ Vector((math.cos(a0) * r, 0, rose_y + math.sin(a0) * r)) for r in (0.38, 1.2, r1)],
-                        0.115, 0.1, p.vary(LIME_PALE, 0.05), sides=6)
-            else:   # a snapped stub left on the ring
-                p.sweep([M @ Vector((math.cos(a0) * r, 0, rose_y + math.sin(a0) * r))
-                         for r in (rose_r - 0.2, rose_r - 0.55 - 0.3 * p.rng.random())], 0.11, 0.07,
-                        p.vary(LIME, 0.05), sides=6)
-        # Cusped arcs between neighbouring surviving spokes.
-        for k in (0, 6, 7):
-            a0, a1 = TAU * k / 8 + 0.39, TAU * (k + 1) / 8 + 0.39
-            arc = []
-            for i in range(6):
-                aa = a0 + (a1 - a0) * i / 5
-                rr = 1.55 + 0.32 * math.sin(math.pi * i / 5)
-                arc.append(M @ Vector((math.cos(aa) * rr, 0, rose_y + math.sin(aa) * rr)))
-            p.sweep(arc, 0.085, 0.085, p.vary(LIME_PALE, 0.05), sides=5)
+            r1 = rose_r - 0.16
+            for (ra, rb) in (((0.45, 0.95), (r1 - 0.45, r1)) if k in snapped else ((0.45, r1),)):
+                p.sweep([rp(a0, ra), rp(a0, rb)], 0.12, 0.1, p.vary(LIME_PALE if k not in snapped else LIME, 0.05), sides=6)
+            am = a0 + TAU / 16
+            if k not in (1, 2, 5):      # a small oculus between two spokes, out by the ring
+                rc, ro = rose_r * 0.67, rose_r * 0.2
+                ring = [M @ Vector((math.cos(am) * rc + math.cos(b) * ro, 0, rose_y + math.sin(am) * rc + math.sin(b) * ro))
+                        for b in (TAU * i / 8 for i in range(9))]
+                p.sweep(ring, 0.07, 0.07, p.vary(LIME_PALE, 0.05), sides=4, cap=False)
+            if k not in snapped and (k + 1) % 8 not in snapped:      # the foil ring round the hub
+                arc = [rp(a0 + TAU / 8 * i / 4, rose_r * 0.37 + 0.13 * math.sin(math.pi * i / 4)) for i in range(5)]
+                p.sweep(arc, 0.08, 0.08, p.vary(LIME_PALE, 0.05), sides=4, cap=False)
     # The string course under the gable, lost where the shoulder fell.
     x = -L / 2 + 0.2
     while x < L / 2 - 0.3:
@@ -410,7 +409,7 @@ def gable():
     for sx in (-1, 1):
         x = sx * (NAVE_X + 0.25)
         byy = base_y([(x, GABLE_Z - 2.6), (x, GABLE_Z)])
-        stages = ((2.5, 3.4), (1.9, 5.6), (1.3, 7.2)) if sx > 0 else ((2.5, 3.4), (1.9, 4.9))
+        stages = ((2.5, 4.0), (1.9, 6.8), (1.3, 9.2)) if sx > 0 else ((2.5, 4.0), (1.9, 5.6))
         prev = byy
         for (d, h) in stages:
             pier(p, x, GABLE_Z - 0.4 - d / 2, 1.3, d, prev, h, ragged=(sx < 0 and h > 4.5))
@@ -421,7 +420,7 @@ def gable():
     for sx in (-1, 1):
         w = (L / 2 - door_hw - 0.5) / 2
         collider_obb(f'gable_wall_{"w" if sx > 0 else "e"}', sx * (door_hw + 0.5 + w), GABLE_Z, w, 0.68, 0.0,
-                     apex if sx > 0 else 10.0)
+                     apex if sx > 0 else 12.0)
     earth_skirt(p, (-L / 2, GABLE_Z - 0.9), (-door_hw - 0.6, GABLE_Z - 0.9))
     earth_skirt(p, (door_hw + 0.6, GABLE_Z - 0.9), (L / 2, GABLE_Z - 0.9))
     earth_skirt(p, (-L / 2, GABLE_Z + 0.9), (L / 2, GABLE_Z + 0.9), width=0.8)
@@ -465,7 +464,7 @@ def nave():
         wins = (0.12, 0.27) if sx > 0 else (0.13, 0.30)
 
         def top_fn(t, sx=sx, breaches=breaches):
-            base = 6.9 * (1 - t) ** 1.25 + 1.3
+            base = 8.6 * (1 - t) ** 1.25 + 1.3
             wob = 0.8 * math.sin(t * 17 + sx) * math.sin(t * 5.3 + 1.0)
             for (b0, b1) in breaches:
                 if b0 < t < b1:
@@ -520,6 +519,25 @@ def nave():
         for off in (-0.85, 0.85):
             earth_skirt(p, (x + off, a[1]), (x + off, b[1]), width=0.85)
         sunk_blocks(p, a, b, 9)
+    # The nave arcade: six piers of the chapel's own masonry, each broken at its
+    # own height, and one more lying where it fell along the aisle.
+    for i, (px, pz, ph) in enumerate(((4.6, -17.6, 2.0), (4.6, -12.6, 4.8), (4.6, -7.6, 1.3), (-4.6, -17.6, 3.5),
+                                      (-4.6, -12.6, 1.6), (-4.6, -7.6, 5.6))):
+        g = gh(px, pz)
+        p.hewn(B(px, pz, g + 0.12), (1.7, 1.7, 0.5), LIME_DARK, bevel=0.07)
+        pier(p, px, pz, 1.25, 1.25, g + 0.34, ph, ragged=ph < 4)
+        if ph > 4:
+            p.hewn(B(px, pz, ph + 0.1), (1.5, 1.5, 0.24), LIME_PALE, bevel=0.06, chip=0.12, roll=0.03)
+        collider_circle(f'nave_pier_{i}', px, pz, 0.85, ph + 0.2, stand=(ph if ph < 2.3 else None))
+        footing(f'nave_pier_{i}', px, pz, 0.6, 0.6, 0.0, g - 0.13)
+        rubble(p, px, pz, 1.4, 1, size=(0.25, 0.55))
+        earth_skirt(p, (px - 0.6, pz), (px + 0.6, pz), width=1.1, step=1.2)
+    for k in range(4):
+        fx_, fz_ = -3.9 + k * 0.82, -16.2 + k * 0.42
+        p.stone(B(fx_, fz_, gh(fx_, fz_) + 0.42), (0.86, 1.2, 1.15), p.tone(fx_, fz_), chip=0.1, knock=0.5, bottom=True,
+                rot=Matrix.Rotation(0.47 + (rng.random() - 0.5) * 0.3, 3, 'Z') @ Matrix.Rotation(rng.uniform(-0.2, 0.2), 3, 'X'))
+    collider_obb('fallen_pier', -2.67, -15.57, 1.7, 0.62, -0.47, 1.05, stand=1.0)
+    footing('fallen_pier', -2.67, -15.57, 1.4, 0.4, -0.47, gh(-2.67, -15.57) - 0.15)
     # Chancel shoulders.
     for sx in (-1, 1):
         a, b = (sx * (NAVE_X - 0.5), NAVE_END_Z), (sx * CHANCEL_X, NAVE_END_Z)
@@ -1012,7 +1030,8 @@ def outside():
             for sx in (-1, 1):
                 p.box(B(lx0 + sx * 1.42, lz0 + sz, (g + 3.9 + ridge) / 2), (3.2, 0.14, 0.18), TIMBER_GREY, roll=sx * 0.52)
         p.box(B(lx0, lz0, ridge + 0.02), (0.22, 3.4, 0.22), TIMBER, bevel=0.03, pitch=0.012)
-    # Slates in four courses a side, each course its own sag; some are gone.
+    # What is left of the slates: the eaves course and a few strays (an open
+    # roof: the approach camera looks straight through the rafters).
     for sx in (-1, 1):
         for r in range(5):
             t = (r + 0.5) / 5
@@ -1021,7 +1040,7 @@ def outside():
             zz = lz0 - 1.7
             while zz < lz0 + 1.7:
                 w = rng.uniform(0.42, 0.62)
-                if rng.random() > (0.14 if sx > 0 else 0.3) or r == 4:
+                if rng.random() < (0.7 if r == 0 else (0.2 if sx > 0 else 0.1)):
                     sag = -0.1 * math.sin(math.pi * (zz + w / 2 - lz0 + 1.7) / 3.4)
                     p.box(B(xx, zz + w / 2, yy + sag), (0.74, w - 0.03, 0.05), p.vary(SLATE, 0.14),
                           roll=sx * 0.52 + (rng.random() - 0.5) * 0.06, yaw=(rng.random() - 0.5) * 0.05, bottom=True)
@@ -1075,33 +1094,33 @@ def growth(sill):
     # Ivy up the gable's standing west half, over the broken east shoulder,
     # through the rose window and down the nave face.
     gy = -GABLE_Z + 0.6       # Blender Y of the gable's south face
-    p.ivy((6.6, gy + 0.03, gh(6.6, GABLE_Z - 0.6)), S, 7.4, 4.6, stems=7, density=2.2)
-    p.ivy((-6.2, gy + 0.03, gh(-6.2, GABLE_Z - 0.6)), S, 5.2, 4.4, stems=6, density=1.8)
-    p.ivy((-1.2, gy + 0.08, 11.5), S, 4.6, 3.4, stems=7, density=2.3, hang=True, lean=0.15)
-    p.ivy((1.9, gy + 0.08, 10.7), S, 2.4, 1.6, stems=5, density=2.1, hang=True)
-    p.ivy((1.2, -GABLE_Z - 0.62, 11.2), N, 4.6, 3.4, stems=6, density=1.8, hang=True)
-    p.ivy((-5.6, -GABLE_Z - 0.62, gh(-5.6, GABLE_Z + 0.7)), N, 4.4, 3.6, stems=6, density=1.8)
+    p.ivy((6.6, gy + 0.03, gh(6.6, GABLE_Z - 0.6)), S, 9.4, 4.6, stems=7, density=2.2, mass=1)
+    p.ivy((-6.2, gy + 0.03, gh(-6.2, GABLE_Z - 0.6)), S, 5.2, 4.4, stems=6, density=1.8, mass=1)
+    p.ivy((-1.2, gy + 0.08, 14.1), S, 5.0, 3.8, stems=7, density=2.3, hang=True, lean=0.15, mass=2, size=0.2)
+    p.ivy((2.2, gy + 0.08, 13.2), S, 2.6, 1.6, stems=5, density=2.1, hang=True, mass=2, size=0.2)
+    p.ivy((1.2, -GABLE_Z - 0.62, 13.9), N, 4.6, 3.4, stems=6, density=1.8, hang=True)
+    p.ivy((-5.6, -GABLE_Z - 0.62, gh(-5.6, GABLE_Z + 0.7)), N, 4.4, 3.6, stems=4, density=1.8)
     # The stair-house: ivy on its west cheek and over the front's broken rake.
     fz = SH['z0'] + 0.65
-    p.ivy((2.9, -(fz - 0.68), gh(2.9, fz - 0.7)), S, 5.6, 1.5, stems=5, density=2.2, lean=-0.15)
+    p.ivy((2.9, -(fz - 0.68), gh(2.9, fz - 0.7)), S, 5.6, 1.5, stems=5, density=2.2, lean=-0.15, mass=1)
     p.ivy((-2.6, -(fz - 0.68), 4.9), S, 3.0, 1.7, stems=5, density=1.8, hang=True)
-    p.ivy((0.2, -(fz - 0.82), 6.5), S, 2.3, 3.4, stems=7, density=2.2, hang=True)
-    p.ivy((1.4, -(fz - 0.82), 7.4), S, 2.0, 1.4, stems=4, density=2.0, hang=True)
-    p.ivy((SH['hw'] + 0.03, -3.0, gh(SH['hw'], 3.0)), Vector((1, 0, 0)), 4.2, 3.2, stems=6, density=1.8)
-    p.ivy((-SH['hw'] - 0.03, -2.2, 4.6), Vector((-1, 0, 0)), 3.2, 3.0, stems=5, density=1.8, hang=True)
+    p.ivy((0.2, -(fz - 0.82), 6.5), S, 2.3, 3.4, stems=7, density=2.2, hang=True, mass=2, size=0.2)
+    p.ivy((1.4, -(fz - 0.82), 7.4), S, 2.0, 1.4, stems=4, density=2.0, hang=True, mass=2, size=0.2)
+    p.ivy((SH['hw'] + 0.03, -3.0, gh(SH['hw'], 3.0)), Vector((1, 0, 0)), 4.2, 3.2, stems=4, density=1.8)
+    p.ivy((-SH['hw'] - 0.03, -2.2, 4.6), Vector((-1, 0, 0)), 3.2, 3.0, stems=3, density=1.8, hang=True)
     # The nave walls: a curtain on the east wall's tall end, tufts at every foot.
-    p.ivy((-(NAVE_X - 0.5) - 0.52, -(GABLE_Z + 3.4), gh(-9.0, GABLE_Z + 3.4)), Vector((-1, 0, 0)), 5.8, 4.6, stems=8,
+    p.ivy((-(NAVE_X - 0.5) - 0.52, -(GABLE_Z + 3.4), gh(-9.0, GABLE_Z + 3.4)), Vector((-1, 0, 0)), 5.8, 4.6, stems=6,
           density=1.8)
-    p.ivy(((NAVE_X - 0.5) - 0.52, -(GABLE_Z + 4.6), 6.4), Vector((-1, 0, 0)), 4.6, 3.8, stems=6, density=1.8,
+    p.ivy(((NAVE_X - 0.5) - 0.52, -(GABLE_Z + 4.6), 6.4), Vector((-1, 0, 0)), 4.6, 3.8, stems=4, density=1.8,
           hang=True)
-    p.ivy((-2.5 + 2.35 + 0.38, 31.0, gh(0, -31) + 0.1), Vector((1, 0, 0)), 2.3, 2.2, stems=5, density=1.8, size=0.3)
+    p.ivy((-2.5 + 2.35 + 0.38, 31.0, gh(0, -31) + 0.1), Vector((1, 0, 0)), 2.3, 2.2, stems=3, density=1.8, size=0.3)
     # Grass and weeds on every broken wall top, with moss pads and loose stones.
     for (pos, w) in TOPS:
         r = rng.random()
-        if r < 0.17:
+        if r < 0.09:
             p.grass(pos + Vector((rng.uniform(-0.3, 0.3) * w, rng.uniform(-0.2, 0.2), 0.02)), radius=0.24, blades=6,
                     height=0.42, dry=0.35)
-        elif r < 0.3:
+        elif r < 0.18:
             moss_pad(p, pos + Vector((0, 0, 0.0)), (min(1.3, w) * rng.uniform(0.6, 1.0), 0.8, 0.2))
     # Tufts along the feet of the walls and round the fallen things.
     def foot(lx, lz, n, spread, h=0.5):
@@ -1109,24 +1128,13 @@ def growth(sill):
             x, z = lx + rng.uniform(-spread, spread), lz + rng.uniform(-spread, spread)
             p.grass(B(x, z, gh(x, z)), radius=0.34, blades=6, height=h * rng.uniform(0.7, 1.4), dry=0.22)
 
-    for sx in (-1, 1):
-        for k in range(15):
-            z = GABLE_Z + 1.2 + k * 1.28
-            for off in (-0.62, 0.62):
-                if rng.random() < 0.6:
-                    foot(sx * (NAVE_X - 0.5) + off, z, 1, 0.22)
-        for k in range(8):
-            x = sx * (2.6 + k * 0.95)
-            for off in (-0.72, 0.72):
-                if rng.random() < 0.6:
-                    foot(x, GABLE_Z + off, 1, 0.22)
     for (lx, lz, n, s) in ((4.9, 4.5, 6, 1.5), (-4.7, 4.3, 4, 1.2), (5.6, -4.3, 2, 0.7), (5.4, -19.4, 3, 1.0), (-5.6, -4.6, 3, 1.4),
                            (0, 10.2, 6, 2.4), (-14.5, -9.0, 6, 3.4), (14.2, -16.5, 6, 3.2), (-2.5, -31.0, 4, 2.6),
                            (3.4, -0.9, 2, 0.4), (-3.4, -0.9, 2, 0.4), (-3.9, 6.3, 4, 1.4), (-6.5, -24.2, 5, 2.2)):
         foot(lx, lz, n, s)
     # Bramble at the wall feet: arching canes with a few leaves.
-    for (lx, lz, yaw, n) in ((-9.6, -14.0, 1.4, 5), (9.7, -8.0, -1.5, 5), (8.6, 1.2, -1.0, 4), (-7.6, 8.0, 2.4, 4),
-                             (6.0, -23.6, 0.2, 5), (-10.6, -20.4, 1.0, 4)):
+    for (lx, lz, yaw, n) in ((-9.6, -14.0, 1.4, 3), (9.7, -8.0, -1.5, 3), (8.6, 1.2, -1.0, 3), (-7.6, 8.0, 2.4, 3),
+                             (6.0, -23.6, 0.2, 3), (-10.6, -20.4, 1.0, 3)):
         for k in range(n):
             a = yaw + rng.uniform(-0.9, 0.9)
             ln = rng.uniform(1.4, 2.6)
@@ -1145,11 +1153,11 @@ def growth(sill):
                            spin=rng.random() * TAU, n=3)
     # Fallen leaves: drifted against the sill, on the landing, under the yew,
     # on the flags inside the gable door.
-    p.litter((0.0, -(fz - 1.2)), 1.9, 60, gb, LITTER)
-    p.litter((-3.2, -5.2), 2.6, 50, gb, LITTER)
-    p.litter((0.0, -(GABLE_Z + 2.0)), 2.4, 46, gb, LITTER)
-    p.litter((2.5, 31.0), 2.2, 30, gb, LITTER)
-    p.litter((4.9, -4.5), 1.6, 20, gb, LITTER)
+    p.litter((0.0, -(fz - 1.2)), 1.9, 36, gb, LITTER)
+    p.litter((-3.2, -5.2), 2.6, 30, gb, LITTER)
+    p.litter((0.0, -(GABLE_Z + 2.0)), 2.4, 27, gb, LITTER)
+    p.litter((2.5, 31.0), 2.2, 18, gb, LITTER)
+    p.litter((4.9, -4.5), 1.6, 12, gb, LITTER)
     # Moss on the bell's upturned flank, the altar slab and the sill ends.
     moss_pad(p, B(4.7, 4.9, 1.25), (0.9, 0.7, 0.2))
     moss_pad(p, B(-4.7, 4.9, gh(-4.7, 4.9) + 0.72), (0.8, 1.0, 0.16))
@@ -1227,7 +1235,6 @@ def main():
     import crypt_renders
     for (kx, kz, yaw, nm) in ((-1.3, -6.2, 8, 'InNave'), (-4.6, -34.0, -20, 'AtLychgate'), (1.5, -3.0, 20, 'AtStair')):
         crypt_renders.figure(GR, kx, kz, yaw, 'Knight_' + nm)
-    existing_world_proxies(mats)
     crypt_renders.vfx_reference(SOCKETS, CANDLES, sill)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, 'hollow_crypt_entrance_v2.blend'))
     if RENDERS != 'none':
