@@ -7,6 +7,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { DUNGEONS, MOBS } from '../src/sim/data';
 import {
+  HEROIC_DUNGEON_IDS,
   HEROIC_MIN_MOVE_SPEED,
   mobTemplateForDungeonDifficulty,
 } from '../src/sim/instances/difficulty';
@@ -51,6 +52,19 @@ describe('heroic move-speed floor', () => {
   });
 
   it('never mobilizes an immobile template in any heroic dungeon', () => {
+    // Every template authored immobile, placed or summoned by an encounter
+    // (cages, anchors, shackles, totems, hydra heads, the sacs), through every
+    // heroic transform.
+    const immobile = Object.values(MOBS).filter((m) => m.moveSpeed <= 0);
+    expect(immobile.map((m) => m.id)).toContain(EGG);
+    expect(immobile.length).toBeGreaterThan(10);
+    for (const dungeonId of HEROIC_DUNGEON_IDS) {
+      for (const base of immobile) {
+        const heroic = mobTemplateForDungeonDifficulty(base, dungeonId, 'heroic');
+        expect(heroic.moveSpeed, `${dungeonId} ${base.id}`).toBe(base.moveSpeed);
+      }
+    }
+    // And every placed walker of the five-mans still gets the floor.
     for (const dungeonId of [
       'hollow_crypt',
       'sunken_bastion',
@@ -60,9 +74,11 @@ describe('heroic move-speed floor', () => {
     ]) {
       for (const spawn of DUNGEONS[dungeonId].spawns) {
         const base = MOBS[spawn.mobId];
-        if (base.moveSpeed > 0) continue;
+        if (base.moveSpeed <= 0) continue;
         const heroic = mobTemplateForDungeonDifficulty(base, dungeonId, 'heroic');
-        expect(heroic.moveSpeed, `${dungeonId} ${spawn.mobId}`).toBe(0);
+        expect(heroic.moveSpeed, `${dungeonId} ${spawn.mobId}`).toBeGreaterThanOrEqual(
+          HEROIC_MIN_MOVE_SPEED,
+        );
       }
     }
   });
