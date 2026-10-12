@@ -1395,7 +1395,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the release/v0.45.0 merge into feature/sporemender-form (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '2fee551b0180b7e995c59e4e2dff55cd43f1876d3445b78b79d13129bca6e53e';
+  // Re-minted for Spore Burst: the renderer leaf gained the spore burster visual wiring. No capture was retaken.
+  '50eb87f555e48f50094f6088f00126805c53583d4a176ead89590b44354d772d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1419,7 +1420,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the release/v0.45.0 merge into feature/sporemender-form (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '53028058afefb5516f0e4533245d7ddaf00d174fba5727e622c2bf28687c1b81';
+  // Re-minted for Spore Burst: the renderer leaf gained the spore burster visual wiring. No capture was retaken.
+  '4eabd335d096e0370085f70a081b31dd29bc5410cf7032c58dfe35db9ed08054';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2804,7 +2806,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // release/v0.45.0 merge into feature/sporemender-form: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('b3149bcb4f0dda026f4b5ea648c35d03fafb871c51a840f7e131c04904868d94');
+      // Spore Burst renderer wiring: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+    ).toBe('dc1ee301886997055a9ae1f021c6e5c258d36604d411ec25bb75043f29efebce');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -55,6 +55,7 @@ import {
 } from './crafted_collection_effects';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
+import { naturesBoonOnHotTick } from './druid_natures_boon';
 import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
@@ -480,6 +481,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             const src = ctx.entities.get(a.sourceId);
             if (src && healed > 0) ctx.healingThreat(src, e, healed);
           }
+          // Groveheart Nature's Boon (combat/druid_natures_boon.ts): an owned
+          // HoT tick can arm the free Spore Burst window. Restoration-gated
+          // and cooldown-gated inside, before any rng draw.
+          naturesBoonOnHotTick(ctx, healer ?? null, a);
         } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
           e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));
         } else if (a.kind === 'polymorph') {

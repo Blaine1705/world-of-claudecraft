@@ -775,6 +775,7 @@ import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { SpiritGrade } from './spirit_grade';
+import { SporeBurstVisuals } from './spore_burst_visual';
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
@@ -1929,6 +1930,7 @@ export class Renderer {
   private farmPatchVisuals: FarmPatchVisuals | null = null;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private paladinConsecrationVisuals!: PaladinConsecrationVisuals;
+  private sporeBurstVisuals!: SporeBurstVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = {
     theme: 'frost',
     value: 0,
@@ -2996,6 +2998,12 @@ export class Renderer {
     );
     this.paladinConsecrationVisuals = new PaladinConsecrationVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.sporeBurstVisuals = new SporeBurstVisuals(
+      this.scene,
+      this.groundSample,
+      (id) => this.isHostileSelectionTargetId(id),
+      this.worldCompileGate(),
     );
     // The displayed pose every pooled ability VFX anchors on: the view group
     // lifted by the rider anchor, so a mounted player's shell wraps the rider.
@@ -4982,6 +4990,8 @@ export class Renderer {
     this.temporalHourglassGroundVisuals.update(dt);
     this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);
     this.paladinConsecrationVisuals.update(dt, this.reducedMotion());
+    this.sporeBurstVisuals.sync(this.sim.activeSporeBursts);
+    this.sporeBurstVisuals.update(dt, this.reducedMotion());
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
@@ -7487,7 +7497,9 @@ export class Renderer {
         // reads, not just its center.
         const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
         const at = new THREE.Vector3(ev.x, gy + 0.4, ev.z);
-        this.vfx.burst(at, ev.school, ev.fx === 'nova' ? 34 : 22, ev.fx === 'nova' ? 1.4 : 1);
+        // A Spore Burst pop reads as the heavier detonation too.
+        const heavy = ev.fx === 'nova' || ev.fx === 'sporeBurst';
+        this.vfx.burst(at, ev.school, heavy ? 34 : 22, heavy ? 1.4 : 1);
         if (ev.radius) this.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
         if (
           ev.ability === 'corpse_explosion' &&
@@ -8614,6 +8626,11 @@ export class Renderer {
         : target.hostile;
     }
     return this.isHostilePlayer(target);
+  }
+
+  private isHostileSelectionTargetId(id: number): boolean {
+    const target = this.sim.entities.get(id);
+    return target !== undefined && this.isHostileSelectionTarget(target);
   }
 
   // The shared client verdict (src/ui/pvp_hostile_core.ts): duel, ranked
@@ -11534,6 +11551,8 @@ export class Renderer {
     this.temporalHourglassGroundVisuals.update(dt);
     this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);
     this.paladinConsecrationVisuals.update(dt, this.reducedMotion());
+    this.sporeBurstVisuals.sync(this.sim.activeSporeBursts);
+    this.sporeBurstVisuals.update(dt, this.reducedMotion());
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);

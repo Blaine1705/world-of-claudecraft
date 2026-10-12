@@ -701,7 +701,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the release/v0.45.0 merge into feature/sporemender-form (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '53028058afefb5516f0e4533245d7ddaf00d174fba5727e622c2bf28687c1b81';
+  // Re-minted for Spore Burst: the renderer leaf gained the spore burster visual wiring. No capture was retaken.
+  '4eabd335d096e0370085f70a081b31dd29bc5410cf7032c58dfe35db9ed08054';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
