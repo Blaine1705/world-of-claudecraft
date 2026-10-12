@@ -61,7 +61,7 @@ export interface ClassDef {
   // Consumables in a fresh character's bags: every class carries food; the
   // mana classes also carry water. Saved characters load their own bags.
   startItems: { itemId: string; count: number }[];
-  // hunters: auto shot (4yd deadzone). casters: wand (wand:true → no deadzone,
+  // hunters: auto shot (no deadzone since v0.45). casters: wand (wand:true → no deadzone,
   // fires a magic-school bolt so they don't run into melee to auto-attack, #94)
   ranged?: WeaponInfo & {
     maxRange: number;
@@ -364,7 +364,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS,
-    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 4 },
+    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 0 },
     abilities: [
       'raptor_strike',
       'pack_command',
@@ -3939,7 +3939,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 1.5,
     cooldown: 0,
     range: 35,
-    minRange: 4,
     school: 'physical',
     projectile: true,
     scalesWith: 'ranged',
@@ -3989,7 +3988,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 0,
     range: 35,
-    minRange: 4,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -4020,7 +4018,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 6,
     range: 35,
-    minRange: 4,
     school: 'arcane',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -4045,7 +4042,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 12,
     range: 35,
-    minRange: 4,
     school: 'physical',
     projectile: true, // a fired shot: damage/slow resolve when the bolt lands
     // A fired shot: its flat damage scales off Ranged AP like the other shots,
@@ -4195,7 +4191,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 2.5,
     cooldown: 0,
     range: 35,
-    minRange: 4,
     school: 'physical',
     projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
@@ -4216,7 +4211,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     channel: { duration: 2.4, ticks: 6 },
     cooldown: 12,
     range: 35,
-    minRange: 4,
     school: 'physical',
     projectile: true,
     scalesWith: 'ranged',
@@ -7700,7 +7694,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 15,
     range: 25,
-    minRange: 4,
     school: 'physical',
     requiresTarget: true,
     effects: [
@@ -7739,7 +7732,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 60,
     range: 30,
-    minRange: 4,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -8293,7 +8285,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 20,
     range: 35,
-    minRange: 4,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: true,
