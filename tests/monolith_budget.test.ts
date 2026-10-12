@@ -2239,7 +2239,10 @@ const MONOLITHS: MonolithRow[] = [
     // kernel (pushOut, resolveAgainst, passesOver, rotY, colliderTopAt) moved
     // verbatim to collider_pushout.ts, the index itself is
     // interior_collider_cells.ts. wc -l. Exact count.
-    ceiling: 2392,
+    // LOWERED 2392 -> 2365 with the Fallen Chapel: the ruin ring's column
+    // layout moved to prop_layout.ts ruinRingColumns (shared with the
+    // renderer, and able to omit a column). wc -l. Exact count.
+    ceiling: 2365,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

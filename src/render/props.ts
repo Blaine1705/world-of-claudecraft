@@ -20,6 +20,7 @@ import {
   delveArchMouthSign,
   delveArchZ,
   propPlacementRoll,
+  ruinRingColumns,
 } from '../sim/prop_layout';
 import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
@@ -2032,13 +2033,9 @@ export function buildProps(
 
   // ---- ruin rings: weathered monolith columns at the exact collider angles -
   for (const r of getActiveWorldContent().props.ruinRings) {
-    for (let i = 0; i < r.columns; i++) {
-      const ang = (i / r.columns) * Math.PI * 2;
-      const x = r.x + Math.sin(ang) * r.ringR,
-        z = r.z + Math.cos(ang) * r.ringR;
-      const intact = i % 4 === 1;
+    for (const col of ruinRingColumns(r)) {
+      const { index: i, x, z, intact, scaleY: sy } = col;
       const kind: PropKey = intact ? 'column' : 'columnBroken';
-      const sy = intact ? 3.5 + (i % 2) * 0.5 : 1.7 + (i % 3) * 0.85;
       const y = ground(x, z);
       const g = new THREE.Group();
       addParts(g, kind, {
@@ -2054,10 +2051,8 @@ export function buildProps(
       // Hideable at the column's REAL drawn top, not the intact monolith's:
       // broken stumps are standable now, and registering them tall would put
       // a standing player's eye inside-and-below the footprint, vanishing
-      // the stump underfoot. Same height math as the collider (native tops
-      // 1.0 intact / 0.65 broken, times the y scale, minus the 0.1 sink).
-      const colTop = intact ? sy - 0.1 : 0.65 * sy - 0.1;
-      registerHideable(g, circleFootprint(x, z, 0.6, y + colTop, 2.2));
+      // the stump underfoot. The same top the collider uses (ruinRingColumns).
+      registerHideable(g, circleFootprint(x, z, 0.6, y + col.top, 2.2));
     }
     if (lowProps) continue;
     // toppled relics at the ring's heart: half-buried head + fallen column
