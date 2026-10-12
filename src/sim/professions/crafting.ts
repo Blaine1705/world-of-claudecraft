@@ -435,10 +435,20 @@ function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
  *  the signed instance on the RESOLVED id (gathering.ts). So a player who
  *  out-tooled the material, holding only signed fine copies, would pay the
  *  reagent line with one and still lose MASTERWORK_SIGNED_CHANCE, which is the
- *  same inversion the sibling exists to prevent. */
-function hasSignedInstance(meta: PlayerMeta, itemId: string): boolean {
+ *  same inversion the sibling exists to prevent.
+ *
+ *  Reads the Materials Vault's identity rows too when `vaultReachable` (the
+ *  vault draw is allowed where the crafter stands, the same gate that lets it
+ *  pay reagents): a signed copy banked there feeds the proc exactly like one in
+ *  the bags. Signed units never sit in the compact count record, so the
+ *  identity rows are the whole vault half. */
+function hasSignedInstance(meta: PlayerMeta, itemId: string, vaultReachable: boolean): boolean {
   const gradeIds = materialGradeIds(itemId);
-  return gradeIds.some((gradeId) => holdsMaterialSignature(meta.inventory, gradeId));
+  return gradeIds.some(
+    (gradeId) =>
+      holdsMaterialSignature(meta.inventory, gradeId) ||
+      (vaultReachable && holdsMaterialSignature(meta.vault.special, gradeId)),
+  );
 }
 
 /** The result of resolving one reagent's required quantity: the final count
@@ -911,10 +921,9 @@ export function resolveCraftForRecipe(
   // The masterwork signed-reagent input: a holding check over the recipe's
   // reagents BEFORE consumption (removeItem consumes end-backward, so the
   // signed copy itself may be what gets consumed), any signer counting.
-  // Deliberately still an INVENTORY-only check, like the #1145 discount: the
-  // signed bonus is keyed on HOLDING a signed copy in the bags. A vault draw
-  // may spend the crafter's OWN signed units (vault_material_sources.ts), but
-  // those feed neither this flag nor the discount.
+  // A signed copy in the bags OR in the Materials Vault (where the vault draw
+  // is allowed here) counts, any signer. The #1145 quantity discount stays
+  // bags-only; this flag does not.
   let signedReagentUsed = false;
   // Apply the plans decided above, one per reagent in reagent order. The two
   // flags are read off the SAME reagent this plan belongs to (the planner
@@ -932,7 +941,9 @@ export function resolveCraftForRecipe(
   recipe.reagents.forEach((reagent, i) => {
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
     if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
-    if (meta && hasSignedInstance(meta, reagent.itemId)) signedReagentUsed = true;
+    if (meta && hasSignedInstance(meta, reagent.itemId, vaultStock !== null)) {
+      signedReagentUsed = true;
+    }
     const plan = plans[i];
     // Lock-aware removal (issue 3042): the plan's carried takes were counted
     // over unlocked units only (the planner call above), and

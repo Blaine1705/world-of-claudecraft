@@ -54,6 +54,7 @@ import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { CoreStats } from '../src/sim/types';
 import { runCraft } from './helpers/enchant_family_cast';
+import { placeInDungeon } from './helpers/instanced_contexts';
 
 const statSum = (stats: Partial<CoreStats> | null | undefined): number => {
   if (!stats) return 0;
@@ -670,6 +671,38 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     expect(traded.ok).toBe(true);
     expect(traded.selfSignedBonusApplied).toBe(false);
     expect(traded.masterwork).toBe(true);
+  });
+
+  it('a signed reagent held in the Materials Vault feeds the proc chance like one in the bags', () => {
+    // Same hunted seed-21 window. Every reagent is paid from the bags; the
+    // only signed linen sits in the vault, so the proc fires only when the
+    // holding check reads the vault too (where vault draw is allowed).
+    const SEED = 21;
+    const setup = (sim: Sim, pid: number) => {
+      const meta = (sim as any).players.get(pid);
+      meta.vault.special.push({
+        itemId: 'linen_scrap',
+        count: 1,
+        instance: { signer: 'Gatherer Friend' },
+      });
+      sim.addItem('linen_scrap', 3, pid);
+      sim.addItem('spider_leg', 1, pid);
+      sim.addItem('homespun_cloth', 3, pid);
+      sim.addItem('spool_of_thread', 5, pid);
+    };
+    const vaulted = craftVestments(SEED, setup);
+    expect(vaulted.ok).toBe(true);
+    expect(vaulted.selfSignedBonusApplied).toBe(false);
+    expect(vaulted.masterwork).toBe(true);
+
+    // Inside a dungeon the vault is out of reach, so it feeds nothing: the
+    // identical draw misses.
+    const blocked = craftVestments(SEED, (sim, pid) => {
+      setup(sim, pid);
+      placeInDungeon(sim, pid);
+    });
+    expect(blocked.ok).toBe(true);
+    expect(blocked.masterwork).toBeUndefined();
   });
 
   it('a signed FINE grade feeds the proc chance for a recipe declaring its base', () => {
