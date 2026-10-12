@@ -362,7 +362,9 @@ describe('Eastbrook authored gameplay data integration', () => {
       [-69, 55],
     ]);
     expect(ZONE1_PROPS.ruinRings).toEqual([
-      { x: 80, z: 78, ringR: 7, columns: 7 },
+      // the Fallen Chapel's nave ring: its lane column is omitted
+      // (tests/hollow_crypt_entrance.test.ts)
+      { x: 80, z: 78, ringR: 7, columns: 7, omit: [0] },
       { x: -5, z: -60, ringR: 8, columns: 6 },
     ]);
     // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76): the

@@ -4,10 +4,15 @@
 // share one doorway, so dedupe by position. A door whose facade is a built
 // set piece hands that set piece's own colliders instead of the jambs: the
 // Gravewyrm Sanctum's Seal Gate (sanctum_seal_gate.ts), whose pylons ARE the
-// jambs. Extracted from colliders.ts under the monolith ratchet; the caller
-// passes its camera-top resolver.
+// jambs, and the Hollow Crypt's Fallen Chapel (hollow_crypt_entrance.ts),
+// whose stair-house portal is the door. Extracted from colliders.ts under the
+// monolith ratchet; the caller passes its camera-top resolver.
 import type { Collider } from './colliders';
 import { DUNGEON_LIST } from './data';
+import {
+  HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID,
+  hollowCryptEntranceColliders,
+} from './hollow_crypt_entrance';
 import {
   DOOR_ARCH_HEIGHT,
   DOOR_ARCH_JAMB_HD,
@@ -30,6 +35,10 @@ export function dungeonDoorJambColliders(
     doorSpots.add(key);
     if (dungeon.id === SANCTUM_SEAL_GATE_DUNGEON_ID) {
       out.push(...sanctumSealGateColliders(seed, dungeon.doorPos));
+      continue;
+    }
+    if (dungeon.id === HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID) {
+      out.push(...hollowCryptEntranceColliders(seed, dungeon.doorPos));
       continue;
     }
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {

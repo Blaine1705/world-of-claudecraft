@@ -2245,7 +2245,10 @@ export const ZONE1_PROPS: ZonePropsDef = {
   ],
   marshReeds: [],
   ruinRings: [
-    { x: 80, z: 78, ringR: 7, columns: 7 },
+    // The Fallen Chapel's nave was built round this ring (the Hollow Crypt's
+    // world entrance, src/sim/hollow_crypt_entrance.ts): its north column
+    // stood on the crypt's door lane, a yard south of the exit drop.
+    { x: 80, z: 78, ringR: 7, columns: 7, omit: [0] },
     { x: -5, z: -60, ringR: 8, columns: 6 },
   ],
   fences: EASTBROOK_LAYOUT.fences.map((fence) => ({
