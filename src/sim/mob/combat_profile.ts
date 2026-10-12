@@ -25,7 +25,9 @@ import {
   LEASH_DISTANCE,
   steadyAngleTo,
 } from '../types';
+import { casterSightBlocked, lastSightBlocked, petSpellSightVerdict } from './cast_sight';
 import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
+import { clearChaseRoute, followChaseRoute } from './chase_route';
 import { updateDerelictBomber } from './derelict_bomber';
 import { dragonkinEngageShout } from './dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
@@ -53,6 +55,7 @@ export function startEvadeHome(mob: Entity): void {
   mob.leashAnchor = null;
   clearChainPullInbound(mob);
   releasePin(mob);
+  clearChaseRoute(mob);
   // A frozen windup must not detonate mid-walk-home (its ring is long gone);
   // the full evade reset on arrival clears the rest of the mechanic state.
   resetRiftMechanicWindups(mob);
@@ -110,6 +113,7 @@ export function updateMobCombatProfile(
     mob.autoAttack = false;
     // No target, no pin: a mob that lost its fight never keeps the immune stance.
     releasePin(mob);
+    clearChaseRoute(mob);
     retargetMob(ctx, mob);
     return 'done';
   }
@@ -224,7 +228,19 @@ export function updateMobCombatProfile(
   const chaseSpeed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
   if (spell) {
     const result = updateCasterCombat(ctx, mob, target, profile, spell);
-    if (profile.canLeash && chaseStalledUnreachable(ctx, mob, target, spell.range, chaseSpeed)) {
+    // Standing at spell range is "in reach" only for a caster that can see its
+    // target (mob/cast_sight.ts): one walled off from it must close like a
+    // melee mob, so a caster no route brings to a sight line stalls like any
+    // other unreachable chase instead of standing in range forever.
+    const reach = lastSightBlocked(mob, target) ? profile.meleeRange : spell.range;
+    // A caster standing through its own cast bar is planted by the cast (an
+    // area bar holds it on its spot, mob/trash_kit/cast_hold.ts), not pinned
+    // by the wall: the stall clock holds for the bar, as it does for a root.
+    if (
+      profile.canLeash &&
+      mob.castingAbility === null &&
+      chaseStalledUnreachable(ctx, mob, target, reach, chaseSpeed)
+    ) {
       onChaseStalled(mob, instanceHold);
       return 'done';
     }
@@ -261,11 +277,17 @@ export function holdPinnedMob(ctx: SimContext, mob: Entity): void {
     return;
   }
   const profile = mobCombatProfile(mob);
-  const reach = MOBS[mob.templateId]?.petSpell?.range ?? profile.meleeRange;
+  const spell = MOBS[mob.templateId]?.petSpell;
+  const reach = spell?.range ?? profile.meleeRange;
   const chaseSpeed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
   mob.autoAttack = false;
   mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
-  if (dist2d(mob.pos, target.pos) <= reach) {
+  // A caster is in reach at spell range only when it also sees its target
+  // (mob/cast_sight.ts); walled off, it holds and then phases like a melee mob.
+  if (
+    dist2d(mob.pos, target.pos) <= reach &&
+    !(spell !== undefined && casterSightBlocked(ctx, mob, target, spell.range))
+  ) {
     releasePin(mob);
     return;
   }
@@ -342,11 +364,14 @@ function updateHealerHold(ctx: SimContext, mob: Entity): MobCombatProfileResult 
 }
 
 // The classic caster loop, keyed on the mob's engaged state: in attack it
-// stands and casts until the target leaves spell range; in chase it closes
-// until the target is in spell range, then flips to attack with the fast-cast
-// clamp. The chase-arm melee probes are dead in practice (every shipped
-// petSpell range dwarfs melee reach) but are kept verbatim from the legacy
-// chase arm so a hypothetical short-range caster behaves exactly as before.
+// stands and casts until the target leaves spell range or its sight; in chase
+// it closes until the target is in spell range AND in sight, then flips to
+// attack with the fast-cast clamp. A cast needs a line of sight to begin and
+// to land (mob/cast_sight.ts), and a caster without one walks its route round
+// the wall (mob/chase_route.ts) instead of casting through it. The chase-arm
+// melee probes are dead in practice (every shipped petSpell range dwarfs melee
+// reach) but are kept verbatim from the legacy chase arm so a hypothetical
+// short-range caster behaves exactly as before.
 function updateCasterCombat(
   ctx: SimContext,
   mob: Entity,
@@ -361,22 +386,33 @@ function updateCasterCombat(
       return 'done';
     }
     mob.autoAttack = false; // casting from range, not swinging
-    ctx.updateRangedPetAttack(mob, target, spell);
+    // Sight is asked for when a cast begins and when its windup ends, never in
+    // between: a target that hides mid-windup lets the windup run out and then
+    // takes nothing.
+    const verdict = petSpellSightVerdict(ctx, mob, target);
+    if (verdict === 'seek') {
+      mob.aiState = 'chase';
+      return 'done';
+    }
+    if (verdict === 'cast') ctx.updateRangedPetAttack(mob, target, spell);
     return 'done';
   }
-  if (d <= spell.range) {
+  const blocked = casterSightBlocked(ctx, mob, target, spell.range);
+  if (d <= spell.range && !blocked) {
     mob.aiState = 'attack';
     mob.swingTimer = Math.min(mob.swingTimer, 0.4);
+    clearChaseRoute(mob);
     return 'done';
   }
   mob.swingTimer = Math.max(0, mob.swingTimer - DT);
   if (tryMobMeleeSwingInRange(ctx, mob, target)) return 'done';
   if (!ctx.isRooted(mob)) {
-    ctx.moveToward(
-      mob,
-      target.pos,
-      mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob),
-    );
+    const speed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
+    // No line of sight: round the wall by its route. With one (the target is
+    // only out of range), or with no route to take, straight at it as before.
+    if (!(blocked && followChaseRoute(ctx, mob, target, speed))) {
+      ctx.moveToward(mob, target.pos, speed);
+    }
   } else {
     mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
   }

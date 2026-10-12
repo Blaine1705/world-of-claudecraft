@@ -29,6 +29,9 @@ export interface TrashKitExtension {
   castDef(kit: TrashKitDef, key: string): TrashKitCast | undefined;
   /** A physical cast: a silence never breaks it, no school lockout gates it. */
   isPhysical(key: string): boolean;
+  /** Its casts at ONE PLAYER that need a line of sight to begin and to land
+   *  (kit_cast_sight.ts). A cast with its own sight rule is left out. */
+  readonly sightKeys?: readonly string[];
   /** May the cast start now? Its victim (or ally) when it has one. */
   ready(
     ctx: SimContext,

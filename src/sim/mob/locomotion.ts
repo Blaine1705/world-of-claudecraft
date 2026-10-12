@@ -1688,6 +1688,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.leashAnchor = null;
   mob.evadeStall = 0;
   mob.chaseStall = 0;
+  mob.chaseRoute = undefined;
   // A full evade-home reset ends this pull for good; the epoch counts them.
   mob.evadeEpoch++;
   mob.chainPullInbound = false;

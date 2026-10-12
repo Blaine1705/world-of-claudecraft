@@ -388,6 +388,26 @@ export type EntityKind = 'player' | 'mob' | 'npc' | 'object';
 
 export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 
+/** An engaged mob's cached route to its target (mob/chase_route.ts). */
+export interface MobChaseRoute {
+  /** The target this record was made for; another target starts a fresh one. */
+  targetId: number;
+  /** Waypoints still ahead (world x and z), the last one the target's spot
+   *  when the route was planned. One or none: no route, chase straight. */
+  path: Vec3[];
+  /** The sim tick before which no new plan is made. */
+  planAt: number;
+  /** Routes walked toward the target while it stood within reach of the
+   *  anchor spot; past the cap no more are planned until it moves. */
+  tries: number;
+  anchorX: number;
+  anchorZ: number;
+  /** A caster's last line-of-sight answer and the sim tick it expires on
+   *  (mob/cast_sight.ts). */
+  sightClear: boolean;
+  sightAt: number;
+}
+
 export type AuraKind =
   | 'dot'
   | 'doctrine'
@@ -7696,6 +7716,11 @@ export interface Entity extends ClientMirroredEntityFields {
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
+  // An engaged mob's route round an obstacle and, for a caster, its throttled
+  // line-of-sight answer (mob/chase_route.ts, mob/cast_sight.ts). Present only
+  // while something is in its way: undefined whenever the mob chases straight
+  // or stands casting with a clear line (never deleted).
+  chaseRoute?: MobChaseRoute;
   chaseStall: number; // seconds an engaged mob has been pinned unable to close on its target; at CHASE_STALL_TIMEOUT (mob/reachability.ts) it evades home like a leash break
   evadeEpoch: number; // bumped every full evade-home reset (resetEvadingMob): a test-observable count of pulls this mob has walked home from
   chainPullInbound: boolean; // woken by a boss chain pull and still crossing to the puller; suspends the soft leash until it arrives (mob/chain_pull_transit.ts)

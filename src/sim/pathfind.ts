@@ -26,6 +26,13 @@ export interface PathOpts {
   swim?: boolean;
   // Per-Sim rift collision token (colliders.ts registry); 0/undefined = none.
   riftToken?: number;
+  // Yards of slack round the start/goal bounding box (default MARGIN). A mob
+  // routing round a wall needs more than a Charge does: the way through may
+  // lie well to one side (mob/chase_route.ts).
+  margin?: number;
+  // The module list of the delve run the mover is in, so its cells are judged
+  // against the rooms that run rolled (colliders.ts delve arm).
+  delveModules?: readonly string[];
 }
 
 function minGroundAt(o: PathOpts, x: number, z: number): number {
@@ -80,7 +87,7 @@ function segmentWalkable(
     if (
       (!isEnd || !allowBlockedEnd) &&
       (h < minGroundAt(o, x, z) ||
-        isBlocked(o.seed, x, z, o.bodyRadius, o.ignoreFences, undefined, o.riftToken))
+        isBlocked(o.seed, x, z, o.bodyRadius, o.ignoreFences, o.delveModules, o.riftToken))
     ) {
       return false;
     }
@@ -123,10 +130,11 @@ export function findPath(
   to: { x: number; z: number },
   o: PathOpts,
 ): { x: number; z: number }[] {
-  const minX = Math.min(from.x, to.x) - MARGIN;
-  const minZ = Math.min(from.z, to.z) - MARGIN;
-  const W = Math.ceil((Math.max(from.x, to.x) + MARGIN - minX) / CELL);
-  const H = Math.ceil((Math.max(from.z, to.z) + MARGIN - minZ) / CELL);
+  const margin = o.margin ?? MARGIN;
+  const minX = Math.min(from.x, to.x) - margin;
+  const minZ = Math.min(from.z, to.z) - margin;
+  const W = Math.ceil((Math.max(from.x, to.x) + margin - minX) / CELL);
+  const H = Math.ceil((Math.max(from.z, to.z) + margin - minZ) / CELL);
   const maxSpan = o.maxSpan ?? MAX_SPAN;
   if (W > maxSpan || H > maxSpan) return [{ x: to.x, z: to.z }];
   const cx = (gx: number) => minX + (gx + 0.5) * CELL;
@@ -158,7 +166,15 @@ export function findPath(
         i === startIdx ||
         i === goalIdx ||
         (groundAt(i) >= minGroundAt(o, cellX, cellZ) &&
-          !isBlocked(o.seed, cellX, cellZ, o.bodyRadius, o.ignoreFences, undefined, o.riftToken));
+          !isBlocked(
+            o.seed,
+            cellX,
+            cellZ,
+            o.bodyRadius,
+            o.ignoreFences,
+            o.delveModules,
+            o.riftToken,
+          ));
       walk[i] = ok ? 1 : -1;
     }
     return walk[i] === 1;

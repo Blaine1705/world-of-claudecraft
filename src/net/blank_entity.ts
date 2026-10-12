@@ -189,6 +189,7 @@ export function blankEntity(id: number): Entity {
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
     evadeStall: 0,
+    chaseRoute: undefined,
     chaseStall: 0,
     evadeEpoch: 0,
     chainPullInbound: false,
