@@ -118,6 +118,17 @@ describe('buildDoorBody: the Hollow Crypt Fallen Chapel', () => {
   });
 });
 
+describe('buildDoorBody: the Drowned Temple Moon Stair', () => {
+  it('the entering Temple door is only the invisible click box: the moongate draws the portal', () => {
+    expect(doorArchAuthoredElsewhere('drowned_temple')).toBe(true);
+    const { body, portal } = buildDoorBody(true, 'drowned_temple', false);
+    expect(portal).toBeUndefined();
+    expect(meshes(body).length).toBe(1);
+    // the exit inside the instance keeps the generic arch and its swirl
+    expect(buildDoorBody(false, 'drowned_temple', false).portal).toBeDefined();
+  });
+});
+
 describe('buildDoorBody: the Gravewyrm Sanctum Seal Gate', () => {
   it('the entering Sanctum door is only the invisible click box: no arch, no swirl disc', () => {
     expect(doorArchAuthoredElsewhere('gravewyrm_sanctum')).toBe(true);

@@ -6258,6 +6258,7 @@ export interface ZonePropsDef {
     omit?: readonly number[];
     bare?: boolean;
   }[];
+  ruinRings: { x: number; z: number; ringR: number; columns: number }[]; // columns 0: a terrain calm anchor only
   // kind 'stone': the low scalloped KayKit stone wall (garden/path walls);
   // kind 'palisade': the spiked KayKit log wall (raider camps); both keep
   // the wood rail's run geometry and the same jumpable OBB

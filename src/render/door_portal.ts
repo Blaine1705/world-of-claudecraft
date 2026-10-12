@@ -995,6 +995,10 @@ export function doorArchAuthoredElsewhere(
   // its stair-house portal frames the walk-in lane and the stair it draws
   // behind the arch is the portal look.
   if (dungeonId === 'hollow_crypt') return true;
+  // The Drowned Temple's Moon Stair (drowned_temple_entrance.ts) is the door:
+  // its moongate ring frames the walk-in lane and the film of cold moonlight
+  // it draws in the ring is the portal look.
+  if (dungeonId === 'drowned_temple') return true;
   // The raid family's overworld door belongs to its chain HEAD (the
   // Forge-Lift since the lift became the first room; the Halls id stays
   // covered so a chain reshuffle can never resurrect the generic arch

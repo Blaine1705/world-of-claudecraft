@@ -522,6 +522,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the Seal Gate rune light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/sunken_bastion_entrance.ts':
     'the Drowned Gate Tower pulse light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/drowned_temple_entrance.ts':
+    'the Moon Stair gate light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/realm_flora.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/soulwell.ts':
@@ -614,6 +616,10 @@ describe('every point-light producer is a carrier source', () => {
       // The Drowned Temple's Hydra Pool water: a mesh hook reading the drain
       // (the Prism Stair gate's openness), never a scene.
       'render/drowned_temple/temple_landmarks.ts: water',
+      // The Moon Stair's mist: a mesh hook writing the time of day, the
+      // reduced-motion switch, the gate's ghost and the gate light's base,
+      // never a scene.
+      'render/drowned_temple_entrance.ts: mesh',
       'render/gather_nodes.ts: target',
       'render/goblin_rocket_sled_fx.ts: inner',
       'render/goblin_rocket_sled_fx.ts: outer',

@@ -24,5 +24,6 @@ export function buildStaticWorldFeatures(seed: number) {
     buildSanctumSealGate(seed),
     buildSunkenBastionEntrance(seed),
     buildHollowCryptEntrance(seed),
+    buildDrownedTempleEntrance(seed),
   ];
 }

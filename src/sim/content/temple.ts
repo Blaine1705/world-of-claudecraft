@@ -829,9 +829,13 @@ export const TEMPLE_OBJECTS: GroundObjectDef[] = [
   },
 ];
 
-// Static props for the surface site: a ring of drowned columns around the gate
-// and Ondrel's lonely little camp just south of it (rendering + collision share
-// this, like every other ZonePropsDef).
+// Static props for the surface site: Ondrel's lonely little camp just south of
+// the gate (rendering + collision share this, like every other ZonePropsDef).
+// The old ring of drowned columns round the gate gave way to the Moon Stair
+// (src/sim/drowned_temple_entrance.ts). Its row stays with ZERO columns: a
+// ring is also one of the terrain's calm anchors (terrain_calm_anchors.ts), so
+// the ground the set piece was modelled on is unchanged, and a ring with no
+// columns draws and collides nothing (colliders.ts, render/props.ts).
 export const TEMPLE_PROPS: ZonePropsDef = {
   buildings: [],
   wells: [],
@@ -846,7 +850,7 @@ export const TEMPLE_PROPS: ZonePropsDef = {
   campfires: [[-63, 788]],
   mudHuts: [],
   marshReeds: [],
-  ruinRings: [{ x: -70, z: 792, ringR: 7, columns: 6 }],
+  ruinRings: [{ x: -70, z: 792, ringR: 7, columns: 0 }],
   fences: [],
   graveyards: [],
 };

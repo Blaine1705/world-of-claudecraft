@@ -3865,7 +3865,7 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // The Old Beacon's stair, the Last Keep's walls and flights, and the
   // Forgefather stair ramps all ride the same idiom, summed by the
   // walk_lifts leaf: raised walkable ground the render terrain never sees.
-  const terrain = overworldWalkSurface(x, z, terrainHeight(x, z, seed));
+  const terrain = overworldWalkSurface(x, z, terrainHeight(x, z, seed), seed);
   return Math.max(
     terrain,
     dockSurfaceHeight(

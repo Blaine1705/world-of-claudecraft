@@ -50,6 +50,10 @@ export function dungeonDoorJambColliders(
       out.push(...hollowCryptEntranceColliders(seed, dungeon.doorPos));
       continue;
     }
+    if (dungeon.id === DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID) {
+      out.push(...drownedTempleEntranceColliders(seed, dungeon.doorPos));
+      continue;
+    }
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {
       const x = dungeon.doorPos.x + sx;
       out.push({

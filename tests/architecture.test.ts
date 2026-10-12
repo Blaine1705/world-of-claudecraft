@@ -1021,6 +1021,9 @@ const RENDER_PURE_CORES = [
   // The Hollow Crypt's Fallen Chapel: the virtual stair trace, the grave
   // mist's puffs and the spirit sprites (flames, motes, wisps, rose glow).
   'src/render/hollow_crypt_entrance_core.ts',
+  // The Drowned Temple's Moon Stair: the moonrise's clock, the pool's moon and
+  // its parallax, the mirror's sight of the gate, the mist and the sprites.
+  'src/render/drowned_temple_entrance_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',

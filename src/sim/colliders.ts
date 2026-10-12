@@ -986,6 +986,39 @@ function staticWorldColliders(seed: number): Collider[] {
       const top = topY(seed, col.x, col.z, col.top);
       const stump = col.intact ? {} : { moveTopY: top, standable: true as const };
       out.push({ type: 'circle', x: col.x, z: col.z, r: 0.6, cameraTopY: top, ...stump });
+  for (const ruin of PROPS.ruinRings.filter((r) => r.columns > 0)) {
+    for (let i = 0; i < ruin.columns; i++) {
+      const ang = (i / ruin.columns) * Math.PI * 2;
+      const x = ruin.x + Math.sin(ang) * ruin.ringR,
+        z = ruin.z + Math.cos(ang) * ruin.ringR;
+      // The renderer keeps every fourth column intact (a tall monolith) and
+      // breaks the rest into STUMPS of three deterministic heights. A stump
+      // is a standable pillar a jump can grab, not an infinite wall: top =
+      // column_broken's 0.65 native top x the render's y-scale, minus the
+      // 0.1 the group sinks.
+      const intact = i % 4 === 1;
+      if (intact) {
+        const sy = 3.5 + (i % 2) * 0.5;
+        out.push({
+          type: 'circle',
+          x,
+          z,
+          r: 0.6,
+          cameraTopY: topY(seed, x, z, sy - 0.1),
+        });
+      } else {
+        const sy = 1.7 + (i % 3) * 0.85;
+        const top = topY(seed, x, z, 0.65 * sy - 0.1);
+        out.push({
+          type: 'circle',
+          x,
+          z,
+          r: 0.6,
+          cameraTopY: top,
+          moveTopY: top,
+          standable: true,
+        });
+      }
     }
     // Toppled relics at the ring's heart (render offsets from props.ts): the
     // half-buried statue head, the carved block, and the fallen column lying
