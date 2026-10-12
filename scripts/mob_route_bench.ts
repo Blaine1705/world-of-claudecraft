@@ -1,25 +1,36 @@
 // Benchmark for mob route planning and the line-of-sight rule (src/sim/mob/
-// chase_route.ts, mob/cast_sight.ts). It PRINTS numbers; it asserts nothing
-// about wall time (a loaded machine would make that a coin toss). The counters
-// it prints beside them (plans and search nodes per tick, Sim.mobScanCounters)
-// are deterministic and are what the route budget is judged by.
+// chase_route.ts, mob/route_search.ts, mob/cast_sight.ts). It PRINTS numbers;
+// it asserts nothing about wall time (a loaded machine would make that a coin
+// toss). The counters it prints beside them (searches, cells judged, mobs
+// deferred and sight queries per tick, Sim.mobScanCounters) are deterministic
+// and are what the two per-tick budgets are judged by.
 //
 //   npx tsx scripts/mob_route_bench.ts
 //
-// Two worlds: the open world (Dawnhold's east curtain wall and its one gate,
-// on the shipped seed) and a claimed heroic Hollow Crypt (the Undercroft
-// Grille's curtain wall and the Ossuary Monument). Per world:
-//   single plans   a clear line, a wall detour that exists, a search that
-//                  fails on a perched target 6 yd away, and a failed search
-//                  at the widest window the planner accepts;
-//   whole ticks    a pack of 20 casters whose target steps out of sight, and
-//                  10 casters with their target dancing across a doorway edge,
-//                  each against the same scene with the target standing still.
-// The single searches call the planner directly in both worlds, to price it;
-// the mob AI itself plans routes only inside a claimed instance, so the open
-// world's whole-tick rows show no search at all. A delve room is timed for the
-// sight query alone (no route is planned in a delve).
+// What it measures:
+//   single searches   in the open world (Dawnhold's east curtain wall and its
+//                     one gate, on the shipped seed) and in a claimed heroic
+//                     Hollow Crypt (the Undercroft Grille's curtain wall and
+//                     the Ossuary Monument): a clear line, a wall detour, a
+//                     perched target, the widest window. Each row prints what
+//                     the search itself answered (found, none, refused).
+//   a tick's budget   timed DIRECTLY, with no whole-tick noise: the most route
+//                     work one tick can do (ROUTE_NODES_PER_TICK cells: one
+//                     capped search and a second in the cells left) and the
+//                     most sight work (SIGHT_QUERIES_PER_TICK queries), in the
+//                     Hollow Crypt and in the dungeon interior with the most
+//                     colliders (found by counting, not by name).
+//   whole scenes      a pack of 20 casters whose target steps out of sight,
+//                     and 10 casters with their target dancing across a
+//                     doorway edge, each against the same scene with the
+//                     target standing still: the per-tick counters, and the
+//                     whole sim tick's time for reference.
+// The searches are called directly in both worlds, to price them; the mob AI
+// itself plans routes only inside a claimed instance, so the open world's
+// scene rows show no search at all. A delve room is timed for the sight query
+// alone (no route is planned in a delve).
 
+import { interiorColliderFrame, isBlocked } from '../src/sim/colliders';
 import { DELVES, DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { DAWNHOLD, DAWNHOLD_GATES } from '../src/sim/dawnhold_layout';
 import { createMob } from '../src/sim/entity';
@@ -29,7 +40,13 @@ import {
   mobTemplateForDungeonDifficulty,
 } from '../src/sim/instances/difficulty';
 import { claimedInstanceAt } from '../src/sim/instances/dungeons';
-import { planChaseRoute } from '../src/sim/mob/chase_route';
+import { SIGHT_QUERIES_PER_TICK } from '../src/sim/mob/cast_sight';
+import {
+  ROUTE_NODES_PER_PLAN,
+  ROUTE_NODES_PER_TICK,
+  routeSearchOpts,
+} from '../src/sim/mob/chase_route';
+import { searchRoute } from '../src/sim/mob/route_search';
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
@@ -94,17 +111,17 @@ function openWorld(): World {
     plans: [
       { name: 'clear line, 28 yd', from: { x: wall + 34, z: 905 }, to: { x: wall + 6, z: 905 } },
       {
-        name: 'wall detour found (gate 18 yd aside)',
+        name: 'wall detour (gate 18 yd aside)',
         from: { x: wall + 8, z: gate + 18 },
         to: { x: wall - 8, z: gate + 18 },
       },
       {
-        name: 'failed: perched target 6 yd away',
+        name: 'target on the wall line, 6 yd away',
         from: { x: wall + 6, z: gate + 18 },
         to: { x: wall, z: gate + 18 },
       },
       {
-        name: 'failed: widest window (perched)',
+        name: 'widest window (perched)',
         from: { x: wall + 30, z: gate + 43 },
         to: { x: wall, z: gate + 12 },
       },
@@ -169,14 +186,14 @@ function crypt(shutGate: boolean): World {
     },
     plans: [
       { name: 'clear line, 26 yd', from: { x: 13, z: -44 }, to: { x: 13, z: -18 } },
-      { name: 'monument detour found', from: { x: 0, z: -44 }, to: { x: 0, z: -18 } },
+      { name: 'monument detour', from: { x: 0, z: -44 }, to: { x: 0, z: -18 } },
       {
-        name: shutGate ? 'failed: wall with its gate shut' : 'wall detour found (gate 18 yd aside)',
+        name: shutGate ? 'wall with its gate shut' : 'wall detour (gate 18 yd aside)',
         from: { x: 18, z: 30 },
         to: { x: 18, z: 12 },
       },
-      { name: 'failed: perched target 6 yd away', from: { x: 0, z: -38.5 }, to: { x: 0, z: -32 } },
-      { name: 'failed: widest window (perched)', from: { x: 30, z: -61 }, to: { x: 0, z: -30 } },
+      { name: 'perched target 6 yd away', from: { x: 0, z: -38.5 }, to: { x: 0, z: -32 } },
+      { name: 'widest window (perched)', from: { x: 30, z: -61 }, to: { x: 0, z: -30 } },
     ],
     pack: {
       casters: (i) => ({ x: 10 + (i % 5) * 2.2, z: 28 + Math.floor(i / 5) * 2.2 }),
@@ -193,33 +210,193 @@ function crypt(shutGate: boolean): World {
 
 const ms = (n: number): string => n.toFixed(3).padStart(8);
 
+/** min / median / max of a sample, formatted. */
+function spread(times: number[]): string {
+  times.sort((a, b) => a - b);
+  return `${ms(times[0])} ${ms(times[times.length >> 1])} ${ms(times[times.length - 1])}`;
+}
+
+/** Time `fn` `n` times after `warm` unmeasured calls. */
+function timed(fn: () => void, n: number, warm = 5): number[] {
+  for (let i = 0; i < warm; i++) fn();
+  const times: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const t0 = performance.now();
+    fn();
+    times.push(performance.now() - t0);
+  }
+  return times;
+}
+
 function benchPlans(w: World): void {
   const mob = w.spawn(w.caster, w.plans[0].from);
   console.log(
     `\n== ${w.name}: single searches, called directly (ms: min / median / max over 15) ==`,
   );
-  // Where the search keeps a tally (since the route budget landed) the cells
-  // it judged are printed too: that number is the same on every machine.
-  const tally = w.sim.mobScanCounters as unknown as Record<string, number | undefined>;
   for (const c of w.plans) {
     place(w, mob, c.from);
     place(w, w.player, c.to);
-    const times: number[] = [];
-    let len = 0;
-    let nodes = 0;
-    for (let i = 0; i < 18; i++) {
-      const before = tally.routeNodes ?? 0;
-      const t0 = performance.now();
-      len = planChaseRoute(w.sim.ctx, mob, w.player).length;
-      if (i >= 3) times.push(performance.now() - t0);
-      nodes = (tally.routeNodes ?? 0) - before;
-    }
-    times.sort((a, b) => a - b);
+    const opts = routeSearchOpts(w.sim.ctx, mob);
+    let result = searchRoute(mob.pos, w.player.pos, opts);
+    const times = timed(() => {
+      result = searchRoute(mob.pos, w.player.pos, opts);
+    }, 15);
+    // What the search itself answered, so no row's label has to be believed.
+    const outcome = !result.attempted
+      ? 'refused (window too wide)'
+      : result.found
+        ? `found, ${result.path.length} waypoint${result.path.length === 1 ? '' : 's'}`
+        : result.nodes >= opts.maxNodes
+          ? 'none (stopped at the cap)'
+          : 'none (window flooded)';
     console.log(
-      `  ${c.name.padEnd(40)} ${ms(times[0])} ${ms(times[times.length >> 1])} ${ms(times[times.length - 1])}   waypoints ${len}  cells judged ${tally.routeNodes === undefined ? 'n/a' : nodes}`,
+      `  ${c.name.padEnd(40)} ${spread(times)}   cells judged ${String(result.nodes).padStart(3)}  ${outcome}`,
     );
   }
   w.sim.ctx.dropEntity(mob.id);
+}
+
+/**
+ * The most a tick can spend, timed DIRECTLY (no whole-tick noise): the route
+ * budget is one capped search plus whatever a second one fits in the cells
+ * left, and the sight budget is SIGHT_QUERIES_PER_TICK queries. `from` must be
+ * walkable and `to` a spot no route reaches, so both searches run to their
+ * caps.
+ */
+function benchBudgets(
+  label: string,
+  sim: Sim,
+  mob: Entity,
+  target: Entity,
+  cases: { name: string; from: Spot; to: Spot }[],
+  put: (e: Entity, at: Spot) => void,
+): void {
+  console.log(
+    `\n== ${label}: a tick's whole budget, timed directly (ms: min / median / max over 30) ==`,
+  );
+  for (const c of cases) {
+    put(mob, c.from);
+    put(target, c.to);
+    const opts = routeSearchOpts(sim.ctx, mob);
+    const rest = { ...opts, maxNodes: ROUTE_NODES_PER_TICK - ROUTE_NODES_PER_PLAN };
+    let judged = 0;
+    const route = timed(() => {
+      judged =
+        searchRoute(mob.pos, target.pos, opts).nodes + searchRoute(mob.pos, target.pos, rest).nodes;
+    }, 30);
+    let clear = 0;
+    const sight = timed(() => {
+      clear = 0;
+      for (let i = 0; i < SIGHT_QUERIES_PER_TICK; i++) {
+        if (sim.ctx.hasLineOfSight(mob, target)) clear++;
+      }
+    }, 30);
+    const one = timed(
+      () => {
+        sim.ctx.hasLineOfSight(mob, target);
+      },
+      200,
+      20,
+    );
+    const yards = Math.hypot(mob.pos.x - target.pos.x, mob.pos.z - target.pos.z).toFixed(0);
+    console.log(`  ${c.name} (${yards} yd apart)`);
+    console.log(
+      `    route: the tick's ${ROUTE_NODES_PER_TICK} cells`.padEnd(46) +
+        `${spread(route)}   cells judged ${judged}`,
+    );
+    console.log(
+      `    sight: the tick's ${SIGHT_QUERIES_PER_TICK} queries`.padEnd(46) +
+        `${spread(sight)}   clear ${clear} of ${SIGHT_QUERIES_PER_TICK}`,
+    );
+    console.log(`    sight: one query`.padEnd(46) + `${spread(one)}`);
+  }
+}
+
+function benchCryptBudgets(): void {
+  const w = crypt(true);
+  const mob = w.spawn(w.caster, { x: 18, z: 30 });
+  benchBudgets(
+    w.name,
+    w.sim,
+    mob,
+    w.player,
+    [
+      { name: 'across the shut grille', from: { x: 18, z: 30 }, to: { x: 18, z: 12 } },
+      { name: 'the monument between them', from: { x: 0, z: -44 }, to: { x: 0, z: -18 } },
+      { name: 'a clear line', from: { x: 13, z: -44 }, to: { x: 13, z: -18 } },
+    ],
+    (e, at) => place(w, e, at),
+  );
+}
+
+/** The dungeon interior with the most colliders (its cell lists are the
+ *  longest, so a judged cell and a sight sample cost the most there). */
+function densestInterior(): { id: string; ox: number; oz: number; colliders: number } {
+  let best = { id: '', ox: 0, oz: 0, colliders: -1 };
+  for (const def of Object.values(DUNGEONS)) {
+    // An unclaimed slot: every gate shut, the dungeon's whole collider set.
+    const o = instanceOrigin(def.index, 9);
+    const frame = interiorColliderFrame(o.x, o.z);
+    if (frame && frame.list.length > best.colliders) {
+      best = { id: def.id, ox: frame.ox, oz: frame.oz, colliders: frame.list.length };
+    }
+  }
+  return best;
+}
+
+function benchDensestInterior(): void {
+  const d = densestInterior();
+  const sim = new Sim({ seed: 23, playerClass: 'warrior', autoEquip: false });
+  const seed = sim.cfg.seed;
+  const free = (x: number, z: number): boolean =>
+    !isBlocked(seed, d.ox + x + 0.5, d.oz + z + 0.5, 0.5);
+  // A floor cell with open floor round it, nearest the interior's origin, and
+  // from it: a far floor cell in a straight clear line, and a cell deep inside
+  // a collider (a perch no route reaches).
+  let from: Spot | null = null;
+  for (let ring = 0; ring < 120 && !from; ring++) {
+    for (let x = -ring; x <= ring && !from; x++) {
+      for (let z = -ring; z <= ring && !from; z++) {
+        if (Math.max(Math.abs(x), Math.abs(z)) !== ring) continue;
+        let open = 0;
+        for (let dx = -3; dx <= 3; dx++)
+          for (let dz = -3; dz <= 3; dz++) if (free(x + dx, z + dz)) open++;
+        if (open === 49) from = { x: x + 0.5, z: z + 0.5 };
+      }
+    }
+  }
+  if (!from) throw new Error(`no open floor found in ${d.id}`);
+  let perch: Spot | null = null;
+  for (let ring = 6; ring < 40 && !perch; ring++) {
+    for (let a = 0; a < 64 && !perch; a++) {
+      const x = Math.floor(from.x + Math.cos((a / 64) * Math.PI * 2) * ring);
+      const z = Math.floor(from.z + Math.sin((a / 64) * Math.PI * 2) * ring);
+      let solid = 0;
+      for (let dx = -1; dx <= 1; dx++)
+        for (let dz = -1; dz <= 1; dz++) if (!free(x + dx, z + dz)) solid++;
+      if (solid === 9) perch = { x: x + 0.5, z: z + 0.5 };
+    }
+  }
+  if (!perch) throw new Error(`no perch found in ${d.id}`);
+  const mob = createMob(
+    sim.ctx.nextId++,
+    MOBS.crypt_gravecaller_adept,
+    8,
+    sim.ctx.groundPos(d.ox + from.x, d.oz + from.z),
+  );
+  sim.ctx.addEntity(mob);
+  benchBudgets(
+    `densest interior: ${d.id} (${d.colliders} colliders, gates shut, unclaimed slot)`,
+    sim,
+    mob,
+    sim.player,
+    [{ name: 'a target perched inside a collider', from, to: perch }],
+    (e, at) => {
+      e.pos = sim.ctx.groundPos(d.ox + at.x, d.oz + at.z);
+      e.prevPos = { ...e.pos };
+      sim.ctx.rebucket(e);
+    },
+  );
 }
 
 interface TickStats {
@@ -228,7 +405,9 @@ interface TickStats {
   plans: number;
   maxPlans: number;
   maxNodes: number;
+  deferred: number;
   sight: number;
+  maxSight: number;
 }
 
 /** Run a scene for `seconds`, moving the target with `move(tick)`. Best of
@@ -246,12 +425,17 @@ function runScene(
     const at = spots(w);
     place(w, w.player, move(w, 0));
     for (let i = 0; i < n; i++) engage(w.spawn(w.caster, at(i, n)), w.player);
-    let worst = 0;
+    const s: TickStats = {
+      worst: 0,
+      mean: 0,
+      plans: 0,
+      maxPlans: 0,
+      maxNodes: 0,
+      deferred: 0,
+      sight: 0,
+      maxSight: 0,
+    };
     let total = 0;
-    let plans = 0;
-    let maxPlans = 0;
-    let maxNodes = 0;
-    let sight = 0;
     const ticks = seconds * 20;
     for (let t = 0; t < ticks; t++) {
       place(w, w.player, move(w, t));
@@ -261,27 +445,31 @@ function runScene(
       const dt = performance.now() - t0;
       // The first second pays for module and collider warm-up.
       if (t >= 20) {
-        worst = Math.max(worst, dt);
+        s.worst = Math.max(s.worst, dt);
         total += dt;
       }
-      const c = w.sim.mobScanCounters as unknown as Record<string, number | undefined>;
-      plans += c.routePlans ?? 0;
-      maxPlans = Math.max(maxPlans, c.routePlans ?? 0);
-      maxNodes = Math.max(maxNodes, c.routeNodes ?? 0);
-      sight += c.sightQueries ?? 0;
+      const c = w.sim.mobScanCounters;
+      s.plans += c.routePlans;
+      s.maxPlans = Math.max(s.maxPlans, c.routePlans);
+      s.maxNodes = Math.max(s.maxNodes, c.routeNodes);
+      s.deferred += c.routeDeferred;
+      s.sight += c.sightQueries;
+      s.maxSight = Math.max(s.maxSight, c.sightQueries);
     }
-    const stats = { worst, mean: total / (ticks - 20), plans, maxPlans, maxNodes, sight };
-    if (!best || stats.worst < best.worst) best = stats;
+    s.mean = total / (ticks - 20);
+    if (!best || s.worst < best.worst) best = s;
   }
   return best as TickStats;
 }
 
 function benchScenes(build: () => World): void {
   const name = build().name;
-  console.log(`\n== ${name}: whole ticks (ms worst tick / mean tick; counters per tick) ==`);
+  console.log(
+    `\n== ${name}: whole scenes (counters per tick are exact; the whole-tick ms is the entire sim tick, for reference only) ==`,
+  );
   const row = (label: string, s: TickStats): void =>
     console.log(
-      `  ${label.padEnd(44)} ${ms(s.worst)} ${ms(s.mean)}   plans ${String(s.plans).padStart(4)}  max plans/tick ${s.maxPlans}  max nodes/tick ${s.maxNodes}  sight queries ${s.sight}`,
+      `  ${label.padEnd(44)} plans ${String(s.plans).padStart(3)}  max plans/tick ${s.maxPlans}  max cells/tick ${String(s.maxNodes).padStart(4)}  deferred ${String(s.deferred).padStart(3)}  sight queries ${String(s.sight).padStart(4)}  max sight/tick ${String(s.maxSight).padStart(2)}   whole tick worst ${ms(s.worst)} mean ${ms(s.mean)}`,
     );
   row(
     '20 casters, target in sight (reference)',
@@ -351,23 +539,23 @@ function benchDelveSight(): void {
     });
     sim.ctx.addEntity(mob);
     run.mobIds.push(mob.id);
-    const times: number[] = [];
     let clear = false;
-    for (let i = 0; i < 220; i++) {
-      const t0 = performance.now();
-      clear = sim.ctx.hasLineOfSight(mob, player);
-      if (i >= 20) times.push(performance.now() - t0);
-    }
-    times.sort((a, b) => a - b);
-    console.log(
-      `  ${`${dist} yd`.padEnd(40)} ${ms(times[0])} ${ms(times[times.length >> 1])} ${ms(times[times.length - 1])}   clear ${clear}`,
+    const times = timed(
+      () => {
+        clear = sim.ctx.hasLineOfSight(mob, player);
+      },
+      200,
+      20,
     );
+    console.log(`  ${`${dist} yd`.padEnd(40)} ${spread(times)}   clear ${clear}`);
   }
 }
 
 benchPlans(openWorld());
 benchPlans(crypt(false));
 benchPlans(crypt(true));
+benchCryptBudgets();
+benchDensestInterior();
 benchScenes(openWorld);
 benchScenes(() => crypt(false));
 benchDelveSight();
