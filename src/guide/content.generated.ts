@@ -21834,7 +21834,7 @@ export const GUIDE_PROF_PAGES: string[] = [
 export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_warrior": {
     "url": "models/chars/players/woc/base_male.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -21847,7 +21847,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_male.glb"
+      "models/chars/players/woc/anims_male.glb",
+      "models/chars/players/woc_keyed/woc_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_warrior_medium.glb"
@@ -21855,7 +21856,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "player_paladin": {
     "url": "models/chars/players/woc/base_male.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -21868,7 +21869,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_male.glb"
+      "models/chars/players/woc/anims_male.glb",
+      "models/chars/players/woc_keyed/woc_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_paladin_medium.glb"
@@ -21876,7 +21878,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "player_hunter": {
     "url": "models/chars/players/woc/base_male.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -21885,7 +21887,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_male.glb"
+      "models/chars/players/woc/anims_male.glb",
+      "models/chars/players/woc_keyed/woc_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_hunter_medium.glb"
@@ -21893,7 +21896,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "player_rogue": {
     "url": "models/chars/players/woc/base_male.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -21906,7 +21909,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_male.glb"
+      "models/chars/players/woc/anims_male.glb",
+      "models/chars/players/woc_keyed/woc_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_rogue_medium.glb"
@@ -21914,7 +21918,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "player_priest": {
     "url": "models/chars/players/woc/base_male.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -21923,7 +21927,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_male.glb"
+      "models/chars/players/woc/anims_male.glb",
+      "models/chars/players/woc_keyed/woc_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_priest_medium.glb"
@@ -21931,7 +21936,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "player_shaman": {
     "url": "models/chars/players/woc/base_male.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -21944,7 +21949,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_male.glb"
+      "models/chars/players/woc/anims_male.glb",
+      "models/chars/players/woc_keyed/woc_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_shaman_medium.glb"
@@ -21952,7 +21958,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "player_mage": {
     "url": "models/chars/players/woc/base_male.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -21961,7 +21967,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_male.glb"
+      "models/chars/players/woc/anims_male.glb",
+      "models/chars/players/woc_keyed/woc_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_mage_medium.glb"
@@ -21969,7 +21976,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "player_warlock": {
     "url": "models/chars/players/woc/base_male.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -21983,7 +21990,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_male.glb"
+      "models/chars/players/woc/anims_male.glb",
+      "models/chars/players/woc_keyed/woc_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_warlock_medium.glb"
@@ -21991,7 +21999,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "player_druid": {
     "url": "models/chars/players/woc/base_male.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -22000,7 +22008,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_male.glb"
+      "models/chars/players/woc/anims_male.glb",
+      "models/chars/players/woc_keyed/woc_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_druid_medium.glb"
@@ -22100,7 +22109,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   },
   "player_warlock_female": {
     "url": "models/chars/players/woc/base_female.glb",
-    "idle": "Idle",
+    "idle": "Woc_Idle",
     "height": 2.8600000000000003,
     "attach": [
       {
@@ -22114,7 +22123,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "animUrls": [
-      "models/chars/players/woc/anims_female.glb"
+      "models/chars/players/woc/anims_female.glb",
+      "models/chars/players/woc_keyed/woc_female.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/female_warlock_medium.glb"
