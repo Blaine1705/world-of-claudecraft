@@ -1229,12 +1229,13 @@ const MONOLITHS: MonolithRow[] = [
     // parent pins (11639 and PR 4352's 11636) stands.
     // Composes the existing buddy PR additions with integration extractions.
     // Exact merged size; no additional coordinator logic introduced by resolution.
-    // LOWERED 11709 -> 11705 with the dungeon objectives tracker: its IWorld
+    // Referral save projections extracted into quest_progress_save and deeds_restore.
+    // LOWERED by four more lines with the dungeon objectives tracker: its IWorld
     // read (the dungeonRun getter, a one-line delegate to
     // instances/dungeon_run.ts) is paid for by moving riftEventMsRemaining's
     // body and its comment to rift/rift_floor_view.ts, beside the floor view it
     // reads. Exact count (wc -l after biome), zero slack.
-    ceiling: 11705,
+    ceiling: 11696,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1732,7 +1733,9 @@ const MONOLITHS: MonolithRow[] = [
     // its `gds` wire field (measured).
     // v0.45.0 integration: 9676 on the merged tree (wc -l); the lower of the two
     // parent pins (9769 and PR 4352's 9803) stands.
-    ceiling: 9769,
+    // The run readouts of the self record (drun, dgrun, dcompanion, dmarks) moved to
+    // dungeon_run_wire.ts with the dungeon objectives tracker. Exact count.
+    ceiling: 9768,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1919,7 +1922,9 @@ const MONOLITHS: MonolithRow[] = [
     // parent pins (5347 and PR 4352's 5347) stands.
     // Composes the existing buddy PR additions with integration extractions.
     // Exact merged size; no additional coordinator logic introduced by resolution.
-    ceiling: 5369,
+    // Account-social position decoding moved to social_frame_wire.
+    // Public character profile REST moved to character_profile; block paging stays intent-only.
+    ceiling: 5342,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

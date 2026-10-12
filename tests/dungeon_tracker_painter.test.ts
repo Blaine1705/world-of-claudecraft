@@ -155,9 +155,10 @@ describe('DungeonTrackerPainter: in the real entry markup', () => {
   it.each(['index.html', 'play.html'])(
     '%s seats it first in the tracker stack, and it paints there',
     (entry) => {
-      // The behaviour the wiring in hud.ts depends on: the entry hands the
-      // painter a real #dungeon-tracker, first in the stack (above the quest
-      // tracker), and the painter takes it over without touching its siblings.
+      // The behaviour the wiring in hud.ts depends on: the entry holds a real
+      // #dungeon-tracker, first in the stack (above the quest tracker), and the
+      // painter, given no root as in hud.ts, finds it by its id and takes it
+      // over without touching its siblings.
       const html = readRepo(['..', entry].join('/'));
       const holder = document.createElement('template');
       holder.innerHTML = html;
@@ -173,7 +174,6 @@ describe('DungeonTrackerPainter: in the real entry markup', () => {
       const siblings = stack.children.length;
       const world = { dungeonRun: run(['rimeweb'], 'heroic') as DungeonRunView | null };
       const painter = new DungeonTrackerPainter({
-        root: () => document.getElementById('dungeon-tracker') as HTMLElement,
         writers: countingFacet().facet,
         world: () => world,
       });

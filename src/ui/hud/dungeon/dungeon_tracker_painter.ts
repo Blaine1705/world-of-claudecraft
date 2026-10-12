@@ -61,8 +61,9 @@ const PLATE_WIDTH_PROP = '--dgt-plate-w';
 export const RAIL_MEASURE_POLLS = 2;
 
 export interface DungeonTrackerPainterDeps {
-  /** The #dungeon-tracker container (Hud owns the id). */
-  root(): HTMLElement;
+  /** The #dungeon-tracker container. Left out (as the Hud leaves it), the
+   *  painter finds it in the document by that id. */
+  root?(): HTMLElement;
   /** The shared write-elision facet (Hud's caches; one skip-rate). */
   writers: PainterHostWriters;
   world(): Pick<IWorld, 'dungeonRun'>;
@@ -101,7 +102,9 @@ export class DungeonTrackerPainter {
   private stripPage: TrackedQuest | null = null;
 
   constructor(private readonly deps: DungeonTrackerPainterDeps) {
-    this.root = deps.root();
+    this.root = deps.root
+      ? deps.root()
+      : (document.querySelector('#dungeon-tracker') as HTMLElement);
     this.rail = deps.rail ? deps.rail() : this.root.ownerDocument.getElementById('side-buttons');
     this.stripText = {
       title: (dungeonId, heroic) =>
