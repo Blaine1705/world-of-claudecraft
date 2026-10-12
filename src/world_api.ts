@@ -535,6 +535,7 @@ export const COMMAND_NAMES = [
   'harvestCorpse',
   'lootRoll',
   'pickup',
+  'buyplot',
   'accept',
   'turnin',
   'abandon',

@@ -114,6 +114,9 @@ function harness(
   const openWorldQuestBoard = vi.fn();
   const openDelveBoard = vi.fn();
   const openCardDuel = vi.fn();
+  const travelToDeepglass = vi.fn();
+  const startDeepglassBout = vi.fn();
+  const summonWizardPortal = vi.fn();
   const openTrain = vi.fn();
   const openUnbind = vi.fn();
   const openCrafting = vi.fn();
@@ -152,6 +155,9 @@ function harness(
     openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
+    travelToDeepglass,
+    startDeepglassBout,
+    summonWizardPortal,
     openTrain,
     openUnbind,
     openCrafting,
@@ -186,6 +192,9 @@ function harness(
     openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
+    travelToDeepglass,
+    startDeepglassBout,
+    summonWizardPortal,
     openTrain,
     openUnbind,
     openCrafting,
@@ -257,7 +266,9 @@ describe('QuestDialogController', () => {
     if (!doneRow) throw new Error('expected the gossip quest row');
     expect(doneRow.innerHTML).toContain('<span class="quest-repeat">!</span>');
     expect(doneRow.getAttribute('aria-label')).toBe(
-      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+      t('questUi.dialog.repeatableQuestAria', {
+        name: `quest:${workOrder.id}`,
+      }),
     );
 
     // Inside the cadence window the dialog lists NO row for the order (it is
@@ -268,7 +279,9 @@ describe('QuestDialogController', () => {
     const blocked = harness(giver3, 'unavailable');
     (blocked.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
     (
-      blocked.world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }
+      blocked.world.craftingIdentity as unknown as {
+        cadenceBlockedQuests: string[];
+      }
     ).cadenceBlockedQuests = [workOrder.id];
     blocked.controller.open(32);
     expect(blocked.element.querySelector(`[data-quest="${workOrder.id}"]`)).toBeNull();
@@ -302,7 +315,9 @@ describe('QuestDialogController', () => {
     if (!row) throw new Error('expected the lapsed work order row without close/reopen');
     expect(row.innerHTML).toContain('<span class="quest-repeat">!</span>');
     expect(row.getAttribute('aria-label')).toBe(
-      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+      t('questUi.dialog.repeatableQuestAria', {
+        name: `quest:${workOrder.id}`,
+      }),
     );
   });
 
@@ -446,7 +461,9 @@ describe('QuestDialogController', () => {
     offered.element.querySelector<HTMLButtonElement>('.btn')?.click();
 
     expect(offered.acceptQuest).toHaveBeenCalledWith('q_wolves');
-    expect(offered.reportTelemetry).toHaveBeenCalledWith('quest_accept', { timeMs: 0 });
+    expect(offered.reportTelemetry).toHaveBeenCalledWith('quest_accept', {
+      timeMs: 0,
+    });
 
     const readyNpc = npc(31, 'marshal_redbrook');
     readyNpc.questIds = ['q_wolves'];
@@ -457,7 +474,9 @@ describe('QuestDialogController', () => {
     ready.element.querySelector<HTMLButtonElement>('.btn')?.click();
 
     expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves');
-    expect(ready.reportTelemetry).toHaveBeenCalledWith('quest_turnin', { timeMs: 0 });
+    expect(ready.reportTelemetry).toHaveBeenCalledWith('quest_turnin', {
+      timeMs: 0,
+    });
   });
 
   it('the preview promises the REMEMBERED hobby when the identity carries one', () => {
@@ -558,7 +577,9 @@ describe('QuestDialogController', () => {
     if (!select) throw new Error('hobby profession selector missing');
     expect([...select.options].map((option) => option.value)).toEqual(['tailoring']);
     expect(preview?.textContent).toBe(
-      t('hudChrome.crafting.hobbyPreview', { hobby: craftNameText('tailoring') }),
+      t('hudChrome.crafting.hobbyPreview', {
+        hobby: craftNameText('tailoring'),
+      }),
     );
     expect(preview?.getAttribute('aria-live')).toBe('polite');
     expect(preview?.getAttribute('aria-atomic')).toBe('true');

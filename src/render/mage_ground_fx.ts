@@ -132,6 +132,72 @@ function meteorImpactEventCueSpawn(
   });
 }
 
+/**
+ * Every tint the falling meteor wears. The Mage's Meteor is a fire spell and
+ * keeps the original ember palette (METEOR_FIRE below); Vaelgrath's Cinderfall
+ * is ARCANE, so it passes the violet set instead. Only the palette differs:
+ * one rock, one trail, one telegraph, drawn twice in different colours.
+ *
+ * The palette is part of every pooled material's key (see paletteKey), so an
+ * arcane meteor can never be handed a recycled fire material.
+ */
+export interface MeteorPalette {
+  /** Identity in the material pool's key. */
+  key: string;
+  /** Glow inside the basalt itself. */
+  rockEmissive: number;
+  /** Molten light in the rock's cracks. */
+  magma: number;
+  /** Halo around the falling body. */
+  corona: number;
+  trailOuter: number;
+  trailInner: number;
+  embers: number;
+  telegraphBoundary: number;
+  telegraphInner: number;
+  telegraphVein: number;
+  telegraphFlame: number;
+}
+
+export const METEOR_FIRE: MeteorPalette = {
+  key: 'fire',
+  rockEmissive: 0x210600,
+  magma: 0xff5a0a,
+  corona: SCHOOL_COLORS.fire,
+  trailOuter: 0xd63708,
+  trailInner: 0xff7a12,
+  embers: 0xffb33c,
+  // Upstream's v0.42 retune: deep reds, so the danger mark reads as a mark and
+  // not as more fire (the mage_ground_fx test pins red >> green on all four).
+  telegraphBoundary: 0xff101c,
+  telegraphInner: 0xff1830,
+  telegraphVein: 0xff0818,
+  telegraphFlame: 0xff2a12,
+};
+
+/** The same rock lit by violet arcane-flame (Vaelgrath's Cinderfall). Kept at
+ *  the fire set's relative brightness ordering so the read is identical: dim
+ *  boundary ring, brighter inner ring, hot core. */
+export const METEOR_ARCANE: MeteorPalette = {
+  key: 'arcane',
+  rockEmissive: 0x1b0632,
+  magma: 0xb35aff,
+  corona: SCHOOL_COLORS.arcane,
+  trailOuter: 0x7a2ed6,
+  trailInner: 0xc07aff,
+  embers: 0xe3b8ff,
+  telegraphBoundary: 0xb36aff,
+  telegraphInner: 0xe0b0ff,
+  telegraphVein: 0x9b3dff,
+  telegraphFlame: 0xb35fff,
+};
+
+/** Palette for a spellfxAt school. Anything but 'arcane' keeps the fire look,
+ *  so no existing caller changes. */
+export function meteorPaletteFor(school?: string): MeteorPalette {
+  return school === 'arcane' ? METEOR_ARCANE : METEOR_FIRE;
+}
+
 export interface MeteorFallSpawn {
   x: number;
   z: number;
@@ -141,6 +207,8 @@ export interface MeteorFallSpawn {
    *  retain their legacy fire burst. */
   sourceId?: number;
   ability?: string;
+  /** Omitted = the fire palette (the Mage's Meteor). */
+  palette?: MeteorPalette;
   /** The cue's damage school, handed to the landing burst so a shadow
    *  eruption never detonates in fire. Absent on the legacy mage cue. */
   school?: string;
@@ -233,6 +301,9 @@ interface MeteorFx {
   flames: THREE.InstancedMesh;
   flameBases: ReadonlyArray<{ x: number; y: number; z: number; phase: number }>;
   flameDummy: THREE.Object3D;
+  /** The palette this meteor was built with: its materials were pooled under
+   *  palette-qualified keys, so they must be released under the same ones. */
+  palette: MeteorPalette;
   ownedGeometries: THREE.BufferGeometry[];
   x: number;
   z: number;
@@ -397,8 +468,9 @@ export class MageGroundFx {
     // shared with every fire meteor) but never shows it: nothing falls from the
     // sky, the ground itself is the threat.
     const grave = isNythraxisGraveEruption(opts.ability);
-    const fire = new THREE.Color(SCHOOL_COLORS.fire);
-    const magma = new THREE.Color(0xff5a0a);
+    const palette = opts.palette ?? METEOR_FIRE;
+    const fire = new THREE.Color(palette.corona);
+    const magma = new THREE.Color(palette.magma);
     const root = new THREE.Group();
     root.name = 'mage-meteor-fx';
     root.userData.persistentMeteorId = opts.persistentId;
@@ -410,14 +482,16 @@ export class MageGroundFx {
     const warningLead = Math.min(Math.max(0, opts.warningLead ?? 0), duration - 0.1);
     const initialElapsed = Math.min(duration, Math.max(0, opts.initialElapsed ?? 0));
     body.visible = !grave && warningLead === 0;
-    const rockMat = this.acquireMaterial('meteor-rock', 1, createMeteorRockMaterial);
+    const rockMat = this.acquireMaterial(`meteor-rock:${palette.key}`, 1, () =>
+      createMeteorRockMaterial(palette),
+    );
     const rock = new THREE.Mesh(geometry.rock, rockMat);
     rock.name = 'mage-meteor-rock';
     rock.castShadow = true;
     body.add(rock);
 
     const magmaMat = this.acquireMaterial(
-      'meteor-magma',
+      `meteor-magma:${palette.key}`,
       0.98,
       () =>
         new THREE.MeshBasicMaterial({
@@ -438,7 +512,7 @@ export class MageGroundFx {
     body.add(cracks);
 
     const coronaMat = this.acquireMaterial(
-      'meteor-corona',
+      `meteor-corona:${palette.key}`,
       0.16,
       () =>
         new THREE.MeshBasicMaterial({
@@ -460,11 +534,11 @@ export class MageGroundFx {
     trail.name = 'mage-meteor-trail';
     trail.visible = !grave && warningLead === 0;
     const trailOuterMat = this.acquireMaterial(
-      'meteor-trail-outer',
+      `meteor-trail-outer:${palette.key}`,
       0.48,
       () =>
         new THREE.MeshBasicMaterial({
-          color: 0xd63708,
+          color: palette.trailOuter,
           transparent: true,
           opacity: 0.48,
           blending: THREE.NormalBlending,
@@ -473,11 +547,11 @@ export class MageGroundFx {
         }),
     );
     const trailInnerMat = this.acquireMaterial(
-      'meteor-trail-inner',
+      `meteor-trail-inner:${palette.key}`,
       0.3,
       () =>
         new THREE.MeshBasicMaterial({
-          color: 0xff7a12,
+          color: palette.trailInner,
           transparent: true,
           opacity: 0.3,
           blending: THREE.AdditiveBlending,
@@ -509,11 +583,11 @@ export class MageGroundFx {
     const emberGeo = new THREE.BufferGeometry();
     emberGeo.setAttribute('position', new THREE.BufferAttribute(emberPositions, 3));
     const emberMat = this.acquireMaterial(
-      'meteor-ember',
+      `meteor-ember:${palette.key}`,
       0.9,
       () =>
         new THREE.PointsMaterial({
-          color: 0xffb33c,
+          color: palette.embers,
           size: 0.18,
           transparent: true,
           opacity: 0.9,
@@ -598,6 +672,7 @@ export class MageGroundFx {
       flames: warning.flames,
       flameBases: warning.flameBases,
       flameDummy: new THREE.Object3D(),
+      palette,
       ownedGeometries: [emberGeo, ...warning.ownedGeometries],
       x: opts.x,
       z: opts.z,
@@ -801,14 +876,17 @@ export class MageGroundFx {
   }
 
   private disposeMeteor(meteor: MeteorFx): void {
+    // Materials were pooled under palette-qualified keys (see paletteKey), so
+    // they go back under the same ones or the pool never recycles them.
+    const pk = meteor.palette.key;
     meteor.ignivarFireAoe?.dispose();
     this.scene.remove(meteor.root);
-    this.releaseMaterial('meteor-rock', meteor.rockMat);
-    this.releaseMaterial('meteor-magma', meteor.magmaMat);
-    this.releaseMaterial('meteor-corona', meteor.coronaMat);
-    this.releaseMaterial('meteor-trail-outer', meteor.trailOuterMat);
-    this.releaseMaterial('meteor-trail-inner', meteor.trailInnerMat);
-    this.releaseMaterial('meteor-ember', meteor.emberMat);
+    this.releaseMaterial(`meteor-rock:${pk}`, meteor.rockMat);
+    this.releaseMaterial(`meteor-magma:${pk}`, meteor.magmaMat);
+    this.releaseMaterial(`meteor-corona:${pk}`, meteor.coronaMat);
+    this.releaseMaterial(`meteor-trail-outer:${pk}`, meteor.trailOuterMat);
+    this.releaseMaterial(`meteor-trail-inner:${pk}`, meteor.trailInnerMat);
+    this.releaseMaterial(`meteor-ember:${pk}`, meteor.emberMat);
     const suffix = meteor.telegraphKindSuffix;
     this.releaseMaterial(`meteor-footprint${suffix}`, meteor.footprintMat);
     this.releaseMaterial(`meteor-boundary${suffix}`, meteor.boundaryMat);
@@ -1984,11 +2062,14 @@ export interface MageGroundSpellfxEvent {
 }
 
 /** The basalt rock of the Meteor fall, one config for the live pool and the
- *  boot stand-in below. */
-function createMeteorRockMaterial(): THREE.MeshStandardMaterial {
+ *  boot stand-in below. The palette only moves the emissive uniform, so the
+ *  fire stand-in links the same program an arcane rock draws with. */
+function createMeteorRockMaterial(
+  palette: MeteorPalette = METEOR_FIRE,
+): THREE.MeshStandardMaterial {
   const material = new THREE.MeshStandardMaterial({
     color: 0x111013,
-    emissive: 0x210600,
+    emissive: palette.rockEmissive,
     emissiveIntensity: 0.42,
     roughness: 0.9,
     metalness: 0.04,

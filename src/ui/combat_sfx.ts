@@ -423,6 +423,10 @@ const SUBFAMILY_ALIAS: Record<string, string> = {
   ridge_stalker: 'wolf',
   mire_prowler: 'wolf',
   old_greyjaw: 'wolf',
+  // The Emberwake world boss gets his own voice instead of the shared dragonkin
+  // barks: 'vaelgrath' keys the procedural bank in game/dragon_audio.ts. He is
+  // the only mob in the family whose scale would make a generic bark wrong.
+  emberwake_vaelgrath: 'vaelgrath',
   ignivar_herald_of_the_last_flame: 'ignivar',
   varkhul_forgefather_of_the_last_flame: 'varkhul',
 };
@@ -434,6 +438,31 @@ const SEMANTIC_BOSS_VOICE_TEMPLATES = new Set([
   'ignivar_herald_of_the_last_flame',
   'varkhul_forgefather_of_the_last_flame',
 ]);
+
+// His ranged beats, keyed off the typed attackAnimation the encounter already
+// stamps on its spellfx events (sim/encounters/emberwake.ts emitDragonFx), so
+// this needs no new sim event to hang a sound on.
+//
+// Both BITE animations deliberately resolve to the same key his melee damage
+// plays (mobVoiceCue -> mob_dragonkin_vaelgrath_attack). The scripted chomp
+// fires the animation cue AND, a moment later, a damage event; sharing one key
+// lets the engine's per-key cooldown collapse them into a single chomp, and a
+// swing that connects with nobody still sounds.
+const DRAGON_ATTACK_CUES: Record<string, string> = {
+  'dragon-breath': 'dragon_breath',
+  'dragon-buffet': 'dragon_wing',
+  'dragon-bite': 'mob_dragonkin_vaelgrath_attack',
+  'dragon-ground-bite': 'mob_dragonkin_vaelgrath_attack',
+};
+
+/** The cue for a dragon beat, or null for any other event. Returns a plain
+ *  string, not an SfxId: these are procedurally synthesized at init and so are
+ *  deliberately absent from the generated clip manifest (same as the water
+ *  elemental's voice). */
+export function dragonAttackCue(attackAnimation: string | null | undefined): string | null {
+  if (!attackAnimation) return null;
+  return DRAGON_ATTACK_CUES[attackAnimation] ?? null;
+}
 
 function magicSchool(value: string | null | undefined): MagicSchool | null {
   return value && value in SCHOOL_CUES ? (value as MagicSchool) : null;

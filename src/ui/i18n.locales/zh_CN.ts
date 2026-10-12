@@ -1096,6 +1096,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 记录',
   'landing.scout': 'WoC 侦察',
   'landing.parseService': 'WoC 战斗日志',
+  'editor.buildMode.materialNames.WardenStone': '光滑石材',
+  'editor.buildMode.diagonal': '斜墙',
+  'editor.buildMode.diagonalHint': '在网格点之间拖动，以任意角度绘制墙体。',
   'guide.professions.endgameBodyRaidCollections':
     '大师锻造是带有“唯一装备：大师锻造”标记的共同装备家族。旧有的巅峰制作路线仍需寻找图样、制作每日限次的中间材料，并消耗共同的终局材料。熔炉套装则是由团队副本材料支持的独立路线，并非在旧路线之上再加一套费用。两条路线共用最多穿戴两件的限制，因此会竞争配装中的同两个位置。成品在臻至完美或委托绑定该件物品之前都可自由交易。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -14943,6 +14946,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '居中',
   'hudChrome.breath.label': '呼吸',
   'hudChrome.breath.drowning': '溺水！',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': '为我打开通往深琉璃之路',
+  'hudChrome.portalWizard.gossipDeepglassAria': '请巴尔德玛开启前往深琉璃的传送门',
+  'hudChrome.portalWizard.gossipHome': '为我打开回家之路',
+  'hudChrome.portalWizard.gossipHomeAria': '请巴尔德玛开启回到你城镇的传送门',
+  'hudChrome.portalWizard.portalOpen': '传送门已开启。走进去吧。',
   'abilityUi.resources.devotion': '虔诚',
   'abilityUi.resources.focus': '集中值',
   'abilityUi.tooltip.requiresStealthSkulduggery': '需要潜行（幽暝达到3层或暗影缠身期间无需潜行）',
@@ -17382,6 +17392,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '最后一道符文。线条可能交叉或再次经过同一点；跟随亮起的标记前往下一个拐角。',
   'questUi.worldQuest.traceReaction.elianGold': '描绘得真漂亮！你的脚步赢得了金色的荣耀。',
   'questUi.worldQuest.traceReaction.elianComplete': '符文完成了！用心练习，下次一定会更好。',
+  'hudChrome.realmBuilder.title': '本月王国建造者',
+  'hudChrome.realmBuilder.currentLabel': '本月荣誉获得者',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '荣誉购买是最终的。回购列表里只会有你卖出去的东西：用钱币买下的东西通常可以按出售价格卖回给商人，若你再次改变主意，还能从那份列表里把它买回来；但战争套装在你买下的那一刻便已灵魂绑定，因此它再也无法交易、邮寄，或以任何形式退回，也永远不会进入那份列表。商店正因如此才要你确认一次：按下之前，请把那件装备看清楚。',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -17454,8 +17466,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '按采集者拆分',
   'hudChrome.itemMenu.takeChosenQuantity': '取出指定数量',
   'hudChrome.itemMenu.combine': '合并素材堆叠',
-  'hudChrome.realmBuilder.title': '本月王国建造者',
-  'hudChrome.realmBuilder.currentLabel': '本月荣誉获得者',
   'hudChrome.realmBuilder.placeholderName': '你的名字',
   'hudChrome.realmBuilder.placeholderHint': '这块铭牌还在等待它的第一个名字。',
   'hudChrome.realmBuilder.pastTitle': '历届荣誉获得者',
@@ -18644,4 +18654,53 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
+  'entities.items.infernal_slag.name': '深渊熔渣',
+  'entities.items.charred_legion_tablet.name': '焦黑的军团石板',
+  'entities.items.brands_of_the_first_flame.name': '初焰烙印',
+  'entities.items.forgekeepers_ledger.name': '守炉者的账簿',
+  'entities.items.azazels_broken_covenant.name': '阿扎泽尔的破碎契约',
+  'entities.items.emberforged_vambraces.name': '余烬铸造护臂',
+  'entities.items.cinderthread_mantle.name': '灰烬丝线披肩',
+  'entities.items.hellstalker_boots.name': '狱行者长靴',
+  'entities.items.forgekeepers_warhammer.name': '守炉者的战锤',
+  'entities.items.forgekeepers_runestaff.name': '守炉者的符文法杖',
+  'entities.items.forgekeepers_fang.name': '守炉者之牙',
+  'entities.items.azazels_ruinblade.name': '阿扎泽尔的毁灭之刃',
+  'entities.items.azazels_soulstaff.name': '阿扎泽尔的灵魂法杖',
+  'entities.items.azazels_emberfang.name': '阿扎泽尔的余烬之牙',
+  'entities.items.hellforged_bulwark.name': '狱铸壁垒',
+  'entities.items.cinderseer_raiment.name': '灰烬先知法衣',
+  'entities.items.abysswalker_harness.name': '深渊行者胸甲',
+  'entities.mobs.abyssal_legionnaire.name': '深渊军团士兵',
+  'entities.mobs.cinder_magus.name': '灰烬法师',
+  'entities.mobs.molten_hellhound.name': '熔岩地狱犬',
+  'entities.mobs.flamebound_smith.name': '缚焰铁匠',
+  'entities.mobs.abyssal_gladiator.name': '深渊角斗士',
+  'entities.mobs.infernal_cinderling.name': '深渊灰烬幼灵',
+  'entities.mobs.forgekeeper.name': '守炉者',
+  'entities.mobs.pyre_golem.name': '焚火魔像',
+  'entities.mobs.azazel_infernal_lord.name': '深渊领主阿扎泽尔',
+  'entities.quests.q_infernal_abyss_echoes.title': '风暴岩下的回声',
+  'entities.quests.q_infernal_abyss_echoes.text':
+    '风暴岩并非生于风暴，{playerName}。最古老的石板称它是一口盖子，用锤击封住了从世界之外坠落的烈火。东侧峭壁下出现了一道新的裂隙。带上四位盟友进入其中，取回军团石板，以及刻在初焰旁的烙印。',
+  'entities.quests.q_infernal_abyss_echoes.completion':
+    '石板记载了一支自愿踏入烈火的大军。烙印则揭示了他们侍奉的力量：阿扎泽尔。这里从来不是为了把恶魔挡在外面而建的牢狱，{playerName}。它是一道迎接他们领主降临的大门。',
+  'entities.quests.q_infernal_abyss_echoes.objectives.0.label': '破译焦黑的军团石板',
+  'entities.quests.q_infernal_abyss_echoes.objectives.1.label': '研究初焰烙印',
+  'entities.quests.q_infernal_abyss_covenant.title': '破碎的契约',
+  'entities.quests.q_infernal_abyss_covenant.text':
+    '军团的誓言许诺为阿扎泽尔开辟一条通往我们世界的道路，但每份契约都有代价，也都有破绽。返回熔岩深渊，在巨口附近寻找守炉者的账簿和破碎的契约。若能弄清是什么束缚了他，也许就能知道如何将他杀死。',
+  'entities.quests.q_infernal_abyss_covenant.completion':
+    '破绽就在这里：阿扎泽尔以军团成员的名字供养大门。每吞噬一个仆从，他就变得更强，但他的生命也被系在了下方的熔炉上。在熔炉核心击败这位领主，大门就必将随他一同消亡。',
+  'entities.quests.q_infernal_abyss_covenant.objectives.0.label': '取回守炉者的账簿',
+  'entities.quests.q_infernal_abyss_covenant.objectives.1.label': '阅读阿扎泽尔的破碎契约',
+  'entities.quests.q_infernal_abyss_azazel.title': '熔岩深渊之主',
+  'entities.quests.q_infernal_abyss_azazel.text':
+    '契约给了我们一次机会，{playerName}。和你信任的同伴一同深入，穿过熔炉与巨口。在初焰触及我们世界的地方直面阿扎泽尔，抵御他的军团，在风暴岩成为他敞开的大门之前，熄灭这位深渊领主。',
+  'entities.quests.q_infernal_abyss_azazel.completion':
+    '山安静了。既非沉睡，也非等待，只是安静。阿扎泽尔以窃取的名字筑起永恒，而你以自己一个凡人的名字终结了它。高望会记住这个名字，{playerName}。',
+  'entities.quests.q_infernal_abyss_azazel.objectives.0.label': '击杀深渊领主阿扎泽尔',
+  'entities.dungeons.infernal_abyss.name': '熔岩深渊',
+  'entities.dungeons.infernal_abyss.enterText': '你深入风暴岩下方，踏入熔岩深渊。',
+  'entities.dungeons.infernal_abyss.leaveText': '你从熔炉般的黑暗中爬出，迎上山间的风。',
 };

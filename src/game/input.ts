@@ -8,9 +8,10 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { focusTargetAction } from '../ui/focus_targets_core';
 import { detectBrowserEngine } from './browser_env';
+import { clampCamPitch } from './camera_pitch_range';
 import { clickClaimedModalFocus } from './click_claimed_focus';
 import { cursorForHover, type HoverCursorKind } from './cursors';
-import { clampGliderCameraPitch, gliderPitchFromCamera } from './glider_pitch_input';
+import { gliderPitchFromCamera } from './glider_pitch_input';
 import {
   comboCode,
   isModifierCode,
@@ -165,6 +166,7 @@ export interface InputDebugState {
     strafeLeft: boolean;
     strafeRight: boolean;
     jump: boolean;
+    boost: boolean;
     dive: boolean;
     surface: boolean;
   };
@@ -175,9 +177,13 @@ export interface InputDebugState {
   hoverActive: boolean;
 }
 
+// The camera's pitch range and clamp live in camera_pitch_range.ts (the
+// renderer reads CAM_PITCH_UP from here).
+export { CAM_PITCH_DOWN, CAM_PITCH_UP } from './camera_pitch_range';
+
 // Camera-driven swimming. camPitch is POSITIVE looking DOWN (renderer.ts seats
-// the boom at eyeY + sin(pitch) * dist), clamped to [-0.4, 1.35], and RESTS at
-// 0.32 — so the bands cannot be centred on zero: a neutral camera has to mean
+// the boom at eyeY + sin(pitch) * dist), clamped by clampCamPitch
+// (camera_pitch_range.ts), and RESTS at 0.32 - so the bands cannot be centred on zero: a neutral camera has to mean
 // "hold this depth", or every swimmer would sink on sight. Diving needs a
 // deliberate ~17 degrees past rest, surfacing about 15 degrees back the other
 // way, leaving a wide dead band in between.
@@ -203,6 +209,33 @@ export function swimSteerFromPitch(pitch: number, from: number, to: number): num
   return Math.round(t * SWIM_STEER_STEPS) / SWIM_STEER_STEPS;
 }
 
+// Deepball aim. Inside the bell the camera does not switch bands, it AIMS: the
+// pitch is sent continuously and the flight pass thrusts along it (see
+// src/sim/deepglass/flight.ts DG_AIM_MAX), so W flies where you look and a Shot
+// leaves along the line you were looking down.
+//
+// Two conversions, and both matter. camPitch is positive looking DOWN and rests
+// at 0.32, so the aim is NEGATED and the rest offset removed, otherwise a
+// player who has touched nothing is aimed 18 degrees into the floor. And it is
+// quantised for the same reason swimSteer is: the aim rides the change-detected
+// input frame, and a raw float would resend it on every mouse-move.
+const DG_AIM_REST = 0.32;
+const DG_AIM_STEPS = 24;
+/** Steepest aim the wire carries, radians either way (flight.ts DG_AIM_MAX). */
+const DG_AIM_PITCH_MAX = 1.35;
+/** How long a bell-side left click stays armed as a dash request, must span at
+ *  least one 20 Hz sim tick (50 ms) with margin for a slow frame. */
+const DASH_CLICK_LATCH_MS = 150;
+/** Clamp and quantise an aim pitch (radians, positive up) to the wire steps. */
+export function quantizeDeepballAim(pitch: number): number {
+  const clamped = Math.min(DG_AIM_PITCH_MAX, Math.max(-DG_AIM_PITCH_MAX, pitch));
+  return Math.round(clamped * DG_AIM_STEPS) / DG_AIM_STEPS;
+}
+/** camPitch -> the deepball aim pitch, radians, POSITIVE UP. */
+export function deepballAimFromPitch(camPitch: number): number {
+  return quantizeDeepballAim(-(camPitch - DG_AIM_REST));
+}
+
 export class Input {
   keys = new Set<string>();
   leftDown = false;
@@ -216,6 +249,25 @@ export class Input {
   onCameraDistChange?: (dist: number) => void;
   autorun = false;
   suspendMovement = false;
+  /**
+   * The local body is flying inside the Deepglass bell.
+   *
+   * Set every frame by the game loop from `player.dgFlight`, and it changes two
+   * things about how the move frame is read. The camera's pitch is sent as a
+   * continuous AIM rather than being latched into the swim dive/surface bands ,
+   * in the bell those bands are the wrong control entirely, because Space and
+   * Ctrl are the absolute climb/sink trim and the camera is for pointing. And
+   * the camera bands stop writing `dive`, so looking down while flying forward
+   * no longer sinks you on top of pitching your thrust down: one input, one job.
+   */
+  deepballFlight = false;
+  /** Deepball ball marker: the HUD points at the Tidesow. On by default (it is
+   *  how you find a 2.4 yd ball in a 76 yd sphere); the bind turns it off for
+   *  players who want a clean view. */
+  ballMarker = true;
+  /** Left-click dash latch (deepball): the press arms a short window so the
+   *  20 Hz move-frame read cannot fall between the click's edges. */
+  private dashClickUntil = 0;
   // click-to-move (#95): a world destination the player clicked; the frame loop
   // walks toward it until arrival or until the player takes manual control.
   // null when inactive. clickMoveTarget is the current waypoint; clickMoveGoal
@@ -325,6 +377,12 @@ export class Input {
   // A left-drag orbit is camera-only sightseeing and must never steer the
   // body up or down through the water (the WoW rule).
   private swimAimPitch = 0.32;
+  /** The deepball ball camera drives the view from the frame loop, and the aim
+   *  has to follow it, otherwise the body keeps pointing wherever the player
+   *  last looked by hand while the camera looks somewhere else. */
+  setSwimAimPitch(pitch: number): void {
+    this.swimAimPitch = pitch;
+  }
   private keyJumpUntil = 0;
   private touchLookActive = false;
   // True while the gamepad's right stick is deflected past its deadzone, set
@@ -549,6 +607,7 @@ export class Input {
         strafeLeft: this.heldAction('strafeLeft'),
         strafeRight: this.heldAction('strafeRight'),
         jump: this.keybinds.codesForAction('jump').some((c) => this.keys.has(comboCode(c))),
+        boost: this.keybinds.codesForAction('boost').some((c) => this.keys.has(comboCode(c))),
         // Read the camera-steer bands the way the move frame does (latched
         // thresholds, key OR camera, move-gated), so the readout cannot
         // disagree with the input the sim is actually being given.
@@ -756,7 +815,7 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT * this.touchLookSpeed;
     this.camYaw -= dx * dragSens;
-    this.camPitch = clampGliderCameraPitch(
+    this.camPitch = clampCamPitch(
       this.camPitch + this.touchPitchSign * dy * dragSens,
       this.cb.isGliderActive?.() === true,
     );
@@ -804,10 +863,7 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     if (yawDelta === 0 && pitchDelta === 0) return;
     this.camYaw += yawDelta;
-    this.camPitch = clampGliderCameraPitch(
-      this.camPitch + pitchDelta,
-      this.cb.isGliderActive?.() === true,
-    );
+    this.camPitch = clampCamPitch(this.camPitch + pitchDelta, this.cb.isGliderActive?.() === true);
     this.swimAimPitch = this.camPitch;
     this.noteIntent('look');
   }
@@ -824,7 +880,7 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     if (!this.touchLookActive) return;
     this.camYaw -= this.touchLookVector.x * TOUCH_LOOK_YAW_RATE * this.touchLookSpeed * dt;
-    this.camPitch = clampGliderCameraPitch(
+    this.camPitch = clampCamPitch(
       this.camPitch +
         this.touchPitchSign *
           this.touchLookVector.y *
@@ -1243,6 +1299,9 @@ export class Input {
       case 'friendlyNameplates':
         this.toggleFriendlyNameplates();
         return;
+      case 'ballMarker':
+        this.ballMarker = !this.ballMarker;
+        return;
       case 'target':
         this.cb.onTab();
         return;
@@ -1374,6 +1433,12 @@ export class Input {
     // spin the camera or retarget). Presses already in flight are unaffected.
     if (this.cb.isCameraLocked?.()) return;
     if (e.button === 0) this.leftDown = true;
+    // In the bell, a left click IS the dash. Armed on the press (a drag that
+    // develops afterwards still dashes, click-then-steer is the whole move);
+    // the flight pass's dash cooldown makes the latch one dash per press.
+    if (e.button === 0 && this.deepballFlight) {
+      this.dashClickUntil = performance.now() + DASH_CLICK_LATCH_MS;
+    }
     if (e.button === 2) this.rightDown = true;
     if (e.button === 0 || e.button === 2) e.preventDefault?.();
     if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
@@ -1578,20 +1643,27 @@ export class Input {
     if (e.button === 2) this.rightDown = false;
     if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
     const wasCameraDrag = this.cameraDragActive;
-    const pick = wasCameraDrag
-      ? null
-      : clickPickFromMouseGesture({
-          button: e.button,
-          downButton: this.downButton,
-          downX: this.downX,
-          downY: this.downY,
-          upX: e.clientX,
-          upY: e.clientY,
-          movementDrag: this.dragDistance,
-          releaseOnCanvas: e.target === this.canvas || document.pointerLockElement === this.canvas,
-          pointerLocked: document.pointerLockElement === this.canvas,
-          pressDurationMs: performance.now() - this.downAt,
-        });
+    // In the bell a left click is the DASH, and the ball cam keeps the action
+    // centred under the cursor, so a plain left click constantly landed on a
+    // bot or the ball and opened a target frame mid-play. No pick from the
+    // dash button there; right-click picking (and every UI click) is untouched.
+    const pickSuppressed = this.deepballFlight && e.button === 0;
+    const pick =
+      wasCameraDrag || pickSuppressed
+        ? null
+        : clickPickFromMouseGesture({
+            button: e.button,
+            downButton: this.downButton,
+            downX: this.downX,
+            downY: this.downY,
+            upX: e.clientX,
+            upY: e.clientY,
+            movementDrag: this.dragDistance,
+            releaseOnCanvas:
+              e.target === this.canvas || document.pointerLockElement === this.canvas,
+            pointerLocked: document.pointerLockElement === this.canvas,
+            pressDurationMs: performance.now() - this.downAt,
+          });
     // Release the drag lock in both camera modes once no rotation button is
     // held, so the OS cursor returns between drags for target/loot/UI clicking.
     if (
@@ -1645,7 +1717,7 @@ export class Input {
     // player kept holding a drag button.
     this.maybeEngageDragPointerLock();
     this.camYaw -= mx * this.lookSensitivity;
-    this.camPitch = clampGliderCameraPitch(
+    this.camPitch = clampCamPitch(
       this.camPitch + my * this.lookSensitivity * this.lookPitchSign,
       this.cb.isGliderActive?.() === true,
     );
@@ -1687,6 +1759,15 @@ export class Input {
    */
   private readSwimSteer(moving: boolean): { dive: boolean; surface: boolean; swimSteer: number } {
     const keyDive = this.heldAction('dive') || this.touchDive;
+    // In the bell the vertical axis is the TRIM KEYS and nothing else: the
+    // camera's job there is to aim (see deepballAimFromPitch), and letting it
+    // also write `dive` meant a player looking down while flying forward was
+    // sinking twice over with no way to separate the two.
+    if (this.deepballFlight) {
+      this.swimLookDown = false;
+      this.swimLookUp = false;
+      return { dive: keyDive, surface: false, swimSteer: 1 };
+    }
     const enterDown = this.swimLookDown ? SWIM_LOOK_DOWN - SWIM_LOOK_HYSTERESIS : SWIM_LOOK_DOWN;
     const enterUp = this.swimLookUp ? SWIM_LOOK_UP + SWIM_LOOK_HYSTERESIS : SWIM_LOOK_UP;
     // Bands latch over swimAimPitch — the pitch STEERING looks wrote — never
@@ -1752,8 +1833,11 @@ export class Input {
         strafeLeft: false,
         strafeRight: false,
         jump: false,
+        boost: false,
+        dash: false,
         dive: false,
         surface: false,
+        aimPitch: undefined,
       };
     }
     if (this.controllerMoveInput) return { ...this.controllerMoveInput };
@@ -1771,6 +1855,13 @@ export class Input {
       this.keybinds.codesForAction('jump').some((c) => this.keys.has(comboCode(c))) ||
       performance.now() <= this.touchJumpUntil ||
       performance.now() <= this.keyJumpUntil;
+    // Deepball burners. Read like jump, off the raw codes rather than
+    // heldAction, because F is not a WASD key and must keep working in Attack
+    // Move mode. This was MISSING outright: `boost` was declared on MoveInput,
+    // set by the bots, honoured by the flight pass, and never once written by
+    // the human's move frame, so a player's burners could not light no matter
+    // what they pressed.
+    const boost = this.keybinds.codesForAction('boost').some((c) => this.keys.has(comboCode(c)));
     // Swim down / up, from the CAMERA as well as the keys: steer the view down
     // (right-drag) while swimming forward and you dive, tilt it back up and
     // you rise. The camera bands only act while a MOVE key is held and only
@@ -1779,7 +1870,7 @@ export class Input {
     // while swimming, so aiming the camera around on land is inert. See
     // SWIM_LOOK_* for the bands and swimSteer for the graded rate.
     const flying = this.cb?.isGliderActive?.() === true;
-    this.camPitch = clampGliderCameraPitch(this.camPitch, flying);
+    this.camPitch = clampCamPitch(this.camPitch, flying);
     const { dive, surface, swimSteer } = flying
       ? { dive: this.heldAction('dive') || this.touchDive, surface: false, swimSteer: 0 }
       : this.readSwimSteer(this.anyMoveHeld());
@@ -1793,16 +1884,26 @@ export class Input {
             flying,
             !this.gliderLookSuspended && (this.isMouselookActive() || this.mouseCameraEnabled),
           );
+    // The deepball aim rides the STEERING pitch, the same one the swim bands use
+    // (swimAimPitch), so a left-drag orbit looks around the bell without pulling
+    // the body's nose with it. Absent outside the bell, where nothing reads it.
+    const aimPitch = this.deepballFlight ? deepballAimFromPitch(this.swimAimPitch) : undefined;
+    // The left-click dash latch (see onMouseDown). Always present so a stale
+    // true can never survive an Object.assign onto the sim's move frame.
+    const dash = this.deepballFlight && performance.now() <= this.dashClickUntil;
 
     if (this.mouseCameraEnabled) {
       return {
         forward,
         back,
         jump,
+        boost,
+        dash,
         dive,
         surface,
         swimSteer,
         gliderPitch,
+        aimPitch,
         turnLeft: false,
         turnRight: false,
         strafeLeft:
@@ -1825,10 +1926,13 @@ export class Input {
       forward,
       back,
       jump,
+      boost,
+      dash,
       dive,
       surface,
       swimSteer,
       gliderPitch,
+      aimPitch,
       strafeLeft:
         held('strafeLeft') ||
         (mouselook && aHeld) ||

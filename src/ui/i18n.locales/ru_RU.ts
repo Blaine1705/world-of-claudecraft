@@ -1153,6 +1153,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC Рекорды',
   'landing.scout': 'WoC Разведка',
   'landing.parseService': 'WoC Боевые отчёты',
+  'editor.buildMode.materialNames.WardenStone': 'Гладкий камень',
+  'editor.buildMode.diagonal': 'Диагональные стены',
+  'editor.buildMode.diagonalHint':
+    'Перетащите указатель между узлами сетки, чтобы построить стену под любым углом.',
   'guide.professions.endgameBodyRaidCollections':
     'Ковка мастера объединяет вещи с меткой «Уникальный (экипируется): Ковка мастера». Прежняя вершина ремесла по-прежнему использует найденные схемы, промежуточные изделия с суточным ограничением и общие материалы финального этапа. Комплекты Горнила представляют отдельный путь с рейдовыми материалами, а не дополнительные расходы поверх прежней цепочки. Обе группы делят один предел ношения в две вещи, поэтому конкурируют за одни и те же два места в вашей сборке. Готовые вещи свободно продаются, пока доведение до совершенства или заказное изготовление не привяжет конкретный экземпляр.',
   'guide.professions.endgamePatternsBodyCollections':
@@ -15947,6 +15951,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': 'По центру',
   'hudChrome.breath.label': 'Дыхание',
   'hudChrome.breath.drowning': 'Вы тонете!',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': 'Открой путь к Дипгласу',
+  'hudChrome.portalWizard.gossipDeepglassAria': 'Попросить Бальдемара открыть портал к Дипгласу',
+  'hudChrome.portalWizard.gossipHome': 'Открой путь домой',
+  'hudChrome.portalWizard.gossipHomeAria': 'Попросить Бальдемара открыть портал обратно в город',
+  'hudChrome.portalWizard.portalOpen': 'Портал открыт. Шагните в него.',
   'abilityUi.resources.devotion': 'Преданность',
   'abilityUi.resources.focus': 'концентрации',
   'abilityUi.tooltip.requiresStealthSkulduggery':
@@ -18591,6 +18602,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Прекрасно начертано! Ваши шаги заслужили золотую оценку.',
   'questUi.worldQuest.traceReaction.elianComplete':
     'Руна завершена! Старательная практика сделает следующую ещё лучше.',
+  'hudChrome.realmBuilder.title': 'Зодчий месяца',
+  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
   'guide.arenaPage.honorFinalNoteSoldBack':
     'Покупки за честь окончательны. Список выкупа у торговца хранит лишь то, что вы продали: купленное за монеты обычно можно продать обратно по цене продажи и, если вы снова передумаете, выкупить из этого списка, но снаряжение Боевой мощи становится персональным в тот же миг, как вы его купили, так что его нельзя ни обменять, ни отправить почтой, ни продать обратно хоть за что-нибудь, и в этот список оно не попадает никогда. Потому магазин и просит подтверждения: прочтите описание вещи, прежде чем нажать.',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -18665,8 +18678,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': 'Разделить по сборщикам',
   'hudChrome.itemMenu.takeChosenQuantity': 'Взять выбранное количество',
   'hudChrome.itemMenu.combine': 'Объединить стопки материалов',
-  'hudChrome.realmBuilder.title': 'Зодчий месяца',
-  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
   'hudChrome.realmBuilder.placeholderName': 'Ваше имя',
   'hudChrome.realmBuilder.placeholderHint': 'Эта табличка ждёт своего первого имени.',
   'hudChrome.realmBuilder.pastTitle': 'Прежние зодчие',
@@ -19978,4 +19989,58 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Время применения Хватких корней сокращается на 0,5 сек.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
+  'entities.items.infernal_slag.name': 'Шлак Бездны',
+  'entities.items.charred_legion_tablet.name': 'Обугленная скрижаль легиона',
+  'entities.items.brands_of_the_first_flame.name': 'Клейма Первого Пламени',
+  'entities.items.forgekeepers_ledger.name': 'Книга учета Хранителя Горна',
+  'entities.items.azazels_broken_covenant.name': 'Нарушенный договор Азазеля',
+  'entities.items.emberforged_vambraces.name': 'Наручи угольной ковки',
+  'entities.items.cinderthread_mantle.name': 'Мантия пепельной нити',
+  'entities.items.hellstalker_boots.name': 'Сапоги адского охотника',
+  'entities.items.forgekeepers_warhammer.name': 'Боевой молот Хранителя Горна',
+  'entities.items.forgekeepers_runestaff.name': 'Рунный посох Хранителя Горна',
+  'entities.items.forgekeepers_fang.name': 'Клык Хранителя Горна',
+  'entities.items.azazels_ruinblade.name': 'Клинок погибели Азазеля',
+  'entities.items.azazels_soulstaff.name': 'Посох душ Азазеля',
+  'entities.items.azazels_emberfang.name': 'Угольный клык Азазеля',
+  'entities.items.hellforged_bulwark.name': 'Оплот адской ковки',
+  'entities.items.cinderseer_raiment.name': 'Одеяние пепельного провидца',
+  'entities.items.abysswalker_harness.name': 'Доспех странника Бездны',
+  'entities.mobs.abyssal_legionnaire.name': 'Легионер Бездны',
+  'entities.mobs.cinder_magus.name': 'Пепельный маг',
+  'entities.mobs.molten_hellhound.name': 'Лавовая адская гончая',
+  'entities.mobs.flamebound_smith.name': 'Скованный пламенем кузнец',
+  'entities.mobs.abyssal_gladiator.name': 'Гладиатор Бездны',
+  'entities.mobs.infernal_cinderling.name': 'Пепельный малыш Бездны',
+  'entities.mobs.forgekeeper.name': 'Хранитель Горна',
+  'entities.mobs.pyre_golem.name': 'Погребальный голем',
+  'entities.mobs.azazel_infernal_lord.name': 'Азазель, владыка Бездны',
+  'entities.quests.q_infernal_abyss_echoes.title': 'Эхо под Грозовым Утесом',
+  'entities.quests.q_infernal_abyss_echoes.text':
+    'Грозовой Утес родился не из бури, {playerName}. Древнейшие скрижали называют его крышкой, которой заковали пламя, упавшее из-за пределов мира. Под восточной скалой открылась новая расселина. Войди туда с четырьмя союзниками и принеси скрижаль легиона и клейма, высеченные у Первого Пламени.',
+  'entities.quests.q_infernal_abyss_echoes.completion':
+    'Скрижаль называет войско, которое добровольно шагнуло в огонь. Клейма называют силу, которой оно служило: Азазеля. Это никогда не было темницей, построенной, чтобы не впускать демонов, {playerName}. Это были врата, созданные, чтобы впустить их владыку.',
+  'entities.quests.q_infernal_abyss_echoes.objectives.0.label':
+    'Расшифровать обугленную скрижаль легиона',
+  'entities.quests.q_infernal_abyss_echoes.objectives.1.label': 'Изучить клейма Первого Пламени',
+  'entities.quests.q_infernal_abyss_covenant.title': 'Нарушенный договор',
+  'entities.quests.q_infernal_abyss_covenant.text':
+    'Клятва легиона обещала Азазелю путь в наш мир, но у каждого договора есть цена и изъян. Вернись в Расплавленную Бездну. Найди книгу учета Хранителя Горна и нарушенный договор возле Пасти. Если мы узнаем, что его связывало, то, возможно, поймем, как его убить.',
+  'entities.quests.q_infernal_abyss_covenant.completion':
+    'Вот изъян: Азазель питал врата именами собственного легиона. Каждый поглощенный слуга делал его сильнее, но привязывал его жизнь к горну внизу. Срази владыку в самом сердце горна, и врата погибнут вместе с ним.',
+  'entities.quests.q_infernal_abyss_covenant.objectives.0.label':
+    'Забрать книгу учета Хранителя Горна',
+  'entities.quests.q_infernal_abyss_covenant.objectives.1.label':
+    'Прочитать нарушенный договор Азазеля',
+  'entities.quests.q_infernal_abyss_azazel.title': 'Владыка Расплавленной Бездны',
+  'entities.quests.q_infernal_abyss_azazel.text':
+    'Договор дает нам один шанс, {playerName}. Спустись за горн и Пасть с верными спутниками. Встреться с Азазелем там, где Первое Пламя касается нашего мира, выдержи натиск его легионов и погаси владыку Бездны, пока Грозовой Утес не стал для него открытыми вратами.',
+  'entities.quests.q_infernal_abyss_azazel.completion':
+    'Гора стихла. Не спит, не ждет, просто молчит. Азазель строил вечность из украденных имен, а ты положил этому конец одним своим смертным именем. Хайвотч его запомнит, {playerName}.',
+  'entities.quests.q_infernal_abyss_azazel.objectives.0.label': 'Убить Азазеля, владыку Бездны',
+  'entities.dungeons.infernal_abyss.name': 'Расплавленная Бездна',
+  'entities.dungeons.infernal_abyss.enterText':
+    'Вы спускаетесь под Грозовой Утес в Расплавленную Бездну.',
+  'entities.dungeons.infernal_abyss.leaveText':
+    'Вы выбираетесь из раскаленной тьмы навстречу горному ветру.',
 };

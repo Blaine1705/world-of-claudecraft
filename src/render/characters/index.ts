@@ -8,6 +8,7 @@ import { type AssembleOptions, modularHeadFor } from './assets';
 import { type CharacterFormKey, characterFormAssetKey } from './form_visual_selection_core';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
 import {
+  authoredRigOverride,
   mechHeldWeaponOverride,
   modularVisualKey,
   VISUALS,
@@ -15,7 +16,7 @@ import {
   visualKeyFor,
 } from './manifest';
 import { MODULAR_WARRIOR_KEY, type ModularLook } from './modular';
-import { npcModularKeyFor } from './npc_looks';
+import { isUnarmedCivilianTemplate, npcModularKeyFor } from './npc_looks';
 import { CharacterVisual } from './visual';
 
 export {
@@ -121,7 +122,12 @@ export function createCharacterVisual(
   // Shapeshift forms are their own model and never compose, and neither does a
   // Combat Mech wearer: the mech is a whole replacement body, so the cosmetic
   // must win over the authored look (composing over it hid a purchased skin).
-  const look = formKey || isMechWearer(e) ? null : (modularLookProvider?.(e) ?? null);
+  // A Studio-authored rig pick is an explicit model choice the same way, so
+  // it beats a composed NPC look too.
+  const look =
+    formKey || isMechWearer(e) || authoredRigOverride(e)
+      ? null
+      : (modularLookProvider?.(e) ?? null);
   const key = formKey
     ? characterFormAssetKey(formKey, e.auras)
     : look
@@ -148,6 +154,12 @@ export function createCharacterVisual(
       look,
       opts,
     );
+    // Civilians (the portal wizard, the Deepglass crowd and its keepers) compose
+    // on a class body and would otherwise inherit that class's held-weapon
+    // layout: a stadium of spectators, every one of them holding a sword.
+    if (!formKey && e.kind === 'npc' && isUnarmedCivilianTemplate(e.templateId)) {
+      visual.disarmHeldProps();
+    }
     visual.budgetedWeaponLight = true;
     return visual;
   } catch (err) {

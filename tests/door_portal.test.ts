@@ -4,11 +4,20 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { buildDoorBody, doorArchAuthoredElsewhere } from '../src/render/door_portal';
+import { buildInfernalDoorBody } from '../src/render/infernal_door_portal';
 import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resource';
 import { DUNGEONS } from '../src/sim/data';
 
 const meshes = (body: THREE.Group): THREE.Mesh[] =>
   body.children.filter((c): c is THREE.Mesh => (c as THREE.Mesh).isMesh);
+
+const descendantMeshes = (body: THREE.Group): THREE.Mesh[] => {
+  const found: THREE.Mesh[] = [];
+  body.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh) found.push(child as THREE.Mesh);
+  });
+  return found;
+};
 
 describe('buildDoorBody: standard arch door', () => {
   it('builds arch + keystone + two plinths + portal, and returns the portal mesh', () => {
@@ -89,6 +98,40 @@ describe('buildDoorBody: Nythraxis crypt click-box', () => {
     // the lift back out of the approach keeps the normal leaving portal
     const exit = buildDoorBody(false, 'ignivar_forge_approach', false);
     expect(exit.portal).toBeDefined();
+  });
+});
+
+describe('Infernal Abyss standalone exterior gate', () => {
+  it('builds the bespoke infernal threshold and reports its height', () => {
+    const { body, height } = buildInfernalDoorBody(false);
+    const gateMeshes = descendantMeshes(body);
+
+    expect(body.name).toBe('infernal-abyss-exterior-gate');
+    expect(body.getObjectByName('infernal-gate-frame')).toBeDefined();
+    expect(body.getObjectByName('infernal-threshold-flame')).toBeDefined();
+    expect(gateMeshes.some((mesh) => mesh.geometry.type === 'ExtrudeGeometry')).toBe(false);
+    expect(gateMeshes.some((mesh) => mesh.geometry.type === 'CircleGeometry')).toBe(false);
+    expect(height).toBeGreaterThan(6);
+  });
+
+  it.each([false, true])(
+    'routes an entering Infernal door through its builder (low=%s)',
+    (lowGfx) => {
+      const { body, portal, height } = buildDoorBody(true, 'infernal_abyss', lowGfx);
+      expect(body.name).toBe('infernal-abyss-exterior-gate');
+      expect(body.getObjectByName('infernal-gate-frame')).toBeDefined();
+      expect(body.getObjectByName('infernal-threshold-flame')).toBeDefined();
+      expect(height).toBeGreaterThan(6);
+      expect(portal).toBeUndefined();
+    },
+  );
+
+  it('keeps the Infernal Abyss exit on the standard blue portal contract', () => {
+    const { body, portal } = buildDoorBody(false, 'infernal_abyss', false);
+
+    expect(body.name).not.toBe('infernal-abyss-exterior-gate');
+    expect(meshes(body).length).toBe(5);
+    expect(portal).toBeDefined();
   });
 });
 

@@ -52,7 +52,12 @@ describe('sanitizeActionBarLayout (untrusted payload bounds)', () => {
   it('accepts a well-formed layout and normalizes the version', () => {
     const clean = sanitizeActionBarLayout({
       v: 99,
-      forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }, null], attack: null } },
+      forms: {
+        normal: {
+          bar: [{ type: 'ability', id: 'heroic_strike' }, null],
+          attack: null,
+        },
+      },
     });
     expect(clean).not.toBeNull();
     expect(clean?.v).toBe(1);
@@ -103,8 +108,19 @@ describe('sanitizeActionBarLayout (untrusted payload bounds)', () => {
       forms: { normal: { bar: [] }, sport: { bar: [] } },
     });
     expect(clean).not.toBeNull();
-    expect(Object.keys(clean?.forms ?? {})).toEqual(['normal']);
-    expect(ACTION_BAR_LAYOUT_FORMS).toEqual(['normal', 'bear', 'cat', 'cat_stealth', 'stealth']);
+    // FORK: 'sport' stays a known form (src/world_api/action_bar.ts) so an
+    // existing character's stored Vale Cup layout still reads, and 'deepball'
+    // is the Deepglass bar; the sanitizer therefore KEEPS sport.
+    expect(Object.keys(clean?.forms ?? {})).toEqual(['normal', 'sport']);
+    expect(ACTION_BAR_LAYOUT_FORMS).toEqual([
+      'normal',
+      'bear',
+      'cat',
+      'cat_stealth',
+      'stealth',
+      'sport',
+      'deepball',
+    ]);
   });
 
   it('rejects a payload with an abusive number of form keys', () => {
@@ -117,7 +133,9 @@ describe('sanitizeActionBarLayout (untrusted payload bounds)', () => {
     const clean = sanitizeActionBarLayout({
       v: 1,
       forms: {
-        normal: { bar: [{ type: 'nope', id: 'x' }, { id: 5 }, 'string', { type: 'item' }] },
+        normal: {
+          bar: [{ type: 'nope', id: 'x' }, { id: 5 }, 'string', { type: 'item' }],
+        },
       },
     });
     expect(clean?.forms.normal?.bar).toEqual([null, null, null, null]);
@@ -196,13 +214,20 @@ describe('sanitizeActionBarLayout (untrusted payload bounds)', () => {
 describe('sanitizeActionBarLayoutProfiles (the stored per-surface document)', () => {
   it('reads a v1 layout at rest as the desktop profile', () => {
     const doc = sanitizeActionBarLayoutProfiles(layoutOf('heroic_strike'));
-    expect(doc).toEqual({ v: 2, profiles: { desktop: layoutOf('heroic_strike') } });
+    expect(doc).toEqual({
+      v: 2,
+      profiles: { desktop: layoutOf('heroic_strike') },
+    });
   });
 
   it('keeps every known profile of a v2 document and normalizes the version', () => {
     const doc = sanitizeActionBarLayoutProfiles({
       v: 7,
-      profiles: { desktop: layoutOf('a'), touch: layoutOf('b'), gamepad: layoutOf('c') },
+      profiles: {
+        desktop: layoutOf('a'),
+        touch: layoutOf('b'),
+        gamepad: layoutOf('c'),
+      },
     });
     expect(doc?.v).toBe(2);
     expect(doc?.profiles).toEqual({
@@ -224,7 +249,10 @@ describe('sanitizeActionBarLayoutProfiles (the stored per-surface document)', ()
   });
 
   it('wires an empty forms mirror when the document has no desktop profile', () => {
-    const wire = actionBarLayoutWire({ v: 2, profiles: { touch: layoutOf('b') } });
+    const wire = actionBarLayoutWire({
+      v: 2,
+      profiles: { touch: layoutOf('b') },
+    });
     expect(wire.forms).toEqual({});
     expect(wire.profiles.touch).toEqual(layoutOf('b'));
   });
@@ -244,7 +272,10 @@ describe('sanitizeActionBarLayoutProfiles (the stored per-surface document)', ()
       })?.profiles,
     ).toEqual({ desktop: layoutOf('a') });
     expect(
-      sanitizeActionBarLayoutProfiles({ v: 2, profiles: { touch: { v: 1, forms: 'nope' } } }),
+      sanitizeActionBarLayoutProfiles({
+        v: 2,
+        profiles: { touch: { v: 1, forms: 'nope' } },
+      }),
     ).toEqual({ v: 2, profiles: {} });
   });
 
@@ -267,9 +298,15 @@ describe('sanitizeActionBarLayoutProfiles (the stored per-surface document)', ()
   });
 
   it('withActionBarLayoutProfile replaces one profile and leaves the rest untouched', () => {
-    const base: ActionBarLayoutProfiles = { v: 2, profiles: { desktop: layoutOf('a') } };
+    const base: ActionBarLayoutProfiles = {
+      v: 2,
+      profiles: { desktop: layoutOf('a') },
+    };
     const next = withActionBarLayoutProfile(base, 'touch', layoutOf('b'));
-    expect(next.profiles).toEqual({ desktop: layoutOf('a'), touch: layoutOf('b') });
+    expect(next.profiles).toEqual({
+      desktop: layoutOf('a'),
+      touch: layoutOf('b'),
+    });
     // Immutable: the input document is not mutated.
     expect(base.profiles).toEqual({ desktop: layoutOf('a') });
     expect(withActionBarLayoutProfile(null, 'gamepad', layoutOf('c')).profiles).toEqual({
@@ -431,7 +468,9 @@ describe('capture/apply round trip', () => {
     const layout: ActionBarLayout = {
       v: 1,
       forms: {
-        normal: { bar: [{ type: 'ability', id: 'a' }, null, { type: 'item', id: 'b' }] },
+        normal: {
+          bar: [{ type: 'ability', id: 'a' }, null, { type: 'item', id: 'b' }],
+        },
         stealth: { bar: [{ type: 'ability', id: 'ambush' }], attack: null },
       },
     };
@@ -475,7 +514,10 @@ describe('capture/apply round trip', () => {
 describe('planActionBarRestore (the locked merge rule)', () => {
   const local = layoutOf('x');
   const server = layoutOf('srv');
-  const withDesktop: ActionBarLayoutProfiles = { v: 2, profiles: { desktop: server } };
+  const withDesktop: ActionBarLayoutProfiles = {
+    v: 2,
+    profiles: { desktop: server },
+  };
   const withBoth: ActionBarLayoutProfiles = {
     v: 2,
     profiles: { desktop: server, touch: layoutOf('touch-srv') },
@@ -491,7 +533,10 @@ describe('planActionBarRestore (the locked merge rule)', () => {
       'touch',
       () => local,
     );
-    expect(plan).toEqual({ action: 'apply-server', layout: layoutOf('touch-srv') });
+    expect(plan).toEqual({
+      action: 'apply-server',
+      layout: layoutOf('touch-srv'),
+    });
     const desktop = planActionBarRestore(
       { source: 'server', profiles: withBoth },
       'desktop',
@@ -506,7 +551,11 @@ describe('planActionBarRestore (the locked merge rule)', () => {
       'touch',
       () => local,
     );
-    expect(plan).toEqual({ action: 'seed-profile', layout: server, upload: false });
+    expect(plan).toEqual({
+      action: 'seed-profile',
+      layout: server,
+      upload: false,
+    });
   });
 
   it('a server document with nothing usable behaves like no copy at all', () => {
@@ -566,7 +615,9 @@ describe('planActionBarRestore (the locked merge rule)', () => {
     expect(planActionBarRestore({ source: 'noop' }, 'desktop', () => local)).toEqual({
       action: 'none',
     });
-    expect(planActionBarRestore(undefined, 'desktop', () => local)).toEqual({ action: 'none' });
+    expect(planActionBarRestore(undefined, 'desktop', () => local)).toEqual({
+      action: 'none',
+    });
     // A touch mirror that already holds its own copy never re-inherits desktop.
     expect(
       planActionBarRestore(
