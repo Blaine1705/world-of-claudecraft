@@ -25,6 +25,7 @@ export {
   applyEntityAnimOverrides,
 } from './anim_state_entity_core';
 export type { AssembleOptions } from './assets';
+export { visualAssetsResident } from './assets';
 export { type LookPiecesStats, lookPiecesStats } from './look_pieces';
 export { npcLookFor } from './npc_looks';
 export { CharacterPreview } from './preview';
