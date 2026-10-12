@@ -27,7 +27,16 @@ After only (the base has nothing to show for these):
 | One boss down (1 / 4) | [after-desktop-boss-down.png](after-desktop-boss-down.png) |
 | Finished heroic run | [after-desktop-heroic-complete.png](after-desktop-heroic-complete.png) |
 | Eight tracked quests beside it, heroic, two bosses down | [after-desktop-long-quest-list.png](after-desktop-long-quest-list.png) |
-| Short viewport (1366 x 768): the plate keeps to the column the button rail leaves free | [after-desktop-1366x768.png](after-desktop-1366x768.png) |
+| Short viewport (1366 x 768), finished heroic run, eight quests: the plate keeps to the column the button rail leaves free, every boss on one line | [after-desktop-1366x768.png](after-desktop-1366x768.png) |
+| UI scale 1.25 on 1920 x 1080, one boss down: the scaled rail climbs beside the plate, which narrows the same way | [after-desktop-1080p-ui-scale-125.png](after-desktop-1080p-ui-scale-125.png) |
+| Russian, 1366 x 768, finished heroic run: the long chip and tally wrap inside the narrowed plate | [after-desktop-1366x768-ru-heroic-complete.png](after-desktop-1366x768-ru-heroic-complete.png) |
+
+The plate is the one opaque box in the tracker stack, so it must not paint over the button
+rail. Where the two meet depends on the viewport, the UI scale, a horizontal or moved rail
+and a moved tracker, so the painter measures it (`dungeonPlateFraction` in
+`dungeon_tracker_view.ts`) and the plate takes the rail-free share of its column; with the
+rail below it, horizontal, or dragged elsewhere, it fills the column. The boss rows are text
+and always span the column.
 
 On the phone the right stack's seat sits on the action ring, so the plate stands down and
 the run is a page of the top-band quest strip instead (the dungeon as the title, each boss
@@ -36,4 +45,6 @@ a counted line). The page sits after the tracked quests, so with three quests it
 
 To reshoot: `scripts/pr_shot_targets.mjs` carries the `dungeon-objectives-tracker` target
 (entry, a boss down, a finished heroic run, and the phone), which `scripts/pr_screenshots.mjs`
-selects for any change to the tracker pair or to `src/sim/instances/dungeon_run.ts`.
+selects for any change to the tracker pair or to `src/sim/instances/dungeon_run.ts`. The
+long-list, short-viewport, UI-scale and Russian stills are the same staging by hand: the
+viewport, the `uiScale` setting, and `?lang=ru_RU` on the URL.
