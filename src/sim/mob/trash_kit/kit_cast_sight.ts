@@ -22,34 +22,45 @@
 // Sergeant's order, judged bolt by bolt).
 //
 // Cost: no query while a cast waits on its cooldown or on its own readiness;
-// one when a bar would begin, one when it ends, and one a player in reach
-// only when the first pick was hidden. Draws no rng; the hashed picks are
-// unchanged whenever everyone is in sight.
+// one when a bar would begin, one when it ends, and, only when the first pick
+// was hidden, one more per further pick until a player in sight is found (the
+// re-draw stops at the first). A cast with nobody in sight waits
+// KIT_SIGHT_RETRY plus a slot of its caster's id, so a pack whose target hides
+// does not all look again on one tick. Every query is tallied on the sim's
+// per-tick counters (mobScanCounters.sightQueries). Draws no rng; the hashed
+// picks are unchanged whenever everyone is in sight.
+//
+// A fizzle is a bar that was begun: it keeps its place in the caster's cast
+// count (TrashKitState.casts, the salt of the hashed picks), so the pick after
+// a fizzle is drawn afresh and never the same hidden player for ever.
 
 import type { SimContext } from '../../sim_context';
-import { dist2d, type Entity } from '../../types';
+import { DT, type Entity } from '../../types';
 
 /** The driver's own keys that are a cast at one player. */
 export const KIT_SIGHT_KEYS: ReadonlySet<string> = new Set(['bolt', 'eye', 'column', 'lullaby']);
 
 /** Seconds a sight-bound cast waits before it looks for a victim again. */
 export const KIT_SIGHT_RETRY = 0.5;
-/** Players farther than this are never asked about (no kit cast reaches them). */
-const KIT_SIGHT_REACH = 60;
+/** Tick slots (by caster id) the retry is spread over, so a pack does not all
+ *  look again together. */
+export const KIT_SIGHT_RETRY_SLOTS = 10;
+
+/** When a cast that found nobody in sight looks again: the retry plus its
+ *  caster's slot, in seconds. */
+export function kitSightRetry(mob: Entity): number {
+  return KIT_SIGHT_RETRY + (mob.id % KIT_SIGHT_RETRY_SLOTS) * DT;
+}
 
 /** Is `target` a living player the caster cannot see? (An ally, a corpse or
- *  no target at all is never hidden: those casts are not sight-bound.) */
+ *  no target at all is never hidden: those casts are not sight-bound.) One
+ *  line-of-sight query, tallied. */
 export function kitVictimHidden(
   ctx: SimContext,
   mob: Entity,
   target: Entity | null | undefined,
 ): boolean {
-  return !!target && target.kind === 'player' && !target.dead && !ctx.hasLineOfSight(mob, target);
-}
-
-/** The living players near the caster that it can see, in the order given. */
-export function playersInSight(ctx: SimContext, mob: Entity, players: readonly Entity[]): Entity[] {
-  return players.filter(
-    (p) => !p.dead && dist2d(p.pos, mob.pos) <= KIT_SIGHT_REACH && ctx.hasLineOfSight(mob, p),
-  );
+  if (!target || target.kind !== 'player' || target.dead) return false;
+  ctx.mobScanCounters.sightQueries++;
+  return !ctx.hasLineOfSight(mob, target);
 }

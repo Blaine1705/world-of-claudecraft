@@ -121,13 +121,17 @@ describe('ranged petSpell casters keep the classic caster loop', () => {
     expect(mob.swingTimer).toBeLessThanOrEqual(0.4);
   });
 
-  it('in spell range but with a world prop in the way, it keeps closing instead of taking its stance', () => {
+  it('in spell range but with a world prop in the way, it begins no cast and goes to close instead', () => {
     const { sim, p } = makeSim();
-    // The same pair on the x axis, where a prop at 5 yd breaks the line.
-    const mob = engageMob(sim, p, 'corrupted_priest_malric', 20, 'chase', { swingTimer: 5 });
+    // The same pair on the x axis, where a prop at 5 yd breaks the line; its
+    // next cast is a tick or two away.
+    const mob = engageMob(sim, p, 'corrupted_priest_malric', 20, 'chase', { swingTimer: 0.1 });
     expect(sim.ctx.hasLineOfSight(mob, p)).toBe(false);
-    sim.updateMob(mob);
+    const hp = p.hp;
+    for (let i = 0; i < 6; i++) sim.updateMob(mob);
+    // The cast it was about to begin asked for sight and did not get it.
     expect(mob.aiState).toBe('chase');
+    expect(p.hp).toBe(hp);
     expect(mob.pos.x !== 20 || mob.pos.z !== 0).toBe(true);
   });
 });

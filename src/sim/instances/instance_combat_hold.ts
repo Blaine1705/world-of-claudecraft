@@ -62,6 +62,9 @@ export function attackerLeftInstance(slot: InstanceSlot, attacker: Entity): bool
 export function pinInPlace(mob: Entity): void {
   if (mob.evadeInPlace === undefined) mob.evadeInPlace = 0;
   mob.autoAttack = false;
+  // Whatever route it was on did not get it there (mob/chase_route.ts): once
+  // it has phased through to its target the old waypoints lie behind a wall.
+  if (mob.chaseRoute !== undefined && mob.chaseRoute.path.length > 0) mob.chaseRoute.path = [];
 }
 
 export function releasePin(mob: Entity): void {

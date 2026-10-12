@@ -2218,10 +2218,10 @@ export class Sim {
   deedDirtyPids = new Set<number>();
   deedDirtyKeys = new Map<number, Set<string>>();
   deedRuntime: DeedRuntime = createDeedRuntime();
-  // Mob-AI scan visit counters (observability): reset at the top of each tick,
-  // incremented in place by the aggro-scan and threat-table hot paths through
-  // ctx, and read by the host after tick() returns. Not persisted, never a
-  // gameplay input; exposed as a live SimContext view and via mobScanCounters.
+  // Mob-AI per-tick tallies (mob/scan_counters.ts): reset at the top of each
+  // tick, incremented in place through ctx, read by the host after tick(). Not
+  // persisted. The visit counts are observability only; routeNodes is also the
+  // tick's route-search budget (deterministic: only the sim resets the holder).
   private readonly _mobScanCounters = createMobScanCounters();
   // World-boss scheduler, one slot per WORLD_BOSSES entry. `nextAt` is the next
   // sim-time (seconds) a boss is due to rise; `entityId` is the live boss entity

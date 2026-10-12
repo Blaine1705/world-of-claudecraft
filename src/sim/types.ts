@@ -388,24 +388,31 @@ export type EntityKind = 'player' | 'mob' | 'npc' | 'object';
 
 export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 
-/** An engaged mob's cached route to its target (mob/chase_route.ts). */
+/** An engaged mob's cached route to its target, its plan throttle, and (for a
+ *  caster) its last line-of-sight answer (mob/chase_route.ts, mob/cast_sight.ts). */
 export interface MobChaseRoute {
   /** The target this record was made for; another target starts a fresh one. */
   targetId: number;
   /** Waypoints still ahead (world x and z), the last one the target's spot
    *  when the route was planned. One or none: no route, chase straight. */
   path: Vec3[];
-  /** The sim tick before which no new plan is made. */
+  /** The sim tick before which no new plan is made (the re-plan period, and
+   *  the backoff after a failed search). Outlives the path. */
   planAt: number;
-  /** Routes walked toward the target while it stood within reach of the
-   *  anchor spot; past the cap no more are planned until it moves. */
+  /** Plans spent, found or failed, and the tick the count last gave one back
+   *  (one every ROUTE_TRY_FORGIVE_TICKS). Outlives the path: nothing the
+   *  target does hands them back. */
   tries: number;
-  anchorX: number;
-  anchorZ: number;
-  /** A caster's last line-of-sight answer and the sim tick it expires on
-   *  (mob/cast_sight.ts). */
+  triesAt: number;
+  /** Failed searches in a row (the backoff's exponent). */
+  fails: number;
+  /** The watchdog: the nearest the mob has been to its next waypoint, the
+   *  tick it last got nearer, and the tick it last walked the route. */
+  stuckDist: number;
+  stuckAt: number;
+  walkedAt: number;
+  /** A caster's last line-of-sight answer (mob/cast_sight.ts). */
   sightClear: boolean;
-  sightAt: number;
 }
 
 export type AuraKind =
@@ -7716,11 +7723,18 @@ export interface Entity extends ClientMirroredEntityFields {
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
-  // An engaged mob's route round an obstacle and, for a caster, its throttled
-  // line-of-sight answer (mob/chase_route.ts, mob/cast_sight.ts). Present only
-  // while something is in its way: undefined whenever the mob chases straight
-  // or stands casting with a clear line (never deleted).
+  // An engaged mob's route round an obstacle, its plan throttle and, for a
+  // caster, its last line-of-sight answer (mob/chase_route.ts,
+  // mob/cast_sight.ts). Made the first time something is in the mob's way and
+  // kept for the rest of the pull (the throttle must outlive the path);
+  // undefined on a mob nothing has blocked and after every pull reset (never
+  // deleted). Server-local: never on the wire.
   chaseRoute?: MobChaseRoute;
+  // On a TARGET: the last route search toward it that found nothing, for the
+  // rest of the pack (mob/chase_route.ts): the tick, where the target stood
+  // and where the search began. A few seconds old at most when it is read;
+  // never cleared, only overwritten. Server-local: never on the wire.
+  routeDenied?: { tick: number; x: number; z: number; fromX: number; fromZ: number };
   chaseStall: number; // seconds an engaged mob has been pinned unable to close on its target; at CHASE_STALL_TIMEOUT (mob/reachability.ts) it evades home like a leash break
   evadeEpoch: number; // bumped every full evade-home reset (resetEvadingMob): a test-observable count of pulls this mob has walked home from
   chainPullInbound: boolean; // woken by a boss chain pull and still crossing to the puller; suspends the soft leash until it arrives (mob/chain_pull_transit.ts)

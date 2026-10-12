@@ -13,21 +13,33 @@
 //     no damage, no resist roll, nothing drawn from the rng;
 //   - a failed cast is not paid for: the caster may try again as soon as it
 //     sees its target (after CAST_SIGHT_RETRY_SECONDS, never on the same tick);
-//   - a caster that cannot see its target does not stand there: it walks to
-//     where it can (mob/chase_route.ts), round the wall, and casts again from
-//     the first spot in range that has a line of sight.
+//   - a caster that cannot see its target does not stand there: it closes on
+//     it, round the wall by a planned route where routes are planned (inside
+//     an instance, mob/chase_route.ts) and by the ordinary straight chase
+//     everywhere else, and casts again from the first spot in range that has a
+//     line of sight. One that can neither see nor reach falls to the existing
+//     stall, evade and hold rules; it never stands silent for ever.
+//
+// WHO: a hostile-AI petSpell caster that leashes and is not a boss
+// (casterObeysSight). A boss, an encounter script that opted out of the leash
+// (canLeash false: it has no stall or evade to fall back on, so a walled-off
+// one would stand silent for ever) and a player's pet keep the old loop. Today
+// no boss and no canLeash-false template carries a petSpell; the gate is here
+// so one added later is not swept in by accident.
 //
 // Cost on the server's tick, bounded by design: a standing caster asks for a
-// line of sight twice a cast (its start and its end); a mob on the move asks
-// once every SIGHT_RECHECK_TICKS; nothing asks every tick. The query itself
+// line of sight twice a cast (its start and its end); a caster on the move
+// asks once every SIGHT_RECHECK_TICKS, on its own tick slot (by entity id, so
+// a pack does not ask together), and only within SIGHT_SEEK_MARGIN of its
+// spell range; nothing asks every tick. Every query is tallied on the sim's
+// per-tick counters (mobScanCounters.sightQueries). The query itself
 // (Sim.hasLineOfSight) samples the sight line every half yard against the
 // slot's collider cells.
 //
-// Scope: the hostile petSpell casters of the mob AI (mob/combat_profile.ts
-// updateCasterCombat). A player's pet never comes through here (pet/pet_ai.ts
-// drives its own ranged attack), nor does any boss or encounter mechanic.
 // Draws no rng.
 
+import { MOBS } from '../data';
+import type { MobCombatProfile } from '../mob_combat';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity } from '../types';
 import { chaseRouteFor } from './chase_route';
@@ -49,24 +61,36 @@ export type CastSightVerdict =
   /** A windup ran out with the target out of sight: the cast failed. */
   | 'failed';
 
-/** Remember that the caster cannot see its target (the route record carries
- *  the answer for the chase arm and the stall detector's reach). */
-function noteBlocked(ctx: SimContext, mob: Entity, target: Entity): void {
-  const route = chaseRouteFor(mob, target);
-  route.sightClear = false;
-  route.sightAt = ctx.tickCount + SIGHT_RECHECK_TICKS;
+/** Does this caster's petSpell obey the sight rule (see WHO above)? */
+export function casterObeysSight(mob: Entity, profile: MobCombatProfile): boolean {
+  return profile.canLeash && mob.ownerId === null && MOBS[mob.templateId]?.boss !== true;
+}
+
+/** One line-of-sight query, tallied. */
+function sees(ctx: SimContext, mob: Entity, target: Entity): boolean {
+  ctx.mobScanCounters.sightQueries++;
+  return ctx.hasLineOfSight(mob, target);
+}
+
+/** Write a fresh answer down. A blocked one makes the record that carries it
+ *  (the chase arm and the stall detector's reach read it back); a clear one
+ *  only corrects a record that already exists, so a caster that never lost
+ *  sight carries none. */
+function note(ctx: SimContext, mob: Entity, target: Entity, clear: boolean): void {
+  const held = mob.chaseRoute?.targetId === target.id ? mob.chaseRoute : undefined;
+  if (clear && held === undefined) return;
+  const route = held ?? chaseRouteFor(ctx, mob, target);
+  route.sightClear = clear;
 }
 
 /**
  * Is the caster's line of sight to its target blocked? For a mob on the move.
- * Asked only within `reach` (its spell range) plus SIGHT_SEEK_MARGIN: farther
+ * Asked only within `reach` (its spell range) plus SIGHT_SEEK_MARGIN (farther
  * out the caster is only closing the distance, sight decides nothing yet, and
- * the query's cost grows with its length, so a caster crossing a whole
- * dungeon asks nothing. A blocked answer is held for SIGHT_RECHECK_TICKS (the
- * long case: a caster walking round a wall); a clear one is not held at all,
- * because a caster with a clear line takes its stance within a few ticks and
- * a mob that never lost sight then carries no record (Entity.chaseRoute stays
- * undefined, so the parity trace of every open-ground fight is unchanged).
+ * the query's cost grows with its length), and only on the caster's own slot
+ * of every SIGHT_RECHECK_TICKS ticks; between asks the last answer stands, and
+ * a caster that has never been blocked reads clear. The cast's own start
+ * check is what catches an answer gone stale in those few ticks.
  */
 export function casterSightBlocked(
   ctx: SimContext,
@@ -74,22 +98,17 @@ export function casterSightBlocked(
   target: Entity,
   reach: number,
 ): boolean {
-  const held = mob.chaseRoute?.targetId === target.id ? mob.chaseRoute : undefined;
   if (dist2d(mob.pos, target.pos) > reach + SIGHT_SEEK_MARGIN) {
-    if (held) held.sightClear = true;
+    note(ctx, mob, target, true);
     return false;
   }
-  if (held && !held.sightClear && ctx.tickCount < held.sightAt) return true;
-  if (ctx.hasLineOfSight(mob, target)) {
-    if (held) held.sightClear = true;
-    return false;
-  }
-  noteBlocked(ctx, mob, target);
-  return true;
+  if ((ctx.tickCount + mob.id) % SIGHT_RECHECK_TICKS === 0)
+    note(ctx, mob, target, sees(ctx, mob, target));
+  return lastSightBlocked(mob, target);
 }
 
 /** The last answer the mob holds about this target, without asking again
- *  (false for a mob that holds none: a standing caster with a clear line). */
+ *  (false for a mob that holds none: it has never been blocked). */
 export function lastSightBlocked(mob: Entity, target: Entity): boolean {
   const route = mob.chaseRoute;
   return route !== undefined && route.targetId === target.id && !route.sightClear;
@@ -99,7 +118,9 @@ export function lastSightBlocked(mob: Entity, target: Entity): boolean {
  * Judge a standing petSpell caster's tick BEFORE its ranged attack runs
  * (Sim.updateRangedPetAttack, whose timing this mirrors: a committed windup
  * releases on its tick, and a new cast begins on the tick the swing timer
- * runs out). Asks for a line of sight on those two ticks only.
+ * runs out). Asks for a line of sight on those two ticks only, and writes
+ * every answer down, a clear one included: a caster whose target stepped back
+ * into sight must not go on reading "blocked" while it stands casting.
  */
 export function petSpellSightVerdict(
   ctx: SimContext,
@@ -108,16 +129,17 @@ export function petSpellSightVerdict(
 ): CastSightVerdict {
   if (mob.rangedWindupReleaseTick != null) {
     if (ctx.tickCount < mob.rangedWindupReleaseTick) return 'cast';
-    if (ctx.hasLineOfSight(mob, target)) return 'cast';
+    const clear = sees(ctx, mob, target);
+    note(ctx, mob, target, clear);
+    if (clear) return 'cast';
     // The windup ran out on a target it cannot see: nothing leaves its hand,
     // and the cast it did not get is not charged to its cadence.
     mob.rangedWindupReleaseTick = null;
     mob.swingTimer = Math.min(mob.swingTimer, CAST_SIGHT_RETRY_SECONDS);
-    noteBlocked(ctx, mob, target);
     return 'failed';
   }
   if (mob.swingTimer - DT > 0) return 'cast';
-  if (ctx.hasLineOfSight(mob, target)) return 'cast';
-  noteBlocked(ctx, mob, target);
-  return 'seek';
+  const clear = sees(ctx, mob, target);
+  note(ctx, mob, target, clear);
+  return clear ? 'cast' : 'seek';
 }

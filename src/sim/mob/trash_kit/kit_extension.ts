@@ -15,6 +15,9 @@ import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity, TrashKitCast, TrashKitDef, TrashKitState } from '../../types';
 
+/** Why a bar that began did not land (TrashKitExtension.broken). */
+export type KitCastDropReason = 'broken' | 'sight';
+
 /** A cast's readiness: may it start now, and at whom. */
 export interface KitCastPick {
   ok: boolean;
@@ -75,14 +78,18 @@ export interface TrashKitExtension {
     st: TrashKitState,
     players: () => Entity[],
   ): boolean;
-  /** Its bar broke before it landed (a kick, a stun, a silence, a lost
-   *  sight): drop what the bar laid while it ran (a locked aim, a draw). */
+  /** Its bar did not land: drop what the bar laid while it ran (a locked aim,
+   *  a draw). `reason` says why: 'broken' is a kick, a stun or a silence;
+   *  'sight' is a bar that RAN OUT with its victim out of sight
+   *  (kit_cast_sight.ts), which nobody kicked. An extension that rewards or
+   *  punishes a kick must look at the reason, never assume one. */
   broken?(
     ctx: SimContext,
     mob: Entity,
     key: string,
     targetId: number | null,
     st: TrashKitState,
+    reason: KitCastDropReason,
   ): void;
   /** The pull ended for this mob (death, evade, reset): lift what it left
    *  on others (a link, a mark, a ring). */

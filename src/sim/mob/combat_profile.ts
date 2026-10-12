@@ -25,9 +25,19 @@ import {
   LEASH_DISTANCE,
   steadyAngleTo,
 } from '../types';
-import { casterSightBlocked, lastSightBlocked, petSpellSightVerdict } from './cast_sight';
+import {
+  casterObeysSight,
+  casterSightBlocked,
+  lastSightBlocked,
+  petSpellSightVerdict,
+} from './cast_sight';
 import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
-import { chaseAroundObstacles, clearChaseRoute, followChaseRoute } from './chase_route';
+import {
+  chaseAroundObstacles,
+  endChaseRoute,
+  followChaseRoute,
+  restChaseRoute,
+} from './chase_route';
 import { updateDerelictBomber } from './derelict_bomber';
 import { dragonkinEngageShout } from './dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
@@ -55,7 +65,7 @@ export function startEvadeHome(mob: Entity): void {
   mob.leashAnchor = null;
   clearChainPullInbound(mob);
   releasePin(mob);
-  clearChaseRoute(mob);
+  endChaseRoute(mob);
   // A frozen windup must not detonate mid-walk-home (its ring is long gone);
   // the full evade reset on arrival clears the rest of the mechanic state.
   resetRiftMechanicWindups(mob);
@@ -113,7 +123,7 @@ export function updateMobCombatProfile(
     mob.autoAttack = false;
     // No target, no pin: a mob that lost its fight never keeps the immune stance.
     releasePin(mob);
-    clearChaseRoute(mob);
+    endChaseRoute(mob);
     retargetMob(ctx, mob);
     return 'done';
   }
@@ -227,18 +237,23 @@ export function updateMobCombatProfile(
   const spell = MOBS[mob.templateId]?.petSpell;
   const chaseSpeed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
   if (spell) {
-    const result = updateCasterCombat(ctx, mob, target, profile, spell);
+    const sight = casterObeysSight(mob, profile);
+    const result = updateCasterCombat(ctx, mob, target, profile, spell, sight);
     // Standing at spell range is "in reach" only for a caster that can see its
     // target (mob/cast_sight.ts): one walled off from it must close like a
     // melee mob, so a caster no route brings to a sight line stalls like any
-    // other unreachable chase instead of standing in range forever.
-    const reach = lastSightBlocked(mob, target) ? profile.meleeRange : spell.range;
-    // A caster standing through its own cast bar is planted by the cast (an
-    // area bar holds it on its spot, mob/trash_kit/cast_hold.ts), not pinned
-    // by the wall: the stall clock holds for the bar, as it does for a root.
+    // other unreachable chase instead of standing in range forever. With a
+    // clear line the bookkeeping is the base's, tick for tick.
+    const walledOff = sight && lastSightBlocked(mob, target);
+    const reach = walledOff ? profile.meleeRange : spell.range;
+    // Intended, and only for a walled-off caster: one standing through its
+    // own cast bar is planted by the cast (an area bar holds it on its spot,
+    // mob/trash_kit/cast_hold.ts), not pinned by the wall, so the stall clock
+    // holds for the bar, as it does for a root. Without this a caster that
+    // lost sight mid-bar would count the bar toward an evade it never earned.
     if (
       profile.canLeash &&
-      mob.castingAbility === null &&
+      !(walledOff && mob.castingAbility !== null) &&
       chaseStalledUnreachable(ctx, mob, target, reach, chaseSpeed)
     ) {
       onChaseStalled(mob, instanceHold);
@@ -286,7 +301,11 @@ export function holdPinnedMob(ctx: SimContext, mob: Entity): void {
   // (mob/cast_sight.ts); walled off, it holds and then phases like a melee mob.
   if (
     dist2d(mob.pos, target.pos) <= reach &&
-    !(spell !== undefined && casterSightBlocked(ctx, mob, target, spell.range))
+    !(
+      spell !== undefined &&
+      casterObeysSight(mob, profile) &&
+      casterSightBlocked(ctx, mob, target, spell.range)
+    )
   ) {
     releasePin(mob);
     return;
@@ -378,6 +397,9 @@ function updateCasterCombat(
   target: Entity,
   profile: MobCombatProfile,
   spell: Parameters<SimContext['updateRangedPetAttack']>[2],
+  // Does this caster obey the sight rule (cast_sight.ts casterObeysSight)? One
+  // that does not runs the old loop below, untouched.
+  sight: boolean,
 ): MobCombatProfileResult {
   const d = dist2d(mob.pos, target.pos);
   if (mob.aiState === 'attack') {
@@ -386,30 +408,37 @@ function updateCasterCombat(
       return 'done';
     }
     mob.autoAttack = false; // casting from range, not swinging
-    // Sight is asked for when a cast begins and when its windup ends, never in
-    // between: a target that hides mid-windup lets the windup run out and then
-    // takes nothing.
-    const verdict = petSpellSightVerdict(ctx, mob, target);
-    if (verdict === 'seek') {
-      mob.aiState = 'chase';
-      return 'done';
+    if (sight) {
+      // Sight is asked for when a cast begins and when its windup ends, never
+      // in between: a target that hides mid-windup lets the windup run out and
+      // then takes nothing.
+      const verdict = petSpellSightVerdict(ctx, mob, target);
+      if (verdict === 'seek') {
+        mob.aiState = 'chase';
+        return 'done';
+      }
+      if (verdict === 'failed') return 'done';
     }
-    if (verdict === 'cast') ctx.updateRangedPetAttack(mob, target, spell);
+    ctx.updateRangedPetAttack(mob, target, spell);
     return 'done';
   }
-  const blocked = casterSightBlocked(ctx, mob, target, spell.range);
+  const blocked = sight && casterSightBlocked(ctx, mob, target, spell.range);
   if (d <= spell.range && !blocked) {
     mob.aiState = 'attack';
     mob.swingTimer = Math.min(mob.swingTimer, 0.4);
-    clearChaseRoute(mob);
+    // The path is done with; its throttle and spent plans are kept, so a
+    // target dancing in and out of sight cannot buy a fresh plan each time.
+    restChaseRoute(mob);
     return 'done';
   }
   mob.swingTimer = Math.max(0, mob.swingTimer - DT);
   if (tryMobMeleeSwingInRange(ctx, mob, target)) return 'done';
   if (!ctx.isRooted(mob)) {
     const speed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
-    // No line of sight: round the wall by its route. With one (the target is
-    // only out of range), or with no route to take, the ordinary chase step.
+    // No line of sight: round the wall by its route. Otherwise (the target is
+    // only out of range, or there is no route to take) the ordinary chase
+    // step: straight at it, unless the mob is still walking a route it began
+    // or has stopped dead on geometry (chaseAroundObstacles).
     if (!(blocked && followChaseRoute(ctx, mob, target, speed))) {
       chaseAroundObstacles(ctx, mob, target, speed);
     }
@@ -447,8 +476,9 @@ function updatePursuitProfileCombat(
     }
   } else {
     mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
-    // Where it wants to stand: whatever route brought it here is done with.
-    clearChaseRoute(mob);
+    // Where it wants to stand: whatever route brought it here is done with
+    // (its throttle and spent plans are kept).
+    restChaseRoute(mob);
   }
 
   if (

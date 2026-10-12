@@ -1,8 +1,9 @@
 // Unreachable-target detection for engaged mobs: the classic evade trigger.
-// Mobs chase in a straight line with a slide fan, and a chase that stops dead
-// on geometry first looks for a route round it (mob/chase_route.ts, a third of
-// a second in: a wall with a doorway is walked round, never waited out). What
-// reaches this module's timeout is the mob NO route helps: its target stands
+// Mobs chase in a straight line with a slide fan, and inside an instance a
+// chase that stops dead on geometry first looks for a route round it
+// (mob/chase_route.ts: a wall with a doorway is walked round, never waited
+// out). What reaches this module's timeout is the mob NO route helps (or, in
+// the open world, a rift or a delve, the mob with no routes at all): its target stands
 // past a wall with no way round or under an unclimbable ledge, and it would pin
 // in place forever, still in combat, while the target chips it down risk-free
 // (the rift ledge exploit). This module watches for that shape: engaged, out

@@ -217,6 +217,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     leashAnchor: null,
     evadeStall: 0,
     chaseRoute: undefined,
+    routeDenied: undefined,
     chaseStall: 0,
     evadeEpoch: 0,
     chainPullInbound: false,
