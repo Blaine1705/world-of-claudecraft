@@ -25,10 +25,10 @@ export const HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID = 'hollow_crypt';
  *  DOOR_TRIGGER_RADIUS (2), so nobody crosses the arch untriggered. */
 export const HOLLOW_CRYPT_ENTRANCE_LANE_HALF_WIDTH = 1.3;
 
-/** The old ruin ring the nave was built round (ZONE1_PROPS.ruinRings): its
- *  north column stood on the door lane, one yard south of the exit drop, so
- *  the ring's record omits it (prop_layout.ts ruinRingColumns). */
-export const HOLLOW_CRYPT_NAVE_RING = { x: 80, z: 78, omittedColumn: 0 } as const;
+/** The old ruin ring whose site the chapel stands on (ZONE1_PROPS.ruinRings):
+ *  it is `bare` now (no kit columns, no toppled relics), the nave's own
+ *  masonry piers stand in its place, and it keeps its terrain pad. */
+export const HOLLOW_CRYPT_NAVE_RING = { x: 80, z: 78 } as const;
 
 export interface CryptEntranceColliderRow {
   readonly name: string;
@@ -50,7 +50,8 @@ export interface CryptEntranceColliderRow {
  * (stats.json of build_crypt_entrance.py): the stair-house's two sides (their
  * inner faces are the lane edges) and its dark back, the mourners' pedestals,
  * the gable either side of its open doorway and its corner buttresses, the
- * nave wall runs between their breaches and their buttresses, the chancel
+ * nave wall runs between their breaches and their buttresses, the six nave
+ * piers and the fallen one, the chancel
  * shoulders, the apse, the yew, the bell, the altar slab, the lectern, the
  * vestry nook, the font, the headstones and table tombs, the lychgate's cheek
  * walls and the churchyard wall. The flags, the candles, the drag scars, the
@@ -79,7 +80,7 @@ export const HOLLOW_CRYPT_ENTRANCE_COLLIDERS: readonly CryptEntranceColliderRow[
     hw: 0.7,
     hd: 1.4,
     rot: 0,
-    top: 4.9,
+    top: 5.6,
   },
   {
     name: 'gable_buttress_w',
@@ -89,18 +90,18 @@ export const HOLLOW_CRYPT_ENTRANCE_COLLIDERS: readonly CryptEntranceColliderRow[
     hw: 0.7,
     hd: 1.4,
     rot: 0,
-    top: 7.2,
+    top: 9.2,
   },
-  { name: 'gable_wall_e', type: 'obb', lx: -5.925, lz: -22, hw: 3.675, hd: 0.68, rot: 0, top: 10 },
-  { name: 'gable_wall_w', type: 'obb', lx: 5.925, lz: -22, hw: 3.675, hd: 0.68, rot: 0, top: 13.9 },
+  { name: 'gable_wall_e', type: 'obb', lx: -5.925, lz: -22, hw: 3.675, hd: 0.68, rot: 0, top: 12 },
+  { name: 'gable_wall_w', type: 'obb', lx: 5.925, lz: -22, hw: 3.675, hd: 0.68, rot: 0, top: 17.6 },
   { name: 'fallen_bell', type: 'circle', lx: 5.1, lz: 4.5, r: 1.15, top: 1.5 },
   { name: 'altar_slab', type: 'obb', lx: -4.7, lz: 4.3, hw: 0.72, hd: 1.42, rot: 0.35, top: 1 },
   { name: 'lectern', type: 'circle', lx: 5.6, lz: -4.3, r: 0.55, top: 1.75 },
   { name: 'vestry_wall', type: 'obb', lx: -7, lz: -4.6, hw: 0.4, hd: 1.85, rot: 0, top: 2.4 },
   { name: 'vestry_return', type: 'obb', lx: -5.85, lz: -2.85, hw: 0.95, hd: 0.4, rot: 0, top: 1.5 },
   { name: 'font', type: 'circle', lx: 5.4, lz: -19.4, r: 0.9, top: 1.7 },
-  { name: 'nave_buttress_e_20', type: 'circle', lx: -9.6, lz: -17.66, r: 0.6, top: 6.1 },
-  { name: 'nave_buttress_e_62', type: 'circle', lx: -9.6, lz: -9.701, r: 0.6, top: 2.54 },
+  { name: 'nave_buttress_e_20', type: 'circle', lx: -9.6, lz: -17.66, r: 0.6, top: 7.38 },
+  { name: 'nave_buttress_e_62', type: 'circle', lx: -9.6, lz: -9.701, r: 0.6, top: 2.6 },
   {
     name: 'nave_wall_e_0',
     type: 'obb',
@@ -109,7 +110,7 @@ export const HOLLOW_CRYPT_ENTRANCE_COLLIDERS: readonly CryptEntranceColliderRow[
     hw: 0.58,
     hd: 4.264,
     rot: 0,
-    top: 6.52,
+    top: 7.76,
   },
   {
     name: 'nave_wall_e_1',
@@ -119,7 +120,7 @@ export const HOLLOW_CRYPT_ENTRANCE_COLLIDERS: readonly CryptEntranceColliderRow[
     hw: 0.58,
     hd: 2.748,
     rot: 0,
-    top: 3.65,
+    top: 4.04,
   },
   {
     name: 'nave_wall_e_2',
@@ -129,10 +130,10 @@ export const HOLLOW_CRYPT_ENTRANCE_COLLIDERS: readonly CryptEntranceColliderRow[
     hw: 0.58,
     hd: 0.758,
     rot: 0,
-    top: 1.36,
+    top: 1.4,
   },
-  { name: 'nave_buttress_w_20', type: 'circle', lx: 9.6, lz: -17.66, r: 0.6, top: 4.95 },
-  { name: 'nave_buttress_w_62', type: 'circle', lx: 9.6, lz: -9.701, r: 0.6, top: 3.08 },
+  { name: 'nave_buttress_w_20', type: 'circle', lx: 9.6, lz: -17.66, r: 0.6, top: 6.23 },
+  { name: 'nave_buttress_w_62', type: 'circle', lx: 9.6, lz: -9.701, r: 0.6, top: 3.59 },
   { name: 'nave_buttress_w_96', type: 'circle', lx: 9.6, lz: -3.258, r: 0.6, top: 1.2 },
   {
     name: 'nave_wall_w_0',
@@ -142,7 +143,7 @@ export const HOLLOW_CRYPT_ENTRANCE_COLLIDERS: readonly CryptEntranceColliderRow[
     hw: 0.58,
     hd: 3.506,
     rot: 0,
-    top: 6.02,
+    top: 7.34,
   },
   {
     name: 'nave_wall_w_1',
@@ -152,17 +153,25 @@ export const HOLLOW_CRYPT_ENTRANCE_COLLIDERS: readonly CryptEntranceColliderRow[
     hw: 0.58,
     hd: 2.274,
     rot: 0,
-    top: 4.23,
+    top: 4.79,
   },
+  { name: 'nave_wall_w_2', type: 'obb', lx: 8.5, lz: -4.395, hw: 0.58, hd: 1.895, rot: 0, top: 2 },
+  { name: 'nave_pier_0', type: 'circle', lx: 4.6, lz: -17.6, r: 0.85, top: 2.2, standTop: 2 },
+  { name: 'nave_pier_1', type: 'circle', lx: 4.6, lz: -12.6, r: 0.85, top: 5 },
+  { name: 'nave_pier_2', type: 'circle', lx: 4.6, lz: -7.6, r: 0.85, top: 1.5, standTop: 1.3 },
+  { name: 'nave_pier_3', type: 'circle', lx: -4.6, lz: -17.6, r: 0.85, top: 3.7 },
+  { name: 'nave_pier_4', type: 'circle', lx: -4.6, lz: -12.6, r: 0.85, top: 1.8, standTop: 1.6 },
+  { name: 'nave_pier_5', type: 'circle', lx: -4.6, lz: -7.6, r: 0.85, top: 5.8 },
   {
-    name: 'nave_wall_w_2',
+    name: 'fallen_pier',
     type: 'obb',
-    lx: 8.5,
-    lz: -4.395,
-    hw: 0.58,
-    hd: 1.895,
-    rot: 0,
-    top: 1.91,
+    lx: -2.67,
+    lz: -15.57,
+    hw: 1.7,
+    hd: 0.62,
+    rot: -0.47,
+    top: 1.05,
+    standTop: 1,
   },
   { name: 'chancel_wall_e', type: 'obb', lx: -7.8, lz: 0, hw: 0.52, hd: 2.5, rot: 0, top: 2.4 },
   { name: 'chancel_wall_w', type: 'obb', lx: 7.8, lz: 0, hw: 0.52, hd: 2.5, rot: 0, top: 2.4 },
@@ -450,6 +459,13 @@ export const HOLLOW_CRYPT_ENTRANCE_FOOTINGS: readonly CryptEntranceFooting[] = [
   { name: 'font', lx: 5.4, lz: -19.4, hw: 0.7, hd: 0.7, rot: 0, bottom: 0.005 },
   { name: 'nave_wall_e', lx: -8.5, lz: -11.975, hw: 0.5, hd: 9.475, rot: 0, bottom: -0.355 },
   { name: 'nave_wall_w', lx: 8.5, lz: -11.975, hw: 0.5, hd: 9.475, rot: 0, bottom: -0.607 },
+  { name: 'nave_pier_0', lx: 4.6, lz: -17.6, hw: 0.6, hd: 0.6, rot: 0, bottom: -0.035 },
+  { name: 'nave_pier_1', lx: 4.6, lz: -12.6, hw: 0.6, hd: 0.6, rot: 0, bottom: -0.035 },
+  { name: 'nave_pier_2', lx: 4.6, lz: -7.6, hw: 0.6, hd: 0.6, rot: 0, bottom: -0.128 },
+  { name: 'nave_pier_3', lx: -4.6, lz: -17.6, hw: 0.6, hd: 0.6, rot: 0, bottom: -0.035 },
+  { name: 'nave_pier_4', lx: -4.6, lz: -12.6, hw: 0.6, hd: 0.6, rot: 0, bottom: -0.035 },
+  { name: 'nave_pier_5', lx: -4.6, lz: -7.6, hw: 0.6, hd: 0.6, rot: 0, bottom: -0.033 },
+  { name: 'fallen_pier', lx: -2.67, lz: -15.57, hw: 1.4, hd: 0.4, rot: -0.47, bottom: -0.055 },
   { name: 'chancel_wall_e', lx: -7.8, lz: 0, hw: 0.46, hd: 2.5, rot: 0, bottom: -0.343 },
   { name: 'chancel_wall_w', lx: 7.8, lz: 0, hw: 0.46, hd: 2.5, rot: 0, bottom: -0.605 },
   { name: 'apse_0', lx: 7.565, lz: 3.834, hw: 1.354, hd: 0.4, rot: -1.745, bottom: -0.59 },

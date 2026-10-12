@@ -2033,6 +2033,7 @@ export function buildProps(
 
   // ---- ruin rings: weathered monolith columns at the exact collider angles -
   for (const r of getActiveWorldContent().props.ruinRings) {
+    if (r.bare) continue;
     for (const col of ruinRingColumns(r)) {
       const { index: i, x, z, intact, scaleY: sy } = col;
       const kind: PropKey = intact ? 'column' : 'columnBroken';

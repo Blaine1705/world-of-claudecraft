@@ -977,6 +977,7 @@ function staticWorldColliders(seed: number): Collider[] {
   for (const [x, z] of PROPS.mudHuts)
     out.push({ type: 'circle', x, z, r: 1.1, cameraTopY: topY(seed, x, z, 12.5) });
   for (const ruin of PROPS.ruinRings) {
+    if (ruin.bare) continue;
     // The renderer keeps every fourth column intact (a tall monolith) and
     // breaks the rest into STUMPS of three deterministic heights
     // (prop_layout.ts ruinRingColumns, the shared layout). A stump is a

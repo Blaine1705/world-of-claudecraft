@@ -3,8 +3,8 @@
 // its stair-house portal is the door's jambs and the lane between them is the
 // walk-in trigger; a player walks in through the gable door, up the nave and
 // into the crypt, and back out from the exit drop; the six quest objects that
-// lie round the stair are walked to; the old ruin ring keeps six columns and
-// loses the one that stood on the door lane; every footing of the Blender
+// lie round the stair are walked to; the old ruin ring is bare and the chapel's
+// own piers stand in the nave; every footing of the Blender
 // model sits on the sim's own ground (no gap, no sinking); and nothing around
 // the door, mob spawns included, is walled in.
 import { describe, expect, it } from 'vitest';
@@ -149,7 +149,7 @@ describe('the Fallen Chapel stands in for the generic door arch', () => {
   });
 });
 
-describe('the old ruin ring is the nave, less the column on the door lane', () => {
+describe('the old ruin ring is bare, and the chapel brings its own nave piers', () => {
   it('ruinRingColumns omits by index and keeps every other column where it stood', () => {
     const plain = ruinRingColumns({ x: 0, z: 0, ringR: 7, columns: 7 });
     const less = ruinRingColumns({ x: 0, z: 0, ringR: 7, columns: 7, omit: [0] });
@@ -163,30 +163,49 @@ describe('the old ruin ring is the nave, less the column on the door lane', () =
     expect(plain[2].top).toBeCloseTo(0.65 * (1.7 + 2 * 0.85) - 0.1, 9);
   });
 
-  it('the chapel ring omits its north column: the spot a yard south of the exit drop is open', () => {
+  it('the ring at the chapel draws and collides nothing: no kit column, no toppled relic', () => {
     const ring = PROPS.ruinRings.find(
       (r) => r.x === HOLLOW_CRYPT_NAVE_RING.x && r.z === HOLLOW_CRYPT_NAVE_RING.z,
     );
-    expect(ring?.omit).toEqual([HOLLOW_CRYPT_NAVE_RING.omittedColumn]);
+    expect(ring?.bare).toBe(true);
     if (!ring) return;
-    expect(isBlocked(SEED, ring.x, ring.z + ring.ringR, 0.3)).toBe(false);
-    const columns = queryOpenWorldColliders(
+    // every other ring of the world still stands
+    expect(PROPS.ruinRings.filter((r) => !r.bare).length).toBeGreaterThan(5);
+    const all = queryOpenWorldColliders(
       SEED,
       ring.x - ring.ringR - 1,
       ring.z - ring.ringR - 1,
       ring.x + ring.ringR + 1,
       ring.z + ring.ringR + 1,
       [],
-    ).filter(
-      (c) =>
-        c.type === 'circle' &&
-        c.r === 0.6 &&
-        Math.abs(Math.hypot(c.x - ring.x, c.z - ring.z) - ring.ringR) < 0.05,
     );
-    expect(columns).toHaveLength(6);
-    // the six that stay stand clear of every chapel solid
-    for (const col of columns) {
-      expect(chapelHits(col.x, col.z, 0.6), `column ${col.x},${col.z}`).toBe(false);
+    // the spot the lane column stood on, a yard south of the exit drop
+    expect(isBlocked(SEED, ring.x, ring.z + ring.ringR, 0.3)).toBe(false);
+    // where each kit column stood, no kit collider is left
+    for (const col of ruinRingColumns(ring)) {
+      const kit = all.filter(
+        (c) => c.type === 'circle' && c.r === 0.6 && Math.hypot(c.x - col.x, c.z - col.z) < 0.05,
+      );
+      expect(kit, `kit column ${col.index}`).toHaveLength(0);
+    }
+    // the toppled statue head stood here: only a chapel solid may block it now
+    expect(isBlocked(SEED, ring.x - 2.4, ring.z - 2.7, 0.2)).toBe(
+      chapelHits(ring.x - 2.4, ring.z - 2.7, 0.2),
+    );
+  });
+
+  it('six masonry piers and the fallen one stand in the nave, clear of the aisle', () => {
+    const piers = HOLLOW_CRYPT_ENTRANCE_COLLIDERS.filter((c) => c.name.startsWith('nave_pier_'));
+    expect(piers).toHaveLength(6);
+    for (const pier of piers) {
+      expect(isBlocked(SEED, DOOR.x + pier.lx, DOOR.z + pier.lz, 0.3), pier.name).toBe(true);
+      // an arcade either side of the aisle, inside the nave walls
+      expect(Math.abs(pier.lx)).toBeGreaterThan(3.5);
+      expect(Math.abs(pier.lx)).toBeLessThan(7);
+    }
+    expect(HOLLOW_CRYPT_ENTRANCE_COLLIDERS.some((c) => c.name === 'fallen_pier')).toBe(true);
+    for (let z = DOOR.z - 20; z <= DOOR.z - 4; z += 0.5) {
+      expect(isBlocked(SEED, DOOR.x, z, PLAYER_BODY_RADIUS), `aisle z ${z}`).toBe(false);
     }
   });
 });
@@ -283,6 +302,8 @@ describe('the Fallen Chapel sits on the real ground', () => {
     ['font', 0.09],
     ['lectern', 0.07],
     ['altar_slab', 0.06],
+    ['nave_pier_', 0.13],
+    ['fallen_pier', 0.15],
     ['table_tomb_', 0.05],
   ];
   // A long wall's lowest ground is sampled along its whole run, so a corner
