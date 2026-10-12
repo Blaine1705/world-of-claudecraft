@@ -118,16 +118,28 @@ counted in sim ticks (`tests/dungeon_gate_seal_delay.test.ts`):
   seal lands, not at the pull).
 - A pending seal is cancelled the moment the boss stops fighting (it dies, or
   drops the pull and turns for home: a wipe inside the window): the door never
-  shuts on an empty room, and every pull gets the whole delay, one taken up again
-  before the boss stands idle included.
+  shuts on an empty room, and a pull whose seal was still pending gets the whole
+  delay again, one taken up before the boss stands idle included. A seal that
+  has already landed is different: it holds while the boss walks home, so a
+  pull taken up again in that walk starts behind a shut door.
 - A boss walked to its own doorway inside the window seals the room at once, with
   the boss still inside (`BOSS_ROOM_DOORWAY_REACH`): the open door is for the group
   to come in, never for the boss to be dragged out of its arena.
 - A seal lands only with the boss on its own side of the gate's line. A boss
-  thrown past it inside the window (a charge, a leap, a knockback) is never
-  sealed out of its room: the seal waits and lands on the first tick it is back.
-  "Its side" is the half of the floor its spawn lies on; the suite floods every
-  sealed arena to prove each lies wholly on that half.
+  thrown past it inside the window (a charge, a leap, a knockback) is not sealed
+  out of its room on the landing tick: the seal waits and lands on the first
+  tick it is back. This is a rule about the landing tick only; a boss carried
+  out after the door has shut is fought outside a sealed room, as before the
+  delay existed. "Its side" is the half of the floor its spawn lies on; the
+  suite floods every sealed arena to prove each lies wholly on that half, and
+  checks every scripted entrance spot of every sealing boss against its gate.
+- That wait has no upper bound, by decision. A due seal stays open for as long
+  as the boss is past the line (the suite holds one out for a minute). It cannot
+  keep a room open for good: a boss walking back to its target crosses the
+  doorway band and shuts the door the tick it is inside, and holding a boss
+  outside its room was already possible once the instance hold had phased it
+  there. A timeout would only add a second way to seal a boss out of its own
+  room, the one thing the rule exists to prevent.
 - Once landed, the seal holds as before (while the boss is in combat or walking
   home) and whoever is outside is locked out until the boss dies or resets.
 

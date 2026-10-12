@@ -22,18 +22,33 @@
 // sealing gate of every dungeon:
 //   - the clock starts on the first tick the boss is fighting and lands
 //     BOSS_ROOM_SEAL_DELAY_SECONDS later, counted in sim ticks;
-//   - a pending seal is cancelled the moment the boss stops fighting (it
+//   - a PENDING seal is cancelled the moment the boss stops fighting (it
 //     dies, or drops the pull and turns for home: a wipe inside the window),
-//     so a door never shuts on an empty room and EVERY pull gets the whole
-//     delay, a pull taken up again before the boss stands idle included;
+//     so a door never shuts on an empty room, and a pull whose seal was still
+//     pending gets the whole delay again, one taken up before the boss stands
+//     idle included. (A seal that has LANDED is another matter: it holds while
+//     the boss walks home, so a pull taken up again in that walk is behind a
+//     shut door from its first tick, as it always was.);
 //   - a boss that reaches its own doorway inside the window seals at once:
 //     the open door is for the group to come in, never for the boss to be
 //     walked out (an instance mob never leashes home, so without this a tank
 //     could drag the fight out of its arena for the length of the window);
-//   - a seal lands only with the boss on ITS side of the gate's line. One
+//   - a seal LANDS only with the boss on ITS side of the gate's line. One
 //     thrown past it inside the window (a charge, a leap, a knockback, a
-//     scripted plant) is never sealed out of its own room: the seal waits,
-//     due, and lands on the first tick the boss is back inside;
+//     scripted plant) is not sealed out of its own room on the landing tick:
+//     the seal waits, due, and lands on the first tick the boss is back
+//     inside. That is a rule about the landing tick only. Once landed the seal
+//     holds wherever the boss goes: one carried out of its room AFTER the door
+//     shut (the instance hold's phase through geometry) is fought outside a
+//     sealed room, exactly as before the delay existed;
+//   - the wait for the boss has NO upper bound, by decision. A due seal stays
+//     open for as long as a body of the boss is past the line, a minute or an
+//     hour. It is not a way to keep a room open for good: a boss walking back
+//     to its target crosses the doorway band (BOSS_ROOM_DOORWAY_REACH) and
+//     shuts the door the tick it is inside, and holding a boss outside its
+//     room was always possible once the hold's phase had carried it there. A
+//     timeout would only add a second way to seal a boss OUT, which is the one
+//     thing this rule exists to prevent;
 //   - a seal that has landed holds exactly as before: while the boss is in
 //     combat or walking home, open again once it stands idle.
 // "Its side" is the half of the floor its spawn lies on, cut by the gate's
@@ -42,6 +57,14 @@
 // half plane is exact for the content that ships.
 // Whoever is outside when it lands is locked out until the boss dies or
 // resets, as they were when the seal landed at the pull.
+//
+// One tick of slack for an early reader: the stamp is a tick number, and a
+// caller of dungeonGateState on the due tick BEFORE this module's pass has run
+// that tick reads "sealed" from the stamp alone, although the pass may still
+// hold the seal for a boss past the line or cancel it for one that just
+// stopped fighting. The collision view and the gate's wire template are
+// written by the pass itself, so those two are never early; a caller that
+// must not be early either should read after tickDungeonGates has run.
 //
 // The collision half lives in dungeon_gate_state.ts: after deriving, this
 // module writes each claimed slot's open set there, and the interior collider
@@ -269,6 +292,18 @@ export function dungeonGateEntity(
 // world that opened it and never by a short-lived world that never did.
 const writtenBy = new WeakMap<InstanceSlot, true>();
 
+// One claim's gate objects, aligned with its gates: refilled for each claim on
+// each tick and read by both passes below, so the tick allocates no list for
+// it. Scratch, never state: nothing is read from it that this tick did not
+// write.
+const gateObjects: (Entity | null)[] = [];
+
+/** The first gate of `gates` that seals for `bossId`. */
+function firstSealGate(gates: readonly DungeonGateDef[], bossId: string): number {
+  for (let i = 0; i < gates.length; i++) if (gates[i].sealWhileEngaged === bossId) return i;
+  return -1;
+}
+
 // Dev-only override (/dev crypt gates): every gate of the claim reads open.
 // Keyed by the slot record of ONE world and bound to the claim's identity
 // (its exit entity id), so a freed and re-claimed slot starts closed again.
@@ -313,24 +348,17 @@ function tickBossSeal(
   }
   // Landed on an earlier tick: from here it only holds or lifts.
   const landed = at !== undefined && now > at;
+  const roster = indexFor(DUNGEONS[inst.dungeonId]).byTemplate.get(bossId) ?? [];
+  // Is the boss engaged, and is it fighting? Asked first and alone: a boss
+  // standing idle in its room (every boss of every claim, nearly every tick)
+  // costs these two flags and nothing more.
   let engaged = false;
   let fighting = false;
-  let atDoor = false;
-  let allHome = true;
-  for (const r of indexFor(DUNGEONS[inst.dungeonId]).byTemplate.get(bossId) ?? []) {
+  for (const r of roster) {
     const boss = rosterMob(ctx, inst, r);
     if (!boss || boss.dead) continue;
     if (isEngaged(boss)) engaged = true;
     if (isFighting(boss)) fighting = true;
-    // Only a seal still to land asks where the boss's bodies stand.
-    if (landed) continue;
-    const home = { x: boss.spawnPos.x - ox, z: boss.spawnPos.z - oz };
-    const here = { x: boss.pos.x - ox, z: boss.pos.z - oz };
-    for (const gate of gates) {
-      if (gate.sealWhileEngaged !== bossId) continue;
-      if (gateInward(gate, home, here) <= 0) allHome = false;
-      else if (isFighting(boss) && inGateDoorway(gate, home, here)) atDoor = true;
-    }
   }
   if (!engaged) {
     // Dead, or home and idle: no seal, pending or landed.
@@ -342,12 +370,28 @@ function tickBossSeal(
       // however soon, gets the whole delay.
       at = undefined;
     } else {
+      // Only here, a seal still to land with its boss fighting, does it
+      // matter where the boss's bodies stand.
+      let atDoor = false;
+      let allHome = true;
+      for (const r of roster) {
+        const boss = rosterMob(ctx, inst, r);
+        if (!boss || boss.dead) continue;
+        const home = { x: boss.spawnPos.x - ox, z: boss.spawnPos.z - oz };
+        const here = { x: boss.pos.x - ox, z: boss.pos.z - oz };
+        for (const gate of gates) {
+          if (gate.sealWhileEngaged !== bossId) continue;
+          if (gateInward(gate, home, here) <= 0) allHome = false;
+          else if (isFighting(boss) && inGateDoorway(gate, home, here)) atDoor = true;
+        }
+      }
       // The first fighting tick starts the clock; a boss at its own door
       // shuts it now, with the boss still inside.
       if (at === undefined) at = now + BOSS_ROOM_SEAL_DELAY_TICKS;
       if (atDoor) at = now;
       // Due, but a body of the boss is past the gate's line: the seal waits
-      // for it rather than shut it out of its own room.
+      // for it rather than shut it out of its own room on this tick. It waits
+      // as long as it takes (see the header: no upper bound, by decision).
       if (now >= at || at === SEAL_AWAITS_BOSS) at = allHome ? now : SEAL_AWAITS_BOSS;
     }
   }
@@ -378,12 +422,14 @@ export function tickDungeonGates(ctx: SimContext): void {
       continue;
     }
     // Each gate's object, found once a tick and shared by the two passes.
-    const entities = gates.map((gate) => dungeonGateEntity(ctx, inst, gate));
+    const entities = gateObjects;
+    entities.length = gates.length;
+    for (let i = 0; i < gates.length; i++) entities[i] = dungeonGateEntity(ctx, inst, gates[i]);
     for (let i = 0; i < gates.length; i++) {
       const bossId = gates[i].sealWhileEngaged;
       if (!bossId) continue;
       // Once per boss: at the first gate that names it.
-      if (gates.findIndex((g) => g.sealWhileEngaged === bossId) !== i) continue;
+      if (firstSealGate(gates, bossId) !== i) continue;
       tickBossSeal(ctx, inst, gates, entities, bossId, o.x, o.z);
     }
     const open: string[] = [];
