@@ -197,11 +197,20 @@ melee and mechanic factors do not move, and a check sized by a share of the pool
 keeps the absolute damage it asked for (the Lady's Frozen Embrace, the Mere Hydra's
 regrown head).
 
+The Mere Hydra is a boss by the owner's ruling (its place in the Finder's encounter
+list is added on another branch). Its heroic fight, measured at the planning 230:
+with the heads brought down together (the intended play, and the deed) 63 s became
+121 s, with two Tsunamis where there was one and four Combined Breaths where there
+were two; killing one head at a time, 98 s became 201 s with seven regrowths where
+there were three. Enraged Hydra counts the heads lying dead (two at most), so its
+level cannot pass the design, but a group that kills head by head now fights under
+it for about 133 s where it was 67 s.
+
 | Dungeon | Bosses at about 25,000 (was) | Minibosses in 15,000 to 20,000 (was) | Normal change |
 |---|---|---|---|
 | Hollow Crypt | Sexton Marrow 24,996 (16,099), Lady of the Bonechill 24,999 (18,382), Cantor Ilvane 24,996 (14,687) | Ossuary Drake 15,872 (7,936), Knellwyrm 18,403 (7,254) | Drake 2,079 (1,040), Knellwyrm 4,400 (1,081) |
 | Sunken Bastion | Knight-Commander Olen 24,999 (18,382), Gaoler Ossick 24,999 (19,530) | Shipwreck Captain 16,996 (13,801), Gaol Turnkey 15,994 (11,041) | Captain 5,539 (4,495), Turnkey 5,214 (3,599) |
-| Drowned Temple | Choirmother Selthe 25,004 (20,650); Tideglass Colossus 23,003 unchanged | Mere Hydra 6,001 a head, 18,003 in all (4,306 a head) | Hydra 2,786 a head (2,000) |
+| Drowned Temple | Choirmother Selthe 25,004 (20,650); Mere Hydra 8,333 a head, 24,999 in all (4,306 a head); Tideglass Colossus 23,003 unchanged | none | none |
 | Wildheart Basin | Beastmaster and jaguar 23,005, Gorgebloom 23,003, all unchanged | Great Saurian 14,998 unchanged | none |
 | Gravewyrm Sanctum | Korgath the Bound 25,004 (18,391), shackles unchanged; Velkhar 22,991 unchanged | Sledge Tusker 16,002 (13,796) | Tusker 10,433 (8,992) |
 

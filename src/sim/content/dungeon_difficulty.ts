@@ -433,17 +433,12 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       choirmother_selthe: 7.97,
       tideglass_colossus: 7.35,
       ysolei: 8.27,
-      // The Mere Hydra is the Temple's miniboss (a solo encounter outside
-      // the Finder's encounter list). Its heads were 1.38 (2,000 each); the
-      // owner's heroic bands (2026-10-12, the heroic record below) raise
-      // them x1.39 there, and a miniboss takes the same factor on normal
-      // while it stays under the weakest boss (Selthe, 9,899): 2,786 a head,
-      // about 8,360 across the three. A regrown head still stands up with
-      // the 1,000 it had (HYDRA_TUNING.regrowShare). Normal BOSS pools are
-      // untouched.
-      mere_hydra_head_left: 1.923,
-      mere_hydra_head_center: 1.923,
-      mere_hydra_head_right: 1.923,
+      // The Mere Hydra is a boss (the owner's ruling, 2026-10-12; its place
+      // in the Finder's encounter list is being added on another branch), so
+      // its normal pool keeps its designed length: 2,000 a head.
+      mere_hydra_head_left: 1.38,
+      mere_hydra_head_center: 1.38,
+      mere_hydra_head_right: 1.38,
     },
     damageMultiplierByMob: {},
   },
@@ -789,22 +784,26 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // 25,000 and a miniboss sits in 15,000 to 20,000 (the Finder's encounter
     // list says which is which). Choirmother Selthe (12.9, 20,650) carries
     // 25,004, about 109 s at the planning 230; the Colossus (23,003) already
-    // sits beside the band and Ysolei is untouched. The Mere Hydra, the
-    // miniboss, goes from 4,306 a head (2.4) to 6,001, about 18,000 across
-    // the three ("raise it a little per head"). Health only. Selthe has no
-    // check sized by her pool and no enrage. The Hydra has one: a fallen head
-    // regrows with a SHARE of its pool, so HYDRA_TUNING.regrowShare went
-    // from 0.5 to 0.3588 and a regrown head still stands up with the 2,153
-    // it had. What the larger heads do change is the damage the group must
-    // finish inside the 20 s before a head regrows, which is the health that
-    // was asked for. Pinned by tests/drowned_temple_health_bands.test.ts.
+    // sits beside the band and Ysolei is untouched. The Mere Hydra, a boss
+    // by the owner's ruling, goes from 4,306 a head (2.4) to 8,333, about
+    // 25,000 across the three: about 109 s at the planning 230 where it was
+    // 56 s. Health only. Selthe has no check sized by her pool and no
+    // enrage. The Hydra has one: a fallen head regrows 20 s later with a
+    // SHARE of its pool, so heroic carries its own
+    // (HYDRA_TUNING.regrowShareHeroic, read through hydraRegrowShare) and a
+    // regrown head still stands up with the 2,153 it had. Its Enraged stacks
+    // count the heads lying dead (two at most), not time, so the larger pool
+    // cannot raise them past the design; what it does bring is a second
+    // Tsunami and more Combined Breaths on the same clocks (the Temple suite
+    // has the measured fights). Pinned by
+    // tests/drowned_temple_health_bands.test.ts.
     healthMultiplierByMob: {
       choirmother_selthe: 15.62,
       tideglass_colossus: 12.05,
       ysolei: 13.66,
-      mere_hydra_head_left: 3.345,
-      mere_hydra_head_center: 3.345,
-      mere_hydra_head_right: 3.345,
+      mere_hydra_head_left: 4.645,
+      mere_hydra_head_center: 4.645,
+      mere_hydra_head_right: 4.645,
     },
     damageMultiplierByMob: {
       // The bosses keep their melee: the pre-budget dungeon-wide 16.5, the

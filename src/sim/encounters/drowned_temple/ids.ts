@@ -346,16 +346,22 @@ export const HYDRA_TUNING = {
   leeHalfWidth: 2,
   // Regrowth: a fallen head grows back while another head lives.
   regrowAfter: 20,
-  // Lowered from 0.5 when the heads' pools rose x1.39 on both difficulties
-  // (the heroic health bands, 2026-10-12): a regrown head stands up with the
-  // health it always had, 1,000 on normal and 2,153 on heroic
-  // (tests/drowned_temple_health_bands.test.ts).
-  regrowShare: 0.3588,
+  regrowShare: 0.5,
+  /** Heroic: its own share, so a regrown head stands up with the health it had
+   *  before the heads' heroic pools were raised (the heroic health bands,
+   *  2026-10-12: 2,153 of 8,333, as half was of the 4,306 a head had). Read
+   *  through hydraRegrowShare(). */
+  regrowShareHeroic: 0.2584,
   /** Enraged Hydra: damage done per fallen head. */
   enragePerHead: 0.15,
   /** The deed: all three heads within this many seconds. */
   deedWindow: 10,
 } as const;
+
+/** The share of its pool a regrown head stands up with, by difficulty. Pure. */
+export function hydraRegrowShare(heroic: boolean): number {
+  return heroic ? HYDRA_TUNING.regrowShareHeroic : HYDRA_TUNING.regrowShare;
+}
 
 export const POOL = HYDRA_POOL;
 
