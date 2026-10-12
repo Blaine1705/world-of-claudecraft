@@ -5,8 +5,15 @@
 // this list, never a new line in renderer.ts (the monolith ratchet).
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildSanctumSealGate } from './sanctum_seal_gate';
+import { clearSetPieceOccluders } from './set_piece_occluders';
 import { buildWaterFlora } from './water_flora';
 
+// The set pieces register what they put between the camera and the character
+// (set_piece_occluders.ts); the renderer drives the pass through this module.
+export { updateSetPieceOccluders } from './set_piece_occluders';
+
 export function buildStaticWorldFeatures(seed: number) {
+  // a rebuilt renderer builds its set pieces afresh: forget the old meshes
+  clearSetPieceOccluders();
   return [buildWaterFlora(seed), buildFarshoreFeatures(seed), buildSanctumSealGate(seed)];
 }

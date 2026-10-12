@@ -782,7 +782,7 @@ import {
   lookAtFrozen,
   refreshFrozenWorldMatrix,
 } from './static_matrix';
-import { buildStaticWorldFeatures } from './static_world_features';
+import { buildStaticWorldFeatures, updateSetPieceOccluders } from './static_world_features';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
@@ -11618,6 +11618,7 @@ export class Renderer {
     );
     this.dungeons?.update(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());
     this.hollowGates.update(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());
+    updateSetPieceOccluders(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'props', worldStart);
     this.foliage.update(
       p.pos.x,
