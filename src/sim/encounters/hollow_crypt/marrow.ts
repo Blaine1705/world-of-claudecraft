@@ -184,8 +184,10 @@ export function startMarrowBar(
   return true;
 }
 
-/** Is the one he fights close enough for a Shovelful to be worth swinging? */
-function shovelInReach(ctx: SimContext, boss: Entity): boolean {
+/** Is the one he fights close enough for the spade (a Shovelful, the heroic
+ *  Gravedigger's Blow) to be worth swinging? The gate lies a yard past his
+ *  melee reach, so a target he is still swinging at is always inside it. */
+function spadeInReach(ctx: SimContext, boss: Entity): boolean {
   const target = bossTarget(ctx, boss);
   if (!target) return false;
   const d = Math.hypot(target.pos.x - boss.pos.x, target.pos.z - boss.pos.z);
@@ -628,11 +630,12 @@ export function tickMarrow(
   if (ctx.isStunned(boss) || boss.castingAbility !== null) return;
   // One bar at a time: the grave first (it needs its 4 s), then the spade.
   if (st.measureTimer <= 0 && startMarrowBar(ctx, inst, boss, st, 'measure')) return;
-  // The spade waits until the one he fights is inside its cone: a Shovelful
-  // that came due while he rang (his timers wait on the Toll) used to plant
-  // him at the bell rope and fling its dirt at nobody.
-  if (st.shovelTimer <= 0 && shovelInReach(ctx, boss)) {
-    if (startMarrowBar(ctx, inst, boss, st, 'shovel')) return;
-  }
+  // The spade waits until the one he fights is inside its reach: a Shovelful
+  // or a Gravedigger's Blow that came due while he rang (his timers wait on
+  // the Toll) used to plant him at the bell rope, the dirt flung at nobody
+  // and the Blow landed from ten yards. One gate for both keeps their order:
+  // out of reach neither starts, in reach the Shovelful goes first.
+  if (!spadeInReach(ctx, boss)) return;
+  if (st.shovelTimer <= 0 && startMarrowBar(ctx, inst, boss, st, 'shovel')) return;
   if (heroicOf(inst) && st.blowTimer <= 0) startMarrowBar(ctx, inst, boss, st, 'blow');
 }

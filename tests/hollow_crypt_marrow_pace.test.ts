@@ -12,11 +12,13 @@ import {
   MARROW_BONES_RISE,
   MARROW_BURIAL_TOLL,
   MARROW_GRAVE_OPENS,
+  MARROW_GRAVEDIGGERS_BLOW,
   MARROW_ID,
   MARROW_MEASURE,
   MARROW_SHOVELFUL,
   MARROW_TUNING,
 } from '../src/sim/encounters/hollow_crypt';
+import { combatProfileForMob } from '../src/sim/mob_combat';
 import { DT, type Entity } from '../src/sim/types';
 import {
   boss,
@@ -123,17 +125,38 @@ function expectWholeKit(f: Fight, seen: Seen, difficulty: 'normal' | 'heroic'): 
 }
 
 describe('Sexton Marrow: his first uses come early', () => {
-  it('measures the first grave at 2 s and swings the first Shovelful at 4 s', () => {
-    expect(T.measureFirst).toBe(2);
-    expect(T.shovelFirst).toBe(4);
-    // The first grave is open before a level-appropriate party reaches his
-    // first Toll, so the first bell already raises the dead.
-    expect(T.measureFirst + T.measureCast + T.markSeconds).toBeLessThan(8);
-    // The damage is what it was.
-    expect([T.shovelMult, T.graveOpenMin, T.graveOpenMax, T.graveDirtPerSecond]).toEqual([
-      1.5, 42, 52, 9,
-    ]);
-    expect([T.tollMin, T.tollMax, T.blowMult]).toEqual([30, 38, 1.0]);
+  it('measures at 2 s, swings the first Shovelful at 4 s and opens the first grave at 7 s', () => {
+    const { f, marrow, hold } = yard('normal');
+    marrow.maxHp = 1e6;
+    marrow.hp = marrow.maxHp;
+    const at = { measure: -1, shovel: -1, grave: -1 };
+    let victimId = -1;
+    for (let t = DT; t < 9; t += DT) {
+      tick(f, hold);
+      if (at.measure < 0 && marrow.castingAbility === MARROW_MEASURE) {
+        at.measure = t;
+        victimId = marrow.castTargetId ?? -1;
+      }
+      if (at.shovel < 0 && marrow.castingAbility === MARROW_SHOVELFUL) at.shovel = t;
+      if (at.grave < 0 && f.cues.some((c) => c.ability === MARROW_GRAVE_OPENS)) at.grave = t;
+    }
+    // Seconds into the fight, to a few ticks (it was 9, 6 and 14).
+    expect(at.measure).toBeGreaterThan(2 - DT / 2);
+    expect(at.measure).toBeLessThan(2.25);
+    expect(at.shovel).toBeGreaterThan(4 - DT / 2);
+    expect(at.shovel).toBeLessThan(4.25);
+    expect(at.grave).toBeGreaterThan(7 - DT / 2);
+    expect(at.grave).toBeLessThan(7.4);
+    // The damage is what it was: the cave-in's 42 to 52 on its mark, and the
+    // Shovelful one and a half of his 32 to 50 swing, less the tank's armor.
+    const caveIn = f.hits.filter((h) => h.targetId === victimId && h.ability === 'Open Grave');
+    expect(caveIn).toHaveLength(1);
+    expect(caveIn[0].amount).toBeGreaterThanOrEqual(42);
+    expect(caveIn[0].amount).toBeLessThanOrEqual(52);
+    const spade = f.hits.filter((h) => h.targetId === f.tank.id && h.ability === 'Shovelful');
+    expect(spade).toHaveLength(1);
+    expect(spade[0].amount).toBeGreaterThan(0);
+    expect(spade[0].amount).toBeLessThanOrEqual(Math.round(50 * 1.5));
   });
 });
 
@@ -200,6 +223,81 @@ describe('Sexton Marrow: a Shovelful that came due while he rang', () => {
     expect(until(f, () => marrow.castingAbility === MARROW_SHOVELFUL, 6, hold)).toBe(true);
     expect(gap()).toBeLessThanOrEqual(T.shovelRange - T.shovelReachMargin + 1e-6);
     expect(until(f, () => marrow.castingAbility === null, T.shovelCast + 0.2, hold)).toBe(true);
+    expect(took(f, f.tank, 'Shovelful', from)).toBeGreaterThan(0);
+  });
+});
+
+describe("Sexton Marrow: a Gravedigger's Blow that came due while he rang (heroic)", () => {
+  /** A Toll with the Blow (and, on request, the spade) due as it ends. */
+  function afterToll(spadeDue: boolean) {
+    const { f, marrow, hold } = yard('heroic');
+    marrow.maxHp = 1e6;
+    marrow.hp = marrow.maxHp;
+    run(f, DT * 2, hold);
+    const st = marrow.cryptBossFight;
+    if (st?.kind !== 'marrow') throw new Error('no fight');
+    st.shovelTimer = 99;
+    st.measureTimer = 99;
+    st.blowTimer = 99;
+    marrow.hp = Math.floor(marrow.maxHp * 0.6);
+    run(f, DT * 2, hold);
+    expect(st.toll).not.toBeNull();
+    // His timers wait on the Toll: both come due the tick it ends.
+    st.blowTimer = 0;
+    if (spadeDue) st.shovelTimer = 0;
+    expect(until(f, () => st.toll === null, T.tollStrideMax + T.tollRing + 1, hold)).toBe(true);
+    const gap = () => Math.hypot(marrow.pos.x - f.tank.pos.x, marrow.pos.z - f.tank.pos.z);
+    // He stands at the rope, far out of reach of the tank in the yard's centre.
+    expect(gap()).toBeGreaterThan(T.shovelRange);
+    return { f, marrow, hold, gap };
+  }
+
+  it('walks back to his tank before he strikes, never from the bell rope', () => {
+    const { f, marrow, hold, gap } = afterToll(false);
+    const from = f.hits.length;
+    expect(until(f, () => marrow.castingAbility === MARROW_GRAVEDIGGERS_BLOW, 6, hold)).toBe(true);
+    expect(gap()).toBeLessThanOrEqual(T.shovelRange - T.shovelReachMargin + 1e-6);
+    expect(until(f, () => marrow.castingAbility === null, T.blowCast + 0.2, hold)).toBe(true);
+    expect(took(f, f.tank, "Gravedigger's Blow", from)).toBeGreaterThan(0);
+  });
+
+  it('keeps the spade first when both are due and he is out of reach', () => {
+    const { f, marrow, hold } = afterToll(true);
+    expect(until(f, () => marrow.castingAbility !== null, 6, hold)).toBe(true);
+    expect(marrow.castingAbility).toBe(MARROW_SHOVELFUL);
+  });
+});
+
+describe("Sexton Marrow: the spade's gate covers his melee reach", () => {
+  it('swings the Shovelful at a tank who keeps to the very edge of his melee reach', () => {
+    const { f, marrow, hold } = yard('normal');
+    marrow.maxHp = 1e6;
+    marrow.hp = marrow.maxHp;
+    const reach = combatProfileForMob(MARROW_ID, marrow.scale).meleeRange;
+    // The gate (6 yd) lies outside the farthest spot he swings from (5 yd).
+    expect(T.shovelRange - T.shovelReachMargin).toBeGreaterThan(reach);
+    // The tank backs off every tick to stay at the edge of his reach, however
+    // he closes: the farthest a target can stand while he keeps swinging.
+    const seat = () => {
+      hold();
+      put(f, f.tank, marrow.pos.x - f.ox, marrow.pos.z - f.oz - (reach - 0.05));
+    };
+    const gap = () => Math.hypot(marrow.pos.x - f.tank.pos.x, marrow.pos.z - f.tank.pos.z);
+    const from = f.hits.length;
+    expect(
+      until(f, () => marrow.castingAbility === MARROW_SHOVELFUL, T.shovelFirst + 0.5, seat),
+    ).toBe(true);
+    expect(gap()).toBeLessThanOrEqual(reach);
+    // His melee landed from there before the spade came: he was swinging.
+    const melee = f.hits.slice(from).filter((h) => h.targetId === f.tank.id && h.ability === null);
+    expect(melee.length).toBeGreaterThan(0);
+    // Planted for the bar, the tank still at the edge of his reach.
+    const stay = [f.tank.pos.x - f.ox, f.tank.pos.z - f.oz];
+    const still = () => {
+      hold();
+      put(f, f.tank, stay[0], stay[1]);
+    };
+    expect(until(f, () => marrow.castingAbility === null, T.shovelCast + 0.2, still)).toBe(true);
     expect(took(f, f.tank, 'Shovelful', from)).toBeGreaterThan(0);
   });
 });

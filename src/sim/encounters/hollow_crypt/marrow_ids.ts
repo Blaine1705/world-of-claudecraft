@@ -107,8 +107,9 @@ export const MARROW_TUNING = {
   shovelEvery: 11,
   shovelCast: 1.2,
   shovelRange: 8,
-  /** He only begins the swing with his target this far inside the cone's
-   *  reach (yd), so a step back during the bar is a dodge, not a given. */
+  /** He only begins the swing (and, on heroic, a Gravedigger's Blow) with his
+   *  target this far inside the cone's reach (yd): 6 yd, a yard past his 5 yd
+   *  melee reach, so a step back during the bar is a dodge, not a given. */
   shovelReachMargin: 2,
   shovelArcDeg: 80,
   /** A multiple of his own melee roll, through armor. */
