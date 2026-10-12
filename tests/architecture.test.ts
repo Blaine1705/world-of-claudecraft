@@ -1011,6 +1011,9 @@ const RENDER_PURE_CORES = [
   'src/render/hoard_entrance_core.ts',
   // The Gravewyrm Sanctum Seal Gate's cosmetic plan (mist flow, rime fan).
   'src/render/sanctum_seal_gate_core.ts',
+  // What a built set piece puts between the chase camera and the character:
+  // one occluder box per collider row, tested with the fade family's own test.
+  'src/render/set_piece_occluders_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',
