@@ -61,7 +61,7 @@ export const TALENT_ABILITIES_V2_A = {
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 62, max: 74, radius: 8 }],
     description:
-      'Loose a spread at the target area, dealing $d Physical damage to enemies within 8 yd. Cannot be aimed within 4 yd of you. (Hunter talent)',
+      'Loose a spread at the target area, dealing $d Physical damage to enemies within 8 yd. (Hunter talent)',
   },
   deterrence: {
     id: 'deterrence',

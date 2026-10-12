@@ -53,6 +53,7 @@ function damageEvents(events: SimEvent[], ability: string) {
 describe('shipped Splitshot', () => {
   it('has no minimum range since the v0.45 hunter pass (8 yards before)', () => {
     expect(ABILITIES.multi_shot.minRange).toBeUndefined();
+    expect(ABILITIES.multi_shot.description).not.toContain('Cannot be aimed within');
   });
 
   it('fires point blank', () => {

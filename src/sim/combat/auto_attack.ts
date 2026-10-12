@@ -172,15 +172,19 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // immediately. Ranged auto-attack (wand / auto shot, up to 30-35yd) must NOT pre-aggro
   // at engage: its threat comes from the shot LANDING (rangedSwing schedules a projectile
   // whose impact aggros, like the spell it accompanies). Otherwise the "Attack on Ability
-  // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a distant
-  // mob the instant the cast starts, before anything lands.
+  // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a mob the
+  // instant the cast starts, before anything lands.
   const d = dist2d(p.pos, t.pos);
+  const ranged = rangedAutoProfile(p, r.meta.cls);
+  const rangedAutoWouldFire =
+    ranged !== undefined && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange);
   // The melee seed is additionally gated on no cast in progress: the swing loop is
   // paused while casting (updatePlayerAutoAttack bails on castingAbility), so a
   // mid-cast Attack press must not aggro an untouched mob (the aggro-before-damage
   // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
   // first landed swing (or the spell's own damage) aggros the target legitimately.
   if (
+    !rangedAutoWouldFire &&
     d <= effectivePlayerAttackRange(t, MELEE_RANGE, meleeReachActor(ctx, p)) &&
     !p.castingAbility &&
     t.kind === 'mob' &&
@@ -258,7 +262,7 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
   const facingDiff = Math.abs(normAngle(angleTo(p.pos, t.pos) - p.facing));
   if (facingDiff > MELEE_ARC) return;
 
-  // ranged auto-attack: hunters (auto shot, dead zone inside minRange) and
+  // ranged auto-attack: hunters (auto shot, no dead zone since v0.45) and
   // casters (wand-style, no dead zone so they don't run into melee, #94).
   // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
   // bear/cat/travel resolve to undefined here and fall through to melee.
