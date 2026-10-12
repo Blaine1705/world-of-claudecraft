@@ -42,6 +42,17 @@ rings sit on a ground-anchored lattice and stay where they landed.
 | --- | --- |
 | ![before](before-splashes-camera-nudge.jpg) | ![after](after-splashes-camera-nudge.jpg) |
 
+A ground-anchored lattice repeats on the floor, so it must leave nothing dry: every cell
+holds a splash and a splash lands anywhere in its cell, edge to edge. Below, the splashes
+alone, straight down, with 48 frames over about eight seconds blended to their brightest:
+an even field with no dry stripe and no grid, fading only with distance from the camera.
+
+![after](after-splash-coverage.jpg)
+
+From a high chase camera, in one frame:
+
+![after](after-bastion-rain-high-camera.jpg)
+
 The storm itself is unchanged (same three draws, same streak, splash and sheet counts):
 
 | Before | After |
