@@ -88,6 +88,30 @@ export interface CryptStairHit {
   depth: number;
 }
 
+/** The stair vault's pointed profile at the well's back, from the west
+ *  springing over the apex to the east one (x, y pairs; `grow` widens it about
+ *  the axis and the springing line). */
+export function cryptVaultProfile(steps: number, grow = 1): [number, number][] {
+  const s = CRYPT_STAIR;
+  const half = s.halfWidth;
+  const rise = s.apex - s.spring;
+  const radius = (half * half + rise * rise) / (2 * half);
+  const top = Math.asin(Math.min(1, rise / radius));
+  const side: [number, number][] = [];
+  for (let i = 0; i < steps; i++) {
+    const a = (top * i) / steps;
+    side.push([
+      (half - radius + radius * Math.cos(a)) * grow,
+      s.spring + radius * Math.sin(a) * grow,
+    ]);
+  }
+  return [
+    ...side,
+    [0, s.spring + rise * grow],
+    ...side.map(([x, y]) => [-x, y] as [number, number]).reverse(),
+  ];
+}
+
 /** Height of tread k of the virtual flight. */
 export function cryptStairTreadY(k: number): number {
   return CRYPT_STAIR.y - CRYPT_STAIR.lip - k * CRYPT_STAIR.riser;
@@ -193,14 +217,20 @@ export interface CryptMistField {
   /** Puff centre above the ground, and puff width. */
   readonly y: number;
   readonly size: number;
+  /** Rise over one life (yards), billboard height over width, and the share
+   *  of its night strength it keeps in full daylight. */
+  readonly rise: number;
+  readonly aspect: number;
+  readonly dayAlpha: number;
 }
 
 /** The stair's breath pours over the sill and creeps down the nave; thinner
- *  pools lie in the nave and between the headstones of the two yards. */
+ *  pools lie in the nave and between the headstones of the two yards; and a
+ *  column of soul wisps rises up the gable's faces and over it, day and night. */
 export const CRYPT_MIST_FIELDS: readonly CryptMistField[] = [
   {
     name: 'stair',
-    share: 0.4,
+    share: 0.32,
     ox: 0,
     oz: 0.4,
     rx: 0.9,
@@ -210,10 +240,13 @@ export const CRYPT_MIST_FIELDS: readonly CryptMistField[] = [
     fan: 4.6,
     y: 0.3,
     size: 2.0,
+    rise: 0.25,
+    aspect: 0.42,
+    dayAlpha: 0.5,
   },
   {
     name: 'nave',
-    share: 0.22,
+    share: 0.18,
     ox: 0,
     oz: -12.5,
     rx: 5.6,
@@ -223,10 +256,13 @@ export const CRYPT_MIST_FIELDS: readonly CryptMistField[] = [
     fan: 0,
     y: 0.28,
     size: 2.9,
+    rise: 0.25,
+    aspect: 0.42,
+    dayAlpha: 0.5,
   },
   {
     name: 'yard_east',
-    share: 0.19,
+    share: 0.15,
     ox: -14.5,
     oz: -9,
     rx: 3.6,
@@ -236,10 +272,13 @@ export const CRYPT_MIST_FIELDS: readonly CryptMistField[] = [
     fan: 0,
     y: 0.28,
     size: 2.7,
+    rise: 0.25,
+    aspect: 0.42,
+    dayAlpha: 0.5,
   },
   {
     name: 'yard_west',
-    share: 0.19,
+    share: 0.15,
     ox: 14.2,
     oz: -16.5,
     rx: 3.6,
@@ -249,6 +288,30 @@ export const CRYPT_MIST_FIELDS: readonly CryptMistField[] = [
     fan: 0,
     y: 0.28,
     size: 2.7,
+    rise: 0.25,
+    aspect: 0.42,
+    dayAlpha: 0.5,
+  },
+  // The daytime signature: soul wisps seeping out of the gable's stone and
+  // rising up both its faces and over its head in a slow leaning column,
+  // tall violet streaks against the shadowed wall that read from the road at
+  // noon (anything rising inside the nave is hidden from the road by the
+  // gable itself).
+  {
+    name: 'column',
+    share: 0.2,
+    ox: 0,
+    oz: -21.6,
+    rx: 4.6,
+    rz: 2,
+    dx: 1.2,
+    dz: -2.4,
+    fan: 0,
+    y: 1.5,
+    size: 3,
+    rise: 32,
+    aspect: 2.2,
+    dayAlpha: 1.7,
   },
 ];
 
@@ -280,6 +343,10 @@ export interface CryptMistPuff {
   /** Width in yards at birth and centre height above the ground. */
   size: number;
   y: number;
+  /** Rise over one life, billboard height over width, daylight strength. */
+  rise: number;
+  aspect: number;
+  dayAlpha: number;
 }
 
 /** A puff's fixed parameters: golden-ratio spreads, no random stream. */
@@ -309,6 +376,9 @@ export function cryptMistPuff(index: number, count: number): CryptMistPuff {
     speed: 0.032 + g * 0.026,
     size: f.size * (0.8 + k * 0.45),
     y: f.y,
+    rise: f.rise,
+    aspect: f.aspect,
+    dayAlpha: f.dayAlpha,
   };
 }
 
@@ -316,7 +386,7 @@ export interface CryptMistPose {
   x: number;
   y: number;
   z: number;
-  /** Billboard width in yards (the height is 0.42 of it). */
+  /** Billboard width in yards (the height is the puff's aspect times it). */
   scale: number;
   alpha: number;
 }
@@ -332,16 +402,17 @@ export function cryptMistPose(
 ): CryptMistPose {
   const t = fract(puff.phase + time * puff.speed * motion);
   out.x = puff.ox + puff.dx * t + Math.sin(time * 0.21 * motion + puff.phase * Math.PI * 2) * 0.35;
-  out.y = puff.y + 0.25 * t;
+  out.y = puff.y + puff.rise * t;
   out.z = puff.oz + puff.dz * t;
   out.scale = puff.size * (0.75 + 0.9 * t);
   out.alpha = smoothstep(0, 0.18, t) * (1 - smoothstep(0.6, 1, t));
   return out;
 }
 
-/** The mist's strength by time of day: a thin veil in daylight, thick at night. */
-export function cryptMistStrength(night: number): number {
-  return 0.4 + 0.6 * night;
+/** A puff's strength by time of day: its own daylight share, full at night
+ *  (the ground mist is a thin veil by day, the soul column stays plain). */
+export function cryptMistStrength(dayAlpha: number, night: number): number {
+  return dayAlpha + (1 - dayAlpha) * night;
 }
 
 // ---- the spirit sprites --------------------------------------------------------------
@@ -375,7 +446,14 @@ export const CRYPT_CANDLE_WICKS: readonly (readonly [number, number, number])[] 
   [-6.415, 0.449, -3.286],
 ];
 
-export const CRYPT_SPRITE_KIND = { flame: 0, halo: 1, mote: 2, wisp: 3, rose: 4 } as const;
+export const CRYPT_SPRITE_KIND = {
+  flame: 0,
+  halo: 1,
+  mote: 2,
+  wisp: 3,
+  rose: 4,
+  shaft: 5,
+} as const;
 export type CryptSpriteKind = (typeof CRYPT_SPRITE_KIND)[keyof typeof CRYPT_SPRITE_KIND];
 
 export interface CryptSprite {
@@ -391,8 +469,11 @@ export interface CryptSprite {
   range: number;
 }
 
-/** The empty rose window's centre and its glow. */
-export const CRYPT_ROSE = { lx: 0, y: 9, lz: -22, size: 7.5 } as const;
+/** The empty rose window: its centre, the radius of its opening, and the
+ *  length of the pale shafts that spill from it (south over the approach,
+ *  north into the nave). The glow is a card IN the wall plane, behind the
+ *  tracery's faces, so the stonework stands dark against it from both sides. */
+export const CRYPT_ROSE = { lx: 0, y: 11.2, lz: -22, radius: 2.8, shaft: 10 } as const;
 
 /** Where the wisps wander: the nave between the walls, off the door lane's end. */
 export const CRYPT_WISP_FIELD = { x0: -6.8, x1: 6.8, z0: -20, z1: -5.5, y0: 1.1, y1: 3.2 } as const;
@@ -423,7 +504,8 @@ export function cryptCandleClusters(
 /**
  * The sprite list of a tier. Every flame burns on every tier (they are the
  * candles' light, two dozen tiny quads); the halos too. The motes and the
- * wisps thin with the tier and are gone on low, with the rose window's glow.
+ * wisps thin with the tier and are gone on low, with the rose window's glow
+ * and its two shafts.
  */
 export function cryptSprites(
   tier: CryptEffectsTier,
@@ -484,19 +566,32 @@ export function cryptSprites(
       range: 1.5,
     });
   }
-  // The lowest preset keeps its daylight grade round the clock, so the rose
-  // window's night glow would hang in a sunlit wall there.
+  // The lowest preset sheds the rose window's glow with the wisps: all three
+  // are decoration, and the door, the stair and the candles stay.
   if (rank === 0) return out;
   out.push({
     kind: CRYPT_SPRITE_KIND.rose,
     x: CRYPT_ROSE.lx,
     y: CRYPT_ROSE.y,
     z: CRYPT_ROSE.lz,
-    size: CRYPT_ROSE.size,
+    size: CRYPT_ROSE.radius * 2,
     phase: 0.3,
     speed: 1,
     range: 0,
   });
+  // range carries the shaft's heading: -1 spills south, +1 north into the nave
+  for (const heading of [-1, 1]) {
+    out.push({
+      kind: CRYPT_SPRITE_KIND.shaft,
+      x: CRYPT_ROSE.lx,
+      y: CRYPT_ROSE.y,
+      z: CRYPT_ROSE.lz,
+      size: CRYPT_ROSE.shaft,
+      phase: heading > 0 ? 0.62 : 0.17,
+      speed: 1,
+      range: heading,
+    });
+  }
   return out;
 }
 

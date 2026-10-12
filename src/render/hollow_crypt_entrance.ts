@@ -10,10 +10,12 @@
 //     doorArchAuthoredElsewhere), and it draws on every tier;
 //   - the soul light, the one point light (a fire-light sink source);
 //   - the grave mist, ONE instanced draw of soft noise-broken puffs pouring
-//     over the sill, down the nave and between the headstones;
+//     over the sill, down the nave and between the headstones, and rising up
+//     the gable's faces as a column of soul wisps (the daytime signature,
+//     meant to read at noon from the road);
 //   - the spirit sprites, ONE instanced additive draw: every candle's flame
-//     and halo, rising motes, the will-o-wisps of the nave after dusk and the
-//     pale glow in the empty rose window.
+//     and halo, rising motes, the will-o-wisps of the nave after dusk, the
+//     pale glow behind the rose window's tracery and the shafts it spills.
 // Pure placement and motion math lives in hollow_crypt_entrance_core.ts; what
 // collides is src/sim/hollow_crypt_entrance.ts.
 //
@@ -46,6 +48,7 @@ import {
   cryptNightAmount,
   cryptSpritePose,
   cryptSprites,
+  cryptVaultProfile,
 } from './hollow_crypt_entrance_core';
 import { mistNoiseTexture } from './ignivar_mist_gate';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
@@ -215,18 +218,24 @@ vec3 cryptWell(vec3 o, vec3 d) {
   float soul = (1.0 - exp(-depth * 0.5)) * breath * (1.0 + 0.6 * night);
   vec3 stone = vec3(0.07, 0.066, 0.078);
   vec3 violet = vec3(0.2, 0.075, 0.62);
+  // The light's heart lies low at the foot of the flight. EVERY surface (and
+  // the dark beyond the last step) takes the same falloff from it, so the
+  // foot has no outline: it is only where the glow is strongest.
+  vec3 heart = vec3(0.0, Y0 - LIP - SLOPE * (ZEND - Z0) + 0.5, ZEND - 0.6);
+  vec3 toHeart = p - heart;
+  toHeart.x *= 1.25;
+  float drift = 0.72 + 0.28 * cryptNoise(vec2(p.x * 1.3 + p.z * 0.4, p.y * 1.1 - tm * 0.16));
+  float glow = (1.0 / (1.0 + 0.22 * dot(toHeart, toHeart))) * breath * drift * (1.0 + 0.6 * night);
   vec3 col;
   if (kind < 0.5) {
     // The foot of the flight: no wall, only the light's own heart, low and soft.
-    float gx = exp(-p.x * p.x * 1.1);
-    float gy = 1.0 - smoothstep(Y0 - 5.6, Y0 - 2.6, p.y);
-    col = violet * 0.75 * gx * (0.15 + 0.85 * gy) * breath * (1.0 + 0.6 * night);
+    col = vec3(0.0);
   } else if (kind < 1.5) {
     float u = (p.z - (Z0 + stepK * TREAD)) / TREAD;
     float wear = 0.78 + 0.22 * cryptNoise(vec2(p.x * 3.0, stepK * 7.0)) - 0.22 * exp(-p.x * p.x * 1.6);
     float nose = smoothstep(0.84, 1.0, u);
     col = stone * wear * (day * 1.7 + 0.035) * (0.45 + 0.55 * smoothstep(0.0, 0.32, u));
-    col += violet * soul * (0.1 + 1.25 * nose);
+    col += violet * (0.14 + soul) * (0.1 + 1.25 * nose);
   } else if (kind < 2.5) {
     col = stone * 0.2 + violet * soul * 0.9;
   } else if (kind < 3.5) {
@@ -260,6 +269,7 @@ vec3 cryptWell(vec3 o, vec3 d) {
       }
     }
   }
+  col += violet * 1.5 * glow;
   // The glow thickens with the length of dark the eye looks through.
   float haze = (1.0 - exp(-tt * 0.05)) * (1.0 - exp(-depth * 0.6));
   col += violet * 0.3 * haze * breath * (1.0 + 0.6 * night);
@@ -317,15 +327,20 @@ function stairWindows(): THREE.Mesh {
     [w, s.lid, s.z0],
     [w, s.lid, s.z1],
     [-w, s.lid, s.z1],
-    [-w, s.lid, s.z1],
-    [w, s.lid, s.z1],
-    [w, s.spring, s.z1],
-    [0, s.apex, s.z1],
-    [-w, s.spring, s.z1],
-  ].flat();
+  ];
+  const index = [0, 1, 2, 0, 2, 3, 4, 6, 5, 4, 7, 6];
+  // The back: a fan under the vault's pointed curve, a hand wider than the
+  // intrados so its rim lies inside the masonry.
+  const fan = positions.length;
+  positions.push([0, s.lid, s.z1]);
+  const profile = cryptVaultProfile(6, 1.07);
+  positions.push([profile[0][0], s.lid, s.z1]);
+  for (const [x, y] of profile) positions.push([x, y, s.z1]);
+  positions.push([profile[profile.length - 1][0], s.lid, s.z1]);
+  for (let k = fan + 1; k < positions.length - 1; k++) index.push(fan, k, k + 1);
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setIndex([0, 1, 2, 0, 2, 3, 4, 6, 5, 4, 7, 6, 8, 9, 10, 8, 10, 12, 12, 10, 11]);
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions.flat(), 3));
+  geometry.setIndex(index);
   geometry.computeVertexNormals();
   const mesh = new THREE.Mesh(geometry, stairMaterial());
   mesh.name = 'hollowCryptStair';
@@ -360,20 +375,25 @@ function puffTexture(): THREE.CanvasTexture | null {
 const MIST_VERTEX = `float cT = fract(aA.z + uTime * aA.w * uCrypt.y);
 vec3 cCenter = vec3(
   aA.x + aB.x * cT + sin(uTime * 0.21 * uCrypt.y + aA.z * 6.2831853) * 0.35,
-  aB.w + 0.25 * cT,
+  aB.w + aC.x * cT,
   aA.y + aB.y * cT);
 float cScale = aB.z * (0.75 + 0.9 * cT);
 vec4 mvPosition = modelViewMatrix * vec4(cCenter, 1.0);
-mvPosition.xy += position.xy * vec2(cScale, cScale * 0.42);
-vCryptPuff = vec2(smoothstep(0.0, 0.18, cT) * (1.0 - smoothstep(0.6, 1.0, cT)), aA.z);
+mvPosition.xy += position.xy * vec2(cScale, cScale * aC.y);
+vCryptPuff = vec3(smoothstep(0.0, 0.18, cT) * (1.0 - smoothstep(0.6, 1.0, cT)), aA.z, aC.z);
 gl_Position = projectionMatrix * mvPosition;`;
 
 const MIST_FRAGMENT = `#include <map_fragment>
+#ifdef USE_MAP
 vec2 cUv = vMapUv * vec2(1.5, 0.66) + vec2(vCryptPuff.y * 7.0 + uTime * 0.016 * uCrypt.y, vCryptPuff.y * 3.0);
 float cWisp = texture2D(uCryptNoise, cUv).r;
 float cHole = texture2D(uCryptNoise, cUv * 2.3 + vec2(0.37, uTime * 0.011 * uCrypt.y)).r;
+diffuseColor.a *= smoothstep(0.04, 0.3, cWisp) * (0.45 + 1.4 * cHole);
+#endif
 diffuseColor.rgb = mix(vec3(0.66, 0.68, 0.8), vec3(0.36, 0.33, 0.74), uCrypt.x);
-diffuseColor.a *= vCryptPuff.x * smoothstep(0.04, 0.3, cWisp) * (0.45 + 1.4 * cHole) * (0.4 + 0.6 * uCrypt.x);`;
+// the soul column (the only puffs stronger by day than the veil) leans violet
+diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.5, 0.36, 0.95), step(1.0, vCryptPuff.z) * 0.85);
+diffuseColor.a *= vCryptPuff.x * mix(vCryptPuff.z, 1.0, uCrypt.x);`;
 
 function graveMistMaterial(): THREE.MeshBasicMaterial {
   if (mistMat) return mistMat;
@@ -391,13 +411,13 @@ function graveMistMaterial(): THREE.MeshBasicMaterial {
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
-        '#include <common>\nattribute vec4 aA;\nattribute vec4 aB;\nuniform float uTime;\nuniform vec2 uCrypt;\nvarying vec2 vCryptPuff;',
+        '#include <common>\nattribute vec4 aA;\nattribute vec4 aB;\nattribute vec3 aC;\nuniform float uTime;\nuniform vec2 uCrypt;\nvarying vec3 vCryptPuff;',
       )
       .replace('#include <project_vertex>', MIST_VERTEX);
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nuniform float uTime;\nuniform vec2 uCrypt;\nuniform sampler2D uCryptNoise;\nvarying vec2 vCryptPuff;',
+        '#include <common>\nuniform float uTime;\nuniform vec2 uCrypt;\nuniform sampler2D uCryptNoise;\nvarying vec3 vCryptPuff;',
       )
       .replace('#include <map_fragment>', MIST_FRAGMENT);
   };
@@ -434,6 +454,7 @@ function graveMist(
   const geometry = new THREE.PlaneGeometry(1, 1);
   const a = new Float32Array(count * 4);
   const b = new Float32Array(count * 4);
+  const c = new Float32Array(count * 3);
   const mesh = new THREE.InstancedMesh(geometry, graveMistMaterial(), count);
   // The shader ignores these matrices; they are seeded across each puff's own
   // drift so the fog sweep's footprint measurement at attach sees the spread.
@@ -446,12 +467,14 @@ function graveMist(
       terrainHeight(door.x + p.ox + p.dx * 0.5, door.z + p.oz + p.dz * 0.5, seed) - base;
     a.set([p.ox, p.oz, p.phase, p.speed], i * 4);
     b.set([p.dx, p.dz, p.size, ground + p.y], i * 4);
+    c.set([p.rise, p.aspect, p.dayAlpha], i * 3);
     cryptMistPose(p, (i / count) * 4, 0, pose);
     m.makeTranslation(pose.x, ground + pose.y, pose.z);
     mesh.setMatrixAt(i, m);
   }
   geometry.setAttribute('aA', new THREE.InstancedBufferAttribute(a, 4));
   geometry.setAttribute('aB', new THREE.InstancedBufferAttribute(b, 4));
+  geometry.setAttribute('aC', new THREE.InstancedBufferAttribute(c, 3));
   // Every puff travels its whole lane in the shader, away from its seeded
   // matrix: frustum culling would drop puffs still on screen. The chapel's
   // cull group (the fog sweep) still sheds it with the rest of the set piece.
@@ -469,7 +492,8 @@ function graveMist(
 
 let spriteMat: THREE.MeshBasicMaterial | null = null;
 
-// Mirrors cryptSpritePose: kind 0 flame, 1 halo, 2 mote, 3 wisp, 4 rose glow.
+// Mirrors cryptSpritePose: kind 0 flame, 1 halo, 2 mote, 3 wisp, 4 rose glow,
+// 5 a shaft of the rose's light.
 const SPRITE_VERTEX = `float cK = aK.z;
 float cTm = uTime * uCrypt.y;
 float cN = uCrypt.x;
@@ -499,8 +523,24 @@ if (cK < 0.5) {
 } else {
   cA = cN * (0.8 + 0.2 * sin(uTime * 0.4 + aK.x * 6.2831853));
 }
-vec4 mvPosition = modelViewMatrix * vec4(cC, 1.0);
-mvPosition.xy += position.xy * cSz;
+vec4 mvPosition;
+if (cK > 4.5) {
+  // a shaft: a beam leaning down and out of the rose, widening, turned about
+  // its own axis to face the camera
+  float along = position.y + 0.5;
+  vec3 axis = normalize(vec3(0.0, -0.72, aK.w * 0.7));
+  vec3 a0 = (modelViewMatrix * vec4(cC, 1.0)).xyz;
+  vec3 a1 = (modelViewMatrix * vec4(cC + axis * aS.w, 1.0)).xyz;
+  vec3 pv = mix(a0, a1, along);
+  vec3 side = normalize(cross(a1 - a0, pv));
+  mvPosition = vec4(pv + side * position.x * (1.2 + 4.2 * along), 1.0);
+} else if (cK > 3.5) {
+  // the rose glow: a card in the wall's own plane, behind the tracery's faces
+  mvPosition = modelViewMatrix * vec4(cC + vec3(position.xy * cSz, 0.0), 1.0);
+} else {
+  mvPosition = modelViewMatrix * vec4(cC, 1.0);
+  mvPosition.xy += position.xy * cSz;
+}
 vCryptQ = position.xy;
 vCryptS = vec2(cK, cA);
 gl_Position = projectionMatrix * mvPosition;`;
@@ -530,9 +570,15 @@ if (cKind < 0.5) {
     float heart = clamp(1.0 - length(cQ) * 5.5, 0.0, 1.0);
     cCol = vec3(0.4, 0.82, 0.95) * (0.65 + 3.2 * heart * heart);
     cAl = g * r;
+  } else if (cKind < 4.5) {
+    // pale violet soul light, bright at the hub and gone before the ring
+    cCol = vec3(0.56, 0.46, 1.0) * (0.45 + 1.1 * g);
+    cAl = g * (0.6 + 0.4 * r);
   } else {
-    cCol = vec3(0.6, 0.7, 1.0) * 0.42;
-    cAl = g;
+    float along = cQ.y + 0.5;
+    float across = clamp(1.0 - abs(cQ.x) * 2.0, 0.0, 1.0);
+    cCol = vec3(0.56, 0.48, 1.0) * 0.5;
+    cAl = across * across * (1.0 - along) * (1.0 - along) * smoothstep(0.0, 0.1, along) * 0.42;
   }
 }
 diffuseColor = vec4(cCol, cAl * vCryptS.y);`;
@@ -543,6 +589,8 @@ function spriteMaterial(): THREE.MeshBasicMaterial {
     color: 0xffffff,
     transparent: true,
     blending: THREE.AdditiveBlending,
+    // the rose card lies in the wall plane and is seen from both sides
+    side: THREE.DoubleSide,
     depthWrite: false,
     // additive light may only fade toward black: no fog-coloured glow
     fog: false,

@@ -66,8 +66,17 @@ describe('the night gate', () => {
     expect(dusk).toBeLessThan(0.8);
     expect(cryptNightAmount(0.85)).toBeGreaterThan(dusk);
     // the mist never leaves: thin by day, thick by night
-    expect(cryptMistStrength(0)).toBeGreaterThan(0.3);
-    expect(cryptMistStrength(1)).toBe(1);
+    for (const field of CRYPT_MIST_FIELDS) {
+      expect(cryptMistStrength(field.dayAlpha, 0)).toBeGreaterThan(0.3);
+      expect(cryptMistStrength(field.dayAlpha, 1)).toBe(1);
+    }
+    // the soul column is the daytime signature: at noon it outshines the ground mist
+    const column = CRYPT_MIST_FIELDS.find((f) => f.name === 'column');
+    const stair = CRYPT_MIST_FIELDS.find((f) => f.name === 'stair');
+    if (!column || !stair) throw new Error('missing field');
+    expect(cryptMistStrength(column.dayAlpha, 0)).toBeGreaterThan(
+      cryptMistStrength(stair.dayAlpha, 0) * 2,
+    );
   });
 });
 
@@ -175,8 +184,32 @@ describe('the grave mist', () => {
           expect(p.dz, 'flows south').toBeLessThan(-8);
         }
       }
-      expect([...fields].sort()).toEqual([0, 1, 2, 3]);
+      expect([...fields].sort()).toEqual([0, 1, 2, 3, 4]);
     }
+  });
+
+  it('the soul column rises up the gable in tall streaks and clears its bellcote', () => {
+    const pose: CryptMistPose = { x: 0, y: 0, z: 0, scale: 0, alpha: 0 };
+    const count = cryptMistPuffCount('high');
+    const wisps = Array.from({ length: count }, (_, i) => cryptMistPuff(i, count)).filter(
+      (p) => CRYPT_MIST_FIELDS[p.field].name === 'column',
+    );
+    expect(wisps.length).toBeGreaterThanOrEqual(6);
+    for (const wisp of wisps) {
+      // born at the gable (lz -22), across its width, and drifting south
+      expect(Math.abs(wisp.ox)).toBeLessThan(5);
+      expect(Math.abs(wisp.oz + 22)).toBeLessThan(2.5);
+      expect(wisp.dz).toBeLessThan(0);
+      expect(wisp.aspect).toBeGreaterThan(1.5);
+      const t0 = (1 - wisp.phase) / wisp.speed;
+      const low = cryptMistPose(wisp, t0 + 0.05 / wisp.speed, 1, pose).y;
+      const high = cryptMistPose(wisp, t0 + 0.9 / wisp.speed, 1, pose).y;
+      expect(low).toBeGreaterThan(1);
+      // over the gable's apex (17.6) and its bellcote
+      expect(high).toBeGreaterThan(24);
+    }
+    // the ground mist still hugs the ground
+    expect(cryptMistPuff(0, count).rise).toBeLessThan(0.5);
   });
 
   it('a puff fades in, drifts along its lane widening, fades out; reduced motion freezes it in place', () => {
@@ -227,6 +260,7 @@ describe('the spirit sprites', () => {
     expect(TIERS.map((t) => count(t, CRYPT_SPRITE_KIND.wisp))).toEqual([0, 3, 5, 7]);
     // the night glow of the rose window goes with them on the daylight-only preset
     expect(TIERS.map((t) => count(t, CRYPT_SPRITE_KIND.rose))).toEqual([0, 1, 1, 1]);
+    expect(TIERS.map((t) => count(t, CRYPT_SPRITE_KIND.shaft))).toEqual([0, 2, 2, 2]);
     // each flame stands on its own wick
     const flames = cryptSprites('ultra').filter((s) => s.kind === CRYPT_SPRITE_KIND.flame);
     flames.forEach((f, i) => {
@@ -234,6 +268,10 @@ describe('the spirit sprites', () => {
     });
     const rose = cryptSprites('medium').find((s) => s.kind === CRYPT_SPRITE_KIND.rose);
     expect(rose).toMatchObject({ x: CRYPT_ROSE.lx, y: CRYPT_ROSE.y, z: CRYPT_ROSE.lz });
+    // the glow card stays inside the window's own opening
+    expect(rose?.size).toBe(CRYPT_ROSE.radius * 2);
+    const shafts = cryptSprites('ultra').filter((s) => s.kind === CRYPT_SPRITE_KIND.shaft);
+    expect(shafts.map((s) => s.range).sort()).toEqual([-1, 1]);
   });
 
   it('wisps wander inside the nave after dusk only, and hold their place under reduced motion', () => {
@@ -354,17 +392,18 @@ describe('the Fallen Chapel painter', () => {
     expect(material.depthWrite).toBe(true);
     expect(material.customProgramCacheKey()).toBe(CRYPT_STAIR_PROGRAM_CACHE_KEY);
     expect(material).toBe(hollowCryptEntranceInternalsForTest.stairMaterial());
-    // front, lid and the vault's pointed back: seven triangles
-    expect(stair.geometry.getIndex()?.count).toBe(21);
+    // front, lid, and the back as a fan under the vault's pointed curve
+    expect(stair.geometry.getIndex()?.count).toBe(12 + 14 * 3);
     const position = stair.geometry.getAttribute('position');
     const s = CRYPT_STAIR;
     for (let i = 0; i < position.count; i++) {
       // (float32 attribute storage: a rounding hair of tolerance)
-      expect(Math.abs(position.getX(i))).toBeLessThanOrEqual(s.halfWidth + 1e-6);
+      // (the back fan is a hand wider than the vault, its rim inside the masonry)
+      expect(Math.abs(position.getX(i))).toBeLessThanOrEqual(s.halfWidth * 1.07 + 1e-6);
       expect(position.getZ(i)).toBeGreaterThanOrEqual(s.z0 - 1e-6);
       expect(position.getZ(i)).toBeLessThanOrEqual(s.z1 + 1e-6);
       expect(position.getY(i)).toBeGreaterThanOrEqual(s.y - 1e-6);
-      expect(position.getY(i)).toBeLessThanOrEqual(s.apex + 1e-6);
+      expect(position.getY(i)).toBeLessThanOrEqual(s.apex + 0.15);
     }
     // the shader is cut from the core's own numbers
     const glsl = hollowCryptEntranceInternalsForTest.stairCommon;
