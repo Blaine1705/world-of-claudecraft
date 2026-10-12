@@ -22,8 +22,11 @@ describe('soulbound: heroic_mark is bound', () => {
     sim.addItem('heroic_mark', 3, pid);
     sim.addItem('minor_healing_potion', 3, pid);
 
+    // Marks are a currency now: the grant credits the balance and leaves no bag
+    // stack to destroy, so a discard aimed at the old id is a no-op.
+    expect(sim.countItem('heroic_mark', pid)).toBe(0);
     sim.discardItem('heroic_mark', 2, pid);
-    expect(sim.countItem('heroic_mark', pid)).toBe(3); // soulbound: discard is a no-op
+    expect(sim.meta(pid)!.heroicMarks).toBe(3);
 
     sim.discardItem('minor_healing_potion', 2, pid);
     expect(sim.countItem('minor_healing_potion', pid)).toBe(1); // control: ordinary item discards
@@ -103,7 +106,7 @@ describe('soulbound: heroic_mark is bound', () => {
       .drainEvents()
       .find((event) => event.type === 'mailResult' && event.code === 'noMailSoulbound');
     expect(refusal).toBeDefined();
-    expect(sim.countItem('heroic_mark', sender)).toBe(1);
+    expect(sim.meta(sender)!.heroicMarks).toBe(1);
   });
 
   it('the migration keys the return by the STABLE sender id when the row carries one', () => {

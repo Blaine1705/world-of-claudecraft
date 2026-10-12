@@ -1,6 +1,7 @@
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
+import { sanitizeHeroicMarks } from '../sim/heroic_marks';
 import type {
   CannonActionId,
   CannonPoint,
@@ -50,6 +51,8 @@ export class QuestWorldWireState {
   nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[] = [];
   factions: Readonly<Record<FactionId, number>> = freshFactionReputation();
   factionCurrencies: Readonly<Record<FactionId, number>> = freshFactionCurrencies();
+  /** The Heroic Marks balance mirrored from the `hmarks` self key. */
+  heroicMarks = 0;
   worldQuestReplacements: Readonly<Record<string, string>> = Object.freeze({});
   worldQuestRerollCycle = '';
   /** The active clue hunt mirrored from the `cluh` self key (null when none). */
@@ -84,14 +87,20 @@ export class QuestWorldWireState {
     return fetchWorldQuestLeaderboard(this.questWorldRestBase, board, page, pageSize, viewer);
   }
 
-  /** The owner-only quest family plus the world-boss and vehicle mirrors of one self record. */
+  /** The owner-only quest family plus the world-boss, vehicle and Heroic Marks
+   *  mirrors of one self record. */
   applyQuestSelfSnapshot(
-    self: Parameters<typeof applyQuestSelfWire>[1] & { wba?: unknown; vehicle?: unknown },
+    self: Parameters<typeof applyQuestSelfWire>[1] & {
+      wba?: unknown;
+      vehicle?: unknown;
+      hmarks?: unknown;
+    },
     simTime?: unknown,
   ): void {
     applyQuestSelfWire(this, self, simTime);
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
     if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
+    if (self.hmarks !== undefined) this.heroicMarks = sanitizeHeroicMarks(self.hmarks);
   }
 
   enterVehicle(stationId: string): void {

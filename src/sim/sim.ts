@@ -281,7 +281,11 @@ import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import * as inventoryConsumption from './inventory_consumption';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
-import { grantInventoryInstances, type InventoryGrantOptions } from './inventory_grant';
+import {
+  grantInventoryInstances,
+  grantPlainStack,
+  type InventoryGrantOptions,
+} from './inventory_grant';
 import { emitInventoryReceipt } from './inventory_receipt';
 import { foldNamedSlotTarget, type NamedSlotTarget } from './item_copy_ref';
 import {
@@ -1764,6 +1768,7 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // is gated only by raidLockouts; this persisted field records which distinct
   // heroic clears contributed to one authoritative reset window without gating rewards.
   heroicDaily: { date: string; marked: Set<string> };
+  heroicMarks: number; // the Heroic Marks currency balance (heroic_marks.ts)
   // Masterwrought materials (phase 04). wyrmfallDaily is the Wyrmfall Core
   // income gate: which faucet sources (dungeonId:difficulty, or 'rift') paid
   // this character inside the current reset-day window. emberWeekAnchor is
@@ -2912,6 +2917,7 @@ export class Sim {
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
       townFocus: {},
       heroicDaily: { date: '', marked: new Set() },
+      heroicMarks: 0,
       wyrmfallDaily: { date: '', sources: new Set() },
       emberWeekAnchor: '',
       craftDaily: { date: '', crafted: new Set() },
@@ -8051,14 +8057,8 @@ export class Sim {
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    addStacked(
-      meta.inventory,
-      itemId,
-      count,
-      undefined,
-      opts?.craftedRecipeId,
-      opts?.materialSources,
-    );
+    // Stacks into the bags, or credits a currency counter (Heroic Marks).
+    grantPlainStack(meta, itemId, count, opts);
     // Every grant that reaches the hub is an acquisition for the Book of
     // Deeds discovery ledger (loot, craft, quest reward, vendor, mail, trade).
     // `movement` rides along but never gates discovery: it only tells the
@@ -11294,6 +11294,10 @@ export class Sim {
 
   get delveMarks(): number {
     return this.delveMarksFor(this.primaryId);
+  }
+
+  get heroicMarks(): number {
+    return this.players.get(this.primaryId)?.heroicMarks ?? 0;
   }
 
   get companionUpgrades(): Record<string, number> {

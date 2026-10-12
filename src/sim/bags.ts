@@ -53,6 +53,7 @@ import {
   totalPoolCapacity,
 } from './bag_pools';
 import { ITEMS } from './data';
+import { isCurrencyGrantId } from './heroic_marks';
 import {
   consumeSelectedInventorySlot,
   newestMatchingSlot,
@@ -200,6 +201,9 @@ export function countFit(
   craftedRecipeId?: string,
   materialSources?: MaterialComposition,
 ): number {
+  // A currency id (Heroic Marks) credits a PlayerMeta counter at the hub, never
+  // a slot, so every capacity gate sees it fit whole (heroic_marks.ts).
+  if (isCurrencyGrantId(itemId)) return count;
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   const freeSlots = freePoolSlots(inventory, pools, itemId, isMaterialItemId);
@@ -319,6 +323,7 @@ export function fitsAll(
       a.materialSources,
     );
     if (fit < a.count) return false;
+    if (isCurrencyGrantId(a.itemId)) continue; // credits a counter, takes no slot
     addStacked(scratch, a.itemId, a.count, a.instance, a.craftedRecipeId, a.materialSources);
   }
   return true;
