@@ -2199,6 +2199,10 @@ function attachAllProps(
         ? offhandAttachDef(base, offhandItemId, weaponSkinId)
         : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
     if (!att) continue;
+    // A held prop whose model streams on demand (an Armory skin model an NPC
+    // carries) degrades while it is cold: left off, its fetch kicked, never a
+    // throw out of the build.
+    if (!residentOrEnsure(att.url)) continue;
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
     const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;
