@@ -406,8 +406,16 @@ describe('stamina baseline model: the merged catalog', () => {
   });
 
   it('the reallocated-rating exemption is exactly the three healer waists, 10 over and floored', () => {
+    expect([...REALLOCATED_RATING_BY_DESIGN].sort()).toEqual([
+      'grovetender_belt',
+      'springbinder_sash',
+      'tidebinder_links',
+    ]);
     for (const id of REALLOCATED_RATING_BY_DESIGN) {
       expect(STAT_DRIFT_ALLOWLIST.has(id), `${id} is on both lists`).toBe(false);
+      expect(FRACTIONAL_BY_DESIGN.has(id), `${id} is also a WARFARE fraction`).toBe(false);
+      expect(ITEMS[id].slot, `${id} is a waist`).toBe('waist');
+      expect(ITEMS[id].healPower ?? 0, `${id} is healer gear`).toBeGreaterThan(0);
       const item = ITEMS[id];
       const line = expectedLineBudget(item);
       expect(line, `${id} has a tier`).toBeDefined();
@@ -415,7 +423,6 @@ describe('stamina baseline model: the merged catalog', () => {
       expect(check.meetsFloor, `${id} floor`).toBe(true);
       expect(check.line - check.expectedLine, `${id} line is 10 over`).toBe(10);
     }
-    expect(REALLOCATED_RATING_BY_DESIGN.size).toBe(3);
   });
 
   it('the drift allowlist only names real items that are still off their line', () => {

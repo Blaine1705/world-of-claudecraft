@@ -10,15 +10,18 @@
 // mob-loot block would price the drops at their kill level instead of the
 // raid tier the plan sets. Stat lines are budget-exact per item_budget.ts
 // (35 x slot mult x 0.7, largest-remainder normalized), pinned by
-// tests/ignivar_loot.test.ts.
+// tests/ignivar_loot.test.ts; the three healer waists are the one deliberate
+// exception (see springbinder_sash).
 //
 // Ratings ladder step (docs/prd/ignivar-raid-loot.md): armor pieces carry a
-// 60-point primary and a 25-point secondary rating; jewelry, shields, and
-// held offhands carry a single 25. Hit appears exactly where the plan's Hit
-// program says: the elective waists at 60 and the physical neck/ring plus
-// the spell-damage ring at 25. Healer pieces (Healing Power) never carry Hit,
-// since heals are not resisted: their elective rating is Crit (25 ring, 30
-// weapon, and 30 on the healer waists, whose other 30 moved into Int/Spi).
+// 60-point primary and a 25-point secondary rating (the healer waists aside);
+// jewelry, shields, and held offhands carry a single 25. Hit appears exactly
+// where the plan's Hit program says: the non-healer elective waists at 60 and
+// the physical neck/ring plus the spell-damage ring at 25. Healer pieces
+// (Healing Power) never carry Hit, since direct heals are not resisted (the
+// damage-converting healers, arcane and discipline, give up Hit by design):
+// their elective rating is Crit (25 ring, 30 weapon, and 30 on the healer
+// waists, whose other 30 moved into Int/Spi).
 //
 // The five-piece sets are class-locked and carry `set:` tags; their
 // ITEM_SETS entries (the 2/4-piece engine bonuses of
@@ -2667,9 +2670,10 @@ export const IGNIVAR_OFFSET_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    // Int 15 / Spi 12 is 10 points over the ilvl-35 waist line on purpose:
-    // the 30 Crit cut (60 to 30) was reallocated at the dev-kit healer
-    // weights (rating 0.3, Int 1, Spi 0.7: 30 x 0.3 = 9 ~ 6 + 4 x 0.7).
+    // Int 15 / Spi 12 is 10 points over the ilvl-35 waist line on purpose (a
+    // deliberate healer buff): the 30 Crit cut (60 to 30) was converted at
+    // the dev-kit healer weights (rating 0.3, Int 1, Spi 0.7: 30 x 0.3 = 9 ~
+    // 6 + 4 x 0.7). The Hit it replaced was worth nothing to a direct healer.
     stats: { armor: 75, int: 15, spi: 12, sta: 6 },
     healPower: 8,
     hasteRating: 25,
@@ -3105,8 +3109,9 @@ export const IGNIVAR_HELD_ITEMS: Record<string, ItemDef> = {
 // plus-or-minus 20 percent spread around average = dps x speed; two-handers
 // carry the TWOHAND_DPS_MULT premium (19.8) and the 33-point stat line
 // (25 x TWOHAND_STAT_MULT). Class locks name the three archetype sets
-// equipment_rules enforces. Hit sits exactly where the plan's weapon
-// program says: the Kris, the Cleaver, and the Wand.
+// equipment_rules enforces. Every non-healer weapon carries the 30 Hit
+// secondary (the 2026-08-30 lane widening); the two healer weapons carry it
+// as Crit.
 export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
   forgefathers_warhammer: {
     id: 'forgefathers_warhammer',

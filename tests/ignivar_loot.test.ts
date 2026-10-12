@@ -1100,6 +1100,10 @@ describe('the 2026-09-07 Heroic redistribution (docs/prd/ignivar-raid-loot.md)',
     // Normal floor without a weapon (min waist + two lowest rings) reaches the
     // spell cap but NOT the melee cap, which is why the wand could move and
     // the Kris and Cleaver could not.
+    // Count controls: Math.min over an empty lane is Infinity, which would pass
+    // every floor check below vacuously.
+    expect(hitLanes.filter((i) => i.slot === 'waist').length).toBeGreaterThan(0);
+    expect(hitLanes.filter((i) => i.kind === 'weapon').length).toBeGreaterThan(0);
     const minWaist = Math.min(
       ...hitLanes.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
     );
@@ -1147,6 +1151,10 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
   const hitLanes = crucible.filter((i) => (i.healPower ?? 0) === 0);
 
   it('the guaranteed elective floor (any waist + two rings + any weapon) covers both caps', () => {
+    // Count controls: Math.min over an empty lane is Infinity, which would pass
+    // every floor check below vacuously.
+    expect(hitLanes.filter((i) => i.slot === 'waist').length).toBeGreaterThan(0);
+    expect(hitLanes.filter((i) => i.kind === 'weapon').length).toBeGreaterThan(0);
     const minWaist = Math.min(
       ...hitLanes.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
     );
@@ -1200,9 +1208,9 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
         .reduce((acc, entry) => acc + entry.chance, 0);
       expect(sum, group).toBe(1);
     }
-    // The Heroic-exclusive hit carriers are the four physical marquee weapons,
-    // the damage staff, and the redistributed Wand of Quenched Sparks, all at
-    // 30 (the two healer weapons carry that 30 as Crit), so a Heroic-only kit
+    // The Heroic-exclusive hit carriers are the physical marquee weapons, the
+    // damage staff, and the redistributed Wand of Quenched Sparks, all at 30
+    // (the two healer weapons carry that 30 as Crit), so a Heroic-only kit
     // tops out at 60 (both hands) against both caps: the Normal lock is
     // load-bearing for hit, by design.
     const heroicIds = [
