@@ -57,7 +57,48 @@ export interface WorldBossDef {
   // `max`. It only ever scales UP within a spawn, so a raid that grows keeps the
   // bigger pool even as members die; a fresh spawn resets to `base`.
   hpScale: { base: number; perPlayer: number; max: number };
+  // How long this boss's lootable corpse lingers before the scheduler removes it.
+  // Defaults to WORLD_BOSS_CORPSE_SECONDS when omitted (see damage.ts death path).
+  corpseSeconds?: number;
+  // Spawn RELATIVE to the loaded map's player start instead of at `pos`. A boss
+  // that belongs to "the starting area" cannot use fixed world coordinates: a
+  // custom/authored map puts its start somewhere else entirely. When set, the
+  // scheduler resolves `world.playerStart + offset` at spawn time (spawnWorldBoss)
+  // and `pos` is used only as the fallback if no player start is configured.
+  atPlayerStart?: { dx: number; dz: number };
+  // SUMMONED boss. With this set the timer never spawns the boss directly:
+  // instead the scheduler keeps a summoning focus standing in the world, and the
+  // boss rises only when a player finishes channelling on it. The focus then
+  // shatters and does not return for `respawnSeconds`, which is what paces the
+  // encounter, a summoned boss is available on the CRYSTAL's cadence, not on
+  // `intervalSeconds`.
+  summonCrystal?: {
+    // Item id the focus entity carries (its name, icon and model resolve from
+    // this, exactly like any other ground object).
+    itemId: string;
+    // Where the focus stands. Deliberately a short walk from `pos`, so the boss
+    // does not rise on top of the player who called it.
+    pos: { x: number; z: number };
+    // Uninterrupted seconds a player must channel to call the boss.
+    channelSeconds: number;
+    // Seconds before a shattered focus reforms. Sim seconds; on the live server
+    // the sim runs at wall-clock speed, so this is real time (the same basis as
+    // WORLD_BOSS_INTERVAL_SECONDS above).
+    respawnSeconds: number;
+  };
 }
+
+// A summoning channel must be long enough to be a commitment (you cannot tap it
+// mid-fight) and short enough not to be a chore.
+export const WORLD_BOSS_SUMMON_CHANNEL_SECONDS = 3;
+
+/** The pseudo-ability id the summoning channel drives the cast bar with. Not a
+ *  real ABILITIES entry, the same trick the Nythraxis ward channel uses. */
+export const WORLD_BOSS_SUMMON_CAST_ID = 'worldboss_summon_channel';
+
+// Three real hours between summons. Sim seconds: at 20 Hz wall-clock on the live
+// server this is three hours of real time.
+export const WORLD_BOSS_SUMMON_RESPAWN_SECONDS = 3 * 3600;
 
 // The world bosses of the live world. One per entry; the scheduler tracks each
 // independently. Thunzharr rises at Stormcrag in Thornpeak Heights; Balgath rises in
@@ -100,6 +141,52 @@ export const WORLD_BOSSES: readonly WorldBossDef[] = [
     // without the bar visibly refilling as they trickle in (scaleWorldBossHp adds each
     // joiner's delta to CURRENT hp, not just to max).
     hpScale: { base: 24_000, perPlayer: 3_500, max: 600_000 },
+  },
+];
+
+// The Studio fork's world bosses (the Dunefather of the Scorching Wastes and
+// Vaelgrath, the Emberwake). NOT scheduled: the live scheduler walks
+// WORLD_BOSSES only, and these two stand on built-in coordinates the release
+// world never shaped for them (WORLD_BOSSES also pads the terrain under every
+// boss, terrain_calm_anchors.ts). Their encounter scripts
+// (encounters/sandworm.ts, encounters/emberwake.ts) and the summoning-focus
+// scheduler they need are not wired into the sim yet, so they are kept here as
+// data only, never as live world content.
+export const STUDIO_WORLD_BOSSES: readonly WorldBossDef[] = [
+  {
+    // The Dunefather: the sand-worm world boss (encounters/sandworm.ts). Rises
+    // in the Scorching Wastes on open ground just east of the Moltenmaw lava
+    // lake (the volcanic belt at the north/top of the world; EMBER_LAVA_POOLS,
+    // world.ts), so the burrow/emerge fight plays out among the lava pools.
+    templateId: 'sandworm_dunefather',
+    pos: { x: 460, z: 2300 },
+    intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
+    hpScale: { base: 36_000, perPlayer: 5_000, max: 1_000_000 },
+    // A slain Dunefather sinks back into the sand fast: his corpse lingers 5
+    // minutes (not the default 15) before the scheduler removes it.
+    corpseSeconds: 300,
+  },
+  {
+    // Vaelgrath, the Emberwake: the dragon world boss (encounters/emberwake.ts).
+    // He is SUMMONED, not scheduled: he lands on the Northspire's summit table
+    // in the Frostveil Reach (the highest flat ground in the world), and only
+    // when someone climbs the Warden's Walk and channels the Emberwake Crystal
+    // standing on the approach below. The crystal shatters calling him and does
+    // not reform for three hours, so the fight is paced by the summon rather
+    // than by a timer nobody is present for.
+    templateId: 'emberwake_vaelgrath',
+    pos: { x: 31.7, z: 1862.8 },
+    intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
+    hpScale: { base: 42_000, perPlayer: 5_000, max: 1_000_000 },
+    summonCrystal: {
+      itemId: 'emberwake_summon_crystal',
+      // On the flat below the summit, a few strides off the Warden's Walk: far
+      // enough that a mountain does not materialise on top of the caller, close
+      // enough that the landing is the reward for touching it.
+      pos: { x: 31.7, z: 1844 },
+      channelSeconds: WORLD_BOSS_SUMMON_CHANNEL_SECONDS,
+      respawnSeconds: WORLD_BOSS_SUMMON_RESPAWN_SECONDS,
+    },
   },
 ];
 

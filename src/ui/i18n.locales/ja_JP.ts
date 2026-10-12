@@ -1639,6 +1639,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 記録',
   'landing.scout': 'WoC スカウト',
   'landing.parseService': 'WoC 戦闘ログ',
+  'editor.buildMode.materialNames.WardenStone': '滑らかな石',
+  'editor.buildMode.diagonal': '斜めの壁',
+  'editor.buildMode.diagonalHint':
+    'グリッド上の点から別の点へドラッグして、任意の角度の壁を作成します。',
   'guide.professions.endgameBodyRaidCollections':
     '名匠鍛造は「装備数制限：名匠鍛造」の印を持つ共通の装備群です。従来の最高位製作ルートでは、発見する型紙、1日ごとに制限される中間素材の製作、共通の終盤素材を引き続き使います。坩堝のセットはレイド素材を使う別ルートであり、従来のルートに追加費用を積み重ねるものではありません。どちらも同じ2部位までの装備上限を共有するため、ビルド内の同じ二つの枠を競います。完成品は完全化や依頼製作によってその個体が帰属するまでは自由に取引できます。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -16430,6 +16434,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '中央',
   'hudChrome.breath.label': '息',
   'hudChrome.breath.drowning': '溺れています！',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': 'ディープグラスへの道を開いてもらう',
+  'hudChrome.portalWizard.gossipDeepglassAria':
+    'バルデマーにディープグラスへのポータルを開いてもらう',
+  'hudChrome.portalWizard.gossipHome': '帰り道を開いてもらう',
+  'hudChrome.portalWizard.gossipHomeAria': 'バルデマーに町へ戻るポータルを開いてもらう',
+  'hudChrome.portalWizard.portalOpen': 'ポータルが開いた。くぐろう。',
   'abilityUi.resources.devotion': '献身',
   'abilityUi.resources.focus': '集中値',
   'abilityUi.tooltip.requiresStealthSkulduggery':
@@ -19317,6 +19329,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.looksNone': '元の姿',
   'hudChrome.deeds.looksNoBuddy': '相棒を呼び出すと、ここで姿を選べる。',
   'hudChrome.deeds.looksEmpty': 'この相棒にはまだ解放された姿がない。',
+  'hudChrome.realmBuilder.title': '今月の王国建設者',
+  'hudChrome.realmBuilder.currentLabel': '今月の受賞者',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '名誉での購入は取り消せません。商人の買い戻し一覧に並ぶのは、自分が売った品だけです。コインでの買い物なら、たいていは売却価格で売り戻せますし、また気が変わればその一覧から取り戻せますが、ウォーフェア装備は買った瞬間に魂縛されるため、取引にも郵送にも売り戻しにも二度と回せません。その一覧にウォーフェア装備が並ぶことは、決してありません。商店がわざわざ確認を求めるのはそのためです。押す前に、その一点をよく読みましょう。',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -19392,8 +19406,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '採集者別に分ける',
   'hudChrome.itemMenu.takeChosenQuantity': '指定数を取り出す',
   'hudChrome.itemMenu.combine': '素材スタックを結合',
-  'hudChrome.realmBuilder.title': '今月の王国建設者',
-  'hudChrome.realmBuilder.currentLabel': '今月の受賞者',
   'hudChrome.realmBuilder.placeholderName': 'あなたの名前',
   'hudChrome.realmBuilder.placeholderHint': 'この銘板は最初の名前を待っています。',
   'hudChrome.realmBuilder.pastTitle': 'これまでの受賞者',
@@ -21593,4 +21605,54 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。',
   'apiError.character.referral_bond_pending':
     '招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。',
+  'entities.items.infernal_slag.name': '深淵の鉱滓',
+  'entities.items.charred_legion_tablet.name': '焦げた軍団の石板',
+  'entities.items.brands_of_the_first_flame.name': '始まりの炎の刻印',
+  'entities.items.forgekeepers_ledger.name': '炉守の帳簿',
+  'entities.items.azazels_broken_covenant.name': 'アザゼルの破られた盟約',
+  'entities.items.emberforged_vambraces.name': '残り火で鍛えた腕甲',
+  'entities.items.cinderthread_mantle.name': '灰糸の肩衣',
+  'entities.items.hellstalker_boots.name': '獄の狩人の長靴',
+  'entities.items.forgekeepers_warhammer.name': '炉守の戦槌',
+  'entities.items.forgekeepers_runestaff.name': '炉守のルーンの杖',
+  'entities.items.forgekeepers_fang.name': '炉守の牙',
+  'entities.items.azazels_ruinblade.name': 'アザゼルの破滅の刃',
+  'entities.items.azazels_soulstaff.name': 'アザゼルの魂の杖',
+  'entities.items.azazels_emberfang.name': 'アザゼルの残り火の牙',
+  'entities.items.hellforged_bulwark.name': '獄で鍛えた防壁',
+  'entities.items.cinderseer_raiment.name': '灰の予見者の法衣',
+  'entities.items.abysswalker_harness.name': '深淵を歩む者の胴鎧',
+  'entities.mobs.abyssal_legionnaire.name': '深淵の軍団兵',
+  'entities.mobs.cinder_magus.name': '灰の魔導師',
+  'entities.mobs.molten_hellhound.name': '溶岩の地獄猟犬',
+  'entities.mobs.flamebound_smith.name': '炎に縛られた鍛冶師',
+  'entities.mobs.abyssal_gladiator.name': '深淵の剣闘士',
+  'entities.mobs.infernal_cinderling.name': '深淵の灰の幼精',
+  'entities.mobs.forgekeeper.name': '炉守',
+  'entities.mobs.pyre_golem.name': '火葬のゴーレム',
+  'entities.mobs.azazel_infernal_lord.name': '深淵の王アザゼル',
+  'entities.quests.q_infernal_abyss_echoes.title': 'ストームクラッグの地下の残響',
+  'entities.quests.q_infernal_abyss_echoes.text':
+    'ストームクラッグは嵐から生まれたのではない、{playerName}。最古の石板によれば、あれは世界の外から落ちてきた炎を封じるために打ち据えられた蓋だという。東の岩山の下に新たな裂け目が開いた。四人の仲間と入り、軍団の石板と、始まりの炎の傍らに刻まれた刻印を持ち帰ってくれ。',
+  'entities.quests.q_infernal_abyss_echoes.completion':
+    '石板には、自ら進んで炎へ行軍した大軍の名が記されている。刻印には彼らが仕えた力の名がある。アザゼルだ。ここは悪魔を外に締め出すための牢獄などではなかった、{playerName}。彼らの王を招き入れる門だったのだ。',
+  'entities.quests.q_infernal_abyss_echoes.objectives.0.label': '焦げた軍団の石板を解読する',
+  'entities.quests.q_infernal_abyss_echoes.objectives.1.label': '始まりの炎の刻印を調べる',
+  'entities.quests.q_infernal_abyss_covenant.title': '破られた盟約',
+  'entities.quests.q_infernal_abyss_covenant.text':
+    '軍団の誓いは、アザゼルに我々の世界へ至る道を約束した。だが、どんな盟約にも代償と欠陥がある。溶岩の深淵へ戻り、大口の近くで炉守の帳簿と破られた盟約を探してくれ。何が彼を縛ったのか分かれば、倒す方法も見つかるかもしれない。',
+  'entities.quests.q_infernal_abyss_covenant.completion':
+    '欠陥が見つかった。アザゼルは己の軍団の名を門に与えていたのだ。従者を一人食らうたびに強くなったが、その命は地下の炉につながれた。炉の中心で王を討てば、門も彼と運命を共にする。',
+  'entities.quests.q_infernal_abyss_covenant.objectives.0.label': '炉守の帳簿を回収する',
+  'entities.quests.q_infernal_abyss_covenant.objectives.1.label': 'アザゼルの破られた盟約を読む',
+  'entities.quests.q_infernal_abyss_azazel.title': '溶岩の深淵の王',
+  'entities.quests.q_infernal_abyss_azazel.text':
+    '盟約が一度だけ機会を与えてくれた、{playerName}。信頼する仲間と炉と大口を越えて下り、始まりの炎が我々の世界に触れる場所でアザゼルと対峙してくれ。彼の軍団を耐え抜き、ストームクラッグが開かれた門となる前に深淵の王を消し去るのだ。',
+  'entities.quests.q_infernal_abyss_azazel.completion':
+    '山が静かだ。眠っても、待ってもいない。ただ静かなのだ。アザゼルは盗んだ名で永遠を築いたが、君は自らの、たった一人の定命の者の名でそれを終わらせた。ハイウォッチはその名を忘れない、{playerName}。',
+  'entities.quests.q_infernal_abyss_azazel.objectives.0.label': '深淵の王アザゼルを倒す',
+  'entities.dungeons.infernal_abyss.name': '溶岩の深淵',
+  'entities.dungeons.infernal_abyss.enterText':
+    'ストームクラッグの地下へ下り、溶岩の深淵に足を踏み入れた。',
+  'entities.dungeons.infernal_abyss.leaveText': '炉のような闇から這い上がり、山風に身をさらした。',
 };

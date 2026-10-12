@@ -21,9 +21,18 @@ import {
   GRID_CELL,
   MAX_BODY_RADIUS,
 } from './collider_cells';
+import { type Collider, colliderTopAt, rotY } from './collider_shapes';
+import {
+  CAMERA_BOOM_STEP,
+  cameraBoomClearDistance,
+  insidePrism,
+  pushColliderVolumeColliders,
+  pushPlacementColliders,
+} from './colliders_authored';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
+  authoredMapActive,
   BG_SLOT_COUNT,
   BUILTIN_WORLD,
   battlegroundOrigin,
@@ -46,17 +55,45 @@ import {
   STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
+import { usesOverworldSiteDressing } from './map_presentation';
+import {
+  CAMPFIRE_MOVE_TOP,
+  DOCK_HUT_ROOF_EAVE,
+  DOCK_HUT_ROOF_TOP,
+  MOVE_TOP_EPS,
+  type MoverHeight,
+  STALL_CANOPY_EAVE,
+  STALL_CANOPY_TOP,
+  STALL_HALF_D,
+  STALL_HALF_W,
+  SUPPORT_OVERLAP,
+} from './parkour_heights';
+import { invalidatePlacementRamps } from './placement_ramps';
 
 // Re-exported from the extracted cell-index module so existing importers keep
 // their './colliders' path.
 export { MAX_BODY_RADIUS } from './collider_cells';
+// The shape types, the top sampler, the fence dims and the authored-collider
+// geometry moved to sibling modules; re-exported so importers keep this path.
+export type {
+  CircleCollider,
+  Collider,
+  LayoutCollider,
+  ObbCollider,
+  PrismCollider,
+  TopSlope,
+} from './collider_shapes';
+export { colliderTopAt } from './collider_shapes';
+export { insidePrism, passesUnder, prismBox, prismPolyAt } from './colliders_authored';
+export { FENCE_HALF_DEPTH } from './fence_dims';
 // Re-exported from the extracted rift-region registry (rift_regions.ts) so
 // rift/runs.ts, the online client, and their tests keep importing the
 // publish/token verbs from './colliders'; riftRegionAt itself has no external
 // consumer, so only it is imported (not re-exported) for internal use here.
 export { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from './rift_regions';
 
-import { colliderTopAt, MOVE_TOP_EPS, pushOut, resolveAgainst, rotY } from './collider_pushout';
+import { isAuthoredTownBuildingDef } from './authored_town_buildings';
+import { pushOut, resolveAgainst } from './collider_pushout';
 import {
   DAWNHOLD_PARAPET_HALF,
   DAWNHOLD_WALL_LEDGES,
@@ -77,6 +114,7 @@ import {
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { FENCE_END_PAD, FENCE_HALF_DEPTH, FENCE_RAIL_HEIGHT } from './fence_dims';
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
 import { harborStructureColliders } from './harbor_structures';
 import { interiorCollidersNear, resolveInteriorAgainst } from './interior_collider_cells';
@@ -148,164 +186,23 @@ import { yumiMazeColliders } from './yumi_maze_layout';
 // from the same defs, so what you see is what you collide with.
 // Sim layer: no three.js imports.
 
-export interface CircleCollider {
-  type: 'circle';
-  x: number;
-  z: number;
-  r: number;
-  /** Absolute world-space visual top used by sight checks; movement ignores it. */
-  cameraTopY?: number;
-  /**
-   * Absolute world-space top of the PHYSICAL obstacle for movement (parkour):
-   * a mover whose feet reach this height passes over instead of being walled
-   * (see `passesOver`). Distinct from `cameraTopY`, which follows the visual
-   * silhouette and often includes flames or roofs taller than the solid body.
-   * Undefined means full-height, blocking at any altitude (buildings, trees, wells).
-   */
-  moveTopY?: number;
-  /**
-   * A mover may stand ON `moveTopY` (crates, rocks): the top feeds
-   * `supportHeightAt` (landing/walking surface) and grants the airborne
-   * mantle lift, so a jump at the rim hoists the body onto the top.
-   */
-  standable?: boolean;
-  /** Optional pitched surface for the standable top (see {@link TopSlope}). */
-  topSlope?: TopSlope;
-  /**
-   * Absolute world-space UNDERSIDE of an elevated slab: a mover with height
-   * whose head clears this passes BENEATH the collider (the balcony-walk
-   * contract; see `passesOver`). Height-less movers (mobs, pathfinding) never
-   * read it, so to them the slab stays a full-height solid by design.
-   * Undefined means nothing passes under (the default for everything).
-   */
-  passUnderY?: number;
-  /** A transport berth gate (transport_gates.ts): the collider is in its grid
-   *  cells only while that berth's ship lies docked (setColliderGateOpen). */
-  gate?: string;
-  /** Engine bookkeeping: index into the owning grid's dedupe stamp buffer. */
-  gridIndex?: number;
-}
-
-export interface ObbCollider {
-  type: 'obb';
-  x: number;
-  z: number;
-  hw: number; // half width (local x)
-  hd: number; // half depth (local z)
-  rot: number; // yaw, three.js rotation.y convention
-  /** Absolute world-space visual top used by sight checks; movement ignores it. */
-  cameraTopY?: number;
-  /** See {@link CircleCollider.moveTopY}. */
-  moveTopY?: number;
-  /** See {@link CircleCollider.standable}. */
-  standable?: boolean;
-  /** See {@link CircleCollider.topSlope}. */
-  topSlope?: TopSlope;
-  /** See {@link CircleCollider.passUnderY}. */
-  passUnderY?: number;
-  /**
-   * Low fence rail: a grounded mover collides normally, but a mover that is
-   * airborne above the rail (see `FENCE_RAIL_HEIGHT`) jumps clear of it. Set on
-   * the OBBs built from `PROPS.fences`.
-   */
-  isFence?: boolean;
-  /** See {@link CircleCollider.gate}. */
-  gate?: string;
-  /** See {@link CircleCollider.gridIndex}. */
-  gridIndex?: number;
-}
-
-export type Collider = CircleCollider | ObbCollider;
-
-// The push-out kernel (pushOut, resolveAgainst, the pass-over gate and the
-// top sampler) lives in collider_pushout.ts so the interior cell index shares it.
-export { colliderTopAt, MOVE_TOP_EPS } from './collider_pushout';
-
-/**
- * A shaped (non-flat) standable top: real roofs pitch. `moveTopY` stays the
- * MAXIMUM surface height (the ridge line or cone peak), so blocking logic can
- * keep using it conservatively; the sampled surface only ever falls from
- * there, clamped at the eaves. `colliderTopAt` is the one sampler.
- */
-export interface TopSlope {
-  /** 'ridge': gable with a straight high line; 'cone': radial peak at the
-   *  circle's centre. */
-  kind: 'ridge' | 'cone';
-  /** Which LOCAL axis the ridge's high line runs along ('x' default): the
-   *  surface falls across the other axis. Measured per asset (house_3 and
-   *  the coffins ridge along their local z, the market stands along x). */
-  axis?: 'x' | 'z';
-  /** surface drop per yard of run away from the ridge line / peak */
-  pitch: number;
-  /** lowest surface height (absolute Y); the slope clamps here (the eaves) */
-  eaveY: number;
-}
-
-// ---------------------------------------------------------------------------
-// Parkour heights (movement-blocking tops, mantle, standable support)
-// ---------------------------------------------------------------------------
-
-/**
- * How far above a mover's feet a STANDABLE top may still sit and be treated as
- * passable while airborne: the mantle assist. A jump whose apex falls short of
- * a crate rim by up to this much still carries the body over, and the support
- * snap in the movement kernel then seats the feet on the top (the vault).
- *
- * It is pinned to the grounded stride band (`MAX_STEP_HEIGHT` in
- * `physics/character.ts`; the equality is pinned by
- * `tests/physics_character.test.ts`) rather than tuned on its own, for two
- * reasons. An airborne body must never lose ground a grounded stride crosses
- * for free, and this ONE number is read by BOTH halves of the tick: the
- * horizontal gates (`passesOver` here, `blocksAt` in the solver) and the
- * vertical support query (`floorHeightAt`'s `maxY` in `player_motion.ts`).
- * They must move together, or the horizontal pass admits a top the landing
- * snap then refuses to seat and the body tunnels into the prop. It also
- * leaves the traversal ladder gapless: `LEDGE_GRAB_MIN` is the same 0.9, so
- * every standable top is either vaulted or grabbed, never a mid-air wall.
- * The literal lives here (not imported) because `physics/` imports this
- * module, never the reverse.
- */
-export const MANTLE_REACH = 0.9;
-// How much of the body radius must overlap a standable top before it supports
-// the mover: standing needs the center meaningfully over the prop, while the
-// full collision radius still gates entry, so a jump can graze past a rim
-// without being captured by it.
-export const SUPPORT_OVERLAP = 0.5;
-// Physical movement tops (yards above the prop's ground). The visual/sight
-// tops above stay untouched: cameraTopY for a campfire includes the flame,
-// but the SOLID obstacle is only the log pile, which is what a jump clears.
-// Exported so tests pin against the one authoritative value.
-export const CAMPFIRE_MOVE_TOP = 0.55;
+// Parkour heights (movement-blocking tops, mantle, standable support) live in
+// parkour_heights.ts; re-exported here so importers keep this path.
+export {
+  CAMPFIRE_MOVE_TOP,
+  DOCK_HUT_ROOF_EAVE,
+  DOCK_HUT_ROOF_TOP,
+  MANTLE_REACH,
+  MOVE_TOP_EPS,
+  type MoverHeight,
+  moverHeight,
+  STALL_CANOPY_EAVE,
+  STALL_CANOPY_TOP,
+  STALL_HALF_D,
+  STALL_HALF_W,
+  SUPPORT_OVERLAP,
+} from './parkour_heights';
 export { campCrateShape } from './prop_layout';
-// Standable roofs, all MEASURED from the shipped GLBs at the scales the
-// renderer places them (dequantized bounds; see docs/design/physics-asset-audit.md).
-// The tops are SHAPED: gables falling from a ridge line to real eaves, so
-// feet track the pitched surface the eye sees.
-// Market stand (market_stand_1/2 scaled to 3.1 x 2.6 x 2.5, group sunk 0.06):
-// a 3.1 x 2.5 BOX whose steep awning ridges along the stall's local x axis,
-// falling from 2.54 at the ridge to 1.50 at the front/back edges. The eave is
-// vault height (jump on at the edge), the ridge climb height.
-export const STALL_HALF_W = 1.55;
-export const STALL_HALF_D = 1.25;
-export const STALL_CANOPY_TOP = 2.54;
-export const STALL_CANOPY_EAVE = 1.5;
-// Dock hut / chapel hall use house_3, whose roof ridges along the model's
-// local z (the OBB depth) and whose eaves sit at 60 percent of the height:
-// walls to ~1.57, then the big pitched roof. The hut is scaled to 2.6 tall.
-export const DOCK_HUT_ROOF_TOP = 2.6;
-export const DOCK_HUT_ROOF_EAVE = 1.57;
-
-/** The mover's feet altitude plus how much standable lift it gets (the
- * airborne mantle assist). Both hosts derive it from the SAME entity fields so
- * the server sim and the client self extrapolator gate colliders identically. */
-export interface MoverHeight {
-  y: number;
-  lift: number;
-}
-
-export function moverHeight(e: { pos: { y: number }; onGround: boolean }): MoverHeight {
-  return { y: e.pos.y, lift: e.onGround ? 0 : MANTLE_REACH };
-}
 
 function topY(seed: number, x: number, z: number, height: number): number {
   return groundHeight(x, z, seed) + height;
@@ -367,7 +264,12 @@ function staticWorldColliders(seed: number): Collider[] {
 
   // Render hideables still block movement while their render subsystem fades
   // whichever one crosses the eye-to-camera segment to 20% opacity.
+  // A document that owns the authored towns' buildings as placements carries
+  // their (baked) collision itself, without this gate a moved town hall
+  // leaves an invisible record collider standing on the square.
+  const townBuildingsPromoted = content.promotedScenery?.authoredTowns === true;
   for (const b of PROPS.buildings) {
+    if (townBuildingsPromoted && isAuthoredTownBuildingDef(b)) continue;
     if (b.kind === 'chapel' && b.assetId === undefined) {
       // The legacy procedural chapel is COMPOSED (render/props.ts): full-height
       // bell tower at the rear, squat entry hall in front. Collide the two
@@ -420,6 +322,9 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: b.d / 2,
       rot: b.rot,
       cameraTopY,
+      // FORK: ground anchor for pass-under, a mover deep in a tube or carve
+      // walks beneath surface props instead of hitting invisible walls.
+      underY: topY(seed, b.x, b.z, 0),
     });
   }
   for (const w of PROPS.wells)
@@ -429,6 +334,7 @@ function staticWorldColliders(seed: number): Collider[] {
       z: w.z,
       r: w.r,
       cameraTopY: topY(seed, w.x, w.z, w.height ?? 3.7),
+      underY: topY(seed, w.x, w.z, 0),
     });
   // the collider runs wider than the data radius: the modeled trunks flare
   // at the base, and the r that sizes the tree understates the bark line
@@ -443,7 +349,12 @@ function staticWorldColliders(seed: number): Collider[] {
   // The Duskfall Passage's cave mouths: each portal side wears a modeled
   // cave (render/hollow_gates.ts); two flank circles and a back circle
   // shape the walk-in so the only way through the rock is the mouth itself.
-  for (const portal of PORTALS) {
+  //
+  // Overworld-only, like the art. These circles sit on fixed world
+  // coordinates, so an authored map inherited three invisible walls wherever
+  // those numbers landed on it, the exact failure invisible decoration
+  // colliders have hit before, and it outlives hiding the mesh.
+  for (const portal of usesOverworldSiteDressing(content.presentationMode) ? PORTALS : []) {
     for (const side of [portal.a, portal.b]) {
       const f = Math.atan2(side.landing.x - side.x, side.landing.z - side.z);
       const fx = Math.sin(f);
@@ -467,24 +378,28 @@ function staticWorldColliders(seed: number): Collider[] {
   }
   // The Willowfen's willows: a trunk collider at the base of every weeping
   // willow, from the same deterministic list the renderer instances the
-  // models from (sim/fen_willows.ts).
-  for (const w of fenWillowSpots(seed))
-    out.push({
-      type: 'circle',
-      x: w.x,
-      z: w.z,
-      r: w.r,
-      cameraTopY: topY(seed, w.x, w.z, 6),
-    });
+  // models from (sim/fen_willows.ts). A document that owns the willows as
+  // placements carries their trunks itself (promotedScenery.willows).
+  const willowsPromoted = content.promotedScenery?.willows === true;
+  if (!willowsPromoted)
+    for (const w of fenWillowSpots(seed))
+      out.push({
+        type: 'circle',
+        x: w.x,
+        z: w.z,
+        r: w.r,
+        cameraTopY: topY(seed, w.x, w.z, 6),
+      });
   // ...and the Veiled Hollow's willows, same one-list contract
-  for (const w of hollowWillowSpots(seed))
-    out.push({
-      type: 'circle',
-      x: w.x,
-      z: w.z,
-      r: w.r,
-      cameraTopY: topY(seed, w.x, w.z, 6),
-    });
+  if (!willowsPromoted)
+    for (const w of hollowWillowSpots(seed))
+      out.push({
+        type: 'circle',
+        x: w.x,
+        z: w.z,
+        r: w.r,
+        cameraTopY: topY(seed, w.x, w.z, 6),
+      });
   // Dawnhold's outside climbing chain: corbelled shelves up each curtain
   // so the wall-walk is reachable by parkour as well as by the flights.
   // These are the only STANDABLE tops the castle has outdoors, because
@@ -529,37 +444,43 @@ function staticWorldColliders(seed: number): Collider[] {
   }
   // ...and the Drakelands' giant ember lilies: the huge and giant tiers
   // carry a rocky-bed collider (r 0 skirt lilies stay walk-through
-  // dressing), same one-list contract as the willows
-  for (const lily of emberLilySpots(seed)) {
-    if (lily.r <= 0) continue;
-    out.push({
-      type: 'circle',
-      x: lily.x,
-      z: lily.z,
-      r: lily.r,
-      cameraTopY: topY(seed, lily.x, lily.z, lily.fp * 0.55),
-    });
-  }
+  // dressing), same one-list contract as the willows. A document that owns
+  // the Drakelands dressing as placements carries the lily beds itself.
+  if (content.promotedScenery?.emberDressing !== true)
+    for (const lily of emberLilySpots(seed)) {
+      if (lily.r <= 0) continue;
+      out.push({
+        type: 'circle',
+        x: lily.x,
+        z: lily.z,
+        r: lily.r,
+        cameraTopY: topY(seed, lily.x, lily.z, lily.fp * 0.55),
+      });
+    }
   // The Palmreach strand: a slim trunk collider at the base of every beach
   // palm, from the same deterministic list the renderer instances the models
-  // from (world.ts).
-  for (const p of reachPalmSpots(seed))
-    out.push({
-      type: 'circle',
-      x: p.x,
-      z: p.z,
-      r: p.r,
-      cameraTopY: topY(seed, p.x, p.z, 7),
-    });
+  // from (world.ts). A document that owns a stand as placements carries its
+  // trunks itself, without the gate a moved palm leaves an invisible
+  // blocker standing where the world had planted it.
+  if (content.promotedScenery?.reachPalms !== true)
+    for (const p of reachPalmSpots(seed))
+      out.push({
+        type: 'circle',
+        x: p.x,
+        z: p.z,
+        r: p.r,
+        cameraTopY: topY(seed, p.x, p.z, 7),
+      });
   // ...and the Farshore strand's palms, the same one-list contract
-  for (const p of farshorePalmSpots(seed))
-    out.push({
-      type: 'circle',
-      x: p.x,
-      z: p.z,
-      r: p.r,
-      cameraTopY: topY(seed, p.x, p.z, 7),
-    });
+  if (content.promotedScenery?.farshorePalms !== true)
+    for (const p of farshorePalmSpots(seed))
+      out.push({
+        type: 'circle',
+        x: p.x,
+        z: p.z,
+        r: p.r,
+        cameraTopY: topY(seed, p.x, p.z, 7),
+      });
   for (const s of PROPS.stalls) {
     const cameraTopY = topY(seed, s.x, s.z, s.height ?? 3.1);
     if (s.w !== undefined && s.d !== undefined) {
@@ -622,6 +543,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: bench.d / 2,
       rot: bench.rot,
       cameraTopY: topY(seed, bench.x, bench.z, bench.height),
+      underY: topY(seed, bench.x, bench.z, 0),
       moveTopY: top,
       standable: true,
     });
@@ -714,6 +636,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: board.depth / 2,
       rot: board.rotation,
       cameraTopY: topY(seed, board.x, board.z, board.height),
+      underY: topY(seed, board.x, board.z, 0),
     });
   }
   // The dedicated Fenbridge renderer is built-in-only. Keep this specialized
@@ -729,6 +652,7 @@ function staticWorldColliders(seed: number): Collider[] {
         hd: board.depth / 2,
         rot: board.rotation,
         cameraTopY: topY(seed, board.x, board.z, board.height),
+        underY: topY(seed, board.x, board.z, 0),
       });
     }
     // The Mirefen muster camps' structure pieces, off the plan the art draws.
@@ -823,8 +747,11 @@ function staticWorldColliders(seed: number): Collider[] {
   // Dungeon door arch jambs (dungeon_door_jambs.ts owns the rule).
   out.push(...dungeonDoorJambColliders(seed, topY));
   // The Forgefather's Isle fortress: the owner's baked exterior pass
-  // (forgefather_fortress.ts owns the ground-standing derivation).
-  out.push(...forgefatherFortressColliders(seed));
+  // (forgefather_fortress.ts owns the ground-standing derivation). Built-in
+  // world only: an authored map reuses these coordinates for its own ground
+  // (the Deepglass's Tidehold market sits where the fortress does), and an
+  // ungated push here put an invisible wall through its stalls.
+  if (!authoredMapActive()) out.push(...forgefatherFortressColliders(seed));
 
   // Delve entrance portals: the whole slab is a solid one-way threshold
   // (players enter by talking to the warden; leaveDelve drops them mouth-side
@@ -847,7 +774,14 @@ function staticWorldColliders(seed: number): Collider[] {
   // never block). Post positions/size mirror the render placement.
   for (const m of PROPS.mines) {
     const { x, z, r } = mineMoundFootprint(m);
-    out.push({ type: 'circle', x, z, r, cameraTopY: topY(seed, x, z, r + 0.2) });
+    out.push({
+      type: 'circle',
+      x,
+      z,
+      r,
+      cameraTopY: topY(seed, x, z, r + 0.2),
+      underY: topY(seed, x, z, 0),
+    });
     for (const sx of [-1.45, 1.45]) {
       const post = rotY(sx, 0, m.rot);
       const px = m.x + post.x;
@@ -858,6 +792,7 @@ function staticWorldColliders(seed: number): Collider[] {
         z: pz,
         r: 0.27,
         cameraTopY: topY(seed, px, pz, 3.4),
+        underY: topY(seed, px, pz, 0),
       });
     }
   }
@@ -876,6 +811,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: d.hutLocal.hd,
       rot: d.rot,
       cameraTopY: topY(seed, x, z, 2.9),
+      underY: topY(seed, x, z, 0),
       // The hut's roof is a climbable perch: full-height to a walk, a ledge
       // grab away from a jump. house_3's ridge runs along its local z (the
       // OBB depth axis), so the surface falls across |local x| to real eaves
@@ -942,6 +878,7 @@ function staticWorldColliders(seed: number): Collider[] {
       z: t.z,
       r: 1.5 * t.scale,
       cameraTopY: topY(seed, t.x, t.z, 3.4 * t.scale),
+      underY: topY(seed, t.x, t.z, 0),
     });
   PROPS.crates.forEach(([x, z, stack], i) => {
     // Camp clutter renders as a wooden crate OR (every third) a barrel, with
@@ -958,6 +895,7 @@ function staticWorldColliders(seed: number): Collider[] {
       r: shape.r,
       cameraTopY: topY(seed, x, z, top),
       moveTopY: topY(seed, x, z, top),
+      underY: topY(seed, x, z, 0),
       standable: true,
     });
   });
@@ -972,9 +910,17 @@ function staticWorldColliders(seed: number): Collider[] {
       // jump clears the fire, walking through it stays blocked, and it is
       // deliberately NOT standable (no perching inside the fire).
       moveTopY: topY(seed, x, z, CAMPFIRE_MOVE_TOP),
+      underY: topY(seed, x, z, 0),
     });
   for (const [x, z] of PROPS.mudHuts)
-    out.push({ type: 'circle', x, z, r: 1.1, cameraTopY: topY(seed, x, z, 12.5) });
+    out.push({
+      type: 'circle',
+      x,
+      z,
+      r: 1.1,
+      cameraTopY: topY(seed, x, z, 12.5),
+      underY: topY(seed, x, z, 0),
+    });
   for (const ruin of PROPS.ruinRings) {
     for (let i = 0; i < ruin.columns; i++) {
       const ang = (i / ruin.columns) * Math.PI * 2;
@@ -994,6 +940,7 @@ function staticWorldColliders(seed: number): Collider[] {
           z,
           r: 0.6,
           cameraTopY: topY(seed, x, z, sy - 0.1),
+          underY: topY(seed, x, z, 0),
         });
       } else {
         const sy = 1.7 + (i % 3) * 0.85;
@@ -1006,6 +953,7 @@ function staticWorldColliders(seed: number): Collider[] {
           cameraTopY: top,
           moveTopY: top,
           standable: true,
+          underY: topY(seed, x, z, 0),
         });
       }
     }
@@ -1061,6 +1009,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: halfDepth,
       rot: Math.atan2(-dz, dx),
       cameraTopY: topY(seed, x, z, f.height ?? FENCE_RAIL_HEIGHT),
+      underY: topY(seed, x, z, 0),
       isFence: true,
     });
   }
@@ -1171,18 +1120,8 @@ function staticWorldColliders(seed: number): Collider[] {
   }
 
   // Editor-placed assets with a collide footprint (custom maps only; the
-  // built-in world has no placements). The ONE placement record drives both the
-  // renderer and this collider, so what you see is what you collide with.
-  for (const p of content.placements ?? []) {
-    if (!p.collideRadius || p.collideRadius <= 0) continue;
-    out.push({
-      type: 'circle',
-      x: p.x,
-      z: p.z,
-      r: p.collideRadius,
-      cameraTopY: topY(seed, p.x, p.z, Math.max(2.5, p.collideRadius * 2)),
-    });
-  }
+  // built-in world has no placements): colliders_authored/placement_colliders.ts.
+  pushPlacementColliders(out, content, seed);
 
   // Editor-authored invisible blocker walls (custom maps only): one fence-width
   // OBB per segment, exactly the PROPS.fences math above, but NOT isFence (a
@@ -1205,6 +1144,9 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, x, z, BLOCKER_WALL_HEIGHT),
     });
   }
+
+  // Editor-authored collider volumes (colliders_authored/placement_colliders.ts).
+  pushColliderVolumeColliders(out, content, seed);
 
   // The banker's strongbox, LAST: its placement algorithm samples the chest
   // footprint against every collider above (the same choice the renderer used
@@ -1252,6 +1194,11 @@ function staticWorldColliders(seed: number): Collider[] {
   }
   lastBuiltBankerChestSpots = chestSpots;
 
+  // The surface props' pass-under floor (underY) only means anything where a
+  // body can walk BELOW the surface: an authored map's cave tubes and carves.
+  // Without either the field is dropped, so the built-in world (and any plain
+  // variant of it) builds exactly the release's collider records.
+  if (!content.caves?.length && !content.holes?.length) for (const c of out) delete c.underY;
   return out;
 }
 
@@ -1325,22 +1272,9 @@ export function arenaCollidersForSlot(slot: number): Collider[] {
 
 // GRID_CELL / MAX_BODY_RADIUS moved to collider_cells.ts (shared with the
 // rift region indexes); imported above.
-/** Fence/blocker wall half-thickness (yards); the editor's blocker overlay
- * reuses it so the drawn wall matches the collider exactly. */
-export const FENCE_HALF_DEPTH = 0.35;
-const FENCE_END_PAD = 0.35;
 /** Blocker walls are full-height (a jump never clears one, unlike a fence);
  * this visual top is retained for the record. */
 const BLOCKER_WALL_HEIGHT = 6;
-/**
- * Visual top of a low village fence rail (yards). The fence.glb rail is ~0.33yd
- * native and renders at ~2.9x, so its silhouette tops out around waist height.
- * This value feeds ONLY the spell line-of-sight check (`sightBlockedAt`): it MUST
- * stay below `SIGHT_HEIGHT` (1.6) so a caster sees and casts over a fence, matching what
- * the player sees on screen (issue #1668). The old 2.8 estimate sat above the
- * eye line and wrongly blocked casts. A jump still clears the rail for movement
- * regardless (see sim `Entity.jumping`). */
-const FENCE_RAIL_HEIGHT = 0.95;
 
 interface ColliderGrid {
   cells: Map<number, Collider[]>;
@@ -1382,6 +1316,10 @@ const pendingGateStates = new WeakMap<WorldContent, Map<number, Map<string, bool
  * call after mutating its placements/props in place). */
 export function invalidateStaticColliders(): void {
   gridCaches.delete(getActiveWorldContent());
+  // Stairs-deck ramps derive from the SAME placements, and they are a separate
+  // cache: bust them together or an edit moves the blockers while the walkable
+  // deck stays where the stairs used to be.
+  invalidatePlacementRamps(getActiveWorldContent());
 }
 
 // colliderBounds moved to collider_cells.ts; imported above.
@@ -1566,7 +1504,29 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
       authoredClearMin: MAX_BODY_RADIUS + Math.max(...Object.values(STREETLAMP_COLLIDER_RADIUS)),
     },
   );
-  return styleStreetlampSites(plan.sites, content.zones);
+  const styled = styleStreetlampSites(plan.sites, content.zones);
+  // Remember the PRISTINE builtin plan for the editor's streetlamp promotion:
+  // planned before any post stands, so nothing self-blocks. A plan computed
+  // against a world that already carries lamps (as colliders or as promoted
+  // placements) drops nearly every site to its own clearance probe.
+  if (content === BUILTIN_WORLD) builtinLampPlanBySeed.set(seed, styled);
+  return styled;
+}
+
+const builtinLampPlanBySeed = new Map<number, PlacedStreetlamp[]>();
+
+/**
+ * The builtin world's streetlamp plan for `seed`, for the editor's promotion
+ * of lamps into editable placements. Cached the first time the pristine
+ * builtin world plans (its grid build, or this call while it is active); null
+ * when it has never planned and the builtin world is not active to plan now,
+ * callers skip the promotion then and retry on a later boot.
+ */
+export function builtinStreetlampPlan(seed: number): readonly PlacedStreetlamp[] | null {
+  const cached = builtinLampPlanBySeed.get(seed);
+  if (cached) return cached;
+  if (getActiveWorldContent() !== BUILTIN_WORLD) return null;
+  return streetlampPlacements(seed);
 }
 
 /**
@@ -1584,6 +1544,14 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
  * never walls off someone you have to walk up to and talk to.
  */
 function addStreetlampColliders(grid: ColliderGrid, seed: number): void {
+  // A world whose DOCUMENT owns the lamps as placements plans none at all:
+  // the placements carry the fixtures, the colliders and (via the renderer's
+  // promoted lane) the night lights, so the one list binds empty and every
+  // consumer of it stands down together.
+  if (getActiveWorldContent().promotedScenery?.streetlamps === true) {
+    streetlampsByGrid.set(grid, []);
+    return;
+  }
   const placements = [...buildStreetlampPlacements(seed), ...forgefatherStreetlampSites()];
   streetlampsByGrid.set(grid, placements);
   if (placements.length === 0) return;
@@ -1979,6 +1947,8 @@ export function slopeGlueHeight(
         dz = lz - c.z;
       const reach = c.r + reachR;
       if (dx * dx + dz * dz >= reach * reach) continue;
+    } else if (c.type === 'prism') {
+      if (!insidePrism(c, lx, lz)) continue;
     } else {
       const local = rotY(lx - c.x, lz - c.z, -c.rot);
       if (Math.abs(local.x) >= c.hw + reachR || Math.abs(local.z) >= c.hd + reachR) continue;
@@ -2018,6 +1988,10 @@ function bestStandableTop(list: Collider[], x: number, z: number, r: number, max
         dz = z - c.z;
       const reach = c.r + reachR;
       if (dx * dx + dz * dz >= reach * reach) continue;
+    } else if (c.type === 'prism') {
+      // Standing on an authored volume is a containment question: use the real
+      // outline, not a rectangle fitted around it.
+      if (!insidePrism(c, x, z)) continue;
     } else {
       const local = rotY(x - c.x, z - c.z, -c.rot);
       if (Math.abs(local.x) >= c.hw + reachR || Math.abs(local.z) >= c.hd + reachR) continue;
@@ -2194,8 +2168,13 @@ export function isBlocked(
   ignoreFences = false,
   delveModules?: readonly string[],
   riftToken = 0,
+  // Optional mover height, forwarded to the same pass-over / pass-under gates
+  // resolvePosition already applies: without it every query is treated as a
+  // ground-level body, so a banded collider (a felled column, an authored
+  // second storey) reads as a full-height wall to anything asking.
+  mover?: MoverHeight,
 ): boolean {
-  const res = resolvePosition(seed, x, z, r, ignoreFences, delveModules, undefined, riftToken);
+  const res = resolvePosition(seed, x, z, r, ignoreFences, delveModules, mover, riftToken);
   return Math.abs(res.x - x) > 1e-4 || Math.abs(res.z - z) > 1e-4;
 }
 
@@ -2242,6 +2221,9 @@ function overlapsAny(
 ): boolean {
   for (const c of list) {
     if (skipLow && c.cameraTopY !== undefined && c.cameraTopY <= sightY) continue;
+    // Above the eye line the obstacle is not in the way either: an authored
+    // upper storey does not block line of sight along the floor below it.
+    if (c.baseY !== undefined && c.baseY > sightY) continue;
     if (pushOut(c, x, z, r) !== null) return true;
   }
   return false;
@@ -2327,6 +2309,40 @@ function sightBlockedAt(
   const list = collidersInCell(grid, seed, Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
   return list.length > 0 ? overlapsAny(list, x, z, r, sightY, true) : false;
 }
+
+/**
+ * How far along the eye->camera segment the chase boom may pull before the
+ * camera would sit inside a placed asset (Infinity when clear). Authored maps
+ * only: the built-in world's chase camera never clamped to colliders (it
+ * fades occluders instead), and it keeps the release's feel. The filter and
+ * the march live in colliders_authored/camera_boom.ts.
+ */
+export function cameraBoomMaxDist(
+  seed: number,
+  ex: number,
+  ey: number,
+  ez: number,
+  cx: number,
+  cy: number,
+  cz: number,
+  pad: number,
+): number {
+  if (!authoredMapActive()) return Infinity;
+  if (isInstancedRegion(ex) || isInstancedRegion(cx) || isBgPos(ex)) return Infinity;
+  if (Math.hypot(cx - ex, cy - ey, cz - ez) < CAMERA_BOOM_STEP) return Infinity;
+  const list = cameraBoomScratch;
+  list.length = 0;
+  queryOpenWorldColliders(
+    seed,
+    Math.min(ex, cx) - pad,
+    Math.min(ez, cz) - pad,
+    Math.max(ex, cx) + pad,
+    Math.max(ez, cz) + pad,
+    list,
+  );
+  return cameraBoomClearDistance(list, ex, ey, ez, cx, cy, cz, pad, pushOut);
+}
+const cameraBoomScratch: Collider[] = [];
 
 export function lineOfSightClear(
   seed: number,

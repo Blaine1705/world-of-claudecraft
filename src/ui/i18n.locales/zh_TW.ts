@@ -1588,6 +1588,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 紀錄',
   'landing.scout': 'WoC 偵察',
   'landing.parseService': 'WoC 戰鬥紀錄',
+  'editor.buildMode.materialNames.WardenStone': '光滑石材',
+  'editor.buildMode.diagonal': '斜牆',
+  'editor.buildMode.diagonalHint': '在網格點之間拖曳，以任意角度繪製牆體。',
   'guide.professions.endgameBodyRaidCollections':
     '大師鍛造是帶有「唯一裝備：大師鍛造」標記的共同裝備家族。舊有的巔峰製作路線仍需尋找圖樣、製作每日限次的中間材料，並消耗共同的終局材料。熔爐套裝則是由團隊副本材料支持的獨立路線，並非在舊路線之上再加一套費用。兩條路線共用最多穿戴兩件的限制，因此會競爭配裝中的同兩個位置。成品在臻至完美或委託綁定該件物品之前都可自由交易。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -15692,6 +15695,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '置中',
   'hudChrome.breath.label': '呼吸',
   'hudChrome.breath.drowning': '溺水！',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': '為我打開通往深琉璃之路',
+  'hudChrome.portalWizard.gossipDeepglassAria': '請巴爾德瑪開啟前往深琉璃的傳送門',
+  'hudChrome.portalWizard.gossipHome': '為我打開回家之路',
+  'hudChrome.portalWizard.gossipHomeAria': '請巴爾德瑪開啟回到你城鎮的傳送門',
+  'hudChrome.portalWizard.portalOpen': '傳送門已開啟。走進去吧。',
   'abilityUi.resources.devotion': '虔誠',
   'abilityUi.resources.focus': '集中值',
   'abilityUi.tooltip.requiresStealthSkulduggery': '需要潛行（幽暝達3層或暗影纏身期間除外）',
@@ -18406,6 +18416,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.looksNone': '原本外觀',
   'hudChrome.deeds.looksNoBuddy': '召喚一個夥伴後在此選擇牠的外觀。',
   'hudChrome.deeds.looksEmpty': '這個夥伴還沒有解鎖任何外觀。',
+  'hudChrome.realmBuilder.title': '本月王國建造者',
+  'hudChrome.realmBuilder.currentLabel': '本月榮譽獲得者',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '榮譽購買一經完成便無法反悔。買回清單裡只會有你賣出過的東西：以錢幣買下的東西通常還能按出售價格賣回，若你再次改變心意，也能從那份清單裡把它取回；但戰爭套裝在你買下的那一刻便靈魂綁定，因此它永遠無法交易、郵寄，也無法賣回換取任何東西，也就永遠不會出現在那份清單裡。商店會因此請你再確認一次：按下去之前，先把那件裝備看清楚。',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -18480,8 +18492,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '依採集者拆分',
   'hudChrome.itemMenu.takeChosenQuantity': '取出指定數量',
   'hudChrome.itemMenu.combine': '合併素材堆疊',
-  'hudChrome.realmBuilder.title': '本月王國建造者',
-  'hudChrome.realmBuilder.currentLabel': '本月榮譽獲得者',
   'hudChrome.realmBuilder.placeholderName': '你的名字',
   'hudChrome.realmBuilder.placeholderHint': '這塊銘牌還在等待它的第一個名字。',
   'hudChrome.realmBuilder.pastTitle': '歷屆榮譽獲得者',
@@ -20556,4 +20566,53 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '刪除此角色前，請先將所有尚未鎖定的集章卡轉移至其他角色。',
   'apiError.character.referral_bond_pending':
     '一份推薦獎勵會員契約正在發放給此角色。請在發放完成後再嘗試刪除此角色。',
+  'entities.items.infernal_slag.name': '深淵熔渣',
+  'entities.items.charred_legion_tablet.name': '焦黑的軍團石板',
+  'entities.items.brands_of_the_first_flame.name': '初焰烙印',
+  'entities.items.forgekeepers_ledger.name': '守爐者的帳簿',
+  'entities.items.azazels_broken_covenant.name': '阿扎澤爾的破碎契約',
+  'entities.items.emberforged_vambraces.name': '餘燼鑄造護臂',
+  'entities.items.cinderthread_mantle.name': '灰燼絲線披肩',
+  'entities.items.hellstalker_boots.name': '獄行者長靴',
+  'entities.items.forgekeepers_warhammer.name': '守爐者的戰鎚',
+  'entities.items.forgekeepers_runestaff.name': '守爐者的符文法杖',
+  'entities.items.forgekeepers_fang.name': '守爐者之牙',
+  'entities.items.azazels_ruinblade.name': '阿扎澤爾的毀滅之刃',
+  'entities.items.azazels_soulstaff.name': '阿扎澤爾的靈魂法杖',
+  'entities.items.azazels_emberfang.name': '阿扎澤爾的餘燼之牙',
+  'entities.items.hellforged_bulwark.name': '獄鑄壁壘',
+  'entities.items.cinderseer_raiment.name': '灰燼先知法衣',
+  'entities.items.abysswalker_harness.name': '深淵行者胸甲',
+  'entities.mobs.abyssal_legionnaire.name': '深淵軍團士兵',
+  'entities.mobs.cinder_magus.name': '灰燼法師',
+  'entities.mobs.molten_hellhound.name': '熔岩地獄犬',
+  'entities.mobs.flamebound_smith.name': '縛焰鐵匠',
+  'entities.mobs.abyssal_gladiator.name': '深淵角鬥士',
+  'entities.mobs.infernal_cinderling.name': '深淵灰燼幼靈',
+  'entities.mobs.forgekeeper.name': '守爐者',
+  'entities.mobs.pyre_golem.name': '焚火魔像',
+  'entities.mobs.azazel_infernal_lord.name': '深淵領主阿扎澤爾',
+  'entities.quests.q_infernal_abyss_echoes.title': '風暴岩下的回聲',
+  'entities.quests.q_infernal_abyss_echoes.text':
+    '風暴岩並非生於風暴，{playerName}。最古老的石板稱它是一口蓋子，用錘擊封住了從世界之外墜落的烈火。東側峭壁下出現了一道新的裂隙。帶上四位盟友進入其中，取回軍團石板，以及刻在初焰旁的烙印。',
+  'entities.quests.q_infernal_abyss_echoes.completion':
+    '石板記載了一支自願踏入烈火的大軍。烙印則揭示了他們侍奉的力量：阿扎澤爾。這裡從來不是為了把惡魔擋在外面而建的牢獄，{playerName}。它是一道迎接他們領主降臨的大門。',
+  'entities.quests.q_infernal_abyss_echoes.objectives.0.label': '破譯焦黑的軍團石板',
+  'entities.quests.q_infernal_abyss_echoes.objectives.1.label': '研究初焰烙印',
+  'entities.quests.q_infernal_abyss_covenant.title': '破碎的契約',
+  'entities.quests.q_infernal_abyss_covenant.text':
+    '軍團的誓言許諾為阿扎澤爾開闢一條通往我們世界的道路，但每份契約都有代價，也都有破綻。返回熔岩深淵，在巨口附近尋找守爐者的帳簿和破碎的契約。若能弄清是什麼束縛了他，也許就能知道如何將他殺死。',
+  'entities.quests.q_infernal_abyss_covenant.completion':
+    '破綻就在這裡：阿扎澤爾以軍團成員的名字供養大門。每吞噬一個僕從，他就變得更強，但他的生命也被繫在了下方的熔爐上。在熔爐核心擊敗這位領主，大門就必將隨他一同消亡。',
+  'entities.quests.q_infernal_abyss_covenant.objectives.0.label': '取回守爐者的帳簿',
+  'entities.quests.q_infernal_abyss_covenant.objectives.1.label': '閱讀阿扎澤爾的破碎契約',
+  'entities.quests.q_infernal_abyss_azazel.title': '熔岩深淵之主',
+  'entities.quests.q_infernal_abyss_azazel.text':
+    '契約給了我們一次機會，{playerName}。和你信任的同伴一同深入，穿過熔爐與巨口。在初焰觸及我們世界的地方直面阿扎澤爾，抵禦他的軍團，在風暴岩成為他敞開的大門之前，熄滅這位深淵領主。',
+  'entities.quests.q_infernal_abyss_azazel.completion':
+    '山安靜了。既非沉睡，也非等待，只是安靜。阿扎澤爾以竊取的名字築起永恆，而你以自己一個凡人的名字終結了它。高望會記住這個名字，{playerName}。',
+  'entities.quests.q_infernal_abyss_azazel.objectives.0.label': '擊殺深淵領主阿扎澤爾',
+  'entities.dungeons.infernal_abyss.name': '熔岩深淵',
+  'entities.dungeons.infernal_abyss.enterText': '你深入風暴岩下方，踏入熔岩深淵。',
+  'entities.dungeons.infernal_abyss.leaveText': '你從熔爐般的黑暗中爬出，迎上山間的風。',
 };

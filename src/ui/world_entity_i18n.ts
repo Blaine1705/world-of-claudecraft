@@ -1,5 +1,6 @@
 import { authoredLettersById } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
+import { STUDIO_CONTENT } from '../sim/studio_content';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
 //
@@ -441,6 +442,16 @@ const MOB_IDS = [
   'buddy_forgemaw',
   'buddy_crystal_tide',
   'buddy_phantom',
+  // The Molten Abyss dungeon (src/sim/content/infernal_abyss.ts).
+  'abyssal_legionnaire',
+  'cinder_magus',
+  'molten_hellhound',
+  'flamebound_smith',
+  'abyssal_gladiator',
+  'infernal_cinderling',
+  'forgekeeper',
+  'pyre_golem',
+  'azazel_infernal_lord',
 ] as const;
 
 const NPC_IDS = [
@@ -506,6 +517,89 @@ const NPC_IDS = [
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
+  'deepglass_steward', // books passage down to the bell (docs/prd/deepglass.md)
+  'deepglass_marshal', // runs the fixtures once you are at the bell (same doc)
+  // Baldemar the Bald, the portal wizard: one self per town square plus the
+  // one at the bell (src/sim/portal_wizard.ts).
+  'portal_wizard_eastbrook',
+  'portal_wizard_fenbridge',
+  'portal_wizard_highwatch',
+  'portal_wizard_eldergleam',
+  'portal_wizard_wyrmwatch',
+  'portal_wizard_icemantle',
+  'portal_wizard_lanternmere',
+  'portal_wizard_bridgemere',
+  'portal_wizard_moonrest',
+  'portal_wizard_gallowmere',
+  'portal_wizard_drifthaven',
+  'portal_wizard_hedgewick',
+  'portal_wizard_wickharbor',
+  'portal_wizard_gullhaven',
+  'portal_wizard_goldcrest',
+  'portal_wizard_deepglass',
+  // The Deepglass city event (src/sim/content/deepglass_event.ts): the
+  // spectators and market stallkeepers outside the bell.
+  'dg_spectator_pace1',
+  'dg_spectator_pace2',
+  'dg_spectator_pace3',
+  'dg_spectator_pace4',
+  'dg_spectator_yard1',
+  'dg_spectator_yard2',
+  'dg_spectator_yard3',
+  'dg_spectator_yard4',
+  'dg_spectator_tier1',
+  'dg_spectator_tier2',
+  'dg_spectator_tier3',
+  'dg_spectator_tier4',
+  'dg_spectator_tier5',
+  'dg_spectator_tier6',
+  'dg_spectator_tier7',
+  'dg_spectator_tier8',
+  'dg_spectator_tier9',
+  'dg_spectator_tier10',
+  'dg_spectator_tier11',
+  'dg_spectator_tier12',
+  'dg_stallkeeper_pies',
+  'dg_stallkeeper_tonics',
+  'dg_stallkeeper_favors',
+  // Tidehold, the Warden City above the Deepglass
+  'th_gate_captain',
+  'th_gate_watch_0',
+  'th_gate_watch_1',
+  'th_lamplighter',
+  'th_stablemaster',
+  'th_market_pies',
+  'th_market_tonics',
+  'th_market_bags',
+  'th_market_reagents',
+  'th_smith',
+  'th_banker',
+  'th_merchant',
+  'th_innkeeper',
+  'th_market_folk_0',
+  'th_market_folk_1',
+  'th_market_folk_2',
+  'th_market_folk_3',
+  'th_market_folk_4',
+  'th_market_folk_5',
+  'th_dockhand_0',
+  'th_dockhand_1',
+  'th_clerk',
+  'th_priest',
+  'th_armourer',
+  'th_row_folk_0',
+  'th_row_folk_1',
+  'th_row_folk_2',
+  'th_row_folk_3',
+  'th_warden',
+  'th_seneschal',
+  'th_keep_guard_0',
+  'th_keep_guard_1',
+  'th_keep_guard_2',
+  'th_keep_guard_3',
+  'th_fountain_keeper',
+  'th_bridge_watch_0',
+  'th_bridge_watch_1',
   'chronicler_saul', // Book of Deeds Chronicler (Eastbrook, zone 1)
   'chronicler_osric_fenn', // Book of Deeds Chronicler (Fenbridge, zone 2)
   'chronicler_edda_hartwell', // Book of Deeds Chronicler (Highwatch, zone 3)
@@ -841,6 +935,9 @@ const QUEST_IDS = [
   // the Eastbrook hub dummy lesson (content/practice_dummies.ts)
   'q_hub_know_your_numbers',
   'q_hub_healing_numbers',
+  'q_infernal_abyss_echoes',
+  'q_infernal_abyss_covenant',
+  'q_infernal_abyss_azazel',
 ] as const;
 
 const ZONE_IDS = [
@@ -858,6 +955,8 @@ const ZONE_IDS = [
   'evergarden',
   'galecrest',
   'farshore_isle',
+  // Appended last, matching the ZONES order in sim/data.ts.
+  'goldcrest_harbor',
   'proving_shore',
 ] as const;
 const DUNGEON_IDS = [
@@ -874,6 +973,7 @@ const DUNGEON_IDS = [
   'wildheart_basin',
   'the_last_keep',
   'dawnhold_castle',
+  'infernal_abyss',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter
@@ -1013,16 +1113,30 @@ function orderedValues<T>(ids: readonly string[], source: Record<string, T>): T[
   });
 }
 
+// Studio-authored rows (src/sim/studio_content.ts) join the live registries only
+// while an authored map is active, but their names are translated like every
+// other row, so the English source reads the base tables plus that overlay.
+const MOB_SOURCE = { ...STUDIO_CONTENT.mobs, ...MOBS };
+const NPC_SOURCE = { ...STUDIO_CONTENT.npcs, ...NPCS };
+const QUEST_SOURCE = { ...STUDIO_CONTENT.quests, ...QUESTS };
+const DUNGEON_SOURCE = { ...STUDIO_CONTENT.dungeons, ...DUNGEONS };
+const ZONE_SOURCE = [
+  ...ZONES,
+  ...STUDIO_CONTENT.zones.filter((zone) => !ZONES.some((base) => base.id === zone.id)),
+];
+
 function makeEnglishWorldEntities(): WorldEntityTranslations {
   const mobs = {} as MobTranslations;
   MOB_IDS.forEach((id) => {
-    const mob = MOBS[id] ?? RETIRED_BUDDY_NAMES[id as keyof typeof RETIRED_BUDDY_NAMES];
+    // The Studio overlay rides MOB_SOURCE; the retired buddy keys stay for the
+    // maintained locale overlays (see RETIRED_BUDDY_NAMES).
+    const mob = MOB_SOURCE[id] ?? RETIRED_BUDDY_NAMES[id as keyof typeof RETIRED_BUDDY_NAMES];
     if (!mob) throw new Error(`Missing world entity source entry for ${id}`);
     mobs[id] = { name: mob.name };
   });
 
   const npcs = {} as NpcTranslations;
-  orderedValues(NPC_IDS, NPCS).forEach((npc) => {
+  orderedValues(NPC_IDS, NPC_SOURCE).forEach((npc) => {
     npcs[npc.id as NpcId] = {
       name: npc.name,
       title: npc.title,
@@ -1031,7 +1145,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const quests = {} as QuestTranslations;
-  orderedValues(QUEST_IDS, QUESTS).forEach((quest) => {
+  orderedValues(QUEST_IDS, QUEST_SOURCE).forEach((quest) => {
     const objectiveRecord = {} as Record<number, { label: string }>;
     quest.objectives.forEach((objective, objectiveIndex) => {
       objectiveRecord[objectiveIndex] = { label: objective.label };
@@ -1045,7 +1159,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const zones = {} as ZoneTranslations;
-  ZONES.forEach((zone) => {
+  ZONE_SOURCE.forEach((zone) => {
     const poiRecord = {} as Record<number, { label: string }>;
     zone.pois.forEach((poi, index) => {
       poiRecord[index] = { label: poi.label };
@@ -1061,7 +1175,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const dungeons = {} as DungeonTranslations;
-  orderedValues(DUNGEON_IDS, DUNGEONS).forEach((dungeon) => {
+  orderedValues(DUNGEON_IDS, DUNGEON_SOURCE).forEach((dungeon) => {
     dungeons[dungeon.id as DungeonId] = {
       name: dungeon.name,
       enterText: normalizeSourceText(dungeon.enterText),

@@ -1,7 +1,7 @@
 import { BODY_EDGE_MELEE_REACH } from './combat/player_attack_reach';
 import { MOBS } from './data';
 import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
-import { MELEE_RANGE } from './types';
+import { EMBERWAKE_MOUTH_FORWARD_PER_SCALE, MELEE_RANGE } from './types';
 
 export type MobCombatProfile = {
   meleeRange: number;
@@ -52,11 +52,116 @@ export function scaledDefaultMobMeleeRange(scale: number): number {
   return MELEE_RANGE + Math.max(0, scale - 1) * 3;
 }
 
+// ---------------------------------------------------------------------------
+// Player-side reach against oversized bodies (the "hitbox" of a colossal mob).
+//
+// Every player melee check measures CENTRE TO CENTRE against a flat MELEE_RANGE
+// (5yd). That is correct for a mob the size of a person, and nonsense for a body
+// the size of a building: a dragon parks with his HEAD over you, which leaves
+// his origin, the point every range check measures to, some 30yd back inside
+// his ribs, and every swing answers "Out of range."
+//
+// The fix is a per-template BODY BOX: a rough ellipse laid along the mob's own
+// facing (`along` runs nose-to-tail, `across` is the flank half-width), and the
+// player's reach is MELEE_RANGE plus however far that box extends in the player's
+// direction. It is direction-aware on purpose, standing at his jaw or his tail
+// is melee, standing the same distance off his flank is not, which keeps a
+// 40yd-long body from turning into a 40yd-radius circle of free hits.
+//
+// Deliberately a small explicit table, not a scale formula: visual size and
+// combat reach are decoupled everywhere else in this file (Thunzharr, the
+// Dunefather), and a blanket scale rule would silently widen every large mob in
+// the game. Add a body here only when its model genuinely swallows melee.
+type MeleeHitbox = { along: number; across: number };
+const MELEE_HITBOX: Record<string, MeleeHitbox> = {
+  // Vaelgrath: his jaw leads his origin by ~31yd (EMBERWAKE_MOUTH_FORWARD_PER_SCALE
+  // x scale 6) and the tail trails behind it, so nose-to-tail he is the better part
+  // of 70yd of dragon. `along` covers the jaw (the contact point his combat profile
+  // below parks on the player) with a couple of yards to spare; `across` is a torso
+  // half-width, so the flank is still a place you have to walk to.
+  emberwake_vaelgrath: { along: 34, across: 12 },
+};
+
+/** Extra yards of reach a player gets when swinging at this mob's body, in the
+ *  direction they are standing. `from` is the attacker's position; without it
+ *  (no spatial context) the box's full length is granted, which is the same
+ *  permissive answer the flat bonus used to give. */
+export function meleeHitboxBonus(
+  target: {
+    kind?: string;
+    templateId?: string;
+    facing?: number;
+    pos?: { x: number; z: number };
+  } | null,
+  from?: { x: number; z: number },
+): number {
+  if (!target || target.kind !== 'mob') return 0;
+  const box = MELEE_HITBOX[target.templateId ?? ''];
+  if (!box) return 0;
+  if (!from || !target.pos || target.facing === undefined) return box.along;
+  const dx = from.x - target.pos.x;
+  const dz = from.z - target.pos.z;
+  const d = Math.hypot(dx, dz);
+  if (d < 1e-3) return box.along;
+  // Component of the attacker's bearing along the body axis vs across it. The
+  // radius of the ellipse in that direction is the reach the body itself adds.
+  const fwd = (dx * Math.sin(target.facing) + dz * Math.cos(target.facing)) / d;
+  const side = Math.sqrt(Math.max(0, 1 - fwd * fwd));
+  return Math.hypot(box.along * fwd, box.across * side);
+}
+
+/** A player's melee reach against a specific body (flat range + its hitbox). */
+export function playerMeleeRangeTo(
+  target: {
+    kind?: string;
+    templateId?: string;
+    facing?: number;
+    pos?: { x: number; z: number };
+  } | null,
+  from?: { x: number; z: number },
+): number {
+  return MELEE_RANGE + meleeHitboxBonus(target, from);
+}
+
+/** An ability's effective range against a specific body. Only MELEE-ranged
+ *  abilities (range <= MELEE_RANGE, including the range-0 "melee" default) grow
+ *  with the target's hitbox; a 30yd bolt is already measured from far outside
+ *  the silhouette and must not creep further. */
+export function abilityRangeTo(
+  baseRange: number,
+  target: {
+    kind?: string;
+    templateId?: string;
+    facing?: number;
+    pos?: { x: number; z: number };
+  } | null,
+  from?: { x: number; z: number },
+): number {
+  return baseRange <= MELEE_RANGE ? baseRange + meleeHitboxBonus(target, from) : baseRange;
+}
+
 // Thunzharr is rendered oversized (scale 8 in zone3.ts) so he reads as a world boss, but
 // his melee reach must NOT follow that visual scale (a scale-8 body would swing far past
 // its model and reach kiters, trivializing the Howling Gale anti-kite snare). Pin his
 // reach to a scale-5 body (~17yd): visual size and combat reach are decoupled.
 const THUNZHARR_REACH_SCALE = 5;
+// The Dunefather reads even larger on screen (a worm is mostly LENGTH), but his
+// bite is pinned to a scale-4 body: the eruption/sweep/slam AoEs are the real
+// reach, a giant melee swing on top would make the surface windows unplayable.
+const SANDWORM_REACH_SCALE = 4;
+// Vaelgrath is the one body whose reach is measured to his HEAD instead of to a
+// ring around his origin. His mesh origin is the body CENTRE and the jaw leads
+// it by EMBERWAKE_MOUTH_FORWARD_PER_SCALE per point of scale (~31yd at scale 6),
+// so a reach sized to the origin made him close until the players were standing
+// under his ribcage, staring up into wings, with the head and its telegraphs a
+// hundred feet past them. Sizing his reach to the mouth offset instead parks him
+// with the JAW over his target: the fight happens in front of a face, the breath
+// wind-up is visible, and the whole animal is on screen. `desiredRange`, what
+// locomotion actually closes to, is the mouth offset itself; the swing reach
+// adds the jaw's own bite. Visual size and combat reach stay decoupled, exactly
+// as they are for Thunzharr and the Dunefather; this is just decoupled to a
+// different point on the model.
+const EMBERWAKE_JAW_BITE = 8;
 
 // Mob AI reads the profile several times per engaged mob per tick (the threat
 // scan in updateMobTarget, the lookup that opens updateMobCombatProfile, and
@@ -185,6 +290,21 @@ function buildCombatProfileForMob(templateId: string, scale: number): MobCombatP
       ...DEFAULT_MOB_COMBAT_PROFILE,
       meleeRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE),
       desiredRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE) * 0.8,
+    };
+  if (templateId === 'emberwake_vaelgrath') {
+    const jaw = scale * EMBERWAKE_MOUTH_FORWARD_PER_SCALE;
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: jaw + EMBERWAKE_JAW_BITE,
+      // Stop with the head ON them, not a jaw-length short of them.
+      desiredRange: jaw,
+    };
+  }
+  if (templateId === 'sandworm_dunefather')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(SANDWORM_REACH_SCALE),
+      desiredRange: scaledDefaultMobMeleeRange(SANDWORM_REACH_SCALE) * 0.8,
     };
   // A towering boss with an authored body (MobTemplate.bodyRadius): its swing
   // reaches one yard past where a player's melee reaches it, so nobody hits

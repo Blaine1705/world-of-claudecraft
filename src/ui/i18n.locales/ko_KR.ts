@@ -1635,6 +1635,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 기록',
   'landing.scout': 'WoC 정찰',
   'landing.parseService': 'WoC 전투 기록',
+  'editor.buildMode.materialNames.WardenStone': '매끄러운 돌',
+  'editor.buildMode.diagonal': '대각선 벽',
+  'editor.buildMode.diagonalHint': '격자점 사이를 드래그하여 원하는 각도로 벽을 만드세요.',
   'guide.professions.endgameBodyRaidCollections':
     '명장 제작은 고유 장착: 명장 제작 표식을 공유하는 장비 계열이다. 기존 최상위 제작 경로는 발견하는 도안, 하루 단위로 제한되는 중간 재료 제작, 공통 최종 단계 재료를 그대로 사용한다. 도가니 세트는 공격대 재료를 쓰는 별도 경로이지, 기존 경로에 비용을 또 얹는 것이 아니다. 두 경로는 동일한 최대 2개 착용 제한을 공유하므로 구성에서 같은 두 자리를 두고 경쟁한다. 완성품은 완전하게 만들기나 의뢰 제작으로 해당 개체가 귀속되기 전까지 자유롭게 거래할 수 있다.',
   'guide.professions.endgamePatternsBodyCollections':
@@ -16391,6 +16394,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '중앙',
   'hudChrome.breath.label': '숨',
   'hudChrome.breath.drowning': '익사 중!',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': '딥글라스로 가는 길을 열어 주세요',
+  'hudChrome.portalWizard.gossipDeepglassAria': '발데마르에게 딥글라스로 가는 차원문을 요청합니다',
+  'hudChrome.portalWizard.gossipHome': '집으로 가는 길을 열어 주세요',
+  'hudChrome.portalWizard.gossipHomeAria': '발데마르에게 마을로 돌아가는 차원문을 요청합니다',
+  'hudChrome.portalWizard.portalOpen': '차원문이 열렸습니다. 걸어 들어가세요.',
   'abilityUi.resources.devotion': '헌신',
   'abilityUi.resources.focus': '집중',
   'abilityUi.tooltip.requiresStealthSkulduggery':
@@ -19282,6 +19292,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.looksNone': '기본 외형',
   'hudChrome.deeds.looksNoBuddy': '동료를 소환하면 여기서 외형을 고를 수 있습니다.',
   'hudChrome.deeds.looksEmpty': '이 동료는 아직 해금된 외형이 없습니다.',
+  'hudChrome.realmBuilder.title': '이달의 왕국 건설자',
+  'hudChrome.realmBuilder.currentLabel': '이달의 수상자',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '명예로 산 물건은 되돌릴 수 없습니다. 되사기 목록에는 언제나 직접 판 물건만 오릅니다. 동전으로 산 물건은 대개 판매 가격에 되팔 수 있고, 마음이 다시 바뀌면 그 목록에서 되찾을 수 있지만, 워페어 장비는 구매하는 순간 귀속되어 거래도, 우편 발송도, 되팔기도 영영 할 수 없습니다. 그러니 그 목록에 오르는 일도 결코 없습니다. 상점이 굳이 한 번 더 확인을 묻는 이유가 그것이니, 누르기 전에 장비를 찬찬히 읽어 보세요.',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -19356,8 +19368,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '채집자별 분리',
   'hudChrome.itemMenu.takeChosenQuantity': '지정 수량 꺼내기',
   'hudChrome.itemMenu.combine': '재료 묶음 합치기',
-  'hudChrome.realmBuilder.title': '이달의 왕국 건설자',
-  'hudChrome.realmBuilder.currentLabel': '이달의 수상자',
   'hudChrome.realmBuilder.placeholderName': '당신의 이름',
   'hudChrome.realmBuilder.placeholderHint': '이 명판은 첫 번째 이름을 기다리고 있습니다.',
   'hudChrome.realmBuilder.pastTitle': '역대 수상자',
@@ -21590,4 +21600,53 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 캐릭터를 삭제하기 전에 고정되지 않은 도장 카드를 모두 다른 캐릭터로 옮기세요.',
   'apiError.character.referral_bond_pending':
     '친구 초대 보상인 멤버십 증서를 이 캐릭터에게 지급 중입니다. 지급이 완료된 후 캐릭터 삭제를 다시 시도하세요.',
+  'entities.items.infernal_slag.name': '심연의 광재',
+  'entities.items.charred_legion_tablet.name': '불탄 군단 석판',
+  'entities.items.brands_of_the_first_flame.name': '태초의 불꽃 낙인',
+  'entities.items.forgekeepers_ledger.name': '용광로지기의 장부',
+  'entities.items.azazels_broken_covenant.name': '아자젤의 깨진 계약',
+  'entities.items.emberforged_vambraces.name': '잿불로 벼린 완갑',
+  'entities.items.cinderthread_mantle.name': '잿실 어깨망토',
+  'entities.items.hellstalker_boots.name': '지옥추적자 장화',
+  'entities.items.forgekeepers_warhammer.name': '용광로지기의 전쟁망치',
+  'entities.items.forgekeepers_runestaff.name': '용광로지기의 룬지팡이',
+  'entities.items.forgekeepers_fang.name': '용광로지기의 송곳니',
+  'entities.items.azazels_ruinblade.name': '아자젤의 파멸검',
+  'entities.items.azazels_soulstaff.name': '아자젤의 영혼지팡이',
+  'entities.items.azazels_emberfang.name': '아자젤의 잿불송곳니',
+  'entities.items.hellforged_bulwark.name': '지옥벼림 보루',
+  'entities.items.cinderseer_raiment.name': '잿불예언자의 의복',
+  'entities.items.abysswalker_harness.name': '심연방랑자 흉갑',
+  'entities.mobs.abyssal_legionnaire.name': '심연의 군단병',
+  'entities.mobs.cinder_magus.name': '잿불 마법사',
+  'entities.mobs.molten_hellhound.name': '용암 지옥사냥개',
+  'entities.mobs.flamebound_smith.name': '불꽃에 속박된 대장장이',
+  'entities.mobs.abyssal_gladiator.name': '심연의 검투사',
+  'entities.mobs.infernal_cinderling.name': '심연의 잿불꼬마',
+  'entities.mobs.forgekeeper.name': '용광로지기',
+  'entities.mobs.pyre_golem.name': '장작불 골렘',
+  'entities.mobs.azazel_infernal_lord.name': '심연의 군주 아자젤',
+  'entities.quests.q_infernal_abyss_echoes.title': '스톰크래그 아래의 메아리',
+  'entities.quests.q_infernal_abyss_echoes.text':
+    '스톰크래그는 폭풍에서 태어난 산이 아니네, {playerName}. 가장 오래된 석판에는 세상 밖에서 떨어진 불길을 덮으려고 두드려 만든 뚜껑이라고 적혀 있지. 동쪽 바위산 아래에 새로운 균열이 열렸네. 네 명의 동료와 함께 들어가 군단 석판과 태초의 불꽃 곁에 새겨진 낙인을 가져와 주게.',
+  'entities.quests.q_infernal_abyss_echoes.completion':
+    '석판에는 스스로 불길 속으로 진군한 대군의 이름이 적혀 있네. 낙인은 그들이 섬긴 힘의 이름을 말해 주지. 아자젤이야. 이곳은 악마가 들어오지 못하게 만든 감옥이 아니었네, {playerName}. 그들의 군주를 들이기 위해 만든 관문이었지.',
+  'entities.quests.q_infernal_abyss_echoes.objectives.0.label': '불탄 군단 석판 해독',
+  'entities.quests.q_infernal_abyss_echoes.objectives.1.label': '태초의 불꽃 낙인 조사',
+  'entities.quests.q_infernal_abyss_covenant.title': '깨진 계약',
+  'entities.quests.q_infernal_abyss_covenant.text':
+    '군단의 맹세는 아자젤에게 우리 세계로 들어오는 길을 약속했지만, 모든 계약에는 대가와 허점이 있네. 용암 심연으로 돌아가게. 아가리 근처에서 용광로지기의 장부와 깨진 계약을 찾아 주게. 무엇이 그를 묶었는지 알아내면, 어떻게 죽일 수 있는지도 알게 될지 모르지.',
+  'entities.quests.q_infernal_abyss_covenant.completion':
+    '허점은 바로 이것이네. 아자젤은 자기 군단의 이름으로 관문을 먹여 살렸어. 하인을 하나씩 삼킬 때마다 강해졌지만, 그 목숨은 아래의 용광로에 묶였지. 그 용광로의 심장부에서 군주를 쓰러뜨리면 관문도 그와 함께 사라질 수밖에 없네.',
+  'entities.quests.q_infernal_abyss_covenant.objectives.0.label': '용광로지기의 장부 회수',
+  'entities.quests.q_infernal_abyss_covenant.objectives.1.label': '아자젤의 깨진 계약 읽기',
+  'entities.quests.q_infernal_abyss_azazel.title': '용암 심연의 군주',
+  'entities.quests.q_infernal_abyss_azazel.text':
+    '계약이 우리에게 한 번의 기회를 주었네, {playerName}. 믿을 수 있는 동료들과 함께 용광로와 아가리를 지나 내려가게. 태초의 불꽃이 우리 세계에 닿는 곳에서 아자젤을 마주하고, 그의 군단을 버텨 내게. 스톰크래그가 그를 위한 열린 관문이 되기 전에 심연의 군주를 꺼뜨려야 하네.',
+  'entities.quests.q_infernal_abyss_azazel.completion':
+    '산이 고요하네. 잠들지도, 기다리지도 않고 그저 고요할 뿐이야. 아자젤은 훔친 이름들로 영원을 쌓았지만, 자네는 필멸자인 자신의 이름 하나로 그것을 끝냈네. 하이워치는 그 이름을 기억할 걸세, {playerName}.',
+  'entities.quests.q_infernal_abyss_azazel.objectives.0.label': '심연의 군주 아자젤 처치',
+  'entities.dungeons.infernal_abyss.name': '용암 심연',
+  'entities.dungeons.infernal_abyss.enterText': '스톰크래그 아래로 내려가 용암 심연에 들어섭니다.',
+  'entities.dungeons.infernal_abyss.leaveText': '용광로 같은 어둠에서 기어 나와 산바람을 맞습니다.',
 };
