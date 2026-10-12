@@ -107,6 +107,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Drowned Gate Tower's marsh fog and gate sprites at the Sunken
   // Bastion's door: the world's own marks, under every telegraph.
   { file: 'src/render/sunken_bastion_entrance.ts', layer: 'ground', strict: true },
+  // The Fallen Chapel's grave mist and spirit sprites at the Hollow Crypt's
+  // door: the world's own marks, under every telegraph.
+  { file: 'src/render/hollow_crypt_entrance.ts', layer: 'ground', strict: true },
   // A Buried Hoard boss room's additive floor light under its kit props, kept on
   // the order it shipped with (2, the ground band's second rung).
   { file: 'src/render/hoard_room_kit.ts', layer: 'ground', strict: true },

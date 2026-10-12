@@ -5,6 +5,7 @@
 // Gate Tower. A new static set piece joins this list, never a new line in
 // renderer.ts (the monolith ratchet).
 import { buildFarshoreFeatures } from './farshore_features';
+import { buildHollowCryptEntrance } from './hollow_crypt_entrance';
 import { buildSanctumSealGate } from './sanctum_seal_gate';
 import { clearSetPieceOccluders } from './set_piece_occluders';
 import { buildSunkenBastionEntrance } from './sunken_bastion_entrance';
@@ -22,5 +23,6 @@ export function buildStaticWorldFeatures(seed: number) {
     buildFarshoreFeatures(seed),
     buildSanctumSealGate(seed),
     buildSunkenBastionEntrance(seed),
+    buildHollowCryptEntrance(seed),
   ];
 }

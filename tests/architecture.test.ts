@@ -1018,6 +1018,9 @@ const RENDER_PURE_CORES = [
   // What a built set piece puts between the chase camera and the character:
   // one occluder box per collider row, tested with the fade family's own test.
   'src/render/set_piece_occluders_core.ts',
+  // The Hollow Crypt's Fallen Chapel: the virtual stair trace, the grave
+  // mist's puffs and the spirit sprites (flames, motes, wisps, rose glow).
+  'src/render/hollow_crypt_entrance_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',

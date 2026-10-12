@@ -502,6 +502,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/night_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/point_light_carriers.ts': 'the carriers themselves, the only lights three gathers',
+  'render/hollow_crypt_entrance.ts':
+    'the Fallen Chapel soul light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/hollow_crypt/crypt_lights.ts':
     'the Hollow Crypt lanterns, braziers and soul light, pushed through the fireLights adopter sink the interiors are handed',
   'render/drowned_temple/temple_lights.ts':
@@ -630,6 +632,9 @@ describe('every point-light producer is a carrier source', () => {
       'render/hoard_reward_chest.ts: mesh',
       'render/hoard_reward_chest.ts: motes',
       'render/hoard_reward_chest.ts: pool.mesh',
+      // The Fallen Chapel's grave mist: a mesh hook writing the time of day
+      // and the reduced-motion switch into its own uniform, never a scene.
+      'render/hollow_crypt_entrance.ts: mesh',
       'render/jail_scene.ts: swirl',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',

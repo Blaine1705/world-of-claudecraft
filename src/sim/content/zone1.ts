@@ -2245,7 +2245,10 @@ export const ZONE1_PROPS: ZonePropsDef = {
   ],
   marshReeds: [],
   ruinRings: [
-    { x: 80, z: 78, ringR: 7, columns: 7 },
+    // The Fallen Chapel stands on this ring's site (the Hollow Crypt's world
+    // entrance, src/sim/hollow_crypt_entrance.ts) and brings its own nave piers,
+    // so the ring is bare: it keeps only its terrain pad and clearings.
+    { x: 80, z: 78, ringR: 7, columns: 7, bare: true },
     { x: -5, z: -60, ringR: 8, columns: 6 },
   ],
   fences: EASTBROOK_LAYOUT.fences.map((fence) => ({
