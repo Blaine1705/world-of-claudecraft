@@ -1959,4 +1959,27 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const awarded = alice?.inventory.find((slot) => slot.itemId === 'sigil_anvil_helmet');
     expect(awarded?.instance?.partyTrade?.eligibleIds).toEqual([101, 102]);
   });
+
+  it('mob_cast_sight_route: a caster with no line of sight plans a way round, walks it and casts, twice', () => {
+    const rec = run('mob_cast_sight_route');
+    type Leg = { plans: number; sparks: number; blind: number; sees: boolean };
+    const first = rec.notes.first as Leg;
+    const second = rec.notes.second as Leg;
+    // Both legs really begin with the monument between the pair, so the
+    // route below is a route round something and not a straight walk.
+    expect(rec.notes.hiddenAtStart).toBe(true);
+    expect(rec.notes.hiddenAgain).toBe(true);
+    for (const leg of [first, second]) {
+      // The search ran, the caster ended in sight of its target, and its
+      // Spark landed from there.
+      expect(leg.plans).toBeGreaterThan(0);
+      expect(leg.sees).toBe(true);
+      expect(leg.sparks).toBeGreaterThan(0);
+      // THE RULE: no Spark landed on a tick that began with the target hidden.
+      expect(leg.blind).toBe(0);
+    }
+    // The route record the golden samples is the Adept's own.
+    const adept = rec.sim.entities.get(rec.notes.adeptId as number);
+    expect(adept?.chaseRoute?.targetId).toBe(rec.notes.pid);
+  });
 });

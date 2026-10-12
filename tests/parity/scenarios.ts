@@ -27,7 +27,9 @@ import {
   arenaOrigin,
   DELVES,
   DUNGEON_X_THRESHOLD,
+  DUNGEONS,
   GATHER_NODES,
+  instanceOrigin,
   LAKE,
   MOBS,
   PROPS,
@@ -7811,6 +7813,121 @@ function bopPartyTradeEligibility(): Scenario {
   };
 }
 
+// Mob casts and line of sight, with the walk round a wall (mob/cast_sight.ts,
+// mob/chase_route.ts, mob/route_search.ts). A Gravecaller Adept in a claimed
+// Hollow Crypt whose target stands dead behind the Ossuary Monument: its Grave
+// Spark may not begin, so on its plan slot it searches a way round (the
+// bounded search), walks the route and casts from where it sees. The target
+// then steps to the far side of the monument and the caster goes round again.
+// Everything the route keeps is on the sampled Adept (Entity.chaseRoute: the
+// waypoints, the plan clock, the tries), so a reordered search, a moved plan
+// slot or a changed budget turns this golden red.
+const SIGHT_ROUTE_SPELL = 'Grave Spark';
+function mobCastSightRoute(): Scenario {
+  return {
+    name: 'mob_cast_sight_route',
+    coverage: [
+      'a petSpell caster in spell range with no line of sight begins no cast (mob/cast_sight.ts casterSightBlocked on its staggered recheck)',
+      'chaseAroundObstacles: the plan slot, searchRoute round a collider and the waypoint walk (mob/chase_route.ts, mob/route_search.ts)',
+      'the cast resumes from the spot that sees the target, and a target that hides again is walked round again',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 4471, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.addPlayer('warrior', 'Bonewall') as number;
+      sim.setPlayerLevel(20, pid);
+      const p = requireEntity(sim, pid, 'parity scenario sight-route player');
+      sim.enterDungeon('hollow_crypt', pid);
+      const inst = requireValue(
+        sim.instances.find((i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null),
+        'parity scenario sight-route instance',
+      );
+      // The placed crypt is cleared so the one engaged mob is the Adept and
+      // every gate stands open. Morthen stays entombed: with him dead the
+      // claim would raise his Knellwyrm into the scene.
+      for (const id of inst.mobIds) {
+        const e = sim.entities.get(id);
+        if (e && !e.dead && e.templateId !== 'morthen') sim.ctx.handleDeath(e, p);
+      }
+      const o = instanceOrigin(DUNGEONS.hollow_crypt.index, inst.slot);
+      // The Ossuary Monument (instance-local): a 5 yd pillar of bone.
+      const monument = { x: o.x, z: o.z - 30 };
+      const stand = (x: number, z: number) => {
+        p.pos = sim.ctx.groundPos(x, z);
+        p.prevPos = { ...p.pos };
+        sim.rebucket(p);
+      };
+      const topUp = () => {
+        p.maxHp = 1_000_000;
+        p.hp = 1_000_000;
+      };
+      // North of the monument, dead behind it from the caster's spot.
+      stand(monument.x, monument.z + 12);
+      topUp();
+      // One tick so the cleared claim's gates stand open to collision before
+      // anything plans a way past them.
+      rec.tick(1);
+      const adept = createMob(
+        sim.nextId++,
+        MOBS.crypt_gravecaller_adept,
+        MOBS.crypt_gravecaller_adept.minLevel,
+        sim.ctx.groundPos(monument.x, monument.z - 14),
+      ) as AnyEntity;
+      adept.maxHp = 1_000_000;
+      adept.hp = 1_000_000;
+      sim.addEntity(adept);
+      inst.mobIds.push(adept.id);
+      adept.aggroTargetId = pid;
+      adept.inCombat = true;
+      adept.aiState = 'chase';
+      adept.leashAnchor = { ...adept.pos };
+      addThreat(adept, pid, 100);
+      rec.track(adept.id);
+      rec.notes.adeptId = adept.id;
+      rec.notes.pid = pid;
+
+      // Run one leg: count the route searches, the Sparks that landed, and any
+      // Spark that landed on a tick that began with the target out of sight.
+      const leg = (ticks: number) => {
+        let plans = 0;
+        let sparks = 0;
+        let blind = 0;
+        for (let i = 0; i < ticks; i++) {
+          topUp();
+          const hidden = !sim.ctx.hasLineOfSight(adept, p);
+          const landed = rec
+            .tick(1)
+            .filter(
+              (ev) =>
+                ev.type === 'damage' && ev.targetId === pid && ev.ability === SIGHT_ROUTE_SPELL,
+            ).length;
+          plans += sim.mobScanCounters.routePlans;
+          sparks += landed;
+          if (hidden) blind += landed;
+        }
+        return { plans, sparks, blind, sees: sim.ctx.hasLineOfSight(adept, p) };
+      };
+
+      rec.notes.hiddenAtStart = !sim.ctx.hasLineOfSight(adept, p);
+      rec.snapshot('target-hidden');
+      rec.notes.first = leg(240);
+      rec.snapshot('walked-into-sight');
+
+      // The target steps to the far side of the monument from where the
+      // caster now stands: out of sight again, the other way round.
+      const dx = monument.x - adept.pos.x;
+      const dz = monument.z - adept.pos.z;
+      const d = Math.hypot(dx, dz);
+      stand(monument.x + (dx / d) * 12, monument.z + (dz / d) * 12);
+      rec.notes.hiddenAgain = !sim.ctx.hasLineOfSight(adept, p);
+      rec.snapshot('target-hides-again');
+      rec.notes.second = leg(240);
+      rec.snapshot('walked-into-sight-again');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -7919,4 +8036,6 @@ export const SCENARIOS: Scenario[] = [
   flaskConsumables(),
   worldQuestLifecycle(),
   bopPartyTradeEligibility(),
+  // Appended on the same tiling rule: it lands in the final shard.
+  mobCastSightRoute(),
 ];
