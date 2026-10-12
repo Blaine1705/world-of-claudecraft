@@ -5741,6 +5741,7 @@ const ALL_DELTA_KEYS = [
   'denc',
   'df',
   'dfb',
+  'dgrun',
   'dmarks',
   'dodge',
   'drun',
@@ -5887,6 +5888,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   denc: 'lastDisenchantResult',
   df: 'dungeonFinderInfo',
   dfb: 'dungeonFinderBoard',
+  dgrun: 'dungeonRun',
   dmarks: 'delveMarks',
   dodge: 'dodgeChance',
   drun: 'delveRun',
@@ -6559,8 +6561,12 @@ describe('full self-state snapshot delta fixture', () => {
       // design. Its non-null arrival (and the by-reference mirror) is pinned
       // in tests/vault_wire.test.ts instead.
       // This fixture stands at a different banker; the weekly keeper gate stays closed.
-      if (key === 'cvault' || key === 'weeklyRewards') {
-        expect(snap.self[key], 'self.cvault must arrive as the explicit gated null').toBeNull();
+      // dgrun is position-exclusive with drun the same way: the dungeon run is
+      // read off the claim the player STANDS in, and this player stands in a
+      // delve, so the fresh session's first value is the explicit null. Its
+      // non-null arrival is pinned in tests/server/dungeon_run_wire.test.ts.
+      if (key === 'cvault' || key === 'weeklyRewards' || key === 'dgrun') {
+        expect(snap.self[key], `self.${key} must arrive as the explicit gated null`).toBeNull();
         continue;
       }
       expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
@@ -7291,7 +7297,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 121 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 122 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
@@ -7354,8 +7360,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Courier adds its small pose and separately revision-gated custody data.
     // The Mirefen world-boss branch's Shardpike self keys (lance, lrest, lguide): 119.
     // The buddy collection adds budOwn and budPend to the integration keys.
-    expect(ALL_DELTA_KEYS).toHaveLength(121);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(121);
+    // +1: the dungeon objectives tracker's dgrun (server/dungeon_run_wire.ts), for 122.
+    expect(ALL_DELTA_KEYS).toHaveLength(122);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(122);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7529,7 +7536,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
     // The courier's keys and the Shardpike trial's lance, lrest and lguide self emits make 119.
     // The buddy collection adds budOwn and budPend.
-    expect(scraped.size).toBe(121);
+    // The dungeon run's dgrun (the game.ts maybeSerialized emit) makes 122.
+    expect(scraped.size).toBe(122);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

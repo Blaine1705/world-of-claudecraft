@@ -739,6 +739,7 @@ import { personalGliderLeaderboard as gliderRecordsPage } from './glider_persona
 import { spawnStaticWorldObjects } from './ground_object_spawns';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import { buyCrucibleVendorItem as buyCrucibleVendorItemImpl } from './instances/crucible_vendor';
+import { dungeonRunForPlayer } from './instances/dungeon_run';
 import {
   awardHeroicMarks as awardHeroicMarksImpl,
   DEFAULT_RAID_LOCKOUT_MS,
@@ -778,7 +779,7 @@ import {
   socketRiftGem as socketRiftGemImpl,
   upgradeRiftItem as upgradeRiftItemImpl,
 } from './rift/progression';
-import { buildRiftFloorView } from './rift/rift_floor_view';
+import { buildRiftFloorView, riftEventMsRemainingFor } from './rift/rift_floor_view';
 import {
   riftLockpickAbort as riftLockpickAbortImpl,
   riftLockpickAction as riftLockpickActionImpl,
@@ -11311,17 +11312,12 @@ export class Sim {
   hoardBossCues(): import('../world_api/dungeons').HoardBossCueView[] {
     return hoardBossCueViewsForPlayer(this.ctx, this.primaryId);
   }
-  // Milliseconds remaining before the current rift's backing event stops admitting
-  // parties (null outside a rift, or for a dev-spawned rift with no
-  // backing RiftEvent). Sim-clock arithmetic only (event.expiresAt and this.time are
-  // both sim-clock seconds), recomputed fresh on every call so a repeated read ticks
-  // down like raidLockouts() does, with no caching to go stale between ticks.
   riftEventMsRemaining(): number | null {
-    const view = this.riftFloor;
-    if (!view || view.eventId === null) return null;
-    const event = this.riftEvents.find((candidate) => candidate.eventId === view.eventId);
-    if (!event) return null;
-    return Math.max(0, Math.round((event.expiresAt - this.time) * 1000));
+    return riftEventMsRemainingFor(this.ctx, this.riftFloor);
+  }
+  // The group dungeon run the primary player stands in (instances/dungeon_run.ts).
+  get dungeonRun(): import('../world_api/dungeons').DungeonRunView | null {
+    return dungeonRunForPlayer(this.ctx, this.primaryId);
   }
 
   get delveRun(): DelveRunInfo | null {

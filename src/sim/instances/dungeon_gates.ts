@@ -99,6 +99,24 @@ export function dungeonPacksDead(
   return packIds.every((pack) => allDead(ctx, inst, index.byPack.get(pack) ?? []));
 }
 
+/**
+ * Is every placed body of `templateId` dead in this claim? The gates' own
+ * boss read (a gate's `bosses` list waits on exactly this), exposed so the
+ * run's objectives (dungeon_run.ts) tick a boss the same instant the gate
+ * behind it opens. False for a template the dungeon never places: a body an
+ * encounter summons is not on the spawn-ordered roster, so it has no answer
+ * here and the caller must look it up its own way.
+ */
+export function dungeonPlacedBossDead(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  templateId: string,
+): boolean {
+  const dungeon = DUNGEONS[inst.dungeonId];
+  const indices = dungeon ? indexFor(dungeon).byTemplate.get(templateId) : undefined;
+  return indices !== undefined && allDead(ctx, inst, indices);
+}
+
 function bossEngaged(ctx: SimContext, inst: InstanceSlot, templateId: string): boolean {
   const index = indexFor(DUNGEONS[inst.dungeonId]);
   for (const i of index.byTemplate.get(templateId) ?? []) {

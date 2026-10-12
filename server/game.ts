@@ -246,6 +246,7 @@ import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
 import * as entryFacing from './dungeon_entry_facing';
 import { dispatchDungeonFinderCommand } from './dungeon_finder_commands';
+import { dungeonRunWireJson } from './dungeon_run_wire';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
@@ -8566,6 +8567,7 @@ export class GameServer {
     maybe('mloot', this.sim.activeMasterLootRolls(anchorSession.pid));
     selfLap?.('self.loot');
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
+    maybeSerialized('dgrun', dungeonRunWireJson(this.sim.ctx, anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
     maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
     maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));

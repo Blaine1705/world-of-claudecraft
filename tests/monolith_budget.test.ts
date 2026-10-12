@@ -1229,7 +1229,12 @@ const MONOLITHS: MonolithRow[] = [
     // parent pins (11639 and PR 4352's 11636) stands.
     // Composes the existing buddy PR additions with integration extractions.
     // Exact merged size; no additional coordinator logic introduced by resolution.
-    ceiling: 11709,
+    // LOWERED 11709 -> 11705 with the dungeon objectives tracker: its IWorld
+    // read (the dungeonRun getter, a one-line delegate to
+    // instances/dungeon_run.ts) is paid for by moving riftEventMsRemaining's
+    // body and its comment to rift/rift_floor_view.ts, beside the floor view it
+    // reads. Exact count (wc -l after biome), zero slack.
+    ceiling: 11705,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
