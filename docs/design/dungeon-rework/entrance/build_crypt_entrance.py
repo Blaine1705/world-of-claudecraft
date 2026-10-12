@@ -572,8 +572,10 @@ def nave():
             lancet(p, Mk, Lk / 2, 2.2, 3.9, 0.95, 0.45, 0.9, head=(k == 2))
         footing(f'apse_{k}', (pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2, Lk / 2, 0.4, math.atan2(-(pb[1] - pa[1]), pb[0] - pa[0]),
                 y0)
-    for k in range(4):
-        a0, a1 = math.pi * k / 4, math.pi * (k + 1) / 4
+    # Four runs, open at the low north breach behind the stair-house (the run
+    # of the wall that fell to a step): the apse is never a sealed pocket.
+    for k, (d0, d1) in enumerate(((0, 45), (45, 80), (100, 135), (135, 180))):
+        a0, a1 = math.radians(d0), math.radians(d1)
         pa = (APSE_C[0] + math.cos(a0) * APSE_R, APSE_C[1] + math.sin(a0) * APSE_R)
         pb = (APSE_C[0] + math.cos(a1) * APSE_R, APSE_C[1] + math.sin(a1) * APSE_R)
         dx, dz = pb[0] - pa[0], pb[1] - pa[1]

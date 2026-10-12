@@ -140,7 +140,9 @@ describe('the Fallen Chapel stands in for the generic door arch', () => {
       expect(isBlocked(SEED, DOOR.x + sx * 6, DOOR.z - 22, 0.4), `gable ${sx}`).toBe(true);
       expect(isBlocked(SEED, DOOR.x + sx * 8.5, DOOR.z - 18, 0.4), `nave ${sx}`).toBe(true);
     }
-    expect(isBlocked(SEED, DOOR.x, DOOR.z + 10.3, 0.4), 'apse').toBe(true);
+    expect(isBlocked(SEED, DOOR.x + 5.52, DOOR.z + 8.02, 0.4), 'apse').toBe(true);
+    // the apse's north run fell to a step: its breach is open ground
+    expect(isBlocked(SEED, DOOR.x, DOOR.z + 10.3, PLAYER_BODY_RADIUS), 'apse breach').toBe(false);
     for (let z = DOOR.z - 27; z <= DOOR.z - 19; z += 0.5) {
       expect(isBlocked(SEED, DOOR.x, z, PLAYER_BODY_RADIUS), `gable door z ${z}`).toBe(false);
     }
@@ -366,6 +368,67 @@ describe('the Fallen Chapel sits on the real ground', () => {
 });
 
 const near80 = (x: number, z: number) => Math.hypot(x - DOOR.x, z - DOOR.z) < 80;
+
+describe('the Fallen Chapel seals nobody in', () => {
+  it('a body walks from the exit drop to every part of the set piece', () => {
+    // Flood the ground a player's body can occupy, a quarter yard at a time,
+    // from the exit drop, over the whole footprint and a margin round it.
+    const STEP = 0.25;
+    const X0 = -24;
+    const Z0 = -52;
+    const NX = Math.round(48 / STEP) + 1;
+    const NZ = Math.round(68 / STEP) + 1;
+    const open = new Uint8Array(NX * NZ);
+    const seen = new Uint8Array(NX * NZ);
+    for (let j = 0; j < NZ; j++) {
+      for (let i = 0; i < NX; i++) {
+        const blocked = isBlocked(
+          SEED,
+          DOOR.x + X0 + i * STEP,
+          DOOR.z + Z0 + j * STEP,
+          PLAYER_BODY_RADIUS,
+        );
+        open[j * NX + i] = blocked ? 0 : 1;
+      }
+    }
+    const cell = (lx: number, lz: number) =>
+      Math.round((lz - Z0) / STEP) * NX + Math.round((lx - X0) / STEP);
+    const queue = [cell(0, -4)];
+    seen[queue[0]] = 1;
+    for (let head = 0; head < queue.length; head++) {
+      const at = queue[head];
+      const i = at % NX;
+      for (const next of [at - 1, at + 1, at - NX, at + NX]) {
+        if (next < 0 || next >= open.length || seen[next] || !open[next]) continue;
+        if (Math.abs((next % NX) - i) > 1) continue;
+        seen[next] = 1;
+        queue.push(next);
+      }
+    }
+    const spots: readonly [string, number, number][] = [
+      ['the approach', 0, -27],
+      ['under the lychgate', -2.5, -31],
+      ['the nave by the font', 3.4, -19.4],
+      ['the vestry nook', -4.6, -4.6],
+      ['west of the stair-house', 5.4, 1.2],
+      ['east of the stair-house, by the altar slab', -5.6, 1.6],
+      ['the apse behind the stair', 0, 7.6],
+      ['beside the east yard', -19, -9],
+      ['beside the west yard', 19, -16.5],
+      ['outside the apse', 0, 12.5],
+    ];
+    for (const [name, lx, lz] of spots) {
+      expect(open[cell(lx, lz)], `${name} is open ground`).toBe(1);
+      expect(seen[cell(lx, lz)], `${name} is reachable`).toBe(1);
+    }
+    // and no open pocket in the footprint is cut off from the rest: only a
+    // crumb between two close solids (a few quarter-yard cells, where a body
+    // centre would fit but can never arrive) may stay unvisited
+    let sealed = 0;
+    for (let k = 0; k < open.length; k++) if (open[k] && !seen[k]) sealed++;
+    expect(sealed, 'open cells no body can walk to').toBeLessThan(10);
+  });
+});
 
 describe('the Fallen Chapel walls nothing in', () => {
   it('no NPC or gather node stands inside a chapel collider', () => {
