@@ -102,6 +102,7 @@ import {
   createGhostEffectMaterial,
   createMoonkinEffectMaterial,
   createShadowformEffectMaterial,
+  createShadowformStandInMaterial,
   type GhostStyle,
   ghostEffectOpacity,
 } from './effect_materials';
@@ -116,6 +117,8 @@ import {
 } from './far_lod_reveal_core';
 import { FormAdornments } from './form_adornments';
 import { GestureMeshToggles } from './gesture_mesh_toggles';
+import { GloamPresence } from './gloam_climb';
+import { GLOAM_CUE_HIDDEN, type GloamCue } from './gloam_climb_core';
 import { GlowPulse } from './glow_pulse';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
@@ -1372,8 +1375,11 @@ export class CharacterVisual {
   private far = false;
   private soulRend = false;
   private shadowform = false;
+  /** Gloamveil's climb, entry and stand-in state (gloam_climb.ts): built on
+   *  the first shift, so a rig that never takes the form pays nothing. */
+  private gloam: GloamPresence | null = null;
   private moonkin = false;
-  /** Moonwing's antlers, crescent and wings; Gloamveil's veil (form_adornments.ts).
+  /** Moonwing's antlers, crescent and wings (form_adornments.ts).
    *  Built on the first form edge, so a rig that never shifts pays nothing. */
   private formAdornments: FormAdornments | null = null;
   private ferocityStage = 0;
@@ -1790,6 +1796,9 @@ export class CharacterVisual {
     // never in the gate callback (woc_atlas_swap.ts), as an effect swap is above.
     if (this.wocAtlas.settled) this.wocAtlas.commit();
     this.updateMetamorphWings(dt, s, reducedMotion);
+    if (this.gloam?.frame(dt, this.root, this.model, s, reducedMotion)) {
+      this.applyVisualMaterials();
+    }
     this.formAdornments?.update(
       dt,
       s.moving,
@@ -2271,6 +2280,7 @@ export class CharacterVisual {
     // next visible update, a crowd dressed behind the camera would all swap on the one
     // frame it turns into view.
     if (this.wocAtlas.settled) this.wocAtlas.commit();
+    this.gloam?.idle(dt);
   }
 
   /** Push the live base action down to `1 - k` under a climb overlay, restoring
@@ -3704,8 +3714,15 @@ export class CharacterVisual {
   setShadowform(on: boolean): void {
     if (on === this.shadowform) return;
     this.shadowform = on;
-    this.syncFormAdornments();
+    // A rig that has drawn out of the form is seen shifting: it plays the entry.
+    this.gloam ??= on ? new GloamPresence(createShadowformStandInMaterial) : null;
+    this.gloam?.shift(on, this.root, this.model, this.clock > 0);
     this.applyVisualMaterials();
+  }
+
+  /** This frame's cue for the Gloamveil pool and smoke, asked after update. */
+  gloamCue(): GloamCue {
+    return this.gloam?.takeCue(this.ghosted) ?? GLOAM_CUE_HIDDEN;
   }
 
   setMoonkin(on: boolean): void {
@@ -3716,13 +3733,13 @@ export class CharacterVisual {
   }
 
   private syncFormAdornments(): void {
-    if (this.disposed || (!this.formAdornments && !this.moonkin && !this.shadowform)) return;
+    if (this.disposed || (!this.formAdornments && !this.moonkin)) return;
     this.formAdornments ??= new FormAdornments(
       this.model,
       this.look ? 'composed' : this.key === 'player_mech' ? 'replacement' : 'classRig',
       () => this.farBakeGate,
     );
-    this.formAdornments.sync(this.moonkin, this.shadowform, this.ghosted);
+    this.formAdornments.sync(this.moonkin, this.ghosted);
   }
 
   pulseMetamorphosis(strength = 1): void {
@@ -3842,11 +3859,14 @@ export class CharacterVisual {
     // A newer effect supersedes anything still linking (a stale settle must
     // never commit over a state the visual has already left).
     this.dropPendingEffectSwap();
+    this.gloam?.release();
     const staged = this.collectUnlinkedEffectMaterials();
     if (staged.length === 0) {
       this.commitVisualMaterials();
       return;
     }
+    // Gloamveil alone shows meanwhile, on stand-ins that cost no link.
+    if (this.gloam?.holdStandIns()) this.commitVisualMaterials();
     this.stageEffectSwap(staged);
   }
 
@@ -3955,6 +3975,7 @@ export class CharacterVisual {
     if (!scratch) return;
     this.recordLinkedEffectMaterials(scratch);
     this.dropPendingEffectSwap();
+    this.gloam?.release();
     this.commitVisualMaterials();
   }
 
@@ -4713,6 +4734,7 @@ export class CharacterVisual {
       this.auraGlowMaterials,
       this.surfaceResponse.materials,
       ...(this.glowPulse ? [this.glowPulse.materials] : []),
+      ...(this.gloam ? [this.gloam.standIns] : []),
     ]);
   }
 
@@ -4732,8 +4754,10 @@ export class CharacterVisual {
       ...this.auraGlowMaterials.values(),
       ...this.surfaceResponse.materials.values(),
       ...(this.glowPulse?.materials.values() ?? []),
+      ...(this.gloam?.standIns.values() ?? []),
     ]);
     for (const material of materials) material.dispose();
+    this.gloam?.standIns.clear();
     this.ghostMaterials.clear();
     this.soulRendMaterials.clear();
     this.shadowformMaterials.clear();
@@ -5203,9 +5227,11 @@ export class CharacterVisual {
   }
 
   private shadowformMaterial(material: THREE.Material): THREE.Material {
+    const standIn = this.gloam?.standInFor(material);
+    if (standIn) return standIn;
     const cached = this.shadowformMaterials.get(material);
     if (cached) return cached;
-    const marked = createShadowformEffectMaterial(material);
+    const marked = createShadowformEffectMaterial(material, this.gloam?.look);
     this.shadowformMaterials.set(material, marked);
     return marked;
   }

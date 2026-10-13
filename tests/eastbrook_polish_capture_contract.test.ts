@@ -708,7 +708,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // on the merged tree, no capture was retaken).
   // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
-  '72200d9055b376bb87d2cddaf2c521f6f5ea0965bfe0dce6e57e489b2667ddfc';
+  'e5f578afe3faab430ad3f8e6835bae1d7a30caf65619a63f05d953f8fef7a95a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
