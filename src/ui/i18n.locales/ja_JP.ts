@@ -5389,7 +5389,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ウルフフォーム中にステルス状態に入る。戦闘中は使用できない。',
   'entities.abilities.rake.name': '皮剥ぎ',
   'entities.abilities.rake.description':
-    '敵を切り裂いて武器ダメージに{damage}を加え、18秒間の出血ダメージを与えます。コンボポイントを1与えます。猫の姿専用。',
+    '敵を切り裂いて武器ダメージに{damage}を加え、18秒間に{overTime}の出血ダメージを与えます。コンボポイントを1与えます。猫の姿専用。',
   'entities.abilities.revive_pet.name': '応急処置',
   'entities.abilities.revive_pet.description':
     'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
