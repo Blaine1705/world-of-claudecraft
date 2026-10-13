@@ -10,10 +10,9 @@
 // - the ctx player-death hook drops a carried rehearsal flag.
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { customMapToWorldContent } from '../src/editor/custom_map';
+import { customMapToWorldContent, newFlatCustomMap } from '../src/editor/custom_map';
 import { thornhollowMap } from '../src/editor/shipped_thornhollow';
 import { setActiveWorldContent } from '../src/sim/data';
-import { buildDeepglassWorld } from '../src/sim/deepglass/world';
 import { Sim } from '../src/sim/sim';
 import { updateMapObjectivesPhase } from '../src/sim/social/map_objectives_hooks';
 import { objectiveRun } from '../src/sim/social/map_objectives_run';
@@ -58,8 +57,9 @@ describe('map objective hooks: the tick phase', () => {
   it('takes the bots down once when the authored world stops carrying objectives', () => {
     const { sim } = thornhollowSim();
     expect([...sim.entities.values()].some((e) => e.objectiveBot)).toBe(true);
-    // Another authored map (the Deepglass arena) with no objective record.
-    setActiveWorldContent(buildDeepglassWorld());
+    // Another authored map (a blank slate) with no objective record.
+    const blank = newFlatCustomMap('Blank', 'obj_hooks_blank', 1, { width: 200, height: 200 });
+    setActiveWorldContent(customMapToWorldContent(blank));
     updateMapObjectivesPhase(sim.ctx, undefined);
     expect(objectiveRun(sim.ctx)).toBeNull();
     expect([...sim.entities.values()].some((e) => e.objectiveBot)).toBe(false);

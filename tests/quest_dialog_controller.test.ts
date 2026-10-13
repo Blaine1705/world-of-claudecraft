@@ -117,9 +117,6 @@ function harness(
   const openWorldQuestBoard = vi.fn();
   const openDelveBoard = vi.fn();
   const openCardDuel = vi.fn();
-  const travelToDeepglass = vi.fn();
-  const startDeepglassBout = vi.fn();
-  const summonWizardPortal = vi.fn();
   const openTrain = vi.fn();
   const openUnbind = vi.fn();
   const openCrafting = vi.fn();
@@ -158,9 +155,6 @@ function harness(
     openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
-    travelToDeepglass,
-    startDeepglassBout,
-    summonWizardPortal,
     openTrain,
     openUnbind,
     openCrafting,
@@ -195,9 +189,6 @@ function harness(
     openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
-    travelToDeepglass,
-    startDeepglassBout,
-    summonWizardPortal,
     openTrain,
     openUnbind,
     openCrafting,

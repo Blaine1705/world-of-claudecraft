@@ -1,5 +1,4 @@
-import { delveAt, dungeonAt, isBgPos, isDelvePos, MOBS, type ZoneDef } from '../sim/data';
-import { inDeepglassBowl } from '../sim/deepglass/layout';
+import { delveAt, dungeonAt, isBgPos, isDelvePos, type ZoneDef } from '../sim/data';
 import type { MapMusic } from '../sim/types';
 import { bossTrackFor } from './boss_music_loop';
 import { type CrucibleFloor, crucibleFloorForDungeon } from './crucible_music';
@@ -9,7 +8,6 @@ import {
   riftMusicZoneForTheme,
   shouldResetMusicForDungeonEntry,
 } from './music';
-import type { MusicVenue, VenueTrack } from './music_venue_layer';
 import { ALL_MUSIC_ZONES } from './music_zones';
 
 export interface InstanceMusicEntity {
@@ -17,17 +15,6 @@ export interface InstanceMusicEntity {
   dead: boolean;
   templateId: string;
   aggroTargetId: number | null;
-}
-
-// The Deepglass bell is its own WORLD rather than a corner of the overworld, so
-// `inArena` is not a position test: the HUD reports whether this session booted
-// the arena at all, plus the bout's phase (null when no bout is on). The phase
-// is what arms the venue music: a bout, not the visit. The one distinction
-// that IS positional - the bowl versus the city around it - is taken from
-// playerPos inside the decision (inDeepglassBowl).
-export interface InstanceMusicDeepglass {
-  inArena: boolean;
-  phase: string | null;
 }
 
 // The slice of RiftFloorView the soundtrack needs: the floor's environment
@@ -57,14 +44,12 @@ export interface InstanceMusicInput {
   // instance entry so the crawl cue re-phrases from the top even when two floors
   // roll the same theme.
   riftFloor: InstanceMusicRiftFloor | null;
-  // The Deepglass arena (null in every other world).
-  deepglass: InstanceMusicDeepglass | null;
   // The active map's AUTHORED soundtrack (WorldContent.music: the Studio's
   // "Map track" plus any rect areas), or null/absent for the shipped world.
   // Resolved by resolveMapMusicZone below, and it outranks the location walk:
   // an authored world's coordinates otherwise resolve through the OVERWORLD's
-  // zone table (the Deepglass map spans seven of its zones), which is how a
-  // player standing on the causeway heard the score churn through them.
+  // zone table, so a player walking across one heard the score churn through
+  // whichever shipped zones its rect happened to overlap.
   mapMusic?: MapMusic | null;
 }
 
@@ -77,8 +62,6 @@ export interface InstanceMusicDecision {
   // shared default loop.
   bossTrackUrl: string | null;
   instanceId: string | null;
-  venue: MusicVenue;
-  venueTrack: VenueTrack | null;
   crucibleFloor: CrucibleFloor | null;
 }
 
@@ -88,7 +71,6 @@ export interface InstanceMusicPort {
   resetForDungeonEntry(dungeonId: string | null, zone?: MusicZone): void;
   update(zone: MusicZone, inCombat: boolean, crucibleFloor?: CrucibleFloor | null): void;
   setBossCombat(active: boolean, url?: string): void;
-  setVenueTrack(venue: MusicVenue, track: VenueTrack | null): void;
 }
 
 const MUSIC_ZONE_SET: ReadonlySet<string> = new Set(ALL_MUSIC_ZONES);
@@ -127,10 +109,6 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
   let aggroed = false;
   let bossEngaged = false;
   let bossTrackUrl: string | null = null;
-  // Any live boss-flagged mob that has a target, wherever it stands. Only the
-  // Deepglass reads it (see the venue track below); the overworld's boss loop
-  // stays on its own Nythraxis signal, so nothing here can double up on it.
-  let anyBossEngaged = false;
   for (const entity of input.entities) {
     if (entity.kind !== 'mob' || entity.dead) continue;
     if (entity.aggroTargetId === input.playerId) aggroed = true;
@@ -140,8 +118,6 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
       bossEngaged = true;
       bossTrackUrl = track;
     }
-    if (entity.aggroTargetId !== null && MOBS[entity.templateId]?.boss === true)
-      anyBossEngaged = true;
   }
 
   const dungeon = dungeonAt(input.playerPos.x);
@@ -189,40 +165,6 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
       ? instanceId
       : null;
 
-  // The match cue arms on the whistle (the 'countdown' walk-out is already the
-  // bout) and holds through the celebrations and the final horn ('over'), then
-  // gives way when the bout is torn down and the phase reads null.
-  //
-  // Between bouts the venue's "grounds" cue holds THE BELL. It used to hold
-  // the city around it too: the 2026-09-02 pass switched the streets to the
-  // map's own zone track and SPACEY asked for the exploration music back
-  // (2026-09-07) - at the time the map track was a borrowed Amberfall cue.
-  // Tidehold now has its own ("Tidesong - Outside the Bell", 2026-09-21), so
-  // the split is by place: inside the bowl the grounds cue, out in the city
-  // the map track. A BOUT still scores the whole world, wherever you watch it
-  // from.
-  //
-  // A BOSS fought in the bell outranks the match cue: a sport's music is wrong
-  // under one. There is no encounter down there yet, so the rule is
-  // deliberately general rather than keyed to a mob id, the day a boss is
-  // placed in the arena it scores itself with no further wiring.
-  const inDeepglass = input.deepglass?.inArena === true;
-  const dgPhase = input.deepglass?.phase ?? null;
-  const boutOn = dgPhase !== null;
-  // The one place the bell DOES need a position test (see the note above):
-  // the decision already carries playerPos, so it asks here rather than
-  // making every host compute and pass a second flag.
-  const inBowl = inDeepglassBowl(input.playerPos.x, input.playerPos.z);
-  const venueTrack: VenueTrack | null = !inDeepglass
-    ? null
-    : anyBossEngaged
-      ? 'boss'
-      : boutOn
-        ? 'match'
-        : inBowl
-          ? 'waiting'
-          : null; // the city between bouts rides the map's own zone track
-
   return {
     zone,
     inCombat,
@@ -232,8 +174,6 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
     bossTrackUrl: crucibleFloor === null ? bossTrackUrl : null,
     crucibleFloor,
     instanceId: musicInstanceId,
-    venue: 'deepglass',
-    venueTrack,
   };
 }
 
@@ -265,7 +205,6 @@ export class InstanceMusicController {
     } else {
       this.music.update(decision.zone, decision.musicCombat);
     }
-    this.music.setVenueTrack(decision.venue, decision.venueTrack);
     return decision;
   }
 }

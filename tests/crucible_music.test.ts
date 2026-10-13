@@ -35,7 +35,6 @@ function input(
     inCombat: false,
     entities: [],
     riftFloor: null,
-    deepglass: null, // the fork's arena venue input (required on this side)
     ...overrides,
   };
 }
@@ -146,7 +145,6 @@ describe('Crucible floor soundtrack', () => {
       resetForDungeonEntry: vi.fn(),
       update: vi.fn(),
       setBossCombat: vi.fn(),
-      setVenueTrack: vi.fn(),
     };
     const controller = new InstanceMusicController(port);
     for (const id of [

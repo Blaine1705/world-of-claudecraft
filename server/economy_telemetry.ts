@@ -67,7 +67,6 @@ const SOURCE_BY_COMMAND: ReadonlyMap<string, CopperFlowSource> = new Map(
     autoloot: 'loot',
     lootRoll: 'loot',
     pickup: 'loot',
-    buyplot: 'vendor',
     harvestCorpse: 'loot',
     harvest_node: 'loot',
     market_buy: 'market',

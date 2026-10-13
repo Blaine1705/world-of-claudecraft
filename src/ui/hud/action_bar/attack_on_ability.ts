@@ -149,9 +149,6 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   ruinousBrand: 'other',
   duskfireClaim: 'other',
   summonPyreColossus: 'other',
-  // Deepball. A sport move never engages the auto-attack: the bell runs under a
-  // truce and there is nothing in there to swing at.
-  deepball: 'other',
   packCommand: 'damage',
   unleashBeast: 'damage',
   howlingRage: 'other',

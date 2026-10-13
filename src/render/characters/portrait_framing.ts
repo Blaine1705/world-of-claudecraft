@@ -8,11 +8,8 @@
  *  title). `body` is a normal 3/4 framing (whole figure, a little headroom
  *  and footroom) used where the portrait is shown large, e.g. the Inspect
  *  window: a headshot crop blown up to that size reads as an over-zoomed
- *  helmet close-up instead of a character portrait. `card` is the whole
- *  figure with almost no margin, the deepglass crowd's cutout sprites,
- *  where the card's own quad is the frame and any footroom would float the
- *  fan above their seat. */
-export type PortraitFraming = 'headshot' | 'body' | 'card';
+ *  helmet close-up instead of a character portrait. */
+export type PortraitFraming = 'headshot' | 'body';
 
 export interface PortraitFrameParams {
   /** Camera vertical FOV, in degrees. */
@@ -41,19 +38,10 @@ const BODY: PortraitFrameParams = {
   extentFrac: 1.15,
 };
 
-const CARD: PortraitFrameParams = {
-  // a slightly longer lens than BODY: the sprite is seen from across a
-  // stadium, where perspective distortion would read as a warped body
-  fov: 33,
-  targetYFromFeetFrac: 0.48,
-  // feet at the very bottom of the frame, a whisker of headroom
-  extentFrac: 1.04,
-};
-
 /** Camera fov/target/extent for a given framing, as fractions of the
  *  model's own bounding-box height. Pure, no THREE/DOM dependency. */
 export function portraitFrameParams(framing: PortraitFraming): PortraitFrameParams {
-  return framing === 'card' ? CARD : framing === 'body' ? BODY : HEADSHOT;
+  return framing === 'body' ? BODY : HEADSHOT;
 }
 
 // ---------------------------------------------------------------------------

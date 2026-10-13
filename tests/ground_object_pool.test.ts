@@ -95,9 +95,8 @@ describe('Renderer.createView object branch (source pin)', () => {
   it('routes the generic ground-object branch through takeOrBuildGroundObject and never re-nulls the key', () => {
     const objectBranch = rendererSource.slice(
       rendererSource.indexOf("} else if (e.kind === 'object') {"),
-      rendererSource.indexOf(
-        "} else if (e.kind === 'mob' && e.templateId === DEEPGLASS_BALL_TEMPLATE_ID) {",
-      ),
+      // the next arm: the rigged-character build
+      rendererSource.indexOf('const visualKey = visualKeyFor(e);'),
     );
     expect(objectBranch).toContain(
       'const result = takeOrBuildGroundObject(this.objectPool, groundObjectPoolKey(e), () =>',

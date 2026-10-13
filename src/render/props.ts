@@ -455,11 +455,6 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
 
-/** Stall groups built for a Deepglass-arena world, so the renderer can pack
- *  the city-event market up while a bout runs (cleared on every props build;
- *  empty everywhere else). */
-export const deepglassStallGroups: THREE.Group[] = [];
-
 const loadedProps = new Map<string, GLTF>();
 const propLoadTasks = new Map<string, Promise<void>>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
@@ -1748,7 +1743,6 @@ export function buildProps(
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
-  deepglassStallGroups.length = 0;
   activeContent.props.stalls.forEach((s, i) => {
     if (eastbrookTown && isEastbrookRebuildStall(s)) return;
     if (fenbridgeTown && isFenbridgeRebuildStall(s)) return;
@@ -1771,10 +1765,6 @@ export function buildProps(
     g.position.set(s.x, ground(s.x, s.z) - 0.06, s.z);
     g.rotation.y = s.rot;
     group.add(shadowed(g));
-    // The Deepglass city-event market packs up for every bout: the renderer
-    // flips these groups with the match phase (the prop half of the crowd
-    // despawn in sim/deepglass/crowd.ts).
-    if (activeContent.presentationMode === 'deepglass') deepglassStallGroups.push(g);
     // Footprint mirrors the collider's true 3.1 x 2.5 box (the old circle
     // overhung the flat sides, so a body pressed to the counter put its eye
     // a hair from the hide surface and the stall vanished at most angles).

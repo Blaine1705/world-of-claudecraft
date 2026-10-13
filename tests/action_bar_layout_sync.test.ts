@@ -108,19 +108,8 @@ describe('sanitizeActionBarLayout (untrusted payload bounds)', () => {
       forms: { normal: { bar: [] }, sport: { bar: [] } },
     });
     expect(clean).not.toBeNull();
-    // FORK: 'sport' stays a known form (src/world_api/action_bar.ts) so an
-    // existing character's stored Vale Cup layout still reads, and 'deepball'
-    // is the Deepglass bar; the sanitizer therefore KEEPS sport.
-    expect(Object.keys(clean?.forms ?? {})).toEqual(['normal', 'sport']);
-    expect(ACTION_BAR_LAYOUT_FORMS).toEqual([
-      'normal',
-      'bear',
-      'cat',
-      'cat_stealth',
-      'stealth',
-      'sport',
-      'deepball',
-    ]);
+    expect(Object.keys(clean?.forms ?? {})).toEqual(['normal']);
+    expect(ACTION_BAR_LAYOUT_FORMS).toEqual(['normal', 'bear', 'cat', 'cat_stealth', 'stealth']);
   });
 
   it('rejects a payload with an abusive number of form keys', () => {

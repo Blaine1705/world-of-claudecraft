@@ -1403,7 +1403,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
   // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
-  'ca333dea723ba5371f65bb8db690b2e236be5fd0d97a84596e64fcf176eaab60';
+  // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  'f18ffccc65bfceedf8f0e59dea1b4c47972d3c3278b5f4d3c7180ca429512194';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1432,7 +1434,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
   // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
-  '2d5185609692b2ebe06229653c9848b0b5ff119fb79f636ca7e9d5cab30b9db9';
+  // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  '18b78a7f22ab93a649eadd789c3dfe90f8aeacd467550322f7d0f3dfe3d29e0d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2821,7 +2825,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // Merging #4466 and #4470 into the v0.45.0 integration: recomputed LAST again
       // over the re-swept evidence. No capture was retaken.
-    ).toBe('dcc71f45b05ee2f175485204c701e96cb8efd5e07bd57a40c9b6886e25a5ce6d');
+    ).toBe('9a6d7f90348f4e883c3acf0f6a2b2d952a05daf875b5e3da727921dfd799ac3b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
