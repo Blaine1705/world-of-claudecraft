@@ -12,7 +12,7 @@
 import { MOBS } from '../data';
 import { swimSurfaceY } from '../player_motion';
 import type { Entity, Vec3 } from '../types';
-import { groundHeight, waterLevelAt } from '../world';
+import { mobGroundHeight, waterLevelAt } from '../world';
 import { keepOutStep, type MutablePoint } from './keep_out';
 
 const kept: MutablePoint = { x: 0, z: 0 };
@@ -41,7 +41,9 @@ export function phaseStep(
   }
   e.pos.x = nx;
   e.pos.z = nz;
-  const g = groundHeight(nx, nz, seed);
+  // mobGroundHeight: on an authored map a phasing body keeps to the sheet it is
+  // on (a tunnel floor); the built-in world has no sheets and reads the terrain.
+  const g = mobGroundHeight(nx, nz, seed, e.pos.y);
   // Ride the surface while phasing rather than sink under terrain or water, EXCEPT
   // a body tall enough to wade this water: its feet stay on the bed and the surface
   // rides up its legs (MobTemplate.wadeDepth). The first Balgath floated across the

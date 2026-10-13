@@ -1588,6 +1588,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 紀錄',
   'landing.scout': 'WoC 偵察',
   'landing.parseService': 'WoC 戰鬥紀錄',
+  'editor.buildMode.materialNames.WardenStone': '光滑石材',
+  'editor.buildMode.diagonal': '斜牆',
+  'editor.buildMode.diagonalHint': '在網格點之間拖曳，以任意角度繪製牆體。',
   'guide.professions.endgameBodyRaidCollections':
     '大師鍛造是帶有「唯一裝備：大師鍛造」標記的共同裝備家族。舊有的巔峰製作路線仍需尋找圖樣、製作每日限次的中間材料，並消耗共同的終局材料。熔爐套裝則是由團隊副本材料支持的獨立路線，並非在舊路線之上再加一套費用。兩條路線共用最多穿戴兩件的限制，因此會競爭配裝中的同兩個位置。成品在臻至完美或委託綁定該件物品之前都可自由交易。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -15692,6 +15695,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '置中',
   'hudChrome.breath.label': '呼吸',
   'hudChrome.breath.drowning': '溺水！',
+  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
+  // non-Latin locales per src/ui/CLAUDE.md).
+  'hudChrome.portalWizard.gossipDeepglass': '為我打開通往深琉璃之路',
+  'hudChrome.portalWizard.gossipDeepglassAria': '請巴爾德瑪開啟前往深琉璃的傳送門',
+  'hudChrome.portalWizard.gossipHome': '為我打開回家之路',
+  'hudChrome.portalWizard.gossipHomeAria': '請巴爾德瑪開啟回到你城鎮的傳送門',
+  'hudChrome.portalWizard.portalOpen': '傳送門已開啟。走進去吧。',
   'abilityUi.resources.devotion': '虔誠',
   'abilityUi.resources.focus': '集中值',
   'abilityUi.tooltip.requiresStealthSkulduggery': '需要潛行（幽暝達3層或暗影纏身期間除外）',
@@ -18406,6 +18416,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.looksNone': '原本外觀',
   'hudChrome.deeds.looksNoBuddy': '召喚一個夥伴後在此選擇牠的外觀。',
   'hudChrome.deeds.looksEmpty': '這個夥伴還沒有解鎖任何外觀。',
+  'hudChrome.realmBuilder.title': '本月王國建造者',
+  'hudChrome.realmBuilder.currentLabel': '本月榮譽獲得者',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '榮譽購買一經完成便無法反悔。買回清單裡只會有你賣出過的東西：以錢幣買下的東西通常還能按出售價格賣回，若你再次改變心意，也能從那份清單裡把它取回；但戰爭套裝在你買下的那一刻便靈魂綁定，因此它永遠無法交易、郵寄，也無法賣回換取任何東西，也就永遠不會出現在那份清單裡。商店會因此請你再確認一次：按下去之前，先把那件裝備看清楚。',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -18480,8 +18492,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '依採集者拆分',
   'hudChrome.itemMenu.takeChosenQuantity': '取出指定數量',
   'hudChrome.itemMenu.combine': '合併素材堆疊',
-  'hudChrome.realmBuilder.title': '本月王國建造者',
-  'hudChrome.realmBuilder.currentLabel': '本月榮譽獲得者',
   'hudChrome.realmBuilder.placeholderName': '你的名字',
   'hudChrome.realmBuilder.placeholderHint': '這塊銘牌還在等待它的第一個名字。',
   'hudChrome.realmBuilder.pastTitle': '歷屆榮譽獲得者',

@@ -52,6 +52,7 @@ function input(overrides: Partial<InstanceMusicInput> = {}): InstanceMusicInput 
     inDungeon: true,
     entities: [],
     riftFloor: null,
+    deepglass: null,
     ...overrides,
   };
 }
@@ -112,7 +113,12 @@ describe('per-boss fight tracks', () => {
   });
 
   it('keeps his track through a short aggro gap, then hands the mix back', () => {
-    const port = { resetForDungeonEntry: vi.fn(), update: vi.fn(), setBossCombat: vi.fn() };
+    const port = {
+      resetForDungeonEntry: vi.fn(),
+      update: vi.fn(),
+      setBossCombat: vi.fn(),
+      setVenueTrack: vi.fn(),
+    };
     const controller = new InstanceMusicController(port);
 
     controller.update(input({ now: 20000, entities: [morthen(7)] }));
@@ -128,7 +134,12 @@ describe('per-boss fight tracks', () => {
   });
 
   it('switches cues when the next boss engages without replaying the previous cue', () => {
-    const port = { resetForDungeonEntry: vi.fn(), update: vi.fn(), setBossCombat: vi.fn() };
+    const port = {
+      resetForDungeonEntry: vi.fn(),
+      update: vi.fn(),
+      setBossCombat: vi.fn(),
+      setVenueTrack: vi.fn(),
+    };
     const controller = new InstanceMusicController(port);
     controller.update(input({ entities: [{ ...morthen(7), templateId: 'sexton_marrow' }] }));
     expect(port.setBossCombat).toHaveBeenLastCalledWith(true, BOSS_TRACK_URLS.sexton_marrow);
@@ -139,7 +150,12 @@ describe('per-boss fight tracks', () => {
   });
 
   it('gives the boss cue ownership before updating the normal combat score', () => {
-    const port = { resetForDungeonEntry: vi.fn(), update: vi.fn(), setBossCombat: vi.fn() };
+    const port = {
+      resetForDungeonEntry: vi.fn(),
+      update: vi.fn(),
+      setBossCombat: vi.fn(),
+      setVenueTrack: vi.fn(),
+    };
     const controller = new InstanceMusicController(port);
     controller.update(input({ entities: [{ ...morthen(7), templateId: 'sexton_marrow' }] }));
     expect(port.setBossCombat).toHaveBeenCalledWith(true, BOSS_TRACK_URLS.sexton_marrow);
@@ -149,7 +165,12 @@ describe('per-boss fight tracks', () => {
   });
 
   it('keeps the shared default loop for fights without a dedicated cue', () => {
-    const port = { resetForDungeonEntry: vi.fn(), update: vi.fn(), setBossCombat: vi.fn() };
+    const port = {
+      resetForDungeonEntry: vi.fn(),
+      update: vi.fn(),
+      setBossCombat: vi.fn(),
+      setVenueTrack: vi.fn(),
+    };
     const controller = new InstanceMusicController(port);
     controller.update(input({ lastBossCombatEventAt: 19000 }));
     expect(port.setBossCombat).toHaveBeenLastCalledWith(true);

@@ -706,11 +706,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  // Re-minted for the Sanctum exit portal (the door membrane's spin now honours reduced
-  // motion, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
-  // Re-minted again for the door prewarm bodies (the Sanctum exit staged at boot: the
-  // renderer's prewarm builder now calls door_portal.ts; no capture was retaken).
-  'de95c87331c4c6f3b10be28b6af05c659b55d1304219ec40837496b758b14094';
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  '72200d9055b376bb87d2cddaf2c521f6f5ea0965bfe0dce6e57e489b2667ddfc';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

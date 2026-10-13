@@ -9,6 +9,7 @@ import { type AssembleOptions, modularHeadFor } from './assets';
 import { type CharacterFormKey, characterFormAssetKey } from './form_visual_selection_core';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
 import {
+  authoredRigOverride,
   mechHeldWeaponOverride,
   modularVisualKey,
   npcHeldProps,
@@ -17,7 +18,7 @@ import {
   visualKeyFor,
 } from './manifest';
 import { MODULAR_WARRIOR_KEY, type ModularLook, wocBodyScaleOf } from './modular';
-import { npcLookFor } from './npc_looks';
+import { isUnarmedCivilianTemplate, npcLookFor } from './npc_looks';
 import { CharacterVisual } from './visual';
 import { ensureWocHeadForAppearance } from './woc_head_packs';
 
@@ -27,6 +28,7 @@ export {
   applyEntityAnimOverrides,
 } from './anim_state_entity_core';
 export type { AssembleOptions } from './assets';
+export { visualAssetsResident } from './assets';
 export { type LookPiecesStats, lookPiecesStats } from './look_pieces';
 export { npcLookFor } from './npc_looks';
 export { CharacterPreview } from './preview';
@@ -48,8 +50,11 @@ export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 // field (set at join from the character's own column), which is what a WOC
 // body's modular head reads. The RULE for what an entity wears is app-level
 // (see src/render/characters/player_look_core.ts), while this module only
-// needs the answer. An NPC never composes either: its authored look rides the
-// WOC def of its class (npc_looks.ts, the factory below).
+// needs the answer. An NPC_LOOKS NPC never composes either: its authored look
+// rides the WOC def of its class (npc_looks.ts, the factory below). The one
+// exception is the Studio's runtime-composed civilians (npc_looks.ts FORK
+// DECLARATIONS, claimed through npc_look_provider.ts), which only authored maps
+// spawn.
 let modularLookProvider: ((e: Entity) => ModularLook | null) | null = null;
 
 /** Install (or clear, with null) the entity-to-look mapping. */
@@ -64,10 +69,12 @@ export function modularLookFor(e: Entity): ModularLook | null {
   return modularLookProvider?.(e) ?? null;
 }
 
-/** The composed-body visual key for a player the look provider claimed: the
+/** The composed-body visual key for an entity the look provider claimed: the
  *  class's own modular def (its clips, ability mapping and hand layout), with
- *  the warrior's as the fallback for a templateId without one. Only a player
- *  composes: an NPC wears its authored look on a WOC body (npc_looks.ts). */
+ *  the warrior's as the fallback for a templateId without one. A player
+ *  composes, and so does a Studio runtime-composed civilian (npc_looks.ts FORK
+ *  DECLARATIONS), which takes the warrior fallback and is disarmed at build
+ *  (createCharacterVisual); an NPC_LOOKS NPC wears its look on a WOC body. */
 export function modularKeyFor(e: Entity): string {
   const key = modularVisualKey(e.templateId as PlayerClass);
   return VISUALS[key] ? key : MODULAR_WARRIOR_KEY;
@@ -78,7 +85,7 @@ export function modularKeyFor(e: Entity): string {
  *  forms are separate lazy slots over this base), or null when the entity
  *  keeps a fixed rig. */
 function composedLookOf(e: Entity): { def: VisualDef; look: ModularLook } | null {
-  if (isMechWearer(e)) return null;
+  if (isMechWearer(e) || authoredRigOverride(e)) return null;
   const look = modularLookProvider?.(e) ?? null;
   if (!look) return null;
   return { def: VISUALS[modularKeyFor(e)], look };
@@ -125,7 +132,12 @@ export function createCharacterVisual(
   // Shapeshift forms are their own model and never compose, and neither does a
   // Combat Mech wearer: the mech is a whole replacement body, so the cosmetic
   // must win over the authored look (composing over it hid a purchased skin).
-  const look = formKey || isMechWearer(e) ? null : (modularLookProvider?.(e) ?? null);
+  // A Studio-authored rig pick is an explicit model choice the same way, so
+  // it beats a composed NPC look too.
+  const look =
+    formKey || isMechWearer(e) || authoredRigOverride(e)
+      ? null
+      : (modularLookProvider?.(e) ?? null);
   const key = formKey
     ? characterFormAssetKey(formKey, e.auras)
     : look
@@ -137,7 +149,8 @@ export function createCharacterVisual(
   // An NPC, or a quest escortee the sim makes a mob (npc_looks.ts MOB_LOOK_IDS), wears
   // an authored look on its class's WOC body (visualKeyFor names the def): its fixed
   // props take the place of the class's own hands.
-  const npcLook = formKey ? null : npcLookFor(e.templateId, e.kind);
+  // A Studio-authored rig pick keeps that rig's own hands and head too.
+  const npcLook = formKey || authoredRigOverride(e) ? null : npcLookFor(e.templateId, e.kind);
   const weaponOverride = npcLook
     ? npcHeldProps(npcLook.props)
     : !formKey && key === 'player_mech' && e.kind === 'player'
@@ -185,6 +198,12 @@ export function createCharacterVisual(
       look,
       localPlayer ? born : { ...born, wocArmorDetail: 'crowd' },
     );
+    // Civilians (the portal wizard, the Deepglass crowd and its keepers) compose
+    // on a class body and would otherwise inherit that class's held-weapon
+    // layout: a stadium of spectators, every one of them holding a sword.
+    if (!formKey && e.kind === 'npc' && isUnarmedCivilianTemplate(e.templateId)) {
+      visual.disarmHeldProps();
+    }
     visual.budgetedWeaponLight = true;
     // ...and the only one that draws crowds: a WOC body folds its head's dozen pieces
     // into one draw here (woc_head_merge.ts). A rig built directly (previews, portraits)

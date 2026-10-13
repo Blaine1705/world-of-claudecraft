@@ -1400,11 +1400,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  // Re-minted for the Sanctum exit portal (the door membrane's spin now honours reduced
-  // motion, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
-  // Re-minted again for the door prewarm bodies (the Sanctum exit staged at boot: the
-  // renderer's prewarm builder now calls door_portal.ts; no capture was retaken).
-  'ca26180f5163c9fd27ceb601ffa582b4d4fc2f06571e8793a0d641d131bc9dbd';
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  'c938c9efbcd059e912ed28471dd5970655cc39a15d98f246fe8c4236fe5a85fa';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1430,11 +1428,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  // Re-minted for the Sanctum exit portal (the door membrane's spin now honours reduced
-  // motion, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
-  // Re-minted again for the door prewarm bodies (the Sanctum exit staged at boot: the
-  // renderer's prewarm builder now calls door_portal.ts; no capture was retaken).
-  'de95c87331c4c6f3b10be28b6af05c659b55d1304219ec40837496b758b14094';
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  '72200d9055b376bb87d2cddaf2c521f6f5ea0965bfe0dce6e57e489b2667ddfc';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2821,11 +2817,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // + the character pack + the five-dungeon rework): recomputed LAST again over the
       // re-swept evidence. No
       // capture was retaken.
-      // Sanctum exit portal (the door membrane's reduced-motion guard): recomputed LAST
-      // again over the re-swept evidence. No capture was retaken.
-      // Door prewarm bodies (the Sanctum exit staged at boot): recomputed LAST again
-      // over the re-swept evidence. No capture was retaken.
-    ).toBe('e80b43f66b74169b040519e8c1461c85be3f9a07b6d85e46cca32838dddd984d');
+    ).toBe('706fd2be527474513aff3c623860c6b11a7c781e3f46b19df528e3a3c0531e69');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -377,6 +377,10 @@ export interface ClipMap {
   /** the swim IDLE: treading water, upright and sculling, played whenever a
    *  swimmer stops. Absent = the stroke keeps playing in place. */
   swimIdle?: string;
+  /** the streamlined BOOST pose: arms out front, legs locked straight, the body
+   *  a spear. Held, not cycled. Only flooded flight (the deepglass bell) ever
+   *  asks for it; absent = a boosting body keeps stroking. */
+  glide?: string;
   /** walking through water too shallow to swim in. Absent = the dry walk. */
   wade?: string;
   /** airborne base pose while jumping/falling */
@@ -2283,6 +2287,9 @@ const HUMANOID_H = 2.6;
 // stays in every GLB and is still what mobs and creatures use.
 // ---------------------------------------------------------------------------
 const SWIM_ANIMS_URL = `${PLAYERS}/swim_anims.glb`;
+/** The Studio's burner glide (SWIM_CLIP_GLIDE) ships alone in its own
+ *  clip-only GLB, so the release swim pack above stays byte-identical. */
+const GLIDE_ANIMS_URL = `${PLAYERS}/glide_anims.glb`;
 /** Submerged stroke: arms sweep out and back to centre, legs frog-kick. */
 export const SWIM_CLIP_SUBMERGED = 'Swim_Breaststroke';
 /** Surface stroke: alternating overarm crawl over a flutter kick. */
@@ -2291,6 +2298,10 @@ export const SWIM_CLIP_SURFACE = 'Swim_Freestyle';
  *  UPRIGHT clip in the pack, which is why the renderer sinks the body for it
  *  (visual.ts SWIM_RISE_TREAD) instead of floating it like the prone strokes. */
 export const SWIM_CLIP_TREAD = 'Swim_Tread';
+/** The burner glide: hands thrust out ahead, elbows locked, legs together and
+ *  toes pointed: a body being pushed rather than one swimming. Held as a pose;
+ *  the clip carries only a slow flutter so it is not stone-still. */
+export const SWIM_CLIP_GLIDE = 'Swim_Glide';
 /** Walking through water too shallow to swim in: short, high-kneed, leaning. */
 export const WATER_CLIP_WADE = 'Water_Wade';
 /** Long-fall panic flail: upright, arched back, arms windmilling out of phase,
@@ -2301,12 +2312,13 @@ export const FALL_CLIP_FLAIL = 'Fall_Flail';
 function swims(def: VisualDef): VisualDef {
   return {
     ...def,
-    animUrls: [...(def.animUrls ?? []), SWIM_ANIMS_URL],
+    animUrls: [...(def.animUrls ?? []), SWIM_ANIMS_URL, GLIDE_ANIMS_URL],
     clips: {
       ...def.clips,
       swim: SWIM_CLIP_SUBMERGED,
       swimSurface: SWIM_CLIP_SURFACE,
       swimIdle: SWIM_CLIP_TREAD,
+      glide: SWIM_CLIP_GLIDE,
       wade: WATER_CLIP_WADE,
       fall: FALL_CLIP_FLAIL,
     },
@@ -8326,12 +8338,24 @@ export function mobVisualKey(templateId: string): string {
   return (family && FAMILY_KEYS[family]) || 'mob_bandit';
 }
 
+/** The Studio's authored rig override for an entity (the Entity tool's
+ *  "Character model" picker), validated against the manifest so a stale key
+ *  cannot dead-end the visual build. An explicit model choice beats both the
+ *  NPC_KEYS default, an NPC_LOOKS look and a composed one. Null = none authored. */
+export function authoredRigOverride(e: Entity): string | null {
+  return e.kind === 'npc' && e.visualKey && VISUALS[e.visualKey] ? e.visualKey : null;
+}
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
     return playerVisualKey(e.templateId, e.modularAppearance);
   }
   if (e.kind === 'mob') return mobVisualKey(e.templateId);
+  // A Studio-authored rig pick (the Entity tool's "Character model") is an
+  // explicit model choice: it beats the authored look and the stock rig alike.
+  const authoredRig = authoredRigOverride(e);
+  if (authoredRig) return authoredRig;
   // An NPC wears an authored look on the WOC body of its class and body type
   // (npc_looks.ts), the very def a player of that class draws. One with no
   // authored look (none ships: tests/npc_looks.test.ts) falls back to a stock rig.
