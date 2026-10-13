@@ -204,6 +204,17 @@ it in seconds) take it to about 6.5. The four bosses are about 6.3 minutes (70,
 80, 80 and 150 s), walking about 2: about 15 minutes. To be measured with the
 meters harness before shipping, like the boss health.
 
+**The normal budget after the playtest pools (2026-10-12): about 16 minutes.**
+Two pools moved on normal. The Ossuary Drake, the miniboss, doubled (1,040 to
+2,079): it is a single target, so its extra 1,040 costs about 23 s at 45 and the
+trash goes from about 6.5 to about 6.9 minutes (about 25,000 trash health, about
+9.3 minutes single target). The Knellwyrm (1,081 to 2,357) sits OUTSIDE Morthen's
+150 s: it arrives after he falls (the pyre, the flight in and the landing, about
+11 s) and then fights about 37 s at the planning 55 (43 s on paper, less its
+Bared Ribs window), about 30 s more than the bare template gave. So: trash 6.9,
+the four bosses 6.3, the Knellwyrm 0.8, walking 2, about 16 minutes against the 15
+the design set. The wing bosses and Morthen keep their normal lengths.
+
 ### 4.1 Trash mechanics pass (2026-10-04)
 
 The approved trash research (one second job per type, in `src/sim/mob/trash_kit/crypt_kit.ts`
@@ -257,10 +268,37 @@ dungeon's own greens; a warrior tank 366 to 404 before gear. The bands of
 
 | Boss | Template pool (normal / heroic) | Target | Multiplier normal / heroic | Pool normal / heroic |
 |---|---|---|---|---|
-| Sexton Marrow | 639 / 1,412 | 70 s | 4.93 / 11.4 | about 3,150 / 16,100 |
+| Sexton Marrow | 639 / 1,412 | 70 s (heroic about 109 s, see below) | 4.93 / 17.7 | about 3,150 / 25,000 |
 | Lady of the Bonechill | 754 / 1,532 | 80 s (heroic about 109 s, see below) | 5.3 / 16.32 | about 4,000 / 25,000 |
-| Cantor Ilvane | 695 / 1,412 | 64 s on her own (80 s with her Choristers) | 4.6 / 10.4 | about 3,200 / 14,700 |
+| Cantor Ilvane | 695 / 1,412 | 64 s on her own (80 s with her Choristers; heroic about 109 s on her own, see below) | 4.6 / 17.7 | about 3,200 / 25,000 |
 | Hollow Chorister | 391 / 971 | about 8 s each | 1 / 1.9 | 391 / about 1,840 |
+
+**Heroic health bands (owner, 2026-10-12).** The manager's playtest read the heroic
+bosses as too short and asked for double health on the minibosses. The owner's
+ruling, in the words of the shared rule (`README.md` section 6): on heroic a
+non-final boss carries about 25,000, a miniboss sits in 15,000 to 20,000, clearly
+under the bosses, and a final boss keeps its own pool (Morthen, 28,837); normal
+boss pools stay at their design values. So Sexton Marrow (was 16,099) and Cantor Ilvane (was 14,687) carry 24,996
+beside the Lady's 24,999 (below), under Morthen's 28,837; the Choristers keep 1,844.
+A miniboss, in the content's own terms, is a solo elite that is no gate's boss: in
+the Crypt the Ossuary Drake (the one spawn-list elite that holds a pull alone:
+doubled, 7,936 to 15,872 on heroic and, by the same factor, 1,040 to 2,079 on
+normal) and the Knellwyrm (below). The gargoyles, the Bone Brute and every other
+elite fight in packs and are trash. Health only: melee, mechanic factors and armor
+are untouched. Pinned by `tests/hollow_crypt_boss_pools.test.ts`.
+
+What the longer heroic fights bring, measured in real fights at the planning 230
+with nobody interrupting or stepping out (old pool, then new):
+
+| Boss | Kill | What scales with the length |
+|---|---|---|
+| Sexton Marrow | 82 s, then 121 s | Shovelfuls 6 then 10; Open Graves 5 then 7 (so each Toll raises one or two more Restless Bones: about 6 then 8 from the two Tolls); Gravedigger's Blows 7 then 12, the tank at the six-stack cap (36 percent more damage taken) for 17 s then 62 s. Still two Tolls: 66 and 33 percent are phases of the fight |
+| Cantor Ilvane | 81 s, then 126 s (her Choristers 17 s of it both times) | Dirges 5 then 8, of which Unbroken Verse 1 then 2; Bone Organ 3 then 5; Crescendo (the last 30 percent) 19 s then 33 s. Harmony and Encore ride the Choristers, whose pool did not move |
+
+Neither has a damage-to-break threshold sized by a share of the pool (the Lady's
+Embrace is the only one in the Crypt), no enrage and no soft timer, so nothing was
+compensated: the longer fight is the intended cost. The one to watch in playtest is
+the tank's time at six Gravedigger's Blow stacks.
 
 **The Lady's heroic pool (owner playtest, 2026-10-12).** Her heroic pool was first
 priced like the others (80 s x 230: multiplier 12, about 18,400). A well-geared
@@ -290,9 +328,9 @@ and Shovelful, the cave-in, Grave Dirt and Gravedigger's Blow do not read the fa
 
 | Mechanic | Rule | Normal numbers (percent of cloth 270) |
 |---|---|---|
-| Shovelful | every 11 s, a 1.2 s bar, aim locked: an 8 yd, 80 degree cone of grave dirt | 1.5 of his melee roll through armor, and 50 percent slower movement for 6 s |
-| Measured for the Grave | every 15 s a 1 s bar marks a non-tank; 4 s later an Open Grave caves in where they stand and stays for the fight (eight at most, the oldest fills) | cave-in 42 to 52 within 3 yd (about 17); Grave Dirt 9 a second (about 3) and 40 percent slower inside |
-| Burial Toll | at 66 and 33 percent: he strides to the bell rope (immune), rings 3 s (three peals), the Toll | 30 to 38 shadow to everyone (about 13; a tenth more on heroic before its transform: 198 to 251); every Open Grave raises a Restless Bones (level 8, no loot) |
+| Shovelful | every 11 s (first at 4 s), a 1.2 s bar, aim locked: an 8 yd, 80 degree cone of grave dirt; he begins it only with his target within 6 yd | 1.5 of his melee roll through armor, and 50 percent slower movement for 6 s |
+| Measured for the Grave | every 15 s (first at 2 s, so the first grave lies at 7 s) a 1 s bar marks a non-tank; 4 s later an Open Grave caves in where they stand and stays for the fight (eight at most, the oldest fills) | cave-in 42 to 52 within 3 yd (about 17); Grave Dirt 9 a second (about 3) and 40 percent slower inside |
+| Burial Toll | at 66 and 33 percent: he strides to the bell rope (immune), rings 3 s (three peals), the Toll; a Toll that comes due mid-bar waits for the bar to land (1.25 s at most) | 30 to 38 shadow to everyone (about 13; a tenth more on heroic before its transform: 198 to 251); every Open Grave raises a Restless Bones (level 8, no loot) |
 | Heroic | Gravedigger's Blow every 9 s on the tank (6 percent more damage taken per stack, 20 s, six stacks); Grave Vigor (30 percent faster swings while he stands in a grave); Unquiet Earth (2 s in a grave raises a Restless Bones, then the grave rests 8 s) | |
 | Deed | A Tidy Churchyard: every grave opened at the yard's edge (7 yd of the rim) | |
 
@@ -380,6 +418,23 @@ the tank's), a wrong candle 252 to 288 (about 22), Grasp of the Grave 162 to 198
 (13 to 16) and a root. No single avoidable mechanic passes 60 percent of a
 full-health cloth wearer; a player rooted by the Grasp in front of the Reap is lost
 (the draft's intent).
+
+**The Knellwyrm's health (2026-10-12).** It spawned on its bare template (1,081
+normal, 7,254 heroic: dead in about 20 s on normal, before its first Dread Bellow at
+24 s; the manager's playtest: "Dragon Morthen had 700 hp?"). On heroic it is priced
+like every Crypt boss, fight length x planning party DPS: 80 s x 230 = 18,400 (9.64
+on its 1,909 level-22 pool), about two thirds of Morthen's own pool and inside the
+miniboss band (15,000 to 20,000). Its heroic clocks fit that length (Pyre Strafe at
+14 s, Dread Bellow at 24 s and 54 s, the Burning Knell at 30 s), and a heroic party
+at twice the planning DPS still meets each once. On normal it follows the owner's
+rule for minibosses (2026-10-12): clearly less than every boss of its dungeon, at
+most three quarters of the weakest (Marrow, 3,152). So 2,357
+(`healthMultiplierByMob.crypt_knellwyrm` 2.18 on its 1,081 pool; a first pass priced
+it at 80 s x 55 = 4,400, above Marrow and the Lady). At the planning 55 that is a
+37 s fight in which the Pyre Strafe and the Dread Bellow (it lands at 26 s) both
+come round; a party at twice that pace kills it in about 21 s, after the Strafe and
+before the Bellow. The rule outranks the Bellow there. Its melee and mechanic
+numbers are untouched. Pinned by `tests/hollow_crypt_knellwyrm_pool.test.ts`.
 
 **The Knellwyrm (normal kit unchanged), heroic Burning Knell.** Every 55 s (first
 30 s into its fight) it takes wing from where it stands (2.5 s, out of reach:

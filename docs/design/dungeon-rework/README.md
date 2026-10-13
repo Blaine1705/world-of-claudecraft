@@ -173,16 +173,61 @@ kit instancing, light zones, prewarm through the preparation scheduler per
 
 | Dungeon | Bosses | Trash pulls | Target clear (good group) | Target boss fights |
 |---|---|---|---|---|
-| The Hollow Crypt | 4 | 9 | about 15 min | 70 s, 80 s, 80 s, 150 s |
+| The Hollow Crypt | 4 | 9 | about 15 min (about 16.5 since the playtest pools of 2026-10-12, `hollow_crypt.md` section 4) | 70 s, 80 s, 80 s, 150 s, then the Knellwyrm's 80 s outside Morthen's 150 |
 | The Sunken Bastion | 3 to 4 | 9 to 11 | about 15 min | after pilot |
 | The Drowned Temple | 3 to 4 | 9 to 11 | about 15 min | after pilot |
 | Gravewyrm Sanctum | 4 | 10 to 12 | about 15 to 17 min | after pilot |
 | The Wildheart Basin | 3 to 4 | 10 to 12 | about 15 to 17 min | after pilot |
 
 Pacing rule: a trash pull costs about 55 s with walking and recovery; bosses
-total 5 to 7 minutes. Boss health is set as target duration times measured party
+total 5 to 7 minutes (the Crypt's four are 6.3; its Knellwyrm finale adds about
+1.35 on top since 2026-10-12, which is what takes its normal run past 15). Boss health is set as target duration times measured party
 DPS at the boss's level (`NormalDungeonTuning.healthMultiplierByMob`), never
 guessed.
+
+**Heroic health bands (owner, 2026-10-12).** On heroic the lengths above gave pools
+a geared level 20 party killed too fast, so the heroic pools sit in bands instead:
+a non-final boss carries about 25,000, a miniboss 15,000 to 20,000 (clearly under
+the bosses), and final bosses keep their own pools (28,800 to 36,800). The bosses
+that already sat at about 23,000 (the Tideglass Colossus, Velkhar, the Fanglord
+Beastmaster and his jaguar, the Gorgebloom) were left unchanged by the owner's
+call: "about 25,000" was not read as a floor for them. Which body is which
+follows the Dungeon Finder catalogue (`src/sim/content/dungeon_finder.ts`) with
+two rulings on top: a body in its dungeon's encounter list is a boss, and a named
+solo elite outside it is a miniboss, EXCEPT that the Gaol Turnkey is listed but is
+the gaol's miniboss by its own content, and the Mere Hydra is a boss by the
+owner's ruling of 2026-10-12 although the list on this branch has no row for it
+(the row lands with the tracker branch `fix/dungeon-tracker-hydra-boss`). Normal
+BOSS pools keep their designed lengths. On normal the owner's rule (2026-10-12) is
+that a miniboss carries clearly less than every boss of its dungeon: at most three
+quarters of the weakest one's pool. The designed miniboss pools already sat there,
+so they stand; the heroic band factors are NOT carried to normal (a first pass did,
+and left the Captain, the Turnkey and the Tusker at about 90 percent of their
+weakest boss). Health only:
+melee and mechanic factors do not move, and a check sized by a share of the pool
+keeps the absolute damage it asked for (the Lady's Frozen Embrace, the Mere Hydra's
+regrown head).
+
+The Mere Hydra's heroic fight, measured at the planning 230 (by hand, in real
+fights; no suite replays them):
+with the heads brought down together (the intended play, and the deed) 63 s became
+121 s, with two Tsunamis where there was one and four Combined Breaths where there
+were two; killing one head at a time, 98 s became 201 s with seven regrowths where
+there were three. Enraged Hydra counts the heads lying dead (two at most), so its
+level cannot pass the design, but a group that kills head by head now fights under
+it for about 133 s where it was 67 s.
+
+| Dungeon | Bosses at about 25,000 (was) | Minibosses in 15,000 to 20,000 (was) | Normal minibosses (share of the weakest normal boss) |
+|---|---|---|---|
+| Hollow Crypt | Sexton Marrow 24,996 (16,099), Lady of the Bonechill 24,999 (18,382), Cantor Ilvane 24,996 (14,687) | Ossuary Drake 15,872 (7,936), Knellwyrm 18,403 (7,254) | Drake 2,079 (was 1,040) and Knellwyrm 2,357 (was 1,081): 66 and 75 percent of Marrow's 3,152 |
+| Sunken Bastion | Knight-Commander Olen 24,999 (18,382), Gaoler Ossick 24,999 (19,530) | Shipwreck Captain 16,996 (13,801), Gaol Turnkey 15,994 (11,041) | Captain 4,495 and Turnkey 3,599, unchanged: 75 and 60 percent of Olen's 5,995 |
+| Drowned Temple | Choirmother Selthe 25,004 (20,650); Mere Hydra 8,333 a head, 24,999 in all (4,306 a head); Tideglass Colossus 23,003 unchanged | none | none |
+| Wildheart Basin | Beastmaster and jaguar 23,005, Gorgebloom 23,003, all unchanged | Great Saurian 14,998 unchanged | Great Saurian about 10,000, unchanged: about two thirds of the 15,000 bosses |
+| Gravewyrm Sanctum | Korgath the Bound 25,004 (18,391), shackles unchanged; Velkhar 22,991 unchanged | Sledge Tusker 16,002 (13,796) | Tusker 8,992, unchanged: 75 percent of Korgath's 12,007 |
+
+Pinned from live spawns by `tests/hollow_crypt_boss_pools.test.ts`,
+`tests/hollow_crypt_knellwyrm_pool.test.ts` and the four
+`tests/*_health_bands.test.ts` suites.
 
 ## 7. Loot philosophy
 

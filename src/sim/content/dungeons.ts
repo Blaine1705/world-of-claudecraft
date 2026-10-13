@@ -546,6 +546,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // difficulties even without the boss: true flag (see morthen).
     ccImmune: true,
     slowImmune: true,
+    // He drops boss loot: his corpse holds like a boss's (boss_corpse_hold.ts).
+    bossCorpseHold: true,
     hpBase: 110,
     hpPerLevel: 24,
     dmgBase: 9,

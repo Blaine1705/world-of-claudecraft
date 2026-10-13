@@ -162,7 +162,8 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       grand_necromancer_velkhar: 1,
       korzul_the_gravewyrm: 1,
     });
-    // The bosses' and the Tusker's pools from fight length x 150 party DPS.
+    // The bosses' pools, and the Tusker's (the miniboss), from fight length x
+    // 150 party DPS.
     expect(tuning.healthMultiplierByMob).toEqual({
       sledge_tusker: 5.43,
       korgath_the_bound: 5.53,
@@ -317,13 +318,15 @@ describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () =
       hpPerLevel: 96,
       armorPerLevel: 31.2,
     },
-    // The Ice Tomb rework gives the bosses their own heroic pools (target
-    // fight length x 230 heroic party DPS).
+    // The Ice Tomb rework gave the bosses their own heroic pools (target
+    // fight length x 230 heroic party DPS); the owner's heroic bands
+    // (2026-10-12) then set Korgath's body at about 25,000 (10.7 on his
+    // template, where 7.87 gave 2046.2 and 283.32). His melee did not move.
     korgath_the_bound: {
       dmgBase: 266,
       dmgPerLevel: 55.1,
-      hpBase: 2046.2,
-      hpPerLevel: 283.32,
+      hpBase: 2782,
+      hpPerLevel: 385.2,
       armorPerLevel: 36,
     },
     grand_necromancer_velkhar: {
