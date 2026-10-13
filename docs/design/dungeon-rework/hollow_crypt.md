@@ -103,10 +103,45 @@ seen from the first step.
 
 **Gates and seals (no skipping, G7).** Gate state is derived every tick from the
 claim roster (`src/sim/instances/dungeon_gates.ts`): a gate is closed until its
-packs and bosses are dead, sealed while its `sealWhileEngaged` boss is alive and
-engaged, open otherwise. A wipe clears the seal and never re-closes a cleared
+packs and bosses are dead, sealed once its `sealWhileEngaged` boss has fought for
+the seal delay, open otherwise. A wipe clears the seal and never re-closes a cleared
 gate, so a corpse run always has a path. `bossChainPull` stays on. Kinds:
 portcullis, bone barrier, frost-web curtain, warded arch, rite ward.
+
+**The seal delay (owner playtest, 2026-10-12).** A boss room does not shut at the
+pull: it seals `BOSS_ROOM_SEAL_DELAY_SECONDS` (10 s) into the fight, so a group
+caught on the threshold gets in. One rule for every sealing gate of every dungeon,
+counted in sim ticks (`tests/dungeon_gate_seal_delay.test.ts`):
+
+- While the seal is pending the gate is open, to collision, to every reader of
+  `dungeonGateState` and on the wire (the gate's closing animation plays when the
+  seal lands, not at the pull).
+- A pending seal is cancelled the moment the boss stops fighting (it dies, or
+  drops the pull and turns for home: a wipe inside the window): the door never
+  shuts on an empty room, and a pull whose seal was still pending gets the whole
+  delay again, one taken up before the boss stands idle included. A seal that
+  has already landed is different: it holds while the boss walks home, so a
+  pull taken up again in that walk starts behind a shut door.
+- A boss walked to its own doorway inside the window seals the room at once, with
+  the boss still inside (`BOSS_ROOM_DOORWAY_REACH`): the open door is for the group
+  to come in, never for the boss to be dragged out of its arena.
+- A seal lands only with the boss on its own side of the gate's line. A boss
+  thrown past it inside the window (a charge, a leap, a knockback) is not sealed
+  out of its room on the landing tick: the seal waits and lands on the first
+  tick it is back. This is a rule about the landing tick only; a boss carried
+  out after the door has shut is fought outside a sealed room, as before the
+  delay existed. "Its side" is the half of the floor its spawn lies on; the
+  suite floods every sealed arena to prove each lies wholly on that half, and
+  checks every scripted entrance spot of every sealing boss against its gate.
+- That wait has no upper bound, by decision. A due seal stays open for as long
+  as the boss is past the line (the suite holds one out for a minute). It cannot
+  keep a room open for good: a boss walking back to its target crosses the
+  doorway band and shuts the door the tick it is inside, and holding a boss
+  outside its room was already possible once the instance hold had phased it
+  there. A timeout would only add a second way to seal a boss out of its own
+  room, the one thing the rule exists to prevent.
+- Once landed, the seal holds as before (while the boss is in combat or walking
+  home) and whoever is outside is locked out until the boss dies or resets.
 
 ## 4. Trash (owner direction, 2026-09-29)
 
@@ -223,14 +258,33 @@ dungeon's own greens; a warrior tank 366 to 404 before gear. The bands of
 | Boss | Template pool (normal / heroic) | Target | Multiplier normal / heroic | Pool normal / heroic |
 |---|---|---|---|---|
 | Sexton Marrow | 639 / 1,412 | 70 s | 4.93 / 11.4 | about 3,150 / 16,100 |
-| Lady of the Bonechill | 754 / 1,532 | 80 s | 5.3 / 12 | about 4,000 / 18,400 |
+| Lady of the Bonechill | 754 / 1,532 | 80 s (heroic about 109 s, see below) | 5.3 / 16.32 | about 4,000 / 25,000 |
 | Cantor Ilvane | 695 / 1,412 | 64 s on her own (80 s with her Choristers) | 4.6 / 10.4 | about 3,200 / 14,700 |
 | Hollow Chorister | 391 / 971 | about 8 s each | 1 / 1.9 | 391 / about 1,840 |
 
+**The Lady's heroic pool (owner playtest, 2026-10-12).** Her heroic pool was first
+priced like the others (80 s x 230: multiplier 12, about 18,400). A well-geared
+level 20 party killed her far faster than that ("she lasted almost nothing"), so
+the owner set her at about 25,000 (multiplier 16.32: 24,999, about 109 s at the
+planning 230). Normal is untouched. Her Frozen Embrace breaks on a share of her
+pool, and the owner asked for more health, not a harder Embrace, so heroic carries
+its own share (`LADY_TUNING.embraceBreakShareHeroic`, 4.41 percent, read through
+`embraceBreakShare`): the damage that frees the held stays the 1,103 it was (6
+percent of the old 18,382), dealt between the seize and the end of the hold (a
+1.5 s rise plus an 8 s hold). Normal keeps 6 percent of 3,998 (240). What the
+longer fight does bring is its intended cost: at the planning 230 a third Embrace
+(one every 30 s from 24 s) and a fifth Lament (one every 22 s) inside the 109 s.
+
 **Heroic mechanic damage** rides `mechanicDamageMultiplierByMob` (Marrow 6, the Lady
-5, Ilvane 8) on heroic cloth of about 1,250: the Toll about 15 percent, a cave-in
-about 22, an unsheltered Lament about 27, the drop about 66, a completed Dirge or a
-note lane about 70 (a fumbled core all but kills).
+5, Ilvane 8) on heroic cloth of about 1,250: the Toll about 18 percent (see below), a
+cave-in about 22, an unsheltered Lament about 27, the drop about 66, a completed
+Dirge or a note lane about 70 (a fumbled core all but kills).
+
+**The Burial Toll on heroic (owner playtest, 2026-10-12).** The Toll alone carries a
+heroic factor of its own on top of Marrow's shared 6 (`MARROW_TUNING.tollHeroicMult`
+1.1, read through `tollDamageRange`): 198 to 251 shadow on everyone, 16 to 20 percent
+of heroic cloth, where it was 180 to 228 (14 to 18 percent). Normal stays 30 to 38,
+and Shovelful, the cave-in, Grave Dirt and Gravedigger's Blow do not read the factor.
 
 #### Sexton Marrow (the Bell Yard)
 
@@ -238,7 +292,7 @@ note lane about 70 (a fumbled core all but kills).
 |---|---|---|
 | Shovelful | every 11 s, a 1.2 s bar, aim locked: an 8 yd, 80 degree cone of grave dirt | 1.5 of his melee roll through armor, and 50 percent slower movement for 6 s |
 | Measured for the Grave | every 15 s a 1 s bar marks a non-tank; 4 s later an Open Grave caves in where they stand and stays for the fight (eight at most, the oldest fills) | cave-in 42 to 52 within 3 yd (about 17); Grave Dirt 9 a second (about 3) and 40 percent slower inside |
-| Burial Toll | at 66 and 33 percent: he strides to the bell rope (immune), rings 3 s (three peals), the Toll | 30 to 38 shadow to everyone (about 13); every Open Grave raises a Restless Bones (level 8, no loot) |
+| Burial Toll | at 66 and 33 percent: he strides to the bell rope (immune), rings 3 s (three peals), the Toll | 30 to 38 shadow to everyone (about 13; a tenth more on heroic before its transform: 198 to 251); every Open Grave raises a Restless Bones (level 8, no loot) |
 | Heroic | Gravedigger's Blow every 9 s on the tank (6 percent more damage taken per stack, 20 s, six stacks); Grave Vigor (30 percent faster swings while he stands in a grave); Unquiet Earth (2 s in a grave raises a Restless Bones, then the grave rests 8 s) | |
 | Deed | A Tidy Churchyard: every grave opened at the yard's edge (7 yd of the rim) | |
 
@@ -252,7 +306,7 @@ are untouched.
 | Mechanic | Rule | Normal numbers (percent of cloth 310) |
 |---|---|---|
 | Bride's Lament | every 22 s a 3 s wail; when it lands, everyone not sheltered by a lit lantern takes it. A lantern shelters two (nearest first) and goes dark 28 s after sheltering anyone (it misses the next Lament; kindling over the last 4) | 60 to 75 frost (about 22), half again per Lingering Lament stack (45 s, three stacks): the group splits across the lanterns and takes turns in the dark |
-| Frozen Embrace | every 30 s a 1.2 s bar on a non-tank; she rises 5 yd with them for up to 8 s (the held are stunned and carried) | 6 frost a second; 6 percent of her health dealt in time and she sets them down, else she drops them for 150 to 180 (about 53) |
+| Frozen Embrace | every 30 s a 1.2 s bar on a non-tank; she rises 5 yd with them for up to 8 s (the held are stunned and carried) | 6 frost a second; 6 percent of her health dealt in time (4.41 percent on heroic, the same 1,103 damage as before her heroic pool was raised) and she sets them down, else she drops them for 150 to 180 (about 53) |
 | Rime Path | a slick patch every 2.5 yd she drifts (25 s, 14 at most) | slippery ground: momentum at 8 yd/s per second of grip |
 | Bridal Freeze | at half health a 2.5 s wail, then the whole ravine floor is ice for the rest of the fight | |
 | Heroic | each lantern also burns out on its own 30 s after it is lit (dark 10 s); the Embrace takes two | |

@@ -6027,7 +6027,9 @@ export interface DungeonGateDef {
   packs?: readonly string[];
   /** Mob template ids (bosses) that must all be dead. */
   bosses?: readonly string[];
-  /** Closed while this boss (template id) is alive and engaged. */
+  /** Seals behind the group while this boss (template id) is alive and
+   *  engaged: BOSS_ROOM_SEAL_DELAY_SECONDS into the fight, or at once if the
+   *  boss reaches the doorway first (instances/dungeon_gates.ts). */
   sealWhileEngaged?: string;
   /** English log line when the gate first opens (sim_i18n EXACT map). */
   openText?: string;
@@ -7919,6 +7921,14 @@ export interface Entity extends ClientMirroredEntityFields {
   // once the grace runs out, attackable on the way). Undefined whenever not
   // pinned (never deleted), which the parity sampler drops like an absent key.
   evadeInPlace?: number;
+  // On an in-dungeon gate OBJECT that seals for a boss: the sim tick its
+  // pending seal lands, stamped when the boss starts fighting and cleared when
+  // the boss dies, drops the pull or goes idle (instances/dungeon_gates.ts);
+  // Infinity while a due seal waits for a boss thrown past the gate's line.
+  // Undefined on everything else and whenever no seal is pending or landed
+  // (never deleted). Session state of the claim; never on the wire, the
+  // gate's template id is what the client mirrors.
+  gateSealTick?: number;
   fleeTimer: number; // seconds left in a low-HP panic flee; counts down in the 'flee' state
   fleeReturnTimer: number; // grace after a panic flee hits leash edge, letting it run back before normal leash reset resumes
   hasFled: boolean; // a cowardly mob flees only once per pull; cleared when it resets at spawn

@@ -99,7 +99,7 @@ reviews, planning grade.
 | G4 | Marked persistent hazard | Mark a player, fuse, drop a persistent zone at their position, cap and oldest-collapses rule (the P2 `groundHazard` of `docs/prd/dungeon-mechanic-primitives.md` with a `markedPlayer` placement) | 2 days |
 | G5 | Walker adds | Adds that walk to a destination (boss or urn) and empower it on arrival; generalized from Soul Harvest (P9 empowerer role) | 2 days |
 | G6 | LOS-gated interruptible nova | `bigCast` variant: `losOnly`, `interruptible`, optional silence, `uninterruptibleEvery` | 1 to 2 days |
-| G7 | Dungeon gates and encounter seals | `DungeonDef.gates`: gate-tagged colliders per instance slot, open on pack or boss death, optional seal-while-engaged; wire field so `ClientWorld` mirrors collision; closes again only on instance reset | 3 to 4 days |
+| G7 | Dungeon gates and encounter seals | `DungeonDef.gates`: gate-tagged colliders per instance slot, open on pack or boss death, optional seal-while-engaged (the seal lands `BOSS_ROOM_SEAL_DELAY_SECONDS` into the fight, `src/sim/instances/dungeon_gates.ts`); wire field so `ClientWorld` mirrors collision; closes again only on instance reset | 3 to 4 days |
 | G8 | Mob patrols | `DungeonSpawn.patrol` waypoint loop for idle mobs, zero rng (escort walker precedent `src/sim/escort.ts`) | 2 days |
 | G9 | Authored interior system | See section 4 | 12 to 16 days (sim plus render) |
 

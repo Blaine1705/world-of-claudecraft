@@ -224,6 +224,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     // The instance combat hold's pin clock: present from birth (undefined) so a
     // mob's shape never forks on its first pin or release.
     evadeInPlace: undefined,
+    gateSealTick: undefined,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
