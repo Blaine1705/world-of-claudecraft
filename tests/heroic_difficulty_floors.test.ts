@@ -333,6 +333,11 @@ describe('heroic five-man doubled health', () => {
     // The crypt rework prices Morthen from fight length x heroic DPS (about
     // 125 s of damage beside his immune Rite, dungeon_difficulty.ts).
     expect(maxHpAt('morthen', 'hollow_crypt', 'heroic')).toBe(28837);
+    // The Lady of the Bonechill: the owner's heroic playtest of 2026-10-12 set
+    // her at about 25,000 (was 18,382 on the fight-length price). Heroic only:
+    // her normal pool stays on its own multiplier.
+    expect(maxHpAt('rimeweb', 'hollow_crypt', 'heroic')).toBe(24999);
+    expect(maxHpAt('rimeweb', 'hollow_crypt', 'normal')).toBe(3998);
     expect(maxHpAt('bastion_revenant', 'sunken_bastion', 'heroic')).toBe(4554); // was 2277
     // The Sunken Bastion rework prices Vael's pool per boss (150 s at heroic
     // party DPS, dungeon_difficulty.ts healthMultiplierByMob), off the doubling.

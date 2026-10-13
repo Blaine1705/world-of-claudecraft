@@ -796,6 +796,8 @@ export function buildWildheartBasinEntrance(seed: number): WildheartBasinEntranc
   // growth on it ghost together; the court before it on its own.
   const solids = { idol: [] as SetPieceSolid[], court: [] as SetPieceSolid[] };
   wildheartBasinEntranceColliders(seed, door).forEach((collider, i) => {
+    // the set piece's rows are circles and boxes; a prism has no occluder box
+    if (collider.type === 'prism') return;
     const { cameraTopY, ...shape } = collider;
     solids[wildheartOccluderSet(WILDHEART_BASIN_ENTRANCE_COLLIDERS[i].name)].push({
       ...shape,

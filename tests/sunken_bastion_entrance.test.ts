@@ -87,6 +87,8 @@ function makeSim(): Sim {
 function gateHits(x: number, z: number, r: number): boolean {
   return sunkenBastionEntranceColliders(SEED, DOOR).some((c) => {
     if (c.type === 'circle') return Math.hypot(x - c.x, z - c.z) < c.r + r;
+    // the set piece hands circles and boxes only
+    if (c.type !== 'obb') throw new Error(`unexpected ${c.type} collider in the set piece`);
     const dx = x - c.x;
     const dz = z - c.z;
     const cs = Math.cos(c.rot);

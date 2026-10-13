@@ -216,12 +216,15 @@ function baseEntity(id: number, pos: Vec3): Entity {
     spawnPos: { ...pos },
     leashAnchor: null,
     evadeStall: 0,
+    chaseRoute: undefined,
+    routeDenied: undefined,
     chaseStall: 0,
     evadeEpoch: 0,
     chainPullInbound: false,
     // The instance combat hold's pin clock: present from birth (undefined) so a
     // mob's shape never forks on its first pin or release.
     evadeInPlace: undefined,
+    gateSealTick: undefined,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -940,6 +943,10 @@ export function createNpc(id: number, def: NpcDef, pos: Vec3): Entity {
   e.questIds = [...def.questIds];
   e.vendorItems = [...(def.vendorItems ?? [])];
   e.devVendor = def.devVendor ?? false;
+  if (def.visualKey) e.visualKey = def.visualKey;
+  // Studio-authored ambient VFX (render-only). Conditional so a built-in NPC
+  // (which never carries one) keeps the exact release entity shape.
+  if (def.authorVfx) e.authorVfx = { ...def.authorVfx };
   return e;
 }
 

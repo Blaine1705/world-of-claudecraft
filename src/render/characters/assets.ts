@@ -32,6 +32,7 @@ import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor, slotToChestScale } from './back_grips';
 import { applyClipPositionDrops, applyClipTrackDrops } from './clip_track_drops';
 import { applyEnvSheen } from './env_sheen';
+import { attachGloamClimb } from './gloam_climb';
 import {
   type HandGrip,
   KAYKIT_ONE_HAND_SWORD_GRIP,
@@ -2199,6 +2200,10 @@ function attachAllProps(
         ? offhandAttachDef(base, offhandItemId, weaponSkinId)
         : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
     if (!att) continue;
+    // A held prop whose model streams on demand (an Armory skin model an NPC
+    // carries) degrades while it is cold: left off, its fetch kicked, never a
+    // throw out of the build.
+    if (!residentOrEnsure(att.url)) continue;
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
     const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;
@@ -2593,6 +2598,7 @@ function buildTintedClone(
     const dyeSpec = (mat.userData as { armorDye?: ArmorDyeSpec }).armorDye;
     if (dyeSpec) attachArmorDye(mat, dyeSpec);
     if (rim) addRimGlow(mat); // dungeon silhouette rim (uRimBoost contract)
+    attachGloamClimb(mat); // dormant on every body but one in Gloamveil (gloam_climb.ts)
     // The skeletons and the necromancer share a `Glow` eye material authored
     // at strength 1, whose two tints straddled the old bloom threshold on luma
     // weights alone: the yellow pair (0.907) lit up, the cyan pair (0.842)
@@ -2645,6 +2651,7 @@ function buildTintedClone(
         polygonOffsetFactor: s.polygonOffsetFactor,
         polygonOffsetUnits: s.polygonOffsetUnits,
       });
+      attachGloamClimb(mat); // the Lambert tier's only layer: same climb, no rim
     }
   }
   if (tint !== null) {

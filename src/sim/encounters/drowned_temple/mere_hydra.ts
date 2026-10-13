@@ -53,6 +53,7 @@ import {
   HYDRA_TSUNAMI,
   HYDRA_TUNING,
   hydraElementOwners,
+  hydraRegrowShare,
 } from './ids';
 
 export { startCombo } from './hydra_combo';
@@ -202,7 +203,7 @@ export function tickMereHydra(ctx: SimContext, inst: InstanceSlot): void {
   heads.forEach((h, i) => {
     if (h?.dead && st.diedAt[i] === null) st.diedAt[i] = ctx.time;
   });
-  if (!st.tsunami) stepRegrowth(ctx, heads, st);
+  if (!st.tsunami) stepRegrowth(ctx, heads, st, hydraRegrowShare(inst.difficulty === 'heroic'));
   const standing = heads.filter((h): h is Entity => h !== null && !h.dead);
   applyEnrage(ctx, heads, heads.filter((h) => h?.dead).length);
   for (const h of standing) {

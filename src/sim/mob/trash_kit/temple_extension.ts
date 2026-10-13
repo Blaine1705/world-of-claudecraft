@@ -45,6 +45,9 @@ export const TEMPLE_KIT_EXTENSION: TrashKitExtension = {
   },
   // The gaze is a look, not a spell: a stun breaks it, a silence does not.
   isPhysical: (key) => key === 'gaze',
+  // The Arcing Spark is thrown at one player (kit_cast_sight.ts). The gaze is
+  // an area and the lure breaks on sight by its own rule (temple_lure.ts).
+  sightKeys: ['spark'],
   ready(_ctx, _inst, mob, kit, key, st, players) {
     if (key === 'gaze') return { ok: gazeReady(mob, kit, players), target: null };
     if (key === 'lure') {

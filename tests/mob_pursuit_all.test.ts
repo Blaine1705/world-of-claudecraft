@@ -107,8 +107,31 @@ describe('ranged petSpell casters keep the classic caster loop', () => {
   it('flips from chase to attack at spell range with the fast-cast clamp', () => {
     const { sim, p } = makeSim();
     const mob = engageMob(sim, p, 'corrupted_priest_malric', 20, 'chase', { swingTimer: 5 });
+    // A caster takes its stance only where it SEES its target
+    // (mob/cast_sight.ts), and on this seed a world prop stands on the x axis
+    // at 5 yd: the pair moves to a clear line 30 yd north.
+    for (const e of [p, mob]) {
+      e.pos.z = 30;
+      e.prevPos.z = 30;
+      sim.rebucket?.(e);
+    }
+    expect(sim.ctx.hasLineOfSight(mob, p)).toBe(true);
     sim.updateMob(mob);
     expect(mob.aiState).toBe('attack');
     expect(mob.swingTimer).toBeLessThanOrEqual(0.4);
+  });
+
+  it('in spell range but with a world prop in the way, it begins no cast and goes to close instead', () => {
+    const { sim, p } = makeSim();
+    // The same pair on the x axis, where a prop at 5 yd breaks the line; its
+    // next cast is a tick or two away.
+    const mob = engageMob(sim, p, 'corrupted_priest_malric', 20, 'chase', { swingTimer: 0.1 });
+    expect(sim.ctx.hasLineOfSight(mob, p)).toBe(false);
+    const hp = p.hp;
+    for (let i = 0; i < 6; i++) sim.updateMob(mob);
+    // The cast it was about to begin asked for sight and did not get it.
+    expect(mob.aiState).toBe('chase');
+    expect(p.hp).toBe(hp);
+    expect(mob.pos.x !== 20 || mob.pos.z !== 0).toBe(true);
   });
 });

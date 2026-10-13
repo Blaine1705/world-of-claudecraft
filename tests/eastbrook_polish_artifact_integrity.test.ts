@@ -1373,7 +1373,6 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  // Re-minted for the set piece occluder hook in renderer.ts (the dungeon entrances fade when they block the camera). No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1401,7 +1400,12 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  '18af0cc4c9aa256b52b196cf7e6f9b028c108ee013bc89a18d619ba1f43df1d2';
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
+  // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  'f18ffccc65bfceedf8f0e59dea1b4c47972d3c3278b5f4d3c7180ca429512194';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1427,8 +1431,12 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  // Re-minted for the set piece occluder hook in renderer.ts (the dungeon entrances fade when they block the camera). No capture was retaken.
-  'c19b8c1344289ed627a1e8b7e53fb1cda65c7503beb8746bc12faac2e1997225';
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
+  // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  '18b78a7f22ab93a649eadd789c3dfe90f8aeacd467550322f7d0f3dfe3d29e0d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2815,8 +2823,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // + the character pack + the five-dungeon rework): recomputed LAST again over the
       // re-swept evidence. No
       // capture was retaken.
-      // Re-minted for the set piece occluder hook in renderer.ts (the dungeon entrances fade when they block the camera). No capture was retaken.
-    ).toBe('d9f9074e4f289b0f7ea524971c74359ddb1653c2b1c254d3763142e25410e5e3');
+      // Merging #4466 and #4470 into the v0.45.0 integration: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+    ).toBe('9a6d7f90348f4e883c3acf0f6a2b2d952a05daf875b5e3da727921dfd799ac3b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

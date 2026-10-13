@@ -870,6 +870,8 @@ export function buildDrownedTempleEntrance(seed: number): DrownedTempleEntranceV
     works: [] as SetPieceSolid[],
   };
   drownedTempleEntranceColliders(seed, door).forEach((collider, i) => {
+    // the set piece's rows are circles and boxes; a prism has no occluder box
+    if (collider.type === 'prism') return;
     const { cameraTopY, ...shape } = collider;
     solids[templeOccluderSet(DROWNED_TEMPLE_ENTRANCE_COLLIDERS[i].name)].push({
       ...shape,

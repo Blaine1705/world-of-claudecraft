@@ -216,6 +216,7 @@ function holdShackle(shackle: Entity, boss: Entity, live: boolean): void {
   shackle.aggroTargetId = boss.aggroTargetId;
   shackle.swingTimer = 999;
   shackle.chaseStall = 0;
+  shackle.chaseRoute = undefined;
   shackle.evadeStall = 0;
 }
 

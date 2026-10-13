@@ -137,6 +137,11 @@ export const LADY_TUNING = {
   embraceHold: 8,
   /** The share of her max health dealt during the hold that makes her let go. */
   embraceBreakShare: 0.06,
+  /** Heroic: its own share, so the damage that frees the held is what it was
+   *  before her heroic pool was raised (the owner's playtest of 2026-10-12
+   *  asked for more health, not a harder Embrace): 1,103 of her 24,999, as 6
+   *  percent was of the 18,382 she had. Read through embraceBreakShare(). */
+  embraceBreakShareHeroic: 0.0441,
   /** Frost a second on the held. */
   embracePerSecond: 6,
   /** The gentle release (seconds to set them down). */
@@ -155,6 +160,11 @@ export const LADY_TUNING = {
   freezeAt: 0.5,
   freezeCast: 2.5,
 } as const;
+
+/** The share of her max health that frees the held, by difficulty. Pure. */
+export function embraceBreakShare(heroic: boolean): number {
+  return heroic ? LADY_TUNING.embraceBreakShareHeroic : LADY_TUNING.embraceBreakShare;
+}
 
 /** Which of `players` a lit lantern at (lx, lz) shelters: those within its
  *  light, nearest first (ties to the lower id), at most `cap`. Pure. */

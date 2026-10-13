@@ -6,6 +6,7 @@ import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { buildSanctumExitPortal } from './sanctum_exit_portal';
 import { markOwnedMaterial, markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { applyWornStone } from './worn_stone';
 
@@ -247,7 +248,7 @@ function cloneWildheartGate(): THREE.Object3D | null {
 // rather than a rotating ball. White so the material colour tints it per rank.
 let riftPortalTex: THREE.CanvasTexture | null = null;
 
-function riftPortalTexture(): THREE.CanvasTexture | null {
+export function riftPortalTexture(): THREE.CanvasTexture | null {
   if (riftPortalTex) return riftPortalTex;
   if (typeof document === 'undefined') return null;
   const S = 256;
@@ -1036,6 +1037,9 @@ export function buildDoorBody(
   dungeonId: string | null | undefined,
   lowGfx: boolean,
 ): { body: THREE.Group; portal?: THREE.Mesh } {
+  if (!entering && dungeonId === SANCTUM_EXIT_DUNGEON) {
+    return buildSanctumExitPortal(lowGfx, riftPortalTexture());
+  }
   const body = new THREE.Group();
   // Doors whose visible arch is authored elsewhere render only an invisible
   // click-box: the Nythraxis crypt arch is baked into that dungeon's
@@ -1108,4 +1112,31 @@ export function buildDoorBody(
     if (!wildheartGate) body.scale.setScalar(1.65);
   }
   return { body, portal };
+}
+
+/** The dungeon whose exit draws its own body (sanctum_exit_portal.ts). */
+const SANCTUM_EXIT_DUNGEON = 'gravewyrm_sanctum';
+
+/**
+ * The door family's boot prewarm bodies, side by side in one group: the
+ * generic entrance and exit arches, and the Gravewyrm Sanctum's frost exit.
+ * The frost exit is the only door body whose textured membrane no other boot
+ * artifact links, and it first appears in the seconds after a boss kill, so
+ * it is staged here rather than left to its view's gate. The renderer places
+ * the group, links it with the monolithic compile and tears it out at world
+ * entry; every material and geometry under it is a shared, process-lifetime
+ * resource, exactly the instances the live views draw.
+ */
+export function buildDoorPrewarmBodies(lowGfx: boolean): THREE.Group {
+  const group = new THREE.Group();
+  const bodies = [
+    buildDoorBody(true, null, lowGfx).body,
+    buildDoorBody(false, null, lowGfx).body,
+    buildDoorBody(false, SANCTUM_EXIT_DUNGEON, lowGfx).body,
+  ];
+  bodies.forEach((body, i) => {
+    body.position.x = (i - (bodies.length - 1) / 2) * 6;
+    group.add(body);
+  });
+  return group;
 }

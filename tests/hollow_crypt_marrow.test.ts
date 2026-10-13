@@ -27,6 +27,7 @@ import {
   MARROW_SHOVELFUL,
   MARROW_TOLLING,
   MARROW_TUNING,
+  tollDamageRange,
 } from '../src/sim/encounters/hollow_crypt';
 import { DT, type Entity } from '../src/sim/types';
 import {
@@ -42,7 +43,10 @@ import {
   until,
 } from './helpers/crypt_boss_fight';
 
-vi.setConfig({ testTimeout: 60_000 });
+// The determinism case plays two 52 s fights: about 40 s on a quiet machine,
+// past 60 s under load on the base commit too, so the budget matches the real
+// kill suites beside it (tests/hollow_crypt_marrow_pace.test.ts).
+vi.setConfig({ testTimeout: 240_000 });
 
 const T = MARROW_TUNING;
 const KEEP = new Set([MARROW_ID]);
@@ -235,6 +239,95 @@ describe('Sexton Marrow: the Burial Toll', () => {
     marrow.hp = Math.floor(marrow.maxHp * 0.32);
     run(f, DT * 2, keep);
     expect(st.tolls).toBe(2);
+  });
+});
+
+// The owner's heroic playtest of 2026-10-12: the bell hits a tenth harder on
+// heroic, and nothing else of his moves. Every damage roll is one
+// `ctx.rng.range(min, max)` draw (claim.ts mechanicDamage), so the spy below
+// reads the exact base range each mechanic rolled, whatever the seed drew.
+describe("Sexton Marrow: the Burial Toll's heroic factor", () => {
+  const HEROIC_MULT = 6;
+
+  /** One Toll with one grave caving in beforehand; the base ranges rolled. */
+  function tollRolls(difficulty: 'normal' | 'heroic') {
+    const { f, marrow } = marrowFight(difficulty);
+    const keep = holdAll(f);
+    run(f, DT, keep);
+    const st = marrow.cryptBossFight;
+    if (st?.kind !== 'marrow') throw new Error('no fight');
+    const range = vi.spyOn(f.sim.ctx.rng, 'range');
+    st.marks.push({ playerId: f.others[0].id, remaining: DT });
+    run(f, DT * 2, keep);
+    expect(graves(f)).toHaveLength(1);
+    const dirtFrom = f.hits.length;
+    run(f, 1.2, keep);
+    const dirt = f.hits
+      .slice(dirtFrom)
+      .filter((h) => h.ability === 'Grave Dirt')
+      .map((h) => h.amount);
+    marrow.hp = Math.floor(marrow.maxHp * 0.65);
+    const from = f.hits.length;
+    expect(until(f, () => st.tolls === 1 && st.toll === null, 12, keep)).toBe(true);
+    const party = [f.tank, ...f.others];
+    const tolls = party.map((p) => took(f, p, 'Burial Toll', from));
+    const calls = range.mock.calls.map(([min, max]) => [min, max] as const);
+    range.mockRestore();
+    return { marrow, tolls, dirt, calls, party };
+  }
+
+  it('is a tuning field read through one pure helper', () => {
+    expect(T.tollHeroicMult).toBe(1.1);
+    expect(tollDamageRange(false)).toEqual({ min: 30, max: 38 });
+    const heroic = tollDamageRange(true);
+    expect(heroic.min).toBeCloseTo(33, 9);
+    expect(heroic.max).toBeCloseTo(41.8, 9);
+  });
+
+  it('rolls 198 to 251 on everyone on heroic (was 180 to 228)', () => {
+    const { marrow, tolls, calls, party } = tollRolls('heroic');
+    expect(marrow.mechanicDamageMult).toBe(HEROIC_MULT);
+    const heroic = tollDamageRange(true);
+    const tollCalls = calls.filter(([min, max]) => min === heroic.min && max === heroic.max);
+    expect(tollCalls).toHaveLength(party.length);
+    // Never the unscaled base on a heroic claim.
+    expect(calls.some(([min, max]) => min === T.tollMin && max === T.tollMax)).toBe(false);
+    for (const amount of tolls) {
+      expect(amount).toBeGreaterThanOrEqual(198);
+      expect(amount).toBeLessThanOrEqual(251);
+    }
+    expect(Math.round(heroic.min * HEROIC_MULT)).toBe(198);
+    expect(Math.round(heroic.max * HEROIC_MULT)).toBe(251);
+    expect(Math.round(T.tollMin * HEROIC_MULT)).toBe(180);
+    expect(Math.round(T.tollMax * HEROIC_MULT)).toBe(228);
+  });
+
+  it('leaves the cave-in and Grave Dirt on the shared heroic factor alone', () => {
+    const { calls, dirt } = tollRolls('heroic');
+    // The grave caved in on its authored base: no tenth on top.
+    expect(calls.some(([min, max]) => min === T.graveOpenMin && max === T.graveOpenMax)).toBe(true);
+    expect(
+      calls.some(
+        ([min, max]) =>
+          Math.abs(min - T.graveOpenMin * T.tollHeroicMult) < 1e-6 ||
+          Math.abs(max - T.graveOpenMax * T.tollHeroicMult) < 1e-6,
+      ),
+    ).toBe(false);
+    expect(dirt.length).toBeGreaterThan(0);
+    for (const amount of dirt) expect(amount).toBe(T.graveDirtPerSecond * HEROIC_MULT);
+  });
+
+  it('stays 30 to 38 on normal', () => {
+    const { marrow, tolls, calls, party } = tollRolls('normal');
+    const mult = marrow.mechanicDamageMult ?? 1;
+    const tollCalls = calls.filter(([min, max]) => min === T.tollMin && max === T.tollMax);
+    expect(tollCalls).toHaveLength(party.length);
+    const heroic = tollDamageRange(true);
+    expect(calls.some(([min, max]) => min === heroic.min && max === heroic.max)).toBe(false);
+    for (const amount of tolls) {
+      expect(amount).toBeGreaterThanOrEqual(Math.round(T.tollMin * mult));
+      expect(amount).toBeLessThanOrEqual(Math.round(T.tollMax * mult));
+    }
   });
 });
 

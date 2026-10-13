@@ -25,6 +25,7 @@ import {
   WOC_BODY_SCALE_RANGE,
   wocHeadLookOf,
 } from '../src/render/characters/modular';
+import { npcEntityLookFor } from '../src/render/characters/npc_look_provider';
 import {
   MOB_LOOK_IDS,
   NPC_LOOKS,
@@ -48,6 +49,7 @@ import { WOC_BODY_CLASSES, wocDefaultWorn } from '../src/render/characters/woc_p
 import { caravanDriverLookId } from '../src/render/world_quest_caravan_driver';
 import { ESCORTS, MOBS, NPCS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
+import { STUDIO_CONTENT } from '../src/sim/studio_content';
 import type { Entity } from '../src/sim/types';
 
 const npc = (templateId: string): Entity => ({ kind: 'npc', templateId }) as unknown as Entity;
@@ -98,12 +100,39 @@ const SLOT_FIELD: Record<WocHeadSlot, keyof NpcLookDef['app']> = {
   eyes: 'headEyes',
 };
 
+// FORK: fork-only NPCs that still render on the fixed NPC rigs (no authored
+// look yet). Shrink this list by authoring rows in NPC_LOOKS; never grow it
+// for an upstream NPC.
+const FORK_FIXED_RIG_NPCS = new Set([
+  // the Scorching Wastes ('scout_maren_wastes' composes via the scout_maren
+  // baseId alias now, the same person recurs there)
+  'caravan_master_saffa',
+  'loremaster_caddis_wastes',
+  'old_haruk',
+  'provisioner_ashka',
+  'forgemaster_derin',
+  'wellwatch_hana',
+  'wellwatch_toma',
+  'drover_pell',
+  'dowser_emrys',
+  'auctioneer_zeph',
+]);
+
 describe('npc looks roster', () => {
   it('covers every NpcDef id: every world NPC wears an authored look but the own-body ones', () => {
     const missing = Object.keys(NPCS).filter(
-      (id) => !NPC_OWN_BODY_IDS.has(id) && npcLookFor(id) === null,
+      (id) => !NPC_OWN_BODY_IDS.has(id) && !FORK_FIXED_RIG_NPCS.has(id) && npcLookFor(id) === null,
     );
     expect(missing).toEqual([]);
+  });
+
+  it('FORK: the fixed-rig exemption list names only NPCs that exist and lack a look', () => {
+    // Studio NPC rows resolve through the authored-map overlay
+    // (src/sim/studio_content.ts), never the built-in table.
+    for (const id of FORK_FIXED_RIG_NPCS) {
+      expect(NPCS[id] ?? STUDIO_CONTENT.npcs[id], id).toBeDefined();
+      expect(npcLookFor(id), id).toBeNull();
+    }
   });
 
   // The NPCs with their own authored body (Laverock) keep it: no composed
@@ -614,5 +643,19 @@ describe('the cast', () => {
     // white hair: the new hair draws a stored value brighter, so 0.7 is already white
     expect(look?.app.hairSat).toBeLessThanOrEqual(0.1);
     expect(look?.app.hairLight).toBeGreaterThanOrEqual(0.65);
+  });
+});
+
+// The non-player half of the look provider (npc_look_provider.ts): nothing
+// composes on the part library's body. An NPC_LOOKS NPC wears its look on a WOC
+// class body through the visual factory, so the provider must never claim it (a
+// claim would compose it instead).
+describe('the look provider for non-players', () => {
+  it('claims nothing with an NPC_LOOKS row', () => {
+    expect(npcLookFor('smith_haldren')).not.toBeNull();
+    expect(npcEntityLookFor(npc('smith_haldren'))).toBeNull();
+    for (const id of MUSTER_MOB_LOOKS) {
+      expect(npcEntityLookFor({ kind: 'mob', templateId: id } as unknown as Entity), id).toBeNull();
+    }
   });
 });

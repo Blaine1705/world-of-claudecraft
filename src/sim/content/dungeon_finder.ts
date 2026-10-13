@@ -59,6 +59,13 @@ export interface FinderComposition {
 // window localizes as hudChrome.finder.mech.<key>.
 export interface FinderEncounter {
   mobId: string;
+  // A boss made of several placed bodies (the Mere Hydra's three heads) lists
+  // the OTHER ones here. The encounter is over only when `mobId` and every
+  // body named here are dead in the same claim (the heads grow back until all
+  // three are down). `mobId` stays the encounter's one identity everywhere: its
+  // display name, its portrait, its loot tables and its row in the run's
+  // objectives (src/sim/instances/dungeon_run.ts), so these ids are never shown.
+  otherBodyIds?: readonly string[];
   final?: boolean;
   // Spawned by a scripted interaction (crypt relics / ritual circle) rather
   // than standing in the spawn list.
@@ -192,8 +199,19 @@ const SUNKEN_BASTION_ENCOUNTERS: readonly FinderEncounter[] = [
 ];
 
 const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
-  // The rework's route (drowned_temple.md): the choir, the prism, the altar.
+  // The rework's route (drowned_temple.md): the choir, the moon pool, the
+  // prism, the altar.
   { mobId: 'choirmother_selthe', mechanics: ['chorus_and_solo'] },
+  // The Mere Hydra (encounters/drowned_temple/mere_hydra.ts) stands between
+  // Selthe's Court Stairs and the Prism Stair, which rises only once its three
+  // heads are down (the prism_stair_rise gate). One boss, three bodies: the
+  // centre head is its identity (it carries the fight's loot tables and the
+  // name every head wears), the other two are its further bodies.
+  {
+    mobId: 'mere_hydra_head_center',
+    otherBodyIds: ['mere_hydra_head_left', 'mere_hydra_head_right'],
+    mechanics: ['hydra_three_elements', 'hydra_tsunami', 'hydra_combined_breath', 'hydra_regrowth'],
+  },
   { mobId: 'tideglass_colossus', mechanics: ['tideglass_reflections'] },
   {
     mobId: 'ysolei',
@@ -601,6 +619,11 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     lockoutDungeonIds: ['ignivar_inner_crucible'],
   },
 ];
+
+/** Every placed body of an encounter: the boss itself, then its further ones. */
+export function finderEncounterBodyIds(encounter: FinderEncounter): readonly string[] {
+  return encounter.otherBodyIds ? [encounter.mobId, ...encounter.otherBodyIds] : [encounter.mobId];
+}
 
 const ACTIVITY_BY_ID = new Map<string, FinderActivity>(FINDER_ACTIVITIES.map((a) => [a.id, a]));
 

@@ -18937,6 +18937,88 @@ export const TARGETS = [
     },
   },
   {
+    key: 'dungeon-objectives-tracker',
+    label:
+      'Dungeon objectives tracker: the plate and boss rows at the top of the right tracker ' +
+      'stack inside the Hollow Crypt (on entry, with one boss down, and a finished heroic ' +
+      'run), plus the same run as a page of the quest strip on a landscape phone',
+    // The tracker pair (dungeon_tracker_view.ts + dungeon_tracker_painter.ts) and the sim
+    // read behind it. Three quests are tracked in every arm so the frame also shows the
+    // tracker sharing the stack with the quest tracker.
+    when: ['ui/hud/dungeon/dungeon_tracker', 'sim/instances/dungeon_run'],
+    variants: [
+      { key: 'entry', beforeLoad: lowGraphicsSeed },
+      { key: 'boss-down', beforeLoad: lowGraphicsSeed, kills: ['marrow'] },
+      { key: 'heroic-complete', beforeLoad: lowGraphicsSeed, heroic: true, complete: true },
+      // On touch the plate stands down and the run is a quest strip page.
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed, heroic: true, kills: ['marrow'] },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      const staged = await page.evaluate((heroic) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+        for (const id of ['q_wolves', 'q_af_goldmelt_road', 'q_dk_ash_on_the_wind'])
+          sim.questLog.set(id, { questId: id, counts: [0, 0, 0], state: 'active' });
+        sim.chat('/dev level 20');
+        sim.chat('/dev god');
+        sim.chat(heroic ? '/dev crypt enter heroic' : '/dev crypt enter');
+        return { ok: true };
+      }, variant?.heroic === true);
+      if (!staged.ok) throw new Error(staged.reason);
+      // The run is the sim's own read: wait for it rather than for a fixed delay.
+      await page.waitForFunction(() => window.__game.sim.dungeonRun?.dungeonId === 'hollow_crypt', {
+        timeout: 60000,
+        polling: 250,
+      });
+      await awaitWorldPainted(page);
+      const kills = variant?.complete ? ['marrow', 'rimeweb', 'ilvane'] : (variant?.kills ?? []);
+      for (const boss of kills) {
+        await page.evaluate((line) => window.__game.sim.chat(line), `/dev crypt kill ${boss}`);
+        await wait(400);
+      }
+      if (variant?.complete) {
+        // The last row belongs to Morthen AND the finale his dying rite summons:
+        // slay him the way a group must (risen), then the Knellwyrm it calls down.
+        await page.evaluate(() => window.__game.sim.chat('/dev crypt wyrm'));
+        await page.waitForFunction(
+          () => {
+            const sim = window.__game.sim;
+            for (const e of sim.entities.values()) {
+              if (e.templateId !== 'crypt_knellwyrm' || e.dead) continue;
+              sim.ctx.handleDeath(e, sim.player);
+              return true;
+            }
+            return false;
+          },
+          { timeout: 60000, polling: 250 },
+        );
+        await page.waitForFunction(
+          () => window.__game.sim.dungeonRun?.bosses.every((boss) => boss.defeated) === true,
+          { timeout: 30000, polling: 250 },
+        );
+      }
+      if (variant?.mobile) {
+        // The strip page is the touch presentation; the plate must be gone.
+        if (!(await pollForSize(page, '#quest-strip'))) throw new Error('quest strip not shown');
+      } else if (!(await pollForSize(page, '#dungeon-tracker .dgt-plate'))) {
+        throw new Error('dungeon tracker plate not shown');
+      }
+      // Past the kill highlight and the banner a boss death raises.
+      await wait(4500);
+      await page.evaluate(() => {
+        for (const id of ['tutorial-greeting', 'profession-tutorial'])
+          document.getElementById(id)?.remove();
+      });
+      // Full frame on every arm: the tracker's place in the whole HUD is the
+      // evidence, and a clipped capture resizes the page under the chat frame.
+      return {};
+    },
+  },
+  {
     key: 'practice-dps-tracker',
     label: 'Eastbrook hub training dummy with the practice DPS tracker (live run + a previous run)',
     when: ['ui/hud/practice', 'content/practice_dummies'],

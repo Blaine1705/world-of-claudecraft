@@ -787,6 +787,8 @@ export function buildSunkenBastionEntrance(seed: number): SunkenBastionEntranceV
   // the growth on it ghost together; the ruins round it on their own.
   const solids = { gate: [] as SetPieceSolid[], ruins: [] as SetPieceSolid[] };
   sunkenBastionEntranceColliders(seed, door).forEach((collider, i) => {
+    // the set piece's rows are circles and boxes; a prism has no occluder box
+    if (collider.type === 'prism') return;
     const { cameraTopY, ...shape } = collider;
     solids[bastionOccluderSet(SUNKEN_BASTION_ENTRANCE_COLLIDERS[i].name)].push({
       ...shape,

@@ -3124,6 +3124,7 @@ export const NPC_OWN_BODY_IDS: ReadonlySet<string> = new Set(['cantor_laverock']
  *  across zones under new templateIds). */
 function baseId(templateId: string): string {
   if (templateId === 'scout_maren_highwatch') return 'scout_maren';
+  if (templateId === 'scout_maren_wastes') return 'scout_maren';
   if (templateId === 'brother_halven_marsh') return 'brother_halven';
   // The Muster Standard's soldiers (combat/balgath_trinkets.ts) are the camp's own.
   if (templateId === 'guardian_muster_standard_spear') return 'muster_footman';

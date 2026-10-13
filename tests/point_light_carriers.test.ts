@@ -465,6 +465,14 @@ describe('a one-shot scene without carriers', () => {
 // sees constructors only: a glTF punctual light is built inside three's loader,
 // which tests/glb_punctual_lights.test.ts covers for every shipped GLB.
 const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
+  // Studio (map editor) producers, landed with the woc-studio merge. Each is
+  // routed into a carrier source list like the release producers below.
+  'editor/3d/viewport.ts':
+    'the editor map lights, handed to Renderer.setEditorMapLights, which swaps them into viewLights and marks them (swapBudgetedLights)',
+  'render/fluid_surfaces.ts':
+    'fluid pool lights, pushed into fireLights at boot and re-adopted through the fireLights adopter on an editor rebuild',
+  'render/placed_assets.ts':
+    'the placed fire-light pool, adoptDynamicBudgetLight into the PlacedLightRegistry (the renderer budgetLights)',
   'render/battleground.ts':
     'field lights, born hidden, handed to the fireLights registry through the battleground host',
   'render/battleground_props.ts':
@@ -644,6 +652,12 @@ describe('every point-light producer is a carrier source', () => {
       // and the reduced-motion switch into its own uniform, never a scene.
       'render/hollow_crypt_entrance.ts: mesh',
       'render/jail_scene.ts: swirl',
+      // Studio mesh clocks, never a scene: the placed fire FX (lathe flame,
+      // smoke puffs, sparks, the shared clock mesh) and the waterfall spray.
+      'render/placed_assets.ts: clockMesh',
+      'render/placed_assets.ts: lathe',
+      'render/placed_assets.ts: puffs',
+      'render/placed_assets.ts: sparks',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
@@ -652,6 +666,7 @@ describe('every point-light producer is a carrier source', () => {
       // The Drowned Gate Tower's marsh fog: a mesh hook writing the time of
       // day, the reduced-motion switch and the pulse light's base, never a scene.
       'render/sunken_bastion_entrance.ts: mesh',
+      'render/waterfall.ts: sp',
       // The Wildheart Basin's gates: mesh hooks reading the gate memory (the
       // vine bridges weaving, the thorn walls sinking, the wards failing),
       // never a scene.
@@ -686,6 +701,8 @@ describe('every point-light producer is a carrier source', () => {
       'render/characters/woc_armor_merge.ts',
       'render/characters/woc_head_merge.ts',
       'render/gather_nodes.ts',
+      // Copies a source MESH's mask onto the fused mesh that replaces it.
+      'render/mesh_merge.ts',
       'render/point_light_carriers_core.ts',
     ]);
   });

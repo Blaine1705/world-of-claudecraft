@@ -23,13 +23,13 @@ import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type LootEntry, type SimEvent } from '../src/sim/types';
+import { terrainWallStandoff } from '../src/sim/wall_standoff';
 import {
   DECORATION_MAX_SLOPE,
   generateDecorationsInBounds,
   groundHeight,
   terrainSteepness,
   terrainSteepnessAt,
-  terrainWallStandoff,
   WATER_LEVEL,
 } from '../src/sim/world';
 
@@ -553,7 +553,11 @@ describe('rare spawn rules', () => {
 
   it('control auras do not stick to control-immune rares', () => {
     const sim = makeSim();
-    const rare = createMob(990002, MOBS.mirejaw_the_ravenous, 10, { x: 0, y: 0, z: 0 });
+    const rare = createMob(990002, MOBS.mirejaw_the_ravenous, 10, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
 
     asHarness(sim).applyAura(rare, {
       id: 'test_root',
@@ -581,8 +585,16 @@ describe('rare spawn rules', () => {
   });
 
   it('rare respawn timers use their configured multiplier', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior', respawnSeconds: 2 });
-    const rare = createMob(990003, MOBS.mirejaw_the_ravenous, 10, { x: 0, y: 0, z: 0 });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      respawnSeconds: 2,
+    });
+    const rare = createMob(990003, MOBS.mirejaw_the_ravenous, 10, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     asHarness(sim).handleDeath(rare, null);
     expect(rare.respawnTimer).toBe(1296);
   });
@@ -591,14 +603,22 @@ describe('rare spawn rules', () => {
     const ids = ['old_cragmaw'] as const;
     for (const id of ids) {
       const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
-      const mob = createMob(990004, MOBS[id], MOBS[id].maxLevel, { x: 0, y: 0, z: 0 });
+      const mob = createMob(990004, MOBS[id], MOBS[id].maxLevel, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
       asHarness(sim).handleDeath(mob, null);
       expect(mob.respawnTimer, id).toBe(180);
     }
   });
 
   it('Mogger respawns on a quest-boss timer instead of a long rare-spawn timer', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior', respawnSeconds: 2 });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      respawnSeconds: 2,
+    });
     const mogger = expectDefined(
       [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === 'mogger'),
     );
@@ -631,8 +651,16 @@ describe('rare spawn rules', () => {
       }
     }
 
-    expect(MOBS.mogger.summonAdds).toEqual({ mobId: 'mogger_lackey', count: 2, atHpPct: [0.7] });
-    expect(MOBS.mogger.enrage).toEqual({ belowHpPct: 0.3, dmgMult: 1.6, hasteMult: 1.3 });
+    expect(MOBS.mogger.summonAdds).toEqual({
+      mobId: 'mogger_lackey',
+      count: 2,
+      atHpPct: [0.7],
+    });
+    expect(MOBS.mogger.enrage).toEqual({
+      belowHpPct: 0.3,
+      dmgMult: 1.6,
+      hasteMult: 1.3,
+    });
   });
 });
 
@@ -964,7 +992,10 @@ describe('boss loot and encounter resets', () => {
     mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
-    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    mob.loot = {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    };
     sim.entities.set(mob.id, mob);
 
     sim.events.length = 0;
@@ -990,7 +1021,10 @@ describe('boss loot and encounter resets', () => {
     mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
-    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    mob.loot = {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    };
     sim.entities.set(mob.id, mob);
 
     sim.events.length = 0;
@@ -1017,7 +1051,10 @@ describe('boss loot and encounter resets', () => {
     mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
-    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    mob.loot = {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    };
     sim.entities.set(mob.id, mob);
 
     const rng = sim.rng;
@@ -1053,7 +1090,10 @@ describe('boss loot and encounter resets', () => {
     mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
-    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    mob.loot = {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    };
     sim.entities.set(mob.id, mob);
 
     sim.events.length = 0;
@@ -1080,7 +1120,10 @@ describe('boss loot and encounter resets', () => {
     mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
-    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    mob.loot = {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    };
     sim.entities.set(mob.id, mob);
 
     sim.events.length = 0;
@@ -1110,7 +1153,10 @@ describe('boss loot and encounter resets', () => {
     mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
-    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    mob.loot = {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    };
     sim.entities.set(mob.id, mob);
 
     sim.events.length = 0;
@@ -1148,7 +1194,10 @@ describe('boss loot and encounter resets', () => {
     mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
-    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    mob.loot = {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    };
     sim.entities.set(mob.id, mob);
 
     sim.events.length = 0;
@@ -1181,7 +1230,10 @@ describe('boss loot and encounter resets', () => {
     mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
-    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    mob.loot = {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    };
     sim.entities.set(mob.id, mob);
 
     sim.events.length = 0;
@@ -1205,7 +1257,11 @@ describe('boss loot and encounter resets', () => {
     sim.partyInvite(b, a);
     sim.partyAccept(b);
     for (const pid of [a, b]) {
-      sim.meta(pid)?.questLog.set('q_boars', { questId: 'q_boars', counts: [0], state: 'active' });
+      sim.meta(pid)?.questLog.set('q_boars', {
+        questId: 'q_boars',
+        counts: [0],
+        state: 'active',
+      });
     }
     const mob = createMob(990101, MOBS.wild_boar, 3, { x: 20, y: 0, z: 22 });
     const boarHide = expectDefined(
@@ -1228,7 +1284,11 @@ describe('boss loot and encounter resets', () => {
 
     expect(sim.countItem('boar_hide', a)).toBe(0);
     expect(sim.countItem('boar_hide', b)).toBe(0);
-    expect(mob.loot?.items).toContainEqual({ itemId: 'boar_hide', count: 1, personalFor: [a, b] });
+    expect(mob.loot?.items).toContainEqual({
+      itemId: 'boar_hide',
+      count: 1,
+      personalFor: [a, b],
+    });
 
     mob.dead = true;
     mob.corpseTimer = FRESH_CORPSE_TIMER;
@@ -1242,7 +1302,11 @@ describe('boss loot and encounter resets', () => {
     expect(sim.countItem('boar_hide', a)).toBe(1);
     expect(sim.countItem('boar_hide', b)).toBe(0);
     expect(mob.lootable).toBe(true);
-    expect(mob.loot?.items).toContainEqual({ itemId: 'boar_hide', count: 1, personalFor: [b] });
+    expect(mob.loot?.items).toContainEqual({
+      itemId: 'boar_hide',
+      count: 1,
+      personalFor: [b],
+    });
 
     sim.partyLeave(b);
     sim.lootCorpse(mob.id, b);
@@ -1286,11 +1350,19 @@ describe('boss loot and encounter resets', () => {
     const sim = makeLootSim();
     const a = sim.playerId;
     // q_boars only collects boar_hide; it has no collect objective for greyjaw_fang.
-    sim.meta(a)?.questLog.set('q_boars', { questId: 'q_boars', counts: [0], state: 'active' });
+    sim.meta(a)?.questLog.set('q_boars', {
+      questId: 'q_boars',
+      counts: [0],
+      state: 'active',
+    });
     const mob = createMob(990102, MOBS.wild_boar, 3, { x: 20, y: 0, z: 22 });
     // Inject a (mis)configured drop gated on q_boars but for an item the quest
     // does not collect. It must never drop, even at chance 1.
-    const bogus: LootEntry = { itemId: 'greyjaw_fang', chance: 1, questId: 'q_boars' };
+    const bogus: LootEntry = {
+      itemId: 'greyjaw_fang',
+      chance: 1,
+      questId: 'q_boars',
+    };
     MOBS.wild_boar.loot.push(bogus);
     try {
       asHarness(sim).rollLoot(mob, expectDefined(sim.meta(a)), [expectDefined(sim.meta(a))]);
@@ -1348,7 +1420,11 @@ describe('boss loot and encounter resets', () => {
       ): void;
       updateBossMechanics(mob: Entity): void;
     };
-    const varkas = createMob(990103, MOBS.marrowlord_varkas, 19, { x: 0, y: 0, z: 0 });
+    const varkas = createMob(990103, MOBS.marrowlord_varkas, 19, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
     internals.addEntity(varkas);
     teleportTo(sim, 2, 0);
     sim.player.maxHp = 100000;

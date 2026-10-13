@@ -12,6 +12,7 @@
 // leaf: deterministic, no rng.
 import { beaconSpiralLift } from './beacon_spiral';
 import { forgefatherStairSurface } from './content/ember_coast';
+import { overworldTerrainPadsActive } from './data';
 import { dawnholdLift } from './dawnhold_layout';
 import { drownedTempleStairSurface } from './drowned_temple_stair';
 
@@ -19,6 +20,9 @@ import { drownedTempleStairSurface } from './drowned_temple_stair';
 // the launch now uses the existing mountain and a plank wharf on the
 // deck_surfaces.ts arm, like the harbor piers.)
 export function overworldWalkSurface(x: number, z: number, terrain: number, seed: number): number {
+  // The lifts stand at shipped-world coordinates: on an authored map they would
+  // be invisible walls and stairs over the maker's own ground.
+  if (!overworldTerrainPadsActive()) return terrain;
   const lifted = terrain + beaconSpiralLift(x, z) + dawnholdLift(x, z);
   return Math.max(lifted, forgefatherStairSurface(x, z), drownedTempleStairSurface(x, z, seed));
 }

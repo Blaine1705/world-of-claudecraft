@@ -24,7 +24,10 @@ import {
 } from '../src/sim/dev/wildheart_basin_dev';
 import { WILDHEART_DEV_TRIGGERS, wildheartDevTrigger } from '../src/sim/encounters/wildheart_basin';
 import { authoredFieldFor } from '../src/sim/instances/authored_field';
-import { dungeonGateStateOf } from '../src/sim/instances/dungeon_gates';
+import {
+  BOSS_ROOM_SEAL_DELAY_SECONDS,
+  dungeonGateStateOf,
+} from '../src/sim/instances/dungeon_gates';
 import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
@@ -74,6 +77,16 @@ function gateState(
 
 function tick(sim: Sim, seconds: number): void {
   for (let t = 0; t < seconds - DT * 0.5; t += DT) sim.tick();
+}
+
+/** Tick with the player kept on their feet: a seal lands only on a boss still
+ *  fighting, and a lone level 20 does not outlast a boss for its delay. */
+function fightFor(sim: Sim, me: Entity, seconds: number): void {
+  for (let t = 0; t < seconds - DT * 0.5; t += DT) {
+    me.maxHp = 1e7;
+    me.hp = 1e7;
+    sim.tick();
+  }
 }
 
 describe('the reworked Wildheart Basin record', () => {
@@ -177,7 +190,7 @@ describe('the gates and seals in a live claim', () => {
     expect(gateState(sim, inst, 'shrine_ward')).toBe('open');
   });
 
-  it('the Beast Pits thorns seal behind the group while the Beastmaster is engaged', () => {
+  it('the Beast Pits thorns seal behind the group ten seconds into the Beastmaster fight', () => {
     const { sim, me, inst } = enter();
     for (const p of ['g1', 'g2', 'g3', 'pa', 'g4', 'g5', 'pb']) dev(sim, me, `kill ${p}`);
     tick(sim, 0.2);
@@ -186,13 +199,17 @@ describe('the gates and seals in a live claim', () => {
     me.hp = 1e7;
     dev(sim, me, 'tp beastmaster');
     sim.ctx.aggroMob(rosterOf(sim, inst, 'wildheart_beastmaster'), me, false);
-    tick(sim, 0.5);
-    expect(gateState(sim, inst, 'beast_pits_thorns')).toBe('sealed');
+    fightFor(sim, me, 0.5);
+    // The pull starts the seal's clock (instances/dungeon_gates.ts): the
+    // thorns stay down for the rest of the group until it runs out.
+    expect(gateState(sim, inst, 'beast_pits_thorns')).toBe('open');
     // Pulling the master pulls his jaguar (one pack).
     expect(rosterOf(sim, inst, 'fanglord_jaguar').aiState).not.toBe('idle');
+    fightFor(sim, me, BOSS_ROOM_SEAL_DELAY_SECONDS);
+    expect(gateState(sim, inst, 'beast_pits_thorns')).toBe('sealed');
   });
 
-  it('the Shrine Ward seals while Zulgar is engaged', () => {
+  it('the Shrine Ward seals ten seconds into the Zulgar fight', () => {
     const { sim, me, inst } = enter();
     me.maxHp = 1e7;
     me.hp = 1e7;
@@ -203,7 +220,9 @@ describe('the gates and seals in a live claim', () => {
     expect(gateState(sim, inst, 'shrine_ward')).toBe('open');
     dev(sim, me, 'tp zulgar');
     sim.ctx.aggroMob(rosterOf(sim, inst, 'wildheart_high_priest'), me, false);
-    tick(sim, 0.5);
+    fightFor(sim, me, 0.5);
+    expect(gateState(sim, inst, 'shrine_ward')).toBe('open');
+    fightFor(sim, me, BOSS_ROOM_SEAL_DELAY_SECONDS);
     expect(gateState(sim, inst, 'shrine_ward')).toBe('sealed');
   });
 });

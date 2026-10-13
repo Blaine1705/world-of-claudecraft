@@ -52,7 +52,15 @@ export class SanctumGateClock {
 
   constructor(private readonly seconds: { open: number; close: number }) {}
 
-  step(openness: number, since: number, open: boolean): number {
+  step(openness: number, since: number, open: boolean, changed = true): number {
+    if (!changed) {
+      // A distant structure can draw before the gate entity is observed.
+      // First observing an already-open gate must still snap, even after
+      // those unknown/closed frames, or its walkable deck stays invisible.
+      this.from = this.k = this.target = open ? 1 : 0;
+      this.wasOpen = open;
+      return this.k;
+    }
     if (this.from === null) {
       this.from = openness > 0 && openness < 1 ? (open ? 0 : 1) : open ? 1 : 0;
       this.wasOpen = open;

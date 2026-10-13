@@ -8,6 +8,13 @@ import {
   WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
 } from '../sim/wildheart_basin_entrance';
 
+/** The foliage placement hash: a deterministic [0, 1) value per (a, b, salt k).
+ *  Shared by foliage.ts and the dressing-spot generator (foliage_dressing_spots.ts). */
+export function hashAt(a: number, b: number, k: number): number {
+  const s = Math.sin(a * 127.1 + b * 311.7 + k * 74.7) * 43758.5453123;
+  return s - Math.floor(s);
+}
+
 export type EastbrookGrassExclusion =
   | {
       kind: 'obb';
