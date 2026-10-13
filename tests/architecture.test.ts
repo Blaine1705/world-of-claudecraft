@@ -1238,6 +1238,9 @@ const RENDER_PURE_CORES = [
   'src/render/point_light_shader_core.ts',
   'src/render/point_light_carriers_core.ts',
   'src/render/final_color_nan_guard_core.ts',
+  // The opt-in cel-shading R&D look (`?cel=on`): URL parse + the toon ramp
+  // patch over three's directional light loop.
+  'src/render/cel_shading_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',

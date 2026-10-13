@@ -777,6 +777,25 @@ GPU work signs. Each rule names its seam and its guard.
   `src/dev/outfit_audit.ts`): a call sited inside `initGfxTier` alone reaches only the
   world renderer, and a per-site call is easy to miss on one of the others. Guard:
   `tests/final_color_nan_guard.test.ts`.
+- **Cel-shading R&D look (`?cel=on`, opt-in, reload to flip).** `cel_shading_core.ts`
+  reads the URL knobs (`cellight=off`, `celbands=2|3`, `celedge`, `cellit`, `celmid`,
+  `celink`, `celinkwidth`, `celsat`) and builds the toon ramp, a patch over the
+  DIRECTIONAL loop of `lights_fragment_begin` only (point lights and the hemisphere
+  fill stay smooth); `cel_shading.ts` installs it at module scope (the template above).
+  Exactly one outline path draws per chain. With an output grade (Medium and up), the
+  depth-based ink is the grade's `CEL_INK` arm (`post_cel_ink_glsl.ts`, wired like the
+  FXAA arm: no pass, no target, taps clamped to the region); it reads N8AO's beauty
+  depth, or on any RenderPass chain (including AO-off High and up) the current
+  composer read buffer's own depth texture. The look
+  turns the grade on for Low (`celNeedsGradePass`, applied in `settingsFor` before the
+  `?gfxo=` overrides), so Low draws the same ink as Medium. iOS keeps its memory-driven
+  no-grade profile; there `syncCelMaterialInk` (driven from `activateGfxProfile`)
+  inserts a material ink block into `opaque_fragment` instead: a rim on the geometric
+  normal gated on curvature per yard and on distance, plus the saturation. It reads
+  weakly on hard-edged low-poly models, which is why Low takes the grade instead. No flag means the stock chunks byte
+  for byte and no ink define. Guards: `tests/cel_shading_core.test.ts`,
+  `tests/post_output_grade.test.ts` and the real-WebGL
+  `tests/browser/cel_shading.browser.test.ts`.
 - **No new queue, no new lane, no fourth gate.** New work rides
   `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
   `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),

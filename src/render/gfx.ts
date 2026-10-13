@@ -16,6 +16,11 @@ import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 // the guard, transitively: they reach it via gfx.ts, never call it directly.
 import './final_color_nan_guard';
 import { CANOPY_TAPS_AO_ONLY, CANOPY_TAPS_FULL, CANOPY_TAPS_OFF } from './canopy_detail_tier_core';
+// The opt-in cel-shading look (`?cel=on`): importing installs its light ramp
+// at module scope, for the same reason as the NaN guard above; the material
+// ink follows the active profile (activateGfxProfile below).
+import { celShadingSettings, syncCelMaterialInk } from './cel_shading';
+import { celNeedsGradePass } from './cel_shading_core';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import { GRASS_CARDS_FULL, GRASS_CARDS_LEAN, GRASS_CARDS_MID } from './grass_tuft_cards_core';
@@ -1600,6 +1605,12 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       };
     }
   }
+  // Cel-shading R&D look (`?cel=on`): its ink rides the output grade, so Low
+  // takes the grade-only chain instead of the direct path (celNeedsGradePass).
+  // Explicit `?gfxo=` overrides still win: they apply after this.
+  if (celNeedsGradePass(celShadingSettings(), settings.gradePass, hints?.platform)) {
+    settings = { ...settings, gradePass: true };
+  }
   return applyGfxOverridesFromSearch(settings, hints?.search ?? '');
 }
 
@@ -2171,6 +2182,9 @@ export function activateGfxProfile(profile: GfxProfile): GfxProfile {
   softwareGlDetected = activated.softwareRendering;
   activeGfxProfile = activated;
   gfxProfileEpoch = epoch;
+  // Cel look only: a chain with no output grade has nowhere to draw the post
+  // ink, so its materials carry the outline instead (no-op without ?cel=on).
+  syncCelMaterialInk(!settings.gradePass);
   return activated;
 }
 
