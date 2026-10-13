@@ -14,6 +14,7 @@ import {
   KEYBOARD_LAYOUTS,
   type KeyboardLayoutId,
   layoutCodeMap,
+  startingSourceLayout,
 } from '../src/ui/keyboard_layout_convert_core';
 
 const MOVEMENT = new Set(BIND_ACTIONS.filter((a) => a.kind === 'held').map((a) => a.id));
@@ -146,7 +147,7 @@ describe('keyboard_layout_convert_core: converting a setup', () => {
     expect(binds.turnLeft[0]).toBe('KeyA');
     expect(binds.strafeLeft[0]).toBe('KeyQ');
     expect(binds.forward[1]).toBe('ArrowUp');
-    // Mnemonic keys follow their letter; the number row never moves.
+    // Letter-named keys follow their letter; the number row never moves.
     expect(binds.map[0]).toBe('Semicolon');
     expect(binds.bags[0]).toBe('KeyB');
     expect(binds.slot0[0]).toBe('Digit1');
@@ -205,6 +206,18 @@ describe('keyboard_layout_convert_core: converting a setup', () => {
         expect(count(kb.snapshot())).toBe(count(start));
       }
     }
+  });
+
+  it('starts the next conversion from the last target, unless the setup is back at defaults', () => {
+    const base = defaults();
+    expect(startingSourceLayout(null, base, base)).toBe('qwerty-us');
+    // A Reset puts the defaults back: they are authored for QWERTY (US).
+    expect(startingSourceLayout('azerty-fr', base, base)).toBe('qwerty-us');
+    const converted = convertBindingsLayout(base, 'qwerty-us', 'azerty-fr', MOVEMENT).binds;
+    expect(startingSourceLayout('azerty-fr', converted, base)).toBe('azerty-fr');
+    // A single changed slot is enough to count as not-defaults.
+    const rebound = { ...base, bags: ['KeyI', null] };
+    expect(startingSourceLayout('dvorak', rebound, base)).toBe('dvorak');
   });
 
   it('reports nothing to move for the same layout', () => {

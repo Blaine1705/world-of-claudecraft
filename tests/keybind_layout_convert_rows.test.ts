@@ -27,7 +27,7 @@ function rig(detected: KeyboardLayoutId | null) {
   const applied: { binds: KeybindSetup; note: string }[] = [];
   let resolveDetect: (id: KeyboardLayoutId | null) => void = () => {};
   const deps: KeybindLayoutConvertDeps = {
-    keybinds: () => ({ snapshot: () => structuredClone(SETUP) }),
+    keybinds: () => ({ snapshot: () => structuredClone(SETUP), profileKey: () => 'p1' }),
     buildDropdown: (_options, current, onChange) => {
       const el = document.createElement('div');
       el.dataset.value = current;
@@ -69,6 +69,7 @@ function rig(detected: KeyboardLayoutId | null) {
 describe('buildKeybindLayoutConvertRow', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
+    localStorage.clear();
   });
   afterEach(() => {
     setInterfaceMode('auto');
@@ -120,6 +121,62 @@ describe('buildKeybindLayoutConvertRow', () => {
     // QWERTZ moves no bound letter here (M and B print the same), so no apply.
     expect(r.applied).toHaveLength(0);
     expect(r.apply.disabled).toBe(true);
+  });
+
+  it('names the movement switch by its row, not just On / Off', () => {
+    const r = rig(null);
+    expect(r.keep.getAttribute('aria-label')).toBe('Keep movement keys in place');
+    r.keep.click();
+    expect(r.keep.getAttribute('aria-label')).toBe('Keep movement keys in place');
+  });
+
+  it('never re-converts: the next open starts from the layout just converted to', async () => {
+    // A painter-shaped host: apply swaps the live map and rebuilds the row,
+    // exactly as OptionsWindow.applyKeybindSetup re-renders the panel.
+    document.body.innerHTML = '<div id="body"></div>';
+    const host = document.getElementById('body') as HTMLElement;
+    let live = structuredClone(SETUP);
+    let froms: HTMLElement[] = [];
+    const deps: KeybindLayoutConvertDeps = {
+      keybinds: () => ({ snapshot: () => structuredClone(live), profileKey: () => 'p1' }),
+      buildDropdown: (_o, current) => {
+        const el = document.createElement('div');
+        el.dataset.value = current;
+        froms.push(el);
+        return el;
+      },
+      setDropdownValue: (root, value) => {
+        root.dataset.value = value;
+      },
+      detectLayout: async () => 'azerty-fr',
+    };
+    const build = () => {
+      host.replaceChildren();
+      froms = [];
+      buildKeybindLayoutConvertRow(host, deps, (binds) => {
+        live = binds;
+        build();
+      });
+    };
+    build();
+    const opener = () => host.querySelector<HTMLButtonElement>('.kb-layout .set-toggle')!;
+    const applyBtn = () => host.querySelector<HTMLButtonElement>('.ui-btn--gold')!;
+    opener().click();
+    await Promise.resolve();
+    await Promise.resolve();
+    applyBtn().click();
+    expect(live.map).toEqual(['Semicolon', null]);
+    // The rebuild handed focus to the new opener instead of dropping it.
+    expect(document.activeElement).toBe(opener());
+    // Reopened: "made for" now starts on AZERTY, and so does the target, so
+    // nothing moves a second time.
+    expect(froms[0].dataset.value).toBe('azerty-fr');
+    opener().click();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(applyBtn().disabled).toBe(true);
+    // The reset-to-defaults fallback is pinned on startingSourceLayout in
+    // tests/keyboard_layout_convert_core.test.ts.
   });
 
   it('builds nothing on the touch interface, which has no keyboard to convert', () => {

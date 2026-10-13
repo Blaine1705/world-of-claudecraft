@@ -4,10 +4,13 @@
 // unreadable.
 import { describe, expect, it } from 'vitest';
 import {
+  KEYBIND_SOURCE_LAYOUT_STORE_KEY,
   KEYBOARD_LAYOUT_STORE_KEY,
   KEYBOARD_LEGENDS_STORE_KEY,
+  loadKeybindSourceLayout,
   loadKeyboardFormFactor,
   loadKeyboardLegendSource,
+  saveKeybindSourceLayout,
   saveKeyboardFormFactor,
   saveKeyboardLegendSource,
 } from '../src/ui/keyboard_layout_pref_core';
@@ -65,5 +68,36 @@ describe('keyboard_layout_pref_core', () => {
     expect(loadKeyboardLegendSource(store)).toBe('layout');
     expect(loadKeyboardLegendSource(null)).toBe('layout');
     expect(KEYBOARD_LEGENDS_STORE_KEY).toBe('woc_keyboard_legends');
+  });
+
+  it('remembers the layout converter target per keybind profile', () => {
+    const store = memory();
+    expect(loadKeybindSourceLayout('woc_keybinds:char:1', store)).toBeNull();
+    saveKeybindSourceLayout('woc_keybinds:char:1', 'azerty-fr', store);
+    saveKeybindSourceLayout('woc_keybinds:char:2', 'dvorak', store);
+    expect(loadKeybindSourceLayout('woc_keybinds:char:1', store)).toBe('azerty-fr');
+    expect(loadKeybindSourceLayout('woc_keybinds:char:2', store)).toBe('dvorak');
+    saveKeybindSourceLayout('woc_keybinds:char:1', 'colemak', store);
+    expect(loadKeybindSourceLayout('woc_keybinds:char:1', store)).toBe('colemak');
+    expect(JSON.parse(store.map.get(KEYBIND_SOURCE_LAYOUT_STORE_KEY) ?? '{}')).toEqual({
+      'woc_keybinds:char:1': 'colemak',
+      'woc_keybinds:char:2': 'dvorak',
+    });
+    expect(KEYBIND_SOURCE_LAYOUT_STORE_KEY).toBe('woc_keybind_source_layout');
+  });
+
+  it('reads no converter target from junk, an unknown layout, or no storage', () => {
+    const store = memory();
+    store.map.set(KEYBIND_SOURCE_LAYOUT_STORE_KEY, '{not json');
+    expect(loadKeybindSourceLayout('p', store)).toBeNull();
+    store.map.set(KEYBIND_SOURCE_LAYOUT_STORE_KEY, '{"p":"klingon"}');
+    expect(loadKeybindSourceLayout('p', store)).toBeNull();
+    store.map.set(KEYBIND_SOURCE_LAYOUT_STORE_KEY, '["p"]');
+    expect(loadKeybindSourceLayout('p', store)).toBeNull();
+    // A corrupt map is replaced, not merged into.
+    saveKeybindSourceLayout('p', 'qwerty-uk', store);
+    expect(loadKeybindSourceLayout('p', store)).toBe('qwerty-uk');
+    expect(loadKeybindSourceLayout('p', null)).toBeNull();
+    expect(() => saveKeybindSourceLayout('p', 'qwerty-uk', null)).not.toThrow();
   });
 });

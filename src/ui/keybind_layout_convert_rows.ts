@@ -13,18 +13,20 @@ import { formatNumber, t } from './i18n';
 import type { KeybindSetup } from './keybind_transfer_core';
 import {
   convertBindingsLayout,
-  DEFAULT_SOURCE_LAYOUT,
   isKeyboardLayoutId,
   KEYBOARD_LAYOUTS,
   type KeyboardLayoutId,
+  startingSourceLayout,
 } from './keyboard_layout_convert_core';
+import { loadKeybindSourceLayout, saveKeybindSourceLayout } from './keyboard_layout_pref_core';
 import { detectOsKeyboardLayout } from './keyboard_map';
 
 /** The seam the options painter hands in; OptionsWindowDeps satisfies it
  *  structurally. */
 export interface KeybindLayoutConvertDeps {
-  /** The live Keybinds store (only its snapshot is read). */
-  keybinds(): { snapshot(): KeybindSetup };
+  /** The live Keybinds store: its snapshot, and the profile key the last
+   *  conversion target is remembered under. */
+  keybinds(): { snapshot(): KeybindSetup; profileKey(): string };
   /** The shared themed dropdown. */
   buildDropdown(
     options: { value: string; label: string }[],
@@ -44,6 +46,16 @@ export interface KeybindLayoutConvertDeps {
 export const MOVEMENT_ACTION_IDS: ReadonlySet<string> = new Set(
   BIND_ACTIONS.filter((a) => a.kind === 'held').map((a) => a.id),
 );
+
+/** The registry's default setup, the shape Keybinds.snapshot() has after a Reset. */
+function defaultSetup(): KeybindSetup {
+  const out: KeybindSetup = {};
+  for (const a of BIND_ACTIONS) out[a.id] = [a.defaults[0] ?? null, a.defaults[1] ?? null];
+  return out;
+}
+
+/** Set across one apply: the rebuild it triggers focuses the new Convert opener. */
+let refocusOpener = false;
 
 const layoutLabel = (id: KeyboardLayoutId): string =>
   t(KEYBOARD_LAYOUTS.find((l) => l.id === id)?.labelKey ?? KEYBOARD_LAYOUTS[0].labelKey);
@@ -80,9 +92,22 @@ export function buildKeybindLayoutConvertRow(
   wrap.append(row, pane);
   body.appendChild(wrap);
 
+  // Converting rebuilds the whole panel (the painter's renderKeybinds), so the
+  // focused Convert Hotkeys button is gone; hand focus to the rebuilt opener.
+  if (refocusOpener) {
+    refocusOpener = false;
+    openBtn.focus();
+  }
+
+  const profile = deps.keybinds().profileKey();
+  const from = startingSourceLayout(
+    loadKeybindSourceLayout(profile),
+    deps.keybinds().snapshot(),
+    defaultSetup(),
+  );
   const state = {
-    from: DEFAULT_SOURCE_LAYOUT as KeyboardLayoutId,
-    to: DEFAULT_SOURCE_LAYOUT as KeyboardLayoutId,
+    from,
+    to: from,
     toChosen: false,
     keepMovement: true,
   };
@@ -159,6 +184,7 @@ export function buildKeybindLayoutConvertRow(
     keepToggle.classList.toggle('off', !state.keepMovement);
     keepToggle.classList.toggle('is-off', !state.keepMovement);
     keepToggle.setAttribute('aria-pressed', String(state.keepMovement));
+    keepToggle.setAttribute('aria-label', t('hudChrome.keybindLayout.keepMovement'));
   };
   syncKeep();
   keepToggle.addEventListener('click', () => {
@@ -177,6 +203,8 @@ export function buildKeybindLayoutConvertRow(
     const { binds, moved } = convert();
     if (moved === 0) return;
     audio.click();
+    saveKeybindSourceLayout(profile, state.to);
+    refocusOpener = true;
     apply(
       binds,
       t('hudChrome.keybindLayout.converted', {
@@ -184,6 +212,8 @@ export function buildKeybindLayoutConvertRow(
         to: layoutLabel(state.to),
       }),
     );
+    // A painter that does not rebuild leaves the flag for nobody; clear it.
+    refocusOpener = false;
   });
 
   openBtn.addEventListener('click', () => {

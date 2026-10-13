@@ -879,6 +879,12 @@ export class Keybinds {
     return obj;
   }
 
+  /** The localStorage key this profile persists under, so a per-profile
+   *  companion preference (the layout-converter's last target) can key by it. */
+  profileKey(): string {
+    return this.storeKey;
+  }
+
   /**
    * Replace this profile with an imported hotkey setup: defaults first, then the
    * blob applied with load()'s validation (unknown actions ignored, reserved
