@@ -139,6 +139,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
   'this.questTracker.relocalize|',
+  'this.referralCards.relocalize|',
   'this.delveTracker.relocalize|',
   'this.riftTracker.relocalize|',
   // The gathering goal tracker (Intentional Gathering PR4): its repaint
@@ -254,6 +255,9 @@ const FANOUT_ARMS: readonly string[] = [
   // Intl-formatted and the placeholder hint is prose, so a locale switch alone
   // moves both without any state changing.
   'this.realmBuilderPopup.relocalize|',
+  // a Tidehold housing-plot deed card (authored maps): its chrome is t() copy
+  // and the price is formatMoney, so an open card repaints on a locale switch.
+  'this.plotSignPopup.relocalize|',
   'this.guildBoardWindow.relocalize|',
   'this.riftForgeWindow.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
@@ -1763,8 +1767,10 @@ function builderOwnedClasses(armCall: string): Set<string> {
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
   const hud = strippedHudSource;
   const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
-  if (!assigned) return owned;
-  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  // Both composition forms retain a real source-owned builder: direct factory
+  // assignment and a member returned from a previously built component family.
+  const direct = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  const built = assigned ? new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud) : direct;
   if (!built) return owned;
   for (const { source } of uiSources) {
     if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;

@@ -855,18 +855,23 @@ describe('resolveWorldDirectPick', () => {
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
     const attackMove = main.indexOf('function handleAttackMove(x: number, y: number): void {');
     expect(attackMove).toBeGreaterThanOrEqual(0);
-    const pick = main.indexOf('renderer.pick(x, y, true)', attackMove);
+    const pick = main.indexOf('renderer.picking.pick(x, y, true)', attackMove);
     expect(pick).toBeGreaterThan(attackMove);
     expect(pick - attackMove).toBeLessThan(200);
-    expect(main.split('renderer.pick(x, y, true)').length).toBe(2);
+    expect(main.split('renderer.picking.pick(x, y, true)').length).toBe(2);
     // The click, the hover cursor and the gather tooltip's entity probe ask without it.
-    expect(main).toContain('let id = renderer.pickDirect(x, y);');
-    expect(main).toContain('hoverPickedId = renderer.pick(input.hoverX, input.hoverY);');
-    expect(main).toContain('(x, y) => renderer.pick(x, y),');
+    expect(main).toContain('let id = renderer.picking.pickDirect(x, y);');
+    expect(main).toContain('hoverPickedId = renderer.picking.pick(input.hoverX, input.hoverY);');
+    expect(main).toContain('(x, y) => renderer.picking.pick(x, y),');
   });
 
-  it('the renderer carries the intent, the ray and no hit on the local player', () => {
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+  it('the picking module carries the intent, the ray and no hit on the local player', () => {
+    // renderer.picking (src/render/world_picking.ts) owns the raycast since the
+    // picking code moved out of renderer.ts.
+    const renderer = readFileSync(
+      new URL('../src/render/world_picking.ts', import.meta.url),
+      'utf8',
+    );
     // pick() forwards the caller's intent to its direct half: without this
     // Attack Move would be promoted onto the candle with every other test green.
     const pick = renderer.indexOf(
@@ -881,18 +886,18 @@ describe('resolveWorldDirectPick', () => {
     expect(forward - pick).toBeLessThan(120);
     const pickDirect = renderer.indexOf('pickDirect(clientX: number, clientY: number,');
     const cast = renderer.indexOf(
-      'this.raycaster.intersectObjects(this.clickTargets, true, this.raycastHits);',
+      'this.raycaster.intersectObjects(this.host.clickTargets(), true, this.raycastHits);',
       pickDirect,
     );
     // The local player's own capsule is raycast like any other and dropped
     // here, so the "nearest live hit is a player" exception only ever sees
     // OTHER players: standing between the camera and the candle, your own body
     // does not take the candle's click.
-    const dropSelf = renderer.indexOf('o.userData.entityId !== this.sim.playerId', cast);
+    const dropSelf = renderer.indexOf('o.userData.entityId !== sim.playerId', cast);
     const push = renderer.indexOf('directHitIds.push(id);', dropSelf);
     // The very ray that produced the hits goes to the resolver with them.
     const resolve = renderer.indexOf(
-      'resolveWorldDirectPick(directHitIds, this.sim, this.raycaster.ray, attackIntent)',
+      'resolveWorldDirectPick(directHitIds, sim, this.raycaster.ray, attackIntent)',
       push,
     );
     expect(pickDirect).toBeGreaterThanOrEqual(0);

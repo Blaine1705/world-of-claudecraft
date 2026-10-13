@@ -37,6 +37,7 @@ import {
   claudiumStore,
   claudiumStripeWebhook,
   claudiumUsdcBalance,
+  membershipStripeWebhook,
 } from './claudium_proxy';
 import {
   accountAndScopeForToken,
@@ -231,13 +232,29 @@ function isKnownSkinSkuId(itemId: string): boolean {
   return isKnownWeaponSkinId(itemId) || isMountSkinId(itemId);
 }
 
-export async function handleClaudiumStripeWebhook(
+export function handleClaudiumStripeWebhook(
   req: http.IncomingMessage,
   res: http.ServerResponse,
 ): Promise<void> {
+  return relayStripeWebhook(req, res, claudiumStripeWebhook);
+}
+
+/** Stripe's membership billing events, relayed to the economy service's own endpoint. */
+export function handleMembershipStripeWebhook(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
+  return relayStripeWebhook(req, res, membershipStripeWebhook);
+}
+
+async function relayStripeWebhook(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  forward: typeof claudiumStripeWebhook,
+): Promise<void> {
   const signature = String(req.headers['stripe-signature'] ?? '');
   const rawBody = await readBinaryBody(req, STRIPE_WEBHOOK_MAX_BYTES);
-  const result = await claudiumStripeWebhook(rawBody, signature);
+  const result = await forward(rawBody, signature);
   return json(res, result.received ? 200 : 400, result);
 }
 
@@ -676,6 +693,13 @@ export const routes: RouteDef[] = [
     surface: 'api',
     meta: { publicRead: true },
     handler: (ctx) => handleClaudiumStripeWebhook(ctx.req, ctx.res),
+  },
+  {
+    method: 'POST',
+    path: '/api/claudium/membership/stripe/webhook',
+    surface: 'api',
+    meta: { publicRead: true },
+    handler: (ctx) => handleMembershipStripeWebhook(ctx.req, ctx.res),
   },
   {
     method: 'GET',

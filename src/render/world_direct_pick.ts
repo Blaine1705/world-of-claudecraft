@@ -1,6 +1,6 @@
 // The renderer's direct-pick entry: the pure stack resolver (pick_resolution.ts)
 // fed with what the live world and the static content tables know about each
-// hit. Renderer.pickDirect raycasts the click capsules and hands the hit ids,
+// hit. WorldPicking.pickDirect raycasts the click capsules and hands the hit ids,
 // nearest first, and the pick ray itself to resolveWorldDirectPick.
 //
 // The one fact it adds is the USE-ONLY body: a mob the local player can use
@@ -22,7 +22,7 @@
 // capsule still selects the body. A use-only body whose visual declares no aim
 // core is never promoted.
 //
-// The local player's own capsule is never among the hits (Renderer.pickDirect
+// The local player's own capsule is never among the hits (WorldPicking.pickDirect
 // drops it), so the resolver's "nearest live hit is a player" exception only
 // ever means ANOTHER player: standing between the camera and the candle, your
 // own body does not take the candle's click.

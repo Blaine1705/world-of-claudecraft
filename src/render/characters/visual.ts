@@ -11,6 +11,7 @@ import {
   offhandMirrorsWeaponSkin,
 } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import { isBuiltinWorldActive } from '../../sim/data';
 import type { EquipSlot } from '../../sim/types';
 import type { OverheadEmoteId } from '../../world_api';
 import { GPU_WORK_PRIORITY } from '../background_gpu_queue';
@@ -77,6 +78,7 @@ import {
   setWeaponsStowed,
   skinEmissiveTexture,
   skinTexture,
+  stripHeldProps,
   type TintedMaterialClaims,
   takeFarBakeBudget,
   tintedFarMaterials,
@@ -91,6 +93,7 @@ import {
 import { auraIdleClip } from './aura_idle_core';
 import { BoneDials } from './bone_dials';
 import { ChargeGlow } from './charge_glow';
+import { clipNamesOf } from './clip_names';
 import { sharedClipSplit } from './clip_split';
 import { twinClipOf } from './clip_twin';
 import { extendBrace, isBraced } from './combat_brace_core';
@@ -139,6 +142,7 @@ import {
   rangedSkinAiming,
   SKIN_ATTACK_CLIP_NAMES,
   weaponSkinCastClip,
+  weaponSkinDrawsBow,
   weaponSkinOrientPin,
 } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
@@ -166,6 +170,7 @@ import {
 } from './woc_armor_dressing';
 import { releaseWocArmorOf, setWocArmorWorkQueue } from './woc_armor_packs';
 import { WocAtlasSwap } from './woc_atlas_swap';
+import { pickWocAutoAttack } from './woc_autoattack_core';
 import type { WocCharacterManifest } from './woc_character_manifest';
 import {
   peekWocFarBake,
@@ -423,7 +428,7 @@ const TREAD_PITCH_SCALE = 0.35;
 // wade — so they get a longer crossfade than the land states, where a fast cut
 // reads as responsive.
 const WATER_FADE = 0.34;
-const WATER_STATES = new Set<BaseState>(['swim', 'swimSurface', 'swimIdle', 'wade']);
+const WATER_STATES = new Set<BaseState>(['swim', 'swimSurface', 'swimIdle', 'glide', 'wade']);
 
 /** Crossfade for a base-state edge: longer whenever water is on either side. */
 function waterFade(from: BaseState, to: BaseState): number {
@@ -2111,7 +2116,12 @@ export class CharacterVisual {
     const swimPitch = s.swimPitch * (1 + (TREAD_PITCH_SCALE - 1) * this.treadBlend);
     this.poseWrap.rotation.x =
       (proneAngle + swimPitch) * this.swimBlend + this.lean + CLIMB_BODY_PITCH * climb * climbLevel;
-    this.poseWrap.rotation.z = 0;
+    // Bank into the turn. Already eased and already scaled for the medium by the
+    // renderer (advanceBankRoll), so it lands here as a finished angle, but the
+    // ledge climb owns the whole body while it runs, and a lean mid-haul reads
+    // as the character falling off the wall. Authored maps only: the built-in
+    // world keeps the upright body it shipped with.
+    this.poseWrap.rotation.z = isBuiltinWorldActive() ? 0 : (s.bankRoll ?? 0) * (1 - climb);
     this.poseWrap.position.y =
       this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
@@ -2623,6 +2633,17 @@ export class CharacterVisual {
     return this.currentIsOneShot;
   }
 
+  /** Take the weapons out of this body's hands, permanently.
+   *
+   *  A composed NPC inherits the class def's held-weapon layout, so a
+   *  townsperson built on the warrior body is born holding a sword. The
+   *  civilian NPCs (the Deepglass crowd, its stallkeepers, the portal wizard)
+   *  call this once at build time so a stadium full of spectators is not a
+   *  stadium full of armed spectators. */
+  disarmHeldProps(): void {
+    stripHeldProps(this.model);
+  }
+
   /** A channel-start event can arrive just before its authoritative entity
    * snapshot. Enter the looping cast pose immediately and interrupt any short
    * projectile one-shot that would otherwise mask the first part of the channel. */
@@ -2760,6 +2781,33 @@ export class CharacterVisual {
       style === 'twohand' &&
       this.loadoutSwap !== null &&
       this.loadoutSwap === this.def.clips.loadoutSwaps?.twohand;
+    // A WOC body's white swings play its hand-keyed autoattacks (woc_autoattack_core.ts),
+    // unless a displayed weapon skin substitutes a clip this rig has bound, or the shot
+    // releases a cast the rig's own aim is holding (it finishes on the rig's own shot).
+    const auto =
+      skinAttack || this.baseState === 'cast'
+        ? null
+        : pickWocAutoAttack({
+            def: this.def,
+            abilityId,
+            kind,
+            style,
+            singleSetTwoHander,
+            bowSkin: weaponSkinDrawsBow(this.weaponSkinId),
+            unarmed: this.bareWhenUnarmed && !this.weaponItemId,
+            index: this.attackIdx,
+            mixerTime: this.mixer.time,
+            dual: this.dualSwing,
+            has: (name) => this.action(name) !== null,
+          });
+    if (auto) {
+      // A third swing this frame: the pair clip already playing carries it.
+      if (!auto.clip) return auto.delay;
+      this.playOneShot(auto.clip, this.def.attackTimeScale ?? 1.3);
+      this.attackIdx++;
+      this.currentOneShotIsAttack = true;
+      return auto.delay;
+    }
     const handClip =
       style && !singleSetTwoHander ? this.def.clips.attackByHand?.[style] : undefined;
     if (!skinAttack && handClip && this.action(handClip)) {
@@ -4957,6 +5005,7 @@ export class CharacterVisual {
       s,
       !!this.action(this.def.clips.walkBack),
       !!this.action(this.def.clips.wade),
+      !!this.action(this.def.clips.glide),
       !!this.action(this.def.clips.combatIdle),
       !!this.action(this.def.clips.prowlIdle),
       !!this.action(this.def.clips.prowlWalk),
@@ -5287,6 +5336,10 @@ export class CharacterVisual {
           this.action(c.swim) ??
           this.action(c.idle)
         );
+      case 'glide':
+        // desiredBase only reaches this state on a rig that HAS the clip; the
+        // fallbacks exist for the state being held across a body swap.
+        return this.action(c.glide) ?? this.action(c.swim) ?? this.action(c.idle);
       case 'wade':
         return this.action(c.wade) ?? this.action(c.walk) ?? this.action(c.idle);
       case 'sit':
@@ -5792,77 +5845,6 @@ export class CharacterVisual {
     }
     this.fadeTo(this.action(this.def.clips.idle), 0.2, false);
   }
-}
-
-export function clipNamesOf(def: VisualDef): string[] {
-  // A stance's vocabulary (phaseClips) must be bound too, or its clips never
-  // get an action and the swap plays nothing.
-  const phases = Object.values(def.phaseClips ?? {}).flatMap((p) => [
-    ...clipMapNames(p.clips),
-    ...(p.enter ? [p.enter] : []),
-  ]);
-  return [...clipMapNames(def.clips), ...phases];
-}
-
-function clipMapNames(c: ClipMap): string[] {
-  return [
-    c.idle,
-    c.combatIdle,
-    c.stunned,
-    ...Object.values(c.heldByAura ?? {}),
-    c.turn,
-    c.entrance,
-    c.prowlIdle,
-    c.prowlWalk,
-    c.walk,
-    c.run,
-    c.rushArrival,
-    c.death,
-    ...(c.attack ?? []),
-    ...(c.meleeAttack ?? []),
-    c.wandAttack,
-    ...Object.values(c.attackByAbility ?? {}),
-    ...(c.abilityAttack ?? []),
-    ...Object.values(c.castByAbility ?? {}),
-    ...Object.values(c.attackByHand ?? {}),
-    ...(c.dualWieldPair ?? []),
-    ...(c.hit ?? []),
-    c.cast,
-    c.sitDown,
-    c.sitIdle,
-    c.swim,
-    c.swimSurface,
-    c.swimIdle,
-    c.wade,
-    c.jump,
-    c.jumpMoving,
-    c.fall,
-    c.land,
-    c.walkBack,
-    c.strafeLeft,
-    c.strafeRight,
-    c.flourish,
-    c.stow,
-    c.climb,
-    // The idle-breakers and the idle beat were MISSING here, which is the only
-    // place actions get built (visual.ts constructor). A clip absent from this
-    // list loads fine and passes the clipmap gate, that gate checks the GLB,
-    // not the action map, but `this.action(name)` returns null forever, so
-    // tickIdleVariant/tickIdleBeat bail on every fire and the rig simply never
-    // fidgets. Silent: no throw, no warning, just a clip that is never seen.
-    ...(c.idleVariants ?? []),
-    ...Object.values(c.loadoutSwaps ?? {}).flatMap((m) => Object.values(m ?? {})),
-    c.idleBeat?.clip,
-    // The night pair (mob/slumber.ts): a slot named here is the ONLY way a clip becomes an
-    // action, so a new ClipMap field joins this list or it never plays (pinned per rig by
-    // tests/character_clipmaps.test.ts against the gate's own required-clip list).
-    c.sleep,
-    c.wake,
-    // The aura-held idles (Balgath's Blinded loop): same rule, a loop never bound is a
-    // pose never seen.
-    ...Object.values(c.idleByAura ?? {}),
-    ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
-  ].filter((n): n is string => !!n);
 }
 
 function firstLoadedEmoteClip(

@@ -192,9 +192,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 256, 270.
 // Buddy collection integration adds four sends and five dispatches: the retired
 // buddy_cosmetic token is dispatch-only; buddy_rename is sent and dispatched.
-const EXPECTED_SEND_COUNT = 260;
-const EXPECTED_DISPATCH_COUNT = 275;
-const EXPECTED_DISPATCH_ONLY_COUNT = 15;
+// The Studio merge adds the plot-sign purchase (`buyplot`, sent by
+// ClientWorld.buyPlot, dispatched server-side): +1/+1 over the release base, so
+// the v0.45.0 integration's 262/276 becomes 263/277.
+const EXPECTED_SEND_COUNT = 263;
+const EXPECTED_DISPATCH_COUNT = 277;
+const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must
@@ -330,10 +333,11 @@ describe('command schema parity (W0b)', () => {
   });
   it('appends courier dispatch as a complete client/server command pair', () => {
     // The integration adds the dungeon guide answer, then the buddy rename command.
-    expect(COMMAND_NAMES.slice(-3)).toEqual([
+    expect(COMMAND_NAMES.slice(-4)).toEqual([
       'courier_dispatch',
       'dungeon_guide_answer',
       'buddy_rename',
+      'referralCards',
     ]);
     expect(sendSet.has('courier_dispatch')).toBe(true);
     expect(dispatchSet.has('courier_dispatch')).toBe(true);

@@ -2237,6 +2237,10 @@ export const hudChromeStrings = {
     hideInterface: 'Hide Interface',
     // Swimming: Jump swims up, this swims down.
     dive: 'Swim Down',
+    // Deepball burners (the Deepglass arena); held, F by default.
+    boost: 'Burners (Deepball)',
+    // Deepball ball marker: the HUD pointer that finds the Tidesow. Shift+V.
+    ballMarker: 'Ball Marker (Deepball)',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
     categoryPet: 'Pet',
     petAttack: 'Pet: Attack',
@@ -2350,6 +2354,8 @@ export const hudChromeStrings = {
     name_goblin_rocket_sled: 'Goblin Rocket Sled',
     name_rallycart_rxt: 'Rallycart RXT',
     name_terrorspark_groundshaker: 'Dreadspark Groundshaker',
+    name_referral_tank: 'Friendship Tank',
+    name_referral_raptor: 'Friendship Raptor',
     name_drakemaw_raptor: 'Drakemaw Raptor',
     name_avian_strider: 'Viridian Valestrider',
     name_mech_bird: 'Cluckwork Mech Bird',
@@ -2373,6 +2379,8 @@ export const hudChromeStrings = {
     desc_rallycart_skin: 'A tiny rally car with a mighty roar.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
+    desc_referral_tank: 'Earned by completing a referral stamp card.',
+    desc_referral_raptor: 'Earned by helping your first bound friend complete a stamp card.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
     desc_avian_strider:
@@ -2492,6 +2500,16 @@ export const hudChromeStrings = {
     flagTakenLog: '{name} has taken the {team} flag!',
     flagDroppedLog: 'The {team} flag was dropped.',
     flagReturnedLog: 'The {team} flag was returned.',
+    // The authored-map flag rehearsal (src/sim/social/map_objectives_run.ts) logs
+    // a sim line per flag call, matched in src/ui/sim_i18n.ts. Taken, captured
+    // and the clock's return reuse the three lines above; these two name the
+    // player who dropped or returned the flag.
+    flagDroppedByLog: '{name} dropped the {team} flag.',
+    flagReturnedByLog: '{name} returned the {team} flag.',
+    // The two flag objects' names (entityDisplayName, src/ui/entity_display_core.ts),
+    // for the battleground's flags and the authored-map rehearsal's alike.
+    flagNameCrimson: 'Crimson Flag',
+    flagNameAzure: 'Azure Flag',
     // The touch-host confirm for the voluntary flag drop (a long press is also the
     // tooltip-peek gesture, so this cancel is the one that must not fire by accident).
     dropFlagConfirmTitle: 'Drop the flag?',
@@ -5569,9 +5587,9 @@ export const hudChromeStrings = {
     // change, each using its locale's trinket and aura names.
     trinket: {
       lastStandCooldown:
-        "Bastion Sigil's Last Bastion shield was used. Falling below {threshold}% health cannot raise it again until this expires.",
+        'Your protective shield was used. Taking damage below {threshold}% health cannot raise it again until this expires.',
       lastBastion:
-        'Absorbs {value} damage. Bastion Sigil raised it when you took damage below {threshold}% health.',
+        'Absorbs {value} damage. Your trinket raised it when you took damage below {threshold}% health.',
       retaliate:
         'Enemies that hit you directly take Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.',
       moored:
@@ -6849,6 +6867,48 @@ export const hudChromeStrings = {
   // (src/ui/realm_builder_popup.ts), opened by inspecting the statue. Honouree
   // names are world data and splice verbatim like player names, never
   // translated; only this chrome and the Intl-formatted month localize.
+  // Baldemar the Bald, the portal wizard (src/sim/portal_wizard.ts): his
+  // gossip rows and the on-screen hint while his gate stands open.
+  deepglass: {
+    // Steward Aleyn Tidewell's gossip-menu entry, in Goldcrest Harbor: passage
+    // down into the Deepglass bell for a bout of deepball.
+    gossip: 'Take me down to the Deepglass',
+    gossipAria: 'Travel to the Deepglass and start a bout of deepball',
+    // Marshal Yvette Coralwake's fixture rows, at the head of the causeway
+    // inside the arena. One row per side size; {n} is 1, 2 or 3.
+    bout: '{n} a side',
+    boutAria: 'Start a bout of deepball, {n} players a side',
+  },
+  portalWizard: {
+    gossipDeepglass: 'Open the way to the Deepglass',
+    gossipDeepglassAria: 'Ask Baldemar to open a portal to the Deepglass',
+    gossipHome: 'Open the way home',
+    gossipHomeAria: 'Ask Baldemar to open a portal back to your town',
+    // Toast shown while the portal stands open; the walk-in is the action.
+    portalOpen: 'The portal stands open. Step through.',
+  },
+  // Tidehold's housing deeds (src/ui/plot_sign_popup.ts, fork).
+  // The Eastbrook Vale Realm Builder monument's honour roll
+  // (src/ui/realm_builder_popup.ts), opened by inspecting the statue. Honouree
+  // names are world data and splice verbatim like player names, never
+  // translated; only this chrome and the Intl-formatted month localize.
+  plotSign: {
+    title: 'Housing plot for sale',
+    size: '{size} plot, {w} by {d} yards',
+    sizes: { small: 'Small', medium: 'Medium', large: 'Large' },
+    price: 'Asking {price}',
+    purse: 'You carry {purse}.',
+    yours: 'You hold this deed.',
+    sold: 'Sold. {name} holds this deed.',
+    buy: 'Buy for {price}',
+    close: 'Close',
+    boughtLog: 'The deed to {name} is yours.',
+    // buyPlot's refusals (src/sim/plots.ts), matched by localizeErrorText
+    // (src/ui/error_text_i18n_core.ts).
+    errAlreadyHeld: 'You already hold this deed.',
+    errHeldBy: '{name} holds this deed.',
+    errCannotAfford: "You can't afford this plot.",
+  },
   realmBuilder: {
     title: 'Realm Builder of the Month',
     currentLabel: 'Honoured this month',

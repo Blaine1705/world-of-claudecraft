@@ -1400,9 +1400,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  // Re-minted for the direct pick's aim rule (pickDirect hands the pick ray to
-  // world_direct_pick.ts, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
-  '20efbbffb6cd681ac3f30597c15207ac9cdd3f69f9e40dfaae0f0fac3281d6b7';
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  'c938c9efbcd059e912ed28471dd5970655cc39a15d98f246fe8c4236fe5a85fa';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1428,9 +1428,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  // Re-minted for the direct pick's aim rule (pickDirect hands the pick ray to
-  // world_direct_pick.ts, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
-  '2bda6ff74975a68c397ab72f5835449bddec8da128867bc107d9ad3282f58ae9';
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  '72200d9055b376bb87d2cddaf2c521f6f5ea0965bfe0dce6e57e489b2667ddfc';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2817,9 +2817,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // + the character pack + the five-dungeon rework): recomputed LAST again over the
       // re-swept evidence. No
       // capture was retaken.
-      // Re-minted for the direct pick's aim rule (pickDirect hands the pick ray to
-      // world_direct_pick.ts, a renderer leaf edit; remint_polish_provenance.mjs, no capture was retaken).
-    ).toBe('9ac58ee3d8bb093d5a1a4cf2240cb7638cd04a51e3deea6d0fc2e92df746f681');
+    ).toBe('706fd2be527474513aff3c623860c6b11a7c781e3f46b19df528e3a3c0531e69');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
