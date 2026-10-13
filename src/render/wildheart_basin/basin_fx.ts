@@ -16,7 +16,9 @@
 //    the jaguar's eyes burning while Zulgar fights.
 // Every telegraph is the shared floor telegraph kit (../floor_telegraph).
 // The three bosses' visuals are their own module (basin_boss_fx.ts), composed
-// here: it draws under this root, on this kit, through these pools.
+// here: it draws under this root, on this kit, through these pools. Zulgar's
+// sun glyphs, Hunting Spear and the Idol's Breath are zulgar_hunt_fx.ts, on
+// the same host.
 //
 // Rules (src/render/CLAUDE.md): pooled geometry and materials built once,
 // attached through the compile gate, no per-frame allocation in the pools.
@@ -103,6 +105,7 @@ import { setBasinMawGlow } from './maw_glow';
 import { isBasinMawPortal, mawGlowStrength, stepMawGlow } from './maw_glow_core';
 import { SaurianFx } from './saurian_fx';
 import { ZulgarAvatarFx } from './zulgar_avatar_fx';
+import { ZulgarHuntFx } from './zulgar_hunt_fx';
 
 const CAST_SLOTS = 10;
 const LANE_SLOTS = 4;
@@ -231,6 +234,10 @@ export class WildheartFx {
   private readonly thorns: BasinThorns;
   /** Zulgar's jade spirit jaguar while he hunts. */
   private readonly avatar: ZulgarAvatarFx | null;
+  /** His sun glyphs, his Hunting Spear and the stone jaguar's breath. */
+  private readonly hunt: ZulgarHuntFx | null;
+  /** The idol's throat burned last frame (put out once on leaving the basin). */
+  private throatLit = false;
   /** Zulgar's model is hidden (heroic Ambush's vanish). */
   private zulgarHidden = false;
   private readonly smoke: ParticlePool;
@@ -436,6 +443,7 @@ export class WildheartFx {
         )
       : null;
     this.avatar = world ? new ZulgarAvatarFx(scene, this.bossHost(), world, compileGate) : null;
+    this.hunt = world ? new ZulgarHuntFx(this.bossHost(), world) : null;
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -608,6 +616,7 @@ export class WildheartFx {
         return this.boss?.handleEvent(ev, src) ?? false;
       default:
         this.avatar?.handleEvent(ev);
+        if (this.hunt?.handleEvent(ev, src)) return true;
         return this.boss?.handleEvent(ev, src) ?? false;
     }
   }
@@ -629,13 +638,15 @@ export class WildheartFx {
       // mark or telegraph stays frozen where the fight left it.
       for (const w of BASIN_WATER_WADERS.value) w.w = 0;
       // The maw's glow is shared by every build of the basin: dark for the next run.
-      if (this.mawLevel > 0) {
+      if (this.mawLevel > 0 || this.throatLit) {
         this.mawLevel = 0;
+        this.throatLit = false;
         setBasinMawGlow(0);
       }
       if (this.bossShown) {
         this.bossShown = false;
         this.boss?.hideAll();
+        this.hunt?.hideAll();
         this.trash?.hideAll();
         this.saurian?.hideAll();
         this.gorgebloom?.hideAll();
@@ -651,7 +662,6 @@ export class WildheartFx {
       return;
     }
     this.mawLevel = stepMawGlow(this.mawLevel, this.mawOpen, dt);
-    setBasinMawGlow(mawGlowStrength(this.mawLevel, this.clock));
     this.paintCasts(world);
     this.paintLanes(world);
     this.paintClouds(world, dt);
@@ -670,7 +680,16 @@ export class WildheartFx {
     this.splash.update(this.clock);
     this.thorns.update(this.clock);
     this.avatar?.update(dt);
-    setBasinJaguarEyesBurn(jaguarEyesBurn(this.zulgarState, this.clock));
+    this.hunt?.update(dt, this.clock);
+    // The stone jaguar: its eyes burn with the hunt and harder with its own
+    // breath; its throat is jade while it is awake, gold-ringed once the way
+    // out opens.
+    const throat = this.hunt?.idolThroat() ?? 0;
+    this.throatLit = throat > 0;
+    setBasinMawGlow(mawGlowStrength(this.mawLevel, this.clock), throat);
+    setBasinJaguarEyesBurn(
+      Math.max(jaguarEyesBurn(this.zulgarState, this.clock), this.hunt?.idolEyes() ?? 0),
+    );
     this.smoke.update(this.clock);
     this.glow.update(this.clock);
   }
@@ -939,6 +958,7 @@ export class WildheartFx {
     let zulgar: 'idle' | 'fight' | 'hunt' = 'idle';
     let maw = false;
     this.boss?.beginScan();
+    this.hunt?.beginScan();
     this.trash?.beginScan();
     this.saurian?.beginScan();
     this.gorgebloom?.beginScan();
@@ -947,6 +967,7 @@ export class WildheartFx {
       if (this.trash?.scanEntity(e)) basin = true;
       if (e.kind === 'player') {
         if (vineRooted(e)) this.claimVine(e);
+        this.hunt?.scanPlayer(e);
         continue;
       }
       if (e.kind !== 'mob') {
@@ -964,6 +985,7 @@ export class WildheartFx {
       if (e.templateId === ZULGAR_ID) {
         basin = true;
         this.avatar?.setZulgar(e);
+        this.hunt?.scanZulgar(e);
         this.syncZulgarHidden(e);
         if (!e.dead && e.inCombat) zulgar = hasAura(e, ZULGAR_AVATAR) ? 'hunt' : 'fight';
       }
@@ -1010,6 +1032,7 @@ export class WildheartFx {
   }
 
   private scanObject(e: Entity): void {
+    this.hunt?.scanObject(e);
     const spec = BASIN_OBJECT_SPECS[e.templateId];
     if (!spec) return;
     if (this.clouds.some((c) => c.objectId === e.id)) return;
@@ -1094,6 +1117,10 @@ export class WildheartFx {
     if (this.avatar) {
       const avatar = this.avatar;
       attempt(() => avatar.dispose());
+    }
+    if (this.hunt) {
+      const hunt = this.hunt;
+      attempt(() => hunt.dispose());
     }
     for (const g of this.geometries) attempt(() => g.dispose());
     for (const m of this.materials) attempt(() => m.dispose());

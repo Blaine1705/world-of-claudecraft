@@ -194,6 +194,12 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/wildheart_basin/basin_splash.ts', layer: 'ground', strict: true },
   // The Pack Bond's ground glows under master and jaguar (the lowest encounter rung).
   { file: 'src/render/wildheart_basin/bond_cord.ts', layer: 'encounter', strict: true },
+  // Zulgar's sun glyphs: the ash veil and the light over the carved floor (the
+  // Sunstruck ring is the shared kit's).
+  { file: 'src/render/wildheart_basin/zulgar_glyph_fx.ts', layer: 'encounter', strict: true },
+  // The Idol's Breath: the warned half of the terrace, the breath over it and
+  // the curtain on the centre line.
+  { file: 'src/render/wildheart_basin/idol_breath_fx.ts', layer: 'encounter', strict: true },
   // The Gravewyrm Sanctum's telegraphs (the shared kit), the soulfire patches'
   // glow and flames, the shock rings and the particle pools.
   { file: 'src/render/gravewyrm_sanctum_fx/sanctum_fx.ts', layer: 'encounter', strict: true },

@@ -3,13 +3,18 @@
 // (JAGUAR_MODEL.spiritUrl, the same rig and clips as the Fanglord's cat) runs
 // round him, a third again its size: it fades in with the hunt's roar, gallops
 // and walks with his pace, pounces when he mauls his prey and fades out when
-// the hunt ends. A jade trail of motes streams off it while it runs.
+// the hunt ends. A jade trail of motes streams off it while it runs. While he
+// is Sunstruck (the damage window's aura) the whole spirit burns GOLD: the
+// "hit him now" read, on the body itself, from any camera and on every tier.
 //
 // Plan in zulgar_avatar_core.ts (Node-tested); this is the thin Three painter.
 // GPU rules (src/render/CLAUDE.md): the clone is built off the cached GLB once,
 // under its own root, attached through attachSceneGroupGated (its programs
 // link before its first frame); the spirit material is cloned once (the GLB
-// cache is immutable) and only its opacity moves; no light.
+// cache is immutable), its gold is one uniform spliced into that clone's own
+// program when it is built (the jade is the GLB's texture, so a colour write
+// could never turn it gold), and only its opacity and that uniform move; no
+// light.
 
 import * as THREE from 'three';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
@@ -18,6 +23,7 @@ import {
   ZULGAR_AVATAR,
   ZULGAR_ID,
   ZULGAR_MAULED,
+  ZULGAR_SUNSTRUCK_EXPOSED,
 } from '../../sim/encounters/wildheart_basin/ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -33,6 +39,16 @@ import {
   avatarGaitRate,
   turnToward,
 } from './zulgar_avatar_core';
+import { avatarGold } from './zulgar_hunt_fx_core';
+
+/** The spirit while he is Sunstruck: its own light and shade kept, its jade
+ *  swapped for burning gold (spliced after the material's last chunk, so it
+ *  recolours what the eye is about to see). */
+const SUN_GOLD_GLSL = /* glsl */ `#include <dithering_fragment>
+  {
+    float sunLum = dot(gl_FragColor.rgb, vec3(0.3, 0.59, 0.11));
+    gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0, 0.7, 0.18) * (sunLum * 2.4 + 0.1), uSunGold);
+  }`;
 
 type Clip = 'Idle' | 'Walk' | 'Run' | 'Pounce' | 'Roar';
 const LOOPS: readonly Clip[] = ['Idle', 'Walk', 'Run'];
@@ -47,6 +63,9 @@ export class ZulgarAvatarFx {
   /** The clone's own skeletons (their bone textures are this module's). */
   private readonly skeletons: THREE.Skeleton[] = [];
   private baseOpacity: number[] = [];
+  /** 0 jade, 1 gold: eased toward the Sunstruck window open or shut (the one
+   *  uniform every spirit material reads). */
+  private readonly gold = { value: 0 };
   private loop: Clip | null = null;
   private oneShot: THREE.AnimationAction | null = null;
   private zulgarId = -1;
@@ -97,6 +116,13 @@ export class ZulgarAvatarFx {
       // Brighter than the Whistle's pet: the hunt's spirit must read across
       // the terrace (its rosettes burn into the bloom).
       m.emissiveIntensity = AVATAR_LOOK.emissive;
+      m.onBeforeCompile = (shader) => {
+        shader.uniforms.uSunGold = this.gold;
+        shader.fragmentShader = shader.fragmentShader
+          .replace('#include <common>', '#include <common>\nuniform float uSunGold;')
+          .replace('#include <dithering_fragment>', SUN_GOLD_GLSL);
+      };
+      m.customProgramCacheKey = () => 'wildheartZulgarAvatarSpirit:sunGold';
       mesh.material = m;
       this.materials.push(m);
       this.baseOpacity.push(Math.min(0.78, m.opacity * AVATAR_LOOK.opacity));
@@ -195,10 +221,15 @@ export class ZulgarAvatarFx {
     const gait = avatarGait(this.speed);
     this.setLoop(gait, avatarGaitRate(gait, this.speed));
     this.mixer.update(dt);
-    const pulse = 0.9 + 0.1 * Math.sin(this.host.uTime.value * 3.2);
+    // Sunstruck: the spirit burns gold (and a little more solid) for as long
+    // as the window stands open.
+    const struck = active && hasAura(e, ZULGAR_SUNSTRUCK_EXPOSED);
+    const gold = avatarGold(this.gold.value, struck, dt);
+    this.gold.value = gold;
+    const pulse = 0.9 + 0.1 * Math.sin(this.host.uTime.value * (3.2 + 9 * gold)) + 0.25 * gold;
     for (let i = 0; i < this.materials.length; i++) {
       const m = this.materials[i] as THREE.MeshStandardMaterial;
-      m.opacity = this.baseOpacity[i] * this.fade * pulse;
+      m.opacity = Math.min(0.95, this.baseOpacity[i] * this.fade * pulse);
       m.visible = this.fade > 0.02;
     }
     // A jade trail off its flanks while it runs.
@@ -220,7 +251,7 @@ export class ZulgarAvatarFx {
             up: 0.8,
             life: 1.2,
             size: [0.6, 0.15],
-            color: [0.4, 1, 0.66],
+            color: gold > 0.5 ? [1, 0.8, 0.36] : [0.4, 1, 0.66],
             alpha: 0.85 * this.fade,
             glow: true,
           },
@@ -231,6 +262,7 @@ export class ZulgarAvatarFx {
 
   hide(): void {
     this.fade = 0;
+    this.gold.value = 0;
     if (this.body) this.body.visible = false;
     this.placed = false;
   }
