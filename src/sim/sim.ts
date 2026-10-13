@@ -8328,7 +8328,6 @@ export class Sim {
     const { pid, named } = foldNamedSlotTarget(slotTarget, slotIndex);
     return items.useItem(this.ctx, itemId, pid, named, obj?.aim ?? aim, obj?.inkMap ?? inkMap);
   }
-
   // ONE explicit shape, no overloads (phase 21): the request rides an options
   // bag (VendorBuyOptions) because any positional count or bulk slot beside
   // the optional numeric pid compiles green under structural typing while
