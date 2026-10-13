@@ -631,6 +631,9 @@ describe('every point-light producer is a carrier source', () => {
       // never a scene.
       'render/drowned_temple_entrance.ts: mesh',
       'render/gather_nodes.ts: target',
+      // The Gloamveil form's ground pool (the Shadow priest's look, #4466): a
+      // mesh hook writing the stain's uniforms each draw, never a scene.
+      'render/gloam_pool.ts: mesh',
       'render/goblin_rocket_sled_fx.ts: inner',
       'render/goblin_rocket_sled_fx.ts: outer',
       // The Gravewyrm Sanctum: mesh hooks, never a scene: the gates reading
