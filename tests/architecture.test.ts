@@ -675,6 +675,9 @@ const UI_PURE_CORES = [
   // Which dungeon prompt the "Dungeon mechanic hints" setting governs, and who
   // holds the prompts' shared slot.
   'src/ui/hud/dungeon/dungeon_prompt_policy_core.ts',
+  // The dungeon objectives tracker (the plate and its boss rows): what it
+  // shows, and which rows a kill just lit.
+  'src/ui/hud/dungeon/dungeon_tracker_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',
@@ -835,6 +838,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
+  // Was a click aimed at a body: the pick ray against its visible core.
+  'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
   // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
   'src/render/body_emote_core.ts',
@@ -962,6 +967,7 @@ const RENDER_PURE_CORES = [
   'src/render/gravewyrm_sanctum/sanctum_lake_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_works_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_surface_wear_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',
@@ -1101,6 +1107,14 @@ const RENDER_PURE_CORES = [
   'src/render/characters/death_grounding_core.ts',
   'src/render/characters/stonebound_shell_core.ts',
   'src/render/characters/form_adornment_core.ts',
+  // Gloamveil (the Shadow priest's form): the climbing dark on the body (the
+  // tongue tables, the cast surge and entry, the shader text and its CPU twin),
+  // then the floor and smoke layer around it (what each tier keeps, where a
+  // stain lies and when it is laid, the smoke pool and its eviction).
+  'src/render/characters/gloam_climb_core.ts',
+  'src/render/gloam_field_core.ts',
+  'src/render/gloam_pool_core.ts',
+  'src/render/gloam_smoke_core.ts',
   'src/render/entry_detail_horizon_core.ts',
   'src/render/gather_batch_reach_core.ts',
   'src/render/zone_feature_cells_core.ts',
@@ -1346,12 +1360,10 @@ const RENDER_PURE_CORES = [
   'src/render/characters/morph_union_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
-  // FORK (Studio + Deepglass) pure cores.
+  // FORK (Studio) pure cores.
   'src/render/foliage_far_placements_core.ts',
   'src/render/decal_stream_core.ts',
-  'src/render/deepglass_crowd_fx_core.ts',
-  'src/render/deepglass_goal_wave_core.ts',
-  // renderer.ts extractions: the authored-map layer and the Deepglass scene.
+  // renderer.ts extractions: the authored-map layer.
   'src/render/authored_map/chase_boom_core.ts',
   'src/render/authored_map/gameplay_fog_core.ts',
   'src/render/authored_map/lighting_rig_core.ts',
@@ -1359,9 +1371,6 @@ const RENDER_PURE_CORES = [
   'src/render/authored_map/underworld_core.ts',
   'src/render/authored_map/zone_atmosphere_core.ts',
   'src/render/authored_map/zone_residency_core.ts',
-  'src/render/deepglass_scene/deepglass_camera_core.ts',
-  'src/render/deepglass_scene/deepglass_cue_core.ts',
-  'src/render/deepglass_scene/deepglass_pose_core.ts',
   'src/render/placed_batch_core.ts',
   'src/render/city_clutter_core.ts',
   'src/render/terrain_cut_clip_core.ts',
@@ -2918,8 +2927,6 @@ const UI_DOM_MODULES = [
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',
   'src/ui/canvas_dpr.ts', // Reads the display's device pixel ratio.
-  'src/ui/deepglass_hud.ts', // Owns the live arena overlay.
-  'src/ui/plot_sign_popup.ts', // Mounts and removes the plot purchase card.
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/map/minimap_objective_tap.ts',

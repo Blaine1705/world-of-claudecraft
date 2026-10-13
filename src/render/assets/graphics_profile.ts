@@ -32,6 +32,7 @@ import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '
 import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
 import { resetQuestObjectProfileCaches } from '../quest_objects';
+import { resetSanctumExitPortalProfileCaches } from '../sanctum_exit_portal';
 import { ensureSkyAssetsAt } from '../sky';
 import { resetStationProfileCaches } from '../stations';
 import { resetTemporalHourglassProfileCaches } from '../temporal_hourglass_visual';
@@ -96,6 +97,7 @@ const RESETTERS = [
   ['cliff_scree', resetCliffScreeProfileCaches],
   ['city_clutter', resetCityClutterProfileCaches],
   ['door_portal', resetDoorPortalProfileCaches],
+  ['sanctum_exit_portal', resetSanctumExitPortalProfileCaches],
   ['fireball_travel_visual', resetFireballTravelProfileCaches],
   ['frost_nova_root_visual', resetFrostNovaRootProfileCaches],
   ['ice_block_visual', resetIceBlockProfileCaches],

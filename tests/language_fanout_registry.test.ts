@@ -138,6 +138,11 @@ const FANOUT_ARMS: readonly string[] = [
   'this.weeklyQuestsWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
+  // The dungeon objectives tracker: its text gate is the view core's `rev`
+  // (dungeon id, difficulty, boss ids and done flags) and its strip page is
+  // remembered per run object, none of which a locale switch moves. Listed
+  // BEFORE the quest tracker's arm in the fan-out, which reads that page.
+  'this.dungeonTracker.relocalize|',
   'this.questTracker.relocalize|',
   'this.referralCards.relocalize|',
   'this.delveTracker.relocalize|',
@@ -255,9 +260,6 @@ const FANOUT_ARMS: readonly string[] = [
   // Intl-formatted and the placeholder hint is prose, so a locale switch alone
   // moves both without any state changing.
   'this.realmBuilderPopup.relocalize|',
-  // a Tidehold housing-plot deed card (authored maps): its chrome is t() copy
-  // and the price is formatMoney, so an open card repaints on a locale switch.
-  'this.plotSignPopup.relocalize|',
   'this.guildBoardWindow.relocalize|',
   'this.riftForgeWindow.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
@@ -497,6 +499,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: "the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it), and a dungeon guide's offer state (an enum, never text)",
   },
   {
+    file: 'hud/dungeon/dungeon_tracker_painter.ts',
+    memos: ['lastGeneration', 'lastRev', 'lastStripGeneration', 'lastStripRun'],
+    answer: 'this.dungeonTracker.relocalize',
+    why: "the view core's rev (dungeon id, difficulty, boss ids and done flags) gating every t(), formatter and entity name on the plate, and the run object the touch strip page was built from; relocalize bumps the generation both gates compare, so each re-resolves exactly once and re-latches",
+  },
+  {
     file: 'hud/rift/rift_floor_tracker_controller.ts',
     memos: ['lastSignature'],
     answer: 'this.riftTracker.relocalize',
@@ -727,9 +735,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   },
   {
     file: 'hud/quest/quest_tracker_controller.ts',
-    memos: ['lastHtml'],
+    memos: ['lastDungeonRowId', 'lastHtml'],
     reason:
-      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature.',
+      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature. lastDungeonRowId gates nothing that is drawn: it is the first-sighting edge of the dungeon run on the touch strip, deciding only whether the strip JUMPS to that page on this tick (stepping into a dungeon takes the strip once). It holds a page id (the dungeon id and difficulty), never text; the page itself is re-resolved on every update, and the strip repaints it through its own locale generation.',
   },
   {
     file: 'hud/practice/practice_dps_controller.ts',

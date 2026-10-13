@@ -1881,6 +1881,10 @@ export const ko_KR: EnTranslations = {
       "replayAction": "다시 연습하기",
       "replayTarget": "다시 대상으로 삼기"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "완료"
+    },
     "riftTracker": {
       "title": "균열",
       "hoardTitle": "묻힌 보물",
@@ -2138,8 +2142,6 @@ export const ko_KR: EnTranslations = {
       "sheathe": "무기 넣기/빼기",
       "hideInterface": "인터페이스 숨기기",
       "dive": "아래로 수영",
-      "boost": "Burners (Deepball)",
-      "ballMarker": "Ball Marker (Deepball)",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
       "petStop": "펫: 정지",
@@ -4641,6 +4643,7 @@ export const ko_KR: EnTranslations = {
         "deedTracker": "업적 추적기",
         "delveTracker": "탐굴 추적기",
         "riftTracker": "균열 추적기",
+        "dungeonTracker": "던전 추적기",
         "swingBarOffhand": "보조 장비",
         "unitTooltip": "툴팁"
       },
@@ -5097,38 +5100,6 @@ export const ko_KR: EnTranslations = {
       "officerEntry": "{name}({rank})",
       "popupTitle": "길드 게시 기둥",
       "close": "닫기"
-    },
-    "deepglass": {
-      "gossip": "Take me down to the Deepglass",
-      "gossipAria": "Travel to the Deepglass and start a bout of deepball",
-      "bout": "{n} a side",
-      "boutAria": "Start a bout of deepball, {n} players a side"
-    },
-    "portalWizard": {
-      "gossipDeepglass": "딥글라스로 가는 길을 열어 주세요",
-      "gossipDeepglassAria": "발데마르에게 딥글라스로 가는 차원문을 요청합니다",
-      "gossipHome": "집으로 가는 길을 열어 주세요",
-      "gossipHomeAria": "발데마르에게 마을로 돌아가는 차원문을 요청합니다",
-      "portalOpen": "차원문이 열렸습니다. 걸어 들어가세요."
-    },
-    "plotSign": {
-      "title": "Housing plot for sale",
-      "size": "{size} plot, {w} by {d} yards",
-      "sizes": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large"
-      },
-      "price": "Asking {price}",
-      "purse": "You carry {purse}.",
-      "yours": "You hold this deed.",
-      "sold": "Sold. {name} holds this deed.",
-      "buy": "Buy for {price}",
-      "close": "Close",
-      "boughtLog": "The deed to {name} is yours.",
-      "errAlreadyHeld": "You already hold this deed.",
-      "errHeldBy": "{name} holds this deed.",
-      "errCannotAfford": "You can't afford this plot."
     },
     "realmBuilder": {
       "title": "이달의 왕국 건설자",
@@ -6541,6 +6512,10 @@ export const ko_KR: EnTranslations = {
         "lunar_tide": "달의 파도(주기적 광역 피해)",
         "chorus_and_solo": "합창과 독창 (한 표식에는 모이고 다른 표식에서는 흩어지기)",
         "tideglass_reflections": "조수유리 투영체 (서로의 거울상을 처치)",
+        "hydra_three_elements": "세 가지 원소 (왼쪽 머리는 18야드 원뿔 범위에 냉기를 내뿜어 4초 동안 이동 속도를 70퍼센트 늦추고, 가운데 머리는 최대 3명의 발밑에 독을 뱉어 1.5초 뒤에 터지며 떨어진 자리에서 6초 동안 타오르고, 오른쪽 머리는 26야드 직선으로 급류를 쏘아 8야드 밀쳐 냅니다: 모두 범위 밖으로 피하세요. 머리 하나가 쓰러지면 남은 머리들이 그 공격을 이어받습니다)",
+        "hydra_tsunami": "해일 (머리들이 4.5초 동안 물속으로 가라앉아 받는 피해가 75퍼센트 줄고, 파도가 웅덩이의 절반을 덮칩니다. 다음에는 반대쪽 절반입니다: 일반 난이도 기준 160~190 냉기 피해와 10야드 밀쳐내기. 반대쪽 절반으로 건너가거나 가장자리 기둥 뒤에 서세요. 영웅 난이도에서는 3.5초 뒤에 파도가 반대쪽 절반으로 되돌아옵니다. 첫 해일은 전투 시작 24초 뒤에, 그 뒤로는 앞선 해일이 지나간 지 40초 뒤에 옵니다)",
+        "hydra_combined_breath": "합동 숨결 (해일과 해일 사이에 머리들이 자신들의 공격 두 가지를 합치며, 순서는 항상 같습니다: 얼어붙은 급류는 직선 위의 모두를 2초 동안 얼리고 다음 파도를 막아 줄 수 있는 얼음 벽을 남깁니다. 독의 해류는 독 웅덩이를 바깥으로 밀어내고, 맹독 서리는 독 웅덩이를 결정으로 얼려 4초 뒤에 터뜨립니다. 일반 난이도에서는 해일 사이에 한 번, 영웅 난이도에서는 두 번)",
+        "hydra_regrowth": "재생 (다른 머리가 살아 있는 동안 쓰러진 머리는 20초 뒤에 생명력 절반으로 다시 자라나며, 쓰러진 머리 하나마다 나머지 머리들이 주는 피해가 15퍼센트 증가합니다: 세 머리를 비슷한 때에 쓰러뜨리세요)",
         "rising_tide": "밀물 (섬의 절반이 잠김, 마른 쪽으로 이동)",
         "undertow": "역류 (모두를 끌어당김, 충돌 전에 벗어나기)",
         "enrage": "체력이 낮으면 격노",
@@ -8301,6 +8276,7 @@ export const ko_KR: EnTranslations = {
       "mapBodyZoneFirst": "M을 누르면 세계 지도가 지금 서 있는 지역에 맞춰 열립니다. 그 위에 내 화살표가, 주변의 명소가, 표식을 단 퀘스트 제공자와 퀘스트 목표가 놓인 구역이, 작업대와 우편함, 게시판, 텃밭이, 던전 입구가, 그리고 그 지역의 모든 채집 노드가 표시됩니다. 노드는 다시 자라는 동안에는 회색으로 흐려지고, 도구가 아직 감당하지 못하는 노드에는 표시가 붙습니다. 파티원도 함께 나타납니다. 지도를 오른쪽 클릭하거나 세계 지도 버튼을 누르면 대륙으로 물러나 모든 지역이 이름과 함께 그려지며, 거기서 지역을 클릭하면 그 지역의 지도가 열립니다. 탐굴이나 던전, 균열, 성채 안으로 들어서면 지도는 지금 서 있는 곳의 도면으로 바뀌고, 쏜할로우 평원 전장은 저만의 전장 지도를 가집니다.\n\n오른쪽 가장자리 미니맵 아래로는 추적기들이 쌓여, 창을 열지 않고도 지금 하는 일을 눈앞에 붙들어 둡니다. 추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 제작에서 고정해 둔 제작법, 지금 들어와 있는 탐굴, 참여 중인 균열이 여기에 놓입니다. 화면을 되찾고 싶을 때는 퀘스트 추적기를 접을 수 있습니다.",
       "gatheringGoalTrackerBody": "제작 창에서 제작법을, 또는 의뢰 게시판에서 의뢰를 \"추적\"하면 채집 목표 트래커가 이 스택에 추가됩니다. 추적 중인 제작법이나 의뢰의 이름, 목표 수량, 그리고 소지 중이거나 보관 중인 재료로 얼마나 채울 수 있는지를 보여줍니다. \"추적\"은 현재 목표를 대체하고, \"지우기\"는 명시적으로 해제합니다. 둘 다 채집 설정을 바꾸지 않습니다.",
       "hubPracticeTrackerBody": "Eastbrook 거점 근처에서 그곳의 안내형 연습 레슨을 받으면 연습 트래커가 스택에 추가되어, 연습용 허수아비를 상대로 한 최고 기록을 계속 보여줍니다. 레슨이 진행 중일 때는 옆의 코칭 스트립이 피해량 미터 열기부터 두 번째 실행 비교까지, 현재 단계를 안내해 줍니다.",
+      "dungeonTrackerBody": "파티 던전 안에서는 던전 추적기가 스택의 맨 위를 차지합니다. 던전 이름이 적힌 명판(영웅 난이도에서는 \"영웅\"으로 표시)과 진행에 따라 차오르는 레일이 있고, 그 아래에는 해당 던전의 모든 우두머리가 경로에서 만나는 순서대로 나열되며, 쓰러지기 전까지는 각각 0 / 1로 표시됩니다. 전투에 2막이 있는 우두머리는 전투 전체가 끝날 때까지 미완료로 남으므로, 목록은 공략이 실제로 끝났을 때만 완료로 표시됩니다. 던전을 나가면 추적기도 사라지며, 프레임 편집에서는 다른 추적기처럼 고유한 이름 칩을 달고 움직일 수 있게 됩니다.",
       "chatTitle": "채팅창",
       "chatBody": "왼쪽 아래에 있습니다. Enter를 눌러 입력을 시작하고 Enter를 다시 눌러 보냅니다.\n\n탭 두 개는 언제나 자리를 지킵니다. 주위에서 오간 말이 모두 모이는 대화 탭과, 전투가 글로 남는 전투 탭입니다. 더하기 버튼으로 채널마다 탭을 하나씩 더할 수 있습니다. 말하기, 외치기, 파티, 일반, 세계, 파티찾기, 길드, 장교, 그리고 주고받은 귓속말을 한자리에 모아 주는 귓속말 탭입니다. 채널 탭에서 입력하면 명령어를 다시 치지 않아도 그 채널로 전해집니다.\n\n채팅창 전체를 다른 자리로 끌어 옮기고 크기도 조절할 수 있으며, 마지막으로 둔 자리를 기억합니다.",
       "keyWindowsTitle": "키로 여는 창",
@@ -25338,396 +25314,6 @@ export const ko_KR: EnTranslations = {
         "name": "영혼 치유사",
         "title": "죽은 자의 수호자",
         "greeting": "편히 쉬게, 영혼이여. 그대를 육신으로 돌려보낼 수 있으나, 돌아오는 길은 그대를 약하게 만들 것이네."
-      },
-      "deepglass_steward": {
-        "name": "Steward Aleyn Tidewell",
-        "title": "Warden of the Deepglass",
-        "greeting": "The bell is full and the truce holds, {className}. Say the word and the tide-lift will set you down inside it, brassgill, thrustpack and all."
-      },
-      "deepglass_marshal": {
-        "name": "Marshal Yvette Coralwake",
-        "title": "Keeper of the Whistle",
-        "greeting": "Bell is warm and the water is clear, {className}. Name your fixture and I will blow the whistle, singles if you want the ball to yourself, or a full three a side if you would rather have someone to blame."
-      },
-      "portal_wizard_eastbrook": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_fenbridge": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_highwatch": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_eldergleam": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_wyrmwatch": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_icemantle": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_lanternmere": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_bridgemere": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_moonrest": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_gallowmere": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_drifthaven": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_hedgewick": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_wickharbor": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_gullhaven": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_goldcrest": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_deepglass": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Told you I would be here first. Baldness travels light, {className}. Enjoy the bell, mind the glass, and when you miss the grass of home, say the word: the way back is one shining thought away."
-      },
-      "dg_spectator_pace1": {
-        "name": "Merri Sallow",
-        "title": "Deepglass Spectator",
-        "greeting": "They say the ball sings if you hit it hard enough. I came to hear it."
-      },
-      "dg_spectator_pace2": {
-        "name": "Josson Brill",
-        "title": "Deepglass Spectator",
-        "greeting": "I cannot sit still before a fixture. Never could. Ask my wife, she is up in the tiers."
-      },
-      "dg_spectator_pace3": {
-        "name": "Petta Wavecrest",
-        "title": "Deepglass Spectator",
-        "greeting": "Three lengths of the apron and back is exactly one bout of nerves. I have measured."
-      },
-      "dg_spectator_pace4": {
-        "name": "Tam Groundswell",
-        "title": "Deepglass Spectator",
-        "greeting": "Keep to the apron and mind the parapet. The first step off the terrace is a long one."
-      },
-      "dg_spectator_yard1": {
-        "name": "Old Cormorant",
-        "title": "Deepglass Spectator",
-        "greeting": "In my day the water was colder and the goals were smaller. Everything else I approve of."
-      },
-      "dg_spectator_yard2": {
-        "name": "Harrow Finch",
-        "title": "Deepglass Spectator",
-        "greeting": "I bet three silver on the away side. The pies are how I am coping."
-      },
-      "dg_spectator_yard3": {
-        "name": "Corbin Ashvane",
-        "title": "Deepglass Spectator",
-        "greeting": "A bald wizard sold me a portal ride up here. Best copper I ever spent."
-      },
-      "dg_spectator_yard4": {
-        "name": "Sesi Brine",
-        "title": "Deepglass Spectator",
-        "greeting": "Match days are the only days the chasm wind smells like fried bread. Follow your nose."
-      },
-      "dg_spectator_tier1": {
-        "name": "Bela Rimeglass",
-        "title": "Deepglass Spectator",
-        "greeting": "Best seat in the bowl. You can see the whole bell shiver when it takes a hit."
-      },
-      "dg_spectator_tier2": {
-        "name": "Ferrin Saltcask",
-        "title": "Deepglass Spectator",
-        "greeting": "I have held this row since dawn and I will hold it through the whistle."
-      },
-      "dg_spectator_tier3": {
-        "name": "Nim Pearlover",
-        "title": "Deepglass Spectator",
-        "greeting": "When the water goes still right before kickoff, the whole stadium holds its breath with it."
-      },
-      "dg_spectator_tier4": {
-        "name": "Goodwife Alder",
-        "title": "Deepglass Spectator",
-        "greeting": "My husband thinks I am at the temple. The temple thinks I am with my husband."
-      },
-      "dg_spectator_tier5": {
-        "name": "Skipper Vell",
-        "title": "Deepglass Spectator",
-        "greeting": "Sailed every sea there is, and the strangest water I know is hanging right up there."
-      },
-      "dg_spectator_tier6": {
-        "name": "Ivo Lanternwake",
-        "title": "Deepglass Spectator",
-        "greeting": "Higher tier, thinner air, better view. The climb is part of the ticket."
-      },
-      "dg_spectator_tier7": {
-        "name": "Maud Threadneedle",
-        "title": "Deepglass Spectator",
-        "greeting": "I knit a row every time the ball changes hands. Finished a whole scarf last bout."
-      },
-      "dg_spectator_tier8": {
-        "name": "Pello the Hoarse",
-        "title": "Deepglass Spectator",
-        "greeting": "Lost my voice at the last fixture. Worth it. Will do it again today."
-      },
-      "dg_spectator_tier9": {
-        "name": "Liva Undertow",
-        "title": "Deepglass Spectator",
-        "greeting": "Do not stand under the bell when a goal collapses. Trust me on the first part."
-      },
-      "dg_spectator_tier10": {
-        "name": "Danna Kelp-Braid",
-        "title": "Deepglass Spectator",
-        "greeting": "The pylons hum before a match. Put your hand on one and you can feel the fixtures coming."
-      },
-      "dg_spectator_tier11": {
-        "name": "Marlo Spume",
-        "title": "Deepglass Spectator",
-        "greeting": "Sixteen lamps and not one moth. Highest lamps in the world, I reckon."
-      },
-      "dg_spectator_tier12": {
-        "name": "Wenna Tidelace",
-        "title": "Deepglass Spectator",
-        "greeting": "I come for the swimming. I stay because the causeway back down is very long."
-      },
-      "dg_stallkeeper_pies": {
-        "name": "Pieman Roldo",
-        "title": "Match-Day Provisions",
-        "greeting": "Hot pies, cold water, and jerky that outlasts the queue. Eat before the whistle, friend, the second half waits for no stomach."
-      },
-      "dg_stallkeeper_tonics": {
-        "name": "Sella Phial",
-        "title": "Tonics and Drams",
-        "greeting": "Bruise tonic, nerve tonic, and a dram for the drop off the causeway. The players buy the first two. The spectators buy the third."
-      },
-      "dg_stallkeeper_favors": {
-        "name": "Banner-Hag Wynn",
-        "title": "Favors and Flags",
-        "greeting": "A pouch for your winnings and a bag for your doubts. Buy the pouch, dear, it is the optimistic purchase."
-      },
-      "th_gate_captain": {
-        "name": "Gate-Captain Isolde Brack",
-        "title": "Keeper of the Tide Gate",
-        "greeting": "Tidehold keeps the bell, {className}, and I keep Tidehold. Causeway is open, the market is loud, and the Warden is in. Mind the rail on the way back down."
-      },
-      "th_gate_watch_0": {
-        "name": "Warden Sable Quist",
-        "title": "Gate Watch",
-        "greeting": "Walk on. The wards are quiet and I would like them to stay that way."
-      },
-      "th_gate_watch_1": {
-        "name": "Warden Tomas Reel",
-        "title": "Gate Watch",
-        "greeting": "Walk on. The wards are quiet and I would like them to stay that way."
-      },
-      "th_lamplighter": {
-        "name": "Ondry the Lamplighter",
-        "title": "Keeper of the Crystal Lamps",
-        "greeting": "Every lamp from the causeway to the Seat, and they all want tending before the light goes. Follow me up if you like, it is the best walk in the city."
-      },
-      "th_stablemaster": {
-        "name": "Stablemaster Corrin Vane",
-        "title": "Tidehold Stables",
-        "greeting": "Nothing with wings, nothing with a burner. Just honest horses that never fell off a causeway."
-      },
-      "th_market_pies": {
-        "name": "Marla Saltmere",
-        "title": "Bread and Brine",
-        "greeting": "Fresh from the Row ovens, {className}. Eat it here, half of it blows off the terrace out there."
-      },
-      "th_market_tonics": {
-        "name": "Apothecary Wren Fell",
-        "title": "Tonics and Drams",
-        "greeting": "Bruise tonic, nerve tonic, and something for the drop. Deepball players are my best trade."
-      },
-      "th_market_bags": {
-        "name": "Packmaster Hest",
-        "title": "Bags and Bindings",
-        "greeting": "You cannot carry the Glass Market home in your fists, {className}. Ask me how I know."
-      },
-      "th_market_reagents": {
-        "name": "Ore-Factor Dunn",
-        "title": "Stone, Bar and Bloom",
-        "greeting": "Everything the Row forges comes up the causeway on somebody’s back. Mine, mostly."
-      },
-      "th_smith": {
-        "name": "Forgewarden Yela Brine",
-        "title": "The Tidehold Forge",
-        "greeting": "Glass is the Warden’s business. Steel is mine, and mine holds when the glass does not."
-      },
-      "th_banker": {
-        "name": "Coffer-Keeper Ansel Tide",
-        "title": "The Deepglass Vault",
-        "greeting": "Your coin is safer in the rock than in your pocket over a fifty-yard drop, {className}."
-      },
-      "th_merchant": {
-        "name": "Factor Iselle Coralwake",
-        "title": "Warden Market",
-        "greeting": "Half the realm sends its goods up here for the fixtures. Buy, sell, and mind the queue."
-      },
-      "th_innkeeper": {
-        "name": "Innkeeper Dov Marrow",
-        "title": "The Gilded Gull",
-        "greeting": "Bed, board and a window facing the bell. You will not sleep on match night, but you will not want to. Board is up by the door if you are looking for company."
-      },
-      "th_market_folk_0": {
-        "name": "Netta Halloway",
-        "title": "Glassmonger",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_1": {
-        "name": "Bram Culloch",
-        "title": "Ropewright",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_2": {
-        "name": "Sister Ivo Marn",
-        "title": "Almswoman of the Tide",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_3": {
-        "name": "Sallis Quay",
-        "title": "Ferry Factor",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_4": {
-        "name": "Old Perrin",
-        "title": "Fixture Tout",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_5": {
-        "name": "Yenna Coll",
-        "title": "Netmender",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_dockhand_0": {
-        "name": "Dockmaster Ferrow Kell",
-        "title": "The Moorings",
-        "greeting": "Ships moor to the rock here and hang over the ice. You get used to it, or you go back down the causeway."
-      },
-      "th_dockhand_1": {
-        "name": "Riggerwoman Sena Tull",
-        "title": "The Moorings",
-        "greeting": "Ships moor to the rock here and hang over the ice. You get used to it, or you go back down the causeway."
-      },
-      "th_clerk": {
-        "name": "Clerk Ottoline Vex",
-        "title": "The Warden’s Hall",
-        "greeting": "Petitions on the left, fixture disputes on the right, and everything about the causeway rail on my desk."
-      },
-      "th_priest": {
-        "name": "Tidespeaker Halloran",
-        "title": "The Chapel of the Still Water",
-        "greeting": "We keep a bowl of the bell’s own water on the altar. It has never once gone cloudy."
-      },
-      "th_armourer": {
-        "name": "Quartermaster Rook Adlin",
-        "title": "The Grand Armoury",
-        "greeting": "Everything the watch carries, and a little of what it should. The Warden pays; you pay less."
-      },
-      "th_row_folk_0": {
-        "name": "Magister Ilvane Doss",
-        "title": "Warden’s Household",
-        "greeting": "Up here you can hear the bell when the wind drops. Best address in the city."
-      },
-      "th_row_folk_1": {
-        "name": "Goodwife Prell",
-        "title": "Of the Row",
-        "greeting": "Up here you can hear the bell when the wind drops. Best address in the city."
-      },
-      "th_row_folk_2": {
-        "name": "Anselm Coy",
-        "title": "Glasswright",
-        "greeting": "Up here you can hear the bell when the wind drops. Best address in the city."
-      },
-      "th_row_folk_3": {
-        "name": "Little Wren",
-        "title": "Of the Row",
-        "greeting": "Up here you can hear the bell when the wind drops. Best address in the city."
-      },
-      "th_warden": {
-        "name": "Warden Cassia Deepglass",
-        "title": "Warden of the Bell",
-        "greeting": "You came up the whole causeway to look at me, {className}? The bell is behind you and it is the only thing here worth the climb. Go and play in it, that is what we keep it for."
-      },
-      "th_seneschal": {
-        "name": "Seneschal Aldric Poole",
-        "title": "The Warden’s Seat",
-        "greeting": "The Warden sees petitioners at the turn of the glass. The glass, in this city, is quite large."
-      },
-      "th_keep_guard_0": {
-        "name": "Guard Ottar",
-        "title": "The Warden’s Watch",
-        "greeting": "The gate stands open by the Warden’s word. Mind the portcullis if the bell rings."
-      },
-      "th_keep_guard_1": {
-        "name": "Guard Lisbet",
-        "title": "The Warden’s Watch",
-        "greeting": "Keep to the yard, friend. The hall is the Warden’s, and the towers are ours."
-      },
-      "th_keep_guard_2": {
-        "name": "Guard Vance",
-        "title": "The Warden’s Watch",
-        "greeting": "The Warden holds court within. Wipe your boots, that carpet came from Goldcrest."
-      },
-      "th_keep_guard_3": {
-        "name": "Guard Merrin",
-        "title": "The Warden’s Watch",
-        "greeting": "Petitioners to the hall, deliveries to the kitchen wing. Which are you?"
-      },
-      "th_fountain_keeper": {
-        "name": "Wellmaster Bryn Cadoc",
-        "title": "Keeper of the Wardens’ Fountain",
-        "greeting": "The fountain runs with the bell’s own water, {className}, piped up under the causeway, if you believe the Wardens. Baldemar likes the spray on his head. Says it keeps the pate shining."
-      },
-      "th_bridge_watch_0": {
-        "name": "Spanwarden Kettil Voss",
-        "title": "The West Span",
-        "greeting": "A hundred and thirty yards of stone over black ice, and my job is the rail. Look down if you like, everyone does, once."
-      },
-      "th_bridge_watch_1": {
-        "name": "Spanwarden Mara Frost",
-        "title": "The East Span",
-        "greeting": "A hundred and thirty yards of stone over black ice, and my job is the rail. Look down if you like, everyone does, once."
       },
       "chronicler_saul": {
         "name": "연대기 기록관 사울",

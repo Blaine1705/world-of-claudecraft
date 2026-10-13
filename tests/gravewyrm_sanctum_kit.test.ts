@@ -137,6 +137,18 @@ describe('Gravewyrm Sanctum kit: the piece list and the shipped GLB', () => {
     expect(statSync(KIT).size).toBeLessThanOrEqual(4 * 1024 * 1024);
   });
 
+  it.skipIf(!haveKit)(
+    'hangs the anchor chain into the gulf instead of pointing into empty air',
+    () => {
+      const tail = shape('Kit_ChainAnchor').points.filter((p) => p[2] > 13);
+      expect(tail.length).toBeGreaterThan(100);
+      // Even the curved bars at the bend stay below the staple's centre.
+      expect(Math.max(...tail.map((p) => p[1]))).toBeLessThan(3.3);
+      expect(tail.reduce((sum, p) => sum + p[1], 0) / tail.length).toBeLessThan(0);
+      expect(Math.min(...tail.map((p) => p[1]))).toBeLessThan(-10);
+    },
+  );
+
   it.skipIf(!haveKit)('keeps every piece inside its triangle budget', () => {
     // Tiles drawn by the dozen stay light; a hero piece at most 24k.
     const tiles = new Set([

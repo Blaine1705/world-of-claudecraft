@@ -2671,6 +2671,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.deedTracker': '功績トラッカー',
   'hudChrome.interfaceUnlock.frameNames.delveTracker': 'デルヴトラッカー',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': 'リフトトラッカー',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': 'ダンジョントラッカー',
+  'hudChrome.dungeonTracker.complete': '完了',
   'hudChrome.interfaceUnlock.frameNames.targetDots': 'ターゲットデバフ',
   'hudChrome.interfaceUnlock.frameNames.chat': 'チャット',
   'hudChrome.interfaceUnlock.frameNames.menu': 'メニュー',
@@ -13493,6 +13495,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': 'ルナタイド（周期的な範囲ダメージ）',
   'hudChrome.finder.mech.chorus_and_solo': '合唱と独唱（片方の印には集まり、もう片方からは離れる）',
   'hudChrome.finder.mech.tideglass_reflections': '潮硝子の映し身（互いの映し身を倒す）',
+  'hudChrome.finder.mech.hydra_three_elements':
+    '三つの属性（左の首は18ヤードの冷気の円錐を吐き、4秒間あなたの移動を70パーセント遅くする。中央の首は最大3人の足元に毒を吐き、1.5秒後に破裂して、落ちた場所で6秒間燃え続ける。右の首は26ヤードの直線に激流を放ち、あなたを8ヤード吹き飛ばす：どれも範囲の外へ出ること。首が1本倒れると、残った首がその攻撃を引き継ぐ）',
+  'hudChrome.finder.mech.hydra_tsunami':
+    '津波（首が4.5秒間水中に沈み、その間の被ダメージが75パーセント減る。波は池の半分を襲い、次はもう半分を襲う：ノーマルでは160から190の冷気ダメージと10ヤードの押し出し。もう半分へ渡るか、池の縁の柱の陰に立つこと。ヒロイックでは3.5秒後に波がもう半分へ打ち返す。最初の津波は戦闘開始から24秒後、その後は前の波が過ぎてから40秒後に来る）',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    '合体ブレス（津波と津波の間に、首が自分たちの攻撃を2つ融合させる、順番は常に同じ：凍てつく激流は直線上の全員を2秒間凍らせ、次の波を防げる氷の壁を残す。毒の潮流は毒の池を外へ滑らせる。毒の霧氷は毒の池を結晶に凍らせ、4秒後に破裂させる。ノーマルでは津波の間に1回、ヒロイックでは2回）',
+  'hudChrome.finder.mech.hydra_regrowth':
+    '再生（ほかの首が生きている間、倒れた首は20秒後に体力半分で生え戻り、倒れた首1本ごとに残りの首の与ダメージが15パーセント増える：3本をほぼ同時に倒すこと）',
   'hudChrome.finder.mech.rising_tide': '満ち潮（島の半分が浸水、乾いた側へ移動）',
   'hudChrome.finder.mech.undertow': '引き潮（全員を引き寄せる、衝撃の前に逃げる）',
   'hudChrome.finder.mech.enrage': '低体力で激怒',
@@ -16437,14 +16447,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '中央',
   'hudChrome.breath.label': '息',
   'hudChrome.breath.drowning': '溺れています！',
-  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
-  // non-Latin locales per src/ui/CLAUDE.md).
-  'hudChrome.portalWizard.gossipDeepglass': 'ディープグラスへの道を開いてもらう',
-  'hudChrome.portalWizard.gossipDeepglassAria':
-    'バルデマーにディープグラスへのポータルを開いてもらう',
-  'hudChrome.portalWizard.gossipHome': '帰り道を開いてもらう',
-  'hudChrome.portalWizard.gossipHomeAria': 'バルデマーに町へ戻るポータルを開いてもらう',
-  'hudChrome.portalWizard.portalOpen': 'ポータルが開いた。くぐろう。',
   'abilityUi.resources.devotion': '献身',
   'abilityUi.resources.focus': '集中値',
   'abilityUi.tooltip.requiresStealthSkulduggery':
@@ -19368,6 +19370,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '製作ウィンドウでレシピを、または依頼ボードで依頼を「追跡」すると、採集目標トラッカーがこのスタックに加わります。追跡中のレシピまたは依頼の名前、目標の個数、そして所持・保管している素材でどこまで届くかを表示します。「追跡」は現在の目標を置き換え、「クリア」で明示的に解除します。どちらも採取設定を変えることはありません。',
   'guide.interfacePage.hubPracticeTrackerBody':
     'Eastbrookの拠点付近では、そこでのガイド付き練習レッスンを受けると練習トラッカーがスタックに加わり、練習用ダミーに対する自己ベストの記録を表示し続けます。レッスンが進行中は、その隣のコーチングストリップが現在のステップを、ダメージメーターを開くことから2回目の記録を比較することまで案内します。',
+  'guide.interfacePage.dungeonTrackerBody':
+    'グループダンジョンの中では、ダンジョントラッカーがスタックの一番上に入ります。ダンジョン名を記したプレート（ヒロイックで挑戦中は「ヒロイック」と表示）と、攻略が進むにつれて満ちていくレール、その下にはそのダンジョンのボスがルートで出会う順に並び、倒れるまではそれぞれ 0 / 1 と数えられます。戦闘に第二幕があるボスは戦闘全体が終わるまで未完了のままなので、リストが完了と表示されるのは攻略が本当に終わったときだけです。あなたが外に出ればトラッカーも消え、フレーム編集では他のトラッカーと同じように、専用の名前チップを付けて動かせるようになります。',
   'guide.interfacePage.mobileBodyTwoPages':
     'タッチ操作は自動的に現れ、配置は画面の大きさに合わせて整えられます。小さなスマートフォンではコンパクトに、大きなスマートフォンでは標準に、タブレットではゆったりと並びます。\n\nアビリティは数字列ではなく輪の形に並びます。攻撃ボタンとその脇の4つのアクションボタン、そして輪を{pages}つのページの間で切り替えるページトグルです。ページを合わせると{slots}個あるアビリティスロットのすべてに届き、デスクトップ用の追加バーを有効にしているかどうかは関係ありません。輪の5番目の弧の位置は消耗品の席です。タップすればそこに据えた品を使い、長押しするか内側へスワイプすれば、持ち物から自動で埋まる列が開きます。その周りには、タッチで遊ぶ人がいちばんよく使うボタン、ターゲットの切り替え、目の前のものへの対話、ジャンプが並びます。\n\n画面の下辺には、ボタンの列の代わりに「クイック操作」のコントロールが一つ置かれています。ここからそれ以外のすべてが開きます。騎乗、チャット、マップ、バッグ、ソーシャル、クエスト、キャラクター、スペルブック、ゲームメニュー、そして残りのウィンドウを収めた「その他」で、ダンジョンファインダー、PvP、エモート、ウィキもそこに入っています。ここではウィンドウは浮かぶのではなく、画面いっぱいに開きます。\n\nユニットフレームの移動はデスクトップだけのものです。タッチでは、配置はゲームの側が決めてくれます。',
   'guide.interfacePage.winMoreBodyNoValeCup':

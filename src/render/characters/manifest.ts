@@ -183,6 +183,7 @@ import {
 } from '../hollow_crypt/morthen_fx_core';
 import { KNELL_GESTURE_POUR, KNELL_GESTURE_SKY_ROAR } from '../hollow_crypt/morthen_rite_fx_core';
 import type { LocoGaitThresholds } from '../locomotion';
+import type { AimCoreDef } from '../pick_aim_core';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import {
   OSSICK_ANCHOR_AWAY_GESTURE,
@@ -377,10 +378,6 @@ export interface ClipMap {
   /** the swim IDLE: treading water, upright and sculling, played whenever a
    *  swimmer stops. Absent = the stroke keeps playing in place. */
   swimIdle?: string;
-  /** the streamlined BOOST pose: arms out front, legs locked straight, the body
-   *  a spear. Held, not cycled. Only flooded flight (the deepglass bell) ever
-   *  asks for it; absent = a boosting body keeps stroking. */
-  glide?: string;
   /** walking through water too shallow to swim in. Absent = the dry walk. */
   wade?: string;
   /** airborne base pose while jumping/falling */
@@ -590,6 +587,16 @@ export interface VisualDef {
    *  stay): a part of a larger creature drawn once by its dungeon's own
    *  visuals (the Mere Hydra's heads). */
   bodyless?: boolean;
+  /** Where a click on this entity is AIMED, when the click capsule is wider
+   *  than (or stands beside) what the player sees of it: a narrow vertical
+   *  core the direct pick tests the pick ray against (pick_aim_core.ts) before
+   *  it lets a use-only body win a click over a nearer live hit
+   *  (world_direct_pick.ts). In WORLD yards from the entity's own position
+   *  and facing: unlike the click capsule it is NOT multiplied by the
+   *  entity's scale, so author it for the size the entity is drawn at.
+   *  Presentation-side targeting help only, like `clickRadius`: the sim never
+   *  reads it. */
+  aimCore?: AimCoreDef;
   /** Material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -2287,9 +2294,6 @@ const HUMANOID_H = 2.6;
 // stays in every GLB and is still what mobs and creatures use.
 // ---------------------------------------------------------------------------
 const SWIM_ANIMS_URL = `${PLAYERS}/swim_anims.glb`;
-/** The Studio's burner glide (SWIM_CLIP_GLIDE) ships alone in its own
- *  clip-only GLB, so the release swim pack above stays byte-identical. */
-const GLIDE_ANIMS_URL = `${PLAYERS}/glide_anims.glb`;
 /** Submerged stroke: arms sweep out and back to centre, legs frog-kick. */
 export const SWIM_CLIP_SUBMERGED = 'Swim_Breaststroke';
 /** Surface stroke: alternating overarm crawl over a flutter kick. */
@@ -2298,10 +2302,6 @@ export const SWIM_CLIP_SURFACE = 'Swim_Freestyle';
  *  UPRIGHT clip in the pack, which is why the renderer sinks the body for it
  *  (visual.ts SWIM_RISE_TREAD) instead of floating it like the prone strokes. */
 export const SWIM_CLIP_TREAD = 'Swim_Tread';
-/** The burner glide: hands thrust out ahead, elbows locked, legs together and
- *  toes pointed: a body being pushed rather than one swimming. Held as a pose;
- *  the clip carries only a slow flutter so it is not stone-still. */
-export const SWIM_CLIP_GLIDE = 'Swim_Glide';
 /** Walking through water too shallow to swim in: short, high-kneed, leaning. */
 export const WATER_CLIP_WADE = 'Water_Wade';
 /** Long-fall panic flail: upright, arched back, arms windmilling out of phase,
@@ -2312,13 +2312,12 @@ export const FALL_CLIP_FLAIL = 'Fall_Flail';
 function swims(def: VisualDef): VisualDef {
   return {
     ...def,
-    animUrls: [...(def.animUrls ?? []), SWIM_ANIMS_URL, GLIDE_ANIMS_URL],
+    animUrls: [...(def.animUrls ?? []), SWIM_ANIMS_URL],
     clips: {
       ...def.clips,
       swim: SWIM_CLIP_SUBMERGED,
       swimSurface: SWIM_CLIP_SURFACE,
       swimIdle: SWIM_CLIP_TREAD,
-      glide: SWIM_CLIP_GLIDE,
       wade: WATER_CLIP_WADE,
       fall: FALL_CLIP_FLAIL,
     },
@@ -4685,6 +4684,16 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     bodyless: true,
     clickRadius: 2.2,
+    // What the player sees is the kit's pillar, not this body: the body stands
+    // at the pillar's foot facing away from it, 1.9 yd out from the pillar's
+    // axis (morthen_ids.ts candleBodySpot). Measured in the running game: the
+    // pillar's stone is 3.55 yd tall (its wick) on a plinth 1.4 yd in radius,
+    // the tallow column 0.95 (hollow_crypt/morthen_rite_fx_core.ts), the dark
+    // candle's glow 0.75 either side of the wick up to 4.4. The core is the
+    // tallow column with a quarter yard of slack, kept inside the pillar's
+    // 1.3 yd collider so it never reaches where a mob can stand beside it;
+    // its rounded top covers the glow (tests/pick_resolution.test.ts pins it).
+    aimCore: { back: 1.9, radius: 1.2, height: 3.55 },
   },
   // The Gravecaller Adept: a novice of the cult in a violet hooded robe split over its
   // legs, a violet staff in its right hand. Cast is the conjuring loop (Grave Spark).
@@ -6339,16 +6348,17 @@ export const VISUALS: Record<string, VisualDef> = {
   // stands about 2.97 yd, a head over the player. His gestures ride the
   // overhead emotes the guide sets as he speaks (point = Talk, cry = Startle,
   // kneel = Kneel) and the song is his channel cast (cantor_last_verse, the
-  // Sing loop). The Walk's long gliding stride covers 1.25 yd/s at this
-  // scale, so the guide's 3.2 yd/s follow walk plays it about 2.6x with the
-  // feet planted; the 7 yd/s catch-up run caps lower and slides a little.
+  // Sing loop). His original-rig animation bank provides foot-matched Walk
+  // and Run cycles: measured planted-foot speeds at the drawn size keep the
+  // 3.2 yd/s follow and 7 yd/s catch-up inside modest cadence ceilings.
   npc_laverock: {
     url: `${CREATURES}/temple_laverock.glb`,
+    animUrls: [`${CREATURES}/temple_laverock_locomotion.glb`],
     height: 3.75,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
-      run: 'Walk',
+      run: 'Run',
       attack: ['Talk'],
       death: 'Idle',
       cast: 'Sing',
@@ -6359,10 +6369,10 @@ export const VISUALS: Record<string, VisualDef> = {
         kneel: { clips: ['Kneel'] },
       },
     },
-    walkRef: 1.25,
-    runRef: 1.25,
-    walkTimeScaleMax: 2.8,
-    runTimeScaleMax: 3.6,
+    walkRef: 1.848751,
+    runRef: 4.468026,
+    walkTimeScaleMax: 1.8,
+    runTimeScaleMax: 1.6,
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 0.9,

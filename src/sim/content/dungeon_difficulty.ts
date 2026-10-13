@@ -231,6 +231,13 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     difficulty: 'normal',
     healthMultiplier: 2.0,
     healthMultiplierByMob: {
+      // The Sledge Tusker is the Sanctum's miniboss (a solo elite outside the
+      // Finder's encounter list): its designed 60 s, 8,992. The owner's rule
+      // for normal (2026-10-12): a miniboss carries clearly less than every
+      // boss of its dungeon, at most three quarters of the weakest (Korgath,
+      // 12,007). The heroic band factor it briefly took here (6.3, 10,433)
+      // put it at 87 percent, so normal is back on the design; the heroic
+      // record below keeps its band.
       sledge_tusker: 5.43,
       // Korgath's body about 12,000 (80 s), plus his four Seal Shackles at
       // about 1,500 each (encounters/gravewyrm_sanctum/korgath.ts): about 105 s
@@ -350,8 +357,16 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       knight_commander_olen: 6.42,
       gaoler_ossick: 6.84,
       vael_the_mistcaller: 8.05,
+      // The two minibosses (the Shipwreck Captain, id turretback_hermit, a
+      // solo elite outside the Finder's encounter list, and the Gaol Turnkey,
+      // in the list but the gaol's miniboss by its own content) are priced at
+      // 60 s (3.66, 4,495) and 50 s (2.93, 3,599). The owner's rule for
+      // normal (2026-10-12): a miniboss carries clearly less than every boss
+      // of its dungeon, at most three quarters of the weakest (Olen, 5,995).
+      // The heroic band factors they briefly took here (5,539 and 5,214) put
+      // them at 92 and 87 percent, so normal is back on the design; the
+      // heroic record below keeps its bands.
       turretback_hermit: 3.66,
-      // The gaol's miniboss: 50 s (about 3,600) on the Hermit's template pool.
       gaol_turnkey: 2.93,
     },
     // The crawler and the prisoner carry a heroic-priced base swing (see
@@ -392,6 +407,27 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       // his immune Rite, about 125 s of damage at 55 (level 10): about 6,800 on
       // his 1,191 template pool.
       morthen: 5.7,
+      // The Knellwyrm his dying rite summons (encounters/hollow_crypt/
+      // knellwyrm.ts) spawned on its bare template (1,081: dead in about
+      // 20 s, before its first Dread Bellow at 24 s; the manager's playtest
+      // of 2026-10-12). It is a miniboss, and the owner's rule for normal
+      // (2026-10-12) is that a miniboss carries clearly less than every boss
+      // of its dungeon: at most three quarters of the weakest (Marrow,
+      // 3,152). So 2.18, 2,357 on that pool (it was first priced at 4.07,
+      // 4,400, above Marrow and the Lady). About 43 s at the planning 55
+      // (level 10): Pyre Strafe at 14 s and the Dread Bellow at 24 s both
+      // come round. A party well over the planning pace kills it before the
+      // Bellow lands; the rule outranks that.
+      crypt_knellwyrm: 2.18,
+      // The Crypt's one spawn-list miniboss, the Ossuary Drake (a solo elite
+      // that holds the Processional's 'drake' pull alone and is no gate's
+      // boss). The manager's playtest of 2026-10-12 asked for double health
+      // on the minibosses; the owner's rule is the heroic band (15,000 to
+      // 20,000, the heroic record below) and, on normal, at most three
+      // quarters of the weakest boss (Marrow, 3,152): twice its template
+      // pool, 2,079 where it had 1,040, two thirds of Marrow. Health only:
+      // its bite and its breath, lash and gust land what they did.
+      crypt_ossuary_drake: 2,
     },
     damageMultiplierByMob: {},
   },
@@ -403,6 +439,10 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       choirmother_selthe: 7.97,
       tideglass_colossus: 7.35,
       ysolei: 8.27,
+      // The Mere Hydra is a boss by the owner's ruling of 2026-10-12. The
+      // Finder's encounter list on this branch has no row for it; the row
+      // lands with the tracker branch fix/dungeon-tracker-hydra-boss. A boss's
+      // normal pool keeps its designed length: 2,000 a head.
       mere_hydra_head_left: 1.38,
       mere_hydra_head_center: 1.38,
       mere_hydra_head_right: 1.38,
@@ -573,19 +613,42 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       crypt_ossuary_cutthroat: 10.35,
       crypt_carrion_crow: 26.7,
     },
-    // The wing bosses' pools from target fight length x heroic party DPS
-    // (about 230) on their level-22 templates: Sexton Marrow 70 s (about
-    // 16,100 on 1,412), the Lady of the Bonechill 80 s (about 18,400 on
-    // 1,532), Cantor Ilvane about 64 s on her own (about 14,700 on 1,412)
-    // after her two Choristers, held to about 8 s each (about 1,840 on 971).
+    // The wing bosses were priced from target fight length x heroic party DPS
+    // (about 230) on their level-22 templates: Sexton Marrow 70 s (11.4,
+    // about 16,100 on 1,412), the Lady of the Bonechill 80 s (12, about
+    // 18,400 on 1,532), Cantor Ilvane about 64 s on her own (10.4, about
+    // 14,700 on 1,412) after her two Choristers, held to about 8 s each
+    // (about 1,840 on 971). The owner's heroic playtest of 2026-10-12 ("she
+    // lasted almost nothing", and the bosses should sit around 25,000 to
+    // 30,000) replaced the three lengths with one pool: each wing boss
+    // carries about 25,000 (the Lady 24,999, Marrow and Ilvane 24,996),
+    // about 109 s at the planning 230, under Morthen's 28,800. The Choristers
+    // keep their pool. The Lady's Frozen Embrace breaks on a share of her
+    // pool, and heroic carries its own (LADY_TUNING.embraceBreakShareHeroic)
+    // so the damage that frees the held stays the 1,103 it was: more health
+    // was asked for, not a harder Embrace. Marrow and Ilvane have no such
+    // share: his Tolls (66 and 33 percent) and her Crescendo (30 percent) are
+    // phases of the fight and stretch with it (hollow_crypt.md 5 has what the
+    // longer fights change). Pinned by tests/hollow_crypt_boss_pools.test.ts.
     healthMultiplierByMob: {
-      sexton_marrow: 11.4,
-      rimeweb: 12,
-      cantor_ilvane: 10.4,
+      sexton_marrow: 17.7,
+      rimeweb: 16.32,
+      cantor_ilvane: 17.7,
       hollow_chorister: 1.9,
       // Morthen: about 125 s of damage at about 230 beside his immune Rite
       // (about 28,800 on his 2,074 level-22 template pool).
       morthen: 13.9,
+      // The Knellwyrm: the same 80 s at about 230 is 18,400 on its 1,909
+      // level-22 template pool (it rode the dungeon-wide 3.8: 7,254, about
+      // 32 s, its first Burning Knell due at 30 s). The Knell flies out of
+      // reach for about 23 s on top, so the heroic finale runs about 100 s.
+      crypt_knellwyrm: 9.64,
+      // The Ossuary Drake, the Crypt's spawn-list miniboss. Heroic minibosses
+      // sit in 15,000 to 20,000, clearly under the bosses' 25,000 (the owner,
+      // 2026-10-12): twice the dungeon-wide 3.8 lands inside the band (15,872
+      // where it had 7,936), so the plain doubling stands. The Knellwyrm
+      // above (18,403) is the Crypt's other miniboss, already in the band.
+      crypt_ossuary_drake: 3.8 * 2,
     },
     // Avoidable trash mechanics priced apart from the tank-swing floor (the
     // dungeon trash pass's balance audit): the necromancer's Grave Rupture
@@ -595,10 +658,13 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // Bolt was priced on it before this pass; its volley's base is set for
     // it).
     // The wing bosses' mechanics are priced apart from the melee floor (the Bastion's
-    // bands, cloth about 1,250 at 20 heroic): Marrow's Toll about 15 percent
-    // and a cave-in about 22; an unsheltered Lament about 27 (Lingering
-    // Lament stacks half again), her drop about 66; Ilvane's completed Dirge
-    // or a note lane about 70 (a fumbled core all but kills).
+    // bands, cloth about 1,250 at 20 heroic): Marrow's Toll about 18 percent
+    // (198 to 251: this factor times the Toll's own heroic tenth,
+    // MARROW_TUNING.tollHeroicMult, set by the owner's playtest of 2026-10-12;
+    // it was 180 to 228, about 16) and a cave-in about 22; an unsheltered
+    // Lament about 27 (Lingering Lament stacks half again), her drop about
+    // 66; Ilvane's completed Dirge or a note lane about 70 (a fumbled core
+    // all but kills).
     // The pack budget lowered the trash melee factors under every trash kit
     // (a mob with no mechanic entry stamps its melee factor as
     // mechanicDamageMult), so each kit-carrying trash mob keeps its
@@ -641,12 +707,25 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // The rework (docs/design/dungeon-rework/sunken_bastion.md): the bosses'
     // pools set per boss from target fight length x heroic party DPS (about
     // 230): Olen 80 s, Ossick 85 s, Vael 150 s; the Turretback Hermit 60 s.
+    // The owner's heroic health bands (2026-10-12) then replaced the lengths
+    // of everything but the final boss: a non-final boss carries about
+    // 25,000 and a miniboss sits in 15,000 to 20,000, clearly under them
+    // (the Finder's encounter list says which is which). Olen (12, 18,382)
+    // and Ossick (12.75, 19,530) carry 24,999, about 109 s at the planning
+    // 230; the Shipwreck Captain (7.3, 13,801), a miniboss, about 17,000
+    // (74 s); the Gaol Turnkey (5.84, 11,041), the gaol's miniboss, about
+    // 16,000 (70 s). Vael is untouched. Health only. None of the four has a
+    // check sized by a share of its pool (the Iron Cage and the Drowned
+    // Anchor break on hit counts, Olen's Oath and the cells are phases), and
+    // none has an enrage, so nothing was compensated: the longer fights
+    // bring more casts on the same clocks. Pinned by
+    // tests/sunken_bastion_health_bands.test.ts.
     healthMultiplierByMob: {
-      knight_commander_olen: 12,
-      gaoler_ossick: 12.75,
+      knight_commander_olen: 16.32,
+      gaoler_ossick: 16.32,
       vael_the_mistcaller: 15.7,
-      turretback_hermit: 7.3,
-      gaol_turnkey: 5.84,
+      turretback_hermit: 8.99,
+      gaol_turnkey: 8.46,
     },
     damageMultiplierByMob: {
       // The bosses and the two solo minibosses keep their melee: the
@@ -707,13 +786,34 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // pools set per boss from target fight length x heroic party DPS (about
     // 230): Selthe 90 s, the Colossus 100 s, Ysolei 150 s, the Hydra's heads
     // 55 s for the three.
+    // The owner's heroic health bands (2026-10-12) then replaced the lengths
+    // of everything but the final boss: a non-final boss carries about
+    // 25,000 and a miniboss sits in 15,000 to 20,000 (the Finder's encounter
+    // list says which is which, except for the Hydra: a boss by the owner's
+    // ruling, its row pending). Choirmother Selthe (12.9, 20,650) carries
+    // 25,004, about 109 s at the planning 230; the Colossus (23,003) already
+    // sits beside the band and Ysolei is untouched. The Mere Hydra, a boss
+    // by the owner's ruling, goes from 4,306 a head (2.4) to 8,333, about
+    // 25,000 across the three: about 109 s at the planning 230 where it was
+    // 56 s. Health only. Selthe has no check sized by her pool and no
+    // enrage. The Hydra has one: a fallen head regrows 20 s later with a
+    // SHARE of its pool, so heroic carries its own
+    // (HYDRA_TUNING.regrowShareHeroic, read through hydraRegrowShare) and a
+    // regrown head still stands up with the 2,153 it had. Its Enraged stacks
+    // count the heads lying dead (two at most), not time, so the larger pool
+    // cannot raise them past the design; what it does bring is a second
+    // Tsunami and more Combined Breaths on the same clocks (measured once by
+    // hand in real fights at 230 DPS and recorded in docs/design/
+    // dungeon-rework/README.md section 6; no suite replays those fights). The
+    // pools and the regrown head's 2,153 are pinned by
+    // tests/drowned_temple_health_bands.test.ts.
     healthMultiplierByMob: {
-      choirmother_selthe: 12.9,
+      choirmother_selthe: 15.62,
       tideglass_colossus: 12.05,
       ysolei: 13.66,
-      mere_hydra_head_left: 2.4,
-      mere_hydra_head_center: 2.4,
-      mere_hydra_head_right: 2.4,
+      mere_hydra_head_left: 4.645,
+      mere_hydra_head_center: 4.645,
+      mere_hydra_head_right: 4.645,
     },
     damageMultiplierByMob: {
       // The bosses keep their melee: the pre-budget dungeon-wide 16.5, the
@@ -776,10 +876,23 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // The Ice Tomb rework's pools from target fight length x heroic party DPS
     // (about 230): the Sledge Tusker 60 s, Korgath 105 s, Velkhar 100 s,
     // Korzul 160 s on the ground (phase B retunes them with their cores).
+    // The owner's heroic health bands (2026-10-12) then replaced the lengths
+    // of everything but the final boss: a non-final boss carries about
+    // 25,000 and a miniboss sits in 15,000 to 20,000 (the Finder's encounter
+    // list says which is which). Korgath's body (7.87, 18,391) carries
+    // 25,004, about 109 s at the planning 230 with every chain broken; his
+    // four shackles keep their pools. The Sledge Tusker, the miniboss (7.69,
+    // 13,796), carries 16,002 (70 s). Velkhar (22,991) already sits beside
+    // the band and Korzul is untouched. Health only. Neither has a check
+    // sized by a share of its pool, and their enrages are phases (the Tusker
+    // under 20 percent, Korgath under 30), not clocks, so nothing was
+    // compensated. Korgath's Lockbound still takes 20 percent off per chain
+    // left on, so a group that leaves chains on feels the larger body more.
+    // Pinned by tests/gravewyrm_sanctum_health_bands.test.ts.
     healthMultiplierByMob: {
-      sledge_tusker: 7.69,
-      // Korgath's body 80 s (about 18,400) plus four shackles of about 2,300.
-      korgath_the_bound: 7.87,
+      sledge_tusker: 8.92,
+      // Korgath's body about 25,000 plus four shackles of about 2,300.
+      korgath_the_bound: 10.7,
       sanctum_shackle_hammer: 3.07,
       sanctum_shackle_tongs: 3.07,
       sanctum_shackle_anvil: 3.07,

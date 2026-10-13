@@ -216,12 +216,15 @@ function baseEntity(id: number, pos: Vec3): Entity {
     spawnPos: { ...pos },
     leashAnchor: null,
     evadeStall: 0,
+    chaseRoute: undefined,
+    routeDenied: undefined,
     chaseStall: 0,
     evadeEpoch: 0,
     chainPullInbound: false,
     // The instance combat hold's pin clock: present from birth (undefined) so a
     // mob's shape never forks on its first pin or release.
     evadeInPlace: undefined,
+    gateSealTick: undefined,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,

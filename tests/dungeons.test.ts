@@ -1096,7 +1096,8 @@ describe('dungeons: heroic difficulty', () => {
       HEROIC_DUNGEON_TUNING.hollow_crypt.healthMultiplier,
     );
 
-    // Anti-kite floor: every heroic mob moves at least 8 (player run speed 7).
+    // Anti-kite floor: every heroic mob that walks moves at least 8 (player
+    // run speed 7); a template authored immobile stays immobile.
     expect(heroicMorthen.moveSpeed).toBe(8);
     // Heroic bosses can be neither controlled nor snared: a stun and a slow
     // both bounce off (entity-level immunity, since the applyAura gates read

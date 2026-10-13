@@ -220,6 +220,9 @@ const INDEX_SECTIONS = [
   'King of the Hill (the in-zone bar over the standing hill)',
   // The Sunken Bastion's Iron Cage escape prompt (src/ui/hud/dungeon/).
   "Iron Cage escape (the Gaol Turnkey's button-mash prompt)",
+  // The dungeon objectives tracker's plate and boss rows (hud.css; both
+  // entries load it through the barrel).
+  'dungeon objectives tracker',
   'ui library (shared primitives)',
   // The WOC character-creation face builder (shell.css); the barrel loads it
   // in both entries.
@@ -243,11 +246,12 @@ describe('css_corpus section manifest', () => {
     // face builder (shell.css, in both entries) another: 76 / 74 on the v0.45.0
     // integration.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 77, 75.
-    expect(INDEX_SECTIONS.length).toBe(77);
-    expect(PLAY_SECTIONS.length).toBe(75);
-    expect(MANIFEST.length).toBe(77);
-    expect(new Set(INDEX_SECTIONS).size).toBe(77);
-    expect(new Set(PLAY_SECTIONS).size).toBe(75);
+    // + the dungeon objectives tracker (hud.css, in both entries): 78, 76.
+    expect(INDEX_SECTIONS.length).toBe(78);
+    expect(PLAY_SECTIONS.length).toBe(76);
+    expect(MANIFEST.length).toBe(78);
+    expect(new Set(INDEX_SECTIONS).size).toBe(78);
+    expect(new Set(PLAY_SECTIONS).size).toBe(76);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

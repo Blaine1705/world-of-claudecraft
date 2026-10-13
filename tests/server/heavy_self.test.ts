@@ -28,7 +28,6 @@ const EXPECTED_CMDS = [
   'bank_withdraw',
   'buy',
   'buyback',
-  'buyplot', // Tidehold housing deeds (fork)
   'change_skin',
   'change_weapon_skin',
   'claim_event_skin',

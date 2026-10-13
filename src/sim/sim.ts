@@ -283,7 +283,7 @@ import {
   tickGroundAoEs,
 } from './entity_roster';
 import * as escortMod from './escort';
-import { updateEscorts as updateEscortsImpl } from './escort';
+import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { forcedMoveGroundHeight } from './forced_move_ground';
 import { forcedStepBlocked } from './forced_move_step';
@@ -291,6 +291,8 @@ import { formatMoney } from './format_money';
 import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
+import { spawnHealingTrainingGround } from './healing_training';
+import { spawnHubPractice } from './hub_practice';
 import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import * as inventoryConsumption from './inventory_consumption';
@@ -447,7 +449,6 @@ import {
   stepPlayerMotion,
 } from './player_motion';
 import { livePlaytimeSeconds } from './playtime';
-import { buyPlot as buyPlotImpl, spawnPlotSigns } from './plots';
 import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,
@@ -657,10 +658,7 @@ import {
 import * as worldPvpMod from './pvp/world_pvp';
 import { savedWorldPvpFields } from './pvp/world_pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
-import {
-  spawnRealmBuilderMonument,
-  spawnTideholdRealmBuilderMonument,
-} from './realm_builder_monument_spawn';
+import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
 import {
   accountReliquaryOwnershipOpts,
   catalogRankOwned,
@@ -722,6 +720,7 @@ import {
   WORLD_BOSSES,
 } from './world_boss';
 import { spawnDevBoss, spawnWorldBoss } from './world_boss_spawn';
+import { spawnHarborHouseKeeper } from './wyrmwatch_harbor_house';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -736,6 +735,7 @@ import { personalGliderLeaderboard as gliderRecordsPage } from './glider_persona
 import { spawnStaticWorldObjects } from './ground_object_spawns';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import { buyCrucibleVendorItem as buyCrucibleVendorItemImpl } from './instances/crucible_vendor';
+import { dungeonRunForPlayer } from './instances/dungeon_run';
 import {
   awardHeroicMarks as awardHeroicMarksImpl,
   DEFAULT_RAID_LOCKOUT_MS,
@@ -775,7 +775,7 @@ import {
   socketRiftGem as socketRiftGemImpl,
   upgradeRiftItem as upgradeRiftItemImpl,
 } from './rift/progression';
-import { buildRiftFloorView } from './rift/rift_floor_view';
+import { buildRiftFloorView, riftEventMsRemainingFor } from './rift/rift_floor_view';
 import {
   riftLockpickAbort as riftLockpickAbortImpl,
   riftLockpickAction as riftLockpickActionImpl,
@@ -810,7 +810,6 @@ import * as worldQuestMod from './world_quests';
 // (online.ts) stays byte-identical.
 export { computeQuestState } from './quests/quest_commands';
 
-import * as deepglassVenue from './deepglass/venue_hooks';
 import { updateNpcRoute } from './npc_routes';
 import { advanceExclusiveMovement } from './player_movement_modes';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
@@ -1386,9 +1385,6 @@ export interface PlayerMeta
   // so pre-feature saves load cleanly as un-trained. Grandfathered: any save
   // that had mountTrainingFeePaid=true gets ridingTrained=true on load.
   ridingTrained?: boolean;
-  // Tidehold housing plots bought at their signs (sim/plots.ts). Absent until
-  // the first deed.
-  ownedPlots?: string[];
   // PBE boost kit version already applied to this character (server/
   // pbe_boost.ts, PBE_BOOST_ACCOUNTS=1 only). Optional and absent outside the
   // PBE so live saves round-trip byte-equal; the world-join top-up re-kits
@@ -2206,10 +2202,10 @@ export class Sim {
   deedDirtyPids = new Set<number>();
   deedDirtyKeys = new Map<number, Set<string>>();
   deedRuntime: DeedRuntime = createDeedRuntime();
-  // Mob-AI scan visit counters (observability): reset at the top of each tick,
-  // incremented in place by the aggro-scan and threat-table hot paths through
-  // ctx, and read by the host after tick() returns. Not persisted, never a
-  // gameplay input; exposed as a live SimContext view and via mobScanCounters.
+  // Mob-AI per-tick tallies (mob/scan_counters.ts): reset at the top of each
+  // tick, incremented in place through ctx, read by the host after tick(). Not
+  // persisted. The visit counts are observability only; routeNodes and sightQueries
+  // are also the tick's two budgets (deterministic: only the sim resets the holder).
   private readonly _mobScanCounters = createMobScanCounters();
   // World-boss scheduler, one slot per WORLD_BOSSES entry. `nextAt` is the next
   // sim-time (seconds) a boss is due to rise; `entityId` is the live boss entity
@@ -2257,8 +2253,6 @@ export class Sim {
       world: cfg.world,
       perfLap: cfg.perfLap,
       idleMobTickRadius: cfg.idleMobTickRadius ?? 0,
-      // Stays optional like `world`: undefined means "the world's own start".
-      playerStartOverride: cfg.playerStartOverride,
     };
     const activeWorldContent = getActiveWorldContent();
     this.worldContent = cfg.world ?? activeWorldContent;
@@ -2435,8 +2429,6 @@ export class Sim {
       }
     }
 
-    // Ground objects, mailboxes, dungeon doors + their instance slots
-    // (ground_object_spawns.ts; the arena skips the doors and slots there).
     spawnStaticWorldObjects(worldContent, {
       entities: this.entities,
       allocateEntityId: () => this.nextId++,
@@ -2452,10 +2444,6 @@ export class Sim {
     spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
 
     weeklyMod.spawnWeeklyKeeper(this.ctx, worldContent.npcs[weeklyMod.WEEKLY_KEEPER_ID]);
-    // Deepglass steward + marshal (deepglass/venue_hooks.ts): reserved ids, no rng.
-    const safeNpcPos = (x: number, z: number) => this.findSafePos(x, z, waterLevel() + 0.6);
-    deepglassVenue.spawnDeepglassVenueStaff(this.ctx, worldContent, safeNpcPos);
-
     // FURY uses a reserved id and spawns after the rng-driven world roster, so
     // the Honor Quartermaster cannot perturb existing entity ids or replay RNG.
     {
@@ -2466,9 +2454,6 @@ export class Sim {
         this.addEntity(fury);
       }
     }
-
-    // Baldemar's selves, the Deepglass crowd, Tidehold's residents: reserved ids, no rng.
-    deepglassVenue.spawnDeepglassVenueTownsfolk(this.ctx, worldContent, safeNpcPos);
 
     // Warmarshal Draven Kole in Highwatch: the same reserved-id, rng-free
     // treatment as Bram and FURY above. See src/sim/pvp/warfare_quartermaster.ts.
@@ -2557,9 +2542,7 @@ export class Sim {
       this.addEntity(board);
     }
 
-    spawnRealmBuilderMonument(this, this.worldContent.props);
-    spawnTideholdRealmBuilderMonument(this, this.worldContent.presentationMode);
-    spawnPlotSigns(this, this.worldContent.presentationMode);
+    spawnRealmBuilderMonument(this.ctx, this.worldContent.props);
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {
@@ -2588,8 +2571,11 @@ export class Sim {
       }
     }
 
-    // Escorts, the practice yards, the harbormaster (skipped in the Deepglass arena).
-    deepglassVenue.spawnOverworldFixtures(this.ctx, worldContent);
+    // Escorts, the practice yards, the harbormaster: rng-free, trailing or reserved ids.
+    initEscortsImpl(this.ctx);
+    spawnHubPractice(this.ctx, worldContent);
+    spawnHealingTrainingGround(this.ctx, worldContent);
+    spawnHarborHouseKeeper(this.ctx, worldContent);
   }
 
   private spawnHealerPracticeDummy(): void {
@@ -3285,10 +3271,6 @@ export class Sim {
       // Grandfather: players who already paid the old 100g fee are riding-trained.
       if (s.ridingTrained === true || s.mountTrainingFeePaid === true) meta.ridingTrained = true;
       if (typeof s.pbeBoostKit === 'number') meta.pbeBoostKit = s.pbeBoostKit;
-      if (Array.isArray(s.ownedPlots)) {
-        const plots = s.ownedPlots.filter((id): id is string => typeof id === 'string');
-        if (plots.length > 0) meta.ownedPlots = plots;
-      }
       // Grandfather: players who had q_riding_lessons active in a mid-quest save
       // (state='active' or 'ready') but never received ridingTrained=true are
       // riding-trained because accepting the quest proves they already paid
@@ -3530,12 +3512,12 @@ export class Sim {
   // Returns the new pid, or -1 if the name is blank or already taken (whisper
   // resolution needs a unique name). Never reached in production (the caller runs
   // only when devCommands is on).
-  spawnDevBot(name: string, cls: PlayerClass = 'mage'): number {
+  spawnDevBot(name: string): number {
     const clean = name.trim();
     if (!clean) return -1;
     for (const m of this.players.values())
       if (m.name.toLowerCase() === clean.toLowerCase()) return -1;
-    const pid = this.addPlayer(cls, clean, { bot: true });
+    const pid = this.addPlayer('mage', clean, { bot: true });
     const meta = this.players.get(pid);
     if (meta) meta.isDevBot = true;
     const me = this.entities.get(this.primaryId);
@@ -3546,15 +3528,6 @@ export class Sim {
       this.rebucket(e);
     }
     return pid;
-  }
-
-  // The spawnDevBot counterpart: remove a dev bot ENTIRELY, entity and player
-  // meta, so its name returns to the pool. Deepball's final whistle calls this
-  // through the context seam; dropEntity alone leaked the meta and drained the
-  // roster a seat per bout.
-  removeDevBot(pid: number): void {
-    if (this.players.has(pid)) this.removePlayer(pid);
-    else this.dropEntity(pid);
   }
 
   // /dev vendor: spawn the free-epic Test Quartermaster next to the caller
@@ -4017,9 +3990,6 @@ export class Sim {
       ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       // Absent until riding skill is purchased (back-compat).
       ...(meta.ridingTrained ? { ridingTrained: true } : {}),
-      ...(meta.ownedPlots && meta.ownedPlots.length > 0
-        ? { ownedPlots: [...meta.ownedPlots] }
-        : {}),
       // Absent outside the PBE (back-compat; server/pbe_boost.ts).
       ...(meta.pbeBoostKit !== undefined ? { pbeBoostKit: meta.pbeBoostKit } : {}),
       craftSkills: { ...meta.craftSkills },
@@ -5721,7 +5691,6 @@ export class Sim {
       notice: sim.notice.bind(sim),
       // Dev-only test-dummy spawner backing "/dev bot <name>" in social/chat.ts.
       spawnDevBot: sim.spawnDevBot.bind(sim),
-      removeDevBot: sim.removeDevBot.bind(sim),
       spawnDevVendor: sim.spawnDevVendor.bind(sim),
       startCascadePlaytest: sim.startCascadePlaytest.bind(sim),
       startDevSandbox: sim.startDevSandbox.bind(sim),
@@ -5997,9 +5966,9 @@ export class Sim {
     // The mob loop additionally passes the mob it just updated as a sub-phase tag so
     // the host can split mob.update per zone; every other call omits it.
     const lap = this.cfg.perfLap;
-    // Zero the mob-AI scan visit counters for this tick before any tick work runs, so
-    // the getter reads this tick's totals once tick() returns (observability only,
-    // draws no rng, mutates no gameplay state).
+    // Zero the mob-AI per-tick tallies before any tick work runs, so the getter reads
+    // this tick's totals once tick() returns. Draws no rng. Two of them are also the
+    // tick's budgets (routeNodes, sightQueries: mob/scan_counters.ts): only the sim resets.
     resetMobScanCounters(this._mobScanCounters);
     this.updatePendingMobRespawns();
     lap?.('respawns');
@@ -6197,7 +6166,6 @@ export class Sim {
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
-    deepglassVenue.updateDeepglassPhase(this.ctx, lap); // authored maps only, zero rng
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
     // tick-math wave and rune clocks; the one seeded draw is the power-rune face
     // at match START), so its tick position cannot fork the draw order mid-match.
@@ -8788,9 +8756,6 @@ export class Sim {
   pickUpObject(objId: number, pid?: number): boolean {
     return interaction.pickUpObject(this.ctx, objId, pid, this.noticeboardDefinitions);
   }
-  buyPlot(deedId: string, pid?: number): boolean {
-    return buyPlotImpl(this.ctx, deedId, pid);
-  }
 
   // Corpse-harvest preference (Intentional Gathering PR3): a stored PLAYER
   // SETTING, not a harvest action (no kit/location/combat/cost gate). Body
@@ -11240,17 +11205,12 @@ export class Sim {
   hoardBossCues(): import('../world_api/dungeons').HoardBossCueView[] {
     return hoardBossCueViewsForPlayer(this.ctx, this.primaryId);
   }
-  // Milliseconds remaining before the current rift's backing event stops admitting
-  // parties (null outside a rift, or for a dev-spawned rift with no
-  // backing RiftEvent). Sim-clock arithmetic only (event.expiresAt and this.time are
-  // both sim-clock seconds), recomputed fresh on every call so a repeated read ticks
-  // down like raidLockouts() does, with no caching to go stale between ticks.
   riftEventMsRemaining(): number | null {
-    const view = this.riftFloor;
-    if (!view || view.eventId === null) return null;
-    const event = this.riftEvents.find((candidate) => candidate.eventId === view.eventId);
-    if (!event) return null;
-    return Math.max(0, Math.round((event.expiresAt - this.time) * 1000));
+    return riftEventMsRemainingFor(this.ctx, this.riftFloor);
+  }
+  // The group dungeon run the primary player stands in (instances/dungeon_run.ts).
+  get dungeonRun(): import('../world_api/dungeons').DungeonRunView | null {
+    return dungeonRunForPlayer(this.ctx, this.primaryId);
   }
 
   get delveRun(): DelveRunInfo | null {

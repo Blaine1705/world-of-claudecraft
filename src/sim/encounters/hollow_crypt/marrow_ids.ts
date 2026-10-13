@@ -94,19 +94,30 @@ export function bellRopeSpot(): { x: number; z: number } {
 // level 8 in the dungeon's own gear. Shovelful rides his own melee roll through the
 // tank's armor; the Grave's cave-in is a must-avoid hit for anyone but its mark (about
 // 15 percent); Grave Dirt about 3 percent a second; the Toll a raid-wide pulse (about
-// 11 percent). The heroic transform (mechanicDamageMult) lifts them all.
+// 11 percent). The heroic transform (mechanicDamageMult) lifts them all; the
+// Toll alone carries a heroic factor of its own on top (tollHeroicMult).
+// First uses (playtest, 2026-10-12: "his mechanics didn't go off"): the grave
+// is measured 2 s into the fight (it was 9) and the first Shovelful swings at
+// 4 s (it was 6), so the first Open Grave lies at 7 s, before a strong party
+// brings him to his first Toll, and a kill of under half a minute still shows
+// the whole kit (tests/hollow_crypt_marrow_pace.test.ts). The cadences and
+// every damage number are unchanged.
 export const MARROW_TUNING = {
-  shovelFirst: 6,
+  shovelFirst: 4,
   shovelEvery: 11,
   shovelCast: 1.2,
   shovelRange: 8,
+  /** He only begins the swing (and, on heroic, a Gravedigger's Blow) with his
+   *  target this far inside the cone's reach (yd): 6 yd, a yard past his 5 yd
+   *  melee reach, so a step back during the bar is a dodge, not a given. */
+  shovelReachMargin: 2,
   shovelArcDeg: 80,
   /** A multiple of his own melee roll, through armor. */
   shovelMult: 1.5,
   /** Dirt in the Eyes: a movement multiplier and its seconds. */
   shovelSlow: 0.5,
   shovelSlowSeconds: 6,
-  measureFirst: 9,
+  measureFirst: 2,
   measureEvery: 15,
   measureCast: 1,
   /** Seconds the mark runs before the grave caves in under them. */
@@ -129,6 +140,11 @@ export const MARROW_TUNING = {
   tollPeals: 3,
   tollMin: 30,
   tollMax: 38,
+  /** Heroic: the Toll's own factor on its base roll, on top of the heroic
+   *  transform his other mechanics share (the owner's playtest of 2026-10-12:
+   *  the bell hits a tenth harder on heroic, 198 to 251 where it was 180 to
+   *  228). Shovelful, the graves and Gravedigger's Blow never read it. */
+  tollHeroicMult: 1.1,
   // Heroic.
   blowFirst: 5,
   blowEvery: 9,
@@ -145,6 +161,13 @@ export const MARROW_TUNING = {
   unquietLinger: 2,
   unquietRest: 8,
 } as const;
+
+/** The Burial Toll's base roll for a claim's difficulty, before the heroic
+ *  transform (mechanicDamageMult) every mechanic rides. Pure. */
+export function tollDamageRange(heroic: boolean): { min: number; max: number } {
+  const k = heroic ? MARROW_TUNING.tollHeroicMult : 1;
+  return { min: MARROW_TUNING.tollMin * k, max: MARROW_TUNING.tollMax * k };
+}
 
 /** Is (px, pz) inside an Open Grave centred at (gx, gz)? Pure. */
 export function inGrave(gx: number, gz: number, radius: number, px: number, pz: number): boolean {

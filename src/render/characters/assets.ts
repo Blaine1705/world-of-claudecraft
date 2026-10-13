@@ -32,6 +32,7 @@ import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor, slotToChestScale } from './back_grips';
 import { applyClipPositionDrops, applyClipTrackDrops } from './clip_track_drops';
 import { applyEnvSheen } from './env_sheen';
+import { attachGloamClimb } from './gloam_climb';
 import {
   type HandGrip,
   KAYKIT_ONE_HAND_SWORD_GRIP,
@@ -2313,25 +2314,6 @@ export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   return payload;
 }
 
-/**
- * Strip every held prop (weapons, shields, the fixed offhands) off an
- * assembled model.
- *
- * A composed NPC inherits its class def's held-weapon layout, so a townsperson
- * built on the warrior body is born gripping the warrior's sword. Civilians
- * cheering in a stadium must not be armed, and removal beats hiding: a hidden
- * weapon still costs its draw call and still rides every animation. Safe for
- * these bodies because they never equip anything (setWeaponsStowed below
- * re-attaches from the def for anyone who does).
- */
-export function stripHeldProps(root: THREE.Object3D): void {
-  const held: THREE.Object3D[] = [];
-  root.traverse((o) => {
-    if (o.userData[HELD_PROP_TAG]) held.push(o);
-  });
-  for (const o of held) o.removeFromParent();
-}
-
 /** Move every held prop (swap slots, the actual equipped offhand, AND fixed
  *  offhands: the rogue's second dagger, the hunter crossbow, the warlock
  *  spellbook) between the hands and the on-back sheathed pose, in place, keeping
@@ -2616,6 +2598,7 @@ function buildTintedClone(
     const dyeSpec = (mat.userData as { armorDye?: ArmorDyeSpec }).armorDye;
     if (dyeSpec) attachArmorDye(mat, dyeSpec);
     if (rim) addRimGlow(mat); // dungeon silhouette rim (uRimBoost contract)
+    attachGloamClimb(mat); // dormant on every body but one in Gloamveil (gloam_climb.ts)
     // The skeletons and the necromancer share a `Glow` eye material authored
     // at strength 1, whose two tints straddled the old bloom threshold on luma
     // weights alone: the yellow pair (0.907) lit up, the cyan pair (0.842)
@@ -2668,6 +2651,7 @@ function buildTintedClone(
         polygonOffsetFactor: s.polygonOffsetFactor,
         polygonOffsetUnits: s.polygonOffsetUnits,
       });
+      attachGloamClimb(mat); // the Lambert tier's only layer: same climb, no rim
     }
   }
   if (tint !== null) {

@@ -246,6 +246,7 @@ import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
 import * as entryFacing from './dungeon_entry_facing';
 import { dispatchDungeonFinderCommand } from './dungeon_finder_commands';
+import { appendRunSelfWire } from './dungeon_run_wire';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
@@ -357,6 +358,7 @@ import {
   applyMobScanTick,
   createMobScanTickStats,
   resetMobScanCaptureAccumulators,
+  routeSightCaptureTotals,
 } from './mob_scan_tick_stats';
 import { parseModerationChatCommand } from './moderation_commands';
 import {
@@ -2560,12 +2562,7 @@ export class GameServer {
             // latest-tick values feed the heartbeat, and an in-flight capture sums and
             // peaks them across its window.
             const scan = this.sim.mobScanCounters;
-            applyMobScanTick(
-              this.mobScanTickStats,
-              scan.aggroScanPlayerVisits,
-              scan.threatEntryVisits,
-              this.perfCaptureDeadlineNs !== null,
-            );
+            applyMobScanTick(this.mobScanTickStats, scan, this.perfCaptureDeadlineNs !== null);
             this.recordBattlegroundOutcomes();
             this.enforceJailStates();
             // Parse capture observes the full drained batch BEFORE routeEvents:
@@ -5340,6 +5337,7 @@ export class GameServer {
       aggroVisitsMaxPerTick: this.mobScanTickStats.aggroVisitsMaxPerTick,
       threatVisitsTotal: this.mobScanTickStats.threatVisitsTotal,
       threatVisitsMaxPerTick: this.mobScanTickStats.threatVisitsMaxPerTick,
+      ...routeSightCaptureTotals(this.mobScanTickStats),
       ...this.movementTimelineTickStats.captureTotals(),
       profile: this.tickProfiler.profile(),
     };
@@ -6305,9 +6303,6 @@ export class GameServer {
         break;
       case 'pickup':
         this.sendCommandOutcome(session, msg, objectCmds.pickupCommandOutcome(sim, msg, pid));
-        break;
-      case 'buyplot':
-        this.sendCommandOutcome(session, msg, objectCmds.buyPlotCommandOutcome(sim, msg, pid));
         break;
       case 'accept':
         if (questWire.acceptQuestWire(sim, msg, pid)) this.resyncQuests(session);
@@ -8615,9 +8610,7 @@ export class GameServer {
     // like lroll, and like lroll it costs one pendingLootRolls scan per session.
     maybe('mloot', this.sim.activeMasterLootRolls(anchorSession.pid));
     selfLap?.('self.loot');
-    maybe('drun', this.sim.delveRunWire(anchorSession.pid));
-    maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
-    maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
+    appendRunSelfWire(this.sim, anchorSession.pid, maybe, maybeSerialized);
     maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
     maybe('dclears', this.sim.delveClearsFor(anchorSession.pid));
     maybe('delveDaily', this.sim.delveDailyWire(anchorSession.pid));

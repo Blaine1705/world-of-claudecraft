@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "3ef3821cc760770044f3fb474c256122922e68072a5f8677ca2c436760944d1c",
+  "rendererFingerprint": "c1291cf84f87633610ab0ec0da55b64c51ee4bba1ad6b21257f9dec139726af2",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "darwin",
-    "arch": "arm64",
+    "platform": "win32",
+    "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "155",
-    "browserVersion": "Chrome/155.0.8059.39",
+    "browserVersion": "Edg/155.0.4283.45",
     "requestedBackend": "swiftshader",
-    "fingerprint": "6e67d503663264cff662556c81a9aa6417a8f960b7c3049c729f1444139419c4"
+    "fingerprint": "9e98302f0df8b738abb95d91c36845ee1f078ce639f22cd177aa8a00341efd0e"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6082477,
-      "sha256": "b67bc802e77f7738fd7cc8c0d1125e595b1cdb534b848f69262c902d70c0f5f5",
+      "bytes": 6082649,
+      "sha256": "4081a4a0f5735b1715f62f537e941875aa4f3d1b88e822c9c8fb127015efca5c",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5737,8 +5737,8 @@
         "model": {
           "url": "models/creatures/wildheart_hexcaller.glb",
           "path": "public/models/creatures/wildheart_hexcaller.glb",
-          "bytes": 1056052,
-          "sha256": "f25e9ea2acad458b9761183277258e5c650137de93a512de2aa59cb8c9a9036e"
+          "bytes": 1070600,
+          "sha256": "ccb788bc8f09456a2119d2e35037ac8702d9e3ca48d4e6a7c7af219319220b0d"
         },
         "idle": "Idle",
         "height": 2.5,
@@ -5755,7 +5755,7 @@
         "resolved": "#a3322a",
         "strength": 0.22
       },
-      "sourceFingerprint": "288049247f3d0c62d24d8d0a72653c67e8e0d4704e0b5f04799d4319423e0a95",
+      "sourceFingerprint": "8d9a4c93fdffee049ef86494ae1ac4a128b0e40b092f4bb3106b6345044c1bc2",
       "output": {
         "path": "public/ui/mobs/howdah_hexcaller.webp",
         "bytes": 3160,
@@ -6416,7 +6416,7 @@
     {
       "id": "mere_hydra_head_center",
       "family": "dragonkin",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "temple_hydra_head",
       "renderSpec": {
         "model": {
@@ -13878,8 +13878,8 @@
         "model": {
           "url": "models/creatures/wildheart_hexcaller.glb",
           "path": "public/models/creatures/wildheart_hexcaller.glb",
-          "bytes": 1056052,
-          "sha256": "f25e9ea2acad458b9761183277258e5c650137de93a512de2aa59cb8c9a9036e"
+          "bytes": 1070600,
+          "sha256": "ccb788bc8f09456a2119d2e35037ac8702d9e3ca48d4e6a7c7af219319220b0d"
         },
         "idle": "Idle",
         "height": 2.5,
@@ -13896,7 +13896,7 @@
         "resolved": "#688057",
         "strength": 0.04
       },
-      "sourceFingerprint": "429116bbd70dc6c987264887d3677dd52cb3ed503d364ebc5da64e4b869e2360",
+      "sourceFingerprint": "ec7f5711c307c50a1f0b4dda4aca83821f7f729c0e13ff3d7fe3db7bab3ea93a",
       "output": {
         "path": "public/ui/mobs/wildheart_hexcaller.webp",
         "bytes": 3210,
@@ -13946,8 +13946,8 @@
         "model": {
           "url": "models/creatures/wildheart_ravager.glb",
           "path": "public/models/creatures/wildheart_ravager.glb",
-          "bytes": 1257032,
-          "sha256": "1d07968792a6a60f8b0fb49445cdc355769dcc9e864cbcbff302bacb5fc81636"
+          "bytes": 1271584,
+          "sha256": "e242f827c2d29ce7b315116a37e08ae001fc7d531614715b19d2979c888c1fca"
         },
         "idle": "Idle",
         "height": 2.7,
@@ -13964,7 +13964,7 @@
         "resolved": "#78513f",
         "strength": 0.04
       },
-      "sourceFingerprint": "157004661e66d007f69d190081688b8b4f8a2c5934b97905e5fd1280698c6bad",
+      "sourceFingerprint": "70adf6c60e0748300f6d795ec70621f83fae004b26382e91a4463e7013477071",
       "output": {
         "path": "public/ui/mobs/wildheart_ravager.webp",
         "bytes": 3432,
@@ -13980,8 +13980,8 @@
         "model": {
           "url": "models/creatures/wildheart_stalker.glb",
           "path": "public/models/creatures/wildheart_stalker.glb",
-          "bytes": 1199520,
-          "sha256": "7b999b51c99b55cc128abb51ec79e95a1f379ed3ee1ee942f76ae1536ed9dade"
+          "bytes": 1214060,
+          "sha256": "f8b599a94afc8186395dbc632359c0c4501ad75cc19426f6f95f55d27e6314d4"
         },
         "idle": "Idle",
         "height": 2.5,
@@ -13998,7 +13998,7 @@
         "resolved": "#4f7651",
         "strength": 0.04
       },
-      "sourceFingerprint": "8566b5949a1b9a4f6cfe84d3f07a6d78a8bc35220e964b9080cbf5e797c1dbed",
+      "sourceFingerprint": "2a5e06d90013d2a4d20f26eb7b0ba05af879962856b7b5edb53ae2a1df58225b",
       "output": {
         "path": "public/ui/mobs/wildheart_stalker.webp",
         "bytes": 2124,

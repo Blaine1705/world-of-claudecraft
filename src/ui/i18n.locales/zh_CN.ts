@@ -2591,6 +2591,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.deedTracker': '功绩追踪器',
   'hudChrome.interfaceUnlock.frameNames.delveTracker': '探秘追踪器',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': '裂隙追踪器',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': '地下城追踪器',
+  'hudChrome.dungeonTracker.complete': '已完成',
   'hudChrome.interfaceUnlock.frameNames.targetDots': '目标减益',
   'hudChrome.interfaceUnlock.framesMenu': '框体设置',
   'hudChrome.interfaceUnlock.showHideFrames': '显示或隐藏框体',
@@ -12872,6 +12874,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': '月潮（周期性范围伤害）',
   'hudChrome.finder.mech.chorus_and_solo': '合唱与独唱（一个标记集合分摊，另一个标记分散）',
   'hudChrome.finder.mech.tideglass_reflections': '潮镜倒影（击杀彼此的镜像）',
+  'hudChrome.finder.mech.hydra_three_elements':
+    '三重元素（左侧头颅喷出18码的冰霜锥形吐息，使你减速70%，持续4秒；中间头颅向最多3名玩家脚下喷吐毒液，1.5秒后爆裂，并在落点灼烧6秒；右侧头颅沿一条26码长的直线射出激流，将你击退8码：每一种都要走出去。一个头颅倒下后，仍然存活的头颅会接手它的攻击）',
+  'hudChrome.finder.mech.hydra_tsunami':
+    '海啸（头颅沉入水中4.5秒，期间受到的伤害降低75%，一道巨浪席卷水池的一半，下一次换另一半：普通难度下造成160到190点冰霜伤害并把你推开10码。跑到另一半，或站到池边石柱后面；英雄难度下，巨浪会在3.5秒后回卷另一半。第一次海啸在开战24秒后到来，之后每一次都在上一次过去40秒后到来）',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    '合体吐息（两次海啸之间，头颅会融合它们的两种攻击，顺序始终相同：冰封激流把直线上的所有人冻结2秒，并留下一道可以为你挡住下一道巨浪的冰墙；毒液洋流让毒池向外滑动；剧毒霜晶把毒池冻成晶体，4秒后爆裂。普通难度下两次海啸之间一次，英雄难度两次）',
+  'hudChrome.finder.mech.hydra_regrowth':
+    '再生（只要还有另一个头颅活着，倒下的头颅会在20秒后以一半生命值长回来，每个倒下的头颅还会使其余头颅造成的伤害提高15%：让三个头颅在相近的时间内倒下）',
   'hudChrome.finder.mech.rising_tide': '涨潮（半座岛被淹没，移动到干燥的一侧）',
   'hudChrome.finder.mech.undertow': '暗流（将所有人拉近，在冲击前跑开）',
   'hudChrome.finder.mech.enrage': '低血量时狂怒',
@@ -15694,13 +15704,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.actionCamShoulderCenter': '居中',
   'hudChrome.breath.label': '呼吸',
   'hudChrome.breath.drowning': '溺水！',
-  // Baldemar the Bald's portal rows (M16 fills; feature PR ships the five
-  // non-Latin locales per src/ui/CLAUDE.md).
-  'hudChrome.portalWizard.gossipDeepglass': '为我打开通往深琉璃之路',
-  'hudChrome.portalWizard.gossipDeepglassAria': '请巴尔德玛开启前往深琉璃的传送门',
-  'hudChrome.portalWizard.gossipHome': '为我打开回家之路',
-  'hudChrome.portalWizard.gossipHomeAria': '请巴尔德玛开启回到你城镇的传送门',
-  'hudChrome.portalWizard.portalOpen': '传送门已开启。走进去吧。',
   'abilityUi.resources.devotion': '虔诚',
   'abilityUi.resources.focus': '集中值',
   'abilityUi.tooltip.requiresStealthSkulduggery': '需要潜行（幽暝达到3层或暗影缠身期间无需潜行）',
@@ -18447,6 +18450,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在制作窗口追踪一个配方，或在委托公告栏追踪一个委托后，采集目标追踪器就会加入这个堆栈：它会显示你正在追踪的配方或委托、你要收集的数量，以及你随身携带和仓库中的材料能满足多少。追踪会替换你当前的目标，清除则会明确取消它；两者都不会改变你的采集偏好。',
   'guide.interfacePage.hubPracticeTrackerBody':
     '在 Eastbrook 枢纽附近，一旦你开始那里的引导式练习课程，练习追踪器就会加入这个堆栈：它会让你时刻看到自己对练习假人的最佳战绩。课程进行中时，它旁边的指导条会引导你完成当前步骤，从打开伤害统计到比较第二轮成绩。',
+  'guide.interfacePage.dungeonTrackerBody':
+    '在小队地下城内，地下城追踪器会占据堆栈的顶部：一块写有地下城名称的铭牌（英雄难度时会标注“英雄”），带有一条随进度填充的进度条，下方按路线遇到的顺序列出该地下城的每个首领，在其倒下之前都计为 0 / 1。战斗分为两幕的首领会保持未完成状态，直到整场战斗结束，因此只有在整次挑战完成时列表才会显示为完成。你离开时追踪器也会随之消失，“编辑框体”会像对待其他追踪器一样松开它，并显示它自己的名称标签。',
   'guide.interfacePage.mobileBodyTwoPages':
     '触屏控制会自行出现，布局也会按你的屏幕自己调整：小手机上是紧凑排布，大屏手机上是标准排布，平板上则更宽松些。\n\n你的技能排成一圈，而不是一排数字：攻击按钮旁边是四个动作按钮，还有一个翻页开关，可以让这一圈在它的 {pages} 页之间切换，这几页合起来能触及你全部 {slots} 个技能格，无论额外的桌面端动作条是否开启。这一圈的第五个弧位是你的消耗品座：点按它就使用座上放着的东西，或者按住它、或向内滑动它，打开一排会自动从你身上带着的东西里补齐的消耗品。围着这一圈的是触屏玩家最常伸手去按的按钮：切换目标、使用面前的东西，以及跳跃。\n\n屏幕底缘只有一个“快捷操作”控件，取代了一排按钮。其余的一切都从它打开：坐骑、聊天、地图、背包、社交、任务、角色、法术书、游戏菜单，以及一个“更多”入口，装着你其余的窗口，地下城查找器、PvP、表情和维基都在其中。这里的窗口会铺满整个屏幕，而不是浮在上面。\n\n移动单位框体是桌面端的事：在触屏上，布局会替你把它们安排好。',
   'guide.interfacePage.winMoreBodyNoValeCup':

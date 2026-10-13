@@ -27,8 +27,11 @@ import {
   RAIN_SHUTTER,
   RAIN_SPEED,
   RAIN_WIND,
+  SPLASH_CELL_GLSL,
   SPLASH_HEIGHT_RANGE,
   SPLASH_RADIUS,
+  splashCells,
+  splashLattice,
 } from './bastion_rain_core';
 export interface BastionRainOptions {
   lowGfx: boolean;
@@ -71,7 +74,8 @@ void main() {
   float fall = mod(aSeed.y * 97.0 - uTime * speed, uBox.y);
   p.y = fall;
   p.xz += wind * (uBox.y - fall) / speed;
-  vec3 rel = mod(p - cameraPosition + uBox * 0.5, uBox) - uBox * 0.5;
+  vec3 cameraLocal = cameraPosition - modelMatrix[3].xyz;
+  vec3 rel = mod(p - cameraLocal + uBox * 0.5, uBox) - uBox * 0.5;
   vec3 head = cameraPosition + rel;
   float len = speed * mix(uShutter.x, uShutter.y, fract(aSeed.z * 7.13));
   vec3 toCam = normalize(cameraPosition - head);
@@ -164,11 +168,14 @@ function buildStreaks(count: number): THREE.Mesh {
 // ---- splashes ---------------------------------------------------------------------------
 
 const SPLASH_VERT = /* glsl */ `${CAMERA_RELATIVE_GLSL}
+${SPLASH_CELL_GLSL}
 attribute vec3 aSeed;
+attribute vec2 aCell;
 attribute vec2 aCorner;
 attribute float aKind;
 uniform float uTime;
 uniform float uRadius;
+uniform vec2 uLattice;
 uniform sampler2D uHeights;
 uniform vec4 uGrid;
 uniform vec2 uHeightRange;
@@ -182,16 +189,17 @@ void main() {
   float cyc = floor(c);
   float ph = fract(c);
   vec2 r2 = vec2(hash(vec2(cyc, aSeed.z * 91.7)), hash(vec2(aSeed.z * 37.3, cyc + 1.7)));
-  vec2 center = cameraPosition.xz + (r2 - 0.5) * 2.0 * uRadius;
-  // The field is laid out in its slot's frame (the interior group's origin).
-  vec2 local = center - modelMatrix[3].xz;
+  // The camera admits cells at the edge, never translates a surviving ring.
+  vec2 cameraLocal = cameraPosition.xz - modelMatrix[3].xz;
+  vec2 local = splashCellCenter(aCell, cameraLocal, r2, uLattice);
+  vec2 center = modelMatrix[3].xz + local;
   vec2 uv = (local - uGrid.xy) * uGrid.zw;
   vec4 texel = texture2D(uHeights, uv);
   float h = uHeightRange.x + (texel.r * 65280.0 + texel.g * 255.0) / 65535.0 * uHeightRange.y;
   float inside = step(0.0, uv.x) * step(uv.x, 1.0) * step(0.0, uv.y) * step(uv.y, 1.0);
   float ok = step(0.5, texel.b) * inside;
-  float distFade = 1.0 - smoothstep(uRadius * 0.55, uRadius, length(center - cameraPosition.xz));
-  vec3 base = vec3(center.x, h + 0.04, center.y);
+  float distFade = 1.0 - smoothstep(uRadius * 0.55, uRadius, length(local - cameraLocal));
+  vec3 base = vec3(center.x, modelMatrix[3].y + h + 0.04, center.y);
   vec3 world;
   if (aKind < 0.5) {
     // The ripple ring: widening and fading on the stone or the water.
@@ -248,6 +256,7 @@ void main() {
 `;
 
 function buildSplashes(count: number): THREE.Mesh {
+  const lattice = splashLattice(count);
   const grid = planSplashHeights(1);
   const tex = new THREE.DataTexture(packSplashHeights(grid), grid.cols, grid.rows);
   tex.magFilter = THREE.NearestFilter;
@@ -257,6 +266,8 @@ function buildSplashes(count: number): THREE.Mesh {
   const seeds = new Float32Array(count * 8 * 3);
   const corners = new Float32Array(count * 8 * 2);
   const kinds = new Float32Array(count * 8);
+  const cells = new Float32Array(count * 8 * 2);
+  const cellOf = splashCells(count);
   const index = new Uint32Array(count * 12);
   let s = 23;
   const rnd = () => {
@@ -279,6 +290,7 @@ function buildSplashes(count: number): THREE.Mesh {
         seeds.set([a, b, c], v * 3);
         corners.set(quad[k], v * 2);
         kinds[v] = q;
+        cells.set([cellOf[i].x, cellOf[i].z], v * 2);
       }
       const o = i * 8 + q * 4;
       index.set([o, o + 1, o + 2, o + 1, o + 3, o + 2], i * 12 + q * 6);
@@ -289,6 +301,7 @@ function buildSplashes(count: number): THREE.Mesh {
   geo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 3));
   geo.setAttribute('aCorner', new THREE.BufferAttribute(corners, 2));
   geo.setAttribute('aKind', new THREE.BufferAttribute(kinds, 1));
+  geo.setAttribute('aCell', new THREE.BufferAttribute(cells, 2));
   geo.setIndex(new THREE.BufferAttribute(index, 1));
   const material = new THREE.ShaderMaterial({
     name: 'sunkenBastionRainSplashes',
@@ -297,6 +310,7 @@ function buildSplashes(count: number): THREE.Mesh {
     uniforms: {
       uTime: sharedUniforms.uTime,
       uRadius: { value: SPLASH_RADIUS },
+      uLattice: { value: new THREE.Vector2(lattice.side, lattice.cellSize) },
       uHeights: { value: tex },
       uGrid: {
         value: new THREE.Vector4(
@@ -344,7 +358,7 @@ void main() {
   float span = 0.5;
   float a = bearing + (aCorner.x - 0.5) * span;
   float radius = aSheet.y;
-  vec3 world = vec3(cameraPosition.x + sin(a) * radius, uSea - 3.0 + aCorner.y * 70.0,
+  vec3 world = vec3(cameraPosition.x + sin(a) * radius, modelMatrix[3].y + uSea - 3.0 + aCorner.y * 70.0,
     cameraPosition.z + cos(a) * radius);
   // The top leans down-wind (the rain slants in the gusts).
   float gust = rainGust(uTime + aSheet.z * 9.0);

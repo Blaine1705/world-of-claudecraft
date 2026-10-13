@@ -1881,6 +1881,10 @@ export const en_CA: EnTranslations = {
       "replayAction": "Practice again",
       "replayTarget": "Target it again"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Rift",
       "hoardTitle": "Buried Hoard",
@@ -2138,8 +2142,6 @@ export const en_CA: EnTranslations = {
       "sheathe": "Sheathe/Unsheathe Weapon",
       "hideInterface": "Hide Interface",
       "dive": "Swim Down",
-      "boost": "Burners (Deepball)",
-      "ballMarker": "Ball Marker (Deepball)",
       "categoryPet": "Pet",
       "petAttack": "Pet: Attack",
       "petStop": "Pet: Stop",
@@ -4190,7 +4192,7 @@ export const en_CA: EnTranslations = {
         "blow": "Increases damage taken by {pct}%: {per}% for each stack, {stacks} of {max} now. Each Gravedigger's Blow adds a stack and resets the duration to {seconds} sec.",
         "graveVigor": "Attacks {pct}% faster while he stands in an Open Grave. Keep him out of the graves.",
         "tolling": "Immune to damage while he strides to the bell rope and rings the Burial Bell. When the ringing ends, the Toll deals {min} to {max} Shadow damage ({heroicMin} to {heroicMax} on Heroic) to everyone, and every Open Grave gives up a Restless Bones.",
-        "embraced": "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
+        "embraced": "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health ({shareHeroic}% on Heroic) she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
         "lament": "When Bride's Lament ends, it deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone not within {radius} yd of a lit grave lantern. A lantern shelters the {cap} players nearest it, then goes dark and misses the next Lament.",
         "lingering": "Your next Bride's Lament deals {pct}% more damage: {per}% for each stack, up to {max} stacks. Take the next one in a lantern's light.",
         "slippery": "On slick ice: your speed changes by at most {grip} yd/sec each second, so you are slow to get going, slide on when you stop, and swing wide when you turn. Step off the ice to get your footing back.",
@@ -4641,6 +4643,7 @@ export const en_CA: EnTranslations = {
         "deedTracker": "Deed Tracker",
         "delveTracker": "Delve Tracker",
         "riftTracker": "Rift Tracker",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Off Hand",
         "unitTooltip": "Tooltip"
       },
@@ -5097,38 +5100,6 @@ export const en_CA: EnTranslations = {
       "officerEntry": "{name} ({rank})",
       "popupTitle": "Guild Signpost",
       "close": "Close"
-    },
-    "deepglass": {
-      "gossip": "Take me down to the Deepglass",
-      "gossipAria": "Travel to the Deepglass and start a bout of deepball",
-      "bout": "{n} a side",
-      "boutAria": "Start a bout of deepball, {n} players a side"
-    },
-    "portalWizard": {
-      "gossipDeepglass": "Open the way to the Deepglass",
-      "gossipDeepglassAria": "Ask Baldemar to open a portal to the Deepglass",
-      "gossipHome": "Open the way home",
-      "gossipHomeAria": "Ask Baldemar to open a portal back to your town",
-      "portalOpen": "The portal stands open. Step through."
-    },
-    "plotSign": {
-      "title": "Housing plot for sale",
-      "size": "{size} plot, {w} by {d} yards",
-      "sizes": {
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large"
-      },
-      "price": "Asking {price}",
-      "purse": "You carry {purse}.",
-      "yours": "You hold this deed.",
-      "sold": "Sold. {name} holds this deed.",
-      "buy": "Buy for {price}",
-      "close": "Close",
-      "boughtLog": "The deed to {name} is yours.",
-      "errAlreadyHeld": "You already hold this deed.",
-      "errHeldBy": "{name} holds this deed.",
-      "errCannotAfford": "You can't afford this plot."
     },
     "realmBuilder": {
       "title": "Realm Builder of the Month",
@@ -6519,7 +6490,7 @@ export const en_CA: EnTranslations = {
         "crypt_frozen_embrace": "Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)",
         "crypt_rime_path": "Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)",
         "crypt_bridal_freeze": "Bridal Freeze (at half health the whole ravine floor freezes over: slippery ice for the rest of the fight)",
-        "crypt_lady_heroic": "Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players",
+        "crypt_lady_heroic": "Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players and lets go at 4.4 percent of her health",
         "crypt_dirge_of_the_hollow": "Dirge of the Hollow (every 16 seconds a 2.5 second song you can interrupt: if she finishes it, 105 to 125 shadow damage on normal and a 4 second silence to everyone within 45 yards who can see her, so interrupt it or hide behind a choir pillar)",
         "crypt_harmony": "Harmony (each living Chorister makes her take 30 percent less damage: kill the Choristers first)",
         "crypt_bone_organ": "Bone Organ (every 26 seconds she plays the Bone Organ: two waves of shadow notes burst down lanes of the loft, 100 to 115 damage on normal in a lane, the second wave filling the first one's gaps)",
@@ -6541,6 +6512,10 @@ export const en_CA: EnTranslations = {
         "lunar_tide": "Lunar Tide (pulsing area damage)",
         "chorus_and_solo": "Chorus and Solo (stack on one mark, spread from the other)",
         "tideglass_reflections": "Tideglass Reflections (kill each other's mirror images)",
+        "hydra_three_elements": "Three Elements (the left head breathes an 18 yard cone of frost that slows you by 70 percent for 4 seconds, the centre head spits venom under up to 3 players that bursts after 1.5 seconds and burns for 6 seconds where it lands, and the right head fires a torrent down a 26 yard lane that throws you back 8 yards: step out of each one. When a head falls, the heads still standing take over its attack)",
+        "hydra_tsunami": "Tsunami (the heads sink for 4.5 seconds, taking 75 percent less damage, and a wave rolls over one half of the pool, the other half the next time: 160 to 190 frost damage on normal and a 10 yard shove. Cross to the other half or stand behind a rim column; on heroic the wave rolls back over the other half 3.5 seconds later. The first Tsunami comes 24 seconds into the fight, each later one 40 seconds after the last has passed)",
+        "hydra_combined_breath": "Combined Breath (between Tsunamis the heads fuse two of their attacks, always in the same order: Frostlocked Torrent freezes everyone in its lane for 2 seconds and leaves an Ice Wall that can shelter you from the next wave, Venom Current slides the venom pools outward, and Toxic Rime freezes the pools into crystals that burst after 4 seconds. Once between Tsunamis on normal, twice on heroic)",
+        "hydra_regrowth": "Regrowth (a fallen head grows back after 20 seconds at half health while another head still lives, and each fallen head makes the others deal 15 percent more damage: bring all three down close together)",
         "rising_tide": "Rising Tide (half the island floods, move to the dry half)",
         "undertow": "Undertow (pulls everyone in, run out before the crash)",
         "enrage": "Enrages at low health",
@@ -6636,8 +6611,8 @@ export const en_CA: EnTranslations = {
       "allyTitle": "Break the chain!",
       "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post",
       "shackledTitle": "Shackled to {name}",
-      "shackledLine": "Stay within {range} yards of each other ({dist} yards apart)",
-      "strainedLine": "Too far apart! The chain bites both of you: close to {range} yards",
+      "shackledLine": "Stay within {range} yards to avoid chain damage to both of you ({dist} yards apart)",
+      "strainedLine": "Move within {range} yards of your partner to stop chain damage to both of you",
       "brokenAria": "Chain broken: {pct}",
       "reachAria": "Chain reach used: {pct}",
       "linksLeft": "Chain links left: {count} of {total}",
@@ -6651,114 +6626,114 @@ export const en_CA: EnTranslations = {
       "brineTitle": "In the Hallowed Brine!",
       "brineLine": "It burns you every second: step out of the pool",
       "reapedTitle": "Death rises behind you!",
-      "reapedLine": "Step out of the scythe's arc: forward, or to either side",
+      "reapedLine": "Move forward or sideways to avoid the scythe swinging behind you",
       "veilTitle": "The Fog Veil",
-      "veilLine": "Watch the beacon's beam: the figure whose lantern flares is the real Vael",
+      "veilLine": "Find the Vael whose lantern flares in the beacon beam, then attack to break the veil",
       "realTitle": "The beam found him!",
       "realLine": "This is the real Vael: strike him to break the veil",
       "shadeTitle": "A hollow shade",
-      "shadeLine": "The light pours through it: leave it, find the one the beam lights",
+      "shadeLine": "Leave this decoy. Attack the Vael whose lantern flares in the beam to break the veil",
       "timeAria": "{seconds} seconds left"
     },
     "wildheartAlert": {
       "preyTitle": "You are the Prey!",
-      "preyLine": "Zulgar hunts you: run him through the lit sun glyphs",
-      "preyWaitLine": "He chases the other Prey now: be ready, he switches",
+      "preyLine": "Lure Zulgar through lit sun glyphs to slow him before he catches and mauls you",
+      "preyWaitLine": "Keep away from Zulgar: he will switch from the other marked player to chase you",
       "stalkedTitle": "Stalked!",
-      "stalkedLine": "The jaguar hunts you: kite it away from its master",
+      "stalkedLine": "Run from the jaguar to avoid its bites. Lead it away from the Beastmaster to break Pack Bond",
       "pollinatedTitle": "Pollinated!",
-      "pollinatedLine": "Stay off the seeds: your touch makes them sprout",
+      "pollinatedLine": "Avoid seedpods: touching them while Pollinated creates enemies. Unmarked allies can stomp them",
       "bondTitle": "Pack Bond",
-      "bondLine": "Together they take half damage: pull them apart",
+      "bondLine": "Separate the Beastmaster and jaguar to remove their damage reduction and damage bonus",
       "timeAria": "{seconds} seconds left"
     },
     "sanctumAlert": {
       "quenchTitle": "In the quench-water!",
-      "quenchLine": "It burns and slows you: swim to the nearest ice or the shore",
+      "quenchLine": "Swim onto ice or the shore to escape the water damage and slow",
       "plungeTitle": "Plunging Fire!",
-      "plungeLine": "Your whole plate is about to burn: get off it now",
+      "plungeLine": "Leave this ice platform now: fire will hit everyone on it and damage the ice",
       "descentTitle": "Crashing Descent!",
-      "descentLine": "He lands right here: step out of his shadow",
+      "descentLine": "Leave the landing shadow to avoid Korzul crashing down and knocking you back",
       "eyeTitle": "Wyrm's Eye on you!",
-      "eyeLine": "Your plate burns when the mark ends: stay on sound ice, away from the group",
-      "eyeCrackedLine": "You stand on cracked ice: walk to a sound plate before the mark ends",
+      "eyeLine": "Move onto uncracked ice away from allies: your mark calls fire onto that platform",
+      "eyeCrackedLine": "Move onto uncracked ice away from allies: your marked fire would break this cracked platform",
       "flailTitle": "Chain Flail!",
-      "flailLine": "The chain whips down the painted lane: step out of it",
+      "flailLine": "Step sideways out of the marked strip to avoid the chain strike",
       "chargeTitle": "Threshold Charge!",
-      "chargeLine": "He charges down the lane: get out of it, away from the edge",
+      "chargeLine": "Step sideways out of the marked strip: Korgath charges through it and knocks you back",
       "trenchTitle": "Soulfire Trench!",
-      "trenchLine": "Soulfire cuts the lane and leaves meltwater: get out of it",
+      "trenchLine": "Step sideways out of the marked strip to avoid the fire damage. The ice then becomes meltwater",
       "strainTitle": "Strain!",
-      "strainLine": "The intact pillars are about to lash out: get away from them",
+      "strainLine": "Move away from pillars with intact chains to avoid the blast and knockback",
       "infernoTitle": "Grave Inferno!",
-      "infernoLine": "Each pulse burns harder: get out of his reach",
+      "infernoLine": "Move away from Korzul: each nearby fire pulse deals more damage",
       "stompTitle": "Shuddering Stomp!",
-      "stompLine": "Get away from him before his foot comes down",
+      "stompLine": "Move away from Korgath before the cast ends to avoid the stomp damage",
       "breathTitle": "Grave Breath!",
-      "breathLine": "You stand in the breath cone: get out to the side",
+      "breathLine": "Move sideways out of the marked cone to avoid Korzul's breath damage",
       "maulTitle": "Maul Arc!",
-      "maulLine": "He swings through everything in front of him: get behind him",
+      "maulLine": "Move behind Korgath to avoid the weapon swing hitting everyone in front",
       "tailTitle": "Tail Sweep!",
-      "tailLine": "You stand behind him: get out before the tail hits",
-      "meltwaterTitle": "In the meltwater",
-      "meltwaterLine": "Your Bonewalker stands in meltwater: drag it onto the cold ice",
-      "meltwaterTargetLine": "If your target dies in meltwater it rises again: wait for cold ice",
+      "tailLine": "Move to Korzul's side to avoid the tail damage and knockback behind him",
+      "meltwaterTitle": "Bonewalker in meltwater",
+      "meltwaterLine": "Lure the Bonewalker chasing you onto dry ice before killing it: dying in water revives it and heals Velkhar",
+      "meltwaterTargetLine": "Stop attacking until the Bonewalker leaves the water: killing it there revives it and heals Velkhar",
       "crackedTitle": "Cracked ice",
-      "crackedLine": "Fire here breaks this plate: keep his fire off it",
+      "crackedLine": "Move onto uncracked ice before drawing fire here: another fire hit breaks this platform",
       "flightTitle": "Korzul takes flight",
-      "flightLine": "Stack on sound ice to choose where he lands, then step off",
+      "flightLine": "Group on uncracked ice to lure Korzul's landing, then leave the shadow to avoid the crash",
       "lockboundTitle": "Lockbound",
-      "lockboundLine": "{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.",
+      "lockboundLine": "Attack the Seal Shackles to remove Korgath's damage reduction: {chains} chains grant {pct}% less damage taken",
       "timeAria": "{seconds} seconds left",
       "brandedTitle": "Branded!",
-      "brandedLine": "The brand burns until it ends: douse it in a meltwater pool",
+      "brandedLine": "Enter a meltwater pool to remove the brand and stop its damage",
       "rimeTitle": "Creeping Rime!",
-      "rimeLine": "Creeping Rime {stacks}/{max}: step out of the whelps' breath",
+      "rimeLine": "Leave the whelps' breath to avoid freezing solid at full stacks: Creeping Rime {stacks}/{max}",
       "slabTitle": "Ice Slab",
-      "slabLine": "Solid ice: it blocks line of sight. Hide behind it from the casters' spells"
+      "slabLine": "Put the ice slab between you and enemy casters to block their line of sight"
     },
     "cryptAlert": {
       "measuredTitle": "Measured for the Grave!",
-      "measuredLine": "A grave caves in under you when the bar runs out: carry it to the edge of the yard",
+      "measuredLine": "Move to the yard's edge before the mark ends to keep the damaging grave away from your group",
       "embracedTitle": "Frozen Embrace!",
-      "embracedLine": "She holds you aloft: your group must hurt her to make her set you down",
+      "embracedLine": "Your group must damage the Lady of the Bonechill to free you from her grip",
       "lamentTitle": "Bride's Lament!",
-      "lamentShelteredLine": "You stand in a lit lantern's light with room for you: hold still",
-      "lamentOpenLine": "Get into a lit lantern's light before the wail lands: two to a lantern",
+      "lamentShelteredLine": "Stay in this lit lantern's light to avoid the wail damage: you have a shelter spot",
+      "lamentOpenLine": "Move into a lit lantern's light to avoid the wail damage: only two players fit per lantern",
       "graveTitle": "In an Open Grave!",
       "graveLine": "The grave dirt burns and slows you: step out of it",
       "tollTitle": "Burial Toll!",
-      "tollLine": "He cannot be hurt while he rings the bell: brace for the Toll and the dead it raises",
+      "tollLine": "Prepare to fight the skeletons raised from open graves: Marrow is immune while ringing the bell",
       "harmonyTitle": "Harmony",
-      "harmonyLine": "Her Choristers take {pct}% off the damage she takes: kill them first",
+      "harmonyLine": "Kill the Choristers to remove Ilvane's {pct}% damage reduction",
       "knellTitle": "Burning Knell!",
       "knellLine": "Ghost fire pours over this half of the ring when the bar runs out: get to the other half",
       "graspTitle": "Grasp of the Grave!",
-      "graspLine": "Hands erupt from this ring and hold whoever stands in it: step out",
+      "graspLine": "Leave the marked ring before the hands erupt to avoid damage and being rooted",
       "reapTitle": "Reap the Unquiet!",
-      "reapLine": "His scythe sweeps the ground in front of him: get behind him",
+      "reapLine": "Move behind Morthen to avoid the scythe striking everyone in front",
       "riteTitle": "Rite of the Unquiet",
-      "riteLine": "Relight the Remembrance Candles to shatter his ward: {lit} of {total} lit",
-      "riteNamedLine": "Relight only the candle the Ledger names next: {lit} of {total} lit",
+      "riteLine": "Relight all Remembrance Candles to break Morthen's immunity: {lit} of {total} lit",
+      "riteNamedLine": "Relight candles in the Ledger's order to break Morthen's immunity: a wrong candle undoes progress ({lit}/{total})",
       "soulTitle": "Bound Soul",
-      "soulLine": "A soul drifts toward Morthen: step into its path to take it before it feeds him",
+      "soulLine": "Intercept the drifting soul to stop it healing Morthen and increasing his damage. Catching it hurts you",
       "timeAria": "{seconds} seconds left"
     },
     "kitUse": {
-      "toppleLine": "Kick it over onto the pack: the spill burns them",
+      "toppleLine": "Topple the brazier onto nearby enemies to burn them with the spill",
       "toppleKey": "Topple the {name} onto them",
       "toppleTap": "Tap here to topple the {name} onto them",
       "toppleClick": "Click here to topple the {name} onto them",
       "toppleFar": "Get within {range} yd to kick it over",
       "toppleAria": "Topple the {name}",
       "usingLine": "Hold still: a hit, a step or a stun breaks it",
-      "relightLine": "It drains your health every second you channel: hits do not break it, a step or a stun does",
+      "relightLine": "Relight the candles to break Morthen's immunity. Channeling drains your health; moving or a stun cancels it",
       "relightKey": "Relight the {name}",
       "relightTap": "Tap here to relight the {name}",
       "relightClick": "Click here to relight the {name}",
       "relightFar": "Get within {range} yd to relight it",
       "relightAria": "Relight the {name}",
-      "relightUsingLine": "Hold still while it drains you: hits do not break it, a step or a stun does",
+      "relightUsingLine": "Keep channeling to light the candle: it drains health. Hits do not interrupt; moving or a stun does",
       "timeAria": "{seconds} seconds left"
     },
     "cosmetics": {
@@ -8248,7 +8223,7 @@ export const en_CA: EnTranslations = {
       "queueTitle": "Your next move is already loaded",
       "queueBody": "You do not have to time your presses to the frame. Press your next ability in the closing moments of the current cast and it is queued, firing the instant the cast completes, so practiced play flows without gaps. A press too early is simply refused, so nothing is wasted. Some melee strikes work the same way, riding out on your next weapon swing.",
       "deathTitle": "When you fall",
-      "deathBody": "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
+      "deathBody": "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance or, in most dungeons, in the arena of the last boss your group has already beaten when the way there is safe. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
       "threatTitle": "Who the enemy hits",
       "threatBody": "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Cat Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
       "hazardsTitle": "The water can kill you",
@@ -8301,6 +8276,7 @@ export const en_CA: EnTranslations = {
       "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, recipes you pinned from crafting, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
       "gatheringGoalTrackerBody": "A gathering goal tracker joins the stack once you Track a recipe in the crafting window or a commission on the board: it names the recipe or commission you are tracking, how many you are collecting for, and how far your held and stored materials get you there. Track replaces your current goal, and Clear drops it explicitly; neither one ever changes your harvest preference.",
       "hubPracticeTrackerBody": "Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "The chat box",
       "chatBody": "Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.",
       "keyWindowsTitle": "Windows you open with a key",
@@ -8332,7 +8308,7 @@ export const en_CA: EnTranslations = {
       "winMoreBodyNoValeCup": "The world map (M), the PvP window (G), the leaderboard (K), and the event calendar (I) all work the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, one for the daily standings, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
       "worldWindowsTitle": "Windows the world opens for you",
       "worldWindowsBody": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback tab holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. A class trainer opens the list of what you can learn now and what is still ahead of you.\n\nA banker opens your vault, the strongbox of extra slots you can buy more of. If your guild has opened a bank, a second tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market at the Merchant has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
-      "worldWindowsBodyStationMaster": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback list at the foot of the same panel holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. Your class abilities need no trainer, they come with your levels; the trainers here are the resident masters of the crafting stations, and Training on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill.\n\nA banker opens your bank, with a Personal tab for the strongbox of extra slots you can buy more of and a Vault tab that stores your crafting materials by kind. If your guild has opened a bank, a Guild tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market, at the Merchant in Eastbrook, Auctioneer Voss up in Highwatch (Auctioneer Zeph keeps the Wastes trade at the stall beside him), or Factor Iselle Coralwake in Tidehold across the water from Fenbridge, has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
+      "worldWindowsBodyStationMaster": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback list at the foot of the same panel holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. Your class abilities need no trainer, they come with your levels; the trainers here are the resident masters of the crafting stations, and Training on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill.\n\nA banker opens your bank, with a Personal tab for the strongbox of extra slots you can buy more of and a Vault tab that stores your crafting materials by kind. If your guild has opened a bank, a Guild tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market, at the Merchant in Eastbrook or Auctioneer Voss up in Highwatch, has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
       "lootTitle": "Loot and rolls",
       "lootBody": "The interact key collects ordinary loot from a body you have earned. You can also open the corpse loot window and choose Take Loot. These actions follow the normal loot rules and never harvest materials.\n\nIn a group, a good drop under the group's loot rules puts a roll prompt on your screen instead: Need if you want it for yourself, Greed if you would take it to sell, or Pass to leave it to someone else. A small panel then shows who has rolled and what they chose while the timer runs down.\n\nThe loot rules themselves live in a small window of their own. The group leader can change them there, and everyone else sees the same window read-only, so the rules are never a secret.\n\nSome bodies can also be harvested for their parts, and that is a separate action from looting: it needs a Field Kit in your bags, carried rather than spent, and its own Harvest command, a short cast rather than an instant grab. The kit's harvest preference, the same picker the Professions window and a corpse's own Change option open, defaults to taking everything a body offers; naming one material and pressing Apply saves a choice to concentrate on it instead, which can earn a finer grade when doing so leaves the body's other workable materials ungathered. If the body does not carry your chosen material, harvesting it refuses rather than falling back to the rest, until you change your preference.",
       "playerCardTitle": "Your player card",
@@ -25338,396 +25314,6 @@ export const en_CA: EnTranslations = {
         "name": "The Pale Keeper",
         "title": "Warden of the Dead",
         "greeting": "Rest now, spirit. I can return you to your body, but the crossing back leaves you weak."
-      },
-      "deepglass_steward": {
-        "name": "Steward Aleyn Tidewell",
-        "title": "Warden of the Deepglass",
-        "greeting": "The bell is full and the truce holds, {className}. Say the word and the tide-lift will set you down inside it, brassgill, thrustpack and all."
-      },
-      "deepglass_marshal": {
-        "name": "Marshal Yvette Coralwake",
-        "title": "Keeper of the Whistle",
-        "greeting": "Bell is warm and the water is clear, {className}. Name your fixture and I will blow the whistle, singles if you want the ball to yourself, or a full three a side if you would rather have someone to blame."
-      },
-      "portal_wizard_eastbrook": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_fenbridge": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_highwatch": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_eldergleam": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_wyrmwatch": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_icemantle": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_lanternmere": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_bridgemere": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_moonrest": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_gallowmere": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_drifthaven": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_hedgewick": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_wickharbor": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_gullhaven": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_goldcrest": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Yes, the pate is bare, and no, the mountain wind did not do it. Hair is an anchor, {className}: every strand ties a soul to one patch of ground. I traded mine, all of it, for doors in the world. Ask, and I will open the way to the Deepglass. My other self is already there, polishing his head for luck."
-      },
-      "portal_wizard_deepglass": {
-        "name": "Baldemar the Bald",
-        "title": "Archmage of the Shining Pate",
-        "greeting": "Told you I would be here first. Baldness travels light, {className}. Enjoy the bell, mind the glass, and when you miss the grass of home, say the word: the way back is one shining thought away."
-      },
-      "dg_spectator_pace1": {
-        "name": "Merri Sallow",
-        "title": "Deepglass Spectator",
-        "greeting": "They say the ball sings if you hit it hard enough. I came to hear it."
-      },
-      "dg_spectator_pace2": {
-        "name": "Josson Brill",
-        "title": "Deepglass Spectator",
-        "greeting": "I cannot sit still before a fixture. Never could. Ask my wife, she is up in the tiers."
-      },
-      "dg_spectator_pace3": {
-        "name": "Petta Wavecrest",
-        "title": "Deepglass Spectator",
-        "greeting": "Three lengths of the apron and back is exactly one bout of nerves. I have measured."
-      },
-      "dg_spectator_pace4": {
-        "name": "Tam Groundswell",
-        "title": "Deepglass Spectator",
-        "greeting": "Keep to the apron and mind the parapet. The first step off the terrace is a long one."
-      },
-      "dg_spectator_yard1": {
-        "name": "Old Cormorant",
-        "title": "Deepglass Spectator",
-        "greeting": "In my day the water was colder and the goals were smaller. Everything else I approve of."
-      },
-      "dg_spectator_yard2": {
-        "name": "Harrow Finch",
-        "title": "Deepglass Spectator",
-        "greeting": "I bet three silver on the away side. The pies are how I am coping."
-      },
-      "dg_spectator_yard3": {
-        "name": "Corbin Ashvane",
-        "title": "Deepglass Spectator",
-        "greeting": "A bald wizard sold me a portal ride up here. Best copper I ever spent."
-      },
-      "dg_spectator_yard4": {
-        "name": "Sesi Brine",
-        "title": "Deepglass Spectator",
-        "greeting": "Match days are the only days the chasm wind smells like fried bread. Follow your nose."
-      },
-      "dg_spectator_tier1": {
-        "name": "Bela Rimeglass",
-        "title": "Deepglass Spectator",
-        "greeting": "Best seat in the bowl. You can see the whole bell shiver when it takes a hit."
-      },
-      "dg_spectator_tier2": {
-        "name": "Ferrin Saltcask",
-        "title": "Deepglass Spectator",
-        "greeting": "I have held this row since dawn and I will hold it through the whistle."
-      },
-      "dg_spectator_tier3": {
-        "name": "Nim Pearlover",
-        "title": "Deepglass Spectator",
-        "greeting": "When the water goes still right before kickoff, the whole stadium holds its breath with it."
-      },
-      "dg_spectator_tier4": {
-        "name": "Goodwife Alder",
-        "title": "Deepglass Spectator",
-        "greeting": "My husband thinks I am at the temple. The temple thinks I am with my husband."
-      },
-      "dg_spectator_tier5": {
-        "name": "Skipper Vell",
-        "title": "Deepglass Spectator",
-        "greeting": "Sailed every sea there is, and the strangest water I know is hanging right up there."
-      },
-      "dg_spectator_tier6": {
-        "name": "Ivo Lanternwake",
-        "title": "Deepglass Spectator",
-        "greeting": "Higher tier, thinner air, better view. The climb is part of the ticket."
-      },
-      "dg_spectator_tier7": {
-        "name": "Maud Threadneedle",
-        "title": "Deepglass Spectator",
-        "greeting": "I knit a row every time the ball changes hands. Finished a whole scarf last bout."
-      },
-      "dg_spectator_tier8": {
-        "name": "Pello the Hoarse",
-        "title": "Deepglass Spectator",
-        "greeting": "Lost my voice at the last fixture. Worth it. Will do it again today."
-      },
-      "dg_spectator_tier9": {
-        "name": "Liva Undertow",
-        "title": "Deepglass Spectator",
-        "greeting": "Do not stand under the bell when a goal collapses. Trust me on the first part."
-      },
-      "dg_spectator_tier10": {
-        "name": "Danna Kelp-Braid",
-        "title": "Deepglass Spectator",
-        "greeting": "The pylons hum before a match. Put your hand on one and you can feel the fixtures coming."
-      },
-      "dg_spectator_tier11": {
-        "name": "Marlo Spume",
-        "title": "Deepglass Spectator",
-        "greeting": "Sixteen lamps and not one moth. Highest lamps in the world, I reckon."
-      },
-      "dg_spectator_tier12": {
-        "name": "Wenna Tidelace",
-        "title": "Deepglass Spectator",
-        "greeting": "I come for the swimming. I stay because the causeway back down is very long."
-      },
-      "dg_stallkeeper_pies": {
-        "name": "Pieman Roldo",
-        "title": "Match-Day Provisions",
-        "greeting": "Hot pies, cold water, and jerky that outlasts the queue. Eat before the whistle, friend, the second half waits for no stomach."
-      },
-      "dg_stallkeeper_tonics": {
-        "name": "Sella Phial",
-        "title": "Tonics and Drams",
-        "greeting": "Bruise tonic, nerve tonic, and a dram for the drop off the causeway. The players buy the first two. The spectators buy the third."
-      },
-      "dg_stallkeeper_favors": {
-        "name": "Banner-Hag Wynn",
-        "title": "Favors and Flags",
-        "greeting": "A pouch for your winnings and a bag for your doubts. Buy the pouch, dear, it is the optimistic purchase."
-      },
-      "th_gate_captain": {
-        "name": "Gate-Captain Isolde Brack",
-        "title": "Keeper of the Tide Gate",
-        "greeting": "Tidehold keeps the bell, {className}, and I keep Tidehold. Causeway is open, the market is loud, and the Warden is in. Mind the rail on the way back down."
-      },
-      "th_gate_watch_0": {
-        "name": "Warden Sable Quist",
-        "title": "Gate Watch",
-        "greeting": "Walk on. The wards are quiet and I would like them to stay that way."
-      },
-      "th_gate_watch_1": {
-        "name": "Warden Tomas Reel",
-        "title": "Gate Watch",
-        "greeting": "Walk on. The wards are quiet and I would like them to stay that way."
-      },
-      "th_lamplighter": {
-        "name": "Ondry the Lamplighter",
-        "title": "Keeper of the Crystal Lamps",
-        "greeting": "Every lamp from the causeway to the Seat, and they all want tending before the light goes. Follow me up if you like, it is the best walk in the city."
-      },
-      "th_stablemaster": {
-        "name": "Stablemaster Corrin Vane",
-        "title": "Tidehold Stables",
-        "greeting": "Nothing with wings, nothing with a burner. Just honest horses that never fell off a causeway."
-      },
-      "th_market_pies": {
-        "name": "Marla Saltmere",
-        "title": "Bread and Brine",
-        "greeting": "Fresh from the Row ovens, {className}. Eat it here, half of it blows off the terrace out there."
-      },
-      "th_market_tonics": {
-        "name": "Apothecary Wren Fell",
-        "title": "Tonics and Drams",
-        "greeting": "Bruise tonic, nerve tonic, and something for the drop. Deepball players are my best trade."
-      },
-      "th_market_bags": {
-        "name": "Packmaster Hest",
-        "title": "Bags and Bindings",
-        "greeting": "You cannot carry the Glass Market home in your fists, {className}. Ask me how I know."
-      },
-      "th_market_reagents": {
-        "name": "Ore-Factor Dunn",
-        "title": "Stone, Bar and Bloom",
-        "greeting": "Everything the Row forges comes up the causeway on somebody’s back. Mine, mostly."
-      },
-      "th_smith": {
-        "name": "Forgewarden Yela Brine",
-        "title": "The Tidehold Forge",
-        "greeting": "Glass is the Warden’s business. Steel is mine, and mine holds when the glass does not."
-      },
-      "th_banker": {
-        "name": "Coffer-Keeper Ansel Tide",
-        "title": "The Deepglass Vault",
-        "greeting": "Your coin is safer in the rock than in your pocket over a fifty-yard drop, {className}."
-      },
-      "th_merchant": {
-        "name": "Factor Iselle Coralwake",
-        "title": "Warden Market",
-        "greeting": "Half the realm sends its goods up here for the fixtures. Buy, sell, and mind the queue."
-      },
-      "th_innkeeper": {
-        "name": "Innkeeper Dov Marrow",
-        "title": "The Gilded Gull",
-        "greeting": "Bed, board and a window facing the bell. You will not sleep on match night, but you will not want to. Board is up by the door if you are looking for company."
-      },
-      "th_market_folk_0": {
-        "name": "Netta Halloway",
-        "title": "Glassmonger",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_1": {
-        "name": "Bram Culloch",
-        "title": "Ropewright",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_2": {
-        "name": "Sister Ivo Marn",
-        "title": "Almswoman of the Tide",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_3": {
-        "name": "Sallis Quay",
-        "title": "Ferry Factor",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_4": {
-        "name": "Old Perrin",
-        "title": "Fixture Tout",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_market_folk_5": {
-        "name": "Yenna Coll",
-        "title": "Netmender",
-        "greeting": "Fixture day, and the whole terrace is up here buying. Mind your purse and your elbows."
-      },
-      "th_dockhand_0": {
-        "name": "Dockmaster Ferrow Kell",
-        "title": "The Moorings",
-        "greeting": "Ships moor to the rock here and hang over the ice. You get used to it, or you go back down the causeway."
-      },
-      "th_dockhand_1": {
-        "name": "Riggerwoman Sena Tull",
-        "title": "The Moorings",
-        "greeting": "Ships moor to the rock here and hang over the ice. You get used to it, or you go back down the causeway."
-      },
-      "th_clerk": {
-        "name": "Clerk Ottoline Vex",
-        "title": "The Warden’s Hall",
-        "greeting": "Petitions on the left, fixture disputes on the right, and everything about the causeway rail on my desk."
-      },
-      "th_priest": {
-        "name": "Tidespeaker Halloran",
-        "title": "The Chapel of the Still Water",
-        "greeting": "We keep a bowl of the bell’s own water on the altar. It has never once gone cloudy."
-      },
-      "th_armourer": {
-        "name": "Quartermaster Rook Adlin",
-        "title": "The Grand Armoury",
-        "greeting": "Everything the watch carries, and a little of what it should. The Warden pays; you pay less."
-      },
-      "th_row_folk_0": {
-        "name": "Magister Ilvane Doss",
-        "title": "Warden’s Household",
-        "greeting": "Up here you can hear the bell when the wind drops. Best address in the city."
-      },
-      "th_row_folk_1": {
-        "name": "Goodwife Prell",
-        "title": "Of the Row",
-        "greeting": "Up here you can hear the bell when the wind drops. Best address in the city."
-      },
-      "th_row_folk_2": {
-        "name": "Anselm Coy",
-        "title": "Glasswright",
-        "greeting": "Up here you can hear the bell when the wind drops. Best address in the city."
-      },
-      "th_row_folk_3": {
-        "name": "Little Wren",
-        "title": "Of the Row",
-        "greeting": "Up here you can hear the bell when the wind drops. Best address in the city."
-      },
-      "th_warden": {
-        "name": "Warden Cassia Deepglass",
-        "title": "Warden of the Bell",
-        "greeting": "You came up the whole causeway to look at me, {className}? The bell is behind you and it is the only thing here worth the climb. Go and play in it, that is what we keep it for."
-      },
-      "th_seneschal": {
-        "name": "Seneschal Aldric Poole",
-        "title": "The Warden’s Seat",
-        "greeting": "The Warden sees petitioners at the turn of the glass. The glass, in this city, is quite large."
-      },
-      "th_keep_guard_0": {
-        "name": "Guard Ottar",
-        "title": "The Warden’s Watch",
-        "greeting": "The gate stands open by the Warden’s word. Mind the portcullis if the bell rings."
-      },
-      "th_keep_guard_1": {
-        "name": "Guard Lisbet",
-        "title": "The Warden’s Watch",
-        "greeting": "Keep to the yard, friend. The hall is the Warden’s, and the towers are ours."
-      },
-      "th_keep_guard_2": {
-        "name": "Guard Vance",
-        "title": "The Warden’s Watch",
-        "greeting": "The Warden holds court within. Wipe your boots, that carpet came from Goldcrest."
-      },
-      "th_keep_guard_3": {
-        "name": "Guard Merrin",
-        "title": "The Warden’s Watch",
-        "greeting": "Petitioners to the hall, deliveries to the kitchen wing. Which are you?"
-      },
-      "th_fountain_keeper": {
-        "name": "Wellmaster Bryn Cadoc",
-        "title": "Keeper of the Wardens’ Fountain",
-        "greeting": "The fountain runs with the bell’s own water, {className}, piped up under the causeway, if you believe the Wardens. Baldemar likes the spray on his head. Says it keeps the pate shining."
-      },
-      "th_bridge_watch_0": {
-        "name": "Spanwarden Kettil Voss",
-        "title": "The West Span",
-        "greeting": "A hundred and thirty yards of stone over black ice, and my job is the rail. Look down if you like, everyone does, once."
-      },
-      "th_bridge_watch_1": {
-        "name": "Spanwarden Mara Frost",
-        "title": "The East Span",
-        "greeting": "A hundred and thirty yards of stone over black ice, and my job is the rail. Look down if you like, everyone does, once."
       },
       "chronicler_saul": {
         "name": "Saul the Chronicler",

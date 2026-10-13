@@ -476,6 +476,30 @@ describe('classifyDiff', () => {
     expect(target?.capture.toString()).toContain('mouseenter');
   });
 
+  it('maps the dungeon tracker pair and its sim read to the dungeon objectives target', () => {
+    for (const path of [
+      'src/ui/hud/dungeon/dungeon_tracker_painter.ts',
+      'src/ui/hud/dungeon/dungeon_tracker_view.ts',
+      'src/sim/instances/dungeon_run.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual, path).toBe(true);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        path,
+      ).toEqual(['dungeon-objectives-tracker']);
+    }
+    const target = resolveTargets(['src/ui/hud/dungeon/dungeon_tracker_painter.ts'])[0];
+    // Desktop on entry, with a boss down and finished on heroic, plus the touch strip page.
+    expect(target.variants.map((v: { key: string }) => v.key)).toEqual([
+      'entry',
+      'boss-down',
+      'heroic-complete',
+      'mobile',
+    ]);
+    expect(target.variants.filter((v: { mobile?: boolean }) => v.mobile === true)).toHaveLength(1);
+  });
+
   it('maps a zone/terrain change to the world-map target', () => {
     const plan = classifyDiff(['src/render/terrain.ts']);
     expect(plan.specific.map((t: { key: string }) => t.key)).toContain('world-map');

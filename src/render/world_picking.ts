@@ -8,11 +8,11 @@ import * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import { resolveGatherNodePick } from './gather_nodes';
 import { isProjectedNameplateAnchorVisible } from './nameplate_projection';
-import { resolveDirectPickEntityId } from './pick_resolution';
 import type { PlacedAssetsView } from './placed_assets';
 import type { MoverHit } from './placed_movers';
 import type { EntityView } from './renderer';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
+import { resolveWorldDirectPick } from './world_direct_pick';
 
 /** What picking reads from the renderer. */
 export interface WorldPickingHost {
@@ -100,15 +100,15 @@ export class WorldPicking {
     return result;
   }
 
-  pick(clientX: number, clientY: number): number | null {
-    const direct = this.pickDirect(clientX, clientY);
+  pick(clientX: number, clientY: number, attackIntent = false): number | null {
+    const direct = this.pickDirect(clientX, clientY, attackIntent);
     if (direct !== null) return direct;
     return this.pickSloppy(clientX, clientY);
   }
 
   // The direct half of pick(): a visible nameplate health bar or an entity mesh.
   // Split out so gather-node callers can slot their raycast before pickSloppy.
-  pickDirect(clientX: number, clientY: number): number | null {
+  pickDirect(clientX: number, clientY: number, attackIntent = false): number | null {
     const nameplate = this.host.nameplatePick(clientX, clientY);
     if (nameplate !== null) return nameplate;
     const { width, height } = this.host.viewport();
@@ -144,7 +144,7 @@ export class WorldPicking {
     }
     hits.length = 0;
     if (directHitIds.length === 0) return null;
-    return resolveDirectPickEntityId(directHitIds, sim.entities, sim.player.targetId);
+    return resolveWorldDirectPick(directHitIds, sim, this.raycaster.ray, attackIntent);
   }
 
   // The forgiving-assist half of pick(): snap to the nearest targetable

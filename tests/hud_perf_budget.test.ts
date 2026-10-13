@@ -784,6 +784,29 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
     reflowAllow: {},
   },
+  // dungeon_tracker (the dungeon objectives plate and its boss rows) is the
+  // same painter contract again: ONE constructor innerHTML write for the whole
+  // skeleton (the plate plus the DUNGEON_TRACKER_ROW_CAP row pool), and every
+  // refresh write facet-routed, visibility included (the is-live class).
+  // The one `.classList` token is a READ (body.classList.contains for the
+  // touch layout, the quest strip's own gate): on touch the plate is hidden
+  // and the painter stops there, resolving and measuring nothing.
+  //
+  // Bounded reflow, by measurement where no stylesheet signal exists: the
+  // plate is the one opaque box in the tracker stack and must keep out from
+  // under the button rail, and whether the two meet depends on the viewport,
+  // the UI scale (#ui zoom), a horizontal or moved rail and a moved tracker.
+  // clearRail() reads three rects (the tracker, its plate, the rail) and
+  // writes a percentage. It runs ONLY while a run is on screen (never outside
+  // a dungeon, never on touch) and only on every RAIL_MEASURE_POLLS-th poll of
+  // the medium band, about twice a second, never per frame. Pinned in
+  // tests/dungeon_tracker_painter.test.ts ("measures on entry and then on a
+  // bounded cadence", "measures nothing outside a run").
+  {
+    file: 'hud/dungeon/dungeon_tracker_painter.ts',
+    allow: { '.innerHTML': 1, '.classList': 1 },
+    reflowAllow: { '.getBoundingClientRect': 3 },
+  },
   // recipe_tracker is the same painter contract: ONE constructor innerHTML
   // write for the whole skeleton (block pool times reagent pool), every refresh
   // write facet-routed. No chip mode (hidden on touch), so no ARIA swap pairs.
