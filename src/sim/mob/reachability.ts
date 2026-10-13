@@ -1,9 +1,13 @@
 // Unreachable-target detection for engaged mobs: the classic evade trigger.
-// Mobs chase in a straight line with a slide fan and no pathfinding, so a mob
-// whose target stands past a wall or under an unclimbable ledge pins in place
-// forever, still in combat, while the target chips it down risk-free (the rift
-// ledge exploit). This module watches for that shape: engaged, out of reach,
-// committing zero movement, with the straight step toward the target refused
+// Mobs chase in a straight line with a slide fan, and inside an instance a
+// chase that stops dead on geometry first looks for a route round it
+// (mob/chase_route.ts: a wall with a doorway is walked round, never waited
+// out). What reaches this module's timeout is the mob NO route helps (or, in
+// the open world, a rift or a delve, the mob with no routes at all): its target stands
+// past a wall with no way round or under an unclimbable ledge, and it would pin
+// in place forever, still in combat, while the target chips it down risk-free
+// (the rift ledge exploit). This module watches for that shape: engaged, out
+// of reach, committing zero movement, with the straight step toward the target refused
 // by the same block modes moveToward enforces. After CHASE_STALL_TIMEOUT
 // seconds of that, the caller (combat_profile.ts) sends an open-world mob home
 // through the existing evade state (immune, heals to full on arrival), while an

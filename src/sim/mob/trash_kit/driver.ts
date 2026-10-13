@@ -69,7 +69,15 @@ import {
 import { stepDeathBurst } from './death_burst';
 import { callDownLastFlier } from './flier_call';
 import { applyFreezeStack } from './freeze_stacks';
-import type { TrashKitExtension } from './kit_extension';
+import {
+  KIT_SIGHT_KEYS,
+  KIT_SIGHT_RETRY,
+  KIT_SIGHT_WAIT,
+  kitSightRetry,
+  kitVictimHidden,
+  pickSeenVictim,
+} from './kit_cast_sight';
+import type { KitCastDropReason, KitCastPick, TrashKitExtension } from './kit_extension';
 import { stepKitHazard } from './kit_hazard';
 import { landNova, novaCastIdFor, novaReady } from './kit_nova';
 import { kitObjectIds } from './kit_objects';
@@ -209,6 +217,13 @@ function castDef(kit: TrashKitDef, key: string): TrashKitCast | undefined {
 function isPhysicalCast(key: string): boolean {
   const ext = extensionOf(key);
   return ext ? ext.isPhysical(key) : isPhysicalKey(key as CastKey);
+}
+
+/** A cast at one player that needs a line of sight to begin and to land
+ *  (kit_cast_sight.ts), of any owner. */
+function needsSight(key: string): boolean {
+  const ext = extensionOf(key);
+  return ext ? (ext.sightKeys?.includes(key) ?? false) : KIT_SIGHT_KEYS.has(key);
 }
 
 function clearCast(mob: Entity, castId: string): void {
@@ -640,6 +655,47 @@ function landCast(
   }
 }
 
+/** A bar that will not land: clear it and drop what it laid while it ran.
+ *  `reason` is 'broken' for a kick, a stun or a silence, 'sight' for a bar
+ *  that ran out on a victim out of sight (the extension is told which). */
+function dropCast(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  mob: Entity,
+  kit: TrashKitDef,
+  st: TrashKitState,
+  key: string,
+  castId: string,
+  targetId: number | null,
+  reason: KitCastDropReason,
+): void {
+  clearCast(mob, castId);
+  st.cast = null;
+  if (key === 'toss') dropToss(ctx, inst, st);
+  if (key === 'rupture') dropRupture(ctx, inst, st);
+  if (key === 'column') endColumn(ctx, mob, kit, st, false);
+  if (key === 'fogBank') dropUnlaidFog(st);
+  if (key === 'hook') st.aim = undefined;
+  extensionOf(key)?.broken?.(ctx, mob, key, targetId, st, reason);
+}
+
+/** May `key` start now, and at whom, picking among `among`? (The core's own
+ *  readiness or its extension's.) */
+function readyPick(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  mob: Entity,
+  kit: TrashKitDef,
+  key: string,
+  st: TrashKitState,
+  among: readonly Entity[],
+): KitCastPick {
+  const ext = extensionOf(key);
+  return ext
+    ? ext.ready(ctx, inst, mob, kit, key, st, among)
+    : castReady(ctx, inst, mob, kit, key as CastKey, st, among);
+}
+
 /** Advance the cast in flight; returns true while a bar is running. */
 function stepCast(
   ctx: SimContext,
@@ -663,14 +719,7 @@ function stepCast(
     ctx.isStunned(mob) ||
     (!isPhysicalCast(key) && !unstoppable && isSilenced(mob));
   if (broken) {
-    clearCast(mob, cast.castId);
-    st.cast = null;
-    if (key === 'toss') dropToss(ctx, inst, st);
-    if (key === 'rupture') dropRupture(ctx, inst, st);
-    if (key === 'column') endColumn(ctx, mob, kit, st, false);
-    if (key === 'fogBank') dropUnlaidFog(st);
-    if (key === 'hook') st.aim = undefined;
-    ext?.broken?.(ctx, mob, key, cast.targetId, st);
+    dropCast(ctx, inst, mob, kit, st, key, cast.castId, cast.targetId, 'broken');
     return false;
   }
   mob.castRemaining = Math.max(0, mob.castRemaining - DT);
@@ -687,6 +736,14 @@ function stepCast(
   else if (target && !target.dead && key !== 'cone') mob.facing = angleTo(mob.pos, target.pos);
   if (key === 'column') stepColumnChannel(ctx, mob, kit, st);
   if (mob.castRemaining > 0) return true;
+  // A cast at one player lands only on a victim the caster can see
+  // (kit_cast_sight.ts): the bar ran out, nothing lands, and the cast is
+  // handed back to be begun again once it sees someone.
+  if (needsSight(key) && kitVictimHidden(ctx, mob, target)) {
+    dropCast(ctx, inst, mob, kit, st, key, cast.castId, cast.targetId, 'sight');
+    st.timers[key] = Math.min(st.timers[key] ?? 0, KIT_SIGHT_RETRY);
+    return false;
+  }
   clearCast(mob, cast.castId);
   st.cast = null;
   if (ext) ext.land(ctx, inst, mob, kit, key, cast.targetId, players, st);
@@ -716,10 +773,28 @@ function tryStartCast(
     const physical = isPhysicalCast(key);
     if (!physical && (isSilenced(mob) || isLockedOut(mob, def.school as Aura['school']))) continue;
     const ext = extensionOf(key);
-    const { ok, target } = ext
-      ? ext.ready(ctx, inst, mob, kit, key, st, players)
-      : castReady(ctx, inst, mob, kit, key as CastKey, st, players);
-    if (!ok) continue;
+    const first = readyPick(ctx, inst, mob, kit, key, st, players);
+    if (!first.ok) continue;
+    let target = first.target;
+    // A cast at one player begins only at a player the caster can see
+    // (kit_cast_sight.ts pickSeenVictim). A hidden pick is set aside and the
+    // cast's own pick is drawn again from the rest (so its rules still hold:
+    // never the tank while another stands there), a bounded number of times;
+    // with nobody in sight the cast waits and looks again, and with the
+    // tick's sight budget spent it simply tries next tick. The picks are
+    // pure, so drawing twice changes nothing else.
+    if (needsSight(key) && target !== null) {
+      const seen = pickSeenVictim(ctx, mob, target, players, (pool) => {
+        const again = readyPick(ctx, inst, mob, kit, key, st, pool);
+        return again.ok ? again.target : null;
+      });
+      if (seen === KIT_SIGHT_WAIT) return;
+      if (seen === null) {
+        st.timers[key] = kitSightRetry(mob);
+        continue;
+      }
+      target = seen;
+    }
     st.timers[key] = def.every;
     st.casts++;
     // A nova's every Nth bar runs under its unstoppable id (kit_nova.ts).

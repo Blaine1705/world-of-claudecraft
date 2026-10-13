@@ -1466,6 +1466,8 @@ export function handleDeath(
     clearSpiritmendCurrents(ctx, e.id);
     clearShamanTalentState(ctx, e);
   }
+  // A dead mob keeps no route and no plan throttle (mob/chase_route.ts).
+  if (e.chaseRoute !== undefined) e.chaseRoute = undefined;
   vespersOnEntityDeath(ctx, e);
   afflictionOnDeath(ctx, e);
   destructionOnDeath(ctx, e);
