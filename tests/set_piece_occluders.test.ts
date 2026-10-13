@@ -495,6 +495,9 @@ describe('everything a player acts on draws below the set piece veil', () => {
     // before any transparent, the veil included
     'src/render/sky.ts': 'opaque far-depth dome',
     'src/render/gravewyrm_sanctum/sanctum_sky.ts': 'opaque far-depth dome',
+    // the Studio's map-authored aurora: sky curtains hung on a ring far over
+    // the camera, drawn after the dome and writing no depth. Scenery only.
+    'src/render/aurora_sky.ts': /depthWrite: false/,
     // screen overlays and debug lines that never test depth
     'src/render/fenbridge_town.ts': /depthTest: false/,
     'src/render/underwater.ts': /depthTest: false/,
