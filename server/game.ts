@@ -350,7 +350,7 @@ import {
   createMobScanTickStats,
   resetMobScanCaptureAccumulators,
 } from './mob_scan_tick_stats';
-import { parseModerationChatCommand } from './moderation_commands';
+import { JAILED_BLOCKED_COMMANDS, parseModerationChatCommand } from './moderation_commands';
 import {
   forceCharacterRename,
   moderateAccount,
@@ -850,18 +850,6 @@ const LANE_DROP_CAUSE = {
   chat: 'lane_chat',
   name_screen: 'lane_name_screen',
 } as const satisfies Record<MsgLane, WsDropCause>;
-const JAILED_BLOCKED_COMMANDS = new Set<string>([
-  'arena_queue',
-  'bg_queue',
-  'enter_dungeon',
-  'df_expedition_travel',
-  'enter_crypt',
-  'enter_delve',
-  'duel_req',
-  'duel_accept',
-  'unstuck',
-  'card_queue_join',
-]);
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
 // read is served from the woc_balance.ts cache (CACHE_TTL_MS), which is the real
 // freshness floor; keeping this loop at/under that TTL means a token change shows

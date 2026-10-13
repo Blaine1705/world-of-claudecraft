@@ -112,13 +112,12 @@ describe('independent expedition applications through the authoritative Sim', ()
   });
 
   it('bounds personal applications at five and keeps duplicate requests idempotent at the cap', () => {
-    const { sim, helper, leaders, listings, apply, pending } = setup(
-      FINDER_PLAYER_APPLICATION_CAP + 1,
-    );
+    expect(FINDER_PLAYER_APPLICATION_CAP).toBe(5);
+    const { sim, helper, leaders, listings, apply, pending } = setup(6);
     for (let i = 0; i < listings.length; i++) apply(i);
     sim.time += 20;
     apply(0);
-    expect(pending()).toEqual(listings.slice(0, FINDER_PLAYER_APPLICATION_CAP));
+    expect(pending()).toEqual(listings.slice(0, 5));
     expect(sim.dungeonFinderInfoFor(helper)?.myApplications?.[0].remaining).toBe(100);
     expect(sim.dungeonFinderInfoFor(leaders.at(-1)!)?.myListing?.applicants).toEqual([]);
   });

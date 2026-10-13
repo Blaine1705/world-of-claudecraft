@@ -1,7 +1,7 @@
 // Run-local active participation, bounded by the current admitted roster.
 
 import { FINDER_ACTIVITIES } from '../content/dungeon_finder';
-import { QUEUE_DAILY_POINT_CAP } from '../content/queue_rewards';
+import { QUEUE_DAILY_POINT_CAP, QUEUE_REWARDS_ENABLED } from '../content/queue_rewards';
 import { killParticipationPos } from '../loot/kill_participation';
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -35,6 +35,7 @@ export function admitQueueHelper(
   pid: number,
   partyId: number,
 ): void {
+  if (!QUEUE_REWARDS_ENABLED) return;
   const family = expeditionFamilyClaims(ctx, claim);
   const roster = family.find((c) => c.queueHelpers)?.queueHelpers ?? new Map();
   for (const member of roster.keys())
@@ -82,6 +83,7 @@ export function recordQueueDamage(
   target: Entity,
   amount: number,
 ): void {
+  if (!QUEUE_REWARDS_ENABLED) return;
   if (!source || amount <= 0) return;
   const boss =
     target.kind === 'mob' && target.ownerId === null
@@ -109,6 +111,7 @@ export function recordQueueHealing(
   target: Entity,
   amount: number,
 ): void {
+  if (!QUEUE_REWARDS_ENABLED) return;
   if (amount <= 0 || target.kind !== 'player') return;
   const pid = source.kind === 'player' ? source.id : source.ownerId;
   if (pid === null) return;
@@ -136,6 +139,7 @@ export function awardQueueEncounter(
   claim: InstanceSlot | null,
   boss: Entity,
 ): void {
+  if (!QUEUE_REWARDS_ENABLED) return;
   const activity = claim && expeditionActivity(claim);
   const encounter = activity?.encounters.find((e) => e.mobId === boss.templateId);
   if (

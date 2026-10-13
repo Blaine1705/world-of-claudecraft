@@ -1693,7 +1693,8 @@ const MONOLITHS: MonolithRow[] = [
     // tree (after biome). Exact count, zero slack.
     // LOWERED for open expeditions: related finder helpers and dungeon
     // mirror projections moved behind sibling module seams. Exact measured size.
-    ceiling: 9799,
+    // Jail command policy now lives with the moderation command rules.
+    ceiling: 9788,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

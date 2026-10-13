@@ -1,4 +1,6 @@
 // Character-only cosmetic bell finishes. No stats, inventory items or paid skins.
+// Paused across all hosts; keep the saved-data catalog for existing characters.
+export const QUEUE_REWARDS_ENABLED = false;
 export const QUEUE_REWARDS = Object.freeze([
   Object.freeze({ id: 'bronze', cost: 20 }),
   Object.freeze({ id: 'silver', cost: 60 }),

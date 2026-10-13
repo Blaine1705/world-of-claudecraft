@@ -259,13 +259,12 @@ describe('open dungeon expeditions through the real Sim', () => {
     sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
     sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
     expect(sim.dungeonFinderInfoFor(leader)?.myListing?.applicants).toHaveLength(1);
-    for (let i = 0; i < FINDER_EXPEDITION_APPLICATION_CAP; i++) {
+    expect(FINDER_EXPEDITION_APPLICATION_CAP).toBe(20);
+    for (let i = 0; i < 20; i++) {
       const applicant = addPlayer(sim, `Applicant${i}`);
       sim.dungeonFinderExpeditionApply(listing.id, 'dps', applicant);
     }
-    expect(sim.dungeonFinderInfoFor(leader)?.myListing?.applicants).toHaveLength(
-      FINDER_EXPEDITION_APPLICATION_CAP,
-    );
+    expect(sim.dungeonFinderInfoFor(leader)?.myListing?.applicants).toHaveLength(20);
     sim.time += FINDER_EXPEDITION_APPLICATION_SECONDS;
     for (let i = 0; i < 20; i++) sim.tick();
     expect(sim.dungeonFinderInfoFor(leader)?.myListing?.applicants).toHaveLength(0);

@@ -1,4 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Exercise the retained enabled rules; queue_rewards_disabled pins shipping mode.
+vi.mock('../src/sim/content/queue_rewards', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/sim/content/queue_rewards')>()),
+  QUEUE_REWARDS_ENABLED: true,
+}));
+
 import { applyHeal } from '../src/sim/combat/heal';
 import { TALENTS } from '../src/sim/content/talents';
 import { expeditionActivity } from '../src/sim/instances/dungeon_expeditions';

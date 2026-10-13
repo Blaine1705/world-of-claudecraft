@@ -120,6 +120,49 @@ describe('simplified group navigation', () => {
     expect(world.dungeonFinderQueueJoin).not.toHaveBeenCalled();
   });
 
+  it('shows the joined group when membership arrives while creating a different group', () => {
+    const { root, world, window, click } = setup();
+    click('[data-start-create]');
+    click('[data-createopt="gravewyrm_sanctum_heroic"]');
+    Object.assign(world, {
+      partyInfo: {
+        leader: 2,
+        members: [
+          { pid: 2, name: 'RaidLeader', cls: 'warrior', level: 20, role: 'tank' },
+          { pid: 1, name: 'Applicant', cls: 'paladin', level: 20, role: 'healer' },
+        ],
+      },
+    });
+    window.render();
+    expect(root.querySelector('#dfinder-title')?.textContent).toBe('Groups');
+    expect(root.querySelector('.df-create')).toBeNull();
+    expect(root.querySelector('.df-current-group')?.textContent).toContain('RaidLeader');
+    expect(root.querySelector('[data-start-create]')).toBeNull();
+    expect(world.dungeonFinderListingCreate).not.toHaveBeenCalled();
+    expect(world.dungeonFinderSetRoles).not.toHaveBeenCalled();
+    Object.assign(world, { partyInfo: null });
+    window.render();
+    expect(root.querySelector('.df-create')).toBeNull();
+    expect(root.querySelector('[data-start-create]')).not.toBeNull();
+  });
+
+  it('keeps a valid creation draft when the player becomes the party leader', () => {
+    const { root, world, window, click } = setup();
+    click('[data-start-create]');
+    click('[data-createopt="gravewyrm_sanctum_heroic"]');
+    Object.assign(world, {
+      partyInfo: {
+        leader: 1,
+        members: [{ pid: 1, name: 'Leader', cls: 'paladin', level: 20, role: 'healer' }],
+      },
+    });
+    window.render();
+    expect(root.querySelector('#dfinder-title')?.textContent).toBe('Create Group');
+    expect(root.querySelector('[data-cancel-create]')).not.toBeNull();
+    click('[data-act="create"]');
+    expect(world.dungeonFinderListingCreate).toHaveBeenCalledWith('gravewyrm_sanctum_heroic', []);
+  });
+
   it('keeps a running queue reachable so the player can leave from the groups screen', () => {
     const { root, world, window, click } = setup();
     Object.assign(world.dungeonFinderInfo, {

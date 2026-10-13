@@ -146,7 +146,9 @@ money, and counts use locale-aware formatters.
   keeps Publish reachable while scrolling and separates dungeon and raid choices.
 - The bell reports listing and application changes and opens Groups. The only exposed alert
   setting is sound. Legacy helper role/availability controls and helper rewards/shop UI are
-  hidden; the backend state and commands remain for compatibility.
+  hidden. Helper rewards are paused in the shared simulation: no participation bookkeeping,
+  new points, purchases, equips, or unequips. Existing saved reward progress and read-only
+  projections remain compatible and are not erased.
 - Add a desktop micro button, a mobile More button, and a rebindable `Shift+I` default action.
   Existing `I` calendar behavior remains unchanged.
 - Opening traps focus and closing restores it. All controls meet mobile target sizes, support

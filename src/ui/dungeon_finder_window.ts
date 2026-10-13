@@ -197,7 +197,7 @@ export class DungeonFinderWindow {
       return;
     }
 
-    if (view.board.myListing) this.creatingGroup = false;
+    if (!view.board.canCreate) this.creatingGroup = false;
     const allRows = view.rows;
     const labels = new Map(allRows.map((r) => [r.id, adventureName(r)]));
     const rows = filterAdventureRows(

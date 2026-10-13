@@ -5,6 +5,7 @@ import {
   QUEUE_COMPLETION_POINTS,
   QUEUE_DAILY_POINT_CAP,
   QUEUE_REWARDS,
+  QUEUE_REWARDS_ENABLED,
   type QueueRewardId,
 } from '../content/queue_rewards';
 
@@ -61,6 +62,7 @@ export function grantQueueEncounter(
   activityId: string,
   mobId: string,
 ): number {
+  if (!QUEUE_REWARDS_ENABLED) return 0;
   const activity = FINDER_ACTIVITIES.find((a) => a.id === activityId);
   const encounter = activity?.encounters.find((e) => e.mobId === mobId);
   if (!activity || !encounter) return 0;
@@ -97,6 +99,7 @@ export function changeQueueReward(
   id: string | null,
   buy: boolean,
 ): boolean {
+  if (!QUEUE_REWARDS_ENABLED) return false;
   if (id === null && !buy) {
     state.equipped = null;
     return true;

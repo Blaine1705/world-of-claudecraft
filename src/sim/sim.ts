@@ -47,7 +47,7 @@ import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import { savedQuestLog } from './quests/quest_log_persist';
-import * as queueRewards from './social/queue_rewards';
+import { loadQueueRewards, savedQueueRewards } from './social/queue_rewards';
 import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
@@ -1310,7 +1310,7 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
 export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
-  queueRewards?: queueRewards.QueueRewardsState;
+  queueRewards?: CharacterState['queueRewards'];
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -3371,8 +3371,7 @@ export class Sim {
       const dailyGate = sanitizeDailyGateLoad(s);
       if (dailyGate.delveDaily) meta.delveDaily = dailyGate.delveDaily;
       if (dailyGate.heroicDaily) meta.heroicDaily = dailyGate.heroicDaily;
-      if (savedState.queueRewards)
-        meta.queueRewards = queueRewards.loadQueueRewards(savedState.queueRewards);
+      if (savedState.queueRewards) meta.queueRewards = loadQueueRewards(savedState.queueRewards);
       if (dailyGate.wyrmfallDaily) meta.wyrmfallDaily = dailyGate.wyrmfallDaily;
       if (dailyGate.craftDaily) meta.craftDaily = dailyGate.craftDaily;
       meta.emberWeekAnchor = dailyGate.emberWeekAnchor;
@@ -3862,7 +3861,7 @@ export class Sim {
       xp: restore ? restore.xp : meta.xp,
       lifetimeXp: meta.lifetimeXp,
       ...savedHonorState(meta),
-      ...queueRewards.savedQueueRewards(meta.queueRewards),
+      ...savedQueueRewards(meta.queueRewards),
       ...savedWorldPvpFields(meta, this.time),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],

@@ -1,4 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Retained rules stay covered for a future reactivation. Shipping-off behavior
+// and save preservation are exercised without mocks in queue_rewards_disabled.
+vi.mock('../src/sim/content/queue_rewards', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/sim/content/queue_rewards')>()),
+  QUEUE_REWARDS_ENABLED: true,
+}));
+
 import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
 import {
   changeQueueReward,
