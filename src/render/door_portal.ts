@@ -988,6 +988,22 @@ export function doorArchAuthoredElsewhere(
   // The Gravewyrm Sanctum's Seal Gate (sanctum_seal_gate.ts) is the door: its
   // pylons frame the walk-in lane and its cold mist film is the portal look.
   if (dungeonId === 'gravewyrm_sanctum') return true;
+  // The Sunken Bastion's Drowned Gate Tower (sunken_bastion_entrance.ts) is
+  // the door: its inner arch frames the walk-in lane and the flooded passage
+  // it draws behind the arch is the portal look.
+  if (dungeonId === 'sunken_bastion') return true;
+  // The Hollow Crypt's Fallen Chapel (hollow_crypt_entrance.ts) is the door:
+  // its stair-house portal frames the walk-in lane and the stair it draws
+  // behind the arch is the portal look.
+  if (dungeonId === 'hollow_crypt') return true;
+  // The Drowned Temple's Moon Stair (drowned_temple_entrance.ts) is the door:
+  // its moongate ring frames the walk-in lane and the film of cold moonlight
+  // it draws in the ring is the portal look.
+  if (dungeonId === 'drowned_temple') return true;
+  // The Wildheart Basin's Jaguar Maw (wildheart_basin_entrance.ts) is the
+  // door: its muzzle frames the walk-in lane and the flooded throat it draws
+  // behind the fangs is the portal look.
+  if (dungeonId === 'wildheart_basin') return true;
   // The raid family's overworld door belongs to its chain HEAD (the
   // Forge-Lift since the lift became the first room; the Halls id stays
   // covered so a chain reshuffle can never resurrect the generic arch

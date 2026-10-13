@@ -975,6 +975,7 @@ export function reachPalmSpots(seed: number): ReachPalm[] {
     return reachDeckClear(x, z, 1.5);
   };
   const push = (x: number, z: number, y: number, sizeF: number): void => {
+    if (isExcludedDecoration(x, z)) return; // an authored clearing (decoration_exclusions.ts)
     const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
     const scale = (PALM_TARGET_H / PALM_NATIVE_H[variant]) * sizeF;
     spots.push({
@@ -3780,7 +3781,7 @@ function groundHeightFor(
   // The Old Beacon's stair, the Last Keep's walls and flights, and the
   // Forgefather stair ramps all ride the same idiom, summed by the
   // walk_lifts leaf: raised walkable ground the render terrain never sees.
-  const terrain = overworldWalkSurface(x, z, terrainHeight(x, z, seed));
+  const terrain = overworldWalkSurface(x, z, terrainHeight(x, z, seed), seed);
   const content = getActiveWorldContent();
   let h = Math.max(
     terrain,

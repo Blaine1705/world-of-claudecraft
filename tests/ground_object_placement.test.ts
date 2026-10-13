@@ -23,10 +23,18 @@ import type { Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-// A pickup deliberately authored onto a walkable structure would go here, as
-// `'<itemId>@<x>,<z>'`, with the reason. Empty on purpose: every shipped
-// pickup stands on natural ground.
-const ON_STRUCTURE_ALLOWLIST: ReadonlySet<string> = new Set<string>();
+// A pickup deliberately authored onto a walkable structure goes here, as
+// `'<itemId>@<x>,<z>'`, with the reason. Every other shipped pickup stands on
+// natural ground.
+const ON_STRUCTURE_ALLOWLIST: ReadonlySet<string> = new Set<string>([
+  // One of the four Warded Shore-Rocks lies on a tread of the Moon Stair, the
+  // built flight to the Drowned Temple's moongate (src/sim/drowned_temple_stair.ts).
+  // Its spot is unchanged (a pickup is a terrain calm anchor: moving it would
+  // reshape the gully the flight is fitted to); the flight is an open ramp from
+  // the mirror to the dais, and tests/drowned_temple_entrance.test.ts walks a
+  // player to the rock and pins it on the tread's own surface.
+  'moongate_rubbing@-68,783',
+]);
 
 // groundHeight adds the walkable lift fields (castle walls and bastions, the
 // beacon spiral, the Vale Cup tiers) over terrainHeight, so any gap between

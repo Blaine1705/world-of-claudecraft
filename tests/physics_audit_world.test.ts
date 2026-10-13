@@ -225,9 +225,14 @@ describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () =
   });
 
   it('dungeon door jambs block while the mouth stays a walkable trigger lane', () => {
-    const door = DUNGEONS.hollow_crypt.doorPos;
+    // Dawnhold Castle keeps the generic arch. The five-man dungeons no longer
+    // do: each door is a built set piece with its own colliders now
+    // (src/sim/dungeon_door_jambs.ts).
+    const door = DUNGEONS.dawnhold_castle.doorPos;
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {
       expect(isBlocked(SEED, door.x + sx, door.z, 0.4), `jamb ${sx}`).toBe(true);
+      // a generic jamb is a slim post: a yard further out the ground is open
+      expect(isBlocked(SEED, door.x + sx * 2, door.z, 0.2), `beside jamb ${sx}`).toBe(false);
     }
     // A body walking the centreline reaches the trigger point itself.
     expect(isBlocked(SEED, door.x, door.z, 0.5)).toBe(false);

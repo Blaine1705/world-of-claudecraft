@@ -8,8 +8,8 @@
     "Cat Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll",
     "bear-form control swinging at the equipped weapon speed on the same loadout"
   ],
-  "draws": 1479,
-  "drawDigest": "039d2a21",
+  "draws": 1477,
+  "drawDigest": "f3fe87a4",
   "frames": [
     {
       "tick": 0,
@@ -340,8 +340,8 @@
       "state": "77e60842",
       "events": "741638a5",
       "rng": {
-        "draws": 1054,
-        "digest": "bac8e05a"
+        "draws": 1055,
+        "digest": "26c74d67"
       }
     },
     {
@@ -384,8 +384,8 @@
       "state": "a85cb00c",
       "events": "741638a5",
       "rng": {
-        "draws": 1279,
-        "digest": "3e15eee2"
+        "draws": 1281,
+        "digest": "cc857ab9"
       }
     },
     {
@@ -395,8 +395,8 @@
       "state": "b4b6b369",
       "events": "741638a5",
       "rng": {
-        "draws": 1344,
-        "digest": "7b0a7521"
+        "draws": 1347,
+        "digest": "cf1992e0"
       }
     },
     {
@@ -406,8 +406,8 @@
       "state": "b4b6b369",
       "events": "741638a5",
       "rng": {
-        "draws": 1344,
-        "digest": "7b0a7521"
+        "draws": 1347,
+        "digest": "cf1992e0"
       },
       "label": "after-swings",
       "players": [
@@ -908,8 +908,8 @@
       "state": "ec063742",
       "events": "741638a5",
       "rng": {
-        "draws": 1402,
-        "digest": "d29b1117"
+        "draws": 1405,
+        "digest": "7ee08fc2"
       }
     },
     {
@@ -919,8 +919,8 @@
       "state": "cc1f5be0",
       "events": "741638a5",
       "rng": {
-        "draws": 1479,
-        "digest": "039d2a21"
+        "draws": 1477,
+        "digest": "f3fe87a4"
       }
     },
     {
@@ -930,8 +930,8 @@
       "state": "cc1f5be0",
       "events": "741638a5",
       "rng": {
-        "draws": 1479,
-        "digest": "039d2a21"
+        "draws": 1477,
+        "digest": "f3fe87a4"
       },
       "label": "final",
       "players": [

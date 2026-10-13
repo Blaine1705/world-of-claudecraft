@@ -32,6 +32,7 @@ import { battlegroundRuneModelPreloadInternalsForTest } from '../src/render/batt
 import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_dressing';
 import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
 import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
+import { drownedTempleEntrancePreloadInternalsForTest } from '../src/render/drowned_temple_entrance';
 import { eastbrookGrandArmouryInternalsForTest } from '../src/render/eastbrook_grand_armoury';
 import { farmPatchesPreloadInternalsForTest } from '../src/render/farm_patches';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
@@ -41,15 +42,18 @@ import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { gliderCourseVisualPreloadInternalsForTest } from '../src/render/glider_course_visual';
 import { harborRouteMarkerInternalsForTest } from '../src/render/harbor_route_markers';
 import { hoardEntrancePreloadInternalsForTest } from '../src/render/hoard_entrance';
+import { hollowCryptEntrancePreloadInternalsForTest } from '../src/render/hollow_crypt_entrance';
 import { ignivarEnvPropsInternalsForTest } from '../src/render/ignivar_env_props';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
 import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { sanctumSealGatePreloadInternalsForTest } from '../src/render/sanctum_seal_gate';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
+import { sunkenBastionEntrancePreloadInternalsForTest } from '../src/render/sunken_bastion_entrance';
 import { transportShipInternalsForTest } from '../src/render/transport_ship';
 import { wickharborHarborInternalsForTest } from '../src/render/wickharbor_harbor';
 import { wickharborWharfInternalsForTest } from '../src/render/wickharbor_wharf';
+import { wildheartBasinEntrancePreloadInternalsForTest } from '../src/render/wildheart_basin_entrance';
 import { wispMazeKitPreloadInternalsForTest } from '../src/render/wisp_maze_kit';
 import { wyrmwatchHarborInternalsForTest } from '../src/render/wyrmwatch_harbor';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
@@ -506,6 +510,22 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
     for (const url of sanctumSealGatePreloadInternalsForTest.urls)
       expectAssetExistsAndManifested(url);
   });
+  it('Sunken Bastion Drowned Gate Tower assets', () => {
+    for (const url of sunkenBastionEntrancePreloadInternalsForTest.urls)
+      expectAssetExistsAndManifested(url);
+  });
+  it('Hollow Crypt Fallen Chapel assets', () => {
+    for (const url of hollowCryptEntrancePreloadInternalsForTest.urls)
+      expectAssetExistsAndManifested(url);
+  });
+  it('Drowned Temple Moon Stair assets', () => {
+    for (const url of drownedTempleEntrancePreloadInternalsForTest.urls)
+      expectAssetExistsAndManifested(url);
+  });
+  it('Wildheart Basin Jaguar Maw assets', () => {
+    for (const url of wildheartBasinEntrancePreloadInternalsForTest.urls)
+      expectAssetExistsAndManifested(url);
+  });
   it('buried hoard entrance asset', () => {
     for (const url of hoardEntrancePreloadInternalsForTest.urls)
       expectAssetExistsAndManifested(url);
@@ -776,8 +796,15 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
     // The bespoke caldera renderer that drew these retired with the Basin's
     // rework (render/wildheart_basin); the shipped models stay (the door
     // portal draws the jaguar gate, the creature looks the mask totem).
+    // The Jaguar Maw (the Basin's world entrance) is a landmark, not a prop:
+    // tests/wildheart_basin_entrance_asset.test.ts pins its own bytes and budget.
     const shipped = readdirSync(path.join(publicDir, 'models/props'))
-      .filter((f) => /^wildheart_.*\.glb$/.test(f) && f !== 'wildheart_basin_kit.glb')
+      .filter(
+        (f) =>
+          /^wildheart_.*\.glb$/.test(f) &&
+          f !== 'wildheart_basin_kit.glb' &&
+          !f.startsWith('wildheart_basin_entrance'),
+      )
       .map((f) => `/models/props/${f}`);
     expect(shipped.length).toBeGreaterThanOrEqual(10);
     for (const url of shipped) {
