@@ -13495,6 +13495,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': 'ルナタイド（周期的な範囲ダメージ）',
   'hudChrome.finder.mech.chorus_and_solo': '合唱と独唱（片方の印には集まり、もう片方からは離れる）',
   'hudChrome.finder.mech.tideglass_reflections': '潮硝子の映し身（互いの映し身を倒す）',
+  'hudChrome.finder.mech.hydra_three_elements':
+    '三つの属性（左の首は18ヤードの冷気の円錐を吐き、4秒間あなたの移動を70パーセント遅くする。中央の首は最大3人の足元に毒を吐き、1.5秒後に破裂して、落ちた場所で6秒間燃え続ける。右の首は26ヤードの直線に激流を放ち、あなたを8ヤード吹き飛ばす：どれも範囲の外へ出ること。首が1本倒れると、残った首がその攻撃を引き継ぐ）',
+  'hudChrome.finder.mech.hydra_tsunami':
+    '津波（首が4.5秒間水中に沈み、その間の被ダメージが75パーセント減る。波は池の半分を襲い、次はもう半分を襲う：ノーマルでは160から190の冷気ダメージと10ヤードの押し出し。もう半分へ渡るか、池の縁の柱の陰に立つこと。ヒロイックでは3.5秒後に波がもう半分へ打ち返す。最初の津波は戦闘開始から24秒後、その後は前の波が過ぎてから40秒後に来る）',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    '合体ブレス（津波と津波の間に、首が自分たちの攻撃を2つ融合させる、順番は常に同じ：凍てつく激流は直線上の全員を2秒間凍らせ、次の波を防げる氷の壁を残す。毒の潮流は毒の池を外へ滑らせる。毒の霧氷は毒の池を結晶に凍らせ、4秒後に破裂させる。ノーマルでは津波の間に1回、ヒロイックでは2回）',
+  'hudChrome.finder.mech.hydra_regrowth':
+    '再生（ほかの首が生きている間、倒れた首は20秒後に体力半分で生え戻り、倒れた首1本ごとに残りの首の与ダメージが15パーセント増える：3本をほぼ同時に倒すこと）',
   'hudChrome.finder.mech.rising_tide': '満ち潮（島の半分が浸水、乾いた側へ移動）',
   'hudChrome.finder.mech.undertow': '引き潮（全員を引き寄せる、衝撃の前に逃げる）',
   'hudChrome.finder.mech.enrage': '低体力で激怒',

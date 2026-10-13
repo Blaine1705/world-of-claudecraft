@@ -6416,7 +6416,7 @@
     {
       "id": "mere_hydra_head_center",
       "family": "dragonkin",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "temple_hydra_head",
       "renderSpec": {
         "model": {

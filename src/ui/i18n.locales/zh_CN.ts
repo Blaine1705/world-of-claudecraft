@@ -12874,6 +12874,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': '月潮（周期性范围伤害）',
   'hudChrome.finder.mech.chorus_and_solo': '合唱与独唱（一个标记集合分摊，另一个标记分散）',
   'hudChrome.finder.mech.tideglass_reflections': '潮镜倒影（击杀彼此的镜像）',
+  'hudChrome.finder.mech.hydra_three_elements':
+    '三重元素（左侧头颅喷出18码的冰霜锥形吐息，使你减速70%，持续4秒；中间头颅向最多3名玩家脚下喷吐毒液，1.5秒后爆裂，并在落点灼烧6秒；右侧头颅沿一条26码长的直线射出激流，将你击退8码：每一种都要走出去。一个头颅倒下后，仍然存活的头颅会接手它的攻击）',
+  'hudChrome.finder.mech.hydra_tsunami':
+    '海啸（头颅沉入水中4.5秒，期间受到的伤害降低75%，一道巨浪席卷水池的一半，下一次换另一半：普通难度下造成160到190点冰霜伤害并把你推开10码。跑到另一半，或站到池边石柱后面；英雄难度下，巨浪会在3.5秒后回卷另一半。第一次海啸在开战24秒后到来，之后每一次都在上一次过去40秒后到来）',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    '合体吐息（两次海啸之间，头颅会融合它们的两种攻击，顺序始终相同：冰封激流把直线上的所有人冻结2秒，并留下一道可以为你挡住下一道巨浪的冰墙；毒液洋流让毒池向外滑动；剧毒霜晶把毒池冻成晶体，4秒后爆裂。普通难度下两次海啸之间一次，英雄难度两次）',
+  'hudChrome.finder.mech.hydra_regrowth':
+    '再生（只要还有另一个头颅活着，倒下的头颅会在20秒后以一半生命值长回来，每个倒下的头颅还会使其余头颅造成的伤害提高15%：让三个头颅在相近的时间内倒下）',
   'hudChrome.finder.mech.rising_tide': '涨潮（半座岛被淹没，移动到干燥的一侧）',
   'hudChrome.finder.mech.undertow': '暗流（将所有人拉近，在冲击前跑开）',
   'hudChrome.finder.mech.enrage': '低血量时狂怒',

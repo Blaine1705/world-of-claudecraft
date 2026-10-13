@@ -160,6 +160,69 @@ describe('dungeon finder view core', () => {
     }
   });
 
+  it('previews the Mere Hydra as one encounter that pays all three of its heads', () => {
+    const normal = live(
+      buildDungeonFinderView(
+        input({ playerLevel: 17, selectedActivityId: 'drowned_temple_normal' }),
+      ),
+    );
+    expect(normal.detail?.encounters.map((e) => e.mobId)).toEqual([
+      'choirmother_selthe',
+      'mere_hydra_head_center',
+      'tideglass_colossus',
+      'ysolei',
+    ]);
+    const hydra = normal.detail?.encounters[1];
+    expect(hydra?.final).toBe(false);
+    expect(hydra?.summoned).toBe(false);
+    expect(hydra?.portraitUrl).toBe('/ui/dungeons/mere_hydra_head_center.webp');
+    expect(hydra?.mechanics).toEqual([
+      'hydra_three_elements',
+      'hydra_tsunami',
+      'hydra_combined_breath',
+      'hydra_regrowth',
+    ]);
+    // Each head pays its own copper once per kill, and all three die for one:
+    // the preview is the sum, not the centre head's share alone.
+    const headCopper = (id: string) =>
+      (MOBS[id].loot ?? []).reduce((sum, e) => sum + (e.copper ?? 0), 0);
+    expect(headCopper('mere_hydra_head_left')).toBe(400);
+    expect(hydra?.copper).toBe(
+      headCopper('mere_hydra_head_left') +
+        headCopper('mere_hydra_head_center') +
+        headCopper('mere_hydra_head_right'),
+    );
+    expect(hydra?.copper).toBe(1200);
+    // The fight's one normal blue roll rides the centre head: four pieces, a
+    // chance and never a guarantee.
+    expect(hydra?.groups).toHaveLength(1);
+    expect(hydra?.groups[0].guaranteed).toBe(false);
+    expect(hydra?.groups[0].items.map((i) => i.itemId)).toEqual([
+      'mere_crested_helm',
+      'mereskin_hood',
+      'merewater_cowl',
+      'merecleaver',
+    ]);
+    expect(hydra?.singles).toEqual([]);
+    expect(hydra?.heroicGroups).toEqual([]);
+
+    const heroic = live(
+      buildDungeonFinderView(
+        input({ playerLevel: 20, specRole: 'tank', selectedActivityId: 'drowned_temple_heroic' }),
+      ),
+    ).detail?.encounters[1];
+    expect(heroic?.mobId).toBe('mere_hydra_head_center');
+    // Heroic never rolls the Normal-only blues; it pays the centre head's own
+    // heroic table, one piece a kill.
+    expect(heroic?.groups).toEqual([]);
+    expect(heroic?.heroicGroups).toHaveLength(1);
+    expect(heroic?.heroicGroups[0].guaranteed).toBe(true);
+    expect(heroic?.heroicGroups[0].items.map((i) => i.itemId)).toEqual(
+      (HEROIC_BOSS_LOOT.mere_hydra_head_center ?? []).map((e) => e.itemId),
+    );
+    expect(heroic?.copper).toBe(1200);
+  });
+
   it('appends heroic-only loot groups on heroic difficulty', () => {
     const view = live(
       buildDungeonFinderView(

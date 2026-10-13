@@ -4,6 +4,7 @@
 // exactly this, on both hosts, so what counts as a boss row and when it ticks
 // is pinned here against the real claim lifecycle.
 import { describe, expect, it } from 'vitest';
+import { MERE_HYDRA_HEAD_IDS } from '../src/sim/content/drowned_temple';
 import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
 import { DUNGEONS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -105,8 +106,12 @@ describe('dungeon run plan (content)', () => {
       'gaoler_ossick',
       'vael_the_mistcaller',
     ]);
+    // The Mere Hydra is one row, second on the route: the Prism Stair behind
+    // it rises only when its heads are down. The row is named for its centre
+    // head, whose mob name is the boss's own.
     expect(dungeonRunPlan('drowned_temple', 'normal')?.map((r) => r.mobId)).toEqual([
       'choirmother_selthe',
+      'mere_hydra_head_center',
       'tideglass_colossus',
       'ysolei',
     ]);
@@ -130,14 +135,41 @@ describe('dungeon run plan (content)', () => {
 
   it('every row is a body its dungeon places exactly once, so its corpse can prove the kill', () => {
     for (const id of GROUP_DUNGEONS) {
+      const seen = new Set<string>();
       for (const row of dungeonRunPlan(id, 'normal') ?? []) {
-        expect(MOBS[row.mobId], `${id}: ${row.mobId} is a mob`).toBeDefined();
-        expect(
-          DUNGEONS[id].spawns.filter((s) => s.mobId === row.mobId).length,
-          `${id}: ${row.mobId} placements`,
-        ).toBe(1);
+        // The boss itself leads its own body list, and no body is in two rows.
+        expect(row.bodyIds[0], `${id}: ${row.mobId} leads its bodies`).toBe(row.mobId);
+        for (const bodyId of row.bodyIds) {
+          expect(MOBS[bodyId], `${id}: ${bodyId} is a mob`).toBeDefined();
+          expect(
+            DUNGEONS[id].spawns.filter((s) => s.mobId === bodyId).length,
+            `${id}: ${bodyId} placements`,
+          ).toBe(1);
+          expect(seen.has(bodyId), `${id}: ${bodyId} belongs to one row`).toBe(false);
+          seen.add(bodyId);
+        }
       }
     }
+  });
+
+  it('only the Mere Hydra is a boss of several bodies, on both difficulties', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const several = GROUP_DUNGEONS.flatMap((id) =>
+        (dungeonRunPlan(id, difficulty) ?? [])
+          .filter((row) => row.bodyIds.length > 1)
+          .map((row) => `${id}:${row.bodyIds.join('+')}`),
+      );
+      expect(several, difficulty).toEqual([
+        'drowned_temple:mere_hydra_head_center+mere_hydra_head_left+mere_hydra_head_right',
+      ]);
+    }
+    // What the row shows is the boss's name, never a head's: all three heads
+    // wear it, and the row is keyed on one of them.
+    for (const head of MERE_HYDRA_HEAD_IDS) expect(MOBS[head].name).toBe('Mere Hydra');
+    // The same three bodies the Cantor waits on before he speaks of the kill.
+    expect([...(dungeonRunPlan('drowned_temple', 'normal')?.[1].bodyIds ?? [])].sort()).toEqual(
+      [...MERE_HYDRA_HEAD_IDS].sort(),
+    );
   });
 
   it('gives a finale only to the Hollow Crypt, on its final boss, naming a summoned body', () => {
@@ -245,6 +277,7 @@ describe('dungeon run (live claim)', () => {
     expect(sim.dungeonRun).toBe(inside);
     expect(rows(sim)).toEqual([
       ['choirmother_selthe', true],
+      ['mere_hydra_head_center', false],
       ['tideglass_colossus', false],
       ['ysolei', false],
     ]);
@@ -275,7 +308,7 @@ describe('dungeon run (live claim)', () => {
       const order = [...plan].reverse();
       order.forEach((row, n) => {
         expect(sim.dungeonRun?.bosses.filter((b) => b.defeated).length).toBe(n);
-        kill(sim, inst, row.mobId);
+        for (const bodyId of row.bodyIds) kill(sim, inst, bodyId);
       });
       expect(sim.dungeonRun?.bosses.every((b) => b.defeated)).toBe(true);
       expect(sim.dungeonRun?.bosses.map((b) => b.mobId)).toEqual(plan.map((r) => r.mobId));
