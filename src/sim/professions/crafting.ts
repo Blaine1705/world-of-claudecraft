@@ -531,8 +531,9 @@ export function requiredReagentCountFor(
  *  The carried half counts only UNLOCKED units (issue 3042, item_lock.ts): a
  *  player-locked reagent copy is not spendable material, exactly like a
  *  held-but-bound copy is not sellable, so it can never satisfy this gate.
- *  The drawable vault view deliberately exposes only ordinary pooled stock.
- *  Identity-bearing special rows can be locked and are excluded from every
+ *  The drawable vault view exposes ordinary pooled stock plus units signed by
+ *  the crafter themself; every other identity-bearing special row (another
+ *  player's signature, a payload, a crafted marker) is excluded from every
  *  automatic craft and Create All plan.
  *
  *  `vaultStock` lets a caller that has ALREADY resolved the place gate hand

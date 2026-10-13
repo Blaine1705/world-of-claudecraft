@@ -34,7 +34,8 @@
 // worst cases (two rows for a socket swap and 112 for vault_deposit_all), so a
 // hostile account is bounded to 172,800 receipts and 345,600 retained rows
 // per day after its one-time burst. Craft-from-vault (Phase 04) adds op
-// 'craft_consume', one row per material id drawn per COMPLETED CAST, and shares
+// 'craft_consume', one row per planned take per COMPLETED CAST (a material id
+// can carry a pooled row and a signer row for the crafter's own units), and shares
 // those same account command/row buckets rather than stacking another source.
 // Account state survives reconnect in-process. A separate process/realm bucket
 // admits 242 rows of burst and 8 rows/s sustained, at most 691,200 of these
@@ -980,14 +981,16 @@ export function buildVaultLedgerRows(
 // purchased_slots_after carries the rung the reservation sampled at
 // consumption time; one row per planned take, in the order
 // src/sim/sim_context.ts reservePlannedVaultConsumption offers them (sorted,
-// then split by signer, so one id may carry a pooled and a signed row). scripts/bank_audit.mjs replays
-// 'craft_consume' as a REMOVAL beside deposit/withdraw/admin_purge; without
+// then split by signer, so one id may carry a pooled and a signed row).
+// scripts/bank_audit.mjs replays 'craft_consume' as a REMOVAL beside
+// deposit/withdraw/admin_purge; without
 // that row every crafting character would reconcile as a permanent
 // ledger_state_mismatch, which is why the row family exists at all.
 // ---------------------------------------------------------------------------
 
 /** One completed cast's vault consumption: the owning session's identity, the
- *  canonically sorted takes, and the rung it sampled. */
+ *  takes sorted by id and split by signer (pooled before signed within an id),
+ *  and the rung it sampled. */
 export interface VaultCraftConsumption {
   who: { characterId: number; accountId: number };
   takes: readonly VaultConsumptionTake[];

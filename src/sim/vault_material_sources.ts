@@ -184,7 +184,7 @@ export function autoDrawableRow(normalized: MaterialStackFacets): boolean {
  *  every non-premium source, plus a premium one signed by the drawing crafter
  *  themself. An undefined or empty `selfSigner` names nobody, so every premium
  *  source stays refused (the strict rule the bare primitives keep). */
-export function autoDrawableSource(source: MaterialSource, selfSigner?: string): boolean {
+function autoDrawableSource(source: MaterialSource, selfSigner?: string): boolean {
   if (!isPremiumMaterialSource(source)) return true;
   return selfSigner !== undefined && selfSigner.length > 0 && source.signer === selfSigner;
 }
@@ -441,13 +441,13 @@ export function planVaultDraw(
   selfSigner?: string,
 ): VaultDrawPlan | null {
   if (!Number.isSafeInteger(count) || count <= 0) return null;
-  const stockUnits = Object.hasOwn(stock, itemId) ? drawableStockUnits(stock[itemId]) : 0;
-  // `rows` is null for a non-material id AND for an id with an unreadable row.
-  // Both contribute nothing from the identity collection in the projection, so
-  // both contribute nothing here; the compact row keeps paying either way.
-  const rows = readSourceRows(special, itemId, materialIds);
-  const identityUnits = rows === null ? 0 : identityDrawableUnits(rows, selfSigner);
-  const drawable = identityUnits === null ? 0 : combineDrawable(stockUnits, identityUnits);
+  const { stockUnits, rows, drawable } = drawableCeiling(
+    stock,
+    special,
+    itemId,
+    materialIds,
+    selfSigner,
+  );
   if (count > drawable) return null;
 
   const fromStock = Math.min(count, stockUnits);
@@ -477,18 +477,26 @@ export function planVaultDraw(
   return { fromStock, fromRows: plan.value };
 }
 
-/** The drawable total for one id under the STRICT rule (no crafter named, so no
- *  signed unit counts), combined exactly the way `planVaultDraw` combines it. */
-function strictDrawableUnits(
+/** The per-id drawable ceiling for an automatic draw by `selfSigner`: the
+ *  compact record's drawable units, the readable identity rows, and the two
+ *  combined. ONE definition shared by `planVaultDraw` and the ledger split, so
+ *  the split's strict total is computed exactly as the spend computes its own.
+ *
+ *  `rows` is null for a non-material id AND for an id with an unreadable row.
+ *  Both contribute nothing from the identity collection in the projection, so
+ *  both contribute nothing here; the compact row keeps paying either way. */
+function drawableCeiling(
   stock: Readonly<Record<string, number>>,
   special: readonly InvSlot[],
   itemId: string,
   materialIds: ReadonlySet<string>,
-): number {
+  selfSigner: string | undefined,
+): { stockUnits: number; rows: readonly MaterialStackSlot[] | null; drawable: number } {
   const stockUnits = Object.hasOwn(stock, itemId) ? drawableStockUnits(stock[itemId]) : 0;
   const rows = readSourceRows(special, itemId, materialIds);
-  const identityUnits = rows === null ? 0 : identityDrawableUnits(rows, undefined);
-  return identityUnits === null ? 0 : combineDrawable(stockUnits, identityUnits);
+  const identityUnits = rows === null ? 0 : identityDrawableUnits(rows, selfSigner);
+  const drawable = identityUnits === null ? 0 : combineDrawable(stockUnits, identityUnits);
+  return { stockUnits, rows, drawable };
 }
 
 /**
@@ -520,7 +528,10 @@ export function splitVaultTakesBySigner(
   const pooledLeft = new Map<string, number>();
   for (const take of takes) {
     if (!pooledLeft.has(take.itemId)) {
-      pooledLeft.set(take.itemId, strictDrawableUnits(stock, special, take.itemId, materialIds));
+      pooledLeft.set(
+        take.itemId,
+        drawableCeiling(stock, special, take.itemId, materialIds, undefined).drawable,
+      );
     }
   }
   const out: VaultConsumptionTake[] = [];
