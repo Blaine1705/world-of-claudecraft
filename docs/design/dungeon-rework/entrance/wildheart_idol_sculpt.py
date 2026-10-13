@@ -4,28 +4,33 @@
 The idol inside the Wildheart Basin (kit/jaguar_head_sculpt.py) is one mass
 sculpted as a signed distance field. The idol at the door is the same people's
 work seen from outside, so it is sculpted the same way, with the same
-primitives: a big cat's skull, broad and low, on a neck that plunges into the
-rise; heavy brows driven down over slanted sockets; cheekbones and jowls
-flaring over the neck; a muzzle whose upper jaw overhangs the way in; a lower
+primitives: a big cat's skull, broad, with a domed forehead that stands a
+step over the brows, on a collared neck that plunges into the rise; heavy
+brows driven down over slanted sockets; cheekbones and jowls flaring over the
+neck; a short deep muzzle (a broad nose, a whisker pad either side of it)
+whose upper jaw overhangs the way in and ends on a level lip line; a lower
 jaw of two rami either side of the walk-in lane; the maw cut right through to
-the throat. The carving is IN the field (the collar's stepped fret, rosettes
-over the cranium and the cheeks, cartouches down the nape, the snarl's
-furrows), so it runs across the joints of the stones.
+the throat; two small round ears on the skull's corners. The broad carving is IN the field (the collar's sunk band, the
+dishes of the pelt's rosettes, the panels down the nape, the snarl's furrows),
+so it runs across the joints of the stones.
 
-The field is never meshed. megalith_skin() lays fitted blocks out on a chart
+The head's field is never meshed whole (only its rubble core, and each ear's
+three stones, through mesh_level). megalith_skin() lays fitted blocks out on a chart
 of its surface (rows of uneven height, blocks of uneven width, some two rows
 tall), and builds each block as its own patch: a face that follows the carved
 surface at the block's own proud or slipped depth, fine enough inside the
 block for the weathering to grade across it, and a chamfer down into a deep V
 joint. A chart is only a family of rays (rays(U, V) -> origins, directions)
 marched through the air to the surface: round the outside, up into the
-palate, down onto the jaws, round the throat, round an ear.
+palate, down onto the jaws, round the throat, up under the brows.
 
 Coordinates are Blender's: X west, Y SOUTH (the face looks +Y), Z up, the
 origin at the door. G(lx, lz, y) takes door-local game coordinates.
 Deterministic: every draw comes from the rng handed in, and every noise is seeded.
 """
 import math
+import os
+import tempfile
 
 import numpy as np
 
@@ -41,11 +46,17 @@ BULLET_R0 = 9.5
 JAW_TOP = 2.3
 JAW_ROT = 0.4455          # the muzzle colliders' yaw
 JAW_C = (3.74, 0.968)     # their centre (lx, lz), mirrored
-JAW_HALF = (2.73, 1.35)
-MUZZLE_FRONT = -5.3       # lz of the upper jaw's front
+JAW_HALF = (2.62, 1.2)   # the colliders' 2.83 by 1.45, less the lean's reach at the gum line
+HEAD_TOP = 17.2           # the crown: a forehead's height over the brows
+MUZZLE_FRONT = -4.35      # lz of the upper lip's front: a short, deep, broad muzzle
+LIP_Z = 5.0               # the upper lip's line: the flews are cut level here, over the open jaws
 EYE = dict(x=4.35, y=10.8, yaw=0.32, slant=0.30, a=1.85, b=1.02)
-EAR = dict(x=8.0, lz=4.9, y=16.3, yaw=0.2, back=0.16, rx=2.9, ry=0.95, rz=4.3)
-NOSE = dict(lz=-5.78, y=7.55)
+EAR = dict(x=7.9, lz=5.6, y=16.0, yaw=0.8, back=0.16, roll=0.3, r=3.1, thick=1.15)
+NOSE = dict(lz=-5.15, y=8.3)
+COLLAR = dict(r=9.2, z0=3.4, z1=5.95, start=1.0)
+# the nape's collapse: where the facing has fallen off the rubble behind it
+# (bearing from south toward west, height, half width along the wall, half height)
+BREACH = dict(th=2.52, z=7.6, hw=2.5, hh=3.3)
 
 
 def G(lx, lz, y):
@@ -101,6 +112,72 @@ class Corbel(js.Prim):
         return out
 
 
+class Collar(js.Prim):
+    """The collar: one course of tall stones standing proud round the neck,
+    under the skull's overhang, from behind one jowl round the nape to the
+    other. Its face is a sunk band between two rims (the fret stands in it)."""
+
+    def __init__(self):
+        r = COLLAR['r']
+        self.lo = np.array((AXIS[0] - r, AXIS[1] - r, COLLAR['z0']))
+        self.hi = np.array((AXIS[0] + r, AXIS[1] + r, COLLAR['z1']))
+
+    @staticmethod
+    def band(Z):
+        """1 in the sunk band, 0 on the rims."""
+        z0, z1 = COLLAR['z0'], COLLAR['z1']
+        return sstep(z0 + 0.3, z0 + 0.44, Z) * sstep(z1 - 0.3, z1 - 0.44, Z)
+
+    def dist(self, X, Y, Z):
+        rho = np.sqrt((X - AXIS[0]) ** 2 + (Y - AXIS[1]) ** 2)
+        th = np.abs(np.arctan2(X - AXIS[0], Y - AXIS[1]))
+        on = sstep(COLLAR['start'] - 0.2, COLLAR['start'] + 0.15, th)
+        r = NECK_R - 0.7 + (COLLAR['r'] - NECK_R + 0.7) * on - 0.2 * self.band(Z)
+        mid, half = (COLLAR['z0'] + COLLAR['z1']) / 2, (COLLAR['z1'] - COLLAR['z0']) / 2
+        qx = rho - r + 0.4
+        qz = np.abs(Z - mid) - half + 0.4
+        return np.minimum(np.maximum(qx, qz), 0.0) + np.sqrt(np.maximum(qx, 0.0) ** 2 + np.maximum(qz, 0.0) ** 2) - 0.4
+
+
+class Nose(js.Prim):
+    """The nose leather: one dark stone let into the muzzle's front, broad
+    across the top and cut in under each wing to the lip's split, as a cat's is."""
+
+    def __init__(self):
+        self.box = RoundBox(G(0, NOSE['lz'] + 0.62, NOSE['y']), (1.85, 0.62, 0.95), 0.46, rot(rx=0.28))
+        self.cuts = [Ellipsoid(G(s * 2.15, NOSE['lz'] + 0.3, NOSE['y'] - 1.02), (1.1, 1.3, 0.98)) for s in (1, -1)]
+        self.lo, self.hi = self.box.lo, self.box.hi
+
+    def dist(self, X, Y, Z):
+        d = self.box.dist(X, Y, Z)
+        for c in self.cuts:
+            d = js.smax(d, -c.dist(X, Y, Z), 0.12)
+        return d
+
+
+class Breach(js.Prim):
+    """The collapse in the nape as a volume: an uneven hollow bitten into the
+    wall, widest low down where the collar burst."""
+
+    def __init__(self):
+        b = BREACH
+        self.c = np.array((AXIS[0] + math.sin(b['th']) * 9.3, AXIS[1] + math.cos(b['th']) * 9.3, b['z']))
+        self.R = rot(rz=-b['th'])
+        self.noise = Noise(41)
+        self.lo, self.hi = self.c - 5.0, self.c + 5.0
+
+    def dist(self, X, Y, Z):
+        b = BREACH
+        Ri = self.R.T
+        px, py, pz = X - self.c[0], Y - self.c[1], Z - self.c[2]
+        a = Ri[0, 0] * px + Ri[0, 1] * py            # along the wall
+        o = Ri[1, 0] * px + Ri[1, 1] * py            # out of it
+        w = b['hw'] * (1.0 - 0.3 * np.clip(pz / b['hh'], -1.0, 1.0))
+        deep = 1.9 * (1.0 - 0.6 * np.clip(pz / b['hh'], 0.0, 1.0))      # shallower toward its top
+        k = np.sqrt((a / w) ** 2 + (pz / b['hh']) ** 2 + (o / deep) ** 2)
+        return (k - 1.0) * 1.6 + 0.5 * self.noise.fbm(X * 0.45, Y * 0.45, Z * 0.45, 2)
+
+
 class Maw(js.Prim):
     """The maw and the throat behind it: an arched tunnel along the lane that
     narrows from the open jaws to the throat's window (the engine's flooded
@@ -152,49 +229,60 @@ def jaw_boxes():
 
 
 def nose_prim():
-    """The nose leather: one dark stone let into the muzzle's front."""
-    return RoundBox(G(0, NOSE['lz'] + 0.45, NOSE['y']), (1.62, 0.62, 0.92), 0.46, rot(rx=0.3))
+    return Nose()
 
 
 def build_head(under, voxel=0.13):
     """The head's mass, before the sockets and the relief. `under` is the
     corbel table: for 72 bearings round the neck (from south, toward west),
-    the height below which nothing may overhang there."""
-    f = js.Field((-13.0, -20.6, -6.6), (13.0, 8.0, 15.4), voxel)
-    _fill(f, Ellipsoid(G(0, 8.6, 8.2), (9.3, 10.0, 7.2)))
+    the height below which nothing may overhang there.
+
+    A big cat's head, not a reptile's: a high domed cranium whose forehead
+    stands a clear step over the brows; a short muzzle as deep as it is long
+    and more than half the skull's width, whose bridge falls from that step to
+    a broad nose; whisker pads round either side of the nose, running back
+    into cheeks and jowls wider than the skull; small round ears on the
+    skull's corners (build_ear)."""
+    f = js.Field((-13.0, -20.6, -6.6), (13.0, 8.0, HEAD_TOP + 0.26), voxel)
+    _fill(f, Ellipsoid(G(0, 8.6, 8.8), (8.7, 10.0, 8.4)))
     f.add(VCyl(AXIS[0], AXIS[1], NECK_R, -7.0, 4.6), 0.5)
-    # where the ground has fallen away, corbelled courses carry the jowls and the nape
-    f.add(Corbel([(8.2, 0.0), (8.6, 0.85), (9.0, 1.7)], under, 4.2), 0.2)
-    # the jowls: the head's widest, hung over the neck either side; the nape's roll behind
+    # where the ground has fallen away, corbelled courses carry the collar
+    f.add(Corbel([(8.2, 0.0), (8.6, 0.85), (9.0, 1.7)], under, COLLAR['z0'] + 0.5), 0.2)
+    f.add(Collar(), 0.3)
+    # the cheeks: the jowl hung over the neck, the masseter over it, the head's
+    # widest; the cheekbone, a hard crest from under the eye back toward the ear
     for s in (1, -1):
-        f.add(Ellipsoid(G(s * 6.6, 5.4, 5.25), (4.0, 5.4, 2.15)), 1.0)
-        f.add(Ellipsoid(G(s * 7.2, 3.8, 7.0), (3.3, 5.2, 3.4)), 1.2)
-        # the cheekbone: a hard crest from under the eye back and up toward the ear
-        f.add(Ellipsoid(G(s * 8.1, 2.6, 9.1), (2.5, 4.6, 1.15), rot(rx=-0.24, rz=-s * 0.12)), 0.7)
-    f.add(Ellipsoid(G(0, 12.6, 5.6), (8.7, 5.7, 2.5)), 1.0)
-    # the occiput, and the crest along the skull's back
-    f.add(Ellipsoid(G(0, 14.0, 8.6), (7.6, 4.9, 5.0)), 1.6)
-    f.add(RoundCone(G(0, 6.5, 14.0), G(0, 17.0, 9.4), 1.4, 1.25), 1.0)
-    # the forehead: a flat slope from the brows back to the crown
-    f.add(RoundBox(G(0, 2.0, 12.4), (5.4, 2.4, 1.6), 1.1, rot(rx=0.42)), 1.5)
+        f.add(Ellipsoid(G(s * 6.6, 5.4, 5.9), (4.0, 5.4, 2.4)), 1.0)
+        f.add(Ellipsoid(G(s * 7.3, 3.6, 7.3), (3.5, 5.2, 3.5)), 1.2)
+        f.add(Ellipsoid(G(s * 8.2, 2.6, 9.2), (2.5, 4.6, 1.2), rot(rx=-0.24, rz=-s * 0.12)), 0.7)
+    # the occiput swelling over the collar, and the ridge down the skull's back
+    f.add(Ellipsoid(G(0, 13.8, 9.6), (7.4, 5.0, 5.2)), 1.6)
+    f.add(RoundCone(G(0, 7.5, 16.0), G(0, 17.6, 9.8), 1.3, 1.5), 1.0)
+    # the forehead: a dome standing right over the brows (the step a cat's
+    # profile has between its forehead and its nose)
+    f.add(Ellipsoid(G(0, 2.6, 12.6), (6.8, 4.9, 4.4)), 1.4)
     # the brows: heavy ridges driven down at the bridge, over the eyes
     for s in (1, -1):
-        f.add(RoundCone(G(s * 1.1, -0.1, 12.0), G(s * 8.4, 2.5, 13.5), 1.45, 0.95), 0.7)
-        f.add(RoundCone(G(s * 5.6, 1.6, 13.2), G(s * 9.0, 4.4, 12.9), 0.95, 0.7), 0.9)
-    # the muzzle: deep under a narrow bridge that falls to the nose (so the
-    # eyes see over it down the road), its upper jaw out over the causeway,
-    # the whisker pads round either side of the nose
-    f.add(RoundBox(G(0, -1.9, 6.1), (3.9, 3.3, 2.0), 1.5), 1.4)
-    f.add(RoundCone(G(0, 1.2, 9.9), G(0, -4.6, 7.45), 1.9, 1.2), 1.0)
+        f.add(RoundCone(G(s * 1.1, -0.9, 11.9), G(s * 7.9, 1.9, 13.1), 1.45, 0.95), 0.7)
+        f.add(RoundCone(G(s * 5.6, 1.3, 12.9), G(s * 8.6, 3.8, 12.4), 0.95, 0.7), 0.9)
+    # the muzzle: a deep block under a broad flat bridge, the whisker pads
+    # round either side of the nose, each run back into its cheek so the
+    # flank is one slope (no crease for a chart to miss)
+    f.add(RoundBox(G(0, -1.55, 6.45), (4.2, 2.8, 2.15), 1.5), 1.4)
+    f.add(RoundBox(G(0, -2.3, 8.2), (2.1, 2.55, 1.45), 1.0, rot(rx=-0.3)), 1.0)
     for s in (1, -1):
-        f.add(Ellipsoid(G(s * 2.3, -4.2, 5.95), (2.2, 1.55, 1.6)), 0.7)
-    f.add(nose_prim(), 0.35)
+        f.add(Ellipsoid(G(s * 2.6, -3.0, 6.5), (2.7, 1.8, 2.05)), 0.7)
+        f.add(Ellipsoid(G(s * 5.2, -0.5, 6.5), (2.1, 2.3, 2.0)), 1.0)
+    f.add(nose_prim(), 0.3)
+    # the upper lip's line: the flews end level, with a hard edge, over the
+    # open jaws (the face above it and the palate under it meet on that edge)
+    f.sub(RoundBox(G(0, -2.9, LIP_Z - 1.3), (7.4, 3.3, 1.3), 0.08), 0.08)
     # the lower jaw, and the hinges that carry it into the jowls
     for (s, box) in zip((1, -1), jaw_boxes()):
         f.add(box, 0.3)
         c, sn = math.cos(JAW_ROT), math.sin(JAW_ROT)
         hx, hz = s * (JAW_C[0] + 1.45 * c - 0.35 * sn), JAW_C[1] + 1.45 * sn + 0.35 * c
-        f.add(RoundBox(G(hx, hz, -0.6), (1.15, 0.9, 4.5), 0.3, rot(rz=-s * JAW_ROT)), 0.7)
+        f.add(RoundBox(G(hx, hz, 0.2), (1.15, 0.9, 5.3), 0.3, rot(rz=-s * JAW_ROT)), 0.7)
     return f
 
 
@@ -202,18 +290,20 @@ def carve_maw(f):
     maw = Maw()
     f.sub(maw, 0.3)
     # the gums: a ridge inside the upper lip, another along each ramus
-    w0, s0, _ = Maw.section(-5.0)
+    front = MUZZLE_FRONT + 0.3
+    w0, s0, _ = Maw.section(front)
     pts = []
-    for lz in (-0.9, -2.2, -3.4, -4.4):
-        w, sp, _r = Maw.section(lz)
-        pts.append(G(w - 0.12, lz, sp - 0.25))
-    arc = [G(math.cos(a) * (w0 - 0.15), -5.0 - 0.25 * math.sin(a), s0 - 0.3 + math.sin(a) * 2.05)
-           for a in (0.35, 0.8, 1.25)]
-    f.add(Polyline(pts + arc, 0.36), 0.25)
-    f.add(Polyline([(-x, y, z) for (x, y, z) in pts + arc], 0.36), 0.25)
+    for lz in (-0.7, -1.7, -2.7, front + 0.5):
+        w, sp, rise = Maw.section(lz)
+        zg = LIP_Z + 0.22
+        pts.append(G(w * math.sqrt(max(0.1, 1 - ((zg - sp) / rise) ** 2)) - 0.05, lz, zg))
+    arc = [G(math.cos(a) * (w0 - 0.15), front - 0.25 * math.sin(a), s0 - 0.3 + math.sin(a) * 2.05)
+           for a in (0.55, 0.9, 1.3)]
+    f.add(Polyline(pts + arc, 0.3), 0.6)
+    f.add(Polyline([(-x, y, z) for (x, y, z) in pts + arc], 0.3), 0.6)
     for s in (1, -1):
         row = []
-        for lz in (-0.5, 0.2, 0.9):
+        for lz in (-0.15, 0.45, 1.05):
             w, _sp, _r = Maw.section(lz)
             row.append(G(s * (w + 0.5), lz, JAW_TOP - 0.05))
         f.add(Polyline(row, 0.34), 0.25)
@@ -239,164 +329,232 @@ def carve_sockets(f, frames):
         f.sub(Ellipsoid(c - n * 0.25, (EYE['a'] + 0.7, 1.45, EYE['b'] + 0.45), R), 0.45)
 
 
+# the three panels down the nape (centre height, half height), and the strip's half width
+NAPE_PANELS = ((7.95, 1.25), (10.75, 1.15), (13.3, 1.0))
+NAPE_HALF = 1.95
+# the whisker pads' pits (lx, y), mirrored
+WHISKERS = ((1.5, 7.05), (2.6, 7.25), (3.7, 7.0), (2.0, 6.0), (3.1, 6.05), (4.1, 5.9))
+
+
 class Relief:
     """What the builders cut into the stone, as patterns over space near the
-    surface, each in [0, 1]: the collar's stepped fret (raised), the rosettes
-    of the pelt (a broken ring sunk round a boss, at points of the surface
-    with their normals) and the cartouches down the nape (sunk panels in
-    raised frames). carve() cuts them into the field; the skin reads the same
-    patterns to darken what is sunk and to light what stands proud."""
+    surface, each in [0, 1]: the collar's sunk band, a shallow dish under each
+    rosette of the pelt, the sunk panels down the nape in their raised frames.
+    carve() cuts them into the field; the skin reads the same patterns to
+    darken what is sunk. What stands IN them (the dark stones of each
+    rosette, the fret in the collar's band, the signs in the panels) is let
+    in by the builder as stones of its own, so it is cut as sharp as a
+    megalith's edge and reads from the road."""
 
     def __init__(self, rosettes):
-        self.rosettes = rosettes
+        self.rosettes = rosettes        # [(centre, normal, radius, phase)]
 
     @staticmethod
     def collar(X, Y, Z):
-        cx, cy = AXIS
-        th = np.arctan2(X - cx, Y - cy)
-        rho = np.sqrt((X - cx) ** 2 + (Y - cy) ** 2)
-        on = (np.abs(th) > 0.86) & (rho < NECK_R + 0.6) & (Z > 1.7) & (Z < 3.15)
-        u = th * NECK_R
-        unit = 2.9
-        k = np.floor(u / unit)
-        a = u - k * unit
-        a = np.where(k % 2 == 0, a, unit - a)
-        b = Z - 1.86
-        bar = 0.3
+        rho = np.sqrt((X - AXIS[0]) ** 2 + (Y - AXIS[1]) ** 2)
+        th = np.abs(np.arctan2(X - AXIS[0], Y - AXIS[1]))
+        return Collar.band(Z) * (th > COLLAR['start'] + 0.12) * (rho > NECK_R + 0.35)
 
-        def box(a0, a1, b0, b1):
-            return sstep(0.07, 0.0, np.maximum(np.maximum(a0 - a, a - a1), np.maximum(b0 - b, b - b1)))
-        hook = np.maximum.reduce([box(0.2, 2.55, 0.84, 0.84 + bar), box(2.55 - bar, 2.55, 0.06, 0.84 + bar),
-                                  box(1.05, 2.55, 0.06, 0.06 + bar), box(1.05, 1.05 + bar, 0.06, 0.64)])
-        return hook * on
-
-    def spots(self, X, Y, Z):
-        """(ring, boss): the sunk broken ring and the boss left standing in it."""
-        ring = np.zeros_like(X)
-        boss = np.zeros_like(X)
+    def dishes(self, X, Y, Z):
+        out = np.zeros_like(X)
         P = np.stack([X, Y, Z], axis=1)
-        for (c, n, r, ph) in self.rosettes:
+        for (c, _n, r, _ph) in self.rosettes:
             v = P - c
-            near = np.nonzero(np.einsum('ij,ij->i', v, v) < (r + 0.8) ** 2)[0]
-            if not len(near):
-                continue
-            v = v[near]
-            t = np.cross(n, (0.0, 0.0, 1.0)) if abs(n[2]) < 0.9 else np.cross(n, (1.0, 0.0, 0.0))
-            t /= np.linalg.norm(t)
-            b = np.cross(n, t)
-            a, bb = v @ t, v @ b
-            rho = np.sqrt(a * a + bb * bb)
-            ang = (np.arctan2(bb, a) + ph) % (TAU / 3)
-            gapped = sstep(0.16, 0.4, np.minimum(ang, TAU / 3 - ang) * r)
-            ring[near] = np.maximum(ring[near], sstep(0.52, 0.2, np.abs(rho - r)) * gapped)
-            boss[near] = np.maximum(boss[near], sstep(0.5, 0.3, rho))
-        return ring, boss
+            d2 = np.einsum('ij,ij->i', v, v)
+            near = np.nonzero(d2 < (r + 0.8) ** 2)[0]
+            if len(near):
+                out[near] = np.maximum(out[near], sstep(r + 0.75, r + 0.3, np.sqrt(d2[near])))
+        return out
 
     @staticmethod
     def nape(X, Y, Z):
-        """(frame, panel) of the cartouches down the back of the skull."""
+        """(frame, panel) of the panels down the back of the skull."""
         cx, cy = AXIS
         th = np.arctan2(X - cx, Y - cy)
-        back = (math.pi - np.abs(th)) * 9.0
-        on = (back < 1.7) & (Y < cy - 5.2) & (Z > 3.5) & (Z < 11.6)
-        k = np.floor((Z - 3.5) / 2.7)
-        b = Z - 3.5 - k * 2.7 - 1.35
-        m = np.maximum(back, np.abs(b))
-        frame = sstep(0.08, 0.0, np.abs(m - 1.12) - 0.16)
-        bars = np.where(k % 2 == 0, sstep(0.07, 0.0, np.abs(back - 0.42) - 0.15) * (np.abs(b) < 0.62),
-                        sstep(0.07, 0.0, np.abs(np.abs(b) - 0.36) - 0.14) * (back < 0.62))
-        panel = (m < 0.96) * (1.0 - bars)
-        return np.maximum(frame, bars * (m < 0.96)) * on, panel * on
+        back = (math.pi - np.abs(th)) * COLLAR['r']
+        behind = Y < cy - 4.0
+        frame = np.zeros_like(X)
+        panel = np.zeros_like(X)
+        for (zc, hh) in NAPE_PANELS:
+            m = np.maximum(back - NAPE_HALF, np.abs(Z - zc) - hh)
+            inner = sstep(-0.3, -0.5, m)
+            frame = np.maximum(frame, sstep(0.08, -0.04, m) * (1.0 - inner))
+            panel = np.maximum(panel, inner)
+        return frame * behind, panel * behind
 
     def carve(self, f):
-        f.displace(lambda X, Y, Z: -0.16 * self.collar(X, Y, Z), band=0.5)
-
-        def spots(X, Y, Z):
-            ring, boss = self.spots(X, Y, Z)
-            return 0.3 * ring - 0.06 * boss
-        f.displace(spots, band=0.5)
+        def dish(X, Y, Z):
+            return 0.1 * self.dishes(X, Y, Z)
+        f.displace(dish, band=0.5)
 
         def nape(X, Y, Z):
             frame, panel = self.nape(X, Y, Z)
-            return 0.22 * panel - 0.12 * frame
-        f.displace(nape, band=0.5)
+            return 0.3 * panel - 0.12 * frame
+        f.displace(nape, band=0.6)
 
     def shade(self, P):
         """How much darker (or lighter) the carving leaves each point."""
         X, Y, Z = P[:, 0], P[:, 1], P[:, 2]
-        ring, boss = self.spots(X, Y, Z)
         frame, panel = self.nape(X, Y, Z)
-        col = self.collar(X, Y, Z)
-        return (1.0 - 0.42 * ring) * (1.0 + 0.1 * boss * (1 - ring)) * (1.0 - 0.34 * panel) * (1.0 + 0.1 * frame) \
-            * (1.0 + 0.12 * col)
+        return (1.0 - 0.14 * self.dishes(X, Y, Z)) * (1.0 - 0.4 * panel) * (1.0 + 0.1 * frame) \
+            * (1.0 - 0.3 * self.collar(X, Y, Z))
 
 
 def carve_relief(f, relief, seed=7):
-    """Cut the builders' relief into the field, then the snarl, the cheek
-    whorls and the nostrils; then weather, crack and chip it."""
+    """Cut the builders' relief into the field, then the snarl, the lip's
+    split, the nostrils and the whisker pits; break the nape open; then
+    weather, crack and chip it. Returns the whisker pits' places."""
     relief.carve(f)
-    # the snarl: furrows across the bridge and up from the nose, the forehead knit
+
+    def cut(pts, depth, width):
+        q = f.snap(np.array(pts, dtype=np.float64), lift=0.0, steps=6)
+        f.groove(Polyline([tuple(v) for v in q], 0.05), depth, width)
+    # the snarl: the nose's skin drawn up in furrows across the bridge
     for k in range(3):
-        lz, y = -3.4 + k * 1.2, 8.85 + k * 0.45
-        f.groove(Polyline([G(-1.9, lz + 0.45, y - 0.7), G(0, lz, y), G(1.9, lz + 0.45, y - 0.7)], 0.05), 0.3, 0.34)
+        lz = -3.9 + k * 1.0
+        y = 10.34 + 0.31 * (lz + 0.29)
+        cut([G(-2.0, lz + 0.55, y - 0.6), G(-0.9, lz + 0.12, y), G(0.9, lz + 0.12, y), G(2.0, lz + 0.55, y - 0.6)], 0.36, 0.4)
     for s in (1, -1):
-        f.groove(Polyline([G(s * 1.6, -5.0, 7.1), G(s * 2.8, -3.4, 7.8), G(s * 3.9, -1.2, 8.2)], 0.05), 0.3, 0.36)
-        f.groove(Polyline([G(s * 0.9, -0.4, 11.9), G(s * 1.3, 1.5, 13.2), G(s * 1.9, 3.6, 14.2)], 0.05), 0.26, 0.32)
+        # the furrow that parts each whisker pad from the bridge
+        cut([G(s * 2.0, -4.7, 8.5), G(s * 3.0, -3.1, 8.75), G(s * 4.0, -1.3, 9.0)], 0.34, 0.42)
+        # the forehead knit over the bridge
+        cut([G(s * 0.9, -2.2, 13.2), G(s * 1.3, -1.6, 14.6), G(s * 1.9, -0.4, 16.0)], 0.26, 0.36)
+        # the fold behind each whisker pad: it is what parts a cat's muzzle from its cheek
+        cut([G(s * 4.3, -1.4, 8.8), G(s * 5.5, -2.0, 7.6), G(s * 5.95, -2.0, 6.4), G(s * 5.8, -1.8, 5.4)], 0.3, 0.6)
         # the shadow line cut under the cheekbone
-        f.groove(Polyline([G(s * 5.2, -0.6, 7.9), G(s * 8.8, 1.4, 7.9), G(s * 10.2, 5.0, 8.3)], 0.05), 0.4, 0.45)
-        # the whorl of the cheek ruff
-        pts = []
-        for i in range(22):
-            t = i / 21
-            a = 0.9 + t * TAU * 1.3
-            rr = 2.1 * (1 - 0.74 * t)
-            pts.append(G(s * 10.2, 4.4 + math.cos(a) * rr, 5.5 + math.sin(a) * rr * 0.82))
-        pts = f.snap(np.array(pts), lift=0.0, steps=5)
-        f.groove(Polyline([tuple(p) for p in pts], 0.05), 0.26, 0.3)
-    # the nostrils and the split of the lip
+        cut([G(s * 5.4, -0.9, 7.95), G(s * 8.8, 1.2, 7.9), G(s * 10.2, 5.0, 8.3)], 0.4, 0.45)
+    # the nostrils, and the split of the lip under the nose
     for s in (1, -1):
-        f.sub(Ellipsoid(G(s * 0.72, NOSE['lz'] - 0.02, NOSE['y'] - 0.22), (0.5, 0.5, 0.27), rot(ry=s * 0.5)), 0.12)
-    f.groove(Polyline([G(0, NOSE['lz'] + 0.1, NOSE['y'] - 0.75), G(0, MUZZLE_FRONT - 0.3, 6.9)], 0.05), 0.24, 0.24)
+        f.sub(Ellipsoid(G(s * 0.9, NOSE['lz'] + 0.02, NOSE['y'] + 0.02), (0.55, 0.5, 0.3), rot(ry=s * 0.5)), 0.12)
+    cut([G(0, NOSE['lz'] + 0.3, NOSE['y'] - 0.9), G(0, MUZZLE_FRONT - 0.35, 7.0), G(0, MUZZLE_FRONT - 0.1, 6.4)], 0.4, 0.3)
+    O = np.array([(s * x, 9.0, y) for s in (1, -1) for (x, y) in WHISKERS], dtype=np.float64)
+    pits, _hit = march(f, O, np.tile(np.array((0.0, -1.0, 0.0)), (len(O), 1)), np.zeros(len(O)), 17.0)
+    for q in pits:
+        f.sub(Ellipsoid(q, (0.34, 0.34, 0.34)), 0.1)
+    # the collapse
+    f.sub(Breach(), 0.22)
     # centuries
     n1, n2 = Noise(seed), Noise(seed + 12)
     f.displace(lambda X, Y, Z: 0.11 * n1.fbm(X * 0.23, Y * 0.23, Z * 0.23, 3) + 0.045 * n1.fbm(X * 0.9 + 9, Y * 0.9, Z * 0.9, 2),
                band=0.6)
     f.displace(lambda X, Y, Z: 0.5 * np.maximum(0.0, n2.ridged(X * 0.16, Y * 0.16, Z * 0.12, 3) - 1.12), band=0.6)
     rng = np.random.default_rng(seed)
-    for (x, lz, y, r) in ((6.4, 16.2, 9.6, 2.6), (8.8, 13.6, 6.4, 1.9), (-9.7, 3.6, 12.9, 1.0), (-4.6, 0.4, 13.8, 0.9),
-                          (4.2, -4.7, 4.6, 0.5), (-6.6, -0.6, 2.2, 0.8), (-8.6, 11.0, 3.6, 1.1), (2.5, 17.8, 5.2, 1.2),
-                          (9.9, 5.6, 3.9, 0.9), (-2.6, -5.3, 7.9, 0.4)):
+    for (x, lz, y, r) in ((-9.7, 3.6, 12.9, 1.0), (-4.6, -0.6, 15.0, 0.9), (4.6, -3.9, 4.7, 0.5), (-6.6, -0.6, 2.2, 0.8),
+                          (-8.6, 11.0, 3.6, 1.1), (2.5, 17.8, 5.2, 1.0), (9.9, 5.6, 3.9, 0.9), (-3.6, -4.5, 7.9, 0.45)):
         f.sub(Ellipsoid(G(x, lz, y), (r * rng.uniform(1.0, 1.5), r, r * rng.uniform(0.8, 1.2))), 0.3)
+    return pits
 
 
-def build_ear(sign, broken, voxel=0.11):
-    """One ear: a rounded slab laid a little back and turned outward, a deep
-    cup carved in its face. The east one has lost its tip."""
-    c = np.array(G(sign * EAR['x'], EAR['lz'], EAR['y']))
-    R = rot(rx=EAR['back'], rz=-sign * EAR['yaw'])
-    f = js.Field(c - 5.2, c + 5.2, voxel)
-    _fill(f, Ellipsoid(c, (EAR['rx'], EAR['ry'], EAR['rz']), R))
-    f.add(Ellipsoid(c - np.array((0, 0, EAR['rz'] - 0.8)), (2.15, 1.3, 1.7), R), 0.8)
+def build_ear(sign, broken, bpy, voxel=0.1, tris=(170, 230, 170)):
+    """One ear: small, thick and round, as a big cat's is, set on the skull's
+    corner and turned a little outward, a deep hollow in its face. Three
+    stones, one on another, each hewn whole (meshed from the form, not laid
+    out in blocks). The east one has lost a corner of its top stone. Returns
+    ([(vertices, polygons)], centre, frame)."""
+    e = EAR
+    r, t = e['r'], e['thick']
+    c = np.array(G(sign * e['x'], e['lz'], e['y']))
+    R = rot(rx=e['back'], ry=sign * e['roll'], rz=-sign * e['yaw'])
     face = R @ np.array((0.0, 1.0, 0.0))
-    f.sub(Ellipsoid(c + face * 0.66 + np.array((0, 0, 0.15)), (EAR['rx'] - 0.8, 0.66, EAR['rz'] - 0.95), R), 0.3)
-    # the fold inside the cup
-    f.add(RoundCone(c + face * 0.05 + R @ np.array((-sign * 0.4, 0, -1.7)),
-                    c + face * 0.1 + R @ np.array((-sign * 0.15, 0, 1.2)), 0.32, 0.16), 0.25)
+    f = js.Field(c - (r + 1.7), c + (r + 1.7), voxel)
+    _fill(f, Ellipsoid(c, (r, t, r), R))
+    # the root, thick, run down into the skull
+    f.add(Ellipsoid(c + R @ np.array((0.0, -0.15, -r * 0.8)), (r * 0.92, t * 1.35, r * 0.75), R), 0.7)
+    # the hollow, and the fold inside it
+    f.sub(Ellipsoid(c + face * (t * 0.95) + R @ np.array((0.0, 0.0, -0.25)), (r - 0.72, t * 0.85, r - 0.62), R), 0.22)
+    f.add(RoundCone(c + face * 0.15 + R @ np.array((-sign * 0.5, 0.0, -1.6)),
+                    c + face * 0.2 + R @ np.array((-sign * 0.2, 0.0, 0.9)), 0.3, 0.14), 0.2)
+    nz = Noise(31 + (0 if sign > 0 else 5))
     if broken:
-        n = np.array((sign * 0.55, 0.1, 1.0))
+        n = np.array((sign * 0.8, 0.0, 1.0))
         n /= np.linalg.norm(n)
-        q = c + np.array((0.0, 0.0, 2.4))
+        q = c + np.array((0.0, 0.0, 2.0))
 
         class Half(js.Prim):
             lo, hi = c - 9.0, c + 9.0
 
             def dist(self, X, Y, Z):
-                return -((X - q[0]) * n[0] + (Y - q[1]) * n[1] + (Z - q[2]) * n[2])
-        f.sub(Half(), 0.15)
-    nz = Noise(31 + (0 if sign > 0 else 5))
-    f.displace(lambda X, Y, Z: 0.09 * nz.fbm(X * 0.5, Y * 0.5, Z * 0.5, 3)
-               + (0.3 * nz.fbm(X * 1.1, Y * 1.1, Z * 1.1, 2) * (Z > q[2] - 0.5) if broken else 0.0), band=0.6)
-    return f, c, R
+                return -((X - q[0]) * n[0] + (Y - q[1]) * n[1] + (Z - q[2]) * n[2]) \
+                    + 0.35 * nz.fbm(X * 1.1, Y * 1.1, Z * 1.1, 2)
+        f.sub(Half(), 0.12)
+    f.displace(lambda X, Y, Z: 0.08 * nz.fbm(X * 0.5, Y * 0.5, Z * 0.5, 3), band=0.6)
+    # the beds between the three stones, a little out of level
+    X, Y, Z = np.meshgrid(f.axes[0], f.axes[1], f.axes[2], indexing='ij')
+    up = R @ np.array((sign * 0.06, 0.0, 1.0))
+    up /= np.linalg.norm(up)
+    zl = ((X - c[0]) * up[0] + (Y - c[1]) * up[1] + (Z - c[2]) * up[2]).astype(np.float32)
+    beds = (-9.0, -1.2, 0.85, 9.0)
+    stones = []
+    for i in range(3):
+        slab = np.maximum(beds[i] - zl, zl - beds[i + 1]) + np.float32(0.03)
+
+        class Stone:
+            d = js.smax(f.d, slab, 0.1)
+            voxel = f.voxel
+            lo = f.lo
+        if float(Stone.d.min()) > -0.25:
+            continue
+        stones.append(mesh_level(Stone, bpy, tris[i]))
+    return stones, c, R, beds
+
+
+_MESHED = [0]
+
+
+def mesh_level(field, bpy, target_tris):
+    """The zero set of a field as (vertices, polygons), decimated to
+    target_tris: js.mesh_field, with a volume file of its own for every call.
+    Blender keeps a volume by its path, so a second mesh read from the same
+    file would be the first one again."""
+    import bmesh
+    import openvdb as vdb
+
+    _MESHED[0] += 1
+    g = vdb.FloatGrid(background=float(js.BIG))
+    g.copyFromArray(field.d)
+    g.transform = vdb.createLinearTransform(voxelSize=field.voxel)
+    g.name = 'density'
+    path = os.path.join(tempfile.gettempdir(), 'wildheart_entrance_%d_%d.vdb' % (os.getpid(), _MESHED[0]))
+    vdb.write(path, grids=[g])
+    before = set(bpy.data.objects)
+    bpy.ops.object.volume_import(filepath=path)
+    vol = [o for o in bpy.data.objects if o not in before][0]
+    me = bpy.data.meshes.new('WildheartSculpt')
+    ob = bpy.data.objects.new('WildheartSculpt', me)
+    bpy.context.scene.collection.objects.link(ob)
+    mod = ob.modifiers.new('v2m', 'VOLUME_TO_MESH')
+    mod.object = vol
+    mod.grid_name = 'density'
+    mod.threshold = 0.0
+    mod.adaptivity = 0.0
+    mod.resolution_mode = 'GRID'
+    bpy.context.view_layer.update()
+    mesh = bpy.data.meshes.new_from_object(ob.evaluated_get(bpy.context.evaluated_depsgraph_get()))
+    ob.modifiers.clear()
+    ob.data = mesh
+    data = vol.data
+    bpy.data.objects.remove(vol, do_unlink=True)
+    bpy.data.volumes.remove(data)
+    mesh.calc_loop_triangles()
+    dec = ob.modifiers.new('dec', 'DECIMATE')
+    dec.ratio = min(1.0, target_tris / max(1, len(mesh.loop_triangles)))
+    dec.use_collapse_triangulate = True
+    bpy.context.view_layer.update()
+    out = bpy.data.meshes.new_from_object(ob.evaluated_get(bpy.context.evaluated_depsgraph_get()))
+    bm = bmesh.new()
+    bm.from_mesh(out)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    verts = np.array([tuple(v.co) for v in bm.verts]) + field.lo
+    faces = [[v.index for v in f.verts] for f in bm.faces]
+    bm.free()
+    bpy.data.objects.remove(ob, do_unlink=True)
+    for m in (me, mesh, out):
+        bpy.data.meshes.remove(m)
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+    return verts, faces
 
 
 def coarse_normal(field, P, h=0.45):
@@ -421,7 +579,7 @@ def liner(field, bpy, depth=0.36, target_tris=2600):
         d = np.ascontiguousarray(field.d[::2, ::2, ::2]) + np.float32(depth)
         voxel = field.voxel * 2
         lo = field.lo
-    return js.mesh_field(Half, bpy, target_tris=target_tris)
+    return mesh_level(Half, bpy, target_tris)
 
 
 # ------------------------------------------------------------------ rays
@@ -654,13 +812,14 @@ def lay_out(field, chart, rng, rows, width, tall=0.16, samples=420):
 
 
 def megalith_skin(piece, field, chart, blocks, rng, tone, cell=0.4, gap=0.13, depth=0.26, proud=(-0.03, 0.09),
-                  keep=None, flag=None, chip=0.3, shade=None, height=None, kind=None, mat=0, jump=1.3):
+                  keep=None, flag=None, chip=0.3, shade=None, height=None, kind=None, mat=0, jump=1.3, joint=0.3):
     """Build the blocks as patches on `piece` (a Ruin): see the module's head.
     tone(P) is a block's colour at its middle; cell(P) or a number the size
     of a facet inside a block; flag(P) marks points no block may use (a cell
     with one is left out); keep(P, N) decides per facet (centres, normals) for
     the charts that share a surface; shade(P) multiplies the vertices' colours;
-    height(vb - va, v) is a row's real height where V is not yards."""
+    height(vb - va, v) is a row's real height where V is not yards; joint is
+    how dark a joint's bottom is."""
     from mathutils import Vector
     specs = []          # per block: (index range, nu, nv, tone)
     Us, Vs, Ls = [], [], []
@@ -775,7 +934,7 @@ def megalith_skin(piece, field, chart, blocks, rng, tone, cell=0.4, gap=0.13, de
             jit = k_tone * (0.97 + 0.06 * rng.random())
             for loop, idx in zip(face.loops, order):
                 if idx >= r0:
-                    k = 0.3
+                    k = joint
                 elif idx in edge_set:
                     k = 1.09 * jit
                 else:

@@ -93,6 +93,19 @@ export function wildheartOccluderSet(rowName: string): 'idol' | 'court' {
   return rowName === 'head' || rowName.startsWith('muzzle_') ? 'idol' : 'court';
 }
 
+/** The idol's highest stone over the door (yards): the tips of its ears,
+ *  after its lean. The skull's crown is at 17.2. */
+export const WILDHEART_EAR_TOP = 19.6;
+
+/** The top of a collider row's occluder box, over the door. The head's row
+ *  stops at the sim's own camera top, which is under the crown and the ears:
+ *  a camera drawn back over the head would sit among them with nothing
+ *  ghosted. So the head's BOX (never its collider) reaches the ears' tips;
+ *  every other row keeps its own top. */
+export function wildheartOccluderTop(rowName: string, top: number): number {
+  return rowName === 'head' ? Math.max(top, WILDHEART_EAR_TOP) : top;
+}
+
 /** How much of the flooded throat shows for the alpha the idol is drawn at
  *  (the registry's onFade): all of it while the idol is solid, none once the
  *  idol is the camera's ghost, so no lit window is left standing in the air
@@ -529,20 +542,21 @@ export interface WildheartSprite {
 /** The two eyes (lx, y, lz), from the Blender build: a point in each socket,
  *  before the jade and under the brow that overhangs it. */
 export const WILDHEART_EYES: readonly (readonly [number, number, number])[] = [
-  [4.562, 10.689, 0.4],
-  [-3.613, 11.046, 0.4],
+  [4.815, 10.594, -0.371],
+  [-3.873, 10.973, -0.371],
 ];
 
 /** The tips of the upper fangs (lx, y, lz), from the Blender build's
- *  stats.json: the drops fall from the ivory. The upper jaw hangs four yards
- *  out over the causeway, so they fall onto the flagstones before the maw. */
+ *  stats.json: the drops fall from the ivory. The upper jaw hangs three yards
+ *  out over the causeway, so they fall onto the flagstones before the maw
+ *  (each drop's ring lies on the ground straight under its own tip). */
 export const WILDHEART_DRIP_SOURCES: readonly (readonly [number, number, number])[] = [
-  [2.594, 2.315, -5.038],
-  [0.696, 5.414, -5.473],
-  [1.4, 5.171, -5.466],
-  [-2.382, 2.532, -5.038],
-  [-0.221, 5.454, -5.473],
-  [-0.944, 5.273, -5.466],
+  [2.596, 2.193, -4.233],
+  [0.759, 5.681, -4.452],
+  [1.661, 5.304, -4.44],
+  [-2.395, 2.41, -4.233],
+  [-0.261, 5.726, -4.452],
+  [-1.192, 5.429, -4.44],
 ];
 
 /** The maw's shafts: yaw off south (positive west), pitch (the causeway

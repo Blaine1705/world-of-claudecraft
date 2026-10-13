@@ -1,11 +1,13 @@
 // Ship the Blender-authored Jaguar Maw, the Wildheart Basin's world entrance
 // (docs/design/dungeon-rework/entrance/build_wildheart_entrance.py). Three GLBs
 // share one origin, the door at its terrain height: the idol (a jaguar's head
-// of fitted megaliths carved across their joints: the neck and its collar,
-// the skull with its brows, cheekbones, jowls and ears, the upper jaw out over
-// the causeway, the palate, the lower jaw's two rami, the jade eyes, the
-// fangs, the rubble core behind the joints, the strangler fig's trunk and
-// roots), the court (the heaved flagstone causeway and its kerbs, the two
+// of fitted megaliths: the neck and its collar with the fret standing in its
+// band, the skull with its domed forehead, brows, cheekbones, jowls and two
+// small round ears, the short deep muzzle with its nose and lips, the upper
+// jaw out over the causeway, the palate, the lower jaw's two rami, the jade
+// eyes, the fangs, the pelt's rosettes and spots let in as dark stones, the
+// nape's panels and its collapse, the rubble core behind the joints, the
+// strangler fig's trunk and roots), the court (the heaved flagstone causeway and its kerbs, the two
 // fire bowls, the Sunbone's tusks with their war cloth, the fallen stone by
 // the east cheek and the blocks down the bank and in the shallows), and the
 // render-only growth (the fig's crown, lianas, fern, taro, reed, moss). Never

@@ -64,6 +64,7 @@ import {
   wildheartMistPuffCount,
   wildheartNightAmount,
   wildheartOccluderSet,
+  wildheartOccluderTop,
   wildheartSprites,
   wildheartThroatGhostFade,
 } from './wildheart_basin_entrance_core';
@@ -799,9 +800,11 @@ export function buildWildheartBasinEntrance(seed: number): WildheartBasinEntranc
     // the set piece's rows are circles and boxes; a prism has no occluder box
     if (collider.type === 'prism') return;
     const { cameraTopY, ...shape } = collider;
-    solids[wildheartOccluderSet(WILDHEART_BASIN_ENTRANCE_COLLIDERS[i].name)].push({
+    const row = WILDHEART_BASIN_ENTRANCE_COLLIDERS[i].name;
+    solids[wildheartOccluderSet(row)].push({
       ...shape,
-      topY: cameraTopY ?? base,
+      // the head's box reaches its ears (the collider's own top is under them)
+      topY: base + wildheartOccluderTop(row, (cameraTopY ?? base) - base),
     });
   });
   // One entrance per world: a rebuild in the same page retires the last one's.

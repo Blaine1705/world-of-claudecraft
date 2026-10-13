@@ -22,6 +22,7 @@ import {
   WILDHEART_BRAZIERS,
   WILDHEART_BREATH,
   WILDHEART_DRIP_SOURCES,
+  WILDHEART_EAR_TOP,
   WILDHEART_EYES,
   WILDHEART_FIREFLY_FIELDS,
   WILDHEART_LEAN,
@@ -41,6 +42,7 @@ import {
   wildheartMistPuffCount,
   wildheartNightAmount,
   wildheartOccluderSet,
+  wildheartOccluderTop,
   wildheartRootSolid,
   wildheartSpritePose,
   wildheartSprites,
@@ -370,6 +372,19 @@ describe('the painter', () => {
     expect(sets.filter((s) => s === 'court')).toHaveLength(5);
     expect(wildheartOccluderSet('head')).toBe('idol');
     expect(wildheartOccluderSet('tusk_w')).toBe('court');
+  });
+
+  it("the head's occluder box reaches the ears, and no other row's top moves", () => {
+    // the collider's camera top is the sim's and stays under the crown; the
+    // box the camera's ghost test reads is the render's and covers the ears
+    const head = WILDHEART_BASIN_ENTRANCE_COLLIDERS.find((r) => r.name === 'head');
+    expect(head?.top).toBe(15.8);
+    expect(wildheartOccluderTop('head', 15.8)).toBe(WILDHEART_EAR_TOP);
+    expect(WILDHEART_EAR_TOP).toBeGreaterThan(15.8);
+    expect(wildheartOccluderTop('head', 25)).toBe(25);
+    for (const r of WILDHEART_BASIN_ENTRANCE_COLLIDERS) {
+      if (r.name !== 'head') expect(wildheartOccluderTop(r.name, r.top), r.name).toBe(r.top);
+    }
   });
 
   it('builds the idol, the leaning throat, the mist, the sprites and three lights for the sink', () => {

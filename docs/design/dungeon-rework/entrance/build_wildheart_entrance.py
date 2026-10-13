@@ -1,28 +1,38 @@
 """The Wildheart Basin world entrance: the Jaguar Maw.
 
   blender -b --factory-startup --python build_wildheart_entrance.py -- --out DIR
-      [--terrain DIR] [--renders all|quick|none] [--tag NAME] [--no-ao] [--holes]
+      [--terrain DIR] [--renders all|quick|none] [--tag NAME] [--no-ao] [--holes] [--ascii VIEW]
 
 The Sunken Idol of the Palmreach (door (-237, 1093)) opened: the head of a
-roaring jaguar, as big as a temple, raised of fitted megaliths and carved
-across their joints, standing on the low rise beside the Sunken Idol's ring of
-columns where the road comes up from the south. Only the head is above ground:
-its neck plunges into the rise under a carved collar, the knoll has taken its
-nape and the ground falls away from its west cheek down a bank to the Sapphire
-Lagoon; the whole mass leans west and forward, over whoever walks up to it.
-The door is its open maw. The upper jaw hangs four yards out over a causeway
-of heaved flagstones that climbs the rise between the Sunbone's two great
-tusks and two troll fire bowls; the lower jaw is the threshold, a ramus with
-its canine either side of the way in; black water stands in the throat. Two
-slanted eyes with jade pupils watch the road from under brows driven down in
-fury; one ear stands against the sky and the other lies where it fell; a
-strangler fig has rooted in the crown and poured its roots down the temples,
-the bank and into the water.
+roaring jaguar, as big as a temple, raised of fitted megaliths, standing on
+the low rise beside the Sunken Idol's ring of columns where the road comes up
+from the south. Only the head is above ground: its neck plunges into the rise
+under a collar (a course of tall stones, a pale fret standing in its red
+band), the knoll has taken its nape and the ground falls away from its west
+cheek down a bank to the Sapphire Lagoon; the whole mass leans west and
+forward, over whoever walks up to it. It is a cat's head: a domed forehead a
+step over the brows, a short deep muzzle with a broad dark nose between two
+whisker pads, cheeks wider than the skull, two small round ears on the
+skull's corners (the east one has lost a corner; what fell lies by the
+cheek), and its pelt let into the stone: rosettes of dark stones on the
+cheeks and the skull, single dark spots on the forehead. The door is its open
+maw. The upper jaw hangs three yards out over a causeway of heaved flagstones
+that climbs the rise between the Sunbone's two great tusks and two troll fire
+bowls, its dark lips drawn back from two great canines; the lower jaw is the
+threshold, a ramus with its canine either side of the way in; black water
+stands in the throat. Two slanted eyes with jade pupils watch the road from
+under brows driven down in fury. Three carved panels run down the nape; beside
+them the facing has fallen off the rubble behind it, and a strangler fig that
+has rooted in the crown has poured a root into the breach, split the east
+cheek with another, and run the rest down the temples, the bank and into the
+water.
 
 The head's form is a signed distance field (wildheart_idol_sculpt.py, the
 primitives of the idol INSIDE the basin, kit/jaguar_head_sculpt.py) and its
 surface a skin of megaliths laid out on charts of that field (--holes prints
-what the skin leaves open and what leaves the colliders). The simulation's
+what the skin leaves open, how much of the core each walker's view shows and
+what leaves the colliders; --ascii road|causeway|maw|west|behind|lagoon|ring
+prints the head as that walker sees it, --ascii side|face its outline). The simulation's
 colliders (src/sim/wildheart_basin_entrance.ts) are older than this head and
 are not its to move: below three yards over the ground the stone fills them
 and never leaves them (the neck is the head collider's drum, the lower jaw the
@@ -43,7 +53,7 @@ Local game coords via ec.B(lx, lz, y): lx = x + 237 (+ WEST), lz = z - 1093
 (+ NORTH), y = y - terrainHeight(-237, 1093). In Blender that is X = lx,
 Y = -lz (so SOUTH is +Y), Z = y. Three GLBs share ONE origin, the door at its
 terrain height:
-  wildheart_basin_entrance.glb         the idol: skull, jaws, eyes, fangs, ears, the fig's trunk and roots
+  wildheart_basin_entrance.glb         the idol: skull, jaws, eyes, fangs, ears, inlays, the fig's trunk and roots
   wildheart_basin_entrance_court.glb   the causeway, the fire bowls, the tusks, fallen stone
   wildheart_basin_entrance_growth.glb  the fig's crown, lianas, fern, taro, reed, moss
 Materials: KitStone (lit, vertex colour), KitLeaf (lit, double sided),
@@ -98,6 +108,10 @@ WAR_RED = (0.55, 0.15, 0.10)
 WAR_OCHRE = (0.82, 0.62, 0.26)
 GUM = (0.42, 0.17, 0.13)
 LEATHER = (0.17, 0.15, 0.13)
+LIP = (0.21, 0.13, 0.11)             # the lips' dark roll round the maw
+INLAY = (0.085, 0.082, 0.075)       # the dark stone let into the pelt
+FRET = (0.80, 0.72, 0.52)            # the pale stone of the collar's fret and the nape's signs
+RUBBLE = (0.33, 0.27, 0.19)
 BARK = (0.43, 0.37, 0.28)
 BARK_DARK = (0.27, 0.22, 0.16)
 BRONZE = (0.36, 0.27, 0.14)
@@ -121,7 +135,7 @@ SOCKETS = {'drips': [], 'eyes': [], 'braziers': [], 'tusks': []}
 # ---- the plan (door-local, upright; the lean is applied last) -------------------
 HEAD_Z = 8.8          # the neck's axis: the head collider's centre
 HEAD_R = sc.NECK_R    # the neck, a hand inside the collider's 8.05
-HEAD_TOP = 15.4       # the crown, where the fig stands
+HEAD_TOP = sc.HEAD_TOP  # the crown, where the fig stands
 MUZ_S = -1.6          # the lower jaw's front (the muzzle colliders' south corner)
 MOUTH = dict(half=2.5, spring=3.6, rise=2.5)   # the throat's window (the engine's)
 LANE = 1.35           # half width of the walk-in lane between the lower teeth
@@ -390,11 +404,11 @@ class Jungle(Ruin):
 
 
 class Wild(Jungle):
-    """What the v3 idol adds: the megalith skin's tones, a leaf crown in the
-    game's own tree language (layered pads of leaf cards, lit as one rounded
-    mass), taro."""
+    """What the v3 idol adds: the stones let into its face (the pelt, the
+    fret, the lips), a leaf crown in the game's own tree language (layered
+    pads of leaf cards, lit as one rounded mass), taro."""
 
-    def pad(self, center, radius, index, density=10.5):
+    def pad(self, center, radius, index, density=9.6):
         """One mass of the fig's crown: a low dark core and a shell of leaf
         cards laid like shingles, each pointing out and down. Every card
         carries the pad's index so main() can round its normals."""
@@ -459,6 +473,82 @@ class Wild(Jungle):
                 ls[1][self.col] = (*scale(tone, shade), 1.0)
                 ls[2][self.col] = (*scale(tone, 1.22 * shade), 1.0)
 
+    def _raw(self, c):
+        k = 0.86 + 0.28 * self.rng.random()
+        return (c[0] * k, c[1] * k, c[2] * k, 1.0)
+
+    def inlay(self, pts, nrm, width, color, top=0.24, foot=-0.1, kind=K_RAW):
+        """A stone let into the idol's face along a line of its surface (pts
+        with the surface's normals there): a low chamfered bar, its foot in
+        the wall. It keeps the colour it is given (no weathering pass), so a
+        dark stone stays dark and a pale one pale from the road."""
+        pts = [Vector(q) for q in pts]
+        nrm = [Vector(q).normalized() for q in nrm]
+        n = len(pts)
+        rows = []
+        for i in range(n):
+            a, b = pts[max(i - 1, 0)], pts[min(i + 1, n - 1)]
+            t = (b - a).normalized()
+            if 0 < i < n - 1:
+                # a mitre: the corner keeps the bar's width
+                t0, t1 = (pts[i] - pts[i - 1]).normalized(), (pts[i + 1] - pts[i]).normalized()
+                k = 1.0 / max(0.6, math.sqrt(max(0.0, (1.0 + t0.dot(t1)) / 2)))
+            else:
+                k = 1.0
+            side = nrm[i].cross(t).normalized()
+            w = width[i] if isinstance(width, (list, tuple)) else width
+            ends = 0.0 if 0 < i < n - 1 else (0.12 if i == 0 else -0.12)
+            rows.append([self.bm.verts.new(pts[i] + side * (o * k) + nrm[i] * h + t * (e * ends))
+                         for (o, h, e) in ((-(w / 2 + 0.07), foot, -1.0), (-(w / 2 - 0.07), top, 1.0),
+                                           ((w / 2 - 0.07), top, 1.0), ((w / 2 + 0.07), foot, -1.0))])
+        faces = []
+        for i in range(n - 1):
+            for k in range(3):
+                faces.append((self.bm.faces.new((rows[i][k], rows[i][k + 1], rows[i + 1][k + 1], rows[i + 1][k])),
+                              (pts[i] + pts[i + 1]) / 2 + (nrm[i] + nrm[i + 1]) * (foot / 2)))
+        faces.append((self.bm.faces.new(rows[0]), pts[0] + nrm[0] * foot + (pts[1] - pts[0]).normalized() * 0.2))
+        faces.append((self.bm.faces.new(rows[-1]), pts[-1] + nrm[-1] * foot + (pts[-2] - pts[-1]).normalized() * 0.2))
+        dark = (color[0] * 0.5, color[1] * 0.5, color[2] * 0.5)
+        tone = self._raw(color)
+        for (f, inner) in faces:
+            f.normal_update()
+            if f.normal.dot(f.calc_center_median() - inner) < 0:
+                f.normal_flip()
+            f.material_index = STONE
+            f[self.kindL] = kind
+            for loop in f.loops:
+                low = any(loop.vert is r[0] or loop.vert is r[3] for r in rows)
+                loop[self.col] = (*dark, 1.0) if low else tone
+        return len(faces)
+
+    def stud(self, pos, nrm, radius, color, top=0.13, foot=-0.1, sides=6):
+        """A round stone let into the idol's face: one spot of the pelt."""
+        rng = self.rng
+        c, n = Vector(pos), Vector(nrm).normalized()
+        t = n.orthogonal().normalized()
+        b = n.cross(t)
+        ph = rng.random() * TAU
+        low, high = [], []
+        for k in range(sides):
+            a = ph + TAU * k / sides
+            d = (t * math.cos(a) + b * math.sin(a)) * (radius * rng.uniform(0.88, 1.12))
+            low.append(self.bm.verts.new(c + d * 1.12 + n * foot))
+            high.append(self.bm.verts.new(c + d * 0.86 + n * top))
+        faces = [self.bm.faces.new(high)]
+        for k in range(sides):
+            faces.append(self.bm.faces.new((low[k], low[(k + 1) % sides], high[(k + 1) % sides], high[k])))
+        dark = (color[0] * 0.5, color[1] * 0.5, color[2] * 0.5)
+        tone = self._raw(color)
+        inner = c + n * foot
+        for f in faces:
+            f.normal_update()
+            if f.normal.dot(f.calc_center_median() - inner) < 0:
+                f.normal_flip()
+            f.material_index = STONE
+            f[self.kindL] = K_RAW
+            for loop in f.loops:
+                loop[self.col] = (*dark, 1.0) if loop.vert in low else tone
+
     def taro(self, pos, leaves=5, height=1.3, size=0.9):
         """A clump of great heart-shaped leaves, each on its own stalk, the
         blade hung from the stalk's top and creased along its midrib."""
@@ -517,7 +607,8 @@ def lean_piece(p):
 
 # ================================================================ the idol's form
 class Idol:
-    field = chart = maw = nose = frames = relief = None
+    field = chart = maw = nose = frames = relief = breach = pits = None
+    rosettes = ()
 
 
 IDOL = Idol()
@@ -556,19 +647,36 @@ def skin_points(pts, lift=0.0, field=None):
     return Pn, f.gradient(Pn)
 
 
-def front_points(pts, lift=0.0):
+def level_points(pts, lift=0.0, field=None):
+    """Points of the idol's surface met by level rays toward the neck's axis
+    at [(bearing, y)]: where a thing stands at a given HEIGHT (the chart's
+    own height is an arc over the dome). Returns (points, normals)."""
+    f = field or IDOL.field
+    out = np.array([(math.sin(th), math.cos(th), 0.0) for (th, _y) in pts], dtype=np.float64)
+    O = np.array([(sc.AXIS[0], sc.AXIS[1], y) for (_th, y) in pts], dtype=np.float64) + out * 17.0
+    Pn, _hit = sc.march(f, O, -out, np.full(len(pts), float(lift)), 16.6)
+    return Pn, sc.coarse_normal(f, Pn, 0.3)
+
+
+def front_points(pts, lift=0.0, field=None):
     """Points of the face met by level rays from the south at [(lx, y)]."""
+    f = field or IDOL.field
     O = np.array([(x, 9.0, y) for (x, y) in pts], dtype=np.float64)
     D = np.tile(np.array((0.0, -1.0, 0.0)), (len(pts), 1))
-    Pn, _hit = sc.march(IDOL.field, O, D, np.full(len(pts), float(lift)), 17.0)
+    Pn, _hit = sc.march(f, O, D, np.full(len(pts), float(lift)), 17.0)
     return Pn
 
 
-# the pelt's rosettes (bearing, chart height, radius), mirrored: jowls and
-# cheeks, the skull's sides and back, the forehead
-ROSETTES = [(1.2, 5.3, 1.15), (1.72, 6.6, 1.3), (2.2, 5.2, 1.15), (2.68, 6.5, 1.25), (1.52, 9.6, 1.2),
-            (2.05, 10.2, 1.35), (2.6, 9.8, 1.25), (2.82, 11.9, 1.05), (2.3, 13.0, 1.25), (2.25, 15.6, 1.05),
-            (2.75, 14.6, 1.1), (2.6, 17.0, 0.9), (0.55, 15.7, 0.85)]
+# The pelt's rosettes (bearing, chart height, radius), mirrored: on the jowl,
+# the flank and the skull's side and back. Few and large: each is a ring of
+# dark stones about a dark stud, in a shallow dish that kept its ochre.
+ROSETTES = [(0.84, 6.7, 1.1), (1.26, 7.4, 1.25), (1.78, 7.9, 1.45), (2.3, 7.4, 1.3), (1.62, 10.9, 1.3), (2.1, 11.6, 1.45),
+            (2.64, 11.0, 1.25), (1.9, 14.9, 1.15), (2.52, 14.6, 1.2)]
+# the forehead's and the cheeks' spots (lx, y), mirrored: single dark stones
+SPOTS = [(1.5, 14.1), (3.3, 14.2), (5.0, 13.95), (0.75, 15.3), (2.5, 15.45), (4.2, 15.35), (1.4, 16.3), (3.2, 16.25),
+         (5.6, 9.2), (6.9, 9.4)]
+# where the fig's root has split the east cheek (chart places, from under the ear down)
+CRACK = [(-1.55, 13.4), (-1.5, 11.6), (-1.42, 9.8), (-1.5, 8.2), (-1.44, 6.6)]
 
 
 def sculpt():
@@ -578,26 +686,32 @@ def sculpt():
     IDOL.frames = sc.eye_frames(f)
     IDOL.maw = sc.carve_maw(f)
     IDOL.nose = sc.nose_prim()
+    IDOL.breach = sc.Breach()
     sc.carve_sockets(f, IDOL.frames)
+    crack, _n = skin_points(CRACK)
     places, sizes = [], []
     for s in (1, -1):
         for i, (th, v, r) in enumerate(ROSETTES):
             places.append((s * th, v))
             sizes.append((r, 0.7 * i + (0.0 if s > 0 else 1.1)))
     Pn, Nn = skin_points(places)
-    IDOL.relief = sc.Relief([(Pn[i], Nn[i], sizes[i][0], sizes[i][1]) for i in range(len(places))])
-    sc.carve_relief(f, IDOL.relief)
+    keep = []
+    for i in range(len(places)):
+        # none in the collapse, none where the root has split the cheek
+        if IDOL.breach.at(Pn[i][None, :])[0] < 1.25 or min(np.linalg.norm(crack - Pn[i], axis=1)) < sizes[i][0] + 1.0:
+            continue
+        keep.append((Pn[i], Nn[i], sizes[i][0], sizes[i][1]))
+    IDOL.rosettes = keep
+    IDOL.relief = sc.Relief(keep)
+    f.groove(sc.Polyline([tuple(q) for q in crack], 0.05), 0.55, 0.5)
+    IDOL.pits = sc.carve_relief(f, IDOL.relief)
 
 
 def stone_tone(p, breach=True):
-    holes = [(Vector(sc.G(6.4, 16.2, 9.6)), 2.9), (Vector(sc.G(8.8, 13.6, 6.4)), 2.2)]
-
     def tone(q):
         c = p.tone(q[0] * 0.7 + q[1] * 0.7, q[2])
-        if breach:
-            for (h, r) in holes:
-                if (Vector(q) - h).length < r:
-                    return mix(c, rk.CORE, 0.55)
+        if breach and IDOL.breach.at(np.array([q], dtype=np.float64))[0] < 1.0:
+            return mix(c, rk.CORE, 0.3)
         return c
     return tone
 
@@ -656,64 +770,182 @@ def eye(p, sign, centre, normal):
     SOCKETS['eyes'].append(leaned(M @ Vector((0, 0.4, 0))))
 
 
+def rosette(p, centre, normal, radius, phase):
+    """One rosette of the pelt: three dark stones in a broken ring about a
+    dark stud, none of them quite alike."""
+    rng = p.rng
+    f = IDOL.field
+    n = np.asarray(normal, dtype=np.float64)
+    t = np.cross(n, (0.0, 0.0, 1.0)) if abs(n[2]) < 0.9 else np.cross(n, (1.0, 0.0, 0.0))
+    t /= np.linalg.norm(t)
+    b = np.cross(n, t)
+    arcs = 3
+    for k in range(arcs):
+        a0 = phase + TAU * k / arcs + rng.uniform(0.16, 0.3)
+        a1 = phase + TAU * (k + 1) / arcs - rng.uniform(0.16, 0.3)
+        steps = 5
+        pts = []
+        for i in range(steps + 1):
+            a = a0 + (a1 - a0) * i / steps
+            rr = radius * (1.0 + 0.09 * math.sin(2 * a + phase * 3.0))
+            pts.append(centre + (t * math.cos(a) + b * math.sin(a)) * rr)
+        pts = f.snap(np.array(pts), lift=0.0, steps=5)
+        w0 = rng.uniform(0.5, 0.66)
+        width = [w0 * (0.72 + 0.4 * math.sin(math.pi * i / steps)) for i in range(steps + 1)]
+        p.inlay(pts, sc.coarse_normal(f, pts, 0.3), width, INLAY, top=0.16)
+    off = (t * rng.uniform(-0.12, 0.12) + b * rng.uniform(-0.12, 0.12)) * radius
+    c = f.snap(np.array([centre + off]), lift=0.0, steps=5)
+    p.stud(c[0], sc.coarse_normal(f, c, 0.3)[0], radius * 0.3, INLAY)
+    p.paint.append((Vector(centre), radius * 0.95, WAR_OCHRE, 1.3))
+
+
+def collar_fret(p):
+    """The collar's fret: one pale stone meander standing in the sunk band,
+    broken where the nape has burst."""
+    c = sc.COLLAR
+    lo, hi = c['z0'] + 0.74, c['z1'] - 0.74
+    th0 = c['start'] + 0.32
+    n = int((TAU - 2 * th0) / (1.75 / c['r']))
+    step = (TAU - 2 * th0) / n
+    mids, _n = level_points([(th0 + (k + 0.5) * step, (lo + hi) / 2) for k in range(n)])
+    ok = IDOL.breach.at(mids) > 0.6
+    runs, run = [], []
+    for k in range(n):
+        lvl = lo if k % 2 == 0 else hi
+        if not ok[k]:
+            if len(run) >= 2:
+                runs.append(run)
+            run = []
+            continue
+        run.append((th0 + k * step, lvl))
+        run.append((th0 + (k + 1) * step, lvl))
+    if len(run) >= 2:
+        runs.append(run)
+    made = 0
+    for run in runs:
+        Pn, Nn = level_points(run)
+        made += p.inlay(Pn, Nn, 0.46, FRET, top=0.2)
+    return made
+
+
+def nape_signs(p):
+    """The signs in the nape's three panels: pale stone bars and studs."""
+    r = sc.COLLAR['r']
+
+    def at(pts, zc):
+        return level_points([(math.pi - a / r, zc + b) for (a, b) in pts])
+    (z0, h0), (z1, h1), (z2, h2) = sc.NAPE_PANELS
+    Pn, Nn = at([(-1.0, -0.45), (-1.0, 0.4), (0.0, 0.4), (0.0, -0.4), (1.0, -0.4), (1.0, 0.45)], z0)
+    p.inlay(Pn, Nn, 0.34, FRET, top=0.2)
+    for sgn in (1, -1):
+        Pn, Nn = at([(sgn * 0.5, 0.42), (sgn * 1.05, 0.42), (sgn * 1.05, -0.42), (sgn * 0.5, -0.42)], z1)
+        p.inlay(Pn, Nn, 0.3, FRET, top=0.2)
+    Pn, Nn = at([(0.0, 0.0)], z1)
+    p.stud(Pn[0], Nn[0], 0.34, FRET, top=0.2)
+    Pn, Nn = at([(-0.95, 0.0), (0.0, 0.0), (0.95, 0.0)], z2)
+    for (q, n) in zip(Pn, Nn):
+        p.stud(q, n, 0.3, FRET, top=0.2)
+    for (zc, _hh) in sc.NAPE_PANELS:
+        Pn, _n = at([(0.0, 0.0)], zc)
+        p.paint.append((Vector(Pn[0]), 1.9, WAR_RED, 1.2))
+
+
 def head():
     p = P('Head', seed=3, moss=2.0)
     rng = p.rng
-    f, maw, nose = IDOL.field, IDOL.maw, IDOL.nose
+    f, maw, nose, breach = IDOL.field, IDOL.maw, IDOL.nose, IDOL.breach
     # the neck's own rim: the ground falls four yards from the maw round to
     # the lagoon side, and the lean lifts the north foot half a yard more
     rim = [(math.sin(TAU * k / 72) * 8.4, HEAD_Z + math.cos(TAU * k / 72) * 8.4) for k in range(72)]
     y0 = footing('head', 0.0, HEAD_Z, 5.6, 5.6, 0.0, 1.0, extra=rim)
     footing('muzzle', 0.0, -0.1, 7.0, 1.9, 0.0, 0.9)
     stats = {}
+    collar0 = sc.COLLAR['z0'] - 0.08
 
-    # ---- the outside: the neck's megaliths, the collar, the skull
-    rows = [y0, y0 + 1.75, y0 + 3.4, y0 + 5.15, 1.82, sc.NECK_TOP - 0.02, 4.55, sc.BULLET_YC]
-    while rows[-1] < 17.1:
-        rows.append(rows[-1] + rng.uniform(1.35, 1.75))
-    rows.append(18.65)
+    # ---- the outside: the neck's megaliths, the collar's course, the skull
+    rows = [y0, y0 + 1.75, y0 + 3.4, y0 + 5.15, 1.82, collar0, sc.BULLET_YC]
+    while rows[-1] < HEAD_TOP + 0.5:
+        rows.append(rows[-1] + rng.uniform(1.4, 1.8))
+    rows.append(19.3)
 
     def width(v):
-        return (2.3, 4.4) if v < 1.8 else ((2.5, 3.3) if v < 3.1 else (1.8, 3.7))
+        return (2.3, 4.4) if v < 1.8 else ((2.3, 3.4) if v < sc.BULLET_YC else (1.8, 3.7))
 
     def cell(u, v):
+        if v < collar0 and abs(wrap(u)) < 0.75:
+            return 0.42         # the jaws' outer faces, beside the way in
         if v < 1.82:
             return 0.9
-        if v < 3.1:
-            return 0.33
-        return 0.39 if abs(wrap(u)) < 1.3 and v < 16.0 else 0.46
+        if v < collar0:
+            return 0.5
+        if v < sc.BULLET_YC:
+            return 0.47
+        if abs(wrap(u)) < 1.3 and v < 17.0:
+            return 0.39
+        if math.pi - abs(wrap(u)) < 0.3 and v < 16.5:
+            return 0.36         # the nape's panels
+        return 0.54
 
     def flag(Pn):
-        return (maw.at(Pn) < 0.1) | (nose.at(Pn) < 0.1) | under_ground(Pn)
+        return (maw.at(Pn) < 0.1) | (nose.at(Pn) < 0.1) | under_ground(Pn) | (breach.at(Pn) < 0.35)
 
     def front(c):
-        return (np.abs(c[:, 0]) < 5.25) & (c[:, 1] > -1.25)
+        return (np.abs(c[:, 0]) < 6.7) & (c[:, 1] > -2.6)
+
+    def under_brow(c):
+        return (c[:, 2] > 10.1) & (c[:, 2] < 13.7) & (c[:, 1] > -3.2) & (np.abs(c[:, 0]) < 9.6) & (np.abs(c[:, 0]) > 2.0)
 
     def facing(cen):
         return sc.coarse_normal(f, cen)[:, 2]
 
+    aim = np.array((0.0, -0.906, 0.423))      # the brows' chart looks along this
+
     def keep(cen, nrm):
         # what faces down and has nothing under it is drawn from below (the
         # charts that follow), not from the side: under the upper jaw all of
-        # it, round the neck only what lies near level
+        # it, round the neck only what lies near level; under the brows the
+        # chart that looks up at them from the causeway draws it
         out = np.ones(len(cen), dtype=bool)
         nz = facing(cen)
-        idx = np.nonzero(nz < np.where(front(cen), -0.45, -0.8))[0]
+        low = front(cen) & (cen[:, 2] < sc.LIP_Z + 0.12)
+        idx = np.nonzero(nz < np.where(low, -0.45, -0.8))[0]
         if len(idx):
             c = cen[idx] + nrm[idx] * 0.15
             stop = np.where(front(c), 2.75, -4.5)
             _q, hit = sc.march(f, c, np.tile(np.array((0.0, 0.0, -1.0)), (len(idx), 1)), np.zeros(len(idx)), c[:, 2] - stop)
             out[idx] = hit
+        idx = np.nonzero(under_brow(cen) & (nz < -0.36))[0]
+        if len(idx):
+            # (only what that chart can see: the way to it is clear)
+            c = cen[idx] + nrm[idx] * 0.2
+            _q, hit = sc.march(f, c, np.tile(-aim, (len(idx), 1)), np.zeros(len(idx)), 8.0)
+            out[idx] &= hit
         return out
 
     blocks = sc.lay_out(f, IDOL.chart, rng, rows, width)
     stats['skull'] = sc.megalith_skin(p, f, IDOL.chart, blocks, rng, stone_tone(p), cell=cell, flag=flag, keep=keep,
                                       shade=IDOL.relief.shade)
-    # ---- what overhangs the neck, from below: the jowls, the nape's roll, the corbels
-    ann = sc.Annulus(-4.5, (0.78, TAU - 0.78), (7.95, 11.5), 15.0)
-    blocks = sc.lay_out(f, ann, rng, [7.95, 9.05, 10.25, 11.5], lambda v: (2.0, 3.6), tall=0.0)
-    stats['soffit'] = sc.megalith_skin(p, f, ann, blocks, rng, stone_tone(p, False), cell=0.44, flag=under_ground,
-                                       keep=lambda c, n: (facing(c) < -0.7) & ~front(c))
+    # ---- the collapse in the nape: the rubble the facing stood against
+    rrows = [3.2 + 0.9 * i for i in range(12)]
+    blocks = sc.lay_out(f, IDOL.chart, rng, rrows, lambda v: (0.9, 1.7), tall=0.0)
+
+    def rubble(q):
+        return p.vary(mix(RUBBLE, COURT_DARK, rng.random() * 0.7), 0.12)
+    stats['rubble'] = sc.megalith_skin(p, f, IDOL.chart, blocks, rng, rubble, cell=0.62, gap=0.1, depth=0.24,
+                                       proud=(-0.2, 0.24), chip=0.6, kind=rk.K_CRUST,
+                                       flag=lambda Pn: (breach.at(Pn) > 0.8) | under_ground(Pn))
+    # ---- what overhangs the neck, from below: the jowls, the collar's foot, the corbels
+    ann = sc.Annulus(-4.5, (0.5, TAU - 0.5), (7.95, 12.6), 15.0)
+    blocks = sc.lay_out(f, ann, rng, [7.95, 9.05, 10.25, 11.4, 12.6], lambda v: (2.0, 3.6), tall=0.0)
+    stats['soffit'] = sc.megalith_skin(p, f, ann, blocks, rng, stone_tone(p, False), cell=0.46, flag=under_ground,
+                                       keep=lambda c, n: (facing(c) < -0.7) & ~((np.abs(c[:, 0]) < 6.4) & (c[:, 1] > -2.4)))
+    # ---- under the brows, as whoever comes up the road looks up at them
+    across = np.array((0.0, 0.423, 0.906))
+    seat = np.array((0.0, 0.3, 11.3)) - aim * 4.5
+    brow = sc.Plane(seat, (1, 0, 0), across, aim, (-9.4, 9.4), (-1.6, 2.6), 9.0)
+    blocks = sc.lay_out(f, brow, rng, [-1.6, -0.2, 1.2, 2.6], lambda v: (1.6, 3.0), tall=0.0)
+    stats['brows'] = sc.megalith_skin(p, f, brow, blocks, rng, stone_tone(p, False), cell=0.4, gap=0.1, depth=0.2,
+                                      keep=lambda c, n: under_brow(c) & (facing(c) < -0.28))
 
     # ---- the maw: the palate and the flews from below
     dark = stone_tone(p, breach=False)
@@ -721,12 +953,14 @@ def head():
     def wet(q):
         return mix(dark(q), COURT_DARK, 0.3)
 
-    up = sc.Plane((0, 0, 2.75), (1, 0, 0), (0, 1, 0), (0, 0, 1), (-5.3, 5.3), (-1.3, 6.3), 5.2)
-    blocks = sc.lay_out(f, up, rng, [-1.3, 0.3, 1.9, 3.4, 4.9, 6.3], lambda v: (1.6, 3.0), tall=0.0)
-    stats['palate'] = sc.megalith_skin(p, f, up, blocks, rng, wet, cell=0.36, gap=0.1, depth=0.2,
-                                       keep=lambda c, n: (facing(c) < -0.3) & (np.abs(c[:, 0]) < 5.05))
+    up = sc.Plane((0, 0, 2.75), (1, 0, 0), (0, 1, 0), (0, 0, 1), (-7.4, 7.4), (-2.7, 5.7), 5.2)
+    blocks = sc.lay_out(f, up, rng, [-2.7, -1.3, 0.3, 1.9, 3.3, 4.6, 5.7], lambda v: (2.0, 3.4), tall=0.0)
+    stats['palate'] = sc.megalith_skin(p, f, up, blocks, rng, wet, cell=0.36, gap=0.08, depth=0.14, proud=(0.0, 0.05),
+                                       chip=0.0, joint=0.45,
+                                       keep=lambda c, n: (facing(c) < -0.3) & (np.abs(c[:, 0]) < 7.0)
+                                       & ((c[:, 2] < sc.LIP_Z + 0.25) | (maw.at(c) < 0.6)))
     # the throat's walls and the jaws' inner faces, from the lane's own axis
-    tun = sc.Tunnel(3.3, (-5.7, 1.32), (-0.95, math.pi + 0.95))
+    tun = sc.Tunnel(3.3, (sc.MUZZLE_FRONT - 0.4, 1.32), (-0.95, math.pi + 0.95))
     trows = [a * tun.rho0 for a in (-0.95, -0.42, 0.12, 0.72, 1.25, 1.89, 2.42, 3.02, 3.56, 4.09)]
     blocks = sc.lay_out(f, tun, rng, trows, lambda v: (1.4, 2.6), tall=0.0)
     stats['throat'] = sc.megalith_skin(p, f, tun, blocks, rng, wet, cell=0.36, gap=0.1, depth=0.2,
@@ -737,101 +971,213 @@ def head():
     stats['jaws'] = sc.megalith_skin(p, f, down, blocks, rng, stone_tone(p, False), cell=0.36, gap=0.1, depth=0.2,
                                      keep=lambda c, n: facing(c) > 0.45)
     # ---- the nose: one dark stone, cut fine
-    nz = sc.Plane((0, 7.4, sc.NOSE['y']), (1, 0, 0), (0, 0, 1), (0, -1, 0), (-2.0, 2.0), (-1.3, 1.3), 3.2)
-    nblocks = [(-2.0, 0.0, -1.3, 0.0, 2.0), (0.0, 2.0, -1.3, 0.0, 2.0), (-2.0, 0.0, 0.0, 1.3, 2.0), (0.0, 2.0, 0.0, 1.3, 2.0)]
+    # (seen from before and above, so its top is cut with its face)
+    ndir = np.array((0.0, -0.866, -0.5))
+    nz = sc.Plane(np.array(sc.G(0, sc.NOSE['lz'] + 0.62, sc.NOSE['y'])) - ndir * 3.0, (1, 0, 0), (0.0, -0.5, 0.866), ndir,
+                  (-2.2, 2.2), (-1.6, 1.6), 4.6)
+    nblocks = [(-2.2, 0.0, -1.6, 0.0, 2.2), (0.0, 2.2, -1.6, 0.0, 2.2), (-2.2, 0.0, 0.0, 1.6, 2.2), (0.0, 2.2, 0.0, 1.6, 2.2)]
     lea = stone_tone(p, False)
 
     def leather(Pn):
-        return np.where(nose.at(Pn) < 0.1, 0.3, 1.0)
-    stats['nose'] = sc.megalith_skin(p, f, nz, nblocks, rng, lambda q: mix(lea(q), COURT_DARK, 0.25), cell=0.135,
+        return np.where(nose.at(Pn) < 0.1, 0.24, 1.0)
+    stats['nose'] = sc.megalith_skin(p, f, nz, nblocks, rng, lambda q: mix(lea(q), COURT_DARK, 0.25), cell=0.15,
                                      gap=0.06, depth=0.12, proud=(0.0, 0.03), chip=0.0, shade=leather,
                                      keep=lambda c, n: nose.at(c) < 0.5)
     p.mark()
 
-    # ---- the ears, over the brows from the road and from behind: the west one whole, the east one's tip gone
+    # ---- the ears: small, thick and round on the skull's corners, three
+    # stones each; the east one has lost half its top stone
     for (sign, broken) in ((1, False), (-1, True)):
-        fe, c, R = sc.build_ear(sign, broken)
+        stones, c, R, beds = sc.build_ear(sign, broken, bpy)
+        er = sc.EAR['r']
         face = R @ np.array((0.0, 1.0, 0.0))
-        ch = sc.Sphere(c - face * 0.3, R, 3.2, (0.04 * 3.2, 2.5 * 3.2), far=6.4, pole='z')
-        erows = [t * 3.2 for t in (0.04, 0.5, 0.95, 1.4, 1.9, 2.5)]
-        blocks = sc.lay_out(fe, ch, rng, erows, lambda v: (1.7, 3.0), tall=0.0, samples=200)
-        pale = stone_tone(p, False)
-        stats['ear_' + ('w' if sign > 0 else 'e')] = sc.megalith_skin(
-            p, fe, ch, blocks, rng, lambda q: mix(pale(q), COURT_PALE, 0.35), cell=0.55, gap=0.1, depth=0.2,
-            flag=lambda Pn: f.sample(Pn) < -0.3)
-        p.paint.append((Vector(c + face * 0.3), 2.8, WAR_OCHRE, 0.7))
-        p.soot.append((Vector(c + face * 0.25 - np.array((0, 0, 0.5))), 2.3, 0.55))
+        upv = R @ np.array((sign * 0.06, 0.0, 1.0))
+        upv /= np.linalg.norm(upv)
+        n_ear = 0
+        for (verts, polys) in stones:
+            tone = mix(p.tone(c[0] + len(verts), c[2]), COURT_PALE, 0.3)
+            made = [p.bm.verts.new(Vector(v)) for v in verts]
+            for poly in polys:
+                try:
+                    fc = p.bm.faces.new([made[i] for i in poly])
+                except ValueError:
+                    continue
+                fc.material_index = STONE
+                fc[p.kindL] = K_STONE
+                k = 0.93 + 0.14 * rng.random()
+                for loop, i in zip(fc.loops, poly):
+                    zl = float((verts[i] - c) @ upv)
+                    bed = min(abs(zl - beds[1]), abs(zl - beds[2]))
+                    kk = k * (0.42 + 0.58 * smooth(0.05, 0.3, bed))
+                    q = R.T @ (verts[i] - c)
+                    cup = (q[0] / (er - 0.6)) ** 2 + ((q[2] + 0.25) / (er - 0.5)) ** 2
+                    if q[1] > 0.0 and cup < 1.0:
+                        kk *= 0.36 + 0.5 * cup * cup
+                    loop[p.col] = (min(1.0, tone[0] * kk), min(1.0, tone[1] * kk), min(1.0, tone[2] * kk), 1.0)
+                n_ear += len(poly) - 2
+        stats['ear_' + ('w' if sign > 0 else 'e')] = n_ear
+        # the hollow's shade and what is left of its ochre; the pale spot a cat wears behind each ear
+        p.soot.append((Vector(c + face * 0.5 - upv * 0.3), 1.9, 0.5))
+        p.paint.append((Vector(c + face * 0.7), 2.2, WAR_OCHRE, 0.8))
+        p.paint.append((Vector(c - face * 1.0 + upv * 0.2), 1.1, COURT_PALE, 1.4))
     p.mark()
+
+    # ---- what is let into the stone: the pelt, the collar's fret, the nape's signs
+    n0 = len(p.bm.faces)
+    for (c, n, r, ph) in IDOL.rosettes:
+        rosette(p, c, n, r, ph)
+    spots = [(s * x, y) for s in (1, -1) for (x, y) in SPOTS]
+    Pn = front_points(spots)
+    Nn = sc.coarse_normal(f, Pn, 0.3)
+    for (q, n) in zip(Pn, Nn):
+        p.stud(q, n, rng.uniform(0.36, 0.5), INLAY)
+    collar_fret(p)
+    nape_signs(p)
+    stats['inlays'] = len(p.bm.faces) - n0
+    # the collar's band kept its red
+    for k in range(40):
+        th = sc.COLLAR['start'] + 0.2 + (TAU - 2 * sc.COLLAR['start'] - 0.4) * k / 39
+        Pn, _n = level_points([(th, (sc.COLLAR['z0'] + sc.COLLAR['z1']) / 2)])
+        p.paint.append((Vector(Pn[0]), 1.15, WAR_RED, 1.25))
+
+    # ---- the lips: a dark roll, as a cat's are, along each flew's edge from
+    # the mouth's corner forward and over the maw's mouth (it is also where
+    # the face's chart and the palate's meet)
+    arch, anrm = [], []
+    for i in range(15):
+        a = 0.32 + (math.pi - 0.64) * i / 14
+        rim = None
+        for k in range(70):
+            lz = -1.2 - k * 0.07
+            w, sp, rise = sc.Maw.section(lz)
+            if f.sample(np.array([[(w + 0.22) * math.cos(a), -lz, sp + (rise + 0.22) * math.sin(a)]]))[0] > 0.0:
+                break
+            rim = (w * math.cos(a), -lz, sp + rise * math.sin(a))
+        if rim is not None:
+            arch.append(rim)
+            anrm.append((-math.cos(a), 1.0, -math.sin(a)))
+    n_lip = p.inlay(arch, anrm, 0.5, LIP, top=0.16, foot=-0.42)
+    for s in (1, -1):
+        phis = [s * (2.05 - 1.75 * i / 15) for i in range(16)]
+        out = np.array([(math.sin(a), math.cos(a), 0.0) for a in phis])
+        O = np.array((0.0, 1.2, sc.LIP_Z + 0.07)) + out * 10.0
+        Pn, hit = sc.march(f, O, -out, np.zeros(len(phis)), 9.6)
+        line, nrm = [], []
+        for (q, h, o) in zip(Pn, hit, out):
+            if h and abs(q[0]) > 3.45 and q[1] > -0.25:
+                line.append((q[0], q[1], sc.LIP_Z))
+                nrm.append((o[0], o[1], -1.0))
+        if len(line) > 1:
+            n_lip += p.inlay(line, nrm, 0.5, LIP, top=0.16, foot=-0.42)
+    stats['lips'] = n_lip
+    for (q, n) in zip(arch[::3], anrm[::3]):
+        p.paint.append((Vector(q), 0.9, GUM, 1.2))
+    # the folds behind the whisker pads, in shade
+    for s in (1, -1):
+        for q in front_points([(s * 5.5, 7.6), (s * 5.95, 6.4), (s * 5.8, 5.5)]):
+            p.soot.append((Vector(q), 0.75, 0.5))
+    # ---- the jaws' quoins: the corner stones where each ramus was cut through for the lane
+    for s in (1, -1):
+        line = []
+        for y in (gh(s * 3.0, -1.0) - 0.5, 0.5, 1.5, sc.JAW_TOP - 0.05):
+            corner = None
+            for k in range(50):
+                lz = 0.6 - k * 0.06
+                w, _sp, _r = sc.Maw.section(lz)
+                if f.sample(np.array([[s * (w + 0.2), -lz, y]]))[0] > 0.0:
+                    break
+                corner = (s * w, -lz, y)
+            if corner is not None:
+                line.append(corner)
+        if len(line) > 1:
+            p.inlay(line, [(-s * 0.57, 0.9, 0.0)] * len(line), 0.3, p.vary(COURT_PALE, 0.06), top=-0.06, foot=-0.5,
+                    kind=K_STONE)
 
     # ---- the eyes
     for (sign, c, n) in IDOL.frames:
         eye(p, sign, c - n * 1.0, n)
     # ---- worn war paint and the damp
+    front_lip = sc.MUZZLE_FRONT + 0.3
     for s in (1, -1):
-        # ochre along the brows, red slashes down the cheeks, red on the lips and the gums
-        Pn, _n = skin_points([(s * 0.36, 13.7), (s * 0.62, 13.4), (s * 0.9, 13.1)])
-        for q in Pn:
+        # ochre along the brows, red on the lips and the gums
+        for q in front_points([(s * 2.2, 12.3), (s * 4.2, 12.7), (s * 6.2, 13.0)]):
             p.paint.append((Vector(q), 1.5, WAR_OCHRE, 0.8))
-        for k in range(3):
-            Pn, _n = skin_points([(s * (0.78 + 0.13 * k), 8.6 - 0.25 * k), (s * (0.9 + 0.13 * k), 7.3 - 0.25 * k),
-                                  (s * (1.0 + 0.13 * k), 6.0 - 0.3 * k)])
-            for q in Pn:
-                p.paint.append((Vector(q), 0.75, WAR_RED, 0.95))
-        for lz in (-0.9, -2.2, -3.4, -4.4, -5.0):
+        for lz in (-0.7, -1.7, -2.7, front_lip + 0.5, front_lip):
             w, sp, _r = sc.Maw.section(lz)
-            p.paint.append((B(s * (w - 0.1), lz, sp - 0.3), 0.85, GUM, 1.7))
+            p.paint.append((B(s * (w + 0.4), lz, sc.LIP_Z + 0.1), 1.0, GUM, 1.7))
             p.paint.append((B(s * (w + 0.5), max(lz, -1.4) + 0.9, sc.JAW_TOP), 0.8, GUM, 1.5))
+        w, sp, _r = sc.Maw.section(front_lip)
         for a in (0.35, 0.8, 1.25):
-            p.paint.append((B(s * math.cos(a) * 3.15, -5.2, 4.3 + math.sin(a) * 2.05), 0.85, GUM, 1.7))
-        # the whisker pads' pits
-        Pn = front_points([(s * x, y) for (x, y) in ((1.5, 6.2), (2.2, 6.6), (3.0, 6.3), (1.9, 5.6), (2.7, 5.6), (3.4, 5.7))])
-        for q in Pn:
-            p.soot.append((Vector(q) + Vector((0, 0.05, 0)), 0.2, 0.9))
+            p.paint.append((B(s * math.cos(a) * (w - 0.15), front_lip - 0.2, sp - 0.3 + math.sin(a) * 2.05), 0.85, GUM, 1.7))
         # algae runs under the brow's end, the cheekbone and the flews
-        Pn, _n = skin_points([(s * 0.95, 12.6), (s * 1.45, 8.4), (s * 0.5, 5.6), (s * 2.2, 8.6), (s * 2.75, 8.0)])
-        for (q, ln) in zip(Pn, (4.0, 4.5, 3.0, 5.0, 4.5)):
+        Pn, _n = skin_points([(s * 1.45, 8.4), (s * 0.5, 5.6), (s * 2.2, 8.6), (s * 2.75, 8.0)])
+        for (q, ln) in zip(Pn, (4.5, 3.0, 5.0, 4.5)):
             p.streaks.append((Vector(q), 0.6, ln, 0.6))
+    # the whisker pads' pits
+    for q in IDOL.pits:
+        p.soot.append((Vector(q) + Vector((0, 0.05, 0)), 0.42, 0.95))
     # the throat's dark, and the nostrils'
     p.soot.append((B(0, 0.6, 3.6), 3.6, 0.55))
     for s in (1, -1):
-        p.soot.append((B(s * 0.72, sc.NOSE['lz'] + 0.25, sc.NOSE['y'] - 0.22), 0.45, 0.95))
+        p.soot.append((B(s * 0.9, sc.NOSE['lz'] + 0.25, sc.NOSE['y'] + 0.02), 0.5, 0.95))
     # ---- the sills: low gum stones along the lane, where the lower jaw was cut through for the causeway
     for s in (1, -1):
         for (lz, ln) in ((-0.75, 0.75), (0.05, 0.8), (0.85, 0.75)):
             w, _sp, _r = sc.Maw.section(lz)
-            x0 = max(LANE + 0.12, 1.81 - (lz + 1.56) * 0.477)
+            x0 = max(LANE + 0.12, 1.85 - (lz - ln / 2 + 1.56) * 0.477)
             cx = s * (x0 + w + 0.1) / 2
             gy = gh(cx, lz)
             hh = rng.uniform(0.42, 0.56)
             with p.as_kind(K_PAVE):
                 p.box(B(cx, lz, gy + hh / 2 - 0.25), (w + 0.1 - x0, ln, hh + 0.5), p.vary(mix(COURT, GUM, 0.25), 0.06),
                       chip=0.14, bevel=0.06, yaw=rng.uniform(-0.05, 0.05), bottom=False)
+    # loose rubble lying in the collapse's foot
+    b = sc.BREACH
+    for k in range(7):
+        th = b['th'] + rng.uniform(-0.22, 0.22)
+        Pn, Nn = level_points([(th, b['z'] - b['hh'] + rng.uniform(0.3, 1.6))])
+        q = Vector(Pn[0]) + Vector(Nn[0]) * rng.uniform(0.1, 0.4)
+        sz = rng.uniform(0.5, 0.95)
+        with p.as_kind(K_PAVE):
+            p.box(q, (sz * 1.3, sz, sz * 0.75), p.vary(mix(RUBBLE, COURT, rng.random() * 0.6), 0.1), chip=0.25, bevel=0.05,
+                  yaw=rng.random() * TAU, pitch=rng.uniform(-0.5, 0.5), roll=rng.uniform(-0.4, 0.4))
     # the earth that has gathered on the crown, where the fig stands
     with p.as_kind(K_EARTH):
         p.mound(0.3, HEAD_Z + 1.4, 3.5, 3.5, 1.5, lambda x, z: HEAD_TOP - 0.9, mix(rk.TURF, rk.MOSS_DEEP, 0.4), rings=3,
                 segs=9, sink=1.3, jitter=0.25)
     if '--holes' in argv:
         hole_report(p)
-    # ---- the core behind the skin
+    # ---- the core behind the skin: shadowed stone, so what the skin leaves
+    # open between its charts reads as a set-back stone and not as a hole
     verts, polys = sc.liner(f, bpy)
-    core = scale(COURT_DARK, 0.62)
     made = [p.bm.verts.new(Vector(v)) for v in verts]
     n_core = 0
-    with p.as_kind(K_STONE):
-        for poly in polys:
-            if all(verts[i][2] < gb(verts[i][0], verts[i][1]) - 1.0 for i in poly):
-                continue
-            try:
-                face = p.bm.faces.new([made[i] for i in poly])
-            except ValueError:
-                continue
-            p._paint([face], core, STONE)
-            n_core += len(poly) - 2
+    first_core = len(p.bm.faces)
+    for poly in polys:
+        if all(verts[i][2] < gb(verts[i][0], verts[i][1]) - 1.0 for i in poly):
+            continue
+        try:
+            face = p.bm.faces.new([made[i] for i in poly])
+        except ValueError:
+            continue
+        cen = np.mean([verts[i] for i in poly], axis=0)
+        inside = breach.at(cen[None, :])[0] < 0.6
+        tone = mix(RUBBLE, COURT_DARK, 0.5) if inside else scale(COURT_DARK, 0.8)
+        k = 0.85 + 0.3 * fbm(cen[0] * 0.6, cen[1] * 0.6, cen[2] * 0.6)
+        face.material_index = STONE
+        face[p.kindL] = K_RAW
+        for loop in face.loops:
+            loop[p.col] = (tone[0] * k, tone[1] * k, tone[2] * k, 1.0)
+        n_core += len(poly) - 2
     for v in made:
         if not v.link_faces:
             p.bm.verts.remove(v)
     stats['core_tris'] = n_core
+    if '--holes' in argv:
+        view_report(p, first_core)
     lean_piece(p)
+    if '--holes' in argv:
+        footprint_report(p, 'head')
     print('SKIN', json.dumps(stats))
     return p
 
@@ -839,12 +1185,12 @@ def head():
 def hole_report(p):
     """A check for the builder, not part of the model: sight lines from
     outside to the carved surface that the skin does not stop (a hole a
-    walker could see the sky through). Prints how many and where."""
+    walker could see the core through). Prints how many and where."""
     from mathutils.bvhtree import BVHTree
     f = IDOL.field
     rng = np.random.default_rng(3)
     bvh = BVHTree.FromBMesh(p.bm, epsilon=0.0)
-    places = [(TAU * rng.random(), -1.0 + 19.0 * rng.random()) for _ in range(9000)]
+    places = [(TAU * rng.random(), -1.0 + 20.0 * rng.random()) for _ in range(9000)]
     Pn, Nn = skin_points(places)
     d = Nn + rng.normal(size=Nn.shape) * 0.45
     d[:, 2] = np.minimum(d[:, 2], 0.35)
@@ -854,7 +1200,7 @@ def hole_report(p):
     tf = np.linalg.norm(Q - O, axis=1)
     bad = []
     for i in range(len(O)):
-        if not hit[i] or Q[i][2] < gb(Q[i][0], Q[i][1]) - 0.2 or Q[i][2] > 15.2:
+        if not hit[i] or Q[i][2] < gb(Q[i][0], Q[i][1]) - 0.2 or Q[i][2] > HEAD_TOP - 0.2:
             continue
         if abs(Q[i][0]) < 2.7 and Q[i][1] < -1.1 and Q[i][2] < 6.4:
             continue      # the throat behind the engine's window
@@ -866,9 +1212,77 @@ def hole_report(p):
         cells[q] = cells.get(q, 0) + 1
     worst = sorted(cells.items(), key=lambda kv: -kv[1])[:24]
     print('HOLES', len(bad), 'of', int(hit.sum()), 'worst (lx, lz, y):', worst)
-    # and the simulation's contract: under three yards over the ground the
-    # stone stays inside the colliders it was fitted to
-    out, worst_out = 0, 0.0
+
+
+# where a walker stands to look at the idol (lx, lz, eye height over the ground or a level)
+LOOKS = {'road': (-13.0, -27.0, 2.6), 'causeway': (-0.8, -12.5, 1.7), 'maw': (0.5, -7.0, 1.7), 'west': (27.0, -3.0, 1.7),
+         'behind': (9.0, 20.0, 1.7), 'lagoon': (11.0, 36.0, None), 'ring': (-14.0, -8.0, 2.2)}
+
+
+def view_report(p, first_core):
+    """A check for the builder, not part of the model: from where walkers
+    stand, how much of what they see of the head is the core showing between
+    the skin's charts, and where. With --ascii NAME it prints the head as
+    that walker sees it (# skin, o core)."""
+    from mathutils.bvhtree import BVHTree
+    p.bm.faces.ensure_lookup_table()
+    p.bm.faces.index_update()
+    bvh = BVHTree.FromBMesh(p.bm, epsilon=0.0)
+    want = arg('--ascii', '')
+    for name, (lx, lz, eye) in LOOKS.items():
+        cam = B(lx, lz, gh(lx, lz) + eye if eye is not None else WATER_Y + 2.4)
+        aim = B(0.0, 6.0, 8.5)
+        fwd = (aim - cam).normalized()
+        right = fwd.cross(Vector((0, 0, 1))).normalized()
+        upv = right.cross(fwd)
+        seen = core = 0
+        where = {}
+        nx, ny = 96, 60
+        rows = []
+        for j in range(ny):
+            row = ''
+            for i in range(nx):
+                q = aim + right * ((i + 0.5) / nx - 0.5) * 30.0 + upv * (0.5 - (j + 0.5) / ny) * 26.0
+                d = (q - cam).normalized()
+                loc, _n, idx, _dist = bvh.ray_cast(cam, d, 90.0)
+                if loc is None or loc.z < gb(loc.x, loc.y) - 0.1:
+                    row += ' '
+                    continue
+                seen += 1
+                if abs(loc.x) < 3.2 and loc.y < -1.1 and loc.z < 6.6:
+                    row += '.'        # the throat behind the engine's window
+                elif idx >= first_core:
+                    core += 1
+                    key = (round(loc.x), round(-loc.y), round(loc.z))
+                    where[key] = where.get(key, 0) + 1
+                    row += 'o'
+                else:
+                    row += '#'
+            rows.append(row)
+        worst = sorted(where.items(), key=lambda kv: -kv[1])[:10]
+        print('VIEW', name, 'core', core, 'of', seen, '(%.2f%%)' % (100.0 * core / max(1, seen)), worst)
+        if name == want:
+            for row in rows[::2]:
+                print('|' + row + '|')
+    if want in ('side', 'face'):
+        # the head's outline, square on: from the west (south at the left) or from the south
+        for j in range(24):
+            y = 19.0 - j * 1.0
+            row = ''
+            for i in range(64):
+                if want == 'side':
+                    o, d = Vector((16.0, 8.0 - i * 0.5, y)), Vector((-1.0, 0.0, 0.0))
+                else:
+                    o, d = Vector((-16.0 + i * 0.5, 12.0, y)), Vector((0.0, -1.0, 0.0))
+                loc, _n, idx, _dist = bvh.ray_cast(o, d, 40.0)
+                row += ' ' if loc is None else ('o' if idx >= first_core else '#')
+            print('|' + row + '|')
+
+
+def footprint_report(p, name):
+    """The simulation's contract, checked on the leaned piece: under three
+    yards over the ground no stone stands outside the colliders."""
+    out, worst_out, where = 0, 0.0, None
     for v in p.bm.verts:
         x, z, y = v.co.x, -v.co.y, v.co.z
         if y > gh(x, z) + 3.0 or y < gh(x, z) - 0.3:
@@ -881,79 +1295,91 @@ def hole_report(p):
             over = min(over, max(abs(u) - c['hw'], abs(w) - c['hd']))
         if over > 0.05:
             out += 1
-            worst_out = max(worst_out, over)
-    print('FOOTPRINT verts outside the colliders under 3 yd:', out, 'worst by', round(worst_out, 3))
+            if over > worst_out:
+                worst_out, where = over, (round(x, 2), round(z, 2), round(y, 2))
+    print('FOOTPRINT', name, 'verts outside the colliders under 3 yd:', out, 'worst by', round(worst_out, 3), 'at', where)
 
 
 # ================================================================ the fangs
 def teeth():
-    """The fangs: the upper row hangs from the gum inside the upper lip, the
-    lower stands on the rami either side of the lane."""
+    """The fangs: few and big, as a cat's are. The two upper canines are the
+    dominant teeth, hung from under the whisker pads at the lip's front
+    corners; four small incisors between them; one shearing tooth back along
+    each side of the upper jaw. The lower canines stand on the rami's fronts
+    either side of the lane, a cheek tooth behind each."""
     p = P('Teeth', seed=5, moss=0.35)
     tips = []
+    front = sc.MUZZLE_FRONT
     for s in (1, -1):
-        # the great upper canines, out over the causeway
-        w, sp, rise = sc.Maw.section(-4.5)
-        x = w - 0.55
-        tip = B(s * (x - 0.22), -4.95, 2.6)
-        p.tooth(B(s * x, -4.5, sp + rise * math.sqrt(1 - (x / w) ** 2) + 0.4), tip, 0.62, IVORY, bend=(s * 0.14, 0.3, 0),
+        # the great upper canines
+        lzc = front + 0.75
+        w, sp, rise = sc.Maw.section(lzc)
+        x = w - 0.36
+        tip = B(s * (x - 0.3), lzc - 0.55, 2.45)
+        p.tooth(B(s * x, lzc, sp + rise * math.sqrt(1 - (x / w) ** 2) + 0.5), tip, 0.78, IVORY, bend=(s * 0.16, 0.34, 0),
                 sides=7)
         tips.append(tip)
         # the incisors between them
-        for (x, ln, r) in ((0.45, 1.05, 0.25), (1.15, 1.15, 0.27), (1.85, 1.3, 0.3)):
-            w, sp, rise = sc.Maw.section(-5.1)
+        lzi = front + 0.3
+        for (x, ln, r) in ((0.5, 0.75, 0.25), (1.4, 0.9, 0.28)):
+            w, sp, rise = sc.Maw.section(lzi)
             top = sp + rise * math.sqrt(max(0.0, 1 - (x / w) ** 2))
-            tip = B(s * x * 1.02, -5.28, top - ln)
-            p.tooth(B(s * x, -5.05, top + 0.3), tip, r, IVORY, bend=(0, 0.06, 0), sides=5)
-            if x < 1.5:
-                tips.append(tip)
+            tip = B(s * x * 1.02, lzi - 0.2, top - ln)
+            p.tooth(B(s * x, lzi, top + 0.3), tip, r, IVORY, bend=(0, 0.05, 0), sides=5)
+            tips.append(tip)
         # the shearing teeth back along the upper jaw
-        for (lz, ln, r) in ((-3.5, 1.3, 0.34), (-2.45, 1.15, 0.33), (-1.4, 1.0, 0.31), (-0.45, 0.8, 0.27)):
-            w, sp, _r = sc.Maw.section(lz)
-            p.tooth(B(s * (w - 0.1), lz, sp + 0.05), B(s * (w - 0.28), lz - 0.12, sp - ln), r, IVORY, bend=(0, 0.04, 0),
-                    sides=5)
-        # the lower jaw: the canine at the ramus's front, the molars along its gum
-        w, _sp, _r = sc.Maw.section(-0.7)
-        p.tooth(B(s * (w + 0.62), -0.3, sc.JAW_TOP - 0.6), B(s * (w + 0.5), -0.75, sc.JAW_TOP + 2.9), 0.56, IVORY,
-                bend=(0, 0.16, 0), sides=7)
-        for (lz, hh, r) in ((0.1, 0.95, 0.3), (0.75, 0.85, 0.29), (1.3, 0.7, 0.26)):
+        for (lz, ln, r) in ((-1.9, 1.55, 0.5),):
             w, _sp, _r = sc.Maw.section(lz)
-            p.tooth(B(s * (w + 0.5), lz, sc.JAW_TOP - 0.3), B(s * (w + 0.42), lz - 0.06, sc.JAW_TOP + hh), r, IVORY,
+            p.tooth(B(s * (w + 0.45), lz, sc.LIP_Z + 0.2), B(s * (w + 0.25), lz - 0.14, sc.LIP_Z - ln), r, IVORY,
+                    bend=(0, 0.05, 0), sides=5)
+        # the lower jaw: the canine at the ramus's front, two cheek teeth along its gum
+        w, _sp, _r = sc.Maw.section(-0.4)
+        p.tooth(B(s * (w + 0.7), 0.2, sc.JAW_TOP - 0.6), B(s * (w + 0.5), -0.55, sc.LIP_Z - 0.15), 0.56, IVORY,
+                bend=(0, 0.2, 0), sides=7)
+        for (lz, hh, r) in ((1.15, 1.05, 0.36),):
+            w, _sp, _r = sc.Maw.section(lz)
+            p.tooth(B(s * (w + 0.55), lz, sc.JAW_TOP - 0.3), B(s * (w + 0.45), lz - 0.06, sc.JAW_TOP + hh), r, IVORY,
                     sides=5)
         # the low teeth left of the cut-through front, along the lane
-        for (lz, hh) in ((-1.35, 0.7), (-0.75, 0.6), (-0.15, 0.52), (0.5, 0.46)):
+        for (lz, hh) in ((-1.2, 0.72), (-0.1, 0.56)):
             x = s * (max(LANE + 0.12, 1.81 - (lz + 1.56) * 0.477) + 0.3)
             gy = gh(x, lz)
-            p.tooth(B(x, lz, gy - 0.1), B(x + s * 0.05, lz - 0.05, gy + 0.3 + hh), 0.2, IVORY, sides=5)
+            p.tooth(B(x, lz, gy - 0.1), B(x + s * 0.05, lz - 0.05, gy + 0.3 + hh), 0.21, IVORY, sides=5)
     for q in tips:
         SOCKETS['drips'].append(leaned(q))
         p.streaks.append((q + Vector((0, 0, 3.4)), 0.45, 2.2, 0.5))
     lean_piece(p)
+    if '--holes' in argv:
+        footprint_report(p, 'teeth')
     return p
 
 
 # ================================================================ the strangler fig
 FIG = dict(x=0.5, z=HEAD_Z + 1.6, y=HEAD_TOP - 0.3)
-FORK = 23.2
+FORK = 24.4
 # the crown's masses (lx, lz, y, radius): one over all, a ring under it, a
 # wider ring lower, three outliers on the longest limbs
-CROWN = [(0.8, 10.6, 31.4, 4.8), (-4.4, 7.6, 29.3, 4.6), (6.0, 8.4, 29.8, 4.9), (1.0, 15.2, 29.4, 4.6),
-         (-7.2, 12.4, 26.6, 4.0), (10.4, 13.0, 26.8, 4.3), (10.0, 5.6, 26.6, 4.1), (-6.8, 5.2, 26.4, 3.6),
-         (2.0, 4.4, 27.6, 3.6), (-2.6, 17.6, 26.4, 3.8), (5.6, 17.8, 26.0, 3.6), (13.4, 9.4, 24.4, 3.2),
-         (-8.8, 9.0, 24.2, 2.8), (0.6, 19.8, 24.0, 3.0), (3.2, 11.4, 27.6, 3.0), (-1.8, 10.6, 27.0, 2.8)]
+CROWN_LIFT = 1.3      # the crown went up with the skull, so the ears still stand against the sky
+CROWN = [(x, z, y + CROWN_LIFT, r) for (x, z, y, r) in (
+    (0.8, 10.6, 31.4, 4.8), (-4.4, 7.6, 29.3, 4.6), (6.0, 8.4, 29.8, 4.9), (1.0, 15.2, 29.4, 4.6),
+    (-7.2, 12.4, 26.6, 4.0), (10.4, 13.0, 26.8, 4.3), (10.0, 5.6, 26.6, 4.1), (-6.8, 5.2, 26.4, 3.6),
+    (2.0, 4.4, 27.6, 3.6), (-2.6, 17.6, 26.4, 3.8), (5.6, 17.8, 26.0, 3.6), (13.4, 9.4, 24.4, 3.2),
+    (-8.8, 9.0, 24.2, 2.8), (0.6, 19.8, 24.0, 3.0), (3.2, 11.4, 27.6, 3.0), (-1.8, 10.6, 27.0, 2.8))]
 ROOTS = [
-    # down the west temple and cheek, to the bank
-    ([(0.42, 18.2), (0.72, 15.6), (0.93, 13.0), (1.0, 10.6), (1.1, 8.0), (1.04, 5.6), (1.14, 3.4), (1.1, 1.0)], 0.46, 0.18),
-    # over the forehead, down the east side of the nose, onto the muzzle
-    ([(-0.04, 18.2), (-0.08, 16.0), (-0.1, 13.8), (-0.12, 11.8), (-0.15, 10.2), (-0.2, 8.6), (-0.3, 7.2)], 0.34, 0.14),
-    # round the broken east ear and down the east cheek into the rise
-    ([(-0.62, 18.2), (-0.95, 15.2), (-1.06, 12.6), (-1.0, 10.0), (-1.12, 7.6), (-1.07, 5.2), (-1.16, 3.2), (-1.1, 1.0)],
-     0.38, 0.15),
-    ([(-1.95, 17.9), (-2.02, 14.8), (-1.95, 12.0), (-2.06, 9.0), (-2.0, 6.2), (-2.09, 3.4), (-2.02, 0.6)], 0.42, 0.16),
-    # down the west flank and round the back, into the bank and the knoll
-    ([(1.95, 17.9), (2.06, 14.6), (2.0, 11.6), (2.1, 8.6), (2.04, 5.6), (2.13, 3.2), (2.05, 0.2), (2.1, -2.2)], 0.5, 0.19),
-    ([(2.52, 17.8), (2.62, 14.4), (2.55, 11.0), (2.66, 7.6), (2.6, 4.6), (2.68, 2.0), (2.6, -1.0)], 0.36, 0.14),
-    ([(-2.6, 17.7), (-2.7, 14.2), (-2.62, 10.6), (-2.73, 7.2), (-2.66, 4.2), (-2.7, 1.6)], 0.38, 0.15),
+    # down the west temple behind the ear, the cheek, to the bank
+    ([(0.6, 19.0), (1.0, 16.6), (1.5, 14.0), (1.42, 11.6), (1.47, 9.2), (1.5, 6.8), (1.45, 4.6), (1.5, 2.6), (1.45, 0.6)],
+     0.46, 0.18),
+    # over the forehead, down the east side of the bridge, onto the muzzle
+    ([(-0.04, 19.0), (-0.1, 17.2), (-0.2, 15.2), (-0.28, 13.4), (-0.3, 11.6), (-0.34, 10.2), (-0.36, 9.0)], 0.34, 0.14),
+    # round the broken east ear and down the crack it has split in the east cheek, into the rise
+    ([(-0.7, 19.0), (-1.3, 16.4)] + CRACK + [(-1.5, 4.6), (-1.45, 2.6), (-1.5, 0.8)], 0.44, 0.17),
+    ([(-1.95, 18.9), (-2.02, 15.8), (-1.95, 12.6), (-2.06, 9.4), (-2.0, 6.4), (-2.09, 3.4), (-2.02, 0.6)], 0.4, 0.16),
+    # down the west flank into the bank
+    ([(1.95, 18.9), (2.02, 16.4), (1.97, 13.4), (1.96, 10.0), (2.02, 6.6), (1.97, 3.2), (2.03, 0.2), (1.98, -2.2)], 0.46, 0.18),
+    # into the collapse in the nape, and out of its foot into the knoll
+    ([(2.44, 18.8), (2.5, 16.0), (2.46, 13.2), (2.54, 10.6), (2.48, 8.4), (2.55, 6.2), (2.5, 4.0), (2.56, 1.6),
+      (2.5, -1.0)], 0.52, 0.2),
+    ([(-2.6, 18.7), (-2.7, 15.2), (-2.62, 11.6), (-2.73, 8.2), (-2.66, 5.2), (-2.7, 1.6)], 0.38, 0.15),
 ]
 
 
@@ -998,7 +1424,7 @@ def fig():
                 k += 1
                 line.append((th + (0.035 if k % 2 else -0.03), v))
         Pn, _n = skin_points(line, lift=r0 * 0.55)
-        pts = ([base + Vector((line[0][0] * 0.3, 0.0, 0.1))] if line[0][1] > 17 else []) + [Vector(q) for q in Pn]
+        pts = ([base + Vector((line[0][0] * 0.3, 0.0, 0.1))] if line[0][1] > 18 else []) + [Vector(q) for q in Pn]
         path = p.limb(pts, r0, r1, p.vary(BARK, 0.1), sides=5 if r0 > 0.4 else 4, wobble=0.03, steps=2)
         for k in ((len(path) // 2, 3 * len(path) // 4) if i % 2 == 0 else (len(path) // 2,)):
             q = path[k]
@@ -1259,19 +1685,19 @@ def growth():
         p.kelp(top, rng.uniform(3.0, 8.0), (math.cos(a), -math.sin(a), 0), width=0.7, blades=3, blade=0.05)
     tally('lianas')
     # hanging leaf curtains off the brows, the flews, the jowls and the nape's overhang
-    hang = [(s * th, v, ln) for s in (1, -1) for (th, v, ln) in ((0.4, 13.2, 1.0), (0.8, 12.8, 1.6), (1.18, 4.75, 2.0),
-                                                                  (1.75, 4.6, 2.4), (2.4, 4.5, 2.2), (0.44, 5.0, 1.4))]
-    hang += [(3.05, 4.6, 2.0), (-2.9, 4.7, 1.6)]
+    under = sc.COLLAR['z0'] + 0.05
+    hang = [(s * th, v, ln) for s in (1, -1) for (th, v, ln) in ((1.3, under, 2.0), (1.9, under, 2.4), (0.44, 5.0, 1.4))]
+    hang += [(3.05, under, 2.0), (-2.5, under, 1.6)]
     Pn, Nn = skin_points([(th, v) for (th, v, _ln) in hang], lift=0.08)
     for (q, n, (_th, _v, ln)) in zip(Pn, Nn, hang):
         p.weed(L(q), ln, level(n), width=1.3, strands=3, leaf=0.26, density=0.85)
     tally('curtains')
     # moss, fern and a trailing vine on every ledge of the skull (the brows,
     # the muzzle, the cheekbones, the crown)
-    places = [(TAU * i / 56, 3.4 + 0.8 * j) for j in range(19) for i in range(56)]
+    places = [(TAU * i / 56, 6.4 + 0.8 * j) for j in range(17) for i in range(56)]
     Pn, Nn = skin_points(places)
     for (q, n, (th, v)) in zip(Pn, Nn, places):
-        if n[2] < 0.62 or (abs(wrap(th)) < 0.82 and 9.8 < v < 12.0) or rng.random() < 0.93:
+        if n[2] < 0.62 or (abs(wrap(th)) < 0.82 and 9.8 < v < 12.0) or rng.random() < 0.945:
             continue
         r = rng.random()
         if r < 0.5:

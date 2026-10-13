@@ -9,8 +9,8 @@
 // entrance's, which ships 49,082 and 859 KB). The head is now a skin of fitted
 // megaliths over a carved form, and with no texture every joint, chamfer,
 // chip and weathering gradient inside a block is geometry and vertex colour:
-// the idol alone is 39,823 triangles. The caps are 64,000 triangles and 1.25
-// MB; the growth was cut from 22,735 to 17,925 to pay for part of it.
+// the idol alone is 39,618 triangles. The caps are 64,000 triangles and 1.25
+// MB; the growth was cut from 22,735 to 17,072 to pay for part of it.
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -24,26 +24,27 @@ import {
 } from '../scripts/assets/wildheart_basin_entrance/build.mjs';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { wildheartBasinEntrancePreloadInternalsForTest } from '../src/render/wildheart_basin_entrance';
+import { WILDHEART_EAR_TOP } from '../src/render/wildheart_basin_entrance_core';
 
 const ROOT = path.join(__dirname, '..');
 
 const PINS: Record<string, { sha: string; bytes: number; triangles: number; maxBytes: number }> = {
   'public/models/props/wildheart_basin_entrance.glb': {
-    sha: 'ad6c1ad92781d301ade5c92c66c06def776aad6efe560dcbd585381188f710e0',
-    bytes: 715876,
-    triangles: 39823,
+    sha: '1d8c81c3104724698b72f8b2e7803106e6213954bb977b852c77c729ad9c99a2',
+    bytes: 724112,
+    triangles: 39618,
     maxBytes: 760 * 1024,
   },
   'public/models/props/wildheart_basin_entrance_court.glb': {
-    sha: 'f7d07bcec2d40c14bef50a32dde8d8962ce61a1289b103e1c5897fc2a9ca2d38',
-    bytes: 91528,
+    sha: 'a4bb7c0d31b60198795a0ae7b28a7e03f43951e534fea922fb3b80221fb2641e',
+    bytes: 92348,
     triangles: 4738,
     maxBytes: 120 * 1024,
   },
   'public/models/props/wildheart_basin_entrance_growth.glb': {
-    sha: '7c87336b871bc1da03afdac6baa5df59abaeeba434d97f709a22955a12653dd9',
-    bytes: 404880,
-    triangles: 17925,
+    sha: 'abfeaedc4eb0bdc40389bf9bf5a17d11978076e97b74054a5a0cb70f9822b1b8',
+    bytes: 390596,
+    triangles: 17072,
     maxBytes: 440 * 1024,
   },
 };
@@ -152,6 +153,46 @@ describe('the Jaguar Maw shipping assets', () => {
     const pins = Object.values(PINS);
     expect(pins.reduce((sum, p) => sum + p.triangles, 0)).toBeLessThanOrEqual(64_000);
     expect(pins.reduce((sum, p) => sum + p.bytes, 0)).toBeLessThanOrEqual(1.25 * 1024 * 1024);
+  });
+
+  it("the ears' tips stand under the top of the head's occluder box", async () => {
+    // The ears are the idol's highest stone, over the sim's camera top for
+    // the head (15.8) and over the crown (17.2). The render raises the head's
+    // occluder box to WILDHEART_EAR_TOP: a rebuild that grows the ears must
+    // move that number with them. Read here from the shipped file: the stone
+    // over each skull corner, under the fig's fork (its limbs start at 23).
+    await MeshoptDecoder.ready;
+    const doc = await new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
+      .readBinary(readFileSync(path.join(ROOT, WILDHEART_BASIN_ENTRANCE_ASSETS[0].target)));
+    const tips = { west: -Infinity, east: -Infinity };
+    for (const node of doc.getRoot().listNodes()) {
+      const mesh = node.getMesh();
+      if (!mesh) continue;
+      const m = node.getWorldMatrix();
+      for (const prim of mesh.listPrimitives()) {
+        const position = prim.getAttribute('POSITION');
+        if (!position) continue;
+        const v = [0, 0, 0];
+        for (let i = 0; i < position.getCount(); i++) {
+          position.getElement(i, v);
+          const x = m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12];
+          const y = m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13];
+          const lz = m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14];
+          if (y < 17.4 || y > 22 || lz < 2 || lz > 9.5 || Math.abs(x) < 4.5) continue;
+          const side = x > 0 ? 'west' : 'east';
+          tips[side] = Math.max(tips[side], y);
+        }
+      }
+    }
+    // both ears stand over the crown (the east one has lost its outer corner,
+    // and the idol's lean lifts what is left of it over the west one's tip)
+    for (const tip of [tips.west, tips.east]) {
+      expect(tip).toBeGreaterThan(18.5);
+      expect(tip).toBeLessThanOrEqual(WILDHEART_EAR_TOP);
+      expect(WILDHEART_EAR_TOP - tip).toBeLessThan(1);
+    }
   });
 
   it("the model reaches from under the bank to the fig's crown and no further than its footprint", async () => {
