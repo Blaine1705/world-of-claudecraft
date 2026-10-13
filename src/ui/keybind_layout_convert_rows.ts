@@ -7,26 +7,24 @@
 // at its line ceiling (tests/monolith_budget.test.ts).
 
 import { audio } from '../game/audio';
-import { BIND_ACTIONS } from '../game/keybinds';
 import { useTouchInterface } from '../game/mobile_controls';
 import { formatNumber, t } from './i18n';
 import type { KeybindSetup } from './keybind_transfer_core';
 import {
   convertBindingsLayout,
+  DEFAULT_SOURCE_LAYOUT,
   isKeyboardLayoutId,
   KEYBOARD_LAYOUTS,
   type KeyboardLayoutId,
-  startingSourceLayout,
 } from './keyboard_layout_convert_core';
-import { loadKeybindSourceLayout, saveKeybindSourceLayout } from './keyboard_layout_pref_core';
 import { detectOsKeyboardLayout } from './keyboard_map';
 
 /** The seam the options painter hands in; OptionsWindowDeps satisfies it
  *  structurally. */
 export interface KeybindLayoutConvertDeps {
-  /** The live Keybinds store: its snapshot, and the profile key the last
-   *  conversion target is remembered under. */
-  keybinds(): { snapshot(): KeybindSetup; profileKey(): string };
+  /** The live Keybinds store: its snapshot, and the layout it was last
+   *  converted to (Reset and an imported code clear it). */
+  keybinds(): { snapshot(): KeybindSetup; convertedLayout(): string | null };
   /** The shared themed dropdown. */
   buildDropdown(
     options: { value: string; label: string }[],
@@ -42,17 +40,17 @@ export interface KeybindLayoutConvertDeps {
   detectLayout?(): Promise<KeyboardLayoutId | null>;
 }
 
-/** The held (movement) actions the keep-in-place switch pins. */
-export const MOVEMENT_ACTION_IDS: ReadonlySet<string> = new Set(
-  BIND_ACTIONS.filter((a) => a.kind === 'held').map((a) => a.id),
-);
-
-/** The registry's default setup, the shape Keybinds.snapshot() has after a Reset. */
-function defaultSetup(): KeybindSetup {
-  const out: KeybindSetup = {};
-  for (const a of BIND_ACTIONS) out[a.id] = [a.defaults[0] ?? null, a.defaults[1] ?? null];
-  return out;
-}
+/** The move and turn actions the keep-in-place switch pins (the WASD and QE
+ *  cluster). Deliberately not every held action: the Emote Wheel's X is a
+ *  letter like any other and follows it. */
+export const MOVEMENT_ACTION_IDS: ReadonlySet<string> = new Set([
+  'forward',
+  'back',
+  'turnLeft',
+  'turnRight',
+  'strafeLeft',
+  'strafeRight',
+]);
 
 /** Set across one apply: the rebuild it triggers focuses the new Convert opener. */
 let refocusOpener = false;
@@ -61,11 +59,12 @@ const layoutLabel = (id: KeyboardLayoutId): string =>
   t(KEYBOARD_LAYOUTS.find((l) => l.id === id)?.labelKey ?? KEYBOARD_LAYOUTS[0].labelKey);
 
 /** Append the row and its expando to `body`. `apply` replaces the live map with
- *  the converted snapshot and shows `note` (the painter's applyKeybindSetup). */
+ *  the converted snapshot, records `layout` as its new source, and shows `note`
+ *  (the painter's applyKeybindSetup). */
 export function buildKeybindLayoutConvertRow(
   body: HTMLElement,
   deps: KeybindLayoutConvertDeps,
-  apply: (binds: KeybindSetup, note: string) => void,
+  apply: (binds: KeybindSetup, note: string, layout: KeyboardLayoutId) => void,
 ): void {
   // Keyboard-only, like the keyboard overview: touch has no layout to convert.
   if (useTouchInterface()) return;
@@ -99,12 +98,10 @@ export function buildKeybindLayoutConvertRow(
     openBtn.focus();
   }
 
-  const profile = deps.keybinds().profileKey();
-  const from = startingSourceLayout(
-    loadKeybindSourceLayout(profile),
-    deps.keybinds().snapshot(),
-    defaultSetup(),
-  );
+  // Start from the layout these hotkeys were last converted to, so a second
+  // Convert never re-scrambles them; as authored they are QWERTY (US).
+  const last = deps.keybinds().convertedLayout();
+  const from = last !== null && isKeyboardLayoutId(last) ? last : DEFAULT_SOURCE_LAYOUT;
   const state = {
     from,
     to: from,
@@ -203,17 +200,21 @@ export function buildKeybindLayoutConvertRow(
     const { binds, moved } = convert();
     if (moved === 0) return;
     audio.click();
-    saveKeybindSourceLayout(profile, state.to);
     refocusOpener = true;
-    apply(
-      binds,
-      t('hudChrome.keybindLayout.converted', {
-        from: layoutLabel(state.from),
-        to: layoutLabel(state.to),
-      }),
-    );
-    // A painter that does not rebuild leaves the flag for nobody; clear it.
-    refocusOpener = false;
+    try {
+      apply(
+        binds,
+        t('hudChrome.keybindLayout.converted', {
+          from: layoutLabel(state.from),
+          to: layoutLabel(state.to),
+        }),
+        state.to,
+      );
+    } finally {
+      // Consumed by the rebuild; a painter that did not rebuild (or threw)
+      // must not leave it for the next, unrelated one.
+      refocusOpener = false;
+    }
   });
 
   openBtn.addEventListener('click', () => {

@@ -541,6 +541,12 @@ const SLOTS_PER_ACTION = 2; // primary + secondary
 // means deciding (and documenting here) whether existing marked profiles need to
 // see it too, e.g. by moving this to a version number bumped for that signature.
 const REPAIR_MARKER = '__repaired';
+// The keyboard layout this profile's hotkeys were last converted to by the Key
+// Bindings layout converter (src/ui/keyboard_layout_convert_core.ts ids), kept
+// in the profile blob so Reset and an imported setup clear it and a fresh
+// character seeded from the legacy blob inherits it with the bindings. Like
+// REPAIR_MARKER it is never a BIND_ACTIONS id, so the id-keyed loops skip it.
+const LAYOUT_MARKER = '__layout';
 
 export function actionKind(id: string): BindKind | null {
   return ACTION_BY_ID.get(id)?.kind ?? null;
@@ -773,6 +779,8 @@ export function keyCapLabel(label: string): string {
 export class Keybinds {
   // actionId -> [primary, secondary] codes (either may be null)
   private map = new Map<string, (string | null)[]>();
+  // The layout converter's last target for these bindings (LAYOUT_MARKER).
+  private layout: string | null = null;
   // localStorage key this profile reads/writes. A non-empty scope namespaces it
   // per character; an empty scope keeps the bare legacy/global key.
   private readonly storeKey: string;
@@ -815,6 +823,8 @@ export class Keybinds {
       repairStoredBindings(obj);
     }
     this.applyBlob(obj);
+    const layout = obj[LAYOUT_MARKER];
+    this.layout = typeof layout === 'string' ? layout : null;
   }
 
   /**
@@ -879,10 +889,10 @@ export class Keybinds {
     return obj;
   }
 
-  /** The localStorage key this profile persists under, so a per-profile
-   *  companion preference (the layout-converter's last target) can key by it. */
-  profileKey(): string {
-    return this.storeKey;
+  /** The keyboard layout these hotkeys were last converted to, or null when
+   *  they are as authored (defaults, a reset, an imported code). */
+  convertedLayout(): string | null {
+    return this.layout;
   }
 
   /**
@@ -891,16 +901,18 @@ export class Keybinds {
    * codes skipped, one code per action, missing actions keep their defaults).
    * Persists immediately, so the setup survives a reload like any rebind.
    */
-  importBindings(obj: Record<string, unknown>): void {
+  importBindings(obj: Record<string, unknown>, convertedLayout: string | null = null): void {
     this.map = this.defaults();
     this.applyBlob(obj);
+    this.layout = convertedLayout;
     this.save();
   }
 
   private save(): void {
-    const obj: Record<string, (string | null)[] | boolean> = {};
+    const obj: Record<string, (string | null)[] | boolean | string> = {};
     for (const [id, codes] of this.map) obj[id] = codes;
     obj[REPAIR_MARKER] = true;
+    if (this.layout !== null) obj[LAYOUT_MARKER] = this.layout;
     try {
       localStorage.setItem(this.storeKey, JSON.stringify(obj));
     } catch {
@@ -1030,6 +1042,7 @@ export class Keybinds {
 
   reset(): void {
     this.map = this.defaults();
+    this.layout = null;
     this.save();
   }
 

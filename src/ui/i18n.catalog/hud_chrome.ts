@@ -5850,8 +5850,9 @@ export const hudChromeStrings = {
     open: 'Convert',
     from: 'Hotkeys made for',
     to: 'Convert to',
+    // The six move and turn actions (the WASD and QE keys); every other hotkey converts.
     keepMovement: 'Keep movement keys in place',
-    help: 'Each hotkey moves to the key that prints the same character on the new layout, so M still opens the map. The number row stays where it is.',
+    help: 'Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.',
     // {count} is how many hotkeys land on a different key.
     moves: 'Hotkeys that will move: {count}',
     noChange: 'No hotkeys change between these layouts.',
@@ -5867,7 +5868,9 @@ export const hudChromeStrings = {
       azertyBe: 'AZERTY (Belgian)',
       qwertyEs: 'QWERTY (Spanish)',
       qwertyIt: 'QWERTY (Italian)',
-      qwertyNordic: 'QWERTY (Nordic)',
+      qwertyNordic: 'QWERTY (Swedish, Finnish)',
+      qwertyDa: 'QWERTY (Danish)',
+      qwertyNo: 'QWERTY (Norwegian)',
       qwertyBr: 'QWERTY (Brazilian ABNT2)',
       dvorak: 'Dvorak',
       colemak: 'Colemak',

@@ -1832,11 +1832,11 @@ export class OptionsWindow {
       },
     });
     body.appendChild(wrap);
-    buildKeybindLayoutConvertRow(body, this.deps, (b, note) => this.applyKeybindSetup(b, note));
+    buildKeybindLayoutConvertRow(body, this.deps, (...a) => this.applyKeybindSetup(...a));
   }
 
-  private applyKeybindSetup(binds: KeybindSetup, note: string): void {
-    this.deps.keybinds().importBindings(binds);
+  private applyKeybindSetup(binds: KeybindSetup, note: string, layout: string | null = null): void {
+    this.deps.keybinds().importBindings(binds, layout);
     this.dropKeyCapture();
     this.keybindNote = note;
     this.deps.refreshKeybindLabels();

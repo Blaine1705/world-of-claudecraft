@@ -11,7 +11,6 @@
 // only codes), so the player picks the form factor once and the overview hides
 // the blocks that board does not have.
 
-import { isKeyboardLayoutId, type KeyboardLayoutId } from './keyboard_layout_convert_core';
 import type { KeyboardFormFactor, KeyboardLegendSource } from './keyboard_map_core';
 import { KEYBOARD_FORM_FACTORS, KEYBOARD_LEGEND_SOURCES } from './keyboard_map_core';
 import { safeLocalStorage } from './safe_local_storage';
@@ -62,48 +61,6 @@ export function loadKeyboardLegendSource(
       : DEFAULT_LEGEND_SOURCE;
   } catch {
     return DEFAULT_LEGEND_SOURCE;
-  }
-}
-
-/** The layout converter's last target per keybind profile (Keybinds.profileKey),
- *  so the next conversion starts from the layout the hotkeys now follow and a
- *  second Convert never re-scrambles an already-converted setup. One JSON map
- *  keyed by profile: keybinds are per character, so this is too. */
-export const KEYBIND_SOURCE_LAYOUT_STORE_KEY = 'woc_keybind_source_layout';
-
-function readSourceLayouts(storage: Pick<Storage, 'getItem'> | null): Map<string, unknown> {
-  try {
-    const raw = storage?.getItem(KEYBIND_SOURCE_LAYOUT_STORE_KEY);
-    const parsed: unknown = raw ? JSON.parse(raw) : null;
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
-      ? new Map(Object.entries(parsed))
-      : new Map();
-  } catch {
-    return new Map();
-  }
-}
-
-/** The layout this profile's hotkeys were last converted to, or null. */
-export function loadKeybindSourceLayout(
-  profile: string,
-  storage: Pick<Storage, 'getItem'> | null = safeLocalStorage(),
-): KeyboardLayoutId | null {
-  const value = readSourceLayouts(storage).get(profile);
-  return typeof value === 'string' && isKeyboardLayoutId(value) ? value : null;
-}
-
-/** Record the layout this profile's hotkeys were just converted to. */
-export function saveKeybindSourceLayout(
-  profile: string,
-  layout: KeyboardLayoutId,
-  storage: Pick<Storage, 'getItem' | 'setItem'> | null = safeLocalStorage(),
-): void {
-  const all = readSourceLayouts(storage);
-  all.set(profile, layout);
-  try {
-    storage?.setItem(KEYBIND_SOURCE_LAYOUT_STORE_KEY, JSON.stringify(Object.fromEntries(all)));
-  } catch {
-    /* storage unavailable */
   }
 }
 

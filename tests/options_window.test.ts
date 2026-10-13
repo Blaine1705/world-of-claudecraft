@@ -129,9 +129,9 @@ describe('options_window: hotkey setup row', () => {
     expect(rows).toContain(
       "this.applyKeybindSetup(parsed.binds, t('hudChrome.keybindTransfer.imported'));",
     );
-    expect(rows).toContain('this.deps.keybinds().importBindings(binds);');
+    expect(rows).toContain('this.deps.keybinds().importBindings(binds, layout);');
     expect(rows).toContain(
-      'buildKeybindLayoutConvertRow(body, this.deps, (b, note) => this.applyKeybindSetup(b, note));',
+      'buildKeybindLayoutConvertRow(body, this.deps, (...a) => this.applyKeybindSetup(...a));',
     );
     expect(rows).toContain("'hudChrome.keybindTransfer.wrongKind'");
     // The hollow-code refusal lives in the core (pinned in

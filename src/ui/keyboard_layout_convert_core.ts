@@ -32,6 +32,8 @@ export type KeyboardLayoutId =
   | 'qwerty-es'
   | 'qwerty-it'
   | 'qwerty-nordic'
+  | 'qwerty-da'
+  | 'qwerty-no'
   | 'qwerty-br'
   | 'dvorak'
   | 'colemak';
@@ -157,6 +159,16 @@ export const KEYBOARD_LAYOUTS: readonly KeyboardLayoutSpec[] = [
     chars: rows("q w e r t y u i o p å ¨ '", 'a s d f g h j k l ö ä', '< z x c v b n m , . -'),
   },
   {
+    id: 'qwerty-da',
+    labelKey: 'hudChrome.keybindLayout.layouts.qwertyDa',
+    chars: rows("q w e r t y u i o p å ¨ '", 'a s d f g h j k l æ ø', '< z x c v b n m , . -'),
+  },
+  {
+    id: 'qwerty-no',
+    labelKey: 'hudChrome.keybindLayout.layouts.qwertyNo',
+    chars: rows("q w e r t y u i o p å ¨ '", 'a s d f g h j k l ø æ', '< z x c v b n m , . -'),
+  },
+  {
     id: 'qwerty-br',
     labelKey: 'hudChrome.keybindLayout.layouts.qwertyBr',
     chars: rows('q w e r t y u i o p ´ [ ]', 'a s d f g h j k l ç ~', '\\ z x c v b n m , . ;'),
@@ -261,24 +273,6 @@ export function convertBindingsLayout(
     });
   }
   return { binds: out, moved };
-}
-
-/** Which layout the converter's "made for" picker starts on: the profile's last
- *  conversion target, unless the setup is back to its defaults (a Reset), which
- *  are authored for DEFAULT_SOURCE_LAYOUT. */
-export function startingSourceLayout(
-  lastTarget: KeyboardLayoutId | null,
-  binds: KeybindSetup,
-  defaults: KeybindSetup,
-): KeyboardLayoutId {
-  if (lastTarget === null) return DEFAULT_SOURCE_LAYOUT;
-  const ids = new Set([...Object.keys(binds), ...Object.keys(defaults)]);
-  const atDefaults = [...ids].every(
-    (id) =>
-      (binds[id]?.[0] ?? null) === (defaults[id]?.[0] ?? null) &&
-      (binds[id]?.[1] ?? null) === (defaults[id]?.[1] ?? null),
-  );
-  return atDefaults ? DEFAULT_SOURCE_LAYOUT : lastTarget;
 }
 
 /** The bare code of a combo: the part after the last modifier "+". */

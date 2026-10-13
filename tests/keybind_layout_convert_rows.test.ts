@@ -24,10 +24,10 @@ function rig(detected: KeyboardLayoutId | null) {
   document.body.innerHTML = '<div id="body"></div>';
   const host = document.getElementById('body') as HTMLElement;
   const dropdowns: { el: HTMLElement; onChange?: (v: string) => void }[] = [];
-  const applied: { binds: KeybindSetup; note: string }[] = [];
+  const applied: { binds: KeybindSetup; note: string; layout: string }[] = [];
   let resolveDetect: (id: KeyboardLayoutId | null) => void = () => {};
   const deps: KeybindLayoutConvertDeps = {
-    keybinds: () => ({ snapshot: () => structuredClone(SETUP), profileKey: () => 'p1' }),
+    keybinds: () => ({ snapshot: () => structuredClone(SETUP), convertedLayout: () => null }),
     buildDropdown: (_options, current, onChange) => {
       const el = document.createElement('div');
       el.dataset.value = current;
@@ -43,7 +43,9 @@ function rig(detected: KeyboardLayoutId | null) {
         resolveDetect = resolve;
       }),
   };
-  buildKeybindLayoutConvertRow(host, deps, (binds, note) => applied.push({ binds, note }));
+  buildKeybindLayoutConvertRow(host, deps, (binds, note, layout) =>
+    applied.push({ binds, note, layout }),
+  );
   const open = host.querySelector<HTMLButtonElement>('.kb-layout .set-toggle')!;
   const pane = host.querySelector<HTMLElement>('.kb-layout-pane')!;
   const status = pane.querySelector<HTMLElement>('[role="status"]')!;
@@ -69,7 +71,6 @@ function rig(detected: KeyboardLayoutId | null) {
 describe('buildKeybindLayoutConvertRow', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
-    localStorage.clear();
   });
   afterEach(() => {
     setInterfaceMode('auto');
@@ -87,7 +88,7 @@ describe('buildKeybindLayoutConvertRow', () => {
     await r.detect();
     expect(r.dropdowns[1].el.dataset.value).toBe('azerty-fr');
     // Only the map moves (KeyM -> Semicolon); movement is kept, digits stay.
-    expect(r.status.textContent).toContain('1');
+    expect(r.status.textContent).toBe('Hotkeys that will move: 1');
     expect(r.apply.disabled).toBe(false);
     for (const dd of r.dropdowns) {
       expect(dd.el.querySelector('.ui-dd-btn')?.classList.contains('ui-btn')).toBe(true);
@@ -101,13 +102,14 @@ describe('buildKeybindLayoutConvertRow', () => {
     expect(r.keep.getAttribute('aria-pressed')).toBe('true');
     r.keep.click();
     expect(r.keep.getAttribute('aria-pressed')).toBe('false');
-    expect(r.status.textContent).toContain('2');
+    expect(r.status.textContent).toBe('Hotkeys that will move: 2');
     r.apply.click();
     expect(r.applied).toHaveLength(1);
     expect(r.applied[0].binds.forward).toEqual(['KeyZ', 'ArrowUp']);
     expect(r.applied[0].binds.map).toEqual(['Semicolon', null]);
     expect(r.applied[0].binds.slot1).toEqual(['Digit1', null]);
-    expect(r.applied[0].note).toContain('AZERTY');
+    expect(r.applied[0].note).toBe('Hotkeys converted from QWERTY (US) to AZERTY (French).');
+    expect(r.applied[0].layout).toBe('azerty-fr');
   });
 
   it('keeps a target the player already picked when detection lands late', async () => {
@@ -136,9 +138,13 @@ describe('buildKeybindLayoutConvertRow', () => {
     document.body.innerHTML = '<div id="body"></div>';
     const host = document.getElementById('body') as HTMLElement;
     let live = structuredClone(SETUP);
+    let liveLayout: string | null = null;
     let froms: HTMLElement[] = [];
     const deps: KeybindLayoutConvertDeps = {
-      keybinds: () => ({ snapshot: () => structuredClone(live), profileKey: () => 'p1' }),
+      keybinds: () => ({
+        snapshot: () => structuredClone(live),
+        convertedLayout: () => liveLayout,
+      }),
       buildDropdown: (_o, current) => {
         const el = document.createElement('div');
         el.dataset.value = current;
@@ -153,8 +159,9 @@ describe('buildKeybindLayoutConvertRow', () => {
     const build = () => {
       host.replaceChildren();
       froms = [];
-      buildKeybindLayoutConvertRow(host, deps, (binds) => {
+      buildKeybindLayoutConvertRow(host, deps, (binds, _note, layout) => {
         live = binds;
+        liveLayout = layout;
         build();
       });
     };
@@ -175,8 +182,11 @@ describe('buildKeybindLayoutConvertRow', () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(applyBtn().disabled).toBe(true);
-    // The reset-to-defaults fallback is pinned on startingSourceLayout in
-    // tests/keyboard_layout_convert_core.test.ts.
+    // A Reset or an imported code clears the record (Keybinds, pinned in
+    // tests/keybinds.test.ts): the row is back to QWERTY (US).
+    liveLayout = null;
+    build();
+    expect(froms[0].dataset.value).toBe('qwerty-us');
   });
 
   it('builds nothing on the touch interface, which has no keyboard to convert', () => {

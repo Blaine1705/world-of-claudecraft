@@ -476,6 +476,34 @@ describe('snapshot / importBindings (hotkey setup export + import)', () => {
     expect(reloaded.snapshot()).toEqual(kb.snapshot());
   });
 
+  it('remembers the layout a setup was converted to, until a Reset or a plain import', () => {
+    const kb = new Keybinds('char:1');
+    expect(kb.convertedLayout()).toBe(null);
+    kb.importBindings({ map: ['Semicolon', null] }, 'azerty-fr');
+    expect(kb.convertedLayout()).toBe('azerty-fr');
+    // Persisted with the profile, outside the action rows and the snapshot.
+    const reloaded = new Keybinds('char:1');
+    expect(reloaded.convertedLayout()).toBe('azerty-fr');
+    expect(reloaded.codeAt('map', 0)).toBe('Semicolon');
+    expect(reloaded.snapshot().__layout).toBeUndefined();
+    // A rebind keeps it: the setup still follows that layout.
+    reloaded.bind('bags', 0, 'KeyI');
+    expect(new Keybinds('char:1').convertedLayout()).toBe('azerty-fr');
+    // An imported code (no layout) and a Reset both clear it.
+    reloaded.importBindings({ map: ['KeyM', null] });
+    expect(new Keybinds('char:1').convertedLayout()).toBe(null);
+    reloaded.importBindings({ map: ['Semicolon', null] }, 'azerty-fr');
+    reloaded.reset();
+    expect(new Keybinds('char:1').convertedLayout()).toBe(null);
+  });
+
+  it('a fresh character seeded from the legacy profile inherits its converted layout', () => {
+    new Keybinds().importBindings({ map: ['Semicolon', null] }, 'azerty-be');
+    const fresh = new Keybinds('char:new');
+    expect(fresh.codeAt('map', 0)).toBe('Semicolon');
+    expect(fresh.convertedLayout()).toBe('azerty-be');
+  });
+
   it('importBindings runs the stored-profile validation: unknown, reserved, duplicate', () => {
     const kb = new Keybinds();
     kb.importBindings({

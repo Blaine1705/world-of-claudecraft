@@ -4,7 +4,7 @@
 // back is exact), the movement pin, and the OS-layout detection.
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import { BIND_ACTIONS, Keybinds } from '../src/game/keybinds';
+import { Keybinds } from '../src/game/keybinds';
 import type { KeybindSetup } from '../src/ui/keybind_transfer_core';
 import {
   CONVERTED_CODES,
@@ -14,10 +14,10 @@ import {
   KEYBOARD_LAYOUTS,
   type KeyboardLayoutId,
   layoutCodeMap,
-  startingSourceLayout,
 } from '../src/ui/keyboard_layout_convert_core';
 
-const MOVEMENT = new Set(BIND_ACTIONS.filter((a) => a.kind === 'held').map((a) => a.id));
+// The keep-in-place set the panel row pins (keybind_layout_convert_rows.ts).
+const MOVEMENT = new Set(['forward', 'back', 'turnLeft', 'turnRight', 'strafeLeft', 'strafeRight']);
 const IDS = KEYBOARD_LAYOUTS.map((l) => l.id);
 const layout = (id: KeyboardLayoutId) => KEYBOARD_LAYOUTS.find((l) => l.id === id)!;
 
@@ -51,6 +51,8 @@ describe('keyboard_layout_convert_core: layout tables', () => {
       'qwerty-es',
       'qwerty-it',
       'qwerty-nordic',
+      'qwerty-da',
+      'qwerty-no',
       'qwerty-br',
       'dvorak',
       'colemak',
@@ -85,6 +87,26 @@ describe('keyboard_layout_convert_core: layout tables', () => {
     expect(letters('dvorak', home)).toBe('aoeuidhtn');
     expect(letters('colemak', top)).toBe('qwfpgjluy;');
     expect(letters('colemak', home)).toBe('arstdhnei');
+    // The punctuation around the letters, which the detector and the
+    // leftover pairing both lean on.
+    const punct = (id: KeyboardLayoutId) =>
+      ['BracketLeft', 'BracketRight', 'Backslash', 'Semicolon', 'Quote', 'IntlBackslash', 'Slash']
+        .map((c) => layout(id).chars.get(c) ?? '_')
+        .join(' ');
+    expect(punct('qwerty-us')).toBe("[ ] \\ ; ' _ /");
+    expect(punct('qwerty-uk')).toBe("[ ] # ; ' \\ /");
+    expect(punct('qwertz-de')).toBe('ü + # ö ä < -');
+    expect(punct('qwertz-ch')).toBe('ü ¨ $ ö ä < -');
+    expect(punct('azerty-fr')).toBe('^ $ * m ù < !');
+    expect(punct('azerty-be')).toBe('^ $ µ m ù < =');
+    expect(punct('qwerty-es')).toBe('` + ç ñ ´ < -');
+    expect(punct('qwerty-it')).toBe('è + ù ò à < -');
+    expect(punct('qwerty-nordic')).toBe("å ¨ ' ö ä < -");
+    expect(punct('qwerty-da')).toBe("å ¨ ' æ ø < -");
+    expect(punct('qwerty-no')).toBe("å ¨ ' ø æ < -");
+    expect(punct('qwerty-br')).toBe('´ [ ] ç ~ \\ ;');
+    expect(punct('dvorak')).toBe('/ = \\ s - _ z');
+    expect(punct('colemak')).toBe("[ ] \\ o ' _ /");
     // ANSI layouts have no key left of Z.
     expect(layout('qwerty-us').chars.has('IntlBackslash')).toBe(false);
     expect(layout('qwerty-uk').chars.get('IntlBackslash')).toBe('\\');
@@ -149,6 +171,11 @@ describe('keyboard_layout_convert_core: converting a setup', () => {
     expect(binds.forward[1]).toBe('ArrowUp');
     // Letter-named keys follow their letter; the number row never moves.
     expect(binds.map[0]).toBe('Semicolon');
+    // Only the move and turn keys are pinned: the Emote Wheel's X and the
+    // Reliquary's Shift+X follow their letter like any other hotkey.
+    const dvorak = convertBindingsLayout(before, 'qwerty-us', 'dvorak', MOVEMENT).binds;
+    expect(dvorak.emoteWheel[0]).toBe('KeyB');
+    expect(dvorak.reliquary[0]).toBe('Shift+KeyB');
     expect(binds.bags[0]).toBe('KeyB');
     expect(binds.slot0[0]).toBe('Digit1');
     expect(binds.slot9[0]).toBe('Digit0');
@@ -208,18 +235,6 @@ describe('keyboard_layout_convert_core: converting a setup', () => {
     }
   });
 
-  it('starts the next conversion from the last target, unless the setup is back at defaults', () => {
-    const base = defaults();
-    expect(startingSourceLayout(null, base, base)).toBe('qwerty-us');
-    // A Reset puts the defaults back: they are authored for QWERTY (US).
-    expect(startingSourceLayout('azerty-fr', base, base)).toBe('qwerty-us');
-    const converted = convertBindingsLayout(base, 'qwerty-us', 'azerty-fr', MOVEMENT).binds;
-    expect(startingSourceLayout('azerty-fr', converted, base)).toBe('azerty-fr');
-    // A single changed slot is enough to count as not-defaults.
-    const rebound = { ...base, bags: ['KeyI', null] };
-    expect(startingSourceLayout('dvorak', rebound, base)).toBe('dvorak');
-  });
-
   it('reports nothing to move for the same layout', () => {
     expect(convertBindingsLayout(defaults(), 'colemak', 'colemak').moved).toBe(0);
   });
@@ -236,6 +251,16 @@ describe('keyboard_layout_convert_core: detecting the OS layout', () => {
   it('returns null without a layout map or for a non-Latin layout', () => {
     expect(detectKeyboardLayout(() => null)).toBeNull();
     expect(detectKeyboardLayout((code) => (code.startsWith('Key') ? 'Ж' : null))).toBeNull();
+  });
+
+  it('reads a US board that reports an ISO key as US, and Danish apart from Swedish', () => {
+    // Windows reports a character for IntlBackslash even on US; it ties UK on
+    // score and the earlier, more common layout wins.
+    const usIso = (code: string) =>
+      code === 'IntlBackslash' ? '\\' : (layout('qwerty-us').chars.get(code) ?? null);
+    expect(detectKeyboardLayout(usIso)).toBe('qwerty-us');
+    expect(detectKeyboardLayout(printing('qwerty-da'))).toBe('qwerty-da');
+    expect(detectKeyboardLayout(printing('qwerty-no'))).toBe('qwerty-no');
   });
 
   it('settles a letters-only match on the more common layout', () => {
