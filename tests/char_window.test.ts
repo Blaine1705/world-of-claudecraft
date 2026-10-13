@@ -11,17 +11,17 @@ vi.mock('../src/render/characters', () => inertCharacters.barrel());
 vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
 vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
 
-// No assertion here reads the portrait chip, but the real chip's renderer starts GLB
-// fetches that can outlive happy-dom teardown and throw Three FileLoader
-// ProgressEvent rejections after otherwise green assertions (the
-// inspect_window.test.ts recipe; quest_dialog_controller.test.ts mocks the same).
+// This suite exercises the character sheet DOM, not WebGL portraits. Importing
+// the real portrait module starts GLB fetches that can outlive happy-dom
+// teardown and throw ProgressEvent errors in Node, so the portrait chip stays a
+// stub.
 vi.mock('../src/ui/portrait_chip', () => ({
   crestUrl: () => '',
   hydrateComposedChips: () => undefined,
   hydratePortraits: () => undefined,
   isComposedPortraitKey: () => false,
   modularLookFor: () => null,
-  onPortraitUpdate: () => undefined,
+  onPortraitUpdate: () => () => undefined,
   portraitChipHtml: () => '',
 }));
 
@@ -40,6 +40,16 @@ import {
 import { hasTranslation } from '../src/ui/i18n';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import { svgIcon } from '../src/ui/ui_icons';
+
+// Importing the portrait chip starts character asset loads. Keep those pending
+// in this DOM suite: real Three loaders can outlive happy-dom teardown and
+// reject when its ProgressEvent global is gone. The painter still exercises
+// the real portrait chip's pending-asset fallback.
+vi.mock('../src/render/assets/loader', () => ({
+  loadGltf: vi.fn(() => new Promise(() => undefined)),
+  loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
+  loadTexture: vi.fn(() => new Promise(() => undefined)),
+}));
 
 // The character window painter is a DOM module. Most guards below inspect its
 // source, while the profession-art arm opts into jsdom and drives the real

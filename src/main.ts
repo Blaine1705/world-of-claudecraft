@@ -11,6 +11,7 @@ import { MOBILE_CHAT_REPLY_CLASS, START_SCREEN_OPEN_CLASS } from './ui/root_stat
 // styles both game entries; admin/guide use their own entries and inline CSS.
 import './styles/index.css';
 import { captureFirstTouch, registerAttributionPayload } from './attribution';
+import { installClientUpdate, searchClientUpdates } from './client_update_search';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
 import {
@@ -48,11 +49,14 @@ import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
   clickMoveShouldWalk,
+  clickMoveStalled,
   clickMoveStep,
+  clickMoveTurn,
   distance2d,
   latencyAdjustedStopDistance,
+  newClickMoveWatch,
   resolveClickMoveAction,
-  stepAngleToward,
+  restartClickMoveWatch,
 } from './game/click_move';
 import { paintClickMoveMarker } from './game/click_move_marker';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
@@ -501,6 +505,7 @@ import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { esc } from './ui/esc';
+import { showFatalOverlay } from './ui/fatal_overlay_controller';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import {
   attachGatherNodeHoverTooltip,
@@ -593,12 +598,9 @@ import {
 } from './ui/wallet_reauth_prompt';
 import { type IWorld, ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
 
-const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
 const CLICK_MOVE_REROUTE_DISTANCE = 4; // yards; live entity targets can move this far before we recompute the path
 const CLICK_MOVE_FENCE_JUMP_LOOKAHEAD = 2; // yards ahead; auto-jump when a click-move path is about to cross a fence
-const CLICK_MOVE_STUCK_MS = 1100; // ms of no forward progress before we reroute around (then give up)
-const CLICK_MOVE_PROGRESS_EPSILON = 1.5; // yards of travel that counts as progress (a walking player clears this fast; a player hopping in place at a fence never does)
 const CLICK_MOVE_LATENCY_STOP_CAP_MS = 240; // avoid overshooting hosted click-move targets while preserving offline precision
 const CLICK_MOVE_LATENCY_STOP_MAX_EXTRA = 1.6; // yards; cap high-latency stop padding so clicks do not end obviously short
 const CLICK_MOVE_LATENCY_WAYPOINT_MAX_EXTRA = 0.8; // yards; helps online A* corners roll through despite input echo delay
@@ -844,7 +846,8 @@ const otaUpdateGate = installOtaUpdateGate({
     hide: hideOtaUpdateOverlay,
   },
   isInWorld: () => document.body.classList.contains('game-active'),
-  onFatalRecoveryFailed: () => fatalOverlay(userFacingApiError(ONLINE_WORLD_INCOMPATIBLE_MESSAGE)),
+  onFatalRecoveryFailed: () =>
+    fatalOverlay(userFacingApiError(ONLINE_WORLD_INCOMPATIBLE_MESSAGE), { searchUpdates: true }),
 });
 preventMobileZoom();
 syncPhoneTouchClass();
@@ -2566,6 +2569,9 @@ async function startGame(
         audio.setVolume(v);
         sfx.setVolume(v);
         break;
+      case 'ambientVolume':
+        sfx.setAmbientVolume(v);
+        break;
       case 'musicVolume':
         music.setVolume(v);
         break;
@@ -3623,8 +3629,7 @@ async function startGame(
   // hopping forever. We track actual displacement, not distance-to-goal, so a
   // legitimate long detour (e.g. around a building) isn't mistaken for stuck.
   let clickMoveStuckPulse = -1;
-  let clickMoveAnchor = { x: 0, z: 0 };
-  let clickMoveStuckSince = 0;
+  const clickMoveWatch = newClickMoveWatch();
   let clickMoveReroutedAround = false;
 
   let lastClickMoveMarkerPulse = -1;
@@ -3917,6 +3922,7 @@ async function startGame(
     mouselook: boolean,
     playerPos: { x: number; z: number },
     playerFacing: number,
+    stepSeconds: number,
     latencyMs = 0,
   ): { mi: ReturnType<typeof input.readMoveInput>; facing: number | null } {
     const flight = glider.resolveGliderMove(world, input);
@@ -3973,7 +3979,7 @@ async function startGame(
           if (!input.advanceClickMoveWaypoint()) input.clearClickMove();
         } else {
           const fromFacing = input.clickMoveFacing ?? playerFacing;
-          const smoothFacing = stepAngleToward(fromFacing, step.facing, CLICK_MOVE_TURN_RATE * DT);
+          const smoothFacing = clickMoveTurn(fromFacing, step.facing, stepSeconds);
           input.clickMoveFacing = smoothFacing;
           facing = smoothFacing;
           // Walk only when aimed at the destination; otherwise turn in place so
@@ -3995,22 +4001,18 @@ async function startGame(
         // Track displacement so a fence we can't actually clear doesn't trap us
         // in an endless jump loop: if we stop moving, reroute around it, then give up.
         const goal = input.clickMoveGoal;
-        if (goal && mi.forward && !playerImmobilized()) {
+        if (goal) {
           const now = performance.now();
           if (input.clickMovePulse !== clickMoveStuckPulse) {
             clickMoveStuckPulse = input.clickMovePulse;
-            clickMoveAnchor = { x: playerPos.x, z: playerPos.z };
-            clickMoveStuckSince = now;
+            restartClickMoveWatch(clickMoveWatch, playerPos, now);
             clickMoveReroutedAround = false;
           }
-          if (distance2d(playerPos, clickMoveAnchor) > CLICK_MOVE_PROGRESS_EPSILON) {
-            clickMoveAnchor = { x: playerPos.x, z: playerPos.z };
-            clickMoveStuckSince = now;
-          } else if (now - clickMoveStuckSince > CLICK_MOVE_STUCK_MS) {
+          const walking = mi.forward && !playerImmobilized();
+          if (clickMoveStalled(clickMoveWatch, playerPos, now, walking)) {
             if (!clickMoveReroutedAround) {
               clickMoveReroutedAround = true;
-              clickMoveAnchor = { x: playerPos.x, z: playerPos.z };
-              clickMoveStuckSince = now;
+              restartClickMoveWatch(clickMoveWatch, playerPos, now);
               input.rerouteClickMoveTarget(
                 goal,
                 findPlayerPath(
@@ -4362,6 +4364,7 @@ async function startGame(
           mouselook,
           offlineSim.player.pos,
           offlineSim.player.facing,
+          DT,
         );
         Object.assign(offlineSim.moveInput, mi);
         const stepFacing = movementFacing ?? facing;
@@ -4509,6 +4512,7 @@ async function startGame(
       mouselook,
       world.player.pos,
       world.player.facing,
+      frameDt,
       inputEcho.echoMs,
     );
     const pe = world.player;
@@ -6642,7 +6646,7 @@ async function refreshCharacters(): Promise<void> {
 
 function fatalOverlay(
   message: string,
-  opts?: { keepResumeMarker?: boolean; buttonLabel?: string },
+  opts?: { keepResumeMarker?: boolean; buttonLabel?: string; searchUpdates?: boolean },
 ): void {
   // A fatal overlay is a terminal client state whose only exit is a reload, so
   // clearing the resume marker HERE covers every present and future caller: the
@@ -6652,19 +6656,11 @@ function fatalOverlay(
   // clearing would erase THAT session's marker, so the caller opts out.
   if (!opts?.keepResumeMarker) clearPlayMarker();
   hideLoadingScreen(); // its art would bleed through the translucent backdrop
-  if (document.getElementById('disconnect-overlay')) return; // first reason wins
-  const el = document.createElement('div');
-  el.id = 'disconnect-overlay';
-  el.className = 'fatal-overlay';
-  const messageEl = document.createElement('div');
-  messageEl.textContent = message;
-  el.appendChild(messageEl);
-  const btn = document.createElement('button');
-  btn.className = 'btn';
-  btn.textContent = opts?.buttonLabel ?? t('errors.returnToLogin');
-  btn.addEventListener('click', () => location.reload());
-  el.appendChild(btn);
-  document.body.appendChild(el);
+  showFatalOverlay(message, {
+    buttonLabel: opts?.buttonLabel,
+    searchUpdates: opts?.searchUpdates ? () => searchClientUpdates(__APP_VERSION__) : undefined,
+    installUpdate: installClientUpdate,
+  });
 }
 
 // Take over a character that is still online in another session, then enter on
@@ -6817,6 +6813,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     // in resume_play.ts keeps this tab from looping on the overlay forever.
     fatalOverlay(userFacingApiError(reason), {
       keepResumeMarker: reason === RECONNECT_CONFLICT_ERROR,
+      searchUpdates: reason === ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
     });
   };
   // an unexpected drop is not fatal: the server holds the character in-world

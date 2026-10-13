@@ -470,12 +470,14 @@ An owner retune of the shared Hunter movement kit, applied on top of the design 
   (`onHunterTrailbreak`); encounter-owned unbreakable control is untouched, and an unbreakable root
   still refuses the cast. Tactical Retreat keeps its second charge, and the Farsight 2-piece's
   4-second cut now reads 20 to 16.
-- Every Hunter ability that had an 8-yard minimum range now has 4 yards: Measured Shot, Fell Shot,
-  Venom Barb, Rattling Shot, Long Draw, Fevered Draw, Splitshot, Startle Shot, Bloodhook, Drakesting,
-  and Hushing Shot. Auto Shot's dead zone is 4 yards too (`CLASSES.hunter.ranged.minRange`, was 8),
-  and the row sweep (`scripts/lib/sweep_engagement.mjs`) stations a Hunter outside it. Auto Shot is
-  resolved before the melee swing, so between 4 yards and melee reach a Hunter auto-attacks with
-  the bow; inside 4 yards it swings its melee weapon.
+- No Hunter ability has a minimum range any more. Measured Shot, Fell Shot, Venom Barb, Rattling
+  Shot, Long Draw, Fevered Draw, Splitshot, Startle Shot, Bloodhook, Drakesting, and Hushing Shot
+  (all 8 yards before) work point blank, and their tooltips show a plain range. Auto Shot has no
+  dead zone either (`CLASSES.hunter.ranged.minRange` is 0, was 8), so the row sweep
+  (`scripts/lib/sweep_engagement.mjs`) stations a Hunter at melee reach like every other class.
+  Auto Shot is resolved before the melee swing, so a Hunter with a target in range always
+  auto-attacks with the bow and no longer swings its melee weapon as a white hit; melee abilities
+  such as Gutting Strike and Woundrend still strike with the melee weapon.
 
 Pinned by `tests/hunter_mobility_pass.test.ts`, `tests/cheetah_daze.test.ts`, and
 `tests/hunter_trailbreak_terrain.test.ts`.

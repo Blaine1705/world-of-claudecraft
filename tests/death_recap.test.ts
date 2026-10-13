@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, expect, it, vi } from 'vitest';
-import { DeathRecapDialog } from '../src/ui/death_recap_dialog';
+import { DeathRecapDialog, deathRecapSource } from '../src/ui/death_recap_dialog';
 import {
   buildDeathRecapCards,
   buildDeathRecapSummary,
@@ -610,5 +610,30 @@ describe('DeathRecapDialog (DOM dialog controller)', () => {
 
     dialog.close();
     rootEl.remove();
+  });
+});
+
+describe('deathRecapSource (meters to dialog data deps)', () => {
+  it('reads the latest recap for the current player id on every call and forwards raid deaths', () => {
+    const record = { pid: 7 } as unknown as DeathRecapRecord;
+    const raidDeaths = [{ pid: 7, order: 1 }] as unknown as RaidDeathEntry[];
+    const getLatestDeathRecap = vi.fn((pid: number) => (pid === 7 ? record : null));
+    const getRaidDeaths = vi.fn(() => raidDeaths);
+    let playerId = 3;
+
+    const source = deathRecapSource({ getLatestDeathRecap, getRaidDeaths }, () => playerId);
+
+    expect(getLatestDeathRecap).not.toHaveBeenCalled();
+    expect(getRaidDeaths).not.toHaveBeenCalled();
+    expect(source.getLatestRecap()).toBeNull();
+    expect(getLatestDeathRecap).toHaveBeenLastCalledWith(3);
+
+    // The player id is read per call, so a repointed local player follows.
+    playerId = 7;
+    expect(source.getLatestRecap()).toBe(record);
+    expect(getLatestDeathRecap).toHaveBeenLastCalledWith(7);
+
+    expect(source.getRaidDeaths()).toBe(raidDeaths);
+    expect(getRaidDeaths).toHaveBeenCalledTimes(1);
   });
 });

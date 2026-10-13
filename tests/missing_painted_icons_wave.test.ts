@@ -690,8 +690,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
     // 320 with the sixth lifetime-XP rung (prog_titan), also pending on the
     // progression crest. The five World PvP streak deeds retain explicit
-    // art-pending identities.
-    expect(DEED_ORDER).toHaveLength(325);
+    // art-pending identities, and the hard Wisp Maze deed joins the exploration
+    // pending set.
+    expect(DEED_ORDER).toHaveLength(326);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

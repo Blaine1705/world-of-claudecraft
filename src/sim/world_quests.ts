@@ -25,6 +25,7 @@ import {
 import { formatMoney } from './format_money';
 import { sanitizeForgeResult } from './minigames/forge_workshop';
 import { applyGliderBoost } from './minigames/glider_boost';
+import { grantHonor } from './pvp';
 import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
@@ -77,6 +78,7 @@ import {
   updateGliderLaunchUpdraft,
 } from './world_quest_glider';
 import { sanitizeGliderResult } from './world_quest_glider_wire';
+import { worldQuestHonorRewardForQuest } from './world_quest_honor_slots';
 import {
   accuseInvestigationSuspect,
   clearInvestigationEncounter,
@@ -382,19 +384,24 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     }
     if (quest.objective.type === 'wisp_maze') {
       ensureWispMazeInstructor(ctx);
-      if (existing && updateWispMaze(ctx, meta, player, existing) && existing.state === 'active') {
+      if (existing && updateWispMaze(ctx, meta, player, existing)) {
         const hard = existing.wispMaze?.difficulty === 'hard';
-        creditWorldQuest(ctx, meta, quest, existing);
-        if (hard)
-          awardWorldQuestBonusCopper(
-            ctx,
-            meta,
-            worldQuestBonusCopper(
-              WISP_MAZE_HARD_BONUS.base,
-              WISP_MAZE_HARD_BONUS.perLevel,
-              player.level,
-            ),
-          );
+        if (existing.state === 'active') {
+          creditWorldQuest(ctx, meta, quest, existing);
+          if (hard)
+            awardWorldQuestBonusCopper(
+              ctx,
+              meta,
+              worldQuestBonusCopper(
+                WISP_MAZE_HARD_BONUS.base,
+                WISP_MAZE_HARD_BONUS.perLevel,
+                player.level,
+              ),
+            );
+        }
+        // Any Hard win earns its deed, a replay after today's credit included
+        // (the calligraphy Gold rule): the deed marks the feat, not the reward.
+        if (hard) grantDeed(ctx, meta, 'exp_wisp_maze_hard');
       }
     }
     if (quest.objective.type === 'glider') {
@@ -580,7 +587,8 @@ export function talkToWorldQuestInstructor(
 
 /** The bundle every world quest pays: XP, copper, then the quest's fixed extra
  *  (if any), then the day's item when this quest's zone is one of the cycle's
- *  item slots and the character is in the item bracket; standing follows in
+ *  item slots and the character is in the item bracket, then the day's Honor
+ *  bonus when the zone is one of the cycle's Honor slots; standing follows in
  *  the caller's order. No rng: the item is fixed per cycle, zone and class
  *  (src/sim/world_quest_item_slots.ts), so the map hover can show it in advance. */
 export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQuestDef): void {
@@ -610,6 +618,11 @@ export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQ
   const dailyItemId = worldQuestItemRewardForQuest(meta.worldQuestCycle, quest, meta.cls, level);
   if (dailyItemId) rewardItems.push({ itemId: dailyItemId, count: 1 });
   grantWorldQuestRewardItems(ctx, meta, rewardItems);
+  // The day's Honor bonus: two rotating quests per cycle, the same two for the
+  // whole realm (src/sim/world_quest_honor_slots.ts). grantHonor emits the
+  // personal honor event the HUD floats and logs.
+  const honor = worldQuestHonorRewardForQuest(meta.worldQuestCycle, quest);
+  if (honor > 0) grantHonor(ctx, meta, honor, 'world_quest');
 
   const factionId = worldQuestFaction(quest);
   const standingAward = worldQuestStandingReward(quest, level);

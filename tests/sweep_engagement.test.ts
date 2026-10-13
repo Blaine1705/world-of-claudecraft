@@ -112,19 +112,17 @@ describe('engagementDistance against the kits the sweep actually runs', () => {
   const standoff = (cls: PlayerClass, rows?: Record<number, string>) =>
     engagementDistance(sweptKit(cls, rows), CLASSES[cls].ranged);
 
-  it('stations the hunter outside its dead zone', () => {
-    // Shots and Auto Shot both refuse inside 4 yards since the v0.45 hunter pass.
-    const stand = standoff('hunter');
-    expect(stand).toBeGreaterThan(CLASSES.hunter.ranged?.minRange ?? 0);
-    expect(stand).toBe(4 + DEAD_ZONE_MARGIN);
-    expect(stand).toBeLessThanOrEqual(CLASSES.hunter.ranged?.maxRange ?? 35);
+  it('stations the hunter at melee reach now it has no dead zone', () => {
+    // Neither the shots nor Auto Shot have a minimum range since the v0.45 hunter pass.
+    expect(CLASSES.hunter.ranged?.minRange).toBe(0);
+    expect(standoff('hunter')).toBe(MELEE_REACH);
   });
 
-  it('is the hunter alone, across every talent row option', () => {
-    // The narrow scope is the point: fixing the sweep must not silently move the
-    // eight classes whose numbers were already measured correctly. Checked against
-    // every single-row build too, so a talent-granted minRange ability on another
-    // class fails here rather than quietly relocating it in the sweep.
+  it('moves no class, across every talent row option', () => {
+    // The narrow scope is the point: the rule must not silently move a class whose
+    // numbers are measured at melee reach. Checked against every single-row build
+    // too, so a talent-granted minRange ability fails here rather than quietly
+    // relocating its class in the sweep.
     const moved = new Set<string>();
     for (const cls of ALL_CLASSES) {
       if (standoff(cls) !== MELEE_REACH) moved.add(cls);
@@ -134,7 +132,7 @@ describe('engagementDistance against the kits the sweep actually runs', () => {
         }
       }
     }
-    expect([...moved]).toEqual(['hunter']);
+    expect([...moved]).toEqual([]);
   });
 });
 

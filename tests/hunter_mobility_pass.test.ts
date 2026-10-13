@@ -1,7 +1,7 @@
 // Hunter mobility pass: Trailbreak leaps 25 yards on a 20 sec cooldown and,
 // for every hunter (not only Tactical Retreat), breaks ordinary roots and
 // movement slows; encounter-owned unbreakable control is left alone. The
-// hunter abilities' minimum range and Auto Shot's dead zone are 4 yards (were 8).
+// hunter abilities have no minimum range and Auto Shot no dead zone (were 8 yards).
 import { describe, expect, it } from 'vitest';
 import { applyCourserDaze, COURSER_DAZE_AURA_ID } from '../src/sim/combat/hunter_shared';
 import { ABILITIES, CLASSES, MOBS } from '../src/sim/data';
@@ -101,63 +101,68 @@ describe('Trailbreak', () => {
 });
 
 describe('hunter minimum ranges', () => {
-  it('every hunter ability that had 8 yards now has 4, and so does Auto Shot', () => {
+  it('no hunter ability has a minimum range, and Auto Shot has no dead zone', () => {
     const withMin = Object.values(ABILITIES).filter(
       (def) => def.class === 'hunter' && def.minRange !== undefined,
     );
-    expect(withMin.map((def) => def.id).sort()).toEqual(
-      [
-        'aimed_shot',
-        'arcane_shot',
-        'bloodhook',
-        'concussive_shot',
-        'counter_shot',
-        'measured_shot',
-        'multi_shot',
-        'rapid_fire',
-        'serpent_sting',
-        'startle_shot',
-        'wyvern_sting',
-      ].sort(),
-    );
-    for (const def of withMin) expect(def.minRange, def.id).toBe(4);
-    expect(CLASSES.hunter.ranged?.minRange).toBe(4);
+    expect(withMin.map((def) => def.id)).toEqual([]);
+    expect(CLASSES.hunter.ranged?.minRange).toBe(0);
   });
 
-  it('Fell Shot fires at 5 yards and is refused at 3', () => {
-    const run = (distance: number, seed: number) => {
-      const sim = hunter(seed);
-      const player = sim.player;
-      const target = createMob(sim.nextId++, MOBS.training_dummy, 20, {
-        x: player.pos.x,
-        y: player.pos.y,
-        z: player.pos.z + distance,
-      });
-      target.hostile = true;
-      target.maxHp = target.hp = 500_000;
-      sim.addEntity(target);
-      player.facing = 0;
-      player.resource = player.maxResource;
-      sim.targetEntity(target.id);
-      sim.drainEvents();
-      sim.castAbility('arcane_shot');
-      const events: SimEvent[] = [];
-      for (let i = 0; i < 20 * 2; i++) events.push(...sim.tick());
-      return {
-        hit: events.some((e) => e.type === 'damage' && e.ability === 'Fell Shot' && e.amount > 0),
-        cooled: player.cooldowns.has('arcane_shot'),
-      };
-    };
-    expect(run(5, 4506).hit).toBe(true);
-    const close = run(3, 4507);
-    expect(close.hit).toBe(false);
-    expect(close.cooled).toBe(false);
+  it('Fell Shot fires point blank', () => {
+    const sim = hunter(4506);
+    const player = sim.player;
+    const target = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+      x: player.pos.x,
+      y: player.pos.y,
+      z: player.pos.z + 1,
+    });
+    target.hostile = true;
+    target.maxHp = target.hp = 500_000;
+    sim.addEntity(target);
+    player.facing = 0;
+    player.resource = player.maxResource;
+    sim.targetEntity(target.id);
+    sim.drainEvents();
+    sim.castAbility('arcane_shot');
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 2; i++) events.push(...sim.tick());
+    expect(
+      events.some((e) => e.type === 'damage' && e.ability === 'Fell Shot' && e.amount > 0),
+    ).toBe(true);
+    expect(player.cooldowns.has('arcane_shot')).toBe(true);
+  });
+
+  it('Bloodhook lands its wound on a target already in melee', () => {
+    const sim = new Sim({
+      seed: 4510,
+      playerClass: 'hunter',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    }) as TestSim;
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('survival')).toBe(true);
+    const player = sim.player;
+    const target = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+      x: player.pos.x,
+      y: player.pos.y,
+      z: player.pos.z + 1,
+    });
+    target.hostile = true;
+    target.maxHp = target.hp = 500_000;
+    sim.addEntity(target);
+    player.facing = 0;
+    sim.targetEntity(target.id);
+    sim.castAbility('bloodhook');
+    for (let i = 0; i < 20 * 2; i++) sim.tick();
+    expect(target.auras.some((aura) => aura.id === 'bloodhook_bleed')).toBe(true);
+    expect(player.cooldowns.has('bloodhook')).toBe(true);
   });
 });
 
 describe('Auto Shot dead zone', () => {
-  // Auto Shot resolves before the melee swing: outside its 4 yard dead zone the
-  // hunter shoots, inside it the hunter swings its melee weapon.
+  // Auto Shot resolves before the melee swing and has no dead zone, so a hunter
+  // with a target in range always shoots, even point blank.
   function autoAttackDamage(distance: number, seed: number): SimEvent[] {
     const sim = hunter(seed);
     const player = sim.player;
@@ -177,12 +182,9 @@ describe('Auto Shot dead zone', () => {
     return events.filter((event) => event.type === 'damage' && event.sourceId === player.id);
   }
 
-  it('shoots at 4.5 yards and swings in melee at 3', () => {
-    const shot = autoAttackDamage(4.5, 4508);
+  it('shoots point blank instead of swinging in melee', () => {
+    const shot = autoAttackDamage(1, 4509);
     expect(shot.length).toBeGreaterThan(0);
     expect(shot.every((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
-    const melee = autoAttackDamage(3, 4509);
-    expect(melee.length).toBeGreaterThan(0);
-    expect(melee.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(false);
   });
 });

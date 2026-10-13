@@ -521,7 +521,13 @@ export const ja_JP: EnTranslations = {
       "departsIn": "{dest}行きの渡し船は{time}後に出航します",
       "castingOff": "{dest}行きの渡し船が出航します",
       "boardHint": "出航の時に甲板に立っていれば一緒に出発できます。運賃は無料です。",
-      "sailing": "{dest}へ航行中"
+      "sailing": "{dest}へ航行中",
+      "portLabel": "{port}発{dest}行きの渡し船",
+      "portTitle": "{port}の渡し船乗り場",
+      "destination": "行き先：{dest}",
+      "boardNow": "今すぐ乗船できます",
+      "arrivesIn": "渡し船の到着まで{time}",
+      "scheduleUnavailable": "渡し船の時刻表を取得できません。"
     },
     "materialStackSelectionUnavailable": "この素材の選択は利用できなくなりました。",
     "vehicle": {
@@ -1876,6 +1882,8 @@ export const ja_JP: EnTranslations = {
       "reportSent": "レポートをコピーしてチャットに送信しました",
       "reportNoData": "記録されたデータがありません。",
       "noDetailedData": "詳細データがありません",
+      "detailHealSubtitle": "有効：{effective} | 過剰回復：{overheal}（{overhealPercent}） | ヒット数：{hits}（クリティカル {critPercent}）",
+      "detailHitSubtitle": "ヒット数：{hits} | クリティカル：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}",
       "noDeathEvents": "死亡前に記録されたイベントはありません",
       "killedBy": "{killer}（{ability}）に倒された",
       "lethalHit": "致死の一撃",
@@ -2143,6 +2151,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "マウスオーバーで呪文ツールチップを表示",
       "clickMoveLeft": "左クリック",
       "clickMoveRight": "右クリック",
       "version": "v{version} ({build})",
@@ -2188,6 +2197,7 @@ export const ja_JP: EnTranslations = {
       "interfaceModeDesktop": "デスクトップ",
       "interfaceModeTouch": "タッチ",
       "interfaceModeNote": "自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。",
+      "ambienceVolume": "環境音の音量",
       "footstepSounds": "足音",
       "interfaceSounds": "インターフェースとフィードバック音",
       "clickFeedback": "クリックマーカー",
@@ -2801,7 +2811,8 @@ export const ja_JP: EnTranslations = {
         "battlegroundAssist": "撃破アシスト",
         "worldKill": "ワールドPvP撃破",
         "worldAssist": "ワールドPvP撃破のアシスト",
-        "hillHold": "丘の保持"
+        "hillHold": "丘の保持",
+        "worldQuest": "ワールドクエスト"
       },
       "floatReasons": {
         "kill": "撃破",
@@ -2932,7 +2943,7 @@ export const ja_JP: EnTranslations = {
       "delveMark": "デルブの印",
       "wocToken": "WoCトークン",
       "heroicMarkNote": "ヒロイックダンジョン . ヒロイック補給官で使用",
-      "honorNote": "戦場とアリーナ",
+      "honorNote": "戦場、アリーナ、ワールドクエスト",
       "delveMarkNote": "完了したデルブ",
       "wocTokenNote": "連携済みウォレットの残高",
       "walletNotLinked": "ウォレット未連携",
@@ -3651,6 +3662,7 @@ export const ja_JP: EnTranslations = {
       "dragEquipHint": "キャラクターにドラッグして装備",
       "dragDestroyHint": "世界へドラッグして破壊",
       "reorderNeedsRecent": "絞り込みを解除し並び順を「最近」にすると持ち物を並べ替えられます",
+      "reorderLocked": "ロック中のアイテムはバッグ内の位置に固定されます。移動するにはロックを解除してください。",
       "itemAriaInstanced": "{item}、数量 {count}、銘入りの品",
       "itemAriaEnchanted": "{item}、数量 {count}、エンチャント済みの品",
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
@@ -4036,7 +4048,7 @@ export const ja_JP: EnTranslations = {
       "duskEconomy": "アビリティの消費エナジーが{pct}%減少する",
       "moontide": "月潮：{stacks}/{max}段階。月翼形態での野生の稲妻・天墜・月の種の詠唱ごとに1段階進む。{max}段階で月の種はムーンサージに、天墜は陽醒に変化し、どちらを使っても3段階すべてを消費する",
       "oldBlood": "古き血：{stacks}/{max}段階。裂き爪・皮剥ぎ・血の亀裂・血噛み・薙ぎ払う爪・骨砕きの命中ごとに1段階蓄える。{max}段階で、キャットフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する",
-      "verdance": "翠成：{stacks}/{max}段階。野生の芽吹き、二度目の開花、野生の癒しを詠唱するたびに1段階進み、1段階ごとに野生の癒しの詠唱時間が短くなる。{max}段階でスウィフトメンドが満開に変化する",
+      "verdance": "翠成：{stacks}/{max}段階。スポアメンディング、二度目の開花、野生の癒しを詠唱するたびに1段階進み、1段階ごとに野生の癒しの詠唱時間が短くなる。{max}段階でスウィフトメンドが満開に変化する",
       "freeExecute": "次の対象となる処刑アビリティはコストを消費しない",
       "resourceSap": "{interval}秒ごとに現在のリソースを{value}回復する",
       "nextAttackCrit": "次の攻撃が必ずクリティカルになる",
@@ -4138,6 +4150,7 @@ export const ja_JP: EnTranslations = {
       "formTravel": "フリートフォーム: 移動速度が{pct}%上昇",
       "formFireball": "火球形態：移動速度が{pct}%上昇、攻撃と呪文は使用不可",
       "formMoonkin": "ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する",
+      "formSporemender": "スポアメンダーフォーム：与える回復量が{pct}%、アーマーが{armorPct}%増加し、移動速度が{slowPct}%低下する",
       "formShadow": "グロームヴェイル形態：影ダメージが{pct}%増加する",
       "resourceCount": "{value}/{max}",
       "formLich": "ソウル・ランスが近くの最大{targets}体にも{pct}%のダメージを与える",
@@ -4224,6 +4237,7 @@ export const ja_JP: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "退席",
       "pvpTag": "PvP",
+      "bountyTag": "賞金首",
       "cheaterTag": "< チーター >",
       "pledgeTag": "{guild}への誓約者",
       "npcRoleTag": "<{role}>",
@@ -6355,7 +6369,9 @@ export const ja_JP: EnTranslations = {
         "passage": "通路"
       },
       "collapseHint": "マップサイドバーを折りたたむ",
-      "expandHint": "マップサイドバーを展開"
+      "expandHint": "マップサイドバーを展開",
+      "resizeRailAria": "マップサイドバーの幅",
+      "resizeRailHint": "ドラッグしてマップサイドバーの幅を変更します。ダブルクリックで元に戻します。"
     },
     "arenaGate": {
       "minLevelNote": "レベル {level} が必要です"
@@ -7830,18 +7846,20 @@ export const ja_JP: EnTranslations = {
       "formsHeading": "変身",
       "formsNote": "ドルイドは姿を変えて戦います。ドルイドのアビリティはほとんどがいずれか一つの姿に属しているので、今どの姿でいるかが何を使えるかを決めます。変身にはわずかなマナがかかります。戦闘中でも戦闘外でも、好きなだけ変身し、また解くことができます。",
       "formsAutoUnshift": "変身中に回復や攻撃の呪文を唱えると、姿はひとりでに解けます。こうして姿を解くのはマナもかからず、グローバルクールダウンも使いません。ですから即時発動の呪文は押した瞬間に飛びます。もう一度変身するのは普通のアビリティなので、マナもグローバルクールダウンもかかります。",
-      "formsMoonwing": "均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。獣の姿でありながら呪文を保てる唯一の形であり、ワンドもこの姿か、通常の術者の姿でしか使えません。",
+      "formsMoonwing": "均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。回復特性のスポアメンダーフォームと同じく呪文をそのまま使え、ワンドはこの二つの姿か、通常の術者の姿でしか使えません。",
       "formsWolfEngage": "狼はブルーインラッシュで戦いを開き、すぐにウルフフォームへ変身して対象を押さえ込み、ステルスでないときはランジで距離を詰め、テイクダウンで敵を足止めする。",
       "formLine": {
         "form_bear": "タンクの姿です。分厚い毛皮をまとい、マナの代わりにレイジを使い、追加の脅威で敵の矛先を自分に引きつけ続けます。",
         "form_cat": "近接ダメージの姿です。ローグと同じくエナジーとコンボポイントで戦い、脅威ははるかに低く抑えられます。",
-        "form_travel": "移動のための姿です。地上をはるかに速く駆けられますが、変身を解くまで他のアビリティは使えません。"
+        "form_travel": "移動のための姿です。地上をはるかに速く駆けられますが、変身を解くまで他のアビリティは使えません。",
+        "form_sporemender": "回復特性の癒しの姿です。より頑丈な外皮と強い回復を備えますが歩みは遅くなり、すべての呪文とマナをそのまま使えます。"
       },
       "mageEleSummon": "エレメンタルを傍らに呼び出し、あなたの標的に差し向けるフロストの呪文です。",
       "formName": {
         "form_bear": "ブルーインフォーム",
         "form_cat": "キャットフォーム",
-        "form_travel": "フリートフォーム"
+        "form_travel": "フリートフォーム",
+        "form_sporemender": "スポアメンダーフォーム"
       }
     },
     "classHook": {
@@ -8543,6 +8561,7 @@ export const ja_JP: EnTranslations = {
       "formBear": "ブルーインフォーム",
       "formCat": "キャットフォーム",
       "formTravel": "フリートフォーム",
+      "formSporemender": "スポアメンダーフォーム",
       "groupCreatures": "クリーチャー",
       "groupPets": "ウォーロックのデーモン",
       "pickerLabel": "表示するモデルを選択",
@@ -11151,6 +11170,10 @@ export const ja_JP: EnTranslations = {
     "selectClass": "クラスを選択してください。",
     "pickClass": "クラスを選んでください。",
     "returnToLogin": "ログインへ戻る",
+    "searchUpdates": "更新を検索",
+    "noUpdateFound": "更新が見つかりませんでした。しばらくしてから再試行してください。",
+    "updateUnavailable": "ゲームストアで更新するか、最新のクライアントをダウンロードしてください。",
+    "updateSearchFailed": "更新を確認できませんでした。もう一度お試しください。",
     "api": {
       "tooManyAttempts": "試行回数が多すぎます。1分待ってから再試行してください。",
       "usernameShape": "ユーザー名は3-24文字で、英字、数字、アンダースコアを使用してください。",
@@ -13819,7 +13842,7 @@ export const ja_JP: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "雷鳴の貯蔵",
-        "description": "パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）"
+        "description": "パッシブ：アークボルト、スカイブランチ、マグマバーストで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）"
       },
       "lightning_overload": {
         "name": "電弧のオーバーロード",
@@ -13827,7 +13850,7 @@ export const ja_JP: EnTranslations = {
       },
       "lava_burst": {
         "name": "マグマバースト",
-        "description": "{damage}の火炎ダメージを与えます。灰燼の衝撃で燃えている対象には必ずクリティカルヒットします。マグマの奔流：灰燼の衝撃がダメージを与えるたびに20%の確率でこのクールダウンをリセットし、10秒以内に使用する次のマグマバーストを即座の詠唱にします。ダメージは呪文威力とともに上がります。（サンダーコール）"
+        "description": "{damage}の火炎ダメージを与えます。命中すると雷が1得られます。灰燼の衝撃で燃えている対象には必ずクリティカルヒットします。クリティカルヒットは通常ダメージの24%を追加で与えます。マグマの奔流：灰燼の衝撃がダメージを与えるたびに20%の確率でこのクールダウンをリセットし、10秒以内に使用する次のマグマバーストを即座の詠唱にします。ダメージは呪文威力とともに上がります。（サンダーコール）"
       },
       "thunderstorm": {
         "name": "嵐砕き",
@@ -13851,7 +13874,7 @@ export const ja_JP: EnTranslations = {
       },
       "flame_shock": {
         "name": "灰燼の衝撃",
-        "description": "{damage}の火炎ダメージを与え、続けて12秒かけて{overTime}の火炎ダメージを与えます。最初の命中は呪文威力とともに上がります。"
+        "description": "{damage}の火炎ダメージを与え、続けて{duration}秒かけて{overTime}の火炎ダメージを与えます。最初の命中は呪文威力とともに上がります。"
       },
       "flametongue_weapon": {
         "name": "火焔烙印の武器",
@@ -14001,7 +14024,7 @@ export const ja_JP: EnTranslations = {
         "description": "月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大{duration}秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。"
       },
       "rejuvenation": {
-        "name": "野生の芽吹き",
+        "name": "スポアメンディング",
         "description": "12秒間で対象の体力を {damage} 回復します。",
         "specNote_restoration": "詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。翠成が3段階のとき、スウィフトメンドは満開に変化する。"
       },
@@ -14327,7 +14350,8 @@ export const ja_JP: EnTranslations = {
       },
       "swiftmend": {
         "name": "スウィフトメンド",
-        "description": "味方の対象にかかった継続回復効果を消費し、{damage}回復します。野生の芽吹き、二度目の開花、野生の癒しを詠唱するたびに翠成が1段階進み、翠成3でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）"
+        "description": "味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディング、二度目の開花、野生の癒しを詠唱するたびに翠成が1段階進み、翠成3でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）",
+        "specNote_restoration": "味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディングと二度目の開花は翠成を蓄えます。翠成5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）"
       },
       "moonlash": {
         "name": "ムーンサージ",
@@ -14353,9 +14377,27 @@ export const ja_JP: EnTranslations = {
         "name": "樹林の覚醒",
         "description": "グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（回復）"
       },
+      "sporemender_form": {
+        "name": "スポアメンダーフォーム",
+        "description": "スポアメンダーになり、与える回復量が20%、アーマーが40%増加しますが、移動速度が20%低下します。通常形態で使える呪文はすべてそのまま使えます。姿を戻すまで持続します。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再び唱えると通常形態に戻ります。（回復の象徴）"
+      },
+      "spore_burst": {
+        "name": "スポアバースト",
+        "description": "対象地点にスポアバースターを召喚します。{duration}秒後に破裂し、8ヤード以内の味方の体力を {healing} 回復し、敵に {damage} の自然ダメージを与えます。",
+        "specNote_balance": "月潮が3段階のとき、効果が25%上昇し、月潮を消費します。",
+        "specNote_restoration": "回復した味方それぞれにスポアメンディングも付与します。翠成が最大のとき、効果が25%上昇し、翠成を消費します。"
+      },
+      "natures_boon": {
+        "name": "自然の恵み",
+        "description": "呪文が10秒間の自然の恵みを発動させることがあります。指定された呪文は無料になり、効果が25%上昇し、どの姿でも詠唱できます。再発動すると時間が更新されます。",
+        "specNote_feral": "近接の自動攻撃が命中するたびに1/15の確率で発動し、スポアメンディングが対象になります。ブルーインフォーム中は樫の肌も対象です。",
+        "specNote_balance": "野生の稲妻または天墜を詠唱するたびに10%の確率で発動し、スポアバーストが対象になります。発動は10秒に1回までです。",
+        "specNote_restoration": "自分の持続回復効果が回復するたびに10%の確率で発動し、スポアバーストが対象になります。発動は10秒に1回までです。"
+      },
       "overbloom": {
         "name": "満開",
-        "description": "翠成を3消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。"
+        "description": "翠成を3消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。",
+        "specNote_restoration": "翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。"
       },
       "summon_imp": {
         "name": "エンバーキンの召喚",
@@ -14836,7 +14878,7 @@ export const ja_JP: EnTranslations = {
       },
       "rake": {
         "name": "皮剥ぎ",
-        "description": "敵を切り裂いて武器ダメージに{damage}を加え、18秒間の出血ダメージを与えます。コンボポイントを1与えます。猫の姿専用。",
+        "description": "敵を切り裂いて武器ダメージに{damage}を加え、18秒間に{overTime}の出血ダメージを与えます。コンボポイントを1与えます。猫の姿専用。",
         "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
       },
       "revive_pet": {
@@ -24149,7 +24191,7 @@ export const ja_JP: EnTranslations = {
       },
       "grovespring": {
         "name": "グローヴスプリングの法衣",
-        "bonus2": "スウィフトメンドが自分の野生の芽吹きまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。",
+        "bonus2": "スウィフトメンドが自分のスポアメンディングまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。",
         "bonus4": "満開が残りの効果の75%を収穫し、その後翠成を1蓄えます。"
       },
       "hexthread": {

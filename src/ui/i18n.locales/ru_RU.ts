@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.spellTooltipOnHover': 'Подсказки заклинаний при наведении',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -595,6 +596,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}, {quality}',
   'hudChrome.mapAtlas.collapseHint': 'Свернуть боковую панель карты',
   'hudChrome.mapAtlas.expandHint': 'Развернуть боковую панель карты',
+  'hudChrome.mapAtlas.resizeRailAria': 'Ширина боковой панели карты',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Перетащите, чтобы изменить ширину боковой панели карты. Двойной щелчок сбрасывает ширину.',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': 'Активный профиль',
   'hudChrome.meters.activeProfileDesc':
@@ -668,6 +672,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Одновременно отображаемые полосы (0 = без ограничений, автоподбор по высоте окна).',
   'hudChrome.meters.noDeathEvents': 'Перед гибелью не записано событий',
   'hudChrome.meters.noDetailedData': 'Нет подробных данных',
+  'hudChrome.meters.detailHealSubtitle':
+    'Эффективное исцеление: {effective} | Избыточное исцеление: {overheal} ({overhealPercent}) | Попаданий: {hits} ({critPercent} крит.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Попаданий: {hits} | Крит. ударов: {crits} ({critPercent}) | Среднее: {average} | Мин./макс.: {min} / {max}',
   'hudChrome.meters.noTargetData': 'Нет данных об игроках по этой цели',
   'hudChrome.meters.numCompact': 'Числа: сокращённые (тыс./млн)',
   'hudChrome.meters.numDetailed': 'Числа: подробные',
@@ -759,6 +767,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': 'Масштаб окна',
   'hudChrome.meters.windowScaleDesc': 'Увеличивает или уменьшает общий масштаб счётчика.',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': 'Розыск',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': 'Просвечивание препятствий',
@@ -786,6 +795,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': 'Удержание холма',
   'hudChrome.warfare.reasons.worldAssist': 'Помощь в мировом убийстве',
   'hudChrome.warfare.reasons.worldKill': 'Мировое убийство',
+  'hudChrome.warfare.reasons.worldQuest': 'локальное задание',
   'hudChrome.warfareShop.groupEntry': 'Боевой сезон 1',
   'hudChrome.warfareShop.groupSeason2': 'Боевой сезон 2: Авангард',
   'hudChrome.worldPvp.aidLine':
@@ -935,7 +945,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Боевая мощь является характеристикой снаряжения чести для боя с игроками. В боях между игроками она повышает урон, который вы и ваш питомец наносите другим игрокам и их питомцам, и снижает урон, который вы и ваш питомец получаете от них. Она также повышает ваше максимальное здоровье везде, кроме подземелий, рейдов, вылазок и разломов, поэтому игрок в снаряжении чести гораздо труднее убить, чем игрока без него. Ваш лист персонажа показывает всё это одной строкой. Она берётся от снаряжения Боевой мощи, которое вы покупаете за честь, так что это награда за игру в PvP, а не то, к чему нужно стремиться во время получения уровней.',
   'entities.abilities.lava_burst.name': 'Взрыв магмы',
   'entities.abilities.lava_burst.description':
-    'Наносит {damage} урона от огня. Всегда наносит критический удар по цели, охваченной вашим Тлеющим разрядом. Прилив магмы: каждый тик Тлеющего разряда с вероятностью 20% сбрасывает время восстановления этого умения и делает следующий Взрыв магмы в течение 10 сек. мгновенным. Урон растёт с силой заклинаний. (Стихии)',
+    'Наносит {damage} урона от огня. Попадание даёт 1 Гром. Всегда наносит критический удар по цели, охваченной вашим Тлеющим разрядом. Критический удар наносит дополнительно 24% от обычного урона. Прилив магмы: каждый тик Тлеющего разряда с вероятностью 20% сбрасывает время восстановления этого умения и делает следующий Взрыв магмы в течение 10 сек. мгновенным. Урон растёт с силой заклинаний. (Стихии)',
   'entities.abilities.lightning_overload.name': 'Дуговая перегрузка',
   'entities.abilities.lightning_overload.description':
     'Пассивно: Дуговая стрела и Разветвленная молния с вероятностью 20% вызывают Перегрузку, поражая первую цель повторно на 50% нанесённого урона и даруя 1 Гром. (Стихии)',
@@ -1124,6 +1134,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.ferry.castingOff': 'Паром на {dest} отчаливает',
   'hudChrome.ferry.boardHint': 'Стойте на палубе в момент отплытия. Переправа бесплатна.',
   'hudChrome.ferry.sailing': 'Курс на {dest}',
+  'hudChrome.ferry.portLabel': '{port}: паром на {dest}',
+  'hudChrome.ferry.portTitle': '{port}: паромный причал',
+  'hudChrome.ferry.destination': 'Пункт назначения: {dest}',
+  'hudChrome.ferry.boardNow': 'Можно садиться на паром',
+  'hudChrome.ferry.arrivesIn': 'Паром прибудет через {time}',
+  'hudChrome.ferry.scheduleUnavailable': 'Расписание парома недоступно.',
   'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
   'hudChrome.framePresets.pickerLabel': 'Профили рамок: {name}',
   'hudChrome.framePresets.overwrite': 'Перезаписать профиль',
@@ -3128,6 +3144,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': 'Сенсорное управление',
   'hudChrome.options.gfxCustomNote':
     'Изменение любого регулятора переключает пресет качества на «Расширенное»: собственный набор на основе базы «Высокое», начинающийся с уровней, показанных для текущего пресета.',
+  'hudChrome.options.ambienceVolume': 'Громкость окружения',
   'hudChrome.options.footstepSounds': 'Звуки шагов',
   'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',
@@ -5239,7 +5256,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Окружает вас молниями на 10 мин. Следующие 3 атаки в ближнем бою по вам наносят атакующему {buff} урона от природы, не чаще раза в 5 сек.',
   'entities.abilities.flame_shock.name': 'Пепельный толчок',
   'entities.abilities.flame_shock.description':
-    'Наносит {damage} урона от огня, затем {overTime} урона от огня за 12 сек. Первое попадание растёт с силой заклинаний.',
+    'Наносит {damage} урона от огня, затем {overTime} урона от огня за {duration} сек. Первое попадание растёт с силой заклинаний.',
   'entities.abilities.flametongue_weapon.name': 'Оружие пламенного клейма',
   'entities.abilities.flametongue_weapon.description':
     'Наполняет ваше оружие на 30 мин. Каждый удар наносит {damage} дополнительного урона от огня.',
@@ -5297,7 +5314,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.name': 'Лунная буря',
   'entities.abilities.moonfire.description':
     'Сжигает врага лунным огнем, нанося {damage} ед. урона от тайной магии и периодический урон.',
-  'entities.abilities.rejuvenation.name': 'Дикий расцвет',
+  'entities.abilities.rejuvenation.name': 'Спороисцеление',
   'entities.abilities.rejuvenation.description': 'Исцеляет цель на {damage} за 12 сек.',
   'entities.abilities.thorns.name': 'Терновая защита',
   'entities.abilities.thorns.description':
@@ -5428,7 +5445,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Переход в скрытность в облике волка. Нельзя использовать в бою.',
   'entities.abilities.rake.name': 'Свежевание',
   'entities.abilities.rake.description':
-    'Полосует врага на урон оружия плюс {damage} и вызывает кровотечение на 18 сек. Даёт 1 серию приёмов. Только в облике кота.',
+    'Полосует врага на урон оружия плюс {damage} и наносит {overTime} урона кровотечением за 18 сек. Даёт 1 серию приёмов. Только в облике кота.',
   'entities.abilities.revive_pet.name': 'Подлатать',
   'entities.abilities.revive_pet.description':
     'Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
@@ -5491,7 +5508,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Высвобождает первобытную силу. В облике кота скорость восстановления энергии повышается на 100% на 10 сек. В облике бурого мгновенно дает 50 ед. ярости. (знаковое умение Силы зверя)',
   'entities.abilities.swiftmend.name': 'Быстрое восстановление',
   'entities.abilities.swiftmend.description':
-    'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Каждое применение Дикого расцвета, Второго расцвета и Дикого заживления добавляет 1 стадию Зелени; при 3 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
+    'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Каждое применение Спороисцеления, Второго расцвета и Дикого заживления добавляет 1 стадию Зелени; при 3 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Спороисцеление и Второй расцвет накапливают Зелень; при 5 стадиях Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
   'entities.abilities.crusader_strike.name': 'Удар воина Света',
   'entities.abilities.crusader_strike.description':
     'Бьет цель, нанося урон оружием плюс {damage} ед. урона от Света. (талант паладина)',
@@ -8296,6 +8315,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.dragDestroyHint': 'Перетащите в мир, чтобы уничтожить',
   'hudChrome.bags.reorderNeedsRecent':
     'Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках',
+  'hudChrome.bags.reorderLocked':
+    'Заблокированные предметы остаются в своей ячейке сумки. Чтобы переместить предмет, снимите блокировку.',
   'hudChrome.bags.filterGroupAria': 'Фильтровать сумки по категории',
   'hudChrome.bags.filterAll': 'Все',
   'hudChrome.bags.filterWeapon': 'Оружие',
@@ -10524,7 +10545,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Дробление костей наносит на 30% больше урона, а его аварийная защита больше не заменяет удар.',
   'entities.itemSets.grovespring.name': 'Одеяние рощевого родника',
   'entities.itemSets.grovespring.bonus2':
-    'Быстрое восстановление сначала поглощает ваш собственный Дикий расцвет или Второй расцвет и исцеляет на 25% больше. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+    'Быстрое восстановление сначала поглощает ваше собственное Спороисцеление или Второй расцвет и исцеляет на 25% больше. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.grovespring.bonus4':
     'Сверхцветение собирает 75% оставшегося исцеления ваших эффектов, после чего добавляет 1 стадию Зелени.',
   'entities.items.lastflame_core.name': 'Ядро Последнего Пламени',
@@ -13463,6 +13484,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': 'Облик бурого',
   'guide.models.formCat': 'Облик кота',
   'guide.models.formTravel': 'Форма скорохода',
+  'guide.models.formSporemender': 'Облик спороцелителя',
   'guide.models.groupForms': 'Облики друида',
   'guide.nav.sidebarLabel': 'Разделы руководства',
   'guide.professions.craftHowTitle': 'Окно ремесла',
@@ -16192,7 +16214,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Отмечает противника на 15 сек., накапливая 20% урона, нанесённого вами и вашими мертвецами. Повторное применение подрывает метку. Если отмеченный противник погибает, она взрывается в радиусе 6 ярдов и создаёт 1 осколок души.',
   'entities.abilities.ossuary_mark.name': 'Метка оссуария',
   'entities.abilities.overbloom.description':
-    'Расходует ваши 3 стадии Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Дикий расцвет.',
+    'Расходует ваши 3 стадии Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Спороисцеление.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новое Спороисцеление.',
   'entities.abilities.overbloom.name': 'Сверхцветение',
   'entities.abilities.pack_command.description':
     'Приказывает вашему живому питомцу атаковать. Успешное попадание дает 20 ед. концентрации и один уровень Свирепости стаи.',
@@ -16321,7 +16345,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Условный свист подстегивает вашу группу, увеличивая скорость атаки, произнесения заклинаний и поддержания на 10% на 10 сек. Союзники, недавно получившие групповое ускорение, слишком истощены, чтобы получить эффект. (талант разбойника)',
   'entities.abilities.thieves_chorus.name': 'Хор воров',
   'entities.abilities.thunder_reservoir.description':
-    'Пассивно: Дуга молнии и Небесная ветвь накапливают Гром, максимум 5. При 5 зарядах Земной толчок наносит на 125% больше урона, а Разлом земли на 100%, затем расходуется весь Гром. (Громовержец)',
+    'Пассивно: Дуга молнии, Небесная ветвь и Взрыв магмы накапливают Гром, максимум 5. При 5 зарядах Земной толчок наносит на 125% больше урона, а Разлом земли на 100%, затем расходуется весь Гром. (Громовержец)',
   'entities.abilities.thunder_reservoir.name': 'Грозовой запас',
   'entities.abilities.tidecall.description':
     'Исцеляет дружественную цель на {damage}. Исцеление усиливается силой заклинаний. Добавляет полный объем до избыточного исцеления в Поток исцеления, вплоть до 30% максимального здоровья цели.',
@@ -16465,11 +16489,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Облик ближнего боя: энергия и приёмы серии, как у разбойника, и куда меньше угрозы.',
   'guide.classPage.formLine.form_travel':
     'Дорожный облик: по земле вы двигаетесь куда быстрее, но других способностей нет, пока не выйдете из него.',
+  'guide.classPage.formLine.form_sporemender':
+    'Целительный облик Исцеления: прочная шкура и более сильное исцеление при более медленном шаге, а все заклинания и мана остаются при вас.',
   'guide.classPage.formName.form_bear': 'Облик бурого',
   'guide.classPage.formName.form_travel': 'Форма скорохода',
+  'guide.classPage.formName.form_sporemender': 'Облик спороцелителя',
   'guide.classPage.formsHeading': 'Смена облика',
   'guide.classPage.formsMoonwing':
-    'Друид ветки Баланса получает ещё один облик, Облик лунного совуха — облик заклинателя, в котором такой друид и сражается. Это единственный звериный облик, что сохраняет ваши заклинания, а ваш жезл работает лишь в нём или в обычном облике заклинателя.',
+    'Друид ветки Баланса получает ещё один облик, Облик лунного совуха — облик заклинателя, в котором такой друид и сражается. Как и Облик спороцелителя у Исцеления, он сохраняет ваши заклинания, а ваш жезл работает лишь в этих двух обликах или в обычном облике заклинателя.',
   'guide.classPage.formsWolfEngage':
     'Волк открывает бой Натиском бурого, сразу переходит в Облик волка, чтобы пригвоздить цель, сокращает дистанцию Выпадом, когда не скрывается, и удерживает врага Повалом.',
   'guide.classPage.formsAutoUnshift':
@@ -17360,6 +17387,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Облик демона: размер тела увеличен на {pct}%; прочие бонусы показаны отдельными эффектами',
   'hudChrome.auraEffect.formMoonkin':
     'Облик лунного крыла: урон заклинаний повышен на {pct}%, а броня на {armorPct}%',
+  'hudChrome.auraEffect.formSporemender':
+    'Облик спороцелителя: исходящее исцеление повышено на {pct}%, броня на {armorPct}%, а скорость передвижения снижена на {slowPct}%',
   'hudChrome.auraEffect.formShadow': 'Сумрачный облик: урон от темной магии повышен на {pct}%',
   'hudChrome.auraEffect.freeExecute': 'Следующее подходящее добивающее умение не требует ресурсов',
   'hudChrome.auraEffect.funeralHarvestLock':
@@ -17432,7 +17461,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     'Ядовитый ритуал: этап {stacks} из {max}. «Трусливый выпад», «Злодейский разрез» и «Ядовитый дротик» добавляют по 1 этапу; на этапе {max} «Вечный сон» превращается в «Ядовитый разрыв»',
   'hudChrome.auraEffect.verdance':
-    'Зелень: стадия {stacks} из {max}. Каждый применённый Дикий расцвет, Второй расцвет или Дикое заживление добавляет 1, и каждая стадия сокращает время применения Дикого заживления. При {max} Быстрое восстановление становится Сверхцветением',
+    'Зелень: стадия {stacks} из {max}. Каждый применённый Спороисцеление, Второй расцвет или Дикое заживление добавляет 1, и каждая стадия сокращает время применения Дикого заживления. При {max} Быстрое восстановление становится Сверхцветением',
   'hudChrome.auraEffect.warlockAnchor':
     'Повторное применение в пределах {range} м возвращает сюда и поглощает якорь',
   'hudChrome.auraEffect.wintersChill':
@@ -18952,7 +18981,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.wocToken': 'Токен WoC',
   'hudChrome.currencies.heroicMarkNote':
     'Героические подземелья . тратится у героического интенданта',
-  'hudChrome.currencies.honorNote': 'Поля боя и арена',
+  'hudChrome.currencies.honorNote': 'Поля боя, арена и локальные задания',
   'hudChrome.currencies.delveMarkNote': 'Пройденные вылазки',
   'hudChrome.currencies.wocTokenNote': 'Баланс привязанного кошелька',
   'hudChrome.currencies.walletNotLinked': 'Кошелёк не привязан',
@@ -19240,6 +19269,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     'Призывает всех погибших участников группы или рейда в пределах 40 м и в поле зрения к вам и возвращает их к жизни с 30% здоровья и маны. Нельзя применять в бою. (Исцеление)',
   'entities.abilities.grove_awakening.name': 'Пробуждение рощи',
+  'entities.abilities.sporemender_form.name': 'Облик спороцелителя',
+  'entities.abilities.sporemender_form.description':
+    'Вы принимаете Облик спороцелителя: исходящее исцеление повышается на 20%, а броня на 40%, но скорость передвижения снижается на 20%. Все заклинания обычного облика остаются доступны. Действует, пока вы не смените облик. Смена облика также даёт эффект «Стремительная поступь», краткий всплеск скорости передвижения. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Исцеления)',
+  'entities.abilities.spore_burst.name': 'Споровый взрыв',
+  'entities.abilities.spore_burst.description':
+    'Призывает в указанную область споровый гриб. Через {duration} сек. он лопается, исцеляя союзников в радиусе 8 м на {healing} и нанося врагам {damage} ед. урона от сил природы.',
+  'entities.abilities.spore_burst.specNote_balance':
+    'При 3 стадиях Лунного прилива эффект сильнее на 25%, а Лунный прилив расходуется.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Также накладывает Спороисцеление на каждого исцелённого союзника. При полной Зелени эффект сильнее на 25%, а Зелень расходуется.',
+  'entities.abilities.natures_boon.name': 'Благодать природы',
+  'entities.abilities.natures_boon.description':
+    'Ваши заклинания могут пробудить Благодать природы на 10 сек.: указанное заклинание становится бесплатным, на 25% сильнее и доступно в любом облике. Новое срабатывание обновляет время действия.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Каждая попавшая автоатака в ближнем бою срабатывает с шансом 1 из 15 для Спороисцеления, а в Облике бурого также для Дубовой шкуры.',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Каждое применение Дикой стрелы или Падения небес срабатывает с шансом 10% для Спорового взрыва, не чаще раза в 10 сек.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Каждый такт ваших эффектов исцеления со временем срабатывает с шансом 10% для Спорового взрыва, не чаще раза в 10 сек.',
   'entities.abilities.prayer_of_returning.description':
     'Призывает всех погибших участников группы или рейда в пределах 40 м и в поле зрения к вам и возвращает их к жизни с 30% здоровья и маны. Нельзя применять в бою. (Свет и Послушание)',
   'entities.abilities.prayer_of_returning.name': 'Молитва возвращения',
@@ -20040,4 +20088,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Когда вы получили эту награду за локальное задание, ваши сумки были полны, поэтому вороны доставили её сюда. Освободите место и заберите её у любого вороньего столба.\n\n- Воронья почта',
   'questUi.logs.worldQuestRewardMailed':
     'Ваши сумки полны. Награда отправлена в почтовый ящик: {items}.',
+  'errors.searchUpdates': 'Поиск обновлений',
+  'errors.noUpdateFound': 'Обновление не найдено. Повторите попытку чуть позже.',
+  'errors.updateUnavailable':
+    'Обновите игру через игровой магазин или скачайте последнюю версию клиента.',
+  'errors.updateSearchFailed': 'Не удалось проверить обновления. Повторите попытку.',
 };

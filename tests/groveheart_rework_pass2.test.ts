@@ -1,18 +1,19 @@
 // Groveheart rework pass 2: Nature's Boon at 4 procs per minute in every form
 // (and every Wildfang proc readies Oakhide), Bruin Form's doubled cadence at
 // half damage with double white-swing rage, the Groveheart Nature's Boon from
-// heal-over-time ticks (instant, free, 25% stronger Wildmend behind a 10 sec
-// internal cooldown), and Second Bloom's 15 sec HoT with its closing heal.
+// heal-over-time ticks (free, 25% stronger Spore Burst behind a 10 sec internal
+// cooldown), and Second Bloom's 15 sec HoT with its closing heal.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   GROVEHEART_BOON_ICD,
   GROVEHEART_BOON_ICD_KEY,
   GROVEHEART_BOON_TICK_CHANCE,
+  MOONGROVE_BOON_ICD_KEY,
   NATURES_BOON_CHANCE,
   NATURES_BOON_ID,
-  NATURES_BOON_POWER,
   naturesBoonChanceAt,
   naturesBoonOnAutoAttack,
+  naturesBoonOnCast,
   naturesBoonOnHotTick,
   OAKHIDE_ID,
 } from '../src/sim/combat/druid_natures_boon';
@@ -195,14 +196,14 @@ describe('Bruin Form: twice the swings, half the damage, double rage', () => {
   });
 });
 
-describe("Nature's Boon (Groveheart): HoT ticks arm an instant, free Wildmend", () => {
-  it('rolls on an owned HoT tick, arms Wildmend, and starts a 10 sec cooldown', () => {
+describe("Nature's Boon (Groveheart): HoT ticks arm a free Spore Burst", () => {
+  it('rolls on an owned HoT tick, arms Spore Burst, and starts a 10 sec cooldown', () => {
     const { sim, player } = rig('restoration');
     const ctx = ctxOf(sim);
     const chance = vi.spyOn(ctx.rng, 'chance').mockReturnValue(true);
     naturesBoonOnHotTick(ctx, player, ownHot(player));
     expect(chance).toHaveBeenCalledExactlyOnceWith(GROVEHEART_BOON_TICK_CHANCE);
-    expect(boonAura(player)?.empowerAbilities).toEqual(['healing_touch']);
+    expect(boonAura(player)?.empowerAbilities).toEqual(['spore_burst']);
     expect(player.procState?.icds[GROVEHEART_BOON_ICD_KEY]).toBe(GROVEHEART_BOON_ICD);
     // Inside the cooldown a tick draws nothing at all.
     naturesBoonOnHotTick(ctx, player, ownHot(player));
@@ -250,54 +251,7 @@ describe("Nature's Boon (Groveheart): HoT ticks arm an instant, free Wildmend", 
     expect(chance.mock.calls.some((call) => call[0] === GROVEHEART_BOON_TICK_CHANCE)).toBe(true);
   });
 
-  it('makes Wildmend instant, free, 25% stronger, and castable in Cat Form', () => {
-    // The INTENDED heal (the amount handed to applyHeal, before the missing-
-    // health clamp), at the fixture's own gear heal power: spending the window
-    // refreshes derived stats, so a hand-set heal power would not survive it.
-    const healFor = (armed: boolean) => {
-      const { sim, player } = rig('restoration', 123);
-      const ctx = ctxOf(sim);
-      player.hp = 1;
-      if (armed) {
-        vi.spyOn(ctx.rng, 'chance').mockReturnValueOnce(true);
-        naturesBoonOnHotTick(ctx, player, ownHot(player));
-        vi.restoreAllMocks();
-      }
-      const resolved = sim.resolvedAbility('healing_touch');
-      const intended: number[] = [];
-      const applyHeal = ctx.applyHeal.bind(ctx);
-      ctx.applyHeal = ((source, target, amount, ...rest) => {
-        if (rest[0] === 'Wildmend') intended.push(amount);
-        return applyHeal(source, target, amount, ...rest);
-      }) as typeof ctx.applyHeal;
-      vi.spyOn(ctx.rng, 'next').mockReturnValue(0.5);
-      vi.spyOn(ctx.rng, 'chance').mockReturnValue(false);
-      const before = player.resource;
-      sim.castAbility('healing_touch');
-      for (let tick = 0; tick < 200 && player.castingAbility; tick++) sim.tick();
-      vi.restoreAllMocks();
-      return {
-        castTime: resolved?.castTime ?? -1,
-        cost: before - player.resource,
-        intended,
-        armedAfter: boonAura(player) !== undefined,
-      };
-    };
-    const plain = healFor(false);
-    const boon = healFor(true);
-    expect(plain.castTime).toBeGreaterThan(0);
-    expect(boon.castTime).toBe(0);
-    expect(plain.cost).toBeGreaterThan(0);
-    expect(boon.cost).toBe(0);
-    expect(plain.intended).toHaveLength(1);
-    expect(boon.intended).toHaveLength(1);
-    // 25% stronger, whole heal (roll plus Spell Power rider), within rounding.
-    expect(Math.abs(boon.intended[0] - plain.intended[0] * NATURES_BOON_POWER)).toBeLessThanOrEqual(
-      1,
-    );
-    expect(boon.armedAfter).toBe(false);
-
-    // In Cat Form the armed Wildmend goes off without leaving the form.
+  it('makes Spore Burst free and castable in Cat Form', () => {
     const { sim, player } = rig('restoration', 124);
     sim.castAbility('cat_form');
     expect(player.auras.some((aura) => aura.kind === 'form_cat')).toBe(true);
@@ -305,23 +259,24 @@ describe("Nature's Boon (Groveheart): HoT ticks arm an instant, free Wildmend", 
     naturesBoonOnHotTick(ctxOf(sim), player, ownHot(player));
     vi.restoreAllMocks();
     player.gcdRemaining = 0;
-    player.hp = Math.round(player.maxHp * 0.5);
-    const hpBefore = player.hp;
-    sim.castAbility('healing_touch');
-    expect(player.hp).toBeGreaterThan(hpBefore);
+    const manaBefore = player.resource;
+    sim.castAbilityAt('spore_burst', { x: player.pos.x + 1, z: player.pos.z });
+    expect(player.resource).toBe(manaBefore);
+    expect(sim.activeSporeBursts).toHaveLength(1);
     expect(player.auras.some((aura) => aura.kind === 'form_cat')).toBe(true);
     expect(boonAura(player)).toBeUndefined();
   });
 
-  it('keeps the heal on the pre-boon cast time coefficient', () => {
+  it('no longer changes Wildmend cast time or cost', () => {
     const { sim, player } = rig('restoration');
     const before = sim.resolvedAbility('healing_touch');
     vi.spyOn(ctxOf(sim).rng, 'chance').mockReturnValueOnce(true);
     naturesBoonOnHotTick(ctxOf(sim), player, ownHot(player));
     vi.restoreAllMocks();
     const armed = sim.resolvedAbility('healing_touch');
-    expect(armed?.castTime).toBe(0);
-    expect(armed?.scalingCastTime).toBe(before?.castTime);
+    expect(boonAura(player)?.empowerAbilities).toEqual(['spore_burst']);
+    expect(armed?.castTime).toBe(before?.castTime);
+    expect(armed?.scalingCastTime).toBe(before?.scalingCastTime);
   });
 });
 
@@ -483,12 +438,12 @@ describe('Bonecrush queued before Old Blood fills', () => {
 });
 
 describe("Nature's Boon windows end on a specialization change", () => {
-  it('a Groveheart Wildmend window does not survive a respec out of Groveheart', () => {
+  it('a Groveheart Spore Burst window does not survive a respec out of Groveheart', () => {
     const { sim, player } = rig('restoration');
     vi.spyOn(ctxOf(sim).rng, 'chance').mockReturnValueOnce(true);
     naturesBoonOnHotTick(ctxOf(sim), player, ownHot(player));
     vi.restoreAllMocks();
-    expect(sim.resolvedAbility('healing_touch')?.castTime).toBe(0);
+    expect(boonAura(player)?.empowerAbilities).toEqual(['spore_burst']);
     expect(sim.applyTalents({ spec: 'feral', rows: {} })).toBe(true);
     expect(boonAura(player)).toBeUndefined();
     expect(sim.resolvedAbility('healing_touch')?.castTime).toBeGreaterThan(0);
@@ -503,5 +458,17 @@ describe("Nature's Boon windows end on a specialization change", () => {
     expect(boonAura(player)?.empowerAbilities).toEqual(['rejuvenation', 'barkskin']);
     expect(sim.applyTalents({ spec: 'restoration', rows: {} })).toBe(true);
     expect(boonAura(player)).toBeUndefined();
+  });
+
+  it('a Moongrove Spore Burst window and cooldown do not survive a respec', () => {
+    const { sim, player } = rig('balance');
+    vi.spyOn(ctxOf(sim).rng, 'chance').mockReturnValueOnce(true);
+    naturesBoonOnCast(ctxOf(sim), player, 'wrath');
+    vi.restoreAllMocks();
+    expect(boonAura(player)?.empowerAbilities).toEqual(['spore_burst']);
+    expect(player.procState?.icds[MOONGROVE_BOON_ICD_KEY]).toBeDefined();
+    expect(sim.applyTalents({ spec: 'restoration', rows: {} })).toBe(true);
+    expect(boonAura(player)).toBeUndefined();
+    expect(player.procState?.icds[MOONGROVE_BOON_ICD_KEY]).toBeUndefined();
   });
 });

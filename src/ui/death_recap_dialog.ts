@@ -17,11 +17,32 @@ export interface DeathRecapDialogDeps {
   root?: () => HTMLElement | null;
   getLatestRecap(): DeathRecapRecord | null;
   getRaidDeaths?(): RaidDeathEntry[];
-  attachTooltip(el: HTMLElement, html: () => string): void;
+  attachTooltip(el: HTMLElement, html: () => string, isSpell?: () => boolean): void;
   hideTooltip(): void;
   previewResolvedAbility?(id: string): ResolvedAbility | null;
   abilityTooltip?(res: ResolvedAbility): string;
   onClose?(): void;
+}
+
+// The recap reads the combat meters answer for the dialog. Structural, so the
+// dialog never depends on the concrete Meters class.
+export interface DeathRecapMeters {
+  getLatestDeathRecap(pid: number): DeathRecapRecord | null;
+  getRaidDeaths(): RaidDeathEntry[];
+}
+
+// Adapts the meters to the dialog's two data deps: the local player's latest
+// recap (the player id is read per call, so a spectate repoint follows) and the
+// raid-wide chronological death list. The HUD spreads the result into the deps
+// bag, so the coordinator carries one line of recap data wiring.
+export function deathRecapSource(
+  meters: DeathRecapMeters,
+  playerId: () => number,
+): Required<Pick<DeathRecapDialogDeps, 'getLatestRecap' | 'getRaidDeaths'>> {
+  return {
+    getLatestRecap: () => meters.getLatestDeathRecap(playerId()),
+    getRaidDeaths: () => meters.getRaidDeaths(),
+  };
 }
 
 export class DeathRecapDialog {
@@ -397,7 +418,11 @@ export class DeathRecapDialog {
       const idx = Number.parseInt(cardEl.dataset.cardIndex ?? '-1', 10);
       const card = cards[idx];
       if (!card) return;
-      this.deps.attachTooltip(cardEl, () => this.generateCardTooltip(card));
+      this.deps.attachTooltip(
+        cardEl,
+        () => this.generateCardTooltip(card),
+        () => !!card.abilityId,
+      );
     });
   }
 

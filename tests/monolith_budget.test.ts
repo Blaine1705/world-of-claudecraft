@@ -543,7 +543,20 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the v0.45.0 release batch after approved PR #4357 added the
     // instance difficulty badge wiring to the coordinator. Exact count measured
     // on the merged tree after the release integration repair (wc -l after biome).
-    ceiling: 18178,
+    // Lowered from 18178 by the resizable world map: the window drag-handle
+    // predicate moved out to src/ui/window_drag_handle.ts and the map canvas
+    // sizing landed as src/ui/hud/map/map_canvas_size_controller.ts behind a
+    // one-line install. Exact merged count after the release batch, zero slack.
+    // LOWERED 18164 -> 18156: the death-screen surface decisions (Release
+    // overlay, ghost hint, corpse prompt) moved to src/ui/death_screen_view.ts
+    // together with the Release input hold. Exact merged count, zero slack.
+    // Ferry announcement history moved to zone_announcement_core; the map
+    // keeps tracking physical zone changes while notices wait for docking.
+    // Exact merged count after #4413 composed with the current release batch.
+    // Re-pinned at the v0.45.0 release batch after #4419's hover-tooltip
+    // options and #4433's mounted-form stride guard composed with the existing
+    // coordinator. Exact merged count after biome, zero slack.
+    ceiling: 18060,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1030,7 +1043,11 @@ const MONOLITHS: MonolithRow[] = [
     // async build tracking stays extracted in static_interior_tracker.ts while
     // the release batch's spirit-veil and Spell Effects extractions remain.
     // Exact count measured with wc -l on the resolved tree. Zero slack.
-    ceiling: 12620,
+    // RAISED 12617 -> 12636 after integrating Spore Burst with the v0.45
+    // renderer extractions: the visual lives in src/render/spore_burst_visual.ts;
+    // renderer.ts only constructs it, syncs it in both frame loops, and routes
+    // the burst cue. Exact count, zero slack.
+    ceiling: 12636,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1247,7 +1264,17 @@ const MONOLITHS: MonolithRow[] = [
     // PR #4387 then moved difficulty selection behind its SimContext sibling.
     // Weekly loot focus composes with that release candidate and keeps the
     // resolved sim.ts at the exact merged count after biome. Zero slack.
-    ceiling: 11629,
+    // Re-pinned at the continued v0.45.0 release batch after the approved PRs
+    // already on this line composed with the weekly loot focus candidate; no
+    // new sim logic lands in this resizable-map merge. Exact merged count, zero
+    // slack.
+    // Down to 11629 with buff persistence composed on the release candidate:
+    // the sickness save fields moved into src/sim/aura_persist.ts's
+    // auraSaveFragment beside the new buff list, while the candidate's
+    // rift-safe corpse save path remains in sim.ts. Exact count, zero slack.
+    // Up to 11630 while composing #4414's Spore Burst ground rider with the
+    // existing v0.45.0 batch. Exact merged count, zero slack.
+    ceiling: 11630,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1471,7 +1498,11 @@ const MONOLITHS: MonolithRow[] = [
     // Colorblind Mode's interface body-class extraction also composes with
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
-    ceiling: 11140,
+    // Fatal screen DOM moved to fatal_overlay_controller for update recovery.
+    // Re-pinned at the v0.45.0 release batch after #4420's client-update
+    // recovery flow composed with the current entrypoint. Exact merged count
+    // after biome, zero slack.
+    ceiling: 10981,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1739,7 +1770,12 @@ const MONOLITHS: MonolithRow[] = [
     // Bank and vault commands share admission and save scheduling in
     // bank_storage_command. Combined merge measures 9816 lines, exact count
     // and zero slack.
-    ceiling: 9816,
+    // LOWERED 9816 -> 9769 after composing the spectate-body fix with this
+    // release candidate: /spectate stopped parking the moderator's body in
+    // limbo (the camera moves, the body stays in the world), retiring the
+    // saved position, GM toggle and pet stow while entry idle moved to
+    // server/spectate_body.ts. Exact count, zero slack.
+    ceiling: 9769,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1926,7 +1962,9 @@ const MONOLITHS: MonolithRow[] = [
     // (adiff): thin ClientWorld decode/read only, measured with wc -l after biome.
     // Weekly Vault self-decode joins the bank_snapshot_wire owner-only cohort.
     // Combined merge measures 5330 lines, exact count and zero slack.
-    ceiling: 5330,
+    // RAISED 5330 -> 5332 for Spore Burst: the activeSporeBursts IWorld field
+    // and its type import (the decode lives in net/ground_telegraph_wire.ts).
+    ceiling: 5332,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2215,7 +2253,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
     // the name row was built with, paid for by three comment trims. Exact count
     // (wc -l < src/render/nameplate_canvas.ts), zero slack.
-    ceiling: 826,
+    // LOWERED 826 -> 823 at World PvP bounties: the state gained the bounty bit
+    // and the name row its blood-red fills, paid for by moving every tag fill
+    // rule (the guild colour tiers included) to nameplate_tag_fill_core.ts.
+    // Exact count (wc -l < src/render/nameplate_canvas.ts), zero slack.
+    ceiling: 823,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
