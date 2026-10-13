@@ -85,10 +85,18 @@ export type {
   SanctumAlertView,
 } from './sanctum_alert_view';
 export { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
+export type { WildheartSceneEntity, WildheartSceneWorld } from './wildheart_alert_scene_core';
+export { WildheartAlertSceneScan } from './wildheart_alert_scene_core';
 export type {
   WildheartAlertEntity,
   WildheartAlertInput,
   WildheartAlertKind,
+  WildheartAlertScene,
   WildheartAlertView,
 } from './wildheart_alert_view';
-export { buildWildheartAlertView, WILDHEART_ALERT_KINDS } from './wildheart_alert_view';
+export {
+  buildWildheartAlertView,
+  EMPTY_WILDHEART_SCENE,
+  WILDHEART_ALERT_KINDS,
+  WILDHEART_SOFT_ALERT_KINDS,
+} from './wildheart_alert_view';

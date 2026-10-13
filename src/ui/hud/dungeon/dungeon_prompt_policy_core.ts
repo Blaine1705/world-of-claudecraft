@@ -17,10 +17,11 @@
 //    profile or governor (tests/dungeon_hints_setting.test.ts pins that).
 //
 // 2. The slot. The prompts share one slot, so the use prompt gives way to
-//    every prompt above it that is SHOWING, except a soft Crypt readout, which
-//    gives the slot to the use prompt instead. An advisory alert the setting
-//    hides is not showing, so it never holds the slot: with the hints off the
-//    use prompt takes the slot exactly as it does when no alert is up.
+//    every prompt above it that is SHOWING, except a soft Crypt readout and a
+//    soft Wildheart alert (the ones that say "pull the spear"), which give the
+//    slot to the use prompt instead. An advisory alert the setting hides is
+//    not showing, so it never holds the slot: with the hints off the use
+//    prompt takes the slot exactly as it does when no alert is up.
 
 /** Every prompt DungeonPrompts composes, in slot order (the use prompt last). */
 export type DungeonPromptId =
@@ -61,10 +62,20 @@ export interface DungeonPromptSlotState {
   crypt: boolean;
   /** The showing Crypt alert is a SOFT readout (ignored while crypt is false). */
   cryptSoft: boolean;
+  /** The showing Wildheart alert is a SOFT one (ignored while wildheart is
+   *  false): it points at a Hunting Spear the use prompt can offer. */
+  wildheartSoft: boolean;
 }
 
 /** Whether a prompt above the use prompt holds the shared slot (the use prompt
- *  is then not built). A soft Crypt readout does not hold it. */
+ *  is then not built). A soft Crypt readout or Wildheart alert does not hold it. */
 export function usePromptYields(s: DungeonPromptSlotState): boolean {
-  return s.cage || s.chain || s.bastion || s.wildheart || s.sanctum || (s.crypt && !s.cryptSoft);
+  return (
+    s.cage ||
+    s.chain ||
+    s.bastion ||
+    (s.wildheart && !s.wildheartSoft) ||
+    s.sanctum ||
+    (s.crypt && !s.cryptSoft)
+  );
 }

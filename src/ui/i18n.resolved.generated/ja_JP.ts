@@ -4180,7 +4180,12 @@ export const ja_JP: EnTranslations = {
         "pollinated": "種莢に触れると、すぐに茨の芽が生える。種には近づかず、花粉のない者に踏み潰させよう。放置された種莢は{seconds}秒で芽吹く（ヒロイックでは{heroic}秒で地中に潜り、最も近い者の傍から現れる）。",
         "prey": "ズルガーがあなたを狙っている。光る太陽紋を踏ませると{slow}%鈍足になる。捕まると引き裂かれ、{damage}のダメージ（ヒロイックでは{heroic}）を受けて{stun}秒間倒される。",
         "avatar": "移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。",
-        "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
+        "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。",
+        "sunstruck": "光る太陽紋に焼かれた：移動速度が{pct}%低下する。",
+        "sunstruckExposed": "光る太陽紋に焼かれた：受けるダメージが{pct}%増加する。",
+        "sunWary": "この効果が終わるまで、どの太陽紋も彼を焼けない。その間に踏まれた光る太陽紋は光ったまま残る。",
+        "pinned": "狩りの槍があなたをその場に釘付けにしている。{every}秒ごとに{bleed}の物理ダメージ（ヒロイックでは{heroicBleed}）の出血を受け、ワイルドハートの脈動はどこにいても命中してダメージが{pulse}%増加する。仲間は{pull}秒で槍を引き抜ける。他に動ける仲間がいなければ、自分で{wrench}秒かけて引き抜ける。{seconds}秒後には自然に抜ける。",
+        "idolAwake": "石のジャガーが目覚めた。{every}秒ごとに、床に{warning}秒の予兆を出してからテラスの片側ずつに息を吐く：その側にいる全員に{min}から{max}の自然ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）。ズルガーは倒されるまでジャガーの化身のままで、{seconds}秒ごと（ヒロイックでは{heroicSeconds}秒ごと）に獲物を替える。"
       },
       "bastion": {
         "brineColumn": "海水の柱に捕らわれ、{tick}秒ごとに{min}～{max}の自然ダメージを最大{seconds}秒間受ける。潮縛りの侍祭を妨害するかスタンさせれば抜け出せる。",
@@ -6652,7 +6657,21 @@ export const ja_JP: EnTranslations = {
       "pollinatedLine": "種に近づくな：触れると芽吹く",
       "bondTitle": "群れの絆",
       "bondLine": "並んでいると被ダメージ半減：引き離せ",
-      "timeAria": "残り{seconds}秒"
+      "timeAria": "残り{seconds}秒",
+      "preyAloneLine": "太陽紋を灯せる仲間がいない。消えた太陽紋の上に{seconds}秒立って灯し、ズルガーにそこを通らせろ",
+      "pinnedTitle": "釘付けにされた！",
+      "pinnedLine": "仲間に狩りの槍を引き抜いてもらえ。釘付けの間はワイルドハートの脈動のダメージが増える",
+      "pinnedSelfLine": "助けに来られる仲間がいない：ワイルドハートの脈動が来る前に自分で狩りの槍を引き抜け",
+      "sunstruckTitle": "ズルガーが太陽に焼かれた！",
+      "sunstruckLine": "効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め",
+      "spearTitle": "仲間が釘付けにされた！",
+      "spearLine": "狩りの槍まで走り、ワイルドハートの脈動が来る前に引き抜け",
+      "glyphTitle": "太陽紋を灯せ",
+      "glyphLine": "消えた太陽紋の上に{seconds}秒立つと灯る。ズルガーがそこを通ると、{duration}秒間受けるダメージが{pct}%増加する",
+      "glyphLightingTitle": "太陽紋を灯している",
+      "glyphLightingLine": "灯るまで太陽紋の上にとどまれ。離れるとやり直しになる",
+      "breathTitle": "偶像の息吹！",
+      "breathLine": "石のジャガーがテラスのこちら側に息を吐こうとしている。反対側へ渡れ"
     },
     "sanctumAlert": {
       "quenchTitle": "焼き入れの水の中だ！",
@@ -6741,6 +6760,13 @@ export const ja_JP: EnTranslations = {
       "relightFar": "{range}ヤード以内に近づいて灯し直せ",
       "relightAria": "{name}を灯し直す",
       "relightUsingLine": "吸い取られる間も動くな：攻撃では中断されないが、動くかスタンで中断される",
+      "freeLine": "槍を地面から引き抜き、釘付けにされた者を解放する。攻撃を受けても中断されないが、移動やスタンでは中断される",
+      "freeKey": "{name}を引き抜く",
+      "freeTap": "ここをタップして{name}を引き抜く",
+      "freeClick": "ここをクリックして{name}を引き抜く",
+      "freeFar": "{range}ヤード以内に近づいて引き抜け",
+      "freeAria": "{name}を引き抜く",
+      "freeUsingLine": "槍を引き抜くまで動くな：移動やスタンで中断される",
       "timeAria": "残り{seconds}秒"
     },
     "cosmetics": {
@@ -14975,6 +15001,12 @@ export const ja_JP: EnTranslations = {
       "wildheart_gorgebloom_gorge": "貪り食い",
       "wildheart_zulgar_pulse": "ワイルドハートの脈動",
       "wildheart_zulgar_spirit_hunt": "狩りの魂",
+      "wildheart_zulgar_hunting_spear": "狩りの槍",
+      "wildheart_zulgar_idol_wakes": "偶像の目覚め",
+      "kituse_wildheart_pull_spear": "槍を引き抜く",
+      "wildheart_idols_breath": "偶像の息吹",
+      "wildheart_sun_glyph_kindle": "点灯中",
+      "wildheart_sun_glyph_cold": "冷却中",
       "sanctum_cinder_breath": "残り火のブレス",
       "sanctum_warming_rite": "温めの儀式",
       "sanctum_goad": "駆り立て",
@@ -24806,6 +24838,9 @@ export const ja_JP: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "茨の芽"
+      },
+      "wildheart_hunting_spear": {
+        "name": "狩りの槍"
       },
       "buddy_ember_fox": {
         "name": "燃えさし狐"

@@ -4180,7 +4180,12 @@ export const zh_TW: EnTranslations = {
         "pollinated": "觸碰種莢會使其立刻長出荊棘幼芽。遠離種子，讓未授粉的玩家去踩碎它們；無人觸碰的種莢會在{seconds}秒後發芽（英雄難度下它會在{heroic}秒後鑽入地下，在最近的玩家身旁破土而出）。",
         "prey": "祖爾加在追獵你。引他踏過點亮的太陽符文，使他減速{slow}%。若被他追上，你會被撕咬，受到{damage}點傷害（英雄難度{heroic}點）並被擊倒{stun}秒。",
         "avatar": "移動速度提高{pct}%，追獵牠的獵物。減速和定身可以生效，擊暈的持續時間減半。",
-        "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。"
+        "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。",
+        "sunstruck": "被點亮的太陽符文灼傷：移動速度降低{pct}%。",
+        "sunstruckExposed": "被點亮的太陽符文灼傷：受到的傷害提高{pct}%。",
+        "sunWary": "在此效果結束前，任何太陽符文都無法灼傷他。他踏過的已點亮符文會保持點亮。",
+        "pinned": "一支狩獵之矛把你釘在原地。你每{every}秒流血，受到{bleed}點物理傷害（英雄難度{heroicBleed}點），而且無論你站在哪裡，荒野之心脈衝都會命中你，傷害提高{pulse}%。隊友可以用{pull}秒拔出長矛。如果沒有其他人能幫忙，你可以用{wrench}秒自己拔出。{seconds}秒後它會自行鬆脫。",
+        "idolAwake": "石美洲豹已經甦醒。每{every}秒，牠會在地面預警{warning}秒後，輪流向平台的一半吐息：對該半場的所有人造成{min}到{max}點自然傷害（英雄難度{heroicMin}到{heroicMax}點）。祖爾加會保持美洲豹化身直到死亡，並且每{seconds}秒更換獵物（英雄難度{heroicSeconds}秒）。"
       },
       "bastion": {
         "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}點自然傷害，最多持續{seconds}秒。打斷或擊暈潮縛侍僧即可掙脫。",
@@ -6652,7 +6657,21 @@ export const zh_TW: EnTranslations = {
       "pollinatedLine": "遠離種子：你的觸碰會讓它們發芽",
       "bondTitle": "獸群羈絆",
       "bondLine": "在一起時牠們傷害減半：把牠們拉開",
-      "timeAria": "剩餘{seconds}秒"
+      "timeAria": "剩餘{seconds}秒",
+      "preyAloneLine": "沒有其他人能點亮太陽符文。站在一個熄滅的符文上{seconds}秒將它點亮，再把祖爾加引過去",
+      "pinnedTitle": "被釘住了！",
+      "pinnedLine": "需要隊友拔出狩獵之矛。被釘住時，荒野之心脈衝對你的傷害更高",
+      "pinnedSelfLine": "沒有人能來幫忙：在荒野之心脈衝落下前自己拔出狩獵之矛",
+      "sunstruckTitle": "祖爾加被烈日灼傷了！",
+      "sunstruckLine": "在效果結束前他受到的傷害提高{pct}%：現在使用你最強的攻擊",
+      "spearTitle": "有隊友被釘住了！",
+      "spearLine": "跑到狩獵之矛旁，在荒野之心脈衝落下前把它拔出來",
+      "glyphTitle": "點亮太陽符文",
+      "glyphLine": "站在熄滅的太陽符文上{seconds}秒將它點亮。祖爾加踏過它時，會在{duration}秒內受到的傷害提高{pct}%",
+      "glyphLightingTitle": "正在點亮太陽符文",
+      "glyphLightingLine": "留在符文上直到它被點亮。離開就要重新開始",
+      "breathTitle": "神像吐息！",
+      "breathLine": "石美洲豹即將向平台的這一半吐息。跑到另一半去"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -6741,6 +6760,13 @@ export const zh_TW: EnTranslations = {
       "relightFar": "靠近到{range}碼內才能重燃它",
       "relightAria": "重燃{name}",
       "relightUsingLine": "在它吸取你時保持不動：受到攻擊不會打斷，移動或昏迷會打斷",
+      "freeLine": "把長矛從地面拔出，解救被釘住的人。受到攻擊不會打斷你，移動或昏迷會打斷",
+      "freeKey": "拔出{name}",
+      "freeTap": "點擊這裡拔出{name}",
+      "freeClick": "點選這裡拔出{name}",
+      "freeFar": "靠近到{range}碼內才能拔出它",
+      "freeAria": "拔出{name}",
+      "freeUsingLine": "保持不動以拔出長矛：移動或昏迷會打斷",
       "timeAria": "剩餘{seconds}秒"
     },
     "cosmetics": {
@@ -14975,6 +15001,12 @@ export const zh_TW: EnTranslations = {
       "wildheart_gorgebloom_gorge": "吞噬",
       "wildheart_zulgar_pulse": "荒野之心脈衝",
       "wildheart_zulgar_spirit_hunt": "狩獵之魂",
+      "wildheart_zulgar_hunting_spear": "狩獵之矛",
+      "wildheart_zulgar_idol_wakes": "神像甦醒",
+      "kituse_wildheart_pull_spear": "拔出長矛",
+      "wildheart_idols_breath": "神像吐息",
+      "wildheart_sun_glyph_kindle": "點亮中",
+      "wildheart_sun_glyph_cold": "冷卻中",
       "sanctum_cinder_breath": "餘燼吐息",
       "sanctum_warming_rite": "回暖儀式",
       "sanctum_goad": "驅策",
@@ -24806,6 +24838,9 @@ export const zh_TW: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "荊棘幼芽"
+      },
+      "wildheart_hunting_spear": {
+        "name": "狩獵之矛"
       },
       "buddy_ember_fox": {
         "name": "餘燼狐"

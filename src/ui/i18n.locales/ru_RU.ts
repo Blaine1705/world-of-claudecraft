@@ -22021,4 +22021,54 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Перед удалением этого персонажа перенесите все незакреплённые карточки с отметками на другого персонажа.',
   'apiError.character.referral_bond_pending':
     'Этому персонажу доставляется облигация подписки за приглашение друга. Повторите попытку удаления после завершения доставки.',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Опалён горящим солнечным глифом: движется на {pct}% медленнее.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Опалён горящим солнечным глифом: получает на {pct}% больше урона.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Пока действует этот эффект, ни один солнечный глиф не может его опалить. Горящий глиф, по которому он пройдёт, останется горящим.',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Охотничье копьё пригвоздило вас к месту. Вы истекаете кровью: {bleed} физического урона ({heroicBleed} в героическом режиме) каждые {every} сек., а Импульс Дикого Сердца поражает вас, где бы вы ни стояли, и наносит на {pulse}% больше урона. Союзник может вырвать копьё за {pull} сек. Если помочь некому, вырвите его сами за {wrench} сек. Через {seconds} сек. оно отпустит само.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'Каменный ягуар пробудился. Каждые {every} сек. после предупреждения на полу в течение {warning} сек. он выдыхает на одну половину террасы, затем на другую: от {min} до {max} урона от сил природы (от {heroicMin} до {heroicMax} в героическом режиме) всем, кто стоит на этой половине. Зулгар остаётся Аватаром ягуара до самой смерти и меняет Добычу каждые {seconds} сек. ({heroicSeconds} сек. в героическом режиме).',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Зажечь солнечные глифы больше некому. Встаньте на погасший глиф на {seconds} сек., чтобы зажечь его, затем проведите через него Зулгара',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Вы пригвождены!',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Охотничье копьё должен вырвать союзник. Пока вы пригвождены, Импульс Дикого Сердца бьёт по вам сильнее',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Помочь некому: вырвите Охотничье копьё сами, пока не ударил Импульс Дикого Сердца',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Зулгар опалён солнцем!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Пока действует эффект, он получает на {pct}% больше урона: бейте сильнейшими атаками сейчас',
+  'hudChrome.wildheartAlert.spearTitle': 'Союзник пригвождён!',
+  'hudChrome.wildheartAlert.spearLine':
+    'Бегите к Охотничьему копью и вырвите его, пока не ударил Импульс Дикого Сердца',
+  'hudChrome.wildheartAlert.glyphTitle': 'Зажгите солнечные глифы',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Встаньте на погасший солнечный глиф на {seconds} сек., чтобы зажечь его. Когда Зулгар пройдёт через него, он {duration} сек. будет получать на {pct}% больше урона',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Вы зажигаете солнечный глиф',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Оставайтесь на глифе, пока он не загорится. Если сойти с него, придётся начать заново',
+  'hudChrome.wildheartAlert.breathTitle': 'Дыхание идола!',
+  'hudChrome.wildheartAlert.breathLine':
+    'Каменный ягуар вот-вот выдохнет на эту половину террасы. Перейдите на другую половину',
+  'hudChrome.kitUse.freeLine':
+    'Вырвите копьё из земли, чтобы освободить пригвождённого. Полученный удар не прервёт вас, а движение или оглушение прервёт',
+  'hudChrome.kitUse.freeKey': 'Вырвать: {name}',
+  'hudChrome.kitUse.freeTap': 'Нажмите здесь, чтобы вырвать: {name}',
+  'hudChrome.kitUse.freeClick': 'Щёлкните здесь, чтобы вырвать: {name}',
+  'hudChrome.kitUse.freeFar': 'Подойдите ближе чем на {range} м, чтобы вырвать его',
+  'hudChrome.kitUse.freeAria': 'Вырвать: {name}',
+  'hudChrome.kitUse.freeUsingLine':
+    'Не двигайтесь, пока вырываете копьё: движение или оглушение прервёт вас',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Охотничье копьё',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'Идол пробуждается',
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Вырвать копьё',
+  'abilityUi.cast.wildheart_idols_breath': 'Дыхание идола',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Зажигается',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Остывает',
+  'entities.mobs.wildheart_hunting_spear.name': 'Охотничье копьё',
 };

@@ -4180,7 +4180,12 @@ export const ko_KR: EnTranslations = {
         "pollinated": "씨앗 꼬투리를 건드리면 즉시 가시 새싹이 자라납니다. 씨앗을 피하고 깨끗한 플레이어가 밟게 하세요. 아무도 건드리지 않은 꼬투리는 {seconds}초 뒤 싹이 틉니다(영웅 난이도에서는 {heroic}초 뒤 땅속으로 파고들어 가장 가까운 플레이어 곁에서 솟아납니다).",
         "prey": "줄가르가 당신을 사냥합니다. 빛나는 태양 문양을 밟게 하면 {slow}% 느려집니다. 붙잡히면 물어뜯겨 {damage}의 피해(영웅 난이도 {heroic})를 입고 {stun}초 동안 쓰러집니다.",
         "avatar": "이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.",
-        "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
+        "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다.",
+        "sunstruck": "빛나는 태양 문양에 그을림: 이동 속도가 {pct}% 감소합니다.",
+        "sunstruckExposed": "빛나는 태양 문양에 그을림: 받는 피해가 {pct}% 증가합니다.",
+        "sunWary": "이 효과가 끝날 때까지 어떤 태양 문양도 그를 그을릴 수 없습니다. 그동안 그가 밟은 빛나는 문양은 계속 빛납니다.",
+        "pinned": "사냥 창이 당신을 그 자리에 꿰어 고정했습니다. {every}초마다 {bleed}의 물리 피해(영웅 난이도 {heroicBleed})를 입는 출혈에 걸리며, 야생심장 파동은 어디에 서 있든 적중하고 피해가 {pulse}% 증가합니다. 아군이 {pull}초에 걸쳐 창을 뽑아 줄 수 있습니다. 도울 수 있는 사람이 아무도 없으면 직접 {wrench}초에 걸쳐 뽑으세요. {seconds}초 뒤에는 저절로 빠집니다.",
+        "idolAwake": "돌 재규어가 깨어났습니다. {every}초마다 바닥에 {warning}초 동안 경고를 띄운 뒤 테라스의 절반씩 번갈아 숨결을 내뿜습니다: 그 절반에 있는 모두에게 {min}~{max}의 자연 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 줄가르는 죽을 때까지 재규어 화신 상태를 유지하며 {seconds}초마다(영웅 난이도 {heroicSeconds}초마다) 사냥감을 바꿉니다."
       },
       "bastion": {
         "brineColumn": "바닷물 기둥에 갇혔습니다: {tick}초마다 {min}~{max}의 자연 피해를 최대 {seconds}초 동안 받습니다. 조수결속 수행사제를 차단하거나 기절시키면 풀려납니다.",
@@ -6652,7 +6657,21 @@ export const ko_KR: EnTranslations = {
       "pollinatedLine": "씨앗에서 떨어지세요: 닿으면 싹이 틉니다",
       "bondTitle": "무리의 유대",
       "bondLine": "함께 있으면 받는 피해가 절반입니다: 떼어 놓으세요",
-      "timeAria": "{seconds}초 남음"
+      "timeAria": "{seconds}초 남음",
+      "preyAloneLine": "태양 문양을 밝혀 줄 사람이 없습니다. 꺼진 문양 위에 {seconds}초 동안 서서 밝힌 뒤 줄가르를 그 위로 끌고 가세요",
+      "pinnedTitle": "꿰뚫려 고정됨!",
+      "pinnedLine": "아군이 사냥 창을 뽑아 줘야 합니다. 고정된 동안 야생심장 파동의 피해가 더 커집니다",
+      "pinnedSelfLine": "도와줄 사람이 없습니다: 야생심장 파동이 닿기 전에 직접 사냥 창을 뽑으세요",
+      "sunstruckTitle": "줄가르가 태양에 그을렸습니다!",
+      "sunstruckLine": "효과가 끝날 때까지 그가 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 쓰세요",
+      "spearTitle": "아군이 꿰뚫려 고정됐습니다!",
+      "spearLine": "사냥 창으로 달려가 야생심장 파동이 닿기 전에 뽑으세요",
+      "glyphTitle": "태양 문양을 밝히세요",
+      "glyphLine": "꺼진 태양 문양 위에 {seconds}초 동안 서면 밝혀집니다. 줄가르가 그 위를 지나면 {duration}초 동안 받는 피해가 {pct}% 증가합니다",
+      "glyphLightingTitle": "태양 문양을 밝히는 중",
+      "glyphLightingLine": "문양이 밝혀질 때까지 그 위에 머무르세요. 벗어나면 처음부터 다시 시작합니다",
+      "breathTitle": "우상의 숨결!",
+      "breathLine": "돌 재규어가 테라스의 이쪽 절반에 숨결을 내뿜으려 합니다. 반대쪽 절반으로 건너가세요"
     },
     "sanctumAlert": {
       "quenchTitle": "담금질 물속이다!",
@@ -6741,6 +6760,13 @@ export const ko_KR: EnTranslations = {
       "relightFar": "{range}야드 안으로 다가가 다시 밝히세요",
       "relightAria": "{name} 다시 밝히기",
       "relightUsingLine": "빨아들이는 동안 가만히 있으세요: 공격으로는 끊기지 않지만 움직이거나 기절하면 끊깁니다",
+      "freeLine": "창을 바닥에서 뽑아 고정된 대상을 풀어 주세요. 공격을 받아도 끊기지 않지만, 이동하거나 기절하면 끊깁니다",
+      "freeKey": "{name} 뽑기",
+      "freeTap": "여기를 탭해 {name}을(를) 뽑으세요",
+      "freeClick": "여기를 클릭해 {name}을(를) 뽑으세요",
+      "freeFar": "{range}야드 안으로 다가가 뽑으세요",
+      "freeAria": "{name} 뽑기",
+      "freeUsingLine": "창을 뽑을 때까지 가만히 있으세요: 이동하거나 기절하면 끊깁니다",
       "timeAria": "{seconds}초 남음"
     },
     "cosmetics": {
@@ -14975,6 +15001,12 @@ export const ko_KR: EnTranslations = {
       "wildheart_gorgebloom_gorge": "포식",
       "wildheart_zulgar_pulse": "야생심장 파동",
       "wildheart_zulgar_spirit_hunt": "사냥의 영혼",
+      "wildheart_zulgar_hunting_spear": "사냥 창",
+      "wildheart_zulgar_idol_wakes": "우상이 깨어나다",
+      "kituse_wildheart_pull_spear": "창 뽑기",
+      "wildheart_idols_breath": "우상의 숨결",
+      "wildheart_sun_glyph_kindle": "밝히는 중",
+      "wildheart_sun_glyph_cold": "식는 중",
       "sanctum_cinder_breath": "잿불 숨결",
       "sanctum_warming_rite": "온기의 의식",
       "sanctum_goad": "몰아세우기",
@@ -24806,6 +24838,9 @@ export const ko_KR: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "가시 새싹"
+      },
+      "wildheart_hunting_spear": {
+        "name": "사냥 창"
       },
       "buddy_ember_fox": {
         "name": "잉걸불 여우"

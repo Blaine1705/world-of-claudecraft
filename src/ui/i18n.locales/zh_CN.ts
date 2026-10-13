@@ -20561,4 +20561,47 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '删除此角色前，请先将所有尚未锁定的集章卡转移至其他角色。',
   'apiError.character.referral_bond_pending':
     '一份推荐奖励会员契约正在发放给此角色。请在发放完成后再尝试删除此角色。',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck': '被点亮的太阳符文灼伤：移动速度降低{pct}%。',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed': '被点亮的太阳符文灼伤：受到的伤害提高{pct}%。',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    '在此效果结束前，任何太阳符文都无法灼伤他。他踏过的已点亮符文会保持点亮。',
+  'hudChrome.auraEffect.wildheart.pinned':
+    '一支狩猎之矛把你钉在原地。你每{every}秒流血，受到{bleed}点物理伤害（英雄难度{heroicBleed}点），并且无论你站在哪里，荒野之心脉冲都会命中你，伤害提高{pulse}%。队友可以用{pull}秒拔出长矛。如果没有其他人能帮忙，你可以用{wrench}秒自己拔出。{seconds}秒后它会自行松脱。',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    '石美洲豹已经苏醒。每{every}秒，它会在地面预警{warning}秒后，轮流向平台的一半吐息：对该半场的所有人造成{min}到{max}点自然伤害（英雄难度{heroicMin}到{heroicMax}点）。祖尔加会保持美洲豹化身直到死亡，并且每{seconds}秒更换猎物（英雄难度{heroicSeconds}秒）。',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    '没有其他人能点亮太阳符文。站在一个熄灭的符文上{seconds}秒将它点亮，再把祖尔加引过去',
+  'hudChrome.wildheartAlert.pinnedTitle': '被钉住了！',
+  'hudChrome.wildheartAlert.pinnedLine':
+    '需要队友拔出狩猎之矛。被钉住时，荒野之心脉冲对你的伤害更高',
+  'hudChrome.wildheartAlert.pinnedSelfLine': '没有人能来帮忙：在荒野之心脉冲落下前自己拔出狩猎之矛',
+  'hudChrome.wildheartAlert.sunstruckTitle': '祖尔加被烈日灼伤了！',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    '在效果结束前他受到的伤害提高{pct}%：现在使用你最强的攻击',
+  'hudChrome.wildheartAlert.spearTitle': '有队友被钉住了！',
+  'hudChrome.wildheartAlert.spearLine': '跑到狩猎之矛旁，在荒野之心脉冲落下前把它拔出来',
+  'hudChrome.wildheartAlert.glyphTitle': '点亮太阳符文',
+  'hudChrome.wildheartAlert.glyphLine':
+    '站在熄灭的太阳符文上{seconds}秒将它点亮。祖尔加踏过它时，会在{duration}秒内受到的伤害提高{pct}%',
+  'hudChrome.wildheartAlert.glyphLightingTitle': '正在点亮太阳符文',
+  'hudChrome.wildheartAlert.glyphLightingLine': '留在符文上直到它被点亮。离开就要重新开始',
+  'hudChrome.wildheartAlert.breathTitle': '神像吐息！',
+  'hudChrome.wildheartAlert.breathLine': '石美洲豹即将向平台的这一半吐息。跑到另一半去',
+  'hudChrome.kitUse.freeLine':
+    '把长矛从地面拔出，解救被钉住的人。受到攻击不会打断你，移动或昏迷会打断',
+  'hudChrome.kitUse.freeKey': '拔出{name}',
+  'hudChrome.kitUse.freeTap': '点击这里拔出{name}',
+  'hudChrome.kitUse.freeClick': '单击这里拔出{name}',
+  'hudChrome.kitUse.freeFar': '靠近到{range}码内才能拔出它',
+  'hudChrome.kitUse.freeAria': '拔出{name}',
+  'hudChrome.kitUse.freeUsingLine': '保持不动以拔出长矛：移动或昏迷会打断',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': '狩猎之矛',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': '神像苏醒',
+  'abilityUi.cast.kituse_wildheart_pull_spear': '拔出长矛',
+  'abilityUi.cast.wildheart_idols_breath': '神像吐息',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': '点亮中',
+  'abilityUi.cast.wildheart_sun_glyph_cold': '冷却中',
+  'entities.mobs.wildheart_hunting_spear.name': '狩猎之矛',
 };

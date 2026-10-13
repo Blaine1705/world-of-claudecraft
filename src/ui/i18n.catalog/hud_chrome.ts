@@ -5355,6 +5355,15 @@ export const hudChromeStrings = {
       avatar:
         'Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.',
       vanished: 'Hidden and immune to damage. He is about to pounce on the farthest player.',
+      // Zulgar's hunt rework: the Sunstruck window, the Hunting Spear's pin and
+      // the final phase. Wordy (M16): non-Latin fills in the overlays.
+      sunstruck: 'Struck by a lit sun glyph: moves {pct}% slower.',
+      sunstruckExposed: 'Struck by a lit sun glyph: takes {pct}% more damage.',
+      sunWary: 'No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.',
+      pinned:
+        'A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.',
+      idolAwake:
+        'The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic).',
     },
     // The Sunken Bastion's boss marks (src/ui/bastion_aura_effect.ts).
     // Wordy (M16): non-Latin fills in the overlays.
@@ -9567,6 +9576,27 @@ export const hudChromeStrings = {
     bondLine:
       'Separate the Beastmaster and jaguar to remove their damage reduction and damage bonus',
     timeAria: '{seconds} seconds left',
+    // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, the Idol's
+    // Breath). Wordy (M16): non-Latin fills in the overlays.
+    preyAloneLine:
+      'Nobody else can light the sun glyphs. Stand on a dark one for {seconds} sec to light it, then lure Zulgar across it',
+    pinnedTitle: 'Pinned!',
+    pinnedLine:
+      'A teammate must pull the Hunting Spear out. Wildheart Pulse hits you harder while you are Pinned',
+    pinnedSelfLine:
+      'Nobody is free to help: pull the Hunting Spear out yourself before Wildheart Pulse lands',
+    sunstruckTitle: 'Zulgar is Sunstruck!',
+    sunstruckLine: 'He takes {pct}% more damage until this ends: use your strongest attacks now',
+    spearTitle: 'An ally is Pinned!',
+    spearLine: 'Run to the Hunting Spear and pull it out before Wildheart Pulse lands',
+    glyphTitle: 'Light the sun glyphs',
+    glyphLine:
+      'Stand on a dark sun glyph for {seconds} sec to light it. When Zulgar crosses it he takes {pct}% more damage for {duration} sec',
+    glyphLightingTitle: 'Lighting the sun glyph',
+    glyphLightingLine: 'Stay on the glyph until it catches light. Stepping off starts it over',
+    breathTitle: "Idol's Breath!",
+    breathLine:
+      'The stone jaguar is about to breathe over this half of the terrace. Cross to the other half',
   },
   // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
   // Wordy (M16): non-Latin fills in the overlays.
@@ -9688,6 +9718,16 @@ export const hudChromeStrings = {
     relightAria: 'Relight the {name}',
     relightUsingLine:
       'Keep channeling to light the candle: it drains health. Hits do not interrupt; moving or a stun does',
+    // The 'free' use (Zulgar's Hunting Spear, pulled out to free whoever it
+    // pins), kept through hits.
+    freeLine:
+      'Pull the spear out of the ground to free whoever it pins. Taking a hit does not stop you; moving or a stun does',
+    freeKey: 'Pull out the {name}',
+    freeTap: 'Tap here to pull out the {name}',
+    freeClick: 'Click here to pull out the {name}',
+    freeFar: 'Get within {range} yd to pull it out',
+    freeAria: 'Pull out the {name}',
+    freeUsingLine: 'Hold still to pull the spear out: moving or a stun stops you',
     timeAria: '{seconds} seconds left',
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,

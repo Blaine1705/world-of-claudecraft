@@ -202,6 +202,14 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.wildheart_gorgebloom_gorge': true,
   'abilityUi.cast.wildheart_zulgar_pulse': true,
   'abilityUi.cast.wildheart_zulgar_spirit_hunt': true,
+  // Zulgar's hunt rework: his bars, the player's own bar on the Hunting Spear
+  // (the trash engine's G3 use), and his encounter objects' clocks.
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': true,
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': true,
+  'abilityUi.cast.kituse_wildheart_pull_spear': true,
+  'abilityUi.cast.wildheart_idols_breath': true,
+  'abilityUi.cast.wildheart_sun_glyph_kindle': true,
+  'abilityUi.cast.wildheart_sun_glyph_cold': true,
   // The Gravewyrm Sanctum rework: its trash kit and the Sledge Tusker.
   'abilityUi.cast.sanctum_cinder_breath': true,
   'abilityUi.cast.sanctum_warming_rite': true,

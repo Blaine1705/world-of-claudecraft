@@ -21613,4 +21613,53 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 캐릭터를 삭제하기 전에 고정되지 않은 도장 카드를 모두 다른 캐릭터로 옮기세요.',
   'apiError.character.referral_bond_pending':
     '친구 초대 보상인 멤버십 증서를 이 캐릭터에게 지급 중입니다. 지급이 완료된 후 캐릭터 삭제를 다시 시도하세요.',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    '빛나는 태양 문양에 그을림: 이동 속도가 {pct}% 감소합니다.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    '빛나는 태양 문양에 그을림: 받는 피해가 {pct}% 증가합니다.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    '이 효과가 끝날 때까지 어떤 태양 문양도 그를 그을릴 수 없습니다. 그동안 그가 밟은 빛나는 문양은 계속 빛납니다.',
+  'hudChrome.auraEffect.wildheart.pinned':
+    '사냥 창이 당신을 그 자리에 꿰어 고정했습니다. {every}초마다 {bleed}의 물리 피해(영웅 난이도 {heroicBleed})를 입는 출혈에 걸리며, 야생심장 파동은 어디에 서 있든 적중하고 피해가 {pulse}% 증가합니다. 아군이 {pull}초에 걸쳐 창을 뽑아 줄 수 있습니다. 도울 수 있는 사람이 아무도 없으면 직접 {wrench}초에 걸쳐 뽑으세요. {seconds}초 뒤에는 저절로 빠집니다.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    '돌 재규어가 깨어났습니다. {every}초마다 바닥에 {warning}초 동안 경고를 띄운 뒤 테라스의 절반씩 번갈아 숨결을 내뿜습니다: 그 절반에 있는 모두에게 {min}~{max}의 자연 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 줄가르는 죽을 때까지 재규어 화신 상태를 유지하며 {seconds}초마다(영웅 난이도 {heroicSeconds}초마다) 사냥감을 바꿉니다.',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    '태양 문양을 밝혀 줄 사람이 없습니다. 꺼진 문양 위에 {seconds}초 동안 서서 밝힌 뒤 줄가르를 그 위로 끌고 가세요',
+  'hudChrome.wildheartAlert.pinnedTitle': '꿰뚫려 고정됨!',
+  'hudChrome.wildheartAlert.pinnedLine':
+    '아군이 사냥 창을 뽑아 줘야 합니다. 고정된 동안 야생심장 파동의 피해가 더 커집니다',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    '도와줄 사람이 없습니다: 야생심장 파동이 닿기 전에 직접 사냥 창을 뽑으세요',
+  'hudChrome.wildheartAlert.sunstruckTitle': '줄가르가 태양에 그을렸습니다!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    '효과가 끝날 때까지 그가 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 쓰세요',
+  'hudChrome.wildheartAlert.spearTitle': '아군이 꿰뚫려 고정됐습니다!',
+  'hudChrome.wildheartAlert.spearLine': '사냥 창으로 달려가 야생심장 파동이 닿기 전에 뽑으세요',
+  'hudChrome.wildheartAlert.glyphTitle': '태양 문양을 밝히세요',
+  'hudChrome.wildheartAlert.glyphLine':
+    '꺼진 태양 문양 위에 {seconds}초 동안 서면 밝혀집니다. 줄가르가 그 위를 지나면 {duration}초 동안 받는 피해가 {pct}% 증가합니다',
+  'hudChrome.wildheartAlert.glyphLightingTitle': '태양 문양을 밝히는 중',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    '문양이 밝혀질 때까지 그 위에 머무르세요. 벗어나면 처음부터 다시 시작합니다',
+  'hudChrome.wildheartAlert.breathTitle': '우상의 숨결!',
+  'hudChrome.wildheartAlert.breathLine':
+    '돌 재규어가 테라스의 이쪽 절반에 숨결을 내뿜으려 합니다. 반대쪽 절반으로 건너가세요',
+  'hudChrome.kitUse.freeLine':
+    '창을 바닥에서 뽑아 고정된 대상을 풀어 주세요. 공격을 받아도 끊기지 않지만, 이동하거나 기절하면 끊깁니다',
+  'hudChrome.kitUse.freeKey': '{name} 뽑기',
+  'hudChrome.kitUse.freeTap': '여기를 탭해 {name}을(를) 뽑으세요',
+  'hudChrome.kitUse.freeClick': '여기를 클릭해 {name}을(를) 뽑으세요',
+  'hudChrome.kitUse.freeFar': '{range}야드 안으로 다가가 뽑으세요',
+  'hudChrome.kitUse.freeAria': '{name} 뽑기',
+  'hudChrome.kitUse.freeUsingLine':
+    '창을 뽑을 때까지 가만히 있으세요: 이동하거나 기절하면 끊깁니다',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': '사냥 창',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': '우상이 깨어나다',
+  'abilityUi.cast.kituse_wildheart_pull_spear': '창 뽑기',
+  'abilityUi.cast.wildheart_idols_breath': '우상의 숨결',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': '밝히는 중',
+  'abilityUi.cast.wildheart_sun_glyph_cold': '식는 중',
+  'entities.mobs.wildheart_hunting_spear.name': '사냥 창',
 };

@@ -16945,7 +16945,8 @@
     min-width: min(420px, calc(100vw - 32px));
   }
 
-  /* ---------- The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond) ---------- */
+  /* ---------- The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond; Zulgar's
+     breath, spear, Sunstruck window and sun glyphs) ---------- */
   /* Self-mounted by the shared encounter alert painter
      (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/wildheart_alert_view.ts.
      It never takes the pointer. The state is carried by the text too. */
@@ -16988,17 +16989,35 @@
     width: 0;
     transition: width 80ms linear;
   }
+  /* A threat to the player themself: the hunt, the stone jaguar's breath, the pin. */
   #wildheart-alert.is-prey,
+  #wildheart-alert.is-prey-alone,
+  #wildheart-alert.is-breath,
+  #wildheart-alert.is-pinned,
+  #wildheart-alert.is-pinned-self,
   #wildheart-alert.is-stalked {
     border-color: var(--color-hostile);
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
   #wildheart-alert.is-prey .fa-title,
+  #wildheart-alert.is-prey-alone .fa-title,
+  #wildheart-alert.is-breath .fa-title,
+  #wildheart-alert.is-pinned .fa-title,
+  #wildheart-alert.is-pinned-self .fa-title,
   #wildheart-alert.is-stalked .fa-title,
   #wildheart-alert.is-prey .fa-fill,
+  #wildheart-alert.is-prey-alone .fa-fill,
+  #wildheart-alert.is-breath .fa-fill,
+  #wildheart-alert.is-pinned .fa-fill,
+  #wildheart-alert.is-pinned-self .fa-fill,
   #wildheart-alert.is-stalked .fa-fill {
     color: var(--color-hostile);
     --bar-color: var(--color-hostile);
+  }
+  /* Zulgar's damage window: the panel's own gold, beating fast while it is open. The
+     glyphs to light and the spear to pull keep the steady gold of a thing to do. */
+  #wildheart-alert.is-sunstruck {
+    animation: bce-throb 0.45s ease-in-out infinite alternate;
   }
   #wildheart-alert.is-pollinated {
     border-color: var(--color-energy);
