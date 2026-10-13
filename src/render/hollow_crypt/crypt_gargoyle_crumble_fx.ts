@@ -213,6 +213,7 @@ export class CryptGargoyleCrumbleFx implements CryptKitPart {
       return mesh;
     };
     this.heapMesh = batch(HEAP_PIECE, CRYPT_KIT_SLOTS.rubble);
+    this.heapMesh.count = 0;
     this.blockMesh = batch(BLOCK_PIECE, BURSTS * this.blocksPerBurst);
     this.shardMesh = batch(SHARD_PIECE, BURSTS * this.shardsPerBurst);
     for (let i = 0; i < CRYPT_KIT_SLOTS.rubble; i++) {
@@ -339,6 +340,7 @@ export class CryptGargoyleCrumbleFx implements CryptKitPart {
     const gy = h.groundY(e.pos.x, e.pos.z);
     const over = e.pos.y - gy;
     heap.owner = e.id;
+    this.submitHeaps();
     heap.x = e.pos.x;
     heap.z = e.pos.z;
     heap.gy = gy;
@@ -390,9 +392,17 @@ export class CryptGargoyleCrumbleFx implements CryptKitPart {
     heap.drawn = -1;
     this.heapMesh.setMatrixAt(i, ZERO);
     this.heapMesh.instanceMatrix.needsUpdate = true;
-    let any = false;
-    for (const s of this.heaps) if (s.owner >= 0) any = true;
-    this.heapMesh.visible = any;
+    this.heapMesh.visible = this.submitHeaps() > 0;
+  }
+
+  /** Submit the heap batch only as far as its highest claimed slot. The batch
+   *  is not frustum culled, and an empty slot's zero matrix still costs the
+   *  heap's whole triangle count in every pass, shadows included. */
+  private submitHeaps(): number {
+    let top = 0;
+    for (let i = 0; i < this.heaps.length; i++) if (this.heaps[i].owner >= 0) top = i + 1;
+    this.heapMesh.count = top;
+    return top;
   }
 
   private endBurst(b: Burst): void {

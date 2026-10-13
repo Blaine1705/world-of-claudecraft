@@ -609,7 +609,9 @@ describe('the gargoyle crumble painter', () => {
     const rig = crumbleRig();
     expect(rig.heaps.material).toBe(rig.blocks.material);
     expect(rig.heaps.material).toBe(rig.shards.material);
-    expect(rig.heaps.count).toBe(CRYPT_KIT_SLOTS.rubble);
+    // The heap batch has room for every slot and submits none while none lies.
+    expect(rig.heaps.instanceMatrix.count).toBe(CRYPT_KIT_SLOTS.rubble);
+    expect(rig.heaps.count).toBe(0);
     for (const mesh of [rig.heaps, rig.blocks, rig.shards]) {
       expect(mesh.visible).toBe(false);
       expect(rig.drawn(mesh)).toHaveLength(0);
@@ -722,12 +724,15 @@ describe('the gargoyle crumble painter', () => {
     mob.dead = true;
     rig.run(1);
     expect(rig.drawn(rig.heaps)).toHaveLength(1);
+    // One heap lying is one instance submitted, never the whole pool.
+    expect(rig.heaps.count).toBe(1);
     mob.dead = false;
     rig.run(0.3);
     expect(rig.gestures.at(-1)).toEqual([4, GARGOYLE_WHOLE_GESTURE]);
     expect(rig.drawn(rig.heaps)).toHaveLength(0);
     expect(rig.drawn(rig.blocks)).toHaveLength(0);
     expect(rig.heaps.visible).toBe(false);
+    expect(rig.heaps.count).toBe(0);
     // And it can die, and crumble, again.
     mob.dead = true;
     rig.run(3);
@@ -744,11 +749,13 @@ describe('the gargoyle crumble painter', () => {
     decayed.dead = true;
     rig.run(0.5);
     expect(rig.drawn(rig.heaps)).toHaveLength(2);
+    expect(rig.heaps.count).toBe(2);
     rig.entities.delete(5);
     decayed.corpseTimer = 0;
     rig.run(1.5);
     expect(rig.drawn(rig.heaps)).toHaveLength(0);
     expect(rig.heaps.visible).toBe(false);
+    expect(rig.heaps.count).toBe(0);
     // A rig that outlived its heap is never left hidden.
     const shown = rig.gestures.filter(([, g]) => g === GARGOYLE_WHOLE_GESTURE).map(([id]) => id);
     expect(shown.sort()).toEqual([5, 6]);
