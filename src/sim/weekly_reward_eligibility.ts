@@ -1,9 +1,10 @@
+import { IGNIVAR_SIGIL_ITEMS } from './content/ignivar_loot';
 import { canEquipItem } from './equipment_rules';
 import { trinketLootFitsClass } from './trinket_loot_eligibility';
 import type { ItemDef, PlayerClass } from './types';
 import type { WeeklyPoolId } from './weekly_rewards';
 
-/** The Crucible core is the sole non-equipment reward, confined to raid slots. */
+/** New rewards: equipment and raid-only Crucible cores. */
 export function weeklyRewardItemAllowed(
   item: ItemDef,
   pool: WeeklyPoolId,
@@ -11,11 +12,26 @@ export function weeklyRewardItemAllowed(
 ): boolean {
   if (item.id === 'lastflame_core') return pool === 'raid' || pool === 'raid_heroic';
   return (
-    ['weapon', 'armor', 'held_offhand'].includes(item.kind) &&
+    weeklyRewardKindAllowed(item) &&
     (item.quality === 'rare' ||
       item.quality === 'epic' ||
       (allowUncommon && item.quality === 'uncommon'))
   );
+}
+
+/** Preserve previously fixed sigils without admitting them to new reward pools. */
+export function weeklySavedRewardItemAllowed(item: ItemDef, pool: WeeklyPoolId): boolean {
+  return (
+    weeklyRewardItemAllowed(item, pool) ||
+    ((pool === 'raid' || pool === 'raid_heroic') &&
+      item.kind === 'tool' &&
+      Object.hasOwn(IGNIVAR_SIGIL_ITEMS, item.id))
+  );
+}
+
+/** Equipment only; the core exception also needs a raid pool. */
+export function weeklyRewardKindAllowed(item: ItemDef): boolean {
+  return item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'held_offhand';
 }
 
 /** Class and stat restrictions shared by vault catalogs and new authoritative rolls. */

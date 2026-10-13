@@ -489,7 +489,7 @@ export const guideStrings = {
     // Non-graphics options: the Audio tab and the live language picker.
     audioTitle: 'Sound and language',
     audioBody:
-      "The options window is not all pixels. Audio holds three volume sliders, for sound effects, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
+      "The options window is not all pixels. Audio holds four volume sliders, for sound effects, ambience, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
     autolootBody:
       "Prefer not to click every corpse? Walk-by Autoloot, on the Interface panel's Combat tab and off by default, scoops the loot from your own kills as you walk past them.",
     // The two panels the tables do not cover (Auras, Performance Overlay), named
@@ -588,7 +588,7 @@ export const guideStrings = {
     ifAuraBarBelowFrame:
       'Moves the buff row below your unit frame instead of above it. Only matters while buffs are on the player frame.',
     ifTargetAurasBelowFrame:
-      "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
+      "Hangs the target frame's buff and debuff strip below the frame, under the target's name and health bar, instead of above it: the classic layout. On its stock seat the target frame (with your cast bar and swing timers) rises by one strip row so the strip's first row clears the action bar; a frame you have moved stays where you put it.",
     ifAlwaysShowAllBuffs:
       'Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.',
     ifShowAuraCaster:
@@ -1383,7 +1383,7 @@ export const guideStrings = {
     formsAutoUnshift:
       'A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.',
     formsMoonwing:
-      'A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.',
+      'A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. Like the Groveheart Sporemender Form, it keeps your spells, and your wand works only in those two shapes or your normal caster form.',
     // The Cat engage loop (Wildfang kit pass 2): names the abilities, never
     // their numbers, so the sentence stays spoiler-safe. The key name predates
     // the Cat Form rename; the English follows the rename and the overlays
@@ -1397,6 +1397,8 @@ export const guideStrings = {
         'The melee damage shape: energy and combo points, like a rogue, and much less threat.',
       form_travel:
         'The travelling shape: far quicker across the ground, but no other abilities until you shift out.',
+      form_sporemender:
+        'The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana.',
     },
     // The summon spell's own kit line. Water Jet is the PET's pet-bar command, not this
     // spell, so it renders as a paragraph under the row instead of as this line.
@@ -1409,6 +1411,7 @@ export const guideStrings = {
       form_bear: 'Bruin Form',
       form_cat: 'Cat Form',
       form_travel: 'Fleet Form',
+      form_sporemender: 'Sporemender Form',
     },
   },
   // Deprecated: short fantasy hooks. The class index and class page now use the canonical
@@ -2625,6 +2628,7 @@ export const guideStrings = {
     formBear: 'Bruin Form',
     formCat: 'Cat Form',
     formTravel: 'Fleet Form',
+    formSporemender: 'Sporemender Form',
     groupCreatures: 'Creatures',
     groupPets: 'Warlock Demons',
     pickerLabel: 'Choose a model to view',

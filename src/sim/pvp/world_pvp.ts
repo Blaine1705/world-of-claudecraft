@@ -48,13 +48,29 @@ import type { Entity } from '../types';
 import { TICK_RATE } from '../types';
 import { grantHonor } from './honor';
 import { updatePvpVitality } from './vitality';
+import {
+  announceWorldPvpBountyCollected,
+  clearWorldPvpBounty,
+  hasWorldPvpBounty,
+  noteWorldPvpStreakKill,
+  noticeWorldPvpBountyLapsed,
+} from './world_pvp_bounty';
+import { worldPvpBountyHolderMultiplier, worldPvpKillHonorPool } from './world_pvp_bounty_rules';
+import {
+  loadWorldPvpPayouts,
+  payDueWorldPvpPayouts,
+  queueWorldPvpPayout,
+  savedWorldPvpPayouts,
+  type WorldPvpPendingPayout,
+  type WorldPvpSavedPayout,
+} from './world_pvp_payouts';
 import { updateWorldPvpRewards, worldPvpRewardPause } from './world_pvp_rewards';
 import { sanitizeWorldPvpRewardTicks } from './world_pvp_rewards_rules';
 import {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
   WORLD_PVP_DR_WINDOW_SECONDS,
-  WORLD_PVP_KILL_HONOR,
+  WORLD_PVP_FORFEIT_PAYOUT_SECONDS,
   WORLD_PVP_MIN_LEVEL,
   type WorldPvpZonePolicy,
   worldPvpGroupEarns,
@@ -87,6 +103,15 @@ export interface WorldPvpMetaState {
   /** Sim time of the last accepted raise/lower/cancel: the toggle cooldown
    *  (WORLD_PVP_TOGGLE_COOLDOWN) reads it. Session-only, never persisted. */
   changedAt?: number;
+  /** Paid world kills in a row while flagged, since the last death or flag
+   *  drop, and whether that streak earned a bounty (world_pvp_bounty.ts).
+   *  Session-only, never persisted; absent until the first counted kill. */
+  streak?: number;
+  bounty?: boolean;
+  /** Gold owed to this character from fights their opponents forfeited by
+   *  leaving the world, each share paid when its countdown runs out
+   *  (world_pvp_payouts.ts). Absent when nothing is owed. */
+  pending?: WorldPvpPendingPayout[];
 }
 
 /** The persisted shape (CharacterState.worldPvp). The countdown is stored as
@@ -99,6 +124,7 @@ export interface WorldPvpSavedState {
   disarmRemaining?: number;
   kills?: number;
   deaths?: number;
+  pending?: WorldPvpSavedPayout[];
 }
 
 /** One contributor's kills of one victim inside the current DR window. */
@@ -149,6 +175,13 @@ export interface WorldPvpBooks {
    *  first tick, so a player is told about their ground at once. */
   zonePassTick: number;
   sweptAtTick: number;
+  /** The earliest held forfeit share (sim time), Infinity when nothing is
+   *  owed: the payout pass is skipped until then (world_pvp_payouts.ts). */
+  nextPayoutAt: number;
+  /** The pid whose death is being resolved as a FORFEIT right now (set only
+   *  for the duration of world_pvp_forfeit.ts's death call), so the death
+   *  hook holds the gold instead of paying it on the spot. */
+  forfeitVictim: number | null;
 }
 
 export function newWorldPvpBooks(): WorldPvpBooks {
@@ -162,6 +195,8 @@ export function newWorldPvpBooks(): WorldPvpBooks {
     nextDisarmAt: Number.POSITIVE_INFINITY,
     zonePassTick: Number.NEGATIVE_INFINITY,
     sweptAtTick: 0,
+    nextPayoutAt: Number.POSITIVE_INFINITY,
+    forfeitVictim: null,
   };
 }
 
@@ -407,9 +442,13 @@ export function updateWorldPvp(ctx: SimContext): void {
       state.disarmAt = null;
       e.pvpFlag = false;
       notice(ctx, meta.entityId, 'World PvP disabled.');
+      // A bounty is worn under the flag: lowering it ends the streak too, so
+      // a holder can never step out of reach and keep the better curve.
+      if (clearWorldPvpBounty(state, e)) noticeWorldPvpBountyLapsed(ctx, meta.entityId);
     }
     books.nextDisarmAt = next;
   }
+  if (ctx.time >= books.nextPayoutAt) payDueWorldPvpPayouts(ctx);
   if (ctx.tickCount - books.zonePassTick >= ZONE_PASS_TICKS) {
     books.zonePassTick = ctx.tickCount;
     // WARFARE Vitality rides this pass but not the world switch: battlegrounds
@@ -644,7 +683,10 @@ function notePairKill(ctx: SimContext, contributor: PlayerMeta, victim: PlayerMe
 interface Contributor {
   e: Entity;
   meta: PlayerMeta;
+  /** The ordinary per-pair multiplier: gold always, honor for a non-holder. */
   mult: number;
+  /** The honor multiplier: the bounty curve for a holder, else `mult`. */
+  honorMult: number;
 }
 
 /** What one paid contributor is told. Exported for the client matcher tests. */
@@ -653,6 +695,14 @@ export function worldPvpKillLine(victimName: string, copper: number, contributor
   const money = formatMoney(copper);
   if (contributors <= 1) return `You defeat ${victimName} and take ${money} from their purse.`;
   return `You defeat ${victimName} and take ${money} from their purse (split ${contributors} ways).`;
+}
+
+/** What one paid contributor is told when the victim forfeited the fight by
+ *  leaving the world: the kill now, the gold (if any) in WORLD_PVP_FORFEIT_PAYOUT_SECONDS. */
+export function worldPvpForfeitKillLine(victimName: string, copper: number): string {
+  if (copper <= 0) return `${victimName} left the fight and is defeated.`;
+  const minutes = Math.round(WORLD_PVP_FORFEIT_PAYOUT_SECONDS / 60);
+  return `${victimName} left the fight and is defeated: ${formatMoney(copper)} from their purse reaches you in ${minutes} minutes.`;
 }
 
 /** What the victim is told: the blow alone, the blow and one other, or the blow
@@ -698,14 +748,23 @@ export function worldPvpOnPlayerDeath(
   const helpers = books.recentDamage.get(victim.id);
   books.recentDamage.delete(victim.id);
   books.recentSupport.delete(victim.id);
-  if (books.paidDeaths.has(victim.id)) return;
   const victimMeta = ctx.players.get(victim.id);
   if (!victimMeta) return;
+  // Any death ends the victim's streak and bounty (owner spec), whoever or
+  // whatever landed the blow. Read before the payout: a bounty standing at the
+  // moment of death doubles the pool below.
+  const victimHadBounty = clearWorldPvpBounty(victimMeta.worldPvp, victim);
   const killerPlayer = controllerOf(ctx, killer);
-  if (!killerPlayer || !isWorldPvpHostile(ctx, killerPlayer, victim)) return;
+  if (
+    books.paidDeaths.has(victim.id) ||
+    !killerPlayer ||
+    !isWorldPvpHostile(ctx, killerPlayer, victim)
+  ) {
+    if (victimHadBounty) noticeWorldPvpBountyLapsed(ctx, victim.id);
+    return;
+  }
   books.paidDeaths.add(victim.id);
   ensureState(victimMeta).deaths++;
-
   const contributors: Contributor[] = [];
   const seen = new Set<number>();
   const fresh = (at: number) => ctx.time - at <= WORLD_PVP_ASSIST_WINDOW;
@@ -716,9 +775,15 @@ export function worldPvpOnPlayerDeath(
     if (!r || !isWorldPvpHostile(ctx, r.e, victim)) return;
     if (!worldPvpGroupEarns(ctx.partyOf(pid))) return;
     if (worldPvpVictimIsGrey(r.e.level, victim.level)) return;
-    const mult = worldPvpPairMultiplier(worldPvpPairRepeats(ctx, r.meta, victimMeta));
+    const repeats = worldPvpPairRepeats(ctx, r.meta, victimMeta);
+    const mult = worldPvpPairMultiplier(repeats);
     if (mult <= 0) return;
-    contributors.push({ e: r.e, meta: r.meta, mult });
+    // A bounty holder's honor rides the bounty curve; gold stays on the
+    // ordinary one, so a bounty never raises what a victim's purse pays.
+    const honorMult = hasWorldPvpBounty(r.meta.worldPvp)
+      ? worldPvpBountyHolderMultiplier(repeats)
+      : mult;
+    contributors.push({ e: r.e, meta: r.meta, mult, honorMult });
   };
   consider(killerPlayer.id);
   if (helpers) {
@@ -733,25 +798,38 @@ export function worldPvpOnPlayerDeath(
 
   const n = contributors.length;
   if (n === 0) {
+    // Nobody earned anything (a raid, a grey or a fully decayed kill), so
+    // nobody collected the bounty either: it simply lapsed with the death.
+    if (victimHadBounty) noticeWorldPvpBountyLapsed(ctx, victim.id);
     notice(ctx, victim.id, worldPvpDefeatLine(killerPlayer.name, 0, 1), DEFEATED_COLOR);
     // Still a kill for the feed: nobody earned (grey victim, fully decayed
     // pair, an oversized group), but the killing blow landed.
     emitKillFeed(ctx, killerPlayer, victim, 0, 0);
     return;
   }
+  // The killing blow is considered first, so it names the collector when it was
+  // paid; otherwise the first paid assist collected it.
+  if (victimHadBounty) announceWorldPvpBountyCollected(ctx, contributors[0].e.name, victim.name);
   const gold = worldPvpSplit(victim.pvpFlag ? worldPvpStake(victimMeta.copper) : 0, n);
-  const honor = worldPvpSplit(WORLD_PVP_KILL_HONOR, n);
+  const honor = worldPvpSplit(worldPvpKillHonorPool(victimHadBounty), n);
+  // A forfeit (the victim left the world mid-fight, world_pvp_forfeit.ts) pays
+  // the honor and the record now and holds the gold for the payout delay.
+  const forfeit = books.forfeitVictim === victim.id;
   let taken = 0;
   for (const c of contributors) {
     const isKiller = c.e.id === killerPlayer.id;
     const goldShare = c.e.pvpFlag
       ? Math.floor((gold.share + (isKiller ? gold.killerBonus : 0)) * c.mult)
       : 0;
-    const honorShare = Math.floor((honor.share + (isKiller ? honor.killerBonus : 0)) * c.mult);
+    const honorShare = Math.floor((honor.share + (isKiller ? honor.killerBonus : 0)) * c.honorMult);
     notePairKill(ctx, c.meta, victimMeta);
-    ensureState(c.meta).kills++;
+    const state = ensureState(c.meta);
+    state.kills++;
     taken += goldShare;
-    if (isKiller && victim.pvpFlag && c.e.pvpFlag) {
+    if (forfeit) {
+      queueWorldPvpPayout(ctx, c.meta, goldShare, victim.name, WORLD_PVP_FORFEIT_PAYOUT_SECONDS);
+      notice(ctx, c.e.id, worldPvpForfeitKillLine(victim.name, goldShare));
+    } else if (isKiller && victim.pvpFlag && c.e.pvpFlag) {
       // Both flagged: the killing blow's share DROPS on the body beside the
       // victim's skull (world_pvp_spoils.ts), to be looted like any corpse.
       placeWorldPvpSpoils(ctx, victim, c.e, goldShare);
@@ -762,6 +840,9 @@ export function worldPvpOnPlayerDeath(
       notice(ctx, c.e.id, worldPvpKillLine(victim.name, goldShare, n));
     }
     grantHonor(ctx, c.meta, honorShare, isKiller ? 'world_kill' : 'world_assist');
+    // Only a kill that actually paid builds a streak: a zero share (a large
+    // group's floored split, a decayed repeat) counts for nothing.
+    if (honorShare > 0 || goldShare > 0) noteWorldPvpStreakKill(ctx, c.e, state);
   }
   victimMeta.copper = Math.max(0, victimMeta.copper - taken);
   notice(ctx, victim.id, worldPvpDefeatLine(killerPlayer.name, taken, n), DEFEATED_COLOR);
@@ -807,7 +888,8 @@ export function worldPvpInfoFor(
 export function savedWorldPvpState(meta: PlayerMeta, now: number): WorldPvpSavedState | undefined {
   const state = meta.worldPvp;
   if (!state) return undefined;
-  if (!state.flagged && state.kills === 0 && state.deaths === 0) return undefined;
+  const pending = savedWorldPvpPayouts(state.pending, now);
+  if (!state.flagged && state.kills === 0 && state.deaths === 0 && !pending) return undefined;
   const remaining = worldPvpDisarmRemaining(meta, now);
   return {
     flagged: state.flagged,
@@ -815,6 +897,7 @@ export function savedWorldPvpState(meta: PlayerMeta, now: number): WorldPvpSaved
     ...(remaining !== null ? { disarmRemaining: remaining } : {}),
     ...(state.kills > 0 ? { kills: state.kills } : {}),
     ...(state.deaths > 0 ? { deaths: state.deaths } : {}),
+    ...(pending ? { pending } : {}),
   };
 }
 
@@ -849,7 +932,10 @@ export function loadWorldPvpState(
     record.flagged === true && e.level >= WORLD_PVP_MIN_LEVEL && !ctx.worldPvpDisabled;
   const kills = nonNegativeInt(record.kills);
   const deaths = nonNegativeInt(record.deaths);
-  if (!flagged && kills === 0 && deaths === 0) return;
+  // Held forfeit gold is owed whatever the flag now says: it loads on a
+  // lowered, under-level or kill-switched character too.
+  const pending = loadWorldPvpPayouts(record.pending, ctx.time);
+  if (!flagged && kills === 0 && deaths === 0 && pending.length === 0) return;
   const remaining =
     flagged && typeof record.disarmRemaining === 'number' && Number.isFinite(record.disarmRemaining)
       ? Math.max(0, record.disarmRemaining)
@@ -859,8 +945,10 @@ export function loadWorldPvpState(
     flagged && disarmAt === null ? sanitizeWorldPvpRewardTicks(record.rewardTicks) : 0;
   meta.worldPvp = { flagged, disarmAt, kills, deaths, ...(rewardTicks > 0 ? { rewardTicks } : {}) };
   e.pvpFlag = flagged;
-  if (disarmAt !== null) {
-    const books = ctx.worldPvpBooks;
-    books.nextDisarmAt = Math.min(books.nextDisarmAt, disarmAt);
+  const books = ctx.worldPvpBooks;
+  if (disarmAt !== null) books.nextDisarmAt = Math.min(books.nextDisarmAt, disarmAt);
+  if (pending.length > 0) {
+    meta.worldPvp.pending = pending;
+    for (const row of pending) books.nextPayoutAt = Math.min(books.nextPayoutAt, row.dueAt);
   }
 }

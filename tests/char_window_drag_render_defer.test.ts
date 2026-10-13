@@ -32,8 +32,16 @@ vi.mock('../src/ui/portrait_chip', () => ({
   hydratePortraits: vi.fn(),
   isComposedPortraitKey: () => false,
   modularLookFor: () => null,
-  onPortraitUpdate: vi.fn(),
+  onPortraitUpdate: () => () => undefined,
   portraitChipHtml: () => '',
+}));
+
+// Keep portrait asset requests pending so real Three loaders cannot outlive
+// happy-dom teardown. The actual portrait pending fallback still renders.
+vi.mock('../src/render/assets/loader', () => ({
+  loadGltf: vi.fn(() => new Promise(() => undefined)),
+  loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
+  loadTexture: vi.fn(() => new Promise(() => undefined)),
 }));
 
 function harness() {

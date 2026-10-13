@@ -133,6 +133,11 @@ import {
   resolveDruidOverbloom,
 } from './druid_engines';
 import { resolveWeaponSweep } from './druid_scratch';
+import {
+  plantSporeBurst,
+  SPORE_BURST_FULL_BANK_POWER,
+  sporeBurstFullBank,
+} from './druid_spore_burst';
 import { consumeNextAttackCrit } from './empower_next';
 import { rollFeralStrikeEnchant, runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -176,6 +181,7 @@ import {
   runHunterWildheart,
 } from './hunter_shared';
 import { spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
+import { applyLaunchKnockback } from './knockback_launch';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
 import {
   addSoulFragments,
@@ -263,8 +269,10 @@ import {
 } from './shaman_thundercall';
 import {
   applyStormbreakMana,
+  magmaBurstCritBonus,
   magmaBurstGuaranteedCrit,
   rollArcOverload,
+  thundercallOnMagmaBurstImpact,
 } from './shaman_thundercall_kit';
 import { runUnleashWeapon } from './shaman_unleash_weapon';
 import {
@@ -393,7 +401,7 @@ function consumeMatchingAura(
 ): number {
   if (!target) return -1;
   // Grovespring 2pc: Swiftmend (the only hot-kind consumer) prefers the
-  // caster's OWN Wildbloom or Second Bloom, so a wearer stops eating another
+  // caster's OWN Sporemending or Second Bloom, so a wearer stops eating another
   // healer's HoT while their own is up. With none of their own present the
   // base pick below still applies (the set doc's explicit fallback: a paid
   // cast must never turn into a silent no-heal). Selection only; draws no
@@ -658,6 +666,33 @@ export function runEffects(
       }
       case 'temporalHourglass': {
         applyTemporalHourglass(ctx, p, p.castAim ?? p.pos, eff, ability.name);
+        break;
+      }
+      case 'sporeBurst': {
+        // Spore Burst (combat/druid_spore_burst.ts): plant the mushroom where
+        // the cast was aimed. Both riders take the area coefficient, like
+        // aoeDamage and aoeHeal, and everything is snapshotted here so the
+        // burst five seconds later only rolls.
+        // A full Verdance or Moontide bank adds its 25% on top of any armed
+        // Nature's Boon window; the bank itself is spent at cast completion
+        // (druid_engines.ts druidEngineOnCast), after this snapshot.
+        const bankPower = sporeBurstFullBank(p.auras, p.id) ? SPORE_BURST_FULL_BANK_POWER : 1;
+        const boonPower = (res.naturesBoonPower ?? 1) * bankPower;
+        plantSporeBurst(ctx, p, p.castAim ?? p.pos, eff, ability.name, {
+          spBonus: directHitBonus(
+            abilityScalingPower(p, ability),
+            ability,
+            res.castTime,
+            true,
+            talentDmgMult,
+          ),
+          healBonus: directHealBonus(p.healPower, res.castTime, true, talentHealMult),
+          healMult: castScopedHealMult * bankPower,
+          primaryHealMult,
+          damageMult: boonPower * primaryDamageMult,
+          plantsSporemending: meta.cls === 'druid' && mods.spec === 'restoration',
+          threat: threatOpts,
+        });
         break;
       }
       case 'weaponStrike': {
@@ -925,7 +960,12 @@ export function runEffects(
           // override against the caster's own Cinder Jolt; the roll is still drawn.
           magmaBurstGuaranteedCrit(ctx, p, ability.id, target);
         if (sureCrit) sureCritRolled = true;
-        if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
+        if (crit)
+          dmg *=
+            (isSpell ? 1.5 : 2) +
+            (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus) +
+            // Lava Flows (combat/shaman_thundercall_kit.ts): Magma Burst only.
+            magmaBurstCritBonus(ctx, p, ability.id);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         // Aether Surge (Chronomancy Phase 3): each held Arcane Charge scales the
@@ -973,6 +1013,7 @@ export function runEffects(
           consumeThunderVent(ctx, p, ability.id, target, finalDamage);
           applyStoneboundJolt(ctx, p, target);
         }
+        if (ability.id === 'lava_burst') thundercallOnMagmaBurstImpact(ctx, p);
         if (ability.id === 'solar_invocation') {
           ctx.emit({
             type: 'spellfx',
@@ -2355,8 +2396,8 @@ export function runEffects(
       case 'incapacitate': {
         if (!target || target.dead) break;
         // Fear keeps its own ladder; every other incapacitate asks
-        // incapacitateDrCategory, which today diminishes Sap alone (and returns
-        // null, meaning "no ladder", for the rest). Deterministic either way:
+        // incapacitateDrCategory, which today diminishes Sap and Slumber (and
+        // returns null, meaning "no ladder", for the rest). Deterministic either way:
         // the resolver draws no rng.
         const incapDrCategory = ability.fearDr ? 'fear' : incapacitateDrCategory(ability.id);
         const remaining = incapDrCategory
@@ -3461,7 +3502,9 @@ export function runEffects(
         // Materialize before movement so displacement cannot perturb iteration.
         for (const hostile of [...ctx.hostilesInRadius(p, p.pos, eff.radius)]) {
           if (!ctx.hasLineOfSight(p, hostile)) continue;
-          ctx.applyKnockback(p, hostile, eff.distance);
+          // Players are thrown into the air (a fall off a ledge credits the
+          // caster); mobs take the grounded shove (combat/knockback_launch.ts).
+          applyLaunchKnockback(ctx, p, hostile, eff.distance);
           ctx.applyAura(hostile, {
             id: `${ability.id}_daze`,
             name: ability.name,

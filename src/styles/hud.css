@@ -1764,7 +1764,9 @@
     zoom: var(--target-frame-scale, 1);
   }
   /* Every extra action row lifts the docked player frame by one socket row, so
-     the mirrored target seat lifts by the same step and the pair stays level. */
+     the mirrored target seat lifts by the same step and the pair stays level
+     (except with targetAurasBelowFrame, where the target seat sits one aura
+     strip row higher; see the bottom-anchored seat below). */
   body.show-actionbar2 #target-frame,
   body.show-actionbar3 #target-frame {
     top: calc(
@@ -1784,6 +1786,54 @@
       (var(--socket-size) + var(--socket-row-gap)) -
       var(--stance-row-lift, 0px) -
       var(--pet-row-lift, 0px)
+    );
+  }
+  /* Target Auras Below the Frame (targetAurasBelowFrame) on the stock seat.
+     The seat sits directly over the action bar, so a strip hung below it
+     would paint across the hotbar. With the setting on (desktop only; the
+     touch sheet pins its own seat), the seat rises by exactly one strip row
+     (the 8px hang, an own-aura icon and its 13px timer, all under the
+     children zoom), so the strip's first row lands where the frame's bottom
+     edge used to be and keeps the full bar gap above the hotbar. The seat is
+     anchored by its BOTTOM edge here, so the target's own cast bar and swing
+     timer (in-flow .uf-bars children) grow the frame upward instead of
+     pushing the strip down onto the hotbar. A moved frame is untouched: its
+     inline top (and MovableFrame's inline bottom: auto) outranks this seat.
+     The lift is body-wide because the player's cast bar and swing timers
+     rise by the same step below, keeping the lifted frame clear of them. */
+  body.target-auras-below-frame:not(.mobile-touch) {
+    --target-aura-band-lift: calc(
+      (8px + var(--aura-size-own) + 13px) *
+      var(--target-frame-scale, 1)
+    );
+  }
+  body.target-auras-below-frame:not(.mobile-touch) #target-frame {
+    top: auto;
+    bottom: calc(
+      var(--unit-frame-seat-floor) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--target-aura-band-lift)
+    );
+  }
+  body.target-auras-below-frame.show-actionbar2:not(.mobile-touch) #target-frame {
+    bottom: calc(
+      var(--unit-frame-seat-floor) +
+      var(--socket-size) +
+      var(--socket-row-gap) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--target-aura-band-lift)
+    );
+  }
+  body.target-auras-below-frame.show-actionbar2.show-actionbar3:not(.mobile-touch) #target-frame {
+    bottom: calc(
+      var(--unit-frame-seat-floor) +
+      2 *
+      (var(--socket-size) + var(--socket-row-gap)) +
+      var(--stance-row-lift, 0px) +
+      var(--pet-row-lift, 0px) +
+      var(--target-aura-band-lift)
     );
   }
   /* The target's debuff strip hangs off the frame instead of living inside the
@@ -3226,6 +3276,22 @@
     position: relative;
     min-width: 0;
     overflow: hidden;
+  }
+  #pf-name-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  #pf-name {
+    flex: 1;
+    min-width: 0;
+  }
+  #pf-pvp {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    --color-danger: var(--color-hostile-rim);
+    white-space: nowrap;
   }
   /* The bordered plaque keeps the .ui-ribbon inset on the PORTRAIT side (30px:
      the medallion overlaps the bar stack by 18px and its joint seal reaches
@@ -4720,6 +4786,29 @@
   }
   body.show-actionbar3 #swingbar-offhand {
     bottom: 272px;
+  }
+  /* Target Auras Below the Frame lifts the stock target seat by one strip
+     row (--target-aura-band-lift, set above with the seat), which would park
+     the frame on these centred timers. They rise by the same step so every
+     stock layout keeps the clearance it had. A moved bar keeps its inline
+     position; the var is unset (0) with the setting off and on touch. */
+  body.target-auras-below-frame:not(.mobile-touch) #castbar {
+    bottom: calc(260px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame:not(.mobile-touch) #swingbar {
+    bottom: calc(234px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame:not(.mobile-touch) #swingbar-offhand {
+    bottom: calc(220px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) #castbar {
+    bottom: calc(312px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) #swingbar {
+    bottom: calc(286px + var(--target-aura-band-lift));
+  }
+  body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) #swingbar-offhand {
+    bottom: calc(272px + var(--target-aura-band-lift));
   }
 
   #actionbar,
@@ -8459,6 +8548,39 @@
     position: relative;
     display: inline-block;
     line-height: 0;
+  }
+  #minimap-disc.pvp-risk::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border: 3px solid var(--color-hostile);
+    border-radius: 50%;
+    box-shadow: 0 0 12px 3px var(--color-hostile-rim);
+    pointer-events: none;
+    animation: minimap-pvp-risk 1.4s ease-in-out infinite alternate;
+  }
+  @keyframes minimap-pvp-risk {
+    from {
+      opacity: 0.6;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #minimap-disc.pvp-risk::after {
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    #minimap-disc.pvp-risk::after {
+      border-color: Highlight;
+      animation: none;
+    }
+    #pf-pvp {
+      color: CanvasText;
+      border-color: CanvasText;
+    }
   }
   /* The board's conic-bronze bezel, painted BEHIND the canvas and outside the
      disc's own layout box (inset -6px, z-index -1), so the canvas covers the
@@ -13721,12 +13843,17 @@
   }
   .cdm-btn {
     flex: none;
+    pointer-events: auto;
     opacity: var(--cdm-idle-opacity, 0.55);
     transition: opacity 0.16s ease;
   }
   .cdm-btn.is-ready,
   .cdm-btn.is-proc {
     opacity: 1;
+  }
+  /* Touch camera gestures pass through readouts outside placement mode. */
+  body.mobile-touch #cooldown-manager:not(.placement) .cdm-btn {
+    pointer-events: none;
   }
   /* A transformed button (Gorebite armed as Redharvest) or a class proc pulses
      with the action bar's own proc rim. Actionable: never tier-gated; only the

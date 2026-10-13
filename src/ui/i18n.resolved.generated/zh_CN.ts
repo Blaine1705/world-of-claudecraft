@@ -521,7 +521,13 @@ export const zh_CN: EnTranslations = {
       "departsIn": "前往{dest}的渡船将在{time}后起航",
       "castingOff": "前往{dest}的渡船正在起航",
       "boardHint": "起航时站在甲板上即可随船出发。渡船免费。",
-      "sailing": "正在驶往{dest}"
+      "sailing": "正在驶往{dest}",
+      "portLabel": "{port}至{dest}的渡船",
+      "portTitle": "{port}渡船码头",
+      "destination": "目的地：{dest}",
+      "boardNow": "现在登船",
+      "arrivesIn": "渡船将在{time}后抵达",
+      "scheduleUnavailable": "渡船时刻表暂不可用。"
     },
     "materialStackSelectionUnavailable": "该素材选择已失效。",
     "vehicle": {
@@ -1876,6 +1882,8 @@ export const zh_CN: EnTranslations = {
       "reportSent": "报告已复制并发送到聊天",
       "reportNoData": "未记录任何数据。",
       "noDetailedData": "没有详细数据",
+      "detailHealSubtitle": "有效：{effective} | 过量治疗：{overheal}（{overhealPercent}） | 命中：{hits}（{critPercent} 暴击）",
+      "detailHitSubtitle": "命中：{hits} | 暴击：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}",
       "noDeathEvents": "死亡前没有记录到任何事件",
       "killedBy": "死于{killer}（{ability}）",
       "lethalHit": "致命打击",
@@ -2142,6 +2150,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "悬停时显示法术提示",
       "clickMoveLeft": "左键",
       "clickMoveRight": "右键",
       "version": "v{version}（{build}）",
@@ -2187,6 +2196,7 @@ export const zh_CN: EnTranslations = {
       "interfaceModeDesktop": "桌面",
       "interfaceModeTouch": "触控",
       "interfaceModeNote": "自动会根据你的设备选择桌面或触控操作。选择桌面可强制使用键盘和鼠标（适合带键盘的平板），选择触控则使用屏幕上的操作控件。",
+      "ambienceVolume": "环境音量",
       "footstepSounds": "脚步声",
       "interfaceSounds": "界面与反馈音效",
       "clickFeedback": "点击标记",
@@ -2800,7 +2810,8 @@ export const zh_CN: EnTranslations = {
         "battlegroundAssist": "助攻击杀",
         "worldKill": "世界击杀",
         "worldAssist": "世界击杀助攻",
-        "hillHold": "占据山丘"
+        "hillHold": "占据山丘",
+        "worldQuest": "世界任务"
       },
       "floatReasons": {
         "kill": "击杀",
@@ -2931,7 +2942,7 @@ export const zh_CN: EnTranslations = {
       "delveMark": "探险印记",
       "wocToken": "WoC 代币",
       "heroicMarkNote": "英雄地下城 . 在英雄军需官处兑换",
-      "honorNote": "战场与竞技场",
+      "honorNote": "战场、竞技场与世界任务",
       "delveMarkNote": "已完成的探险",
       "wocTokenNote": "已关联钱包的余额",
       "walletNotLinked": "未关联钱包",
@@ -3650,6 +3661,7 @@ export const zh_CN: EnTranslations = {
       "dragEquipHint": "拖到角色身上以装备",
       "dragDestroyHint": "拖出到世界中以销毁",
       "reorderNeedsRecent": "清除筛选并按“最近”排序即可整理背包",
+      "reorderLocked": "已锁定的物品会固定在其背包格中。请先解锁再移动。",
       "itemAriaInstanced": "{item}，数量 {count}，带工匠印记的物品",
       "itemAriaEnchanted": "{item}，数量 {count}，已附魔的副本",
       "itemAriaBound": "{item}，数量 {count}，已绑定的副本",
@@ -4035,7 +4047,7 @@ export const zh_CN: EnTranslations = {
       "duskEconomy": "技能的能量消耗降低{pct}%",
       "moontide": "月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法各累积1层。达到{max}层时：月种变为月涌，天陨变为日醒，使用任意一个都会消耗全部3层",
       "oldBlood": "古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓",
-      "verdance": "繁茂：第{stacks}/{max}层。每施放一次野性绽放、二度绽放或野性愈合累积1层，每层都会缩短野性愈合的施法时间。达到{max}层时，迅捷治愈变为盛放",
+      "verdance": "繁茂：第{stacks}/{max}层。每施放一次孢愈术、二度绽放或野性愈合累积1层，每层都会缩短野性愈合的施法时间。达到{max}层时，迅捷治愈变为盛放",
       "freeExecute": "下一个符合条件的斩杀技能不消耗资源",
       "resourceSap": "每 {interval} 秒恢复 {value} 点当前资源",
       "nextAttackCrit": "下一次攻击必定暴击",
@@ -4137,6 +4149,7 @@ export const zh_CN: EnTranslations = {
       "formTravel": "迅捷形态：移动速度提高 {pct}%",
       "formFireball": "火球形态：移动速度提高 {pct}%；无法攻击或施法",
       "formMoonkin": "月翼形态：法术伤害提高 {pct}%，护甲提高 {armorPct}%",
+      "formSporemender": "孢愈者形态：造成的治疗提高 {pct}%，护甲提高 {armorPct}%，移动速度降低 {slowPct}%",
       "formShadow": "幽幕形态：暗影伤害提高 {pct}%",
       "resourceCount": "{value}/{max}",
       "formLich": "灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害",
@@ -4223,6 +4236,7 @@ export const zh_CN: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "暂离",
       "pvpTag": "PvP",
+      "bountyTag": "悬赏",
       "cheaterTag": "< 作弊者 >",
       "pledgeTag": "{guild}的宣誓者",
       "npcRoleTag": "<{role}>",
@@ -6354,7 +6368,9 @@ export const zh_CN: EnTranslations = {
         "passage": "通道"
       },
       "collapseHint": "收起地图侧栏",
-      "expandHint": "展开地图侧栏"
+      "expandHint": "展开地图侧栏",
+      "resizeRailAria": "地图侧栏宽度",
+      "resizeRailHint": "拖动以调整地图侧栏大小。双击可重置。"
     },
     "arenaGate": {
       "minLevelNote": "需要等级 {level}"
@@ -7829,18 +7845,20 @@ export const zh_CN: EnTranslations = {
       "formsHeading": "变形",
       "formsNote": "德鲁伊靠变形作战。大多数德鲁伊技能都归属于某一种形态，因此你当前所处的形态决定了你能施放什么，而变形本身会消耗少量法力。无论是否身处战斗，你都可以随时变形，次数不限。",
       "formsAutoUnshift": "变身时施放治疗或伤害法术会自动为你解除变身。以这种方式离开形态不消耗法力，也不占用公共冷却时间，因此瞬发法术会在你按下的那一刻释放。重新变身是普通技能，依然消耗法力并占用公共冷却时间。",
-      "formsMoonwing": "平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它是唯一保留法术的野兽形态，而你的魔杖也只在这个形态或你普通的施法形态下才能使用。",
+      "formsMoonwing": "平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它和恢复系的孢愈者形态一样保留你的法术，而你的魔杖只在这两种形态或你普通的施法形态下才能使用。",
       "formsWolfEngage": "狼以巨熊冲锋开战，随即变为狼形态钉制目标，未潜行时用扑击拉近距离，再用扑倒把敌人钉在原地。",
       "formLine": {
         "form_bear": "坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。",
         "form_cat": "近战输出形态：像盗贼一样使用能量与连击点，威胁值也低得多。",
-        "form_travel": "赶路形态：在地面上快得多，但在你变回原形之前无法使用其他技能。"
+        "form_travel": "赶路形态：在地面上快得多，但在你变回原形之前无法使用其他技能。",
+        "form_sporemender": "恢复德鲁伊的治疗形态：外皮更坚韧，治疗更强但步伐更慢，并保留你的所有法术和法力值。"
       },
       "mageEleSummon": "一个冰霜法术，把水元素召唤到你身边，并让它扑向你的目标。",
       "formName": {
         "form_bear": "巨熊形态",
         "form_cat": "豹形态",
-        "form_travel": "迅捷形态"
+        "form_travel": "迅捷形态",
+        "form_sporemender": "孢愈者形态"
       }
     },
     "classHook": {
@@ -8542,6 +8560,7 @@ export const zh_CN: EnTranslations = {
       "formBear": "巨熊形态",
       "formCat": "豹形态",
       "formTravel": "迅捷形态",
+      "formSporemender": "孢愈者形态",
       "groupCreatures": "生物",
       "groupPets": "术士恶魔",
       "pickerLabel": "选择要查看的模型",
@@ -11150,6 +11169,10 @@ export const zh_CN: EnTranslations = {
     "selectClass": "请选择一个职业。",
     "pickClass": "选择一个职业。",
     "returnToLogin": "返回登录",
+    "searchUpdates": "搜索更新",
+    "noUpdateFound": "未找到更新。请稍后再试。",
+    "updateUnavailable": "请通过游戏商店更新，或下载最新客户端。",
+    "updateSearchFailed": "无法检查更新。请重试。",
     "api": {
       "tooManyAttempts": "尝试次数过多。请等待一分钟后重试。",
       "usernameShape": "用户名必须为 3-24 个字符，并使用字母、数字或下划线。",
@@ -13186,7 +13209,7 @@ export const zh_CN: EnTranslations = {
       },
       "trailbreak": {
         "name": "断迹",
-        "description": "向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。"
+        "description": "向后跃出25码，并解除定身和移动减速效果。若你拥有狩猎势能，则将其刷新，并使你获得蓄势返场，持续12秒。"
       },
       "wildheart": {
         "name": "野性之心",
@@ -13753,7 +13776,7 @@ export const zh_CN: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "骏马之姿",
-        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 4 秒（每次命中都会刷新昏乱状态）。"
+        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 2 秒（每次命中都会刷新昏乱状态）。"
       },
       "aimed_shot": {
         "name": "引弓长射",
@@ -13813,7 +13836,7 @@ export const zh_CN: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "雷霆蓄能",
-        "description": "被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）"
+        "description": "被动：奥术闪电、天穹连锁和岩浆爆发会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）"
       },
       "lightning_overload": {
         "name": "电弧超载",
@@ -13821,7 +13844,7 @@ export const zh_CN: EnTranslations = {
       },
       "lava_burst": {
         "name": "岩浆爆发",
-        "description": "造成{damage}点火焰伤害。对被你的余烬震击点燃的目标必定造成暴击。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）"
+        "description": "造成{damage}点火焰伤害。命中可给予 1 点雷霆。对被你的余烬震击点燃的目标必定造成暴击。暴击时额外造成相当于普通伤害24%的伤害。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）"
       },
       "thunderstorm": {
         "name": "碎风暴",
@@ -13845,7 +13868,7 @@ export const zh_CN: EnTranslations = {
       },
       "flame_shock": {
         "name": "余烬震击",
-        "description": "造成 {damage} 点火焰伤害，随后在 12 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。"
+        "description": "造成 {damage} 点火焰伤害，随后在 {duration} 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。"
       },
       "flametongue_weapon": {
         "name": "焰烙武器",
@@ -13995,7 +14018,7 @@ export const zh_CN: EnTranslations = {
         "description": "仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长{duration}秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。"
       },
       "rejuvenation": {
-        "name": "野性绽放",
+        "name": "孢愈术",
         "description": "在 12 秒内为目标恢复 {damage} 点生命值。",
         "specNote_restoration": "每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。繁茂达到3层时，迅捷治愈变为盛放。"
       },
@@ -14321,7 +14344,8 @@ export const zh_CN: EnTranslations = {
       },
       "swiftmend": {
         "name": "迅捷治愈",
-        "description": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。每次施放野性绽放、二度绽放或野性愈合累积1层繁茂；在 3 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）"
+        "description": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。每次施放孢愈术、二度绽放或野性愈合累积1层繁茂；在 3 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）",
+        "specNote_restoration": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。孢愈术和二度绽放会累积繁茂；在 5 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）"
       },
       "moonlash": {
         "name": "月涌",
@@ -14347,9 +14371,27 @@ export const zh_CN: EnTranslations = {
         "name": "林地觉醒",
         "description": "呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（恢复）"
       },
+      "sporemender_form": {
+        "name": "孢愈者形态",
+        "description": "变形为孢愈者，使你造成的治疗提高20%，护甲提高40%，但移动速度降低20%。你在普通形态下的所有法术仍可施放。持续到你切换形态为止。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回普通形态。（恢复标志技能）"
+      },
+      "spore_burst": {
+        "name": "孢子爆发",
+        "description": "在目标区域召唤一株孢子爆裂菇。{duration} 秒后它会爆开，为 8 码内的盟友恢复 {healing} 点生命值，并对敌人造成 {damage} 点自然伤害。",
+        "specNote_balance": "月潮达到 3 层时，效果提高 25%，并消耗你的月潮。",
+        "specNote_restoration": "同时为每个被治疗的盟友施加孢愈术。繁茂叠满时，效果提高 25%，并消耗你的繁茂。"
+      },
+      "natures_boon": {
+        "name": "自然恩惠",
+        "description": "你的法术可以触发持续 10 秒的自然恩惠：其指定的法术无需消耗、效果提高 25%，且可在任意形态下施放。再次触发会刷新持续时间。",
+        "specNote_feral": "每次命中的近战自动攻击有 1/15 的几率触发它，作用于孢愈术；处于巨熊形态时也作用于橡树皮。",
+        "specNote_balance": "每次施放野性弹或天陨有 10% 的几率触发它，作用于孢子爆发，每 10 秒最多触发一次。",
+        "specNote_restoration": "你的持续治疗效果每次跳动有 10% 的几率触发它，作用于孢子爆发，每 10 秒最多触发一次。"
+      },
       "overbloom": {
         "name": "盛放",
-        "description": "消耗你的3层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。"
+        "description": "消耗你的3层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的孢愈术。",
+        "specNote_restoration": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的孢愈术。"
       },
       "summon_imp": {
         "name": "召唤烬裔",
@@ -14830,7 +14872,7 @@ export const zh_CN: EnTranslations = {
       },
       "rake": {
         "name": "剐削",
-        "description": "撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限豹形态。",
+        "description": "撕裂敌人，造成武器伤害外加 {damage} 点，并在 18 秒内造成 {overTime} 点流血伤害。给予 1 点连击点。仅限豹形态。",
         "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
       "revive_pet": {
@@ -24143,7 +24185,7 @@ export const zh_CN: EnTranslations = {
       },
       "grovespring": {
         "name": "林泉法衣",
-        "bonus2": "迅捷治愈优先消耗你自己的野性绽放或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。",
+        "bonus2": "迅捷治愈优先消耗你自己的孢愈术或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。",
         "bonus4": "盛放收割你剩余治疗效果的 75%，随后积累 1 层繁茂。"
       },
       "hexthread": {

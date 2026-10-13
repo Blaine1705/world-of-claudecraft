@@ -233,15 +233,15 @@ describe('walking aboard (the real movement kernel)', () => {
     expect(fc.y).toBeCloseTo(HULL.forecastleY, 3);
   });
 
-  it('the rails hold: walking at the side keeps the player aboard', () => {
+  it('the rails hold: walking at either side keeps the player aboard', () => {
     placeLocal(0, 3.5, HULL.mainDeckY);
     const walked = walkToLocal(-8, 3.5, false, 90);
     expect(walked.overboard).toBe(false);
     expect(walked.x).toBeGreaterThan(-5.2);
     placeLocal(0, -1.8, HULL.mainDeckY);
-    const port = walkToLocal(8, -1.8, false, 90);
-    expect(port.overboard).toBe(false);
-    expect(port.x).toBeLessThan(5.2);
+    const otherSide = walkToLocal(8, -1.8, false, 90);
+    expect(otherSide.overboard).toBe(false);
+    expect(otherSide.x).toBeLessThan(5.2);
     // the starboard gangway is barred while no dock meets it
     placeLocal(-2, 0.8, HULL.mainDeckY);
     const barred = walkToLocal(-8, 0.8, false, 90);
@@ -265,7 +265,8 @@ describe('walking aboard (the real movement kernel)', () => {
     expect(sim.isSwimming(sim.player)).toBe(true);
   });
 
-  it('walking into the rails beside benches, barrels and crates keeps the player aboard', () => {
+  it('walking stays aboard beside the edge dressing too (bench, barrels, crates)', () => {
+    // Edge dressing must not let grounded walking bypass the rail.
     placeLocal(3.3, 5.0, HULL.mainDeckY);
     const fromBench = walkToLocal(8, 5.0, false, 90);
     expect(fromBench.overboard).toBe(false);

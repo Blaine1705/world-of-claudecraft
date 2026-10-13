@@ -1962,7 +1962,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "rejuvenation",
-        "name": "Wildbloom"
+        "name": "Sporemending"
       }
     ],
     "abilities": [
@@ -1988,7 +1988,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "rejuvenation",
-        "name": "Wildbloom"
+        "name": "Sporemending"
       },
       {
         "id": "thorns",
@@ -2129,6 +2129,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "grove_awakening",
         "name": "Grove Awakening"
+      },
+      {
+        "id": "sporemender_form",
+        "name": "Sporemender Form"
+      },
+      {
+        "id": "spore_burst",
+        "name": "Spore Burst"
+      },
+      {
+        "id": "natures_boon",
+        "name": "Nature's Boon"
       }
     ],
     "model": "player_druid",
@@ -2587,6 +2599,11 @@ export const GUIDE_DRUID_FORMS: GuideDruidForm[] = [
     "id": "form_travel",
     "model": "form_travel",
     "still": "/guide-stills/form_travel.webp"
+  },
+  {
+    "id": "form_sporemender",
+    "model": "form_sporemender",
+    "still": "/guide-stills/form_sporemender.webp"
   }
 ];
 
@@ -6060,6 +6077,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 50,
     "feat": false,
     "rewardTitle": "Indomitable"
+  },
+  {
+    "id": "exp_wisp_maze_hard",
+    "name": "Brighter Than the Shadows",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -21619,6 +21643,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/chicken_cow.glb",
     "idle": "Idle",
     "height": 2.3
+  },
+  "form_sporemender": {
+    "url": "models/creatures/sporemender_form.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "yaw": -1.5707963267948966
   },
   "mob_emberkin": {
     "url": "models/creatures/emberkin.glb",

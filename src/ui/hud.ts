@@ -167,7 +167,8 @@ import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime
 import type { AuraOverlayController } from './aura_overlay_controller';
 import { auraOverlaySettingsHooks, mountAuraOverlay } from './aura_overlay_wiring';
 import type { AuraTooltipFooterDeps } from './aura_tooltip';
-import { auraTooltipFooterHtml, renderAuraTooltipBodyHtml } from './aura_tooltip';
+import { auraTooltipFooterHtml } from './aura_tooltip';
+import { resolvedAuraTooltipBodyHtml } from './aura_tooltip_body';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import {
   type AurasDeps,
@@ -249,6 +250,14 @@ import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_windo
 import { DayNightDialPainter } from './day_night_dial_painter';
 import { DeathRecapDialog } from './death_recap_dialog';
 import { deathRecapFeedback } from './death_recap_feedback';
+import {
+  createDeathScreenInputHold,
+  createDeathScreenView,
+  deathScreenInputReady,
+  deathScreenViewInto,
+  holdDeathScreenInput,
+  noteReleaseOverlayShown,
+} from './death_screen_view';
 import { decorativeArtImg } from './decorative_art';
 import { deedBorderSlug } from './deed_border_view';
 import {
@@ -475,6 +484,7 @@ import { LootWindowController } from './hud/loot/loot_window_controller';
 import { LootExplorerWindow } from './hud/loot_explorer/loot_explorer_window';
 import {
   bindMinimapObjectiveTap,
+  installMapWindowSizing,
   MapMarkerInteractionController,
   MapMarkerTooltipContent,
 } from './hud/map';
@@ -799,6 +809,7 @@ import {
 import { maskProfanity } from './profanity';
 import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
 import { isPvpHostilePlayer, isPvpHostileTargetId } from './pvp_hostile_core';
+import { playerPvpRisk } from './pvp_risk_core';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
@@ -873,7 +884,6 @@ import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
-import { nearestSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
 import { localizeSystemText } from './system_text_i18n';
 import { TalentsWindow } from './talents_window';
@@ -892,7 +902,8 @@ import { TargetSwingTimerBars } from './target_swing_timer_bars';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
 import { toolEffectTooltipLines } from './tool_effect_tooltip';
-import { type TooltipViewport, tooltipPlacementAt } from './tooltip_clamp_core';
+import { bindTooltip } from './tooltip_binding';
+import type { TooltipViewport } from './tooltip_clamp_core';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import {
@@ -901,7 +912,7 @@ import {
 } from './tooltip_paint';
 import { installTargetOfTargetControls } from './totarget_frame_controller';
 import { attachTouchFrameDrags, type TouchFrameDrags } from './touch_frame_drag';
-import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
+import { TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
@@ -936,6 +947,7 @@ import {
   isWindowDragPreviewMutation,
   type WindowDragController,
 } from './window_drag';
+import { isWindowDragHandle } from './window_drag_handle';
 import { makeWindowFocus } from './window_focus';
 import { syncWindowOpenBodyClasses } from './window_open_state';
 import { installWindowReflow, rememberWindowPos, requestedWindowPos } from './window_reflow';
@@ -949,6 +961,7 @@ import { WorldQuestPuzzleWindow } from './world_quest_puzzle_window';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
+import { ZoneAnnouncementCore } from './zone_announcement_core';
 import { zoneEntryLine } from './zone_entry_line_core';
 
 let lpAdvancedLast = -1;
@@ -1112,12 +1125,6 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
-// Ghost-mode display threshold, mirroring src/sim/spirit.ts CORPSE_REZ_RANGE. The
-// server re-validates the range; this only decides whether the ghost prompt's corpse
-// button is shown, so keep it in sync. (The Pale Keeper's raise is reached by talking
-// to the Keeper, so no healer range is mirrored here any more.)
-const GHOST_CORPSE_REZ_RANGE = 35;
-
 const STAT_VIEW_DEPS: StatTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
@@ -1649,6 +1656,8 @@ export class Hud {
   private partyFramesEl = $('#party-frames');
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
+  private deathScreenInput = createDeathScreenInputHold();
+  private deathScreen = createDeathScreenView();
   private deathRecapBtnEl = $('#death-recap-btn');
   private deathRecapDialog!: DeathRecapDialog;
   private ghostPromptEl = $('#ghost-prompt');
@@ -1992,6 +2001,7 @@ export class Hud {
   private lastNythraxisCombatEventAt = 0;
   private lastResting: boolean | null = false;
   private lastZoneId = '';
+  private readonly zoneAnnouncements = new ZoneAnnouncementCore();
   private mapZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
   private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
@@ -2213,6 +2223,8 @@ export class Hud {
         station: stationNameText,
         poi: zonePoiLabel,
         rift: riftFloorLabel,
+        ferryPort: (routeId, berthId) =>
+          this.mapMarkerTooltipContent.ferryPortSemantic(routeId, berthId),
         npc: npcDisplayName,
         mob: mobDisplayName,
         worldQuest: (questId) =>
@@ -2222,6 +2234,7 @@ export class Hud {
       navigation: (marker) =>
         this.mapMarkerTooltipContent.navigation(
           this.mapMarkerInteraction.semantics.navigationText(marker),
+          marker,
         ),
       station: (marker) => this.mapMarkerTooltipContent.station(marker),
       service: (marker) => this.mapMarkerTooltipContent.service(marker),
@@ -2232,12 +2245,18 @@ export class Hud {
       questArea: (refs, count) => this.mapMarkerTooltipContent.questArea(refs, count),
       paint: (html, x, y) => this.paintTooltipAt(html, x, y),
       clearMemo: () => this.mapMarkerTooltipContent.clearMemo(),
+      hide: () => this.hideTooltip(),
     });
     this.mapMarkerArt.preload();
     this.auraOverlayController = mountAuraOverlay(this.sim, this.writerFacet, (rings) =>
       this.renderer.setPlayerAuraRings(rings),
     );
-    this.cooldownManager = mountCooldowns(this.sim, this.writerFacet, this.auraOverlayController);
+    this.cooldownManager = mountCooldowns(this.sim, this.writerFacet, this.auraOverlayController, {
+      abilityTooltip: (ability) => this.abilityTooltip(ability),
+      aurasView: this.aurasViewDeps,
+      aurasPainter: this.aurasPainterDeps,
+      hideTooltip: () => this.hideTooltip(),
+    });
     this.farmPressAffordance = new FarmPressAffordanceController({
       root: $('#interact-affordance'),
       writers: this.writerFacet,
@@ -2285,7 +2304,7 @@ export class Hud {
     this.deathRecapDialog = new DeathRecapDialog({
       root: () => $('#death-recap-dialog'),
       getLatestRecap: () => this.meters.getLatestDeathRecap(this.sim.playerId),
-      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      attachTooltip: (el, html, isSpell) => this.attachTooltip(el, html, isSpell),
       hideTooltip: () => this.hideTooltip(),
       previewResolvedAbility: (id) => this.previewResolvedAbility(id),
       abilityTooltip: (res) => this.abilityTooltip(res),
@@ -2747,6 +2766,7 @@ export class Hud {
     // every other touch-facing HUD button; desktop mouse/keyboard is preserved.
     bindTouchTap(this.releaseSpiritBtnEl, () => {
       if (this.sim.arenaInfo?.match) return;
+      if (!deathScreenInputReady(this.deathScreenInput, performance.now())) return;
       // Thornhollow Fields releases like the open world: the spirit rises in the keep
       // graveyard and waits for the wave (the sim routes the destination).
       this.sim.releaseSpirit();
@@ -2979,6 +2999,7 @@ export class Hud {
       this.syncAnyWindowOpenState();
     });
     const mapCanvas = $('#map-canvas') as unknown as HTMLCanvasElement;
+    installMapWindowSizing(mapCanvas, this.repaintOpenMap.bind(this), () => this.optionsHooks);
     mapCanvas.addEventListener(
       'wheel',
       (ev) => {
@@ -3109,6 +3130,11 @@ export class Hud {
       this.toggleMapLevel();
     });
     mapCanvas.addEventListener('click', (ev) => {
+      if (
+        this.mapLevel === 'continent' &&
+        showMapTipAt(ev.clientX, ev.clientY, this.isMobileLayout())
+      )
+        return;
       if (this.mapLevel === 'zone') {
         if (this.mapMarkerInteraction.selectWorldQuestAt(mapCanvas, ev.clientX, ev.clientY)) {
           this.updateMapWindow();
@@ -3124,6 +3150,8 @@ export class Hud {
     });
     mapCanvas.addEventListener('pointermove', (ev) => {
       if (this.mapLevel !== 'continent' || ev.pointerType !== 'mouse') return;
+      if (showMapTipAt(ev.clientX, ev.clientY)) return;
+      hideMapAreaTip();
       const { cx, cy } = canvasPoint(ev.clientX, ev.clientY);
       const zoneId = continentZoneAt(this.continentRegions, cx, cy);
       if (zoneId !== this.mapHoverZone) {
@@ -3131,7 +3159,11 @@ export class Hud {
         this.updateMapWindow();
       }
       if (zoneId) {
-        this.paintTooltipAt(this.continentZoneTooltipHtml(zoneId), ev.clientX, ev.clientY);
+        this.paintTooltipAt(
+          this.mapMarkerTooltipContent.continentZone(zoneId, this.continentRegions),
+          ev.clientX,
+          ev.clientY,
+        );
         continentTipShown = true;
       } else {
         hideContinentTip();
@@ -3217,9 +3249,11 @@ export class Hud {
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
     this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
-    this.showBanner(startZoneName);
-    this.log(t('hud.core.welcomeZone', { zone: startZoneName }), HUD_LOG.NOTICE);
-    this.logZoneWelcome(startZone);
+    if (this.zoneAnnouncements.initialize(startZone.id, sim.player)) {
+      this.showBanner(startZoneName);
+      this.log(t('hud.core.welcomeZone', { zone: startZoneName }), HUD_LOG.NOTICE);
+      this.logZoneWelcome(startZone);
+    }
     this.log(t('hudChrome.tips.joinChannels'), HUD_LOG.TIP);
   }
 
@@ -3341,7 +3375,7 @@ export class Hud {
 
     this.windowDragController = installWindowDrag({
       getScale: () => getUiScale(),
-      isDragHandle: (target, el) => this.isWindowDragHandle(target, el),
+      isDragHandle: isWindowDragHandle,
       bringToFront: (el) => this.bringWindowToFront(el),
       hideTooltip: () => this.hideTooltip(),
       pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
@@ -3471,18 +3505,6 @@ export class Hud {
   private windowZValue(el: HTMLElement): number {
     const z = Number.parseInt(el.style.zIndex || getComputedStyle(el).zIndex || '', 10);
     return Number.isFinite(z) ? z : 0;
-  }
-
-  private isWindowDragHandle(target: HTMLElement, win: HTMLElement): boolean {
-    if (
-      target.closest(
-        'button, input, textarea, select, a, .x-btn, .ui-dd, [draggable="true"], #map-canvas, #map-zoom',
-      )
-    )
-      return false;
-    const title = target.closest('.panel-title');
-    if (title && win.contains(title)) return true;
-    return win.id === 'map-window' && target === win;
   }
 
   // left/top: visual space (placeWindow); remember=false for a passive reflow.
@@ -4708,12 +4730,10 @@ export class Hud {
     // governor. spawn() reads this per event.
     { getFxTier: () => this.fxTier() },
   );
-  // First unit-frame painter instance; heraldry hosts are captured once. The name
-  // stays login-owned, and player dead/range state is absent, so no stateClasses.
-  // CSS keeps this visible, so no shownDisplay; setup owns the portrait, so no
-  // repaintPortrait.
+  // Player frame: static name/portrait, cached heraldry and self PvP risk hosts.
   private readonly playerFramePainter = new UnitFramePainter(this.writerFacet, {
     frame: this.playerFrameEl,
+    pvpRisk: { badge: $('#pf-pvp'), minimap: $('#minimap-disc') },
     level: this.pfLevelEl,
     hpFill: this.pfHpEl,
     hpText: this.pfHpTextEl,
@@ -4969,7 +4989,13 @@ export class Hud {
       u.d = t('hudChrome.unitFrame.durationUnitDays');
       return u;
     },
-    auraEffectHtml: (a) => this.auraTooltipBodyHtml(a),
+    auraEffectHtml: (a) =>
+      resolvedAuraTooltipBodyHtml(
+        a,
+        this.sim.player,
+        (id) => this.previewResolvedAbility(id),
+        (aura) => this.auraEffectTooltipHtml(aura),
+      ),
     // Own-aura check for the target strip's ownFirst prominence: a missing/zero
     // sourceId (an old server's mirror) is never own, so the strip degrades to
     // the un-prioritized layout instead of misattributing another caster's dot.
@@ -5147,7 +5173,7 @@ export class Hud {
     moneyHtml: (copper) => moneyHtml(copper),
     itemTooltip: (item, instance, materialSources) =>
       this.itemTooltip(item, true, instance, materialSources),
-    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    attachTooltip: (el, html, isSpell) => this.attachTooltip(el, html, isSpell),
   };
   // The interactive talents window. All allocation reads and mutations cross the
   // IWorld seam; the painter owns no optimistic talent state. All closures are
@@ -5948,7 +5974,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#spellbook'),
     ...this.windowFocus('#spellbook'),
     hideTooltip: () => this.hideTooltip(),
-    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    attachTooltip: (el, html) => this.attachTooltip(el, html, () => true),
     abilitySummary: (known) =>
       describeAbilitySummary(
         known,
@@ -6180,25 +6206,6 @@ export class Hud {
     return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
   }
 
-  // Complete aura tooltip body. A buff created by a known ability first shows that
-  // ability's localized, rank/talent-resolved description; the mechanical one-line
-  // descriptor follows when the aura kind has one. Proc-only auras without an ability
-  // definition still retain their descriptor. This keeps new ability buffs from
-  // silently degrading to name + timer just because their AuraKind is new.
-  private auraTooltipBodyHtml(a: AuraEffectInput & { id?: string }): string {
-    if (!a.id) return this.auraEffectTooltipHtml(a);
-    return renderAuraTooltipBodyHtml(a as AuraEffectInput & { id: string }, {
-      abilityDescription: (id) => {
-        const res = this.previewResolvedAbility(id);
-        if (!res) return null;
-        const scaling = abilityScalingOf(this.sim.player);
-        return abilityDisplayDescription(res, abilityEffectText(res, scaling), scaling, a);
-      },
-      effectHtml: (aura) => this.auraEffectTooltipHtml(aura),
-      escapeHtml: esc,
-    });
-  }
-
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
   // (aura_effect.ts) resolved to localized, esc'd text. The descriptor is exhaustive
   // for current AuraKinds and safely omits an unknown mixed-release kind. Injected so
@@ -6227,112 +6234,15 @@ export class Hud {
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
   }
 
-  attachTooltip(el: HTMLElement, html: () => string): void {
-    let touchTimer: number | undefined;
-    // tooltip box size, measured once in showAt (right after the content is set)
-    // and reused by every mousemove: the content cannot change between showAt
-    // calls, so re-reading offsetWidth/Height per mousemove only forced a reflow
-    let ttW = 0;
-    let ttH = 0;
-    const mobile = () => document.body.classList.contains('mobile-touch');
-    const clearTouchTimer = () => {
-      if (touchTimer !== undefined) window.clearTimeout(touchTimer);
-      touchTimer = undefined;
-    };
-    const showAt = (x: number, y: number, trigger: 'touch' | 'mouse' | 'focus') => {
-      // Touch-only path: showing the tooltip means the held control is being
-      // inspected, so the release click should peek, not fire its action.
-      this.peekGuard.tooltipShown(trigger);
-      const size = this.paintTooltipAt(html(), x, y);
-      // cache the measured box for the mousemove clamp below (no forced reflow)
-      ttW = size.w;
-      ttH = size.h;
-      // This element now owns the shared box, so its own mousemove keeps the
-      // cheap reposition-only path and a hover onto any other element re-resolves.
-      this.tooltipOwner.claim(el);
-    };
-    const showNearElement = () => {
-      const rect = el.getBoundingClientRect();
-      showAt(rect.right, rect.top + rect.height / 2, 'focus');
-    };
-    // A mouse click or a tap focuses the button as a side effect (the browser
-    // moves focus to whatever was pressed), which used to fire showNearElement
-    // on EVERY action-bar press, not just real keyboard (Tab) navigation. Flag
-    // the pointer press so the very next focusin it causes is skipped; Tab
-    // never fires pointerdown first, so keyboard users still get the tooltip.
-    let pointerFocusPending = false;
-    el.addEventListener('pointerdown', () => {
-      pointerFocusPending = true;
-    });
-    el.addEventListener('focusin', () => {
-      if (el.dataset.suppressFocusTooltip === 'true') {
-        delete el.dataset.suppressFocusTooltip;
-        return;
-      }
-      if (pointerFocusPending) {
-        pointerFocusPending = false;
-        return;
-      }
-      showNearElement();
-    });
-    el.addEventListener('mouseenter', () => {
-      if (mobile()) return;
-      const rect = el.getBoundingClientRect();
-      showAt(rect.right, rect.top + rect.height / 2, 'mouse');
-    });
-    el.addEventListener('mousemove', (e) => {
-      if (mobile()) return;
-      // The shared box may be showing another element's content: a drag-drop
-      // that ended inside a slot fires no mouseenter, and Firefox re-enters the
-      // drag SOURCE after a native drag, so the visible tooltip can belong to a
-      // different (or no) element while the cursor sits over this one (#1626).
-      // Repaint this element's own tooltip in that case; the common in-slot move
-      // stays on the cheap reposition-only path below.
-      if (this.tooltipOwner.needsReshow(el)) {
-        showAt(e.clientX, e.clientY, 'mouse');
-        return;
-      }
-      // reuse the box size measured in showAt: same content, no forced reflow
-      const at = tooltipPlacementAt(
-        e.clientX,
-        e.clientY,
-        { w: ttW, h: ttH },
-        this.tooltipViewport(),
-      );
-      this.tooltipEl.style.left = `${at.left}px`;
-      this.tooltipEl.style.top = `${at.top}px`;
-    });
-    el.addEventListener('mouseleave', () => {
-      clearTouchTimer();
-      this.tooltipEl.style.display = 'none';
-      // Box hidden: no element owns it, so the next move over any slot re-resolves.
-      this.tooltipOwner.release();
-    });
-    el.addEventListener('focusout', () => {
-      clearTouchTimer();
-      this.tooltipEl.style.display = 'none';
-      this.tooltipOwner.release();
-    });
-    el.addEventListener('pointerdown', (e) => {
-      if (!mobile() || e.pointerType === 'mouse') return;
-      clearTouchTimer();
-      // A fresh press: drop any stale peek and dismiss a lingering tooltip.
-      this.peekGuard.press();
-      this.tooltipEl.style.display = 'none';
-      const x = e.clientX,
-        y = e.clientY;
-      touchTimer = window.setTimeout(() => showAt(x, y, 'touch'), TOOLTIP_PEEK_MS);
-    });
-    el.addEventListener('pointerup', () => {
-      clearTouchTimer();
-      // Safari desktop never focuses a button on click, so pointerdown's flag
-      // above would otherwise never get consumed by a focusin and could wrongly
-      // swallow a later, real keyboard-focus tooltip; drop it once the press ends.
-      pointerFocusPending = false;
-    });
-    el.addEventListener('pointercancel', () => {
-      clearTouchTimer();
-      pointerFocusPending = false;
+  attachTooltip(el: HTMLElement, html: () => string, isSpell: () => boolean = () => false): void {
+    bindTooltip(el, html, {
+      peekGuard: this.peekGuard,
+      tooltipOwner: this.tooltipOwner,
+      tooltipEl: this.tooltipEl,
+      paintTooltipAt: (content, x, y) => this.paintTooltipAt(content, x, y),
+      tooltipViewport: () => this.tooltipViewport(),
+      hoverAllowed: () =>
+        !isSpell() || (this.optionsHooks?.settings.get('spellTooltipOnHover') ?? true),
     });
   }
 
@@ -6345,6 +6255,7 @@ export class Hud {
   }
 
   hideTooltip(): void {
+    this.mapMarkerInteraction?.stopPortRefresh();
     this.tooltipEl.style.display = 'none';
     this.tooltipEl.classList.remove('mob-tooltip');
     // Box hidden (drag start, window close, slot mutate): drop ownership so a
@@ -7710,25 +7621,32 @@ export class Hud {
         if (e.key !== ' ' && e.key !== 'Spacebar') return;
         e.preventDefault();
       });
-      this.attachTooltip(btn, () => {
-        if (slot === 0 && this.attackSlotIsAttack()) {
-          return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
-        }
-        const known = this.abilityForSlot(slot);
-        const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
-        if (known) return this.abilityTooltip(known) + clearHint;
-        const freed = slot === 0 && this.freedAttackSlotAbility();
-        if (freed)
-          return `<div class="tt-title">${esc(abilityDisplayName(freed.def))}</div><div class="tt-sub">${esc(t('abilityUi.tooltip.unavailable'))}</div>${clearHint}`;
-        const item = this.itemForSlot(slot);
-        if (item) {
-          const worn = item.id === this.sim.equipment.trinket;
-          return (
-            this.itemTooltip(item) + itemInBagsLine(this.inventoryCount(item.id), worn) + clearHint
-          );
-        }
-        return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
-      });
+      this.attachTooltip(
+        btn,
+        () => {
+          if (slot === 0 && this.attackSlotIsAttack()) {
+            return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
+          }
+          const known = this.abilityForSlot(slot);
+          const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
+          if (known) return this.abilityTooltip(known) + clearHint;
+          const freed = slot === 0 && this.freedAttackSlotAbility();
+          if (freed)
+            return `<div class="tt-title">${esc(abilityDisplayName(freed.def))}</div><div class="tt-sub">${esc(t('abilityUi.tooltip.unavailable'))}</div>${clearHint}`;
+          const item = this.itemForSlot(slot);
+          if (item) {
+            const worn = item.id === this.sim.equipment.trinket;
+            return (
+              this.itemTooltip(item) +
+              itemInBagsLine(this.inventoryCount(item.id), worn) +
+              clearHint
+            );
+          }
+          return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
+        },
+        () =>
+          this.actionForSlot(slot)?.type === 'ability' || (slot === 0 && this.attackSlotIsAttack()),
+      );
       if (slot >= 1) {
         // drag an action onto another slot to place or swap it;
         // slot 0 (Attack) stays fixed
@@ -8021,7 +7939,7 @@ export class Hud {
           ? t('hudChrome.mobile.stanceAnchorEmptyAria')
           : t('hudChrome.mobile.stanceAnchorAria', { stance: stanceName }),
       abilityTooltip: (known) => this.abilityTooltip(known),
-      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      attachTooltip: (el, html) => this.attachTooltip(el, html, () => true),
       hideTooltip: () => this.hideTooltip(),
       consumePeekGuard: () => this.peekGuard.consume(),
       clickSfx: () => audio.click(),
@@ -8267,7 +8185,6 @@ export class Hud {
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
       if (opts.disabled) btn.classList.add('disabled');
-      btn.title = title;
       btn.setAttribute(
         'aria-label',
         opts.cooldownText
@@ -8409,7 +8326,11 @@ export class Hud {
         btn.addEventListener('pointerup', (event) => finishTouchHold(event, false));
         btn.addEventListener('pointercancel', (event) => finishTouchHold(event, true));
       }
-      this.attachTooltip(btn, () => tooltip);
+      this.attachTooltip(
+        btn,
+        () => tooltip,
+        () => true,
+      );
       parent.appendChild(btn);
     };
     const restorePetBarFocus = () => {
@@ -8895,6 +8816,7 @@ export class Hud {
       playerFrame.levelText = String(p.level);
     }
     playerFrame.name = p.name;
+    playerFrame.pvpRisk = playerPvpRisk(sim);
     // SELF reads its worn border from the deeds facet, not the entity wire
     // (the wire carries other players' borders). One guarded record lookup per
     // frame, cheap enough that a signature cache would only add state.
@@ -9398,65 +9320,45 @@ export class Hud {
     // returns immediately, so this costs nothing at steady state.
     this.fctPainter.step(now);
 
-    // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
-    // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
-    // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
-    // A small prompt appears only in corpse reach (the server re-checks the range); the
-    // Pale Keeper's raise is reached by talking to the Keeper, and a standing top line
-    // names both ways back for the whole ghost run.
-    const ghost = p.dead && p.ghost;
-    const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
-    // A battleground corpse releases like the open world, so the Release modal shows;
-    // only the corpse-run / Spirit Healer prompts are suppressed in a match
-    // (the wave is the one way back, enforced server-side too).
-    const ghostInBgMatch = !!this.sim.bgInfo?.match;
+    const arenaMatch = !!this.sim.arenaInfo?.match;
+    const death = deathScreenViewInto(this.deathScreen, p, arenaMatch, !!this.sim.bgInfo?.match);
     if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
     if (!p.dead) {
       this.closeResurrectionPrompt();
       if (this.deathRecapDialog.isOpen()) this.deathRecapDialog.close();
     }
-    document.body.classList.toggle('spirit-mode', ghost);
-    this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
-    this.setDisplay(this.ghostHintEl, ghost && !ghostInBgMatch ? 'block' : 'none');
-    if (ghost && !ghostInBgMatch) {
-      const corpseInRange = !!p.corpsePos && dist2d(p.pos, p.corpsePos) <= GHOST_CORPSE_REZ_RANGE;
-      this.setDisplay(this.ghostPromptEl, corpseInRange ? 'flex' : 'none');
-    } else {
-      this.setDisplay(this.ghostPromptEl, 'none');
-    }
+    document.body.classList.toggle('spirit-mode', death.spiritMode);
+    noteReleaseOverlayShown(this.deathScreenInput, death.releaseOverlay, now);
+    this.setDisplay(this.deathOverlayEl, death.releaseOverlay ? 'flex' : 'none');
+    this.setDisplay(this.ghostHintEl, death.ghostHint ? 'block' : 'none');
+    this.setDisplay(this.ghostPromptEl, death.ghostPrompt ? 'flex' : 'none');
 
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
     const currentZone = zoneAt(p.pos.x, p.pos.z);
     if (mediumHud) {
-      // zone transitions: banner + welcome hint when crossing into a new band.
+      // Ferry announcements wait for docking; map tracking stays live at sea.
+      if (!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)) {
+        const currentZoneName = zoneDisplayName(currentZone.id);
+        this.showBanner(currentZoneName);
+        this.log(t('hud.core.enteringZone', { zone: currentZoneName }), HUD_LOG.NOTICE);
+        this.logZoneWelcome(currentZone);
+        // Recent events cover combat arriving before its matching self snapshot.
+        const recentlyInCombat = performance.now() - this.lastCombatEventAt < 5000;
+        if (!p.dead && !p.inCombat && !recentlyInCombat) this.renderer.vistaPan();
+      }
       if (!inDungeon && currentZone.id !== this.lastZoneId) {
-        // commit the moment zoneAt flips: the old 1D z deadband never fired
-        // on an east-west crossing (the grid's column borders share the z
-        // band), so the banner and map lagged the border by a whole realm.
-        // Re-crossing costs only a banner re-emit; the map bg is cached.
-        if (this.lastZoneId !== '') {
-          const currentZoneName = zoneDisplayName(currentZone.id);
-          this.showBanner(currentZoneName);
-          this.log(t('hud.core.enteringZone', { zone: currentZoneName }), HUD_LOG.NOTICE);
-          this.logZoneWelcome(currentZone);
-          // Zone-entry vista: a slow up-and-out camera sweep over the new
-          // zone alongside the banner. Display-only, cancelled by any
-          // camera input, skipped in combat/while dead and under reduced
-          // motion (the renderer gates the latter). Recent local combat events
-          // cover the online frame where events have arrived before the matching
-          // self cbt snapshot.
-          const recentlyInCombat = performance.now() - this.lastCombatEventAt < 5000;
-          if (!p.dead && !p.inCombat && !recentlyInCombat) this.renderer.vistaPan();
-        }
         this.lastZoneId = currentZone.id;
         this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
       }
 
       // subzone text: a smaller banner when you step into a named landmark
       // (classic "subzone" display). POIs are the same labels the minimap pins.
-      const subzone = inDungeon
-        ? null
-        : nearestSubzone(p.pos.x, p.pos.z, currentZone.pois, this.lastSubzone);
+      const subzone = this.zoneAnnouncements.subzone(
+        p,
+        inDungeon,
+        currentZone.pois,
+        this.lastSubzone,
+      );
       if (subzone !== this.lastSubzone) {
         this.lastSubzone = subzone;
         if (subzone) {
@@ -10676,12 +10578,7 @@ export class Hud {
     return this.mapMarkerInteraction.showAt(canvas, x, y, touch);
   }
 
-  // The map window shows the zone band the player is standing in (each band is a
-  // square); POIs and dungeon portals come from the zone/dungeon data. It redraws
-  // while open from hud.update()'s mediumHud band; the painter owns the canvas
-  // draw, the cached terrain blit, and the cadence. The delve branch is owned by
-  // delve_map_painter (paintWorldMapDelve), the overworld branch by
-  // map_window_painter; the pure geometry lives in map_window_view.ts.
+  // Clear marker ownership when entering an instance plan.
   private clearMapHitState(canvas: HTMLCanvasElement): void {
     this.mapMarkerInteraction.clear();
     this.mapView = null;
@@ -10776,17 +10673,22 @@ export class Hud {
     }
 
     if (this.mapLevel === 'continent') {
-      this.clearMapHitState(canvas); // panning/zoom belong to the per-zone level only
+      this.mapView = null; // panning/zoom belong to the per-zone level only
       const result = this.continentPainter.paintContinent(ctx, this.sim, {
         canvasSize: S,
         hoveredZoneId: this.mapHoverZone,
       });
       this.continentRegions = result.regions;
+      this.mapMarkerInteraction.setContinentPorts(result.ports);
       canvas.style.cursor = this.mapHoverZone ? 'pointer' : 'default';
       this.setText(summaryEl, t('hudChrome.continentMap.summary'));
       this.setText(
         markerSummaryEl,
-        this.mapMarkerInteraction.semantics.updateSimple(t('hudChrome.continentMap.title'), S),
+        this.mapMarkerInteraction.semantics.updatePorts(
+          result.ports,
+          t('hudChrome.continentMap.title'),
+          S,
+        ),
       );
       return;
     }
@@ -10836,22 +10738,6 @@ export class Hud {
       markerSummaryEl,
       this.mapMarkerInteraction.semantics.updateOverworld(result, zoneLabel, S),
     );
-  }
-
-  // Tooltip body for a hovered zone region on the continent overview: the zone's
-  // localized name plus its suggested level band (from the region's levelRange).
-  private continentZoneTooltipHtml(zoneId: string): string {
-    const region = this.continentRegions.find((r) => r.zoneId === zoneId);
-    let html = `<div class="tt-title">${esc(zoneDisplayName(zoneId))}</div>`;
-    if (region) {
-      html += `<div class="tt-quest-req">${esc(
-        t('hudChrome.continentMap.levels', {
-          min: formatCount(region.levelMin),
-          max: formatCount(region.levelMax),
-        }),
-      )}</div>`;
-    }
-    return html;
   }
 
   // -------------------------------------------------------------------------
@@ -13312,6 +13198,7 @@ export class Hud {
           // which that host-agnostic cue facade has no access to.
           const self = sim.entities.get(sim.playerId);
           audio.playerDeath(playerVoiceCue(self?.modularAppearance, 'death', sfxHasCue));
+          holdDeathScreenInput(this.deathScreenInput, now);
           break;
         }
         case 'respawn':

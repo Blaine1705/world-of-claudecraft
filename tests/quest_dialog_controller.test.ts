@@ -9,10 +9,9 @@ vi.mock('../src/render/characters', () => inertCharacters.barrel());
 vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
 vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
 
-// This suite drives the quest dialog DOM, not WebGL portraits. char_window pulls in
-// the real portrait chip, whose renderer starts GLB fetches that can outlive
-// happy-dom teardown and throw Three FileLoader ProgressEvent rejections after
-// otherwise green assertions (the inspect_window.test.ts recipe).
+// This suite drives the quest dialog DOM, not WebGL portraits. char_window and
+// craft-name helpers can reach the portrait chip; keep that unrelated renderer
+// boundary inert so asset loads cannot outlive happy-dom teardown.
 vi.mock('../src/ui/portrait_chip', () => ({
   crestUrl: () => '',
   hydrateComposedChips: () => undefined,

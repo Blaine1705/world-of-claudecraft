@@ -2,7 +2,7 @@
 // Moongrove fills one Moontide bank toward a CHOSEN payoff (Moonsurge on the
 // Moonseed button or Sunwake on the Skyfall button, either spend clears it),
 // Wildfang shares Old Blood across Cat and Bruin forms, and Groveheart
-// grows Verdance toward Overbloom (every Wildbloom, Second Bloom, or Wildmend
+// grows Verdance toward Overbloom (every Sporemending, Second Bloom, or Wildmend
 // cast adds 1, and each banked Verdance speeds Wildmend's cast).
 
 import { DRUID_CHOICE_ROWS } from '../content/choice_rows_classic';
@@ -19,7 +19,11 @@ import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scalin
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
 import { LUNGE_ID, startLunge } from './druid_lunge';
-import { GROVEHEART_BOON_ICD_KEY, NATURES_BOON_ID } from './druid_natures_boon';
+import {
+  GROVEHEART_BOON_ICD_KEY,
+  MOONGROVE_BOON_ICD_KEY,
+  NATURES_BOON_ID,
+} from './druid_natures_boon';
 import {
   BRUIN_RUSH_WINDOW_ID,
   BRUIN_RUSH_WINDOW_SECONDS,
@@ -140,7 +144,13 @@ export function bruinRushMakesCatFormFree(
 }
 
 const ENGINE_AURA_IDS = new Set([MOONTIDE_ID, OLD_BLOOD_ID, VERDANCE_ID, BRUIN_RUSH_WINDOW_ID]);
-const FORM_ABILITY_IDS = new Set(['bear_form', 'cat_form', 'travel_form', 'moonkin_form']);
+const FORM_ABILITY_IDS = new Set([
+  'bear_form',
+  'cat_form',
+  'travel_form',
+  'moonkin_form',
+  'sporemender_form',
+]);
 const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
 // Every landed feral strike that banks one Old Blood. Slinkstrike ('pounce')
 // and Lunge joined the list in the v0.43 feral pass: the stealth opener banks
@@ -305,7 +315,8 @@ function inMoonwing(player: Entity): boolean {
 
 // Strip every breakable root and slow the player wears (an aura stamped
 // unbreakableControl stays). Fleet Form runs this on every cast, baseline;
-// the other three forms run it only with Wildshift selected. Draws no rng.
+// the other forms (Cat, Bruin, Moonwing, Sporemender) run it only with
+// Wildshift selected. Draws no rng.
 // A form button reaches this hook in BOTH directions of the shift: the
 // toggle-off press that returns to caster form runs the same
 // casting_lifecycle path as the shift in, so a druid rooted while in Fleet
@@ -332,19 +343,28 @@ export function druidEngineOnCast(
 
   if (FORM_ABILITY_IDS.has(abilityId)) {
     // Fleet Form breaks control on its own (the classic travel-form escape:
-    // 30 mana, no cooldown, and no abilities while shifted). Cat, Bruin, and
-    // Moonwing keep the Wildshift gate, which is what makes the row 5 pick
+    // 30 mana, no cooldown, and no abilities while shifted). Cat, Bruin,
+    // Moonwing and Sporemender keep the Wildshift gate, which is what makes the row 5 pick
     // the in-combat option: break the root without leaving your damage form.
     if (abilityId === 'travel_form' || selectedRow(ctx, player, DRUID_TALENT_IDS.wildshift)) {
       breakMovementControl(ctx, player);
     }
     // Loping Stride is baseline: every form shift sprints, no talent check.
-    // Longstride only changes the two numbers (duration and cooldown).
+    // Longstride only changes the two numbers (duration and cooldown). A shift
+    // in the saddle (a mount-safe form, combat/forms.ts) does not sprint: the
+    // buff would stack onto the mount's speed on every toggle. The cooldown is
+    // left unspent, so the next shift on foot still sprints.
     const longstride = selectedRow(ctx, player, DRUID_TALENT_IDS.longstride);
     const strideDuration = longstride ? longstrideMetrics().duration : LOPING_STRIDE_DURATION;
     const strideIcd = longstride ? longstrideMetrics().icd : LOPING_STRIDE_ICD;
     if (!player.procState) player.procState = { counters: {}, icds: {} };
-    if (player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined) {
+    const mountSummonInFlight =
+      (player.mountCastRemaining ?? 0) > 0 && (player.mountCastKey ?? '') !== '';
+    if (
+      !player.mountKey &&
+      !mountSummonInFlight &&
+      player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined
+    ) {
       player.procState.icds[LOPING_STRIDE_ICD_KEY] = strideIcd;
       ctx.applyAura(player, {
         id: 'loping_stride',
@@ -394,6 +414,22 @@ export function druidEngineOnCast(
   if (abilityId === LUNGE_ID) startLunge(ctx, player, target);
 
   const spec = specOf(ctx, player);
+  // Spore Burst (combat/druid_spore_burst.ts) is a payoff when the bank is
+  // full: the cast arm already took the 25%, and here the whole bank is
+  // spent, in any form, exactly as Overbloom or Moonsurge spend it.
+  if (abilityId === 'spore_burst') {
+    const bankId = spec === 'restoration' ? VERDANCE_ID : spec === 'balance' ? MOONTIDE_ID : null;
+    const cap = spec === 'restoration' ? VERDANCE_STAGES : MOONTIDE_STAGES;
+    if (bankId && (ownedAura(player, bankId)?.stacks ?? 0) >= cap) {
+      removeOwnedAura(ctx, player, bankId);
+      if (bankId === VERDANCE_ID) {
+        seedNextEngineBank(ctx, player, VERDANCE_ID, 'Verdance', 'verdance');
+      } else {
+        seedNextEngineBank(ctx, player, MOONTIDE_ID, 'Moontide', 'moontide');
+      }
+    }
+    return;
+  }
   if (spec === 'balance') {
     if (!inMoonwing(player)) return;
     // One bank, one loop: every completed Wildbolt, Skyfall, or Moonseed
@@ -444,7 +480,7 @@ export function druidEngineOnCast(
   }
 }
 
-// Every Wildbloom or Second Bloom application banks 1 Verdance, a fresh
+// Every Sporemending or Second Bloom application banks 1 Verdance, a fresh
 // plant and a refresh of one already ticking alike (the Groveheart rework
 // dropped the old new-plant-only rule, so a druid never has to let a bloom
 // fall off to keep the engine growing).
@@ -520,7 +556,17 @@ function remainingTicks(aura: Aura): number {
     : 0;
 }
 
-function replantWildbloom(ctx: SimContext, player: Entity, target: Entity): void {
+/** Plant the player's own Sporemending on `target` at the rank and bonuses a
+ *  real cast would carry. Also Spore Burst's Groveheart rider
+ *  (combat/druid_spore_burst.ts), which passes its cast-scoped multiplier
+ *  (an armed Nature's Boon window) as `castMult`: like the hot arm, it scales
+ *  the WHOLE tick, and the === 1 guard keeps every other replant identical. */
+export function replantSporemending(
+  ctx: SimContext,
+  player: Entity,
+  target: Entity,
+  castMult = 1,
+): void {
   const resolved = ctx.resolvedAbility('rejuvenation', player.id);
   const hot = resolved?.effects.find((effect) => effect.type === 'hot');
   if (!resolved || !hot || hot.type !== 'hot') return;
@@ -539,10 +585,9 @@ function replantWildbloom(ctx: SimContext, player: Entity, target: Entity): void
     hot.interval,
     talentHealMult * (1 + mods.global.hotHealPct),
   );
-  const tickValue = scalePrimaryHealing(
-    hotBase + hotSp,
-    primaryHealingMultiplier(meta.cls, mods.spec),
-  );
+  const hotTick =
+    castMult === 1 ? hotBase + hotSp : Math.max(1, Math.round((hotBase + hotSp) * castMult));
+  const tickValue = scalePrimaryHealing(hotTick, primaryHealingMultiplier(meta.cls, mods.spec));
   ctx.applyAura(target, {
     id: 'rejuvenation',
     name: resolved.def.name,
@@ -631,10 +676,10 @@ export function resolveDruidOverbloom(
       false,
     );
   }
-  replantWildbloom(ctx, player, castTarget);
+  replantSporemending(ctx, player, castTarget);
   if (druidSeedspreadSelected(ctx, player)) {
     for (const ally of harvested.values()) {
-      if (ally.id !== castTarget.id) replantWildbloom(ctx, player, ally);
+      if (ally.id !== castTarget.id) replantSporemending(ctx, player, ally);
     }
   }
   if (selectedRow(ctx, player, DRUID_TALENT_IDS.naturesFury)) {
@@ -667,7 +712,7 @@ export function cleanDruidEngineState(
 ): void {
   for (let index = player.auras.length - 1; index >= 0; index--) {
     const aura = player.auras[index];
-    // A Nature's Boon window is spec-scoped too (Wildfang: Wildbloom or Oakhide;
+    // A Nature's Boon window is spec-scoped too (Wildfang: Sporemending or Oakhide;
     // Groveheart: Wildmend), so it ends with the specialization that armed it.
     if (aura.sourceId !== player.id) continue;
     if (!ENGINE_AURA_IDS.has(aura.id) && aura.id !== NATURES_BOON_ID) continue;
@@ -677,6 +722,7 @@ export function cleanDruidEngineState(
   if (player.procState) {
     delete player.procState.icds[LOPING_STRIDE_ICD_KEY];
     delete player.procState.icds[GROVEHEART_BOON_ICD_KEY];
+    delete player.procState.icds[MOONGROVE_BOON_ICD_KEY];
   }
 }
 

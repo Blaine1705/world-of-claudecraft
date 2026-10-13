@@ -382,17 +382,19 @@ describe('Book of Deeds webp icons', () => {
     // crest beside the ferry round trip: 319 live, still 289 painted.
     // The sixth lifetime-XP rung (prog_titan) joins on the progression
     // crest: 320 live, still 289 painted. Five World PvP streak deeds join
-    // on the existing PvP category crest.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(325);
+    // on the existing PvP category crest, then the hard Wisp Maze deed joins
+    // on the exploration crest.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(326);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(36);
-    expect(DEED_ART_PENDING_IDS.slice(-6)).toEqual([
+    expect(DEED_ART_PENDING_IDS).toHaveLength(37);
+    expect(DEED_ART_PENDING_IDS.slice(-7)).toEqual([
       'prog_titan',
       'pvp_flag_1h',
       'pvp_flag_3h',
       'pvp_flag_6h',
       'pvp_flag_24h',
       'pvp_flag_168h',
+      'exp_wisp_maze_hard',
     ]);
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {

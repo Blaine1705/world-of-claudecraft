@@ -49,7 +49,18 @@ already fixed in the same week's vaults, including hidden or pending-save reward
 Each remaining eligible item has equal probability within its pool. A later week
 can roll the same item again. Existing saved rewards stay unchanged, including
 duplicates rolled before this rule. Equipment must be usable by the character's class.
-Legendary chase drops, quest items and non-equipment are excluded.
+Legendary chase drops, quest items and non-equipment other than Core of the Last
+Flame are excluded. The core remains confined to Normal and Heroic
+Ignivar/Varkhul raid rewards and fits every class and specialization. Crucible
+redemption sigils, other materials, recipes and tools are excluded from all new
+rolls and possible-loot lists.
+
+Previously fixed sigil rewards remain visible and claimable through save/load and
+client decoding, including rewards awaiting their first reveal. This compatibility
+allowlist does not make sigils eligible for new rolls. Deploy updated clients and
+servers together: older code rejects fixed sigil/core choices during decoding or
+save loading. Rolling back requires preserving affected weekly ledgers before an
+older server can load and resave them.
 
 New rolls and possible-loot lists share class stat restrictions. Warrior, Rogue
 and Hunter exclude any equipment granting Intellect, Spell Power or Healing Power,

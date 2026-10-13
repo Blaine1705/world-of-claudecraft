@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.spellTooltipOnHover': '悬停时显示法术提示',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分钟',
   'abilityUi.cast.hoard_cast_rime_beam': '白霜射束',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -568,6 +569,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}，{quality}',
   'hudChrome.mapAtlas.collapseHint': '收起地图侧栏',
   'hudChrome.mapAtlas.expandHint': '展开地图侧栏',
+  'hudChrome.mapAtlas.resizeRailAria': '地图侧栏宽度',
+  'hudChrome.mapAtlas.resizeRailHint': '拖动以调整地图侧栏大小。双击可重置。',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': '当前配置',
   'hudChrome.meters.activeProfileDesc': '为不同的游玩场景选择或管理独立的配置。',
@@ -632,6 +635,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.maxRowsDesc': '同时显示的条形数量（0 = 不限，自动适配窗口高度）。',
   'hudChrome.meters.noDeathEvents': '死亡前没有记录到任何事件',
   'hudChrome.meters.noDetailedData': '没有详细数据',
+  'hudChrome.meters.detailHealSubtitle':
+    '有效：{effective} | 过量治疗：{overheal}（{overhealPercent}） | 命中：{hits}（{critPercent} 暴击）',
+  'hudChrome.meters.detailHitSubtitle':
+    '命中：{hits} | 暴击：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}',
   'hudChrome.meters.noTargetData': '没有该目标的玩家数据',
   'hudChrome.meters.numCompact': '数字：缩写（k/M）',
   'hudChrome.meters.numDetailed': '数字：详细',
@@ -719,6 +726,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': '窗口缩放',
   'hudChrome.meters.windowScaleDesc': '增大或减小统计窗口的整体缩放。',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': '悬赏',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': '遮挡渐隐',
@@ -746,6 +754,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': '占据山丘',
   'hudChrome.warfare.reasons.worldAssist': '世界击杀助攻',
   'hudChrome.warfare.reasons.worldKill': '世界击杀',
+  'hudChrome.warfare.reasons.worldQuest': '世界任务',
   'hudChrome.warfareShop.groupEntry': '战争赛季 1',
   'hudChrome.warfareShop.groupSeason2': '战争赛季 2：先锋',
   'hudChrome.worldPvp.aidLine':
@@ -875,7 +884,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.hillwarn.description': '立即宣布山丘出现；倒计时结束后山丘升起。',
   'devCommand.actions.hillwarn.label': '山丘倒计时',
   'entities.abilities.lava_burst.description':
-    '造成{damage}点火焰伤害。对被你的余烬震击点燃的目标必定造成暴击。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）',
+    '造成{damage}点火焰伤害。命中可给予 1 点雷霆。对被你的余烬震击点燃的目标必定造成暴击。暴击时额外造成相当于普通伤害24%的伤害。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）',
   'entities.abilities.lava_burst.name': '岩浆爆发',
   'entities.abilities.lightning_overload.description':
     '被动：电弧箭和叉状闪电有20%几率触发超载，对其首个目标再次造成50%的已造成伤害，并获得1点雷霆。（唤雷）',
@@ -1102,6 +1111,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.ferry.castingOff': '前往{dest}的渡船正在起航',
   'hudChrome.ferry.boardHint': '起航时站在甲板上即可随船出发。渡船免费。',
   'hudChrome.ferry.sailing': '正在驶往{dest}',
+  'hudChrome.ferry.portLabel': '{port}至{dest}的渡船',
+  'hudChrome.ferry.portTitle': '{port}渡船码头',
+  'hudChrome.ferry.destination': '目的地：{dest}',
+  'hudChrome.ferry.boardNow': '现在登船',
+  'hudChrome.ferry.arrivesIn': '渡船将在{time}后抵达',
+  'hudChrome.ferry.scheduleUnavailable': '渡船时刻表暂不可用。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'landing.contribute': '参与游戏开发',
@@ -2974,6 +2989,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': '触控操作',
   'hudChrome.options.gfxCustomNote':
     '调整任一细节旋钮会将画质预设切换为“高级”：一套基于“高”画质基础、以当前预设所示等级为起点的自定义组合。',
+  'hudChrome.options.ambienceVolume': '环境音量',
   'hudChrome.options.footstepSounds': '脚步声',
   'hudChrome.options.interfaceSounds': '界面与反馈音效',
   'hudChrome.options.clickFeedback': '点击标记',
@@ -4913,7 +4929,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '化身为貂的形态，将你的躲闪几率提高 8%，持续 30 分钟。',
   'entities.abilities.aspect_of_the_cheetah.name': '骏马之姿',
   'entities.abilities.aspect_of_the_cheetah.description':
-    '化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 4 秒（每次命中都会刷新昏乱状态）。',
+    '化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 2 秒（每次命中都会刷新昏乱状态）。',
   'entities.abilities.aimed_shot.name': '引弓长射',
   'entities.abilities.aimed_shot.description':
     '射击目标，造成 {damage} 点物理伤害。伤害随远程攻击强度提升。',
@@ -4969,7 +4985,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以闪电环绕你 10 分钟。接下来针对你的 3 次近战攻击会对攻击者造成 {buff} 点自然伤害，最多每 5 秒一次。',
   'entities.abilities.flame_shock.name': '余烬震击',
   'entities.abilities.flame_shock.description':
-    '造成 {damage} 点火焰伤害，随后在 12 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。',
+    '造成 {damage} 点火焰伤害，随后在 {duration} 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。',
   'entities.abilities.flametongue_weapon.name': '焰烙武器',
   'entities.abilities.flametongue_weapon.description':
     '为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点火焰伤害。',
@@ -5023,7 +5039,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.name': '月光风暴',
   'entities.abilities.moonfire.description':
     '以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。',
-  'entities.abilities.rejuvenation.name': '野性绽放',
+  'entities.abilities.rejuvenation.name': '孢愈术',
   'entities.abilities.rejuvenation.description': '在 12 秒内为目标恢复 {damage} 点生命值。',
   'entities.abilities.thorns.name': '荆棘守护',
   'entities.abilities.thorns.description': '目标身上长出荆棘：近战攻击者受到 {buff} 点自然伤害。',
@@ -5145,7 +5161,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description': '在狼形态下进入潜行状态。无法在战斗中使用。',
   'entities.abilities.rake.name': '剐削',
   'entities.abilities.rake.description':
-    '撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限豹形态。',
+    '撕裂敌人，造成武器伤害外加 {damage} 点，并在 18 秒内造成 {overTime} 点流血伤害。给予 1 点连击点。仅限豹形态。',
   'entities.abilities.revive_pet.name': '修补',
   'entities.abilities.revive_pet.description':
     '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
@@ -5207,7 +5223,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '释放一股原始涌动。豹形态下，能量恢复速度提高100%，持续10秒。巨熊形态下，立即产生50点怒气。（野性专精招牌）',
   'entities.abilities.swiftmend.name': '迅捷治愈',
   'entities.abilities.swiftmend.description':
-    '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。每次施放野性绽放、二度绽放或野性愈合累积1层繁茂；在 3 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
+    '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。每次施放孢愈术、二度绽放或野性愈合累积1层繁茂；在 3 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
+  'entities.abilities.swiftmend.specNote_restoration':
+    '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。孢愈术和二度绽放会累积繁茂；在 5 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
   'entities.abilities.crusader_strike.name': '十字军打击',
   'entities.abilities.crusader_strike.description':
     '打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）',
@@ -7846,6 +7864,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.dragEquipHint': '拖到角色身上以装备',
   'hudChrome.bags.dragDestroyHint': '拖出到世界中以销毁',
   'hudChrome.bags.reorderNeedsRecent': '清除筛选并按“最近”排序即可整理背包',
+  'hudChrome.bags.reorderLocked': '已锁定的物品会固定在其背包格中。请先解锁再移动。',
   'hudChrome.bags.filterGroupAria': '按类别筛选背包',
   'hudChrome.bags.filterAll': '全部',
   'hudChrome.bags.filterWeapon': '武器',
@@ -9899,7 +9918,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.cinderbark.bonus4': '碎髓造成的伤害提高 30%，且其紧急护盾不再取代这次打击。',
   'entities.itemSets.grovespring.name': '林泉法衣',
   'entities.itemSets.grovespring.bonus2':
-    '迅捷治愈优先消耗你自己的野性绽放或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。',
+    '迅捷治愈优先消耗你自己的孢愈术或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。',
   'entities.itemSets.grovespring.bonus4': '盛放收割你剩余治疗效果的 75%，随后积累 1 层繁茂。',
   'entities.items.lastflame_core.name': '末焰之核',
   'entities.itemSets.slagbreaker.name': '碎渣战甲',
@@ -12602,6 +12621,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': '巨熊形态',
   'guide.models.formCat': '豹形态',
   'guide.models.formTravel': '迅捷形态',
+  'guide.models.formSporemender': '孢愈者形态',
   'guide.models.groupForms': '德鲁伊形态',
   'guide.nav.sidebarLabel': '指南主题',
   'guide.professions.craftHowTitle': '制作窗口',
@@ -15170,7 +15190,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为敌人标记15秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
   'entities.abilities.ossuary_mark.name': '骸骨印记',
   'entities.abilities.overbloom.description':
-    '消耗你的3层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。',
+    '消耗你的3层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的孢愈术。',
+  'entities.abilities.overbloom.specNote_restoration':
+    '消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的孢愈术。',
   'entities.abilities.overbloom.name': '盛放',
   'entities.abilities.pack_command.description':
     '命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。',
@@ -15292,13 +15314,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一声呼哨激励你的队伍，使攻击、施法和引导速度提高10%，持续10秒。近期受过群体加速激励的盟友过于疲惫，无法受益。（潜行者天赋）',
   'entities.abilities.thieves_chorus.name': '盗贼合唱',
   'entities.abilities.thunder_reservoir.description':
-    '被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
+    '被动：奥术闪电、天穹连锁和岩浆爆发会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
   'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
   'entities.abilities.tidecall.description':
     '为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。',
   'entities.abilities.tidecall.name': '潮汐召唤',
   'entities.abilities.trailbreak.description':
-    '向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。',
+    '向后跃出25码，并解除定身和移动减速效果。若你拥有狩猎势能，则将其刷新，并使你获得蓄势返场，持续12秒。',
   'entities.abilities.trailbreak.name': '断迹',
   'entities.abilities.umbral_anchor.description':
     '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。',
@@ -15413,11 +15435,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_cat': '近战输出形态：像盗贼一样使用能量与连击点，威胁值也低得多。',
   'guide.classPage.formLine.form_travel':
     '赶路形态：在地面上快得多，但在你变回原形之前无法使用其他技能。',
+  'guide.classPage.formLine.form_sporemender':
+    '恢复德鲁伊的治疗形态：外皮更坚韧，治疗更强但步伐更慢，并保留你的所有法术和法力值。',
   'guide.classPage.formName.form_bear': '巨熊形态',
   'guide.classPage.formName.form_travel': '迅捷形态',
+  'guide.classPage.formName.form_sporemender': '孢愈者形态',
   'guide.classPage.formsHeading': '变形',
   'guide.classPage.formsMoonwing':
-    '平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它是唯一保留法术的野兽形态，而你的魔杖也只在这个形态或你普通的施法形态下才能使用。',
+    '平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它和恢复系的孢愈者形态一样保留你的法术，而你的魔杖只在这两种形态或你普通的施法形态下才能使用。',
   'guide.classPage.formsWolfEngage':
     '狼以巨熊冲锋开战，随即变为狼形态钉制目标，未潜行时用扑击拉近距离，再用扑倒把敌人钉在原地。',
   'guide.classPage.formsAutoUnshift':
@@ -16251,6 +16276,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formLich': '灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害',
   'hudChrome.auraEffect.formMetamorph': '恶魔形态：体型增大 {pct}%；其他加成由独立增益提供',
   'hudChrome.auraEffect.formMoonkin': '月翼形态：法术伤害提高 {pct}%，护甲提高 {armorPct}%',
+  'hudChrome.auraEffect.formSporemender':
+    '孢愈者形态：造成的治疗提高 {pct}%，护甲提高 {armorPct}%，移动速度降低 {slowPct}%',
   'hudChrome.auraEffect.formShadow': '幽幕形态：暗影伤害提高 {pct}%',
   'hudChrome.auraEffect.freeExecute': '下一个符合条件的斩杀技能不消耗资源',
   'hudChrome.auraEffect.funeralHarvestLock': '葬礼收割暂时无法再次生成灵魂碎片',
@@ -16311,7 +16338,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     '毒祭：第{stacks}/{max}层。卑劣突刺、邪恶斩击与毒镖各累积1层。达到{max}层时，长眠变为蚀毒撕裂',
   'hudChrome.auraEffect.verdance':
-    '繁茂：第{stacks}/{max}层。每施放一次野性绽放、二度绽放或野性愈合累积1层，每层都会缩短野性愈合的施法时间。达到{max}层时，迅捷治愈变为盛放',
+    '繁茂：第{stacks}/{max}层。每施放一次孢愈术、二度绽放或野性愈合累积1层，每层都会缩短野性愈合的施法时间。达到{max}层时，迅捷治愈变为盛放',
   'hudChrome.auraEffect.warlockAnchor': '在 {range} 码内再次施放可返回此处并消耗锚点',
   'hudChrome.auraEffect.wintersChill': '剩余 {charges} 层：符合条件的法术视此目标为冻结状态',
   'hudChrome.paladin.ascensionLastAnnouncement': '升华的最后一次充能',
@@ -17715,7 +17742,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': '探险印记',
   'hudChrome.currencies.wocToken': 'WoC 代币',
   'hudChrome.currencies.heroicMarkNote': '英雄地下城 . 在英雄军需官处兑换',
-  'hudChrome.currencies.honorNote': '战场与竞技场',
+  'hudChrome.currencies.honorNote': '战场、竞技场与世界任务',
   'hudChrome.currencies.delveMarkNote': '已完成的探险',
   'hudChrome.currencies.wocTokenNote': '已关联钱包的余额',
   'hudChrome.currencies.walletNotLinked': '未关联钱包',
@@ -17989,6 +18016,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     '呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（恢复）',
   'entities.abilities.grove_awakening.name': '林地觉醒',
+  'entities.abilities.sporemender_form.name': '孢愈者形态',
+  'entities.abilities.sporemender_form.description':
+    '变形为孢愈者，使你造成的治疗提高20%，护甲提高40%，但移动速度降低20%。你在普通形态下的所有法术仍可施放。持续到你切换形态为止。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回普通形态。（恢复标志技能）',
+  'entities.abilities.spore_burst.name': '孢子爆发',
+  'entities.abilities.spore_burst.description':
+    '在目标区域召唤一株孢子爆裂菇。{duration} 秒后它会爆开，为 8 码内的盟友恢复 {healing} 点生命值，并对敌人造成 {damage} 点自然伤害。',
+  'entities.abilities.spore_burst.specNote_balance':
+    '月潮达到 3 层时，效果提高 25%，并消耗你的月潮。',
+  'entities.abilities.spore_burst.specNote_restoration':
+    '同时为每个被治疗的盟友施加孢愈术。繁茂叠满时，效果提高 25%，并消耗你的繁茂。',
+  'entities.abilities.natures_boon.name': '自然恩惠',
+  'entities.abilities.natures_boon.description':
+    '你的法术可以触发持续 10 秒的自然恩惠：其指定的法术无需消耗、效果提高 25%，且可在任意形态下施放。再次触发会刷新持续时间。',
+  'entities.abilities.natures_boon.specNote_feral':
+    '每次命中的近战自动攻击有 1/15 的几率触发它，作用于孢愈术；处于巨熊形态时也作用于橡树皮。',
+  'entities.abilities.natures_boon.specNote_balance':
+    '每次施放野性弹或天陨有 10% 的几率触发它，作用于孢子爆发，每 10 秒最多触发一次。',
+  'entities.abilities.natures_boon.specNote_restoration':
+    '你的持续治疗效果每次跳动有 10% 的几率触发它，作用于孢子爆发，每 10 秒最多触发一次。',
   'entities.abilities.prayer_of_returning.description':
     '呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（神圣与戒律）',
   'entities.abilities.prayer_of_returning.name': '归返祈祷',
@@ -18708,6 +18754,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.world_quest_reward.body':
     '你获得这份世界任务奖励时背包已满，所以渡鸦把它送到了这里。腾出空间后，可在任意渡鸦石柱领取。\n\n- 渡鸦邮局',
   'questUi.logs.worldQuestRewardMailed': '你的背包已满。奖励已寄送到你的邮箱：{items}。',
+  'errors.searchUpdates': '搜索更新',
+  'errors.noUpdateFound': '未找到更新。请稍后再试。',
+  'errors.updateUnavailable': '请通过游戏商店更新，或下载最新客户端。',
+  'errors.updateSearchFailed': '无法检查更新。请重试。',
   'entities.abilities.vampiric_touch.name': '吸血之触',
   'entities.abilities.vampiric_touch.description':
     '在15秒内造成{damage}点暗影伤害，每3秒一次。伤害随法术强度提升，每次伤害均可暴击。每次伤害将敌人实际损失生命值的20%转化为治疗，平均分配给你和30码内受伤的小队成员；在团队中，仅治疗你所在的小队。若你拥有至少2层幽暗什一，施加此效果会消耗2层，使其全部伤害提高30%。',

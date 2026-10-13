@@ -122,6 +122,36 @@ ratings.
   income"; tests: `tests/world_pvp.test.ts`, `tests/world_pvp_rules.test.ts`,
   `tests/world_pvp_zones.test.ts`, `tests/world_pvp_server_dispatch.test.ts`,
   and the matcher round trip in `tests/world_pvp_view.test.ts`.
+- `world_pvp_bounty_rules.ts` owns the World PvP bounty PURE rules: the streak
+  that earns one (`WORLD_PVP_BOUNTY_STREAK`), the doubled pool a holder's death
+  pays (`worldPvpKillHonorPool`) and the holder's own per-victim honor curve
+  (`worldPvpBountyHolderMultiplier` over `WORLD_PVP_BOUNTY_HOLDER_DR`). No ctx,
+  no rng, no clock. `world_pvp_bounty.ts` owns the SYSTEM half: the streak and
+  the bounty on `PlayerMeta.worldPvp` (session-only, never persisted),
+  `Entity.bounty` as the display mirror written ONLY there (the `bty` entity
+  wire bit, `server/entity_status_wire.ts` / `src/net/entity_status_wire.ts`),
+  and the realm and holder notices the client matcher re-localizes (the
+  `worldPvp.bounty*` rows in `src/ui/sim_i18n.ts`). Its two callers are
+  `world_pvp.ts`'s death hook (any death ends a bounty; a paid kill builds a
+  flagged contributor's streak) and its disarm pass (the flag dropping ends
+  it). Numbers: `docs/design/warfare.md`, "World PvP bounties"; tests:
+  `tests/world_pvp_bounty.test.ts`.
+- `world_pvp_forfeit.ts` owns the departure forfeit: `worldPvpFightOpponent`
+  (the most recent live, world-hostile enemy who hit the player inside the
+  assist window, else the one they hit) and `forfeitWorldPvpFightOnDeparture`,
+  which the SERVER calls from `socketClosed` and from `leave()` (every logout,
+  kick and takeover; skipped for an escrow-quarantined session that can no
+  longer save), via `server/world_pvp_departure.ts`; the offline Sim and the
+  RL env have no departure to judge. It kills the leaver through `ctx.handleDeath` with
+  `WorldPvpBooks.forfeitVictim` set, so `worldPvpOnPlayerDeath` resolves the
+  kill by its usual rules but HOLDS each gold share instead of paying it.
+  `world_pvp_payouts.ts` owns the held shares (`WorldPvpMetaState.pending` on
+  the WINNER, persisted as remaining seconds, capped at
+  `WORLD_PVP_PENDING_PAYOUT_LIMIT` on load) and the due pass `updateWorldPvp`
+  runs behind the `nextPayoutAt` watermark. Delay: `WORLD_PVP_FORFEIT_PAYOUT_SECONDS`
+  in `world_pvp_rules.ts`. Lines: `worldPvpForfeitKillLine`,
+  `worldPvpForfeitPayoutLine` (matcher rows in `src/ui/sim_i18n.ts`). Tests:
+  `tests/world_pvp_forfeit.test.ts`, `tests/world_pvp_departure.test.ts`.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch
   WARFARE honor vendor, under his RESERVED entity id
   (`WARFARE_QUARTERMASTER_ENTITY_ID`, `1_000_000_002`, the singleton band

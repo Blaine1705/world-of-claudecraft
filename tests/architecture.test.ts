@@ -211,6 +211,7 @@ describe('live graphics profile architecture', () => {
 const UI_PURE_CORES = [
   // Whether the "restoring graphics" note shows over the held 3D view.
   'src/ui/graphics_restore_note_view.ts',
+  'src/ui/ferry_port_map_core.ts',
   'src/ui/frame_presets_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
@@ -280,6 +281,12 @@ const UI_PURE_CORES = [
   // Which zone the overworld map frames (dungeon door, frozen last zone,
   // committed zone, override), lifted out of Hud.updateMapWindow.
   'src/ui/hud/map/map_zone_focus_core.ts',
+  // The resizable map's canvas backing side (map_canvas_size_controller.ts
+  // feeds it the ResizeObserver content box).
+  'src/ui/hud/map/map_canvas_size_core.ts',
+  // The atlas rail width: clamp, drag and key steps (map_rail_resize_controller.ts
+  // applies it as --map-rail-width).
+  'src/ui/hud/map/map_rail_width_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
@@ -321,6 +328,7 @@ const UI_PURE_CORES = [
   'src/ui/daily_rewards_chrome_view.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/death_recap_view.ts',
+  'src/ui/death_screen_view.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/empower_hold_core.ts',
   'src/ui/equip_drop_core.ts',
@@ -574,6 +582,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/professions_view.ts',
   'src/ui/tutorial_greeting_view.ts',
   'src/ui/bootcamp_view.ts',
+  'src/ui/zone_announcement_core.ts',
   'src/ui/coach_prompt_view.ts',
   'src/ui/objective_glow_view.ts',
   'src/ui/vendor_stock_gate_core.ts',
@@ -637,6 +646,7 @@ const UI_PURE_CORES = [
   'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
   'src/ui/pvp_hostile_core.ts',
+  'src/ui/pvp_risk_core.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
@@ -1037,6 +1047,7 @@ const RENDER_PURE_CORES = [
   'src/render/spirit_grade_core.ts',
   'src/render/nameplate_cadence_core.ts',
   'src/render/nameplate_heraldry_core.ts',
+  'src/render/nameplate_tag_fill_core.ts',
   'src/render/nameplate_dots_core.ts',
   'src/render/nameplate_friendly_core.ts',
   'src/render/net_interp_core.ts',
@@ -1106,6 +1117,7 @@ const RENDER_PURE_CORES = [
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
+  'src/render/characters/form_visual_slots_core.ts',
   'src/render/characters/metamorph_wing_motion_core.ts',
   'src/render/warlock_meteor_fx_core.ts',
   'src/render/weapon_vfx_apply_queue_core.ts',
@@ -2670,6 +2682,7 @@ const UI_DOM_MODULES = [
   // Mints the "restoring graphics" status line and toggles it on the context
   // restore hold's edges.
   'src/ui/graphics_restore_note_controller.ts',
+  'src/ui/tooltip_binding.ts',
   'src/ui/error_toast_controller.ts',
   'src/ui/boot_splash.ts',
   'src/ui/frame_presets_live.ts',
@@ -2684,6 +2697,11 @@ const UI_DOM_MODULES = [
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/map/minimap_objective_tap.ts',
+  // Owns a ResizeObserver over the map canvas and writes its backing store.
+  'src/ui/hud/map/map_canvas_size_controller.ts',
+  // Hud's map-window sizing wiring: a ResizeObserver over #map-window that
+  // re-reads the stored rail width once settings exist.
+  'src/ui/hud/map/map_window_sizing_wiring.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
@@ -2862,6 +2880,7 @@ const UI_DOM_MODULES = [
   'src/ui/realm_builder_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
+  'src/ui/fatal_overlay_controller.ts',
   'src/ui/perf_metrics_sampler.ts',
   'src/ui/perf_nudge_toast.ts',
   'src/ui/perf_ornament_svg.ts',

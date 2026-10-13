@@ -3281,6 +3281,15 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
   conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
   moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
+  // Groveheart's Sporemender Form: the healer's cross inside the druid leaf
+  // (procedural fallback; owner-provided painted art ships beside it).
+  sporemender_form: r('nature', 'leafGreen', ['leaf', { p: 'cross', ...BR }], ['sparkle']),
+  // Spore Burst: a bursting sun of spores over the druid leaf (procedural
+  // fallback; the painted art ships beside it).
+  spore_burst: r('nature', 'leafGreen', ['sunburst', { p: 'leaf', ...BR }], ['sparkle', 'glow']),
+  // Nature's Boon passive: the druid leaf held in a warm glow (procedural
+  // fallback; the painted art ships beside it).
+  natures_boon: r('nature', 'leafGreen', ['leaf'], ['glow', 'sparkle']),
   feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
   swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
   // Groveheart resurrections: the in-combat single rez (a heart bursting back
@@ -4893,6 +4902,9 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'typhoon',
   'wildwake',
   'grove_awakening',
+  'sporemender_form',
+  'spore_burst',
+  'natures_boon',
   // hunter
   'aspect_of_the_wild',
   'bestial_wrath',
@@ -5621,6 +5633,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'pvp_flag_6h',
   'pvp_flag_24h',
   'pvp_flag_168h',
+  // The Hard wisp maze clear: exploration category crest pending art.
+  'exp_wisp_maze_hard',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
