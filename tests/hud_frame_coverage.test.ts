@@ -176,6 +176,8 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/focus_targets_controller.ts':
     'mounts the focusTargets frame registered with the shared editor',
   'src/main.ts': 'mounts the breath bar (transient survival meter, exempt for now) into #ui',
+  'src/ui/hud/referral_cards/referral_cards_hud_controller.ts':
+    'mounts the referral card window and launcher; the shared window focus and close bridge owns its lifecycle',
   'src/ui/hud.ts': 'the HUD coordinator: mounts the proc overlay, FCT pool, match strips',
   'src/ui/interface_unlock.ts': 'the unlock coordinator: its own edit chrome + the detacher',
   'src/ui/meters_frame.ts': 're-homes framed meter panels onto #ui',
@@ -185,6 +187,7 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
     'mounts nothing: toggles #ui.options-open (the Esc menu scrim state class that replaced a #ui-anchored :has())',
   'src/ui/noticeboard_popup.ts': 'transient noticeboard popup card',
   'src/ui/realm_builder_popup.ts': 'transient Realm Builder honour roll card',
+  'src/ui/plot_sign_popup.ts': 'transient Tidehold housing-plot deed card (fork)',
   'src/ui/dev_command_window.ts': 'dev-only command window (a .window, window_drag governs it)',
   'src/ui/hud/professions/perfecting_window.ts':
     'the Perfecting window (a .window.panel, window_drag governs it), minted at runtime like dev_command_window.ts since no markup entry ships it',
@@ -270,7 +273,10 @@ describe('hud_frame_coverage (standing HUD surfaces are movable frames)', () => 
   // test rather than as a describe-scope collection error.
   let built: Array<{ entry: string; harvest: Harvest }> | null = null;
   const entries = () =>
-    (built ??= HTML_ENTRIES.map((entry) => ({ entry, harvest: harvestEntry(read(entry)) })));
+    (built ??= HTML_ENTRIES.map((entry) => ({
+      entry,
+      harvest: harvestEntry(read(entry)),
+    })));
   const frameIds = new Set(HUD_FRAME_SPECS.map((s) => s.elementId));
 
   it('every element in the harvest carries an id', () => {

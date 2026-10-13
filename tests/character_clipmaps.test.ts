@@ -5,6 +5,7 @@ import {
   PALADIN_SYNTHESIZED_CLIP_SOURCES,
   synthesizesPaladinClips,
 } from '../src/render/characters/assets';
+import { clipNamesOf } from '../src/render/characters/clip_names';
 import { clipSplitNames } from '../src/render/characters/clip_split';
 import {
   type ClipMap,
@@ -12,7 +13,6 @@ import {
   type VisualDef,
   visualAssetUrlForGraphics,
 } from '../src/render/characters/manifest';
-import { clipNamesOf } from '../src/render/characters/visual';
 
 // A clip name the shipped GLB does not carry fails SILENTLY at every layer:
 // baseAction() falls back, fadeTo()/playOneShot() return early, and the
@@ -177,6 +177,7 @@ function requiredClipNames(clips: ClipMap): string[] {
     clips.swim,
     clips.swimSurface,
     clips.swimIdle,
+    clips.glide,
     clips.wade,
     clips.jump,
     clips.fall,
@@ -293,6 +294,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'swim',
   'swimSurface',
   'swimIdle',
+  'glide',
   'wade',
   'jump',
   'jumpMoving',

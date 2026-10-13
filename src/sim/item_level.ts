@@ -36,6 +36,7 @@ import {
 } from './content/nythraxis_loot';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL, WARFARE_TRINKET_STOCK } from './content/pvp_honor';
 import { SEASON2_SOURCE_LEVEL, SEASON2_STOCK } from './content/pvp_honor_season2';
+import { REFERRAL_REWARD_SOURCE_BOSSES } from './content/referral_rewards';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
@@ -43,7 +44,7 @@ import {
   RIFT_RARE_ITEM_IDS,
 } from './content/rift/items';
 import { CRUCIBLE_TRINKET_ITEM_IDS } from './content/trinkets';
-import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
+import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS, studioContentActive } from './data';
 // The pure budget primitives live in the leaf module ./item_budget (no ./data
 // import, so content/heroic_variants.ts can share them at data-eval time without a
 // cycle). Imported for internal use and re-exported so every existing importer of
@@ -157,9 +158,13 @@ export const WEAPON_DPS_WEIGHT = 0.5;
 // boss therefore reports its raid size). Lets a drop know it came from a raid
 // without a per-mob flag. Built lazily + memoized, pure over the static tables.
 let encounterIndex: Map<string, number> | null = null;
+// DUNGEONS carries Studio rows only while an authored map is active
+// (studio_content.ts); a memo built on the other side of that switch is stale.
+let encounterIndexStudio = false;
 
 function encounterIndexOf(): Map<string, number> {
-  if (encounterIndex) return encounterIndex;
+  if (encounterIndex && encounterIndexStudio === studioContentActive()) return encounterIndex;
+  encounterIndexStudio = studioContentActive();
   const idx = new Map<string, number>();
   for (const def of Object.values(DUNGEONS)) {
     for (const spawn of def.spawns) {
@@ -248,6 +253,10 @@ function buildSourceIndex(): Map<string, ItemSource> {
   for (const itemId of FURY_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
   // The two honor trinkets sold beside the kit read the same PvP tier.
   for (const itemId of WARFARE_TRINKET_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
+  // Referral charms use their milestone boss's ordinary accessory budget: the
+  // level-10 uncommon gives 3 Stamina; the level-13 rare evolution gives 5.
+  for (const [itemId, bossId] of Object.entries(REFERRAL_REWARD_SOURCE_BOSSES))
+    bump(itemId, MOBS[bossId]?.maxLevel, false);
   // Warfare Season 2 reads source 29: epic item level 35, level with the raid tier.
   for (const itemId of SEASON2_STOCK) bump(itemId, SEASON2_SOURCE_LEVEL, false);
   // Heroic boss drops: level-20 content one tier up (the heroic bump), so the

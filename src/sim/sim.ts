@@ -26,6 +26,7 @@ import type {
 import type { GroundAimPointXZ } from '../world_api/combat';
 import { abilityNeedsLineOfSight } from './ability_line_of_sight';
 import { offlineActionBarRestore } from './action_bar_restore';
+import { playerStartPos, type SpawnSlots, setPlaytestGod } from './authored_world_hooks';
 import { maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {
@@ -45,6 +46,7 @@ import * as buddiesMod from './buddies';
 import { revealBuddiesOnJoin, updateBuddyReveals } from './buddy_drops';
 import { renameBuddy } from './buddy_names';
 import { campSpawnOffset } from './camp_scatter';
+import { carveSpawnFloor, caveSpawnFloor } from './cave_ground_core';
 import type { CharacterState, PetState } from './character_state';
 import { restoreCharacterStorage, savedCharacterStorage } from './character_storage';
 import type { TreasureMapProgress } from './content/treasure_maps';
@@ -54,7 +56,11 @@ import type { ItemCopyAnchor } from './item_copy_anchor';
 import * as membershipMod from './membership';
 import { refreshKnownAbilities } from './progression/known_abilities';
 import { setPlayerLevel as setPlayerLevelImpl } from './progression/level';
+import { savedQuestProgress } from './quests/quest_progress_save';
 import type { HostArmourAuthority } from './referral_armour';
+import type { ReferralCardsAction, ReferralCardsSnapshot } from './referral_contract';
+import { type ReferralRewardState, referralRewardState } from './referral_reward_state';
+import { applyReferralRewardState as applyReferralRewardStateImpl } from './referral_rewards';
 import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
@@ -217,6 +223,7 @@ import {
   ABILITIES,
   ALL_RECIPES,
   arenaOrigin,
+  authoredMapActive,
   CLASSES,
   DELVE_COMPANIONS,
   DELVE_LIST,
@@ -238,13 +245,8 @@ import { dayNightPhaseOf } from './day_night';
 import { refusedWhileDead } from './dead_gate';
 import { deckFloorHeight } from './deck_floor';
 import * as deedsMod from './deeds';
-import {
-  createDeedRuntime,
-  type DeedRuntime,
-  deedStatsSaveFragment,
-  freshDeedStats,
-} from './deeds';
-import { restoreBookOfDeeds, runBookOfDeedsJoinRetro } from './deeds_restore';
+import { createDeedRuntime, type DeedRuntime, freshDeedStats } from './deeds';
+import { restoreBookOfDeeds, runBookOfDeedsJoinRetro, savedBookOfDeeds } from './deeds_restore';
 import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
@@ -281,14 +283,14 @@ import {
   tickGroundAoEs,
 } from './entity_roster';
 import * as escortMod from './escort';
-import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
+import { updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
+import { forcedMoveGroundHeight } from './forced_move_ground';
+import { forcedStepBlocked } from './forced_move_step';
 import { formatMoney } from './format_money';
 import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
-import { spawnHealingTrainingGround } from './healing_training';
-import { spawnHubPractice } from './hub_practice';
 import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import * as inventoryConsumption from './inventory_consumption';
@@ -387,8 +389,8 @@ import {
   updateMob as updateMobFn,
 } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
+import { moveTowardImpl } from './mob/move_toward';
 import { spawnOpenWorldMob } from './mob/open_world_tuning';
-import { phaseStep } from './mob/phase_step';
 import { applyPlayerDummyVitals } from './mob/practice_dummies';
 import { questGateBlocksAggro, questGateBlocksCombat } from './mob/quest_gated_aggro';
 import {
@@ -431,27 +433,21 @@ import {
   MAX_DEVOTION,
   updatePaladinDevotion,
 } from './paladin_devotion';
-import {
-  findPlayerPath,
-  PLAYER_BODY_RADIUS,
-  PLAYER_MAX_CLIMB_SLOPE,
-  PLAYER_SWIM_DEPTH,
-} from './pathfind';
+import { findPlayerPath, PLAYER_BODY_RADIUS } from './pathfind';
 import { isBuddyMob } from './pet/buddy_ai';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
 import type { PetReturnSnapshot } from './pet/pet_return';
-import { floorHeightAt } from './physics/character';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
   type PlayerMotionDeps,
   SWIM_SPEED_MULT,
   stepPlayerMotion,
-  swimSurfaceY,
 } from './player_motion';
 import { livePlaytimeSeconds } from './playtime';
+import { buyPlot as buyPlotImpl, spawnPlotSigns } from './plots';
 import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,
@@ -661,7 +657,10 @@ import {
 import * as worldPvpMod from './pvp/world_pvp';
 import { savedWorldPvpFields } from './pvp/world_pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
-import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
+import {
+  spawnRealmBuilderMonument,
+  spawnTideholdRealmBuilderMonument,
+} from './realm_builder_monument_spawn';
 import {
   accountReliquaryOwnershipOpts,
   catalogRankOwned,
@@ -678,7 +677,6 @@ import {
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import type { ResolvedAbility } from './resolved_ability';
 import { freshCounters, type RewardCounters } from './reward_counters';
-import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
 import { persistedResource } from './serialize_resource';
@@ -724,7 +722,6 @@ import {
   WORLD_BOSSES,
 } from './world_boss';
 import { spawnDevBoss, spawnWorldBoss } from './world_boss_spawn';
-import { spawnHarborHouseKeeper } from './wyrmwatch_harbor_house';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -733,7 +730,7 @@ export type { MailSave } from './mail/post_office';
 // stays valid now that the type lives in market.ts.
 export type { MarketSave } from './market';
 
-import { updateBreath } from './breath';
+import { updateEnvironmentDamage } from './environment_damage';
 import { updateSwimFatigue } from './fatigue';
 import { personalGliderLeaderboard as gliderRecordsPage } from './glider_personal_records';
 import { spawnStaticWorldObjects } from './ground_object_spawns';
@@ -813,6 +810,8 @@ import * as worldQuestMod from './world_quests';
 // (online.ts) stays byte-identical.
 export { computeQuestState } from './quests/quest_commands';
 
+import * as deepglassVenue from './deepglass/venue_hooks';
+import { updateNpcRoute } from './npc_routes';
 import { advanceExclusiveMovement } from './player_movement_modes';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
@@ -822,6 +821,7 @@ import * as bgProposalMod from './social/battleground_proposal';
 import type { CardDuelMatch } from './social/card_duel';
 import * as cardDuelMod from './social/card_duel';
 import * as duelMod from './social/duel';
+import * as mapObjectiveHooks from './social/map_objectives_hooks';
 // A4: Protect Yumi (formats yumi3/yumi5); match logic in social/yumi.ts, reached
 // via ctx callbacks + the two hostility arms in isHostileTo/isFriendlyTo.
 import * as yumiMod from './social/yumi';
@@ -936,22 +936,13 @@ import {
 } from './types';
 import type { VendorBuyOptions } from './vendor_buy_stack';
 import * as weaponStowMod from './weapon_stow';
-import {
-  groundHeight,
-  nearSteepWalls,
-  terrainSteepnessAt,
-  waterLevel,
-  waterLevelAt,
-} from './world';
+import { groundHeight, waterLevel } from './world';
 
 // TRIVIAL_LEVEL_GAP moved to mob/targeting.ts (used only by isTrivialTo).
 // CORPSE_DURATION moved to combat/damage.ts (C1; used only by the death path).
 // LEASH_DISTANCE / DUNGEON_LEASH_DISTANCE moved to types.ts (M2; shared with mob/locomotion.ts).
 // EVADE_SPEED_MULT / EVADE_STALL_TIMEOUT moved to mob/locomotion.ts (M2; slice-only).
-// Heading offsets (radians) a mob tries when its straight path is blocked, so it
-// can slide around a prop instead of pinning on it. Desired heading (0) first;
-// only evaluated past the first entry when that straight step is obstructed.
-const MOVE_SLIDE_FAN = [0, 0.5, -0.5, 1.0, -1.0, 1.6, -1.6];
+// MOVE_SLIDE_FAN moved to mob/move_toward.ts with the moveToward body.
 // BACKPEDAL_MULT moved to player_motion.ts (MV1; read only by the movement kernel).
 // Low-HP flee ("fear"): a cowardly mob at or below this HP fraction panics, turns
 // and runs from its attacker for FLEE_DURATION seconds at FLEE_SPEED_MULT speed,
@@ -1027,24 +1018,16 @@ const DELVE_COMPANION_LEVEL_PCT = [0, 0.5, 0.75, 1.0]; // index = rank
 // re-exported from there so external importers (src/ui/sim_i18n.ts, tests) are unchanged.
 export { DELVE_IMPLEMENTED_AFFIXES, DELVE_MODULE_NAMES } from './delves/runs';
 
-// Rise/run above which ground is unwalkable (cliffs, mountain walls, the world
-// rim). Uphill steps are blocked both along the step direction AND by the true
-// terrain steepness at the destination (terrainSteepness), so a diagonal
-// switchback cannot beat the limit; airborne movement is gated the same way so
-// jump-spam cannot climb a face; and a player standing on ground steeper than
-// this slides downhill (STEEP_SLIDE_SPEED) and cannot jump until footing is
-// walkable again.
-const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
+// MAX_CLIMB_SLOPE / SWIM_DEPTH moved with their last readers to forced_move_step.ts
+// (Charge + /follow) and mob/move_toward.ts.
 // STEEP_SLIDE_SPEED moved to player_motion.ts (MV1; movement-kernel-only).
 
 // SOCIAL_PULL_RADIUS moved to mob/social_aggro.ts with socialPullSameTemplate.
 // POTION_COOLDOWN moved to items.ts (W2) with the useItem potion branch.
 // PACK_FRENZY_AURA_ID moved to mob/lifecycle.ts (M4; used only by frenzyPackmates).
 // BLOOD_FRENZY_AURA_ID moved to combat/damage.ts (C1; used only by maybeFrenzyOnHit).
-// swimSurfaceY / SWIM_SPEED_MULT moved to player_motion.ts (MV1) and imported back
-// (follow trailing + the mob/pet water paths still read them here). swimSurfaceY
-// carries v0.22.0's location-aware form (waterLevelAt) in its new home.
-const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
+// swimSurfaceY / SWIM_SPEED_MULT moved to player_motion.ts (MV1); SWIM_SPEED_MULT is
+// imported back for follow trailing, swimSurfaceY now read by mob/move_toward.ts.
 // DOOR_TRIGGER_RADIUS moved to instances/dungeons.ts (I1: read only by updateDoorTriggers).
 // NYTHRAXIS_PARTY_INTERACT_RANGE / NYTHRAXIS_VISION_LINE_DELAY moved to
 // encounters/nythraxis.ts (N1) with the crypt-quest helpers that read them.
@@ -1324,7 +1307,8 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
 export interface PlayerMeta
-  extends worldQuestState.WorldQuestPlayerState,
+  extends ReferralRewardState,
+    worldQuestState.WorldQuestPlayerState,
     HostArmourAuthority,
     lanceTrialMod.LancePlayerState {
   courier?: courierMod.CourierState;
@@ -1402,6 +1386,9 @@ export interface PlayerMeta
   // so pre-feature saves load cleanly as un-trained. Grandfathered: any save
   // that had mountTrainingFeePaid=true gets ridingTrained=true on load.
   ridingTrained?: boolean;
+  // Tidehold housing plots bought at their signs (sim/plots.ts). Absent until
+  // the first deed.
+  ownedPlots?: string[];
   // PBE boost kit version already applied to this character (server/
   // pbe_boost.ts, PBE_BOOST_ACCOUNTS=1 only). Optional and absent outside the
   // PBE so live saves round-trip byte-equal; the world-join top-up re-kits
@@ -1916,6 +1903,7 @@ export class Sim {
    * future joins, and spirit release must remain bound to this Sim's world.
    */
   private readonly worldContent: WorldContent;
+  private readonly spawnSlots: SpawnSlots = { next: 0 }; // authored_world_hooks.ts
   /** Validated active-world noticeboards captured for this Sim at construction. */
   readonly noticeboardDefinitions: readonly NoticeboardDef[];
   /** Civic services that this Sim actually spawned, captured at construction. */
@@ -2269,6 +2257,8 @@ export class Sim {
       world: cfg.world,
       perfLap: cfg.perfLap,
       idleMobTickRadius: cfg.idleMobTickRadius ?? 0,
+      // Stays optional like `world`: undefined means "the world's own start".
+      playerStartOverride: cfg.playerStartOverride,
     };
     const activeWorldContent = getActiveWorldContent();
     this.worldContent = cfg.world ?? activeWorldContent;
@@ -2351,6 +2341,11 @@ export class Sim {
       if (npcDef.dynamic) continue; // spawned on demand by its owning system, not surface-placed
       const safe = this.findSafePos(npcDef.pos.x, npcDef.pos.z, waterLevel() + 0.6);
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
+      // An authored patrol (map documents; sanitized by map_doc sanitizeNpc)
+      // rides onto the entity. createNpc deliberately copies only identity
+      // fields, so without this the route survived the document round-trip and
+      // then went nowhere, a maker's patrolling guard stood at his spawn.
+      if (npcDef.route) npc.route = npcDef.route;
       this.addEntity(npc);
       if (npcDef.market) this.market.merchantIds.push(npc.id); // every auctioneer anchors the shared World Market
       if (npcDef.banker) this.bankerIds.push(npc.id); // every bursar is a place to use the bank
@@ -2360,6 +2355,15 @@ export class Sim {
     // Mobs from camps
     for (const camp of worldContent.camps) {
       const template = MOBS[camp.mobId];
+      // An authored map saved against an older build can name a mob this build
+      // no longer ships. Skip that camp rather than tearing the whole Sim down:
+      // the editor has to be able to OPEN a stale document to fix it. Nothing is
+      // drawn from the shared rng before this point in the loop, so skipping
+      // keeps the seed-stable spawn stream intact.
+      if (!template) {
+        console.warn(`sim: camp references unknown mob '${camp.mobId}'; skipping`);
+        continue;
+      }
       // Aquatic/flagged swimmers may wade in the shallows; everyone else
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
@@ -2431,6 +2435,8 @@ export class Sim {
       }
     }
 
+    // Ground objects, mailboxes, dungeon doors + their instance slots
+    // (ground_object_spawns.ts; the arena skips the doors and slots there).
     spawnStaticWorldObjects(worldContent, {
       entities: this.entities,
       allocateEntityId: () => this.nextId++,
@@ -2446,6 +2452,10 @@ export class Sim {
     spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
 
     weeklyMod.spawnWeeklyKeeper(this.ctx, worldContent.npcs[weeklyMod.WEEKLY_KEEPER_ID]);
+    // Deepglass steward + marshal (deepglass/venue_hooks.ts): reserved ids, no rng.
+    const safeNpcPos = (x: number, z: number) => this.findSafePos(x, z, waterLevel() + 0.6);
+    deepglassVenue.spawnDeepglassVenueStaff(this.ctx, worldContent, safeNpcPos);
+
     // FURY uses a reserved id and spawns after the rng-driven world roster, so
     // the Honor Quartermaster cannot perturb existing entity ids or replay RNG.
     {
@@ -2456,6 +2466,9 @@ export class Sim {
         this.addEntity(fury);
       }
     }
+
+    // Baldemar's selves, the Deepglass crowd, Tidehold's residents: reserved ids, no rng.
+    deepglassVenue.spawnDeepglassVenueTownsfolk(this.ctx, worldContent, safeNpcPos);
 
     // Warmarshal Draven Kole in Highwatch: the same reserved-id, rng-free
     // treatment as Bram and FURY above. See src/sim/pvp/warfare_quartermaster.ts.
@@ -2544,7 +2557,9 @@ export class Sim {
       this.addEntity(board);
     }
 
-    spawnRealmBuilderMonument(this.ctx, this.worldContent.props);
+    spawnRealmBuilderMonument(this, this.worldContent.props);
+    spawnTideholdRealmBuilderMonument(this, this.worldContent.presentationMode);
+    spawnPlotSigns(this, this.worldContent.presentationMode);
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {
@@ -2573,11 +2588,8 @@ export class Sim {
       }
     }
 
-    // Escorts, the practice yards, the harbormaster: rng-free, trailing or reserved ids.
-    initEscortsImpl(this.ctx);
-    spawnHubPractice(this.ctx, worldContent);
-    spawnHealingTrainingGround(this.ctx, worldContent);
-    spawnHarborHouseKeeper(this.ctx, worldContent);
+    // Escorts, the practice yards, the harbormaster (skipped in the Deepglass arena).
+    deepglassVenue.spawnOverworldFixtures(this.ctx, worldContent);
   }
 
   private spawnHealerPracticeDummy(): void {
@@ -2611,6 +2623,12 @@ export class Sim {
   // `this.dropEntity` / `this.rebucket` call site resolving unchanged through the seam.
   addEntity(e: Entity): void {
     addEntityToRoster(this.ctx, e);
+  }
+
+  /** Drop one entity by id. Public for the map editor, which swaps authored
+   *  camp mobs and NPCs in a live Sim rather than restarting it. */
+  removeEntity(id: number): void {
+    this.dropEntity(id);
   }
 
   private dropEntity(id: number): void {
@@ -2731,10 +2749,7 @@ export class Sim {
       // while instance/delve exits above retain their established behavior.
       savedPos = this.findSafePos(savedPos.x, savedPos.z, -Infinity, PLAYER_BODY_RADIUS);
     }
-    const playerStart = this.worldContent.playerStart;
-    const startPos = savedPos
-      ? this.groundPos(savedPos.x, savedPos.z)
-      : this.groundPos(playerStart.x, playerStart.z);
+    const startPos = playerStartPos(this.ctx, savedPos, this.worldContent, this.spawnSlots);
     const savedArena1v1: ArenaStanding = {
       rating: savedState?.arena1v1Rating ?? savedState?.arenaRating ?? arenaMod.ARENA_BASE_RATING,
       wins: savedState?.arena1v1Wins ?? savedState?.arenaWins ?? 0,
@@ -3270,6 +3285,10 @@ export class Sim {
       // Grandfather: players who already paid the old 100g fee are riding-trained.
       if (s.ridingTrained === true || s.mountTrainingFeePaid === true) meta.ridingTrained = true;
       if (typeof s.pbeBoostKit === 'number') meta.pbeBoostKit = s.pbeBoostKit;
+      if (Array.isArray(s.ownedPlots)) {
+        const plots = s.ownedPlots.filter((id): id is string => typeof id === 'string');
+        if (plots.length > 0) meta.ownedPlots = plots;
+      }
       // Grandfather: players who had q_riding_lessons active in a mid-quest save
       // (state='active' or 'ready') but never received ridingTrained=true are
       // riding-trained because accepting the quest proves they already paid
@@ -3365,6 +3384,7 @@ export class Sim {
       // The Book of Deeds + Reliquary restore (deeds_restore.ts): earned days,
       // stat block, sparse Reliquary state, milestone unification, the renown
       // recompute, and the validated title/border re-apply.
+      Object.assign(meta, referralRewardState(s));
       restoreBookOfDeeds(meta, player, s);
       // The buddy collection restores beside the Book (buddies.ts): owned
       // companions and pending boss reveals.
@@ -3510,12 +3530,12 @@ export class Sim {
   // Returns the new pid, or -1 if the name is blank or already taken (whisper
   // resolution needs a unique name). Never reached in production (the caller runs
   // only when devCommands is on).
-  spawnDevBot(name: string): number {
+  spawnDevBot(name: string, cls: PlayerClass = 'mage'): number {
     const clean = name.trim();
     if (!clean) return -1;
     for (const m of this.players.values())
       if (m.name.toLowerCase() === clean.toLowerCase()) return -1;
-    const pid = this.addPlayer('mage', clean, { bot: true });
+    const pid = this.addPlayer(cls, clean, { bot: true });
     const meta = this.players.get(pid);
     if (meta) meta.isDevBot = true;
     const me = this.entities.get(this.primaryId);
@@ -3526,6 +3546,15 @@ export class Sim {
       this.rebucket(e);
     }
     return pid;
+  }
+
+  // The spawnDevBot counterpart: remove a dev bot ENTIRELY, entity and player
+  // meta, so its name returns to the pool. Deepball's final whistle calls this
+  // through the context seam; dropEntity alone leaked the meta and drained the
+  // roster a seat per bout.
+  removeDevBot(pid: number): void {
+    if (this.players.has(pid)) this.removePlayer(pid);
+    else this.dropEntity(pid);
   }
 
   // /dev vendor: spawn the free-epic Test Quartermaster next to the caller
@@ -3903,23 +3932,11 @@ export class Sim {
       // Unstuck Sickness persists across logout for the same reason.
       unstuckSickness: e.auras.find((a) => a.id === UNSTUCK_SICKNESS_ID)?.remaining ?? null,
       ...savedCharacterStorage(meta),
+      ...referralRewardState(meta),
       // A lent muster pike is folded back out of every save (muster_pike.ts).
       ...savedGearFor(meta, this.musterArmy.lent.get(pid)),
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
-      questLog: [...meta.questLog.values()].map((q) => ({
-        questId: q.questId,
-        counts: [...q.counts],
-        state: q.state,
-        ...(q.selection === undefined ? {} : { selection: q.selection }),
-        ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
-        ...(q.burnedObjects === undefined
-          ? {}
-          : { burnedObjects: q.burnedObjects.map((b) => ({ key: b.key, at: b.at })) }),
-        // Absent until the first interact credit (parity-stable saves).
-        ...(q.creditedObjects === undefined ? {} : { creditedObjects: [...q.creditedObjects] }),
-        ...(q.rev === undefined ? {} : { rev: q.rev }),
-      })),
-      questsDone: [...meta.questsDone],
+      ...savedQuestProgress(meta),
       ...savedWorldQuestState(meta),
       arenaRating: meta.arenaRating,
       arenaWins: meta.arenaWins,
@@ -4000,6 +4017,9 @@ export class Sim {
       ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       // Absent until riding skill is purchased (back-compat).
       ...(meta.ridingTrained ? { ridingTrained: true } : {}),
+      ...(meta.ownedPlots && meta.ownedPlots.length > 0
+        ? { ownedPlots: [...meta.ownedPlots] }
+        : {}),
       // Absent outside the PBE (back-compat; server/pbe_boost.ts).
       ...(meta.pbeBoostKit !== undefined ? { pbeBoostKit: meta.pbeBoostKit } : {}),
       craftSkills: { ...meta.craftSkills },
@@ -4069,14 +4089,7 @@ export class Sim {
         return saved === undefined ? {} : { gatheringGoal: saved };
       })(),
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
-      // Book of Deeds: every field conditional (absent while empty/null/zero)
-      // so pre-deed saves stay byte-equal until the system engages. The
-      // legacy unlockedMilestones above stays dual-written for one release.
-      ...(meta.deedsEarned.size > 0 ? { deeds: Object.fromEntries(meta.deedsEarned) } : {}),
-      ...deedStatsSaveFragment(meta.deedStats),
-      ...(meta.activeTitle !== null ? { activeTitle: meta.activeTitle } : {}),
-      ...(meta.activeBorder !== null ? { activeBorder: meta.activeBorder } : {}),
-      ...(meta.renown > 0 ? { renown: meta.renown } : {}),
+      ...savedBookOfDeeds(meta),
       // Reliquary: absent while empty (zero-default omission), same contract as
       // deedStats so pre-system saves stay byte-equal until a catalogued find.
       ...reliquarySaveFragment(meta.reliquary),
@@ -4532,6 +4545,7 @@ export class Sim {
   // address "the" player; these delegate to the primary player.
   // -------------------------------------------------------------------------
 
+  setDevGod = (on: boolean, pid: number): boolean => setPlaytestGod(this.ctx, on, pid);
   get playerId(): number {
     return this.primaryId;
   }
@@ -4892,7 +4906,15 @@ export class Sim {
   groundPos(x: number, z: number): Vec3 {
     // The floor, not the terrain: on the battleground field an authored deck
     // (a flag podium, a stair landing) IS the ground a flag or a body rests on.
-    return { x, y: placementFloorHeight(this.cfg.seed, x, z), z };
+    const surface = placementFloorHeight(this.cfg.seed, x, z);
+    // ...and inside a bore, the tube floor: a camp authored in a mine dug under
+    // a mountain spawns on the tunnel floor, not two hundred yards up on the
+    // summit above it (sim/cave_ground_core.ts).
+    const content = getActiveWorldContent();
+    const tube =
+      caveSpawnFloor(getActiveWorldContent().caves, x, z, surface) ??
+      carveSpawnFloor(content.holes, content.holePatches, x, z, surface);
+    return { x, y: tube ?? surface, z };
   }
 
   // Deterministic outward spiral to the nearest spot that is on dry-enough
@@ -4901,6 +4923,12 @@ export class Sim {
     const seed = this.cfg.seed;
     const ok = (px: number, pz: number): boolean => {
       if (groundHeight(px, pz, seed) < minHeight) return false;
+      // Resolve as a body STANDING on the floor there, not height-blind: a
+      // height-blind resolve walls every overhead slab (an upper storey, a
+      // roof, a balcony), so every NPC authored indoors was shoved out into
+      // the street (the Gilded Gull's innkeeper spawned 5 yd from his bar,
+      // the town shops' keepers behind the back wall). Authored maps only: the
+      // built-in world keeps its height-blind resolve, so its spawns never move.
       const res = resolvePosition(
         seed,
         px,
@@ -4908,7 +4936,7 @@ export class Sim {
         bodyRadius,
         false,
         undefined,
-        undefined,
+        authoredMapActive() ? { y: this.groundPos(px, pz).y, lift: 0 } : undefined,
         this.riftCollisionToken,
       );
       return Math.abs(res.x - px) < 1e-4 && Math.abs(res.z - pz) < 1e-4;
@@ -5693,6 +5721,7 @@ export class Sim {
       notice: sim.notice.bind(sim),
       // Dev-only test-dummy spawner backing "/dev bot <name>" in social/chat.ts.
       spawnDevBot: sim.spawnDevBot.bind(sim),
+      removeDevBot: sim.removeDevBot.bind(sim),
       spawnDevVendor: sim.spawnDevVendor.bind(sim),
       startCascadePlaytest: sim.startCascadePlaytest.bind(sim),
       startDevSandbox: sim.startDevSandbox.bind(sim),
@@ -5746,8 +5775,9 @@ export class Sim {
       markVisited: (meta, markId) => deedsMod.markVisited(sim.ctx, meta, markId),
       markDeedsDirty: (pid) => deedsMod.markDeedsDirty(sim.ctx, pid),
       grantDeed: (meta, deedId, opts) => deedsMod.grantDeed(sim.ctx, meta, deedId, opts),
-      // Thornhollow Fields battleground hooks (social/battleground.ts).
-      bgOnPlayerDeath: (e, killer) => bgMod.bgOnPlayerDeath(sim.ctx, e, killer),
+      // Thornhollow Fields battleground hooks (social/battleground.ts, plus the
+      // authored-map flag rehearsal via social/map_objectives_hooks.ts).
+      bgOnPlayerDeath: (e, killer) => mapObjectiveHooks.onObjectivePlayerDeath(sim.ctx, e, killer),
       bgOnPlayerDamaged: (victim, source) => bgMod.bgOnPlayerDamaged(sim.ctx, victim, source),
       bgOnPlayerHealed: (target, source) => bgMod.bgOnPlayerHealed(sim.ctx, target, source),
       bgCancelFlagAura: (e, auraId) => bgMod.bgCancelCarriedFlagAura(sim.ctx, e, auraId),
@@ -6046,14 +6076,14 @@ export class Sim {
         updateSpiritRunTriggers(this.ctx, p);
         lap?.('p.move');
       }
-      // Breath runs for DEAD players too, and must: updateBreath's own reset
-      // branch is what starts the corpse run with full lungs, so gating this on
+      // Breath (then fluid pools) runs for DEAD players too, and must: updateBreath's
+      // reset branch is what starts the corpse run with full lungs, so gating this on
       // !p.dead leaves a drowned player's spent breath and drown clock intact
       // and resumes the damage the instant they resurrect at the corpse. Draws
-      // rng only through the drown pulse's dealDamage, which cannot fire for a
-      // dead player (the reset returns first), so the tick-phase draw order is
-      // unchanged for everyone who is not actively drowning.
-      updateBreath(this.ctx, p);
+      // rng only through the drown/fluid pulse's dealDamage, which cannot fire for a
+      // dead player (the reset returns first) and finds no fluid pool in the built-in
+      // world, so the tick-phase draw order is unchanged for everyone not drowning.
+      updateEnvironmentDamage(this.ctx, p);
       // Riding-lesson driver: server-authoritative; tracks the training-steed
       // phase and ends a dead/ghost player's IN_PROGRESS lesson, so death never
       // strands the session. Finishing the race credits success. Draws no rng,
@@ -6090,6 +6120,12 @@ export class Sim {
         lap?.('mob.auras');
       } else if (e.kind === 'npc') {
         cleanseFriendlyNpcAuras(this.ctx, e);
+        // Authored patrols. npc_routes.ts's header has always said friendly
+        // NPCs walk theirs every tick; this is that caller. Parity-safe by the
+        // module's own contract (zero rng, fixed-DT steps), and a world with no
+        // routed NPCs, every shipped world today, takes one undefined check
+        // per NPC and changes nothing.
+        if (e.route) updateNpcRoute(this.ctx, e);
       } else if (e.kind === 'object') {
         if (!e.lootable) {
           e.respawnTimer -= DT;
@@ -6161,11 +6197,13 @@ export class Sim {
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
+    deepglassVenue.updateDeepglassPhase(this.ctx, lap); // authored maps only, zero rng
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
     // tick-math wave and rune clocks; the one seeded draw is the power-rune face
     // at match START), so its tick position cannot fork the draw order mid-match.
     bgMod.updateBattleground(this.ctx);
     lap?.('battleground');
+    mapObjectiveHooks.updateMapObjectivesPhase(this.ctx, lap); // authored maps only, zero rng
     worldPvpMod.updateWorldPvp(this.ctx); // the /pvp clock, zone pass + books sweep; zero rng
     lap?.('worldPvp');
     hillMod.updateHill(this.ctx); // King of the Hill (pvp/hill.ts): spawns draw a PRIVATE rng
@@ -6498,27 +6536,12 @@ export class Sim {
     const step = Math.min(RUN_SPEED * CHARGE_SPEED_MULT * DT, Math.max(0.01, dist2d(p.pos, wp)));
     const nx = p.pos.x + Math.sin(p.facing) * step;
     const nz = p.pos.z + Math.cos(p.facing) * step;
-    // deep water and cliffs end the charge early rather than dragging the
-    // player in; slopes use the ridden surface (ride_height.ts) plus the shore
-    // step-out, matching the movement kernel and the clamp findChargePath
-    // already plans with, so a wading-depth ford never ends a charge.
-    const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return done(false);
-    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
-    const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
-    const r1 = Math.max(h1, wls);
-    if (
-      r1 > r0 &&
-      ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
-        (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
-      !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE)
-    ) {
-      return done(false);
-    }
+    // deep water and cliffs end the charge early (forced_move_step.ts)
+    if (forcedStepBlocked(this.cfg.seed, p.pos, nx, nz, step, false)) return done(false);
     const resolved = this.resolveMove(p.pos.x, p.pos.z, nx, nz, BODY_RADIUS, p);
     p.pos.x = resolved.x;
     p.pos.z = resolved.z;
-    p.pos.y = groundHeight(resolved.x, resolved.z, this.cfg.seed);
+    p.pos.y = forcedMoveGroundHeight(resolved.x, resolved.z, this.cfg.seed, p.pos.y);
     p.vy = 0;
     p.onGround = true;
     p.fallStartY = p.pos.y;
@@ -6573,29 +6596,14 @@ export class Sim {
     const step = Math.min(speed * DT, d - FOLLOW_STOP_DIST);
     const nx = p.pos.x + Math.sin(p.facing) * step;
     const nz = p.pos.z + Math.cos(p.facing) * step;
-    const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return true; // don't trail into deep water
-    // ridden-surface slopes plus the shore step-out (ride_height.ts), matching
-    // the movement kernel: a follower crosses the same fords and climbs the
-    // same low banks its leader just walked.
-    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
-    const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
-    const r1 = Math.max(h1, wls);
-    if (
-      r1 > r0 &&
-      step > 1e-5 &&
-      ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
-        (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
-      !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE)
-    ) {
-      return true; // wall/cliff
-    }
+    // don't trail into deep water or up a wall/cliff (forced_move_step.ts)
+    if (forcedStepBlocked(this.cfg.seed, p.pos, nx, nz, step, true)) return true;
     const fromX = p.pos.x;
     const fromZ = p.pos.z;
     const resolved = this.resolveMove(p.pos.x, p.pos.z, nx, nz, BODY_RADIUS, p);
     p.pos.x = resolved.x;
     p.pos.z = resolved.z;
-    p.pos.y = groundHeight(resolved.x, resolved.z, this.cfg.seed);
+    p.pos.y = forcedMoveGroundHeight(resolved.x, resolved.z, this.cfg.seed, p.pos.y);
     p.vy = 0;
     p.onGround = true;
     p.fallStartY = p.pos.y;
@@ -7835,100 +7843,9 @@ export class Sim {
     pet.swingTimer = spell.every;
   }
 
-  // Step `e` one tick toward `dest`. With `ignoreObstacles`, the mover phases
-  // straight through props — used to free a stuck evader, and forced on for
-  // templates flagged `phasesThroughObstacles` (mountain-sized world bosses
-  // that must never wedge on a collider mid-chase). Returns true on arrival.
+  // One-tick step toward `dest` (mob/move_toward.ts; ctx.moveToward binds this).
   private moveToward(e: Entity, dest: Vec3, speed: number, ignoreObstacles = false): boolean {
-    if (!ignoreObstacles && MOBS[e.templateId]?.phasesThroughObstacles) ignoreObstacles = true;
-    const d = dist2d(e.pos, dest);
-    if (d < 0.3) return true;
-    const desired = angleTo(e.pos, dest);
-    e.facing = desired;
-    const step = Math.min(speed * DT, d);
-    const canSwim = this.mobCanSwim(MOBS[e.templateId]);
-
-    // The straight-line step (and the keep-out circles it still obeys): mob/phase_step.ts.
-    if (ignoreObstacles) return phaseStep(e, dest, desired, step, d, this.cfg.seed);
-    // Mobs have no nav mesh. Try the straight path first; only if a prop or the
-    // waterline eats it do we fan the heading out and take the best slide AROUND
-    // the obstacle. That lets a mob round the camp props to reach its target
-    // instead of pinning on them. Open-ground movers take the first branch.
-    let bestX = e.pos.x,
-      bestZ = e.pos.z,
-      bestProgress = 1e-3;
-    // Swimmers ride the water surface, so slope checks clamp submerged ground
-    // to the waterline (a sloped lake bed is not a wall; see pathfind rideHeight).
-    // The waterline itself is terrain/feature-aware: outside a declared lake's
-    // footprint there is no waterline at all, so a dry sunken feature never
-    // reads as a shore.
-    const ride = (x: number, z: number, h: number): number => {
-      const wl = waterLevelAt(x, z, this.cfg.seed);
-      return canSwim && h < wl ? wl : h;
-    };
-    let h0 = Number.NaN; // lazily sampled: only steep cells pay for heights
-    for (const off of MOVE_SLIDE_FAN) {
-      const a = desired + off;
-      const nx = e.pos.x + Math.sin(a) * step;
-      const nz = e.pos.z + Math.cos(a) * step;
-      // landlocked creatures stop at the waterline instead of walking under it
-      if (
-        !canSwim &&
-        groundHeight(nx, nz, this.cfg.seed) < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH
-      ) {
-        continue;
-      }
-      // Mobs, pets, and feared players obey the wall rule too: no uphill step
-      // onto unwalkably steep ground. Screened to the wall bands so the hot
-      // open-world fan pays nothing; inside a band the memoized cell steepness
-      // screens next, and only actual wall cells pay for exact heights. This
-      // is a NEW gate for these movers, so the finer per-step cliff check
-      // players get is not replicated here.
-      if (nearSteepWalls(nx, nz) && terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE) {
-        if (Number.isNaN(h0))
-          h0 = ride(e.pos.x, e.pos.z, groundHeight(e.pos.x, e.pos.z, this.cfg.seed));
-        if (ride(nx, nz, groundHeight(nx, nz, this.cfg.seed)) > h0) continue;
-      }
-      // The Great Maze's hedge walls are hard for mobs too (the maze patrol
-      // knights pace their dead ends instead of drifting through a hedge).
-      // resolveMovePoint now does that on its own: the hedges are real collider
-      // boxes, so this no longer needs its own segment test, and keeping one
-      // would reject every candidate for a body that ever ended up inside a
-      // hedge, leaving it stuck instead of letting the push-out carry it clear.
-      const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
-      const progress = d - Math.hypot(r.x - dest.x, r.z - dest.z);
-      if (progress > bestProgress) {
-        bestProgress = progress;
-        bestX = r.x;
-        bestZ = r.z;
-      }
-      if (off === 0 && progress >= step - 1e-3) break; // straight path is clear
-    }
-    e.pos.x = bestX;
-    e.pos.z = bestZ;
-    // The floor a body rests on, which for a PLAYER includes the standable prop
-    // top underfoot, not just the terrain. Feared players are moved through here
-    // and return early from the player step, so `stepPlayerMotion` and its whole
-    // vertical pass never run for the duration: snapping to raw terrain dropped
-    // anyone feared off a rampart deck several yards INSIDE the rampart, where
-    // swept collision then refused every direction once the fear ended (from
-    // inside a volume every direction is a surface). Same expression the vertical
-    // pass and climb.ts already land against.
-    //
-    // Scoped to players deliberately: mobs and pets keep the terrain snap they
-    // have always had, so their movement, and the parity draw order with it, is
-    // untouched.
-    const g =
-      e.kind === 'player'
-        ? floorHeightAt(this.cfg.seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
-        : groundHeight(bestX, bestZ, this.cfg.seed);
-    // A body with its own wade depth (MobTemplate.wadeDepth) wades deeper than players swim.
-    const wadeDepth = MOBS[e.templateId]?.wadeDepth ?? SWIM_DEPTH;
-    e.pos.y =
-      canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - wadeDepth
-        ? swimSurfaceY(bestX, bestZ, this.cfg.seed)
-        : g;
-    return dist2d(e.pos, dest) < 0.3;
+    return moveTowardImpl(this.ctx, e, dest, speed, ignoreObstacles);
   }
 
   // blockedTowardSpawn moved to mob/locomotion.ts (M2; called only by the evade arm).
@@ -8871,6 +8788,9 @@ export class Sim {
   pickUpObject(objId: number, pid?: number): boolean {
     return interaction.pickUpObject(this.ctx, objId, pid, this.noticeboardDefinitions);
   }
+  buyPlot(deedId: string, pid?: number): boolean {
+    return buyPlotImpl(this.ctx, deedId, pid);
+  }
 
   // Corpse-harvest preference (Intentional Gathering PR3): a stored PLAYER
   // SETTING, not a harvest action (no kit/location/combat/cost gate). Body
@@ -9497,6 +9417,15 @@ export class Sim {
   readonly spectating: string | null = null;
   readonly actionBarReadOnly = false;
   socialInfo: null = null;
+  applyReferralRewardState(pid: number, before: CharacterState, after: CharacterState): boolean {
+    return applyReferralRewardStateImpl(this.ctx, pid, before, after);
+  }
+  referralCardsSnapshot(): ReferralCardsSnapshot | null {
+    return null;
+  }
+  referralCardsAction(_action: ReferralCardsAction): void {}
+  socialFriendsPage(_afterCharacterId: number): void {}
+  socialBlocksPage(_cursor: number): void {}
   friendAdd(_name: string): void {}
   friendRemove(_name: string): void {}
   blockAdd(_name: string): void {}
@@ -9778,7 +9707,7 @@ export class Sim {
   }
 
   bgFlagAction(pid?: number): void {
-    bgMod.bgFlagAction(this.ctx, pid);
+    mapObjectiveHooks.routeFlagAction(this.ctx, pid); // Ravenrift's flag, or an authored map's
   }
 
   bgMatchFor(pid: number): bgMod.BgMatch | null {

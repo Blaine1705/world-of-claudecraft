@@ -230,4 +230,22 @@ describe('LoadQueue', () => {
     for (const start of launched) start();
     expect(started).toEqual(['a', 'b']);
   });
+
+  it('starts the lowest rank first inside a class, sampled when a slot frees', () => {
+    const started: string[] = [];
+    const queue = new LoadQueue(1, (start) => start());
+    const distance: Record<string, number> = { near: 5, far: 50, bulk: 1 };
+    const rankOf = (name: string) => () => distance[name];
+    queue.push(() => void started.push('running'));
+    queue.push(() => void started.push('far'), 'demand', 'far', rankOf('far'));
+    queue.push(() => void started.push('plain'));
+    queue.push(() => void started.push('near'), 'demand', 'near', rankOf('near'));
+    // a lower rank never jumps the class line: background still waits for every demand
+    queue.push(() => void started.push('bulk'), 'background', 'bulk', rankOf('bulk'));
+    // the camera moved after these were queued: the rank is read at dequeue, not at push
+    distance.far = 1;
+    for (let i = 0; i < 4; i++) queue.release();
+    // an unranked load is rank 0, so it starts ahead of both ranked demands
+    expect(started).toEqual(['running', 'plain', 'far', 'near', 'bulk']);
+  });
 });

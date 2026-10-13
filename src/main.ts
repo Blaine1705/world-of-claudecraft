@@ -1,5 +1,6 @@
 import { applyFrameGeometrySetting } from './game/frame_geometry_settings';
 import { createSubscriptionStoreHooks, storeSnapshotForHud } from './net/subscription_sdk';
+import { captureReferralSlug } from './referral_signup';
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
 import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
@@ -83,7 +84,7 @@ import {
 } from './game/discord_login_choice';
 import { desktopPresenceOnFrame } from './game/discord_presence';
 import { cycleHudFocus } from './game/dpad_focus_nav';
-import { takeEditorPlaytestRequest } from './game/editor_playtest';
+import { mountPlaytestReturnButton, takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
   ENTRY_PROBE_STABLE_MS,
@@ -197,6 +198,8 @@ import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { runPetCommand } from './game/pet_commands';
+import { clickPlacedMover, pickPlacedMoverAt } from './game/placed_mover_input';
+import { mountPlaytestDevPanel } from './game/playtest_dev_panel';
 import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { startRealmBuilderRollLoad } from './game/realm_builder_boot';
@@ -233,6 +236,13 @@ import {
 import { markSpawnIntroSeen, readSpawnIntroSeen } from './game/spawn_intro_seen';
 import { createStartPanelNavigation } from './game/start_panel_navigation';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
+import {
+  initAudioOnFirstGesture,
+  registerStudioAudioTeardown,
+  resolveStudioEntry,
+  startAuthoredOfflineSession,
+} from './game/studio_boot';
+import { installStudioWorldHooks } from './game/studio_world_hooks';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
 import { dispatchTargetingAction, targetingInputCallbacks } from './game/targeting_actions';
 import {
@@ -366,6 +376,7 @@ import {
   type ModularLook,
   normalizeAppearance,
 } from './render/characters/modular';
+import { npcEntityLookFor } from './render/characters/npc_look_provider';
 import {
   armorSetSourceFor,
   charselectLook,
@@ -641,6 +652,8 @@ registerShaderWarmSetting(() => settingsForShellReflection().get('shaderWarm'));
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
 installWebGLContextRelease();
+// The audio engines close with the page on a studio world swap (studio_boot.ts).
+registerStudioAudioTeardown();
 // World-only GLB textures (props, dungeon, biome, ...) drop their CPU-side
 // transcoded mip chains after GPU upload. Only the GAME entry opts in: here,
 // every renderer that can draw those categories is the world renderer, whose
@@ -1489,10 +1502,14 @@ async function startGame(
     // paperdoll eye toggle), so peers see the owner's choice. Per-entity
     // wire JSON is normalized at compose time (visual build, not per frame):
     // hostile or stale payloads clamp to a valid body.
-    // Only players compose: an NPC wears its authored look on a WOC body, which
-    // the visual factory resolves by templateId (characters/npc_looks.ts).
+    // Players compose; an NPC_LOOKS NPC wears its authored look on a WOC body,
+    // which the visual factory resolves by templateId (characters/npc_looks.ts).
+    // The non-player half (the authored maps' runtime-composed fork looks) is
+    // shared with the Studio viewport via npc_look_provider.ts.
     setModularLookProvider((e) =>
-      e.kind === 'player' ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId)) : null,
+      e.kind === 'player'
+        ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
+        : npcEntityLookFor(e),
     );
     // Helmet visibility belongs to each character's saved state: creator
     // toggle first, then paperdoll eye. Do not re-assert the old device-wide
@@ -2024,12 +2041,12 @@ async function startGame(
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
     onGroundAimMove: (x, y) => {
       if (!hud.isGroundAimActive()) return false;
-      hud.updateGroundAimPoint(renderer.groundPoint(x, y, world.player.pos.y));
+      hud.updateGroundAimPoint(renderer.picking.groundPoint(x, y, world.player.pos.y));
       return true;
     },
     onGroundAimTap: (x, y) => {
       if (!hud.isGroundAimActive()) return false;
-      const point = renderer.groundPoint(x, y, world.player.pos.y);
+      const point = renderer.picking.groundPoint(x, y, world.player.pos.y);
       if (point) hud.commitGroundAimAt(point);
       return true;
     },
@@ -2049,6 +2066,20 @@ async function startGame(
     entryDiagnostics.checkpoint(open ? 'quest-dialog-open' : 'quest-dialog-closed');
     syncOverlayDiagnostics();
   };
+  // Authored-map gossip rows (the Deepglass steward and marshal, Baldemar's
+  // gate) and the arena's hint keys; the returned tick runs in the frame loop.
+  const tickWizardPortal = installStudioWorldHooks({
+    hud,
+    world,
+    offlineSim,
+    renderer: () => renderer.wizardGate,
+    keybinds,
+    setGameInputReady: (ready) => {
+      gameInputReady = ready;
+    },
+    showLoadingScreen,
+    nextPaint,
+  });
   stopMobileMoreDiagnostics?.();
   stopMobileMoreDiagnostics = watchMobileMoreState(document.body, (open) => {
     syncOverlayDiagnostics();
@@ -2143,6 +2174,10 @@ async function startGame(
         padTargetPick.interact();
         break;
       }
+      case 'ballMarker':
+        // FORK (Deepball): the pad's edge press toggles the marker like the key.
+        input.ballMarker = !input.ballMarker;
+        break;
       case 'bags':
         hud.toggleBags();
         break;
@@ -3310,6 +3345,9 @@ async function startGame(
   // (world click, interact key, gathering-tool use).
   const gatherEffectConfirm = createGatherEffectConfirm(world, hud);
   function interactKey(preferNpcId?: number | null): void {
+    // Inside the Deepglass bell F is the HELD burner throttle, and nothing in the
+    // bell is interactable: skip the scan rather than spam its error mid-flight.
+    if (world.player.dgFlight) return;
     if (shouldRouteInteractToBgFlag(world.bgInfo, world.player, world.entities)) {
       world.bgFlagAction();
       return;
@@ -3382,7 +3420,7 @@ async function startGame(
     hud,
     isMobileTouch: () => document.body.classList.contains('mobile-touch'),
     cursorPoint: () => input.cursorPoint(),
-    groundPoint: (x, y) => renderer.groundPoint(x, y, world.player.pos.y),
+    groundPoint: (x, y) => renderer.picking.groundPoint(x, y, world.player.pos.y),
     setReticle: (reticle) => renderer.setGroundAimReticle(reticle),
   });
 
@@ -3393,7 +3431,7 @@ async function startGame(
         return;
       }
       if (button === 0) {
-        hud.commitGroundAimAt(renderer.groundPoint(x, y, world.player.pos.y));
+        hud.commitGroundAimAt(renderer.picking.groundPoint(x, y, world.player.pos.y));
         return;
       }
     }
@@ -3404,7 +3442,7 @@ async function startGame(
     // a mob/player camps the node), then the sloppy character assist, then the
     // ground-click/click-to-move fallback. A click that lands on a node
     // harvests it; it does not also walk you there or deselect your target.
-    let id = renderer.pickDirect(x, y);
+    let id = renderer.picking.pickDirect(x, y);
     const directEntity = id !== null ? world.entities.get(id) : undefined;
     const deferDirectCorpseToNode = shouldDeferPickedCorpseToGatherNode(
       directEntity,
@@ -3413,7 +3451,7 @@ async function startGame(
       localPartyMemberIds(world.partyInfo),
     );
     if (id === null || deferDirectCorpseToNode) {
-      const nodeId = renderer.pickGatherNode(x, y);
+      const nodeId = renderer.picking.pickGatherNode(x, y);
       const node = nodeId !== null ? GATHER_NODES.find((n) => n.id === nodeId) : undefined;
       if (node) {
         stopAutorunForInteraction(
@@ -3433,7 +3471,9 @@ async function startGame(
         );
         return;
       }
-      if (id === null) id = renderer.pickSloppy(x, y);
+      // A placed building's moving part (the vault door; authored maps only).
+      if (id === null && clickPlacedMover(renderer.picking, hud, world.player.pos, x, y)) return;
+      if (id === null) id = renderer.picking.pickSloppy(x, y);
     }
     // OSRS-style click feedback (its own toggle): a brief ground marker, gold for a
     // neutral click and red on a hostile. Both reference games only mark a real action,
@@ -3454,7 +3494,7 @@ async function startGame(
       // One ground raycast feeds both the move target and its marker, so the gold
       // marker appears only where the click actually sends you.
       if (isClickMoveButton) {
-        const g = renderer.groundPoint(x, y, world.player.pos.y);
+        const g = renderer.picking.groundPoint(x, y, world.player.pos.y);
         if (g) {
           if (wantClickFeedback) renderer.spawnClickMarker(g.x, g.z, false);
           const target = resolvedClickMoveTarget(g);
@@ -3499,7 +3539,7 @@ async function startGame(
   // along the way (see attackMoveTick). Reuses the click-to-move travel pipeline.
   function handleAttackMove(x: number, y: number): void {
     if (world.player.dead) return;
-    const id = renderer.pick(x, y);
+    const id = renderer.picking.pick(x, y);
     if (id !== null) {
       const e = world.entities.get(id);
       if (e && isAttackableEntity(e, world.playerId, activePvpOpponentIds(world))) {
@@ -3515,7 +3555,7 @@ async function startGame(
         return;
       }
     }
-    const g = renderer.groundPoint(x, y, world.player.pos.y);
+    const g = renderer.picking.groundPoint(x, y, world.player.pos.y);
     if (g) {
       const target = resolvedClickMoveTarget(g);
       input.setClickMoveTarget(target, 0.5, null, clickMovePathTo(target), true);
@@ -3854,6 +3894,8 @@ async function startGame(
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
     tickCameraZoomCeiling(input, world, frameDt);
+    // Deepball reads the camera as an AIM (Input.deepballFlight); refresh it first.
+    input.deepballFlight = world.player.dgFlight === true;
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
     // When click-to-move ends, the player's facing snaps from the (camera-lagging)
@@ -4040,6 +4082,7 @@ async function startGame(
   // hovered mob dying or turning hostile updates without waiting for a re-pick.
   const hoverPickGate = new HoverPickGate();
   let hoverPickedId: number | null = null;
+  let hoverOnMover = false;
   const hoverPartyMemberIds = new Set<number>();
   const hoverPvpOpponentIds = new Set<number>();
 
@@ -4050,12 +4093,23 @@ async function startGame(
       return;
     }
     if (hoverPickGate.shouldPick(input.hoverX, input.hoverY, performance.now())) {
-      hoverPickedId = renderer.pick(input.hoverX, input.hoverY);
+      hoverPickedId = renderer.picking.pick(input.hoverX, input.hoverY);
+      // a vault door under the cursor wears the hand, like a friendly NPC
+      hoverOnMover =
+        hoverPickedId === null &&
+        pickPlacedMoverAt(renderer.picking, input.hoverX, input.hoverY) !== null;
     }
     const entity = hoverPickedId !== null ? world.entities.get(hoverPickedId) : undefined;
     const pvpOpponents = activePvpOpponentIds(world, hoverPvpOpponentIds);
     input.setHoverCursor(
-      hoverCursorKind(entity, world.playerId, partyMemberIds(hoverPartyMemberIds), pvpOpponents),
+      hoverOnMover
+        ? 'friendly'
+        : hoverCursorKind(
+            entity,
+            world.playerId,
+            partyMemberIds(hoverPartyMemberIds),
+            pvpOpponents,
+          ),
     );
     // WoW-style mouseover tooltip (name / level / creature type) for a mob under
     // the cursor, reusing the same (gated) pick this function already does for
@@ -4094,8 +4148,8 @@ async function startGame(
     canvas,
     world,
     hud,
-    (x, y) => renderer.pickGatherNode(x, y),
-    (x, y) => renderer.pick(x, y),
+    (x, y) => renderer.picking.pickGatherNode(x, y),
+    (x, y) => renderer.picking.pick(x, y),
     () => input.isDragging() || hud.isModalOpen(),
   );
 
@@ -4176,12 +4230,9 @@ async function startGame(
     getPredLeadMs: () => renderer.selfMotionLeadMs,
     getApm: () => inputMeter.apm(performance.now()),
   });
-  function visualFacingFor(
-    mi: ReturnType<typeof input.readMoveInput>,
-    baseFacing: number,
-  ): number | null {
-    return !movementFrozen() ? glider.gliderAwareVisualFacing(world, mi, baseFacing) : null;
-  }
+
+  // The drawn yaw for diagonal travel, eased per frame (glider_controls.ts).
+  const visualFacingFor = glider.easedGliderAwareVisualFacing(world, movementFrozen);
   const perfNetworkStats = {
     connected: false,
     snapInterval: 0,
@@ -4261,6 +4312,8 @@ async function startGame(
       syncPerfOverlay(frameDt, now);
       syncOverlayDiagnostics();
     }
+    // Baldemar's gate: tick the cast open, watch for the walk-in.
+    tickWizardPortal(frameDt);
 
     // Freeze movement while the game menu is up, during the first-spawn intro,
     // the camera prompt, and through the race countdown. The sim independently
@@ -4430,8 +4483,11 @@ async function startGame(
       if (gate.render) syncGroundAimReticle();
       perf.setNetwork(null);
       const offlineRenderFacing =
-        visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
-        movementFacing;
+        visualFacingFor(
+          input.readMoveInput(),
+          movementFacing ?? offlineSim.player.facing,
+          frameDt,
+        ) ?? movementFacing;
       const offlineAlpha = acc / DT;
       const offlineViews = renderer.views.size;
       // A hidden frame's draw is not timed (it never ran); the world draw is
@@ -4525,7 +4581,7 @@ async function startGame(
     const netFacing = foreignFacing ?? kbTurn.wireFacing;
     const localFacing = netFacing ?? kbFacing;
     const onlineRenderFacing =
-      visualFacingFor(resolved.mi, localFacing ?? interpServerFacing) ?? localFacing;
+      visualFacingFor(resolved.mi, localFacing ?? interpServerFacing, frameDt) ?? localFacing;
     const turnEngageEdge =
       kbFacing !== null &&
       (resolved.mi.turnLeft || resolved.mi.turnRight) &&
@@ -5131,6 +5187,7 @@ async function startOffline(
   skin = 0,
   world?: WorldContent,
   seedOverride?: number,
+  playerStartOverride?: { x: number; z: number },
 ): Promise<void> {
   stopShaderWarmup();
   if (!(await prepareWorldEntry())) return;
@@ -5143,15 +5200,18 @@ async function startOffline(
   const sim = loadSpan(
     'sim-build',
     () =>
-      new Sim(
-        offlineWorldConfig({
+      new Sim({
+        ...offlineWorldConfig({
           playerClass,
           name,
           world,
           seedOverride,
           devCommands: import.meta.env.DEV,
         }),
-      ),
+        // Baldemar's return trip lands at the departed town square rather than
+        // the world's own start (src/game/portal_travel.ts).
+        playerStartOverride,
+      }),
   );
   sim.setPlayerSkin(sim.playerId, skin);
   // Offline has no account and no character row, so the local draft IS this
@@ -5216,6 +5276,8 @@ async function startOffline(
     if (usable[0]) sim.equipItem(usable[0], sim.playerId);
   }
   if (bossTestDrive) applyBossTestDrive(sim, bossTestDrive, playerClass);
+  // The Deepglass arena's pinned hour and URL-booked bout (studio_boot.ts).
+  startAuthoredOfflineSession(sim, world);
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true);
@@ -5239,11 +5301,7 @@ const seekerEntitlementSync = createSeekerEntitlementSync({
 // Referral capture: a visitor who arrives from a shared player card link
 // (?ref=<slug>) carries the referrer's slug into registration. Read it once at
 // load and sanitise it to the server's slug shape so a junk param is dropped.
-const REFERRAL_SLUG = (() => {
-  const raw = new URLSearchParams(location.search).get('ref') ?? '';
-  const slug = raw.trim().toLowerCase();
-  return /^[a-z0-9][a-z0-9-]{0,63}$/.test(slug) ? slug : '';
-})();
+const REFERRAL_SLUG = captureReferralSlug(location.search);
 
 // First-touch attribution capture (fbclid/utm/landing/referrer), write-once at
 // load like the referral slug above; the register call sends it to the server.
@@ -10355,8 +10413,8 @@ function wireStartScreens(): void {
       discordChoiceError('');
       const request =
         pendingDiscordChoice.provider === 'apple'
-          ? api.appleLoginNew(pendingDiscordChoice.linkToken)
-          : api.discordLoginNew(pendingDiscordChoice.linkToken);
+          ? api.appleLoginNew(pendingDiscordChoice.linkToken, REFERRAL_SLUG)
+          : api.discordLoginNew(pendingDiscordChoice.linkToken, REFERRAL_SLUG);
       void request
         .then(finishDiscordChoice)
         .catch(onDiscordChoiceError)
@@ -10943,15 +11001,28 @@ const diagnosticsAutoOffline =
   import.meta.env.DEV &&
   startupParams.get('diagnostics') === '1' &&
   startupParams.get('diagnosticsAuto') === '1';
+// Studio entries (studio_boot.ts): a published ?map=<slug> world, or the way
+// home from Baldemar's portal. Resolved before the branches so the portal's
+// one-shot handoff is consumed whatever boots; null on the normal flow.
+const studioEntry = resolveStudioEntry(startupParams, editorPlaytest !== null);
 if (editorPlaytest) {
   startSitePresence('home');
-  void startOffline(
-    editorPlaytest.playerClass,
-    editorPlaytest.playerName,
-    0,
-    editorPlaytest.content,
-    editorPlaytest.seed,
+  initAudioOnFirstGesture();
+  // Map-maker playtest chrome: the Back-to-Editor pin and the Dev cheat
+  // drawer (collision wireframe, god mode, speed, badges).
+  mountPlaytestReturnButton();
+  mountPlaytestDevPanel();
+  // The transfer arrives async (IndexedDB). A refreshed playtest tab finds it
+  // already consumed and reloads into the normal start screen.
+  void editorPlaytest.then((req) =>
+    req
+      ? startOffline(req.playerClass, req.playerName, 0, req.content, req.seed)
+      : location.replace('/index.html'),
   );
+} else if (studioEntry) {
+  startSitePresence('home');
+  initAudioOnFirstGesture();
+  studioEntry.boot(startOffline, sanitizeOfflineName);
 } else if (diagnosticsAutoOffline) {
   startSitePresence('home');
   void startOffline('warrior', 'Diagnostics', 0);

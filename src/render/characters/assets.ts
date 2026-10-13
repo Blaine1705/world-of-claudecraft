@@ -2200,6 +2200,10 @@ function attachAllProps(
         ? offhandAttachDef(base, offhandItemId, weaponSkinId)
         : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
     if (!att) continue;
+    // A held prop whose model streams on demand (an Armory skin model an NPC
+    // carries) degrades while it is cold: left off, its fetch kicked, never a
+    // throw out of the build.
+    if (!residentOrEnsure(att.url)) continue;
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
     const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;
@@ -2308,6 +2312,25 @@ export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   });
   markOwnedWeaponSkinMaterials(payload);
   return payload;
+}
+
+/**
+ * Strip every held prop (weapons, shields, the fixed offhands) off an
+ * assembled model.
+ *
+ * A composed NPC inherits its class def's held-weapon layout, so a townsperson
+ * built on the warrior body is born gripping the warrior's sword. Civilians
+ * cheering in a stadium must not be armed, and removal beats hiding: a hidden
+ * weapon still costs its draw call and still rides every animation. Safe for
+ * these bodies because they never equip anything (setWeaponsStowed below
+ * re-attaches from the def for anyone who does).
+ */
+export function stripHeldProps(root: THREE.Object3D): void {
+  const held: THREE.Object3D[] = [];
+  root.traverse((o) => {
+    if (o.userData[HELD_PROP_TAG]) held.push(o);
+  });
+  for (const o of held) o.removeFromParent();
 }
 
 /** Move every held prop (swap slots, the actual equipped offhand, AND fixed
