@@ -129,6 +129,7 @@ import { heroicLeapPlacementPreview } from './combat/heroic_leap';
 import { clearFieldcraftState } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
 import { clearHunterTalentState, hunterPetDamageMultiplier } from './combat/hunter_shared';
+import { dealKernelDamage } from './combat/knockback_launch';
 import { tickNaturesFury } from './combat/natures_fury';
 import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
@@ -2276,7 +2277,8 @@ export class Sim {
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
         const wasAlive = !target.dead;
-        this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
+        // A fall off a hostile launch is credited to the launcher (combat/knockback_launch.ts).
+        dealKernelDamage(this.ctx, source, target, amount, crit, school, ability, kind, noRage);
         // Null-source Falling is the kernel sentinel; dead targets no-op, so require transition.
         const isPlayerFall = source === null && ability === 'Falling' && target.kind === 'player';
         if (isPlayerFall && wasAlive && target.dead) {
