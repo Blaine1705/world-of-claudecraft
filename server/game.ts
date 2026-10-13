@@ -510,6 +510,7 @@ import {
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { activeWorldBossIdsWireJson, writeWorldBossWireFields } from './world_boss_wire';
+import * as objectCmds from './world_object_commands';
 import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -6268,11 +6269,7 @@ export class GameServer {
         sim.interact(pid);
         break;
       case 'loot':
-        this.sendCommandOutcome(
-          session,
-          msg,
-          typeof msg.id === 'number' && sim.lootCorpse(msg.id, pid),
-        );
+        this.sendCommandOutcome(session, msg, objectCmds.lootCommandOutcome(sim, msg, pid));
         break;
       case 'autoloot':
         if (typeof msg.id === 'number') sim.autoLoot(msg.id, pid);
@@ -6308,11 +6305,10 @@ export class GameServer {
         }
         break;
       case 'pickup':
-        this.sendCommandOutcome(
-          session,
-          msg,
-          typeof msg.id === 'number' && sim.pickUpObject(msg.id, pid),
-        );
+        this.sendCommandOutcome(session, msg, objectCmds.pickupCommandOutcome(sim, msg, pid));
+        break;
+      case 'buyplot':
+        this.sendCommandOutcome(session, msg, objectCmds.buyPlotCommandOutcome(sim, msg, pid));
         break;
       case 'accept':
         if (questWire.acceptQuestWire(sim, msg, pid)) this.resyncQuests(session);

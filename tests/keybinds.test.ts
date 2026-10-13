@@ -6,6 +6,7 @@ import {
   actionKind,
   BIND_ACTIONS,
   BIND_CATEGORIES,
+  bindActionLive,
   bindRefusalReason,
   comboCode,
   comboMods,
@@ -15,6 +16,7 @@ import {
   Keybinds,
   keyCapLabel,
   keyLabel,
+  liveBindActions,
   makeCombo,
 } from '../src/game/keybinds';
 
@@ -209,7 +211,13 @@ describe('registry', () => {
       }
     }
     const collisions = [...owners.entries()].filter(([, ids]) => ids.length > 1);
-    expect(collisions).toEqual([['KeyA', ['turnLeft', 'attackMove']]]);
+    // FORK: the Deepball burners (boost, a HELD Movement bind) deliberately share
+    // KeyF with interact (an edge bind): the bell has no interactables, so the
+    // two never fire together (src/game/keybinds.ts, the boost entry).
+    expect(collisions).toEqual([
+      ['KeyA', ['turnLeft', 'attackMove']],
+      ['KeyF', ['boost', 'interact']],
+    ]);
   });
 });
 
@@ -502,7 +510,10 @@ describe('snapshot / importBindings (hotkey setup export + import)', () => {
     expect(kb.codeAt('strafeLeft', 0)).toBe(null);
     // A string that is not a combo (no keydown could ever produce it) is skipped,
     // so a crafted code cannot park garbage in a slot or reach a DOM lookup.
-    kb.importBindings({ slot3: ['Digit1"]', 'shift+KeyA'], slot4: ['Ctrl+Shift+KeyA', null] });
+    kb.importBindings({
+      slot3: ['Digit1"]', 'shift+KeyA'],
+      slot4: ['Ctrl+Shift+KeyA', null],
+    });
     expect(kb.codeAt('slot3', 0)).toBe(null);
     expect(kb.codeAt('slot3', 1)).toBe(null);
     expect(kb.codeAt('slot4', 0)).toBe('Ctrl+Shift+KeyA');
@@ -918,15 +929,25 @@ describe('modifier combos', () => {
     expect(makeCombo('KeyF', { ctrl: true, alt: false, shift: true })).toBe('Ctrl+Shift+KeyF');
     // Meta (Cmd on macOS / Win key) folds in last, so Cmd+1 is its own chord; a
     // bare 1 stays byte-identical because an omitted/false meta changes nothing.
-    expect(makeCombo('Digit1', { ctrl: false, alt: false, shift: false, meta: true })).toBe(
-      'Meta+Digit1',
-    );
+    expect(
+      makeCombo('Digit1', {
+        ctrl: false,
+        alt: false,
+        shift: false,
+        meta: true,
+      }),
+    ).toBe('Meta+Digit1');
     expect(makeCombo('KeyA', { ctrl: true, alt: false, shift: true, meta: true })).toBe(
       'Ctrl+Shift+Meta+KeyA',
     );
-    expect(makeCombo('Digit1', { ctrl: false, alt: false, shift: false, meta: false })).toBe(
-      'Digit1',
-    );
+    expect(
+      makeCombo('Digit1', {
+        ctrl: false,
+        alt: false,
+        shift: false,
+        meta: false,
+      }),
+    ).toBe('Digit1');
   });
 
   it('splits a combo back into its code and modifiers', () => {
@@ -940,8 +961,18 @@ describe('modifier combos', () => {
       shift: true,
       meta: false,
     });
-    expect(comboMods('Digit1')).toEqual({ ctrl: false, alt: false, shift: false, meta: false });
-    expect(comboMods('Meta+Digit1')).toEqual({ ctrl: false, alt: false, shift: false, meta: true });
+    expect(comboMods('Digit1')).toEqual({
+      ctrl: false,
+      alt: false,
+      shift: false,
+      meta: false,
+    });
+    expect(comboMods('Meta+Digit1')).toEqual({
+      ctrl: false,
+      alt: false,
+      shift: false,
+      meta: true,
+    });
   });
 
   it('identifies the bare modifier keys', () => {
@@ -1241,5 +1272,44 @@ describe('Keybinds.findBindConflict', () => {
     kb.bind('interact', 0, 'KeyP');
     expect(kb.findBindConflict('nosuchaction', 0, 'KeyP')).toBeNull();
     expect(kb.findBindConflict('map', 9, 'KeyP')).toBeNull();
+  });
+});
+
+describe('authored-map (Deepglass) binds on the built-in world', () => {
+  // The test env runs on the built-in world, the one the default game plays.
+  it('marks the two deepball binds authored-only and shared, and nothing else', () => {
+    const authored = BIND_ACTIONS.filter((a) => a.authoredOnly).map((a) => a.id);
+    expect(authored.sort()).toEqual(['ballMarker', 'boost']);
+    for (const id of authored) expect(actionAllowsShared(id)).toBe(true);
+  });
+
+  it('is live only on an authored map', () => {
+    expect(bindActionLive('boost', true)).toBe(false);
+    expect(bindActionLive('ballMarker', true)).toBe(false);
+    expect(bindActionLive('boost', false)).toBe(true);
+    expect(bindActionLive('ballMarker', false)).toBe(true);
+    expect(bindActionLive('interact', true)).toBe(true);
+    expect(liveBindActions(true).some((a) => a.authoredOnly)).toBe(false);
+    expect(liveBindActions(false)).toEqual(BIND_ACTIONS);
+    expect(liveBindActions(true)).toHaveLength(BIND_ACTIONS.length - 2);
+  });
+
+  it('keeps F a pure Interact key: no held burner, no movement intent', () => {
+    const kb = new Keybinds();
+    expect(kb.heldActionForCode('KeyF')).toBeNull();
+    expect(kb.edgeActionForCombo('KeyF')).toBe('interact');
+    expect(kb.codesForAction('boost')).toEqual([]);
+    expect(kb.edgeActionForCombo('Shift+KeyV')).toBeNull();
+    // The stored default is still there for the arena to resolve.
+    expect(kb.codeAt('boost', 0)).toBe('KeyF');
+  });
+
+  it('never lets the burner default evict Interact from F in the load sweep', () => {
+    // A stored blob that names neither action: both fall back to defaults, and
+    // the shared burner must not claim F ahead of Interact (it is listed first).
+    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['Space', null] }));
+    const kb = new Keybinds();
+    expect(kb.codeAt('interact', 0)).toBe('KeyF');
+    expect(kb.edgeActionForCombo('KeyF')).toBe('interact');
   });
 });
