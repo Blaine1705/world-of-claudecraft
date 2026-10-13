@@ -248,6 +248,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/cosmetics/cosmetics_view.ts',
   'src/ui/hud/faction_reward_tooltip_view.ts',
   'src/ui/hud/treasure/treasure_map_view.ts',
+  'src/ui/hud/treasure/ink_map_picker_view.ts',
   'src/ui/hud/vehicle/vehicle_aim_core.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_view.ts',
   'src/ui/hud/vehicle/glider_action_bar_view.ts',
@@ -2703,6 +2704,8 @@ const UI_DOM_MODULES = [
   // re-reads the stored rail width once settings exist.
   'src/ui/hud/map/map_window_sizing_wiring.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
+  // Mounts the Cartographer's Ink map picker into #prompt-stack.
+  'src/ui/hud/treasure/ink_map_picker_controller.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',

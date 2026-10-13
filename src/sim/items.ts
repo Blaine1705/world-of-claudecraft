@@ -903,6 +903,7 @@ export function useItem(
   pid?: number,
   slotIndex?: number,
   aimPoint?: { x: number; z: number },
+  inkMapTarget?: unknown,
 ): ItemUseResult | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -1076,7 +1077,7 @@ export function useItem(
     return;
   }
   if (def.use?.type === 'cartographersInk') {
-    useCartographersInk(ctx, meta);
+    useCartographersInk(ctx, meta, inkMapTarget);
     return;
   }
   if (def.use?.type === 'treasureMap') {
