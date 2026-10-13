@@ -64,12 +64,25 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import {
+  type DungeonPlacementRecord,
   type PendingArenaWall,
   type PendingArenaWalls,
   Placements,
   pendingArenaWallsFor,
 } from './dungeon_arena_walls';
+
+// Re-exported for the editor's shipped-map adapter, which reads the tape here.
+export type { DungeonPlacementRecord } from './dungeon_arena_walls';
+
 import { dungeonBannerKind, hangsKitBanners } from './dungeon_banner_core';
+import {
+  capturePlacementRecords,
+  disposeKeyedInterior,
+  type KeyedBuildRegistries,
+  type KeyedInteriorBuild,
+  keyedBuildTracker,
+} from './dungeon_keyed_builds';
+import { createTempleWaterMaterial } from './dungeon_temple_water';
 import {
   dungeonFloorKind,
   dungeonFloorQuadKind,
@@ -89,7 +102,7 @@ import {
 } from './dungeon_wall_occlusion';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
-import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
+import { EMISSIVE_LIGHT } from './gfx';
 import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
 import { buildIgnivarLavaMoat, ensureIgnivarLavaMoatAssets } from './ignivar_lava_moat';
 import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ignivar_raid_dressing';
@@ -115,7 +128,6 @@ import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { riftPlatformSlabs } from './rift_platform_core';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
-import { TEMPLE_WATER_FRAG, TEMPLE_WATER_VERT } from './temple_water_shader';
 import { radialGlowTexture } from './textures';
 import { addTorchGlowDecal } from './torch_glow_decal';
 import { applySurfaceDetail } from './worn_stone';
@@ -198,6 +210,12 @@ export function dungeonDaisHasRaisedPlatform(variant: DungeonInteriorVariant): b
 /** Encounter floors where uncollided legacy aisle props must never be emitted. */
 export function dungeonVariantKeepsFightingFloorClear(variant: DungeonInteriorVariant): boolean {
   return isArenaVariant(variant) || variant === 'ignivar';
+}
+
+/** The point-light colour a variant's torches burn, so the editor can seat the
+ *  same warm glow on an imported dungeon map (editor/shipped_maps.ts). */
+export function dungeonTorchLightColor(variant: DungeonInteriorVariant): number {
+  return TORCH_COLORS[variant].light;
 }
 
 // The Drowned Litany reuses the same KayKit crypt-stone wall/floor/pillar kit as
@@ -505,6 +523,8 @@ export class DungeonInteriors {
   private waterMat: THREE.ShaderMaterial | null = null;
   private arenaHideables: WallHideable[] = [];
   private wallPropBindings: WallPropBinding[] = [];
+  // Keyed builds the world editor's dungeon mode rebuilds live (dungeon_keyed_builds.ts).
+  private builtByKey = new Map<string, KeyedInteriorBuild>();
   private readonly interiorResources = new Map<THREE.Group, OwnedInteriorResourceRegistry>();
   readonly openAirFields = new OpenAirFieldRoster();
 
@@ -519,6 +539,10 @@ export class DungeonInteriors {
     // but the lazily minted tinted grades (tintedMats) and bespoke shaders
     // otherwise link synchronously at first draw.
     private compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    // World-editor dungeon mode only: the RAW fire-light registry behind the
+    // sink above, plus its rank-dirty hook (see dungeon_keyed_builds.ts).
+    private fireLightRegistry?: THREE.PointLight[],
+    private onFireLightsChanged?: () => void,
     // The renderer removes lights, flames, and hideable-wall entries that are
     // registered outside the interior root when a build fails. The resource
     // registry itself is always cleaned here, even for direct/off-screen users.
@@ -600,18 +624,30 @@ export class DungeonInteriors {
       // base kits. `style.kit` picks the wall/floor/prop mesh mix; `style.torch`
       // overrides the torch/light colours. Undefined for authored dungeons/delves.
       style?: InteriorStyle;
+      /** Track this build so disposeInterior(key) can tear it down live
+       *  (world-editor dungeon mode). Untracked without it. */
+      key?: string;
+      /** Editor importer only: compute the exact placement plan without
+       *  loading assets, emitting meshes, or attaching the group to a scene. */
+      captureOnly?: boolean;
     },
   ): Promise<THREE.Group> {
-    await ensureDungeonAssets();
-    await ensureIgnivarRaidDressingAssets(interior);
-    await ensureIgnivarTileAssets(interior, loadModuleAsset);
+    if (!opts?.captureOnly) {
+      await ensureDungeonAssets();
+      await ensureIgnivarRaidDressingAssets(interior);
+      await ensureIgnivarTileAssets(interior, loadModuleAsset);
+    }
+    // Snapshot AFTER the asset awaits: the kit build below is synchronous (an
+    // open-air field's own builder may await, so a keyed field build must not
+    // race another build; the editor builds one at a time).
+    const track = keyedBuildTracker(this.builtByKey, opts?.key, () => this.keyedRegistries());
     const field = OPEN_AIR_FIELDS[interior];
     if (field) {
       // Open-air fields: their own builders, same deps and compile gate.
       const deps = { lowGfx: this.lowGfx, flames: this.flames, fireLights: this.fireLights };
       const group = await this.openAirFields.build(field, deps, ox, oz);
       await attachSceneGroupGated(this.scene, group, this.compileGate);
-      return group;
+      return track(group);
     }
     // Delve modules pass an explicit per-module layout so render geometry matches
     // the SAME layout sim/colliders.ts derives collision from (what you see is
@@ -717,6 +753,7 @@ export class DungeonInteriors {
           if (layout.illusionWalls?.length) {
             this.placeIllusionWalls(group, layout.illusionWalls, variant);
           }
+          if (opts?.captureOnly) return capturePlacementRecords(group, p, arenaWalls);
           // The authored floor honours its InteriorStyle's stone grade (the base kit
           // reads as grey crypt otherwise). Scoped to this path: the procedural rift
           // floors keep the look they shipped with; the keep grades its stone warm.
@@ -745,7 +782,7 @@ export class DungeonInteriors {
             this.compileGate,
             () => registry.isRetired,
           );
-          return group;
+          return track(group);
         }
 
         this.placeFloor(p, layout, variant, interior);
@@ -790,6 +827,7 @@ export class DungeonInteriors {
           }
         }
 
+        if (opts?.captureOnly) return capturePlacementRecords(group, p, arenaWalls);
         this.emit(group, p, variant);
         if (interior === 'ignivar') {
           group.add(buildIgnivarLavaMoat({ lowGfx: this.lowGfx }));
@@ -812,7 +850,7 @@ export class DungeonInteriors {
         group.userData.renderCategory = 'dungeon';
         this.collectInteriorResources(group);
         await attachSceneGroupGated(this.scene, group, this.compileGate, () => registry.isRetired);
-        return group;
+        return track(group);
       },
       (failedGroup, report) => {
         this.interiorResources.delete(failedGroup);
@@ -825,6 +863,36 @@ export class DungeonInteriors {
         }
       },
     );
+  }
+
+  /** Build one interior WITHOUT loading assets or attaching it to a scene, and
+   *  hand back the placement plan. The editor's shipped-map adapter turns these
+   *  into ordinary editable placements. */
+  static async captureDungeonPlacementRecords(
+    interior: string,
+    opts: Parameters<DungeonInteriors['buildInterior']>[3],
+  ): Promise<DungeonPlacementRecord[]> {
+    const dungeons = new DungeonInteriors(new THREE.Scene(), true, [], []);
+    const group = await dungeons.buildInterior(interior, 0, 0, { ...opts, captureOnly: true });
+    return (group.userData.dungeonPlacementRecords ?? []) as DungeonPlacementRecord[];
+  }
+
+  private keyedRegistries(): KeyedBuildRegistries {
+    const { flames, fireLightRegistry, arenaHideables } = this;
+    return { flames, fireLightRegistry, arenaHideables };
+  }
+
+  /** Tear down a keyed interior build (world-editor live rebuild; see
+   *  dungeon_keyed_builds.ts disposeKeyedInterior). */
+  disposeInterior(key: string): void {
+    const record = this.builtByKey.get(key);
+    if (!record) return;
+    this.builtByKey.delete(key);
+    this.scene.remove(record.group);
+    const registries = this.keyedRegistries();
+    this.arenaHideables = disposeKeyedInterior(record, registries, this.onFireLightsChanged);
+    // The keyed build owns a resource registry too; it goes with the record.
+    this.disposeInteriorResources(record.group);
   }
 
   private collectInteriorResources(group: THREE.Group): void {
@@ -891,23 +959,7 @@ export class DungeonInteriors {
   // -------------------------------------------------------------------------
 
   private templeWaterMaterial(): THREE.ShaderMaterial {
-    if (this.waterMat) return this.waterMat;
-    this.waterMat = markSharedMaterial(
-      new THREE.ShaderMaterial({
-        uniforms: {
-          ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
-          uTime: sharedUniforms.uTime,
-          uShallow: { value: new THREE.Color(0x49c9bd) },
-          uDeep: { value: new THREE.Color(0x07303c) },
-          uGlow: { value: new THREE.Color(0x76f0dd) },
-        },
-        vertexShader: TEMPLE_WATER_VERT,
-        fragmentShader: TEMPLE_WATER_FRAG,
-        transparent: true,
-        depthWrite: false,
-        fog: true,
-      }),
-    );
+    this.waterMat ??= createTempleWaterMaterial();
     return this.waterMat;
   }
 

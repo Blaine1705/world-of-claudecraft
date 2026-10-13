@@ -28,7 +28,8 @@ vi.mock('three/addons/loaders/GLTFLoader.js', () => ({
       const name = fileOf(url);
       wire.started.push(name);
       wire.land.set(name, (ok = true) => {
-        if (ok) onLoad({ scene: {}, name });
+        // the scene post-passes (town weathering, foliage edge fade) walk it: an empty one
+        if (ok) onLoad({ scene: { traverse() {} }, name });
         else onError();
       });
     }

@@ -1,4 +1,5 @@
 import { audio } from '../game/audio';
+import { authoredMapMusicInput } from '../game/authored_map_music';
 import { corpseLootAvailabilityInWorld } from '../game/corpse_loot_availability';
 import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
 import { syncDeathControllerHints } from '../game/death_controller_hint';
@@ -66,6 +67,9 @@ import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
   ALL_RECIPES,
+  activeNamedAreas,
+  activeWorldStripRegion,
+  activeZoneList,
   CLASSES,
   DUNGEON_X_THRESHOLD,
   dungeonAt,
@@ -74,10 +78,6 @@ import {
   MOBS,
   NPCS,
   QUESTS,
-  WORLD_MAX_X,
-  WORLD_MAX_Z,
-  WORLD_MIN_X,
-  WORLD_MIN_Z,
   ZONES,
   zoneAt,
 } from '../sim/data';
@@ -306,9 +306,11 @@ import {
   itemSetBonusField,
   knownLetterId,
   riftFloorLabel,
+  subzoneBannerText,
   tEntity,
   zoneDisplayName,
   zonePoiLabel,
+  zoneSourceById,
 } from './entity_i18n';
 import {
   type ErrorTextLockoutDeps,
@@ -599,6 +601,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { type StudioGossipHooks, studioGossipDeps } from './hud/quest/studio_gossip_hooks';
 import { createReferralCardsHud } from './hud/referral_cards/referral_cards_hud_controller';
 import { paintFactionTierCelebrations } from './hud/reputation/faction_tier_celebration_painter';
 import { advanceFactionTierObservation } from './hud/reputation/faction_tier_celebration_view';
@@ -695,7 +698,7 @@ import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
-import { onMapArtReady } from './map_art';
+import { onMapArtReady, paintMapArtIntoStrip } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { createMapMarkerArt } from './map_marker_icon_loader';
 import { mapMarkerProfileForFlags } from './map_marker_profile_core';
@@ -805,6 +808,7 @@ import {
 import { playerPortraitSubject, portraitUpdateFrames } from './player_portrait_core';
 import { playerHoverTooltipHtml } from './player_tooltip';
 import { playerTooltipKey } from './player_tooltip_view';
+import { PlotSignPopup, presentPlotSign } from './plot_sign_popup';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import {
   type PreviewPrewarmHandle,
@@ -900,7 +904,7 @@ import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tool
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
-import { nearestSubzone } from './subzone';
+import { currentSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
 import { localizeSystemText } from './system_text_i18n';
 import { TalentsWindow } from './talents_window';
@@ -1338,6 +1342,8 @@ export class Hud {
   // attack handler then falls back to the fixed attack control.
   onMobileAttackNearest: (() => void) | null = null;
   onQuestDialogStateChange: ((open: boolean) => void) | null = null;
+  /** Authored-map gossip rows, wired by game/studio_world_hooks.ts. */
+  readonly studioGossip: StudioGossipHooks = {};
   // First-ever landing on the tutorial island (the sim's per-character
   // firstVisit): main.ts wires the arrival camera cinematic here
   // (game/arrival_cinematic.ts). The HUD owns the event arm, not the camera.
@@ -2164,6 +2170,7 @@ export class Hud {
   private bootcamp = new BootcampOverlay();
   private noticeboardPopup = new NoticeboardPopup();
   private realmBuilderPopup = new RealmBuilderPopup();
+  private plotSignPopup = new PlotSignPopup((deedId) => void this.sim.buyPlot(deedId));
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -2324,6 +2331,7 @@ export class Hud {
       talentSpec: () => this.sim.talentSpec,
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
+      isInDeepballBout: () => this.sim.player.dgFlight === true, // docs/prd/deepglass.md
       showAttackButton: () => this.optionsHooks?.settings.get('showAttackButton') ?? true,
       // The arrangement profile for this device's interface (desktop or touch),
       // read from the same body.mobile-touch signal every touch-gated path uses.
@@ -2477,6 +2485,7 @@ export class Hud {
       openWorldQuestBoard: () => this.mapSidebarCollapse.openBoard(),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openCardDuel: () => this.toggleCardDuel(),
+      ...studioGossipDeps(this.studioGossip),
       onOpenChange: (open) => this.onQuestDialogStateChange?.(open),
       voice: {
         play: (key) => voice.play(key),
@@ -2678,12 +2687,8 @@ export class Hud {
     // (public/map_bg/world_strip.webp) blitted in as soon as it decodes, so
     // boot skips ~50k pixels of synchronous terrain painting; other worlds
     // keep the procedural render.
-    const worldStripRegion = {
-      minX: WORLD_MIN_X,
-      maxX: WORLD_MAX_X,
-      minZ: WORLD_MIN_Z,
-      maxZ: WORLD_MAX_Z,
-    };
+    // The ACTIVE world's rect; the painter samples the same one (data.ts).
+    const worldStripRegion = activeWorldStripRegion();
     if (bakedMapBgEligible(this.sim.cfg.seed, 'world_strip')) {
       const stripCanvas = document.createElement('canvas');
       stripCanvas.width = 140;
@@ -2704,17 +2709,7 @@ export class Hud {
       this.minimapBg = this.renderTerrainCanvas(140, worldStripRegion);
     }
     // hand-painted plates land in the world strip too, each over its own band
-    {
-      const stripH = this.minimapBg.height;
-      const spanZ = WORLD_MAX_Z - WORLD_MIN_Z;
-      for (const zn of ZONES) {
-        onMapArtReady(zn.id, (img) => {
-          const top = ((WORLD_MAX_Z - zn.zMax) / spanZ) * stripH;
-          const rows = ((zn.zMax - zn.zMin) / spanZ) * stripH;
-          require2dContext(this.minimapBg).drawImage(img, 0, top, this.minimapBg.width, rows);
-        });
-      }
-    }
+    paintMapArtIntoStrip(() => this.minimapBg, worldStripRegion, activeZoneList());
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
     bindMinimapObjectiveTap(mm, this);
@@ -7024,6 +7019,7 @@ export class Hud {
     this.bootcamp.relocalize(this.sim, this.keybinds);
     this.noticeboardPopup.relocalize();
     this.realmBuilderPopup.relocalize();
+    this.plotSignPopup.relocalize();
     this.guildBoardWindow.relocalize();
     this.riftForgeWindow.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
@@ -8773,6 +8769,7 @@ export class Hud {
         inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
         entities: sim.entities.values(),
         riftFloor: sim.riftFloor,
+        ...authoredMapMusicInput(),
       });
     }
 
@@ -9452,15 +9449,14 @@ export class Hud {
 
       // subzone text: a smaller banner when you step into a named landmark
       // (classic "subzone" display). POIs are the same labels the minimap pins.
-      const subzone = inDungeon
+      // Zone POI points AND the map's authored `locations` rects (subzone.ts).
+      const hit = inDungeon
         ? null
-        : nearestSubzone(p.pos.x, p.pos.z, currentZone.pois, this.lastSubzone);
+        : currentSubzone(p.pos.x, p.pos.z, currentZone.pois, activeNamedAreas(), this.lastSubzone);
+      const subzone = hit?.label ?? null;
       if (subzone !== this.lastSubzone) {
         this.lastSubzone = subzone;
-        if (subzone) {
-          const poiIndex = currentZone.pois.findIndex((q) => q.label === subzone);
-          this.showSubzone(poiIndex >= 0 ? zonePoiLabel(currentZone.id, poiIndex) : subzone);
-        }
+        if (hit) this.showSubzone(subzoneBannerText(currentZone.id, hit));
       }
 
       // The music machine ran in the non-paint head this same frame (same
@@ -10122,7 +10118,8 @@ export class Hud {
   private prewarmMapBg(zoneId: string): void {
     if (this.mapBgCache.has(zoneId)) return;
     if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
-    const zone = ZONES.find((z) => z.id === zoneId);
+    // ACTIVE zones too: an authored map's zone is in no static list.
+    const zone = zoneSourceById(zoneId);
     if (!zone) return;
     if (bakedMapBgEligible(this.sim.cfg.seed, zoneId)) {
       loadBakedMapBg(
@@ -12134,6 +12131,9 @@ export class Hud {
           break;
         case 'realmBuilder':
           presentRealmBuilder(this.realmBuilderPopup, this.renderer, ev.current, ev.past);
+          break;
+        case 'plotSign':
+          presentPlotSign(this.plotSignPopup, ev.plot, (text) => this.log(text, HUD_LOG.NEWS));
           break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their

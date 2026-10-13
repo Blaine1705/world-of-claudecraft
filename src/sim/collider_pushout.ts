@@ -1,62 +1,15 @@
 // The static-collision push-out kernel, moved verbatim out of colliders.ts
 // (the monolith ratchet) so the interior cell index (interior_collider_cells.ts)
-// resolves through the very same loop: pushOut against one collider, the
-// mover pass-over gate, the standable top sampler, and resolveAgainst, the
-// sequential three-pass slide every collision arm runs. Pure leaf: no Sim
-// state, no rng, type-only imports from colliders.ts (no import cycle).
-import type { Collider, MoverHeight } from './colliders';
-
-/**
- * The standable surface height of a collider at a point: `moveTopY` for flat
- * tops, the pitched surface for sloped ones (never above `moveTopY`, never
- * below the eaves). Infinity for full-height colliders, which have no top.
- */
-export function colliderTopAt(c: Collider, x: number, z: number): number {
-  const top = c.moveTopY;
-  if (top === undefined) return Infinity;
-  const s = c.topSlope;
-  if (!s) return top;
-  let run: number;
-  if (s.kind === 'cone' || c.type === 'circle') {
-    run = Math.hypot(x - c.x, z - c.z);
-  } else {
-    const cos = Math.cos(-c.rot);
-    const sin = Math.sin(-c.rot);
-    const lx = (x - c.x) * cos + (z - c.z) * sin;
-    const lz = -(x - c.x) * sin + (z - c.z) * cos;
-    // The surface falls across the axis PERPENDICULAR to the ridge line.
-    run = s.axis === 'z' ? Math.abs(lx) : Math.abs(lz);
-  }
-  return Math.max(s.eaveY, top - run * s.pitch);
-}
-
-/** Float slack when comparing feet height against a collider top. */
-export const MOVE_TOP_EPS = 1e-3;
-
-/** Head clearance a mover with height needs to walk beneath an elevated slab
- *  (`passUnderY`): a touch above the tallest body so a deck one yard overhead
- *  still walls, while a real balcony admits the walk below. */
-const PASS_UNDER_HEADROOM = 2.1;
-
-// Does the mover pass clean over this collider at (x, z)? Full-height
-// colliders (moveTopY undefined) never pass; standable tops grant the mantle
-// lift. Sloped tops are sampled at the mover's own point, so the eaves of a
-// roof pass a body the ridge would still wall. An elevated slab that carries
-// `passUnderY` also passes the mover walking BENEATH it when their head
-// clears its underside (the balcony-walk contract); height-less movers never
-// reach here, so mobs and pathfinding still see a full-height solid.
-function passesOver(c: Collider, mover: MoverHeight | undefined, x: number, z: number): boolean {
-  if (!mover || c.moveTopY === undefined) return false;
-  if (c.passUnderY !== undefined && mover.y + PASS_UNDER_HEADROOM <= c.passUnderY) return true;
-  return colliderTopAt(c, x, z) <= mover.y + (c.standable ? mover.lift : 0) + MOVE_TOP_EPS;
-}
-
-// rotate a local offset by a three.js rotation.y angle
-export function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
-  const c = Math.cos(rot),
-    s = Math.sin(rot);
-  return { x: lx * c + lz * s, z: -lx * s + lz * c };
-}
+// resolves through the very same loop: pushOut against one collider (circle,
+// OBB, or an authored prism) and resolveAgainst, the sequential three-pass
+// slide every collision arm runs, with the mover pass-over and pass-under
+// gates. The shapes and the top sampler live in collider_shapes.ts, the
+// pass-over gate in parkour_heights.ts, the prism and pass-under halves in
+// colliders_authored/. No Sim state, no rng, and no import of colliders.ts
+// itself (no import cycle).
+import { type Collider, rotY } from './collider_shapes';
+import { passesUnder, pushOutPrism } from './colliders_authored';
+import { type MoverHeight, passesOver } from './parkour_heights';
 
 // Push (x,z) out of one collider. Returns the corrected point, or null if clear.
 export function pushOut(
@@ -64,7 +17,9 @@ export function pushOut(
   x: number,
   z: number,
   r: number,
+  feetY?: number,
 ): { x: number; z: number } | null {
+  if (c.type === 'prism') return pushOutPrism(c, x, z, r, feetY);
   if (c.type === 'circle') {
     const dx = x - c.x,
       dz = z - c.z;
@@ -138,7 +93,8 @@ export function resolveAgainst(
     for (const c of list) {
       if (ignoreFences && c.type === 'obb' && c.isFence) continue;
       if (passesOver(c, mover, px, pz)) continue;
-      const res = pushOut(c, px, pz, r);
+      if (passesUnder(c, mover?.y)) continue;
+      const res = pushOut(c, px, pz, r, mover?.y);
       if (res) {
         px = res.x;
         pz = res.z;
