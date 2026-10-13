@@ -526,21 +526,23 @@ export interface WildheartSprite {
   spread: number;
 }
 
-/** The two eyes (lx, y, lz of the jade's face), from the Blender build. */
+/** The two eyes (lx, y, lz), from the Blender build: a point in each socket,
+ *  before the jade and under the brow that overhangs it. */
 export const WILDHEART_EYES: readonly (readonly [number, number, number])[] = [
-  [4.104, 10.399, 1.757],
-  [-3.182, 10.717, 1.757],
+  [4.562, 10.689, 0.4],
+  [-3.613, 11.046, 0.4],
 ];
 
 /** The tips of the upper fangs (lx, y, lz), from the Blender build's
- *  stats.json: the drops fall from the ivory. */
+ *  stats.json: the drops fall from the ivory. The upper jaw hangs four yards
+ *  out over the causeway, so they fall onto the flagstones before the maw. */
 export const WILDHEART_DRIP_SOURCES: readonly (readonly [number, number, number])[] = [
-  [2.339, 2.137, -0.407],
-  [0.765, 4.84, -1.43],
-  [1.647, 4.49, -1.184],
-  [-2.144, 2.333, -0.407],
-  [-0.34, 4.888, -1.43],
-  [-1.249, 4.617, -1.184],
+  [2.594, 2.315, -5.038],
+  [0.696, 5.414, -5.473],
+  [1.4, 5.171, -5.466],
+  [-2.382, 2.532, -5.038],
+  [-0.221, 5.454, -5.473],
+  [-0.944, 5.273, -5.466],
 ];
 
 /** The maw's shafts: yaw off south (positive west), pitch (the causeway

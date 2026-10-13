@@ -2,9 +2,15 @@
 // authored by docs/design/dungeon-rework/entrance/build_wildheart_entrance.py):
 // exact bytes, the live authoring fingerprint, the media manifest rows, the
 // Blender nodes and materials the runtime keys on, and the landmark budget
-// (texture free, vertex colour only, meshopt; under 50,000 triangles and one
-// megabyte across the three files, split so the growth and the court cull and
-// shed apart from the idol).
+// (texture free, vertex colour only, meshopt, split so the growth and the
+// court cull and shed apart from the idol).
+//
+// The budget was 50,000 triangles and one megabyte (the Sunken Bastion
+// entrance's, which ships 49,082 and 859 KB). The head is now a skin of fitted
+// megaliths over a carved form, and with no texture every joint, chamfer,
+// chip and weathering gradient inside a block is geometry and vertex colour:
+// the idol alone is 39,823 triangles. The caps are 64,000 triangles and 1.25
+// MB; the growth was cut from 22,735 to 17,925 to pay for part of it.
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -23,22 +29,22 @@ const ROOT = path.join(__dirname, '..');
 
 const PINS: Record<string, { sha: string; bytes: number; triangles: number; maxBytes: number }> = {
   'public/models/props/wildheart_basin_entrance.glb': {
-    sha: '2a0362cb790de8bd4e95e090b03fc4d15145c82132089f41900404cf12b2e91b',
-    bytes: 380816,
-    triangles: 22323,
-    maxBytes: 420 * 1024,
+    sha: 'ad6c1ad92781d301ade5c92c66c06def776aad6efe560dcbd585381188f710e0',
+    bytes: 715876,
+    triangles: 39823,
+    maxBytes: 760 * 1024,
   },
   'public/models/props/wildheart_basin_entrance_court.glb': {
-    sha: '0fee4a25f99ab945892ee19f030fc7d4e4a8cb7877aadf0ac34c6df753e3e8b6',
-    bytes: 91504,
+    sha: 'f7d07bcec2d40c14bef50a32dde8d8962ce61a1289b103e1c5897fc2a9ca2d38',
+    bytes: 91528,
     triangles: 4738,
     maxBytes: 120 * 1024,
   },
   'public/models/props/wildheart_basin_entrance_growth.glb': {
-    sha: 'd7048a071880db3d077db957ab9bde53604214e60bb3b4cfdcc29f51d0977e8e',
-    bytes: 455084,
-    triangles: 22735,
-    maxBytes: 480 * 1024,
+    sha: '7c87336b871bc1da03afdac6baa5df59abaeeba434d97f709a22955a12653dd9',
+    bytes: 404880,
+    triangles: 17925,
+    maxBytes: 440 * 1024,
   },
 };
 
@@ -144,8 +150,8 @@ describe('the Jaguar Maw shipping assets', () => {
 
   it('the whole landmark stays inside its budget', () => {
     const pins = Object.values(PINS);
-    expect(pins.reduce((sum, p) => sum + p.triangles, 0)).toBeLessThanOrEqual(50_000);
-    expect(pins.reduce((sum, p) => sum + p.bytes, 0)).toBeLessThanOrEqual(1024 * 1024);
+    expect(pins.reduce((sum, p) => sum + p.triangles, 0)).toBeLessThanOrEqual(64_000);
+    expect(pins.reduce((sum, p) => sum + p.bytes, 0)).toBeLessThanOrEqual(1.25 * 1024 * 1024);
   });
 
   it("the model reaches from under the bank to the fig's crown and no further than its footprint", async () => {
@@ -164,15 +170,16 @@ describe('the Jaguar Maw shipping assets', () => {
     // idol's foot is cut under the bank on its lagoon side, five yards under
     // the door, and its roots run on down into the shallows, six yards under;
     // the fig rooted in its crown carries its limbs (in the idol's file) and
-    // its leaves (the growth) to fifteen character heights over the door.
+    // its leaves (the growth) to eighteen character heights over the door,
+    // clear of the ears.
     const idol = bounds.Entrance_Idol;
     expect(idol.max[1]).toBeGreaterThan(24);
-    expect(idol.max[1]).toBeLessThan(30);
+    expect(idol.max[1]).toBeLessThan(33);
     expect(idol.min[1]).toBeLessThan(-5);
     expect(idol.min[1]).toBeGreaterThan(-7.5);
     const growth = bounds.Entrance_Growth;
     expect(growth.max[1]).toBeGreaterThan(27);
-    expect(growth.max[1]).toBeLessThan(34);
+    expect(growth.max[1]).toBeLessThan(36);
     // the causeway's foot, fifteen yards before the door
     const court = bounds.Entrance_Court;
     expect(court.min[2]).toBeLessThan(-14);
