@@ -2277,6 +2277,18 @@ describe('vendor sell log line localizes the item name for both a single item an
     }
   });
 
+  it('localizes both current and legacy royal-door denial punctuation', () => {
+    try {
+      setLanguage('es');
+      const current = 'Nythraxis is engaged - the royal door has sealed shut.';
+      const legacy = 'Nythraxis is engaged \u2014 the royal door has sealed shut.';
+      expect(localizeSimText(current)).not.toBe(current);
+      expect(localizeSimText(current)).toBe(localizeSimText(legacy));
+    } finally {
+      setLanguage('en');
+    }
+  });
+
   it('localizes a STACKED sale (quantity > 1) in every locale instead of leaking raw English', () => {
     try {
       for (const lang of supportedLanguages) {

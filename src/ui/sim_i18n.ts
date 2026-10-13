@@ -20579,7 +20579,7 @@ const RULES: Rule[] = [
   { re: /^The royal door is sealed to you\.$/, build: () => tRaidExtra('royalDoorSealed') },
   { re: /^You are locked to Nythraxis Raid Arena\.$/, build: () => tRaidExtra('locked') },
   {
-    re: /^Nythraxis is engaged — the royal door has sealed shut\.$/,
+    re: /^Nythraxis is engaged (?:\u2014|-) the royal door has sealed shut\.$/,
     build: () => tRaidExtra('engagedSealed'),
   },
   {

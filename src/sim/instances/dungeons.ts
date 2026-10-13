@@ -406,7 +406,7 @@ export function enterDungeon(
       (i) => i.dungeonId === dungeonId && i.partyKey === instanceKeyFor(ctx, r.meta.entityId),
     );
     if (engaged && nythraxisInstanceSealed(ctx, engaged)) {
-      deny(r.meta.entityId, 'Nythraxis is engaged — the royal door has sealed shut.');
+      deny(r.meta.entityId, 'Nythraxis is engaged - the royal door has sealed shut.');
       return false;
     }
   }

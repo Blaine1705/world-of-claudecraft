@@ -333,6 +333,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/confection-cascade-v6/',
       '            /docs/screenshots/confection-cascade-v7/',
       '            /docs/screenshots/deed-border-cartouche/',
+      '            /docs/screenshots/dungeon-groups/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
       '            /docs/screenshots/far-foliage-impostors/',
