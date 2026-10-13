@@ -24,6 +24,7 @@ import type { GuildBankState } from './guild_bank';
 import type { InventoryGrantOptions } from './inventory_grant';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
+import { materialItemIds } from './material_ids';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
@@ -87,6 +88,7 @@ import type {
   Vec3,
   WorldQuestDef,
 } from './types';
+import { splitVaultTakesBySigner } from './vault_material_sources';
 
 /** Shared inert success handle for hosts with no durable audit sink. Reused by
  *  reference so offline/headless vault actions allocate no reservation object. */
@@ -1872,7 +1874,10 @@ export function createSimContext(host: SimContextHost): SimContext {
  * Undefined means the action has no vault draw and the host was deliberately
  * not called. Null is a host refusal. A handle is an accepted reservation.
  * The cloned rows and array are frozen before crossing the host boundary, and
- * sorting uses code-unit order so it is deterministic across runtimes. */
+ * sorting uses code-unit order so it is deterministic across runtimes. Units
+ * the draw will take from the crafter's OWN signed buckets are split into
+ * their own signer-carrying takes (splitVaultTakesBySigner), so the host's
+ * ledger rows name the identity that really leaves the vault. */
 export function reservePlannedVaultConsumption(
   ctx: SimContext,
   pid: number,
@@ -1881,13 +1886,25 @@ export function reservePlannedVaultConsumption(
 ): VaultConsumptionReservation | null | undefined {
   const takes: VaultConsumptionTake[] = [];
   for (const plan of plans) {
-    for (const take of plan.vault) {
-      takes.push(Object.freeze({ itemId: take.itemId, count: take.count }));
-    }
+    for (const take of plan.vault) takes.push({ itemId: take.itemId, count: take.count });
   }
   if (takes.length === 0) return undefined;
   takes.sort((a, b) => (a.itemId < b.itemId ? -1 : a.itemId > b.itemId ? 1 : a.count - b.count));
-  return ctx.reserveVaultConsumption(pid, Object.freeze(takes), vaultUpgrades);
+  const meta = ctx.players.get(pid);
+  const offered = meta
+    ? splitVaultTakesBySigner(
+        takes,
+        meta.vault.stock,
+        meta.vault.special,
+        materialItemIds(),
+        meta.name,
+      )
+    : takes;
+  return ctx.reserveVaultConsumption(
+    pid,
+    Object.freeze(offered.map((take) => Object.freeze({ ...take }))),
+    vaultUpgrades,
+  );
 }
 
 /** Settle a planned vault reservation against what the apply loop really moved.
