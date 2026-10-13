@@ -73,7 +73,7 @@
 // Draws NO rng; reads entities by the claim's spawn-ordered roster
 // (claimInstance pushes one mob per DungeonSpawn, in order).
 
-import { rotY } from '../collider_pushout';
+import { rotY } from '../collider_shapes';
 import { DUNGEONS, instanceOrigin, MOBS } from '../data';
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
