@@ -14486,6 +14486,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showNameplateDots': 'Показывать мои эффекты на полосах имён',
   'hudChrome.options.nameplateDotScale': 'Размер эффектов на полосах имён',
   'hudChrome.options.showTargetDots': 'Показывать эффекты на целях',
+  'hudChrome.options.showDungeonHints': 'Подсказки по механикам подземелий',
+  'hudChrome.options.showDungeonHintsNote':
+    'Показывает подсказку, которая объясняет механику подземелья и что с ней делать. Отключение скрывает только эти подсказки: предупреждения на земле, полосы применения и отрицательные эффекты остаются. Подсказки, требующие действия, показываются всегда: клетка, из которой нужно вырваться, цепь, которую нужно разбить, предмет, который можно использовать.',
   'hudChrome.targetDots.title': 'Эффекты на целях',
   'hudChrome.targetDots.overflow': 'ещё {count}, не показаны',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Цель цели',

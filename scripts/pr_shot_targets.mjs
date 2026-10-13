@@ -1061,6 +1061,89 @@ const dotsOffSeed = async (page) => {
   );
 };
 
+// The "Dungeon mechanic hints" option (settings.showDungeonHints): stated ON
+// before the document loads, on the standing lowest preset. The harness
+// profile's localStorage outlives page.close, so a "hidden" variant's off
+// (set through the real options row below) would otherwise leak into the next
+// shot.
+const dungeonHintsOnSeed = async (page) => {
+  await lowGraphicsSeed(page);
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.showDungeonHints = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
+/** Turn the hints off the way a player does: Options, Interface, Combat, the
+ *  row's own button. Throws unless the button then reads off. */
+async function turnDungeonHintsOffThroughTheOption(page) {
+  await openInterfaceCombatTab(page);
+  const pressed = await page.evaluate(() => {
+    const toggle = document.querySelector('#options-menu [data-setting-key="showDungeonHints"]');
+    toggle?.click();
+    return toggle?.getAttribute('aria-pressed') ?? null;
+  });
+  if (pressed !== 'false')
+    throw new Error(`the Dungeon mechanic hints row did not turn off (aria-pressed=${pressed})`);
+  await wait(300);
+  await page.evaluate(() => window.__game?.hud?.toggleOptionsMenu?.());
+  await wait(500);
+}
+
+/** A real Sunken Bastion fight for the hints shots: a fresh run, the jump to
+ *  Knight-Commander Olen, the pull, then his Sentence of the Tide fired through
+ *  the playtest trigger until the Sentenced mark is on the local player. The
+ *  mark lasts five seconds, shorter than a software-rendered capture can be
+ *  trusted to take, so its clock (and the fight's own copy) is HELD for the
+ *  shot: the staging the frames disclose. Returns once the mark is up. */
+async function stageOlenSentence(page) {
+  const chat = async (line, ms) => {
+    await page.evaluate((l) => window.__game.world.chat(l), line);
+    await wait(ms);
+  };
+  for (const line of ['/dev level 20', '/dev god', '/dev bastion enter', '/dev bastion gates'])
+    await chat(line, 1300);
+  await chat('/dev bastion tp olen', 1500);
+  await waitForCurtainStreak(page);
+  await sweepOverlays(page, 3);
+  const pulled = await page.evaluate(() => {
+    const w = window.__game.world;
+    for (const e of w.ctx.entities.values()) {
+      if (e.kind !== 'mob' || e.templateId !== 'knight_commander_olen' || e.dead) continue;
+      // A deep pool so the fight outlasts the capture.
+      e.maxHp = 1e6;
+      e.hp = 1e6;
+      w.ctx.aggroMob(e, w.player, false);
+      w.targetEntity(e.id);
+      return true;
+    }
+    return false;
+  });
+  if (!pulled) throw new Error('Knight-Commander Olen is not in the room');
+  let marked = false;
+  for (let i = 0; i < 240 && !marked; i++) {
+    await chat('/dev bastion trigger sentence', 250);
+    marked = await page.evaluate(() =>
+      window.__game.world.player.auras.some((a) => a.id === 'bastion_sentenced'),
+    );
+  }
+  if (!marked) throw new Error('the Sentence of the Tide never marked the player');
+  await page.evaluate(() => {
+    const w = window.__game.world;
+    const hold = () => {
+      for (const a of w.player.auras) if (a.id === 'bastion_sentenced') a.remaining = 3;
+      for (const e of w.ctx.entities.values()) {
+        const sentence = e.bastionFight?.kind === 'olen' ? e.bastionFight.sentence : null;
+        if (sentence) sentence.remaining = 3;
+      }
+    };
+    hold();
+    const timer = setInterval(hold, 50);
+    setTimeout(() => clearInterval(timer), 30000);
+  });
+  // The trigger's own log lines scroll the chat; let the HUD paint the mark.
+  await wait(1200);
+}
+
 // Hub practice lessons (hub_lesson_controller.ts / hub_lesson_view.ts): shared
 // drivers for the two recipes below. Every one of these is a REAL interaction
 // through the actual control the coach names, never a synthetic completion of
@@ -4597,6 +4680,81 @@ export const TARGETS = [
     async capture(page) {
       await openInterfaceChatTab(page);
       return { clip: '#options-menu' };
+    },
+  },
+  {
+    // The "Dungeon mechanic hints" option (settings.showDungeonHints): its row,
+    // and one boss alert with the hints on and off. Keyed on the prompts' own
+    // modules (not options_view) so the options_view target order pinned in
+    // tests/pr_shot_targets.test.ts stays as it is.
+    key: 'dungeon-hints',
+    label:
+      'Dungeon mechanic hints: the Interface, Combat row, and a boss alert over the action bar with the hints on and off',
+    when: ['ui/hud/dungeon/dungeon_prompt'],
+    variants: [
+      { key: 'options-desktop', beforeLoad: dungeonHintsOnSeed },
+      { key: 'options-mobile', mobile: true, beforeLoad: dungeonHintsOnSeed },
+      { key: 'fight-shown-desktop', fight: true, hints: true, beforeLoad: dungeonHintsOnSeed },
+      { key: 'fight-hidden-desktop', fight: true, hints: false, beforeLoad: dungeonHintsOnSeed },
+      {
+        key: 'fight-shown-mobile',
+        mobile: true,
+        fight: true,
+        hints: true,
+        beforeLoad: dungeonHintsOnSeed,
+      },
+      {
+        key: 'fight-hidden-mobile',
+        mobile: true,
+        fight: true,
+        hints: false,
+        beforeLoad: dungeonHintsOnSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await sweepOverlays(page);
+      if (!variant?.fight) {
+        await openInterfaceCombatTab(page);
+        const row = await pollForSize(page, '#options-menu [data-setting-key="showDungeonHints"]');
+        if (!row) throw new Error('the Dungeon mechanic hints row is not in the Combat tab');
+        // A phone's panel is short enough to cut the row's button off under
+        // the footer: bring the row to the middle of the list when (and only
+        // when) its button is not wholly on screen, then prove it is.
+        const framed = await page.evaluate(() => {
+          const toggle = document.querySelector(
+            '#options-menu [data-setting-key="showDungeonHints"]',
+          );
+          const row = toggle?.closest('.set-row');
+          if (!toggle || !row) return false;
+          let scroller = row.parentElement;
+          while (scroller && scroller.scrollHeight <= scroller.clientHeight + 1)
+            scroller = scroller.parentElement;
+          const inView = () => {
+            const box = (scroller ?? document.documentElement).getBoundingClientRect();
+            const r = toggle.getBoundingClientRect();
+            return r.height > 0 && r.top >= box.top && r.bottom <= box.bottom;
+          };
+          if (!inView()) row.scrollIntoView({ block: 'center' });
+          return inView();
+        });
+        if (!framed) throw new Error('the Dungeon mechanic hints button is cut off in the panel');
+        await wait(300);
+        return { clip: '#options-menu' };
+      }
+      // The hidden arm flips the real row first, then fights the same fight.
+      if (!variant.hints) await turnDungeonHintsOffThroughTheOption(page);
+      await stageOlenSentence(page);
+      const state = await page.evaluate(() => {
+        const alert = document.querySelector('#bastion-alert');
+        return {
+          marked: window.__game.world.player.auras.some((a) => a.id === 'bastion_sentenced'),
+          alertShown: !!alert && getComputedStyle(alert).display !== 'none',
+          setting: window.__game.hud.optionsHooks?.settings.get('showDungeonHints'),
+        };
+      });
+      if (!state.marked || state.setting !== variant.hints || state.alertShown !== variant.hints)
+        throw new Error(`dungeon hints (${variant.key}) staged wrong: ${JSON.stringify(state)}`);
+      return {};
     },
   },
   {

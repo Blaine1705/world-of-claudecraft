@@ -672,6 +672,9 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/crypt_alert_scene_core.ts',
   // The trash engine's use prompt (a Soul Brazier to topple) and its scene scan.
   'src/ui/hud/dungeon/kit_use_prompt_view.ts',
+  // Which dungeon prompt the "Dungeon mechanic hints" setting governs, and who
+  // holds the prompts' shared slot.
+  'src/ui/hud/dungeon/dungeon_prompt_policy_core.ts',
   // The dungeon objectives tracker (the plate and its boss rows): what it
   // shows, and which rows a kill just lit.
   'src/ui/hud/dungeon/dungeon_tracker_view.ts',
