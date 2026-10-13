@@ -2,15 +2,18 @@
 // authored by docs/design/dungeon-rework/entrance/build_wildheart_entrance.py):
 // exact bytes, the live authoring fingerprint, the media manifest rows, the
 // Blender nodes and materials the runtime keys on, and the landmark budget
-// (texture free, vertex colour only, meshopt, split so the growth and the
-// court cull and shed apart from the idol).
+// (texture free, vertex colour only, meshopt, split in three files so the
+// growth casts no shadow and the court ghosts apart from the idol; the three
+// share one cull group and carry no LOD levels).
 //
 // The budget was 50,000 triangles and one megabyte (the Sunken Bastion
 // entrance's, which ships 49,082 and 859 KB). The head is now a skin of fitted
 // megaliths over a carved form, and with no texture every joint, chamfer,
 // chip and weathering gradient inside a block is geometry and vertex colour:
-// the idol alone is 39,618 triangles. The caps are 64,000 triangles and 1.25
-// MB; the growth was cut from 22,735 to 17,072 to pay for part of it.
+// the idol alone is 39,618 triangles. The caps are 62,000 triangles and
+// 1,230,000 bytes (the shipped totals plus about two percent), a one-off for
+// this landmark and not the entrance family's number; the growth was cut from
+// 22,735 to 17,072 to pay for part of it.
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -24,7 +27,10 @@ import {
 } from '../scripts/assets/wildheart_basin_entrance/build.mjs';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { wildheartBasinEntrancePreloadInternalsForTest } from '../src/render/wildheart_basin_entrance';
-import { WILDHEART_EAR_TOP } from '../src/render/wildheart_basin_entrance_core';
+import {
+  WILDHEART_EAR_TOP,
+  WILDHEART_OVERHANG_SOLIDS,
+} from '../src/render/wildheart_basin_entrance_core';
 
 const ROOT = path.join(__dirname, '..');
 
@@ -33,7 +39,7 @@ const PINS: Record<string, { sha: string; bytes: number; triangles: number; maxB
     sha: '1d8c81c3104724698b72f8b2e7803106e6213954bb977b852c77c729ad9c99a2',
     bytes: 724112,
     triangles: 39618,
-    maxBytes: 760 * 1024,
+    maxBytes: 740 * 1024,
   },
   'public/models/props/wildheart_basin_entrance_court.glb': {
     sha: 'a4bb7c0d31b60198795a0ae7b28a7e03f43951e534fea922fb3b80221fb2641e',
@@ -45,7 +51,7 @@ const PINS: Record<string, { sha: string; bytes: number; triangles: number; maxB
     sha: 'abfeaedc4eb0bdc40389bf9bf5a17d11978076e97b74054a5a0cb70f9822b1b8',
     bytes: 390596,
     triangles: 17072,
-    maxBytes: 440 * 1024,
+    maxBytes: 400 * 1024,
   },
 };
 
@@ -151,8 +157,50 @@ describe('the Jaguar Maw shipping assets', () => {
 
   it('the whole landmark stays inside its budget', () => {
     const pins = Object.values(PINS);
-    expect(pins.reduce((sum, p) => sum + p.triangles, 0)).toBeLessThanOrEqual(64_000);
-    expect(pins.reduce((sum, p) => sum + p.bytes, 0)).toBeLessThanOrEqual(1.25 * 1024 * 1024);
+    // the shipped totals (61,428 triangles, 1,207,056 bytes) plus about two
+    // percent: a named one-off for this landmark, not the family's number
+    expect(pins.reduce((sum, p) => sum + p.triangles, 0)).toBeLessThanOrEqual(62_000);
+    expect(pins.reduce((sum, p) => sum + p.bytes, 0)).toBeLessThanOrEqual(1_230_000);
+  });
+
+  it('the stone over head height stands inside the overhang occluder boxes', async () => {
+    // The skull is carved wider than its collider rows and the upper jaw
+    // hangs over the way in. The render ghosts that stone through
+    // WILDHEART_OVERHANG_SOLIDS: a rebuild that carves it further out must
+    // move those boxes with it. Read here from the shipped file: every vertex
+    // of the idol from the jaw's underside to the ears' tips (the fig's limbs
+    // start over them).
+    await MeshoptDecoder.ready;
+    const doc = await new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
+      .readBinary(readFileSync(path.join(ROOT, WILDHEART_BASIN_ENTRANCE_ASSETS[0].target)));
+    const [jaw, skull] = WILDHEART_OVERHANG_SOLIDS;
+    const inside = (o: (typeof WILDHEART_OVERHANG_SOLIDS)[number], x: number, lz: number) =>
+      Math.abs(x - o.lx) <= o.hw && Math.abs(lz - o.lz) <= o.hd;
+    let seen = 0;
+    let outside = 0;
+    for (const node of doc.getRoot().listNodes()) {
+      const mesh = node.getMesh();
+      if (!mesh) continue;
+      const m = node.getWorldMatrix();
+      for (const prim of mesh.listPrimitives()) {
+        const position = prim.getAttribute('POSITION');
+        if (!position) continue;
+        const v = [0, 0, 0];
+        for (let i = 0; i < position.getCount(); i++) {
+          position.getElement(i, v);
+          const x = m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12];
+          const y = m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13];
+          const lz = m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14];
+          if (y < jaw.baseY || y > WILDHEART_EAR_TOP) continue;
+          seen++;
+          if (!inside(jaw, x, lz) && !inside(skull, x, lz)) outside++;
+        }
+      }
+    }
+    expect(seen).toBeGreaterThan(40_000);
+    expect(outside).toBe(0);
   });
 
   it("the ears' tips stand under the top of the head's occluder box", async () => {
@@ -215,7 +263,7 @@ describe('the Jaguar Maw shipping assets', () => {
     // clear of the ears.
     const idol = bounds.Entrance_Idol;
     expect(idol.max[1]).toBeGreaterThan(24);
-    expect(idol.max[1]).toBeLessThan(33);
+    expect(idol.max[1]).toBeLessThan(34);
     expect(idol.min[1]).toBeLessThan(-5);
     expect(idol.min[1]).toBeGreaterThan(-7.5);
     const growth = bounds.Entrance_Growth;

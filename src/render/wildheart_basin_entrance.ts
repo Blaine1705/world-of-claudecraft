@@ -54,6 +54,7 @@ import {
   WILDHEART_MAW_LIGHT,
   WILDHEART_MIST_FIELDS,
   WILDHEART_MIST_NEAR,
+  WILDHEART_OVERHANG_SOLIDS,
   WILDHEART_THROAT,
   type WildheartEffectsTier,
   type WildheartMistPose,
@@ -807,6 +808,19 @@ export function buildWildheartBasinEntrance(seed: number): WildheartBasinEntranc
       topY: base + wildheartOccluderTop(row, (cameraTopY ?? base) - base),
     });
   });
+  // the stone over head height that no row stands under ghosts with the idol
+  for (const o of WILDHEART_OVERHANG_SOLIDS) {
+    solids.idol.push({
+      type: 'obb',
+      x: door.x + o.lx,
+      z: door.z + o.lz,
+      hw: o.hw,
+      hd: o.hd,
+      rot: 0,
+      topY: base + o.topY,
+      baseY: base + o.baseY,
+    });
+  }
   // One entrance per world: a rebuild in the same page retires the last one's.
   for (const handle of occluderHandles) handle.dispose();
   wildheartUniforms.uWildGhost.value = 1;

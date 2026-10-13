@@ -106,6 +106,19 @@ export function wildheartOccluderTop(rowName: string, top: number): number {
   return rowName === 'head' ? Math.max(top, WILDHEART_EAR_TOP) : top;
 }
 
+/** The idol's stone that no collider row stands under, as occluder boxes of
+ *  the render's own (door-local yards: x west, z north, heights over the
+ *  door). Over head height the skull is carved wider than its foot and the
+ *  upper jaw hangs out over the way in, so the rows' footprints alone would
+ *  leave a camera drawn back under the jaw or beside a cheek inside stone
+ *  with nothing ghosted. Each box begins at its `baseY`: a sight line under
+ *  the jaw, the plain view of someone walking in, passes. Pinned against the
+ *  shipped idol in tests/wildheart_basin_entrance_asset.test.ts. */
+export const WILDHEART_OVERHANG_SOLIDS = [
+  { name: 'jaw', lx: 0.33, lz: -2.41, hw: 10.92, hd: 3.17, baseY: 4.8, topY: 17.3 },
+  { name: 'skull', lx: 0.33, lz: 9.88, hw: 10.92, hd: 9.13, baseY: 4, topY: WILDHEART_EAR_TOP },
+] as const;
+
 /** How much of the flooded throat shows for the alpha the idol is drawn at
  *  (the registry's onFade): all of it while the idol is solid, none once the
  *  idol is the camera's ghost, so no lit window is left standing in the air
