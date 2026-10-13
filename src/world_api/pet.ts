@@ -1,5 +1,9 @@
 import type { PetMode } from '../sim/types';
 
+// The five pet-bar commands (the Ctrl+1..5 binds, and the commands an action-bar
+// slot can hold). Routed onto the methods below by src/game/pet_commands.ts.
+export type PetCommand = 'attack' | 'taunt' | 'stop' | 'defensive' | 'aggressive';
+
 export interface IWorldPet {
   readonly petSpecialCommandsSupported: boolean;
   abandonPet(): void;

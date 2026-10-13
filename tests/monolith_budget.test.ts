@@ -537,7 +537,12 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // Lowered from 18093 by the pet-commands-on-the-action-bar change: the pet
+    // bar's inline button builder moved out to src/ui/hud/pet_bar_button.ts
+    // (which now also owns the drag that copies a pet command onto a slot), so
+    // the cast, drop, tooltip and slot wiring the feature added here still nets
+    // the coordinator 127 lines smaller. Exact count, zero slack.
+    ceiling: 17966,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
