@@ -2457,6 +2457,8 @@ export const pl_PL: EnTranslations = {
       "groundReticle": "Celownik naziemny",
       "mouseoverCast": "Rzucanie po najechaniu na ramki drużyny",
       "stickyTarget": "Zachowaj cel po kliknięciu w ziemię",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "showReliquaryTracker": "Pokaż narzędzie do śledzenia relikwiarzy",
       "confirmVendorSell": "Potwierdzaj przed sprzedażą",

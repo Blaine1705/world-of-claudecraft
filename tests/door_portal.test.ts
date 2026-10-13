@@ -90,10 +90,60 @@ describe('buildDoorBody: Nythraxis crypt click-box', () => {
     );
     // the crypt stays a click-box regardless, other doors keep their arch
     expect(doorArchAuthoredElsewhere('nythraxis_crypt', [])).toBe(true);
-    expect(doorArchAuthoredElsewhere('wildheart_basin', [{ key: 'dungeon_entrance' }])).toBe(false);
+    expect(doorArchAuthoredElsewhere('nythraxis_boss_arena', [{ key: 'dungeon_entrance' }])).toBe(
+      false,
+    );
     // the lift back out of the approach keeps the normal leaving portal
     const exit = buildDoorBody(false, 'ignivar_forge_approach', false);
     expect(exit.portal).toBeDefined();
+  });
+});
+
+describe('buildDoorBody: the Sunken Bastion Drowned Gate Tower', () => {
+  it('the entering Bastion door is only the invisible click box: the gatehouse draws the portal', () => {
+    expect(doorArchAuthoredElsewhere('sunken_bastion')).toBe(true);
+    const { body, portal } = buildDoorBody(true, 'sunken_bastion', false);
+    expect(portal).toBeUndefined();
+    expect(meshes(body).length).toBe(1);
+    // the exit inside the instance keeps the generic arch and its swirl
+    expect(buildDoorBody(false, 'sunken_bastion', false).portal).toBeDefined();
+  });
+});
+
+describe('buildDoorBody: the Hollow Crypt Fallen Chapel', () => {
+  it('the entering Crypt door is only the invisible click box: the chapel draws the portal', () => {
+    expect(doorArchAuthoredElsewhere('hollow_crypt')).toBe(true);
+    const { body, portal } = buildDoorBody(true, 'hollow_crypt', false);
+    expect(portal).toBeUndefined();
+    let count = 0;
+    body.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) count++;
+    });
+    expect(count).toBe(1);
+    // the exit inside the instance keeps the generic arch and its swirl
+    expect(buildDoorBody(false, 'hollow_crypt', false).portal).toBeDefined();
+  });
+});
+
+describe('buildDoorBody: the Drowned Temple Moon Stair', () => {
+  it('the entering Temple door is only the invisible click box: the moongate draws the portal', () => {
+    expect(doorArchAuthoredElsewhere('drowned_temple')).toBe(true);
+    const { body, portal } = buildDoorBody(true, 'drowned_temple', false);
+    expect(portal).toBeUndefined();
+    expect(meshes(body).length).toBe(1);
+    // the exit inside the instance keeps the generic arch and its swirl
+    expect(buildDoorBody(false, 'drowned_temple', false).portal).toBeDefined();
+  });
+});
+
+describe('buildDoorBody: the Wildheart Basin Jaguar Maw', () => {
+  it('the entering Basin door is only the invisible click box: the idol draws the portal', () => {
+    expect(doorArchAuthoredElsewhere('wildheart_basin')).toBe(true);
+    const { body, portal } = buildDoorBody(true, 'wildheart_basin', false);
+    expect(portal).toBeUndefined();
+    expect(meshes(body).length).toBe(1);
+    // the exit inside the instance keeps its own gate and membrane
+    expect(buildDoorBody(false, 'wildheart_basin', false).portal).toBeDefined();
   });
 });
 

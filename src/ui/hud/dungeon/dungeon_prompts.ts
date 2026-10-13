@@ -25,6 +25,11 @@
 // prompt when it has a body to offer (the relight prompt at a candle); the
 // interact press itself still kicks the brazier
 // whatever the slot shows (src/game/nearby_interaction_core.ts).
+//
+// The player's "Dungeon mechanic hints" setting hides the ADVISORY alerts (the
+// four encounter alert family members) and nothing else; a hidden alert is not
+// built and never holds the slot. Which prompt the setting governs and who
+// holds the slot are both decided in dungeon_prompt_policy_core.ts.
 
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
@@ -36,6 +41,11 @@ import {
   CRYPT_SOFT_ALERT_KINDS,
   type CryptAlertView,
 } from './crypt_alert_view';
+import {
+  type DungeonPromptSlotState,
+  dungeonPromptEnabled,
+  usePromptYields,
+} from './dungeon_prompt_policy_core';
 import { EncounterAlert } from './encounter_alert_painter';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
@@ -50,6 +60,8 @@ import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view
 import { buildWildheartAlertView, WILDHEART_ALERT_KINDS } from './wildheart_alert_view';
 
 const KIT_USE_HIDDEN = { visible: false } as const;
+/** An advisory alert the hints setting hides (never built that frame). */
+const HINT_HIDDEN = { visible: false } as const;
 
 export interface DungeonPromptsFrame {
   player: {
@@ -88,6 +100,9 @@ export interface DungeonPromptsFrame {
   /** The interact key's label ('' when unbound). */
   interactKey: string;
   touch: boolean;
+  /** The player's "Dungeon mechanic hints" setting: false hides the advisory
+   *  alerts only (dungeon_prompt_policy_core.ts), never a prompt to press. */
+  mechanicHints: boolean;
 }
 
 export class DungeonPrompts {
@@ -106,6 +121,16 @@ export class DungeonPrompts {
   private world: DungeonPromptsFrame['world'] | null = null;
   /** One lookup for every view (no closure a frame). */
   private readonly entity = (id: number) => this.world?.entities.get(id);
+  /** What is showing above the use prompt (one object, rewritten a frame). */
+  private readonly slot: DungeonPromptSlotState = {
+    cage: false,
+    chain: false,
+    bastion: false,
+    wildheart: false,
+    sanctum: false,
+    crypt: false,
+    cryptSoft: false,
+  };
 
   constructor(deps: CageEscapeDeps) {
     this.cage = new CageEscapePrompt(deps);
@@ -168,41 +193,52 @@ export class DungeonPrompts {
       party: f.party,
     });
     this.chain.paint(chain);
-    const bastion = buildBastionAlertView({ auras: p.auras, targetId: p.targetId, entity });
+    // The advisory alerts: built only while the hints setting lets them show.
+    const hints = f.mechanicHints;
+    const bastion = dungeonPromptEnabled('bastion', hints)
+      ? buildBastionAlertView({ auras: p.auras, targetId: p.targetId, entity })
+      : HINT_HIDDEN;
     this.bastion.paint(bastion);
-    const wildheart = buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity });
+    const wildheart = dungeonPromptEnabled('wildheart', hints)
+      ? buildWildheartAlertView({ auras: p.auras, targetId: p.targetId, entity })
+      : HINT_HIDDEN;
     this.wildheart.paint(wildheart);
     // The UI clock (seconds): an Ice Slab's cover hint shows for its first moments.
     const now = performance.now() / 1000;
-    const sanctum = buildSanctumAlertView({
-      selfId: p.id,
-      selfPos: p.pos,
-      auras: p.auras,
-      targetId: p.targetId,
-      entity,
-      scene: this.sanctumScene.update(f.world, now),
-      now,
-    });
+    const sanctum = dungeonPromptEnabled('sanctum', hints)
+      ? buildSanctumAlertView({
+          selfId: p.id,
+          selfPos: p.pos,
+          auras: p.auras,
+          targetId: p.targetId,
+          entity,
+          scene: this.sanctumScene.update(f.world, now),
+          now,
+        })
+      : HINT_HIDDEN;
     this.sanctum.paint(sanctum);
-    let crypt: CryptAlertView = buildCryptAlertView({
-      selfId: p.id,
-      selfPos: p.pos,
-      auras: p.auras,
-      targetId: p.targetId,
-      entity,
-      scene: this.cryptScene.update(f.world),
-    });
+    let crypt: CryptAlertView = dungeonPromptEnabled('crypt', hints)
+      ? buildCryptAlertView({
+          selfId: p.id,
+          selfPos: p.pos,
+          auras: p.auras,
+          targetId: p.targetId,
+          entity,
+          scene: this.cryptScene.update(f.world),
+        })
+      : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
-    // The use prompt last: it yields the shared slot to any prompt above (a
-    // soft Crypt readout yields to it instead).
-    const slotTaken =
-      cage.visible ||
-      chain.visible ||
-      bastion.visible ||
-      wildheart.visible ||
-      sanctum.visible ||
-      (crypt.visible && !cryptSoft);
-    const use = slotTaken
+    // The use prompt last: it yields the shared slot to any prompt showing
+    // above (a soft Crypt readout yields to it instead).
+    const slot = this.slot;
+    slot.cage = cage.visible;
+    slot.chain = chain.visible;
+    slot.bastion = bastion.visible;
+    slot.wildheart = wildheart.visible;
+    slot.sanctum = sanctum.visible;
+    slot.crypt = crypt.visible;
+    slot.cryptSoft = cryptSoft;
+    const use = usePromptYields(slot)
       ? null
       : buildKitUsePromptView({
           self: p,

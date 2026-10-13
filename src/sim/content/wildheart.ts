@@ -1382,9 +1382,10 @@ export const WILDHEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: WILDHEART_DUNGEON,
     name: 'The Wildheart Basin',
     index: 7,
-    // Hidden beyond the Sunken Idol, clear of its overworld guardian and the
-    // Sapphire Lagoon. The door reads as the newly opened idol maw.
-    doorPos: { x: -232, z: 1112 },
+    // Beside the Sunken Idol's ring, clear of its overworld guardian: on the
+    // flat ground where the road comes up from the south, backed into the
+    // knoll over the Sapphire Lagoon. The door reads as the newly opened idol maw.
+    doorPos: { x: -237, z: 1093 },
     // The arrival on the Idol Maw Landing, 40 yd above the ford, the whole
     // caldera in view and the first pack 40 yd off down the Fern Steps.
     entry: { x: WILDHEART_BASIN_ANCHORS.entry.x, z: WILDHEART_BASIN_ANCHORS.entry.z },

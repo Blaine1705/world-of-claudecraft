@@ -13580,6 +13580,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showNameplateDots': '在姓名板上显示我的减益',
   'hudChrome.options.nameplateDotScale': '姓名板减益图标大小',
   'hudChrome.options.showTargetDots': '显示目标减益追踪',
+  'hudChrome.options.showDungeonHints': '地下城机制提示',
+  'hudChrome.options.showDungeonHintsNote':
+    '显示提示面板，说明地下城机制以及应对方法。关闭后只隐藏这些提示：地面警示、施法条和减益效果仍会显示。需要你操作的提示始终显示：需要挣脱的牢笼、需要打断的锁链、可以使用的物体。',
   'hudChrome.targetDots.title': '目标减益',
   'hudChrome.targetDots.overflow': '还有 {count} 个未显示',
   'hudChrome.unitFrame.targetOfTargetLabel': '目标的目标',

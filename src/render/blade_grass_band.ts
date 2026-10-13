@@ -46,7 +46,7 @@ import {
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
 import { GRASS_BIOME_DENSITY } from './foliage';
-import { insideGrassHubExclusion } from './foliage_core';
+import { insideGrassHubExclusion, insidePavedGrassExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { GFX, sharedUniforms } from './gfx';
 import { getGrassGroundBake } from './grass_ground_bake';
@@ -213,6 +213,7 @@ export function buildBladeGrassBand(
       // the player steps back from it.
       if (ok) ok = !grassClearedAt(getActiveWorldContent().grassClear, x, z);
       if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
+      if (ok) ok = !insidePavedGrassExclusion(x, z);
       if (ok) {
         const h = terrainHeight(x, z, seed);
         ok = h > WATER_LEVEL + 1.4;

@@ -2457,6 +2457,8 @@ export const zh_CN: EnTranslations = {
       "groundReticle": "地面瞄准指示圈",
       "mouseoverCast": "队伍头像上鼠标悬停施法",
       "stickyTarget": "点击地面时保留目标",
+      "showDungeonHints": "地下城机制提示",
+      "showDungeonHintsNote": "显示提示面板，说明地下城机制以及应对方法。关闭后只隐藏这些提示：地面警示、施法条和减益效果仍会显示。需要你操作的提示始终显示：需要挣脱的牢笼、需要打断的锁链、可以使用的物体。",
       "showItemLevel": "显示物品等级",
       "showReliquaryTracker": "显示圣物库追踪器",
       "confirmVendorSell": "出售前确认",

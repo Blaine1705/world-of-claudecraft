@@ -2808,6 +2808,15 @@ export const hudChromeStrings = {
     // the classic behavior). On keeps the target on a ground left-click so
     // click-to-move repositioning does not deselect.
     stickyTarget: 'Keep Target on Ground Click',
+    // Interface > Combat toggle (on by default) for the ADVISORY dungeon
+    // alerts: the tip panel that explains a mechanic (over the action bar on
+    // desktop, upper centre on touch, so the copy names no position). The
+    // note says what turning it off does NOT hide (the prompts a player acts
+    // on, and everything outside this panel). Both values are wordy (M16): the
+    // five non-Latin fills land in this same change.
+    showDungeonHints: 'Dungeon mechanic hints',
+    showDungeonHintsNote:
+      'Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.',
     // Interface panel toggle + the item-tooltip lines it reveals (off by default).
     showItemLevel: 'Show Item Level',
     // Interface panel toggle for the on-screen Reliquary tracker (on by

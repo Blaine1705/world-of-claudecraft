@@ -13581,6 +13581,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showNameplateDots': '在名條上顯示我的減益',
   'hudChrome.options.nameplateDotScale': '名條減益圖示大小',
   'hudChrome.options.showTargetDots': '顯示目標減益追蹤',
+  'hudChrome.options.showDungeonHints': '地城機制提示',
+  'hudChrome.options.showDungeonHintsNote':
+    '顯示提示面板，說明地城機制以及應對方法。關閉後只隱藏這些提示：地面警示、施法條和減益效果仍會顯示。需要你操作的提示一律顯示：需要掙脫的牢籠、需要打斷的鎖鏈、可以使用的物體。',
   'hudChrome.targetDots.title': '目標減益',
   'hudChrome.targetDots.overflow': '另有 {count} 個未顯示',
   'hudChrome.unitFrame.targetOfTargetLabel': '目標的目標',

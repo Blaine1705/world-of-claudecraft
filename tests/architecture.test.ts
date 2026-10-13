@@ -672,6 +672,9 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/crypt_alert_scene_core.ts',
   // The trash engine's use prompt (a Soul Brazier to topple) and its scene scan.
   'src/ui/hud/dungeon/kit_use_prompt_view.ts',
+  // Which dungeon prompt the "Dungeon mechanic hints" setting governs, and who
+  // holds the prompts' shared slot.
+  'src/ui/hud/dungeon/dungeon_prompt_policy_core.ts',
   // The dungeon objectives tracker (the plate and its boss rows): what it
   // shows, and which rows a kill just lit.
   'src/ui/hud/dungeon/dungeon_tracker_view.ts',
@@ -1020,6 +1023,21 @@ const RENDER_PURE_CORES = [
   'src/render/hoard_entrance_core.ts',
   // The Gravewyrm Sanctum Seal Gate's cosmetic plan (mist flow, rime fan).
   'src/render/sanctum_seal_gate_core.ts',
+  // The Sunken Bastion's Drowned Gate Tower: the Fogbeacon's turn, the flooded
+  // passage's trace, the marsh fog's puffs and the gate sprites.
+  'src/render/sunken_bastion_entrance_core.ts',
+  // What a built set piece puts between the chase camera and the character:
+  // one occluder box per collider row, tested with the fade family's own test.
+  'src/render/set_piece_occluders_core.ts',
+  // The Hollow Crypt's Fallen Chapel: the virtual stair trace, the grave
+  // mist's puffs and the spirit sprites (flames, motes, wisps, rose glow).
+  'src/render/hollow_crypt_entrance_core.ts',
+  // The Drowned Temple's Moon Stair: the moonrise's clock, the pool's moon and
+  // its parallax, the mirror's sight of the gate, the mist and the sprites.
+  'src/render/drowned_temple_entrance_core.ts',
+  // The Wildheart Basin's Jaguar Maw: the idol's breath, the flooded throat's
+  // trace, the mist's puffs and the maw's sprites.
+  'src/render/wildheart_basin_entrance_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',

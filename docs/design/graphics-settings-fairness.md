@@ -629,6 +629,27 @@ a cosmetic ease on the tiers that chose it, the same one the reduced-motion sett
 already removes, and never a hidden entity.
 The choice reads the static preset or the player's own dial, never the FPS governor.
 
+### The dungeon mechanic hints are a player's choice, not a tier knob (2026-10-13)
+
+`settings.showDungeonHints` (Options, Interface, Combat: "Dungeon mechanic hints", on by
+default) lets a player hide the ADVISORY dungeon alerts: the tip panel in the dungeon prompts'
+slot that names a mechanic and says what to do about it (the encounter alert family the
+`DungeonPrompts` composer paints for the Sunken Bastion's crown, the Wildheart Basin, the
+Gravewyrm Sanctum and the Hollow Crypt). It is the same class of switch as the Target dots
+frame and the aura tracks: an interface preference the PLAYER sets for themselves, so it is
+not a fairness question the way a preset is. What keeps it honest is that it stays one:
+
+- No graphics preset, effects profile, tier knob or governor reads or writes it. The HUD hands
+  the composer the setting's own boolean and nothing else, and the alerts themselves are still
+  never tier-gated: with the setting on, they paint every frame on every preset.
+- It governs advisory text only. The prompts a player presses or steers by are outside it
+  (`DUNGEON_PROMPT_ADVISORY` in `src/ui/hud/dungeon/dungeon_prompt_policy_core.ts`): the Iron Cage
+  escape, Gaoler Ossick's chain alert (the links left and the shackle's reach are a live gauge)
+  and the use prompt. A hidden alert never holds the prompts' shared slot, so the use prompt
+  shows exactly as it does with no alert up.
+- It touches nothing outside that panel: ground telegraphs, cast bars, auras and nameplates
+  have no read of it.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -819,6 +840,13 @@ The choice reads the static preset or the player's own dial, never the FPS gover
   motion signature (ring position, sprite shape, and the fear band's vertical bob), so the
   distinction survives for a colourblind player rather than resting on hue alone.
 
+- `tests/dungeon_hints_setting.test.ts`: the dungeon mechanic hints setting holds its value
+  across every graphics preset and moves none; the policy and the composer are scanned
+  profile- and governor-free; the client source names the setting in exactly three places (the
+  settings table, the options row, the HUD pass-through), and the HUD passes it uncombined.
+  `tests/dungeon_prompt_policy.test.ts`: the advisory set is literal-pinned, and with the
+  hints off the cage escape, the chain alert and the use prompt still show and still take
+  their press.
 - `tests/frame_cadence.test.ts`: the divisor tables, the 24 images per second floor and the
   one-input-tick bound on every display rate, and that the limit yields to a loading cover,
   a held world draw and a hidden desktop shell. `tests/frame_cadence_fairness.test.ts`: the

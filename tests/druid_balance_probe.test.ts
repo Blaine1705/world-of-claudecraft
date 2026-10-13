@@ -106,10 +106,26 @@ const FERAL_LOADOUT = {
 // Measured identically on the integration tip and on the faction ladder
 // branch (PR 4169). Moongrove (5982/225/5983/7) and Bruin (3060/139/
 // 10541.4575/4) stayed inside their bands and keep their anchors.
+// RE-MEASURED 2026-10-13 for all three arms, at the four built dungeon
+// entrances (src/sim/*_entrance.ts). No druid, combat or tuning code moved:
+// the entrances' colliders push the spawn point of three neighbouring world
+// mobs, the Wildheart Basin door moved and the Idol Guardian's camp with it,
+// and every world mob's idle wander draws from the shared stream, so this
+// seed's whole trace re-rolls. Moongrove 5956/212/5957/7 to 5637/273/5638/7
+// (only the wolf's incoming left its old band), wildfang 5315/201/6228.5225/8
+// to 6126/172/7178.609/10 (off the low eight-payoff trace it had sat on since
+// 2026-09-20), bruin 3082/131/10651.925/4 to 2721/142/8804.0075/4. Each new
+// row is an ordinary trace of the same rotation on this tree, read against
+// the neighbouring seeds: moongrove 5329 to 6004 damage and 208 to 285
+// incoming over seeds 42421 to 42436 (payoffs 7 on every one); wildfang 5962
+// to 7419 damage, 168 to 266 incoming and 10 or 12 payoffs over 42421 to
+// 42428; bruin 2309 to 3240 damage, 96 to 161 incoming and 3 or 4 payoffs
+// over the same eight. The matrix test below, whose bands are design bands
+// rather than measurements, still holds on this tree. BAND stays 0.08.
 const LIVE_MOB_MEASURED = {
-  moongrove: { damage: 5956, incomingDamage: 212, threat: 5957, payoffs: 7 },
-  wildfang: { damage: 5315, incomingDamage: 201, threat: 6228.5225, payoffs: 8 },
-  bruin: { damage: 3082, incomingDamage: 131, threat: 10651.925, payoffs: 4 },
+  moongrove: { damage: 5637, incomingDamage: 273, threat: 5638, payoffs: 7 },
+  wildfang: { damage: 6126, incomingDamage: 172, threat: 7178.609, payoffs: 10 },
+  bruin: { damage: 2721, incomingDamage: 142, threat: 8804.0075, payoffs: 4 },
 } as const;
 const BRUIN_TANK_MEASURED = {
   wolfIncomingDamage: 220,

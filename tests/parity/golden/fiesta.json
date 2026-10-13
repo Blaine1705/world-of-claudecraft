@@ -55,8 +55,8 @@
       "state": "f819eae9",
       "events": "f3c46c01",
       "rng": {
-        "draws": 247,
-        "digest": "6b3f31b5"
+        "draws": 246,
+        "digest": "8266846b"
       }
     },
     {
@@ -66,8 +66,8 @@
       "state": "63c4f11e",
       "events": "1b9b3d0d",
       "rng": {
-        "draws": 485,
-        "digest": "b0986e30"
+        "draws": 482,
+        "digest": "1bf852d5"
       }
     },
     {
@@ -77,8 +77,8 @@
       "state": "4282aa9f",
       "events": "f71b8be8",
       "rng": {
-        "draws": 756,
-        "digest": "b0eecf8d"
+        "draws": 757,
+        "digest": "c785d863"
       }
     },
     {
@@ -88,8 +88,8 @@
       "state": "8a2b1658",
       "events": "741638a5",
       "rng": {
-        "draws": 1041,
-        "digest": "4a68f71a"
+        "draws": 1028,
+        "digest": "b0a85b51"
       }
     },
     {

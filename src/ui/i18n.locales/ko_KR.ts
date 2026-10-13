@@ -14211,6 +14211,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showNameplateDots': '이름표에 내 디버프 표시',
   'hudChrome.options.nameplateDotScale': '이름표 디버프 아이콘 크기',
   'hudChrome.options.showTargetDots': '대상 디버프 목록 표시',
+  'hudChrome.options.showDungeonHints': '던전 기믹 도움말',
+  'hudChrome.options.showDungeonHintsNote':
+    '던전 기믹과 대처 방법을 설명하는 도움말 패널을 표시합니다. 이 설정을 끄면 해당 도움말만 숨겨지며, 바닥 경고, 시전 막대, 디버프는 그대로 표시됩니다. 직접 조작해야 하는 안내는 항상 표시됩니다: 탈출해야 하는 우리, 끊어야 하는 사슬, 사용할 수 있는 물체.',
   'hudChrome.targetDots.title': '대상 디버프',
   'hudChrome.targetDots.overflow': '{count}개 더 있음, 표시되지 않음',
   'hudChrome.unitFrame.targetOfTargetLabel': '대상의 대상',
