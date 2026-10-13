@@ -1523,7 +1523,7 @@ describe('the audit arm (mutation check: a dropped or bent row is caught)', () =
     // mismatch this guards against.
     const pooledOnly = rows.map((r) => (r.op === 'craft_consume' ? { ...r, instance: null } : r));
     expect(audit(pooledOnly).map((f) => f.kind)).toContain('ledger_state_mismatch');
-  }, 60_000);
+  });
 });
 
 // ---------------------------------------------------------------------------
