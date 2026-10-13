@@ -4347,6 +4347,32 @@ export const pl_PL: EnTranslations = {
       "imported": "Układ skrótów zaimportowany.",
       "wrongKind": "Ten kod jest eksportem ustawień, a nie układem skrótów."
     },
+    "keybindLayout": {
+      "title": "Keyboard Layout",
+      "open": "Convert",
+      "from": "Hotkeys made for",
+      "to": "Convert to",
+      "keepMovement": "Keep movement keys in place",
+      "help": "Each hotkey moves to the key that prints the same character on the new layout, so M still opens the map. The number row stays where it is.",
+      "moves": "Hotkeys that will move: {count}",
+      "noChange": "No hotkeys change between these layouts.",
+      "apply": "Convert Hotkeys",
+      "converted": "Hotkeys converted from {from} to {to}.",
+      "layouts": {
+        "qwertyUs": "QWERTY (US)",
+        "qwertyUk": "QWERTY (UK)",
+        "qwertzDe": "QWERTZ (German)",
+        "qwertzCh": "QWERTZ (Swiss)",
+        "azertyFr": "AZERTY (French)",
+        "azertyBe": "AZERTY (Belgian)",
+        "qwertyEs": "QWERTY (Spanish)",
+        "qwertyIt": "QWERTY (Italian)",
+        "qwertyNordic": "QWERTY (Nordic)",
+        "qwertyBr": "QWERTY (Brazilian ABNT2)",
+        "dvorak": "Dvorak",
+        "colemak": "Colemak"
+      }
+    },
     "keyboardMap": {
       "title": "Przegląd klawiatury",
       "hint": "Używane klawisze są pokolorowane według kategorii. Najedź na klawisz lub ustaw na nim fokus, aby zobaczyć wszystko, co jest do niego przypisane.",

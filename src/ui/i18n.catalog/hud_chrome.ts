@@ -5840,6 +5840,39 @@ export const hudChromeStrings = {
     imported: 'Hotkey setup imported.',
     wrongKind: 'That code is a settings export, not a hotkey setup.',
   },
+  // The Key Bindings panel's keyboard-layout converter
+  // (keybind_layout_convert_rows.ts over keyboard_layout_convert_core.ts):
+  // moves every hotkey to the key that prints the same character on another
+  // layout. QWERTY, QWERTZ, AZERTY, Dvorak and Colemak are layout names; the
+  // wordy rows (M16) get their five non-Latin fills in this same change.
+  keybindLayout: {
+    title: 'Keyboard Layout',
+    open: 'Convert',
+    from: 'Hotkeys made for',
+    to: 'Convert to',
+    keepMovement: 'Keep movement keys in place',
+    help: 'Each hotkey moves to the key that prints the same character on the new layout, so M still opens the map. The number row stays where it is.',
+    // {count} is how many hotkeys land on a different key.
+    moves: 'Hotkeys that will move: {count}',
+    noChange: 'No hotkeys change between these layouts.',
+    apply: 'Convert Hotkeys',
+    // {from} and {to} are layout names from layouts.* below.
+    converted: 'Hotkeys converted from {from} to {to}.',
+    layouts: {
+      qwertyUs: 'QWERTY (US)',
+      qwertyUk: 'QWERTY (UK)',
+      qwertzDe: 'QWERTZ (German)',
+      qwertzCh: 'QWERTZ (Swiss)',
+      azertyFr: 'AZERTY (French)',
+      azertyBe: 'AZERTY (Belgian)',
+      qwertyEs: 'QWERTY (Spanish)',
+      qwertyIt: 'QWERTY (Italian)',
+      qwertyNordic: 'QWERTY (Nordic)',
+      qwertyBr: 'QWERTY (Brazilian ABNT2)',
+      dvorak: 'Dvorak',
+      colemak: 'Colemak',
+    },
+  },
   // The Key Bindings panel's keyboard overview (src/ui/keyboard_map.ts): a live
   // keyboard with every key in use coloured by category and captioned with its
   // action, shown one modifier layer at a time. The layer names (Ctrl, Alt) are

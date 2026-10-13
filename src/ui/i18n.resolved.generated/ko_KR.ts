@@ -4347,6 +4347,32 @@ export const ko_KR: EnTranslations = {
       "imported": "단축키 설정을 가져왔습니다.",
       "wrongKind": "이 코드는 설정 내보내기이며 단축키 설정이 아닙니다."
     },
+    "keybindLayout": {
+      "title": "키보드 배열",
+      "open": "변환",
+      "from": "단축키 원래 배열",
+      "to": "변환할 배열",
+      "keepMovement": "이동 키는 그대로 유지",
+      "help": "각 단축키는 새 배열에서 같은 문자를 입력하는 키로 옮겨지므로 M을 누르면 계속 지도가 열립니다. 숫자 줄은 그대로 유지됩니다.",
+      "moves": "이동할 단축키: {count}",
+      "noChange": "이 배열 사이에서 바뀌는 단축키가 없습니다.",
+      "apply": "단축키 변환",
+      "converted": "단축키를 {from}에서 {to}(으)로 변환했습니다.",
+      "layouts": {
+        "qwertyUs": "QWERTY (US)",
+        "qwertyUk": "QWERTY (UK)",
+        "qwertzDe": "QWERTZ (독일어)",
+        "qwertzCh": "QWERTZ (스위스)",
+        "azertyFr": "AZERTY (프랑스어)",
+        "azertyBe": "AZERTY (벨기에)",
+        "qwertyEs": "QWERTY (스페인어)",
+        "qwertyIt": "QWERTY (이탈리아어)",
+        "qwertyNordic": "QWERTY (북유럽)",
+        "qwertyBr": "QWERTY (브라질 ABNT2)",
+        "dvorak": "드보락",
+        "colemak": "콜맥"
+      }
+    },
     "keyboardMap": {
       "title": "키보드 개요",
       "hint": "사용 중인 키는 범주별로 색이 칠해집니다. 키에 마우스를 올리거나 포커스하면 그 키의 모든 지정을 볼 수 있습니다.",
