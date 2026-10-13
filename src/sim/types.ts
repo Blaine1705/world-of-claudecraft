@@ -5218,10 +5218,14 @@ export interface KitUseDef {
    *  from the user. 'relight': the body's dungeon module reads the completion
    *  off the body (`Entity.kitUseCompletedBy`) and decides what it lights
    *  (the Hollow Crypt's Remembrance Candles, encounters/hollow_crypt/
-   *  morthen_candles.ts). */
+   *  morthen_candles.ts). 'free': the same hand-off to the dungeon module,
+   *  for a body that holds a player (the Wildheart Basin's Hunting Spear,
+   *  encounters/wildheart_basin/zulgar_spear.ts); only the prompt's copy
+   *  differs. */
   effect:
     | { kind: 'topple'; ahead: number; hazard: KitHazardDef }
-    | { kind: 'relight'; school: Aura['school'] };
+    | { kind: 'relight'; school: Aura['school'] }
+    | { kind: 'free'; school: Aura['school'] };
   /** The use is NOT broken by a hit that lands on the user (a step, a stun,
    *  death or drifting out of reach still break it): the candle's channel
    *  drains its lighter's health and the healer heals them through it. */
@@ -5831,12 +5835,51 @@ export interface GorgebloomFightState {
 }
 
 /** Zulgar's pull (encounters/wildheart_basin/zulgar.ts). */
+/** One sun glyph of Zulgar's terrace (zulgar_glyphs.ts). */
+export interface ZulgarGlyphState {
+  /** Its encounter object (the look: lit or dark, and its clocks). */
+  objectId: number;
+  lit: boolean;
+  /** Seconds a player has stood lighting it (0 when nobody does). */
+  kindle: number;
+  /** Seconds left before a spent glyph can be lit again. */
+  cold: number;
+}
+
+/** A Hunting Spear standing in the terrace (zulgar_spear.ts). */
+export interface ZulgarSpearState {
+  /** The spear's usable body and the player it pins. */
+  bodyId: number;
+  victimId: number;
+  /** Seconds it has stood, and bleeds dealt. */
+  age: number;
+  bleeds: number;
+  /** Where it pinned its victim (world): a shove never drags them off it. */
+  x: number;
+  y: number;
+  z: number;
+}
+
+/** The Idol's Breath of the final phase (zulgar_idol.ts). */
+export interface ZulgarIdolState {
+  /** Seconds to the next warning. */
+  timer: number;
+  /** The half the next exhale marks (+1 east, -1 west). */
+  side: 1 | -1;
+  /** The exhale in flight: its object, its half, and the seconds left of
+   *  its warning (then of its pour). */
+  breath: { objectId: number; side: 1 | -1; left: number; landed: boolean } | null;
+}
+
 export interface ZulgarFightState {
   kind: 'zulgar';
-  phase: 'fight' | 'hunt' | 'ambush';
+  /** `final`: The Idol Wakes (30 percent): the avatar hunts until he dies. */
+  phase: 'fight' | 'hunt' | 'ambush' | 'final';
   pulseTimer: number;
   /** Spirit of the Hunt thresholds fired (70 and 40 percent). */
   huntsFired: number;
+  /** The Idol Wakes has begun (its 30 percent threshold fires once a pull). */
+  idolFired: boolean;
   /** Seconds left of the hunt (or of the ambush). */
   huntLeft: number;
   /** The prey marks (two on heroic Twin Prey) and which one he chases. */
@@ -5852,9 +5895,20 @@ export interface ZulgarFightState {
   respite: { id: number; left: number }[];
   /** He roared over the kill, waiting out a respite with nobody to hunt. */
   waiting: boolean;
-  /** Seconds each sun glyph stays dark (0 = lit), and its object. */
-  glyphDark: number[];
-  glyphIds: number[];
+  /** The six sun glyphs, in SUN_GLYPHS order. */
+  glyphs: ZulgarGlyphState[];
+  /** Seconds a Sunstruck avatar is still wary of the sun: no glyph strikes
+   *  him again until it runs out. */
+  sunWary: number;
+  /** Seconds to the next Hunting Spear, the pick its bar is aimed at, and
+   *  the spears standing. */
+  spearTimer: number;
+  spearTargetId: number | null;
+  spears: ZulgarSpearState[];
+  /** The final phase's Prey clock (seconds to the next switch) and the
+   *  idol's breath; null until the idol wakes. */
+  markClock: number;
+  idol: ZulgarIdolState | null;
   /** Heroic Ambush: the marked spot (instance-local) and its circle. */
   ambushAt: { x: number; z: number } | null;
   ambushMarkId: number | null;
@@ -8115,7 +8169,7 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Sexton Marrow, the Lady of the Bonechill, Cantor Ilvane). Sim authority
    *  only; the client reads casts, auras and the encounter objects. */
   cryptBossFight?: CryptBossFightState;
-  /** A 'relight' G3 use completed on this body (mob/trash_kit/encounter_use.ts):
+  /** A 'relight' or 'free' G3 use completed on this body (mob/trash_kit/encounter_use.ts):
    *  the user's entity id, read and cleared by the dungeon module that owns
    *  the body on its next pass. Sim authority only. */
   kitUseCompletedBy?: number;
