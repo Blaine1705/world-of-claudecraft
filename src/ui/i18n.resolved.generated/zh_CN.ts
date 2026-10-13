@@ -4187,6 +4187,10 @@ export const zh_CN: EnTranslations = {
         "pinned": "一支狩猎之矛把你钉在原地。你每{every}秒流血，受到{bleed}点物理伤害（英雄难度{heroicBleed}点），并且无论你站在哪里，荒野之心脉冲都会命中你，伤害提高{pulse}%。队友可以用{pull}秒拔出长矛。如果没有其他人能帮忙，你可以用{wrench}秒自己拔出。{seconds}秒后它会自行松脱。",
         "idolAwake": "石美洲豹已经苏醒。每{every}秒，它会在地面预警{warning}秒后，轮流向平台的一半吐息：对该半场的所有人造成{min}到{max}点自然伤害（英雄难度{heroicMin}到{heroicMax}点）。祖尔加会保持美洲豹化身直到死亡，并且每{seconds}秒更换猎物（英雄难度{heroicSeconds}秒）。"
       },
+      "temple": {
+        "scoreWard": "正在吟唱乐谱：在结束前不会受到伤害。在乐句结束前，按石板响起的顺序踏上月光石板，即可使她的嗓音破碎。如果乐句先结束，不谐之音会对庭院中的所有人造成{min}到{max}点冰霜伤害（英雄难度下为{heroicMin}到{heroicMax}点）。",
+        "brokenVoice": "她的嗓音已破碎：在此效果结束前，她受到的伤害提高{pct}%。"
+      },
       "bastion": {
         "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}点自然伤害，最多持续{seconds}秒。打断或击晕潮缚侍僧即可挣脱。",
         "halberdWall": "另一名溺亡守望者在{radius}码内时，受到的伤害降低{pct}%。把它们分开。",
@@ -6645,6 +6649,21 @@ export const zh_CN: EnTranslations = {
       "realLine": "这是真正的维尔：攻击他以打破雾幕",
       "shadeTitle": "空洞的幻影",
       "shadeLine": "光穿透了它：别管它，去找光束照亮的那个",
+      "timeAria": "剩余{seconds}秒"
+    },
+    "templeAlert": {
+      "melodyTitle": "乐谱",
+      "melodyLine": "注意月光石板依次响起的顺序。等她唱完后，按同样的顺序踏上石板",
+      "melodyDarkLine": "注意月光石板依次响起的顺序并记住它。在你作答之前，石板会变暗",
+      "answerTitle": "回应乐谱！",
+      "answerLine": "踏上标有{place}的月光石板。已奏响：{done}/{total}",
+      "answerDarkLine": "石板已变暗。按它们响起的顺序踏上去。已奏响：{done}/{total}",
+      "stepOffTitle": "先走下去，再踏上来",
+      "stepOffLine": "月光石板只有在有人踏上时才会奏响。离开这块石板，然后重新踏上去",
+      "falseTitle": "错音！",
+      "falseLine": "那块石板的顺序不对。回应将从第一块石板重新开始",
+      "brokenTitle": "塞尔瑟的嗓音破碎了！",
+      "brokenLine": "在效果结束前，她受到的伤害提高{pct}%：现在使用你最强的攻击",
       "timeAria": "剩余{seconds}秒"
     },
     "wildheartAlert": {
@@ -14964,6 +14983,8 @@ export const zh_CN: EnTranslations = {
       "temple_moonwater_bolt": "月水箭",
       "temple_drowning_aria": "溺亡咏叹调",
       "temple_mere_surge": "湖涌",
+      "temple_score": "乐谱",
+      "temple_score_answer": "回应乐谱",
       "temple_tideglass_fracture": "潮镜碎裂",
       "temple_undertow": "暗流",
       "temple_lunar_tide": "月潮",

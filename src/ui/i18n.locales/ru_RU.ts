@@ -22071,4 +22071,32 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_sun_glyph_kindle': 'Зажигается',
   'abilityUi.cast.wildheart_sun_glyph_cold': 'Остывает',
   'entities.mobs.wildheart_hunting_spear.name': 'Охотничье копьё',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': 'Партитура',
+  'hudChrome.templeAlert.melodyLine':
+    'Следите, как лунные плиты звучат одна за другой. Когда она допоёт, наступите на них в том же порядке',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Следите, как лунные плиты звучат одна за другой, и запомните порядок. Перед вашим ответом они погаснут',
+  'hudChrome.templeAlert.answerTitle': 'Ответьте на Партитуру!',
+  'hudChrome.templeAlert.answerLine':
+    'Наступите на лунную плиту с меткой {place}. Прозвучало: {done} из {total}',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Плиты погасли. Наступайте на них в том порядке, в котором они звучали. Прозвучало: {done} из {total}',
+  'hudChrome.templeAlert.stepOffTitle': 'Сойдите и наступите снова',
+  'hudChrome.templeAlert.stepOffLine':
+    'Лунная плита звучит, только когда на неё наступают. Сойдите с этой плиты и наступите на неё снова',
+  'hudChrome.templeAlert.falseTitle': 'Фальшивая нота!',
+  'hudChrome.templeAlert.falseLine':
+    'Эта плита была не в свой черёд. Ответ начинается заново с первой плиты',
+  'hudChrome.templeAlert.brokenTitle': 'Голос Селте сорван!',
+  'hudChrome.templeAlert.brokenLine':
+    'Пока действует эффект, она получает на {pct}% больше урона: бейте сильнейшими атаками',
+  'hudChrome.templeAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Поёт Партитуру: не получает урона, пока та не закончится. Наступите на лунные плиты в том порядке, в котором они звучали, прежде чем закончится куплет, и её голос сорвётся. Если куплет закончится раньше, Диссонанс нанесёт всем во дворе от {min} до {max} ед. урона от льда (в героическом режиме от {heroicMin} до {heroicMax}).',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'Её голос сорван: пока действует эффект, она получает на {pct}% больше урона.',
+  'abilityUi.cast.temple_score': 'Партитура',
+  'abilityUi.cast.temple_score_answer': 'Ответ на Партитуру',
 };

@@ -4187,6 +4187,10 @@ export const ko_KR: EnTranslations = {
         "pinned": "사냥 창이 당신을 그 자리에 꿰어 고정했습니다. {every}초마다 {bleed}의 물리 피해(영웅 난이도 {heroicBleed})를 입는 출혈에 걸리며, 야생심장 파동은 어디에 서 있든 적중하고 피해가 {pulse}% 증가합니다. 아군이 {pull}초에 걸쳐 창을 뽑아 줄 수 있습니다. 도울 수 있는 사람이 아무도 없으면 직접 {wrench}초에 걸쳐 뽑으세요. {seconds}초 뒤에는 저절로 빠집니다.",
         "idolAwake": "돌 재규어가 깨어났습니다. {every}초마다 바닥에 {warning}초 동안 경고를 띄운 뒤 테라스의 절반씩 번갈아 숨결을 내뿜습니다: 그 절반에 있는 모두에게 {min}~{max}의 자연 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 줄가르는 죽을 때까지 재규어 화신 상태를 유지하며 {seconds}초마다(영웅 난이도 {heroicSeconds}초마다) 사냥감을 바꿉니다."
       },
+      "temple": {
+        "scoreWard": "악보를 노래하는 중: 끝날 때까지 피해를 받지 않습니다. 노래가 끝나기 전에 울린 순서대로 달의 타일에 올라서면 그녀의 목소리가 갈라집니다. 노래가 먼저 끝나면 불협화음이 뜰에 있는 모두에게 {min}~{max}의 냉기 피해(영웅 난이도에서는 {heroicMin}~{heroicMax})를 입힙니다.",
+        "brokenVoice": "목소리가 갈라졌습니다: 이 효과가 끝날 때까지 받는 피해가 {pct}% 증가합니다."
+      },
       "bastion": {
         "brineColumn": "바닷물 기둥에 갇혔습니다: {tick}초마다 {min}~{max}의 자연 피해를 최대 {seconds}초 동안 받습니다. 조수결속 수행사제를 차단하거나 기절시키면 풀려납니다.",
         "halberdWall": "다른 익사한 파수꾼이 {radius}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. 둘을 떼어 놓으세요.",
@@ -6645,6 +6649,21 @@ export const ko_KR: EnTranslations = {
       "realLine": "이것이 진짜 바엘이다: 공격해 장막을 깨뜨려라",
       "shadeTitle": "텅 빈 그림자",
       "shadeLine": "빛이 그대로 통과한다: 내버려 두고 빛이 비추는 자를 찾아라",
+      "timeAria": "{seconds}초 남음"
+    },
+    "templeAlert": {
+      "melodyTitle": "악보",
+      "melodyLine": "달의 타일이 차례로 울리는 것을 지켜보세요. 그녀가 노래를 마치면 같은 순서로 타일에 올라서세요",
+      "melodyDarkLine": "달의 타일이 차례로 울리는 것을 지켜보고 순서를 외우세요. 답하기 전에 타일이 어두워집니다",
+      "answerTitle": "악보에 답하세요!",
+      "answerLine": "{place} 표시가 있는 달의 타일에 올라서세요. 울린 타일: {total}개 중 {done}개",
+      "answerDarkLine": "타일이 어둡습니다. 울린 순서대로 올라서세요. 울린 타일: {total}개 중 {done}개",
+      "stepOffTitle": "내려갔다가 다시 올라서세요",
+      "stepOffLine": "달의 타일은 누군가 올라설 때만 울립니다. 이 타일에서 내려갔다가 다시 올라서세요",
+      "falseTitle": "틀린 음!",
+      "falseLine": "그 타일은 차례가 아니었습니다. 답은 첫 번째 타일부터 다시 시작됩니다",
+      "brokenTitle": "셀세의 목소리가 갈라졌습니다!",
+      "brokenLine": "효과가 끝날 때까지 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 쏟아부으세요",
       "timeAria": "{seconds}초 남음"
     },
     "wildheartAlert": {
@@ -14964,6 +14983,8 @@ export const ko_KR: EnTranslations = {
       "temple_moonwater_bolt": "월수 화살",
       "temple_drowning_aria": "익사의 아리아",
       "temple_mere_surge": "호수의 해일",
+      "temple_score": "악보",
+      "temple_score_answer": "악보에 답하기",
       "temple_tideglass_fracture": "조수유리 균열",
       "temple_undertow": "역류",
       "temple_lunar_tide": "달의 조수",

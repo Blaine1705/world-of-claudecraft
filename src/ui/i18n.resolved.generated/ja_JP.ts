@@ -4187,6 +4187,10 @@ export const ja_JP: EnTranslations = {
         "pinned": "狩りの槍があなたをその場に釘付けにしている。{every}秒ごとに{bleed}の物理ダメージ（ヒロイックでは{heroicBleed}）の出血を受け、ワイルドハートの脈動はどこにいても命中してダメージが{pulse}%増加する。仲間は{pull}秒で槍を引き抜ける。他に動ける仲間がいなければ、自分で{wrench}秒かけて引き抜ける。{seconds}秒後には自然に抜ける。",
         "idolAwake": "石のジャガーが目覚めた。{every}秒ごとに、床に{warning}秒の予兆を出してからテラスの片側ずつに息を吐く：その側にいる全員に{min}から{max}の自然ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）。ズルガーは倒されるまでジャガーの化身のままで、{seconds}秒ごと（ヒロイックでは{heroicSeconds}秒ごと）に獲物を替える。"
       },
+      "temple": {
+        "scoreWard": "楽譜を歌っている：終わるまでダメージを受けない。歌が終わる前に、鳴った順番どおりに月のタイルへ踏み入ると彼女の声が砕ける。先に歌が終わると、不協和音が広間の全員に{min}から{max}の冷気ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。",
+        "brokenVoice": "声が砕けている：この効果が終わるまで受けるダメージが{pct}%増加する。"
+      },
       "bastion": {
         "brineColumn": "海水の柱に捕らわれ、{tick}秒ごとに{min}～{max}の自然ダメージを最大{seconds}秒間受ける。潮縛りの侍祭を妨害するかスタンさせれば抜け出せる。",
         "halberdWall": "{radius}ヤード以内に別の溺れた見張り番がいる間、受けるダメージが{pct}%減少する。引き離せ。",
@@ -6645,6 +6649,21 @@ export const ja_JP: EnTranslations = {
       "realLine": "これが本物のヴァエルだ：攻撃してヴェールを破れ",
       "shadeTitle": "虚ろな影",
       "shadeLine": "光が素通りしている：放っておき、光線が照らす者を探せ",
+      "timeAria": "残り{seconds}秒"
+    },
+    "templeAlert": {
+      "melodyTitle": "楽譜",
+      "melodyLine": "月のタイルが順番に鳴るのを見ておけ。彼女が歌い終えたら、同じ順番でタイルに踏み入れ",
+      "melodyDarkLine": "月のタイルが順番に鳴るのを見て、順番を覚えろ。答える前にタイルは暗くなる",
+      "answerTitle": "楽譜に答えろ！",
+      "answerLine": "{place}の印がある月のタイルに踏み入れ。鳴らした数：{total}枚中{done}枚",
+      "answerDarkLine": "タイルは暗い。鳴った順番どおりに踏み入れ。鳴らした数：{total}枚中{done}枚",
+      "stepOffTitle": "一度降りて、踏み直せ",
+      "stepOffLine": "月のタイルは誰かが踏み入った時にだけ鳴る。このタイルから降りて、もう一度踏み入れ",
+      "falseTitle": "外れた音！",
+      "falseLine": "そのタイルは順番が違う。答えは最初のタイルからやり直しになる",
+      "brokenTitle": "セルセの声が砕けた！",
+      "brokenLine": "効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め",
       "timeAria": "残り{seconds}秒"
     },
     "wildheartAlert": {
@@ -14964,6 +14983,8 @@ export const ja_JP: EnTranslations = {
       "temple_moonwater_bolt": "月水の矢",
       "temple_drowning_aria": "溺れのアリア",
       "temple_mere_surge": "湖の大波",
+      "temple_score": "楽譜",
+      "temple_score_answer": "楽譜に答えろ",
       "temple_tideglass_fracture": "潮硝子の亀裂",
       "temple_undertow": "引き潮",
       "temple_lunar_tide": "月の潮",

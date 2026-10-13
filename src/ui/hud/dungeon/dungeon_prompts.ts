@@ -9,16 +9,18 @@
 // lake) and the Hollow Crypt's (crypt_alert_view.ts on the same family: the
 // grave mark, the Frozen Embrace, the Bride's Lament, the Open Grave, the
 // Burning Knell's half, Grasp of the Grave, the Reap, the Toll and Harmony
-// readouts, the Rite's candles and the Bound Souls), plus the trash engine's
+// readouts, the Rite's candles and the Bound Souls) and the Drowned Temple's
+// (temple_alert_view.ts on the same family: Choirmother Selthe's Score, its
+// melody, its answer and her broken voice), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
 // no DOM itself; it builds
 // each view from the frame's inputs and hands it to that prompt's painter. The
 // frame hands it the world (its entities and roster version, and the target
 // command a use press needs): the prompts look bodies up by id, and the
-// Sanctum, Crypt and Wildheart alerts and the use prompt keep their scenes off
-// the roster (sanctum_alert_scene_core.ts, crypt_alert_scene_core.ts,
-// wildheart_alert_scene_core.ts, KitUseSceneScan).
+// Sanctum, Crypt, Wildheart and Temple alerts and the use prompt keep their
+// scenes off the roster (sanctum_alert_scene_core.ts, crypt_alert_scene_core.ts,
+// wildheart_alert_scene_core.ts, temple_alert_scene_core.ts, KitUseSceneScan).
 //
 // The prompts share one slot over the action bar, so the use prompt gives way
 // to every encounter prompt above it (a strike to dodge or a cage to break
@@ -30,7 +32,7 @@
 // whatever the slot shows (src/game/nearby_interaction_core.ts).
 //
 // The player's "Dungeon mechanic hints" setting hides the ADVISORY alerts (the
-// four encounter alert family members) and nothing else; a hidden alert is not
+// five encounter alert family members) and nothing else; a hidden alert is not
 // built and never holds the slot. Which prompt the setting governs and who
 // holds the slot are both decided in dungeon_prompt_policy_core.ts.
 
@@ -60,6 +62,8 @@ import {
 } from './kit_use_prompt_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
+import { TempleAlertSceneScan, type TempleSceneEntity } from './temple_alert_scene_core';
+import { buildTempleAlertView, TEMPLE_ALERT_KINDS } from './temple_alert_view';
 import { WildheartAlertSceneScan, type WildheartSceneEntity } from './wildheart_alert_scene_core';
 import {
   buildWildheartAlertView,
@@ -99,7 +103,12 @@ export interface DungeonPromptsFrame {
   world: {
     entities: ReadonlyMap<
       number,
-      GaolChainEntity & SanctumSceneEntity & CryptSceneEntity & WildheartSceneEntity & KitUseBody
+      GaolChainEntity &
+        SanctumSceneEntity &
+        CryptSceneEntity &
+        WildheartSceneEntity &
+        TempleSceneEntity &
+        KitUseBody
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
@@ -124,6 +133,8 @@ export class DungeonPrompts {
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
   private readonly cryptScene = new CryptAlertSceneScan();
+  private readonly temple: EncounterAlert;
+  private readonly templeScene = new TempleAlertSceneScan();
   private readonly kitUse: EncounterAlert;
   private readonly kitUseScene = new KitUseSceneScan();
   /** The body a press on the use prompt targets (-1: none on offer). */
@@ -139,6 +150,7 @@ export class DungeonPrompts {
     wildheart: false,
     sanctum: false,
     crypt: false,
+    temple: false,
     cryptSoft: false,
     wildheartSoft: false,
   };
@@ -165,6 +177,11 @@ export class DungeonPrompts {
       id: 'crypt-alert',
       className: 'ui-panel-strong encounter-alert crypt-alert',
       kinds: CRYPT_ALERT_KINDS,
+    });
+    this.temple = new EncounterAlert(deps, {
+      id: 'temple-alert',
+      className: 'ui-panel-strong encounter-alert temple-alert',
+      kinds: TEMPLE_ALERT_KINDS,
     });
     // A press on the use prompt is the interact key's own 'use' arm: target
     // the body it names, then the ordinary interact.
@@ -246,6 +263,10 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
+    const temple = dungeonPromptEnabled('temple', hints)
+      ? buildTempleAlertView({ selfPos: p.pos, scene: this.templeScene.update(f.world) })
+      : HINT_HIDDEN;
+    this.temple.paint(temple);
     // The use prompt last: it yields the shared slot to any prompt showing
     // above (a soft Crypt readout yields to it instead).
     const slot = this.slot;
@@ -255,6 +276,7 @@ export class DungeonPrompts {
     slot.wildheart = wildheart.visible;
     slot.sanctum = sanctum.visible;
     slot.crypt = crypt.visible;
+    slot.temple = temple.visible;
     slot.cryptSoft = cryptSoft;
     slot.wildheartSoft = wildheartSoft;
     const use = usePromptYields(slot)
@@ -282,6 +304,7 @@ export class DungeonPrompts {
     this.wildheart.dispose();
     this.sanctum.dispose();
     this.crypt.dispose();
+    this.temple.dispose();
     this.kitUse.dispose();
   }
 }

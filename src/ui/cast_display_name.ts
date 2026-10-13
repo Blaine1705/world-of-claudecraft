@@ -161,6 +161,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.temple_moonwater_bolt': true,
   'abilityUi.cast.temple_drowning_aria': true,
   'abilityUi.cast.temple_mere_surge': true,
+  'abilityUi.cast.temple_score': true,
+  'abilityUi.cast.temple_score_answer': true,
   'abilityUi.cast.temple_tideglass_fracture': true,
   'abilityUi.cast.temple_undertow': true,
   'abilityUi.cast.temple_lunar_tide': true,

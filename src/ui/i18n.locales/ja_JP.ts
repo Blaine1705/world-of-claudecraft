@@ -21664,4 +21664,31 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_sun_glyph_kindle': '点灯中',
   'abilityUi.cast.wildheart_sun_glyph_cold': '冷却中',
   'entities.mobs.wildheart_hunting_spear.name': '狩りの槍',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': '楽譜',
+  'hudChrome.templeAlert.melodyLine':
+    '月のタイルが順番に鳴るのを見ておけ。彼女が歌い終えたら、同じ順番でタイルに踏み入れ',
+  'hudChrome.templeAlert.melodyDarkLine':
+    '月のタイルが順番に鳴るのを見て、順番を覚えろ。答える前にタイルは暗くなる',
+  'hudChrome.templeAlert.answerTitle': '楽譜に答えろ！',
+  'hudChrome.templeAlert.answerLine':
+    '{place}の印がある月のタイルに踏み入れ。鳴らした数：{total}枚中{done}枚',
+  'hudChrome.templeAlert.answerDarkLine':
+    'タイルは暗い。鳴った順番どおりに踏み入れ。鳴らした数：{total}枚中{done}枚',
+  'hudChrome.templeAlert.stepOffTitle': '一度降りて、踏み直せ',
+  'hudChrome.templeAlert.stepOffLine':
+    '月のタイルは誰かが踏み入った時にだけ鳴る。このタイルから降りて、もう一度踏み入れ',
+  'hudChrome.templeAlert.falseTitle': '外れた音！',
+  'hudChrome.templeAlert.falseLine': 'そのタイルは順番が違う。答えは最初のタイルからやり直しになる',
+  'hudChrome.templeAlert.brokenTitle': 'セルセの声が砕けた！',
+  'hudChrome.templeAlert.brokenLine':
+    '効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め',
+  'hudChrome.templeAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.temple.scoreWard':
+    '楽譜を歌っている：終わるまでダメージを受けない。歌が終わる前に、鳴った順番どおりに月のタイルへ踏み入ると彼女の声が砕ける。先に歌が終わると、不協和音が広間の全員に{min}から{max}の冷気ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    '声が砕けている：この効果が終わるまで受けるダメージが{pct}%増加する。',
+  'abilityUi.cast.temple_score': '楽譜',
+  'abilityUi.cast.temple_score_answer': '楽譜に答えろ',
 };

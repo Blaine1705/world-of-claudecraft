@@ -4187,6 +4187,10 @@ export const da_DK: EnTranslations = {
         "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
         "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
       },
+      "temple": {
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends."
+      },
       "bastion": {
         "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
         "halberdWall": "Takes {pct}% less damage while another Drowned Watchman stands within {radius} yd. Pull them apart.",
@@ -6645,6 +6649,21 @@ export const da_DK: EnTranslations = {
       "realLine": "This is the real Vael: strike him to break the veil",
       "shadeTitle": "A hollow shade",
       "shadeLine": "Leave this decoy. Attack the Vael whose lantern flares in the beam to break the veil",
+      "timeAria": "{seconds} seconds left"
+    },
+    "templeAlert": {
+      "melodyTitle": "The Score",
+      "melodyLine": "Watch the moon tiles ring one after another. When she finishes, step onto them in that same order",
+      "melodyDarkLine": "Watch the moon tiles ring one after another and remember the order. They go dark before you answer",
+      "answerTitle": "Answer the Score!",
+      "answerLine": "Step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "The tiles are dark. Step onto them in the order they rang. Sounded: {done} of {total}",
+      "stepOffTitle": "Step off, then back on",
+      "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
+      "falseTitle": "False Note!",
+      "falseLine": "That tile was out of turn. The answer starts over from the first tile",
+      "brokenTitle": "Selthe's voice is broken!",
+      "brokenLine": "She takes {pct}% more damage until this ends: use your strongest attacks now",
       "timeAria": "{seconds} seconds left"
     },
     "wildheartAlert": {
@@ -14964,6 +14983,8 @@ export const da_DK: EnTranslations = {
       "temple_moonwater_bolt": "Moonwater Bolt",
       "temple_drowning_aria": "Drowning Aria",
       "temple_mere_surge": "Mere Surge",
+      "temple_score": "The Score",
+      "temple_score_answer": "Answer the Score",
       "temple_tideglass_fracture": "Tideglass Fracture",
       "temple_undertow": "Undertow",
       "temple_lunar_tide": "Lunar Tide",

@@ -20604,4 +20604,29 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_sun_glyph_kindle': '点亮中',
   'abilityUi.cast.wildheart_sun_glyph_cold': '冷却中',
   'entities.mobs.wildheart_hunting_spear.name': '狩猎之矛',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': '乐谱',
+  'hudChrome.templeAlert.melodyLine':
+    '注意月光石板依次响起的顺序。等她唱完后，按同样的顺序踏上石板',
+  'hudChrome.templeAlert.melodyDarkLine':
+    '注意月光石板依次响起的顺序并记住它。在你作答之前，石板会变暗',
+  'hudChrome.templeAlert.answerTitle': '回应乐谱！',
+  'hudChrome.templeAlert.answerLine': '踏上标有{place}的月光石板。已奏响：{done}/{total}',
+  'hudChrome.templeAlert.answerDarkLine':
+    '石板已变暗。按它们响起的顺序踏上去。已奏响：{done}/{total}',
+  'hudChrome.templeAlert.stepOffTitle': '先走下去，再踏上来',
+  'hudChrome.templeAlert.stepOffLine':
+    '月光石板只有在有人踏上时才会奏响。离开这块石板，然后重新踏上去',
+  'hudChrome.templeAlert.falseTitle': '错音！',
+  'hudChrome.templeAlert.falseLine': '那块石板的顺序不对。回应将从第一块石板重新开始',
+  'hudChrome.templeAlert.brokenTitle': '塞尔瑟的嗓音破碎了！',
+  'hudChrome.templeAlert.brokenLine': '在效果结束前，她受到的伤害提高{pct}%：现在使用你最强的攻击',
+  'hudChrome.templeAlert.timeAria': '剩余{seconds}秒',
+  'hudChrome.auraEffect.temple.scoreWard':
+    '正在吟唱乐谱：在结束前不会受到伤害。在乐句结束前，按石板响起的顺序踏上月光石板，即可使她的嗓音破碎。如果乐句先结束，不谐之音会对庭院中的所有人造成{min}到{max}点冰霜伤害（英雄难度下为{heroicMin}到{heroicMax}点）。',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    '她的嗓音已破碎：在此效果结束前，她受到的伤害提高{pct}%。',
+  'abilityUi.cast.temple_score': '乐谱',
+  'abilityUi.cast.temple_score_answer': '回应乐谱',
 };

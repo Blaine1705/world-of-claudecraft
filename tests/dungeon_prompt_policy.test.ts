@@ -10,6 +10,12 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { GRAVEWYRM_SANCTUM_MOBS } from '../src/sim/content/gravewyrm_sanctum';
 import { MOBS } from '../src/sim/data';
 import {
+  moonTileTemplate,
+  SELTHE_ID,
+  SELTHE_SCORE,
+  SELTHE_SCORE_WARD,
+} from '../src/sim/encounters/drowned_temple/ids';
+import {
   MORTHEN_CANDLE_ID,
   MORTHEN_GRASP_TEMPLATE,
   MORTHEN_GRAVE_CHILL,
@@ -48,13 +54,14 @@ const ALL_IDS: DungeonPromptId[] = [
   'wildheart',
   'sanctum',
   'crypt',
+  'temple',
   'kitUse',
 ];
 
 // ---- the pure policy --------------------------------------------------------------
 
 describe('dungeon prompt policy: what the hints setting governs', () => {
-  it('classifies every prompt, the four encounter alerts advisory and no other', () => {
+  it('classifies every prompt, the five encounter alerts advisory and no other', () => {
     // Literal, so reclassifying a prompt is a deliberate edit here too.
     expect(DUNGEON_PROMPT_ADVISORY).toEqual({
       cage: false,
@@ -63,6 +70,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       wildheart: true,
       sanctum: true,
       crypt: true,
+      temple: true,
       kitUse: false,
     });
     expect(Object.keys(DUNGEON_PROMPT_ADVISORY).sort()).toEqual([...ALL_IDS].sort());
@@ -77,6 +85,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
     expect(dungeonPromptEnabled('wildheart', false)).toBe(false);
     expect(dungeonPromptEnabled('sanctum', false)).toBe(false);
     expect(dungeonPromptEnabled('crypt', false)).toBe(false);
+    expect(dungeonPromptEnabled('temple', false)).toBe(false);
     // The prompts a player presses or steers by are never governed by it.
     expect(dungeonPromptEnabled('cage', false)).toBe(true);
     expect(dungeonPromptEnabled('chain', false)).toBe(true);
@@ -92,6 +101,7 @@ describe('dungeon prompt policy: the shared slot', () => {
     wildheart: false,
     sanctum: false,
     crypt: false,
+    temple: false,
     cryptSoft: false,
     wildheartSoft: false,
   };
@@ -101,7 +111,15 @@ describe('dungeon prompt policy: the shared slot', () => {
   });
 
   it('any prompt showing above holds the slot', () => {
-    for (const id of ['cage', 'chain', 'bastion', 'wildheart', 'sanctum', 'crypt'] as const) {
+    for (const id of [
+      'cage',
+      'chain',
+      'bastion',
+      'wildheart',
+      'sanctum',
+      'crypt',
+      'temple',
+    ] as const) {
       expect(usePromptYields({ ...none, [id]: true }), id).toBe(true);
     }
   });
@@ -113,7 +131,7 @@ describe('dungeon prompt policy: the shared slot', () => {
   });
 
   it('a soft Crypt readout beside another showing prompt changes nothing', () => {
-    for (const id of ['cage', 'chain', 'bastion', 'wildheart', 'sanctum'] as const) {
+    for (const id of ['cage', 'chain', 'bastion', 'wildheart', 'sanctum', 'temple'] as const) {
       expect(usePromptYields({ ...none, crypt: true, cryptSoft: true, [id]: true }), id).toBe(true);
     }
   });
@@ -122,7 +140,7 @@ describe('dungeon prompt policy: the shared slot', () => {
     expect(usePromptYields({ ...none, wildheart: true, wildheartSoft: true })).toBe(false);
     // The soft flag means nothing without a showing Wildheart alert.
     expect(usePromptYields({ ...none, wildheartSoft: true })).toBe(false);
-    for (const id of ['cage', 'chain', 'bastion', 'sanctum', 'crypt'] as const) {
+    for (const id of ['cage', 'chain', 'bastion', 'sanctum', 'crypt', 'temple'] as const) {
       const state = { ...none, wildheart: true, wildheartSoft: true, [id]: true };
       expect(usePromptYields(state), id).toBe(true);
     }
@@ -197,6 +215,38 @@ const pinned = (alone: boolean): Auras => [
   { id: ZULGAR_PINNED, sourceId: 52, value2: alone ? 1 : 0, remaining: 8, duration: 10 },
 ];
 
+/** Choirmother Selthe singing the Score's melody, and one of her moon tiles. */
+const seltheSinging = () => {
+  const e = createMob(54, MOBS[SELTHE_ID], 16, { x: 20, y: 0, z: 0 });
+  e.castingAbility = SELTHE_SCORE;
+  e.castRemaining = 3;
+  e.castTotal = 5.1;
+  e.auras = [
+    {
+      id: SELTHE_SCORE_WARD,
+      name: 'The Score',
+      kind: 'buff_dr',
+      remaining: 19,
+      duration: 20,
+      value: 0,
+      value2: 0,
+      stacks: 3,
+      sourceId: 54,
+      school: 'frost',
+    },
+  ];
+  return e;
+};
+const moonTile = () =>
+  ({
+    id: 61,
+    kind: 'object',
+    templateId: moonTileTemplate('note', 1),
+    pos: { x: 12, y: 0, z: 0 },
+    scale: 2.5,
+    auras: [],
+  }) as unknown as Entity;
+
 const SENTENCED: Auras = [{ id: OLEN_SENTENCED, remaining: 4, duration: 8 }];
 const PREY: Auras = [{ id: ZULGAR_PREY, remaining: 4, duration: 8, value2: 1 }];
 const BRANDED: Auras = [{ id: SANCTUM_BRANDED, remaining: 6, duration: 12 }];
@@ -223,6 +273,15 @@ describe('DungeonPrompts: the hints setting hides the advisory alerts only', () 
       setup: (r) => r.add(graspRing()),
     },
     { name: "the Hollow Crypt's soft readout (the Rite)", id: 'crypt-alert', auras: RITE },
+    {
+      name: "the Drowned Temple's alert (Selthe's Score)",
+      id: 'temple-alert',
+      auras: [],
+      setup: (r) => {
+        r.add(seltheSinging());
+        r.add(moonTile());
+      },
+    },
   ];
 
   for (const c of cases) {

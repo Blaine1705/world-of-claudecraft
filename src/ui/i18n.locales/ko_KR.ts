@@ -21662,4 +21662,32 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.wildheart_sun_glyph_kindle': '밝히는 중',
   'abilityUi.cast.wildheart_sun_glyph_cold': '식는 중',
   'entities.mobs.wildheart_hunting_spear.name': '사냥 창',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': '악보',
+  'hudChrome.templeAlert.melodyLine':
+    '달의 타일이 차례로 울리는 것을 지켜보세요. 그녀가 노래를 마치면 같은 순서로 타일에 올라서세요',
+  'hudChrome.templeAlert.melodyDarkLine':
+    '달의 타일이 차례로 울리는 것을 지켜보고 순서를 외우세요. 답하기 전에 타일이 어두워집니다',
+  'hudChrome.templeAlert.answerTitle': '악보에 답하세요!',
+  'hudChrome.templeAlert.answerLine':
+    '{place} 표시가 있는 달의 타일에 올라서세요. 울린 타일: {total}개 중 {done}개',
+  'hudChrome.templeAlert.answerDarkLine':
+    '타일이 어둡습니다. 울린 순서대로 올라서세요. 울린 타일: {total}개 중 {done}개',
+  'hudChrome.templeAlert.stepOffTitle': '내려갔다가 다시 올라서세요',
+  'hudChrome.templeAlert.stepOffLine':
+    '달의 타일은 누군가 올라설 때만 울립니다. 이 타일에서 내려갔다가 다시 올라서세요',
+  'hudChrome.templeAlert.falseTitle': '틀린 음!',
+  'hudChrome.templeAlert.falseLine':
+    '그 타일은 차례가 아니었습니다. 답은 첫 번째 타일부터 다시 시작됩니다',
+  'hudChrome.templeAlert.brokenTitle': '셀세의 목소리가 갈라졌습니다!',
+  'hudChrome.templeAlert.brokenLine':
+    '효과가 끝날 때까지 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 쏟아부으세요',
+  'hudChrome.templeAlert.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.temple.scoreWard':
+    '악보를 노래하는 중: 끝날 때까지 피해를 받지 않습니다. 노래가 끝나기 전에 울린 순서대로 달의 타일에 올라서면 그녀의 목소리가 갈라집니다. 노래가 먼저 끝나면 불협화음이 뜰에 있는 모두에게 {min}~{max}의 냉기 피해(영웅 난이도에서는 {heroicMin}~{heroicMax})를 입힙니다.',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    '목소리가 갈라졌습니다: 이 효과가 끝날 때까지 받는 피해가 {pct}% 증가합니다.',
+  'abilityUi.cast.temple_score': '악보',
+  'abilityUi.cast.temple_score_answer': '악보에 답하기',
 };

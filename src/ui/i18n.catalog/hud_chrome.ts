@@ -5365,6 +5365,13 @@ export const hudChromeStrings = {
       idolAwake:
         'The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic).',
     },
+    // The Drowned Temple's boss auras (src/ui/temple_aura_effect.ts).
+    // Wordy (M16): non-Latin fills in the overlays.
+    temple: {
+      scoreWard:
+        'Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.',
+      brokenVoice: 'Her voice is broken: she takes {pct}% more damage until this ends.',
+    },
     // The Sunken Bastion's boss marks (src/ui/bastion_aura_effect.ts).
     // Wordy (M16): non-Latin fills in the overlays.
     bastion: {
@@ -9559,6 +9566,27 @@ export const hudChromeStrings = {
     shadeTitle: 'A hollow shade',
     shadeLine:
       'Leave this decoy. Attack the Vael whose lantern flares in the beam to break the veil',
+    timeAria: '{seconds} seconds left',
+  },
+  // The Drowned Temple's encounter alert (src/ui/hud/dungeon/temple_alert_view.ts):
+  // Choirmother Selthe's Score. Wordy (M16): non-Latin fills in the overlays.
+  templeAlert: {
+    melodyTitle: 'The Score',
+    melodyLine:
+      'Watch the moon tiles ring one after another. When she finishes, step onto them in that same order',
+    melodyDarkLine:
+      'Watch the moon tiles ring one after another and remember the order. They go dark before you answer',
+    answerTitle: 'Answer the Score!',
+    answerLine: 'Step onto the moon tile marked {place}. Sounded: {done} of {total}',
+    answerDarkLine:
+      'The tiles are dark. Step onto them in the order they rang. Sounded: {done} of {total}',
+    stepOffTitle: 'Step off, then back on',
+    stepOffLine:
+      'A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again',
+    falseTitle: 'False Note!',
+    falseLine: 'That tile was out of turn. The answer starts over from the first tile',
+    brokenTitle: "Selthe's voice is broken!",
+    brokenLine: 'She takes {pct}% more damage until this ends: use your strongest attacks now',
     timeAria: '{seconds} seconds left',
   },
   // The Wildheart Basin's encounter alert (src/ui/hud/dungeon/wildheart_alert_view.ts).

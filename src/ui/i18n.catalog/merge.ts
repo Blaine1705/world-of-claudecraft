@@ -691,6 +691,10 @@ const mergeStringsEn = {
       temple_moonwater_bolt: 'Moonwater Bolt',
       temple_drowning_aria: 'Drowning Aria',
       temple_mere_surge: 'Mere Surge',
+      // Selthe's Score (encounters/drowned_temple/selthe_score.ts): the melody's
+      // bar and the answer's (its time left is the verse's clock). Never kicked.
+      temple_score: 'The Score',
+      temple_score_answer: 'Answer the Score',
       temple_tideglass_fracture: 'Tideglass Fracture',
       temple_undertow: 'Undertow',
       temple_lunar_tide: 'Lunar Tide',
