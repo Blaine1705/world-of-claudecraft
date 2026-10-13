@@ -2455,6 +2455,8 @@ export const ko_KR: EnTranslations = {
       "groundReticle": "지면 조준 표시기",
       "mouseoverCast": "파티 창에서 마우스오버 시전",
       "stickyTarget": "지면 클릭 시 대상 유지",
+      "showDungeonHints": "던전 기믹 도움말",
+      "showDungeonHintsNote": "던전 기믹과 대처 방법을 설명하는 도움말 패널을 표시합니다. 이 설정을 끄면 해당 도움말만 숨겨지며, 바닥 경고, 시전 막대, 디버프는 그대로 표시됩니다. 직접 조작해야 하는 안내는 항상 표시됩니다: 탈출해야 하는 우리, 끊어야 하는 사슬, 사용할 수 있는 물체.",
       "showItemLevel": "아이템 레벨 표시",
       "showReliquaryTracker": "성물고 추적기 표시",
       "confirmVendorSell": "판매 전 확인",

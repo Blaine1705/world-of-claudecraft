@@ -2455,6 +2455,8 @@ export const da_DK: EnTranslations = {
       "groundReticle": "Jordsigte-retikel",
       "mouseoverCast": "Museover-kast på grupperammer",
       "stickyTarget": "Bevar mål ved jordklik",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Vis genstandsniveau",
       "showReliquaryTracker": "Vis Relikviesporer",
       "confirmVendorSell": "Bekræft før salg",

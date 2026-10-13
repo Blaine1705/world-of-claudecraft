@@ -15455,6 +15455,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.showDailyRewardsChest'
   | 'hudChrome.options.showDefensivesTrack'
   | 'hudChrome.options.showDevBadges'
+  | 'hudChrome.options.showDungeonHints'
+  | 'hudChrome.options.showDungeonHintsNote'
   | 'hudChrome.options.showFriendlyTrack'
   | 'hudChrome.options.showItemLevel'
   | 'hudChrome.options.showNameplateDots'

@@ -2455,6 +2455,8 @@ export const vi_VN: EnTranslations = {
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
       "mouseoverCast": "Thi Triển Khi Rê Chuột Trên Khung Tổ Đội",
       "stickyTarget": "Giữ Mục Tiêu Khi Nhấp Đất",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "showReliquaryTracker": "Hiển thị Trình theo dõi Thánh tích",
       "confirmVendorSell": "Xác Nhận Trước Khi Bán",

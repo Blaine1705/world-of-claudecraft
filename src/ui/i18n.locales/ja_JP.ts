@@ -14240,6 +14240,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showNameplateDots': 'ネームプレートに自分のデバフを表示',
   'hudChrome.options.nameplateDotScale': 'ネームプレートのデバフ表示サイズ',
   'hudChrome.options.showTargetDots': 'ターゲットデバフ一覧を表示',
+  'hudChrome.options.showDungeonHints': 'ダンジョンのギミックヒント',
+  'hudChrome.options.showDungeonHintsNote':
+    'ダンジョンのギミックとその対処法を説明するヒントパネルを表示します。オフにするとこのヒントだけが非表示になり、地面の警告、詠唱バー、デバフはそのまま表示されます。操作が必要なプロンプトは常に表示されます：脱出する檻、壊す鎖、使用するオブジェクト。',
   'hudChrome.targetDots.title': 'ターゲットデバフ',
   'hudChrome.targetDots.overflow': '他に{count}件は非表示',
   'hudChrome.unitFrame.targetOfTargetLabel': 'ターゲットのターゲット',

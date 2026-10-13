@@ -2455,6 +2455,8 @@ export const id_ID: EnTranslations = {
       "groundReticle": "Retikel bidik darat",
       "mouseoverCast": "Rapal Saat Menyorot Bingkai Kelompok",
       "stickyTarget": "Pertahankan Sasaran Saat Klik Tanah",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Tampilkan Level Item",
       "showReliquaryTracker": "Tampilkan Pelacak Relikui",
       "confirmVendorSell": "Konfirmasi Sebelum Menjual",

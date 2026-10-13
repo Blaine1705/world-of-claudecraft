@@ -2455,6 +2455,8 @@ export const zh_TW: EnTranslations = {
       "groundReticle": "地面瞄準指示圈",
       "mouseoverCast": "對隊伍框架滑鼠指向施法",
       "stickyTarget": "點擊地面時保留目標",
+      "showDungeonHints": "地城機制提示",
+      "showDungeonHintsNote": "顯示提示面板，說明地城機制以及應對方法。關閉後只隱藏這些提示：地面警示、施法條和減益效果仍會顯示。需要你操作的提示一律顯示：需要掙脫的牢籠、需要打斷的鎖鏈、可以使用的物體。",
       "showItemLevel": "顯示物品等級",
       "showReliquaryTracker": "顯示聖物庫追蹤器",
       "confirmVendorSell": "出售前確認",

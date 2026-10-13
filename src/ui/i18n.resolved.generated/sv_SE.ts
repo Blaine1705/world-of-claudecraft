@@ -2455,6 +2455,8 @@ export const sv_SE: EnTranslations = {
       "groundReticle": "Markriktmedel",
       "mouseoverCast": "Kasta via muspekaren på gruppramarna",
       "stickyTarget": "Behåll mål vid markklick",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Visa föremålsnivå",
       "showReliquaryTracker": "Visa Relikviespårare",
       "confirmVendorSell": "Bekräfta innan försäljning",

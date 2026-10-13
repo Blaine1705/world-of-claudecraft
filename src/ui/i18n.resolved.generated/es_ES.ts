@@ -2455,6 +2455,8 @@ export const es_ES: EnTranslations = {
       "groundReticle": "Retícula de objetivo terrestre",
       "mouseoverCast": "Lanzar al pasar el ratón sobre los marcos de grupo",
       "stickyTarget": "Mantener objetivo al hacer clic en el suelo",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Mostrar nivel de objeto",
       "showReliquaryTracker": "Mostrar rastreador de relicarios",
       "confirmVendorSell": "Confirmar antes de vender",

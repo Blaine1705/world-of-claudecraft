@@ -2455,6 +2455,8 @@ export const cs_CZ: EnTranslations = {
       "groundReticle": "Zaměřovací kruh na zemi",
       "mouseoverCast": "Sesílání najetím myší na rámech skupiny",
       "stickyTarget": "Zachovat cíl při kliknutí na zem",
+      "showDungeonHints": "Dungeon mechanic hints",
+      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
       "showItemLevel": "Zobrazit úroveň předmětu",
       "showReliquaryTracker": "Zobrazit Reliquary Tracker",
       "confirmVendorSell": "Potvrdit před prodejem",

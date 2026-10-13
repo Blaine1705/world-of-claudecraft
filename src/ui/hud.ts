@@ -8942,6 +8942,7 @@ export class Hud {
       party: this.sim.partyInfo?.members,
       interactKey: keyCapLabel(this.keybinds.primaryLabel('interact')),
       touch: this.isMobileLayout(),
+      mechanicHints: this.boolSetting('showDungeonHints', true),
     });
 
     // Target dots: the multi-target tracker for the debuffs the LOCAL player has
@@ -8952,8 +8953,7 @@ export class Hud {
     // painter renders as a hidden frame.
     this.targetDotsInput.entities = sim.entities.values();
     this.targetDotsInput.targetId = p.targetId;
-    this.targetDotsInput.enabled =
-      (this.optionsHooks?.settings.get('showTargetDots') ?? true) === true;
+    this.targetDotsInput.enabled = this.optionsHooks?.settings.get('showTargetDots') !== false;
     this.targetDotsPainter.update(this.targetDotsView.tick(this.targetDotsInput));
 
     // The aura tracks: the auras the LOCAL player has out, one frame per
