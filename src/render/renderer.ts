@@ -538,8 +538,8 @@ import {
 } from './opaque_draw_order_core';
 import {
   hemiOutdoorIntensity as hemiOutdoorIntensityFor,
-  LAMBERT_RIG_HEMI_INTENSITY,
-  LAMBERT_RIG_SUN_INTENSITY,
+  lowHemiIntensity,
+  lowSunIntensity,
   terrainFillBoostTarget,
 } from './outdoor_light_rig_core';
 import {
@@ -2365,7 +2365,7 @@ export class Renderer {
     const hemi = new THREE.HemisphereLight(
       0xdcefff,
       0x465f39,
-      LOW_GFX ? LAMBERT_RIG_HEMI_INTENSITY : hemiOutdoorIntensity(),
+      LOW_GFX ? lowHemiIntensity(GFX) : hemiOutdoorIntensity(),
     );
     this.scene.add(hemi);
     this.hemi = hemi;
@@ -2373,7 +2373,7 @@ export class Renderer {
     // as soft sun, not white glare; the hemisphere stays cool for contrast.
     const sun = new THREE.DirectionalLight(
       LOW_GFX ? 0xffdfaa : 0xffd99a,
-      LOW_GFX ? LAMBERT_RIG_SUN_INTENSITY : SUN_INTENSITY,
+      LOW_GFX ? lowSunIntensity(GFX) : SUN_INTENSITY,
     );
     sun.position.copy(SUN_ANCHOR);
     sun.castShadow = GFX.dynamicShadows;

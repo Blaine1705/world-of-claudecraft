@@ -25,7 +25,7 @@ const WOOD_ZMAX = 1820;
 // The giant trees are the Eldershine's twisted-elder model (realm_flora
 // already preloads the same URL, so the loader cache makes this free),
 // cloned per greatTrees record and darkened into haunted silhouettes.
-const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
+const GREAT_TREE_URL = '/models/foliage/twisted_1_lod.glb';
 let greatTreeScene: THREE.Group | null = null;
 registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {

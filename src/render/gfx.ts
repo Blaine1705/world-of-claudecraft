@@ -89,7 +89,8 @@ export function gfxTierAtLeast(tier: GfxTier, floor: GfxTier): boolean {
 // water / character detail) join the derived profile: vistaTier and waterTier
 // become explicit settings fields and the post-chain per-effect flags follow
 // the dials rather than the effectsQuality bundle alone.
-export const GFX_CONFIG_VERSION = 21;
+// v22: Low uses distant scenery index LOD and the clearer outdoor light pair.
+export const GFX_CONFIG_VERSION = 22;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -198,6 +199,10 @@ export interface GfxSettings {
   readonly shadowMap: number;
   /** PBR MeshStandardMaterial; low keeps Lambert */
   readonly standardMaterials: boolean;
+  /** Static scenery uses authored coarse indices past this footprint distance; 0 disables. */
+  readonly sceneryGeometryLodDistance: number;
+  /** More ambient fill and a softer key for readable Low surfaces, without extra lights. */
+  readonly lowReadabilityLighting: boolean;
   // -------------------------------------------------------------------------
   // Round-10 granular detail knobs. The graphics-overhaul layers cost real
   // frame budget, so each one keys off its OWN derived knob here (never a
@@ -1245,6 +1250,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
             ? 4096
             : 2560,
     standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    sceneryGeometryLodDistance: gfxTierAtLeast(tier, 'medium') ? 0 : 180,
+    lowReadabilityLighting: !gfxTierAtLeast(tier, 'medium'),
     // Round-10 detail-knob defaults (see the interface comment): High takes the
     // existing Advanced-Medium profile to bound its steady cost (basic worn
     // surface, reduced carpet, cavity-only relief). Ultra and Insane request

@@ -30,6 +30,8 @@ export const GFX_OVERRIDE_VALUE_KINDS = {
   grassCardsPerTuft: 'number',
   leanFoliage: 'boolean',
   standardMaterials: 'boolean',
+  sceneryGeometryLodDistance: 'number',
+  lowReadabilityLighting: 'boolean',
   terrainSplat: 'boolean',
   maxPointLights: 'number',
   farCharacterAnimScale: 'number',

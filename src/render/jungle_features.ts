@@ -17,10 +17,12 @@ import {
   terrainHeight,
   WATER_LEVEL,
 } from '../sim/world';
+import { carryGeometryLod } from './assets/geometry_lod';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
+import { prepareSceneryGeometryLod } from './scenery_geometry_lod';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface JungleFeaturesView {
@@ -31,9 +33,9 @@ export interface JungleFeaturesView {
 // The three beach-palm models, instanced per variant so the whole strand is a
 // handful of draws. Preloaded at import; buildJungleFeatures reads the cache.
 const PALM_URLS = [
-  '/models/biome/beach_palm_1.glb',
-  '/models/biome/beach_palm_2.glb',
-  '/models/biome/beach_palm_3.glb',
+  '/models/biome/beach_palm_1_lod.glb',
+  '/models/biome/beach_palm_2_lod.glb',
+  '/models/biome/beach_palm_3_lod.glb',
 ];
 const palmScenes: (THREE.Group | null)[] = [null, null, null];
 PALM_URLS.forEach((url, i) => {
@@ -60,7 +62,7 @@ export function bakedPalmVariant(variant: number): PalmPart[] | null {
 // meshopt-quantized, so attributes are converted to float32 before the node
 // transform is folded into the geometry; writing world-space values back into
 // normalized int16 attributes would clip (same recipe as foliage.ts).
-function bakePalmParts(scene: THREE.Group): PalmPart[] {
+export function bakePalmParts(scene: THREE.Group): PalmPart[] {
   scene.updateMatrixWorld(true);
   const parts: PalmPart[] = [];
   scene.traverse((obj) => {
@@ -79,6 +81,7 @@ function bakePalmParts(scene: THREE.Group): PalmPart[] {
     }
     if (src.index) geo.setIndex(src.index.clone());
     geo.applyMatrix4(mesh.matrixWorld);
+    carryGeometryLod(src, geo);
     parts.push({ geometry: geo, material: mesh.material });
   });
   return parts;
@@ -87,7 +90,7 @@ function bakePalmParts(scene: THREE.Group): PalmPart[] {
 // The banyans reuse the twisted-elder model the Hollow's centerpiece and the
 // Wraithwood's giants wear (already preloaded twice over, so free), regrown
 // lush and hung with vines.
-const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
+const GREAT_TREE_URL = '/models/foliage/twisted_1_lod.glb';
 let greatTreeScene: THREE.Group | null = null;
 registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
@@ -433,6 +436,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     });
   }
 
+  if (GFX.sceneryGeometryLodDistance > 0) prepareSceneryGeometryLod(group);
   return {
     group,
     update(): void {

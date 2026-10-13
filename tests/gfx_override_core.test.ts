@@ -36,6 +36,8 @@ const settings = {
   grassCardsPerTuft: 4,
   leanFoliage: false,
   standardMaterials: true,
+  sceneryGeometryLodDistance: 0,
+  lowReadabilityLighting: false,
   terrainSplat: true,
   maxPointLights: 6,
   farCharacterAnimScale: 1.55,
@@ -73,6 +75,8 @@ describe('gfx override parsing', () => {
           'grassCardsPerTuft:3',
           'leanFoliage:1',
           'standardMaterials:0',
+          'sceneryGeometryLodDistance:180',
+          'lowReadabilityLighting:1',
           'terrainSplat:0',
           'maxPointLights:3',
           'farCharacterAnimScale:1',
@@ -106,6 +110,8 @@ describe('gfx override parsing', () => {
       grassCardsPerTuft: 3,
       leanFoliage: true,
       standardMaterials: false,
+      sceneryGeometryLodDistance: 180,
+      lowReadabilityLighting: true,
       terrainSplat: false,
       maxPointLights: 3,
       farCharacterAnimScale: 1,
@@ -142,7 +148,7 @@ describe('gfx override parsing', () => {
 });
 
 describe('gfx override application', () => {
-  it('pins no-gfxo derived settings bytes for every preset profile', () => {
+  it('pins existing settings bytes and the new Low knobs for every preset profile', () => {
     const cases = {
       low: gfxInternalsForTest.settingsFor('low'),
       medium: gfxInternalsForTest.settingsFor('medium'),
@@ -152,10 +158,14 @@ describe('gfx override application', () => {
       advanced: gfxInternalsForTest.settingsFor('high', { graphicsPreset: 5 }),
     };
     const hashes = Object.fromEntries(
-      Object.entries(cases).map(([preset, derived]) => [
-        preset,
-        createHash('sha256').update(JSON.stringify(derived)).digest('hex'),
-      ]),
+      Object.entries(cases).map(([preset, derived]) => {
+        const { sceneryGeometryLodDistance, lowReadabilityLighting, ...existing } = derived;
+        expect(sceneryGeometryLodDistance).toBe(preset === 'low' ? 180 : 0);
+        expect(lowReadabilityLighting).toBe(preset === 'low');
+        // Preserve the old pins to prove this change moves no existing dial,
+        // including the High base used by Advanced.
+        return [preset, createHash('sha256').update(JSON.stringify(existing)).digest('hex')];
+      }),
     );
 
     // Regenerated for the GfxSettings.nativeIosMemoryProfile -> iosMemoryProfile rename (the

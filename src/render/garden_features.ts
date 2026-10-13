@@ -19,6 +19,7 @@ import {
   planGardenMazePieces,
 } from './garden_maze_core';
 import { GFX } from './gfx';
+import { prepareSceneryGeometryLod } from './scenery_geometry_lod';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface GardenFeaturesView {
@@ -32,7 +33,7 @@ const GARDEN_ZMAX = 1260;
 // The specimen elders reuse the twisted-elder model the Hollow, the
 // Wraithwood, and the Palmreach already preload, regrown into clipped
 // evergreen giants.
-const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
+const GREAT_TREE_URL = '/models/foliage/twisted_1_lod.glb';
 let greatTreeScene: THREE.Group | null = null;
 registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
@@ -43,8 +44,8 @@ registerDeferredPreload(() =>
 // The Great Maze's modeled hedge walls and entry arches (user-authored
 // models). The wall grid, cell geometry, and the movement-blocking bands
 // all live in sim/world.ts; this module only DRAWS that same data.
-const MAZE_WALL_URL = '/models/props/maze_hedge_wall.glb';
-const MAZE_ARCH_URL = '/models/props/maze_hedge_arch.glb';
+const MAZE_WALL_URL = '/models/props/maze_hedge_wall_lod.glb';
+const MAZE_ARCH_URL = '/models/props/maze_hedge_arch_lod.glb';
 let mazeWallScene: THREE.Group | null = null;
 let mazeArchScene: THREE.Group | null = null;
 registerDeferredPreload(() =>
@@ -297,6 +298,7 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
     }
   }
 
+  if (GFX.sceneryGeometryLodDistance > 0) prepareSceneryGeometryLod(group);
   return {
     group,
     update(): void {

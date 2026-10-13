@@ -57,7 +57,7 @@ const SEA_ROCK_URLS = [
 // The great tree of Eldershine: one hand-placed giant of the twisted elder
 // model the realm's forests already use, kept with its own materials (the
 // loader cache is immutable, so the scene is cloned before use).
-const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
+const GREAT_TREE_URL = '/models/foliage/twisted_1_lod.glb';
 let greatTreeScene: THREE.Group | null = null;
 registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
