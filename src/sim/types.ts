@@ -5581,15 +5581,16 @@ export interface SeltheFightState {
   kind: 'selthe';
   chorusTimer: number;
   soloTimer: number;
-  songTimer: number;
   /** Seconds to the next Mere Surge and the next Drowning Aria. */
   surgeTimer: number;
   ariaTimer: number;
-  /** The breath she takes after a bar before her next Moonwater Bolt. */
-  boltGap: number;
-  /** After a kick: seconds she casts neither bolt nor aria. */
+  /** Seconds to her next Moonwater Bolt (it runs only while she sings no
+   *  bar), and whether its gather cue has gone out. */
+  boltTimer: number;
+  boltCued: boolean;
+  /** After a kick: seconds she throws no bolt and sings no aria. */
   quiet: number;
-  /** The kickable bar she began (a bolt or the aria), so a cut one is seen. */
+  /** The kickable bar she began (the aria), so a cut one is seen. */
   kickable: string | null;
   /** The Mere Surge's locked aim while its bar runs. */
   surgeYaw: number | null;
@@ -5614,6 +5615,39 @@ export interface SeltheFightState {
   casts: number;
   /** Someone took a Chorus alone or a Solo caught a second player (the deed). */
   flubbed: boolean;
+  /** The moon tiles round her pool (selthe_score.ts): their spots
+   *  (instance-local) and their encounter objects, in tile order. */
+  tiles: { x: number; z: number; objectId: number }[];
+  /** Scores begun this fight, and whether the next one is owed (her health
+   *  crossed its mark and she is waiting for her bar and her marks to end). */
+  scores: number;
+  scoreQueued: boolean;
+  /** The Score in flight. */
+  score: SeltheScoreState | null;
+}
+
+/** One Score (encounters/drowned_temple/selthe_score.ts): she sings the
+ *  melody on the tiles, then the group steps on them in that order. */
+export interface SeltheScoreState {
+  phase: 'melody' | 'answer';
+  /** Which Score of the fight this is (0 the first): its notes and its clock. */
+  index: number;
+  /** The melody: tile indices in the order they ring. */
+  order: number[];
+  /** Heroic: the tiles go dark for the answer. */
+  hidden: boolean;
+  /** Seconds left in this phase (it mirrors her bar). */
+  timer: number;
+  /** Melody: notes rung so far and the seconds to the next. */
+  rung: number;
+  noteIn: number;
+  /** Answer: tiles sounded in order so far. */
+  progress: number;
+  /** Who stands on each tile (player ids, by tile), so a step counts once,
+   *  on the way in. */
+  inside: number[][];
+  /** Tiles a wrong step soured, and the seconds until each clears. */
+  sour: { tile: number; remaining: number }[];
 }
 
 /** The Mere Hydra's fight, SHARED by its three heads (one object referenced

@@ -696,11 +696,12 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
     // The serpent tail: a chain of eight from the hips to the fluke.
     expect(parentOf(path, 'tail.1')).toBe('hips');
     expect(parentOf(path, 'tail.8')).toBe('tail.7');
-    // The bolt and the surge land on their bars' ends and play their
-    // follow-through out after; the song spans its bar.
-    expect(clipSeconds(path, 'Bolt')).toBeGreaterThan(SELTHE_TUNING.boltCast);
+    // The surge lands on its bar's end and plays its follow-through out
+    // after. The bolt's clip was cut for the 2 s bar it once had, and the
+    // song's for the retired Sea-Song's 1.5 s.
+    expect(clipSeconds(path, 'Bolt')).toBeGreaterThan(2);
     expect(clipSeconds(path, 'Surge')).toBeGreaterThan(SELTHE_TUNING.surgeCast);
-    expect(clipSeconds(path, 'SeaSong')).toBeCloseTo(SELTHE_TUNING.songCast, 2);
+    expect(clipSeconds(path, 'SeaSong')).toBeCloseTo(1.5, 2);
   });
 
   it('casts water on her bars (no hand swings) and answers each mark with its gesture', () => {
@@ -717,8 +718,6 @@ describe('Choirmother Selthe: the siren matriarch and her fan', () => {
     expect(v.castClipSync).not.toContain(SELTHE_DROWNING_ARIA);
     expect(c.attackByAbility?.[SELTHE_CHORUS_MARK]).toBe('Chorus');
     expect(c.attackByAbility?.[SELTHE_SOLO_MARK]).toBe('Solo');
-    expect(SELTHE_TUNING.songCast).toBe(1.5);
-    expect(SELTHE_TUNING.boltCast).toBe(2);
     expect(SELTHE_TUNING.surgeCast).toBe(3);
   });
 });

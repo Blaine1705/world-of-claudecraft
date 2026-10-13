@@ -1382,6 +1382,13 @@ const baseEnTable = {
   'mechanic.templeDrowningAria': 'Drowning Aria',
   'mechanic.templeMereSurge': 'Mere Surge',
   'mechanic.templeTideglassFracture': 'Tideglass Fracture',
+  // Selthe's Score (encounters/drowned_temple/selthe_score.ts): its two
+  // damage names, her ward and her broken voice, and the tile objects' name.
+  'mechanic.templeDiscord': 'Discord',
+  'mechanic.templeFalseNote': 'False Note',
+  'mechanic.templeMoonTile': 'Moon Tile',
+  'aura.templeTheScore': 'The Score',
+  'aura.templeBrokenVoice': 'Broken Voice',
   'mechanic.templePrismFlare': 'Prism Flare',
   'mechanic.templeNorthTide': 'North Tide',
   'mechanic.templeSouthTide': 'South Tide',
@@ -18083,6 +18090,12 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Resonant Slam': 'mechanic.templeResonantSlam',
   'Prism Flare': 'mechanic.templePrismFlare',
   'Tideglass Fracture': 'mechanic.templeTideglassFracture',
+  // Selthe's Score (selthe_score.ts).
+  Discord: 'mechanic.templeDiscord',
+  'False Note': 'mechanic.templeFalseNote',
+  'Moon Tile': 'mechanic.templeMoonTile',
+  'The Score': 'aura.templeTheScore',
+  'Broken Voice': 'aura.templeBrokenVoice',
   Frostbitten: 'aura.templeFrostbitten',
   Submerged: 'aura.templeSubmerged',
   'Shell Up': 'aura.templeShellUp',
