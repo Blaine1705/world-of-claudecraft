@@ -7,7 +7,7 @@ import { shadowActionsLocked } from '../shadow_action_lock';
 //   - updatePlayerAutoAttack: the per-tick driver (swing-timer decay, facing/range
 //     gates, the ranged-vs-melee branch, and queuedOnSwing consumption that feeds
 //     on-next-swing abilities like Heroic Strike / Raptor Strike into the swing).
-//   - rangedSwing: Auto Shot (hunters, 8yd dead zone) and Wand (casters, no dead
+//   - rangedSwing: Auto Shot (hunters, no dead zone since v0.45) and Wand (casters, no dead
 //     zone); miss roll, crit, and armor mitigation for physical shots only.
 //   - meleeSwing: the white-hit table (single rng.next() miss -> dodge -> hit, crit,
 //     weapon imbue bonus, armor mitigation, and the thorns / spiked-hide reflect
@@ -172,15 +172,19 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // immediately. Ranged auto-attack (wand / auto shot, up to 30-35yd) must NOT pre-aggro
   // at engage: its threat comes from the shot LANDING (rangedSwing schedules a projectile
   // whose impact aggros, like the spell it accompanies). Otherwise the "Attack on Ability
-  // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a distant
-  // mob the instant the cast starts, before anything lands.
+  // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a mob the
+  // instant the cast starts, before anything lands.
   const d = dist2d(p.pos, t.pos);
+  const ranged = rangedAutoProfile(p, r.meta.cls);
+  const rangedAutoWouldFire =
+    ranged !== undefined && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange);
   // The melee seed is additionally gated on no cast in progress: the swing loop is
   // paused while casting (updatePlayerAutoAttack bails on castingAbility), so a
   // mid-cast Attack press must not aggro an untouched mob (the aggro-before-damage
   // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
   // first landed swing (or the spell's own damage) aggros the target legitimately.
   if (
+    !rangedAutoWouldFire &&
     d <= effectivePlayerAttackRange(t, MELEE_RANGE, meleeReachActor(ctx, p)) &&
     !p.castingAbility &&
     t.kind === 'mob' &&
@@ -258,7 +262,7 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
   const facingDiff = Math.abs(normAngle(angleTo(p.pos, t.pos) - p.facing));
   if (facingDiff > MELEE_ARC) return;
 
-  // ranged auto-attack: hunters (auto shot, dead zone inside minRange) and
+  // ranged auto-attack: hunters (auto shot, no dead zone since v0.45) and
   // casters (wand-style, no dead zone so they don't run into melee, #94).
   // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
   // bear/cat/travel resolve to undefined here and fall through to melee.

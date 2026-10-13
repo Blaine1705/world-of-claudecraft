@@ -2254,7 +2254,9 @@ function scaleNaturesBoonPower(p: Entity, res: ResolvedAbility): ResolvedAbility
     // less than the printed bonus at any real heal power. They take the whole
     // multiplier in runEffects instead, through the cast-scoped heal multiplier
     // that `naturesBoonPower` below feeds (the Stonehearth 2pc shape).
-    if (eff.type === 'heal' || eff.type === 'hot') return eff;
+    // Spore Burst takes it the same way: its rider applies the multiplier to
+    // the whole heal, HoT and damage (combat/druid_spore_burst.ts).
+    if (eff.type === 'heal' || eff.type === 'hot' || eff.type === 'sporeBurst') return eff;
     const scaled: Record<string, unknown> = { ...eff };
     for (const key of ['min', 'max', 'amount', 'total', 'value'] as const) {
       const v = scaled[key];

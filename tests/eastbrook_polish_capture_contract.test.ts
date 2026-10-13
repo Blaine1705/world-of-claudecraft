@@ -730,7 +730,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the spore drift split: the renderer leaf picks the form or the sparser HoT drift through characterSporeAura. No capture was retaken.
   // Re-minted for the v0.45 release batch after the merged Eastbrook runtime
   // inputs settled. No capture was retaken.
-  'eed86f0423e147ce1ffc782f9947bfa6f63480a344363294de97745bad9bb96a';
+  '0a7e2a340fc97a3a490c0ff6bee30ad3a95482c389b53eeb07d9de83a433bb58';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

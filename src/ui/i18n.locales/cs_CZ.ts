@@ -16342,7 +16342,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Spotřebuje 1 Úlomek duše a přidá trvalého Kostlivého bojovníka do tvého dvouslotového Panství. Sloužit ti může jen jeden. Každých 6 s zasáhne sekem blízké nepřátele za 45 % poškození a Reaping Command na 4 s připoutá jeho cíl 40% zpomalením.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Rozpárej nepřítele za poškození zbraně plus {damage} a způsob krvácení po dobu 18 s. Udělí 1 combo bod. Pouze v kočičí podobě.',
+    'Rozpárej nepřítele za poškození zbraně plus {damage} a způsob {overTime} poškození krvácením během 18 s. Udělí 1 combo bod. Pouze v kočičí podobě.',
   'entities.abilities.rake.specNote_feral': 'Každý zásah přidá 1 Starou krev (max 3).',
   'entities.abilities.reaping_command.description':
     'Spotřebuje 2 Úlomky duše a přikáže všem nemrtvým služebníkům udeřit společně. Hrobové stráže provokují a připraví se, Bojovníci připoutají, Kostění mágové odhalí magické obrany a Hrobové křídlo roztrhá všechny zasažené nepřátele.',

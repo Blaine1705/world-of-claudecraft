@@ -131,13 +131,15 @@ describe('ability icons', () => {
     // release/v0.44.0 merge into feature/buried-hoards).
     // 474: plus the Scratch glyph (the Cat Form sweep builder).
     // 475: plus Groveheart's Sporemender Form (sporemender_form).
-    // 477: plus Vampiric Touch and the parked Tithe Bomb mechanic icon.
-    // 478: plus Void Rupture's fractured-eye glyph.
-    expect(ids).toHaveLength(478);
+    // 476: plus the druid's Spore Burst (spore_burst).
+    // 477: plus the druid's Nature's Boon passive (natures_boon).
+    // 479: plus Vampiric Touch and the parked Tithe Bomb mechanic icon.
+    // 480: plus Void Rupture's fractured-eye glyph.
+    expect(ids).toHaveLength(480);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('0bbf11a341d649b71096f27b9a3e7ee32d35865ca4cb3a7f8ba1a23e6665b0ab');
+    expect(hash).toBe('a3bb70846bbaeb4664139d45e5fcddf5762459e122839134a367ede4cd98daf3');
   });
 });

@@ -16555,7 +16555,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa 1 Odłamek Duszy, aby dodać trwałego Szkieletowego Wojownika do twojej Władzy z 2 miejscami. Może ci służyć tylko jeden. Co 6 sekund rozcina pobliskich wrogów za 45% obrażeń, a Reaping Command przygważdża jego cel spowolnieniem o 40% na 4 sekundy.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Zedrzyj skórę wroga za obrażenia broni plus {damage} i zadaj obrażenia od krwawienia przez 18 sekund. Przyznaje 1 punkt combo. Tylko w Postaci kota.',
+    'Zedrzyj skórę wroga za obrażenia broni plus {damage} i zadaj {overTime} obrażeń od krwawienia przez 18 sekund. Przyznaje 1 punkt combo. Tylko w Postaci kota.',
   'entities.abilities.rake.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
   'entities.abilities.reaping_command.description':
     'Zużywa 2 Odłamki Duszy, rozkazując wszystkim nieumarłym sługom uderzyć jednocześnie. Grobowi Strażnicy prowokują i przygotowują się na cios, Wojownicy przygważdżają, Kościani Magowie obnażają magiczne osłony, a Grobowe Skrzydło rozrywa wszystkich trafionych wrogów.',

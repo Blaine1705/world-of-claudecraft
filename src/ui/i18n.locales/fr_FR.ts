@@ -17024,7 +17024,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Dépense 1 Fragment d'âme pour ajouter un Guerrier squelette permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 45% de dégâts toutes les 6 s, et Commandement de la moisson cloue sa cible avec un ralentissement de 40% pendant 4 s.",
   'entities.abilities.raise_skeletal_warrior.name': 'Relever un Guerrier squelette',
   'entities.abilities.rake.description':
-    "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et cause des dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de chat uniquement.",
+    "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et inflige {overTime} points de dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de chat uniquement.",
   'entities.abilities.rake.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.reaping_command.description':
     "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés.",

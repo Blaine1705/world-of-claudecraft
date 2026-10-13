@@ -61,7 +61,7 @@ export interface ClassDef {
   // Consumables in a fresh character's bags: every class carries food; the
   // mana classes also carry water. Saved characters load their own bags.
   startItems: { itemId: string; count: number }[];
-  // hunters: auto shot (4yd deadzone). casters: wand (wand:true → no deadzone,
+  // hunters: auto shot (no deadzone since v0.45). casters: wand (wand:true → no deadzone,
   // fires a magic-school bolt so they don't run into melee to auto-attack, #94)
   ranged?: WeaponInfo & {
     maxRange: number;
@@ -364,7 +364,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS,
-    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 4 },
+    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 0 },
     abilities: [
       'raptor_strike',
       'pack_command',
@@ -626,6 +626,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'wildwake',
       'grove_awakening',
       'sporemender_form',
+      'spore_burst',
+      'natures_boon',
     ],
     color: 0xff8c1a,
   },
@@ -3942,7 +3944,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 1.5,
     cooldown: 0,
     range: 35,
-    minRange: 4,
     school: 'physical',
     projectile: true,
     scalesWith: 'ranged',
@@ -3992,7 +3993,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 0,
     range: 35,
-    minRange: 4,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -4023,7 +4023,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 6,
     range: 35,
-    minRange: 4,
     school: 'arcane',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -4048,7 +4047,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 12,
     range: 35,
-    minRange: 4,
     school: 'physical',
     projectile: true, // a fired shot: damage/slow resolve when the bolt lands
     // A fired shot: its flat damage scales off Ranged AP like the other shots,
@@ -4198,7 +4196,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 2.5,
     cooldown: 0,
     range: 35,
-    minRange: 4,
     school: 'physical',
     projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
@@ -4219,7 +4216,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     channel: { duration: 2.4, ticks: 6 },
     cooldown: 12,
     range: 35,
-    minRange: 4,
     school: 'physical',
     projectile: true,
     scalesWith: 'ranged',
@@ -6292,7 +6288,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       // (combat/druid_engines.ts), pinned to this note by
       // tests/druid_engines.test.ts.
       restoration:
-        "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3. Nature's Boon makes it instant, free, and 25% stronger.",
+        'Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3.',
     },
   },
   mark_of_the_wild: {
@@ -6693,7 +6689,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Flense the enemy for weapon damage plus $d and cause bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
+      'Flense the enemy for weapon damage plus $d and cause $o bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
     specNotes: {
       feral: 'Each hit that lands adds 1 Old Blood (max 3).',
     },
@@ -6977,7 +6973,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     effects: [{ type: 'incapacitate', duration: 8 }],
-    description: 'Forces the target into a deep sleep for up to 8 sec. Any damage will awaken it.',
+    description:
+      'Forces the target into a deep sleep for up to 8 sec. Any damage will awaken it. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails.',
   },
   dash: {
     id: 'dash',
@@ -6994,9 +6991,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    requiresForm: 'cat',
+    // Pressable from ANY form (and caster form): it shifts the druid into Cat
+    // Form on the way in (combat/druid_form_entry.ts), instantly and still off
+    // the global cooldown, so it doubles as the panic escape out of Bruin.
+    usableInForm: true,
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.5, duration: 15 }],
-    description: 'Sprint forward, increasing movement speed by 50% for 15 sec. Cat Form only.',
+    description:
+      'Shift into Cat Form if you are not already, then sprint, increasing movement speed by 50% for 15 sec. Usable in any form. Instant, and does not trigger the global cooldown.',
   },
   pounce: {
     id: 'pounce',
@@ -7137,10 +7138,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     spendsCombo: true,
     requiresForm: 'cat',
     effects: [
-      { type: 'dot', total: 156, duration: 24, interval: 2, baseTotal: 36, perComboTotal: 24 },
+      // Doubled (was 156 total: 36 base plus 24 per point) so the finisher
+      // bleed earns its press against Gorebite in the feral cycle.
+      { type: 'dot', total: 312, duration: 24, interval: 2, baseTotal: 72, perComboTotal: 48 },
     ],
     description:
-      'Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: $d total). Cat Form only.',
+      'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: $d total). Cat Form only.',
     specNotes: {
       feral: 'The landed hit adds 1 Old Blood (max 3).',
     },
@@ -7703,7 +7706,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 15,
     range: 25,
-    minRange: 4,
     school: 'physical',
     requiresTarget: true,
     effects: [
@@ -7742,7 +7744,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 60,
     range: 30,
-    minRange: 4,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -8034,6 +8035,63 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
   },
+  spore_burst: {
+    id: 'spore_burst',
+    name: 'Spore Burst',
+    class: 'druid',
+    // The splash heal-and-damage both caster specs lacked (owner design
+    // 2026-10-12). Wildfang does not get it.
+    specs: ['balance', 'restoration'],
+    learnLevel: 10,
+    cost: 90,
+    castTime: 0,
+    cooldown: 30,
+    range: 40,
+    school: 'nature',
+    requiresTarget: false,
+    targetMode: 'position',
+    // Placed on the floor with a 5 sec fuse everyone can see, so it hits
+    // harder than an instant heal or nuke: one roll for every ally and enemy
+    // in the 8 yd splash (Galeheart's radius), uncapped
+    // (combat/druid_spore_burst.ts).
+    effects: [
+      { type: 'sporeBurst', min: 250, max: 250, healMin: 250, healMax: 250, radius: 8, fuse: 5 },
+    ],
+    description:
+      'Summons a spore burster onto the target area. After $t sec it bursts, healing allies for $h and dealing $d Nature damage to enemies within 8 yards.',
+    specNotes: {
+      balance: 'At 3 Moontide it is 25% stronger and spends your Moontide.',
+      restoration:
+        'Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance.',
+    },
+  },
+  // Nature's Boon as a spellbook passive: the window itself is armed by
+  // combat/druid_natures_boon.ts; this row only teaches it, per spec.
+  natures_boon: {
+    id: 'natures_boon',
+    name: "Nature's Boon",
+    class: 'druid',
+    specs: ['feral', 'balance', 'restoration'],
+    learnLevel: 10,
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [],
+    description:
+      "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+    specNotes: {
+      feral:
+        'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
+      balance:
+        'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+      restoration:
+        'Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+    },
+  },
   feral_charge: {
     id: 'feral_charge',
     name: 'Primal Surge',
@@ -8296,7 +8354,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 20,
     range: 35,
-    minRange: 4,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -8951,6 +9008,16 @@ function scaleEffect(
         ...eff,
         min: Math.round(eff.min * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
         max: Math.round(eff.max * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
+      };
+    case 'sporeBurst':
+      // Both halves of the burst: the damage roll takes the damage multiplier
+      // and the heal roll the heal multiplier, as aoeDamage and aoeHeal do.
+      return {
+        ...eff,
+        min: Math.round(eff.min * dmgMult + flat),
+        max: Math.round(eff.max * dmgMult + flat),
+        healMin: Math.round(eff.healMin * healMult + flat),
+        healMax: Math.round(eff.healMax * healMult + flat),
       };
     case 'chainDamage':
       return {

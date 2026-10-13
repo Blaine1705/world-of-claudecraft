@@ -19,7 +19,11 @@ import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scalin
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
 import { LUNGE_ID, startLunge } from './druid_lunge';
-import { GROVEHEART_BOON_ICD_KEY, NATURES_BOON_ID } from './druid_natures_boon';
+import {
+  GROVEHEART_BOON_ICD_KEY,
+  MOONGROVE_BOON_ICD_KEY,
+  NATURES_BOON_ID,
+} from './druid_natures_boon';
 import {
   BRUIN_RUSH_WINDOW_ID,
   BRUIN_RUSH_WINDOW_SECONDS,
@@ -410,6 +414,22 @@ export function druidEngineOnCast(
   if (abilityId === LUNGE_ID) startLunge(ctx, player, target);
 
   const spec = specOf(ctx, player);
+  // Spore Burst (combat/druid_spore_burst.ts) is a payoff when the bank is
+  // full: the cast arm already took the 25%, and here the whole bank is
+  // spent, in any form, exactly as Overbloom or Moonsurge spend it.
+  if (abilityId === 'spore_burst') {
+    const bankId = spec === 'restoration' ? VERDANCE_ID : spec === 'balance' ? MOONTIDE_ID : null;
+    const cap = spec === 'restoration' ? VERDANCE_STAGES : MOONTIDE_STAGES;
+    if (bankId && (ownedAura(player, bankId)?.stacks ?? 0) >= cap) {
+      removeOwnedAura(ctx, player, bankId);
+      if (bankId === VERDANCE_ID) {
+        seedNextEngineBank(ctx, player, VERDANCE_ID, 'Verdance', 'verdance');
+      } else {
+        seedNextEngineBank(ctx, player, MOONTIDE_ID, 'Moontide', 'moontide');
+      }
+    }
+    return;
+  }
   if (spec === 'balance') {
     if (!inMoonwing(player)) return;
     // One bank, one loop: every completed Wildbolt, Skyfall, or Moonseed
@@ -536,7 +556,17 @@ function remainingTicks(aura: Aura): number {
     : 0;
 }
 
-function replantSporemending(ctx: SimContext, player: Entity, target: Entity): void {
+/** Plant the player's own Sporemending on `target` at the rank and bonuses a
+ *  real cast would carry. Also Spore Burst's Groveheart rider
+ *  (combat/druid_spore_burst.ts), which passes its cast-scoped multiplier
+ *  (an armed Nature's Boon window) as `castMult`: like the hot arm, it scales
+ *  the WHOLE tick, and the === 1 guard keeps every other replant identical. */
+export function replantSporemending(
+  ctx: SimContext,
+  player: Entity,
+  target: Entity,
+  castMult = 1,
+): void {
   const resolved = ctx.resolvedAbility('rejuvenation', player.id);
   const hot = resolved?.effects.find((effect) => effect.type === 'hot');
   if (!resolved || !hot || hot.type !== 'hot') return;
@@ -555,10 +585,9 @@ function replantSporemending(ctx: SimContext, player: Entity, target: Entity): v
     hot.interval,
     talentHealMult * (1 + mods.global.hotHealPct),
   );
-  const tickValue = scalePrimaryHealing(
-    hotBase + hotSp,
-    primaryHealingMultiplier(meta.cls, mods.spec),
-  );
+  const hotTick =
+    castMult === 1 ? hotBase + hotSp : Math.max(1, Math.round((hotBase + hotSp) * castMult));
+  const tickValue = scalePrimaryHealing(hotTick, primaryHealingMultiplier(meta.cls, mods.spec));
   ctx.applyAura(target, {
     id: 'rejuvenation',
     name: resolved.def.name,
@@ -693,6 +722,7 @@ export function cleanDruidEngineState(
   if (player.procState) {
     delete player.procState.icds[LOPING_STRIDE_ICD_KEY];
     delete player.procState.icds[GROVEHEART_BOON_ICD_KEY];
+    delete player.procState.icds[MOONGROVE_BOON_ICD_KEY];
   }
 }
 

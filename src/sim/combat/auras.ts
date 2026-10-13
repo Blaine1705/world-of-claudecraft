@@ -505,8 +505,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             if (src && healed > 0) ctx.healingThreat(src, e, healed);
           }
           // Groveheart Nature's Boon (combat/druid_natures_boon.ts): an owned
-          // HoT tick can arm the instant, free Wildmend window. Restoration-
-          // gated and cooldown-gated inside, before any rng draw.
+          // HoT tick can arm the free Wildmend and Spore Burst window.
+          // Restoration-gated and cooldown-gated inside, before any rng draw.
           naturesBoonOnHotTick(ctx, healer ?? null, a);
         } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
           e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));

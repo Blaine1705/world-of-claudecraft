@@ -16436,7 +16436,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "1 Ruh Parçası harcayarak 2 kişilik Hükümranlığına kalıcı bir İskelet Savaşçı ekler. Sana yalnızca bir tanesi hizmet edebilir. Her 6 sn'de bir yakındaki düşmanları %45 hasarla biçer ve Hasat Emri hedefini 4 sn boyunca %40 yavaşlatarak sabitler.",
   'entities.abilities.raise_skeletal_warrior.name': 'İskelet Savaşçı Diriltme',
   'entities.abilities.rake.description':
-    'Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca kanatır. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.',
+    'Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca {overTime} kanama hasarı verir. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.',
   'entities.abilities.rake.specNote_feral': 'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
   'entities.abilities.reaping_command.description':
     '2 Ruh Parçası harcayarak tüm ölü hizmetkarlara birlikte vurma emri verir. Mezar Muhafızları kışkırtır ve hazırlanır, Savaşçılar sabitler, Kemik Büyücüler büyü savunmalarını açığa çıkarır ve Mezar Kanadı vurduğu tüm düşmanları parçalar.',

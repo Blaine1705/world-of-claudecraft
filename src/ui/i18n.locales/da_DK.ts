@@ -16385,7 +16385,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bruger 1 Sjælesplint for at tilføje en vedvarende Skeletkriger til dit 2-plads Herredømme. Kun én kan tjene dig ad gangen. Den kløver nærliggende fjender for 45% skade hvert 6. sek., og Reaping Command nedsætter dens måls bevægelse med 40% i 4 sek.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Flæns fjenden for våbenskade plus {damage} og giv blødningsskade over 18 sek. Giver 1 combopoint. Kun i Katteform.',
+    'Flæns fjenden for våbenskade plus {damage} og giv {overTime} blødningsskade over 18 sek. Giver 1 combopoint. Kun i Katteform.',
   'entities.abilities.rake.specNote_feral':
     'Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3).',
   'entities.abilities.reaping_command.description':

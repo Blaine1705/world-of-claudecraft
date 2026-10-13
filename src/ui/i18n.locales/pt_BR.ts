@@ -17245,7 +17245,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Gasta 1 Fragmento de Alma para adicionar um Guerreiro Esquelético permanente ao seu Domínio de 2 vagas. Apenas um pode servi-lo. Ele atinge em área os inimigos próximos por 45% de dano a cada 6 s, e Reaping Command imobiliza seu alvo com uma lentidão de 40% por 4 s.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Esfola o inimigo por dano da arma mais {damage} e causa dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Gato.',
+    'Esfola o inimigo por dano da arma mais {damage} e causa {overTime} de dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Gato.',
   'entities.abilities.rake.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
   'entities.abilities.reaping_command.description':
     'Gasta 2 Fragmentos de Alma para comandar todos os servos mortos-vivos a golpear em uníssono. Guardas Tumulares provocam e se preparam, Guerreiros imobilizam, Magos de Ossos expõem defesas mágicas, e a Asa Tumular dilacera todos os inimigos atingidos.',

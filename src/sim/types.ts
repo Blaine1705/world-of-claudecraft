@@ -854,6 +854,7 @@ export interface DamageBreakBudget {
 export type CrowdControlDrCategory =
   | 'root'
   | 'incapacitate'
+  | 'sleep'
   | 'polymorph'
   | 'fear'
   | 'lockout'
@@ -3285,6 +3286,20 @@ export type AbilityEffect =
       selfCooldownRate: number;
       allyCooldownRate: number;
     }
+  // Druid Spore Burst (combat/druid_spore_burst.ts): plants a spore burster at
+  // the aimed point. After `fuse` seconds it bursts once, healing every friendly
+  // unit within `radius` for healMin..healMax and dealing min..max Nature damage
+  // to every hostile one (no target cap on either side). Groveheart also plants
+  // Sporemending on each ally it heals.
+  | {
+      type: 'sporeBurst';
+      min: number;
+      max: number;
+      healMin: number;
+      healMax: number;
+      radius: number;
+      fuse: number;
+    }
   // Chronomancy raid cooldown (Rewind / Rebobinar): instant, no target, centered on
   // the caster. Restores `fraction` of the REAL damage each living group/raid member
   // within `radius` took in the last `windowSec` seconds, capped per target at
@@ -5342,6 +5357,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // Lets a jump clear fences for the whole arc, independent of slope.
   jumping: boolean;
   fallStartY: number;
+  // Set while a hostile airborne knockback (Typhoon) has the body in flight
+  // (combat/knockback_launch.ts): who threw it, and the movement-kernel steps
+  // the throw has left. While set, air steering is off and a fall credits the
+  // thrower. The kernel counts it down and clears it once the body stands
+  // settled (not sliding); death and teleports clear it. Sim-side only.
+  launchedBy?: { sourceId: number; ticksLeft: number };
   // Seconds of held underwater travel. Ramps the dive speed from its slow
   // opening pace to the cruise across one stroke (see player_motion.ts
   // swimSpeedMult); zero whenever the body is not submerged.
@@ -5937,6 +5958,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Captured synchronously when loot rolls, so a later disconnect cannot
    *  erase a kill-eligible character from the copy's transfer group. */
   lootPartyTradeEligibility?: { names: string[]; characterIds: number[] };
+  /** Runtime-only: the durable character behind each entity id a full-bags
+   *  award is held on this corpse for (loot/awarded_loot_hold.ts). A relog
+   *  mints a new entity id, so the join re-points the held slots through it.
+   *  Never on the wire: the snapshot sends the loot slots, not this map. */
+  heldLootOwners?: Map<number, number>;
   xpValue: number;
   // npc
   questIds: string[];
@@ -7723,6 +7749,8 @@ export type SimEvent = { pid?: number } & (
         // travels to targetId as a cosmetic homing projectile.
         | 'soulTravel'
         | 'meteorImpact'
+        // A Spore Burst mushroom bursting (combat/druid_spore_burst.ts).
+        | 'sporeBurst'
         | 'ambientMeteorFall';
       // The casting ability's id, so the renderer can pick that ground cast's
       // authored visual instead of a generic per-school one.

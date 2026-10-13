@@ -16630,7 +16630,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan 1 Serpihan Jiwa untuk menambahkan Skeletal Warrior persisten ke Dominasi 2-slot milikmu. Hanya satu yang boleh mengabdi kepadamu. Ia membelah musuh terdekat sebesar 45% kerusakan setiap 6 detik, dan Reaping Command menahan targetnya dengan perlambatan 40% selama 4 detik.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Kucing.',
+    'Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan {overTime} kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Kucing.',
   'entities.abilities.rake.specNote_feral':
     'Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
   'entities.abilities.reaping_command.description':

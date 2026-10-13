@@ -5163,7 +5163,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description': '在狼形態下進入隱匿狀態。無法於戰鬥中使用。',
   'entities.abilities.rake.name': '剮擊',
   'entities.abilities.rake.description':
-    '撕裂敵人，造成武器傷害外加 {damage} 點，並造成持續 18 秒的流血傷害。給予 1 點連擊點。僅限貓形態。',
+    '撕裂敵人，造成武器傷害外加 {damage} 點，並在 18 秒內造成 {overTime} 點流血傷害。給予 1 點連擊點。僅限貓形態。',
   'entities.abilities.revive_pet.name': '修補',
   'entities.abilities.revive_pet.description':
     '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',
@@ -18027,6 +18027,22 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sporemender_form.name': '孢癒者形態',
   'entities.abilities.sporemender_form.description':
     '變形為孢癒者，使你造成的治療提高20%，護甲提高40%，但移動速度降低20%。你在普通形態下的所有法術仍可施放。持續到你切換形態為止。變形為任何形態時都會獲得「輕捷步伐」，短暫提升移動速度。再次施放可返回普通形態。（恢復標誌技能）',
+  'entities.abilities.spore_burst.name': '孢子爆發',
+  'entities.abilities.spore_burst.description':
+    '在目標區域召喚一株孢子爆裂菇。{duration} 秒後它會爆開，為 8 碼內的盟友恢復 {healing} 點生命值，並對敵人造成 {damage} 點自然傷害。',
+  'entities.abilities.spore_burst.specNote_balance':
+    '月潮達到 3 層時，效果提高 25%，並消耗你的月潮。',
+  'entities.abilities.spore_burst.specNote_restoration':
+    '同時為每個被治療的盟友施加孢癒術。繁茂疊滿時，效果提高 25%，並消耗你的繁茂。',
+  'entities.abilities.natures_boon.name': '自然恩惠',
+  'entities.abilities.natures_boon.description':
+    '你的法術可以觸發持續 10 秒的自然恩惠：其指定的法術無需消耗、效果提高 25%，且可在任意形態下施放。再次觸發會刷新持續時間。',
+  'entities.abilities.natures_boon.specNote_feral':
+    '每次命中的近戰自動攻擊有 1/15 的機率觸發它，作用於孢癒術；處於巨熊形態時也作用於橡樹皮術。',
+  'entities.abilities.natures_boon.specNote_balance':
+    '每次施放狂野奔雷或隕天術有 10% 的機率觸發它，作用於孢子爆發，每 10 秒最多觸發一次。',
+  'entities.abilities.natures_boon.specNote_restoration':
+    '你的持續治療效果每次跳動有 10% 的機率觸發它，作用於孢子爆發，每 10 秒最多觸發一次。',
   'entities.abilities.prayer_of_returning.description':
     '呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（聖光與戒律）',
   'entities.abilities.prayer_of_returning.name': '歸返祈禱',

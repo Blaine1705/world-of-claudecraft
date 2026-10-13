@@ -85,7 +85,9 @@ const SECOND_PASS_RECORD_SHA256 =
   // the sealed hotbarItems census 81 -> 85 without retaking any captures.
   // Groveheart's Sporemender Form (sporemender_form) advances the live ability
   // census 408 -> 409, two lines substituted by hand, no capture retaken.
-  '9113aed3b3dac5e6a305c7c2c7a3baa971d7730d0871bf9738b61c389396c858';
+  // Spore Burst (spore_burst) and the Nature's Boon passive (natures_boon)
+  // advance it 409 -> 411 the same way.
+  '94a7469620da52ec3193d2024b09a7edd69dbbe948ffacecc7170a15930d6b41';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -383,7 +385,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // the release arm's two new abilities riding the v0.40.0 sync merge.
         // The hotbar census stays at this branch's 75 (the release's own arm
         // read 72 without the three role foods).
-        abilities: { live: 409, painted: 409 },
+        abilities: { live: 411, painted: 411 },
         // 76 at the first v0.42.0 sync: the release's one new hotbar item, the
         // Bonebound Rickshaw reins (reins_rickshaw_mount, kind 'mount'), joins
         // the census and ships committed painted art, so painted moves with
@@ -491,15 +493,15 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       liveAbilityIds.length,
     );
     // Vampiric Touch, Tithe Bomb and Void Rupture all ship painted art.
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(412);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(414);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',
     ).toEqual([]);
-    expect(paintedAbilityIds.size).toBe(412);
+    expect(paintedAbilityIds.size).toBe(414);
     expect(aggregate.runtimeClosure.abilities, 'sealed v0.39 inventory').toEqual({
-      live: 409,
-      painted: 409,
+      live: 411,
+      painted: 411,
     });
 
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(

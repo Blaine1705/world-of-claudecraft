@@ -1043,9 +1043,11 @@ const MONOLITHS: MonolithRow[] = [
     // async build tracking stays extracted in static_interior_tracker.ts while
     // the release batch's spirit-veil and Spell Effects extractions remain.
     // Exact count measured with wc -l on the resolved tree. Zero slack.
-    // LOWERED 12620 -> 12617 after resolving the Sporemender Form rig-slot
-    // extraction with the release batch. Exact count.
-    ceiling: 12617,
+    // RAISED 12617 -> 12636 after integrating Spore Burst with the v0.45
+    // renderer extractions: the visual lives in src/render/spore_burst_visual.ts;
+    // renderer.ts only constructs it, syncs it in both frame loops, and routes
+    // the burst cue. Exact count, zero slack.
+    ceiling: 12636,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1270,7 +1272,9 @@ const MONOLITHS: MonolithRow[] = [
     // the sickness save fields moved into src/sim/aura_persist.ts's
     // auraSaveFragment beside the new buff list, while the candidate's
     // rift-safe corpse save path remains in sim.ts. Exact count, zero slack.
-    ceiling: 11629,
+    // Up to 11630 while composing #4414's Spore Burst ground rider with the
+    // existing v0.45.0 batch. Exact merged count, zero slack.
+    ceiling: 11630,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1958,7 +1962,9 @@ const MONOLITHS: MonolithRow[] = [
     // (adiff): thin ClientWorld decode/read only, measured with wc -l after biome.
     // Weekly Vault self-decode joins the bank_snapshot_wire owner-only cohort.
     // Combined merge measures 5330 lines, exact count and zero slack.
-    ceiling: 5330,
+    // RAISED 5330 -> 5332 for Spore Burst: the activeSporeBursts IWorld field
+    // and its type import (the decode lives in net/ground_telegraph_wire.ts).
+    ceiling: 5332,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

@@ -4,6 +4,7 @@ import type {
   ActionBarLayoutProfile,
   ActiveConsecration,
   ActiveFrostRing,
+  ActiveSporeBurst,
   ActiveTemporalHourglass,
   BankBonusSource,
   CivicServicePlacement,
@@ -128,6 +129,7 @@ import { heroicLeapPlacementPreview } from './combat/heroic_leap';
 import { clearFieldcraftState } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
 import { clearHunterTalentState, hunterPetDamageMultiplier } from './combat/hunter_shared';
+import { dealKernelDamage } from './combat/knockback_launch';
 import { tickNaturesFury } from './combat/natures_fury';
 import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
@@ -312,6 +314,7 @@ import {
 import { entityLineOfSightClear } from './line_of_sight_elevation';
 import { cloneGearSet } from './loadout_gear';
 import type { Ante, PickAction } from './lockpick';
+import { rebindHeldAwardsOnJoin } from './loot/awarded_loot_hold';
 import { retirePartyTradeOnLoad, retirePartyTradeOnSave } from './loot/bop_trade_persistence';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 import { replacementTapperForLeave } from './loot/kill_participation';
@@ -436,6 +439,7 @@ import {
   stepPlayerMotion,
   swimSurfaceY,
 } from './player_motion';
+import { addClassStartItems } from './player_start_items';
 import { livePlaytimeSeconds } from './playtime';
 import {
   type ArchetypeState,
@@ -2171,6 +2175,9 @@ export class Sim {
   get activeConsecrations(): ActiveConsecration[] {
     return groundAoeReadouts.collectActiveConsecrations(this.groundAoEs);
   }
+  get activeSporeBursts(): ActiveSporeBurst[] {
+    return groundAoeReadouts.collectActiveSporeBursts(this.groundAoEs);
+  }
   reactiveAbilityWindowRemaining(abilityId: string): number {
     if (abilityId !== 'mongoose_bite') return 0;
     return Math.max(0, this.player.overpowerUntil - this.time);
@@ -2271,8 +2278,7 @@ export class Sim {
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
         const wasAlive = !target.dead;
-        this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
-        // Null-source Falling is the kernel sentinel; dead targets no-op, so require transition.
+        dealKernelDamage(this.ctx, source, target, amount, crit, school, ability, kind, noRage);
         const isPlayerFall = source === null && ability === 'Falling' && target.kind === 'player';
         if (isPlayerFall && wasAlive && target.dead) {
           deedsMod.onFallDeathForDeeds(this.ctx, target);
@@ -2925,14 +2931,9 @@ export class Sim {
       reliquary: freshReliquaryState(),
       accountLedger: opts?.accountLedger ?? freshAccountLedger(),
     };
-    // A fresh character sets out provisioned (class-defined starter rations);
-    // a saved character loads its own bags from savedState below.
-    if (!savedState) {
-      for (const it of classDef.startItems) {
-        meta.inventory.push({ itemId: it.itemId, count: it.count });
-      }
-    }
+    if (!savedState) addClassStartItems(meta.inventory, classDef);
     this.players.set(player.id, meta);
+    rebindHeldAwardsOnJoin(this.ctx, player.id); // awards held on a corpse across a relog
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
     player.mountSkinId = meta.mountSkinId;

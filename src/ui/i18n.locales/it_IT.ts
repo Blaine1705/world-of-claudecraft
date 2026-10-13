@@ -17343,7 +17343,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Spende 1 Frammento d'Anima per aggiungere un Guerriero Scheletrico permanente al tuo Dominio a 2 posti. Solo uno può servirti. Colpisce in area i nemici vicini per il 45% dei danni ogni 6 sec, e Reaping Command blocca il suo bersaglio con un rallentamento del 40% per 4 sec.",
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    "Scarnifica il nemico per danni dell'arma più {damage} e causa danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
+    "Scarnifica il nemico per danni dell'arma più {damage} e causa {overTime} danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
   'entities.abilities.rake.specNote_feral':
     'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
   'entities.abilities.reaping_command.description':
