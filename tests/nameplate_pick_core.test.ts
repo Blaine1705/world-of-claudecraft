@@ -94,7 +94,7 @@ describe('nameplate health-bar picking', () => {
     expect(gatherNodePick).toBeGreaterThan(directEntityPick);
     expect(sloppyEntityPick).toBeGreaterThan(gatherNodePick);
     const directPick = renderer.indexOf(
-      'pickDirect(clientX: number, clientY: number): number | null',
+      'pickDirect(clientX: number, clientY: number, attackIntent = false): number | null',
     );
     const nameplatePick = renderer.indexOf('this.host.nameplatePick(', directPick);
     const nameplateWins = renderer.indexOf(

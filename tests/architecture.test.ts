@@ -832,6 +832,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
+  // Was a click aimed at a body: the pick ray against its visible core.
+  'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
   // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
   'src/render/body_emote_core.ts',

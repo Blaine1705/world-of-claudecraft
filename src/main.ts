@@ -3539,7 +3539,7 @@ async function startGame(
   // along the way (see attackMoveTick). Reuses the click-to-move travel pipeline.
   function handleAttackMove(x: number, y: number): void {
     if (world.player.dead) return;
-    const id = renderer.picking.pick(x, y);
+    const id = renderer.picking.pick(x, y, true);
     if (id !== null) {
       const e = world.entities.get(id);
       if (e && isAttackableEntity(e, world.playerId, activePvpOpponentIds(world))) {
