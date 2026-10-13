@@ -11818,37 +11818,6 @@
     align-items: center;
     gap: 8px;
   }
-  /* The buddy shelf: the whistle still as the option's icon, the drag grip
-     for the action bar. */
-  .deeds-buddies .deed-title-option {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .deed-buddy-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    border: 1px solid var(--color-deed-buddy-icon-border);
-    flex: 0 0 auto;
-  }
-  .deed-buddy-icon-empty {
-    background: linear-gradient(160deg, var(--color-card-hi), var(--color-card-lo));
-  }
-  .deed-buddy-drag {
-    margin-left: auto;
-    width: 40px;
-    height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: grab;
-    color: var(--color-text-muted);
-    border-radius: 4px;
-  }
-  .deed-buddy-drag:hover {
-    color: var(--color-deed-banner-text);
-  }
   .deed-border-swatch {
     flex: none;
     display: inline-flex;
@@ -17703,17 +17672,14 @@
     font-size: 12px;
     padding: 5px 4px;
     color: var(--color-text-muted);
-    background: linear-gradient(var(--color-collections-tab-hi), var(--color-collections-tab-lo));
+    background: var(--collections-tab-bg);
     border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     cursor: pointer;
   }
   .col-tab.active {
     color: var(--gold);
-    background: linear-gradient(
-      var(--color-collections-tab-on-hi),
-      var(--color-collections-tab-on-lo)
-    );
+    background: var(--collections-tab-active-bg);
   }
   /* Readability pass (owner request): every word in this window is white and
      bold. The item-quality tints the rows carry (q-common through q-epic) read
@@ -17729,7 +17695,7 @@
   #collections-window .col-line-value,
   #collections-window .col-note,
   #collections-window .col-tab {
-    color: var(--color-white);
+    color: var(--color-collections-text);
     font-weight: 700;
   }
   /* Two panes: the catalog list scrolls, the detail pane holds the preview. */
@@ -17888,7 +17854,7 @@
      broken image. */
   .col-noart {
     display: inline-block;
-    background: var(--color-collections-art-empty);
+    background: var(--color-collections-noart);
   }
 
   /* ---------- Ashen Coliseum (arena) ---------- */
