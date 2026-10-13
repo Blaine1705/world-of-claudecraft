@@ -186,7 +186,9 @@ describe('the Remembrance Candle: lit and guttered on every graphics tier', () =
       4,
     );
     const m = new THREE.Matrix4();
-    RITE_CANDLE_SPOTS.forEach((s, k) => mesh.setMatrixAt(k, m.makeTranslation(s.x, 0, s.z)));
+    RITE_CANDLE_SPOTS.forEach((s, k) => {
+      mesh.setMatrixAt(k, m.makeTranslation(s.x, 0, s.z));
+    });
     tagRiteCandleGlow(mesh, RITE_CANDLE_SPOTS);
     const tag = mesh.userData.riteCandleGlow as { instanceOf: number[]; matrices: THREE.Matrix4[] };
     expect(tag.instanceOf).toEqual([0, 1, 2, 3]);
