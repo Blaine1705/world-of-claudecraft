@@ -78,9 +78,9 @@ and the character sheet shows the current title.
     The Rift Watch's Champion row also sells the Viridian Valestrider's reins
     (the faction mount: a teal coast-runner on the Agility line; the reins def
     stays with the other reins in `content/items.ts`) for 500 marks
-    (`MOUNT_MARKS`), never coin, behind the same riding and one-per-account gates
-    every reins purchase carries. The Reliquary hints the
-    mount at the quartermaster and it leaves the pending-ruling list. The
+    (`MOUNT_MARKS`), never coin, behind the same riding and one-per-account
+    gates every reins purchase carries. The Reliquary hints the mount at the
+    quartermaster and it leaves the pending-ruling list. The
     Church Order and the Automatons get their own mounts when their assets
     land (Terrid's Dawn Strider is the Church Order's).
   Every gear and bag row binds on purchase (`soulbound`), because the standing
