@@ -1,4 +1,5 @@
 import { audio } from '../game/audio';
+import { authoredMapMusicInput } from '../game/authored_map_music';
 import { corpseLootAvailabilityInWorld } from '../game/corpse_loot_availability';
 import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
 import { syncDeathControllerHints } from '../game/death_controller_hint';
@@ -66,6 +67,9 @@ import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
   ALL_RECIPES,
+  activeNamedAreas,
+  activeWorldStripRegion,
+  activeZoneList,
   CLASSES,
   DUNGEON_X_THRESHOLD,
   dungeonAt,
@@ -74,10 +78,6 @@ import {
   MOBS,
   NPCS,
   QUESTS,
-  WORLD_MAX_X,
-  WORLD_MAX_Z,
-  WORLD_MIN_X,
-  WORLD_MIN_Z,
   ZONES,
   zoneAt,
 } from '../sim/data';
@@ -306,9 +306,11 @@ import {
   itemSetBonusField,
   knownLetterId,
   riftFloorLabel,
+  subzoneBannerText,
   tEntity,
   zoneDisplayName,
   zonePoiLabel,
+  zoneSourceById,
 } from './entity_i18n';
 import {
   type ErrorTextLockoutDeps,
@@ -479,6 +481,7 @@ import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
 import { DungeonPrompts, fctAvoidanceText, wardHealthText, wardHitText } from './hud/dungeon';
 import { applyDungeonGuideSpeech } from './hud/dungeon/dungeon_guide_speech';
+import { DungeonTrackerPainter } from './hud/dungeon/dungeon_tracker_painter';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
@@ -598,6 +601,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { createReferralCardsHud } from './hud/referral_cards/referral_cards_hud_controller';
 import { paintFactionTierCelebrations } from './hud/reputation/faction_tier_celebration_painter';
 import { advanceFactionTierObservation } from './hud/reputation/faction_tier_celebration_view';
 import { RiftMapPainter } from './hud/rift';
@@ -693,7 +697,7 @@ import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
-import { onMapArtReady } from './map_art';
+import { onMapArtReady, paintMapArtIntoStrip } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { createMapMarkerArt } from './map_marker_icon_loader';
 import { mapMarkerProfileForFlags } from './map_marker_profile_core';
@@ -898,7 +902,7 @@ import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tool
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
-import { nearestSubzone } from './subzone';
+import { currentSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
 import { localizeSystemText } from './system_text_i18n';
 import { TalentsWindow } from './talents_window';
@@ -2436,6 +2440,7 @@ export class Hud {
       questTitle,
       objectiveLabel: questObjectiveLabel,
       click: () => audio.click(),
+      dungeonRow: () => this.dungeonTracker.stripQuest(),
     });
     this.questDialog = new QuestDialogController({
       element: $('#quest-dialog'),
@@ -2675,12 +2680,8 @@ export class Hud {
     // (public/map_bg/world_strip.webp) blitted in as soon as it decodes, so
     // boot skips ~50k pixels of synchronous terrain painting; other worlds
     // keep the procedural render.
-    const worldStripRegion = {
-      minX: WORLD_MIN_X,
-      maxX: WORLD_MAX_X,
-      minZ: WORLD_MIN_Z,
-      maxZ: WORLD_MAX_Z,
-    };
+    // The ACTIVE world's rect; the painter samples the same one (data.ts).
+    const worldStripRegion = activeWorldStripRegion();
     if (bakedMapBgEligible(this.sim.cfg.seed, 'world_strip')) {
       const stripCanvas = document.createElement('canvas');
       stripCanvas.width = 140;
@@ -2701,17 +2702,7 @@ export class Hud {
       this.minimapBg = this.renderTerrainCanvas(140, worldStripRegion);
     }
     // hand-painted plates land in the world strip too, each over its own band
-    {
-      const stripH = this.minimapBg.height;
-      const spanZ = WORLD_MAX_Z - WORLD_MIN_Z;
-      for (const zn of ZONES) {
-        onMapArtReady(zn.id, (img) => {
-          const top = ((WORLD_MAX_Z - zn.zMax) / spanZ) * stripH;
-          const rows = ((zn.zMax - zn.zMin) / spanZ) * stripH;
-          require2dContext(this.minimapBg).drawImage(img, 0, top, this.minimapBg.width, rows);
-        });
-      }
-    }
+    paintMapArtIntoStrip(() => this.minimapBg, worldStripRegion, activeZoneList());
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
     bindMinimapObjectiveTap(mm, this);
@@ -3776,6 +3767,9 @@ export class Hud {
         break;
       case 'quest-log-window':
         this.questlogWindow.close();
+        break;
+      case 'referral-cards-window':
+        this.referralCards.close();
         break;
       case 'world-quest-leaderboard-window':
       case 'leaderboard-window':
@@ -5524,6 +5518,10 @@ export class Hud {
     root: () => $('#reliquary-tracker'),
     writers: this.writerFacet,
   });
+  private readonly dungeonTracker = new DungeonTrackerPainter({
+    writers: this.writerFacet,
+    world: () => this.sim,
+  });
   // Pinned-recipe HUD tracker (#recipe-tracker): the crafting window's pin
   // chips write the per-character store, the slow-band painter reads it and
   // folds each reagent's carried count against the craft's charge.
@@ -6009,10 +6007,16 @@ export class Hud {
       this.commitHotbarActions(swapHotbarSlots(this.hotbarActions, slotA - 1, slotB - 1)),
     clearSlot: (slot) => this.commitHotbarActions(clearHotbarSlot(this.hotbarActions, slot - 1)),
   });
-  // Quest-log window painter (questlog_view.ts core + questlog_window.ts painter).
-  // It composes the presentation bag (icon/money/tooltip) for the reward row and
-  // owns the selected quest id (Hud's quest-share command reads it back); the
-  // abandon / chat-link / confirm seams route through these lazy closures.
+  private readonly referralCards = createReferralCardsHud({
+    world: () => this.sim,
+    focus: this.windowFocus('#referral-cards-window'),
+    focusFirst: (root) => this.focusManager.focusFirst(root),
+    closeOthers: () => this.closeOtherWindows('#referral-cards-window'),
+    visibilityChanged: () => this.syncAnyWindowOpenState(),
+    snapshotChanged: () => {
+      if (this.questlogWindow.isOpen) this.questlogWindow.render();
+    },
+  });
   private readonly questlogWindow = new QuestLogWindow({
     ...this.presentationBag,
     root: () => $('#quest-log-window'),
@@ -6027,6 +6031,7 @@ export class Hud {
       this.confirmDialog(title, body, okText, cancelText, onOk),
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
+    openReferralCards: () => this.referralCards.open(),
   });
   private readonly treasureMapWindow = new TreasureMapWindow({ world: () => this.sim });
   private readonly worldQuestPuzzleWindow = new WorldQuestPuzzleWindow({
@@ -6913,7 +6918,9 @@ export class Hud {
     this.mountRaceStrip.relocalize();
     this.mountRaceControls.relocalize();
     this.refreshKeybindLabels();
+    this.dungeonTracker.relocalize(); // before the quest tracker, which reads its strip page.
     this.questTracker.relocalize(); // the strip key cannot see a locale-only change.
+    this.referralCards.relocalize();
     this.worldQuestPuzzleWindow.relocalize();
     // NOT updateDelveTracker(): the tracker's own signature is ids + numbers, so
     // a plain update() early-returns here and re-emits nothing. relocalize()
@@ -8754,6 +8761,7 @@ export class Hud {
         inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
         entities: sim.entities.values(),
         riftFloor: sim.riftFloor,
+        ...authoredMapMusicInput(),
       });
     }
 
@@ -9433,15 +9441,14 @@ export class Hud {
 
       // subzone text: a smaller banner when you step into a named landmark
       // (classic "subzone" display). POIs are the same labels the minimap pins.
-      const subzone = inDungeon
+      // Zone POI points AND the map's authored `locations` rects (subzone.ts).
+      const hit = inDungeon
         ? null
-        : nearestSubzone(p.pos.x, p.pos.z, currentZone.pois, this.lastSubzone);
+        : currentSubzone(p.pos.x, p.pos.z, currentZone.pois, activeNamedAreas(), this.lastSubzone);
+      const subzone = hit?.label ?? null;
       if (subzone !== this.lastSubzone) {
         this.lastSubzone = subzone;
-        if (subzone) {
-          const poiIndex = currentZone.pois.findIndex((q) => q.label === subzone);
-          this.showSubzone(poiIndex >= 0 ? zonePoiLabel(currentZone.id, poiIndex) : subzone);
-        }
+        if (hit) this.showSubzone(subzoneBannerText(currentZone.id, hit));
       }
 
       // The music machine ran in the non-paint head this same frame (same
@@ -9465,6 +9472,7 @@ export class Hud {
         paintRestIndicator($('#pf-rest'), rest, this.writerFacet);
       }
 
+      this.dungeonTracker.update();
       this.updateQuestTracker(now);
       this.updateDelveTracker();
       this.updateRiftTracker();
@@ -9571,6 +9579,7 @@ export class Hud {
     // Social repaints only on the slow divider, behind the painter's struct/content
     // diff-gate; a content tick swaps the body innerHTML without re-wiring rows.
     if (slowHud) this.socialWindow.refreshIfChanged();
+    if (slowHud) this.referralCards.update();
     if (slowHud) this.updateGuildBillboardEcho();
     if (slowHud && this.marketWindow.isOpen) {
       if (!nearbyServiceNpc(this.sim, 'market')) this.marketWindow.close();
@@ -10101,7 +10110,8 @@ export class Hud {
   private prewarmMapBg(zoneId: string): void {
     if (this.mapBgCache.has(zoneId)) return;
     if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
-    const zone = ZONES.find((z) => z.id === zoneId);
+    // ACTIVE zones too: an authored map's zone is in no static list.
+    const zone = zoneSourceById(zoneId);
     if (!zone) return;
     if (bakedMapBgEligible(this.sim.cfg.seed, zoneId)) {
       loadBakedMapBg(

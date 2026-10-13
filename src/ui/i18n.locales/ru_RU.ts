@@ -1655,6 +1655,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC Рекорды',
   'landing.scout': 'WoC Разведка',
   'landing.parseService': 'WoC Боевые отчёты',
+  'editor.buildMode.materialNames.WardenStone': 'Гладкий камень',
+  'editor.buildMode.diagonal': 'Диагональные стены',
+  'editor.buildMode.diagonalHint':
+    'Перетащите указатель между узлами сетки, чтобы построить стену под любым углом.',
   'guide.professions.endgameBodyRaidCollections':
     'Ковка мастера объединяет вещи с меткой «Уникальный (экипируется): Ковка мастера». Прежняя вершина ремесла по-прежнему использует найденные схемы, промежуточные изделия с суточным ограничением и общие материалы финального этапа. Комплекты Горнила представляют отдельный путь с рейдовыми материалами, а не дополнительные расходы поверх прежней цепочки. Обе группы делят один предел ношения в две вещи, поэтому конкурируют за одни и те же два места в вашей сборке. Готовые вещи свободно продаются, пока доведение до совершенства или заказное изготовление не привяжет конкретный экземпляр.',
   'guide.professions.endgamePatternsBodyCollections':
@@ -2697,6 +2701,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.deedTracker': 'Трекер деяний',
   'hudChrome.interfaceUnlock.frameNames.delveTracker': 'Трекер вылазки',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': 'Трекер разлома',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': 'Трекер подземелья',
+  'hudChrome.dungeonTracker.complete': 'Пройдено',
   'hudChrome.interfaceUnlock.frameNames.targetDots': 'Эффекты на целях',
   'hudChrome.interfaceUnlock.framesMenu': 'Настройки фреймов',
   'hudChrome.interfaceUnlock.showHideFrames': 'Показать или скрыть фреймы',
@@ -13686,6 +13692,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Хор и соло (соберитесь у одной метки, разойдитесь от другой)',
   'hudChrome.finder.mech.tideglass_reflections':
     'Отражения Приливного стекла (убивайте отражения друг друга)',
+  'hudChrome.finder.mech.hydra_three_elements':
+    'Три стихии (левая голова выдыхает конус холода на 18 ярдов, который замедляет вас на 70 процентов на 4 секунды, средняя плюёт ядом под ноги не более чем 3 игрокам: он взрывается через 1,5 секунды и 6 секунд горит там, куда упал, а правая бьёт потоком по полосе длиной 26 ярдов и отбрасывает вас на 8 ярдов. Выходите из каждой атаки. Когда голова падает, её атаку перенимают уцелевшие головы)',
+  'hudChrome.finder.mech.hydra_tsunami':
+    'Цунами (головы на 4,5 секунды уходят под воду, получая на 75 процентов меньше урона, и волна накрывает одну половину водоёма, а в следующий раз другую: от 160 до 190 урона от холода на обычной сложности и отбрасывание на 10 ярдов. Перейдите на другую половину или встаньте за колонну у края; в героическом режиме через 3,5 секунды волна откатывается по другой половине. Первое цунами приходит через 24 секунды после начала боя, каждое следующее через 40 секунд после того, как прошло предыдущее)',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    'Слитое дыхание (между цунами головы сливают две свои атаки, всегда в одном порядке: Скованный льдом поток замораживает всех на своей полосе на 2 секунды и оставляет Ледяную стену, которая может укрыть вас от следующей волны, Ядовитое течение сдвигает ядовитые лужи наружу, а Ядовитая изморозь замораживает лужи в кристаллы, которые взрываются через 4 секунды. Один раз между цунами на обычной сложности, дважды в героическом режиме)',
+  'hudChrome.finder.mech.hydra_regrowth':
+    'Отрастание (упавшая голова отрастает через 20 секунд с половиной здоровья, пока жива хоть одна другая, и каждая упавшая голова заставляет остальные наносить на 15 процентов больше урона: убивайте все три почти одновременно)',
   'hudChrome.finder.mech.rising_tide':
     'Прилив (затапливает половину острова, переходите на сухую сторону)',
   'hudChrome.finder.mech.undertow': 'Отбойное течение (притягивает всех, убегайте до удара)',
@@ -19641,6 +19655,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.looksNone': 'Собственный облик',
   'hudChrome.deeds.looksNoBuddy': 'Призовите спутника, чтобы выбрать его облик здесь.',
   'hudChrome.deeds.looksEmpty': 'У этого спутника пока нет открытых обликов.',
+  'hudChrome.realmBuilder.title': 'Зодчий месяца',
+  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
   'guide.arenaPage.honorFinalNoteSoldBack':
     'Покупки за честь окончательны. Список выкупа у торговца хранит лишь то, что вы продали: купленное за монеты обычно можно продать обратно по цене продажи и, если вы снова передумаете, выкупить из этого списка, но снаряжение Боевой мощи становится персональным в тот же миг, как вы его купили, так что его нельзя ни обменять, ни отправить почтой, ни продать обратно хоть за что-нибудь, и в этот список оно не попадает никогда. Потому магазин и просит подтверждения: прочтите описание вещи, прежде чем нажать.',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -19675,6 +19691,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Трекер цели сбора присоединяется к стопке, как только вы отслеживаете рецепт в окне создания или заказ на доске: он называет рецепт или заказ, который вы отслеживаете, сколько вы собираете, и насколько ваши материалы при себе и на складе приближают вас к цели. "Отследить" заменяет вашу текущую цель, а "Очистить" явно её сбрасывает; ни то, ни другое никогда не меняет вашу настройку сбора.',
   'guide.interfacePage.hubPracticeTrackerBody':
     'Рядом с узлом Eastbrook в стопку добавляется трекер тренировок, как только вы начинаете проходить там управляемые тренировочные уроки: он держит на виду ваши лучшие результаты против тренировочных манекенов. Пока урок активен, полоса подсказок рядом с ним проведет вас через текущий шаг урока, от открытия Счетчиков урона до сравнения второго забега.',
+  'guide.interfacePage.dungeonTrackerBody':
+    'Внутри группового подземелья трекер подземелья занимает верх стопки: табличка с названием подземелья (в героическом забеге с пометкой «Героический»), полоса, которая заполняется по ходу прохождения, а под ней все боссы этого подземелья в том порядке, в котором их встречает маршрут; каждый считается как 0 / 1, пока не падёт. Босс, у боя с которым есть второй акт, остаётся незакрытым до конца всего боя, поэтому список читается завершённым только тогда, когда завершён сам забег. Трекер исчезает, когда вы выходите, а «Редактирование фреймов» освобождает его, как и остальные трекеры, под собственной плашкой с названием.',
   'guide.interfacePage.mobileBodyTwoPages':
     'Сенсорное управление появляется само, а раскладка подгоняется под ваш экран: компактная на маленьком телефоне, обычная на телефоне побольше и просторная на планшете.\n\nСпособности лежат кольцом, а не рядом цифр: кнопка атаки и четыре кнопки действий рядом с ней, плюс переключатель страниц, который перебрасывает кольцо между его {pages} страницами, а вместе они дотягиваются до всех ваших ячеек способностей, всех {slots}, независимо от того, включены ли дополнительные настольные панели. Пятое место на дуге этого кольца отведено расходникам: коснитесь его, чтобы применить то, что там лежит, либо удержите его или смахните внутрь, чтобы открыть ряд, который сам наполняется из того, что вы несёте. Вокруг кольца стоят кнопки, к которым чаще всего тянется рука на сенсорном экране: смена цели, взаимодействие с тем, что перед вами, и прыжок.\n\nУ нижнего края вместо ряда кнопок стоит один элемент «Быстрые действия». Он открывает всё остальное: транспорт, чат, карту, сумки, общение, задания, персонажа, книгу заклинаний, игровое меню и пункт «Еще», в котором лежат остальные ваши окна, среди них «Поиск подземелий», PvP, эмоции и вики. Окна здесь занимают весь экран, а не висят поверх него.\n\nПеремещение рамок существ — дело настольной версии: на сенсорном экране раскладка расставляет их за вас.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -19717,8 +19735,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': 'Разделить по сборщикам',
   'hudChrome.itemMenu.takeChosenQuantity': 'Взять выбранное количество',
   'hudChrome.itemMenu.combine': 'Объединить стопки материалов',
-  'hudChrome.realmBuilder.title': 'Зодчий месяца',
-  'hudChrome.realmBuilder.currentLabel': 'Отмечен в этом месяце',
   'hudChrome.realmBuilder.placeholderName': 'Ваше имя',
   'hudChrome.realmBuilder.placeholderHint': 'Эта табличка ждёт своего первого имени.',
   'hudChrome.realmBuilder.pastTitle': 'Прежние зодчие',
@@ -20748,9 +20764,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.heartNova':
     'Тратит все стаки жара на огненную вспышку, которая наносит {perHeat} ед. урона от огня за стак ({max} ед. при {maxHeat} стаках) каждому врагу в пределах {radius} м и провоцирует каждое задетое существо. Урон растет с силой атаки. Требуется стак жара.',
   'hudChrome.auraEffect.trinket.lastStandCooldown':
-    'Щит «Последний бастион» от Печати бастиона уже использован. Пока этот эффект не истечет, падение здоровья ниже {threshold}% не создаст его снова.',
+    'Защитный щит уже сработал. До окончания этого эффекта получение урона при здоровье ниже {threshold}% не создаст новый щит.',
   'hudChrome.auraEffect.trinket.lastBastion':
-    'Поглощает {value} ед. урона. Печать бастиона создала этот щит, когда вы получили урон при здоровье ниже {threshold}%.',
+    'Поглощает {value} урона. Аксессуар создал этот щит, когда вы получили урон при здоровье ниже {threshold}%.',
   'hudChrome.auraEffect.trinket.retaliate':
     'Враги, напрямую поражающие вас, получают физический урон, равный {pct}% здоровья, которое у вас отнял этот удар. Периодический урон эффект не вызывает.',
   'hudChrome.auraEffect.trinket.moored':
@@ -21852,4 +21868,149 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.merewater_cowl.name': 'Капюшон озёрной воды',
   'entities.items.merecleaver.name': 'Озёрный секач',
   'entities.items.moonwrack_stave.name': 'Посох Лунной погибели',
+  'referralCards.title': 'Пригласить друга',
+  'referralCards.subtitle': 'Путешествуйте вместе и собирайте отметки.',
+  'referralCards.close': 'Закрыть приглашение друзей',
+  'referralCards.launcher': 'Карточки отметок',
+  'referralCards.pages': 'Страницы карточек',
+  'referralCards.firstPage': 'Первая страница',
+  'referralCards.nextPage': 'Другие карточки',
+  'referralCards.trailmateTitle': 'Спутник',
+  'referralCards.friendshipAura': 'Дружба',
+  'referralCards.protectiveCharm': 'Защитный оберег',
+  'referralCards.bankBonus': 'Завершённые карточки',
+  'referralCards.bankBonusHelp':
+    'Помогите двум связанным друзьям завершить карточки, чтобы навсегда открыть 20 ячеек банка.',
+  'referralCards.friendshipUse':
+    'Повышает вашу силу, ловкость, выносливость, интеллект и дух на {stats} на {duration} сек.',
+  'referralCards.readyCount': 'Карточки: доступно наград: {count}',
+  'referralCards.loading': 'Подключение к вашим карточкам...',
+  'referralCards.empty': 'Пригласите нового игрока и вместе начните первую карточку.',
+  'referralCards.inviteTitle': 'Пригласить друга',
+  'referralCards.inviteHelp':
+    'Поделитесь ссылкой до того, как друг создаст аккаунт. Связанными друзьями становятся только новые аккаунты, созданные по вашей ссылке.',
+  'referralCards.inviteLabel': 'Ваша ссылка-приглашение',
+  'referralCards.inviteUnavailable': 'Ваша ссылка-приглашение пока недоступна.',
+  'referralCards.membership':
+    'Когда связанный друг впервые купит подписку, вы получите облигацию подписки.',
+  'referralCards.cardBetween': '{you} и {friend}',
+  'referralCards.yourCard': 'Карточка: {name}',
+  'referralCards.unassigned': 'Персонаж не выбран',
+  'referralCards.start': 'Начать карточку',
+  'referralCards.startPrompt':
+    'Начать карточки с {friend}? Вы оба должны согласиться. Оба персонажа должны быть ниже 5-го уровня и ещё не завершить последнее задание учебного острова.',
+  'referralCards.accept': 'Принять',
+  'referralCards.decline': 'Отклонить',
+  'referralCards.declinePrompt':
+    'Вы уверены, что хотите отказаться? Пока оба персонажа соответствуют условиям, карточку можно начать позже через меню.',
+  'referralCards.declineConfirmed':
+    'Карточка не начата. Вы можете начать её через меню, пока оба персонажа соответствуют условиям.',
+  'referralCards.waiting': 'Ожидание согласия связанного друга.',
+  'referralCards.cancel': 'Отмена',
+  'referralCards.okay': 'Хорошо',
+  'referralCards.understand': 'Да, я понимаю',
+  'referralCards.confirmLock': 'Да, закрепить карточку',
+  'referralCards.lockFirst':
+    'Получив награду за Вязателя Тумана, вы навсегда закрепите карточку за персонажем {name}. Карточку и её награды больше нельзя будет перенести на другого персонажа. Вы понимаете?',
+  'referralCards.lockSecond':
+    'Вы уверены? Получить награду за Вязателя Тумана и навсегда закрепить карточку за персонажем {name}.',
+  'referralCards.locked': 'Карточка закреплена за персонажем {name}. Перенести её больше нельзя.',
+  'referralCards.unlocked':
+    'До получения награды за Вязателя Тумана карточку можно перенести на другого подходящего персонажа. Получение награды навсегда закрепит её за текущим персонажем.',
+  'referralCards.move': 'Перенести карточку на этого персонажа',
+  'referralCards.movePrompt':
+    'Перенести карточку с {oldName} на {newName}? Весь прогресс и все награды этой карточки будут перенесены. Эти награды будут удалены у {oldName}.',
+  'referralCards.confirmMove': 'Да, перенести карточку',
+  'referralCards.summon': 'Призвать связанного друга',
+  'referralCards.summonPrompt': '{friend} хочет призвать вас к себе. Принять призыв?',
+  'referralCards.summonHelp': 'Призовите связанного друга к себе. Доступно раз в 30 минут.',
+  'referralCards.summonCooldown': 'Призыв через {minutes} мин {seconds} сек',
+  'referralCards.reward': 'Награда: {reward}',
+  'referralCards.earned': 'Получено',
+  'referralCards.redeemed': 'Награда получена',
+  'referralCards.emptyStamp': 'Ещё не получено',
+  'referralCards.stamping': 'Ставим отметку на карточке...',
+  'referralCards.redeem': 'Получить награду',
+  'referralCards.previous': 'Сначала получите награды за предыдущие отметки.',
+  'referralCards.playTogether': 'Выполняйте этапы в группе с персонажами, указанными на карточке.',
+  'referralCards.fallback':
+    'Уже выполнили этапное задание в одиночку? Снова объединитесь с другом в группу, чтобы получить отметку за учебный остров. Для отметок за последующие задания вместе пройдите соответствующее подземелье.',
+  'referralCards.questGroup': 'Задания карточки',
+  'referralCards.questWithFriend': '{quest} вместе с {friend}',
+  'referralCards.browseCards': 'Просмотреть все страницы карточек',
+  'referralCards.nextQuest': 'Карточка: {quest}',
+  'referralCards.questIndicator': 'Это задание приближает вас к следующей награде карточки.',
+  'referralCards.completion': 'Поздравляем! {friend} завершает карточку с вашей помощью.',
+  'referralCards.openInvites': 'Открыть приглашение друзей',
+  'referralCards.referrerTitle': 'Друзья, которым вы помогли',
+  'referralCards.referrerCount': 'Друзей с завершённой карточкой: {count}',
+  'referralCards.friendTier': 'Помощь друзьям: {count}',
+  'referralCards.awarded': 'Выдано',
+  'referralCards.pending': 'Ещё не выдано',
+  'referralCards.milestones.tutorial': 'Последнее задание учебного острова',
+  'referralCards.milestones.hollow': 'В Пустоту',
+  'referralCards.milestones.fogbinder': 'Вязатель Тумана',
+  'referralCards.milestones.gravewyrm': 'Корзул Могильный Вирм',
+  'referralCards.milestones.raid': 'Победите первого рейдового босса',
+  'referralCards.rewards.tutorial':
+    'Уникальное звание и сумка высшего ранга, привязанная к вашему персонажу.',
+  'referralCards.rewards.hollow':
+    'Аксессуар, повышающий выносливость и автоматически создающий щит при низком здоровье.',
+  'referralCards.rewards.fogbinder':
+    'Аксессуар улучшается: даёт больше выносливости и активный эффект, повышающий все характеристики на 5 на 15 секунд. Перезарядка: 2 минуты.',
+  'referralCards.rewards.gravewyrm': 'Бесплатное обучение верховой езде.',
+  'referralCards.rewards.raid': 'Эксклюзивный ездовой танк дружбы.',
+  'referralCards.referrerRewards.1': 'Эксклюзивный ездовой раптор дружбы.',
+  'referralCards.referrerRewards.2': '20 ячеек банка и 5 слотов персонажей.',
+  'referralCards.referrerRewards.3': 'Награда: 1 000 Claudium.',
+  'referralCards.referrerRewards.4': 'Награда: 1 000 Claudium.',
+  'referralCards.referrerRewards.5': 'Спутник Деревце.',
+  'referralCards.reasons.notParticipant': 'Этот аккаунт не участвует в данной связи друзей.',
+  'referralCards.reasons.staleRevision':
+    'Карточка изменилась. Проверьте текущий прогресс и повторите попытку.',
+  'referralCards.reasons.invalidCharacters':
+    'Персонажи группы не принадлежат этой паре связанных друзей.',
+  'referralCards.reasons.notTogether': 'Оба связанных друга должны быть в одной группе.',
+  'referralCards.reasons.levelTooHigh':
+    'Персонажи для новой карточки должны быть ниже 5-го уровня.',
+  'referralCards.reasons.tutorialCompleted':
+    'Один из персонажей уже завершил последнее задание учебного острова.',
+  'referralCards.reasons.alreadyStarted':
+    'У этой пары уже есть карточка. Каждая пара связанных друзей может иметь только одну активную карточку.',
+  'referralCards.reasons.notPending': 'Нет приглашения начать карточку, ожидающего ответа.',
+  'referralCards.reasons.declinePending': 'Связанный друг решает, отказаться ли от карточки.',
+  'referralCards.reasons.declineNotConfirmed':
+    'Подтвердите отказ, прежде чем завершить приглашение.',
+  'referralCards.reasons.notActive': 'Сначала вместе начните карточку, чтобы получать награды.',
+  'referralCards.reasons.wrongCharacter':
+    'Используйте персонажей, указанных на карточке, или перенесите незакреплённую карточку на подходящего персонажа.',
+  'referralCards.reasons.locked': 'Карточка закреплена за персонажем, и её нельзя перенести.',
+  'referralCards.reasons.sameCharacter': 'Карточка уже принадлежит этому персонажу.',
+  'referralCards.reasons.invalidMilestone': 'Эта отметка не относится к данной карточке.',
+  'referralCards.reasons.notEarned': 'Сначала вместе выполните этот этап, затем получите награду.',
+  'referralCards.reasons.alreadyRedeemed': 'Эта награда уже получена.',
+  'referralCards.reasons.previousRewardRequired': 'Сначала получите награды за предыдущие отметки.',
+  'referralCards.reasons.confirmationRequired':
+    'Перед получением награды за Вязателя Тумана прочитайте предупреждение о закреплении карточки.',
+  'referralCards.reasons.newAccountsOnly':
+    'Связанными друзьями можно стать только при создании нового аккаунта по реферальной ссылке. Уже существующие аккаунты связать нельзя.',
+  'referralCards.reasons.unavailable': 'Сейчас это действие недоступно. Попробуйте позже.',
+  'entities.items.referral_satchel.name': 'Сумка дружбы',
+  'entities.items.referral_hollow_charm.name': 'Оберег дружбы Пустоты',
+  'entities.items.referral_fog_charm.name': 'Окутанный туманом оберег дружбы',
+  'entities.items.reins_referral_tank.name': 'Поводья танка дружбы',
+  'entities.items.reins_referral_raptor.name': 'Поводья раптора дружбы',
+  'hud.social.friendFirstPage': 'Первая страница',
+  'hud.social.friendNextPage': 'Следующая страница',
+  'hud.social.boundFriend': 'Связанный друг',
+  'hud.social.boundFriendLink': 'Связанные друзья объединены приглашением по реферальной ссылке.',
+  'hudChrome.mounts.name_referral_tank': 'Танк дружбы',
+  'hudChrome.mounts.name_referral_raptor': 'Раптор дружбы',
+  'hudChrome.mounts.desc_referral_tank': 'Награда за завершение реферальной карточки с отметками.',
+  'hudChrome.mounts.desc_referral_raptor':
+    'Награда за помощь первому связанному другу в завершении карточки с отметками.',
+  'apiError.character.referral_transfer_pending':
+    'Перед удалением этого персонажа перенесите все незакреплённые карточки с отметками на другого персонажа.',
+  'apiError.character.referral_bond_pending':
+    'Этому персонажу доставляется облигация подписки за приглашение друга. Повторите попытку удаления после завершения доставки.',
 };

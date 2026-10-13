@@ -188,6 +188,7 @@ import {
 } from '../hollow_crypt/morthen_fx_core';
 import { KNELL_GESTURE_POUR, KNELL_GESTURE_SKY_ROAR } from '../hollow_crypt/morthen_rite_fx_core';
 import type { LocoGaitThresholds } from '../locomotion';
+import type { AimCoreDef } from '../pick_aim_core';
 import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import {
   OSSICK_ANCHOR_AWAY_GESTURE,
@@ -239,6 +240,7 @@ import {
   WOC_WARRIOR_MANIFEST,
   type WocCharacterManifest,
 } from './woc_character_manifest';
+import { withWocKeyedAnimations, wocKeyedAnimsUrl } from './woc_keyed_animations';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -590,6 +592,16 @@ export interface VisualDef {
    *  stay): a part of a larger creature drawn once by its dungeon's own
    *  visuals (the Mere Hydra's heads). */
   bodyless?: boolean;
+  /** Where a click on this entity is AIMED, when the click capsule is wider
+   *  than (or stands beside) what the player sees of it: a narrow vertical
+   *  core the direct pick tests the pick ray against (pick_aim_core.ts) before
+   *  it lets a use-only body win a click over a nearer live hit
+   *  (world_direct_pick.ts). In WORLD yards from the entity's own position
+   *  and facing: unlike the click capsule it is NOT multiplied by the
+   *  entity's scale, so author it for the size the entity is drawn at.
+   *  Presentation-side targeting help only, like `clickRadius`: the sim never
+   *  reads it. */
+  aimCore?: AimCoreDef;
   /** Material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -799,6 +811,10 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
 // holdable airborne pose, so the rig takes the held-jump treatment (Jump clamps
 // in the air, Land fires on touchdown, Fall flails on a long drop). Walk, Run and
 // Walk_Back are authored at their game speeds (2.2, 7 and 4.55 yd/s).
+// A second library keyed on this exact bind pose rides on top (woc_keyed_animations.ts,
+// players/woc_keyed/): it replaces the idle, gaits, swim, jump take-off, death, four emotes
+// and the white swings; every other slot above keeps the rig's own clip, and the rig's
+// idle fidget is not bound (wocRigClips).
 // NEVER layer a KayKit donor GLB onto this rig: the bone NAMES match, so a
 // Rig_Medium clip binds, but its bind pose does not, and it poses the body wrong.
 // ---------------------------------------------------------------------------
@@ -900,16 +916,21 @@ export const WOC_CONTACTS_FEMALE: Readonly<Record<string, readonly number[]>> = 
  *  grey film at noon and a quarter keeps a hint of sky without it. */
 const WOC_ENV_SHEEN = 0.25;
 
+// The body, the rig's own library, and the hand-keyed movement/emote/autoattack
+// library layered over it (woc_keyed_animations.ts); all three share one bind pose.
 function wocBody(fit: WocFit): Pick<VisualDef, 'url' | 'animUrls' | 'lazyPreload'> {
-  return { url: wocBaseUrl(fit), animUrls: [wocAnimsUrl(fit)], lazyPreload: true };
+  return {
+    url: wocBaseUrl(fit),
+    animUrls: [wocAnimsUrl(fit), wocKeyedAnimsUrl(fit)],
+    lazyPreload: true,
+  };
 }
 
-const woc = (attack: string[]): ClipMap => ({
+// The rig's own clip vocabulary; woc() layers the hand-keyed clips over it.
+const wocRigClips = (attack: string[]): ClipMap => ({
   idle: 'Idle',
-  // A look around now and then while standing (never mid-fight: an engaged body holds
-  // Combat_Idle instead).
-  idleVariants: ['Idle_Look'],
-  idleVariantCadence: { everySec: 14, jitterSec: 8 },
+  // No idle-breaker: the library's Idle_Look opens and closes on this Idle, so over the
+  // keyed idle it put the old stance back for seconds at a time (owner report 2026-10-12).
   combatIdle: 'Combat_Idle',
   walk: 'Walk',
   run: 'Run',
@@ -947,6 +968,8 @@ const woc = (attack: string[]): ClipMap => ({
   dualWieldPair: ['Dual_Cross', 'Dual_Chop'],
   contacts: WOC_CONTACTS,
 });
+
+const woc = (attack: string[]): ClipMap => withWocKeyedAnimations(wocRigClips(attack));
 
 const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing'): ClipMap => ({
   ...kaykit(attack, 'Idle_Combat'),
@@ -2528,7 +2551,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warrior: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     // A tenth taller than the KayKit-sized roster (the artist's body reads
     // small at the shared height); the held weapons scale with the rig.
@@ -2614,7 +2637,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_paladin: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2665,7 +2688,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_hunter: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2718,7 +2741,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_rogue: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2766,7 +2789,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_priest: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2815,7 +2838,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_shaman: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2859,7 +2882,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_mage: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2915,7 +2938,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warlock: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -2975,7 +2998,7 @@ export const VISUALS: Record<string, VisualDef> = {
   player_druid: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
-    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`, `${PLAYERS}/woc_keyed/woc_male.glb`],
     lazyPreload: true,
     height: HUMANOID_H * 1.1,
     authoredAtlas: true,
@@ -3537,6 +3560,12 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${BUDDIES_DIR}/horse.glb`,
     height: 0.75,
     clips: BUDDY_CLIPS,
+  },
+  buddy_sapling: {
+    url: `${BUDDIES_DIR}/sapling.glb`,
+    height: 0.75,
+    clips: { ...BUDDY_CLIPS, run: 'Run' },
+    authoredAtlas: true,
   },
   buddy_crystal_lich: {
     url: `${BUDDIES_DIR}/crystal_lich.glb`,
@@ -4660,6 +4689,16 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     bodyless: true,
     clickRadius: 2.2,
+    // What the player sees is the kit's pillar, not this body: the body stands
+    // at the pillar's foot facing away from it, 1.9 yd out from the pillar's
+    // axis (morthen_ids.ts candleBodySpot). Measured in the running game: the
+    // pillar's stone is 3.55 yd tall (its wick) on a plinth 1.4 yd in radius,
+    // the tallow column 0.95 (hollow_crypt/morthen_rite_fx_core.ts), the dark
+    // candle's glow 0.75 either side of the wick up to 4.4. The core is the
+    // tallow column with a quarter yard of slack, kept inside the pillar's
+    // 1.3 yd collider so it never reaches where a mob can stand beside it;
+    // its rounded top covers the glow (tests/pick_resolution.test.ts pins it).
+    aimCore: { back: 1.9, radius: 1.2, height: 3.55 },
   },
   // The Gravecaller Adept: a novice of the cult in a violet hooded robe split over its
   // legs, a violet staff in its right hand. Cast is the conjuring loop (Grave Spark).
@@ -6327,16 +6366,17 @@ export const VISUALS: Record<string, VisualDef> = {
   // stands about 2.97 yd, a head over the player. His gestures ride the
   // overhead emotes the guide sets as he speaks (point = Talk, cry = Startle,
   // kneel = Kneel) and the song is his channel cast (cantor_last_verse, the
-  // Sing loop). The Walk's long gliding stride covers 1.25 yd/s at this
-  // scale, so the guide's 3.2 yd/s follow walk plays it about 2.6x with the
-  // feet planted; the 7 yd/s catch-up run caps lower and slides a little.
+  // Sing loop). His original-rig animation bank provides foot-matched Walk
+  // and Run cycles: measured planted-foot speeds at the drawn size keep the
+  // 3.2 yd/s follow and 7 yd/s catch-up inside modest cadence ceilings.
   npc_laverock: {
     url: `${CREATURES}/temple_laverock.glb`,
+    animUrls: [`${CREATURES}/temple_laverock_locomotion.glb`],
     height: 3.75,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
-      run: 'Walk',
+      run: 'Run',
       attack: ['Talk'],
       death: 'Idle',
       cast: 'Sing',
@@ -6347,10 +6387,10 @@ export const VISUALS: Record<string, VisualDef> = {
         kneel: { clips: ['Kneel'] },
       },
     },
-    walkRef: 1.25,
-    runRef: 1.25,
-    walkTimeScaleMax: 2.8,
-    runTimeScaleMax: 3.6,
+    walkRef: 1.848751,
+    runRef: 4.468026,
+    walkTimeScaleMax: 1.8,
+    runTimeScaleMax: 1.6,
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 0.9,
@@ -7947,6 +7987,7 @@ const MOB_KEYS: Record<string, string> = {
   guardian_tithefiend: 'mob_demonalt',
   // Active cosmetic buddy followers.
   buddy_horse: 'buddy_horse',
+  buddy_sapling: 'buddy_sapling',
   buddy_crystal_lich: 'buddy_crystal_lich',
   buddy_forgemaw: 'buddy_forgemaw',
   // Packlord Stampede guardians are transient local templates, not MOBS rows.
@@ -8325,12 +8366,24 @@ export function mobVisualKey(templateId: string): string {
   return (family && FAMILY_KEYS[family]) || 'mob_bandit';
 }
 
+/** The Studio's authored rig override for an entity (the Entity tool's
+ *  "Character model" picker), validated against the manifest so a stale key
+ *  cannot dead-end the visual build. An explicit model choice beats both the
+ *  NPC_KEYS default, an NPC_LOOKS look and a composed one. Null = none authored. */
+export function authoredRigOverride(e: Entity): string | null {
+  return e.kind === 'npc' && e.visualKey && VISUALS[e.visualKey] ? e.visualKey : null;
+}
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
     return playerVisualKey(e.templateId, e.modularAppearance);
   }
   if (e.kind === 'mob') return mobVisualKey(e.templateId);
+  // A Studio-authored rig pick (the Entity tool's "Character model") is an
+  // explicit model choice: it beats the authored look and the stock rig alike.
+  const authoredRig = authoredRigOverride(e);
+  if (authoredRig) return authoredRig;
   // An NPC wears an authored look on the WOC body of its class and body type
   // (npc_looks.ts), the very def a player of that class draws. One with no
   // authored look (none ships: tests/npc_looks.test.ts) falls back to a stock rig.

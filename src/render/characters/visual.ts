@@ -11,6 +11,7 @@ import {
   offhandMirrorsWeaponSkin,
 } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import { isBuiltinWorldActive } from '../../sim/data';
 import type { EquipSlot } from '../../sim/types';
 import type { OverheadEmoteId } from '../../world_api';
 import { GPU_WORK_PRIORITY } from '../background_gpu_queue';
@@ -91,6 +92,7 @@ import {
 import { auraIdleClip } from './aura_idle_core';
 import { BoneDials } from './bone_dials';
 import { ChargeGlow } from './charge_glow';
+import { clipNamesOf } from './clip_names';
 import { sharedClipSplit } from './clip_split';
 import { twinClipOf } from './clip_twin';
 import { extendBrace, isBraced } from './combat_brace_core';
@@ -99,6 +101,7 @@ import {
   createGhostEffectMaterial,
   createMoonkinEffectMaterial,
   createShadowformEffectMaterial,
+  createShadowformStandInMaterial,
   type GhostStyle,
   ghostEffectOpacity,
 } from './effect_materials';
@@ -117,6 +120,8 @@ import {
   type MeshToggleRemains,
   remainsPickHeight,
 } from './gesture_mesh_toggles';
+import { GloamPresence } from './gloam_climb';
+import { GLOAM_CUE_HIDDEN, type GloamCue } from './gloam_climb_core';
 import { GlowPulse } from './glow_pulse';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
@@ -143,6 +148,7 @@ import {
   rangedSkinAiming,
   SKIN_ATTACK_CLIP_NAMES,
   weaponSkinCastClip,
+  weaponSkinDrawsBow,
   weaponSkinOrientPin,
 } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
@@ -170,6 +176,7 @@ import {
 } from './woc_armor_dressing';
 import { releaseWocArmorOf, setWocArmorWorkQueue } from './woc_armor_packs';
 import { WocAtlasSwap } from './woc_atlas_swap';
+import { pickWocAutoAttack } from './woc_autoattack_core';
 import type { WocCharacterManifest } from './woc_character_manifest';
 import {
   peekWocFarBake,
@@ -1372,8 +1379,11 @@ export class CharacterVisual {
   private far = false;
   private soulRend = false;
   private shadowform = false;
+  /** Gloamveil's climb, entry and stand-in state (gloam_climb.ts): built on
+   *  the first shift, so a rig that never takes the form pays nothing. */
+  private gloam: GloamPresence | null = null;
   private moonkin = false;
-  /** Moonwing's antlers, crescent and wings; Gloamveil's veil (form_adornments.ts).
+  /** Moonwing's antlers, crescent and wings (form_adornments.ts).
    *  Built on the first form edge, so a rig that never shifts pays nothing. */
   private formAdornments: FormAdornments | null = null;
   private ferocityStage = 0;
@@ -1792,6 +1802,9 @@ export class CharacterVisual {
     // never in the gate callback (woc_atlas_swap.ts), as an effect swap is above.
     if (this.wocAtlas.settled) this.wocAtlas.commit();
     this.updateMetamorphWings(dt, s, reducedMotion);
+    if (this.gloam?.frame(dt, this.root, this.model, s, reducedMotion)) {
+      this.applyVisualMaterials();
+    }
     this.formAdornments?.update(
       dt,
       s.moving,
@@ -2118,7 +2131,12 @@ export class CharacterVisual {
     const swimPitch = s.swimPitch * (1 + (TREAD_PITCH_SCALE - 1) * this.treadBlend);
     this.poseWrap.rotation.x =
       (proneAngle + swimPitch) * this.swimBlend + this.lean + CLIMB_BODY_PITCH * climb * climbLevel;
-    this.poseWrap.rotation.z = 0;
+    // Bank into the turn. Already eased and already scaled for the medium by the
+    // renderer (advanceBankRoll), so it lands here as a finished angle, but the
+    // ledge climb owns the whole body while it runs, and a lean mid-haul reads
+    // as the character falling off the wall. Authored maps only: the built-in
+    // world keeps the upright body it shipped with.
+    this.poseWrap.rotation.z = isBuiltinWorldActive() ? 0 : (s.bankRoll ?? 0) * (1 - climb);
     this.poseWrap.position.y =
       this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
@@ -2268,6 +2286,7 @@ export class CharacterVisual {
     // next visible update, a crowd dressed behind the camera would all swap on the one
     // frame it turns into view.
     if (this.wocAtlas.settled) this.wocAtlas.commit();
+    this.gloam?.idle(dt);
   }
 
   /** Push the live base action down to `1 - k` under a climb overlay, restoring
@@ -2768,6 +2787,33 @@ export class CharacterVisual {
       style === 'twohand' &&
       this.loadoutSwap !== null &&
       this.loadoutSwap === this.def.clips.loadoutSwaps?.twohand;
+    // A WOC body's white swings play its hand-keyed autoattacks (woc_autoattack_core.ts),
+    // unless a displayed weapon skin substitutes a clip this rig has bound, or the shot
+    // releases a cast the rig's own aim is holding (it finishes on the rig's own shot).
+    const auto =
+      skinAttack || this.baseState === 'cast'
+        ? null
+        : pickWocAutoAttack({
+            def: this.def,
+            abilityId,
+            kind,
+            style,
+            singleSetTwoHander,
+            bowSkin: weaponSkinDrawsBow(this.weaponSkinId),
+            unarmed: this.bareWhenUnarmed && !this.weaponItemId,
+            index: this.attackIdx,
+            mixerTime: this.mixer.time,
+            dual: this.dualSwing,
+            has: (name) => this.action(name) !== null,
+          });
+    if (auto) {
+      // A third swing this frame: the pair clip already playing carries it.
+      if (!auto.clip) return auto.delay;
+      this.playOneShot(auto.clip, this.def.attackTimeScale ?? 1.3);
+      this.attackIdx++;
+      this.currentOneShotIsAttack = true;
+      return auto.delay;
+    }
     const handClip =
       style && !singleSetTwoHander ? this.def.clips.attackByHand?.[style] : undefined;
     if (!skinAttack && handClip && this.action(handClip)) {
@@ -3673,8 +3719,15 @@ export class CharacterVisual {
   setShadowform(on: boolean): void {
     if (on === this.shadowform) return;
     this.shadowform = on;
-    this.syncFormAdornments();
+    // A rig that has drawn out of the form is seen shifting: it plays the entry.
+    this.gloam ??= on ? new GloamPresence(createShadowformStandInMaterial) : null;
+    this.gloam?.shift(on, this.root, this.model, this.clock > 0);
     this.applyVisualMaterials();
+  }
+
+  /** This frame's cue for the Gloamveil pool and smoke, asked after update. */
+  gloamCue(): GloamCue {
+    return this.gloam?.takeCue(this.ghosted) ?? GLOAM_CUE_HIDDEN;
   }
 
   setMoonkin(on: boolean): void {
@@ -3685,13 +3738,13 @@ export class CharacterVisual {
   }
 
   private syncFormAdornments(): void {
-    if (this.disposed || (!this.formAdornments && !this.moonkin && !this.shadowform)) return;
+    if (this.disposed || (!this.formAdornments && !this.moonkin)) return;
     this.formAdornments ??= new FormAdornments(
       this.model,
       this.look ? 'composed' : this.key === 'player_mech' ? 'replacement' : 'classRig',
       () => this.farBakeGate,
     );
-    this.formAdornments.sync(this.moonkin, this.shadowform, this.ghosted);
+    this.formAdornments.sync(this.moonkin, this.ghosted);
   }
 
   pulseMetamorphosis(strength = 1): void {
@@ -3811,11 +3864,14 @@ export class CharacterVisual {
     // A newer effect supersedes anything still linking (a stale settle must
     // never commit over a state the visual has already left).
     this.dropPendingEffectSwap();
+    this.gloam?.release();
     const staged = this.collectUnlinkedEffectMaterials();
     if (staged.length === 0) {
       this.commitVisualMaterials();
       return;
     }
+    // Gloamveil alone shows meanwhile, on stand-ins that cost no link.
+    if (this.gloam?.holdStandIns()) this.commitVisualMaterials();
     this.stageEffectSwap(staged);
   }
 
@@ -3924,6 +3980,7 @@ export class CharacterVisual {
     if (!scratch) return;
     this.recordLinkedEffectMaterials(scratch);
     this.dropPendingEffectSwap();
+    this.gloam?.release();
     this.commitVisualMaterials();
   }
 
@@ -4682,6 +4739,7 @@ export class CharacterVisual {
       this.auraGlowMaterials,
       this.surfaceResponse.materials,
       ...(this.glowPulse ? [this.glowPulse.materials] : []),
+      ...(this.gloam ? [this.gloam.standIns] : []),
     ]);
   }
 
@@ -4701,8 +4759,10 @@ export class CharacterVisual {
       ...this.auraGlowMaterials.values(),
       ...this.surfaceResponse.materials.values(),
       ...(this.glowPulse?.materials.values() ?? []),
+      ...(this.gloam?.standIns.values() ?? []),
     ]);
     for (const material of materials) material.dispose();
+    this.gloam?.standIns.clear();
     this.ghostMaterials.clear();
     this.soulRendMaterials.clear();
     this.shadowformMaterials.clear();
@@ -5192,9 +5252,11 @@ export class CharacterVisual {
   }
 
   private shadowformMaterial(material: THREE.Material): THREE.Material {
+    const standIn = this.gloam?.standInFor(material);
+    if (standIn) return standIn;
     const cached = this.shadowformMaterials.get(material);
     if (cached) return cached;
-    const marked = createShadowformEffectMaterial(material);
+    const marked = createShadowformEffectMaterial(material, this.gloam?.look);
     this.shadowformMaterials.set(material, marked);
     return marked;
   }
@@ -5833,77 +5895,6 @@ export class CharacterVisual {
     }
     this.fadeTo(this.action(this.def.clips.idle), 0.2, false);
   }
-}
-
-export function clipNamesOf(def: VisualDef): string[] {
-  // A stance's vocabulary (phaseClips) must be bound too, or its clips never
-  // get an action and the swap plays nothing.
-  const phases = Object.values(def.phaseClips ?? {}).flatMap((p) => [
-    ...clipMapNames(p.clips),
-    ...(p.enter ? [p.enter] : []),
-  ]);
-  return [...clipMapNames(def.clips), ...phases];
-}
-
-function clipMapNames(c: ClipMap): string[] {
-  return [
-    c.idle,
-    c.combatIdle,
-    c.stunned,
-    ...Object.values(c.heldByAura ?? {}),
-    c.turn,
-    c.entrance,
-    c.prowlIdle,
-    c.prowlWalk,
-    c.walk,
-    c.run,
-    c.rushArrival,
-    c.death,
-    ...(c.attack ?? []),
-    ...(c.meleeAttack ?? []),
-    c.wandAttack,
-    ...Object.values(c.attackByAbility ?? {}),
-    ...(c.abilityAttack ?? []),
-    ...Object.values(c.castByAbility ?? {}),
-    ...Object.values(c.attackByHand ?? {}),
-    ...(c.dualWieldPair ?? []),
-    ...(c.hit ?? []),
-    c.cast,
-    c.sitDown,
-    c.sitIdle,
-    c.swim,
-    c.swimSurface,
-    c.swimIdle,
-    c.wade,
-    c.jump,
-    c.jumpMoving,
-    c.fall,
-    c.land,
-    c.walkBack,
-    c.strafeLeft,
-    c.strafeRight,
-    c.flourish,
-    c.stow,
-    c.climb,
-    // The idle-breakers and the idle beat were MISSING here, which is the only
-    // place actions get built (visual.ts constructor). A clip absent from this
-    // list loads fine and passes the clipmap gate, that gate checks the GLB,
-    // not the action map, but `this.action(name)` returns null forever, so
-    // tickIdleVariant/tickIdleBeat bail on every fire and the rig simply never
-    // fidgets. Silent: no throw, no warning, just a clip that is never seen.
-    ...(c.idleVariants ?? []),
-    ...Object.values(c.loadoutSwaps ?? {}).flatMap((m) => Object.values(m ?? {})),
-    c.idleBeat?.clip,
-    // The night pair (mob/slumber.ts): a slot named here is the ONLY way a clip becomes an
-    // action, so a new ClipMap field joins this list or it never plays (pinned per rig by
-    // tests/character_clipmaps.test.ts against the gate's own required-clip list).
-    c.sleep,
-    c.wake,
-    // The aura-held idles (Balgath's Blinded loop): same rule, a loop never bound is a
-    // pose never seen.
-    ...Object.values(c.idleByAura ?? {}),
-    ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
-  ].filter((n): n is string => !!n);
 }
 
 function firstLoadedEmoteClip(

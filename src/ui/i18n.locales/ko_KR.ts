@@ -1635,6 +1635,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 기록',
   'landing.scout': 'WoC 정찰',
   'landing.parseService': 'WoC 전투 기록',
+  'editor.buildMode.materialNames.WardenStone': '매끄러운 돌',
+  'editor.buildMode.diagonal': '대각선 벽',
+  'editor.buildMode.diagonalHint': '격자점 사이를 드래그하여 원하는 각도로 벽을 만드세요.',
   'guide.professions.endgameBodyRaidCollections':
     '명장 제작은 고유 장착: 명장 제작 표식을 공유하는 장비 계열이다. 기존 최상위 제작 경로는 발견하는 도안, 하루 단위로 제한되는 중간 재료 제작, 공통 최종 단계 재료를 그대로 사용한다. 도가니 세트는 공격대 재료를 쓰는 별도 경로이지, 기존 경로에 비용을 또 얹는 것이 아니다. 두 경로는 동일한 최대 2개 착용 제한을 공유하므로 구성에서 같은 두 자리를 두고 경쟁한다. 완성품은 완전하게 만들기나 의뢰 제작으로 해당 개체가 귀속되기 전까지 자유롭게 거래할 수 있다.',
   'guide.professions.endgamePatternsBodyCollections':
@@ -2662,6 +2665,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.deedTracker': '업적 추적기',
   'hudChrome.interfaceUnlock.frameNames.delveTracker': '탐굴 추적기',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': '균열 추적기',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': '던전 추적기',
+  'hudChrome.dungeonTracker.complete': '완료',
   'hudChrome.interfaceUnlock.frameNames.targetDots': '대상 디버프',
   'hudChrome.interfaceUnlock.frameNames.chat': '채팅',
   'hudChrome.interfaceUnlock.frameNames.menu': '메뉴',
@@ -13456,6 +13461,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.chorus_and_solo':
     '합창과 독창 (한 표식에는 모이고 다른 표식에서는 흩어지기)',
   'hudChrome.finder.mech.tideglass_reflections': '조수유리 투영체 (서로의 거울상을 처치)',
+  'hudChrome.finder.mech.hydra_three_elements':
+    '세 가지 원소 (왼쪽 머리는 18야드 원뿔 범위에 냉기를 내뿜어 4초 동안 이동 속도를 70퍼센트 늦추고, 가운데 머리는 최대 3명의 발밑에 독을 뱉어 1.5초 뒤에 터지며 떨어진 자리에서 6초 동안 타오르고, 오른쪽 머리는 26야드 직선으로 급류를 쏘아 8야드 밀쳐 냅니다: 모두 범위 밖으로 피하세요. 머리 하나가 쓰러지면 남은 머리들이 그 공격을 이어받습니다)',
+  'hudChrome.finder.mech.hydra_tsunami':
+    '해일 (머리들이 4.5초 동안 물속으로 가라앉아 받는 피해가 75퍼센트 줄고, 파도가 웅덩이의 절반을 덮칩니다. 다음에는 반대쪽 절반입니다: 일반 난이도 기준 160~190 냉기 피해와 10야드 밀쳐내기. 반대쪽 절반으로 건너가거나 가장자리 기둥 뒤에 서세요. 영웅 난이도에서는 3.5초 뒤에 파도가 반대쪽 절반으로 되돌아옵니다. 첫 해일은 전투 시작 24초 뒤에, 그 뒤로는 앞선 해일이 지나간 지 40초 뒤에 옵니다)',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    '합동 숨결 (해일과 해일 사이에 머리들이 자신들의 공격 두 가지를 합치며, 순서는 항상 같습니다: 얼어붙은 급류는 직선 위의 모두를 2초 동안 얼리고 다음 파도를 막아 줄 수 있는 얼음 벽을 남깁니다. 독의 해류는 독 웅덩이를 바깥으로 밀어내고, 맹독 서리는 독 웅덩이를 결정으로 얼려 4초 뒤에 터뜨립니다. 일반 난이도에서는 해일 사이에 한 번, 영웅 난이도에서는 두 번)',
+  'hudChrome.finder.mech.hydra_regrowth':
+    '재생 (다른 머리가 살아 있는 동안 쓰러진 머리는 20초 뒤에 생명력 절반으로 다시 자라나며, 쓰러진 머리 하나마다 나머지 머리들이 주는 피해가 15퍼센트 증가합니다: 세 머리를 비슷한 때에 쓰러뜨리세요)',
   'hudChrome.finder.mech.rising_tide': '밀물 (섬의 절반이 잠김, 마른 쪽으로 이동)',
   'hudChrome.finder.mech.undertow': '역류 (모두를 끌어당김, 충돌 전에 벗어나기)',
   'hudChrome.finder.mech.enrage': '체력이 낮으면 격노',
@@ -19282,6 +19295,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.looksNone': '기본 외형',
   'hudChrome.deeds.looksNoBuddy': '동료를 소환하면 여기서 외형을 고를 수 있습니다.',
   'hudChrome.deeds.looksEmpty': '이 동료는 아직 해금된 외형이 없습니다.',
+  'hudChrome.realmBuilder.title': '이달의 왕국 건설자',
+  'hudChrome.realmBuilder.currentLabel': '이달의 수상자',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '명예로 산 물건은 되돌릴 수 없습니다. 되사기 목록에는 언제나 직접 판 물건만 오릅니다. 동전으로 산 물건은 대개 판매 가격에 되팔 수 있고, 마음이 다시 바뀌면 그 목록에서 되찾을 수 있지만, 워페어 장비는 구매하는 순간 귀속되어 거래도, 우편 발송도, 되팔기도 영영 할 수 없습니다. 그러니 그 목록에 오르는 일도 결코 없습니다. 상점이 굳이 한 번 더 확인을 묻는 이유가 그것이니, 누르기 전에 장비를 찬찬히 읽어 보세요.',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -19316,6 +19331,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '제작 창에서 제작법을, 또는 의뢰 게시판에서 의뢰를 "추적"하면 채집 목표 트래커가 이 스택에 추가됩니다. 추적 중인 제작법이나 의뢰의 이름, 목표 수량, 그리고 소지 중이거나 보관 중인 재료로 얼마나 채울 수 있는지를 보여줍니다. "추적"은 현재 목표를 대체하고, "지우기"는 명시적으로 해제합니다. 둘 다 채집 설정을 바꾸지 않습니다.',
   'guide.interfacePage.hubPracticeTrackerBody':
     'Eastbrook 거점 근처에서 그곳의 안내형 연습 레슨을 받으면 연습 트래커가 스택에 추가되어, 연습용 허수아비를 상대로 한 최고 기록을 계속 보여줍니다. 레슨이 진행 중일 때는 옆의 코칭 스트립이 피해량 미터 열기부터 두 번째 실행 비교까지, 현재 단계를 안내해 줍니다.',
+  'guide.interfacePage.dungeonTrackerBody':
+    '파티 던전 안에서는 던전 추적기가 스택의 맨 위를 차지합니다. 던전 이름이 적힌 명판(영웅 난이도에서는 "영웅"으로 표시)과 진행에 따라 차오르는 레일이 있고, 그 아래에는 해당 던전의 모든 우두머리가 경로에서 만나는 순서대로 나열되며, 쓰러지기 전까지는 각각 0 / 1로 표시됩니다. 전투에 2막이 있는 우두머리는 전투 전체가 끝날 때까지 미완료로 남으므로, 목록은 공략이 실제로 끝났을 때만 완료로 표시됩니다. 던전을 나가면 추적기도 사라지며, 프레임 편집에서는 다른 추적기처럼 고유한 이름 칩을 달고 움직일 수 있게 됩니다.',
   'guide.interfacePage.mobileBodyTwoPages':
     '터치 조작은 알아서 나타나며, 배치는 화면 크기에 맞춰 스스로 조절됩니다. 작은 휴대전화에서는 촘촘하게, 큰 휴대전화에서는 표준으로, 태블릿에서는 한결 여유롭게 놓입니다.\n\n능력은 숫자 줄 대신 원환에 놓입니다. 공격 버튼 곁에 행동 버튼 네 개가 붙고, 페이지 전환 버튼이 원환을 페이지 {pages}개 사이에서 넘겨 줍니다. 이 페이지들을 합치면 데스크톱의 추가 단축바를 켜 두었든 아니든 능력 슬롯 {slots}칸 전부에 닿습니다. 그 원환의 다섯째 호 자리는 소모품 자리입니다. 탭하면 거기 놓인 것을 쓰고, 길게 누르거나 안쪽으로 밀면 지니고 있는 물품에서 스스로 채워지는 줄이 열립니다. 그 둘레에는 터치로 플레이할 때 가장 자주 찾는 버튼들이 놓입니다. 대상 바꾸기, 눈앞의 것 사용하기, 점프하기입니다.\n\n아래 가장자리에는 버튼 줄 대신 빠른 실행 조작 하나가 자리합니다. 나머지 모든 것이 여기서 열립니다. 탈것, 대화, 지도, 가방, 사교, 퀘스트, 캐릭터, 주문서, 게임 메뉴, 그리고 나머지 창을 담은 더보기 항목이 있으며, 던전 찾기와 PvP, 감정 표현, 위키가 그 안에 들어 있습니다. 이곳에서 창은 화면 위에 떠 있는 대신 화면을 가득 채웁니다.\n\n유닛 프레임을 옮기는 것은 데스크톱에서만 하는 일입니다. 터치에서는 배치가 알아서 자리를 잡아 줍니다.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -19356,8 +19373,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '채집자별 분리',
   'hudChrome.itemMenu.takeChosenQuantity': '지정 수량 꺼내기',
   'hudChrome.itemMenu.combine': '재료 묶음 합치기',
-  'hudChrome.realmBuilder.title': '이달의 왕국 건설자',
-  'hudChrome.realmBuilder.currentLabel': '이달의 수상자',
   'hudChrome.realmBuilder.placeholderName': '당신의 이름',
   'hudChrome.realmBuilder.placeholderHint': '이 명판은 첫 번째 이름을 기다리고 있습니다.',
   'hudChrome.realmBuilder.pastTitle': '역대 수상자',
@@ -20369,9 +20384,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.heartNova':
     '열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다.',
   'hudChrome.auraEffect.trinket.lastStandCooldown':
-    '보루의 인장의 최후의 보루 보호막을 이미 사용했습니다. 이 효과가 끝날 때까지 생명력이 {threshold}% 미만으로 떨어져도 다시 발동하지 않습니다.',
+    '보호막이 이미 발동했습니다. 이 효과가 끝날 때까지 생명력이 {threshold}% 미만인 상태에서 피해를 받아도 보호막이 다시 생성되지 않습니다.',
   'hudChrome.auraEffect.trinket.lastBastion':
-    '{value}의 피해를 흡수합니다. 생명력이 {threshold}% 미만일 때 피해를 받아 보루의 인장이 만들어 낸 보호막입니다.',
+    '피해를 {value} 흡수합니다. 생명력이 {threshold}% 미만일 때 피해를 받아 장신구가 생성한 보호막입니다.',
   'hudChrome.auraEffect.trinket.retaliate':
     '당신을 직접 공격한 적은 그 공격으로 잃은 생명력의 {pct}%에 해당하는 물리 피해를 받습니다. 지속 피해로는 발동하지 않습니다.',
   'hudChrome.auraEffect.trinket.moored':
@@ -21447,4 +21462,147 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.merewater_cowl.name': '호숫물 두건',
   'entities.items.merecleaver.name': '호수가르개 대도끼',
   'entities.items.moonwrack_stave.name': '달파멸 지팡이',
+  'referralCards.title': '친구 초대',
+  'referralCards.subtitle': '함께 모험하며 도장을 모으세요.',
+  'referralCards.close': '친구 초대 닫기',
+  'referralCards.launcher': '도장 카드',
+  'referralCards.pages': '도장 카드 페이지',
+  'referralCards.firstPage': '첫 페이지',
+  'referralCards.nextPage': '더 많은 카드',
+  'referralCards.trailmateTitle': '여행 동반자',
+  'referralCards.friendshipAura': '우정',
+  'referralCards.protectiveCharm': '수호 부적',
+  'referralCards.bankBonus': '완료한 도장 카드',
+  'referralCards.bankBonusHelp':
+    '연결된 친구 2명이 도장 카드를 완료하도록 도우면 은행 슬롯 20칸이 영구 해제됩니다.',
+  'referralCards.friendshipUse':
+    '힘, 민첩, 체력, 지능, 정신력이 {duration}초 동안 {stats}만큼 증가합니다.',
+  'referralCards.readyCount': '도장 카드: 보상 {count}개 수령 가능',
+  'referralCards.loading': '친구 초대 카드에 연결 중...',
+  'referralCards.empty': '새 플레이어를 초대해 함께 첫 도장 카드를 시작하세요.',
+  'referralCards.inviteTitle': '친구 초대하기',
+  'referralCards.inviteHelp':
+    '친구가 계정을 만들기 전에 이 링크를 공유하세요. 내 링크로 새로 만든 계정만 연결된 친구가 됩니다.',
+  'referralCards.inviteLabel': '내 초대 링크',
+  'referralCards.inviteUnavailable': '아직 초대 링크를 사용할 수 없습니다.',
+  'referralCards.membership': '연결된 친구가 처음 멤버십을 구매하면 멤버십 증서를 받습니다.',
+  'referralCards.cardBetween': '{you} 및 {friend}',
+  'referralCards.yourCard': '{name}의 도장 카드',
+  'referralCards.unassigned': '캐릭터 미선택',
+  'referralCards.start': '카드 시작',
+  'referralCards.startPrompt':
+    '{friend} 님과 도장 카드를 시작할까요? 두 사람 모두 수락해야 합니다. 각 캐릭터는 5레벨 미만이어야 하며 튜토리얼 섬의 마지막 퀘스트를 완료하지 않았어야 합니다.',
+  'referralCards.accept': '수락',
+  'referralCards.decline': '거절',
+  'referralCards.declinePrompt':
+    '정말 거절할까요? 두 캐릭터가 조건을 충족하는 동안 도장 카드 메뉴에서 나중에 시작할 수 있습니다.',
+  'referralCards.declineConfirmed':
+    '카드를 시작하지 않았습니다. 두 캐릭터가 조건을 충족하는 동안 도장 카드 메뉴에서 시작할 수 있습니다.',
+  'referralCards.waiting': '연결된 친구가 수락하기를 기다리는 중입니다.',
+  'referralCards.cancel': '취소',
+  'referralCards.okay': '확인',
+  'referralCards.understand': '예, 이해했습니다',
+  'referralCards.confirmLock': '예, 이 카드를 고정합니다',
+  'referralCards.lockFirst':
+    '안개엮는자 도장 보상을 받으면 이 카드가 {name} 캐릭터에 영구 고정됩니다. 이후 카드나 보상을 다른 캐릭터로 옮길 수 없습니다. 이해하셨나요?',
+  'referralCards.lockSecond':
+    '정말 진행할까요? 안개엮는자 보상을 받고 이 카드를 {name} 캐릭터에 영구 고정합니다.',
+  'referralCards.locked': '이 카드는 {name} 캐릭터에 고정되어 더 이상 옮길 수 없습니다.',
+  'referralCards.unlocked':
+    '안개엮는자 도장 보상을 받기 전까지는 조건을 충족하는 다른 캐릭터로 카드를 옮길 수 있습니다. 해당 보상을 받으면 현재 캐릭터에 영구 고정됩니다.',
+  'referralCards.move': '이 캐릭터로 카드 옮기기',
+  'referralCards.movePrompt':
+    '카드를 {oldName}에서 {newName}(으)로 옮길까요? 진행 상황과 이 카드로 얻은 모든 보상이 함께 옮겨집니다. 해당 보상은 {oldName}에서 제거됩니다.',
+  'referralCards.confirmMove': '예, 카드를 옮깁니다',
+  'referralCards.summon': '연결된 친구 소환',
+  'referralCards.summonPrompt': '{friend} 님이 자신의 위치로 소환하려고 합니다. 소환을 수락할까요?',
+  'referralCards.summonHelp':
+    '연결된 친구를 내 위치로 불러옵니다. 30분마다 한 번 소환할 수 있습니다.',
+  'referralCards.summonCooldown': '소환 대기: {minutes}분 {seconds}초',
+  'referralCards.reward': '보상: {reward}',
+  'referralCards.earned': '획득함',
+  'referralCards.redeemed': '수령함',
+  'referralCards.emptyStamp': '아직 획득하지 않음',
+  'referralCards.stamping': '카드에 도장을 찍는 중...',
+  'referralCards.redeem': '보상 받기',
+  'referralCards.previous': '이전 도장 보상부터 받으세요.',
+  'referralCards.playTogether': '이 카드의 캐릭터들과 파티를 이루어 목표를 완료하세요.',
+  'referralCards.fallback':
+    '목표 퀘스트를 이미 혼자 완료했나요? 친구와 다시 파티를 맺으면 튜토리얼 섬 도장을 받을 수 있습니다. 이후 퀘스트 도장은 해당 던전을 함께 완료하면 받을 수 있습니다.',
+  'referralCards.questGroup': '도장 카드 퀘스트',
+  'referralCards.questWithFriend': '{friend} 님과 {quest}',
+  'referralCards.browseCards': '모든 도장 카드 페이지 보기',
+  'referralCards.nextQuest': '도장 카드: {quest}',
+  'referralCards.questIndicator': '이 퀘스트를 완료하면 다음 도장 카드 보상에 가까워집니다.',
+  'referralCards.completion':
+    '축하합니다! {friend} 님이 여러분의 도움으로 도장 카드를 완료했습니다.',
+  'referralCards.openInvites': '친구 초대 열기',
+  'referralCards.referrerTitle': '도움을 준 친구',
+  'referralCards.referrerCount': '완료한 친구: {count}명',
+  'referralCards.friendTier': '도움을 준 친구: {count}명',
+  'referralCards.awarded': '지급됨',
+  'referralCards.pending': '아직 지급되지 않음',
+  'referralCards.milestones.tutorial': '튜토리얼 섬 마지막 퀘스트',
+  'referralCards.milestones.hollow': '공허 속으로',
+  'referralCards.milestones.fogbinder': '안개엮는자',
+  'referralCards.milestones.gravewyrm': '무덤고룡 코르줄',
+  'referralCards.milestones.raid': '첫 공격대 우두머리 처치',
+  'referralCards.rewards.tutorial': '고유 칭호와 캐릭터에 귀속되는 최대 용량 가방.',
+  'referralCards.rewards.hollow':
+    '체력을 높이고 생명력이 낮을 때 자동으로 보호막을 생성하는 장신구.',
+  'referralCards.rewards.fogbinder':
+    '장신구가 진화하여 체력이 더 증가하고 사용 효과를 얻습니다. 15초 동안 모든 능력치가 5 증가하며 재사용 대기시간은 2분입니다.',
+  'referralCards.rewards.gravewyrm': '무료 탈것 훈련.',
+  'referralCards.rewards.raid': '전용 우정 전차 탈것.',
+  'referralCards.referrerRewards.1': '전용 우정 랩터 탈것.',
+  'referralCards.referrerRewards.2': '은행 슬롯 20칸과 캐릭터 슬롯 5칸.',
+  'referralCards.referrerRewards.3': 'Claudium 1,000개.',
+  'referralCards.referrerRewards.4': 'Claudium 1,000개.',
+  'referralCards.referrerRewards.5': '어린 나무 동료.',
+  'referralCards.reasons.notParticipant': '이 계정은 해당 친구 연결에 속하지 않습니다.',
+  'referralCards.reasons.staleRevision':
+    '카드가 변경되었습니다. 최신 진행 상황을 확인하고 다시 시도하세요.',
+  'referralCards.reasons.invalidCharacters': '파티의 캐릭터들이 해당 친구 연결에 속하지 않습니다.',
+  'referralCards.reasons.notTogether': '두 연결된 친구가 같은 파티에 있어야 합니다.',
+  'referralCards.reasons.levelTooHigh': '새 카드를 시작하는 캐릭터는 5레벨 미만이어야 합니다.',
+  'referralCards.reasons.tutorialCompleted':
+    '캐릭터 중 하나가 이미 튜토리얼 섬의 마지막 퀘스트를 완료했습니다.',
+  'referralCards.reasons.alreadyStarted':
+    '이 친구 연결에는 이미 카드가 있습니다. 연결된 친구 한 쌍당 활성 카드는 하나만 가질 수 있습니다.',
+  'referralCards.reasons.notPending': '응답을 기다리는 카드 초대가 없습니다.',
+  'referralCards.reasons.declinePending': '연결된 친구가 카드 거절 여부를 결정하고 있습니다.',
+  'referralCards.reasons.declineNotConfirmed': '초대를 끝내려면 거절을 확정하세요.',
+  'referralCards.reasons.notActive': '보상을 받기 전에 함께 카드를 시작하세요.',
+  'referralCards.reasons.wrongCharacter':
+    '카드에 표시된 캐릭터를 사용하거나 고정되지 않은 카드를 조건에 맞는 캐릭터로 옮기세요.',
+  'referralCards.reasons.locked': '이 카드는 캐릭터에 고정되어 옮길 수 없습니다.',
+  'referralCards.reasons.sameCharacter': '이 카드는 이미 이 캐릭터에게 있습니다.',
+  'referralCards.reasons.invalidMilestone': '해당 도장은 이 카드에 속하지 않습니다.',
+  'referralCards.reasons.notEarned': '이 목표를 함께 완료한 후 보상을 받으세요.',
+  'referralCards.reasons.alreadyRedeemed': '이미 받은 보상입니다.',
+  'referralCards.reasons.previousRewardRequired': '이전 도장 보상부터 받으세요.',
+  'referralCards.reasons.confirmationRequired':
+    '안개엮는자 보상을 받기 전에 카드 고정 경고를 확인하세요.',
+  'referralCards.reasons.newAccountsOnly':
+    '초대 링크로 새 계정을 만들 때만 연결된 친구가 될 수 있습니다. 기존 계정은 연결할 수 없습니다.',
+  'referralCards.reasons.unavailable':
+    '지금은 이 작업을 사용할 수 없습니다. 나중에 다시 시도하세요.',
+  'entities.items.referral_satchel.name': '우정 가방',
+  'entities.items.referral_hollow_charm.name': '공허의 우정 부적',
+  'entities.items.referral_fog_charm.name': '안개에 싸인 우정 부적',
+  'entities.items.reins_referral_tank.name': '우정 전차 고삐',
+  'entities.items.reins_referral_raptor.name': '우정 랩터 고삐',
+  'hud.social.friendFirstPage': '첫 페이지',
+  'hud.social.friendNextPage': '다음 페이지',
+  'hud.social.boundFriend': '연결된 친구',
+  'hud.social.boundFriendLink': '연결된 친구는 초대 링크를 통해 연결됩니다.',
+  'hudChrome.mounts.name_referral_tank': '우정 전차',
+  'hudChrome.mounts.name_referral_raptor': '우정 랩터',
+  'hudChrome.mounts.desc_referral_tank': '친구 초대 도장 카드를 완성하면 획득합니다.',
+  'hudChrome.mounts.desc_referral_raptor':
+    '첫 번째 연결된 친구가 도장 카드를 완성하도록 도우면 획득합니다.',
+  'apiError.character.referral_transfer_pending':
+    '이 캐릭터를 삭제하기 전에 고정되지 않은 도장 카드를 모두 다른 캐릭터로 옮기세요.',
+  'apiError.character.referral_bond_pending':
+    '친구 초대 보상인 멤버십 증서를 이 캐릭터에게 지급 중입니다. 지급이 완료된 후 캐릭터 삭제를 다시 시도하세요.',
 };

@@ -210,6 +210,7 @@ describe('live graphics profile architecture', () => {
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
   'src/ui/hud/courier/courier_core.ts',
+  'src/ui/hud/referral_cards/referral_cards_view.ts',
   'src/ui/frame_presets_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
@@ -671,6 +672,9 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/crypt_alert_scene_core.ts',
   // The trash engine's use prompt (a Soul Brazier to topple) and its scene scan.
   'src/ui/hud/dungeon/kit_use_prompt_view.ts',
+  // The dungeon objectives tracker (the plate and its boss rows): what it
+  // shows, and which rows a kill just lit.
+  'src/ui/hud/dungeon/dungeon_tracker_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',
@@ -831,6 +835,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
+  // Was a click aimed at a body: the pick ray against its visible core.
+  'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
   // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
   'src/render/body_emote_core.ts',
@@ -960,6 +966,7 @@ const RENDER_PURE_CORES = [
   'src/render/gravewyrm_sanctum/sanctum_lake_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_works_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_surface_wear_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',
@@ -1036,6 +1043,11 @@ const RENDER_PURE_CORES = [
   'src/render/shadow_detection_core.ts',
   'src/render/world_quest_public_trace_core.ts',
   'src/render/world_quest_trace_core.ts',
+  'src/render/assets/load_priority_core.ts',
+  'src/render/voxel_identity_core.ts',
+  'src/render/cut_cavity_tile_core.ts',
+  'src/render/rail_tracks_core.ts',
+  'src/render/terrain_paint_interior_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/outdoor_light_rig_core.ts',
   'src/render/wall_backface_cull_core.ts',
@@ -1088,11 +1100,20 @@ const RENDER_PURE_CORES = [
   'src/render/characters/weapon_loadout_core.ts',
   'src/render/characters/held_item_size_core.ts',
   'src/render/characters/attack_swing_core.ts',
+  'src/render/characters/woc_autoattack_core.ts',
   'src/render/characters/woc_armor_core.ts',
   'src/render/characters/woc_armor_merge_core.ts',
   'src/render/characters/death_grounding_core.ts',
   'src/render/characters/stonebound_shell_core.ts',
   'src/render/characters/form_adornment_core.ts',
+  // Gloamveil (the Shadow priest's form): the climbing dark on the body (the
+  // tongue tables, the cast surge and entry, the shader text and its CPU twin),
+  // then the floor and smoke layer around it (what each tier keeps, where a
+  // stain lies and when it is laid, the smoke pool and its eviction).
+  'src/render/characters/gloam_climb_core.ts',
+  'src/render/gloam_field_core.ts',
+  'src/render/gloam_pool_core.ts',
+  'src/render/gloam_smoke_core.ts',
   'src/render/entry_detail_horizon_core.ts',
   'src/render/gather_batch_reach_core.ts',
   'src/render/zone_feature_cells_core.ts',
@@ -1288,6 +1309,9 @@ const RENDER_PURE_CORES = [
   'src/render/shore_water_gate_core.ts',
   'src/render/static_merge_shadow_core.ts',
   'src/render/terrain_region_core.ts',
+  // The chunk grid's world box (shipped box, or an authored map's own rect
+  // plus outskirts): pure arithmetic over the active zones and stamps.
+  'src/render/terrain_grid_core.ts',
   'src/render/texture_prep_core.ts',
   'src/render/terrain_splat_presence_core.ts',
   'src/render/vehicle_exhaust_core.ts',
@@ -1335,6 +1359,22 @@ const RENDER_PURE_CORES = [
   'src/render/characters/morph_union_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
+  // FORK (Studio) pure cores.
+  'src/render/foliage_far_placements_core.ts',
+  'src/render/decal_stream_core.ts',
+  // renderer.ts extractions: the authored-map layer.
+  'src/render/authored_map/chase_boom_core.ts',
+  'src/render/authored_map/gameplay_fog_core.ts',
+  'src/render/authored_map/lighting_rig_core.ts',
+  'src/render/authored_map/shadow_cache_core.ts',
+  'src/render/authored_map/underworld_core.ts',
+  'src/render/authored_map/zone_atmosphere_core.ts',
+  'src/render/authored_map/zone_residency_core.ts',
+  'src/render/placed_batch_core.ts',
+  'src/render/city_clutter_core.ts',
+  'src/render/terrain_cut_clip_core.ts',
+  'src/render/terrain_cut_rim_core.ts',
+  'src/render/cut_cavity_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -2873,6 +2913,8 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/hud/referral_cards/referral_cards_controller.ts',
+  'src/ui/hud/referral_cards/referral_cards_hud_controller.ts',
   'src/ui/error_toast_controller.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',
@@ -2883,6 +2925,7 @@ const UI_DOM_MODULES = [
   // Mints the shared unit and bag-stack step buttons around a number input and
   // writes the input on a press; the rules are quantity_step_core.ts.
   'src/ui/quantity_stepper.ts',
+  'src/ui/canvas_dpr.ts', // Reads the display's device pixel ratio.
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/map/minimap_objective_tap.ts',

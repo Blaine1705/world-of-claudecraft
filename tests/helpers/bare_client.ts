@@ -124,6 +124,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.hillInfo = null;
   c.cardMinigameInfo = { queued: false, available: true, match: null };
   c.socialInfo = null;
+  c.referralCardsState = null;
   c.whoInfo = null;
   c.marketInfo = null;
   c.marketCollectPending = false;
@@ -148,6 +149,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeTitle = null;
   c.activeBorder = null;
   c.delveRun = null;
+  c.dungeonRun = null;
   c.companionState = null;
   c.riftFloor = null;
   // The reserved "no token" sentinel (src/sim/colliders.ts allocRiftCollisionToken

@@ -10,11 +10,13 @@
 // pool of persistent looping sources for ambience and sustained spell casts.
 
 import { apiUrl } from '../client_origin';
+import type { PointSoundSource } from '../render/audio_sink';
 import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
 import { isMeleeAudioId, meleeAudioSample } from './fury_audio_core';
+import { mountAudioKey } from './mount_audio_key';
 import {
   advanceInterruptibleMountEngine,
   advanceMountEngine,
@@ -53,6 +55,9 @@ const ABILITY_VOICES = 8;
 const ABILITY_GAIN = 0.34;
 export const REF_DISTANCE = 5; // world units at which a sound is at full volume
 export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
+// Hysteresis past a map point sound's authored radius before its loop is
+// released, so walking the edge does not restart the source every step.
+const POINT_SOUND_CULL = 6;
 const POINT_AMBIENCE_GAIN = 0.18;
 const COOLDOWN_ENTRY_TTL = 60;
 const COOLDOWN_PRUNE_INTERVAL = 30;
@@ -205,6 +210,7 @@ interface PendingLoop {
   y?: number;
   z?: number;
   maxDistance?: number;
+  refDistance?: number;
   // Carries the caller's `immediate` request through the cold-buffer wait so
   // a resumed loop() call (once the buffer finishes loading) still snaps
   // straight to target gain instead of silently falling back to a fade-in.
@@ -340,6 +346,17 @@ class Sfx {
     } catch {
       this.ctx = null;
     }
+  }
+
+  /** Release the AudioContext for a page that is going away (the editor's
+   *  pagehide teardown). Nulls the context so a later init() rebuilds it. */
+  close(): void {
+    const ctx = this.ctx;
+    this.ctx = null;
+    this.master = null;
+    this.clips = SFX_CLIPS;
+    this.clipsReady = null;
+    if (ctx) void ctx.close().catch(() => {});
   }
 
   private entry(key: string): SfxEntry | undefined {
@@ -872,8 +889,10 @@ class Sfx {
   // maxDistance defaults to makePanner's own default (the shared MAX_DISTANCE),
   // so every existing caller keeps its current audible range; only a caller
   // that needs its own falloff (pointAmbient's 'forge' branch) passes an
-  // override. refDistance has no caller that overrides it today; add it back
-  // if a future station ambience needs its own near-field radius.
+  // override. refDistance is likewise optional, and is passed by the
+  // map-authored point sounds: a maker's radius IS the whole falloff circle,
+  // so the near field has to scale with it rather than sit at the shared
+  // constant (see pointSounds).
   loop(
     id: string,
     key: string,
@@ -883,6 +902,7 @@ class Sfx {
     z?: number,
     maxDistance?: number,
     immediate = false,
+    refDistance?: number,
   ): void {
     const ctx = this.ctx,
       master = this.master;
@@ -907,7 +927,7 @@ class Sfx {
           this.pendingLoopVariants.delete(id);
           return;
         }
-        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance, immediate });
+        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance, refDistance, immediate });
         this.pendingLoopVariants.set(id, variantIndex);
         if (this.pendingLoopLoads.get(id) !== key) {
           this.pendingLoopLoads.set(id, key);
@@ -933,6 +953,7 @@ class Sfx {
               pending.z,
               pending.maxDistance,
               pending.immediate,
+              pending.refDistance,
             );
           });
         }
@@ -944,7 +965,7 @@ class Sfx {
       src.playbackRate.value = this.authoredPlaybackRate(key);
       const g = ctx.createGain();
       g.gain.value = 0;
-      const panner = positional ? this.makePanner(x, y, z, undefined, maxDistance) : null;
+      const panner = positional ? this.makePanner(x, y, z, refDistance, maxDistance) : null;
       if (panner) src.connect(g).connect(panner).connect(master);
       else src.connect(g).connect(master);
       src.start();
@@ -976,7 +997,8 @@ class Sfx {
       // takes effect on the NEXT frame rather than only for a loop that
       // hasn't started yet.
       const resolvedMax = maxDistance ?? MAX_DISTANCE;
-      if (slot.panner.refDistance !== REF_DISTANCE) slot.panner.refDistance = REF_DISTANCE;
+      const resolvedRef = refDistance ?? REF_DISTANCE;
+      if (slot.panner.refDistance !== resolvedRef) slot.panner.refDistance = resolvedRef;
       if (slot.panner.maxDistance !== resolvedMax) slot.panner.maxDistance = resolvedMax;
     }
     // Only (re)arm the ramp when the target actually changes. loop() is called
@@ -1134,8 +1156,8 @@ class Sfx {
     // stuttering. Gated on the loop clip EXISTING rather than on a mount-key
     // allowlist, so any mount that later gains a loop drops its strides for
     // free, and every mount without one is untouched.
-    if (`mount_loop_${mountKey}` in SFX_CLIPS) return;
-    const custom = `mount_run_${mountKey}`;
+    if (`mount_loop_${mountAudioKey(mountKey)}` in SFX_CLIPS) return;
+    const custom = `mount_run_${mountAudioKey(mountKey)}`;
     if (custom in SFX_CLIPS) {
       this.playAt(custom, x, y, z, {
         gain: 0.85,
@@ -1174,7 +1196,7 @@ class Sfx {
     self: boolean,
     entityId: number,
   ): void {
-    const key = `mount_summon_${mountKey}`;
+    const key = `mount_summon_${mountAudioKey(mountKey)}`;
     if (!(key in SFX_CLIPS)) return;
     // A TAIL fade, because the take does NOT decay to silence: its last 120ms
     // still peaks at about -15 dBFS, so simply reaching the end of the buffer
@@ -1225,7 +1247,7 @@ class Sfx {
   /** Warm a mount's summon take, called on the summon channel's START edge so
    *  the 1.5s channel covers the fetch and decode. */
   preloadMountSummon(mountKey: string): void {
-    const key = `mount_summon_${mountKey}`;
+    const key = `mount_summon_${mountAudioKey(mountKey)}`;
     if (key in SFX_CLIPS) this.preload(key);
   }
 
@@ -1251,7 +1273,9 @@ class Sfx {
     const cached = this.engineClipKeysCache.get(cacheId);
     if (cached !== undefined) return cached;
     const stem =
-      direction === 'forward' ? `mount_run_${mountKey}` : `mount_run_${mountKey}_reverse`;
+      direction === 'forward'
+        ? `mount_run_${mountAudioKey(mountKey)}`
+        : `mount_run_${mountAudioKey(mountKey)}_reverse`;
     const startKey = `${stem}_start`;
     const resolved =
       startKey in SFX_CLIPS ? { startKey, loopKey: stem, stopKey: `${stem}_stop` } : null;
@@ -1288,7 +1312,7 @@ class Sfx {
    *  while summoned, and reverse becomes this same loop pitched up rather than
    *  a separate take (see mountEngine). */
   private engineIdleKey(mountKey: string): string | null {
-    const key = `mount_run_${mountKey}_idle`;
+    const key = `mount_run_${mountAudioKey(mountKey)}_idle`;
     const cached = this.engineIdleKeysCache.get(mountKey);
     if (cached !== undefined) return cached;
     const resolved = key in SFX_CLIPS ? key : null;
@@ -1463,7 +1487,7 @@ class Sfx {
   private idleClipKey(mountKey: string): string | null {
     const cached = this.idleClipKeyCache.get(mountKey);
     if (cached !== undefined) return cached;
-    const key = `mount_idle_${mountKey}`;
+    const key = `mount_idle_${mountAudioKey(mountKey)}`;
     const resolved = key in SFX_CLIPS ? key : null;
     this.idleClipKeyCache.set(mountKey, resolved);
     return resolved;
@@ -1503,7 +1527,7 @@ class Sfx {
     // The per-stride gait beat, idle hum, and mount-aware jump/land takes ride
     // the same warm-up edge: a mount can ship them without an engine take set
     // (the Mech Bird), so they preload before the engine-set early return.
-    const runKey = `mount_run_${mountKey}`;
+    const runKey = `mount_run_${mountAudioKey(mountKey)}`;
     if (runKey in SFX_CLIPS) this.preload(runKey);
     const idleKey = this.idleClipKey(mountKey);
     if (idleKey) this.preload(idleKey);
@@ -1512,7 +1536,7 @@ class Sfx {
       if (key) this.preload(key);
     }
     for (const kind of ['squawk', 'flap'] as const) {
-      const key = `mount_${kind}_${mountKey}`;
+      const key = `mount_${kind}_${mountAudioKey(mountKey)}`;
       if (key in SFX_CLIPS) this.preload(key);
     }
     const keys = this.engineClipKeys(mountKey);
@@ -1542,7 +1566,7 @@ class Sfx {
    *  and the guard only catches a mount bouncing on a ledge seam. */
   mountApex(x: number, y: number, z: number, mountKey: string): void {
     for (const kind of ['squawk', 'flap'] as const) {
-      const key = `mount_${kind}_${mountKey}`;
+      const key = `mount_${kind}_${mountAudioKey(mountKey)}`;
       if (key in SFX_CLIPS) this.playAt(key, x, y, z, { gain: MOVE_GAIN, cooldown: 0.08 });
     }
   }
@@ -1559,7 +1583,7 @@ class Sfx {
    *  players on carts get two independently positioned voices rather than
    *  fighting over one slot. */
   mountLoop(id: number, x: number, y: number, z: number, mountKey: string, moving: boolean): void {
-    const key = `mount_loop_${mountKey}`;
+    const key = `mount_loop_${mountAudioKey(mountKey)}`;
     if (!(key in SFX_CLIPS)) {
       // The renderer calls this every frame for every mounted entity in view,
       // and most mounts have no mount_loop_* clip at all: skip the three
@@ -1601,7 +1625,7 @@ class Sfx {
     mountKey?: string,
   ): void {
     if (mountKey && (kind === 'jump' || kind === 'land')) {
-      const mkey = `mount_${kind}_${mountKey}`;
+      const mkey = `mount_${kind}_${mountAudioKey(mountKey)}`;
       if (mkey in SFX_CLIPS) {
         const gain = kind === 'land' ? MOVE_GAIN * MOUNT_LAND_BOOST : MOVE_GAIN;
         this.playAt(mkey, x, y, z, { gain, cooldown: 0.08 });
@@ -1640,10 +1664,10 @@ class Sfx {
    *  and every mount without them keeps the sound it has today. */
   private mountMovementKey(kind: 'jump' | 'land', mountKey: string, fallback: string): string {
     if (!mountKey) return fallback;
-    const cacheId = `${kind}:${mountKey}`;
+    const cacheId = `${kind}:${mountAudioKey(mountKey)}`;
     const cached = this.mountMovementKeyCache.get(cacheId);
     if (cached !== undefined) return cached ?? fallback;
-    const candidate = `mount_${kind}_${mountKey}`;
+    const candidate = `mount_${kind}_${mountAudioKey(mountKey)}`;
     const resolved = candidate in SFX_CLIPS ? candidate : null;
     this.mountMovementKeyCache.set(cacheId, resolved);
     return resolved ?? fallback;
@@ -1872,6 +1896,42 @@ class Sfx {
     };
     blast(196, 0, 0.5);
     blast(261.6, 0.42, 0.9);
+  }
+
+  /** Per-frame update of the map-authored point sounds (the editor's Sound
+   *  tool). Each node is one positional loop whose panner falls off over the
+   *  authored radius, so it rides the same pool as world ambience: lazy clip
+   *  loading, the manifest's gain trim, and allocation-free repeat calls all
+   *  come along. Out-of-range nodes release their source rather than sitting
+   *  silent, with a little hysteresis past the radius so a player walking the
+   *  edge does not restart the loop every step. */
+  pointSounds(sources: readonly PointSoundSource[]): void {
+    if (!this.ctx) return;
+    for (let i = 0; i < sources.length; i++) {
+      const s = sources[i];
+      const dx = s.x - this.lx,
+        dz = s.z - this.lz;
+      const cull = s.radius + POINT_SOUND_CULL;
+      if (dx * dx + dz * dz > cull * cull) {
+        if (this.loops.has(s.id) || this.pendingLoops.has(s.id)) this.unloop(s.id, 0.7);
+        continue;
+      }
+      // The authored radius IS the whole falloff circle, so it drives both ends
+      // of the linear distance model: full gain out to a small core, silent at
+      // the edge. Without the matching near field a small emitter would sit at
+      // full volume across most of its own circle.
+      this.loop(
+        s.id,
+        s.key,
+        s.volume,
+        s.x,
+        s.y,
+        s.z,
+        Math.max(1, s.radius),
+        false,
+        Math.max(0.5, s.radius * 0.12),
+      );
+    }
   }
 
   // --- Per-ability procedural combat audio (src/render/ability_vfx) --------

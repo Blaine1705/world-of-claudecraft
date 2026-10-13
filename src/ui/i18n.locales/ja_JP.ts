@@ -1639,6 +1639,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 記録',
   'landing.scout': 'WoC スカウト',
   'landing.parseService': 'WoC 戦闘ログ',
+  'editor.buildMode.materialNames.WardenStone': '滑らかな石',
+  'editor.buildMode.diagonal': '斜めの壁',
+  'editor.buildMode.diagonalHint':
+    'グリッド上の点から別の点へドラッグして、任意の角度の壁を作成します。',
   'guide.professions.endgameBodyRaidCollections':
     '名匠鍛造は「装備数制限：名匠鍛造」の印を持つ共通の装備群です。従来の最高位製作ルートでは、発見する型紙、1日ごとに制限される中間素材の製作、共通の終盤素材を引き続き使います。坩堝のセットはレイド素材を使う別ルートであり、従来のルートに追加費用を積み重ねるものではありません。どちらも同じ2部位までの装備上限を共有するため、ビルド内の同じ二つの枠を競います。完成品は完全化や依頼製作によってその個体が帰属するまでは自由に取引できます。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -2667,6 +2671,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.deedTracker': '功績トラッカー',
   'hudChrome.interfaceUnlock.frameNames.delveTracker': 'デルヴトラッカー',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': 'リフトトラッカー',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': 'ダンジョントラッカー',
+  'hudChrome.dungeonTracker.complete': '完了',
   'hudChrome.interfaceUnlock.frameNames.targetDots': 'ターゲットデバフ',
   'hudChrome.interfaceUnlock.frameNames.chat': 'チャット',
   'hudChrome.interfaceUnlock.frameNames.menu': 'メニュー',
@@ -13489,6 +13495,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': 'ルナタイド（周期的な範囲ダメージ）',
   'hudChrome.finder.mech.chorus_and_solo': '合唱と独唱（片方の印には集まり、もう片方からは離れる）',
   'hudChrome.finder.mech.tideglass_reflections': '潮硝子の映し身（互いの映し身を倒す）',
+  'hudChrome.finder.mech.hydra_three_elements':
+    '三つの属性（左の首は18ヤードの冷気の円錐を吐き、4秒間あなたの移動を70パーセント遅くする。中央の首は最大3人の足元に毒を吐き、1.5秒後に破裂して、落ちた場所で6秒間燃え続ける。右の首は26ヤードの直線に激流を放ち、あなたを8ヤード吹き飛ばす：どれも範囲の外へ出ること。首が1本倒れると、残った首がその攻撃を引き継ぐ）',
+  'hudChrome.finder.mech.hydra_tsunami':
+    '津波（首が4.5秒間水中に沈み、その間の被ダメージが75パーセント減る。波は池の半分を襲い、次はもう半分を襲う：ノーマルでは160から190の冷気ダメージと10ヤードの押し出し。もう半分へ渡るか、池の縁の柱の陰に立つこと。ヒロイックでは3.5秒後に波がもう半分へ打ち返す。最初の津波は戦闘開始から24秒後、その後は前の波が過ぎてから40秒後に来る）',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    '合体ブレス（津波と津波の間に、首が自分たちの攻撃を2つ融合させる、順番は常に同じ：凍てつく激流は直線上の全員を2秒間凍らせ、次の波を防げる氷の壁を残す。毒の潮流は毒の池を外へ滑らせる。毒の霧氷は毒の池を結晶に凍らせ、4秒後に破裂させる。ノーマルでは津波の間に1回、ヒロイックでは2回）',
+  'hudChrome.finder.mech.hydra_regrowth':
+    '再生（ほかの首が生きている間、倒れた首は20秒後に体力半分で生え戻り、倒れた首1本ごとに残りの首の与ダメージが15パーセント増える：3本をほぼ同時に倒すこと）',
   'hudChrome.finder.mech.rising_tide': '満ち潮（島の半分が浸水、乾いた側へ移動）',
   'hudChrome.finder.mech.undertow': '引き潮（全員を引き寄せる、衝撃の前に逃げる）',
   'hudChrome.finder.mech.enrage': '低体力で激怒',
@@ -19317,6 +19331,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.looksNone': '元の姿',
   'hudChrome.deeds.looksNoBuddy': '相棒を呼び出すと、ここで姿を選べる。',
   'hudChrome.deeds.looksEmpty': 'この相棒にはまだ解放された姿がない。',
+  'hudChrome.realmBuilder.title': '今月の王国建設者',
+  'hudChrome.realmBuilder.currentLabel': '今月の受賞者',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '名誉での購入は取り消せません。商人の買い戻し一覧に並ぶのは、自分が売った品だけです。コインでの買い物なら、たいていは売却価格で売り戻せますし、また気が変わればその一覧から取り戻せますが、ウォーフェア装備は買った瞬間に魂縛されるため、取引にも郵送にも売り戻しにも二度と回せません。その一覧にウォーフェア装備が並ぶことは、決してありません。商店がわざわざ確認を求めるのはそのためです。押す前に、その一点をよく読みましょう。',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -19351,6 +19367,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '製作ウィンドウでレシピを、または依頼ボードで依頼を「追跡」すると、採集目標トラッカーがこのスタックに加わります。追跡中のレシピまたは依頼の名前、目標の個数、そして所持・保管している素材でどこまで届くかを表示します。「追跡」は現在の目標を置き換え、「クリア」で明示的に解除します。どちらも採取設定を変えることはありません。',
   'guide.interfacePage.hubPracticeTrackerBody':
     'Eastbrookの拠点付近では、そこでのガイド付き練習レッスンを受けると練習トラッカーがスタックに加わり、練習用ダミーに対する自己ベストの記録を表示し続けます。レッスンが進行中は、その隣のコーチングストリップが現在のステップを、ダメージメーターを開くことから2回目の記録を比較することまで案内します。',
+  'guide.interfacePage.dungeonTrackerBody':
+    'グループダンジョンの中では、ダンジョントラッカーがスタックの一番上に入ります。ダンジョン名を記したプレート（ヒロイックで挑戦中は「ヒロイック」と表示）と、攻略が進むにつれて満ちていくレール、その下にはそのダンジョンのボスがルートで出会う順に並び、倒れるまではそれぞれ 0 / 1 と数えられます。戦闘に第二幕があるボスは戦闘全体が終わるまで未完了のままなので、リストが完了と表示されるのは攻略が本当に終わったときだけです。あなたが外に出ればトラッカーも消え、フレーム編集では他のトラッカーと同じように、専用の名前チップを付けて動かせるようになります。',
   'guide.interfacePage.mobileBodyTwoPages':
     'タッチ操作は自動的に現れ、配置は画面の大きさに合わせて整えられます。小さなスマートフォンではコンパクトに、大きなスマートフォンでは標準に、タブレットではゆったりと並びます。\n\nアビリティは数字列ではなく輪の形に並びます。攻撃ボタンとその脇の4つのアクションボタン、そして輪を{pages}つのページの間で切り替えるページトグルです。ページを合わせると{slots}個あるアビリティスロットのすべてに届き、デスクトップ用の追加バーを有効にしているかどうかは関係ありません。輪の5番目の弧の位置は消耗品の席です。タップすればそこに据えた品を使い、長押しするか内側へスワイプすれば、持ち物から自動で埋まる列が開きます。その周りには、タッチで遊ぶ人がいちばんよく使うボタン、ターゲットの切り替え、目の前のものへの対話、ジャンプが並びます。\n\n画面の下辺には、ボタンの列の代わりに「クイック操作」のコントロールが一つ置かれています。ここからそれ以外のすべてが開きます。騎乗、チャット、マップ、バッグ、ソーシャル、クエスト、キャラクター、スペルブック、ゲームメニュー、そして残りのウィンドウを収めた「その他」で、ダンジョンファインダー、PvP、エモート、ウィキもそこに入っています。ここではウィンドウは浮かぶのではなく、画面いっぱいに開きます。\n\nユニットフレームの移動はデスクトップだけのものです。タッチでは、配置はゲームの側が決めてくれます。',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -19392,8 +19410,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '採集者別に分ける',
   'hudChrome.itemMenu.takeChosenQuantity': '指定数を取り出す',
   'hudChrome.itemMenu.combine': '素材スタックを結合',
-  'hudChrome.realmBuilder.title': '今月の王国建設者',
-  'hudChrome.realmBuilder.currentLabel': '今月の受賞者',
   'hudChrome.realmBuilder.placeholderName': 'あなたの名前',
   'hudChrome.realmBuilder.placeholderHint': 'この銘板は最初の名前を待っています。',
   'hudChrome.realmBuilder.pastTitle': 'これまでの受賞者',
@@ -20397,9 +20413,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trinkets.use.heartNova':
     '熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。',
   'hudChrome.auraEffect.trinket.lastStandCooldown':
-    '砦の印章の「最後の砦」シールドは使用済み。この効果が切れるまで、体力が{threshold}%を下回っても再び発動しない。',
+    '防護シールドは使用済みです。この効果が切れるまで、体力が{threshold}%未満でダメージを受けても再発動しません。',
   'hudChrome.auraEffect.trinket.lastBastion':
-    '{value}のダメージを吸収する。体力が{threshold}%未満でダメージを受けたときに砦の印章が張ったシールド。',
+    '{value}ダメージを吸収します。体力が{threshold}%未満でダメージを受けたときに、装飾品が張ったシールドです。',
   'hudChrome.auraEffect.trinket.retaliate':
     'あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。',
   'hudChrome.auraEffect.trinket.moored':
@@ -21447,4 +21463,150 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.merewater_cowl.name': '湖水の頭巾',
   'entities.items.merecleaver.name': '湖断ちの大斧',
   'entities.items.moonwrack_stave.name': 'ムーンラックの杖',
+  'referralCards.title': 'フレンド招待',
+  'referralCards.subtitle': '一緒に冒険して、スタンプを集めよう。',
+  'referralCards.close': 'フレンド招待を閉じる',
+  'referralCards.launcher': 'スタンプカード',
+  'referralCards.pages': 'スタンプカードのページ',
+  'referralCards.firstPage': '最初のページ',
+  'referralCards.nextPage': 'ほかのカード',
+  'referralCards.trailmateTitle': '旅の仲間',
+  'referralCards.friendshipAura': '友情',
+  'referralCards.protectiveCharm': '守りのお守り',
+  'referralCards.bankBonus': '完了したスタンプカード',
+  'referralCards.bankBonusHelp':
+    '絆のフレンド2人のスタンプカード完成を手伝うと、銀行スロットが永久に20枠増えます。',
+  'referralCards.friendshipUse':
+    '筋力、敏捷性、スタミナ、知力、精神力が{stats}上昇します。持続時間：{duration}秒。',
+  'referralCards.readyCount': 'スタンプカード：報酬を{count}件受け取れます',
+  'referralCards.loading': '招待スタンプカードに接続中...',
+  'referralCards.empty': '新しいプレイヤーを招待して、一緒に最初のスタンプカードを始めましょう。',
+  'referralCards.inviteTitle': 'フレンドを招待',
+  'referralCards.inviteHelp':
+    'フレンドがアカウントを作る前に、このリンクを共有してください。あなたのリンクから新規作成したアカウントだけが絆のフレンドになります。',
+  'referralCards.inviteLabel': 'あなたの招待リンク',
+  'referralCards.inviteUnavailable': '招待リンクはまだ利用できません。',
+  'referralCards.membership':
+    '絆のフレンドが初めてメンバーシップを購入すると、メンバーシップ債券を受け取れます。',
+  'referralCards.cardBetween': '{you} と {friend}',
+  'referralCards.yourCard': '{name}のスタンプカード',
+  'referralCards.unassigned': 'キャラクター未選択',
+  'referralCards.start': 'カードを始める',
+  'referralCards.startPrompt':
+    '{friend}とスタンプカードを始めますか？双方の承諾が必要です。両キャラクターともレベル5未満で、チュートリアル島の最終クエストを未完了である必要があります。',
+  'referralCards.accept': '承諾',
+  'referralCards.decline': '辞退',
+  'referralCards.declinePrompt':
+    '本当に辞退しますか？両キャラクターが条件を満たしていれば、後からスタンプカードメニューで開始できます。',
+  'referralCards.declineConfirmed':
+    'カードは開始されませんでした。両キャラクターが条件を満たしていれば、スタンプカードメニューで開始できます。',
+  'referralCards.waiting': '絆のフレンドの承諾を待っています。',
+  'referralCards.cancel': 'キャンセル',
+  'referralCards.okay': '確認',
+  'referralCards.understand': 'はい、理解しました',
+  'referralCards.confirmLock': 'はい、このカードを固定する',
+  'referralCards.lockFirst':
+    'フォグバインダーの報酬を受け取ると、このカードは{name}に永久に固定されます。カードも報酬も他のキャラクターに移せなくなります。理解しましたか？',
+  'referralCards.lockSecond':
+    '本当によろしいですか？フォグバインダーの報酬を受け取り、このカードを{name}に永久に固定します。',
+  'referralCards.locked': 'このカードは{name}に固定されています。もう移せません。',
+  'referralCards.unlocked':
+    'フォグバインダーの報酬を受け取るまでは、条件を満たす別のキャラクターにカードを移せます。受け取ると現在のキャラクターに永久に固定されます。',
+  'referralCards.move': 'このキャラクターにカードを移す',
+  'referralCards.movePrompt':
+    'カードを{oldName}から{newName}へ移しますか？進行状況と、このカードで獲得した報酬がすべて移ります。それらの報酬は{oldName}から削除されます。',
+  'referralCards.confirmMove': 'はい、カードを移す',
+  'referralCards.summon': '絆のフレンドを召喚',
+  'referralCards.summonPrompt':
+    '{friend}が自分の場所にあなたを召喚しようとしています。召喚を受け入れますか？',
+  'referralCards.summonHelp': '絆のフレンドを自分の場所に呼び寄せます。30分に1回召喚できます。',
+  'referralCards.summonCooldown': '召喚可能まで{minutes}分{seconds}秒',
+  'referralCards.reward': '報酬：{reward}',
+  'referralCards.earned': '獲得済み',
+  'referralCards.redeemed': '受取済み',
+  'referralCards.emptyStamp': '未獲得',
+  'referralCards.stamping': 'カードにスタンプを押しています...',
+  'referralCards.redeem': '報酬を受け取る',
+  'referralCards.previous': '先に前のスタンプ報酬を受け取ってください。',
+  'referralCards.playTogether':
+    'このカードのキャラクター同士でパーティを組み、目標を達成しましょう。',
+  'referralCards.fallback':
+    '目標のクエストを一人で完了しましたか？フレンドと再びパーティを組むとチュートリアル島のスタンプを獲得できます。その後のクエストのスタンプは、対応するダンジョンを一緒にクリアすると獲得できます。',
+  'referralCards.questGroup': 'スタンプカードのクエスト',
+  'referralCards.questWithFriend': '{friend}と{quest}',
+  'referralCards.browseCards': 'すべてのスタンプカードのページを見る',
+  'referralCards.nextQuest': 'スタンプカード：{quest}',
+  'referralCards.questIndicator': 'このクエストで次のスタンプカード報酬に近づきます。',
+  'referralCards.completion':
+    'おめでとう！{friend}があなたの助けでスタンプカードを完成させました。',
+  'referralCards.openInvites': 'フレンド招待を開く',
+  'referralCards.referrerTitle': '手伝ったフレンド',
+  'referralCards.referrerCount': '完了したフレンド：{count}人',
+  'referralCards.friendTier': '手伝ったフレンド：{count}人',
+  'referralCards.awarded': '付与済み',
+  'referralCards.pending': '未付与',
+  'referralCards.milestones.tutorial': 'チュートリアル島の最終クエスト',
+  'referralCards.milestones.hollow': '虚ろへ',
+  'referralCards.milestones.fogbinder': 'フォグバインダー',
+  'referralCards.milestones.gravewyrm': '墓ワームのコルズル',
+  'referralCards.milestones.raid': '初めてのレイドボスを倒す',
+  'referralCards.rewards.tutorial': '特別な称号と、キャラクターに帰属する最大容量のバッグ。',
+  'referralCards.rewards.hollow': 'スタミナを増やし、体力が低いときに自動でシールドを張る装飾品。',
+  'referralCards.rewards.fogbinder':
+    '装飾品が進化してスタミナがさらに増加し、使用効果を得ます。全能力値が15秒間5上昇し、再使用まで2分かかります。',
+  'referralCards.rewards.gravewyrm': '無料の騎乗訓練。',
+  'referralCards.rewards.raid': '限定の友情タンクマウント。',
+  'referralCards.referrerRewards.1': '限定の友情ラプターマウント。',
+  'referralCards.referrerRewards.2': '銀行スロット20枠とキャラクタースロット5枠。',
+  'referralCards.referrerRewards.3': 'Claudiumを1,000。',
+  'referralCards.referrerRewards.4': 'Claudiumを1,000。',
+  'referralCards.referrerRewards.5': '若木の仲間。',
+  'referralCards.reasons.notParticipant':
+    'このアカウントはこの絆のフレンド関係に含まれていません。',
+  'referralCards.reasons.staleRevision':
+    'カードが更新されました。最新の進行状況を確認してから、もう一度お試しください。',
+  'referralCards.reasons.invalidCharacters':
+    'パーティのキャラクターはこの絆のフレンド関係に含まれていません。',
+  'referralCards.reasons.notTogether': '絆のフレンド同士で同じパーティに入る必要があります。',
+  'referralCards.reasons.levelTooHigh':
+    '新しいカードを始めるキャラクターはレベル5未満である必要があります。',
+  'referralCards.reasons.tutorialCompleted':
+    'いずれかのキャラクターがチュートリアル島の最終クエストを完了しています。',
+  'referralCards.reasons.alreadyStarted':
+    'この絆のフレンド関係にはすでにカードがあります。1組につき有効なカードは1枚だけです。',
+  'referralCards.reasons.notPending': '返答待ちのカード招待はありません。',
+  'referralCards.reasons.declinePending': '絆のフレンドがカードを辞退するかどうか確認しています。',
+  'referralCards.reasons.declineNotConfirmed': '招待を終了する前に辞退を確定してください。',
+  'referralCards.reasons.notActive': '報酬を受け取る前に、一緒にカードを始めてください。',
+  'referralCards.reasons.wrongCharacter':
+    'カードに記載されたキャラクターを使うか、未固定のカードを条件に合うキャラクターへ移してください。',
+  'referralCards.reasons.locked': 'このカードはキャラクターに固定されているため、移せません。',
+  'referralCards.reasons.sameCharacter': 'このカードはすでにこのキャラクターのものです。',
+  'referralCards.reasons.invalidMilestone': 'そのスタンプはこのカードのものではありません。',
+  'referralCards.reasons.notEarned': '報酬を受け取る前に、この目標を一緒に達成してください。',
+  'referralCards.reasons.alreadyRedeemed': 'この報酬はすでに受取済みです。',
+  'referralCards.reasons.previousRewardRequired': '先に前のスタンプ報酬を受け取ってください。',
+  'referralCards.reasons.confirmationRequired':
+    'フォグバインダーの報酬を受け取る前に、カード固定の警告を確認してください。',
+  'referralCards.reasons.newAccountsOnly':
+    '招待リンクから新規アカウントを作成したときだけ絆のフレンドになれます。既存のアカウント同士は結べません。',
+  'referralCards.reasons.unavailable': '現在この操作は利用できません。後でもう一度お試しください。',
+  'entities.items.referral_satchel.name': '友情のサッチェル',
+  'entities.items.referral_hollow_charm.name': '虚ろの友情のお守り',
+  'entities.items.referral_fog_charm.name': '霧に包まれた友情のお守り',
+  'entities.items.reins_referral_tank.name': '友情タンクの手綱',
+  'entities.items.reins_referral_raptor.name': '友情ラプターの手綱',
+  'hud.social.friendFirstPage': '最初のページ',
+  'hud.social.friendNextPage': '次のページ',
+  'hud.social.boundFriend': '絆のフレンド',
+  'hud.social.boundFriendLink': '絆のフレンドは招待リンクで結ばれています。',
+  'hudChrome.mounts.name_referral_tank': '友情タンク',
+  'hudChrome.mounts.name_referral_raptor': '友情ラプター',
+  'hudChrome.mounts.desc_referral_tank': '招待スタンプカードを完成させると獲得できます。',
+  'hudChrome.mounts.desc_referral_raptor':
+    '最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。',
+  'apiError.character.referral_transfer_pending':
+    'このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。',
+  'apiError.character.referral_bond_pending':
+    '招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。',
 };

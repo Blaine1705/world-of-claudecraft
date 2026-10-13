@@ -1,8 +1,9 @@
 // In-dungeon gates and encounter seals (src/sim/instances/dungeon_gates.ts)
 // driven through a real Sim claim of the Hollow Crypt: closed until their
-// packs and bosses die, sealed while the named boss is engaged, reopened on
-// the wipe, closed again when the instance resets, and mirrored to collision
-// per slot.
+// packs and bosses die, sealed once the named boss has fought for the seal
+// delay (the delay's own cases: tests/dungeon_gate_seal_delay.test.ts),
+// reopened on the wipe, closed again when the instance resets, and mirrored to
+// collision per slot.
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
@@ -10,6 +11,7 @@ import { HOLLOW_CRYPT_GATES } from '../src/sim/content/hollow_crypt';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { clearDungeonGateStateForTest } from '../src/sim/instances/dungeon_gate_state';
 import {
+  BOSS_ROOM_SEAL_DELAY_TICKS,
   DUNGEON_GATE_TEMPLATES,
   dungeonGateEntity,
   dungeonGateState,
@@ -102,24 +104,46 @@ describe('dungeon gates: the Hollow Crypt claim', () => {
     ).toBe(false);
   });
 
-  it('an arena seals while its boss is engaged and reopens when it resets', () => {
-    const { sim, inst } = setup();
+  it('an arena seals once its boss has fought for the delay and reopens when it resets', () => {
+    const { sim, pid, inst } = setup();
     kill(sim, inst, ['c1', 'c2', 'c3', 'c4', 'w1', 'w2', 'w3', 'w4']);
     sim.tick();
     expect(dungeonGateState(sim.ctx, inst, gate('yard_barrier'))).toBe('open');
     const marrow = mob(sim, inst, 'sexton_marrow');
-    marrow.aiState = 'chase';
-    marrow.inCombat = true;
+    marrow.maxHp = 1e6;
+    marrow.hp = marrow.maxHp;
+    // A real pull, driven through full sim ticks: the player stands on him and
+    // is kept on their feet for the length of the delay.
+    const player = sim.ctx.entities.get(pid) as Entity;
+    const stand = (): void => {
+      player.pos = sim.ctx.groundPos(marrow.spawnPos.x, marrow.spawnPos.z - 2.5);
+      player.prevPos = { ...player.pos };
+      player.maxHp = 1e7;
+      player.hp = 1e7;
+      sim.ctx.rebucket(player);
+    };
+    stand();
+    expect(sim.ctx.aggroMob(marrow, player, false)).toBe(true);
+    stand();
     sim.tick();
+    // The pull alone seals nothing: the yard stays open for the delay.
+    expect(marrow.inCombat).toBe(true);
+    expect(dungeonGateState(sim.ctx, inst, gate('yard_barrier'))).toBe('open');
+    expect(blockedAt(sim, inst, 'yard_barrier')).toBe(false);
+    for (let i = 0; i < BOSS_ROOM_SEAL_DELAY_TICKS; i++) {
+      stand();
+      sim.tick();
+    }
     expect(dungeonGateState(sim.ctx, inst, gate('yard_barrier'))).toBe('sealed');
     expect(dungeonGateEntity(sim.ctx, inst, gate('yard_barrier'))?.templateId).toBe(
       'dungeon_gate_sealed',
     );
     expect(blockedAt(sim, inst, 'yard_barrier')).toBe(true);
-    // The wipe: the boss evades home and goes idle again.
-    marrow.aiState = 'idle';
-    marrow.inCombat = false;
+    // The wipe: the boss walks home and goes idle again.
+    sim.ctx.handleDeath(player, marrow);
+    for (let i = 0; i < 20 * 20 && (marrow.aiState !== 'idle' || marrow.inCombat); i++) sim.tick();
     sim.tick();
+    expect(marrow.aiState).toBe('idle');
     expect(dungeonGateState(sim.ctx, inst, gate('yard_barrier'))).toBe('open');
     expect(blockedAt(sim, inst, 'yard_barrier')).toBe(false);
   });

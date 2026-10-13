@@ -45,6 +45,9 @@ export const WILDHEART_KIT_EXTENSION: TrashKitExtension = {
   // The spear, the totem's dread and the tongue: dodge them or deal with the
   // caster; a silence never stops them.
   isPhysical: (key) => key === 'mark' || key === 'dread' || key === 'tongue',
+  // The Toad Hex and the Quarry Mark are laid on one player (kit_cast_sight.ts);
+  // the roar, the totems and the dread are areas, the tongue a locked lane.
+  sightKeys: ['hex', 'mark'],
   ready(ctx, inst, mob, kit, key, st, players) {
     switch (key) {
       case 'roar':

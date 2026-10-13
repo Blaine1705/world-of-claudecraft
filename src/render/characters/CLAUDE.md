@@ -49,7 +49,60 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   gate is replaced (`setFarBakeGate`, a pooled body handed out again) is
   planned again behind the new gate, never dropped and forgotten; the Soul
   Rend mark is exempt and commits at once, being actionable raid information
-  (`tests/character_effect_compile_gate.test.ts`).
+  (`tests/character_effect_compile_gate.test.ts`). Shadowform (Gloamveil) alone
+  never waits to SHOW: it has a program-free stand-in set the visual mounts on
+  the frame of the shift and keeps while the body swims (next entry).
+- Gloamveil, the Shadow priest's form (`setShadowform`): a look on the body's
+  own materials, no bone and no adornment. `gloam_climb_core.ts` is the pure
+  half (the tongue tables, the cast surge and entry, the shader text and its
+  CPU twin, the cue for the floor layer); `gloam_climb.ts` is the layer and the
+  per-rig `GloamPresence` (the surge, the entry, and which of the two clone
+  sets the rig wears; `visual.ts` only asks it and remounts). Five rules hold
+  it together:
+  - **Every lit rig material carries the climb as a dormant layer**, attached
+    in `assets.ts` `buildTintedClone` on both tier arms right after the rim and
+    re-attached by `material_clone_hooks.ts`. A body out of the form pays one
+    uniform branch; a body in it rebinds two uniform objects per material
+    (`dressGloamClone`), so the form has NO program of its own. A new way to
+    build a rig material keeps that property only by going through the factory
+    or `cloneMaterialWithHooks` (`tests/character_gloam_form.test.ts` checks a
+    built priest).
+  - **A rebind wrapper pins its clone's program key.** A hook chain whose first
+    layer sat on three's default key reads `onBeforeCompile.toString()` lazily,
+    so wrapping the hook after the chain is built changes the key unless the
+    value is captured first (`tests/gloam_climb.test.ts`).
+  - **Two clone sets, one look** (`effect_materials.ts`). The settled form is
+    the transparent clone (solid, depth written): in the transparent pass the
+    body draws after the sun-shaft overlay and its dark stays deep, which is
+    the approved look. Its program is the transparent variant of each rig
+    material, the one the ghost run and stealth use, so the form adds no
+    program of its OWN; whether that variant is already linked depends on the
+    mesh. The boot twin (`character_effect_prewarm.ts`) stages skinned meshes
+    only, so it covers the body; a player's rigid bone-attached pieces (head,
+    hair, shoulders, weapon, halo) get their transparent variant on the first
+    shift, stealth or ghost run of the session, behind the effect-swap gate.
+    The stand-in is the same look on a clone that flips nothing, so it needs
+    no link at all: `applyVisualMaterials` mounts it while the transparent set
+    is behind its gate (that first link shows as the stand-ins for a moment,
+    never as a late form), and for as long as the body swims (a body in the
+    transparent pass would draw over the water it is in). A host with no
+    compile gate (a preview, a test, a renderer that links synchronously)
+    mounts the settled set at once and pays its links on that draw, the same
+    baseline the ghost run and stealth have always had there.
+  - **The form recolours every unlit clone, which today is the halo alone.**
+    `dressGloamClone` repaints by material type, and the class halo is the one
+    unlit piece a rig that can hold `form_shadow` carries (a priest's set, on
+    both tier arms). The other unlit rig pieces (an eye glow, the Eye Ward
+    marker's ring, the effigy's flames, a boss's charge glow) live on rigs
+    that never take the form. A second unlit piece on a priest rig that means
+    something has to be told apart by identity there first.
+  - **The form's time passes off screen** (`GloamPresence.idle`, called from
+    `advanceOffscreen`). The renderer forwards the form edge every frame but
+    updates a rig only while it presents it, so without that tick a shift made
+    out of view would play its entry when the body next came into view.
+  The pool, the wake, the smoke and the entry burst are world-space and live
+  in `../gloam_field.ts` (see `src/render/CLAUDE.md`); the rig tells that layer
+  what to show through `CharacterVisual.gloamCue()`, never the other way.
 - `halo.ts`: the class halo (`buildHalo`, driven by `VisualDef.halo` +
   `haloUpOffset`/`haloRadius` overrides). Texture, per-color materials, and
   per-radius geometries are shared never-disposed caches, so radii MUST come
@@ -220,19 +273,23 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   code and registered per ability; the template future ability-animation work
   follows.
 - Form adornments: `form_adornments.ts`, the per-rig owner `CharacterVisual`
-  holds and drives from the `setMoonkin`/`setShadowform` edges the renderer
-  already sends, over the pure `form_adornment_core.ts` (what a rig wears, the
-  pose math) and two painters, `moonwing_adornment.ts` (antlers, crescent,
-  wings) and `gloamveil_veil.ts` (the face veil), with their canvas art in
-  `form_adornment_textures.ts` and the shared marker and glow recipe in
-  `rig_fx.ts`. Pieces ride the rig's `head`/`chest` bones, carry the
+  holds and drives from the `setMoonkin` edge the renderer already sends, over
+  the pure `form_adornment_core.ts` (what a rig wears, the pose math) and its
+  painter, `moonwing_adornment.ts` (antlers, crescent, wings), with its canvas
+  art in `form_adornment_textures.ts` and the shared marker and glow recipe in
+  `rig_fx.ts`. Moonwing is the only form that wears one: Gloamveil's face veil
+  was sized for one head and is gone (see the Gloamveil entry above). Pieces
+  ride the rig's `head`/`chest` bones, carry the
   `weaponVfxMesh` marker so no overlay swap, prewarm twin or caster sweep
   touches them, hide under a ghost or stealth body, and their shared kits are
   prewarmed through `ABILITY_MATERIAL_SOURCES`; a rig's first mount of a set
   still waits hidden behind the injected compile gate
   (`tests/form_adornments.test.ts`, `tests/character_form_adornments.test.ts`).
 - WOC split character files (the player bodies, 2026-09-28): one base and one
-  animation library per body fit, and per armor set and fit a low file, a medium
+  animation library per body fit, plus the hand-keyed library over it
+  (`woc_keyed_animations.ts`: `players/woc_keyed/woc_<fit>.glb`, keyed on the same bind
+  pose by `scripts/assets/woc_keyed_anims/`, for the idle, gaits, swim, jump take-off,
+  death, four emotes and the white swings), and per armor set and fit a low file, a medium
   file and a TOP file (`woc_armor_core.ts`: file names, the tier a character
   draws, the stand-in tier, the idle rule and its ledger; pure). Since 2026-10-03 the
   medium file carries every map of the set's one full layout at half its size and
@@ -349,7 +406,11 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `tests/woc_export.test.ts`), so no hairstyle or helm can change a character's
   size. Blade-contact timing for the
   hit presentation: `attack_swing_core.ts` (`ClipMap.contacts`, measured off
-  the shipped library by `tests/woc_character.test.ts`). The renderer holds the
+  the shipped library by `tests/woc_character.test.ts`). A WOC body's white swings
+  instead play the hand-keyed set (`woc_autoattack_core.ts`, pure): `playAttack` asks it
+  after the held-shot tail and skin checks and before the hand clip, and it times each
+  swing by `woc_autoattack_contacts.json` (written by the keyed build's validator,
+  pinned by `tests/woc_autoattacks.test.ts`). The renderer holds the
   target-side effects until that contact (`../contact_queue.ts`), a kill's
   collapse included, and the mount under a seated rider and a paladin's wings
   read the same hold, so they go on the frame the blade lands (`collapsed`,
@@ -466,9 +527,10 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   renderer never gated, a prewarm or speculative build whose stand-in nothing
   would prove), so a crowd arriving at once mounts a few a frame. Never mount
   inside `apply` or a part pass: both run within the host's own material
-  sweeps. A translucent effect (the ghost run, stealth, Shadowform, the Soul
-  Rend mark) keeps the pieces for as long as it lasts: one merged mesh cannot
-  blend what three sorts piece by piece.
+  sweeps. A translucent effect (the ghost run, stealth, the settled Shadowform
+  clones, the Soul Rend mark) keeps the pieces for as long as it lasts: one
+  merged mesh cannot blend what three sorts piece by piece. (Shadowform's
+  stand-in clones are opaque, so a merged head or kit stays merged under them.)
   - The head (`woc_head_merge.ts`, pure `woc_head_merge_core.ts`: the fold rule,
     the slot table, the cache identity): one mesh on the head bone with the
     face morphs baked, each vertex carrying the SLOT of its material; one
@@ -801,7 +863,8 @@ told so, which drops a far bake still queued for it) are
   `attach[].url` + `animUrls` (skipping `lazyPreload` defs), so drop the GLB
   under `public/models/...` and run the media-manifest build.
 - **New animation state:** add the field to `AnimState`, extend `BaseState` +
-  `desiredBaseState()` (`anim_state.ts`), `baseAction()`, and `ClipMap`/`clipNamesOf()`,
+  `desiredBaseState()` (`anim_state.ts`), `baseAction()`, and `ClipMap`/`clipNamesOf()`
+  (`clip_names.ts`, the one list a visual binds actions from),
   then have the renderer set the new flag. New pose LOGIC goes in the pure
   `anim_state.ts` half a Vitest imports directly, never inline in `visual.ts`.
 - **Tests:** `tests/visual_manifest.test.ts` pins the `VISUALS`/clip contract,

@@ -706,7 +706,12 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  '16d24d35e308ac6bc78c0b6ac73fe1e3e8bc725ca098f1b910af1847a67e8b7a';
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
+  // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  '18b78a7f22ab93a649eadd789c3dfe90f8aeacd467550322f7d0f3dfe3d29e0d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

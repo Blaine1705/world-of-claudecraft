@@ -546,6 +546,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // difficulties even without the boss: true flag (see morthen).
     ccImmune: true,
     slowImmune: true,
+    // He drops boss loot: his corpse holds like a boss's (boss_corpse_hold.ts).
+    bossCorpseHold: true,
     hpBase: 110,
     hpPerLevel: 24,
     dmgBase: 9,
@@ -1777,8 +1779,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: GRAVEWYRM_SANCTUM_ANCHORS.entry.x, z: GRAVEWYRM_SANCTUM_ANCHORS.entry.z },
     exitOffset: { x: GRAVEWYRM_SANCTUM_ANCHORS.exit.x, z: GRAVEWYRM_SANCTUM_ANCHORS.exit.z },
     // The Wyrm's Hollow lies 410 yd down the cirque from the gate: a second
-    // exit opens on the Shore of the Held once Korzul falls.
-    bossExitPortal: { x: -14, z: 138 },
+    // exit opens beside the fight on the permanent rock rim once Korzul falls.
+    // Outside the breakable lake plates, inside the shelf's cliff edge.
+    bossExitPortal: { x: -42, z: 192 },
     spawns: GRAVEWYRM_SANCTUM_SPAWNS,
     objects: [...GRAVEWYRM_SANCTUM_GATE_OBJECTS, ...GRAVEWYRM_SANCTUM_STORY_OBJECTS],
     gates: GRAVEWYRM_SANCTUM_GATES,

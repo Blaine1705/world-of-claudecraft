@@ -3,7 +3,9 @@
 // Basin's, the Gravewyrm Sanctum's and the Hollow Crypt's alerts (the shared encounter alert
 // painter) and the trash engine's use prompt (a Soul Brazier to topple, a
 // Remembrance Candle to relight, on the same painter), composed by the HUD as one DungeonPrompts member; and the
-// floating avoidance word.
+// floating avoidance word. Also the dungeon objectives tracker: the plate at
+// the top of the right tracker stack that names the dungeon and counts its
+// bosses (dungeon_tracker_view.ts + dungeon_tracker_painter.ts).
 
 export type {
   BastionAlertEntity,
@@ -34,6 +36,21 @@ export {
 } from './crypt_alert_view';
 export type { DungeonPromptsFrame } from './dungeon_prompts';
 export { DungeonPrompts } from './dungeon_prompts';
+export type { DungeonTrackerPainterDeps } from './dungeon_tracker_painter';
+export { DungeonTrackerPainter } from './dungeon_tracker_painter';
+export type {
+  DungeonStripText,
+  DungeonTrackerModel,
+  DungeonTrackerRow,
+} from './dungeon_tracker_view';
+export {
+  buildDungeonTracker,
+  DUNGEON_STRIP_QUEST_PREFIX,
+  DUNGEON_TRACKER_FLASH_BUILDS,
+  DUNGEON_TRACKER_ROW_CAP,
+  dungeonStripQuest,
+  makeDungeonTrackerModel,
+} from './dungeon_tracker_view';
 export type { AlertLook, EncounterAlertDeps } from './encounter_alert_painter';
 export { EncounterAlert } from './encounter_alert_painter';
 export type {

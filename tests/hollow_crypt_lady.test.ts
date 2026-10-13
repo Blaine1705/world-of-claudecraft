@@ -12,6 +12,7 @@ import { MOBS } from '../src/sim/data';
 import {
   BONECHILL_RAVINE,
   EMBRACE_LIFT,
+  embraceBreakShare,
   GRAVE_LANTERNS,
   LADY_BRIDAL_FREEZE,
   LADY_BRIDES_LAMENT,
@@ -52,9 +53,12 @@ function ladyFight(
   difficulty: 'normal' | 'heroic' = 'normal',
   extra = 3,
   seed = 23,
-): { f: Fight; lady: Entity } {
+): { f: Fight; lady: Entity; pool: number } {
   const f = cryptFight(difficulty, extra, KEEP, seed);
   const lady = boss(f, LADY_ID);
+  // Her real health in this claim, as the live spawn was tuned, before the
+  // rig below gives her a million to stand through the scripted beats.
+  const pool = lady.maxHp;
   put(f, lady, MID.x, MID.z);
   put(f, f.tank, MID.x, MID.z - 2.5);
   const spots = [
@@ -66,7 +70,7 @@ function ladyFight(
   lady.maxHp = 1e6;
   lady.hp = lady.maxHp;
   f.sim.ctx.aggroMob(lady, f.tank, false);
-  return { f, lady };
+  return { f, lady, pool };
 }
 
 function holdAll(f: Fight, skip: ReadonlySet<number> = new Set()): () => void {
@@ -243,6 +247,61 @@ describe('the Lady of the Bonechill: the Frozen Embrace', () => {
     expect(took(f, victim, 'Shattering Fall', from)).toBe(0);
     expect(st(lady).embrace).toBeNull();
     expect(st(lady).dropped).toBe(false);
+  });
+
+  // The Embrace's absolute difficulty on heroic is what it was before her
+  // heroic pool was raised (dungeon_difficulty.ts): 6 percent of 18,382 was
+  // 1,103 damage, and her heroic share of 24,999 is 1,103 still. Normal keeps
+  // its 6 percent of 3,998.
+  //
+  // The pool is read from the LIVE spawn of each difficulty, never written
+  // here by hand: a later retune of her heroic health multiplier moves the
+  // damage the Embrace asks for, and the band below is what catches it (the
+  // share must then be retuned with it, lady_ids.ts embraceBreakShareHeroic).
+  it.each([
+    ['normal', 235, 245],
+    ['heroic', 1090, 1115],
+  ] as const)(
+    'on %s she lets go at exactly the damage the share asks of her live pool (between %i and %i)',
+    (difficulty, least, most) => {
+      const heroic = difficulty === 'heroic';
+      const { f, lady, pool } = ladyFight(difficulty);
+      const needed = Math.ceil(embraceBreakShare(heroic) * pool - 1e-6);
+      expect(needed).toBeGreaterThanOrEqual(least);
+      expect(needed).toBeLessThanOrEqual(most);
+      // Her real pool for the difficulty (the rig's own is a million).
+      lady.maxHp = pool;
+      lady.hp = pool;
+      const keep = holdAll(f);
+      run(f, DT, keep);
+      const s = st(lady);
+      s.lamentTimer = 999;
+      s.embraceTimer = 0;
+      expect(
+        until(f, () => lady.castingAbility === LADY_EMBRACE_HOLD, T.embraceCast + 1.2, keep),
+      ).toBe(true);
+      run(f, T.embraceRise + 0.1, keep);
+      const held = f.others.filter((p) => p.carriedBy === lady.id);
+      expect(held).toHaveLength(heroic ? T.embraceVictimsHeroic : T.embraceVictims);
+      // One point short of the share: she holds on.
+      lady.hp = pool - (needed - 1);
+      run(f, 0.5, keep);
+      expect(held.every((p) => p.carriedBy === lady.id)).toBe(true);
+      // The last point: she sets them down, and nobody is dropped.
+      lady.hp = pool - needed;
+      run(f, T.embraceSetDown + 0.3, keep);
+      expect(held.every((p) => p.carriedBy === undefined)).toBe(true);
+      expect(st(lady).dropped).toBe(false);
+    },
+  );
+
+  it('keeps the heroic share apart from the normal one', () => {
+    expect(T.embraceBreakShare).toBe(0.06);
+    expect(T.embraceBreakShareHeroic).toBe(0.0441);
+    expect(embraceBreakShare(false)).toBe(T.embraceBreakShare);
+    expect(embraceBreakShare(true)).toBe(T.embraceBreakShareHeroic);
+    // What the old heroic pool asked for under the one share.
+    expect(Math.ceil(T.embraceBreakShare * 18382 - 1e-6)).toBe(1103);
   });
 
   it('drops them onto the ice when the hold runs out, and the impact lands as they land', () => {

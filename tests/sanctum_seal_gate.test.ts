@@ -294,6 +294,7 @@ const near = (x: number, z: number) => Math.hypot(x - DOOR.x, z - DOOR.z) < 80;
 function gateHits(x: number, z: number, r: number): boolean {
   return sanctumSealGateColliders(SEED, DOOR).some((c) => {
     if (c.type === 'circle') return Math.hypot(x - c.x, z - c.z) < c.r + r;
+    if (c.type === 'prism') throw new Error('unexpected prism collider');
     const dx = x - c.x;
     const dz = z - c.z;
     const cs = Math.cos(c.rot);

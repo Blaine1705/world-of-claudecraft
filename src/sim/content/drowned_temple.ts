@@ -708,7 +708,9 @@ export const DROWNED_TEMPLE_PACKS = [
 /** The three patrols (dev helpers, tests). */
 export const DROWNED_TEMPLE_PATROLS = ['pa', 'pb', 'pc'] as const;
 
-/** The three bosses, in route order. */
+/** The three single-bodied bosses, in route order. The Mere Hydra's heads are
+ *  MERE_HYDRA_HEAD_IDS; the full boss list, the Hydra included, is the Dungeon
+ *  Finder catalogue's (dungeon_finder.ts DROWNED_TEMPLE_ENCOUNTERS). */
 export const DROWNED_TEMPLE_BOSSES = [
   'choirmother_selthe',
   'tideglass_colossus',

@@ -20,6 +20,7 @@ import {
 } from '../../sim/content/gravewyrm_sanctum_layout';
 import { glacierCliffColor } from '../authored_field/field_mesh_core';
 import { buildAuthoredFieldTerrain } from '../authored_field/field_terrain';
+import { addSanctumSurfaceWear } from './sanctum_surface_wear';
 
 /** Fires whose heat melts and soots the snow round them (prop kind, radius). */
 const SOOTING_FIRES: Readonly<Record<string, number>> = {
@@ -80,5 +81,6 @@ export function buildSanctumTerrain(lowGfx: boolean): THREE.Group {
     if (!mesh.isMesh || !o.name.startsWith('fieldTop:')) return;
     gradeTop(mesh, o.name.slice('fieldTop:'.length));
   });
+  addSanctumSurfaceWear(terrain);
   return terrain;
 }

@@ -468,6 +468,18 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     fallbackSize: { w: 240, h: 140 },
     detachToUiRoot: true,
   },
+  // The dungeon objectives tracker (src/ui/hud/dungeon/dungeon_tracker_*): the
+  // plate and boss rows at the top of the same #right-tracker-stack column.
+  // Its painter builds the skeleton once and never rebuilds it, so the root is
+  // safe as the frame, the deed tracker's posture.
+  {
+    id: 'dungeonTracker',
+    elementId: 'dungeon-tracker',
+    storageKey: 'woc_hud_frame_dungeon_tracker',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.dungeonTracker',
+    fallbackSize: { w: 240, h: 130 },
+    detachToUiRoot: true,
+  },
   // The off-hand swing timer, the main-hand row's dual-wield sibling: same
   // placeholder posture as the cast and swing bars (hidden outside combat,
   // force-shown dimmed while editing).

@@ -101,7 +101,7 @@ import {
   type Vec3,
 } from '../types';
 import { VARKHUL_WORK_FACING } from '../varkhul_forge_intermission';
-import { groundHeight, waterLevelAt } from '../world';
+import { groundHeight, mobGroundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
 import { splashNearbyMobs } from './boss_collateral';
@@ -589,7 +589,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const step = 1.6 * DT;
       mob.pos.x += Math.sin(mob.facing) * step;
       mob.pos.z += Math.cos(mob.facing) * step;
-      mob.pos.y = groundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed);
+      mob.pos.y = mobGroundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed, mob.pos.y);
     }
     return;
   }
@@ -1688,6 +1688,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.leashAnchor = null;
   mob.evadeStall = 0;
   mob.chaseStall = 0;
+  mob.chaseRoute = undefined;
   // A full evade-home reset ends this pull for good; the epoch counts them.
   mob.evadeEpoch++;
   mob.chainPullInbound = false;

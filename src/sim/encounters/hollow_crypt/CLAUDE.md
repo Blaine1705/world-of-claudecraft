@@ -37,6 +37,11 @@ Rules:
 - Tests: `tests/hollow_crypt_morthen.test.ts`, `tests/hollow_crypt_knell.test.ts`,
   `tests/hollow_crypt_finale.test.ts`, `tests/hollow_crypt_marrow.test.ts`,
   `tests/hollow_crypt_lady.test.ts`, `tests/hollow_crypt_ilvane.test.ts`,
-  `tests/slippery_ground.test.ts`; dev: `/dev crypt rise [skip]`, `/dev crypt wyrm`,
+  `tests/slippery_ground.test.ts`; the playtest pins of 2026-10-12 (real kills
+  on the live pools): `tests/hollow_crypt_marrow_pace.test.ts` (his whole kit in
+  a fast kill), `tests/hollow_crypt_marrow_loot.test.ts` (his loot and the
+  corpse hold), `tests/hollow_crypt_boss_pools.test.ts` (the boss pools, the
+  heroic bands and the miniboss), `tests/hollow_crypt_knellwyrm_pool.test.ts` (the wyrm's pool and
+  clocks), `tests/hollow_crypt_egg_sacs.test.ts` (the sacs never move); dev: `/dev crypt rise [skip]`, `/dev crypt wyrm`,
   `/dev crypt pull morthen`,
   `/dev crypt trigger <strafe|bellow|knell|shovel|grave|blow|toll|lament|embrace|freeze|dirge|organ|crescendo|pulse|gravecall|rite|candle|reap|grasp>`.

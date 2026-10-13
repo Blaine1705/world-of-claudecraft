@@ -69,6 +69,7 @@ import {
   worldPvpOnPlayerDeath,
 } from '../pvp';
 import { referralArmourXpActive } from '../referral_armour';
+import { emitReferralBossEvidence } from '../referral_evidence';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import { computeCharacterModifiers } from '../set_bonus_mods';
@@ -1465,6 +1466,8 @@ export function handleDeath(
     clearSpiritmendCurrents(ctx, e.id);
     clearShamanTalentState(ctx, e);
   }
+  // A dead mob keeps no route and no plan throttle (mob/chase_route.ts).
+  if (e.chaseRoute !== undefined) e.chaseRoute = undefined;
   vespersOnEntityDeath(ctx, e);
   afflictionOnDeath(ctx, e);
   destructionOnDeath(ctx, e);
@@ -1933,6 +1936,8 @@ export function handleDeath(
       // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
+      if (e.templateId !== 'nythraxis_scourge_of_thornpeak')
+        emitReferralBossEvidence(ctx, e, eligible);
     }
     // Settle the heroic reward and its realm-reset lockout together. This runs
     // even without player credit so the owning group cannot dodge the lockout;

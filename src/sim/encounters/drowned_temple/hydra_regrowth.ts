@@ -58,12 +58,14 @@ export function releaseHeldHeadLoot(head: Entity | null): void {
   head.trashLife.lootHeld = false;
 }
 
-/** Grow back every head that has lain long enough while another lives.
+/** Grow back every head that has lain long enough while another lives, at
+ *  `share` of its pool (the claim's difficulty picks it: hydraRegrowShare).
  *  Returns how many grew back this tick. */
 export function stepRegrowth(
   ctx: SimContext,
   heads: readonly (Entity | null)[],
   st: HydraFightState,
+  share: number,
 ): number {
   const living = heads.filter((h): h is Entity => h !== null && !h.dead);
   if (living.length === 0) return 0;
@@ -71,7 +73,7 @@ export function stepRegrowth(
   heads.forEach((h, i) => {
     const fell = st.diedAt[i];
     if (!h?.dead || fell === null || ctx.time - fell < T.regrowAfter) return;
-    regrowHead(ctx, h, T.regrowShare);
+    regrowHead(ctx, h, share);
     st.diedAt[i] = null;
     // Back into the same fight, on the same foe, with the pack's hate.
     const sibling = living[0];
