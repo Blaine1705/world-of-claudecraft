@@ -827,7 +827,8 @@ export const GRAVEWYRM_SANCTUM_GATES: DungeonGateDef[] = [
     name: 'Vault Ward',
     kind: 'rite_ward',
     x: 0,
-    z: 85,
+    // Seal above the descent, so players on the ramp stay inside the fight.
+    z: 78,
     hw: 6.6,
     rot: across(0, 1),
     packs: ['g8', 'g9', 'g10', 'pc'],
