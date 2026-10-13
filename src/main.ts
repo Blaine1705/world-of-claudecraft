@@ -236,9 +236,7 @@ import {
   initAudioOnFirstGesture,
   registerStudioAudioTeardown,
   resolveStudioEntry,
-  startAuthoredOfflineSession,
 } from './game/studio_boot';
-import { installStudioWorldHooks } from './game/studio_world_hooks';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
 import { dispatchTargetingAction, targetingInputCallbacks } from './game/targeting_actions';
 import {
@@ -643,7 +641,7 @@ registerShaderWarmSetting(() => settingsForShellReflection().get('shaderWarm'));
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
 installWebGLContextRelease();
-// The audio engines close with the page on a studio world swap (studio_boot.ts).
+// The audio engines close with the page when a studio page retires (studio_boot.ts).
 registerStudioAudioTeardown();
 // World-only GLB textures (props, dungeon, biome, ...) drop their CPU-side
 // transcoded mip chains after GPU upload. Only the GAME entry opts in: here,
@@ -2056,20 +2054,6 @@ async function startGame(
     entryDiagnostics.checkpoint(open ? 'quest-dialog-open' : 'quest-dialog-closed');
     syncOverlayDiagnostics();
   };
-  // Authored-map gossip rows (the Deepglass steward and marshal, Baldemar's
-  // gate) and the arena's hint keys; the returned tick runs in the frame loop.
-  const tickWizardPortal = installStudioWorldHooks({
-    hud,
-    world,
-    offlineSim,
-    renderer: () => renderer.wizardGate,
-    keybinds,
-    setGameInputReady: (ready) => {
-      gameInputReady = ready;
-    },
-    showLoadingScreen,
-    nextPaint,
-  });
   stopMobileMoreDiagnostics?.();
   stopMobileMoreDiagnostics = watchMobileMoreState(document.body, (open) => {
     syncOverlayDiagnostics();
@@ -2164,10 +2148,6 @@ async function startGame(
         padTargetPick.interact();
         break;
       }
-      case 'ballMarker':
-        // FORK (Deepball): the pad's edge press toggles the marker like the key.
-        input.ballMarker = !input.ballMarker;
-        break;
       case 'bags':
         hud.toggleBags();
         break;
@@ -3336,9 +3316,6 @@ async function startGame(
   // (world click, interact key, gathering-tool use).
   const gatherEffectConfirm = createGatherEffectConfirm(world, hud);
   function interactKey(preferNpcId?: number | null): void {
-    // Inside the Deepglass bell F is the HELD burner throttle, and nothing in the
-    // bell is interactable: skip the scan rather than spam its error mid-flight.
-    if (world.player.dgFlight) return;
     if (shouldRouteInteractToBgFlag(world.bgInfo, world.player, world.entities)) {
       world.bgFlagAction();
       return;
@@ -3884,8 +3861,6 @@ async function startGame(
     riftFloor: null,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
-    // Deepball reads the camera as an AIM (Input.deepballFlight); refresh it first.
-    input.deepballFlight = world.player.dgFlight === true;
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
     // When click-to-move ends, the player's facing snaps from the (camera-lagging)
@@ -4302,8 +4277,6 @@ async function startGame(
       syncPerfOverlay(frameDt, now);
       syncOverlayDiagnostics();
     }
-    // Baldemar's gate: tick the cast open, watch for the walk-in.
-    tickWizardPortal(frameDt);
 
     // Freeze movement while the game menu is up, during the first-spawn intro,
     // the camera prompt, and through the race countdown. The sim independently
@@ -5177,7 +5150,6 @@ async function startOffline(
   skin = 0,
   world?: WorldContent,
   seedOverride?: number,
-  playerStartOverride?: { x: number; z: number },
 ): Promise<void> {
   stopShaderWarmup();
   if (!(await prepareWorldEntry())) return;
@@ -5190,18 +5162,15 @@ async function startOffline(
   const sim = loadSpan(
     'sim-build',
     () =>
-      new Sim({
-        ...offlineWorldConfig({
+      new Sim(
+        offlineWorldConfig({
           playerClass,
           name,
           world,
           seedOverride,
           devCommands: import.meta.env.DEV,
         }),
-        // Baldemar's return trip lands at the departed town square rather than
-        // the world's own start (src/game/portal_travel.ts).
-        playerStartOverride,
-      }),
+      ),
   );
   sim.setPlayerSkin(sim.playerId, skin);
   // Offline has no account and no character row, so the local draft IS this
@@ -5265,8 +5234,6 @@ async function startOffline(
     for (const id of usable) sim.addItem(id, 1, sim.playerId);
     if (usable[0]) sim.equipItem(usable[0], sim.playerId);
   }
-  // The Deepglass arena's pinned hour and URL-booked bout (studio_boot.ts).
-  startAuthoredOfflineSession(sim, world);
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true);
@@ -11004,9 +10971,8 @@ const diagnosticsAutoOffline =
   import.meta.env.DEV &&
   startupParams.get('diagnostics') === '1' &&
   startupParams.get('diagnosticsAuto') === '1';
-// Studio entries (studio_boot.ts): a published ?map=<slug> world, or the way
-// home from Baldemar's portal. Resolved before the branches so the portal's
-// one-shot handoff is consumed whatever boots; null on the normal flow.
+// Studio entry (studio_boot.ts): a published ?map=<slug> world, or null on the
+// normal flow.
 const studioEntry = resolveStudioEntry(startupParams, editorPlaytest !== null);
 if (editorPlaytest) {
   startSitePresence('home');
@@ -11025,7 +10991,7 @@ if (editorPlaytest) {
 } else if (studioEntry) {
   startSitePresence('home');
   initAudioOnFirstGesture();
-  studioEntry.boot(startOffline, sanitizeOfflineName);
+  studioEntry.boot(startOffline);
 } else if (diagnosticsAutoOffline) {
   startSitePresence('home');
   void startOffline('warrior', 'Diagnostics', 0);

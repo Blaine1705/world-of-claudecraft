@@ -583,7 +583,6 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
-import { type StudioGossipHooks, studioGossipDeps } from './hud/quest/studio_gossip_hooks';
 import { paintFactionTierCelebrations } from './hud/reputation/faction_tier_celebration_painter';
 import { advanceFactionTierObservation } from './hud/reputation/faction_tier_celebration_view';
 import { RiftMapPainter } from './hud/rift';
@@ -778,7 +777,6 @@ import {
 import { playerPortraitSubject, portraitUpdateFrames } from './player_portrait_core';
 import { playerHoverTooltipHtml } from './player_tooltip';
 import { playerTooltipKey } from './player_tooltip_view';
-import { PlotSignPopup, presentPlotSign } from './plot_sign_popup';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import {
   type PreviewPrewarmHandle,
@@ -1345,8 +1343,6 @@ export class Hud {
   // attack handler then falls back to the fixed attack control.
   onMobileAttackNearest: (() => void) | null = null;
   onQuestDialogStateChange: ((open: boolean) => void) | null = null;
-  /** Authored-map gossip rows, wired by game/studio_world_hooks.ts. */
-  readonly studioGossip: StudioGossipHooks = {};
   // First-ever landing on the tutorial island (the sim's per-character
   // firstVisit): main.ts wires the arrival camera cinematic here
   // (game/arrival_cinematic.ts). The HUD owns the event arm, not the camera.
@@ -2173,7 +2169,6 @@ export class Hud {
   private bootcamp = new BootcampOverlay();
   private noticeboardPopup = new NoticeboardPopup();
   private realmBuilderPopup = new RealmBuilderPopup();
-  private plotSignPopup = new PlotSignPopup((deedId) => void this.sim.buyPlot(deedId));
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -2334,7 +2329,6 @@ export class Hud {
       talentSpec: () => this.sim.talentSpec,
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
-      isInDeepballBout: () => this.sim.player.dgFlight === true, // docs/prd/deepglass.md
       showAttackButton: () => this.optionsHooks?.settings.get('showAttackButton') ?? true,
       // The arrangement profile for this device's interface (desktop or touch),
       // read from the same body.mobile-touch signal every touch-gated path uses.
@@ -2487,7 +2481,6 @@ export class Hud {
       openWorldQuestBoard: () => this.mapSidebarCollapse.openBoard(),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openCardDuel: () => this.toggleCardDuel(),
-      ...studioGossipDeps(this.studioGossip),
       onOpenChange: (open) => this.onQuestDialogStateChange?.(open),
       voice: {
         play: (key) => voice.play(key),
@@ -6998,7 +6991,6 @@ export class Hud {
     this.bootcamp.relocalize(this.sim, this.keybinds);
     this.noticeboardPopup.relocalize();
     this.realmBuilderPopup.relocalize();
-    this.plotSignPopup.relocalize();
     this.guildBoardWindow.relocalize();
     this.riftForgeWindow.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
@@ -12104,9 +12096,6 @@ export class Hud {
           break;
         case 'realmBuilder':
           presentRealmBuilder(this.realmBuilderPopup, this.renderer, ev.current, ev.past);
-          break;
-        case 'plotSign':
-          presentPlotSign(this.plotSignPopup, ev.plot, (text) => this.log(text, HUD_LOG.NEWS));
           break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their

@@ -16,7 +16,7 @@ import {
   visualKeyFor,
 } from './manifest';
 import { MODULAR_WARRIOR_KEY, type ModularLook } from './modular';
-import { isUnarmedCivilianTemplate, npcModularKeyFor } from './npc_looks';
+import { npcModularKeyFor } from './npc_looks';
 import { CharacterVisual } from './visual';
 
 export {
@@ -155,12 +155,6 @@ export function createCharacterVisual(
       look,
       opts,
     );
-    // Civilians (the portal wizard, the Deepglass crowd and its keepers) compose
-    // on a class body and would otherwise inherit that class's held-weapon
-    // layout: a stadium of spectators, every one of them holding a sword.
-    if (!formKey && e.kind === 'npc' && isUnarmedCivilianTemplate(e.templateId)) {
-      visual.disarmHeldProps();
-    }
     visual.budgetedWeaponLight = true;
     return visual;
   } catch (err) {

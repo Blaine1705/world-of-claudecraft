@@ -33,15 +33,14 @@ import {
   GATHER_NODES,
   setActiveWorldContent,
 } from '../src/sim/data';
-import { buildDeepglassWorld } from '../src/sim/deepglass/world';
 import { groundHeight, terrainHeight } from '../src/sim/world';
 
 describe("authored maps: the shipped world's gather veins do not appear", () => {
   // The file header above already claimed these were "gated in render/
-  // renderer.ts". They were not: buildGatherNodes ran unconditionally, so the
-  // Deepglass arena drew 223,702 triangles of ore, timber and herbs a frame ,
-  // 36% of its whole frame, around and inside a blitzball stadium, while the
-  // minimap (which DID gate) drew none of them. Now every reader goes through
+  // renderer.ts". They were not: buildGatherNodes ran unconditionally, so an
+  // authored arena drew 223,702 triangles of ore, timber and herbs a frame,
+  // 36% of its whole frame, while the minimap (which DID gate) drew none of
+  // them. Now every reader goes through
   // activeGatherNodes(), so the mesh, the map and the interact key agree.
   it('offers the full table on the built-in world', () => {
     setActiveWorldContent(BUILTIN_WORLD);
@@ -54,28 +53,13 @@ describe("authored maps: the shipped world's gather veins do not appear", () => 
     setActiveWorldContent(customMapToWorldContent(blank));
     expect(activeGatherNodes()).toEqual([]);
   });
-
-  it('offers none in the Deepglass, whose building the veins stand inside', () => {
-    const world = buildDeepglassWorld();
-    expect(world.presentationMode).toBe('deepglass');
-
-    // The leak was not theoretical: veins really do land inside the arena.
-    // Measured against the parapet (r 99, sim/deepglass/world.ts), which is as
-    // far out as a player can walk.
-    setActiveWorldContent(BUILTIN_WORLD);
-    const insideTheBuilding = GATHER_NODES.filter((n) => Math.hypot(n.pos.x, n.pos.z) < 99);
-    expect(insideTheBuilding.length).toBeGreaterThan(0);
-
-    setActiveWorldContent(world);
-    expect(activeGatherNodes()).toEqual([]);
-  });
 });
 
 describe("authored maps: the shipped world's level pads and walk lifts do not apply", () => {
   // terrainHeight runs the shipped world's pad chain (Dawnhold's grounds, the
   // Last Keep site, the Evergarden and Galecrest pads) AFTER the sculpt layer,
   // so on an authored map each pad was a patch the maker could not sculpt:
-  // SPACEY's Deepglass had Dawnhold's pad pinned at y 3.2 under 28 lowering
+  // SPACEY's authored map had Dawnhold's pad pinned at y 3.2 under 28 lowering
   // stamps (2026-09-15, "a weird flat square ... hard stuck"). Its wall walks
   // rode groundHeight the same way, as invisible walls over the maker's ground.
   const PAD = { x: 266, z: 899 }; // inside DAWNHOLD.pad (x 232..300, z 854..944)

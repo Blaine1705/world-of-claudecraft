@@ -537,7 +537,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 18082,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -576,7 +578,9 @@ const MONOLITHS: MonolithRow[] = [
     // sub-view landed: the Auras render method and its placement/teardown lines
     // moved out with them to src/ui/options_overlay_panels.ts. Measured with
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
-    ceiling: 2813,
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 2807,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -997,7 +1001,9 @@ const MONOLITHS: MonolithRow[] = [
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
     // Lowered after the ClaudeCraft Studio merge moved its inline code into
     // sibling modules (v0.45.0); exact count.
-    ceiling: 12675,
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 12420,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1211,7 +1217,9 @@ const MONOLITHS: MonolithRow[] = [
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
     // Lowered after the ClaudeCraft Studio merge moved its inline code into
     // sibling modules (v0.45.0); exact count.
-    ceiling: 11570,
+    // Lowered 11570 -> 11534 when Deepglass and Tidehold left the Studio
+    // merge (the venue hooks, plot deeds and dev-bot removal). wc -l, exact.
+    ceiling: 11534,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1437,7 +1445,9 @@ const MONOLITHS: MonolithRow[] = [
     // tree at 11140 lines, preserving both extraction sets.
     // Lowered after the ClaudeCraft Studio merge moved its inline code into
     // sibling modules (v0.45.0); exact count.
-    ceiling: 11036,
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 11002,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1697,7 +1707,9 @@ const MONOLITHS: MonolithRow[] = [
     // tree (after biome). Exact count, zero slack.
     // Lowered after the ClaudeCraft Studio merge moved its inline code into
     // sibling modules (v0.45.0); exact count.
-    ceiling: 9836,
+    // Lowered 9836 -> 9833 when the Tidehold `buyplot` case left the Studio
+    // merge. wc -l, exact count.
+    ceiling: 9833,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1878,7 +1890,9 @@ const MONOLITHS: MonolithRow[] = [
     // tree (after biome). Exact count, zero slack.
     // Lowered after the ClaudeCraft Studio merge moved its inline code into
     // sibling modules (v0.45.0); exact count.
-    ceiling: 5355,
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 5352,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1895,7 +1909,9 @@ const MONOLITHS: MonolithRow[] = [
     // NoteEvent/Theme, and the push* composition helpers) to music_notes.ts.
     // Lowered after the ClaudeCraft Studio merge moved its inline code into
     // sibling modules (v0.45.0); exact count.
-    ceiling: 4716,
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 4705,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {

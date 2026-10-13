@@ -16,9 +16,6 @@ import {
 } from '../src/render/characters/modular';
 import {
   aldricKeepsHisRig,
-  isDeepglassCrowdTemplate,
-  isDeepglassMarshalTemplate,
-  isPortalWizardTemplate,
   NPC_LOOKS,
   NPC_PROP_SET_IDS,
   normalizeNpcAppearance,
@@ -26,21 +23,7 @@ import {
   npcModularKeyFor,
 } from '../src/render/characters/npc_looks';
 import { NPCS } from '../src/sim/data';
-import { isTideholdTemplate } from '../src/sim/deepglass/citadel';
 import { STUDIO_CONTENT } from '../src/sim/studio_content';
-
-// FORK: NPCs whose look is composed at RUNTIME rather than authored in
-// NPC_LOOKS, main.ts's look provider consults these before npcLookFor
-// (render/characters/npc_looks.ts, FORK DECLARATIONS): Baldemar's selves, the
-// Deepglass crowd and marshal, and every Tidehold resident.
-function forkRuntimeComposed(id: string): boolean {
-  return (
-    isPortalWizardTemplate(id) ||
-    isDeepglassCrowdTemplate(id) ||
-    isDeepglassMarshalTemplate(id) ||
-    isTideholdTemplate(id)
-  );
-}
 
 // FORK: fork-only NPCs that still render on the fixed NPC rigs (no authored
 // look yet). Shrink this list by authoring rows in NPC_LOOKS; never grow it
@@ -58,18 +41,12 @@ const FORK_FIXED_RIG_NPCS = new Set([
   'drover_pell',
   'dowser_emrys',
   'auctioneer_zeph',
-  // the Deepglass fixture desk
-  'deepglass_steward',
 ]);
 
 describe('npc looks roster', () => {
   it('covers every NpcDef id except Brother Aldric (every other world NPC composes)', () => {
     const missing = Object.keys(NPCS).filter(
-      (id) =>
-        !aldricKeepsHisRig(id) &&
-        !forkRuntimeComposed(id) &&
-        !FORK_FIXED_RIG_NPCS.has(id) &&
-        npcLookFor(id) === null,
+      (id) => !aldricKeepsHisRig(id) && !FORK_FIXED_RIG_NPCS.has(id) && npcLookFor(id) === null,
     );
     expect(missing).toEqual([]);
   });

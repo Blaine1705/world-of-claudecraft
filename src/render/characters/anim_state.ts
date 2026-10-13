@@ -45,10 +45,6 @@ export interface AnimState {
    *  never disagree with the turn it is drawn against. Absent/0 = the old
    *  bolt-upright turn. */
   bankRoll?: number;
-  /** Streamlined boost pose: arms out front, legs locked straight, the whole
-   *  body a spear. Only flooded flight sets it (Entity.dgBoosting), and only
-   *  while the burners are actually lit. */
-  gliding?: boolean;
   /** Feet under water but the ground still under them, the band between a dry
    *  stride and a swim. Walking here plays the wade cycle and the sim slows the
    *  body down (player_motion.wadeSpeedMult). */
@@ -82,7 +78,6 @@ export type BaseState =
   | 'swim'
   | 'swimSurface'
   | 'swimIdle'
-  | 'glide'
   | 'wade'
   | 'sit'
   | 'jump'
@@ -248,10 +243,10 @@ export function advanceSwimPitch(
   verticalSpeed: number,
   swimming: boolean,
   dt: number,
-  fullSpeed = SWIM_PITCH_FULL_SPEED,
-  maxPitch = SWIM_PITCH_MAX,
 ): number {
-  const target = swimming ? clamp(-verticalSpeed / fullSpeed, -1, 1) * maxPitch : 0;
+  const target = swimming
+    ? clamp(-verticalSpeed / SWIM_PITCH_FULL_SPEED, -1, 1) * SWIM_PITCH_MAX
+    : 0;
   const safeCurrent = Number.isFinite(current) ? current : 0;
   return target + (safeCurrent - target) * Math.exp(-SWIM_PITCH_RESPONSE * Math.max(0, dt));
 }
@@ -267,15 +262,13 @@ export function advanceSwimPitch(
 //
 // Two gains, because the same lean means different things in the two media. On
 // land it is a runner's inside lean, small, and only while actually running.
-// In water, and above all in the bell's flooded flight, it is a full airplane
-// bank: the body rolls onto its side to carve, which is most of what makes
-// three-axis flight feel slick instead of like driving a chair.
+// In water it is a full bank: the body rolls onto its side to carve.
 // ---------------------------------------------------------------------------
 
 /** Land lean at a full-rate turn, radians. Deliberately small, a runner tips
  *  in, they do not bank. */
 export const TURN_LEAN_MAX = 0.17;
-/** Swim/flight bank at a full-rate turn, radians (~46 degrees). */
+/** Swim bank at a full-rate turn, radians (~46 degrees). */
 export const BANK_ROLL_MAX = 0.8;
 /** Yaw rate (rad/s) that earns the full lean. A hard mouse flick beats this many
  *  times over, which is exactly why the result is clamped. */
@@ -511,18 +504,11 @@ export function desiredBaseState(
   s: AnimState,
   hasWalkBackClip: boolean,
   hasWadeClip = true,
-  hasGlideClip = true,
   hasCombatIdleClip = false,
   hasProwlIdleClip = false,
   hasProwlWalkClip = false,
 ): BaseState {
   if (s.swimming) {
-    // Burners lit: the body stops stroking and streamlines, arms out front,
-    // legs locked. It outranks every other water state, including the idle,
-    // because a boosting body is under thrust whether or not it has picked up
-    // any speed yet. Gated on the LOADED clip for the same reason as wade: a rig
-    // without it would hold a state nothing is playing.
-    if (s.gliding && hasGlideClip) return 'glide';
     // A swimmer who stops treads water rather than stroking on the spot; a
     // swimmer who moves picks the stroke for their depth: surface crawl above
     // the waterline, breaststroke below it. Rigs with one swim clip and no
@@ -610,8 +596,7 @@ export function locomotionTimeScale(
     return clamp(s.speed / DEFAULT_SWIM_REF, 0.55, 1.4);
   }
   // Treading is an idle: it holds its own tempo whatever the body drifts at.
-  // The glide is a held POSE, there is no cycle to speed up.
-  if (baseState === 'swimIdle' || baseState === 'glide') return null;
+  if (baseState === 'swimIdle') return null;
   let timeScale: number;
   if (baseState === 'prowlWalk') {
     const stalkScale = clamp(s.speed / prowlRef, 0.6, 1.8);

@@ -177,11 +177,10 @@ export const KTX2_MIP_RELEASABLE_MODEL_ROOTS: readonly string[] = [
   'biome',
   'city',
   // Studio merge: authored-map world kits, each drawn only by the world
-  // renderer (painted ground clutter baked into InstancedMeshes, the Deepglass
-  // venue kit, the Tidehold buildings and wall kit). None is a character
-  // attachment or a preview subject.
+  // renderer (painted ground clutter baked into InstancedMeshes, the Tidehold
+  // buildings and wall kit). None is a character attachment or a preview
+  // subject.
   'clutter',
-  'deepglass',
   'drakelands_kit',
   'dungeon',
   'foliage',
@@ -200,10 +199,6 @@ export const KTX2_MIP_RELEASABLE_MODEL_ROOTS: readonly string[] = [
  *  list so tests can prove every on-disk root was consciously classified. */
 export const KTX2_MIP_EXEMPT_MODEL_ROOTS: readonly string[] = [
   'chars',
-  // Studio merge: the Brennoch thrustpack and its plume ride a character's
-  // chest seat (deepglass_pack.ts), the same hover-cosmetic attachment a
-  // preview or portrait rig can draw.
-  'cosmetics',
   'creatures',
   'mounts',
   'tools',

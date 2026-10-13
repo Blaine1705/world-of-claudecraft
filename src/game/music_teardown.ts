@@ -1,14 +1,12 @@
 // MusicDirector teardown for a page that is going away (the editor's pagehide
-// teardown and the studio world swaps, src/game/studio_boot.ts). It sits beside
-// the director instead of inside it (the music.ts monolith ratchet), reading
-// the director's private plumbing through an untyped host the same way
-// minigame_music_layer.ts and music_venue_layer.ts do, welded to music.ts in
+// teardown and the playtest page retirement, src/game/studio_boot.ts). It sits
+// beside the director instead of inside it (the music.ts monolith ratchet),
+// reading the director's private plumbing through an untyped host the same way
+// minigame_music_layer.ts and music_zone_streams.ts do, welded to music.ts in
 // tests/music.test.ts.
 //
 // Only page-retiring paths call it, and the built-in world never retires its
 // page through them, so it changes nothing about a normal session.
-
-import { venueLayerFor } from './music_venue_layer';
 
 /** The private MusicDirector members the teardown releases. */
 interface MusicDirectorTeardownHost {
@@ -57,7 +55,6 @@ export function closeMusicDirector(director: object): void {
   h.bossElement = null;
   h.zoneStreams = {};
   h.combatStreams = [];
-  venueLayerFor(director).detach();
   const ctx = h.ctx;
   h.ctx = null;
   h.master = null;

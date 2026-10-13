@@ -3,7 +3,6 @@ import { NATURES_BOON_ABILITIES } from '../../../sim/combat/druid_natures_boon';
 import { abilityBelongsToForm, hasFormRequirement } from '../../../sim/combat/form_requirement';
 import { classTalentChoiceAbilityGroups } from '../../../sim/content/talents';
 import { ABILITIES, ITEMS } from '../../../sim/data';
-import { DEEPBALL_KIT } from '../../../sim/deepglass/abilities';
 import type { PlayerClass } from '../../../sim/types';
 import {
   ACTION_BAR_LAYOUT_LEGACY_PROFILE,
@@ -50,7 +49,7 @@ import { isUsableTrinketId } from './trinket_slot_core';
 
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
-export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth' | 'deepball';
+export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth';
 
 const FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']);
 // Buttons that seed onto EVERY form kit bar:
@@ -76,12 +75,6 @@ export interface ActionBarControllerDeps {
   talentSpec(): string | null;
   knownAbilityIds(): readonly string[];
   hasAura(kind: string): boolean;
-  /** In a live deepball bout (docs/prd/deepglass.md): the whole bar swaps to
-   *  the four class-agnostic sport moves for the duration. OPTIONAL, so every
-   *  upstream test stub and any host that has never heard of the arena still
-   *  types and reads as "not in a bout" (the ZoneBuildPool.setContent?()
-   *  precedent). */
-  isInDeepballBout?(): boolean;
   showAttackButton(): boolean;
   // A broader owner-presentation hold, including the first snapshot after reconnect.
   readOnly?(): boolean;
@@ -328,7 +321,6 @@ export class ActionBarController {
   }
 
   resolveActiveForm(): HotbarForm {
-    if (this.deps.isInDeepballBout?.()) return 'deepball';
     if (this.deps.playerClass === 'druid') {
       if (this.deps.hasAura('form_bear')) return 'bear';
       if (this.deps.hasAura('form_cat')) {
@@ -657,10 +649,6 @@ export class ActionBarController {
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
     // Passives never castable: keep them off every seeded/form kit bar too.
     if (!this.isAbilityPlacementAllowed(id)) return false;
-    // The deepball bar holds the bout kit and nothing else, and no other bar
-    // ever holds a dg_* id (they are uncastable outside the bell).
-    if (form === 'deepball') return DEEPBALL_KIT.includes(id);
-    if (DEEPBALL_KIT.includes(id)) return false;
     if (this.isStealthForm(form)) return false;
     const def = ABILITIES[id];
     if (form === 'bear' || form === 'cat') {
