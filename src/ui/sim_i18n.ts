@@ -1237,6 +1237,7 @@ const baseEnTable = {
   'dfinder.alreadyListing': 'You already lead a group listing.',
   'dfinder.noListing': 'You do not lead a group listing.',
   'dfinder.alreadyApplied': 'You already have a pending application.',
+  'dfinder.expeditionApplicationCap': 'You may have at most 5 pending expedition applications.',
   'dfinder.applyInParty': 'Leave your party before applying to a listing.',
   'dfinder.noRoom': 'That listing has no room for your roles.',
   'dfinder.noApplication': 'You have no pending application.',
