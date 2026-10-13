@@ -201,6 +201,8 @@ export interface GfxSettings {
   readonly standardMaterials: boolean;
   /** Static scenery uses authored coarse indices past this footprint distance; 0 disables. */
   readonly sceneryGeometryLodDistance: number;
+  /** Coconut batch grid in yards; 0 retains the single strand-wide draw. Build-time only. */
+  readonly coconutCellSize: number;
   /** More ambient fill and a softer key for readable Low surfaces, without extra lights. */
   readonly lowReadabilityLighting: boolean;
   // -------------------------------------------------------------------------
@@ -1251,6 +1253,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
             : 2560,
     standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     sceneryGeometryLodDistance: gfxTierAtLeast(tier, 'medium') ? 0 : 180,
+    coconutCellSize: gfxTierAtLeast(tier, 'medium') ? 0 : 128,
     lowReadabilityLighting: !gfxTierAtLeast(tier, 'medium'),
     // Round-10 detail-knob defaults (see the interface comment): High takes the
     // existing Advanced-Medium profile to bound its steady cost (basic worn

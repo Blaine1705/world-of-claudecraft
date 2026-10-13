@@ -37,6 +37,7 @@ const settings = {
   leanFoliage: false,
   standardMaterials: true,
   sceneryGeometryLodDistance: 0,
+  coconutCellSize: 0,
   lowReadabilityLighting: false,
   terrainSplat: true,
   maxPointLights: 6,
@@ -76,6 +77,7 @@ describe('gfx override parsing', () => {
           'leanFoliage:1',
           'standardMaterials:0',
           'sceneryGeometryLodDistance:180',
+          'coconutCellSize:128',
           'lowReadabilityLighting:1',
           'terrainSplat:0',
           'maxPointLights:3',
@@ -111,6 +113,7 @@ describe('gfx override parsing', () => {
       leanFoliage: true,
       standardMaterials: false,
       sceneryGeometryLodDistance: 180,
+      coconutCellSize: 128,
       lowReadabilityLighting: true,
       terrainSplat: false,
       maxPointLights: 3,
@@ -159,7 +162,9 @@ describe('gfx override application', () => {
     };
     const hashes = Object.fromEntries(
       Object.entries(cases).map(([preset, derived]) => {
-        const { sceneryGeometryLodDistance, lowReadabilityLighting, ...existing } = derived;
+        const { sceneryGeometryLodDistance, coconutCellSize, lowReadabilityLighting, ...existing } =
+          derived;
+        expect(coconutCellSize).toBe(preset === 'low' ? 128 : 0);
         expect(sceneryGeometryLodDistance).toBe(preset === 'low' ? 180 : 0);
         expect(lowReadabilityLighting).toBe(preset === 'low');
         // Preserve the old pins to prove this change moves no existing dial,

@@ -23,11 +23,13 @@ import { registerDeferredPreload } from './assets/preload';
 import { buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
 import { prepareSceneryGeometryLod } from './scenery_geometry_lod';
+import { buildStaticInstanceCells } from './static_instance_cells';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
 export interface JungleFeaturesView {
   group: THREE.Group;
   update(time: number): void;
+  dispose(): void;
 }
 
 // The three beach-palm models, instanced per variant so the whole strand is a
@@ -214,6 +216,7 @@ function mat(color: number, rough = 0.85): THREE.MeshStandardMaterial | THREE.Me
 export function buildJungleFeatures(seed: number): JungleFeaturesView {
   const group = new THREE.Group();
   group.name = 'jungle-features';
+  const coconutCells: THREE.InstancedMesh[] = [];
 
   const instance = (geo: THREE.BufferGeometry, material: THREE.Material, spots: Placement[]) => {
     if (spots.length === 0) return;
@@ -239,7 +242,13 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     const scene = propScenes[key];
     if (!scene || spots.length === 0) return;
     for (const part of extractParts(scene)) {
-      instance(part.geo, part.mat, spots);
+      if (key === 'coconuts') {
+        const cells = buildStaticInstanceCells(part.geo, part.mat, spots, GFX.coconutCellSize);
+        coconutCells.push(...cells);
+        group.add(...cells);
+      } else {
+        instance(part.geo, part.mat, spots);
+      }
     }
   };
 
@@ -439,6 +448,16 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
   if (GFX.sceneryGeometryLodDistance > 0) prepareSceneryGeometryLod(group);
   return {
     group,
+    dispose(): void {
+      // Release cell buffers and the rebaked geometry, never borrowed GLB materials.
+      const geometries = new Set(coconutCells.map((mesh) => mesh.geometry));
+      for (const mesh of coconutCells) {
+        mesh.removeFromParent();
+        mesh.dispose();
+      }
+      for (const geometry of geometries) geometry.dispose();
+      coconutCells.length = 0;
+    },
     update(): void {
       // still air: the global wind shader sways the modeled foliage; the
       // strand itself holds its pose

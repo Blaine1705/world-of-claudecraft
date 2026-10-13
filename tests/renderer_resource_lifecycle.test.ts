@@ -75,6 +75,7 @@ describe('renderer resource lifecycle', () => {
     };
     const warlockMeteorFx = { dispose: vi.fn() };
     const abilityVfxFx = { dispose: vi.fn() };
+    const jungleFeatures = { dispose: vi.fn() };
     const vfx = { dispose: vi.fn() };
     // The farm patch visuals joined the seam at the Phase 17 render review:
     // their dispose() had no production caller before this arm existed.
@@ -103,6 +104,7 @@ describe('renderer resource lifecycle', () => {
         mageGroundFx,
         warlockMeteorFx,
         abilityVfxFx,
+        jungleFeatures,
         vfx,
         farmPatchVisuals,
         frozenOrbFx,
@@ -115,6 +117,7 @@ describe('renderer resource lifecycle', () => {
     expect(mageGroundFx.dispose).toHaveBeenCalledOnce();
     expect(warlockMeteorFx.dispose).toHaveBeenCalledOnce();
     expect(abilityVfxFx.dispose).toHaveBeenCalledOnce();
+    expect(jungleFeatures.dispose).toHaveBeenCalledOnce();
     expect(vfx.dispose).toHaveBeenCalledOnce();
     expect(farmPatchVisuals.dispose).toHaveBeenCalledOnce();
     expect(frozenOrbFx.dispose).toHaveBeenCalledOnce();

@@ -5,6 +5,9 @@ Research record, 14 October 2026, on `feature/cel-shading-rnd`, starting at
 [Low scenery R&D](low-scenery-rnd.md) and the inconclusive
 [distant-tree sprite experiment](distant-tree-sprite-rnd.md).
 
+Follow-up: [constructor-time coconut integration](coconut-cell-integration.md)
+records the production-path implementation and its separate measurements.
+
 ## Decision
 
 Keep spatial grouping as a specific Low development candidate. Redmi Thornpeak improves

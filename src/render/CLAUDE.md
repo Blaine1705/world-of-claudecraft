@@ -112,6 +112,15 @@ Everything else is a sibling module in one of these families:
   reference view, so a one-off giant keeps its whole group to the horizon with nothing
   to write anywhere. Never on a collider-backed family (the distance rule alone), never
   a per-family distance table.
+- **Low coconut batches:** `jungle_features.ts` builds coconut parts through
+  `static_instance_cells.ts` before zone attach, preparation and shadow registration.
+  `GFX.coconutCellSize` controls the build-time grid (`?gfxo=coconutCellSize:0`
+  restores one batch per part). Cells share the original geometry/material and keep
+  every placement; only ordinary full-bounds frustum rejection changes. They do not
+  register separate distance or apparent-size culls. The jungle view disposes its
+  cell buffers and rebaked coconut geometry through `renderer_resource_lifecycle.ts`,
+  never borrowed GLB materials. Tests: `static_instance_cells.test.ts` and
+  `jungle_feature_cells.test.ts`.
 - **Zone streaming + residency:** `zone_streaming.ts` (pure policy: WHICH
   zones to materialize and in what order, feeding the renderer's background
   prepare queue), `chunk_residency_core.ts` (chunk-level "how far can the
