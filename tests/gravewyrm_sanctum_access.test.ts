@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import { WYRMS_HOLLOW } from '../src/sim/content/gravewyrm_sanctum_layout';
 import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
-import { dungeonGateState, tickDungeonGates } from '../src/sim/instances/dungeon_gates';
+import {
+  BOSS_ROOM_SEAL_DELAY_TICKS,
+  dungeonGateState,
+  tickDungeonGates,
+} from '../src/sim/instances/dungeon_gates';
 import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
@@ -35,6 +39,11 @@ describe('Gravewyrm Sanctum party access', () => {
     tickDungeonGates(sim.ctx);
     const ward = dungeon.gates?.find((g) => g.id === 'vault_ward');
     if (!ward) throw new Error('no vault ward');
+    // A boss room seals BOSS_ROOM_SEAL_DELAY_TICKS into the fight (instances/dungeon_gates.ts):
+    // the ward stays down until the clock runs out, with Velkhar fighting throughout.
+    expect(dungeonGateState(sim.ctx, inst, ward)).toBe('open');
+    sim.tickCount += BOSS_ROOM_SEAL_DELAY_TICKS;
+    tickDungeonGates(sim.ctx);
     expect(dungeonGateState(sim.ctx, inst, ward)).toBe('sealed');
     expect(ward.z).toBeLessThan(79);
     // Party members already descending can reach the tank across the old seal line.
