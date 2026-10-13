@@ -1402,7 +1402,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // on the merged tree, no capture was retaken).
   // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
-  'c938c9efbcd059e912ed28471dd5970655cc39a15d98f246fe8c4236fe5a85fa';
+  '294e46cfe7a8d255b1dcc76ab0a481594ce596b43a9d2008aea61c7afff3e5e5';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1430,7 +1430,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // on the merged tree, no capture was retaken).
   // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
-  '72200d9055b376bb87d2cddaf2c521f6f5ea0965bfe0dce6e57e489b2667ddfc';
+  'fe225fa39bdb4aa44a77ac66ffe94d93e09b05645cbfb38ef20690c6e297dac9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2817,7 +2817,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // + the character pack + the five-dungeon rework): recomputed LAST again over the
       // re-swept evidence. No
       // capture was retaken.
-    ).toBe('706fd2be527474513aff3c623860c6b11a7c781e3f46b19df528e3a3c0531e69');
+    ).toBe('2ea421ac203748494459cc776ffba039f37c5607511215f3febc99b16eebbbf6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
