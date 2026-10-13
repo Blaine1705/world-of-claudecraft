@@ -2665,6 +2665,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.deedTracker': '업적 추적기',
   'hudChrome.interfaceUnlock.frameNames.delveTracker': '탐굴 추적기',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': '균열 추적기',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': '던전 추적기',
+  'hudChrome.dungeonTracker.complete': '완료',
   'hudChrome.interfaceUnlock.frameNames.targetDots': '대상 디버프',
   'hudChrome.interfaceUnlock.frameNames.chat': '채팅',
   'hudChrome.interfaceUnlock.frameNames.menu': '메뉴',
@@ -19328,6 +19330,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '제작 창에서 제작법을, 또는 의뢰 게시판에서 의뢰를 "추적"하면 채집 목표 트래커가 이 스택에 추가됩니다. 추적 중인 제작법이나 의뢰의 이름, 목표 수량, 그리고 소지 중이거나 보관 중인 재료로 얼마나 채울 수 있는지를 보여줍니다. "추적"은 현재 목표를 대체하고, "지우기"는 명시적으로 해제합니다. 둘 다 채집 설정을 바꾸지 않습니다.',
   'guide.interfacePage.hubPracticeTrackerBody':
     'Eastbrook 거점 근처에서 그곳의 안내형 연습 레슨을 받으면 연습 트래커가 스택에 추가되어, 연습용 허수아비를 상대로 한 최고 기록을 계속 보여줍니다. 레슨이 진행 중일 때는 옆의 코칭 스트립이 피해량 미터 열기부터 두 번째 실행 비교까지, 현재 단계를 안내해 줍니다.',
+  'guide.interfacePage.dungeonTrackerBody':
+    '파티 던전 안에서는 던전 추적기가 스택의 맨 위를 차지합니다. 던전 이름이 적힌 명판(영웅 난이도에서는 "영웅"으로 표시)과 진행에 따라 차오르는 레일이 있고, 그 아래에는 해당 던전의 모든 우두머리가 경로에서 만나는 순서대로 나열되며, 쓰러지기 전까지는 각각 0 / 1로 표시됩니다. 전투에 2막이 있는 우두머리는 전투 전체가 끝날 때까지 미완료로 남으므로, 목록은 공략이 실제로 끝났을 때만 완료로 표시됩니다. 던전을 나가면 추적기도 사라지며, 프레임 편집에서는 다른 추적기처럼 고유한 이름 칩을 달고 움직일 수 있게 됩니다.',
   'guide.interfacePage.mobileBodyTwoPages':
     '터치 조작은 알아서 나타나며, 배치는 화면 크기에 맞춰 스스로 조절됩니다. 작은 휴대전화에서는 촘촘하게, 큰 휴대전화에서는 표준으로, 태블릿에서는 한결 여유롭게 놓입니다.\n\n능력은 숫자 줄 대신 원환에 놓입니다. 공격 버튼 곁에 행동 버튼 네 개가 붙고, 페이지 전환 버튼이 원환을 페이지 {pages}개 사이에서 넘겨 줍니다. 이 페이지들을 합치면 데스크톱의 추가 단축바를 켜 두었든 아니든 능력 슬롯 {slots}칸 전부에 닿습니다. 그 원환의 다섯째 호 자리는 소모품 자리입니다. 탭하면 거기 놓인 것을 쓰고, 길게 누르거나 안쪽으로 밀면 지니고 있는 물품에서 스스로 채워지는 줄이 열립니다. 그 둘레에는 터치로 플레이할 때 가장 자주 찾는 버튼들이 놓입니다. 대상 바꾸기, 눈앞의 것 사용하기, 점프하기입니다.\n\n아래 가장자리에는 버튼 줄 대신 빠른 실행 조작 하나가 자리합니다. 나머지 모든 것이 여기서 열립니다. 탈것, 대화, 지도, 가방, 사교, 퀘스트, 캐릭터, 주문서, 게임 메뉴, 그리고 나머지 창을 담은 더보기 항목이 있으며, 던전 찾기와 PvP, 감정 표현, 위키가 그 안에 들어 있습니다. 이곳에서 창은 화면 위에 떠 있는 대신 화면을 가득 채웁니다.\n\n유닛 프레임을 옮기는 것은 데스크톱에서만 하는 일입니다. 터치에서는 배치가 알아서 자리를 잡아 줍니다.',
   'guide.interfacePage.winMoreBodyNoValeCup':

@@ -1881,6 +1881,10 @@ export const en_CA: EnTranslations = {
       "replayAction": "Practice again",
       "replayTarget": "Target it again"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Rift",
       "hoardTitle": "Buried Hoard",
@@ -4639,6 +4643,7 @@ export const en_CA: EnTranslations = {
         "deedTracker": "Deed Tracker",
         "delveTracker": "Delve Tracker",
         "riftTracker": "Rift Tracker",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Off Hand",
         "unitTooltip": "Tooltip"
       },
@@ -8299,6 +8304,7 @@ export const en_CA: EnTranslations = {
       "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, recipes you pinned from crafting, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
       "gatheringGoalTrackerBody": "A gathering goal tracker joins the stack once you Track a recipe in the crafting window or a commission on the board: it names the recipe or commission you are tracking, how many you are collecting for, and how far your held and stored materials get you there. Track replaces your current goal, and Clear drops it explicitly; neither one ever changes your harvest preference.",
       "hubPracticeTrackerBody": "Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "The chat box",
       "chatBody": "Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.",
       "keyWindowsTitle": "Windows you open with a key",

@@ -149,6 +149,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeTitle = null;
   c.activeBorder = null;
   c.delveRun = null;
+  c.dungeonRun = null;
   c.companionState = null;
   c.riftFloor = null;
   // The reserved "no token" sentinel (src/sim/colliders.ts allocRiftCollisionToken

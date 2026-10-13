@@ -495,6 +495,7 @@ export const IWORLD_MEMBERS = [
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'worldBossActive', kind: 'method' }, // realm liveness, separate from loot lockout
   { name: 'answerDungeonGuide', kind: 'method' }, // a dungeon guide's offer answer (send-only)
+  { name: 'dungeonRun', kind: 'data' }, // the group dungeon run stood in, with boss progress (null outside)
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
@@ -977,9 +978,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 438, 131, 307.
     // Buddy collection contributes six methods and no data members.
     // Plus the Studio merge: Tidehold housing deeds' buyPlot (+1 method over the
-    // release base): 449/131/318.
-    expect(IWORLD_MEMBERS.length).toBe(449);
-    expect(DATA_MEMBERS.length).toBe(131);
+    // release base): 449/131/318. The dungeon objectives tracker's dungeonRun adds one
+    // data member: 450/132/318.
+    expect(IWORLD_MEMBERS.length).toBe(450);
+    expect(DATA_MEMBERS.length).toBe(132);
     expect(METHOD_MEMBERS.length).toBe(318);
   });
   it('has no duplicate member names', () => {
@@ -1134,6 +1136,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderQueueLeave',
       'dungeonFinderRespond',
       'dungeonFinderSetRoles',
+      'dungeonRun',
       'enterDelve',
       'enterDungeon',
       'enterVehicle',
@@ -1494,6 +1497,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'duelInfo',
       'dungeonFinderBoard',
       'dungeonFinderInfo',
+      'dungeonRun',
       'entities',
       'entityRosterVersion',
       'equipment',
@@ -2404,6 +2408,7 @@ type _ExhaustGuildBank = AssertNever<
 const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
+  'dungeonRun',
   'raidLockouts',
   'worldBossActive',
   'answerDungeonGuide',
@@ -2754,9 +2759,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
     // The integration includes the five-dungeon rework, six buddy methods and
-    // the Studio merge's buyPlot.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(449);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(449);
+    // the Studio merge's buyPlot, plus the
+    // dungeon objectives tracker's dungeonRun (one data member).
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(450);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(450);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

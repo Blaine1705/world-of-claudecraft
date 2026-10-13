@@ -989,6 +989,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the resting zZz on the player portrait, behind an edge latch. Was an inline restEl.classList.toggle until masterwrought D129s review round moved the badges whole DOM half (the on/off class plus BOTH text sinks) into rest_indicator_painter.ts: the title was being corrected on a locale switch while the aria-label was left saying Resting through a whole meal, and one function writing both from one resolved string is what stops them drifting again',
   },
   {
+    call: 'this.dungeonTracker.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the dungeon objectives tracker (the plate and boss rows at the top of the right stack). A facet-routed painter over a skeleton built once: every write is elided, so an unchanged run, or no run at all, costs a model rebuild in place and zero DOM writes (tests/dungeon_tracker_painter.test.ts drives the identical-frame loop)',
+  },
+  {
     call: 'this.updateQuestTracker',
     band: 'medium',
     gate: '',
@@ -1913,7 +1920,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // The courier window adds one slow-band, open-only window surface.
       // The Mirefen world-boss branch's Shardpike bar paint: chrome 98.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 52, 99.
-    ).toEqual({ window: 53, chrome: 99, none: 18 });
+      // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
+      // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
+    ).toEqual({ window: 53, chrome: 100, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

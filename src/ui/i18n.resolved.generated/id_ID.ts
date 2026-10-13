@@ -1881,6 +1881,10 @@ export const id_ID: EnTranslations = {
       "replayAction": "Berlatih lagi",
       "replayTarget": "Targetkan lagi"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Rift",
       "hoardTitle": "Harta Karun Terpendam",
@@ -4639,6 +4643,7 @@ export const id_ID: EnTranslations = {
         "deedTracker": "Pelacak Perbuatan",
         "delveTracker": "Pelacak Delve",
         "riftTracker": "Pelacak Rift",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Tangan Kiri",
         "unitTooltip": "Tooltip"
       },
@@ -8299,6 +8304,7 @@ export const id_ID: EnTranslations = {
       "mapBodyZoneFirst": "M membuka peta dunia pada zona tempat kamu berdiri, dengan panahmu sendiri, titik menarik di sekitarmu, pemberi misi beserta tandanya dan area tujuanmu, stasiun kerajinan, kotak surat, papan pengumuman dan petak kebun, pintu masuk dungeon, serta setiap simpul pengumpulan di zona, yang memudar saat tumbuh kembali dan diberi tanda saat alatmu belum cukup. Partymu juga muncul di sana. Klik kanan peta, atau tekan tombol Peta dunia, dan peta menarik kembali ke benua, setiap zona digambar beserta namanya, lalu klik zona membuka petanya. Masuk ke delve, dungeon, rift, atau kastel dan peta berubah menjadi denah lantai tempatmu berdiri; medan pertempuran Medan Thornhollow memiliki peta lapangannya sendiri.\n\nDi sisi kanan, di bawah peta mini, tumpukan pelacak menjaga urusanmu saat ini tetap terlihat tanpa membuka apa pun: misi dan tujuan yang dilacak, kemajuan jasamu, halaman Relikvarium, resep yang kamu sematkan dari kerajinan, delve yang sedang kamu jalani, dan rift yang sedang kamu ikuti. Pelacak misi dapat diciutkan saat kamu ingin melihat layar lebih luas.",
       "gatheringGoalTrackerBody": "Pelacak sasaran pengumpulan masuk ke tumpukan setelah kamu melacak resep di jendela kerajinan atau komisi di papan: ia menyebut resep atau komisi yang dilacak, jumlah yang sedang kamu kumpulkan, dan seberapa jauh material yang kamu pegang serta simpan membawamu menuju sasaran. Lacak menggantikan sasaranmu saat ini, dan Hapus membuangnya secara eksplisit; keduanya tidak pernah mengubah preferensi panenmu.",
       "hubPracticeTrackerBody": "Di dekat pusat Eastbrook, pelacak latihan masuk ke tumpukan setelah kamu mengambil pelajaran latihan terpandu di sana: ia menjaga rekor terbaikmu melawan boneka latihan tetap terlihat. Saat pelajaran aktif, pita pelatihan di sampingnya memandumu melalui langkah pelajaran saat ini, dari membuka Meter Kerusakan hingga membandingkan percobaan kedua.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Kotak obrolan",
       "chatBody": "Kiri bawah. Tekan Enter untuk mulai mengetik dan Enter lagi untuk mengirim.\n\nDua tab selalu ada di sana: Obrolan, catatan gabungan dari semua yang dikatakan di sekitarmu, dan Catatan Tempur, catatan tertulis dari pertarunganmu. Tombol plus menambah lebih banyak lagi, satu per saluran: Ucap, Teriak, Party, Umum, Dunia, LFG, Guild, dan Perwira, ditambah sebuah tab Bisik yang mengumpulkan setiap bisikan yang kamu kirim dan terima di satu tempat. Mengetik di sebuah tab saluran mengirim ke saluran itu tanpa kamu perlu mengetik ulang perintahnya.\n\nSeluruh kotak ini bisa diseret ke tempat lain dan diubah ukurannya, dan ia mengingat di mana kamu meninggalkannya.",
       "keyWindowsTitle": "Jendela yang kamu buka dengan sebuah tombol",

@@ -1881,6 +1881,10 @@ export const de_DE: EnTranslations = {
       "replayAction": "Erneut üben",
       "replayTarget": "Erneut anvisieren"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Riss",
       "hoardTitle": "Vergrabener Schatz",
@@ -4639,6 +4643,7 @@ export const de_DE: EnTranslations = {
         "deedTracker": "Tatentracker",
         "delveTracker": "Tiefentracker",
         "riftTracker": "Riss-Tracker",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Nebenhand",
         "unitTooltip": "Tooltip"
       },
@@ -8299,6 +8304,7 @@ export const de_DE: EnTranslations = {
       "mapBodyZoneFirst": "M öffnet die Weltkarte in der Zone, in der du stehst, mit deinem eigenen Pfeil, den Orten um dich herum, Questgebern mit ihren Markierungen und den Gebieten deiner Ziele. Sie zeigt außerdem Handwerksstationen, Briefkästen, Anschlagtafeln und Gartenbeete, Dungeonportale und jeden Sammelknoten der Zone. Knoten werden während der Regeneration grau und markiert, wenn deine Werkzeuge nicht ausreichen. Deine Gruppe erscheint ebenfalls. Rechtsklicke die Karte oder drücke die Weltkartenschaltfläche, um zum Kontinent zurückzuzoomen. Jede Zone ist dort mit Namen gezeichnet, ein Klick öffnet ihre Karte. Betrittst du ein Delve, einen Dungeon, einen Riss oder eine Burgfeste, wechselt die Karte zum Grundriss deines Standorts. Das Schlachtfeld Thornhollow-Felder hat eine eigene Feldkarte.\n\nRechts unter der Minikarte hält ein Stapel Tracker dein aktuelles Geschäft sichtbar, ohne ein Fenster zu öffnen: Quests und ihre Ziele, Fortschritt im Buch der Taten, Reliquiarseiten, vom Handwerk angepinnte Rezepte, das aktuelle Delve und jeder Riss, an dem du teilnimmst. Der Questtracker lässt sich einklappen, wenn du den Bildschirm wieder frei haben willst.",
       "gatheringGoalTrackerBody": "Ein Sammelziel-Tracker erscheint, sobald du im Handwerksfenster ein Rezept oder am Brett einen Auftrag verfolgst. Er zeigt Rezept oder Auftrag, die benötigte Menge und den Fortschritt aus gehaltenen und gelagerten Materialien. Verfolgen ersetzt das aktuelle Ziel, Löschen entfernt es ausdrücklich.",
       "hubPracticeTrackerBody": "Beim Eastbrook-Hub erscheint nach den geführten Übungslektionen ein Tracker mit deinen besten Läufen an den Übungsattrappen. Während einer Lektion erklärt eine Leiste den aktuellen Schritt, vom Öffnen der Schadensanzeigen bis zum Vergleich eines zweiten Laufs.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Das Chatfenster",
       "chatBody": "Unten links. Drücke Enter, um mit dem Tippen zu beginnen, und noch einmal Enter, um zu senden.\n\nZwei Reiter sind immer vorhanden: Chat, das gemeinsame Protokoll von allem, was um dich herum gesagt wird, und Kampf, der schriftliche Bericht deines Gefechts. Die Plus-Schaltfläche fügt weitere hinzu, einen pro Kanal: Sagen, Rufen, Gruppe, Allgemein, Welt, LFG, Gilde und Offizier, dazu einen Flüstern-Reiter, der jedes Flüstern sammelt, das du sendest und empfängst, an einem Ort. Tippen in einem Kanal-Reiter sendet an diesen Kanal, ohne dass du den Befehl erneut eingeben musst.\n\nDas ganze Fenster lässt sich an eine andere Stelle ziehen und in der Größe ändern, und es merkt sich, wo du es zuletzt platziert hast.",
       "keyWindowsTitle": "Fenster, die du mit einer Taste öffnest",

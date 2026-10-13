@@ -823,6 +823,15 @@ export const guideStrings = {
     hubPracticeTrackerBody:
       'Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.',
 
+    // The dungeon objectives tracker (src/ui/hud/dungeon/dungeon_tracker_*):
+    // added ALONGSIDE the trackers above for the same reason, and it is also
+    // this page's prose for its HUD_FRAME_SPECS row. The rows are the sim's own
+    // boss list (src/sim/instances/dungeon_run.ts), so nothing here names a
+    // dungeon or a boss. Wordy (M16): the five non-Latin fills land in this
+    // same change.
+    dungeonTrackerBody:
+      "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
+
     chatTitle: 'The chat box',
     chatBody:
       'Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.',

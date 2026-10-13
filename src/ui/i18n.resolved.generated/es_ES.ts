@@ -1881,6 +1881,10 @@ export const es_ES: EnTranslations = {
       "replayAction": "Practicar de nuevo",
       "replayTarget": "Seleccionarlo de nuevo"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Brecha",
       "hoardTitle": "Tesoro enterrado",
@@ -4639,6 +4643,7 @@ export const es_ES: EnTranslations = {
         "deedTracker": "Seguimiento de hazañas",
         "delveTracker": "Seguimiento de exploraciones",
         "riftTracker": "Seguimiento de fallas",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Mano izquierda",
         "unitTooltip": "Tooltip"
       },
@@ -8299,6 +8304,7 @@ export const es_ES: EnTranslations = {
       "mapBodyZoneFirst": "M abre el mapa del mundo en la zona donde estás, con tu propia flecha, los puntos de interés cercanos, los emisores de misiones con sus marcas y las áreas de tus objetivos, estaciones de fabricación, buzones, tablones y bancales, entradas de mazmorra y todos los nodos de recolección de la zona, apagados mientras reaparecen y marcados cuando tus herramientas no bastan. Tu grupo también aparece. Haz clic derecho en el mapa o pulsa su botón Mapa del mundo para alejarlo hasta el continente, con cada zona dibujada y nombrada; al hacer clic en una zona se abre su mapa. Entra en una Profundidad, mazmorra, Brecha o fortaleza y el mapa cambia al plano del lugar; el campo de batalla de Campos Espinosos tiene su propio mapa.\n\nA la derecha, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales: misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual y cualquier Brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar espacio en pantalla.",
       "gatheringGoalTrackerBody": "Un rastreador de objetivos de recolección se une a la pila cuando sigues una receta en la ventana de fabricación o una comisión en el tablón: indica la receta o comisión, cuánto estás reuniendo y cuánto aportan tus materiales guardados y almacenados. Seguir reemplaza el objetivo actual y Borrar lo elimina explícitamente; ninguno cambia tu preferencia de cosecha.",
       "hubPracticeTrackerBody": "Cerca del centro de Eastbrook se une un rastreador de práctica cuando aceptas allí las lecciones guiadas: mantiene visibles tus mejores intentos contra los muñecos de práctica. Mientras una lección está activa, una franja de entrenamiento te guía por el paso actual, desde abrir los medidores de daño hasta comparar un segundo intento.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "La caja de chat",
       "chatBody": "Abajo a la izquierda. Pulsa Intro para empezar a escribir y de nuevo Intro para enviar.\n\nDos pestañas están siempre presentes: Chat, el registro combinado de cuanto se dice a tu alrededor, y Combate, el registro escrito de tu combate. El botón más añade otras, una por canal: Decir, Gritar, Grupo, General, Mundo, BdG, Hermandad y Oficiales, además de una pestaña de Susurro que reúne en un solo lugar cada susurro que envías y recibes. Escribir en la pestaña de un canal envía el mensaje a ese canal sin que tengas que volver a escribir el comando.\n\nLa caja entera se puede arrastrar a otro lugar y redimensionar, y recuerda dónde la dejaste.",
       "keyWindowsTitle": "Ventanas que abres con una tecla",

@@ -1242,7 +1242,12 @@ const MONOLITHS: MonolithRow[] = [
     // the Studio's own delta (11570 - 11642 = -72) gives 11628; re-measure with wc -l.
     // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
     // the release/v0.45.0 ceiling both merged PRs were held to.
-    ceiling: 11638,
+    // LOWERED by four more lines with the dungeon objectives tracker: its IWorld
+    // read (the dungeonRun getter, a one-line delegate to
+    // instances/dungeon_run.ts) is paid for by moving riftEventMsRemaining's
+    // body and its comment to rift/rift_floor_view.ts, beside the floor view it
+    // reads. Exact count (wc -l after biome), zero slack.
+    ceiling: 11634,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1750,7 +1755,9 @@ const MONOLITHS: MonolithRow[] = [
     // sibling modules (v0.45.0); exact count.
     // Studio merge into the v0.45.0 integration: the integration pin 9769 plus
     // the Studio's own delta (9836 - 9840 = -4) gives 9765; re-measure with wc -l.
-    ceiling: 9765,
+    // The run readouts of the self record (drun, dgrun, dcompanion, dmarks) moved to
+    // dungeon_run_wire.ts with the dungeon objectives tracker. Exact count.
+    ceiling: 9764,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

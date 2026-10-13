@@ -672,6 +672,9 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/crypt_alert_scene_core.ts',
   // The trash engine's use prompt (a Soul Brazier to topple) and its scene scan.
   'src/ui/hud/dungeon/kit_use_prompt_view.ts',
+  // The dungeon objectives tracker (the plate and its boss rows): what it
+  // shows, and which rows a kill just lit.
+  'src/ui/hud/dungeon/dungeon_tracker_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',

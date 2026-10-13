@@ -1881,6 +1881,10 @@ export const fr_CA: EnTranslations = {
       "replayAction": "S’entraîner à nouveau",
       "replayTarget": "Reprendre la cible"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Faille",
       "hoardTitle": "Butin enfoui",
@@ -4639,6 +4643,7 @@ export const fr_CA: EnTranslations = {
         "deedTracker": "Suivi des hauts faits",
         "delveTracker": "Suivi des explorations",
         "riftTracker": "Suivi des failles",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Main gauche",
         "unitTooltip": "Tooltip"
       },
@@ -8299,6 +8304,7 @@ export const fr_CA: EnTranslations = {
       "mapBodyZoneFirst": "M ouvre la carte de la zone où vous vous trouvez, avec votre flèche, les points d'intérêt, les donneurs de quêtes, les zones de vos objectifs, les stations d'artisanat, boîtes aux lettres, tableaux et parcelles, les entrées de donjons et tous les nœuds de récolte, grisés pendant leur repousse ou marqués lorsque vos outils sont insuffisants. Votre groupe apparaît aussi. Faites un clic droit sur la carte ou appuyez sur le bouton Carte du monde pour reculer jusqu'au continent ; chaque zone porte son nom et un clic ouvre sa carte. Entrez dans une exploration, un donjon, une faille ou une forteresse pour passer au plan de l'étage ; le champ de bataille des Champs de Thornhollow possède sa propre carte.\n\nÀ droite, sous la minicarte, une pile de suivis garde vos activités visibles : quêtes et objectifs, hauts faits, pages du Reliquaire, recettes épinglées depuis l'artisanat, exploration et faille en cours. Le suivi de quête se réduit quand vous voulez récupérer de l'espace.",
       "gatheringGoalTrackerBody": "Un suivi d’objectif de récolte rejoint la pile lorsque vous suivez une recette dans la fenêtre d’artisanat ou une commission sur le tableau. Il indique la recette ou commission suivie, la quantité à rassembler et la progression de vos matériaux détenus et stockés. Suivre remplace l’objectif actuel et Effacer le supprime explicitement ; aucun des deux ne modifie votre préférence de récolte.",
       "hubPracticeTrackerBody": "Près du hub d’Eastbrook, un suivi d’entraînement rejoint la pile lorsque vous prenez les leçons guidées : il garde vos meilleurs résultats contre les mannequins d’entraînement. Pendant une leçon, une bande de coaching vous guide à travers l’étape actuelle, de l’ouverture des compteurs de dégâts à la comparaison d’un deuxième résultat.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "La fenêtre de discussion",
       "chatBody": "En bas à gauche. Appuyez sur Entrée pour commencer à écrire et de nouveau sur Entrée pour envoyer.\n\nDeux onglets sont toujours présents : Discussion, le journal combiné de tout ce qui se dit autour de vous, et Combat, le relevé écrit de votre affrontement. Le bouton plus en ajoute d'autres, un par canal : Dire, Crier, Groupe, Général, Monde, RG, Guilde et Officier, plus un onglet Chuchotements qui rassemble en un seul endroit tous les murmures que vous envoyez et recevez. Taper dans un onglet de canal envoie sur ce canal sans que vous ayez à retaper la commande.\n\nToute la fenêtre peut être déplacée ailleurs et redimensionnée, et elle se souvient de l'endroit où vous l'avez laissée.",
       "keyWindowsTitle": "Les fenêtres que vous ouvrez avec une touche",

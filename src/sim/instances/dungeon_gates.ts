@@ -171,6 +171,24 @@ export function dungeonPacksDead(
   return packIds.every((pack) => allDead(ctx, inst, index.byPack.get(pack) ?? []));
 }
 
+/**
+ * Is every placed body of `templateId` dead in this claim? The gates' own
+ * boss read (a gate's `bosses` list waits on exactly this), exposed so the
+ * run's objectives (dungeon_run.ts) tick a boss the same instant the gate
+ * behind it opens. False for a template the dungeon never places: a body an
+ * encounter summons is not on the spawn-ordered roster, so it has no answer
+ * here and the caller must look it up its own way.
+ */
+export function dungeonPlacedBossDead(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  templateId: string,
+): boolean {
+  const dungeon = DUNGEONS[inst.dungeonId];
+  const indices = dungeon ? indexFor(dungeon).byTemplate.get(templateId) : undefined;
+  return indices !== undefined && allDead(ctx, inst, indices);
+}
+
 /** Engaged in the old, broad sense a landed seal holds on: alive and either
  *  in combat or anywhere but idle (so a boss walking home keeps it shut). */
 function isEngaged(mob: Entity): boolean {

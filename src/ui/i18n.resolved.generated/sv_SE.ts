@@ -1881,6 +1881,10 @@ export const sv_SE: EnTranslations = {
       "replayAction": "Öva igen",
       "replayTarget": "Välj den som mål igen"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Reva",
       "hoardTitle": "Begravd skatt",
@@ -4639,6 +4643,7 @@ export const sv_SE: EnTranslations = {
         "deedTracker": "Dådspårare",
         "delveTracker": "Delve-spårare",
         "riftTracker": "Revspårare",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Avhand",
         "unitTooltip": "Tooltip"
       },
@@ -8299,6 +8304,7 @@ export const sv_SE: EnTranslations = {
       "mapBodyZoneFirst": "M öppnar världskartan över zonen där du står, med din egen pil, sevärdheterna omkring dig, uppdragsgivarna med sina markeringar och områdena där dina mål finns, tillverkningsstationerna, brevlådorna, anslagstavlorna och odlingsbäddarna, ingångarna till fängelsehålorna och varje insamlingsnod i zonen. Noder är gråtonade medan de växer tillbaka och markerade när dina verktyg inte räcker till. Din grupp visas också på kartan. Högerklicka på kartan eller tryck på dess knapp Världskarta så zoomar den ut till kontinenten, där varje zon ritas med sitt namn och ett klick på en zon öppnar dess karta. Kliv in i ett djup, en fängelsehåla, en spricka eller ett slottsfäste så växlar kartan till en planritning över platsen där du står; slagfältet Törnhålefälten har en egen fältkarta.\n\nLängs höger sida, under minimappen, håller en stack av spårare din aktuella verksamhet synlig utan att något behöver öppnas: dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, recept du fäst vid tillverkning, djupet du befinner dig i och varje spricka du deltar i. Uppdragsspåraren kan fällas ihop när du vill ha tillbaka skärmen.",
       "gatheringGoalTrackerBody": "En spårare för insamlingsmål läggs till i stacken när du väljer Följ för ett recept i tillverkningsfönstret eller en beställning på anslagstavlan: den visar receptet eller beställningen du följer, hur mycket du samlar till och hur långt dina burna och lagrade material räcker. Följ ersätter ditt nuvarande mål och Rensa tar bort det uttryckligen; inget av dem ändrar någonsin din skördeinställning.",
       "hubPracticeTrackerBody": "Nära navet i Östbäck läggs en övningsspårare till i stacken när du tar de vägledda övningslektionerna där: den håller dina bästa försök mot övningsdockorna synliga. Medan en lektion är aktiv visar en coachningsrad bredvid den det aktuella steget i lektionen, från att öppna Skademätare till att jämföra ett andra försök.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Chattrutan",
       "chatBody": "Nere till vänster. Tryck på Enter för att börja skriva och Enter igen för att skicka.\n\nTvå flikar finns alltid: Chatt, den samlade loggen över allt som sägs runt omkring dig, och Stridslogg, den skriftliga redogörelsen för din strid. Plus-knappen lägger till fler, en per kanal: Säg, Ropa, Grupp, Allmänt, Världen, LFG, Gille och Officer, samt en Viska-flik som samlar varenda viskning du skickar och tar emot på ett ställe. Att skriva i en kanalflik skickar till den kanalen utan att du behöver skriva om kommandot.\n\nHela rutan kan dras till en annan plats och ändra storlek, och den kommer ihåg var du lämnade den.",
       "keyWindowsTitle": "Fönster du öppnar med en tangent",

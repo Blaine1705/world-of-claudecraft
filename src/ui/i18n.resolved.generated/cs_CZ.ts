@@ -1881,6 +1881,10 @@ export const cs_CZ: EnTranslations = {
       "replayAction": "Cvičit znovu",
       "replayTarget": "Znovu ji vyber jako cíl"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Trhlina",
       "hoardTitle": "Pohřbený poklad",
@@ -4639,6 +4643,7 @@ export const cs_CZ: EnTranslations = {
         "deedTracker": "Sledování skutků",
         "delveTracker": "Sledování výprav do hlubin",
         "riftTracker": "Sledování trhlin",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Levá ruka",
         "unitTooltip": "Tooltip"
       },
@@ -8299,6 +8304,7 @@ export const cs_CZ: EnTranslations = {
       "mapBodyZoneFirst": "M otevře mapu světa v zóně, kde stojíš, s tvou šipkou, body zájmu kolem tebe, zadavateli úkolů s jejich značkami a oblastmi cílů, řemeslnými stanicemi, poštovními schránkami, nástěnkami a zahradními políčky, vstupy do dungeonů a každým sběračským nalezištěm v zóně. Naleziště během obnovy zešednou a označí se, když na ně tvé nástroje nestačí. Zobrazí se i skupina. Klikni na mapu pravým tlačítkem nebo stiskni tlačítko Mapa světa a mapa se oddálí na kontinent, kde má každá zóna své jméno a kliknutí otevře její mapu. Vstup do delve, dungeonu, riftu nebo hradní pevnosti přepne mapu na půdorys místa, kde stojíš; bojiště Thornhollowských polí má vlastní mapu pole.\n\nVpravo pod minimapou zásobník trackerů udržuje přehled tvé práce bez otevírání okna: sledované úkoly a cíle, postup skutků, stránky Reliquiáře, recepty, které sis připnul(a) z řemesel, delve, ve kterém jsi, a každý rift, jehož se účastníš. Tracker úkolů lze sbalit, když chceš obrazovku uvolnit.",
       "gatheringGoalTrackerBody": "Do zásobníku se přidá tracker sběračského cíle, jakmile v okně výroby zvolíš Sledovat recept nebo na nástěnce zakázku: pojmenuje sledovaný recept či zakázku, kolik kusů sbíráš a jak daleko tě k cíli dostanou držené a uložené materiály. Sledovat nahradí aktuální cíl a Vymazat ho výslovně odstraní; ani jedno nikdy nemění předvolbu sklizně.",
       "hubPracticeTrackerBody": "U eastbrookského hubu se do zásobníku přidá tracker cvičení, jakmile tam absolvuješ vedené lekce: udrží na očích tvé nejlepší běhy proti cvičným terčům. Během lekce tě koučovací pruh vedle něj provede aktuálním krokem, od otevření Měřičů poškození až po porovnání druhého běhu.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "Okno chatu",
       "chatBody": "Vlevo dole. Stisknutím Enter začneš psát a dalším Enter odešleš.\n\nDvě záložky jsou tu vždy: Chat, souhrnný záznam všeho, co se řekne kolem tebe, a Bojový záznam, písemný záznam tvého souboje. Tlačítko plus přidává další, jednu na kanál: Říct, Křik, Skupina, Obecné, Svět, Hledání skupiny, Cech a Důstojník, a k tomu záložku Šepot, která na jednom místě shromažďuje každý šepot, který pošleš i přijmeš. Psaní v záložce kanálu odešle zprávu do tohoto kanálu, aniž bys musel znovu psát příkaz.\n\nCelé okno lze přetáhnout jinam a změnit mu velikost, a pamatuje si, kde jsi ho nechal.",
       "keyWindowsTitle": "Okna, která otevíráš klávesou",

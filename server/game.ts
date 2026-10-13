@@ -246,6 +246,7 @@ import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
 import * as entryFacing from './dungeon_entry_facing';
 import { dispatchDungeonFinderCommand } from './dungeon_finder_commands';
+import { appendRunSelfWire } from './dungeon_run_wire';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
@@ -8612,9 +8613,7 @@ export class GameServer {
     // like lroll, and like lroll it costs one pendingLootRolls scan per session.
     maybe('mloot', this.sim.activeMasterLootRolls(anchorSession.pid));
     selfLap?.('self.loot');
-    maybe('drun', this.sim.delveRunWire(anchorSession.pid));
-    maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
-    maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
+    appendRunSelfWire(this.sim, anchorSession.pid, maybe, maybeSerialized);
     maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
     maybe('dclears', this.sim.delveClearsFor(anchorSession.pid));
     maybe('delveDaily', this.sim.delveDailyWire(anchorSession.pid));

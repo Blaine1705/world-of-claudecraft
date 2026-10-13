@@ -1881,6 +1881,10 @@ export const pt_BR: EnTranslations = {
       "replayAction": "Praticar novamente",
       "replayTarget": "Mirar novamente"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Fenda",
       "hoardTitle": "Tesouro Enterrado",
@@ -4639,6 +4643,7 @@ export const pt_BR: EnTranslations = {
         "deedTracker": "Rastreador de feitos",
         "delveTracker": "Rastreador de explorações",
         "riftTracker": "Rastreador de fendas",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Mão secundária",
         "unitTooltip": "Tooltip"
       },
@@ -8299,6 +8304,7 @@ export const pt_BR: EnTranslations = {
       "mapBodyZoneFirst": "M abre o mapa-múndi na zona onde você está, com sua própria seta, os pontos de interesse ao redor, os doadores de missão com suas marcas, as áreas dos seus objetivos, estações de criação, caixas de correio, quadros de avisos e canteiros, entradas de masmorra e cada nó de coleta da zona, acinzentado enquanto se recupera e marcado quando suas ferramentas não dão conta. Seu grupo também aparece. Clique com o botão direito no mapa, ou pressione o botão Mapa-múndi, para recuar até o continente, com cada zona desenhada e seu nome, e clique em uma zona para abrir seu mapa. Entre em uma incursão, masmorra, fenda ou fortaleza e o mapa muda para uma planta do andar onde você está; o campo de batalha dos Campos de Thornhollow tem seu próprio mapa de campo.\n\nNo lado direito, sob o minimapa, uma pilha de rastreadores mantém seu trabalho atual à vista sem abrir nada: suas missões e objetivos rastreados, seu progresso de feitos, suas páginas do Relicário, as receitas que você fixou na criação, a incursão em que está e qualquer fenda da qual participa. O rastreador de missões se recolhe quando você quer recuperar a tela.",
       "gatheringGoalTrackerBody": "Um rastreador de meta de coleta entra na pilha quando você acompanha uma receita na janela de criação ou uma encomenda no quadro: ele mostra a receita ou encomenda acompanhada, quantos itens você está reunindo e até onde os materiais guardados e armazenados levam você. Acompanhar substitui sua meta atual, e Limpar a remove explicitamente; nenhuma das duas ações muda sua preferência de coleta.",
       "hubPracticeTrackerBody": "Perto do centro de Eastbrook, um rastreador de prática entra na pilha quando você aceita as lições guiadas de prática dali: ele mantém à vista seus melhores resultados contra os bonecos de prática. Enquanto uma lição está ativa, uma faixa de instruções ao lado guia você pelo passo atual, desde abrir os Medidores de Dano até comparar uma segunda tentativa.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "A janela de chat",
       "chatBody": "No canto inferior esquerdo. Pressione Enter para começar a digitar e Enter de novo para enviar.\n\nDuas abas estão sempre lá: Chat, o registro combinado de tudo que é dito ao seu redor, e Combate, o registro escrito da sua luta. O botão de mais adiciona outras, uma por canal: Dizer, Gritar, Grupo, Geral, Mundo, Procurando Grupo, Guilda e Oficial, além de uma aba de Sussurro que reúne num só lugar cada sussurro que você envia e recebe. Digitar numa aba de canal envia para aquele canal sem que você precise redigitar o comando.\n\nA janela inteira pode ser arrastada para outro lugar e redimensionada, e ela lembra onde você a deixou.",
       "keyWindowsTitle": "Janelas que você abre com uma tecla",

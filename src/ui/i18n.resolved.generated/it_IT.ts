@@ -1881,6 +1881,10 @@ export const it_IT: EnTranslations = {
       "replayAction": "Esercitati di nuovo",
       "replayTarget": "Selezionalo di nuovo"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "Complete"
+    },
     "riftTracker": {
       "title": "Squarcio",
       "hoardTitle": "Tesoro Sepolto",
@@ -4639,6 +4643,7 @@ export const it_IT: EnTranslations = {
         "deedTracker": "Tracciatore imprese",
         "delveTracker": "Tracciatore esplorazioni",
         "riftTracker": "Tracciatore varchi",
+        "dungeonTracker": "Dungeon Tracker",
         "swingBarOffhand": "Mano secondaria",
         "unitTooltip": "Tooltip"
       },
@@ -8299,6 +8304,7 @@ export const it_IT: EnTranslations = {
       "mapBodyZoneFirst": "M apre la mappa del mondo sulla zona in cui ti trovi, con la tua freccia, i punti di interesse vicini, i donatori di missioni con i loro simboli, le aree degli obiettivi, stazioni di fabbricazione, cassette della posta, bacheche e aiuole, ingressi dei dungeon e ogni nodo di raccolta della zona, attenuato mentre ricresce e segnato quando i tuoi strumenti non sono all’altezza. Anche il gruppo compare. Fai clic destro sulla mappa o premi il pulsante Mappa del mondo per allontanare la vista al continente, con ogni zona disegnata e nominata; un clic su una zona apre la sua mappa. Entrando in una spedizione, dungeon, squarcio o fortezza, la mappa passa alla pianta del piano in cui ti trovi; il campo di battaglia delle Piane di Thornhollow ha una mappa propria.\n\nA destra, sotto la minimappa, una pila di tracciatori tiene in vista le tue attività senza aprire finestre: missioni e obiettivi seguiti, progresso delle imprese, pagine del Reliquiario, le ricette che hai appuntato dalla fabbricazione, la spedizione in corso e ogni squarcio a cui partecipi. Il tracciatore delle missioni si comprime quando vuoi recuperare spazio.",
       "gatheringGoalTrackerBody": "Un tracciatore degli obiettivi di raccolta entra nella pila quando segui una ricetta nella finestra di fabbricazione o una commissione sulla bacheca: indica la ricetta o commissione, quanti pezzi stai raccogliendo e quanto i materiali tenuti e immagazzinati ti avvicinano al traguardo. Segui sostituisce l’obiettivo attuale e Cancella lo rimuove esplicitamente; nessuna delle due azioni cambia la tua preferenza di raccolta.",
       "hubPracticeTrackerBody": "Vicino al centro di Eastbrook compare un tracciatore di pratica quando segui le lezioni guidate: tiene in vista i tuoi risultati migliori contro i manichini da pratica. Durante una lezione, una fascia di insegnamento accanto indica il passo attuale, dall’apertura dei Misuratori dei Danni al confronto con una seconda prova.",
+      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
       "chatTitle": "La finestra della chat",
       "chatBody": "In basso a sinistra. Premi Invio per iniziare a scrivere e di nuovo Invio per inviare.\n\nDue schede sono sempre presenti: Chat, il registro combinato di tutto ciò che viene detto intorno a te, e Combattimento, il resoconto scritto del tuo scontro. Il pulsante più ne aggiunge altre, una per canale: Dire, Gridare, Gruppo, Generale, Mondo, LFG, Gilda e Ufficiale, più una scheda Sussurri che raccoglie in un unico posto ogni sussurro che invii e ricevi. Scrivere in una scheda di canale invia a quel canale senza bisogno di ridigitare il comando.\n\nL'intera finestra può essere trascinata altrove e ridimensionata, e ricorda dove l'hai lasciata.",
       "keyWindowsTitle": "Finestre che apri con un tasto",
