@@ -15,8 +15,11 @@
 import type * as THREE from 'three';
 import { dismissKtx2Source } from './ktx2_mip_release';
 
+// A town building's texture-tier files (`<name>.half.glb`, `<name>.quarter.glb`,
+// placed_texture_tier_core.ts) take part too: the leaf sheets are the same
+// bytes in every building of one tier.
 const KIT_URL =
-  /\/tidehold\/(?:house_[a-e]|tavern(?:_b)?|smithy|market|hall|shop_[ab]|bank)(?:\.parts)?(?:\.[0-9a-f]+)?\.glb$/i;
+  /\/tidehold\/(?:house_[a-e]|tavern(?:_b)?|smithy|market|hall|shop_[ab]|bank)(?:\.parts)?(?:\.(?:half|quarter))?(?:\.[0-9a-f]+)?\.glb$/i;
 
 export function isSharedKitTextureUrl(url: string): boolean {
   return KIT_URL.test(url.split('?')[0]);
@@ -47,13 +50,20 @@ interface TextureLike {
 /** A content key for a transcoded KTX2 texture: its shape, sampling and an
  *  FNV-1a hash of its top mip (sampled with a stride past 64 KB, which on
  *  block-compressed data is still thousands of distinct blocks). Null for
- *  anything that is not a compressed texture with data in hand. */
+ *  anything that is not a compressed texture with data in hand.
+ *
+ *  The stride is always ODD. Blocks are 8 or 16 bytes, and an even stride on a
+ *  power-of-two map is a whole number of them, so it reads the same byte of
+ *  every block. In BC7 mode 5 (what an ETC1S map transcodes to on a desktop
+ *  GPU) that is the constant mode byte: every 1024, 2048 and 3072 colour map
+ *  of a kit keyed alike and wore the first one loaded. An odd stride walks
+ *  through every byte position of a block. */
 export function kitTextureKey(tex: TextureLike): string | null {
   if (!tex?.isCompressedTexture || !tex.mipmaps?.length) return null;
   const top = tex.mipmaps[0]?.data;
   if (!top) return null;
   const bytes = new Uint8Array(top.buffer, top.byteOffset, top.byteLength);
-  const stride = Math.max(1, Math.floor(bytes.length / 65536));
+  const stride = Math.max(1, Math.floor(bytes.length / 65536)) | 1;
   let h = 0x811c9dc5;
   for (let i = 0; i < bytes.length; i += stride) {
     h ^= bytes[i];

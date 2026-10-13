@@ -233,13 +233,19 @@ describe('gfx override application', () => {
     // Regenerated across the board at the Studio merge (studio/main into
     // release/v0.45.0): the two cityClutter keys are new to every release
     // profile, so every row moves; measured on the merged gfx.ts.
+    // Regenerated across the board for `placedTextureTier`, the texture set a
+    // placed town building loads (placed_texture_tier_core.ts). The key is new
+    // to every profile; its VALUE is 'half' on low and 'full' on the other five
+    // (none of these desktop cases is a constrained-memory profile, which is
+    // the one that takes 'quarter'). Named pins:
+    // tests/placed_texture_tier_core.test.ts.
     expect(hashes).toEqual({
-      low: '8a0d7207a1001131fe1b63b920aad247c5c132a5089939692457c654c14ae6fe',
-      medium: '9f6180995123d8b961ab82f2a25b3dad98c1a644ec2c9a8a0ff52390140f95b8',
-      high: '7a0d308e519b77347f4e74a50dd2d0c780d50f805064df62a05c5d4a8b3979ad',
-      ultra: '841013f9654ba7b09a3ea729d463ecfc6fb9472f1c9be4d77062315b709f004e',
-      insane: '00c3b4f4f603bba100aba5b8ebab12ea50ee7db8390a90a9b2e2a95557de454f',
-      advanced: '21d070667192a5bc52b2288135ef58473f3ca3cb7d3a637314617dd307e7851f',
+      low: '92f2725926f8d891875cbd97c9fd184b78848d2aaa062542fbda5ac599f259db',
+      medium: '89be3abe078ab01b9f66b77906f33c327011d6d03ec698ba666d9d1299628890',
+      high: '72b73c8b4551103c146cd3142a672e47f0ff0958d44125552ce26831bbd41799',
+      ultra: 'ec5adbfe8d406553307fe9a9b790bb260c73d1092d42e9200fa383833a6066ec',
+      insane: '6e4cda8517982d0159e1ebe49c0b82e14a42eec481c6f1224384e1165e7346da',
+      advanced: 'ea7e08b964e586c9084d0f8129e0fc5faf962e9e7028f5d1d235527dcd585f32',
     });
   });
 

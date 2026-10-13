@@ -93,6 +93,18 @@ export async function measureFloors(file) {
   return { minY: min[1], min, max, maxDim: Math.max(...size), size, floors };
 }
 
+/** The floor plane an authored deck is judged against: the nearest of the
+ *  model's MAJOR up-facing planes (at least half the largest one's area). The
+ *  largest plane alone is not always the ground floor: once the faces hidden
+ *  under its furniture were culled, the repainted tavern's upper storey has
+ *  more up-facing area than its hall. A minor plane (a table top, a stair
+ *  tread) is never the answer, so a deck that sank under its floor still reads
+ *  as a gap. */
+export function floorUnderDeck(m, deckY) {
+  const major = m.floors.filter((f) => f.area >= m.floors[0].area * 0.5);
+  return major.reduce((best, f) => (Math.abs(f.y - deckY) < Math.abs(best.y - deckY) ? f : best));
+}
+
 const BUILDINGS = ['castle', 'castle_b', 'hall', 'bank', 'market', 'smithy', 'tavern'];
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const overridesPath = path.join(root, 'data/asset_collision_overrides.json');
@@ -105,7 +117,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (!o) continue;
     const m = await measureFloors(path.join(root, `public/models/tidehold/${b}.glb`));
     const norm = 2.2 / m.maxDim;
-    const floor = m.floors[0].y; // dominant floor plane, yards from base
     const ramps = o.ramps ?? [];
     // the authored ground floor: the LARGEST flat deck (threshold aprons and
     // stair decks are small and can dip under the floor line by design)
@@ -117,6 +128,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       continue;
     }
     const lowest = main.y0 / norm;
+    const floor = floorUnderDeck(m, lowest).y; // the floor under that deck, yards from base
     const gap = floor - lowest;
     const want = -m.minY;
     const status =

@@ -6,12 +6,12 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
   {
     "assetId": "tidehold/bank",
     "building": "bank",
-    "maxDim": 22.6065,
-    "minY": -1,
+    "maxDim": 22.6067,
+    "minY": -1.0005,
     "shell": {
       "assetId": "tidehold_parts/bank/shell",
-      "maxDim": 18.8,
-      "minY": -1
+      "maxDim": 18.8004,
+      "minY": -1.0006
     },
     "pieces": [
       {
@@ -23,8 +23,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 19.72,
-        "minY": 4.5094
+        "maxDim": 19.5009,
+        "minY": 4.5099
       },
       {
         "assetId": "tidehold_parts/bank/P002_roof",
@@ -35,8 +35,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 21.204,
-        "minY": 8.7234
+        "maxDim": 21.2,
+        "minY": 8.7243
       },
       {
         "assetId": "tidehold_parts/bank/P003_dormer",
@@ -47,8 +47,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.6
+        "maxDim": 4.1652,
+        "minY": 10.6002
       },
       {
         "assetId": "tidehold_parts/bank/P004_dormer_001",
@@ -59,8 +59,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.6
+        "maxDim": 4.1652,
+        "minY": 10.6002
       },
       {
         "assetId": "tidehold_parts/bank/P005_chimney",
@@ -71,8 +71,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 8.33,
-        "minY": 9.15
+        "maxDim": 8.3357,
+        "minY": 9.1496
       },
       {
         "assetId": "tidehold_parts/bank/P006_chimney_001",
@@ -83,8 +83,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 8.33,
-        "minY": 9.15
+        "maxDim": 8.336,
+        "minY": 9.1496
       },
       {
         "assetId": "tidehold_parts/bank/P007_turret",
@@ -107,8 +107,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 8.15,
-        "minY": -0.6
+        "maxDim": 8.1504,
+        "minY": -0.6004
       },
       {
         "assetId": "tidehold_parts/bank/P009_furniture",
@@ -120,7 +120,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 17.04,
-        "minY": 0.45
+        "minY": 0.449
       },
       {
         "assetId": "tidehold_parts/bank/P010_vault",
@@ -131,8 +131,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.94,
-        "minY": 0.45
+        "maxDim": 4.9409,
+        "minY": 0.4495
       },
       {
         "assetId": "tidehold_parts/bank/P011_G_MOV_vault_door",
@@ -179,8 +179,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 6.6,
-        "minY": -1
+        "maxDim": 6.6003,
+        "minY": -1.0004
       },
       {
         "assetId": "tidehold_parts/bank/P015_strongroom_roof",
@@ -191,8 +191,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 6.9,
-        "minY": 4.3904
+        "maxDim": 6.8989,
+        "minY": 4.3906
       },
       {
         "assetId": "tidehold_parts/bank/P016_hoard",
@@ -203,8 +203,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.0007,
-        "minY": 0.4093
+        "maxDim": 4.0001,
+        "minY": 0.409
       },
       {
         "assetId": "tidehold_parts/bank/P017_Book_03",
@@ -215,8 +215,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.3994,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/bank/P018_Book_03",
@@ -227,8 +227,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.3988,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/bank/P019_Book_03",
@@ -240,7 +240,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.3985,
-        "minY": 0
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/bank/P020_Chest_01",
@@ -251,8 +251,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9275,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/bank/P021_Chest_01",
@@ -263,8 +263,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9275,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/bank/P022_Chest_01",
@@ -275,8 +275,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.44,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9275,
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/bank/P023_Chest_01",
@@ -287,8 +287,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.44,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9276,
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/bank/P024_Chest_01",
@@ -300,7 +300,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.9272,
-        "minY": 0
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/bank/P025_Chest_01",
@@ -311,8 +311,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.44,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9273,
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/bank/P026_Furniture_14",
@@ -323,8 +323,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.5,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 2.998,
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/bank/P027_Furniture_14",
@@ -335,8 +335,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.5,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.0348,
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/bank/P028_Carpet_02",
@@ -347,8 +347,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 2,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 0.0005,
+        "minY": 0.0148
       },
       {
         "assetId": "tidehold_parts/bank/P029_NoticeBoard_01",
@@ -359,8 +359,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8776,
-        "minY": 0
+        "maxDim": 1.8723,
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/bank/P030_flowers",
@@ -17757,12 +17757,12 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
   {
     "assetId": "tidehold/hall",
     "building": "hall",
-    "maxDim": 30.4997,
-    "minY": -1,
+    "maxDim": 30.4998,
+    "minY": -1.0002,
     "shell": {
       "assetId": "tidehold_parts/hall/shell",
-      "maxDim": 22.9,
-      "minY": -1
+      "maxDim": 22.9011,
+      "minY": -0.9999
     },
     "pieces": [
       {
@@ -17774,8 +17774,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 15.51,
-        "minY": 4.05
+        "maxDim": 10.84,
+        "minY": 5.073
       },
       {
         "assetId": "tidehold_parts/hall/P002_roof",
@@ -17787,7 +17787,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 23.6845,
-        "minY": 8.2142
+        "minY": 8.214
       },
       {
         "assetId": "tidehold_parts/hall/P003_tower",
@@ -17798,7 +17798,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 15.7,
+        "maxDim": 15.6997,
         "minY": -1
       },
       {
@@ -17810,8 +17810,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 14.8,
-        "minY": 14.7
+        "maxDim": 14.7696,
+        "minY": 14.7302
       },
       {
         "assetId": "tidehold_parts/hall/P005_entry",
@@ -17822,8 +17822,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 5.64,
-        "minY": -0.6
+        "maxDim": 5.6391,
+        "minY": -0.6002
       },
       {
         "assetId": "tidehold_parts/hall/P006_Furniture_14",
@@ -17834,8 +17834,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P007_Furniture_14",
@@ -17846,8 +17846,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P008_Furniture_14",
@@ -17858,8 +17858,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P009_Furniture_14",
@@ -17870,8 +17870,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P010_Furniture_14",
@@ -17882,8 +17882,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P011_Furniture_14",
@@ -17894,8 +17894,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P012_Furniture_14",
@@ -17906,8 +17906,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P013_Furniture_14",
@@ -17918,8 +17918,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P014_Furniture_14",
@@ -17930,8 +17930,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P015_Furniture_14",
@@ -17942,8 +17942,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.037,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/hall/P016_Carpet_03",
@@ -17954,8 +17954,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.6,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5,
-        "minY": 0
+        "maxDim": 6.0002,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/hall/P017_Carpet_03",
@@ -17966,8 +17966,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.6,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5,
-        "minY": 0
+        "maxDim": 0.0006,
+        "minY": 0.0097
       },
       {
         "assetId": "tidehold_parts/hall/P018_Carpet_03",
@@ -17978,8 +17978,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.6,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5,
-        "minY": 0
+        "maxDim": 0.0006,
+        "minY": 0.0097
       },
       {
         "assetId": "tidehold_parts/hall/P019_Carpet_03",
@@ -17990,8 +17990,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.6,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5,
-        "minY": 0
+        "maxDim": 0.9998,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/hall/P020_Altar_02",
@@ -18002,8 +18002,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 2,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3492,
-        "minY": 0
+        "maxDim": 1.3161,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/hall/P021_Altar_01",
@@ -18014,8 +18014,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3245,
-        "minY": 0
+        "maxDim": 1.3159,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/hall/P022_Candle_05",
@@ -18026,8 +18026,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3893,
-        "minY": 0
+        "maxDim": 1.3814,
+        "minY": 0.0083
       },
       {
         "assetId": "tidehold_parts/hall/P023_Candle_05",
@@ -18038,8 +18038,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3893,
-        "minY": 0
+        "maxDim": 1.3814,
+        "minY": 0.0083
       },
       {
         "assetId": "tidehold_parts/hall/P024_Candle_05",
@@ -18050,8 +18050,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3893,
-        "minY": 0
+        "maxDim": 1.3836,
+        "minY": 0.0058
       },
       {
         "assetId": "tidehold_parts/hall/P025_Candle_05",
@@ -18062,8 +18062,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3893,
-        "minY": 0
+        "maxDim": 1.3836,
+        "minY": 0.0058
       },
       {
         "assetId": "tidehold_parts/hall/P026_notices",
@@ -18074,8 +18074,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8776,
-        "minY": 0
+        "maxDim": 1.8717,
+        "minY": -0.0001
       }
     ]
   },
@@ -18086,8 +18086,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
     "minY": -1,
     "shell": {
       "assetId": "tidehold_parts/house_a/shell",
-      "maxDim": 9.8,
-      "minY": -1
+      "maxDim": 9.8002,
+      "minY": -0.9999
     },
     "pieces": [
       {
@@ -18111,7 +18111,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 10.9845,
+        "maxDim": 10.9841,
         "minY": 3.26
       },
       {
@@ -18123,7 +18123,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
+        "maxDim": 4.1652,
         "minY": 5.35
       },
       {
@@ -18159,8 +18159,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.773,
+        "minY": -0.0034
       },
       {
         "assetId": "tidehold_parts/house_a/P007_Box_01",
@@ -18171,8 +18171,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6662,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/house_a/P008_Firewood_01",
@@ -18184,7 +18184,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.4076,
-        "minY": -0.0071
+        "minY": -0.0074
       },
       {
         "assetId": "tidehold_parts/house_a/P009_flowers",
@@ -18203,11 +18203,11 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
   {
     "assetId": "tidehold/house_b",
     "building": "house_b",
-    "maxDim": 15.9795,
-    "minY": -0.9998,
+    "maxDim": 15.9799,
+    "minY": -1.0001,
     "shell": {
       "assetId": "tidehold_parts/house_b/shell",
-      "maxDim": 13.2,
+      "maxDim": 13.1997,
       "minY": -1
     },
     "pieces": [
@@ -18220,8 +18220,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 12.92,
-        "minY": 3.1064
+        "maxDim": 12.6598,
+        "minY": 3.1065
       },
       {
         "assetId": "tidehold_parts/house_b/P002_roof",
@@ -18244,8 +18244,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 7.33,
-        "minY": 7.65
+        "maxDim": 7.3299,
+        "minY": 7.6498
       },
       {
         "assetId": "tidehold_parts/house_b/P004_entry",
@@ -18256,8 +18256,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.92,
-        "minY": -0.6
+        "maxDim": 3.9195,
+        "minY": -0.5996
       },
       {
         "assetId": "tidehold_parts/house_b/P005_Barrel_02",
@@ -18268,8 +18268,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7696,
+        "minY": -0.0007
       },
       {
         "assetId": "tidehold_parts/house_b/P006_Box_01",
@@ -18280,8 +18280,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6661,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/house_b/P007_flowers",
@@ -18304,7 +18304,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
     "minY": -1,
     "shell": {
       "assetId": "tidehold_parts/house_c/shell",
-      "maxDim": 12.4,
+      "maxDim": 12.3998,
       "minY": -1
     },
     "pieces": [
@@ -18317,8 +18317,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 13.22,
-        "minY": 3.0094
+        "maxDim": 13.0352,
+        "minY": 3.009
       },
       {
         "assetId": "tidehold_parts/house_c/P002_roof",
@@ -18341,8 +18341,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 8.13,
-        "minY": 10.45
+        "maxDim": 8.1307,
+        "minY": 10.4498
       },
       {
         "assetId": "tidehold_parts/house_c/P004_turret",
@@ -18377,8 +18377,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7749,
+        "minY": -0.0006
       },
       {
         "assetId": "tidehold_parts/house_c/P007_flowers",
@@ -18389,8 +18389,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.4054,
-        "minY": 5.12
+        "maxDim": 4.4053,
+        "minY": 5.1204
       }
     ]
   },
@@ -18398,10 +18398,10 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
     "assetId": "tidehold/house_d",
     "building": "house_d",
     "maxDim": 14.9396,
-    "minY": -1,
+    "minY": -1.0002,
     "shell": {
       "assetId": "tidehold_parts/house_d/shell",
-      "maxDim": 12.4,
+      "maxDim": 12.4004,
       "minY": -1
     },
     "pieces": [
@@ -18438,8 +18438,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 5.6
+        "maxDim": 4.1656,
+        "minY": 5.6001
       },
       {
         "assetId": "tidehold_parts/house_d/P004_dormer_001",
@@ -18450,8 +18450,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 5.6
+        "maxDim": 4.1656,
+        "minY": 5.6001
       },
       {
         "assetId": "tidehold_parts/house_d/P005_chimney",
@@ -18462,8 +18462,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 12.88,
-        "minY": -1
+        "maxDim": 12.8803,
+        "minY": -1.0003
       },
       {
         "assetId": "tidehold_parts/house_d/P006_entry",
@@ -18474,8 +18474,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.7,
-        "minY": -0.6
+        "maxDim": 2.6996,
+        "minY": -0.5997
       },
       {
         "assetId": "tidehold_parts/house_d/P007_porch",
@@ -18486,8 +18486,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 10,
-        "minY": -0.6
+        "maxDim": 10.0005,
+        "minY": -0.6003
       },
       {
         "assetId": "tidehold_parts/house_d/P008_Furniture_12",
@@ -18498,8 +18498,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
-        "minY": 0.0013
+        "maxDim": 2.0018,
+        "minY": 0.0015
       },
       {
         "assetId": "tidehold_parts/house_d/P009_Barrel_01",
@@ -18510,8 +18510,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7699,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/house_d/P010_flowers",
@@ -18531,11 +18531,11 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
     "assetId": "tidehold/house_e",
     "building": "house_e",
     "maxDim": 20.629,
-    "minY": -1,
+    "minY": -1.0011,
     "shell": {
       "assetId": "tidehold_parts/house_e/shell",
-      "maxDim": 17.2,
-      "minY": -1
+      "maxDim": 17.1989,
+      "minY": -1.0003
     },
     "pieces": [
       {
@@ -18547,8 +18547,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 16.92,
-        "minY": 3.1064
+        "maxDim": 16.6597,
+        "minY": 3.106
       },
       {
         "assetId": "tidehold_parts/house_e/P002_roof",
@@ -18571,8 +18571,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 9
+        "maxDim": 4.1647,
+        "minY": 9.0005
       },
       {
         "assetId": "tidehold_parts/house_e/P004_dormer_001",
@@ -18583,8 +18583,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 9
+        "maxDim": 4.1647,
+        "minY": 9.0005
       },
       {
         "assetId": "tidehold_parts/house_e/P005_chimney",
@@ -18607,8 +18607,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 15.58,
-        "minY": -1
+        "maxDim": 15.5867,
+        "minY": -1.0004
       },
       {
         "assetId": "tidehold_parts/house_e/P007_entry",
@@ -18619,8 +18619,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.92,
-        "minY": -0.6
+        "maxDim": 3.9202,
+        "minY": -0.5998
       },
       {
         "assetId": "tidehold_parts/house_e/P008_leanto",
@@ -18631,8 +18631,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 6,
-        "minY": -0.5
+        "maxDim": 5.9992,
+        "minY": -0.4999
       },
       {
         "assetId": "tidehold_parts/house_e/P009_Box_01",
@@ -18643,8 +18643,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.7248,
+        "minY": 0.0033
       },
       {
         "assetId": "tidehold_parts/house_e/P010_Box_01",
@@ -18655,8 +18655,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.7048,
+        "minY": 0.0026
       },
       {
         "assetId": "tidehold_parts/house_e/P011_Barrel_02",
@@ -18667,8 +18667,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7966,
+        "minY": -0.006
       },
       {
         "assetId": "tidehold_parts/house_e/P012_Firewood_01",
@@ -18679,8 +18679,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.4076,
-        "minY": -0.0071
+        "maxDim": 0.4081,
+        "minY": -0.0069
       },
       {
         "assetId": "tidehold_parts/house_e/P013_flowers",
@@ -18691,7 +18691,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 11.7554,
+        "maxDim": 11.7547,
         "minY": 5.22
       }
     ]
@@ -18703,8 +18703,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
     "minY": -1.0012,
     "shell": {
       "assetId": "tidehold_parts/market/shell",
-      "maxDim": 32.8,
-      "minY": -1
+      "maxDim": 32.8019,
+      "minY": -1.0006
     },
     "pieces": [
       {
@@ -18716,8 +18716,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 16.6,
-        "minY": -0.8
+        "maxDim": 16.5995,
+        "minY": -0.8006
       },
       {
         "assetId": "tidehold_parts/market/P002_buttresses",
@@ -18728,8 +18728,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 34.06,
-        "minY": -0.6
+        "maxDim": 33.8999,
+        "minY": -0.599
       },
       {
         "assetId": "tidehold_parts/market/P003_tower",
@@ -18740,7 +18740,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 22.1,
+        "maxDim": 22.1012,
         "minY": -0.1
       },
       {
@@ -18752,7 +18752,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 22.1,
+        "maxDim": 22.1012,
         "minY": -0.1
       },
       {
@@ -18765,7 +18765,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 34.304,
-        "minY": 8.3053
+        "minY": 8.3073
       },
       {
         "assetId": "tidehold_parts/market/P006_dormer",
@@ -18776,8 +18776,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.6
+        "maxDim": 3.7,
+        "minY": 10.6011
       },
       {
         "assetId": "tidehold_parts/market/P007_dormer_001",
@@ -18788,8 +18788,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.6
+        "maxDim": 3.7,
+        "minY": 10.6011
       },
       {
         "assetId": "tidehold_parts/market/P008_dormer_002",
@@ -18800,8 +18800,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.6
+        "maxDim": 3.7,
+        "minY": 10.6011
       },
       {
         "assetId": "tidehold_parts/market/P009_dormer_003",
@@ -18812,8 +18812,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.6
+        "maxDim": 3.7,
+        "minY": 10.6011
       },
       {
         "assetId": "tidehold_parts/market/P010_dormer_004",
@@ -18824,8 +18824,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.6
+        "maxDim": 3.7,
+        "minY": 10.6011
       },
       {
         "assetId": "tidehold_parts/market/P011_cupola",
@@ -18836,7 +18836,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 10.3,
+        "maxDim": 10.2995,
         "minY": 16.3
       },
       {
@@ -18849,7 +18849,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 30.02,
-        "minY": 0.9
+        "minY": 0.8997
       },
       {
         "assetId": "tidehold_parts/market/P013_Altar_01",
@@ -18860,8 +18860,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3245,
-        "minY": 0
+        "maxDim": 1.316,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/market/P014_Altar_01",
@@ -18872,8 +18872,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3245,
-        "minY": 0
+        "maxDim": 1.316,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/market/P015_Altar_01",
@@ -18884,8 +18884,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3245,
-        "minY": 0
+        "maxDim": 1.316,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/market/P016_Altar_01",
@@ -18896,8 +18896,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3245,
-        "minY": 0
+        "maxDim": 1.316,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/market/P017_Altar_01",
@@ -18908,8 +18908,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3245,
-        "minY": 0
+        "maxDim": 1.316,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/market/P018_Box_02",
@@ -18920,8 +18920,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.8145,
-        "minY": -0.4053
+        "maxDim": 0.8146,
+        "minY": -0.4038
       },
       {
         "assetId": "tidehold_parts/market/P019_Box_01",
@@ -18932,8 +18932,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.633,
+        "minY": 0.0016
       },
       {
         "assetId": "tidehold_parts/market/P020_Barrel_01",
@@ -18944,8 +18944,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7698,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/market/P021_Barrel_02",
@@ -18956,8 +18956,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7702,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/market/P022_Chest_01",
@@ -18969,7 +18969,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.9272,
-        "minY": 0
+        "minY": -0.0005
       },
       {
         "assetId": "tidehold_parts/market/P023_Box_01",
@@ -18980,8 +18980,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.2,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6669,
+        "minY": -0.0007
       },
       {
         "assetId": "tidehold_parts/market/P024_Barrel_01",
@@ -18992,8 +18992,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7696,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/market/P025_Box_02",
@@ -19005,7 +19005,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.8145,
-        "minY": -0.4053
+        "minY": -0.4038
       },
       {
         "assetId": "tidehold_parts/market/P026_Bag_02",
@@ -19016,8 +19016,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6488,
-        "minY": 0.0113
+        "maxDim": 0.6453,
+        "minY": 0.0108
       },
       {
         "assetId": "tidehold_parts/market/P027_Bag_01",
@@ -19028,8 +19028,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6492,
-        "minY": 0.0113
+        "maxDim": 0.6453,
+        "minY": 0.0109
       },
       {
         "assetId": "tidehold_parts/market/P028_Weapon_01",
@@ -19040,8 +19040,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.1839,
-        "minY": -0.1334
+        "maxDim": 1.1387,
+        "minY": -0.0894
       },
       {
         "assetId": "tidehold_parts/market/P029_Weapon_02",
@@ -19052,8 +19052,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.1487,
-        "minY": -0.1303
+        "maxDim": 1.1244,
+        "minY": -0.0948
       },
       {
         "assetId": "tidehold_parts/market/P030_Weapon_03",
@@ -19064,8 +19064,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.4692,
-        "minY": -0.7102
+        "maxDim": 1.4651,
+        "minY": -0.7111
       },
       {
         "assetId": "tidehold_parts/market/P031_Weapon_04",
@@ -19076,8 +19076,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8933,
-        "minY": -0.3998
+        "maxDim": 1.886,
+        "minY": -0.3924
       },
       {
         "assetId": "tidehold_parts/market/P032_Weapon_01",
@@ -19088,8 +19088,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.1839,
-        "minY": -0.1334
+        "maxDim": 1.1388,
+        "minY": -0.0894
       },
       {
         "assetId": "tidehold_parts/market/P033_Weapon_01",
@@ -19100,8 +19100,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.1839,
-        "minY": -0.1334
+        "maxDim": 1.1387,
+        "minY": -0.0894
       },
       {
         "assetId": "tidehold_parts/market/P034_Weapon_02",
@@ -19112,8 +19112,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.1487,
-        "minY": -0.1303
+        "maxDim": 1.1129,
+        "minY": -0.0948
       },
       {
         "assetId": "tidehold_parts/market/P035_Weapon_03",
@@ -19124,8 +19124,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.4692,
-        "minY": -0.7102
+        "maxDim": 1.4653,
+        "minY": -0.7112
       },
       {
         "assetId": "tidehold_parts/market/P036_Weapon_04",
@@ -19136,8 +19136,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8933,
-        "minY": -0.3998
+        "maxDim": 1.887,
+        "minY": -0.3933
       },
       {
         "assetId": "tidehold_parts/market/P037_Weapon_01",
@@ -19148,20 +19148,20 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.1839,
-        "minY": -0.1334
+        "maxDim": 1.1398,
+        "minY": -0.0894
       }
     ]
   },
   {
     "assetId": "tidehold/shop_a",
     "building": "shop_a",
-    "maxDim": 16.2801,
-    "minY": -1,
+    "maxDim": 16.2797,
+    "minY": -0.9999,
     "shell": {
       "assetId": "tidehold_parts/shop_a/shell",
       "maxDim": 11.8,
-      "minY": -1
+      "minY": -0.9999
     },
     "pieces": [
       {
@@ -19173,8 +19173,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 11.52,
-        "minY": 3.3064
+        "maxDim": 11.2598,
+        "minY": 3.3067
       },
       {
         "assetId": "tidehold_parts/shop_a/P002_roof",
@@ -19209,8 +19209,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.865,
-        "minY": -0.6
+        "maxDim": 4.8656,
+        "minY": -0.6003
       },
       {
         "assetId": "tidehold_parts/shop_a/P005_stall",
@@ -19221,8 +19221,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.31,
-        "minY": -0.35
+        "maxDim": 4.3104,
+        "minY": -0.3497
       },
       {
         "assetId": "tidehold_parts/shop_a/P006_furniture",
@@ -19233,8 +19233,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 8.04,
-        "minY": 0.45
+        "maxDim": 8.0399,
+        "minY": 0.4502
       },
       {
         "assetId": "tidehold_parts/shop_a/P007_Food_04",
@@ -19245,8 +19245,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2428,
-        "minY": -0.0123
+        "maxDim": 0.2425,
+        "minY": -0.0122
       },
       {
         "assetId": "tidehold_parts/shop_a/P008_Food_02",
@@ -19257,8 +19257,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1297,
-        "minY": -0.0567
+        "maxDim": 0.1173,
+        "minY": -0.0565
       },
       {
         "assetId": "tidehold_parts/shop_a/P009_Food_08",
@@ -19269,8 +19269,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2018,
-        "minY": 0
+        "maxDim": 0.2051,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P010_Food_05",
@@ -19305,8 +19305,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1351,
-        "minY": -0.0521
+        "maxDim": 0.1187,
+        "minY": -0.052
       },
       {
         "assetId": "tidehold_parts/shop_a/P013_Bag_03",
@@ -19317,8 +19317,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.75,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6783,
-        "minY": -0.0002
+        "maxDim": 0.6785,
+        "minY": -0.0006
       },
       {
         "assetId": "tidehold_parts/shop_a/P014_Box_01",
@@ -19329,8 +19329,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6664,
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/shop_a/P015_Barrel_02",
@@ -19341,8 +19341,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.792,
+        "minY": -0.0144
       },
       {
         "assetId": "tidehold_parts/shop_a/P016_Bag_01",
@@ -19353,8 +19353,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.3,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6492,
-        "minY": 0.0113
+        "maxDim": 0.6482,
+        "minY": 0.0116
       },
       {
         "assetId": "tidehold_parts/shop_a/P017_Food_04",
@@ -19378,7 +19378,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.1999,
-        "minY": 0
+        "minY": -0.0001
       },
       {
         "assetId": "tidehold_parts/shop_a/P019_Book_03",
@@ -19389,8 +19389,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.9,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.4009,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P020_Candle_03",
@@ -19401,8 +19401,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.9,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5556,
-        "minY": 0.0049
+        "maxDim": 0.5555,
+        "minY": 0.0051
       },
       {
         "assetId": "tidehold_parts/shop_a/P021_Food_08",
@@ -19413,8 +19413,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2018,
-        "minY": 0
+        "maxDim": 0.2053,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_a/P022_PlateFood_01",
@@ -19425,8 +19425,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2111,
-        "minY": 0.073
+        "maxDim": 0.0006,
+        "minY": 0.078
       },
       {
         "assetId": "tidehold_parts/shop_a/P023_Food_04",
@@ -19449,8 +19449,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6783,
-        "minY": -0.0002
+        "maxDim": 0.6782,
+        "minY": 0
       },
       {
         "assetId": "tidehold_parts/shop_a/P025_Cup_01",
@@ -19461,8 +19461,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.1996,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P026_Bottle_04",
@@ -19473,8 +19473,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3168,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P027_Food_04",
@@ -19509,8 +19509,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6488,
-        "minY": 0.0113
+        "maxDim": 0.648,
+        "minY": 0.0119
       },
       {
         "assetId": "tidehold_parts/shop_a/P030_Bottle_01",
@@ -19521,8 +19521,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.3336,
+        "minY": 0.0006
       },
       {
         "assetId": "tidehold_parts/shop_a/P031_Food_08",
@@ -19533,8 +19533,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2018,
-        "minY": 0
+        "maxDim": 0.2051,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P032_Food_04",
@@ -19557,8 +19557,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.55,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6661,
+        "minY": 0.0006
       },
       {
         "assetId": "tidehold_parts/shop_a/P034_Bottle_01",
@@ -19570,7 +19570,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.3335,
-        "minY": 0.0004
+        "minY": 0.0007
       },
       {
         "assetId": "tidehold_parts/shop_a/P035_Food_04",
@@ -19593,8 +19593,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.55,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6663,
+        "minY": 0.0006
       },
       {
         "assetId": "tidehold_parts/shop_a/P037_Bottle_01",
@@ -19605,8 +19605,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.3336,
+        "minY": 0.0005
       },
       {
         "assetId": "tidehold_parts/shop_a/P038_Bag_03",
@@ -19618,7 +19618,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.6783,
-        "minY": -0.0002
+        "minY": -0.0008
       },
       {
         "assetId": "tidehold_parts/shop_a/P039_Bag_02",
@@ -19629,8 +19629,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6488,
-        "minY": 0.0113
+        "maxDim": 0.6479,
+        "minY": 0.0115
       },
       {
         "assetId": "tidehold_parts/shop_a/P040_Box_01",
@@ -19641,8 +19641,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.55,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6661,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P041_Bag_03",
@@ -19653,8 +19653,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6783,
-        "minY": -0.0002
+        "maxDim": 0.6666,
+        "minY": 0.0109
       },
       {
         "assetId": "tidehold_parts/shop_a/P042_Bottle_04",
@@ -19665,8 +19665,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3148,
+        "minY": 0.0007
       },
       {
         "assetId": "tidehold_parts/shop_a/P043_Food_04",
@@ -19689,8 +19689,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2018,
-        "minY": 0
+        "maxDim": 0.2052,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_a/P045_Food_04",
@@ -19713,8 +19713,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.55,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6662,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P047_Bottle_01",
@@ -19725,8 +19725,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.3338,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P048_Cup_01",
@@ -19737,8 +19737,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.1997,
+        "minY": -0.0005
       },
       {
         "assetId": "tidehold_parts/shop_a/P049_Bottle_04",
@@ -19749,8 +19749,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3159,
+        "minY": 0.0007
       },
       {
         "assetId": "tidehold_parts/shop_a/P050_Bottle_01",
@@ -19761,8 +19761,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.334,
+        "minY": 0
       },
       {
         "assetId": "tidehold_parts/shop_a/P051_Cup_01",
@@ -19773,8 +19773,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.2,
+        "minY": -0.0005
       },
       {
         "assetId": "tidehold_parts/shop_a/P052_Food_04",
@@ -19797,8 +19797,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6488,
-        "minY": 0.0113
+        "maxDim": 0.6479,
+        "minY": 0.011
       },
       {
         "assetId": "tidehold_parts/shop_a/P054_Bottle_01",
@@ -19809,8 +19809,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.3336,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/shop_a/P055_Food_04",
@@ -19821,8 +19821,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2428,
-        "minY": -0.0123
+        "maxDim": 0.2429,
+        "minY": -0.0124
       },
       {
         "assetId": "tidehold_parts/shop_a/P056_Bottle_04",
@@ -19833,8 +19833,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3162,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P057_Bottle_01",
@@ -19845,8 +19845,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.3336,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P058_Cup_01",
@@ -19857,7 +19857,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
+        "maxDim": 0.1973,
         "minY": 0
       },
       {
@@ -19869,8 +19869,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3163,
+        "minY": 0
       },
       {
         "assetId": "tidehold_parts/shop_a/P060_Bottle_01",
@@ -19881,8 +19881,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.3336,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P061_Cup_01",
@@ -19893,7 +19893,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
+        "maxDim": 0.2,
         "minY": 0
       },
       {
@@ -19905,8 +19905,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.55,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6667,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P063_Food_04",
@@ -19929,7 +19929,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2018,
+        "maxDim": 0.2052,
         "minY": 0
       },
       {
@@ -19942,7 +19942,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.666,
-        "minY": 0
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P066_Bag_02",
@@ -19953,8 +19953,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6488,
-        "minY": 0.0113
+        "maxDim": 0.6479,
+        "minY": 0.011
       },
       {
         "assetId": "tidehold_parts/shop_a/P067_Food_08",
@@ -19965,7 +19965,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2018,
+        "maxDim": 0.2052,
         "minY": 0
       },
       {
@@ -19977,8 +19977,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.2,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P069_Bottle_04",
@@ -19989,8 +19989,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.316,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/shop_a/P070_Bottle_01",
@@ -20002,7 +20002,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.3335,
-        "minY": 0.0004
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P071_Bag_03",
@@ -20013,8 +20013,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6783,
-        "minY": -0.0002
+        "maxDim": 0.6776,
+        "minY": -0.0009
       },
       {
         "assetId": "tidehold_parts/shop_a/P072_Box_01",
@@ -20026,7 +20026,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.666,
-        "minY": 0
+        "minY": -0.0005
       },
       {
         "assetId": "tidehold_parts/shop_a/P073_Bag_02",
@@ -20037,8 +20037,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6488,
-        "minY": 0.0113
+        "maxDim": 0.6481,
+        "minY": 0.0105
       },
       {
         "assetId": "tidehold_parts/shop_a/P074_Bag_03",
@@ -20049,8 +20049,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6783,
-        "minY": -0.0002
+        "maxDim": 0.6668,
+        "minY": 0.0099
       },
       {
         "assetId": "tidehold_parts/shop_a/P075_Box_01",
@@ -20061,8 +20061,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.55,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6665,
+        "minY": -0.0005
       },
       {
         "assetId": "tidehold_parts/shop_a/P076_Bottle_04",
@@ -20073,8 +20073,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3159,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/shop_a/P077_Food_08",
@@ -20085,8 +20085,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2018,
-        "minY": 0
+        "maxDim": 0.2053,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P078_Food_04",
@@ -20098,7 +20098,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.2428,
-        "minY": -0.0123
+        "minY": -0.0125
       },
       {
         "assetId": "tidehold_parts/shop_a/P079_Bottle_04",
@@ -20109,8 +20109,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3157,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/shop_a/P080_Food_04",
@@ -20133,8 +20133,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.42,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6783,
-        "minY": -0.0002
+        "maxDim": 0.6836,
+        "minY": -0.0069
       },
       {
         "assetId": "tidehold_parts/shop_a/P082_Food_04",
@@ -20157,8 +20157,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7753,
+        "minY": -0.0006
       },
       {
         "assetId": "tidehold_parts/shop_a/P084_Barrel_01",
@@ -20169,8 +20169,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7745,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P085_Bag_02",
@@ -20181,8 +20181,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6488,
-        "minY": 0.0113
+        "maxDim": 0.644,
+        "minY": 0.0116
       },
       {
         "assetId": "tidehold_parts/shop_a/P086_Bag_01",
@@ -20193,8 +20193,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.6492,
-        "minY": 0.0113
+        "maxDim": 0.6437,
+        "minY": 0.0121
       },
       {
         "assetId": "tidehold_parts/shop_a/P087_Box_02",
@@ -20205,8 +20205,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.8145,
-        "minY": -0.4053
+        "maxDim": 0.8144,
+        "minY": -0.4029
       },
       {
         "assetId": "tidehold_parts/shop_a/P088_Box_01",
@@ -20217,8 +20217,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6663,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_a/P089_Carpet_05",
@@ -20229,8 +20229,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5,
-        "minY": 0
+        "maxDim": 1.4997,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_a/P090_flowers",
@@ -20253,8 +20253,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
     "minY": -1,
     "shell": {
       "assetId": "tidehold_parts/shop_b/shell",
-      "maxDim": 10.2,
-      "minY": -1
+      "maxDim": 10.1999,
+      "minY": -0.9999
     },
     "pieces": [
       {
@@ -20266,8 +20266,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 10.47,
-        "minY": 3.3124
+        "maxDim": 10.1005,
+        "minY": 3.3126
       },
       {
         "assetId": "tidehold_parts/shop_b/P002_roof",
@@ -20290,7 +20290,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 16.48,
+        "maxDim": 16.4864,
         "minY": -1
       },
       {
@@ -20314,8 +20314,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.865,
-        "minY": -0.6
+        "maxDim": 4.8652,
+        "minY": -0.6005
       },
       {
         "assetId": "tidehold_parts/shop_b/P006_stall",
@@ -20326,8 +20326,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.28,
-        "minY": -0.35
+        "maxDim": 4.2808,
+        "minY": -0.3506
       },
       {
         "assetId": "tidehold_parts/shop_b/P007_furniture",
@@ -20338,8 +20338,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 7.56,
-        "minY": 0.45
+        "maxDim": 6.9181,
+        "minY": 0.4497
       },
       {
         "assetId": "tidehold_parts/shop_b/P008_Potion_01",
@@ -20350,7 +20350,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
+        "maxDim": 0.2692,
         "minY": 0
       },
       {
@@ -20362,8 +20362,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.1271,
+        "minY": 0.0016
       },
       {
         "assetId": "tidehold_parts/shop_b/P010_Potion_07",
@@ -20374,7 +20374,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
+        "maxDim": 0.2692,
         "minY": 0
       },
       {
@@ -20386,8 +20386,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2546,
-        "minY": 0
+        "maxDim": 0.252,
+        "minY": 0.0031
       },
       {
         "assetId": "tidehold_parts/shop_b/P012_Bottle_04",
@@ -20398,8 +20398,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3157,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/shop_b/P013_Box_01",
@@ -20410,8 +20410,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.7,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.666,
-        "minY": 0
+        "maxDim": 0.6658,
+        "minY": -0.0009
       },
       {
         "assetId": "tidehold_parts/shop_b/P014_Potion_02",
@@ -20422,8 +20422,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2546,
-        "minY": 0
+        "maxDim": 0.2519,
+        "minY": 0.0033
       },
       {
         "assetId": "tidehold_parts/shop_b/P015_Book_02",
@@ -20434,8 +20434,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.9,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.3988,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/shop_b/P016_Potion_04",
@@ -20446,8 +20446,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.1258,
+        "minY": 0.0029
       },
       {
         "assetId": "tidehold_parts/shop_b/P017_Candle_03",
@@ -20458,8 +20458,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.9,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5556,
-        "minY": 0.0049
+        "maxDim": 0.5553,
+        "minY": 0.0052
       },
       {
         "assetId": "tidehold_parts/shop_b/P018_Potion_07",
@@ -20470,8 +20470,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.2688,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P019_Potion_01",
@@ -20482,8 +20482,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.2692,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P020_Book_03",
@@ -20494,8 +20494,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.3986,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P021_Potion_04",
@@ -20506,8 +20506,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.1258,
+        "minY": 0.0028
       },
       {
         "assetId": "tidehold_parts/shop_b/P022_Potion_04",
@@ -20518,8 +20518,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.0006,
+        "minY": 0.0643
       },
       {
         "assetId": "tidehold_parts/shop_b/P023_Book_03",
@@ -20530,8 +20530,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.3989,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P024_Potion_01",
@@ -20542,8 +20542,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.2692,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P025_Potion_07",
@@ -20554,8 +20554,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.2693,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P026_Potion_04",
@@ -20566,8 +20566,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.1258,
+        "minY": 0.0028
       },
       {
         "assetId": "tidehold_parts/shop_b/P027_Potion_01",
@@ -20578,8 +20578,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.2692,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P028_Book_03",
@@ -20590,8 +20590,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.4058,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P029_Potion_04",
@@ -20602,8 +20602,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.0006,
+        "minY": 0.0643
       },
       {
         "assetId": "tidehold_parts/shop_b/P030_Potion_04",
@@ -20614,7 +20614,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
+        "maxDim": 0.1284,
         "minY": 0.0002
       },
       {
@@ -20626,8 +20626,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2546,
-        "minY": 0
+        "maxDim": 0.255,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/shop_b/P032_Potion_04",
@@ -20638,8 +20638,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.1258,
+        "minY": 0.0028
       },
       {
         "assetId": "tidehold_parts/shop_b/P033_Bottle_04",
@@ -20650,8 +20650,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3152,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/shop_b/P034_Potion_04",
@@ -20662,7 +20662,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
+        "maxDim": 0.1286,
         "minY": 0.0002
       },
       {
@@ -20674,8 +20674,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.4063,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P036_Potion_01",
@@ -20686,8 +20686,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.0006,
+        "minY": 0.1348
       },
       {
         "assetId": "tidehold_parts/shop_b/P037_Potion_04",
@@ -20698,7 +20698,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
+        "maxDim": 0.1286,
         "minY": 0.0002
       },
       {
@@ -20710,8 +20710,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2546,
-        "minY": 0
+        "maxDim": 0.2549,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/shop_b/P039_Potion_04",
@@ -20722,8 +20722,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.126,
+        "minY": 0.0028
       },
       {
         "assetId": "tidehold_parts/shop_b/P040_Book_03",
@@ -20735,7 +20735,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.3985,
-        "minY": 0
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P041_Potion_02",
@@ -20746,8 +20746,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2546,
-        "minY": 0
+        "maxDim": 0.2549,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/shop_b/P042_Bottle_01",
@@ -20758,8 +20758,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.3333,
+        "minY": 0.0005
       },
       {
         "assetId": "tidehold_parts/shop_b/P043_Potion_02",
@@ -20770,8 +20770,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2546,
-        "minY": 0
+        "maxDim": 0.0006,
+        "minY": 0.127
       },
       {
         "assetId": "tidehold_parts/shop_b/P044_Potion_04",
@@ -20782,7 +20782,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
+        "maxDim": 0.1286,
         "minY": 0.0002
       },
       {
@@ -20794,7 +20794,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
+        "maxDim": 0.1286,
         "minY": 0.0002
       },
       {
@@ -20806,8 +20806,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2546,
-        "minY": 0
+        "maxDim": 0.252,
+        "minY": 0.0032
       },
       {
         "assetId": "tidehold_parts/shop_b/P047_Bottle_01",
@@ -20818,7 +20818,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
+        "maxDim": 0.3336,
         "minY": 0.0004
       },
       {
@@ -20830,8 +20830,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2546,
-        "minY": 0
+        "maxDim": 0.2549,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P049_Bottle_01",
@@ -20842,7 +20842,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
+        "maxDim": 0.3336,
         "minY": 0.0004
       },
       {
@@ -20854,8 +20854,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.0006,
+        "minY": 0.1348
       },
       {
         "assetId": "tidehold_parts/shop_b/P051_Potion_04",
@@ -20866,8 +20866,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.1286,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P052_Potion_04",
@@ -20878,8 +20878,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.1286,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P053_Bottle_04",
@@ -20890,8 +20890,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3161,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/shop_b/P054_Potion_04",
@@ -20902,8 +20902,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.126,
+        "minY": 0.0028
       },
       {
         "assetId": "tidehold_parts/shop_b/P055_Book_03",
@@ -20914,7 +20914,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
+        "maxDim": 0.3987,
         "minY": 0
       },
       {
@@ -20926,8 +20926,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3159,
+        "minY": 0.0006
       },
       {
         "assetId": "tidehold_parts/shop_b/P057_Potion_01",
@@ -20938,8 +20938,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.0006,
+        "minY": 0.1348
       },
       {
         "assetId": "tidehold_parts/shop_b/P058_Book_03",
@@ -20962,8 +20962,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3157,
+        "minY": 0.0006
       },
       {
         "assetId": "tidehold_parts/shop_b/P060_Bottle_01",
@@ -20974,8 +20974,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.3339,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P061_Potion_04",
@@ -20986,8 +20986,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.1259,
+        "minY": 0.0027
       },
       {
         "assetId": "tidehold_parts/shop_b/P062_Book_03",
@@ -20998,8 +20998,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.3989,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P063_Potion_02",
@@ -21010,8 +21010,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2546,
-        "minY": 0
+        "maxDim": 0.2521,
+        "minY": 0.003
       },
       {
         "assetId": "tidehold_parts/shop_b/P064_Potion_01",
@@ -21022,8 +21022,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.0006,
+        "minY": 0.1348
       },
       {
         "assetId": "tidehold_parts/shop_b/P065_Book_03",
@@ -21034,8 +21034,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.3986,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P066_Potion_01",
@@ -21058,8 +21058,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.2692,
+        "minY": -0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P068_Book_03",
@@ -21070,8 +21070,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.399,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P069_Potion_04",
@@ -21082,8 +21082,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.1286,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P070_Book_03",
@@ -21094,8 +21094,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.3988,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P071_Potion_04",
@@ -21106,8 +21106,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1287,
-        "minY": 0.0002
+        "maxDim": 0.0006,
+        "minY": 0.0643
       },
       {
         "assetId": "tidehold_parts/shop_b/P072_Potion_01",
@@ -21118,8 +21118,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2702,
-        "minY": 0
+        "maxDim": 0.2692,
+        "minY": -0.0001
       },
       {
         "assetId": "tidehold_parts/shop_b/P073_Book_03",
@@ -21130,8 +21130,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.85,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.398,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/shop_b/P074_Potion_01",
@@ -21154,8 +21154,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.769,
-        "minY": -0.4403
+        "maxDim": 0.7691,
+        "minY": -0.4364
       },
       {
         "assetId": "tidehold_parts/shop_b/P076_Furniture_08",
@@ -21178,7 +21178,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 0.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
+        "maxDim": 0.3986,
         "minY": 0
       },
       {
@@ -21190,8 +21190,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.4,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.3893,
-        "minY": 0
+        "maxDim": 1.3803,
+        "minY": 0.0089
       },
       {
         "assetId": "tidehold_parts/shop_b/P079_Carpet_03",
@@ -21214,8 +21214,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.9731,
-        "minY": 5.42
+        "maxDim": 3.9727,
+        "minY": 5.4197
       }
     ]
   },
@@ -21223,11 +21223,11 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
     "assetId": "tidehold/smithy",
     "building": "smithy",
     "maxDim": 19.797,
-    "minY": -1.0006,
+    "minY": -1.0012,
     "shell": {
       "assetId": "tidehold_parts/smithy/shell",
-      "maxDim": 11.8,
-      "minY": -1
+      "maxDim": 11.7991,
+      "minY": -1.0006
     },
     "pieces": [
       {
@@ -21239,8 +21239,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.84,
-        "minY": 3.25
+        "maxDim": 1.8403,
+        "minY": 3.2499
       },
       {
         "assetId": "tidehold_parts/smithy/P002_shed",
@@ -21251,8 +21251,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 10.6,
-        "minY": -1
+        "maxDim": 10.5994,
+        "minY": -1.0005
       },
       {
         "assetId": "tidehold_parts/smithy/P003_roof",
@@ -21263,8 +21263,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 12.904,
-        "minY": 4.3145
+        "maxDim": 12.922,
+        "minY": 4.3142
       },
       {
         "assetId": "tidehold_parts/smithy/P004_dormer",
@@ -21275,8 +21275,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 6.15
+        "maxDim": 4.1648,
+        "minY": 6.1494
       },
       {
         "assetId": "tidehold_parts/smithy/P005_chimney",
@@ -21287,8 +21287,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 12.78,
-        "minY": -1
+        "maxDim": 12.7807,
+        "minY": -1.0006
       },
       {
         "assetId": "tidehold_parts/smithy/P006_entry",
@@ -21299,8 +21299,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.95,
-        "minY": -0.6
+        "maxDim": 4.9504,
+        "minY": -0.6002
       },
       {
         "assetId": "tidehold_parts/smithy/P007_Furniture_02",
@@ -21335,8 +21335,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.6137,
-        "minY": 0
+        "maxDim": 2.5965,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/smithy/P010_Weapon_01",
@@ -21347,8 +21347,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.1839,
-        "minY": -0.1334
+        "maxDim": 1.1392,
+        "minY": -0.0897
       },
       {
         "assetId": "tidehold_parts/smithy/P011_Helmet_01",
@@ -21359,7 +21359,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3528,
+        "maxDim": 0.353,
         "minY": -0.0761
       },
       {
@@ -21371,8 +21371,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.1487,
-        "minY": -0.1303
+        "maxDim": 1.1129,
+        "minY": -0.0944
       },
       {
         "assetId": "tidehold_parts/smithy/P013_Blacksmith_07",
@@ -21383,8 +21383,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.8164,
-        "minY": -0.4079
+        "maxDim": 0.8234,
+        "minY": -0.4116
       },
       {
         "assetId": "tidehold_parts/smithy/P014_Shield_02",
@@ -21395,8 +21395,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7011,
-        "minY": -0.3508
+        "maxDim": 0.7012,
+        "minY": -0.3507
       },
       {
         "assetId": "tidehold_parts/smithy/P015_Shield_03",
@@ -21419,8 +21419,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7011,
-        "minY": -0.3508
+        "maxDim": 0.7012,
+        "minY": -0.3507
       },
       {
         "assetId": "tidehold_parts/smithy/P017_Weapon_03",
@@ -21431,8 +21431,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.4692,
-        "minY": -0.7102
+        "maxDim": 1.4662,
+        "minY": -0.7103
       },
       {
         "assetId": "tidehold_parts/smithy/P018_Weapon_04",
@@ -21443,8 +21443,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8933,
-        "minY": -0.3998
+        "maxDim": 1.8862,
+        "minY": -0.3922
       },
       {
         "assetId": "tidehold_parts/smithy/P019_Weapon_03",
@@ -21455,8 +21455,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.4692,
-        "minY": -0.7102
+        "maxDim": 1.4662,
+        "minY": -0.7103
       },
       {
         "assetId": "tidehold_parts/smithy/P020_Box_02",
@@ -21479,8 +21479,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.8145,
-        "minY": -0.4053
+        "maxDim": 0.8147,
+        "minY": -0.4052
       },
       {
         "assetId": "tidehold_parts/smithy/P022_Chest_01",
@@ -21491,8 +21491,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9273,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/smithy/P023_forge",
@@ -21503,8 +21503,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.758,
-        "minY": -0.0066
+        "maxDim": 4.7521,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/smithy/P024_coal_hearth",
@@ -21515,8 +21515,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.4554,
-        "minY": 0
+        "maxDim": 1.4484,
+        "minY": 0.0042
       },
       {
         "assetId": "tidehold_parts/smithy/P025_anvil",
@@ -21527,8 +21527,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9973,
-        "minY": -0.1005
+        "maxDim": 0.997,
+        "minY": -0.1001
       },
       {
         "assetId": "tidehold_parts/smithy/P026_grindstone",
@@ -21539,8 +21539,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.6014,
-        "minY": 0
+        "maxDim": 1.6017,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/smithy/P027_barrel",
@@ -21551,8 +21551,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7655,
+        "minY": -0.0002
       }
     ]
   },
@@ -21560,7 +21560,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
     "assetId": "tidehold/tavern",
     "building": "tavern",
     "maxDim": 22.6483,
-    "minY": -0.9999,
+    "minY": -1,
     "shell": {
       "assetId": "tidehold_parts/tavern/shell",
       "maxDim": 20.8,
@@ -21576,8 +21576,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 12.4,
-        "minY": 3.65
+        "maxDim": 12.3999,
+        "minY": 3.6471
       },
       {
         "assetId": "tidehold_parts/tavern/P002_upper",
@@ -21588,8 +21588,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 20.52,
-        "minY": 4.3035
+        "maxDim": 20.2595,
+        "minY": 4.303
       },
       {
         "assetId": "tidehold_parts/tavern/P003_loft",
@@ -21600,8 +21600,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.7,
-        "minY": 7.75
+        "maxDim": 1.7016,
+        "minY": 7.7482
       },
       {
         "assetId": "tidehold_parts/tavern/P004_roof",
@@ -21624,8 +21624,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.65
+        "maxDim": 4.1652,
+        "minY": 10.6494
       },
       {
         "assetId": "tidehold_parts/tavern/P006_dormer_001",
@@ -21636,8 +21636,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.65
+        "maxDim": 4.1652,
+        "minY": 10.6494
       },
       {
         "assetId": "tidehold_parts/tavern/P007_dormer_002",
@@ -21648,8 +21648,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.65
+        "maxDim": 4.1652,
+        "minY": 10.6494
       },
       {
         "assetId": "tidehold_parts/tavern/P008_dormer_003",
@@ -21660,8 +21660,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
-        "minY": 10.65
+        "maxDim": 4.1652,
+        "minY": 10.6494
       },
       {
         "assetId": "tidehold_parts/tavern/P009_chimney",
@@ -21672,8 +21672,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 18.78,
-        "minY": -1
+        "maxDim": 18.7797,
+        "minY": -0.9999
       },
       {
         "assetId": "tidehold_parts/tavern/P010_entry",
@@ -21684,8 +21684,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 7.09,
-        "minY": -0.6
+        "maxDim": 7.0909,
+        "minY": -0.5999
       },
       {
         "assetId": "tidehold_parts/tavern/P011_BarCounter_01",
@@ -21696,8 +21696,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 5.3561,
+        "minY": -0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P012_BarCounter_01",
@@ -21708,8 +21708,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 1.2499,
+        "minY": 0.1498
       },
       {
         "assetId": "tidehold_parts/tavern/P013_BarCounter_01",
@@ -21720,8 +21720,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 0.0006,
+        "minY": 0.5247
       },
       {
         "assetId": "tidehold_parts/tavern/P014_BarCounter_01",
@@ -21744,7 +21744,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.05,
+        "maxDim": 1.0499,
         "minY": 0
       },
       {
@@ -21756,7 +21756,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.05,
+        "maxDim": 1.0499,
         "minY": 0
       },
       {
@@ -21768,7 +21768,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3,
+        "maxDim": 2.2999,
         "minY": 0
       },
       {
@@ -21780,7 +21780,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3,
+        "maxDim": 2.2999,
         "minY": 0
       },
       {
@@ -21792,7 +21792,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5631,
+        "maxDim": 1.5629,
         "minY": 0
       },
       {
@@ -21804,7 +21804,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5631,
+        "maxDim": 1.5628,
         "minY": 0
       },
       {
@@ -21816,8 +21816,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7711,
+        "minY": -0.0019
       },
       {
         "assetId": "tidehold_parts/tavern/P022_Barrel_01",
@@ -21828,8 +21828,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7714,
+        "minY": -0.0022
       },
       {
         "assetId": "tidehold_parts/tavern/P023_Barrel_01",
@@ -21840,8 +21840,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7711,
+        "minY": -0.0019
       },
       {
         "assetId": "tidehold_parts/tavern/P024_Bottle_01",
@@ -21852,7 +21852,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
+        "maxDim": 0.3337,
         "minY": 0.0004
       },
       {
@@ -21864,8 +21864,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.201,
+        "minY": -0.0007
       },
       {
         "assetId": "tidehold_parts/tavern/P026_Bottle_04",
@@ -21876,8 +21876,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3154,
+        "minY": 0.0006
       },
       {
         "assetId": "tidehold_parts/tavern/P027_Cup_03",
@@ -21888,8 +21888,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2389,
-        "minY": 0
+        "maxDim": 0.2385,
+        "minY": -0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P028_Furniture_08",
@@ -21900,7 +21900,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
+        "maxDim": 0.5147,
         "minY": 0
       },
       {
@@ -21912,7 +21912,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
+        "maxDim": 0.5151,
         "minY": 0
       },
       {
@@ -21924,7 +21924,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
+        "maxDim": 0.5171,
         "minY": 0
       },
       {
@@ -21936,7 +21936,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
+        "maxDim": 0.5142,
         "minY": 0
       },
       {
@@ -21948,7 +21948,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
+        "maxDim": 0.5147,
         "minY": 0
       },
       {
@@ -21960,8 +21960,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 2.6,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 1.2503,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P034_Furniture_12",
@@ -21972,7 +21972,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
+        "maxDim": 2.0074,
         "minY": 0.0013
       },
       {
@@ -21996,7 +21996,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
+        "maxDim": 2.0131,
         "minY": 0.0013
       },
       {
@@ -22008,7 +22008,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
+        "maxDim": 2.0058,
         "minY": 0.0013
       },
       {
@@ -22020,8 +22020,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2111,
-        "minY": 0.073
+        "maxDim": 0.0006,
+        "minY": 0.078
       },
       {
         "assetId": "tidehold_parts/tavern/P039_Cup_02",
@@ -22032,8 +22032,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.2009,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/tavern/P040_Candle_03",
@@ -22044,8 +22044,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5556,
-        "minY": 0.0049
+        "maxDim": 0.5553,
+        "minY": 0.005
       },
       {
         "assetId": "tidehold_parts/tavern/P041_Table_02",
@@ -22068,7 +22068,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
+        "maxDim": 2.0132,
         "minY": 0.0013
       },
       {
@@ -22080,7 +22080,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
+        "maxDim": 2.006,
         "minY": 0.0013
       },
       {
@@ -22092,8 +22092,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2111,
-        "minY": 0.073
+        "maxDim": 0.0006,
+        "minY": 0.078
       },
       {
         "assetId": "tidehold_parts/tavern/P045_Cup_02",
@@ -22104,8 +22104,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.2009,
+        "minY": -0.0004
       },
       {
         "assetId": "tidehold_parts/tavern/P046_Candle_03",
@@ -22116,8 +22116,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5556,
-        "minY": 0.0049
+        "maxDim": 0.5553,
+        "minY": 0.005
       },
       {
         "assetId": "tidehold_parts/tavern/P047_Table_01",
@@ -22128,7 +22128,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8338,
+        "maxDim": 1.8271,
         "minY": 0
       },
       {
@@ -22140,7 +22140,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
+        "maxDim": 0.5147,
         "minY": 0
       },
       {
@@ -22152,7 +22152,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
+        "maxDim": 0.5147,
         "minY": 0
       },
       {
@@ -22164,7 +22164,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8776,
+        "maxDim": 1.8719,
         "minY": 0
       },
       {
@@ -22177,7 +22177,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.7011,
-        "minY": -0.3508
+        "minY": -0.3509
       },
       {
         "assetId": "tidehold_parts/tavern/P052_Bed_02",
@@ -22188,8 +22188,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": 0
+        "maxDim": 2.3774,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P053_Bed_03",
@@ -22200,8 +22200,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": -0.0001
+        "maxDim": 2.3774,
+        "minY": 0
       },
       {
         "assetId": "tidehold_parts/tavern/P054_Chest_01",
@@ -22212,8 +22212,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9273,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P055_Bed_02",
@@ -22224,8 +22224,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": 0
+        "maxDim": 2.3774,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P056_Bed_03",
@@ -22236,8 +22236,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": -0.0001
+        "maxDim": 2.3774,
+        "minY": 0
       },
       {
         "assetId": "tidehold_parts/tavern/P057_Chest_01",
@@ -22249,7 +22249,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.9272,
-        "minY": 0
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P058_Bed_02",
@@ -22260,8 +22260,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": 0
+        "maxDim": 2.3774,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P059_Bed_03",
@@ -22272,8 +22272,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": -0.0001
+        "maxDim": 2.3774,
+        "minY": 0
       },
       {
         "assetId": "tidehold_parts/tavern/P060_Chest_01",
@@ -22285,7 +22285,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.9272,
-        "minY": 0
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P061_Furniture_04",
@@ -22296,8 +22296,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.8223,
-        "minY": 0
+        "maxDim": 0.8225,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P062_Candle_04",
@@ -22308,8 +22308,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3163,
-        "minY": 0.5043
+        "maxDim": 0.044,
+        "minY": 0.5676
       },
       {
         "assetId": "tidehold_parts/tavern/P063_Furniture_04",
@@ -22320,8 +22320,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.8223,
-        "minY": 0
+        "maxDim": 0.8224,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P064_Candle_04",
@@ -22332,8 +22332,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3163,
-        "minY": 0.5043
+        "maxDim": 0.044,
+        "minY": 0.5676
       },
       {
         "assetId": "tidehold_parts/tavern/P065_Table_01",
@@ -22344,8 +22344,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8338,
-        "minY": 0
+        "maxDim": 1.8279,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P066_Furniture_08",
@@ -22356,8 +22356,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.5146,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P067_Book_03",
@@ -22368,8 +22368,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3985,
-        "minY": 0
+        "maxDim": 0.3989,
+        "minY": -0.0002
       },
       {
         "assetId": "tidehold_parts/tavern/P068_Carpet_05",
@@ -22392,8 +22392,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.0369,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern/P070_barrel",
@@ -22404,8 +22404,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7684,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/tavern/P071_barrel",
@@ -22416,8 +22416,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7684,
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/tavern/P072_flowers",
@@ -22428,8 +22428,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 15.3093,
-        "minY": 6.37
+        "maxDim": 15.3094,
+        "minY": 6.371
       }
     ]
   },
@@ -22437,7 +22437,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
     "assetId": "tidehold/tavern_b",
     "building": "tavern_b",
     "maxDim": 30.262,
-    "minY": -1.0009,
+    "minY": -1.0007,
     "shell": {
       "assetId": "tidehold_parts/tavern_b/shell",
       "maxDim": 26.8,
@@ -22453,8 +22453,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 14.84,
-        "minY": 3.65
+        "maxDim": 14.8398,
+        "minY": 3.6481
       },
       {
         "assetId": "tidehold_parts/tavern_b/P002_upper",
@@ -22465,8 +22465,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 26.52,
-        "minY": 4.3035
+        "maxDim": 26.261,
+        "minY": 4.3037
       },
       {
         "assetId": "tidehold_parts/tavern_b/P003_loft",
@@ -22477,8 +22477,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.7,
-        "minY": 7.75
+        "maxDim": 1.7036,
+        "minY": 7.7458
       },
       {
         "assetId": "tidehold_parts/tavern_b/P004_roof",
@@ -22501,7 +22501,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
+        "maxDim": 4.1654,
         "minY": 10.65
       },
       {
@@ -22513,7 +22513,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
+        "maxDim": 4.1654,
         "minY": 10.65
       },
       {
@@ -22525,7 +22525,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
+        "maxDim": 4.1654,
         "minY": 10.65
       },
       {
@@ -22537,7 +22537,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
+        "maxDim": 4.1654,
         "minY": 10.65
       },
       {
@@ -22549,7 +22549,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 4.165,
+        "maxDim": 4.1654,
         "minY": 10.65
       },
       {
@@ -22573,8 +22573,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 20.66,
-        "minY": -1
+        "maxDim": 20.5904,
+        "minY": -1.0008
       },
       {
         "assetId": "tidehold_parts/tavern_b/P012_entry",
@@ -22585,8 +22585,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1,
         "sy": 1,
         "sz": 1,
-        "maxDim": 7.09,
-        "minY": -0.6
+        "maxDim": 7.0887,
+        "minY": -0.5992
       },
       {
         "assetId": "tidehold_parts/tavern_b/P013_BarCounter_01",
@@ -22597,8 +22597,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 6.2502,
+        "minY": 0.0005
       },
       {
         "assetId": "tidehold_parts/tavern_b/P014_BarCounter_01",
@@ -22609,8 +22609,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 0.0006,
+        "minY": 0.5247
       },
       {
         "assetId": "tidehold_parts/tavern_b/P015_BarCounter_01",
@@ -22621,8 +22621,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 0.7522,
+        "minY": 0.1503
       },
       {
         "assetId": "tidehold_parts/tavern_b/P016_BarCounter_01",
@@ -22633,8 +22633,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 0.7522,
+        "minY": 0.1503
       },
       {
         "assetId": "tidehold_parts/tavern_b/P017_BarCounter_01",
@@ -22645,8 +22645,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.25,
-        "minY": 0
+        "maxDim": 1.2507,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P018_BarCounter_02",
@@ -22657,8 +22657,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.05,
-        "minY": 0
+        "maxDim": 1.0493,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P019_BarCounter_02",
@@ -22669,8 +22669,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.05,
-        "minY": 0
+        "maxDim": 1.0493,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P020_Furniture_03",
@@ -22681,8 +22681,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3,
-        "minY": 0
+        "maxDim": 2.2997,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P021_Furniture_03",
@@ -22693,8 +22693,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3,
-        "minY": 0
+        "maxDim": 2.2997,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P022_Furniture_05",
@@ -22705,8 +22705,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5631,
-        "minY": 0
+        "maxDim": 1.5628,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P023_Furniture_05",
@@ -22717,8 +22717,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5631,
-        "minY": 0
+        "maxDim": 1.5634,
+        "minY": 0.0005
       },
       {
         "assetId": "tidehold_parts/tavern_b/P024_Barrel_01",
@@ -22729,8 +22729,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.7721,
+        "minY": -0.0007
       },
       {
         "assetId": "tidehold_parts/tavern_b/P025_Barrel_01",
@@ -22741,7 +22741,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
+        "maxDim": 0.7707,
         "minY": 0
       },
       {
@@ -22753,7 +22753,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
+        "maxDim": 0.7691,
         "minY": 0
       },
       {
@@ -22765,8 +22765,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.334,
+        "minY": 0.0001
       },
       {
         "assetId": "tidehold_parts/tavern_b/P028_Cup_01",
@@ -22777,8 +22777,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.2,
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P029_Bottle_04",
@@ -22789,8 +22789,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3149,
-        "minY": 0.0005
+        "maxDim": 0.3153,
+        "minY": 0.0008
       },
       {
         "assetId": "tidehold_parts/tavern_b/P030_Cup_03",
@@ -22801,8 +22801,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2389,
-        "minY": 0
+        "maxDim": 0.2385,
+        "minY": -0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P031_Bottle_01",
@@ -22813,8 +22813,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3335,
-        "minY": 0.0004
+        "maxDim": 0.3342,
+        "minY": 0
       },
       {
         "assetId": "tidehold_parts/tavern_b/P032_Furniture_08",
@@ -22825,8 +22825,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.5108,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P033_Furniture_08",
@@ -22837,8 +22837,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.5083,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P034_Furniture_08",
@@ -22849,8 +22849,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.512,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P035_Furniture_08",
@@ -22861,8 +22861,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.5085,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P036_Furniture_08",
@@ -22873,8 +22873,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.5084,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P037_Carpet_02",
@@ -22897,8 +22897,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
-        "minY": 0.0013
+        "maxDim": 2.0043,
+        "minY": 0.0017
       },
       {
         "assetId": "tidehold_parts/tavern_b/P039_Table_02",
@@ -22909,8 +22909,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.6137,
-        "minY": 0
+        "maxDim": 2.5965,
+        "minY": 0.0005
       },
       {
         "assetId": "tidehold_parts/tavern_b/P040_Furniture_12",
@@ -22921,8 +22921,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
-        "minY": 0.0013
+        "maxDim": 2.0037,
+        "minY": 0.0017
       },
       {
         "assetId": "tidehold_parts/tavern_b/P041_Furniture_12",
@@ -22933,8 +22933,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
-        "minY": 0.0013
+        "maxDim": 2,
+        "minY": 0.0017
       },
       {
         "assetId": "tidehold_parts/tavern_b/P042_PlateFood_01",
@@ -22945,8 +22945,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2111,
-        "minY": 0.073
+        "maxDim": 0.0006,
+        "minY": 0.078
       },
       {
         "assetId": "tidehold_parts/tavern_b/P043_Cup_02",
@@ -22957,8 +22957,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.201,
+        "minY": -0.0007
       },
       {
         "assetId": "tidehold_parts/tavern_b/P044_Candle_03",
@@ -22969,8 +22969,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5556,
-        "minY": 0.0049
+        "maxDim": 0.5558,
+        "minY": 0.0047
       },
       {
         "assetId": "tidehold_parts/tavern_b/P045_Table_02",
@@ -22981,8 +22981,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.6137,
-        "minY": 0
+        "maxDim": 2.5967,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P046_Furniture_12",
@@ -22993,8 +22993,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
-        "minY": 0.0013
+        "maxDim": 2.0015,
+        "minY": 0.0018
       },
       {
         "assetId": "tidehold_parts/tavern_b/P047_Furniture_12",
@@ -23005,8 +23005,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
-        "minY": 0.0013
+        "maxDim": 2.0015,
+        "minY": 0.0018
       },
       {
         "assetId": "tidehold_parts/tavern_b/P048_PlateFood_01",
@@ -23017,8 +23017,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2111,
-        "minY": 0.073
+        "maxDim": 0.0006,
+        "minY": 0.078
       },
       {
         "assetId": "tidehold_parts/tavern_b/P049_Cup_02",
@@ -23029,8 +23029,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.2001,
+        "minY": -0.0007
       },
       {
         "assetId": "tidehold_parts/tavern_b/P050_Candle_03",
@@ -23041,8 +23041,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5556,
-        "minY": 0.0049
+        "maxDim": 0.5558,
+        "minY": 0.0047
       },
       {
         "assetId": "tidehold_parts/tavern_b/P051_Table_02",
@@ -23053,8 +23053,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.6137,
-        "minY": 0
+        "maxDim": 2.5967,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P052_Furniture_12",
@@ -23065,8 +23065,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
-        "minY": 0.0013
+        "maxDim": 2.0015,
+        "minY": 0.0018
       },
       {
         "assetId": "tidehold_parts/tavern_b/P053_Furniture_12",
@@ -23077,8 +23077,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.0036,
-        "minY": 0.0013
+        "maxDim": 2.0017,
+        "minY": 0.0017
       },
       {
         "assetId": "tidehold_parts/tavern_b/P054_PlateFood_01",
@@ -23089,8 +23089,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.2111,
-        "minY": 0.073
+        "maxDim": 0.0006,
+        "minY": 0.078
       },
       {
         "assetId": "tidehold_parts/tavern_b/P055_Cup_02",
@@ -23101,8 +23101,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.1999,
-        "minY": 0
+        "maxDim": 0.2001,
+        "minY": -0.0006
       },
       {
         "assetId": "tidehold_parts/tavern_b/P056_Candle_03",
@@ -23113,8 +23113,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5556,
-        "minY": 0.0049
+        "maxDim": 0.5558,
+        "minY": 0.0047
       },
       {
         "assetId": "tidehold_parts/tavern_b/P057_Table_01",
@@ -23125,8 +23125,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8338,
-        "minY": 0
+        "maxDim": 1.8112,
+        "minY": 0.0005
       },
       {
         "assetId": "tidehold_parts/tavern_b/P058_Furniture_08",
@@ -23137,8 +23137,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.5115,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P059_Furniture_08",
@@ -23149,8 +23149,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.511,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P060_Table_01",
@@ -23161,8 +23161,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8338,
-        "minY": 0
+        "maxDim": 1.8109,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P061_Furniture_08",
@@ -23173,8 +23173,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.5127,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P062_Furniture_08",
@@ -23185,8 +23185,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.5084,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P063_NoticeBoard_01",
@@ -23197,8 +23197,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8776,
-        "minY": 0
+        "maxDim": 1.8713,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P064_Shield_02",
@@ -23209,8 +23209,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7011,
-        "minY": -0.3508
+        "maxDim": 0.7009,
+        "minY": -0.3507
       },
       {
         "assetId": "tidehold_parts/tavern_b/P065_Bed_02",
@@ -23221,8 +23221,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": 0
+        "maxDim": 2.372,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P066_Bed_03",
@@ -23233,8 +23233,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": -0.0001
+        "maxDim": 2.377,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P067_Chest_01",
@@ -23245,8 +23245,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9273,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P068_Bed_02",
@@ -23257,8 +23257,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": 0
+        "maxDim": 2.3771,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P069_Bed_03",
@@ -23269,8 +23269,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": -0.0001
+        "maxDim": 2.3771,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P070_Chest_01",
@@ -23281,8 +23281,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9275,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P071_Bed_02",
@@ -23293,8 +23293,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": 0
+        "maxDim": 2.3716,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P072_Bed_03",
@@ -23305,8 +23305,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 2.3831,
-        "minY": -0.0001
+        "maxDim": 2.377,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P073_Chest_01",
@@ -23317,8 +23317,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.9272,
-        "minY": 0
+        "maxDim": 0.9275,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P074_Furniture_04",
@@ -23330,7 +23330,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.8223,
-        "minY": 0
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P075_Candle_04",
@@ -23341,8 +23341,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3163,
-        "minY": 0.5043
+        "maxDim": 0.0437,
+        "minY": 0.5678
       },
       {
         "assetId": "tidehold_parts/tavern_b/P076_Furniture_04",
@@ -23353,8 +23353,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.8223,
-        "minY": 0
+        "maxDim": 0.8221,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P077_Candle_04",
@@ -23365,8 +23365,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.3163,
-        "minY": 0.5043
+        "maxDim": 0.0437,
+        "minY": 0.5678
       },
       {
         "assetId": "tidehold_parts/tavern_b/P078_Table_01",
@@ -23377,8 +23377,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.8338,
-        "minY": 0
+        "maxDim": 1.8111,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P079_Furniture_08",
@@ -23389,8 +23389,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.5095,
-        "minY": 0
+        "maxDim": 0.5051,
+        "minY": 0.0003
       },
       {
         "assetId": "tidehold_parts/tavern_b/P080_Book_03",
@@ -23402,7 +23402,7 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "sy": 1,
         "sz": 1,
         "maxDim": 0.3985,
-        "minY": 0
+        "minY": 0.0002
       },
       {
         "assetId": "tidehold_parts/tavern_b/P081_Carpet_05",
@@ -23413,8 +23413,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 2.6,
         "sy": 1,
         "sz": 1,
-        "maxDim": 1.5,
-        "minY": 0
+        "maxDim": 1.4999,
+        "minY": 0.0067
       },
       {
         "assetId": "tidehold_parts/tavern_b/P082_bench",
@@ -23425,8 +23425,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 3.0344,
-        "minY": 0
+        "maxDim": 3.0361,
+        "minY": 0.0005
       },
       {
         "assetId": "tidehold_parts/tavern_b/P083_barrel",
@@ -23437,8 +23437,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.9417,
+        "minY": 0.0004
       },
       {
         "assetId": "tidehold_parts/tavern_b/P084_barrel",
@@ -23449,8 +23449,8 @@ export const PREFAB_PIECES: readonly PrefabPiecesDef[] = [
         "s": 1.8,
         "sy": 1,
         "sz": 1,
-        "maxDim": 0.7693,
-        "minY": 0
+        "maxDim": 0.9243,
+        "minY": -0.0013
       },
       {
         "assetId": "tidehold_parts/tavern_b/P085_flowers",

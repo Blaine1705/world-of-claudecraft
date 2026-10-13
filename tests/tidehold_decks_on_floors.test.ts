@@ -8,7 +8,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error - shared zero-dep JS tool (no .d.ts); same pattern as tests/i18n_completeness.test.ts.
-import { measureFloors } from '../scripts/assets/tidehold_rebase_overrides.mjs';
+import { floorUnderDeck, measureFloors } from '../scripts/assets/tidehold_rebase_overrides.mjs';
 
 const BUILDINGS = ['castle', 'castle_b', 'hall', 'bank', 'market', 'smithy', 'tavern'];
 
@@ -25,7 +25,10 @@ describe('Tidehold building decks', () => {
         .sort((a, c) => c.hx * c.hz - a.hx * a.hz)[0];
       expect(main, b).toBeTruthy();
       const deck = main.y0 / norm;
-      const floor = m.floors[0].y;
+      // the floor this deck stands on, which is not always the model's LARGEST
+      // plane: the repainted tavern's upper storey has more up-facing area
+      // than its hall
+      const floor = floorUnderDeck(m, deck).y;
       // within a foot of the boards: a deck under the floor sinks the player,
       // one far above floats them.
       expect(
@@ -34,4 +37,20 @@ describe('Tidehold building decks', () => {
       ).toBeLessThan(0.2);
     }
   }, 60000);
+
+  it('judges a deck against a major floor plane only', () => {
+    const plane = (y: number, area: number) => ({ y, area });
+    // the tavern's shape: the upper storey is the largest plane, the hall is
+    // the one the ground deck stands on
+    const tavern = { floors: [plane(6.7, 289), plane(1.5, 220), plane(7.6, 50)] };
+    expect(floorUnderDeck(tavern, 1.45).y).toBe(1.5);
+    // the bug this suite exists for: a deck authored 0.87 yd under the floor
+    // still answers with that floor, so the gap shows
+    const castle = { floors: [plane(1.07, 708), plane(1.17, 369), plane(14.67, 321)] };
+    expect(floorUnderDeck(castle, 0.2).y).toBe(1.07);
+    // and a small plane that happens to lie at the sunk deck's height (a
+    // table top, a tread) never stands in for the floor
+    const withTread = { floors: [plane(1.07, 708), plane(0.2, 100)] };
+    expect(floorUnderDeck(withTread, 0.2).y).toBe(1.07);
+  });
 });
