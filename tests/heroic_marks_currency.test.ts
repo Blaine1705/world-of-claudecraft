@@ -43,6 +43,8 @@ function bagMarks(sim: Sim, pid: number): number {
 
 describe('heroic marks: the pure currency helpers', () => {
   it('names exactly the heroic_mark id as a currency grant', () => {
+    // The persisted save, parcel and vault-claim token: frozen to the legacy item id.
+    expect(HEROIC_MARK_CURRENCY_ID).toBe('heroic_mark');
     expect(isCurrencyGrantId(HEROIC_MARK_CURRENCY_ID)).toBe(true);
     expect(isCurrencyGrantId('wyrmfall_core')).toBe(false);
     expect(isCurrencyGrantId('worn_sword')).toBe(false);
@@ -125,6 +127,12 @@ describe('heroic marks: bag capacity never gates a marks grant', () => {
     const sword = { itemId: 'worn_sword', count: 1 };
     expect(fitsAll(meta.inventory, pools, [sword])).toBe(true);
     expect(fitsAll(meta.inventory, pools, [sword, sword])).toBe(false);
+    // A payload-bearing copy keeps the slot path, so it does not fit full bags.
+    const locked = { itemId: HEROIC_MARK_CURRENCY_ID, count: 1, instance: { locked: true } };
+    meta.inventory.push(sword);
+    expect(countFit(meta.inventory, pools, HEROIC_MARK_CURRENCY_ID, 1, locked.instance)).toBe(0);
+    expect(fitsAll(meta.inventory, pools, [locked])).toBe(false);
+    meta.inventory.pop();
     // Marks first: as a bag item they would have taken the last slot.
     expect(
       fitsAll(meta.inventory, pools, [{ itemId: HEROIC_MARK_CURRENCY_ID, count: 40 }, sword]),

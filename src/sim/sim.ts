@@ -27,7 +27,6 @@ import { offlineActionBarRestore } from './action_bar_restore';
 import { maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {
-  addStacked,
   BAG_SOCKETS,
   bagCapacity,
   bagPools,
@@ -8005,8 +8004,9 @@ export class Sim {
     return inventoryConsumption.countFungibleItem(this.ctx, itemId, pid);
   }
 
-  // Grants are stack-aware (bags.ts addStacked, which never merges into an
-  // instanced slot, #1165) but NEVER capacity-capped here: a grant that reaches
+  // Grants are stack-aware (inventory_grant.ts grantPlainStack: bags.ts addStacked,
+  // never merging into an instanced slot, #1165, or the Heroic Marks counter) but
+  // NEVER capacity-capped here: a grant that reaches
   // this hub always lands, so an async award (loot roll, master loot, delve
   // rewards) can't destroy items. Capacity is enforced by canAddItem pre-checks
   // at the command boundaries instead.

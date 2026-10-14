@@ -417,6 +417,19 @@ describe('heroic vendor buy path', () => {
     ).toBe(true);
   });
 
+  it('sells at exactly the price, spending the balance to zero', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Exact');
+    atQuartermaster(sim, pid);
+    sim.addItem(HEROIC_MARK_CURRENCY_ID, 12, pid);
+    sim.drainEvents();
+
+    sim.buyHeroicVendorItem('seal_of_the_nine_oaths', pid);
+
+    expect(sim.countItem('seal_of_the_nine_oaths', pid)).toBe(1);
+    expect(sim.meta(pid)!.heroicMarks).toBe(0);
+  });
+
   it('refuses when the buyer cannot afford the price, without debiting', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Broke');

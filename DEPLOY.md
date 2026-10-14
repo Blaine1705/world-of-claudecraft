@@ -258,8 +258,11 @@ For off-box safety, sync the directory to S3 occasionally:
   Before rolling back past it, stop every game process and snapshot the balances
   (`CREATE TABLE heroic_marks_rollback AS SELECT id, (state->>'heroicMarks')::int AS
   marks FROM characters WHERE state ? 'heroicMarks';`), then either re-inject them as
-  `heroic_mark` inventory stacks of at most 20 before the old binary starts, or accept
-  the loss explicitly in the release notes.
+  `heroic_mark` inventory stacks of at most 20 AND strip the `heroicMarks` key from the
+  same rows in the same statement (`state - 'heroicMarks'`) before the old binary
+  starts, or accept the loss explicitly in the release notes. Never leave both: a row
+  that keeps the key and gains stacks is folded twice on the next roll forward,
+  doubling its balance.
 - **Farming plot deploy order and rollback (mixed fleet)**: `farmPlots` rides
   `characters.state`, which is written whole, so a server binary that predates the
   farming growth-engine release autosaves the blob WITHOUT `farmPlots` and erases

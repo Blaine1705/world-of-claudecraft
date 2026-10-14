@@ -5404,11 +5404,20 @@ describe('delve self-state mirrors over the wire', () => {
     const snap = lastSnap(fc.sent);
     expect(snap.self.hmarks).toBe(6);
     const client = bareClient(session.pid);
+    // A marks move no longer echoes through the bags, so the mirror itself must
+    // raise the inventory-changed repaint (quartermaster and Currencies tab).
+    (client as any).invChanged = false;
     (client as any).applySnapshot(snap);
     expect(client.heroicMarks).toBe(6);
+    expect((client as any).invChanged).toBe(true);
     fc.sent.length = 0;
     broadcast(server);
-    expect(lastSnap(fc.sent).self.hmarks).toBeUndefined();
+    const quiet = lastSnap(fc.sent);
+    expect(quiet.self.hmarks).toBeUndefined();
+    (client as any).invChanged = false;
+    (client as any).applySnapshot(quiet);
+    expect(client.heroicMarks).toBe(6);
+    expect((client as any).invChanged).toBe(false);
   });
 
   it('mirrors delveMarks + delveClears + delveDaily to the client when they change', () => {
