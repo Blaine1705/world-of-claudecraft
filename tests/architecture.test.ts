@@ -993,6 +993,9 @@ const RENDER_PURE_CORES = [
   // the gaze eye and veil, the whirlpool, the spark's arcs and the swell.
   'src/render/drowned_temple/temple_trash_fx_core.ts',
   'src/render/drowned_temple/temple_lure_fx_core.ts',
+  // Selthe's Score: a moon tile's six looks, its pips and numeral strokes,
+  // her ward's water and Discord's wave.
+  'src/render/drowned_temple/temple_score_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
   'src/render/ambience_state_core.ts',

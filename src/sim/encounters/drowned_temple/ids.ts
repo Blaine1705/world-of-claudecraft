@@ -313,8 +313,9 @@ export const SELTHE_TUNING = {
   // mechanics ride the row's mechanic factor.
   boltEvery: 2.5,
   /** She gathers the bolt this long before it flies (the gather cue's lead;
-   *  the damage lands on boltEvery). */
-  boltWindup: 0.6,
+   *  the damage lands on boltEvery). One second: her Bolt clip, played at
+   *  double speed, flings the orb on exactly this beat. */
+  boltWindup: 1,
   boltWeaponShare: 0.8,
   boltRange: 45,
   /** After a kick (her aria cut short) she throws no bolt and sings no aria
