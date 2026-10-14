@@ -6,9 +6,26 @@ registration. The existing first referral wins. Legacy referrals are not
 retroactively eligible; their historical membership state is unknown.
 
 Every character on the referred account can claim the seven soulbound pieces.
-Initial admission grants missing pieces automatically. Full bags allow a partial
-grant; Bank > Account > Claim friendship armour retries without duplicating
-pieces already in equipment, bags, bank or courier custody.
+Initial admission grants missing pieces automatically. Full bags allow a partial grant.
+Refer a Friend > Claim friendship armour is the manual recovery action for missing
+pieces, using `createFriendshipArmourClaim`. The shared bank only offers membership
+gear recovery. Referral-screen wiring lives on the integration branch alongside
+that screen; the membership PR supplies the reusable control without importing
+the stamp-card feature. Claims never
+duplicate pieces already in equipment, bags (including overflow), bank or courier
+custody.
+
+Claim-location validation on membership PR #4281 (2026-10-14):
+
+- `node node_modules/vitest/vitest.mjs run tests/friendship_armour_claim.test.ts tests/account_bank_window.test.ts tests/architecture.test.ts --maxWorkers=1`: 123 passed.
+- `node node_modules/vitest/vitest.mjs run --config vitest.browser.config.ts tests/browser/referral_armour.browser.test.ts`: three viewport cases passed after enforcing a 40px claim target.
+- `node node_modules/@typescript/native/bin/tsc --noEmit`: passed.
+- Scoped Biome over the changed source/tests passed; `git diff --check` passed.
+- `GATE_SELECT_BASE=25d238d80f55d85f4a95b0a57653139430fd3e43 GATE_MAX_WORKERS=1 node scripts/gate_select.mjs`: generation, freshness, SFX and security passed. The broad test phase was interrupted before a verdict to continue integration verification; this is not a green merge gate. The earlier Windows path failure documented in `membership-refinements-verification.md` remains unresolved.
+
+The standalone browser control fixture verifies semantics and target size, not
+the destination screen. Integration carries the actual Refer a Friend wiring
+and its screen-level verification separately.
 
 The set uses the membership armour class/specialization budget, scales with the
 wearer's level, and perfects at level 20 into item level 25. The friend does not

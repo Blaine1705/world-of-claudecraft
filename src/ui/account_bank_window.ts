@@ -16,10 +16,10 @@ import { wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 
 export function available(world: IWorld): boolean {
-  return world.player?.membershipActive === true || !!world.player?.referralInviterName;
+  return world.player?.membershipActive === true;
 }
 
-/** The referral claim panel is available without granting member bank reads. */
+/** Only active members request other characters' bank data. */
 export function request(world: IWorld, force = false): void {
   if (world.player?.membershipActive && (force || !world.accountBankInfo))
     world.requestAccountBanks?.();
@@ -38,15 +38,11 @@ export function renderAccountBank(
   pane.setAttribute('role', 'tabpanel');
   pane.setAttribute('aria-labelledby', 'bank-tab-account');
   root.appendChild(pane);
-  if (deps.world().player.membershipActive || deps.world().player.referralInviterName) {
+  if (deps.world().player.membershipActive) {
     const claim = document.createElement('button');
     claim.type = 'button';
     claim.className = 'btn ui-btn';
-    claim.textContent = t(
-      deps.world().player.membershipActive
-        ? 'hudChrome.bank.accountArmour'
-        : 'hudChrome.bank.referralArmour',
-    );
+    claim.textContent = t('hudChrome.bank.accountArmour');
     claim.dataset.focusKey = 'account-armour';
     claim.addEventListener('click', () => deps.world().claimMembershipArmour());
     pane.appendChild(claim);

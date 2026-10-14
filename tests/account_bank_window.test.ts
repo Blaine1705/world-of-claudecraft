@@ -55,11 +55,11 @@ function setup(selected = false) {
 }
 
 describe('other character banks', () => {
-  it('hides stale member bank data after expiry while retaining the friendship claim', () => {
+  it('hides stale member bank data and referral claiming after expiry', () => {
     const { world, root, repaint, deps } = setup(true);
     Object.assign(world.player, { membershipActive: false, referralInviterName: 'Aldric' });
     renderAccountBank(root, deps, repaint);
-    expect(root.querySelector('[data-focus-key="account-armour"]')).not.toBeNull();
+    expect(root.querySelector('[data-focus-key="account-armour"]')).toBeNull();
     expect(root.querySelector('.account-bank-tab')).toBeNull();
     expect(root.querySelector('.bank-grid')).toBeNull();
   });
@@ -104,7 +104,7 @@ describe('other character banks', () => {
     root.querySelector<HTMLButtonElement>('[data-focus-key="account-armour"]')!.click();
     expect(world.claimMembershipArmour).toHaveBeenCalledOnce();
   });
-  it('lets an entitled nonmember retry the friendship grant without requesting member bank data', () => {
+  it('does not expose the shared bank to an entitled nonmember', () => {
     const { world, root, deps } = setup();
     Object.assign(world, {
       accountBankInfo: null,
@@ -125,11 +125,9 @@ describe('other character banks', () => {
       moneyHtml: () => '',
     } as BankWindowDeps);
     win.open();
-    root.querySelector<HTMLButtonElement>('[data-tab="account"]')!.click();
-    const claim = root.querySelector<HTMLButtonElement>('[data-focus-key="account-armour"]')!;
-    expect(claim.textContent).toBe('Claim friendship armour');
-    claim.click();
-    expect(world.claimMembershipArmour).toHaveBeenCalledOnce();
+    expect(root.querySelector('[data-tab="account"]')).toBeNull();
+    expect(root.textContent).not.toContain('Claim friendship armour');
+    expect(world.claimMembershipArmour).not.toHaveBeenCalled();
     expect(world.requestAccountBanks).not.toHaveBeenCalled();
     win.close();
   });
