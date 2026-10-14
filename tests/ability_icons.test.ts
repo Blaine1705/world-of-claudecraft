@@ -133,11 +133,12 @@ describe('ability icons', () => {
     // 475: plus Groveheart's Sporemender Form (sporemender_form).
     // 476: plus the druid's Spore Burst (spore_burst).
     // 477: plus the druid's Nature's Boon passive (natures_boon).
-    expect(ids).toHaveLength(477);
+    // 479: plus the Fieldcraft rework glyphs (tactical_camo, play_dead).
+    expect(ids).toHaveLength(479);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('43872bc489ca8b69121821f2a3ef9aadde51cfa26a48ecae43739a94c73c9969');
+    expect(hash).toBe('63720788dd219fbd6dc4a1a9463aeb311c4bd663c7a1ba4fc83fbaf2a3a53dde');
   });
 });

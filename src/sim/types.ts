@@ -631,6 +631,8 @@ export type AuraKind =
   // the existing 'internal_cd' kind instead of a second new kind here.
   | 'hunter_coldsight_read'
   | 'hunter_momentum'
+  // Play Dead (hunter feign death): display-only death; the entity stays alive.
+  | 'feign_death'
   | 'hunter_reentry'
   | 'hunter_bloodtrail'
   // Ice Floes (mage choice row): `value` = cast-time spells left that may be
@@ -3182,6 +3184,9 @@ export type AbilityEffect =
       bleedInterval: number;
       rangedPowerCoeff: number;
       damageMult?: number;
+      /** Arrival slow: the hooked target moves at this multiplier (0.7 = 30% slower). */
+      slowMult?: number;
+      slowDuration?: number;
     }
   | {
       type: 'hunterShrapnel';
@@ -3189,14 +3194,16 @@ export type AbilityEffect =
       primaryMax: number;
       splashMin: number;
       splashMax: number;
-      radius: number;
-      maxTargets: number;
+      /** Cone fired from the hunter's facing: reach in yards and full arc in degrees. */
+      coneRange: number;
+      coneAngleDeg: number;
       spreadTotal: number;
       spreadDuration: number;
       spreadInterval: number;
       damageMult?: number;
     }
   | { type: 'hunterTrailbreak'; distance: number }
+  | { type: 'hunterPlayDead' }
   | { type: 'hunterPackRally'; duration: number; radius: number }
   | {
       type: 'frostjawTrap';

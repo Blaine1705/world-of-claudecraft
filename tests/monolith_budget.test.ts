@@ -561,7 +561,9 @@ const MONOLITHS: MonolithRow[] = [
     // bag's own tooltip line (src/ui/hud/skull_bag/). Exact count, zero slack.
     // Re-pinned after composing both release-batch sides. Exact merged count
     // measured with wc -l, zero slack.
-    ceiling: 18058,
+    // LOWERED 18058 -> 18056 after the Fieldcraft rework composed with the
+    // current release batch. Exact merged count measured with wc -l.
+    ceiling: 18056,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1281,7 +1283,9 @@ const MONOLITHS: MonolithRow[] = [
     // existing v0.45.0 batch. Exact merged count, zero slack.
     // Up to 11634 with the World PvP Skull Bag composed into this release
     // batch. Exact merged count, zero slack.
-    ceiling: 11634,
+    // Up to 11636 with the Fieldcraft rework's SimContext tick hook composed
+    // into the current release batch. Exact merged count, zero slack.
+    ceiling: 11636,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1788,7 +1792,9 @@ const MONOLITHS: MonolithRow[] = [
     // Exact count, zero slack.
     // Re-pinned after composing both release-batch sides. Exact merged count
     // measured with wc -l, zero slack.
-    ceiling: 9766,
+    // LOWERED 9766 -> 9765 after the Fieldcraft rework composed with the
+    // current release batch. Exact merged count measured with wc -l.
+    ceiling: 9765,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

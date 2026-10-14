@@ -21,6 +21,7 @@ import { type Collider, isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from 
 import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/cast_move_gate';
 import { isRooted, isStunned } from './combat/cc';
 import { SPOREMENDER_FORM_KIND, SPOREMENDER_MOVE_SPEED_MULT } from './combat/druid_sporemender';
+import { huntingMomentumSpeedMult } from './combat/hunting_momentum_speed';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { mountMoveSpeedPct } from './content/mounts';
 import { guardAndReportPose } from './finite_pose_guard';
@@ -275,6 +276,9 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     if (a.kind === SPOREMENDER_FORM_KIND) formPace = SPOREMENDER_MOVE_SPEED_MULT;
   }
   speed *= formPassive;
+  // Hunting Momentum (Fieldcraft): +15% per stack, its own layer like the form
+  // passive, so it multiplies the strongest temporary buff instead of losing to it.
+  speed *= huntingMomentumSpeedMult(e.auras);
   // Mounted travel: the active ground mount rides the entity mirror (mountKey,
   // synced over the wire like skin), so the online self-extrapolator predicts
   // mounted speed in lockstep with the server. Additive on top of the buff

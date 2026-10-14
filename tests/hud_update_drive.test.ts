@@ -555,6 +555,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'marks the target-name announcement so a same-named re-target still re-reads; its result is written straight to the target live region, deliberately NOT through the elided writer, and the id gate makes that an event write rather than a per-frame one',
   },
   {
+    call: 'fillTargetHealthText',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetFramePaintAt, now, targetFrameNonSelfIntervalMs(fxTier))",
+    surface: 'none',
+    why: 'fills the target descriptor health text under the Health Text option (dead or playing dead reads Dead); a pure descriptor write the painter call below paints, no DOM touch of its own',
+  },
+  {
     call: 'this.targetFramePainter.paint',
     band: 'frame',
     gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetFramePaintAt, now, targetFrameNonSelfIntervalMs(fxTier))",
@@ -1885,7 +1892,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // its Release input hold is one state-only call.
       // chrome 96 -> 97, none 19 -> 20 after the click-move marker gains its
       // own HUD repaint row while the move-state holder stays state-only.
-    ).toEqual({ window: 51, chrome: 96, none: 20 });
+      // none 20 -> 21 after Fieldcraft's Play Dead state-only HUD tick.
+      ).toEqual({ window: 51, chrome: 96, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

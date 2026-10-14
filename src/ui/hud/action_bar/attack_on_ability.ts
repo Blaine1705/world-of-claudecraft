@@ -157,6 +157,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   hunterBloodhook: 'damage',
   hunterShrapnel: 'damage',
   hunterTrailbreak: 'other',
+  hunterPlayDead: 'other',
   hunterPackRally: 'other',
   frostjawTrap: 'other',
 };
