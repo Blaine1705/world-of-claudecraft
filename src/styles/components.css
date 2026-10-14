@@ -17233,6 +17233,25 @@
     color: var(--color-debuff-frost);
     --bar-color: var(--color-debuff-frost);
   }
+  /* The Sledge Tusker's bait rework: a lane or soulfire to leave throbs in the hostile
+     tone like every strike; its stuck window is the panel's own gold, beating fast while
+     it is open; a Trample that will end in the ice and the bait's lesson keep the steady
+     gold of a thing to do. */
+  #sanctum-alert.is-trample,
+  #sanctum-alert.is-soulfire {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #sanctum-alert.is-trample .fa-title,
+  #sanctum-alert.is-soulfire .fa-title,
+  #sanctum-alert.is-trample .fa-fill,
+  #sanctum-alert.is-soulfire .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #sanctum-alert.is-stuck {
+    animation: bce-throb 0.45s ease-in-out infinite alternate;
+  }
   /* The Ice Slab's cover hint: calm, never a warning (it is shelter). */
   #sanctum-alert.is-slab {
     border-color: var(--color-friendly);

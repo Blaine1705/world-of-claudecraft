@@ -220,6 +220,10 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.sanctum_ice_block_toss': true,
   'abilityUi.cast.sanctum_tusker_tusk_sweep': true,
   'abilityUi.cast.sanctum_tusker_trample': true,
+  // The Tusker's bait rework: the clocks its encounter objects carry (a
+  // soulfire trail burning down, an outcrop holding its tusks).
+  'abilityUi.cast.sanctum_soulfire_trail_burn': true,
+  'abilityUi.cast.sanctum_ice_outcrop_held': true,
   // The Sanctum trash mechanics pass (trash_kit/sanctum_cast_ids.ts).
   'abilityUi.cast.sanctum_thaw_the_held': true,
   'abilityUi.cast.sanctum_counterweight_lash': true,

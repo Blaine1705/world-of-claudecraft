@@ -1501,6 +1501,8 @@ const baseEnTable = {
     "The Hollow Ward fails. On the lake, the ice groans under the Wyrm's weight.",
   'log.sanctumTuskerSpill':
     'The sledge tips over! Burning soul braziers spill across the Sledge Road.',
+  // The Tusker's bait rework (sledge_tusker.ts TUSKER_STUCK_LOG, EXACT).
+  'log.sanctumTuskerStuck': 'The Sledge Tusker buries its tusks in the ice. It is stuck!',
   // The rune wall's lore line (encounters/gravewyrm_sanctum/rune_wall.ts
   // RUNE_WALL_LORE_LOG): the wall carries runes, never letters, so this line is
   // where its meaning reaches the player.
@@ -1516,6 +1518,8 @@ const baseEnTable = {
   'mechanic.sanctumTuskSweep': 'Tusk Sweep',
   'mechanic.sanctumTrample': 'Trample',
   'mechanic.sanctumSpilledBraziers': 'Spilled Braziers',
+  'mechanic.sanctumSoulfireTrail': 'Soulfire Trail',
+  'aura.sanctumStuckInTheIce': 'Stuck in the Ice',
   // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts): his lines as
   // the chains come off (EXACT), his mechanic and aura names.
   'log.sanctumKorgathPull': 'The lock holds! No one passes the foreman!',
@@ -18161,6 +18165,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Tusk Sweep': 'mechanic.sanctumTuskSweep',
   Trample: 'mechanic.sanctumTrample',
   'Spilled Braziers': 'mechanic.sanctumSpilledBraziers',
+  'Soulfire Trail': 'mechanic.sanctumSoulfireTrail',
+  'Stuck in the Ice': 'aura.sanctumStuckInTheIce',
   // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts); his Shuddering
   // Stomp and Enrage share the keys above.
   'Maul Arc': 'mechanic.sanctumMaulArc',

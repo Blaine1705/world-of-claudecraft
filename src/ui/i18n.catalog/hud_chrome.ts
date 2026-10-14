@@ -5461,6 +5461,10 @@ export const hudChromeStrings = {
       creepingRime:
         'Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.',
       icedOver: 'Frozen solid by Creeping Rime: unable to move or act.',
+      // The Sledge Tusker's bait rework. Wordy (M16): non-Latin fills in the overlays.
+      tuskerStuck:
+        'Its tusks are buried in an ice outcrop. It cannot move or attack for {seconds} sec, then it breaks free and the outcrop shatters.',
+      tuskerStuckExposed: 'Stuck in an ice outcrop: takes {pct}% more damage.',
     },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
@@ -9693,6 +9697,20 @@ export const hudChromeStrings = {
     // it is for, for its first seconds.
     slabTitle: 'Ice Slab',
     slabLine: 'Put the ice slab between you and enemy casters to block their line of sight',
+    // The Sledge Tusker's bait rework (sanctum_tusker_alert_view.ts). Wordy (M16):
+    // non-Latin fills in the overlays.
+    trampleTitle: 'Trample!',
+    trampleLine: 'Step sideways out of the marked lane before the Tusker charges down it',
+    soulfireTitle: 'Soulfire!',
+    soulfireLine: 'You are standing in burning soulfire. Step off it',
+    stuckTitle: 'The Tusker is stuck!',
+    stuckLine: 'It takes {pct}% more damage until it breaks free: use your strongest attacks now',
+    trampleBaitTitle: 'Charging into the ice',
+    trampleBaitLine:
+      'This Trample ends in an ice outcrop. Stay out of the lane and get ready to attack',
+    baitHintTitle: 'Bait the Trample',
+    baitHintLine:
+      'It charges the farthest player. Stand behind an ice outcrop so the charge runs into it: the Tusker is stuck for {seconds} sec and takes {pct}% more damage',
   },
   // The Hollow Crypt's wing-boss alert (src/ui/hud/dungeon/crypt_alert_view.ts):
   // Sexton Marrow's grave mark and Open Graves, the Lady of the Bonechill's

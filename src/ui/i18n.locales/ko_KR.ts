@@ -21711,4 +21711,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '다른 플레이어가 다음 올바른 음을 울릴 때까지 타일을 울릴 수 없습니다. 진행: {total}개 중 {done}개',
   'hudChrome.auraEffect.temple.spentVoice':
     '다른 플레이어가 다음 올바른 음을 울릴 때까지 달 타일을 울릴 수 없습니다. 이 동안 타일을 밟아도 답이 초기화되거나 피해를 받지 않습니다. 해제할 수 없습니다. 같은 인스턴스에 살아 있는 플레이어가 자신뿐이거나 악보가 끝나면 사라집니다.',
+  // The Sledge Tusker's bait rework (the ice outcrops, Stuck in the Ice, the
+  // soulfire trail): the M16 non-Latin fills of its new English.
+  'hudChrome.sanctumAlert.trampleTitle': '짓밟기!',
+  'hudChrome.sanctumAlert.trampleLine': '거대엄니가 돌진하기 전에 표시된 선에서 옆으로 벗어나라',
+  'hudChrome.sanctumAlert.soulfireTitle': '영혼불!',
+  'hudChrome.sanctumAlert.soulfireLine': '타오르는 영혼불 위에 서 있다. 밖으로 나와라',
+  'hudChrome.sanctumAlert.stuckTitle': '거대엄니가 얼음에 박혔습니다!',
+  'hudChrome.sanctumAlert.stuckLine':
+    '빠져나올 때까지 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 사용하세요',
+  'hudChrome.sanctumAlert.trampleBaitTitle': '얼음으로 돌진합니다',
+  'hudChrome.sanctumAlert.trampleBaitLine':
+    '이번 짓밟기는 얼음 돌출부에 부딪힌다. 선 밖에 머물며 공격을 준비하라',
+  'hudChrome.sanctumAlert.baitHintTitle': '짓밟기를 유인하라',
+  'hudChrome.sanctumAlert.baitHintLine':
+    '가장 멀리 있는 플레이어에게 돌진한다. 얼음 돌출부 뒤에 서서 돌진이 거기에 부딪히게 하라: 거대엄니가 {seconds}초 동안 박혀 움직이지 못하고 받는 피해가 {pct}% 증가한다',
+  'hudChrome.auraEffect.sanctum.tuskerStuck':
+    '엄니가 얼음 돌출부에 박혔습니다. {seconds}초 동안 이동하거나 공격할 수 없으며, 이후 빠져나오면서 돌출부가 부서집니다.',
+  'hudChrome.auraEffect.sanctum.tuskerStuckExposed':
+    '얼음 돌출부에 박힘: 받는 피해가 {pct}% 증가합니다.',
+  'abilityUi.cast.sanctum_soulfire_trail_burn': '연소 중',
+  'abilityUi.cast.sanctum_ice_outcrop_held': '엄니 박힘',
 };

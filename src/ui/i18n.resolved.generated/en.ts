@@ -4236,7 +4236,9 @@ export const en: EnTranslations = {
         "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.",
         "branded": "Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.",
         "creepingRime": "Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.",
-        "icedOver": "Frozen solid by Creeping Rime: unable to move or act."
+        "icedOver": "Frozen solid by Creeping Rime: unable to move or act.",
+        "tuskerStuck": "Its tusks are buried in an ice outcrop. It cannot move or attack for {seconds} sec, then it breaks free and the outcrop shatters.",
+        "tuskerStuckExposed": "Stuck in an ice outcrop: takes {pct}% more damage."
       },
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
       "varkhulSharedPyre": "Deals {total}% of each player's maximum health, divided among players inside the circle ({perPlayer}% each with {players} players). Each missing player also deals {missingPenalty}% of maximum health to the entire raid, including players inside the circle.",
@@ -6739,7 +6741,17 @@ export const en: EnTranslations = {
       "rimeTitle": "Creeping Rime!",
       "rimeLine": "Leave the whelps' breath to avoid freezing solid at full stacks: Creeping Rime {stacks}/{max}",
       "slabTitle": "Ice Slab",
-      "slabLine": "Put the ice slab between you and enemy casters to block their line of sight"
+      "slabLine": "Put the ice slab between you and enemy casters to block their line of sight",
+      "trampleTitle": "Trample!",
+      "trampleLine": "Step sideways out of the marked lane before the Tusker charges down it",
+      "soulfireTitle": "Soulfire!",
+      "soulfireLine": "You are standing in burning soulfire. Step off it",
+      "stuckTitle": "The Tusker is stuck!",
+      "stuckLine": "It takes {pct}% more damage until it breaks free: use your strongest attacks now",
+      "trampleBaitTitle": "Charging into the ice",
+      "trampleBaitLine": "This Trample ends in an ice outcrop. Stay out of the lane and get ready to attack",
+      "baitHintTitle": "Bait the Trample",
+      "baitHintLine": "It charges the farthest player. Stand behind an ice outcrop so the charge runs into it: the Tusker is stuck for {seconds} sec and takes {pct}% more damage"
     },
     "cryptAlert": {
       "measuredTitle": "Measured for the Grave!",
@@ -15053,6 +15065,8 @@ export const en: EnTranslations = {
       "sanctum_ice_block_toss": "Ice Block Toss",
       "sanctum_tusker_tusk_sweep": "Tusk Sweep",
       "sanctum_tusker_trample": "Trample",
+      "sanctum_soulfire_trail_burn": "Burning",
+      "sanctum_ice_outcrop_held": "Tusks Stuck",
       "sanctum_thaw_the_held": "Thaw the Held",
       "sanctum_counterweight_lash": "Counterweight Lash",
       "sanctum_branding_iron": "Branding Iron",

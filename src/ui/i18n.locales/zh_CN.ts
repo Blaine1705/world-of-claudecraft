@@ -20649,4 +20649,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '另一名玩家奏响下一个正确音符前，你无法奏响地砖。已奏响：{done}/{total}',
   'hudChrome.auraEffect.temple.spentVoice':
     '另一名玩家奏响下一个正确音符前，你无法奏响月亮地砖。在此期间踩上地砖不会重置应答，也不会对你造成伤害。无法驱散。当你成为同一副本内唯一存活的玩家或乐谱结束时移除。',
+  // The Sledge Tusker's bait rework (the ice outcrops, Stuck in the Ice, the
+  // soulfire trail): the M16 non-Latin fills of its new English.
+  'hudChrome.sanctumAlert.trampleTitle': '践踏！',
+  'hudChrome.sanctumAlert.trampleLine': '在巨牙兽冲锋之前，从标出的路线向侧面离开',
+  'hudChrome.sanctumAlert.soulfireTitle': '魂火！',
+  'hudChrome.sanctumAlert.soulfireLine': '你正站在燃烧的魂火中。离开它',
+  'hudChrome.sanctumAlert.stuckTitle': '巨牙兽卡住了！',
+  'hudChrome.sanctumAlert.stuckLine': '在它挣脱之前，它受到的伤害提高{pct}%：现在使用你最强的攻击',
+  'hudChrome.sanctumAlert.trampleBaitTitle': '正冲向冰岩',
+  'hudChrome.sanctumAlert.trampleBaitLine': '这次践踏会撞进一块冰岩。不要进入路线，准备攻击',
+  'hudChrome.sanctumAlert.baitHintTitle': '引诱践踏',
+  'hudChrome.sanctumAlert.baitHintLine':
+    '它会冲向最远的玩家。站在冰岩后面，让冲锋撞上冰岩：巨牙兽会被卡住{seconds}秒，受到的伤害提高{pct}%',
+  'hudChrome.auraEffect.sanctum.tuskerStuck':
+    '它的獠牙插进了一块冰岩。{seconds}秒内无法移动或攻击，随后它会挣脱，冰岩随之碎裂。',
+  'hudChrome.auraEffect.sanctum.tuskerStuckExposed': '卡在冰岩里：受到的伤害提高{pct}%。',
+  'abilityUi.cast.sanctum_soulfire_trail_burn': '燃烧中',
+  'abilityUi.cast.sanctum_ice_outcrop_held': '獠牙卡住',
 };

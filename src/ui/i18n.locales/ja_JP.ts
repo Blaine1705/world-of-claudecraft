@@ -21712,4 +21712,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '別のプレイヤーが次の正しい音を鳴らすまで、タイルを鳴らせない。鳴らした数：{total}枚中{done}枚',
   'hudChrome.auraEffect.temple.spentVoice':
     '別のプレイヤーが次の正しい音を鳴らすまで、月のタイルを鳴らせない。この間にタイルを踏んでも答えはリセットされず、ダメージも受けない。解除不可。同じインスタンスで生きているプレイヤーが自分だけになるか、楽譜が終了すると解除される。',
+  // The Sledge Tusker's bait rework (the ice outcrops, Stuck in the Ice, the
+  // soulfire trail): the M16 non-Latin fills of its new English.
+  'hudChrome.sanctumAlert.trampleTitle': '踏みつぶし！',
+  'hudChrome.sanctumAlert.trampleLine': '巨牙獣が突進する前に、描かれた線から横へ出ろ',
+  'hudChrome.sanctumAlert.soulfireTitle': '魂火！',
+  'hudChrome.sanctumAlert.soulfireLine': '燃える魂火の上に立っている。そこから出ろ',
+  'hudChrome.sanctumAlert.stuckTitle': '巨牙獣が氷に刺さった！',
+  'hudChrome.sanctumAlert.stuckLine':
+    '抜け出すまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め',
+  'hudChrome.sanctumAlert.trampleBaitTitle': '氷へ突進する',
+  'hudChrome.sanctumAlert.trampleBaitLine':
+    'この踏みつぶしは氷の露頭に突き当たる。線に入らず、攻撃の準備をしろ',
+  'hudChrome.sanctumAlert.baitHintTitle': '踏みつぶしを誘え',
+  'hudChrome.sanctumAlert.baitHintLine':
+    '最も遠いプレイヤーへ突進する。氷の露頭の後ろに立って突進をぶつけさせろ：巨牙獣は{seconds}秒間動けなくなり、受けるダメージが{pct}%増加する',
+  'hudChrome.auraEffect.sanctum.tuskerStuck':
+    '牙が氷の露頭に刺さっている。{seconds}秒間、移動も攻撃もできない。その後は抜け出し、露頭は砕ける。',
+  'hudChrome.auraEffect.sanctum.tuskerStuckExposed':
+    '氷の露頭に刺さっている：受けるダメージが{pct}%増加。',
+  'abilityUi.cast.sanctum_soulfire_trail_burn': '燃焼中',
+  'abilityUi.cast.sanctum_ice_outcrop_held': '牙が刺さっている',
 };

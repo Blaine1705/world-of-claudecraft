@@ -4236,7 +4236,9 @@ export const zh_TW: EnTranslations = {
         "shardFlare": "心之碎片閃耀：墓穴吐息每{breath}秒一次，振翼狂風每{gale}秒一次。",
         "branded": "每{interval}秒造成{value}點{school}傷害，持續{seconds}秒。踏入融水池可立即將其澆熄。",
         "creepingRime": "移動速度降低{pct}%，每層{per}%。每次霜凇吐息都會疊加一層並將持續時間重置為{seconds}秒。疊到{max}層時你會被凍結（冰封）{freeze}秒，並清除所有層數。",
-        "icedOver": "被蔓延霜凇凍結：無法移動或行動。"
+        "icedOver": "被蔓延霜凇凍結：無法移動或行動。",
+        "tuskerStuck": "牠的獠牙插進了一塊冰岩。{seconds}秒內無法移動或攻擊，隨後牠會掙脫，冰岩隨之碎裂。",
+        "tuskerStuckExposed": "卡在冰岩裡：受到的傷害提高{pct}%。"
       },
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。",
@@ -6739,7 +6741,17 @@ export const zh_TW: EnTranslations = {
       "rimeTitle": "蔓延霜凇！",
       "rimeLine": "蔓延霜凇 {stacks}/{max}：離開幼龍的吐息",
       "slabTitle": "冰塊",
-      "slabLine": "堅冰：它會阻擋視線。躲到它後面，避開施法者的法術"
+      "slabLine": "堅冰：它會阻擋視線。躲到它後面，避開施法者的法術",
+      "trampleTitle": "踐踏！",
+      "trampleLine": "在巨牙獸衝鋒之前，從標出的路線向側面離開",
+      "soulfireTitle": "魂火！",
+      "soulfireLine": "你正站在燃燒的魂火中。離開它",
+      "stuckTitle": "巨牙獸卡住了！",
+      "stuckLine": "在牠掙脫之前，牠受到的傷害提高{pct}%：現在使用你最強的攻擊",
+      "trampleBaitTitle": "正衝向冰岩",
+      "trampleBaitLine": "這次踐踏會撞進一塊冰岩。不要進入路線，準備攻擊",
+      "baitHintTitle": "引誘踐踏",
+      "baitHintLine": "牠會衝向最遠的玩家。站在冰岩後面，讓衝鋒撞上冰岩：巨牙獸會被卡住{seconds}秒，受到的傷害提高{pct}%"
     },
     "cryptAlert": {
       "measuredTitle": "量身定墓！",
@@ -15053,6 +15065,8 @@ export const zh_TW: EnTranslations = {
       "sanctum_ice_block_toss": "投擲冰塊",
       "sanctum_tusker_tusk_sweep": "獠牙橫掃",
       "sanctum_tusker_trample": "踐踏",
+      "sanctum_soulfire_trail_burn": "燃燒中",
+      "sanctum_ice_outcrop_held": "獠牙卡住",
       "sanctum_thaw_the_held": "Thaw the Held",
       "sanctum_counterweight_lash": "配重尾鞭",
       "sanctum_branding_iron": "烙鐵",

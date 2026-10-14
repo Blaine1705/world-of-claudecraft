@@ -22120,4 +22120,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы не можете озвучить плиту, пока другой игрок не сыграет следующую верную ноту. Сыграно: {done} из {total}',
   'hudChrome.auraEffect.temple.spentVoice':
     'Вы не можете озвучить лунную плиту, пока другой игрок не сыграет следующую верную ноту. Наступая на плиту под этим эффектом, вы не сбрасываете ответ и не получаете урон. Нельзя рассеять. Снимается, если вы остались единственным живым игроком в вашем экземпляре подземелья или партитура завершена.',
+  // The Sledge Tusker's bait rework (the ice outcrops, Stuck in the Ice, the
+  // soulfire trail): the M16 non-Latin fills of its new English.
+  'hudChrome.sanctumAlert.trampleTitle': 'Растаптывание!',
+  'hudChrome.sanctumAlert.trampleLine':
+    'Уйдите вбок с отмеченной полосы, пока бивнерог не бросился по ней',
+  'hudChrome.sanctumAlert.soulfireTitle': 'Душевный огонь!',
+  'hudChrome.sanctumAlert.soulfireLine': 'Вы стоите в горящем душевном огне. Выйдите из него',
+  'hudChrome.sanctumAlert.stuckTitle': 'Бивнерог застрял!',
+  'hudChrome.sanctumAlert.stuckLine':
+    'Он получает на {pct}% больше урона, пока не вырвется: используйте сильнейшие атаки сейчас',
+  'hudChrome.sanctumAlert.trampleBaitTitle': 'Рывок в лёд',
+  'hudChrome.sanctumAlert.trampleBaitLine':
+    'Это Растаптывание закончится в ледяном выступе. Не заходите на полосу и готовьтесь атаковать',
+  'hudChrome.sanctumAlert.baitHintTitle': 'Заманите Растаптывание',
+  'hudChrome.sanctumAlert.baitHintLine':
+    'Он бросается на самого дальнего игрока. Встаньте за ледяным выступом, чтобы рывок упёрся в него: бивнерог застрянет на {seconds} сек. и будет получать на {pct}% больше урона',
+  'hudChrome.auraEffect.sanctum.tuskerStuck':
+    'Его бивни увязли в ледяном выступе. Он не может двигаться и атаковать {seconds} сек., затем вырывается, и выступ раскалывается.',
+  'hudChrome.auraEffect.sanctum.tuskerStuckExposed':
+    'Застрял в ледяном выступе: получает на {pct}% больше урона.',
+  'abilityUi.cast.sanctum_soulfire_trail_burn': 'Горит',
+  'abilityUi.cast.sanctum_ice_outcrop_held': 'Бивни увязли',
 };

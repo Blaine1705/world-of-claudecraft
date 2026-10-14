@@ -764,6 +764,9 @@ const mergeStringsEn = {
       sanctum_ice_block_toss: 'Ice Block Toss',
       sanctum_tusker_tusk_sweep: 'Tusk Sweep',
       sanctum_tusker_trample: 'Trample',
+      // The Tusker's bait rework: the clocks on its encounter objects.
+      sanctum_soulfire_trail_burn: 'Burning',
+      sanctum_ice_outcrop_held: 'Tusks Stuck',
       // The Sanctum trash mechanics pass (trash_kit/sanctum_cast_ids.ts). Thaw
       // the Held and Branding Iron can be kicked.
       sanctum_thaw_the_held: 'Thaw the Held',

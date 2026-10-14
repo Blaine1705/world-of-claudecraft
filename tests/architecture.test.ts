@@ -673,6 +673,7 @@ const UI_PURE_CORES = [
   // scene scan.
   'src/ui/hud/dungeon/sanctum_alert_view.ts',
   'src/ui/hud/dungeon/sanctum_alert_scene_core.ts',
+  'src/ui/hud/dungeon/sanctum_tusker_alert_view.ts',
   // The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the
   // Open Grave, Morthen's Rite Ring, the Knell's half, the Toll and Harmony
   // readouts) and its scene scan.

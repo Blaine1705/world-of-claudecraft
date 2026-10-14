@@ -4236,7 +4236,9 @@ export const ja_JP: EnTranslations = {
         "shardFlare": "心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。",
         "branded": "{seconds}秒間、{interval}秒ごとに{value}の{school}ダメージを与える。融け水の池に入るとすぐに消える。",
         "creepingRime": "移動速度が{pct}%低下する（スタック1つにつき{per}%）。霧氷のブレスを受けるたびにスタックが1つ増え、効果時間が{seconds}秒にリセットされる。{max}スタックに達すると{freeze}秒間凍りつき（凍結）、スタックは消える。",
-        "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。"
+        "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。",
+        "tuskerStuck": "牙が氷の露頭に刺さっている。{seconds}秒間、移動も攻撃もできない。その後は抜け出し、露頭は砕ける。",
+        "tuskerStuckExposed": "氷の露頭に刺さっている：受けるダメージが{pct}%増加。"
       },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
@@ -6739,7 +6741,17 @@ export const ja_JP: EnTranslations = {
       "rimeTitle": "忍び寄る霧氷！",
       "rimeLine": "忍び寄る霧氷 {stacks}/{max}：幼竜のブレスから出ろ",
       "slabTitle": "氷塊",
-      "slabLine": "堅い氷：視線を遮る。その陰に隠れて術者の呪文を避けろ"
+      "slabLine": "堅い氷：視線を遮る。その陰に隠れて術者の呪文を避けろ",
+      "trampleTitle": "踏みつぶし！",
+      "trampleLine": "巨牙獣が突進する前に、描かれた線から横へ出ろ",
+      "soulfireTitle": "魂火！",
+      "soulfireLine": "燃える魂火の上に立っている。そこから出ろ",
+      "stuckTitle": "巨牙獣が氷に刺さった！",
+      "stuckLine": "抜け出すまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め",
+      "trampleBaitTitle": "氷へ突進する",
+      "trampleBaitLine": "この踏みつぶしは氷の露頭に突き当たる。線に入らず、攻撃の準備をしろ",
+      "baitHintTitle": "踏みつぶしを誘え",
+      "baitHintLine": "最も遠いプレイヤーへ突進する。氷の露頭の後ろに立って突進をぶつけさせろ：巨牙獣は{seconds}秒間動けなくなり、受けるダメージが{pct}%増加する"
     },
     "cryptAlert": {
       "measuredTitle": "墓の採寸！",
@@ -15053,6 +15065,8 @@ export const ja_JP: EnTranslations = {
       "sanctum_ice_block_toss": "氷塊投げ",
       "sanctum_tusker_tusk_sweep": "牙薙ぎ",
       "sanctum_tusker_trample": "踏みつぶし",
+      "sanctum_soulfire_trail_burn": "燃焼中",
+      "sanctum_ice_outcrop_held": "牙が刺さっている",
       "sanctum_thaw_the_held": "Thaw the Held",
       "sanctum_counterweight_lash": "重り尾の鞭打ち",
       "sanctum_branding_iron": "焼き印",

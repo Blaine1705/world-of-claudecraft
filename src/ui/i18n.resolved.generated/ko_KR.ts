@@ -4236,7 +4236,9 @@ export const ko_KR: EnTranslations = {
         "shardFlare": "심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다.",
         "branded": "{seconds}초 동안 {interval}초마다 {value}의 {school} 피해를 입힙니다. 녹은 물웅덩이에 들어가면 즉시 꺼집니다.",
         "creepingRime": "이동 속도가 {pct}% 감소합니다(중첩당 {per}%). 서리 숨결을 맞을 때마다 1회 중첩되고 지속 시간이 {seconds}초로 초기화됩니다. {max}회 중첩되면 {freeze}초 동안 얼어붙고(빙결) 중첩이 사라집니다.",
-        "icedOver": "스며드는 서리에 얼어붙었습니다: 이동하거나 행동할 수 없습니다."
+        "icedOver": "스며드는 서리에 얼어붙었습니다: 이동하거나 행동할 수 없습니다.",
+        "tuskerStuck": "엄니가 얼음 돌출부에 박혔습니다. {seconds}초 동안 이동하거나 공격할 수 없으며, 이후 빠져나오면서 돌출부가 부서집니다.",
+        "tuskerStuckExposed": "얼음 돌출부에 박힘: 받는 피해가 {pct}% 증가합니다."
       },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
@@ -6739,7 +6741,17 @@ export const ko_KR: EnTranslations = {
       "rimeTitle": "스며드는 서리!",
       "rimeLine": "스며드는 서리 {stacks}/{max}: 새끼용의 숨결에서 벗어나세요",
       "slabTitle": "얼음 덩어리",
-      "slabLine": "단단한 얼음: 시야를 가립니다. 뒤에 숨어 시전자의 주문을 피하세요"
+      "slabLine": "단단한 얼음: 시야를 가립니다. 뒤에 숨어 시전자의 주문을 피하세요",
+      "trampleTitle": "짓밟기!",
+      "trampleLine": "거대엄니가 돌진하기 전에 표시된 선에서 옆으로 벗어나라",
+      "soulfireTitle": "영혼불!",
+      "soulfireLine": "타오르는 영혼불 위에 서 있다. 밖으로 나와라",
+      "stuckTitle": "거대엄니가 얼음에 박혔습니다!",
+      "stuckLine": "빠져나올 때까지 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 사용하세요",
+      "trampleBaitTitle": "얼음으로 돌진합니다",
+      "trampleBaitLine": "이번 짓밟기는 얼음 돌출부에 부딪힌다. 선 밖에 머물며 공격을 준비하라",
+      "baitHintTitle": "짓밟기를 유인하라",
+      "baitHintLine": "가장 멀리 있는 플레이어에게 돌진한다. 얼음 돌출부 뒤에 서서 돌진이 거기에 부딪히게 하라: 거대엄니가 {seconds}초 동안 박혀 움직이지 못하고 받는 피해가 {pct}% 증가한다"
     },
     "cryptAlert": {
       "measuredTitle": "무덤 치수 재기!",
@@ -15053,6 +15065,8 @@ export const ko_KR: EnTranslations = {
       "sanctum_ice_block_toss": "얼음덩이 던지기",
       "sanctum_tusker_tusk_sweep": "엄니 휩쓸기",
       "sanctum_tusker_trample": "짓밟기",
+      "sanctum_soulfire_trail_burn": "연소 중",
+      "sanctum_ice_outcrop_held": "엄니 박힘",
       "sanctum_thaw_the_held": "Thaw the Held",
       "sanctum_counterweight_lash": "평형추 꼬리채찍",
       "sanctum_branding_iron": "낙인 인두",
