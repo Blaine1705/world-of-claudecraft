@@ -49,7 +49,6 @@
 // the cast ids). The stone jaguar's eyes burn while the Avatar aura holds.
 
 import { emitMobYell } from '../../mob/yells';
-import { combatProfileForMob } from '../../mob_combat';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { addThreat } from '../../threat';
@@ -534,6 +533,7 @@ function switchPrey(ctx: SimContext, inst: InstanceSlot, z: Entity, st: ZulgarFi
 
 /** One tick of the hunt: switch, feed, chase, catch. */
 function stepHunt(ctx: SimContext, inst: InstanceSlot, z: Entity, st: ZulgarFightState): void {
+  const previousPreyId = st.preyIds[st.chase] ?? null;
   z.swingTimer = Math.max(z.swingTimer, 0.5);
   if (st.phase === 'hunt') {
     // The idol wakes over a hunt in flight: it simply never ends.
@@ -615,13 +615,22 @@ function stepHunt(ctx: SimContext, inst: InstanceSlot, z: Entity, st: ZulgarFigh
   st.chase = Math.min(st.chase, st.preyIds.length - 1);
   const prey = ctx.entities.get(st.preyIds[st.chase]);
   if (!prey) return;
+  const changedPrey = previousPreyId !== prey.id;
   fixateOn(z, prey, final ? FOREVER : st.huntLeft);
+  // Twin Prey, a death, or a replacement after feeding can put the next
+  // chased player at his feet. Give every changed target the same turn
+  // window as the final phase's scheduled fresh mark.
+  if (changedPrey) {
+    st.feedTimer = T.finalSwitchPause;
+    st.plantedAt = { ...z.pos };
+    if (st.preyIds.length > 1) st.switchTimer -= T.finalSwitchPause;
+    return;
+  }
   if (ctx.isStunned(z)) return;
   // Never a knockdown on a knockdown: a player still down, or in a respite,
   // is never caught.
   if (ctx.isStunned(prey) || st.respite.some((r) => r.id === prey.id)) return;
-  const reach = combatProfileForMob(z.templateId, z.scale).meleeRange + T.catchReach;
-  if (dist2d(z.pos, prey.pos) <= reach) maul(ctx, z, st, prey);
+  if (dist2d(z.pos, prey.pos) <= T.catchReach) maul(ctx, z, st, prey);
 }
 
 // ---- The Idol Wakes -----------------------------------------------------------

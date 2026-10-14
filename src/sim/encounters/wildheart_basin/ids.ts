@@ -409,8 +409,9 @@ export const ZULGAR_TUNING = {
   huntSeconds: 20,
   /** He chases at 110 percent of his run (a player's run speed, 7 yd a second). */
   huntSpeedMult: 1.1,
-  /** He catches his prey within this of his reach. */
-  catchReach: 1.5,
+  /** Avatar contact: standard 5 yd melee reach, not the giant priest's
+   *  scaled reach plus a catch bonus. This is centre-to-centre. */
+  catchReach: 5,
   /** Mauled: 500 landed and a 2 s knockdown; he feeds 1 s, then hunts on. */
   maulDamage: 500,
   maulStun: 2,
