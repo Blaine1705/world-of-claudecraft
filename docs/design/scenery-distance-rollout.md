@@ -1,5 +1,8 @@
 # Scenery distance rollout, October 2026
 
+Completed follow-up: [Windows RTX 4070 Laptop results](scenery-windows-4070-results.md)
+measure the pre-integration commit `c33418ac348`, not the later merged head.
+
 Status: implementation and Mac/Redmi study complete, ready for Windows review.
 The final Low build measured **38.74 FPS in Thornpeak and 29.73 FPS in Palmreach**
 after the loading route. It preserves the selected aggressive configuration.

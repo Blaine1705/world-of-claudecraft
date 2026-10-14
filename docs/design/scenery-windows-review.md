@@ -1,5 +1,8 @@
 # RTX 3060 Windows scenery review
 
+Completed follow-up: [Windows RTX 4070 Laptop results](scenery-windows-4070-results.md)
+measure the pre-integration commit `c33418ac348`, not the later merged head.
+
 Use this with [the rollout report](scenery-distance-rollout.md). The earlier Mac
 tests ran two simultaneous browsers; they do not predict normal Windows play FPS.
 The Windows result is required before a desktop recommendation is final.
