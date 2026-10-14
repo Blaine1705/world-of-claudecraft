@@ -13982,10 +13982,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.iconSize': '아이콘 크기',
   'hudChrome.cooldownManager.iconPadding': '아이콘 간격',
   'hudChrome.cooldownManager.opacity': '불투명도',
-  'hudChrome.cooldownManager.visibility': '표시',
-  'hudChrome.cooldownManager.visAlways': '항상 표시',
   'hudChrome.cooldownManager.visCombat': '전투 중',
-  'hudChrome.cooldownManager.visHidden': '숨김',
   'hudChrome.cooldownManager.visHiddenHint':
     '숨긴 그룹도 소리를 재생하고 행동 단축바를 빛나게 합니다.',
   'hudChrome.cooldownManager.showTimer': '타이머 표시',
@@ -14007,7 +14004,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.aurasHint':
     '엔진 자원과 그 중첩, 발동 효과, 그리고 내 주문이 나에게 거는 강화 효과입니다. 그 밖에 나에게 걸렸던 효과도 여기에 표시됩니다.',
   'hudChrome.cooldownManager.auraFallback': '오라',
-  'hudChrome.cooldownManager.onlyWhileActive': '활성 중에만 표시',
   'hudChrome.cooldownManager.alertStacks': '중첩 알림',
   'hudChrome.cooldownManager.alertStacksAny': '획득 시',
   'hudChrome.cooldownManager.alertStacksHint':
@@ -14028,10 +14024,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주문을 시전할 수 있는 동안 버튼을 밝게 하고 테두리를 표시합니다.',
   'hudChrome.cooldownManager.hotbarGlow': '단축바 강조',
   'hudChrome.cooldownManager.hotbarGlowHint': '준비된 동안 행동 단축바의 이 주문도 빛나게 합니다.',
-  'hudChrome.cooldownManager.onlyWhenReady': '준비되었을 때만 표시',
   'hudChrome.cooldownManager.sound': '준비 알림음',
   'hudChrome.cooldownManager.soundHint':
     '주문이 준비되었을 때, 또는 준비된 상태에서 버튼이 다른 주문으로 바뀔 때 재생됩니다.',
+  'hudChrome.cooldownManager.showWhile': '표시 상황',
+  'hudChrome.cooldownManager.showOutOfCombat': '비전투 중',
+  'hudChrome.cooldownManager.showIn': '표시 장소',
+  'hudChrome.cooldownManager.showInWorld': '오픈 월드',
+  'hudChrome.cooldownManager.showInInstances': '인스턴스',
+  'hudChrome.cooldownManager.placeHint':
+    '인스턴스는 던전, 공격대, 탐굴, 균열, 전장, 투기장 등 모든 인스턴스 지역을 말합니다. 체크하지 않은 장소에서는 그룹이 숨겨지고 소리도 나지 않습니다.',
+  'hudChrome.cooldownManager.groupOffHint':
+    '장소를 하나도 체크하지 않으면 이 그룹은 표시되지 않고 소리도 나지 않습니다.',
+  'hudChrome.cooldownManager.showButtonWhen': '버튼 표시 조건',
+  'hudChrome.cooldownManager.showReady': '준비됨',
+  'hudChrome.cooldownManager.showNotReady': '준비 안 됨',
+  'hudChrome.cooldownManager.notReadyHint':
+    '준비 안 됨은 재사용 대기 중이거나 지금 사용할 수 없는 상태를 뜻합니다.',
+  'hudChrome.cooldownManager.auraShowWhen': '오라가 이 상태일 때 버튼 표시',
+  'hudChrome.cooldownManager.auraActive': '활성',
+  'hudChrome.cooldownManager.auraMissing': '없음',
+  'hudChrome.cooldownManager.neverShownHint':
+    '둘 다 체크하지 않으면 버튼은 표시되지 않지만 소리는 계속 납니다.',
+  'hudChrome.cooldownManager.reminderHint':
+    '강화 효과 알림: 이 오라가 없는 동안 버튼이 빛나고, 얻으면 사라집니다.',
+  'hudChrome.cooldownManager.glowWhileMissing': '없을 때 빛내기',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    '오라가 없는 동안 버튼을 밝게 하고 테두리를 두르며 깜박입니다.',
+  'hudChrome.cooldownManager.reminderSoundHint': '오라가 사라질 때 재생됩니다.',
   'hudChrome.auraOverlay.title': '오라',
   'hudChrome.auraOverlay.currentClass': '현재 직업: {class}',
   'hudChrome.auraOverlay.previewHint': '위치 설정으로 오라를 옮겨 메뉴를 가리지 마세요.',

@@ -14018,10 +14018,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.iconSize': 'アイコンのサイズ',
   'hudChrome.cooldownManager.iconPadding': 'アイコンの間隔',
   'hudChrome.cooldownManager.opacity': '不透明度',
-  'hudChrome.cooldownManager.visibility': '表示',
-  'hudChrome.cooldownManager.visAlways': '常に表示',
   'hudChrome.cooldownManager.visCombat': '戦闘中',
-  'hudChrome.cooldownManager.visHidden': '非表示',
   'hudChrome.cooldownManager.visHiddenHint':
     '非表示のグループも音を鳴らし、アクションバーを光らせます。',
   'hudChrome.cooldownManager.showTimer': 'タイマーを表示',
@@ -14043,7 +14040,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.aurasHint':
     'エンジン資源とそのスタック、発動効果、そして自分の呪文で得る強化効果です。それ以外に自分にかかったことのある効果もここに表示されます。',
   'hudChrome.cooldownManager.auraFallback': 'オーラ',
-  'hudChrome.cooldownManager.onlyWhileActive': '発動中のみ表示',
   'hudChrome.cooldownManager.alertStacks': 'スタック数で通知',
   'hudChrome.cooldownManager.alertStacksAny': '獲得時',
   'hudChrome.cooldownManager.alertStacksHint':
@@ -14066,10 +14062,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.hotbarGlow': 'ホットバーの発光',
   'hudChrome.cooldownManager.hotbarGlowHint':
     '使用可能な間、アクションバー上のこの呪文も光らせます。',
-  'hudChrome.cooldownManager.onlyWhenReady': '使用可能時のみ表示',
   'hudChrome.cooldownManager.sound': '準備完了の音',
   'hudChrome.cooldownManager.soundHint':
     '呪文が使用可能になったとき、または使用可能なままボタンが別の呪文に変化したときに鳴ります。',
+  'hudChrome.cooldownManager.showWhile': '表示する状況',
+  'hudChrome.cooldownManager.showOutOfCombat': '非戦闘中',
+  'hudChrome.cooldownManager.showIn': '表示する場所',
+  'hudChrome.cooldownManager.showInWorld': 'オープンワールド',
+  'hudChrome.cooldownManager.showInInstances': 'インスタンス',
+  'hudChrome.cooldownManager.placeHint':
+    'インスタンスとはダンジョン、レイド、デルヴ、リフト、戦場、アリーナなど、インスタンス化されたすべての場所のことです。チェックしていない場所では、グループは非表示になり音も鳴りません。',
+  'hudChrome.cooldownManager.groupOffHint':
+    '場所が1つもチェックされていないと、このグループは表示されず、音も鳴りません。',
+  'hudChrome.cooldownManager.showButtonWhen': 'ボタンを表示する条件',
+  'hudChrome.cooldownManager.showReady': '使用可能',
+  'hudChrome.cooldownManager.showNotReady': '使用不可',
+  'hudChrome.cooldownManager.notReadyHint':
+    '使用不可とは、クールダウン中か、今は使えない状態のことです。',
+  'hudChrome.cooldownManager.auraShowWhen': 'オーラがこの状態のときにボタンを表示',
+  'hudChrome.cooldownManager.auraActive': '発動中',
+  'hudChrome.cooldownManager.auraMissing': '未発動',
+  'hudChrome.cooldownManager.neverShownHint':
+    'どちらもチェックしていないとボタンは表示されませんが、音は鳴ります。',
+  'hudChrome.cooldownManager.reminderHint':
+    'バフリマインダー: このオーラがないあいだボタンが光り、得ると消えます。',
+  'hudChrome.cooldownManager.glowWhileMissing': '未発動時に光らせる',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'オーラがないあいだ、ボタンを明るくし、縁取りして点滅させます。',
+  'hudChrome.cooldownManager.reminderSoundHint': 'オーラが切れたときに鳴ります。',
   'hudChrome.auraOverlay.title': 'オーラ',
   'hudChrome.auraOverlay.currentClass': '現在のクラス: {class}',
   'hudChrome.auraOverlay.previewHint':

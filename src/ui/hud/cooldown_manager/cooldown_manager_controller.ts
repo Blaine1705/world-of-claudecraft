@@ -12,6 +12,7 @@
 
 import { AURA_CUE_NONE } from '../../../game/aura_cue_catalog';
 import { isDebuffDisplayAura } from '../../../sim/aura_classify';
+import { DUNGEON_X_THRESHOLD } from '../../../sim/data';
 import type { ResolvedAbility } from '../../../sim/sim';
 import type { AuraKind, PlayerClass } from '../../../sim/types';
 import { resolveHudAuraIconId, resolveHudAuraIconUrl } from '../../aura_icon_runtime';
@@ -37,6 +38,7 @@ import {
   type CooldownSpellConfig,
   type CooldownSpellPatch,
   cooldownCell,
+  cooldownGroupActive,
   cooldownGroupShown,
   moveCooldownSpell,
   newCooldownGroup,
@@ -54,7 +56,14 @@ import {
 /** The world slice the manager reads: a structural subset of IWorld. */
 export interface CooldownManagerWorld {
   readonly cfg: { readonly playerClass: PlayerClass };
-  readonly player: { readonly name: string; readonly inCombat: boolean };
+  readonly player: {
+    readonly name: string;
+    readonly inCombat: boolean;
+    /** Past DUNGEON_X_THRESHOLD is the instance plane (dungeons, raids, delves,
+     *  rifts, battlegrounds, the arena): the same test the HUD's zone label and
+     *  music use. */
+    readonly pos: { readonly x: number };
+  };
   readonly known: readonly ResolvedAbility[];
   /** The entity roster (IWorld.entities). The manager takes its OWN iterator
    *  from it each frame; see paint(). */
@@ -120,7 +129,10 @@ const APPEARANCE_KEYS: ReadonlySet<string> = new Set([
   'scale',
   'padding',
   'opacity',
-  'visibility',
+  'showOutOfCombat',
+  'showInCombat',
+  'showInWorld',
+  'showInInstances',
   'showTimer',
 ]);
 const POSITION_STEP = 0.005;
@@ -136,6 +148,16 @@ export class CooldownManagerController {
   private layout: CooldownManagerLayout;
   private groupEls: HTMLElement[] = [];
   private readonly groupShown: boolean[] = [];
+  /** Per tracked entry (the view's order): the index of the group holding it. */
+  private entryGroup: number[] = [];
+  /** Per tracked entry: its group is off where the player stands. Reused. */
+  private readonly entryMuted: boolean[] = [];
+  /** The view's per-frame options, mutated in place so a frame allocates none. */
+  private readonly tickOpts: { soundsAllowed: boolean; preview: boolean; muted: boolean[] } = {
+    soundsAllowed: false,
+    preview: false,
+    muted: this.entryMuted,
+  };
   private buttons: CooldownButtonElements[] = [];
   private placement = false;
   // Helpful auras seen on the player (persisted), offered in the picker so
@@ -185,17 +207,25 @@ export class CooldownManagerController {
   /** Per frame: derive, paint, sound, and refresh the hotbar glow set. */
   paint(world: ActionBarWorldInput): void {
     const { enabled, soundInCombatOnly } = this.layout;
-    const inCombat = this.deps.world.player.inCombat;
+    const { inCombat, pos } = this.deps.world.player;
+    const inInstance = pos.x > DUNGEON_X_THRESHOLD;
     const soundsAllowed = enabled && (!soundInCombatOnly || inCombat);
     const own = this.world ?? { ...world };
     this.world = own;
     for (const key of COOLDOWN_WORLD_FIELDS) copyWorldField(own, world, key);
     own.entities = this.deps.world.entities.values();
-    const state = this.view.tick(own, { soundsAllowed, preview: this.placement });
-    this.recordSeen(world.player.auras);
     for (let g = 0; g < this.groups.length; g++) {
-      this.groupShown[g] = cooldownGroupShown(this.groups[g].visibility, inCombat, this.placement);
+      const group = this.groups[g];
+      this.groupShown[g] = cooldownGroupShown(group, inCombat, inInstance, this.placement);
     }
+    for (let i = 0; i < this.entryGroup.length; i++) {
+      const group = this.groups[this.entryGroup[i]];
+      this.entryMuted[i] = group !== undefined && !cooldownGroupActive(group, inInstance);
+    }
+    this.tickOpts.soundsAllowed = soundsAllowed;
+    this.tickOpts.preview = this.placement;
+    const state = this.view.tick(own, this.tickOpts);
+    this.recordSeen(world.player.auras);
     this.painter.paint(
       this.layer,
       enabled || this.placement,
@@ -406,8 +436,10 @@ export class CooldownManagerController {
   private rearm(): void {
     const spells: CooldownManagerTrackedSpell[] = [];
     const catalog = this.auraCatalog();
-    for (const group of this.groups) {
-      for (const id of group.spells) {
+    this.entryGroup = [];
+    for (let g = 0; g < this.groups.length; g++) {
+      for (const id of this.groups[g].spells) {
+        this.entryGroup.push(g);
         const config = this.store.getSpell(id);
         const cue = config.soundId === AURA_CUE_NONE ? null : config.soundId;
         const rule = parseCooldownAuraToken(id);
@@ -427,6 +459,8 @@ export class CooldownManagerController {
         });
       }
     }
+    this.entryMuted.length = this.entryGroup.length;
+    this.entryMuted.fill(false);
     this.view.setTracked(spells);
   }
 
