@@ -55,6 +55,7 @@ import {
   pruneCorpseLoot,
 } from './loot/loot_roll';
 import { startCorpseHarvest } from './professions/corpse_harvest_session';
+import { storeLootedSkulls } from './pvp/skull_bag';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { corpseHasDecayed } from './respawn_policy';
 import { isRiftForgeNpc } from './rift/forge_gate';
@@ -178,6 +179,16 @@ export function lootCorpse(
       continue;
     }
     if (s.personalFor) {
+      // A trophy skull goes straight into a carried Skull Bag, which has no
+      // room limit (pvp/skull_bag.ts); anything else takes the bag check.
+      const bagged =
+        !s.instance && storeLootedSkulls(ctx, meta, s.itemId, s.count, s.materialSources);
+      if (bagged) {
+        s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
+        tookPersonal = true;
+        didLoot = true;
+        continue;
+      }
       if (
         s.instance
           ? !canGrantItemInstance(

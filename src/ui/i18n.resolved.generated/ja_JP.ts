@@ -2840,11 +2840,28 @@ export const ja_JP: EnTranslations = {
       "falls": "{minutes}後に消滅",
       "standingRaid": "レイドメンバーはカウントされません：丘を保持できるのはパーティのみです"
     },
+    "skullBag": {
+      "title": "頭蓋骨袋",
+      "total": "頭蓋骨：{count}",
+      "close": "頭蓋骨袋を閉じる",
+      "clickOpen": "クリックで開く",
+      "notCarried": "頭蓋骨を収納・取り出しするには、頭蓋骨袋をバッグに入れておく必要があります。",
+      "empty": "空です。袋を持っている間、戦利品の頭蓋骨は直接この袋に入ります。",
+      "unrecorded": "戦利品の頭蓋骨",
+      "store": "持っている頭蓋骨を収納（{count}）",
+      "storeNone": "収納できる頭蓋骨がありません",
+      "takeOne": "1個取り出す",
+      "takeAll": "すべて取り出す",
+      "takeOneAria": "1個取り出す：{item}",
+      "takeAllAria": "すべて取り出す：{item}",
+      "tooltip": "戦利品の頭蓋骨をバッグの空きを使わずにいくつでも収納できます。バッグに入れている間、拾った頭蓋骨は直接この袋に入ります。バッグ内でクリックすると頭蓋骨の収納や取り出しができます。"
+    },
     "warfareShop": {
       "gossipOption": "ウォーフェアセットを見る",
       "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
       "jewelry": "アクセサリー",
       "weapons": "武器",
+      "goods": "雑貨",
       "groupSeason2": "ウォーフェア シーズン2：ヴァンガード",
       "groupEntry": "ウォーフェア シーズン1",
       "owned": "所有済み",
@@ -18939,6 +18956,9 @@ export const ja_JP: EnTranslations = {
       },
       "pvp_trophy_skull": {
         "name": "戦利品の頭蓋骨"
+      },
+      "pvp_skull_bag": {
+        "name": "頭蓋骨袋"
       },
       "clue_scroll": {
         "name": "手がかりの巻物"

@@ -2840,11 +2840,28 @@ export const zh_CN: EnTranslations = {
       "falls": "{minutes} 后消失",
       "standingRaid": "团队成员不计入人数：只有队伍才能占据山丘"
     },
+    "skullBag": {
+      "title": "头骨袋",
+      "total": "头骨：{count}",
+      "close": "关闭头骨袋",
+      "clickOpen": "点击打开",
+      "notCarried": "将头骨袋放在背包中才能存放或取出头骨。",
+      "empty": "空的。只要你携带此袋，拾取的头骨会直接放入袋中。",
+      "unrecorded": "战利品头骨",
+      "store": "存放携带的头骨（{count}）",
+      "storeNone": "没有可存放的头骨",
+      "takeOne": "取出 1 个",
+      "takeAll": "全部取出",
+      "takeOneAria": "取出 1 个：{item}",
+      "takeAllAria": "全部取出：{item}",
+      "tooltip": "可容纳任意数量的战利品头骨，且不占用背包空间。放在背包中时，你拾取的头骨会直接放入袋中。在背包中点击它即可存放或取出头骨。"
+    },
     "warfareShop": {
       "gossipOption": "浏览战争套装",
       "gossipOptionAria": "浏览 {name} 提供的战争套装商店",
       "jewelry": "饰品",
       "weapons": "武器",
+      "goods": "物品",
       "groupSeason2": "战争赛季 2：先锋",
       "groupEntry": "战争赛季 1",
       "owned": "已拥有",
@@ -18939,6 +18956,9 @@ export const zh_CN: EnTranslations = {
       },
       "pvp_trophy_skull": {
         "name": "战利品头骨"
+      },
+      "pvp_skull_bag": {
+        "name": "头骨袋"
       },
       "clue_scroll": {
         "name": "线索卷轴"

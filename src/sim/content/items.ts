@@ -3016,6 +3016,23 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     sellValue: 0,
   },
+  // The Skull Bag (src/sim/pvp/skull_bag.ts): a sub-inventory sold by both
+  // honor quartermasters that holds any number of trophy skulls outside the bag
+  // pools. Clicking it opens its own window; carrying it sends looted skulls
+  // straight in. One cell, never socketed (so not kind 'bag'), soulbound like
+  // every honor purchase, and one per character.
+  pvp_skull_bag: {
+    id: 'pvp_skull_bag',
+    name: 'Skull Bag',
+    kind: 'junk',
+    // Epic like every honor quartermaster row (tests/reliquary_content.test.ts).
+    quality: 'epic',
+    unique: true,
+    soulbound: true,
+    stackSize: 1,
+    priceHonor: 500,
+    sellValue: 0,
+  },
   // Vendor food nerf (11n-D-13): was ABOVE crafted pan_seared_perch 90 (a
   // negative margin); 90 / 1.10, bottom tercile, floored; crafted margin
   // +11.1 percent.

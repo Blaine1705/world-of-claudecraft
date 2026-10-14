@@ -2840,11 +2840,28 @@ export const cs_CZ: EnTranslations = {
       "falls": "Padne za {minutes}",
       "standingRaid": "Členové raidu se nepočítají: kopec mohou ovládat jen skupiny"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Prohlédnout válečnické sady",
       "gossipOptionAria": "Prohlédnout obchod s válečnickými sadami, který nabízí {name}",
       "jewelry": "Šperky",
       "weapons": "Zbraně",
+      "goods": "Goods",
       "groupSeason2": "Válečnictví, sezóna 2: Předvoj",
       "groupEntry": "Válečnictví, sezóna 1",
       "owned": "Vlastněno",
@@ -18939,6 +18956,9 @@ export const cs_CZ: EnTranslations = {
       },
       "pvp_trophy_skull": {
         "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Hádankový svitek"

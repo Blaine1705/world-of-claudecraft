@@ -2840,11 +2840,28 @@ export const es: EnTranslations = {
       "falls": "Cae en {minutes}",
       "standingRaid": "Los miembros de banda no cuentan: solo los grupos pueden controlar la colina"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Explorar conjuntos de guerra",
       "gossipOptionAria": "Explorar la tienda de conjuntos de guerra de {name}",
       "jewelry": "Joyería",
       "weapons": "Armas",
+      "goods": "Goods",
       "groupSeason2": "Temporada de Guerra 2: Vanguardia",
       "groupEntry": "Temporada de Guerra 1",
       "owned": "Adquirido",
@@ -18939,6 +18956,9 @@ export const es: EnTranslations = {
       },
       "pvp_trophy_skull": {
         "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Pergamino de Pistas"

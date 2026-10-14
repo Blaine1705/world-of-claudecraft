@@ -2840,11 +2840,28 @@ export const tr_TR: EnTranslations = {
       "falls": "{minutes} içinde düşüyor",
       "standingRaid": "Akın üyeleri sayılmaz: yalnızca partiler tepeyi tutabilir"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Harp Setlerine Göz At",
       "gossipOptionAria": "{name} tarafından sunulan Harp seti dükkanına göz at",
       "jewelry": "Takılar",
       "weapons": "Silahlar",
+      "goods": "Goods",
       "groupSeason2": "Savaş Mevsimi 2: Öncü",
       "groupEntry": "Savaş Mevsimi 1",
       "owned": "Sahip",
@@ -18939,6 +18956,9 @@ export const tr_TR: EnTranslations = {
       },
       "pvp_trophy_skull": {
         "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "İpucu Tomarı"

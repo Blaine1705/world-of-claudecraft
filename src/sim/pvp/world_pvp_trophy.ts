@@ -16,3 +16,7 @@ export const WORLD_PVP_SKULL_ITEM_ID = 'pvp_trophy_skull';
 
 /** Non-reagent items that still carry per-unit provenance like materials. */
 export const WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS: readonly string[] = [WORLD_PVP_SKULL_ITEM_ID];
+
+/** The honor-vendor Skull Bag (src/sim/pvp/skull_bag.ts): a sub-inventory that
+ *  holds any number of trophy skulls outside the bag pools. */
+export const WORLD_PVP_SKULL_BAG_ITEM_ID = 'pvp_skull_bag';

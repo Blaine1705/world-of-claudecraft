@@ -2670,6 +2670,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.gossipOptionAria': '{name}のウォーフェアセット商店を見る',
   'hudChrome.warfareShop.jewelry': 'アクセサリー',
   'hudChrome.warfareShop.weapons': '武器',
+  'hudChrome.warfareShop.goods': '雑貨',
+  // World PvP Skull Bag (M16 fills).
+  'hudChrome.skullBag.title': '頭蓋骨袋',
+  'hudChrome.skullBag.total': '頭蓋骨：{count}',
+  'hudChrome.skullBag.close': '頭蓋骨袋を閉じる',
+  'hudChrome.skullBag.clickOpen': 'クリックで開く',
+  'hudChrome.skullBag.notCarried':
+    '頭蓋骨を収納・取り出しするには、頭蓋骨袋をバッグに入れておく必要があります。',
+  'hudChrome.skullBag.empty': '空です。袋を持っている間、戦利品の頭蓋骨は直接この袋に入ります。',
+  'hudChrome.skullBag.unrecorded': '戦利品の頭蓋骨',
+  'hudChrome.skullBag.store': '持っている頭蓋骨を収納（{count}）',
+  'hudChrome.skullBag.storeNone': '収納できる頭蓋骨がありません',
+  'hudChrome.skullBag.takeOne': '1個取り出す',
+  'hudChrome.skullBag.takeAll': 'すべて取り出す',
+  'hudChrome.skullBag.takeOneAria': '1個取り出す：{item}',
+  'hudChrome.skullBag.takeAllAria': 'すべて取り出す：{item}',
+  'hudChrome.skullBag.tooltip':
+    '戦利品の頭蓋骨をバッグの空きを使わずにいくつでも収納できます。バッグに入れている間、拾った頭蓋骨は直接この袋に入ります。バッグ内でクリックすると頭蓋骨の収納や取り出しができます。',
   'hudChrome.warfareShop.owned': '所有済み',
   'hudChrome.warfareShop.buyOwnedAria': '{item}を{honor}で購入、所有済み',
   'hudChrome.warfareShop.buyConfirmBody':
@@ -18520,6 +18538,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_surveyors_satchel.name': '裂け目測量士の鞄',
   'entities.items.emissary_cache.name': '使者の宝箱',
   'entities.items.pvp_trophy_skull.name': '戦利品の頭蓋骨',
+  'entities.items.pvp_skull_bag.name': '頭蓋骨袋',
   'entities.npcs.weekly_emissary.name': 'チャム・ピート',
   'entities.npcs.weekly_emissary.title': '使者',
   'entities.npcs.weekly_emissary.greeting':

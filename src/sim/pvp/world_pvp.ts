@@ -41,10 +41,12 @@
 // identically.
 
 import { formatMoney } from '../format_money';
+import type { MaterialComposition } from '../material_sources';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { grantHonor } from './honor';
+import { loadSkullBag, savedSkullBag, skullBagInfoFor } from './skull_bag';
 import { updatePvpVitality } from './vitality';
 import {
   WORLD_PVP_ASSIST_WINDOW,
@@ -747,6 +749,21 @@ export function worldPvpInfoFor(
   };
 }
 
+/** The whole IWorld readout: the flag readout above plus the Skull Bag
+ *  (skull_bag.ts), present only for a player who carries one or keeps skulls
+ *  in it. The offline Sim answers with this; the server sends the flag
+ *  readout on `wpvp` and the bag on its own change-gated `skb` key
+ *  (server/world_pvp_wire.ts), which the client merges back in. */
+export function worldPvpReadoutFor(
+  ctx: SimContext,
+  pid: number,
+): import('../../world_api').WorldPvpInfo | null {
+  const info = worldPvpInfoFor(ctx, pid);
+  const r = playerOf(ctx, pid);
+  const skullBag = r ? skullBagInfoFor(r.meta) : undefined;
+  return info && skullBag ? { ...info, skullBag } : info;
+}
+
 /** The persisted form, or undefined for a character who never raised the
  *  flag and has no record (so their save stays byte-identical). */
 export function savedWorldPvpState(meta: PlayerMeta, now: number): WorldPvpSavedState | undefined {
@@ -766,9 +783,10 @@ export function savedWorldPvpState(meta: PlayerMeta, now: number): WorldPvpSaved
 export function savedWorldPvpFields(
   meta: PlayerMeta,
   now: number,
-): { worldPvp?: WorldPvpSavedState } {
+): { worldPvp?: WorldPvpSavedState; skullBag?: MaterialComposition } {
   const saved = savedWorldPvpState(meta, now);
-  return saved ? { worldPvp: saved } : {};
+  const skulls = savedSkullBag(meta);
+  return { ...(saved ? { worldPvp: saved } : {}), ...(skulls ? { skullBag: skulls } : {}) };
 }
 
 function nonNegativeInt(value: unknown): number {
@@ -786,7 +804,10 @@ export function loadWorldPvpState(
   meta: PlayerMeta,
   e: Entity,
   saved: unknown,
+  savedSkulls?: unknown,
 ): void {
+  // The Skull Bag's contents (skull_bag.ts) ride beside the flag record.
+  loadSkullBag(meta, savedSkulls);
   if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return;
   const record = saved as Record<string, unknown>;
   const flagged =
