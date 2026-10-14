@@ -28,13 +28,11 @@ const EASTBROOK_FENCE_IDS = new Set<string>(
 const EASTBROOK_BENCH_IDS = new Set<string>(
   EASTBROOK_LAYOUT.civic.benches.map((placement) => placement.id),
 );
-const EASTBROOK_WALL_IDS = new Set<string>(
+// Fenbridge stands open (no palisade), so only Eastbrook's wall ids are
+// built-in-only.
+const BUILTIN_ONLY_WALL_IDS = new Set<string>(
   EASTBROOK_LAYOUT.wall.segments.map((placement) => placement.id),
 );
-const BUILTIN_ONLY_WALL_IDS = new Set<string>([
-  ...EASTBROOK_WALL_IDS,
-  ...FENBRIDGE_LAYOUT.wall.segments.map((placement) => placement.id),
-]);
 
 function cloneRecords<T extends object>(records: readonly T[]): T[] {
   return records.map((record) => ({ ...record }));

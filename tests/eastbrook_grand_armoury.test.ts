@@ -340,11 +340,12 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     if (!fenbridgeInn) throw new Error('missing Fenbridge inn fixture');
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
-      assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
-      x: -21.25,
-      z: 317,
-      w: 9,
-      d: 8,
+      // the painted tavern on the main street (fenbridge_layout.ts)
+      assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
+      x: 12.25,
+      z: 299.9,
+      w: 20,
+      d: 13,
       rot: FENBRIDGE_BUILDINGS_BY_ID.fenbridge_crooked_reed_inn.rotation,
     });
 
@@ -354,7 +355,8 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
       authoredInn.position,
       authoredInn.rotation,
       authoredInn.sockets.entrance.localPosition.x,
-      authoredInn.nativeDimensions.depth / 2 + restPadding + 0.25,
+      // the painted tavern's door is on its -Z face
+      -(authoredInn.nativeDimensions.depth / 2 + restPadding + 0.25),
     );
     expect(restPadding).toBe(2);
     expect(buildingContainsPoint(fenbridgeInn, restPoint.x, restPoint.z, restPadding)).toBe(true);

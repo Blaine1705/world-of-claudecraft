@@ -6,10 +6,14 @@
 // placement (promotedScenery.authoredTowns). Matching is by the same
 // coordinate/dimension/rotation identity the render predicates use.
 
+import { bakedBoxesForPath } from './asset_collision';
 import type { Collider } from './collider_shapes';
+import { emitPlacementBoxes } from './colliders_authored/placement_colliders';
 import { EASTBROOK_LAYOUT, type Obb2 } from './eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { walkInPlacementFor } from './town_walk_in';
 import type { BuildingDef, PromotedScenery } from './types';
+import { terrainHeight } from './world';
 
 const EPSILON = 1e-6;
 
@@ -20,15 +24,16 @@ function sameNumber(a: number, b: number): boolean {
 const TOWN_BUILDINGS = [...EASTBROOK_LAYOUT.buildings, ...FENBRIDGE_LAYOUT.buildings];
 
 /**
- * The solid annexes of a placed Eastbrook building (its bell tower, its
- * strongroom, its forge shelter: sim/eastbrook_layout.ts makePlacedBuilding),
- * for a record that still stands where the layout put it. A record a custom
- * world moved, resized or turned carries no annex: the boxes are authored
- * around the model's own anchor and would be left behind as invisible walls.
+ * The solid annexes of a placed town building (a bell tower, a strongroom, a
+ * forge shelter, a stall counter: makePlacedBuilding in sim/eastbrook_layout.ts
+ * and sim/fenbridge_layout.ts), for a record that still stands where the
+ * layout put it. A record a custom world moved, resized or turned carries no
+ * annex: the boxes are authored around the model's own anchor and would be
+ * left behind as invisible walls.
  */
 export function placedBuildingAnnexes(building: BuildingDef): readonly Obb2[] {
   if (building.id === undefined) return [];
-  for (const candidate of EASTBROOK_LAYOUT.buildings) {
+  for (const candidate of TOWN_BUILDINGS) {
     if (candidate.id !== building.id) continue;
     return sameNumber(candidate.position.x, building.x) &&
       sameNumber(candidate.position.z, building.z) &&
@@ -47,12 +52,28 @@ export function placedBuildingAnnexes(building: BuildingDef): readonly Obb2[] {
  * each annex. `groundAt` anchors each box's pass-under floor on its own
  * ground, so a mover deep in a tube or carve walks beneath surface props
  * instead of hitting invisible walls.
+ *
+ * A walk-in record (town_walk_in.ts) collides instead on its model's own
+ * baked boxes, the asset rows a Studio placement of the model reads, through
+ * the same emitter (a document-level bake or authored prisms are not
+ * consulted), so its open doorway lets a player in; its annexes are part of
+ * that bake. Those boxes stand on the TERRAIN under the model's anchor (the
+ * placement rule), never on `groundAt`, which already carries the building's
+ * own floor deck. With no `seed` the record keeps its sealed box.
  */
 export function buildingRecordColliders(
   building: BuildingDef,
   cameraTopY: number,
   groundAt: (x: number, z: number) => number,
+  seed?: number,
 ): Collider[] {
+  const walkIn = seed === undefined ? null : walkInPlacementFor(building);
+  const baked = walkIn ? bakedBoxesForPath(walkIn.path) : null;
+  if (walkIn && seed !== undefined && baked && baked.length > 0) {
+    const walls: Collider[] = [];
+    emitPlacementBoxes(walls, walkIn, baked, terrainHeight(walkIn.x, walkIn.z, seed));
+    return walls;
+  }
   const out: Collider[] = [
     {
       type: 'obb',

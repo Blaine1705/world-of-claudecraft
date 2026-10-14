@@ -64,10 +64,9 @@ describe('CustomMap build + projection', () => {
       benches: new Set<string>(EASTBROOK_LAYOUT.civic.benches.map((placement) => placement.id)),
       walls: new Set<string>(EASTBROOK_LAYOUT.wall.segments.map((placement) => placement.id)),
     };
-    const builtInOnlyWallIds = new Set<string>([
-      ...eastbrookIds.walls,
-      ...FENBRIDGE_LAYOUT.wall.segments.map((placement) => placement.id),
-    ]);
+    // Fenbridge stands open (no palisade), so only Eastbrook's wall ids are
+    // built-in-only.
+    const builtInOnlyWallIds = eastbrookIds.walls;
     const builtInOnlyBuildingIds = new Set<string>([
       ...eastbrookIds.buildings,
       ...FENBRIDGE_LAYOUT.buildings.map((placement) => placement.id),
@@ -146,9 +145,10 @@ describe('CustomMap build + projection', () => {
     expect(exteriorValeMine).toBeDefined();
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
-      assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
-      x: -21.25,
-      z: 317,
+      // the painted tavern on the main street (fenbridge_layout.ts)
+      assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
+      x: 12.25,
+      z: 299.9,
     });
     expect(highwatchForge).toBeDefined();
     expect(templeCampfire).toBeDefined();

@@ -2334,7 +2334,10 @@ const MONOLITHS: MonolithRow[] = [
     // record's collider (its box, plus one per solid annex of a placed
     // building) moved to authored_town_buildings.ts buildingRecordColliders.
     // wc -l. Exact count.
-    ceiling: 2327,
+    // LOWERED 2327 -> 2288 with the open Fenbridge: the palisade's
+    // full-height wall arm and the gate-arch jamb block retired with the
+    // ring. wc -l. Exact count.
+    ceiling: 2288,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

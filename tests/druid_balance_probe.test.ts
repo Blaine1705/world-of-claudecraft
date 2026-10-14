@@ -122,14 +122,29 @@ const FERAL_LOADOUT = {
 // 42428; bruin 2309 to 3240 damage, 96 to 161 incoming and 3 or 4 payoffs
 // over the same eight. The matrix test below, whose bands are design bands
 // rather than measurements, still holds on this tree. BAND stays 0.08.
+// RE-MEASURED 2026-10-15 for all three arms and the tank probe's two incoming
+// figures, at the Fenbridge rebuild (src/sim/fenbridge_layout.ts: the painted
+// buildings, the open ring, the walk-in floors, the re-threaded streets and
+// lamps). No druid, combat or tuning code moved: the town's colliders and
+// walkable ground are world-gen inputs and every world mob's idle wander draws
+// from the shared stream, so this seed's whole trace re-rolls. Moongrove
+// 5637/273/5638/7 to 5455/251/5456/7, wildfang 6126/172/7178.609/10 to
+// 6558/197/7684.697/10, bruin 2721/142/8804.0075/4 to 2891/159/9807.33125/4.
+// The neighbouring seeds on this tree: moongrove 5557 to 6068 damage and 193
+// to 285 incoming over 42421 to 42436 (payoffs 7 on every one); wildfang 6120
+// to 7439 damage, 191 to 278 incoming and 10 or 12 payoffs over 42421 to
+// 42428; bruin 2309 to 3075 damage, 96 to 160 incoming and 3 or 4 payoffs over
+// the same eight. The tank probe at 42920 re-rolls the same way: wolf incoming
+// 220 to 262, bear 143 to 157 (40 percent less, inside the 30 to 42 percent
+// bounds); its threat product and Marrowbreak snap stayed in band.
 const LIVE_MOB_MEASURED = {
-  moongrove: { damage: 5637, incomingDamage: 273, threat: 5638, payoffs: 7 },
-  wildfang: { damage: 6126, incomingDamage: 172, threat: 7178.609, payoffs: 10 },
-  bruin: { damage: 2721, incomingDamage: 142, threat: 8804.0075, payoffs: 4 },
+  moongrove: { damage: 5455, incomingDamage: 251, threat: 5456, payoffs: 7 },
+  wildfang: { damage: 6558, incomingDamage: 197, threat: 7684.697, payoffs: 10 },
+  bruin: { damage: 2891, incomingDamage: 159, threat: 9807.33125, payoffs: 4 },
 } as const;
 const BRUIN_TANK_MEASURED = {
-  wolfIncomingDamage: 220,
-  bruinIncomingDamage: 143,
+  wolfIncomingDamage: 262,
+  bruinIncomingDamage: 157,
   bruinMitigationPct: 0.35,
   bruinThreatFrom100Damage: 214.5,
   marrowbreakSnapThreat: 990.99,
@@ -234,7 +249,8 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     expect(result.head).toBe('test-head');
     expect(result.bruinIncomingDamage).toBeLessThan(result.wolfIncomingDamage);
     // The two incoming figures and the mitigation they imply are banded on
-    // the 2026-09-08 measurement (wolf 220, bear 143, 35 percent less):
+    // the 2026-09-08 measurement (wolf 220, bear 143, 35 percent less),
+    // re-measured 2026-10-15 for the Fenbridge rebuild (wolf 262, bear 157):
     // the drift the audit read (bear +12 percent) reds on the bear figure.
     const [wolfLo, wolfHi] = within(BRUIN_TANK_MEASURED.wolfIncomingDamage);
     expect(result.wolfIncomingDamage).toBeGreaterThanOrEqual(wolfLo);

@@ -156,7 +156,9 @@ export function eastbrookGrassExclusions(
     }
 
     for (const building of FENBRIDGE_LAYOUT.buildings) {
-      exclusions.push(layoutObb(building.id, building.footprint));
+      // A painted building clears its whole reach (porch, stair, awning), not
+      // only its wall box, as Eastbrook's do.
+      exclusions.push(layoutObb(building.id, building.reach));
       exclusions.push({
         kind: 'circle',
         id: `${building.id}:serviceApron`,
@@ -221,12 +223,8 @@ export function eastbrookGrassExclusions(
       z: FENBRIDGE_LAYOUT.civic.musterBoard.frontStandingPoint.z,
       radius: 1.2,
     });
-    for (const wall of FENBRIDGE_LAYOUT.wall.segments) {
-      exclusions.push(layoutObb(wall.id, wall.footprint));
-    }
-    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
-      for (const jamb of gate.arch.jambs) exclusions.push(layoutObb(jamb.id, jamb));
-    }
+    // Fenbridge stands open: grass grows up to the town on every side, with no
+    // palisade or gate footing to clear.
     for (const boardwalk of FENBRIDGE_LAYOUT.repeated.boardwalks) {
       exclusions.push({
         kind: 'obb',

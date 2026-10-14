@@ -73,6 +73,11 @@ const STREETLAMP_EXCLUSIONS = [
   // Eastbrook's main street: the lamp the road plan stands a stride and a
   // half off the painted smithy's door step, square in the way in.
   { x: -33.44783716157823, z: -103.6111100755925 },
+  // Fenbridge's painted buildings (fenbridge_layout.ts): the south road's last
+  // lamp, on the inn's door step, and the north street's lamp under the
+  // chapel's eaves by its bell tower.
+  { x: 4.25, z: 297.4690161983138 },
+  { x: -13.06878557216685, z: 310.4292763607378 },
 ];
 
 export function isExcludedStreetlamp(x: number, z: number): boolean {

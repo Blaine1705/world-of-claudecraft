@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => {
     cliff: prepare(),
     cityClutter: prepare(),
     town: prepare(),
+    fenbridgeTown: prepare(),
     armoury: prepare(),
     mailbox: prepare(),
     noticeboard: prepare(),
@@ -76,6 +77,10 @@ vi.mock('../src/render/city_clutter', () => ({
 vi.mock('../src/render/eastbrook_town', () => ({
   prepareEastbrookTownProfileAssets: mocks.town,
   resetEastbrookTownProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/fenbridge_town', () => ({
+  prepareFenbridgeTownProfileAssets: mocks.fenbridgeTown,
+  resetFenbridgeTownProfileCaches: mocks.reset,
 }));
 vi.mock('../src/render/transport_ship', () => ({
   prepareTransportShipAssets: mocks.ship,
@@ -176,6 +181,7 @@ const prepareSpies = [
   mocks.cliff,
   mocks.cityClutter,
   mocks.town,
+  mocks.fenbridgeTown,
   mocks.armoury,
   mocks.mailbox,
   mocks.noticeboard,
@@ -207,9 +213,10 @@ describe('graphics profile asset preparation', () => {
     expect(mocks.sky).toHaveBeenCalledWith(position.x, position.z, target);
     expect(mocks.cliff).toHaveBeenCalledWith(target);
     expect(mocks.cityClutter).toHaveBeenCalledWith(target);
-    // The Eastbrook town loads its placed buildings at the TARGET profile's
+    // Both towns load their placed buildings at the TARGET profile's
     // texture tier (a rebuild prepares before the live settings switch).
     expect(mocks.town).toHaveBeenCalledWith(target);
+    expect(mocks.fenbridgeTown).toHaveBeenCalledWith(target);
     for (const prepare of [
       mocks.armoury,
       mocks.mailbox,
@@ -255,6 +262,7 @@ describe('graphics profile derived-cache reset', () => {
       'stations',
       'eastbrook_surface_atlas',
       'eastbrook_town',
+      'fenbridge_town',
       'banker_chest',
       'mailbox',
       'noticeboard',

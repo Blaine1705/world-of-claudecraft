@@ -16,14 +16,10 @@ export interface Obb2 {
   rotation: number;
 }
 
+/** The town's circle: the ring its four entrances stand on. */
 interface CircularWallConfig {
-  idPrefix: string;
-  assetId: string;
   center: Point2;
   radius: number;
-  thickness: number;
-  height: number;
-  maximumSegmentSpan: number;
 }
 
 interface CircularWallGate {
@@ -124,18 +120,6 @@ export function obbsOverlap(left: Obb2, right: Obb2): boolean {
   return true;
 }
 
-export function segmentToObb(id: string, start: Point2, end: Point2, width: number): Obb2 {
-  const dx = end.x - start.x;
-  const dz = end.z - start.z;
-  return {
-    id,
-    center: { x: (start.x + end.x) / 2, z: (start.z + end.z) / 2 },
-    halfWidth: Math.hypot(dx, dz) / 2,
-    halfDepth: width / 2,
-    rotation: Math.atan2(-dz, dx),
-  };
-}
-
 /** Sample every polyline segment at a deterministic maximum spacing. */
 export function samplePolyline(points: readonly Point2[], maximumStep: number): Point2[] {
   if (!(maximumStep > 0) || points.length === 0) return [];
@@ -195,43 +179,6 @@ function makeCircularWallGate(
     start: pointOnCircle(config.center, config.radius, startAngle),
     end: pointOnCircle(config.center, config.radius, endAngle),
   };
-}
-
-function generateCircularWallSegments(
-  config: CircularWallConfig,
-  gates: readonly CircularWallGate[],
-): CircularWallSegment[] {
-  const sorted = [...gates].sort((left, right) => left.angle - right.angle);
-  const segments: CircularWallSegment[] = [];
-  for (let gateIndex = 0; gateIndex < sorted.length; gateIndex++) {
-    const gate = sorted[gateIndex];
-    const next = sorted[(gateIndex + 1) % sorted.length];
-    const startAngle = gate.endAngle;
-    let endAngle = next.startAngle;
-    if (endAngle <= startAngle) endAngle += TAU;
-    const intervalArcLength = (endAngle - startAngle) * config.radius;
-    const count = Math.max(1, Math.ceil(intervalArcLength / config.maximumSegmentSpan));
-    for (let intervalIndex = 0; intervalIndex < count; intervalIndex++) {
-      const segmentStartAngle = startAngle + ((endAngle - startAngle) * intervalIndex) / count;
-      const segmentEndAngle = startAngle + ((endAngle - startAngle) * (intervalIndex + 1)) / count;
-      const start = pointOnCircle(config.center, config.radius, segmentStartAngle);
-      const end = pointOnCircle(config.center, config.radius, segmentEndAngle);
-      const id = `${config.idPrefix}_${String(segments.length).padStart(2, '0')}`;
-      segments.push({
-        id,
-        assetId: config.assetId,
-        startAngle: segmentStartAngle,
-        endAngle: segmentEndAngle,
-        start,
-        end,
-        arcLength: (segmentEndAngle - segmentStartAngle) * config.radius,
-        chordLength: Math.hypot(end.x - start.x, end.z - start.z),
-        height: config.height,
-        footprint: segmentToObb(id, start, end, config.thickness),
-      });
-    }
-  }
-  return segments;
 }
 
 function deepFreeze<T>(value: T): T {
@@ -390,141 +337,246 @@ export const REMOVED_FENBRIDGE_PLACEMENTS = deepFreeze({
 const CIVIC_CENTER = { x: 0, z: 303 } as const;
 const FRONT_CLEARANCE = 1.5;
 
-function makeBuilding(
-  id: string,
-  assetId: string,
-  kind: 'house' | 'inn' | 'chapel',
-  position: Point2,
-  width: number,
-  height: number,
-  depth: number,
-  rotation: number,
-  entranceLocalX = 0,
-) {
-  const frontSocket = localToWorld(position, rotation, entranceLocalX, depth / 2);
+/** Normalize an angle into (-PI, PI]. */
+function wrapAngle(angle: number): number {
+  let wrapped = angle % TAU;
+  if (wrapped <= -Math.PI) wrapped += TAU;
+  if (wrapped > Math.PI) wrapped -= TAU;
+  return wrapped;
+}
+
+// Where a visitor stands at a placed building's door: at the foot of its
+// stoop, 1.8 yd off the wall face on the door's own line, the stand the
+// painted Eastbrook uses (sim/eastbrook_layout.ts PLACED_FRONT_CLEARANCE).
+const PLACED_FRONT_CLEARANCE = 1.8;
+// The painted Tidehold models are authored in yards with their ground line
+// at y 0 and one yard of footing below it. Fenbridge stands them at their
+// authored size (Eastbrook's wider streets take them 1.3 times larger): the
+// town's circle is 63 yards across, and at authored size it holds an inn, a
+// chapel, a bank, an apothecary and the warden's house with streets, a
+// square and a barrow between them. The lift buries the yard of footing and
+// sinks the ground line a further 0.05, the seat every placed building
+// takes.
+const PLACED_BUILDING_SCALE = 1;
+const PLACED_BUILDING_LIFT = -1.05;
+
+/**
+ * A PLACED building: one of the painted Tidehold models in the Fenrire moss
+ * look, stood at `anchor` (where the model's own origin goes) with `rotation`
+ * and one uniform size. It is SEALED, like every town building: the record is
+ * one solid box. `walls` is the walled body in the model's own axes, in yards
+ * at the placed size: `position`, `nativeDimensions` and `footprint` are that
+ * rectangle, so collision, the rest area and the map silhouette follow the
+ * walls a player sees rather than the eaves above them. `annexes` are the
+ * parts outside the wall box that are just as solid (a bell tower, a turret,
+ * a stall counter), each one more box in the same axes. `reach` is the whole
+ * ground rectangle the model covers (porch, stair, awning and chimney
+ * included): the draw cull and the grass clearing read that one. These models
+ * face local -Z, so the door and its standing point are on the -Z side.
+ * Every number is measured off the shipped file and its baked collision rows
+ * (tests/fenbridge_placed_buildings.test.ts).
+ */
+function makePlacedBuilding(spec: {
+  id: string;
+  assetId: string;
+  kind: 'house' | 'inn' | 'chapel';
+  anchor: Point2;
+  rotation: number;
+  /** The whole model in its own axes: its centre off the origin, its ground
+   *  extents, and its full height from the bottom of its footing. */
+  reach: { x: number; z: number; width: number; height: number; depth: number };
+  /** The walled body in the model's own axes. */
+  walls: { x: number; z: number; width: number; depth: number };
+  /** Solid parts outside the wall box, in the model's own axes. */
+  annexes?: readonly { name: string; x: number; z: number; width: number; depth: number }[];
+  /** Where the door sits along the front (local -Z) face. */
+  doorX: number;
+  /** An open doorway a player walks through: the record collides on the
+   *  model's own baked walls and stands its floor and entry step as walkable
+   *  ground (sim/town_walk_in.ts), the way the same model does as a Studio
+   *  placement. Without it the record is one sealed box. */
+  walkIn?: boolean;
+}) {
+  const position = localToWorld(spec.anchor, spec.rotation, spec.walls.x, spec.walls.z);
+  const wallFrontZ = spec.walls.z - spec.walls.depth / 2;
+  const annexes: Obb2[] = (spec.annexes ?? []).map((annex) => ({
+    id: `${spec.id}:${annex.name}`,
+    center: localToWorld(spec.anchor, spec.rotation, annex.x, annex.z),
+    halfWidth: annex.width / 2,
+    halfDepth: annex.depth / 2,
+    rotation: spec.rotation,
+  }));
+  const doorSocket = localToWorld(spec.anchor, spec.rotation, spec.doorX, wallFrontZ);
   const frontStandingPoint = localToWorld(
-    position,
-    rotation,
-    entranceLocalX,
-    depth / 2 + FRONT_CLEARANCE,
+    spec.anchor,
+    spec.rotation,
+    spec.doorX,
+    wallFrontZ - PLACED_FRONT_CLEARANCE,
   );
   return {
-    id,
-    assetId,
-    kind,
+    id: spec.id,
+    assetId: spec.assetId,
+    kind: spec.kind,
+    walkIn: spec.walkIn === true,
     position,
-    nativeDimensions: { width, height, depth },
-    rotation,
-    footprint: {
-      id,
-      center: position,
-      halfWidth: width / 2,
-      halfDepth: depth / 2,
-      rotation,
+    nativeDimensions: {
+      width: spec.walls.width,
+      // above the ground line: the footing below it is buried
+      height: spec.reach.height + PLACED_BUILDING_LIFT,
+      depth: spec.walls.depth,
     },
-    maxCornerRadius: Math.hypot(width / 2, depth / 2),
-    frontClearance: FRONT_CLEARANCE,
+    rotation: spec.rotation,
+    footprint: {
+      id: spec.id,
+      center: position,
+      halfWidth: spec.walls.width / 2,
+      halfDepth: spec.walls.depth / 2,
+      rotation: spec.rotation,
+    },
+    maxCornerRadius: Math.hypot(spec.walls.width / 2, spec.walls.depth / 2),
+    frontClearance: PLACED_FRONT_CLEARANCE,
     frontStandingPoint,
+    /** The way a visitor looks standing at the door, facing out of it. */
+    frontFacing: wrapAngle(spec.rotation + Math.PI),
     sockets: {
       entrance: {
-        id: `${id}_entrance`,
-        localPosition: { x: entranceLocalX, z: depth / 2 },
-        position: frontSocket,
+        id: `${spec.id}_entrance`,
+        // In the MODEL's own axes: the door on the -Z face.
+        localPosition: { x: spec.doorX, z: wallFrontZ },
+        position: doorSocket,
         standingPoint: frontStandingPoint,
       },
+    },
+    placement: {
+      x: spec.anchor.x,
+      z: spec.anchor.z,
+      rotation: spec.rotation,
+      scale: PLACED_BUILDING_SCALE,
+      lift: PLACED_BUILDING_LIFT,
+      /** The model's largest dimension at authored size: its baked collision
+       *  rows are stored in multiples of this over the placed-asset target
+       *  height (sim/town_walk_in.ts). */
+      modelSize: Math.max(spec.reach.width, spec.reach.height, spec.reach.depth),
+    },
+    annexes,
+    reach: {
+      id: spec.id,
+      center: localToWorld(spec.anchor, spec.rotation, spec.reach.x, spec.reach.z),
+      halfWidth: spec.reach.width / 2,
+      halfDepth: spec.reach.depth / 2,
+      rotation: spec.rotation,
     },
   };
 }
 
-// Canonical site plan (master-plan.md). Every lot faces the cistern so the
-// building front (+Z) and Eastbrook-style greeter facing open onto the square.
-// Rotations are facingToward(lot, CIVIC_CENTER), then literal-pinned by tests.
-const GATEHOUSE = makeBuilding(
-  'fenbridge_warden_gatehouse',
-  '/models/props/fenbridge_warden_gatehouse.glb',
-  'house',
-  { x: 9, z: 282 },
-  7.8,
-  10.5,
-  7,
-  facingToward({ x: 9, z: 282 }, CIVIC_CENTER),
-);
-const INN_BASE = makeBuilding(
-  'fenbridge_crooked_reed_inn',
-  '/models/props/fenbridge_crooked_reed_inn.glb',
-  'inn',
-  // Back-west ring: clear of the east-marsh road and the west gate path.
-  { x: -21.25, z: 317 },
-  9,
-  8.8,
-  8,
-  facingToward({ x: -21.25, z: 317 }, CIVIC_CENTER),
-  -2.8,
-);
-const CHAPEL_BASE = makeBuilding(
-  'fenbridge_lantern_chapel',
-  '/models/props/fenbridge_lantern_chapel.glb',
-  'chapel',
-  { x: -19.5, z: 294 },
-  7,
-  8.6,
-  7,
-  facingToward({ x: -19.5, z: 294 }, CIVIC_CENTER),
-);
-const APOTHECARY = makeBuilding(
-  'fenbridge_moonwort_apothecary',
-  '/models/props/fenbridge_moonwort_apothecary.glb',
-  'house',
-  { x: 17.8, z: 291.5 },
-  7,
-  7.2,
-  6,
-  facingToward({ x: 17.8, z: 291.5 }, CIVIC_CENTER),
-);
-const BANK_BASE = makeBuilding(
-  'fenbridge_gilded_strongbox',
-  '/models/props/fenbridge_gilded_strongbox.glb',
-  'house',
-  { x: 19.2, z: 309.5 },
-  7.5,
-  7.4,
-  6.5,
-  facingToward({ x: 19.2, z: 309.5 }, CIVIC_CENTER),
-  // Matches the GLB front-entry socket local x = 1.75.
-  1.75,
-);
-const TANNERY_BASE = makeBuilding(
-  'fenbridge_hesk_tannery',
-  '/models/props/fenbridge_hesk_tannery.glb',
-  'house',
-  // North ring, west of the north road so the gate stay open.
-  { x: -2, z: 320 },
-  12,
-  7.2,
-  7,
-  facingToward({ x: -2, z: 320 }, CIVIC_CENTER),
-);
-const SCOUT_LODGE = makeBuilding(
-  'fenbridge_scout_lodge',
-  '/models/props/fenbridge_scout_lodge.glb',
-  'house',
-  // West of the north exit (smaller footprint than the tannery).
-  { x: -13.5, z: 325.5 },
-  8,
-  7.6,
-  6.5,
-  facingToward({ x: -13.5, z: 325.5 }, CIVIC_CENTER),
-);
+// The site plan. Two streets cross in the town's circle, which stands open
+// with no palisade: the main street runs north from the south entrance (the
+// causeway every traveller arrives by) past the cistern to the north
+// entrance, and the marsh street joins the west and east entrances. The inn
+// and the chapel face each other across the cistern, so the first thing a
+// newcomer meets past the warden is a door to rest at and a door to pray at;
+// the chapel's bell tower marks the crossroads, the
+// barrow (the graveyard) lies along the chapel's south side, and the bank
+// and the apothecary face each other up the north street. A quarter turn
+// either way stands a building side-on to the circle with its door on a
+// street: facing the cistern head-on, these models are too deep for it.
+const EAST_FACING = Math.PI / 2; // the door looks east (-x), the model turned a quarter
+const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
+// The Fenrire look of the painted set: the same models and geometry as
+// /models/tidehold/, re-baked wearing the moss-grown town maps.
+const PAINTED_SET = '/models/tidehold/fenrire';
 
-// Market stall on the inn front apron (NW of the cistern, clear of chapel greeters).
-const PROVISION_STALL_POSITION = { x: -14, z: 313 } as const;
-const PROVISION_STALL_ROTATION = facingToward(PROVISION_STALL_POSITION, CIVIC_CENTER);
+const WARDEN_HOUSE = makePlacedBuilding({
+  id: 'fenbridge_warden_gatehouse',
+  assetId: `${PAINTED_SET}/house_a.glb`,
+  kind: 'house',
+  // at the south entrance, west of the main street: the first door in town
+  anchor: { x: 7.4, z: 281.7 },
+  rotation: EAST_FACING,
+  reach: { x: 0.2145, z: 0, width: 11.763, height: 12.23, depth: 9.8 },
+  walls: { x: 0, z: 0, width: 9.36, depth: 7.96 },
+  doorX: -1.4,
+});
+const INN_BASE = makePlacedBuilding({
+  id: 'fenbridge_crooked_reed_inn',
+  assetId: `${PAINTED_SET}/tavern.glb`,
+  kind: 'inn',
+  // west of the cistern, its long front on the main street
+  anchor: { x: 12.25, z: 299.9 },
+  rotation: EAST_FACING,
+  reach: { x: 0.272, z: -0.05, width: 22.648, height: 18.78, depth: 16.8 },
+  walls: { x: 0, z: 0, width: 20, depth: 13 },
+  annexes: [
+    { name: 'front_bench', x: -5.1, z: -7.25, width: 5.4, depth: 0.9 },
+    { name: 'barrels', x: 10.9, z: -4.9, width: 1.1, depth: 2.3 },
+  ],
+  doorX: 0,
+  walkIn: true,
+});
+const CHAPEL_BASE = makePlacedBuilding({
+  id: 'fenbridge_lantern_chapel',
+  assetId: `${PAINTED_SET}/hall.glb`,
+  kind: 'chapel',
+  // east of the cistern, its gable and door facing the inn's
+  anchor: { x: -16.2, z: 299.6 },
+  rotation: WEST_FACING,
+  reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
+  walls: { x: 0, z: 0, width: 12, depth: 22 },
+  annexes: [
+    // at the crossroads corner
+    { name: 'bell_tower', x: 8.25, z: -9, width: 5.4, depth: 5.4 },
+    // the chronicler's archive board, left of the door
+    { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
+  ],
+  doorX: 0,
+  walkIn: true,
+});
+const APOTHECARY = makePlacedBuilding({
+  id: 'fenbridge_moonwort_apothecary',
+  // the potion shop: a flask on its sign, bottles on its street stall
+  assetId: `${PAINTED_SET}/shop_b.glb`,
+  kind: 'house',
+  // north street, west side, facing the bank; its turret on the crossroads
+  anchor: { x: 9.2, z: 322.8 },
+  rotation: EAST_FACING,
+  reach: { x: 0.4745, z: -0.849, width: 13.649, height: 18.7, depth: 12.702 },
+  walls: { x: 0, z: 0, width: 9.4, depth: 9 },
+  annexes: [{ name: 'turret', x: 5.19, z: -4.99, width: 2.66, depth: 2.66 }],
+  doorX: -0.7,
+  walkIn: true,
+});
+const BANK_BASE = makePlacedBuilding({
+  id: 'fenbridge_gilded_strongbox',
+  // the goods shop with the sack sign: the town's counting house
+  assetId: `${PAINTED_SET}/shop_a.glb`,
+  kind: 'house',
+  // north street, east side, its counter and awning on the street
+  anchor: { x: -8.9, z: 322 },
+  rotation: WEST_FACING,
+  reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
+  walls: { x: 0, z: 0, width: 11, depth: 8.4 },
+  annexes: [
+    { name: 'stall_counter', x: 2.375, z: -5.925, width: 3.61, depth: 0.77 },
+    // the barrels at the stall's north end, with the awning post beside them
+    { name: 'stall_barrels', x: 4.885, z: -5.762, width: 1.477, depth: 2.169 },
+  ],
+  doorX: -1.6,
+  walkIn: true,
+});
+
+// Provisioner Hale's stall stands on the main street in front of the inn's
+// south half, its counter facing the street (the stall's front is its +Z).
+const PROVISION_STALL_POSITION = { x: 3, z: 294.5 } as const;
+const PROVISION_STALL_ROTATION = facingToward(PROVISION_STALL_POSITION, {
+  x: 0,
+  z: PROVISION_STALL_POSITION.z,
+});
 const PROVISION_STALL_WIDTH = 3.2;
 const PROVISION_STALL_DEPTH = 1.6;
-// Inner south-gate apron, board facing the square (readable on approach).
+// By the south entrance, board facing the square (readable on approach).
 const MUSTER_BOARD_POSITION = { x: -6, z: 278 } as const;
 const MUSTER_BOARD_ROTATION = facingToward(MUSTER_BOARD_POSITION, CIVIC_CENTER);
-// Stand to the vendor's left of the counter, clear of the stall OBB so
+// The vendor stands at the counter's south end, clear of the stall OBB so
 // pathfinding can reach them (Eastbrook-style service apron, not inside mesh).
 const PROVISION_STALL_VENDOR_POINT = localToWorld(
   PROVISION_STALL_POSITION,
@@ -539,19 +591,27 @@ const INN = {
     ...INN_BASE.sockets,
     provisionCounter: {
       id: 'fenbridge_crooked_reed_inn_provision_counter',
-      localPosition: { x: 0, z: INN_BASE.nativeDimensions.depth / 2 },
+      localPosition: null,
       position: PROVISION_STALL_POSITION,
       standingPoint: PROVISION_STALL_VENDOR_POINT,
     },
   },
 };
 
-// Archive apron: left of the door on the clear front (not pressed into the wall).
-const CHAPEL_ARCHIVE_STANDING_POINT = localToWorld(
-  CHAPEL_BASE.position,
+// The chronicler keeps the chapel's archive at the notice board left of the
+// door: he stands 1.5 yd off its face.
+const CHAPEL_BOARD = { x: -4.2, z: -11.8, depth: 0.6 } as const;
+const CHAPEL_ARCHIVE_POSITION = localToWorld(
+  CHAPEL_BASE.placement,
   CHAPEL_BASE.rotation,
-  -2.4,
-  CHAPEL_BASE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
+  CHAPEL_BOARD.x,
+  CHAPEL_BOARD.z - CHAPEL_BOARD.depth / 2,
+);
+const CHAPEL_ARCHIVE_STANDING_POINT = localToWorld(
+  CHAPEL_BASE.placement,
+  CHAPEL_BASE.rotation,
+  CHAPEL_BOARD.x,
+  CHAPEL_BOARD.z - CHAPEL_BOARD.depth / 2 - FRONT_CLEARANCE,
 );
 const CHAPEL = {
   ...CHAPEL_BASE,
@@ -559,94 +619,30 @@ const CHAPEL = {
     ...CHAPEL_BASE.sockets,
     archive: {
       id: 'fenbridge_lantern_chapel_archive',
-      localPosition: { x: -2.4, z: CHAPEL_BASE.nativeDimensions.depth / 2 },
-      position: localToWorld(
-        CHAPEL_BASE.position,
-        CHAPEL_BASE.rotation,
-        -2.4,
-        CHAPEL_BASE.nativeDimensions.depth / 2,
-      ),
+      localPosition: { x: CHAPEL_BOARD.x, z: CHAPEL_BOARD.z - CHAPEL_BOARD.depth / 2 },
+      position: CHAPEL_ARCHIVE_POSITION,
       standingPoint: CHAPEL_ARCHIVE_STANDING_POINT,
     },
   },
 };
 
-// Teller counter on the bank face; Petra stands on the apron in front of it
-// (Eastbrook bursar style: front apron + building rotation into the square).
-const BANK_TELLER_LOCAL_X = -1.25;
-const BANK_TELLER_POSITION = localToWorld(
-  BANK_BASE.position,
-  BANK_BASE.rotation,
-  BANK_TELLER_LOCAL_X,
-  BANK_BASE.nativeDimensions.depth / 2,
-);
-const BANK_TELLER_STANDING_POINT = localToWorld(
-  BANK_BASE.position,
-  BANK_BASE.rotation,
-  BANK_TELLER_LOCAL_X,
-  BANK_BASE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
-);
+// Petra keeps the bank's door: the teller stand is the doorstep.
 const BANK = {
   ...BANK_BASE,
-  // Pathfinding apron: teller bay is clear; the door-bay stand collides with
-  // the west-road sample at 1.5 yd. Socket local x stays 1.75 for GLB parity.
-  frontStandingPoint: BANK_TELLER_STANDING_POINT,
   sockets: {
     ...BANK_BASE.sockets,
-    entrance: {
-      ...BANK_BASE.sockets.entrance,
-      // Keep localPosition from makeBuilding (1.75); only the world stand moves.
-      standingPoint: BANK_TELLER_STANDING_POINT,
-    },
     teller: {
+      ...BANK_BASE.sockets.entrance,
       id: 'fenbridge_gilded_strongbox_teller',
-      localPosition: {
-        x: BANK_TELLER_LOCAL_X,
-        z: BANK_BASE.nativeDimensions.depth / 2,
-      },
-      position: BANK_TELLER_POSITION,
-      standingPoint: BANK_TELLER_STANDING_POINT,
     },
   },
 };
 
-// Profession station on the open craft bay apron (outside the OBB so body 0.8
-// pathfinding can stand on it). Master stands 1 to 3 yd from the station.
-const TANNERY_STATION_POSITION = localToWorld(
-  TANNERY_BASE.position,
-  TANNERY_BASE.rotation,
-  -2.5,
-  TANNERY_BASE.nativeDimensions.depth / 2 + 1.5,
-);
-const TANNER_POSITION = localToWorld(
-  TANNERY_BASE.position,
-  TANNERY_BASE.rotation,
-  -4.5,
-  TANNERY_BASE.nativeDimensions.depth / 2 + 1.5,
-);
-const TANNERY = {
-  ...TANNERY_BASE,
-  sockets: {
-    ...TANNERY_BASE.sockets,
-    station: {
-      id: 'fenbridge_hesk_tannery_station',
-      localPosition: null,
-      position: TANNERY_STATION_POSITION,
-      standingPoint: TANNERY_STATION_POSITION,
-    },
-  },
-};
-
-const BUILDINGS = [GATEHOUSE, INN, CHAPEL, APOTHECARY, BANK, TANNERY, SCOUT_LODGE] as const;
+const BUILDINGS = [WARDEN_HOUSE, INN, CHAPEL, APOTHECARY, BANK] as const;
 
 const WALL_CONFIG = {
-  idPrefix: 'fenbridge_palisade_wing',
-  assetId: '/models/props/fenbridge_palisade_wing.glb',
   center: CIVIC_CENTER,
   radius: 31.5,
-  thickness: 0.75,
-  height: 3.4,
-  maximumSegmentSpan: 12,
 } as const;
 
 const BASE_WALL_GATES = [
@@ -662,51 +658,13 @@ const BASE_WALL_GATES = [
   makeCircularWallGate(WALL_CONFIG, 'fenbridge_gate_north', 'north_fen', { x: 0, z: 334.5 }, 6),
 ] as const;
 
-function addGateArch(gate: CircularWallGate) {
-  const rotation = facingToward(gate.crossing, CIVIC_CENTER);
-  const jambOffset = gate.width / 2 + 0.3;
-  return {
-    ...gate,
-    arch: {
-      id: `${gate.id}_arch`,
-      assetId: '/models/props/fenbridge_gate_arch.glb',
-      position: gate.crossing,
-      rotation,
-      nativeDimensions: { width: 7.2, height: 4.8, depth: 1 },
-      openingWidth: gate.width,
-      collision: 'jambs_only',
-      jambs: [
-        {
-          ...segmentToObb(
-            `${gate.id}_jamb_left`,
-            localToWorld(gate.crossing, rotation, -jambOffset, -0.5),
-            localToWorld(gate.crossing, rotation, -jambOffset, 0.5),
-            0.6,
-          ),
-        },
-        {
-          ...segmentToObb(
-            `${gate.id}_jamb_right`,
-            localToWorld(gate.crossing, rotation, jambOffset, -0.5),
-            localToWorld(gate.crossing, rotation, jambOffset, 0.5),
-            0.6,
-          ),
-        },
-      ],
-    },
-  };
-}
-
-const WALL_GATES = BASE_WALL_GATES.map(addGateArch);
-const WALL_SEGMENTS = generateCircularWallSegments(WALL_CONFIG, WALL_GATES);
-
-export function palisadeSegmentMirrored(segment: CircularWallSegment): boolean {
-  return WALL_GATES.some(
-    (gate) =>
-      Math.abs(gate.end.x - segment.start.x) < 1e-8 &&
-      Math.abs(gate.end.z - segment.start.z) < 1e-8,
-  );
-}
+// Fenbridge stands open: no palisade and no gate arches, so the town has
+// open ground all round it. The four entrances keep the ring's road
+// crossings, so the streets, the scout's post and the muster board meet the
+// marsh where they always did; the palisade and gate models stay shipped for
+// Studio.
+const WALL_GATES = BASE_WALL_GATES;
+const WALL_SEGMENTS: readonly CircularWallSegment[] = [];
 
 function gateCrossing(id: string): Point2 {
   const gate = WALL_GATES.find((candidate) => candidate.id === id);
@@ -727,6 +685,10 @@ function gateRadialPoint(id: string, distanceFromCrossing: number): Point2 {
   };
 }
 
+// The crossroads where the marsh street meets the main street, north of the
+// cistern.
+const CROSSROADS = { x: 0, z: 313.5 } as const;
+
 const ROADS = [
   {
     id: 'south_causeway',
@@ -745,11 +707,9 @@ const ROADS = [
     gateId: 'fenbridge_gate_west',
     halfWidth: 1.5,
     points: [
-      { x: 4.5, z: 303 },
-      { x: 7, z: 307 },
-      { x: 10, z: 315 },
-      { x: 19, z: 318 },
-      { x: 26, z: 316 },
+      CROSSROADS,
+      // bowed a stride north, clear of the inn's gable and chimney
+      { x: 14, z: 313.7 },
       gateRadialPoint('fenbridge_gate_west', -GATE_RADIAL_APPROACH_DISTANCE),
       gateCrossing('fenbridge_gate_west'),
       gateRadialPoint('fenbridge_gate_west', GATE_RADIAL_APPROACH_DISTANCE),
@@ -764,10 +724,9 @@ const ROADS = [
     gateId: 'fenbridge_gate_east',
     halfWidth: 1.5,
     points: [
-      { x: -4.5, z: 303 },
-      { x: -8, z: 302 },
-      { x: -15, z: 305 },
-      { x: -22, z: 310 },
+      CROSSROADS,
+      // bowed a stride north, clear of the chapel's eaves
+      { x: -14, z: 313.8 },
       gateRadialPoint('fenbridge_gate_east', -GATE_RADIAL_APPROACH_DISTANCE),
       gateCrossing('fenbridge_gate_east'),
       gateRadialPoint('fenbridge_gate_east', GATE_RADIAL_APPROACH_DISTANCE),
@@ -781,11 +740,6 @@ const ROADS = [
     halfWidth: 1.5,
     points: [
       { x: 0, z: 307.5 },
-      { x: 4, z: 313 },
-      { x: 9, z: 318 },
-      { x: 11, z: 324 },
-      // Keep east of the north-ring lots; wood nodes sit outside the wall.
-      { x: 7.5, z: 330 },
       gateCrossing('fenbridge_gate_north'),
       { x: 10, z: 400 },
       { x: 20, z: 470 },
@@ -796,8 +750,8 @@ const ROADS = [
 
 /**
  * Ground-seated boardwalk modules (long axis = local X, joins at ±2).
- * Continuous paths from the south gate into the square, then short spurs
- * toward the inn/chapel (west) and bank/apothecary (east) aprons.
+ * Continuous runs down the main street: from the south entrance to the
+ * cistern, and from the crossroads to the north entrance.
  */
 function boardwalkModulesAlong(
   points: readonly Point2[],
@@ -825,20 +779,15 @@ function boardwalkModulesAlong(
 }
 
 const BOARDWALK_PATHS: readonly (readonly Point2[])[] = [
-  // South gate -> square (6 modules along the causeway).
+  // South entrance -> cistern (6 modules along the causeway).
   [
     { x: 0, z: 274 },
     { x: 0, z: 298 },
   ],
-  // West spur to the inn / chapel approach (3 modules).
+  // Crossroads -> north entrance (4 modules up the north street).
   [
-    { x: -2, z: 302 },
-    { x: -14, z: 308 },
-  ],
-  // East spur to the bank / apothecary approach (3 modules).
-  [
-    { x: 2, z: 302 },
-    { x: 14, z: 300 },
+    { x: 0, z: 316 },
+    { x: 0, z: 332 },
   ],
 ];
 
@@ -863,6 +812,16 @@ const MUSTER_ORDERS = [
   blocking: false,
 }));
 
+// Tanner Hesk works an open yard in the north-east corner, between the
+// bank's back and the east entrance: his tanning rack, barrel and crate
+// stand round the station point (sim/town_props.ts STATION_PROP_CLUSTERS), and he
+// keeps his place 2 yd off it (the cluster notes' tannery stand).
+const TANNERY_STATION_POSITION = { x: -20, z: 320.5 } as const;
+const TANNER_POSITION = {
+  x: TANNERY_STATION_POSITION.x + 2,
+  z: TANNERY_STATION_POSITION.z + 1.5,
+} as const;
+
 const STATIONS = [
   {
     id: 'station_fenbridge_tannery',
@@ -877,49 +836,52 @@ function makeNpc(id: string, position: Point2, facing: number, anchorId: string)
   return { id, position, facing, anchorId, bodyRadius: 0.6 };
 }
 
-// Eastbrook pattern: greeters on the front apron face with the building
-// (into the square). Gate guard faces arrivals; tanner faces the station.
-const WARDEN_POSITION = localToWorld(
-  GATEHOUSE.position,
-  GATEHOUSE.rotation,
-  -2.4,
-  GATEHOUSE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
-);
-// Map lean-to: right front of the scout lodge (north lot, not the tannery).
-const SCOUT_MAP_POSITION = localToWorld(
-  SCOUT_LODGE.position,
-  SCOUT_LODGE.rotation,
-  2.2,
-  SCOUT_LODGE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
-);
+// Scout Maren keeps the north entrance, looking down the north street into
+// town.
+const SCOUT_POSITION = { x: -3.2, z: 330 } as const;
 const NPCS = [
-  // Face the square like the other greeters (not the south causeway).
-  makeNpc('warden_fenwick', WARDEN_POSITION, GATEHOUSE.rotation, GATEHOUSE.id),
-  makeNpc('brother_aldric_fen', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
-  // Eastbrook merchant: stand on the customer face, face with the stall.
+  // The warden greets arrivals at his own door, by the south entrance.
+  makeNpc(
+    'warden_fenwick',
+    WARDEN_HOUSE.frontStandingPoint,
+    WARDEN_HOUSE.frontFacing,
+    WARDEN_HOUSE.id,
+  ),
+  makeNpc('brother_aldric_fen', CHAPEL.frontStandingPoint, CHAPEL.frontFacing, CHAPEL.id),
+  // Eastbrook merchant: stand at the counter's end, face with the stall.
   makeNpc(
     'provisioner_hale',
     PROVISION_STALL_VENDOR_POINT,
     PROVISION_STALL_ROTATION,
     'fenbridge_provision_stall',
   ),
-  makeNpc('herbalist_yara', APOTHECARY.frontStandingPoint, APOTHECARY.rotation, APOTHECARY.id),
-  makeNpc('scout_maren', SCOUT_MAP_POSITION, SCOUT_LODGE.rotation, SCOUT_LODGE.id),
-  // Eastbrook bursar: bank front apron, face into the square.
+  makeNpc('herbalist_yara', APOTHECARY.frontStandingPoint, APOTHECARY.frontFacing, APOTHECARY.id),
+  makeNpc(
+    'scout_maren',
+    SCOUT_POSITION,
+    facingToward(SCOUT_POSITION, CROSSROADS),
+    'fenbridge_gate_north',
+  ),
+  // Eastbrook bursar: the bank's doorstep, facing the street.
   makeNpc(
     'bursar_petra_vell',
     BANK.sockets.teller.standingPoint,
-    BANK.rotation,
+    BANK.frontFacing,
     BANK.sockets.teller.id,
   ),
   makeNpc(
     'chronicler_osric_fenn',
     CHAPEL_ARCHIVE_STANDING_POINT,
-    CHAPEL.rotation,
+    CHAPEL.frontFacing,
     'fenbridge_lantern_chapel_archive',
   ),
-  // Face the square with the building (craft station stays on the apron).
-  makeNpc('tanner_hesk', TANNER_POSITION, TANNERY.rotation, TANNERY.id),
+  // Faces the crossroads from his yard, the station beside him.
+  makeNpc(
+    'tanner_hesk',
+    TANNER_POSITION,
+    facingToward(TANNER_POSITION, CROSSROADS),
+    'station_fenbridge_tannery',
+  ),
   // The farmer (the farming go-live): outside the hub circle on the town
   // side of the patch_mirefen raised beds (content/farm_patches.ts, beds at
   // z 339 and 344), facing north across them (facing 0 looks along +z).
@@ -969,6 +931,9 @@ const PRESERVED_PROPS = {
   ruinRings: [{ x: 100, z: 435, ringR: 7, columns: 7 }],
 } as const;
 
+// The town's post pillar stands at the inn's north corner on the crossroads.
+const MAILBOX_POSITION = { x: 3.2, z: 310.2 } as const;
+
 export const FENBRIDGE_LAYOUT = deepFreeze({
   id: 'fenbridge_rebuild_v1',
   zoneId: 'mirefen_marsh',
@@ -976,6 +941,7 @@ export const FENBRIDGE_LAYOUT = deepFreeze({
   buildings: BUILDINGS,
   civic: {
     center: CIVIC_CENTER,
+    crossroads: CROSSROADS,
     ring: { radius: 4.5, pathHalfWidth: 1.5 },
     cistern: {
       id: 'fenbridge_mirelight_cistern',
@@ -1046,10 +1012,11 @@ export const FENBRIDGE_LAYOUT = deepFreeze({
       id: 'mailbox_fenbridge',
       templateId: 'mailbox',
       assetId: '/models/props/mailbox_pillar.glb',
-      position: { x: 6, z: 294 },
+      position: MAILBOX_POSITION,
       bodyRadius: 0.8,
       interactionRadius: 7,
-      frontStandingPoint: { x: 6, z: 296 },
+      // on the main street, east of the pillar
+      frontStandingPoint: { x: MAILBOX_POSITION.x - 2, z: MAILBOX_POSITION.z },
     },
     graveyard: {
       id: 'gy_fenbridge',

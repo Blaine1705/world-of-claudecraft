@@ -1,8 +1,10 @@
-// A PLACED town building: one of the painted Tidehold models stood in the
-// built-in Eastbrook at the anchor, turn, size and seat it has on the Studio
-// rebuild map (sim/eastbrook_layout.ts makePlacedBuilding), drawn with its own
-// materials. The town view owns everything around it (the reveal gate, the fog
-// cull, the camera fade); this module only builds the group.
+// A PLACED town building: one of the painted Tidehold models stood in a
+// built-in town at the anchor, turn, size and seat its layout record gives it
+// (makePlacedBuilding in sim/eastbrook_layout.ts, whose anchors are the Studio
+// rebuild map's, and in sim/fenbridge_layout.ts), drawn with its own
+// materials. Both towns stand their painted buildings through this module. The
+// town view owns everything around it (the reveal gate, the fog cull, the
+// camera fade); this module only builds the group.
 //
 // It mirrors what render/placed_assets.ts does for the same file on an
 // authored map, so the built-in town and the map show the same building:
@@ -13,12 +15,39 @@
 //     threshold, exactly as a placed asset's is;
 //   - the file: the profile's texture tier of the model, same geometry.
 import * as THREE from 'three';
-import type { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { GFX } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeRecordFor } from './occluder_fade';
 
-type EastbrookBuilding = (typeof EASTBROOK_LAYOUT.buildings)[number];
+/** What a placed building record carries: both towns' makePlacedBuilding
+ *  build this shape. */
+export interface PlacedTownBuildingRecord {
+  readonly id: string;
+  readonly assetId: string;
+  readonly position: { readonly x: number; readonly z: number };
+  readonly rotation: number;
+  readonly nativeDimensions: {
+    readonly width: number;
+    readonly height: number;
+    readonly depth: number;
+  };
+  readonly frontStandingPoint: { readonly x: number; readonly z: number };
+  readonly placement: {
+    readonly x: number;
+    readonly z: number;
+    readonly rotation: number;
+    readonly scale: number;
+    readonly lift: number;
+  };
+  readonly reach: {
+    readonly center: { readonly x: number; readonly z: number };
+    readonly halfWidth: number;
+    readonly halfDepth: number;
+  };
+}
+
+/** Which town stands the building: names its group and its id field. */
+export type PlacedTown = 'eastbrook' | 'fenbridge';
 
 const PLACED_BUILDING_ASSET_PREFIX = '/models/tidehold/';
 
@@ -111,11 +140,12 @@ export interface PlacedBuildingBuild {
 }
 
 /**
- * Stand `source` (the loaded model scene) in the town for `building`.
+ * Stand `source` (the loaded model scene) in `town` for `building`.
  * `groundAt` is the terrain height under a world point.
  */
-export function buildEastbrookPlacedBuilding(
-  building: EastbrookBuilding,
+export function buildPlacedTownBuilding(
+  town: PlacedTown,
+  building: PlacedTownBuildingRecord,
   source: THREE.Object3D,
   groundAt: (x: number, z: number) => number,
 ): PlacedBuildingBuild {
@@ -142,8 +172,8 @@ export function buildEastbrookPlacedBuilding(
 
   const ground = groundAt(placement.x, placement.z);
   const group = new THREE.Group();
-  group.name = `eastbrookBuilding:${building.id}`;
-  group.userData.eastbrookBuildingId = building.id;
+  group.name = `${town}Building:${building.id}`;
+  group.userData[`${town}BuildingId`] = building.id;
   group.userData.assetId = building.assetId;
   group.userData.assetUrl = building.assetId;
   group.userData.position = building.position;
@@ -171,4 +201,13 @@ export function buildEastbrookPlacedBuilding(
     topY: ground + building.nativeDimensions.height,
     cullRadius,
   };
+}
+
+/** Eastbrook's placed building (sim/eastbrook_layout.ts). */
+export function buildEastbrookPlacedBuilding(
+  building: PlacedTownBuildingRecord,
+  source: THREE.Object3D,
+  groundAt: (x: number, z: number) => number,
+): PlacedBuildingBuild {
+  return buildPlacedTownBuilding('eastbrook', building, source, groundAt);
 }
