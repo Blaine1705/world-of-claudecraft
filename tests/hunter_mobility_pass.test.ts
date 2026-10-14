@@ -43,15 +43,15 @@ function control(id: string, kind: Aura['kind'], unbreakable = false): Aura {
 }
 
 describe('Trailbreak', () => {
-  it('leaps 25 yards on a 20 sec cooldown', () => {
+  it('leaps 25 yards on a 15 sec cooldown', () => {
     const sim = hunter(4501);
     const resolved = sim.resolvedAbility('trailbreak');
-    expect(resolved?.cooldown).toBe(20);
+    expect(resolved?.cooldown).toBe(15);
     expect(resolved?.effects).toContainEqual({ type: 'hunterTrailbreak', distance: 25 });
     expect(resolved?.charges ?? 1).toBe(1);
 
     sim.castAbility('trailbreak');
-    expect(sim.player.cooldowns.get('trailbreak')).toBe(20);
+    expect(sim.player.cooldowns.get('trailbreak')).toBe(15);
   });
 
   it('breaks free of roots and movement slows without Tactical Retreat', () => {

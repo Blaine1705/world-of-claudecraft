@@ -418,13 +418,13 @@ export const zh_CN: EnTranslations = {
       "heroicClears": "{count}次英雄",
       "normalClears": "{count}次普通",
       "viewPossibleLoot": "查看可能的战利品",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "战利品专精",
+      "allClassGear": "所有本职业装备",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "仅适用于尚未开启的宝库。",
+      "noFocusedLoot": "没有符合条件的战利品。请选择其他专精。",
+      "rolledFocus": "抽取时的专精：{focus}",
       "chooseTable": "选择用于抽取奖励的战利品表",
       "selectAllTables": "全选",
       "selectedTables": "已选择 {count} 个战利品表",
@@ -522,12 +522,12 @@ export const zh_CN: EnTranslations = {
       "castingOff": "前往{dest}的渡船正在起航",
       "boardHint": "起航时站在甲板上即可随船出发。渡船免费。",
       "sailing": "正在驶往{dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "{port}至{dest}的渡船",
+      "portTitle": "{port}渡船码头",
+      "destination": "目的地：{dest}",
+      "boardNow": "现在登船",
+      "arrivesIn": "渡船将在{time}后抵达",
+      "scheduleUnavailable": "渡船时刻表暂不可用。"
     },
     "materialStackSelectionUnavailable": "该素材选择已失效。",
     "vehicle": {
@@ -588,13 +588,13 @@ export const zh_CN: EnTranslations = {
       "banner": "正在观察 {name}"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "今日消息：{text}",
+      "updated": "今日消息已更新。",
+      "cleared": "今日消息已清除。",
+      "none": "当前未设置今日消息。",
+      "usage": "用法：/motd \"<消息>\" 设置今日消息，/motd clear 将其清除。",
+      "tooLong": "今日消息最多 {max} 个字符。",
+      "saveFailed": "今日消息未能保存，服务器重启后将会丢失。"
     },
     "readyCheck": {
       "title": "就绪确认",
@@ -619,11 +619,11 @@ export const zh_CN: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "在尸体旁复活",
-      "pvpResurrect": "PvP 复活",
-      "pvpResurrectTitle": "在最近的墓地以满生命值复活，且不会新增复活后遗症。",
-      "pvpResurrectWaitButton": "PvP 复活（{seconds}）",
-      "pvpResurrectWaitNote": "{seconds}后可以 PvP 复活：你将在最近的墓地复活。",
-      "pvpResurrectReadyNote": "PvP 复活已就绪：你将在最近的墓地复活。",
+      "pvpResurrect": "PvP复活",
+      "pvpResurrectTitle": "以满生命值在最近的墓地复活，且不会产生新的守墓人通行费。",
+      "pvpResurrectWaitButton": "PvP复活（{seconds}）",
+      "pvpResurrectWaitNote": "{seconds}后可进行PvP复活：你会在最近的墓地起身。",
+      "pvpResurrectReadyNote": "PvP复活已就绪：你会在最近的墓地起身。",
       "resurrectAtHealer": "灵魂医者（复活后遗症）",
       "ghostHint": "跑回你死亡的地点，或与灵魂医者交谈以复活",
       "spiritHealerAlive": "灵魂医者只看护逝者。你仍是生者。",
@@ -1887,8 +1887,8 @@ export const zh_CN: EnTranslations = {
       "reportSent": "报告已复制并发送到聊天",
       "reportNoData": "未记录任何数据。",
       "noDetailedData": "没有详细数据",
-      "detailHealSubtitle": "Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)",
-      "detailHitSubtitle": "Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}",
+      "detailHealSubtitle": "有效：{effective} | 过量治疗：{overheal}（{overhealPercent}） | 命中：{hits}（{critPercent} 暴击）",
+      "detailHitSubtitle": "命中：{hits} | 暴击：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}",
       "noDeathEvents": "死亡前没有记录到任何事件",
       "killedBy": "死于{killer}（{ability}）",
       "lethalHit": "致命打击",
@@ -2155,7 +2155,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "悬停显示法术提示",
       "clickMoveLeft": "左键",
       "clickMoveRight": "右键",
       "version": "v{version}（{build}）",
@@ -2201,7 +2201,7 @@ export const zh_CN: EnTranslations = {
       "interfaceModeDesktop": "桌面",
       "interfaceModeTouch": "触控",
       "interfaceModeNote": "自动会根据你的设备选择桌面或触控操作。选择桌面可强制使用键盘和鼠标（适合带键盘的平板），选择触控则使用屏幕上的操作控件。",
-      "ambienceVolume": "Ambience Volume",
+      "ambienceVolume": "环境音量",
       "footstepSounds": "脚步声",
       "interfaceSounds": "界面与反馈音效",
       "clickFeedback": "点击标记",
@@ -2269,7 +2269,7 @@ export const zh_CN: EnTranslations = {
       "confirmVendorSellNote": "关闭后，出售物品只需单击即可完成，不再确认；如果背包格位发生变化，可能会卖错物品。",
       "confirmVendorSellMinQuality": "确认出售的最低品质",
       "confirmVendorSellMinQualityNote": "低于此品质的物品单击即可出售；误售的物品仍可从商人处回购。",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "低于此品质的物品单击即可出售。误售的物品可从商人处回购，未署名的灰色物品除外。",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
@@ -2290,9 +2290,9 @@ export const zh_CN: EnTranslations = {
       "showUtilityModes": "包含潜行与旅行形态",
       "showFriendlyTrack": "显示我给队友的增益",
       "showShieldTrack": "显示我的护盾",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "经典战斗文字",
       "waterRipples": "水面涟漪（尾波）",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "法术特效",
       "actionCam": "动作镜头",
       "actionCamShoulder": "动作镜头肩位",
       "actionCamShoulderLeft": "左 {pct}",
@@ -2826,11 +2826,11 @@ export const zh_CN: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "开启世界PvP时，在开放世界或PvP副本中的游戏时间达到{thresholds}后可获得永久称号。退出游戏、死亡、PvE副本和安全区会暂停计时。关闭PvP会重置计时。",
+      "rewardPaused": "当前PvP连续游戏时间：{time}（在安全区暂停）",
+      "rewardPausedDead": "当前PvP连续游戏时间：{time}（死亡期间暂停）",
+      "rewardPausedInstance": "当前PvP连续游戏时间：{time}（在PvE副本中暂停）",
+      "rewardProgress": "当前PvP连续游戏时间：{time}",
       "tab": "世界 PvP",
       "title": "世界 PvP",
       "blurb": "升起旗帜后，你可以在开放世界的任何地方与其他已开启旗帜的玩家战斗。击败一人可分得对方钱袋中的一部分，外加用于兑换战争装备的荣誉。战场和竞技场仍然给予更多回报。",
@@ -2849,8 +2849,8 @@ export const zh_CN: EnTranslations = {
       "markLine": "在那里攻击未开启旗帜的玩家会升起你自己的旗帜；攻击已开启旗帜的玩家则永远不会。",
       "aidLine": "在世界战斗中为一名已开启旗帜的玩家治疗、上护盾或增益，会升起你自己的旗帜。",
       "stakeLine": "败者支付 {cap} 或其钱袋 {percent} 中较少的一项。",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "双方都开启 PvP 时，致命一击者的金币会与败者的头骨一同掉落在尸体上。",
+      "skullName": "{name}的头骨",
       "noStakeLine": "在自由混战地带被击杀的未开启旗帜玩家不会损失金币。",
       "noTakeLine": "未开启旗帜的战斗者同样不会获得金币：金币只在两名已开启旗帜的玩家之间转移。",
       "honorLine": "每次击杀获得 {honor} 点荣誉，由所有出力者平分。",
@@ -2880,8 +2880,8 @@ export const zh_CN: EnTranslations = {
       "countsHolding": "圈内：你方 {yours}，对手 {theirs}",
       "contestYou": "正在占据山丘：{seconds} / {total}",
       "contestOther": "正在失去山丘：{seconds} / {total}",
-      "contestYouPaused": "已暂停：{seconds} / {total}",
-      "contestOtherPaused": "对手的占领已暂停：{seconds} / {total}",
+      "contestYouPaused": "Paused: {seconds} of {total}",
+      "contestOtherPaused": "Rival paused: {seconds} of {total}",
       "contestNone": "在圈内保持人数优势 {total} 即可占据它",
       "inside": "你在圈内",
       "distance": "距离圆圈 {yards} 码",
@@ -2890,20 +2890,20 @@ export const zh_CN: EnTranslations = {
       "standingRaid": "团队成员不计入人数：只有队伍才能占据山丘"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
+      "title": "颅骨袋",
+      "total": "颅骨：{count}",
+      "close": "关闭颅骨袋",
+      "clickOpen": "点击打开",
+      "notCarried": "把颅骨袋放在背包里，才能存入或取出颅骨。",
+      "empty": "空的。携带此袋时，你拾取的颅骨会直接放入其中。",
+      "unrecorded": "战利品颅骨",
+      "store": "存入携带的颅骨（{count}）",
+      "storeNone": "没有可存入的颅骨",
       "takeOne": "Take 1",
       "takeAll": "Take all",
       "takeOneAria": "Take 1: {item}",
       "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "tooltip": "可不占背包空间地保存任意数量的战利品颅骨。它在背包中时，你拾取的颅骨会直接放入其中。点击背包中的它可存入或取出颅骨。"
     },
     "warfareShop": {
       "gossipOption": "浏览战争套装",
@@ -2951,12 +2951,12 @@ export const zh_CN: EnTranslations = {
       "hint": "找到这张地图所示的地方，站在 X 标记上，再次使用地图进行挖掘。一处埋藏的宝藏将为你和你的队伍开启。",
       "upgradeNote": "将其重绘为{rarity}地图需要 {inks} 瓶制图师的墨水（你持有 {held} 瓶）。各阵营军需官均有出售。",
       "upgradeMaxed": "没有哪位制图师能让这张地图更进一步。",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "要在哪张地图上使用制图师墨水？",
+      "inkPickerHeld": "你持有{held}份制图师墨水。",
+      "inkPickerRead": "正在追踪：它的X位于{zone}。X不会移动。",
+      "inkPickerUnread": "未读（持有{count}张）",
+      "inkPickerCost": "重绘为{rarity}：{inks}份墨水",
+      "inkPickerCancel": "取消",
       "rarity": {
         "common": "普通",
         "rare": "稀有",
@@ -3673,8 +3673,8 @@ export const zh_CN: EnTranslations = {
       "resetDone": "所有副本已重置。",
       "resetNone": "你没有可重置的副本。",
       "resetOccupied": "仍有人在副本内时无法重置副本。",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "难度变更已加入队列，因为仍有人或其尸体留在副本内。副本清空后将应用变更。",
+      "queuedCancelled": "由于队伍或队长发生变化，已取消排队中的难度变更。",
       "resetSameDifficulty": "切换地下城难度后才能重置这些副本。空置副本会在5分钟后自动重置。",
       "resetLoot": "副本内仍有战利品时无法重置。",
       "resetConfirmTitle": "重置所有副本？",
@@ -3691,7 +3691,7 @@ export const zh_CN: EnTranslations = {
       "dragEquipHint": "拖到角色身上以装备",
       "dragDestroyHint": "拖出到世界中以销毁",
       "reorderNeedsRecent": "清除筛选并按“最近”排序即可整理背包",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "锁定物品会留在原背包格。解锁后才能移动。",
       "itemAriaInstanced": "{item}，数量 {count}，带工匠印记的物品",
       "itemAriaEnchanted": "{item}，数量 {count}，已附魔的副本",
       "itemAriaBound": "{item}，数量 {count}，已绑定的副本",
@@ -4077,7 +4077,7 @@ export const zh_CN: EnTranslations = {
       "duskEconomy": "技能的能量消耗降低{pct}%",
       "moontide": "月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法各累积1层。达到{max}层时：月种变为月涌，天陨变为日醒，使用任意一个都会消耗全部3层",
       "oldBlood": "古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓",
-      "verdance": "繁茂：第{stacks}/{max}层。每种下一个新的野性绽放或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放",
+      "verdance": "繁茂：第{stacks}/{max}层。每施放一次孢愈术、二度绽放或野性愈合累积1层，每层都会缩短野性愈合的施法时间。达到{max}层时，迅捷治愈变为盛放",
       "freeExecute": "下一个符合条件的斩杀技能不消耗资源",
       "resourceSap": "每 {interval} 秒恢复 {value} 点当前资源",
       "nextAttackCrit": "下一次攻击必定暴击",
@@ -4179,7 +4179,7 @@ export const zh_CN: EnTranslations = {
       "formTravel": "迅捷形态：移动速度提高 {pct}%",
       "formFireball": "火球形态：移动速度提高 {pct}%；无法攻击或施法",
       "formMoonkin": "月翼形态：法术伤害提高 {pct}%，护甲提高 {armorPct}%",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "孢愈者形态：造成的治疗提高 {pct}%，护甲提高 {armorPct}%，移动速度降低 {slowPct}%",
       "formShadow": "幽幕形态：暗影伤害提高 {pct}%",
       "resourceCount": "{value}/{max}",
       "formLich": "灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害",
@@ -4266,7 +4266,7 @@ export const zh_CN: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "暂离",
       "pvpTag": "PvP",
-      "bountyTag": "Bounty",
+      "bountyTag": "悬赏",
       "cheaterTag": "< 作弊者 >",
       "pledgeTag": "{guild}的宣誓者",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const zh_CN: EnTranslations = {
       "wrongKind": "该代码是设置导出，不是快捷键配置。"
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "键盘布局",
+      "open": "转换",
+      "from": "热键原布局",
+      "to": "转换为",
+      "keepMovement": "保留移动键位置",
+      "keepMovementLocked": "上次保留了移动键位置，因此这次也保持不变。重置为默认值后可重新开始。",
+      "help": "每个热键都会移动到新布局上输出相同字符的按键。数字行保持原位。此列表中的键名为QWERTY位置；键盘概览会显示你的实际布局。",
+      "moves": "将移动的热键：{count}",
+      "noChange": "这些布局之间没有热键变化。",
+      "apply": "转换热键",
+      "converted": "热键已从{from}转换为{to}。",
       "layouts": {
         "qwertyUs": "QWERTY (US)",
         "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertzDe": "QWERTZ（德语）",
+        "qwertzCh": "QWERTZ（瑞士）",
+        "azertyFr": "AZERTY（法语）",
+        "azertyBe": "AZERTY（比利时）",
+        "qwertyEs": "QWERTY（西班牙语）",
+        "qwertyIt": "QWERTY（意大利语）",
+        "qwertyNordic": "QWERTY（瑞典语、芬兰语）",
+        "qwertyDa": "QWERTY（丹麦语）",
+        "qwertyNo": "QWERTY（挪威语）",
+        "qwertyBr": "QWERTY（巴西ABNT2）",
+        "qwertyPt": "QWERTY（葡萄牙语）",
+        "qwertyTr": "QWERTY（土耳其语）",
+        "dvorak": "德沃夏克",
+        "colemak": "科勒马克"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const zh_CN: EnTranslations = {
       "perfectedBadge": "臻至完美",
       "perfectingRank": "完美化：第{rank}阶，共{ranks}阶",
       "materialSourceGatherer": "{count} × 由{name}采集",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × 取自{name}",
       "materialSourceGathererSigned": "{count} × 由{name}采集，由{signer}签名",
       "materialSourceUnrecorded": "{count} × 未记录采集者",
       "materialSourceUnrecordedSigned": "{count} × 未记录采集者，由{name}签名",
@@ -6430,8 +6430,8 @@ export const zh_CN: EnTranslations = {
       },
       "collapseHint": "收起地图侧栏",
       "expandHint": "展开地图侧栏",
-      "resizeRailAria": "Map sidebar width",
-      "resizeRailHint": "Drag to resize the map sidebar. Double-click to reset."
+      "resizeRailAria": "地图侧栏宽度",
+      "resizeRailHint": "拖动以调整地图侧栏大小。双击可重置。"
     },
     "arenaGate": {
       "minLevelNote": "需要等级 {level}"
@@ -7428,7 +7428,7 @@ export const zh_CN: EnTranslations = {
       "rowCameraSpeed": "用鼠标环顾四周时，镜头转动得有多快。",
       "rowTouchLookSpeed": "滑动视角的同一项设置，只有在触屏设备上才会出现。",
       "rowFullscreen": "让游戏铺满整个屏幕。",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "玩家及其宠物施放的法术光芒、火花、飞行弹道和命中爆发，也包括你自己的。关闭后画面更清爽，大型团队战斗中也能多挤出几帧。敌人施放的一切仍会显示，提示你离开区域的范围圈、被昏迷、恐惧或定身目标头顶的标记，以及所有施法条也都会保留。",
       "rowWaterRipples": "游泳时在你身后荡开的尾迹与涟漪。默认关闭，也是唯一一项真会吃帧数的水效；无论开关，水花和气泡都不受影响。",
       "rowOverflowXp": "在满级之后，你的经验条是继续用溢出经验填充，还是改为显示经典的满级静态文字。",
       "rowInterfaceMode": "你用的是桌面界面，还是屏幕上的触控操作。“自动”会读取你的设备，你也可以强制指定其中一种：带键盘的平板可以用桌面布局，触屏笔记本也可以用触控操作。",
@@ -7481,7 +7481,7 @@ export const zh_CN: EnTranslations = {
       "ifMouseoverCast": "让治疗或友方法术落在你鼠标悬停的那个队伍框体上，而不改变你当前的目标。",
       "ifStickyTarget": "点击空地时保留当前目标，而不是把它清空。",
       "ifFctScale": "从目标身上飘出的伤害与治疗数字的大小。",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "恢复为直线上升的纯白色与淡金色伤害数字。保持关闭（默认）时，数字更醒目并向两侧散开，暴击和格外大的伤害会闪耀。",
       "ifExtraBars": "显示第二排动作条，开启第二排之后还能再开第三排。即使这些排处于隐藏状态，其中的格子依然可以用快捷键触发。",
       "ifHideUnused": "隐藏空的动作格，只绘制你真正会用到的按钮。",
       "ifLockBars": "锁定你的技能栏，免得不小心把技能从格子里拖出来。",
@@ -7906,20 +7906,20 @@ export const zh_CN: EnTranslations = {
       "formsHeading": "变形",
       "formsNote": "德鲁伊靠变形作战。大多数德鲁伊技能都归属于某一种形态，因此你当前所处的形态决定了你能施放什么，而变形本身会消耗少量法力。无论是否身处战斗，你都可以随时变形，次数不限。",
       "formsAutoUnshift": "变身时施放治疗或伤害法术会自动为你解除变身。以这种方式离开形态不消耗法力，也不占用公共冷却时间，因此瞬发法术会在你按下的那一刻释放。重新变身是普通技能，依然消耗法力并占用公共冷却时间。",
-      "formsMoonwing": "平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它是唯一保留法术的野兽形态，而你的魔杖也只在这个形态或你普通的施法形态下才能使用。",
+      "formsMoonwing": "平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它和恢复系的孢愈者形态一样保留你的法术，而你的魔杖只在这两种形态或你普通的施法形态下才能使用。",
       "formsWolfEngage": "狼以巨熊冲锋开战，随即变为狼形态钉制目标，未潜行时用扑击拉近距离，再用扑倒把敌人钉在原地。",
       "formLine": {
         "form_bear": "坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。",
         "form_cat": "近战输出形态：像盗贼一样使用能量与连击点，威胁值也低得多。",
         "form_travel": "赶路形态：在地面上快得多，但在你变回原形之前无法使用其他技能。",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "恢复德鲁伊的治疗形态：外皮更坚韧，治疗更强但步伐更慢，并保留你的所有法术和法力值。"
       },
       "mageEleSummon": "一个冰霜法术，把水元素召唤到你身边，并让它扑向你的目标。",
       "formName": {
         "form_bear": "巨熊形态",
         "form_cat": "豹形态",
         "form_travel": "迅捷形态",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "孢愈者形态"
       }
     },
     "classHook": {
@@ -8418,7 +8418,7 @@ export const zh_CN: EnTranslations = {
       "honorFinalNoteSoldBack": "荣誉购买是最终的。回购列表里只会有你卖出去的东西：用钱币买下的东西通常可以按出售价格卖回给商人，若你再次改变主意，还能从那份列表里把它买回来；但战争套装在你买下的那一刻便已灵魂绑定，因此它再也无法交易、邮寄，或以任何形式退回，也永远不会进入那份列表。商店正因如此才要你确认一次：按下之前，请把那件装备看清楚。",
       "warfareHeading": "战争套装",
       "warfareBody": "每一件战争装备都带有战争进攻等级与战争防御等级，而这两项等级对怪物毫无作用。它们只在你与其他玩家交手时生效，无论是决斗、竞技场还是战场：进攻提高你造成的伤害，防御削减你受到的伤害，各自都有自己的上限。每个护甲系列同时也是一套套装，它的套装效果同样是只对玩家生效的战争等级或效果，因此一整身荣誉装备在地下城首领面前一文不值。",
-      "warfareBodyStatsStay": "每一件战争装备都带有战争进攻等级与战争防御等级，而这两项等级对怪物毫无作用。它们只在你与其他玩家交手时生效，无论是决斗、竞技场还是战场：进攻提高你造成的伤害，防御削减你受到的伤害，各自都有自己的上限。每个护甲系列同时也是一套套装，它的套装效果同样是只对玩家生效的战争等级或效果，因此一整身荣誉装备的套装效果在地下城首领面前一文不值。装备本身仍带有普通属性、护甲与武器伤害，这些在任何地方都照常生效；面对怪物时哑火的，只是战争等级与套装效果。",
+      "warfareBodyStatsStay": "每一件战争装备都带有战争进攻等级与战争防御等级，而这两项等级对怪物毫无作用。它们只在你与其他玩家交手时生效，无论是决斗、竞技场还是战场：进攻提高你造成的伤害，防御削减你受到的伤害，各自都有自己的上限。每个护甲系列同时也是一套套装，它的套装效果同样是只对玩家生效的战争等级或效果，因此一整身荣誉装备的套装效果在地下城首领面前一文不值。装备本身仍带有普通属性、护甲与武器伤害，这些在任何地方都照常生效；面对怪物时哑火的，只是战争等级与套装效果。但有一个例外在任何地方都有效：穿戴施法者套装的两件后，受到伤害不再延迟你的施法。",
       "warfareTradeBody": "这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它所带来的一切都只花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。",
       "warfareTradeBodyRatingSpent": "这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它转而带有的战争等级与套装效果，则全都花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。",
       "vanguardHeading": "先锋套装：战争第二赛季",
@@ -8443,7 +8443,7 @@ export const zh_CN: EnTranslations = {
       "hillBody": "每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；单独一人算作一支一人小队，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得少量荣誉，因此一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉略少于一场战场胜利。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
       "limitsBodyHour": "反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。",
       "hillBodyRamp": "每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；单独一人算作一支一人小队，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得荣誉，同一支小队占据得越久，每分钟获得的荣誉就越多。一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘易手时，新的占据者从头开始累积。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
-      "hillBodyPause": "每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，保持人数优势三十秒后，山丘便归他们所有。对手小队进入只会暂停这一计时，直到你方重新领先；只有当你方小队在圈内无人存活时，计时才会从头开始。单独一人算作一支一人小队，占据山丘后组建小队也不会失去它，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得荣誉，同一支小队占据得越久，每分钟获得的荣誉就越多。一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘易手时，新的占据者从头开始累积。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
+      "hillBodyPause": "每三小时，某个自由混战地带会出现一座山丘。山丘存在期间，每五分钟全领域都会收到它的位置以及各队伍占据时长的排名。山丘消失时，若占据总时长最长的队伍累计占据至少十分钟，该队伍成员会为每周宝库的 PvP 进度获得一场胜利，前提是该玩家在本队占据期间曾在圆圈内站满至少一分钟，并且结束时仍留在该队伍中。",
       "limitsBodyRaids": "反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。团队无法从世界击杀中获得任何收益：团队成员既得不到荣誉也得不到金币，也不会减少其他人的份额，所以想获得报酬就以小队身份作战。"
     },
     "thornhollowPage": {
@@ -8621,7 +8621,7 @@ export const zh_CN: EnTranslations = {
       "formBear": "巨熊形态",
       "formCat": "豹形态",
       "formTravel": "迅捷形态",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "孢愈者形态",
       "groupCreatures": "生物",
       "groupPets": "术士恶魔",
       "pickerLabel": "选择要查看的模型",
@@ -9141,7 +9141,7 @@ export const zh_CN: EnTranslations = {
       "buyingBody": "与商人交谈并选择浏览他的货物，他的商店便会打开，分为三个标签页：浏览、出售和买回。浏览页陈列着他的全部存货，只要付得起钱就归你。出售页列出你背包中他愿意收购的物品，而出售一件带有自身随机品质的物品时会先请你确认，这样一件珍视的物品就绝不会因失误而溜走。若你卖掉了让自己后悔的东西，买回标签页会保留你近期的售出记录，让你能按当初卖出的价钱把它们买回来。",
       "junkTitle": "清理废品",
       "junkBody": "你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。这样卖出的未署名灰色物品不会进入回购列表，所以按下之前请确认没有想留下的东西。",
       "tradeTitle": "与其他玩家交易",
       "tradeBody": "你可以与站在身旁的任何人面对面交易。双方将物品与钱币放入一个共享窗口，唯有两人都确认后才会完成交换，因此谁也不会吃亏。这是把掉落物递给朋友或敲定一笔买卖最简单的方式。",
       "mailTitle": "渡鸦邮驿",
@@ -11230,10 +11230,10 @@ export const zh_CN: EnTranslations = {
     "selectClass": "请选择一个职业。",
     "pickClass": "选择一个职业。",
     "returnToLogin": "返回登录",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "搜索更新",
+    "noUpdateFound": "未找到更新。请稍后再试。",
+    "updateUnavailable": "请通过你的游戏商店更新，或下载最新客户端。",
+    "updateSearchFailed": "无法检查更新。请重试。",
     "api": {
       "tooManyAttempts": "尝试次数过多。请等待一分钟后重试。",
       "usernameShape": "用户名必须为 3-24 个字符，并使用字母、数字或下划线。",
@@ -12797,7 +12797,7 @@ export const zh_CN: EnTranslations = {
       "clueCasketOpened": "宝箱中有{money}和{items}。",
       "treasureMapEarned": "今日所有世界任务均已完成：你找到了一张{map}。",
       "treasureMapLost": "今日所有世界任务均已完成，但你的背包没有空间放藏宝图。",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "你的背包已满。奖励已寄送到你的邮箱：{items}。",
       "treasureMapRead": "你研究了{map}。X 标记位于{zone}的某处。",
       "treasureMapUpgraded": "地图以更精细的墨水重绘：现在它是一张{map}。",
       "treasureVaultOpened": "地面塌陷。一处埋藏的宝藏在你面前敞开。",
@@ -12976,7 +12976,7 @@ export const zh_CN: EnTranslations = {
       "sellJunk": "出售杂物",
       "sellJunkAria": "以 {price} 出售所有杂物",
       "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "未署名的灰色物品不会进入回购列表，因此出售后无法撤销。"
     },
     "market": {
       "title": "世界市场",
@@ -13270,7 +13270,7 @@ export const zh_CN: EnTranslations = {
       },
       "trailbreak": {
         "name": "断迹",
-        "description": "向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。"
+        "description": "向后跃出25码，并解除定身和移动减速效果。落地后移动速度提高50%，持续3秒。若你拥有狩猎势能，则将其刷新，并使你获得蓄势返场，持续12秒。"
       },
       "wildheart": {
         "name": "野性之心",
@@ -13281,12 +13281,12 @@ export const zh_CN: EnTranslations = {
         "description": "受到的伤害降低 60%，持续 8 秒，但生效期间无法攻击。"
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "装死",
+        "description": "倒地装死：所有人看到你的生命值和集中值都为空。敌人会遗忘你，正以你为目标的敌方玩家会失去目标。移动、攻击或使用其他技能都会结束装死。再次施放即可起身。"
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "战术伪装",
+        "description": "融入周围环境：敌人几乎察觉不到你，你以80%的速度移动。攻击或受到伤害会打破战术伪装。再次施放即可解除。（野战技艺）"
       },
       "frostjaw_trap": {
         "name": "霜颚陷阱",
@@ -13845,7 +13845,7 @@ export const zh_CN: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "骏马之姿",
-        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 4 秒（每次命中都会刷新昏乱状态）。"
+        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 2 秒（每次命中都会刷新昏乱状态）。"
       },
       "aimed_shot": {
         "name": "引弓长射",
@@ -13933,7 +13933,7 @@ export const zh_CN: EnTranslations = {
       },
       "flame_shock": {
         "name": "余烬震击",
-        "description": "造成 {damage} 点火焰伤害，随后在 12 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。"
+        "description": "造成 {damage} 点火焰伤害，随后在 {duration} 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。"
       },
       "flametongue_weapon": {
         "name": "焰烙武器",
@@ -14067,7 +14067,7 @@ export const zh_CN: EnTranslations = {
       "healing_touch": {
         "name": "野性愈合",
         "description": "为一个友方目标恢复 {damage} 点生命值。",
-        "specNote_restoration": "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3."
+        "specNote_restoration": "每次完成施放累积1层繁茂（最多3层）。已累积的繁茂会缩短此法术的施法时间：1层时2.2秒，2层时1.9秒，3层时1.5秒。自然恩惠使其变为瞬发、免费，且效果提高25%。"
       },
       "mark_of_the_wild": {
         "name": "野性守护",
@@ -14083,9 +14083,9 @@ export const zh_CN: EnTranslations = {
         "description": "仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长{duration}秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。"
       },
       "rejuvenation": {
-        "name": "野性绽放",
+        "name": "孢愈术",
         "description": "在 12 秒内为目标恢复 {damage} 点生命值。",
-        "specNote_restoration": "种下新的绽放会累积1层繁茂（最多5层）。繁茂达到5层时，迅捷治愈变为盛放。"
+        "specNote_restoration": "每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。繁茂达到3层时，迅捷治愈变为盛放。"
       },
       "thorns": {
         "name": "荆棘守护",
@@ -14097,12 +14097,12 @@ export const zh_CN: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形态",
-        "description": "变形为熊：护甲 +110%，最大生命值 +30%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回施法者形态。"
+        "description": "变形为熊：护甲 +110%，最大生命值 +30%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。攻击速度提高一倍，但每次攻击的伤害减半，每次攻击产生的怒气翻倍。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回施法者形态。"
       },
       "maul": {
         "name": "碎骨击",
         "description": "一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。",
-        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为碎髓：一次高威胁打击，造成78至96点伤害；生命值低于一半时，改为吸收相当于你最大生命值18%的伤害，并返还15点怒气。"
+        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为碎髓：一次高威胁打击，造成78至96点伤害；生命值低于一半时，改为恢复相当于你最大生命值18%的生命值，并返还15点怒气。"
       },
       "growl": {
         "name": "威吓",
@@ -14122,9 +14122,9 @@ export const zh_CN: EnTranslations = {
         "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "抓挠",
+        "description": "抓挠 6 码内的附近目标，造成武器伤害加 {damage}。每命中一个目标奖励 1 个连击点。使范围内潜行的敌人现形。仅限豹形态。",
+        "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
       "ferocious_bite": {
         "name": "血噬",
@@ -14138,8 +14138,8 @@ export const zh_CN: EnTranslations = {
       },
       "regrowth": {
         "name": "二度绽放",
-        "description": "为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。",
-        "specNote_restoration": "种下新的绽放会累积1层繁茂（最多5层）。"
+        "description": "为一个友方目标恢复 {damage} 点生命值，并在 15 秒内额外恢复一定生命值。若该效果持续到结束，会再次为目标恢复与初始治疗相同的生命值。",
+        "specNote_restoration": "每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。"
       },
       "barkskin": {
         "name": "橡树皮",
@@ -14409,8 +14409,8 @@ export const zh_CN: EnTranslations = {
       },
       "swiftmend": {
         "name": "迅捷治愈",
-        "description": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。野性绽放与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。每次施放孢愈术、二度绽放或野性愈合累积1层繁茂；在 3 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）",
+        "specNote_restoration": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。孢愈术和二度绽放会累积繁茂；在 5 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）"
       },
       "moonlash": {
         "name": "月涌",
@@ -14426,7 +14426,7 @@ export const zh_CN: EnTranslations = {
       },
       "marrowbreak": {
         "name": "碎髓",
-        "description": "消耗你的3层古血，造成{damage}点伤害的高威胁重击。生命值低于一半时，改为吸收相当于最大生命值18%的伤害，持续8秒，并返还15点怒气。"
+        "description": "消耗你的3层古血，造成{damage}点伤害的高威胁重击。生命值低于一半时，改为恢复相当于最大生命值18%的生命值，并返还15点怒气。"
       },
       "wildwake": {
         "name": "野性复苏",
@@ -14437,26 +14437,26 @@ export const zh_CN: EnTranslations = {
         "description": "呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（恢复）"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "孢愈者形态",
+        "description": "变形为孢愈者，使你造成的治疗提高20%，护甲提高40%，但移动速度降低20%。你在普通形态下的所有法术仍可施放。持续到你切换形态为止。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回普通形态。（恢复标志技能）"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "孢子爆裂",
+        "description": "在目标区域召唤孢子爆裂体。{duration}秒后爆开，为盟友恢复{healing}点生命，并对8码内敌人造成{damage}点自然伤害。",
+        "specNote_balance": "在3层月潮时强化25%，并消耗你的月潮。",
+        "specNote_restoration": "也会为每个被治疗的盟友施加孢愈术。满层青翠时强化25%，并消耗你的青翠。"
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "自然恩赐",
+        "description": "你的法术可以准备自然恩赐，持续10秒：它点名的法术变为免费、强化25%，并可在任何形态下施放。新的触发会刷新持续时间。",
+        "specNote_feral": "每次近战自动攻击命中有1/15几率为孢愈术准备它，或在熊形态下为橡皮准备它。",
+        "specNote_balance": "你每次施放野性箭或天落有10%几率为孢子爆裂准备它，最多每10秒一次。",
+        "specNote_restoration": "你的持续治疗效果每次跳动有10%几率为孢子爆裂准备它，最多每10秒一次。"
       },
       "overbloom": {
         "name": "盛放",
-        "description": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "description": "消耗你的3层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的孢愈术。",
+        "specNote_restoration": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的孢愈术。"
       },
       "summon_imp": {
         "name": "召唤烬裔",
@@ -14937,12 +14937,12 @@ export const zh_CN: EnTranslations = {
       },
       "rake": {
         "name": "剐削",
-        "description": "撕裂敌人，造成武器伤害外加 {damage} 点，并在 18 秒内造成 {overTime} 点流血伤害。给予 1 点连击点。仅限豹形态。",
+        "description": "撕裂敌人，造成武器伤害外加 {damage} 点，并在18秒内造成 {overTime} 点流血伤害。给予 1 点连击点。仅限豹形态。",
         "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
       "revive_pet": {
         "name": "修补",
-        "description": "修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。"
+        "description": "修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值；若其死亡，则以35%生命值将其复活。"
       }
     },
     "items": {
@@ -19096,10 +19096,10 @@ export const zh_CN: EnTranslations = {
         "name": "使者的宝箱"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "战利品头骨"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "颅骨袋"
       },
       "clue_scroll": {
         "name": "线索卷轴"
@@ -24115,9 +24115,9 @@ export const zh_CN: EnTranslations = {
         "body": "宝藏已被攻克，但你没有从宝箱领取自己的那份奖励。渡鸦已将你获得的物品和金币送到这里。\n\n- 渡鸦邮局"
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "渡鸦邮局",
+        "subject": "你的世界任务奖励",
+        "body": "你获得这份世界任务奖励时背包已满，所以渡鸦把它送到了这里。腾出空间后，可在任意渡鸦石柱领取。\n\n- 渡鸦邮局"
       }
     },
     "itemSets": {
@@ -24253,7 +24253,7 @@ export const zh_CN: EnTranslations = {
       },
       "grovespring": {
         "name": "林泉法衣",
-        "bonus2": "迅捷治愈优先消耗你自己的野性绽放或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。",
+        "bonus2": "迅捷治愈优先消耗你自己的孢愈术或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。",
         "bonus4": "盛放收割你剩余治疗效果的 75%，随后积累 1 层繁茂。"
       },
       "hexthread": {
@@ -24346,7 +24346,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "星卫法衣",
-        "bonus2": "缠缚根须的施法时间缩短0.5秒。",
+        "bonus2": "缠缚根须的施法时间缩短0.5秒。受到伤害不再延迟你的施法。",
         "bonus4": "施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。"
       },
       "vanguard_druid_feral": {
@@ -24356,7 +24356,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_druid_restoration": {
         "name": "蓟花法衣",
-        "bonus2": "迅愈的冷却时间缩短1秒。",
+        "bonus2": "迅愈的冷却时间缩短1秒。受到伤害不再延迟你的施法。",
         "bonus4": "迅愈还会使你的移动速度提高30%，持续3秒。"
       },
       "vanguard_hunter_beast_mastery": {
@@ -24376,22 +24376,22 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_mage_arcane": {
         "name": "先锋套装：缚时法衣",
-        "bonus2": "时光屏障的冷却时间缩短2秒。",
+        "bonus2": "时光屏障的冷却时间缩短2秒。受到伤害不再延迟你的施法。",
         "bonus4": "时光屏障还会使受护盾保护的目标移动速度提高20%，持续3秒。"
       },
       "vanguard_mage_fire": {
         "name": "先锋套装：烬鞭礼服",
-        "bonus2": "余烬坠落恢复速度加快3秒。",
+        "bonus2": "余烬坠落恢复速度加快3秒。受到伤害不再延迟你的施法。",
         "bonus4": "施放余烬坠落会使炽焰屏障的剩余冷却时间缩短2秒。"
       },
       "vanguard_mage_frost": {
         "name": "先锋套装：霜卫衣装",
-        "bonus2": "冰缚的冷却时间缩短2秒。",
+        "bonus2": "冰缚的冷却时间缩短2秒。受到伤害不再延迟你的施法。",
         "bonus4": "施放冰缚会使疾步的剩余冷却时间缩短5秒。"
       },
       "vanguard_paladin_holy": {
         "name": "先锋套装：日誓圣衣",
-        "bonus2": "生命誓约的冷却时间缩短30秒。",
+        "bonus2": "生命誓约的冷却时间缩短30秒。受到伤害不再延迟你的施法。",
         "bonus4": "生命誓约还会为盟友提供相当于其最大生命值8%的护盾，持续6秒。"
       },
       "vanguard_paladin_protection": {
@@ -24406,17 +24406,17 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "先锋套装：帷咏法衣",
-        "bonus2": "恐惧圣歌的冷却时间缩短3秒。",
+        "bonus2": "恐惧圣歌的冷却时间缩短3秒。受到伤害不再延迟你的施法。",
         "bonus4": "你的守护圣咏被完全消耗时，受护盾保护的盟友移动速度提高20%，持续3秒。每8秒最多触发一次。"
       },
       "vanguard_priest_holy": {
         "name": "先锋套装：恩翼法衣",
-        "bonus2": "帷步的冷却时间缩短6秒。",
+        "bonus2": "帷步的冷却时间缩短6秒。受到伤害不再延迟你的施法。",
         "bonus4": "帷步还会为你提供相当于最大生命值8%的护盾，持续6秒。"
       },
       "vanguard_priest_shadow": {
         "name": "先锋套装：暮咏礼服",
-        "bonus2": "悲歌还会在引导期间使目标移动速度降低30%。",
+        "bonus2": "悲歌还会在引导期间使目标移动速度降低30%。受到伤害不再延迟你的施法。",
         "bonus4": "召唤什一魔还会为你提供相当于最大生命值10%的护盾，持续8秒。"
       },
       "vanguard_rogue_assassination": {
@@ -24436,7 +24436,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "先锋套装：风暴铭甲",
-        "bonus2": "释放武器的冷却时间缩短3秒。",
+        "bonus2": "释放武器的冷却时间缩短3秒。受到伤害不再延迟你的施法。",
         "bonus4": "释放武器使你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。"
       },
       "vanguard_shaman_enhancement": {
@@ -24446,22 +24446,22 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "先锋套装：盐潮链甲",
-        "bonus2": "对生命值低于50%的盟友施放愈合之水加快0.5秒。",
+        "bonus2": "对生命值低于50%的盟友施放愈合之水加快0.5秒。受到伤害不再延迟你的施法。",
         "bonus4": "潮唤还会为目标提供相当于你最大生命值5%的护盾，持续6秒。"
       },
       "vanguard_warlock_affliction": {
         "name": "先锋套装：惧羽法衣",
-        "bonus2": "折磨的施法时间缩短0.3秒。",
+        "bonus2": "折磨的施法时间缩短0.3秒。受到伤害不再延迟你的施法。",
         "bonus4": "吞噬为你多治疗30%，并且可以在移动中引导。"
       },
       "vanguard_warlock_demonology": {
         "name": "先锋套装：骨缚礼服",
-        "bonus2": "骨甲的冷却时间缩短10秒。",
+        "bonus2": "骨甲的冷却时间缩短10秒。受到伤害不再延迟你的施法。",
         "bonus4": "收割指令使骨甲的剩余冷却时间缩短2秒。"
       },
       "vanguard_warlock_destruction": {
         "name": "先锋套装：渣冠法衣",
-        "bonus2": "烬皮的冷却时间缩短30秒。",
+        "bonus2": "烬皮的冷却时间缩短30秒。受到伤害不再延迟你的施法。",
         "bonus4": "每第二次烧燃会使你8秒内的下一次毁灭箭变为瞬发。"
       },
       "vanguard_warrior_arms": {
@@ -24492,7 +24492,7 @@ export const zh_CN: EnTranslations = {
       },
       "warfare_cinderweave": {
         "name": "烬织法衣",
-        "bonus2": "战争防御等级提高 40。",
+        "bonus2": "战争防御等级提高 40。受到伤害不再延迟你的施法。",
         "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
         "bonus7": "战争攻击与防御等级提高 80。你的法术有 15% 的几率给予余烬守护，在 8 秒内吸收 120 点伤害。"
       },
@@ -24504,13 +24504,13 @@ export const zh_CN: EnTranslations = {
       },
       "warfare_stormbound": {
         "name": "缚雷法衣",
-        "bonus2": "战争防御等级提高 40。",
+        "bonus2": "战争防御等级提高 40。受到伤害不再延迟你的施法。",
         "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
         "bonus7": "战争攻击与防御等级提高 80。你的法术有 15% 的几率给予余烬守护，在 8 秒内吸收 120 点伤害。"
       },
       "warfare_thornhide": {
         "name": "荆棘皮甲",
-        "bonus2": "战争防御等级提高 40。",
+        "bonus2": "战争防御等级提高 40。受到伤害不再延迟你的施法。",
         "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
         "bonus7": "战争攻击与防御等级提高 80。你的法术有 15% 的几率给予荆棘守护，使躲闪提高 15%，持续 6 秒。"
       },

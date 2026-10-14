@@ -112,6 +112,7 @@ describe('characterGhostLook', () => {
       vanish: 'rogue',
       prowl: 'druid',
       greater_invisibility: 'mage',
+      tactical_camo: 'hunter',
     });
     for (const [id, cls] of sources) {
       expect(ROGUE_STEALTH_AURA_IDS.has(id), id).toBe(cls === 'rogue');
