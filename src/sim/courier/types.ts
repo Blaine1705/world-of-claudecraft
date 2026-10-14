@@ -6,8 +6,6 @@ export const COURIER_PAYLOAD_BYTES = 12 * 1024;
 export const COURIER_CUSTODY_BYTES = COURIER_PAYLOAD_BYTES - 512;
 /** Admission leaves room for bounded load normalization and armour perfection. */
 export const COURIER_ADMISSION_BYTES = COURIER_CUSTODY_BYTES - 512;
-/** +150% of the ordinary 7 units/second movement speed. */
-export const COURIER_SPEED = 17.5;
 export type CourierPhase = 'ready' | 'outbound' | 'returning' | 'waiting';
 /** Whole-stack selection. The fingerprint includes quantity and all provenance. */
 export interface CourierSelection {
@@ -23,8 +21,12 @@ export interface CourierState {
   x: number;
   z: number;
   bankerId: number | null;
-  /** Distance from this leg's start, saturated at the 8-unit takeoff ramp. */
+  /** Legacy pose distance, saturated at eight units for older clients. */
   travelDistance: number;
+  /** Elapsed fixed simulation ticks in this ten-second leg; absent on legacy saves. */
+  travelTicks?: number;
+  legStartX?: number;
+  legStartZ?: number;
   cargo: InvSlot[];
   withdrawals: CourierSelection[];
   revision: number;
@@ -36,7 +38,8 @@ export type CourierBankExchange = (
   deposit: () => void,
   withdraw: () => void,
 ) => boolean;
-export interface CourierInfo extends Omit<CourierState, 'retryRemaining'> {
+export interface CourierInfo
+  extends Omit<CourierState, 'retryRemaining' | 'legStartX' | 'legStartZ'> {
   /** Current authoritative target distance; zero while grounded or paused. */
   remainingDistance: number;
   active: boolean;
@@ -47,5 +50,12 @@ export interface CourierInfo extends Omit<CourierState, 'retryRemaining'> {
 }
 export type CourierPose = Pick<
   CourierInfo,
-  'phase' | 'x' | 'z' | 'bankerId' | 'inventoryRevision' | 'travelDistance' | 'remainingDistance'
+  | 'phase'
+  | 'x'
+  | 'z'
+  | 'bankerId'
+  | 'inventoryRevision'
+  | 'travelDistance'
+  | 'remainingDistance'
+  | 'travelTicks'
 >;

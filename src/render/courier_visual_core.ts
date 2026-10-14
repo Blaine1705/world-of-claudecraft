@@ -1,10 +1,11 @@
-import { courierFlightBlend } from '../sim/courier/motion';
+import { courierFlightBlend, courierTimedFlightBlend } from '../sim/courier/motion';
 
 /** Read-only presentation subset of the authoritative courier snapshot. */
 export interface CourierVisualInfo {
   phase: 'ready' | 'outbound' | 'returning' | 'waiting';
   x: number;
   z: number;
+  travelTicks?: number;
   travelDistance?: number;
   remainingDistance?: number;
 }
@@ -23,7 +24,11 @@ export function courierVisualPoseInto(
 ): void {
   const travelling = info.phase === 'outbound' || info.phase === 'returning';
   out.flight = travelling
-    ? courierFlightBlend(info.travelDistance ?? 0, info.remainingDistance ?? 0)
+    ? info.travelTicks === undefined
+      ? courierFlightBlend(info.travelDistance ?? 0, info.remainingDistance ?? 0)
+      : (info.remainingDistance ?? 0) > 0
+        ? courierTimedFlightBlend(info.travelTicks)
+        : 0
     : 0;
   out.lift = 2 * out.flight;
   out.moving = moved || (travelling && (info.remainingDistance ?? 0) > 0);

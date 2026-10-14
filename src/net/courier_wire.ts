@@ -1,11 +1,11 @@
 // Small courier pose and revision-gated cargo arrive independently. Omission
 // retains the previous value; malformed frames never replace a valid mirror.
 import type { CourierInfo, CourierPose } from '../sim/courier';
-import { COURIER_FLIGHT_DISTANCE } from '../sim/courier/motion';
+import { COURIER_FLIGHT_DISTANCE, COURIER_LEG_TICKS } from '../sim/courier/motion';
 import { isRecord, isWireBankSlot } from './vault_snapshot_wire';
 
-type Pose = CourierPose;
-type Data = Omit<CourierInfo, keyof Pose>;
+type Pose = Omit<CourierPose, 'travelTicks'>;
+type Data = Omit<CourierInfo, keyof CourierPose>;
 const PHASES = new Set(['ready', 'outbound', 'returning', 'waiting']);
 export function decodeCourierPose(value: unknown): Pose | null | undefined {
   if (value === null) return null;
@@ -83,16 +83,34 @@ export function decodeCourierData(value: unknown): Data | null | undefined {
     return undefined;
   return value as unknown as Data;
 }
+/** Separate from the legacy pose so older clients can ignore the new timing. */
+export function decodeCourierTravelTicks(value: unknown): number | null | undefined {
+  if (value === null) return null;
+  return typeof value === 'number' &&
+    Number.isSafeInteger(value) &&
+    value >= 0 &&
+    value <= COURIER_LEG_TICKS
+    ? value
+    : undefined;
+}
+
 export function applyCourierSelfWire(
   target: { courierInfo: CourierInfo | null },
   self: Record<string, unknown>,
 ): void {
-  if (self.courier === undefined && self.courierData === undefined) return;
+  if (
+    self.courier === undefined &&
+    self.courierData === undefined &&
+    self.courierTravelTicks === undefined
+  )
+    return;
   const pose = decodeCourierPose(self.courier);
   const data = decodeCourierData(self.courierData);
+  const travelTicks = decodeCourierTravelTicks(self.courierTravelTicks);
   if (
     (self.courier !== undefined && pose === undefined) ||
-    (self.courierData !== undefined && data === undefined)
+    (self.courierData !== undefined && data === undefined) ||
+    (self.courierTravelTicks !== undefined && travelTicks === undefined)
   )
     return;
   if (pose === null || data === null) {
@@ -101,5 +119,8 @@ export function applyCourierSelfWire(
   }
   const prior = target.courierInfo;
   if ((!pose || !data) && !prior) return;
-  target.courierInfo = { ...prior, ...data, ...pose } as CourierInfo;
+  const merged = { ...prior, ...data, ...pose } as CourierInfo;
+  if (travelTicks === null) delete merged.travelTicks;
+  else if (travelTicks !== undefined) merged.travelTicks = travelTicks;
+  target.courierInfo = merged;
 }

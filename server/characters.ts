@@ -1,3 +1,4 @@
+import { membershipWeaponDisplayId } from '../src/sim/membership_weapon';
 // Owner-gated character surface, ported onto RouteDefs.
 //
 // The account-scoped character endpoints move off the inline handleApi ladder in
@@ -407,18 +408,34 @@ export function buildCharacterList(
       // Keep the migrated RouteDef byte-identical with the retained legacy arm:
       // character select renders the same body and held items as the live world.
       skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-      mainhandItemId: c.state?.equipment?.mainhand ?? null,
-      offhandItemId: c.state?.equipment?.offhand ?? null,
+      mainhandItemId: membershipWeaponDisplayId(
+        c.state?.equipment?.mainhand ?? null,
+        c.class,
+        c.state?.talents?.spec,
+      ),
+      offhandItemId: membershipWeaponDisplayId(
+        c.state?.equipment?.offhand ?? null,
+        c.class,
+        c.state?.talents?.spec,
+      ),
       // The account's active Armory weapon skin for THIS character's class and
       // held hands (the same shared rule the world and paperdoll use), so
       // the char-select turntable matches the in-world render. Loadout is
       // account state; resolution is per character.
       weaponSkinId: resolveActiveWeaponSkin(
         c.class,
-        c.state?.equipment?.mainhand ?? null,
+        membershipWeaponDisplayId(
+          c.state?.equipment?.mainhand ?? null,
+          c.class,
+          c.state?.talents?.spec,
+        ),
         weaponSkinLoadout,
         c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-        c.state?.equipment?.offhand ?? null,
+        membershipWeaponDisplayId(
+          c.state?.equipment?.offhand ?? null,
+          c.class,
+          c.state?.talents?.spec,
+        ),
       ),
       // The authored modular look (null = pre-creator character, legacy rig).
       // Re-validated here the same way the join path does (ws_auth.ts

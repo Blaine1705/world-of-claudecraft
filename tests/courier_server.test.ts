@@ -83,9 +83,7 @@ describe('live courier server wiring', () => {
     });
     expect(meta.courier?.phase).toBe('outbound');
     const state = meta.courier!;
-    const banker = sim.entities.get(state.bankerId!)!;
-    state.x = banker.pos.x;
-    state.z = banker.pos.z;
+    state.travelTicks = 199;
     updateCourier(sim.ctx, meta, player);
     expect(state.phase).toBe('returning');
     expect(state.cargo).toEqual([selected]);
@@ -105,6 +103,51 @@ describe('live courier server wiring', () => {
         instanceJson: JSON.stringify({ signer: 'Legacy9999' }),
       },
     ]);
+  });
+
+  it('400 moving broadcasts over grown banks and bags rebuild heavy courier data only at bank arrival', () => {
+    const server = new GameServer();
+    const socket = fakeWs();
+    const session = joinServer(server, socket, 51, 'Courierscale');
+    const sim = server.sim;
+    const player = sim.entities.get(session.pid)!;
+    player.pos.x = 0;
+    player.pos.z = 0;
+    sim.setMembership(session.pid, 60);
+    const meta = sim.meta(session.pid)!;
+    meta.inventory = Array.from({ length: 1000 }, () => ({ itemId: 'baked_bread', count: 20 }));
+    meta.bank.inventory = Array.from({ length: 1000 }, () => ({
+      itemId: 'roasted_boar',
+      count: 20,
+    }));
+    courierSummon(sim.ctx, session.pid);
+    sim.courierDispatch(
+      {
+        deposits: [],
+        withdrawals: [
+          { index: 999, fingerprint: courierSlotFingerprint(meta.bank.inventory[999]) },
+        ],
+      },
+      session.pid,
+    );
+    broadcast(server);
+    const heavy = vi.spyOn(sim, 'courierInfoFor');
+    const bankMap = vi.spyOn(meta.bank.inventory, 'map');
+    const inventoryMap = vi.spyOn(meta.inventory, 'map');
+    for (let tick = 1; tick <= 400; tick++) {
+      updateCourier(sim.ctx, meta, player);
+      broadcast(server);
+      if (tick === 200) bankMap.mockClear();
+      else expect(bankMap).not.toHaveBeenCalled();
+      if (tick !== 200)
+        expect(lastSnap(socket.sent).self.courierData).toBe(tick === 400 ? null : undefined);
+      expect(heavy).toHaveBeenCalledTimes(tick >= 200 ? 1 : 0);
+    }
+    expect(bankMap).not.toHaveBeenCalled();
+    // The ordinary inventory snapshot rebuilds once for the delivery mutation.
+    expect(inventoryMap.mock.calls.length).toBeLessThanOrEqual(1);
+    expect(meta.inventory).toHaveLength(1001);
+    expect(meta.courier).toBeUndefined();
   });
 
   it('keeps remote bank commands gated while courier requests round-trip owner-only', () => {
@@ -176,8 +219,8 @@ describe('live courier server wiring', () => {
     broadcast(server);
     const moving = lastSnap(socket.sent);
     expect(moving.self.courierData).toBeUndefined();
-    expect(moving.self.courier.travelDistance).toBeGreaterThan(3);
-    expect(moving.self.courier.travelDistance).toBeLessThan(8);
+    expect(moving.self.courierTravelTicks).toBe(15);
+    expect(moving.self.courier).not.toHaveProperty('travelTicks');
     expect(moving.self.courier.remainingDistance).toBeGreaterThan(8);
     (client as any).applySnapshot(moving);
     expect(client.courierInfo?.travelDistance).toBe(meta.courier!.travelDistance);
@@ -187,9 +230,7 @@ describe('live courier server wiring', () => {
     );
     expect(heavyRead).not.toHaveBeenCalled();
     const state = meta.courier!;
-    const banker = sim.entities.get(state.bankerId!)!;
-    state.x = banker.pos.x;
-    state.z = banker.pos.z;
+    state.travelTicks = 199;
     updateCourier(sim.ctx, meta, player);
     expect(state.phase).toBe('returning');
     expect(state.cargo).toEqual([]);

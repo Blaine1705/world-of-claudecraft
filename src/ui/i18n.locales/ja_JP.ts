@@ -13,6 +13,34 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.courier.inventory': '所持品',
+  'hudChrome.courier.bankTitle': '銀行',
+  'hudChrome.courier.capacity': '{used} / {capacity} スロット',
+  'hudChrome.courier.travelTime': '片道10秒',
+  'hudChrome.courier.cargoSafe':
+    'バッグが満杯の場合、返却品は超過分として保管されます。配達後、再召喚するまでクーリエは姿を消します。',
+  'entities.abilities.courier.description':
+    '空飛ぶロバを召喚し、バッグと最寄りの銀行の間でアイテムを運びます。銀行まで10秒、帰りも10秒かかります。1回につき最大24スタックを選択できます。返却品は満杯のバッグにも超過分として入り、クーリエは再召喚するまで姿を消します。死亡中やインスタンス内では帰路が一時停止します。新しい配達にはメンバーシップが必要です。',
+  'itemUi.tooltip.membershipWeaponAdaptive':
+    '装備中はクラスと専門分野に合わせて武器の種類、外見、能力値が変化します。',
+  'itemUi.tooltip.membershipScaling':
+    'アイテムレベル{level}。常にキャラクターレベルより5高くなります。',
+  'itemUi.tooltip.membershipRequired':
+    'メンバーシップが切れると装備の能力値とセット効果が停止し、更新すると復活します。',
+  'itemUi.tooltip.membershipDormant':
+    '無効：メンバーシップを更新すると装備の能力値とセット効果が復活します。',
+  'entities.items.membership_staff.name': '変化の杖',
+  'hudChrome.bags.membershipSlot': 'メンバーシップバッグ枠',
+  'hudChrome.bags.membershipSlotLocked': 'メンバーシップでこのバッグ枠を解放。',
+  'hudChrome.bags.membershipSlotHint':
+    'メンバーシップ有効中はバッグを1個追加で装備できます。期限が切れてもバッグとアイテムは安全に保管されます。',
+  'hudChrome.wocStore.subscription.benefitBag':
+    'メンバーシップバッグ枠にバッグを1個追加で装備できます。',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    'レア品質のソウルバウンド防具と変化の杖を受け取れます。能力値はクラスと専門分野に適応し、アイテムレベルは常にキャラクターレベルより5高くなります。防具7部位をすべて装備すると経験値が20%増加します。',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    'メンバーシップが切れると追加キャラクター枠、装備の効果、追加バッグ枠は更新までロックされます。バッグとアイテムは安全に保管され、容量超過分も保持されます。基本キャラクター枠は引き続き利用できます。',
+  'hudChrome.bank.accountArmour': 'メンバーシップ装備を受け取る',
   'hudChrome.courier.title': '配達員',
   'hudChrome.courier.close': '配達員を閉じる',
   'hudChrome.courier.ready': '配達の準備完了',
@@ -30,26 +58,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.instructions':
     'スタック全体を選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。',
   'hudChrome.courier.membership': '次の配達にはメンバーシップの更新が必要です。',
-  'hudChrome.courier.cargoSafe': 'バッグに空きができるまで、配達員がアイテムを保管します。',
   'hudChrome.courier.unavailable': '配達員を召喚して配達を計画しましょう。',
   'entities.abilities.courier.name': '配達員',
-  'entities.abilities.courier.description':
-    '空飛ぶロバを召喚し、バッグと最寄りの銀行の間で荷物を運びます。通常の走行速度の250%で飛びます。1回につき最大24スタックを選択できます。新しい配達にはメンバーシップが必要です。',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '有効なメンバーシップの特典',
   'hudChrome.wocStore.subscription.benefitBank':
     'どの銀行員からでも、ほかのキャラクターの銀行を利用できます。',
   'hudChrome.wocStore.subscription.benefitSlots': 'キャラクター枠を10個追加で解放します。',
-  'hudChrome.wocStore.subscription.benefitArmour':
-    'クラスと専門化に合った能力値を持つ魂縛の防具を受け取れます。レベルに合わせて成長し、レベル20でアイテムレベル25になります。全身に装備すると獲得経験値が20%増加します。',
   'hudChrome.wocStore.subscription.benefitTax': 'オークションの通常の手数料が半額になります。',
-  'hudChrome.wocStore.subscription.benefitExpiry':
-    'メンバーシップが切れると、追加枠のキャラクターと防具の特典は更新するまで利用できなくなります。基本枠のキャラクターは引き続き遊べます。',
   'character.membershipRequired': 'このキャラクターで遊ぶにはメンバーシップを更新してください。',
   'character.membershipSlots': 'メンバーシップでキャラクター枠を解放',
   'character.emptySlot': '利用可能なキャラクター枠',
   'hudChrome.bank.accountTab': 'ほかのキャラクター',
-  'hudChrome.bank.accountArmour': 'メンバーシップ防具を受け取る',
   'hudChrome.bank.accountMembership':
     'メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。',
   'hudChrome.bank.accountCharacters': 'キャラクターの銀行',
@@ -76,15 +96,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipToken':
     '使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。',
   'itemUi.tooltip.membershipAdaptive': '能力値と防具の種類がクラスと専門化に合わせて変わります。',
-  'itemUi.tooltip.membershipScaling':
-    'アイテムレベルは自分のレベルに合わせて上がります。レベル20になると完成し、アイテムレベル25になります。',
   'itemUi.tooltip.membershipPerfected': '完成：アイテムレベル{level}。',
   'itemUi.tooltip.membershipFullSet':
     'メンバーシップ防具を全{pieces}部位装備すると、獲得経験値が{percent}%増加します。有効なメンバーシップが必要です。',
-  'itemUi.tooltip.membershipRequired':
-    'メンバーシップが切れると防具の能力値とセット効果は無効になり、更新すると再び有効になります。',
-  'itemUi.tooltip.membershipDormant':
-    '無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。',
   'entities.items.membership_token.name': 'メンバーシップトークン（30日）',
   'entities.items.membership_helmet.name': 'メンバーシップの兜',
   'entities.items.membership_shoulder.name': 'メンバーシップの肩当て',

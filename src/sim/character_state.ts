@@ -94,6 +94,8 @@ export interface CharacterState {
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
   bags?: (string | null)[];
+  /** Equipped member bag, retained without capacity while membership is inactive. */
+  membershipBag?: string;
   // Per-character bank (JSONB; optional so pre-bank saves load cleanly, defaulting
   // to an empty bank with no purchased/bonus slots). sanitizeBankState is the one
   // load path (never destroys items; tolerates an over-capacity inventory). The

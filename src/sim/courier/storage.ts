@@ -1,7 +1,7 @@
 import { sanitizeBankState } from '../bank';
 import { cloneInvSlot } from '../types';
 import { courierPayloadFits } from './identity';
-import { COURIER_FLIGHT_DISTANCE } from './motion';
+import { COURIER_FLIGHT_DISTANCE, COURIER_LEG_TICKS } from './motion';
 import { COURIER_CAPACITY, COURIER_CUSTODY_BYTES, type CourierState } from './types';
 
 export function savedCourierState(state: CourierState): CourierState {
@@ -62,6 +62,19 @@ export function sanitizeCourierState(
       ? Math.max(0, Math.min(1, r.retryRemaining!))
       : 0,
   };
+  // Old or malformed motion metadata restarts the remaining leg from its saved
+  // position; owned cargo and selections remain intact and no wall clock runs.
+  if (
+    Number.isSafeInteger(r.travelTicks) &&
+    r.travelTicks! >= 0 &&
+    r.travelTicks! <= COURIER_LEG_TICKS &&
+    Number.isFinite(r.legStartX) &&
+    Number.isFinite(r.legStartZ)
+  ) {
+    state.travelTicks = r.travelTicks;
+    state.legStartX = r.legStartX;
+    state.legStartZ = r.legStartZ;
+  }
   // Invalid request metadata can be abandoned without deleting owned inventory.
   if (cargo.length + state.withdrawals.length > COURIER_CAPACITY) state.withdrawals = [];
   if (!courierPayloadFits({ cargo, withdrawals: state.withdrawals }, COURIER_CUSTODY_BYTES))

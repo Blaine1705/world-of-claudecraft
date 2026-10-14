@@ -4,6 +4,7 @@ import { membershipActive } from '../membership';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot } from '../types';
 import { courierPayloadFits, courierSlotFingerprint, validCourierRequest } from './identity';
+import { startCourierLeg } from './motion';
 import { COURIER_ADMISSION_BYTES, COURIER_CAPACITY, type CourierDispatchRequest } from './types';
 
 export function courierSummon(ctx: SimContext, pid?: number): boolean {
@@ -95,7 +96,7 @@ export function courierDispatch(
   state.x = e.pos.x;
   state.z = e.pos.z;
   state.phase = 'outbound';
-  state.travelDistance = 0;
+  startCourierLeg(state);
   state.retryRemaining = 0;
   state.revision++;
   ctx.onInventoryChangedForQuests(meta);

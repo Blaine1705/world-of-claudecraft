@@ -15,9 +15,45 @@ import {
   applyCourierSelfWire,
   decodeCourierData,
   decodeCourierPose,
+  decodeCourierTravelTicks,
 } from '../src/net/courier_wire';
 import type { CourierInfo } from '../src/sim/courier';
 import type { BankInfo } from '../src/world_api/bank';
+
+// Frozen pre-timing decoder contract. Keep this independent of the live decoder:
+// broadening the live allowlist must not hide a rolling-deployment regression.
+function legacyCourierPose(value: unknown): Record<string, unknown> | null | undefined {
+  if (value === null) return null;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const v = value as Record<string, unknown>;
+  if (
+    Object.keys(v).some(
+      (k) =>
+        ![
+          'phase',
+          'x',
+          'z',
+          'bankerId',
+          'inventoryRevision',
+          'travelDistance',
+          'remainingDistance',
+        ].includes(k),
+    ) ||
+    !['ready', 'outbound', 'returning', 'waiting'].includes(v.phase as string) ||
+    !Number.isSafeInteger(v.inventoryRevision) ||
+    (v.inventoryRevision as number) < 0 ||
+    !Number.isFinite(v.travelDistance) ||
+    (v.travelDistance as number) < 0 ||
+    (v.travelDistance as number) > 8 ||
+    !Number.isFinite(v.remainingDistance) ||
+    (v.remainingDistance as number) < 0 ||
+    !Number.isFinite(v.x) ||
+    !Number.isFinite(v.z) ||
+    (v.bankerId !== null && (!Number.isSafeInteger(v.bankerId) || (v.bankerId as number) <= 0))
+  )
+    return undefined;
+  return v;
+}
 
 const info = (): CourierInfo => ({
   phase: 'ready',
@@ -172,6 +208,13 @@ describe('courier wire validation and owner mirror', () => {
     expect(target.courierInfo).toBeNull();
   });
   it.each([
+    { travelTicks: -1 },
+    { travelTicks: 201 },
+    { travelTicks: 1.5 },
+    { travelTicks: Infinity },
+    { travelTicks: NaN },
+    { travelTicks: null },
+    { travelTicks: '200' },
     { travelDistance: -1 },
     { travelDistance: 8.01 },
     { travelDistance: Infinity },
@@ -199,6 +242,75 @@ describe('courier wire validation and owner mirror', () => {
     applyCourierSelfWire(target, { courier: { ...pose, ...patch } });
     expect(target.courierInfo).toBe(before);
     expect(decodeCourierPose({ ...pose, ...patch })).toBeUndefined();
+  });
+  it('round-trips elapsed leg ticks without exposing saved leg anchors or rebuilding heavy data', () => {
+    const { sim, set } = host();
+    const value = { ...info(), phase: 'outbound' as const, travelTicks: 77 };
+    set(value);
+    sim.courierPoseFor = () => ({
+      phase: value.phase,
+      x: value.x,
+      z: value.z,
+      bankerId: value.bankerId,
+      inventoryRevision: value.inventoryRevision,
+      travelDistance: value.travelDistance,
+      remainingDistance: value.remainingDistance,
+      travelTicks: value.travelTicks,
+    });
+    const frame: Record<string, unknown> = {};
+    emitCourierSelfKeys(
+      (key, v) => {
+        frame[key] = v;
+      },
+      sim,
+      { pid: 17, lastSent: {}, lastCourierWireRevision: null },
+    );
+    const target = { courierInfo: null as CourierInfo | null };
+    applyCourierSelfWire(target, frame);
+    expect(target.courierInfo).toEqual(value);
+    expect(frame.courierTravelTicks).toBe(77);
+    expect(frame.courier).not.toHaveProperty('travelTicks');
+    const legacyPose = legacyCourierPose(frame.courier);
+    expect(legacyPose).toEqual(frame.courier);
+    expect(legacyPose).toMatchObject({ phase: 'outbound', x: value.x, z: value.z });
+    // An already-open old client can advance from ready to outbound using the
+    // new server's frame; the extra top-level scalar is simply ignored.
+    const legacyMirror = { ...info(), ...decodeCourierData(frame.courierData), ...legacyPose };
+    expect(legacyMirror.phase).toBe('outbound');
+    expect(legacyMirror).not.toHaveProperty('travelTicks');
+    expect(frame.courierData).not.toHaveProperty('travelTicks');
+    expect(frame.courierData).not.toHaveProperty('legStartX');
+    expect(frame.courierData).not.toHaveProperty('legStartZ');
+  });
+  it.each([-1, 201, 0.5, Infinity, NaN, '1', true, {}, []])(
+    'rejects malformed separate timing scalars without replacing the courier: %j',
+    (value) => {
+      const target = { courierInfo: { ...info(), travelTicks: 77 } as CourierInfo | null };
+      const before = target.courierInfo;
+      expect(decodeCourierTravelTicks(value)).toBeUndefined();
+      applyCourierSelfWire(target, { courierTravelTicks: value });
+      expect(target.courierInfo).toBe(before);
+    },
+  );
+  it('merges timing-only deltas, preserves omissions and clears only timing on null', () => {
+    const target = { courierInfo: info() as CourierInfo | null };
+    const cargo = target.courierInfo!.cargo;
+    for (const ticks of [0, 1, 77, 200]) {
+      expect(decodeCourierTravelTicks(ticks)).toBe(ticks);
+      applyCourierSelfWire(target, { courierTravelTicks: ticks });
+      expect(target.courierInfo!.travelTicks).toBe(ticks);
+      expect(target.courierInfo!.cargo).toBe(cargo);
+    }
+    const unchanged = target.courierInfo;
+    applyCourierSelfWire(target, {});
+    expect(target.courierInfo).toBe(unchanged);
+    expect(decodeCourierTravelTicks(null)).toBeNull();
+    applyCourierSelfWire(target, { courierTravelTicks: null });
+    expect(target.courierInfo).toEqual(info());
+    expect(target.courierInfo).not.toHaveProperty('travelTicks');
+    const absent = { courierInfo: null as CourierInfo | null };
+    applyCourierSelfWire(absent, { courierTravelTicks: 77 });
+    expect(absent.courierInfo).toBeNull();
   });
   it('retains omitted data and refuses malformed nested rows or pose', () => {
     const target = { courierInfo: info() as CourierInfo | null };

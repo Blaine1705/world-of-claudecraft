@@ -13,6 +13,34 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.courier.inventory': 'Инвентарь',
+  'hudChrome.courier.bankTitle': 'Банк',
+  'hudChrome.courier.capacity': '{used} / {capacity} ячеек',
+  'hudChrome.courier.travelTime': '10 секунд в каждую сторону',
+  'hudChrome.courier.cargoSafe':
+    'Если сумки полны, доставленные предметы сохраняются сверх лимита. После доставки курьер исчезает до следующего вызова.',
+  'entities.abilities.courier.description':
+    'Призывает летающего ослика для перевозки предметов между вашими сумками и ближайшим банком. Дорога до банка занимает 10 секунд, обратная дорога тоже 10 секунд. За рейс можно выбрать до 24 стопок. Возвращённые предметы помещаются даже в полные сумки сверх лимита, после чего курьер исчезает до следующего вызова. Обратный путь приостанавливается, пока вы мертвы или находитесь в инстансе. Для нового рейса нужна активная подписка.',
+  'itemUi.tooltip.membershipWeaponAdaptive':
+    'При экипировке тип, внешний вид и характеристики оружия подстраиваются под ваш класс и специализацию.',
+  'itemUi.tooltip.membershipScaling':
+    'Уровень предмета: {level}. Всегда на 5 выше уровня персонажа.',
+  'itemUi.tooltip.membershipRequired':
+    'После окончания подписки характеристики снаряжения и бонусы комплекта отключаются до её продления.',
+  'itemUi.tooltip.membershipDormant':
+    'Неактивно: продлите подписку, чтобы восстановить характеристики снаряжения и бонусы комплекта.',
+  'entities.items.membership_staff.name': 'Посох перемен',
+  'hudChrome.bags.membershipSlot': 'Ячейка сумки по подписке',
+  'hudChrome.bags.membershipSlotLocked': 'Оформите подписку, чтобы открыть эту ячейку сумки.',
+  'hudChrome.bags.membershipSlotHint':
+    'Активная подписка позволяет надеть ещё одну сумку. После её окончания сумка и предметы сохраняются.',
+  'hudChrome.wocStore.subscription.benefitBag':
+    'Наденьте дополнительную сумку в ячейку по подписке.',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    'Получите редкую персональную броню и Посох перемен. Их характеристики подстраиваются под класс и специализацию, а уровень предметов всегда на 5 выше уровня персонажа. Все 7 частей брони дают на 20% больше опыта.',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    'После окончания подписки дополнительные ячейки персонажей, бонусы снаряжения и ячейка сумки блокируются до продления. Сумка и предметы сохраняются, лишние предметы остаются сверх лимита. Базовые ячейки персонажей остаются доступными.',
+  'hudChrome.bank.accountArmour': 'Получить снаряжение подписки',
   'hudChrome.courier.title': 'Курьер',
   'hudChrome.courier.close': 'Закрыть курьера',
   'hudChrome.courier.ready': 'Готов к доставке',
@@ -30,26 +58,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.instructions':
     'Выберите целые стопки. Курьер сначала положит их в банк, затем заберёт выбранные предметы. Предметы заданий отправлять нельзя.',
   'hudChrome.courier.membership': 'Продлите подписку, чтобы начать новую доставку.',
-  'hudChrome.courier.cargoSafe': 'Курьер хранит предметы, пока в ваших сумках не появится место.',
   'hudChrome.courier.unavailable': 'Призовите курьера, чтобы подготовить доставку.',
   'entities.abilities.courier.name': 'Курьер',
-  'entities.abilities.courier.description':
-    'Призывает летающего осла для перевозки предметов между вашими сумками и ближайшим банком. Он летит со скоростью 250% от обычного бега. За рейс можно выбрать до 24 стопок. Для новой доставки нужна подписка.',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': 'Преимущества действующего членства',
   'hudChrome.wocStore.subscription.benefitBank':
     'Пользуйтесь банками других своих персонажей у любого банкира.',
   'hudChrome.wocStore.subscription.benefitSlots': 'Откройте ещё 10 ячеек персонажей.',
-  'hudChrome.wocStore.subscription.benefitArmour':
-    'Получите привязанные доспехи с характеристиками для вашего класса и специализации. Они растут вместе с вашим уровнем и на 20-м уровне получают 25-й уровень предмета. Полный комплект даёт на 20% больше опыта.',
   'hudChrome.wocStore.subscription.benefitTax': 'Платите половину обычного налога на аукционе.',
-  'hudChrome.wocStore.subscription.benefitExpiry':
-    'По окончании членства персонажи в дополнительных ячейках и бонусы доспехов блокируются до продления. Персонажами в основных ячейках по-прежнему можно играть.',
   'character.membershipRequired': 'Продлите членство, чтобы играть этим персонажем.',
   'character.membershipSlots': 'Откройте ячейки персонажей с членством',
   'character.emptySlot': 'Свободная ячейка персонажа',
   'hudChrome.bank.accountTab': 'Другие персонажи',
-  'hudChrome.bank.accountArmour': 'Получить доспехи участника',
   'hudChrome.bank.accountMembership':
     'При действующем членстве здесь можно пользоваться банками других своих персонажей.',
   'hudChrome.bank.accountCharacters': 'Банки персонажей',
@@ -77,15 +97,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Использование: расходует жетон и добавляет {days} дней членства к вашей учётной записи. Оставшееся время сохраняется. До использования жетон можно передать или продать на аукционе.',
   'itemUi.tooltip.membershipAdaptive':
     'Характеристики и тип брони подстраиваются под ваш класс и специализацию.',
-  'itemUi.tooltip.membershipScaling':
-    'Уровень предмета соответствует вашему уровню. На 20-м уровне доспех достигает совершенства и получает 25-й уровень предмета.',
   'itemUi.tooltip.membershipPerfected': 'Совершенный предмет: уровень {level}.',
   'itemUi.tooltip.membershipFullSet':
     'Наденьте все {pieces} предметов доспехов участника, чтобы получать на {percent}% больше опыта. Требуется действующее членство.',
-  'itemUi.tooltip.membershipRequired':
-    'Характеристики доспехов и бонусы комплекта отключаются по окончании членства и возвращаются после продления.',
-  'itemUi.tooltip.membershipDormant':
-    'Неактивно: продлите членство, чтобы вернуть характеристики доспехов и бонусы комплекта.',
   'entities.items.membership_token.name': 'Жетон членства (30 дней)',
   'entities.items.membership_helmet.name': 'Шлем участника',
   'entities.items.membership_shoulder.name': 'Наплечники участника',

@@ -11,7 +11,12 @@ import {
   savedCourierState,
   updateCourier,
 } from '../src/sim/courier';
-import { courierFlightBlend, courierTravelSpeed, travelCourier } from '../src/sim/courier/motion';
+import {
+  COURIER_LEG_TICKS,
+  courierLegProgress,
+  courierTimedFlightBlend,
+  travelCourier,
+} from '../src/sim/courier/motion';
 import { INSTANCE_X_BASE } from '../src/sim/data';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -55,140 +60,168 @@ function journey(x = 60, z = 80) {
   return { player, banker, meta, ctx, dispatch, tick };
 }
 
-describe('courier straight flight and grounded endpoints', () => {
-  it('pins smooth takeoff and landing to the same ground and cruise distances', () => {
-    for (const [distance, blend, speed] of [
-      [0, 0, 7],
-      [3, 0, 7],
-      [5.5, 0.5, 12.25],
-      [8, 1, 17.5],
+describe('courier fixed-duration flight and grounded endpoints', () => {
+  it.each([0, 0.1, 6, 100, 10000])(
+    'takes exactly 200 ticks each way at distance %s',
+    (distance) => {
+      const f = journey(distance * 0.6, distance * 0.8);
+      expect(f.dispatch()).toBe(true);
+      const state = f.meta.courier!;
+      for (let i = 1; i < 200; i++) {
+        f.tick();
+        expect(state.phase).toBe('outbound');
+        expect(state.travelTicks).toBe(i);
+        expect(f.meta.bank.inventory).toEqual([]);
+        expect(state.x).toBeCloseTo(distance * 0.6 * courierLegProgress(i), 9);
+        expect(state.z).toBeCloseTo(distance * 0.8 * courierLegProgress(i), 9);
+      }
+      f.tick();
+      expect(state.phase).toBe('returning');
+      expect(state.travelTicks).toBe(0);
+      expect(state.x).toBe(distance * 0.6);
+      expect(state.z).toBe(distance * 0.8);
+      expect(f.meta.bank.inventory).toEqual([{ itemId: 'baked_bread', count: 1 }]);
+      for (let i = 1; i < 200; i++) {
+        f.tick();
+        expect(f.meta.courier).toBe(state);
+        expect(state.phase).toBe('returning');
+        expect(state.travelTicks).toBe(i);
+      }
+      f.tick();
+      expect(f.meta.courier).toBeUndefined();
+      expect(courierPoseFor(f.ctx, 1)).toBeNull();
+      expect(courierInfoFor(f.ctx, 1)).toBeNull();
+      expect(courierWireRevisionFor(f.ctx, 1)).toBeNull();
+      expect(courierSummon(f.ctx, 1)).toBe(true);
+      expect(f.meta.courier?.phase).toBe('ready');
+    },
+  );
+
+  it('accelerates smoothly for two seconds, cruises, then brakes symmetrically', () => {
+    const steps = Array.from(
+      { length: COURIER_LEG_TICKS },
+      (_, i) => courierLegProgress(i + 1) - courierLegProgress(i),
+    );
+    for (let i = 1; i < 40; i++) expect(steps[i]).toBeGreaterThan(steps[i - 1]);
+    for (let i = 41; i < 160; i++) expect(steps[i]).toBeCloseTo(steps[40], 12);
+    for (let i = 161; i < 200; i++) expect(steps[i]).toBeLessThan(steps[i - 1]);
+    for (let i = 0; i < 200; i++) expect(steps[i]).toBeCloseTo(steps[199 - i], 12);
+    expect(steps.reduce((sum, step) => sum + step, 0)).toBe(1);
+    for (const [ticks, lift] of [
+      [0, 0],
+      [12, 0],
+      [26, 0.5],
+      [40, 1],
+      [100, 1],
+      [160, 1],
+      [174, 0.5],
+      [188, 0],
+      [200, 0],
     ]) {
-      expect(courierFlightBlend(distance, 100)).toBe(blend);
-      expect(courierFlightBlend(8, distance)).toBe(blend);
-      expect(courierTravelSpeed(distance, 100)).toBe(speed);
-      expect(courierTravelSpeed(8, distance)).toBe(speed);
+      expect(courierTimedFlightBlend(ticks)).toBeCloseTo(lift);
     }
   });
 
-  it('selects the closest banker once, then stays on a straight line through both accelerated legs', () => {
+  it('chooses the closest bank once and reaches a continuously moving owner on tick 200', () => {
     const f = journey();
     f.ctx.entities.set(3, { ...f.banker, id: 3, pos: { x: -101, y: 0, z: 0 } });
     f.ctx.bankerIds.unshift(3);
-    expect(f.dispatch()).toBe(true);
+    f.dispatch();
+    expect(f.meta.courier!.bankerId).toBe(2);
+    for (let i = 0; i < 200; i++) f.tick();
     const state = f.meta.courier!;
-    expect(state.bankerId).toBe(2);
-    const legs: Record<string, number[]> = { outbound: [], returning: [] };
-    let transitions = 0;
-    for (let i = 0; i < 800 && state.phase !== 'ready'; i++) {
-      const phase = state.phase;
-      const before = { x: state.x, z: state.z };
+    for (let i = 1; i <= 200; i++) {
+      f.player.pos.x += 2;
+      f.player.pos.z += 1;
       f.tick();
-      legs[phase].push(Math.hypot(state.x - before.x, state.z - before.z) / DT);
-      expect(state.z).toBeCloseTo((state.x * 4) / 3, 10);
-      expect(state.x).toBeGreaterThanOrEqual(0);
-      expect(state.x).toBeLessThanOrEqual(60);
-      if (phase === 'outbound' && state.phase === 'returning') {
-        transitions++;
-        expect(state.travelDistance).toBe(0);
-        expect(state.x).toBe(60);
-        expect(state.z).toBe(80);
-      }
+      expect(state.x).toBeCloseTo(60 + (f.player.pos.x - 60) * courierLegProgress(i), 9);
+      if (i < 200) expect(f.meta.courier).toBe(state);
     }
-    expect(transitions).toBe(1);
-    expect(state.phase).toBe('ready');
-    for (const speeds of Object.values(legs)) {
-      expect(speeds[0]).toBeCloseTo(7);
-      expect(speeds.some((speed) => speed > 7.1 && speed < 17.4)).toBe(true);
-      expect(Math.max(...speeds)).toBeCloseTo(17.5);
-      expect(speeds.at(-2)).toBeCloseTo(7);
-      expect(speeds.at(-1)).toBeLessThanOrEqual(7.000001);
-    }
+    expect(f.meta.courier).toBeUndefined();
+    expect(state.x).toBe(f.player.pos.x);
+    expect(state.z).toBe(f.player.pos.z);
   });
 
-  it('keeps a trip shorter than both ground runs entirely grounded', () => {
-    const f = journey(3.6, 4.8);
-    expect(f.dispatch()).toBe(true);
-    const state = f.meta.courier!;
-    for (let i = 0; i < 100 && state.phase !== 'ready'; i++) {
-      const pose = courierPoseFor(f.ctx, 1)!;
-      expect(courierFlightBlend(pose.travelDistance, pose.remainingDistance)).toBe(0);
+  it.each([73, 199, 200, 273, 399])(
+    'save/reconnect at tick %s preserves trajectory and custody',
+    (count) => {
+      const f = journey();
+      f.meta.bank.inventory = [
+        {
+          itemId: 'wolf_fang',
+          count: 2,
+          materialSources: [{ source: { signer: 'miner' }, count: 2 }],
+        },
+      ];
+      courierDispatch(
+        f.ctx,
+        {
+          deposits: [{ index: 0, fingerprint: courierSlotFingerprint(f.meta.inventory[0]) }],
+          withdrawals: [
+            { index: 0, fingerprint: courierSlotFingerprint(f.meta.bank.inventory[0]) },
+          ],
+        },
+        1,
+      );
+      for (let i = 0; i < count; i++) f.tick();
+      const saved = savedCourierState(f.meta.courier!);
+      const loaded = sanitizeCourierState(saved)!;
+      expect(loaded).toEqual(saved);
+      expect(loaded.cargo).not.toBe(saved.cargo);
+      f.meta.courier = loaded;
+      // Expiry and time spent offline never cancel or advance owned cargo.
+      f.meta.membershipExpiresAt = 0;
+      for (let i = count; i < 399; i++) f.tick();
+      expect(f.meta.courier).toBeDefined();
       f.tick();
-    }
-    expect(state.phase).toBe('ready');
-    expect(f.meta.bank.inventory).toEqual([{ itemId: 'baked_bread', count: 1 }]);
-  });
+      expect(f.meta.courier).toBeUndefined();
+      expect(f.meta.inventory).toEqual([
+        {
+          itemId: 'wolf_fang',
+          count: 2,
+          materialSources: [{ source: { signer: 'miner' }, count: 2 }],
+        },
+      ]);
+      expect(courierSummon(f.ctx, 1)).toBe(false);
+    },
+  );
 
-  it('resumes the same trajectory after save and clamps legacy or malformed ramp metadata without losing cargo', () => {
+  it('repairs legacy or malformed timing without losing cargo or consuming time offline', () => {
     const f = journey();
     f.dispatch();
     for (let i = 0; i < 15; i++) f.tick();
     const saved = savedCourierState(f.meta.courier!);
-    const loaded = sanitizeCourierState(saved)!;
-    expect(loaded.travelDistance).toBe(saved.travelDistance);
-    const expected = savedCourierState(saved);
-    travelCourier(expected, 60, 80);
-    f.meta.courier = loaded;
-    f.tick();
-    expect(loaded).toEqual(expected);
-    const { travelDistance: _distance, ...legacy } = saved;
-    for (const travelDistance of [undefined, -1, NaN, Infinity, 'bad']) {
-      const repaired = sanitizeCourierState({ ...legacy, travelDistance })!;
-      expect(repaired.travelDistance).toBe(0);
-      expect(repaired.cargo).toEqual(saved.cargo);
+    for (const travelTicks of [undefined, -1, 1.5, 201, NaN, Infinity, 'bad']) {
+      const loaded = sanitizeCourierState({ ...saved, travelTicks })!;
+      expect(loaded.travelTicks).toBeUndefined();
+      expect(loaded.cargo).toEqual(saved.cargo);
+      const oldX = loaded.x;
+      travelCourier(loaded, 60, 80);
+      expect(loaded.travelTicks).toBe(1);
+      expect(loaded.legStartX).toBe(oldX);
     }
-    expect(sanitizeCourierState({ ...saved, travelDistance: 1e100 })!.travelDistance).toBe(8);
-    for (let i = 0; i < 20; i++) f.tick();
-    expect(f.meta.courier!.travelDistance).toBe(8);
   });
 
-  it('ground poses use direct target lookups and moving pose reads never clone a grown ready bank', () => {
+  it('pauses a returning leg for a dead or instanced owner, then finishes its remaining ticks', () => {
     const f = journey();
-    f.meta.bank.inventory = Array.from({ length: 10000 }, () => ({
-      itemId: 'baked_bread',
-      count: 1,
-    }));
-    const clone = vi.spyOn(f.meta.bank.inventory, 'map');
-    const ready = courierInfoFor(f.ctx, 1)!;
-    f.player.pos.x = 20;
-    const revision = courierWireRevisionFor(f.ctx, 1);
-    for (let i = 0; i < 10; i++) {
-      f.tick();
-      expect(courierInfoFor(f.ctx, 1)).toBe(ready);
-      expect(ready.remainingDistance).toBe(0);
-      expect(courierWireRevisionFor(f.ctx, 1)).toBe(revision);
-    }
-    expect(clone).toHaveBeenCalledTimes(1);
     f.dispatch();
-    const flying = courierInfoFor(f.ctx, 1)!;
-    const flyingRevision = courierWireRevisionFor(f.ctx, 1);
-    vi.spyOn(f.ctx.entities, 'values').mockImplementation(() => {
-      throw new Error('entity scan');
-    });
-    for (let i = 0; i < 30; i++) {
-      f.tick();
-      const pose = courierPoseFor(f.ctx, 1)!;
-      expect(courierInfoFor(f.ctx, 1)).toBe(flying);
-      expect(flying.travelDistance).toBe(pose.travelDistance);
-      expect(flying.remainingDistance).toBe(pose.remainingDistance);
-      expect(pose.remainingDistance).toBeCloseTo(Math.hypot(60 - pose.x, 80 - pose.z));
-      expect(courierWireRevisionFor(f.ctx, 1)).toBe(flyingRevision);
-    }
-    expect(clone).toHaveBeenCalledTimes(1);
-    f.ctx.entities.delete(2);
-    expect(courierPoseFor(f.ctx, 1)!.remainingDistance).toBe(0);
-    f.tick();
-    expect(f.meta.courier!.travelDistance).toBe(0);
+    for (let i = 0; i < 240; i++) f.tick();
+    const state = savedCourierState(f.meta.courier!);
     f.player.dead = true;
-    expect(courierPoseFor(f.ctx, 1)!.remainingDistance).toBe(0);
-    const frozen = savedCourierState(f.meta.courier!);
-    f.tick();
-    expect(f.meta.courier).toEqual(frozen);
+    for (let i = 0; i < 300; i++) f.tick();
+    expect(f.meta.courier).toEqual(state);
     f.player.dead = false;
     f.player.pos.x = INSTANCE_X_BASE;
-    expect(courierPoseFor(f.ctx, 1)!.remainingDistance).toBe(0);
+    for (let i = 0; i < 300; i++) f.tick();
+    expect(f.meta.courier).toEqual(state);
+    f.player.pos.x = 0;
+    for (let i = 0; i < 159; i++) f.tick();
+    expect(f.meta.courier).toBeDefined();
+    f.tick();
+    expect(f.meta.courier).toBeUndefined();
   });
 
-  it('does not reset leg progress on a refused bank retry and resets once on successful exchange', () => {
+  it('never restarts elapsed time while bank admission is refused', () => {
     const f = journey(30, 0);
     let admitted = false;
     Object.assign(f.ctx, {
@@ -200,15 +233,15 @@ describe('courier straight flight and grounded endpoints', () => {
       },
     });
     f.dispatch();
-    for (let i = 0; i < 100 && f.meta.courier!.x !== 30; i++) f.tick();
-    expect(f.meta.courier!.travelDistance).toBe(8);
-    for (let i = 0; i < 25; i++) f.tick();
-    expect(f.meta.courier!.travelDistance).toBe(8);
-    expect(courierPoseFor(f.ctx, 1)!.remainingDistance).toBe(0);
+    for (let i = 0; i < 240; i++) f.tick();
+    expect(f.meta.courier!.travelTicks).toBe(200);
+    expect(f.meta.courier!.x).toBe(30);
+    expect(f.meta.bank.inventory).toEqual([]);
     admitted = true;
-    for (let i = 0; i < 30 && f.meta.courier!.phase === 'outbound'; i++) f.tick();
-    expect(f.meta.courier!.travelDistance).toBe(0);
+    for (let i = 0; i < 20; i++) f.tick();
+    expect(f.meta.courier!.phase).toBe('returning');
+    expect(f.meta.courier!.travelTicks).toBe(0);
     f.tick();
-    expect(f.meta.courier!.travelDistance).toBeCloseTo(0.35);
+    expect(f.meta.courier!.travelTicks).toBe(1);
   });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes';
-import { COURIER_CAPACITY, COURIER_SPEED } from '../src/sim/courier/types';
+import { COURIER_LEG_SECONDS } from '../src/sim/courier/motion';
+import { COURIER_CAPACITY } from '../src/sim/courier/types';
 import { membershipAbilities } from '../src/sim/membership_abilities';
 import type { PlayerClass } from '../src/sim/types';
 
@@ -18,9 +19,12 @@ describe('membership spell grant', () => {
       expect(membershipAbilities(active, false)).toEqual(base);
     },
   );
-  it('the spell promise pins the live travel speed and selection limit', () => {
-    expect(COURIER_SPEED).toBe(7 * 2.5);
-    expect(ABILITIES.courier.description).toContain('250%');
+  it('the spell promise pins the live travel duration and selection limit', () => {
+    expect(COURIER_LEG_SECONDS).toBe(10);
+    expect(ABILITIES.courier.description).toContain(
+      `${COURIER_LEG_SECONDS} seconds to the bank and ${COURIER_LEG_SECONDS} seconds back`,
+    );
+    expect(ABILITIES.courier.description).toContain('overflow full bags');
     expect(ABILITIES.courier.description).toContain(`${COURIER_CAPACITY} stacks`);
     expect(ABILITIES.courier.effects).toEqual([]);
   });

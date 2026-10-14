@@ -40,6 +40,7 @@ import { isKillParticipant, killParticipationPos } from '../loot/kill_participat
 import { membershipActive } from '../membership';
 import { wearsMembershipArmour } from '../membership_armour';
 import { perfectMembershipArmour } from '../membership_armour_progression';
+import { isMembershipWeapon, membershipWeaponShape } from '../membership_weapon';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
@@ -350,10 +351,15 @@ export function dealDamage(
   if (!alreadyFinal && source?.kind === 'player' && source.id !== target.id && amount > 0) {
     const sourceMeta = ctx.players.get(source.id);
     const twoHandPct = sourceMeta ? ctx.playerMods(sourceMeta).global.masteryTwoHandDmgPct : 0;
-    const mainhandId = sourceMeta?.equipment.mainhand;
-    const mainhand = mainhandId ? ITEMS[mainhandId] : undefined;
-    if (twoHandPct > 0 && mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand') {
-      amount = Math.round(amount * (1 + twoHandPct));
+    if (twoHandPct > 0 && sourceMeta) {
+      const mainhandId = sourceMeta.equipment.mainhand;
+      const base = mainhandId ? ITEMS[mainhandId] : undefined;
+      const mainhand =
+        base && !(isMembershipWeapon(base.id) && !source.membershipActive)
+          ? membershipWeaponShape(base, sourceMeta.cls, sourceMeta.talents.spec)
+          : undefined;
+      if (mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand')
+        amount = Math.round(amount * (1 + twoHandPct));
     }
   }
 

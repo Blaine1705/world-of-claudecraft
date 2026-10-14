@@ -37,6 +37,7 @@ export function courierPoseFor(ctx: SimContext, pid: number): CourierPose | null
         z: state.z,
         bankerId: state.bankerId,
         travelDistance: state.travelDistance,
+        travelTicks: state.travelTicks,
         remainingDistance: remainingDistance(ctx, pid, state),
         inventoryRevision: meta.wireRev,
       }
@@ -60,6 +61,7 @@ export function courierInfoFor(ctx: SimContext, pid: number): CourierInfo | null
     cached.info.z = state.z;
     cached.info.inventoryRevision = meta.wireRev;
     cached.info.travelDistance = state.travelDistance;
+    cached.info.travelTicks = state.travelTicks;
     cached.info.remainingDistance = remainingDistance(ctx, pid, state);
     return cached.info;
   }

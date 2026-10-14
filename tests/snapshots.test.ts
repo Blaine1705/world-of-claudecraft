@@ -5707,6 +5707,7 @@ const ALL_DELTA_KEYS = [
   'cosmetics',
   'courier',
   'courierData',
+  'courierTravelTicks',
   'cprof',
   'crat',
   'crit',
@@ -5850,6 +5851,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   cosmetics: 'accountCosmetics',
   courier: 'courierInfo',
   courierData: 'courierInfo',
+  courierTravelTicks: 'courierInfo',
   cprof: 'craftingIdentity',
   crat: 'critRating',
   crit: 'critChance',
@@ -6006,9 +6008,10 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
-  // The courier's pose and revision-gated custody blob recombine into one owner mirror.
+  // Pose, optional elapsed ticks and revision-gated custody recombine into one owner mirror.
   meta.courier = {
     phase: 'returning',
+    travelTicks: 77,
     travelDistance: 8,
     x: 17,
     z: 29,
@@ -7088,18 +7091,21 @@ describe('full self-state snapshot delta fixture', () => {
       cargo: [{ itemId: 'wolf_fang', count: 3 }],
       revision: 7,
     });
+    expect(initial.self.courierTravelTicks).toBe(77);
     expect(initial.self.courierData).not.toHaveProperty('x');
     expect(initial.self.courierData).not.toHaveProperty('travelDistance');
     expect(initial.self.courierData).not.toHaveProperty('remainingDistance');
     expect(
       initial.ents.every(
-        (entry: Record<string, unknown>) => !('courier' in entry) && !('courierData' in entry),
+        (entry: Record<string, unknown>) =>
+          !('courier' in entry) && !('courierData' in entry) && !('courierTravelTicks' in entry),
       ),
     ).toBe(true);
     (client as any).applySnapshot(initial);
     const cargo = client.courierInfo!.cargo;
     const meta = server.sim.meta(leader.pid)!;
     meta.courier!.x = 41;
+    meta.courier!.travelTicks = 78;
     fc.sent.length = 0;
     broadcast(server);
     const moved = lastSnap(fc.sent);
@@ -7112,9 +7118,11 @@ describe('full self-state snapshot delta fixture', () => {
       remainingDistance: 0,
       inventoryRevision: 0,
     });
+    expect(moved.self.courierTravelTicks).toBe(78);
     expect(moved.self).not.toHaveProperty('courierData');
     (client as any).applySnapshot(moved);
     expect(client.courierInfo!.x).toBe(41);
+    expect(client.courierInfo!.travelTicks).toBe(78);
     expect(client.courierInfo!.cargo).toBe(cargo);
     meta.courier = undefined;
     fc.sent.length = 0;
@@ -7122,6 +7130,7 @@ describe('full self-state snapshot delta fixture', () => {
     const ended = lastSnap(fc.sent);
     expect(ended.self.courier).toBeNull();
     expect(ended.self.courierData).toBeNull();
+    expect(ended.self.courierTravelTicks).toBeNull();
     (client as any).applySnapshot(ended);
     expect(client.courierInfo).toBeNull();
   });
@@ -7237,7 +7246,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 116 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 117 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
@@ -7296,8 +7305,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
     // Courier adds its small pose and separately revision-gated custody data.
-    expect(ALL_DELTA_KEYS).toHaveLength(116);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(116);
+    expect(ALL_DELTA_KEYS).toHaveLength(117);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(117);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7421,6 +7430,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('cvault')).toBe(true);
     expect(scraped.has('courier')).toBe(true);
     expect(scraped.has('courierData')).toBe(true);
+    expect(scraped.has('courierTravelTicks')).toBe(true);
     // ...and the narrowing really narrows. A member `emit` is not a delta call,
     // and asserting it on a synthetic source keeps the claim honest even while
     // neither emitter file happens to contain one.
@@ -7469,7 +7479,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(116);
+    expect(scraped.size).toBe(117);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7550,6 +7560,7 @@ describe('delta-key contract pins (anti-drift)', () => {
       fplot: 'myFarmPlots',
       courier: 'courierInfo',
       courierData: 'courierInfo',
+      courierTravelTicks: 'courierInfo',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);

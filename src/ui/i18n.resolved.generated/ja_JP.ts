@@ -356,6 +356,10 @@ export const ja_JP: EnTranslations = {
       "waiting": "アイテムを返すため待機中",
       "bags": "銀行へ送る",
       "bank": "銀行から取り出す",
+      "inventory": "所持品",
+      "bankTitle": "銀行",
+      "capacity": "{used} / {capacity} スロット",
+      "travelTime": "片道10秒",
       "cargo": "配達員の荷物",
       "empty": "アイテムなし",
       "send": "配達員を送る",
@@ -364,7 +368,7 @@ export const ja_JP: EnTranslations = {
       "selectedItem": "{item}、{count}の選択を解除",
       "instructions": "スタック全体を選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。",
       "membership": "次の配達にはメンバーシップの更新が必要です。",
-      "cargoSafe": "バッグに空きができるまで、配達員がアイテムを保管します。",
+      "cargoSafe": "バッグが満杯の場合、返却品は超過分として保管されます。配達後、再召喚するまでクーリエは姿を消します。",
       "unavailable": "配達員を召喚して配達を計画しましょう。"
     },
     "framePresets": {
@@ -864,9 +868,10 @@ export const ja_JP: EnTranslations = {
         "benefitsTitle": "有効なメンバーシップの特典",
         "benefitBank": "どの銀行員からでも、ほかのキャラクターの銀行を利用できます。",
         "benefitSlots": "キャラクター枠を10個追加で解放します。",
-        "benefitArmour": "クラスと専門化に合った能力値を持つ魂縛の防具を受け取れます。レベルに合わせて成長し、レベル20でアイテムレベル25になります。全身に装備すると獲得経験値が20%増加します。",
+        "benefitArmour": "レア品質のソウルバウンド防具と変化の杖を受け取れます。能力値はクラスと専門分野に適応し、アイテムレベルは常にキャラクターレベルより5高くなります。防具7部位をすべて装備すると経験値が20%増加します。",
+        "benefitBag": "メンバーシップバッグ枠にバッグを1個追加で装備できます。",
         "benefitTax": "オークションの通常の手数料が半額になります。",
-        "benefitExpiry": "メンバーシップが切れると、追加枠のキャラクターと防具の特典は更新するまで利用できなくなります。基本枠のキャラクターは引き続き遊べます。",
+        "benefitExpiry": "メンバーシップが切れると追加キャラクター枠、装備の効果、追加バッグ枠は更新までロックされます。バッグとアイテムは安全に保管され、容量超過分も保持されます。基本キャラクター枠は引き続き利用できます。",
         "tokenTerms": "{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。",
         "tokenBuy": "メンバーシップトークンを購入",
         "tokenClaim": "購入したトークンを受け取る",
@@ -3674,6 +3679,9 @@ export const ja_JP: EnTranslations = {
       "entryMismatchHeroic": "このインスタンスはヒロイック難易度に設定されています。ノーマルで新しく始めるには「すべてのインスタンスをリセット」を使用してください。"
     },
     "bags": {
+      "membershipSlot": "メンバーシップバッグ枠",
+      "membershipSlotLocked": "メンバーシップでこのバッグ枠を解放。",
+      "membershipSlotHint": "メンバーシップ有効中はバッグを1個追加で装備できます。期限が切れてもバッグとアイテムは安全に保管されます。",
       "cannotDestroy": "このアイテムは破壊できません。",
       "rightClickDestroy": "右クリックで破壊",
       "dragEquipHint": "キャラクターにドラッグして装備",
@@ -4945,7 +4953,7 @@ export const ja_JP: EnTranslations = {
       "tabsAria": "銀行タブ",
       "personalTab": "個人",
       "accountTab": "ほかのキャラクター",
-      "accountArmour": "メンバーシップ防具を受け取る",
+      "accountArmour": "メンバーシップ装備を受け取る",
       "referralArmour": "友情の防具を受け取る",
       "accountMembership": "メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。",
       "accountCharacters": "キャラクターの銀行",
@@ -12839,11 +12847,12 @@ export const ja_JP: EnTranslations = {
       "referralDormant": "無効：このアカウントはメンバーの招待による友情の防具を獲得していません。",
       "membershipToken": "使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。",
       "membershipAdaptive": "能力値と防具の種類がクラスと専門化に合わせて変わります。",
-      "membershipScaling": "アイテムレベルは自分のレベルに合わせて上がります。レベル20になると完成し、アイテムレベル25になります。",
+      "membershipWeaponAdaptive": "装備中はクラスと専門分野に合わせて武器の種類、外見、能力値が変化します。",
+      "membershipScaling": "アイテムレベル{level}。常にキャラクターレベルより5高くなります。",
       "membershipPerfected": "完成：アイテムレベル{level}。",
       "membershipFullSet": "メンバーシップ防具を全{pieces}部位装備すると、獲得経験値が{percent}%増加します。有効なメンバーシップが必要です。",
-      "membershipRequired": "メンバーシップが切れると防具の能力値とセット効果は無効になり、更新すると再び有効になります。",
-      "membershipDormant": "無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。",
+      "membershipRequired": "メンバーシップが切れると装備の能力値とセット効果が停止し、更新すると復活します。",
+      "membershipDormant": "無効：メンバーシップを更新すると装備の能力値とセット効果が復活します。",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "現在の装備",
       "ifYouEquip": "これを装備すると",
@@ -13145,7 +13154,7 @@ export const ja_JP: EnTranslations = {
     "abilities": {
       "courier": {
         "name": "配達員",
-        "description": "空飛ぶロバを召喚し、バッグと最寄りの銀行の間で荷物を運びます。通常の走行速度の250%で飛びます。1回につき最大24スタックを選択できます。新しい配達にはメンバーシップが必要です。"
+        "description": "空飛ぶロバを召喚し、バッグと最寄りの銀行の間でアイテムを運びます。銀行まで10秒、帰りも10秒かかります。1回につき最大24スタックを選択できます。返却品は満杯のバッグにも超過分として入り、クーリエは再召喚するまで姿を消します。死亡中やインスタンス内では帰路が一時停止します。新しい配達にはメンバーシップが必要です。"
       },
       "sport_kick": {
         "name": "キック",
@@ -18545,6 +18554,9 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
+      },
+      "membership_staff": {
+        "name": "変化の杖"
       },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"

@@ -51,6 +51,32 @@ describe('courier visual presentation', () => {
       expect(out).toEqual({ lift: 0, flight: 0, moving: true });
     }
   });
+  it('uses authoritative elapsed ticks for takeoff on short and long routes', () => {
+    const out = { lift: 0, flight: 0, moving: false };
+    for (const phase of ['outbound', 'returning'] as const) {
+      for (const remainingDistance of [0.001, 10000]) {
+        for (const [travelTicks, lift] of [
+          [0, 0],
+          [12, 0],
+          [26, 1],
+          [40, 2],
+          [160, 2],
+          [174, 1],
+          [188, 0],
+          [200, 0],
+        ]) {
+          courierVisualPoseInto(out, { phase, x: 0, z: 0, travelTicks, remainingDistance }, false);
+          expect(out.lift).toBeCloseTo(lift);
+        }
+      }
+    }
+    courierVisualPoseInto(
+      out,
+      { phase: 'returning', x: 0, z: 0, travelTicks: 100, remainingDistance: 0 },
+      false,
+    );
+    expect(out.lift).toBe(0);
+  });
   it('faces observed movement and holds facing when stationary', () => {
     expect(courierFacing(0, 0, 1, 0, 0)).toBe(Math.PI / 2);
     expect(courierFacing(1, 2, 1, 2, 1.2)).toBe(1.2);

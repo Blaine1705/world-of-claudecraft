@@ -356,6 +356,10 @@ export const ko_KR: EnTranslations = {
       "waiting": "아이템 반환을 위해 대기 중",
       "bags": "은행에 보낼 아이템",
       "bank": "은행에서 가져올 아이템",
+      "inventory": "소지품",
+      "bankTitle": "은행",
+      "capacity": "{used} / {capacity}칸",
+      "travelTime": "편도 10초",
       "cargo": "배달부 소지품",
       "empty": "아이템 없음",
       "send": "배달부 보내기",
@@ -364,7 +368,7 @@ export const ko_KR: EnTranslations = {
       "selectedItem": "{item}, {count} 선택 해제",
       "instructions": "묶음 전체를 선택하세요. 배달부가 먼저 맡긴 뒤 요청한 아이템을 찾습니다. 퀘스트 아이템은 보낼 수 없습니다.",
       "membership": "새 배달을 시작하려면 멤버십을 갱신하세요.",
-      "cargoSafe": "가방에 공간이 생길 때까지 배달부가 아이템을 보관합니다.",
+      "cargoSafe": "가방이 가득 차면 돌아온 아이템은 초과 소지품으로 보관됩니다. 배달 후 배달부는 다시 소환할 때까지 사라집니다.",
       "unavailable": "배달부를 소환하여 배달을 계획하세요."
     },
     "framePresets": {
@@ -864,9 +868,10 @@ export const ko_KR: EnTranslations = {
         "benefitsTitle": "활성 멤버십 혜택",
         "benefitBank": "어느 은행원에게서든 다른 캐릭터의 은행을 이용할 수 있습니다.",
         "benefitSlots": "캐릭터 슬롯 10개를 추가로 잠금 해제합니다.",
-        "benefitArmour": "직업과 전문화에 맞는 능력치를 지닌 귀속 방어구를 받으세요. 캐릭터 레벨에 따라 성장하며 20레벨에 아이템 레벨 25가 됩니다. 전체 세트를 착용하면 경험치 획득량이 20% 증가합니다.",
+        "benefitArmour": "희귀 등급의 귀속 방어구와 변화의 지팡이를 받습니다. 능력치는 직업과 전문화에 맞춰 변하며 아이템 레벨은 항상 캐릭터 레벨보다 5 높습니다. 방어구 7부위를 모두 착용하면 경험치를 20% 더 얻습니다.",
+        "benefitBag": "멤버십 가방 칸에 가방을 하나 더 장착할 수 있습니다.",
         "benefitTax": "경매장 수수료가 일반 수수료의 절반으로 줄어듭니다.",
-        "benefitExpiry": "멤버십이 만료되면 추가 슬롯의 캐릭터와 방어구 보너스가 갱신할 때까지 잠깁니다. 기본 슬롯의 캐릭터는 계속 플레이할 수 있습니다.",
+        "benefitExpiry": "멤버십이 만료되면 추가 캐릭터 칸, 장비 효과, 추가 가방 칸은 갱신할 때까지 잠깁니다. 가방과 아이템은 안전하게 보관되며 초과 아이템도 유지됩니다. 기본 캐릭터 칸은 계속 사용할 수 있습니다.",
         "tokenTerms": "{price}를 한 번 결제하면 30일 이용권을 받습니다. 이 캐릭터에게 우편으로 전달됩니다. 사용하여 멤버십 기간을 추가하거나 경매장에서 판매하세요.",
         "tokenBuy": "멤버십 토큰 구매",
         "tokenClaim": "구매한 토큰 받기",
@@ -3674,6 +3679,9 @@ export const ko_KR: EnTranslations = {
       "entryMismatchHeroic": "이 인스턴스는 영웅 난이도로 설정되어 있습니다. 일반 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요."
     },
     "bags": {
+      "membershipSlot": "멤버십 가방 칸",
+      "membershipSlotLocked": "멤버십으로 이 가방 칸을 잠금 해제하세요.",
+      "membershipSlotHint": "멤버십이 활성화된 동안 가방을 하나 더 장착할 수 있습니다. 만료되어도 가방과 아이템은 안전하게 보관됩니다.",
       "cannotDestroy": "이 아이템은 파괴할 수 없습니다.",
       "rightClickDestroy": "마우스 오른쪽 버튼으로 파괴",
       "dragEquipHint": "캐릭터로 끌어다 놓아 장착",
@@ -4945,7 +4953,7 @@ export const ko_KR: EnTranslations = {
       "tabsAria": "은행 탭",
       "personalTab": "개인",
       "accountTab": "다른 캐릭터",
-      "accountArmour": "멤버십 방어구 받기",
+      "accountArmour": "멤버십 장비 받기",
       "referralArmour": "우정 방어구 받기",
       "accountMembership": "멤버십이 활성화되어 있으면 여기서 다른 캐릭터의 은행을 이용할 수 있습니다.",
       "accountCharacters": "캐릭터 은행",
@@ -12839,11 +12847,12 @@ export const ko_KR: EnTranslations = {
       "referralDormant": "비활성: 이 계정은 회원 초대를 통해 우정 방어구를 받지 않았습니다.",
       "membershipToken": "사용: 이 토큰을 소모하여 계정의 멤버십 기간에 {days}일을 추가합니다. 남은 멤버십 기간은 유지됩니다. 사용 전에는 거래하거나 경매장에서 판매할 수 있습니다.",
       "membershipAdaptive": "능력치와 방어구가 직업 및 전문화에 맞게 바뀝니다.",
-      "membershipScaling": "아이템 레벨이 캐릭터 레벨에 맞춰 증가합니다. 20레벨에 도달하면 방어구가 완성되어 아이템 레벨이 25가 됩니다.",
+      "membershipWeaponAdaptive": "장착 시 직업과 전문화에 맞게 무기 유형, 외형 및 능력치가 변합니다.",
+      "membershipScaling": "아이템 레벨 {level}. 항상 캐릭터 레벨보다 5 높습니다.",
       "membershipPerfected": "완성됨: 아이템 레벨 {level}.",
       "membershipFullSet": "멤버십 방어구 {pieces}부위를 모두 착용하면 경험치 획득량이 {percent}% 증가합니다. 활성 멤버십이 필요합니다.",
-      "membershipRequired": "멤버십이 만료되면 방어구 능력치와 세트 효과가 비활성화되며, 갱신하면 다시 활성화됩니다.",
-      "membershipDormant": "비활성: 멤버십을 갱신하면 방어구 능력치와 세트 효과가 복구됩니다.",
+      "membershipRequired": "멤버십이 만료되면 장비 능력치와 세트 효과가 중단되며 갱신하면 복구됩니다.",
+      "membershipDormant": "비활성: 멤버십을 갱신하면 장비 능력치와 세트 효과가 복구됩니다.",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "현재 착용 중",
       "ifYouEquip": "이것을 착용하면",
@@ -13145,7 +13154,7 @@ export const ko_KR: EnTranslations = {
     "abilities": {
       "courier": {
         "name": "배달부",
-        "description": "날아다니는 당나귀를 소환하여 가방과 가장 가까운 은행 사이에서 아이템을 운반합니다. 일반 달리기 속도의 250%로 비행합니다. 한 번에 최대 24묶음을 선택할 수 있습니다. 새 배달을 시작하려면 멤버십이 필요합니다."
+        "description": "하늘을 나는 당나귀를 소환해 가방과 가장 가까운 은행 사이에서 아이템을 운반합니다. 은행까지 10초, 돌아오는 데 10초가 걸립니다. 한 번에 최대 24묶음을 선택할 수 있습니다. 가방이 가득 차도 반환된 아이템은 초과 소지품으로 들어가며, 배달부는 다시 소환할 때까지 사라집니다. 사망 중이거나 인스턴스 안에 있으면 귀환이 일시 정지됩니다. 새 배달을 시작하려면 멤버십이 필요합니다."
       },
       "sport_kick": {
         "name": "킥",
@@ -18545,6 +18554,9 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
+      },
+      "membership_staff": {
+        "name": "변화의 지팡이"
       },
       "membership_token": {
         "name": "멤버십 토큰 (30일)"

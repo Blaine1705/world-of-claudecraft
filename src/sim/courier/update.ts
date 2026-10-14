@@ -7,7 +7,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot, DT, type Entity, type InvSlot } from '../types';
 import { courierPayloadFits, courierSlotFingerprint } from './identity';
-import { travelCourier } from './motion';
+import { startCourierLeg, travelCourier } from './motion';
 import { COURIER_ADMISSION_BYTES, COURIER_CAPACITY, type CourierState } from './types';
 
 function withdrawOriginal(
@@ -74,7 +74,7 @@ function exchange(ctx: SimContext, meta: PlayerMeta, state: CourierState): boole
   bumpBankWireRev(meta);
   state.withdrawals = [];
   state.phase = 'returning';
-  state.travelDistance = 0;
+  startCourierLeg(state);
   state.revision++;
   return true;
 }
@@ -92,7 +92,7 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
     const banker = state.bankerId === null ? undefined : ctx.entities.get(state.bankerId);
     if (!banker || banker.kind !== 'npc' || banker.dead) {
       state.phase = 'returning';
-      state.travelDistance = 0;
+      startCourierLeg(state);
       state.withdrawals = [];
       state.revision++;
       return;
@@ -102,7 +102,7 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
     // Validate the static banker anchor only at arrival, never during flight.
     if (!ctx.bankerIds.includes(banker.id)) {
       state.phase = 'returning';
-      state.travelDistance = 0;
+      startCourierLeg(state);
       state.withdrawals = [];
       state.revision++;
       return;
@@ -117,20 +117,13 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
     state.retryRemaining > 0
   )
     return;
-  let delivered = 0;
-  for (let i = state.cargo.length - 1; i >= 0; i--) {
-    delivered += moveBetweenContainers(
-      state.cargo,
-      i,
-      undefined,
-      meta.inventory,
-      bagPools(meta.bags),
-    ).moved;
-  }
-  const phase = state.cargo.length > 0 ? 'waiting' : 'ready';
-  if (state.phase !== phase || delivered > 0) state.revision++;
-  state.phase = phase;
-  state.travelDistance = 0;
-  state.retryRemaining = state.cargo.length > 0 ? 1 : 0;
+  // The player already owns this bounded cargo. Returning it may overflow bags;
+  // capacity must never strand custody or keep the courier visible after arrival.
+  const delivered = state.cargo.length;
+  for (let i = state.cargo.length - 1; i >= 0; i--)
+    moveBetweenContainers(state.cargo, i, undefined, meta.inventory, bagPools(meta.bags));
+  meta.inventory.push(...state.cargo);
+  state.cargo = [];
+  delete meta.courier;
   if (delivered > 0) ctx.onInventoryChangedForQuests(meta);
 }

@@ -608,6 +608,7 @@ const UI_PURE_CORES = [
   'src/ui/char_stats_view.ts',
   // The live world -> stat-sheet model bridge (extracted from Hud.statModel).
   'src/ui/char_stat_model_core.ts',
+  'src/ui/worn_item_definition_core.ts',
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
@@ -2688,6 +2689,7 @@ const UI_DOM_MODULES = [
   'src/ui/mount_inspect_controller.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
+  'src/ui/membership_bag_socket.ts',
   'src/ui/bank_buy_prompt.ts',
   'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_status_line.ts',

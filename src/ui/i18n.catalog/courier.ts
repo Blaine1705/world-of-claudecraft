@@ -7,6 +7,10 @@ export const courierStrings = {
   waiting: 'Waiting to return your items',
   bags: 'Send to bank',
   bank: 'Bring from bank',
+  inventory: 'Inventory',
+  bankTitle: 'Bank',
+  capacity: '{used} / {capacity} slots',
+  travelTime: '10 seconds each way',
   cargo: 'Courier inventory',
   empty: 'No items',
   send: 'Send courier',
@@ -16,6 +20,7 @@ export const courierStrings = {
   instructions:
     'Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.',
   membership: 'Renew your membership to start another trip.',
-  cargoSafe: 'Carried items stay with the courier until there is room in your bags.',
+  cargoSafe:
+    'Returned items overflow full bags. The courier vanishes after delivery until summoned again.',
   unavailable: 'Summon your courier to plan a delivery.',
 };

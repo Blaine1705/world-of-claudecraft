@@ -356,6 +356,10 @@ export const zh_CN: EnTranslations = {
       "waiting": "等待归还物品",
       "bags": "存入银行",
       "bank": "从银行取出",
+      "inventory": "背包",
+      "bankTitle": "银行",
+      "capacity": "{used} / {capacity} 栏位",
+      "travelTime": "单程10秒",
       "cargo": "信使背包",
       "empty": "没有物品",
       "send": "派出信使",
@@ -364,7 +368,7 @@ export const zh_CN: EnTranslations = {
       "selectedItem": "取消选择{item}，{count}",
       "instructions": "请选择整组物品。信使会先存入物品，再取出您指定的物品。任务物品无法寄送。",
       "membership": "续订会员后即可开始新的配送。",
-      "cargoSafe": "背包有空位前，信使会保管所携带的物品。",
+      "cargoSafe": "送回的物品会在背包已满时存为溢出物品。送达后信使会消失，直到再次召唤。",
       "unavailable": "召唤信使以安排配送。"
     },
     "framePresets": {
@@ -864,9 +868,10 @@ export const zh_CN: EnTranslations = {
         "benefitsTitle": "有效会员权益",
         "benefitBank": "在任意银行员处访问您其他角色的银行。",
         "benefitSlots": "额外解锁10个角色栏位。",
-        "benefitArmour": "领取属性适配您职业与专精的灵魂绑定护甲。护甲随角色等级成长，在20级时达到物品等级25。装备全套可多获得20%经验。",
+        "benefitArmour": "领取稀有品质的灵魂绑定护甲和万变法杖。属性适配您的职业与专精，物品等级始终比角色等级高5级。装备全部7件护甲可多获得20%经验。",
+        "benefitBag": "可在会员背包栏位额外装备一个背包。",
         "benefitTax": "拍卖行税费减半。",
-        "benefitExpiry": "会员到期后，额外栏位中的角色和护甲加成会锁定，续订后恢复。基础栏位中的角色仍可正常游玩。",
+        "benefitExpiry": "会员到期后，额外角色栏位、装备加成和额外背包栏位会锁定，续订后恢复。背包和物品会安全保留，超出容量的物品以溢出形式保存。基础角色栏位仍可正常使用。",
         "tokenTerms": "一次支付{price}，获得30天会员代币。代币将邮寄给此角色，可兑换为会员时长，也可在拍卖行出售。",
         "tokenBuy": "购买会员代币",
         "tokenClaim": "领取已购买的代币",
@@ -3674,6 +3679,9 @@ export const zh_CN: EnTranslations = {
       "entryMismatchHeroic": "此副本的难度为英雄。使用“重置所有副本”以开始全新的普通难度副本。"
     },
     "bags": {
+      "membershipSlot": "会员背包栏位",
+      "membershipSlotLocked": "开通会员以解锁此背包栏位。",
+      "membershipSlotHint": "会员有效期间可额外装备一个背包。会员到期后，背包和物品会安全保留。",
       "cannotDestroy": "该物品无法销毁。",
       "rightClickDestroy": "右键单击以销毁",
       "dragEquipHint": "拖到角色身上以装备",
@@ -4945,7 +4953,7 @@ export const zh_CN: EnTranslations = {
       "tabsAria": "银行标签页",
       "personalTab": "个人",
       "accountTab": "其他角色",
-      "accountArmour": "领取会员护甲",
+      "accountArmour": "领取会员装备",
       "referralArmour": "领取友谊护甲",
       "accountMembership": "会员有效期间，可在此访问您其他角色的银行。",
       "accountCharacters": "角色银行",
@@ -12839,11 +12847,12 @@ export const zh_CN: EnTranslations = {
       "referralDormant": "未激活：此账号尚未通过会员邀请获得友谊护甲。",
       "membershipToken": "使用：消耗此代币，为您的账号增加{days}天会员时长。现有剩余时长会保留。兑换前可交易此代币或在拍卖行出售。",
       "membershipAdaptive": "属性和护甲会随您的职业与专精调整。",
-      "membershipScaling": "物品等级与您的角色等级一致。达到20级时，此护甲会完善为物品等级25。",
+      "membershipWeaponAdaptive": "装备时，武器类型、外观和属性会适配您的职业与专精。",
+      "membershipScaling": "物品等级{level}。始终比角色等级高5级。",
       "membershipPerfected": "已完善：物品等级{level}。",
       "membershipFullSet": "装备全部{pieces}件会员护甲，经验获取量提高{percent}%。需要有效会员资格。",
-      "membershipRequired": "会员到期后，护甲属性和套装加成会停用，续订后恢复。",
-      "membershipDormant": "未激活：续订会员以恢复护甲属性和套装加成。",
+      "membershipRequired": "会员到期后，装备属性和套装加成会停用，续订后恢复。",
+      "membershipDormant": "未激活：续订会员以恢复装备属性和套装加成。",
       "qualityKind": "{quality}{kind}",
       "currentlyEquipped": "当前装备",
       "ifYouEquip": "装备后",
@@ -13145,7 +13154,7 @@ export const zh_CN: EnTranslations = {
     "abilities": {
       "courier": {
         "name": "信使",
-        "description": "召唤一头会飞的驴，在您的背包和最近的银行之间运送物品。飞行速度为普通跑步速度的250%。每次最多可选择24组物品。开始新的配送需要会员资格。"
+        "description": "召唤一头会飞的驴，在您的背包和最近的银行之间运送物品。去程和回程各需10秒。每次最多选择24组物品。送回的物品会溢出存入已满的背包，随后信使会消失，直到再次召唤。死亡或进入副本时，回程会暂停。开始新的配送需要会员资格。"
       },
       "sport_kick": {
         "name": "踢球",
@@ -18545,6 +18554,9 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "先锋之战杖"
+      },
+      "membership_staff": {
+        "name": "万变法杖"
       },
       "membership_token": {
         "name": "会员代币（30天）"

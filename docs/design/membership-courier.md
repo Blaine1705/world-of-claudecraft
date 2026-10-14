@@ -2,25 +2,26 @@
 
 An active member learns Courier in the spellbook and can place it on an action
 bar. Casting it summons an owner-only flying donkey and opens the courier window.
-The window selects whole stacks from the character's bags and personal bank.
+The window shows the existing bank and inventory item grids with the courier
+portrait between them. It selects whole stacks from the character's bags and personal bank.
 Quest items cannot travel. A trip accepts at most 24 selected stacks in total.
 
 Dispatch moves deposits out of the bags into persistent courier custody. The
-courier travels in a straight line to the nearest overworld banker. Each leg
-starts and ends with ground running at seven units per second. Between three and
-eight units from either end, speed and flight height ease up to 17.5 units per
-second (250% of normal running speed) and two units above the ground. Very short
-trips remain grounded. At arrival it deposits first, then
-collects the exact bank stacks requested at dispatch, then follows the owner's
-current position home. Changes to a requested bank stack invalidate that request;
+courier travels in a straight line to the nearest overworld banker. Each leg takes
+200 simulation ticks (10 seconds), including when the owner moves during the return.
+Speed eases up during the first two seconds, cruises, then eases down during the
+last two seconds. The courier runs at takeoff and landing and flies in between.
+At arrival it deposits first, then collects the exact bank stacks requested at
+dispatch, then travels to the owner's current position home. Changes to a requested bank stack invalidate that request;
 the courier never substitutes a different item occupying its old index.
 
-Full banks leave undeposited cargo with the courier. Full bags leave returned
-cargo waiting for space, with retries at one-second intervals. Transfer helpers
+Full banks leave undeposited cargo with the courier for the return trip. Returned
+cargo overflows full bags, then the courier vanishes until summoned again. Transfer helpers
 preserve item instances and material provenance and move whole requested stacks.
 Existing journeys finish after membership expires; new dispatches require active
 membership. Logout saves custody and freezes travel. Private instances cannot
 start a trip, and a returning courier waits while its owner is dead or inside one.
+Those pauses and any durable ledger admission delay do not consume travel ticks.
 
 ## Ownership and durability
 

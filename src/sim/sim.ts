@@ -1394,9 +1394,9 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState, HostA
   // it every frame. Runtime-only signal, never serialized/persisted.
   wireRev: number;
   inventory: InvSlot[];
-  // The 4 equippable bag sockets (itemId of a kind:'bag' item, or null). The
-  // 16-slot backpack is implicit; capacity math lives in bags.ts. Persisted.
+  // Four normal bags plus an active member bag; backpack space is implicit.
   bags: (string | null)[];
+  membershipBag?: string;
   // The per-character bank: a second pooled item store with its own copper-bought
   // slot budget. Capacity/move math lives in bank.ts. Persisted (inside the
   // character save, exactly like inventory/bags).

@@ -50,6 +50,8 @@ interface MembershipAccountSessions {
 export class MembershipGameServices {
   private readonly busy = new Set<number>();
   private readonly accounts = new Map<number, MembershipAccountSessions>();
+  // One pending explicit grant per resident session, cleared on refresh or leave.
+  private readonly redemptionArmourClaims = new Set<ClientSession>();
   private readonly refreshQueue = new Set<number>();
   private readonly refreshWakeups = new Map<
     number,
@@ -207,6 +209,7 @@ export class MembershipGameServices {
     this.requestRefresh(session.accountId);
   }
   onLeave(session: ClientSession): void {
+    this.redemptionArmourClaims.delete(session);
     const group = this.accounts.get(session.accountId);
     if (!group) return;
     group.sessions.delete(session);
@@ -297,7 +300,14 @@ export class MembershipGameServices {
           : 0;
         for (const session of group.sessions) {
           if (!this.valid(session)) continue;
+          const repairArmour =
+            seconds > 0 &&
+            this.redemptionArmourClaims.delete(session) &&
+            this.host.sim.entities.get(session.pid)?.membershipActive;
           this.host.sim.setMembership(session.pid, seconds);
+          // Ordinary refreshes never traverse owned storage. A committed token
+          // repairs already-active members; activation already claims new members.
+          if (repairArmour) this.host.sim.claimMembershipArmour(session.pid);
           if (seconds <= 0) {
             this.host.send(session, { t: 'account_bank', info: null });
             if (session.membershipSlot)
@@ -374,6 +384,7 @@ export class MembershipGameServices {
           }
           this.host.sim.ctx.onInventoryChangedForQuests(meta);
           bustMembership(session.accountId);
+          this.redemptionArmourClaims.add(session);
           this.requestRefresh(session.accountId);
         },
         controller.signal,
