@@ -32,7 +32,13 @@ function walk(dir) {
     // A building's parts twin (<name>.parts.glb) is not placeable whole: its
     // nodes are catalogued one by one from data/prefab_pieces below. Its LOD
     // twin (<name>.lod.glb) is drawn in its place past 200 yd, never placed.
-    else if (/\.(glb|gltf)$/i.test(name.name) && !/\.(parts|lod)\.glb$/i.test(name.name))
+    // Its texture-tier files (<name>.half.glb, <name>.quarter.glb, the same
+    // model with smaller maps; src/render/placed_texture_tier_core.ts) are
+    // loaded in its place on a low profile, never placed either.
+    else if (
+      /\.(glb|gltf)$/i.test(name.name) &&
+      !/\.(parts|lod|half|quarter)\.glb$/i.test(name.name)
+    )
       out.push(full);
   }
   return out;

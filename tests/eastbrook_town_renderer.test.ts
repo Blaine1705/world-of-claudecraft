@@ -32,7 +32,7 @@ import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade'
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
 import { vertexColorEmissiveInternalsForTest } from '../src/render/vertex_color_emissive';
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../src/sim/building_layout';
-import { BUILTIN_WORLD } from '../src/sim/data';
+import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
 import { terrainHeight } from '../src/sim/world';
 
@@ -886,6 +886,41 @@ describe('Eastbrook town renderer', () => {
     expect(staticBatches.every((mesh) => !mesh.visible)).toBe(true);
     view.update(0, 5, 0, 0, 5, 0, 100, 1);
     expect(staticBatches.every((mesh) => mesh.visible)).toBe(true);
+  });
+
+  it('stands the Weekly Vault down for a document that owns it as a placement', () => {
+    // its own family: the rebuild buildings ride authoredTowns and still draw
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      placements: [],
+      promotedScenery: { eastbrookVault: true },
+    });
+    try {
+      const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+      expect(
+        view.group.getObjectByName('eastbrookBuilding:eastbrook_weekly_vault'),
+      ).toBeUndefined();
+      // the hall keeps its slot in the town's lists, with nothing drawn in it
+      const slot = view.group.getObjectByName('eastbrookWeeklyVaultStoodDown');
+      expect(slot).toBeInstanceOf(THREE.Group);
+      expect(meshesOf(slot as THREE.Object3D)).toHaveLength(0);
+      expect(view.group.userData.roofHideTargetCount).toBe(EASTBROOK_LAYOUT.buildings.length + 1);
+      for (const building of EASTBROOK_LAYOUT.buildings) {
+        expect(
+          view.group.getObjectByName(`eastbrookBuilding:${building.id}`),
+          building.id,
+        ).toBeInstanceOf(THREE.Group);
+      }
+    } finally {
+      setActiveWorldContent(null);
+    }
+    // and the shipped world, which promotes nothing, keeps the town-drawn hall
+    const shipped = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    expect(
+      meshesOf(
+        shipped.group.getObjectByName('eastbrookBuilding:eastbrook_weekly_vault') as THREE.Object3D,
+      ),
+    ).toHaveLength(8);
   });
 
   it('returns an empty stable root for custom worlds before asking for any built-in asset source', () => {

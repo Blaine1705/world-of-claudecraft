@@ -314,6 +314,14 @@ export interface GfxSettings {
    * app. Set purely from `platform === 'ios'`; it does not require `nativeApp`.
    */
   readonly iosMemoryProfile: boolean;
+  /**
+   * Which texture set a placed town building loads (`placed_texture_tier_core.ts`): the
+   * full maps, the half-size set (a quarter of the memory) or the quarter-size one (a
+   * sixteenth). Phone-class memory profiles take the quarter set and the low tier the half
+   * set. Cosmetic sharpness only: the geometry, and so the collision, is the same in every
+   * set (fairness rule).
+   */
+  readonly placedTextureTier: 'full' | 'half' | 'quarter';
   /** Global cap for inactive skinned character rigs retained for reuse. */
   readonly maxPooledCharacterVisuals: number;
   /** Global cap for inactive ground-object views (harvest nodes, loot, quest pickups) retained for reuse. */
@@ -1362,6 +1370,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     constrainedMemory,
     iosMemoryProfile,
     tightMemory: tightMemoryProfile,
+    placedTextureTier: constrainedMemory ? 'quarter' : tier === 'low' ? 'half' : 'full',
     // Bounded on EVERY profile, desktop included. A pooled visual retains its
     // per-instance Skeleton and GPU bone-matrix DataTexture so a re-entering
     // mob/NPC skips the skeleton re-upload hitch pooling exists for, and the

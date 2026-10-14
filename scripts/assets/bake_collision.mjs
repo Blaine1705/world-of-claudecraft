@@ -53,8 +53,9 @@ function walk(dir, out = []) {
     // A building's parts twin is addressed node by node (data/prefab_pieces);
     // its collision comes from the installer, never from a whole-file bake.
     // Its LOD twin (<name>.lod.glb) is only ever drawn, never collided with.
-    else if (name.endsWith('.glb') && !name.endsWith('.parts.glb') && !name.endsWith('.lod.glb'))
-      out.push(p);
+    // Its texture-tier files (<name>.half.glb, <name>.quarter.glb) are the
+    // same model with smaller maps: the model's own collision serves them.
+    else if (name.endsWith('.glb') && !/\.(parts|lod|half|quarter)\.glb$/.test(name)) out.push(p);
   }
   return out;
 }

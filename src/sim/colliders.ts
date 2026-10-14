@@ -92,7 +92,7 @@ export { FENCE_HALF_DEPTH } from './fence_dims';
 // consumer, so only it is imported (not re-exported) for internal use here.
 export { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from './rift_regions';
 
-import { isAuthoredTownBuildingDef } from './authored_town_buildings';
+import { promotedTownBuildingStandsDown } from './authored_town_buildings';
 import { pushOut, resolveAgainst } from './collider_pushout';
 import {
   DAWNHOLD_PARAPET_HALF,
@@ -269,9 +269,8 @@ function staticWorldColliders(seed: number): Collider[] {
   // A document that owns the authored towns' buildings as placements carries
   // their (baked) collision itself, without this gate a moved town hall
   // leaves an invisible record collider standing on the square.
-  const townBuildingsPromoted = content.promotedScenery?.authoredTowns === true;
   for (const b of PROPS.buildings) {
-    if (townBuildingsPromoted && isAuthoredTownBuildingDef(b)) continue;
+    if (promotedTownBuildingStandsDown(content.promotedScenery, b)) continue;
     if (b.kind === 'chapel' && b.assetId === undefined) {
       // The legacy procedural chapel is COMPOSED (render/props.ts): full-height
       // bell tower at the rear, squat entry hall in front. Collide the two

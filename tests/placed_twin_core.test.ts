@@ -20,6 +20,7 @@ describe('twinPathFor', () => {
     expect(twinPathFor('/models/tidehold/house_b.glb')).toBe('/models/tidehold/house_b.lod.glb');
     expect(twinPathFor('/models/tidehold/tavern_b.glb')).toBe('/models/tidehold/tavern_b.lod.glb');
     expect(twinPathFor('/models/tidehold/bank.glb?v=1')).toBe('/models/tidehold/bank.lod.glb');
+    expect(twinPathFor('/models/tidehold/vault.glb')).toBe('/models/tidehold/vault.lod.glb');
     expect(twinPathFor('/models/tidehold/bank.parts.glb')).toBeNull();
     expect(twinPathFor('/models/tidehold/castle_b.glb')).toBeNull();
     expect(twinPathFor('/models/foliage/pine_01.glb')).toBeNull();

@@ -1506,7 +1506,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 11003 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 11037 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 11003,
+    // LOWERED to 11001 when the offline Play click (its audio start and its world
+    // choice) moved into src/game/studio_boot.ts bootOfflinePlay.
+    ceiling: 11001,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
