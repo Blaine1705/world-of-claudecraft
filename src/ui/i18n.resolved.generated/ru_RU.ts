@@ -4372,6 +4372,8 @@ export const ru_RU: EnTranslations = {
         "qwertyDa": "QWERTY (датская)",
         "qwertyNo": "QWERTY (норвежская)",
         "qwertyBr": "QWERTY (бразильская ABNT2)",
+        "qwertyPt": "QWERTY (португальская)",
+        "qwertyTr": "QWERTY (турецкая)",
         "dvorak": "Дворак",
         "colemak": "Колемак"
       }

@@ -2190,6 +2190,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY（デンマーク語）',
   'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY（ノルウェー語）',
   'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY（ブラジル ABNT2）',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY（ポルトガル語）',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY（トルコ語）',
   'hudChrome.keybindLayout.layouts.dvorak': 'Dvorak 配列',
   'hudChrome.keybindLayout.layouts.colemak': 'Colemak 配列',
   'hudChrome.keyboardMap.title': 'キーボード一覧',

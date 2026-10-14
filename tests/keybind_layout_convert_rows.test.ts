@@ -132,6 +132,8 @@ describe('buildKeybindLayoutConvertRow', () => {
         'qwerty-da',
         'qwerty-no',
         'qwerty-br',
+        'qwerty-pt',
+        'qwerty-tr',
         'dvorak',
         'colemak',
       ]);

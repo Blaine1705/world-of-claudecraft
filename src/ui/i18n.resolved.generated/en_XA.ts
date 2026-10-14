@@ -4372,6 +4372,8 @@ export const en_XA: EnTranslations = {
         "qwertyDa": "[ɊŴÉŔŢÝ (Ðáñíšĥ)]",
         "qwertyNo": "[ɊŴÉŔŢÝ (Ñóŕŵéĝíáñ)]",
         "qwertyBr": "[ɊŴÉŔŢÝ (Ɓŕážíļíáñ ÁƁÑŢ2)]",
+        "qwertyPt": "[ɊŴÉŔŢÝ (Þóŕţúĝúéšé)]",
+        "qwertyTr": "[ɊŴÉŔŢÝ (Ţúŕķíšĥ)]",
         "dvorak": "[Ðʋóŕáķ]",
         "colemak": "[Çóļéɱáķ]"
       }

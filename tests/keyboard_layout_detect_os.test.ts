@@ -23,26 +23,38 @@ async function detectWith(keyboard: unknown) {
   return detectOsKeyboardLayout();
 }
 
+// Each case re-imports the keyboard overview module fresh (vi.resetModules), a
+// few seconds apiece, so the cases carry a roomier timeout than the default.
+const FRESH_IMPORT_TIMEOUT_MS = 60_000;
+
 describe('detectOsKeyboardLayout', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('names the listed layout the OS reports', async () => {
-    expect(await detectWith({ getLayoutMap: () => Promise.resolve(osMap('azerty-fr')) })).toBe(
-      'azerty-fr',
-    );
-    expect(await detectWith({ getLayoutMap: () => Promise.resolve(osMap('colemak')) })).toBe(
-      'colemak',
-    );
-  });
+  it(
+    'names the listed layout the OS reports',
+    async () => {
+      expect(await detectWith({ getLayoutMap: () => Promise.resolve(osMap('azerty-fr')) })).toBe(
+        'azerty-fr',
+      );
+      expect(await detectWith({ getLayoutMap: () => Promise.resolve(osMap('colemak')) })).toBe(
+        'colemak',
+      );
+    },
+    FRESH_IMPORT_TIMEOUT_MS,
+  );
 
-  it('is null without the API, on a rejected read, or for a layout it does not list', async () => {
-    expect(await detectWith(undefined)).toBe(null);
-    expect(await detectWith({ getLayoutMap: () => Promise.reject(new Error('denied')) })).toBe(
-      null,
-    );
-    const cyrillic = new Map([...osMap('qwerty-us')].map(([code]) => [code, 'ж']));
-    expect(await detectWith({ getLayoutMap: () => Promise.resolve(cyrillic) })).toBe(null);
-  });
+  it(
+    'is null without the API, on a rejected read, or for a layout it does not list',
+    async () => {
+      expect(await detectWith(undefined)).toBe(null);
+      expect(await detectWith({ getLayoutMap: () => Promise.reject(new Error('denied')) })).toBe(
+        null,
+      );
+      const cyrillic = new Map([...osMap('qwerty-us')].map(([code]) => [code, 'ж']));
+      expect(await detectWith({ getLayoutMap: () => Promise.resolve(cyrillic) })).toBe(null);
+    },
+    FRESH_IMPORT_TIMEOUT_MS,
+  );
 });

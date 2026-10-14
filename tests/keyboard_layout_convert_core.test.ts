@@ -56,6 +56,8 @@ describe('keyboard_layout_convert_core: layout tables', () => {
       'qwerty-da',
       'qwerty-no',
       'qwerty-br',
+      'qwerty-pt',
+      'qwerty-tr',
       'dvorak',
       'colemak',
     ]);
@@ -88,6 +90,9 @@ describe('keyboard_layout_convert_core: layout tables', () => {
     expect(letters('azerty-fr', bottom)).toBe('wxcvbn,');
     expect(letters('dvorak', home)).toBe('aoeuidhtn');
     expect(letters('colemak', top)).toBe('qwfpgjluy;');
+    // Turkish Q: dotless ı on the I key, the dotted i on the quote key.
+    expect(letters('qwerty-tr', top)).toBe('qwertyuıop');
+    expect(layout('qwerty-tr').chars.get('Quote')).toBe('i');
     expect(letters('colemak', home)).toBe('arstdhnei');
     // The punctuation around the letters, which the detector and the
     // leftover pairing both lean on.
@@ -107,6 +112,8 @@ describe('keyboard_layout_convert_core: layout tables', () => {
     expect(punct('qwerty-da')).toBe("å ¨ ' æ ø < -");
     expect(punct('qwerty-no')).toBe("å ¨ ' ø æ < -");
     expect(punct('qwerty-br')).toBe('´ [ ] ç ~ \\ ;');
+    expect(punct('qwerty-pt')).toBe('+ ´ ~ ç º < -');
+    expect(punct('qwerty-tr')).toBe('ğ ü , ş i < .');
     expect(punct('dvorak')).toBe('/ = \\ s - _ z');
     expect(punct('colemak')).toBe("[ ] \\ o ' _ /");
     // ANSI layouts have no key left of Z.

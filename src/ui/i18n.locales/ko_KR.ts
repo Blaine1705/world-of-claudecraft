@@ -2182,6 +2182,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (덴마크어)',
   'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (노르웨이어)',
   'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (브라질 ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (포르투갈어)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (터키어)',
   'hudChrome.keybindLayout.layouts.dvorak': '드보락',
   'hudChrome.keybindLayout.layouts.colemak': '콜맥',
   'hudChrome.keyboardMap.title': '키보드 개요',

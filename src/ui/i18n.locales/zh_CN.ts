@@ -2115,6 +2115,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY（丹麦语）',
   'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY（挪威语）',
   'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY（巴西 ABNT2）',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY（葡萄牙语）',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY（土耳其语）',
   'hudChrome.keybindLayout.layouts.dvorak': '德沃夏克',
   'hudChrome.keybindLayout.layouts.colemak': 'Colemak 布局',
   'hudChrome.keyboardMap.title': '键盘总览',

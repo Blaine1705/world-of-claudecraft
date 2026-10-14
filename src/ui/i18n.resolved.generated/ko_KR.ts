@@ -4372,6 +4372,8 @@ export const ko_KR: EnTranslations = {
         "qwertyDa": "QWERTY (덴마크어)",
         "qwertyNo": "QWERTY (노르웨이어)",
         "qwertyBr": "QWERTY (브라질 ABNT2)",
+        "qwertyPt": "QWERTY (포르투갈어)",
+        "qwertyTr": "QWERTY (터키어)",
         "dvorak": "드보락",
         "colemak": "콜맥"
       }

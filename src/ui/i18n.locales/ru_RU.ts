@@ -2209,6 +2209,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (датская)',
   'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (норвежская)',
   'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (бразильская ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (португальская)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (турецкая)',
   'hudChrome.keybindLayout.layouts.dvorak': 'Дворак',
   'hudChrome.keybindLayout.layouts.colemak': 'Колемак',
   'hudChrome.keyboardMap.title': 'Обзор клавиатуры',

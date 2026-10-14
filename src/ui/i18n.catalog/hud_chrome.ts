@@ -5876,6 +5876,8 @@ export const hudChromeStrings = {
       qwertyDa: 'QWERTY (Danish)',
       qwertyNo: 'QWERTY (Norwegian)',
       qwertyBr: 'QWERTY (Brazilian ABNT2)',
+      qwertyPt: 'QWERTY (Portuguese)',
+      qwertyTr: 'QWERTY (Turkish)',
       dvorak: 'Dvorak',
       colemak: 'Colemak',
     },

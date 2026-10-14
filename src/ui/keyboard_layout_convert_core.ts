@@ -35,6 +35,8 @@ export type KeyboardLayoutId =
   | 'qwerty-da'
   | 'qwerty-no'
   | 'qwerty-br'
+  | 'qwerty-pt'
+  | 'qwerty-tr'
   | 'dvorak'
   | 'colemak';
 
@@ -172,6 +174,18 @@ export const KEYBOARD_LAYOUTS: readonly KeyboardLayoutSpec[] = [
     id: 'qwerty-br',
     labelKey: 'hudChrome.keybindLayout.layouts.qwertyBr',
     chars: rows('q w e r t y u i o p ´ [ ]', 'a s d f g h j k l ç ~', '\\ z x c v b n m , . ;'),
+  },
+  {
+    id: 'qwerty-pt',
+    labelKey: 'hudChrome.keybindLayout.layouts.qwertyPt',
+    chars: rows('q w e r t y u i o p + ´ ~', 'a s d f g h j k l ç º', '< z x c v b n m , . -'),
+  },
+  {
+    // Turkish Q: the dotless ı sits on QWERTY's I key and the dotted i on the
+    // quote key, so an I hotkey follows the i the player types.
+    id: 'qwerty-tr',
+    labelKey: 'hudChrome.keybindLayout.layouts.qwertyTr',
+    chars: rows('q w e r t y u ı o p ğ ü ,', 'a s d f g h j k l ş i', '< z x c v b n m ö ç .'),
   },
   {
     id: 'dvorak',

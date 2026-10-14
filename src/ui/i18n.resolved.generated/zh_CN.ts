@@ -4372,6 +4372,8 @@ export const zh_CN: EnTranslations = {
         "qwertyDa": "QWERTY（丹麦语）",
         "qwertyNo": "QWERTY（挪威语）",
         "qwertyBr": "QWERTY（巴西 ABNT2）",
+        "qwertyPt": "QWERTY（葡萄牙语）",
+        "qwertyTr": "QWERTY（土耳其语）",
         "dvorak": "德沃夏克",
         "colemak": "Colemak 布局"
       }

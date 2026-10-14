@@ -11475,6 +11475,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.keybindLayout.layouts.qwertyIt'
   | 'hudChrome.keybindLayout.layouts.qwertyNo'
   | 'hudChrome.keybindLayout.layouts.qwertyNordic'
+  | 'hudChrome.keybindLayout.layouts.qwertyPt'
+  | 'hudChrome.keybindLayout.layouts.qwertyTr'
   | 'hudChrome.keybindLayout.layouts.qwertyUk'
   | 'hudChrome.keybindLayout.layouts.qwertyUs'
   | 'hudChrome.keybindLayout.layouts.qwertzCh'

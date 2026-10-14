@@ -4372,6 +4372,8 @@ export const ja_JP: EnTranslations = {
         "qwertyDa": "QWERTY（デンマーク語）",
         "qwertyNo": "QWERTY（ノルウェー語）",
         "qwertyBr": "QWERTY（ブラジル ABNT2）",
+        "qwertyPt": "QWERTY（ポルトガル語）",
+        "qwertyTr": "QWERTY（トルコ語）",
         "dvorak": "Dvorak 配列",
         "colemak": "Colemak 配列"
       }
