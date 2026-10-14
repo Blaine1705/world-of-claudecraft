@@ -1,12 +1,13 @@
 import { ITEMS } from '../sim/data';
 import { WEEKLY_REWARD_MAX_LEVEL_OFFSET } from '../sim/weekly_reward_options';
+import { needsWeeklyBossTable } from '../sim/weekly_reward_tables';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import { weeklyRewardTableName } from './weekly_reward_table_picker_controller';
-import type { buildWeeklyRewardsView } from './weekly_rewards_view';
+import type { buildWeeklyRewardsView, WeeklyLootCatalog } from './weekly_rewards_view';
 
 /** Content categories contain difficulty sections and collapsible loot tables. */
 export function appendWeeklyLootCategory(
@@ -14,6 +15,7 @@ export function appendWeeklyLootCategory(
   row: ReturnType<typeof buildWeeklyRewardsView>[number],
   presentation: PainterHostPresentation,
   expanded: Set<string>,
+  catalog: WeeklyLootCatalog = 'eligible',
 ): void {
   const category = document.createElement('section');
   category.className = 'weekly-loot-category ui-well';
@@ -30,13 +32,19 @@ export function appendWeeklyLootCategory(
     rule.textContent = t(
       pool.pool === 'world'
         ? 'hudChrome.weeklyRewards.worldPoolRule'
-        : 'hudChrome.weeklyRewards.selectionPoolRule',
+        : catalog === 'all' && needsWeeklyBossTable(pool.pool)
+          ? 'hudChrome.weeklyRewards.previewPoolRule'
+          : 'hudChrome.weeklyRewards.selectionPoolRule',
       { maxLevelOffset: formatNumber(WEEKLY_REWARD_MAX_LEVEL_OFFSET) },
     );
     group.append(title, rule);
     if (!pool.tables.length) {
       const empty = document.createElement('p');
-      empty.textContent = t('hudChrome.weeklyRewards.noLevelLoot');
+      empty.textContent = t(
+        pool.emptyReason === 'noClears'
+          ? 'hudChrome.weeklyRewards.noTables'
+          : 'hudChrome.weeklyRewards.noLevelLoot',
+      );
       group.append(empty);
     }
     for (const table of pool.tables) {

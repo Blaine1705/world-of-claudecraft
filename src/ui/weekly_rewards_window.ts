@@ -116,7 +116,8 @@ export class WeeklyRewardsTab {
       info.playerLevel,
       !!info.state.vaults[0] && info.state.vaults[0].resetAtMs <= info.nowMs,
     ]);
-    const rows = buildWeeklyRewardsView(info, world.cfg.playerClass);
+    const catalog = this.options?.readOnly ? 'all' : 'eligible';
+    const rows = buildWeeklyRewardsView(info, world.cfg.playerClass, { catalog });
     panel.innerHTML = `<header class="weekly-rewards-header"><div class="weekly-vault-crest" aria-hidden="true"><img src="${chromeIconUrl('chest')}" alt="" draggable="false"></div><div class="weekly-vault-intro"><h2>${esc(t('hudChrome.weeklyRewards.title'))}</h2><p>${esc(t('hudChrome.weeklyRewards.intro'))}</p></div><div class="weekly-reset"><span>${esc(t('hudChrome.weeklyRewards.nextReset'))}</span><strong data-weekly-countdown role="timer"></strong></div></header>`;
     this.timer = panel.querySelector('[data-weekly-countdown]');
     this.refreshCountdown();
@@ -196,7 +197,7 @@ export class WeeklyRewardsTab {
           },
         )
         .join('')}</div></div>`;
-      appendWeeklyLootCategory(allPools, row, this.deps.presentation, this.expanded);
+      appendWeeklyLootCategory(allPools, row, this.deps.presentation, this.expanded, catalog);
 
       tracks.appendChild(section);
     }

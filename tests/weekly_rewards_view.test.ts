@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { earnedWeeklyRolls, emptyWeeklyRewards } from '../src/sim/weekly_rewards';
+import { weeklyItemWithinLevel } from '../src/sim/weekly_reward_options';
+import { WEEKLY_BOSS_TABLES, weeklyBossLootPool } from '../src/sim/weekly_reward_tables';
+import {
+  earnedWeeklyRolls,
+  emptyWeeklyRewards,
+  type WeeklyPoolId,
+} from '../src/sim/weekly_rewards';
 import { buildWeeklyRewardsView, weeklyCountdown } from '../src/ui/weekly_rewards_view';
 
 describe('weekly reward presentation', () => {
@@ -84,6 +90,73 @@ describe('weekly reward presentation', () => {
       'mage',
     )[1];
     expect(dungeon.pools[1].tables.map((table) => table.id)).toEqual(['drowned_temple']);
+  });
+  it('previews every class-eligible boss table in the all catalog, kills or not', () => {
+    const state = emptyWeeklyRewards();
+    state.bossUnlocks = {};
+    state.weeklyBossUnlocks = {};
+    const info = {
+      playerLevel: 60,
+      state,
+      nowMs: 0,
+      canClaim: false,
+      worldQuestsAvailable: true,
+      readyWeeks: 0,
+    };
+    const [raid, dungeon] = buildWeeklyRewardsView(info, 'warrior', { catalog: 'all' });
+    const expected = (category: 'raid' | 'dungeon', pool: WeeklyPoolId) => [
+      ...new Set(
+        WEEKLY_BOSS_TABLES.filter(
+          (table) =>
+            table.category === category &&
+            weeklyBossLootPool(table.bossId, pool, 'warrior').some((id) =>
+              weeklyItemWithinLevel(id, 60),
+            ),
+        ).map((table) => (category === 'dungeon' ? table.dungeonId : table.bossId)),
+      ),
+    ];
+    for (const entry of [...raid.pools, ...dungeon.pools]) {
+      const category = entry.pool.startsWith('raid') ? 'raid' : 'dungeon';
+      expect(entry.tables.map((table) => table.id).sort()).toEqual(
+        expected(category, entry.pool).sort(),
+      );
+      expect(entry.emptyReason).toBeNull();
+    }
+    expect(dungeon.pools[0].tables.map((table) => table.id)).toEqual(
+      expect.arrayContaining([
+        'hollow_crypt',
+        'sunken_bastion',
+        'drowned_temple',
+        'gravewyrm_sanctum',
+        'wildheart_basin',
+      ]),
+    );
+    // The default (keeper) catalog stays cleared-only and names the real reason.
+    const keeper = buildWeeklyRewardsView(info, 'warrior');
+    for (const row of keeper.slice(0, 2))
+      for (const entry of row.pools) {
+        expect(entry.tables).toEqual([]);
+        expect(entry.emptyReason).toBe('noClears');
+      }
+  });
+  it('names level as the empty reason once cleared tables exist but are over level', () => {
+    const state = emptyWeeklyRewards();
+    state.weeklyBossUnlocks = { nythraxis_scourge_of_thornpeak: 2 };
+    const raid = buildWeeklyRewardsView(
+      {
+        playerLevel: 1,
+        state,
+        nowMs: 0,
+        canClaim: true,
+        worldQuestsAvailable: true,
+        readyWeeks: 0,
+      },
+      'warrior',
+    )[0];
+    expect(raid.pools.map((entry) => [entry.tables.length, entry.emptyReason])).toEqual([
+      [0, 'level'],
+      [0, 'level'],
+    ]);
   });
   it('shows days, hours, minutes and seconds and clamps expired resets to zero', () => {
     expect(weeklyCountdown(90061000, 0)).toBe('01d 01h 01m 01s');
