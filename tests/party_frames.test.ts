@@ -44,10 +44,24 @@ describe('party frame style resolution', () => {
 });
 
 describe('party frame header state', () => {
-  it('shows the member count and derives the disclosure state without DOM state', () => {
-    expect(partyFrameHeaderState(4, false)).toEqual({ visible: true, count: 4, collapsed: false });
-    expect(partyFrameHeaderState(4, true)).toEqual({ visible: true, count: 4, collapsed: true });
+  it('counts the local player and derives the disclosure state without DOM state', () => {
+    // Four other members' rows plus the hidden local player is a party of five.
+    expect(partyFrameHeaderState(4, false)).toEqual({ visible: true, count: 5, collapsed: false });
+    expect(partyFrameHeaderState(4, true)).toEqual({ visible: true, count: 5, collapsed: true });
     expect(partyFrameHeaderState(0, true)).toEqual({ visible: false, count: 0, collapsed: true });
+  });
+
+  it('does not count the local player twice when their own row is shown', () => {
+    expect(partyFrameHeaderState(5, false, true)).toEqual({
+      visible: true,
+      count: 5,
+      collapsed: false,
+    });
+    expect(partyFrameHeaderState(0, false, true)).toEqual({
+      visible: false,
+      count: 0,
+      collapsed: false,
+    });
   });
 });
 

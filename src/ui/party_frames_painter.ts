@@ -137,6 +137,7 @@ export class PartyFramesPainter {
   private header: PartyFrameHeader | null = null;
   private headerCollapsed = false;
   private memberCount = 0;
+  private selfShown = false;
   private mobile = false;
   // The last-synced expanded flag, so relocalize() can re-emit the chip caption in
   // the new language after an in-game switch (a switch does not flip the collapse
@@ -239,7 +240,7 @@ export class PartyFramesPainter {
   }
 
   private paintHeader(): void {
-    const state = partyFrameHeaderState(this.memberCount, this.headerCollapsed);
+    const state = partyFrameHeaderState(this.memberCount, this.headerCollapsed, this.selfShown);
     const visible = state.visible && !this.mobile;
     if (visible) {
       const header = this.ensureHeader();
@@ -287,6 +288,7 @@ export class PartyFramesPainter {
     targetId?: number | null,
   ): void {
     this.memberCount = members.length;
+    this.selfShown = config?.showSelf ?? false;
     this.paintHeader();
     this.writers.toggleClass(this.container, PARTY_PRESENT_CLASS, members.length > 0);
     this.writers.toggleClass(
@@ -406,7 +408,8 @@ export class PartyFramesPainter {
     }
     if (this.header?.el.parentNode === this.container) {
       this.writers.setText(this.header.label, t('hudChrome.partyFrames.header'));
-      this.writers.setText(this.header.count, formatNumber(this.memberCount));
+      const state = partyFrameHeaderState(this.memberCount, this.headerCollapsed, this.selfShown);
+      this.writers.setText(this.header.count, formatNumber(state.count));
     }
   }
 
