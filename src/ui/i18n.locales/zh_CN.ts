@@ -5115,7 +5115,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description': '在狼形态下进入潜行状态。无法在战斗中使用。',
   'entities.abilities.rake.name': '剐削',
   'entities.abilities.rake.description':
-    '撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限豹形态。',
+    '撕裂敌人，造成武器伤害外加 {damage} 点，并在 18 秒内造成 {overTime} 点流血伤害。给予 1 点连击点。仅限豹形态。',
   'entities.abilities.revive_pet.name': '修补',
   'entities.abilities.revive_pet.description':
     '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',

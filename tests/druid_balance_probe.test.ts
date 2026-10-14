@@ -115,8 +115,10 @@ const FERAL_LOADOUT = {
 // jewelry for its own Moonscorch set and spell-damage jewelry. Damage 5956 to
 // 6115 and threat 5957 to 6116 stayed in band; incoming 212 to 242 left it
 // (the healer pieces' extra Spirit and Stamina are gone), still 7 payoffs.
+// RE-MEASURED 2026-10-14 after the v0.45 integration stack: moongrove kept
+// its damage/threat/payoff trace, while incoming settled back to 214.
 const LIVE_MOB_MEASURED = {
-  moongrove: { damage: 6115, incomingDamage: 242, threat: 6116, payoffs: 7 },
+  moongrove: { damage: 6115, incomingDamage: 214, threat: 6116, payoffs: 7 },
   wildfang: { damage: 5315, incomingDamage: 201, threat: 6228.5225, payoffs: 8 },
   // Re-measured for the Groveheart rework pass 2 Bruin cadence: twice the swings
   // at half the damage each and double white-swing rage. White damage is

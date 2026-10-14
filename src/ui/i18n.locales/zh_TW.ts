@@ -5117,7 +5117,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description': '在狼形態下進入隱匿狀態。無法於戰鬥中使用。',
   'entities.abilities.rake.name': '剮擊',
   'entities.abilities.rake.description':
-    '撕裂敵人，造成武器傷害外加 {damage} 點，並造成持續 18 秒的流血傷害。給予 1 點連擊點。僅限貓形態。',
+    '撕裂敵人，造成武器傷害外加 {damage} 點，並在 18 秒內造成 {overTime} 點流血傷害。給予 1 點連擊點。僅限貓形態。',
   'entities.abilities.revive_pet.name': '修補',
   'entities.abilities.revive_pet.description':
     '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',

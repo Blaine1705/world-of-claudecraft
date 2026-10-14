@@ -14937,7 +14937,7 @@ export const zh_CN: EnTranslations = {
       },
       "rake": {
         "name": "剐削",
-        "description": "撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限豹形态。",
+        "description": "撕裂敌人，造成武器伤害外加 {damage} 点，并在 18 秒内造成 {overTime} 点流血伤害。给予 1 点连击点。仅限豹形态。",
         "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
       "revive_pet": {

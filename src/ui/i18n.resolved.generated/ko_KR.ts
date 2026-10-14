@@ -14937,7 +14937,7 @@ export const ko_KR: EnTranslations = {
       },
       "rake": {
         "name": "저미기",
-        "description": "적을 찢어 무기 피해에 {damage}를 더하고 18초 동안 출혈 피해를 입힙니다. 연계 점수를 1 줍니다. 표범 형상 전용.",
+        "description": "적을 찢어 무기 피해에 {damage}를 더하고 18초 동안 {overTime}의 출혈 피해를 입힙니다. 연계 점수를 1 줍니다. 표범 형상 전용.",
         "specNote_feral": "적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계)."
       },
       "revive_pet": {

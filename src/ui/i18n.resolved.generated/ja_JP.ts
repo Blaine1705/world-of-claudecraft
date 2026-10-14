@@ -14937,7 +14937,7 @@ export const ja_JP: EnTranslations = {
       },
       "rake": {
         "name": "皮剥ぎ",
-        "description": "敵を切り裂いて武器ダメージに{damage}を加え、18秒間の出血ダメージを与えます。コンボポイントを1与えます。猫の姿専用。",
+        "description": "敵を切り裂いて武器ダメージに{damage}を加え、18秒間で{overTime}の出血ダメージを与えます。コンボポイントを1与えます。猫の姿専用。",
         "specNote_feral": "命中した攻撃ごとに古き血を1蓄える（最大3）。"
       },
       "revive_pet": {
