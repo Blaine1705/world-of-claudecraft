@@ -22,6 +22,7 @@ import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { buildDeckWood } from './deck_render';
 import { GFX } from './gfx';
+import { prepareSceneryDetailRoot } from './scenery_detail';
 import { prepareSceneryGeometryLod } from './scenery_geometry_lod';
 import { buildStaticInstanceCells } from './static_instance_cells';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
@@ -446,6 +447,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
   }
 
   if (GFX.sceneryGeometryLodDistance > 0) prepareSceneryGeometryLod(group);
+  prepareSceneryDetailRoot(group);
   return {
     group,
     dispose(): void {

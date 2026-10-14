@@ -1,4 +1,5 @@
 import { uninstallOccluderFadeGate } from './occluder_fade_gate';
+import { disposeSceneryDetail } from './scenery_detail';
 import { disposeShaderWarmAudit } from './shader_warm_audit';
 import { disposeShaderWarm } from './shader_warm_client';
 
@@ -39,6 +40,7 @@ export function disposeRendererPrewarmAndGroundFx(
   owner: object,
   bestEffort: (cleanup: () => void) => void,
 ): void {
+  bestEffort(disposeSceneryDetail);
   const resources = owner as RendererPrewarmAndGroundFxOwner<RendererDisposable>;
   for (const material of resources.prewarmDepthMaterials.values())
     bestEffort(() => material.dispose());

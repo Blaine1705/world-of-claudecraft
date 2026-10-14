@@ -19,6 +19,7 @@ import {
   planGardenMazePieces,
 } from './garden_maze_core';
 import { GFX } from './gfx';
+import { prepareSceneryDetailRoot } from './scenery_detail';
 import { prepareSceneryGeometryLod } from './scenery_geometry_lod';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
@@ -299,6 +300,7 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
   }
 
   if (GFX.sceneryGeometryLodDistance > 0) prepareSceneryGeometryLod(group);
+  prepareSceneryDetailRoot(group, true);
   return {
     group,
     update(): void {

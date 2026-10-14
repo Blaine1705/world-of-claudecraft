@@ -37,6 +37,7 @@ const settings = {
   leanFoliage: false,
   standardMaterials: true,
   sceneryGeometryLodDistance: 0,
+  sceneryDetail: false,
   coconutCellSize: 0,
   lowReadabilityLighting: false,
   terrainSplat: true,
@@ -162,10 +163,16 @@ describe('gfx override application', () => {
     };
     const hashes = Object.fromEntries(
       Object.entries(cases).map(([preset, derived]) => {
-        const { sceneryGeometryLodDistance, coconutCellSize, lowReadabilityLighting, ...existing } =
-          derived;
+        const {
+          sceneryGeometryLodDistance,
+          sceneryDetail,
+          coconutCellSize,
+          lowReadabilityLighting,
+          ...existing
+        } = derived;
         expect(coconutCellSize).toBe(preset === 'low' ? 128 : 0);
         expect(sceneryGeometryLodDistance).toBe(preset === 'low' ? 180 : 0);
+        expect(sceneryDetail).toBe(false);
         expect(lowReadabilityLighting).toBe(preset === 'low');
         // Preserve the old pins to prove this change moves no existing dial,
         // including the High base used by Advanced.

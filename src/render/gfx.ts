@@ -9,6 +9,7 @@ import { safeStartupGraphicsPreset } from '../game/startup_graphics_safety';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { attachBiomeHaze } from './biome_haze_field';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
+import type { SceneryDetailBands } from './scenery_detail_core';
 // Side-effect import only: installs the final-color NaN guard (see the
 // point-light pruning comment in initGfxTier below for why this is a bare
 // import here, not a direct invocation). This import is also what
@@ -52,6 +53,17 @@ import { isSoftwareRendererName } from './software_renderer';
 //      medium data-fx-level fallback on the desktop path that still lands there
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra' | 'insane';
+
+// Scenery geometry at 0..60, 60..120, 120..240, 240..480 and beyond.
+// 0 full, 1 light reduction, 2 fuller, 3 strong, 4 very simple, 5 minimum.
+// Visibility, textures and lighting remain owned by their existing policies.
+export const SCENERY_DETAIL_BANDS: Record<GfxTier, SceneryDetailBands> = {
+  low: [0, 3, 4, 5, 5],
+  medium: [0, 2, 3, 4, 5],
+  high: [0, 0, 2, 3, 4],
+  ultra: [0, 0, 1, 2, 3],
+  insane: [0, 0, 0, 1, 2],
+};
 
 // Monotone tier ladder: every tier-gated knob compares RANKS through
 // gfxTierAtLeast instead of scattering string comparisons, so inserting a tier
@@ -201,6 +213,8 @@ export interface GfxSettings {
   readonly standardMaterials: boolean;
   /** Static scenery uses authored coarse indices past this footprint distance; 0 disables. */
   readonly sceneryGeometryLodDistance: number;
+  /** Geometry-only pilot; opt in through gfxo until silhouettes and speed qualify. */
+  readonly sceneryDetail: boolean;
   /** Coconut batch grid in yards; 0 retains the single strand-wide draw. Build-time only. */
   readonly coconutCellSize: number;
   /** More ambient fill and a softer key for readable Low surfaces, without extra lights. */
@@ -1252,6 +1266,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
             ? 4096
             : 2560,
     standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    sceneryDetail: false,
     sceneryGeometryLodDistance: gfxTierAtLeast(tier, 'medium') ? 0 : 180,
     coconutCellSize: gfxTierAtLeast(tier, 'medium') ? 0 : 128,
     lowReadabilityLighting: !gfxTierAtLeast(tier, 'medium'),

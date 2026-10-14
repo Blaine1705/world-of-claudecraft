@@ -728,6 +728,7 @@ import {
   sceneCensusChild,
 } from './scene_census_core';
 import { sceneKeyLightUniform } from './scene_sampling';
+import { installSceneryDetail, updateSceneryDetail } from './scenery_detail';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
 import { drapeRingLocalY, reticleShownUnder, selectionRingScale } from './selection_ring';
@@ -2141,6 +2142,7 @@ export class Renderer {
     if (options.initializeGfx !== false) {
       initGfxTier(this.webgl); // software-GL autodetect needs the live context
     }
+    installSceneryDetail(this.backgroundGpuWork);
     refreshTextureAnisotropy(this.webgl); // resolved budget before any upload
     if (GFX.composer || GFX.gradePass) {
       // three's render() resets info per pass (since r185 at the top of the
@@ -4944,6 +4946,7 @@ export class Renderer {
       dt,
       this.reducedMotion(),
     );
+    updateSceneryDetail(this.camera.position.x, this.camera.position.z);
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.abilityVfx.update(dt, this.reducedMotion());
     this.vfx.update(dt);
@@ -11640,6 +11643,7 @@ export class Renderer {
       dt,
       this.reducedMotion(),
     );
+    updateSceneryDetail(camX, camZ);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart);

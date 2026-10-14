@@ -125,6 +125,7 @@ import {
   reorderInstanceDataByStableRank,
 } from './perceptual_lod_core';
 import { collectBuildingImpostors } from './props';
+import { prepareSceneryDetailMesh } from './scenery_detail';
 import { makeShadowOnlyMaterial } from './shadow_only_material';
 import { freezeStaticMatrices } from './static_matrix';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
@@ -3717,6 +3718,8 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
   const drawPaths: FoliageDrawPath[] = [];
   const drawSources = new Map<string, Omit<FoliagePrewarmDraw, 'path'>>();
   for (const b of bucketMeshes) {
+    if (b.lod === 'core' || b.lod === 'near-fill' || b.lod === 'rock')
+      prepareSceneryDetailMesh(b.mesh);
     modelBucketsByLod[b.lod] = (modelBucketsByLod[b.lod] ?? 0) + 1;
     modelDraws += b.draws;
     modelTriangles += b.triangles;

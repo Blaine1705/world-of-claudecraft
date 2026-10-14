@@ -2,6 +2,7 @@
 // variants: no new material, shader, draw or vertex buffer at a distance flip.
 import * as THREE from 'three';
 import { geometryLodVariant } from './assets/geometry_lod';
+import { isSceneryDetailMesh } from './scenery_detail';
 import { sceneryUsesCoarseGeometry } from './scenery_geometry_lod_core';
 import { type FeatureFootprint, featureEdgeDistance } from './zone_feature_visibility_core';
 
@@ -66,6 +67,7 @@ export function updateSceneryGeometryLod(
   const entries = entriesByRoot.get(root);
   if (!entries) return;
   for (const entry of entries) {
+    if (isSceneryDetailMesh(entry.mesh)) continue;
     const coarse = sceneryUsesCoarseGeometry(
       featureEdgeDistance(entry.footprint, camX, camZ),
       farDistance,

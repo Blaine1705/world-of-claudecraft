@@ -31,6 +31,7 @@ export const GFX_OVERRIDE_VALUE_KINDS = {
   leanFoliage: 'boolean',
   standardMaterials: 'boolean',
   sceneryGeometryLodDistance: 'number',
+  sceneryDetail: 'boolean',
   coconutCellSize: 'number',
   lowReadabilityLighting: 'boolean',
   terrainSplat: 'boolean',
