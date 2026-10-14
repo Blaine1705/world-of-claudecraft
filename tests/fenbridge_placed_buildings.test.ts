@@ -6,7 +6,7 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { isPlacedBuildingAsset } from '../src/render/eastbrook_placed_building';
 import { buildingRecordColliders, placedBuildingAnnexes } from '../src/sim/authored_town_buildings';
-import { isBlocked } from '../src/sim/colliders';
+import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { ZONE2_PROPS } from '../src/sim/content/zone2';
 import { FENBRIDGE_LAYOUT, localToWorld, type Obb2 } from '../src/sim/fenbridge_layout';
 import { terrainHeight } from '../src/sim/world';
@@ -365,6 +365,32 @@ describe('the ground under the placed Fenbridge buildings', () => {
       expect(high - seat, `${building.id} high ground`).toBeLessThan(0.05);
       const footing = -boundsOf(building).min[1] * building.placement.scale;
       expect(seat - low, `${building.id} low ground`).toBeLessThan(footing - 0.3);
+    }
+  });
+});
+
+describe('the street lamps around the placed Fenbridge buildings', () => {
+  it('stand clear of every building, porch and eave, and off every door step', () => {
+    const hub = FENBRIDGE_LAYOUT.hub.center;
+    isBlocked(WORLD_SEED, hub.x, hub.z); // plans the lamp network with the grid
+    const lamps = streetlampPlacements(WORLD_SEED).filter(
+      (lamp) => Math.hypot(lamp.x - hub.x, lamp.z - hub.z) < 60,
+    );
+    expect(lamps.length).toBeGreaterThan(0);
+    for (const lamp of lamps) {
+      const at = `lamp at ${lamp.x.toFixed(2)}, ${lamp.z.toFixed(2)}`;
+      for (const building of BUILDINGS) {
+        const local = toModelAxes(building, lamp);
+        const reach = rectOf(building, building.reach);
+        const within =
+          local.x > reach.x0 && local.x < reach.x1 && local.z > reach.z0 && local.z < reach.z1;
+        expect(within, `${at} in ${building.id}`).toBe(false);
+        const step = building.frontStandingPoint;
+        expect(
+          Math.hypot(lamp.x - step.x, lamp.z - step.z),
+          `${at} by the ${building.id} door`,
+        ).toBeGreaterThan(3);
+      }
     }
   });
 });
