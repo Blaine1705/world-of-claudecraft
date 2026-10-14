@@ -101,8 +101,22 @@ describe('active-world noticeboard service', () => {
       noPlayer: true,
       world: worldWithoutBoard,
     });
+    // The board is the ONLY difference between the two worlds: both are plain
+    // copies of the built-in content. (The built-in world itself also carries
+    // the Weekly Vault's identity-gated terrain pad, sim/eastbrook_vault_terrain.ts,
+    // which since the Tidehold rebuild stands at the square's south edge and
+    // shifts the ground under the mailbox, the ferry bell and two NPCs by
+    // millimetres. Comparing a copy against the original would measure that
+    // pad, not the board.)
+    const worldWithBoard: WorldContent = { ...BUILTIN_WORLD };
+    setActiveWorldContent(worldWithBoard);
+    const withBoard = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: worldWithBoard,
+    });
     setActiveWorldContent(null);
-    const withBoard = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
     const board = noticeboard(withBoard);
 
     // Re-pinned 2026-08 for the harbor move (d19aa33f76,

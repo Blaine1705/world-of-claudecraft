@@ -121,7 +121,11 @@ export function eastbrookGrassExclusions(
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,
     ]) {
-      exclusions.push(layoutObb(building.id, building.footprint));
+      // A placed building clears its whole reach (porch, stair, awning), not
+      // only its wall box: grass would otherwise grow through its forge deck.
+      exclusions.push(
+        layoutObb(building.id, 'reach' in building ? building.reach : building.footprint),
+      );
       exclusions.push({
         kind: 'circle',
         id: `${building.id}:serviceApron`,

@@ -67,7 +67,7 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
     Promise.all([
       prepareCliffScreeProfileAssets(target),
       prepareCityClutterProfileAssets(target),
-      prepareEastbrookTownProfileAssets(),
+      prepareEastbrookTownProfileAssets(target),
       prepareEastbrookGrandArmouryProfileAssets(),
       prepareMailboxProfileAssets(),
       prepareNoticeboardProfileAssets(),

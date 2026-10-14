@@ -127,6 +127,90 @@ export const SOWFIELD_SEABED_TERRAIN_EDITS: HeightStamp[] = [
   { x: 10, z: -140, radius: 12, delta: -5.2, falloff: 'smooth', mode: 'level' },
   { x: 20, z: -146, radius: 13, delta: -5.2, falloff: 'smooth', mode: 'level' },
 ];
+
+// The Tidehold rebuild's building pads: one level stamp under each placed
+// building (sim/eastbrook_layout.ts makePlacedBuilding), the Studio rebuild
+// map's own six, so each building stands on the same shelf in both worlds.
+// A painted building is far wider than the kit lot it replaced, and the
+// natural grade under one rose up through its floor (measured before the
+// pads: 1.9 yd under the tavern's north end) or fell away under its footing
+// (1.8 yd under the bank's seaward corner). Each stamp's solid core (radius x
+// hardness) covers the model's whole reach and the taper carries the grade
+// change in the streets around it. Applied LAST (array order is application
+// order), after the plat, the quay and the strand.
+//
+// Two stamps differ from the map's. The chapel's keeps the map's centre and
+// shelf height but is drawn in from radius 28.41 so its taper ends at the
+// harbour bluff instead of running on out over the water: at the map's radius
+// it lifted a strip of seabed west of the chapel out of the sea, and the
+// coastline is world data other things are built from (the Wyrmwatch harbor
+// house's painted world map, for one). Its solid core still covers the
+// chapel's whole reach, and below the shelf the bluff keeps its own slope.
+//
+// The quay cottage's stamp is NOT the map's at all. The map centres
+// it on the cottage (-75.4, -49.89, radius 20.37), which lifts the east half
+// of the quay's working pad by up to a yard and with it the pier roots the
+// ferry's boarding stage is seated from; a published map has no ferry to
+// notice. Here the stamp sits 5 yd further east and is drawn in to radius 15,
+// so it ends exactly at the working pad's east edge (x -85): the quay, the
+// piers and the player start 25 yd away keep their own ground to the bit.
+// The cottage's east two thirds stand on the level shelf; under its west
+// end the ground falls away to the quay's grade, and the model's own buried
+// footing (1.3 yd deep) stands in it there.
+export const EASTBROOK_BUILDING_PAD_TERRAIN_EDITS: HeightStamp[] = [
+  // the chapel, on the rise at the harbour end (drawn in, see above)
+  {
+    x: -66.5,
+    z: -115.24,
+    radius: 21.5,
+    delta: -0.6,
+    falloff: 'smooth',
+    mode: 'level',
+    hardness: 0.94,
+  },
+  // the smithy and its forge shelter
+  {
+    x: -38.52,
+    z: -113.1,
+    radius: 22.95,
+    delta: -0.6,
+    falloff: 'smooth',
+    mode: 'level',
+    hardness: 0.69,
+  },
+  // the tavern
+  {
+    x: -40.58,
+    z: -72.65,
+    radius: 26.33,
+    delta: -0.45,
+    falloff: 'smooth',
+    mode: 'level',
+    hardness: 0.73,
+  },
+  // the apothecary's shop
+  {
+    x: -7.02,
+    z: -83.07,
+    radius: 20.63,
+    delta: -0.45,
+    falloff: 'smooth',
+    mode: 'level',
+    hardness: 0.66,
+  },
+  // the bank
+  {
+    x: 31.39,
+    z: -114.08,
+    radius: 27.55,
+    delta: -0.9,
+    falloff: 'smooth',
+    mode: 'level',
+    hardness: 0.75,
+  },
+  // the quay cottage (see above: east of centre, clear of the quay)
+  { x: -70, z: -49.89, radius: 15, delta: -1, falloff: 'smooth', mode: 'level', hardness: 0.7 },
+];
 // Flower drifts beside the lamplit town streets (owner refinement round 3).
 // The renderer's grass ring treats these circles as guaranteed bloom cells
 // (the REALM_FLOWER_MEADOWS mechanism); placement inside them still skips
@@ -994,6 +1078,10 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'farmer_jessica',
     name: 'Farmer Jessica',
     title: 'Allotment Keeper',
+    // (the Tidehold rebuild's apothecary's shop stands a stride east of her;
+    // she keeps her spot, which the Studio rebuild map moves to (-17, -82):
+    // there she would stand inside the 3 yd the beds keep clear, and a
+    // customer beside her inside a bed's working reach)
     pos: { x: -15.5, z: -81.5 },
     facing: -Math.PI / 2,
     color: 0xa8843a,
@@ -2143,32 +2231,19 @@ export const ZONE1_PROPS: ZonePropsDef = {
     },
     // eyes over the runs
     { key: 'hexWatchtower', x: 27, z: -13, rot: 2.2, scale: 6.5, r: 2.4, h: 12 },
-    // Round 5 (owner): Smith Haldren gets his own KayKit blacksmith on the
-    // green between the civic square and the crafts lane, facing west toward
-    // the lane. The kmed hollow variant is the BLUE-awning colourway the owner
-    // asked for; it shares the hex blacksmith mesh byte for byte, so the
-    // measured wall box (1.2876 x 1.2452 at scale 6.5) and the r clearance
-    // radius carry over unchanged.
-    {
-      key: 'kmedBlacksmith',
-      x: 2,
-      z: -112,
-      rot: -1.5707963267948966,
-      scale: 6.5,
-      r: 4.5,
-      h: 9,
-      hw: 4.2,
-      hd: 4.05,
-    },
+    // The Tidehold rebuild retired Smith Haldren's KayKit blacksmith from the
+    // green at (2, -112): he keeps the painted smithy on the square now, and
+    // the Weekly Vault stands on the lot.
     // Round 6 (owner): the Pale Keeper's yard rebuilt on the Evergarden
     // churchyard idiom (content/evergarden.ts): a wrought-iron enclosure of
     // corner pillars and 4yd rails at a 3.5yd pitch, walk-through dressing with
     // no colliders, wrapping the graves with ONE side left gateless. The open
-    // side is the EAST, because that is where the chapel, Brother Aldric, the
-    // north road and the graveyard approach route all arrive; a closed box
-    // there would fence the road out of its own churchyard. The town chapel at
-    // (2,-78) sits a stride south of the south run, so church and yard read as
-    // one place, and the lot the removed rise house left is the west half.
+    // side is the EAST, because that is where the north road and the
+    // graveyard approach route arrive; a closed box there would fence the road
+    // out of its own churchyard. The lot the removed rise house left is the
+    // west half. (The kit chapel that stood a stride south of the south run
+    // gave way to the apothecary's shop in the Tidehold rebuild; the chapel
+    // is the painted hall at the harbour end now.)
     { key: 'gardenIronPillar', x: -13, z: -73.5 },
     { key: 'gardenIronPillar', x: 3.2, z: -73.5 },
     { key: 'gardenIronPillar', x: -13, z: -66 },
@@ -2188,25 +2263,13 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // two yews for churchyard shade, clear of both grave plots
     { key: 'oakTree', x: -11.5, z: -71.8, rot: 0.6, scale: 1.3, r: 0.8, h: 9 },
     { key: 'oakTree', x: -11.5, z: -67.6, rot: -1.1, scale: 1.2, r: 0.8, h: 9 },
-    // Round 6 (owner): kitchen gardens behind the harbour quarter's houses and
-    // a bench at each door. Walk-through dressing like the churchyard rails, so
-    // a garden never becomes an invisible wall across the seaward approach.
-    // Every spot was probed clear of the roads and of its own house footprint.
-    { key: 'fence', x: -77.1, z: -98.5, rot: 0.94, scale: 3 },
-    { key: 'fence', x: -75, z: -96.9, rot: 0.94, scale: 3 },
-    { key: 'fence', x: -78.7, z: -96.4, rot: -0.63, scale: 3 },
-    { key: 'fence', x: -45.1, z: -108.5, rot: 0.94, scale: 3 },
-    { key: 'fence', x: -43, z: -106.9, rot: 0.94, scale: 3 },
-    { key: 'fence', x: -46.7, z: -106.4, rot: -0.63, scale: 3 },
-    { key: 'shrubFlowering', x: -76.2, z: -97.6, rot: 0.3, scale: 0.9 },
-    { key: 'shrubFlowering', x: -44.2, z: -107.6, rot: -0.8, scale: 0.95 },
+    // The round 6 kitchen gardens and door benches of the harbour quarter's
+    // kit houses left with those houses in the Tidehold rebuild: the painted
+    // smithy and chapel stand on that ground.
     // Round 6c (owner): blooms where the west road ends in the boar meadow,
     // walk-through like every flower, set off the painted track
     { key: 'shrubFlowering', x: 55, z: -66, rot: -1.2, scale: 0.95 },
     { key: 'shrubFlowering', x: 50, z: -76, rot: 0.3, scale: 0.9 },
-    { key: 'kcasBench', x: -86.4, z: -105.2, rot: -2.2, scale: 1.6 },
-    { key: 'kcasBench', x: -72.4, z: -111.2, rot: -2.2, scale: 1.6 },
-    { key: 'kcasBench', x: -54.4, z: -115.2, rot: -2.2, scale: 1.6 },
   ],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
   // The first two tents, the first two crates and the first campfire are the

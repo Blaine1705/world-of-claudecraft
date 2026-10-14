@@ -289,6 +289,13 @@ const TOWN_BUILDING_NATURAL: Readonly<Record<string, { x: number; y: number; z: 
   'biome/hexb_home_a': { x: 0.7919, y: 0.93, z: 0.8537 },
   'biome/hexb_home_b': { x: 0.8749, y: 1.28, z: 1.0987 },
   'biome/hexb_market': { x: 1.7994, y: 0.9818, z: 1.3156 },
+  // The painted Tidehold set Eastbrook is built from, authored in real yards.
+  'tidehold/smithy': { x: 19.797, y: 12.7809, z: 11.6901 },
+  'tidehold/tavern': { x: 22.6483, y: 18.7798, z: 16.7997 },
+  'tidehold/hall': { x: 18.8515, y: 30.4998, z: 24.212 },
+  'tidehold/bank': { x: 22.6067, y: 22.5005, z: 19.8387 },
+  'tidehold/shop_a': { x: 13.004, y: 16.2797, z: 12.2001 },
+  'tidehold/house_b': { x: 15.0123, y: 15.9799, z: 11.6997 },
   'props/fenbridge_warden_gatehouse': { x: 7.8003, y: 10.5, z: 7.0004 },
   'props/fenbridge_crooked_reed_inn': { x: 9, y: 8.8, z: 8.0002 },
   'props/fenbridge_lantern_chapel': { x: 7, y: 8.6, z: 7 },
@@ -306,6 +313,11 @@ const TOWN_BUILDING_NATURAL: Readonly<Record<string, { x: number; y: number; z: 
  * The rest of each town, wells, stalls, fences, streets, wall, harbor ,
  * stays town-drawn. Known deltas, deliberate: the lit window panes and the
  * walk-in roof reveal are town-view dressing and do not convert.
+ *
+ * A PLACED building (Eastbrook's painted Tidehold set) converts back into the
+ * placement its record was copied from: the model's own anchor, one uniform
+ * scale and its buried footing, with the model's baked collision, so the
+ * document's copy is the walk-in building a maker expects.
  */
 export function authoredTownBuildingPlacements(seed: number): MapPlacement[] {
   const out: MapPlacement[] = [];
@@ -314,6 +326,20 @@ export function authoredTownBuildingPlacements(seed: number): MapPlacement[] {
     const nat = TOWN_BUILDING_NATURAL[assetId];
     if (!nat) continue;
     const maxDim = Math.max(nat.x, nat.y, nat.z);
+    if ('placement' in b) {
+      out.push({
+        assetId,
+        name: b.id.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()),
+        x: b.placement.x,
+        z: b.placement.z,
+        y: b.placement.lift,
+        rotY: cleanZero(b.placement.rotation),
+        scale: (b.placement.scale * maxDim) / TARGET_HEIGHT,
+        collide: true,
+        collisionMode: 'baked',
+      });
+      continue;
+    }
     const heightFit = b.nativeDimensions.height / nat.y;
     // door-threshold seat: the town rests each building's base at the height
     // of the ground just outside its entrance, not at its centre sample

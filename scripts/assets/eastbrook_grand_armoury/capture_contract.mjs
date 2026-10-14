@@ -342,6 +342,10 @@ export const EASTBROOK_TOWN_PERF_SCENARIOS = Object.freeze([
 // so each target follows its stall's derived front standing point and each
 // camera rides the same move, holding its former offset from the target. Both
 // targets and both cameras re-probed collision-clear at camera height.
+// Re-aimed 2026-10 for the Tidehold rebuild: six placed buildings replaced the
+// eleven kit shells and face local -Z. Of these views only Lin's subject moved
+// (to her shop door on the square); every other subject holds its point, and
+// each camera re-probed collision-clear at seed 20061.
 export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   Object.freeze({
     name: 'stall-world-market',
@@ -357,11 +361,15 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   }),
   // The live portrait follows Lin to the civic square. Historical
   // captures retain their original camera records and frozen source identity.
+  // Tidehold rebuild: she stands out from her shop door at (-9.5, -93.2),
+  // facing the square. The target is her stand; the camera holds its 5 yd on
+  // her public-facing side, a step west of the Ravenpost pillar straight ahead
+  // of her (and clear of the ferry landing at (-6, -97.5)).
   Object.freeze({
     name: 'apothecary-lin',
     subject: 'apothecary_lin',
-    camera: Object.freeze({ x: -12, y: 6, z: -94 }),
-    target: Object.freeze({ x: -11, y: 2.5, z: -89 }),
+    camera: Object.freeze({ x: -13, y: 6, z: -96.5 }),
+    target: Object.freeze({ x: -9.5, y: 2.5, z: -93.2 }),
   }),
   Object.freeze({
     name: 'ravenpost-mailbox',
@@ -419,6 +427,14 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
 // though v3 parted the two buildings by about 53 yards; the only region
 // public-side of BOTH fronts is east of the bank, so that camera is now a
 // wide establishing shot across the civic square.
+// Re-aimed 2026-10 for the Tidehold rebuild: six placed buildings replaced the
+// eleven kit shells and face local -Z, so every door, and every public face,
+// turned. The bank, smithy and inn targets sit on their buildings' front
+// standing points (1.8 yd off the wall at the door) and each camera stands
+// outside the model, on the door side. The weaving workshop and the toolworks
+// went with the shells; their stations and masters still hold the crafts
+// lane, so those halves of the pairing are the stations now, whose public
+// side is the way their masters face (the retired lots' own turn).
 export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
   'armoury-relation': Object.freeze({
     // Round 4: the armoury retired from placement and the KayKit barracks
@@ -427,17 +443,26 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
     camera: Object.freeze({ x: 34, y: 15, z: 25 }),
     target: Object.freeze({ x: 12.5, y: 4, z: -5.5 }),
   }),
+  // Tidehold: the bank door faces west across its forecourt; the camera
+  // stands south-west of it, so the bursar and the banker chest beside the
+  // door sit in the near frame.
   'bank-and-chest': Object.freeze({
-    camera: Object.freeze({ x: 5, y: 7, z: -101 }),
-    target: Object.freeze({ x: 8.994796179957174, y: 3.2, z: -97.00520382004282 }),
+    camera: Object.freeze({ x: 9, y: 7, z: -121.5 }),
+    target: Object.freeze({ x: 20.46, y: 3.2, z: -115 }),
   }),
+  // Tidehold: the smithy fronts the main street; the camera stands across
+  // the street to the north-east, so the open forge shelter at the harbour
+  // end of the front is in frame with the door.
   'smithy-and-forge': Object.freeze({
-    camera: Object.freeze({ x: -9.5, y: 7, z: -126 }),
-    target: Object.freeze({ x: -6.293250516799596, y: 3, z: -124.1466252583998 }),
+    camera: Object.freeze({ x: -28, y: 7, z: -92 }),
+    target: Object.freeze({ x: -32.5, y: 3, z: -105.83 }),
   }),
+  // Tidehold: the tavern door faces the quay road (west). The kitchen yard
+  // sits round its southern gable, out of any frame that holds the door, so
+  // the camera stands south-west on the door side and leans toward it.
   'inn-and-kitchens': Object.freeze({
-    camera: Object.freeze({ x: -43, y: 8, z: -94 }),
-    target: Object.freeze({ x: -42.82589170715949, y: 3, z: -90.73189846640925 }),
+    camera: Object.freeze({ x: -68, y: 9, z: -79 }),
+    target: Object.freeze({ x: -50.76, y: 3, z: -72.3 }),
   }),
   'chapel-and-weaving': Object.freeze({
     // Round 8: the aim was (-13, -100), the middle of the square, and the
@@ -445,9 +470,16 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
     // collider fails the clearance probe. Moved a yard past the plinth's west
     // face, still an establishing shot across the square with the statue as
     // its backdrop.
-    camera: Object.freeze({ x: 26, y: 12, z: -100 }),
+    // Tidehold: the placed bank's model covers the old camera spot at
+    // (26, -100), so the camera stepped 10 yd in to the bank's corner. It is
+    // still public-side of the chapel front and of the loom station (the
+    // weaving half): those two public sides only meet east of the square.
+    camera: Object.freeze({ x: 16, y: 12, z: -100.5 }),
     target: Object.freeze({ x: -10.5, y: 3, z: -100 }),
   }),
+  // Tidehold: the toolworks building retired with the kit shells, and the
+  // toolworks station still stands on its old front standing point with
+  // Tinker Gizzel beside it, so this view keeps its station framing as is.
   'toolworks-service-perimeter': Object.freeze({
     camera: Object.freeze({ x: -11, y: 7, z: -120 }),
     target: Object.freeze({ x: -13.614789156231515, y: 5, z: -124.42218373434727 }),
@@ -520,7 +552,9 @@ export const EASTBROOK_POLISH_BASELINE_REVISION = '3ab740db453bd8b5858a52c304edc
 // 51 yd, the farthest being apothecary-lin at 50.6, so the captures show the
 // statue BODY and can never show the impostor card. The one polish view beyond
 // that range (camera (34, 15, 25), target (12.5, 4, -5.5)) is aimed at another
-// district, away from the monument. The civicShader leaf still seals the
+// district, away from the monument. (The 2026-10 Tidehold re-aim moved the
+// farthest live camera to inn-and-kitchens at 58 yd, still inside 72; Lin's
+// is now 6 yd off the statue.) The civicShader leaf still seals the
 // wiring (which strings, which uniforms, fog: true), and the bytes themselves
 // now carry a stronger guard than a sha256: a real driver links them in
 // tests/browser/dry_compile_sources.browser.test.ts. Add the module as a leaf

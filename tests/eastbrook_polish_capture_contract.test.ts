@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, resolvePosition } from '../src/sim/colliders';
-import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
+import { distancePointToObb, EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 
 const captureContract =
   // @ts-expect-error The executable capture contract intentionally ships as plain Node ESM.
@@ -711,7 +711,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
   // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
-  'b13e2b326060c11b76ac549d32c58d1e8289e7e13a5751d184860675ef882f95';
+  // Re-minted for the painted Tidehold buildings in the built-in town: the
+  // authoritative layout's six building rows and the town runtime leaf moved.
+  // No capture was retaken.
+  '50fa04a27db4bf416edf4d2e5bbd20c152baef8564527e761e448d6add99ebd5';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -1121,25 +1124,30 @@ describe('Eastbrook polish capture contract', () => {
     // override moves with its stall to the opened-out market square, in
     // lockstep with the polish view it mirrors, so the matched shot still
     // frames the stall rather than the ground it left.
+    // Re-aimed 2026-10 for the Tidehold rebuild: six placed buildings replaced
+    // the eleven kit shells and face local -Z. The bank, smithy and inn
+    // targets moved onto the placed buildings' front standing points with
+    // door-side cameras; chapel-and-weaving's camera stepped off the placed
+    // bank; the toolworks row is unchanged (its station did not move).
     expect(EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES).toEqual({
       'armoury-relation': {
         camera: { x: 34, y: 15, z: 25 },
         target: { x: 12.5, y: 4, z: -5.5 },
       },
       'bank-and-chest': {
-        camera: { x: 5, y: 7, z: -101 },
-        target: { x: 8.994796179957174, y: 3.2, z: -97.00520382004282 },
+        camera: { x: 9, y: 7, z: -121.5 },
+        target: { x: 20.46, y: 3.2, z: -115 },
       },
       'smithy-and-forge': {
-        camera: { x: -9.5, y: 7, z: -126 },
-        target: { x: -6.293250516799596, y: 3, z: -124.1466252583998 },
+        camera: { x: -28, y: 7, z: -92 },
+        target: { x: -32.5, y: 3, z: -105.83 },
       },
       'inn-and-kitchens': {
-        camera: { x: -43, y: 8, z: -94 },
-        target: { x: -42.82589170715949, y: 3, z: -90.73189846640925 },
+        camera: { x: -68, y: 9, z: -79 },
+        target: { x: -50.76, y: 3, z: -72.3 },
       },
       'chapel-and-weaving': {
-        camera: { x: 26, y: 12, z: -100 },
+        camera: { x: 16, y: 12, z: -100.5 },
         target: { x: -10.5, y: 3, z: -100 },
       },
       'toolworks-service-perimeter': {
@@ -1170,14 +1178,23 @@ describe('Eastbrook polish capture contract', () => {
         `${view.name} target`,
       ).toBe(false);
     }
-    const serviceSubjects = new Map([
+    // Re-aimed 2026-10 for the Tidehold rebuild: six placed buildings replaced
+    // the eleven kit shells and face local -Z. The weaving workshop and the
+    // toolworks retired with the shells, but their stations and masters hold
+    // the crafts lane, so those subjects are the STATIONS now: a station's
+    // public side is the way its master faces (the retired lot's own turn),
+    // measured from the station itself rather than a building centre. A lone
+    // building subject also keeps its target on the front standing point and
+    // its camera outside the model's reach, so a moved door can no longer
+    // leave a matched shot aimed at empty ground.
+    const serviceSubjects = new Map<string, readonly string[]>([
       ['bank-and-chest', ['eastbrook_bank']],
       ['smithy-and-forge', ['eastbrook_smithy']],
       ['inn-and-kitchens', ['eastbrook_inn']],
-      ['chapel-and-weaving', ['eastbrook_chapel', 'eastbrook_weaving_workshop']],
-      ['toolworks-service-perimeter', ['eastbrook_toolworks']],
+      ['chapel-and-weaving', ['eastbrook_chapel', 'station_eastbrook_loom']],
+      ['toolworks-service-perimeter', ['station_eastbrook_toolworks']],
     ]);
-    for (const [viewName, buildingIds] of serviceSubjects) {
+    for (const [viewName, subjectIds] of serviceSubjects) {
       const view = EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS.find(
         (candidate: { name: string }) => candidate.name === viewName,
       );
@@ -1191,23 +1208,51 @@ describe('Eastbrook polish capture contract', () => {
         isBlocked(EASTBROOK_ARMOURY_CAPTURE_SEED, view.target.x, view.target.z, 0.5),
         `${viewName} target`,
       ).toBe(false);
-      for (const buildingId of buildingIds) {
-        const building = EASTBROOK_LAYOUT.buildings.find(
-          (candidate) => candidate.id === buildingId,
+      for (const subjectId of subjectIds) {
+        const building = EASTBROOK_LAYOUT.buildings.find((candidate) => candidate.id === subjectId);
+        const station = EASTBROOK_LAYOUT.services.stations.find(
+          (candidate) => candidate.id === subjectId,
         );
-        expect(building, buildingId).toBeDefined();
-        if (!building) throw new Error(`missing service building ${buildingId}`);
-        const publicFront = {
-          x: building.frontStandingPoint.x - building.position.x,
-          z: building.frontStandingPoint.z - building.position.z,
-        };
+        expect(building ?? station, subjectId).toBeDefined();
+        let origin: { x: number; z: number };
+        let publicFront: { x: number; z: number };
+        if (building) {
+          origin = building.position;
+          publicFront = {
+            x: building.frontStandingPoint.x - building.position.x,
+            z: building.frontStandingPoint.z - building.position.z,
+          };
+          if (subjectIds.length === 1) {
+            expect(
+              Math.hypot(
+                view.target.x - building.frontStandingPoint.x,
+                view.target.z - building.frontStandingPoint.z,
+              ),
+              `${viewName} target must stay on ${subjectId}'s front standing point`,
+            ).toBeLessThan(0.25);
+            expect(
+              distancePointToObb(view.camera, building.reach),
+              `${viewName} camera must stand outside ${subjectId}'s model`,
+            ).toBeGreaterThan(0);
+          }
+        } else if (station) {
+          const master = EASTBROOK_LAYOUT.services.npcs.find(
+            (npc) => npc.id === station.masterNpcId,
+          );
+          expect(master, station.masterNpcId).toBeDefined();
+          if (!master) throw new Error(`missing station master ${station.masterNpcId}`);
+          origin = station.position;
+          publicFront = { x: Math.sin(master.facing), z: Math.cos(master.facing) };
+        } else {
+          throw new Error(`missing service subject ${subjectId}`);
+        }
         const cameraSide = {
-          x: view.camera.x - building.position.x,
-          z: view.camera.z - building.position.z,
+          x: view.camera.x - origin.x,
+          z: view.camera.z - origin.z,
         };
         expect(
           publicFront.x * cameraSide.x + publicFront.z * cameraSide.z,
-          `${viewName} must photograph ${buildingId}'s public face`,
+          `${viewName} must photograph ${subjectId}'s public face`,
         ).toBeGreaterThan(0);
       }
     }
@@ -1235,31 +1280,44 @@ describe('Eastbrook polish capture contract', () => {
   });
 
   it('pins the final toolworks seam and stable noticeboard capture anchors', () => {
-    const toolworks = EASTBROOK_LAYOUT.buildings.find(
-      (building) => building.id === 'eastbrook_toolworks',
-    );
+    // Re-pinned 2026-10 for the Tidehold rebuild: six placed buildings
+    // replaced the eleven kit shells and face local -Z, and the toolworks
+    // building retired with them. Its station still stands on the retired
+    // lot's front standing point (the harbor move's crafts-lane lot at
+    // (-16, -128), turned 0.588 rad), with Tinker Gizzel working it on the
+    // lot's own facing, so the seam is the station now and the shared target
+    // stays beside that interaction anchor.
+    expect(
+      EASTBROOK_LAYOUT.buildings.find((building) => building.id === 'eastbrook_toolworks'),
+      'the toolworks building retired with the kit shells',
+    ).toBeUndefined();
     const toolworksStation = EASTBROOK_LAYOUT.services.stations.find(
       (station) => station.id === 'station_eastbrook_toolworks',
     );
+    const tinker = EASTBROOK_LAYOUT.services.npcs.find((npc) => npc.id === 'tinker_gizzel');
     const toolworksView = EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS.find(
       (view: { name: string }) => view.name === 'toolworks-service-perimeter',
     );
-    expect(toolworks).toBeDefined();
+    expect(toolworksStation).toBeDefined();
+    expect(tinker).toBeDefined();
     expect(toolworksView).toBeDefined();
-    if (!toolworks || !toolworksView) throw new Error('missing toolworks capture seam');
-    // Re-pinned 2026-08-18 for the Eastbrook harbor move (layout v3, commit
-    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the toolworks
-    // was re-lotted to the crafts lane.
-    expect(toolworks).toMatchObject({
-      position: { x: -16, z: -128 },
-      rotation: 0.5880026035475675,
-      frontStandingPoint: { x: -13.614789156231515, z: -124.42218373434727 },
+    if (!toolworksStation || !tinker || !toolworksView) {
+      throw new Error('missing toolworks capture seam');
+    }
+    expect(toolworksStation).toMatchObject({
+      type: 'toolworks',
+      masterNpcId: 'tinker_gizzel',
+      position: { x: -13.614789156231515, z: -124.42218373434727 },
     });
-    expect(toolworksStation?.position).toEqual(toolworks?.frontStandingPoint);
+    expect(tinker).toMatchObject({
+      anchorId: 'station_eastbrook_toolworks',
+      position: { x: -16.277350098112613, z: -122.64714310642654 },
+      facing: 0.5880026035475675,
+    });
     expect(
       Math.hypot(
-        toolworksView.target.x - toolworks.frontStandingPoint.x,
-        toolworksView.target.z - toolworks.frontStandingPoint.z,
+        toolworksView.target.x - toolworksStation.position.x,
+        toolworksView.target.z - toolworksStation.position.z,
       ),
       'shared target must remain beside the final toolworks interaction anchor',
     ).toBeLessThan(0.25);
@@ -1441,11 +1499,16 @@ describe('Eastbrook polish capture contract', () => {
     // not move this round.
     // The handoff experiment moves Lin to (-11, -89); the live portrait
     // follows her while the artifact suite keeps the historical framing frozen.
+    // Re-aimed 2026-10 for the Tidehold rebuild: six placed buildings replaced
+    // the eleven kit shells and face local -Z, and Lin now stands out from her
+    // shop door at (-9.5, -93.2) facing the square, so her row follows her
+    // (camera 5 yd out on her public side, west of the Ravenpost pillar).
+    // Saul and FURY did not move.
     const expectedViews = {
       'apothecary-lin': {
         subject: 'apothecary_lin',
-        camera: { x: -12, y: 6, z: -94 },
-        target: { x: -11, y: 2.5, z: -89 },
+        camera: { x: -13, y: 6, z: -96.5 },
+        target: { x: -9.5, y: 2.5, z: -93.2 },
       },
       'ravenpost-chronicler': {
         subject: 'chronicler_saul',

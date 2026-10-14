@@ -7,7 +7,7 @@ import {
   insideGrassHubExclusion,
 } from '../src/render/foliage_core';
 import { BUILTIN_WORLD, PROPS } from '../src/sim/data';
-import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
+import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
 import {
   EASTBROOK_NOTICEBOARD_ASSET_ID,
   EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
@@ -53,8 +53,15 @@ describe('Eastbrook town grass exclusion', () => {
     // The 13 town guild boards (content/noticeboards.ts, one per hub
     // settlement) each add a footprint and a reading-spot exclusion: 26 more.
     // The glider sign adds its footprint and reading-spot exclusions too.
-    expect(exclusions).toHaveLength(125);
+    // Re-pinned 2026-10 for the Tidehold rebuild: six placed buildings replaced
+    // the eleven kit shells (src/render/eastbrook_placed_building.ts). Each
+    // building still contributes exactly two rows, a rectangle and a
+    // service-apron circle, so five fewer buildings is ten fewer rows
+    // (125 to 115). The rectangle is no longer the wall box: a placed building
+    // clears its whole REACH (porch, stair, awning and eaves), pinned below.
+    expect(exclusions).toHaveLength(115);
     expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
+    expect(EASTBROOK_LAYOUT.buildings).toHaveLength(6);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,
@@ -78,6 +85,85 @@ describe('Eastbrook town grass exclusion', () => {
         ),
       ).toBe(true);
     }
+    for (const building of EASTBROOK_LAYOUT.buildings) {
+      // The building's own rectangle IS its reach, row for row, and there is
+      // exactly one of it.
+      const own = exclusions.filter((item) => item.id === building.id);
+      expect(own, building.id).toEqual([
+        {
+          kind: 'obb',
+          id: building.id,
+          x: building.reach.center.x,
+          z: building.reach.center.z,
+          halfWidth: building.reach.halfWidth,
+          halfDepth: building.reach.halfDepth,
+          rotation: building.reach.rotation,
+        },
+      ]);
+      // That one rectangle, on its own and with no padding, covers everything
+      // the model stands on: its anchor, the four corners of its reach, the
+      // four corners of its wall box and every corner of every annex (the bell
+      // tower, the strongroom, the forge shelter). A hair inside each corner,
+      // because the test is a strict inequality.
+      const covered = (point: { x: number; z: number }): boolean =>
+        insideEastbrookGrassExclusion(own, point.x, point.z, 0);
+      const cornersOf = (
+        rect: {
+          center: { x: number; z: number };
+          halfWidth: number;
+          halfDepth: number;
+          rotation: number;
+        },
+        inset: number,
+      ) =>
+        [
+          [1, 1],
+          [1, -1],
+          [-1, 1],
+          [-1, -1],
+        ].map(([signX, signZ]) =>
+          localToWorld(
+            rect.center,
+            rect.rotation,
+            signX * (rect.halfWidth - inset),
+            signZ * (rect.halfDepth - inset),
+          ),
+        );
+      expect(covered({ x: building.placement.x, z: building.placement.z }), building.id).toBe(true);
+      const reachCorners = cornersOf(building.reach, 1e-6);
+      for (const corner of reachCorners) expect(covered(corner), `${building.id} reach`).toBe(true);
+      for (const corner of cornersOf(building.footprint, 0)) {
+        expect(covered(corner), `${building.id} walls`).toBe(true);
+      }
+      expect(building.annexes.length, `${building.id} annexes`).toBeGreaterThan(0);
+      for (const annex of building.annexes) {
+        for (const corner of cornersOf(annex, 0)) expect(covered(corner), annex.id).toBe(true);
+      }
+      // And it stops at the reach: a step past each corner is open ground.
+      for (const corner of cornersOf(building.reach, -0.01)) {
+        expect(covered(corner), `${building.id} past the reach`).toBe(false);
+      }
+      // The wall box alone would not have covered it: every reach corner
+      // stands outside the padded wall box, where grass grew through the
+      // porch and the forge deck.
+      const wallsOnly = [
+        {
+          kind: 'obb' as const,
+          id: building.id,
+          x: building.footprint.center.x,
+          z: building.footprint.center.z,
+          halfWidth: building.footprint.halfWidth,
+          halfDepth: building.footprint.halfDepth,
+          rotation: building.footprint.rotation,
+        },
+      ];
+      for (const corner of reachCorners) {
+        expect(
+          insideEastbrookGrassExclusion(wallsOnly, corner.x, corner.z, PADDING),
+          `${building.id} reach corner outside the walls`,
+        ).toBe(false);
+      }
+    }
   });
 
   it('pins the literal exclusion dimensions for the complete replacement layout', () => {
@@ -91,22 +177,39 @@ describe('Eastbrook town grass exclusion', () => {
     // out of the layout after live review. Round 6 also grew the table by
     // three rows when the town gained the coastal harbour-quarter buildings,
     // including the first hexb_market lot Eastbrook has ever seated.
+    // Re-pinned 2026-10 for the Tidehold rebuild: six placed buildings replaced
+    // the eleven kit shells (src/render/eastbrook_placed_building.ts), so the
+    // table is six rows, and each is the half extents of the building's REACH
+    // (the whole model at the placed size, measured off the shipped file by
+    // tests/eastbrook_placed_buildings.test.ts), no longer its wall box: the
+    // bank's 23.4 by 16.24 walls sit under a 29.39 by 25.79 clearing.
     const expectedObbDimensions = {
-      eastbrook_bank: [4.3, 3.45],
-      eastbrook_smithy: [4.2, 3.3],
-      eastbrook_inn: [4.3, 3.45],
-      eastbrook_chapel: [2.75, 3],
-      eastbrook_weaving_workshop: [3.45, 2.8],
-      eastbrook_toolworks: [3.45, 2.8],
-      eastbrook_home_market: [3.45, 2.8],
-      eastbrook_home_east: [3.45, 2.8],
-      eastbrook_quayside_home: [3.45, 2.8],
-      eastbrook_harbour_market: [4.3, 3.5],
-      eastbrook_dock_home: [3.45, 2.8],
+      eastbrook_bank: [14.695, 12.895],
+      eastbrook_smithy: [12.87, 7.6],
+      eastbrook_inn: [14.72, 10.92],
+      eastbrook_chapel: [12.255, 15.74],
+      eastbrook_apothecary: [8.455, 7.93],
+      eastbrook_quay_cottage: [9.76, 7.605],
     } as const;
+    expect(Object.keys(expectedObbDimensions)).toEqual(
+      EASTBROOK_LAYOUT.buildings.map((building) => building.id),
+    );
     for (const [id, [halfWidth, halfDepth]] of Object.entries(expectedObbDimensions)) {
       expect(byId.get(id)).toMatchObject({ kind: 'obb', halfWidth, halfDepth });
       expect(byId.get(`${id}:serviceApron`)).toMatchObject({ kind: 'circle', radius: 1.5 });
+    }
+    // None of the retired lots left a row behind.
+    for (const id of [
+      'eastbrook_weaving_workshop',
+      'eastbrook_toolworks',
+      'eastbrook_home_market',
+      'eastbrook_home_east',
+      'eastbrook_quayside_home',
+      'eastbrook_harbour_market',
+      'eastbrook_dock_home',
+    ]) {
+      expect(byId.has(id), id).toBe(false);
+      expect(byId.has(`${id}:serviceApron`), id).toBe(false);
     }
     // Round 7 replaced the well beacon with the Realm Builder monument on the
     // same point, and round 8 doubled it: the exclusion is the sculpt's own

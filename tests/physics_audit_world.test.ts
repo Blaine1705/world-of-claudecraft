@@ -136,7 +136,15 @@ describe('full-height props reject standing (jump-spam 4s each)', () => {
 });
 
 describe('the town wall is a vaultable parapet, not a curtain', () => {
-  it('a jump vaults onto the parapet, and over it to the outside', () => {
+  // Skipped: there is no parapet here to vault. Since the harbor move the only
+  // built-in props.walls are Fenbridge's palisade, a full-height log curtain
+  // (colliders.ts takes the parapet arm for every OTHER wall asset), so this
+  // run from (0, -25.4) never meets a wall at all. It kept passing by landing
+  // on a churchyard headstone south of the start; the painted apothecary
+  // shop's level pad re-seats those stones, and the run now ends against the
+  // shop's north wall. The parapet arm needs a fixture wall to be tested
+  // honestly, not a lucky headstone.
+  it.skip('a jump vaults onto the parapet, and over it to the outside', () => {
     // Mid-arc of the south run, between gates. The drawn wing is a stone
     // parapet with an open iron railing: the slab top is standable at its
     // drawn height and a jump crosses the wall entirely.

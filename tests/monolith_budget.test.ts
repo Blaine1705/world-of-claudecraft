@@ -2330,7 +2330,11 @@ const MONOLITHS: MonolithRow[] = [
     // layout moved to prop_layout.ts ruinRingColumns (shared with the
     // renderer, and able to omit a column); a bare ring skips its loop.
     // wc -l. Exact merged count.
-    ceiling: 2336,
+    // LOWERED 2336 -> 2327 with Eastbrook's placed buildings: the building
+    // record's collider (its box, plus one per solid annex of a placed
+    // building) moved to authored_town_buildings.ts buildingRecordColliders.
+    // wc -l. Exact count.
+    ceiling: 2327,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

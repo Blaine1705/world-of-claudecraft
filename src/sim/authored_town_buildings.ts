@@ -6,7 +6,8 @@
 // placement (promotedScenery.authoredTowns). Matching is by the same
 // coordinate/dimension/rotation identity the render predicates use.
 
-import { EASTBROOK_LAYOUT } from './eastbrook_layout';
+import type { Collider } from './collider_shapes';
+import { EASTBROOK_LAYOUT, type Obb2 } from './eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import type { BuildingDef, PromotedScenery } from './types';
 
@@ -17,6 +18,67 @@ function sameNumber(a: number, b: number): boolean {
 }
 
 const TOWN_BUILDINGS = [...EASTBROOK_LAYOUT.buildings, ...FENBRIDGE_LAYOUT.buildings];
+
+/**
+ * The solid annexes of a placed Eastbrook building (its bell tower, its
+ * strongroom, its forge shelter: sim/eastbrook_layout.ts makePlacedBuilding),
+ * for a record that still stands where the layout put it. A record a custom
+ * world moved, resized or turned carries no annex: the boxes are authored
+ * around the model's own anchor and would be left behind as invisible walls.
+ */
+export function placedBuildingAnnexes(building: BuildingDef): readonly Obb2[] {
+  if (building.id === undefined) return [];
+  for (const candidate of EASTBROOK_LAYOUT.buildings) {
+    if (candidate.id !== building.id) continue;
+    return sameNumber(candidate.position.x, building.x) &&
+      sameNumber(candidate.position.z, building.z) &&
+      sameNumber(candidate.nativeDimensions.width, building.w) &&
+      sameNumber(candidate.nativeDimensions.depth, building.d) &&
+      sameNumber(candidate.rotation, building.rot)
+      ? candidate.annexes
+      : [];
+  }
+  return [];
+}
+
+/**
+ * The movement colliders of one asset-backed (or legacy house / inn) building
+ * record: the full-height box on its authored footprint, then one more for
+ * each annex. `groundAt` anchors each box's pass-under floor on its own
+ * ground, so a mover deep in a tube or carve walks beneath surface props
+ * instead of hitting invisible walls.
+ */
+export function buildingRecordColliders(
+  building: BuildingDef,
+  cameraTopY: number,
+  groundAt: (x: number, z: number) => number,
+): Collider[] {
+  const out: Collider[] = [
+    {
+      type: 'obb',
+      x: building.x,
+      z: building.z,
+      hw: building.w / 2,
+      hd: building.d / 2,
+      rot: building.rot,
+      cameraTopY,
+      underY: groundAt(building.x, building.z),
+    },
+  ];
+  for (const annex of placedBuildingAnnexes(building)) {
+    out.push({
+      type: 'obb',
+      x: annex.center.x,
+      z: annex.center.z,
+      hw: annex.halfWidth,
+      hd: annex.halfDepth,
+      rot: annex.rotation,
+      cameraTopY,
+      underY: groundAt(annex.center.x, annex.center.z),
+    });
+  }
+  return out;
+}
 
 /** True when this props record is an authored-town rebuild building. */
 export function isAuthoredTownBuildingDef(building: BuildingDef): boolean {

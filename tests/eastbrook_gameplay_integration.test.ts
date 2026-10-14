@@ -80,12 +80,14 @@ function midpoint(a: { x: number; z: number }, b: { x: number; z: number }) {
   return { x: (a.x + b.x) / 2, z: (a.z + b.z) / 2 };
 }
 
+// Returns where the follower actually stopped (within 0.2 yd of `to`), so a
+// walk made of several legs can start each leg from the last one's arrival.
 function expectWalkableRoute(
   label: string,
   from: { x: number; z: number },
   to: { x: number; z: number },
   bodyRadius: number,
-): void {
+): { x: number; z: number } {
   const options = {
     seed: SEED,
     bodyRadius,
@@ -150,6 +152,27 @@ function expectWalkableRoute(
   expect(Math.hypot(to.x - current.x, to.z - current.z), `${label} endpoint`).toBeLessThanOrEqual(
     0.2,
   );
+  return current;
+}
+
+// One unbroken walk through the points in order: every leg goes through
+// expectWalkableRoute (so every stride keeps its fence, collision, deep-water
+// and climb-slope checks and every leg must arrive), and each leg starts
+// where the one before it stopped, never back on the waypoint itself.
+function expectWalkableLegs(
+  label: string,
+  points: readonly { x: number; z: number }[],
+  bodyRadius: number,
+): void {
+  let at = points[0];
+  for (let leg = 1; leg < points.length; leg++) {
+    at = expectWalkableRoute(
+      `${label} leg ${leg} of ${points.length - 1}`,
+      at,
+      points[leg],
+      bodyRadius,
+    );
+  }
 }
 
 function placeEntity(sim: Sim, entity: Entity, point: { x: number; z: number }): void {
@@ -184,6 +207,17 @@ function placeEntity(sim: Sim, entity: Entity, point: { x: number; z: number }):
 // the opened-out market square: this fixture only holds if its plain rows carry
 // the SAME collision as the live authored stalls, so a stale position here
 // forks the wolf projection at the bottom of this file rather than the town.
+// Re-minted 2026-10 for the Tidehold rebuild: six placed buildings replaced
+// the eleven kit shells, so the six building rows are re-probed from the live
+// ZONE1_PROPS records (each one the building's WALL box). The old rows stood
+// on ground the rebuild cleared (the kit bank, chapel and workshops), which
+// made them colliders and calm pads present in this fixture and nowhere else.
+// Each row keeps its record id and nothing else of the authored record: a
+// placed building is solid past its wall box (a bell tower, a strongroom, a
+// forge shelter), and those annex boxes are found by id and standing place
+// (placedBuildingAnnexes), so an id-less row would leave the live town with
+// solids this fixture lacks. The chapel still keeps an assetId, for the same
+// reason as before.
 function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
   const townBuildingIds = new Set(
     [...EASTBROOK_LAYOUT.preservedBuildings, ...EASTBROOK_LAYOUT.buildings].map(
@@ -193,20 +227,45 @@ function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
   return {
     ...current,
     buildings: [
-      { kind: 'house', x: 12, z: -94, w: 7, d: 5.5, rot: -2.356194490192345 },
-      { kind: 'house', x: -2, z: -122, w: 7, d: 5.5, rot: -2.0344439357957027 },
-      { kind: 'inn', x: -38, z: -88, w: 7.5, d: 6, rot: -2.5535900500422257 },
       {
-        kind: 'chapel',
-        assetId: '/models/props/eastbrook_chapel.glb',
-        x: 2,
-        z: -78,
-        w: 5.5,
-        d: 6,
-        rot: 0.7853981633974483,
+        id: 'eastbrook_bank',
+        kind: 'house',
+        x: 30.38,
+        z: -115,
+        w: 23.4,
+        d: 16.24,
+        rot: Math.PI / 2,
       },
-      { kind: 'house', x: -28, z: -122, w: 5.5, d: 4.5, rot: 2.5535900500422257 },
-      { kind: 'house', x: -16, z: -128, w: 5.5, d: 4.5, rot: 0.5880026035475675 },
+      {
+        id: 'eastbrook_smithy',
+        kind: 'house',
+        x: -34.06,
+        z: -113.48,
+        w: 14.3,
+        d: 11.7,
+        rot: Math.PI,
+      },
+      {
+        id: 'eastbrook_inn',
+        kind: 'inn',
+        x: -40.51,
+        z: -72.3,
+        w: 26,
+        d: 16.9,
+        rot: Math.PI / 2,
+      },
+      {
+        id: 'eastbrook_chapel',
+        kind: 'chapel',
+        assetId: '/models/tidehold/hall.glb',
+        x: -64,
+        z: -115.57,
+        w: 15.6,
+        d: 28.6,
+        rot: Math.PI,
+      },
+      { id: 'eastbrook_apothecary', kind: 'house', x: -7.02, z: -82.03, w: 14.3, d: 10.92, rot: 0 },
+      { id: 'eastbrook_quay_cottage', kind: 'house', x: -75, z: -49.9, w: 16.58, d: 11.12, rot: 0 },
       ...current.buildings.filter((building) => !building.id || !townBuildingIds.has(building.id)),
     ],
     wells: [
@@ -995,6 +1054,9 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   // dropping its entrance too (31), then appended the harbour quarter's three
   // coastal buildings along the dock road, each bringing its own entrance
   // back into the proof (34).
+  // Re-pinned 2026-10 for the Tidehold rebuild: six placed buildings replaced
+  // the eleven kit shells, so eleven entrances became six (29). Every one of
+  // the six is still walked to and from the square below.
   it('pathfinds bidirectionally from the square to every service, NPC, station, and entrance', () => {
     // A standing spot in the square, DERIVED from the centrepiece rather than
     // hardcoded. It used to be (-12.5, -100.5), which was clear of the well
@@ -1032,7 +1094,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
         (building) => ({ id: `${building.id}:entrance`, point: building.frontStandingPoint }),
       ),
     ];
-    expect(destinations).toHaveLength(34);
+    expect(destinations).toHaveLength(29);
     const moverProfiles = [
       { id: 'player', bodyRadius: PLAYER_BODY_RADIUS },
       // Pet locomotion deliberately shares PLAYER_BODY_RADIUS; keep this
@@ -1262,6 +1324,30 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     setActiveWorldContent(BUILTIN_WORLD);
     const rebuilt = new Sim({ seed: stabilitySeed, playerClass: 'warrior', noPlayer: true });
 
+    // The Weekly Vault's terrain pad is a built-in-world rule
+    // (sim/eastbrook_vault_terrain.ts gates on isBuiltinWorldActive), so the
+    // legacy fixture, a custom content object, can never carry it. The
+    // Tidehold rebuild (2026-10) moved the vault onto the green south of the
+    // square, and its pad apron now reaches the return ferry bell at
+    // (-7.5, -100), half a yard off the flat core: measured at this seed the
+    // bell seats at -0.5305 in the rebuilt world and -0.6141 in the fixture,
+    // the pad's own lift and nothing else. So a spawn point standing on the
+    // pad is compared without its ground height (everything else about the
+    // entity still is), and the row below the first comparison pins that the
+    // bell is the ONLY projected entity this covers. Same reach as the pad.
+    const onVaultTerrainPad = (point: { x: number; z: number }): boolean => {
+      const hall = EASTBROOK_LAYOUT.weeklyVault;
+      const dx = point.x - hall.x;
+      const dz = point.z - hall.z;
+      const lx = dx * Math.cos(hall.rot) - dz * Math.sin(hall.rot);
+      const lz = dx * Math.sin(hall.rot) + dz * Math.cos(hall.rot);
+      return (
+        Math.hypot(
+          Math.max(0, Math.abs(lx) - hall.w / 2 - 0.5),
+          Math.max(0, -hall.d / 2 - 0.5 - lz, lz - hall.d / 2 - 3.5),
+        ) < 4
+      );
+    };
     const stableProjection = (sim: Sim) =>
       [...sim.entities.values()]
         .filter((entity) => entity.kind === 'mob' || entity.kind === 'object')
@@ -1286,12 +1372,20 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
           level: entity.level,
           dead: entity.dead,
           hp: entity.hp,
-          spawnPos: entity.spawnPos,
+          spawnPos: onVaultTerrainPad(entity.spawnPos)
+            ? { x: entity.spawnPos.x, z: entity.spawnPos.z }
+            : entity.spawnPos,
           wanderTarget: entity.wanderTarget,
           wanderTimer: entity.wanderTimer,
           respawnTimer: entity.respawnTimer,
         }));
     expect(stableProjection(rebuilt)).toEqual(stableProjection(legacy));
+    expect(
+      stableProjection(rebuilt)
+        .filter((row) => !('y' in row.spawnPos))
+        .map((row) => row.templateId),
+      'projected entities standing on the vault terrain pad',
+    ).toEqual(['ground_ps_ferry_bell']);
     expect(rebuilt.postOffice.mailboxIds).toEqual(legacy.postOffice.mailboxIds);
     expect(rebuilt.entities.get(rebuilt.postOffice.mailboxIds[0])?.pos).toMatchObject({
       x: EASTBROOK_LAYOUT.services.mailbox.position.x,
@@ -1352,6 +1446,22 @@ describe('the first sixty seconds: starter pull lanes from spawn', () => {
       .sort((a, b) => a.d - b.d)
       .slice(0, 2);
     expect(nearest.length).toBe(2);
+    // The walk out goes the way a player goes, by the main street. The
+    // Tidehold rebuild (2026-10) put a wide building across each old beeline:
+    // the quay cottage across the wolf camp's (its detour climbed the quay
+    // pad's north-east rim, a 0.36 yd kerb in one stride) and the 26 yd tavern
+    // front across the boar camp's. So the wolf walk leaves the quay by the
+    // street south of the cottage, to where it has rounded the cottage at
+    // (-70, -68), and the boar walk carries on along the street to the square
+    // at (-26, -101) before heading east. One waypoint each, both on the
+    // street itself (pinned below); the pull spot and its checks are unchanged.
+    const viaMainStreet: Record<string, readonly { x: number; z: number }[]> = {
+      forest_wolf: [{ x: -70, z: -68 }],
+      wild_boar: [{ x: -26, z: -101 }],
+    };
+    for (const via of Object.values(viaMainStreet)) {
+      for (const waypoint of via) expect(ZONE1_ROADS[1]).toContainEqual(waypoint);
+    }
     for (const { camp } of nearest) {
       // The pull spot as a player finds it: walk the pathfinder's own route
       // out of town and stop at the first waypoint inside ranged pull
@@ -1369,7 +1479,11 @@ describe('the first sixty seconds: starter pull lanes from spawn', () => {
         route.find((p) => Math.hypot(p.x - camp.center.x, p.z - camp.center.z) <= 25) ??
         route[route.length - 1];
       expect(isBlocked(SEED, pull.x, pull.z, 0.5), `${camp.mobId} pull spot`).toBe(false);
-      expectWalkableRoute(`${camp.mobId} camp approach`, PLAYER_START, pull, 0.5);
+      expectWalkableLegs(
+        `${camp.mobId} camp approach`,
+        [PLAYER_START, ...(viaMainStreet[camp.mobId] ?? []), pull],
+        0.5,
+      );
       expect(lineOfSightClear(SEED, pull, camp.center), `${camp.mobId} pull sight lane`).toBe(true);
       expect(
         Math.hypot(pull.x - camp.center.x, pull.z - camp.center.z),

@@ -94,7 +94,9 @@ describe('grounded line-of-sight elevation', () => {
     expect(stall.height).toBe(2.7);
     // The stall tracks EASTBROOK_LAYOUT, so the New Eastbrook rebuild moved it
     // into the harbor basin; the terrain sanity pin follows the new site.
-    expect(terrainY).toBeCloseTo(-0.64);
+    // Re-pinned 2026-10 for the Tidehold rebuild: the taper of the level pad
+    // under the apothecary's shop lifts the ground here by 0.08 yd.
+    expect(terrainY).toBeCloseTo(-0.556);
     expect(canopyY).toBeCloseTo(terrainY + stall.height);
     const stallCollider = colliderInternalsForTest
       .staticWorldColliders(WORLD_SEED)
