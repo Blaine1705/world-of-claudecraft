@@ -9,8 +9,8 @@
     "class:priest Vespers Effigy, deterministic echo, Gloomtithe, and Tithefiend",
     "Priest respec cleanup removes links, bank, and guardian"
   ],
-  "draws": 3392,
-  "drawDigest": "f4947744",
+  "draws": 3370,
+  "drawDigest": "24c9a531",
   "frames": [
     {
       "tick": 0,
@@ -1225,8 +1225,8 @@
       "state": "d197c6ec",
       "events": "5e447ea5",
       "rng": {
-        "draws": 1865,
-        "digest": "60f17755"
+        "draws": 1866,
+        "digest": "4a9ecae2"
       }
     },
     {
@@ -1236,8 +1236,8 @@
       "state": "2604da2b",
       "events": "741638a5",
       "rng": {
-        "draws": 2035,
-        "digest": "7f484738"
+        "draws": 2037,
+        "digest": "dc8e9b0c"
       }
     },
     {
@@ -1247,8 +1247,8 @@
       "state": "e0eb43f3",
       "events": "9caf14cd",
       "rng": {
-        "draws": 2186,
-        "digest": "c6dc44a8"
+        "draws": 2189,
+        "digest": "545f0f22"
       }
     },
     {
@@ -1258,8 +1258,8 @@
       "state": "fe01c425",
       "events": "d3ee4915",
       "rng": {
-        "draws": 2345,
-        "digest": "1f9e1d8c"
+        "draws": 2342,
+        "digest": "b77a44f2"
       }
     },
     {
@@ -1269,8 +1269,8 @@
       "state": "fddccb43",
       "events": "741638a5",
       "rng": {
-        "draws": 2513,
-        "digest": "52a850b9"
+        "draws": 2510,
+        "digest": "157c7c9a"
       }
     },
     {
@@ -1280,8 +1280,8 @@
       "state": "cd02c200",
       "events": "741638a5",
       "rng": {
-        "draws": 2531,
-        "digest": "fc7c51b5"
+        "draws": 2529,
+        "digest": "541380a7"
       },
       "label": "effigy-banked",
       "players": [
@@ -2521,8 +2521,8 @@
       "state": "ae0dd3b9",
       "events": "660eeb0e",
       "rng": {
-        "draws": 2703,
-        "digest": "29182262"
+        "draws": 2702,
+        "digest": "35a4377c"
       }
     },
     {
@@ -2532,41 +2532,41 @@
       "state": "37e3d70f",
       "events": "6002d862",
       "rng": {
-        "draws": 2905,
-        "digest": "7233bc26"
+        "draws": 2883,
+        "digest": "79e4780e"
       }
     },
     {
       "tick": 360,
       "time": 18,
       "nextId": 1021,
-      "state": "99eec2b5",
-      "events": "00ed8b41",
+      "state": "92ac77cb",
+      "events": "af89989a",
       "rng": {
-        "draws": 3082,
-        "digest": "544e4372"
+        "draws": 3080,
+        "digest": "24460b7c"
       }
     },
     {
       "tick": 380,
       "time": 19,
       "nextId": 1021,
-      "state": "7c8254fd",
+      "state": "78a2c367",
       "events": "92f2bae8",
       "rng": {
-        "draws": 3274,
-        "digest": "1d01ee37"
+        "draws": 3253,
+        "digest": "c703d12d"
       }
     },
     {
       "tick": 393,
       "time": 19.65,
       "nextId": 1021,
-      "state": "006969af",
-      "events": "2ffacbbc",
+      "state": "44e23dff",
+      "events": "c69c5f27",
       "rng": {
-        "draws": 3392,
-        "digest": "f4947744"
+        "draws": 3370,
+        "digest": "24c9a531"
       },
       "label": "respec-cleanup",
       "players": [
@@ -3534,7 +3534,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49457,
+          "hp": 49459,
           "id": 1016,
           "inCombat": true,
           "kind": "mob",
@@ -3578,7 +3578,7 @@
             ],
             [
               1020,
-              84
+              82
             ]
           ],
           "weapon": {
@@ -3784,11 +3784,11 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 1021,
-      "state": "006969af",
+      "state": "44e23dff",
       "events": "741638a5",
       "rng": {
-        "draws": 3392,
-        "digest": "f4947744"
+        "draws": 3370,
+        "digest": "24c9a531"
       },
       "label": "final",
       "players": [
@@ -4756,7 +4756,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49457,
+          "hp": 49459,
           "id": 1016,
           "inCombat": true,
           "kind": "mob",
@@ -4800,7 +4800,7 @@
             ],
             [
               1020,
-              84
+              82
             ]
           ],
           "weapon": {
