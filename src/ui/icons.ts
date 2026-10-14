@@ -4525,6 +4525,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'trailbreak',
   'wildheart',
   'shellskin',
+  'play_dead',
+  'tactical_camo',
   'frostjaw_trap',
   'cold_focus',
   'bloodhook',
@@ -4980,10 +4982,6 @@ export const ABILITY_ART_PENDING = new Set<string>([
   // Buried Hoards: the Clockwork Shock Bomb's thrown cast draws its glyph until
   // its skill painting ships (the item itself already ships painted art).
   'clockwork_shock_bomb',
-  // Fieldcraft rework: Tactical Camo and Play Dead draw their glyphs until
-  // their paintings ship.
-  'tactical_camo',
-  'play_dead',
 ]);
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
