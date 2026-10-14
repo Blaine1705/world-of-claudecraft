@@ -48,7 +48,7 @@ def scene(gr, water_y, sockets):
     water = bpy.context.active_object
     water.name = 'Scene_Lagoon'
     water.data.materials.append(mat)
-    for (kx, kz, yaw, nm) in ((0.3, -2.6, 0, 'AtMaw'), (-1.4, -13.0, 5, 'AtTusks'), (11.0, 9.0, 30, 'OnBank')):
+    for (kx, kz, yaw, nm) in ((0.3, -2.6, 0, 'AtMaw'), (-1.4, -13.0, 5, 'AtTusks'), (11.5, 9.0, 30, 'OnBank'), (4.0, 20.5, 200, 'Behind')):
         figure(gr, kx, kz, yaw, 'Knight_' + nm)
     w = sockets['window']
     dark = ec.emissive_material('SceneThroat', (0.004, 0.012, 0.01), strength=1.0)
@@ -90,10 +90,10 @@ def scene(gr, water_y, sockets):
 
 
 VIEWS = {
-    'road': dict(name='desde_el_camino', cam=(-12.0, -25.0, ('eye', 2.6)), target=(0.0, 0.0, 6.2), lens=22),
-    'apron': dict(name='subiendo_la_calzada', cam=(-0.8, -10.5, ('eye', 2.2)), target=(0.0, 0.5, 5.2), lens=17),
-    'west': dict(name='desde_la_orilla_oeste', cam=(22.0, -5.0, ('eye', 2.0)), target=(0.5, 3.0, 6.5), lens=24),
-    'back': dict(name='por_detras_desde_el_agua', cam=(13.0, 30.0, -4.4), target=(0.0, 6.0, 6.0), lens=26),
+    'road': dict(name='desde_el_camino', cam=(-13.0, -27.0, ('eye', 2.6)), target=(0.0, 1.0, 8.0), lens=21),
+    'apron': dict(name='subiendo_la_calzada', cam=(-0.8, -12.5, ('eye', 1.7)), target=(0.0, 0.5, 6.4), lens=17),
+    'west': dict(name='desde_la_orilla_oeste', cam=(27.0, -3.0, ('eye', 1.7)), target=(0.5, 5.0, 7.0), lens=21),
+    'back': dict(name='por_detras_desde_el_agua', cam=(11.0, 36.0, -3.6), target=(0.0, 8.0, 7.5), lens=24),
     'eyes': dict(name='los_ojos_de_cerca', cam=(2.0, -9.5, ('eye', 4.0)), target=(1.2, 1.0, 9.6), lens=30),
     'maw': dict(name='las_fauces_de_cerca', cam=(1.3, -4.6, ('eye', 1.75)), target=(0.0, 0.8, 2.6), lens=18),
     'ring': dict(name='desde_el_anillo_de_columnas', cam=(-14.0, -8.0, ('eye', 2.2)), target=(0.0, 1.5, 6.0), lens=22),

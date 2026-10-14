@@ -54,6 +54,7 @@ import {
   WILDHEART_MAW_LIGHT,
   WILDHEART_MIST_FIELDS,
   WILDHEART_MIST_NEAR,
+  WILDHEART_OVERHANG_SOLIDS,
   WILDHEART_THROAT,
   type WildheartEffectsTier,
   type WildheartMistPose,
@@ -64,6 +65,7 @@ import {
   wildheartMistPuffCount,
   wildheartNightAmount,
   wildheartOccluderSet,
+  wildheartOccluderTop,
   wildheartSprites,
   wildheartThroatGhostFade,
 } from './wildheart_basin_entrance_core';
@@ -799,11 +801,26 @@ export function buildWildheartBasinEntrance(seed: number): WildheartBasinEntranc
     // the set piece's rows are circles and boxes; a prism has no occluder box
     if (collider.type === 'prism') return;
     const { cameraTopY, ...shape } = collider;
-    solids[wildheartOccluderSet(WILDHEART_BASIN_ENTRANCE_COLLIDERS[i].name)].push({
+    const row = WILDHEART_BASIN_ENTRANCE_COLLIDERS[i].name;
+    solids[wildheartOccluderSet(row)].push({
       ...shape,
-      topY: cameraTopY ?? base,
+      // the head's box reaches its ears (the collider's own top is under them)
+      topY: base + wildheartOccluderTop(row, (cameraTopY ?? base) - base),
     });
   });
+  // the stone over head height that no row stands under ghosts with the idol
+  for (const o of WILDHEART_OVERHANG_SOLIDS) {
+    solids.idol.push({
+      type: 'obb',
+      x: door.x + o.lx,
+      z: door.z + o.lz,
+      hw: o.hw,
+      hd: o.hd,
+      rot: 0,
+      topY: base + o.topY,
+      baseY: base + o.baseY,
+    });
+  }
   // One entrance per world: a rebuild in the same page retires the last one's.
   for (const handle of occluderHandles) handle.dispose();
   wildheartUniforms.uWildGhost.value = 1;

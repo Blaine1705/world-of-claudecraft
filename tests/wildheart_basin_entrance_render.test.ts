@@ -22,11 +22,13 @@ import {
   WILDHEART_BRAZIERS,
   WILDHEART_BREATH,
   WILDHEART_DRIP_SOURCES,
+  WILDHEART_EAR_TOP,
   WILDHEART_EYES,
   WILDHEART_FIREFLY_FIELDS,
   WILDHEART_LEAN,
   WILDHEART_MAW_SHAFTS,
   WILDHEART_MIST_FIELDS,
+  WILDHEART_OVERHANG_SOLIDS,
   WILDHEART_SPRITE_KIND,
   WILDHEART_THROAT,
   type WildheartEffectsTier,
@@ -41,6 +43,7 @@ import {
   wildheartMistPuffCount,
   wildheartNightAmount,
   wildheartOccluderSet,
+  wildheartOccluderTop,
   wildheartRootSolid,
   wildheartSpritePose,
   wildheartSprites,
@@ -54,6 +57,7 @@ import { DUNGEONS } from '../src/sim/data';
 import {
   onWildheartBasinEntranceCauseway,
   WILDHEART_BASIN_ENTRANCE_COLLIDERS,
+  WILDHEART_BASIN_ENTRANCE_LANE_HALF_WIDTH,
   WILDHEART_BASIN_ENTRANCE_RING,
 } from '../src/sim/wildheart_basin_entrance';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -372,6 +376,39 @@ describe('the painter', () => {
     expect(wildheartOccluderSet('tusk_w')).toBe('court');
   });
 
+  it("the head's occluder box reaches the ears, and no other row's top moves", () => {
+    // the collider's camera top is the sim's and stays under the crown; the
+    // box the camera's ghost test reads is the render's and covers the ears
+    const head = WILDHEART_BASIN_ENTRANCE_COLLIDERS.find((r) => r.name === 'head');
+    expect(head?.top).toBe(15.8);
+    expect(wildheartOccluderTop('head', 15.8)).toBe(WILDHEART_EAR_TOP);
+    expect(WILDHEART_EAR_TOP).toBeGreaterThan(15.8);
+    expect(wildheartOccluderTop('head', 25)).toBe(25);
+    for (const r of WILDHEART_BASIN_ENTRANCE_COLLIDERS) {
+      if (r.name !== 'head') expect(wildheartOccluderTop(r.name, r.top), r.name).toBe(r.top);
+    }
+  });
+
+  it('the overhanging jaw and skull are occluders that begin over head height', () => {
+    const lane = WILDHEART_BASIN_ENTRANCE_LANE_HALF_WIDTH;
+    for (const o of WILDHEART_OVERHANG_SOLIDS) {
+      // someone on foot or mounted passes under every one of them
+      expect(o.baseY, o.name).toBeGreaterThanOrEqual(4);
+      expect(o.topY, o.name).toBeGreaterThan(o.baseY);
+      expect(o.topY, o.name).toBeLessThanOrEqual(WILDHEART_EAR_TOP);
+      // each spans the way in, wider than the head's own row
+      expect(o.hw, o.name).toBeGreaterThan(8.05);
+      expect(Math.abs(o.lx) + lane, o.name).toBeLessThan(o.hw);
+    }
+    const jaw = WILDHEART_OVERHANG_SOLIDS[0];
+    const skull = WILDHEART_OVERHANG_SOLIDS[1];
+    expect([jaw.name, skull.name]).toEqual(['jaw', 'skull']);
+    // the jaw hangs out before the door plane and meets the skull behind it
+    expect(jaw.lz - jaw.hd).toBeLessThan(-5);
+    expect(jaw.lz + jaw.hd).toBeGreaterThanOrEqual(skull.lz - skull.hd - 0.01);
+    expect(skull.topY).toBe(WILDHEART_EAR_TOP);
+  });
+
   it('builds the idol, the leaning throat, the mist, the sprites and three lights for the sink', () => {
     const view = buildWildheartBasinEntrance(WORLD_SEED);
     expect(view.cullGroups).toHaveLength(1);
@@ -414,7 +451,15 @@ describe('the painter', () => {
     // one occluder per collider row
     const handles = internals.occluderHandles();
     expect(handles).toHaveLength(2);
-    expect(handles[0].boxes).toHaveLength(3);
+    // the idol's three collider rows, then its two overhangs
+    expect(handles[0].boxes).toHaveLength(3 + WILDHEART_OVERHANG_SOLIDS.length);
+    expect(handles[0].boxes.map((b) => b.baseY !== undefined)).toEqual([
+      false,
+      false,
+      false,
+      true,
+      true,
+    ]);
     expect(handles[1].boxes).toHaveLength(5);
     // a rebuild retires the last entrance's sets
     buildWildheartBasinEntrance(WORLD_SEED);

@@ -1,16 +1,22 @@
 // Ship the Blender-authored Jaguar Maw, the Wildheart Basin's world entrance
 // (docs/design/dungeon-rework/entrance/build_wildheart_entrance.py). Three GLBs
-// share one origin, the door at its terrain height: the idol (the round head
-// of coursed limestone with its carved brows, jade eyes and ears, the muzzle
-// with the lip ring and the nose, the fangs, the strangler fig's trunk and
-// roots), the court (the heaved flagstone causeway and its kerbs, the two
-// fire bowls, the Sunbone's tusks with their war cloth, the fallen ear and the
-// blocks down the bank and in the shallows), and the render-only growth (the
-// fig's crown, lianas, fern, broadleaf, reed, moss). Never flatten or join:
-// the runtime
+// share one origin, the door at its terrain height: the idol (a jaguar's head
+// of fitted megaliths: the neck and its collar with the fret standing in its
+// band, the skull with its domed forehead, brows, cheekbones, jowls and two
+// small round ears, the short deep muzzle with its nose and lips, the upper
+// jaw out over the causeway, the palate, the lower jaw's two rami, the jade
+// eyes, the fangs, the pelt's rosettes and spots let in as dark stones, the
+// nape's panels and its collapse, the rubble core behind the joints, the
+// strangler fig's trunk and roots), the court (the heaved flagstone causeway and its kerbs, the two
+// fire bowls, the Sunbone's tusks with their war cloth, the fallen stone by
+// the east cheek and the blocks down the bank and in the shallows), and the
+// render-only growth (the fig's crown, lianas, fern, taro, reed, moss). Never
+// flatten or join: the runtime
 // (src/render/wildheart_basin_entrance.ts) keeps each Entrance_* node and
 // splits it by material (KitStone lit, KitLeaf lit and double sided, KitGlow
-// the unlit coals, KitWet the glossy lit jade).
+// the unlit coals, KitWet the glossy lit jade). The crown's leaf cards carry
+// authored normals (each pad lit as one rounded mass): keep the NORMAL
+// attribute as exported.
 //
 // The height grid is probed with the door ALREADY at its place in
 // src/sim/content/wildheart.ts: the door's own calm pad shapes the ground.
@@ -62,7 +68,9 @@ export function sourceFingerprint(root = ROOT) {
   for (const file of [
     'docs/design/dungeon-rework/kit/hckit.py',
     'docs/design/dungeon-rework/entrance/entrance_common.py',
+    'docs/design/dungeon-rework/kit/jaguar_head_sculpt.py',
     'docs/design/dungeon-rework/entrance/wildheart_ruin_kit.py',
+    'docs/design/dungeon-rework/entrance/wildheart_idol_sculpt.py',
     'docs/design/dungeon-rework/entrance/build_wildheart_entrance.py',
     'scripts/assets/wildheart_basin_entrance/build.mjs',
   ]) {

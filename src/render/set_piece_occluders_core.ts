@@ -19,6 +19,10 @@ export interface SetPieceSolid {
   readonly rot?: number;
   readonly r?: number;
   readonly topY: number;
+  /** The underside of a solid that begins over the ground (a jaw over a way
+   *  in, a skull wider than its foot): a sight line under it passes. Absent,
+   *  the solid stands on the ground. */
+  readonly baseY?: number;
 }
 
 export interface SetPieceOccluderBox {
@@ -28,6 +32,7 @@ export interface SetPieceOccluderBox {
   hd: number;
   rot: number;
   topY: number;
+  baseY?: number;
 }
 
 /** One occluder box per solid: an obb as it is, a round one (a tower drum, a
@@ -35,7 +40,7 @@ export interface SetPieceOccluderBox {
 export function setPieceOccluderBox(solid: SetPieceSolid): SetPieceOccluderBox {
   if (solid.type === 'circle') {
     const r = solid.r ?? 0;
-    return { x: solid.x, z: solid.z, hw: r, hd: r, rot: 0, topY: solid.topY };
+    return { x: solid.x, z: solid.z, hw: r, hd: r, rot: 0, topY: solid.topY, baseY: solid.baseY };
   }
   return {
     x: solid.x,
@@ -44,6 +49,7 @@ export function setPieceOccluderBox(solid: SetPieceSolid): SetPieceOccluderBox {
     hd: solid.hd ?? 0,
     rot: solid.rot ?? 0,
     topY: solid.topY,
+    baseY: solid.baseY,
   };
 }
 
@@ -60,22 +66,29 @@ export function setPieceBoxesBlock(
 ): boolean {
   for (let i = 0; i < boxes.length; i++) {
     const b = boxes[i];
-    if (
-      occluderSegmentHitsObb(
-        b.x,
-        b.z,
-        b.hw,
-        b.hd,
-        b.rot,
-        b.topY,
-        eyeX,
-        eyeY,
-        eyeZ,
-        camX,
-        camY,
-        camZ,
-      )
-    ) {
+    let ex = eyeX;
+    let ey = eyeY;
+    let ez = eyeZ;
+    let cx = camX;
+    let cy = camY;
+    let cz = camZ;
+    if (b.baseY !== undefined) {
+      // an overhang: only the part of the sight line at or over its underside
+      // can meet it, so the segment is cut there before the family's test
+      if (ey < b.baseY && cy < b.baseY) continue;
+      if (ey < b.baseY) {
+        const t = (b.baseY - ey) / (cy - ey);
+        ex += (cx - ex) * t;
+        ez += (cz - ez) * t;
+        ey = b.baseY;
+      } else if (cy < b.baseY) {
+        const t = (b.baseY - cy) / (ey - cy);
+        cx += (ex - cx) * t;
+        cz += (ez - cz) * t;
+        cy = b.baseY;
+      }
+    }
+    if (occluderSegmentHitsObb(b.x, b.z, b.hw, b.hd, b.rot, b.topY, ex, ey, ez, cx, cy, cz)) {
       return true;
     }
   }

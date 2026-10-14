@@ -93,6 +93,32 @@ export function wildheartOccluderSet(rowName: string): 'idol' | 'court' {
   return rowName === 'head' || rowName.startsWith('muzzle_') ? 'idol' : 'court';
 }
 
+/** The idol's highest stone over the door (yards): the tips of its ears,
+ *  after its lean. The skull's crown is at 17.2. */
+export const WILDHEART_EAR_TOP = 19.6;
+
+/** The top of a collider row's occluder box, over the door. The head's row
+ *  stops at the sim's own camera top, which is under the crown and the ears:
+ *  a camera drawn back over the head would sit among them with nothing
+ *  ghosted. So the head's BOX (never its collider) reaches the ears' tips;
+ *  every other row keeps its own top. */
+export function wildheartOccluderTop(rowName: string, top: number): number {
+  return rowName === 'head' ? Math.max(top, WILDHEART_EAR_TOP) : top;
+}
+
+/** The idol's stone that no collider row stands under, as occluder boxes of
+ *  the render's own (door-local yards: x west, z north, heights over the
+ *  door). Over head height the skull is carved wider than its foot and the
+ *  upper jaw hangs out over the way in, so the rows' footprints alone would
+ *  leave a camera drawn back under the jaw or beside a cheek inside stone
+ *  with nothing ghosted. Each box begins at its `baseY`: a sight line under
+ *  the jaw, the plain view of someone walking in, passes. Pinned against the
+ *  shipped idol in tests/wildheart_basin_entrance_asset.test.ts. */
+export const WILDHEART_OVERHANG_SOLIDS = [
+  { name: 'jaw', lx: 0.33, lz: -2.41, hw: 10.92, hd: 3.17, baseY: 4.8, topY: 17.3 },
+  { name: 'skull', lx: 0.33, lz: 9.88, hw: 10.92, hd: 9.13, baseY: 4, topY: WILDHEART_EAR_TOP },
+] as const;
+
 /** How much of the flooded throat shows for the alpha the idol is drawn at
  *  (the registry's onFade): all of it while the idol is solid, none once the
  *  idol is the camera's ghost, so no lit window is left standing in the air
@@ -526,21 +552,24 @@ export interface WildheartSprite {
   spread: number;
 }
 
-/** The two eyes (lx, y, lz of the jade's face), from the Blender build. */
+/** The two eyes (lx, y, lz), from the Blender build: a point in each socket,
+ *  before the jade and under the brow that overhangs it. */
 export const WILDHEART_EYES: readonly (readonly [number, number, number])[] = [
-  [4.104, 10.399, 1.757],
-  [-3.182, 10.717, 1.757],
+  [4.815, 10.594, -0.371],
+  [-3.873, 10.973, -0.371],
 ];
 
 /** The tips of the upper fangs (lx, y, lz), from the Blender build's
- *  stats.json: the drops fall from the ivory. */
+ *  stats.json: the drops fall from the ivory. The upper jaw hangs three yards
+ *  out over the causeway, so they fall onto the flagstones before the maw
+ *  (each drop's ring lies on the ground straight under its own tip). */
 export const WILDHEART_DRIP_SOURCES: readonly (readonly [number, number, number])[] = [
-  [2.339, 2.137, -0.407],
-  [0.765, 4.84, -1.43],
-  [1.647, 4.49, -1.184],
-  [-2.144, 2.333, -0.407],
-  [-0.34, 4.888, -1.43],
-  [-1.249, 4.617, -1.184],
+  [2.596, 2.193, -4.233],
+  [0.759, 5.681, -4.452],
+  [1.661, 5.304, -4.44],
+  [-2.395, 2.41, -4.233],
+  [-0.261, 5.726, -4.452],
+  [-1.192, 5.429, -4.44],
 ];
 
 /** The maw's shafts: yaw off south (positive west), pitch (the causeway

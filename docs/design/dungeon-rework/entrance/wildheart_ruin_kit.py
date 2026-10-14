@@ -1060,6 +1060,22 @@ class Ruin(hckit.Piece):
                 lr, lg, lb = srgb_to_linear((max(0.0, min(1.0, c[0])), max(0.0, min(1.0, c[1])),
                                              max(0.0, min(1.0, c[2]))))
                 loop[self.col] = (lr, lg, lb, 1.0)
+        # bmesh.ops.bevel hands back its new faces in an order that follows
+        # the addresses of what it bevelled, which differ from run to run. The
+        # exporter writes triangles in face order, so sort the faces by where
+        # they are: two runs of the same sources then write the same bytes.
+        # (By two-yard cell first, so neighbours stay neighbours and the
+        # shipped file packs as well as it did in the order they were built.)
+        bm.faces.index_update()
+        keys = []
+        for f in bm.faces:
+            c = f.calc_center_median()
+            keys.append((f.material_index, math.floor(c.z / 2.0), math.floor(c.x / 2.0), math.floor(c.y / 2.0),
+                         tuple(sorted((round(v.co.x, 4), round(v.co.y, 4), round(v.co.z, 4)) for v in f.verts))))
+        rank = [0] * len(keys)
+        for place, i in enumerate(sorted(range(len(keys)), key=keys.__getitem__)):
+            rank[i] = place
+        bm.faces.sort(key=lambda f: rank[f.index])
         mesh = bpy.data.meshes.new(self.name)
         bm.to_mesh(mesh)
         bm.free()

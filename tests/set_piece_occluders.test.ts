@@ -96,6 +96,30 @@ describe('the occluder boxes of a set piece', () => {
     expect(setPieceBoxesBlock(both, 20, 1.6, -6, 20, 4, 6)).toBe(true);
     expect(setPieceBoxesBlock([], 0, 1.6, -3, 0, 4, 6)).toBe(false);
   });
+
+  it('an overhang blocks only the sight lines that reach its underside', () => {
+    // a lintel over a way in: the WALL's footprint, from five yards up
+    const lintel = setPieceOccluderBox({ ...WALL, baseY: 5 });
+    expect(lintel.baseY).toBe(5);
+    const boxes = [lintel];
+    // the plain view of someone walking under it: eye and camera both below
+    expect(setPieceBoxesBlock(boxes, 0, 1.6, -3, 0, 4, 6)).toBe(false);
+    // an eye standing under it is not inside it
+    expect(setPieceBoxesBlock(boxes, 0, 1.6, 0, 0, 4, -8)).toBe(false);
+    // a low eye and a high camera across it: the line climbs through the stone
+    expect(setPieceBoxesBlock(boxes, 0, 1.6, -0.4, 0, 7.5, 0.4)).toBe(true);
+    // the same climb taken well clear of the footprint passes before it
+    expect(setPieceBoxesBlock(boxes, 0, 1.6, 0, 0, 7.5, -12)).toBe(false);
+    // a camera INSIDE the overhang, and one under it
+    expect(setPieceBoxesBlock(boxes, 0, 1.6, -3, 0, 6, 0)).toBe(true);
+    expect(setPieceBoxesBlock(boxes, 0, 1.6, -3, 0, 4.9, 0)).toBe(false);
+    // the high camera first: the cut is the same from either end
+    expect(setPieceBoxesBlock(boxes, 0, 7.5, 0.4, 0, 1.6, -0.4)).toBe(true);
+    // over its top nothing changes
+    expect(setPieceBoxesBlock(boxes, 0, 9, -3, 0, 12, 6)).toBe(false);
+    // a solid on the ground carries no base
+    expect(setPieceOccluderBox(WALL).baseY).toBeUndefined();
+  });
 });
 
 describe('the reach of a set piece', () => {
