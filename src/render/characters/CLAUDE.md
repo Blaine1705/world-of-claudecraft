@@ -155,9 +155,15 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   (`tests/preview_material_gate.test.ts`). Until its character draws (a WOC
   body: its head is live), a stage handed a loading layer
   (`setLoadingLayer`; the launcher's yellow silhouette,
-  `src/ui/preview_loading_silhouette.ts`) shows it, and a WOC body's kit asks
-  its LOW armor file first (`woc_armor_dressing.ts` `prefetchWocKitLowTier`),
-  which stands in while the stage's own tier streams over it. A TOUCH stage
+  `src/ui/preview_loading_silhouette.ts`) shows it. The creator's WOC body asks,
+  just before its build (`CharacterPreview` `askCreatorFilesFirst`), for what lets
+  the player see it soonest, ahead of the stage's own armor tier in the loader's
+  first-come demand line: its head look's files (it draws nothing until its whole
+  head is live), then its kit's LOW armor file (`woc_armor_dressing.ts`
+  `prefetchWocKitLowTier`), which stands in while that tier streams over it. Asked
+  in the block that installs the body's gate, so none of them can land before it
+  (a tier already resident is attached at build, like any resident file); pinned
+  by the creator cases of `tests/preview_armor_detail.test.ts`. A TOUCH stage
   (`CharacterPreviewOptions.touchStage`, the launcher on the phone interface)
   opens the creator on the head and shoulders (`preview_framing.ts`
   `touchShouldersPose`), never eases to a category's close-up, and takes

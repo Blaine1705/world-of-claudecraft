@@ -4,9 +4,10 @@
 // own constructor), the real CharacterVisual, the real dressing and the real armor store, over
 // every shipped WOC class and both bodies (their real manifests, so the files asked for are the
 // shipped ones): the Inspect stage and the creator ask for the crowd's files and never a top
-// file, the creator asks for exactly one top file once a class is chosen and lets it go when
-// the player flips away, the character sheet and the roster still draw full detail, and the low
-// preset and a phone ask for the low file everywhere
+// file (the creator asks for each body's low file first, its stand-in while the crowd's file
+// streams), the creator asks for exactly one top file once a class is chosen and lets it go
+// when the player flips away, the character sheet and the roster still draw full detail, and
+// the low preset and a phone ask for the low file everywhere
 // (src/render/characters/preview_armor_detail_core.ts).
 //
 // Stubbed: the loader (a two-bone body for every file, an armor file landing only when the
@@ -162,6 +163,8 @@ async function world(
   vi.resetModules();
   /** Every armor file asked of the loader, in order. */
   const fetches: string[] = [];
+  /** Every armor and head file asked of the loader, in order: the order a stage asks in. */
+  const requests: string[] = [];
   const pending = new Map<string, (gltf: unknown) => void>();
   const heldBodies: (() => void)[] = [];
   const gates: Gate[] = [];
@@ -204,6 +207,7 @@ async function world(
   };
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn((url: string) => {
+      if (url.includes('/armor/') || url.includes('head_type_')) requests.push(url);
       if (url.includes('/armor/')) {
         fetches.push(url);
         return new Promise((resolve) => pending.set(url, resolve));
@@ -415,6 +419,7 @@ async function world(
     display,
     CharacterVisual,
     fetches,
+    requests,
     stage,
     bodyOf,
     hung,
@@ -528,12 +533,18 @@ describe('the Inspect stage on a High desktop', () => {
 
 describe('the creator on a High desktop', () => {
   it(
-    'asks only for medium files while every class and both bodies are flipped through',
+    'asks for each body its low file, then its medium file, and never a top file while every class and both bodies are flipped through',
     async () => {
       const w = await world('high');
       const preview = w.stage();
       for (const [cls, body] of EVERY_BODY) {
         w.browse(preview, cls, body);
+        // the smallest file first, ahead of the medium file in the loader's line, so the
+        // body has armor to draw soonest (it stands in while the medium file streams)
+        expect(w.fetches.slice(-2), `${cls}/${body}`).toEqual([
+          w.url(cls, body, 'low'),
+          w.url(cls, body, 'medium'),
+        ]);
         await w.land(preview);
         expect(w.hung(preview), `${cls}/${body}`).toEqual({ [w.url(cls, body, 'medium')]: true });
         expect(w.levels(preview), `${cls}/${body}`).toEqual(['lod0']);
@@ -545,7 +556,10 @@ describe('the creator on a High desktop', () => {
       }
       expect(w.tops()).toEqual([]);
       expect([...w.fetches].sort()).toEqual(
-        EVERY_BODY.map(([cls, body]) => w.url(cls, body, 'medium')).sort(),
+        EVERY_BODY.flatMap(([cls, body]) => [
+          w.url(cls, body, 'low'),
+          w.url(cls, body, 'medium'),
+        ]).sort(),
       );
       // the levels read above are real: a body the WORLD builds at the crowd's detail draws
       // the coarser one off the same files
@@ -567,20 +581,79 @@ describe('the creator on a High desktop', () => {
     WALK_BUDGET_MS,
   );
 
+  it('asks for its head look files, then the low file, then the medium file', async () => {
+    const w = await world('high');
+    const { wocHeadAppearanceUrls } = await import('../src/render/characters/woc_head_stream_core');
+    const { wocHeadCoreUrl, wocHeadTypeForGender } = await import(
+      '../src/render/characters/woc_head_catalog'
+    );
+    const preview = w.stage();
+    for (const body of BODIES) {
+      // the head core is in the body's own wait (and failed here: the stub has no head
+      // library), so what is left of the look is its hairstyle and beard files
+      const core = wocHeadCoreUrl(wocHeadTypeForGender(body));
+      const look = wocHeadAppearanceUrls(w.app(body), wocHeadTypeForGender(body)).filter(
+        (url) => url !== core,
+      );
+      expect(look.length, body).toBeGreaterThan(0);
+      const before = w.requests.length;
+      w.browse(preview, 'priest', body);
+      // what lets the player SEE the body first (it draws nothing until its whole head is
+      // live), then its stand-in armor, then the tier the creator draws: one line, in order
+      expect(
+        w.requests.slice(before).filter((url) => url !== core),
+        body,
+      ).toEqual([...look, w.url('priest', body, 'low'), w.url('priest', body, 'medium')]);
+    }
+  });
+
+  it('draws the low file, linked behind the gate, while the medium file streams, then steps up', async () => {
+    const w = await world('high');
+    const preview = w.stage();
+    const low = w.url('rogue', 'female', 'low');
+    const medium = w.url('rogue', 'female', 'medium');
+    w.browse(preview, 'rogue', 'female');
+    const body = w.bodyOf(preview);
+    expect(body).not.toBeNull();
+    // nothing of its armor is here yet: the body is built and draws its bare suit
+    expect(w.hung(preview)).toEqual({});
+    w.frame(preview);
+    expect((body as unknown as { bodyShown: boolean }).bodyShown).toBe(true);
+
+    // the small file lands first: it hangs hidden while it links, then draws, the medium
+    // file still on its way
+    await w.land(preview, [low], false);
+    expect(w.hung(preview)).toEqual({ [low]: false });
+    w.settle();
+    w.frame(preview);
+    expect(w.hung(preview)).toEqual({ [low]: true });
+
+    // the medium file lands: the low file keeps drawing until it has linked, then hands over
+    // on the same body (never a rebuild)
+    await w.land(preview, [medium], false);
+    expect(w.hung(preview)).toEqual({ [low]: true, [medium]: false });
+    w.settle();
+    w.frame(preview);
+    expect(w.hung(preview)).toEqual({ [medium]: true });
+    expect(w.bodyOf(preview)).toBe(body);
+    expect(w.tops()).toEqual([]);
+  });
+
   it("asks for exactly the chosen class and body's top file, the medium file drawing until it links", async () => {
     const w = await world('high');
     const preview = w.stage();
+    const low = w.url('mage', 'female', 'low');
     const medium = w.url('mage', 'female', 'medium');
     const top = w.url('mage', 'female', 'high');
     w.browse(preview, 'mage', 'female');
     await w.land(preview);
     const body = w.bodyOf(preview);
-    expect(w.fetches).toEqual([medium]);
+    expect(w.fetches).toEqual([low, medium]);
 
     // chosen: its next frame asks for the one file
     preview.markChosen();
     w.frame(preview);
-    expect(w.fetches).toEqual([medium, top]);
+    expect(w.fetches).toEqual([low, medium, top]);
     // the body on the stage is the one that sharpens: never a rebuild
     expect(w.bodyOf(preview)).toBe(body);
     expect(w.hung(preview)).toEqual({ [medium]: true });
@@ -599,7 +672,7 @@ describe('the creator on a High desktop', () => {
     w.browse(preview, 'mage', 'female');
     preview.markChosen();
     w.frame(preview);
-    expect(w.fetches).toEqual([medium, top]);
+    expect(w.fetches).toEqual([low, medium, top]);
   });
 
   it('lets the top file go when the player flips away before it lands, and asks again on return', async () => {

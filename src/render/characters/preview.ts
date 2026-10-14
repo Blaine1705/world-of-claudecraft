@@ -71,6 +71,7 @@ import { prefetchWocKitLowTier } from './woc_armor_dressing';
 import { wocHeadBaseNode } from './woc_head_catalog';
 import type { WocHeadHold } from './woc_head_dressing';
 import type { WocHeadAppearanceInput } from './woc_head_look_core';
+import { ensureWocHeadForAppearance } from './woc_head_packs';
 import { classBodyComposes } from './woc_parts_core';
 
 /** The modular head packs' base heads (woc_head_catalog wocHeadBaseNode): what the
@@ -453,6 +454,30 @@ export class CharacterPreview {
     return previewArmorDetail(this.armorSurface, this.stagedBody, this.chosenBody);
   }
 
+  /**
+   * The creator's class body, about to be built: the files that let the player SEE it,
+   * asked for ahead of the one the build asks for itself (the stage's own armor tier).
+   * Every file of its head look first, since a preview body draws nothing until its whole
+   * head is live, then the smallest armor file of its kit (woc_armor_dressing.ts
+   * prefetchWocKitLowTier), which stands in while the stage's tier streams over it. All
+   * are demands and the loader serves demands first come first served, so they start
+   * ahead of the build's file even while the boot set's background stream holds most
+   * slots. Asked in the block that builds the body and puts its gate in without yielding,
+   * so no file asked for here can land before the gate is in (a tier already resident is
+   * attached at build, like any resident file). The creator wears exactly the default kit;
+   * another stage's character may wear other sets. A prefetch never costs the body.
+   */
+  private askCreatorFilesFirst(visualKey: string, detail: WocArmorDetail): void {
+    const manifest = VISUALS[visualKey]?.wocCharacter;
+    if (!manifest || this.armorSurface !== 'creator') return;
+    try {
+      ensureWocHeadForAppearance(manifest.fit, this.wocHeadApp);
+      prefetchWocKitLowTier(manifest, detail);
+    } catch (err) {
+      console.warn(`Preview prefetch failed for ${visualKey}:`, err);
+    }
+  }
+
   /** Draw the built body at the armor detail its stage asks for now, in place (a body
    *  that is rebuilt is born at it: setVisualKey). The body takes it with its next
    *  dressing, which a mount hands it right after with the sets of what it shows now,
@@ -660,6 +685,7 @@ export class CharacterPreview {
       // the ones it is handed (a character's own, or the class starters): a weapon slot
       // handed nothing is an empty hand, as in the world.
       const detail = this.stagedArmorDetail();
+      this.askCreatorFilesFirst(visualKey, detail);
       this.currentVisual = new CharacterVisual(
         visualKey,
         tint,
@@ -687,13 +713,6 @@ export class CharacterPreview {
           isCurrent: () => !this.destroyed && this.currentVisual === visual,
         }),
       );
-      // The creator's class body: the smallest armor file of its kit, asked for only now that
-      // the body's gate is in, so it lands through the dressing's gated first-file reveal (a
-      // file resident at build is attached ungated, on the body's first draw) and draws as the
-      // stand-in tier while the stage's own tier, asked for by the build, streams over it. The
-      // creator wears exactly the default kit; another stage's character may wear other sets.
-      const manifest = VISUALS[visualKey]?.wocCharacter;
-      if (manifest && this.armorSurface === 'creator') prefetchWocKitLowTier(manifest, detail);
       // Re-apply the persisted weapon-skin cosmetic to the rebuilt visual (the
       // constructor attaches the equipped item's own model).
       if (this.currentWeaponSkinId) this.currentVisual.setWeaponSkin(this.currentWeaponSkinId);
