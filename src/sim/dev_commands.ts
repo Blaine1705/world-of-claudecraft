@@ -82,6 +82,9 @@ import {
   worldQuestPuzzleVariantForCycle,
 } from './world_quest_rotation';
 
+/** /dev healing faces the middle of the healing dummy row from its teleport spot. */
+const HEALING_TRAINING_DEV_FACING = Math.atan2(-39 - -36, -76 - -82);
+
 const MAX_DEV_SPAWNS = 20;
 const DEV_SPAWN_RADIUS = 4;
 const DEV_SPAWN_RING_SIZE = 8;
@@ -444,9 +447,11 @@ export function handleDevChat(
   if (/^\/(?:dev\s+healing|devhealing|healing)\s*$/i.test(raw)) {
     const entity = ctx.entities.get(pid);
     if (entity) {
-      displacePlayerForDev(ctx, entity, -82, -42);
-      entity.facing = 0;
-      entity.prevFacing = 0;
+      // Behind the dummy row (content/healing_training.ts), clear of the quay cottage, with
+      // sight of every healing dummy and of Drillmaster Hale's own dummies; facing the middle one.
+      displacePlayerForDev(ctx, entity, -82, -36);
+      entity.facing = HEALING_TRAINING_DEV_FACING;
+      entity.prevFacing = HEALING_TRAINING_DEV_FACING;
       if (entity.level < 20) {
         ctx.setPlayerLevel(20, pid);
       }
