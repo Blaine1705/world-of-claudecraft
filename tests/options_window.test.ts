@@ -129,7 +129,7 @@ describe('options_window: hotkey setup row', () => {
     expect(rows).toContain(
       "this.applyKeybindSetup(parsed.binds, t('hudChrome.keybindTransfer.imported'));",
     );
-    expect(rows).toContain('this.deps.keybinds().importBindings(binds, layout);');
+    expect(rows).toContain('this.deps.keybinds().importBindings(binds, layout ?? null);');
     expect(rows).toContain(
       'buildKeybindLayoutConvertRow(body, this.deps, (...a) => this.applyKeybindSetup(...a));',
     );

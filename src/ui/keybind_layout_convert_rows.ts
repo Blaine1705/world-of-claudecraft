@@ -7,6 +7,7 @@
 // at its line ceiling (tests/monolith_budget.test.ts).
 
 import { audio } from '../game/audio';
+import type { ConvertedLayout } from '../game/keybinds';
 import { useTouchInterface } from '../game/mobile_controls';
 import { formatNumber, t } from './i18n';
 import type { KeybindSetup } from './keybind_transfer_core';
@@ -22,9 +23,9 @@ import { detectOsKeyboardLayout } from './keyboard_map';
 /** The seam the options painter hands in; OptionsWindowDeps satisfies it
  *  structurally. */
 export interface KeybindLayoutConvertDeps {
-  /** The live Keybinds store: its snapshot, and the layout it was last
-   *  converted to (Reset and an imported code clear it). */
-  keybinds(): { snapshot(): KeybindSetup; convertedLayout(): string | null };
+  /** The live Keybinds store: its snapshot, and its last conversion record
+   *  (Reset and an imported code clear it). */
+  keybinds(): { snapshot(): KeybindSetup; convertedLayout(): ConvertedLayout | null };
   /** The shared themed dropdown. */
   buildDropdown(
     options: { value: string; label: string }[],
@@ -59,12 +60,12 @@ const layoutLabel = (id: KeyboardLayoutId): string =>
   t(KEYBOARD_LAYOUTS.find((l) => l.id === id)?.labelKey ?? KEYBOARD_LAYOUTS[0].labelKey);
 
 /** Append the row and its expando to `body`. `apply` replaces the live map with
- *  the converted snapshot, records `layout` as its new source, and shows `note`
- *  (the painter's applyKeybindSetup). */
+ *  the converted snapshot, records `layout` as its conversion record, and shows
+ *  `note` (the painter's applyKeybindSetup). */
 export function buildKeybindLayoutConvertRow(
   body: HTMLElement,
   deps: KeybindLayoutConvertDeps,
-  apply: (binds: KeybindSetup, note: string, layout: KeyboardLayoutId) => void,
+  apply: (binds: KeybindSetup, note: string, layout: ConvertedLayout) => void,
 ): void {
   // Keyboard-only, like the keyboard overview: touch has no layout to convert.
   if (useTouchInterface()) return;
@@ -101,7 +102,10 @@ export function buildKeybindLayoutConvertRow(
   // Start from the layout these hotkeys were last converted to, so a second
   // Convert never re-scrambles them; as authored they are QWERTY (US).
   const last = deps.keybinds().convertedLayout();
-  const from = last !== null && isKeyboardLayoutId(last) ? last : DEFAULT_SOURCE_LAYOUT;
+  const from = last !== null && isKeyboardLayoutId(last.id) ? last.id : DEFAULT_SOURCE_LAYOUT;
+  // Movement kept in place last time still sits on its earlier positions, not
+  // on `from`'s, so converting it as `from` now would scramble it: keep it pinned.
+  const movementLocked = last !== null && last.id === from && last.keptMovement;
   const state = {
     from,
     to: from,
@@ -184,6 +188,7 @@ export function buildKeybindLayoutConvertRow(
     keepToggle.setAttribute('aria-label', t('hudChrome.keybindLayout.keepMovement'));
   };
   syncKeep();
+  keepToggle.disabled = movementLocked;
   keepToggle.addEventListener('click', () => {
     audio.click();
     state.keepMovement = !state.keepMovement;
@@ -194,7 +199,14 @@ export function buildKeybindLayoutConvertRow(
   const help = document.createElement('div');
   help.className = 'set-note';
   help.textContent = t('hudChrome.keybindLayout.help');
-  pane.append(keepRow, help, status, applyBtn);
+  pane.append(keepRow);
+  if (movementLocked) {
+    const locked = document.createElement('div');
+    locked.className = 'set-note';
+    locked.textContent = t('hudChrome.keybindLayout.keepMovementLocked');
+    pane.append(locked);
+  }
+  pane.append(help, status, applyBtn);
 
   applyBtn.addEventListener('click', () => {
     const { binds, moved } = convert();
@@ -208,7 +220,7 @@ export function buildKeybindLayoutConvertRow(
           from: layoutLabel(state.from),
           to: layoutLabel(state.to),
         }),
-        state.to,
+        { id: state.to, keptMovement: state.keepMovement },
       );
     } finally {
       // Consumed by the rebuild; a painter that did not rebuild (or threw)

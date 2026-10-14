@@ -4353,6 +4353,7 @@ export const zh_TW: EnTranslations = {
       "from": "快捷鍵原配置",
       "to": "轉換為",
       "keepMovement": "移動鍵維持原位",
+      "keepMovementLocked": "上次轉換時移動鍵維持原位，因此這次也會維持原位。如需重新開始，請恢復預設值。",
       "help": "每個快捷鍵會移到新配置中打出相同字元的按鍵上。數字列維持不變。此清單中的按鍵名稱是 QWERTY 位置；鍵盤總覽會顯示你自己的配置。",
       "moves": "將移動的快捷鍵：{count}",
       "noChange": "這兩種配置之間沒有快捷鍵需要變更。",

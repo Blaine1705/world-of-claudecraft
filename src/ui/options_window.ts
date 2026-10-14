@@ -66,6 +66,7 @@ import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
   bindRefusalReason,
+  type ConvertedLayout,
   type Keybinds,
   keyLabel,
 } from '../game/keybinds';
@@ -1808,10 +1809,9 @@ export class OptionsWindow {
 
   // The hotkey-setup rows on the Key Bindings panel: the Export/Import expando
   // (Keybinds.snapshot in the keybind_transfer_core.ts envelope) and the layout
-  // converter (keybind_layout_convert_rows.ts). Both apply live through
-  // applyKeybindSetup: Keybinds.importBindings (load()'s validation: unknown
-  // actions ignored, reserved codes skipped, one code per action), then a panel
-  // repaint; no reload, since every reader of the map uses the live instance.
+  // converter (keybind_layout_convert_rows.ts). Both apply live (no reload)
+  // through applyKeybindSetup: Keybinds.importBindings with load()'s
+  // validation (unknown actions, reserved codes, one code per action), then a repaint.
   private keybindTransferRows(body: HTMLElement): void {
     const wrap = document.createElement('div');
     wrap.className = 'kb-transfer';
@@ -1835,8 +1835,8 @@ export class OptionsWindow {
     buildKeybindLayoutConvertRow(body, this.deps, (...a) => this.applyKeybindSetup(...a));
   }
 
-  private applyKeybindSetup(binds: KeybindSetup, note: string, layout: string | null = null): void {
-    this.deps.keybinds().importBindings(binds, layout);
+  private applyKeybindSetup(binds: KeybindSetup, note: string, layout?: ConvertedLayout): void {
+    this.deps.keybinds().importBindings(binds, layout ?? null);
     this.dropKeyCapture();
     this.keybindNote = note;
     this.deps.refreshKeybindLabels();

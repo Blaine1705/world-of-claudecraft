@@ -4353,6 +4353,7 @@ export const vi_VN: EnTranslations = {
       "from": "Hotkeys made for",
       "to": "Convert to",
       "keepMovement": "Keep movement keys in place",
+      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
       "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
       "moves": "Hotkeys that will move: {count}",
       "noChange": "No hotkeys change between these layouts.",

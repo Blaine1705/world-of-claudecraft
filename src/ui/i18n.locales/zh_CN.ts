@@ -2097,6 +2097,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybindLayout.from': '快捷键原布局',
   'hudChrome.keybindLayout.to': '转换为',
   'hudChrome.keybindLayout.keepMovement': '移动键保持原位',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    '上次转换时移动键保持原位，因此这次也会保持原位。如需重新开始，请恢复默认设置。',
   'hudChrome.keybindLayout.help':
     '每个快捷键会移到新布局中打出相同字符的按键上。数字行保持不变。此列表中的按键名称是 QWERTY 位置；键盘总览会显示你自己的布局。',
   'hudChrome.keybindLayout.moves': '将移动的快捷键：{count}',

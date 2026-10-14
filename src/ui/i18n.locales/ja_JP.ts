@@ -2172,6 +2172,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybindLayout.from': 'ホットキーの元の配列',
   'hudChrome.keybindLayout.to': '変換先',
   'hudChrome.keybindLayout.keepMovement': '移動キーはそのままにする',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    '前回の変換で移動キーをそのままにしたため、今回もそのままになります。やり直すには初期設定に戻してください。',
   'hudChrome.keybindLayout.help':
     '各ホットキーは新しい配列で同じ文字を入力するキーに移動します。数字列はそのままです。この一覧のキー名は QWERTY の位置で、キーボード概要にはお使いの配列が表示されます。',
   'hudChrome.keybindLayout.moves': '移動するホットキー：{count}',

@@ -16,7 +16,9 @@ import {
   layoutCodeMap,
 } from '../src/ui/keyboard_layout_convert_core';
 
-// The keep-in-place set the panel row pins (keybind_layout_convert_rows.ts).
+// The keep-in-place set the panel row pins (MOVEMENT_ACTION_IDS in
+// keybind_layout_convert_rows.ts, pinned to these six literally in
+// tests/keybind_layout_convert_rows.test.ts).
 const MOVEMENT = new Set(['forward', 'back', 'turnLeft', 'turnRight', 'strafeLeft', 'strafeRight']);
 const IDS = KEYBOARD_LAYOUTS.map((l) => l.id);
 const layout = (id: KeyboardLayoutId) => KEYBOARD_LAYOUTS.find((l) => l.id === id)!;
@@ -155,6 +157,7 @@ describe('keyboard_layout_convert_core: the code move', () => {
   it('is empty for the same layout or an unknown one', () => {
     expect(layoutCodeMap('dvorak', 'dvorak').size).toBe(0);
     expect(layoutCodeMap('dvorak', 'nope' as KeyboardLayoutId).size).toBe(0);
+    expect(layoutCodeMap('nope' as KeyboardLayoutId, 'dvorak').size).toBe(0);
   });
 });
 
@@ -206,6 +209,34 @@ describe('keyboard_layout_convert_core: converting a setup', () => {
     expect(moved).toBe(2);
   });
 
+  it('undoes itself key by key over the whole letter block, for every pair', () => {
+    const pins = [new Set<string>(), new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE'])];
+    for (const from of IDS) {
+      for (const to of IDS) {
+        if (from === to) continue;
+        for (const pin of pins) {
+          const there = layoutCodeMap(from, to, pin);
+          const back = layoutCodeMap(to, from, pin);
+          for (const code of CONVERTED_CODES) {
+            if (pin.has(code)) continue;
+            expect(back.get(there.get(code) ?? ''), `${from}->${to} ${code}`).toBe(code);
+          }
+        }
+      }
+    }
+  });
+
+  it('pins a movement key in every slot and modifier layer', () => {
+    const setup: KeybindSetup = { forward: ['KeyI', 'KeyW'], other: ['Shift+KeyI', 'Alt+KeyW'] };
+    const { binds } = convertBindingsLayout(setup, 'qwerty-us', 'dvorak', MOVEMENT);
+    // KeyI is pinned only because forward's PRIMARY is on it.
+    expect(binds.forward).toEqual(['KeyI', 'KeyW']);
+    expect(binds.other).toEqual(['Shift+KeyI', 'Alt+KeyW']);
+    // Without the pin both follow their letters.
+    const free = convertBindingsLayout(setup, 'qwerty-us', 'dvorak').binds;
+    expect(free.forward).toEqual(['KeyG', 'Comma']);
+  });
+
   it('round-trips exactly between every pair of layouts', () => {
     const start = defaults();
     for (const from of IDS) {
@@ -246,6 +277,14 @@ describe('keyboard_layout_convert_core: detecting the OS layout', () => {
 
   it('recognises every listed layout from its own characters', () => {
     for (const id of IDS) expect(detectKeyboardLayout(printing(id))).toBe(id);
+  });
+
+  it('rejects a layout with a single letter out of place', () => {
+    // US with only KeyY swapped to QWERTZ's z: US fails on KeyY, QWERTZ on
+    // KeyZ, so nothing matches even though every other key agrees with US.
+    const oneOff = (code: string) =>
+      code === 'KeyY' ? 'z' : (layout('qwerty-us').chars.get(code) ?? null);
+    expect(detectKeyboardLayout(oneOff)).toBe(null);
   });
 
   it('returns null without a layout map or for a non-Latin layout', () => {

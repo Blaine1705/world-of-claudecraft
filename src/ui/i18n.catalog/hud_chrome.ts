@@ -5852,6 +5852,10 @@ export const hudChromeStrings = {
     to: 'Convert to',
     // The six move and turn actions (the WASD and QE keys); every other hotkey converts.
     keepMovement: 'Keep movement keys in place',
+    // Shown when the last conversion kept movement in place: those keys are
+    // still on their earlier positions, so they stay put again.
+    keepMovementLocked:
+      'Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.',
     help: 'Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.',
     // {count} is how many hotkeys land on a different key.
     moves: 'Hotkeys that will move: {count}',

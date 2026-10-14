@@ -11464,6 +11464,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.keybindLayout.from'
   | 'hudChrome.keybindLayout.help'
   | 'hudChrome.keybindLayout.keepMovement'
+  | 'hudChrome.keybindLayout.keepMovementLocked'
   | 'hudChrome.keybindLayout.layouts.azertyBe'
   | 'hudChrome.keybindLayout.layouts.azertyFr'
   | 'hudChrome.keybindLayout.layouts.colemak'

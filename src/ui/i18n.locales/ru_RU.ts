@@ -2191,6 +2191,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybindLayout.from': 'Горячие клавиши для',
   'hudChrome.keybindLayout.to': 'Преобразовать в',
   'hudChrome.keybindLayout.keepMovement': 'Не менять клавиши движения',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'В прошлый раз клавиши движения остались на месте, поэтому они останутся на месте и сейчас. Чтобы начать заново, сбросьте настройки по умолчанию.',
   'hudChrome.keybindLayout.help':
     'Каждая горячая клавиша переносится на клавишу, которая печатает тот же символ в новой раскладке. Цифровой ряд остаётся на месте. Названия клавиш в этом списке соответствуют позициям QWERTY; обзор клавиатуры показывает вашу раскладку.',
   'hudChrome.keybindLayout.moves': 'Горячих клавиш будет перенесено: {count}',

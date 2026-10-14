@@ -2164,6 +2164,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybindLayout.from': '단축키 원래 배열',
   'hudChrome.keybindLayout.to': '변환할 배열',
   'hudChrome.keybindLayout.keepMovement': '이동 키는 그대로 유지',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    '지난 변환에서 이동 키를 그대로 두었으므로 이번에도 그대로 유지됩니다. 처음부터 하려면 기본값으로 초기화하세요.',
   'hudChrome.keybindLayout.help':
     '각 단축키는 새 배열에서 같은 문자를 입력하는 키로 옮겨집니다. 숫자 줄은 그대로 유지됩니다. 이 목록의 키 이름은 QWERTY 위치이며, 키보드 개요에는 사용 중인 배열이 표시됩니다.',
   'hudChrome.keybindLayout.moves': '이동할 단축키: {count}',
