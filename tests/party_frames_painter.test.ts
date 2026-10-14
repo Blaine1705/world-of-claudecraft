@@ -412,6 +412,13 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
   const wrapperOf = () =>
     container.childNodes.find((c) => String(c.className).includes('party-rows'));
   const headerOf = () => container.childNodes.find((c) => c.id === 'party-frame-header');
+  const lastCountWrite = () => {
+    const countSpan = headerOf()?.childNodes.find((c) =>
+      String(c.className).includes('party-frame-header-count'),
+    );
+    expect(countSpan).toBeTruthy();
+    return calls.filter((c) => c.m === 'setText' && c.el === countSpan).at(-1)?.args;
+  };
   const rows = () => {
     const w = wrapperOf();
     return w ? w.childNodes.filter((c) => c.tagName === 'DIV') : [];
@@ -441,7 +448,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(container.childNodes[0]).toBe(header);
     expect(calls).toContainEqual(expect.objectContaining({ m: 'setText', args: ['Party'] }));
     // Two other members plus the local player (hidden by default) is a party of three.
-    expect(calls).toContainEqual(expect.objectContaining({ m: 'setText', args: ['3'] }));
+    expect(lastCountWrite()).toEqual(['3']);
     expect(calls).toContainEqual(
       expect.objectContaining({ m: 'setAttr', args: ['aria-expanded', 'true'] }),
     );
@@ -462,16 +469,23 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
 
   it('counts the shown self row once in the Party N disclosure', () => {
     painter.setCollapse(true, false, false, false);
-    painter.sync([member({ pid: 1 }), member({ pid: 2 }), member({ pid: 3 })], 1, false, {
-      ...DEFAULT_PARTY_FRAME_DISPLAY,
-      showSelf: true,
-    });
-    const countSpan = headerOf()?.childNodes.find((c) =>
-      String(c.className).includes('party-frame-header-count'),
-    );
-    expect(countSpan).toBeTruthy();
-    const countWrites = calls.filter((c) => c.m === 'setText' && c.el === countSpan);
-    expect(countWrites.at(-1)?.args).toEqual(['3']);
+    const others = [member({ pid: 2 }), member({ pid: 3 })];
+    const withSelf = { ...DEFAULT_PARTY_FRAME_DISPLAY, showSelf: true };
+    painter.sync([member({ pid: 1 }), ...others], 1, false, withSelf);
+    expect(lastCountWrite()).toEqual(['3']);
+    // Toggling showSelf off and on adds and drops the self row, never the count.
+    painter.sync(others, 1, false, DEFAULT_PARTY_FRAME_DISPLAY);
+    expect(lastCountWrite()).toEqual(['3']);
+    painter.sync([member({ pid: 1 }), ...others], 1, false, withSelf);
+    expect(lastCountWrite()).toEqual(['3']);
+  });
+
+  it('relocalize() re-emits the Party N count including the local player', () => {
+    painter.setCollapse(true, false, false, false);
+    painter.sync([member({ pid: 2 }), member({ pid: 3 })], 1, false, DEFAULT_PARTY_FRAME_DISPLAY);
+    calls.length = 0;
+    painter.relocalize();
+    expect(lastCountWrite()).toEqual(['3']);
   });
 
   it('paints target and role classes for compact raid cells', () => {

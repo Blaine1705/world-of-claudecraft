@@ -41,6 +41,7 @@ import {
 } from './party_frame_row';
 import {
   type PartyFrameDisplayConfig,
+  type PartyFrameHeaderState,
   type PartyFrameMember,
   partyFrameHeaderState,
   partyFrameHealthText,
@@ -239,8 +240,12 @@ export class PartyFramesPainter {
     return this.header;
   }
 
+  private headerState(): PartyFrameHeaderState {
+    return partyFrameHeaderState(this.memberCount, this.headerCollapsed, this.selfShown);
+  }
+
   private paintHeader(): void {
-    const state = partyFrameHeaderState(this.memberCount, this.headerCollapsed, this.selfShown);
+    const state = this.headerState();
     const visible = state.visible && !this.mobile;
     if (visible) {
       const header = this.ensureHeader();
@@ -408,8 +413,7 @@ export class PartyFramesPainter {
     }
     if (this.header?.el.parentNode === this.container) {
       this.writers.setText(this.header.label, t('hudChrome.partyFrames.header'));
-      const state = partyFrameHeaderState(this.memberCount, this.headerCollapsed, this.selfShown);
-      this.writers.setText(this.header.count, formatNumber(state.count));
+      this.writers.setText(this.header.count, formatNumber(this.headerState().count));
     }
   }
 

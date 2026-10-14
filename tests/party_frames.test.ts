@@ -51,6 +51,20 @@ describe('party frame header state', () => {
     expect(partyFrameHeaderState(0, true)).toEqual({ visible: false, count: 0, collapsed: true });
   });
 
+  it('matches the full roster size for the rows the selector hands the painter', () => {
+    const info: PartyInfo = {
+      leader: 1,
+      raid: false,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
+      members: [member(1, 1), member(2, 1), member(3, 1), member(4, 1)],
+    };
+    for (const showSelf of [false, true]) {
+      const config = { ...DEFAULT_PARTY_FRAME_DISPLAY, showSelf };
+      const rows = selectPartyFrameMembers(info, 1, { x: 0, z: 0 }, undefined, config);
+      expect(partyFrameHeaderState(rows.length, false, showSelf).count).toBe(4);
+    }
+  });
+
   it('does not count the local player twice when their own row is shown', () => {
     expect(partyFrameHeaderState(5, false, true)).toEqual({
       visible: true,
