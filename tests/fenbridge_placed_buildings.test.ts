@@ -4,11 +4,21 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { authoredTownBuildingPlacements } from '../src/editor/feature_prop_placements';
 import { isPlacedBuildingAsset } from '../src/render/eastbrook_placed_building';
-import { buildingRecordColliders, placedBuildingAnnexes } from '../src/sim/authored_town_buildings';
+import {
+  buildingRecordColliders,
+  isAuthoredTownBuildingDef,
+  placedBuildingAnnexes,
+  promotedTownBuildingStandsDown,
+} from '../src/sim/authored_town_buildings';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { ZONE2_PROPS } from '../src/sim/content/zone2';
+import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld, type Obb2 } from '../src/sim/fenbridge_layout';
+import { loadPublishedMap, MAP_SEED } from '../src/sim/maps/eastbrook_rebuild.generated';
+import { isResting } from '../src/sim/progression/xp';
+import type { Entity, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -391,6 +401,184 @@ describe('the street lamps around the placed Fenbridge buildings', () => {
           `${at} by the ${building.id} door`,
         ).toBeGreaterThan(3);
       }
+    }
+  });
+});
+
+// Fenbridge in ClaudeCraft Studio. A maker rearranges the town in the
+// published Studio map (data/maps/eastbrook_rebuild.map.json, the shipped
+// world with both rebuilt towns) or in a new map from the world: either way
+// every building is an ordinary placement they can select and move, standing
+// where the game stands it.
+
+interface StudioPlacement {
+  assetId: string;
+  x: number;
+  z: number;
+  y?: number;
+  rotY?: number;
+  scale?: number;
+  scaleX?: number;
+  collide?: boolean;
+  collisionMode?: string;
+}
+const REBUILD_MAP = JSON.parse(
+  readFileSync(path.join(ROOT, 'data/maps/eastbrook_rebuild.map.json'), 'utf8'),
+) as {
+  placements: StudioPlacement[];
+  content: {
+    npcs: Record<string, { pos: { x: number; z: number }; facing?: number }>;
+    roads: { x: number; z: number }[][];
+  };
+};
+
+/** The kit buildings the rebuild retired (their models stay shipped for Studio). */
+const RETIRED_KIT_BUILDING =
+  /^props\/fenbridge_(warden_gatehouse|crooked_reed_inn|lantern_chapel|moonwort_apothecary|gilded_strongbox|hesk_tannery|scout_lodge)$/;
+
+function placementAssetIdOf(building: Building): string {
+  return building.assetId.replace(/^\/models\//, '').replace(/\.glb$/, '');
+}
+
+/** A yard grid across a record's wall box, a stride in from every wall,
+ *  optionally shifted. */
+function wallBoxGrid(building: Building, dx = 0, dz = 0): { x: number; z: number }[] {
+  const box = building.footprint;
+  const out: { x: number; z: number }[] = [];
+  for (let lx = -box.halfWidth + 1; lx <= box.halfWidth - 1 + 1e-6; lx += 1) {
+    for (let lz = -box.halfDepth + 1; lz <= box.halfDepth - 1 + 1e-6; lz += 1) {
+      const point = localToWorld(box.center, box.rotation, lx, lz);
+      out.push({ x: point.x + dx, z: point.z + dz });
+    }
+  }
+  return out;
+}
+
+describe('Fenbridge in Studio', () => {
+  it('turns each building into one movable placement at the spot the game stands it', () => {
+    const converted = authoredTownBuildingPlacements(WORLD_SEED);
+    for (const building of BUILDINGS) {
+      const placed = converted.filter((p) => p.assetId === placementAssetIdOf(building));
+      expect(placed, building.id).toHaveLength(1);
+      expect(placed[0]).toMatchObject({
+        x: building.placement.x,
+        z: building.placement.z,
+        y: building.placement.lift,
+        collide: true,
+        collisionMode: 'baked',
+      });
+      expect(placed[0].rotY).toBeCloseTo(building.placement.rotation, 9);
+      // one uniform scale over the model's largest dimension, the placed-asset rule
+      const largest = Math.max(...boundsOf(building).size);
+      expect(placed[0].scale, building.id).toBeCloseTo(
+        (building.placement.scale * largest) / PLACED_TARGET_HEIGHT,
+        2,
+      );
+      expect(placed[0].scaleX, building.id).toBeUndefined();
+    }
+  });
+
+  it('stands the rebuilt town in the published Studio map, with no kit building left over', () => {
+    const converted = authoredTownBuildingPlacements(WORLD_SEED);
+    for (const building of BUILDINGS) {
+      const want = converted.find((p) => p.assetId === placementAssetIdOf(building));
+      if (!want) throw new Error(`no Studio placement for ${building.id}`);
+      const placed = REBUILD_MAP.placements.filter(
+        (p) => p.assetId === placementAssetIdOf(building),
+      );
+      expect(placed, building.id).toHaveLength(1);
+      expect(placed[0]).toMatchObject({
+        x: want.x,
+        z: want.z,
+        y: want.y,
+        collide: true,
+        collisionMode: 'baked',
+      });
+      expect(placed[0].rotY ?? 0, building.id).toBeCloseTo(want.rotY, 9);
+      expect(placed[0].scale ?? 1, building.id).toBeCloseTo(want.scale, 9);
+    }
+    const leftover = REBUILD_MAP.placements
+      .filter((p) => RETIRED_KIT_BUILDING.test(p.assetId))
+      .map((p) => p.assetId);
+    expect(leftover).toEqual([]);
+  });
+
+  it('stands the townsfolk and runs the streets in the Studio map where the game does', () => {
+    for (const npc of FENBRIDGE_LAYOUT.services.npcs) {
+      const doc = REBUILD_MAP.content.npcs[npc.id];
+      if (!doc) throw new Error(`the Studio map has no ${npc.id}`);
+      expect(doc.pos.x, npc.id).toBeCloseTo(npc.position.x, 9);
+      expect(doc.pos.z, npc.id).toBeCloseTo(npc.position.z, 9);
+      expect(doc.facing ?? 0, npc.id).toBeCloseTo(npc.facing, 9);
+    }
+    const hub = FENBRIDGE_LAYOUT.hub.center;
+    const touchesTown = (road: readonly { x: number; z: number }[]) =>
+      road.some((q) => Math.hypot(q.x - hub.x, q.z - hub.z) < 40);
+    const gameStreets = BUILTIN_WORLD.roads.filter(touchesTown);
+    expect(gameStreets.length).toBeGreaterThan(0);
+    expect(REBUILD_MAP.content.roads.filter(touchesTown)).toEqual(gameStreets);
+  });
+
+  it('hands the game copy of the Studio map current town records, so its record walls stand down', () => {
+    const world = loadPublishedMap();
+    const collision = (world.assetCollision ?? {}) as Record<string, readonly unknown[]>;
+    for (const building of BUILDINGS) {
+      const record = world.props.buildings.find((candidate) => candidate.id === building.id);
+      if (!record) throw new Error(`the published map has no ${building.id} record`);
+      expect(isAuthoredTownBuildingDef(record), building.id).toBe(true);
+      expect(promotedTownBuildingStandsDown(world.promotedScenery, record), building.id).toBe(true);
+      expect(collision[building.assetId]?.length ?? 0, building.assetId).toBeGreaterThan(0);
+    }
+  });
+
+  it('moves a building with its walls and rest area when a maker moves it, leaving nothing behind', () => {
+    const world = loadPublishedMap();
+    const inn = BUILDINGS.find((building) => building.kind === 'inn');
+    if (!inn) throw new Error('no Fenbridge inn');
+    const index = (world.placements ?? []).findIndex((p) => p.path === inn.assetId);
+    expect(index).toBeGreaterThanOrEqual(0);
+    // a maker drags the inn eight yards west
+    const SHIFT = 8;
+    const moved: WorldContent = {
+      ...world,
+      placements: (world.placements ?? []).map((p, i) =>
+        i === index ? { ...p, x: p.x + SHIFT } : p,
+      ),
+    };
+    const walls = rectOf(inn, inn.footprint);
+    const underMovedInn = (point: { x: number; z: number }) => {
+      const local = toModelAxes(inn, { x: point.x - SHIFT, z: point.z });
+      return (
+        local.x > walls.x0 - 1.5 &&
+        local.x < walls.x1 + 1.5 &&
+        local.z > walls.z0 - 1.5 &&
+        local.z < walls.z1 + 1.5
+      );
+    };
+    const blockedCount = (content: WorldContent, points: { x: number; z: number }[]) => {
+      setActiveWorldContent(content);
+      try {
+        return points.filter((point) => isBlocked(MAP_SEED, point.x, point.z)).length;
+      } finally {
+        setActiveWorldContent(null);
+      }
+    };
+    const vacated = wallBoxGrid(inn).filter((point) => !underMovedInn(point));
+    expect(vacated.length).toBeGreaterThan(20);
+    // the inn blocks where it stands, and stops blocking there once it is moved
+    expect(blockedCount(world, vacated)).toBeGreaterThan(0);
+    expect(blockedCount(moved, vacated)).toBe(0);
+    expect(blockedCount(moved, wallBoxGrid(inn, SHIFT, 0))).toBeGreaterThan(0);
+    // its rest area rides the placement (the placement path alone, records aside)
+    const body = (point: { x: number; z: number }) =>
+      ({ inCombat: false, pos: { x: point.x, y: 0, z: point.z } }) as unknown as Entity;
+    setActiveWorldContent(moved);
+    try {
+      const centre = inn.footprint.center;
+      expect(isResting(body({ x: centre.x + SHIFT, z: centre.z }), [], [], false)).toBe(true);
+      expect(isResting(body(vacated[0]), [], [], false)).toBe(false);
+    } finally {
+      setActiveWorldContent(null);
     }
   });
 });

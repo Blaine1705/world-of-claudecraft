@@ -3,9 +3,9 @@
   "meta": {
     "id": "eastbrook_rebuild",
     "name": "Eastbrook Rebuild",
-    "description": "The shipped world with Eastbrook Vale's town rebuilt from the Tidehold buildings. Every building is an ordinary placement: select it and move it.",
+    "description": "The shipped world with the towns of Eastbrook Vale and Fenbridge rebuilt from the Tidehold buildings. Every building is an ordinary placement: select it and move it.",
     "createdAt": 1791882000000,
-    "updatedAt": 1791882000000,
+    "updatedAt": 1791968400000,
     "seed": 20061,
     "parentId": ""
   },
@@ -3735,10 +3735,10 @@
         "name": "Warden Fenwick",
         "title": "Warden of Fenbridge",
         "pos": {
-          "x": 4.824455435060822,
-          "z": 285.6503188335003
+          "x": 1.62,
+          "z": 283.09999999999997
         },
-        "facing": -0.4048917862850834,
+        "facing": -1.5707963267948966,
         "color": 8278281,
         "questIds": [
           "q_fenbridge_muster",
@@ -3769,10 +3769,10 @@
         "name": "Brother Aldric",
         "title": "Priest of the Vale",
         "pos": {
-          "x": -14.960203077497741,
-          "z": 296.09529088730875
+          "x": -3.3999999999999986,
+          "z": 299.6
         },
-        "facing": 1.1383885512243588,
+        "facing": 1.5707963267948966,
         "color": 16251385,
         "questIds": [
           "q_aldrics_fallen_star",
@@ -3793,10 +3793,10 @@
         "name": "Provisioner Hale",
         "title": "Provisioner",
         "pos": {
-          "x": -12.424844495021249,
-          "z": 314.94714794895896
+          "x": 2.85,
+          "z": 292
         },
-        "facing": 2.191045812777718,
+        "facing": -1.5707963267948966,
         "color": 1999945,
         "questIds": ["q_prowler_pelts", "q_fen_supplies", "q_the_codfather", "q_grubjaw"],
         "greeting": "Dry boots, dry bread, dry powder: at Fenbridge you get two of the three on a good day.",
@@ -3831,10 +3831,10 @@
         "name": "Herbalist Yara",
         "title": "Herbalist",
         "pos": {
-          "x": 14.020226082985031,
-          "z": 293.9419887666108
+          "x": 2.8999999999999995,
+          "z": 323.5
         },
-        "facing": -0.9971906342364164,
+        "facing": -1.5707963267948966,
         "color": 8207512,
         "questIds": ["q_widows", "q_broodmother"],
         "greeting": "Mind the thicket west of the road. The webs are thick as sailcloth this season."
@@ -3844,10 +3844,10 @@
         "name": "Scout Maren",
         "title": "Marshal's Scout",
         "pos": {
-          "x": -12.942629598286846,
-          "z": 320.2950179409249
+          "x": -3.2,
+          "z": 330
         },
-        "facing": 2.601173153319209,
+        "facing": 2.950031333260667,
         "color": 8218120,
         "questIds": ["q_troll_fetishes", "q_cult_camp", "q_olen"],
         "greeting": "Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds."
@@ -3857,10 +3857,10 @@
         "name": "Bursar Petra Vell",
         "title": "The Gilded Strongbox",
         "pos": {
-          "x": 15.101663970557492,
-          "z": 306.79285357068125
+          "x": -2.9000000000000004,
+          "z": 320.4
         },
-        "facing": -1.8972270342276318,
+        "facing": 1.5707963267948966,
         "color": 13214247,
         "questIds": [],
         "greeting": "The Gilded Strongbox keeps clean ledgers and cleaner vaults. What shall we stow for you?",
@@ -3871,10 +3871,10 @@
         "name": "Chronicler Osric Fenn",
         "title": "The Marsh Chronicle",
         "pos": {
-          "x": -15.965942703405933,
-          "z": 298.27439341010984
+          "x": -2.599999999999998,
+          "z": 295.40000000000003
         },
-        "facing": 1.1383885512243588,
+        "facing": 1.5707963267948966,
         "color": 4171371,
         "questIds": [],
         "greeting": "Mind the damp on the pages, $N. The fen eats more books than readers ever will."
@@ -3884,10 +3884,10 @@
         "name": "Tanner Hesk",
         "title": "Master of the Tannery",
         "pos": {
-          "x": 3.053383957289929,
-          "z": 315.5600325924389
+          "x": -18,
+          "z": 322
         },
-        "facing": 3.024483909022929,
+        "facing": 2.0119758072098772,
         "color": 9067050,
         "questIds": ["q_prof_workorder_tannery"],
         "greeting": "A hide is only as good as its tanning, $C. The vats are ready when you are.",
@@ -7046,24 +7046,12 @@
       ],
       [
         {
-          "x": 4.5,
-          "z": 303
+          "x": 0,
+          "z": 313.5
         },
         {
-          "x": 7,
-          "z": 307
-        },
-        {
-          "x": 10,
-          "z": 315
-        },
-        {
-          "x": 19,
-          "z": 318
-        },
-        {
-          "x": 26,
-          "z": 316
+          "x": 14,
+          "z": 313.7
         },
         {
           "x": 26.69908183610601,
@@ -7096,20 +7084,12 @@
       ],
       [
         {
-          "x": -4.5,
-          "z": 303
+          "x": 0,
+          "z": 313.5
         },
         {
-          "x": -8,
-          "z": 302
-        },
-        {
-          "x": -15,
-          "z": 305
-        },
-        {
-          "x": -22,
-          "z": 310
+          "x": -14,
+          "z": 313.8
         },
         {
           "x": -26.737237334414147,
@@ -7136,22 +7116,6 @@
         {
           "x": 0,
           "z": 307.5
-        },
-        {
-          "x": 4,
-          "z": 313
-        },
-        {
-          "x": 9,
-          "z": 318
-        },
-        {
-          "x": 11,
-          "z": 324
-        },
-        {
-          "x": 7.5,
-          "z": 330
         },
         {
           "x": 0,
@@ -38050,24 +38014,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 4.25,
-      "z": 297.4690161983138,
-      "rotY": 1.3852857968150303,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.02,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 15"
-    },
-    {
-      "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 40.89553189126121,
-      "z": 336.26485201481194,
-      "rotY": 5.523433600833938,
+      "x": 39.542901354788114,
+      "z": 316.294191420407,
+      "rotY": 1.9882344848035975,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38080,9 +38029,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 69.62300848140326,
-      "z": 338.89997279873575,
-      "rotY": 2.959450299761047,
+      "x": 49.57803867195575,
+      "z": 341.32867189155354,
+      "rotY": 5.921932218908367,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38095,9 +38044,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -18.627996230977228,
-      "z": 302.92159216287484,
-      "rotY": 3.593419553535626,
+      "x": -30.922846634265532,
+      "z": 319.93796491136004,
+      "rotY": 1.5471601461985836,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38110,9 +38059,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -31.080535033360533,
-      "z": 321.4398301683645,
-      "rotY": 1.5350547326494093,
+      "x": -37.82218763270345,
+      "z": 373.36070256644047,
+      "rotY": 1.0174593644943242,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38125,9 +38074,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -38.76555262818247,
-      "z": 374.53990881078926,
-      "rotY": 1.0213189612762226,
+      "x": -59.99886182088551,
+      "z": 388.9156092505457,
+      "rotY": 4.200198765230849,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38140,9 +38089,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -60.59083585211518,
-      "z": 390.37592826629395,
-      "rotY": 4.202166238156746,
+      "x": -70.3063301055335,
+      "z": 413.96588065747807,
+      "rotY": 0.7260103364575183,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38155,9 +38104,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -71.24969510101253,
-      "z": 415.14508690182686,
-      "rotY": 0.7494947473736078,
+      "x": 5.56754876274619,
+      "z": 345.7890389659369,
+      "rotY": 1.7688853326876854,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38170,9 +38119,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 5.6965363714984,
-      "z": 320.0705479085162,
-      "rotY": 5.254585668559757,
+      "x": 1.9786002786555321,
+      "z": 372.63823725524435,
+      "rotY": 4.865338523249854,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38185,9 +38134,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 0.6370446609505209,
-      "z": 363.8510479592765,
-      "rotY": 4.882446346994092,
+      "x": 13.41554376580398,
+      "z": 397.1934062359655,
+      "rotY": 1.6091098473055108,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38200,9 +38149,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 12.07398814809897,
-      "z": 388.40621693999765,
-      "rotY": 1.6859454281290986,
+      "x": 31.5924717071417,
+      "z": 483.041770165705,
+      "rotY": 2.0008261413302115,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38212,36 +38161,6 @@
       "scaleZ": 1,
       "y": 0,
       "name": "Streetlamp 25"
-    },
-    {
-      "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 27.275587698179695,
-      "z": 475.2713789495733,
-      "rotY": 2.09355636751972,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.02,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 26"
-    },
-    {
-      "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 13.90891007274707,
-      "z": 410.19891751339503,
-      "rotY": 1.5990966700575342,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.02,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 27"
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
@@ -56739,102 +56658,62 @@
       "name": "Isle coconuts 13"
     },
     {
-      "assetId": "props/fenbridge_warden_gatehouse",
-      "x": 9,
-      "z": 282,
-      "rotY": -0.4048917862850834,
-      "scale": 4.7727272727272725,
+      "assetId": "tidehold/fenrire/house_a",
+      "x": 7.4,
+      "z": 281.7,
+      "rotY": 1.5707963267948966,
+      "scale": 5.559090909090909,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 0.9999615399407715,
-      "scaleY": 1,
-      "scaleZ": 0.9999428604079766,
-      "y": 0,
+      "y": -1.05,
       "name": "Fenbridge warden gatehouse"
     },
     {
-      "assetId": "props/fenbridge_crooked_reed_inn",
-      "x": -21.25,
-      "z": 317,
-      "rotY": 2.1533493930082517,
-      "scale": 4.090909090909091,
+      "assetId": "tidehold/fenrire/tavern",
+      "x": 12.25,
+      "z": 299.9,
+      "rotY": 1.5707963267948966,
+      "scale": 10.294681818181816,
       "collide": true,
+      "worldPropKind": "inn",
+      "worldPropWidth": 1.9428,
+      "worldPropDepth": 1.2628,
       "collisionMode": "baked",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 0.9999750006249845,
-      "y": 0.06212350794658339,
+      "y": -1.05,
       "name": "Fenbridge crooked reed inn"
     },
     {
-      "assetId": "props/fenbridge_lantern_chapel",
-      "x": -19.5,
-      "z": 294,
-      "rotY": 1.1383885512243588,
-      "scale": 3.9090909090909087,
+      "assetId": "tidehold/fenrire/hall",
+      "x": -16.2,
+      "z": 299.6,
+      "rotY": -1.5707963267948966,
+      "scale": 13.863545454545454,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
+      "y": -1.05,
       "name": "Fenbridge lantern chapel"
     },
     {
-      "assetId": "props/fenbridge_moonwort_apothecary",
-      "x": 17.8,
-      "z": 291.5,
-      "rotY": -0.9971906342364164,
-      "scale": 3.2727272727272725,
+      "assetId": "tidehold/fenrire/shop_b",
+      "x": 9.2,
+      "z": 322.8,
+      "rotY": 1.5707963267948966,
+      "scale": 8.499999999999998,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 1.0000571461226355,
-      "scaleY": 1,
-      "scaleZ": 0.999950002499875,
-      "y": 0,
+      "y": -1.05,
       "name": "Fenbridge moonwort apothecary"
     },
     {
-      "assetId": "props/fenbridge_gilded_strongbox",
-      "x": 19.2,
-      "z": 309.5,
-      "rotY": -1.8972270342276318,
-      "scale": 3.4089987739889094,
+      "assetId": "tidehold/fenrire/shop_a",
+      "x": -8.9,
+      "z": 322,
+      "rotY": -1.5707963267948966,
+      "scale": 7.399863636363635,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 1.0000270270270268,
-      "scaleY": 1,
-      "scaleZ": 0.9999962579113988,
-      "y": 0,
+      "y": -1.05,
       "name": "Fenbridge gilded strongbox"
-    },
-    {
-      "assetId": "props/fenbridge_hesk_tannery",
-      "x": -2,
-      "z": 320,
-      "rotY": 3.024483909022929,
-      "scale": 5.454015203067378,
-      "collide": true,
-      "collisionMode": "baked",
-      "scaleX": 1.0000972222222222,
-      "scaleY": 1,
-      "scaleZ": 1.0000972222222222,
-      "y": 0,
-      "name": "Fenbridge hesk tannery"
-    },
-    {
-      "assetId": "props/fenbridge_scout_lodge",
-      "x": -13.5,
-      "z": 325.5,
-      "rotY": 2.601173153319209,
-      "scale": 3.6365550339970043,
-      "collide": true,
-      "collisionMode": "baked",
-      "scaleX": 0.9999473684210527,
-      "scaleY": 1,
-      "scaleZ": 0.9999473684210527,
-      "y": 0.09333117915423439,
-      "name": "Fenbridge scout lodge"
     },
     {
       "assetId": "tidehold/smithy",
