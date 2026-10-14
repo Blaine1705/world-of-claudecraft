@@ -57371,6 +57371,21 @@
       "collisionMode": "baked",
       "y": -1.37,
       "name": "Eastbrook weekly vault"
+    },
+    {
+      "assetId": "props/streetlamp_mirefen_witchflame",
+      "x": -3.690703705030453,
+      "z": 272.40535416144263,
+      "rotY": 4.908718560339981,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 1.02,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 16"
     }
   ],
   "promotedScenery": {
