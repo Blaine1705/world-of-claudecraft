@@ -203,4 +203,15 @@ describe('the Fenrire look', () => {
       ).toBe(true);
     }
   });
+
+  it('is credited, every building and tier', () => {
+    const credits = fs.readFileSync(path.resolve(__dirname, '..', 'CREDITS.md'), 'utf8');
+    const row = credits
+      .split('\n')
+      .find((line) => line.includes('public/models/tidehold/fenrire/'));
+    expect(row, 'a CREDITS.md row for the Fenrire look').toBeDefined();
+    for (const b of LOOK_BUILDINGS) expect(row, b).toContain(b);
+    expect(row).toContain('.half.glb');
+    expect(row).toContain('.quarter.glb');
+  });
 });
