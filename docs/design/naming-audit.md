@@ -791,6 +791,17 @@ major game wikis found no ability, aura or object of any of these names.
 | Soulfire Trail | the burning lane its hitched sledge leaves | KEEP. No match ("Soulfire" already ships here; World of Warcraft's warlock spell is the two-word "Soul Fire", an unrelated direct-damage cast, and "Viscous Trail" and "Ice Trail" are other games' unrelated trails). |
 | Ice Outcrop | the five outcrops on the Sledge Road's rim | KEEP. Generic geology. |
 
+The Great Saurian's totem rework (web-verified 2026-10-14; `src/sim/encounters/wildheart_basin/
+saurian_totems.ts` and `saurian_drum.ts`). Exact-phrase searches against the major game wikis
+found no mob, ability or aura of any of these names.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Sunbone Sap Totem | the totem the howdah's rider throws onto the ford | KEEP. No match; this game's own "Sunbone" (Sunbone Totem) and "Sap" (Ancestral Sap). "Hex Totem", first considered, is a core Dead by Daylight term and was NOT used. |
+| Sap Backlash | the damage a broken totem returns to the Saurian | KEEP. No match; plain English. |
+| Howdah Drum | the heroic second rider's drum (an aura on the Saurian) | KEEP. No match; a place word and an instrument. |
+| Drum Silenced | the drum knocked off its beat | KEEP. No match; plain English. |
+
 The second round of the same pass (web-verified 2026-10-04): the Mere Hydra's Combined Breath
 (`hydra_combo.ts`), Ysolei calling the moon (`ysolei_moon.ts`) and the Pearlguard Sentinel's new
 manta body (display only; the id `pearlguard_sentinel` is frozen).

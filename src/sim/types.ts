@@ -5797,6 +5797,17 @@ export interface SaurianFightState {
   /** Where it braced its feet for the bar in flight (world coordinates), so
    *  the strike lands where it was drawn. */
   plantedAt: { x: number; y: number; z: number } | null;
+  /** The rider's Sap Totems (saurian_totems.ts): seconds to his next throw,
+   *  how many he has thrown this pull (the deterministic salt), and the ones
+   *  standing with the seconds to each one's next mending (`by`: the player
+   *  highest on its threat while it stood, who its backlash is credited to). */
+  totemTimer: number;
+  totemsThrown: number;
+  totems: { id: number; next: number; by?: number }[];
+  /** Heroic: the second rider's drum (saurian_drum.ts): the seconds it is
+   *  still silenced and the seconds to its next beat. Null on normal, and
+   *  once the howdah has broken. */
+  drum: { silenced: number; beat: number } | null;
   /** The howdah broke this pull (the Howdah Hexcaller is down). */
   howdahBroken: boolean;
   /** The rider that jumped down, while it lives. */

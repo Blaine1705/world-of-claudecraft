@@ -35,6 +35,7 @@ import {
   startStomp,
   startTailSwipe,
   tickSaurian,
+  tickSaurianPaused,
 } from './great_saurian';
 import {
   BEASTMASTER_ID,
@@ -42,9 +43,12 @@ import {
   GORGEBLOOM_ID,
   GREAT_SAURIAN_ID,
   HOWDAH_HEXCALLER_ID,
+  SAURIAN_TUNING,
   WILDHEART_SPORE_CLOUD,
   ZULGAR_ID,
 } from './ids';
+import { silenceDrum, startDrum } from './saurian_drum';
+import { sapTotems, throwTotem } from './saurian_totems';
 import {
   beginHunt,
   endHunt,
@@ -63,6 +67,8 @@ export { jaguarState, syncPool } from './beastmaster';
 export { podSpot, terracePlayers } from './gorgebloom';
 export { breakHowdah, saurianState } from './great_saurian';
 export * from './ids';
+export { drumAboard, drumBeating } from './saurian_drum';
+export { SAP_BACKLASH_NAME, SAP_HEAL_NAME, sapTotems, totemSpot } from './saurian_totems';
 export { shrinePlayers } from './zulgar';
 export { glyphsLit } from './zulgar_glyphs';
 export { IDOL_BREATH_FIELD } from './zulgar_idol';
@@ -100,6 +106,9 @@ export function tickWildheartEncounters(ctx: SimContext): void {
   for (const inst of wildheartClaims(ctx)) {
     const saurian = claimBoss(ctx, inst, GREAT_SAURIAN_ID);
     if (saurian && !paused(saurian)) tickSaurian(ctx, inst, saurian, bossEngaged(saurian));
+    else if (saurian?.wildheartFight?.kind === 'saurian')
+      // A blip with no target holds the fight, but its totems still mend.
+      tickSaurianPaused(ctx, saurian, saurian.wildheartFight);
     sweepIdleRider(ctx, inst, saurian);
     const bm = claimBoss(ctx, inst, BEASTMASTER_ID);
     const jaguar = claimBoss(ctx, inst, FANGLORD_JAGUAR_ID);
@@ -117,7 +126,7 @@ export function tickWildheartEncounters(ctx: SimContext): void {
 }
 
 const HELP =
-  'Mechanics: tail, stomp, howdah, enrage (the Great Saurian); quake, stalk, hunt, ward, heel (the Beastmaster); seeds, pods, pollinate, lash, gorge (the Gorgebloom); pulse, spirit, prey, endhunt, ambush, glyphs, sunstrike, spear, pin, idol, breath (Zulgar).';
+  'Mechanics: tail, stomp, totem, sap, drum, silence, howdah, enrage (the Great Saurian); quake, stalk, hunt, ward, heel (the Beastmaster); seeds, pods, pollinate, lash, gorge (the Gorgebloom); pulse, spirit, prey, endhunt, ambush, glyphs, sunstrike, spear, pin, idol, breath (Zulgar).';
 
 /** A dev trigger cuts whatever bar is running so the mechanic always shows. */
 function cutBar(boss: { castingAbility: string | null; castRemaining: number }): void {
@@ -138,6 +147,30 @@ function saurianTrigger(ctx: SimContext, inst: InstanceSlot, what: string): stri
   if (what === 'enrage') {
     if (!st.enraged) enrageSaurian(ctx, saurian, st);
     return 'The Great Saurian enrages.';
+  }
+  if (what === 'totem') {
+    if (st.howdahBroken) return 'The howdah is broken: the rider throws no more totems.';
+    const totem = throwTotem(ctx, inst, saurian, st);
+    if (totem) st.totemTimer = SAURIAN_TUNING.totemEvery;
+    return totem
+      ? 'The rider hurls a Sunbone Sap Totem onto the ford.'
+      : 'Three totems already stand (or no spot round it is fit).';
+  }
+  if (what === 'sap') {
+    const standing = sapTotems(ctx, st);
+    if (standing.length === 0) return 'No Sap Totem stands (trigger totem throws one).';
+    for (const row of st.totems) row.next = 0;
+    return `${standing.length} Sap Totem${standing.length === 1 ? '' : 's'} mend the Great Saurian now.`;
+  }
+  if (what === 'drum') {
+    if (st.howdahBroken) return 'The howdah is broken: the drum went down with it.';
+    startDrum(ctx, saurian, st);
+    return 'The howdah drum beats: the Stomp comes twice as often (heroic only in a real run).';
+  }
+  if (what === 'silence') {
+    return silenceDrum(ctx, saurian, st)
+      ? 'The drummer loses his beat.'
+      : 'No drum beats (trigger drum starts it; heroic carries it from the pull).';
   }
   cutBar(saurian);
   if (what === 'stomp') {
@@ -251,7 +284,16 @@ function zulgarTrigger(ctx: SimContext, inst: InstanceSlot, what: string): strin
   return 'Zulgar gathers a Wildheart Pulse.';
 }
 
-const SAURIAN_TRIGGERS = new Set(['tail', 'stomp', 'howdah', 'enrage']);
+const SAURIAN_TRIGGERS = new Set([
+  'tail',
+  'stomp',
+  'totem',
+  'sap',
+  'drum',
+  'silence',
+  'howdah',
+  'enrage',
+]);
 const BEAST_TRIGGERS = new Set(['quake', 'stalk', 'hunt', 'ward', 'heel']);
 const BLOOM_TRIGGERS = new Set(['seeds', 'pods', 'pollinate', 'lash', 'gorge']);
 const ZULGAR_TRIGGERS = new Set([

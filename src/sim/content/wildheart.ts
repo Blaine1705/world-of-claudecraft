@@ -52,6 +52,7 @@ import {
   HOWDAH_HEXCALLER_ID,
   HUNTING_SPEAR_ID,
   HUNTING_SPEAR_PULL_CAST,
+  SAP_TOTEM_ID,
   SPORE_TOAD_ID,
   SUNBONE_DREAD_TOTEM_ID,
   SUNBONE_TOTEM_ID,
@@ -744,6 +745,38 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 430, chance: 1 }],
     scale: 1.9,
     color: 0x688057,
+  },
+  // The totem the howdah's rider throws onto the ford (encounters/
+  // wildheart_basin/saurian_totems.ts): a carved post in the howdah's war red
+  // that feeds the Great Saurian down a tether until it is broken. It never
+  // moves or fights and carries no kit of its own: the encounter owns its
+  // mending. About 80 health on normal and 160 on heroic through the
+  // dungeon's rows: a couple of global cooldowns for one player (the planning
+  // party deals 30 a second each on normal, 46 on heroic). Raised by the
+  // encounter, never placed, so it never counts toward a clear and drops
+  // nothing.
+  sunbone_sap_totem: {
+    id: SAP_TOTEM_ID,
+    name: 'Sunbone Sap Totem',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    untameable: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 40,
+    hpPerLevel: 0,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 30,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    idleStationary: true,
+    xpMult: 0,
+    loot: [],
+    scale: 2,
+    color: 0xa3322a,
   },
   // What a missed Seedpod grows into (the Gorgebloom's Seed Rain, section
   // 5.2): a thorned biter as tall as a man, rooted no longer, straight at the

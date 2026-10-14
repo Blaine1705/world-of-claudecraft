@@ -16,6 +16,10 @@ export const ZULGAR_ID = 'wildheart_high_priest';
 /** The showpiece patrol of the River Ford, and the rider its howdah drops. */
 export const GREAT_SAURIAN_ID = 'great_saurian';
 export const HOWDAH_HEXCALLER_ID = 'howdah_hexcaller';
+/** The totem the howdah's rider throws onto the ford (the rework): it feeds
+ *  the Saurian until it is destroyed. A body of the claim, raised by the
+ *  encounter (never placed in the spawn list). */
+export const SAP_TOTEM_ID = 'sunbone_sap_totem';
 /** The trash. */
 export const STALKER_ID = 'wildheart_stalker';
 export const RAVAGER_ID = 'wildheart_ravager';
@@ -48,11 +52,50 @@ export const SAURIAN_RIDER_LANDS = 'wildheart_saurian_rider_lands';
 /** The Saurian's Enrage under a fifth of its health (a damage-done aura). */
 export const SAURIAN_ENRAGE = 'wildheart_saurian_enrage';
 
+// The rider's totems (the rework, 2026-10-14, the owner's approved design):
+// the Howdah Hexcaller fights from his seat from the pull, throwing Sunbone
+// Sap Totems onto the ford that heal the beast until the group breaks them.
+
+/** The rider's throw (a `nova` spellfx on the Saurian, its target the totem
+ *  that has just landed: the renderer draws the arc from the howdah). */
+export const SAURIAN_TOTEM_THROW = 'wildheart_saurian_totem_throw';
+/** A totem's own clock, carried as its cast bar: the seconds to its next
+ *  mending of the Saurian (`castTargetId` = the Saurian; the first bar is the
+ *  longer arming one). Also the spellfx of each mending (source the totem,
+ *  target the Saurian: the pulse down the tether) and the heal's cast id. */
+export const SAURIAN_SAP_TETHER = 'wildheart_saurian_sap_tether';
+/** Fed by its totems: an aura on the Saurian while any Sap Totem stands
+ *  (`stacks` = how many; it carries no stat, the totems do the healing). */
+export const SAURIAN_SAPPED = 'wildheart_saurian_sapped';
+/** A totem breaks: its stored sap snaps back down the tether into the beast
+ *  (a `nova` spellfx on the Saurian, its source the broken totem), and the
+ *  damage name of that backlash. */
+export const SAURIAN_SAP_BACKLASH = 'wildheart_saurian_sap_backlash';
+/** Heroic: the second rider's drum. An aura on the Saurian while it beats
+ *  (the Stomp's clock runs faster), its twin while a broken totem's backlash
+ *  has knocked the drummer off his beat (`remaining` = the silence left), and
+ *  the spellfx of each beat (a `nova` on the Saurian). */
+export const SAURIAN_WAR_DRUM = 'wildheart_saurian_war_drum';
+export const SAURIAN_DRUM_SILENCED = 'wildheart_saurian_drum_silenced';
+export const SAURIAN_DRUM_BEAT = 'wildheart_saurian_drum_beat';
+
 /**
  * The Saurian's numbers (normal; heroic scales the damage through the claim's
  * mechanicDamageMult). Damage is stated LANDED on a level-20 cloth wearer of
  * about 950 health (README section 7): Tail Swipe about 21 percent, the Stomp
  * about 19 percent, both avoidable.
+ *
+ * The totem rework moves no pool and adds no damage on normal:
+ *   - A totem mends nothing for its first 4 s, so a group that breaks each
+ *     one promptly is healed for nothing at all.
+ *   - What the group spent on the totem comes straight back: a broken totem's
+ *     backlash deals the Saurian exactly the totem's own health. A group that
+ *     keeps the totems down has the fight it had before, to the second.
+ *   - A totem left alone mends 0.8 percent of the Saurian every 2 s; three
+ *     stand at most. On the planning party (150 a second against about 10,000:
+ *     1.5 percent a second) three totems give back 1.2: the fight still moves,
+ *     at a fifth of its pace. Ignoring them loses, breaking them never costs.
+ * Heroic adds the drum, and pays for it out of the Stomp it quickens (below).
  */
 export const SAURIAN_TUNING = {
   /** Tail Swipe: every 12 s a 1 s bar, then a rear 120 degree cone 12 yd deep. */
@@ -87,11 +130,59 @@ export const SAURIAN_TUNING = {
   /** Enrage under a fifth of its health: 30 percent more damage. */
   enrageAtHpPct: 0.2,
   enrageDamage: 0.3,
+
+  // ---- the rider's totems ------------------------------------------------------
+  /** The rider throws his first totem 5 s into the pull and one every 10 s
+   *  after it, while he sits the howdah: three before it breaks on the 65 s
+   *  plan. On the ground he throws none (his bundle went down with the
+   *  howdah): from there his own Ancestral Sap is the thing to stop. */
+  totemFirst: 5,
+  totemEvery: 10,
+  /** At most three stand at once; with three up he holds his throw and tries
+   *  again this often. */
+  totemMax: 3,
+  totemRetry: 2,
+  /** A totem lands this far from the Saurian's centre: past the Stomp's 12 yd
+   *  ring and the Tail Swipe's 12 yd cone, so whoever breaks it stands clear
+   *  of both. One of eight spots round it, picked by a hash, on its own floor
+   *  and at least `totemSpacing` from every standing totem. */
+  totemRange: 14,
+  totemSpots: 8,
+  totemSpacing: 6,
+  /** Its first mending comes 4 s after it lands (the arming bar: a solo
+   *  player's run to it and a couple of global cooldowns), then one every
+   *  2 s: 0.8 percent of the Saurian's health each. */
+  totemArm: 4,
+  totemHealEvery: 2,
+  totemHealPct: 0.008,
+
+  // ---- heroic: the drum ----------------------------------------------------------
+  // A second rider beats a drum from the howdah: while it beats, the Stomp's
+  // clock runs twice as fast (a Stomp every 8 s instead of 16). The answer is
+  // the totems again: a broken totem's backlash knocks the drummer off his
+  // beat for 6 s. Totems land 10 s apart, so a group that breaks each inside
+  // its 4 s arming bar hears the drum 4 s in every 10: the Stomp's clock runs
+  // 1.4 times as fast for them. The Stomp is priced to that: while the drum is
+  // aboard a heroic Stomp lands at 0.7 of its roll, so the group that answers
+  // takes 1.4 x 0.7 = 0.98 of the Stomp damage it took before, and a group
+  // that lets the drum run takes 2 x 0.7 = 1.4. The drum goes down with the
+  // howdah at half health, and the Stomp is whole again from there.
+  /** How fast the Stomp's clock runs while the drum beats. */
+  drumStompRate: 2,
+  /** Seconds a broken totem silences the drum. */
+  drumSilence: 6,
+  /** The drum's beat (the pulse the renderer lands on the ford). */
+  drumBeatEvery: 1,
+  /** A heroic Stomp's share of its roll while the drum is aboard. */
+  drumStompScale: 0.7,
 } as const;
 
 /** The Saurian's chat line when the howdah breaks (re-localized by src/ui/sim_i18n.ts). */
 export const SAURIAN_HOWDAH_LOG =
   'The howdah splinters! A Howdah Hexcaller leaps down to tend the Great Saurian.';
+/** The emote of the rider's first throw of a pull (re-localized by src/ui/sim_i18n.ts). */
+export const SAURIAN_TOTEM_LOG =
+  'The Howdah Hexcaller hurls a Sunbone Sap Totem onto the ford. Break it before it feeds the Great Saurian!';
 
 // ---- encounter objects: their template id carries their look -----------------
 
