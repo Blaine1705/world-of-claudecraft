@@ -68,8 +68,13 @@ function sectionTitleText(section: WarfareShopSection): string {
   }
   if (section.kind === 'goods') return t('hudChrome.warfareShop.goods');
   if (section.kind === 'jewelry') return t('hudChrome.warfareShop.jewelry');
-  if (section.kind === 'companions') return t('hudChrome.warfareShop.companions');
   return t('hudChrome.warfareShop.weapons');
+}
+
+function groupTitleText(group: WarfareShopSection['group']): string {
+  if (group === 'season2') return t('hudChrome.warfareShop.groupSeason2');
+  if (group === 'companions') return t('hudChrome.warfareShop.companions');
+  return t('hudChrome.warfareShop.groupEntry');
 }
 
 function appendOfferTile(
@@ -161,30 +166,31 @@ export function renderWarfareVendorWindow(
     // under it is the deader of the two. buildWarfareVendorView emits no empty
     // section today; this stays correct if it ever does.
     if (section.offers.length === 0) continue;
-    // A group heading (Warfare Season 2 above the entry tier) whenever the
-    // group changes, so the two tiers read as two blocks.
+    // A group heading (Warfare Season 2 above the entry tier, then the
+    // companions) whenever the group changes, so each reads as its own block.
     if (section.group !== group) {
       group = section.group;
       const groupHeading = document.createElement('div');
       groupHeading.className = 'vendor-section-title warfare-group-title';
-      groupHeading.textContent =
-        group === 'season2'
-          ? t('hudChrome.warfareShop.groupSeason2')
-          : t('hudChrome.warfareShop.groupEntry');
+      groupHeading.textContent = groupTitleText(group);
       el.appendChild(groupHeading);
     }
-    const heading = document.createElement('div');
-    heading.className = 'vendor-section-title';
-    heading.textContent = sectionTitleText(section);
-    // A Season 2 set names the spec it is built for beside the set name.
-    const specName = section.kind === 'set' ? setSpecName(section.spec) : null;
-    if (specName) {
-      const spec = document.createElement('span');
-      spec.className = 'warfare-set-spec';
-      spec.textContent = specName;
-      heading.appendChild(spec);
+    // The companions group holds one section, so its group heading already
+    // names it; a second "Companions" title under it would only repeat it.
+    if (section.kind !== 'companions') {
+      const heading = document.createElement('div');
+      heading.className = 'vendor-section-title';
+      heading.textContent = sectionTitleText(section);
+      // A Season 2 set names the spec it is built for beside the set name.
+      const specName = section.kind === 'set' ? setSpecName(section.spec) : null;
+      if (specName) {
+        const spec = document.createElement('span');
+        spec.className = 'warfare-set-spec';
+        spec.textContent = specName;
+        heading.appendChild(spec);
+      }
+      el.appendChild(heading);
     }
-    el.appendChild(heading);
     const grid = document.createElement('div');
     grid.className = 'vendor-goods-grid';
     grid.dataset.grid = section.key;

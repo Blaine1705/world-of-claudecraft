@@ -35,8 +35,9 @@ export interface WarfareShopSetSpec {
   spec: string;
 }
 
-/** The two groups the shop lists, top tier first. */
-export type WarfareShopGroup = 'season2' | 'entry';
+/** The groups the shop lists, top tier first, then the cosmetic companions,
+ *  which belong to no Warfare season. */
+export type WarfareShopGroup = 'season2' | 'entry' | 'companions';
 
 /** The five WARFARE armor families, in the order the shop lists them. Any set
  *  the stock carries that is NOT named here still gets a section, appended in
@@ -363,11 +364,12 @@ export function buildWarfareVendorView(
   if (goods.length > 0) {
     sections.push({ kind: 'goods', group: 'entry', key: WARFARE_SHOP_GOODS_KEY, offers: goods });
   }
-  // Last: the cosmetic row never pushes a gear section down the window.
+  // Last: the cosmetic row never pushes a gear section down the window. Its
+  // own group, so a companion never reads as part of the Season 1 tier.
   if (companions.length > 0) {
     sections.push({
       kind: 'companions',
-      group: 'entry',
+      group: 'companions',
       key: WARFARE_SHOP_COMPANIONS_KEY,
       offers: companions,
     });

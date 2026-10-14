@@ -203,7 +203,7 @@ describe('renderWarfareVendorWindow: direct buddy purchases', () => {
     return view([
       {
         kind: 'companions',
-        group: 'entry',
+        group: 'companions',
         key: 'companions',
         offers: [
           {
@@ -262,6 +262,25 @@ describe('renderWarfareVendorWindow: direct buddy purchases', () => {
     expect(gear.disabled).toBe(false);
     gear.click();
     expect(onBuy).toHaveBeenCalledExactlyOnceWith('a_one');
+  });
+
+  it('heads the companions with their own group, never under Warfare Season 1', () => {
+    const el = mount();
+    const model = companionView(false);
+    model.sections.unshift(section(SET_A, [offer('a_one', 'helmet')]));
+    renderWarfareVendorWindow(el, 'FURY', model, deps());
+    const groups = [...el.querySelectorAll<HTMLElement>('.warfare-group-title')].map(
+      (h) => h.textContent,
+    );
+    expect(groups).toEqual(['Warfare Season 1', 'Companions']);
+    // The group heading names the one companions section, so no second
+    // "Companions" section title repeats it, and the grid follows directly.
+    const titles = [...el.querySelectorAll<HTMLElement>('.vendor-section-title')].map(
+      (h) => h.textContent,
+    );
+    expect(titles.filter((text) => text === 'Companions')).toHaveLength(1);
+    const companionsHead = [...el.querySelectorAll<HTMLElement>('.warfare-group-title')][1];
+    expect(companionsHead.nextElementSibling?.getAttribute('data-grid')).toBe('companions');
   });
 });
 
