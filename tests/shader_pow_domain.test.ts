@@ -80,6 +80,17 @@ interface ProvenSafeBase {
 /** Bases that are non-negative by provenance rather than by syntax. */
 const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
   {
+    file: 'src/render/campfire_flame.ts',
+    base: 'flameH',
+    sites: 1,
+    // flameH is the layer's normalized height, and it is CLAMPED to [0,1] on
+    // the line above the pow(): transformed.y can go either side of the layer
+    // height on a swaying ring, so the clamp, not the geometry, is what keeps
+    // the base non-negative. The anchor pins the clamp, so the row dies with it.
+    anchor: /float flameH = clamp\(transformed\.y \/ \$\{height\.toFixed\(4\)\}, 0\.0, 1\.0\);/,
+    why: 'flameH is a clamp(..., 0.0, 1.0) one line above the pow()',
+  },
+  {
     file: 'src/render/weapon_vfx.ts',
     base: 'w',
     sites: 1,
@@ -130,6 +141,11 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ability_vfx/solid_impact_fragments.ts': 2,
   'src/render/ability_vfx/warrior_rage_material.ts': 1,
   'src/render/characters/surface_response.ts': 5,
+  // Gloamveil's climbing tongues (one templated line for the three
+  // families) and the pool's two tendril lobes: every base is a
+  // clamp(0.5 + 0.5 * sin(x), 0.0, 1.0).
+  'src/render/characters/gloam_climb_core.ts': 1,
+  'src/render/gloam_pool.ts': 2,
   'src/render/ability_vfx/rings.ts': 1,
   'src/render/ability_vfx/shells.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))
@@ -137,7 +153,10 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   // the WOC head tint's sRGB<->linear pair and the skin transfer's softened
   // colour offset (bases clamped with max(x, 0))
   'src/render/characters/woc_head_tint.ts': 3,
-  'src/render/dungeon.ts': 1,
+  // the campfire flame's lick ramp (base is a clamped normalized height)
+  'src/render/campfire_flame.ts': 1,
+  // the brazier flame's taper ramp
+  'src/render/placed_assets.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
   'src/render/hoard_entrance.ts': 3,
   // the Buried Hoard glow cards, sparks, reward-chest rays and column (bases
@@ -199,7 +218,6 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/hollow_crypt/morthen_ward_fx.ts': 1,
   'src/render/sanctum_seal_gate_surface.ts': 1,
   'src/render/sunken_bastion/bastion_beacon.ts': 4,
-  'src/render/sunken_bastion/bastion_boss_fx.ts': 1,
   'src/render/sunken_bastion/bastion_creature_fx.ts': 1,
   'src/render/sunken_bastion/bastion_flood.ts': 2,
   'src/render/sunken_bastion/bastion_olen_fx.ts': 1,
@@ -229,6 +247,18 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/trash_engine_fx/engine_nova.ts': 1,
   'src/render/trash_engine_fx/engine_walkers.ts': 2,
   'src/render/trash_engine_fx/engine_walls.ts': 1,
+  // Pinned at the v0.45.0 integration merge of the Studio import, at the measured
+  // counts: sites neither parent's pin listed (the temple flood's pow moved out of
+  // dungeon.ts into temple_water_shader.ts, and the Bastion's ghost discharge and
+  // ghost fx replaced the boss fx row on the integration side; the Studio's
+  // cut cavity, model generator, triplanar maps and wall finishes).
+  'src/render/cut_cavity_mesh.ts': 1,
+  'src/render/model_gen.ts': 1,
+  'src/render/sunken_bastion/bastion_ghost_discharge.ts': 3,
+  'src/render/sunken_bastion/bastion_ghost_fx.ts': 1,
+  'src/render/temple_water_shader.ts': 1,
+  'src/render/triplanar_maps.ts': 1,
+  'src/render/wall_finishes.ts': 1,
 };
 
 // Generated locale bundles are megabytes of prose with no shader in them; a
@@ -401,7 +431,9 @@ const POW_CALL = /(^|[^.A-Za-z0-9_])pow\s*\(/g;
 function powSites(roots: string[], base: string): PowSite[] {
   const sites: PowSite[] = [];
   for (const root of roots) {
-    for (const entry of sourceFilesUnder(join(base, root), { skipDirectories: SKIPPED_DIRS })) {
+    for (const entry of sourceFilesUnder(join(base, root), {
+      skipDirectories: SKIPPED_DIRS,
+    })) {
       const file = `${root}/${entry.file}`;
       const raw = readFileSync(entry.full, 'utf8');
       if (!raw.includes('pow')) continue;

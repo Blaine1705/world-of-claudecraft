@@ -1,7 +1,19 @@
 import { isEastbrookGrandArmoury } from '../sim/building_layout';
+import { DUNGEONS } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
+import {
+  onWildheartBasinEntranceCauseway,
+  WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
+} from '../sim/wildheart_basin_entrance';
+
+/** The foliage placement hash: a deterministic [0, 1) value per (a, b, salt k).
+ *  Shared by foliage.ts and the dressing-spot generator (foliage_dressing_spots.ts). */
+export function hashAt(a: number, b: number, k: number): number {
+  const s = Math.sin(a * 127.1 + b * 311.7 + k * 74.7) * 43758.5453123;
+  return s - Math.floor(s);
+}
 
 export type EastbrookGrassExclusion =
   | {
@@ -29,6 +41,16 @@ export function insideGrassHubExclusion(
     if (dx * dx + dz * dz < radiusSq) return true;
   }
   return false;
+}
+
+/** True when a grass candidate falls on a set piece's paving: the meadow does
+ *  not grow through the flagstones of the Jaguar Maw's causeway (the Wildheart
+ *  Basin's world door, src/sim/wildheart_basin_entrance.ts). Every grass
+ *  system asks this (the tuft ring and both blade carpets), so the paving
+ *  reads as paving at every distance. */
+export function insidePavedGrassExclusion(x: number, z: number): boolean {
+  const door = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID]?.doorPos;
+  return door !== undefined && onWildheartBasinEntranceCauseway(door, x, z, 0.3);
 }
 
 /** Hub and camp clearings for bushes/ferns, sourced from the active world only. */
@@ -99,7 +121,11 @@ export function eastbrookGrassExclusions(
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,
     ]) {
-      exclusions.push(layoutObb(building.id, building.footprint));
+      // A placed building clears its whole reach (porch, stair, awning), not
+      // only its wall box: grass would otherwise grow through its forge deck.
+      exclusions.push(
+        layoutObb(building.id, 'reach' in building ? building.reach : building.footprint),
+      );
       exclusions.push({
         kind: 'circle',
         id: `${building.id}:serviceApron`,
@@ -130,7 +156,9 @@ export function eastbrookGrassExclusions(
     }
 
     for (const building of FENBRIDGE_LAYOUT.buildings) {
-      exclusions.push(layoutObb(building.id, building.footprint));
+      // A painted building clears its whole reach (porch, stair, awning), not
+      // only its wall box, as Eastbrook's do.
+      exclusions.push(layoutObb(building.id, building.reach));
       exclusions.push({
         kind: 'circle',
         id: `${building.id}:serviceApron`,
@@ -195,12 +223,8 @@ export function eastbrookGrassExclusions(
       z: FENBRIDGE_LAYOUT.civic.musterBoard.frontStandingPoint.z,
       radius: 1.2,
     });
-    for (const wall of FENBRIDGE_LAYOUT.wall.segments) {
-      exclusions.push(layoutObb(wall.id, wall.footprint));
-    }
-    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
-      for (const jamb of gate.arch.jambs) exclusions.push(layoutObb(jamb.id, jamb));
-    }
+    // Fenbridge stands open: grass grows up to the town on every side, with no
+    // palisade or gate footing to clear.
     for (const boardwalk of FENBRIDGE_LAYOUT.repeated.boardwalks) {
       exclusions.push({
         kind: 'obb',

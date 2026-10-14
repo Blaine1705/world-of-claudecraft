@@ -1635,6 +1635,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'landing.records': 'WoC 기록',
   'landing.scout': 'WoC 정찰',
   'landing.parseService': 'WoC 전투 기록',
+  'editor.buildMode.materialNames.WardenStone': '매끄러운 돌',
+  'editor.buildMode.diagonal': '대각선 벽',
+  'editor.buildMode.diagonalHint': '격자점 사이를 드래그하여 원하는 각도로 벽을 만드세요.',
   'guide.professions.endgameBodyRaidCollections':
     '명장 제작은 고유 장착: 명장 제작 표식을 공유하는 장비 계열이다. 기존 최상위 제작 경로는 발견하는 도안, 하루 단위로 제한되는 중간 재료 제작, 공통 최종 단계 재료를 그대로 사용한다. 도가니 세트는 공격대 재료를 쓰는 별도 경로이지, 기존 경로에 비용을 또 얹는 것이 아니다. 두 경로는 동일한 최대 2개 착용 제한을 공유하므로 구성에서 같은 두 자리를 두고 경쟁한다. 완성품은 완전하게 만들기나 의뢰 제작으로 해당 개체가 귀속되기 전까지 자유롭게 거래할 수 있다.',
   'guide.professions.endgamePatternsBodyCollections':
@@ -2662,6 +2665,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.deedTracker': '업적 추적기',
   'hudChrome.interfaceUnlock.frameNames.delveTracker': '탐굴 추적기',
   'hudChrome.interfaceUnlock.frameNames.riftTracker': '균열 추적기',
+  'hudChrome.interfaceUnlock.frameNames.dungeonTracker': '던전 추적기',
+  'hudChrome.dungeonTracker.complete': '완료',
   'hudChrome.interfaceUnlock.frameNames.targetDots': '대상 디버프',
   'hudChrome.interfaceUnlock.frameNames.chat': '채팅',
   'hudChrome.interfaceUnlock.frameNames.menu': '메뉴',
@@ -13456,6 +13461,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.chorus_and_solo':
     '합창과 독창 (한 표식에는 모이고 다른 표식에서는 흩어지기)',
   'hudChrome.finder.mech.tideglass_reflections': '조수유리 투영체 (서로의 거울상을 처치)',
+  'hudChrome.finder.mech.hydra_three_elements':
+    '세 가지 원소 (왼쪽 머리는 18야드 원뿔 범위에 냉기를 내뿜어 4초 동안 이동 속도를 70퍼센트 늦추고, 가운데 머리는 최대 3명의 발밑에 독을 뱉어 1.5초 뒤에 터지며 떨어진 자리에서 6초 동안 타오르고, 오른쪽 머리는 26야드 직선으로 급류를 쏘아 8야드 밀쳐 냅니다: 모두 범위 밖으로 피하세요. 머리 하나가 쓰러지면 남은 머리들이 그 공격을 이어받습니다)',
+  'hudChrome.finder.mech.hydra_tsunami':
+    '해일 (머리들이 4.5초 동안 물속으로 가라앉아 받는 피해가 75퍼센트 줄고, 파도가 웅덩이의 절반을 덮칩니다. 다음에는 반대쪽 절반입니다: 일반 난이도 기준 160~190 냉기 피해와 10야드 밀쳐내기. 반대쪽 절반으로 건너가거나 가장자리 기둥 뒤에 서세요. 영웅 난이도에서는 3.5초 뒤에 파도가 반대쪽 절반으로 되돌아옵니다. 첫 해일은 전투 시작 24초 뒤에, 그 뒤로는 앞선 해일이 지나간 지 40초 뒤에 옵니다)',
+  'hudChrome.finder.mech.hydra_combined_breath':
+    '합동 숨결 (해일과 해일 사이에 머리들이 자신들의 공격 두 가지를 합치며, 순서는 항상 같습니다: 얼어붙은 급류는 직선 위의 모두를 2초 동안 얼리고 다음 파도를 막아 줄 수 있는 얼음 벽을 남깁니다. 독의 해류는 독 웅덩이를 바깥으로 밀어내고, 맹독 서리는 독 웅덩이를 결정으로 얼려 4초 뒤에 터뜨립니다. 일반 난이도에서는 해일 사이에 한 번, 영웅 난이도에서는 두 번)',
+  'hudChrome.finder.mech.hydra_regrowth':
+    '재생 (다른 머리가 살아 있는 동안 쓰러진 머리는 20초 뒤에 생명력 절반으로 다시 자라나며, 쓰러진 머리 하나마다 나머지 머리들이 주는 피해가 15퍼센트 증가합니다: 세 머리를 비슷한 때에 쓰러뜨리세요)',
   'hudChrome.finder.mech.rising_tide': '밀물 (섬의 절반이 잠김, 마른 쪽으로 이동)',
   'hudChrome.finder.mech.undertow': '역류 (모두를 끌어당김, 충돌 전에 벗어나기)',
   'hudChrome.finder.mech.enrage': '체력이 낮으면 격노',
@@ -14198,6 +14211,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showNameplateDots': '이름표에 내 디버프 표시',
   'hudChrome.options.nameplateDotScale': '이름표 디버프 아이콘 크기',
   'hudChrome.options.showTargetDots': '대상 디버프 목록 표시',
+  'hudChrome.options.showDungeonHints': '던전 기믹 도움말',
+  'hudChrome.options.showDungeonHintsNote':
+    '던전 기믹과 대처 방법을 설명하는 도움말 패널을 표시합니다. 이 설정을 끄면 해당 도움말만 숨겨지며, 바닥 경고, 시전 막대, 디버프는 그대로 표시됩니다. 직접 조작해야 하는 안내는 항상 표시됩니다: 탈출해야 하는 우리, 끊어야 하는 사슬, 사용할 수 있는 물체.',
   'hudChrome.targetDots.title': '대상 디버프',
   'hudChrome.targetDots.overflow': '{count}개 더 있음, 표시되지 않음',
   'hudChrome.unitFrame.targetOfTargetLabel': '대상의 대상',
@@ -19282,6 +19298,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.looksNone': '기본 외형',
   'hudChrome.deeds.looksNoBuddy': '동료를 소환하면 여기서 외형을 고를 수 있습니다.',
   'hudChrome.deeds.looksEmpty': '이 동료는 아직 해금된 외형이 없습니다.',
+  'hudChrome.realmBuilder.title': '이달의 왕국 건설자',
+  'hudChrome.realmBuilder.currentLabel': '이달의 수상자',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '명예로 산 물건은 되돌릴 수 없습니다. 되사기 목록에는 언제나 직접 판 물건만 오릅니다. 동전으로 산 물건은 대개 판매 가격에 되팔 수 있고, 마음이 다시 바뀌면 그 목록에서 되찾을 수 있지만, 워페어 장비는 구매하는 순간 귀속되어 거래도, 우편 발송도, 되팔기도 영영 할 수 없습니다. 그러니 그 목록에 오르는 일도 결코 없습니다. 상점이 굳이 한 번 더 확인을 묻는 이유가 그것이니, 누르기 전에 장비를 찬찬히 읽어 보세요.',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -19316,6 +19334,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '제작 창에서 제작법을, 또는 의뢰 게시판에서 의뢰를 "추적"하면 채집 목표 트래커가 이 스택에 추가됩니다. 추적 중인 제작법이나 의뢰의 이름, 목표 수량, 그리고 소지 중이거나 보관 중인 재료로 얼마나 채울 수 있는지를 보여줍니다. "추적"은 현재 목표를 대체하고, "지우기"는 명시적으로 해제합니다. 둘 다 채집 설정을 바꾸지 않습니다.',
   'guide.interfacePage.hubPracticeTrackerBody':
     'Eastbrook 거점 근처에서 그곳의 안내형 연습 레슨을 받으면 연습 트래커가 스택에 추가되어, 연습용 허수아비를 상대로 한 최고 기록을 계속 보여줍니다. 레슨이 진행 중일 때는 옆의 코칭 스트립이 피해량 미터 열기부터 두 번째 실행 비교까지, 현재 단계를 안내해 줍니다.',
+  'guide.interfacePage.dungeonTrackerBody':
+    '파티 던전 안에서는 던전 추적기가 스택의 맨 위를 차지합니다. 던전 이름이 적힌 명판(영웅 난이도에서는 "영웅"으로 표시)과 진행에 따라 차오르는 레일이 있고, 그 아래에는 해당 던전의 모든 우두머리가 경로에서 만나는 순서대로 나열되며, 쓰러지기 전까지는 각각 0 / 1로 표시됩니다. 전투에 2막이 있는 우두머리는 전투 전체가 끝날 때까지 미완료로 남으므로, 목록은 공략이 실제로 끝났을 때만 완료로 표시됩니다. 던전을 나가면 추적기도 사라지며, 프레임 편집에서는 다른 추적기처럼 고유한 이름 칩을 달고 움직일 수 있게 됩니다.',
   'guide.interfacePage.mobileBodyTwoPages':
     '터치 조작은 알아서 나타나며, 배치는 화면 크기에 맞춰 스스로 조절됩니다. 작은 휴대전화에서는 촘촘하게, 큰 휴대전화에서는 표준으로, 태블릿에서는 한결 여유롭게 놓입니다.\n\n능력은 숫자 줄 대신 원환에 놓입니다. 공격 버튼 곁에 행동 버튼 네 개가 붙고, 페이지 전환 버튼이 원환을 페이지 {pages}개 사이에서 넘겨 줍니다. 이 페이지들을 합치면 데스크톱의 추가 단축바를 켜 두었든 아니든 능력 슬롯 {slots}칸 전부에 닿습니다. 그 원환의 다섯째 호 자리는 소모품 자리입니다. 탭하면 거기 놓인 것을 쓰고, 길게 누르거나 안쪽으로 밀면 지니고 있는 물품에서 스스로 채워지는 줄이 열립니다. 그 둘레에는 터치로 플레이할 때 가장 자주 찾는 버튼들이 놓입니다. 대상 바꾸기, 눈앞의 것 사용하기, 점프하기입니다.\n\n아래 가장자리에는 버튼 줄 대신 빠른 실행 조작 하나가 자리합니다. 나머지 모든 것이 여기서 열립니다. 탈것, 대화, 지도, 가방, 사교, 퀘스트, 캐릭터, 주문서, 게임 메뉴, 그리고 나머지 창을 담은 더보기 항목이 있으며, 던전 찾기와 PvP, 감정 표현, 위키가 그 안에 들어 있습니다. 이곳에서 창은 화면 위에 떠 있는 대신 화면을 가득 채웁니다.\n\n유닛 프레임을 옮기는 것은 데스크톱에서만 하는 일입니다. 터치에서는 배치가 알아서 자리를 잡아 줍니다.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -19356,8 +19376,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemMenu.separateByGatherer': '채집자별 분리',
   'hudChrome.itemMenu.takeChosenQuantity': '지정 수량 꺼내기',
   'hudChrome.itemMenu.combine': '재료 묶음 합치기',
-  'hudChrome.realmBuilder.title': '이달의 왕국 건설자',
-  'hudChrome.realmBuilder.currentLabel': '이달의 수상자',
   'hudChrome.realmBuilder.placeholderName': '당신의 이름',
   'hudChrome.realmBuilder.placeholderHint': '이 명판은 첫 번째 이름을 기다리고 있습니다.',
   'hudChrome.realmBuilder.pastTitle': '역대 수상자',
@@ -21447,6 +21465,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.merewater_cowl.name': '호숫물 두건',
   'entities.items.merecleaver.name': '호수가르개 대도끼',
   'entities.items.moonwrack_stave.name': '달파멸 지팡이',
+  'referralCards.celebration.earned': '모험의 결실',
+  'referralCards.celebration.title': '보상 획득!',
+  'referralCards.celebration.titleReward': '칭호 잠금 해제: {title}',
+  'referralCards.celebration.together': '{friend} 님과 함께 획득했습니다.',
+  'referralCards.celebration.continue': '모험 계속하기',
   'referralCards.title': '친구 초대',
   'referralCards.subtitle': '함께 모험하며 도장을 모으세요.',
   'referralCards.close': '친구 초대 닫기',
@@ -21573,8 +21596,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'referralCards.reasons.unavailable':
     '지금은 이 작업을 사용할 수 없습니다. 나중에 다시 시도하세요.',
   'entities.items.referral_satchel.name': '우정 가방',
-  'entities.items.referral_hollow_charm.name': '공허의 우정 부적',
-  'entities.items.referral_fog_charm.name': '안개에 싸인 우정 부적',
+  'entities.items.referral_hollow_charm.name': '맹세 수호자의 심장',
+  'entities.items.referral_fog_charm.name': '각성한 맹세 수호자의 심장',
   'entities.items.reins_referral_tank.name': '우정 전차 고삐',
   'entities.items.reins_referral_raptor.name': '우정 랩터 고삐',
   'hud.social.friendFirstPage': '첫 페이지',

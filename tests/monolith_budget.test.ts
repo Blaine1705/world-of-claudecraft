@@ -540,7 +540,10 @@ const MONOLITHS: MonolithRow[] = [
     // the Moonbridge banner) moved into log_event_route.ts logEventCue.
     // v0.45.0 integration: 18025 on the merged tree (wc -l); the lower of the two
     // parent pins (18054 and PR 4352's 18069) stands.
-    ceiling: 18054,
+    // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
+    // Deepglass and the Tidehold city out of the Studio import: the integration pin
+    // 18054 minus that removal. Exact merged count (wc -l), zero slack.
+    ceiling: 18043,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -579,7 +582,9 @@ const MONOLITHS: MonolithRow[] = [
     // sub-view landed: the Auras render method and its placement/teardown lines
     // moved out with them to src/ui/options_overlay_panels.ts. Measured with
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
-    ceiling: 2813,
+    // Lowered when Deepglass and the Tidehold city left the Studio merge for
+    // their own PR (v0.45.0); wc -l on the tree. Exact count, zero slack.
+    ceiling: 2807,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1010,7 +1015,22 @@ const MONOLITHS: MonolithRow[] = [
     // polymorph slot on the right animal: the Toad Hex's toad). wc -l.
     // v0.45.0 integration: 12583 on the merged tree (wc -l); the lower of the two
     // parent pins (12598 and PR 4352's 12659) stands.
-    ceiling: 12598,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Studio merge into the v0.45.0 integration: the integration pin 12598 plus
+    // the Studio's own delta (12675 - 12688 = -13) gives 12585; re-measure with wc -l.
+    // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
+    // the release/v0.45.0 ceiling both merged PRs were held to.
+    // LOWERED to 12425 at the v0.45.0 integration merge of #4479's head that moved
+    // Deepglass and the Tidehold city out of the Studio import: the integration pin
+    // 12671 minus that removal. Exact merged count (wc -l), zero slack.
+    // Merge of the four dungeon entrances (#4478): both parents' additions combine
+    // (ours is the one updateSetPieceOccluders call), exact merged count, within
+    // the release/v0.45.0 ceiling the branch was held to.
+    // v0.45 integration sync at 78c350c8d55 into cel-shading-rnd:
+    // parent pins 12598 and 12426; combined existing wiring,
+    // exact merged count with no new coordinator behavior or slack.
+    ceiling: 12432,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1230,7 +1250,21 @@ const MONOLITHS: MonolithRow[] = [
     // Composes the existing buddy PR additions with integration extractions.
     // Exact merged size; no additional coordinator logic introduced by resolution.
     // Referral save projections extracted into quest_progress_save and deeds_restore.
-    ceiling: 11700,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Studio merge into the v0.45.0 integration: the integration pin 11700 plus
+    // the Studio's own delta (11570 - 11642 = -72) gives 11628; re-measure with wc -l.
+    // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
+    // the release/v0.45.0 ceiling both merged PRs were held to.
+    // LOWERED by four more lines with the dungeon objectives tracker: its IWorld
+    // read (the dungeonRun getter, a one-line delegate to
+    // instances/dungeon_run.ts) is paid for by moving riftEventMsRemaining's
+    // body and its comment to rift/rift_floor_view.ts, beside the floor view it
+    // reads. Exact count (wc -l after biome), zero slack.
+    // LOWERED to 11598 at the v0.45.0 integration merge of #4479's head that moved
+    // Deepglass and the Tidehold city out of the Studio import: the integration pin
+    // 11634 minus that removal. Exact merged count (wc -l), zero slack.
+    ceiling: 11598,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1466,7 +1500,18 @@ const MONOLITHS: MonolithRow[] = [
     // INTEGRATION-ONLY pin; neither parent PR carries it.
     // Composes the existing buddy PR additions with integration extractions.
     // Exact merged size; no additional coordinator logic introduced by resolution.
-    ceiling: 10966,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Studio merge into the v0.45.0 integration: the integration pin 10966 plus
+    // the Studio's own delta (11036 - 11140 = -104) gives 10862; re-measure with wc -l.
+    // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
+    // the release/v0.45.0 ceiling both merged PRs were held to.
+    // LOWERED to 11003 at the v0.45.0 integration merge of #4479's head that moved
+    // Deepglass and the Tidehold city out of the Studio import: the integration pin
+    // 11037 minus that removal. Exact merged count (wc -l), zero slack.
+    // LOWERED to 11001 when the offline Play click (its audio start and its world
+    // choice) moved into src/game/studio_boot.ts bootOfflinePlay.
+    ceiling: 11001,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1728,7 +1773,16 @@ const MONOLITHS: MonolithRow[] = [
     // its `gds` wire field (measured).
     // v0.45.0 integration: 9676 on the merged tree (wc -l); the lower of the two
     // parent pins (9769 and PR 4352's 9803) stands.
-    ceiling: 9769,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Studio merge into the v0.45.0 integration: the integration pin 9769 plus
+    // the Studio's own delta (9836 - 9840 = -4) gives 9765; re-measure with wc -l.
+    // The run readouts of the self record (drun, dgrun, dcompanion, dmarks) moved to
+    // dungeon_run_wire.ts with the dungeon objectives tracker. Exact count.
+    // LOWERED to 9758 at the v0.45.0 integration merge of #4479's head that moved
+    // Deepglass and the Tidehold city out of the Studio import: the integration pin
+    // 9764 minus that removal. Exact merged count (wc -l), zero slack.
+    ceiling: 9758,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1917,7 +1971,14 @@ const MONOLITHS: MonolithRow[] = [
     // Exact merged size; no additional coordinator logic introduced by resolution.
     // Account-social position decoding moved to social_frame_wire.
     // Public character profile REST moved to character_profile; block paging stays intent-only.
-    ceiling: 5342,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Studio merge into the v0.45.0 integration: the integration pin 5342 plus
+    // the Studio's own delta (5355 - 5356 = -1) gives 5341; re-measure with wc -l.
+    // LOWERED to 5338 at the v0.45.0 integration merge of #4479's head that moved
+    // Deepglass and the Tidehold city out of the Studio import: the integration pin
+    // 5341 minus that removal. Exact merged count (wc -l), zero slack.
+    ceiling: 5338,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1934,7 +1995,16 @@ const MONOLITHS: MonolithRow[] = [
     // NoteEvent/Theme, and the push* composition helpers) to music_notes.ts.
     // Lowered 4720 -> 4672: the boss-fight loop's asset handling moved to
     // src/game/boss_music_loop.ts with the per-boss fight tracks.
-    ceiling: 4672,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Studio merge into the v0.45.0 integration: the integration pin 4672 plus
+    // the Studio's own delta (4716 - 4720 = -4) gives 4668; re-measure with wc -l.
+    // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
+    // the release/v0.45.0 ceiling both merged PRs were held to.
+    // LOWERED to 4660 at the v0.45.0 integration merge of #4479's head that moved
+    // Deepglass and the Tidehold city out of the Studio import: the integration pin
+    // 4671 minus that removal. Exact merged count (wc -l), zero slack.
+    ceiling: 4660,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -1962,7 +2032,14 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5194 -> 5188 at the merge of release/v0.44.0 into the
     // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
     // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 5188,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
+    // the release/v0.45.0 ceiling both merged PRs were held to.
+    // Merge of the four dungeon entrances (#4478): both parents' additions combine
+    // (ours is the palm scatter's decoration exclusion check), exact merged count,
+    // within the release/v0.45.0 ceiling the branch was held to.
+    ceiling: 5133,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -2160,7 +2237,15 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered after extracting the world trees' camera-occluder fade (the
     // hideable records, the trunk hit test, the gated instance/ghost swap)
     // into src/render/tree_hide_fade.ts.
-    ceiling: 3996,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Merge of the four dungeon entrances (#4478): both parents' additions combine
+    // (ours is the paved causeway import), exact merged count, within the
+    // release/v0.45.0 ceiling the branch was held to.
+    // v0.45 integration sync at 78c350c8d55 into cel-shading-rnd:
+    // parent pins 3996 and 3864; combined existing wiring,
+    // exact merged count with no new coordinator behavior or slack.
+    ceiling: 3867,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -2242,7 +2327,23 @@ const MONOLITHS: MonolithRow[] = [
     // kernel (pushOut, resolveAgainst, passesOver, rotY, colliderTopAt) moved
     // verbatim to collider_pushout.ts, the index itself is
     // interior_collider_cells.ts. wc -l. Exact count.
-    ceiling: 2392,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
+    // the release/v0.45.0 ceiling both merged PRs were held to (Studio moved
+    // crossesFence to fence_crossing.ts).
+    // LOWERED 2352 -> 2336 with the Fallen Chapel: the ruin ring's column
+    // layout moved to prop_layout.ts ruinRingColumns (shared with the
+    // renderer, and able to omit a column); a bare ring skips its loop.
+    // wc -l. Exact merged count.
+    // LOWERED 2336 -> 2327 with Eastbrook's placed buildings: the building
+    // record's collider (its box, plus one per solid annex of a placed
+    // building) moved to authored_town_buildings.ts buildingRecordColliders.
+    // wc -l. Exact count.
+    // LOWERED 2327 -> 2288 with the open Fenbridge: the palisade's
+    // full-height wall arm and the gate-arch jamb block retired with the
+    // ring. wc -l. Exact count.
+    ceiling: 2288,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -2290,7 +2391,13 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered 2364 -> 2362: the open-air arm's placement moved into the
     // roster that draws only the field the player stands in
     // (src/render/open_air_field_visibility_core.ts). Exact count, zero slack.
-    ceiling: 2362,
+    // Lowered after the ClaudeCraft Studio merge moved its inline code into
+    // sibling modules (v0.45.0); exact count.
+    // Studio merge into the v0.45.0 integration: the integration pin 2362 plus
+    // the Studio's own delta (2414 - 2420 = -6) gives 2356; re-measure with wc -l.
+    // Integration merge of #4479 (ClaudeCraft Studio): exact merged count, within
+    // the release/v0.45.0 ceiling both merged PRs were held to.
+    ceiling: 2414,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

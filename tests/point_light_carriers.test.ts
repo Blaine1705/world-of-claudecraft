@@ -465,6 +465,14 @@ describe('a one-shot scene without carriers', () => {
 // sees constructors only: a glTF punctual light is built inside three's loader,
 // which tests/glb_punctual_lights.test.ts covers for every shipped GLB.
 const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
+  // Studio (map editor) producers, landed with the woc-studio merge. Each is
+  // routed into a carrier source list like the release producers below.
+  'editor/3d/viewport.ts':
+    'the editor map lights, handed to Renderer.setEditorMapLights, which swaps them into viewLights and marks them (swapBudgetedLights)',
+  'render/fluid_surfaces.ts':
+    'fluid pool lights, pushed into fireLights at boot and re-adopted through the fireLights adopter on an editor rebuild',
+  'render/placed_assets.ts':
+    'the placed fire-light pool, adoptDynamicBudgetLight into the PlacedLightRegistry (the renderer budgetLights)',
   'render/battleground.ts':
     'field lights, born hidden, handed to the fireLights registry through the battleground host',
   'render/battleground_props.ts':
@@ -502,6 +510,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/night_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/point_light_carriers.ts': 'the carriers themselves, the only lights three gathers',
+  'render/hollow_crypt_entrance.ts':
+    'the Fallen Chapel soul light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/hollow_crypt/crypt_lights.ts':
     'the Hollow Crypt lanterns, braziers and soul light, pushed through the fireLights adopter sink the interiors are handed',
   'render/drowned_temple/temple_lights.ts':
@@ -518,6 +528,12 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'the ground-object glow inside the entity view body, a view light marked on reconcile',
   'render/sanctum_seal_gate.ts':
     'the Seal Gate rune light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/sunken_bastion_entrance.ts':
+    'the Drowned Gate Tower pulse light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/drowned_temple_entrance.ts':
+    'the Moon Stair gate light, a static zone feature glowLight lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/wildheart_basin_entrance.ts':
+    'the Jaguar Maw breath light and its two fire bowls, static zone feature glowLights lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/realm_flora.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/soulwell.ts':
@@ -610,7 +626,14 @@ describe('every point-light producer is a carrier source', () => {
       // The Drowned Temple's Hydra Pool water: a mesh hook reading the drain
       // (the Prism Stair gate's openness), never a scene.
       'render/drowned_temple/temple_landmarks.ts: water',
+      // The Moon Stair's mist: a mesh hook writing the time of day, the
+      // reduced-motion switch, the gate's ghost and the gate light's base,
+      // never a scene.
+      'render/drowned_temple_entrance.ts: mesh',
       'render/gather_nodes.ts: target',
+      // The Gloamveil form's ground pool (the Shadow priest's look, #4466): a
+      // mesh hook writing the stain's uniforms each draw, never a scene.
+      'render/gloam_pool.ts: mesh',
       'render/goblin_rocket_sled_fx.ts: inner',
       'render/goblin_rocket_sled_fx.ts: outer',
       // The Gravewyrm Sanctum: mesh hooks, never a scene: the gates reading
@@ -628,16 +651,32 @@ describe('every point-light producer is a carrier source', () => {
       'render/hoard_reward_chest.ts: mesh',
       'render/hoard_reward_chest.ts: motes',
       'render/hoard_reward_chest.ts: pool.mesh',
+      // The Fallen Chapel's grave mist: a mesh hook writing the time of day
+      // and the reduced-motion switch into its own uniform, never a scene.
+      'render/hollow_crypt_entrance.ts: mesh',
       'render/jail_scene.ts: swirl',
+      // Studio mesh clocks, never a scene: the placed fire FX (lathe flame,
+      // smoke puffs, sparks, the shared clock mesh) and the waterfall spray.
+      'render/placed_assets.ts: clockMesh',
+      'render/placed_assets.ts: lathe',
+      'render/placed_assets.ts: puffs',
+      'render/placed_assets.ts: sparks',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
       // the idle sweep or to Vael's lamp yaw, never a scene.
       'render/sunken_bastion/bastion_beacon.ts: mesh',
+      // The Drowned Gate Tower's marsh fog: a mesh hook writing the time of
+      // day, the reduced-motion switch and the pulse light's base, never a scene.
+      'render/sunken_bastion_entrance.ts: mesh',
+      'render/waterfall.ts: sp',
       // The Wildheart Basin's gates: mesh hooks reading the gate memory (the
       // vine bridges weaving, the thorn walls sinking, the wards failing),
       // never a scene.
       'render/wildheart_basin/basin_gates.ts: m',
+      // The Jaguar Maw's mist: a mesh hook writing the time of day, the
+      // reduced-motion switch and the breath light's base, never a scene.
+      'render/wildheart_basin_entrance.ts: mesh',
     ]);
 
     expect(sourceOf('render/light_pulses.ts')).toContain('markPointLightSource(light);');
@@ -665,6 +704,8 @@ describe('every point-light producer is a carrier source', () => {
       'render/characters/woc_armor_merge.ts',
       'render/characters/woc_head_merge.ts',
       'render/gather_nodes.ts',
+      // Copies a source MESH's mask onto the fused mesh that replaces it.
+      'render/mesh_merge.ts',
       'render/point_light_carriers_core.ts',
     ]);
   });

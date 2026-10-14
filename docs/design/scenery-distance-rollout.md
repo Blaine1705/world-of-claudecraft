@@ -5,8 +5,46 @@ The final Low build measured **38.74 FPS in Thornpeak and 29.73 FPS in Palmreach
 after the loading route. It preserves the selected aggressive configuration.
 Medium and higher retain native materials and lighting, but the Mac results do
 not establish a gain. This is a testing candidate, not a shipping approval.
-Reuben authorized remote feature-branch publication with this report. Merge and
-deployment remain unauthorized.
+Reuben authorized remote feature-branch publication with this report. Merging this
+feature into integration/release and deployment remain unauthorized.
+
+## Integration merge, 15 October 2026
+
+Reuben authorized merging `feature/v045-integration` at `78c350c8d55`
+into this branch after the study at `c33418ac348`. The earlier FPS numbers,
+screenshots and frozen build hashes describe the pre-merge candidate. They
+have not been remeasured on the merged Studio/town content. Use the Windows
+review harness to collect fresh paired measurements before judging this head.
+This authorization is for the feature-branch sync; deployment and merging
+this feature into integration/release remain separate decisions.
+
+The merge preserves the scenery bands and incoming Studio zone isolation,
+promoted-scenery gates, rebuilt towns and set-piece resource cleanup. A new
+`zone_feature_sweep.test.ts` case exercises per-group scenery horizons together
+with Studio isolation. The graphics byte guard retains the integration hashes,
+normalizing only its config version to v21 while separately pinning the cel
+branch's v22 marker and four added knobs. Direct comparison against incoming
+`gfx.ts` found no other setting differences. The coordinator size pins use
+exact merged sizes under the existing release-sync rule; no runtime extraction
+or policy retune was added.
+
+Focused validation: 26 suites, 370 tests passed and 3 skipped; TypeScript and the
+minified Vite bundle passed. The bundle check omitted copying public assets to
+avoid duplicating them on a nearly full disk. The canonical selective gate also
+passed generated-artifact freshness, malware scanning and changed-file Biome.
+The full-suite fallback was stopped after failures, so the overall gate is not
+green and its later browser/build stages did not run. Two failures were reproduced
+as missing evidence in the existing sparse checkout (`ci_workflow.test.ts` and
+`eastbrook_polish_artifact_integrity.test.ts`). The professions maximal-blob test
+also reproduced a 249939 versus 246084 byte pin failure; that test and the entire
+simulation tree are identical to the incoming integration parent. No unrelated
+baseline fixes were made. Audit verdict: CLEAN WITH FOLLOW-UP, with full-checkout
+validation and fresh hardware measurements still required.
+
+Commands: `node_modules/.bin/tsc --noEmit`; `node scripts/gate_select.mjs`;
+`node node_modules/vitest/vitest.mjs run tests/scenery*.test.ts tests/zone_feature_sweep.test.ts tests/jungle_feature_cells.test.ts tests/renderer_resource_lifecycle.test.ts tests/gfx_override_core.test.ts tests/monolith_budget.test.ts tests/architecture.test.ts tests/cel_shading_core.test.ts tests/studio_render_builtin_gates.test.ts tests/set_piece_occluders.test.ts tests/placed_texture_tier_core.test.ts tests/localization_fixes.test.ts --maxWorkers=2`.
+The bundle used Vite's `build` API with `copyPublicDir: false` and output under
+`tmp/integration-merge-build`. Detailed local logs are `/tmp/woc-cel-merge-*.log`.
 
 ## Selected policy
 

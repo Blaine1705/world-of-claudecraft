@@ -68,9 +68,44 @@ export interface HoardBossCueView {
   targetId?: number;
 }
 
+/** One boss row of the dungeon run the local player stands in. */
+export interface DungeonRunBossView {
+  /** The boss's mob template id: the row's stable identity and its name key. */
+  mobId: string;
+  /** True while this encounter is over in this run. Dead bosses stay dead
+   *  until the claim is freed, so in play a finished row stays finished. A
+   *  boss of several bodies (the Mere Hydra's three heads) is over only while
+   *  ALL of them lie dead: one or two fallen heads leave the row open. */
+  defeated: boolean;
+}
+
+/**
+ * The group dungeon run the local player is physically inside, or null
+ * anywhere else (the open world, a delve, a rift, an arena, a raid room, or a
+ * dungeon that authors no boss list). The rows are the dungeon's own boss
+ * list in route order, decided by the sim (src/sim/instances/dungeon_run.ts),
+ * so both hosts and every surface agree on what counts as a boss.
+ *
+ * Reference-stable: a world hands back the SAME object until the run changes
+ * (a boss falls, the difficulty or the dungeon differs, the player leaves),
+ * so a consumer may diff by identity.
+ */
+export interface DungeonRunView {
+  dungeonId: string;
+  /** The difficulty the CLAIM runs on, which is what the mobs were spawned
+   *  at. Not the selector read by dungeonDifficulty(), which a leader can
+   *  flip for the next run while standing inside this one. */
+  difficulty: DungeonDifficulty;
+  bosses: readonly DungeonRunBossView[];
+}
+
 export interface IWorldDungeons {
   enterDungeon(dungeonId: string): WorldInteractionOutcome;
   leaveDungeon(): WorldInteractionOutcome;
+  // The group dungeon run the local player stands in, with each boss's
+  // defeated state, driving the HUD's dungeon objectives tracker. Null outside
+  // a tracked dungeon. Online it mirrors the self record's `dgrun` key.
+  dungeonRun: DungeonRunView | null;
   // Still-locked raids for the local player (unlock countdown in ms), driving the
   // minimap raid-lockout badge + panel. Empty when nothing is locked.
   raidLockouts(): RaidLockout[];

@@ -4,10 +4,21 @@
 // share one doorway, so dedupe by position. A door whose facade is a built
 // set piece hands that set piece's own colliders instead of the jambs: the
 // Gravewyrm Sanctum's Seal Gate (sanctum_seal_gate.ts), whose pylons ARE the
-// jambs. Extracted from colliders.ts under the monolith ratchet; the caller
-// passes its camera-top resolver.
+// jambs, and the four built entrances, each its own door: the Sunken
+// Bastion's Drowned Gate Tower, the Hollow Crypt's Fallen Chapel, the Drowned
+// Temple's Moon Stair and the Wildheart Basin's Jaguar Maw (the
+// *_entrance.ts modules beside this one). Extracted from colliders.ts under
+// the monolith ratchet; the caller passes its camera-top resolver.
 import type { Collider } from './colliders';
 import { DUNGEON_LIST } from './data';
+import {
+  DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID,
+  drownedTempleEntranceColliders,
+} from './drowned_temple_entrance';
+import {
+  HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID,
+  hollowCryptEntranceColliders,
+} from './hollow_crypt_entrance';
 import {
   DOOR_ARCH_HEIGHT,
   DOOR_ARCH_JAMB_HD,
@@ -15,6 +26,14 @@ import {
   DOOR_ARCH_JAMB_X,
 } from './prop_layout';
 import { SANCTUM_SEAL_GATE_DUNGEON_ID, sanctumSealGateColliders } from './sanctum_seal_gate';
+import {
+  SUNKEN_BASTION_ENTRANCE_DUNGEON_ID,
+  sunkenBastionEntranceColliders,
+} from './sunken_bastion_entrance';
+import {
+  WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
+  wildheartBasinEntranceColliders,
+} from './wildheart_basin_entrance';
 
 export function dungeonDoorJambColliders(
   seed: number,
@@ -30,6 +49,22 @@ export function dungeonDoorJambColliders(
     doorSpots.add(key);
     if (dungeon.id === SANCTUM_SEAL_GATE_DUNGEON_ID) {
       out.push(...sanctumSealGateColliders(seed, dungeon.doorPos));
+      continue;
+    }
+    if (dungeon.id === SUNKEN_BASTION_ENTRANCE_DUNGEON_ID) {
+      out.push(...sunkenBastionEntranceColliders(seed, dungeon.doorPos));
+      continue;
+    }
+    if (dungeon.id === HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID) {
+      out.push(...hollowCryptEntranceColliders(seed, dungeon.doorPos));
+      continue;
+    }
+    if (dungeon.id === DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID) {
+      out.push(...drownedTempleEntranceColliders(seed, dungeon.doorPos));
+      continue;
+    }
+    if (dungeon.id === WILDHEART_BASIN_ENTRANCE_DUNGEON_ID) {
+      out.push(...wildheartBasinEntranceColliders(seed, dungeon.doorPos));
       continue;
     }
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {

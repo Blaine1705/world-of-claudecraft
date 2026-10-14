@@ -121,7 +121,10 @@ export const WORLD_QUEST_ESCORTS: Record<string, EscortDef> = {
     ambushes: [
       { atWaypoint: 2, mobId: 'vale_bandit', count: 3, level: 5, radius: 6 },
       { atWaypoint: 5, mobId: 'vale_bandit', count: 4, level: 5, radius: 7 },
-      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 8 },
+      // radius 7, not 8: at 8 the fourth bandit lands against the painted
+      // smithy's north wall, 0.15 yd of clearance (spawns are not collision
+      // checked); at 7 every spawn has at least 0.95 yd
+      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 7 },
     ],
     creditRadius: 35,
     respawnSeconds: 30,

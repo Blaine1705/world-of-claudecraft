@@ -1,6 +1,6 @@
 // Boss-table eligibility is content-bounded. No character cache or random draws here.
 import { HEROIC_DUNGEON_TUNING } from './content/dungeon_difficulty';
-import { FINDER_ACTIVITIES } from './content/dungeon_finder';
+import { FINDER_ACTIVITIES, finderEncounterBodyIds } from './content/dungeon_finder';
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from './content/heroic_loot';
 import {
   NYTHRAXIS_RELOCATED_ITEM_IDS,
@@ -46,6 +46,38 @@ export const WEEKLY_BOSS_TABLES = Object.freeze(
     );
   }),
 );
+
+/** A boss made of several placed bodies, as the weekly ledger reads it. */
+export interface WeeklyBossBodies {
+  /** The encounter's own mob id: the one that owns the boss table. */
+  bossId: string;
+  /** Every placed body of the encounter, the boss itself first. */
+  bodyIds: readonly string[];
+}
+
+// A boss of several bodies (FinderEncounter.otherBodyIds: the Mere Hydra's
+// three heads) keeps ONE table, keyed on the encounter's own mob id. Its kill
+// is the death of the LAST body, whichever head that is, so every body maps to
+// the encounter here and recordWeeklyBossKill waits for all of them.
+const SEVERAL_BODIED_BOSSES: ReadonlyMap<string, WeeklyBossBodies> = new Map(
+  FINDER_ACTIVITIES.filter((activity) => activity.kind !== 'solo').flatMap((activity) =>
+    activity.encounters
+      .filter((encounter) => encounter.otherBodyIds !== undefined)
+      .flatMap((encounter) => {
+        const bodies: WeeklyBossBodies = Object.freeze({
+          bossId: encounter.mobId,
+          bodyIds: finderEncounterBodyIds(encounter),
+        });
+        return bodies.bodyIds.map((bodyId): [string, WeeklyBossBodies] => [bodyId, bodies]);
+      }),
+  ),
+);
+
+/** The several-bodied boss a mob template is one body of, or undefined for
+ *  every ordinary boss and every other mob. */
+export function weeklyBossBodies(templateId: string): WeeklyBossBodies | undefined {
+  return SEVERAL_BODIED_BOSSES.get(templateId);
+}
 
 export function sanitizeWeeklyBossUnlocks(raw: unknown): WeeklyBossUnlocks | undefined {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;

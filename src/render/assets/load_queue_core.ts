@@ -14,10 +14,24 @@
 // one slot stays free for a demand, which would otherwise wait out a download nobody asked
 // for (and its retries, when that download is failing).
 //
+// Inside each class a waiting load may also carry a RANK (load_priority_core.ts), sampled
+// when a slot frees: the lowest rank starts first, and equal ranks keep arrival order. Only
+// the Studio placed-asset stream ranks its loads (the nearest waiting placement); a load
+// with no rank is rank 0, so a queue nobody ranks is exactly first come first served.
+//
 // Pure (no Three, no DOM, no timers): the loader hands in how a start is launched.
+
+import { type AssetLoadPriority, nextPendingIndex } from './load_priority_core';
 
 /** When a waiting load may start relative to the others on its queue. */
 export type LoadPriority = 'demand' | 'background';
+
+/** One waiting start. `priority` is its in-class rank (nextPendingIndex reads it). */
+interface Waiting {
+  key: string;
+  start: LoadStart;
+  priority?: AssetLoadPriority;
+}
 
 /** A load's start. `background`: the class it was STARTED in (a promoted load starts as a
  *  demand), which it hands back to `release` when it ends. */
@@ -30,9 +44,9 @@ export class LoadQueue {
   /** The most background loads that run at once: every slot but one, and the one slot of a
    *  single-slot queue. */
   private readonly backgroundLimit: number;
-  private readonly demand: LoadStart[] = [];
+  private readonly demand: Waiting[] = [];
   /** Waiting background starts in arrival order, each under the key of its file. */
-  private readonly background: { key: string; start: LoadStart }[] = [];
+  private readonly background: Waiting[] = [];
 
   /**
    * `limit`: how many loads run at once. `launch`: how a start is run once it has a slot
@@ -47,10 +61,17 @@ export class LoadQueue {
 
   /** Queue one load. `start` runs once, when a slot is free and nothing ahead of it waits;
    *  the load calls `release` when it ends, with the class `start` was told. `key` names a
-   *  background load (its file), so a later demand for the same file can promote it. */
-  push(start: LoadStart, priority: LoadPriority = 'demand', key = ''): void {
-    if (priority === 'background') this.background.push({ key, start });
-    else this.demand.push(start);
+   *  background load (its file), so a later demand for the same file can promote it.
+   *  `rank`: its order inside its class (lower first), sampled when a slot frees. */
+  push(
+    start: LoadStart,
+    priority: LoadPriority = 'demand',
+    key = '',
+    rank?: AssetLoadPriority,
+  ): void {
+    const waiting: Waiting = { key, start, priority: rank };
+    if (priority === 'background') this.background.push(waiting);
+    else this.demand.push(waiting);
     this.pump();
   }
 
@@ -61,7 +82,7 @@ export class LoadQueue {
     if (this.background.length === 0) return;
     let kept = 0;
     for (const waiting of this.background) {
-      if (waiting.key === key) this.demand.push(waiting.start);
+      if (waiting.key === key) this.demand.push(waiting);
       else this.background[kept++] = waiting;
     }
     if (kept === this.background.length) return;
@@ -79,19 +100,26 @@ export class LoadQueue {
 
   private pump(): void {
     while (this.active < this.limit) {
-      const demand = this.demand.shift();
+      const demand = takeNext(this.demand);
       if (demand) {
         this.active++;
-        this.launch(() => demand(false));
+        this.launch(() => demand.start(false));
         continue;
       }
       // the slot kept for a demand: background work waits for one of its own to end
       if (this.activeBackground >= this.backgroundLimit) return;
-      const waiting = this.background.shift();
+      const waiting = takeNext(this.background);
       if (!waiting) return;
       this.active++;
       this.activeBackground++;
       this.launch(() => waiting.start(true));
     }
   }
+}
+
+/** The next start of one line: the lowest rank, the earliest of equal ranks. */
+function takeNext(line: Waiting[]): Waiting | undefined {
+  if (line.length === 0) return undefined;
+  const at = nextPendingIndex(line);
+  return at === 0 ? line.shift() : line.splice(at, 1)[0];
 }

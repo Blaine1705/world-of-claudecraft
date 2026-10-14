@@ -11,6 +11,8 @@ import {
   referralStampRows,
 } from './referral_cards_view';
 import { referralCardsHtml, referralText } from './referral_cards_window';
+import { referralRewardCelebration } from './referral_reward_celebration_window';
+import { type ReferralRewardClaim, ReferralRewardClaims } from './referral_reward_core';
 import type {
   ReferralCardsHost,
   ReferralCardsSnapshot,
@@ -21,7 +23,11 @@ import type {
 
 export class ReferralCardsController {
   private openState = false;
+  private readonly rewardClaims = new ReferralRewardClaims();
+  private rewardQueue: ReferralRewardClaim[] = [];
+  private rewardPrompt: ReferralRewardClaim | null = null;
   private lastRevision: number | null | undefined;
+  private lastFriendshipInviter: string | null | undefined;
   private animated = new Set<string>();
   private animations: Animation[] = [];
   private seenPrompts = new Set<string>();
@@ -61,12 +67,14 @@ export class ReferralCardsController {
     this.paintLauncher(this.host.getSnapshot());
     this.paint();
     this.host.focusWindow('#referral-cards-window');
+    this.collectRewards(this.host.getSnapshot());
     this.processPrompts(this.host.getSnapshot());
     this.scheduleCooldown();
   }
 
   close(): void {
     const wasOpen = this.openState;
+    this.rewardQueue.length = 0;
     this.dismissPrompt();
     this.stopAnimations();
     if (this.cooldownTimer !== null) clearTimeout(this.cooldownTimer);
@@ -86,8 +94,11 @@ export class ReferralCardsController {
     if (this.destroyed) return;
     const snapshot = this.host.getSnapshot();
     const revision = snapshot?.revision ?? null;
-    if (this.lastRevision === revision) return;
+    const inviter = this.host.friendshipArmour?.inviterName() ?? null;
+    if (this.lastRevision === revision && this.lastFriendshipInviter === inviter) return;
     this.lastRevision = revision;
+    this.lastFriendshipInviter = inviter;
+    this.collectRewards(snapshot);
     this.trackCooldown(snapshot);
     this.retainSnapshotState(snapshot);
     this.host.onSnapshotChange?.();
@@ -117,6 +128,7 @@ export class ReferralCardsController {
   destroy(): void {
     this.close();
     this.destroyed = true;
+    this.rewardClaims.clear();
     this.host.root.removeEventListener('click', this.onClick);
     this.host.launcher.removeEventListener('click', this.onLauncher);
     for (const launcher of this.host.extraLaunchers ?? [])
@@ -186,6 +198,13 @@ export class ReferralCardsController {
     const key = captureFocusKey(this.host.root);
     this.stopAnimations();
     this.host.root.innerHTML = referralCardsHtml(this.cooldownSnapshot(), this.animated);
+    this.lastFriendshipInviter = this.host.friendshipArmour?.inviterName() ?? null;
+    const claim = this.host.friendshipArmour?.create();
+    if (claim)
+      (
+        this.host.root.querySelector('.referral-invite') ??
+        this.host.root.querySelector('.ui-win-body')
+      )?.append(claim);
     markDialogRoot(this.host.root, { labelledBy: 'referral-cards-title' });
     if (key !== null) {
       const controls = Array.from(
@@ -311,11 +330,37 @@ export class ReferralCardsController {
   };
 
   private send(link: ReferralLinkSnapshot, action: ReferralLinkActionPayload): void {
+    if (action.type === 'redeem') {
+      const snapshot = this.host.getSnapshot();
+      if (snapshot) this.rewardClaims.request(snapshot, link, action.milestone);
+    }
     this.host.send({
       ...action,
       linkId: link.card.linkId,
       expectedRevision: link.card.revision,
     });
+  }
+
+  private collectRewards(snapshot: ReferralCardsSnapshot | null): void {
+    if (
+      this.rewardPrompt &&
+      (snapshot?.accountId !== this.rewardPrompt.accountId ||
+        snapshot.characterId !== this.rewardPrompt.characterId)
+    )
+      this.dismissPrompt();
+    this.rewardQueue.push(...this.rewardClaims.observe(snapshot));
+    if (
+      snapshot?.notices.some(
+        (notice) => notice.type === 'reason' && !this.seenPrompts.has(`notice:${notice.id}`),
+      )
+    )
+      this.rewardClaims.clear();
+    this.rewardQueue = this.rewardQueue.filter(
+      (reward) =>
+        snapshot?.accountId === reward.accountId && snapshot.characterId === reward.characterId,
+    );
+    // A page contains at most 50 links. Celebrations never retain an unbounded history.
+    if (this.rewardQueue.length > 50) this.rewardQueue.splice(0, this.rewardQueue.length - 50);
   }
 
   private processPrompts(snapshot: ReferralCardsSnapshot | null): void {
@@ -368,7 +413,24 @@ export class ReferralCardsController {
       }
     }
     const notice = snapshot.notices.find((row) => !this.seenPrompts.has(`notice:${row.id}`));
-    if (!notice) return;
+    if (!notice) {
+      const reward = this.rewardQueue.shift();
+      if (reward) {
+        this.host.playReward?.();
+        this.dialog(
+          () => referralText('celebration.title'),
+          'celebration.continue',
+          () => {},
+          this.activeLauncher,
+          false,
+          undefined,
+          undefined,
+          'cancel',
+          reward,
+        );
+      }
+      return;
+    }
     this.seenPrompts.add(`notice:${notice.id}`);
     this.host.send({ type: 'acknowledgeNotice', noticeId: notice.id });
     if (notice.type === 'reason') this.reason(notice.reason, this.activeLauncher);
@@ -456,17 +518,21 @@ export class ReferralCardsController {
     link?: ReferralLinkSnapshot,
     cancel?: () => void,
     cancelKey = 'cancel',
+    reward?: ReferralRewardClaim,
   ): void {
     this.dismissPrompt();
+    this.rewardPrompt = reward ?? null;
     this.promptReopen = () =>
-      this.dialog(text, acceptKey, accept, opener, cancellable, link, cancel, cancelKey);
+      this.dialog(text, acceptKey, accept, opener, cancellable, link, cancel, cancelKey, reward);
     this.promptLink = link ? { linkId: link.card.linkId, revision: link.card.revision } : null;
-    const element = document.createElement('div');
-    element.className = 'prompt referral-prompt';
-    const title = document.createElement('p');
-    title.className = 'prompt-text';
-    title.textContent = text();
-    element.append(title);
+    const element = reward ? referralRewardCelebration(reward) : document.createElement('div');
+    if (!reward) {
+      element.className = 'prompt referral-prompt';
+      const title = document.createElement('p');
+      title.className = 'prompt-text';
+      title.textContent = text();
+      element.append(title);
+    }
     const yes = document.createElement('button');
     yes.type = 'button';
     yes.textContent = referralText(acceptKey);
@@ -491,6 +557,7 @@ export class ReferralCardsController {
       () => {
         element.remove();
         this.prompt = null;
+        this.rewardPrompt = null;
         this.promptLink = null;
         this.promptReopen = null;
         if (this.openState && !returnTarget.isConnected)
@@ -515,6 +582,7 @@ export class ReferralCardsController {
   private dismissPrompt(): void {
     this.prompt?.dismiss();
     this.prompt = null;
+    this.rewardPrompt = null;
     this.promptLink = null;
     this.promptReopen = null;
     this.host.root.inert = false;

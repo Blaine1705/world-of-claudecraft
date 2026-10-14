@@ -26,7 +26,7 @@ Object.assign(card.participants[1], {characterId:200, characterName:'Briar', cre
 const snapshot = {revision:1, accountId:10, characterId:100, characterName:'Aster', inviteUrl:'https://example.test/?ref=invite-example', links:[{card,friendName:'Briar',canMove:false,summonRemainingSeconds:0}],completedFriends:2,rewardedTiers:[1,2],notices:[],nextCursor:8,titleOwned:true,readyCount:1};
 const actions=[];
 const focus=new FocusManager();
-const controller=createReferralCardsHud({world:()=>({referralCardsSnapshot:()=>snapshot,referralCardsAction:a=>actions.push(a)}),focus:makeWindowFocus(focus,()=>document.getElementById('referral-cards-window')),focusFirst:root=>focus.focusFirst(root),closeOthers:()=>{},visibilityChanged:()=>{},snapshotChanged:()=>{}});
+const controller=createReferralCardsHud({world:()=>({referralCardsSnapshot:()=>snapshot,referralCardsAction:a=>actions.push(a)}),focus:makeWindowFocus(focus,()=>document.getElementById('referral-cards-window')),focusFirst:root=>focus.focusFirst(root),closeOthers:()=>document.getElementById('social-window')?.classList.remove('open'),visibilityChanged:()=>{},snapshotChanged:()=>{}});
 controller.update();
 document.getElementById('mm-referral-cards').focus();
 controller.open();
@@ -39,8 +39,14 @@ const browser = await puppeteer.launch({
   headless: true,
   args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
+const deadline = setTimeout(() => {
+  console.error('Referral browser evidence exceeded 180 seconds');
+  void browser.close();
+}, 180000);
 try {
   const page = await browser.newPage();
+  page.setDefaultNavigationTimeout(90000);
+  page.setDefaultTimeout(90000);
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(`${base}/tmp/referral-cards-preview.html`, { waitUntil: 'networkidle0' });
@@ -139,6 +145,189 @@ try {
   await page.waitForFunction(() => document.activeElement?.closest('#referral-cards-window'));
   await page.evaluate(() => window.referralFixture.controller.close());
   await page.waitForFunction(() => document.activeElement?.id === 'mm-referral-cards');
+  // Exercise a user claim and then its authoritative confirmation, never an optimistic reveal.
+  await page.evaluate(() => {
+    const f = window.referralFixture;
+    delete f.snapshot.links[0].card.lockConfirmation;
+    f.snapshot.links[0].card.participants[0].credited = 3;
+    f.snapshot.links[0].card.participants[0].redeemed = 1;
+    f.snapshot.revision++;
+    f.controller.open();
+  });
+  await page.waitForFunction(
+    () => document.querySelector('[data-referral-action="redeem"]')?.disabled === false,
+  );
+  await page.click('[data-referral-action="redeem"]');
+  if (await page.$('.referral-celebration'))
+    throw new Error('Unconfirmed click showed celebration');
+  await page.evaluate(() => {
+    const f = window.referralFixture;
+    f.snapshot.links[0].card.participants[0].redeemed = 3;
+    f.snapshot.links[0].card.revision++;
+    f.snapshot.revision++;
+    f.controller.update();
+  });
+  await page.waitForSelector('.referral-celebration');
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll('.referral-celebration img')].every(
+      (img) => img.complete && img.naturalWidth,
+    ),
+  );
+  for (const [name, width, height, touch] of [
+    ['desktop', 1440, 1000, false],
+    ['mobile-portrait', 390, 844, true],
+    ['mobile-landscape', 844, 390, true],
+  ]) {
+    await page.setViewport({
+      width,
+      height,
+      deviceScaleFactor: 1,
+    });
+    await page.evaluate(
+      ({ width, height, touch }) => {
+        document.body.classList.toggle('mobile-touch', touch);
+        document.documentElement.style.setProperty('--app-vw', `${width}px`);
+        document.documentElement.style.setProperty('--app-vh', `${height}px`);
+      },
+      { width, height, touch },
+    );
+    await page.waitForFunction(() =>
+      document
+        .querySelector('.referral-celebration')
+        .getAnimations()
+        .every((a) => a.playState === 'finished'),
+    );
+    const bounds = await page.$eval('.referral-celebration', (el) => {
+      const r = el.getBoundingClientRect();
+      return {
+        clipped: r.left < 0 || r.right > innerWidth + 1 || r.top < 0 || r.bottom > innerHeight + 1,
+      };
+    });
+    if (bounds.clipped) throw new Error(`${name} reward popup clips viewport`);
+    await page.screenshot({ path: path.join(output, `reward-${name}-final.png`) });
+    console.log(`Confirmed reward captured: ${name}`);
+  }
+  for (const [name, width, height] of [
+    ['portrait', 390, 844],
+    ['landscape', 844, 390],
+  ]) {
+    await page.setViewport({ width, height, deviceScaleFactor: 1 });
+    await page.evaluate(
+      ({ width, height }) => {
+        document.getElementById('ui').style.zoom = '1.25';
+        document.documentElement.style.setProperty('--ui-scale', '1.25');
+        document.documentElement.style.setProperty('--app-vw', `${width}px`);
+        document.documentElement.style.setProperty('--app-vh', `${height}px`);
+      },
+      { width, height },
+    );
+    const rewardSafe = await page.$eval('.referral-celebration', (el) => {
+      const r = el.getBoundingClientRect();
+      return {
+        left: r.left,
+        right: r.right,
+        top: r.top,
+        bottom: r.bottom,
+        w: innerWidth,
+        h: innerHeight,
+      };
+    });
+    if (
+      rewardSafe.left < 0 ||
+      rewardSafe.right > rewardSafe.w + 1 ||
+      rewardSafe.top < 0 ||
+      rewardSafe.bottom > rewardSafe.h + 1
+    )
+      throw new Error(`125% ${name} reward clips: ${JSON.stringify(rewardSafe)}`);
+    await page.screenshot({ path: path.join(output, `reward-mobile-${name}-scaled-final.png`) });
+    console.log(`125% ${name} reward fits viewport`);
+  }
+  await page.evaluate(() => {
+    document.getElementById('ui').style.zoom = '';
+    document.documentElement.style.removeProperty('--ui-scale');
+  });
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  const motion = await page.$eval(
+    '.referral-celebration',
+    (el) => getComputedStyle(el).animationName,
+  );
+  if (motion !== 'none') throw new Error('Reduced motion still animates reward');
+  await page.screenshot({ path: path.join(output, 'reward-reduced-motion-final.png') });
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+  await page.evaluate(() => document.body.classList.add('reduce-motion'));
+  if (
+    (await page.$eval('.referral-celebration', (el) => getComputedStyle(el).animationName)) !==
+    'none'
+  )
+    throw new Error('In-game Reduce Motion still animates reward');
+  await page.evaluate(() => document.body.classList.remove('reduce-motion'));
+
+  await page.keyboard.press('Escape');
+  if (await page.$('.referral-celebration')) throw new Error('Escape failed to dismiss reward');
+  await page.evaluate(() => {
+    const f = window.referralFixture;
+    f.snapshot.revision++;
+    f.controller.update();
+  });
+  if (await page.$('.referral-celebration')) throw new Error('Snapshot replay repeated reward');
+  console.log(
+    'Confirmed reward: desktop, portrait, landscape, reduced motion, Escape and replay pass.',
+  );
+  await page.emulateMediaFeatures([]);
+  await page.evaluate(async () => {
+    const { SocialWindow } = await import('/src/ui/social_window.ts');
+    const f = window.referralFixture;
+    f.controller.close();
+    const root = document.createElement('div');
+    root.id = 'social-window';
+    root.className = 'window panel ui-window';
+    document.getElementById('ui').append(root);
+    const social = new SocialWindow({
+      root: () => root,
+      world: () => ({
+        playerId: 100,
+        player: { id: 100, name: 'Aster' },
+        realm: 'Referral preview',
+        socialInfo: { friends: [], ignores: [], blocks: [], guild: null },
+        partyInfo: null,
+        searchCharacters: async () => [],
+      }),
+      closeOthers: () => f.controller.close(),
+      hideTooltip: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+      showPrompt: () => {},
+      startWhisper: () => {},
+      openReferralCards: () => f.controller.open(),
+    });
+    window.referralFixture.social = social;
+    social.toggle();
+  });
+  for (const [name, width, height, touch] of [
+    ['desktop', 1440, 1000, false],
+    ['mobile-portrait', 390, 844, true],
+    ['mobile-landscape', 844, 390, true],
+  ]) {
+    await page.setViewport({ width, height, deviceScaleFactor: 1 });
+    await page.evaluate(
+      ({ width, height, touch }) => {
+        document.body.classList.toggle('mobile-touch', touch);
+        document.documentElement.style.setProperty('--app-vw', `${width}px`);
+        document.documentElement.style.setProperty('--app-vh', `${height}px`);
+      },
+      { width, height, touch },
+    );
+    await page.screenshot({ path: path.join(output, `social-${name}-final.png`) });
+  }
+  await page.evaluate(() => {
+    document.body.classList.remove('mobile-touch');
+    document.querySelector('[data-open-referral-cards]').focus();
+  });
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => window.referralFixture.controller.isOpen());
+  await page.evaluate(() => window.referralFixture.controller.close());
+  await page.waitForFunction(() => document.activeElement?.id === 'mm-social');
+  console.log('Social entry opens referral window and keyboard close returns to Social launcher.');
   if (errors.length) throw new Error(errors.join('\n'));
   console.log('Keyboard close returns focus to the launcher; no browser errors.');
   if (process.argv.includes('--real-hud')) {
@@ -216,7 +405,11 @@ try {
     await mobile.screenshot({ path: path.join(output, 'game-mobile-card-after.png') });
     console.log('Real game touch layout: More tray launcher opens the shared stamp card window.');
   }
+} catch (error) {
+  console.error(error);
+  throw error;
 } finally {
+  clearTimeout(deadline);
   await browser.close();
   await fs.unlink(fixture);
 }

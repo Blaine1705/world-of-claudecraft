@@ -7,6 +7,7 @@ import { FURY_STOCK } from './content/pvp_honor';
 import { DUNGEONS, ITEMS, MOBS } from './data';
 import { createNpc } from './entity';
 import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
+import { dungeonPlacedBossDead } from './instances/dungeon_gates';
 import { instanceLockoutMetas } from './instances/dungeons';
 import { RAID_MIN_PLAYERS } from './item_level';
 import { heroicLootItemId } from './loot/heroic_item';
@@ -32,6 +33,7 @@ import {
   sanitizeWeeklyBossUnlocks,
   type WeeklyBossUnlocks,
   weeklyAvailableBossTables,
+  weeklyBossBodies,
   weeklyBossTable,
 } from './weekly_reward_tables';
 
@@ -359,11 +361,21 @@ export function recordWeeklyBossKill(
   recipients: readonly PlayerMeta[],
   inst: InstanceSlot | null,
 ): void {
-  if (!inst || recipients.length === 0) return;
+  if (!inst) return;
+  // A boss of several bodies (the Mere Hydra) is one table, and it is killed
+  // when its last body falls, whichever body that is.
+  const bodies = weeklyBossBodies(boss.templateId);
+  // That last body may be one that grew back, which pays no kill credit of its
+  // own (Entity.regrown) and so arrives with no recipients: the claim's own
+  // roster below is then the whole credit list. Any other death with nobody to
+  // credit stays what it always was, no credit at all.
+  if (recipients.length === 0 && !(bodies && boss.regrown === true)) return;
+  const bossId = bodies?.bossId ?? boss.templateId;
   const dungeon = DUNGEONS[inst.dungeonId];
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
-  const table = weeklyBossTable(boss.templateId);
+  const table = weeklyBossTable(bossId);
   if (!dungeon || !tuning || table?.dungeonId !== inst.dungeonId) return;
+  if (bodies && !bodies.bodyIds.every((bodyId) => dungeonPlacedBossDead(ctx, inst, bodyId))) return;
   const raid = (dungeon.suggestedPlayers ?? 0) >= RAID_MIN_PLAYERS;
   const eligible = new Map(recipients.map((meta) => [meta.entityId, meta]));
   for (const meta of instanceLockoutMetas(ctx, inst)) eligible.set(meta.entityId, meta);
@@ -372,10 +384,10 @@ export function recordWeeklyBossKill(
       continue;
     const state = stateFor(ctx, meta);
     const tier = inst.difficulty === 'heroic' ? 2 : 1;
-    state.bossUnlocks![boss.templateId] = Math.max(state.bossUnlocks![boss.templateId] ?? 0, tier);
-    if (tuning.finalBossId !== boss.templateId) continue;
+    state.bossUnlocks![bossId] = Math.max(state.bossUnlocks![bossId] ?? 0, tier);
+    if (tuning.finalBossId !== bossId) continue;
     if (raid) {
-      const i = WEEKLY_RAID_BOSSES.indexOf(boss.templateId);
+      const i = WEEKLY_RAID_BOSSES.indexOf(bossId);
       if (i >= 0) {
         state.raids[i] = Math.max(state.raids[i], tier);
         state.raidUnlocks[i] = Math.max(state.raidUnlocks[i], tier);

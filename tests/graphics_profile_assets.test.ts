@@ -16,7 +16,9 @@ const mocks = vi.hoisted(() => {
     characters: prepare(),
     sky: prepare(),
     cliff: prepare(),
+    cityClutter: prepare(),
     town: prepare(),
+    fenbridgeTown: prepare(),
     armoury: prepare(),
     mailbox: prepare(),
     noticeboard: prepare(),
@@ -68,9 +70,17 @@ vi.mock('../src/render/cliff_scree', () => ({
   prepareCliffScreeProfileAssets: mocks.cliff,
   resetCliffScreeProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/city_clutter', () => ({
+  prepareCityClutterProfileAssets: mocks.cityClutter,
+  resetCityClutterProfileCaches: mocks.reset,
+}));
 vi.mock('../src/render/eastbrook_town', () => ({
   prepareEastbrookTownProfileAssets: mocks.town,
   resetEastbrookTownProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/fenbridge_town', () => ({
+  prepareFenbridgeTownProfileAssets: mocks.fenbridgeTown,
+  resetFenbridgeTownProfileCaches: mocks.reset,
 }));
 vi.mock('../src/render/transport_ship', () => ({
   prepareTransportShipAssets: mocks.ship,
@@ -109,6 +119,9 @@ vi.mock('../src/render/banker_chest', () => ({
 }));
 vi.mock('../src/render/door_portal', () => ({
   resetDoorPortalProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/sanctum_exit_portal', () => ({
+  resetSanctumExitPortalProfileCaches: mocks.reset,
 }));
 vi.mock('../src/render/eastbrook_surface_atlas', () => ({
   resetEastbrookSurfaceProfileCaches: mocks.reset,
@@ -166,7 +179,9 @@ const prepareSpies = [
   mocks.characters,
   mocks.sky,
   mocks.cliff,
+  mocks.cityClutter,
   mocks.town,
+  mocks.fenbridgeTown,
   mocks.armoury,
   mocks.mailbox,
   mocks.noticeboard,
@@ -197,8 +212,12 @@ describe('graphics profile asset preparation', () => {
     for (const prepare of prepareSpies.slice(0, 9)) expect(prepare).toHaveBeenCalledWith(target);
     expect(mocks.sky).toHaveBeenCalledWith(position.x, position.z, target);
     expect(mocks.cliff).toHaveBeenCalledWith(target);
+    expect(mocks.cityClutter).toHaveBeenCalledWith(target);
+    // Both towns load their placed buildings at the TARGET profile's
+    // texture tier (a rebuild prepares before the live settings switch).
+    expect(mocks.town).toHaveBeenCalledWith(target);
+    expect(mocks.fenbridgeTown).toHaveBeenCalledWith(target);
     for (const prepare of [
-      mocks.town,
       mocks.armoury,
       mocks.mailbox,
       mocks.noticeboard,
@@ -243,6 +262,7 @@ describe('graphics profile derived-cache reset', () => {
       'stations',
       'eastbrook_surface_atlas',
       'eastbrook_town',
+      'fenbridge_town',
       'banker_chest',
       'mailbox',
       'noticeboard',
@@ -250,7 +270,9 @@ describe('graphics profile derived-cache reset', () => {
       'quest_objects',
       'jail_scene',
       'cliff_scree',
+      'city_clutter',
       'door_portal',
+      'sanctum_exit_portal',
       'fireball_travel_visual',
       'frost_nova_root_visual',
       'ice_block_visual',

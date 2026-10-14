@@ -951,13 +951,15 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     vendorItems: [...FACTION_VENDOR_STOCK.rift_watch],
   },
 
-  // Church Order Quartermaster: Eastbrook Vale chapel (eastbrook_vale)
+  // Church Order Quartermaster: Eastbrook Vale chapel (eastbrook_vale). She
+  // followed the chapel to the harbour end in the Tidehold rebuild and stands
+  // at the foot of its steps beside Brother Aldric, looking up the street.
   npc_church_order_quartermaster: {
     id: 'npc_church_order_quartermaster',
     name: 'Templar Althea',
     title: 'Church Order Quartermaster',
-    pos: { x: 8, z: -80 },
-    facing: 3.14,
+    pos: { x: -72, z: -97 },
+    facing: 0,
     color: 0xecd57a,
     questIds: [],
     greeting:
@@ -979,12 +981,13 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     vendorItems: [...FACTION_VENDOR_STOCK.automatons],
   },
 
-  // World Quest Taskmaster: Eastbrook Vale central hub
+  // World Quest Taskmaster: Eastbrook Vale central hub (a step out from the
+  // apothecary's stall front, which took the ground he used to stand on)
   npc_wq_taskmaster: {
     id: 'npc_wq_taskmaster',
     name: 'Taskmaster Kaelen',
     title: 'World Quest Taskmaster',
-    pos: { x: -5, z: -95 },
+    pos: { x: -2.8, z: -96 },
     facing: -2.1,
     color: 0x8a6a50,
     questIds: [],

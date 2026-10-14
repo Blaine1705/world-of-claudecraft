@@ -244,10 +244,19 @@ describe('the Realm Builder monument as a static world service', () => {
     });
 
     expect(seated.nextId).toBe(bare.nextId);
+    // Ids, templates and footprints: nothing is renumbered or pushed aside. Heights are left
+    // out on purpose: the monument's wells record also gets a terrain calm pad
+    // (terrain_calm_anchors.ts), which legitimately reshapes the ground its neighbours stand on
+    // wherever the town's terrain is not already flat.
     const stableProjection = (sim: Sim) =>
       [...sim.entities.values()]
         .filter((entity) => entity.templateId !== REALM_BUILDER_MONUMENT_TEMPLATE_ID)
-        .map((entity) => ({ id: entity.id, templateId: entity.templateId, pos: entity.pos }));
+        .map((entity) => ({
+          id: entity.id,
+          templateId: entity.templateId,
+          x: entity.pos.x,
+          z: entity.pos.z,
+        }));
     expect(stableProjection(seated)).toEqual(stableProjection(bare));
     expect(seated.rng.next()).toBe(bare.rng.next());
   });

@@ -61,7 +61,7 @@ import {
   plateIndexAt,
 } from '../src/sim/encounters/gravewyrm_sanctum/plates';
 import { storyStep } from '../src/sim/encounters/gravewyrm_sanctum/story';
-import { dungeonGateState } from '../src/sim/instances/dungeon_gates';
+import { BOSS_ROOM_SEAL_DELAY_TICKS, dungeonGateState } from '../src/sim/instances/dungeon_gates';
 import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -975,7 +975,7 @@ describe('Korzul: Break Free, the cinematic of his pull', () => {
     expect(st(r).phase).toBe('ground');
   }, 60_000);
 
-  it('the Hollow Ward stays open through the wake and while he waits; it seals at the pull', () => {
+  it('the Hollow Ward stays open through the wake and while he waits; it seals ten seconds into the pull', () => {
     const r = room();
     r.sim.chat('/dev sanctum kill trash', r.me.id);
     const ward = DUNGEONS[DUNGEON].gates?.find((g) => g.id === 'hollow_ward');
@@ -993,6 +993,13 @@ describe('Korzul: Break Free, the cinematic of his pull', () => {
     put(r, r.me, 0, WYRMS_HOLLOW.z - 10);
     realTick(r, 2);
     expect(st(r).phase).toBe('ground');
+    // The pull starts the seal's clock; the ward shuts when it runs out
+    // (instances/dungeon_gates.ts BOSS_ROOM_SEAL_DELAY_SECONDS).
+    expect(dungeonGateState(r.sim.ctx, r.inst, ward)).toBe('open');
+    realTick(r, BOSS_ROOM_SEAL_DELAY_TICKS, () => {
+      r.me.hp = r.me.maxHp;
+    });
+    expect(r.boss.inCombat).toBe(true);
     expect(dungeonGateState(r.sim.ctx, r.inst, ward)).toBe('sealed');
   }, 60_000);
 

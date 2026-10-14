@@ -24,6 +24,8 @@ import {
   removeReferralRewards,
 } from '../src/sim/referral_rewards';
 import { Sim } from '../src/sim/sim';
+import { formatNumber } from '../src/ui/i18n';
+import { trinketTooltipLineTexts } from '../src/ui/trinket_tooltip_view';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function blank(): CharacterState {
@@ -56,6 +58,10 @@ function simWith(state: CharacterState) {
 }
 
 describe('referral reward transactions', () => {
+  it('preserves saved trinket IDs while exposing their new names', () => {
+    expect(ITEMS.referral_hollow_charm.name).toBe("Oathkeeper's Heart");
+    expect(ITEMS.referral_fog_charm.name).toBe("Awakened Oathkeeper's Heart");
+  });
   it('prices both charms at the ordinary accessory budget of their milestone bosses', () => {
     expect(itemSourceLevel(REFERRAL_HOLLOW_TRINKET)).toBe(10);
     expect(itemSourceLevel(REFERRAL_FOG_TRINKET)).toBe(13);
@@ -198,23 +204,33 @@ describe('live referral reward behavior', () => {
     expect(unearned.player.title).toBeNull();
   });
 
-  it('raises the stated low-health shield at two health scales and respects its cooldown', () => {
-    for (const level of [10, 20]) {
-      const state = hollow();
-      state.level = level;
-      state.equipment.trinket = REFERRAL_HOLLOW_TRINKET;
-      const { sim, player } = simWith(state);
-      const maxHp = player.maxHp;
-      player.hp = Math.floor(maxHp * 0.3);
-      onTrinketDamage(sim.ctx, null, player, 1, 'physical', true, null);
-      const shield = player.auras.find((a) => a.id === TRINKET_AURA.lastStand)!;
-      expect(shield).toMatchObject({ value: Math.round(maxHp * 0.1), duration: 10, value2: 0.35 });
-      expect(player.auras.find((a) => a.id === TRINKET_AURA.lastStandIcd)?.duration).toBe(120);
-      player.auras = player.auras.filter((a) => a !== shield);
-      onTrinketDamage(sim.ctx, null, player, 1, 'physical', true, null);
-      expect(player.auras.some((a) => a.id === TRINKET_AURA.lastStand)).toBe(false);
-    }
-  });
+  it.each([REFERRAL_HOLLOW_TRINKET, REFERRAL_FOG_TRINKET])(
+    '%s grants a 30% maximum-health shield matching its tooltip at two health scales',
+    (itemId) => {
+      for (const level of [10, 20]) {
+        const state = hollow();
+        state.level = level;
+        state.equipment.trinket = itemId;
+        const { sim, player } = simWith(state);
+        const maxHp = player.maxHp;
+        player.hp = Math.floor(maxHp * 0.3);
+        onTrinketDamage(sim.ctx, null, player, 1, 'physical', true, null);
+        const shield = player.auras.find((a) => a.id === TRINKET_AURA.lastStand)!;
+        expect(shield).toMatchObject({
+          value: Math.round(maxHp * 0.3),
+          duration: 10,
+          value2: 0.35,
+        });
+        const tooltip = trinketTooltipLineTexts(itemId, player)[0].text;
+        expect(tooltip).toContain(`absorbs ${formatNumber(shield.value)} damage`);
+        expect(tooltip).toContain('30% of your maximum health');
+        expect(player.auras.find((a) => a.id === TRINKET_AURA.lastStandIcd)?.duration).toBe(120);
+        player.auras = player.auras.filter((a) => a !== shield);
+        onTrinketDamage(sim.ctx, null, player, 1, 'physical', true, null);
+        expect(player.auras.some((a) => a.id === TRINKET_AURA.lastStand)).toBe(false);
+      }
+    },
+  );
 
   it('uses the evolved charm for five flat primary stats for 15 seconds on a 120-second cooldown', () => {
     const state = grantReferralReward(hollow(), 1, 'fogbinder');

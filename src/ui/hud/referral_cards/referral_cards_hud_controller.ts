@@ -1,4 +1,5 @@
 import type { IWorld } from '../../../world_api';
+import { createFriendshipArmourClaim } from '../../friendship_armour_claim';
 import { svgIcon } from '../../ui_icons';
 import type { WindowFocusBridge } from '../../window_focus';
 import { ReferralCardsController } from './referral_cards_controller';
@@ -11,6 +12,7 @@ export function createReferralCardsHud(deps: {
   closeOthers(): void;
   visibilityChanged(): void;
   snapshotChanged(): void;
+  playReward?(): void;
 }): ReferralCardsController {
   const root = document.createElement('div');
   root.classList.add('panel');
@@ -43,7 +45,12 @@ export function createReferralCardsHud(deps: {
       return deps.world().referralCardsSnapshot();
     },
     send: (action) => deps.world().referralCardsAction(action),
+    friendshipArmour: {
+      inviterName: () => deps.world().player?.referralInviterName ?? null,
+      create: () => createFriendshipArmourClaim(deps.world),
+    },
     onSnapshotChange: () => deps.snapshotChanged(),
+    playReward: () => deps.playReward?.(),
     beforeOpen: () => {
       if (document.body.classList.contains('mobile-more-open')) {
         document.body.classList.remove('mobile-more-open');
@@ -52,6 +59,12 @@ export function createReferralCardsHud(deps: {
         document.getElementById('mobile-menu-anchor')?.focus();
       }
       opener = deps.focus.captureFocus();
+      // Social closes as this window opens, so return to its visible HUD entry.
+      if (opener?.closest('#social-window')) {
+        opener = document.getElementById(
+          document.body.classList.contains('mobile-touch') ? 'mobile-menu-anchor' : 'mm-social',
+        );
+      }
       if (opener?.closest('#mobile-extra-controls')) {
         opener = document.getElementById('mobile-menu-anchor');
       }

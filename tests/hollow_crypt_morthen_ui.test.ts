@@ -186,6 +186,7 @@ function promptsRig() {
     party: null,
     interactKey: 'F',
     touch: false,
+    mechanicHints: true,
   });
   const bump = () => {
     version++;

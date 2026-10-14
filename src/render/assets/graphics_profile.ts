@@ -1,6 +1,7 @@
 import { resetBankerChestProfileCaches } from '../banker_chest';
 import { prepareCanopyDetailProfileAssets } from '../canopy_detail';
 import { prepareCharacterProfileAssets, resetCharacterProfileCaches } from '../characters/assets';
+import { prepareCityClutterProfileAssets, resetCityClutterProfileCaches } from '../city_clutter';
 import { prepareCliffScreeProfileAssets, resetCliffScreeProfileCaches } from '../cliff_scree';
 import { prepareStoneDetailProfileAssets } from '../detail_normals';
 import { resetDoorPortalProfileCaches } from '../door_portal';
@@ -13,6 +14,10 @@ import {
   prepareEastbrookTownProfileAssets,
   resetEastbrookTownProfileCaches,
 } from '../eastbrook_town';
+import {
+  prepareFenbridgeTownProfileAssets,
+  resetFenbridgeTownProfileCaches,
+} from '../fenbridge_town';
 import { resetFireballTravelProfileCaches } from '../fireball_travel_visual';
 import { prepareFoliageProfileAssets, resetFoliageProfileCaches } from '../foliage';
 import { resetFrostNovaRootProfileCaches } from '../frost_nova_root_visual';
@@ -31,6 +36,7 @@ import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '
 import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
 import { resetQuestObjectProfileCaches } from '../quest_objects';
+import { resetSanctumExitPortalProfileCaches } from '../sanctum_exit_portal';
 import { ensureSkyAssetsAt } from '../sky';
 import { resetStationProfileCaches } from '../stations';
 import { resetTemporalHourglassProfileCaches } from '../temporal_hourglass_visual';
@@ -64,7 +70,9 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
   (target) =>
     Promise.all([
       prepareCliffScreeProfileAssets(target),
-      prepareEastbrookTownProfileAssets(),
+      prepareCityClutterProfileAssets(target),
+      prepareEastbrookTownProfileAssets(target),
+      prepareFenbridgeTownProfileAssets(target),
       prepareEastbrookGrandArmouryProfileAssets(),
       prepareMailboxProfileAssets(),
       prepareNoticeboardProfileAssets(),
@@ -85,6 +93,7 @@ const RESETTERS = [
   ['stations', resetStationProfileCaches],
   ['eastbrook_surface_atlas', resetEastbrookSurfaceProfileCaches],
   ['eastbrook_town', resetEastbrookTownProfileCaches],
+  ['fenbridge_town', resetFenbridgeTownProfileCaches],
   ['banker_chest', resetBankerChestProfileCaches],
   ['mailbox', resetMailboxProfileCaches],
   ['noticeboard', resetNoticeboardProfileCaches],
@@ -92,7 +101,9 @@ const RESETTERS = [
   ['quest_objects', resetQuestObjectProfileCaches],
   ['jail_scene', resetJailSceneProfileCaches],
   ['cliff_scree', resetCliffScreeProfileCaches],
+  ['city_clutter', resetCityClutterProfileCaches],
   ['door_portal', resetDoorPortalProfileCaches],
+  ['sanctum_exit_portal', resetSanctumExitPortalProfileCaches],
   ['fireball_travel_visual', resetFireballTravelProfileCaches],
   ['frost_nova_root_visual', resetFrostNovaRootProfileCaches],
   ['ice_block_visual', resetIceBlockProfileCaches],

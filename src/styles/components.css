@@ -13,6 +13,10 @@
    practice. */
 
 @layer components {
+  .friendship-armour-claim {
+    min-height: 40px;
+  }
+
   /* ---------- delve board ---------- */
   #delve-board {
     width: 360px;

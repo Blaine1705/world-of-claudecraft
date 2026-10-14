@@ -6,9 +6,48 @@ registration. The existing first referral wins. Legacy referrals are not
 retroactively eligible; their historical membership state is unknown.
 
 Every character on the referred account can claim the seven soulbound pieces.
-Initial admission grants missing pieces automatically. Full bags allow a partial
-grant; Bank > Account > Claim friendship armour retries without duplicating
-pieces already in equipment, bags, bank or courier custody.
+Initial admission grants missing pieces automatically. Full bags allow a partial grant.
+Stamp card menu (Refer a Friend) > Claim friendship armour is the manual recovery action for missing
+pieces, using `createFriendshipArmourClaim`. The shared bank only offers membership
+gear recovery. Referral-screen wiring lives on the integration branch alongside
+that screen; the membership PR supplies the reusable control without importing
+the stamp-card feature. Claims never
+duplicate pieces already in equipment, bags (including overflow), bank or courier
+custody.
+
+Claim-location validation on membership PR #4281 (2026-10-14):
+
+- `node node_modules/vitest/vitest.mjs run tests/friendship_armour_claim.test.ts tests/account_bank_window.test.ts tests/architecture.test.ts --maxWorkers=1`: 123 passed.
+- `node node_modules/vitest/vitest.mjs run --config vitest.browser.config.ts tests/browser/referral_armour.browser.test.ts`: three viewport cases passed after enforcing a 40px claim target.
+- `node node_modules/@typescript/native/bin/tsc --noEmit`: passed.
+- Scoped Biome over the changed source/tests passed; `git diff --check` passed.
+- `GATE_SELECT_BASE=25d238d80f55d85f4a95b0a57653139430fd3e43 GATE_MAX_WORKERS=1 node scripts/gate_select.mjs`: generation, freshness, SFX and security passed. The broad test phase was interrupted before a verdict to continue integration verification; this is not a green merge gate. The earlier Windows path failure documented in [PR #4281's refinement evidence](https://github.com/levy-street/world-of-claudecraft/blob/b73ea4d6b364ac76257c38c81a3fc72d6abb2b3e/docs/design/membership-refinements-verification.md) remains unresolved.
+
+The standalone browser control fixture verifies semantics and target size, not
+the destination screen. Integration carries the actual Refer a Friend wiring
+and its screen-level verification separately.
+
+Stamp-menu integration validation on PR #4423 (2026-10-14), based on
+`4a366b29899221e17e2c1851611e3bcd1251e038`:
+
+- `node node_modules/vitest/vitest.mjs run tests/friendship_referral_screen.test.ts tests/referral_cards_controller.test.ts tests/account_bank_window.test.ts tests/friendship_armour_claim.test.ts --maxWorkers=1`: 37 passed.
+- `node node_modules/@typescript/native/bin/tsc --noEmit`: passed.
+- `node node_modules/vitest/vitest.mjs run --config vitest.browser.config.ts tests/browser/friendship_referral_screen.browser.test.ts`: three viewport cases passed, covering keyboard activation, focus after repaint, 40px targets and viewport bounds.
+- The same browser file passed all three cases with Playwright context `forcedColors: 'active'` through the local `tmp/courier-forced.browser.config.ts` wrapper.
+- Scoped Biome passed; `git diff --check` passed. Frontend and test-coverage reviews found no actionable issues.
+- `GATE_SELECT_BASE=4a366b29899221e17e2c1851611e3bcd1251e038 GATE_MAX_WORKERS=1 node scripts/gate_select.mjs`: generation/freshness, SFX, security and changed-file lint passed. The broader test phase has not produced a complete passing result. This change is not certified merge-ready by the full repository gate.
+
+The actual shipping stamp-menu component was visually inspected at desktop,
+portrait and landscape sizes, including visible focus in forced colors. These
+are component fixtures, not multiplayer-world captures:
+
+| Desktop | Portrait | Landscape |
+|---|---|---|
+| ![Desktop](../screenshots/referral-armour/stamp-menu-1280x800.png) | ![Portrait](../screenshots/referral-armour/stamp-menu-390x844.png) | ![Landscape](../screenshots/referral-armour/stamp-menu-844x390.png) |
+
+| Forced colors desktop | Forced colors portrait | Forced colors landscape |
+|---|---|---|
+| ![Desktop](../screenshots/referral-armour/stamp-menu-forced-1280x800.png) | ![Portrait](../screenshots/referral-armour/stamp-menu-forced-390x844.png) | ![Landscape](../screenshots/referral-armour/stamp-menu-forced-844x390.png) |
 
 The set uses the membership armour class/specialization budget, scales with the
 wearer's level, and perfects at level 20 into item level 25. The friend does not

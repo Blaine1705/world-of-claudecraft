@@ -18,6 +18,11 @@ export interface ReferralCardsHost {
   send(action: ReferralCardsAction): void;
   beforeOpen?(): void;
   onSnapshotChange?(): void;
+  playReward?(): void;
+  friendshipArmour?: {
+    inviterName(): string | null;
+    create(): HTMLButtonElement | null;
+  };
   /** Parent owns the shared FocusManager and cross-window coordination. */
   focusWindow(selector: string): void;
   onClose(): void;

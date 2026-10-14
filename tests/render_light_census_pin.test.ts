@@ -87,6 +87,11 @@ const ALLOWED: Readonly<Record<string, CensusEntry>> = {
     reason:
       'same shape as foliage_impostor.ts: the dome and key light a PRIVATE scene (a local THREE.Scene inside bakeBossAtlas) rendered into a render target and then dropped, so neither is ever in the world light census; BossImpostorField adds only a Group to the world scene, and the bake runs once per session behind the atlasKey latch',
   },
+  'placed_imposters.ts': {
+    kinds: ['HemisphereLight'],
+    reason:
+      'the Studio placed-asset impostor atlas bake (the foliage_impostor.ts twin) lights a PRIVATE bake scene rendered into a render target, never part of the world light census',
+  },
   'characters/preview.ts': {
     kinds: ['HemisphereLight', 'DirectionalLight'],
     reason:
@@ -183,6 +188,7 @@ describe('the src/render light census', () => {
       'characters/preview.ts',
       'foliage_impostor.ts',
       'mount_preview.ts',
+      'placed_imposters.ts',
       'renderer.ts',
     ]);
   });

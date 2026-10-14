@@ -268,6 +268,14 @@ export const SETTING_RANGES = {
 export const BOOL_SETTINGS = {
   // Optional mainland directions, independent of quest tracking and graphics quality.
   eastbrookGuidance: { def: true },
+  // on by default: the ADVISORY dungeon alerts, the tip panel over the action
+  // bar that names a mechanic and says what to do about it (the encounter
+  // alert family, src/ui/hud/dungeon/dungeon_prompt_policy_core.ts). Off hides only
+  // those tips. The prompts a player presses or steers by (the Iron Cage
+  // escape, Gaoler Ossick's chain alert, the use prompt) are not governed by
+  // it. A player-chosen interface preference, never a graphics-tier knob: no
+  // preset, effects profile or governor reads or writes it.
+  showDungeonHints: { def: true },
   // Icon flow of the standalone buff/debuff rows (the Frames Settings menu in
   // edit mode). Off = the stock right-to-left growth (the rows anchor beside
   // the minimap and fill toward the screen centre); on = left to right, via

@@ -658,7 +658,7 @@ export const guideStrings = {
     // Death and recovery: light penalty, no lost progress.
     deathTitle: 'When you fall',
     deathBody:
-      "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
+      "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance or, in most dungeons, in the arena of the last boss your group has already beaten when the way there is safe. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
     // Threat: how an enemy picks who to hit (src/sim/threat.ts, and the healing
     // split in src/sim/combat/heal.ts, which keys on the HEALED target's hate
     // tables, not on party membership).
@@ -822,6 +822,15 @@ export const guideStrings = {
     // is a standing tracker regardless of where it is earned.
     hubPracticeTrackerBody:
       'Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.',
+
+    // The dungeon objectives tracker (src/ui/hud/dungeon/dungeon_tracker_*):
+    // added ALONGSIDE the trackers above for the same reason, and it is also
+    // this page's prose for its HUD_FRAME_SPECS row. The rows are the sim's own
+    // boss list (src/sim/instances/dungeon_run.ts), so nothing here names a
+    // dungeon or a boss. Wordy (M16): the five non-Latin fills land in this
+    // same change.
+    dungeonTrackerBody:
+      "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
 
     chatTitle: 'The chat box',
     chatBody:

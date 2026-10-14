@@ -77,6 +77,13 @@ export const referralCardStrings = {
   friendTier: 'Friends helped: {count}',
   awarded: 'Awarded',
   pending: 'Not yet awarded',
+  celebration: {
+    earned: 'Adventure rewarded',
+    title: 'Reward claimed!',
+    titleReward: 'Title unlocked: {title}',
+    together: 'Earned together with {friend}.',
+    continue: 'Keep adventuring',
+  },
   milestones: {
     tutorial: 'Tutorial Island final quest',
     hollow: 'Into the Hollow',

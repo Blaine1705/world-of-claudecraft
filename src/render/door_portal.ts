@@ -6,6 +6,7 @@ import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { buildSanctumExitPortal } from './sanctum_exit_portal';
 import { markOwnedMaterial, markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { applyWornStone } from './worn_stone';
 
@@ -247,7 +248,7 @@ function cloneWildheartGate(): THREE.Object3D | null {
 // rather than a rotating ball. White so the material colour tints it per rank.
 let riftPortalTex: THREE.CanvasTexture | null = null;
 
-function riftPortalTexture(): THREE.CanvasTexture | null {
+export function riftPortalTexture(): THREE.CanvasTexture | null {
   if (riftPortalTex) return riftPortalTex;
   if (typeof document === 'undefined') return null;
   const S = 256;
@@ -987,6 +988,22 @@ export function doorArchAuthoredElsewhere(
   // The Gravewyrm Sanctum's Seal Gate (sanctum_seal_gate.ts) is the door: its
   // pylons frame the walk-in lane and its cold mist film is the portal look.
   if (dungeonId === 'gravewyrm_sanctum') return true;
+  // The Sunken Bastion's Drowned Gate Tower (sunken_bastion_entrance.ts) is
+  // the door: its inner arch frames the walk-in lane and the flooded passage
+  // it draws behind the arch is the portal look.
+  if (dungeonId === 'sunken_bastion') return true;
+  // The Hollow Crypt's Fallen Chapel (hollow_crypt_entrance.ts) is the door:
+  // its stair-house portal frames the walk-in lane and the stair it draws
+  // behind the arch is the portal look.
+  if (dungeonId === 'hollow_crypt') return true;
+  // The Drowned Temple's Moon Stair (drowned_temple_entrance.ts) is the door:
+  // its moongate ring frames the walk-in lane and the film of cold moonlight
+  // it draws in the ring is the portal look.
+  if (dungeonId === 'drowned_temple') return true;
+  // The Wildheart Basin's Jaguar Maw (wildheart_basin_entrance.ts) is the
+  // door: its muzzle frames the walk-in lane and the flooded throat it draws
+  // behind the fangs is the portal look.
+  if (dungeonId === 'wildheart_basin') return true;
   // The raid family's overworld door belongs to its chain HEAD (the
   // Forge-Lift since the lift became the first room; the Halls id stays
   // covered so a chain reshuffle can never resurrect the generic arch
@@ -1020,6 +1037,9 @@ export function buildDoorBody(
   dungeonId: string | null | undefined,
   lowGfx: boolean,
 ): { body: THREE.Group; portal?: THREE.Mesh } {
+  if (!entering && dungeonId === SANCTUM_EXIT_DUNGEON) {
+    return buildSanctumExitPortal(lowGfx, riftPortalTexture());
+  }
   const body = new THREE.Group();
   // Doors whose visible arch is authored elsewhere render only an invisible
   // click-box: the Nythraxis crypt arch is baked into that dungeon's
@@ -1092,4 +1112,31 @@ export function buildDoorBody(
     if (!wildheartGate) body.scale.setScalar(1.65);
   }
   return { body, portal };
+}
+
+/** The dungeon whose exit draws its own body (sanctum_exit_portal.ts). */
+const SANCTUM_EXIT_DUNGEON = 'gravewyrm_sanctum';
+
+/**
+ * The door family's boot prewarm bodies, side by side in one group: the
+ * generic entrance and exit arches, and the Gravewyrm Sanctum's frost exit.
+ * The frost exit is the only door body whose textured membrane no other boot
+ * artifact links, and it first appears in the seconds after a boss kill, so
+ * it is staged here rather than left to its view's gate. The renderer places
+ * the group, links it with the monolithic compile and tears it out at world
+ * entry; every material and geometry under it is a shared, process-lifetime
+ * resource, exactly the instances the live views draw.
+ */
+export function buildDoorPrewarmBodies(lowGfx: boolean): THREE.Group {
+  const group = new THREE.Group();
+  const bodies = [
+    buildDoorBody(true, null, lowGfx).body,
+    buildDoorBody(false, null, lowGfx).body,
+    buildDoorBody(false, SANCTUM_EXIT_DUNGEON, lowGfx).body,
+  ];
+  bodies.forEach((body, i) => {
+    body.position.x = (i - (bodies.length - 1) / 2) * 6;
+    group.add(body);
+  });
+  return group;
 }

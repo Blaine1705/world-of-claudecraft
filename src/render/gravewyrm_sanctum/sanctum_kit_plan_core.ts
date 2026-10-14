@@ -78,7 +78,8 @@ export const SANCTUM_KIT_SIZES: Readonly<Record<string, readonly [number, number
   Kit_Pyre: [2.6, 2.6, 2.4],
   Kit_GoadRack: [3.1, 1.0, 2.4],
   Kit_ChainHeap: [18.7, 17.4, 6.0],
-  Kit_ChainAnchor: [14.9, 32.2, 8.2],
+  // Height above its base; the loose tail hangs below the ledge.
+  Kit_ChainAnchor: [14.6, 28.5, 8.2],
   Kit_RuneWall: [28.0, 8.3, 17.0],
   Kit_SmithsHammer: [6.6, 15.0, 3.1],
   Kit_VigilCairn: [1.8, 1.9, 2.4],

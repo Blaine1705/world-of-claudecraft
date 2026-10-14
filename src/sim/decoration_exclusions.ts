@@ -28,6 +28,35 @@ const EXCLUSIONS = [
   { x: 370.69166315346956, z: 1915.294014248997 },
   { x: 375.35517376009375, z: 1926.9491909733042 },
   { x: 373.5998047152534, z: 1939.6218792777508 },
+  // The Sunken Bastion's Drowned Gate Tower: a rock inside the west tower's
+  // drum, and a tree against the east tower whose crown filled its hoarding.
+  { x: 53.64584932429716, z: 511.6929228263907 },
+  { x: 37.96934285759926, z: 518.8265399737284 },
+  // The Wildheart Basin's Jaguar Maw: the great palm that grew on the door
+  // itself, in the walk-in lane under the fangs, and the palm in its forecourt
+  // that stood between the road's end and the maw.
+  { x: -237.19542878307402, z: 1093.0744675970636 },
+  { x: -246.96982042654417, z: 1079.8916892490815 },
+  // Eastbrook's painted buildings (the Tidehold rebuild, eastbrook_layout.ts):
+  // the scatter that stood on the ground they took. The chapel's four, the
+  // last of them on its door step.
+  { x: -72.872, z: -101.956 },
+  { x: -62.186, z: -102.367 },
+  { x: -58.645, z: -107.878 },
+  { x: -64.218, z: -97.913 },
+  // A boulder wedged in the alley between the chapel and the smithy's forge
+  // shelter, and the tree behind the shelter.
+  { x: -52.853, z: -116.816 },
+  { x: -46.382, z: -120.497 },
+  // Under the tavern's north eaves.
+  { x: -35.756, z: -58.377 },
+  { x: -30.413, z: -59.072 },
+  // The bank's five.
+  { x: 23.486, z: -127.802 },
+  { x: 26.947, z: -110.899 },
+  { x: 35.861, z: -127.765 },
+  { x: 34.664, z: -111.777 },
+  { x: 43.681, z: -111.512 },
 ];
 
 export function isExcludedDecoration(x: number, z: number): boolean {
@@ -41,6 +70,14 @@ const STREETLAMP_EXCLUSIONS = [
   { x: 460.6305996347541, z: 1028.5178347589988 },
   // The North Watch battery: a Wraithwood lamp inside the east firing lane.
   { x: 400.2, z: 1817 },
+  // Eastbrook's main street: the lamp the road plan stands a stride and a
+  // half off the painted smithy's door step, square in the way in.
+  { x: -33.44783716157823, z: -103.6111100755925 },
+  // Fenbridge's painted buildings (fenbridge_layout.ts): the south road's last
+  // lamp, on the inn's door step, and the north street's lamp under the
+  // chapel's eaves by its bell tower.
+  { x: 4.25, z: 297.4690161983138 },
+  { x: -13.06878557216685, z: 310.4292763607378 },
 ];
 
 export function isExcludedStreetlamp(x: number, z: number): boolean {

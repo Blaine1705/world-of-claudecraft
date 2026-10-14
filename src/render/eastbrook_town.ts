@@ -6,8 +6,11 @@ import { EASTBROOK_LAYOUT, localToWorld, wallSegmentMirrored } from '../sim/east
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
+import { mediaAssetExists } from './assets/media';
 import { registerDeferredPreload } from './assets/preload';
+import { activeWorldHasAuthoredTown } from './authored_town_gate';
 import { buildEastbrookHarbor } from './eastbrook_harbor';
+import { buildEastbrookPlacedBuilding, isPlacedBuildingAsset } from './eastbrook_placed_building';
 import {
   applyEastbrookTownSurfaceDetail,
   EASTBROOK_SURFACE_ATLAS_URL,
@@ -27,7 +30,7 @@ import {
 } from './eastbrook_town_visibility_core';
 import { buildEastbrookWeeklyVault, WEEKLY_VAULT_TRIANGLES } from './eastbrook_weekly_vault';
 import { indexExactVertexTuples } from './exact_index_geometry';
-import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { EMISSIVE_GLOW, GFX, type GfxSettings, surfaceMat } from './gfx';
 import { type KitWindowPane, kitWindowPanes } from './kit_window_panes_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import {
@@ -37,6 +40,8 @@ import {
   occluderFadeRecordFor,
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
+import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 import {
   buildRealmBuilderMonumentBody,
   buildRealmBuilderMonumentFx,
@@ -102,14 +107,29 @@ const ASSET_INSTANCE_COUNTS = (() => {
 const loadedSources = new Map<string, THREE.Group>();
 const preparedTemplates = new Map<string, TownAssetTemplate>();
 const sourceLoadTasks = new Map<string, Promise<void>>();
+/** The FILE each resident source was read from. A placed building's URL names
+ *  the model; the file follows the profile's texture tier (same geometry, see
+ *  placed_texture_tier_core.ts), so everything else here stays keyed on the
+ *  URL and a tier change is one replaced source. */
+const loadedSourceFiles = new Map<string, string>();
 
-function prepareTownSource(url: string): Promise<void> {
-  if (loadedSources.has(url)) return Promise.resolve();
+function townSourceFile(url: string, tier: PlacedTextureTier): string {
+  return isPlacedBuildingAsset(url) ? placedTextureTierPath(url, tier, mediaAssetExists) : url;
+}
+
+function prepareTownSource(url: string, tier = GFX.placedTextureTier): Promise<void> {
+  const file = townSourceFile(url, tier);
+  const residentFile = loadedSourceFiles.get(url);
+  if (loadedSources.has(url) && residentFile === file) return Promise.resolve();
   const existing = sourceLoadTasks.get(url);
   if (existing) return existing;
-  const task = loadGltf(url)
+  const task = loadGltf(file)
     .then((gltf) => {
       loadedSources.set(url, gltf.scene);
+      loadedSourceFiles.set(url, file);
+      // The tier this replaces is no longer wanted: drop its cache entry (the
+      // retiring view's clones keep its textures alive until they go).
+      if (residentFile !== undefined && residentFile !== file) releaseGltf(residentFile);
       sourceLoadTasks.delete(url);
     })
     .catch((err) => {
@@ -120,8 +140,17 @@ function prepareTownSource(url: string): Promise<void> {
   return task;
 }
 
-export function prepareEastbrookTownProfileAssets(): Promise<void> {
-  return Promise.all(ALL_ASSET_URLS.map(prepareTownSource)).then(() => undefined);
+/**
+ * `target` is the profile about to be activated: a rebuild prepares its assets
+ * BEFORE the live settings switch, so the texture tier must come from the
+ * target, never from the profile being retired.
+ */
+export function prepareEastbrookTownProfileAssets(
+  target: Pick<GfxSettings, 'placedTextureTier'> = GFX,
+): Promise<void> {
+  return Promise.all(
+    ALL_ASSET_URLS.map((url) => prepareTownSource(url, target.placedTextureTier)),
+  ).then(() => undefined);
 }
 
 export function resetEastbrookTownProfileCaches(): void {
@@ -365,14 +394,19 @@ function isKitBuildingAsset(url: string): boolean {
  * Assets that keep their OWN GLB materials instead of being baked into the
  * vertex-colour micro-batch.
  *
- * Two different reasons land here. The kit buildings' colour lives in KTX2
+ * Three different reasons land here. The kit buildings' colour lives in KTX2
  * palette textures the CPU cannot sample. The Realm Builder monument is a
  * judgement call: its baked albedo carries the carving that makes it a statue
  * rather than a shape, and the owner rejected the palette-colour version on
- * sight, so it draws as its own textured prop.
+ * sight, so it draws as its own textured prop. The placed Tidehold buildings
+ * are painted: every wall and roof carries its relief in its own atlases.
  */
 function keepsOwnMaterials(url: string): boolean {
-  return isKitBuildingAsset(url) || url === EASTBROOK_LAYOUT.civic.monument.assetId;
+  return (
+    isKitBuildingAsset(url) ||
+    isPlacedBuildingAsset(url) ||
+    url === EASTBROOK_LAYOUT.civic.monument.assetId
+  );
 }
 
 // Kit materials keep their GLB textures; on the Lambert tiers they downgrade
@@ -1193,8 +1227,36 @@ function buildFromTemplates(
 
   const roofHideTargets: RoofHideTarget[] = [];
   const buildingGroups: THREE.Object3D[] = [];
-  for (const building of EASTBROOK_LAYOUT.buildings) {
+  // The document may own the town's BUILDINGS as placements (the
+  // promoted-scenery contract): only the building loop stands down, the
+  // wells, stalls, fences, streets, wall and harbor stay town-drawn.
+  const buildingsPromoted = activeWorldPromoted('authoredTowns');
+  const buildingList = buildingsPromoted ? [] : EASTBROOK_LAYOUT.buildings;
+  for (const building of buildingList) {
     const kitTemplate = templates.get(building.assetId);
+    if (kitTemplate?.raw && isPlacedBuildingAsset(building.assetId)) {
+      // A painted Tidehold building, stood as the Studio map stands it
+      // (eastbrook_placed_building.ts). A reveal root and a roof-hide target
+      // like every other building, so the two lists stay index-aligned.
+      const placed = buildEastbrookPlacedBuilding(building, kitTemplate.raw, groundAt);
+      group.add(placed.group);
+      roofHideTargets.push({
+        group: placed.group,
+        mats: placed.mats,
+        hidden: false,
+        alpha: 1,
+        x: building.position.x,
+        z: building.position.z,
+        halfWidth: building.nativeDimensions.width / 2,
+        halfDepth: building.nativeDimensions.depth / 2,
+        cosine: Math.cos(building.rotation),
+        sine: Math.sin(building.rotation),
+        topY: placed.topY,
+        cullRadius: placed.cullRadius,
+      });
+      buildingGroups.push(placed.group);
+      continue;
+    }
     if (kitTemplate?.raw) {
       const built = buildKitBuilding(building, kitTemplate.raw, groundAt);
       group.add(built.group);
@@ -1424,7 +1486,10 @@ export function buildEastbrookTownView(seed: number): EastbrookTownView {
   // root stays isolated, while loader-owned decoded sources can be released and
   // a later same-page switch to the built-in world remains synchronous.
   if (loadedSources.size > 0) prepareTemplates(loadedSources, preparedTemplates, true);
-  if (getActiveWorldContent() !== BUILTIN_WORLD) {
+  // Data-gated, not identity-gated: an editor copy of the built-in world
+  // still carries this town's buildings and must get its real art, or the
+  // kit buildings it replaces draw in Studio instead (authored_town_gate.ts).
+  if (!activeWorldHasAuthoredTown(isEastbrookRebuildBuilding)) {
     return buildFromTemplates(preparedTemplates, () => 0, false, undefined);
   }
   prepareTemplates(loadedSources, preparedTemplates, true);
@@ -1546,10 +1611,20 @@ export function eastbrookTownTriangleBudget(
     };
   });
   const assetTriangles = assets.reduce((sum, asset) => sum + asset.repeatedTriangles, 0);
-  const maximumFoundationTriangles = EASTBROOK_LAYOUT.buildings.length * 12;
+  // A placed building buries its own footing and draws no skirt.
+  const maximumFoundationTriangles =
+    EASTBROOK_LAYOUT.buildings.filter((building) => !isPlacedBuildingAsset(building.assetId))
+      .length * 12;
   const proceduralTriangles = WEEKLY_VAULT_TRIANGLES;
   const maximumRuntimeTriangles = assetTriangles + maximumFoundationTriangles + proceduralTriangles;
-  const hardCeiling = 40_000;
+  // The Tidehold rebuild: the eleven kit shells (21,924 triangles between
+  // them) gave way to six painted buildings (46,128, furniture included), so
+  // the ceiling moved from 40,000 to 64,000, the measured total plus a
+  // twentieth. Fenbridge's town draws under 88,000 by the same rule. Two
+  // levers stay unpulled: dropping the furniture groups from buildings nobody
+  // can enter (22,128 of those triangles), and the far twins
+  // (`<name>.lod.glb`) the placed-asset pipeline already swaps to at range.
+  const hardCeiling = 64_000;
   // Round 8 (owner): raised 30,000 to 33,000 to pay for the Realm Builder
   // monument at full sculpt resolution and double size. The earlier pass
   // collapse-decimated the statue to 45 percent to fit under 30,000, and the

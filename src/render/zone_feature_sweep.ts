@@ -12,6 +12,7 @@ import { updateSceneryGeometryLod } from './scenery_geometry_lod';
 import {
   type FeatureFootprint,
   isZoneFeatureInReach,
+  isZoneFeatureInRect,
   isZoneFeatureShadowCasting,
   isZoneFeatureVisible,
   zoneFeatureReach,
@@ -66,6 +67,12 @@ export function zoneFeatureEntryFor(
  * pass would otherwise redraw whole neighbour towns that cannot land one
  * texel in the shadow volume), with the per-mesh castShadow writes made only
  * on a state flip, never as a steady per-frame traversal.
+ *
+ * `isolate` is the editor's zone-isolate rect: it narrows visibility from
+ * "near enough to see" to "belongs to the isolated zone" (streetlamps,
+ * braziers and water flora register one cull child PER ZONE, so the rect test
+ * lands at the right granularity). It gates drawing only; the shadow cull is
+ * an independent gate.
  */
 export function sweepZoneFeatures(
   entries: readonly ZoneFeatureEntry[],
@@ -73,6 +80,7 @@ export function sweepZoneFeatures(
   camZ: number,
   cullFar: number | ((group: THREE.Group) => number),
   shadowHalfExtent: number,
+  isolate: { minX: number; maxX: number; minZ: number; maxZ: number } | null = null,
 ): void {
   for (const entry of entries) {
     updateSceneryGeometryLod(entry.group, camX, camZ, GFX.sceneryGeometryLodDistance);
@@ -84,7 +92,8 @@ export function sweepZoneFeatures(
         camX,
         camZ,
         typeof cullFar === 'number' ? cullFar : cullFar(entry.group),
-      );
+      ) &&
+      (!isolate || isZoneFeatureInRect(entry.footprint, isolate));
     const casting = isZoneFeatureShadowCasting(
       entry.footprint,
       camX,

@@ -267,7 +267,9 @@ describe('the Sanctum alert: the trash debuffs', () => {
       const v = at(stacks);
       expect(v.visible && v.kind).toBe('rime');
       if (v.visible) {
-        expect(v.line).toBe(`Creeping Rime ${stacks}/5: step out of the whelps' breath`);
+        expect(v.line).toBe(
+          `Leave the whelps' breath to avoid freezing solid at full stacks: Creeping Rime ${stacks}/5`,
+        );
         expect(v.progress).toBeCloseTo(0.5);
       }
     }
@@ -328,7 +330,7 @@ describe('the use prompt view', () => {
     expect(v.title).toBe('Soul Brazier');
     expect(v.key).toBe('F');
     expect(v.hint).toBe('Topple the Soul Brazier onto them');
-    expect(v.line).toBe('Kick it over onto the pack: the spill burns them');
+    expect(v.line).toBe('Topple the brazier onto nearby enemies to burn them with the spill');
     expect(v.pressable).toBe(true);
     expect(v.bodyId).toBe(50);
     expect(v.buttonAria).toBe('Topple the Soul Brazier');
@@ -507,6 +509,7 @@ function promptsRig() {
     party: null,
     interactKey: 'F',
     touch: false,
+    mechanicHints: true,
   });
   return { layer, prompts, calls, frame, brazier };
 }

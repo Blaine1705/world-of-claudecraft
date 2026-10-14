@@ -19,3 +19,14 @@ has a server identity, so rendering a repeated snapshot does not repeat a prompt
 Animation and prompt history retain only the current bounded page and notice batch.
 The real-browser fixture in `scripts/referral_cards_screenshots.mjs` verifies desktop,
 portrait and landscape fit, touch-target sizing, explicit redemption and focus return.
+
+`referral_reward_core.ts` tracks only locally requested claims, keyed to account,
+character, link, milestone and expected card revision. A later authoritative redeemed
+bit confirms success. Initial loads, replayed snapshots, transfers and rejected claims
+never create celebrations. `referral_reward_celebration_window.ts` builds the reward
+artwork reveal; the controller queues it behind consent and refusal prompts using the
+shared dialog lifecycle. Its finite CSS effects honor both OS and in-game reduced
+motion. Achievement audio plays once when a new confirmed celebration opens.
+
+Social offers a Refer a Friend entry alongside the existing stamp launchers. Opening
+from Social returns keyboard focus to its visible HUD launcher after the card closes.
