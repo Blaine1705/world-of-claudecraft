@@ -156,3 +156,51 @@ describe('tidehold texture-tier files', () => {
     expect(ASSET_CATALOG.some((a) => a.id === 'tidehold/smithy')).toBe(true);
   });
 });
+
+// The Fenrire look (Fenbridge's buildings, src/sim/fenbridge_layout.ts): the
+// same models re-baked wearing the moss-grown town maps. A look is only sound
+// while it is the same model with other pictures and nothing else: the town's
+// collision boxes, its seat and the Studio's baked rows all read the default
+// model's numbers.
+const LOOK_BUILDINGS = ['hall', 'house_a', 'shop_a', 'shop_b', 'tavern'];
+const LOOK_TIERS = ['.glb', '.half.glb', '.quarter.glb'];
+
+function imageBytes({ json, bin }: Glb, name: string): Buffer {
+  const image = json.images.find((img: { name: string }) => img.name === name);
+  expect(image, name).toBeDefined();
+  const view = json.bufferViews[image.bufferView];
+  const at = view.byteOffset ?? 0;
+  return bin.subarray(at, at + view.byteLength);
+}
+
+describe('the Fenrire look', () => {
+  it.each(
+    LOOK_BUILDINGS.flatMap((b) => LOOK_TIERS.map((t) => [`fenrire/${b}${t}`, `${b}${t}`] as const)),
+  )('%s is %s with other pictures and nothing else', (lookFile, baseFile) => {
+    const base = read(baseFile);
+    const look = read(lookFile);
+    expect(shape(look)).toBe(shape(base));
+    expect(images(look)).toEqual(images(base).map((img) => ({ ...img, mime: 'image/ktx2' })));
+    // ...and really repainted: the walls atlas is not the default look's bytes
+    const walls = `${baseFile.replace(/\..*$/, '')}_walls_color`;
+    expect(imageBytes(look, walls).equals(imageBytes(base, walls)), walls).toBe(false);
+  });
+
+  it('every look file is in the media manifest, and each model is a placeable asset', () => {
+    const exists = (p: string) => MEDIA_ASSETS[p.replace(/^\/+/, '')] !== undefined;
+    for (const b of LOOK_BUILDINGS) {
+      const model = `/models/tidehold/fenrire/${b}.glb`;
+      expect(exists(model), model).toBe(true);
+      expect(placedTextureTierPath(model, 'half', exists)).toBe(
+        `/models/tidehold/fenrire/${b}.half.glb`,
+      );
+      expect(placedTextureTierPath(model, 'quarter', exists)).toBe(
+        `/models/tidehold/fenrire/${b}.quarter.glb`,
+      );
+      expect(
+        ASSET_CATALOG.some((a) => a.id === `tidehold/fenrire/${b}`),
+        b,
+      ).toBe(true);
+    }
+  });
+});
