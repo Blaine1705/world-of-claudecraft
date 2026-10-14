@@ -237,6 +237,7 @@ import { markSpawnIntroSeen, readSpawnIntroSeen } from './game/spawn_intro_seen'
 import { createStartPanelNavigation } from './game/start_panel_navigation';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import {
+  bootOfflinePlay,
   initAudioOnFirstGesture,
   registerStudioAudioTeardown,
   resolveStudioEntry,
@@ -9232,11 +9233,8 @@ function wireStartScreens(): void {
     offlineNameInput.classList.remove('user-invalid-fallback');
     offlineNameInput.removeAttribute('aria-invalid');
 
-    audio.init();
-    music.init();
-    sfx.init();
     const name = sanitizeOfflineName(rawName);
-    void startOffline(cls, name, selectedSkin('#offline-skin-row', offlineSkin));
+    void bootOfflinePlay(startOffline, cls, name, selectedSkin('#offline-skin-row', offlineSkin));
   };
 
   const handleOfflineSelect = () => {

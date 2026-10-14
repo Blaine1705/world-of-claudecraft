@@ -63,8 +63,16 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
   keyed off their `*_manifest.generated.ts`; a missing clip is a silent no-op (the
   dialogue/combat text stays the source of truth).
 - **`AudioContext` needs a user gesture**: `audio.init()`/`music.init()`/`sfx.init()`
-  are called from `enterWorld` in `main.ts`, not at module load. `setVolume` is safe
+  are called from `enterWorld` in `main.ts` (online) and from the offline Play click
+  through `bootOfflinePlay` in `studio_boot.ts`, not at module load. `setVolume` is safe
   before init. (`voice.ts` uses a plain `Audio` element, so it has no gated init.)
+- **Offline Play boots the built-in world unless a published map is asked for.**
+  `?offlineWorld=<slug>` on the page, or `VITE_OFFLINE_WORLD=<slug>` in a developer's own
+  `.env.local`, boots that Studio-published map with the character just made
+  (`offlineWorldSlug` in `studio_boot.ts`; `builtin` always means the built-in world).
+  It is a switch and never the default: a published map is an authored world and runs
+  without what only the built-in world has (the ferry, stations and mailboxes,
+  graveyards). Pinned by `tests/studio_boot.test.ts`.
 - **SFX assets follow one standard.** Every clip under `public/audio/sfx/` is MP3
   44.1 kHz, 192 kbps, normalized loudness, and mono, EXCEPT non-positional
   ambience beds explicitly flagged `stereo: true` in the catalog. Positioned
