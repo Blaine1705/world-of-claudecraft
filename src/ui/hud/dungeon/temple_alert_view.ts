@@ -12,7 +12,7 @@
 //  - a False Note: that tile was out of turn, the answer starts over;
 //  - her voice is broken: the damage window is open.
 // Every bar is the clock the sim runs (her bar, or her aura's time left).
-// Priority: the false note (it just happened) over the step-off hint over the
+// Priority: personal Spent Voice over a false note over the step-off hint over the
 // answer over the melody over the window. The painter is the shared encounter
 // alert's (encounter_alert_painter.ts); every decision is here.
 
@@ -22,12 +22,14 @@ import {
   SELTHE_SCORE,
   SELTHE_SCORE_ANSWER,
   SELTHE_SCORE_WARD,
+  SELTHE_SPENT_VOICE,
   SELTHE_TUNING,
 } from '../../../sim/encounters/drowned_temple/ids';
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
 export type TempleAlertKind =
+  | 'score-spent'
   | 'score-false'
   | 'score-step-off'
   | 'score-answer'
@@ -37,6 +39,7 @@ export type TempleAlertKind =
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const TEMPLE_ALERT_KINDS: readonly TempleAlertKind[] = [
+  'score-spent',
   'score-false',
   'score-step-off',
   'score-answer',
@@ -79,6 +82,7 @@ export const EMPTY_TEMPLE_SCENE: TempleAlertScene = { selthe: null, tiles: [] };
 export interface TempleAlertInput {
   /** The local player (the tile they stand on). */
   selfPos?: { x: number; z: number };
+  auras?: readonly AlertAura[];
   scene?: TempleAlertScene;
 }
 
@@ -146,6 +150,14 @@ export function buildTempleAlertView(input: TempleAlertInput): TempleAlertView {
     }
     const notes = ward?.stacks ?? 0;
     const values = { done: count(done), total: count(notes), place: count(nextPlace) };
+    if (auraOf(input.auras, SELTHE_SPENT_VOICE))
+      return alert(
+        'score-spent',
+        t('hudChrome.templeAlert.spentTitle'),
+        t('hudChrome.templeAlert.spentLine', values),
+        left,
+        total,
+      );
     if (sour)
       return alert(
         'score-false',

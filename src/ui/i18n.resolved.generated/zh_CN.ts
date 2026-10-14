@@ -4188,8 +4188,9 @@ export const zh_CN: EnTranslations = {
         "idolAwake": "石美洲豹已经苏醒。每{every}秒，它会在地面预警{warning}秒后，轮流向平台的一半吐息：对该半场的所有人造成{min}到{max}点自然伤害（英雄难度{heroicMin}到{heroicMax}点）。祖尔加会保持美洲豹化身直到死亡，并且每{seconds}秒更换猎物（英雄难度{heroicSeconds}秒）。"
       },
       "temple": {
-        "scoreWard": "正在吟唱乐谱：在结束前不会受到伤害。在乐句结束前，按石板响起的顺序踏上月光石板，即可使她的嗓音破碎。如果乐句先结束，不谐之音会对庭院中的所有人造成{min}到{max}点冰霜伤害（英雄难度下为{heroicMin}到{heroicMax}点）。",
-        "brokenVoice": "她的嗓音已破碎：在此效果结束前，她受到的伤害提高{pct}%。"
+        "scoreWard": "正在吟唱乐谱：在结束前不会受到伤害。在乐句结束前，按石板响起的顺序踏上月光石板，即可使她的嗓音破碎。轮流踩踏：奏响音符后，须等待另一名玩家奏响下一个正确音符。唯一的幸存者可以独自完成。如果乐句先结束，不谐之音会对庭院中的所有人造成{min}到{max}点冰霜伤害（英雄难度下为{heroicMin}到{heroicMax}点）。",
+        "brokenVoice": "她的嗓音已破碎：在此效果结束前，她受到的伤害提高{pct}%。",
+        "spentVoice": "另一名玩家奏响下一个正确音符前，你无法奏响月亮地砖。在此期间踩上地砖不会重置应答，也不会对你造成伤害。无法驱散。当你成为同一副本内唯一存活的玩家或乐谱结束时移除。"
       },
       "bastion": {
         "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}点自然伤害，最多持续{seconds}秒。打断或击晕潮缚侍僧即可挣脱。",
@@ -6654,11 +6655,13 @@ export const zh_CN: EnTranslations = {
     },
     "templeAlert": {
       "melodyTitle": "乐谱",
-      "melodyLine": "注意月光石板依次响起的顺序。等她唱完后，按同样的顺序踏上石板",
-      "melodyDarkLine": "注意月光石板依次响起的顺序并记住它。在你作答之前，石板会变暗",
+      "melodyLine": "观察月亮地砖依次奏响。与另一名玩家轮流踩出相同顺序",
+      "melodyDarkLine": "在地砖熄灭前记住顺序。与另一名玩家轮流踩出相同顺序",
       "answerTitle": "回应乐谱！",
-      "answerLine": "踏上标有{place}的月光石板。已奏响：{done}/{total}",
-      "answerDarkLine": "按记住的顺序踏上石板。再次踏上同一块石板前，先走下去。已奏响：{done}/{total}",
+      "answerLine": "轮流踩踏：踩上标记为{place}的月亮地砖。已奏响：{done}/{total}",
+      "answerDarkLine": "轮流凭记忆重复顺序。再次踩同一块地砖前先离开。已奏响：{done}/{total}",
+      "spentTitle": "该由另一道声音应答",
+      "spentLine": "另一名玩家奏响下一个正确音符前，你无法奏响地砖。已奏响：{done}/{total}",
       "stepOffTitle": "先走下去，再踏上来",
       "stepOffLine": "月光石板只有在有人踏上时才会奏响。离开这块石板，然后重新踏上去",
       "falseTitle": "错音！",

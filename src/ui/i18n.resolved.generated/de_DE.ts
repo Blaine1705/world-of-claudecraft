@@ -4188,8 +4188,9 @@ export const de_DE: EnTranslations = {
         "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
       },
       "temple": {
-        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
-        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends."
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends.",
+        "spentVoice": "You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends."
       },
       "bastion": {
         "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
@@ -6654,11 +6655,13 @@ export const de_DE: EnTranslations = {
     },
     "templeAlert": {
       "melodyTitle": "The Score",
-      "melodyLine": "Watch the moon tiles ring one after another. When she finishes, step onto them in that same order",
-      "melodyDarkLine": "Watch the moon tiles ring one after another and remember the order. They go dark before you answer",
+      "melodyLine": "Watch the moon tiles ring one after another. Repeat the order, taking turns with another player",
+      "melodyDarkLine": "Remember the order before the tiles go dark. Repeat it, taking turns with another player",
       "answerTitle": "Answer the Score!",
-      "answerLine": "Step onto the moon tile marked {place}. Sounded: {done} of {total}",
-      "answerDarkLine": "Repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "answerLine": "Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "spentTitle": "Another voice must answer",
+      "spentLine": "You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}",
       "stepOffTitle": "Step off, then back on",
       "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
       "falseTitle": "False Note!",

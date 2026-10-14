@@ -7,8 +7,8 @@
 //                first time, four the second.
 //   The answer   the verse stays open for 14 s (16 s the second time). The
 //                group steps on those tiles in that same order. A step counts
-//                when a player ENTERS a tile, any player may step any tile,
-//                and a tile already sounded is inert.
+//                when a player ENTERS a tile. Correct notes alternate players
+//                while more than one is alive; already sounded tiles are inert.
 //   False Note   a tile stepped out of turn stings whoever stepped it and
 //                sends the answer back to its first tile; the clock runs on.
 //   Broken Voice the last tile sounded in time: her voice breaks. Stunned 4 s
@@ -68,6 +68,12 @@ import {
   scoreNoteRing,
   scoreNotesOf,
 } from './ids';
+import {
+  clearScoreRelay,
+  recordScoreSinger,
+  refreshScoreRelay,
+  scoreSingerBlocked,
+} from './selthe_score_relay';
 
 const T = SELTHE_TUNING;
 /** After a Score her next mark and her next bar wait at least this long. */
@@ -199,6 +205,7 @@ export function startScore(
     rung: 0,
     noteIn: T.scoreIntro,
     progress: 0,
+    lastSingerId: null,
     inside: st.tiles.map(() => []),
     sour: [],
   };
@@ -234,6 +241,7 @@ export function startScore(
 /** The Score is over: the ward falls, the tiles go dormant, her clocks take a
  *  breath before they run again. */
 function closeScore(ctx: SimContext, boss: Entity, st: SeltheFightState): void {
+  clearScoreRelay(ctx, boss.id);
   st.score = null;
   clearCastOf(boss, SELTHE_SCORE);
   clearCastOf(boss, SELTHE_SCORE_ANSWER);
@@ -368,6 +376,7 @@ function stepAnswer(
   const o = ctx.instanceOriginOf(inst);
   const players = claimPlayers(ctx, inst);
   const steps: { tile: number; player: Entity }[] = [];
+  refreshScoreRelay(ctx, boss, sc, players);
   for (let i = 0; i < st.tiles.length; i++) {
     const was = sc.inside[i];
     const now: number[] = [];
@@ -376,7 +385,8 @@ function stepAnswer(
       const on = was.includes(p.id);
       if (!onMoonTile(st.tiles[i], p.pos.x - o.x, p.pos.z - o.z, on)) continue;
       now.push(p.id);
-      if (!on) steps.push({ tile: i, player: p });
+      // A blocked entry is consumed without a penalty or a queued future note.
+      if (!on && !scoreSingerBlocked(sc, players, p.id)) steps.push({ tile: i, player: p });
     }
     sc.inside[i] = now;
   }
@@ -387,7 +397,9 @@ function stepAnswer(
     found = false;
     for (let i = 0; i < steps.length; i++) {
       if (steps[i].tile !== sc.order[sc.progress]) continue;
+      if (scoreSingerBlocked(sc, players, steps[i].player.id)) continue;
       sc.progress++;
+      recordScoreSinger(ctx, boss, sc, players, steps[i].player.id);
       cue(ctx, boss, st.tiles[steps[i].tile].objectId, SELTHE_TILE_SOUNDED);
       steps.splice(i, 1);
       found = true;
@@ -399,6 +411,7 @@ function stepAnswer(
   // too; duplicate correct steps stay harmless regardless of tile order.
   let falseNote = false;
   for (const step of steps) {
+    if (scoreSingerBlocked(sc, players, step.player.id)) continue;
     // A tile already sounded is inert: only a tile still to come is false.
     const place = sc.order.indexOf(step.tile) + 1;
     if (place > 0 && place <= sc.progress) continue;
@@ -456,6 +469,7 @@ function dropScoreAuras(boss: Entity): void {
 /** A dev trigger's clean slate: a running Score and the last one's window
  *  end quietly (no Discord, no stun); the tiles stay standing. */
 export function resetScoreRun(ctx: SimContext, boss: Entity, st: SeltheFightState): void {
+  clearScoreRelay(ctx, boss.id);
   if (st.score) closeScore(ctx, boss, st);
   st.scoreQueued = false;
   dropScoreAuras(boss);
@@ -468,6 +482,7 @@ export function resetScore(
   boss: Entity,
   st: SeltheFightState | null,
 ): void {
+  clearScoreRelay(ctx, boss.id);
   if (st) {
     for (const tile of st.tiles) dropEncounterObject(ctx, inst, tile.objectId);
     st.tiles = [];

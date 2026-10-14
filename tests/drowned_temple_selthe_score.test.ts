@@ -545,9 +545,10 @@ describe('the answer: step ONTO the tiles in the order they rang', () => {
     const { f, b, st, order } = answering();
     const broke: number[] = [];
     for (let i = 0; i < order.length; i++) {
-      put(f, f.others[0], OFF.x, OFF.z);
+      const runner = f.others[i % 2];
+      put(f, runner, OFF.x, OFF.z);
       tick(f);
-      put(f, f.others[0], st.tiles[order[i]].x, st.tiles[order[i]].z);
+      put(f, runner, st.tiles[order[i]].x, st.tiles[order[i]].z);
       for (const ev of events(f))
         if (ev.type === 'spellfx' && ev.ability === SELTHE_VOICE_BREAKS) broke.push(ev.targetId);
     }
@@ -667,14 +668,16 @@ describe('the answer: step ONTO the tiles in the order they rang', () => {
     run(f, T.scoreSourSeconds + 0.1);
     expect(looks(f, st)[order[2]]).toEqual({ state: 'lit', place: 3 });
     // The answer still works from the first tile.
-    for (const tile of order) stepOn(f, st, f.others[0], tile);
+    order.forEach((tile, i) => {
+      stepOn(f, st, f.others[(i + 1) % 2], tile);
+    });
     expect(aura(b, SELTHE_BROKEN_VOICE)).toBeDefined();
   });
 
   it('a tile that is not in the melody is wrong too; a tile already sounded is inert', () => {
     const { f, st, sc, order } = answering();
     stepOn(f, st, f.others[0], order[0]);
-    stepOn(f, st, f.others[0], order[1]);
+    stepOn(f, st, f.tank, order[1]);
     expect(sc.progress).toBe(2);
     // Back over the first tile: nothing happens.
     const from = f.hits.length;
@@ -748,7 +751,9 @@ describe('the answer: step ONTO the tiles in the order they rang', () => {
         .filter((h) => h.ability === 'False Note')
         .map((h) => h.targetId),
     ).toEqual([f.others[2].id]);
-    for (const tile of order) stepOn(f, st, f.tank, tile);
+    order.forEach((tile, i) => {
+      stepOn(f, st, i % 2 ? f.others[0] : f.tank, tile);
+    });
     expect(aura(b, SELTHE_BROKEN_VOICE)).toBeDefined();
   });
 });

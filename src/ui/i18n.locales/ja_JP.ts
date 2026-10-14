@@ -21668,14 +21668,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // broken voice, her two bars): the M16 non-Latin fills of its new English.
   'hudChrome.templeAlert.melodyTitle': '楽譜',
   'hudChrome.templeAlert.melodyLine':
-    '月のタイルが順番に鳴るのを見ておけ。彼女が歌い終えたら、同じ順番でタイルに踏み入れ',
+    '月のタイルが順番に鳴るのを見ておけ。仲間と交代しながら同じ順番で踏め',
   'hudChrome.templeAlert.melodyDarkLine':
-    '月のタイルが順番に鳴るのを見て、順番を覚えろ。答える前にタイルは暗くなる',
+    'タイルが暗くなる前に順番を覚えろ。仲間と交代しながら同じ順番で踏め',
   'hudChrome.templeAlert.answerTitle': '楽譜に答えろ！',
   'hudChrome.templeAlert.answerLine':
-    '{place}の印がある月のタイルに踏み入れ。鳴らした数：{total}枚中{done}枚',
+    '交代して踏め。{place}の印がある月のタイルに踏み入れ。鳴らした数：{total}枚中{done}枚',
   'hudChrome.templeAlert.answerDarkLine':
-    '覚えた順番どおりに踏め。同じタイルを踏み直すには、一度降りること。鳴らした数：{total}枚中{done}枚',
+    '交代しながら覚えた順番どおりに踏め。同じタイルを踏み直すには、一度降りること。鳴らした数：{total}枚中{done}枚',
   'hudChrome.templeAlert.stepOffTitle': '一度降りて、踏み直せ',
   'hudChrome.templeAlert.stepOffLine':
     '月のタイルは誰かが踏み入った時にだけ鳴る。このタイルから降りて、もう一度踏み入れ',
@@ -21686,7 +21686,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め',
   'hudChrome.templeAlert.timeAria': '残り{seconds}秒',
   'hudChrome.auraEffect.temple.scoreWard':
-    '楽譜を歌っている：終わるまでダメージを受けない。歌が終わる前に、鳴った順番どおりに月のタイルへ踏み入ると彼女の声が砕ける。先に歌が終わると、不協和音が広間の全員に{min}から{max}の冷気ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。',
+    '楽譜を歌っている：終わるまでダメージを受けない。歌が終わる前に、鳴った順番どおりに月のタイルへ踏み入ると彼女の声が砕ける。交代して踏むこと。音を鳴らしたら、別のプレイヤーが次の正しい音を鳴らすまで待つ。生存者が一人なら、一人で最後まで答えられる。先に歌が終わると、不協和音が広間の全員に{min}から{max}の冷気ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。',
   'hudChrome.auraEffect.temple.brokenVoice':
     '声が砕けている：この効果が終わるまで受けるダメージが{pct}%増加する。',
   'abilityUi.cast.temple_score': '楽譜',
@@ -21694,4 +21694,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // The Dungeon Finder's line for Selthe's Score (M16).
   'hudChrome.finder.mech.the_score':
     '楽譜（彼女は二度、月のタイルで旋律を歌う：鳴った順番どおりに踏み入ると彼女の声が砕ける）',
+  'hudChrome.templeAlert.spentTitle': '次は別の人が答える番',
+  'hudChrome.templeAlert.spentLine':
+    '別のプレイヤーが次の正しい音を鳴らすまで、タイルを鳴らせない。鳴らした数：{total}枚中{done}枚',
+  'hudChrome.auraEffect.temple.spentVoice':
+    '別のプレイヤーが次の正しい音を鳴らすまで、月のタイルを鳴らせない。この間にタイルを踏んでも答えはリセットされず、ダメージも受けない。解除不可。同じインスタンスで生きているプレイヤーが自分だけになるか、楽譜が終了すると解除される。',
 };

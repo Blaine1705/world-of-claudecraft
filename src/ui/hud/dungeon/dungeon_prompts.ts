@@ -264,7 +264,11 @@ export class DungeonPrompts {
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
     const temple = dungeonPromptEnabled('temple', hints)
-      ? buildTempleAlertView({ selfPos: p.pos, scene: this.templeScene.update(f.world) })
+      ? buildTempleAlertView({
+          selfPos: p.pos,
+          auras: p.auras,
+          scene: this.templeScene.update(f.world),
+        })
       : HINT_HIDDEN;
     this.temple.paint(temple);
     // The use prompt last: it yields the shared slot to any prompt showing

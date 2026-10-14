@@ -194,6 +194,7 @@ describe('the Temple alert view: Selthe’s Score', () => {
         'score-broken',
         'score-false',
         'score-melody',
+        'score-spent',
         'score-step-off',
       ].sort(),
     );
@@ -232,6 +233,7 @@ describe('the Temple alert reads the live fight', () => {
       const v = buildTempleAlertView({
         scene: scan.update(world()),
         selfPos: { x: p.pos.x, z: p.pos.z },
+        auras: p.auras,
       });
       return v.visible ? v : null;
     };
@@ -267,6 +269,7 @@ describe('the Temple alert reads the live fight', () => {
     put(f, f.others[0], st.tiles[order[0]].x, st.tiles[order[0]].z);
     expect(look(f.others[0])?.kind).toBe('score-step-off');
     stepOn(f, st, f.others[0], order[0]);
+    expect(look(f.others[0])?.kind).toBe('score-spent');
     expect(look(f.tank)?.line).toBe(
       t('hudChrome.templeAlert.answerLine', { place: '2', done: '1', total: '3' }),
     );
@@ -275,7 +278,7 @@ describe('the Temple alert reads the live fight', () => {
     expect(look(f.tank)?.kind).toBe('score-false');
     run(f, T.scoreSourSeconds + 0.1);
     expect(look(f.tank)?.kind).toBe('score-answer');
-    for (const i of order) stepOn(f, st, f.others[0], i);
+    for (let i = 0; i < order.length; i++) stepOn(f, st, f.others[(i + 1) % 2], order[i]);
     const broken = look(f.tank);
     expect(broken?.kind).toBe('score-broken');
     expect(broken?.progress).toBeGreaterThan(0.9);

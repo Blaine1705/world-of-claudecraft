@@ -13,6 +13,7 @@ import {
   SELTHE_BROKEN_VOICE_EXPOSED,
   SELTHE_ID,
   SELTHE_SCORE_WARD,
+  SELTHE_SPENT_VOICE,
   SELTHE_TUNING,
 } from '../sim/encounters/drowned_temple/ids';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
@@ -29,6 +30,8 @@ export function templeHeroicAmount(mobId: string, amount: number): number {
 /** The Temple aura's descriptor, or null when `a` is not one of them. */
 export function templeAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
   switch (a.id) {
+    case SELTHE_SPENT_VOICE:
+      return { key: `${KEY}.spentVoice` };
     case SELTHE_SCORE_WARD:
       return {
         key: `${KEY}.scoreWard`,

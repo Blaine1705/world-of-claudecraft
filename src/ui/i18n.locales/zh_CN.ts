@@ -20607,14 +20607,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
   // broken voice, her two bars): the M16 non-Latin fills of its new English.
   'hudChrome.templeAlert.melodyTitle': '乐谱',
-  'hudChrome.templeAlert.melodyLine':
-    '注意月光石板依次响起的顺序。等她唱完后，按同样的顺序踏上石板',
-  'hudChrome.templeAlert.melodyDarkLine':
-    '注意月光石板依次响起的顺序并记住它。在你作答之前，石板会变暗',
+  'hudChrome.templeAlert.melodyLine': '观察月亮地砖依次奏响。与另一名玩家轮流踩出相同顺序',
+  'hudChrome.templeAlert.melodyDarkLine': '在地砖熄灭前记住顺序。与另一名玩家轮流踩出相同顺序',
   'hudChrome.templeAlert.answerTitle': '回应乐谱！',
-  'hudChrome.templeAlert.answerLine': '踏上标有{place}的月光石板。已奏响：{done}/{total}',
+  'hudChrome.templeAlert.answerLine':
+    '轮流踩踏：踩上标记为{place}的月亮地砖。已奏响：{done}/{total}',
   'hudChrome.templeAlert.answerDarkLine':
-    '按记住的顺序踏上石板。再次踏上同一块石板前，先走下去。已奏响：{done}/{total}',
+    '轮流凭记忆重复顺序。再次踩同一块地砖前先离开。已奏响：{done}/{total}',
   'hudChrome.templeAlert.stepOffTitle': '先走下去，再踏上来',
   'hudChrome.templeAlert.stepOffLine':
     '月光石板只有在有人踏上时才会奏响。离开这块石板，然后重新踏上去',
@@ -20624,7 +20623,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.templeAlert.brokenLine': '在效果结束前，她受到的伤害提高{pct}%：现在使用你最强的攻击',
   'hudChrome.templeAlert.timeAria': '剩余{seconds}秒',
   'hudChrome.auraEffect.temple.scoreWard':
-    '正在吟唱乐谱：在结束前不会受到伤害。在乐句结束前，按石板响起的顺序踏上月光石板，即可使她的嗓音破碎。如果乐句先结束，不谐之音会对庭院中的所有人造成{min}到{max}点冰霜伤害（英雄难度下为{heroicMin}到{heroicMax}点）。',
+    '正在吟唱乐谱：在结束前不会受到伤害。在乐句结束前，按石板响起的顺序踏上月光石板，即可使她的嗓音破碎。轮流踩踏：奏响音符后，须等待另一名玩家奏响下一个正确音符。唯一的幸存者可以独自完成。如果乐句先结束，不谐之音会对庭院中的所有人造成{min}到{max}点冰霜伤害（英雄难度下为{heroicMin}到{heroicMax}点）。',
   'hudChrome.auraEffect.temple.brokenVoice':
     '她的嗓音已破碎：在此效果结束前，她受到的伤害提高{pct}%。',
   'abilityUi.cast.temple_score': '乐谱',
@@ -20632,4 +20631,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // The Dungeon Finder's line for Selthe's Score (M16).
   'hudChrome.finder.mech.the_score':
     '乐谱（她会两次在月光石板上吟唱旋律：按石板响起的顺序踏上去，即可使她的嗓音破碎）',
+  'hudChrome.templeAlert.spentTitle': '该由另一道声音应答',
+  'hudChrome.templeAlert.spentLine':
+    '另一名玩家奏响下一个正确音符前，你无法奏响地砖。已奏响：{done}/{total}',
+  'hudChrome.auraEffect.temple.spentVoice':
+    '另一名玩家奏响下一个正确音符前，你无法奏响月亮地砖。在此期间踩上地砖不会重置应答，也不会对你造成伤害。无法驱散。当你成为同一副本内唯一存活的玩家或乐谱结束时移除。',
 };

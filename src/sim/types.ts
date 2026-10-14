@@ -5643,6 +5643,8 @@ export interface SeltheScoreState {
   noteIn: number;
   /** Answer: tiles sounded in order so far. */
   progress: number;
+  /** Last correct singer, independent of the display aura and wrong notes. */
+  lastSingerId: number | null;
   /** Who stands on each tile (player ids, by tile), so a step counts once,
    *  on the way in. */
   inside: number[][];

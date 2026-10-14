@@ -89,6 +89,8 @@ export const SELTHE_SOLO_MARK = 'temple_solo_mark';
 /** Her ward while a Score runs: she takes no damage (stacks: the melody's
  *  notes; value2 1 when the tiles go dark for the answer, heroic). */
 export const SELTHE_SCORE_WARD = 'temple_score_ward';
+/** The last correct singer waits for a different player to sound a note. */
+export const SELTHE_SPENT_VOICE = 'temple_spent_voice';
 /** The Score was answered: her voice breaks and she reels (a stun), */
 export const SELTHE_BROKEN_VOICE = 'temple_broken_voice';
 /** ...and takes more damage for a while longer. */

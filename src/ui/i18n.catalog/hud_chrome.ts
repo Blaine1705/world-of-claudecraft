@@ -5369,8 +5369,10 @@ export const hudChromeStrings = {
     // Wordy (M16): non-Latin fills in the overlays.
     temple: {
       scoreWard:
-        'Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.',
+        'Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.',
       brokenVoice: 'Her voice is broken: she takes {pct}% more damage until this ends.',
+      spentVoice:
+        'You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends.',
     },
     // The Sunken Bastion's boss marks (src/ui/bastion_aura_effect.ts).
     // Wordy (M16): non-Latin fills in the overlays.
@@ -9577,13 +9579,16 @@ export const hudChromeStrings = {
   templeAlert: {
     melodyTitle: 'The Score',
     melodyLine:
-      'Watch the moon tiles ring one after another. When she finishes, step onto them in that same order',
+      'Watch the moon tiles ring one after another. Repeat the order, taking turns with another player',
     melodyDarkLine:
-      'Watch the moon tiles ring one after another and remember the order. They go dark before you answer',
+      'Remember the order before the tiles go dark. Repeat it, taking turns with another player',
     answerTitle: 'Answer the Score!',
-    answerLine: 'Step onto the moon tile marked {place}. Sounded: {done} of {total}',
+    answerLine: 'Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}',
     answerDarkLine:
-      'Repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}',
+      'Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}',
+    spentTitle: 'Another voice must answer',
+    spentLine:
+      'You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}',
     stepOffTitle: 'Step off, then back on',
     stepOffLine:
       'A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again',
