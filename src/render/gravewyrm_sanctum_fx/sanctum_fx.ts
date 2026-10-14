@@ -10,7 +10,8 @@
 //    bar, and the spilled soulfire patches burning on the ice for their 10 s
 //    (violet-green flames inside the edge, a glow under them, steam);
 //  - the creature layers it composes: the Tusker's sledge and body
-//    (tusker_fx.ts) and the trash (sanctum_trash_fx.ts), through the pooled
+//    (tusker_fx.ts), its bait rework (tusker_bait_fx.ts: the ice outcrops, the
+//    stuck window, the soulfire trail) and the trash (sanctum_trash_fx.ts), through the pooled
 //    particles (smoke, glow, soulfire and pyre flames), the shock rings and
 //    the ice shards it lends them (sanctum_fx_host.ts).
 //
@@ -28,10 +29,12 @@ import {
   SANCTUM_TOSS_RING,
   SCALEGUARD_ID,
   SLEDGE_TUSKER_ID,
+  TUSKER_BREAKS_FREE,
   TUSKER_ENRAGE,
   TUSKER_SPILLED_BRAZIERS,
   TUSKER_TRAMPLE,
   TUSKER_TUSK_SWEEP,
+  TUSKER_TUSKS_STICK,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import {
   SANCTUM_BRANDING_IRON,
@@ -94,6 +97,7 @@ import type { SanctumFxHost } from './sanctum_fx_host';
 import { SanctumKitFx } from './sanctum_kit_fx';
 import { SanctumShards } from './sanctum_shards';
 import { SanctumTrashFx } from './sanctum_trash_fx';
+import { TuskerBaitFx } from './tusker_bait_fx';
 import { TuskerFx } from './tusker_fx';
 
 const CAST_SLOTS = 10;
@@ -174,6 +178,8 @@ export class SanctumFx {
   /** The trash mechanics pass (tethers, eruption, lash, fracture, topple). */
   private readonly kitFx: SanctumKitFx | null;
   private readonly tusker: TuskerFx | null;
+  /** The Tusker's bait rework (outcrops, the stuck window, the soulfire trail). */
+  private readonly bait: TuskerBaitFx | null;
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly geometries: THREE.BufferGeometry[] = [];
@@ -338,6 +344,7 @@ export class SanctumFx {
     const host = this.host();
     this.trash = world ? new SanctumTrashFx(host, world, glowTex) : null;
     this.kitFx = world ? new SanctumKitFx(host, world) : null;
+    this.bait = world ? new TuskerBaitFx(host, world) : null;
     this.tusker = world
       ? new TuskerFx(scene, host, world, compileGate, playGesture, glowTex ?? undefined)
       : null;
@@ -453,6 +460,9 @@ export class SanctumFx {
       case TUSKER_SPILLED_BRAZIERS:
       case TUSKER_ENRAGE:
         return this.tusker?.handleEvent(ev, src) ?? false;
+      case TUSKER_TUSKS_STICK:
+      case TUSKER_BREAKS_FREE:
+        return this.bait?.handleEvent(ev, src) ?? false;
       case SANCTUM_GOAD:
       case SANCTUM_SOULFIRE_STOKE:
       case SANCTUM_HOARFROST_POP:
@@ -498,6 +508,7 @@ export class SanctumFx {
         this.trash?.hideAll();
         this.kitFx?.hideAll();
         this.tusker?.hideAll();
+        this.bait?.hideAll();
         this.shards.hideAll();
       }
       for (const p of this.poolList) p.update(this.clock);
@@ -511,6 +522,7 @@ export class SanctumFx {
     this.trash?.update(dt, this.clock);
     this.kitFx?.update(dt, this.clock);
     this.tusker?.update(dt, this.clock);
+    this.bait?.update(dt, this.clock);
     this.shards.update(dt);
     for (const p of this.poolList) p.update(this.clock);
   }
@@ -555,7 +567,9 @@ export class SanctumFx {
       const z = caster.pos.z;
       // The lane runs down its locked facing until the road ends, measured
       // from the instance-local start exactly as the sim measured it.
-      if (slot.length < 0) slot.length = tramplePaintLength(x, z, caster.facing);
+      // A lane that touches a standing ice outcrop ends in it.
+      if (slot.length < 0)
+        slot.length = tramplePaintLength(x, z, caster.facing, this.bait?.standing() ?? []);
       this.kit.drapeLane(
         slot,
         this.groundY,
@@ -672,6 +686,7 @@ export class SanctumFx {
     let sanctum = false;
     this.tusker?.beginScan();
     this.tusker?.clearPatches();
+    this.bait?.beginScan();
     for (const e of world.entities.values()) {
       if (e.kind === 'player') continue;
       if (e.kind !== 'mob') {
@@ -686,7 +701,10 @@ export class SanctumFx {
       this.kitFx?.scanMob(e);
       if (!SANCTUM_FX_MOBS.has(e.templateId) && !this.castSpec(e.castingAbility ?? '')) continue;
       sanctum = true;
-      if (e.templateId === SLEDGE_TUSKER_ID) this.tusker?.scanTusker(e);
+      if (e.templateId === SLEDGE_TUSKER_ID) {
+        this.tusker?.scanTusker(e);
+        this.bait?.scanTusker(e);
+      }
       if (e.dead) continue;
       const castId = e.castingAbility;
       const spec = castId ? this.castSpec(castId) : undefined;
@@ -713,12 +731,14 @@ export class SanctumFx {
       slot.group.visible = true;
     }
     this.tusker?.endScan();
+    this.bait?.endScan();
     this.inSanctum = sanctum;
   }
 
   private scanObject(e: Entity): void {
     if (e.templateId === SANCTUM_TOSS_RING) this.trash?.scanRing(e);
     if (e.templateId === SANCTUM_SOULFIRE_PATCH) this.tusker?.notePatch(e);
+    if (this.bait?.scanObject(e)) return;
     const spec = this.objectSpecs[e.templateId];
     if (!spec) return;
     if (this.objects.some((o) => o.objectId === e.id)) return;
@@ -759,6 +779,10 @@ export class SanctumFx {
     if (this.tusker) {
       const tusker = this.tusker;
       attempt(() => tusker.dispose());
+    }
+    if (this.bait) {
+      const bait = this.bait;
+      attempt(() => bait.dispose());
     }
     for (const g of this.geometries) attempt(() => g.dispose());
     for (const m of this.materials) attempt(() => m.dispose());

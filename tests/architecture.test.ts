@@ -951,6 +951,9 @@ const RENDER_PURE_CORES = [
   // length, the object looks, the palette and the timelines).
   'src/render/gravewyrm_sanctum_fx/tusker_model_core.ts',
   'src/render/gravewyrm_sanctum_fx/sanctum_fx_core.ts',
+  // The Tusker's bait rework: the outcrops' looks and shape, the stuck window
+  // and the soulfire trail's life.
+  'src/render/gravewyrm_sanctum_fx/tusker_bait_fx_core.ts',
   // The trash engine's visuals: the catalog swept from the kits, the hazard
   // looks, the wall box, the nova's sight reach and wave, the use hint, the
   // freeze and encase timelines, the quench pools' placement.
