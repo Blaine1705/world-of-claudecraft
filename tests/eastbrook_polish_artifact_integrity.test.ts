@@ -1397,7 +1397,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the ClaudeCraft Studio import (PR 4479): Studio moved the renderer,
   // town runtime, civic shader and ground-sample leaves (remint_polish_provenance.mjs
   // on the merged tree). No Eastbrook capture or measured value changed.
-  'fdfcf832db28b5a2b9e47b6cbc64f1a048ef612a1651c3a8fe28865c6cdfaf19';
+  // Re-minted after Deepglass moved out of the Studio import and the default-world
+  // fast path returned (remint_polish_provenance.mjs, no capture was retaken).
+  '4bb95c49a307508970b954810b051ed46b72f291004ce6ed7957fc921d63e24d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1423,7 +1425,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the ClaudeCraft Studio import (PR 4479): Studio moved the renderer,
   // town runtime, civic shader and ground-sample leaves (remint_polish_provenance.mjs
   // on the merged tree). No Eastbrook capture or measured value changed.
-  'a889cc0e7ee97f1376bbb71cf7e660f55c5a79af6b85f2554df03b5df3db3425';
+  // Re-minted after Deepglass moved out of the Studio import and the default-world
+  // fast path returned (remint_polish_provenance.mjs, no capture was retaken).
+  'af66e9fb95de7ac214d506d52afaa47026aa160fe3bcf6f341b3fc348af18472';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2808,7 +2812,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // ClaudeCraft Studio import (PR 4479): recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('ea4a7561761e100fb196f58db75fdfe2b998a2a027edc35e21a27b6b79066e35');
+    ).toBe('9d1abf5514673e0b10f71f7eb8b58533b19d945f0a34f6fb993a030fc595e8f1');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
