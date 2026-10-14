@@ -79,6 +79,13 @@ export const zh_TW: EnTranslations = {
     "friendTier": "已幫助好友：{count}",
     "awarded": "已發放",
     "pending": "尚未發放",
+    "celebration": {
+      "earned": "冒險有回報",
+      "title": "獎勵已領取！",
+      "titleReward": "已解鎖頭銜：{title}",
+      "together": "與{friend}共同贏得。",
+      "continue": "繼續冒險"
+    },
     "milestones": {
       "tutorial": "新手島最終任務",
       "hollow": "進入空洞",
@@ -22822,10 +22829,10 @@ export const zh_TW: EnTranslations = {
         "name": "友誼背袋"
       },
       "referral_hollow_charm": {
-        "name": "空洞友誼護符"
+        "name": "守誓者之心"
       },
       "referral_fog_charm": {
-        "name": "縛霧友誼護符"
+        "name": "覺醒的守誓者之心"
       },
       "reins_referral_tank": {
         "name": "友誼坦克韁繩"

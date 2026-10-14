@@ -79,6 +79,13 @@ export const zh_CN: EnTranslations = {
     "friendTier": "已帮助好友：{count}",
     "awarded": "已发放",
     "pending": "尚未发放",
+    "celebration": {
+      "earned": "冒险有回报",
+      "title": "奖励已领取！",
+      "titleReward": "已解锁头衔：{title}",
+      "together": "与{friend}共同赢得。",
+      "continue": "继续冒险"
+    },
     "milestones": {
       "tutorial": "新手岛最终任务",
       "hollow": "进入空洞",
@@ -22822,10 +22829,10 @@ export const zh_CN: EnTranslations = {
         "name": "友谊挎包"
       },
       "referral_hollow_charm": {
-        "name": "空洞友谊护符"
+        "name": "守誓者之心"
       },
       "referral_fog_charm": {
-        "name": "缚雾友谊护符"
+        "name": "觉醒的守誓者之心"
       },
       "reins_referral_tank": {
         "name": "友谊坦克缰绳"

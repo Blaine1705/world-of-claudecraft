@@ -440,12 +440,12 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
   referral_hollow_charm: {
     cooldown: 120,
     use: { kind: 'passiveOnly' },
-    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.1, icd: 120, duration: 10 },
+    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.3, icd: 120, duration: 10 },
   },
   referral_fog_charm: {
     cooldown: 120,
     use: { kind: 'friendship', duration: 15, stats: 5 },
-    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.1, icd: 120, duration: 10 },
+    passive: { kind: 'lastStand', belowHp: 0.35, absorb: 0.3, icd: 120, duration: 10 },
   },
   bastion_sigil: {
     cooldown: 120,

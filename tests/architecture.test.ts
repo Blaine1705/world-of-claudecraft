@@ -209,6 +209,7 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/hud/referral_cards/referral_reward_core.ts',
   'src/ui/hud/courier/courier_core.ts',
   'src/ui/hud/referral_cards/referral_cards_view.ts',
   'src/ui/frame_presets_core.ts',
@@ -2930,6 +2931,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/hud/referral_cards/referral_reward_celebration_window.ts',
   'src/ui/hud/referral_cards/referral_cards_controller.ts',
   'src/ui/hud/referral_cards/referral_cards_hud_controller.ts',
   'src/ui/error_toast_controller.ts',

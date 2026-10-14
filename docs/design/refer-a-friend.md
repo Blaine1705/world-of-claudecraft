@@ -374,3 +374,43 @@ regression suites passed (47 tests). The 123 changed portrait/finder pairs were
 visually reviewed against the latest integration art; subjects, poses and framing
 are preserved. Dated merge receipts and comparison sheets remain in the existing
 `referral-portrait-render-2026-10-09` evidence directories.
+
+
+### Social entry and reward celebration, October 14
+
+The online Social window now opens Refer a Friend through a dedicated button.
+Confirmed stamp claims show reward art and names, a gold seal and finite particles,
+and the existing achievement sound. The reveal respects both reduced-motion
+settings. Failed requests, initial snapshots and replayed snapshots cannot create
+a celebration. Consent and error prompts retain priority.
+
+Both referral trinket forms absorb 30% of current maximum health for 10 seconds
+when damage leaves the wearer below 35% health, with a 120-second internal cooldown.
+The evolved active remains +5 to all five primary stats for 15 seconds. Their
+display names are Oathkeeper's Heart and Awakened Oathkeeper's Heart; saved IDs
+remain referral_hollow_charm and referral_fog_charm.
+
+The exact full-name search found no matching game item. Oathkeeper is shared
+fantasy vocabulary used across unrelated games, including the
+[FFXIV sword](https://ffxiv.consolegameswiki.com/wiki/Keeping_the_Oath) and
+[Guild Wars 2 character](https://wiki.guildwars2.com/wiki/List_of_hearts_in_Bloodtide_Coast),
+so the display name passes the repository's shared-vocabulary rule. This is a
+limited collision search, not an exhaustive catalog audit.
+
+Validation on integration base `b19441a5c70cf4ee99f082de921a676697ab1d9a`:
+
+- `pnpm run i18n:gen`: passed; wiki regeneration also passed through the gate.
+- `pnpm exec vitest run tests/referral_rewards.test.ts tests/trinket_tooltip_view.test.ts tests/trinket_aura_tooltip.test.ts tests/referral_cards_controller.test.ts tests/referral_reward_core.test.ts tests/social_guild_create_lock.test.ts --maxWorkers=1 --reporter=default`: 193 passed, one timeout in the existing Gambler's Die stress case. That case passed in the earlier run; all referral behavior and both Spanish regressions pass.
+- Earlier seven-suite run including architecture, localization and HUD performance: 552 passed, seven skipped. Three architecture scans timed out; two whole-catalog localization failures concern existing buddy labels and the Crypt Embraced `shareHeroic` token. Two Spanish test-literal encoding mistakes introduced during editing were repaired and pass in the final focused run.
+- `node scripts/malware_scan.mjs --gate`: passed (13,833 files; zero high findings after priors).
+- Scoped `node node_modules/@biomejs/biome/bin/biome check` over 20 changed/new source and test files: passed with warnings. `ci:changed` selected zero unstaged files, so it is not counted as lint coverage.
+- `GATE_SELECT_BASE=b19441a5c70cf4ee99f082de921a676697ab1d9a GATE_WORKER_TIER=low node scripts/gate_select.mjs`: artifact generation and SFX passed; stopped at i18n freshness because regenerated files are intentionally unstaged. This is not a green merge gate.
+- Frontend and test-coverage review caught and resolved failure-notice ordering, reduced-motion parity, Social focus restoration, mobile cascade/scale issues and the Spanish test encoding problem.
+
+Validation resource note: the Windows host had less than 1 MiB free physical memory while unrelated full-suite and compiler jobs ran in other worktrees. This caused long paging stalls and scan timeouts. `pnpm run check:types` was attempted twice and interrupted during the game TypeScript check because of this resource pressure; admin/bot checking did not run. No final build was completed.
+
+The final browser attempt against the fresh Vite host failed with `FATAL ERROR: Zone Allocation failed - process out of memory`. The earlier `reward-*-after.png` images in `docs/screenshots/referral-cards/` show an intermediate iteration, before the final mobile layer, centering, opacity and compact-layout fixes. They must not be cited as visual proof of those final fixes. The final source passes the two-file CSS/harness Biome check, but the 125% portrait and landscape verification must be rerun when memory is available. All task-owned preview and capture processes were stopped.
+
+QA verdict: **NOT READY for merge** until final type/build/browser checks and the canonical gate complete. This verdict describes validation readiness, independently of publication to the integration branch.
+
+The user subsequently authorized publishing this follow-up to `feature/v045-integration`. Publication does not certify a complete green QA gate. The companion economy-service work remains local as requested.

@@ -79,6 +79,13 @@ export const ko_KR: EnTranslations = {
     "friendTier": "도움을 준 친구: {count}명",
     "awarded": "지급됨",
     "pending": "아직 지급되지 않음",
+    "celebration": {
+      "earned": "모험의 결실",
+      "title": "보상 획득!",
+      "titleReward": "칭호 잠금 해제: {title}",
+      "together": "{friend} 님과 함께 획득했습니다.",
+      "continue": "모험 계속하기"
+    },
     "milestones": {
       "tutorial": "튜토리얼 섬 마지막 퀘스트",
       "hollow": "공허 속으로",
@@ -22822,10 +22829,10 @@ export const ko_KR: EnTranslations = {
         "name": "우정 가방"
       },
       "referral_hollow_charm": {
-        "name": "공허의 우정 부적"
+        "name": "맹세 수호자의 심장"
       },
       "referral_fog_charm": {
-        "name": "안개에 싸인 우정 부적"
+        "name": "각성한 맹세 수호자의 심장"
       },
       "reins_referral_tank": {
         "name": "우정 전차 고삐"

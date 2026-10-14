@@ -79,6 +79,13 @@ export const en_XA: EnTranslations = {
     "friendTier": "[Ƒŕíéñðš ĥéļþéð: {count}]",
     "awarded": "[Áŵáŕðéð]",
     "pending": "[Ñóţ ýéţ áŵáŕðéð]",
+    "celebration": {
+      "earned": "[Áðʋéñţúŕé ŕéŵáŕðéð]",
+      "title": "[Ŕéŵáŕð çļáíɱéð!]",
+      "titleReward": "[Ţíţļé úñļóçķéð: {title}]",
+      "together": "[Éáŕñéð ţóĝéţĥéŕ ŵíţĥ {friend}.]",
+      "continue": "[Ķééþ áðʋéñţúŕíñĝ]"
+    },
     "milestones": {
       "tutorial": "[Ţúţóŕíáļ Íšļáñð ƒíñáļ ɋúéšţ]",
       "hollow": "[Íñţó ţĥé Ĥóļļóŵ]",
@@ -22822,10 +22829,10 @@ export const en_XA: EnTranslations = {
         "name": "[Ƒŕíéñðšĥíþ Šáţçĥéļ]"
       },
       "referral_hollow_charm": {
-        "name": "[Ĥóļļóŵ Ƒŕíéñðšĥíþ Çĥáŕɱ]"
+        "name": "[Óáţĥķééþéŕ'š Ĥéáŕţ]"
       },
       "referral_fog_charm": {
-        "name": "[Ƒóĝƀóúñð Ƒŕíéñðšĥíþ Çĥáŕɱ]"
+        "name": "[Áŵáķéñéð Óáţĥķééþéŕ'š Ĥéáŕţ]"
       },
       "reins_referral_tank": {
         "name": "[Ƒŕíéñðšĥíþ Ţáñķ Ŕéíñš]"

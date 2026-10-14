@@ -41,7 +41,7 @@ export const REFERRAL_STAMP_ITEMS: Record<string, ItemDef> = {
   },
   [REFERRAL_HOLLOW_TRINKET]: {
     id: REFERRAL_HOLLOW_TRINKET,
-    name: 'Hollow Friendship Charm',
+    name: "Oathkeeper's Heart",
     kind: 'armor',
     slot: 'trinket',
     quality: 'uncommon',
@@ -50,7 +50,7 @@ export const REFERRAL_STAMP_ITEMS: Record<string, ItemDef> = {
   },
   [REFERRAL_FOG_TRINKET]: {
     id: REFERRAL_FOG_TRINKET,
-    name: 'Fogbound Friendship Charm',
+    name: "Awakened Oathkeeper's Heart",
     kind: 'armor',
     slot: 'trinket',
     quality: 'rare',

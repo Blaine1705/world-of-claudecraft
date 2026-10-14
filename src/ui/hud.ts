@@ -5165,10 +5165,8 @@ export class Hud {
       this.confirmDialog(title, body, okText, cancelText, onOk),
     showError: (text) => this.showError(text),
   });
-  // Social panel painter (social_view.ts core + social_window.ts painter). The
-  // window renders no item rows, so it composes no PainterHostPresentation bag; it
-  // reads/commands the live world and routes the shared chrome (whisper, confirm
-  // prompt, close-others, focus return) through these lazy closures.
+  // Social painter has no item rows, so it needs no PainterHostPresentation bag; it
+  // reads the world and routes shared whisper, prompt and focus chrome through closures.
   private readonly socialWindow = new SocialWindow({
     root: () => $('#social-window'),
     world: () => this.sim,
@@ -5178,6 +5176,7 @@ export class Hud {
     showPrompt: (text, acceptLabel, onAccept, onDecline) =>
       this.showPrompt(text, acceptLabel, onAccept, onDecline),
     startWhisper: (name) => this.startWhisper(name),
+    openReferralCards: () => this.referralCards.open(),
   });
   // Set by main.ts once the realm's /api/status advert answers, which lands AFTER
   // this window is constructed: a hosted dev/PBE realm booted with
@@ -6008,6 +6007,7 @@ export class Hud {
     clearSlot: (slot) => this.commitHotbarActions(clearHotbarSlot(this.hotbarActions, slot - 1)),
   });
   private readonly referralCards = createReferralCardsHud({
+    playReward: () => audio.achievement(),
     world: () => this.sim,
     focus: this.windowFocus('#referral-cards-window'),
     focusFirst: (root) => this.focusManager.focusFirst(root),

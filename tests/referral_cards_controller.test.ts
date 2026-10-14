@@ -7,6 +7,10 @@ import { createReferralCardsHud } from '../src/ui/hud/referral_cards/referral_ca
 import { referralCardStrings } from '../src/ui/i18n.catalog/referral_cards';
 import type { IWorld } from '../src/world_api';
 
+vi.mock('../src/ui/entity_i18n', () => ({
+  itemDisplayName: (item: { name: string }) => item.name,
+}));
+
 vi.mock('../src/ui/i18n', () => ({
   t: (key: string, values: Record<string, string> = {}) => {
     let value: unknown = referralCardStrings;
@@ -40,6 +44,7 @@ function setup() {
   const launcher = document.getElementById('launcher') as HTMLButtonElement;
   const send = vi.fn();
   const focusWindow = vi.fn();
+  const playReward = vi.fn();
   const controller = new ReferralCardsController({
     root,
     launcher,
@@ -47,6 +52,7 @@ function setup() {
     getSnapshot: () => snapshot,
     send,
     focusWindow,
+    playReward,
     onClose: vi.fn(),
   });
   return {
@@ -54,6 +60,7 @@ function setup() {
     root,
     launcher,
     send,
+    playReward,
     card,
     snapshot,
     replace: (next: ReferralCardsSnapshot) => {
@@ -80,6 +87,184 @@ afterEach(() => {
 });
 
 describe('referral card controller', () => {
+  it('celebrates only a confirmed requested reward, with real art and focus-safe dismissal', () => {
+    const f = setup();
+    f.card.participants[0].credited = 1;
+    f.controller.open();
+    clickText('Redeem reward');
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    f.card.participants[0].redeemed = 1;
+    f.card.revision++;
+    f.replace({ ...f.snapshot, revision: 2 });
+    const popup = document.querySelector<HTMLElement>('.referral-celebration')!;
+    expect(f.playReward).toHaveBeenCalledOnce();
+    f.controller.relocalize();
+    expect(f.playReward).toHaveBeenCalledOnce();
+    expect(popup.textContent).toContain('Friendship Satchel');
+    expect(popup.textContent).toContain('Trailmate');
+    expect(popup.querySelector('img')?.getAttribute('src')).toContain('resonant_weave_bag.webp');
+    expect(popup.getAttribute('role')).toBe('dialog');
+    expect(f.root.inert).toBe(true);
+    expect(document.querySelector('.referral-celebration')!.contains(document.activeElement)).toBe(
+      true,
+    );
+    clickText('Keep adventuring');
+    expect(f.root.inert).toBe(false);
+    f.replace({ ...f.snapshot, revision: 3 });
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    expect(f.send.mock.calls.filter(([a]) => a.type === 'redeem')).toHaveLength(1);
+  });
+
+  it('defers celebration until consent is answered and keeps Escape inside the popup', () => {
+    const f = setup();
+    f.card.participants[0].credited = 1;
+    f.controller.open();
+    clickText('Redeem reward');
+    f.card.participants[0].redeemed = 1;
+    f.card.revision++;
+    f.replace({
+      ...f.snapshot,
+      revision: 2,
+      notices: [{ id: 'summon', type: 'summon', requestId: 'request', friendName: 'Briar' }],
+    });
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    clickText('Decline');
+    const popup = document.querySelector<HTMLElement>('.referral-celebration')!;
+    expect(popup).not.toBeNull();
+    const escaped = vi.fn();
+    window.addEventListener('keydown', escaped);
+    popup.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+    );
+    expect(escaped).not.toHaveBeenCalled();
+    window.removeEventListener('keydown', escaped);
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    expect(f.root.inert).toBe(false);
+    expect(f.controller.isOpen()).toBe(true);
+  });
+
+  it('celebrates a confirmed grant after an unrelated refusal in the same snapshot', () => {
+    const f = setup();
+    f.card.participants[0].credited = 1;
+    f.controller.open();
+    clickText('Redeem reward');
+    f.card.participants[0].redeemed = 1;
+    f.card.revision++;
+    f.replace({
+      ...f.snapshot,
+      revision: 2,
+      notices: [{ id: 'other-failure', type: 'reason', reason: 'unavailable' }],
+    });
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    clickText('OK');
+    expect(document.querySelector('.referral-celebration')).not.toBeNull();
+  });
+
+  it('dismisses an already visible reward when switching characters', () => {
+    const f = setup();
+    f.card.participants[0].credited = 1;
+    f.controller.open();
+    clickText('Redeem reward');
+    f.card.participants[0].redeemed = 1;
+    f.card.revision++;
+    f.replace({ ...f.snapshot, revision: 2 });
+    expect(document.querySelector('.referral-celebration')).not.toBeNull();
+    f.replace({ ...f.snapshot, revision: 3, characterId: 101 });
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    expect(f.root.inert).toBe(false);
+  });
+
+  it('returns Social keyboard launches to the visible HUD Social button', () => {
+    const { snapshot } = setup();
+    document.body.innerHTML =
+      '<div id="ui"><button id="mm-social"></button><div id="social-window"><button id="social-opener"></button></div><div id="prompt-stack"></div></div>';
+    const restoreFocus = vi.fn();
+    const controller = createReferralCardsHud({
+      world: () =>
+        ({
+          referralCardsSnapshot: () => snapshot,
+          referralCardsAction: () => {},
+        }) as unknown as IWorld,
+      focus: { captureFocus: () => document.getElementById('social-opener'), restoreFocus },
+      focusFirst: () => {},
+      closeOthers: () => {
+        document.getElementById('social-window')!.hidden = true;
+      },
+      visibilityChanged: () => {},
+      snapshotChanged: () => {},
+    });
+    controller.open();
+    controller.close();
+    expect(restoreFocus).toHaveBeenCalledWith(document.getElementById('mm-social'));
+    controller.destroy();
+  });
+
+  it('retains a pending claim after closing the card but never celebrates an initial claimed snapshot', () => {
+    const f = setup();
+    f.card.participants[0].credited = 3;
+    f.card.participants[0].redeemed = 1;
+    f.controller.open();
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    clickText('Redeem reward');
+    f.controller.close();
+    f.card.participants[0].redeemed = 3;
+    f.card.revision++;
+    f.replace({ ...f.snapshot, revision: 2 });
+    expect(document.querySelector('.referral-celebration')).not.toBeNull();
+    f.controller.destroy();
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    expect(f.root.inert).toBe(false);
+  });
+
+  it('rejects failed and moved-character claims instead of showing a false success', () => {
+    const f = setup();
+    f.card.participants[0].credited = 1;
+    f.controller.open();
+    clickText('Redeem reward');
+    f.replace({
+      ...f.snapshot,
+      revision: 2,
+      notices: [{ id: 'failure', type: 'reason', reason: 'unavailable' }],
+    });
+    clickText('OK');
+    f.card.participants[0].redeemed = 1;
+    f.card.revision++;
+    f.replace({ ...f.snapshot, revision: 3 });
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    f.card.participants[0].redeemed = 0;
+    f.replace({ ...f.snapshot, revision: 4 });
+    clickText('Redeem reward');
+    f.card.participants[0].characterId = 101;
+    f.card.participants[0].redeemed = 1;
+    f.card.revision++;
+    f.replace({ ...f.snapshot, revision: 5, characterId: 101 });
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+  });
+
+  it('waits through both Fogbinder confirmations and only celebrates the final server grant', () => {
+    const f = setup();
+    f.card.participants[0].credited = 7;
+    f.card.participants[0].redeemed = 3;
+    f.controller.open();
+    clickText('Redeem reward');
+    f.card.revision++;
+    f.card.lockConfirmation = { accountId: 10, revision: f.card.revision, stage: 1 };
+    f.replace({ ...f.snapshot, revision: 2 });
+    clickText('Yes, I understand');
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    f.card.revision++;
+    f.card.lockConfirmation = { accountId: 10, revision: f.card.revision, stage: 2 };
+    f.replace({ ...f.snapshot, revision: 3 });
+    clickText('Yes, lock this card');
+    expect(document.querySelector('.referral-celebration')).toBeNull();
+    f.card.revision++;
+    f.card.lockConfirmation = undefined;
+    f.card.participants[0].redeemed = 7;
+    f.card.participants[0].locked = true;
+    f.replace({ ...f.snapshot, revision: 4 });
+    expect(document.querySelector('.referral-celebration')).not.toBeNull();
+  });
+
   it('expires the visible summon cooldown without another server revision', () => {
     vi.useFakeTimers();
     try {

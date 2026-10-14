@@ -79,6 +79,13 @@ export const ru_RU: EnTranslations = {
     "friendTier": "Помощь друзьям: {count}",
     "awarded": "Выдано",
     "pending": "Ещё не выдано",
+    "celebration": {
+      "earned": "Награда за приключение",
+      "title": "Награда получена!",
+      "titleReward": "Получен титул: {title}",
+      "together": "Заслужено вместе с {friend}.",
+      "continue": "Продолжить приключение"
+    },
     "milestones": {
       "tutorial": "Последнее задание учебного острова",
       "hollow": "В Пустоту",
@@ -22822,10 +22829,10 @@ export const ru_RU: EnTranslations = {
         "name": "Сумка дружбы"
       },
       "referral_hollow_charm": {
-        "name": "Оберег дружбы Пустоты"
+        "name": "Сердце хранителя клятвы"
       },
       "referral_fog_charm": {
-        "name": "Окутанный туманом оберег дружбы"
+        "name": "Пробуждённое сердце хранителя клятвы"
       },
       "reins_referral_tank": {
         "name": "Поводья танка дружбы"

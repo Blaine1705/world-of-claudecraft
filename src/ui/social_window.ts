@@ -151,6 +151,7 @@ export interface SocialWindowDeps {
   showPrompt(text: string, acceptLabel: string, onAccept: () => void, onDecline: () => void): void;
   /** Open the chat bar pre-filled with a whisper to this player. */
   startWhisper(name: string): void;
+  openReferralCards?(): void;
 }
 
 function cap(s: string): string {
@@ -711,6 +712,9 @@ export class SocialWindow {
           selected: tab,
         }),
       ) +
+      (online && this.deps.openReferralCards
+        ? `<div class="soc-referral-entry"><button type="button" class="ui-btn" data-open-referral-cards>${svgIcon('cards')}${esc(t('referralCards.title'))}</button></div>`
+        : '') +
       `<div class="soc-body" id="soc-body-panel" role="tabpanel"></div>` +
       `<div class="soc-notice"></div>` +
       // The raid tab has no footer; the pledges and ranks tabs' actions all
@@ -1507,6 +1511,9 @@ export class SocialWindow {
 
   // Wire the parts that survive a content refresh: close, tabs, footer + search.
   private wireChrome(el: HTMLElement): void {
+    el.querySelector('[data-open-referral-cards]')?.addEventListener('click', () =>
+      this.deps.openReferralCards?.(),
+    );
     el.querySelector('[data-close]')?.addEventListener('click', () => this.toggle());
     // WAI-ARIA tabs: click OR roving Arrow/Home/End select a tab, wired through the
     // shared tab_strip_painter core. render() rebuilds the strip, so a keyboard move
