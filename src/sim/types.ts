@@ -12156,6 +12156,12 @@ export interface PromotedScenery {
    *  the town views' building loops and the record colliders stand down;
    *  wells, stalls, fences, streets and the harbor stay town-drawn. */
   authoredTowns?: boolean;
+  /** The Eastbrook Weekly Vault (render/eastbrook_weekly_vault.ts draws it
+   *  from EASTBROOK_LAYOUT.weeklyVault, and its record collider rides the
+   *  same flag). Its own family, not part of authoredTowns: a document
+   *  promoted before the vault had a placeable model keeps the town-drawn
+   *  hall until this family promotes too. */
+  eastbrookVault?: boolean;
 }
 
 /** The resolved storage price tables every sim price read consumes: bank slot

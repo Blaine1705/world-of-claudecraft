@@ -129,7 +129,7 @@ export const TWIN_FAR = 300;
 export const BUILDING_CULL = 500;
 
 const TWIN_OF =
-  /^(\/models\/tidehold\/(?:house_[a-e]|tavern(?:_b)?|smithy|market|hall|shop_[ab]|bank))\.glb$/;
+  /^(\/models\/tidehold\/(?:house_[a-e]|tavern(?:_b)?|smithy|market|hall|shop_[ab]|bank|vault))\.glb$/;
 
 /** The LOD twin of a town building's GLB path, or null for anything else. */
 export function twinPathFor(path: string | undefined): string | null {

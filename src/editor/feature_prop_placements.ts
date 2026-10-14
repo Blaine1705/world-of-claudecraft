@@ -339,6 +339,40 @@ export function authoredTownBuildingPlacements(seed: number): MapPlacement[] {
   return out;
 }
 
+/** The Weekly Vault's placeable model (public/models/tidehold/vault.glb): the
+ *  town-drawn hall's own boxes, authored in real yards, so its largest
+ *  dimension over the target height draws it at the hall's size. The buried
+ *  footing is the part of the model below its ground line. */
+const WEEKLY_VAULT_MAX_DIM = 14.125;
+const WEEKLY_VAULT_FOOTING = 1.45;
+
+/**
+ * The Eastbrook Weekly Vault as an editable placement, standing where the
+ * town view draws it and seated by the same rule (its ground line at the
+ * height of the ground in front of its door). The keeper is an ordinary NPC
+ * and stays one.
+ */
+export function eastbrookVaultPlacements(seed: number): MapPlacement[] {
+  const vault = EASTBROOK_LAYOUT.weeklyVault;
+  const entrance = localToWorld(vault, vault.rot, 0, vault.d / 2);
+  return [
+    {
+      assetId: 'tidehold/vault',
+      name: 'Eastbrook weekly vault',
+      x: vault.x,
+      z: vault.z,
+      y:
+        terrainHeight(entrance.x, entrance.z, seed) -
+        terrainHeight(vault.x, vault.z, seed) -
+        WEEKLY_VAULT_FOOTING,
+      rotY: cleanZero(vault.rot),
+      scale: WEEKLY_VAULT_MAX_DIM / TARGET_HEIGHT,
+      collide: true,
+      collisionMode: 'baked',
+    },
+  ];
+}
+
 export const FEATURE_PROMOTIONS: readonly {
   flag: string;
   placements(seed: number): MapPlacement[];
@@ -349,6 +383,7 @@ export const FEATURE_PROMOTIONS: readonly {
   { flag: 'waterFlora', placements: waterFloraPlacements },
   { flag: 'jungleCoconuts', placements: jungleCoconutPlacements },
   { flag: 'authoredTowns', placements: authoredTownBuildingPlacements },
+  { flag: 'eastbrookVault', placements: eastbrookVaultPlacements },
 ];
 
 /**
