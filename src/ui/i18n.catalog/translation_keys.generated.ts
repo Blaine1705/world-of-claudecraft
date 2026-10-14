@@ -13982,6 +13982,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.finder.mech.stalk'
   | 'hudChrome.finder.mech.summons_adds'
   | 'hudChrome.finder.mech.tempering_ray'
+  | 'hudChrome.finder.mech.the_score'
   | 'hudChrome.finder.mech.thickhide_ward'
   | 'hudChrome.finder.mech.tide_sentence'
   | 'hudChrome.finder.mech.tideglass_reflections'

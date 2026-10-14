@@ -21691,4 +21691,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '声が砕けている：この効果が終わるまで受けるダメージが{pct}%増加する。',
   'abilityUi.cast.temple_score': '楽譜',
   'abilityUi.cast.temple_score_answer': '楽譜に答えろ',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    '楽譜（彼女は二度、月のタイルで旋律を歌う：鳴った順番どおりに踏み入ると彼女の声が砕ける）',
 };

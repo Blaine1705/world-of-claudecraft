@@ -20629,4 +20629,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '她的嗓音已破碎：在此效果结束前，她受到的伤害提高{pct}%。',
   'abilityUi.cast.temple_score': '乐谱',
   'abilityUi.cast.temple_score_answer': '回应乐谱',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    '乐谱（她会两次在月光石板上吟唱旋律：按石板响起的顺序踏上去，即可使她的嗓音破碎）',
 };

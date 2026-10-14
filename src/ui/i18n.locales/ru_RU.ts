@@ -22099,4 +22099,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Её голос сорван: пока действует эффект, она получает на {pct}% больше урона.',
   'abilityUi.cast.temple_score': 'Партитура',
   'abilityUi.cast.temple_score_answer': 'Ответ на Партитуру',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    'Партитура (дважды она поёт мелодию на лунных плитах: наступите на них в том порядке, в котором они звучали, и её голос сорвётся)',
 };

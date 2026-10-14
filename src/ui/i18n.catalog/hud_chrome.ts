@@ -9400,6 +9400,10 @@ export const hudChromeStrings = {
       summons_adds: 'Summons reinforcements',
       lunar_tide: 'Lunar Tide (pulsing area damage)',
       chorus_and_solo: 'Chorus and Solo (stack on one mark, spread from the other)',
+      // Selthe's Score (encounters/drowned_temple/selthe_score.ts). Wordy (M16):
+      // non-Latin fills in the overlays.
+      the_score:
+        'The Score (twice she sings a melody on the moon tiles: step onto them in the order they rang to break her voice)',
       tideglass_reflections: "Tideglass Reflections (kill each other's mirror images)",
       // The Mere Hydra (encounters/drowned_temple/mere_hydra.ts and its
       // hydra_* siblings). Every number is the encounter tuning combat reads

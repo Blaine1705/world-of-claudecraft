@@ -21690,4 +21690,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '목소리가 갈라졌습니다: 이 효과가 끝날 때까지 받는 피해가 {pct}% 증가합니다.',
   'abilityUi.cast.temple_score': '악보',
   'abilityUi.cast.temple_score_answer': '악보에 답하기',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    '악보 (그녀가 두 번 달의 타일에 선율을 노래합니다: 울린 순서대로 올라서면 그녀의 목소리가 갈라집니다)',
 };
