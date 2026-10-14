@@ -12186,6 +12186,7 @@ export const id_ID: EnTranslations = {
     "realm": "Dunia",
     "newCharacter": "Karakter Baru",
     "appearance": "Penampilan",
+    "modelLoading": "Loading character...",
     "customize": "Ubah Suai",
     "body": "Tubuh",
     "genderMale": "Pria",

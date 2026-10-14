@@ -12186,6 +12186,7 @@ export const zh_CN: EnTranslations = {
     "realm": "服务器",
     "newCharacter": "新建角色",
     "appearance": "外观",
+    "modelLoading": "正在加载角色...",
     "customize": "自定义",
     "body": "体型",
     "genderMale": "男性",

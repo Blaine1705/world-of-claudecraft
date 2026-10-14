@@ -5459,6 +5459,11 @@
     height: 100% !important;
   }
 
+  /* Touch: the stage takes its own pinch, pan and turn gestures (CharacterPreview's touch stage). */
+  body.mobile-touch .char-preview-container canvas {
+    touch-action: none;
+  }
+
   /* The selected-character name plate over the 3D stage. Belongs to the desktop
      docked layout (the only one with a full 3D turntable); mobile shows the name
      on each roster card already, so it stays hidden by default and the docked
@@ -10450,4 +10455,124 @@
 
 .whb[hidden] {
   display: none;
+}
+
+/* ---------- character preview loading silhouette ---------- */
+/* The launcher turntable's loading placeholder (src/ui/preview_loading_silhouette.ts):
+   a gold outline of a person over the still-empty stage with a lighter gold
+   sheen sweeping inside it, removed the moment the 3D character draws. It sits
+   in whichever .char-preview-container holds the stage, above the WebGL canvas
+   and below the stage's name plate (z-index 3). The two art boxes follow the
+   camera framings (src/render/characters/preview_framing.ts), as measured on
+   the WOC body (about 3 units tall): the desktop full-body framing stands the
+   model from its crown at about 14% of the stage height down to its feet at
+   about 80%, and the phone's head-and-shoulders opening shot fills the stage
+   with head and shoulders, the chest cut on the bottom edge. Tokens only. Back
+   inside @layer shell (the customizer and face builder above are not, on
+   purpose): nothing here has to outrank a panel layout. */
+@layer shell {
+  /* z-index 1: over the canvas whatever their DOM order, under the name plate,
+     and the least it can claim where the container forms no stacking context. */
+  .preview-loading-silhouette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    animation: pls-fade-in 150ms ease-out both;
+  }
+  /* Each art box is centred on the stage (the body box spans its width, the
+     bust box more, below); the SVG's xMidYMax meet centres the figure and keeps
+     its base (the soles, or the chest cut) on the box's bottom edge, shrinking
+     it in place on a stage too narrow for the box. */
+  .preview-loading-silhouette .pls-art {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    overflow: visible;
+  }
+  .preview-loading-silhouette .pls-art-body {
+    top: 14%;
+    height: 66%;
+  }
+  /* The bust box runs past both stage edges (the container clips), so on a
+     narrow phone stage the head and shoulders stay height-bound, crown near
+     12%, with the shoulders running off both sides as the close shot frames
+     them, instead of shrinking down to fit the width. */
+  .preview-loading-silhouette .pls-art-bust {
+    top: 12%;
+    left: -15%;
+    width: 130%;
+    height: 88%;
+  }
+  .preview-loading-silhouette:not([data-shape="bust"]) .pls-art-bust,
+  .preview-loading-silhouette[data-shape="bust"] .pls-art-body {
+    display: none;
+  }
+  .preview-loading-silhouette .pls-outline {
+    fill: color-mix(in srgb, var(--gold) 7%, transparent);
+    stroke: var(--gold);
+    stroke-width: 2px;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  /* The sweep rect is three figure boxes wide and tall, and fill-box makes the
+     keyframe's percentages its own size, so one keyframe serves both arts. The
+     band crosses at a steady pace from just clear of the figures' top-left to
+     just past their bottom-right, then rests off the figure until the next
+     sweep: one pass every 1.6 s. */
+  .preview-loading-silhouette .pls-sheen {
+    transform-box: fill-box;
+    animation: pls-sweep 1.6s linear infinite;
+  }
+  .preview-loading-silhouette .pls-stop-edge {
+    stop-color: var(--color-gold-300);
+    stop-opacity: 0;
+  }
+  .preview-loading-silhouette .pls-stop-core {
+    stop-color: var(--color-gold-300);
+    stop-opacity: 0.6;
+  }
+  @keyframes pls-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes pls-sweep {
+    0% {
+      transform: translate(-15%, -15%);
+    }
+    75%,
+    100% {
+      transform: translate(21%, 21%);
+    }
+  }
+  /* Reduced motion: no sweep and no fade; a still, softer inside fill keeps it
+     reading as a placeholder. The OS setting always applies; the in-game one
+     applies wherever the page stamps body.reduce-motion (main.ts does so from
+     the in-world options today, not yet on the launcher). */
+  @media (prefers-reduced-motion: reduce) {
+    .preview-loading-silhouette {
+      animation: none;
+    }
+    .preview-loading-silhouette .pls-sheen {
+      animation: none;
+      display: none;
+    }
+    .preview-loading-silhouette .pls-outline {
+      fill: color-mix(in srgb, var(--color-gold-300) 18%, transparent);
+    }
+  }
+  body.reduce-motion .preview-loading-silhouette {
+    animation: none;
+  }
+  body.reduce-motion .preview-loading-silhouette .pls-sheen {
+    animation: none;
+    display: none;
+  }
+  body.reduce-motion .preview-loading-silhouette .pls-outline {
+    fill: color-mix(in srgb, var(--color-gold-300) 18%, transparent);
+  }
 }

@@ -25,6 +25,7 @@ const visualInstances = vi.hoisted(() => [] as Array<{ dispose: ReturnType<typeo
 vi.mock('../src/render/characters/assets', () => ({
   // every body resident: the streamed-WOC wait (pendingBuild) never defers a build here
   visualAssetsResident: () => true,
+  directBuildAssetsResident: () => true,
   onCharacterAssetReady: () => () => undefined,
   mechAssetsReady: () => mechAssets.ready,
   preloadMechAssets: vi.fn(() => {

@@ -8060,6 +8060,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'auth.realm': '월드',
   'auth.newCharacter': '새 캐릭터',
   'auth.appearance': '외형',
+  'auth.modelLoading': '캐릭터를 불러오는 중...',
   'auth.class': '직업',
   'auth.name': '이름',
   'auth.chromaOption': '색상 {n}',

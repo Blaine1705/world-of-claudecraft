@@ -12186,6 +12186,7 @@ export const da_DK: EnTranslations = {
     "realm": "Verden",
     "newCharacter": "Ny karakter",
     "appearance": "Udseende",
+    "modelLoading": "Loading character...",
     "customize": "Tilpas",
     "body": "Krop",
     "genderMale": "Mand",

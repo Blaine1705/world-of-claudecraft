@@ -130,6 +130,39 @@ export function creationFocusPose(
   return { x, y: lookY + 0.04, z: dist, lookY };
 }
 
+/** How many head heights the touch stage's close framing shows (head, neck, shoulders and
+ *  the top of the chest), and how wide its shoulders need to fit, in head heights. */
+const SHOULDERS_FRAME_HEADS = 2.4;
+const SHOULDERS_WIDTH_HEADS = 2.0;
+/** The head centre sits this share of the frame above its middle, so the shoulders fill
+ *  the lower part. */
+const SHOULDERS_HEAD_RISE = 0.16;
+
+/**
+ * The touch stage's close framing (a phone's creator, CharacterPreview's touch stage): the
+ * head and shoulders, the face in the upper part of the frame and the shoulders across the
+ * bottom, centred. It is the stage's FIXED opening shot there: a category's close-up
+ * (setFocus) never moves the camera on a touch stage, the player's own pinch and drag do
+ * (preview_touch_core.ts). `headY` / `headH` are the measured head (see creationFocusPose);
+ * without them it aims at CREATION_HEAD_Y with a fixed frame.
+ */
+export function touchShouldersPose(
+  aspect: number,
+  headY: number = CREATION_HEAD_Y,
+  headH?: number,
+): PreviewCamPose {
+  const a = Number.isFinite(aspect) && aspect > 0 ? aspect : 1;
+  const tanV = Math.tan(((FOV_DEG / 2) * Math.PI) / 180);
+  const sized = headH !== undefined && Number.isFinite(headH) && headH > 0;
+  const frameH = sized ? headH * SHOULDERS_FRAME_HEADS : 1.1;
+  const shoulderW = sized ? headH * SHOULDERS_WIDTH_HEADS : 0.95;
+  const dist = Math.max(frameH / (2 * tanV), shoulderW / (2 * tanV * a));
+  const visibleH = 2 * dist * tanV;
+  const head = Number.isFinite(headY) ? headY : CREATION_HEAD_Y;
+  const lookY = head - SHOULDERS_HEAD_RISE * visibleH;
+  return { x: 0, y: lookY + 0.04, z: dist, lookY };
+}
+
 /** Ease between two poses: `t` is the elapsed fraction of the ease (0..1),
  *  shaped by a smoothstep so the move starts and lands softly. Frame-rate
  *  independent because the caller advances `t` by dt / FOCUS_EASE_SECONDS. */

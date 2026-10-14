@@ -12186,6 +12186,7 @@ export const sv_SE: EnTranslations = {
     "realm": "Värld",
     "newCharacter": "Ny karaktär",
     "appearance": "Utseende",
+    "modelLoading": "Loading character...",
     "customize": "Anpassa",
     "body": "Kropp",
     "genderMale": "Man",

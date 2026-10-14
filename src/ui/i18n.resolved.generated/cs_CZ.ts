@@ -12186,6 +12186,7 @@ export const cs_CZ: EnTranslations = {
     "realm": "Svět",
     "newCharacter": "Nová postava",
     "appearance": "Vzhled",
+    "modelLoading": "Loading character...",
     "customize": "Přizpůsobit",
     "body": "Tělo",
     "genderMale": "Muž",

@@ -207,6 +207,26 @@ export function wocSetFileNow(
   return shown ? wocArmorPackUrl(fit, set, shown) : null;
 }
 
+/**
+ * Ask for the LOW file of each set of a manifest's default kit that has no tier resident at
+ * all, for a body a host is about to build directly at `detail` (the launcher's creator):
+ * the smallest file of a set lands first and draws as its stand-in tier (wocSetFileNow,
+ * woc_armor_core.ts wocStandInTier) while the tier the stage asks for streams in over it,
+ * the low file drawing until the new one's reveal settles. Nothing for a set already
+ * drawing some tier, nor at a detail whose own tier IS low (the low preset, every phone).
+ */
+export function prefetchWocKitLowTier(
+  manifest: WocCharacterManifest,
+  detail: WocArmorDetail = 'full',
+): void {
+  if (currentWocArmorTier(detail) === 'low') return;
+  for (const set of wocManifestSets(manifest)) {
+    if (WOC_ARMOR_TIERS.some((t) => wocArmorPackResident(wocArmorPackUrl(manifest.fit, set, t))))
+      continue;
+    ensureWocArmorPack(wocArmorPackUrl(manifest.fit, set, 'low'));
+  }
+}
+
 /** Whether a manifest's default kit is resident at the tier a character of `detail` draws (a
  *  body built directly: full), kicking the fetch of any pack that is not (`fetch: false` only
  *  asks; a caller that builds a body directly waits for the whole kit, never a stand-in

@@ -12186,6 +12186,7 @@ export const tr_TR: EnTranslations = {
     "realm": "Dünya",
     "newCharacter": "Yeni Karakter",
     "appearance": "Görünüm",
+    "modelLoading": "Loading character...",
     "customize": "Özelleştir",
     "body": "Vücut",
     "genderMale": "Erkek",

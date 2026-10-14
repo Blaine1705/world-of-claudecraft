@@ -12186,6 +12186,7 @@ export const en_XA: EnTranslations = {
     "realm": "[Ŵóŕļð]",
     "newCharacter": "[Ñéŵ Çĥáŕáçţéŕ]",
     "appearance": "[Áþþéáŕáñçé]",
+    "modelLoading": "[Ļóáðíñĝ çĥáŕáçţéŕ...]",
     "customize": "[Çúšţóɱížé]",
     "body": "[Ɓóðý]",
     "genderMale": "[Ɱáļé]",

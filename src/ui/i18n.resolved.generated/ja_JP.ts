@@ -12186,6 +12186,7 @@ export const ja_JP: EnTranslations = {
     "realm": "ワールド",
     "newCharacter": "新規キャラクター",
     "appearance": "外見",
+    "modelLoading": "キャラクターを読み込み中...",
     "customize": "カスタマイズ",
     "body": "体型",
     "genderMale": "男性",
