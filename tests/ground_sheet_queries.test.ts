@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import * as sheets from '../src/sim/ground_sheet_queries';
-import type { TerrainCut, WorldContent } from '../src/sim/types';
+import type { CaveDef, TerrainCut, WorldContent } from '../src/sim/types';
 import * as world from '../src/sim/world';
 import { groundHeight, groundHeightAtBody, terrainHeight } from '../src/sim/world';
 
@@ -44,7 +44,9 @@ describe('world.ts re-exports the moved bindings', () => {
       'terrainCutAt',
       'terrainCutAtHeight',
     ] as const;
-    expect(Object.keys(sheets).sort()).toEqual([...names].sort());
+    // groundSheetsActive is the hot-path gate move_toward.ts imports directly;
+    // world.ts (at its monolith ceiling) does not re-export it.
+    expect(Object.keys(sheets).sort()).toEqual([...names, 'groundSheetsActive'].sort());
     for (const name of names) {
       expect(typeof sheets[name], name).toBe('function');
       expect(world[name], name).toBe(sheets[name]);
@@ -58,6 +60,12 @@ describe('a map with no caves and no cuts', () => {
     [12.5, -30.25],
     [-140, 220],
   ];
+
+  it('the sheet gate is off, which is what lets the mob fan skip every query', () => {
+    expect(sheets.groundSheetsActive()).toBe(false);
+    setActiveWorldContent(content({ caves: [], holes: [] }));
+    expect(sheets.groundSheetsActive()).toBe(false);
+  });
 
   it('every query collapses to the plain heightfield answer', () => {
     for (const [x, z] of points) {
@@ -87,6 +95,20 @@ describe('a map with no caves and no cuts', () => {
 });
 
 describe('a buried carve cavity', () => {
+  it('turns the sheet gate on, so the mob fan runs the sheet queries', () => {
+    setActiveWorldContent(content({ holes: [buriedCarve().cut] }));
+    expect(sheets.groundSheetsActive()).toBe(true);
+    const cave: CaveDef = {
+      id: 'gate_cave',
+      nodes: [
+        { x: -20, y: -30, z: 40, radius: 4 },
+        { x: 20, y: -30, z: 40, radius: 4 },
+      ],
+    };
+    setActiveWorldContent(content({ caves: [cave] }));
+    expect(sheets.groundSheetsActive()).toBe(true);
+  });
+
   it('a mob on the cavity floor keeps that floor; a surface mob keeps the surface', () => {
     const { cut, surface } = buriedCarve();
     setActiveWorldContent(content({ holes: [cut] }));
