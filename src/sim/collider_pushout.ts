@@ -19,7 +19,6 @@ export function pushOut(
   r: number,
   feetY?: number,
 ): { x: number; z: number } | null {
-  if (c.type === 'prism') return pushOutPrism(c, x, z, r, feetY);
   if (c.type === 'circle') {
     const dx = x - c.x,
       dz = z - c.z;
@@ -31,6 +30,7 @@ export function pushOut(
     const k = min / d;
     return { x: c.x + dx * k, z: c.z + dz * k };
   }
+  if (c.type === 'prism') return pushOutPrism(c, x, z, r, feetY);
   // OBB: into local frame
   const local = rotY(x - c.x, z - c.z, -c.rot);
   const ex = c.hw + r,
@@ -92,8 +92,8 @@ export function resolveAgainst(
     let moved = false;
     for (const c of list) {
       if (ignoreFences && c.type === 'obb' && c.isFence) continue;
-      if (passesOver(c, mover, px, pz)) continue;
-      if (passesUnder(c, mover?.y)) continue;
+      // Height-less movers (mobs, pathing) never pass over or under: skip both calls.
+      if (mover && (passesOver(c, mover, px, pz) || passesUnder(c, mover.y))) continue;
       const res = pushOut(c, px, pz, r, mover?.y);
       if (res) {
         px = res.x;
