@@ -17010,7 +17010,9 @@
     animation: bce-throb 0.45s ease-in-out infinite alternate;
   }
   @media (prefers-reduced-motion: reduce) {
-    #temple-alert {
+    #temple-alert.is-score-false,
+    #temple-alert.is-score-step-off,
+    #temple-alert.is-score-broken {
       animation: none;
     }
   }

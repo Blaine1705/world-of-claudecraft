@@ -20632,7 +20632,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.templeAlert.answerTitle': '回應樂譜！',
   'hudChrome.templeAlert.answerLine': '踏上標有{place}的月光石板。已奏響：{done}/{total}',
   'hudChrome.templeAlert.answerDarkLine':
-    '石板已變暗。按它們響起的順序踏上去。已奏響：{done}/{total}',
+    '按記住的順序踏上石板。再次踏上同一塊石板前，先走下去。已奏響：{done}/{total}',
   'hudChrome.templeAlert.stepOffTitle': '先走下去，再踏上來',
   'hudChrome.templeAlert.stepOffLine':
     '月光石板只有在有人踏上時才會奏響。離開這塊石板，然後重新踏上去',

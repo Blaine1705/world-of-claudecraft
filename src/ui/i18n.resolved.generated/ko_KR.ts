@@ -6658,7 +6658,7 @@ export const ko_KR: EnTranslations = {
       "melodyDarkLine": "달의 타일이 차례로 울리는 것을 지켜보고 순서를 외우세요. 답하기 전에 타일이 어두워집니다",
       "answerTitle": "악보에 답하세요!",
       "answerLine": "{place} 표시가 있는 달의 타일에 올라서세요. 울린 타일: {total}개 중 {done}개",
-      "answerDarkLine": "타일이 어둡습니다. 울린 순서대로 올라서세요. 울린 타일: {total}개 중 {done}개",
+      "answerDarkLine": "기억한 순서대로 밟으세요. 같은 타일을 다시 밟으려면 먼저 내려오세요. 울린 타일: {total}개 중 {done}개",
       "stepOffTitle": "내려갔다가 다시 올라서세요",
       "stepOffLine": "달의 타일은 누군가 올라설 때만 울립니다. 이 타일에서 내려갔다가 다시 올라서세요",
       "falseTitle": "틀린 음!",

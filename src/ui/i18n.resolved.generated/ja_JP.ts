@@ -6658,7 +6658,7 @@ export const ja_JP: EnTranslations = {
       "melodyDarkLine": "月のタイルが順番に鳴るのを見て、順番を覚えろ。答える前にタイルは暗くなる",
       "answerTitle": "楽譜に答えろ！",
       "answerLine": "{place}の印がある月のタイルに踏み入れ。鳴らした数：{total}枚中{done}枚",
-      "answerDarkLine": "タイルは暗い。鳴った順番どおりに踏み入れ。鳴らした数：{total}枚中{done}枚",
+      "answerDarkLine": "覚えた順番どおりに踏め。同じタイルを踏み直すには、一度降りること。鳴らした数：{total}枚中{done}枚",
       "stepOffTitle": "一度降りて、踏み直せ",
       "stepOffLine": "月のタイルは誰かが踏み入った時にだけ鳴る。このタイルから降りて、もう一度踏み入れ",
       "falseTitle": "外れた音！",

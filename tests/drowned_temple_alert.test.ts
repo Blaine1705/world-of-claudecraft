@@ -167,6 +167,7 @@ describe('the Temple alert view: Selthe’s Score', () => {
     );
     expect(v.visible && v.line).toContain('2');
     expect(v.visible && v.line).toContain('4');
+    expect(v.visible && v.line).toContain('Step off before stepping onto a tile again');
   });
 
   it('her broken voice opens the window: the bar is the aura’s own time left', () => {

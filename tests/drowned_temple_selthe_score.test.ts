@@ -385,6 +385,46 @@ describe('the Score begins at 60 and 30 percent', () => {
 });
 
 describe('the melody is shown one tile after another', () => {
+  it('the second heroic melody rings four notes 0.75 s apart, each visible for 0.6 s', () => {
+    const { f, b, st } = selthe('heroic');
+    st.scores = 1;
+    toShare(f, b, 0.29);
+    expect(b.castTotal).toBeCloseTo(4.5, 6);
+    const rang: number[] = [];
+    const visible = new Map<number, number>();
+    let ticks = 0;
+    while (st.score?.phase === 'melody') {
+      for (const ev of events(f))
+        if (ev.type === 'spellfx' && ev.ability === SELTHE_TILE_NOTE) rang.push(ticks);
+      for (const look of looks(f, st))
+        if (look.state === 'note') visible.set(look.place, (visible.get(look.place) ?? 0) + 1);
+      ticks++;
+    }
+    expect(rang).toHaveLength(4);
+    for (let i = 1; i < rang.length; i++) expect((rang[i] - rang[i - 1]) * DT).toBe(0.75);
+    expect([...visible.values()]).toEqual([12, 12, 12, 12]);
+    expect(b.castTotal).toBe(16);
+  });
+
+  it('waits for a pending heroic echo before starting either melody', () => {
+    for (const index of [0, 1]) {
+      const { f, b, st } = selthe('heroic');
+      st.scores = index;
+      f.sim.chat('/dev temple trigger chorus', f.tank.id);
+      run(f, T.markSeconds + 0.1);
+      expect(st.echoes.length).toBeGreaterThan(0);
+      toShare(f, b, index === 0 ? 0.59 : 0.29);
+      expect(st.scoreQueued).toBe(true);
+      expect(st.score).toBeNull();
+      run(f, T.echoAfter + 0.1);
+      expect(st.echoes).toHaveLength(0);
+      expect(st.score?.phase).toBe('melody');
+      const from = f.hits.length;
+      sing(f, st);
+      expect(f.hits.slice(from).filter((h) => h.ability === 'Echo')).toHaveLength(0);
+    }
+  });
+
   it('rings each tile in its turn, 1.2 s apart, and on normal leaves its place lit', () => {
     const { f, b, st } = selthe();
     toShare(f, b, 0.59);
@@ -659,6 +699,57 @@ describe('the answer: step ONTO the tiles in the order they rang', () => {
     tick(f);
     expect(sc.progress).toBe(2);
     expect(f.hits.slice(from).some((h) => h.ability === 'False Note')).toBe(false);
+  });
+
+  it.each(['normal', 'heroic'] as const)(
+    'covering all five tiles cannot solve either %s melody',
+    (difficulty) => {
+      for (const index of [0, 1]) {
+        const { f, b, st } = selthe(difficulty, 4);
+        const players = [f.tank, ...f.others];
+        for (const p of players) put(f, p, OFF.x, OFF.z);
+        st.scores = index;
+        toShare(f, b, index === 0 ? 0.59 : 0.29);
+        sing(f, st);
+        const from = f.hits.length;
+        players.forEach((p, i) => {
+          put(f, p, st.tiles[i].x, st.tiles[i].z);
+        });
+        tick(f);
+        expect(st.score?.progress).toBe(0);
+        expect(aura(b, SELTHE_BROKEN_VOICE)).toBeUndefined();
+        expect(f.hits.slice(from).filter((h) => h.ability === 'False Note')).toHaveLength(
+          index === 0 ? 2 : 1,
+        );
+        expect(b.damageImmune).toBe(true);
+      }
+    },
+  );
+
+  it('a wrong final-tick step resets once without punishing duplicate correct steps', () => {
+    const { f, b, st } = selthe('normal', 4);
+    toShare(f, b, 0.59);
+    sing(f, st);
+    const order = [...(st.score?.order ?? [])];
+    for (const p of [f.tank, ...f.others]) put(f, p, OFF.x, OFF.z);
+    tick(f);
+    stepOn(f, st, f.tank, order[0]);
+    const tiles = [order[1], order[2], spareTile(st), order[1]];
+    const from = f.hits.length;
+    f.others.forEach((p, i) => {
+      put(f, p, st.tiles[tiles[i]].x, st.tiles[tiles[i]].z);
+    });
+    tick(f);
+    expect(st.score?.progress).toBe(0);
+    expect(aura(b, SELTHE_BROKEN_VOICE)).toBeUndefined();
+    expect(
+      f.hits
+        .slice(from)
+        .filter((h) => h.ability === 'False Note')
+        .map((h) => h.targetId),
+    ).toEqual([f.others[2].id]);
+    for (const tile of order) stepOn(f, st, f.tank, tile);
+    expect(aura(b, SELTHE_BROKEN_VOICE)).toBeDefined();
   });
 });
 

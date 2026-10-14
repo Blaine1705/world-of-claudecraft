@@ -21673,7 +21673,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.templeAlert.answerLine':
     '{place} 표시가 있는 달의 타일에 올라서세요. 울린 타일: {total}개 중 {done}개',
   'hudChrome.templeAlert.answerDarkLine':
-    '타일이 어둡습니다. 울린 순서대로 올라서세요. 울린 타일: {total}개 중 {done}개',
+    '기억한 순서대로 밟으세요. 같은 타일을 다시 밟으려면 먼저 내려오세요. 울린 타일: {total}개 중 {done}개',
   'hudChrome.templeAlert.stepOffTitle': '내려갔다가 다시 올라서세요',
   'hudChrome.templeAlert.stepOffLine':
     '달의 타일은 누군가 올라설 때만 울립니다. 이 타일에서 내려갔다가 다시 올라서세요',

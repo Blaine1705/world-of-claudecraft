@@ -364,12 +364,13 @@ export const SELTHE_TUNING = {
   scoreAt: [0.6, 0.3],
   scoreNotes: [3, 4],
   /** The melody's bar: she draws breath for scoreIntro, then a tile rings
-   *  every scoreNoteEvery (it rings for scoreNoteRing of that). Three notes
-   *  are 5.1 s and four 6.3 s: longer than a heroic Echo's 4 s, so a mark
-   *  that fell just before the Score has rung out before the answer opens. */
+   *  every scoreNoteEvery (it rings for scoreNoteRing of that). The second
+   *  melody uses the faster cadence. Pending echoes finish before either begins. */
   scoreIntro: 1.5,
   scoreNoteEvery: 1.2,
   scoreNoteRing: 1,
+  scoreSecondNoteEvery: 0.75,
+  scoreSecondNoteRing: 0.6,
   // The answer's clock, sized from run speed (types.ts RUN_SPEED, 7 yd/s) for
   // ONE player doing the whole answer alone from the worst spot in the court.
   // The tiles stand on an arc of scoreRingRadius round her, 50 degrees apart:
@@ -496,7 +497,19 @@ export function scoreMelody(notes: number, hash: number): number[] {
 
 /** The melody's bar: her breath, then a slot for every note. */
 export function scoreMelodySeconds(notes: number): number {
-  return SELTHE_TUNING.scoreIntro + notes * SELTHE_TUNING.scoreNoteEvery;
+  return SELTHE_TUNING.scoreIntro + notes * scoreNoteEvery(notes);
+}
+
+/** Shared melody cadence, keyed by the note count mirrored on her ward. */
+export function scoreNoteEvery(notes: number): number {
+  return notes >= SELTHE_TUNING.scoreNotes[1]
+    ? SELTHE_TUNING.scoreSecondNoteEvery
+    : SELTHE_TUNING.scoreNoteEvery;
+}
+export function scoreNoteRing(notes: number): number {
+  return notes >= SELTHE_TUNING.scoreNotes[1]
+    ? SELTHE_TUNING.scoreSecondNoteRing
+    : SELTHE_TUNING.scoreNoteRing;
 }
 
 /** Which Score this is (0 the first) to its notes and its answer's clock. */

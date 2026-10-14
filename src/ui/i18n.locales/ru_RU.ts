@@ -22082,7 +22082,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.templeAlert.answerLine':
     'Наступите на лунную плиту с меткой {place}. Прозвучало: {done} из {total}',
   'hudChrome.templeAlert.answerDarkLine':
-    'Плиты погасли. Наступайте на них в том порядке, в котором они звучали. Прозвучало: {done} из {total}',
+    'Повторите порядок по памяти. Прежде чем наступить на плиту снова, сойдите с неё. Прозвучало: {done} из {total}',
   'hudChrome.templeAlert.stepOffTitle': 'Сойдите и наступите снова',
   'hudChrome.templeAlert.stepOffLine':
     'Лунная плита звучит, только когда на неё наступают. Сойдите с этой плиты и наступите на неё снова',

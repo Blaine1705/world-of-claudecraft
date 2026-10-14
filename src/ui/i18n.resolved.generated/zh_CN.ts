@@ -6658,7 +6658,7 @@ export const zh_CN: EnTranslations = {
       "melodyDarkLine": "注意月光石板依次响起的顺序并记住它。在你作答之前，石板会变暗",
       "answerTitle": "回应乐谱！",
       "answerLine": "踏上标有{place}的月光石板。已奏响：{done}/{total}",
-      "answerDarkLine": "石板已变暗。按它们响起的顺序踏上去。已奏响：{done}/{total}",
+      "answerDarkLine": "按记住的顺序踏上石板。再次踏上同一块石板前，先走下去。已奏响：{done}/{total}",
       "stepOffTitle": "先走下去，再踏上来",
       "stepOffLine": "月光石板只有在有人踏上时才会奏响。离开这块石板，然后重新踏上去",
       "falseTitle": "错音！",

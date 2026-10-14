@@ -21675,7 +21675,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.templeAlert.answerLine':
     '{place}の印がある月のタイルに踏み入れ。鳴らした数：{total}枚中{done}枚',
   'hudChrome.templeAlert.answerDarkLine':
-    'タイルは暗い。鳴った順番どおりに踏み入れ。鳴らした数：{total}枚中{done}枚',
+    '覚えた順番どおりに踏め。同じタイルを踏み直すには、一度降りること。鳴らした数：{total}枚中{done}枚',
   'hudChrome.templeAlert.stepOffTitle': '一度降りて、踏み直せ',
   'hudChrome.templeAlert.stepOffLine':
     '月のタイルは誰かが踏み入った時にだけ鳴る。このタイルから降りて、もう一度踏み入れ',

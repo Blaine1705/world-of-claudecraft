@@ -6658,7 +6658,7 @@ export const cs_CZ: EnTranslations = {
       "melodyDarkLine": "Watch the moon tiles ring one after another and remember the order. They go dark before you answer",
       "answerTitle": "Answer the Score!",
       "answerLine": "Step onto the moon tile marked {place}. Sounded: {done} of {total}",
-      "answerDarkLine": "The tiles are dark. Step onto them in the order they rang. Sounded: {done} of {total}",
+      "answerDarkLine": "Repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
       "stepOffTitle": "Step off, then back on",
       "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
       "falseTitle": "False Note!",

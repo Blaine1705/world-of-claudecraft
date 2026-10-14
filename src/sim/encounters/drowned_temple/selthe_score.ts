@@ -64,6 +64,8 @@ import {
   scoreAnswerSeconds,
   scoreMelody,
   scoreMelodySeconds,
+  scoreNoteEvery,
+  scoreNoteRing,
   scoreNotesOf,
 } from './ids';
 
@@ -107,7 +109,9 @@ function tileLook(sc: SeltheScoreState | null, tile: number): [MoonTileState, nu
   if (sc.phase === 'melody') {
     if (place === 0 || place > sc.rung) return ['dark', 0];
     // The last note rung is still ringing for scoreNoteRing of its slot.
-    const ringing = place === sc.rung && T.scoreNoteEvery - sc.noteIn < T.scoreNoteRing - 1e-6;
+    const ringing =
+      place === sc.rung &&
+      scoreNoteEvery(sc.order.length) - sc.noteIn < scoreNoteRing(sc.order.length) - 1e-6;
     if (ringing) return ['note', place];
     return sc.hidden ? ['dark', 0] : ['lit', place];
   }
@@ -147,13 +151,14 @@ export function queueScore(boss: Entity, st: SeltheFightState): void {
   if (share <= T.scoreAt[st.scores]) st.scoreQueued = true;
 }
 
-/** An owed Score begins once her bar has ended, her marks have fallen and the
+/** An owed Score begins once her bar has ended, her marks and echoes have finished and the
  *  last Score's window has closed (the window is the group's reward: she
  *  never wards herself inside it). */
 function scoreReady(boss: Entity, st: SeltheFightState): boolean {
   return (
     boss.castingAbility === null &&
     st.marks.length === 0 &&
+    st.echoes.length === 0 &&
     !boss.auras.some((a) => a.id === SELTHE_BROKEN_VOICE_EXPOSED)
   );
 }
@@ -337,7 +342,7 @@ function stepMelody(
   if (sc.rung < sc.order.length && sc.noteIn <= 1e-6) {
     const tile = sc.order[sc.rung];
     sc.rung++;
-    sc.noteIn += T.scoreNoteEvery;
+    sc.noteIn += scoreNoteEvery(sc.order.length);
     // She sings to the tile that rings.
     faceTile(ctx, boss, st, tile);
     cue(ctx, boss, st.tiles[tile].objectId, SELTHE_TILE_NOTE);
@@ -388,22 +393,27 @@ function stepAnswer(
       found = true;
       break;
     }
-    if (sc.progress >= sc.order.length) {
-      breakVoice(ctx, boss, st);
-      return;
-    }
   }
+  // Judge every leftover step against the same completed prefix. A wrong
+  // tile cancels the tick's answer, even when the last correct tile arrived
+  // too; duplicate correct steps stay harmless regardless of tile order.
+  let falseNote = false;
   for (const step of steps) {
     // A tile already sounded is inert: only a tile still to come is false.
     const place = sc.order.indexOf(step.tile) + 1;
     if (place > 0 && place <= sc.progress) continue;
-    sc.progress = 0;
+    falseNote = true;
     const at = sc.sour.find((s) => s.tile === step.tile);
     if (at) at.remaining = T.scoreSourSeconds;
     else sc.sour.push({ tile: step.tile, remaining: T.scoreSourSeconds });
     cue(ctx, boss, st.tiles[step.tile].objectId, SELTHE_FALSE_NOTE);
     const amount = Math.max(1, Math.round(T.falseNoteDamage * (boss.mechanicDamageMult ?? 1)));
     ctx.dealDamage(boss, step.player, amount, false, 'frost', 'False Note', 'hit', true);
+  }
+  if (falseNote) sc.progress = 0;
+  else if (sc.progress >= sc.order.length) {
+    breakVoice(ctx, boss, st);
+    return;
   }
   if (sc.timer <= 1e-6) failScore(ctx, inst, boss, st);
 }
