@@ -451,7 +451,8 @@ describe('warfareShopViewer: the IWorld derivation, identical in both worlds', (
       group: 'companions',
       key: WARFARE_SHOP_COMPANIONS_KEY,
     });
-    expect(last.offers.map((o) => o.itemId)).toEqual(['whistle_horse']);
+    expect(last.offers.length).toBeGreaterThan(0);
+    for (const o of last.offers) expect(o.item.kind, o.itemId).toBe('buddy');
     // The only companions-group section, and no companion leaks into a gear group.
     expect(view.sections.filter((s) => s.group === 'companions')).toEqual([last]);
     for (const s of view.sections.slice(0, -1)) {

@@ -177,7 +177,7 @@ export function renderWarfareVendorWindow(
     }
     // The companions group holds one section, so its group heading already
     // names it; a second "Companions" title under it would only repeat it.
-    if (section.kind !== 'companions') {
+    if (section.group !== 'companions') {
       const heading = document.createElement('div');
       heading.className = 'vendor-section-title';
       heading.textContent = sectionTitleText(section);
