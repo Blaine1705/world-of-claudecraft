@@ -6,7 +6,8 @@ ceiling. `colliders.ts` imports through `index.ts` and re-exports the public nam
 (`passesUnder`, `prismPolyAt`, `prismBox`, `insidePrism`), so other importers keep the
 `./colliders` path. The one other consumer is `../authored_town_buildings.ts`, which
 takes `emitPlacementBoxes` so a walk-in town building (`../town_walk_in.ts`) collides on
-its model's baked boxes exactly as the same model placed in Studio does.
+the same baked asset rows, through the same emitter, as the same model placed in Studio
+(a document-level bake or authored prisms are not consulted for it).
 
 | File | Owns |
 |------|------|

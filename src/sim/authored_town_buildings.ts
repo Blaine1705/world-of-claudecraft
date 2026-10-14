@@ -54,11 +54,12 @@ export function placedBuildingAnnexes(building: BuildingDef): readonly Obb2[] {
  * instead of hitting invisible walls.
  *
  * A walk-in record (town_walk_in.ts) collides instead on its model's own
- * baked boxes, exactly as the same model placed in Studio does, so its open
- * doorway lets a player in; its annexes are part of that bake. Those boxes
- * stand on the TERRAIN under the model's anchor (the placement rule), never
- * on `groundAt`, which already carries the building's own floor deck. With no
- * `seed` the record keeps its sealed box.
+ * baked boxes, the asset rows a Studio placement of the model reads, through
+ * the same emitter (a document-level bake or authored prisms are not
+ * consulted), so its open doorway lets a player in; its annexes are part of
+ * that bake. Those boxes stand on the TERRAIN under the model's anchor (the
+ * placement rule), never on `groundAt`, which already carries the building's
+ * own floor deck. With no `seed` the record keeps its sealed box.
  */
 export function buildingRecordColliders(
   building: BuildingDef,

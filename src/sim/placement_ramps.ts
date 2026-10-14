@@ -8,7 +8,9 @@
 //
 // The per-content ramp list is cached (custom maps carry thousands of
 // placements; stairs are a handful) and busted alongside the static-collider
-// cache whenever placements mutate.
+// cache whenever placements mutate. It also carries the walk-in town
+// buildings' floors (town_walk_in.ts), read off the content's building records
+// and its promoted scenery, so an edit to either busts it the same way.
 
 import { authoredRampsForPath } from './asset_collision';
 import { ASSET_RAMPS } from './asset_collision.generated';
@@ -179,6 +181,9 @@ function rampTable(content: WorldContent, seed: number): RampTable {
   // A walk-in town building's floor and entry step (town_walk_in.ts): its
   // record stands the model the way a placement would, with the same decks.
   for (const p of townWalkInPlacements(content)) {
+    // the model's seat never moves, so its ground is read once here rather
+    // than on every ground query inside the town
+    const seat = terrainHeight(p.x, p.z, seed);
     for (const r of authoredRampsForPath(p.path)) {
       ramps.push({
         x: p.x,
@@ -187,8 +192,8 @@ function rampTable(content: WorldContent, seed: number): RampTable {
         sx: p.scale,
         sy: p.scale,
         sz: p.scale,
-        detached: false,
-        groundY: 0,
+        detached: true,
+        groundY: seat,
         lift: p.y ?? 0,
         cx: r.x,
         cz: r.z,
@@ -208,7 +213,9 @@ function rampTable(content: WorldContent, seed: number): RampTable {
   let boundMinZ = Number.POSITIVE_INFINITY;
   let boundMaxZ = Number.NEGATIVE_INFINITY;
   for (const r of ramps) {
-    const reach = Math.hypot((Math.abs(r.cx) + r.hx) * r.sx, (Math.abs(r.cz) + r.hz) * r.sz) + 1;
+    // A true bound: a deck turned within the model (its own ry) reaches its
+    // centre's distance plus its half-diagonal, under the larger axis scale.
+    const reach = Math.max(r.sx, r.sz) * (Math.hypot(r.cx, r.cz) + Math.hypot(r.hx, r.hz)) + 1;
     boundMinX = Math.min(boundMinX, r.x - reach);
     boundMaxX = Math.max(boundMaxX, r.x + reach);
     boundMinZ = Math.min(boundMinZ, r.z - reach);

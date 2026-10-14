@@ -472,9 +472,10 @@ function makePlacedBuilding(spec: {
 // The site plan. Two streets cross in the town's circle, which stands open
 // with no palisade: the main street runs north from the south entrance (the
 // causeway every traveller arrives by) past the cistern to the north
-// entrance, and the marsh street joins the west and east entrances. The inn and the chapel face each other across the cistern, so
-// the first thing a newcomer meets past the warden is a door to rest at and
-// a door to pray at; the chapel's bell tower marks the crossroads, the
+// entrance, and the marsh street joins the west and east entrances. The inn
+// and the chapel face each other across the cistern, so the first thing a
+// newcomer meets past the warden is a door to rest at and a door to pray at;
+// the chapel's bell tower marks the crossroads, the
 // barrow (the graveyard) lies along the chapel's south side, and the bank
 // and the apothecary face each other up the north street. A quarter turn
 // either way stands a building side-on to the circle with its door on a

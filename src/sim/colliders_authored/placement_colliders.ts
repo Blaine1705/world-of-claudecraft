@@ -149,7 +149,9 @@ export function emitPlacementPrisms(
  * doorstep course or vaults a rail, and both gates require standable.
  */
 const STANDABLE_MIN_HALF_EXTENT = 0.22;
-// Placement boxes exist only on authored maps, so they read the Studio band.
+// Placement boxes stand on authored maps, and on the built-in world only for a
+// walk-in town building (../town_walk_in.ts), which reads the Studio band too
+// so it stands the same way there as the same model placed in Studio.
 const STANDABLE_LOW_TOP = AUTHORED_TRAVERSAL_BAND + 0.35;
 function standableSurface(hw: number, hd: number, topAboveGround: number): boolean {
   return Math.min(hw, hd) >= STANDABLE_MIN_HALF_EXTENT || topAboveGround <= STANDABLE_LOW_TOP;
