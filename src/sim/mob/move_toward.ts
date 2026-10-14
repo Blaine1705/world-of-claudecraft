@@ -6,6 +6,7 @@
 // same floor snap. It draws NO rng.
 
 import { authoredMapActive, MOBS } from '../data';
+import { groundSheetsActive } from '../ground_sheet_queries';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { floorHeightAt } from '../physics/character';
 import { swimSurfaceY } from '../player_motion';
@@ -61,14 +62,20 @@ export function moveTowardImpl(
   if (speed <= 0 && authoredMapActive()) return false;
   const step = Math.min(speed * DT, d);
   const canSwim = ctx.mobCanSwim(MOBS[e.templateId]);
+  // Read once per step, not per fan candidate: the seed rides a getter chain,
+  // and every cave/carve sheet query below early-outs to the plain surface
+  // answer on a map with no sheets (the built-in world), so this one
+  // constant-time check skips them there and the release fan runs unchanged.
+  const seed = ctx.cfg.seed;
+  const sheets = groundSheetsActive();
 
   if (ignoreObstacles) {
     const nx = e.pos.x + Math.sin(desired) * step;
     const nz = e.pos.z + Math.cos(desired) * step;
     e.pos.x = nx;
     e.pos.z = nz;
-    const g = mobGroundHeight(nx, nz, ctx.cfg.seed, e.pos.y);
-    e.pos.y = Math.max(g, swimSurfaceY(nx, nz, ctx.cfg.seed)); // ride the surface while phasing, don't sink under terrain/water
+    const g = sheets ? mobGroundHeight(nx, nz, seed, e.pos.y) : groundHeight(nx, nz, seed);
+    e.pos.y = Math.max(g, swimSurfaceY(nx, nz, seed)); // ride the surface while phasing, don't sink under terrain/water
     return d - step < 0.3;
   }
   // Mobs have no nav mesh. Try the straight path first; only if a prop or the
@@ -84,7 +91,7 @@ export function moveTowardImpl(
   // footprint there is no waterline at all, so a dry sunken feature never
   // reads as a shore.
   const ride = (x: number, z: number, h: number): number => {
-    const wl = waterLevelAt(x, z, ctx.cfg.seed);
+    const wl = waterLevelAt(x, z, seed);
     return canSwim && h < wl ? wl : h;
   };
   let h0 = Number.NaN; // lazily sampled: only steep cells pay for heights
@@ -93,10 +100,7 @@ export function moveTowardImpl(
     const nx = e.pos.x + Math.sin(a) * step;
     const nz = e.pos.z + Math.cos(a) * step;
     // landlocked creatures stop at the waterline instead of walking under it
-    if (
-      !canSwim &&
-      groundHeight(nx, nz, ctx.cfg.seed) < waterLevelAt(nx, nz, ctx.cfg.seed) - SWIM_DEPTH
-    ) {
+    if (!canSwim && groundHeight(nx, nz, seed) < waterLevelAt(nx, nz, seed) - SWIM_DEPTH) {
       continue;
     }
     // Mobs, pets, and feared players obey the wall rule too: no uphill step
@@ -107,19 +111,18 @@ export function moveTowardImpl(
     // players get is not replicated here.
     if (
       nearSteepWalls(nx, nz) &&
-      terrainSteepnessAt(nx, nz, ctx.cfg.seed) > MAX_CLIMB_SLOPE &&
+      terrainSteepnessAt(nx, nz, seed) > MAX_CLIMB_SLOPE &&
       // Surface steepness is scenery to a mob walking a tunnel beneath it.
-      !onUnderSheet(nx, nz, ctx.cfg.seed, e.pos.y)
+      !(sheets && onUnderSheet(nx, nz, seed, e.pos.y))
     ) {
-      if (Number.isNaN(h0))
-        h0 = ride(e.pos.x, e.pos.z, groundHeight(e.pos.x, e.pos.z, ctx.cfg.seed));
-      if (ride(nx, nz, groundHeight(nx, nz, ctx.cfg.seed)) > h0) continue;
+      if (Number.isNaN(h0)) h0 = ride(e.pos.x, e.pos.z, groundHeight(e.pos.x, e.pos.z, seed));
+      if (ride(nx, nz, groundHeight(nx, nz, seed)) > h0) continue;
     }
     // Cave/carve sheets: a candidate that resolves onto ANOTHER layer (the
     // surface over the tunnel, or the tunnel under the field) is a teleport,
     // not a step, and the rock walls are solid for mobs and pets too.
-    if (sheetStepMismatch(ctx.cfg.seed, e.pos.x, e.pos.z, e.pos.y, nx, nz)) continue;
-    if (sheetWallBlocksStep(ctx.cfg.seed, e.pos.x, e.pos.z, e.pos.y, nx, nz)) continue;
+    if (sheets && sheetStepMismatch(seed, e.pos.x, e.pos.z, e.pos.y, nx, nz)) continue;
+    if (sheets && sheetWallBlocksStep(seed, e.pos.x, e.pos.z, e.pos.y, nx, nz)) continue;
     // The Great Maze's hedge walls are hard for mobs too (the maze patrol
     // knights pace their dead ends instead of drifting through a hedge).
     // resolveMovePoint now does that on its own: the hedges are real collider
@@ -151,11 +154,13 @@ export function moveTowardImpl(
   // untouched.
   const g =
     e.kind === 'player'
-      ? floorHeightAt(ctx.cfg.seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
-      : mobGroundHeight(bestX, bestZ, ctx.cfg.seed, e.pos.y);
+      ? floorHeightAt(seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
+      : sheets
+        ? mobGroundHeight(bestX, bestZ, seed, e.pos.y)
+        : groundHeight(bestX, bestZ, seed);
   e.pos.y =
-    canSwim && g < waterLevelAt(bestX, bestZ, ctx.cfg.seed) - SWIM_DEPTH
-      ? swimSurfaceY(bestX, bestZ, ctx.cfg.seed)
+    canSwim && g < waterLevelAt(bestX, bestZ, seed) - SWIM_DEPTH
+      ? swimSurfaceY(bestX, bestZ, seed)
       : g;
   return dist2d(e.pos, dest) < 0.3;
 }

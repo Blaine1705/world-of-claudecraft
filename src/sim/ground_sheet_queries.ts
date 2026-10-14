@@ -24,6 +24,15 @@ function activeTerrainCuts(): readonly TerrainCut[] {
   return effectiveTerrainCuts(content.caves, content.holes);
 }
 
+/** True when the active map carries any second-sheet geometry (a cave or a
+ *  terrain cut). When false, every sheet query below early-outs to the plain
+ *  surface answer, so a hot caller (the mob step fan) may skip them on this
+ *  one constant-time check: the built-in world has neither. */
+export function groundSheetsActive(): boolean {
+  const content = getActiveWorldContent();
+  return (content.caves?.length ?? 0) > 0 || activeTerrainCuts().length > 0;
+}
+
 // The carve-flagged subset (the solids with a real interior), memoized on the
 // effective list's identity: the editor swaps whole arrays on every mutation,
 // so a stale entry can never be read.

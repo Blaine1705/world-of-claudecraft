@@ -3789,16 +3789,14 @@ function groundHeightFor(
       content.props.docks,
     ),
   );
-  // Editor-authored walkable floors, both of them raised ground rather than
-  // blockers, so they belong here and not in the collider set:
-  //
+  // Editor-authored walkable floors, both raised ground rather than blockers, so
+  // they belong here and not in the collider set:
   //   ramp decks    a placement's stair treads / rampart walk (placement_ramps),
-  //                 whether authored on the asset or live in a Collision Master
-  //                 session. Without this a maker's stairs are decoration you
-  //                 walk straight through.
-  //   plane volumes the editor's 'collider/plane' primitive: a bridge deck, a
-  //                 second storey, a sloped ramp. Planes never block; the whole
-  //                 point of the kind is that it carries a body.
+  //                 authored on the asset or live in a Collision Master session
+  //                 (without them a maker's stairs are walk-through decoration).
+  //   plane volumes the editor's 'collider/plane' primitive (a bridge deck, a
+  //                 second storey, a sloped ramp): never a blocker, it carries a body.
+  if (content.placements === undefined && !content.colliderVolumes?.length) return h; // neither
   const rampFloor = placementRampFloorAt(content, seed, x, z, prevY, deckReach);
   if (rampFloor > h) h = rampFloor;
   const reach = prevY === undefined ? Number.POSITIVE_INFINITY : prevY + deckReach;
@@ -4025,8 +4023,11 @@ function borderSeaGate(x: number, z: number): number {
 }
 
 function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = false): number {
-  const slate = authoredSlateBase(x, z, seed, baseHeight); // authored maps only
-  if (slate !== undefined) return skipEdits ? slate : applyEditLayer(x, z, slate);
+  const content = getActiveWorldContent(); // Studio slate / linked map: never built-in
+  if (content.presentationMode !== undefined) {
+    const slate = authoredSlateBase(x, z, seed, baseHeight);
+    if (slate !== undefined) return skipEdits ? slate : applyEditLayer(x, z, slate);
+  }
   const region = terrainRegionAt(x, z);
   let h = baseHeight(x, z, seed, region);
 
@@ -4492,9 +4493,8 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
     ? stableFlattenWeight(x, z)
     : 0;
   if (stable > 0) h = lerp(h, STABLE_FLAT.height, stable);
-  // A linked map's terrain in its rect, then the sculpt edits as the LAST word
-  // (no-ops in the built-in world); skipEdits: terrainHeightSansEdits alone.
-  h = applyLinkedMapTerrain(x, z, seed, h, baseHeight);
+  // A linked map's terrain in its rect, then the sculpt edits as the LAST word.
+  if (content.linkedMap) h = applyLinkedMapTerrain(x, z, seed, h, baseHeight);
   return skipEdits ? h : applyEditLayer(x, z, h);
 }
 
