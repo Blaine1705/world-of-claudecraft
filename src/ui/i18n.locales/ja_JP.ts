@@ -561,9 +561,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.contestNone': '{total}の間、内部で過半数を維持すると占拠できます',
   'hudChrome.hill.contestOther': '丘を失いつつあります：{seconds} / {total}',
   'hudChrome.hill.contestYou': '丘を占拠中：{seconds} / {total}',
-  'hudChrome.hill.contestYouPaused':
-    '{seconds} / {total}で一時停止中：すべてのライバルより人数で上回れば再開します',
-  'hudChrome.hill.contestOtherPaused': 'ライバルの占拠は{seconds} / {total}で一時停止中',
+  'hudChrome.hill.contestYouPaused': '一時停止中：{seconds} / {total}',
+  'hudChrome.hill.contestOtherPaused': 'ライバルの占拠は一時停止中：{seconds} / {total}',
   'hudChrome.hill.counts': '内部：自分 {yours}、保持者 {theirs}',
   'hudChrome.hill.countsHolding': '内部：自分 {yours}、対抗勢力 {theirs}',
   'hudChrome.hill.countsUnheld': '内部：自分 {yours}、最大の対抗勢力 {theirs}',

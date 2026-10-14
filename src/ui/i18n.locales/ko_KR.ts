@@ -559,9 +559,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.contestNone': '{total} 동안 다수를 유지하면 점령할 수 있습니다',
   'hudChrome.hill.contestOther': '언덕을 빼앗기는 중: {total} 중 {seconds}',
   'hudChrome.hill.contestYou': '언덕을 점령하는 중: {total} 중 {seconds}',
-  'hudChrome.hill.contestYouPaused':
-    '{total} 중 {seconds}에서 일시 정지됨: 모든 경쟁자보다 수가 많아야 재개됩니다',
-  'hudChrome.hill.contestOtherPaused': '경쟁자의 점령이 {total} 중 {seconds}에서 일시 정지됨',
+  'hudChrome.hill.contestYouPaused': '일시 정지됨: {total} 중 {seconds}',
+  'hudChrome.hill.contestOtherPaused': '경쟁자의 점령 일시 정지됨: {total} 중 {seconds}',
   'hudChrome.hill.counts': '안쪽 인원: 나 {yours}, 점령자 {theirs}',
   'hudChrome.hill.countsHolding': '안쪽 인원: 나 {yours}, 상대 {theirs}',
   'hudChrome.hill.countsUnheld': '안쪽 인원: 나 {yours}, 최다 상대 {theirs}',

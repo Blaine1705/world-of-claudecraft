@@ -3441,9 +3441,10 @@ export const hudChromeStrings = {
     contestYou: 'Taking the hill: {seconds} of {total}',
     contestOther: 'Losing the hill: {seconds} of {total}',
     // The clock while its group is inside but not leading (src/sim/pvp/hill_rules.ts
-    // hillProgressStep): a rival only pauses a capture, it never resets it.
-    contestYouPaused: 'Paused at {seconds} of {total}: outnumber every rival to resume',
-    contestOtherPaused: "A rival's capture is paused at {seconds} of {total}",
+    // hillProgressStep): a rival only pauses a capture, it never resets it. Short,
+    // so the line fits the one-line track; the counts row above names the rival.
+    contestYouPaused: 'Paused: {seconds} of {total}',
+    contestOtherPaused: 'Rival paused: {seconds} of {total}',
     contestNone: 'Hold a majority inside for {total} to take it',
     inside: 'You are inside the circle',
     distance: '{yards} yd to the circle',

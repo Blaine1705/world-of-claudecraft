@@ -573,9 +573,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.contestNone': 'Чтобы захватить холм, удерживайте большинство внутри {total}.',
   'hudChrome.hill.contestOther': 'Вы теряете холм: {seconds} из {total}',
   'hudChrome.hill.contestYou': 'Вы захватываете холм: {seconds} из {total}',
-  'hudChrome.hill.contestYouPaused':
-    'Пауза на {seconds} из {total}: превзойдите числом всех соперников, чтобы продолжить',
-  'hudChrome.hill.contestOtherPaused': 'Захват соперника приостановлен: {seconds} из {total}',
+  'hudChrome.hill.contestYouPaused': 'Пауза: {seconds} из {total}',
+  'hudChrome.hill.contestOtherPaused': 'Захват соперника на паузе: {seconds} из {total}',
   'hudChrome.hill.counts': 'Внутри: вы {yours}, владелец {theirs}',
   'hudChrome.hill.countsHolding': 'Внутри: вы {yours}, соперник {theirs}',
   'hudChrome.hill.countsUnheld': 'Внутри: вы {yours}, сильнейший соперник {theirs}',

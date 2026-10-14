@@ -221,9 +221,7 @@ describe('HillBar (the painter)', () => {
     });
     bar.update(buildHillBarView(paused, { x: 360, z: 1540 }));
     const root = layer.querySelector('#hill-bar') as HTMLElement;
-    expect(root.textContent).toContain(
-      'Paused at 20 seconds of 30 seconds: outnumber every rival to resume',
-    );
+    expect(root.textContent).toContain('Paused: 20 seconds of 30 seconds');
     expect(root.textContent).toContain('Inside: you 1, largest rival 1');
     expect(root.classList.contains('is-paused')).toBe(true);
     bar.update(
@@ -232,7 +230,7 @@ describe('HillBar (the painter)', () => {
         { x: 360, z: 1540 },
       ),
     );
-    expect(root.textContent).toContain("A rival's capture is paused at 20 seconds of 30 seconds");
+    expect(root.textContent).toContain('Rival paused: 20 seconds of 30 seconds');
     bar.update(
       buildHillBarView(
         { ...paused, rivalCount: 0, contest: 21, contestPaused: false },
