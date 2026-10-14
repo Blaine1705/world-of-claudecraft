@@ -6842,7 +6842,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.clueTalkAria': 'Спросить о подсказке: {name}',
   'questUi.dialog.clueDeliver': 'Отдать {item} ({count} шт.).',
   'questUi.dialog.clueDeliverAria': 'Отдать {item} ({count} шт.) персонажу {name}',
-  'questUi.dialog.attuneHearthstone': 'Привязать мой союзный камень возвращения к месту: {hub}.',
+  'questUi.dialog.attuneHearthstone': 'Привязать здесь мой союзный камень возвращения.',
   'questUi.dialog.attuneHearthstoneAria':
     'Привязать союзный камень возвращения к месту {hub} у персонажа {name}',
   'questUi.dialog.nythraxisDeathlessKingWarning':

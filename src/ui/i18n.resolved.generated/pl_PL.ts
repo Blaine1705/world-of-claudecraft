@@ -12285,7 +12285,7 @@ export const pl_PL: EnTranslations = {
       "clueTalkAria": "Spytaj o wskazówkę: {name}",
       "clueDeliver": "Wręcz {count} {item}.",
       "clueDeliverAria": "Wręcz {count} {item} dla {name}",
-      "attuneHearthstone": "Attune my Allied Hearthstone to {hub}.",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
       "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Porozmawiaj z {name} o \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Te trzy relikwie opowiadają tę samą historię: Aldren walczył w obronie swojego króla, Malric przełamał granicę śmierci, a Voss próbował powstrzymać to, co nastąpiło. Pieczęć słabnie, a opuszczona krypta to droga w głąb.",

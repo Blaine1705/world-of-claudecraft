@@ -12285,7 +12285,7 @@ export const en_XA: EnTranslations = {
       "clueTalkAria": "[Ášķ áƀóúţ ţĥé çļúé: {name}]",
       "clueDeliver": "[Ĥáñð óʋéŕ {count} {item}.]",
       "clueDeliverAria": "[Ĥáñð óʋéŕ {count} {item} ţó {name}]",
-      "attuneHearthstone": "[Áţţúñé ɱý Áļļíéð Ĥéáŕţĥšţóñé ţó {hub}.]",
+      "attuneHearthstone": "[Áţţúñé ɱý Áļļíéð Ĥéáŕţĥšţóñé ĥéŕé.]",
       "attuneHearthstoneAria": "[Áţţúñé ýóúŕ Áļļíéð Ĥéáŕţĥšţóñé ţó {hub} ŵíţĥ {name}]",
       "profIntroHint": "[Šéé {name} ƒóŕ \"{quest}\".]",
       "nythraxisDeathlessKingWarning": "[Ţĥé ţĥŕéé ŕéļíçš ţéļļ ţĥé šáɱé šţóŕý: Áļðŕéñ ƒóúĝĥţ ţó ðéƒéñð ĥíš ķíñĝ, Ɱáļŕíç ƀŕóķé ţĥé ƀóúñðáŕý óƒ ðéáţĥ, áñð Ʋóšš ţŕíéð ţó šţóþ ŵĥáţ ƒóļļóŵéð. Ţĥé šéáļ íš ŵéáķéñíñĝ, áñð ţĥé áƀáñðóñéð çŕýþţ íš ţĥé ŵáý ðóŵñ.]",

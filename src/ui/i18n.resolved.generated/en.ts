@@ -12285,7 +12285,7 @@ export const en: EnTranslations = {
       "clueTalkAria": "Ask about the clue: {name}",
       "clueDeliver": "Hand over {count} {item}.",
       "clueDeliverAria": "Hand over {count} {item} to {name}",
-      "attuneHearthstone": "Attune my Allied Hearthstone to {hub}.",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
       "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "See {name} for \"{quest}\".",
       "nythraxisDeathlessKingWarning": "The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and the abandoned crypt is the way down.",

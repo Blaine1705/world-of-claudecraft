@@ -573,7 +573,7 @@ export class QuestDialogController {
     this.lastHearthRowFaction = hearthFaction;
     if (hearthFaction) {
       const hub = t(HEARTH_HUB_KEYS[hearthFaction]);
-      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-hearth-attune="1" aria-label="${esc(t('questUi.dialog.attuneHearthstoneAria', { hub, name: npcName }))}"><span class="gold">${svgIcon('map')}</span> ${esc(t('questUi.dialog.attuneHearthstone', { hub }))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-hearth-attune="1" aria-label="${esc(t('questUi.dialog.attuneHearthstoneAria', { hub, name: npcName }))}"><span class="gold">${svgIcon('map')}</span> ${esc(t('questUi.dialog.attuneHearthstone'))}</button>`;
     }
     // Crafting shortcut: the master's Crafting option opens the crafting
     // window straight to their own craft's tab (the viewer's stronger craft

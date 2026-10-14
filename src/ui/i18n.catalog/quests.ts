@@ -65,9 +65,10 @@ const questStringsEn = {
       clueDeliver: 'Hand over {count} {item}.',
       clueDeliverAria: 'Hand over {count} {item} to {name}',
       // A faction quartermaster's Allied Hearthstone row
-      // (hearthstone_attune_row_core.ts): binds the stone to this hub. {hub}
-      // is the localized hudChrome.factionRewards.hub_* label.
-      attuneHearthstone: 'Attune my Allied Hearthstone to {hub}.',
+      // (hearthstone_attune_row_core.ts): binds the stone to this hub. The
+      // label stays short so it fits a phone-width dialog; the aria label
+      // names the hub ({hub} is the localized hudChrome.factionRewards.hub_*).
+      attuneHearthstone: 'Attune my Allied Hearthstone here.',
       attuneHearthstoneAria: 'Attune your Allied Hearthstone to {hub} with {name}',
       // The profession masters' locked-quest hint row. Deliberately terse:
       // both {placeholders} resolve to already

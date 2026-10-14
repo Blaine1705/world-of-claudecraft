@@ -12285,7 +12285,7 @@ export const es_ES: EnTranslations = {
       "clueTalkAria": "Preguntar sobre la pista: {name}",
       "clueDeliver": "Entrega {count} {item}.",
       "clueDeliverAria": "Entregar {count} {item} a {name}",
-      "attuneHearthstone": "Attune my Allied Hearthstone to {hub}.",
+      "attuneHearthstone": "Attune my Allied Hearthstone here.",
       "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
       "profIntroHint": "Habla con {name} para \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Las tres reliquias cuentan la misma historia: Aldren luchó para defender a su rey, Malric rompió el límite de la muerte y Voss intentó detener lo que vino después. El sello se debilita, y la cripta abandonada es el camino hacia abajo.",
