@@ -47,7 +47,6 @@ import {
   SAURIAN_TAIL_SWIPE,
   ZULGAR_AVATAR,
   ZULGAR_ID,
-  ZULGAR_VANISHED,
 } from '../../sim/encounters/wildheart_basin/ids';
 import {
   WILDHEART_ANCESTRAL_SAP,
@@ -58,7 +57,6 @@ import {
 } from '../../sim/mob/trash_kit/wildheart_cast_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
-import { ZULGAR_HIDE_GESTURE, ZULGAR_SHOW_GESTURE } from '../characters/wildheart_creature_looks';
 import { type TelegraphFan, TelegraphKit, type TelegraphLane } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -238,8 +236,6 @@ export class WildheartFx {
   private readonly hunt: ZulgarHuntFx | null;
   /** The idol's throat burned last frame (put out once on leaving the basin). */
   private throatLit = false;
-  /** Zulgar's model is hidden (heroic Ambush's vanish). */
-  private zulgarHidden = false;
   private readonly smoke: ParticlePool;
   private readonly glow: ParticlePool;
   private readonly uTime = { value: 0 };
@@ -442,7 +438,9 @@ export class WildheartFx {
           boss ? boss.lashYaw(id, fallback) : fallback,
         )
       : null;
-    this.avatar = world ? new ZulgarAvatarFx(scene, this.bossHost(), world, compileGate) : null;
+    this.avatar = world
+      ? new ZulgarAvatarFx(scene, this.bossHost(), world, compileGate, playGesture)
+      : null;
     this.hunt = world ? new ZulgarHuntFx(this.bossHost(), world) : null;
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
@@ -986,7 +984,6 @@ export class WildheartFx {
         basin = true;
         this.avatar?.setZulgar(e);
         this.hunt?.scanZulgar(e);
-        this.syncZulgarHidden(e);
         if (!e.dead && e.inCombat) zulgar = hasAura(e, ZULGAR_AVATAR) ? 'hunt' : 'fight';
       }
       if (e.dead) continue;
@@ -1045,16 +1042,6 @@ export class WildheartFx {
     slot.emit = 0;
     slot.drapedX = Number.NaN;
     slot.group.visible = true;
-  }
-
-  /** Heroic Ambush: his model is gone while the vanish holds (the nameplate
-   *  and the floor circle still say where the fight is), back on the landing.
-   *  Re-sent each scan while it holds, so a view rebuilt mid-vanish hides too. */
-  private syncZulgarHidden(e: Entity): void {
-    const hidden = !e.dead && hasAura(e, ZULGAR_VANISHED);
-    if (hidden) this.playGesture?.(e.id, ZULGAR_HIDE_GESTURE);
-    else if (this.zulgarHidden) this.playGesture?.(e.id, ZULGAR_SHOW_GESTURE);
-    this.zulgarHidden = hidden;
   }
 
   private claimVine(e: Entity): void {

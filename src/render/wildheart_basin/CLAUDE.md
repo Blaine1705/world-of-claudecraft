@@ -63,11 +63,11 @@ model's origin is the waterline. It slews round to its target (`ClipMap.turn`,
 `VisualDef.turnRate`), its three bars are bar-locked (`VisualDef.castClipSync`), and its
 gullet and sacs glow from its own emissive map (`VisualDef.glowPulses`).
 
-The boss layer is PLACEHOLDER: the art phase replaces looks, never sizes (those are the
-sim's). Known gaps it owns: Zulgar's model must hide while `ZULGAR_VANISHED` holds (the
-fx only throws smoke at the vanish and the landing, and the renderer still draws him),
-the Avatar wants a real spirit-jaguar body over the glow, and the pods want a modelled
-seed in place of the ovoid. Zulgar has no throwing clip: his Hunting Spear bar plays his
+The boss layer still has placeholder pods, which want a modelled seed in place of the
+ovoid. Zulgar's avatar painter owns his priest mesh visibility: it hides the priest
+while `ZULGAR_VANISHED` holds or a ready spirit body replaces him, preserving the
+entity's nameplate and click proxy. Loading the spirit never hides the priest first.
+Ending the hunt, death, leaving the basin and disposal restore the priest. Zulgar has no throwing clip: his Hunting Spear bar plays his
 overhead blow drawn out, and the spear's streak covers the release.
 
 Rules:

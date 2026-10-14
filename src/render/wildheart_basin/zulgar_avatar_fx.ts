@@ -1,7 +1,7 @@
 // Zulgar's Jaguar Avatar: while the Spirit of the Hunt holds him (the
 // `wildheart_jaguar_avatar` aura), the Great Jaguar's jade spirit body
 // (JAGUAR_MODEL.spiritUrl, the same rig and clips as the Fanglord's cat) runs
-// round him, a third again its size: it fades in with the hunt's roar, gallops
+// in place of him, a third again its size: it fades in with the hunt's roar, gallops
 // and walks with his pace, pounces when he mauls his prey and fades out when
 // the hunt ends. A jade trail of motes streams off it while it runs. While he
 // is Sunstruck (the damage window's aura) the whole spirit burns GOLD: the
@@ -24,10 +24,12 @@ import {
   ZULGAR_ID,
   ZULGAR_MAULED,
   ZULGAR_SUNSTRUCK_EXPOSED,
+  ZULGAR_VANISHED,
 } from '../../sim/encounters/wildheart_basin/ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { loadGltf } from '../assets/loader';
+import { ZULGAR_HIDE_GESTURE, ZULGAR_SHOW_GESTURE } from '../characters/wildheart_creature_looks';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { setRenderCategory } from '../renderer_diagnostics';
 import type { BasinFxHost } from './basin_fx_host';
@@ -78,12 +80,14 @@ export class ZulgarAvatarFx {
   private placed = false;
   private trail = 0;
   private disposed = false;
+  private hiddenPriestId = -1;
 
   constructor(
     scene: THREE.Scene,
     private readonly host: BasinFxHost,
     private readonly world: IWorld,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.root.name = 'wildheart-zulgar-avatar';
     setRenderCategory(this.root, 'ui3d');
@@ -146,7 +150,8 @@ export class ZulgarAvatarFx {
     mixer.addEventListener('finished', (e) => {
       if (e.action === this.oneShot) {
         this.oneShot = null;
-        if (this.loop) this.actions.get(this.loop)?.fadeIn(0.2);
+        if (this.loop)
+          this.actions.get(this.loop)?.reset().setEffectiveWeight(1).fadeIn(0.2).play();
       }
     });
     this.mixer = mixer;
@@ -180,7 +185,7 @@ export class ZulgarAvatarFx {
         if (this.loop) this.actions.get(this.loop)?.fadeOut(0.25);
         next.reset().play();
         if (this.oneShot) next.setEffectiveWeight(0);
-        else next.fadeIn(0.25);
+        else next.setEffectiveWeight(1).fadeIn(0.25);
       }
       this.loop = name;
     }
@@ -189,13 +194,18 @@ export class ZulgarAvatarFx {
   }
 
   update(dt: number): void {
-    if (this.disposed || !this.body || !this.mixer) return;
+    if (this.disposed) return;
     const e = this.zulgarId >= 0 ? this.world.entities.get(this.zulgarId) : undefined;
+    if (!this.body || !this.mixer) {
+      this.syncPriest(e, false);
+      return;
+    }
     const active = !!e && !e.dead && hasAura(e, ZULGAR_AVATAR);
     this.fade = avatarFade(this.fade, active, dt);
     if (this.fade <= 0.001 || !e) {
       if (this.body.visible) this.body.visible = false;
       this.placed = false;
+      this.syncPriest(e, false);
       return;
     }
     // Follow his displayed body: an exponential chase over the 20 Hz steps.
@@ -232,6 +242,9 @@ export class ZulgarAvatarFx {
       m.opacity = Math.min(0.95, this.baseOpacity[i] * this.fade * pulse);
       m.visible = this.fade > 0.02;
     }
+    // Hide only the priest meshes, preserving his nameplate and click proxy.
+    // A loading or compile-gated spirit never leaves an invisible boss.
+    this.syncPriest(e, active && this.root.visible && this.fade > 0.02);
     // A jade trail off its flanks while it runs.
     if (gait !== 'Idle' && this.fade > 0.5) {
       this.trail += dt * 34 * this.host.density;
@@ -260,7 +273,21 @@ export class ZulgarAvatarFx {
     }
   }
 
+  private syncPriest(e: Entity | undefined, replaced: boolean): void {
+    const hidden = !!e && !e.dead && (replaced || hasAura(e, ZULGAR_VANISHED));
+    if (this.hiddenPriestId >= 0 && (!hidden || this.hiddenPriestId !== e?.id)) {
+      this.playGesture?.(this.hiddenPriestId, ZULGAR_SHOW_GESTURE);
+      this.hiddenPriestId = -1;
+    }
+    if (hidden) {
+      // Re-send so a view rebuilt during a hunt immediately hides its meshes.
+      this.playGesture?.(e.id, ZULGAR_HIDE_GESTURE);
+      this.hiddenPriestId = e.id;
+    }
+  }
+
   hide(): void {
+    this.syncPriest(undefined, false);
     this.fade = 0;
     this.gold.value = 0;
     if (this.body) this.body.visible = false;
@@ -269,6 +296,7 @@ export class ZulgarAvatarFx {
 
   dispose(): void {
     if (this.disposed) return;
+    this.hide();
     this.disposed = true;
     this.root.removeFromParent();
     this.mixer?.stopAllAction();
