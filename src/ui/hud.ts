@@ -89,6 +89,7 @@ import type { FactionId } from '../sim/factions';
 import { isItemLevelEligible, itemInstanceLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MaterialComposition } from '../sim/material_sources';
+import { PET_MODES } from '../sim/pet/pet_assist';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import {
   computeRespecCost,
@@ -1142,11 +1143,13 @@ const PET_MODE_LABEL_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passive',
   defensive: 'hud.pet.defensive',
   aggressive: 'hud.pet.aggressive',
+  assist: 'hud.pet.assist',
 };
 const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passiveDesc',
   defensive: 'hud.pet.defensiveDesc',
   aggressive: 'hud.pet.aggressiveDesc',
+  assist: 'hud.pet.assistDesc',
 };
 /** The visual language the shared #banner slot paints in. 'default' is the
  *  bare gold celebration text every milestone has always used (level up, zone
@@ -8393,31 +8396,17 @@ export class Hud {
         },
       );
     }
-    const modes: {
-      mode: PetMode;
-      labelKey: TranslationKey;
-      descKey: TranslationKey;
-    }[] = [
-      {
-        mode: 'passive',
-        labelKey: PET_MODE_LABEL_KEYS.passive,
-        descKey: PET_MODE_DESC_KEYS.passive,
-      },
-      {
-        mode: 'defensive',
-        labelKey: PET_MODE_LABEL_KEYS.defensive,
-        descKey: PET_MODE_DESC_KEYS.defensive,
-      },
-      {
-        mode: 'aggressive',
-        labelKey: PET_MODE_LABEL_KEYS.aggressive,
-        descKey: PET_MODE_DESC_KEYS.aggressive,
-      },
-    ];
+    // One row per stance, in menu order (pet/pet_assist.ts PET_MODES).
+    const modes = PET_MODES.map((m) => ({
+      mode: m,
+      labelKey: PET_MODE_LABEL_KEYS[m],
+      descKey: PET_MODE_DESC_KEYS[m],
+    }));
     const modeIcons: Record<PetMode, string> = {
       passive: PET_ACTION_ICONS.passive,
       defensive: PET_ACTION_ICONS.defensive,
       aggressive: PET_ACTION_ICONS.aggressive,
+      assist: PET_ACTION_ICONS.attack, // Assist wears Pet Attack's art, by design
     };
     addButton(
       stances,

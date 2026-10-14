@@ -418,13 +418,20 @@ describe('Hud pet bar: dragging a command onto the action bar', () => {
     return { event, data };
   }
 
-  it('makes exactly the five commands draggable, never feed or the stance toggle', () => {
+  it('makes exactly the six commands draggable, never feed or the stance toggle', () => {
     dragHud();
     const draggable = [...document.querySelectorAll<HTMLButtonElement>('.pet-btn')]
       .filter((b) => b.draggable)
       .map((b) => b.dataset.focusKey);
     expect(draggable.sort()).toEqual(
-      ['pet_attack', 'pet_growl', 'stance-aggressive', 'stance-defensive', 'stance-passive'].sort(),
+      [
+        'pet_attack',
+        'pet_growl',
+        'stance-aggressive',
+        'stance-assist',
+        'stance-defensive',
+        'stance-passive',
+      ].sort(),
     );
   });
 
@@ -446,6 +453,21 @@ describe('Hud pet bar: dragging a command onto the action bar', () => {
     passive?.dispatchEvent(new Event('dragend'));
     expect(hud.dragAction).toBeNull();
     expect(hud.clearActionDropTargets).toHaveBeenCalled();
+  });
+
+  it('offers Assist in the stance menu with Pet Attack art, selecting and dragging as assist', () => {
+    const hud = dragHud();
+    const assist = document.querySelector<HTMLButtonElement>('[data-focus-key="stance-assist"]');
+    expect(assist?.title).toBe('Assist');
+    expect(assist?.querySelector<HTMLElement>('.icon-label')?.style.backgroundImage).toContain(
+      'mock:ability:pet_attack',
+    );
+    const { event } = dragEvent('dragstart');
+    assist?.dispatchEvent(event);
+    expect(hud.dragAction).toEqual({ action: { type: 'pet', id: 'assist' }, sourceIndex: null });
+    assist?.dispatchEvent(new Event('dragend'));
+    assist?.click();
+    expect(hud.sim.setPetMode).toHaveBeenCalledWith('assist');
   });
 
   it('refuses the drag while the action bars are locked', () => {

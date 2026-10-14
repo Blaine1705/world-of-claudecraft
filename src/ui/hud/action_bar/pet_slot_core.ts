@@ -1,5 +1,5 @@
-// Pet commands as action-bar slots: the five pet-bar commands (the same set the
-// Ctrl+1..5 binds run, src/game/pet_commands.ts) can be dragged off the pet bar
+// Pet commands as action-bar slots: the pet-bar commands (the set the Ctrl+1..5
+// binds run, src/game/pet_commands.ts, plus the Assist stance) can be dragged off the pet bar
 // onto any configurable action-bar slot and pressed from there. This is the pure
 // half: which ids are valid, what each slot paints (icon, name, usable, active,
 // cooldown) for the commanded pet, and nothing that touches the DOM or the world.
@@ -21,6 +21,7 @@ export const PET_SLOT_COMMANDS: readonly PetCommand[] = [
   'stop',
   'defensive',
   'aggressive',
+  'assist',
 ];
 
 const PET_SLOT_COMMAND_SET: ReadonlySet<string> = new Set(PET_SLOT_COMMANDS);
@@ -37,6 +38,8 @@ const PET_SLOT_ICON_IDS: Record<PetCommand, string> = {
   stop: PET_ACTION_ICONS.passive,
   defensive: PET_ACTION_ICONS.defensive,
   aggressive: PET_ACTION_ICONS.aggressive,
+  // Assist has no art of its own: it wears Pet Attack's, by design.
+  assist: PET_ACTION_ICONS.attack,
 };
 
 const PET_SLOT_TEXT: Record<
@@ -60,6 +63,7 @@ const PET_SLOT_TEXT: Record<
     title: 'hud.pet.aggressive',
     desc: 'hud.pet.aggressiveDesc',
   },
+  assist: { name: 'hud.pet.assist', title: 'hud.pet.assist', desc: 'hud.pet.assistDesc' },
 };
 
 // The stance a command selects, or null for the one-shot commands.
@@ -69,6 +73,7 @@ const PET_SLOT_MODE: Record<PetCommand, PetMode | null> = {
   stop: 'passive',
   defensive: 'defensive',
   aggressive: 'aggressive',
+  assist: 'assist',
 };
 
 export function petSlotIconId(command: PetCommand): string {

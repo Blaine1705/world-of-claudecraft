@@ -55,9 +55,9 @@ function pet(over: Partial<PetSlotPet> = {}): PetSlotPet {
 }
 
 describe('pet slot command set', () => {
-  it('holds exactly the five pet-bar commands', () => {
+  it('holds exactly the six pet-bar commands', () => {
     expect([...PET_SLOT_COMMANDS].sort()).toEqual(
-      ['aggressive', 'attack', 'defensive', 'stop', 'taunt'].sort(),
+      ['aggressive', 'assist', 'attack', 'defensive', 'stop', 'taunt'].sort(),
     );
     for (const id of PET_SLOT_COMMANDS) expect(isPetSlotCommand(id)).toBe(true);
     expect(isPetSlotCommand('follow')).toBe(false);
@@ -71,6 +71,9 @@ describe('pet slot command set', () => {
     expect(petSlotIconId('stop')).toBe(PET_ACTION_ICONS.passive);
     expect(petSlotIconId('defensive')).toBe(PET_ACTION_ICONS.defensive);
     expect(petSlotIconId('aggressive')).toBe(PET_ACTION_ICONS.aggressive);
+    // Assist has no art of its own: it wears Pet Attack's.
+    expect(petSlotIconId('assist')).toBe(PET_ACTION_ICONS.attack);
+    expect(petSlotMode('assist')).toBe('assist');
     expect(petSlotMode('stop')).toBe('passive');
     expect(petSlotMode('attack')).toBeNull();
     expect(petSlotMode('taunt')).toBeNull();

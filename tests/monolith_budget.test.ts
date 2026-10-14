@@ -542,7 +542,10 @@ const MONOLITHS: MonolithRow[] = [
     // (which now also owns the drag that copies a pet command onto a slot), so
     // the cast, drop, tooltip and slot wiring the feature added here still nets
     // the coordinator 127 lines smaller. Exact count, zero slack.
-    ceiling: 17966,
+    // Lowered again from 17966 by the Assist pet stance: the pet bar's stance-menu
+    // table now derives from PET_MODES (sim/pet/pet_assist.ts) instead of three
+    // hand-written rows, so adding the fourth stance shrank the file. Exact count.
+    ceiling: 17955,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
