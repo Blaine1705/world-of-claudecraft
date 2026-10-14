@@ -2705,6 +2705,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.gossipOptionAria': '{name}이(가) 운영하는 워페어 세트 상점 둘러보기',
   'hudChrome.warfareShop.jewelry': '장신구',
   'hudChrome.warfareShop.weapons': '무기',
+  'hudChrome.warfareShop.goods': '물품',
+  // World PvP Skull Bag (M16 fills).
+  'hudChrome.skullBag.title': '해골 가방',
+  'hudChrome.skullBag.total': '해골: {count}',
+  'hudChrome.skullBag.close': '해골 가방 닫기',
+  'hudChrome.skullBag.clickOpen': '클릭하여 열기',
+  'hudChrome.skullBag.notCarried':
+    '해골을 보관하거나 꺼내려면 해골 가방을 가방에 넣고 다녀야 합니다.',
+  'hudChrome.skullBag.empty':
+    '비어 있습니다. 가방을 지니고 있는 동안 획득한 해골은 바로 이 가방에 들어갑니다.',
+  'hudChrome.skullBag.unrecorded': '전리품 해골',
+  'hudChrome.skullBag.store': '소지한 해골 보관 ({count})',
+  'hudChrome.skullBag.storeNone': '보관할 해골 없음',
+  'hudChrome.skullBag.takeOne': '1개 꺼내기',
+  'hudChrome.skullBag.takeAll': '모두 꺼내기',
+  'hudChrome.skullBag.takeOneAria': '1개 꺼내기: {item}',
+  'hudChrome.skullBag.takeAllAria': '모두 꺼내기: {item}',
+  'hudChrome.skullBag.tooltip':
+    '가방 공간을 차지하지 않고 전리품 해골을 개수 제한 없이 보관합니다. 가방에 있는 동안 획득한 해골은 바로 이 가방에 들어갑니다. 가방에서 클릭하여 해골을 보관하거나 꺼낼 수 있습니다.',
   'hudChrome.warfareShop.owned': '보유 중',
   'hudChrome.warfareShop.buyOwnedAria': '{honor}에 {item} 구매, 이미 보유 중',
   'hudChrome.warfareShop.buyConfirmBody':
@@ -18565,6 +18584,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_surveyors_satchel.name': '균열 측량사의 가방',
   'entities.items.emissary_cache.name': '사절의 보관함',
   'entities.items.pvp_trophy_skull.name': '전리품 해골',
+  'entities.items.pvp_skull_bag.name': '해골 가방',
   'entities.npcs.weekly_emissary.name': '참 피트',
   'entities.npcs.weekly_emissary.title': '사절',
   'entities.npcs.weekly_emissary.greeting':

@@ -590,9 +590,11 @@ export const IWORLD_MEMBERS = [
   // --- the scheduled ferry (IWorldTransport): one read-returning method, the
   // live timetable view both worlds derive from their schedule clock ---
   { name: 'ferryView', kind: 'method' },
-  // IWorldWorldPvp (world_pvp.ts): the /pvp flag readout + raise/lower.
+  // IWorldWorldPvp (world_pvp.ts): the /pvp flag readout + raise/lower, and
+  // the Skull Bag's store/take command.
   { name: 'worldPvpInfo', kind: 'data' },
   { name: 'setWorldPvpFlag', kind: 'method' },
+  { name: 'skullBagAction', kind: 'method' },
   { name: 'hillInfo', kind: 'data' },
 ] as const satisfies readonly IWorldMember[];
 
@@ -944,9 +946,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // 426/126/300.
     // Plus the druid Spore Burst mushrooms activeSporeBursts (+1 data):
     // 427/127/300.
-    expect(IWORLD_MEMBERS.length).toBe(427);
+    // Plus the World PvP Skull Bag's skullBagAction (+1 method): 428/127/301.
+    expect(IWORLD_MEMBERS.length).toBe(428);
     expect(DATA_MEMBERS.length).toBe(127);
-    expect(METHOD_MEMBERS.length).toBe(300);
+    expect(METHOD_MEMBERS.length).toBe(301);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1313,6 +1316,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'skullBagAction',
       'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
@@ -1777,6 +1781,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'skullBagAction',
       'slotToolEffect',
       'socketRiftGem',
       'sortInventory',
@@ -2496,6 +2501,7 @@ type _ExhaustTransport = AssertNever<
 const FACET_WORLD_PVP = [
   'worldPvpInfo',
   'setWorldPvpFlag',
+  'skullBagAction',
   'hillInfo',
 ] as const satisfies readonly (keyof IWorldWorldPvp)[];
 type _ExhaustWorldPvp = AssertNever<
@@ -2637,8 +2643,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(427);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(427);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(428);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(428);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

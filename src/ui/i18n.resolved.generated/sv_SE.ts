@@ -2882,11 +2882,28 @@ export const sv_SE: EnTranslations = {
       "falls": "Faller om {minutes}",
       "standingRaid": "Rajdmedlemmar räknas inte: bara partier kan inneha kullen"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Bläddra bland Krigföringsset",
       "gossipOptionAria": "Bläddra bland Krigföringssetbutiken som erbjuds av {name}",
       "jewelry": "Smycken",
       "weapons": "Vapen",
+      "goods": "Goods",
       "groupSeason2": "Krigsföring Säsong 2: Framfart",
       "groupEntry": "Krigsföring Säsong 1",
       "owned": "Ägd",
@@ -19034,6 +19051,9 @@ export const sv_SE: EnTranslations = {
       },
       "pvp_trophy_skull": {
         "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Ledtrådsrull"

@@ -408,6 +408,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'capacity, purchased and bonus slot counts, the next expansion cost, the stored slots (both panes ride ONE sig, the guild arm and the activity log key appended). render() carries no self-gate, so the arm rebuilds',
   },
   {
+    file: 'hud/skull_bag/skull_bag_pane_controller.ts',
+    memos: ['lastSignature'],
+    answer: 'this.renderBags',
+    why: 'the Skull Bag pane is mounted only inside the open bags window; the bags language arm rebuilds that window, remounts the pane, resets lastSignature, and repaints the title, row labels, aria labels and buttons in the new locale',
+  },
+  {
     file: 'calendar_window.ts',
     memos: ['lastSig'],
     answer: 'this.calendarWindow.relocalize',

@@ -178,6 +178,8 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'lifetimeHonor',
   'honorArenaDaily',
   'worldPvp',
+  // The World PvP Skull Bag's stored skulls (src/sim/pvp/skull_bag.ts).
+  'skullBag',
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
@@ -2483,7 +2485,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         138 +
         // Plus 34 for the Groveheart deed row that this maximal fixture earns,
         // measured on the merged v0.45 tree.
-        34,
+        34 +
+        // Plus 62 for the World PvP Skull Bag (an honor purchase, so a Warfare
+        // armory relic): `"pvp_skull_bag",` in deedStats.itemsDiscovered (+16)
+        // and its reliquary.firstFind row (+46). MEASURED on this tree.
+        62,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2531,8 +2537,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // +19 for the World PvP trophy skull id (attributed above).
-      deedStats: 9446,
-      reliquary: 11501,
+      // +16 for the World PvP Skull Bag id (attributed above).
+      deedStats: 9462,
+      // +46 for the World PvP Skull Bag's reliquary.firstFind row (attributed above).
+      reliquary: 11547,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2574,7 +2582,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 231,729 -> 231,755 with prog_titan in the deeds row (+26, kept here).
       // Five World PvP title dates add +138, also kept here.
       // Groveheart's deed row adds +34, also kept here.
-    ).toBe(231969);
+      // +62 for the World PvP Skull Bag (deedStats id and reliquary row), kept.
+    ).toBe(232031);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2606,7 +2615,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 233,348 -> 233,374 with prog_titan in the deeds row (+26, kept).
       // Five World PvP title dates add +138, also kept here.
       // Groveheart's deed row adds +34, also kept here.
-    ).toBe(233588);
+      // +62 for the World PvP Skull Bag, which this baseline keeps.
+    ).toBe(233650);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2714,8 +2724,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 381-byte tracking band and the unchanged character warning threshold.
     // Together they measure 233,600 bytes. Floor at measurement minus 380,
     // edge at measurement plus one: 233220..233601.
-    expect(bytes, reMint).toBeGreaterThan(233220);
-    expect(bytes, reMint).toBeLessThan(233601);
+    // RE-BASED with the World PvP Skull Bag: 233,464 bytes, up 62 (its
+    // deedStats id +16 and its reliquary.firstFind row +46, both attributed in
+    // the growth equation above). Floor at measurement minus 380, edge at
+    // measurement plus one: 233084..233465.
+    // Composed together they measure 233,662 bytes. Floor at measurement minus
+    // 380, edge at measurement plus one: 233282..233663.
+    expect(bytes, reMint).toBeGreaterThan(233282);
+    expect(bytes, reMint).toBeLessThan(233663);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

@@ -2882,11 +2882,28 @@ export const ko_KR: EnTranslations = {
       "falls": "{minutes} 후 무너짐",
       "standingRaid": "공격대원은 인원수에 포함되지 않습니다: 파티만 언덕을 점령할 수 있습니다"
     },
+    "skullBag": {
+      "title": "해골 가방",
+      "total": "해골: {count}",
+      "close": "해골 가방 닫기",
+      "clickOpen": "클릭하여 열기",
+      "notCarried": "해골을 보관하거나 꺼내려면 해골 가방을 가방에 넣고 다녀야 합니다.",
+      "empty": "비어 있습니다. 가방을 지니고 있는 동안 획득한 해골은 바로 이 가방에 들어갑니다.",
+      "unrecorded": "전리품 해골",
+      "store": "소지한 해골 보관 ({count})",
+      "storeNone": "보관할 해골 없음",
+      "takeOne": "1개 꺼내기",
+      "takeAll": "모두 꺼내기",
+      "takeOneAria": "1개 꺼내기: {item}",
+      "takeAllAria": "모두 꺼내기: {item}",
+      "tooltip": "가방 공간을 차지하지 않고 전리품 해골을 개수 제한 없이 보관합니다. 가방에 있는 동안 획득한 해골은 바로 이 가방에 들어갑니다. 가방에서 클릭하여 해골을 보관하거나 꺼낼 수 있습니다."
+    },
     "warfareShop": {
       "gossipOption": "워페어 세트 둘러보기",
       "gossipOptionAria": "{name}이(가) 운영하는 워페어 세트 상점 둘러보기",
       "jewelry": "장신구",
       "weapons": "무기",
+      "goods": "물품",
       "groupSeason2": "워페어 시즌 2: 선봉대",
       "groupEntry": "워페어 시즌 1",
       "owned": "보유 중",
@@ -19034,6 +19051,9 @@ export const ko_KR: EnTranslations = {
       },
       "pvp_trophy_skull": {
         "name": "전리품 해골"
+      },
+      "pvp_skull_bag": {
+        "name": "해골 가방"
       },
       "clue_scroll": {
         "name": "단서 두루마리"

@@ -2882,11 +2882,28 @@ export const fr_CA: EnTranslations = {
       "falls": "Retombe dans {minutes}",
       "standingRaid": "Les membres du raid ne comptent pas : seuls les groupes peuvent détenir la colline"
     },
+    "skullBag": {
+      "title": "Skull Bag",
+      "total": "Skulls: {count}",
+      "close": "Close the Skull Bag",
+      "clickOpen": "Click to open",
+      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
+      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
+      "unrecorded": "Trophy Skull",
+      "store": "Store carried skulls ({count})",
+      "storeNone": "No skulls to store",
+      "takeOne": "Take 1",
+      "takeAll": "Take all",
+      "takeOneAria": "Take 1: {item}",
+      "takeAllAria": "Take all: {item}",
+      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+    },
     "warfareShop": {
       "gossipOption": "Parcourir les tenues de Guerre",
       "gossipOptionAria": "Parcourir la boutique de tenues de Guerre proposée par {name}",
       "jewelry": "Bijoux",
       "weapons": "Armes",
+      "goods": "Goods",
       "groupSeason2": "Saison de Guerre 2 : Avant-garde",
       "groupEntry": "Saison de Guerre 1",
       "owned": "Possédé",
@@ -19034,6 +19051,9 @@ export const fr_CA: EnTranslations = {
       },
       "pvp_trophy_skull": {
         "name": "Trophy Skull"
+      },
+      "pvp_skull_bag": {
+        "name": "Skull Bag"
       },
       "clue_scroll": {
         "name": "Parchemin d'indice"

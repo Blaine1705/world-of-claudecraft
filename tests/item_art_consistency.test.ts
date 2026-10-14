@@ -854,7 +854,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
     // The World PvP trophy skull (pvp_trophy_skull, world_pvp_spoils.ts): 1,618.
-    expect(Object.keys(ITEMS)).toHaveLength(1618);
+    // The World PvP Skull Bag (pvp_skull_bag, pvp/skull_bag.ts): 1,619.
+    expect(Object.keys(ITEMS)).toHaveLength(1619);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1019,9 +1020,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
     // + the World PvP trophy skull (pvp_trophy_skull): 1465 owners, 1618 items.
-    expect(new Set(currentOwnerIds).size).toBe(1465);
-    expect(shippingIds).toHaveLength(1465);
-    expect(Object.keys(ITEMS)).toHaveLength(1618);
+    // + the World PvP Skull Bag (pvp_skull_bag): 1466 owners, 1619 items.
+    expect(new Set(currentOwnerIds).size).toBe(1466);
+    expect(shippingIds).toHaveLength(1466);
+    expect(Object.keys(ITEMS)).toHaveLength(1619);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1180,6 +1182,8 @@ describe('item-art consistency accepted-art provenance', () => {
         'reins_avian_strider',
         // The World PvP trophy skull (pvp_trophy_skull), additive the same way.
         'pvp_trophy_skull',
+        // The World PvP Skull Bag (pvp_skull_bag), additive the same way.
+        'pvp_skull_bag',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
@@ -1338,8 +1342,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // one generated batch. The surviving ordinary-art cohort stays explicit.
     // 43 -> 44 at the weekly emissary: the Emissary's Cache chest; 45 with
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge);
-    // 46 with the World PvP trophy skull (pvp_trophy_skull).
-    expect(mapping.entries).toHaveLength(46);
+    // 46 with the World PvP trophy skull (pvp_trophy_skull); 47 with the
+    // World PvP Skull Bag (pvp_skull_bag).
+    expect(mapping.entries).toHaveLength(47);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
@@ -1429,8 +1434,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1465);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1465);
+    expect(allCurrentOwnerIds).toHaveLength(1466);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1466);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1440,7 +1445,8 @@ describe('item-art consistency accepted-art provenance', () => {
     }).toEqual({
       // 45 entries (the release's mapping entries; the hoard batches own no entries)
       // + the World PvP trophy skull's own entry = 46.
-      entries: 46,
+      // + the World PvP Skull Bag's own entry = 47.
+      entries: 47,
       // + the 2 Clue Scroll ids = 776 + the 17 faction ladder ids = 793.
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
@@ -1536,6 +1542,8 @@ describe('item-art consistency accepted-art provenance', () => {
         'reins_avian_strider',
         // The World PvP trophy skull (pvp_trophy_skull), additive the same way.
         'pvp_trophy_skull',
+        // The World PvP Skull Bag (pvp_skull_bag), additive the same way.
+        'pvp_skull_bag',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
@@ -1674,10 +1682,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the World PvP trophy skull (pvp_trophy_skull) = 1465.
-    if (ownerIds.length !== 1465)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1465`);
-    if (fileIds.length !== 1465) violations.push(`shipping WebP count: ${fileIds.length} != 1465`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the World PvP trophy skull (pvp_trophy_skull) = 1465. Plus the World PvP Skull Bag (pvp_skull_bag) = 1466.
+    if (ownerIds.length !== 1466)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1466`);
+    if (fileIds.length !== 1466) violations.push(`shipping WebP count: ${fileIds.length} != 1466`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -34,6 +34,7 @@ import type { MaterialComposition } from '../material_sources';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, LootSlot } from '../types';
+import { storeLootedSkulls } from './skull_bag';
 import { WORLD_PVP_SKULL_ITEM_ID } from './world_pvp_trophy';
 
 export { WORLD_PVP_SKULL_ITEM_ID };
@@ -135,6 +136,13 @@ export function settleWorldPvpSpoils(ctx: SimContext, victimId: number): void {
     // room whoever it names, the victim riding along as a source bucket. The
     // room check stays behind ctx (importing bags.ts here would load the
     // material tables before the content they derive from).
+    // A carried Skull Bag takes the skull with no room check (skull_bag.ts).
+    if (
+      !slot.instance &&
+      storeLootedSkulls(ctx, killerMeta, slot.itemId, slot.count, slot.materialSources)
+    ) {
+      continue;
+    }
     if (!ctx.canAddItem(slot.itemId, slot.count, killerId, slot.instance)) {
       bagsFull = true;
       continue;

@@ -866,11 +866,13 @@ describe('item-art audit builder', () => {
       // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
       // 1465 / 1483 with the World PvP trophy skull (pvp_trophy_skull), re-measured
       // with `--verify-only` on this tree.
-      catalogSha256: '5e5c56553efc847a62b19f14fc633ed594e52d8d922d7c974edfd801905c5806',
-      catalogBytes: 801799,
+      // 1466 / 1484 with the World PvP Skull Bag (pvp_skull_bag, PR #4284),
+      // re-measured the same way on the merged candidate.
+      catalogSha256: 'e68706e2cddc711b74e54553bcf334701eacc7ec6396b9550ad0d7c2bc5ca6b7',
+      catalogBytes: 802296,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1465,
-      liveItemCount: 1483,
+      catalogCount: 1466,
+      liveItemCount: 1484,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -888,7 +890,7 @@ describe('item-art audit builder', () => {
         identity: 36,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'ece7e03c615a1866c93f2d26c023aa5b112acaa4084c158ee2236866f8e5a502',
+      shippingCatalogSha256: 'd3ece8a81af79fbbe5cb6a0c1c95cf9e8c5dea00cc9551f7f88ceeefd9f63862',
       machineChecksPassed: true,
       verdict: null,
     });

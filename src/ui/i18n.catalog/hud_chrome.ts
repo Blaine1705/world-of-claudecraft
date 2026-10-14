@@ -3498,6 +3498,30 @@ export const hudChromeStrings = {
     falls: 'Falls in {minutes}',
     standingRaid: 'Raid members do not count: only parties can hold the hill',
   },
+  // The World PvP Skull Bag (src/sim/pvp/skull_bag.ts): the sub-inventory pane
+  // docked in the bags window (src/ui/hud/skull_bag/), its bag hint and its
+  // item tooltip line.
+  skullBag: {
+    title: 'Skull Bag',
+    // {count} is the number of skulls held.
+    total: 'Skulls: {count}',
+    close: 'Close the Skull Bag',
+    clickOpen: 'Click to open',
+    notCarried: 'Carry the Skull Bag in your bags to store or take skulls.',
+    empty: 'Empty. While you carry the bag, skulls you loot go straight in.',
+    // A row of skulls whose victim was never recorded.
+    unrecorded: 'Trophy Skull',
+    // {count} is the number of plain skulls carried in the bags.
+    store: 'Store carried skulls ({count})',
+    storeNone: 'No skulls to store',
+    takeOne: 'Take 1',
+    takeAll: 'Take all',
+    // {item} is the row's skull name ("Bet's Skull" or "Trophy Skull").
+    takeOneAria: 'Take 1: {item}',
+    takeAllAria: 'Take all: {item}',
+    tooltip:
+      'Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls.',
+  },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings
   // live here: the honor price, the honor balance, the panel title, the close
@@ -3512,6 +3536,8 @@ export const hudChromeStrings = {
     gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
     jewelry: 'Jewelry',
     weapons: 'Weapons',
+    // Honor goods with nothing to wear (the World PvP Skull Bag).
+    goods: 'Goods',
     // Group headings: Warfare Season 2 (the viewer's class sets and weapons)
     // listed above the Season 1 entry tier (warfare_vendor_window.ts).
     groupSeason2: 'Warfare Season 2: Vanguard',

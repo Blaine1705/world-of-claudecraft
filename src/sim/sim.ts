@@ -1444,6 +1444,7 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   honorArenaDaily?: HonorArenaDailyState;
   // World PvP flag state (pvp/world_pvp.ts): absent until first raised.
   worldPvp?: worldPvpMod.WorldPvpMetaState;
+  skullBag?: MaterialComposition; // Skull Bag contents (pvp/skull_bag.ts), absent when empty
   prestigeRank: number;
   unlockedMilestones: Set<string>;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
@@ -2955,7 +2956,7 @@ export class Sim {
       // existing characters from day one.
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
       honorMod.loadHonorState(meta, s);
-      worldPvpMod.loadWorldPvpState(this.ctx, meta, player, s.worldPvp);
+      worldPvpMod.loadWorldPvpState(this.ctx, meta, player, s.worldPvp, s.skullBag);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
@@ -10702,11 +10703,14 @@ export class Sim {
     return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHonor ?? 0);
   }
   get worldPvpInfo(): import('../world_api').WorldPvpInfo | null {
-    return this.primaryId === -1 ? null : worldPvpMod.worldPvpInfoFor(this.ctx, this.primaryId);
+    return this.primaryId === -1 ? null : worldPvpMod.worldPvpReadoutFor(this.ctx, this.primaryId);
   }
 
   setWorldPvpFlag(enabled: boolean, pid = this.primaryId): void {
     worldPvpMod.setWorldPvpFlag(this.ctx, pid, enabled);
+  }
+  skullBagAction(action: import('../world_api').SkullBagAction, pid = this.primaryId): void {
+    honorMod.skullBagAction(this.ctx, pid, action);
   }
 
   get hillInfo(): import('../world_api').HillInfo | null {

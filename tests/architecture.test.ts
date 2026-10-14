@@ -653,6 +653,11 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/world_pvp/world_pvp_window_view.ts',
+  // The World PvP Skull Bag pane's rows and signature, and the bag's tooltip line.
+  'src/ui/hud/skull_bag/skull_bag_view.ts',
+  'src/ui/hud/skull_bag/skull_bag_tooltip_view.ts',
+  // The potion Use lines of the item tooltip, moved out of Hud.itemTooltip.
+  'src/ui/potion_tooltip_view.ts',
   'src/ui/hud/hill/hill_bar_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
@@ -2684,6 +2689,8 @@ const UI_DOM_MODULES = [
   // restore hold's edges.
   'src/ui/graphics_restore_note_controller.ts',
   'src/ui/tooltip_binding.ts',
+  // The Skull Bag sub-inventory pane the bags window docks (createElement only).
+  'src/ui/hud/skull_bag/skull_bag_pane_controller.ts',
   'src/ui/error_toast_controller.ts',
   'src/ui/boot_splash.ts',
   'src/ui/frame_presets_live.ts',

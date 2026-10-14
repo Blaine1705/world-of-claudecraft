@@ -556,7 +556,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the v0.45.0 release batch after #4419's hover-tooltip
     // options and #4433's mounted-form stride guard composed with the existing
     // coordinator. Exact merged count after biome, zero slack.
-    ceiling: 18060,
+    // LOWERED 18093 -> 18091 at the World PvP Skull Bag: the item tooltip's
+    // potion Use lines moved to src/ui/potion_tooltip_view.ts, paying for the
+    // bag's own tooltip line (src/ui/hud/skull_bag/). Exact count, zero slack.
+    // Re-pinned after composing both release-batch sides. Exact merged count
+    // measured with wc -l, zero slack.
+    ceiling: 18058,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1274,7 +1279,9 @@ const MONOLITHS: MonolithRow[] = [
     // rift-safe corpse save path remains in sim.ts. Exact count, zero slack.
     // Up to 11630 while composing #4414's Spore Burst ground rider with the
     // existing v0.45.0 batch. Exact merged count, zero slack.
-    ceiling: 11630,
+    // Up to 11634 with the World PvP Skull Bag composed into this release
+    // batch. Exact merged count, zero slack.
+    ceiling: 11634,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1775,7 +1782,13 @@ const MONOLITHS: MonolithRow[] = [
     // limbo (the camera moves, the body stays in the world), retiring the
     // saved position, GM toggle and pet stow while entry idle moved to
     // server/spectate_body.ts. Exact count, zero slack.
-    ceiling: 9769,
+    // LOWERED 9840 -> 9837 at the World PvP Skull Bag: the pvp_flag dispatch
+    // arm and the wpvp wire cadence moved to server/world_pvp_wire.ts, which
+    // also carries the new skull_bag command and the change-gated skb self key.
+    // Exact count, zero slack.
+    // Re-pinned after composing both release-batch sides. Exact merged count
+    // measured with wc -l, zero slack.
+    ceiling: 9766,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1964,7 +1977,12 @@ const MONOLITHS: MonolithRow[] = [
     // Combined merge measures 5330 lines, exact count and zero slack.
     // RAISED 5330 -> 5332 for Spore Burst: the activeSporeBursts IWorld field
     // and its type import (the decode lives in net/ground_telegraph_wire.ts).
-    ceiling: 5332,
+    // LOWERED 5356 -> 5354 at the World PvP Skull Bag: the input-send helper
+    // types moved to src/net/input_send_cadence.ts, paying for the new
+    // skullBagAction send. Exact count, zero slack.
+    // Re-pinned after composing both release-batch sides. Exact merged count
+    // measured with wc -l, zero slack.
+    ceiling: 5329,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

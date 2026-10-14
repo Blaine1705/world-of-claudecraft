@@ -199,7 +199,8 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // (character-scoped items), the same +32 as reliquary_content.test.ts's pair.
     // 467 with the sixth lifetime-XP rung's Titan title slot on the Horizons
     // titles page. Five permanent World PvP titles add five character-scoped relics.
-    expect(catalogTotal).toBe(472);
+    // 473 with the World PvP Skull Bag, which is player-scoped collection content.
+    expect(catalogTotal).toBe(473);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });
