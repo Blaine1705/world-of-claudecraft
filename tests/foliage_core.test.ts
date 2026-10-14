@@ -59,7 +59,11 @@ describe('Eastbrook town grass exclusion', () => {
     // service-apron circle, so five fewer buildings is ten fewer rows
     // (125 to 115). The rectangle is no longer the wall box: a placed building
     // clears its whole REACH (porch, stair, awning and eaves), pinned below.
-    expect(exclusions).toHaveLength(115);
+    // Re-pinned 2026-10 for the painted Fenbridge: its seven kit lots became
+    // five placed buildings (two rows each, four fewer) and its boardwalks
+    // run down the main street only (twelve modules to ten, two fewer):
+    // 115 to 109.
+    expect(exclusions).toHaveLength(109);
     expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
     expect(EASTBROOK_LAYOUT.buildings).toHaveLength(6);
     for (const building of [

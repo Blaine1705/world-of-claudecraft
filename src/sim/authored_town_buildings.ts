@@ -20,15 +20,16 @@ function sameNumber(a: number, b: number): boolean {
 const TOWN_BUILDINGS = [...EASTBROOK_LAYOUT.buildings, ...FENBRIDGE_LAYOUT.buildings];
 
 /**
- * The solid annexes of a placed Eastbrook building (its bell tower, its
- * strongroom, its forge shelter: sim/eastbrook_layout.ts makePlacedBuilding),
- * for a record that still stands where the layout put it. A record a custom
- * world moved, resized or turned carries no annex: the boxes are authored
- * around the model's own anchor and would be left behind as invisible walls.
+ * The solid annexes of a placed town building (a bell tower, a strongroom, a
+ * forge shelter, a stall counter: makePlacedBuilding in sim/eastbrook_layout.ts
+ * and sim/fenbridge_layout.ts), for a record that still stands where the
+ * layout put it. A record a custom world moved, resized or turned carries no
+ * annex: the boxes are authored around the model's own anchor and would be
+ * left behind as invisible walls.
  */
 export function placedBuildingAnnexes(building: BuildingDef): readonly Obb2[] {
   if (building.id === undefined) return [];
-  for (const candidate of EASTBROOK_LAYOUT.buildings) {
+  for (const candidate of TOWN_BUILDINGS) {
     if (candidate.id !== building.id) continue;
     return sameNumber(candidate.position.x, building.x) &&
       sameNumber(candidate.position.z, building.z) &&

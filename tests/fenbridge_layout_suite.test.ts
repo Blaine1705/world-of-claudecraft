@@ -27,8 +27,8 @@ import {
   FENBRIDGE_LAYOUT,
   FENBRIDGE_NPC_PLACEMENTS_BY_ID,
   FENBRIDGE_STATIONS_BY_ID,
-  facingToward,
   localToWorld,
+  obbCorners,
   obbsOverlap,
   REMOVED_FENBRIDGE_PLACEMENTS,
   samplePolyline,
@@ -90,62 +90,75 @@ describe('Fenbridge canonical pure layout', () => {
     expectDeepFrozen(REMOVED_FENBRIDGE_PLACEMENTS);
   });
 
-  it('pins all seven non-overlapping lots, native dimensions, facings, and entrance sockets', () => {
+  it('pins the five painted buildings, their anchors, turns, and door stands', () => {
+    // The painted Tidehold set in the Fenrire look, one model per role
+    // (tests/fenbridge_placed_buildings.test.ts measures each record off its file).
     expect(
-      FENBRIDGE_LAYOUT.buildings.map((building) => ({
-        id: building.id,
-        position: building.position,
-        nativeDimensions: building.nativeDimensions,
-        rotation: building.rotation,
-      })),
-    ).toEqual(
-      FENBRIDGE_LAYOUT.buildings.map((building) => ({
-        id: building.id,
-        position: building.position,
-        nativeDimensions: building.nativeDimensions,
-        rotation: building.rotation,
-      })),
-    );
-    // Explicit lot anchors (readable site-plan pin).
-    expect(FENBRIDGE_LAYOUT.buildings.map((b) => [b.id, b.position.x, b.position.z])).toEqual([
-      ['fenbridge_warden_gatehouse', 9, 282],
-      ['fenbridge_crooked_reed_inn', -21.25, 317],
-      ['fenbridge_lantern_chapel', -19.5, 294],
-      ['fenbridge_moonwort_apothecary', 17.8, 291.5],
-      ['fenbridge_gilded_strongbox', 19.2, 309.5],
-      ['fenbridge_hesk_tannery', -2, 320],
-      ['fenbridge_scout_lodge', -13.5, 325.5],
+      FENBRIDGE_LAYOUT.buildings.map((b) => [
+        b.id,
+        b.kind,
+        b.assetId.replace(/^.*\//, '').replace(/\.glb$/, ''),
+        b.placement.x,
+        b.placement.z,
+        b.placement.rotation,
+      ]),
+    ).toEqual([
+      ['fenbridge_warden_gatehouse', 'house', 'house_a', 7.4, 281.7, Math.PI / 2],
+      ['fenbridge_crooked_reed_inn', 'inn', 'tavern', 12.25, 299.9, Math.PI / 2],
+      ['fenbridge_lantern_chapel', 'chapel', 'hall', -16.2, 299.6, -Math.PI / 2],
+      ['fenbridge_moonwort_apothecary', 'house', 'shop_b', 9.2, 322.8, Math.PI / 2],
+      ['fenbridge_gilded_strongbox', 'house', 'shop_a', -8.9, 322, -Math.PI / 2],
     ]);
 
+    const roadSamples = FENBRIDGE_LAYOUT.roads.flatMap((road) => samplePolyline(road.points, 0.25));
     for (let left = 0; left < FENBRIDGE_LAYOUT.buildings.length; left++) {
       const building = FENBRIDGE_LAYOUT.buildings[left];
-      expect(building.rotation, building.id).toBeCloseTo(
-        facingToward(building.position, FENBRIDGE_LAYOUT.civic.center),
-        12,
-      );
-      expect(building.assetId).toBe(`/models/props/${building.id}.glb`);
+      expect(building.assetId).toMatch(/^\/models\/tidehold\/(?:fenrire\/)?[a-z_]+\.glb$/);
       expect(FENBRIDGE_BUILDINGS_BY_ID[building.id]).toBe(building);
-      expect(distancePointToObb(building.frontStandingPoint, building.footprint)).toBeCloseTo(1.5);
-      for (let right = left + 1; right < FENBRIDGE_LAYOUT.buildings.length; right++) {
-        expect(
-          obbsOverlap(building.footprint, FENBRIDGE_LAYOUT.buildings[right].footprint),
-          `${building.id} overlaps ${FENBRIDGE_LAYOUT.buildings[right].id}`,
-        ).toBe(false);
-      }
-      for (const corner of [
-        { x: -building.footprint.halfWidth, z: -building.footprint.halfDepth },
-        { x: building.footprint.halfWidth, z: -building.footprint.halfDepth },
-        { x: building.footprint.halfWidth, z: building.footprint.halfDepth },
-        { x: -building.footprint.halfWidth, z: building.footprint.halfDepth },
-      ]) {
-        // maxCornerRadius is an intentionally conservative wall-containment bound.
-        expect(
+      // the visitor's stand at the foot of the stoop, and the way they look
+      // standing there: out of the door, away from the wall
+      expect(distancePointToObb(building.frontStandingPoint, building.footprint)).toBeCloseTo(1.8);
+      const out = localToWorld(building.frontStandingPoint, building.frontFacing, 0, 1);
+      expect(distancePointToObb(out, building.footprint), building.id).toBeGreaterThan(1.8);
+      // every door opens onto a street or the cistern square: its stand is
+      // within a few strides of a road centreline or of the cistern
+      const nearestRoad = Math.min(
+        ...roadSamples.map((point) =>
           Math.hypot(
-            building.position.x - FENBRIDGE_LAYOUT.civic.center.x,
-            building.position.z - FENBRIDGE_LAYOUT.civic.center.z,
-          ) + Math.hypot(corner.x, corner.z),
-          building.id,
-        ).toBeLessThan(FENBRIDGE_LAYOUT.wall.radius);
+            point.x - building.frontStandingPoint.x,
+            point.z - building.frontStandingPoint.z,
+          ),
+        ),
+      );
+      const cistern = FENBRIDGE_LAYOUT.civic.cistern.position;
+      const toCistern = Math.hypot(
+        cistern.x - building.frontStandingPoint.x,
+        cistern.z - building.frontStandingPoint.z,
+      );
+      expect(nearestRoad < 4 || toCistern < 6, `${building.id} door to street`).toBe(true);
+      // the walls, every annex and the whole drawn reach stay apart from
+      // every other building's
+      const boxes = [building.footprint, ...building.annexes, building.reach];
+      for (let right = left + 1; right < FENBRIDGE_LAYOUT.buildings.length; right++) {
+        const other = FENBRIDGE_LAYOUT.buildings[right];
+        for (const box of boxes) {
+          for (const otherBox of [other.footprint, ...other.annexes, other.reach]) {
+            expect(obbsOverlap(box, otherBox), `${box.id} overlaps ${otherBox.id}`).toBe(false);
+          }
+        }
+      }
+      // ...and the whole drawn model stands inside the palisade with room to
+      // walk behind it
+      for (const box of boxes) {
+        for (const corner of obbCorners(box)) {
+          expect(
+            Math.hypot(
+              corner.x - FENBRIDGE_LAYOUT.civic.center.x,
+              corner.z - FENBRIDGE_LAYOUT.civic.center.z,
+            ),
+            box.id,
+          ).toBeLessThan(FENBRIDGE_LAYOUT.wall.radius - 1);
+        }
       }
     }
   });
@@ -162,18 +175,19 @@ describe('Fenbridge canonical pure layout', () => {
     expect(FENBRIDGE_LAYOUT.civic.provisionStall).toMatchObject({
       id: 'fenbridge_provision_stall',
       assetId: '/models/props/fenbridge_provision_stall.glb',
-      position: { x: -14, z: 313 },
+      position: { x: 3, z: 294.5 },
     });
     expect(FENBRIDGE_LAYOUT.civic.musterBoard).toMatchObject({
       id: 'fenbridge_muster_board',
       assetId: '/models/props/fenbridge_muster_board.glb',
       position: { x: -6, z: 278 },
     });
-    expect(FENBRIDGE_LAYOUT.repeated.boardwalks).toHaveLength(12);
-    // Continuous paths: south spine + west/east spurs (not scattered planks).
+    expect(FENBRIDGE_LAYOUT.repeated.boardwalks).toHaveLength(10);
+    // Continuous runs down the main street (not scattered planks): six from
+    // the south gate to the cistern, four from the crossroads to the north gate.
     expect(
       FENBRIDGE_LAYOUT.repeated.boardwalks.filter((b) => Math.abs(b.position.x) < 0.01).length,
-    ).toBeGreaterThanOrEqual(5);
+    ).toBe(10);
     expect(FENBRIDGE_LAYOUT.repeated.boardwalks.every((boardwalk) => !boardwalk.blocking)).toBe(
       true,
     );
@@ -344,12 +358,9 @@ describe('Fenbridge canonical pure layout', () => {
       { x: 20, z: 470 },
       { x: 45, z: 515 },
     ]);
-    expect(north.points.slice(0, 6)).toEqual([
+    // the north street runs straight up from the cistern square to its gate
+    expect(north.points.slice(0, 2)).toEqual([
       { x: 0, z: 307.5 },
-      { x: 4, z: 313 },
-      { x: 9, z: 318 },
-      { x: 11, z: 324 },
-      { x: 7.5, z: 330 },
       { x: 0, z: 334.5 },
     ]);
     for (const road of FENBRIDGE_LAYOUT.roads) {
@@ -365,11 +376,12 @@ describe('Fenbridge canonical pure layout', () => {
       for (const point of samplePolyline(road.points, 0.2)) {
         if (Math.hypot(point.x, point.z - 303) > 35) continue;
         for (const building of FENBRIDGE_LAYOUT.buildings) {
-          // 0.8 is the largest ordinary pet/body radius exercised below.
-          expect(
-            distancePointToObb(point, building.footprint),
-            `${road.id}:${building.id}`,
-          ).toBeGreaterThanOrEqual(0.8);
+          for (const box of [building.footprint, ...building.annexes]) {
+            // 0.8 is the largest ordinary pet/body radius exercised below.
+            expect(distancePointToObb(point, box), `${road.id}:${box.id}`).toBeGreaterThanOrEqual(
+              0.8,
+            );
+          }
         }
         expect(
           distancePointToObb(point, stall.footprint),
@@ -449,7 +461,7 @@ describe('Fenbridge canonical pure layout', () => {
     });
     if (!north || !woodNode) return;
 
-    const connectorSamples = samplePolyline(north.points.slice(0, 6), 0.1);
+    const connectorSamples = samplePolyline(north.points.slice(0, 2), 0.1);
     for (const bodyRadius of [0.5, 0.8]) {
       for (const point of connectorSamples) {
         expect(
@@ -785,7 +797,7 @@ describe('Fenbridge content projection and preservation', () => {
   });
 
   it('projects the exact mailbox, graveyard, and preserved tannery station', () => {
-    expect(MAILBOXES[1]).toEqual({ x: 6, z: 294 });
+    expect(MAILBOXES[1]).toEqual({ x: 3.2, z: 310.2 });
     expect(OVERWORLD_GRAVEYARDS.find((graveyard) => graveyard.id === 'gy_fenbridge')).toEqual({
       id: 'gy_fenbridge',
       name: 'Fenbridge Barrow',
@@ -802,11 +814,10 @@ describe('Fenbridge content projection and preservation', () => {
       pos: { x: stationPos.x, z: stationPos.z },
       masterNpcId: 'tanner_hesk',
     });
-    // Station + master sit on the craft-bay apron and move with the tannery lot.
-    expect(stationPos.x).toBeCloseTo(1.0670827486441765, 10);
-    expect(stationPos.z).toBeCloseTo(315.3263500973041, 10);
-    expect(heskPos.x).toBeCloseTo(3.053383957289929, 10);
-    expect(heskPos.z).toBeCloseTo(315.5600325924389, 10);
+    // Station + master work an open yard in the north-east corner, the
+    // tanner at the cluster's own stand beside the station.
+    expect(stationPos).toEqual({ x: -20, z: 320.5 });
+    expect(heskPos).toEqual({ x: -18, z: 322 });
     const masterDistance = Math.hypot(stationPos.x - heskPos.x, stationPos.z - heskPos.z);
     expect(masterDistance).toBeGreaterThanOrEqual(1);
     expect(masterDistance).toBeLessThanOrEqual(3);
@@ -922,8 +933,9 @@ describe('Fenbridge runtime safety and traversal', () => {
       id: 'fenbridge_bank_service',
       buildingId: 'fenbridge_gilded_strongbox',
       npcId: 'bursar_petra_vell',
-      entrance: { localPosition: { x: 1.75, z: 3.25 } },
-      teller: { localPosition: { x: -1.25, z: 3.25 } },
+      // the door on the model's front (-Z) face, and Petra on its doorstep
+      entrance: { localPosition: { x: -1.6, z: -4.2 } },
+      teller: { localPosition: { x: -1.6, z: -4.2 } },
     });
     expect(petra.position).toEqual(FENBRIDGE_LAYOUT.services.bank.teller.standingPoint);
     expect(
@@ -931,7 +943,7 @@ describe('Fenbridge runtime safety and traversal', () => {
         petra.position.x - FENBRIDGE_LAYOUT.services.bank.teller.position.x,
         petra.position.z - FENBRIDGE_LAYOUT.services.bank.teller.position.z,
       ),
-    ).toBeLessThanOrEqual(1.8);
+    ).toBeCloseTo(1.8, 9);
     expect(isBlocked(SEED, petra.position.x, petra.position.z, 0.8)).toBe(false);
     expect(isBlocked(SEED, chest?.x ?? 0, chest?.z ?? 0, 0.5)).toBe(true);
   });

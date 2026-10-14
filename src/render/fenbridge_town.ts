@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../sim/building_layout';
-import { BUILTIN_WORLD, getActiveWorldContent } from '../sim/data';
+import { getActiveWorldContent } from '../sim/data';
 import {
   FENBRIDGE_BUILDINGS_BY_ID,
   FENBRIDGE_LAYOUT,
@@ -11,8 +11,10 @@ import {
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
+import { mediaAssetExists } from './assets/media';
 import { registerDeferredPreload } from './assets/preload';
 import { activeWorldHasAuthoredTown } from './authored_town_gate';
+import { buildPlacedTownBuilding, isPlacedBuildingAsset } from './eastbrook_placed_building';
 import { indexExactVertexTuples } from './exact_index_geometry';
 import {
   applyFenbridgeTownSurfaceDetail,
@@ -30,14 +32,14 @@ import {
   fenbridgeFogVisible,
   newFenbridgeBuildingVisibilityPlan,
 } from './fenbridge_town_visibility_core';
-import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { EMISSIVE_GLOW, GFX, type GfxSettings, surfaceMat } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import {
   advanceOccluderFade,
   type OccluderFadeMat,
-  occluderFadeMat,
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
+import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
@@ -51,8 +53,6 @@ import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'fenbridgeTownRebuild';
 const OVERLAY_NAME = 'fenbridgeCaptureOverlay';
-const FOUNDATION_OVERLAP = 0.03;
-const FOUNDATION_COLOR = 0x4e5650;
 const TOWN_CULL_RADIUS = FENBRIDGE_LAYOUT.hub.radius + FENBRIDGE_LAYOUT.wall.maximumSegmentSpan / 2;
 /** The one reveal-gate key of the town's static content. */
 const STATIC_REVEAL_KEY = 'fenbridge-town-static';
@@ -65,6 +65,12 @@ const PROP_ASSET_URLS = Object.freeze([
   FENBRIDGE_LAYOUT.wall.assetId,
   FENBRIDGE_LAYOUT.wall.gates[0].arch.assetId,
   FENBRIDGE_LAYOUT.repeated.boardwalks[0].assetId,
+]);
+/** The painted Tidehold buildings (eastbrook_placed_building.ts): drawn with
+ *  their own materials, never baked into the town's vertex-colour batches, and
+ *  loaded from the file of the profile's texture tier. */
+const BUILDING_ASSET_URLS = Object.freeze([
+  ...new Set(FENBRIDGE_LAYOUT.buildings.map((building) => building.assetId)),
 ]);
 const QUEST_ASSET_URL = FENBRIDGE_LAYOUT.repeated.musterOrders[0].assetId;
 const ALL_ASSET_URLS = Object.freeze([...PROP_ASSET_URLS, QUEST_ASSET_URL]);
@@ -101,17 +107,63 @@ const ASSET_INSTANCE_COUNTS = (() => {
 
 const loadedSources = new Map<string, THREE.Group>();
 const preparedTemplates = new Map<string, TownAssetTemplate>();
+const sourceLoadTasks = new Map<string, Promise<void>>();
+/** The FILE each resident source was read from. A painted building's URL
+ *  names the model; the file follows the profile's texture tier (same
+ *  geometry, see placed_texture_tier_core.ts), so everything else here stays
+ *  keyed on the URL and a tier change is one replaced source. */
+const loadedSourceFiles = new Map<string, string>();
+
+function prepareTownSource(url: string, tier: PlacedTextureTier = GFX.placedTextureTier) {
+  const file = isPlacedBuildingAsset(url)
+    ? placedTextureTierPath(url, tier, mediaAssetExists)
+    : url;
+  const residentFile = loadedSourceFiles.get(url);
+  if (loadedSources.has(url) && residentFile === file) return Promise.resolve();
+  const existing = sourceLoadTasks.get(url);
+  if (existing) return existing;
+  const task = loadGltf(file)
+    .then((gltf) => {
+      loadedSources.set(url, gltf.scene);
+      loadedSourceFiles.set(url, file);
+      // The tier this replaces is no longer wanted: drop its cache entry (the
+      // retiring view's clones keep its textures alive until they go).
+      if (residentFile !== undefined && residentFile !== file) releaseGltf(residentFile);
+      sourceLoadTasks.delete(url);
+    })
+    .catch((err) => {
+      sourceLoadTasks.delete(url);
+      throw err;
+    });
+  sourceLoadTasks.set(url, task);
+  return task;
+}
+
+/**
+ * Only the painted buildings follow the graphics profile (their texture
+ * tier). `target` is the profile about to be activated: a rebuild prepares
+ * its assets BEFORE the live settings switch, so the tier must come from the
+ * target, never from the profile being retired.
+ */
+export function prepareFenbridgeTownProfileAssets(
+  target: Pick<GfxSettings, 'placedTextureTier'> = GFX,
+): Promise<void> {
+  return Promise.all(
+    BUILDING_ASSET_URLS.map((url) => prepareTownSource(url, target.placedTextureTier)),
+  ).then(() => undefined);
+}
+
+/** A rebuild re-reads each painted building from the source its tier loaded. */
+export function resetFenbridgeTownProfileCaches(): void {
+  for (const url of BUILDING_ASSET_URLS) preparedTemplates.delete(url);
+}
 
 if (typeof window !== 'undefined') {
   // The quest renderer owns the muster-order GLB's one preload/cache/release
   // lifecycle. This town renderer declares and inventories that URL, but only
-  // extracts the thirteen prop templates it actually draws.
+  // prepares the prop templates and painted buildings it actually draws.
   for (const url of PROP_ASSET_URLS) {
-    registerDeferredPreload(() =>
-      loadGltf(url).then((gltf) => {
-        loadedSources.set(url, gltf.scene);
-      }),
-    );
+    registerDeferredPreload(() => prepareTownSource(url));
   }
 }
 
@@ -122,6 +174,9 @@ interface TownAssetTemplate {
   emissive: THREE.BufferGeometry | null;
   size: THREE.Vector3;
   triangles: number;
+  /** Painted buildings only: the loaded model scene, drawn with its own
+   *  materials (eastbrook_placed_building.ts). */
+  raw?: THREE.Object3D;
 }
 
 interface SurfaceTextures {
@@ -195,10 +250,6 @@ function runtimeSurfaceTextures(): SurfaceTextures {
     normal: fenbridgeSurfaceNormalTexture(),
     roughness: fenbridgeSurfaceRoughnessTexture(),
   };
-}
-
-function assetKeyFromUrl(url: string): string {
-  return url.slice(url.lastIndexOf('/') + 1).replace(/\.glb$/, '');
 }
 
 function toFloatAttr(
@@ -309,7 +360,8 @@ function extractTemplate(source: THREE.Object3D, url: string): TownAssetTemplate
   let opaque = mergeParts(opaqueParts, `${url} opaque`);
   let emissive = mergeParts(emissiveParts, `${url} emissive`);
   // Low preserves the exact same silhouettes and placements but folds authored
-  // glow triangles into the Lambert color pass to hold the town under 16 draws.
+  // glow triangles into the Lambert color pass, one draw per batch instead of
+  // two. (The painted buildings draw their own materials and are not batched.)
   if (!GFX.standardMaterials && emissive) {
     opaque = mergeParts([...(opaque ? [opaque] : []), emissive], `${url} low combined surface`);
     emissive = null;
@@ -321,6 +373,23 @@ function extractTemplate(source: THREE.Object3D, url: string): TownAssetTemplate
   return { opaque, emissive, size: box.getSize(new THREE.Vector3()), triangles };
 }
 
+function placedTemplate(source: THREE.Object3D): TownAssetTemplate {
+  const box = new THREE.Box3().setFromObject(source);
+  let triangles = 0;
+  source.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const position = child.geometry.getAttribute('position');
+    triangles += (child.geometry.index?.count ?? position?.count ?? 0) / 3;
+  });
+  return {
+    opaque: null,
+    emissive: null,
+    size: box.getSize(new THREE.Vector3()),
+    triangles,
+    raw: source,
+  };
+}
+
 function prepareTemplates(
   sources: ReadonlyMap<string, THREE.Object3D>,
   cache: Map<string, TownAssetTemplate>,
@@ -330,6 +399,12 @@ function prepareTemplates(
     if (cache.has(url)) continue;
     const source = sources.get(url);
     if (!source) throw new Error(`Fenbridge town asset was not preloaded: ${url}`);
+    if (isPlacedBuildingAsset(url)) {
+      // The raw scene rides the template cache, and its GLB cache entry is
+      // never released: every building's clones share its textures.
+      cache.set(url, placedTemplate(source));
+      continue;
+    }
     cache.set(url, extractTemplate(source, url));
     if (release) {
       loadedSources.delete(url);
@@ -394,148 +469,6 @@ function townMaterial(
   return emissive
     ? modulateEmissiveByVertexColor(material)
     : applyFenbridgeTownSurfaceDetail(material);
-}
-
-function scaledGeometry(
-  geometry: THREE.BufferGeometry,
-  scaleX: number,
-  scaleY: number,
-  scaleZ: number,
-): THREE.BufferGeometry {
-  return geometry.clone().applyMatrix4(new THREE.Matrix4().makeScale(scaleX, scaleY, scaleZ));
-}
-
-function foundationGeometry(
-  width: number,
-  height: number,
-  depth: number,
-  centerY: number,
-): THREE.BufferGeometry {
-  const geometry = new THREE.BoxGeometry(width, height, depth).toNonIndexed();
-  geometry.translate(0, centerY, 0);
-  const count = geometry.getAttribute('position').count;
-  const color = new THREE.Color(FOUNDATION_COLOR);
-  const colors = new Float32Array(count * 3);
-  for (let index = 0; index < count; index++) {
-    colors[index * 3] = color.r;
-    colors[index * 3 + 1] = color.g;
-    colors[index * 3 + 2] = color.b;
-  }
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  return indexExactVertexTuples(fenbridgeSurfaceGeometry(geometry, 'mossStone'));
-}
-
-function buildingTerrain(
-  building: (typeof FENBRIDGE_LAYOUT.buildings)[number],
-  groundAt: GroundAt,
-): { entranceY: number; minimumY: number } {
-  const { width, depth } = building.nativeDimensions;
-  const xSteps = Math.max(1, Math.ceil(width / BUILDING_TERRAIN_SAMPLE_STEP));
-  const zSteps = Math.max(1, Math.ceil(depth / BUILDING_TERRAIN_SAMPLE_STEP));
-  let minimumY = Infinity;
-  for (let zIndex = 0; zIndex <= zSteps; zIndex++) {
-    const localZ = -depth / 2 + (depth * zIndex) / zSteps;
-    for (let xIndex = 0; xIndex <= xSteps; xIndex++) {
-      const localX = -width / 2 + (width * xIndex) / xSteps;
-      const world = localToWorld(building.position, building.rotation, localX, localZ);
-      minimumY = Math.min(minimumY, groundAt(world.x, world.z));
-    }
-  }
-  const entranceLocal = building.sockets.entrance.localPosition;
-  const entrance = localToWorld(
-    building.position,
-    building.rotation,
-    entranceLocal.x,
-    entranceLocal.z,
-  );
-  return { entranceY: groundAt(entrance.x, entrance.z), minimumY };
-}
-
-function buildBuilding(
-  building: (typeof FENBRIDGE_LAYOUT.buildings)[number],
-  template: TownAssetTemplate,
-  groundAt: GroundAt,
-  textures: SurfaceTextures,
-): { group: THREE.Group; hideTarget: BuildingHideTarget } {
-  if (!template.opaque) throw new Error(`Fenbridge building has no opaque mesh: ${building.id}`);
-  const dimensions = building.nativeDimensions;
-  const scaleX = dimensions.width / template.size.x;
-  const scaleY = dimensions.height / template.size.y;
-  const scaleZ = dimensions.depth / template.size.z;
-  const terrain = buildingTerrain(building, groundAt);
-  const foundationDepth = Math.max(0, terrain.entranceY - terrain.minimumY);
-  const opaqueParts = [scaledGeometry(template.opaque, scaleX, scaleY, scaleZ)];
-  if (foundationDepth > 1e-4) {
-    const height = foundationDepth + FOUNDATION_OVERLAP;
-    opaqueParts.push(
-      foundationGeometry(
-        dimensions.width,
-        height,
-        dimensions.depth,
-        (FOUNDATION_OVERLAP - foundationDepth) / 2,
-      ),
-    );
-  }
-  const opaqueGeometry = mergeParts(opaqueParts, `${building.id} foundation`);
-  if (!opaqueGeometry) throw new Error(`Fenbridge building lost geometry: ${building.id}`);
-
-  const opaqueMaterial = townMaterial(false, textures, true);
-  opaqueMaterial.name = `fenbridgeTownOpaque:${building.id}`;
-  const opaqueMesh = new THREE.Mesh(opaqueGeometry, opaqueMaterial);
-  opaqueMesh.name = `fenbridgeBuildingOpaque:${building.id}`;
-  opaqueMesh.castShadow = GFX.dynamicShadows;
-  opaqueMesh.receiveShadow = GFX.dynamicShadows;
-  opaqueMesh.userData.placementId = building.id;
-  opaqueMesh.userData.placementAssetKey = assetKeyFromUrl(building.assetId);
-
-  const group = new THREE.Group();
-  group.name = `fenbridgeBuilding:${building.id}`;
-  group.userData.placementId = building.id;
-  group.userData.fenbridgeBuildingId = building.id;
-  group.userData.assetId = building.assetId;
-  group.userData.assetUrl = building.assetId;
-  group.userData.position = building.position;
-  group.userData.rotation = building.rotation;
-  group.userData.target = dimensions;
-  group.userData.front = building.frontStandingPoint;
-  group.userData.foundationDepth = foundationDepth;
-  group.position.set(building.position.x, terrain.entranceY, building.position.z);
-  group.rotation.y = building.rotation;
-  group.add(opaqueMesh);
-
-  const materials = [occluderFadeMat(opaqueMaterial, opaqueMesh)];
-  if (template.emissive) {
-    const emissiveMaterial = townMaterial(true, textures, true);
-    emissiveMaterial.name = `fenbridgeTownEmissive:${building.id}`;
-    const emissiveMesh = new THREE.Mesh(
-      scaledGeometry(template.emissive, scaleX, scaleY, scaleZ),
-      emissiveMaterial,
-    );
-    emissiveMesh.name = `fenbridgeBuildingEmissive:${building.id}`;
-    emissiveMesh.castShadow = false;
-    emissiveMesh.receiveShadow = false;
-    emissiveMesh.userData.placementId = building.id;
-    group.add(emissiveMesh);
-    materials.push(occluderFadeMat(emissiveMaterial, emissiveMesh));
-  }
-
-  return {
-    group,
-    hideTarget: {
-      group,
-      materials,
-      hidden: false,
-      alpha: 1,
-      x: building.position.x,
-      z: building.position.z,
-      halfWidth: dimensions.width / 2,
-      halfDepth: dimensions.depth / 2,
-      cosine: Math.cos(building.rotation),
-      sine: Math.sin(building.rotation),
-      topY: terrain.entranceY + dimensions.height,
-      cullRadius: building.maxCornerRadius,
-    },
-  };
 }
 
 function addPlacedGeometry(
@@ -999,8 +932,10 @@ function buildCaptureOverlay(groundAt: GroundAt): THREE.Group {
   const colliderRecords: Array<Record<string, unknown>> = [];
   const colliderVertices: number[] = [];
   for (const building of FENBRIDGE_LAYOUT.buildings) {
-    colliderRecords.push({ kind: 'obb', ...building.footprint });
-    addObbOutline(colliderVertices, building.footprint, groundAt);
+    for (const box of [building.footprint, ...building.annexes]) {
+      colliderRecords.push({ kind: 'obb', ...box });
+      addObbOutline(colliderVertices, box, groundAt);
+    }
   }
   const cistern = FENBRIDGE_LAYOUT.civic.cistern;
   colliderRecords.push({
@@ -1236,10 +1171,29 @@ function buildFromTemplates(
   const fenBuildingList = activeWorldPromoted('authoredTowns') ? [] : FENBRIDGE_LAYOUT.buildings;
   for (const building of fenBuildingList) {
     const template = templates.get(building.assetId);
-    if (!template) throw new Error(`Fenbridge town template is missing: ${building.assetId}`);
-    const built = buildBuilding(building, template, groundAt, textures);
+    if (!template?.raw) {
+      throw new Error(`Fenbridge town building is missing: ${building.assetId}`);
+    }
+    // A painted Tidehold building in the Fenrire look, stood as its layout
+    // record says (eastbrook_placed_building.ts). A reveal root and a fade
+    // target like every building, so the two lists stay index-aligned.
+    const built = buildPlacedTownBuilding('fenbridge', building, template.raw, groundAt);
+    built.group.userData.placementId = building.id;
     group.add(built.group);
-    hideTargets.push(built.hideTarget);
+    hideTargets.push({
+      group: built.group,
+      materials: built.mats,
+      hidden: false,
+      alpha: 1,
+      x: building.position.x,
+      z: building.position.z,
+      halfWidth: building.nativeDimensions.width / 2,
+      halfDepth: building.nativeDimensions.depth / 2,
+      cosine: Math.cos(building.rotation),
+      sine: Math.sin(building.rotation),
+      topY: built.topY,
+      cullRadius: built.cullRadius,
+    });
     buildingGroups.push(built.group);
   }
 
@@ -1522,7 +1476,10 @@ export function fenbridgeTownTriangleBudget(
     };
   });
   const assetTriangles = assets.reduce((sum, asset) => sum + asset.repeatedTriangles, 0);
-  const maximumFoundationTriangles = FENBRIDGE_LAYOUT.buildings.length * 12;
+  // A painted building buries its own footing and draws no skirt.
+  const maximumFoundationTriangles =
+    FENBRIDGE_LAYOUT.buildings.filter((building) => !isPlacedBuildingAsset(building.assetId))
+      .length * 12;
   const maximumRuntimeTriangles = assetTriangles + maximumFoundationTriangles;
   // Raised with the concept-quality geometry pass so plank walls and shingle
   // courses can ship without a hard 40k wall. Still a real bound, not unbounded.
@@ -1542,6 +1499,7 @@ export const fenbridgeTownInternalsForTest = {
   rootName: ROOT_NAME,
   overlayName: OVERLAY_NAME,
   propAssetUrls: PROP_ASSET_URLS,
+  buildingAssetUrls: BUILDING_ASSET_URLS,
   questAssetUrl: QUEST_ASSET_URL,
   allAssetUrls: ALL_ASSET_URLS,
   requiredPlacementIds: REQUIRED_PLACEMENT_IDS,

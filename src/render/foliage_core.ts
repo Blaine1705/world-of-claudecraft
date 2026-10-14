@@ -156,7 +156,9 @@ export function eastbrookGrassExclusions(
     }
 
     for (const building of FENBRIDGE_LAYOUT.buildings) {
-      exclusions.push(layoutObb(building.id, building.footprint));
+      // A painted building clears its whole reach (porch, stair, awning), not
+      // only its wall box, as Eastbrook's do.
+      exclusions.push(layoutObb(building.id, building.reach));
       exclusions.push({
         kind: 'circle',
         id: `${building.id}:serviceApron`,

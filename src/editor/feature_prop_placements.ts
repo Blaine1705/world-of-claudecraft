@@ -296,71 +296,43 @@ const TOWN_BUILDING_NATURAL: Readonly<Record<string, { x: number; y: number; z: 
   'tidehold/bank': { x: 22.6067, y: 22.5005, z: 19.8387 },
   'tidehold/shop_a': { x: 13.004, y: 16.2797, z: 12.2001 },
   'tidehold/house_b': { x: 15.0123, y: 15.9799, z: 11.6997 },
-  'props/fenbridge_warden_gatehouse': { x: 7.8003, y: 10.5, z: 7.0004 },
-  'props/fenbridge_crooked_reed_inn': { x: 9, y: 8.8, z: 8.0002 },
-  'props/fenbridge_lantern_chapel': { x: 7, y: 8.6, z: 7 },
-  'props/fenbridge_moonwort_apothecary': { x: 6.9996, y: 7.2, z: 6.0003 },
-  'props/fenbridge_gilded_strongbox': { x: 7.5, y: 7.4002, z: 6.5002 },
-  'props/fenbridge_hesk_tannery': { x: 12, y: 7.2007, z: 7 },
-  'props/fenbridge_scout_lodge': { x: 8, y: 7.5996, z: 6.5 },
+  // Fenbridge stands the same set in the Fenrire moss look: the same models
+  // re-baked with other maps, so the same sizes.
+  'tidehold/fenrire/house_a': { x: 11.7628, y: 12.23, z: 9.8009 },
+  'tidehold/fenrire/tavern': { x: 22.6483, y: 18.7798, z: 16.7997 },
+  'tidehold/fenrire/hall': { x: 18.8515, y: 30.4998, z: 24.212 },
+  'tidehold/fenrire/shop_a': { x: 13.004, y: 16.2797, z: 12.2001 },
+  'tidehold/fenrire/shop_b': { x: 13.6495, y: 18.7, z: 12.7017 },
 };
 
 /**
  * The authored towns' rebuild BUILDINGS (Eastbrook Vale + Fenbridge) as
- * editable placements, the same kit GLBs the town views draw, fitted to the
- * same per-building target dimensions (per-axis, the town's own rule), seated
- * on the town's door-threshold rule (base at the entrance sample's height).
- * The rest of each town, wells, stalls, fences, streets, wall, harbor ,
- * stays town-drawn. Known deltas, deliberate: the lit window panes and the
- * walk-in roof reveal are town-view dressing and do not convert.
+ * editable placements. The rest of each town, wells, stalls, fences, streets,
+ * wall, harbor, stays town-drawn.
  *
- * A PLACED building (Eastbrook's painted Tidehold set) converts back into the
- * placement its record was copied from: the model's own anchor, one uniform
- * scale and its buried footing, with the model's baked collision, so the
- * document's copy is the walk-in building a maker expects.
+ * Every town building is a PLACED one (the painted Tidehold set): it converts
+ * back into the placement its record was built from, the model's own anchor,
+ * one uniform scale and its buried footing, with the model's baked collision,
+ * so the document's copy is the walk-in building a maker expects.
  */
-export function authoredTownBuildingPlacements(seed: number): MapPlacement[] {
+export function authoredTownBuildingPlacements(_seed: number): MapPlacement[] {
   const out: MapPlacement[] = [];
   for (const b of [...EASTBROOK_LAYOUT.buildings, ...FENBRIDGE_LAYOUT.buildings]) {
     const assetId = b.assetId.replace(/^\/models\//, '').replace(/\.glb$/i, '');
     const nat = TOWN_BUILDING_NATURAL[assetId];
     if (!nat) continue;
     const maxDim = Math.max(nat.x, nat.y, nat.z);
-    if ('placement' in b) {
-      out.push({
-        assetId,
-        name: b.id.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()),
-        x: b.placement.x,
-        z: b.placement.z,
-        y: b.placement.lift,
-        rotY: cleanZero(b.placement.rotation),
-        scale: (b.placement.scale * maxDim) / TARGET_HEIGHT,
-        collide: true,
-        collisionMode: 'baked',
-      });
-      continue;
-    }
-    const heightFit = b.nativeDimensions.height / nat.y;
-    // door-threshold seat: the town rests each building's base at the height
-    // of the ground just outside its entrance, not at its centre sample
-    const entrance = localToWorld(b.position, b.rotation, 0, b.nativeDimensions.depth / 2);
-    const placement: MapPlacement = {
+    out.push({
       assetId,
       name: b.id.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()),
-      x: b.position.x,
-      z: b.position.z,
-      y:
-        terrainHeight(entrance.x, entrance.z, seed) -
-        terrainHeight(b.position.x, b.position.z, seed),
-      rotY: cleanZero(b.rotation),
-      scale: (heightFit * maxDim) / TARGET_HEIGHT,
-      scaleX: b.nativeDimensions.width / nat.x / heightFit,
-      scaleY: 1,
-      scaleZ: b.nativeDimensions.depth / nat.z / heightFit,
+      x: b.placement.x,
+      z: b.placement.z,
+      y: b.placement.lift,
+      rotY: cleanZero(b.placement.rotation),
+      scale: (b.placement.scale * maxDim) / TARGET_HEIGHT,
       collide: true,
       collisionMode: 'baked',
-    };
-    out.push(placement);
+    });
   }
   return out;
 }
