@@ -781,6 +781,16 @@ boss mechanic, aura or object of any of these names.
 | Discord | the court-wide hit when the verse runs out | KEEP. A common English word used across many unrelated properties (shared vocabulary); no boss mechanic of the name found. |
 | False Note | a tile stepped out of turn | KEEP. No match; a common English idiom. |
 
+The Sledge Tusker's bait rework (web-verified 2026-10-14; `src/sim/encounters/gravewyrm_sanctum/
+sledge_tusker.ts` and its siblings). Plain descriptive English; exact-phrase searches against the
+major game wikis found no ability, aura or object of any of these names.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Stuck in the Ice | the Tusker's stun and damage window once its tusks are in an outcrop | KEEP. No match; a plain English phrase. |
+| Soulfire Trail | the burning lane its hitched sledge leaves | KEEP. No match ("Soulfire" already ships here; World of Warcraft's warlock spell is the two-word "Soul Fire", an unrelated direct-damage cast, and "Viscous Trail" and "Ice Trail" are other games' unrelated trails). |
+| Ice Outcrop | the five outcrops on the Sledge Road's rim | KEEP. Generic geology. |
+
 The second round of the same pass (web-verified 2026-10-04): the Mere Hydra's Combined Breath
 (`hydra_combo.ts`), Ysolei calling the moon (`ysolei_moon.ts`) and the Pearlguard Sentinel's new
 manta body (display only; the id `pearlguard_sentinel` is frozen).

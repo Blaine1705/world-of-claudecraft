@@ -5962,22 +5962,63 @@ export type WildheartFightState =
   | GorgebloomFightState
   | ZulgarFightState;
 
+/** A Trample lane of the Sledge Tusker (encounters/gravewyrm_sanctum/
+ *  tusker_road.ts), instance-local: where it starts, its aim, how far the
+ *  beast's centre runs (`length`), how far down it the charge strikes
+ *  (`reach`: the body's leading edge, or the middle of the outcrop it runs
+ *  into), and that outcrop's object (null for a lane that meets none). */
+export interface TuskerLane {
+  x: number;
+  z: number;
+  yaw: number;
+  length: number;
+  reach: number;
+  outcropId: number | null;
+}
+
+/** A soulfire trail burning down a charged lane (tusker_trail.ts): its
+ *  object, the strip (world start, yaw, length) and its clocks. */
+export interface TuskerTrailState {
+  objectId: number;
+  x: number;
+  z: number;
+  yaw: number;
+  length: number;
+  remaining: number;
+  tick: number;
+}
+
 /** The Sledge Tusker's pull (encounters/gravewyrm_sanctum/sledge_tusker.ts),
- *  on the Tusker: Tusk Sweep, Trample, Spilled Braziers and its enrage. */
+ *  on the Tusker: Tusk Sweep, Trample (and the outcrop it can be baited
+ *  into), the soulfire trail, Spilled Braziers and its enrage. */
 export interface TuskerFightState {
   kind: 'tusker';
   sweepTimer: number;
   trampleTimer: number;
   /** The Tusk Sweep's locked aim (the Tusker's facing) while its bar runs. */
   sweepYaw: number | null;
-  /** Trample: the lane locked at the bar's start (world start, yaw, length),
-   *  then the charge down it (`t` seconds into the run). */
-  lane: { x: number; z: number; yaw: number; length: number } | null;
-  charge: { x: number; z: number; yaw: number; length: number; t: number; hit: number[] } | null;
+  /** Trample: the lane locked at the bar's start, then the charge down it
+   *  (`t` seconds into the run). */
+  lane: TuskerLane | null;
+  charge: (TuskerLane & { t: number; hit: number[] }) | null;
+  /** Stuck in the Ice: the seconds left, the outcrop its tusks are in, and
+   *  where it stands held (world coordinates, and its facing). */
+  stuck: {
+    left: number;
+    outcropId: number;
+    x: number;
+    y: number;
+    z: number;
+    yaw: number;
+  } | null;
+  /** Tramples that ended in an outcrop this pull. */
+  baits: number;
+  /** The soulfire trails still burning on the road. */
+  trails: TuskerTrailState[];
   /** Where it braced its feet for the bar in flight (world coordinates). */
   plantedAt: { x: number; y: number; z: number } | null;
-  /** Where it unhitched its sledge when pulled (world, and its facing then):
-   *  the sledge waits there and tips at half health. */
+  /** Where its sledge stood when it tipped at half health (world, and the
+   *  beast's facing then); null while it is still hitched. */
   sledge: { x: number; z: number; yaw: number } | null;
   /** The sledge tipped this pull (the soulfire patches are down). */
   spilled: boolean;
