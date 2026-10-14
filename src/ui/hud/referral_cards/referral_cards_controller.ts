@@ -27,6 +27,7 @@ export class ReferralCardsController {
   private rewardQueue: ReferralRewardClaim[] = [];
   private rewardPrompt: ReferralRewardClaim | null = null;
   private lastRevision: number | null | undefined;
+  private lastFriendshipInviter: string | null | undefined;
   private animated = new Set<string>();
   private animations: Animation[] = [];
   private seenPrompts = new Set<string>();
@@ -93,8 +94,10 @@ export class ReferralCardsController {
     if (this.destroyed) return;
     const snapshot = this.host.getSnapshot();
     const revision = snapshot?.revision ?? null;
-    if (this.lastRevision === revision) return;
+    const inviter = this.host.friendshipArmour?.inviterName() ?? null;
+    if (this.lastRevision === revision && this.lastFriendshipInviter === inviter) return;
     this.lastRevision = revision;
+    this.lastFriendshipInviter = inviter;
     this.collectRewards(snapshot);
     this.trackCooldown(snapshot);
     this.retainSnapshotState(snapshot);
@@ -195,6 +198,13 @@ export class ReferralCardsController {
     const key = captureFocusKey(this.host.root);
     this.stopAnimations();
     this.host.root.innerHTML = referralCardsHtml(this.cooldownSnapshot(), this.animated);
+    this.lastFriendshipInviter = this.host.friendshipArmour?.inviterName() ?? null;
+    const claim = this.host.friendshipArmour?.create();
+    if (claim)
+      (
+        this.host.root.querySelector('.referral-invite') ??
+        this.host.root.querySelector('.ui-win-body')
+      )?.append(claim);
     markDialogRoot(this.host.root, { labelledBy: 'referral-cards-title' });
     if (key !== null) {
       const controls = Array.from(

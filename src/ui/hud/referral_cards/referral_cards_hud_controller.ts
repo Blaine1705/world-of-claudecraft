@@ -1,4 +1,5 @@
 import type { IWorld } from '../../../world_api';
+import { createFriendshipArmourClaim } from '../../friendship_armour_claim';
 import { svgIcon } from '../../ui_icons';
 import type { WindowFocusBridge } from '../../window_focus';
 import { ReferralCardsController } from './referral_cards_controller';
@@ -44,6 +45,10 @@ export function createReferralCardsHud(deps: {
       return deps.world().referralCardsSnapshot();
     },
     send: (action) => deps.world().referralCardsAction(action),
+    friendshipArmour: {
+      inviterName: () => deps.world().player?.referralInviterName ?? null,
+      create: () => createFriendshipArmourClaim(deps.world),
+    },
     onSnapshotChange: () => deps.snapshotChanged(),
     playReward: () => deps.playReward?.(),
     beforeOpen: () => {
