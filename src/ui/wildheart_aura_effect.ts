@@ -21,6 +21,10 @@ import {
   BLOOM_POLLINATED,
   BLOOM_TUNING,
   FANGLORD_JAGUAR_ID,
+  SAURIAN_DRUM_SILENCED,
+  SAURIAN_SAPPED,
+  SAURIAN_TUNING,
+  SAURIAN_WAR_DRUM,
   ZULGAR_AVATAR,
   ZULGAR_ID,
   ZULGAR_IDOL_AWAKE,
@@ -48,6 +52,28 @@ export function wildheartHeroicAmount(mobId: string, amount: number): number {
 /** The Basin aura's descriptor, or null when `a` is not one of them. */
 export function wildheartAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
   switch (a.id) {
+    // The Great Saurian's totem rework: fed by its rider's Sap Totems, and
+    // the heroic drum (beating, and knocked off its beat).
+    case SAURIAN_SAPPED:
+      return {
+        key: `${KEY}.sapped`,
+        nums: {
+          count: a.stacks ?? 1,
+          // 0.8 percent: one decimal, never rounded to 1.
+          pct: Math.round(SAURIAN_TUNING.totemHealPct * 1000) / 10,
+          seconds: SAURIAN_TUNING.totemHealEvery,
+        },
+      };
+    case SAURIAN_WAR_DRUM:
+      return {
+        key: `${KEY}.howdahDrum`,
+        nums: {
+          pct: pct(1 - 1 / SAURIAN_TUNING.drumStompRate),
+          seconds: SAURIAN_TUNING.drumSilence,
+        },
+      };
+    case SAURIAN_DRUM_SILENCED:
+      return { key: `${KEY}.drumSilenced`, nums: {} };
     case BEAST_PACK_BOND:
       return { key: `${KEY}.packBond`, nums: { pct: pct(BEAST_TUNING.bondDr) } };
     case BEAST_PACK_BOND_FURY:

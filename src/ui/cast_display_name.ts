@@ -196,6 +196,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.wildheart_snaring_tongue': true,
   'abilityUi.cast.wildheart_saurian_tail_swipe': true,
   'abilityUi.cast.wildheart_saurian_stomp': true,
+  // The Saurian's totem rework: a Sap Totem's own bar (its next mending).
+  'abilityUi.cast.wildheart_saurian_sap_tether': true,
   // The Wildheart Basin's three bosses.
   'abilityUi.cast.wildheart_beast_pit_quake': true,
   'abilityUi.cast.wildheart_jaguar_heel': true,

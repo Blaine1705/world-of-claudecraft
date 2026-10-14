@@ -4185,7 +4185,10 @@ export const zh_CN: EnTranslations = {
         "sunstruckExposed": "被点亮的太阳符文灼伤：受到的伤害提高{pct}%。",
         "sunWary": "在此效果结束前，任何太阳符文都无法灼伤他。他踏过的已点亮符文会保持点亮。",
         "pinned": "一支狩猎之矛把你钉在原地。你每{every}秒流血，受到{bleed}点物理伤害（英雄难度{heroicBleed}点），并且无论你站在哪里，荒野之心脉冲都会命中你，伤害提高{pulse}%。队友可以用{pull}秒拔出长矛。如果没有其他人能帮忙，你可以用{wrench}秒自己拔出。{seconds}秒后它会自行松脱。",
-        "idolAwake": "石美洲豹已经苏醒。每{every}秒，它会在地面预警{warning}秒后，轮流向平台的一半吐息：对该半场的所有人造成{min}到{max}点自然伤害（英雄难度{heroicMin}到{heroicMax}点）。祖尔加会保持美洲豹化身直到死亡，并且每{seconds}秒更换猎物（英雄难度{heroicSeconds}秒）。"
+        "idolAwake": "石美洲豹已经苏醒。每{every}秒，它会在地面预警{warning}秒后，轮流向平台的一半吐息：对该半场的所有人造成{min}到{max}点自然伤害（英雄难度{heroicMin}到{heroicMax}点）。祖尔加会保持美洲豹化身直到死亡，并且每{seconds}秒更换猎物（英雄难度{heroicSeconds}秒）。",
+        "sapped": "正在供给它的日骨树汁图腾：{count}个。每个图腾每{seconds}秒为它恢复{pct}%的最大生命值。摧毁图腾即可停止治疗。",
+        "howdahDrum": "驮轿里的鼓手在驱策它：两次撼地践踏之间的间隔缩短{pct}%。摧毁一个日骨树汁图腾可让鼓声停止{seconds}秒。鼓会随驮轿一同坠落。",
+        "drumSilenced": "鼓手乱了节拍：在效果结束前，撼地践踏按正常间隔出现。"
       },
       "temple": {
         "scoreWard": "正在吟唱乐谱：在结束前不会受到伤害。在乐句结束前，按石板响起的顺序踏上月光石板，即可使她的嗓音破碎。轮流踩踏：奏响音符后，须等待另一名玩家奏响下一个正确音符。唯一的幸存者可以独自完成。如果乐句先结束，不谐之音会对庭院中的所有人造成{min}到{max}点冰霜伤害（英雄难度下为{heroicMin}到{heroicMax}点）。",
@@ -6696,7 +6699,13 @@ export const zh_CN: EnTranslations = {
       "glyphLightingTitle": "正在点亮太阳符文",
       "glyphLightingLine": "留在符文上直到它被点亮。离开就要重新开始",
       "breathTitle": "神像吐息！",
-      "breathLine": "石美洲豹即将向平台的这一半吐息。跑到另一半去"
+      "breathLine": "石美洲豹即将向平台的这一半吐息。跑到另一半去",
+      "saurianStompTitle": "撼地践踏！",
+      "saurianStompLine": "在巨型蜥脚兽践踏之前跑出圆环",
+      "sapTotemTitle": "树汁图腾！",
+      "sapTotemLine": "日骨树汁图腾每{seconds}秒治疗一次巨型蜥脚兽，直到被摧毁。立着的图腾：{count}",
+      "drumTitle": "鼓声催快了践踏",
+      "drumLine": "鼓声响起期间，撼地践踏的频率翻倍。摧毁一个日骨树汁图腾可让鼓声停止{seconds}秒"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -15040,6 +15049,7 @@ export const zh_CN: EnTranslations = {
       "wildheart_entangling_lash": "缠绕鞭笞",
       "wildheart_saurian_tail_swipe": "甩尾",
       "wildheart_saurian_stomp": "撼地践踏",
+      "wildheart_saurian_sap_tether": "先祖树汁",
       "wildheart_quarry_mark": "猎物印记",
       "wildheart_war_roar": "战争咆哮",
       "wildheart_toad_hex": "蟾蜍妖术",
@@ -24843,6 +24853,9 @@ export const zh_CN: EnTranslations = {
       },
       "howdah_hexcaller": {
         "name": "驮轿巫咒师"
+      },
+      "sunbone_sap_totem": {
+        "name": "日骨树汁图腾"
       },
       "fanglord_jaguar": {
         "name": "獠牙领主的巨型美洲豹"

@@ -21733,4 +21733,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '氷の露頭に刺さっている：受けるダメージが{pct}%増加。',
   'abilityUi.cast.sanctum_soulfire_trail_burn': '燃焼中',
   'abilityUi.cast.sanctum_ice_outcrop_held': '牙が刺さっている',
+  // The Great Saurian's totem rework (the Sunbone Sap Totems, the heroic drum):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.wildheartAlert.saurianStompTitle': '大地を揺るがす踏みつけ！',
+  'hudChrome.wildheartAlert.saurianStompLine': 'グレート・サウリアンが踏みつける前に輪の外へ走れ',
+  'hudChrome.wildheartAlert.sapTotemTitle': '樹液トーテム！',
+  'hudChrome.wildheartAlert.sapTotemLine':
+    '陽骨の樹液トーテムは、破壊されるまで{seconds}秒ごとにグレート・サウリアンを回復する。立っているトーテム：{count}',
+  'hudChrome.wildheartAlert.drumTitle': '太鼓が踏みつけを速める',
+  'hudChrome.wildheartAlert.drumLine':
+    '太鼓が鳴っている間、大地を揺るがす踏みつけは2倍の頻度で来る。陽骨の樹液トーテムを破壊すると太鼓が{seconds}秒間止まる',
+  'hudChrome.auraEffect.wildheart.sapped':
+    '陽骨の樹液トーテムが樹液を送っている：{count}本。それぞれが{seconds}秒ごとに最大体力の{pct}%を回復する。トーテムを破壊すれば回復は止まる。',
+  'hudChrome.auraEffect.wildheart.howdahDrum':
+    '輿の太鼓打ちが駆り立てている：大地を揺るがす踏みつけの間隔が{pct}%短くなる。陽骨の樹液トーテムを破壊すると太鼓は{seconds}秒間止まる。太鼓は輿とともに落ちる。',
+  'hudChrome.auraEffect.wildheart.drumSilenced':
+    '太鼓打ちが拍子を失った：この効果が終わるまで、大地を揺るがす踏みつけは通常の間隔で来る。',
+  'abilityUi.cast.wildheart_saurian_sap_tether': '祖霊の樹液',
+  'entities.mobs.sunbone_sap_totem.name': '陽骨の樹液トーテム',
 };

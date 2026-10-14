@@ -22142,4 +22142,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Застрял в ледяном выступе: получает на {pct}% больше урона.',
   'abilityUi.cast.sanctum_soulfire_trail_burn': 'Горит',
   'abilityUi.cast.sanctum_ice_outcrop_held': 'Бивни увязли',
+  // The Great Saurian's totem rework (the Sunbone Sap Totems, the heroic drum):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.wildheartAlert.saurianStompTitle': 'Сотрясающий топот!',
+  'hudChrome.wildheartAlert.saurianStompLine': 'Выбегите из круга, пока Великий завр не топнул',
+  'hudChrome.wildheartAlert.sapTotemTitle': 'Тотем сока!',
+  'hudChrome.wildheartAlert.sapTotemLine':
+    'Тотем сока Солнечной Кости исцеляет Великого завра каждые {seconds} сек., пока его не уничтожат. Тотемов стоит: {count}',
+  'hudChrome.wildheartAlert.drumTitle': 'Барабан торопит топот',
+  'hudChrome.wildheartAlert.drumLine':
+    'Пока бьёт барабан, Сотрясающий топот случается вдвое чаще. Уничтожьте Тотем сока Солнечной Кости, чтобы барабан умолк на {seconds} сек.',
+  'hudChrome.auraEffect.wildheart.sapped':
+    'Его питают Тотемы сока Солнечной Кости: {count}. Каждый восстанавливает {pct}% его максимального здоровья каждые {seconds} сек. Уничтожьте тотемы, чтобы прекратить исцеление.',
+  'hudChrome.auraEffect.wildheart.howdahDrum':
+    'Барабанщик в паланкине подгоняет его: время между Сотрясающими топотами сокращено на {pct}%. Уничтожение Тотема сока Солнечной Кости заставляет барабан умолкнуть на {seconds} сек. Барабан падает вместе с паланкином.',
+  'hudChrome.auraEffect.wildheart.drumSilenced':
+    'Барабанщик сбился с ритма: до конца эффекта Сотрясающий топот случается с обычной частотой.',
+  'abilityUi.cast.wildheart_saurian_sap_tether': 'Сок предков',
+  'entities.mobs.sunbone_sap_totem.name': 'Тотем сока Солнечной Кости',
 };

@@ -4185,7 +4185,10 @@ export const ko_KR: EnTranslations = {
         "sunstruckExposed": "빛나는 태양 문양에 그을림: 받는 피해가 {pct}% 증가합니다.",
         "sunWary": "이 효과가 끝날 때까지 어떤 태양 문양도 그를 그을릴 수 없습니다. 그동안 그가 밟은 빛나는 문양은 계속 빛납니다.",
         "pinned": "사냥 창이 당신을 그 자리에 꿰어 고정했습니다. {every}초마다 {bleed}의 물리 피해(영웅 난이도 {heroicBleed})를 입는 출혈에 걸리며, 야생심장 파동은 어디에 서 있든 적중하고 피해가 {pulse}% 증가합니다. 아군이 {pull}초에 걸쳐 창을 뽑아 줄 수 있습니다. 도울 수 있는 사람이 아무도 없으면 직접 {wrench}초에 걸쳐 뽑으세요. {seconds}초 뒤에는 저절로 빠집니다.",
-        "idolAwake": "돌 재규어가 깨어났습니다. {every}초마다 바닥에 {warning}초 동안 경고를 띄운 뒤 테라스의 절반씩 번갈아 숨결을 내뿜습니다: 그 절반에 있는 모두에게 {min}~{max}의 자연 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 줄가르는 죽을 때까지 재규어 화신 상태를 유지하며 {seconds}초마다(영웅 난이도 {heroicSeconds}초마다) 사냥감을 바꿉니다."
+        "idolAwake": "돌 재규어가 깨어났습니다. {every}초마다 바닥에 {warning}초 동안 경고를 띄운 뒤 테라스의 절반씩 번갈아 숨결을 내뿜습니다: 그 절반에 있는 모두에게 {min}~{max}의 자연 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 줄가르는 죽을 때까지 재규어 화신 상태를 유지하며 {seconds}초마다(영웅 난이도 {heroicSeconds}초마다) 사냥감을 바꿉니다.",
+        "sapped": "태양뼈 수액 토템이 수액을 보내는 중: {count}개. 각각 {seconds}초마다 최대 생명력의 {pct}%를 치유합니다. 토템을 파괴하면 치유가 멈춥니다.",
+        "howdahDrum": "가마의 고수가 몰아붙입니다: 대지를 뒤흔드는 발구르기 사이의 시간이 {pct}% 줄어듭니다. 태양뼈 수액 토템을 파괴하면 북이 {seconds}초 동안 멈춥니다. 북은 가마와 함께 떨어집니다.",
+        "drumSilenced": "고수가 박자를 놓쳤습니다: 이 효과가 끝날 때까지 대지를 뒤흔드는 발구르기가 평소 간격으로 옵니다."
       },
       "temple": {
         "scoreWard": "악보를 노래하는 중: 끝날 때까지 피해를 받지 않습니다. 노래가 끝나기 전에 울린 순서대로 달의 타일에 올라서면 그녀의 목소리가 갈라집니다. 번갈아 밟으세요. 음을 울린 뒤에는 다른 플레이어가 다음 올바른 음을 울릴 때까지 기다려야 합니다. 혼자 살아남았다면 끝까지 혼자 답할 수 있습니다. 노래가 먼저 끝나면 불협화음이 뜰에 있는 모두에게 {min}~{max}의 냉기 피해(영웅 난이도에서는 {heroicMin}~{heroicMax})를 입힙니다.",
@@ -6696,7 +6699,13 @@ export const ko_KR: EnTranslations = {
       "glyphLightingTitle": "태양 문양을 밝히는 중",
       "glyphLightingLine": "문양이 밝혀질 때까지 그 위에 머무르세요. 벗어나면 처음부터 다시 시작합니다",
       "breathTitle": "우상의 숨결!",
-      "breathLine": "돌 재규어가 테라스의 이쪽 절반에 숨결을 내뿜으려 합니다. 반대쪽 절반으로 건너가세요"
+      "breathLine": "돌 재규어가 테라스의 이쪽 절반에 숨결을 내뿜으려 합니다. 반대쪽 절반으로 건너가세요",
+      "saurianStompTitle": "대지를 뒤흔드는 발구르기!",
+      "saurianStompLine": "거대 용각수가 발을 구르기 전에 고리 밖으로 달아나라",
+      "sapTotemTitle": "수액 토템!",
+      "sapTotemLine": "태양뼈 수액 토템은 파괴될 때까지 {seconds}초마다 거대 용각수를 치유한다. 서 있는 토템: {count}",
+      "drumTitle": "북소리가 발구르기를 재촉한다",
+      "drumLine": "북이 울리는 동안 대지를 뒤흔드는 발구르기가 두 배로 자주 온다. 태양뼈 수액 토템을 파괴하면 북이 {seconds}초 동안 멈춘다"
     },
     "sanctumAlert": {
       "quenchTitle": "담금질 물속이다!",
@@ -15040,6 +15049,7 @@ export const ko_KR: EnTranslations = {
       "wildheart_entangling_lash": "휘감는 채찍",
       "wildheart_saurian_tail_swipe": "꼬리 휩쓸기",
       "wildheart_saurian_stomp": "대지를 뒤흔드는 발구르기",
+      "wildheart_saurian_sap_tether": "선조의 수액",
       "wildheart_quarry_mark": "사냥감 표식",
       "wildheart_war_roar": "전쟁의 포효",
       "wildheart_toad_hex": "두꺼비 사술",
@@ -24843,6 +24853,9 @@ export const ko_KR: EnTranslations = {
       },
       "howdah_hexcaller": {
         "name": "가마 사술사"
+      },
+      "sunbone_sap_totem": {
+        "name": "태양뼈 수액 토템"
       },
       "fanglord_jaguar": {
         "name": "송곳니 군주의 거대 재규어"

@@ -385,6 +385,8 @@ const MOB_IDS = [
   'vine_lasher',
   'great_saurian',
   'howdah_hexcaller',
+  // The totem the howdah's rider throws (encounters/wildheart_basin/saurian_totems.ts).
+  'sunbone_sap_totem',
   'fanglord_jaguar',
   'the_gorgebloom',
   'wildheart_high_priest',

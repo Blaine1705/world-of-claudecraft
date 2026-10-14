@@ -664,6 +664,7 @@ const UI_PURE_CORES = [
   // Zulgar's breath, spear, Sunstruck window and sun glyphs) and its scene scan.
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
   'src/ui/hud/dungeon/wildheart_alert_scene_core.ts',
+  'src/ui/hud/dungeon/wildheart_saurian_alert_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Drowned Temple's alert (Choirmother Selthe's Score) and its scene scan.

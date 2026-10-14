@@ -4185,7 +4185,10 @@ export const ja_JP: EnTranslations = {
         "sunstruckExposed": "光る太陽紋に焼かれた：受けるダメージが{pct}%増加する。",
         "sunWary": "この効果が終わるまで、どの太陽紋も彼を焼けない。その間に踏まれた光る太陽紋は光ったまま残る。",
         "pinned": "狩りの槍があなたをその場に釘付けにしている。{every}秒ごとに{bleed}の物理ダメージ（ヒロイックでは{heroicBleed}）の出血を受け、ワイルドハートの脈動はどこにいても命中してダメージが{pulse}%増加する。仲間は{pull}秒で槍を引き抜ける。他に動ける仲間がいなければ、自分で{wrench}秒かけて引き抜ける。{seconds}秒後には自然に抜ける。",
-        "idolAwake": "石のジャガーが目覚めた。{every}秒ごとに、床に{warning}秒の予兆を出してからテラスの片側ずつに息を吐く：その側にいる全員に{min}から{max}の自然ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）。ズルガーは倒されるまでジャガーの化身のままで、{seconds}秒ごと（ヒロイックでは{heroicSeconds}秒ごと）に獲物を替える。"
+        "idolAwake": "石のジャガーが目覚めた。{every}秒ごとに、床に{warning}秒の予兆を出してからテラスの片側ずつに息を吐く：その側にいる全員に{min}から{max}の自然ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）。ズルガーは倒されるまでジャガーの化身のままで、{seconds}秒ごと（ヒロイックでは{heroicSeconds}秒ごと）に獲物を替える。",
+        "sapped": "陽骨の樹液トーテムが樹液を送っている：{count}本。それぞれが{seconds}秒ごとに最大体力の{pct}%を回復する。トーテムを破壊すれば回復は止まる。",
+        "howdahDrum": "輿の太鼓打ちが駆り立てている：大地を揺るがす踏みつけの間隔が{pct}%短くなる。陽骨の樹液トーテムを破壊すると太鼓は{seconds}秒間止まる。太鼓は輿とともに落ちる。",
+        "drumSilenced": "太鼓打ちが拍子を失った：この効果が終わるまで、大地を揺るがす踏みつけは通常の間隔で来る。"
       },
       "temple": {
         "scoreWard": "楽譜を歌っている：終わるまでダメージを受けない。歌が終わる前に、鳴った順番どおりに月のタイルへ踏み入ると彼女の声が砕ける。交代して踏むこと。音を鳴らしたら、別のプレイヤーが次の正しい音を鳴らすまで待つ。生存者が一人なら、一人で最後まで答えられる。先に歌が終わると、不協和音が広間の全員に{min}から{max}の冷気ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。",
@@ -6696,7 +6699,13 @@ export const ja_JP: EnTranslations = {
       "glyphLightingTitle": "太陽紋を灯している",
       "glyphLightingLine": "灯るまで太陽紋の上にとどまれ。離れるとやり直しになる",
       "breathTitle": "偶像の息吹！",
-      "breathLine": "石のジャガーがテラスのこちら側に息を吐こうとしている。反対側へ渡れ"
+      "breathLine": "石のジャガーがテラスのこちら側に息を吐こうとしている。反対側へ渡れ",
+      "saurianStompTitle": "大地を揺るがす踏みつけ！",
+      "saurianStompLine": "グレート・サウリアンが踏みつける前に輪の外へ走れ",
+      "sapTotemTitle": "樹液トーテム！",
+      "sapTotemLine": "陽骨の樹液トーテムは、破壊されるまで{seconds}秒ごとにグレート・サウリアンを回復する。立っているトーテム：{count}",
+      "drumTitle": "太鼓が踏みつけを速める",
+      "drumLine": "太鼓が鳴っている間、大地を揺るがす踏みつけは2倍の頻度で来る。陽骨の樹液トーテムを破壊すると太鼓が{seconds}秒間止まる"
     },
     "sanctumAlert": {
       "quenchTitle": "焼き入れの水の中だ！",
@@ -15040,6 +15049,7 @@ export const ja_JP: EnTranslations = {
       "wildheart_entangling_lash": "絡みつく鞭",
       "wildheart_saurian_tail_swipe": "尾の薙ぎ払い",
       "wildheart_saurian_stomp": "大地を揺るがす踏みつけ",
+      "wildheart_saurian_sap_tether": "祖霊の樹液",
       "wildheart_quarry_mark": "獲物の印",
       "wildheart_war_roar": "戦の咆哮",
       "wildheart_toad_hex": "ヒキガエルの呪い",
@@ -24843,6 +24853,9 @@ export const ja_JP: EnTranslations = {
       },
       "howdah_hexcaller": {
         "name": "輿の呪術師"
+      },
+      "sunbone_sap_totem": {
+        "name": "陽骨の樹液トーテム"
       },
       "fanglord_jaguar": {
         "name": "牙王の大ジャガー"

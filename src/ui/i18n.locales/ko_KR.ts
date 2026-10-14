@@ -21732,4 +21732,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '얼음 돌출부에 박힘: 받는 피해가 {pct}% 증가합니다.',
   'abilityUi.cast.sanctum_soulfire_trail_burn': '연소 중',
   'abilityUi.cast.sanctum_ice_outcrop_held': '엄니 박힘',
+  // The Great Saurian's totem rework (the Sunbone Sap Totems, the heroic drum):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.wildheartAlert.saurianStompTitle': '대지를 뒤흔드는 발구르기!',
+  'hudChrome.wildheartAlert.saurianStompLine':
+    '거대 용각수가 발을 구르기 전에 고리 밖으로 달아나라',
+  'hudChrome.wildheartAlert.sapTotemTitle': '수액 토템!',
+  'hudChrome.wildheartAlert.sapTotemLine':
+    '태양뼈 수액 토템은 파괴될 때까지 {seconds}초마다 거대 용각수를 치유한다. 서 있는 토템: {count}',
+  'hudChrome.wildheartAlert.drumTitle': '북소리가 발구르기를 재촉한다',
+  'hudChrome.wildheartAlert.drumLine':
+    '북이 울리는 동안 대지를 뒤흔드는 발구르기가 두 배로 자주 온다. 태양뼈 수액 토템을 파괴하면 북이 {seconds}초 동안 멈춘다',
+  'hudChrome.auraEffect.wildheart.sapped':
+    '태양뼈 수액 토템이 수액을 보내는 중: {count}개. 각각 {seconds}초마다 최대 생명력의 {pct}%를 치유합니다. 토템을 파괴하면 치유가 멈춥니다.',
+  'hudChrome.auraEffect.wildheart.howdahDrum':
+    '가마의 고수가 몰아붙입니다: 대지를 뒤흔드는 발구르기 사이의 시간이 {pct}% 줄어듭니다. 태양뼈 수액 토템을 파괴하면 북이 {seconds}초 동안 멈춥니다. 북은 가마와 함께 떨어집니다.',
+  'hudChrome.auraEffect.wildheart.drumSilenced':
+    '고수가 박자를 놓쳤습니다: 이 효과가 끝날 때까지 대지를 뒤흔드는 발구르기가 평소 간격으로 옵니다.',
+  'abilityUi.cast.wildheart_saurian_sap_tether': '선조의 수액',
+  'entities.mobs.sunbone_sap_totem.name': '태양뼈 수액 토템',
 };

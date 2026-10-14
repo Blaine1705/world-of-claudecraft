@@ -20685,4 +20685,22 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sanctum.tuskerStuckExposed': '卡在冰岩裡：受到的傷害提高{pct}%。',
   'abilityUi.cast.sanctum_soulfire_trail_burn': '燃燒中',
   'abilityUi.cast.sanctum_ice_outcrop_held': '獠牙卡住',
+  // The Great Saurian's totem rework (the Sunbone Sap Totems, the heroic drum):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.wildheartAlert.saurianStompTitle': '撼地踐踏！',
+  'hudChrome.wildheartAlert.saurianStompLine': '在巨型蜥腳獸踐踏之前跑出圓環',
+  'hudChrome.wildheartAlert.sapTotemTitle': '樹汁圖騰！',
+  'hudChrome.wildheartAlert.sapTotemLine':
+    '日骨樹汁圖騰每{seconds}秒治療一次巨型蜥腳獸，直到被摧毀。立著的圖騰：{count}',
+  'hudChrome.wildheartAlert.drumTitle': '鼓聲催快了踐踏',
+  'hudChrome.wildheartAlert.drumLine':
+    '鼓聲響起期間，撼地踐踏的頻率翻倍。摧毀一個日骨樹汁圖騰可讓鼓聲停止{seconds}秒',
+  'hudChrome.auraEffect.wildheart.sapped':
+    '正在供給牠的日骨樹汁圖騰：{count}個。每個圖騰每{seconds}秒為牠恢復{pct}%的最大生命值。摧毀圖騰即可停止治療。',
+  'hudChrome.auraEffect.wildheart.howdahDrum':
+    '馱轎裡的鼓手在驅策牠：兩次撼地踐踏之間的間隔縮短{pct}%。摧毀一個日骨樹汁圖騰可讓鼓聲停止{seconds}秒。鼓會隨馱轎一同墜落。',
+  'hudChrome.auraEffect.wildheart.drumSilenced':
+    '鼓手亂了節拍：在效果結束前，撼地踐踏按正常間隔出現。',
+  'abilityUi.cast.wildheart_saurian_sap_tether': '先祖樹汁',
+  'entities.mobs.sunbone_sap_totem.name': '日骨樹汁圖騰',
 };

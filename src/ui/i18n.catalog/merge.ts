@@ -730,6 +730,8 @@ const mergeStringsEn = {
       wildheart_entangling_lash: 'Entangling Lash',
       wildheart_saurian_tail_swipe: 'Tail Swipe',
       wildheart_saurian_stomp: 'Earthshaking Stomp',
+      // The Saurian's totem rework: a Sap Totem's own bar (its next mending).
+      wildheart_saurian_sap_tether: 'Ancestral Sap',
       // The Wildheart trash mechanics pass (trash_kit/wildheart_cast_ids.ts).
       // The War Roar and the Toad Hex can be kicked; the rest cannot.
       wildheart_quarry_mark: 'Quarry Mark',

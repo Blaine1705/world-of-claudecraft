@@ -17,7 +17,9 @@
 //    while you stand lighting one, its bar);
 //  - targeting the Beastmaster or his jaguar while Pack Bond holds: pull them
 //    apart.
-// Priority is that order. Two kinds are SOFT (`WILDHEART_SOFT_ALERT_KINDS`):
+// Priority is that order. The Great Saurian's totem rework sits between the
+// personal marks and Zulgar's readouts (wildheart_saurian_alert_view.ts: its
+// Stomp's ring, a Sap Totem to break, the heroic drum's rule). Two kinds are SOFT (`WILDHEART_SOFT_ALERT_KINDS`):
 // they tell the player about a spear to pull, so they give the shared slot to
 // the use prompt once the spear is near enough for it to offer the press. The
 // painter is the shared encounter alert's (encounter_alert_painter.ts); every
@@ -44,8 +46,15 @@ import {
 } from '../../../sim/encounters/wildheart_basin/ids';
 import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
+import {
+  buildSaurianAlert,
+  SAURIAN_ALERT_KINDS,
+  type SaurianAlertEntity,
+  type SaurianAlertKind,
+} from './wildheart_saurian_alert_view';
 
 export type WildheartAlertKind =
+  | SaurianAlertKind
   | 'breath'
   | 'prey'
   | 'prey-alone'
@@ -62,6 +71,7 @@ export type WildheartAlertKind =
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const WILDHEART_ALERT_KINDS: readonly WildheartAlertKind[] = [
+  ...SAURIAN_ALERT_KINDS,
   'breath',
   'prey',
   'prey-alone',
@@ -120,6 +130,10 @@ export interface WildheartAlertScene {
   breaths: readonly WildheartAlertEntity[];
   /** Every player in view (who else stands free to light a glyph). */
   players: readonly WildheartAlertEntity[];
+  /** The Great Saurian and its rider's Sap Totems
+   *  (wildheart_saurian_alert_view.ts); absent in a scene with no ford. */
+  saurian?: SaurianAlertEntity | null;
+  sapTotems?: readonly SaurianAlertEntity[];
 }
 
 export const EMPTY_WILDHEART_SCENE: WildheartAlertScene = {
@@ -128,6 +142,8 @@ export const EMPTY_WILDHEART_SCENE: WildheartAlertScene = {
   spears: [],
   breaths: [],
   players: [],
+  saurian: null,
+  sapTotems: [],
 };
 
 export interface WildheartAlertInput {
@@ -318,6 +334,20 @@ export function buildWildheartAlertView(input: WildheartAlertInput): WildheartAl
       t('hudChrome.wildheartAlert.pollinatedLine'),
       pollen,
     );
+  // The Great Saurian's ford (no boss fights there): its Stomp's ring, a Sap
+  // Totem to break, the heroic drum (wildheart_saurian_alert_view.ts).
+  if (scene.saurian) {
+    const targeted =
+      input.targetId !== null && input.targetId !== undefined
+        ? input.entity(input.targetId)?.templateId
+        : undefined;
+    const ford = buildSaurianAlert(
+      { saurian: scene.saurian, sapTotems: scene.sapTotems ?? [] },
+      input.selfPos,
+      targeted,
+    );
+    if (ford) return alert(ford.kind, ford.title, ford.line, ford.progress, ford.seconds);
+  }
   if (zulgar) {
     const struck = auraOf(zulgar.auras, ZULGAR_SUNSTRUCK_EXPOSED);
     if (struck)

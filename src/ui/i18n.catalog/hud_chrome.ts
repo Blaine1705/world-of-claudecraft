@@ -5364,6 +5364,14 @@ export const hudChromeStrings = {
         'A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.',
       idolAwake:
         'The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic).',
+      // The Great Saurian's totem rework: fed by its rider's totems, and the
+      // heroic drum. Wordy (M16): non-Latin fills in the overlays.
+      sapped:
+        'Sunbone Sap Totems feeding it: {count}. Each heals it for {pct}% of its maximum health every {seconds} sec. Destroy the totems to stop the healing.',
+      howdahDrum:
+        'A drummer in the howdah drives it on: the time between Earthshaking Stomps is cut by {pct}%. Destroying a Sunbone Sap Totem silences the drum for {seconds} sec. The drum falls with the howdah.',
+      drumSilenced:
+        'The drummer has lost the beat: Earthshaking Stomp comes at its normal pace until this ends.',
     },
     // The Drowned Temple's boss auras (src/ui/temple_aura_effect.ts).
     // Wordy (M16): non-Latin fills in the overlays.
@@ -9638,6 +9646,16 @@ export const hudChromeStrings = {
     breathTitle: "Idol's Breath!",
     breathLine:
       'The stone jaguar is about to breathe over this half of the terrace. Cross to the other half',
+    // The Great Saurian's totem rework (wildheart_saurian_alert_view.ts). Wordy
+    // (M16): non-Latin fills in the overlays.
+    saurianStompTitle: 'Earthshaking Stomp!',
+    saurianStompLine: 'Run out of the ring before the Great Saurian stomps',
+    sapTotemTitle: 'Sap Totem!',
+    sapTotemLine:
+      'A Sunbone Sap Totem heals the Great Saurian every {seconds} sec until it is destroyed. Totems standing: {count}',
+    drumTitle: 'The drum quickens the Stomp',
+    drumLine:
+      'Earthshaking Stomp comes twice as often while the drum beats. Destroy a Sunbone Sap Totem to silence the drum for {seconds} sec',
   },
   // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
   // Wordy (M16): non-Latin fills in the overlays.

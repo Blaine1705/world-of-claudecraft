@@ -17108,6 +17108,18 @@
   #wildheart-alert.is-bonded .fa-title {
     color: var(--color-debuff-nature);
   }
+  /* The Great Saurian's totem rework: its Stomp's ring throbs in the hostile tone like
+     every strike; a Sap Totem to break and the heroic drum's rule keep the steady gold of
+     a thing to do. */
+  #wildheart-alert.is-saurian-stomp {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #wildheart-alert.is-saurian-stomp .fa-title,
+  #wildheart-alert.is-saurian-stomp .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
   @media (prefers-reduced-motion: reduce) {
     #wildheart-alert {
       animation: none;

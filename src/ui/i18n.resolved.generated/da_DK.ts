@@ -4185,7 +4185,10 @@ export const da_DK: EnTranslations = {
         "sunstruckExposed": "Struck by a lit sun glyph: takes {pct}% more damage.",
         "sunWary": "No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.",
         "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
-        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
+        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic).",
+        "sapped": "Sunbone Sap Totems feeding it: {count}. Each heals it for {pct}% of its maximum health every {seconds} sec. Destroy the totems to stop the healing.",
+        "howdahDrum": "A drummer in the howdah drives it on: the time between Earthshaking Stomps is cut by {pct}%. Destroying a Sunbone Sap Totem silences the drum for {seconds} sec. The drum falls with the howdah.",
+        "drumSilenced": "The drummer has lost the beat: Earthshaking Stomp comes at its normal pace until this ends."
       },
       "temple": {
         "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
@@ -6696,7 +6699,13 @@ export const da_DK: EnTranslations = {
       "glyphLightingTitle": "Lighting the sun glyph",
       "glyphLightingLine": "Stay on the glyph until it catches light. Stepping off starts it over",
       "breathTitle": "Idol's Breath!",
-      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half"
+      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half",
+      "saurianStompTitle": "Earthshaking Stomp!",
+      "saurianStompLine": "Run out of the ring before the Great Saurian stomps",
+      "sapTotemTitle": "Sap Totem!",
+      "sapTotemLine": "A Sunbone Sap Totem heals the Great Saurian every {seconds} sec until it is destroyed. Totems standing: {count}",
+      "drumTitle": "The drum quickens the Stomp",
+      "drumLine": "Earthshaking Stomp comes twice as often while the drum beats. Destroy a Sunbone Sap Totem to silence the drum for {seconds} sec"
     },
     "sanctumAlert": {
       "quenchTitle": "In the quench-water!",
@@ -15040,6 +15049,7 @@ export const da_DK: EnTranslations = {
       "wildheart_entangling_lash": "Entangling Lash",
       "wildheart_saurian_tail_swipe": "Tail Swipe",
       "wildheart_saurian_stomp": "Earthshaking Stomp",
+      "wildheart_saurian_sap_tether": "Ancestral Sap",
       "wildheart_quarry_mark": "Quarry Mark",
       "wildheart_war_roar": "War Roar",
       "wildheart_toad_hex": "Toad Hex",
@@ -24843,6 +24853,9 @@ export const da_DK: EnTranslations = {
       },
       "howdah_hexcaller": {
         "name": "Howdah Hexcaller"
+      },
+      "sunbone_sap_totem": {
+        "name": "Sunbone Sap Totem"
       },
       "fanglord_jaguar": {
         "name": "Fanglord's Great Jaguar"

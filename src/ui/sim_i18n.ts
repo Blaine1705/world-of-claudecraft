@@ -1467,6 +1467,9 @@ const baseEnTable = {
     'The Shrine Ward falls. Above the terrace, the stone jaguar watches.',
   'log.wildheartHowdahBreaks':
     'The howdah splinters! A Howdah Hexcaller leaps down to tend the Great Saurian.',
+  // The Saurian's totem rework (great_saurian.ts SAURIAN_TOTEM_LOG, EXACT).
+  'log.wildheartSaurianTotem':
+    'The Howdah Hexcaller hurls a Sunbone Sap Totem onto the ford. Break it before it feeds the Great Saurian!',
   'mechanic.wildheartAncestralSap': 'Ancestral Sap',
   'mechanic.wildheartPlantTotem': 'Plant Totem',
   'mechanic.wildheartSunboneMending': 'Sunbone Mending',
@@ -1474,6 +1477,9 @@ const baseEnTable = {
   'mechanic.wildheartEntanglingLash': 'Entangling Lash',
   'mechanic.wildheartTailSwipe': 'Tail Swipe',
   'mechanic.wildheartEarthshakingStomp': 'Earthshaking Stomp',
+  'mechanic.wildheartSapBacklash': 'Sap Backlash',
+  'aura.wildheartHowdahDrum': 'Howdah Drum',
+  'aura.wildheartDrumSilenced': 'Drum Silenced',
   'aura.wildheartKnockedDown': 'Knocked Down',
   'aura.wildheartEnrage': 'Enrage',
   // The Wildheart trash mechanics pass (mob/trash_kit/wildheart_hunt.ts,
@@ -18144,6 +18150,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Entangling Lash': 'mechanic.wildheartEntanglingLash',
   'Tail Swipe': 'mechanic.wildheartTailSwipe',
   'Earthshaking Stomp': 'mechanic.wildheartEarthshakingStomp',
+  'Sap Backlash': 'mechanic.wildheartSapBacklash',
+  'Howdah Drum': 'aura.wildheartHowdahDrum',
+  'Drum Silenced': 'aura.wildheartDrumSilenced',
   'Knocked Down': 'aura.wildheartKnockedDown',
   Enrage: 'aura.wildheartEnrage',
   // The Wildheart trash mechanics pass (trash_kit/wildheart_hunt.ts, content/wildheart.ts).
