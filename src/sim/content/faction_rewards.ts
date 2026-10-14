@@ -101,7 +101,10 @@ export function attuneAlliedHearthstone(
     return false;
   }
   if (!FACTION_HUB_LANDINGS[factionId]) return false;
-  setAlliedHearthstoneAttunement(ctx, meta, factionId);
+  // Already bound here: nothing changes, so no line and no self-wire re-send.
+  if (meta.alliedHearthstoneAttunement !== factionId) {
+    setAlliedHearthstoneAttunement(ctx, meta, factionId);
+  }
   return true;
 }
 

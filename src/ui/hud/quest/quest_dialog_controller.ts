@@ -347,8 +347,8 @@ export class QuestDialogController {
     this.deps.onOpenChange(true);
   }
 
-  /** The one rule for the intro hint row, shared by the gossip render and the
-   *  staleness probe so the two can never drift. */
+  /** The Allied Hearthstone attune row's hub (or null), shared by the gossip
+   *  render and the staleness probe so the two can never drift. */
   private hearthRowFactionFor(npc: Entity): FactionId | null {
     const world = this.deps.world();
     return hearthstoneAttuneRowFaction(
@@ -358,6 +358,8 @@ export class QuestDialogController {
     );
   }
 
+  /** The one rule for the intro hint row, shared by the gossip render and the
+   *  staleness probe so the two can never drift. */
   private introHintVisibleFor(npc: Entity): boolean {
     const world = this.deps.world();
     return professionIntroHintVisible(

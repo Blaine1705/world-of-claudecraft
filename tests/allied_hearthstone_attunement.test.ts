@@ -48,11 +48,14 @@ describe('Allied Hearthstone attunement', () => {
     const hub = FACTION_HUB_LANDINGS.automatons;
     placeAt(sim, hub.x + 5, hub.z + 5);
 
+    const revBefore = meta.wireRev;
     sim.useItem('allied_hearthstone');
     expect(texts(sim.drainEvents())).toContain(
       'Your Allied Hearthstone is now attuned to Wyrmwatch.',
     );
     expect(meta.alliedHearthstoneAttunement).toBe('automatons');
+    // The bump is what makes the server's owner gate re-send the `ahs` key.
+    expect(meta.wireRev).toBeGreaterThan(revBefore);
     // The bind is the whole action: no 10 s cast toward the hub the player
     // already stands in, and no 15 min cooldown on the teleport they bought.
     expect(sim.player.castingAbility).toBeNull();
@@ -95,6 +98,24 @@ describe('Allied Hearthstone attunement', () => {
     expect(restored.serializeCharacter(pid)?.worldQuests?.alliedHearthstone).toBe('rift_watch');
   });
 
+  it('loads a pre-feature save unbound and keeps an unbound save free of the key', () => {
+    const sim = hearthSim();
+    const state = sim.serializeCharacter(sim.playerId);
+    if (!state) throw new Error('missing state');
+    // An unbound character adds nothing to the save (no key, no empty blob).
+    expect(JSON.stringify(state)).not.toContain('alliedHearthstone');
+    // A save written before the field existed, with and without a worldQuests blob.
+    for (const legacy of [
+      { ...state, worldQuests: undefined },
+      { ...state, worldQuests: { cycle: '', progress: [] } },
+      { ...state, worldQuests: { cycle: '', progress: [], alliedHearthstone: 'south_reach' } },
+    ]) {
+      const restored = new Sim({ seed: 4403, playerClass: 'mage', noPlayer: true });
+      const pid = restored.addPlayer('mage', 'Legacy', { state: legacy });
+      expect(restored.meta(pid)?.alliedHearthstoneAttunement).toBeUndefined();
+    }
+  });
+
   it('writes nothing for an unbound stone and drops an unknown saved hub', () => {
     const sim = hearthSim();
     expect(sim.serializeCharacter(sim.playerId)?.worldQuests?.alliedHearthstone).toBeUndefined();
@@ -111,13 +132,34 @@ describe('Allied Hearthstone attunement', () => {
     const tobrin = npcByTemplate(sim, 'npc_automaton_quartermaster');
     placeAt(sim, tobrin.pos.x + 2, tobrin.pos.z);
 
+    const revBefore = meta.wireRev;
     sim.attuneAlliedHearthstone(tobrin.id);
     expect(meta.alliedHearthstoneAttunement).toBe('automatons');
+    expect(meta.wireRev).toBeGreaterThan(revBefore);
     expect(texts(sim.drainEvents())).toContain(
       'Your Allied Hearthstone is now attuned to Wyrmwatch.',
     );
     expect(sim.alliedHearthstoneAttunement).toBe('automatons');
     expect(sim.player.castingAbility).toBeNull();
+  });
+
+  it('a rebind to the hub already bound is a silent no-op, and the dead cannot bind', () => {
+    const sim = hearthSim();
+    const meta = sim.meta(sim.playerId)!;
+    meta.alliedHearthstoneAttunement = 'automatons';
+    const tobrin = npcByTemplate(sim, 'npc_automaton_quartermaster');
+    placeAt(sim, tobrin.pos.x + 2, tobrin.pos.z);
+    sim.drainEvents();
+    const revBefore = meta.wireRev;
+    sim.attuneAlliedHearthstone(tobrin.id);
+    expect(meta.wireRev).toBe(revBefore);
+    expect(texts(sim.drainEvents())).toEqual([]);
+
+    meta.alliedHearthstoneAttunement = undefined;
+    sim.player.dead = true;
+    sim.attuneAlliedHearthstone(tobrin.id);
+    expect(texts(sim.drainEvents())).toContain("You can't do that while dead.");
+    expect(meta.alliedHearthstoneAttunement).toBeUndefined();
   });
 
   it('refuses the quartermaster attune out of range, at a non-quartermaster, or without the stone', () => {
