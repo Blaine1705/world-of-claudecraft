@@ -303,6 +303,7 @@ import {
 import { YUMI_MOBS } from './content/yumi';
 import {
   COPPER_DIG_TERRAIN_EDITS,
+  EASTBROOK_BUILDING_PAD_TERRAIN_EDITS,
   EASTBROOK_QUAY_TERRAIN_EDITS,
   GRAVEYARD_POS,
   HARBOR_SAND_TERRAIN_EDITS,
@@ -1028,6 +1029,8 @@ export const BUILTIN_WORLD: WorldContent = {
     ...HARBOR_SAND_TERRAIN_EDITS,
     ...SOWFIELD_SEABED_TERRAIN_EDITS,
     ...FORGEFATHER_ISLE_TERRAIN_EDITS,
+    // last, as the Studio rebuild map applies them: over the plat and the strand
+    ...EASTBROOK_BUILDING_PAD_TERRAIN_EDITS,
   ],
 };
 

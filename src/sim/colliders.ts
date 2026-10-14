@@ -92,7 +92,7 @@ export { FENCE_HALF_DEPTH } from './fence_dims';
 // consumer, so only it is imported (not re-exported) for internal use here.
 export { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from './rift_regions';
 
-import { promotedTownBuildingStandsDown } from './authored_town_buildings';
+import { buildingRecordColliders, promotedTownBuildingStandsDown } from './authored_town_buildings';
 import { pushOut, resolveAgainst } from './collider_pushout';
 import {
   DAWNHOLD_PARAPET_HALF,
@@ -315,18 +315,7 @@ function staticWorldColliders(seed: number): Collider[] {
     const cameraTopY = isEastbrookGrandArmoury(b)
       ? buildingTerrainEnvelope(b, (x, z) => terrainHeight(x, z, seed)).cameraTopY
       : topY(seed, b.x, b.z, buildingCameraHeight(b));
-    out.push({
-      type: 'obb',
-      x: b.x,
-      z: b.z,
-      hw: b.w / 2,
-      hd: b.d / 2,
-      rot: b.rot,
-      cameraTopY,
-      // FORK: ground anchor for pass-under, a mover deep in a tube or carve
-      // walks beneath surface props instead of hitting invisible walls.
-      underY: topY(seed, b.x, b.z, 0),
-    });
+    out.push(...buildingRecordColliders(b, cameraTopY, (x, z) => topY(seed, x, z, 0)));
   }
   for (const w of PROPS.wells)
     out.push({

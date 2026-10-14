@@ -46,14 +46,15 @@ export const WEEKLY_QUEST_WEEK_PREFIX = 'wk_';
 export const WEEKLY_EMISSARY_TALK_RANGE = 7;
 
 export const WEEKLY_EMISSARY_NPC_ID = 2_146_900_060;
-// On the green south of the Eastbrook notice board, a stride from Marshal
-// Redbrook, facing the civic square (the same lawn the marshal watches from).
+// On the civic square beside the Weekly Vault's door, facing the square (the
+// Tidehold rebuild moved him off the harbour street, where the painted
+// smithy's forge shelter now reaches).
 export const WEEKLY_EMISSARY_NPC_DEF: NpcDef = {
   id: 'weekly_emissary',
   name: 'Cham Pete',
   title: 'Emissary',
-  pos: { x: -52, z: -108 },
-  facing: 1.41,
+  pos: { x: -4, z: -102.2 },
+  facing: 0,
   color: 0x6b4fa8,
   questIds: [],
   dynamic: true,

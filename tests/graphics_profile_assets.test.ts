@@ -207,8 +207,10 @@ describe('graphics profile asset preparation', () => {
     expect(mocks.sky).toHaveBeenCalledWith(position.x, position.z, target);
     expect(mocks.cliff).toHaveBeenCalledWith(target);
     expect(mocks.cityClutter).toHaveBeenCalledWith(target);
+    // The Eastbrook town loads its placed buildings at the TARGET profile's
+    // texture tier (a rebuild prepares before the live settings switch).
+    expect(mocks.town).toHaveBeenCalledWith(target);
     for (const prepare of [
-      mocks.town,
       mocks.armoury,
       mocks.mailbox,
       mocks.noticeboard,

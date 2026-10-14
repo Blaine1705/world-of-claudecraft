@@ -18,7 +18,7 @@ function world(state = 'active'): WolvesGuideReader {
 describe('wolves guidance geometry and visibility', () => {
   it('resolves the authored forest wolf camp (a content rename degrades to no route, never a throw)', () => {
     expect(WOLF_RUN_CAMP).not.toBeNull();
-    expect(WOLVES_ROUTE.length).toBe(4);
+    expect(WOLVES_ROUTE.length).toBe(6);
   });
 
   it('answers a finished quest from questsDone before the zone scan or any questState read', () => {
@@ -85,10 +85,16 @@ describe('wolves guidance geometry and visibility', () => {
     if (!outbound.plan) throw new Error('Expected active wolves route');
     expect(WOLF_RUN_CAMP).toEqual({ x: -10, z: 6, radius: 28.5 });
     expect(outbound.plan?.points).toEqual(WOLVES_ROUTE);
+    // Re-pinned 2026-10 for the Tidehold rebuild: the apothecary's shop stands
+    // on the old line north-west out of the square, so the trail follows the
+    // north road round its east end, past the churchyard's open side and east
+    // of the ruin ring's columns.
     expect(WOLVES_ROUTE).toEqual([
       EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position,
-      { x: -14.5, z: -72.5 },
-      { x: -14.5, z: -53.5 },
+      { x: 12, z: -89.5 },
+      { x: 9, z: -77 },
+      { x: 5.5, z: -64 },
+      { x: 5, z: -52 },
       WOLF_RUN_CAMP,
     ]);
     expect(outbound.areaRing).toEqual(WOLF_RUN_CAMP);

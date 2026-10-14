@@ -67,29 +67,37 @@ describe('player pathfinding', () => {
 
   it('routes around static blockers instead of walking straight through them', () => {
     // Re-staged 2026-08-18 for the Eastbrook harbor move (d19aa33f76): the old
-    // blocker at (0,2) was a town building on the now-open vacated ground. The
-    // chapel at (2,-78) blocks the straight line across the chapel green, with
-    // walkable ground on both sides to detour over.
+    // blocker at (0,2) was a town building on the now-open vacated ground.
+    // Re-staged again for the painted Tidehold town, which took the chapel off
+    // the green at (2,-78): the apothecary's shop at (-7,-82) blocks the
+    // straight line along z -80, with open ground at both ends to detour over.
     const seed = 20061;
-    const from = { x: -2, z: -78 };
-    const to = { x: 6, z: -78 };
+    const from = { x: -17, z: -80 };
+    const to = { x: 3, z: -80 };
     const path = findPlayerPath(seed, from, to);
 
-    expect(isBlocked(seed, 2, -78)).toBe(true);
+    expect(isBlocked(seed, -7, -80)).toBe(true);
+    expect(isBlocked(seed, from.x, from.z)).toBe(false);
+    expect(isBlocked(seed, to.x, to.z)).toBe(false);
     expect(path.length).toBeGreaterThan(1);
-    expect(path.some((p) => Math.abs(p.z + 78) > 0.5)).toBe(true);
+    expect(path.some((p) => Math.abs(p.z + 80) > 0.5)).toBe(true);
     expect(path[path.length - 1]).toEqual(to);
   });
 
   it('resolves click destinations inside buildings to the nearest walkable outside point', () => {
     const seed = 20061;
-    const center = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.position;
+    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
+    const center = bank.position;
     const target = resolvePlayerDestination(seed, center);
 
     expect(isBlocked(seed, center.x, center.z)).toBe(true);
     expect(isBlocked(seed, target.x, target.z)).toBe(false);
-    expect(Math.hypot(target.x - center.x, target.z - center.z)).toBeGreaterThan(0.5);
-    expect(Math.hypot(target.x - center.x, target.z - center.z)).toBeLessThan(6);
+    // just outside the nearest wall face (the painted bank is 16 yd deep, so
+    // the nearest outside point sits a body width past its half depth)
+    const nearestFace = Math.min(bank.footprint.halfWidth, bank.footprint.halfDepth);
+    const reached = Math.hypot(target.x - center.x, target.z - center.z);
+    expect(reached).toBeGreaterThan(nearestFace);
+    expect(reached).toBeLessThan(nearestFace + 1.5);
   });
 
   it('snaps a water click to shore for walkers but keeps it for swimmers', () => {
