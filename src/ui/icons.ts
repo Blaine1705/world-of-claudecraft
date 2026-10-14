@@ -2911,6 +2911,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   trailbreak: r('storm', 'leafGreen', ['boot', { p: 'arrow', ...TR }], ['motion', 'arcs']),
   wildheart: r('nature', 'blood', ['heart', { p: 'paw', ...BR }], ['glow', 'sparkle']),
   shellskin: r('earth', 'earthBrown', ['shield', { p: 'pelt', ...BR }], ['crack']),
+  tactical_camo: r('nature', 'leafGreen', ['eye', { p: 'pelt', ...BR }], ['glow']),
+  play_dead: r('shadow', 'bone', [{ p: 'skull', ...BIG }], ['glow']),
   frostjaw_trap: r('frost', 'ice', ['fang', { p: 'tendrils', ...BR }], ['arcs', 'glow']),
   cold_focus: r('frost', 'steel', ['eye', { p: 'crosshair', ...BR }], ['sparkle']),
   bloodhook: r('blood', 'steel', ['fang', { p: 'tendrils', ...TR }], ['motion', 'drips']),
@@ -4978,6 +4980,10 @@ export const ABILITY_ART_PENDING = new Set<string>([
   // Buried Hoards: the Clockwork Shock Bomb's thrown cast draws its glyph until
   // its skill painting ships (the item itself already ships painted art).
   'clockwork_shock_bomb',
+  // Fieldcraft rework: Tactical Camo and Play Dead draw their glyphs until
+  // their paintings ship.
+  'tactical_camo',
+  'play_dead',
 ]);
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
