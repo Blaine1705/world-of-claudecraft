@@ -48,8 +48,8 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { TICK_RATE } from '../types';
 import { grantHonor } from './honor';
-import { loadSkullBag, savedSkullBag, skullBagInfoFor } from './skull_bag';
 import { notePvpResurrectAtDeath } from './pvp_resurrect';
+import { loadSkullBag, savedSkullBag, skullBagInfoFor } from './skull_bag';
 import { updatePvpVitality } from './vitality';
 import {
   announceWorldPvpBountyCollected,
@@ -762,11 +762,7 @@ export function worldPvpOnPlayerDeath(
   // whatever landed the blow. Read before the payout: a bounty standing at the
   // moment of death doubles the pool below.
   const victimHadBounty = clearWorldPvpBounty(victimMeta.worldPvp, victim);
-  if (
-    books.paidDeaths.has(victim.id) ||
-    !killerPlayer ||
-    !killerHostile
-  ) {
+  if (books.paidDeaths.has(victim.id) || !killerPlayer || !killerHostile) {
     if (victimHadBounty) noticeWorldPvpBountyLapsed(ctx, victim.id);
     return;
   }

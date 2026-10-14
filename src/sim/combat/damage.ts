@@ -509,7 +509,7 @@ export function dealDamage(
     if (form) amount = Math.round(amount * (1 + form.value / 100));
   }
 
-  // Lonely Soul (hunter choice row): a petless hunter deals 40% more damage.
+  // Lonely Soul (hunter choice row): a petless hunter deals 10% more damage.
   // Source-output, so the alreadyFinal guard keeps a redirect share clean.
   if (!alreadyFinal && source && source.id !== target.id && amount > 0) {
     const lonely = lonelySoulDamageMult(ctx, source);

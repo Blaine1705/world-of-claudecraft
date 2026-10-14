@@ -131,6 +131,16 @@ export {
   pvpVitalityFromRating,
 } from './power';
 export {
+  notePvpResurrectAtDeath,
+  PVP_RESURRECT_WAIT_SECONDS,
+  PVP_RESURRECT_WINDOW_SECONDS,
+  type PvpResurrectDeath,
+  pvpResurrectBarred,
+  pvpResurrectEarned,
+  pvpResurrectReady,
+  pvpResurrectWaitSeconds,
+} from './pvp_resurrect';
+export {
   ownsSkullBag,
   SKULL_BAG_MISSING_LINE,
   SKULL_BAG_NOTHING_LINE,
@@ -141,16 +151,6 @@ export {
   storeLootedSkulls,
   WORLD_PVP_SKULL_BAG_ITEM_ID,
 } from './skull_bag';
-export {
-  notePvpResurrectAtDeath,
-  PVP_RESURRECT_WAIT_SECONDS,
-  PVP_RESURRECT_WINDOW_SECONDS,
-  type PvpResurrectDeath,
-  pvpResurrectBarred,
-  pvpResurrectEarned,
-  pvpResurrectReady,
-  pvpResurrectWaitSeconds,
-} from './pvp_resurrect';
 export { pvpVitalityAppliesTo, updatePvpVitality } from './vitality';
 export {
   isWorldPvpFlagged,

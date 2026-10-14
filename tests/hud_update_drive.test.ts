@@ -1901,7 +1901,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // own HUD repaint row while the move-state holder stays state-only.
       // none 20 -> 21 after Fieldcraft's Play Dead state-only HUD tick.
       // PvP Resurrect's button/note painter adds one chrome row.
-      ).toEqual({ window: 51, chrome: 97, none: 21 });
+    ).toEqual({ window: 51, chrome: 97, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
