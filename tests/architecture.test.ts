@@ -2696,6 +2696,7 @@ const UI_DOM_MODULES = [
   'src/ui/bank_window.ts',
   'src/ui/bank_window_lifecycle.ts',
   'src/ui/account_bank_window.ts',
+  'src/ui/friendship_armour_claim.ts',
   'src/ui/bank_window_focus.ts',
   'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',

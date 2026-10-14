@@ -1,10 +1,10 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { page } from 'vitest/browser';
 import { REFERRAL_ITEMS } from '../../src/sim/content/referral';
-import { renderAccountBank } from '../../src/ui/account_bank_window';
+import { createFriendshipArmourClaim } from '../../src/ui/friendship_armour_claim';
 import { membershipItemTooltipLines } from '../../src/ui/membership_item_tooltip';
 import type { IWorld } from '../../src/world_api';
-import { cleanup, host, stubDeps } from './_harness';
+import { cleanup, host } from './_harness';
 
 afterEach(async () => {
   cleanup();
@@ -22,7 +22,7 @@ it.each([
   document.documentElement.style.setProperty('--app-width', `${width}px`);
   document.documentElement.style.setProperty('--app-height', `${height}px`);
   document.documentElement.style.setProperty('--ui-scale', '1');
-  const root = host('bank-window');
+  const root = host('friendship-claim-fixture', 'panel');
   root.style.display = 'flex';
   const claim = vi.fn();
   const world = {
@@ -30,15 +30,16 @@ it.each([
     accountBankInfo: null,
     claimMembershipArmour: claim,
   };
-  renderAccountBank(root, stubDeps({ world: () => world as unknown as IWorld }), () => {});
-  const button = root.querySelector<HTMLButtonElement>('[data-focus-key="account-armour"]')!;
+  const button = createFriendshipArmourClaim(() => world as unknown as IWorld)!;
+  root.append(button);
   expect(button.textContent).toBe('Claim friendship armour');
   expect(button.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
   button.focus();
   expect(document.activeElement).toBe(button);
   button.click();
   expect(claim).toHaveBeenCalledOnce();
-  const pane = root.querySelector<HTMLElement>('#account-bank-panel')!;
+  const pane = document.createElement('div');
+  root.append(pane);
   pane.insertAdjacentHTML(
     'beforeend',
     membershipItemTooltipLines(REFERRAL_ITEMS.referral_chest, {
@@ -51,7 +52,4 @@ it.each([
   expect(pane.textContent).toContain('Their membership must be active');
   expect(pane.scrollWidth).toBeLessThanOrEqual(pane.clientWidth + 1);
   expect(button.getBoundingClientRect().right).toBeLessThanOrEqual(width);
-  await page.screenshot({
-    path: `../../docs/screenshots/referral-armour/claim-${width}x${height}.png`,
-  });
 });
