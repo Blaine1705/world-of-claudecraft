@@ -21,6 +21,7 @@ export interface DistanceExperimentSnapshot {
   }[];
 }
 export function installSceneryDistanceExperiment(renderer: object): {
+  retains(mesh: object, index: number): boolean | null;
   set(distance: number): void;
   setSceneryOff(enabled: boolean): void;
   refresh(): void;

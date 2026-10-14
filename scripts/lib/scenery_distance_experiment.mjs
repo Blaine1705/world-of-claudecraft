@@ -201,6 +201,10 @@ export function installSceneryDistanceExperiment(renderer) {
   renderer.updateZoneFeatureVisibility = sweep;
   renderer.webgl.render = render;
   return {
+    retains(mesh, index) {
+      const entry = entries.find((e) => e.mesh === mesh);
+      return entry ? entry.indices.includes(index) : null;
+    },
     setSceneryOff(enabled) {
       if (disposed) throw Error('Experiment disposed');
       sceneryOff = enabled;
