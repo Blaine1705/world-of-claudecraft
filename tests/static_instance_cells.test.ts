@@ -43,7 +43,9 @@ describe('static instance cells', () => {
       const c = Math.cos(spot.rot) * spot.s;
       const s = Math.sin(spot.rot) * spot.s;
       const expected = [c, 0, -s, 0, 0, spot.s, 0, 0, s, 0, c, 0, spot.x, spot.y, spot.z, 1];
-      matrix.elements.forEach((value, j) => expect(value).toBeCloseTo(expected[j], 5));
+      matrix.elements.forEach((value, j) => {
+        expect(value).toBeCloseTo(expected[j], 5);
+      });
       return matrix.elements;
     });
     expect(matrices).toEqual(originals);

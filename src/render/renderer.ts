@@ -728,7 +728,7 @@ import {
   sceneCensusChild,
 } from './scene_census_core';
 import { sceneKeyLightUniform } from './scene_sampling';
-import { installSceneryDetail, updateSceneryDetail } from './scenery_detail';
+import * as sceneryDetail from './scenery_detail';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
 import { drapeRingLocalY, reticleShownUnder, selectionRingScale } from './selection_ring';
@@ -2142,7 +2142,7 @@ export class Renderer {
     if (options.initializeGfx !== false) {
       initGfxTier(this.webgl); // software-GL autodetect needs the live context
     }
-    installSceneryDetail(this.backgroundGpuWork);
+    sceneryDetail.installSceneryDetail(this.backgroundGpuWork, this, this.compileGate.bind(this));
     refreshTextureAnisotropy(this.webgl); // resolved budget before any upload
     if (GFX.composer || GFX.gradePass) {
       // three's render() resets info per pass (since r185 at the top of the
@@ -4031,6 +4031,7 @@ export class Renderer {
     freeze = true,
   ): void {
     setRenderCategory(view.group, 'props');
+    if (freeze) sceneryDetail.prepareSceneryDetailRoot(view.group, true);
     // Attach hidden until the live gate links the group's programs (the same
     // contract as dungeon interiors): a lazily built biome feature otherwise
     // links its freshly minted materials synchronously on its first visible
@@ -4093,7 +4094,7 @@ export class Renderer {
       this.zoneFeatureGroups,
       this.camera.position.x,
       this.camera.position.z,
-      fogFar,
+      (group) => sceneryDetail.sceneryCullFar(fogFar, group),
       this.sun.shadow.camera.top,
     );
   }
@@ -4899,7 +4900,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      this.entryDetailHorizon.sceneryCullFar(fogFar),
+      sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -4910,7 +4911,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      this.entryDetailHorizon.sceneryCullFar(fogFar),
+      sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -4921,7 +4922,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      this.entryDetailHorizon.sceneryCullFar(fogFar),
+      sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -4935,7 +4936,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogNear,
-      this.entryDetailHorizon.sceneryCullFar(fogFar),
+      sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
       this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar * 0.9
         : this.lastRequestedFogNear,
@@ -4946,7 +4947,7 @@ export class Renderer {
       dt,
       this.reducedMotion(),
     );
-    updateSceneryDetail(this.camera.position.x, this.camera.position.z);
+    sceneryDetail.updateSceneryDetail(this.camera.position.x, this.camera.position.z);
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.abilityVfx.update(dt, this.reducedMotion());
     this.vfx.update(dt);
@@ -8693,7 +8694,8 @@ export class Renderer {
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
-  private fogState: FogSceneState = 'outdoor';
+  /** Read by scenery eligibility; atmosphere updates remain owned here. */
+  fogState: FogSceneState = 'outdoor';
 
   /** Drop a retired interior's scene nodes, registries, and owned resources. */
   private retireInteriorGroup(group: THREE.Group): void {
@@ -11595,7 +11597,7 @@ export class Renderer {
     const eyeX = this.cameraLookAt.x;
     const eyeY = this.cameraLookAt.y;
     const eyeZ = this.cameraLookAt.z;
-    const sceneryFar = this.entryDetailHorizon.sceneryCullFar(fogFar);
+    const sceneryFar = sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar);
     this.propsView.update(camX, camY, camZ, eyeX, eyeY, eyeZ, sceneryFar, dt, this.reducedMotion());
     this.eastbrookTownView.update(
       camX,
@@ -11643,7 +11645,7 @@ export class Renderer {
       dt,
       this.reducedMotion(),
     );
-    updateSceneryDetail(camX, camZ);
+    sceneryDetail.updateSceneryDetail(camX, camZ);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart);

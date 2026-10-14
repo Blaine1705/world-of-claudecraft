@@ -38,6 +38,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import type { RevealGateCore } from './reveal_gate_core';
+import { prepareSceneryDetailRoot } from './scenery_detail';
 import {
   newTownPiecewiseReveal,
   orderTownRootsNearestFirst,
@@ -1341,6 +1342,7 @@ function buildFromTemplates(
   let lastCamX = 0;
   let lastCamZ = 0;
   const orderedRevealRoots: THREE.Object3D[] = [];
+  for (const root of [...staticCullTargets, ...buildingGroups]) prepareSceneryDetailRoot(root);
   return {
     group,
     setCaptureOverlay,

@@ -13,7 +13,7 @@ import {
 const queue = { run: async <T>(work: () => T | Promise<T>): Promise<T> => work() };
 
 function fixture(xs = [0, 100, 200, 350, 600]) {
-  const geometry = new THREE.SphereGeometry(3, 32, 16);
+  const geometry = new THREE.SphereGeometry(3, 48, 24);
   const material = new THREE.MeshStandardMaterial({ roughness: 0.7 });
   material.name = 'Leaves_Pine';
   material.onBeforeCompile = vi.fn();
@@ -36,7 +36,7 @@ describe('scenery detail production policy', () => {
     async (tier) => {
       const f = fixture([30, 90, 180, 360, 600]);
       const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS[tier]);
-      session.prepare(f.mesh, false);
+      session.prepare(f.mesh);
       await session.settled();
       session.update(0, 700);
       const children = f.mesh.children as THREE.InstancedMesh[];
@@ -46,7 +46,8 @@ describe('scenery detail production policy', () => {
         for (let i = 0; i < child.count; i++) {
           const x = child.instanceMatrix.array[i * 16 + 12];
           const expected = sceneryDetailLevel(x, 0, SCENERY_DETAIL_BANDS[tier]);
-          expect(child.name).toBe(`scenery-detail:${expected}`);
+          // Adjacent budgets may converge to identical geometry and share a draw.
+          expect(Number(child.name.split(':')[1])).toBeLessThanOrEqual(expected);
           if (expected === 0) expect(child.geometry.index).toBe(f.geometry.index);
         }
       }
@@ -71,7 +72,7 @@ describe('scenery detail production policy', () => {
   it('releases rendered reduced GPU indices while retaining all borrowed source buffers', async () => {
     const f = fixture([100, 200]);
     const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
-    session.prepare(f.mesh, false);
+    session.prepare(f.mesh);
     await session.settled();
     session.update(0, 700);
     const removed = new Set<THREE.BufferAttribute>();
@@ -131,12 +132,13 @@ describe('scenery detail production policy', () => {
     const original = Array.from(f.mesh.instanceMatrix.array);
     const colors = Array.from(f.mesh.instanceColor!.array);
     const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
-    session.prepare(f.mesh, false);
+    session.prepare(f.mesh);
     await session.settled();
     session.update(0, 700);
     expect(f.mesh.count).toBe(0);
     const children = f.mesh.children as THREE.InstancedMesh[];
-    expect(children.map((mesh) => mesh.count)).toEqual([1, 1, 1, 2]);
+    expect(children.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(5);
+    expect(children[0].count).toBe(1);
     const seen = [];
     for (const child of children) {
       expect(child.material).toBe(f.material);
@@ -169,7 +171,7 @@ describe('scenery detail production policy', () => {
     const hide = new THREE.InstancedBufferAttribute(new Float32Array([0, 0.7]), 1);
     f.geometry.setAttribute('aGhostHide', hide);
     const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
-    session.prepare(f.mesh, false);
+    session.prepare(f.mesh);
     await session.settled();
     session.update(0, 700);
     const far = f.mesh.children[1] as THREE.InstancedMesh;
@@ -187,13 +189,66 @@ describe('scenery detail production policy', () => {
   it('does not reupload matrices when the camera moves within the same detail band', async () => {
     const f = fixture([0, 100]);
     const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
-    session.prepare(f.mesh, false);
+    session.prepare(f.mesh);
     await session.settled();
     session.update(0, 700);
     const children = f.mesh.children as THREE.InstancedMesh[];
     const versions = children.map((mesh) => mesh.instanceMatrix.version);
     session.update(1, 700);
     expect(children.map((mesh) => mesh.instanceMatrix.version)).toEqual(versions);
+    session.dispose();
+  });
+
+  it('copies live ghost changes without recalculating stationary placement distances', async () => {
+    const f = fixture([0, 100]);
+    const hide = new THREE.InstancedBufferAttribute(new Float32Array([0, 0]), 1);
+    f.geometry.setAttribute('aGhostHide', hide);
+    const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.medium);
+    session.prepare(f.mesh);
+    await session.settled();
+    session.update(0, 700);
+    hide.setX(1, 0.6);
+    hide.needsUpdate = true;
+    const distance = vi.spyOn(Math, 'hypot');
+    try {
+      session.update(0, 700);
+      expect(distance).not.toHaveBeenCalled();
+      const far = (f.mesh.children as THREE.InstancedMesh[]).find(
+        (mesh) => mesh.count > 0 && mesh.instanceMatrix.array[12] === 100,
+      )!;
+      expect(far.geometry.getAttribute('aGhostHide').getX(0)).toBeCloseTo(0.6);
+    } finally {
+      distance.mockRestore();
+      session.dispose();
+    }
+  });
+
+  it('follows an existing camera-fade material replacement without waiting for camera movement', async () => {
+    const f = fixture([100]);
+    const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
+    session.prepare(f.mesh);
+    await session.settled();
+    session.update(0, 700);
+    const faded = f.material.clone();
+    faded.transparent = true;
+    faded.opacity = 0.25;
+    f.mesh.material = faded;
+    session.update(0, 700);
+    for (const child of f.mesh.children as THREE.Mesh[]) expect(child.material).toBe(faded);
+    session.dispose();
+  });
+
+  it('does not split an extra draw when a small model already fits its target budget', async () => {
+    const f = fixture([0, 90]);
+    f.mesh.geometry = new THREE.SphereGeometry(3, 8, 4);
+    const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
+    session.prepare(f.mesh);
+    await session.settled();
+    session.update(0, 700);
+    const draws = (f.mesh.children as THREE.InstancedMesh[]).filter((child) => child.visible);
+    expect(draws).toHaveLength(1);
+    expect(draws[0].count).toBe(2);
+    expect(draws[0].geometry.index).toBe(f.mesh.geometry.index);
     session.dispose();
   });
 
@@ -207,7 +262,7 @@ describe('scenery detail production policy', () => {
         }),
     };
     const session = new SceneryDetailSession(held, SCENERY_DETAIL_BANDS.low);
-    session.prepare(f.mesh, false);
+    session.prepare(f.mesh);
     await scenerySimplifierReady;
     session.update(0, 700);
     expect((f.mesh.children[0] as THREE.InstancedMesh).count).toBe(1);
@@ -228,8 +283,8 @@ describe('scenery detail production policy', () => {
     f.geometry.addEventListener('dispose', geometryDispose);
     f.material.addEventListener('dispose', materialDispose);
     const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
-    session.prepare(f.mesh, false);
-    session.prepare(other, false);
+    session.prepare(f.mesh);
+    session.prepare(other);
     await session.settled();
     session.update(0, 700);
     expect(session.snapshot().models).toBe(1);
@@ -245,13 +300,30 @@ describe('scenery detail production policy', () => {
     expect(materialDispose).not.toHaveBeenCalled();
   });
 
-  it('leaves placements outside the pilot regions full detail', async () => {
+  it('applies distance bands across region borders', async () => {
     const f = fixture([0, 100, 600]);
     const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
     session.prepare(f.mesh);
     await session.settled();
     session.update(-100, 700);
-    expect(session.snapshot().levels[0]).toBe(1);
+    expect(session.snapshot().levels[0]).toBe(0);
+    session.dispose();
+  });
+
+  it('gives only Palmreach placements the stronger tree budget in a mixed batch', async () => {
+    const f = fixture([-270, -90]);
+    const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
+    session.prepare(f.mesh);
+    await session.settled();
+    session.update(-180, 700);
+    const draws = (f.mesh.children as THREE.InstancedMesh[]).filter((m) => m.visible);
+    expect(draws).toHaveLength(2);
+    const palm = draws.find((m) => m.instanceMatrix.array[12] === -270)!;
+    const ordinary = draws.find((m) => m.instanceMatrix.array[12] === -90)!;
+    expect(palm.geometry.index!.count).toBeLessThan(ordinary.geometry.index!.count);
+    expect(palm.material).toBe(ordinary.material);
+    session.update(-180, 700);
+    expect(draws.reduce((n, m) => n + m.count, 0)).toBe(2);
     session.dispose();
   });
 
@@ -260,12 +332,64 @@ describe('scenery detail production policy', () => {
     const mesh = new THREE.Mesh(source, new THREE.MeshStandardMaterial());
     mesh.position.set(200, 0, 700);
     const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
-    session.prepare(mesh, false);
+    session.prepare(mesh);
     await session.settled();
     session.update(0, 700);
-    expect(mesh.geometry.index!.count).toBeLessThan(source.index!.count);
+    const color = mesh.children[0] as THREE.Mesh;
+    expect(color.visible).toBe(true);
+    expect(color.geometry.index!.count).toBeLessThan(source.index!.count);
+    expect(mesh.geometry.attributes.position).toBe(source.attributes.position);
+    expect(mesh.geometry.drawRange.count).toBe(0);
     session.update(150, 700);
     expect(mesh.geometry).toBe(source);
+    expect(color.visible).toBe(false);
+    session.dispose();
+  });
+
+  it('preserves far prop count, bounds and existing shadow callbacks', async () => {
+    const f = fixture([100]);
+    f.mesh.name = 'far-bake:cell:material';
+    f.mesh.computeBoundingBox();
+    f.mesh.computeBoundingSphere();
+    const box = f.mesh.boundingBox!.clone();
+    f.mesh.count = 0;
+    f.mesh.onBeforeShadow = () => {
+      f.mesh.count = 1;
+    };
+    f.mesh.onAfterShadow = () => {
+      f.mesh.count = 0;
+    };
+    const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
+    session.prepareRoot(f.root);
+    await session.settled();
+    session.update(0, 700);
+    expect(f.mesh.count).toBe(0);
+    expect(f.mesh.children).toHaveLength(0);
+    expect(f.mesh.boundingBox).toEqual(box);
+    const args = [null, f.mesh, null, null, f.mesh.geometry, null, null] as unknown as Parameters<
+      typeof f.mesh.onBeforeShadow
+    >;
+    f.mesh.onBeforeShadow(...args);
+    expect(f.mesh.count).toBe(1);
+    f.mesh.onAfterShadow(...args);
+    expect(f.mesh.count).toBe(0);
+    f.mesh.count = 1;
+    session.update(1, 700);
+    expect(f.mesh.count).toBe(1);
+    session.dispose();
+    expect(f.mesh.count).toBe(1);
+  });
+
+  it('excludes moving transport hierarchies and empty dynamic batches', async () => {
+    const f = fixture([100]);
+    f.root.userData.decorative = false;
+    const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
+    session.prepareRoot(f.root);
+    const empty = fixture([200]);
+    empty.mesh.count = 0;
+    session.prepareRoot(empty.root);
+    await session.settled();
+    expect(session.snapshot().entries).toBe(0);
     session.dispose();
   });
 

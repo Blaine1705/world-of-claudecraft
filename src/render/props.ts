@@ -66,6 +66,7 @@ import {
   updatePropCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
+import { prepareSceneryDetailRoot } from './scenery_detail';
 import { shipWakePrewarmParts } from './ship_wake';
 import { mergeBandDepth, mergeStaticMeshes, normalizedStaticGeometry } from './static_merge';
 import { buildScheduledShips, type FerryViewSource } from './transport_ferry_ships';
@@ -2613,6 +2614,7 @@ export function buildProps(
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
   const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
   const cullablesByKey = new Map(cullables.map((cullable) => [cullable.key, cullable]));
+  prepareSceneryDetailRoot(group);
   const cullPass = newPropCullPass();
   let revealGate: RevealGateCore | null = null;
   let bandRevealGate: RevealGateCore | null = null;

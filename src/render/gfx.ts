@@ -213,7 +213,7 @@ export interface GfxSettings {
   readonly standardMaterials: boolean;
   /** Static scenery uses authored coarse indices past this footprint distance; 0 disables. */
   readonly sceneryGeometryLodDistance: number;
-  /** Geometry-only pilot; opt in through gfxo until silhouettes and speed qualify. */
+  /** Shared scenery bands; gfxo can disable them for an unchanged baseline. */
   readonly sceneryDetail: boolean;
   /** Coconut batch grid in yards; 0 retains the single strand-wide draw. Build-time only. */
   readonly coconutCellSize: number;
@@ -1266,7 +1266,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
             ? 4096
             : 2560,
     standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
-    sceneryDetail: false,
+    sceneryDetail: true,
     sceneryGeometryLodDistance: gfxTierAtLeast(tier, 'medium') ? 0 : 180,
     coconutCellSize: gfxTierAtLeast(tier, 'medium') ? 0 : 128,
     lowReadabilityLighting: !gfxTierAtLeast(tier, 'medium'),

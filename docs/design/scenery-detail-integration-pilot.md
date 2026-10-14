@@ -1,6 +1,9 @@
 # Scenery detail integration pilot, 14 October 2026
 
-Status: local opt-in pilot. Wider rollout withheld after visual acceptance failed.
+Historical failed pilot, retained as evidence. Current recovery and rollout work
+is tracked in [Scenery distance rollout](scenery-distance-rollout.md).
+
+Status at the end of this pilot: local opt-in. Wider rollout withheld after visual acceptance failed.
 The five geometry profiles exist, but they are not approved defaults or a completed
 whole-world graphics upgrade. No push, merge or deployment.
 

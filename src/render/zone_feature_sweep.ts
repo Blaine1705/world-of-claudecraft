@@ -71,14 +71,20 @@ export function sweepZoneFeatures(
   entries: readonly ZoneFeatureEntry[],
   camX: number,
   camZ: number,
-  cullFar: number,
+  cullFar: number | ((group: THREE.Group) => number),
   shadowHalfExtent: number,
 ): void {
   for (const entry of entries) {
     updateSceneryGeometryLod(entry.group, camX, camZ, GFX.sceneryGeometryLodDistance);
     entry.inReach = isZoneFeatureInReach(entry.footprint, camX, camZ, entry.reach, entry.inReach);
     entry.group.visible =
-      entry.inReach && isZoneFeatureVisible(entry.footprint, camX, camZ, cullFar);
+      entry.inReach &&
+      isZoneFeatureVisible(
+        entry.footprint,
+        camX,
+        camZ,
+        typeof cullFar === 'number' ? cullFar : cullFar(entry.group),
+      );
     const casting = isZoneFeatureShadowCasting(
       entry.footprint,
       camX,

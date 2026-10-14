@@ -19,6 +19,7 @@ describe('scenery colour detail leaves the shadow representation unchanged', () 
     >;
     mesh.onBeforeShadow(...args);
     expect(reduced.index).toBe(full.index);
+    expect(reduced.attributes.position).toBe(full.attributes.position);
     expect(before).toHaveBeenCalledTimes(1);
     mesh.onAfterShadow(...args);
     expect(reduced.index).toBe(index);
