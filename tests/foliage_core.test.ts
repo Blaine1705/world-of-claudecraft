@@ -63,7 +63,10 @@ describe('Eastbrook town grass exclusion', () => {
     // five placed buildings (two rows each, four fewer) and its boardwalks
     // run down the main street only (twelve modules to ten, two fewer):
     // 115 to 109.
-    expect(exclusions).toHaveLength(109);
+    // Re-pinned 2026-10 for the open Fenbridge: the palisade and its gate
+    // arches came down, taking the sixteen wing OBBs and the eight gate-jamb
+    // OBBs with them: 109 to 85.
+    expect(exclusions).toHaveLength(85);
     expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
     expect(EASTBROOK_LAYOUT.buildings).toHaveLength(6);
     for (const building of [

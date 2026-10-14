@@ -2,12 +2,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../sim/building_layout';
 import { getActiveWorldContent } from '../sim/data';
-import {
-  FENBRIDGE_BUILDINGS_BY_ID,
-  FENBRIDGE_LAYOUT,
-  localToWorld,
-  palisadeSegmentMirrored,
-} from '../sim/fenbridge_layout';
+import { FENBRIDGE_BUILDINGS_BY_ID, FENBRIDGE_LAYOUT, localToWorld } from '../sim/fenbridge_layout';
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
@@ -53,17 +48,23 @@ import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'fenbridgeTownRebuild';
 const OVERLAY_NAME = 'fenbridgeCaptureOverlay';
-const TOWN_CULL_RADIUS = FENBRIDGE_LAYOUT.hub.radius + FENBRIDGE_LAYOUT.wall.maximumSegmentSpan / 2;
+// The town-wide cull and imminent-reveal circle round the hub centre. Every
+// static batch (the boardwalks, the cistern, the stall, the muster board)
+// stands inside the hub ring; the margin keeps the circle where the walled
+// town had it (half a palisade wing past the ring), so opening the town moved
+// no cull and no reveal.
+const TOWN_CULL_MARGIN_YD = 6;
+const TOWN_CULL_RADIUS = FENBRIDGE_LAYOUT.hub.radius + TOWN_CULL_MARGIN_YD;
 /** The one reveal-gate key of the town's static content. */
 const STATIC_REVEAL_KEY = 'fenbridge-town-static';
 
+// Fenbridge stands open: no palisade wing or gate arch is drawn or loaded
+// here (their GLBs stay shipped for Studio).
 const PROP_ASSET_URLS = Object.freeze([
   ...FENBRIDGE_LAYOUT.buildings.map((building) => building.assetId),
   FENBRIDGE_LAYOUT.civic.cistern.assetId,
   FENBRIDGE_LAYOUT.civic.provisionStall.assetId,
   FENBRIDGE_LAYOUT.civic.musterBoard.assetId,
-  FENBRIDGE_LAYOUT.wall.assetId,
-  FENBRIDGE_LAYOUT.wall.gates[0].arch.assetId,
   FENBRIDGE_LAYOUT.repeated.boardwalks[0].assetId,
 ]);
 /** The painted Tidehold buildings (eastbrook_placed_building.ts): drawn with
@@ -83,8 +84,6 @@ const REQUIRED_PLACEMENT_IDS = Object.freeze([
 ]);
 
 const ASSET_PLACEMENT_COUNTS = Object.freeze({
-  fenbridge_palisade_wing: FENBRIDGE_LAYOUT.wall.segments.length,
-  fenbridge_gate_arch: FENBRIDGE_LAYOUT.wall.gates.length,
   fenbridge_boardwalk: FENBRIDGE_LAYOUT.repeated.boardwalks.length,
   fenbridge_muster_order: FENBRIDGE_LAYOUT.repeated.musterOrders.length,
 });
@@ -98,8 +97,6 @@ const ASSET_INSTANCE_COUNTS = (() => {
   add(FENBRIDGE_LAYOUT.civic.cistern.assetId);
   add(FENBRIDGE_LAYOUT.civic.provisionStall.assetId);
   add(FENBRIDGE_LAYOUT.civic.musterBoard.assetId);
-  add(FENBRIDGE_LAYOUT.wall.assetId, FENBRIDGE_LAYOUT.wall.segments.length);
-  add(FENBRIDGE_LAYOUT.wall.gates[0].arch.assetId, FENBRIDGE_LAYOUT.wall.gates.length);
   add(FENBRIDGE_LAYOUT.repeated.boardwalks[0].assetId, FENBRIDGE_LAYOUT.repeated.boardwalks.length);
   add(QUEST_ASSET_URL, FENBRIDGE_LAYOUT.repeated.musterOrders.length);
   return Object.freeze(counts);
@@ -225,8 +222,6 @@ export interface FenbridgeTownDrawStats {
   buildingFadeTargetCount: number;
   microBatchCount: number;
   repeatedBatchCount: number;
-  wallSegmentCount: number;
-  gateCount: number;
   boardwalkCount: number;
 }
 
@@ -445,11 +440,12 @@ function townMaterial(
   emissive: boolean,
   textures: SurfaceTextures,
   independent = false,
-  doubleSided = false,
 ): THREE.Material {
+  // FrontSide stays spelled out: the side is part of surfaceMat's dedupe key,
+  // so this keeps every batch on the shared entry it has always drawn with.
   const options = {
     ...materialOptions(emissive, textures),
-    side: doubleSided ? THREE.DoubleSide : THREE.FrontSide,
+    side: THREE.FrontSide,
   };
   // The shared response texture packs roughness in green and semantic metalness
   // in blue, so aged iron/brass can read distinctly without a fourth town-wide
@@ -705,11 +701,10 @@ function buildRepeatedBatches(
   assetKey: keyof typeof ASSET_PLACEMENT_COUNTS,
   textures: SurfaceTextures,
   castShadow: boolean,
-  doubleSided = false,
 ): THREE.InstancedMesh[] {
   const opaque = repeatedInstanceMesh(
     template.opaque,
-    townMaterial(false, textures, false, doubleSided),
+    townMaterial(false, textures),
     placements,
     `${name}OpaqueInstances`,
     assetKey,
@@ -719,7 +714,7 @@ function buildRepeatedBatches(
   );
   const emissive = repeatedInstanceMesh(
     template.emissive,
-    townMaterial(true, textures, false, doubleSided),
+    townMaterial(true, textures),
     placements,
     `${name}EmissiveInstances`,
     assetKey,
@@ -728,88 +723,6 @@ function buildRepeatedBatches(
     opaque === null,
   );
   return [opaque, emissive].filter((mesh): mesh is THREE.InstancedMesh => mesh !== null);
-}
-
-function buildWallBatches(
-  template: TownAssetTemplate,
-  groundAt: GroundAt,
-  textures: SurfaceTextures,
-): THREE.InstancedMesh[] {
-  const placements: InstancePlacement[] = [];
-  for (const segment of FENBRIDGE_LAYOUT.wall.segments) {
-    const terrain = pitchedSegmentPlacement(
-      segment.start,
-      segment.end,
-      FENBRIDGE_LAYOUT.wall.thickness,
-      groundAt,
-    );
-    const signedLength = palisadeSegmentMirrored(segment)
-      ? -terrain.spatialLength
-      : terrain.spatialLength;
-    placements.push({
-      id: segment.id,
-      matrix: placementMatrix(
-        template,
-        terrain.centerX,
-        terrain.centerY,
-        terrain.centerZ,
-        terrain.rotation,
-        signedLength,
-        segment.height,
-        FENBRIDGE_LAYOUT.wall.thickness,
-        terrain.pitch,
-      ),
-    });
-  }
-  // A negative local-X scale mirrors the asymmetric wing in the same instance
-  // batch; DoubleSide keeps its winding valid without paying two wall draws.
-  return buildRepeatedBatches(
-    template,
-    placements,
-    'fenbridgeTownPalisade',
-    'fenbridge_palisade_wing',
-    textures,
-    true,
-    true,
-  );
-}
-
-function buildGateBatches(
-  template: TownAssetTemplate,
-  groundAt: GroundAt,
-  textures: SurfaceTextures,
-): THREE.InstancedMesh[] {
-  const placements = FENBRIDGE_LAYOUT.wall.gates.map((gate) => {
-    const terrain = pitchedFootprintPlacement(
-      gate.arch.position,
-      gate.arch.rotation,
-      gate.arch.nativeDimensions.width,
-      gate.arch.nativeDimensions.depth,
-      groundAt,
-    );
-    return {
-      id: gate.arch.id,
-      matrix: placementMatrix(
-        template,
-        terrain.centerX,
-        terrain.centerY,
-        terrain.centerZ,
-        terrain.rotation,
-        terrain.spatialLength,
-        gate.arch.nativeDimensions.height,
-        gate.arch.nativeDimensions.depth,
-        terrain.pitch,
-      ),
-    };
-  });
-  return buildRepeatedBatches(
-    template,
-    placements,
-    'fenbridgeTownGateArch',
-    'fenbridge_gate_arch',
-    textures,
-    true,
-  );
 }
 
 function buildBoardwalkBatches(
@@ -966,16 +879,6 @@ function buildCaptureOverlay(groundAt: GroundAt): THREE.Group {
     colliderRecords.push({ kind: 'obb', ...footprint });
     addObbOutline(colliderVertices, footprint, groundAt);
   }
-  for (const wall of FENBRIDGE_LAYOUT.wall.segments) {
-    colliderRecords.push({ kind: 'obb', ...wall.footprint });
-    addObbOutline(colliderVertices, wall.footprint, groundAt);
-  }
-  for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
-    for (const jamb of gate.arch.jambs) {
-      colliderRecords.push({ kind: 'obb', ...jamb });
-      addObbOutline(colliderVertices, jamb, groundAt);
-    }
-  }
   overlay.add(lineSegments('fenbridgeCaptureColliderLines', colliderVertices, 0xff4b4b));
 
   const routeRecords = FENBRIDGE_LAYOUT.roads.map((road) => ({
@@ -1108,8 +1011,6 @@ function buildMusterOrderEvidence(groundAt: GroundAt): THREE.Group {
 
 function zeroPlacementCounts(): Record<keyof typeof ASSET_PLACEMENT_COUNTS, number> {
   return {
-    fenbridge_palisade_wing: 0,
-    fenbridge_gate_arch: 0,
     fenbridge_boardwalk: 0,
     fenbridge_muster_order: 0,
   };
@@ -1139,8 +1040,6 @@ function buildFromTemplates(
   group.userData.buildingFadeTargetCount = 0;
   group.userData.microBatchNames = [];
   group.userData.repeatedBatchNames = [];
-  group.userData.wallSegmentCount = 0;
-  group.userData.gateCount = 0;
   group.userData.boardwalkCount = 0;
 
   if (!builtInWorld) {
@@ -1193,25 +1092,13 @@ function buildFromTemplates(
       sine: Math.sin(building.rotation),
       topY: built.topY,
       cullRadius: built.cullRadius,
+      walkIn: building.walkIn,
     });
     buildingGroups.push(built.group);
   }
 
   const microBatches = buildMicroBatches(templates, groundAt, textures);
   for (const batch of microBatches) group.add(batch);
-
-  const wallTemplate = templates.get(FENBRIDGE_LAYOUT.wall.assetId);
-  if (!wallTemplate) {
-    throw new Error(`Fenbridge town template is missing: ${FENBRIDGE_LAYOUT.wall.assetId}`);
-  }
-  const wallBatches = buildWallBatches(wallTemplate, groundAt, textures);
-  for (const batch of wallBatches) group.add(batch);
-
-  const gateUrl = FENBRIDGE_LAYOUT.wall.gates[0].arch.assetId;
-  const gateTemplate = templates.get(gateUrl);
-  if (!gateTemplate) throw new Error(`Fenbridge town template is missing: ${gateUrl}`);
-  const gateBatches = buildGateBatches(gateTemplate, groundAt, textures);
-  for (const batch of gateBatches) group.add(batch);
 
   const boardwalkUrl = FENBRIDGE_LAYOUT.repeated.boardwalks[0].assetId;
   const boardwalkTemplate = templates.get(boardwalkUrl);
@@ -1224,7 +1111,7 @@ function buildFromTemplates(
   const overlay = buildCaptureOverlay(groundAt);
   group.add(overlay);
 
-  const repeatedBatches = [...wallBatches, ...gateBatches, ...boardwalkBatches];
+  const repeatedBatches = boardwalkBatches;
   const staticCullTargets: THREE.Object3D[] = [...microBatches, ...repeatedBatches];
   // The reveal gate compiles the buildings with the static batches: their
   // per-building materials (the emissive lantern variant above all) are not
@@ -1264,8 +1151,6 @@ function buildFromTemplates(
   group.userData.buildingFadeTargetCount = hideTargets.length;
   group.userData.microBatchNames = microBatches.map((batch) => batch.name);
   group.userData.repeatedBatchNames = repeatedBatches.map((batch) => batch.name);
-  group.userData.wallSegmentCount = FENBRIDGE_LAYOUT.wall.segments.length;
-  group.userData.gateCount = FENBRIDGE_LAYOUT.wall.gates.length;
   group.userData.boardwalkCount = FENBRIDGE_LAYOUT.repeated.boardwalks.length;
   group.userData.surfaceAtlas = fenbridgeSurfaceAtlasMetadata(group, textures.atlas);
   group.userData.captureContract = {
@@ -1453,8 +1338,6 @@ export function fenbridgeTownDrawStats(root: THREE.Object3D): FenbridgeTownDrawS
     repeatedBatchCount: Array.isArray(root.userData.repeatedBatchNames)
       ? root.userData.repeatedBatchNames.length
       : 0,
-    wallSegmentCount: Number(root.userData.wallSegmentCount ?? 0),
-    gateCount: Number(root.userData.gateCount ?? 0),
     boardwalkCount: Number(root.userData.boardwalkCount ?? 0),
   };
 }
@@ -1504,6 +1387,7 @@ export const fenbridgeTownInternalsForTest = {
   allAssetUrls: ALL_ASSET_URLS,
   requiredPlacementIds: REQUIRED_PLACEMENT_IDS,
   assetPlacementCounts: ASSET_PLACEMENT_COUNTS,
+  townCullRadius: TOWN_CULL_RADIUS,
   materialOptions,
   extractTemplate,
   forEachSegmentFootprintSample,

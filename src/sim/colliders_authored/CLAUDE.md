@@ -2,9 +2,11 @@
 
 The Studio (map editor) additions to the static collider build, extracted out of
 `../colliders.ts` so that monolith stays under its `tests/monolith_budget.test.ts`
-ceiling. `colliders.ts` is the only consumer: it imports through `index.ts` and
-re-exports the public names (`passesUnder`, `prismPolyAt`, `prismBox`,
-`insidePrism`), so other importers keep the `./colliders` path.
+ceiling. `colliders.ts` imports through `index.ts` and re-exports the public names
+(`passesUnder`, `prismPolyAt`, `prismBox`, `insidePrism`), so other importers keep the
+`./colliders` path. The one other consumer is `../authored_town_buildings.ts`, which
+takes `emitPlacementBoxes` so a walk-in town building (`../town_walk_in.ts`) collides on
+its model's baked boxes exactly as the same model placed in Studio does.
 
 | File | Owns |
 |------|------|
@@ -20,8 +22,9 @@ Rules:
   collider list order feeds the grid and every order-sensitive query.
 - Shape types and `rotY` come from `../collider_shapes.ts`; never import `../colliders`
   from here (that would be a cycle).
-- The built-in world builds none of this (no placements, no volumes, no caves); the
-  parity goldens (`tests/parity`) pin that it stays so.
+- The built-in world builds none of this (no placements, no volumes, no caves), except
+  `emitPlacementBoxes` for its walk-in town buildings; the parity goldens
+  (`tests/parity`) pin the rest staying so.
 - Unit coverage: `tests/colliders_authored.test.ts`; end to end: `tests/mesh_prisms.test.ts`,
   `tests/authored_prism_collision.test.ts`, `tests/camera_boom_colliders.test.ts`,
   `tests/caves.test.ts`, `tests/collider_volumes.test.ts`.

@@ -12,18 +12,21 @@ import {
   placedBuildingAnnexes,
   promotedTownBuildingStandsDown,
 } from '../src/sim/authored_town_buildings';
+import { rotY } from '../src/sim/collider_shapes';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { ZONE2_PROPS } from '../src/sim/content/zone2';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld, type Obb2 } from '../src/sim/fenbridge_layout';
 import { loadPublishedMap, MAP_SEED } from '../src/sim/maps/eastbrook_rebuild.generated';
 import { isResting } from '../src/sim/progression/xp';
+import { Sim } from '../src/sim/sim';
+import { townWalkInPlacements } from '../src/sim/town_walk_in';
 import type { Entity, WorldContent } from '../src/sim/types';
-import { terrainHeight } from '../src/sim/world';
+import { groundHeight, terrainHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The built-in Fenbridge stands five painted Tidehold buildings (in the
-// Fenrire moss look) inside its palisade ring. This suite measures each
+// Fenrire moss look) round its open square. This suite measures each
 // layout record off the things it was copied from: the shipped model file and
 // the model's baked collision rows.
 
@@ -309,7 +312,7 @@ describe('placed Fenbridge building collision in the built-in world', () => {
     return record;
   };
 
-  it('gives each record its wall box plus one box per annex', () => {
+  it('gives a sealed record its wall box plus one box per annex', () => {
     for (const building of BUILDINGS) {
       const record = recordOf(building);
       expect(record).toMatchObject({
@@ -319,6 +322,7 @@ describe('placed Fenbridge building collision in the built-in world', () => {
         d: building.nativeDimensions.depth,
         rot: building.rotation,
       });
+      // without the world seed every record keeps the sealed shape
       const colliders = buildingRecordColliders(record, 30, () => 0);
       expect(colliders, building.id).toHaveLength(1 + building.annexes.length);
       building.annexes.forEach((annex, index) => {
@@ -338,20 +342,165 @@ describe('placed Fenbridge building collision in the built-in world', () => {
     expect(placedBuildingAnnexes({ ...inn, x: inn.x + 4 })).toHaveLength(0);
   });
 
-  it('seals the doorway and every annex, and leaves the street in front open', () => {
+  it('makes the four buildings with an open doorway walk-in, and keeps the warden house shut', () => {
+    expect(BUILDINGS.filter((building) => building.walkIn).map((building) => building.id)).toEqual([
+      'fenbridge_crooked_reed_inn',
+      'fenbridge_lantern_chapel',
+      'fenbridge_moonwort_apothecary',
+      'fenbridge_gilded_strongbox',
+    ]);
+  });
+
+  it('collides a walk-in record on its own model baked boxes, seated on the terrain', () => {
+    for (const building of BUILDINGS) {
+      const record = recordOf(building);
+      const colliders = buildingRecordColliders(record, 30, () => 0, WORLD_SEED);
+      if (!building.walkIn) {
+        expect(colliders, building.id).toHaveLength(1 + building.annexes.length);
+        continue;
+      }
+      const baked = BAKED[modelIdOf(building)].boxes;
+      expect(colliders, building.id).toHaveLength(baked.length);
+      // the placement rule: the model stands on the terrain under its anchor,
+      // never on the ground query, which already carries its own floor deck
+      const unit = (building.placement.scale * building.placement.modelSize) / PLACED_TARGET_HEIGHT;
+      const seat =
+        terrainHeight(building.placement.x, building.placement.z, WORLD_SEED) +
+        building.placement.lift;
+      const lowestBox = Math.min(...baked.map((box) => box.y - box.hy));
+      const lowestCollider = Math.min(
+        ...colliders.map((collider) => (collider as { baseY?: number }).baseY ?? Infinity),
+      );
+      expect(lowestCollider, building.id).toBeCloseTo(seat + lowestBox * unit, 6);
+      // every annex is still solid: a baked box stands inside it (a pair of
+      // barrels can leave its very centre open)
+      for (const annex of building.annexes) {
+        const covered = colliders.some((collider) => {
+          if (collider.type !== 'obb') return false;
+          const local = rotY(
+            collider.x - annex.center.x,
+            collider.z - annex.center.z,
+            -annex.rotation,
+          );
+          return (
+            Math.abs(local.x) <= annex.halfWidth + 0.1 && Math.abs(local.z) <= annex.halfDepth + 0.1
+          );
+        });
+        expect(covered, annex.id).toBe(true);
+      }
+      // a record a custom world moved is one sealed box again, annexes left behind
+      expect(
+        buildingRecordColliders({ ...record, x: record.x + 4 }, 30, () => 0, WORLD_SEED),
+        building.id,
+      ).toHaveLength(1);
+    }
+  });
+
+  it('opens the doorway of each walk-in building, keeps its walls, and seals the rest', () => {
     for (const building of BUILDINGS) {
       const anchor = { x: building.placement.x, z: building.placement.z };
       const walls = rectOf(building, building.footprint);
       const door = toModelAxes(building, building.frontStandingPoint);
-      // one stride inside the front wall, on the door's own line
+      // one stride inside the front wall, on the door's own line, asked for a
+      // body standing on the ground there (the lintel and the storey above a
+      // doorway are overhead, not in its way)
       const inside = localToWorld(anchor, building.placement.rotation, door.x, walls.z0 + 1);
-      expect(isBlocked(WORLD_SEED, inside.x, inside.z), `${building.id} doorway`).toBe(true);
+      const standing = { y: groundHeight(inside.x, inside.z, WORLD_SEED), lift: 0 };
+      expect(
+        isBlocked(WORLD_SEED, inside.x, inside.z, 0.5, false, undefined, 0, standing),
+        `${building.id} doorway`,
+      ).toBe(!building.walkIn);
       const front = building.frontStandingPoint;
       expect(isBlocked(WORLD_SEED, front.x, front.z, 0.5), `${building.id} front`).toBe(false);
       for (const annex of building.annexes) {
         expect(isBlocked(WORLD_SEED, annex.center.x, annex.center.z), annex.id).toBe(true);
       }
+      // the back wall still stands, straight across from the door
+      const back = localToWorld(anchor, building.placement.rotation, door.x, walls.z1 - 0.1);
+      expect(isBlocked(WORLD_SEED, back.x, back.z), `${building.id} back wall`).toBe(true);
     }
+  });
+});
+
+describe('walking into the walk-in Fenbridge buildings', () => {
+  const insideBy = (building: Building, depth: number) => {
+    const walls = rectOf(building, building.footprint);
+    const door = toModelAxes(building, building.frontStandingPoint);
+    return localToWorld(
+      { x: building.placement.x, z: building.placement.z },
+      building.placement.rotation,
+      door.x,
+      walls.z0 + depth,
+    );
+  };
+
+  it('raises the ground to the floor inside each walk-in building, and nowhere else', () => {
+    for (const building of BUILDINGS) {
+      const inside = insideBy(building, 2);
+      const rise =
+        groundHeight(inside.x, inside.z, WORLD_SEED) -
+        terrainHeight(inside.x, inside.z, WORLD_SEED);
+      if (building.walkIn) {
+        // the painted floors stand a step to most of a yard over the ground line
+        expect(rise, `${building.id} floor`).toBeGreaterThan(0.25);
+        expect(rise, `${building.id} floor`).toBeLessThan(1.2);
+      } else {
+        expect(rise, `${building.id} floor`).toBe(0);
+      }
+      // four strides out of the door the street is the plain ground again
+      const street = insideBy(building, -4);
+      expect(groundHeight(street.x, street.z, WORLD_SEED), `${building.id} street`).toBe(
+        terrainHeight(street.x, street.z, WORLD_SEED),
+      );
+    }
+  });
+
+  it('walks a player from the street through each open door onto its floor', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const body = sim.player;
+    const meta = sim.players.get(body.id);
+    if (!meta) throw new Error('missing player meta');
+    for (const building of BUILDINGS.filter((candidate) => candidate.walkIn)) {
+      const start = building.frontStandingPoint;
+      const goal = insideBy(building, 3);
+      body.pos.x = start.x;
+      body.pos.z = start.z;
+      body.pos.y = groundHeight(start.x, start.z, WORLD_SEED);
+      body.prevPos = { ...body.pos };
+      body.facing = Math.atan2(goal.x - start.x, goal.z - start.z);
+      for (let i = 0; i < 20 * 2; i++) {
+        Object.assign(meta.moveInput, {
+          forward: true,
+          back: false,
+          turnLeft: false,
+          turnRight: false,
+          strafeLeft: false,
+          strafeRight: false,
+          jump: false,
+          dive: false,
+          surface: false,
+        });
+        sim.tick();
+      }
+      Object.assign(meta.moveInput, { forward: false });
+      for (let i = 0; i < 20; i++) sim.tick();
+      const walls = rectOf(building, building.footprint);
+      const local = toModelAxes(building, body.pos);
+      expect(local.z, `${building.id}: got past the door`).toBeGreaterThan(walls.z0 + 1.5);
+      expect(local.x, building.id).toBeGreaterThan(walls.x0);
+      expect(local.x, building.id).toBeLessThan(walls.x1);
+      // standing on the raised floor, not sunk to the ground line under it
+      expect(body.pos.y, building.id).toBeCloseTo(
+        groundHeight(body.pos.x, body.pos.z, WORLD_SEED),
+        3,
+      );
+      expect(body.pos.y - terrainHeight(body.pos.x, body.pos.z, WORLD_SEED)).toBeGreaterThan(0.25);
+    }
+  });
+
+  it('leaves the floors of a Studio document to its own placements', () => {
+    expect(townWalkInPlacements(BUILTIN_WORLD)).toHaveLength(4);
+    expect(townWalkInPlacements(loadPublishedMap())).toEqual([]);
   });
 });
 

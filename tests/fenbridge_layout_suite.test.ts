@@ -36,9 +36,10 @@ import {
 import { findPath, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import type { NpcDef } from '../src/sim/types';
-import { terrainHeight, waterLevelAt } from '../src/sim/world';
+import { waterLevelAt } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SEED = 20_061;
+const SEED = WORLD_SEED;
 
 function expectDeepFrozen(value: unknown): void {
   if (value === null || typeof value !== 'object') return;
@@ -147,8 +148,8 @@ describe('Fenbridge canonical pure layout', () => {
           }
         }
       }
-      // ...and the whole drawn model stands inside the palisade with room to
-      // walk behind it
+      // ...and the whole drawn model stands inside the ring the four
+      // entrances sit on, with room to walk behind it
       for (const box of boxes) {
         for (const corner of obbCorners(box)) {
           expect(
@@ -209,11 +210,13 @@ describe('Fenbridge canonical pure layout', () => {
     ]);
   });
 
-  it('opens four six-yard gates and keeps every palisade wing within its hard cap', () => {
-    expect(FENBRIDGE_LAYOUT.wall).toMatchObject({
-      radius: 31.5,
-      maximumSegmentSpan: 12,
-    });
+  it('stands open: four six-yard entrances on the old ring, no palisade wing and no gate arch', () => {
+    // The open town (2026-10): the palisade and its four gate arches came
+    // down, so nothing is built on the ring. The four entrances keep the
+    // ring's road crossings, so every street still meets the marsh where it
+    // always did.
+    expect(FENBRIDGE_LAYOUT.wall.radius).toBe(31.5);
+    expect(FENBRIDGE_LAYOUT.wall.segments).toEqual([]);
     expect(
       FENBRIDGE_LAYOUT.wall.gates.map((gate) => ({
         id: gate.id,
@@ -247,93 +250,56 @@ describe('Fenbridge canonical pure layout', () => {
         width: 6,
       },
     ]);
-    expect(FENBRIDGE_LAYOUT.wall.segments).toHaveLength(16);
-    expect(FENBRIDGE_LAYOUT.wall.segments.length).toBeLessThanOrEqual(18);
-    for (const segment of FENBRIDGE_LAYOUT.wall.segments) {
-      expect(segment.arcLength, segment.id).toBeLessThanOrEqual(12);
-    }
     for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
+      // An entrance, not a gate: its six yards on the ring and nothing built.
+      expect(gate, gate.id).not.toHaveProperty('arch');
       expect(Math.hypot(gate.end.x - gate.start.x, gate.end.z - gate.start.z)).toBeCloseTo(6, 10);
-      expect(gate.arch.assetId).toBe('/models/props/fenbridge_gate_arch.glb');
-      expect(gate.arch.collision).toBe('jambs_only');
-      expect(gate.arch.jambs).toHaveLength(2);
+      // ...and its street still runs through the crossing.
+      const road = FENBRIDGE_LAYOUT.roads.find((candidate) => candidate.id === gate.roadId);
+      expect(road?.gateId, gate.id).toBe(gate.id);
+      expect(road?.points, gate.id).toContainEqual(gate.crossing);
     }
   });
 
-  it('projects only the eight authored gate-arch jambs into runtime collision', () => {
-    const colliders = colliderInternalsForTest.staticWorldColliders(SEED);
-    const jambs = FENBRIDGE_LAYOUT.wall.gates.flatMap((gate) => gate.arch.jambs);
-
-    for (const jamb of jambs) {
-      const runtimeCollider = colliders.find(
+  it('leaves the old ring line open ground that a body walks straight across', () => {
+    const { center } = FENBRIDGE_LAYOUT.civic;
+    const { radius } = FENBRIDGE_LAYOUT.wall;
+    // No static collider stands on or beside the old ring line: no palisade
+    // wing, no gate jamb, no arch.
+    const onRing = colliderInternalsForTest
+      .staticWorldColliders(SEED)
+      .filter(
         (collider) =>
-          collider.type === 'obb' &&
-          Math.abs(collider.x - jamb.center.x) < 1e-10 &&
-          Math.abs(collider.z - jamb.center.z) < 1e-10 &&
-          Math.abs(collider.hw - jamb.halfWidth) < 1e-10 &&
-          Math.abs(collider.hd - jamb.halfDepth) < 1e-10 &&
-          Math.abs(collider.rot - jamb.rotation) < 1e-10,
+          Math.abs(Math.hypot(collider.x - center.x, collider.z - center.z) - radius) < 1.5,
       );
-      expect(runtimeCollider, jamb.id).toBeDefined();
-      expect(isBlocked(SEED, jamb.center.x, jamb.center.z, 0.2), jamb.id).toBe(true);
-    }
-
-    expect(jambs).toHaveLength(8);
+    expect(onRing).toEqual([]);
     for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
       expect(isBlocked(SEED, gate.crossing.x, gate.crossing.z, 0.8), gate.id).toBe(false);
-      expect(
-        colliders.some(
-          (collider) =>
-            collider.type === 'obb' &&
-            Math.abs(collider.x - gate.arch.position.x) < 1e-10 &&
-            Math.abs(collider.z - gate.arch.position.z) < 1e-10 &&
-            Math.abs(collider.hw - gate.arch.nativeDimensions.width / 2) < 1e-10 &&
-            Math.abs(collider.hd - gate.arch.nativeDimensions.depth / 2) < 1e-10,
-        ),
-        `${gate.id} must not have a solid full-width arch collider`,
-      ).toBe(false);
     }
-  });
-
-  it('keeps Fenbridge palisades full-height and free of Eastbrook synthetic pillars', () => {
-    const colliders = colliderInternalsForTest.staticWorldColliders(SEED);
-    const segment = FENBRIDGE_LAYOUT.wall.segments[0];
-    const footprint = segment.footprint;
-    const collinear = colliders.filter((collider) => {
-      if (
-        collider.type !== 'obb' ||
-        Math.abs(collider.rot - footprint.rotation) >= 1e-10 ||
-        Math.abs(collider.hd - footprint.halfDepth) >= 1e-10
-      ) {
-        return false;
-      }
-      const dx = collider.x - footprint.center.x;
-      const dz = collider.z - footprint.center.z;
-      const cos = Math.cos(-footprint.rotation);
-      const sin = Math.sin(-footprint.rotation);
-      const localX = dx * cos + dz * sin;
-      const localZ = -dx * sin + dz * cos;
-      return Math.abs(localZ) < 1e-10 && Math.abs(localX) <= footprint.halfWidth;
+    // Between the entrances, where the wings stood: at the middle of each of
+    // the four stretches the ring line is clear for the largest body, and a
+    // body walks straight across it, out of town and back in, with nothing
+    // to stop it or slide it.
+    const sorted = [...FENBRIDGE_LAYOUT.wall.gates].sort((left, right) => left.angle - right.angle);
+    const at = (angle: number, distance: number) => ({
+      x: center.x + Math.cos(angle) * distance,
+      z: center.z + Math.sin(angle) * distance,
     });
-    expect(collinear).toHaveLength(1);
-    expect(collinear[0]).toMatchObject({
-      type: 'obb',
-      x: footprint.center.x,
-      z: footprint.center.z,
-      hw: footprint.halfWidth,
-      hd: footprint.halfDepth,
-      rot: footprint.rotation,
-    });
-    expect(collinear[0].moveTopY).toBeUndefined();
-    expect(collinear[0].standable).toBeUndefined();
-
-    const from = localToWorld(footprint.center, footprint.rotation, 0, -2);
-    const to = localToWorld(footprint.center, footprint.rotation, 0, 2);
-    const airborne = resolveMovement(SEED, from.x, from.z, to.x, to.z, 0.2, false, undefined, {
-      y: terrainHeight(footprint.center.x, footprint.center.z, SEED) + 2.5,
-      lift: 0,
-    });
-    expect(Math.hypot(airborne.x - to.x, airborne.z - to.z)).toBeGreaterThan(1);
+    for (let index = 0; index < sorted.length; index++) {
+      const gate = sorted[index];
+      const next = sorted[(index + 1) % sorted.length];
+      const end = next.startAngle > gate.endAngle ? next.startAngle : next.startAngle + 2 * Math.PI;
+      const angle = (gate.endAngle + end) / 2;
+      const label = `between ${gate.id} and ${next.id}`;
+      const onLine = at(angle, radius);
+      expect(isBlocked(SEED, onLine.x, onLine.z, 0.8), label).toBe(false);
+      const inside = at(angle, radius - 3);
+      const outside = at(angle, radius + 3);
+      const out = resolveMovement(SEED, inside.x, inside.z, outside.x, outside.z, 0.5);
+      expect(Math.hypot(out.x - outside.x, out.z - outside.z), `${label}, out`).toBeLessThan(0.01);
+      const back = resolveMovement(SEED, outside.x, outside.z, inside.x, inside.z, 0.5);
+      expect(Math.hypot(back.x - inside.x, back.z - inside.z), `${label}, in`).toBeLessThan(0.01);
+    }
   });
 
   it('keeps every exterior road suffix unchanged beyond the four new gate connectors', () => {
@@ -513,9 +479,8 @@ describe('Fenbridge content projection and preservation', () => {
     expect(ZONE2_PROPS.stalls.map((stall) => stall.id)).toEqual([
       FENBRIDGE_LAYOUT.civic.provisionStall.id,
     ]);
-    expect(ZONE2_PROPS.walls?.map((wall) => wall.id)).toEqual(
-      FENBRIDGE_LAYOUT.wall.segments.map((segment) => segment.id),
-    );
+    // Fenbridge stands open: the zone projects no wall at all.
+    expect(ZONE2_PROPS.walls).toEqual([]);
     expect(ZONE2_PROPS.fences).toEqual([]);
     expect(ZONE2_PROPS.docks).toEqual(FENBRIDGE_LAYOUT.preservedProps.docks);
     expect(ZONE2_PROPS.tents).toEqual(FENBRIDGE_LAYOUT.preservedProps.tents);

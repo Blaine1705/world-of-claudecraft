@@ -707,21 +707,31 @@ describe('Fenbridge dedicated town renderer', () => {
         .reduce((sum, asset) => sum + asset.repeatedTriangles, 0);
     // The seven template shells' 53_852 triangles left and the painted models'
     // 31_007 arrived (furniture included), and the boardwalks went 12 to 10
-    // (-752), so the whole town moves 80_344 to 56_747. The legacy-family share
-    // is the sibling of tests/fenbridge_town_assets.test.ts
+    // (-752), so the whole town moved 80_344 to 56_747. Re-pinned for the
+    // open town: the 16 palisade wings (766 each, -12_256) and the 4 gate
+    // arches (1_216 each, -4_864) came down with the ring, so the legacy
+    // family goes 25_740 to 8_620 and the whole town 56_747 to 39_627. The
+    // legacy-family share is the sibling of tests/fenbridge_town_assets.test.ts
     // EXPECTED_TOTALS.townPlacementTriangles; move both together. The skirt
-    // reserve drops from 84 to 0 (see the reserve test above).
+    // reserve stays 0 (see the reserve test above).
     expect({ legacyFamily: shareOf(false), paintedBuildings: shareOf(true) }).toEqual({
-      legacyFamily: 25_740,
+      legacyFamily: 8_620,
       paintedBuildings: 31_007,
     });
     expect(budget).toMatchObject({
-      assetTriangles: 56_747,
+      assetTriangles: 39_627,
       maximumFoundationTriangles: 0,
-      maximumRuntimeTriangles: 56_747,
+      maximumRuntimeTriangles: 39_627,
       hardCeiling: 88_000,
       withinHardCeiling: true,
     });
+    // The budget no longer carries either ring model at all.
+    expect(budget.assets.map((asset) => asset.assetUrl)).not.toContain(
+      '/models/props/fenbridge_palisade_wing.glb',
+    );
+    expect(budget.assets.map((asset) => asset.assetUrl)).not.toContain(
+      '/models/props/fenbridge_gate_arch.glb',
+    );
 
     // The shipped models' furniture: every mesh under a G_INT node, which
     // never casts.
@@ -744,15 +754,18 @@ describe('Fenbridge dedicated town renderer', () => {
     // Re-pinned for the painted town: a placed building draws every mesh of its
     // model on its own material, so the seven shells' 14 draws (one opaque and
     // one emissive pass each) become the five models' 72 meshes, 57 of them
-    // casting (all but the 15 furniture meshes). The template batches keep
-    // their 6 colour and 3 shadow draws: one opaque pass per placement class,
-    // an emissive one where the asset authors glow (the micro batch and the
-    // gate arch), and every opaque pass but the boardwalk's casts. Colour 20
-    // to 78, shadow 10 to 60.
-    expect(standardRoot).toMatchObject({ colorDraws: 78, shadowDraws: 60, triangles: 56_339 });
+    // casting (all but the 15 furniture meshes). Colour went 20 to 78, shadow
+    // 10 to 60.
+    // Re-pinned for the open town: the palisade's opaque pass and the gate
+    // arch's opaque and emissive passes left with the ring (two of them
+    // casting), so the template batches are 3 colour draws (the micro batch's
+    // opaque and emissive passes, the boardwalk's opaque one) and 1 shadow
+    // draw (only the micro batch's opaque pass casts). Colour 78 to 75, shadow
+    // 60 to 58, triangles 56_339 to 39_219.
+    expect(standardRoot).toMatchObject({ colorDraws: 75, shadowDraws: 58, triangles: 39_219 });
     expect(townDrawSplit(standard.group)).toEqual({
-      batchColor: 6,
-      batchShadow: 3,
+      batchColor: 3,
+      batchShadow: 1,
       buildingColor: 72,
       buildingShadow: 72 - interiorMeshes,
     });
@@ -765,7 +778,7 @@ describe('Fenbridge dedicated town renderer', () => {
       colorDraws: standardRoot.colorDraws + questDraws * 2,
       shadowDraws: standardRoot.shadowDraws,
       triangles: standardRoot.triangles + questTriangles * 2,
-    }).toEqual({ colorDraws: 80, shadowDraws: 60, triangles: 56_747 });
+    }).toEqual({ colorDraws: 77, shadowDraws: 58, triangles: 39_627 });
 
     setGfx({
       standardMaterials: false,
@@ -776,28 +789,31 @@ describe('Fenbridge dedicated town renderer', () => {
     const low = fenbridgeTownInternalsForTest.buildFromSources(sources, ground, true);
     const lowRoot = fenbridgeTownDrawStats(low.group);
     // Re-pinned for the painted town: Low still folds every batch's glow into
-    // one Lambert pass per placement class (4 draws, no caster), and the
-    // painted models keep all 72 of their meshes on their own Lambert clones,
-    // so colour goes 11 to 76. The buildings' 57 cast flags are their own on
-    // every tier (src/render/eastbrook_placed_building.ts, as in Eastbrook's
-    // town and on an authored map) and inert on Low, where the renderer turns
-    // the shadow map off: see the Low silhouette test below.
-    expect(lowRoot).toMatchObject({ colorDraws: 76, shadowDraws: 57, triangles: 56_339 });
+    // one Lambert pass per placement class, and the painted models keep all 72
+    // of their meshes on their own Lambert clones. The buildings' 57 cast
+    // flags are their own on every tier (src/render/eastbrook_placed_building.ts,
+    // as in Eastbrook's town and on an authored map) and inert on Low, where
+    // the renderer turns the shadow map off: see the Low silhouette test below.
+    // Re-pinned for the open town: the palisade and gate-arch classes left
+    // with the ring, so the batches are 2 Lambert passes (the micro batch and
+    // the boardwalk, no caster) and colour goes 76 to 74.
+    expect(lowRoot).toMatchObject({ colorDraws: 74, shadowDraws: 57, triangles: 39_219 });
     expect(townDrawSplit(low.group)).toEqual({
-      batchColor: 4,
+      batchColor: 2,
       batchShadow: 0,
       buildingColor: 72,
       buildingShadow: 72 - interiorMeshes,
     });
-    expect(lowRoot.colorDraws + questDraws * 2).toBe(78);
-    // The Low draw ceiling, re-set for the painted town. The template town held
-    // Low under 16 draws: one Lambert pass per building and per placement
-    // class. A painted building draws its model's own materials on every tier
-    // (72 meshes over the five shipped models), so the ceiling is now those
-    // meshes plus the four batch passes. A model that gains a mesh, or a batch
-    // that stops folding its glow into its colour pass, crosses it and has to
-    // move it on purpose.
-    const LOW_TOWN_COLOR_DRAW_CEILING = 76;
+    expect(lowRoot.colorDraws + questDraws * 2).toBe(76);
+    // The Low draw ceiling, re-set for the painted town and again for the
+    // open one. The template town held Low under 16 draws: one Lambert pass
+    // per building and per placement class. A painted building draws its
+    // model's own materials on every tier (72 meshes over the five shipped
+    // models), so the ceiling is those meshes plus the two batch passes left
+    // once the ring came down. A model that gains a mesh, or a batch that
+    // stops folding its glow into its colour pass, crosses it and has to move
+    // it on purpose.
+    const LOW_TOWN_COLOR_DRAW_CEILING = 74;
     expect(lowRoot.colorDraws).toBeLessThanOrEqual(LOW_TOWN_COLOR_DRAW_CEILING);
   });
 
@@ -833,27 +849,43 @@ describe('Fenbridge dedicated town renderer', () => {
 
     const stats = fenbridgeTownDrawStats(view.group);
     // Re-pinned for the painted town: each building's opaque and emissive
-    // template pass (14 draws, 7 casting) becomes the fixture's three meshes
-    // on their own materials (15 draws, the 10 exterior ones casting), so
-    // colour goes 22 to 23 and shadow 10 to 13. The batches keep the budget
-    // they had: one opaque and one emissive pass per placement class (8), every
-    // opaque pass but the boardwalk's casting (3). The boardwalks went 12 to
-    // 10. These are the FIXTURE's numbers; the shipped totals are pinned in
-    // the shipping-GLB test above.
+    // template pass (14 draws, 7 casting) became the fixture's three meshes
+    // on their own materials (15 draws, the 10 exterior ones casting). The
+    // boardwalks went 12 to 10. Re-pinned for the open town: the palisade and
+    // gate-arch classes left with the ring, so the batches are one opaque and
+    // one emissive pass for each of the two classes left (4), and only the
+    // micro batch's opaque pass casts (1): colour 23 to 19, shadow 13 to 11.
+    // These are the FIXTURE's numbers; the shipped totals are pinned in the
+    // shipping-GLB test above.
     expect(stats).toMatchObject({
-      colorDraws: 23,
-      shadowDraws: 13,
+      colorDraws: 19,
+      shadowDraws: 11,
       buildingCount: 5,
       buildingFadeTargetCount: 5,
-      wallSegmentCount: 16,
-      gateCount: 4,
+      microBatchCount: 2,
+      repeatedBatchCount: 2,
       boardwalkCount: 10,
     });
+    // ...and the stats carry no wall-segment or gate count any more.
+    expect(stats).not.toHaveProperty('wallSegmentCount');
+    expect(stats).not.toHaveProperty('gateCount');
     expect(townDrawSplit(view.group)).toEqual({
-      batchColor: 8,
-      batchShadow: 3,
+      batchColor: 4,
+      batchShadow: 1,
       buildingColor: 15,
       buildingShadow: 10,
+    });
+    // No palisade or gate-arch mesh is built: the repeated batches are the
+    // boardwalk's two passes and nothing else.
+    expect(view.group.userData.repeatedBatchNames).toEqual([
+      'fenbridgeTownBoardwalkOpaqueInstances',
+      'fenbridgeTownBoardwalkEmissiveInstances',
+    ]);
+    expect(view.group.getObjectByName('fenbridgeTownPalisadeOpaqueInstances')).toBeUndefined();
+    expect(view.group.getObjectByName('fenbridgeTownGateArchOpaqueInstances')).toBeUndefined();
+    expect(FENBRIDGE_TOWN_ASSET_PLACEMENT_COUNTS).toEqual({
+      fenbridge_boardwalk: 10,
+      fenbridge_muster_order: 2,
     });
 
     // The Standard PBR maps are the batches' alone: the painted buildings
@@ -882,8 +914,6 @@ describe('Fenbridge dedicated town renderer', () => {
       if (key) observedCounts[key] = (observedCounts[key] ?? 0) + object.count;
     });
     expect(observedCounts).toEqual({
-      fenbridge_palisade_wing: FENBRIDGE_TOWN_ASSET_PLACEMENT_COUNTS.fenbridge_palisade_wing,
-      fenbridge_gate_arch: FENBRIDGE_TOWN_ASSET_PLACEMENT_COUNTS.fenbridge_gate_arch,
       fenbridge_boardwalk: FENBRIDGE_TOWN_ASSET_PLACEMENT_COUNTS.fenbridge_boardwalk,
     });
     const orderEvidence = view.group.getObjectByName('fenbridgeMusterOrderPlacements');
@@ -930,12 +960,14 @@ describe('Fenbridge dedicated town renderer', () => {
     // Re-pinned for the painted town: the seven template shells drew one
     // Lambert pass each, holding the town to 11 draws under its 16-draw Low
     // cap. The five placed buildings draw their model's own meshes on every
-    // tier (the fixture's three each), so the town is 19 draws on Low: the
-    // batches' one pass per placement class (4) plus the buildings' 15. The
-    // shipped models' count is pinned in the shipping-GLB test above.
-    expect(stats.colorDraws).toBe(19);
+    // tier (the fixture's three each). Re-pinned for the open town: the
+    // palisade and gate-arch classes left with the ring, so the town is 17
+    // draws on Low: the batches' one pass per placement class (2) plus the
+    // buildings' 15. The shipped models' count is pinned in the shipping-GLB
+    // test above.
+    expect(stats.colorDraws).toBe(17);
     expect(townDrawSplit(view.group)).toEqual({
-      batchColor: 4,
+      batchColor: 2,
       batchShadow: 0,
       buildingColor: 15,
       buildingShadow: 10,
@@ -946,8 +978,6 @@ describe('Fenbridge dedicated town renderer', () => {
     const batches = meshesOf(view.group).filter((mesh) => !buildingMeshes.has(mesh));
     expect(batches.map((mesh) => mesh.name)).toEqual([
       'fenbridgeTownMicroOpaqueBatch',
-      'fenbridgeTownPalisadeOpaqueInstances',
-      'fenbridgeTownGateArchOpaqueInstances',
       'fenbridgeTownBoardwalkOpaqueInstances',
     ]);
     // No shadow pass on Low. No batch casts, and the shadow draws counted here
@@ -1050,7 +1080,9 @@ describe('Fenbridge dedicated town renderer', () => {
     },
   );
 
-  it('footprint-seats and pitches thin gate and boardwalk instances on production terrain', () => {
+  it('footprint-seats and pitches the thin boardwalk instances on production terrain', () => {
+    // Re-staged for the open town: the gate arches this test seated beside
+    // the boardwalks came down with the ring.
     setGfx({ standardMaterials: false, dynamicShadows: false, surfaceDetail: false });
     const ground = (x: number, z: number): number => terrainHeight(x, z, 20_061);
     const view = fenbridgeTownInternalsForTest.buildFromSources(
@@ -1058,41 +1090,29 @@ describe('Fenbridge dedicated town renderer', () => {
       ground,
       true,
     );
-    const cases = [
-      {
-        mesh: view.group.getObjectByName('fenbridgeTownGateArchOpaqueInstances'),
-        placements: FENBRIDGE_LAYOUT.wall.gates.map((gate) => gate.arch),
-      },
-      {
-        mesh: view.group.getObjectByName('fenbridgeTownBoardwalkOpaqueInstances'),
-        placements: FENBRIDGE_LAYOUT.repeated.boardwalks,
-      },
-    ];
+    const mesh = view.group.getObjectByName('fenbridgeTownBoardwalkOpaqueInstances');
+    expect(mesh).toBeInstanceOf(THREE.InstancedMesh);
+    const instances = mesh as THREE.InstancedMesh;
+    const placements = FENBRIDGE_LAYOUT.repeated.boardwalks;
+    expect(instances.count).toBe(placements.length);
     let nonCenterSeated = 0;
-    for (const entry of cases) {
-      expect(entry.mesh).toBeInstanceOf(THREE.InstancedMesh);
-      const mesh = entry.mesh as THREE.InstancedMesh;
-      expect(mesh.count).toBe(entry.placements.length);
-      for (let index = 0; index < entry.placements.length; index++) {
-        const placement = entry.placements[index];
-        const expected = fenbridgeTownInternalsForTest.pitchedFootprintPlacement(
-          placement.position,
-          placement.rotation,
-          placement.nativeDimensions.width,
-          placement.nativeDimensions.depth,
-          ground,
-        );
-        const matrix = new THREE.Matrix4();
-        mesh.getMatrixAt(index, matrix);
-        // Instanced matrices are uploaded/stored as Float32 values.
-        expect(matrix.elements[12]).toBeCloseTo(expected.centerX, 4);
-        expect(matrix.elements[13]).toBeCloseTo(expected.centerY, 4);
-        expect(matrix.elements[14]).toBeCloseTo(expected.centerZ, 4);
-        if (
-          Math.abs(expected.centerY - ground(placement.position.x, placement.position.z)) > 1e-4
-        ) {
-          nonCenterSeated++;
-        }
+    for (let index = 0; index < placements.length; index++) {
+      const placement = placements[index];
+      const expected = fenbridgeTownInternalsForTest.pitchedFootprintPlacement(
+        placement.position,
+        placement.rotation,
+        placement.nativeDimensions.width,
+        placement.nativeDimensions.depth,
+        ground,
+      );
+      const matrix = new THREE.Matrix4();
+      instances.getMatrixAt(index, matrix);
+      // Instanced matrices are uploaded/stored as Float32 values.
+      expect(matrix.elements[12]).toBeCloseTo(expected.centerX, 4);
+      expect(matrix.elements[13]).toBeCloseTo(expected.centerY, 4);
+      expect(matrix.elements[14]).toBeCloseTo(expected.centerZ, 4);
+      if (Math.abs(expected.centerY - ground(placement.position.x, placement.position.z)) > 1e-4) {
+        nonCenterSeated++;
       }
     }
     expect(nonCenterSeated).toBeGreaterThan(0);
@@ -1144,6 +1164,19 @@ describe('Fenbridge dedicated town renderer', () => {
     }
     const musterBoard = BUILTIN_WORLD.services?.musterBoards?.[0];
     expect(musterBoard).toBeDefined();
+    // Re-pinned for the open town: the complete collider evidence is the
+    // buildings' boxes, the cistern, the stall and the muster board. The
+    // sixteen palisade wings and eight gate jambs it used to outline came down
+    // with the ring.
+    expect(
+      overlay.userData.captureRecords.colliders.map((record: { id?: string }) => record.id),
+    ).toEqual([
+      ...buildingBoxes.map((box) => box.id),
+      FENBRIDGE_LAYOUT.civic.cistern.id,
+      FENBRIDGE_LAYOUT.civic.provisionStall.id,
+      musterBoard?.id,
+    ]);
+    expect(overlay.userData.recordCounts.colliders).toBe(buildingBoxes.length + 3);
     expect(
       overlay.userData.captureRecords.colliders.find(
         (record: { id?: string }) => record.id === musterBoard?.id,
@@ -1210,8 +1243,12 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(view.staticRevealRoots()).toContain(micro);
 
     // Camera outside the town cull radius, town and buildings inside the fog.
+    // The radius is the hub ring plus a fixed margin, and it stayed where the
+    // walled town had it (the 34-yard hub plus half a twelve-yard wing) when
+    // the palisade came down, so opening the town moved no cull or reveal.
     const hub = FENBRIDGE_LAYOUT.hub.center;
-    const cullRadius = FENBRIDGE_LAYOUT.hub.radius + FENBRIDGE_LAYOUT.wall.maximumSegmentSpan / 2;
+    const cullRadius = fenbridgeTownInternalsForTest.townCullRadius;
+    expect(cullRadius).toBe(40);
     const approachX = hub.x + cullRadius + 20;
     view.update(approachX, 2, hub.z, approachX - 5, 2, hub.z, 400, 0.05);
     expect(requested).toEqual(['fenbridge-town-static']);
@@ -1250,7 +1287,7 @@ describe('Fenbridge dedicated town renderer', () => {
     if (!firstGroup || !secondGroup || !micro) throw new Error('renderer fixture lost a town node');
 
     const hub = FENBRIDGE_LAYOUT.hub.center;
-    const cullRadius = FENBRIDGE_LAYOUT.hub.radius + FENBRIDGE_LAYOUT.wall.maximumSegmentSpan / 2;
+    const cullRadius = fenbridgeTownInternalsForTest.townCullRadius;
     const approachX = hub.x + cullRadius + 20;
     view.update(approachX, 2, hub.z, approachX - 5, 2, hub.z, 400, 0.05);
     expect(firstGroup.visible).toBe(false);
@@ -1371,18 +1408,41 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(microMaterial.opacity).toBe(1);
   });
 
-  it('ghosts a placed building from inside its wall box under its roof line, never from under its eaves', () => {
+  it('ghosts a placed building from inside its wall box under its roof line, never from under its eaves, and keeps a walk-in room solid round a camera inside it', () => {
     // Added for the painted town, the probe tests/eastbrook_town_renderer.test.ts
     // runs on Eastbrook's placed buildings. A template shell was scaled to its
     // wall box, so the box that ghosted it and the shell it drew were one
     // rectangle. A placed model reaches well past its walls (porch, stair,
     // awning, eaves), and the camera-fade box stays the WALL box: the record's
     // footprint, topped at the model's own height above the ground under its
-    // anchor (nativeDimensions.height, the buried footing not counted). Every
-    // probe stands the camera and the eye on one point, so the only way to
-    // ghost a building is to be inside that box, and every material of the
-    // building answers together. Half extents taken from the reach fail the
-    // eaves probes; a roof line that counted the footing fails the roof probe.
+    // anchor (nativeDimensions.height, the buried footing not counted). The
+    // shared probes stand the camera and the eye on one point, so the only way
+    // to ghost a sealed building is to be inside that box, and every material
+    // of the building answers together. Half extents taken from the reach fail
+    // the eaves probes; a roof line that counted the footing fails the roof
+    // probe.
+    // Split for the walk-in buildings (fenbridge_layout.ts walkIn): the inn,
+    // the chapel, the apothecary and the bank are rooms a player walks into,
+    // so with the eye inside one of them it ghosts only once the camera is
+    // outside its wall box or over its roof line; eye and camera both inside
+    // keep it solid. A camera inside the box with the eye outside still
+    // ghosts it, as for any building. The sealed warden house keeps the rule
+    // above unchanged (fenbridge_town_visibility_core.ts).
+    expect(
+      FENBRIDGE_LAYOUT.buildings
+        .filter((building) => building.walkIn)
+        .map((building) => building.id),
+    ).toEqual([
+      'fenbridge_crooked_reed_inn',
+      'fenbridge_lantern_chapel',
+      'fenbridge_moonwort_apothecary',
+      'fenbridge_gilded_strongbox',
+    ]);
+    expect(
+      FENBRIDGE_LAYOUT.buildings
+        .filter((building) => !building.walkIn)
+        .map((building) => building.id),
+    ).toEqual(['fenbridge_warden_gatehouse']);
     setGfx({ standardMaterials: false, dynamicShadows: false, surfaceDetail: false });
     const groundY = 1.5;
     const view = fenbridgeTownInternalsForTest.buildFromSources(
@@ -1408,14 +1468,20 @@ describe('Fenbridge dedicated town renderer', () => {
       expect(materials, building.id).toHaveLength(3);
       const { footprint, reach } = building;
       const roofY = groundY + building.nativeDimensions.height;
+      const belowRoof = groundY + 2;
       // Stand well over the roof first (so each probe starts from the authored
-      // state), then on the probe point.
-      const stateAt = (point: { x: number; z: number }, y: number): string => {
-        view.update(point.x, roofY + 20, point.z, point.x, roofY + 20, point.z, 200, 10);
+      // state), then put the camera and the eye where the probe says.
+      const stateWith = (
+        camera: { x: number; y: number; z: number },
+        eye: { x: number; y: number; z: number },
+      ): string => {
+        view.update(eye.x, roofY + 20, eye.z, eye.x, roofY + 20, eye.z, 200, 10);
         expect(fadeState(materials), `${building.id} cleared`).toBe('solid');
-        view.update(point.x, y, point.z, point.x, y, point.z, 200, 10);
+        view.update(camera.x, camera.y, camera.z, eye.x, eye.y, eye.z, 200, 10);
         return fadeState(materials);
       };
+      const stateAt = (point: { x: number; z: number }, y: number): string =>
+        stateWith({ x: point.x, y, z: point.z }, { x: point.x, y, z: point.z });
 
       for (const [signX, signZ] of [
         [1, 1],
@@ -1424,16 +1490,41 @@ describe('Fenbridge dedicated town renderer', () => {
         [-1, -1],
       ]) {
         // A step inside each corner of the wall box: the box is the whole
-        // footprint, not a patch around the door.
+        // footprint, not a patch around the door. A sealed building ghosts;
+        // a walk-in room with the eye and the camera both in it stays solid.
         const inside = pointIn(
           footprint,
           signX * (footprint.halfWidth - 0.05),
           signZ * (footprint.halfDepth - 0.05),
         );
         expect(insideRect(footprint, inside)).toBe(true);
-        expect(stateAt(inside, groundY + 2), `${building.id} inside ${signX},${signZ}`).toBe(
-          'ghost',
+        expect(stateAt(inside, belowRoof), `${building.id} inside ${signX},${signZ}`).toBe(
+          building.walkIn ? 'solid' : 'ghost',
         );
+        if (!building.walkIn) continue;
+        // The walk-in room still ghosts when the camera leaves its box with
+        // the eye inside, and when the camera backs into it from an eye
+        // outside: three yards out past the same corner, under the roof line.
+        const outPastCorner = pointIn(
+          footprint,
+          signX * (footprint.halfWidth + 3),
+          signZ * (footprint.halfDepth + 3),
+        );
+        expect(insideRect(footprint, outPastCorner)).toBe(false);
+        expect(
+          stateWith(
+            { x: outPastCorner.x, y: belowRoof, z: outPastCorner.z },
+            { x: inside.x, y: belowRoof, z: inside.z },
+          ),
+          `${building.id} camera out past ${signX},${signZ}`,
+        ).toBe('ghost');
+        expect(
+          stateWith(
+            { x: inside.x, y: belowRoof, z: inside.z },
+            { x: outPastCorner.x, y: belowRoof, z: outPastCorner.z },
+          ),
+          `${building.id} camera backed in at ${signX},${signZ}`,
+        ).toBe('ghost');
       }
       // A step outside each wall, still under the model's eaves (inside its
       // reach): never a ghost.
@@ -1447,7 +1538,7 @@ describe('Fenbridge dedicated town renderer', () => {
         const label = `${building.id} outside ${localX},${localZ}`;
         expect(insideRect(footprint, outside), label).toBe(false);
         expect(insideRect(reach, outside), `${label} under the eaves`).toBe(true);
-        expect(stateAt(outside, groundY + 2), label).toBe('solid');
+        expect(stateAt(outside, belowRoof), label).toBe('solid');
       }
       // The four corners of the reach, where the porch, the stair and the
       // eaves end: on the model's ground, outside its walls.
@@ -1455,13 +1546,28 @@ describe('Fenbridge dedicated town renderer', () => {
       expect(underEaves).toHaveLength(4);
       for (const point of underEaves) {
         expect(insideRect(footprint, point), `${building.id} reach corner`).toBe(false);
-        expect(stateAt(point, groundY + 2), `${building.id} under the eaves`).toBe('solid');
+        expect(stateAt(point, belowRoof), `${building.id} under the eaves`).toBe('solid');
       }
       // The roof line is the model's own top over the ground under its anchor.
+      // Eye and camera together just under it: a sealed building ghosts, a
+      // walk-in room stays solid. Just over it, neither ghosts.
       expect(stateAt(footprint.center, roofY - 0.05), `${building.id} under the roof`).toBe(
-        'ghost',
+        building.walkIn ? 'solid' : 'ghost',
       );
       expect(stateAt(footprint.center, roofY + 0.05), `${building.id} over the roof`).toBe('solid');
+      if (building.walkIn) {
+        // With the eye in the room, the same roof line decides by the camera:
+        // still under it keeps the room solid, over it ghosts the room.
+        const eye = { x: footprint.center.x, y: belowRoof, z: footprint.center.z };
+        expect(
+          stateWith({ x: eye.x, y: roofY - 0.05, z: eye.z }, eye),
+          `${building.id} camera under the roof`,
+        ).toBe('solid');
+        expect(
+          stateWith({ x: eye.x, y: roofY + 0.05, z: eye.z }, eye),
+          `${building.id} camera over the roof`,
+        ).toBe('ghost');
+      }
       // The merged microgeometry is never a camera-fade target.
       expect((micro.material as THREE.Material).transparent).toBe(false);
       expect((micro.material as THREE.Material).opacity).toBe(1);

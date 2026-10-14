@@ -113,7 +113,6 @@ import {
 } from './dungeon_layout';
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
-import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { crossesFence } from './fence_crossing';
 import { FENCE_END_PAD, FENCE_HALF_DEPTH, FENCE_RAIL_HEIGHT } from './fence_dims';
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
@@ -315,7 +314,7 @@ function staticWorldColliders(seed: number): Collider[] {
     const cameraTopY = isEastbrookGrandArmoury(b)
       ? buildingTerrainEnvelope(b, (x, z) => terrainHeight(x, z, seed)).cameraTopY
       : topY(seed, b.x, b.z, buildingCameraHeight(b));
-    out.push(...buildingRecordColliders(b, cameraTopY, (x, z) => topY(seed, x, z, 0)));
+    out.push(...buildingRecordColliders(b, cameraTopY, (x, z) => topY(seed, x, z, 0), seed));
   }
   for (const w of PROPS.wells)
     out.push({
@@ -539,23 +538,9 @@ function staticWorldColliders(seed: number): Collider[] {
     });
   }
   // Eastbrook's town wall is a stone parapet with an open iron railing and
-  // two modeled pillars. Fenbridge's palisade is instead a solid log curtain:
-  // its one authored OBB stays full-height and carries no synthetic pillars.
+  // two modeled pillars.
   for (const wall of PROPS.walls ?? []) {
     const cameraTopY = topY(seed, wall.x, wall.z, wall.height);
-    if (wall.assetId === FENBRIDGE_LAYOUT.wall.assetId) {
-      out.push({
-        type: 'obb',
-        x: wall.x,
-        z: wall.z,
-        hw: wall.w / 2,
-        hd: wall.d / 2,
-        rot: wall.rot,
-        cameraTopY,
-      });
-      continue;
-    }
-
     const parapet = topY(seed, wall.x, wall.z, wall.height * TOWN_WALL_PARAPET_FRAC);
     out.push({
       type: 'obb',
@@ -590,27 +575,6 @@ function staticWorldColliders(seed: number): Collider[] {
         moveTopY: top,
         standable: top !== undefined,
       });
-    }
-  }
-
-  // Fenbridge's gate arch is a compound obstacle: the overhead beam never
-  // closes the route, while its two authored jamb OBBs remain solid. The
-  // stable wall ids gate this projection so custom worlds that remove the
-  // Fenbridge palisade do not inherit invisible builtin collision.
-  const wallIds = new Set((PROPS.walls ?? []).map((wall) => wall.id));
-  if (FENBRIDGE_LAYOUT.wall.segments.every((segment) => wallIds.has(segment.id))) {
-    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
-      for (const jamb of gate.arch.jambs) {
-        out.push({
-          type: 'obb',
-          x: jamb.center.x,
-          z: jamb.center.z,
-          hw: jamb.halfWidth,
-          hd: jamb.halfDepth,
-          rot: jamb.rotation,
-          cameraTopY: topY(seed, jamb.center.x, jamb.center.z, gate.arch.nativeDimensions.height),
-        });
-      }
     }
   }
 

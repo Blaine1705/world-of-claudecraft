@@ -13,6 +13,9 @@ export interface FenbridgeBuildingVisibilityTarget {
   sine: number;
   topY: number;
   cullRadius: number;
+  /** A building with an open doorway the player walks into
+   *  (fenbridge_layout.ts `walkIn`). */
+  walkIn?: boolean;
 }
 
 export interface FenbridgeBuildingVisibilityPlan {
@@ -116,12 +119,15 @@ export function fenbridgeCameraSegmentHitsBuilding(
   camZ: number,
 ): boolean {
   if (occluderFadesDisabled()) return false;
-  if (
-    (eyeY < target.topY && pointInsideFootprint(target, eyeX, eyeZ)) ||
-    (camY < target.topY && pointInsideFootprint(target, camX, camZ))
-  ) {
-    return true;
-  }
+  const eyeInside = eyeY < target.topY && pointInsideFootprint(target, eyeX, eyeZ);
+  const cameraInside = camY < target.topY && pointInsideFootprint(target, camX, camZ);
+  // A walk-in building is a room the player stands in: while the camera is in
+  // there too, nothing of the building stands between them, so it stays solid
+  // (the same model placed in Studio never fades). A camera that ends up
+  // outside its walls or over its roof line still fades it, so the player is
+  // never lost behind a wall.
+  if (target.walkIn && eyeInside) return !cameraInside;
+  if (eyeInside || cameraInside) return true;
   const entry = segmentFootprintEntry(target, eyeX, eyeZ, camX, camZ);
   return entry >= 0 && entry <= 1 && eyeY + (camY - eyeY) * entry < target.topY;
 }

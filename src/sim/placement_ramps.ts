@@ -13,6 +13,7 @@
 import { authoredRampsForPath } from './asset_collision';
 import { ASSET_RAMPS } from './asset_collision.generated';
 import { invalidateLadders } from './ladders';
+import { nearTownWalkIn, townWalkInPlacements } from './town_walk_in';
 import type { WorldContent } from './types';
 import { terrainHeight } from './world';
 
@@ -61,6 +62,12 @@ export const WALK_DECK_REACH = 2.5;
 interface RampTable {
   ramps: WorldRamp[];
   buckets: Map<string, WorldRamp[]>;
+  // Every deck's reach in one world box: a query outside it skips the bucket
+  // key, which matters on the built-in world, whose only decks are a town's.
+  minX: number;
+  maxX: number;
+  minZ: number;
+  maxZ: number;
 }
 const RAMP_BUCKET = 32; // yards per cell
 const bucketKey = (cx: number, cz: number): string => `${cx}:${cz}`;
@@ -169,10 +176,43 @@ function rampTable(content: WorldContent, seed: number): RampTable {
       });
     }
   }
+  // A walk-in town building's floor and entry step (town_walk_in.ts): its
+  // record stands the model the way a placement would, with the same decks.
+  for (const p of townWalkInPlacements(content)) {
+    for (const r of authoredRampsForPath(p.path)) {
+      ramps.push({
+        x: p.x,
+        z: p.z,
+        rotY: p.rotY,
+        sx: p.scale,
+        sy: p.scale,
+        sz: p.scale,
+        detached: false,
+        groundY: 0,
+        lift: p.y ?? 0,
+        cx: r.x,
+        cz: r.z,
+        hx: r.hx,
+        hz: r.hz,
+        axis: 'x',
+        ry: r.ry ?? 0,
+        yNeg: r.y0,
+        yPos: r.y1,
+      });
+    }
+  }
   // bucket every deck into each cell its (rotated) footprint can reach
   const buckets = new Map<string, WorldRamp[]>();
+  let boundMinX = Number.POSITIVE_INFINITY;
+  let boundMaxX = Number.NEGATIVE_INFINITY;
+  let boundMinZ = Number.POSITIVE_INFINITY;
+  let boundMaxZ = Number.NEGATIVE_INFINITY;
   for (const r of ramps) {
     const reach = Math.hypot((Math.abs(r.cx) + r.hx) * r.sx, (Math.abs(r.cz) + r.hz) * r.sz) + 1;
+    boundMinX = Math.min(boundMinX, r.x - reach);
+    boundMaxX = Math.max(boundMaxX, r.x + reach);
+    boundMinZ = Math.min(boundMinZ, r.z - reach);
+    boundMaxZ = Math.max(boundMaxZ, r.z + reach);
     const minX = Math.floor((r.x - reach) / RAMP_BUCKET);
     const maxX = Math.floor((r.x + reach) / RAMP_BUCKET);
     const minZ = Math.floor((r.z - reach) / RAMP_BUCKET);
@@ -189,7 +229,14 @@ function rampTable(content: WorldContent, seed: number): RampTable {
       }
     }
   }
-  const table = { ramps, buckets };
+  const table = {
+    ramps,
+    buckets,
+    minX: boundMinX,
+    maxX: boundMaxX,
+    minZ: boundMinZ,
+    maxZ: boundMaxZ,
+  };
   bySeed.set(seed, table);
   return table;
 }
@@ -203,6 +250,7 @@ function rampsNear(
 ): readonly WorldRamp[] {
   const table = rampTable(content, seed);
   if (table.ramps.length === 0) return NO_RAMPS;
+  if (x < table.minX || x > table.maxX || z < table.minZ || z > table.maxZ) return NO_RAMPS;
   return (
     table.buckets.get(bucketKey(Math.floor(x / RAMP_BUCKET), Math.floor(z / RAMP_BUCKET))) ??
     NO_RAMPS
@@ -237,6 +285,20 @@ function rampFloorAt(r: WorldRamp, x: number, z: number, seed: number): number |
   const deckModel = r.yNeg + (r.yPos - r.yNeg) * Math.min(1, Math.max(0, t));
   const base = r.detached ? r.groundY : terrainHeight(r.x, r.z, seed);
   return base + r.lift + deckModel * r.sy;
+}
+
+/**
+ * Whether a walkable deck or plane could stand at (x, z) in this world at
+ * all: a world with no placements and no volumes (the built-in world) has
+ * decks only where a walk-in town building stands its floor, so its ground
+ * query skips the deck table everywhere else.
+ */
+export function decksMayStand(content: WorldContent, x: number, z: number): boolean {
+  return (
+    content.placements !== undefined ||
+    (content.colliderVolumes?.length ?? 0) > 0 ||
+    nearTownWalkIn(x, z)
+  );
 }
 
 /**

@@ -64,10 +64,9 @@ describe('CustomMap build + projection', () => {
       benches: new Set<string>(EASTBROOK_LAYOUT.civic.benches.map((placement) => placement.id)),
       walls: new Set<string>(EASTBROOK_LAYOUT.wall.segments.map((placement) => placement.id)),
     };
-    const builtInOnlyWallIds = new Set<string>([
-      ...eastbrookIds.walls,
-      ...FENBRIDGE_LAYOUT.wall.segments.map((placement) => placement.id),
-    ]);
+    // Fenbridge stands open (no palisade), so only Eastbrook's wall ids are
+    // built-in-only.
+    const builtInOnlyWallIds = eastbrookIds.walls;
     const builtInOnlyBuildingIds = new Set<string>([
       ...eastbrookIds.buildings,
       ...FENBRIDGE_LAYOUT.buildings.map((placement) => placement.id),

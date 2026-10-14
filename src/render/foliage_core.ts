@@ -223,12 +223,8 @@ export function eastbrookGrassExclusions(
       z: FENBRIDGE_LAYOUT.civic.musterBoard.frontStandingPoint.z,
       radius: 1.2,
     });
-    for (const wall of FENBRIDGE_LAYOUT.wall.segments) {
-      exclusions.push(layoutObb(wall.id, wall.footprint));
-    }
-    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
-      for (const jamb of gate.arch.jambs) exclusions.push(layoutObb(jamb.id, jamb));
-    }
+    // Fenbridge stands open: grass grows up to the town on every side, with no
+    // palisade or gate footing to clear.
     for (const boardwalk of FENBRIDGE_LAYOUT.repeated.boardwalks) {
       exclusions.push({
         kind: 'obb',

@@ -59,10 +59,15 @@ const TEMPLATE_URLS = [
   FENBRIDGE_LAYOUT.civic.cistern.assetId,
   FENBRIDGE_LAYOUT.civic.provisionStall.assetId,
   FENBRIDGE_LAYOUT.civic.musterBoard.assetId,
-  FENBRIDGE_LAYOUT.wall.assetId,
-  FENBRIDGE_LAYOUT.wall.gates[0].arch.assetId,
   FENBRIDGE_LAYOUT.repeated.boardwalks[0].assetId,
 ];
+
+/** The ring models the walled town drew. Fenbridge stands open now: neither is
+ *  preloaded or requested here, and both stay shipped for Studio. */
+const RETIRED_RING_URLS = [
+  '/models/props/fenbridge_palisade_wing.glb',
+  '/models/props/fenbridge_gate_arch.glb',
+] as const;
 
 describe('Fenbridge town preload ownership', () => {
   // Re-pinned for the painted town: five placed Tidehold buildings replaced the
@@ -77,7 +82,7 @@ describe('Fenbridge town preload ownership', () => {
     ['Low', '?gfx=low', '.half.glb'],
     ['Standard', '?gfx=ultra', '.glb'],
   ] as const)(
-    'preloads the five painted buildings at the %s texture tier beside six prop templates and leaves the muster order to quest objects',
+    'preloads the five painted buildings at the %s texture tier beside four prop templates and leaves the muster order to quest objects',
     async (tier, search, placedFileSuffix) => {
       vi.stubGlobal('window', { location: { search } });
       vi.stubGlobal('location', { search });
@@ -107,11 +112,16 @@ describe('Fenbridge town preload ownership', () => {
       const buildingUrls = [...town.fenbridgeTownInternalsForTest.buildingAssetUrls];
       // The seven template shells (fenbridge_*.glb, the tannery and the scout
       // lodge among them) left the set and the five painted models arrived,
-      // one per layout row, so the prop set goes 13 to 11 and, with the muster
-      // order, the whole set 14 to 12.
-      expect(propUrls).toHaveLength(11);
-      expect(town.FENBRIDGE_TOWN_ASSET_URLS).toHaveLength(12);
-      expect(new Set(town.FENBRIDGE_TOWN_ASSET_URLS).size).toBe(12);
+      // one per layout row, so the prop set went 13 to 11 and, with the muster
+      // order, the whole set 14 to 12. Re-pinned for the open town: the
+      // palisade wing and the gate arch left with the ring, so the prop set is
+      // 9 and the whole set 10.
+      expect(propUrls).toHaveLength(9);
+      expect(town.FENBRIDGE_TOWN_ASSET_URLS).toHaveLength(10);
+      expect(new Set(town.FENBRIDGE_TOWN_ASSET_URLS).size).toBe(10);
+      for (const retired of RETIRED_RING_URLS) {
+        expect(town.FENBRIDGE_TOWN_ASSET_URLS, retired).not.toContain(retired);
+      }
       expect(buildingUrls).toEqual(FENBRIDGE_LAYOUT.buildings.map((building) => building.assetId));
       expect(buildingUrls.map(paintedModelName)).toEqual([
         'house_a',
@@ -131,6 +141,9 @@ describe('Fenbridge town preload ownership', () => {
       );
       const loadedFiles = mocks.loadGltf.mock.calls.map(([url]) => url);
       expect(loadedFiles).toEqual(expectedFiles);
+      for (const retired of RETIRED_RING_URLS) {
+        expect(loadedFiles, retired).not.toContain(retired);
+      }
       expect(loadedFiles.filter((file) => file.endsWith('.half.glb'))).toHaveLength(
         tier === 'Low' ? buildingUrls.length : 0,
       );
@@ -301,7 +314,7 @@ describe('Fenbridge town preload ownership', () => {
       expect(textureByUrl.get('/textures/fenbridge_surface_roughness.webp')?.colorSpace).toBe(
         THREE.NoColorSpace,
       );
-      // Only the six assets the vertex-colour bake copies out of are released.
+      // Only the four assets the vertex-colour bake copies out of are released.
       // The painted buildings keep their GLB cache entries resident: every
       // clone draws the maps of its model's loader-cache scene, so releasing
       // one would break a later same-page rebuild. The quest renderer owns the

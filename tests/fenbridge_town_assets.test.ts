@@ -152,11 +152,12 @@ const EXPECTED_TOTALS = {
   // Added for the painted town: what the built-in town still places of this
   // family (FENBRIDGE_LAYOUT). The painted Tidehold models replaced all seven
   // buildings (-53_852) and the boardwalks went 12 to 10 (-752), so the town
-  // keeps 25_740 of the wave: the cistern, stall, muster board, 16 palisade
-  // wings, 4 gate arches, 10 boardwalks and the 2 muster orders. Sibling pin:
-  // the legacy-family share of the whole-town budget in
+  // kept 25_740 of the wave. Re-pinned for the open town: the 16 palisade
+  // wings (-12_256) and the 4 gate arches (-4_864) came down, so it keeps
+  // 8_620: the cistern, stall, muster board, 10 boardwalks and the 2 muster
+  // orders. Sibling pin: the legacy-family share of the whole-town budget in
   // tests/fenbridge_town_renderer.test.ts; move both together.
-  townPlacementTriangles: 25_740,
+  townPlacementTriangles: 8_620,
 } as const;
 
 const SUPPORT_MAPS = {
@@ -210,8 +211,9 @@ function townPlacementsByUrl(): Map<string, number> {
   place(FENBRIDGE_LAYOUT.civic.cistern.assetId);
   place(FENBRIDGE_LAYOUT.civic.provisionStall.assetId);
   place(FENBRIDGE_LAYOUT.civic.musterBoard.assetId);
+  // Empty since the town opened (no wall wing, and the entrances carry no
+  // arch), but still counted, so a wing laid back on the ring shows up here.
   for (const segment of FENBRIDGE_LAYOUT.wall.segments) place(segment.assetId);
-  for (const gate of FENBRIDGE_LAYOUT.wall.gates) place(gate.arch.assetId);
   for (const boardwalk of FENBRIDGE_LAYOUT.repeated.boardwalks) place(boardwalk.assetId);
   for (const order of FENBRIDGE_LAYOUT.repeated.musterOrders) place(order.assetId);
   return placements;
@@ -423,6 +425,8 @@ describe('Fenbridge shipping asset family', () => {
     // The painted Tidehold models replaced every building and the boardwalks
     // went to 10, and the town never places more of an asset than that wave
     // budgeted (the triangle sibling is EXPECTED_TOTALS.townPlacementTriangles).
+    // Re-pinned for the open town: the palisade wings and the gate arches came
+    // down, so the town places none of either.
     const townPlacements = townPlacementsByUrl();
     expect(
       Object.fromEntries(
@@ -438,8 +442,8 @@ describe('Fenbridge shipping asset family', () => {
       scout_lodge: 0,
       mirelight_cistern: 1,
       provision_stall: 1,
-      palisade_wing: 16,
-      gate_arch: 4,
+      palisade_wing: 0,
+      gate_arch: 0,
       boardwalk: 10,
       muster_board: 1,
       muster_order: 2,
@@ -448,6 +452,12 @@ describe('Fenbridge shipping asset family', () => {
       expect(townPlacements.get(familyAssetUrl(assetId)) ?? 0, assetId).toBeLessThanOrEqual(
         FENBRIDGE_TOWN_CONTRACTS[assetId].placementCount,
       );
+    }
+    // Both ring models stay shipped (Studio still lists them); the town just
+    // stands none of them.
+    for (const assetId of ['palisade_wing', 'gate_arch'] as const) {
+      expect(existsSync(outputPath(assetId)), `${assetId} still shipped`).toBe(true);
+      expect(townPlacements.has(familyAssetUrl(assetId)), `${assetId} in town`).toBe(false);
     }
 
     const optimizerSpec = JSON.parse(

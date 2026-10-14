@@ -6,10 +6,14 @@
 // placement (promotedScenery.authoredTowns). Matching is by the same
 // coordinate/dimension/rotation identity the render predicates use.
 
+import { bakedBoxesForPath } from './asset_collision';
 import type { Collider } from './collider_shapes';
+import { emitPlacementBoxes } from './colliders_authored/placement_colliders';
 import { EASTBROOK_LAYOUT, type Obb2 } from './eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { walkInPlacementFor } from './town_walk_in';
 import type { BuildingDef, PromotedScenery } from './types';
+import { terrainHeight } from './world';
 
 const EPSILON = 1e-6;
 
@@ -48,12 +52,27 @@ export function placedBuildingAnnexes(building: BuildingDef): readonly Obb2[] {
  * each annex. `groundAt` anchors each box's pass-under floor on its own
  * ground, so a mover deep in a tube or carve walks beneath surface props
  * instead of hitting invisible walls.
+ *
+ * A walk-in record (town_walk_in.ts) collides instead on its model's own
+ * baked boxes, exactly as the same model placed in Studio does, so its open
+ * doorway lets a player in; its annexes are part of that bake. Those boxes
+ * stand on the TERRAIN under the model's anchor (the placement rule), never
+ * on `groundAt`, which already carries the building's own floor deck. With no
+ * `seed` the record keeps its sealed box.
  */
 export function buildingRecordColliders(
   building: BuildingDef,
   cameraTopY: number,
   groundAt: (x: number, z: number) => number,
+  seed?: number,
 ): Collider[] {
+  const walkIn = seed === undefined ? null : walkInPlacementFor(building);
+  const baked = walkIn ? bakedBoxesForPath(walkIn.path) : null;
+  if (walkIn && seed !== undefined && baked && baked.length > 0) {
+    const walls: Collider[] = [];
+    emitPlacementBoxes(walls, walkIn, baked, terrainHeight(walkIn.x, walkIn.z, seed));
+    return walls;
+  }
   const out: Collider[] = [
     {
       type: 'obb',
