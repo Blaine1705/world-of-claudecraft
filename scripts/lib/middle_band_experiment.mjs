@@ -3,6 +3,7 @@
 import { MeshoptSimplifier } from 'meshoptimizer';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { isPalmBudgetTree, sceneryQualityIndices } from './scenery_quality_indices.mjs';
 
 export function bandDistance(bounds, x, z) {
   return Math.hypot(
@@ -90,6 +91,7 @@ export function collectMiddleBandScenery(renderer, radius = 190) {
 
 function materialFor(source, basic = false) {
   const material = basic ? new THREE.MeshBasicMaterial() : new THREE.MeshLambertMaterial();
+  material.name = `research-scenery-${basic ? 'albedo' : 'lit'}:${source.name}`;
   material.map = source.map;
   material.color.copy(source.color ?? new THREE.Color(1, 1, 1));
   material.alphaTest = source.alphaTest;
@@ -111,20 +113,30 @@ function compactGeometry(source, indices) {
   return g;
 }
 
-export async function installMiddleBandExperiment(renderer, distanceController) {
+export async function installMiddleBandExperiment(renderer, distanceController, options = {}) {
+  const member = options.member ?? inMiddleBand;
+  const excluded = options.excluded ?? (() => false);
+  const cellSize = options.cellSize ?? 64;
+  const columns = 1024 / cellSize;
+  const perAtlas = (columns * columns) / 4;
+  if (![64, 128, 256].includes(cellSize)) throw Error('Unsupported atlas cell size');
   if (renderer.webgl.shadowMap.enabled) throw Error('Low without dynamic shadows required');
   if (distanceController.snapshot().cap !== 0)
     throw Error('Collect before packing source instances');
   await MeshoptSimplifier.ready;
-  const items = collectMiddleBandScenery(renderer);
-  if (!items.length || items.length > 320)
+  const items = collectMiddleBandScenery(renderer, options.radius ?? 190).filter(
+    options.filter ?? (() => true),
+  );
+  if ((!items.length && !options.allowEmpty) || items.length > 320)
     throw Error(`Unsupported atlas population: ${items.length}`);
   const root = new THREE.Group();
-  root.name = 'research-middle-band';
+  root.name = options.name ?? 'research-middle-band';
   root.visible = false;
+  const quality = new THREE.Group();
+  const regional = new THREE.Group();
   const simple = new THREE.Group(),
     sprites = new THREE.Group();
-  root.add(simple, sprites);
+  root.add(simple, sprites, quality, regional);
   const ownedGeometry = new Set(),
     ownedMaterial = new Set(),
     targets = [];
@@ -154,7 +166,7 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
     const { x, z } = renderer.camera.position;
     return items
       .map((item, i) => {
-        if (!inMiddleBand(item, x, z)) return -1;
+        if (!member(item, x, z) || excluded(item)) return -1;
         // Do not duplicate complete landmarks or instance parts the 60-yard
         // source still owns, including merged/broad source batches.
         if (item.kind === 'landmark' && item.owner.visible) return -1;
@@ -172,15 +184,16 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
   }
   function update(...args) {
     const result = originalUpdate.apply(this, args);
-    tick();
+    if (mode !== 'cutoff') tick();
     return result;
   }
   function tick() {
     active = selection();
     const key = active.join(',');
-    if (mode === 'simple' && key !== lastSelection) {
+    if (['simple', 'quality', 'regional'].includes(mode) && key !== lastSelection) {
       const keep = new Set(active);
       for (const b of simpleBatches.values()) {
+        if (b.mode !== mode) continue;
         let n = 0;
         for (const part of b.ranges)
           if (keep.has(part.item)) {
@@ -204,8 +217,8 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
         );
         const view = ((Math.round(angle / (Math.PI / 2)) % 4) + 4) % 4;
         const cell = (i - b.start) * 4 + view,
-          col = cell % 16,
-          row = Math.floor(cell / 16);
+          col = cell % columns,
+          row = Math.floor(cell / columns);
         const w = item.width,
           h = item.height,
           rightX = Math.cos(angle),
@@ -221,8 +234,8 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
           );
           b.uv.setXY(
             n * 4 + k,
-            (col * 64 + (k % 2 ? 63.5 : 0.5)) / 1024,
-            (row * 64 + (top ? 63.5 : 0.5)) / 1024,
+            (col * cellSize + (k % 2 ? cellSize - 0.5 : 0.5)) / 1024,
+            (row * cellSize + (top ? cellSize - 0.5 : 0.5)) / 1024,
           );
         }
         n++;
@@ -232,76 +245,100 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
       b.uv.needsUpdate = true;
     }
     simple.visible = mode === 'simple';
+    quality.visible = mode === 'quality';
+    regional.visible = mode === 'regional';
     sprites.visible = mode === 'sprites';
   }
   const spriteBatches = [];
   try {
-    for (const [i, item] of items.entries())
-      for (const p of item.parts) {
-        const g = p.source.geometry,
-          sourceMat = p.source.material;
-        let indices = reduced.get(g.attributes.position);
-        if (!indices) {
-          const base = g.index
-            ? Uint32Array.from(g.index.array)
-            : Uint32Array.from({ length: g.attributes.position.count }, (_, j) => j);
-          const positions = new Float32Array(g.attributes.position.count * 3);
-          for (let j = 0; j < g.attributes.position.count; j++)
-            positions.set(
+    for (const variant of [
+      'simple',
+      ...(options.quality ? ['quality'] : []),
+      ...(options.palmZone ? ['regional'] : []),
+    ]) {
+      reduced.clear();
+      for (const [i, item] of items.entries())
+        for (const p of item.parts) {
+          const g = p.source.geometry,
+            sourceMat = p.source.material;
+          const palm = variant === 'regional' && isPalmBudgetTree(item, p.source, options.palmZone);
+          let profiles = reduced.get(g);
+          if (!profiles) {
+            profiles = new Map();
+            reduced.set(g, profiles);
+          }
+          let indices = profiles.get(palm);
+          if (!indices) {
+            const base = g.index
+              ? Uint32Array.from(g.index.array)
+              : Uint32Array.from({ length: g.attributes.position.count }, (_, j) => j);
+            const positions = new Float32Array(g.attributes.position.count * 3);
+            for (let j = 0; j < g.attributes.position.count; j++)
+              positions.set(
+                [
+                  g.attributes.position.getX(j),
+                  g.attributes.position.getY(j),
+                  g.attributes.position.getZ(j),
+                ],
+                j * 3,
+              );
+            indices =
+              variant !== 'simple'
+                ? sceneryQualityIndices(g, palm ? 256 : 512, palm)
+                : base.length > 384
+                  ? MeshoptSimplifier.simplifySloppy(base, positions, 3, null, 384, 1)[0]
+                  : base;
+            if (!indices.length)
+              indices = MeshoptSimplifier.simplify(base, positions, 3, 384, 1, ['Permissive'])[0];
+            if (!indices.length) indices = base;
+            profiles.set(palm, indices);
+            stats.push({
+              mode: variant,
+              palm,
+              name: sourceMat.name,
+              before: base.length / 3,
+              after: indices.length / 3,
+            });
+          }
+          const geo = compactGeometry(g, indices).toNonIndexed();
+          geo.applyMatrix4(p.matrix);
+          if (!geo.attributes.uv)
+            geo.setAttribute(
+              'uv',
+              new THREE.Float32BufferAttribute(
+                new Float32Array(geo.attributes.position.count * 2),
+                2,
+              ),
+            );
+          const colors = new Float32Array(geo.attributes.position.count * 3),
+            c = geo.attributes.color;
+          for (let j = 0; j < geo.attributes.position.count; j++)
+            colors.set(
               [
-                g.attributes.position.getX(j),
-                g.attributes.position.getY(j),
-                g.attributes.position.getZ(j),
+                (c?.getX(j) ?? 1) * p.tint.r,
+                (c?.getY(j) ?? 1) * p.tint.g,
+                (c?.getZ(j) ?? 1) * p.tint.b,
               ],
               j * 3,
             );
-          indices =
-            base.length > 384
-              ? MeshoptSimplifier.simplifySloppy(base, positions, 3, null, 384, 1)[0]
-              : base;
-          if (!indices.length)
-            indices = MeshoptSimplifier.simplify(base, positions, 3, 384, 1, ['Permissive'])[0];
-          if (!indices.length) indices = base;
-          reduced.set(g.attributes.position, indices);
-          stats.push({ name: sourceMat.name, before: base.length / 3, after: indices.length / 3 });
+          geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+          const batchKey = `${variant}:${sourceMat.uuid}`;
+          let b = simpleBatches.get(batchKey);
+          if (!b) {
+            const material = ownMaterial(materialFor(sourceMat));
+            material.vertexColors = true;
+            b = { mode: variant, material, parts: [], ranges: [], vertices: 0 };
+            simpleBatches.set(batchKey, b);
+          }
+          b.ranges.push({
+            item: i,
+            start: b.vertices,
+            end: b.vertices + geo.attributes.position.count,
+          });
+          b.vertices += geo.attributes.position.count;
+          b.parts.push(geo);
         }
-        const geo = compactGeometry(g, indices).toNonIndexed();
-        geo.applyMatrix4(p.matrix);
-        if (!geo.attributes.uv)
-          geo.setAttribute(
-            'uv',
-            new THREE.Float32BufferAttribute(
-              new Float32Array(geo.attributes.position.count * 2),
-              2,
-            ),
-          );
-        const colors = new Float32Array(geo.attributes.position.count * 3),
-          c = geo.attributes.color;
-        for (let j = 0; j < geo.attributes.position.count; j++)
-          colors.set(
-            [
-              (c?.getX(j) ?? 1) * p.tint.r,
-              (c?.getY(j) ?? 1) * p.tint.g,
-              (c?.getZ(j) ?? 1) * p.tint.b,
-            ],
-            j * 3,
-          );
-        geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-        let b = simpleBatches.get(sourceMat.uuid);
-        if (!b) {
-          const material = ownMaterial(materialFor(sourceMat));
-          material.vertexColors = true;
-          b = { material, parts: [], ranges: [], vertices: 0 };
-          simpleBatches.set(sourceMat.uuid, b);
-        }
-        b.ranges.push({
-          item: i,
-          start: b.vertices,
-          end: b.vertices + geo.attributes.position.count,
-        });
-        b.vertices += geo.attributes.position.count;
-        b.parts.push(geo);
-      }
+    }
     for (const b of simpleBatches.values()) {
       const g = mergeGeometries(b.parts);
       for (const p of b.parts) p.dispose();
@@ -311,12 +348,12 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
       g.setDrawRange(0, 0);
       b.mesh = new THREE.Mesh(g, b.material);
       b.mesh.frustumCulled = false;
-      simple.add(b.mesh);
+      (b.mode === 'regional' ? regional : b.mode === 'quality' ? quality : simple).add(b.mesh);
     }
     // Bake full source meshes into bounded 1024px atlases, four yaw views at
-    // 64px per cell. This is a steady-state representation experiment only.
-    for (let start = 0; start < items.length; start += 64) {
-      const end = Math.min(items.length, start + 64);
+    // configurable cells. This is a steady-state representation experiment only.
+    for (let start = 0; start < items.length; start += perAtlas) {
+      const end = Math.min(items.length, start + perAtlas);
       const target = new THREE.WebGLRenderTarget(1024, 1024, {
         depthBuffer: true,
         stencilBuffer: false,
@@ -326,6 +363,10 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
       target.texture.minFilter = THREE.LinearFilter;
       target.texture.magFilter = THREE.LinearFilter;
       const bake = new THREE.Scene();
+      if (options.litSprites) {
+        for (const light of renderer.scene.children)
+          if (light.isHemisphereLight || light.isDirectionalLight) bake.add(light.clone());
+      }
       const camera = new THREE.OrthographicCamera();
       const groups = [];
       for (let i = start; i < end; i++) {
@@ -338,7 +379,9 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
         for (const p of item.parts) {
           let base = materialCache.get(p.source.material);
           if (!base) {
-            base = ownMaterial(materialFor(p.source.material, true));
+            base = ownMaterial(materialFor(p.source.material, !options.litSprites));
+            base.fog = false;
+            base.toneMapped = false;
             materialCache.set(p.source.material, base);
           }
           const mat = ownMaterial(base.clone());
@@ -401,8 +444,18 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
             camera.updateMatrixWorld();
             const cell = (i - start) * 4 + view;
             webgl.setRenderTarget(target);
-            webgl.setViewport((cell % 16) * 64, Math.floor(cell / 16) * 64, 64, 64);
-            webgl.setScissor((cell % 16) * 64, Math.floor(cell / 16) * 64, 64, 64);
+            webgl.setViewport(
+              (cell % columns) * cellSize,
+              Math.floor(cell / columns) * cellSize,
+              cellSize,
+              cellSize,
+            );
+            webgl.setScissor(
+              (cell % columns) * cellSize,
+              Math.floor(cell / columns) * cellSize,
+              cellSize,
+              cellSize,
+            );
             webgl.setScissorTest(true);
             webgl.clear();
             webgl.render(bake, camera);
@@ -436,34 +489,49 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
         ]).flat(),
       );
       ownedGeometry.add(g);
+      const SpriteMaterial = options.litSprites
+        ? THREE.MeshBasicMaterial
+        : THREE.MeshLambertMaterial;
       const mat = ownMaterial(
-        new THREE.MeshLambertMaterial({
+        new SpriteMaterial({
           map: target.texture,
           alphaTest: 0.35,
           side: THREE.DoubleSide,
         }),
       );
+      mat.name = `${root.name}:sprite-atlas`;
       const mesh = new THREE.Mesh(g, mat);
       mesh.frustumCulled = false;
       sprites.add(mesh);
       spriteBatches.push({ start, end, mesh, position, uv });
     }
     // New visible materials go through the game's compile/upload/touch lane.
-    await renderer.compileGate(root, false, 'research-middle-band');
+    await renderer.compileGate(root, false, root.name);
     renderer.scene.add(root);
     root.visible = true;
-    distanceController.set(60);
+    if (options.activateDistance !== false) distanceController.set(60);
     renderer.foliage.update = update;
     tick();
     return {
       set(value) {
         if (disposed) throw Error('Disposed');
-        if (!['cutoff', 'simple', 'sprites'].includes(value)) throw Error('Unsupported mode');
+        if (
+          ![
+            'cutoff',
+            'simple',
+            'sprites',
+            ...(options.quality ? ['quality'] : []),
+            ...(options.palmZone ? ['regional'] : []),
+          ].includes(value)
+        )
+          throw Error('Unsupported mode');
         mode = value;
         lastSelection = null;
         tick();
       },
       snapshot() {
+        // Audits are outside timing; a disabled representation does no frame work.
+        tick();
         return {
           mode,
           items: items.length,
@@ -474,13 +542,21 @@ export async function installMiddleBandExperiment(renderer, distanceController) 
           }, {}),
           atlasBytes: targets.length * 1024 * 1024 * 4,
           stats,
-          simpleDraws: simpleBatches.size,
+          simpleDraws: [...simpleBatches.values()].filter((b) => b.mode === mode).length,
+          triangles: ['simple', 'quality', 'regional'].includes(mode)
+            ? [...simpleBatches.values()]
+                .filter((b) => b.mode === mode)
+                .reduce((n, b) => n + b.mesh.geometry.drawRange.count / 3, 0)
+            : 0,
           spriteDraws: spriteBatches.length,
           nearViolations: active.filter(
-            (i) => !inMiddleBand(items[i], renderer.camera.position.x, renderer.camera.position.z),
+            (i) => !member(items[i], renderer.camera.position.x, renderer.camera.position.z),
           ).length,
           inventory: items.map((i, n) => ({
             id: n,
+            key: i.key,
+            x: i.x,
+            z: i.z,
             kind: i.kind,
             bounds: i.bounds,
             parts: i.parts.length,

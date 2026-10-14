@@ -10,15 +10,18 @@ export function inFarBand(item, x, z) {
   return d > 120 && d <= 240;
 }
 
-export async function installFarBandExperiment(renderer, distance) {
+export async function installFarBandExperiment(renderer, distance, options = {}) {
+  const member = options.member ?? inFarBand;
+  const excluded = options.excluded ?? (() => false);
+  const target = (options.targetTriangles ?? 32) * 3;
   if (renderer.webgl.shadowMap.enabled || distance.snapshot().cap !== 0)
     throw Error('Requires unpacked Low scenery without dynamic shadows');
   await MeshoptSimplifier.ready;
   // Seventy extra yards permit the same bounded movement captures as the middle study.
-  const items = collectMiddleBandScenery(renderer, 310);
+  const items = collectMiddleBandScenery(renderer, options.radius ?? 310);
   if (!items.length || items.length > 2000) throw Error('Unsupported far population');
   const root = new THREE.Group();
-  root.name = 'research-far-band';
+  root.name = options.name ?? 'research-far-band';
   root.visible = false;
   const batches = new Map(),
     geometries = new Set(),
@@ -43,7 +46,7 @@ export async function installFarBandExperiment(renderer, distance) {
     active = [];
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      if (!inFarBand(item, x, z)) continue;
+      if (!member(item, x, z) || excluded(item)) continue;
       if (item.kind === 'landmark' && item.owner.visible) continue;
       if (
         item.kind === 'zone-instance' &&
@@ -98,11 +101,11 @@ export async function installFarBandExperiment(renderer, distance) {
               j * 3,
             );
           indices =
-            base.length > 96
-              ? MeshoptSimplifier.simplifySloppy(base, positions, 3, null, 96, 1)[0]
+            base.length > target
+              ? MeshoptSimplifier.simplifySloppy(base, positions, 3, null, target, 1)[0]
               : base;
           if (!indices.length)
-            indices = MeshoptSimplifier.simplify(base, positions, 3, 96, 1, ['Permissive'])[0];
+            indices = MeshoptSimplifier.simplify(base, positions, 3, target, 1, ['Permissive'])[0];
           if (!indices.length) indices = base;
           reduced.set(source, indices);
           stats.push({ name: sourceMat.name, before: base.length / 3, after: indices.length / 3 });
@@ -144,6 +147,7 @@ export async function installFarBandExperiment(renderer, distance) {
             side: sourceMat.side,
             vertexColors: true,
           });
+          material.name = `${root.name}:${sourceMat.name}`;
           materials.add(material);
           b = { material, parts: [], ranges: [], vertices: 0 };
           batches.set(sourceMat, b);
@@ -172,7 +176,7 @@ export async function installFarBandExperiment(renderer, distance) {
       b.mesh.frustumCulled = false;
       root.add(b.mesh);
     }
-    await renderer.compileGate(root, false, 'research-far-band');
+    await renderer.compileGate(root, false, root.name);
     renderer.scene.add(root);
     renderer.foliage.update = update;
     tick();
@@ -197,7 +201,7 @@ export async function installFarBandExperiment(renderer, distance) {
             ? [...batches.values()].reduce((n, b) => n + b.mesh.geometry.drawRange.count / 3, 0)
             : 0,
           nearViolations: active.filter(
-            (i) => !inFarBand(items[i], renderer.camera.position.x, renderer.camera.position.z),
+            (i) => !member(items[i], renderer.camera.position.x, renderer.camera.position.z),
           ).length,
           inventory: items.map((item, id) => ({
             id,

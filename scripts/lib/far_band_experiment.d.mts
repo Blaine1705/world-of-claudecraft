@@ -8,6 +8,13 @@ export function inFarBand(
 export function installFarBandExperiment(
   renderer: object,
   distance: ReturnType<typeof installSceneryDistanceExperiment>,
+  options?: {
+    name?: string;
+    radius?: number;
+    targetTriangles?: number;
+    member?: (item: BandItem, x: number, z: number) => boolean;
+    excluded?: (item: BandItem) => boolean;
+  },
 ): Promise<{
   set(enabled: boolean): void;
   snapshot(): {
