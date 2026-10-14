@@ -563,7 +563,9 @@ const MONOLITHS: MonolithRow[] = [
     // measured with wc -l, zero slack.
     // LOWERED 18058 -> 18056 after the Fieldcraft rework composed with the
     // current release batch. Exact merged count measured with wc -l.
-    ceiling: 18056,
+    // Re-pinned at 18069 after composing PvP Resurrect with the current release
+    // batch. Exact merged count measured with wc -l.
+    ceiling: 18069,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1285,7 +1287,9 @@ const MONOLITHS: MonolithRow[] = [
     // batch. Exact merged count, zero slack.
     // Up to 11636 with the Fieldcraft rework's SimContext tick hook composed
     // into the current release batch. Exact merged count, zero slack.
-    ceiling: 11636,
+    // Up to 11641 with PvP Resurrect composed into the current release batch.
+    // Exact merged count, zero slack.
+    ceiling: 11641,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1794,7 +1798,9 @@ const MONOLITHS: MonolithRow[] = [
     // measured with wc -l, zero slack.
     // LOWERED 9766 -> 9765 after the Fieldcraft rework composed with the
     // current release batch. Exact merged count measured with wc -l.
-    ceiling: 9765,
+    // LOWERED 9765 -> 9764 after composing PvP Resurrect with the current
+    // release batch. Exact merged count measured with wc -l.
+    ceiling: 9764,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

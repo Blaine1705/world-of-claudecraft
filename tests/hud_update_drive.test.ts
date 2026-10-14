@@ -870,7 +870,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     sites: 3,
     surface: 'chrome',
-    why: 'the full-screen death overlay, the standing ghost hint line and the corpse prompt, as decided by death_screen_view, through the elided writer',
+    why: 'the death screens through the elided writer: the full-screen death overlay, the standing ghost hint line and the ghost prompt (its one corpse button), each shown or hidden by the pure death view core (src/ui/hud/death; a battleground spirit gets neither ghost surface because the respawn wave is its only way back)',
+  },
+  {
+    call: 'this.pvpRez.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the PvP Resurrect button and its note line (src/ui/hud/death/pvp_resurrect_painter.ts): shown with the offer, disabled and counting down while the PVP_RESURRECT_WAIT_SECONDS wait runs, all through the elided writers',
   },
   {
     call: 'syncDeathControllerHints',
@@ -1893,7 +1900,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 96 -> 97, none 19 -> 20 after the click-move marker gains its
       // own HUD repaint row while the move-state holder stays state-only.
       // none 20 -> 21 after Fieldcraft's Play Dead state-only HUD tick.
-      ).toEqual({ window: 51, chrome: 96, none: 21 });
+      // PvP Resurrect's button/note painter adds one chrome row.
+      ).toEqual({ window: 51, chrome: 97, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

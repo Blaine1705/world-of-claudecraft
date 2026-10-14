@@ -252,9 +252,7 @@ import { DeathRecapDialog } from './death_recap_dialog';
 import { deathRecapFeedback } from './death_recap_feedback';
 import {
   createDeathScreenInputHold,
-  createDeathScreenView,
   deathScreenInputReady,
-  deathScreenViewInto,
   holdDeathScreenInput,
   noteReleaseOverlayShown,
 } from './death_screen_view';
@@ -468,6 +466,7 @@ import {
   crossHotbarResolvers,
   crossHotbarSeedActions,
 } from './hud/cross_hotbar';
+import { createDeathPromptView, PvpResurrectPrompt, updateDeathPromptView } from './hud/death';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
@@ -1660,7 +1659,6 @@ export class Hud {
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
   private deathScreenInput = createDeathScreenInputHold();
-  private deathScreen = createDeathScreenView();
   private deathRecapBtnEl = $('#death-recap-btn');
   private deathRecapDialog!: DeathRecapDialog;
   private ghostPromptEl = $('#ghost-prompt');
@@ -1668,6 +1666,7 @@ export class Hud {
   private guildInvitePromptEl: HTMLElement | null = null;
   private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
+  private deathView = createDeathPromptView();
   // The standing top-of-screen ghost line (both ways back); shown for a ghost only.
   private ghostHintEl = $('#ghost-hint');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
@@ -4556,6 +4555,7 @@ export class Hud {
       this.hotDomSkippedWrites++;
     },
   );
+  private pvpRez = new PvpResurrectPrompt(this.writerFacet, () => this.sim.pvpResurrect());
   // The micro-menu rail's open-window ring and count badges. The view core owns the
   // launcher-to-window table; the painter writes only through the elided facet.
   private readonly microMenuStateView = createMicroMenuStateView((value) =>
@@ -9316,16 +9316,29 @@ export class Hud {
     // returns immediately, so this costs nothing at steady state.
     this.fctPainter.step(now);
 
-    const arenaMatch = !!this.sim.arenaInfo?.match;
-    const death = deathScreenViewInto(this.deathScreen, p, arenaMatch, !!this.sim.bgInfo?.match);
+    // Death UI: src/ui/hud/death/death_prompt_view.ts decides (the Release overlay
+    // and its PvP Resurrect button for a fresh corpse; the greyscale spirit world,
+    // hint line and corpse-reach prompt for a ghost); this paints.
+    const death = updateDeathPromptView(
+      this.deathView,
+      p.dead,
+      p.ghost,
+      !!this.sim.arenaInfo?.match,
+      !!this.sim.bgInfo?.match,
+      p.pos,
+      p.corpsePos,
+      p.pvpResurrect === true,
+      p.pvpResurrectWait ?? 0,
+    );
     if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
     if (!p.dead) {
       this.closeResurrectionPrompt();
       if (this.deathRecapDialog.isOpen()) this.deathRecapDialog.close();
     }
     document.body.classList.toggle('spirit-mode', death.spiritMode);
-    noteReleaseOverlayShown(this.deathScreenInput, death.releaseOverlay, now);
-    this.setDisplay(this.deathOverlayEl, death.releaseOverlay ? 'flex' : 'none');
+    noteReleaseOverlayShown(this.deathScreenInput, death.overlay, now);
+    this.setDisplay(this.deathOverlayEl, death.overlay ? 'flex' : 'none');
+    this.pvpRez.paint(death);
     this.setDisplay(this.ghostHintEl, death.ghostHint ? 'block' : 'none');
     this.setDisplay(this.ghostPromptEl, death.ghostPrompt ? 'flex' : 'none');
 

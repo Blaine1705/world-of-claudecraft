@@ -188,8 +188,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // The World PvP Skull Bag adds skull_bag to both sets (sent by
 // ClientWorld.skullBagAction, dispatched beside pvp_flag): 248/262/14.
 // Weekly loot spec composes with Skull Bag in this release batch: 249/263/14.
-const EXPECTED_SEND_COUNT = 249;
-const EXPECTED_DISPATCH_COUNT = 263;
+// PvP Resurrect adds pvp_resurrect to both sets (sent by
+// ClientWorld.pvpResurrect, dispatched beside resurrect_healer): 250/264/14.
+const EXPECTED_SEND_COUNT = 250;
+const EXPECTED_DISPATCH_COUNT = 264;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -49,6 +49,7 @@ import type { Entity } from '../types';
 import { TICK_RATE } from '../types';
 import { grantHonor } from './honor';
 import { loadSkullBag, savedSkullBag, skullBagInfoFor } from './skull_bag';
+import { notePvpResurrectAtDeath } from './pvp_resurrect';
 import { updatePvpVitality } from './vitality';
 import {
   announceWorldPvpBountyCollected,
@@ -748,6 +749,11 @@ export function worldPvpOnPlayerDeath(
 ): void {
   const books = ctx.worldPvpBooks;
   const helpers = books.recentDamage.get(victim.id);
+  const killerPlayer = controllerOf(ctx, killer);
+  const killerHostile = !!killerPlayer && isWorldPvpHostile(ctx, killerPlayer, victim);
+  // Every player death decides its own PvP Resurrect offer (pvp_resurrect.ts),
+  // from the same hostile-hit books the kill credit reads, before they clear.
+  if (victim.kind === 'player') notePvpResurrectAtDeath(ctx, victim, killerHostile, helpers);
   books.recentDamage.delete(victim.id);
   books.recentSupport.delete(victim.id);
   const victimMeta = ctx.players.get(victim.id);
@@ -756,11 +762,10 @@ export function worldPvpOnPlayerDeath(
   // whatever landed the blow. Read before the payout: a bounty standing at the
   // moment of death doubles the pool below.
   const victimHadBounty = clearWorldPvpBounty(victimMeta.worldPvp, victim);
-  const killerPlayer = controllerOf(ctx, killer);
   if (
     books.paidDeaths.has(victim.id) ||
     !killerPlayer ||
-    !isWorldPvpHostile(ctx, killerPlayer, victim)
+    !killerHostile
   ) {
     if (victimHadBounty) noticeWorldPvpBountyLapsed(ctx, victim.id);
     return;
