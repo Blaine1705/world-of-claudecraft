@@ -1,5 +1,5 @@
 import { isEastbrookGrandArmoury } from '../sim/building_layout';
-import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS, getActiveWorldContent } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
@@ -51,10 +51,51 @@ export function insideGrassHubExclusion(
  *  reads as paving at every distance. */
 export function insidePavedGrassExclusion(x: number, z: number): boolean {
   const dungeon = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID];
-  return (
+  if (
     dungeon !== undefined &&
     onWildheartBasinEntranceCauseway(activeDungeonDoorPos(dungeon), x, z, 0.3)
-  );
+  ) {
+    return true;
+  }
+  return insideHighwatchManorGround(x, z);
+}
+
+// The Highwatch manor (sim/highwatch_layout.ts) is a walk-in house whose model brings its
+// own ground: flagged floors a hand over the pad, the porch, the garden's lawn, path and
+// beds. The meadow must not grow through any of it, so its whole reach is paving. Asked
+// only while the active world stands the manor where the layout does (its built-in record,
+// or a Studio placement of its model at the same anchor), cached per world.
+const MANOR = HIGHWATCH_LAYOUT.buildings.find((building) => building.id === 'highwatch_manor');
+const manorStands = new WeakMap<object, boolean>();
+
+function activeWorldStandsManor(): boolean {
+  if (!MANOR) return false;
+  const content = getActiveWorldContent();
+  const cached = manorStands.get(content);
+  if (cached !== undefined) return cached;
+  const stands =
+    (content.props?.buildings ?? []).some((building) => building.id === MANOR.id) ||
+    (content.placements ?? []).some(
+      (placement) =>
+        placement.path === MANOR.assetId &&
+        Math.abs(placement.x - MANOR.placement.x) < 1e-6 &&
+        Math.abs(placement.z - MANOR.placement.z) < 1e-6,
+    );
+  manorStands.set(content, stands);
+  return stands;
+}
+
+/** True inside the Highwatch manor's reach while the active world stands it. */
+export function insideHighwatchManorGround(x: number, z: number): boolean {
+  if (!MANOR) return false;
+  const reach = MANOR.reach;
+  if (
+    Math.abs(x - reach.center.x) > reach.halfWidth ||
+    Math.abs(z - reach.center.z) > reach.halfDepth
+  ) {
+    return false;
+  }
+  return activeWorldStandsManor();
 }
 
 /** Hub and camp clearings for bushes/ferns, sourced from the active world only. */

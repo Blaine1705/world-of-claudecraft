@@ -16,6 +16,11 @@ export interface FenbridgeBuildingVisibilityTarget {
   /** A building with an open doorway the player walks into
    *  (fenbridge_layout.ts `walkIn`). */
   walkIn?: boolean;
+  /** A walk-in building's doorways as world boxes [x0, x1, y0, y1, z0, z1] (its camera
+   *  interior's openings, placed_town_interior_core.ts). A player stepping in with the camera
+   *  still outside sees in through the door: the building stays solid while the line from the
+   *  eye to the camera leaves the walls through one of these. */
+  doorways?: readonly (readonly [number, number, number, number, number, number])[];
 }
 
 export interface FenbridgeBuildingVisibilityPlan {
@@ -108,6 +113,41 @@ function segmentFootprintEntry(
   return maximum < minimum || maximum < 0 ? Infinity : minimum;
 }
 
+/** Whether the line from an eye inside the footprint to a camera outside it crosses the
+ *  footprint's edge inside one of the target's doorways. */
+function exitsThroughDoorway(
+  target: FenbridgeBuildingVisibilityTarget,
+  eyeX: number,
+  eyeY: number,
+  eyeZ: number,
+  camX: number,
+  camY: number,
+  camZ: number,
+): boolean {
+  const doorways = target.doorways;
+  if (!doorways || doorways.length === 0) return false;
+  // where the segment, walked from the camera, enters the footprint
+  const t = segmentFootprintEntry(target, camX, camZ, eyeX, eyeZ);
+  if (!Number.isFinite(t) || t < 0 || t > 1) return false;
+  const x = camX + (eyeX - camX) * t;
+  const y = camY + (eyeY - camY) * t;
+  const z = camZ + (eyeZ - camZ) * t;
+  const margin = 0.05;
+  for (const [x0, x1, y0, y1, z0, z1] of doorways) {
+    if (
+      x >= x0 - margin &&
+      x <= x1 + margin &&
+      z >= z0 - margin &&
+      z <= z1 + margin &&
+      y >= y0 &&
+      y <= y1
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /** Whether the eye-to-camera segment enters the footprint below the roof. */
 export function fenbridgeCameraSegmentHitsBuilding(
   target: FenbridgeBuildingVisibilityTarget,
@@ -126,7 +166,10 @@ export function fenbridgeCameraSegmentHitsBuilding(
   // (the same model placed in Studio never fades). A camera that ends up
   // outside its walls or over its roof line still fades it, so the player is
   // never lost behind a wall.
-  if (target.walkIn && eyeInside) return !cameraInside;
+  if (target.walkIn && eyeInside) {
+    if (cameraInside) return false;
+    return !exitsThroughDoorway(target, eyeX, eyeY, eyeZ, camX, camY, camZ);
+  }
   if (eyeInside || cameraInside) return true;
   const entry = segmentFootprintEntry(target, eyeX, eyeZ, camX, camZ);
   return entry >= 0 && entry <= 1 && eyeY + (camY - eyeY) * entry < target.topY;

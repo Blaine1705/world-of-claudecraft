@@ -26,8 +26,9 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The air of Highwatch's walk-in painted buildings (src/render/placed_town_interior_core.ts),
 // registered with the indoor camera (src/render/interior_camera.ts) by the placed-town view,
-// so walking into the grand inn, chapel, counting house or smithy the camera follows in
-// through the door and then keeps to the rooms, the way it does in the Mirefen tavern.
+// so walking into the grand inn, chapel, counting house, smithy or the manor the camera
+// follows in through the door and then keeps to the rooms, the way it does in the Mirefen
+// tavern.
 
 const BUILDINGS = HIGHWATCH_LAYOUT.buildings;
 type Building = (typeof BUILDINGS)[number];
@@ -58,6 +59,7 @@ describe('the air of a walk-in placed building', () => {
       'hall',
       'shop_a',
       'smithy',
+      'manor',
     ]);
     for (const name of WALK_IN.map((building) => placedTownModelName(building.assetId))) {
       expect(placedTownInteriorModels()).toContain(name);
@@ -235,6 +237,7 @@ describe('the authored air against each model baked collision', () => {
     hall: 30.5,
     shop_a: 16.28,
     smithy: 19.797,
+    manor: 51.248,
   };
 
   it('stands each door under its lintel and each room on its floor deck', () => {
@@ -242,7 +245,8 @@ describe('the authored air against each model baked collision', () => {
       const air = placedTownModelAir(name);
       if (!air) throw new Error(name);
       const unit = SIZE[name] / 2.2;
-      const rows = BAKED[`tidehold/${name}`];
+      // the painted set's rows sit under its default model; the manor's under its own path
+      const rows = BAKED[name === 'manor' ? 'tidehold/highwatch/manor' : `tidehold/${name}`];
       const boxes = rows.boxes.map((b) => {
         const c = Math.abs(Math.cos(b.ry ?? 0));
         const s = Math.abs(Math.sin(b.ry ?? 0));
@@ -267,6 +271,51 @@ describe('the authored air against each model baked collision', () => {
         (b) => b.x0 <= mx && b.x1 >= mx && b.z0 <= mz && b.z1 >= mz && b.y0 > door[2] + 1,
       );
       expect(Math.min(...over.map((b) => b.y0)), name).toBeCloseTo(door[3], 1);
+    }
+  });
+
+  it("keeps every piece of the manor's air on a floor deck and clear of its walls", () => {
+    // the manor has many rooms: each piece stands on the deck under its middle, and no wall
+    // (a baked box five yards tall or more) cuts into any of them, so the camera can never be
+    // walked into masonry the model would draw through
+    const air = placedTownModelAir('manor');
+    if (!air) throw new Error('no manor air');
+    const unit = SIZE.manor / 2.2;
+    const rows = BAKED['tidehold/highwatch/manor'];
+    const walls = rows.boxes
+      .map((b) => ({
+        x0: (b.x - b.hx) * unit,
+        x1: (b.x + b.hx) * unit,
+        z0: (b.z - b.hz) * unit,
+        z1: (b.z + b.hz) * unit,
+        y0: (b.y - b.hy) * unit - 1,
+        y1: (b.y + b.hy) * unit - 1,
+      }))
+      .filter((b) => b.y1 - b.y0 >= 5);
+    expect(walls.length).toBeGreaterThan(20);
+    const decks = (rows.ramps ?? []).map((r) => ({
+      x0: (r.x - (r.ry ? r.hz : r.hx)) * unit,
+      x1: (r.x + (r.ry ? r.hz : r.hx)) * unit,
+      z0: (r.z - (r.ry ? r.hx : r.hz)) * unit,
+      z1: (r.z + (r.ry ? r.hx : r.hz)) * unit,
+      y: Math.max(r.y0 ?? 0, r.y1 ?? 0) * unit - 1,
+    }));
+    for (const [i, [x0, x1, y0, y1, z0, z1]] of air.boxes.entries()) {
+      const mx = (x0 + x1) / 2;
+      const mz = (z0 + z1) / 2;
+      // the highest deck under its middle is its floor
+      const under = decks.filter((d) => d.x0 <= mx && d.x1 >= mx && d.z0 <= mz && d.z1 >= mz);
+      expect(under.length, `piece ${i}`).toBeGreaterThan(0);
+      expect(Math.max(...under.map((d) => d.y)), `piece ${i} floor`).toBeCloseTo(y0, 1);
+      for (const w of walls) {
+        const overlap =
+          Math.min(x1, w.x1) - Math.max(x0, w.x0) > 0.05 &&
+          Math.min(z1, w.z1) - Math.max(z0, w.z0) > 0.05 &&
+          Math.min(y1, w.y1) - Math.max(y0, w.y0) > 0.05;
+        expect(overlap, `piece ${i} against a wall at ${w.x0.toFixed(1)}, ${w.z0.toFixed(1)}`).toBe(
+          false,
+        );
+      }
     }
   });
 });

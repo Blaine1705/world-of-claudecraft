@@ -198,7 +198,11 @@ Everything else is a sibling module in one of these families:
   through an opening. Outdoors it touches nothing. Reference registrant: the placed-town
   view (`placed_town_buildings.ts`) registers each walk-in painted building's air from
   `placed_town_interior_core.ts` (rooms and doors per model, at the building's scale and
-  turn). The chase camera's floor (ground, rift tier, maze hedges) is
+  turn), and hands the same doors to the town's camera fade, so a walk-in building stays
+  solid while the player steps in with the lens still outside looking through the door
+  (`fenbridge_town_visibility_core.ts` `doorways`). The Highwatch manor's fires and lamps
+  (`highwatch_manor_lights.ts`) join the props' fire-light budget and the scenery flame pass,
+  the campfire's rule. The chase camera's floor (ground, rift tier, maze hedges) is
   `chase_camera_floor_core.ts`.
 - **Studio (authored maps) and the editor:** two directories, each with its
   own `CLAUDE.md` and `index.ts` barrel. `authored_map/` holds what the

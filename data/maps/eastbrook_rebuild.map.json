@@ -11754,6 +11754,231 @@
       "hardness": 0.30592607560893387
     },
     {
+      "x": 11.000800000000002,
+      "z": 722.4305,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 11.000800000000002,
+      "z": 731.8615,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 11.000800000000002,
+      "z": 741.2925,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 11.000800000000002,
+      "z": 750.7235000000001,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 11.000800000000002,
+      "z": 760.1545,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 21.2504,
+      "z": 722.4305,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 21.2504,
+      "z": 731.8615,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 21.2504,
+      "z": 741.2925,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 21.2504,
+      "z": 750.7235000000001,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 21.2504,
+      "z": 760.1545,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 31.5,
+      "z": 722.4305,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 31.5,
+      "z": 731.8615,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 31.5,
+      "z": 741.2925,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 31.5,
+      "z": 750.7235000000001,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 31.5,
+      "z": 760.1545,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 41.7496,
+      "z": 722.4305,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 41.7496,
+      "z": 731.8615,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 41.7496,
+      "z": 741.2925,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 41.7496,
+      "z": 750.7235000000001,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 41.7496,
+      "z": 760.1545,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 51.9992,
+      "z": 722.4305,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 51.9992,
+      "z": 731.8615,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 51.9992,
+      "z": 741.2925,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 51.9992,
+      "z": 750.7235000000001,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
+      "x": 51.9992,
+      "z": 760.1545,
+      "radius": 20.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.33219358935198756
+    },
+    {
       "x": 0,
       "z": 660,
       "radius": 16,
@@ -12100,6 +12325,240 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.5889000280722397
+    },
+    {
+      "x": 11.000800000000002,
+      "z": 722.4305,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 11.000800000000002,
+      "z": 731.8615,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 11.000800000000002,
+      "z": 741.2925,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 11.000800000000002,
+      "z": 750.7235000000001,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 11.000800000000002,
+      "z": 760.1545,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 21.2504,
+      "z": 722.4305,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 21.2504,
+      "z": 731.8615,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 21.2504,
+      "z": 741.2925,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 21.2504,
+      "z": 750.7235000000001,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 21.2504,
+      "z": 760.1545,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 31.5,
+      "z": 722.4305,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 31.5,
+      "z": 731.8615,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 31.5,
+      "z": 741.2925,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 31.5,
+      "z": 750.7235000000001,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 31.5,
+      "z": 760.1545,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 41.7496,
+      "z": 722.4305,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 41.7496,
+      "z": 731.8615,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 41.7496,
+      "z": 741.2925,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 41.7496,
+      "z": 750.7235000000001,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 41.7496,
+      "z": 760.1545,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 51.9992,
+      "z": 722.4305,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 51.9992,
+      "z": 731.8615,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 51.9992,
+      "z": 741.2925,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 51.9992,
+      "z": 750.7235000000001,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 51.9992,
+      "z": 760.1545,
+      "radius": 10.964159338355206,
+      "delta": 12.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6351749480685618
+    },
+    {
+      "x": 10,
+      "z": 770,
+      "radius": 10.6,
+      "delta": 17.3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5
     }
   ],
   "placements": [
@@ -12160,6 +12619,17 @@
       "collisionMode": "baked",
       "y": -1.35,
       "name": "Highwatch smithy"
+    },
+    {
+      "assetId": "tidehold/highwatch/manor",
+      "name": "Highwatch manor",
+      "x": 31.5,
+      "z": 746,
+      "y": -1.05,
+      "rotY": 0,
+      "scale": 23.294545454545453,
+      "collide": true,
+      "collisionMode": "baked"
     },
     {
       "assetId": "props/inn",
