@@ -12186,6 +12186,7 @@ export const ko_KR: EnTranslations = {
     "realm": "월드",
     "newCharacter": "새 캐릭터",
     "appearance": "외형",
+    "modelLoading": "캐릭터를 불러오는 중...",
     "customize": "커스터마이즈",
     "body": "체형",
     "genderMale": "남성",

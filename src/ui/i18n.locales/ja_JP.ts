@@ -8094,6 +8094,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'auth.realm': 'ワールド',
   'auth.newCharacter': '新規キャラクター',
   'auth.appearance': '外見',
+  'auth.modelLoading': 'キャラクターを読み込み中...',
   'auth.class': 'クラス',
   'auth.name': '名前',
   'auth.chromaOption': 'カラー {n}',

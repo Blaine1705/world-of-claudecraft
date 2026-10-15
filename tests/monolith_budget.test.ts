@@ -1508,7 +1508,10 @@ const MONOLITHS: MonolithRow[] = [
     // 11037 minus that removal. Exact merged count (wc -l), zero slack.
     // LOWERED to 11001 when the offline Play click (its audio start and its world
     // choice) moved into src/game/studio_boot.ts bootOfflinePlay.
-    ceiling: 11001,
+    // LOWERED to 10958 when the launcher's 3D stage build (and its panel-to-container
+    // map) moved into src/game/launcher_preview_stage.ts, which builds it at once
+    // instead of behind charactersReady(). Exact count (wc -l), zero slack.
+    ceiling: 10958,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -27,10 +27,15 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   `assetsReady()`: only this file's boot GLBs (the skin atlases defer on every
   host and rejoin this gate only if the eagerSkinAtlases kill-switch in
   `assets.ts` is ever flipped back), with its own
-  delayed, backed-off retry loop, so a transient failure anywhere else on the
-  site can never permanently blank the landing character-creation preview
-  (`src/main.ts` awaits it there instead of `assetsReady()`;
-  `tests/character_preview_boot.test.ts`).
+  delayed, backed-off retry loop (`tests/character_preview_boot.test.ts`). The
+  launcher's 3D stage does NOT wait on it: on a desktop the boot set is every
+  creature and item weapon in the game, and waiting on it left a first visit's
+  creator empty for minutes. The stage is built at once
+  (`src/game/launcher_preview_stage.ts`), each body it shows waits for exactly
+  its own files (`directBuildAssetsResident`: base, animation libraries and the
+  weapons its build hangs, asked as demands), and the boot set itself rides the
+  loader's BACKGROUND class, so none of it queues ahead of those
+  (`tests/preview_direct_build_assets.test.ts`).
 - `armor_dye.ts`: the outfit-colorway dye shader layer (`attachArmorDye`, plus
   `reapplyArmorDyeToClone` for the clone path). Its own leaf module because
   `../material_clone_hooks.ts` must re-attach it on every program-preserving
@@ -147,7 +152,24 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   node with nothing standing in for it (a late head file, a first armor file)
   is then shown rather than left hidden for good, while the body atlas swap
   keeps its stand-in, asks once more, and is never committed cold there
-  (`tests/preview_material_gate.test.ts`).
+  (`tests/preview_material_gate.test.ts`). Until its character draws (a WOC
+  body: its head is live), a stage handed a loading layer
+  (`setLoadingLayer`; the launcher's yellow silhouette,
+  `src/ui/preview_loading_silhouette.ts`) shows it. The creator's WOC body asks,
+  just before its build (`CharacterPreview` `askCreatorFilesFirst`), for what lets
+  the player see it soonest, ahead of the stage's own armor tier in the loader's
+  first-come demand line: its head look's files (it draws nothing until its whole
+  head is live), then its kit's LOW armor file (`woc_armor_dressing.ts`
+  `prefetchWocKitLowTier`), which stands in while that tier streams over it. Asked
+  in the block that installs the body's gate, so none of them can land before it
+  (a tier already resident is attached at build, like any resident file); pinned
+  by the creator cases of `tests/preview_armor_detail.test.ts`. A TOUCH stage
+  (`CharacterPreviewOptions.touchStage`, the launcher on the phone interface)
+  opens the creator on the head and shoulders (`preview_framing.ts`
+  `touchShouldersPose`), never eases to a category's close-up, and takes
+  pinch, two-finger slide, one-finger turn and tilt, and a double tap to reset:
+  the pure camera is `preview_touch_core.ts`, the finger tracking
+  `preview_touch_input.ts` (`tests/preview_touch_core.test.ts`).
 - Portraits: `portrait.ts` (offscreen-WebGL headshot factory, caches data
   URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`) +
   `portrait_prewarm_core.ts` (the async capture's step order) +

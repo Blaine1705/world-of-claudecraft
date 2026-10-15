@@ -12186,6 +12186,7 @@ export const nl_NL: EnTranslations = {
     "realm": "Wereld",
     "newCharacter": "Nieuw personage",
     "appearance": "Uiterlijk",
+    "modelLoading": "Loading character...",
     "customize": "Aanpassen",
     "body": "Lichaam",
     "genderMale": "Man",

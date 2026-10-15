@@ -614,6 +614,7 @@ export type TranslationKeyFlat =
   | 'auth.logIn'
   | 'auth.makeupNone'
   | 'auth.marketingOptIn'
+  | 'auth.modelLoading'
   | 'auth.mouth'
   | 'auth.mouthAwe'
   | 'auth.mouthFrown'

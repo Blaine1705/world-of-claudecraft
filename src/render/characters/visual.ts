@@ -715,6 +715,13 @@ export class CharacterVisual {
     if (this.wocHeadAwaited) this.syncFarVisibility();
   }
 
+  /** Whether the body draws now: past the wait for its head (a WOC body, syncFarVisibility:
+   *  the head live, or a file of it failed) and shown, as the rig or its far mesh. A host's 2D
+   *  loading layer (the launcher's preview silhouette) stands in until it does. */
+  get bodyShown(): boolean {
+    return !this.wocHeadAwaited && (this.modelWrap.visible || this.farMesh?.visible === true);
+  }
+
   /** The WOC head's live look (tests, dev overlays); null on any other rig and until the
    *  head is live (a body built directly is not drawn yet; one in the world draws without
    *  a head only while its core is missing). What it DRAWS of that look, a hairstyle or a

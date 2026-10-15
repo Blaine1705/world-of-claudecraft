@@ -12186,6 +12186,7 @@ export const fr_CA: EnTranslations = {
     "realm": "Monde",
     "newCharacter": "Nouveau personnage",
     "appearance": "Apparence",
+    "modelLoading": "Loading character...",
     "customize": "Personnaliser",
     "body": "Corps",
     "genderMale": "Homme",
