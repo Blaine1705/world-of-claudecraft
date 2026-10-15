@@ -582,6 +582,7 @@ import {
   promoteStreetlamps,
   promoteWillows,
   repairDecorBuildingCollision,
+  repairLegacyWorldPropFit,
   repairStretchedWorldProps,
   withoutEditableWorldProps,
   withoutMajorWorldProps,
@@ -1489,6 +1490,7 @@ export class EditorApp {
     promoteWillows(this.map as CustomMap);
     promoteFarshorePalms(this.map as CustomMap);
     promoteFeatureDressing(this.map as CustomMap);
+    repairLegacyWorldPropFit(this.map as CustomMap);
     repairStretchedWorldProps(this.map);
     repairPlacedAssetShapes(this.map);
     repairMissingTreeCollision(this.map, applyDefaultCollision);
@@ -16109,6 +16111,7 @@ export class EditorApp {
     promoteFarshorePalms(map as CustomMap);
     promoteFeatureDressing(map as CustomMap);
     repairDecorBuildingCollision(map);
+    repairLegacyWorldPropFit(map as CustomMap);
     repairStretchedWorldProps(map);
     repairPlacedAssetShapes(map);
     repairMissingTreeCollision(map, applyDefaultCollision);
