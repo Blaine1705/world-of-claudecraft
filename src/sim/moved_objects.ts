@@ -15,6 +15,15 @@
 // nothing of that kind, so the shipped path reads the same frozen rows by
 // reference (tests/moved_objects.test.ts pins the identity).
 //
+// TWO SOURCES, ONE ANSWER ON EVERY HOST: the Sim's own systems (plant and
+// harvest range, gathering, the door exit drop, the death graveyard) read the
+// Sim's world through ctx.objectMoves, while the host-agnostic readers
+// (colliders, door jambs, quest map areas, the render and HUD helpers) read
+// the active world, the same split the Sim constructor's world INVARIANT
+// draws for terrain and colliders. Every host that boots a moved world
+// (editor playtest, published maps) activates that same world first, so the
+// two agree; the server only ever runs the built-in world.
+//
 // Terrain stays put: the calm pads under these objects
 // (terrain_calm_anchors.ts) are cached per seed from the built-in tables, the
 // same as an authored NPC move today, so moving an object never reshapes the
@@ -98,21 +107,37 @@ export function freezeObjectMoves(
   return Object.freeze(out);
 }
 
-function hasKind(moves: ObjectMoves, kind: MovableObjectKind): boolean {
+/** Whether the record moves anything of this kind (allocation-free). */
+export function movesKind(moves: ObjectMoves | undefined, kind: MovableObjectKind): boolean {
+  if (!moves) return false;
   const prefix = `${kind}:`;
   for (const key in moves) if (key.startsWith(prefix)) return true;
   return false;
 }
 
+const hasKind = movesKind;
+
+// Records proven frozen through and through (outer object and every entry),
+// the only ones a memo may key on: an unfrozen entry could change under it.
+const DEEP_FROZEN = new WeakSet<ObjectMoves>();
+function deepFrozen(moves: ObjectMoves): boolean {
+  if (DEEP_FROZEN.has(moves)) return true;
+  if (!Object.isFrozen(moves)) return false;
+  for (const key in moves) if (!Object.isFrozen(moves[key])) return false;
+  DEEP_FROZEN.add(moves);
+  return true;
+}
+
 // Derived-output memos keyed on the (frozen) moves record and the (frozen or
 // shared) table it was resolved against, so a world asks once per table, and
-// two worlds, or one world's two tables, never answer for each other. An
-// unfrozen record is resolved uncached, so a caller that mutated one in place
-// could never read a stale answer.
+// two worlds, or one world's two tables, never answer for each other. A record
+// that is not frozen through and through is resolved uncached, so a caller
+// that mutated one in place could never read a stale answer, and every output
+// is frozen, so no reader can poison the answer the next one gets.
 type Memo<T> = WeakMap<ObjectMoves, WeakMap<object, T>>;
 
 function memoized<T>(memo: Memo<T>, moves: ObjectMoves, table: object, build: () => T): T {
-  if (!Object.isFrozen(moves)) return build();
+  if (!deepFrozen(moves)) return build();
   let byTable = memo.get(moves);
   if (!byTable) {
     byTable = new WeakMap();
@@ -130,8 +155,9 @@ const GATHER_MEMO: Memo<GatherNodeDef[]> = new WeakMap();
 
 /**
  * The garden-bed geography with this world's moved beds. A patch with a moved
- * bed re-centres its anchor (the map pin and the compost bin) on its beds;
- * every other patch is the shared built-in row. Deep-frozen, like the table.
+ * bed re-centres its anchor (the map pin) on its beds, and the compost bin,
+ * derived from the beds (render/farm_patches_core.ts), follows them; every
+ * other patch is the shared built-in row. Deep-frozen, like the table.
  */
 export function farmPatchesFor(
   moves: ObjectMoves | undefined,
@@ -182,11 +208,19 @@ export function gatherNodesFor(
   nodes: GatherNodeDef[],
 ): GatherNodeDef[] {
   if (!moves || !hasKind(moves, 'gatherNode')) return nodes;
-  return memoized(GATHER_MEMO, moves, nodes, () =>
-    nodes.map((node) => {
-      const move = moves[objectMoveKey('gatherNode', node.id)];
-      return move ? { ...node, pos: { x: move.x, z: move.z } } : node;
-    }),
+  return memoized(
+    GATHER_MEMO,
+    moves,
+    nodes,
+    () =>
+      Object.freeze(
+        nodes.map((node) => {
+          const move = moves[objectMoveKey('gatherNode', node.id)];
+          return move
+            ? Object.freeze({ ...node, pos: Object.freeze({ x: move.x, z: move.z }) })
+            : node;
+        }),
+      ) as GatherNodeDef[],
   );
 }
 

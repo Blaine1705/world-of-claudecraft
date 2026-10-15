@@ -729,7 +729,9 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...WORLD_QUEST_OBJECTS,
 ];
 
-export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
+// The content table itself (deep-frozen there), so every reader resolves a
+// map's moved nodes against ONE memo key (moved_objects.ts gatherNodesFor).
+export const GATHER_NODES: GatherNodeDef[] = GATHER_NODES_CONTENT;
 
 /**
  * The gathering veins that exist in the world the player is actually standing
@@ -1099,8 +1101,10 @@ export function setActiveWorldContent(world: WorldContent | null): void {
   // A world that arrived as JSON (a playtest handoff, a published map) carries
   // a plain moves record: freeze it once here so every moved-object resolver
   // (moved_objects.ts) memoizes on it instead of rebuilding per read.
-  if (activeWorld.objectMoves && !Object.isFrozen(activeWorld.objectMoves)) {
-    activeWorld.objectMoves = freezeObjectMoves(activeWorld.objectMoves);
+  if (activeWorld.objectMoves) {
+    const frozen = freezeObjectMoves(activeWorld.objectMoves);
+    if (frozen) activeWorld.objectMoves = frozen;
+    else delete activeWorld.objectMoves;
   }
   refreshAuthoredMapGate();
   contentGeneration++;

@@ -58,7 +58,7 @@ export const GATHER_NODE_TYPES: readonly GatherNodeType[] = ['ore', 'wood', 'her
 // `level` (issue: profession XP) is a one-time snapshot of each node's zone
 // levelRange midpoint (eastbrook_vale [1,7] -> 4; mirefen_marsh, zone2's
 // levelRange [6,13] -> 10), not a live lookup: see types.ts GatherNodeDef.
-export const GATHER_NODES: GatherNodeDef[] = [
+const GATHER_NODE_ROWS: GatherNodeDef[] = [
   // Eastbrook Vale (eastbrook_vale), ore around the Copper Dig outcrops (the
   // zone's mine-themed POI, zone1.ts pois); moved here from Boar Meadow (a
   // wolf/boar mob area with no mining flavor and no discoverable landmark)
@@ -1666,3 +1666,12 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
 ];
+
+// Deep-frozen at module load, not just shared: a Studio map resolves its moved
+// veins against this table through an identity-keyed memo
+// (sim/moved_objects.ts gatherNodesFor), which is only sound while the rows
+// behind the key cannot change (the src/sim/CLAUDE.md content-memo rule). A
+// moved node is a fresh row, never a write into one of these.
+export const GATHER_NODES: GatherNodeDef[] = Object.freeze(
+  GATHER_NODE_ROWS.map((node) => Object.freeze({ ...node, pos: Object.freeze({ ...node.pos }) })),
+) as GatherNodeDef[];

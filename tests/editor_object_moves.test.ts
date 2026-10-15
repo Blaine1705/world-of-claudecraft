@@ -64,6 +64,12 @@ describe('object_moves_core: the record edit', () => {
     expect(objectPosition(undefined, bed)).toEqual(bed.builtin);
   });
 
+  it('every overworld door stands on its own spot (a door move moves one door)', () => {
+    const doors = MOVABLE_OBJECTS.filter((o) => o.kind === 'dungeonDoor');
+    const spots = new Set(doors.map((o) => `${o.builtin.x},${o.builtin.z}`));
+    expect(spots.size).toBe(doors.length);
+  });
+
   it('leaves other entries alone and ignores an unknown key', () => {
     const start = freezeObjectMoves({ 'dungeonDoor:hollow_crypt': { x: 9, z: 9 } });
     const next = withObjectMovedTo(start, BED_KEY, { x: 1, z: 1 });
@@ -184,6 +190,13 @@ describe('custom map: the moves ride the document, playtest and publish', () => 
     const untouched = customMapToWorldContent(newCustomMap('Plain', 'plain', 1));
     expect('objectMoves' in untouched).toBe(false);
   });
+
+  it('a linked map projects no moves (its objects stay put in the full world)', () => {
+    const map = newCustomMap('Linked', 'linked', 1);
+    map.objectMoves = withObjectMovedTo(undefined, BED_KEY, { x: 5, z: 6 });
+    map.worldAnchor = { x: -200, z: 800 };
+    expect(customMapToWorldContent(map).objectMoves).toBeUndefined();
+  });
 });
 
 describe('moved_object_preview: the live shift', () => {
@@ -236,6 +249,25 @@ describe('moved_object_preview: the live shift', () => {
     expect(
       shiftMovedObjectInScene(scene, { kind: 'gatherNode', id: 'zzz' }, from, to, ground),
     ).toBe(0);
+  });
+
+  it('moves a patch compost bin instance', () => {
+    const scene = new THREE.Scene();
+    const bin = new THREE.InstancedMesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial(), 1);
+    bin.name = 'farmPatches:bin:patch_eastbrook';
+    bin.setMatrixAt(0, new THREE.Matrix4().makeTranslation(-27, 0, -84));
+    scene.add(bin);
+    const n = shiftMovedObjectInScene(
+      scene,
+      { kind: 'farmBin', patchId: 'patch_eastbrook' },
+      { x: -27, z: -84 },
+      { x: -27, z: -85 },
+      () => 0,
+    );
+    expect(n).toBe(1);
+    const m = new THREE.Matrix4();
+    bin.getMatrixAt(0, m);
+    expect(m.elements[14]).toBeCloseTo(-85);
   });
 
   it('moves a door set piece as a whole, and a plain door has none to move', () => {

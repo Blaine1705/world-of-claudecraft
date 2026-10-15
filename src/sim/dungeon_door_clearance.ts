@@ -10,7 +10,7 @@
 
 import { DUNGEONS } from './data';
 import { MAX_AGGRO_RADIUS } from './mob/locomotion';
-import { dungeonDoorPos, type ObjectMoves } from './moved_objects';
+import { dungeonDoorPos, movesKind, type ObjectMoves } from './moved_objects';
 
 // The clear radius around a door is exactly the aggro-radius clamp (imported, not a
 // re-typed literal), so a mob spawned strictly outside this ring can never aggro a
@@ -44,7 +44,7 @@ export const DUNGEON_DOORS: ReadonlyArray<{ x: number; z: number }> = (() => {
 // record, so a camp loop asks once per world.
 const MOVED_DOORS = new WeakMap<ObjectMoves, ReadonlyArray<{ x: number; z: number }>>();
 function doorsFor(moves: ObjectMoves | undefined): ReadonlyArray<{ x: number; z: number }> {
-  if (!moves || !Object.keys(moves).some((key) => key.startsWith('dungeonDoor:'))) {
+  if (!moves || !movesKind(moves, 'dungeonDoor')) {
     return DUNGEON_DOORS;
   }
   const hit = Object.isFrozen(moves) ? MOVED_DOORS.get(moves) : undefined;

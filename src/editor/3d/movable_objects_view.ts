@@ -22,9 +22,6 @@ import {
   practiceDummyKeyForTemplate,
 } from '../object_moves_core';
 
-/** A projected position this close (CSS px) counts as a direct hit: tight
- *  enough to beat a nearby placement's slack radius, like an NPC body hit. */
-const DIRECT_PICK_PX = 16;
 /** The loose pass, after placements miss (the NPC loose pass's reach). */
 const LOOSE_PICK_PX = 44;
 
@@ -34,6 +31,8 @@ export interface MovableObjectsViewHost {
   seed(): number;
   canvas(): HTMLCanvasElement;
   moves(): ObjectMoves | undefined;
+  /** False on a map that cannot move built-in objects (a linked map). */
+  enabled(): boolean;
 }
 
 export class MovableObjectsView {
@@ -49,14 +48,16 @@ export class MovableObjectsView {
 
   constructor(private readonly host: MovableObjectsViewHost) {}
 
-  /** The movable object under the cursor, as its `<kind>:<id>` key. Direct
-   *  first: the exact entity pick (a dummy, a door), the exact gather-node
-   *  pick, then a bed's projected spot within a few pixels. `directOnly`
-   *  stops there; otherwise the loose projected pass runs too. */
+  /** The movable object under the cursor, as its `<kind>:<id>` key. The
+   *  exact passes first: the entity pick (a dummy, a door) and the gather-node
+   *  raycast, both occlusion-correct, so they may beat a placement's slack
+   *  radius. `directOnly` stops there; otherwise the loose projected pass runs
+   *  too (the only way to a bed, which is no entity), which the viewport asks
+   *  only after placements miss. */
   pick(clientX: number, clientY: number, directOnly: boolean): string | null {
     const renderer = this.host.renderer();
     const sim = this.host.sim();
-    if (!renderer || !sim) return null;
+    if (!renderer || !sim || !this.host.enabled()) return null;
     const rect = this.host.canvas().getBoundingClientRect();
     const localX = clientX - rect.left;
     const localY = clientY - rect.top;
@@ -75,8 +76,7 @@ export class MovableObjectsView {
       const key = `gatherNode:${nodeId}`;
       if (movableObjectByKey(key)) return key;
     }
-    const near = this.nearest(clientX, clientY, DIRECT_PICK_PX, (o) => o.kind === 'farmBed');
-    if (near || directOnly) return near?.key ?? null;
+    if (directOnly) return null;
     return this.nearest(clientX, clientY, LOOSE_PICK_PX, (o) => this.drawn(o))?.key ?? null;
   }
 

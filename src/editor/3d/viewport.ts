@@ -51,6 +51,7 @@ import {
   MIN_COLLIDER_SIZE,
   MIN_COLLIDER_SIZE_Y,
 } from '../../sim/map_doc';
+import type { ObjectMoves } from '../../sim/moved_objects';
 import { Sim } from '../../sim/sim';
 import { cutBounds, cutSdfAt, cutVerticalBounds } from '../../sim/terrain_cuts';
 import type {
@@ -63,6 +64,7 @@ import type {
   NpcDef,
   PlacedAsset,
   TerrainHole,
+  WorldContent,
 } from '../../sim/types';
 import { terrainHeight, zoneBiomeAt } from '../../sim/world';
 import { t } from '../../ui/i18n';
@@ -601,6 +603,9 @@ export class Editor3DViewport {
   private pendingMobId: number | null = null;
   // And for a movable built-in gameplay object (its `<kind>:<id>` key).
   private pendingObjectKey: string | null = null;
+  /** The world the viewport Sim was built over (a copy without placements),
+   *  kept so a live object move reaches the Sim's own readers too. */
+  private simWorld: WorldContent | null = null;
   /** Picks, live moves and the selection ring for the built-in gameplay
    *  objects a map can move (movable_objects_view.ts). */
   readonly objects = new MovableObjectsView({
@@ -609,7 +614,18 @@ export class Editor3DViewport {
     seed: () => this.seed,
     canvas: () => this.canvas,
     moves: () => this.map.objectMoves,
+    // A linked map is a district of the full world at an offset: its moves
+    // would not land where the maker sees them, so the objects stay put there.
+    enabled: () => !this.map.worldAnchor,
   });
+
+  /** The live record for the viewport Sim's own readers (its farm beds,
+   *  gather range, door exits) as well as the active world's. */
+  setSimObjectMoves(moves: ObjectMoves | undefined): void {
+    if (!this.simWorld) return;
+    if (moves) this.simWorld.objectMoves = moves;
+    else delete this.simWorld.objectMoves;
+  }
   // Ctrl+drag box select: client-space corners + whether Ctrl/Cmd+Shift should
   // accumulate this box into the existing placement selection.
   private marquee: {
@@ -955,10 +971,11 @@ export class Editor3DViewport {
     if (this.disposed || gen !== this.generation) return;
     // The live PlacedAssetsView owns placements, so strip them from the Sim's
     // world or the Renderer ctor would build a second, frozen copy.
+    this.simWorld = { ...world, placements: undefined };
     this.sim = new Sim({
       seed: this.seed,
       playerClass: 'warrior',
-      world: { ...world, placements: undefined },
+      world: this.simWorld,
     });
     this.authoredCampMobIds.clear();
     for (const entity of this.sim.entities.values()) {

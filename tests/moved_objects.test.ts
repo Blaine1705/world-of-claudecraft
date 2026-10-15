@@ -12,6 +12,7 @@ import {
   queryOpenWorldColliders,
 } from '../src/sim/colliders';
 import { FARM_PATCHES, farmBedById } from '../src/sim/content/farm_patches';
+import { GATHER_NODES as CONTENT_GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { HEALING_TRAINING_GROUND_SPAWNS } from '../src/sim/content/healing_training';
 import {
   HUB_HEALING_DUMMY_ID,
@@ -129,6 +130,26 @@ describe('moved objects: the record', () => {
     expect(doc?.objectMoves).toEqual({ 'farmBed:bed_eastbrook_1': { x: 3, z: 4 } });
     const none = sanitizeMapDoc({ content: { zones: BUILTIN_WORLD.zones } });
     expect(none && 'objectMoves' in none).toBe(false);
+  });
+});
+
+describe('moved objects: activating a world', () => {
+  it('freezes a record that arrived as JSON (a playtest handoff, a published map)', () => {
+    const world = JSON.parse(
+      JSON.stringify({
+        ...BUILTIN_WORLD,
+        objectMoves: { [objectMoveKey('farmBed', BED)]: { x: 1, z: 2 } },
+      }),
+    ) as WorldContent;
+    expect(Object.isFrozen(world.objectMoves)).toBe(false);
+    setActiveWorldContent(world);
+    expect(Object.isFrozen(world.objectMoves)).toBe(true);
+    expect(Object.isFrozen(world.objectMoves?.[objectMoveKey('farmBed', BED)])).toBe(true);
+    expect(world.objectMoves).toEqual({ [objectMoveKey('farmBed', BED)]: { x: 1, z: 2 } });
+    // An empty record leaves no field behind.
+    const empty = { ...BUILTIN_WORLD, objectMoves: {} } as WorldContent;
+    setActiveWorldContent(empty);
+    expect('objectMoves' in empty).toBe(false);
   });
 });
 
@@ -260,6 +281,32 @@ describe('moved objects: gather nodes', () => {
   const target = { x: node.pos.x + 30, z: node.pos.z + 12 };
   const moves = freezeObjectMoves({ [objectMoveKey('gatherNode', node.id)]: target });
 
+  it('memoizes only on deep-frozen content, and hands out frozen answers', () => {
+    // ONE table: the data merge re-exports the deep-frozen content table, so
+    // every reader resolves against the same memo key.
+    expect(GATHER_NODES).toBe(CONTENT_GATHER_NODES);
+    expect(Object.isFrozen(GATHER_NODES)).toBe(true);
+    expect(Object.isFrozen(GATHER_NODES[0])).toBe(true);
+    expect(Object.isFrozen(GATHER_NODES[0].pos)).toBe(true);
+    const nodes = gatherNodesFor(moves, GATHER_NODES);
+    expect(Object.isFrozen(nodes)).toBe(true);
+    const moved = nodes.find((n) => n.id === node.id);
+    expect(Object.isFrozen(moved)).toBe(true);
+    expect(Object.isFrozen(moved?.pos)).toBe(true);
+    // A record frozen on the outside with a live entry is never memoized:
+    // each read resolves afresh, so an entry mutated in place shows at once.
+    const entry = { x: 1, z: 2 };
+    const shallow = Object.freeze({ [objectMoveKey('gatherNode', node.id)]: entry });
+    const a = gatherNodesFor(shallow, GATHER_NODES);
+    expect(gatherNodesFor(shallow, GATHER_NODES)).not.toBe(a);
+    entry.x = 9;
+    expect(gatherNodesFor(shallow, GATHER_NODES).find((n) => n.id === node.id)?.pos.x).toBe(9);
+    // A different table never answers from another table's memo entry.
+    const copy = [...GATHER_NODES];
+    expect(gatherNodesFor(moves, copy)).not.toBe(nodes);
+    expect(gatherNodesFor(moves, copy)).toEqual(nodes);
+  });
+
   it('resolves the moved node in place, keeping order and every other row', () => {
     const nodes = gatherNodesFor(moves, GATHER_NODES);
     expect(nodes).toBe(gatherNodesFor(moves, GATHER_NODES));
@@ -270,6 +317,40 @@ describe('moved objects: gather nodes', () => {
     expect(node.pos).not.toEqual(target);
     expect(gatherNodeById(node.id, moves)?.pos).toEqual(target);
     expect(gatherNodeById(node.id)).toBe(node);
+  });
+
+  it('the harvest command measures its reach from the moved node', () => {
+    const ore = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_1');
+    if (!ore) throw new Error('no ore_eastbrook_1');
+    const spot = { x: ore.pos.x + 7, z: ore.pos.z + 3 };
+    const world = movedWorld({ [objectMoveKey('gatherNode', ore.id)]: spot });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world });
+    const pid = sim.addPlayer('warrior', 'Gatherer');
+    sim.addItem('copper_mining_pick', 1, pid); // bare hands never harvest
+    for (const e of sim.entities.values()) {
+      if (e.kind === 'mob') e.dead = true;
+    }
+    const errors = (): string[] =>
+      sim
+        .tick()
+        .filter((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error')
+        .map((e) => e.text);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('no player');
+    const stand = (x: number, z: number) => {
+      p.pos.x = x;
+      p.pos.z = z;
+      p.pos.y = terrainHeight(x, z, sim.cfg.seed);
+      p.prevPos = { ...p.pos };
+    };
+    stand(ore.pos.x, ore.pos.z);
+    expect(sim.harvestNode(ore.id, undefined, pid)).toBe(false);
+    expect(errors()).toContain('Too far away.');
+    stand(spot.x, spot.z);
+    const ok = sim.harvestNode(ore.id, undefined, pid);
+    expect(errors()).toEqual([]);
+    expect(ok).toBe(true);
+    expect(p.gatherCastNodeId).toBe(ore.id);
   });
 
   it('the active world reads the moved node, and its collider travels with it', () => {

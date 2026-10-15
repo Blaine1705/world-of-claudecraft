@@ -1162,7 +1162,10 @@ export class EditorApp {
       if (next) this.activeWorld.objectMoves = next;
       else delete this.activeWorld.objectMoves;
     },
-    moveLive: (key, before, after) => this.viewport3d?.objects.moveLive(key, before, after),
+    moveLive: (key, before, after) => {
+      this.viewport3d?.setSimObjectMoves(after);
+      this.viewport3d?.objects.moveLive(key, before, after);
+    },
     showSelection: (key) => this.viewport3d?.objects.setSelected(key),
     pushUndo: (entry) => this.pushUndo(entry),
     committed: () => {
@@ -3872,6 +3875,7 @@ export class EditorApp {
       if (mobLoose !== null && this.selectMobFromTap(mobLoose.id, false)) return;
     }
     if (this.selectedNpcKeys.size > 0) this.clearNpcSelection();
+    this.objectMoves.select(null);
     if (this.selectedMobIds.size > 0) {
       this.clearMobSelection();
       this.syncSelectedMobRouteOverlay();
@@ -3919,6 +3923,8 @@ export class EditorApp {
       this.syncSelectedMobRouteOverlay();
     }
     if (this.selectedLight !== null) this.setSelectedLight(null);
+    if (this.selectedSound !== null) this.setSelectedSound(null);
+    this.selectedCamp = null;
     this.selectedKey = null;
     this.objectMoves.select(key);
     this.inspector.refresh();
@@ -6716,6 +6722,7 @@ export class EditorApp {
   private setSelectedLight(index: number | null): void {
     if (index !== null) {
       this.setSelectedPlacement(null);
+      this.objectMoves.select(null);
       if (this.selectedSound !== null) {
         this.selectedSound = null;
         this.viewport3d?.setSelectedSound(null);
@@ -6926,6 +6933,7 @@ export class EditorApp {
   private setSelectedSound(index: number | null): void {
     if (index !== null) {
       this.setSelectedPlacement(null);
+      this.objectMoves.select(null);
       if (this.selectedLight !== null) {
         this.selectedLight = null;
         this.viewport3d?.setSelectedLight(null);
@@ -15133,6 +15141,7 @@ export class EditorApp {
     this.buildingWorkspace?.cancel();
     // An open transform burst commits first, so Ctrl+Z reverts THAT burst.
     this.flushTransformCommit();
+    this.objectMoves.commitPending();
     if (this.undo.undo()) {
       this.markDirty();
       this.inspector.refresh();
@@ -15143,6 +15152,7 @@ export class EditorApp {
   private doRedo(): void {
     this.buildingWorkspace?.cancel();
     this.flushTransformCommit();
+    this.objectMoves.commitPending();
     if (this.undo.redo()) {
       this.markDirty();
       this.inspector.refresh();
@@ -16061,6 +16071,7 @@ export class EditorApp {
 
   // Replace the whole working document and rebuild the editor over its content.
   private loadMap(map: CustomMap, options: { preserveViewportTerrain?: boolean } = {}): boolean {
+    this.objectMoves.select(null);
     // Collision Master may reuse the already-running world renderer. In that
     // case keep the globally active terrain content on the return map too;
     // the scratch placement is detached and never needs to replace it.
@@ -16432,7 +16443,8 @@ export class EditorApp {
         this.selectedNpcKeys.size > 0 ||
         this.selectedMobIds.size > 0 ||
         this.selectedLight !== null ||
-        this.selectedMusicArea !== null
+        this.selectedMusicArea !== null ||
+        this.objectMoves.selectedKey !== null
       ) {
         this.setSelectedPlacement(null);
         this.selectedKey = null;
@@ -16472,7 +16484,8 @@ export class EditorApp {
         ev.key === 'ArrowRight') &&
       (this.selectedPlacement !== null ||
         this.selectedNpcDefs().length > 0 ||
-        this.selectedMobCamps.size > 0)
+        this.selectedMobCamps.size > 0 ||
+        this.objectMoves.selectedKey !== null)
     ) {
       ev.preventDefault();
       this.nudgeSelected(ev.key, ev.shiftKey);

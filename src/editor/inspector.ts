@@ -1408,10 +1408,13 @@ export class Inspector {
         break;
       case 'move':
       case 'rotate':
-      case 'scale':
+      case 'scale': {
         this.transformPanel(tool);
-        this.selectPanel();
+        const moved = d.movedObjectPanel?.() ?? null;
+        if (moved) this.root.appendChild(moved);
+        else this.selectPanel();
         break;
+      }
       case 'raise':
       case 'lower':
         this.brushPanel(true, true);
