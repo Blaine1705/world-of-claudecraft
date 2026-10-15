@@ -51,6 +51,11 @@ import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
 import { highwatchManorFlames, highwatchManorLights } from './highwatch_manor_lights';
+import {
+  buildHighwatchManorSmoke,
+  highwatchManorSmokePrewarmPart,
+  type ManorSmokeView,
+} from './highwatch_manor_smoke';
 import { isHighwatchRebuildBuilding } from './highwatch_town';
 import {
   type KitSurfaceFamily,
@@ -1061,6 +1066,7 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     ...wyrmwatchHarborPrewarmParts(),
     ...wickharborWharfPrewarmParts(),
     ...wickharborHarborPrewarmParts(),
+    highwatchManorSmokePrewarmPart(),
   ]) {
     const mesh = new THREE.Mesh(part.geometry, part.material);
     mesh.castShadow = true;
@@ -1400,6 +1406,7 @@ export function buildProps(
   // moored transport ships (render/transport_ship.ts): live, idle-animated,
   // their own LODs; ticked from update() below, never merged or ghosted
   const transportShips: TransportShipView[] = [];
+  let manorSmoke: ManorSmokeView | null = null;
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
   const builtInShaped = isBuiltinShapedWorld(activeContent);
@@ -1753,6 +1760,11 @@ export function buildProps(
       group.add(light);
       fireLights.push(light);
     }
+    // ...and its kitchen chimney's smoke (cosmetic: the painter draws none on the low tier)
+    manorSmoke = buildHighwatchManorSmoke(seed);
+    group.add(manorSmoke.mesh);
+    keepFromMerge.add(manorSmoke.mesh);
+    noShadow.add(manorSmoke.mesh);
     for (const fire of highwatchManorFlames(seed, usePbr ? EMISSIVE_LIGHT : 1.4)) {
       group.add(fire.holder);
       flames.push(fire.flame);
@@ -2684,6 +2696,7 @@ export function buildProps(
     ): void {
       const fogFarSq = fogFar * fogFar;
       scheduledShips?.sync(dt);
+      manorSmoke?.update(camX, camZ, dt);
       for (let i = 0; i < transportShips.length; i++) {
         transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
       }
