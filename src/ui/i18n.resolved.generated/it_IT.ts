@@ -12199,6 +12199,7 @@ export const it_IT: EnTranslations = {
     "newCharacter": "Nuovo personaggio",
     "appearance": "Aspetto",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Personalizza",
     "body": "Corpo",
     "genderMale": "Uomo",

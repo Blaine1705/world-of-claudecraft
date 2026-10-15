@@ -12199,6 +12199,7 @@ export const ru_RU: EnTranslations = {
     "newCharacter": "Новый персонаж",
     "appearance": "Внешность",
     "modelLoading": "Загрузка персонажа...",
+    "previewPinchHint": "Масштаб двумя пальцами",
     "customize": "Настройка",
     "body": "Телосложение",
     "genderMale": "Мужчина",

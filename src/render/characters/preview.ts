@@ -61,6 +61,8 @@ import {
   TOUCH_TURN_PER_PX,
   type TouchStep,
   type TouchView,
+  touchHintOffered,
+  touchStepMoves,
   touchViewAt,
   touchViewPose,
 } from './preview_touch_core';
@@ -103,6 +105,17 @@ export interface PreviewLoadingLayer {
   hide(): void;
 }
 
+/** The one-time gesture hint a host shows beside a touch stage's creator model until the
+ *  player first moves it (the launcher's pinch hint, src/ui/preview_touch_hint.ts).
+ *  Structural, like PreviewLoadingLayer: the DOM lives in src/ui, and so does the memory of
+ *  whether the player has moved the model before. show() and hide() run every frame and must
+ *  be idempotent; interacted() is the player's first pinch, slide, turn or double tap. */
+export interface PreviewTouchHint {
+  show(container: HTMLElement): void;
+  hide(): void;
+  interacted(): void;
+}
+
 /** A camera this close (world units) frames a head and shoulders, not a whole body: the
  *  loading layer draws its bust there. */
 const LOADING_BUST_MAX_DIST = 2.6;
@@ -117,9 +130,9 @@ export interface CharacterPreviewOptions {
   /** Read live: whether this stage is a TOUCH stage, the phone interface's (the launcher
    *  passes body.mobile-touch). A touch stage takes pinch to zoom, two fingers to move the
    *  view, one finger to turn the character and tilt the camera, and a double tap to put the
-   *  camera back (preview_touch_core.ts); the creator opens on the head and shoulders there
-   *  and a category never eases the camera to its close-up (setFocus). Omitted (the HUD's
-   *  stages): the mouse turntable, as before. */
+   *  camera back (preview_touch_core.ts); every stage there (the creator and the roster's
+   *  pick) opens on the head and shoulders, and a category never eases the camera to its
+   *  close-up (setFocus). Omitted (the HUD's stages): the mouse turntable, as before. */
   touchStage?: () => boolean;
 }
 
@@ -255,6 +268,8 @@ export class CharacterPreview {
   private armorDetail: WocArmorDetail = 'full';
   /** The host's loading layer (setLoadingLayer): shown while the stage has no character drawn. */
   private loadingLayer: PreviewLoadingLayer | null = null;
+  /** The host's gesture hint (setTouchHint): offered beside a touch creator's drawn model. */
+  private touchHint: PreviewTouchHint | null = null;
 
   // Drag controls
   private isDragging = false;
@@ -275,7 +290,6 @@ export class CharacterPreview {
     aspect: 0,
     headY: 0,
     headH: -1,
-    creator: false,
     view: null as unknown,
   };
 
@@ -901,10 +915,10 @@ export class CharacterPreview {
     };
   }
 
-  /** The view the touch stage opens on: the creator on the head and shoulders, any other
-   *  stage (the roster's pick) on the whole body. */
-  private touchOpeningView(near: PreviewCamPose, far: PreviewCamPose): TouchView {
-    return touchViewAt(this.armorSurface === 'creator' ? near : far);
+  /** The view the touch stage opens on: the head and shoulders, on every launcher stage (the
+   *  creator and the roster's pick alike); a pinch takes it out to the whole body. */
+  private touchOpeningView(near: PreviewCamPose): TouchView {
+    return touchViewAt(near);
   }
 
   /** The stage became (or stopped being) a touch stage between two frames: the phone
@@ -931,11 +945,10 @@ export class CharacterPreview {
   }
 
   /** Solve and apply the touch stage's camera: only when what it depends on moved (the
-   *  stage's shape, the drawn head, the stage kind, the player's view), so a still stage
-   *  costs a handful of compares a frame. `force` re-applies it regardless. */
+   *  stage's shape, the drawn head, the player's view), so a still stage costs a handful of
+   *  compares a frame. `force` re-applies it regardless. */
   private stepTouchCamera(force = false): void {
     const head = this.focusHeadOf();
-    const creator = this.armorSurface === 'creator';
     const s = this.touchSolvedFor;
     const headH = head.h ?? -1;
     if (
@@ -943,7 +956,6 @@ export class CharacterPreview {
       s.aspect === this.camera.aspect &&
       s.headY === head.y &&
       s.headH === headH &&
-      s.creator === creator &&
       s.view === this.touchView
     ) {
       return;
@@ -951,10 +963,9 @@ export class CharacterPreview {
     s.aspect = this.camera.aspect;
     s.headY = head.y;
     s.headH = headH;
-    s.creator = creator;
     s.view = this.touchView;
     const { near, far } = this.touchFramings();
-    this.applyPose(touchViewPose(this.touchView ?? this.touchOpeningView(near, far), near, far));
+    this.applyPose(touchViewPose(this.touchView ?? this.touchOpeningView(near), near, far));
   }
 
   /** Force the renderer to match the current visible container size. */
@@ -992,6 +1003,7 @@ export class CharacterPreview {
       this.standDownOpenGate();
     }
     this.syncLoadingLayer();
+    this.syncTouchHint();
   }
 
   /** Hand the stage the 2D layer to show while it has no character drawn (null: none).
@@ -1001,6 +1013,30 @@ export class CharacterPreview {
     if (this.loadingLayer && this.loadingLayer !== layer) this.loadingLayer.hide();
     this.loadingLayer = layer;
     this.syncLoadingLayer();
+  }
+
+  /** Hand the stage the gesture hint it offers beside a touch creator's drawn model (null:
+   *  none). The launcher passes its pinch hint. */
+  setTouchHint(hint: PreviewTouchHint | null): void {
+    if (this.destroyed) return;
+    if (this.touchHint && this.touchHint !== hint) this.touchHint.hide();
+    this.touchHint = hint;
+    this.syncTouchHint();
+  }
+
+  /** Offer the gesture hint while a visible touch creator draws its model, else take it off
+   *  (touchHintOffered). Idempotent on the hint's side, like the loading layer. */
+  private syncTouchHint(): void {
+    const hint = this.touchHint;
+    if (!hint) return;
+    const offered = touchHintOffered({
+      touch: this.touchStage(),
+      creator: this.armorSurface === 'creator',
+      visible: this.renderActive,
+      drawn: this.subjectDrawn(),
+    });
+    if (offered) hint.show(this.container);
+    else hint.hide();
   }
 
   /** Whether the stage draws its character now: a body is built and shown (a WOC body only
@@ -1307,6 +1343,7 @@ export class CharacterPreview {
         // put the camera and the turn back where the stage opened
         this.resetTouchView();
         this.characterGroup.rotation.y = 0;
+        this.touchHint?.interacted();
         this.wakeLoop();
       },
     });
@@ -1332,15 +1369,17 @@ export class CharacterPreview {
   }
 
   /** One sample of the fingers on a touch stage: a one-finger drag turns the character and
-   *  tilts the camera, two fingers pinch and slide the view (preview_touch_core.ts). */
+   *  tilts the camera, two fingers pinch and slide the view (preview_touch_core.ts). The
+   *  first one that moves anything retires the gesture hint for good. */
   private applyTouchStep(step: TouchStep): void {
+    if (touchStepMoves(step)) this.touchHint?.interacted();
     if (step.dragX !== 0) this.characterGroup.rotation.y += step.dragX * TOUCH_TURN_PER_PX;
     if (step.dragY === 0 && step.pinch === 1 && step.slideX === 0 && step.slideY === 0) {
       this.wakeLoop();
       return;
     }
     const { near, far } = this.touchFramings();
-    const from = this.touchView ?? this.touchOpeningView(near, far);
+    const from = this.touchView ?? this.touchOpeningView(near);
     this.touchView = applyTouchStep(
       from,
       step,
@@ -1382,6 +1421,7 @@ export class CharacterPreview {
       this.timer.reset();
       this.standDownOpenGate();
       this.loadingLayer?.hide();
+      this.touchHint?.hide();
       return;
     }
     this.wakeLoop();
@@ -1394,6 +1434,7 @@ export class CharacterPreview {
     if (touch) this.stepTouchCamera();
     else this.stepFocus(dt);
     this.syncLoadingLayer();
+    this.syncTouchHint();
     // The second live draw site: a gate covering only syncSize is not a gate,
     // because the loop draws the same cold scene on the very next frame.
     if (!this.gateAllowsDraw()) return;
@@ -1567,6 +1608,8 @@ export class CharacterPreview {
     this.hideStandIn();
     this.loadingLayer?.hide();
     this.loadingLayer = null;
+    this.touchHint?.hide();
+    this.touchHint = null;
     if (this.currentVisual) {
       this.characterGroup.remove(this.currentVisual.root);
       this.currentVisual.dispose();

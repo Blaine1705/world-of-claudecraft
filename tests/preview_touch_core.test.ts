@@ -21,7 +21,9 @@ import {
   TOUCH_TILT_PER_PX,
   type TouchPoint,
   type TouchStep,
+  touchHintOffered,
   touchStepBetween,
+  touchStepMoves,
   touchViewAt,
   touchViewPose,
 } from '../src/render/characters/preview_touch_core';
@@ -228,5 +230,44 @@ describe('isDoubleTap', () => {
     expect(isDoubleTap(first, { t: 1000 + TOUCH_DOUBLE_TAP_MS - 1, x: 108, y: 96 })).toBe(true);
     expect(isDoubleTap(first, { t: 1000 + TOUCH_DOUBLE_TAP_MS + 1, x: 100, y: 100 })).toBe(false);
     expect(isDoubleTap(first, { t: 1100, x: 200, y: 100 })).toBe(false);
+  });
+});
+
+describe('touchStepMoves (what retires the gesture hint)', () => {
+  const still: TouchStep = { dragX: 0, dragY: 0, pinch: 1, slideX: 0, slideY: 0 };
+
+  it('is false for the empty step a finger landing or lifting sends', () => {
+    expect(touchStepMoves(still)).toBe(false);
+    // the real empty step, from a change of shape
+    const one = new Map<number, TouchPoint>([[1, { x: 10, y: 10 }]]);
+    const two = new Map<number, TouchPoint>([
+      [1, { x: 10, y: 10 }],
+      [2, { x: 60, y: 10 }],
+    ]);
+    expect(touchStepMoves(touchStepBetween(one, two))).toBe(false);
+  });
+
+  it('is true for each way the fingers move the model, alone', () => {
+    expect(touchStepMoves({ ...still, dragX: 1 })).toBe(true);
+    expect(touchStepMoves({ ...still, dragY: -1 })).toBe(true);
+    expect(touchStepMoves({ ...still, pinch: 1.05 })).toBe(true);
+    expect(touchStepMoves({ ...still, pinch: 0.95 })).toBe(true);
+    expect(touchStepMoves({ ...still, slideX: 2 })).toBe(true);
+    expect(touchStepMoves({ ...still, slideY: -2 })).toBe(true);
+  });
+});
+
+describe('touchHintOffered (the phone creator beside a drawn model)', () => {
+  const all = { touch: true, creator: true, visible: true, drawn: true };
+
+  it('is offered on a visible touch creator whose model draws', () => {
+    expect(touchHintOffered(all)).toBe(true);
+  });
+
+  it('is withheld when any one fact is missing', () => {
+    expect(touchHintOffered({ ...all, touch: false })).toBe(false);
+    expect(touchHintOffered({ ...all, creator: false })).toBe(false);
+    expect(touchHintOffered({ ...all, visible: false })).toBe(false);
+    expect(touchHintOffered({ ...all, drawn: false })).toBe(false);
   });
 });

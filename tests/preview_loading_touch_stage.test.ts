@@ -105,8 +105,9 @@ function harness(opts: { touch: boolean; creator: boolean }): Harness {
     touchStage: () => opts.touch,
     touchWasActive: false,
     touchView: null,
-    touchSolvedFor: { aspect: 0, headY: 0, headH: -1, creator: false, view: null },
+    touchSolvedFor: { aspect: 0, headY: 0, headH: -1, view: null },
     loadingLayer: null,
+    touchHint: null,
   });
   return {
     preview,
@@ -202,12 +203,48 @@ describe('the touch stage (a phone)', () => {
     expect(h.pose().y).toBeCloseTo(want.y, 6);
   });
 
-  it('opens any other stage (the roster pick) on the whole body', () => {
+  it('opens the roster pick (character select) on the head and shoulders too', () => {
     const h = harness({ touch: true, creator: false });
     stageBody(h, true);
     h.preview.syncSize();
-    expect(h.pose().z).toBeCloseTo(PREVIEW_FRAMING.sheet.z, 6);
-    expect(h.pose().lookY).toBeCloseTo(PREVIEW_FRAMING.sheet.lookY, 6);
+    const want = touchShouldersPose(300 / 330, HEAD.y, HEAD.h);
+    expect(h.pose().lookY).toBeCloseTo(want.lookY, 6);
+    expect(h.pose().z).toBeCloseTo(want.z, 6);
+    expect(h.pose().y).toBeCloseTo(want.y, 6);
+    // the close shot, not the whole-body sheet framing it opened on before
+    expect(h.pose().z).toBeLessThan(PREVIEW_FRAMING.sheet.z / 2);
+  });
+
+  it('keeps the shoulders shot when the stage changes hands between the creator and the roster', () => {
+    const h = harness({ touch: true, creator: true });
+    stageBody(h, true);
+    h.preview.syncSize();
+    const opened = { ...h.pose() };
+    // back to character select: the creator's surface is left, the camera stays put
+    h.state.armorSurface = 'own';
+    h.frame();
+    h.preview.syncSize();
+    expect(h.pose()).toEqual(opened);
+  });
+
+  it('a pinch out from the roster pick still reaches the whole body', () => {
+    const h = harness({ touch: true, creator: false });
+    stageBody(h, true);
+    h.preview.syncSize();
+    const step: TouchStep = { dragX: 0, dragY: 0, pinch: 0.2, slideX: 0, slideY: 0 };
+    for (let i = 0; i < 4; i++) {
+      (h.preview as unknown as { applyTouchStep(s: TouchStep): void }).applyTouchStep(step);
+      h.frame();
+    }
+    // the far end of the path is the sheet framing's distance (a little past it at most)
+    expect(h.pose().z).toBeGreaterThan(PREVIEW_FRAMING.sheet.z * 0.9);
+  });
+
+  it('draws the bust silhouette while the roster pick loads on a phone', () => {
+    const h = harness({ touch: true, creator: false });
+    h.preview.setLoadingLayer(h.layer);
+    h.preview.syncSize();
+    expect(h.layer.show).toHaveBeenLastCalledWith(h.container, 'bust');
   });
 
   it('never moves the camera for a category: no zoom on Skin Tone', () => {
@@ -350,6 +387,144 @@ describe('the touch stage, frame by frame', () => {
     h.container.clientWidth = 0;
     h.frame();
     expect(h.layer.hide).toHaveBeenCalled();
+  });
+});
+
+/** The gesture hint's three calls, typed as PreviewTouchHint takes them. */
+interface HintMock {
+  show: Mock<(container: HTMLElement) => void>;
+  hide: Mock<() => void>;
+  interacted: Mock<() => void>;
+}
+
+function hintMock(): HintMock {
+  return {
+    show: vi.fn<(container: HTMLElement) => void>(),
+    hide: vi.fn<() => void>(),
+    interacted: vi.fn<() => void>(),
+  };
+}
+
+describe('the gesture hint (the phone creator)', () => {
+  const gesture = (h: Harness, s: Partial<TouchStep>) =>
+    (h.preview as unknown as { applyTouchStep(s: TouchStep): void }).applyTouchStep({
+      dragX: 0,
+      dragY: 0,
+      pinch: 1,
+      slideX: 0,
+      slideY: 0,
+      ...s,
+    });
+
+  it('is offered beside a touch creator once its model draws, never while it loads', () => {
+    const h = harness({ touch: true, creator: true });
+    const hint = hintMock();
+    h.preview.setTouchHint(hint);
+    h.preview.syncSize();
+    // nothing drawn yet: the loading silhouette's turn, not the hint's
+    expect(hint.show).not.toHaveBeenCalled();
+    const body = stageBody(h, false);
+    h.frame();
+    expect(hint.show).not.toHaveBeenCalled();
+    body.bodyShown = true;
+    h.frame();
+    expect(hint.show).toHaveBeenLastCalledWith(h.container);
+  });
+
+  it('is never offered on the roster pick (character select)', () => {
+    const h = harness({ touch: true, creator: false });
+    const hint = hintMock();
+    stageBody(h, true);
+    h.preview.setTouchHint(hint);
+    h.preview.syncSize();
+    h.frame();
+    expect(hint.show).not.toHaveBeenCalled();
+    expect(hint.hide).toHaveBeenCalled();
+  });
+
+  it('is never offered on a desktop (mouse) stage', () => {
+    const h = harness({ touch: false, creator: true });
+    const hint = hintMock();
+    stageBody(h, true);
+    h.preview.setTouchHint(hint);
+    h.preview.syncSize();
+    h.frame();
+    expect(hint.show).not.toHaveBeenCalled();
+  });
+
+  it('comes off when the phone interface is switched off, and when the loop parks', () => {
+    const opts = { touch: true, creator: true };
+    const h = harness(opts);
+    const hint = hintMock();
+    stageBody(h, true);
+    h.preview.setTouchHint(hint);
+    h.preview.syncSize();
+    expect(hint.show).toHaveBeenCalled();
+    hint.hide.mockClear();
+    opts.touch = false;
+    h.frame();
+    expect(hint.hide).toHaveBeenCalled();
+    // back on, then the stage hides without a resize callback: the parking frame takes it off
+    opts.touch = true;
+    h.frame();
+    hint.hide.mockClear();
+    h.container.clientWidth = 0;
+    h.frame();
+    expect(hint.hide).toHaveBeenCalled();
+  });
+
+  it('hands a replaced hint back before taking the new one', () => {
+    const h = harness({ touch: true, creator: true });
+    const first = hintMock();
+    const next = hintMock();
+    stageBody(h, true);
+    h.preview.setTouchHint(first);
+    h.preview.syncSize();
+    first.hide.mockClear();
+    h.preview.setTouchHint(next);
+    expect(first.hide).toHaveBeenCalledTimes(1);
+    expect(next.show).toHaveBeenLastCalledWith(h.container);
+  });
+
+  it('hears every gesture that moves the model, and no empty step', () => {
+    const h = harness({ touch: true, creator: true });
+    h.state.characterGroup = { rotation: { y: 0 } };
+    const hint = hintMock();
+    stageBody(h, true);
+    h.preview.setTouchHint(hint);
+    h.preview.syncSize();
+    // a finger landing or lifting sends the empty step: not a gesture
+    gesture(h, {});
+    expect(hint.interacted).not.toHaveBeenCalled();
+    gesture(h, { pinch: 1.2 });
+    gesture(h, { dragX: 8 });
+    gesture(h, { dragY: -5 });
+    gesture(h, { slideX: 3, slideY: 4 });
+    expect(hint.interacted).toHaveBeenCalledTimes(4);
+  });
+
+  it('hears a double tap (the camera reset) as a gesture', () => {
+    const canvasHandlers = new Map<string, (e: unknown) => void>();
+    vi.stubGlobal('window', { addEventListener: () => {}, removeEventListener: () => {} });
+    const h = harness({ touch: true, creator: true });
+    h.state.characterGroup = { rotation: { y: 0 } };
+    h.state.canvas = {
+      isConnected: true,
+      addEventListener: (type: string, fn: (e: unknown) => void) => canvasHandlers.set(type, fn),
+      removeEventListener: () => {},
+    };
+    const hint = hintMock();
+    h.preview.setTouchHint(hint);
+    (h.preview as unknown as { setupDragControls(): void }).setupDragControls();
+    const tap = (t: number) => {
+      const at = { pointerType: 'touch', pointerId: 1, clientX: 120, clientY: 90 };
+      canvasHandlers.get('pointerdown')?.({ ...at, type: 'pointerdown', timeStamp: t });
+      canvasHandlers.get('pointerup')?.({ ...at, type: 'pointerup', timeStamp: t + 60 });
+    };
+    tap(1000);
+    expect(hint.interacted).not.toHaveBeenCalled();
+    tap(1200);
+    expect(hint.interacted).toHaveBeenCalledTimes(1);
   });
 });
 
