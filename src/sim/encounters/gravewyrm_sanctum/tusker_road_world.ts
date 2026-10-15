@@ -28,9 +28,27 @@ export function planTrampleLaneWorld(
   z: number,
   yaw: number,
   outcrops: readonly OutcropSpot[],
+  out?: TuskerLane,
 ): TuskerLane {
   const o = sanctumOriginAt(z);
-  const local = outcrops.map((spot) => ({ id: spot.id, x: spot.x - o.x, z: spot.z - o.z }));
-  const lane = planTrampleLane(x - o.x, z - o.z, yaw, local);
-  return { ...lane, x, z };
+  // The outcrops in the instance's frame, on reused spots (the painters plan
+  // every frame of a bar; nothing is allocated once the pool is warm).
+  const local = LOCAL;
+  local.length = outcrops.length;
+  for (let i = 0; i < outcrops.length; i++) {
+    const spot = (POOL[i] ??= { id: 0, x: 0, z: 0 });
+    spot.id = outcrops[i].id;
+    spot.x = outcrops[i].x - o.x;
+    spot.z = outcrops[i].z - o.z;
+    local[i] = spot;
+  }
+  const lane = planTrampleLane(x - o.x, z - o.z, yaw, local, out);
+  lane.x = x;
+  lane.z = z;
+  return lane;
 }
+
+/** The reused instance-local spots of planTrampleLaneWorld (client only:
+ *  the encounter plans in its own frame and never calls it). */
+const POOL: OutcropSpot[] = [];
+const LOCAL: OutcropSpot[] = [];

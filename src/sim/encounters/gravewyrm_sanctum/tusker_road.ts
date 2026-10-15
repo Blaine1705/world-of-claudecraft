@@ -86,6 +86,7 @@ export function planTrampleLane(
   z: number,
   yaw: number,
   outcrops: readonly OutcropSpot[],
+  out?: TuskerLane,
 ): TuskerLane {
   const run = trampleReach(x, z, yaw, T.trampleLength);
   const ax = Math.sin(yaw);
@@ -107,16 +108,21 @@ export function planTrampleLane(
       face = f;
     }
   }
-  if (hit)
-    return {
-      x,
-      z,
-      yaw,
-      length: face - T.tuskReach,
-      reach: face + T.outcropRadius,
-      outcropId: hit.id,
-    };
-  return { x, z, yaw, length: run, reach: run + TUSKER_BODY, outcropId: null };
+  // `out` (a painter's reused lane) is filled in place: no allocation.
+  const lane = out ?? { x, z, yaw, length: 0, reach: 0, outcropId: null };
+  lane.x = x;
+  lane.z = z;
+  lane.yaw = yaw;
+  if (hit) {
+    lane.length = face - T.tuskReach;
+    lane.reach = face + T.outcropRadius;
+    lane.outcropId = hit.id;
+  } else {
+    lane.length = run;
+    lane.reach = run + TUSKER_BODY;
+    lane.outcropId = null;
+  }
+  return lane;
 }
 
 /** Is (px, pz) inside the strip a soulfire trail burns: `length` yards from

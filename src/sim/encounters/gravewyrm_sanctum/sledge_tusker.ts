@@ -203,7 +203,10 @@ export function aimTrample(
 ): void {
   const lane = st.lane;
   if (!lane || tusker.castTargetId === null || trampleAimLocked(tusker.castRemaining)) return;
-  const target = ctx.entities.get(tusker.castTargetId);
+  // Only a living player still in this claim (one who ported out keeps the
+  // lane where it last pointed).
+  const id = tusker.castTargetId;
+  const target = claimPlayers(ctx, inst).find((p) => p.id === id);
   if (!target || target.dead) return;
   const o = ctx.instanceOriginOf(inst);
   const yaw = trampleAimYaw(lane.x, lane.z, target.pos.x - o.x, target.pos.z - o.z, lane.yaw);

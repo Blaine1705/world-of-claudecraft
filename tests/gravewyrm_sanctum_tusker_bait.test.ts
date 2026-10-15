@@ -456,22 +456,47 @@ describe('the Trample follows its target until the lock (the readability pass)',
     expect(dealt(r, r.me.id, 'Trample')).toHaveLength(1);
   });
 
+  it('a target who leaves the claim leaves the lane where it last pointed', () => {
+    const r = road();
+    baitSetup(r);
+    run(r, T.trampleFirst + 0.05);
+    const st = state(r);
+    const before = { ...(st.lane as NonNullable<typeof st.lane>) };
+    // Ported out: far outside the instance (still alive, still an entity).
+    r.me.pos = { x: r.ox + 5000, y: r.me.pos.y, z: r.oz + 5000 };
+    r.me.prevPos = { ...r.me.pos };
+    run(r, 0.3);
+    expect(trampleAimLocked(r.tusker.castRemaining)).toBe(false);
+    expect(st.lane).toEqual(before);
+  });
+
   it('draws nothing from the shared rng while it aims', () => {
-    const a = road();
-    const b = road();
-    for (const r of [a, b]) {
-      put(r, r.tusker, MID.x, MID.z);
-      put(r, r.me, OPEN.x, OPEN.z);
-      run(r, T.trampleFirst + 0.05);
+    const r = road();
+    put(r, r.tusker, MID.x, MID.z);
+    put(r, r.me, OPEN.x, OPEN.z);
+    run(r, T.trampleFirst + 0.05);
+    expect(r.tusker.castingAbility).toBe(TUSKER_TRAMPLE);
+    // Count every draw while the target walks the whole aim.
+    const rng = r.sim.ctx.rng as unknown as Record<string, (...a: unknown[]) => unknown>;
+    let draws = 0;
+    for (const key of ['next', 'range', 'int', 'chance', 'pick']) {
+      const fn = rng[key];
+      if (typeof fn !== 'function') continue;
+      rng[key] = (...args: unknown[]) => {
+        draws++;
+        return fn.apply(rng, args);
+      };
     }
-    // One target walks the whole aim; the other stands. The rng ends level.
+    const yaws = new Set<number>();
     for (let i = 0; i < 20; i++) {
       const k = i / 19;
-      put(a, a.me, OPEN.x + (BEHIND.x - OPEN.x) * k, OPEN.z + (BEHIND.z - OPEN.z) * k);
-      run(a, DT);
-      run(b, DT);
+      put(r, r.me, OPEN.x + (BEHIND.x - OPEN.x) * k, OPEN.z + (BEHIND.z - OPEN.z) * k);
+      run(r, DT);
+      yaws.add(state(r).lane?.yaw ?? 0);
     }
-    expect(a.sim.ctx.rng.next()).toBe(b.sim.ctx.rng.next());
+    // It really aimed (the lane turned with every step) and drew nothing.
+    expect(yaws.size).toBeGreaterThan(10);
+    expect(draws).toBe(0);
   });
 });
 
@@ -1326,9 +1351,10 @@ describe('the road never closes (a scripted pull on the real road)', () => {
 
   it('whoever stands in a lane, anywhere on the road, has room to step out of it in the bar', () => {
     // Every lane the road allows: from every 3 yd of both legs, sixteen ways.
-    // A bystander caught anywhere in its strip reaches clear road in the bar
-    // less a half second to see it. (Its target is the next test: it stands
-    // on the lane's line when the lane locks.)
+    // A bystander the lane stands on through its aim reaches clear road in
+    // the bar less a half second to see it. (A lane that swings onto someone
+    // on its last aiming tick leaves them only the lock: the next test holds
+    // that bound for the hardest spot, the lane's own line.)
     const reach = RUN_SPEED * (T.trampleCast - 0.5);
     let lanes = 0;
     let worst = 0;
