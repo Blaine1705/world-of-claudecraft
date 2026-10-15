@@ -29,6 +29,7 @@ import {
   BLOOM_VINE_LASH,
   SAURIAN_ENRAGE,
   SAURIAN_HOWDAH_BREAK,
+  SAURIAN_SAP_TETHER,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
   ZULGAR_HUNTING_SPEAR,
@@ -118,6 +119,7 @@ import {
   saurianLookHeight,
   saurianModelScale,
 } from '../wildheart_basin/saurian_model_core';
+import { SAP_TOTEM_TINT, SAP_TOTEM_TINT_STRENGTH } from '../wildheart_basin/saurian_totem_fx_core';
 import type { ClipMap, VisualDef } from './manifest';
 
 /** The gestures the basin's fx send the Saurian's howdah (saurian_fx.ts):
@@ -512,6 +514,32 @@ export const WILDHEART_SUNBONE_TOTEM_LOOK: VisualDef = {
   clickRadius: 1.4,
 };
 
+/** The Sunbone Sap Totem (the Great Saurian rework, encounters/
+ *  wildheart_basin/saurian_totems.ts): the Sunbone Totem's carved post washed
+ *  in the howdah's war red, drawn at its own scale, 8.3 yd: over three
+ *  players and a head over the Binders' own totems. It tears up out of the
+ *  ford as the rider's thrown bundle lands (Rise, offered by
+ *  wildheart_basin/saurian_totem_fx.ts) and flares on every mending (Pulse,
+ *  a gesture off the same module); the tether, ring, beacon and sigil are the
+ *  fx layer's. */
+export const WILDHEART_SAP_TOTEM_LOOK: VisualDef = {
+  url: SUN_TOTEM_MODEL.url,
+  height: trashLookHeight(SUN_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  hover: trashLookHover(SUN_TOTEM_MODEL, TOTEM_SIM_SCALE),
+  tint: SAP_TOTEM_TINT,
+  tintStrength: SAP_TOTEM_TINT_STRENGTH,
+  clips: {
+    ...TOTEM_CLIPS,
+    attackByAbility: { [SAURIAN_SAP_TETHER]: 'Pulse' },
+    attackTimeScaleByAbility: { [SAURIAN_SAP_TETHER]: 1 },
+  },
+  entranceGesture: TOTEM_RISE_GESTURE,
+  oneShotsHoldAttacks: ['Rise'],
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.8,
+};
+
 /** Zulgar's Hunting Spear (encounters/wildheart_basin/zulgar_spear.ts): the
  *  usable body a teammate pulls out of the terrace. It draws no body: the
  *  spear, its cord and the ring under its victim are the fx layer's own
@@ -740,6 +768,7 @@ export function wildheartPlaceholderLooks(
   // The Fanglord Beastmaster trades his shipped body for his Blender one.
   out.mob_wildheart_beastmaster = WILDHEART_BEASTMASTER_LOOK;
   out.wildheart_sunbone_totem = WILDHEART_SUNBONE_TOTEM_LOOK;
+  out.wildheart_sap_totem = WILDHEART_SAP_TOTEM_LOOK;
   out.wildheart_sunbone_dread_totem = WILDHEART_SUNBONE_DREAD_TOTEM_LOOK;
   out.wildheart_hunting_spear = WILDHEART_HUNTING_SPEAR_LOOK;
   return out;
@@ -753,6 +782,7 @@ export const WILDHEART_MOB_KEYS: Readonly<Record<string, string>> = {
   thorn_sprout: 'wildheart_thorn_sprout',
   sunbone_totem_binder: 'wildheart_totem_binder',
   sunbone_totem: 'wildheart_sunbone_totem',
+  sunbone_sap_totem: 'wildheart_sap_totem',
   sunbone_dread_totem: 'wildheart_sunbone_dread_totem',
   howdah_hexcaller: 'wildheart_howdah_hexcaller',
   fanglord_jaguar: 'wildheart_fanglord_jaguar',

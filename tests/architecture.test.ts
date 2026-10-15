@@ -927,6 +927,9 @@ const RENDER_PURE_CORES = [
   // Zulgar's hunt rework: the sun glyphs' four looks, the Sunstruck window,
   // the Hunting Spear and the half the Idol's Breath marks.
   'src/render/wildheart_basin/zulgar_hunt_fx_core.ts',
+  // The Great Saurian's totem rework: the Sap Totem's height, the throw's arc,
+  // the tether's life, the rider's flare and the heroic drum's beat.
+  'src/render/wildheart_basin/saurian_totem_fx_core.ts',
   'src/render/wildheart_basin/bond_cord_core.ts',
   'src/render/wildheart_basin/basin_fire_core.ts',
   'src/render/characters/stun_idle_core.ts',

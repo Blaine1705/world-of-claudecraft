@@ -204,6 +204,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Idol's Breath: the warned half of the terrace, the breath over it and
   // the curtain on the centre line.
   { file: 'src/render/wildheart_basin/idol_breath_fx.ts', layer: 'encounter', strict: true },
+  // The Great Saurian's totem rework: the ring at a Sap Totem's foot, its
+  // tether, beacon and sigil, the drum's ring of force.
+  { file: 'src/render/wildheart_basin/saurian_totem_fx.ts', layer: 'encounter', strict: true },
   // The Gravewyrm Sanctum's telegraphs (the shared kit), the soulfire patches'
   // glow and flames, the shock rings and the particle pools.
   { file: 'src/render/gravewyrm_sanctum_fx/sanctum_fx.ts', layer: 'encounter', strict: true },

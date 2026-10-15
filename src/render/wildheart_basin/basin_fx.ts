@@ -17,8 +17,9 @@
 // Every telegraph is the shared floor telegraph kit (../floor_telegraph).
 // The three bosses' visuals are their own module (basin_boss_fx.ts), composed
 // here: it draws under this root, on this kit, through these pools. Zulgar's
-// sun glyphs, Hunting Spear and the Idol's Breath are zulgar_hunt_fx.ts, on
-// the same host.
+// sun glyphs, Hunting Spear and the Idol's Breath are zulgar_hunt_fx.ts, and
+// the Saurian rider's Sap Totems and heroic drum saurian_totem_fx.ts, on the
+// same host.
 //
 // Rules (src/render/CLAUDE.md): pooled geometry and materials built once,
 // attached through the compile gate, no per-frame allocation in the pools.
@@ -40,11 +41,16 @@ import {
   BLOOM_VINE_LASH,
   GORGEBLOOM_ID,
   GREAT_SAURIAN_ID,
+  SAP_TOTEM_ID,
+  SAURIAN_DRUM_BEAT,
   SAURIAN_ENRAGE,
   SAURIAN_HOWDAH_BREAK,
   SAURIAN_RIDER_LANDS,
+  SAURIAN_SAP_BACKLASH,
+  SAURIAN_SAP_TETHER,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
+  SAURIAN_TOTEM_THROW,
   ZULGAR_AVATAR,
   ZULGAR_ID,
 } from '../../sim/encounters/wildheart_basin/ids';
@@ -102,6 +108,7 @@ import { LasherFx } from './lasher_fx';
 import { setBasinMawGlow } from './maw_glow';
 import { isBasinMawPortal, mawGlowStrength, stepMawGlow } from './maw_glow_core';
 import { SaurianFx } from './saurian_fx';
+import { SaurianTotemFx } from './saurian_totem_fx';
 import { ZulgarAvatarFx } from './zulgar_avatar_fx';
 import { ZulgarHuntFx } from './zulgar_hunt_fx';
 
@@ -234,6 +241,8 @@ export class WildheartFx {
   private readonly avatar: ZulgarAvatarFx | null;
   /** His sun glyphs, his Hunting Spear and the stone jaguar's breath. */
   private readonly hunt: ZulgarHuntFx | null;
+  /** The Saurian rider's Sap Totems and the heroic drum. */
+  private readonly totems: SaurianTotemFx | null;
   /** The idol's throat burned last frame (put out once on leaving the basin). */
   private throatLit = false;
   private readonly smoke: ParticlePool;
@@ -442,6 +451,12 @@ export class WildheartFx {
       ? new ZulgarAvatarFx(scene, this.bossHost(), world, compileGate, playGesture)
       : null;
     this.hunt = world ? new ZulgarHuntFx(this.bossHost(), world) : null;
+    const saurian = this.saurian;
+    this.totems = world
+      ? new SaurianTotemFx(this.bossHost(), world, playGesture, (id) =>
+          saurian ? saurian.howdahStanding(id) : true,
+        )
+      : null;
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -557,6 +572,11 @@ export class WildheartFx {
       case SAURIAN_ENRAGE:
       case SAURIAN_RIDER_LANDS:
         return this.saurian?.handleEvent(ev, src) ?? false;
+      case SAURIAN_TOTEM_THROW:
+      case SAURIAN_SAP_TETHER:
+      case SAURIAN_SAP_BACKLASH:
+      case SAURIAN_DRUM_BEAT:
+        return this.totems?.handleEvent(ev) ?? false;
       // The Gorgebloom's body beats; the seeds and the spit's glob are still
       // the boss layer's (they land on its pods and slots).
       case BLOOM_POLLINATE:
@@ -647,6 +667,7 @@ export class WildheartFx {
         this.hunt?.hideAll();
         this.trash?.hideAll();
         this.saurian?.hideAll();
+        this.totems?.hideAll();
         this.gorgebloom?.hideAll();
         this.lasher.hideAll();
         this.splash.hideAll();
@@ -673,6 +694,7 @@ export class WildheartFx {
     this.boss?.update(dt, this.clock);
     this.trash?.update(dt, this.clock);
     this.saurian?.update(dt, this.clock);
+    this.totems?.update(dt, this.clock);
     this.gorgebloom?.update(dt, this.clock);
     this.lasher.update(this.clock);
     this.splash.update(this.clock);
@@ -959,6 +981,7 @@ export class WildheartFx {
     this.hunt?.beginScan();
     this.trash?.beginScan();
     this.saurian?.beginScan();
+    this.totems?.beginScan();
     this.gorgebloom?.beginScan();
     for (const e of world.entities.values()) {
       if (this.boss?.scanEntity(e)) basin = true;
@@ -976,10 +999,12 @@ export class WildheartFx {
       if (e.templateId === GREAT_SAURIAN_ID) {
         basin = true;
         this.saurian?.scanSaurian(e);
+        this.totems?.scanSaurian(e);
         if (!e.dead && this.waders.length < 4) this.waders.push(e);
         if (!e.dead && hasAura(e, SAURIAN_ENRAGE)) this.claimEnrage(e);
       }
       if (e.templateId === GORGEBLOOM_ID) this.gorgebloom?.scanBloom(e);
+      if (e.templateId === SAP_TOTEM_ID && this.totems?.scanTotem(e)) basin = true;
       if (e.templateId === ZULGAR_ID) {
         basin = true;
         this.avatar?.setZulgar(e);
@@ -1015,6 +1040,7 @@ export class WildheartFx {
       slot.group.visible = true;
     }
     this.saurian?.endScan();
+    this.totems?.endScan();
     this.trash?.endScan();
     this.gorgebloom?.endScan();
     this.mawOpen = maw;
@@ -1096,6 +1122,10 @@ export class WildheartFx {
     if (this.saurian) {
       const saurian = this.saurian;
       attempt(() => saurian.dispose());
+    }
+    if (this.totems) {
+      const totems = this.totems;
+      attempt(() => totems.dispose());
     }
     if (this.gorgebloom) {
       const gorgebloom = this.gorgebloom;
