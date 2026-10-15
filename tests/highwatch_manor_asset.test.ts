@@ -24,21 +24,21 @@ import { HIGHWATCH_BUILDINGS_BY_ID } from '../src/sim/highwatch_layout';
 // by scripts/assets/highwatch_manor/build_manor.py and shipped by build.mjs, which also merges
 // the collision rows the same Blender run writes into data/asset_collision_overrides.json.
 // Pins the bytes, the live source fingerprint, the named parts the town view draws (the G_INT
-// ones cast no shadow), the seven texture-free materials, the triangle budget, the footing the
+// ones cast no shadow), the texture-free materials, the triangle budget, the footing the
 // town buries, the door and the open roof the camera's air is cut to, and the collision rows.
 // Re-pin the sha256, size and triangle literals only with a re-export.
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, HIGHWATCH_MANOR_ASSET.target);
-const SHIPPED_SHA256 = 'cff3e8ca6f62d0745d2b9acb7cfc7b59e973e0fdcdaa05521606c7a4eb050a3c';
-const SHIPPED_BYTES = 984832;
+const SHIPPED_SHA256 = 'ddbc76efc78d5ea7b6bbb673fb66a570a37115f9c704c09ceea036e43bc4580b';
+const SHIPPED_BYTES = 1015412;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
-  ManorShell: 25466,
+  ManorShell: 25418,
   ManorRoof: 14278,
-  ManorTrim: 3642,
+  ManorTrim: 5982,
   ManorGrounds: 7256,
-  ManorGlow: 2584,
+  ManorGlow: 3006,
   G_INT_Timber: 3542,
   G_INT_Furnishings: 18507,
 };
@@ -116,7 +116,7 @@ describe('the Highwatch manor GLB', () => {
     }
   });
 
-  it('ships seven texture-free materials, unskinned and still', () => {
+  it('ships texture-free materials, unskinned and still', () => {
     const root = doc.getRoot();
     expect(
       root
@@ -136,6 +136,19 @@ describe('the Highwatch manor GLB', () => {
     expect(b).toBeGreaterThan(0);
     const glass = root.listMaterials().find((m) => m.getName() === 'ManorGlass');
     expect(Math.max(...(glass?.getEmissiveFactor() ?? [0]))).toBeLessThan(r);
+    // the stained glass's colours each glow in their own hue: blue, garnet and gold
+    const hue = (name: string) =>
+      root
+        .listMaterials()
+        .find((m) => m.getName() === name)
+        ?.getEmissiveFactor() ?? [0, 0, 0];
+    const [br, bg, bb] = hue('ManorGlassBlue');
+    expect(bb).toBeGreaterThan(Math.max(br, bg));
+    const [rr, rg, rb] = hue('ManorGlassRed');
+    expect(rr).toBeGreaterThan(Math.max(rg, rb) * 3);
+    const [gr, gg, gb] = hue('ManorGlassGold');
+    expect(gr).toBeGreaterThan(gg);
+    expect(gg).toBeGreaterThan(gb);
     for (const mesh of root.listMeshes()) {
       for (const prim of mesh.listPrimitives()) {
         expect(prim.getAttribute('COLOR_0'), mesh.getName()).not.toBeNull();

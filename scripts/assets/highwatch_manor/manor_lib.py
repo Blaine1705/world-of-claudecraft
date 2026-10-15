@@ -20,8 +20,10 @@ import bpy  # noqa: E402
 from shiplib import EDGE, FLAT, P, PLAIN, scale_color  # noqa: E402,F401
 
 WOOD, METAL, STONE, PLASTER, GLOW, SLATE, GLASS = 0, 1, 2, 3, 4, 5, 6
+# the stained glass by its colour
+GLASS_BLUE, GLASS_RED, GLASS_GOLD = 7, 8, 9
 # every glowing material (the weathering and the warm bake leave them alone)
-EMISSIVE = (GLOW, GLASS)
+EMISSIVE = (GLOW, GLASS, GLASS_BLUE, GLASS_RED, GLASS_GOLD)
 
 # The least gap between a decal-like layer and the surface under it (a rug on a floor, a stripe
 # on a banner, a skin on a wall's core): closer than this, two overlapping faces fight in the
@@ -42,6 +44,10 @@ MATERIAL_SPECS = (
     ('ManorGlow', 0.5, 0.0, 1.0, (0.62, 0.34, 0.1)),
     ('ManorSlate', 0.7, 0.05, 0.0, None),
     ('ManorGlass', 0.3, 0.0, 1.0, (0.2, 0.15, 0.09)),
+    # the stained glass's colours, lit from the room behind them at night
+    ('ManorGlassBlue', 0.3, 0.0, 1.0, (0.08, 0.14, 0.42)),
+    ('ManorGlassRed', 0.3, 0.0, 1.0, (0.42, 0.06, 0.07)),
+    ('ManorGlassGold', 0.3, 0.0, 1.0, (0.6, 0.4, 0.1)),
 )
 
 PAL = dict(

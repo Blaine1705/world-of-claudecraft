@@ -14,6 +14,7 @@ from manor_plan import (ARCH_DAIS, ARCH_SIDE, BAY, CHAPEL, CHAPEL_DOOR, COLUMN_R
                         HOOD, KITCHEN, KITCHEN_DOOR, LANTERN, PORCH, SIDE_DOOR_H, STEPS, VERGE_OUT, WEST,
                         WING_T)
 from shiplib import P
+from manor_glass import chapel_window, great_window
 
 H = HALL
 STONE_TO = FLOOR + 3.6   # the ashlar storey under the plaster and timber
@@ -1102,89 +1103,26 @@ def bay(p, p_roof, p_trim, glow):
 
 
 def stained_glass(p, p_trim, glow, wall, u0, u1, v0, v1, t):
-    """The great window behind the high table: a round-headed light in stone tracery, its glass
-    leaded in colour (our own design: a gilded sun over three blue peaks on a field of amber and
-    garnet, a border of blue and gold). It glows warm at night."""
+    """The great window behind the high table: three leaded lancets and a rose in stone
+    tracery (manor_glass.py has the glass: our own design). It glows warm at night."""
     um = (u0 + u1) / 2
     w = u1 - u0
     rect_top = v1 - w / 2
-    rows, cols = 24, 10
-    for i in range(rows):
-        for j in range(cols):
-            ua = u0 + w * j / cols
-            ub = u0 + w * (j + 1) / cols
-            va = v0 + (rect_top - v0) * i / rows
-            vb = v0 + (rect_top - v0) * (i + 1) / rows
-            cu, cv = (ua + ub) / 2, (va + vb) / 2
-            col = _glass_colour(cu - um, cv - v0, w, v1 - v0)
-            _pane(glow, wall, ua + 0.025, ub - 0.025, va + 0.025, vb - 0.025, col)
-    n = 8
-    for i in range(n):
-        for ring in range(3):
-            a0, a1 = math.pi * i / n, math.pi * (i + 1) / n
-            ra, rb = w / 2 * ring / 3, w / 2 * (ring + 1) / 3
-            cu = um - math.cos((a0 + a1) / 2) * (ra + rb) / 2
-            cv = rect_top + math.sin((a0 + a1) / 2) * (ra + rb) / 2
-            col = _glass_colour(cu - um, cv - v0, w, v1 - v0)
-            pts = []
-            for (aa, rr) in ((a0, ra), (a1, ra), (a1, rb), (a0, rb)):
-                pts.append((um - math.cos(aa) * rr, rect_top + math.sin(aa) * rr))
-            q = [wall.pt(a, b, -0.03) for (a, b) in pts] + [wall.pt(a, b, 0.03) for (a, b) in pts]
-            hexa(glow, q, col, GLASS)
-    lead = (0.12, 0.11, 0.1)
-    for s in (1, -1):
-        g = s * 0.05
-        for j in range(1, cols):
-            uu = u0 + w * j / cols
-            wall.box(p_trim, uu - 0.025, uu + 0.025, v0, rect_top, g - 0.02, g + 0.02, lead, METAL)
-        for i in range(1, rows):
-            vv = v0 + (rect_top - v0) * i / rows
-            wall.box(p_trim, u0, u1, vv - 0.025, vv + 0.025, g - 0.02, g + 0.02, lead, METAL)
-        # the stone tracery: two mullions and a transom
+
+    def tracery(mull):
+        # the stone: two mullions through the wall's depth, the arch, jambs and the sill
         for f in (1 / 3, 2 / 3):
             uu = u0 + w * f
-            wall.box(p, uu - 0.12, uu + 0.12, v0, rect_top, g - 0.1, g + 0.1, PAL['ashlar_hi'], STONE)
-        vv = v0 + (rect_top - v0) * 0.5
-        wall.box(p, u0, u1, vv - 0.12, vv + 0.12, g - 0.1, g + 0.1, PAL['ashlar_hi'], STONE)
-    arch_ring(p, wall, u0, u1, rect_top, t, n=11)
-    for s in (1, -1):
-        wo = s * t / 2
-        wa, wb = (wo - 0.02, wo + 0.14) if s > 0 else (wo - 0.14, wo + 0.02)
-        wall.box(p, u0 - 0.3, u0, v0, rect_top, wa, wb, PAL['ashlar_hi'], STONE)
-        wall.box(p, u1, u1 + 0.3, v0, rect_top, wa, wb, PAL['ashlar_hi'], STONE)
-    wall.box(p, u0 - 0.4, u1 + 0.4, v0 - 0.22, v0, -t / 2 - 0.1, t / 2 + 0.2, PAL['stone_dark'], STONE)
-
-
-def _pane(glow, wall, u0, u1, v0, v1, col):
-    """One pane of coloured glass, a face to each side of the wall."""
-    for s in (1, -1):
-        flat_face(glow, [wall.pt(u0, v0, s * 0.02), wall.pt(u1, v0, s * 0.02), wall.pt(u1, v1, s * 0.02),
-                         wall.pt(u0, v1, s * 0.02)], col, GLASS, (wall.nx * s, 0, wall.nz * s))
-
-
-def _glass_colour(du, dv, w, hgt):
-    """The window's picture at a point (du across from the middle, dv up from the sill)."""
-    # deep jewel tones: the glow is lifted at runtime, so a pale pane would bloom white
-    gold, amber, garnet, blue, white = (0.85, 0.6, 0.16), (0.8, 0.4, 0.1), (0.55, 0.08, 0.1), \
-        (0.12, 0.22, 0.62), (0.72, 0.7, 0.62)
-    edge = min(w / 2 - abs(du), dv, 99)
-    if edge < 0.38:
-        return gold if int((dv + abs(du)) / 0.6) % 2 else blue
-    # three peaks
-    peaks = ((-1.15, 0.0, 3.6), (0.0, 0.0, 4.6), (1.15, 0.0, 3.4))
-    for (px, _, ph) in peaks:
-        top = ph - abs(du - px) * 2.1
-        if dv < top:
-            return white if dv > top - 0.7 else blue
-    # the sun above the peaks
-    sx, sy = 0.0, hgt * 0.68
-    d = math.hypot(du - sx, dv - sy)
-    if d < 1.05:
-        return gold
-    if d < 1.6:
-        ang = math.atan2(dv - sy, du - sx)
-        return gold if int((ang + math.pi) / (math.pi / 6)) % 2 else amber
-    return garnet if int(dv / 1.2) % 2 else amber
+            wall.box(p, uu - mull / 2, uu + mull / 2, v0, rect_top, -0.16, 0.16, PAL['ashlar_hi'], STONE)
+        arch_ring(p, wall, u0, u1, rect_top, t, n=11)
+        for s in (1, -1):
+            wo = s * t / 2
+            wa, wb = (wo - 0.02, wo + 0.14) if s > 0 else (wo - 0.14, wo + 0.02)
+            wall.box(p, u0 - 0.3, u0 + LAYER, v0, rect_top, wa, wb, PAL['ashlar_hi'], STONE)
+            wall.box(p, u1 - LAYER, u1 + 0.3, v0, rect_top, wa, wb, PAL['ashlar_hi'], STONE)
+        wall.box(p, u0 - 0.4, u1 + 0.4, v0 - 0.22, v0, -t / 2 - 0.1, t / 2 + 0.2, PAL['stone_dark'], STONE)
+    great_window(p, p_trim, glow, wall, u0, u1, v0, v1, t, tracery)
+    _ = um
 
 
 # ---------------------------------------------------------------------------
@@ -1442,23 +1380,10 @@ def chapel_roof(p_roof, p_trim, plate, pitch):
 
 
 def stained_small(p, p_trim, glow, wall, u0, u1, v0, v1, t):
-    """The chapel's window: a round-headed light in coloured glass, a sun over a peak."""
-    um = (u0 + u1) / 2
+    """The chapel's window: one leaded lancet, a sun over a peak in a roundel (manor_glass.py)."""
     w = u1 - u0
     rect_top = v1 - w / 2
-    rows, cols = 8, 4
-    for i in range(rows):
-        for j in range(cols):
-            ua, ub = u0 + w * j / cols, u0 + w * (j + 1) / cols
-            va, vb = v0 + (rect_top - v0) * i / rows, v0 + (rect_top - v0) * (i + 1) / rows
-            col = _glass_colour(((ua + ub) / 2 - um) * 2.4, ((va + vb) / 2 - v0) * 1.6, w * 2.4, (v1 - v0) * 1.6)
-            _pane(glow, wall, ua + 0.02, ub - 0.02, va + 0.02, vb - 0.02, col)
-    for i in range(6):
-        a0, a1 = math.pi * i / 6, math.pi * (i + 1) / 6
-        pts = [(um, rect_top), (um - math.cos(a0) * w / 2, rect_top + math.sin(a0) * w / 2),
-               (um - math.cos(a1) * w / 2, rect_top + math.sin(a1) * w / 2), (um, rect_top)]
-        q = [wall.pt(a, b, -0.03) for (a, b) in pts] + [wall.pt(a, b, 0.03) for (a, b) in pts]
-        hexa(glow, q, (0.85, 0.6, 0.16) if i % 2 else (0.8, 0.4, 0.1), GLASS)
+    chapel_window(p_trim, glow, wall, u0, u1, v0, v1)
     arch_ring(p, wall, u0, u1, rect_top, t, n=7)
     wall.box(p, u0 - 0.3, u1 + 0.3, v0 - 0.2, v0, -t / 2 - 0.08, t / 2 + 0.16, PAL['stone_dark'], STONE)
 
