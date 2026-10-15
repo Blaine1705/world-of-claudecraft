@@ -1193,6 +1193,10 @@ const RENDER_PURE_CORES = [
   'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/biome_haze_field_core.ts',
+  // Palette lab (?palette=on dev tool): per-zone ground overrides the terrain
+  // caches re-read, and the zone-look model, display solver and export.
+  'src/render/ground_palette_override_core.ts',
+  'src/render/palette_lab/zone_look_core.ts',
   'src/render/battleground_core.ts',
   'src/render/battleground_fx_core.ts',
   'src/render/battleground_lantern_fx_core.ts',

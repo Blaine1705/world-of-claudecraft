@@ -39,6 +39,7 @@ import { fbm2 } from '../sim/rng';
 import { cutBounds, cutsInRect, cutsSdfAt, inTerrainCut } from '../sim/terrain_cuts';
 import type { TerrainCut, TerrainKnockout } from '../sim/types';
 import { roadDistance, waterLevel, zoneBiomeAt } from '../sim/world';
+import { groundPaletteFor, groundPaletteVersion } from './ground_palette_override_core';
 import { type ImpactCraterTerrainBlend, impactCraterTerrainBlend } from './impact_terrain';
 import { clamp01 } from './num_clamp';
 import { makeShoreProbe, type ShoreProbe, shoreWaterGate } from './shore_water_gate_core';
@@ -101,6 +102,23 @@ const zonePalettes = ZONES.map((zn) => {
     sand: new THREE.Color(p.sand),
   };
 });
+// Palette-lab overrides (ground_palette_override_core.ts): re-read the zone
+// rows only when the override table moved, so a normal session never does.
+let zonePaletteVersion = groundPaletteVersion();
+function syncZonePalettes(): void {
+  const v = groundPaletteVersion();
+  if (v === zonePaletteVersion) return;
+  zonePaletteVersion = v;
+  for (let i = 0; i < ZONES.length; i++) {
+    const p = groundPaletteFor(ZONES[i].id, ZONES[i].biome);
+    const pal = zonePalettes[i];
+    pal.grass.setHex(p.grass);
+    pal.grassDark.setHex(p.grassDark);
+    pal.grassYellow.setHex(p.grassYellow);
+    pal.dirt.setHex(p.dirt);
+    pal.sand.setHex(p.sand);
+  }
+}
 
 // An AUTHORED map is tinted by its own zone's biome. The strip cascade below
 // is the shipped world's z-band layout (vale, marsh, dusk, night ...): walked
@@ -135,6 +153,7 @@ function paletteAt(x: number, z: number): void {
     sandC.copy(pal.sand);
     return;
   }
+  syncZonePalettes();
   const stripPalette = (zn: (typeof ZONES)[number]) =>
     zonePalettes[ZONES.indexOf(zn)] ?? zonePalettes[0];
   grassC.copy(stripPalette(STRIP_ZONES[0]).grass);

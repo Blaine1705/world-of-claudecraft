@@ -19,6 +19,12 @@ import {
   stepEnvironmentBlend,
 } from './environment_transition_core';
 import { GFX, type GfxSettings } from './gfx';
+import {
+  PALETTE_SKY_DECLARATIONS,
+  PALETTE_SKY_GLSL,
+  paletteLabEnabled,
+  paletteSkyUniforms,
+} from './palette_lab';
 import type { SkyResidencyRegion } from './sky_residency_core';
 import { skyTexture } from './textures';
 
@@ -792,9 +798,9 @@ const SKY_VERT = /* glsl */ `
 // directional horizon-band tint; without a field the string is byte-identical
 // to the legacy shader. Decided once, before the material compiles, exactly
 // like the geometry consumers gate on hasBiomeHazeField().
-const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
+const skyFrag = (zoneHaze: boolean, paletteSky = false): string => /* glsl */ `${
   zoneHaze ? BIOME_HAZE_DECLARATIONS : ''
-}
+}${paletteSky ? PALETTE_SKY_DECLARATIONS : ''}
   uniform sampler2D uSkyA;
   uniform sampler2D uSkyB;
   uniform float uMix;
@@ -893,7 +899,7 @@ const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
       c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
     }
     c *= mix(uTintA, uTintB, uMix); // biome grade
-    // Cycle sky grading, between the biome grade and the dark night multiply:
+${paletteSky ? PALETTE_SKY_GLSL : ''}    // Cycle sky grading, between the biome grade and the dark night multiply:
     // (1) desaturate toward night, so the day HDRI greys out to moonlight
     // instead of reading as a dimmed daytime photograph; (2) pour a warm
     // dawn/dusk glow into the horizon band around the live sun azimuth while
@@ -1174,10 +1180,17 @@ export function buildSky(
   // field before buildSky runs), so the dome's tint follows the same camera
   // and day/night grade with zero per-frame writes of its own.
   const zoneHaze = hasBiomeHazeField();
+  // The palette lab's gradient arm (`?palette=on` only): absent, the dome
+  // compiles the shipped string byte for byte.
+  const paletteSky = paletteLabEnabled();
   const material = new THREE.ShaderMaterial({
-    uniforms: { ...uniforms, ...(zoneHaze ? biomeHazeUniforms() : {}) },
+    uniforms: {
+      ...uniforms,
+      ...(zoneHaze ? biomeHazeUniforms() : {}),
+      ...(paletteSky ? paletteSkyUniforms() : {}),
+    },
     vertexShader: SKY_VERT,
-    fragmentShader: skyFrag(zoneHaze),
+    fragmentShader: skyFrag(zoneHaze, paletteSky),
     side: THREE.BackSide,
     fog: false,
     depthWrite: false,

@@ -61,6 +61,7 @@ const richTerrainSplat = (): boolean =>
   terrainReliefLevel() >= 1 && !renderLayerDisabled('talbedo');
 
 import { getGrassGroundBake } from './grass_ground_bake';
+import { groundPaletteVersion } from './ground_palette_override_core';
 import { idleSlot } from './idle_queue';
 import {
   GRASS_BAKE_PATCH_YARDS,
@@ -381,6 +382,20 @@ const NORMAL_TEX_STRENGTH = 1.55;
 // Ground colors per biome; boundaries blend across the same window as the
 // heightfield's shape blend. This is the tint layer the splat albedo
 // multiplies into (splat textures are authored near mid-gray).
+// The palette-lab ground version a chunk's colours were baked under
+// (ground_palette_override_core.ts), stamped on the geometry. Unstamped
+// geometry is version 0, the stock palette, which is all a normal session
+// ever builds, so nothing outside the lab ever reads a mismatch.
+const GROUND_PALETTE_STAMP = 'wocGroundPaletteVersion';
+function stampGroundPalette(geo: THREE.BufferGeometry, version: number): THREE.BufferGeometry {
+  if (version !== 0) geo.userData[GROUND_PALETTE_STAMP] = version;
+  else delete geo.userData[GROUND_PALETTE_STAMP];
+  return geo;
+}
+function groundPaletteStamp(geo: THREE.BufferGeometry): number {
+  return (geo.userData[GROUND_PALETTE_STAMP] as number | undefined) ?? 0;
+}
+
 function finishChunkGeometry(state: ChunkGeometryArrays): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
   const welded = state.rim || state.clip ? weldCutRim(state) : state;
@@ -2539,6 +2554,23 @@ export interface TerrainView {
    */
   rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void;
   /**
+   * Palette lab (src/render/palette_lab/): re-bake only the vertex COLOURS of
+   * the built chunks intersecting the region, nearest to (cx, cz) first, in the
+   * zone build worker when there is one (else on the main thread, one chunk per
+   * macrotask). Each chunk is re-meshed from its own unchanged inputs, so only
+   * the colour buffer is copied into the live geometry: no new buffer, no
+   * relink, nothing moves. Resolves with the number of chunks recoloured.
+   */
+  recolorRegion(
+    minX: number,
+    minZ: number,
+    maxX: number,
+    maxZ: number,
+    cx: number,
+    cz: number,
+    cancelled?: () => boolean,
+  ): Promise<number>;
+  /**
    * Editor-only: rebake the region's texels of the macro normal DataTexture
    * from the current mesh height and flag it for re-upload. Byte-identical
    * to a full bake over those texels. Call at stroke end, never per drag
@@ -2939,8 +2971,12 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     });
   };
   const addChunk = (x0: number, z0: number, size: number, spacing: number, ring = 0): void => {
+    const palette = groundPaletteVersion();
     attachChunk(
-      buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan, lowShade),
+      stampGroundPalette(
+        buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan, lowShade),
+        palette,
+      ),
       x0,
       z0,
       size,
@@ -2975,6 +3011,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     const world = getActiveWorldContent();
     active.setContent?.(getContentGeneration(), world === BUILTIN_WORLD ? null : world);
     const cutSet = activeChunkCutSet();
+    // Read BEFORE the job is submitted: the pool copies the override table at
+    // submission, so this is the version the worker colours with.
+    const palette = groundPaletteVersion();
     const arrays = await active.buildChunk(
       {
         x0,
@@ -2990,7 +3029,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       },
       { urgent },
     );
-    return arrays ? finishChunkGeometry(arrays) : null;
+    return arrays ? stampGroundPalette(finishChunkGeometry(arrays), palette) : null;
   };
   const addChunkInWorker = async (
     x0: number,
@@ -3018,6 +3057,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     ring = 0,
   ): Promise<boolean> => {
     if (await addChunkInWorker(x0, z0, size, spacing, false, ring)) return !cancelled;
+    const palette = groundPaletteVersion();
     const geo = await buildChunkGeometryIdle(
       x0,
       z0,
@@ -3031,7 +3071,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       () => cancelled,
     );
     if (!geo) return false;
-    attachChunk(geo, x0, z0, size, spacing, ring);
+    attachChunk(stampGroundPalette(geo, palette), x0, z0, size, spacing, ring);
     return true;
   };
 
@@ -3500,9 +3540,64 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
           skirtSpan,
           lowShade,
         );
+        stampGroundPalette(geo, groundPaletteVersion());
         chunk.mesh.geometry.dispose();
         chunk.mesh.geometry = geo; // bounding box/sphere already computed by the build
       }
+    },
+    async recolorRegion(minX, minZ, maxX, maxZ, cx, cz, cancelled): Promise<number> {
+      // A chunk already baked under the live table (built after the change, or
+      // recoloured by an earlier pass) is skipped, so a sweep pays only for
+      // ground that is actually stale.
+      const stale = (c: ChunkRec): boolean =>
+        groundPaletteStamp(c.mesh.geometry) !== groundPaletteVersion();
+      const targets = chunks
+        .filter(
+          (c) => stale(c) && chunkIntersectsRegion(c.x0, c.z0, c.size, minX, minZ, maxX, maxZ),
+        )
+        .sort((a, b) => (a.x - cx) ** 2 + (a.z - cz) ** 2 - ((b.x - cx) ** 2 + (b.z - cz) ** 2));
+      let done = 0;
+      for (const chunk of targets) {
+        if (cancelled?.()) break;
+        // Swapped out meanwhile (LOD, zone drop), or re-meshed under the live table.
+        if (!chunks.includes(chunk) || !stale(chunk)) continue;
+        const { size, spacing } = chunk;
+        let geo = await buildChunkGeoInPool(chunk.x0, chunk.z0, size, spacing);
+        if (!geo) {
+          await yieldBuild();
+          geo = stampGroundPalette(
+            buildChunkGeometry(
+              chunk.x0,
+              chunk.z0,
+              size,
+              spacing,
+              seed,
+              !lowGfx,
+              skirtSpan,
+              lowShade,
+            ),
+            groundPaletteVersion(),
+          );
+        }
+        const live = chunk.mesh.geometry.getAttribute('color');
+        const fresh = geo.getAttribute('color');
+        if (
+          chunks.includes(chunk) &&
+          chunk.size === size &&
+          chunk.spacing === spacing &&
+          live instanceof THREE.BufferAttribute &&
+          fresh instanceof THREE.BufferAttribute &&
+          live.count === fresh.count &&
+          live.itemSize === fresh.itemSize
+        ) {
+          (live.array as Float32Array).set(fresh.array as Float32Array);
+          live.needsUpdate = true;
+          stampGroundPalette(chunk.mesh.geometry, groundPaletteStamp(geo));
+          done++;
+        }
+        geo.dispose();
+      }
+      return done;
     },
     rebakeNormalRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {
       if (!normalTex) return; // Lambert tier: no macro normal map

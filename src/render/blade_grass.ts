@@ -65,6 +65,17 @@ const FADE_START = MEADOW_CARPET_FADE_START;
 export interface BladeGrassView {
   group: THREE.Group;
   update(px: number, pz: number): void;
+  /** Palette lab: re-place every slot (same spots, fresh ground colour) over
+   *  the next frames at the normal placement budget. Nothing hides meanwhile:
+   *  a slot keeps its old tint until its turn. */
+  recolor(): void;
+}
+
+// The live view, so the palette lab can recolour it without a renderer field
+// (a graphics rebuild constructs a new one, which replaces this).
+let liveView: BladeGrassView | null = null;
+export function recolorLiveBladeGrassView(): void {
+  liveView?.recolor();
 }
 
 // same tiny deterministic PRNG the motes pool uses (module-local there);
@@ -242,7 +253,10 @@ export function buildBladeGrass(
   // (render_dev_flags.ts).
   const RADIUS = GFX.bladeCarpetRadius;
   if (RADIUS <= 0 || renderLayerDisabled('bladegrass')) {
-    return { group, update: () => undefined };
+    // A tier without the carpet still replaces the live view, so a rebuild
+    // never keeps the old carpet's buffers reachable from here.
+    liveView = { group, update: () => undefined, recolor: () => undefined };
+    return liveView;
   }
   const GRID_W = Math.ceil((RADIUS * 2) / CELL); // slots per axis
   const POOL = GRID_W * GRID_W;
@@ -426,8 +440,12 @@ export function buildBladeGrass(
   let lastBaseJ = initialBaseJ;
   let pending = false;
 
-  return {
+  const view: BladeGrassView = {
     group,
+    recolor(): void {
+      slotCell.fill(0x7fffffff);
+      pending = true;
+    },
     update(px: number, pz: number): void {
       uPlayerPos.value.set(px, pz);
       // target cell block: the GRID_W x GRID_W square centred on the player
@@ -444,4 +462,6 @@ export function buildBladeGrass(
       sectorPool.syncSectors();
     },
   };
+  liveView = view;
+  return view;
 }

@@ -854,6 +854,13 @@ GPU work signs. Each rule names its seam and its guard.
   for byte and no ink define. Guards: `tests/cel_shading_core.test.ts`,
   `tests/post_output_grade.test.ts` and the real-WebGL
   `tests/browser/cel_shading.browser.test.ts`.
+- **Palette lab (`?palette=on`, dev tool).** `palette_lab/` swaps a zone's whole colour
+  look live (ground palette, fog/light rows, sky gradient, water, bloom, display grade);
+  its own `CLAUDE.md` has the model. Every shader arm it adds is compile-time behind the
+  flag (the grade's `PALETTE_GRADE` define, the dome's gradient block), so a normal session
+  builds the stock shaders byte for byte. The ground re-bake rides
+  `ground_palette_override_core.ts` (main thread, the zone build worker and the far vista
+  re-read it by version) and `renderer.editor.recolorGround` (colour buffers only).
 - **No new queue, no new lane, no fourth gate.** New work rides
   `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
   `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),

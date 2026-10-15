@@ -327,6 +327,47 @@ export const SHALLOW_COLOR = new THREE.Color(0x2d8077);
 const SKY_TINT = new THREE.Color(0x7fb2e0); // matches the sky horizon band
 const SUN_COLOR = new THREE.Color(0xfff0d4);
 
+/** The four water tones, sRGB hex (the palette lab's water row). */
+export interface WaterPaletteHexes {
+  deep: number;
+  shallow: number;
+  sky: number;
+  scatter: number;
+}
+const WATER_STOCK = {
+  deep: DEEP_COLOR.clone(),
+  shallow: SHALLOW_COLOR.clone(),
+  sky: SKY_TINT.clone(),
+  scatter: SCATTER_COLOR.clone(),
+};
+/** The shipped water tones, for the palette lab's stock look. */
+export function stockWaterPalette(): WaterPaletteHexes {
+  return {
+    deep: WATER_STOCK.deep.getHex(),
+    shallow: WATER_STOCK.shallow.getHex(),
+    sky: WATER_STOCK.sky.getHex(),
+    scatter: WATER_STOCK.scatter.getHex(),
+  };
+}
+/**
+ * Palette lab: recolour every water surface at once (null restores the
+ * shipped tones exactly). The surface materials hold these Color objects BY
+ * REFERENCE, so this is a uniform write, never a rebuild or a relink.
+ */
+export function setWaterPalette(p: WaterPaletteHexes | null): void {
+  if (!p) {
+    DEEP_COLOR.copy(WATER_STOCK.deep);
+    SHALLOW_COLOR.copy(WATER_STOCK.shallow);
+    SKY_TINT.copy(WATER_STOCK.sky);
+    SCATTER_COLOR.copy(WATER_STOCK.scatter);
+    return;
+  }
+  DEEP_COLOR.setHex(p.deep);
+  SHALLOW_COLOR.setHex(p.shallow);
+  SKY_TINT.setHex(p.sky);
+  SCATTER_COLOR.setHex(p.scatter);
+}
+
 // Live day/night inputs, shared BY REFERENCE across every water surface
 // material (the overworld field plus the Wildheart pools), the same idiom as
 // sharedUniforms.uTime: the renderer writes them once per frame and every

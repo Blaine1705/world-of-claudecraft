@@ -19,6 +19,7 @@
 
 import type { WorldContent } from '../sim/types';
 import type { CavityMeshArrays } from './cut_cavity_core';
+import { groundPaletteOverrideTable, groundPaletteVersion } from './ground_palette_override_core';
 import type { ChunkGeometryArrays } from './terrain_chunk_build';
 import { createVoxelIdentityRegistry } from './voxel_identity_core';
 import type {
@@ -268,7 +269,15 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
       content = next;
     },
     async buildChunk(job, opts): Promise<ChunkGeometryArrays | null> {
-      const response = await submit({ ...job, kind: 'chunk' }, undefined, opts?.urgent === true);
+      // Palette-lab ground overrides ride the job once any were ever set (a
+      // normal session never sets one, so its jobs stay byte-identical).
+      const palette =
+        groundPaletteVersion() > 0 ? { groundPalette: groundPaletteOverrideTable() } : {};
+      const response = await submit(
+        { ...job, ...palette, kind: 'chunk' },
+        undefined,
+        opts?.urgent === true,
+      );
       if (!response?.ok || response.kind !== 'chunk') return null;
       return {
         positions: response.positions,

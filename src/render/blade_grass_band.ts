@@ -72,6 +72,17 @@ export interface BladeGrassBandView {
    * uses: dungeons and interiors never draw the band.
    */
   update(px: number, pz: number, bandFar: number, outdoor: boolean): void;
+  /** Palette lab: re-place every slot (same spots, fresh ground colour) over
+   *  the next frames at the normal placement budget. Nothing hides meanwhile:
+   *  a slot keeps its old tint until its turn. */
+  recolor(): void;
+}
+
+// The live view, so the palette lab can recolour it without a renderer field
+// (a graphics rebuild constructs a new one, which replaces this).
+let liveView: BladeGrassBandView | null = null;
+export function recolorLiveBladeGrassBandView(): void {
+  liveView?.recolor();
 }
 
 export function buildBladeGrassBand(
@@ -86,7 +97,10 @@ export function buildBladeGrassBand(
   // perf-attribution kill switch.
   const RADIUS = MEADOW_BAND_RADIUS;
   if (GFX.bladeCarpetRadius <= 0 || renderLayerDisabled('meadowband')) {
-    return { group, update: () => undefined };
+    // A tier without the carpet still replaces the live view, so a rebuild
+    // never keeps the old carpet's buffers reachable from here.
+    liveView = { group, update: () => undefined, recolor: () => undefined };
+    return liveView;
   }
   const CELL = MEADOW_BAND_CELL;
   const GRID_W = Math.ceil((RADIUS * 2) / CELL);
@@ -275,8 +289,12 @@ export function buildBladeGrassBand(
   let lastBaseJ = initialBaseJ;
   let pending = false;
 
-  return {
+  const view: BladeGrassBandView = {
     group,
+    recolor(): void {
+      slotCell.fill(0x7fffffff);
+      pending = true;
+    },
     update(px: number, pz: number, bandFar: number, outdoor: boolean): void {
       group.visible = outdoor;
       if (!outdoor) return;
@@ -295,4 +313,6 @@ export function buildBladeGrassBand(
       sectorPool.syncSectors();
     },
   };
+  liveView = view;
+  return view;
 }

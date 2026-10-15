@@ -11,6 +11,7 @@ import {
   GPU_TIMER_SCENE_BRACKET,
   labelGpuTimerPass,
 } from './gpu_timer_probe_core';
+import { paletteLabEnabled, setPaletteBloomPass } from './palette_lab';
 import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
@@ -67,9 +68,9 @@ import { OpaqueSceneCapture } from './scene_sampling';
 // brightest lit diffuse or the whole sunlit world glows. Sunlit high-albedo
 // plaster/snow peaks near 1.02 luma at the current rig; 1.32 leaves it dark
 // and reserves bloom for emissives, which gfx.ts EMISSIVE_* push above it.
-const BLOOM_STRENGTH = 0.4; // subtle: fires/lamps/windows glow, sky must not blow out
+export const BLOOM_STRENGTH = 0.4; // subtle: fires/lamps/windows glow, sky must not blow out
 const BLOOM_RADIUS = 0.6;
-const BLOOM_THRESHOLD = 1.32;
+export const BLOOM_THRESHOLD = 1.32;
 
 // Ability-VFX screen feedback (ported from the gallery DistortShader, ripple
 // and flash arms only): up to 4 world-anchored radial distortion ripples,
@@ -300,6 +301,7 @@ export function buildComposer(
     labelGpuTimerPass(bloom, 'bloom');
     composer.addPass(bloom);
   }
+  setPaletteBloomPass(bloom);
   // RenderPass writes readBuffer, and bloom does not swap it before the grade.
   // Read it at grade draw time: the swapping tail can alternate the scene's
   // target each frame. Capturing `target` would sample stale depth (or the
@@ -330,7 +332,7 @@ export function buildComposer(
   const grade = new OutputGradePass(
     sharedUniforms.uTime,
     bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
-    { fxaa: plan.gradeFxaa, celInk },
+    { fxaa: plan.gradeFxaa, celInk, paletteGrade: paletteLabEnabled() },
   );
   labelGpuTimerPass(grade, 'grade');
   composer.addPass(grade);
@@ -341,7 +343,7 @@ export function buildComposer(
     ? new OutputGradePass(
         sharedUniforms.uTime,
         bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
-        { fxaa: true, celInk },
+        { fxaa: true, celInk, paletteGrade: paletteLabEnabled() },
       )
     : null;
   if (gradeFxaaTwin) {

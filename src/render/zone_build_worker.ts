@@ -21,6 +21,7 @@ import { attachVoxelData, decodeVoxelRle } from '../sim/terrain_cuts';
 import type { TerrainCut, WorldContent } from '../sim/types';
 import type { CavityMeshArrays } from './cut_cavity_core';
 import { type CavityTileJob, cavityTransferList, marchCavityTile } from './cut_cavity_tile_core';
+import { type GroundPaletteTable, setGroundPaletteOverrides } from './ground_palette_override_core';
 
 /** FORK: dug volumes this worker holds, by identity (see VoxelVolumeMessage). */
 const voxStore = new Map<string, { vrev: number; data: Int8Array }>();
@@ -78,6 +79,9 @@ export interface TerrainChunkRequest {
    *  cuts sends nothing and the mesher keeps its old fast path. */
   cuts?: readonly TerrainCut[];
   cutPatches?: readonly TerrainCut[];
+  /** Palette-lab ground overrides (ground_palette_override_core.ts), present
+   *  once the main thread ever set one; null clears them back to stock. */
+  groundPalette?: GroundPaletteTable | null;
 }
 
 /** The sheet's vertex positions travel EXPLICITLY rather than being re-derived
@@ -167,6 +171,7 @@ function transferListFor(arrays: ChunkGeometryArrays): Transferable[] {
 }
 
 export function buildChunkArrays(job: TerrainChunkRequest): ChunkGeometryArrays {
+  if (job.groundPalette !== undefined) setGroundPaletteOverrides(job.groundPalette);
   const state = beginChunkGeometry(
     job.x0,
     job.z0,

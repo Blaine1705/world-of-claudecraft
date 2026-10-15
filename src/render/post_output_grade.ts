@@ -19,6 +19,7 @@ import {
   type WebGLRenderTarget,
 } from 'three';
 import { FullScreenQuad, Pass } from 'three/examples/jsm/postprocessing/Pass.js';
+import { PALETTE_GRADE_GLSL, paletteGradeUniforms } from './palette_lab';
 import { CEL_INK_GLSL } from './post_cel_ink_glsl';
 import { FINITE_GUARD_GLSL } from './post_finite_guard_glsl';
 
@@ -41,6 +42,10 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
 
   #ifdef CEL_INK
   ${CEL_INK_GLSL}
+  #endif
+
+  #ifdef PALETTE_GRADE
+  ${PALETTE_GRADE_GLSL}
   #endif
 
   #include <tonemapping_pars_fragment>
@@ -285,10 +290,19 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
     // one, so on that path this is the grade's own entry quantize and nothing
     // more; the taps it blended are deliberately not quantized individually.
     vec3 c = quantizeHalf(outputColor.rgb);
+    #ifdef PALETTE_GRADE
+    // Palette lab: the look owns the white balance (the stock GAIN at mix 0).
+    c = pow(max(vec3(0.0), c * mix(GAIN, uPalWB.rgb, uPalWB.a) + LIFT), GAMMA);
+    #else
     c = pow(max(vec3(0.0), c * GAIN + LIFT), GAMMA);
+    #endif
     c = mix(c, c * c * (3.0 - 2.0 * c), 0.23);
     float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
     c = mix(vec3(l), c, 1.07);
+    #ifdef PALETTE_GRADE
+      // Palette lab (?palette=on): the live zone look, on the display image.
+      c = paletteGrade(c);
+    #endif
     vec2 d = vUv - 0.5;
     c *= 1.0 - 0.20 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);
     c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;
@@ -335,6 +349,12 @@ export interface OutputGradeOptions {
    * its own, and its taps ride the same uInputUvRect remap and clamp.
    */
   readonly celInk?: GradeCelInk;
+  /**
+   * Compile in the palette lab's live grade (`?palette=on`,
+   * palette_lab/palette_grade.ts) over the lab's SHARED uniform block, so every
+   * grade pass of the chain draws the same look.
+   */
+  readonly paletteGrade?: boolean;
 }
 
 /** Where the grade's cel ink reads scene depth, and the look's knobs. */
@@ -366,6 +386,7 @@ export class OutputGradePass extends Pass {
   readonly fsQuad: FullScreenQuad;
   readonly fxaa: boolean;
   private readonly celInk: GradeCelInk | null;
+  private readonly paletteGrade: boolean;
   private outputColorSpace: string | null = null;
   private toneMapping: ToneMapping | null = null;
   private readonly hasPreparedBloom: boolean;
@@ -379,6 +400,7 @@ export class OutputGradePass extends Pass {
     this.hasPreparedBloom = bloomTexture !== null;
     this.fxaa = options.fxaa === true;
     this.celInk = options.celInk ?? null;
+    this.paletteGrade = options.paletteGrade === true;
     this.uniforms = {
       tDiffuse: { value: null },
       tBloom: { value: bloomTexture },
@@ -395,7 +417,7 @@ export class OutputGradePass extends Pass {
     this.material = new RawShaderMaterial({
       name: 'OutputGradeShader',
       glslVersion: GLSL3,
-      uniforms: this.uniforms,
+      uniforms: this.paletteGrade ? { ...this.uniforms, ...paletteGradeUniforms() } : this.uniforms,
       vertexShader: OUTPUT_GRADE_VERTEX_SHADER,
       fragmentShader: OUTPUT_GRADE_FRAGMENT_SHADER,
       depthTest: false,
@@ -440,6 +462,9 @@ export class OutputGradePass extends Pass {
       }
       if (this.celInk) {
         this.material.defines.CEL_INK = '';
+      }
+      if (this.paletteGrade) {
+        this.material.defines.PALETTE_GRADE = '';
       }
       if (ColorManagement.getTransfer(renderer.outputColorSpace) === SRGBTransfer) {
         this.material.defines.SRGB_TRANSFER = '';
