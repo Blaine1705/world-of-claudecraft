@@ -25650,6 +25650,11 @@ export const pt_BR: EnTranslations = {
         "title": "Mestre do Boticário",
         "greeting": "Meça duas vezes e despeje uma vez, {className}. O boticário não tem paciência com reagentes derramados."
       },
+      "steward_ansel_hale": {
+        "name": "Ansel Hale",
+        "title": "Steward of the Manor",
+        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
+      },
       "farmer_jessica": {
         "name": "Fazendeira Jessica",
         "title": "Cuidadora de Lotes",

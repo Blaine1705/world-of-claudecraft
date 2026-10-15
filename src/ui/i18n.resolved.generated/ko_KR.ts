@@ -25650,6 +25650,11 @@ export const ko_KR: EnTranslations = {
         "title": "약방의 주인",
         "greeting": "두 번 재고 한 번에 부어라, {className}. 약방에서는 쏟은 시약을 봐주지 않는다."
       },
+      "steward_ansel_hale": {
+        "name": "안셀 헤일",
+        "title": "저택의 집사",
+        "greeting": "저택에 온 것을 환영하오, {className}. 화롯가에서 몸을 녹이시오. 양탄자를 조심하고, 상석의 식탁에는 손대지 마시오. 광장 사람들이 집으로 가는 길을 찾도록 등불은 밤새 타오르오."
+      },
       "farmer_jessica": {
         "name": "농부 제시카",
         "title": "텃밭 지기",

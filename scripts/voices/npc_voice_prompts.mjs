@@ -1195,6 +1195,11 @@ export const VOICE_ALIAS = {
   // Promote her to her own VOICE_PROMPTS entry, warmer and more weathered than
   // Odile's, once an ElevenLabs key is available to design and render it.
   harbormaster_tamsin: 'harbormaster_odile',
+  // Ansel Hale, the steward of the Highwatch manor (src/sim/content/highwatch_manor.ts):
+  // a household's keeper of accounts and keys, so he borrows the bursar's designed voice
+  // as a ROLE match. Promote him to his own VOICE_PROMPTS entry once an ElevenLabs key is
+  // available to design and render it.
+  steward_ansel_hale: 'bursar_fernando',
   // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
   // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
   // than the same character recurring under a suffixed id: each borrows the

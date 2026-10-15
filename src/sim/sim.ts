@@ -673,6 +673,7 @@ import {
   reliquarySaveFragment,
 } from './reliquary';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
+import { spawnReservedResidents } from './reserved_residents';
 import type { ResolvedAbility } from './resolved_ability';
 import { freshCounters, type RewardCounters } from './reward_counters';
 import { Rng } from './rng';
@@ -720,7 +721,6 @@ import {
   WORLD_BOSSES,
 } from './world_boss';
 import { spawnDevBoss, spawnWorldBoss } from './world_boss_spawn';
-import { spawnHarborHouseKeeper } from './wyrmwatch_harbor_house';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -2576,11 +2576,11 @@ export class Sim {
       }
     }
 
-    // Escorts, the practice yards, the harbormaster: rng-free, trailing or reserved ids.
+    // Escorts, the practice yards, the reserved residents: rng-free, trailing or reserved ids.
     initEscortsImpl(this.ctx);
     spawnHubPractice(this.ctx, worldContent);
     spawnHealingTrainingGround(this.ctx, worldContent);
-    spawnHarborHouseKeeper(this.ctx, worldContent);
+    spawnReservedResidents(this.ctx, worldContent);
   }
 
   private lockoutNowMs(): number {

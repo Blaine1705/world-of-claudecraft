@@ -4303,6 +4303,20 @@
           "field_kit"
         ]
       },
+      "steward_ansel_hale": {
+        "id": "steward_ansel_hale",
+        "name": "Ansel Hale",
+        "title": "Steward of the Manor",
+        "pos": {
+          "x": 31.5,
+          "z": 754.4
+        },
+        "facing": 3.141592653589793,
+        "color": 6969996,
+        "questIds": [],
+        "greeting": "Welcome to the manor, $C. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home.",
+        "dynamic": true
+      },
       "tidewatcher_ondrel": {
         "id": "tidewatcher_ondrel",
         "name": "Ondrel Vane",

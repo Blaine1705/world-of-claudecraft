@@ -25650,6 +25650,11 @@ export const pl_PL: EnTranslations = {
         "title": "Mistrz Aptekarstwa",
         "greeting": "Odmierz dwa razy i wlej raz, {className}. Aptekarz nie ma cierpliwości do rozlanych odczynników."
       },
+      "steward_ansel_hale": {
+        "name": "Ansel Hale",
+        "title": "Steward of the Manor",
+        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
+      },
       "farmer_jessica": {
         "name": "Farmer Jessica",
         "title": "Opiekunka działek",
