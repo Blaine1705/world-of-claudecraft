@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { customMapToWorldContent, newCustomMap, newFlatCustomMap } from '../src/editor/custom_map';
+import { GREAT_TREE_MODEL } from '../src/editor/world_prop_conversion';
 import {
   promoteEditablePalms,
   promoteMajorWorldProps,
@@ -7,6 +8,7 @@ import {
   withoutEditableWorldProps,
   worldMajorPropPlacements,
 } from '../src/editor/world_prop_placements';
+import { targetHeightFor } from '../src/render/asset_scale';
 import { isEastbrookRebuildBuilding } from '../src/render/eastbrook_town';
 import { isFenbridgeRebuildBuilding } from '../src/render/fenbridge_town';
 import { pathCrossesFence } from '../src/sim/colliders';
@@ -83,16 +85,21 @@ describe('editable overworld scenery', () => {
     expect(withoutEditableWorldProps(props)).toEqual(EMPTY);
   });
 
-  it('sizes promoted great trees from the same full-model height as the renderer', () => {
+  it('sizes promoted great trees the way the zone modules scale the full model', () => {
     const [tree] = worldMajorPropPlacements({
       ...EMPTY,
       greatTrees: [{ x: 23, z: 24, r: 4 }],
     });
 
-    // The authored target is r * 12 = 48 yards. PlacedAssetsView normalizes
-    // twisted_1 to 7.5 yards, so scale 6.4 is the exact matching transform.
+    // No zone owns this record, so it takes the Wraithwood elders' scale
+    // (render/haunt_features.ts): r * (2.4 + roll * 0.5) on the raw model,
+    // which PlacedAssetsView reaches through its targetHeightFor normalization.
     expect(tree.assetId).toBe('foliage/twisted_1');
-    expect(tree.scale).toBeCloseTo(6.4, 6);
+    const raw =
+      (targetHeightFor('/models/foliage/twisted_1.glb') / GREAT_TREE_MODEL.maxDim) * tree.scale;
+    expect(raw).toBeGreaterThanOrEqual(4 * 2.4 - 1e-9);
+    expect(raw).toBeLessThanOrEqual(4 * 2.9 + 1e-9);
+    // the model keeps its authored proportions
     expect(tree.scaleX).toBe(1);
     expect(tree.scaleY).toBe(1);
     expect(tree.scaleZ).toBe(1);
@@ -203,8 +210,8 @@ describe('editable overworld scenery', () => {
 
   it('fits camp tents to a natural aspect instead of stretching them across the map', () => {
     // The tents' baked collision is only thin pole slabs, so fitting the target
-    // width to it used to blow scaleX up to ~12 (a map-spanning band). The fit
-    // must now fall back to a sane aspect on that axis.
+    // width to it once blew scaleX up to ~12 (a map-spanning band). The faithful
+    // conversion scales a tent evenly in its own units, never lopsided.
     const props: ZonePropsDef = {
       ...EMPTY,
       tents: [
@@ -217,8 +224,7 @@ describe('editable overworld scenery', () => {
     const tents = worldMajorPropPlacements(props).filter((p) => p.name?.startsWith('Camp tent'));
     expect(tents.length).toBe(4);
     for (const tent of tents) {
-      expect(tent.scaleX ?? 1, `${tent.assetId} scaleX`).toBeLessThanOrEqual(3);
-      expect(tent.scaleZ ?? 1, `${tent.assetId} scaleZ`).toBeLessThanOrEqual(3);
+      expect(tent.scaleX ?? 1, `${tent.assetId} even`).toBeCloseTo(tent.scaleZ ?? 1, 9);
       // Height still scaled normally (positive), just not stretched sideways.
       expect(tent.scale).toBeGreaterThan(0);
     }

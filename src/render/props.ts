@@ -455,7 +455,7 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   ...MUSTER_KIT_PROP_DEFS,
 };
 
-type PropKey = keyof typeof PROP_ASSET_DEFS;
+export type PropKey = keyof typeof PROP_ASSET_DEFS;
 
 const loadedProps = new Map<string, GLTF>();
 const propLoadTasks = new Map<string, Promise<void>>();
@@ -1085,7 +1085,7 @@ const propRand = propPlacementRoll;
 // building becomes is always the asset it really renders as.
 const HOUSE_POOL: PropKey[] = ['house1', 'house2', 'blacksmith'];
 const HOUSE_POOL_HOLLOW: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
-const HOUSE_HEIGHT: Record<string, number> = {
+export const HOUSE_HEIGHT: Readonly<Record<string, number>> = {
   house1: 8.0,
   house2: 7.6,
   blacksmith: 6.6,
@@ -1138,7 +1138,7 @@ export function chapelTowerWorldCenter(b: { x: number; z: number; rot: number })
  * impostor collector, so a far sprite can never disagree with the model it
  * hands off to.
  */
-function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] }): PropKey {
+export function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] }): PropKey {
   const key = b.x * 13.7 + b.z * 3.1;
   const pool = b.kind === 'hollowHouse' ? HOUSE_POOL_HOLLOW : HOUSE_POOL;
   return KIND_ASSET[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];

@@ -33,6 +33,7 @@ import {
   reachPalmSpots,
   terrainHeight,
 } from '../sim/world';
+import { worldMajorPropPlacements } from './world_prop_conversion';
 
 const MIN_AXIS_SCALE = 0.05;
 
@@ -192,8 +193,14 @@ function offsetAlongLocalZ(
   return { x: x + Math.sin(rotY) * localZ, z: z + Math.cos(rotY) * localZ };
 }
 
-/** Expand every built-in building and fence module into a selectable placement. */
-export function worldMajorPropPlacements(
+/**
+ * The FIRST world-prop conversion, frozen: it fitted each model to a box
+ * measured from its collision, which is not the drawn model (a mud hut's
+ * mushroom came out five times the game's size). world_prop_conversion.ts is
+ * the conversion now; this survives only so repairLegacyWorldPropFit can
+ * recognise placements older documents saved from it. Do not change it.
+ */
+export function legacyWorldMajorPropPlacements(
   props: ZonePropsDef,
   seed = 20061,
   includePalms = false,
@@ -872,6 +879,8 @@ function propLabel(key: string): string {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
+export { worldMajorPropPlacements };
+
 export function withoutEditableWorldProps(props: ZonePropsDef): ZonePropsDef {
   const town = authoredTownProps(props);
   const out: ZonePropsDef = {
@@ -919,7 +928,13 @@ const STRETCH_PRONE_ASSET_IDS = new Set(['props/tent_open', 'props/tent_small'])
 export function repairStretchedWorldProps(map: { placements: MapPlacement[] }): boolean {
   let changed = false;
   for (const placement of map.placements) {
-    if (STRETCH_PRONE_ASSET_IDS.has(placement.assetId)) {
+    // Only a LOPSIDED stretch is the old runaway fit: a faithful conversion
+    // (world_prop_conversion.ts) scales a tent evenly in its own units, so
+    // both axes run above the cap together and must be left alone.
+    const sx = placement.scaleX ?? 1;
+    const sz = placement.scaleZ ?? 1;
+    const lopsided = Math.max(sx, sz) / Math.max(1e-6, Math.min(sx, sz)) > MAX_FIT_STRETCH;
+    if (STRETCH_PRONE_ASSET_IDS.has(placement.assetId) && lopsided) {
       if ((placement.scaleX ?? 1) > MAX_FIT_STRETCH) {
         placement.scaleX = 1;
         changed = true;
@@ -933,7 +948,14 @@ export function repairStretchedWorldProps(map: { placements: MapPlacement[] }): 
       // Older promoted great trees derived their uniform scale from the baked
       // trunk collider's height even though the renderer normalizes the full
       // canopy to 7.5 yards. Convert that legacy basis once.
-      if (/^Great tree \d+$/.test(placement.name ?? '') && placement.scale > 8) {
+      // Those seated the tree at y 0 or -0.2; the faithful conversion drops
+      // the GLB origin by the model's base times its (large) scale, always
+      // below -2, so a faithful giant is never mistaken for one.
+      if (
+        /^Great tree \d+$/.test(placement.name ?? '') &&
+        placement.scale > 8 &&
+        (placement.y ?? 0) > -0.25
+      ) {
         const ratio =
           collisionHeight(placement.assetId) / targetHeightFor(`/models/${placement.assetId}.glb`);
         placement.scale *= ratio;
@@ -950,6 +972,81 @@ export function repairStretchedWorldProps(map: { placements: MapPlacement[] }): 
     }
   }
   return changed;
+}
+
+// The transform a world-prop conversion sets, with each field's default.
+const CONVERTED_TRANSFORM: readonly (readonly [keyof MapPlacement, number])[] = [
+  ['x', 0],
+  ['z', 0],
+  ['y', 0],
+  ['rotX', 0],
+  ['rotY', 0],
+  ['rotZ', 0],
+  ['scale', 1],
+  ['scaleX', 1],
+  ['scaleY', 1],
+  ['scaleZ', 1],
+];
+
+function sameConvertedTransform(a: MapPlacement, b: MapPlacement): boolean {
+  return CONVERTED_TRANSFORM.every(([key, fallback]) => {
+    const av = (a[key] as number | undefined) ?? fallback;
+    const bv = (b[key] as number | undefined) ?? fallback;
+    return Math.abs(av - bv) <= 1e-6 * Math.max(1, Math.abs(bv));
+  });
+}
+
+/**
+ * Upgrade world props an older document saved from the first conversion
+ * (legacyWorldMajorPropPlacements, fitted to collision boxes, so a mud hut
+ * drew five times the game's size) to the faithful one
+ * (world_prop_conversion.ts). Only placements the maker never touched move:
+ * same name, same asset, and exactly the transform the old conversion set.
+ * Anything moved, turned, resized or renamed keeps the maker's edit. A
+ * placement the faithful conversion no longer emits is left as it is.
+ * Idempotent (an upgraded placement no longer matches the old transform);
+ * returns how many it upgraded.
+ */
+export function repairLegacyWorldPropFit(map: {
+  placements: MapPlacement[];
+  propsMode?: 'empty' | 'editable-major' | 'editable-all';
+  presentationMode?: string;
+  content: { zones: readonly { id: string }[] };
+  meta: { seed: number };
+}): number {
+  if (map.propsMode !== 'editable-all' || map.presentationMode !== undefined) return 0;
+  const builtinIds = BUILTIN_WORLD.zones.map((zone) => zone.id);
+  if (
+    map.content.zones.length !== builtinIds.length ||
+    !map.content.zones.every((zone, index) => zone.id === builtinIds[index])
+  ) {
+    return 0;
+  }
+  const byName = (list: MapPlacement[]) => new Map(list.map((p) => [p.name ?? '', p] as const));
+  const legacy = byName(legacyWorldMajorPropPlacements(BUILTIN_WORLD.props, map.meta.seed, true));
+  const faithful = byName(worldMajorPropPlacements(BUILTIN_WORLD.props, map.meta.seed, true));
+  let upgraded = 0;
+  map.placements.forEach((placement, index) => {
+    const name = placement.name;
+    if (!name) return;
+    const old = legacy.get(name);
+    const next = faithful.get(name);
+    if (!old || !next || old.assetId !== placement.assetId) return;
+    if (!sameConvertedTransform(placement, old)) return;
+    // the two conversions agree on this one (the palms): nothing to upgrade
+    if (next.assetId === placement.assetId && sameConvertedTransform(placement, next)) return;
+    // Untouched: take the faithful conversion whole, keeping the document's
+    // own identity fields (uid, group, building membership and the like).
+    const { uid, groupId, cityId, building } = placement;
+    const replacement: MapPlacement = { ...next };
+    if (uid !== undefined) replacement.uid = uid;
+    if (groupId !== undefined) replacement.groupId = groupId;
+    if (cityId !== undefined) replacement.cityId = cityId;
+    if (building !== undefined) replacement.building = building;
+    map.placements[index] = replacement;
+    upgraded++;
+  });
+  return upgraded;
 }
 
 /** One-time in-memory upgrade for legacy world maps whose scenery was still
