@@ -1416,7 +1416,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
   // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
-  '1032a348ffb83867324be023bdad53df1f5d6d466034414a5c52d1a84220ea92';
+  // Re-minted for the Highwatch grand-scale experiment: the indoor camera port moved the
+  // renderer leaf. No capture was retaken.
+  'f8e31f464a440b075eb7eed63b61bdb886efcd50b5b5f66f7d80f07bd7d665e7';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1454,7 +1456,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
   // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
-  'f730059759e29f6116e528853e94fb8003bd821bcaff27cf0e12ef1b44731805';
+  // Re-minted for the Highwatch grand-scale experiment: the indoor camera port moved the
+  // renderer leaf. No capture was retaken.
+  'cc40556df6c1eb149573d554c664f7ff06a749db0a115635524b62c6efd41868';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2849,7 +2853,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // over the re-swept evidence. No capture was retaken.
       // The Studio movable-objects merge with the v0.45.0 integration:
       // recomputed LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('079a0b5f8472f56b57c054a4ea651de7837d6b5f511318a1f4f8564cce562088');
+      // The Highwatch grand-scale experiment's indoor camera port: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+    ).toBe('e2cd7fa72d6a64ea6784e2fa772857ef1e3383db8f4e43c9439342830f6c2251');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
