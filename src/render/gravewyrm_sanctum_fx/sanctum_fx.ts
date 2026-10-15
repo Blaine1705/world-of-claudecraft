@@ -50,7 +50,7 @@ import {
   SANCTUM_THAW_THE_HELD,
   SANCTUM_TOPPLE_BRAZIER,
 } from '../../sim/mob/trash_kit/sanctum_cast_ids';
-import type { Entity, SimEvent } from '../../sim/types';
+import type { Entity, SimEvent, TuskerLane } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import {
   type TelegraphFan,
@@ -187,6 +187,15 @@ export class SanctumFx {
    *  target marker). */
   private readonly aim: TuskerAimFx | null;
   private readonly aimLook: TrampleAimLook = trampleAimLook(null, 0);
+  /** The Trample lane re-planned each frame of its bar (reused). */
+  private readonly laneScratch: TuskerLane = {
+    x: 0,
+    z: 0,
+    yaw: 0,
+    length: 0,
+    reach: 0,
+    outcropId: null,
+  };
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly geometries: THREE.BufferGeometry[] = [];
@@ -580,7 +589,13 @@ export class SanctumFx {
       // the lock) until the road ends, measured from the instance-local start
       // exactly as the sim measures it. A lane that touches a standing ice
       // outcrop ends in it, and reads ice blue; any other reads red.
-      const lane = planTrampleLaneWorld(x, z, caster.facing, this.bait?.standing() ?? []);
+      const lane = planTrampleLaneWorld(
+        x,
+        z,
+        caster.facing,
+        this.bait?.standing() ?? [],
+        this.laneScratch,
+      );
       slot.length = lane.reach;
       const look = trampleAimLook(lane.outcropId, caster.castRemaining, this.aimLook);
       this.kit.drapeLane(

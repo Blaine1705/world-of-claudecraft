@@ -41,7 +41,7 @@ import {
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import type { OutcropSpot } from '../../sim/encounters/gravewyrm_sanctum/tusker_road';
 import { planTrampleLaneWorld } from '../../sim/encounters/gravewyrm_sanctum/tusker_road_world';
-import type { Entity, SimEvent } from '../../sim/types';
+import type { Entity, SimEvent, TuskerLane } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import {
   TELEGRAPH_THREAT_COLORS,
@@ -412,6 +412,15 @@ export class TuskerBaitFx {
   private readonly armed: TelegraphFan;
   private readonly paint: TelegraphPaint = { fill: 0, clock: 0, range: 1, fade: 1 };
   private readonly standingSpots: OutcropSpot[] = [];
+  private readonly spotPool: OutcropSpot[] = [];
+  private readonly laneScratch: TuskerLane = {
+    x: 0,
+    z: 0,
+    yaw: 0,
+    length: 0,
+    reach: 0,
+    outcropId: null,
+  };
   private readonly tmpPt = { x: 0, z: 0 };
   private readonly struck = { shove: 0, jitter: 0, cracks: 0 };
   private readonly presence = { front: 0, flames: 0, edge: 0 };
@@ -639,10 +648,17 @@ export class TuskerBaitFx {
 
   /** The standing outcrops in view, in the world (the lane plan's input). */
   standing(): readonly OutcropSpot[] {
+    // Called every frame of a Trample's bar: the spots are reused.
     const out = this.standingSpots;
     out.length = 0;
-    for (const o of this.outcrops)
-      if (o.objectId >= 0 && o.phase === 'whole') out.push({ id: o.objectId, x: o.x, z: o.z });
+    for (const o of this.outcrops) {
+      if (o.objectId < 0 || o.phase !== 'whole') continue;
+      const spot = (this.spotPool[out.length] ??= { id: 0, x: 0, z: 0 });
+      spot.id = o.objectId;
+      spot.x = o.x;
+      spot.z = o.z;
+      out.push(spot);
+    }
     return out;
   }
 
@@ -805,7 +821,13 @@ export class TuskerBaitFx {
     let armedFill = 0;
     const aiming = !!tusker && !tusker.dead && tusker.castingAbility === TUSKER_TRAMPLE;
     if (tusker && aiming) {
-      const lane = planTrampleLaneWorld(tusker.pos.x, tusker.pos.z, tusker.facing, this.standing());
+      const lane = planTrampleLaneWorld(
+        tusker.pos.x,
+        tusker.pos.z,
+        tusker.facing,
+        this.standing(),
+        this.laneScratch,
+      );
       if (lane.outcropId !== null) {
         armedId = lane.outcropId;
         armedFill = telegraphFillOf(tusker.castRemaining, tusker.castTotal);

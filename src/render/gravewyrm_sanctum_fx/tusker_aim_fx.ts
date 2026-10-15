@@ -3,8 +3,8 @@
 //  - every ice outcrop's floor circle: an ice-blue ring with turning rune
 //    ticks under each intact outcrop for the whole fight, pulsing through a
 //    Trample's aim (the one the lane runs into hardest), white-blue while it
-//    holds the beast, and a dark broken ring once it has burst, so a player
-//    counts the baits left at a glance;
+//    holds the beast, and an unlit grey broken ring once it has burst, so a
+//    player counts the baits left at a glance;
 //  - the lane's end cap: an ice-shard burst on the outcrop's face while the
 //    lane would end in the ice, a plain arrowhead with chevrons running down
 //    the lane while it would not (the lane's own colour is the coordinator's,
@@ -23,11 +23,13 @@ import * as THREE from 'three';
 import { TUSKER_TRAMPLE } from '../../sim/encounters/gravewyrm_sanctum/ids';
 import type { OutcropSpot } from '../../sim/encounters/gravewyrm_sanctum/tusker_road';
 import { planTrampleLaneWorld } from '../../sim/encounters/gravewyrm_sanctum/tusker_road_world';
-import type { Entity } from '../../sim/types';
+import type { Entity, TuskerLane } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { SanctumFxHost } from './sanctum_fx_host';
 import {
+  MARKER_FAR_YARDS,
+  MARKER_MAX_SCALE,
   OUTCROP_CIRCLE_RADIUS,
   type OutcropCircleLook,
   outcropCircleLook,
@@ -68,7 +70,7 @@ void main() {
 
 /** An outcrop's circle: the ring, rune ticks turning inside it, a frost glow
  *  in its middle and a halo round it, with a dark rim either side so it reads
- *  on white snow. Spent: a dark ring broken in five, cracks across it. */
+ *  on white snow. Spent: an unlit grey ring broken in five, cracks across it. */
 const CIRCLE_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform float uGlow;
@@ -181,14 +183,19 @@ void main() {
 }
 `;
 
+/** The marker's shapes span -1..1 with their outlines; the quad spans a
+ *  little more, so no rim is clipped at a tip. */
+const MARKER_SPAN = 1.15;
+
 const MARKER_VERT = /* glsl */ `
 uniform float uSize;
 varying vec2 vUv;
 void main() {
-  vUv = position.xy * 2.0;
-  // A billboard: square to the camera, kept a readable size from afar.
+  vUv = position.xy * ${(2 * MARKER_SPAN).toFixed(2)};
+  // A billboard: square to the camera, kept a readable size from afar
+  // (tusker_aim_fx_core.ts targetMarkerScale).
   vec4 c = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
-  float s = uSize * clamp(-c.z / 26.0, 1.0, 3.0);
+  float s = uSize * clamp(-c.z / ${MARKER_FAR_YARDS.toFixed(1)}, 1.0, ${MARKER_MAX_SCALE.toFixed(1)});
   c.xy += position.xy * s;
   gl_Position = projectionMatrix * c;
 }
@@ -280,6 +287,8 @@ export class TuskerAimFx {
   private readonly look: TrampleAimLook = trampleAimLook(null, 0);
   private readonly circleLook: OutcropCircleLook = outcropCircleLook('whole', false, false, 0);
   private readonly standingSpots: OutcropSpot[] = [];
+  private readonly spotPool: OutcropSpot[] = [];
+  private readonly lane: TuskerLane = { x: 0, z: 0, yaw: 0, length: 0, reach: 0, outcropId: null };
   private aiming = false;
   private shown = { cap: false, marker: false };
   private disposed = false;
@@ -370,7 +379,7 @@ export class TuskerAimFx {
         uColor: { value: new THREE.Color(this.look.color) },
         uMode: { value: 0 },
         uTime: host.uTime,
-        uSize: { value: TARGET_MARKER_SIZE },
+        uSize: { value: TARGET_MARKER_SIZE * MARKER_SPAN },
       },
       vertexShader: MARKER_VERT,
       fragmentShader: MARKER_FRAG,
@@ -414,10 +423,21 @@ export class TuskerAimFx {
     if (casting && tusker) {
       const standing = this.standingSpots;
       standing.length = 0;
-      for (const o of outcrops)
-        if (o.objectId >= 0 && o.phase === 'whole')
-          standing.push({ id: o.objectId, x: o.x, z: o.z });
-      const lane = planTrampleLaneWorld(tusker.pos.x, tusker.pos.z, tusker.facing, standing);
+      for (const o of outcrops) {
+        if (o.objectId < 0 || o.phase !== 'whole') continue;
+        const spot = (this.spotPool[standing.length] ??= { id: 0, x: 0, z: 0 });
+        spot.id = o.objectId;
+        spot.x = o.x;
+        spot.z = o.z;
+        standing.push(spot);
+      }
+      const lane = planTrampleLaneWorld(
+        tusker.pos.x,
+        tusker.pos.z,
+        tusker.facing,
+        standing,
+        this.lane,
+      );
       const look = trampleAimLook(lane.outcropId, tusker.castRemaining, this.look);
       aimedId = lane.outcropId ?? -1;
       this.paintCap(tusker, lane, look);

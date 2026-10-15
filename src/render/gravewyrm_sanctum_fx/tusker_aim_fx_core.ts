@@ -11,7 +11,8 @@
 //                  whole fight; through a Trample's aim they all pulse and
 //                  the one the lane runs into pulses hardest; a struck one
 //                  burns white-blue while it holds the beast; a burst one goes
-//                  dark and broken, so a player counts the baits left.
+//                  out (no glow, an unlit grey ring broken in five), so a
+//                  player counts the baits left.
 //   The marker     over the target for the whole bar: a down arrow while the
 //                  lane follows them (lead it), two arrows pointing out to
 //                  either side once it locks (step aside).
@@ -160,11 +161,17 @@ export const TARGET_MARKER_HEIGHT = 4.4;
 /** Its size up close (yards). */
 export const TARGET_MARKER_SIZE = 2.6;
 
+/** Past this many yards from the camera the marker grows with distance... */
+export const MARKER_FAR_YARDS = 26;
+/** ...up to this many times its size up close. */
+export const MARKER_MAX_SCALE = 3;
+
 /** How much bigger the marker draws at `distance` yards from the camera, so
  *  it stays a readable size from across the road (never smaller than up
- *  close, never more than three times it). */
+ *  close, never more than three times it). The marker's vertex shader
+ *  (tusker_aim_fx.ts) is built from the same two constants. */
 export function targetMarkerScale(distance: number): number {
-  return Math.min(3, Math.max(1, distance / 26));
+  return Math.min(MARKER_MAX_SCALE, Math.max(1, distance / MARKER_FAR_YARDS));
 }
 
 /** The marker's bob (yards): it bounces while the lane follows, and holds
