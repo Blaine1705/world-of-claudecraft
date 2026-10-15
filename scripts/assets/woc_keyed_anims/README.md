@@ -92,6 +92,13 @@ independence, and this method makes no such claim.
   place in the weapon hand's frame is read at its keys, turned about the haft
   between them, and the arm is solved onto it every frame (`spec.grip`, with an
   optional let-go `weight`).
+- `keyed/pauldron.mjs` poses the shoulder pads (the `armor_shoulder` bones) from
+  the arm each frame, by the rule the rig's own library keys them with: half of
+  a swing forward or back, 0.45 of a drop and 0.3 of a lift out of the T-pose
+  bind, and none of the arm's twist, so the plates stay on top of the shoulders.
+  It runs at bake time, after the cached solve, so an edit to it needs no
+  re-solve; `tests/woc_keyed_pauldrons.test.ts` holds the rule to the rig's own
+  library and the shipped clips to the rule.
 - Direction variants reuse one authored clip: the eight crouch directions turn
   the forward sneak about the vertical axis; the right sidestroke mirrors the
   left one (`mirrorBeat`), with the male's own leg keys.
