@@ -27,6 +27,7 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from './rift/items';
+import { VAULT_MATERIAL_POOL } from './treasure_maps';
 
 /** Top-level shelf ids (Overview is virtual UI, not a catalog shelf row). */
 export type ReliquaryShelfId = 'conquerors' | 'professions' | 'horizons';
@@ -113,7 +114,9 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  * - buried_hoard: src/sim/treasure_vault.ts payOne rolls one piece off the fallen
  *   keeper's table (content/hoard_loot.ts rollHoardBossDrop) when an entrant
  *   opens the hoard's reward chest. The piece is never on the keeper's own mob
- *   loot, so a boss hint would name a door that does not hold it.
+ *   loot, so a boss hint would name a door that does not hold it. The same
+ *   chest always pays a stack of one Pristine specimen (VAULT_MATERIAL_POOL,
+ *   content/treasure_maps.ts, rolled by src/sim/rift/hoard_reward_roll.ts).
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
@@ -606,6 +609,16 @@ function withProfessions(
     if (professionId) return [id, fromProfession(professionId)] as const;
     return [id, fallback] as const;
   });
+}
+
+/** Adds the Buried Hoard door to a specimen the hoard chest also pays. */
+function withHoardMaterialHint(entry: RelicEntry): RelicEntry {
+  if (typeof entry === 'string' || !VAULT_MATERIAL_POOL.includes(entry[0])) return entry;
+  const [id, hints] = entry;
+  const [first, ...rest]: readonly ReliquarySourceHint[] = Array.isArray(hints)
+    ? hints
+    : [hints as ReliquarySourceHint];
+  return [id, [first, ...rest, fromActivity('buried_hoard')]] as const;
 }
 
 // Epic set members, pinned to the same id lists as col_set_* deeds in
@@ -1449,8 +1462,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // SPECIMEN_PROFESSIONS). The five pristine specimens come from corpse
     // harvest, which no gathering profession owns, so they name the
     // corpse_harvest activity, the same answer gather_event:perfect_specimen
-    // gives (one write site, src/sim/interaction.ts, awards the mark and these
-    // five items together). The CRAFTED FISHING ROD LADDER closes the angler's
+    // gives (src/sim/interaction.ts awards the mark and these five items
+    // together). The four Pristine ones are also the Buried Hoard chest's
+    // material stack (VAULT_MATERIAL_POOL), so they name buried_hoard as a
+    // second door; prime_cut is not in that pool. The CRAFTED FISHING ROD LADDER closes the angler's
     // chase, and since masterwrought Phase 11i that ladder is three rungs, not
     // two. Engineering crafts all three at the toolworks (ROD_RECIPES in
     // content/recipes.ts), so every one of them names the craft. What differs
@@ -1477,7 +1492,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
         RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
         SPECIMEN_PROFESSIONS,
         fromActivity('corpse_harvest'),
-      ),
+      ).map(withHoardMaterialHint),
       [
         'stormreel_fishing_rod',
         [fromProfession('engineering'), fromVendor('brother_halven_marsh')],
