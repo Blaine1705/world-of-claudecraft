@@ -23,6 +23,7 @@ import {
   GATHER_NODES,
   instanceOrigin,
   NPCS,
+  setActiveWorldContent,
   YUMI_BAND_X_MIN,
 } from '../src/sim/data';
 import { CRYPT_LAYOUT, DAIS_HEIGHT, tombSlotRoll } from '../src/sim/dungeon_layout';
@@ -38,7 +39,7 @@ import {
   TOWN_WALL_TALL_PILLAR_ALONG,
 } from '../src/sim/prop_layout';
 import { Sim } from '../src/sim/sim';
-import type { MoveInput } from '../src/sim/types';
+import type { MoveInput, StaticObbPropDef } from '../src/sim/types';
 import { groundHeight, terrainHeight } from '../src/sim/world';
 
 // The physics-asset audit, world half (docs/design/physics-asset-audit.md):
@@ -136,10 +137,10 @@ describe('full-height props reject standing (jump-spam 4s each)', () => {
 });
 
 describe('the town wall is a vaultable parapet, not a curtain', () => {
-  // Skipped: there is no parapet here to vault. Since the harbor move the only
-  // built-in props.walls are Fenbridge's palisade, a full-height log curtain
-  // (colliders.ts takes the parapet arm for every OTHER wall asset), so this
-  // run from (0, -25.4) never meets a wall at all. It kept passing by landing
+  // Skipped: there is no parapet here to vault. Since the harbor move the
+  // built-in world has had no parapet wall (and since the open Fenbridge, no
+  // props.walls entry at all), so this run from (0, -25.4) never meets a wall
+  // at all. It kept passing by landing
   // on a churchyard headstone south of the start; the painted apothecary
   // shop's level pad re-seats those stones, and the run now ends against the
   // shop's north wall. The parapet arm needs a fixture wall to be tested
@@ -164,21 +165,52 @@ describe('the town wall is a vaultable parapet, not a curtain', () => {
   });
 
   it('the tall lantern pylons stay full-height even for a body on the parapet', () => {
-    const walls = BUILTIN_WORLD.props.walls ?? [];
-    expect(walls.length).toBeGreaterThan(0);
-    for (const wall of walls.slice(0, 6)) {
-      const mirror = wall.mirrored ? -1 : 1;
-      const along = TOWN_WALL_TALL_PILLAR_ALONG * mirror * (wall.w / 2);
-      const px = wall.x + Math.sin(wall.rot + Math.PI / 2) * along;
-      const pz = wall.z + Math.cos(wall.rot + Math.PI / 2) * along;
-      const parapetY = groundHeight(px, pz, SEED) + wall.height * TOWN_WALL_PARAPET_FRAC + 1e-3;
-      // A mover standing at parapet height is still pushed out of the pylon.
-      const res = resolvePosition(SEED, px, pz, 0.4, false, undefined, {
-        y: parapetY,
-        lift: 0,
-      });
-      const moved = Math.hypot(res.x - px, res.z - pz);
-      expect(moved, `${wall.id} pylon holds at parapet height`).toBeGreaterThan(1e-4);
+    // Re-staged for the open Fenbridge (2026-10): its palisade was the last
+    // built-in props.walls entry (Eastbrook's ring retired with the harbor
+    // move), so the built-in world carries no wall at all now. Two fixture
+    // wings in a custom world (one mirrored, so the pylon swaps ends) drive
+    // the parapet arm of colliders.ts instead, the arm the pylons belong to;
+    // the palisade was a full-height curtain, which no pylon probe could fail.
+    expect(BUILTIN_WORLD.props.walls ?? []).toEqual([]);
+    const wing = {
+      assetId: '/models/props/eastbrook_wall_wing.glb',
+      w: 6.5,
+      d: 0.65,
+      rot: 0.4,
+      height: 2.7,
+    };
+    const walls: StaticObbPropDef[] = [
+      { ...wing, id: 'fixture_wall_wing', x: -60, z: 0 },
+      { ...wing, id: 'fixture_wall_wing_mirrored', x: -60, z: 20, mirrored: true },
+    ];
+    // Open, dry ground before the wings go in, so every push below is theirs.
+    for (const wall of walls) expect(isBlocked(SEED, wall.x, wall.z, 3.5), wall.id).toBe(false);
+    setActiveWorldContent({ ...BUILTIN_WORLD, props: { ...BUILTIN_WORLD.props, walls } });
+    try {
+      for (const wall of walls) {
+        const parapetFrom = (x: number, z: number): number =>
+          groundHeight(x, z, SEED) + wall.height * TOWN_WALL_PARAPET_FRAC + 1e-3;
+        // A body standing on the parapet's middle is carried, not pushed: the
+        // parapet itself is standable at its drawn height.
+        const onParapet = resolvePosition(SEED, wall.x, wall.z, 0.4, false, undefined, {
+          y: parapetFrom(wall.x, wall.z),
+          lift: 0,
+        });
+        expect(Math.hypot(onParapet.x - wall.x, onParapet.z - wall.z), wall.id).toBeLessThan(1e-9);
+        const mirror = wall.mirrored ? -1 : 1;
+        const along = TOWN_WALL_TALL_PILLAR_ALONG * mirror * (wall.w / 2);
+        const px = wall.x + Math.sin(wall.rot + Math.PI / 2) * along;
+        const pz = wall.z + Math.cos(wall.rot + Math.PI / 2) * along;
+        // A mover standing at parapet height is still pushed out of the pylon.
+        const res = resolvePosition(SEED, px, pz, 0.4, false, undefined, {
+          y: parapetFrom(px, pz),
+          lift: 0,
+        });
+        const moved = Math.hypot(res.x - px, res.z - pz);
+        expect(moved, `${wall.id} pylon holds at parapet height`).toBeGreaterThan(1e-4);
+      }
+    } finally {
+      setActiveWorldContent(null);
     }
   });
 });
@@ -345,17 +377,23 @@ describe('rebuild market stall (flat canopy at the authored height)', () => {
 });
 
 describe('chapel flows', () => {
-  // Re-anchored to the zone3 chapel (Highpass): the v0.31 civic rebuild
-  // replaced the Eastbrook chapel with a kit GLB (full-height OBB); the
+  // Re-anchored to Icemantle's chapel (Frostveil): the v0.31 civic rebuild
+  // replaced the Eastbrook chapel with a kit GLB (full-height OBB), and the
+  // Highwatch rebuild replaced the zone3 one with a painted building; the
   // composed tower-plus-hall physics now lives wherever the legacy
   // procedural chapel still stands.
-  const rot = 0.9;
-  const cx = -16;
-  const cz = 650;
+  const rot = -2;
+  const cx = -18;
+  const cz = 1570;
   const fx = Math.sin(rot);
   const fz = Math.cos(rot);
 
   it('climb the hall roof, walk into the tower face (blocked), fall off a side', () => {
+    const chapel = BUILTIN_WORLD.props.buildings.find(
+      (b) => b.kind === 'chapel' && !b.assetId && b.x === cx && b.z === cz,
+    );
+    // a rebuild that replaces this chapel moves the flow to another procedural one
+    expect(chapel, 'the procedural chapel this flow stands on').toMatchObject({ rot, w: 5, d: 7 });
     const sim = makeSim();
     const startX = cx + fx * (3.5 + 1.7);
     const startZ = cz + fz * (3.5 + 1.7);

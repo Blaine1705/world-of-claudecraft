@@ -5,8 +5,19 @@ import {
 } from '../src/render/foliage_core';
 import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 
+/** Points on the old palisade ring, every quarter yard, all the way round. */
+function oldRingSamples(): { x: number; z: number }[] {
+  const { center } = FENBRIDGE_LAYOUT.civic;
+  const { radius } = FENBRIDGE_LAYOUT.wall;
+  const count = Math.ceil((2 * Math.PI * radius) / 0.25);
+  return Array.from({ length: count }, (_, index) => {
+    const angle = (index / count) * 2 * Math.PI;
+    return { x: center.x + Math.cos(angle) * radius, z: center.z + Math.sin(angle) * radius };
+  });
+}
+
 describe('Fenbridge layout-driven grass exclusions', () => {
-  it('covers every canonical footprint, repeated boardwalk, gate jamb, and quest pickup', () => {
+  it('covers every canonical footprint, repeated boardwalk, and quest pickup', () => {
     const exclusions = eastbrookGrassExclusions([], true);
     const ids = new Set(exclusions.map((exclusion) => exclusion.id));
 
@@ -17,10 +28,6 @@ describe('Fenbridge layout-driven grass exclusions', () => {
     expect(ids.has(FENBRIDGE_LAYOUT.civic.cistern.id)).toBe(true);
     expect(ids.has(FENBRIDGE_LAYOUT.civic.provisionStall.id)).toBe(true);
     expect(ids.has(FENBRIDGE_LAYOUT.civic.musterBoard.id)).toBe(true);
-    for (const wall of FENBRIDGE_LAYOUT.wall.segments) expect(ids.has(wall.id)).toBe(true);
-    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
-      for (const jamb of gate.arch.jambs) expect(ids.has(jamb.id)).toBe(true);
-    }
     for (const boardwalk of FENBRIDGE_LAYOUT.repeated.boardwalks) {
       expect(ids.has(boardwalk.id)).toBe(true);
       expect(
@@ -35,11 +42,30 @@ describe('Fenbridge layout-driven grass exclusions', () => {
     }
   });
 
+  it('clears no palisade or gate footing: grass grows across the old ring all the way round', () => {
+    // Fenbridge stands open. The ring's sixteen wing OBBs and eight gate-jamb
+    // OBBs used to clear a band of grass round the town; now no exclusion is
+    // keyed to a wing or a jamb, and no point of the old ring line (gates
+    // included) sits inside any exclusion, at the padding the grass uses.
+    const exclusions = eastbrookGrassExclusions([], true);
+    expect(
+      exclusions.filter(
+        (exclusion) =>
+          exclusion.id.startsWith('fenbridge_palisade_wing') || exclusion.id.includes('_jamb_'),
+      ),
+    ).toEqual([]);
+    const samples = oldRingSamples();
+    expect(samples.length).toBeGreaterThan(700);
+    const covered = samples.filter((point) =>
+      insideEastbrookGrassExclusion(exclusions, point.x, point.z, 0.35),
+    );
+    expect(covered).toEqual([]);
+  });
+
   it('never injects fixed Fenbridge coordinates into a custom world', () => {
     const exclusions = eastbrookGrassExclusions([], false);
     const fenbridgeIds = new Set([
       ...FENBRIDGE_LAYOUT.buildings.map((building) => building.id),
-      ...FENBRIDGE_LAYOUT.wall.segments.map((wall) => wall.id),
       ...FENBRIDGE_LAYOUT.repeated.boardwalks.map((boardwalk) => boardwalk.id),
     ]);
     expect(exclusions.some((exclusion) => fenbridgeIds.has(exclusion.id))).toBe(false);

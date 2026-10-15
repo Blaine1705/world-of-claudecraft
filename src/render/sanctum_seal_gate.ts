@@ -15,7 +15,7 @@
 // mist moves on the shared uTime clock in its vertex shader: no per-frame CPU.
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
-import { DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
 import { SANCTUM_SEAL_GATE_DUNGEON_ID } from '../sim/sanctum_seal_gate';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -337,7 +337,7 @@ function rimeFan(door: { x: number; z: number }, base: number, seed: number): TH
 
 /** Build the Seal Gate (world coordinates). */
 export function buildSanctumSealGate(seed: number): SanctumSealGateView {
-  const door = DUNGEONS[SANCTUM_SEAL_GATE_DUNGEON_ID].doorPos;
+  const door = activeDungeonDoorPos(DUNGEONS[SANCTUM_SEAL_GATE_DUNGEON_ID]);
   const base = terrainHeight(door.x, door.z, seed);
   setSealSurfaceOrigin(door.x, base, door.z);
   const group = new THREE.Group();

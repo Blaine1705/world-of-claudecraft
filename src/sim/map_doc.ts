@@ -39,6 +39,7 @@ import { type ClutterStamp, MAX_CLUTTER_STAMPS, sanitizeClutterStamp } from './c
 import { sanitizeAssetFireEmitters } from './fire_effects';
 import { type FoliageParams, sanitizeFoliageParams } from './foliage_params';
 import type { GrassClearCircle } from './grass_clear';
+import { type ObjectMoves, sanitizeObjectMoves } from './moved_objects';
 import {
   CUT_MAX_BLEND,
   MAX_HOLE_PATCHES,
@@ -711,6 +712,11 @@ export interface MapDoc {
   // renderer-owned as shipped. Persisted here because most families have no
   // unique asset id to self-detect from the placements list.
   promotedScenery?: Record<string, boolean>;
+  // v3 optional: built-in GAMEPLAY objects this document moved (farm beds,
+  // practice dummies, gather nodes, dungeon doors), keyed `<kind>:<id>`
+  // (sim/moved_objects.ts). Ids never change; only positions do. The
+  // projection carries it into WorldContent.objectMoves. Absent = none moved.
+  objectMoves?: ObjectMoves;
   // v2 optional: caves/tunnels (the Caves tool). Each is a capsule-chain
   // centerline; sim + render share src/sim/caves.ts to derive the standalone
   // tube volume, the second ground sheet, and the mesh. Absent = none.
@@ -1909,6 +1915,8 @@ export function sanitizeMapDoc(raw: unknown): MapDoc | null {
     }
     if (Object.keys(flags).length > 0) doc.promotedScenery = flags;
   }
+  const objectMoves = sanitizeObjectMoves(o.objectMoves, MAX_WORLD_COORD);
+  if (objectMoves) doc.objectMoves = objectMoves;
   const blockers = arr(o.blockers)
     .slice(0, MAX_BLOCKERS)
     .map(sanitizeBlocker)

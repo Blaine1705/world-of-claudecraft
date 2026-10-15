@@ -1,7 +1,8 @@
 import { isEastbrookGrandArmoury } from '../sim/building_layout';
-import { DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
+import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 import {
   onWildheartBasinEntranceCauseway,
@@ -49,8 +50,11 @@ export function insideGrassHubExclusion(
  *  system asks this (the tuft ring and both blade carpets), so the paving
  *  reads as paving at every distance. */
 export function insidePavedGrassExclusion(x: number, z: number): boolean {
-  const door = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID]?.doorPos;
-  return door !== undefined && onWildheartBasinEntranceCauseway(door, x, z, 0.3);
+  const dungeon = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID];
+  return (
+    dungeon !== undefined &&
+    onWildheartBasinEntranceCauseway(activeDungeonDoorPos(dungeon), x, z, 0.3)
+  );
 }
 
 /** Hub and camp clearings for bushes/ferns, sourced from the active world only. */
@@ -156,7 +160,9 @@ export function eastbrookGrassExclusions(
     }
 
     for (const building of FENBRIDGE_LAYOUT.buildings) {
-      exclusions.push(layoutObb(building.id, building.footprint));
+      // A painted building clears its whole reach (porch, stair, awning), not
+      // only its wall box, as Eastbrook's do.
+      exclusions.push(layoutObb(building.id, building.reach));
       exclusions.push({
         kind: 'circle',
         id: `${building.id}:serviceApron`,
@@ -221,12 +227,8 @@ export function eastbrookGrassExclusions(
       z: FENBRIDGE_LAYOUT.civic.musterBoard.frontStandingPoint.z,
       radius: 1.2,
     });
-    for (const wall of FENBRIDGE_LAYOUT.wall.segments) {
-      exclusions.push(layoutObb(wall.id, wall.footprint));
-    }
-    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
-      for (const jamb of gate.arch.jambs) exclusions.push(layoutObb(jamb.id, jamb));
-    }
+    // Fenbridge stands open: grass grows up to the town on every side, with no
+    // palisade or gate footing to clear.
     for (const boardwalk of FENBRIDGE_LAYOUT.repeated.boardwalks) {
       exclusions.push({
         kind: 'obb',
@@ -245,6 +247,21 @@ export function eastbrookGrassExclusions(
         x: order.position.x,
         z: order.position.z,
         radius: 0.7,
+      });
+    }
+  }
+
+  if (builtInWorld) {
+    // Highwatch's painted buildings clear their whole reach and their door
+    // aprons, the Fenbridge rule; the rest of its square is the props view's.
+    for (const building of HIGHWATCH_LAYOUT.buildings) {
+      exclusions.push(layoutObb(building.id, building.reach));
+      exclusions.push({
+        kind: 'circle',
+        id: `${building.id}:serviceApron`,
+        x: building.frontStandingPoint.x,
+        z: building.frontStandingPoint.z,
+        radius: 1.5,
       });
     }
   }

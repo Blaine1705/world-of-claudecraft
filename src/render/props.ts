@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
+import { isBuiltinShapedWorld } from '../sim/builtin_shaped_world';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
 import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
@@ -49,6 +50,7 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
+import { isHighwatchRebuildBuilding } from './highwatch_town';
 import {
   type KitSurfaceFamily,
   kitHasUvSurfaceRouting,
@@ -454,7 +456,7 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   ...MUSTER_KIT_PROP_DEFS,
 };
 
-type PropKey = keyof typeof PROP_ASSET_DEFS;
+export type PropKey = keyof typeof PROP_ASSET_DEFS;
 
 const loadedProps = new Map<string, GLTF>();
 const propLoadTasks = new Map<string, Promise<void>>();
@@ -1084,7 +1086,7 @@ const propRand = propPlacementRoll;
 // building becomes is always the asset it really renders as.
 const HOUSE_POOL: PropKey[] = ['house1', 'house2', 'blacksmith'];
 const HOUSE_POOL_HOLLOW: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
-const HOUSE_HEIGHT: Record<string, number> = {
+export const HOUSE_HEIGHT: Readonly<Record<string, number>> = {
   house1: 8.0,
   house2: 7.6,
   blacksmith: 6.6,
@@ -1137,7 +1139,7 @@ export function chapelTowerWorldCenter(b: { x: number; z: number; rot: number })
  * impostor collector, so a far sprite can never disagree with the model it
  * hands off to.
  */
-function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] }): PropKey {
+export function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] }): PropKey {
   const key = b.x * 13.7 + b.z * 3.1;
   const pool = b.kind === 'hollowHouse' ? HOUSE_POOL_HOLLOW : HOUSE_POOL;
   return KIND_ASSET[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
@@ -1399,12 +1401,14 @@ export function buildProps(
   const transportShips: TransportShipView[] = [];
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
+  const builtInShaped = isBuiltinShapedWorld(activeContent);
   // The authored-town swap is gated on the town's DATA, not on world identity,
   // so an editor copy of the built-in world gets the same art the game draws
   // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
+  const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
@@ -1563,6 +1567,7 @@ export function buildProps(
     }
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
     if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
+    if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
     // roof Y mirrors the camera collider height in colliders.ts, through the
     // same shared helper, so an authored per-building height override cannot
     // leave the hideable top and the camera top disagreeing.
@@ -1719,14 +1724,18 @@ export function buildProps(
         if (wake) group.add(wake.points);
       })
     : null;
-  if (builtInWorld) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
+  // The piers and the built harbors below draw on any copy of the built-in
+  // world too (sim/builtin_shaped_world.ts): the sim walks their decks on every
+  // world. The ferry and its berth markers stay built-in only (it never sails
+  // a copy, transport_ferry.ts).
+  if (builtInShaped) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
   // ...and the route marker at every berth (render/harbor_route_markers.ts)
   if (builtInWorld) group.add(buildHarborRouteMarkers(seed));
   // ...and the Wyrmwatch cliff harbor at the Drakelands berth (render/wyrmwatch_harbor.ts),
   // its Harbormaster's House walls and roof kept out of the merge (they fade one by one for
   // the camera, render/wyrmwatch_harbor_house.ts) and its hearth and lanterns lit like a
   // campfire (root-level, world-positioned, in the fire-light budget)
-  if (builtInWorld) {
+  if (builtInShaped) {
     group.add(buildWyrmwatchHarbor(seed));
     for (const m of harborHouseShellMeshes()) keepFromMerge.add(m);
     for (const light of wyrmwatchHarborHouseLights()) {
@@ -1738,7 +1747,7 @@ export function buildProps(
   }
   // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts),
   // with the rest of the town's wooden harbor in the same wood (render/wickharbor_harbor.ts)
-  if (builtInWorld) {
+  if (builtInShaped) {
     group.add(buildWickharborWharf());
     group.add(buildWickharborHarbor());
   }
@@ -3131,6 +3140,7 @@ export function collectBuildingImpostors(seed: number): {
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
+  const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
   const used = new Map<string, PropAsset>();
   const instances: BuildingImpostorInstance[] = [];
   const use = (key: PropKey): PropAsset => {
@@ -3140,7 +3150,10 @@ export function collectBuildingImpostors(seed: number): {
   };
   for (const b of activeContent.props.buildings) {
     if (b.landmark) continue;
+    // A painted town building draws no kit sprite: its town view owns it.
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
+    if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
+    if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
     const y = terrainHeight(b.x, b.z, seed);
     if (b.kind === 'chapel') {
       const tower = use('bellTower');

@@ -17,10 +17,10 @@ import {
   yieldToMainThread,
 } from '../texture_prewarm';
 import {
+  directBuildAssetsResident,
   mechAssetsReady,
   onCharacterAssetReady,
   preloadMechAssets,
-  visualAssetsResident,
 } from './assets';
 import { modularVisualKey, playerVisualKey, VISUALS, type WeaponLayoutOverride } from './manifest';
 import {
@@ -51,15 +51,29 @@ import {
   type PreviewCamPose,
   type PreviewFocus,
   type PreviewFramingName,
+  touchShouldersPose,
 } from './preview_framing';
 import { previewMaterialGate } from './preview_material_gate';
 import { createPreviewOpenGate, type PreviewOpenGate } from './preview_open_gate_core';
 import { characterPreviewFrameVisible, resolveCharacterPreviewPolicy } from './preview_policy';
+import {
+  applyTouchStep,
+  TOUCH_TURN_PER_PX,
+  type TouchStep,
+  type TouchView,
+  touchHintOffered,
+  touchStepMoves,
+  touchViewAt,
+  touchViewPose,
+} from './preview_touch_core';
+import { attachPreviewTouchInput, type PreviewTouchInput } from './preview_touch_input';
 import { CharacterVisual } from './visual';
 import type { WocArmorDetail } from './woc_armor_core';
+import { prefetchWocKitLowTier } from './woc_armor_dressing';
 import { wocHeadBaseNode } from './woc_head_catalog';
 import type { WocHeadHold } from './woc_head_dressing';
 import type { WocHeadAppearanceInput } from './woc_head_look_core';
+import { ensureWocHeadForAppearance } from './woc_head_packs';
 import { classBodyComposes } from './woc_parts_core';
 
 /** The modular head packs' base heads (woc_head_catalog wocHeadBaseNode): what the
@@ -83,6 +97,29 @@ export interface PreviewOpenStandIn {
  *  enumerates GpuPrepEventKind keeps working with the union at four members. */
 export const PREVIEW_OPEN_ESCAPE_EVENT_KEY = 'preview-open';
 
+/** The 2D layer a host paints over the stage while its character is still loading (the
+ *  launcher's yellow silhouette, src/ui/preview_loading_silhouette.ts). Structural, like
+ *  PreviewOpenStandIn: the DOM lives in src/ui. `shape` is what the camera frames now. */
+export interface PreviewLoadingLayer {
+  show(container: HTMLElement, shape: 'body' | 'bust'): void;
+  hide(): void;
+}
+
+/** The one-time gesture hint a host shows beside a touch stage's creator model until the
+ *  player first moves it (the launcher's pinch hint, src/ui/preview_touch_hint.ts).
+ *  Structural, like PreviewLoadingLayer: the DOM lives in src/ui, and so does the memory of
+ *  whether the player has moved the model before. show() and hide() run every frame and must
+ *  be idempotent; interacted() is the player's first pinch, slide, turn or double tap. */
+export interface PreviewTouchHint {
+  show(container: HTMLElement): void;
+  hide(): void;
+  interacted(): void;
+}
+
+/** A camera this close (world units) frames a head and shoulders, not a whole body: the
+ *  loading layer draws its bust there. */
+const LOADING_BUST_MAX_DIST = 2.6;
+
 export interface CharacterPreviewPose {
   clips: readonly string[];
   fraction: number;
@@ -90,7 +127,24 @@ export interface CharacterPreviewPose {
 
 export interface CharacterPreviewOptions {
   constrainedMemory?: boolean;
+  /** Read live: whether this stage is a TOUCH stage, the phone interface's (the launcher
+   *  passes body.mobile-touch). A touch stage takes pinch to zoom, two fingers to move the
+   *  view, one finger to turn the character and tilt the camera, and a double tap to put the
+   *  camera back (preview_touch_core.ts); every stage there (the creator and the roster's
+   *  pick) opens on the head and shoulders, and a category never eases the camera to its
+   *  close-up (setFocus). Omitted (the HUD's stages): the mouse turntable, as before. */
+  touchStage?: () => boolean;
 }
+
+/** Vertical field of view of the preview camera, degrees (the constructor's). */
+const PREVIEW_FOV_DEG = 45;
+/** Reused by every camera aim, so a camera moved each frame allocates nothing. */
+const LOOK_AT = new THREE.Vector3();
+
+/** A head measure: the face close-up's aim height and the drawn head's height. */
+type HeadMeasure = { readonly y: number; readonly h: number | undefined };
+/** The measure of a stage with no head to measure (shared: the per-frame touch camera reads it). */
+const NO_HEAD_MEASURE: HeadMeasure = { y: CREATION_HEAD_Y, h: undefined };
 
 const PREVIEW_ANIM_STATE = {
   speed: 0,
@@ -183,7 +237,7 @@ export class CharacterPreview {
   /** The body the face close-up last measured its head on, and that height:
    *  a rebuilt body (a body-type switch) re-aims the landed close-up. */
   private focusHeadFor: object | null = null;
-  private focusHead: { y: number; h: number | undefined } = { y: CREATION_HEAD_Y, h: undefined };
+  private focusHead: HeadMeasure = NO_HEAD_MEASURE;
   /** The measure came off the modular head pack (final); a fallback measure (the
    *  head bone, while a head pack still streams) is re-taken once the pack hangs. */
   private focusHeadFinal = false;
@@ -212,10 +266,34 @@ export class CharacterPreview {
   private chosenBody: string | null = null;
   /** The armor detail the built body draws: what it was built at, or changed to since. */
   private armorDetail: WocArmorDetail = 'full';
+  /** The host's loading layer (setLoadingLayer): shown while the stage has no character drawn. */
+  private loadingLayer: PreviewLoadingLayer | null = null;
+  /** The host's gesture hint (setTouchHint): offered beside a touch creator's drawn model. */
+  private touchHint: PreviewTouchHint | null = null;
+  /** syncTouchHint's facts, refilled every frame instead of allocated. */
+  private readonly touchHintFacts = { touch: false, creator: false, visible: false, drawn: false };
 
   // Drag controls
   private isDragging = false;
   private previousMouseX = 0;
+
+  // Touch stage (CharacterPreviewOptions.touchStage)
+  private readonly touchStage: () => boolean;
+  /** Where the player put the camera on a touch stage; null while the stage's own opening
+   *  framing holds it (no gesture since the stage changed, or a double tap put it back). */
+  private touchView: TouchView | null = null;
+  /** The fingers on the canvas (preview_touch_input.ts), attached with the drag controls. */
+  private touchInput: PreviewTouchInput | null = null;
+  /** Whether the last frame's camera was the touch stage's (an Interface Mode switch flips
+   *  it between frames, with no resize to re-aim the camera). */
+  private touchWasActive = false;
+  /** What the touch camera was last solved for, so a still stage moves no camera. */
+  private touchSolvedFor = {
+    aspect: 0,
+    headY: 0,
+    headH: -1,
+    view: null as unknown,
+  };
 
   constructor(
     container: HTMLElement,
@@ -224,6 +302,7 @@ export class CharacterPreview {
   ) {
     this.container = container;
     this.canvas = canvas;
+    this.touchStage = options.touchStage ?? (() => false);
     const policy = resolveCharacterPreviewPolicy(options.constrainedMemory === true);
 
     // 1. Initialize WebGLRenderer
@@ -389,6 +468,30 @@ export class CharacterPreview {
   /** The armor detail the body on this stage draws now. */
   private stagedArmorDetail(): WocArmorDetail {
     return previewArmorDetail(this.armorSurface, this.stagedBody, this.chosenBody);
+  }
+
+  /**
+   * The creator's class body, about to be built: the files that let the player SEE it,
+   * asked for ahead of the one the build asks for itself (the stage's own armor tier).
+   * Every file of its head look first, since a preview body draws nothing until its whole
+   * head is live, then the smallest armor file of its kit (woc_armor_dressing.ts
+   * prefetchWocKitLowTier), which stands in while the stage's tier streams over it. All
+   * are demands and the loader serves demands first come first served, so they start
+   * ahead of the build's file even while the boot set's background stream holds most
+   * slots. Asked in the block that builds the body and puts its gate in without yielding,
+   * so no file asked for here can land before the gate is in (a tier already resident is
+   * attached at build, like any resident file). The creator wears exactly the default kit;
+   * another stage's character may wear other sets. A prefetch never costs the body.
+   */
+  private askCreatorFilesFirst(visualKey: string, detail: WocArmorDetail): void {
+    const manifest = VISUALS[visualKey]?.wocCharacter;
+    if (!manifest || this.armorSurface !== 'creator') return;
+    try {
+      ensureWocHeadForAppearance(manifest.fit, this.wocHeadApp);
+      prefetchWocKitLowTier(manifest, detail);
+    } catch (err) {
+      console.warn(`Preview prefetch failed for ${visualKey}:`, err);
+    }
   }
 
   /** Draw the built body at the armor detail its stage asks for now, in place (a body
@@ -580,11 +683,14 @@ export class CharacterPreview {
       this.openGate.forgetLinked();
     }
     this.currentVisualSig = null;
-    // A body file still streaming (a WOC base or animation library): show nothing
-    // rather than throw, and build the moment it lands (retryPendingBuild).
+    // A file this body draws still streaming (a WOC base or animation library, a weapon it
+    // holds): show nothing rather than throw (the host's loading layer stands in), and build
+    // the moment it lands (retryPendingBuild). Only this body's files are waited on, as
+    // demands; the rest of the character boot set downloads behind them.
     this.pendingBuild = null;
-    if (!visualAssetsResident(visualKey)) {
+    if (!directBuildAssetsResident(visualKey, weaponItemId, offhandItemId, weaponOverride, true)) {
       this.pendingBuild = [visualKey, weaponItemId, weaponOverride, offhandItemId, tint];
+      this.syncLoadingLayer();
       return;
     }
 
@@ -595,6 +701,7 @@ export class CharacterPreview {
       // the ones it is handed (a character's own, or the class starters): a weapon slot
       // handed nothing is an empty hand, as in the world.
       const detail = this.stagedArmorDetail();
+      this.askCreatorFilesFirst(visualKey, detail);
       this.currentVisual = new CharacterVisual(
         visualKey,
         tint,
@@ -668,6 +775,8 @@ export class CharacterPreview {
       this.camEase = 1;
       this.applyFraming(PREVIEW_FRAMING.sheet);
     }
+    // ...and a touch stage on its own opening framing, whatever the player did on the last
+    if (container !== this.container) this.resetTouchView();
     this.container = container;
     this.container.appendChild(this.canvas);
 
@@ -695,6 +804,13 @@ export class CharacterPreview {
   setFocus(focus: PreviewFocus): void {
     if (this.destroyed || this.focus === focus) return;
     this.focus = focus;
+    // A touch stage never moves its camera for a category: it opens on the head and
+    // shoulders and stays where the player puts it (stepTouchCamera). The focus is kept
+    // (landed) so a stage that stops being a touch one picks it up without an ease.
+    if (this.touchStage()) {
+      this.camEase = 1;
+      return;
+    }
     this.camFrom = { ...this.camPose };
     this.camEase = 0;
     this.wakeLoop();
@@ -724,17 +840,19 @@ export class CharacterPreview {
   /** The face close-up's aim: the drawn head's bounds (the modular head pack's
    *  base) at CREATION_HEAD_AIM plus its height, else the head bone while the
    *  head still streams, so every body type and class scale frames its own face. */
-  private focusHeadOf(): { y: number; h: number | undefined } {
+  private focusHeadOf(): HeadMeasure {
     const visual = this.currentVisual;
     if (!visual) {
       this.focusHeadFor = null;
-      return { y: CREATION_HEAD_Y, h: undefined };
+      return NO_HEAD_MEASURE;
     }
     if (this.focusHeadCurrent()) return this.focusHead;
     const root = visual.root;
     root.updateWorldMatrix(true, true);
-    let head: { y: number; h: number | undefined } | null = null;
-    let final = false;
+    let head: HeadMeasure | null = null;
+    // a live head has hung every piece of its look: the measure taken now is the last one,
+    // pack head found or not, so no later frame walks the rig for it again
+    let final = !!visual.wocHeadLook;
     for (const name of FOCUS_PACK_HEADS) {
       const node = root.getObjectByName(name);
       if (!node) continue;
@@ -747,8 +865,9 @@ export class CharacterPreview {
     }
     if (head === null) {
       const bone = root.getObjectByName('head');
-      if (!bone) return { y: CREATION_HEAD_Y, h: undefined };
-      head = { y: bone.getWorldPosition(new THREE.Vector3()).y, h: undefined };
+      head = bone
+        ? { y: bone.getWorldPosition(new THREE.Vector3()).y, h: undefined }
+        : NO_HEAD_MEASURE;
     }
     this.focusHeadFor = visual;
     this.focusHead = head;
@@ -761,13 +880,14 @@ export class CharacterPreview {
     return { w: this.container.clientWidth, h: this.container.clientHeight };
   }
 
-  /** Whether the held head measure is still good: same body, and either final or
-   *  still no pack head to measure (a streaming pack keeps the fallback cheap). */
+  /** Whether the held head measure is still good: same body, and either final or its head
+   *  not live yet (a whole-look head hangs its pack head with the rest of its pieces, so the
+   *  fallback measure holds until then: one read a frame, never a tree walk; a rig with no
+   *  modular head never goes live and keeps its bone measure). */
   private focusHeadCurrent(): boolean {
     const visual = this.currentVisual;
     if (!visual || this.focusHeadFor !== visual) return false;
-    if (this.focusHeadFinal) return true;
-    return !FOCUS_PACK_HEADS.some((name) => visual.root.getObjectByName(name));
+    return this.focusHeadFinal || !visual.wocHeadLook;
   }
 
   private applyFraming(f: { y: number; z: number; lookY: number }): void {
@@ -777,8 +897,77 @@ export class CharacterPreview {
   private applyPose(p: PreviewCamPose): void {
     this.camPose = p;
     this.camera.position.set(p.x, p.y, p.z);
-    this.camera.lookAt(new THREE.Vector3(p.x, p.lookY, 0));
+    this.camera.lookAt(LOOK_AT.set(p.x, p.lookY, 0));
     this.camera.updateProjectionMatrix();
+  }
+
+  /** Whether the touch stage owns the camera now (a phone's launcher stage). */
+  private touchCameraActive(): boolean {
+    return this.touchStage();
+  }
+
+  /** The touch stage's two framings: the head and shoulders (measured off the drawn head,
+   *  like the face close-up) and the whole body. */
+  private touchFramings(): { near: PreviewCamPose; far: PreviewCamPose } {
+    const head = this.focusHeadOf();
+    const sheet = PREVIEW_FRAMING.sheet;
+    return {
+      near: touchShouldersPose(this.camera.aspect, head.y, head.h),
+      far: { x: LIVE_PREVIEW_X, y: sheet.y, z: sheet.z, lookY: sheet.lookY },
+    };
+  }
+
+  /** The view the touch stage opens on: the head and shoulders, on every launcher stage (the
+   *  creator and the roster's pick alike); a pinch takes it out to the whole body. */
+  private touchOpeningView(near: PreviewCamPose): TouchView {
+    return touchViewAt(near);
+  }
+
+  /** The stage became (or stopped being) a touch stage between two frames: the phone
+   *  interface was switched with no resize to re-aim the camera. A touch stage solves its
+   *  camera at once; a mouse stage eases to the focus it holds, else takes the sheet framing. */
+  private switchCameraMode(touch: boolean): void {
+    this.touchWasActive = touch;
+    if (touch) {
+      this.stepTouchCamera(true);
+      return;
+    }
+    if (this.focus) {
+      this.camFrom = { ...this.camPose };
+      this.camEase = 0;
+      return;
+    }
+    this.applyFraming(PREVIEW_FRAMING.sheet);
+  }
+
+  /** Put the touch stage back on its opening framing (a new stage, a double tap). */
+  private resetTouchView(): void {
+    this.touchView = null;
+    this.touchInput?.reset();
+  }
+
+  /** Solve and apply the touch stage's camera: only when what it depends on moved (the
+   *  stage's shape, the drawn head, the player's view), so a still stage costs a handful of
+   *  compares a frame. `force` re-applies it regardless. */
+  private stepTouchCamera(force = false): void {
+    const head = this.focusHeadOf();
+    const s = this.touchSolvedFor;
+    const headH = head.h ?? -1;
+    if (
+      !force &&
+      s.aspect === this.camera.aspect &&
+      s.headY === head.y &&
+      s.headH === headH &&
+      s.view === this.touchView
+    ) {
+      return;
+    }
+    s.aspect = this.camera.aspect;
+    s.headY = head.y;
+    s.headH = headH;
+    s.view = this.touchView;
+    const { near, far } = this.touchFramings();
+    this.applyPose(touchViewPose(this.touchView ?? this.touchOpeningView(near), near, far));
   }
 
   /** Force the renderer to match the current visible container size. */
@@ -801,8 +990,10 @@ export class CharacterPreview {
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
       // a landed focus re-fits the new aspect (the face close-up's width fit
-      // and sideways slide both depend on it)
-      if (this.focus !== null && this.camEase >= 1) {
+      // and sideways slide both depend on it); a touch stage solves its own camera
+      if (this.touchCameraActive()) {
+        this.stepTouchCamera(true);
+      } else if (this.focus !== null && this.camEase >= 1) {
         const head = this.focusHeadOf();
         this.applyPose(
           creationFocusPose(this.focus, this.camera.aspect, head.y, head.h, this.stageSize()),
@@ -813,6 +1004,61 @@ export class CharacterPreview {
     } else {
       this.standDownOpenGate();
     }
+    this.syncLoadingLayer();
+    this.syncTouchHint();
+  }
+
+  /** Hand the stage the 2D layer to show while it has no character drawn (null: none).
+   *  The launcher's creator and roster stages pass the yellow silhouette. */
+  setLoadingLayer(layer: PreviewLoadingLayer | null): void {
+    if (this.destroyed) return;
+    if (this.loadingLayer && this.loadingLayer !== layer) this.loadingLayer.hide();
+    this.loadingLayer = layer;
+    this.syncLoadingLayer();
+  }
+
+  /** Hand the stage the gesture hint it offers beside a touch creator's drawn model (null:
+   *  none). The launcher passes its pinch hint. */
+  setTouchHint(hint: PreviewTouchHint | null): void {
+    if (this.destroyed) return;
+    if (this.touchHint && this.touchHint !== hint) this.touchHint.hide();
+    this.touchHint = hint;
+    this.syncTouchHint();
+  }
+
+  /** Offer the gesture hint while a visible touch creator draws its model, else take it off
+   *  (touchHintOffered). Idempotent on the hint's side, like the loading layer. */
+  private syncTouchHint(): void {
+    const hint = this.touchHint;
+    if (!hint) return;
+    // one reused facts record: this runs every frame
+    const facts = this.touchHintFacts;
+    facts.touch = this.touchStage();
+    facts.creator = this.armorSurface === 'creator';
+    facts.visible = this.renderActive;
+    facts.drawn = this.subjectDrawn();
+    if (touchHintOffered(facts)) hint.show(this.container);
+    else hint.hide();
+  }
+
+  /** Whether the stage draws its character now: a body is built and shown (a WOC body only
+   *  once its head ends the wait: a whole-look head keeps the body hidden until every piece
+   *  hangs, or a file of it failed). */
+  private subjectDrawn(): boolean {
+    return this.currentVisual?.bodyShown === true;
+  }
+
+  /** Show the loading layer while a visible stage has no character drawn, else take it
+   *  off. Idempotent on the layer's side, so the per-frame call writes nothing while the
+   *  answer holds. */
+  private syncLoadingLayer(): void {
+    const layer = this.loadingLayer;
+    if (!layer) return;
+    if (!this.renderActive || this.subjectDrawn()) {
+      layer.hide();
+      return;
+    }
+    layer.show(this.container, this.camPose.z < LOADING_BUST_MAX_DIST ? 'bust' : 'body');
   }
 
   /** Requests the next animation frame unless one is already pending: the
@@ -1069,8 +1315,10 @@ export class CharacterPreview {
       this.isDragging = false;
     };
 
-    // Touch support
+    // Touch support (a stage that is not a touch stage: one finger turns, as the mouse does;
+    // a touch stage takes every finger through the pointer handlers below instead)
     const onTouchStart = (e: TouchEvent) => {
+      if (this.touchStage()) return;
       if (e.touches.length === 1) {
         this.isDragging = true;
         this.previousMouseX = e.touches[0].clientX;
@@ -1088,6 +1336,20 @@ export class CharacterPreview {
       this.isDragging = false;
     };
 
+    // The touch stage: every finger on the canvas (preview_touch_input.ts)
+    this.touchInput = attachPreviewTouchInput({
+      canvas: this.canvas,
+      active: this.touchStage,
+      step: (step) => this.applyTouchStep(step),
+      doubleTap: () => {
+        // put the camera and the turn back where the stage opened
+        this.resetTouchView();
+        this.characterGroup.rotation.y = 0;
+        this.touchHint?.interacted();
+        this.wakeLoop();
+      },
+    });
+
     this.canvas.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
@@ -1103,7 +1365,32 @@ export class CharacterPreview {
       this.canvas.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
+      this.touchInput?.dispose();
+      this.touchInput = null;
     };
+  }
+
+  /** One sample of the fingers on a touch stage: a one-finger drag turns the character and
+   *  tilts the camera, two fingers pinch and slide the view (preview_touch_core.ts). The
+   *  first one that moves anything retires the gesture hint for good. */
+  private applyTouchStep(step: TouchStep): void {
+    if (touchStepMoves(step)) this.touchHint?.interacted();
+    if (step.dragX !== 0) this.characterGroup.rotation.y += step.dragX * TOUCH_TURN_PER_PX;
+    if (step.dragY === 0 && step.pinch === 1 && step.slideX === 0 && step.slideY === 0) {
+      this.wakeLoop();
+      return;
+    }
+    const { near, far } = this.touchFramings();
+    const from = this.touchView ?? this.touchOpeningView(near);
+    this.touchView = applyTouchStep(
+      from,
+      step,
+      near,
+      far,
+      this.container.clientHeight,
+      PREVIEW_FOV_DEG,
+    );
+    this.wakeLoop();
   }
 
   private setupResizeObserver(): void {
@@ -1135,6 +1422,8 @@ export class CharacterPreview {
       // reopening cannot produce a large animation step.
       this.timer.reset();
       this.standDownOpenGate();
+      this.loadingLayer?.hide();
+      this.touchHint?.hide();
       return;
     }
     this.wakeLoop();
@@ -1142,7 +1431,12 @@ export class CharacterPreview {
     this.timer.update();
     const dt = Math.min(this.timer.getDelta(), 0.1); // cap dt to prevent huge jumps
     if (!this.renderActive) return;
-    this.stepFocus(dt);
+    const touch = this.touchCameraActive();
+    if (touch !== this.touchWasActive) this.switchCameraMode(touch);
+    if (touch) this.stepTouchCamera();
+    else this.stepFocus(dt);
+    this.syncLoadingLayer();
+    this.syncTouchHint();
     // The second live draw site: a gate covering only syncSize is not a gate,
     // because the loop draws the same cold scene on the very next frame.
     if (!this.gateAllowsDraw()) return;
@@ -1314,6 +1608,10 @@ export class CharacterPreview {
     this.cleanupDragControls = null;
     this.openGate.cancel();
     this.hideStandIn();
+    this.loadingLayer?.hide();
+    this.loadingLayer = null;
+    this.touchHint?.hide();
+    this.touchHint = null;
     if (this.currentVisual) {
       this.characterGroup.remove(this.currentVisual.root);
       this.currentVisual.dispose();

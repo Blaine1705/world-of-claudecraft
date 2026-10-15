@@ -49,7 +49,7 @@ import { GALE_DECK_FREEBOARD } from './gale_harbor';
 import { applyGliderApproachPath } from './glider_approach_path';
 import { instancedFieldHeight } from './instances/authored_field/registry';
 import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
-import { placementRampFloorAt, WALK_DECK_REACH } from './placement_ramps';
+import { decksMayStand, placementRampFloorAt, WALK_DECK_REACH } from './placement_ramps';
 import { planeFloorAt } from './plane_floor';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
@@ -3800,7 +3800,7 @@ function groundHeightFor(
   //                 (without them a maker's stairs are walk-through decoration).
   //   plane volumes the editor's 'collider/plane' primitive (a bridge deck, a
   //                 second storey, a sloped ramp): never a blocker, it carries a body.
-  if (content.placements === undefined && !content.colliderVolumes?.length) return h; // neither
+  if (!decksMayStand(content, x, z)) return h; // no placements, volumes or walk-in town floor
   const rampFloor = placementRampFloorAt(content, seed, x, z, prevY, deckReach);
   if (rampFloor > h) h = rampFloor;
   const reach = prevY === undefined ? Number.POSITIVE_INFINITY : prevY + deckReach;

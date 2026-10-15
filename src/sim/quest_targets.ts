@@ -10,12 +10,23 @@
 // interest-radius limited: a camp or quest giver far across the zone still resolves.
 
 import { FARM_PATCHES } from './content/farm_patches';
-import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
+import {
+  CAMPS,
+  ESCORTS,
+  GROUND_OBJECTS,
+  gatherNodesInActiveWorld,
+  getActiveWorldContent,
+  MOBS,
+  NPCS,
+  QUESTS,
+} from './data';
+import { farmPatchesFor } from './moved_objects';
 import { nodeMaterialFor } from './professions/gathering';
 import { fineGradeReachable, fineMaterialFor } from './professions/material_grades';
 import { ambientNpcQuestMarkerKind } from './quests/ambient_quest_marker';
 import { type QuestMarkerKind, questMarkerRank } from './quests/quest_marker_kind';
 import {
+  type GatherNodeDef,
   type GatherNodeType,
   type QuestObjective,
   type QuestProgress,
@@ -127,7 +138,7 @@ export function gatherNodeClusters(
   linkYd: number = NODE_CLUSTER_LINK_YD,
 ): { x: number; z: number }[][] {
   return clusterNodes(
-    GATHER_NODES.filter((n) => n.type === nodeType),
+    gatherNodesInActiveWorld().filter((n) => n.type === nodeType),
     linkYd,
   );
 }
@@ -154,28 +165,40 @@ export function gatherNodeClusters(
  * gatherNodeClusters, which builds fresh): callers must never mutate it,
  * which the readonly type enforces at compile time.
  */
-const yieldClusterMemo = new Map<string, readonly (readonly { x: number; z: number }[])[]>();
+const yieldClusterMemo = new WeakMap<
+  readonly GatherNodeDef[],
+  Map<string, readonly (readonly { x: number; z: number }[])[]>
+>();
 export function nodeYieldClusters(
   itemId: string,
   linkYd: number = NODE_CLUSTER_LINK_YD,
 ): readonly (readonly { x: number; z: number }[])[] {
+  // Keyed by the node table too: a map that moved nodes (moved_objects.ts)
+  // resolves its own memoized table, so its clusters never answer for the
+  // shipped world's, or the reverse.
+  const nodes = gatherNodesInActiveWorld();
+  let memo = yieldClusterMemo.get(nodes);
+  if (!memo) {
+    memo = new Map();
+    yieldClusterMemo.set(nodes, memo);
+  }
   const key = `${itemId}:${linkYd}`;
-  const hit = yieldClusterMemo.get(key);
+  const hit = memo.get(key);
   if (hit) return hit;
   const clusters = clusterNodes(
-    GATHER_NODES.filter((n) => {
+    nodes.filter((n) => {
       const base = nodeMaterialFor(n.type, n.zoneId).itemId;
       if (base === itemId) return true;
       return fineMaterialFor(base) === itemId && fineGradeReachable(base, n.tier);
     }),
     linkYd,
   );
-  yieldClusterMemo.set(key, clusters);
+  memo.set(key, clusters);
   return clusters;
 }
 
 function clusterNodes(
-  nodes: readonly (typeof GATHER_NODES)[number][],
+  nodes: readonly GatherNodeDef[],
   linkYd: number,
 ): { x: number; z: number }[][] {
   const root = nodes.map((_, i) => i);
@@ -364,7 +387,7 @@ export function questObjectiveAreas(
   // patchless objective is honestly earned at any bed in the world. Beds are
   // static content like GATHER_NODES (no entity id to resolve).
   const pushFarmPatches = (ref: QuestObjectiveRef, patchId: string | undefined): void => {
-    for (const patch of FARM_PATCHES) {
+    for (const patch of farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES)) {
       if (patchId !== undefined && patch.id !== patchId) continue;
       // fresh {x,z}: never alias the deep-frozen FARM_PATCHES content
       pushEnclosing(

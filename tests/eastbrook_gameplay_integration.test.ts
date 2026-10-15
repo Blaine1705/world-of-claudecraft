@@ -20,6 +20,7 @@ import {
   localToWorld,
   samplePolyline,
 } from '../src/sim/eastbrook_layout';
+import { FENBRIDGE_LAYOUT, FENBRIDGE_STATIONS_BY_ID } from '../src/sim/fenbridge_layout';
 import {
   findPath,
   PLAYER_BODY_RADIUS,
@@ -827,7 +828,9 @@ describe('Eastbrook authored gameplay data integration', () => {
         id: 'station_fenbridge_tannery',
         type: 'tannery',
         zoneId: 'mirefen_marsh',
-        pos: { x: 1.0670827486441765, z: 315.3263500973041 },
+        // Fenbridge's own layout owns its station (the painted rebuild moved it
+        // to the tanning yard behind the bank)
+        pos: { ...FENBRIDGE_STATIONS_BY_ID.station_fenbridge_tannery.position },
         masterNpcId: 'tanner_hesk',
       },
       {
@@ -847,7 +850,9 @@ describe('Eastbrook authored gameplay data integration', () => {
         x: EASTBROOK_LAYOUT.services.mailbox.position.x,
         z: EASTBROOK_LAYOUT.services.mailbox.position.z,
       },
-      { x: 6, z: 294 },
+      // Fenbridge's own layout owns its mailbox (the painted rebuild moved it to
+      // the crossroads)
+      { ...FENBRIDGE_LAYOUT.services.mailbox.position },
       { x: 6, z: 654 },
       { x: -33, z: 1025 },
       { x: 397, z: 1905 },

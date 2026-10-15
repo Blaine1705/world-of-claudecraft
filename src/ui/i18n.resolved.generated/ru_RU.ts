@@ -10898,6 +10898,18 @@ export const ru_RU: EnTranslations = {
       "deleteTitle": "Remove this location",
       "hideBoxes": "Hide area boxes"
     },
+    "objectMove": {
+      "title": "Игровой объект",
+      "kindFarmBed": "Грядка",
+      "kindPracticeDummy": "Тренировочный манекен",
+      "kindGatherNode": "Точка сбора",
+      "kindDungeonDoor": "Вход в подземелье",
+      "position": "Позиция: {x}, {z}",
+      "moved": "Перемещён на этой карте.",
+      "original": "На исходном месте.",
+      "hint": "Перетащите его или сдвиньте стрелками. Перемещение действует только на этой карте, а объект сохраняет свой идентификатор, поэтому сохранённый прогресс его по-прежнему находит.",
+      "reset": "Вернуть на исходное место"
+    },
     "lightTool": {
       "title": "Point Lights",
       "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",
@@ -12235,6 +12247,8 @@ export const ru_RU: EnTranslations = {
     "realm": "Мир",
     "newCharacter": "Новый персонаж",
     "appearance": "Внешность",
+    "modelLoading": "Загрузка персонажа...",
+    "previewPinchHint": "Масштаб щипком",
     "customize": "Настройка",
     "body": "Телосложение",
     "genderMale": "Мужчина",

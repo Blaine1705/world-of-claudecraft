@@ -28,7 +28,7 @@
 // time of day and the reduced-motion switch) and the maw light's base.
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
-import { DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
 import {
   WILDHEART_BASIN_ENTRANCE_COLLIDERS,
   WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
@@ -768,7 +768,7 @@ function mawSprites(
 
 /** Build the Jaguar Maw (world coordinates). */
 export function buildWildheartBasinEntrance(seed: number): WildheartBasinEntranceView {
-  const door = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID].doorPos;
+  const door = activeDungeonDoorPos(DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID]);
   const base = terrainHeight(door.x, door.z, seed);
   const ground = (lx: number, lz: number) => terrainHeight(door.x + lx, door.z + lz, seed) - base;
   // the mist lies, and the fireflies fly, on the lagoon where the ground is under it

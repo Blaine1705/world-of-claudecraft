@@ -15,6 +15,7 @@ import type { DungeonLayout } from '../../sim/dungeon_layout';
 import { DEFAULT_ASSET_VIEW_DISTANCE } from '../../sim/map_doc';
 import { interiorPresentationMode } from '../../sim/map_presentation';
 import type { FluidVolume, MapDecal, MapWeather, ZoneDef } from '../../sim/types';
+import { terrainHeight } from '../../sim/world';
 import {
   type AuthoredLightingRig,
   type AuthoredSceneLayers,
@@ -47,6 +48,7 @@ import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from '../static_mat
 import { buildTerrain, type TerrainView } from '../terrain';
 import { buildWater, type WaterView } from '../water';
 import { MIN_OUTDOOR_FOG_FAR } from '../zone_streaming';
+import { type MovedObjectPreview, shiftMovedObjectInScene } from './moved_object_preview';
 
 /** Editor visibility can extend beyond the shipped fog ceiling, but the
  *  prepared-zone guard still prevents unloaded terrain from being exposed. */
@@ -301,6 +303,23 @@ export class RendererEditorApi {
     const stale = new Set(layers.fluidSurfaces.lights);
     layers.rebuildFluids(volumes);
     this.host.replaceFireLights(stale, layers.fluidSurfaces.lights);
+  }
+
+  /** Live preview of a moved built-in gameplay object (a farm bed or its
+   *  compost bin, a gather node, a dungeon entrance set piece): shift what was
+   *  drawn by the move's offset. The next renderer build draws the moved
+   *  tables exactly (moved_object_preview.ts). Returns how many moved. */
+  previewObjectMove(
+    target: MovedObjectPreview,
+    from: { readonly x: number; readonly z: number },
+    to: { readonly x: number; readonly z: number },
+  ): number {
+    const seed = this.host.seed();
+    const moved = shiftMovedObjectInScene(this.host.scene(), target, from, to, (x, z) =>
+      terrainHeight(x, z, seed),
+    );
+    if (moved > 0) this.invalidateShadows();
+    return moved;
   }
 
   /** Re-read the authored ground decals (`list` = the editor's live document). */

@@ -10898,6 +10898,18 @@ export const ko_KR: EnTranslations = {
       "deleteTitle": "Remove this location",
       "hideBoxes": "Hide area boxes"
     },
+    "objectMove": {
+      "title": "게임플레이 오브젝트",
+      "kindFarmBed": "농지 묘판",
+      "kindPracticeDummy": "연습용 허수아비",
+      "kindGatherNode": "채집 지점",
+      "kindDungeonDoor": "던전 입구",
+      "position": "위치: {x}, {z}",
+      "moved": "이 맵에서 이동되었습니다.",
+      "original": "원래 위치에 있습니다.",
+      "hint": "드래그하거나 화살표 키로 미세 조정하세요. 이동은 이 맵에만 적용되며 오브젝트의 식별자는 그대로이므로 저장된 진행 상황에서도 찾을 수 있습니다.",
+      "reset": "원래 위치로 되돌리기"
+    },
     "lightTool": {
       "title": "Point Lights",
       "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",
@@ -12235,6 +12247,8 @@ export const ko_KR: EnTranslations = {
     "realm": "월드",
     "newCharacter": "새 캐릭터",
     "appearance": "외형",
+    "modelLoading": "캐릭터를 불러오는 중...",
+    "previewPinchHint": "핀치로 확대/축소",
     "customize": "커스터마이즈",
     "body": "체형",
     "genderMale": "남성",

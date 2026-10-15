@@ -1027,7 +1027,11 @@ const MONOLITHS: MonolithRow[] = [
     // Merge of the four dungeon entrances (#4478): both parents' additions combine
     // (ours is the one updateSetPieceOccluders call), exact merged count, within
     // the release/v0.45.0 ceiling the branch was held to.
-    ceiling: 12426,
+    // LOWERED to 12395 when the rebuilt towns became one list (the painted
+    // Highwatch, placed_town_buildings.ts): Eastbrook's and Fenbridge's mount,
+    // reveal-gate and two per-frame update blocks folded into loops over
+    // townViews, which paid for the third town and 31 lines more. wc -l.
+    ceiling: 12395,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1261,7 +1265,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 11598 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 11634 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 11598,
+    // LOWERED to 11594 by the Studio movable gameplay objects change: the
+    // dev-only healer practice dummy spawn moved to hub_practice.ts, paying for
+    // the moved-objects ctx view and farm-bed resolver. Exact count, zero slack.
+    ceiling: 11594,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1508,7 +1515,10 @@ const MONOLITHS: MonolithRow[] = [
     // 11037 minus that removal. Exact merged count (wc -l), zero slack.
     // LOWERED to 11001 when the offline Play click (its audio start and its world
     // choice) moved into src/game/studio_boot.ts bootOfflinePlay.
-    ceiling: 11001,
+    // LOWERED to 10958 when the launcher's 3D stage build (and its panel-to-container
+    // map) moved into src/game/launcher_preview_stage.ts, which builds it at once
+    // instead of behind charactersReady(). Exact count (wc -l), zero slack.
+    ceiling: 10958,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -2334,7 +2344,10 @@ const MONOLITHS: MonolithRow[] = [
     // record's collider (its box, plus one per solid annex of a placed
     // building) moved to authored_town_buildings.ts buildingRecordColliders.
     // wc -l. Exact count.
-    ceiling: 2327,
+    // LOWERED 2327 -> 2288 with the open Fenbridge: the palisade's
+    // full-height wall arm and the gate-arch jamb block retired with the
+    // ring. wc -l. Exact count.
+    ceiling: 2288,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

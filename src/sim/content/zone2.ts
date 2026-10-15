@@ -4,11 +4,7 @@
 // Sunken Bastion.
 
 import { BARROW_SMASH_GAP } from '../boss_ring_gap';
-import {
-  FENBRIDGE_LAYOUT,
-  FENBRIDGE_NPC_PLACEMENTS_BY_ID,
-  palisadeSegmentMirrored,
-} from '../fenbridge_layout';
+import { FENBRIDGE_LAYOUT, FENBRIDGE_NPC_PLACEMENTS_BY_ID } from '../fenbridge_layout';
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
@@ -3162,16 +3158,7 @@ export const ZONE2_PROPS: ZonePropsDef = {
   mudHuts: FENBRIDGE_LAYOUT.preservedProps.mudHuts.map(([x, z]): [number, number] => [x, z]),
   ruinRings: FENBRIDGE_LAYOUT.preservedProps.ruinRings.map((ring) => ({ ...ring })),
   fences: [],
-  walls: FENBRIDGE_LAYOUT.wall.segments.map((segment) => ({
-    id: segment.id,
-    assetId: segment.assetId,
-    x: segment.footprint.center.x,
-    z: segment.footprint.center.z,
-    w: segment.footprint.halfWidth * 2,
-    d: segment.footprint.halfDepth * 2,
-    rot: segment.footprint.rotation,
-    height: segment.height,
-    ...(palisadeSegmentMirrored(segment) ? { mirrored: true as const } : {}),
-  })),
+  // Fenbridge stands open: no palisade (fenbridge_layout.ts).
+  walls: [],
   graveyards: [{ ...FENBRIDGE_LAYOUT.services.graveyard.position }],
 };

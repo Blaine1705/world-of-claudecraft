@@ -51,6 +51,7 @@ import {
   MIN_COLLIDER_SIZE,
   MIN_COLLIDER_SIZE_Y,
 } from '../../sim/map_doc';
+import type { ObjectMoves } from '../../sim/moved_objects';
 import { Sim } from '../../sim/sim';
 import { cutBounds, cutSdfAt, cutVerticalBounds } from '../../sim/terrain_cuts';
 import type {
@@ -63,6 +64,7 @@ import type {
   NpcDef,
   PlacedAsset,
   TerrainHole,
+  WorldContent,
 } from '../../sim/types';
 import { terrainHeight, zoneBiomeAt } from '../../sim/world';
 import { t } from '../../ui/i18n';
@@ -96,6 +98,7 @@ import { dominantCameraPlane, projectCameraAxes } from './camera_axis_widget';
 import { type CmComponentPick, CmMeshView, type CmSurfacePick } from './cm_mesh_view';
 import { type CameraAxisView, EditorCamera, shouldAcceptCameraMovementKey } from './editor_camera';
 import { HitboxHandles, type HitboxSubMode } from './hitbox_handles';
+import { MovableObjectsView } from './movable_objects_view';
 import { EditorPerfOverlay, type PerfOverlayConfig } from './perf_overlay';
 import {
   type GizmoAxis,
@@ -155,6 +158,12 @@ export interface Editor3DHooks {
   onMobDragStart(id: number): boolean;
   onMobDragMove(world: { x: number; z: number }): void;
   onMobDragEnd(): void;
+  // And the built-in gameplay objects a map can move (farm beds, practice
+  // dummies, gather nodes, dungeon doors), same contract again; the key is
+  // the object's `<kind>:<id>` (editor/object_moves_core.ts).
+  onObjectDragStart(key: string): boolean;
+  onObjectDragMove(world: { x: number; z: number }): void;
+  onObjectDragEnd(): void;
   // Ctrl+left-drag marquee in Select mode: every placement index whose anchor
   // projected inside the released box (empty = clear the selection). Holding
   // Shift too adds the box to the existing placement selection.
@@ -574,6 +583,8 @@ export class Editor3DViewport {
     | 'movenpc'
     | 'mobpending'
     | 'movemob'
+    | 'objectpending'
+    | 'moveobject'
     | 'gizmo'
     | 'hitboxhandle'
     | 'marquee' = 'none';
@@ -590,6 +601,31 @@ export class Editor3DViewport {
   private pendingNpcKey: string | null = null;
   // And for a rendered camp mob (entity id), same contract again.
   private pendingMobId: number | null = null;
+  // And for a movable built-in gameplay object (its `<kind>:<id>` key).
+  private pendingObjectKey: string | null = null;
+  /** The world the viewport Sim was built over (a copy without placements),
+   *  kept so a live object move reaches the Sim's own readers too. */
+  private simWorld: WorldContent | null = null;
+  /** Picks, live moves and the selection ring for the built-in gameplay
+   *  objects a map can move (movable_objects_view.ts). */
+  readonly objects = new MovableObjectsView({
+    renderer: () => this.renderer,
+    sim: () => this.sim,
+    seed: () => this.seed,
+    canvas: () => this.canvas,
+    moves: () => this.map.objectMoves,
+    // A linked map is a district of the full world at an offset: its moves
+    // would not land where the maker sees them, so the objects stay put there.
+    enabled: () => !this.map.worldAnchor,
+  });
+
+  /** The live record for the viewport Sim's own readers (its farm beds,
+   *  gather range, door exits) as well as the active world's. */
+  setSimObjectMoves(moves: ObjectMoves | undefined): void {
+    if (!this.simWorld) return;
+    if (moves) this.simWorld.objectMoves = moves;
+    else delete this.simWorld.objectMoves;
+  }
   // Ctrl+drag box select: client-space corners + whether Ctrl/Cmd+Shift should
   // accumulate this box into the existing placement selection.
   private marquee: {
@@ -935,10 +971,11 @@ export class Editor3DViewport {
     if (this.disposed || gen !== this.generation) return;
     // The live PlacedAssetsView owns placements, so strip them from the Sim's
     // world or the Renderer ctor would build a second, frozen copy.
+    this.simWorld = { ...world, placements: undefined };
     this.sim = new Sim({
       seed: this.seed,
       playerClass: 'warrior',
-      world: { ...world, placements: undefined },
+      world: this.simWorld,
     });
     this.authoredCampMobIds.clear();
     for (const entity of this.sim.entities.values()) {
@@ -5215,6 +5252,7 @@ export class Editor3DViewport {
     this.teardownEngine();
     this.perfOverlay?.dispose();
     this.perfOverlay = null;
+    this.objects.dispose();
     setOccluderFadesDisabled(false);
   }
 
@@ -5308,6 +5346,7 @@ export class Editor3DViewport {
     this.syncGizmo();
     this.syncMobSelectionRings();
     this.syncNpcSelectionRings();
+    this.objects.syncRing();
     // Preview mode re-hides overlays each frame: refreshAuthoredOverlays and
     // friends rebuild their groups visible, so a one-shot hide would leak.
     if (this.previewMode) this.applyPreviewHide();
@@ -5551,8 +5590,16 @@ export class Editor3DViewport {
     // (onPointerMove). A stationary release stays a tap so repeated clicks cycle
     // through overlapping objects (onPointerUp). Empty ground orbits as before.
     if (ev.button === 0 && !this.hooks.toolActive() && this.hooks.placementDragEnabled()) {
-      // Pixel-precise NPC/mob body hits first: they beat a nearby placement's
-      // slack radius. Both behave exactly like placements from here on.
+      // A movable gameplay object first (a practice dummy is a mob the camp
+      // path would refuse), then pixel-precise NPC/mob body hits: they beat a
+      // nearby placement's slack radius. All behave like placements from here.
+      const objectDirect = this.objects.pick(ev.clientX, ev.clientY, true);
+      if (objectDirect !== null) {
+        this.pendingObjectKey = objectDirect;
+        this.dragMode = 'objectpending';
+        this.canvas.setPointerCapture(ev.pointerId);
+        return;
+      }
       const npcDirect = this.pickRuntimeNpc(ev.clientX, ev.clientY, true);
       if (npcDirect !== null) {
         this.pendingNpcKey = npcDirect;
@@ -5579,6 +5626,13 @@ export class Editor3DViewport {
       if (npcLoose !== null) {
         this.pendingNpcKey = npcLoose;
         this.dragMode = 'npcpending';
+        this.canvas.setPointerCapture(ev.pointerId);
+        return;
+      }
+      const objectLoose = this.objects.pick(ev.clientX, ev.clientY, false);
+      if (objectLoose !== null) {
+        this.pendingObjectKey = objectLoose;
+        this.dragMode = 'objectpending';
         this.canvas.setPointerCapture(ev.pointerId);
         return;
       }
@@ -5693,6 +5747,22 @@ export class Editor3DViewport {
     } else if (this.dragMode === 'movemob') {
       const w = this.surfaceAt(ev.clientX, ev.clientY);
       if (w) this.hooks.onMobDragMove(w);
+    } else if (this.dragMode === 'objectpending') {
+      if (this.dragDist > TAP_SLOP_PX && this.pendingObjectKey !== null) {
+        const key = this.pendingObjectKey;
+        this.pendingObjectKey = null;
+        if (this.hooks.onObjectDragStart(key)) {
+          this.dragMode = 'moveobject';
+          this.canvas.style.cursor = 'grabbing';
+          const w = this.surfaceAt(ev.clientX, ev.clientY);
+          if (w) this.hooks.onObjectDragMove(w);
+        } else {
+          this.dragMode = 'orbit';
+        }
+      }
+    } else if (this.dragMode === 'moveobject') {
+      const w = this.surfaceAt(ev.clientX, ev.clientY);
+      if (w) this.hooks.onObjectDragMove(w);
     } else if (this.grabFollow) {
       // Shift+D grab: the duplicates chase the cursor with no button held.
       const w = this.surfaceAt(ev.clientX, ev.clientY);
@@ -5792,6 +5862,9 @@ export class Editor3DViewport {
     } else if (this.dragMode === 'movemob') {
       this.hooks.onMobDragEnd();
       this.canvas.style.cursor = '';
+    } else if (this.dragMode === 'moveobject') {
+      this.hooks.onObjectDragEnd();
+      this.canvas.style.cursor = '';
     } else if (this.dragMode === 'placepending' && ev.button === 0) {
       // A press on a placement that never moved past the tap threshold: a
       // Select-mode tap. Route through onTap so repeated clicks on overlapping
@@ -5805,6 +5878,10 @@ export class Editor3DViewport {
     } else if (this.dragMode === 'mobpending' && ev.button === 0) {
       // A stationary press on a mob: a Select-mode tap (select it).
       this.pendingMobId = null;
+      this.hooks.onTap(ev.clientX, ev.clientY, null, false);
+    } else if (this.dragMode === 'objectpending' && ev.button === 0) {
+      // A stationary press on a movable gameplay object: a tap (select it).
+      this.pendingObjectKey = null;
       this.hooks.onTap(ev.clientX, ev.clientY, null, false);
     } else if (
       (this.dragMode === 'orbit' || this.dragMode === 'pan') &&

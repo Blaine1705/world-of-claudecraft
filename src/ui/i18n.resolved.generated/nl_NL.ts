@@ -10898,6 +10898,18 @@ export const nl_NL: EnTranslations = {
       "deleteTitle": "Remove this location",
       "hideBoxes": "Hide area boxes"
     },
+    "objectMove": {
+      "title": "Gameplay Object",
+      "kindFarmBed": "Farm bed",
+      "kindPracticeDummy": "Practice dummy",
+      "kindGatherNode": "Gather node",
+      "kindDungeonDoor": "Dungeon door",
+      "position": "Position: {x}, {z}",
+      "moved": "Moved on this map.",
+      "original": "At its original spot.",
+      "hint": "Drag it, or nudge it with the arrow keys. The move applies to this map only and the object keeps its identity, so saved progress still finds it.",
+      "reset": "Reset to original spot"
+    },
     "lightTool": {
       "title": "Point Lights",
       "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",
@@ -12235,6 +12247,8 @@ export const nl_NL: EnTranslations = {
     "realm": "Wereld",
     "newCharacter": "Nieuw personage",
     "appearance": "Uiterlijk",
+    "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Aanpassen",
     "body": "Lichaam",
     "genderMale": "Man",

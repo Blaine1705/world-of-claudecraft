@@ -573,8 +573,10 @@ export interface PreservedBuildingPlacement {
 /**
  * A PLACED building: one of the painted Tidehold models, stood at the anchor,
  * turn and size it has on the Studio rebuild map (maps/eastbrook_rebuild), so
- * the built-in town and that map show the same street. It is SEALED, like
- * every town building before it: the record is one solid box.
+ * the built-in town and that map show the same street. A building whose
+ * model bakes a shut door is SEALED, like every town building before it: the
+ * record is one solid box. One whose model bakes an open doorway is
+ * `walkIn`, entered the way Fenbridge's are (sim/town_walk_in.ts).
  *
  * `anchor` is where the model's own origin stands. `walls` is the walled body
  * in the model's own axes, in yards at the placed size: `position`,
@@ -605,6 +607,15 @@ function makePlacedBuilding(spec: {
   annexes?: readonly { name: string; x: number; z: number; width: number; depth: number }[];
   /** Where the door sits along the front (local -Z) face. */
   doorX: number;
+  /** The model's largest dimension at AUTHORED size, measured off the shipped
+   *  file (`reach` is at the placed size and rounded there, too coarse to
+   *  scale the baked collision rows by). */
+  modelSize: number;
+  /** An open doorway a player walks through: the record collides on the
+   *  model's own baked walls and stands its floor and entry step as walkable
+   *  ground (sim/town_walk_in.ts), the way the same model does as a Studio
+   *  placement. Without it the record is one sealed box. */
+  walkIn?: boolean;
 }) {
   const position = localToWorld(spec.anchor, spec.rotation, spec.walls.x, spec.walls.z);
   const wallFrontZ = spec.walls.z - spec.walls.depth / 2;
@@ -619,6 +630,7 @@ function makePlacedBuilding(spec: {
     id: spec.id,
     assetId: spec.assetId,
     kind: spec.kind,
+    walkIn: spec.walkIn === true,
     position,
     nativeDimensions: {
       width: spec.walls.width,
@@ -648,6 +660,10 @@ function makePlacedBuilding(spec: {
       rotation: spec.rotation,
       scale: PLACED_BUILDING_SCALE,
       lift: PLACED_BUILDING_LIFT,
+      /** The model's largest dimension at authored size: its baked collision
+       *  rows are stored in multiples of this over the placed-asset target
+       *  height (sim/town_walk_in.ts). */
+      modelSize: spec.modelSize,
     },
     annexes,
     reach: {
@@ -685,7 +701,8 @@ const PLACED_BUILDING_LIFT = -1.35;
 // Studio map's placements; reach boxes are the shipped models' bounds at the
 // placed size, and the wall and annex boxes are their baked collision lines
 // (tests/eastbrook_placed_buildings.test.ts measures all of them off the
-// shipped files).
+// shipped files). Every one whose model bakes an open doorway (all but the
+// quay cottage) is walk-in.
 const BUILDINGS = [
   makePlacedBuilding({
     id: 'eastbrook_bank',
@@ -700,6 +717,8 @@ const BUILDINGS = [
       { name: 'turret', x: -12.47, z: -8.9, width: 4.2, depth: 4.2 },
     ],
     doorX: 0,
+    modelSize: 22.6067,
+    walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_smithy',
@@ -713,6 +732,8 @@ const BUILDINGS = [
     // crowded with the forge, the anvil and the quench trough
     annexes: [{ name: 'forge_shelter', x: 11.86, z: -0.13, width: 9.4, depth: 12.48 }],
     doorX: -1.56,
+    modelSize: 19.797,
+    walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_inn',
@@ -727,6 +748,8 @@ const BUILDINGS = [
       { name: 'barrels', x: 14.17, z: -6.37, width: 1.42, depth: 2.98 },
     ],
     doorX: 0,
+    modelSize: 22.6483,
+    walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_chapel',
@@ -741,6 +764,8 @@ const BUILDINGS = [
       { name: 'notice_board', x: -5.46, z: -15.34, width: 2.34, depth: 0.78 },
     ],
     doorX: 0,
+    modelSize: 30.4998,
+    walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_apothecary',
@@ -756,6 +781,8 @@ const BUILDINGS = [
       { name: 'stall_barrels', x: 6.35, z: -7.49, width: 1.92, depth: 2.82 },
     ],
     doorX: -2.08,
+    modelSize: 16.2797,
+    walkIn: true,
   }),
   makePlacedBuilding({
     id: 'eastbrook_quay_cottage',
@@ -767,6 +794,8 @@ const BUILDINGS = [
     walls: { x: 0, z: 0, width: 16.58, depth: 11.12 },
     annexes: [{ name: 'crates', x: -9.14, z: -2.37, width: 1.5, depth: 2.92 }],
     doorX: 0,
+    modelSize: 15.9799,
+    // no walkIn: the cottage's model bakes a shut door, so it stays one sealed box
   }),
 ] as const;
 

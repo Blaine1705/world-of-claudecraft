@@ -14,6 +14,10 @@ import {
   prepareEastbrookTownProfileAssets,
   resetEastbrookTownProfileCaches,
 } from '../eastbrook_town';
+import {
+  prepareFenbridgeTownProfileAssets,
+  resetFenbridgeTownProfileCaches,
+} from '../fenbridge_town';
 import { resetFireballTravelProfileCaches } from '../fireball_travel_visual';
 import { prepareFoliageProfileAssets, resetFoliageProfileCaches } from '../foliage';
 import { resetFrostNovaRootProfileCaches } from '../frost_nova_root_visual';
@@ -25,6 +29,10 @@ import {
   prepareHarborRouteMarkerAssets,
   resetHarborRouteMarkerCaches,
 } from '../harbor_route_markers';
+import {
+  prepareHighwatchTownProfileAssets,
+  resetHighwatchTownProfileCaches,
+} from '../highwatch_town';
 import { resetIceBlockProfileCaches } from '../ice_block_visual';
 import { resetJailSceneProfileCaches } from '../jail_scene';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
@@ -68,6 +76,8 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
       prepareCliffScreeProfileAssets(target),
       prepareCityClutterProfileAssets(target),
       prepareEastbrookTownProfileAssets(target),
+      prepareFenbridgeTownProfileAssets(target),
+      prepareHighwatchTownProfileAssets(target),
       prepareEastbrookGrandArmouryProfileAssets(),
       prepareMailboxProfileAssets(),
       prepareNoticeboardProfileAssets(),
@@ -88,6 +98,8 @@ const RESETTERS = [
   ['stations', resetStationProfileCaches],
   ['eastbrook_surface_atlas', resetEastbrookSurfaceProfileCaches],
   ['eastbrook_town', resetEastbrookTownProfileCaches],
+  ['fenbridge_town', resetFenbridgeTownProfileCaches],
+  ['highwatch_town', resetHighwatchTownProfileCaches],
   ['banker_chest', resetBankerChestProfileCaches],
   ['mailbox', resetMailboxProfileCaches],
   ['noticeboard', resetNoticeboardProfileCaches],

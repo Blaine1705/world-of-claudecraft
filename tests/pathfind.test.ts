@@ -31,6 +31,10 @@ const TEST_FENCE = {
   z2: TEST_FENCE_PLACEMENT.z2,
 } as const;
 
+// Highwatch's painted chapel stands just south of this fence, door to it, so
+// the crossings below start on the chapel's forecourt, a stride off the rails.
+const FENCE_CROSSING_DISTANCE = 2;
+
 function acrossFence(distance: number): {
   from: { x: number; z: number };
   to: { x: number; z: number };
@@ -132,7 +136,7 @@ describe('player pathfinding', () => {
 
   it('treats fence runs as movement blockers', () => {
     const seed = 20061;
-    const { from, to } = acrossFence(6);
+    const { from, to } = acrossFence(FENCE_CROSSING_DISTANCE);
     const midpoint = { x: (from.x + to.x) / 2, z: (from.z + to.z) / 2 };
     expect(isBlocked(seed, midpoint.x, midpoint.z)).toBe(true);
 
@@ -144,7 +148,7 @@ describe('player pathfinding', () => {
 
   it('routes over a fence when the mover can jump it (click-to-move)', () => {
     const seed = 20061;
-    const { from, to } = acrossFence(6);
+    const { from, to } = acrossFence(FENCE_CROSSING_DISTANCE);
 
     const anySegmentCrossesFence = (path: { x: number; z: number }[]) => {
       let prev = from;

@@ -340,11 +340,12 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     if (!fenbridgeInn) throw new Error('missing Fenbridge inn fixture');
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
-      assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
-      x: -21.25,
-      z: 317,
-      w: 9,
-      d: 8,
+      // the painted tavern on the main street (fenbridge_layout.ts)
+      assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
+      x: 12.25,
+      z: 299.9,
+      w: 20,
+      d: 13,
       rot: FENBRIDGE_BUILDINGS_BY_ID.fenbridge_crooked_reed_inn.rotation,
     });
 
@@ -354,7 +355,8 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
       authoredInn.position,
       authoredInn.rotation,
       authoredInn.sockets.entrance.localPosition.x,
-      authoredInn.nativeDimensions.depth / 2 + restPadding + 0.25,
+      // the painted tavern's door is on its -Z face
+      -(authoredInn.nativeDimensions.depth / 2 + restPadding + 0.25),
     );
     expect(restPadding).toBe(2);
     expect(buildingContainsPoint(fenbridgeInn, restPoint.x, restPoint.z, restPadding)).toBe(true);
@@ -426,12 +428,19 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     // the toolworks bench. A player comes down the north road east of the
     // shop instead, so that walk goes through the road's town end at
     // (14.6, -88.6), on the road itself (pinned here), and then across the
-    // square. Every other walk, and the walk back up, keeps its beeline.
+    // square. The walk back up takes the same road: since the shop became
+    // walk-in it collides on its own baked boxes, and its stall counter and
+    // barrels meet in a corner that holds a body walking the beeline into it.
+    // Every other walk keeps its beeline.
     const northRoadTownEnd = { x: 14.6, z: -88.6 };
     expect(ZONE1_ROADS[0]).toContainEqual(northRoadTownEnd);
     for (const destination of [square, NPCS.card_master.pos, toolworks]) {
-      if (destination === toolworks) expectWalkableLegs([approach, northRoadTownEnd, toolworks]);
-      else expectWalkableRoute(approach, destination);
+      if (destination === toolworks) {
+        expectWalkableLegs([approach, northRoadTownEnd, toolworks]);
+        expectWalkableLegs([toolworks, northRoadTownEnd, approach]);
+        continue;
+      }
+      expectWalkableRoute(approach, destination);
       expectWalkableRoute(destination, approach);
     }
   });

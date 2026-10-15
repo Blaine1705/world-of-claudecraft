@@ -258,9 +258,11 @@ describe('cave pass-under collision (sim/colliders.ts)', () => {
     setActiveWorldContent(world({ caves: [tube(0, 400, 0)] }));
     // A solid OBB collider on the surface, read from the layout rather than
     // written as a literal: v0.31's Eastbrook rebuild moved the house this test
-    // used to name by coordinate, and (10, 12) is open ground now.
-    const house = BUILTIN_WORLD.props.buildings.find((b) => b.id === 'eastbrook_bank');
-    if (!house) throw new Error('expected the eastbrook_bank footprint');
+    // used to name by coordinate, and (10, 12) is open ground now. The quay
+    // cottage, because it is still sealed: the bank this used to name is a
+    // walk-in room now, open at its centre (sim/town_walk_in.ts).
+    const house = BUILTIN_WORLD.props.buildings.find((b) => b.id === 'eastbrook_quay_cottage');
+    if (!house) throw new Error('expected the eastbrook_quay_cottage footprint');
     const { x: hx, z: hz } = house;
     const ground = groundHeight(hx, hz, SEED);
     // Surface mover (no y / y at ground): pushed out of the footprint.

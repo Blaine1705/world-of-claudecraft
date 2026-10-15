@@ -26,6 +26,7 @@ import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MusterArmyState } from './mirefen_muster';
 import type { MobScanCounters } from './mob/scan_counters';
+import type { ObjectMoves } from './moved_objects';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
@@ -149,6 +150,10 @@ export interface SimContextPrimitives {
   accountCosmetics: AccountCosmetics;
   /** Static crafting stations owned by this Sim's authored world bundle. */
   readonly stationPlacements: readonly StationDef[];
+  /** Gameplay objects this Sim's authored world moved (sim/moved_objects.ts):
+   *  farm beds, practice dummies, gather nodes, dungeon doors. Undefined for
+   *  the built-in world, so every resolver returns the shipped row. */
+  readonly objectMoves?: ObjectMoves;
   // The local / RL player id (single-player + renderer contexts). Reassigned on the
   // first join and on the primary's departure, so it is a LIVE getter, not a snapshot.
   // Stays a Sim field; the moved raid-marker `markerFor` (T1) reads it through the seam.
@@ -1303,6 +1308,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get stationPlacements() {
       return host.stationPlacements;
+    },
+    get objectMoves() {
+      return host.objectMoves;
     },
     get primaryId() {
       return host.primaryId;

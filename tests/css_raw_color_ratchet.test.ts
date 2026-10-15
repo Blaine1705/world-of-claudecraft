@@ -182,12 +182,17 @@ const ZERO_LITERAL_SECTIONS = [
   'woc face builder',
   // tokenized as authored (the plate composes ui-panel-soft, ui-chip, ui-bar)
   'dungeon objectives tracker',
+  // tokenized as authored (the outline reads --gold, the sheen --color-gold-300)
+  'character preview loading silhouette',
+  // tokenized as authored (the tab reads --gold, --color-gold-300 and --color-bg-dark)
+  'character preview touch hint',
 ];
 
 // A section counts zero when it is tokenized AND when it is empty, so the zero pin
-// alone would bless a deleted or relocated section. These floors sit well under the
-// live bodies (the smallest today is `window shell`: 42 declarations, 13 token reads),
-// so ordinary editing never trips them but an emptied section does.
+// alone would bless a deleted or relocated section. These floors sit under the live
+// bodies (the smallest today is `character preview loading silhouette`: 39
+// declarations, 6 token reads), so ordinary editing never trips them but an emptied
+// section does.
 const MIN_ZERO_SECTION_DECLARATIONS = 20;
 const MIN_ZERO_SECTION_TOKEN_READS = 4;
 

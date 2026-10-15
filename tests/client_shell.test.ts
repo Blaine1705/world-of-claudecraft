@@ -1255,7 +1255,8 @@ describe('client HTML shell', () => {
       'this.applyPose({ x: LIVE_PREVIEW_X, y: f.y, z: f.z, lookY: f.lookY });',
     );
     expect(characterPreviewTs).toContain('this.camera.position.set(p.x, p.y, p.z);');
-    expect(characterPreviewTs).toContain('this.camera.lookAt(new THREE.Vector3(p.x, p.lookY, 0));');
+    // (LOOK_AT is a module scratch vector, so a camera moved every frame allocates nothing)
+    expect(characterPreviewTs).toContain('this.camera.lookAt(LOOK_AT.set(p.x, p.lookY, 0));');
   });
 
   it('offers the quest log in the mobile controls drawer', () => {

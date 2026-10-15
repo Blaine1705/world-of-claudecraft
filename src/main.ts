@@ -160,6 +160,11 @@ import { createKtx2RestoreUploadQueueCoordinator } from './game/ktx2_restore_upl
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
 import {
+  activePreviewPanel,
+  createLauncherPreview,
+  previewContainerFor,
+} from './game/launcher_preview_stage';
+import {
   collectLoadSpans,
   loadPhaseEnd,
   loadPhaseStart,
@@ -353,12 +358,11 @@ import { assetUrl } from './render/assets/media';
 import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { battlegroundAssetPrewarm } from './render/battleground';
 import {
-  CharacterPreview,
+  type CharacterPreview,
   type PreviewAppearance,
   setModularLookProvider,
 } from './render/characters';
 import {
-  charactersReady,
   ensureCharacterUrl,
   modularCacheStats,
   preloadMechAssets,
@@ -416,7 +420,7 @@ import { HEROIC_VENDOR_STOCK } from './sim/content/heroic_vendor';
 import { MECH_CHROMAS } from './sim/content/skins';
 import { rowTreeFor } from './sim/content/talents';
 import {
-  GATHER_NODES,
+  activeGatherNodeById,
   ITEMS,
   isRiftPos,
   MOBS,
@@ -3430,7 +3434,7 @@ async function startGame(
     );
     if (id === null || deferDirectCorpseToNode) {
       const nodeId = renderer.picking.pickGatherNode(x, y);
-      const node = nodeId !== null ? GATHER_NODES.find((n) => n.id === nodeId) : undefined;
+      const node = nodeId !== null ? activeGatherNodeById(nodeId) : undefined;
       if (node) {
         stopAutorunForInteraction(
           handleGatherNodeInteract(
@@ -5633,13 +5637,7 @@ onPortraitUpdate((visualKey, skin) => {
 
 function updatePreviewContainer(panelId: string): void {
   if (!characterPreview) return;
-  const containerId =
-    panelId === '#charselect-panel'
-      ? '#online-preview-container'
-      : panelId === '#charcreate-panel'
-        ? '#charcreate-preview-container'
-        : '#offline-preview-container';
-  const container = $(containerId);
+  const container = $(previewContainerFor(panelId));
   if (!container) return;
   characterPreview.setContainer(container);
 
@@ -10844,57 +10842,16 @@ function wireStartScreens(): void {
   // plain label for the rest of the page's life.
   decorateClassChips();
 
-  // Initialize 3D character preview once its assets are ready. Gated on the
-  // narrower charactersReady() (with its own retries), not the site-wide
-  // assetsReady(): that single shared promise covers EVERY registered preload
-  // (terrain, dungeon, foliage, ...), so an unrelated failure there must never
-  // permanently blank the character-creation preview. This previously used
-  // assetsReady().then() with no failure handler at all, so on a cold,
-  // first-visit cache a single transient asset failure anywhere on the site
-  // silently stranded the preview forever (issue: new players saw no
-  // character model on their first load; a reload "fixed" it only because the
-  // browser's HTTP cache was warm by then).
-  charactersReady()
-    .then(() => {
-      // Resolve each panel defensively: play.html (online-only) has no #offline-select.
-      const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
-        const panel = $(id) as HTMLElement | null;
-        return panel !== null && !panel.hasAttribute('hidden');
-      });
-      const containerId =
-        activePanelId === '#offline-select'
-          ? '#offline-preview-container'
-          : '#online-preview-container';
-      const container = $(containerId);
-      const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
-      if (container && canvas) {
-        characterPreview = new CharacterPreview(container, canvas, {
-          // GFX.constrainedMemory covers every iOS WebKit host (Safari and other iOS
-          // browsers, not just the packaged app) plus the general touch/coarse-pointer
-          // detector, not just NATIVE_APP: the launcher's char-select preview sits in the
-          // same entry-allocation window the boot preload defers/streams for
-          // (assets/preload.ts: "a 12 GB iPhone 17 Pro was killed 1.6s into the LAUNCHER").
-          constrainedMemory: GFX.constrainedMemory,
-        });
-        // If a token auto-login already rendered the roster and selected a
-        // character before assets finished, show its real appearance; otherwise
-        // fall back to the selected class chip (create/offline panels).
-        if (charselectSelected) {
-          showCharselectCharacter(charselectSelected);
-        } else {
-          const selSelector =
-            activePanelId === '#offline-select'
-              ? '#offline-select .mini-class.sel'
-              : '#charcreate-panel .mini-class.sel';
-          const selEl = document.querySelector(selSelector) as HTMLElement | null;
-          const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
-          previewClassBody(cls);
-        }
-      }
-    })
-    .catch((err: unknown) => {
-      console.error('character preview assets failed to load, preview will stay blank:', err);
-    });
+  // The 3D stage, built at once and shown in the panel on screen (why it waits on nothing:
+  // src/game/launcher_preview_stage.ts). Off every panel (the landing) it stages the
+  // creator's selected class, so that body's files are already on their way.
+  characterPreview = createLauncherPreview();
+  const stagePanel = activePreviewPanel();
+  if (stagePanel) updatePreviewContainer(stagePanel);
+  else if (characterPreview) {
+    const sel = $('#charcreate-panel .mini-class.sel') as HTMLElement | null;
+    previewClassBody(sel ? (sel.dataset.class as PlayerClass) : 'warrior');
+  }
 }
 
 // Looping home-page theme. Browsers block audio autoplay until a user gesture,

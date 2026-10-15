@@ -3,9 +3,9 @@
   "meta": {
     "id": "eastbrook_rebuild",
     "name": "Eastbrook Rebuild",
-    "description": "The shipped world with Eastbrook Vale's town rebuilt from the Tidehold buildings. Every building is an ordinary placement: select it and move it.",
+    "description": "The shipped world with the towns of Eastbrook Vale, Fenbridge and Highwatch rebuilt from the Tidehold buildings. Every building is an ordinary placement: select it and move it.",
     "createdAt": 1791882000000,
-    "updatedAt": 1791882000000,
+    "updatedAt": 1792054800000,
     "seed": 20061,
     "parentId": ""
   },
@@ -3735,10 +3735,10 @@
         "name": "Warden Fenwick",
         "title": "Warden of Fenbridge",
         "pos": {
-          "x": 4.824455435060822,
-          "z": 285.6503188335003
+          "x": 1.62,
+          "z": 283.09999999999997
         },
-        "facing": -0.4048917862850834,
+        "facing": -1.5707963267948966,
         "color": 8278281,
         "questIds": [
           "q_fenbridge_muster",
@@ -3769,10 +3769,10 @@
         "name": "Brother Aldric",
         "title": "Priest of the Vale",
         "pos": {
-          "x": -14.960203077497741,
-          "z": 296.09529088730875
+          "x": -3.3999999999999986,
+          "z": 299.6
         },
-        "facing": 1.1383885512243588,
+        "facing": 1.5707963267948966,
         "color": 16251385,
         "questIds": [
           "q_aldrics_fallen_star",
@@ -3793,10 +3793,10 @@
         "name": "Provisioner Hale",
         "title": "Provisioner",
         "pos": {
-          "x": -12.424844495021249,
-          "z": 314.94714794895896
+          "x": 2.85,
+          "z": 292
         },
-        "facing": 2.191045812777718,
+        "facing": -1.5707963267948966,
         "color": 1999945,
         "questIds": ["q_prowler_pelts", "q_fen_supplies", "q_the_codfather", "q_grubjaw"],
         "greeting": "Dry boots, dry bread, dry powder: at Fenbridge you get two of the three on a good day.",
@@ -3831,10 +3831,10 @@
         "name": "Herbalist Yara",
         "title": "Herbalist",
         "pos": {
-          "x": 14.020226082985031,
-          "z": 293.9419887666108
+          "x": 2.8999999999999995,
+          "z": 323.5
         },
-        "facing": -0.9971906342364164,
+        "facing": -1.5707963267948966,
         "color": 8207512,
         "questIds": ["q_widows", "q_broodmother"],
         "greeting": "Mind the thicket west of the road. The webs are thick as sailcloth this season."
@@ -3844,10 +3844,10 @@
         "name": "Scout Maren",
         "title": "Marshal's Scout",
         "pos": {
-          "x": -12.942629598286846,
-          "z": 320.2950179409249
+          "x": -3.2,
+          "z": 330
         },
-        "facing": 2.601173153319209,
+        "facing": 2.950031333260667,
         "color": 8218120,
         "questIds": ["q_troll_fetishes", "q_cult_camp", "q_olen"],
         "greeting": "Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds."
@@ -3857,10 +3857,10 @@
         "name": "Bursar Petra Vell",
         "title": "The Gilded Strongbox",
         "pos": {
-          "x": 15.101663970557492,
-          "z": 306.79285357068125
+          "x": -2.9000000000000004,
+          "z": 320.4
         },
-        "facing": -1.8972270342276318,
+        "facing": 1.5707963267948966,
         "color": 13214247,
         "questIds": [],
         "greeting": "The Gilded Strongbox keeps clean ledgers and cleaner vaults. What shall we stow for you?",
@@ -3871,10 +3871,10 @@
         "name": "Chronicler Osric Fenn",
         "title": "The Marsh Chronicle",
         "pos": {
-          "x": -15.965942703405933,
-          "z": 298.27439341010984
+          "x": -2.599999999999998,
+          "z": 295.40000000000003
         },
-        "facing": 1.1383885512243588,
+        "facing": 1.5707963267948966,
         "color": 4171371,
         "questIds": [],
         "greeting": "Mind the damp on the pages, $N. The fen eats more books than readers ever will."
@@ -3884,10 +3884,10 @@
         "name": "Tanner Hesk",
         "title": "Master of the Tannery",
         "pos": {
-          "x": 3.053383957289929,
-          "z": 315.5600325924389
+          "x": -18,
+          "z": 322
         },
-        "facing": 3.024483909022929,
+        "facing": 2.0119758072098772,
         "color": 9067050,
         "questIds": ["q_prof_workorder_tannery"],
         "greeting": "A hide is only as good as its tanning, $C. The vats are ready when you are.",
@@ -3949,10 +3949,10 @@
         "name": "Brother Aldric",
         "title": "Priest of the Vale",
         "pos": {
-          "x": -10,
-          "z": 656
+          "x": -12.500000000000002,
+          "z": 645.4
         },
-        "facing": 0.8,
+        "facing": 0,
         "color": 16251385,
         "questIds": [
           "q_zealots",
@@ -4156,10 +4156,10 @@
         "name": "Loremaster Caddis",
         "title": "Loremaster",
         "pos": {
-          "x": 12,
-          "z": 655
+          "x": 8.5,
+          "z": 651.5
         },
-        "facing": -1.2,
+        "facing": -0.6805212246672144,
         "color": 3894949,
         "questIds": ["q_kobold_tunnels", "q_elementals", "q_shard_cores", "q_kazzix"],
         "greeting": "Mind the loose shale, $C. The mountain has been... restless of late. I intend to learn why."
@@ -4169,10 +4169,10 @@
         "name": "Auctioneer Voss",
         "title": "Keeper of the World Market",
         "pos": {
-          "x": 16,
-          "z": 666
+          "x": -12.89,
+          "z": 660.775
         },
-        "facing": -2.2,
+        "facing": 1.5707963267948966,
         "color": 9329366,
         "questIds": [],
         "greeting": "The World Market is open here too, $C. Buy from every adventurer in the realm, or set out your own wares.",
@@ -4183,8 +4183,8 @@
         "name": "Bursar Aldous Crane",
         "title": "The Gilded Strongbox",
         "pos": {
-          "x": -12,
-          "z": 663
+          "x": -14.5,
+          "z": 656.8
         },
         "facing": 1.5707963267948966,
         "color": 13214247,
@@ -7046,24 +7046,12 @@
       ],
       [
         {
-          "x": 4.5,
-          "z": 303
+          "x": 0,
+          "z": 313.5
         },
         {
-          "x": 7,
-          "z": 307
-        },
-        {
-          "x": 10,
-          "z": 315
-        },
-        {
-          "x": 19,
-          "z": 318
-        },
-        {
-          "x": 26,
-          "z": 316
+          "x": 14,
+          "z": 313.7
         },
         {
           "x": 26.69908183610601,
@@ -7096,20 +7084,12 @@
       ],
       [
         {
-          "x": -4.5,
-          "z": 303
+          "x": 0,
+          "z": 313.5
         },
         {
-          "x": -8,
-          "z": 302
-        },
-        {
-          "x": -15,
-          "z": 305
-        },
-        {
-          "x": -22,
-          "z": 310
+          "x": -14,
+          "z": 313.8
         },
         {
           "x": -26.737237334414147,
@@ -7136,22 +7116,6 @@
         {
           "x": 0,
           "z": 307.5
-        },
-        {
-          "x": 4,
-          "z": 313
-        },
-        {
-          "x": 9,
-          "z": 318
-        },
-        {
-          "x": 11,
-          "z": 324
-        },
-        {
-          "x": 7.5,
-          "z": 330
         },
         {
           "x": 0,
@@ -7204,8 +7168,28 @@
       ],
       [
         {
-          "x": 6,
-          "z": 668
+          "x": 4,
+          "z": 674
+        },
+        {
+          "x": 11,
+          "z": 687
+        },
+        {
+          "x": 33,
+          "z": 690
+        },
+        {
+          "x": 42,
+          "z": 695
+        },
+        {
+          "x": 48,
+          "z": 700
+        },
+        {
+          "x": 56,
+          "z": 707
         },
         {
           "x": 70,
@@ -11366,89 +11350,522 @@
       "falloff": "smooth",
       "mode": "level",
       "hardness": 0.66
+    },
+    {
+      "x": 16.029,
+      "z": 675.4083333333333,
+      "radius": 18.17774494144536,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.39486443255566106
+    },
+    {
+      "x": 26.243000000000002,
+      "z": 675.4083333333333,
+      "radius": 18.17774494144536,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.39486443255566106
+    },
+    {
+      "x": 16.029,
+      "z": 665.321,
+      "radius": 18.17774494144536,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.39486443255566106
+    },
+    {
+      "x": 26.243000000000002,
+      "z": 665.321,
+      "radius": 18.17774494144536,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.39486443255566106
+    },
+    {
+      "x": 16.029,
+      "z": 655.2336666666667,
+      "radius": 18.17774494144536,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.39486443255566106
+    },
+    {
+      "x": 26.243000000000002,
+      "z": 655.2336666666667,
+      "radius": 18.17774494144536,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.39486443255566106
+    },
+    {
+      "x": -16.65,
+      "z": 655.149,
+      "radius": 18.457746179405014,
+      "delta": 9.3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.24151086140619527
+    },
+    {
+      "x": -22.75,
+      "z": 655.149,
+      "radius": 18.457746179405014,
+      "delta": 9.3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.24151086140619527
+    },
+    {
+      "x": -16.65,
+      "z": 661.651,
+      "radius": 18.457746179405014,
+      "delta": 9.3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.24151086140619527
+    },
+    {
+      "x": -22.75,
+      "z": 661.651,
+      "radius": 18.457746179405014,
+      "delta": 9.3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.24151086140619527
+    },
+    {
+      "x": -9.712750000000002,
+      "z": 640.9246666666667,
+      "radius": 16.20434748169468,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -9.71275,
+      "z": 632.854,
+      "radius": 16.20434748169468,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -9.712749999999998,
+      "z": 624.7833333333334,
+      "radius": 16.20434748169468,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -19.13825,
+      "z": 640.9246666666667,
+      "radius": 16.20434748169468,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -19.13825,
+      "z": 632.854,
+      "radius": 16.20434748169468,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -19.13825,
+      "z": 624.7833333333334,
+      "radius": 16.20434748169468,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": 7.164000000000001,
+      "z": 637.8050000000001,
+      "radius": 15.168639763032436,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34074510594080776
+    },
+    {
+      "x": 15.296000000000001,
+      "z": 637.8050000000001,
+      "radius": 15.168639763032436,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34074510594080776
+    },
+    {
+      "x": 7.164000000000001,
+      "z": 631.423,
+      "radius": 15.168639763032436,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34074510594080776
+    },
+    {
+      "x": 15.296000000000001,
+      "z": 631.423,
+      "radius": 15.168639763032436,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34074510594080776
+    },
+    {
+      "x": 16.8295,
+      "z": 698.7045,
+      "radius": 19.711983704539218,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3405027015618728
+    },
+    {
+      "x": 23.4285,
+      "z": 698.7045,
+      "radius": 19.711983704539218,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3405027015618728
+    },
+    {
+      "x": 30.027500000000003,
+      "z": 698.7045,
+      "radius": 19.711983704539218,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3405027015618728
+    },
+    {
+      "x": 0,
+      "z": 660,
+      "radius": 16,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.875
+    },
+    {
+      "x": 14,
+      "z": 687.4090909090909,
+      "radius": 6,
+      "delta": 10.077685950413219,
+      "falloff": "smooth",
+      "mode": "level",
+      "gx": 0,
+      "gz": 0.14545454545454542,
+      "hardness": 0.4
+    },
+    {
+      "x": 22,
+      "z": 688.5,
+      "radius": 6,
+      "delta": 10.236363636363636,
+      "falloff": "smooth",
+      "mode": "level",
+      "gx": 0,
+      "gz": 0.14545454545454542,
+      "hardness": 0.4
+    },
+    {
+      "x": 30,
+      "z": 689.5909090909091,
+      "radius": 6,
+      "delta": 10.395041322314054,
+      "falloff": "smooth",
+      "mode": "level",
+      "gx": 0,
+      "gz": 0.14545454545454542,
+      "hardness": 0.4
+    },
+    {
+      "x": 16.029,
+      "z": 675.4083333333333,
+      "radius": 12.177744941445361,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.589414951286822
+    },
+    {
+      "x": 26.243000000000002,
+      "z": 675.4083333333333,
+      "radius": 12.177744941445361,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.589414951286822
+    },
+    {
+      "x": 16.029,
+      "z": 665.321,
+      "radius": 12.177744941445361,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.589414951286822
+    },
+    {
+      "x": 26.243000000000002,
+      "z": 665.321,
+      "radius": 12.177744941445361,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.589414951286822
+    },
+    {
+      "x": 16.029,
+      "z": 655.2336666666667,
+      "radius": 12.177744941445361,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.589414951286822
+    },
+    {
+      "x": 26.243000000000002,
+      "z": 655.2336666666667,
+      "radius": 12.177744941445361,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.589414951286822
+    },
+    {
+      "x": -16.65,
+      "z": 655.149,
+      "radius": 8.457746179405014,
+      "delta": 9.3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716
+    },
+    {
+      "x": -22.75,
+      "z": 655.149,
+      "radius": 8.457746179405014,
+      "delta": 9.3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716
+    },
+    {
+      "x": -16.65,
+      "z": 661.651,
+      "radius": 8.457746179405014,
+      "delta": 9.3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716
+    },
+    {
+      "x": -22.75,
+      "z": 661.651,
+      "radius": 8.457746179405014,
+      "delta": 9.3,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5270607659354716
+    },
+    {
+      "x": -9.712750000000002,
+      "z": 640.9246666666667,
+      "radius": 11.204347481694679,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5537446506216585
+    },
+    {
+      "x": -9.71275,
+      "z": 632.854,
+      "radius": 11.204347481694679,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5537446506216585
+    },
+    {
+      "x": -9.712749999999998,
+      "z": 624.7833333333334,
+      "radius": 11.204347481694679,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5537446506216585
+    },
+    {
+      "x": -19.13825,
+      "z": 640.9246666666667,
+      "radius": 11.204347481694679,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5537446506216585
+    },
+    {
+      "x": -19.13825,
+      "z": 632.854,
+      "radius": 11.204347481694679,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5537446506216585
+    },
+    {
+      "x": -19.13825,
+      "z": 624.7833333333334,
+      "radius": 11.204347481694679,
+      "delta": 8.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5537446506216585
+    },
+    {
+      "x": 7.164000000000001,
+      "z": 637.8050000000001,
+      "radius": 9.168639763032436,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.563730269333099
+    },
+    {
+      "x": 15.296000000000001,
+      "z": 637.8050000000001,
+      "radius": 9.168639763032436,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.563730269333099
+    },
+    {
+      "x": 7.164000000000001,
+      "z": 631.423,
+      "radius": 9.168639763032436,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.563730269333099
+    },
+    {
+      "x": 15.296000000000001,
+      "z": 631.423,
+      "radius": 9.168639763032436,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.563730269333099
+    },
+    {
+      "x": 16.8295,
+      "z": 698.7045,
+      "radius": 10.711983704539218,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6265864371782982
+    },
+    {
+      "x": 23.4285,
+      "z": 698.7045,
+      "radius": 10.711983704539218,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6265864371782982
+    },
+    {
+      "x": 30.027500000000003,
+      "z": 698.7045,
+      "radius": 10.711983704539218,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6265864371782982
     }
   ],
   "placements": [
     {
-      "assetId": "props/house_1",
-      "x": 14,
-      "z": 671,
-      "rotY": -0.5,
-      "scale": 3.606853020739405,
-      "collide": true,
-      "collisionMode": "baked",
-      "scaleX": 1.6186405337781489,
-      "scaleZ": 1.201950867052023,
-      "y": -0.12,
-      "name": "Building 20"
-    },
-    {
-      "assetId": "props/blacksmith",
-      "x": 8,
-      "z": 650,
-      "rotY": 0.4,
-      "scale": 4.274611398963731,
-      "collide": true,
-      "collisionMode": "baked",
-      "scaleX": 0.7025207025207025,
-      "scaleZ": 1.0537810537810537,
-      "y": -0.12,
-      "name": "Building 21"
-    },
-    {
-      "assetId": "props/house_2",
-      "x": 18,
-      "z": 660,
-      "rotY": -0.3707963267948966,
-      "scale": 4.040404040404041,
-      "collide": true,
-      "collisionMode": "baked",
-      "scaleX": 1.2395659432387311,
-      "scaleZ": 0.6607047517351842,
-      "y": -0.12,
-      "name": "Building 22"
-    },
-    {
-      "assetId": "props/inn",
-      "x": -15,
-      "z": 666,
-      "rotY": 0.6,
-      "scale": 4.04040404040404,
+      "assetId": "tidehold/highwatch/tavern_b",
+      "x": 22,
+      "z": 666.4,
+      "rotY": 1.5707963267948966,
+      "scale": 13.755454545454544,
       "collide": true,
       "worldPropKind": "inn",
-      "worldPropWidth": 1.448,
-      "worldPropDepth": 2.059,
+      "worldPropWidth": 1.8902,
+      "worldPropDepth": 1.0905,
       "collisionMode": "baked",
-      "scaleX": 1.0255524861878456,
-      "scaleZ": 0.8414278776104905,
-      "y": -0.12,
-      "name": "Building 23"
+      "y": -1.05,
+      "name": "Highwatch summit inn"
     },
     {
-      "assetId": "props/bell_tower",
-      "x": -16.587495182220614,
-      "z": 649.533792523797,
-      "rotY": 0.9,
-      "scale": 4.967197750702906,
+      "assetId": "tidehold/highwatch/hall",
+      "x": -12.5,
+      "z": 632.6,
+      "rotY": 3.141592653589793,
+      "scale": 13.863545454545454,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 1.234632913783739,
-      "scaleZ": 1.0428125424188948,
-      "y": -0.12,
-      "name": "Building 24 tower"
+      "y": -1.05,
+      "name": "Highwatch gate chapel"
     },
     {
-      "assetId": "props/house_3",
-      "x": -14.527345409900331,
-      "z": 651.1686267403488,
-      "rotY": 0.9,
-      "scale": 1.9623233908948194,
+      "assetId": "tidehold/highwatch/shop_a",
+      "x": -20.5,
+      "z": 658.4,
+      "rotY": -1.5707963267948966,
+      "scale": 7.399863636363635,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 1.223692636072572,
-      "scaleZ": 0.8706460224239189,
-      "y": -0.12,
-      "name": "Building 24 hall"
+      "y": -1.05,
+      "name": "Highwatch counting house"
+    },
+    {
+      "assetId": "tidehold/highwatch/house_c",
+      "x": 11,
+      "z": 635,
+      "rotY": 1.5707963267948966,
+      "scale": 8.900181818181817,
+      "collide": true,
+      "collisionMode": "baked",
+      "y": -1.05,
+      "name": "Highwatch watch house"
+    },
+    {
+      "assetId": "tidehold/highwatch/smithy",
+      "x": 20,
+      "z": 699,
+      "rotY": 0,
+      "scale": 8.998636363636363,
+      "collide": true,
+      "collisionMode": "baked",
+      "y": -1.05,
+      "name": "Highwatch smithy"
     },
     {
       "assetId": "props/inn",
@@ -12287,10 +12704,10 @@
       "worldPropWidth": 1.814,
       "worldPropDepth": 0.1,
       "collisionMode": "baked",
-      "rotZ": -0.04321790853822337,
+      "rotZ": -0.055674767682070754,
       "scaleX": 0.46137955527319424,
       "scaleZ": 1.148965517241379,
-      "y": -0.04084327160009878,
+      "y": -0.0196290027616481,
       "name": "Fence 1"
     },
     {
@@ -12304,10 +12721,10 @@
       "worldPropWidth": 1.814,
       "worldPropDepth": 0.1,
       "collisionMode": "baked",
-      "rotZ": -0.017899833226590476,
+      "rotZ": 0.005171768227424516,
       "scaleX": 0.46137955527319424,
       "scaleZ": 1.148965517241379,
-      "y": -0.043093256170229924,
+      "y": -0.04602900024316732,
       "name": "Fence 2"
     },
     {
@@ -12321,10 +12738,10 @@
       "worldPropWidth": 1.814,
       "worldPropDepth": 0.1,
       "collisionMode": "baked",
-      "rotZ": -0.0027901527166732764,
+      "rotZ": 0.012819131098381707,
       "scaleX": 0.46137955527319424,
       "scaleZ": 1.148965517241379,
-      "y": -0.04761556162712495,
+      "y": -0.044845779292688806,
       "name": "Fence 3"
     },
     {
@@ -12338,10 +12755,10 @@
       "worldPropWidth": 1.814,
       "worldPropDepth": 0.1,
       "collisionMode": "baked",
-      "rotZ": -0.000007446846396181673,
+      "rotZ": 0.0415855278987017,
       "scaleX": 0.46137955527319424,
       "scaleZ": 1.148965517241379,
-      "y": -0.0499905070962285,
+      "y": -0.036666583994127325,
       "name": "Fence 4"
     },
     {
@@ -12355,10 +12772,10 @@
       "worldPropWidth": 1.814,
       "worldPropDepth": 0.1,
       "collisionMode": "baked",
-      "rotZ": -0.00003459641737367857,
+      "rotZ": -0.0019492062649077136,
       "scaleX": 0.46137955527319424,
       "scaleZ": 1.148965517241379,
-      "y": -0.050044101951839795,
+      "y": -0.052484763342071264,
       "name": "Fence 5"
     },
     {
@@ -12372,10 +12789,10 @@
       "worldPropWidth": 1.814,
       "worldPropDepth": 0.1,
       "collisionMode": "baked",
-      "rotZ": -0.003897096208435121,
+      "rotZ": -0.09988071073066129,
       "scaleX": 0.46137955527319424,
       "scaleZ": 1.148965517241379,
-      "y": -0.05234105554927489,
+      "y": -0.06460293735406282,
       "name": "Fence 6"
     },
     {
@@ -12389,10 +12806,10 @@
       "worldPropWidth": 1.814,
       "worldPropDepth": 0.1,
       "collisionMode": "baked",
-      "rotZ": -0.006042147418822437,
+      "rotZ": 0.07526710834503852,
       "scaleX": 0.46137955527319424,
       "scaleZ": 1.148965517241379,
-      "y": -0.047728632407095975,
+      "y": 0.01326834237618861,
       "name": "Fence 7"
     },
     {
@@ -12406,10 +12823,10 @@
       "worldPropWidth": 1.814,
       "worldPropDepth": 0.1,
       "collisionMode": "baked",
-      "rotZ": 0.017875730375841396,
+      "rotZ": 0.026747447660624243,
       "scaleX": 0.46137955527319424,
       "scaleZ": 1.148965517241379,
-      "y": -0.036877231325303586,
+      "y": -0.08349574898376773,
       "name": "Fence 8"
     },
     {
@@ -38050,24 +38467,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 4.25,
-      "z": 297.4690161983138,
-      "rotY": 1.3852857968150303,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.02,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 15"
-    },
-    {
-      "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 40.89553189126121,
-      "z": 336.26485201481194,
-      "rotY": 5.523433600833938,
+      "x": 39.542901354788114,
+      "z": 316.294191420407,
+      "rotY": 1.9882344848035975,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38080,9 +38482,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 69.62300848140326,
-      "z": 338.89997279873575,
-      "rotY": 2.959450299761047,
+      "x": 49.57803867195575,
+      "z": 341.32867189155354,
+      "rotY": 5.921932218908367,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38095,9 +38497,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -18.627996230977228,
-      "z": 302.92159216287484,
-      "rotY": 3.593419553535626,
+      "x": -30.922846634265532,
+      "z": 319.93796491136004,
+      "rotY": 1.5471601461985836,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38110,9 +38512,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -31.080535033360533,
-      "z": 321.4398301683645,
-      "rotY": 1.5350547326494093,
+      "x": -37.82218763270345,
+      "z": 373.36070256644047,
+      "rotY": 1.0174593644943242,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38125,9 +38527,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -38.76555262818247,
-      "z": 374.53990881078926,
-      "rotY": 1.0213189612762226,
+      "x": -59.99886182088551,
+      "z": 388.9156092505457,
+      "rotY": 4.200198765230849,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38140,9 +38542,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -60.59083585211518,
-      "z": 390.37592826629395,
-      "rotY": 4.202166238156746,
+      "x": -70.3063301055335,
+      "z": 413.96588065747807,
+      "rotY": 0.7260103364575183,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38155,9 +38557,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": -71.24969510101253,
-      "z": 415.14508690182686,
-      "rotY": 0.7494947473736078,
+      "x": 5.56754876274619,
+      "z": 345.7890389659369,
+      "rotY": 1.7688853326876854,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38170,9 +38572,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 5.6965363714984,
-      "z": 320.0705479085162,
-      "rotY": 5.254585668559757,
+      "x": 1.9786002786555321,
+      "z": 372.63823725524435,
+      "rotY": 4.865338523249854,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38185,9 +38587,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 0.6370446609505209,
-      "z": 363.8510479592765,
-      "rotY": 4.882446346994092,
+      "x": 13.41554376580398,
+      "z": 397.1934062359655,
+      "rotY": 1.6091098473055108,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38200,9 +38602,9 @@
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 12.07398814809897,
-      "z": 388.40621693999765,
-      "rotY": 1.6859454281290986,
+      "x": 31.5924717071417,
+      "z": 483.041770165705,
+      "rotY": 2.0008261413302115,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.02,
@@ -38212,36 +38614,6 @@
       "scaleZ": 1,
       "y": 0,
       "name": "Streetlamp 25"
-    },
-    {
-      "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 27.275587698179695,
-      "z": 475.2713789495733,
-      "rotY": 2.09355636751972,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.02,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 26"
-    },
-    {
-      "assetId": "props/streetlamp_mirefen_witchflame",
-      "x": 13.90891007274707,
-      "z": 410.19891751339503,
-      "rotY": 1.5990966700575342,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.02,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 27"
     },
     {
       "assetId": "props/streetlamp_mirefen_witchflame",
@@ -38290,9 +38662,9 @@
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 3.8,
-      "z": 628.0621005145729,
-      "rotY": -1.539428982247696,
+      "x": 6.817507519750961,
+      "z": 687.2477036265213,
+      "rotY": 2.4530709859435027,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.08,
@@ -38301,7 +38673,52 @@
       "scaleY": 1,
       "scaleZ": 1,
       "y": 0,
-      "name": "Streetlamp 31"
+      "name": "Streetlamp 35"
+    },
+    {
+      "assetId": "props/streetlamp_thornpeak_beacon",
+      "x": 36.83989732691958,
+      "z": 687.2714509483782,
+      "rotY": -0.2646676562806689,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 1.08,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 36"
+    },
+    {
+      "assetId": "props/streetlamp_thornpeak_beacon",
+      "x": 52.96752833158015,
+      "z": 709.3959065511816,
+      "rotY": 2.470050173488176,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 1.08,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 37"
+    },
+    {
+      "assetId": "props/streetlamp_thornpeak_beacon",
+      "x": 77.06440320629967,
+      "z": 721.6903916692819,
+      "rotY": -0.698018383476948,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 1.08,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 38"
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
@@ -38377,81 +38794,6 @@
       "scaleZ": 1,
       "y": 0,
       "name": "Streetlamp 36"
-    },
-    {
-      "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 13.693230026152483,
-      "z": 679.1469373266698,
-      "rotY": 2.2562176971057215,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.08,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 37"
-    },
-    {
-      "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 38.94846466118584,
-      "z": 689.2946278781901,
-      "rotY": -0.6486329669818811,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.08,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 38"
-    },
-    {
-      "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 54.05115803219829,
-      "z": 711.9377538315821,
-      "rotY": 2.516736118436264,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.08,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 39"
-    },
-    {
-      "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 78.7242039080317,
-      "z": 723.3501923710139,
-      "rotY": -0.5280193250942615,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.08,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 40"
-    },
-    {
-      "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": -3.8,
-      "z": 689,
-      "rotY": 1.5645813429021518,
-      "scale": 2.5,
-      "collide": true,
-      "collideRadius": 1.08,
-      "collisionMode": "basic",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
-      "name": "Streetlamp 41"
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
@@ -56739,102 +57081,62 @@
       "name": "Isle coconuts 13"
     },
     {
-      "assetId": "props/fenbridge_warden_gatehouse",
-      "x": 9,
-      "z": 282,
-      "rotY": -0.4048917862850834,
-      "scale": 4.7727272727272725,
+      "assetId": "tidehold/fenrire/house_a",
+      "x": 7.4,
+      "z": 281.7,
+      "rotY": 1.5707963267948966,
+      "scale": 5.559090909090909,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 0.9999615399407715,
-      "scaleY": 1,
-      "scaleZ": 0.9999428604079766,
-      "y": 0,
+      "y": -1.05,
       "name": "Fenbridge warden gatehouse"
     },
     {
-      "assetId": "props/fenbridge_crooked_reed_inn",
-      "x": -21.25,
-      "z": 317,
-      "rotY": 2.1533493930082517,
-      "scale": 4.090909090909091,
+      "assetId": "tidehold/fenrire/tavern",
+      "x": 12.25,
+      "z": 299.9,
+      "rotY": 1.5707963267948966,
+      "scale": 10.294681818181816,
       "collide": true,
+      "worldPropKind": "inn",
+      "worldPropWidth": 1.9428,
+      "worldPropDepth": 1.2628,
       "collisionMode": "baked",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 0.9999750006249845,
-      "y": 0.06212350794658339,
+      "y": -1.05,
       "name": "Fenbridge crooked reed inn"
     },
     {
-      "assetId": "props/fenbridge_lantern_chapel",
-      "x": -19.5,
-      "z": 294,
-      "rotY": 1.1383885512243588,
-      "scale": 3.9090909090909087,
+      "assetId": "tidehold/fenrire/hall",
+      "x": -16.2,
+      "z": 299.6,
+      "rotY": -1.5707963267948966,
+      "scale": 13.863545454545454,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 1,
-      "scaleY": 1,
-      "scaleZ": 1,
-      "y": 0,
+      "y": -1.05,
       "name": "Fenbridge lantern chapel"
     },
     {
-      "assetId": "props/fenbridge_moonwort_apothecary",
-      "x": 17.8,
-      "z": 291.5,
-      "rotY": -0.9971906342364164,
-      "scale": 3.2727272727272725,
+      "assetId": "tidehold/fenrire/shop_b",
+      "x": 9.2,
+      "z": 322.8,
+      "rotY": 1.5707963267948966,
+      "scale": 8.499999999999998,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 1.0000571461226355,
-      "scaleY": 1,
-      "scaleZ": 0.999950002499875,
-      "y": 0,
+      "y": -1.05,
       "name": "Fenbridge moonwort apothecary"
     },
     {
-      "assetId": "props/fenbridge_gilded_strongbox",
-      "x": 19.2,
-      "z": 309.5,
-      "rotY": -1.8972270342276318,
-      "scale": 3.4089987739889094,
+      "assetId": "tidehold/fenrire/shop_a",
+      "x": -8.9,
+      "z": 322,
+      "rotY": -1.5707963267948966,
+      "scale": 7.399863636363635,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 1.0000270270270268,
-      "scaleY": 1,
-      "scaleZ": 0.9999962579113988,
-      "y": 0,
+      "y": -1.05,
       "name": "Fenbridge gilded strongbox"
-    },
-    {
-      "assetId": "props/fenbridge_hesk_tannery",
-      "x": -2,
-      "z": 320,
-      "rotY": 3.024483909022929,
-      "scale": 5.454015203067378,
-      "collide": true,
-      "collisionMode": "baked",
-      "scaleX": 1.0000972222222222,
-      "scaleY": 1,
-      "scaleZ": 1.0000972222222222,
-      "y": 0,
-      "name": "Fenbridge hesk tannery"
-    },
-    {
-      "assetId": "props/fenbridge_scout_lodge",
-      "x": -13.5,
-      "z": 325.5,
-      "rotY": 2.601173153319209,
-      "scale": 3.6365550339970043,
-      "collide": true,
-      "collisionMode": "baked",
-      "scaleX": 0.9999473684210527,
-      "scaleY": 1,
-      "scaleZ": 0.9999473684210527,
-      "y": 0.09333117915423439,
-      "name": "Fenbridge scout lodge"
     },
     {
       "assetId": "tidehold/smithy",
@@ -57492,6 +57794,21 @@
       "collisionMode": "baked",
       "y": -1.37,
       "name": "Eastbrook weekly vault"
+    },
+    {
+      "assetId": "props/streetlamp_mirefen_witchflame",
+      "x": -3.690703705030453,
+      "z": 272.40535416144263,
+      "rotY": 4.908718560339981,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 1.02,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 16"
     }
   ],
   "promotedScenery": {
@@ -57501,7 +57818,8 @@
     "waterFlora": true,
     "jungleCoconuts": true,
     "authoredTowns": true,
-    "eastbrookVault": true
+    "eastbrookVault": true,
+    "highwatchTown": true
   },
   "propsMode": "editable-all",
   "decorationExclusions": [

@@ -38,12 +38,16 @@ describe('character preview memory policy', () => {
       'utf8',
     );
     expect(hud).toContain('constrainedMemory: this.features.constrainedMemory === true');
-    const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    // The launcher's stage is built by src/game/launcher_preview_stage.ts (main.ts calls it).
+    const stage = readFileSync(
+      new URL('../src/game/launcher_preview_stage.ts', import.meta.url),
+      'utf8',
+    );
     // Every iOS WebKit host (Safari, other iOS browsers, and the packaged app), not just
     // NATIVE_APP: GFX.constrainedMemory already folds in platform === 'ios' (iosMemoryProfile)
     // alongside the generic touch/coarse-pointer detector.
-    expect(main).toMatch(
-      /new CharacterPreview\(container, canvas, \{[\s\S]*?constrainedMemory: GFX\.constrainedMemory,?\s*\}\)/,
+    expect(stage).toMatch(
+      /new CharacterPreview\(home, canvas, \{[\s\S]*?constrainedMemory: GFX\.constrainedMemory,[\s\S]*?\}\)/,
     );
     expect(preview).toContain('resolveCharacterPreviewPolicy(options.constrainedMemory === true)');
     expect(preview).toContain('antialias: policy.antialias');

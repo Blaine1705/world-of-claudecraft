@@ -8,6 +8,7 @@ import {
 } from '../src/render/foliage_core';
 import { BUILTIN_WORLD, PROPS } from '../src/sim/data';
 import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
+import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import {
   EASTBROOK_NOTICEBOARD_ASSET_ID,
   EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
@@ -59,7 +60,21 @@ describe('Eastbrook town grass exclusion', () => {
     // service-apron circle, so five fewer buildings is ten fewer rows
     // (125 to 115). The rectangle is no longer the wall box: a placed building
     // clears its whole REACH (porch, stair, awning and eaves), pinned below.
-    expect(exclusions).toHaveLength(115);
+    // Re-pinned 2026-10 for the painted Fenbridge: its seven kit lots became
+    // five placed buildings (two rows each, four fewer) and its boardwalks
+    // run down the main street only (twelve modules to ten, two fewer):
+    // 115 to 109.
+    // Re-pinned 2026-10 for the open Fenbridge: the palisade and its gate
+    // arches came down, taking the sixteen wing OBBs and the eight gate-jamb
+    // OBBs with them: 109 to 85.
+    // Re-pinned 2026-10 for the painted Highwatch: its five placed buildings
+    // clear their reach and door apron the Fenbridge way (two rows each; its
+    // old kit houses had none): 85 to 95.
+    expect(exclusions).toHaveLength(95);
+    for (const building of HIGHWATCH_LAYOUT.buildings) {
+      expect(exclusions.some((item) => item.id === building.id)).toBe(true);
+      expect(exclusions.some((item) => item.id === `${building.id}:serviceApron`)).toBe(true);
+    }
     expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
     expect(EASTBROOK_LAYOUT.buildings).toHaveLength(6);
     for (const building of [
