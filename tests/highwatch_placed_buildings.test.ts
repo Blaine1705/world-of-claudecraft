@@ -180,10 +180,13 @@ describe('the five placed Highwatch buildings', () => {
     }
   });
 
-  it('stand at authored size with their footing buried', () => {
+  it('stand grand, each at its own size, with their footing buried', () => {
     for (const building of BUILDINGS) {
-      expect(building.placement.scale, building.id).toBe(1);
-      expect(building.placement.lift, building.id).toBe(-1.05);
+      expect(building.placement.scale, building.id).toBeGreaterThanOrEqual(1.2);
+      expect(building.placement.lift, building.id).toBeCloseTo(
+        -(building.placement.scale + 0.05),
+        9,
+      );
       const groundLine =
         -boundsOf(building).min[1] * building.placement.scale + building.placement.lift;
       expect(groundLine, `${building.id} ground line`).toBeLessThan(0);
@@ -408,6 +411,11 @@ describe('placed Highwatch building collision in the built-in world', () => {
       { x: 20.702, z: 704.601 },
       { x: 33.195, z: 650.412 },
       { x: 31.928, z: 667.127 },
+      // stood grand, the buildings reach further
+      { x: -25.576, z: 668.259 },
+      { x: 27.314, z: 648.031 },
+      { x: 34.786, z: 673.567 },
+      { x: 31.334, z: 708.04 },
     ];
     for (const point of CLEARED) {
       expect(isExcludedDecoration(point.x, point.z), `${point.x}, ${point.z}`).toBe(true);
@@ -608,7 +616,7 @@ describe('Highwatch in WoC Studio', () => {
         collisionMode: 'baked',
       });
       expect(placement.scale).toBeCloseTo(
-        Math.max(...boundsOf(building).size) / PLACED_TARGET_HEIGHT,
+        (Math.max(...boundsOf(building).size) / PLACED_TARGET_HEIGHT) * building.placement.scale,
         3,
       );
       // turned as the game turns it: a flipped yaw would face every door away

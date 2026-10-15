@@ -117,9 +117,22 @@ describe('the Highwatch layout', () => {
       ['highwatch_watch_house', '/models/tidehold/highwatch/house_c.glb', 'house', false],
       ['highwatch_smithy', '/models/tidehold/highwatch/smithy.glb', 'house', true],
     ]);
+    // stood GRAND: each at the scale that clears a door of about five yards
+    // (highwatch_layout.ts), the footing buried and the ground line sunk 0.05
+    expect(BUILDINGS.map((building) => [building.id, building.placement.scale])).toEqual([
+      ['highwatch_summit_inn', 1.2],
+      ['highwatch_gate_chapel', 1.2],
+      ['highwatch_counting_house', 1.5],
+      ['highwatch_watch_house', 1.4],
+      ['highwatch_smithy', 1.3],
+    ]);
     for (const building of BUILDINGS) {
-      expect(building.placement.scale, building.id).toBe(1);
-      expect(building.placement.lift, building.id).toBe(-1.05);
+      expect(building.placement.lift, building.id).toBeCloseTo(
+        -(building.placement.scale + 0.05),
+        9,
+      );
+      // the door step grows with the building
+      expect(building.frontClearance, building.id).toBeCloseTo(1.8 * building.placement.scale, 9);
     }
     // the town is the third rebuilt town, with its own promoted family
     const town = AUTHORED_TOWNS.find((candidate) => candidate.id === 'highwatch');
@@ -232,8 +245,8 @@ describe('the Highwatch layout', () => {
     // the new first stretch, then the old line from (70, 720) to Stormcrag
     expect(ZONE3_ROADS[2]).toEqual([
       { x: 4, z: 674 },
-      { x: 11, z: 687 },
-      { x: 33, z: 690 },
+      { x: 11, z: 689 },
+      { x: 33, z: 691.5 },
       { x: 42, z: 695 },
       { x: 48, z: 700 },
       { x: 56, z: 707 },
@@ -266,7 +279,7 @@ describe('the Highwatch layout', () => {
     const inn = BUILDINGS.find((building) => building.id === 'highwatch_summit_inn');
     const smithy = BUILDINGS.find((building) => building.id === 'highwatch_smithy');
     if (!inn || !smithy) throw new Error('missing inn or smithy');
-    const roadZAt22 = 687 + ((22 - 11) / (33 - 11)) * (690 - 687);
+    const roadZAt22 = 689 + ((22 - 11) / (33 - 11)) * (691.5 - 689);
     expect(roadZAt22).toBeGreaterThan(inn.reach.center.z + inn.reach.halfWidth);
     expect(roadZAt22).toBeLessThan(smithy.reach.center.z - smithy.reach.halfDepth);
   });
@@ -289,8 +302,8 @@ describe('the Highwatch layout', () => {
     expect(edits.slice(-pads.length)).toEqual([...pads]);
     const expected: Record<string, number> = {
       highwatch_summit_inn: 9,
-      highwatch_gate_chapel: 8.6,
-      highwatch_counting_house: 9.3,
+      highwatch_gate_chapel: 8.8,
+      highwatch_counting_house: 8.8,
       highwatch_watch_house: 7.6,
       highwatch_smithy: 10.6,
     };

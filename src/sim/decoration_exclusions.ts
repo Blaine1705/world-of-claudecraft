@@ -68,6 +68,13 @@ const EXCLUSIONS = [
   { x: 20.702, z: 704.601 },
   { x: 33.195, z: 650.412 },
   { x: 31.928, z: 667.127 },
+  // ...and, the buildings stood grand (larger, set further out), the tree by
+  // the counting house's north-east corner, the rock and the tree on the inn's
+  // south end and back wall, and the rock under the smithy's forge shelter.
+  { x: -25.576, z: 668.259 },
+  { x: 27.314, z: 648.031 },
+  { x: 34.786, z: 673.567 },
+  { x: 31.334, z: 708.04 },
 ];
 
 export function isExcludedDecoration(x: number, z: number): boolean {

@@ -17,7 +17,8 @@ import {
   localToWorld,
   makePlacedTownBuilding,
   makeTownNpc,
-  type PlacedTownSeat,
+  placedTownSeat,
+  scalePlacedTownMeasurements,
 } from './placed_town_kit';
 
 /** The five kit records the rebuild replaced (zone3 ZONE3_PROPS before it),
@@ -33,12 +34,29 @@ export const REMOVED_HIGHWATCH_BUILDINGS = deepFreeze([
 const HUB_CENTER = { x: 0, z: 660 } as const;
 
 // The painted models are authored in yards with their ground line at y 0 and
-// one yard of footing below it. Highwatch stands them at their authored size,
-// as Fenbridge does: the hold's shelf is a disc of level ground some
-// twenty-eight yards across, and at authored size the inn alone runs the
-// length of its west side. The lift buries the footing and sinks the ground
-// line a further 0.05; a visitor stands 1.8 yd off the wall face at a door.
-const SEAT: PlacedTownSeat = { scale: 1, lift: -1.05, frontClearance: 1.8 };
+// one yard of footing below it; a visitor stands 1.8 yd off the wall face at a
+// door at authored size, and that step grows with the building (its stoop and
+// its upper storey's overhang grow too). Highwatch stands them GRAND, each at its own size, so a player (2.6 yd
+// to the crown) walks in under a door of about five yards, as at a classic
+// mountain inn, never stooping into a toy house. Measured off each model's
+// baked collision (door head and ceiling over its floor, authored size), each
+// scale brings the door to about five yards and the room to six or more:
+//  - the inn (tavern_b): door 4.4, taproom ceiling 4.9 at authored size; at 1.2
+//    the door clears 5.3 and the taproom 5.9, the ridge stands 25.6 yd up;
+//  - the chapel (hall): door 5.0, nave walls 8.4 over its floor; at 1.2 the
+//    portal clears 6.0 and the nave 10.1, a church door over an inn door;
+//  - the counting house (shop_a): door 3.25, ceiling 4.2, the smallest; at 1.5
+//    the door clears 4.9 and the counting room 6.3;
+//  - the watch house (house_c, sealed): a storey of 3.9; at 1.4 it stands 5.5
+//    a storey, beside the counting house;
+//  - the smithy: door 4.0, ceiling 4.8; at 1.3 the door clears 5.2, the forge
+//    room 6.2.
+const FRONT_CLEARANCE = 1.8;
+const INN_SCALE = 1.2;
+const CHAPEL_SCALE = 1.2;
+const COUNTING_HOUSE_SCALE = 1.5;
+const WATCH_HOUSE_SCALE = 1.4;
+const SMITHY_SCALE = 1.3;
 
 // The Highwatch look of the painted set: the same models and geometry as
 // /models/tidehold/, re-baked wearing the harbour colours with square slate
@@ -50,31 +68,40 @@ const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
 const SOUTH_FACING = 0; // the door looks south (-z), the model as authored
 const NORTH_FACING = Math.PI; // the door looks north (+z), the model turned half round
 
-// The site plan. The square round the well keeps every service it had. The
-// inn is its west side, the long front on the square and the door looking at
-// the apothecary station; the counting house stands east of the square past
-// the quartermaster's stall, the practice row behind it; the chapel and the
+// The site plan, widened for the grand buildings: the square round the well
+// keeps every service it had and opens out to the buildings round it. The inn
+// is its west side, set back past the station and the mailbox, its long front
+// on the square and its door looking at the apothecary station; the counting
+// house stands east of the square past the quartermaster's stall, between the
+// east road and the gate fence, the practice row behind it; the chapel and the
 // watch house flank the Fenbridge road where it climbs in through the south
 // gate, the chapel's door and bell tower looking north at the gate; and the
 // smithy works the north-west terrace, its forge open onto the Stormcrag road.
+// Each record's measurements are the model's at AUTHORED size
+// (scalePlacedTownMeasurements carries them to the building's own scale).
 const INN = makePlacedTownBuilding(
   {
     id: 'highwatch_summit_inn',
     assetId: `${PAINTED_SET}/tavern_b.glb`,
     kind: 'inn',
-    anchor: { x: 22, z: 666.4 },
+    anchor: { x: 29, z: 668.6 },
     rotation: EAST_FACING,
-    reach: { x: 1.079, z: -0.864, width: 30.262, height: 22.351, depth: 20.428 },
-    walls: { x: 0, z: 0, width: 26, depth: 15 },
-    annexes: [
-      // the round turret at the front's south corner
-      { name: 'turret', x: 13.5, z: -8.5, width: 3.8, depth: 3.8 },
-      { name: 'chimney', x: -13.47, z: -1, width: 1, depth: 2.4 },
-    ],
-    doorX: -2,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 1.079, z: -0.864, width: 30.262, height: 22.351, depth: 20.428 },
+        walls: { x: 0, z: 0, width: 26, depth: 15 },
+        annexes: [
+          // the round turret at the front's south corner
+          { name: 'turret', x: 13.5, z: -8.5, width: 3.8, depth: 3.8 },
+          { name: 'chimney', x: -13.47, z: -1, width: 1, depth: 2.4 },
+        ],
+        doorX: -2,
+      },
+      INN_SCALE,
+    ),
     walkIn: true,
   },
-  SEAT,
+  placedTownSeat(INN_SCALE, FRONT_CLEARANCE * INN_SCALE),
 );
 const CHAPEL = makePlacedTownBuilding(
   {
@@ -84,19 +111,24 @@ const CHAPEL = makePlacedTownBuilding(
     // east of the Fenbridge road at the south gate, its long side on the
     // road and its door looking north at the gate and the square: Brother
     // Aldric keeps the door inside the hub circle, as he kept his old spot
-    anchor: { x: -12.5, z: 632.6 },
+    anchor: { x: -12.2, z: 629.8 },
     rotation: NORTH_FACING,
-    reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
-    walls: { x: 0, z: 0, width: 12, depth: 22 },
-    annexes: [
-      // the bell tower at the front's east corner, over the gate
-      { name: 'bell_tower', x: 8.25, z: -9, width: 5.4, depth: 5.4 },
-      { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
-    ],
-    doorX: 0,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
+        walls: { x: 0, z: 0, width: 12, depth: 22 },
+        annexes: [
+          // the bell tower at the front's east corner, over the gate
+          { name: 'bell_tower', x: 8.25, z: -9, width: 5.4, depth: 5.4 },
+          { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
+        ],
+        doorX: 0,
+      },
+      CHAPEL_SCALE,
+    ),
     walkIn: true,
   },
-  SEAT,
+  placedTownSeat(CHAPEL_SCALE, FRONT_CLEARANCE * CHAPEL_SCALE),
 );
 const COUNTING_HOUSE = makePlacedTownBuilding(
   {
@@ -105,18 +137,23 @@ const COUNTING_HOUSE = makePlacedTownBuilding(
     assetId: `${PAINTED_SET}/shop_a.glb`,
     kind: 'house',
     // east of the square, its counter and awning on the square
-    anchor: { x: -20.5, z: 658.4 },
+    anchor: { x: -26.8, z: 657.5 },
     rotation: WEST_FACING,
-    reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
-    walls: { x: 0, z: 0, width: 11, depth: 8.4 },
-    annexes: [
-      { name: 'stall_counter', x: 2.375, z: -5.925, width: 3.61, depth: 0.77 },
-      { name: 'stall_barrels', x: 4.885, z: -5.762, width: 1.477, depth: 2.169 },
-    ],
-    doorX: -1.6,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
+        walls: { x: 0, z: 0, width: 11, depth: 8.4 },
+        annexes: [
+          { name: 'stall_counter', x: 2.375, z: -5.925, width: 3.61, depth: 0.77 },
+          { name: 'stall_barrels', x: 4.885, z: -5.762, width: 1.477, depth: 2.169 },
+        ],
+        doorX: -1.6,
+      },
+      COUNTING_HOUSE_SCALE,
+    ),
     walkIn: true,
   },
-  SEAT,
+  placedTownSeat(COUNTING_HOUSE_SCALE, FRONT_CLEARANCE * COUNTING_HOUSE_SCALE),
 );
 const WATCH_HOUSE = makePlacedTownBuilding(
   {
@@ -124,14 +161,19 @@ const WATCH_HOUSE = makePlacedTownBuilding(
     assetId: `${PAINTED_SET}/house_c.glb`,
     kind: 'house',
     // west of the Fenbridge road at the south gate, its door on the road
-    anchor: { x: 11, z: 635 },
+    anchor: { x: 15, z: 634 },
     rotation: EAST_FACING,
-    reach: { x: 0.386, z: 0.23, width: 12.764, height: 19.58, depth: 16.264 },
-    walls: { x: 0, z: 0, width: 8.56, depth: 11.96 },
-    annexes: [{ name: 'tower', x: 4.61, z: 6.31, width: 2.76, depth: 2.76 }],
-    doorX: -1.6,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 0.386, z: 0.23, width: 12.764, height: 19.58, depth: 16.264 },
+        walls: { x: 0, z: 0, width: 8.56, depth: 11.96 },
+        annexes: [{ name: 'tower', x: 4.61, z: 6.31, width: 2.76, depth: 2.76 }],
+        doorX: -1.6,
+      },
+      WATCH_HOUSE_SCALE,
+    ),
   },
-  SEAT,
+  placedTownSeat(WATCH_HOUSE_SCALE, FRONT_CLEARANCE * WATCH_HOUSE_SCALE),
 );
 const SMITHY = makePlacedTownBuilding(
   {
@@ -139,30 +181,36 @@ const SMITHY = makePlacedTownBuilding(
     assetId: `${PAINTED_SET}/smithy.glb`,
     kind: 'house',
     // the north-west terrace, the forge shelter at its west end
-    anchor: { x: 20, z: 699 },
+    anchor: { x: 20, z: 704 },
     rotation: SOUTH_FACING,
-    reach: { x: 3.4285, z: -0.2955, width: 19.797, height: 12.781, depth: 11.69 },
-    walls: { x: 0, z: 0, width: 11, depth: 9 },
-    annexes: [
-      { name: 'forge_shelter', x: 9.12, z: -0.08, width: 7.24, depth: 9.64 },
-      { name: 'chimney', x: -5.97, z: 1, width: 1, depth: 2 },
-    ],
-    doorX: -1.2,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 3.4285, z: -0.2955, width: 19.797, height: 12.781, depth: 11.69 },
+        walls: { x: 0, z: 0, width: 11, depth: 9 },
+        annexes: [
+          { name: 'forge_shelter', x: 9.12, z: -0.08, width: 7.24, depth: 9.64 },
+          { name: 'chimney', x: -5.97, z: 1, width: 1, depth: 2 },
+        ],
+        doorX: -1.2,
+      },
+      SMITHY_SCALE,
+    ),
     walkIn: true,
   },
-  SEAT,
+  placedTownSeat(SMITHY_SCALE, FRONT_CLEARANCE * SMITHY_SCALE),
 );
 
 const BUILDINGS = [INN, CHAPEL, COUNTING_HOUSE, WATCH_HOUSE, SMITHY] as const;
 
 // The counting house's market counter (the stall annex on its front): the
-// auctioneer keeps it, a stride and a half in front of the boards.
+// auctioneer keeps it, a stride and a half in front of the boards (the counter
+// is the model's, at the building's scale; the stride is a person's).
 const COUNTER = { x: 2.375, z: -5.925, depth: 0.77 } as const;
 const COUNTER_STANDING_POINT = localToWorld(
   COUNTING_HOUSE.placement,
   COUNTING_HOUSE.rotation,
-  COUNTER.x,
-  COUNTER.z - COUNTER.depth / 2 - 1.3,
+  COUNTER.x * COUNTING_HOUSE_SCALE,
+  (COUNTER.z - COUNTER.depth / 2) * COUNTING_HOUSE_SCALE - 1.3,
 );
 
 // Loremaster Caddis gave his corner to the inn's porch: he keeps the square's
@@ -197,8 +245,8 @@ const NPCS = [
 // and the smithy's terrace, then rejoins the old line down to Stormcrag.
 const STORMCRAG_ROAD = [
   { x: 4, z: 674 },
-  { x: 11, z: 687 },
-  { x: 33, z: 690 },
+  { x: 11, z: 689 },
+  { x: 33, z: 691.5 },
   { x: 42, z: 695 },
   { x: 48, z: 700 },
   { x: 56, z: 707 },
@@ -248,14 +296,19 @@ function padsAlong(
 // inn (level with the square) and the smithy's terrace: three tilted stamps
 // along it grade the lane from the one to the other, applied over the aprons
 // and before the pads, so the buildings' own pads keep their ground.
-const ROAD_GRADE_FALL = (10.6 - 9) / 11; // smithy terrace over inn shelf, across the lane
+const INN_HEIGHT = 9;
+const SMITHY_HEIGHT = 10.6;
+const INN_NORTH_Z = INN.reach.center.z + INN.reach.halfWidth;
+const SMITHY_SOUTH_Z = SMITHY.reach.center.z - SMITHY.reach.halfDepth;
+// smithy terrace over inn shelf, across the lane
+const ROAD_GRADE_FALL = (SMITHY_HEIGHT - INN_HEIGHT) / (SMITHY_SOUTH_Z - INN_NORTH_Z);
 const ROAD_GRADE = [14, 22, 30].map((x) => {
-  const z = 687 + ((x - 11) / 22) * 3;
+  const z = 689 + ((x - 11) / 22) * 2.5;
   return {
     x,
     z,
     radius: 6,
-    delta: 9 + ROAD_GRADE_FALL * (z - 680),
+    delta: INN_HEIGHT + ROAD_GRADE_FALL * (z - INN_NORTH_Z),
     hardness: 0.4,
     gx: 0,
     gz: ROAD_GRADE_FALL,
@@ -271,11 +324,11 @@ const ROAD_GRADE = [14, 22, 30].map((x) => {
 // each reach exactly. The counting house and the smithy cut deepest into the
 // hill, so theirs reach furthest.
 const GROUND = [
-  { building: INN, height: 9, columns: 3, rows: 2, taper: 5, apron: 11 },
-  { building: COUNTING_HOUSE, height: 9.3, columns: 2, rows: 2, taper: 4, apron: 14 },
-  { building: CHAPEL, height: 8.6, columns: 2, rows: 3, taper: 5, apron: 10 },
-  { building: WATCH_HOUSE, height: 7.6, columns: 2, rows: 2, taper: 4, apron: 10 },
-  { building: SMITHY, height: 10.6, columns: 3, rows: 1, taper: 4, apron: 13 },
+  { building: INN, height: INN_HEIGHT, columns: 4, rows: 3, taper: 5, apron: 15 },
+  { building: COUNTING_HOUSE, height: 8.8, columns: 2, rows: 2, taper: 4, apron: 14 },
+  { building: CHAPEL, height: 8.8, columns: 2, rows: 3, taper: 5, apron: 10 },
+  { building: WATCH_HOUSE, height: 7.6, columns: 2, rows: 3, taper: 4, apron: 10 },
+  { building: SMITHY, height: SMITHY_HEIGHT, columns: 3, rows: 2, taper: 4, apron: 13 },
 ] as const;
 
 // The aprons reach into the square: this sets the shelf back at its own height
