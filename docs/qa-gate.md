@@ -228,6 +228,18 @@ its affected set with the given paths themselves; the property is pinned by exec
 `tests/ci_shard_plan.test.ts`). The entry regenerates the generated artifacts once per
 job before spawning, since `npx vitest` has no npm lifecycle.
 
+**The related walk's heap.** Before running anything, `vitest related` walks the import
+graph of EVERY collected test file in the main process. Stock vitest does that for all of
+them at once and keeps each file's whole dependency Set alive until the last walk ends,
+so its heap grows with test files times graph size; on this suite it crossed the runner's
+default heap and every selective shard died with exit 134 before any test reported. The
+Vitest-only plugin `scripts/lib/vitest_bounded_related.mjs` (registered in
+`vite.config.ts` under `VITEST`) replaces that one selection method with the same
+predicate walked in bounded batches, one boolean per file, and no walk for a file that is
+itself a related path (the floor seeds); the selected set is unchanged. Pinned by
+`tests/vitest_bounded_related.test.ts`, which also proves the override is live in the run.
+A vitest upgrade that moves the replaced internals fails every run loudly at startup.
+
 **The real-SQL arm.** The shard gates and nightly's full suite each carry a per-job
 Postgres service and a job-level `TEST_DATABASE_URL`, so the pg integration suites
 (which skip green without the variable) actually run at the merge bar: the
