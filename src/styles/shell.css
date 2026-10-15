@@ -10688,6 +10688,11 @@
     color: var(--color-gold-300);
     text-shadow: 0 1px 3px var(--color-bg-dark);
   }
+  /* Korean breaks between syllables by default; keep its words whole (each one fits). The
+     page's lang follows the chosen language (main.ts translatePage). */
+  .preview-touch-hint .pth-label:lang(ko) {
+    word-break: keep-all;
+  }
   @keyframes pth-dock-in {
     from {
       opacity: 0;

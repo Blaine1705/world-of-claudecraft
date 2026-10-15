@@ -396,6 +396,14 @@ describe('preview touch hint: its shell.css section', () => {
     expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
     expect(css).not.toMatch(/\brgba?\(|\bhsla?\(/);
   });
+
+  it('keeps Korean words whole in the narrow label (the browser breaks between syllables)', () => {
+    // seen in a capture: "확대/축소" split as "확 / 대/축소" before this rule
+    const css = stripCssComments(hintSection());
+    expect(css).toMatch(
+      /\.preview-touch-hint \.pth-label:lang\(ko\)\s*\{\s*word-break:\s*keep-all;\s*\}/,
+    );
+  });
 });
 
 describe('preview touch hint: localization', () => {
