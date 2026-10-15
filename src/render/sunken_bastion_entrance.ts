@@ -27,7 +27,7 @@
 // time of day and the reduced-motion switch) and the pulse light's base.
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
-import { DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
 import {
   SUNKEN_BASTION_ENTRANCE_COLLIDERS,
   SUNKEN_BASTION_ENTRANCE_DUNGEON_ID,
@@ -764,7 +764,7 @@ function gateSprites(
 
 /** Build the Drowned Gate Tower (world coordinates). */
 export function buildSunkenBastionEntrance(seed: number): SunkenBastionEntranceView {
-  const door = DUNGEONS[SUNKEN_BASTION_ENTRANCE_DUNGEON_ID].doorPos;
+  const door = activeDungeonDoorPos(DUNGEONS[SUNKEN_BASTION_ENTRANCE_DUNGEON_ID]);
   const base = terrainHeight(door.x, door.z, seed);
   const ground = (lx: number, lz: number) => terrainHeight(door.x + lx, door.z + lz, seed) - base;
   const group = new THREE.Group();

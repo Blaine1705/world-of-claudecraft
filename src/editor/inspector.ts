@@ -340,6 +340,9 @@ export interface InspectorDeps {
   }[];
   /** Selected map light (viewport bulb click or panel row click), or null. */
   getSelectedLight(): number | null;
+  /** The selected built-in gameplay object's panel (object_move_panel.ts), or
+   *  null when none is selected. */
+  movedObjectPanel?(): HTMLElement | null;
   setSelectedLight(index: number | null): void;
   updateMapLight(
     index: number,
@@ -1397,7 +1400,11 @@ export class Inspector {
         // sound): edit it right here without hopping to that tool.
         if (d.getSelectedLight() !== null) this.lightPanel();
         else if (d.getSelectedSound() !== null) this.soundPanel();
-        else this.selectPanel();
+        else {
+          const moved = d.movedObjectPanel?.() ?? null;
+          if (moved) this.root.appendChild(moved);
+          else this.selectPanel();
+        }
         break;
       case 'move':
       case 'rotate':

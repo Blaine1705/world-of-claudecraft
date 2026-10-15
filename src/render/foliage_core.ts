@@ -1,5 +1,5 @@
 import { isEastbrookGrandArmoury } from '../sim/building_layout';
-import { DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
@@ -49,8 +49,11 @@ export function insideGrassHubExclusion(
  *  system asks this (the tuft ring and both blade carpets), so the paving
  *  reads as paving at every distance. */
 export function insidePavedGrassExclusion(x: number, z: number): boolean {
-  const door = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID]?.doorPos;
-  return door !== undefined && onWildheartBasinEntranceCauseway(door, x, z, 0.3);
+  const dungeon = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID];
+  return (
+    dungeon !== undefined &&
+    onWildheartBasinEntranceCauseway(activeDungeonDoorPos(dungeon), x, z, 0.3)
+  );
 }
 
 /** Hub and camp clearings for bushes/ferns, sourced from the active world only. */

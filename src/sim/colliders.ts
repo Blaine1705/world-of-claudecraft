@@ -41,7 +41,7 @@ import {
   defaultDelveModules,
   delveAt,
   delveModuleLocal,
-  GATHER_NODES,
+  gatherNodesInActiveWorld,
   getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
@@ -683,7 +683,7 @@ function staticWorldColliders(seed: number): Collider[] {
   // solid, standable bodies; herb clusters stay soft vegetation on purpose
   // (GATHER_NODE_BODIES). INTERACT_RANGE (5) dwarfs the radii, so collision
   // never pushes a gatherer out of harvesting reach.
-  for (const node of GATHER_NODES) {
+  for (const node of gatherNodesInActiveWorld()) {
     const nodeBody = GATHER_NODE_BODIES[node.type];
     if (!nodeBody) continue;
     const top = topY(seed, node.pos.x, node.pos.z, nodeBody.top);

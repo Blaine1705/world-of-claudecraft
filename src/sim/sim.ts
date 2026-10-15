@@ -292,7 +292,7 @@ import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import { spawnHealingTrainingGround } from './healing_training';
-import { spawnHubPractice } from './hub_practice';
+import { spawnDevHealerPracticeDummy, spawnHubPractice } from './hub_practice';
 import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import * as inventoryConsumption from './inventory_consumption';
@@ -427,6 +427,7 @@ import {
   mountTrainBegin as mountTrainBeginImpl,
   tickMountTraining as tickMountTrainingImpl,
 } from './mounts_training';
+import { farmPatchesFor } from './moved_objects';
 import { savedGearFor } from './muster_pike';
 import * as nythraxisReadouts from './nythraxis_raid_readouts';
 import {
@@ -2406,13 +2407,17 @@ export class Sim {
         // Pure geometry on the already-rolled point: it draws no rng, so the spawn
         // loop's own draw order is untouched (mob positions do shift, which moves
         // their later idle-wander draws, but that is downstream in the drive phase).
-        const cleared = projectOutsideDungeonDoors(camp.center.x + off.x, camp.center.z + off.z);
+        const cleared = projectOutsideDungeonDoors(
+          camp.center.x + off.x,
+          camp.center.z + off.z,
+          worldContent.objectMoves,
+        );
         // findSafePos's inward spiral can walk a shore-side ring-edge point back
         // toward land, i.e. back INTO the ring; re-project the safe point so the
         // "never inside a door ring" guarantee holds for every seed, not just the
         // shipped one. Still pure and rng-free.
         const grounded = this.findSafePos(cleared.x, cleared.z, minHeight);
-        const safe = projectOutsideDungeonDoors(grounded.x, grounded.z);
+        const safe = projectOutsideDungeonDoors(grounded.x, grounded.z, worldContent.objectMoves);
         const pos = this.groundPos(safe.x, safe.z);
         const level = campRng.int(template.minLevel, template.maxLevel);
         const mob = spawnOpenWorldMob(this.nextId++, template, level, pos);
@@ -2543,7 +2548,7 @@ export class Sim {
     }
 
     spawnRealmBuilderMonument(this.ctx, this.worldContent.props);
-    if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
+    if (cfg.noPlayer && this.devCommands) spawnDevHealerPracticeDummy(this.ctx);
 
     if (!cfg.noPlayer) {
       this.ownPlayerPid = this.addPlayer(this.cfg.playerClass, this.cfg.playerName, {
@@ -2576,18 +2581,6 @@ export class Sim {
     spawnHubPractice(this.ctx, worldContent);
     spawnHealingTrainingGround(this.ctx, worldContent);
     spawnHarborHouseKeeper(this.ctx, worldContent);
-  }
-
-  private spawnHealerPracticeDummy(): void {
-    const pos = this.groundPos(-34, 648);
-    const dummy = createMob(this.nextId++, MOBS.training_dummy, 20, pos);
-    dummy.name = 'Healing Dummy';
-    dummy.color = 0x74c476;
-    dummy.hostile = false;
-    dummy.friendlyPracticeTarget = true;
-    dummy.facing = 0;
-    dummy.prevFacing = 0;
-    this.addEntity(dummy);
   }
 
   private lockoutNowMs(): number {
@@ -4991,6 +4984,9 @@ export class Sim {
       },
       get stationPlacements() {
         return sim.stationPlacements;
+      },
+      get objectMoves() {
+        return sim.worldContent.objectMoves;
       },
       get primaryId() {
         return sim.primaryId;
@@ -11471,9 +11467,9 @@ export class Sim {
     return this.toolEffectSlotsFor(this.primaryId);
   }
 
-  // Static garden-bed geography (content/farm_patches.ts), by shared readonly reference.
+  // Garden beds with this world's moved beds (sim/moved_objects.ts), by shared reference.
   get farmPatches(): readonly FarmPatchDef[] {
-    return FARM_PATCHES;
+    return farmPatchesFor(this.worldContent.objectMoves, FARM_PATCHES);
   }
 
   // The viewer's farm plots, projected for the seam: explicit pid (the

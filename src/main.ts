@@ -420,7 +420,7 @@ import { HEROIC_VENDOR_STOCK } from './sim/content/heroic_vendor';
 import { MECH_CHROMAS } from './sim/content/skins';
 import { rowTreeFor } from './sim/content/talents';
 import {
-  GATHER_NODES,
+  activeGatherNodeById,
   ITEMS,
   isRiftPos,
   MOBS,
@@ -3434,7 +3434,7 @@ async function startGame(
     );
     if (id === null || deferDirectCorpseToNode) {
       const nodeId = renderer.picking.pickGatherNode(x, y);
-      const node = nodeId !== null ? GATHER_NODES.find((n) => n.id === nodeId) : undefined;
+      const node = nodeId !== null ? activeGatherNodeById(nodeId) : undefined;
       if (node) {
         stopAutorunForInteraction(
           handleGatherNodeInteract(

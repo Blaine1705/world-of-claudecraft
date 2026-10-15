@@ -381,6 +381,7 @@ import { REFERRAL_STAMP_ITEMS } from './content/referral_rewards';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
+import { dungeonDoorPos, freezeObjectMoves, gatherNodesFor } from './moved_objects';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
   const merged = Object.assign({}, ...parts);
@@ -742,7 +743,24 @@ export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
  * on ore inside its stadium.
  */
 export function activeGatherNodes(): GatherNodeDef[] {
-  return usesOverworldSiteDressing(getActiveWorldContent().presentationMode) ? GATHER_NODES : [];
+  return usesOverworldSiteDressing(getActiveWorldContent().presentationMode)
+    ? gatherNodesInActiveWorld()
+    : [];
+}
+
+/**
+ * GATHER_NODES as the active world places them: any node a Studio map moved
+ * (moved_objects.ts) at its new spot, the shipped table itself otherwise.
+ * UNGATED, unlike activeGatherNodes: this is the table the by-id lookups and
+ * the collider build read, which never filtered by presentation.
+ */
+export function gatherNodesInActiveWorld(): GatherNodeDef[] {
+  return gatherNodesFor(getActiveWorldContent().objectMoves, GATHER_NODES);
+}
+
+/** One node of gatherNodesInActiveWorld by id (a click pick), or undefined. */
+export function activeGatherNodeById(id: string): GatherNodeDef | undefined {
+  return gatherNodesInActiveWorld().find((node) => node.id === id);
 }
 
 /** The dungeons the WORLD MAP may draw an overworld portal for.
@@ -763,6 +781,16 @@ export function activeGatherNodes(): GatherNodeDef[] {
 const NO_NAMED_AREAS: NonNullable<WorldContent['locations']> = [];
 export function activeNamedAreas(): NonNullable<WorldContent['locations']> {
   return getActiveWorldContent().locations ?? NO_NAMED_AREAS;
+}
+
+/** A dungeon's overworld door as the active world stands it: a Studio map may
+ *  move a door (moved_objects.ts), and its entrance set piece, map portal and
+ *  finder pin follow. The shipped doorPos otherwise. */
+export function activeDungeonDoorPos(dungeon: Pick<DungeonDef, 'id' | 'doorPos'>): {
+  readonly x: number;
+  readonly z: number;
+} {
+  return dungeonDoorPos(getActiveWorldContent().objectMoves, dungeon);
 }
 
 export function activeOverworldDungeons(): readonly DungeonDef[] {
@@ -1068,6 +1096,12 @@ export function isBuiltinWorldActive(): boolean {
 // through getActiveWorldContent. Spawns come from SimConfig.world too (sim.ts ctor).
 export function setActiveWorldContent(world: WorldContent | null): void {
   activeWorld = world ?? BUILTIN_WORLD;
+  // A world that arrived as JSON (a playtest handoff, a published map) carries
+  // a plain moves record: freeze it once here so every moved-object resolver
+  // (moved_objects.ts) memoizes on it instead of rebuilding per read.
+  if (activeWorld.objectMoves && !Object.isFrozen(activeWorld.objectMoves)) {
+    activeWorld.objectMoves = freezeObjectMoves(activeWorld.objectMoves);
+  }
   refreshAuthoredMapGate();
   contentGeneration++;
 }
