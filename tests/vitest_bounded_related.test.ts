@@ -7,12 +7,13 @@
 
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, inject, it } from 'vitest';
 import {
-  BOUNDED_RELATED_ENV,
+  BOUNDED_RELATED_PROVIDE_KEY,
   filterTestsBySourceBounded,
   installBoundedRelatedFilter,
   RELATED_WALK_BATCH,
+  VERIFIED_VITEST_VERSION,
   vitestBoundedRelatedPlugin,
 } from '../scripts/lib/vitest_bounded_related.mjs';
 
@@ -151,10 +152,12 @@ describe('installBoundedRelatedFilter', () => {
     };
   };
 
+  const quiet = { log: () => {} };
+
   it('replaces the live method with the bounded selection', async () => {
     const v = fakeVitest();
     const original = v.specifications.filterTestsBySource;
-    installBoundedRelatedFilter(v);
+    installBoundedRelatedFilter(v, quiet);
     expect(v.specifications.filterTestsBySource).not.toBe(original);
     expect(ids(await v.specifications.filterTestsBySource(SPECS))).toEqual([
       '/r/t1.test.ts',
@@ -162,26 +165,87 @@ describe('installBoundedRelatedFilter', () => {
     ]);
   });
 
+  // The merged CI leg passes the floor test files themselves as related
+  // paths; through the installed method each must select itself, reached or
+  // not (t4 imports nothing), alongside what the changed source reaches.
+  it('keeps every seed test file through the installed method', async () => {
+    const v = fakeVitest();
+    v.config.related = ['/r/s3.ts', '/r/t4.test.ts', '/r/t2.test.ts'];
+    installBoundedRelatedFilter(v, quiet);
+    expect(ids(await v.specifications.filterTestsBySource(SPECS))).toEqual(
+      ids(vitestReference(SPECS, v.config.related)),
+    );
+    expect(ids(await v.specifications.filterTestsBySource(SPECS))).toEqual([
+      '/r/t2.test.ts',
+      '/r/t3.test.ts',
+      '/r/t4.test.ts',
+      '/r/t5.test.ts',
+    ]);
+  });
+
+  it('logs one line per install, and only for a related run', async () => {
+    const lines: string[] = [];
+    const v = fakeVitest();
+    installBoundedRelatedFilter(v, { log: (line) => lines.push(line) });
+    await v.specifications.filterTestsBySource(SPECS);
+    await v.specifications.filterTestsBySource(SPECS);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatch(/^\[bounded-related\] related selection over 5 test file\(s\)/);
+    expect(lines[0]).toContain(`batches of ${RELATED_WALK_BATCH}`);
+
+    const plain = fakeVitest();
+    plain.config.related = undefined;
+    const silent: string[] = [];
+    installBoundedRelatedFilter(plain, { log: (line) => silent.push(line) });
+    expect(ids(await plain.specifications.filterTestsBySource(SPECS))).toEqual(ids(SPECS));
+    expect(silent).toEqual([]);
+  });
+
+  it('installs once per instance', () => {
+    const v = fakeVitest();
+    installBoundedRelatedFilter(v, quiet);
+    const installed = v.specifications.filterTestsBySource;
+    installBoundedRelatedFilter(v, quiet);
+    expect(v.specifications.filterTestsBySource).toBe(installed);
+  });
+
+  it('refuses any vitest release but the verified one', () => {
+    expect(VERIFIED_VITEST_VERSION).toBe('4.1.11');
+    expect(() =>
+      installBoundedRelatedFilter(fakeVitest(), { ...quiet, vitestVersion: '4.2.0' }),
+    ).toThrow(/verified against vitest 4\.1\.11, found 4\.2\.0/);
+    // The installed release is the verified one, or every run would throw.
+    const pkg = JSON.parse(
+      readFileSync(path.resolve(__dirname, '../node_modules/vitest/package.json'), 'utf8'),
+    ) as { version: string };
+    expect(pkg.version).toBe(VERIFIED_VITEST_VERSION);
+  });
+
   it('fails loudly when the vitest internals it replaces are gone', () => {
     const noFilter = fakeVitest() as Record<string, unknown>;
     noFilter.specifications = { getTestDependencies: async () => new Set() };
-    expect(() => installBoundedRelatedFilter(noFilter)).toThrow(/filterTestsBySource is missing/);
+    expect(() => installBoundedRelatedFilter(noFilter, quiet)).toThrow(
+      /filterTestsBySource is missing/,
+    );
     const noDeps = fakeVitest() as Record<string, unknown>;
     noDeps.specifications = { filterTestsBySource: async () => [] };
-    expect(() => installBoundedRelatedFilter(noDeps)).toThrow(/getTestDependencies is missing/);
+    expect(() => installBoundedRelatedFilter(noDeps, quiet)).toThrow(
+      /getTestDependencies is missing/,
+    );
     const noVcs = fakeVitest() as Record<string, unknown>;
     delete noVcs.vcs;
-    expect(() => installBoundedRelatedFilter(noVcs)).toThrow(/findChangedFiles is missing/);
+    expect(() => installBoundedRelatedFilter(noVcs, quiet)).toThrow(/findChangedFiles is missing/);
   });
 });
 
 describe('wiring', () => {
-  // The plugin sets the marker in the main process right after installing,
-  // and this worker was forked afterwards: proof the override is live in
-  // every vitest run of this config, `vitest related` included.
+  // The plugin provides this value from configureVitest in THIS run's main
+  // process, right after installing; it is per run (not inherited like an
+  // env var), so it proves the override is live for every vitest run of
+  // this config, `vitest related` included.
   it('is installed in this very run', () => {
     expect(vitestBoundedRelatedPlugin().name).toBe('woc-vitest-bounded-related');
-    expect(process.env[BOUNDED_RELATED_ENV]).toBe('1');
+    expect((inject as (key: string) => unknown)(BOUNDED_RELATED_PROVIDE_KEY)).toBe(true);
   });
 
   it('is registered only inside the process.env.VITEST branch of vite.config.ts', () => {

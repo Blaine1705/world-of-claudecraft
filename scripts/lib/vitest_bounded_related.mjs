@@ -16,13 +16,26 @@
 // files at a time, (2) keeps one boolean per file instead of its dependency
 // Set, and (3) skips the walk for a file that is itself a related path, whose
 // answer the predicate already fixes. The selected set is identical; only
-// the peak heap changes (measured on the full suite: about 3.97 GB and an OOM
-// at the 4 GB ceiling, against a 0.68 GB peak).
+// the peak heap changes (measured on the full suite with CI's shard argv at
+// the 4 GB ceiling: stock OOMs at about 3.97 GB live; this peaks at 0.57 GB
+// and keeps the identical 4308 of 5699 files).
+//
+// It replaces vitest internals, so it is pinned to the vitest release it was
+// verified against and refuses to install on any other: a bump must re-check
+// the stock method and re-measure equivalence before moving the pin.
 
 import { createRequire } from 'node:module';
 
 /** Files walked concurrently. Bounds the live dependency Sets. */
 export const RELATED_WALK_BATCH = 64;
+
+/** The vitest release whose filterTestsBySource this reproduces. */
+export const VERIFIED_VITEST_VERSION = '4.1.11';
+
+/** provide/inject key a suite reads to prove the override is live in its run. */
+export const BOUNDED_RELATED_PROVIDE_KEY = 'wocBoundedRelated';
+
+const INSTALLED = Symbol.for('woc.vitestBoundedRelated');
 
 /**
  * The selection itself, with vitest's semantics and bounded memory.
@@ -79,14 +92,24 @@ export async function filterTestsBySourceBounded(io) {
 
 /**
  * Replace `vitest.specifications.filterTestsBySource` on a live Vitest
- * instance. Throws when the internals it relies on are missing, so a vitest
- * upgrade that moves them fails every run loudly instead of silently
- * reverting to the unbounded walk (or selecting differently).
+ * instance. Throws when the internals it relies on are missing or the vitest
+ * release is not the verified one, so an upgrade fails every run loudly
+ * instead of silently reverting to the unbounded walk or selecting
+ * differently. Idempotent per instance.
  *
  * @param {any} vitest the Vitest instance (configureVitest context)
- * @param {{ batch?: number }} [options]
+ * @param {{ batch?: number, vitestVersion?: string, log?: (line: string) => void }} [options]
  */
 export function installBoundedRelatedFilter(vitest, options = {}) {
+  const require = createRequire(import.meta.url);
+  const version = options.vitestVersion ?? require('vitest/package.json').version;
+  if (version !== VERIFIED_VITEST_VERSION) {
+    throw new Error(
+      `vitest_bounded_related: verified against vitest ${VERIFIED_VITEST_VERSION}, found ` +
+        `${version}. Re-check stock filterTestsBySource against ` +
+        'scripts/lib/vitest_bounded_related.mjs, re-measure equivalence, then move the pin.',
+    );
+  }
   const specifications = vitest?.specifications;
   for (const name of ['filterTestsBySource', 'getTestDependencies']) {
     if (typeof specifications?.[name] !== 'function') {
@@ -99,36 +122,42 @@ export function installBoundedRelatedFilter(vitest, options = {}) {
   if (typeof vitest.vcs?.findChangedFiles !== 'function') {
     throw new Error('vitest_bounded_related: vitest.vcs.findChangedFiles is missing');
   }
+  if (specifications[INSTALLED]) return;
   // The same picomatch vitest itself resolves, so trigger globs match alike.
-  const pm = createRequire(createRequire(import.meta.url).resolve('vitest/package.json'))(
-    'picomatch',
-  );
-  specifications.filterTestsBySource = (specs) =>
-    filterTestsBySourceBounded({
+  const pm = createRequire(require.resolve('vitest/package.json'))('picomatch');
+  const log = options.log ?? ((line) => console.log(line));
+  const batch = options.batch ?? RELATED_WALK_BATCH;
+  let announced = false;
+  specifications.filterTestsBySource = (specs) => {
+    if (!announced && (vitest.config.related || vitest.config.changed)) {
+      // One line in every related run's log, so a job log shows which
+      // selection decided the test set.
+      announced = true;
+      log(
+        `[bounded-related] related selection over ${specs.length} test file(s): bounded walk, ` +
+          `batches of ${batch} (scripts/lib/vitest_bounded_related.mjs, vitest ${version})`,
+      );
+    }
+    return filterTestsBySourceBounded({
       specs,
       config: vitest.config,
       findChangedFiles: (opts) => vitest.vcs.findChangedFiles(opts),
       getTestDependencies: (spec) => specifications.getTestDependencies(spec),
       matchesAny: (patterns) => pm(patterns),
-      batch: options.batch,
+      batch,
     });
+  };
+  specifications[INSTALLED] = true;
 }
-
-/**
- * Set in the main process once the override is installed. Test workers are
- * forked after configureVitest and inherit it, so a suite can prove the
- * override is live in its own run (tests/vitest_bounded_related.test.ts).
- */
-export const BOUNDED_RELATED_ENV = 'WOC_VITEST_BOUNDED_RELATED';
 
 /** The Vitest plugin vite.config.ts registers under VITEST. */
 export function vitestBoundedRelatedPlugin() {
   return {
     name: 'woc-vitest-bounded-related',
-    /** @param {{ vitest: any }} context */
-    configureVitest({ vitest }) {
+    /** @param {{ vitest: any, project: { provide(key: string, value: unknown): void } }} context */
+    configureVitest({ vitest, project }) {
       installBoundedRelatedFilter(vitest);
-      process.env[BOUNDED_RELATED_ENV] = '1';
+      project.provide(BOUNDED_RELATED_PROVIDE_KEY, true);
     },
   };
 }

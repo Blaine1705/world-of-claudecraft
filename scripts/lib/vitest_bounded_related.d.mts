@@ -1,6 +1,8 @@
 export const RELATED_WALK_BATCH: number;
 
-export const BOUNDED_RELATED_ENV: 'WOC_VITEST_BOUNDED_RELATED';
+export const VERIFIED_VITEST_VERSION: string;
+
+export const BOUNDED_RELATED_PROVIDE_KEY: 'wocBoundedRelated';
 
 export function filterTestsBySourceBounded<S extends { moduleId: string }>(io: {
   specs: readonly S[];
@@ -17,9 +19,15 @@ export function filterTestsBySourceBounded<S extends { moduleId: string }>(io: {
   batch?: number;
 }): Promise<S[]>;
 
-export function installBoundedRelatedFilter(vitest: unknown, options?: { batch?: number }): void;
+export function installBoundedRelatedFilter(
+  vitest: unknown,
+  options?: { batch?: number; vitestVersion?: string; log?: (line: string) => void },
+): void;
 
 export function vitestBoundedRelatedPlugin(): {
   name: string;
-  configureVitest(context: { vitest: unknown }): void;
+  configureVitest(context: {
+    vitest: unknown;
+    project: { provide(key: string, value: unknown): void };
+  }): void;
 };
