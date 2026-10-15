@@ -495,6 +495,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/haunt_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/highwatch_manor_lights.ts':
+    'the Highwatch manor hearth, lamps and ridge lantern, pushed into the props fireLights budget beside the campfires',
   'render/ignivar_fire_vfx.ts':
     'Ignivar flame light on the model bone inside the entity view, a view light marked on reconcile',
   'render/ignivar_model_vfx.ts':
