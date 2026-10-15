@@ -71,6 +71,7 @@ describe('Iron Resolve: a maximum-health shield for a flat 20 rage', () => {
     sim.castAbility('iron_resolve');
     expect(sim.player.auras.some((a) => a.id === 'iron_resolve')).toBe(false);
     expect(sim.player.resource).toBe(19);
+    expect(sim.player.cooldowns.get('iron_resolve') ?? 0).toBe(0);
   });
 
   it('Forgewall 2-piece raises the shield to 25 percent of max health', () => {
