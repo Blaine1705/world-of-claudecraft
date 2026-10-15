@@ -14,6 +14,7 @@ import {
   isFenbridgeRebuildStall,
   isFenbridgeRebuildWell,
 } from '../render/fenbridge_town';
+import { isHighwatchRebuildBuilding } from '../render/highwatch_town';
 import { PROP_NATURAL_SIZE } from '../render/prop_natural_size.generated';
 import { PROP_ASSET_DEFS } from '../render/props';
 import { STREETLAMP_FIXTURE } from '../render/streetlamp_fixture.generated';
@@ -208,7 +209,13 @@ export function worldMajorPropPlacements(
     // stop matching the live game precisely where the maker looks first.
     // Skipped rather than promoted: the authored art is not placement-shaped,
     // so these buildings render but are not individually editable.
-    if (isEastbrookRebuildBuilding(building) || isFenbridgeRebuildBuilding(building)) continue;
+    if (
+      isEastbrookRebuildBuilding(building) ||
+      isFenbridgeRebuildBuilding(building) ||
+      isHighwatchRebuildBuilding(building)
+    ) {
+      continue;
+    }
     const label = `Building ${index + 1}`;
     if (building.kind === 'chapel') {
       const towerPos = offsetAlongLocalZ(building.x, building.z, building.rot, -0.75);
@@ -783,7 +790,10 @@ function authoredTownProps(
 ): Pick<ZonePropsDef, 'buildings' | 'wells' | 'stalls' | 'fences'> {
   return {
     buildings: props.buildings.filter(
-      (b) => isEastbrookRebuildBuilding(b) || isFenbridgeRebuildBuilding(b),
+      (b) =>
+        isEastbrookRebuildBuilding(b) ||
+        isFenbridgeRebuildBuilding(b) ||
+        isHighwatchRebuildBuilding(b),
     ),
     wells: props.wells.filter((w) => isEastbrookRebuildWell(w) || isFenbridgeRebuildWell(w)),
     stalls: props.stalls.filter((s) => isEastbrookRebuildStall(s) || isFenbridgeRebuildStall(s)),

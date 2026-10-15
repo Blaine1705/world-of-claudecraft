@@ -455,6 +455,7 @@ import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
+import { buildHighwatchTownView, type HighwatchTownView } from './highwatch_town';
 import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { HOARD_BODY_IDS, hoardEntrance } from './hoard_entrance';
@@ -1813,6 +1814,8 @@ export class Renderer {
     this.eastbrookTownView?.setRealmBuilderHonouree(name);
   }
   private fenbridgeTownView!: FenbridgeTownView;
+  /** Every rebuilt town's view (Eastbrook, Fenbridge, Highwatch), one loop. */
+  private townViews: readonly (EastbrookTownView | FenbridgeTownView | HighwatchTownView)[] = [];
   private hollowGates!: HollowGatesView;
   private lightRank: RankedPointLight[] = [];
   private doomedIds: number[] = [];
@@ -2719,23 +2722,20 @@ export class Renderer {
     ]);
     this.propsView = props;
 
-    // Eastbrook's replacement town is a distinct, stable scene subtree. Its
-    // six opaque building volumes stay individual for camera roof ghosting;
-    // civic, market, fence, and wall geometry is initialization-batched.
+    // The rebuilt towns are distinct, stable, built-in-only scene subtrees:
+    // every building stays an individual camera-fade target, and Eastbrook's
+    // and Fenbridge's civic and repeated geometry is initialization-batched
+    // (Highwatch is painted buildings only, placed_town_buildings.ts).
     this.eastbrookTownView = buildEastbrookTownView(this.sim.cfg.seed);
-    setRenderCategory(this.eastbrookTownView.group, 'props');
-    this.scene.add(this.eastbrookTownView.group);
-    freezeStaticSubtreeMatrices(this.eastbrookTownView.group);
-    bd('eastbrook-town');
-
-    // Fenbridge's replacement town is a separate built-in-only subtree. Its
-    // seven buildings remain independent camera-fade targets; civic and
-    // repeated palisade/gate/boardwalk geometry is initialization-batched.
     this.fenbridgeTownView = buildFenbridgeTownView(this.sim.cfg.seed);
-    setRenderCategory(this.fenbridgeTownView.group, 'props');
-    this.scene.add(this.fenbridgeTownView.group);
-    freezeStaticSubtreeMatrices(this.fenbridgeTownView.group);
-    bd('fenbridge-town');
+    const highwatch = buildHighwatchTownView(this.sim.cfg.seed);
+    this.townViews = [this.eastbrookTownView, this.fenbridgeTownView, highwatch];
+    for (const town of this.townViews) {
+      setRenderCategory(town.group, 'props');
+      this.scene.add(town.group);
+      freezeStaticSubtreeMatrices(town.group);
+    }
+    bd('towns');
 
     // First-reveal compile gates (hitch-hunt P3a): a cull flipping world
     // content visible for the first time holds it one representation back
@@ -2764,12 +2764,9 @@ export class Renderer {
       });
       this.propsRevealGate = createRevealGate(revealHost, (key) => this.propsView.revealRoots(key));
       this.propsView.setRevealGate(this.propsRevealGate);
-      this.eastbrookTownView.setRevealGate(
-        createRevealGate(revealHost, () => this.eastbrookTownView.staticRevealRoots()),
-      );
-      this.fenbridgeTownView.setRevealGate(
-        createRevealGate(revealHost, () => this.fenbridgeTownView.staticRevealRoots()),
-      );
+      for (const town of this.townViews) {
+        town.setRevealGate(createRevealGate(revealHost, () => town.staticRevealRoots()));
+      }
       this.foliageRevealGate = createRevealGate(revealHost, (key) => this.foliage.revealRoots(key));
       installOccluderFadeGate(revealHost);
     }
@@ -5069,28 +5066,19 @@ export class Renderer {
       dt,
       this.reducedMotion(),
     );
-    this.eastbrookTownView.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
-      sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
-      dt,
-      this.reducedMotion(),
-    );
-    this.fenbridgeTownView.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
-      sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
-      dt,
-      this.reducedMotion(),
-    );
+    for (const town of this.townViews) {
+      town.update(
+        this.camera.position.x,
+        this.camera.position.y,
+        this.camera.position.z,
+        this.cameraLookAt.x,
+        this.cameraLookAt.y,
+        this.cameraLookAt.z,
+        sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
+        dt,
+        this.reducedMotion(),
+      );
+    }
     this.foliage.update(
       p.pos.x,
       p.pos.z,
@@ -11676,28 +11664,9 @@ export class Renderer {
     const eyeZ = this.cameraLookAt.z;
     const sceneryFar = sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar);
     this.propsView.update(camX, camY, camZ, eyeX, eyeY, eyeZ, sceneryFar, dt, this.reducedMotion());
-    this.eastbrookTownView.update(
-      camX,
-      camY,
-      camZ,
-      eyeX,
-      eyeY,
-      eyeZ,
-      sceneryFar,
-      dt,
-      this.reducedMotion(),
-    );
-    this.fenbridgeTownView.update(
-      camX,
-      camY,
-      camZ,
-      eyeX,
-      eyeY,
-      eyeZ,
-      sceneryFar,
-      dt,
-      this.reducedMotion(),
-    );
+    for (const town of this.townViews) {
+      town.update(camX, camY, camZ, eyeX, eyeY, eyeZ, sceneryFar, dt, this.reducedMotion());
+    }
     this.dungeons?.update(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());
     this.hollowGates.update(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());
     updateSetPieceOccluders(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());

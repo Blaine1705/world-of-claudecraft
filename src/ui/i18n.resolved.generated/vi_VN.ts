@@ -12186,6 +12186,7 @@ export const vi_VN: EnTranslations = {
     "realm": "Thế Giới",
     "newCharacter": "Nhân Vật Mới",
     "appearance": "Ngoại hình",
+    "modelLoading": "Loading character...",
     "customize": "Tùy chỉnh",
     "body": "Cơ thể",
     "genderMale": "Nam",

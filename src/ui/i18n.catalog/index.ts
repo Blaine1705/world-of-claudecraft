@@ -401,6 +401,9 @@ export const en = {
     realm: 'World',
     newCharacter: 'New Character',
     appearance: 'Appearance',
+    // The launcher turntable's loading placeholder (src/ui/preview_loading_silhouette.ts):
+    // its status text while the 3D character is still loading.
+    modelLoading: 'Loading character...',
     // Modular character customization (every class): the body is composed
     // from parts, so these pick the parts and recolour skin/hair.
     customize: 'Customize',

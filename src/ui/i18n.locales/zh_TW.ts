@@ -7818,6 +7818,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'auth.realm': '世界',
   'auth.newCharacter': '新增角色',
   'auth.appearance': '外觀',
+  'auth.modelLoading': '正在載入角色...',
   'auth.class': '職業',
   'auth.name': '名稱',
   'auth.chromaOption': '配色 {n}',

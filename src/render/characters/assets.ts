@@ -60,6 +60,7 @@ import {
   type VisualDef,
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
+  type WeaponLayoutOverride,
   weaponSkinModelUrl,
   weaponSkinModelUrls,
 } from './manifest';
@@ -785,7 +786,8 @@ const lazyOnDemandUrls = new Set(
 let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
-/** The urls in flight that the post-entry stream queued as background loads. */
+/** The urls in flight as background loads (the boot set and the post-entry stream): a
+ *  demand for one is asked of the loader once more, which promotes it. */
 const streamQueuedUrls = new Set<string>();
 /** Body files a host is waiting on (visualAssetsResident), until each lands. */
 const hostAwaitedUrls = new Set<string>();
@@ -904,6 +906,45 @@ export function visualAssetsResident(key: string, fetch = true): boolean {
   return resident;
 }
 
+/**
+ * Whether a body a host builds DIRECTLY (a launcher preview: the creator's class body, the
+ * roster's pick) can be built now: its body files (visualAssetsResident) AND every held prop
+ * its build attaches for these hands (the class starters, a character's own weapons), the
+ * selection the build itself makes (heldPropChoices). Every missing file is asked for as a
+ * DEMAND, so one still waiting in the background boot set below (every item weapon is in
+ * it) moves ahead of the rest of that set; the host builds on onCharacterAssetReady, and a
+ * failed fetch is asked for again after its cooldown (armCharacterRetry), as for a body file.
+ * A prop that streams on demand (an Armory skin model) never holds the build: the build
+ * leaves it off while it is cold (residentOrEnsure). `weaponOverride` is the layout the
+ * build adopts (CharacterVisual's def clone); `bareWhenUnarmed` the build's own option.
+ */
+export function directBuildAssetsResident(
+  key: string,
+  weaponItemId: string | null,
+  offhandItemId: string | null,
+  weaponOverride: WeaponLayoutOverride | null = null,
+  bareWhenUnarmed = false,
+): boolean {
+  const base = VISUALS[key];
+  if (!base) return false;
+  let resident = visualAssetsResident(key);
+  const def = weaponOverride
+    ? {
+        ...base,
+        attach: weaponOverride.attach,
+        weaponSlots: weaponOverride.weaponSlots,
+        offhandSlot: weaponOverride.offhandSlot,
+      }
+    : base;
+  for (const { att } of heldPropChoices(def, weaponItemId, null, offhandItemId, bareWhenUnarmed)) {
+    if (streamedUrlSet.has(att.url) || characterAssetResident(att.url)) continue;
+    resident = false;
+    hostAwaitedUrls.add(att.url);
+    if (!characterRetryArmed.has(att.url)) ensureCharacterUrl(att.url);
+  }
+  return resident;
+}
+
 /** A streamed url that has not arrived yet must degrade, never throw: return
  *  null so the caller falls back (base weapon / no ranged override) and kick
  *  the fetch so the cosmetic appears on the next swap or view rebuild. */
@@ -914,9 +955,21 @@ function residentOrEnsure(url: string | null): string | null {
   return null;
 }
 
+// The boot set rides the loader's BACKGROUND class (assets/load_queue_core.ts). None of it is
+// what the launcher draws: its previews build one body each, from files they ask for
+// themselves as demands (visualAssetsResident, directBuildAssetsResident), and on a desktop
+// this set is every creature body and every item weapon in the game, a few hundred files.
+// Queued as demands, a first visit's creator turntable waited behind all of them.
+// assetsReady() still awaits the whole set before the Renderer exists, and a file somebody
+// needs now is promoted on the same fetch (prepareCharacterUrl).
 for (const url of preloadUrls) {
-  registerPreload(prepareCharacterUrl(url));
+  registerPreload(prepareCharacterUrl(url, 'background'));
 }
+// At Play the rest of the set becomes a demand again (the deferred lane opens before the
+// assetsReady() that gates the Renderer): world entry waits for all of it, so none of it may
+// keep the background class's narrower share of the loader's slots once the launcher is left
+// (a background load never takes a queue's last free slot, assets/load_queue_core.ts).
+registerDeferredPreload(() => Promise.all(preloadUrls.map((url) => prepareCharacterUrl(url))));
 
 // World entry (the deferred lane, awaited before the Renderer exists): the minimum to draw
 // ANY player, which is the WOC base and animation library of both body fits and both head
@@ -1040,8 +1093,10 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
 /** Resolve once every boot-time character GLB + skin atlas is cached, retrying
  *  whatever is still missing instead of depending on the site-wide assetsReady()
  *  barrier. That barrier is one shared promise over EVERY registered preload
- *  (terrain, dungeon, foliage, ...): an unrelated failure there must not sink the
- *  character-creation preview, and loadGltf/loadTexture already evict a failed
+ *  (terrain, dungeon, foliage, ...): an unrelated failure there must not sink a
+ *  caller that only needs character files. The launcher's previews do NOT wait
+ *  here (on a desktop this is every creature and item weapon in the game): each
+ *  waits for its own body's files (directBuildAssetsResident). loadGltf/loadTexture already evict a failed
  *  URL from their own cache on rejection, so a fresh call here genuinely
  *  re-fetches rather than re-awaiting a permanently rejected promise. A transient
  *  failure is far more likely on a cold, first-visit cache (no warm HTTP cache to
@@ -2147,6 +2202,48 @@ function attachTargetBone(
   return resolveBone(root, stowed && isHandslotBone(att.bone) ? STOW_BONE : att.bone);
 }
 
+/** One held prop a build attaches: its attachment as resolved for these hands, and the
+ *  kind of slot it fills. */
+interface HeldPropChoice {
+  att: AttachDef;
+  isWeapon: boolean;
+  isOffhandSwap: boolean;
+}
+
+/** The held props a build of `def` attaches for these hands, in attach order (the
+ *  selection attachAllProps below makes), shared with directBuildAssetsResident so a host
+ *  that waits for a body's files waits for exactly the props its build will hang. */
+function heldPropChoices(
+  def: VisualDef,
+  weaponItemId: string | null,
+  weaponSkinId: string | null,
+  offhandItemId: string | null,
+  bareWhenUnarmed: boolean,
+): HeldPropChoice[] {
+  const attachments = visibleAttachmentsForGraphics(def);
+  const choices: HeldPropChoice[] = [];
+  for (let i = 0; i < attachments.length; i++) {
+    const base = attachments[i];
+    const isSwap = def.weaponSlots?.includes(i) ?? false;
+    const isOffhandSwap = def.offhandSlot === i;
+    if (
+      !isSwap &&
+      !isOffhandSwap &&
+      isHandslotBone(base.bone) &&
+      !fixedHandPropsShown(bareWhenUnarmed, weaponItemId)
+    ) {
+      continue;
+    }
+    const att = isSwap
+      ? swapAttachDef(base, weaponItemId, weaponSkinId, bareWhenUnarmed)
+      : isOffhandSwap
+        ? offhandAttachDef(base, offhandItemId, weaponSkinId)
+        : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
+    if (att) choices.push({ att, isWeapon: isSwap || isRangedSwapAttach(base), isOffhandSwap });
+  }
+  return choices;
+}
+
 // Attach every authored prop: swappable slots take the equipped item's model (or an
 // applied weapon skin, which wins); the actual offhand slot takes the equipped
 // offhand's model (or the same skin mirrored onto a matching-type weapon,
@@ -2170,7 +2267,6 @@ function attachAllProps(
   offhandItemId: string | null = null,
   bareWhenUnarmed = false,
 ): THREE.Object3D[] {
-  const attachments = visibleAttachmentsForGraphics(def);
   // A skin mirrored onto the offhand rides the same rarity-VFX + material path as
   // the mainhand skin, so its payload joins the returned set (the caller runs the
   // VFX/isolation pass over these). A plain offhand (shield/held-offhand/different
@@ -2181,25 +2277,13 @@ function attachAllProps(
   const offhandSkinned = offhandMirrorsWeaponSkin(weaponSkinId, offhandItemId);
   const mainhandSkinned = !weaponSkinId || mainhandShowsWeaponSkin(weaponSkinId, weaponItemId);
   const payloads: THREE.Object3D[] = [];
-  for (let i = 0; i < attachments.length; i++) {
-    const base = attachments[i];
-    const isSwap = def.weaponSlots?.includes(i) ?? false;
-    const isOffhandSwap = def.offhandSlot === i;
-    const isWeapon = isSwap || isRangedSwapAttach(base);
-    if (
-      !isSwap &&
-      !isOffhandSwap &&
-      isHandslotBone(base.bone) &&
-      !fixedHandPropsShown(bareWhenUnarmed, weaponItemId)
-    ) {
-      continue;
-    }
-    const att = isSwap
-      ? swapAttachDef(base, weaponItemId, weaponSkinId, bareWhenUnarmed)
-      : isOffhandSwap
-        ? offhandAttachDef(base, offhandItemId, weaponSkinId)
-        : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
-    if (!att) continue;
+  for (const { att, isWeapon, isOffhandSwap } of heldPropChoices(
+    def,
+    weaponItemId,
+    weaponSkinId,
+    offhandItemId,
+    bareWhenUnarmed,
+  )) {
     // A held prop whose model streams on demand (an Armory skin model an NPC
     // carries) degrades while it is cold: left off, its fetch kicked, never a
     // throw out of the build.

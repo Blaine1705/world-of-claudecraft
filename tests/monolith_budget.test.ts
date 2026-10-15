@@ -1027,10 +1027,10 @@ const MONOLITHS: MonolithRow[] = [
     // Merge of the four dungeon entrances (#4478): both parents' additions combine
     // (ours is the one updateSetPieceOccluders call), exact merged count, within
     // the release/v0.45.0 ceiling the branch was held to.
-    // v0.45 integration sync at 78c350c8d55 into cel-shading-rnd:
-    // parent pins 12598 and 12426; combined existing wiring,
-    // exact merged count with no new coordinator behavior or slack.
-    ceiling: 12432,
+    // v0.45 integration sync at a9b50f71fb4 into cel-shading-rnd:
+    // parent pins 12432 and 12395; retain the shared townViews loops
+    // and branch scenery-distance wiring at the exact merged count.
+    ceiling: 12401,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1511,7 +1511,10 @@ const MONOLITHS: MonolithRow[] = [
     // 11037 minus that removal. Exact merged count (wc -l), zero slack.
     // LOWERED to 11001 when the offline Play click (its audio start and its world
     // choice) moved into src/game/studio_boot.ts bootOfflinePlay.
-    ceiling: 11001,
+    // LOWERED to 10958 when the launcher's 3D stage build (and its panel-to-container
+    // map) moved into src/game/launcher_preview_stage.ts, which builds it at once
+    // instead of behind charactersReady(). Exact count (wc -l), zero slack.
+    ceiling: 10958,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -8,6 +8,7 @@ import { type KeyValueStore, MapStore, parseMap, serializeMap } from '../src/edi
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
+import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 
 function memStore(): KeyValueStore {
   const m = new Map<string, string>();
@@ -38,7 +39,7 @@ describe('CustomMap build + projection', () => {
     expect(w.terrainEdits).toHaveLength(1);
   });
 
-  // Studio keeps the authored towns' (Eastbrook Vale, Fenbridge) buildings,
+  // Studio keeps the authored towns' (Eastbrook Vale, Fenbridge, Highwatch) buildings,
   // wells, stalls and fences on a custom map (commit 1c426ac1ba,
   // custom_world_props.ts clonePropsKeepingAuthoredTowns): with those records
   // stripped the authored town subtrees had nothing to gate on and the editor
@@ -70,6 +71,7 @@ describe('CustomMap build + projection', () => {
     const builtInOnlyBuildingIds = new Set<string>([
       ...eastbrookIds.buildings,
       ...FENBRIDGE_LAYOUT.buildings.map((placement) => placement.id),
+      ...HIGHWATCH_LAYOUT.buildings.map((placement) => placement.id),
     ]);
     const builtInOnlyWellIds = new Set<string>([
       ...eastbrookIds.wells,

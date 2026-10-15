@@ -9,6 +9,7 @@ import {
 } from '../src/editor/world_prop_placements';
 import { isEastbrookRebuildBuilding } from '../src/render/eastbrook_town';
 import { isFenbridgeRebuildBuilding } from '../src/render/fenbridge_town';
+import { isHighwatchRebuildBuilding } from '../src/render/highwatch_town';
 import { pathCrossesFence } from '../src/sim/colliders';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { MAX_PLACEMENTS, type MapPlacement, sanitizeMapDoc } from '../src/sim/map_doc';
@@ -109,14 +110,16 @@ describe('editable overworld scenery', () => {
     expect(map.placements.some((p) => p.assetId === 'dungeon/delve_entrance_2')).toBe(true);
 
     // The ONE exception to "everything becomes a placement": the authored
-    // towns (Eastbrook Vale, Fenbridge) draw their own buildings from bespoke
+    // towns (Eastbrook Vale, Fenbridge, Highwatch) draw their own buildings from bespoke
     // subtrees whose art is not placement-shaped. Those records STAY static so
     // the subtree has something to gate on, props.ts skips the generic kit
     // stand-ins for exactly the same records, so there is still no duplicate.
     // Strip them and the editor renders an empty village while the live game
     // shows the town (see sim/custom_world_props clonePropsKeepingAuthoredTowns).
     const authoredTown = (b: { id?: string }): boolean =>
-      isEastbrookRebuildBuilding(b as never) || isFenbridgeRebuildBuilding(b as never);
+      isEastbrookRebuildBuilding(b as never) ||
+      isFenbridgeRebuildBuilding(b as never) ||
+      isHighwatchRebuildBuilding(b as never);
     expect(world.props.buildings.length).toBeGreaterThan(0);
     expect(world.props.buildings.every(authoredTown)).toBe(true);
     expect(map.placements.some((p) => authoredTown(p as never))).toBe(false);

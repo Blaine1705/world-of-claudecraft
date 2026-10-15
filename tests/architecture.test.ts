@@ -1147,6 +1147,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
   'src/render/characters/preview_armor_detail_core.ts',
+  'src/render/characters/preview_touch_core.ts',
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/view_vfx_pose_core.ts',
@@ -3155,6 +3156,9 @@ const UI_DOM_MODULES = [
   'src/ui/hud/professions/profession_identity_card.ts',
   'src/ui/hud/professions/profession_tutorial_window.ts',
   'src/ui/preview_stand_in.ts',
+  // The launcher turntable's loading silhouette: mints its own layer and SVG
+  // art (the `= document` default) and moves it between stage containers.
+  'src/ui/preview_loading_silhouette.ts',
   'src/ui/prompt_dialog.ts',
   // The report window body moved whole out of hud.ts (the Phase 9b headroom
   // extraction); it paints #report-window and owns its listeners. Renamed to

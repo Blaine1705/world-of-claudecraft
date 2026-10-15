@@ -19,6 +19,7 @@
 // (+ toes up about the heel, - heel up about the ball), yaw (+ toes out), toe
 // (extra toe bend, + up) }, knee: degrees of knee-out swing of the leg plane.
 import { Matrix4, Quaternion, Vector3 } from 'three';
+import { pauldronLocal } from './pauldron.mjs';
 
 const D = Math.PI / 180;
 const X = new Vector3(1, 0, 0),
@@ -180,19 +181,22 @@ export function makeAnatomySolver(model) {
           return side === 'l' ? q : mirror(q);
         };
         deltaSet(`upperarm.${side}`, upperArm(swing, arm.twist ?? 0));
-        // Pauldrons sit on the deltoid: they follow the arm fully up to shoulder
-        // height and only partly above it, so an overhead arm cannot drive the
-        // plate into the head. They ignore most of the arm's twist.
-        const follow = pose.pauldronFollow ?? 0.85;
-        const lifted =
-          raise <= 90 ? follow * raise : follow * 90 + (pose.pauldronLift ?? 0.45) * (raise - 90);
-        deltaSet(
-          `armor_shoulder.${side}`,
-          upperArm(
-            new Quaternion().slerp(swing, raise > 1e-3 ? lifted / raise : 1),
-            0.3 * (arm.twist ?? 0),
-          ),
+        // The pauldron rides its own bone beside the upper arm and takes only part
+        // of the arm's swing out of the T-pose bind, as the rig's own clips key it
+        // (pauldron.mjs), so the plate stays on top of the shoulder.
+        const clavicle = cur.get(`clavicle.${side}`).q;
+        const armLocal = clavicle
+          .clone()
+          .invert()
+          .multiply(cur.get(`upperarm.${side}`).q);
+        const armBindInverse = bind.get(`upperarm.${side}`).q.clone().invert();
+        const pad = pauldronLocal(
+          new Quaternion(...byName.get(`upperarm.${side}`).q),
+          armLocal,
+          new Quaternion(...byName.get(`armor_shoulder.${side}`).q),
+          new Vector3(0, -1, 0).applyQuaternion(armBindInverse),
         );
+        set(`armor_shoulder.${side}`, clavicle.clone().multiply(pad));
         const flex = pose.elbow?.[side] ?? 0;
         if (flex < -2 || flex > 140) warn(`elbow.${side}`, flex);
         const supination = pose.forearm?.[side] ?? 0;

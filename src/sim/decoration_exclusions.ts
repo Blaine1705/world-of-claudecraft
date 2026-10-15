@@ -57,6 +57,17 @@ const EXCLUSIONS = [
   { x: 35.861, z: -127.765 },
   { x: 34.664, z: -111.777 },
   { x: 43.681, z: -111.512 },
+  // Highwatch's painted buildings (highwatch_layout.ts) reach past the hub's
+  // scatter-free ring: the pine and the rock in the chapel's nave, the oak
+  // before its south gable, and the trees and rocks whose crowns or shoulders
+  // reached the inn, the watch house and the smithy.
+  { x: -18.039, z: 624.694 },
+  { x: -10.043, z: 630.927 },
+  { x: -10.244, z: 618.3 },
+  { x: 22.009, z: 634.679 },
+  { x: 20.702, z: 704.601 },
+  { x: 33.195, z: 650.412 },
+  { x: 31.928, z: 667.127 },
 ];
 
 export function isExcludedDecoration(x: number, z: number): boolean {
@@ -78,6 +89,9 @@ const STREETLAMP_EXCLUSIONS = [
   // chapel's eaves by its bell tower.
   { x: 4.25, z: 297.4690161983138 },
   { x: -13.06878557216685, z: 310.4292763607378 },
+  // Highwatch's painted buildings (highwatch_layout.ts): the Fenbridge road's
+  // lamp against the watch house's corner at the south gate.
+  { x: 3.8, z: 628.0621005145729 },
 ];
 
 export function isExcludedStreetlamp(x: number, z: number): boolean {

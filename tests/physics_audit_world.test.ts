@@ -377,17 +377,23 @@ describe('rebuild market stall (flat canopy at the authored height)', () => {
 });
 
 describe('chapel flows', () => {
-  // Re-anchored to the zone3 chapel (Highpass): the v0.31 civic rebuild
-  // replaced the Eastbrook chapel with a kit GLB (full-height OBB); the
+  // Re-anchored to Icemantle's chapel (Frostveil): the v0.31 civic rebuild
+  // replaced the Eastbrook chapel with a kit GLB (full-height OBB), and the
+  // Highwatch rebuild replaced the zone3 one with a painted building; the
   // composed tower-plus-hall physics now lives wherever the legacy
   // procedural chapel still stands.
-  const rot = 0.9;
-  const cx = -16;
-  const cz = 650;
+  const rot = -2;
+  const cx = -18;
+  const cz = 1570;
   const fx = Math.sin(rot);
   const fz = Math.cos(rot);
 
   it('climb the hall roof, walk into the tower face (blocked), fall off a side', () => {
+    const chapel = BUILTIN_WORLD.props.buildings.find(
+      (b) => b.kind === 'chapel' && !b.assetId && b.x === cx && b.z === cz,
+    );
+    // a rebuild that replaces this chapel moves the flow to another procedural one
+    expect(chapel, 'the procedural chapel this flow stands on').toMatchObject({ rot, w: 5, d: 7 });
     const sim = makeSim();
     const startX = cx + fx * (3.5 + 1.7);
     const startZ = cz + fz * (3.5 + 1.7);

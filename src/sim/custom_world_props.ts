@@ -1,3 +1,4 @@
+import { AUTHORED_TOWN_BUILDINGS } from './authored_town_registry';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import type { ZonePropsDef } from './types';
@@ -10,9 +11,11 @@ const EASTBROOK_WELL_IDS = new Set<string>([EASTBROOK_LAYOUT.civic.monument.id])
 const EASTBROOK_STALL_IDS = new Set<string>(
   EASTBROOK_LAYOUT.market.stalls.map((placement) => placement.id),
 );
+// Every rebuilt town's buildings (Eastbrook, Fenbridge, Highwatch: the
+// authored_town_registry.ts list) plus Eastbrook's preserved landmarks.
 const BUILTIN_ONLY_BUILDING_IDS = new Set<string>([
   ...EASTBROOK_BUILDING_IDS,
-  ...FENBRIDGE_LAYOUT.buildings.map((placement) => placement.id),
+  ...AUTHORED_TOWN_BUILDINGS.map((placement) => placement.id),
 ]);
 const BUILTIN_ONLY_WELL_IDS = new Set<string>([
   ...EASTBROOK_WELL_IDS,
@@ -53,7 +56,8 @@ function cloneRecordsWithoutIds<T extends { id?: string }>(
  * regular prop renderers remain active are fresh-cloned into the custom world.
  */
 /**
- * Editor variant: keep the authored-town records (Eastbrook Vale, Fenbridge)
+ * Editor variant: keep the authored-town records (Eastbrook Vale, Fenbridge,
+ * Highwatch)
  * that the plain clone strips.
  *
  * They are stripped for a custom world because upstream draws those towns ONLY

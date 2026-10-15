@@ -309,7 +309,10 @@ rules, all CI-enforced:
     when invoked, never close over one already in flight.
   - `registerPreload(promise)` stays eager, for the few assets the LAUNCHER itself
     draws. Today that is `characters/assets.ts` (the character-creation preview) and
-    `placed_assets.ts` (which runs during world build, not at import).
+    `placed_assets.ts` (which runs during world build, not at import). The character
+    boot set registers at the loader's BACKGROUND priority: the launcher's stage asks
+    for its own body's files as demands (`directBuildAssetsResident`) and never waits
+    on the set, so a creature it will never draw cannot hold its character back.
   Fetching world content at import meant merely reaching the home screen decoded the
   whole set, and the spike crossed WKWebView's per-process ceiling: a 12 GB iPhone 17
   Pro was killed 1.6s in and reloaded forever, unseen by the entry crash guard (it
@@ -349,8 +352,9 @@ rules, all CI-enforced:
     the stand-in on every profile. A new streamed piece of a player body names
     its stand-in or joins the entry-critical set; it never holds the body back.
   The launcher is the one place a body itself is fetched on demand: its previews
-  ask per body (`visualAssetsResident`, built on `onCharacterAssetReady`; a
-  fetch that failed is asked for again after its cooldown, so the wait ends).
+  ask per body (`visualAssetsResident`, and `directBuildAssetsResident` for the
+  weapons the build hangs too, built on `onCharacterAssetReady`; a fetch that
+  failed is asked for again after its cooldown, so the wait ends).
   `characters/woc_entry_prepare.ts` then runs under the curtain, ahead of the
   prewarm's budget clock: the local player's own hair and beard get a bounded
   chance to settle, and both fits are prepared, so neither happens in a live

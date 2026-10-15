@@ -49,6 +49,7 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
+import { isHighwatchRebuildBuilding } from './highwatch_town';
 import {
   type KitSurfaceFamily,
   kitHasUvSurfaceRouting,
@@ -1406,6 +1407,7 @@ export function buildProps(
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
+  const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
@@ -1564,6 +1566,7 @@ export function buildProps(
     }
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
     if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
+    if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
     // roof Y mirrors the camera collider height in colliders.ts, through the
     // same shared helper, so an authored per-building height override cannot
     // leave the hideable top and the camera top disagreeing.
@@ -3133,6 +3136,7 @@ export function collectBuildingImpostors(seed: number): {
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
+  const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
   const used = new Map<string, PropAsset>();
   const instances: BuildingImpostorInstance[] = [];
   const use = (key: PropKey): PropAsset => {
@@ -3142,7 +3146,10 @@ export function collectBuildingImpostors(seed: number): {
   };
   for (const b of activeContent.props.buildings) {
     if (b.landmark) continue;
+    // A painted town building draws no kit sprite: its town view owns it.
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
+    if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
+    if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
     const y = terrainHeight(b.x, b.z, seed);
     if (b.kind === 'chapel') {
       const tower = use('bellTower');
