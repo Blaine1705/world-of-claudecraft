@@ -2,8 +2,10 @@
 // composed by SanctumFx (sanctum_fx.ts) on its host:
 //  - the five ice outcrops: a cluster of glacier fangs three players tall, cut
 //    in facets and lit from inside (one ice shader: rim light, frost, snow on
-//    its shoulders). The outcrop a painted Trample lane will end in burns with
-//    a warm pulse inside a gold ring on the shared kit that fills with the bar;
+//    its shoulders). Through a Trample's aim every intact outcrop glows cold
+//    from inside, and the one the painted lane will end in burns brightest
+//    inside an ice-blue ring on the shared kit that fills with the bar (the
+//    floor circles and the lane's colour are tusker_aim_fx.ts's);
 //    an outcrop the tusks are buried in is shoved, shudders, and cracks of
 //    light climb it for the seconds it holds; a burst outcrop is a jagged
 //    stump among its fallen blocks;
@@ -51,6 +53,8 @@ import {
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { FLAME_HEAT, rampGlsl, rgb, SANCTUM_ACCENTS, SOULFIRE_RAMP } from './sanctum_fx_core';
 import type { SanctumFxHost } from './sanctum_fx_host';
+import type { OutcropView } from './tusker_aim_fx';
+import { TRAMPLE_AIM_COLORS } from './tusker_aim_fx_core';
 import {
   BAIT_POOLS,
   BAIT_RING_RADIUS,
@@ -110,7 +114,8 @@ void main() {
 /** Glacier ice: a deep blue heart to rime at its tips, cut in hard facets
  *  (the normal is the face's own), a cold light through its thin edges, snow
  *  on whatever faces up. `uStruck` sends cracks of light climbing it,
- *  `uArmed` is the warm pulse of the outcrop a lane will end in, `uFlash` the
+ *  `uArmed` is the cold pulse through a Trample's aim (1: the outcrop the
+ *  lane will end in; a third of it: every other intact one), `uFlash` the
  *  white of an impact. */
 const ICE_FRAG = /* glsl */ `
 uniform float uTime;
@@ -162,8 +167,9 @@ void main() {
   float beat = 0.8 + 0.4 * sin(uTime * 15.0 + vH * 9.0);
   col += vec3(0.55, 0.95, 1.0) * vein * climbed * beat * step(0.001, uStruck) * 2.6;
   col += vec3(0.1, 0.42, 0.66) * climbed * uStruck * 0.5;
-  // The outcrop a painted lane will end in: a warm pulse from inside.
-  col += vec3(1.0, 0.72, 0.28) * uArmed * (0.4 + 0.3 * sin(uTime * 8.0)) * (0.32 + rim * 1.7);
+  // Through a Trample's aim: a cold pulse from inside (strongest in the
+  // outcrop the lane will end in).
+  col += vec3(0.45, 0.9, 1.0) * uArmed * (0.45 + 0.35 * sin(uTime * 8.0)) * (0.35 + rim * 1.9);
   col = mix(col, vec3(0.94, 0.98, 1.0), uFlash);
   gl_FragColor = vec4(col, 1.0);
   #include <fog_fragment>
@@ -491,7 +497,7 @@ export class TuskerBaitFx {
     this.armed = host.kit.fan(15);
     this.armed.group.name = 'sanctum-tusker-bait-ring';
     host.kit.layOutFan(this.armed, 360, {
-      color: TELEGRAPH_THREAT_COLORS.interrupt,
+      color: TRAMPLE_AIM_COLORS.bait,
       accent: SANCTUM_ACCENTS.rime,
     });
     this.armed.group.visible = false;
@@ -617,6 +623,18 @@ export class TuskerBaitFx {
       o.group.visible = false;
     }
     for (const t of this.trails) if (t.objectId >= 0 && !t.seen) this.releaseTrail(t);
+  }
+
+  /** The Tusker the scan found (the one whose bars are drawn), or null. */
+  currentTusker(): Entity | null {
+    if (this.tuskerId < 0) return null;
+    return this.world.entities.get(this.tuskerId) ?? null;
+  }
+
+  /** The outcrop slots (a negative objectId is a free one): the floor
+   *  circles' input (tusker_aim_fx.ts). */
+  outcropViews(): readonly OutcropView[] {
+    return this.outcrops;
   }
 
   /** The standing outcrops in view, in the world (the lane plan's input). */
@@ -785,7 +803,8 @@ export class TuskerBaitFx {
     // The outcrop a painted lane will end in (the sim's own plan).
     let armedId = -1;
     let armedFill = 0;
-    if (tusker && !tusker.dead && tusker.castingAbility === TUSKER_TRAMPLE) {
+    const aiming = !!tusker && !tusker.dead && tusker.castingAbility === TUSKER_TRAMPLE;
+    if (tusker && aiming) {
       const lane = planTrampleLaneWorld(tusker.pos.x, tusker.pos.z, tusker.facing, this.standing());
       if (lane.outcropId !== null) {
         armedId = lane.outcropId;
@@ -801,7 +820,7 @@ export class TuskerBaitFx {
       u.uFlash.value = flash * 0.85;
       o.stumpMat.uniforms.uFlash.value = flash * 0.6;
       const isArmed = o.objectId === armedId && o.phase === 'whole';
-      const want = isArmed ? 1 : 0;
+      const want = isArmed ? 1 : aiming && o.phase === 'whole' ? 0.33 : 0;
       u.uArmed.value += (want - u.uArmed.value) * Math.min(1, dt * 10);
       if (isArmed) {
         ringOn = true;

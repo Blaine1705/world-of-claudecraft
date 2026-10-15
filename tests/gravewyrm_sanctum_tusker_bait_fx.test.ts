@@ -334,7 +334,8 @@ describe('the bait painter', () => {
       expect(drawn(roots, 'sanctum-tusker-bait-ring')).toHaveLength(0);
       expect(drawn(roots, 'sanctum-tusker-stuck-ring')).toHaveLength(0);
 
-      // A Trample aimed at the fourth: its ring draws and its ice warms.
+      // A Trample aimed at the fourth: its ring draws and its ice glows
+      // hardest; every other intact outcrop glows a little through the aim.
       Object.assign(tusker, {
         castingAbility: TUSKER_TRAMPLE,
         castTotal: T.trampleCast,
@@ -347,7 +348,7 @@ describe('the bait painter', () => {
       expect(ring[0].position.z).toBeCloseTo(outcrops[3].pos.z, 6);
       const armed = drawn(roots, 'sanctumIceOutcrop').map((g) => uniform(g.children[0], 'uArmed'));
       expect(armed.filter((a) => a > 0.5)).toHaveLength(1);
-      expect(armed.filter((a) => a === 0)).toHaveLength(4);
+      expect(armed.filter((a) => a > 0.2 && a < 0.4)).toHaveLength(4);
 
       // The tusks go in: shards, the shock, the shake, the flash; the outcrop
       // cracks and the gold window opens under the beast.

@@ -36,6 +36,7 @@ import {
   TUSKER_TUSK_SWEEP,
   TUSKER_TUSKS_STICK,
 } from '../../sim/encounters/gravewyrm_sanctum/ids';
+import { planTrampleLaneWorld } from '../../sim/encounters/gravewyrm_sanctum/tusker_road_world';
 import {
   SANCTUM_BRANDING_IRON,
   SANCTUM_COUNTERWEIGHT_LASH,
@@ -91,12 +92,13 @@ import {
   sanctumTelegraphSpecs,
   shockRingLook,
   telegraphYaw,
-  tramplePaintLength,
 } from './sanctum_fx_core';
 import type { SanctumFxHost } from './sanctum_fx_host';
 import { SanctumKitFx } from './sanctum_kit_fx';
 import { SanctumShards } from './sanctum_shards';
 import { SanctumTrashFx } from './sanctum_trash_fx';
+import { TuskerAimFx } from './tusker_aim_fx';
+import { type TrampleAimLook, trampleAimLook } from './tusker_aim_fx_core';
 import { TuskerBaitFx } from './tusker_bait_fx';
 import { TuskerFx } from './tusker_fx';
 
@@ -113,7 +115,8 @@ interface CastSlot extends TelegraphFan {
 }
 interface LaneSlot extends TelegraphLane {
   casterId: number;
-  /** The lane's painted length, measured once per bar (-1: not yet). */
+  /** The lane's painted length, measured each frame (it follows its target
+   *  until the lock); -1 while the slot is free. */
   length: number;
 }
 interface ObjectSlot extends TelegraphFan {
@@ -180,6 +183,10 @@ export class SanctumFx {
   private readonly tusker: TuskerFx | null;
   /** The Tusker's bait rework (outcrops, the stuck window, the soulfire trail). */
   private readonly bait: TuskerBaitFx | null;
+  /** The Trample readability pass (outcrop circles, the lane's end, the
+   *  target marker). */
+  private readonly aim: TuskerAimFx | null;
+  private readonly aimLook: TrampleAimLook = trampleAimLook(null, 0);
   private readonly uTime = { value: 0 };
   private readonly density: number;
   private readonly geometries: THREE.BufferGeometry[] = [];
@@ -345,6 +352,7 @@ export class SanctumFx {
     this.trash = world ? new SanctumTrashFx(host, world, glowTex) : null;
     this.kitFx = world ? new SanctumKitFx(host, world) : null;
     this.bait = world ? new TuskerBaitFx(host, world) : null;
+    this.aim = world ? new TuskerAimFx(host, world) : null;
     this.tusker = world
       ? new TuskerFx(scene, host, world, compileGate, playGesture, glowTex ?? undefined)
       : null;
@@ -509,6 +517,7 @@ export class SanctumFx {
         this.kitFx?.hideAll();
         this.tusker?.hideAll();
         this.bait?.hideAll();
+        this.aim?.hideAll();
         this.shards.hideAll();
       }
       for (const p of this.poolList) p.update(this.clock);
@@ -523,6 +532,8 @@ export class SanctumFx {
     this.kitFx?.update(dt, this.clock);
     this.tusker?.update(dt, this.clock);
     this.bait?.update(dt, this.clock);
+    if (this.aim && this.bait)
+      this.aim.update(this.clock, this.bait.currentTusker(), this.bait.outcropViews());
     this.shards.update(dt);
     for (const p of this.poolList) p.update(this.clock);
   }
@@ -565,11 +576,13 @@ export class SanctumFx {
       }
       const x = caster.pos.x;
       const z = caster.pos.z;
-      // The lane runs down its locked facing until the road ends, measured
-      // from the instance-local start exactly as the sim measured it.
-      // A lane that touches a standing ice outcrop ends in it.
-      if (slot.length < 0)
-        slot.length = tramplePaintLength(x, z, caster.facing, this.bait?.standing() ?? []);
+      // The lane runs down the beast's facing (it follows its target until
+      // the lock) until the road ends, measured from the instance-local start
+      // exactly as the sim measures it. A lane that touches a standing ice
+      // outcrop ends in it, and reads ice blue; any other reads red.
+      const lane = planTrampleLaneWorld(x, z, caster.facing, this.bait?.standing() ?? []);
+      slot.length = lane.reach;
+      const look = trampleAimLook(lane.outcropId, caster.castRemaining, this.aimLook);
       this.kit.drapeLane(
         slot,
         this.groundY,
@@ -579,7 +592,7 @@ export class SanctumFx {
         caster.facing,
         slot.length,
         spec.halfWidth ?? 2.5,
-        { color: spec.color, accent: spec.accent },
+        { color: look.color, accent: look.accent },
       );
       const fill = telegraphFillOf(caster.castRemaining, caster.castTotal);
       this.kit.paintLane(slot, { fill, clock: this.clock, range: slot.length });
@@ -783,6 +796,10 @@ export class SanctumFx {
     if (this.bait) {
       const bait = this.bait;
       attempt(() => bait.dispose());
+    }
+    if (this.aim) {
+      const aim = this.aim;
+      attempt(() => aim.dispose());
     }
     for (const g of this.geometries) attempt(() => g.dispose());
     for (const m of this.materials) attempt(() => m.dispose());

@@ -221,6 +221,7 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The Tusker's bait rework: the ice outcrops, the soulfire trail's river and
   // flame walls (its edge and the two rings ride the shared kit).
   { file: 'src/render/gravewyrm_sanctum_fx/tusker_bait_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/gravewyrm_sanctum_fx/tusker_aim_fx.ts', layer: 'encounter', strict: true },
   // The Sanctum trash mechanics pass: the Thaw the Held cracks under the
   // corpse, the lash's swoosh, the eruption column, the fallen brazier's coals.
   {

@@ -116,8 +116,9 @@ export function struckOutcrop(
   return out;
 }
 
-/** The ring round the outcrop a painted Trample lane will end in (yards): a
- *  step wider than the fangs' feet, so it reads round the ice from above. */
+/** The ice-blue ring round the outcrop a painted Trample lane will end in
+ *  (yards): a step wider than the fangs' feet and its floor circle
+ *  (tusker_aim_fx_core.ts), so it reads round the ice from above. */
 export const BAIT_RING_RADIUS = TUSKER_TUNING.outcropRadius + 1.6;
 
 // ---- the stuck Tusker ---------------------------------------------------------------

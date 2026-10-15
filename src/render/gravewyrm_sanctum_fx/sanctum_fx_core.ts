@@ -82,7 +82,7 @@ export type SanctumTelegraphShape = 'cone' | 'lane' | 'sigil';
 export interface SanctumTelegraphSpec {
   shape: SanctumTelegraphShape;
   /** Yards: the cone's reach from the caster's centre, the sigil's radius (a
-   *  lane's length is measured per bar: tramplePaintLength). */
+   *  lane's length is measured per frame: tramplePaintLength). */
   range: number;
   /** Degrees of the cone's arc. */
   arcDeg: number;
