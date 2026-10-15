@@ -6,10 +6,13 @@
 //   Tusk Sweep        every 12 s a 1.5 s bar, then its tusks sweep a frontal
 //                     120 degree cone 10 yd past its body: 180 to 220 and an
 //                     8 yd knockback. The cone stays where the bar was drawn.
-//   Trample           every 16 s a 2 s bar paints a lane 30 yd long toward the
+//   Trample           every 16 s a 3 s bar paints a lane 30 yd long toward the
 //                     farthest player (stopping short of a drop), then it
 //                     charges down it: everyone in the lane when the bar ends
-//                     takes 160 to 200 and a 1 s knockdown.
+//                     takes 160 to 200 and a 1 s knockdown. The lane FOLLOWS
+//                     its target through the bar, so the target can lead it
+//                     into an outcrop, and locks for the bar's last 0.9 s so
+//                     they can step out (the readability pass, 2026-10-15).
 //   The bait          (the rework, 2026-10-14) five ice outcrops stand on the
 //                     road's rim. A lane that touches one RUNS INTO it: it is
 //                     painted only as far as the outcrop, nobody behind the
@@ -37,7 +40,8 @@
 // reads the dead Tusker; the face is render only).
 //
 // Deterministic: no pick is rolled (the cone and the lane take everyone inside,
-// the lane's victim is the farthest player with ties to the lower id, the
+// the lane's victim is the farthest player with ties to the lower id, its aim
+// is read off the two positions each tick until the lock, the
 // outcrop a lane meets is the nearest along it, the patches stand on fixed
 // spots behind it); the only rng draws are the damage rolls, in claim-player
 // order. Every visible state rides existing entity fields (the cast bar, a
@@ -87,7 +91,12 @@ import {
   standingOutcrops,
   strikeOutcrop,
 } from './tusker_outcrops';
-import { TUSKER_BODY as BODY, planTrampleLane } from './tusker_road';
+import {
+  TUSKER_BODY as BODY,
+  planTrampleLane,
+  trampleAimLocked,
+  trampleAimYaw,
+} from './tusker_road';
 import { clearTrails, layTrail, stepTrails } from './tusker_trail';
 
 export { trampleReach } from './tusker_road';
@@ -148,7 +157,8 @@ export function startTuskSweep(tusker: Entity, st: TuskerFightState): boolean {
 }
 
 /** Paint a Trample lane to the farthest player (it runs into the first ice
- *  outcrop it touches). Returns true when it started. */
+ *  outcrop it touches; it follows them until the lock, aimTrample). Returns
+ *  true when it started. */
 export function startTrample(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -177,6 +187,28 @@ export function startTrample(
     ability: TUSKER_TRAMPLE,
   });
   return true;
+}
+
+/** The Trample's aim while its bar runs: until the lock the lane turns to
+ *  follow its target (the bar's cast target) wherever they walk, re-planned
+ *  from the beast's planted spot against the outcrops standing now; from the
+ *  lock on (and for a bar with no target, the dev bait) it holds still. A
+ *  target that dies or leaves leaves the lane where it last pointed. No rng:
+ *  the yaw is read off the two positions. */
+export function aimTrample(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  tusker: Entity,
+  st: TuskerFightState,
+): void {
+  const lane = st.lane;
+  if (!lane || tusker.castTargetId === null || trampleAimLocked(tusker.castRemaining)) return;
+  const target = ctx.entities.get(tusker.castTargetId);
+  if (!target || target.dead) return;
+  const o = ctx.instanceOriginOf(inst);
+  const yaw = trampleAimYaw(lane.x, lane.z, target.pos.x - o.x, target.pos.z - o.z, lane.yaw);
+  if (yaw === lane.yaw) return;
+  st.lane = planTrampleLane(lane.x, lane.z, yaw, standingOutcrops(ctx, inst));
 }
 
 /** The tusks land: everyone in the frontal cone is struck and thrown. Returns
@@ -554,21 +586,32 @@ export function tickTuskerPaused(
   if (st.stuck) stepStuck(ctx, tusker, st);
 }
 
-/** `/dev sanctum trigger bait | stick | trail`: aim a Trample at the nearest
- *  standing outcrop in reach (`bait`: the bar and the charge; `stick`: its
- *  tusks go in now), or lay a soulfire trail down its facing (`trail`).
- *  Returns the log line. */
+/** `/dev sanctum trigger bait | stick | trail | burst`: aim a Trample at the
+ *  nearest standing outcrop in reach (`bait`: the bar and the charge;
+ *  `stick`: its tusks go in now), lay a soulfire trail down its facing
+ *  (`trail`), or burst the standing outcrop nearest it (`burst`: a spent
+ *  bait, its floor circle dark). Returns the log line. */
 export function tuskerBaitDevTrigger(
   ctx: SimContext,
   inst: InstanceSlot,
   tusker: Entity,
   st: TuskerFightState,
-  what: 'bait' | 'stick' | 'trail',
+  what: 'bait' | 'stick' | 'trail' | 'burst',
 ): string {
   if (st.stuck) return 'The Tusker is already stuck in the ice.';
   const o = ctx.instanceOriginOf(inst);
   const x = tusker.pos.x - o.x;
   const z = tusker.pos.z - o.z;
+  if (what === 'burst') {
+    let near: { id: number; d: number } | null = null;
+    for (const spot of standingOutcrops(ctx, inst)) {
+      const d = Math.hypot(spot.x - x, spot.z - z);
+      if (!near || d < near.d) near = { id: spot.id, d };
+    }
+    if (!near) return 'No ice outcrop is left standing (trigger outcrops stands them up).';
+    breakOutcrop(ctx, near.id);
+    return 'The nearest ice outcrop bursts: one bait fewer.';
+  }
   if (what === 'trail') {
     const lane = planTrampleLane(x, z, tusker.facing, []);
     return layTrail(ctx, inst, st, lane)
@@ -670,6 +713,7 @@ export function tickTusker(
   if (bar === TUSKER_TUSK_SWEEP || bar === TUSKER_TRAMPLE) {
     if (st.plantedAt) holdPlanted(ctx, tusker, st.plantedAt);
     if (bar === TUSKER_TUSK_SWEEP && st.sweepYaw !== null) tusker.facing = st.sweepYaw;
+    if (bar === TUSKER_TRAMPLE) aimTrample(ctx, inst, tusker, st);
     if (bar === TUSKER_TRAMPLE && st.lane) tusker.facing = st.lane.yaw;
     tusker.swingTimer = Math.max(tusker.swingTimer, 0.6);
     tusker.castRemaining = Math.max(0, tusker.castRemaining - DT);

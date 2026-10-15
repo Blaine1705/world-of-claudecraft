@@ -6008,8 +6008,9 @@ export interface TuskerFightState {
   trampleTimer: number;
   /** The Tusk Sweep's locked aim (the Tusker's facing) while its bar runs. */
   sweepYaw: number | null;
-  /** Trample: the lane locked at the bar's start, then the charge down it
-   *  (`t` seconds into the run). */
+  /** Trample: the lane painted at the bar's start (it follows the bar's
+   *  target until TUSKER_TUNING.trampleLock, then holds), then the charge
+   *  down it (`t` seconds into the run). */
   lane: TuskerLane | null;
   charge: (TuskerLane & { t: number; hit: number[] }) | null;
   /** Stuck in the Ice: the seconds left, the outcrop its tusks are in, and

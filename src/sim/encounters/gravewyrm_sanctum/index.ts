@@ -47,7 +47,14 @@ export {
   restoreOutcrops,
   standingOutcrops,
 } from './tusker_outcrops';
-export { inTrail, onSledgeRoad, planTrampleLane, TUSKER_BODY } from './tusker_road';
+export {
+  inTrail,
+  onSledgeRoad,
+  planTrampleLane,
+  TUSKER_BODY,
+  trampleAimLocked,
+  trampleAimYaw,
+} from './tusker_road';
 export { TRAIL_DAMAGE_NAME } from './tusker_trail';
 export { velkharDevTrigger } from './velkhar';
 

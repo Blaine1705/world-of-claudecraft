@@ -41,6 +41,7 @@ import {
   TUSKER_TUSK_SWEEP,
   TUSKER_TUSKS_STICK,
   tickSanctumEncounters,
+  trampleAimLocked,
   trampleReach,
 } from '../src/sim/encounters/gravewyrm_sanctum';
 import { authoredFieldHeight } from '../src/sim/instances/authored_field';
@@ -335,6 +336,142 @@ describe('the lane plan (pure)', () => {
     const gulf = planTrampleLane(from.x, from.z, Math.atan2(across.x, across.z), spots);
     expect(gulf.outcropId).toBeNull();
     expect(gulf.length).toBeLessThan(across.d - 10);
+  });
+});
+
+/** Across the road from BEHIND: a lane from MID to here misses the outcrop. */
+const OPEN = leg(27.5, -5);
+
+/** Run until the Trample's lane locks (its bar's last trampleLock seconds). */
+function runToLock(r: Road): void {
+  for (let i = 0; i < 200 && !trampleAimLocked(r.tusker.castRemaining); i++) run(r, DT);
+}
+
+describe('the Trample follows its target until the lock (the readability pass)', () => {
+  it('the bar runs 3 s and its lane locks for the last 0.9 s', () => {
+    expect(T.trampleCast).toBe(3);
+    expect(T.trampleLock).toBeGreaterThanOrEqual(0.6);
+    expect(T.trampleLock).toBeLessThanOrEqual(1);
+    // Steering time: a few yards at a run, at least.
+    expect((T.trampleCast - T.trampleLock) * RUN_SPEED).toBeGreaterThan(12);
+    expect(trampleAimLocked(T.trampleCast)).toBe(false);
+    expect(trampleAimLocked(T.trampleLock + 0.05)).toBe(false);
+    expect(trampleAimLocked(T.trampleLock)).toBe(true);
+    expect(trampleAimLocked(0)).toBe(true);
+  });
+
+  it('before the lock the lane turns to follow its target onto an outcrop', () => {
+    const r = road();
+    put(r, r.tusker, MID.x, MID.z);
+    put(r, r.me, OPEN.x, OPEN.z);
+    run(r, T.trampleFirst + 0.05);
+    expect(r.tusker.castingAbility).toBe(TUSKER_TRAMPLE);
+    expect(r.tusker.castTargetId).toBe(r.me.id);
+    const st = state(r);
+    // Opened on the open side of the road: no outcrop in the lane.
+    expect(st.lane?.outcropId).toBeNull();
+    const yaw0 = st.lane?.yaw ?? 0;
+    // The target walks behind the fourth outcrop while the lane still aims.
+    put(r, r.me, BEHIND.x, BEHIND.z);
+    run(r, 0.1);
+    expect(trampleAimLocked(r.tusker.castRemaining)).toBe(false);
+    const u = toward(MID, BEHIND);
+    const outcrop = outcropObjects(r.sim.ctx, r.inst)[3];
+    expect(st.lane?.yaw).toBeCloseTo(Math.atan2(u.x, u.z), 6);
+    expect(st.lane?.yaw).not.toBeCloseTo(yaw0, 3);
+    expect(st.lane?.outcropId).toBe(outcrop.id);
+    // The beast turns with it (the mirrored facing the client paints from).
+    expect(r.tusker.facing).toBeCloseTo(st.lane?.yaw ?? 0, 9);
+    // The lane is the planner's own from the planted spot.
+    const plan = planTrampleLane(
+      MID.x,
+      MID.z,
+      Math.atan2(u.x, u.z),
+      standingOutcrops(r.sim.ctx, r.inst),
+    );
+    expect(st.lane?.reach).toBeCloseTo(plan.reach, 6);
+    expect(local(r, r.tusker).x).toBeCloseTo(MID.x, 6);
+  });
+
+  it('after the lock the lane holds still, whatever its target does', () => {
+    const r = road();
+    baitSetup(r);
+    run(r, T.trampleFirst + 0.05);
+    runToLock(r);
+    const st = state(r);
+    const locked = { ...(st.lane as NonNullable<typeof st.lane>) };
+    expect(locked.outcropId).not.toBeNull();
+    put(r, r.me, OPEN.x, OPEN.z);
+    run(r, T.trampleLock - 0.2);
+    expect(r.tusker.castingAbility).toBe(TUSKER_TRAMPLE);
+    expect(st.lane).toEqual(locked);
+    expect(r.tusker.facing).toBeCloseTo(locked.yaw, 9);
+  });
+
+  it('the locked lane decides the bait: led into the ice it sticks, though the target stepped off', () => {
+    const r = road();
+    put(r, r.tusker, MID.x, MID.z);
+    put(r, r.me, OPEN.x, OPEN.z);
+    run(r, T.trampleFirst + 0.05);
+    // Lead it behind the outcrop before the lock, then step away after it.
+    put(r, r.me, BEHIND.x, BEHIND.z);
+    runToLock(r);
+    put(r, r.me, OPEN.x, OPEN.z);
+    run(r, T.trampleLock + T.trampleRun + 0.2);
+    const st = state(r);
+    expect(st.baits).toBe(1);
+    expect(st.stuck).not.toBeNull();
+    expect(dealt(r, r.me.id, 'Trample')).toHaveLength(0);
+  });
+
+  it('the locked lane decides the miss: led off the ice before the lock, no bait', () => {
+    const r = road();
+    baitSetup(r);
+    run(r, T.trampleFirst + 0.05);
+    expect(state(r).lane?.outcropId).not.toBeNull();
+    // The target walks off to open road while it still aims: the lane follows.
+    put(r, r.me, OPEN.x, OPEN.z);
+    runToLock(r);
+    const st = state(r);
+    expect(st.lane?.outcropId).toBeNull();
+    // They sidestep the locked lane (out of its strip) and it runs on past.
+    const u = toward(MID, OPEN);
+    put(r, r.me, OPEN.x + u.z * 6, OPEN.z - u.x * 6);
+    run(r, T.trampleLock + T.trampleRun + 0.2);
+    expect(st.baits).toBe(0);
+    expect(st.stuck).toBeNull();
+    expect(outcropsStanding(r.sim.ctx, r.inst)).toBe(5);
+    expect(dealt(r, r.me.id, 'Trample')).toHaveLength(0);
+  });
+
+  it('a target standing still in the locked lane is still run over (the lock is a dodge, not a pass)', () => {
+    const r = road();
+    put(r, r.tusker, MID.x, MID.z);
+    put(r, r.me, OPEN.x, OPEN.z);
+    run(r, T.trampleFirst + 0.05);
+    const st = state(r);
+    expect(st.lane?.outcropId).toBeNull();
+    run(r, T.trampleCast + 0.1);
+    expect(st.lane).toBeNull();
+    expect(dealt(r, r.me.id, 'Trample')).toHaveLength(1);
+  });
+
+  it('draws nothing from the shared rng while it aims', () => {
+    const a = road();
+    const b = road();
+    for (const r of [a, b]) {
+      put(r, r.tusker, MID.x, MID.z);
+      put(r, r.me, OPEN.x, OPEN.z);
+      run(r, T.trampleFirst + 0.05);
+    }
+    // One target walks the whole aim; the other stands. The rng ends level.
+    for (let i = 0; i < 20; i++) {
+      const k = i / 19;
+      put(a, a.me, OPEN.x + (BEHIND.x - OPEN.x) * k, OPEN.z + (BEHIND.z - OPEN.z) * k);
+      run(a, DT);
+      run(b, DT);
+    }
+    expect(a.sim.ctx.rng.next()).toBe(b.sim.ctx.rng.next());
   });
 });
 
@@ -980,6 +1117,7 @@ function walkPull(extra: number, dps: number, limit: number): Walk {
   };
   const burned = new Map<number, number>();
   let barSeen = false;
+  let lockSeen = false;
   const fight = (): TuskerFightState | null =>
     t.sanctumFight?.kind === 'tusker' ? t.sanctumFight : null;
   // Seconds each player has stood blocked by fire across their way.
@@ -1018,15 +1156,16 @@ function walkPull(extra: number, dps: number, limit: number): Walk {
     const standing = t.dead ? [] : standingOutcrops(ctx, r.inst);
     const bar = t.dead ? null : t.castingAbility;
     const lane = st && bar === TUSKER_TRAMPLE ? st.lane : null;
-    // A Trample opening: was there an outcrop to bait, and did it take it?
+    // A Trample opening: was there an outcrop to bait? And at its lock (the
+    // lane follows its target until then): did it take it?
     if (lane && !barSeen) {
       out.tramples++;
-      if (standing.length > 0) {
-        out.tramplesWithOutcrop++;
-        if (lane.outcropId !== null) out.baited++;
-      }
+      if (standing.length > 0) out.tramplesWithOutcrop++;
     }
     barSeen = lane !== null;
+    const locked = lane !== null && trampleAimLocked(t.castRemaining);
+    if (locked && !lockSeen && lane.outcropId !== null) out.baited++;
+    lockSeen = locked;
     const sweeping = bar === TUSKER_TUSK_SWEEP && st?.sweepYaw != null;
     const inSweep = (p: Pt): boolean => {
       if (!sweeping || st?.sweepYaw == null) return false;
@@ -1054,8 +1193,12 @@ function walkPull(extra: number, dps: number, limit: number): Walk {
     for (const p of party) {
       const at = local(r, p);
       let goal: Pt | null = null;
-      if (lane) {
-        // Rule 1: out of the painted lane, sideways.
+      if (lane && !locked && p.id === t.castTargetId) {
+        // Rule 1a: the lane follows its target until the lock: they lead it
+        // (they hold the spot they took to bait it, or keep their plan).
+        goal = plans.get(p.id) ?? null;
+      } else if (lane) {
+        // Rule 1: out of the painted lane, sideways (its target once it locks).
         if (inStrip(lane, at, 0.9))
           goal = nearestGround(r, st, at, 12, (q) => !inStrip(lane, q, 1.3));
         plans.delete(p.id);
@@ -1183,8 +1326,9 @@ describe('the road never closes (a scripted pull on the real road)', () => {
 
   it('whoever stands in a lane, anywhere on the road, has room to step out of it in the bar', () => {
     // Every lane the road allows: from every 3 yd of both legs, sixteen ways.
-    // A player caught anywhere in its strip reaches clear road in the 2 s bar
-    // less a half second to see it: 10.5 yd at a run.
+    // A bystander caught anywhere in its strip reaches clear road in the bar
+    // less a half second to see it. (Its target is the next test: it stands
+    // on the lane's line when the lane locks.)
     const reach = RUN_SPEED * (T.trampleCast - 0.5);
     let lanes = 0;
     let worst = 0;
@@ -1233,5 +1377,49 @@ describe('the road never closes (a scripted pull on the real road)', () => {
     expect(lanes).toBeGreaterThan(200);
     // In fact a few strides: the road is 14 yd wide and a lane 5.
     expect(worst).toBeLessThanOrEqual(6);
+  });
+
+  it('the target, on the lane line when it locks, steps clear inside the lock anywhere on the road', () => {
+    // The lane follows its target until the lock, so at the lock they stand
+    // on its line. From there clear road (past the half width the charge
+    // tests) is within the lock less a quarter second to see it, at a run.
+    const reach = RUN_SPEED * (T.trampleLock - 0.25);
+    expect(reach).toBeGreaterThan(T.trampleHalfWidth + 1);
+    let checked = 0;
+    for (const legDef of LEGS) {
+      const u = toward(legDef.p, legDef.q);
+      for (let s = 2; s <= u.d - 2; s += 3)
+        for (const side of [-4, 0, 4]) {
+          const from = {
+            x: legDef.p.x + u.x * s + u.z * side,
+            z: legDef.p.z + u.z * s - u.x * side,
+          };
+          if (!roomy(from)) continue;
+          for (let a = 0; a < 16; a++) {
+            const yaw = (a / 16) * Math.PI * 2;
+            const lane = planTrampleLane(from.x, from.z, yaw, []);
+            if (lane.length < 8) continue;
+            // The target 8 yd and more down the line (it is the farthest body).
+            for (let along = 8; along <= lane.reach; along += 3) {
+              const p = { x: from.x + Math.sin(yaw) * along, z: from.z + Math.cos(yaw) * along };
+              if (!onSledgeRoad(p.x, p.z)) continue;
+              checked++;
+              // Any straight step of that length (most often sideways; by the
+              // rim, out past the lane's end or back along the rim).
+              let clear = false;
+              for (let b = 0; b < 24 && !clear; b++) {
+                const q = {
+                  x: p.x + Math.cos((b / 24) * Math.PI * 2) * reach,
+                  z: p.z + Math.sin((b / 24) * Math.PI * 2) * reach,
+                };
+                if (straightOnRoad(p, q) && onSledgeRoad(q.x, q.z) && !inStrip(lane, q, 0.3))
+                  clear = true;
+              }
+              expect(clear, `target at ${p.x.toFixed(1)}, ${p.z.toFixed(1)}`).toBe(true);
+            }
+          }
+        }
+    }
+    expect(checked).toBeGreaterThan(200);
   });
 });

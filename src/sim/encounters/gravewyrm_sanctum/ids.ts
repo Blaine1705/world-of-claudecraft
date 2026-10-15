@@ -94,11 +94,24 @@ export const TUSKER_TUNING = {
   sweepMax: 220,
   /** Yards the Tusk Sweep throws a player. */
   sweepKnockback: 8,
-  /** Trample: every 16 s a 2 s bar painting a lane to the farthest player,
-   *  then the charge down it (30 yd, 4 yd wide). */
+  /** Trample: every 16 s a 3 s bar painting a lane to the farthest player,
+   *  then the charge down it (30 yd, 5 yd wide). The lane FOLLOWS its target
+   *  through the bar (the readability pass, 2026-10-15: the owner's call), so
+   *  the target can lead the charge into an ice outcrop, and locks
+   *  `trampleLock` seconds before the charge so they can step out of it.
+   *  The bar was 2 s; it is 3 s so the aim leaves 2.1 s to steer (about
+   *  15 yd at a run, enough to put an outcrop between you and the beast) and
+   *  the lock keeps the old bar's last 0.9 s. Its damage is untouched; the
+   *  beast swings at nobody through the extra second of the bar. */
   trampleEvery: 16,
   trampleFirst: 9,
-  trampleCast: 2,
+  trampleCast: 3,
+  /** Seconds before the charge the lane stops following its target. The
+   *  target stands on the lane's line at the lock: 2.5 yd to its edge is
+   *  0.36 s at a run, plus a quarter second to see the lock and a latency
+   *  margin, with room to spare inside 0.9 s. Longer and the aim is too
+   *  short to steer; shorter and the dodge is a coin toss online. */
+  trampleLock: 0.9,
   trampleLength: 30,
   trampleHalfWidth: 2.5,
   /** Seconds the charge takes to run the lane. */

@@ -35,6 +35,29 @@ export function trampleReach(x: number, z: number, yaw: number, max: number): nu
   return len;
 }
 
+/** Is the Trample lane locked with `castRemaining` seconds left on its bar?
+ *  Before the lock the lane follows its target (sledge_tusker.ts aims it each
+ *  tick); from the lock to the charge it holds still. The renderer and the
+ *  HUD read the same bar off the mirrored Tusker, so they lock with it. */
+export function trampleAimLocked(castRemaining: number): boolean {
+  return castRemaining <= T.trampleLock + 1e-9;
+}
+
+/** The yaw from (x, z) to (tx, tz), or `fallback` when the two stand on top
+ *  of each other (no direction to read). */
+export function trampleAimYaw(
+  x: number,
+  z: number,
+  tx: number,
+  tz: number,
+  fallback: number,
+): number {
+  const dx = tx - x;
+  const dz = tz - z;
+  if (dx * dx + dz * dz < 0.25) return fallback;
+  return Math.atan2(dx, dz);
+}
+
 /** A standing outcrop as the lane reads it: its object and where it stands
  *  (instance-local). */
 export interface OutcropSpot {
