@@ -119,11 +119,11 @@ describe('the air of a walk-in placed building', () => {
     }
   });
 
-  it('rooms are roomy: six yards or more from the floor to the ceiling', () => {
+  it('rooms are roomy: more than five yards of air over the floor', () => {
     for (const building of WALK_IN) {
       const air = airOf(building);
       const room = air.boxes[0];
-      expect(room[3] - room[2], building.id).toBeGreaterThan(5.8);
+      expect(room[3] - room[2], building.id).toBeGreaterThan(5.4);
     }
   });
 

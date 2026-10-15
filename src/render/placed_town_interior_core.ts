@@ -8,7 +8,7 @@
 // the inner wall faces (a quarter yard in from them, clear of the beams, sills and trims the
 // collision lines do not carry), the floor deck and the ceiling over it:
 //  - tavern_b (an inn): the taproom under the upper floor's slab, the front door, the stair
-//    well at the east end, and the upper floor under the roof's tie beams;
+//    well at its +x end, and the upper floor under the roof's tie beams;
 //  - hall (a chapel): the nave to the wall plates (the roof is open above them), the portal;
 //  - shop_a (a counting house): the counting room under its ceiling, the front door;
 //  - smithy: the forge room under its ceiling, the front door, and the side arch onto the
@@ -40,14 +40,19 @@ interface ModelAir {
 const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
   tavern_b: {
     boxes: [
-      // the taproom: inner walls x +-12.4, z +-6.9, the deck at 0.45, the slab at 5.36
-      [-12.15, 12.15, 0.45, 5.36, -6.65, 6.65],
-      // the front door through the south wall (z -7.5 to -6.9), its head at 4.85
+      // the taproom: inner walls x +-12.4, z +-6.9, the deck at 0.45, under the beams that
+      // carry the upper floor's slab (5.36); the chimney breast (x -12.5 to -11.1, z -2.8
+      // to 0.8) stands in its -x end, so that strip is cut round it
+      [-11.0, 12.15, 0.45, 5.0, -6.65, 6.65],
+      // the front door through the front wall (z -7.5 to -6.9), its head at 4.85
       [-3.5, -0.5, 0.45, 4.85, -7.6, -6.4],
-      // the stair well at the east end, open from the taproom to the upper floor
+      // the stair well at the +x end, open from the taproom to the upper floor
       [10.28, 12.15, 0.45, 9.65, -5.9, 3.5],
       // the upper floor: over the slab (5.68) to the tie beams (9.65)
       [-12.3, 12.3, 5.68, 9.65, -7.5, 7.5],
+      // the taproom's -x strip either side of the chimney breast
+      [-12.15, -11.0, 0.45, 5.0, -6.65, -2.95],
+      [-12.15, -11.0, 0.45, 5.0, 0.95, 6.65],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },
@@ -55,7 +60,7 @@ const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
     boxes: [
       // the nave: inner walls x +-5.2, z +-10.2, the floor at 0.9, the wall plates at 9.3
       [-4.95, 4.95, 0.9, 9.3, -9.95, 9.95],
-      // the portal through the north gable (z -11 to -10.2), its head at 5.9
+      // the portal through the front gable (z -11 to -10.2), its head at 5.9
       [-1.6, 1.6, 0.9, 5.9, -11.1, -9.7],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
@@ -63,7 +68,8 @@ const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
   shop_a: {
     boxes: [
       // the counting room: inner walls x +-5.05, z +-3.75, the deck at 0.45, the ceiling 4.65
-      [-4.8, 4.8, 0.45, 4.65, -3.5, 3.5],
+      // (its back shelves, z 3.33 to 3.75, stand in front of the back wall)
+      [-4.8, 4.8, 0.45, 4.65, -3.5, 3.25],
       // the front door through the shop front (z -4.2 to -3.75), its head at 3.7
       [-2.5, -0.7, 0.45, 3.7, -4.3, -3.2],
     ],
@@ -71,11 +77,12 @@ const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
   },
   smithy: {
     boxes: [
-      // the forge room: inner walls x +-4.9, z +-3.9, the deck at 0.45, the ceiling 5.25
-      [-4.65, 4.65, 0.45, 5.25, -3.65, 3.65],
-      // the front door through the south wall (z -4.5 to -3.9), its head at 4.45
+      // the forge room: inner walls x +-4.9, z +-3.9, the deck at 0.45, the ceiling 5.25;
+      // the hearth (x -4.9 to -3.98, four yards up) fills its -x end
+      [-3.85, 4.65, 0.45, 5.25, -3.65, 3.65],
+      // the front door through the front wall (z -4.5 to -3.9), its head at 4.45
       [-2.6, 0.2, 0.45, 4.45, -4.6, -3.4],
-      // the side arch onto the forge shelter through the west wall (x 4.9 to 5.5)
+      // the side arch onto the forge shelter through the +x wall (x 4.9 to 5.5)
       [4.4, 5.6, 0.45, 4.05, -1.2, 1.2],
     ],
     openings: [
