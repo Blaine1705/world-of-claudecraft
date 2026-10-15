@@ -626,6 +626,7 @@ import { type RankedPointLight, reconcileViewPointLights } from './point_light_b
 import { attachPointLightCarriers, NO_POINT_LIGHTS } from './point_light_carriers';
 import { markPointLightSource } from './point_light_carriers_core';
 import { buildComposer, type PostPipeline } from './post';
+import { precipBiomeAt } from './precip_shelter';
 import { withSceneHiddenForPresentationPrewarm } from './presentation_prewarm';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
@@ -774,6 +775,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
+import { applySeatAnim } from './seated_pose';
 import { drapeRingLocalY, reticleShownUnder, selectionRingScale } from './selection_ring';
 import {
   createSelfRenderPositionState,
@@ -10808,9 +10810,7 @@ export class Renderer {
       // A mounted rider holds the seated pose (the sit loop reads as riding);
       // swim/cast still outrank it in desiredBaseState, so mounted casting
       // and swimming animate normally.
-      st.sitting =
-        e.kind === 'player' &&
-        (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
+      applySeatAnim(st, v, e, riderMounted, active.root); // a seat's clips + lift, or the sit
       // Facts about the ENTITY that override what its displayed motion implies
       // (battle-stance engagement, ice-slide suppression): anim_state_entity_core.
       applyEntityAnimOverrides(st, e, visuallyDead, characterEffects, hasStealth);
@@ -11775,7 +11775,7 @@ export class Renderer {
         this.updateEnvBiome(dt);
       }
     }
-    // precipitation only falls outdoors; indoors/underwater pass null to clear.
+    // precipitation only falls outdoors and in the open (precip_shelter.ts); indoors pass null.
     // The sampler lets a neighbouring zone's weather fall inside the box while
     // the player stands outside it (weather_field_core.ts).
     // Precipitation is unlit, so it takes the grade explicitly or snow stays
@@ -11784,7 +11784,7 @@ export class Renderer {
     this.weather.update(
       this.camera.position,
       dt,
-      this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.x, p.pos.z) : null,
+      precipBiomeAt(this.fogState === 'outdoor', p.pos.x, p.pos.y, p.pos.z),
       zoneBiomeAt,
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'sky', worldStart);
@@ -12261,9 +12261,10 @@ export class Renderer {
     );
     // The camera orbits the lagged/led pivot at the player's requested
     // distance. Scene geometry never changes that distance on the built-in
-    // world; registered obstructors fade through their subsystem's
-    // occluder-fade pass. An authored map also lets rock and a placed asset's
-    // collider stop the boom (authored_map/chase_boom_core.ts).
+    // world outdoors; registered obstructors fade through their subsystem's
+    // occluder-fade pass, and an authored interior clamps it (interior_camera.ts).
+    // An authored map also lets rock and a placed asset's collider stop the boom
+    // (authored_map/chase_boom_core.ts).
     const pose = stepRendererVehicleCamera(this, directedPose, dt, reduce);
     // The opt-in Action Cam shoulder shift rides on top of the vehicle-aware
     // pose: the vehicle camera decides the boom, the shoulder offsets it.
@@ -12336,7 +12337,7 @@ export class Renderer {
         for (const p of this.riftAmbienceScratch) this.ambientPointsMergedScratch.push(p);
         points = this.ambientPointsMergedScratch;
       }
-      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, 0, points);
+      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, 0, points, eye);
     }
   }
 

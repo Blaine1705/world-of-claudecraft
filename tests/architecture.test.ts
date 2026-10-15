@@ -993,6 +993,9 @@ const RENDER_PURE_CORES = [
   'src/render/drowned_temple/temple_lure_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
+  // where a body sitting on a seat is drawn, and which seat a screen ray points at
+  'src/render/seated_pose_core.ts',
+  'src/render/seat_pick_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
@@ -1054,6 +1057,14 @@ const RENDER_PURE_CORES = [
   'src/render/wickharbor_wharf_core.ts',
   'src/render/wickharbor_harbor_core.ts',
   'src/render/wyrmwatch_harbor_house_core.ts',
+  'src/render/mirefen_tavern_core.ts',
+  // the tavern's air for the indoor chase camera (interior_camera_core.ts is registered above)
+  'src/render/mirefen_tavern_interior_core.ts',
+  // the tavern's dog breathing on its porch and its chimney smoke
+  'src/render/mirefen_tavern_dog_core.ts',
+  'src/render/mirefen_tavern_smoke_core.ts',
+  // the tavern's wall fire laid out in its fireplace's mouth
+  'src/render/mirefen_tavern_wall_fire_core.ts',
   'src/render/ship_wake_core.ts',
   'src/render/water_approach_core.ts',
   'src/render/view_candidate_scan_core.ts',

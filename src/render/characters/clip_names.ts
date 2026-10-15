@@ -1,6 +1,7 @@
 // Every clip name a visual binds an action for: the only place actions get built
 // (visual.ts constructor), so a clip missing here never plays.
 import type { ClipMap, VisualDef } from './manifest';
+import { seatClipNames } from './seat_clips';
 import { WOC_AUTO_ATTACK_NAMES } from './woc_autoattack_core';
 
 export function clipNamesOf(def: VisualDef): string[] {
@@ -43,6 +44,7 @@ function clipMapNames(c: ClipMap): string[] {
     c.cast,
     c.sitDown,
     c.sitIdle,
+    ...seatClipNames(c.seat),
     c.swim,
     c.swimSurface,
     c.swimIdle,

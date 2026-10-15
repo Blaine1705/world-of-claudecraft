@@ -543,6 +543,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'fall and impact lights handed to registerBudgetPointLight, born hidden, marked on the rank rebuild',
   'render/weapon_vfx.ts':
     'weapon-skin light: in the world a hidden view light marked on reconcile; in a preview canvas the only point lights of that scene, all driven live together',
+  'render/mirefen_tavern.ts':
+    'the Mirefen tavern hearth, wall fire, chandelier and lantern lights, pushed into the props fireLights by buildProps and mass hidden with them',
   'render/wyrmwatch_harbor_house.ts':
     'the Harbormaster House hearth and lantern lights, pushed into the props fireLights by buildProps and mass hidden with them',
   'render/yumi_maze.ts': 'maze brazier lights pushed through the fireLights adopter sink',

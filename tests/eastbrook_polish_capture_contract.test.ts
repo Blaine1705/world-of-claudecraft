@@ -721,7 +721,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
   // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
   // the town runtime leaf moved. No capture was retaken.
-  '5b39ae40fc0f518ae1492f2c763c6540f43978eff3aeee2fbb60b7898f7ea55e';
+  // Re-minted for merging #4258 (the Mirefen tavern) over #4516 (grand Highwatch):
+  // it moved the renderer leaf. No capture was retaken.
+  '4578821b7c1b4d11a3e6093e460a721ca1944f15f520cefd86be4ba21899b9a6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

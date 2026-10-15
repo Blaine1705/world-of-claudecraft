@@ -193,8 +193,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Buddy collection integration adds four sends and five dispatches: the retired
 // buddy_cosmetic token is dispatch-only; buddy_rename is sent and dispatched.
 // The Studio merge adds no command, so the v0.45.0 integration stays at 262/276.
-const EXPECTED_SEND_COUNT = 262;
-const EXPECTED_DISPATCH_COUNT = 276;
+// The tavern's seats add sit_seat (sent by ClientWorld.sitOnSeat, dispatched to
+// Sim.sitOnSeat) on feature/walkable-tavern-aaa: 248/262/14 on its own. Merged with
+// the v0.45.0 integration's 262/276: 263/277/14.
+const EXPECTED_SEND_COUNT = 263;
+const EXPECTED_DISPATCH_COUNT = 277;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

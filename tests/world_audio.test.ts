@@ -5,6 +5,7 @@ import {
   footstepSurfaceAt,
   isOnDockDeck,
 } from '../src/render/world_audio';
+import { TAVERN_FLOOR_Y, TAVERN_ORIGIN } from '../src/sim/content/mirefen_tavern';
 import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
 import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
@@ -101,6 +102,16 @@ describe('world audio routing', () => {
       [eastbrookSmithy?.position.x, eastbrookSmithy?.position.z],
       [-4.5, 673.5],
     ]);
+    // the Mirefen tavern's room bed, anchored at the hall's middle (built-in world only)
+    expect(sources.filter((source) => source.kind === 'tavern')).toEqual([
+      {
+        id: 'world:tavern:mirefen',
+        kind: 'tavern',
+        x: TAVERN_ORIGIN.x,
+        y: TAVERN_FLOOR_Y + 2,
+        z: TAVERN_ORIGIN.z,
+      },
+    ]);
   });
 
   // The editor's Sound tool saves y as a height ABOVE the terrain seat (the
@@ -154,5 +165,7 @@ describe('world audio routing', () => {
     expect(campfires.map(({ x, z }) => [x, z])).toEqual(props.campfires);
     expect(forges.map(({ x, z }) => [x, z])).toEqual([[-4.5, 673.5]]);
     expect(sources.some((source) => source.id === 'world:forge:4.5:18.5')).toBe(false);
+    // a custom map has no tavern, so no tavern bed
+    expect(sources.some((source) => source.kind === 'tavern')).toBe(false);
   });
 });

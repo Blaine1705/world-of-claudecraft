@@ -57,6 +57,7 @@
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
 //   transport.ts        IWorldTransport      the scheduled ferry's phase, ship pose, passenger bit
 //   world_pvp.ts        IWorldWorldPvp       the /pvp flag: self readout + raise/lower command
+//   seating.ts          IWorldSeating        sit on a piece of furniture by its seat id
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -102,6 +103,7 @@ import type { IWorldQuests } from './world_api/quests';
 export type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from './world_api/quests';
 
 import type { IWorldReliquary } from './world_api/reliquary';
+import type { IWorldSeating } from './world_api/seating';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
@@ -511,7 +513,8 @@ export interface IWorld
     IWorldVehicles,
     IWorldTransport,
     IWorldWorldPvp,
-    IWorldBuddies {}
+    IWorldBuddies,
+    IWorldSeating {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -968,6 +971,8 @@ export const COMMAND_NAMES = [
   // Rename a specific summoned buddy; the sim verifies its current owner.
   'buddy_rename',
   'referralCards',
+  // Sit on a piece of furniture by its seat id (IWorldSeating.sitOnSeat).
+  'sit_seat',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1061,7 +1066,8 @@ export type WorldFacet =
   | 'IWorldLanceTrial'
   | 'IWorldVehicles'
   | 'IWorldWorldPvp'
-  | 'IWorldBuddies';
+  | 'IWorldBuddies'
+  | 'IWorldSeating';
 
 export const COMMAND_FACETS = {
   weekly_reward_claim: 'IWorldBank',
@@ -1378,4 +1384,6 @@ export const COMMAND_FACETS = {
   // IWorldDungeons: the dungeon guide's offer answer (the guide's state is a
   // snapshot read off his entity, `gds`).
   dungeon_guide_answer: 'IWorldDungeons',
+  // IWorldSeating: sit on a seat (the seats and who holds one are derived, untagged).
+  sit_seat: 'IWorldSeating',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;
