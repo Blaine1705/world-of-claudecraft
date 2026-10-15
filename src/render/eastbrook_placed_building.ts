@@ -1,8 +1,9 @@
 // A PLACED town building: one of the painted Tidehold models stood in a
 // built-in town at the anchor, turn, size and seat its layout record gives it
 // (makePlacedBuilding in sim/eastbrook_layout.ts, whose anchors are the Studio
-// rebuild map's, and in sim/fenbridge_layout.ts), drawn with its own
-// materials. Both towns stand their painted buildings through this module. The
+// rebuild map's, in sim/fenbridge_layout.ts, and makePlacedTownBuilding in
+// sim/placed_town_kit.ts for Highwatch), drawn with its own materials. Every
+// town stands its painted buildings through this module. The
 // town view owns everything around it (the reveal gate, the fog cull, the
 // camera fade); this module only builds the group.
 //
@@ -19,8 +20,8 @@ import { GFX } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeRecordFor } from './occluder_fade';
 
-/** What a placed building record carries: both towns' makePlacedBuilding
- *  build this shape. */
+/** What a placed building record carries: every town's makePlacedBuilding
+ *  builds this shape. */
 export interface PlacedTownBuildingRecord {
   readonly id: string;
   readonly assetId: string;
@@ -47,7 +48,7 @@ export interface PlacedTownBuildingRecord {
 }
 
 /** Which town stands the building: names its group and its id field. */
-export type PlacedTown = 'eastbrook' | 'fenbridge';
+export type PlacedTown = 'eastbrook' | 'fenbridge' | 'highwatch';
 
 const PLACED_BUILDING_ASSET_PREFIX = '/models/tidehold/';
 
@@ -191,16 +192,24 @@ export function buildPlacedTownBuilding(
   group.rotation.y = placement.rotation;
   group.add(wrap);
 
-  const reach = building.reach;
-  const cullRadius =
-    Math.hypot(reach.center.x - building.position.x, reach.center.z - building.position.z) +
-    Math.hypot(reach.halfWidth, reach.halfDepth);
   return {
     group,
     mats,
     topY: ground + building.nativeDimensions.height,
-    cullRadius,
+    cullRadius: placedBuildingCullRadius(building),
   };
+}
+
+/** A placed building's own cull circle round its position: far enough to hold
+ *  its whole reach (eaves, annexes, the model's widest point). */
+export function placedBuildingCullRadius(
+  building: Pick<PlacedTownBuildingRecord, 'position' | 'reach'>,
+): number {
+  const reach = building.reach;
+  return (
+    Math.hypot(reach.center.x - building.position.x, reach.center.z - building.position.z) +
+    Math.hypot(reach.halfWidth, reach.halfDepth)
+  );
 }
 
 /** Eastbrook's placed building (sim/eastbrook_layout.ts). */

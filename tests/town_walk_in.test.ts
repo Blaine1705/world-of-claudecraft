@@ -1,13 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { authoredTownBuildingPlacements } from '../src/editor/feature_prop_placements';
+import {
+  authoredTownBuildingPlacements,
+  highwatchTownBuildingPlacements,
+} from '../src/editor/feature_prop_placements';
 import { TARGET_HEIGHT } from '../src/render/asset_scale';
 import { authoredRampsForPath } from '../src/sim/asset_collision';
 import { buildingRecordColliders } from '../src/sim/authored_town_buildings';
 import { type Collider, rotY } from '../src/sim/collider_shapes';
 import { pushPlacementColliders } from '../src/sim/colliders_authored/placement_colliders';
 import { ZONE2_PROPS } from '../src/sim/content/zone2';
+import { ZONE3_PROPS } from '../src/sim/content/zone3';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
+import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { loadPublishedMap } from '../src/sim/maps/eastbrook_rebuild.generated';
 import { decksMayStand } from '../src/sim/placement_ramps';
 import { nearTownWalkIn, townWalkInPlacements, walkInPlacementFor } from '../src/sim/town_walk_in';
@@ -16,19 +21,27 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The walk-in town buildings (src/sim/town_walk_in.ts): the one placement a
 // walk-in record resolves to, which its walls (authored_town_buildings.ts)
-// and its floors (placement_ramps.ts) are both built from.
+// and its floors (placement_ramps.ts) are both built from. Fenbridge and
+// Highwatch stand walk-in buildings; each town keeps its own bounds box.
 
-const WALK_IN = FENBRIDGE_LAYOUT.buildings.filter((building) => building.walkIn);
+const FENBRIDGE_WALK_IN = FENBRIDGE_LAYOUT.buildings.filter((building) => building.walkIn);
+const HIGHWATCH_WALK_IN = HIGHWATCH_LAYOUT.buildings.filter((building) => building.walkIn);
+const WALK_IN = [...FENBRIDGE_WALK_IN, ...HIGHWATCH_WALK_IN];
 
 function recordOf(id: string): BuildingDef {
-  const record = ZONE2_PROPS.buildings.find((candidate) => candidate.id === id);
+  const record = [...ZONE2_PROPS.buildings, ...ZONE3_PROPS.buildings].find(
+    (candidate) => candidate.id === id,
+  );
   if (!record) throw new Error(`no props record for ${id}`);
   return record;
 }
 
 describe('the walk-in town placement', () => {
   it('stands each walk-in model at its layout anchor, at the size Studio places it', () => {
-    const studio = authoredTownBuildingPlacements(WORLD_SEED);
+    const studio = [
+      ...authoredTownBuildingPlacements(WORLD_SEED),
+      ...highwatchTownBuildingPlacements(WORLD_SEED),
+    ];
     expect(WALK_IN.length).toBeGreaterThan(0);
     for (const building of WALK_IN) {
       const placement = walkInPlacementFor(recordOf(building.id));
@@ -52,8 +65,13 @@ describe('the walk-in town placement', () => {
   });
 
   it('gives a sealed record, and one a custom world moved, turned or resized, nothing', () => {
-    const sealed = FENBRIDGE_LAYOUT.buildings.filter((building) => !building.walkIn);
-    expect(sealed.length).toBeGreaterThan(0);
+    const sealed = [...FENBRIDGE_LAYOUT.buildings, ...HIGHWATCH_LAYOUT.buildings].filter(
+      (building) => !building.walkIn,
+    );
+    expect(sealed.map((building) => building.id)).toEqual([
+      'fenbridge_warden_gatehouse',
+      'highwatch_watch_house',
+    ]);
     for (const building of sealed) expect(walkInPlacementFor(recordOf(building.id))).toBeNull();
     const inn = recordOf(WALK_IN[0].id);
     expect(walkInPlacementFor(inn)).not.toBeNull();
@@ -71,11 +89,25 @@ describe('the walk-in town placement', () => {
     );
     // a plain copy of the built-in world keeps the records, and their floors
     expect(townWalkInPlacements({ ...BUILTIN_WORLD } as WorldContent)).toHaveLength(WALK_IN.length);
-    // a document that took the buildings over as placements stands the records down
+    // a document that took a town's buildings over as placements stands that
+    // town's records down: Eastbrook and Fenbridge under authoredTowns,
+    // Highwatch under its own family
     expect(
       townWalkInPlacements({
         ...BUILTIN_WORLD,
         promotedScenery: { authoredTowns: true },
+      } as WorldContent).map((p) => p.path),
+    ).toEqual(HIGHWATCH_WALK_IN.map((building) => building.assetId));
+    expect(
+      townWalkInPlacements({
+        ...BUILTIN_WORLD,
+        promotedScenery: { highwatchTown: true },
+      } as WorldContent).map((p) => p.path),
+    ).toEqual(FENBRIDGE_WALK_IN.map((building) => building.assetId));
+    expect(
+      townWalkInPlacements({
+        ...BUILTIN_WORLD,
+        promotedScenery: { authoredTowns: true, highwatchTown: true },
       } as WorldContent),
     ).toEqual([]);
     expect(townWalkInPlacements(loadPublishedMap())).toEqual([]);
@@ -126,12 +158,16 @@ describe('the walk-in town placement', () => {
         }
       }
     }
-    // away from the town the built-in world asks for no deck at all
+    // away from the towns the built-in world asks for no deck at all: one box
+    // per town, so the road between Fenbridge and Highwatch asks for none
     for (const [x, z] of [
       [0, 0],
       [-14, -100],
       [120, 300],
       [0, 420],
+      [0, 540],
+      [0, 600],
+      [80, 660],
     ]) {
       expect(decksMayStand(BUILTIN_WORLD, x, z), `${x}, ${z}`).toBe(false);
     }

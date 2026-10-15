@@ -217,7 +217,8 @@ describe('renderer CPU hot path', () => {
     expect(renderer).not.toContain('const markWorldPhase =');
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.terrainView.group)');
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.waterView.group)');
-    expect(renderer).toContain('freezeStaticSubtreeMatrices(this.eastbrookTownView.group)');
+    // the rebuilt towns are frozen together, one loop over the town views
+    expect(renderer).toContain('freezeStaticSubtreeMatrices(town.group)');
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.gatherNodes.group)');
   });
 

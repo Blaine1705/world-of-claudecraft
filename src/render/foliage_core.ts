@@ -2,6 +2,7 @@ import { isEastbrookGrandArmoury } from '../sim/building_layout';
 import { DUNGEONS } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
+import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 import {
   onWildheartBasinEntranceCauseway,
@@ -243,6 +244,21 @@ export function eastbrookGrassExclusions(
         x: order.position.x,
         z: order.position.z,
         radius: 0.7,
+      });
+    }
+  }
+
+  if (builtInWorld) {
+    // Highwatch's painted buildings clear their whole reach and their door
+    // aprons, the Fenbridge rule; the rest of its square is the props view's.
+    for (const building of HIGHWATCH_LAYOUT.buildings) {
+      exclusions.push(layoutObb(building.id, building.reach));
+      exclusions.push({
+        kind: 'circle',
+        id: `${building.id}:serviceApron`,
+        x: building.frontStandingPoint.x,
+        z: building.frontStandingPoint.z,
+        radius: 1.5,
       });
     }
   }
