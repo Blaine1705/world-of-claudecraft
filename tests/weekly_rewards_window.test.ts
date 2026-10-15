@@ -339,9 +339,9 @@ describe('weekly reward pane', () => {
     expect(dungeon.textContent).not.toContain('No eligible');
     expect(dungeon.querySelectorAll('.weekly-loot').length).toBeGreaterThan(0);
     // PvP has no boss tables, so it keeps its own rule.
-    expect(root.querySelector('#weekly-pool-pvp')!.textContent).not.toContain(
-      'All tables these vaults can roll from.',
-    );
+    const pvp = root.querySelector('#weekly-pool-pvp')!;
+    expect(pvp.textContent).not.toContain('All tables these vaults can roll from.');
+    expect(pvp.textContent).toContain('For raids and dungeons, select one or more tables');
   });
 
   it('keeps the level filter in the read-only preview', () => {

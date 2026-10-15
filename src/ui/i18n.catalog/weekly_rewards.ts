@@ -88,7 +88,7 @@ export const weeklyRewardStrings = {
   selectionPoolRule:
     'For raids and dungeons, select one or more tables before opening. Dungeon tables combine bosses you have cleared at this difficulty. Rolls exclude duplicates, legendary items and equipment requiring more than {maxLevelOffset} levels above your level.',
   previewPoolRule:
-    'All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already revealed. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.',
+    'All tables these vaults can roll from. Defeat a boss in the week that earns the vault to make its loot selectable at the Vault Keeper; a dungeon table then holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.',
   rare: 'Rare',
   epic: 'Epic',
   unavailable: 'Not yet available',

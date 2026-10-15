@@ -61,6 +61,7 @@ export function buildWeeklyRewardsView(
   };
   return (['raid', 'dungeon', 'world', 'pvp'] as const).map((category, index) => ({
     category,
+    catalog,
     progress: progress[index],
     thresholds: WEEKLY_THRESHOLDS[category],
     available: category !== 'world' || info.worldQuestsAvailable,
