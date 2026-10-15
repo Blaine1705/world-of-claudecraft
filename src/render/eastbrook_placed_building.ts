@@ -192,16 +192,24 @@ export function buildPlacedTownBuilding(
   group.rotation.y = placement.rotation;
   group.add(wrap);
 
-  const reach = building.reach;
-  const cullRadius =
-    Math.hypot(reach.center.x - building.position.x, reach.center.z - building.position.z) +
-    Math.hypot(reach.halfWidth, reach.halfDepth);
   return {
     group,
     mats,
     topY: ground + building.nativeDimensions.height,
-    cullRadius,
+    cullRadius: placedBuildingCullRadius(building),
   };
+}
+
+/** A placed building's own cull circle round its position: far enough to hold
+ *  its whole reach (eaves, annexes, the model's widest point). */
+export function placedBuildingCullRadius(
+  building: Pick<PlacedTownBuildingRecord, 'position' | 'reach'>,
+): number {
+  const reach = building.reach;
+  return (
+    Math.hypot(reach.center.x - building.position.x, reach.center.z - building.position.z) +
+    Math.hypot(reach.halfWidth, reach.halfDepth)
+  );
 }
 
 /** Eastbrook's placed building (sim/eastbrook_layout.ts). */

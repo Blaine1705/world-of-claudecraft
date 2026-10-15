@@ -135,6 +135,38 @@ describe('the Highwatch town view', () => {
     expect(kept.group.userData.buildingIds).toHaveLength(5);
   });
 
+  it('holds every building in the town circle: the smithy past its far corner in thick fog', () => {
+    gfxInternalsForTest.overrideSettings({ standardMaterials: false, dynamicShadows: false });
+    const view = KIT.buildFromSources(fixtureSources(), () => 9, true);
+    const hub = HIGHWATCH_LAYOUT.hub.center;
+    // every reach corner lies inside the circle the fog test and the reveal read
+    for (const building of HIGHWATCH_LAYOUT.buildings) {
+      const { center, halfWidth, halfDepth, rotation } = building.reach;
+      for (const [sx, sz] of [
+        [1, 1],
+        [1, -1],
+        [-1, 1],
+        [-1, -1],
+      ]) {
+        const lx = sx * halfWidth;
+        const lz = sz * halfDepth;
+        const x = center.x + lx * Math.cos(rotation) + lz * Math.sin(rotation);
+        const z = center.z - lx * Math.sin(rotation) + lz * Math.cos(rotation);
+        expect(Math.hypot(x - hub.x, z - hub.z), building.id).toBeLessThan(KIT.cullRadius);
+      }
+    }
+    // the smithy stands on its terrace about 44 yards out: a camera just past
+    // its far corner, in fog 20 yards deep, is 57 yards from the hub, where a
+    // circle of the hub ring plus its margin (32) answered hidden
+    const smithy = HIGHWATCH_LAYOUT.buildings.find((b) => b.id === 'highwatch_smithy');
+    if (!smithy) throw new Error('missing smithy');
+    const camX = smithy.reach.center.x + smithy.reach.halfWidth + 0.7;
+    const camZ = smithy.reach.center.z + smithy.reach.halfDepth + 1.5;
+    expect(Math.hypot(camX - hub.x, camZ - hub.z)).toBeGreaterThan(20 + 32);
+    view.update(camX, 12, camZ, camX - 1, 11, camZ - 1, 20, 0.05);
+    expect(buildingGroup(view.group, smithy.id).visible).toBe(true);
+  });
+
   it('builds an empty root for a world that does not carry the town', () => {
     const view = KIT.buildFromSources(new Map(), () => 0, false);
     expect(view.group.children).toHaveLength(0);
@@ -154,11 +186,32 @@ describe('the Highwatch town view', () => {
     expect(isHighwatchRebuildBuilding({ kind: 'inn', x: 352, z: 598, w: 10, d: 8, rot: 2.7 })).toBe(
       false,
     );
-    const propsSource = readFileSync(path.join(__dirname, '..', 'src/render/props.ts'), 'utf8');
-    // the kit building loop and the far-sprite layer both skip the painted
-    // records, for every painted town
-    expect(propsSource.match(/highwatchTown && isHighwatchRebuildBuilding\(b\)/g)).toHaveLength(2);
-    expect(propsSource.match(/fenbridgeTown && isFenbridgeRebuildBuilding\(b\)/g)).toHaveLength(2);
+    // The kit building loop (buildProps) and the far-sprite pass
+    // (collectBuildingImpostors) both skip the painted records, for every
+    // painted town. The sprite pass needs every prop model loaded, which a
+    // Node test cannot afford, so this reads each function's own body with the
+    // comments stripped, and asks for the skip to `continue` there.
+    const propsSource = readFileSync(path.join(__dirname, '..', 'src/render/props.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+    const bodyOf = (name: string) => {
+      const start = propsSource.indexOf(`export function ${name}(`);
+      expect(start, name).toBeGreaterThanOrEqual(0);
+      const next = propsSource.indexOf('\nexport ', start + 1);
+      return propsSource.slice(start, next === -1 ? undefined : next);
+    };
+    for (const name of ['buildProps', 'collectBuildingImpostors']) {
+      const body = bodyOf(name);
+      for (const town of ['Eastbrook', 'Fenbridge', 'Highwatch']) {
+        const flag = `${town.toLowerCase()}Town`;
+        expect(body, `${name} ${town}`).toContain(
+          `const ${flag} = activeWorldHasAuthoredTown(is${town}RebuildBuilding);`,
+        );
+        expect(body, `${name} ${town}`).toContain(
+          `if (${flag} && is${town}RebuildBuilding(b)) continue;`,
+        );
+      }
+    }
     const view = KIT.buildFromSources(fixtureSources(), () => 9, true);
     expect(view.update.toString()).not.toMatch(/\bnew\s+/);
   });

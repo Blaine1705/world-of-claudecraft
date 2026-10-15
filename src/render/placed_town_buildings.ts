@@ -20,6 +20,7 @@ import {
   buildPlacedTownBuilding,
   type PlacedTown,
   type PlacedTownBuildingRecord,
+  placedBuildingCullRadius,
 } from './eastbrook_placed_building';
 import {
   type FenbridgeBuildingVisibilityTarget,
@@ -108,10 +109,28 @@ interface BuildingHideTarget extends FenbridgeBuildingVisibilityTarget {
 
 type GroundAt = (x: number, z: number) => number;
 
-// The town-wide cull circle's margin past the hub ring: a building's own
-// reach may stand past the ring, and the reveal key must be consulted before
-// the camera reaches any of them.
+// The town-wide cull circle's margin past the hub ring: the reveal key must be
+// consulted before the camera reaches a building.
 const TOWN_CULL_MARGIN_YD = 12;
+
+/**
+ * The town circle round its hub, which the town's fog test and its reveal's
+ * imminence both read: the hub ring plus the margin, or further, so that it
+ * holds every building's own cull circle whole. A building standing past it
+ * would be hidden by the town's fog answer, or revealed without the imminent
+ * priority, while its own cull still wants it drawn (Highwatch's smithy stands
+ * on a terrace about 44 yards out).
+ */
+export function placedTownCullRadius(spec: Pick<PlacedTownSpec, 'hub' | 'buildings'>): number {
+  let radius = spec.hub.radius + TOWN_CULL_MARGIN_YD;
+  for (const building of spec.buildings) {
+    const out =
+      Math.hypot(building.position.x - spec.hub.center.x, building.position.z - spec.hub.center.z) +
+      placedBuildingCullRadius(building);
+    if (out > radius) radius = out;
+  }
+  return radius;
+}
 
 export function placedTownDrawStats(root: THREE.Object3D): PlacedTownDrawStats {
   let colorDraws = 0;
@@ -143,7 +162,7 @@ export function placedTownDrawStats(root: THREE.Object3D): PlacedTownDrawStats {
 export function createPlacedTownKit(spec: PlacedTownSpec) {
   const urls = Object.freeze([...new Set(spec.buildings.map((building) => building.assetId))]);
   const ids = new Set(spec.buildings.map((building) => building.id));
-  const cullRadius = spec.hub.radius + TOWN_CULL_MARGIN_YD;
+  const cullRadius = placedTownCullRadius(spec);
   const loadedSources = new Map<string, THREE.Object3D>();
   /** The FILE each resident source was read from: the URL names the model,
    *  the file follows the texture tier (same geometry). */
