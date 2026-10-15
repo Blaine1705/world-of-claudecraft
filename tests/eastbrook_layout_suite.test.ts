@@ -414,6 +414,9 @@ describe('authoritative Eastbrook replacement plan', () => {
     // ground rectangle). The standing point is pinned literally as well: the
     // door sits wherever the model has it along the front, so the point no
     // longer follows from the other pinned fields the way a kit shell's did.
+    // Each placement also carries the model's authored size (its baked
+    // collision scales by it), and every building whose model bakes an open
+    // doorway is walk-in (sim/town_walk_in.ts): all but the quay cottage.
     expect(
       EASTBROOK_LAYOUT.buildings.map((building) => ({
         id: building.id,
@@ -428,6 +431,7 @@ describe('authoritative Eastbrook replacement plan', () => {
         placement: building.placement,
         annexes: building.annexes,
         reach: building.reach,
+        walkIn: building.walkIn,
       })),
     ).toEqual([
       {
@@ -440,7 +444,14 @@ describe('authoritative Eastbrook replacement plan', () => {
         maxCornerRadius: 14.241643163624062,
         frontClearance: 1.8,
         frontStandingPoint: { x: 20.46, z: -115 },
-        placement: { x: 30.38, z: -115, rotation: Math.PI / 2, scale: 1.3, lift: -1.35 },
+        placement: {
+          x: 30.38,
+          z: -115,
+          rotation: Math.PI / 2,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 22.6067,
+        },
         annexes: [
           {
             id: 'eastbrook_bank:strongroom',
@@ -464,6 +475,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           halfDepth: 12.895,
           rotation: Math.PI / 2,
         },
+        walkIn: true,
       },
       {
         id: 'eastbrook_smithy',
@@ -475,7 +487,14 @@ describe('authoritative Eastbrook replacement plan', () => {
         maxCornerRadius: 9.238235762308733,
         frontClearance: 1.8,
         frontStandingPoint: { x: -32.5, z: -105.83 },
-        placement: { x: -34.06, z: -113.48, rotation: Math.PI, scale: 1.3, lift: -1.35 },
+        placement: {
+          x: -34.06,
+          z: -113.48,
+          rotation: Math.PI,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 19.797,
+        },
         annexes: [
           {
             id: 'eastbrook_smithy:forge_shelter',
@@ -492,6 +511,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           halfDepth: 7.6,
           rotation: Math.PI,
         },
+        walkIn: true,
       },
       {
         id: 'eastbrook_inn',
@@ -503,7 +523,14 @@ describe('authoritative Eastbrook replacement plan', () => {
         maxCornerRadius: 15.504918574439532,
         frontClearance: 1.8,
         frontStandingPoint: { x: -50.76, z: -72.3 },
-        placement: { x: -40.51, z: -72.3, rotation: Math.PI / 2, scale: 1.3, lift: -1.35 },
+        placement: {
+          x: -40.51,
+          z: -72.3,
+          rotation: Math.PI / 2,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 22.6483,
+        },
         annexes: [
           {
             id: 'eastbrook_inn:front_bench',
@@ -527,6 +554,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           halfDepth: 10.92,
           rotation: Math.PI / 2,
         },
+        walkIn: true,
       },
       {
         id: 'eastbrook_chapel',
@@ -538,7 +566,14 @@ describe('authoritative Eastbrook replacement plan', () => {
         maxCornerRadius: 16.28895331198417,
         frontClearance: 1.8,
         frontStandingPoint: { x: -64, z: -99.47 },
-        placement: { x: -64, z: -115.57, rotation: Math.PI, scale: 1.3, lift: -1.35 },
+        placement: {
+          x: -64,
+          z: -115.57,
+          rotation: Math.PI,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 30.4998,
+        },
         annexes: [
           {
             id: 'eastbrook_chapel:bell_tower',
@@ -562,6 +597,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           halfDepth: 15.74,
           rotation: Math.PI,
         },
+        walkIn: true,
       },
       {
         id: 'eastbrook_apothecary',
@@ -573,7 +609,14 @@ describe('authoritative Eastbrook replacement plan', () => {
         maxCornerRadius: 8.996338143933897,
         frontClearance: 1.8,
         frontStandingPoint: { x: -9.1, z: -89.29 },
-        placement: { x: -7.02, z: -82.03, rotation: 0, scale: 1.3, lift: -1.35 },
+        placement: {
+          x: -7.02,
+          z: -82.03,
+          rotation: 0,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 16.2797,
+        },
         annexes: [
           {
             id: 'eastbrook_apothecary:stall_counter',
@@ -597,6 +640,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           halfDepth: 7.93,
           rotation: 0,
         },
+        walkIn: true,
       },
       {
         id: 'eastbrook_quay_cottage',
@@ -608,7 +652,14 @@ describe('authoritative Eastbrook replacement plan', () => {
         maxCornerRadius: 9.981868562548797,
         frontClearance: 1.8,
         frontStandingPoint: { x: -75, z: -57.26 },
-        placement: { x: -75, z: -49.9, rotation: 0, scale: 1.3, lift: -1.35 },
+        placement: {
+          x: -75,
+          z: -49.9,
+          rotation: 0,
+          scale: 1.3,
+          lift: -1.35,
+          modelSize: 15.9799,
+        },
         annexes: [
           {
             id: 'eastbrook_quay_cottage:crates',
@@ -625,6 +676,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           halfDepth: 7.605,
           rotation: 0,
         },
+        walkIn: false,
       },
     ]);
 

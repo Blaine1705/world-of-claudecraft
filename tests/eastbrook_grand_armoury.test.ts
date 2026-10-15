@@ -428,12 +428,19 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     // the toolworks bench. A player comes down the north road east of the
     // shop instead, so that walk goes through the road's town end at
     // (14.6, -88.6), on the road itself (pinned here), and then across the
-    // square. Every other walk, and the walk back up, keeps its beeline.
+    // square. The walk back up takes the same road: since the shop became
+    // walk-in it collides on its own baked boxes, and its stall counter and
+    // barrels meet in a corner that holds a body walking the beeline into it.
+    // Every other walk keeps its beeline.
     const northRoadTownEnd = { x: 14.6, z: -88.6 };
     expect(ZONE1_ROADS[0]).toContainEqual(northRoadTownEnd);
     for (const destination of [square, NPCS.card_master.pos, toolworks]) {
-      if (destination === toolworks) expectWalkableLegs([approach, northRoadTownEnd, toolworks]);
-      else expectWalkableRoute(approach, destination);
+      if (destination === toolworks) {
+        expectWalkableLegs([approach, northRoadTownEnd, toolworks]);
+        expectWalkableLegs([toolworks, northRoadTownEnd, approach]);
+        continue;
+      }
+      expectWalkableRoute(approach, destination);
       expectWalkableRoute(destination, approach);
     }
   });
