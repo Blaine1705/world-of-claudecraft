@@ -232,6 +232,18 @@ describe("the Tusker's alert", () => {
     expect(buildTuskerAlert(scene, W(BEHIND), 100)?.kind).toBe('trample-bait');
   });
 
+  it('with every outcrop spent there is nothing to lead it into: the target is told to step out', () => {
+    const aiming = {
+      castingAbility: TUSKER_TRAMPLE,
+      castRemaining: T.trampleCast - 0.05,
+      castTotal: T.trampleCast,
+      castTargetId: 1,
+    };
+    const scene = scan([tusker(aiming), ...outcrops([0, 1, 2, 3, 4])]);
+    expect(kindAt(scene, leg(12, 0))).toBe('trample');
+    expect(kindAt(scene, BEHIND)).toBe('trample');
+  });
+
   it('a plain lane says nothing to a player standing clear of it', () => {
     const down = Math.atan2(42, 21.8);
     const scene = scan([tusker({ ...trampling, pos: W(leg(4)), facing: down }), ...outcrops()]);

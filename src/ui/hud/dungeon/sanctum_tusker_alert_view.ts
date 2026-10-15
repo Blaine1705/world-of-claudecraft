@@ -141,18 +141,21 @@ export function buildTuskerAlert(
   const pct = formatNumber(Math.round(T.stuckVuln * 100), { maximumFractionDigits: 0 });
   // You are the Trample's target and its lane still follows you: lead it
   // into an ice outcrop, then step aside. The bar counts down to the lock.
+  // With every outcrop spent there is nothing to lead it into: the plain
+  // lane rules below say step out.
   if (
     tusker &&
     tusker.castingAbility === TUSKER_TRAMPLE &&
     selfId !== undefined &&
     tusker.castTargetId === selfId &&
-    !trampleAimLocked(tusker.castRemaining ?? 0)
+    !trampleAimLocked(tusker.castRemaining ?? 0) &&
+    scene.outcrops.some((o) => o.templateId === SANCTUM_ICE_OUTCROP)
   ) {
     const left = Math.max(0, (tusker.castRemaining ?? 0) - T.trampleLock);
     return {
       kind: 'trample-lead',
       line: t('hudChrome.sanctumAlert.trampleLeadLine'),
-      progress: share(left, (tusker.castTotal ?? T.trampleCast) - T.trampleLock),
+      progress: share(left, (tusker.castTotal || T.trampleCast) - T.trampleLock),
       seconds: left,
     };
   }
