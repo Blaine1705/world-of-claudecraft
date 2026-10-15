@@ -139,9 +139,10 @@ const SHOULDERS_WIDTH_HEADS = 2.0;
 const SHOULDERS_HEAD_RISE = 0.16;
 
 /**
- * The touch stage's close framing (a phone's creator, CharacterPreview's touch stage): the
- * head and shoulders, the face in the upper part of the frame and the shoulders across the
- * bottom, centred. It is the stage's FIXED opening shot there: a category's close-up
+ * The touch stage's close framing (a phone's launcher stage, CharacterPreview's touch stage:
+ * the creator and the character select's pick alike): the head and shoulders, the face in
+ * the upper part of the frame and the shoulders across the bottom, centred. It is the
+ * stage's FIXED opening shot there: a category's close-up
  * (setFocus) never moves the camera on a touch stage, the player's own pinch and drag do
  * (preview_touch_core.ts). `headY` / `headH` are the measured head (see creationFocusPose);
  * without them it aims at CREATION_HEAD_Y with a fixed frame.

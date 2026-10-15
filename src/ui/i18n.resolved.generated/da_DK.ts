@@ -12199,6 +12199,7 @@ export const da_DK: EnTranslations = {
     "newCharacter": "Ny karakter",
     "appearance": "Udseende",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Tilpas",
     "body": "Krop",
     "genderMale": "Mand",

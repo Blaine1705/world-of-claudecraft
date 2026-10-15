@@ -12199,6 +12199,7 @@ export const en_XA: EnTranslations = {
     "newCharacter": "[Ñéŵ Çĥáŕáçţéŕ]",
     "appearance": "[Áþþéáŕáñçé]",
     "modelLoading": "[Ļóáðíñĝ çĥáŕáçţéŕ...]",
+    "previewPinchHint": "[Þíñçĥ ţó žóóɱ]",
     "customize": "[Çúšţóɱížé]",
     "body": "[Ɓóðý]",
     "genderMale": "[Ɱáļé]",

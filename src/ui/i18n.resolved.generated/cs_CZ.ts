@@ -12199,6 +12199,7 @@ export const cs_CZ: EnTranslations = {
     "newCharacter": "Nová postava",
     "appearance": "Vzhled",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Přizpůsobit",
     "body": "Tělo",
     "genderMale": "Muž",

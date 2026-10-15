@@ -12199,6 +12199,7 @@ export const de_DE: EnTranslations = {
     "newCharacter": "Neuer Charakter",
     "appearance": "Aussehen",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Anpassen",
     "body": "Körper",
     "genderMale": "Männlich",

@@ -12199,6 +12199,7 @@ export const tr_TR: EnTranslations = {
     "newCharacter": "Yeni Karakter",
     "appearance": "Görünüm",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Özelleştir",
     "body": "Vücut",
     "genderMale": "Erkek",

@@ -229,6 +229,8 @@ const INDEX_SECTIONS = [
   'woc face builder',
   // The launcher turntable's loading silhouette (shell.css, in both entries).
   'character preview loading silhouette',
+  // The phone creator's one-time pinch hint beside the model (shell.css, in both entries).
+  'character preview touch hint',
 ];
 
 // The two index-only sections play.html does not ship, so its count is 58 (plus the
@@ -240,7 +242,7 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 79 index + 77 play sections, no duplicate names', () => {
+  it('pins a non-vacuous manifest: 80 index + 78 play sections, no duplicate names', () => {
     // The World Quests branch's vehicle bar and music override sections (72 / 70)
     // plus World PvP (the flag tab) and King of the Hill (src/ui/hud/hill/), one
     // components.css section each in both entries: 74 / 72. The courier
@@ -250,11 +252,12 @@ describe('css_corpus section manifest', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 77, 75.
     // + the dungeon objectives tracker (hud.css, in both entries): 78, 76.
     // + the launcher turntable's loading silhouette (shell.css, in both entries): 79, 77.
-    expect(INDEX_SECTIONS.length).toBe(79);
-    expect(PLAY_SECTIONS.length).toBe(77);
-    expect(MANIFEST.length).toBe(79);
-    expect(new Set(INDEX_SECTIONS).size).toBe(79);
-    expect(new Set(PLAY_SECTIONS).size).toBe(77);
+    // + the phone creator's pinch hint (shell.css, in both entries): 80, 78.
+    expect(INDEX_SECTIONS.length).toBe(80);
+    expect(PLAY_SECTIONS.length).toBe(78);
+    expect(MANIFEST.length).toBe(80);
+    expect(new Set(INDEX_SECTIONS).size).toBe(80);
+    expect(new Set(PLAY_SECTIONS).size).toBe(78);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

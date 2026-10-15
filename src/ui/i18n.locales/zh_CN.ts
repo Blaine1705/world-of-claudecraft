@@ -7827,6 +7827,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'auth.newCharacter': '新建角色',
   'auth.appearance': '外观',
   'auth.modelLoading': '正在加载角色...',
+  'auth.previewPinchHint': '双指缩放',
   'auth.class': '职业',
   'auth.name': '名称',
   'auth.chromaOption': '配色 {n}',
