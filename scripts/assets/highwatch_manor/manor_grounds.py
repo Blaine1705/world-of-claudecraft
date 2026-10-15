@@ -8,7 +8,7 @@ the paving lies a hair over it. Parts: ManorGrounds and ManorGlow (the lamps' pa
 """
 import math
 
-from manor_lib import GLOW, LAYER, METAL, PAL, STONE, WOOD, Wall, abox, cyl, disc, flat_face, hashf, pick, tone
+from manor_lib import GLOW, GLOW_LANTERN, LAYER, METAL, PAL, STONE, WOOD, Wall, abox, cyl, disc, flat_face, hashf, pick, tone
 from manor_plan import (BENCH, EAST, FLOOR, FOUNTAIN, GARDEN, GATE, LAMPS, STEPS, WEST)
 from manor_shell import _ashlar_face, _ball, finial, hanging_lantern
 
@@ -152,7 +152,7 @@ def lamp(p, glow, x, z):
     abox(p, x - 0.3, x + 0.3, -0.2, 0.45, z - 0.3, z + 0.3, PAL['ashlar_hi'], STONE)
     cyl(p, x, 0.45, 3.1, z, 0.09, PAL['iron'], METAL, sides=8, r1=0.07)
     cyl(p, x, 2.9, 3.05, z, 0.14, PAL['gold'], METAL, sides=8)
-    abox(glow, x - 0.22, x + 0.22, 3.1, 3.62, z - 0.22, z + 0.22, PAL['lantern_lit'], GLOW)
+    abox(glow, x - 0.22, x + 0.22, 3.1, 3.62, z - 0.22, z + 0.22, PAL['lantern_lit'], GLOW_LANTERN)
     for sx in (-1, 1):
         for sz in (-1, 1):
             abox(p, x + sx * 0.23 - 0.03, x + sx * 0.23 + 0.03, 3.08, 3.64, z + sz * 0.23 - 0.03, z + sz * 0.23 + 0.03,

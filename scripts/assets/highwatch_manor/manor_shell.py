@@ -7,7 +7,7 @@ ManorTrim (gold, iron and the carved crest) and ManorGlow (lit glass).
 """
 import math
 
-from manor_lib import (GLASS, GLOW, LAYER, METAL, PAL, PLASTER, SLATE, STONE, WOOD, Wall, abox, cbox, cyl, disc,
+from manor_lib import (GLASS, GLOW, GLOW_LANTERN, GLOW_SOFT, LAYER, METAL, PAL, PLASTER, SLATE, STONE, WOOD, Wall, abox, cbox, cyl, disc,
                        flat_face, hashf, hexa, manor_wall, opening_spans, pick, slate_roof, tone, window)
 from manor_plan import (ARCH_DAIS, ARCH_SIDE, BAY, CHAPEL, CHAPEL_DOOR, COLUMN_R, COLUMNS, DAIS,
                         DAIS_FRONT, DOOR, EAST, EAVE_OUT, FLOOR, FOOT, HALL, HALL_PITCH, HATCH, HEARTH,
@@ -337,7 +337,7 @@ def oculus(p, wall, uc, vc, r, t, glow):
                wall.pt(uc + math.cos(a1) * r, vc + math.sin(a1) * r, -0.03), wall.pt(uc, vc, -0.03),
                wall.pt(uc, vc, 0.03), wall.pt(uc + math.cos(a0) * r, vc + math.sin(a0) * r, 0.03),
                wall.pt(uc + math.cos(a1) * r, vc + math.sin(a1) * r, 0.03), wall.pt(uc, vc, 0.03)]
-        hexa(glow, pts, PAL['glass_lit'], GLOW)
+        hexa(glow, pts, PAL['glass_lit'], GLOW_SOFT)
         # the stone filling the square cut round the disc
         ca, sa = math.cos(a0), math.sin(a0)
         cb, sb = math.cos(a1), math.sin(a1)
@@ -659,7 +659,7 @@ def lantern(p_roof, p_trim, glow):
     gli, ghi = ring(r - 0.2, L['y0']), ring(r - 0.2, L['y1'])
     for i in range(n):
         j = (i + 1) % n
-        hexa(glow, [gl[i], gl[j], gli[j], gli[i], gh[i], gh[j], ghi[j], ghi[i]], PAL['lantern_lit'], GLOW)
+        hexa(glow, [gl[i], gl[j], gli[j], gli[i], gh[i], gh[j], ghi[j], ghi[i]], PAL['lantern_lit'], GLOW_LANTERN)
         # the mullion at each corner
         cx, _, cz = ring(r, 0)[i]
         cbox(p_trim, cx, (L['y0'] + L['y1']) / 2, cz, 0.26, L['y1'] - L['y0'], 0.26, PAL['gold'], METAL,
@@ -1019,7 +1019,7 @@ def hanging_lantern(p_trim, glow, x, y, z, drop=1.2, size=0.45):
     yb = y - drop - size * 1.4
     abox(p_trim, x - size * 0.6, x + size * 0.6, yb - 0.06, yb, z - size * 0.6, z + size * 0.6, PAL['gold_dark'], METAL)
     abox(glow, x - size * 0.48, x + size * 0.48, yb, yb + size * 1.2, z - size * 0.48, z + size * 0.48,
-         PAL['lantern_lit'], GLOW)
+         PAL['lantern_lit'], GLOW_LANTERN)
     for sx in (1, -1):
         for sz in (1, -1):
             abox(p_trim, x + sx * size * 0.5 - 0.035, x + sx * size * 0.5 + 0.035, yb, yb + size * 1.2,

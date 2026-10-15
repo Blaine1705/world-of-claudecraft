@@ -22,8 +22,10 @@ from shiplib import EDGE, FLAT, P, PLAIN, scale_color  # noqa: E402,F401
 WOOD, METAL, STONE, PLASTER, GLOW, SLATE, GLASS = 0, 1, 2, 3, 4, 5, 6
 # the stained glass by its colour
 GLASS_BLUE, GLASS_RED, GLASS_GOLD = 7, 8, 9
+# the warm lights in more tones than one: honey lamplight, the lanterns, the candle flames
+GLOW_SOFT, GLOW_LANTERN, GLOW_CANDLE = 10, 11, 12
 # every glowing material (the weathering and the warm bake leave them alone)
-EMISSIVE = (GLOW, GLASS, GLASS_BLUE, GLASS_RED, GLASS_GOLD)
+EMISSIVE = (GLOW, GLASS, GLASS_BLUE, GLASS_RED, GLASS_GOLD, GLOW_SOFT, GLOW_LANTERN, GLOW_CANDLE)
 
 # The least gap between a decal-like layer and the surface under it (a rug on a floor, a stripe
 # on a banner, a skin on a wall's core): closer than this, two overlapping faces fight in the
@@ -48,6 +50,10 @@ MATERIAL_SPECS = (
     ('ManorGlassBlue', 0.3, 0.0, 1.0, (0.08, 0.14, 0.42)),
     ('ManorGlassRed', 0.3, 0.0, 1.0, (0.42, 0.06, 0.07)),
     ('ManorGlassGold', 0.3, 0.0, 1.0, (0.6, 0.4, 0.1)),
+    # honey lamplight (alternate windows), the brighter lanterns, the soft candle flames
+    ('ManorGlowSoft', 0.5, 0.0, 1.0, (0.66, 0.46, 0.18)),
+    ('ManorGlowLantern', 0.5, 0.0, 1.0, (0.86, 0.5, 0.14)),
+    ('ManorGlowCandle', 0.5, 0.0, 1.0, (0.78, 0.6, 0.24)),
 )
 
 PAL = dict(
@@ -434,7 +440,8 @@ def window(p, wall, u0, u1, v0, v1, t, lit=True, arch=True, bars=2, inner=True, 
     w = u1 - u0
     # the glass plane in the wall's middle (both faces read it)
     glass = PAL['glass_lit'] if lit else PAL['glass']
-    gm = GLOW if lit else STONE
+    # lit windows in two warm tones, by a stable hash of where they stand
+    gm = (GLOW if hashf(wall.x0, wall.z0, u0) < 0.55 else GLOW_SOFT) if lit else STONE
     top_rect = v1 - (w / 2 if arch else 0.0)
     for s in ((1, -1) if inner else (1,)):
         wall.skin(p, u0, u1, v0, top_rect, s * 0.03, s, glass, gm, tag=FLAT)

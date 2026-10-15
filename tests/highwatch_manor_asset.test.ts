@@ -30,8 +30,8 @@ import { HIGHWATCH_BUILDINGS_BY_ID } from '../src/sim/highwatch_layout';
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, HIGHWATCH_MANOR_ASSET.target);
-const SHIPPED_SHA256 = 'ddbc76efc78d5ea7b6bbb673fb66a570a37115f9c704c09ceea036e43bc4580b';
-const SHIPPED_BYTES = 1015412;
+const SHIPPED_SHA256 = 'ddae2cee9d55c66d9e97f1bc784bb11088d6677c7780f8378c6e430878cba12e';
+const SHIPPED_BYTES = 1021588;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   ManorShell: 25418,
@@ -149,6 +149,14 @@ describe('the Highwatch manor GLB', () => {
     const [gr, gg, gb] = hue('ManorGlassGold');
     expect(gr).toBeGreaterThan(gg);
     expect(gg).toBeGreaterThan(gb);
+    // the warm lights come in four tones, every one warm, no two alike: amber and honey
+    // windows, the brighter lanterns, the softer candle flames
+    const warm = ['ManorGlow', 'ManorGlowSoft', 'ManorGlowLantern', 'ManorGlowCandle'].map(hue);
+    for (const [wr, wg, wb] of warm) {
+      expect(wr).toBeGreaterThan(wg);
+      expect(wg).toBeGreaterThan(wb);
+    }
+    expect(new Set(warm.map((c) => c.map((v) => v.toFixed(2)).join(','))).size).toBe(4);
     for (const mesh of root.listMeshes()) {
       for (const prim of mesh.listPrimitives()) {
         expect(prim.getAttribute('COLOR_0'), mesh.getName()).not.toBeNull();

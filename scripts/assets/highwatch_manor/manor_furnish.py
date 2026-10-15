@@ -12,7 +12,7 @@ flames, lit lantern panes, embers).
 """
 import math
 
-from manor_lib import (GLOW, LAYER, METAL, PAL, STONE, WOOD, abox, cbox, cyl, disc, flat_face, hashf, pick, tone)
+from manor_lib import (GLOW, GLOW_CANDLE, LAYER, METAL, PAL, STONE, WOOD, abox, cbox, cyl, disc, flat_face, hashf, pick, tone)
 from manor_plan import (BAY, CHAPEL, CHAPEL_DOOR, DAIS, EAST, FLOOR, HALL, KITCHEN, WEST)
 from manor_shell import chain
 
@@ -280,7 +280,7 @@ def candle(glow, p, x, y, z, h=0.35, r=0.06):
 
 
 def p_flame(glow, x, y, z, s):
-    glow.prism((x, y, z), 4, s, 0.0, s * 3.2, PAL['candle'], GLOW, axis=(0, 1, 0), cap0=False)
+    glow.prism((x, y, z), 4, s, 0.0, s * 3.2, PAL['candle'], GLOW_CANDLE, axis=(0, 1, 0), cap0=False)
 
 
 def candelabrum(p, glow, x, z, y=FLOOR, h=2.6):
