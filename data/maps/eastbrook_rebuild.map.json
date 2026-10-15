@@ -3456,7 +3456,13 @@
         },
         "facing": -2.1763409903998667,
         "color": 12031243,
-        "questIds": ["q_wolves", "q_greyjaw", "q_bandits", "q_ringleader", "q_mogger"],
+        "questIds": [
+          "q_wolves",
+          "q_greyjaw",
+          "q_bandits",
+          "q_ringleader",
+          "q_mogger"
+        ],
         "greeting": "Keep your blade close, $C. The Vale is not what it was."
       },
       "trader_wilkes": {
@@ -3639,7 +3645,11 @@
         },
         "facing": -2.0344439357957027,
         "color": 11883548,
-        "questIds": ["q_prof_attune_smith", "q_prof_amends_smith", "q_prof_workorder_forge"],
+        "questIds": [
+          "q_prof_attune_smith",
+          "q_prof_amends_smith",
+          "q_prof_workorder_forge"
+        ],
         "greeting": "The forge answers to me, $C. Bring good ore and it will answer to you too.",
         "vendorItems": ["copper_mining_pick", "field_kit", "smithing_flux"]
       },
@@ -3680,7 +3690,11 @@
         },
         "facing": 2.5535900500422257,
         "color": 7430568,
-        "questIds": ["q_prof_attune_outfitter", "q_prof_amends_outfitter", "q_prof_workorder_loom"],
+        "questIds": [
+          "q_prof_attune_outfitter",
+          "q_prof_amends_outfitter",
+          "q_prof_workorder_loom"
+        ],
         "greeting": "Mind the threads, $C. A steady hand at the loom beats a strong one.",
         "vendorItems": [
           "linen_pouch",
@@ -3707,7 +3721,12 @@
           "q_prof_workorder_toolworks"
         ],
         "greeting": "Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.",
-        "vendorItems": ["handaxe", "simple_fishing_pole", "field_kit", "arcanite_bar"]
+        "vendorItems": [
+          "handaxe",
+          "simple_fishing_pole",
+          "field_kit",
+          "arcanite_bar"
+        ]
       },
       "farmer_jessica": {
         "id": "farmer_jessica",
@@ -3798,7 +3817,12 @@
         },
         "facing": -1.5707963267948966,
         "color": 1999945,
-        "questIds": ["q_prowler_pelts", "q_fen_supplies", "q_the_codfather", "q_grubjaw"],
+        "questIds": [
+          "q_prowler_pelts",
+          "q_fen_supplies",
+          "q_the_codfather",
+          "q_grubjaw"
+        ],
         "greeting": "Dry boots, dry bread, dry powder: at Fenbridge you get two of the three on a good day.",
         "vendorItems": [
           "fenbridge_rye",
@@ -3891,7 +3915,12 @@
         "color": 9067050,
         "questIds": ["q_prof_workorder_tannery"],
         "greeting": "A hide is only as good as its tanning, $C. The vats are ready when you are.",
-        "vendorItems": ["travelers_knapsack", "tough_jerky", "smoked_eel", "tanning_agent"]
+        "vendorItems": [
+          "travelers_knapsack",
+          "tough_jerky",
+          "smoked_eel",
+          "tanning_agent"
+        ]
       },
       "farmer_teasel": {
         "id": "farmer_teasel",
@@ -3905,7 +3934,12 @@
         "color": 7044922,
         "questIds": [],
         "greeting": "Marsh rice and bog beet seed, $C, and compost to feed them. The paddies drain slow, so mind where you tread.",
-        "vendorItems": ["marsh_rice_seed", "bog_beet_seed", "compost", "field_kit"]
+        "vendorItems": [
+          "marsh_rice_seed",
+          "bog_beet_seed",
+          "compost",
+          "field_kit"
+        ]
       },
       "muster_commander": {
         "id": "muster_commander",
@@ -3917,7 +3951,11 @@
         },
         "facing": -0.36,
         "color": 10242604,
-        "questIds": ["q_muster_summons", "q_muster_pike_drill", "q_muster_trophy"],
+        "questIds": [
+          "q_muster_summons",
+          "q_muster_pike_drill",
+          "q_muster_trophy"
+        ],
         "greeting": "Pikes first, $C, then everyone. That is the whole of it, and it has kept this camp alive.",
         "dynamic": true
       },
@@ -3949,8 +3987,8 @@
         "name": "Brother Aldric",
         "title": "Priest of the Vale",
         "pos": {
-          "x": -12.500000000000002,
-          "z": 645.4
+          "x": -12.200000000000001,
+          "z": 645.16
         },
         "facing": 0,
         "color": 16251385,
@@ -4161,7 +4199,12 @@
         },
         "facing": -0.6805212246672144,
         "color": 3894949,
-        "questIds": ["q_kobold_tunnels", "q_elementals", "q_shard_cores", "q_kazzix"],
+        "questIds": [
+          "q_kobold_tunnels",
+          "q_elementals",
+          "q_shard_cores",
+          "q_kazzix"
+        ],
         "greeting": "Mind the loose shale, $C. The mountain has been... restless of late. I intend to learn why."
       },
       "auctioneer_voss": {
@@ -4169,8 +4212,8 @@
         "name": "Auctioneer Voss",
         "title": "Keeper of the World Market",
         "pos": {
-          "x": -12.89,
-          "z": 660.775
+          "x": -16.035,
+          "z": 661.0625
         },
         "facing": 1.5707963267948966,
         "color": 9329366,
@@ -4183,8 +4226,8 @@
         "name": "Bursar Aldous Crane",
         "title": "The Gilded Strongbox",
         "pos": {
-          "x": -14.5,
-          "z": 656.8
+          "x": -17.8,
+          "z": 655.1
         },
         "facing": 1.5707963267948966,
         "color": 13214247,
@@ -4415,7 +4458,12 @@
         },
         "facing": -0.9,
         "color": 12890250,
-        "questIds": ["q_spore_hearts", "q_wisp_lights", "q_treant_accord", "q_spore_tide"],
+        "questIds": [
+          "q_spore_hearts",
+          "q_wisp_lights",
+          "q_treant_accord",
+          "q_spore_tide"
+        ],
         "greeting": "Every light in this valley remembers something, $N. Help me listen."
       },
       "provisioner_fenna": {
@@ -4428,7 +4476,11 @@
         },
         "facing": -0.87,
         "color": 9420682,
-        "questIds": ["q_gleaming_antlers", "q_grove_menace", "q_hollow_the_huntsman"],
+        "questIds": [
+          "q_gleaming_antlers",
+          "q_grove_menace",
+          "q_hollow_the_huntsman"
+        ],
         "greeting": "Bread still warm, water still sweet. The Hollow provides, and so do I.",
         "vendorItems": [
           "trail_hardtack",
@@ -4452,7 +4504,11 @@
         "color": 10127032,
         "questIds": [],
         "greeting": "These forges cooled centuries ago, $C, but their work still holds an edge.",
-        "vendorItems": ["wardplate_cuirass", "nightweave_tunic", "veilcloth_robe"]
+        "vendorItems": [
+          "wardplate_cuirass",
+          "nightweave_tunic",
+          "veilcloth_robe"
+        ]
       },
       "archivist_tullo": {
         "id": "archivist_tullo",
@@ -4464,7 +4520,11 @@
         },
         "facing": 2.08,
         "color": 12101848,
-        "questIds": ["q_monument_tour", "q_shards_of_starfall", "q_wardens_echoes"],
+        "questIds": [
+          "q_monument_tour",
+          "q_shards_of_starfall",
+          "q_wardens_echoes"
+        ],
         "greeting": "The monuments out there have not spoken to anyone in an age. Perhaps they were waiting for fresh ears."
       },
       "huntsman_deral": {
@@ -4562,7 +4622,11 @@
         },
         "facing": 0.8,
         "color": 14262374,
-        "questIds": ["q_fv_winter_pelts", "q_fv_ember_caches", "q_fv_silent_trapline"],
+        "questIds": [
+          "q_fv_winter_pelts",
+          "q_fv_ember_caches",
+          "q_fv_silent_trapline"
+        ],
         "greeting": "Come in off the cold. The lodge fire never goes out, so long as I draw breath."
       },
       "scout_einna": {
@@ -4606,7 +4670,11 @@
         },
         "facing": 1.6,
         "color": 8227434,
-        "questIds": ["q_fv_silent_trapline", "q_fv_sprung_traps", "q_fv_seeing_wren_home"],
+        "questIds": [
+          "q_fv_silent_trapline",
+          "q_fv_sprung_traps",
+          "q_fv_seeing_wren_home"
+        ],
         "greeting": "Fen took three of my lines this week. Fen never took a line in twenty years."
       },
       "reeve_ottoline": {
@@ -4619,7 +4687,11 @@
         },
         "facing": -0.6,
         "color": 12617800,
-        "questIds": ["q_af_goldmelt_road", "q_af_foxes_in_the_lamplight", "q_af_orchard_call"],
+        "questIds": [
+          "q_af_goldmelt_road",
+          "q_af_foxes_in_the_lamplight",
+          "q_af_orchard_call"
+        ],
         "greeting": "Welcome to Lanternmere, where the harvest never ends and neither does the work."
       },
       "waywatcher_sorrel": {
@@ -4662,7 +4734,11 @@
         },
         "facing": 1.2,
         "color": 9083466,
-        "questIds": ["q_af_orchard_call", "q_af_sprites_and_spigots", "q_af_amber_from_the_herd"],
+        "questIds": [
+          "q_af_orchard_call",
+          "q_af_sprites_and_spigots",
+          "q_af_amber_from_the_herd"
+        ],
         "greeting": "Mind where you step. Every root in these rows is older than the town, and they remember."
       },
       "waykeeper_pell": {
@@ -4719,7 +4795,11 @@
         },
         "facing": 1.2,
         "color": 8227418,
-        "questIds": ["q_wf_witch_of_willowweep", "q_wf_wisplight_charms", "q_wf_croakers_hush"],
+        "questIds": [
+          "q_wf_witch_of_willowweep",
+          "q_wf_wisplight_charms",
+          "q_wf_croakers_hush"
+        ],
         "greeting": "The willows told me you were coming before your boots left the bridge."
       },
       "lamplighter_sorrel": {
@@ -4931,7 +5011,11 @@
         },
         "facing": 2.8,
         "color": 11823738,
-        "questIds": ["q_eg_gate_report", "q_eg_hungry_shapes", "q_eg_who_trims_the_hedges"],
+        "questIds": [
+          "q_eg_gate_report",
+          "q_eg_hungry_shapes",
+          "q_eg_who_trims_the_hedges"
+        ],
         "greeting": "Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams."
       },
       "wickmother_sorrel": {
@@ -5045,7 +5129,11 @@
         },
         "facing": -1.8,
         "color": 8227434,
-        "questIds": ["q_gc_the_far_shore", "q_gc_dead_mens_cargo", "q_gc_the_wreck_warden"],
+        "questIds": [
+          "q_gc_the_far_shore",
+          "q_gc_dead_mens_cargo",
+          "q_gc_the_wreck_warden"
+        ],
         "greeting": "Wreckwood, rope, and dead men's cargo. The sea pays my wage, when the Warden lets it."
       },
       "warden_coalfast": {
@@ -5256,7 +5344,11 @@
         },
         "facing": 2.356194490192345,
         "color": 8014410,
-        "questIds": ["q_ps_strike_true", "q_ps_hone_the_edge", "q_ps_shell_and_claw"],
+        "questIds": [
+          "q_ps_strike_true",
+          "q_ps_hone_the_edge",
+          "q_ps_shell_and_claw"
+        ],
         "greeting": "Straw first, shells second, $N. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds."
       },
       "tidewarden_nel": {
@@ -5269,7 +5361,11 @@
         },
         "facing": 2.356194490192345,
         "color": 3828330,
-        "questIds": ["q_ps_shell_and_claw", "q_ps_mother_of_pearl", "q_ps_the_wreck_line"],
+        "questIds": [
+          "q_ps_shell_and_claw",
+          "q_ps_mother_of_pearl",
+          "q_ps_the_wreck_line"
+        ],
         "greeting": "The tide takes and the tide pays, $N. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path."
       },
       "archivist_maelin_emberward": {
@@ -7173,11 +7269,11 @@
         },
         {
           "x": 11,
-          "z": 687
+          "z": 689
         },
         {
           "x": 33,
-          "z": 690
+          "z": 691.5
         },
         {
           "x": 42,
@@ -11352,211 +11448,310 @@
       "hardness": 0.66
     },
     {
-      "x": 16.029,
-      "z": 675.4083333333333,
-      "radius": 18.17774494144536,
+      "x": 19.792,
+      "z": 680.9231,
+      "radius": 21.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.39486443255566106
+      "hardness": 0.2893405921100779
     },
     {
-      "x": 26.243000000000002,
-      "z": 675.4083333333333,
-      "radius": 18.17774494144536,
+      "x": 27.9632,
+      "z": 680.9231,
+      "radius": 21.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.39486443255566106
+      "hardness": 0.2893405921100779
     },
     {
-      "x": 16.029,
-      "z": 665.321,
-      "radius": 18.17774494144536,
+      "x": 36.1344,
+      "z": 680.9231,
+      "radius": 21.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.39486443255566106
+      "hardness": 0.2893405921100779
     },
     {
-      "x": 26.243000000000002,
-      "z": 665.321,
-      "radius": 18.17774494144536,
+      "x": 19.792,
+      "z": 671.8445,
+      "radius": 21.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.39486443255566106
+      "hardness": 0.2893405921100779
     },
     {
-      "x": 16.029,
-      "z": 655.2336666666667,
-      "radius": 18.17774494144536,
+      "x": 27.9632,
+      "z": 671.8445,
+      "radius": 21.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.39486443255566106
+      "hardness": 0.2893405921100779
     },
     {
-      "x": 26.243000000000002,
-      "z": 655.2336666666667,
-      "radius": 18.17774494144536,
+      "x": 36.1344,
+      "z": 671.8445,
+      "radius": 21.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.39486443255566106
+      "hardness": 0.2893405921100779
     },
     {
-      "x": -16.65,
-      "z": 655.149,
-      "radius": 18.457746179405014,
-      "delta": 9.3,
+      "x": 19.792,
+      "z": 662.7659,
+      "radius": 21.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.24151086140619527
+      "hardness": 0.2893405921100779
     },
     {
-      "x": -22.75,
-      "z": 655.149,
-      "radius": 18.457746179405014,
-      "delta": 9.3,
+      "x": 27.9632,
+      "z": 662.7659,
+      "radius": 21.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.24151086140619527
+      "hardness": 0.2893405921100779
     },
     {
-      "x": -16.65,
-      "z": 661.651,
-      "radius": 18.457746179405014,
-      "delta": 9.3,
+      "x": 36.1344,
+      "z": 662.7659,
+      "radius": 21.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.24151086140619527
+      "hardness": 0.2893405921100779
     },
     {
-      "x": -22.75,
-      "z": 661.651,
-      "radius": 18.457746179405014,
-      "delta": 9.3,
+      "x": 19.792,
+      "z": 653.6873,
+      "radius": 21.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.24151086140619527
+      "hardness": 0.2893405921100779
     },
     {
-      "x": -9.712750000000002,
-      "z": 640.9246666666667,
-      "radius": 16.20434748169468,
-      "delta": 8.6,
+      "x": 27.9632,
+      "z": 653.6873,
+      "radius": 21.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.3828816611531844
+      "hardness": 0.2893405921100779
     },
     {
-      "x": -9.71275,
-      "z": 632.854,
-      "radius": 16.20434748169468,
-      "delta": 8.6,
+      "x": 36.1344,
+      "z": 653.6873,
+      "radius": 21.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.3828816611531844
+      "hardness": 0.2893405921100779
     },
     {
-      "x": -9.712749999999998,
-      "z": 624.7833333333334,
-      "radius": 16.20434748169468,
-      "delta": 8.6,
+      "x": -21.025000000000002,
+      "z": 652.6235,
+      "radius": 20.68661926910752,
+      "delta": 8.8,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.3828816611531844
+      "hardness": 0.3232340278574673
     },
     {
-      "x": -19.13825,
-      "z": 640.9246666666667,
-      "radius": 16.20434748169468,
-      "delta": 8.6,
+      "x": -30.175,
+      "z": 652.6235,
+      "radius": 20.68661926910752,
+      "delta": 8.8,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.3828816611531844
+      "hardness": 0.3232340278574673
     },
     {
-      "x": -19.13825,
-      "z": 632.854,
-      "radius": 16.20434748169468,
-      "delta": 8.6,
+      "x": -21.025000000000002,
+      "z": 662.3765,
+      "radius": 20.68661926910752,
+      "delta": 8.8,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.3828816611531844
+      "hardness": 0.3232340278574673
     },
     {
-      "x": -19.13825,
-      "z": 624.7833333333334,
-      "radius": 16.20434748169468,
-      "delta": 8.6,
+      "x": -30.175,
+      "z": 662.3765,
+      "radius": 20.68661926910752,
+      "delta": 8.8,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.3828816611531844
+      "hardness": 0.3232340278574673
     },
     {
-      "x": 7.164000000000001,
-      "z": 637.8050000000001,
-      "radius": 15.168639763032436,
+      "x": -8.855300000000002,
+      "z": 639.7896,
+      "radius": 17.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4267769777474458
+    },
+    {
+      "x": -8.8553,
+      "z": 630.1048,
+      "radius": 17.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4267769777474458
+    },
+    {
+      "x": -8.855299999999998,
+      "z": 620.42,
+      "radius": 17.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4267769777474458
+    },
+    {
+      "x": -20.1659,
+      "z": 639.7896,
+      "radius": 17.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4267769777474458
+    },
+    {
+      "x": -20.1659,
+      "z": 630.1048,
+      "radius": 17.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4267769777474458
+    },
+    {
+      "x": -20.1659,
+      "z": 620.42,
+      "radius": 17.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4267769777474458
+    },
+    {
+      "x": 7.7321333333333335,
+      "z": 637.927,
+      "radius": 15.861670560893408,
       "delta": 7.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.34074510594080776
+      "hardness": 0.36954938248088604
     },
     {
-      "x": 15.296000000000001,
-      "z": 637.8050000000001,
-      "radius": 15.168639763032436,
+      "x": 15.322,
+      "z": 637.927,
+      "radius": 15.861670560893408,
       "delta": 7.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.34074510594080776
+      "hardness": 0.36954938248088604
     },
     {
-      "x": 7.164000000000001,
-      "z": 631.423,
-      "radius": 15.168639763032436,
+      "x": 22.911866666666665,
+      "z": 637.927,
+      "radius": 15.861670560893408,
       "delta": 7.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.34074510594080776
+      "hardness": 0.36954938248088604
     },
     {
-      "x": 15.296000000000001,
-      "z": 631.423,
-      "radius": 15.168639763032436,
+      "x": 7.7321333333333335,
+      "z": 628.9922,
+      "radius": 15.861670560893408,
       "delta": 7.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.34074510594080776
+      "hardness": 0.36954938248088604
     },
     {
-      "x": 16.8295,
-      "z": 698.7045,
-      "radius": 19.711983704539218,
+      "x": 15.322,
+      "z": 628.9922,
+      "radius": 15.861670560893408,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.36954938248088604
+    },
+    {
+      "x": 22.911866666666665,
+      "z": 628.9922,
+      "radius": 15.861670560893408,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.36954938248088604
+    },
+    {
+      "x": 15.878350000000001,
+      "z": 699.8166,
+      "radius": 18.729993366924607,
       "delta": 10.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.3405027015618728
+      "hardness": 0.30592607560893387
     },
     {
-      "x": 23.4285,
-      "z": 698.7045,
-      "radius": 19.711983704539218,
+      "x": 15.878350000000001,
+      "z": 707.4151,
+      "radius": 18.729993366924607,
       "delta": 10.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.3405027015618728
+      "hardness": 0.30592607560893387
     },
     {
-      "x": 30.027500000000003,
-      "z": 698.7045,
-      "radius": 19.711983704539218,
+      "x": 24.457050000000002,
+      "z": 699.8166,
+      "radius": 18.729993366924607,
       "delta": 10.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.3405027015618728
+      "hardness": 0.30592607560893387
+    },
+    {
+      "x": 24.457050000000002,
+      "z": 707.4151,
+      "radius": 18.729993366924607,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.30592607560893387
+    },
+    {
+      "x": 33.03575,
+      "z": 699.8166,
+      "radius": 18.729993366924607,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.30592607560893387
+    },
+    {
+      "x": 33.03575,
+      "z": 707.4151,
+      "radius": 18.729993366924607,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.30592607560893387
     },
     {
       "x": 0,
@@ -11569,302 +11764,401 @@
     },
     {
       "x": 14,
-      "z": 687.4090909090909,
+      "z": 689.3409090909091,
       "radius": 6,
-      "delta": 10.077685950413219,
+      "delta": 9.587934054207224,
       "falloff": "smooth",
       "mode": "level",
       "gx": 0,
-      "gz": 0.14545454545454542,
+      "gz": 0.15158764371219077,
       "hardness": 0.4
     },
     {
       "x": 22,
-      "z": 688.5,
+      "z": 690.25,
       "radius": 6,
-      "delta": 10.236363636363636,
+      "delta": 9.725741003036484,
       "falloff": "smooth",
       "mode": "level",
       "gx": 0,
-      "gz": 0.14545454545454542,
+      "gz": 0.15158764371219077,
       "hardness": 0.4
     },
     {
       "x": 30,
-      "z": 689.5909090909091,
+      "z": 691.1590909090909,
       "radius": 6,
-      "delta": 10.395041322314054,
+      "delta": 9.863547951865744,
       "falloff": "smooth",
       "mode": "level",
       "gx": 0,
-      "gz": 0.14545454545454542,
+      "gz": 0.15158764371219077,
       "hardness": 0.4
     },
     {
-      "x": 16.029,
-      "z": 675.4083333333333,
-      "radius": 12.177744941445361,
+      "x": 19.792,
+      "z": 680.9231,
+      "radius": 11.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.589414951286822
+      "hardness": 0.5498398188352533
     },
     {
-      "x": 26.243000000000002,
-      "z": 675.4083333333333,
-      "radius": 12.177744941445361,
+      "x": 27.9632,
+      "z": 680.9231,
+      "radius": 11.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.589414951286822
+      "hardness": 0.5498398188352533
     },
     {
-      "x": 16.029,
-      "z": 665.321,
-      "radius": 12.177744941445361,
+      "x": 36.1344,
+      "z": 680.9231,
+      "radius": 11.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.589414951286822
+      "hardness": 0.5498398188352533
     },
     {
-      "x": 26.243000000000002,
-      "z": 665.321,
-      "radius": 12.177744941445361,
+      "x": 19.792,
+      "z": 671.8445,
+      "radius": 11.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.589414951286822
+      "hardness": 0.5498398188352533
     },
     {
-      "x": 16.029,
-      "z": 655.2336666666667,
-      "radius": 12.177744941445361,
+      "x": 27.9632,
+      "z": 671.8445,
+      "radius": 11.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.589414951286822
+      "hardness": 0.5498398188352533
     },
     {
-      "x": 26.243000000000002,
-      "z": 655.2336666666667,
-      "radius": 12.177744941445361,
+      "x": 36.1344,
+      "z": 671.8445,
+      "radius": 11.107157427969252,
       "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.589414951286822
+      "hardness": 0.5498398188352533
     },
     {
-      "x": -16.65,
-      "z": 655.149,
-      "radius": 8.457746179405014,
-      "delta": 9.3,
+      "x": 19.792,
+      "z": 662.7659,
+      "radius": 11.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5270607659354716
+      "hardness": 0.5498398188352533
     },
     {
-      "x": -22.75,
-      "z": 655.149,
-      "radius": 8.457746179405014,
-      "delta": 9.3,
+      "x": 27.9632,
+      "z": 662.7659,
+      "radius": 11.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5270607659354716
+      "hardness": 0.5498398188352533
     },
     {
-      "x": -16.65,
-      "z": 661.651,
-      "radius": 8.457746179405014,
-      "delta": 9.3,
+      "x": 36.1344,
+      "z": 662.7659,
+      "radius": 11.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5270607659354716
+      "hardness": 0.5498398188352533
     },
     {
-      "x": -22.75,
-      "z": 661.651,
-      "radius": 8.457746179405014,
-      "delta": 9.3,
+      "x": 19.792,
+      "z": 653.6873,
+      "radius": 11.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5270607659354716
+      "hardness": 0.5498398188352533
     },
     {
-      "x": -9.712750000000002,
-      "z": 640.9246666666667,
-      "radius": 11.204347481694679,
-      "delta": 8.6,
+      "x": 27.9632,
+      "z": 653.6873,
+      "radius": 11.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5537446506216585
+      "hardness": 0.5498398188352533
     },
     {
-      "x": -9.71275,
-      "z": 632.854,
-      "radius": 11.204347481694679,
-      "delta": 8.6,
+      "x": 36.1344,
+      "z": 653.6873,
+      "radius": 11.107157427969252,
+      "delta": 9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5537446506216585
+      "hardness": 0.5498398188352533
     },
     {
-      "x": -9.712749999999998,
-      "z": 624.7833333333334,
-      "radius": 11.204347481694679,
-      "delta": 8.6,
+      "x": -21.025000000000002,
+      "z": 652.6235,
+      "radius": 10.68661926910752,
+      "delta": 8.8,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5537446506216585
+      "hardness": 0.625700149011292
     },
     {
-      "x": -19.13825,
-      "z": 640.9246666666667,
-      "radius": 11.204347481694679,
-      "delta": 8.6,
+      "x": -30.175,
+      "z": 652.6235,
+      "radius": 10.68661926910752,
+      "delta": 8.8,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5537446506216585
+      "hardness": 0.625700149011292
     },
     {
-      "x": -19.13825,
-      "z": 632.854,
-      "radius": 11.204347481694679,
-      "delta": 8.6,
+      "x": -21.025000000000002,
+      "z": 662.3765,
+      "radius": 10.68661926910752,
+      "delta": 8.8,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5537446506216585
+      "hardness": 0.625700149011292
     },
     {
-      "x": -19.13825,
-      "z": 624.7833333333334,
-      "radius": 11.204347481694679,
-      "delta": 8.6,
+      "x": -30.175,
+      "z": 662.3765,
+      "radius": 10.68661926910752,
+      "delta": 8.8,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.5537446506216585
+      "hardness": 0.625700149011292
     },
     {
-      "x": 7.164000000000001,
-      "z": 637.8050000000001,
-      "radius": 9.168639763032436,
+      "x": -8.855300000000002,
+      "z": 639.7896,
+      "radius": 12.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5982392264574229
+    },
+    {
+      "x": -8.8553,
+      "z": 630.1048,
+      "radius": 12.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5982392264574229
+    },
+    {
+      "x": -8.855299999999998,
+      "z": 620.42,
+      "radius": 12.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5982392264574229
+    },
+    {
+      "x": -20.1659,
+      "z": 639.7896,
+      "radius": 12.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5982392264574229
+    },
+    {
+      "x": -20.1659,
+      "z": 630.1048,
+      "radius": 12.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5982392264574229
+    },
+    {
+      "x": -20.1659,
+      "z": 620.42,
+      "radius": 12.445216978033613,
+      "delta": 8.8,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5982392264574229
+    },
+    {
+      "x": 7.7321333333333335,
+      "z": 637.927,
+      "radius": 9.861670560893408,
       "delta": 7.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.563730269333099
+      "hardness": 0.5943892086740298
     },
     {
-      "x": 15.296000000000001,
-      "z": 637.8050000000001,
-      "radius": 9.168639763032436,
+      "x": 15.322,
+      "z": 637.927,
+      "radius": 9.861670560893408,
       "delta": 7.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.563730269333099
+      "hardness": 0.5943892086740298
     },
     {
-      "x": 7.164000000000001,
-      "z": 631.423,
-      "radius": 9.168639763032436,
+      "x": 22.911866666666665,
+      "z": 637.927,
+      "radius": 9.861670560893408,
       "delta": 7.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.563730269333099
+      "hardness": 0.5943892086740298
     },
     {
-      "x": 15.296000000000001,
-      "z": 631.423,
-      "radius": 9.168639763032436,
+      "x": 7.7321333333333335,
+      "z": 628.9922,
+      "radius": 9.861670560893408,
       "delta": 7.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.563730269333099
+      "hardness": 0.5943892086740298
     },
     {
-      "x": 16.8295,
-      "z": 698.7045,
-      "radius": 10.711983704539218,
+      "x": 15.322,
+      "z": 628.9922,
+      "radius": 9.861670560893408,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5943892086740298
+    },
+    {
+      "x": 22.911866666666665,
+      "z": 628.9922,
+      "radius": 9.861670560893408,
+      "delta": 7.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5943892086740298
+    },
+    {
+      "x": 15.878350000000001,
+      "z": 699.8166,
+      "radius": 9.729993366924607,
       "delta": 10.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.6265864371782982
+      "hardness": 0.5889000280722397
     },
     {
-      "x": 23.4285,
-      "z": 698.7045,
-      "radius": 10.711983704539218,
+      "x": 15.878350000000001,
+      "z": 707.4151,
+      "radius": 9.729993366924607,
       "delta": 10.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.6265864371782982
+      "hardness": 0.5889000280722397
     },
     {
-      "x": 30.027500000000003,
-      "z": 698.7045,
-      "radius": 10.711983704539218,
+      "x": 24.457050000000002,
+      "z": 699.8166,
+      "radius": 9.729993366924607,
       "delta": 10.6,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.6265864371782982
+      "hardness": 0.5889000280722397
+    },
+    {
+      "x": 24.457050000000002,
+      "z": 707.4151,
+      "radius": 9.729993366924607,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5889000280722397
+    },
+    {
+      "x": 33.03575,
+      "z": 699.8166,
+      "radius": 9.729993366924607,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5889000280722397
+    },
+    {
+      "x": 33.03575,
+      "z": 707.4151,
+      "radius": 9.729993366924607,
+      "delta": 10.6,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5889000280722397
     }
   ],
   "placements": [
     {
       "assetId": "tidehold/highwatch/tavern_b",
-      "x": 22,
-      "z": 666.4,
+      "x": 29,
+      "z": 668.6,
       "rotY": 1.5707963267948966,
-      "scale": 13.755454545454544,
+      "scale": 16.506545454545453,
       "collide": true,
       "worldPropKind": "inn",
       "worldPropWidth": 1.8902,
       "worldPropDepth": 1.0905,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.25,
       "name": "Highwatch summit inn"
     },
     {
       "assetId": "tidehold/highwatch/hall",
-      "x": -12.5,
-      "z": 632.6,
+      "x": -12.2,
+      "z": 629.8,
       "rotY": 3.141592653589793,
-      "scale": 13.863545454545454,
+      "scale": 16.63625454545454,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.25,
       "name": "Highwatch gate chapel"
     },
     {
       "assetId": "tidehold/highwatch/shop_a",
-      "x": -20.5,
-      "z": 658.4,
+      "x": -26.8,
+      "z": 657.5,
       "rotY": -1.5707963267948966,
-      "scale": 7.399863636363635,
+      "scale": 11.099795454545452,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.55,
       "name": "Highwatch counting house"
     },
     {
       "assetId": "tidehold/highwatch/house_c",
-      "x": 11,
-      "z": 635,
+      "x": 15,
+      "z": 634,
       "rotY": 1.5707963267948966,
-      "scale": 8.900181818181817,
+      "scale": 12.460254545454545,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.45,
       "name": "Highwatch watch house"
     },
     {
       "assetId": "tidehold/highwatch/smithy",
       "x": 20,
-      "z": 699,
+      "z": 704,
       "rotY": 0,
-      "scale": 8.998636363636363,
+      "scale": 11.698227272727271,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.35,
       "name": "Highwatch smithy"
     },
     {
