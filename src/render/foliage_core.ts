@@ -8,6 +8,7 @@ import {
   onWildheartBasinEntranceCauseway,
   WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
 } from '../sim/wildheart_basin_entrance';
+import { onHighwatchManorLane } from './highwatch_manor_lane_core';
 
 /** The foliage placement hash: a deterministic [0, 1) value per (a, b, salt k).
  *  Shared by foliage.ts and the dressing-spot generator (foliage_dressing_spots.ts). */
@@ -85,13 +86,15 @@ function activeWorldStandsManor(): boolean {
   return stands;
 }
 
-/** True inside the Highwatch manor's reach while the active world stands it. */
+/** True inside the Highwatch manor's reach, or on its lane's paving from the road to the
+ *  gate (highwatch_manor_lane_core.ts), while the active world stands it. */
 export function insideHighwatchManorGround(x: number, z: number): boolean {
   if (!MANOR) return false;
   const reach = MANOR.reach;
   if (
-    Math.abs(x - reach.center.x) > reach.halfWidth ||
-    Math.abs(z - reach.center.z) > reach.halfDepth
+    (Math.abs(x - reach.center.x) > reach.halfWidth ||
+      Math.abs(z - reach.center.z) > reach.halfDepth) &&
+    !onHighwatchManorLane(x, z)
   ) {
     return false;
   }

@@ -50,6 +50,7 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
+import { buildHighwatchManorLane, highwatchManorLanePrewarmPart } from './highwatch_manor_lane';
 import { highwatchManorFlames, highwatchManorLights } from './highwatch_manor_lights';
 import {
   buildHighwatchManorSmoke,
@@ -1067,6 +1068,7 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     ...wickharborWharfPrewarmParts(),
     ...wickharborHarborPrewarmParts(),
     highwatchManorSmokePrewarmPart(),
+    highwatchManorLanePrewarmPart(),
   ]) {
     const mesh = new THREE.Mesh(part.geometry, part.material);
     mesh.castShadow = true;
@@ -1760,6 +1762,10 @@ export function buildProps(
       group.add(light);
       fireLights.push(light);
     }
+    // ...its lane from the Sanctum road to the garden gate (paving, not a road record)
+    const lane = buildHighwatchManorLane(seed);
+    group.add(lane);
+    keepFromMerge.add(lane);
     // ...and its kitchen chimney's smoke (cosmetic: the painter draws none on the low tier)
     manorSmoke = buildHighwatchManorSmoke(seed);
     group.add(manorSmoke.mesh);
