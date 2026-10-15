@@ -48,6 +48,7 @@ import {
 } from './data';
 import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
+import { dungeonDoorPos } from './moved_objects';
 import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import {
@@ -131,7 +132,8 @@ function ghostGraveyard(
   if (bgMatch) return bgGraveyardSpot(bgMatch, p.id);
   const dungeon = dungeonAt(p.pos.x);
   if (dungeon) {
-    return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z, graveyards, fallback);
+    const door = dungeonDoorPos(ctx.objectMoves, dungeon);
+    return nearestOverworldGraveyard(door.x, door.z, graveyards, fallback);
   }
   const delve = ctx.delveRunForPlayer(p.id);
   if (delve && isDelvePos(p.pos.x)) {

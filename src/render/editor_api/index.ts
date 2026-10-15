@@ -5,3 +5,4 @@ export {
   type RendererEditorHost,
   type TerrainRegion,
 } from './editor_api';
+export type { MovedObjectPreview } from './moved_object_preview';

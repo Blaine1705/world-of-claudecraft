@@ -10849,6 +10849,18 @@ export const zh_CN: EnTranslations = {
       "deleteTitle": "Remove this location",
       "hideBoxes": "Hide area boxes"
     },
+    "objectMove": {
+      "title": "游戏物件",
+      "kindFarmBed": "农田苗床",
+      "kindPracticeDummy": "训练假人",
+      "kindGatherNode": "采集点",
+      "kindDungeonDoor": "地下城入口",
+      "position": "位置：{x}, {z}",
+      "moved": "已在此地图中移动。",
+      "original": "位于原始位置。",
+      "hint": "拖动它，或用方向键微调。移动只作用于此地图，物件保持原有身份，因此已保存的进度仍能找到它。",
+      "reset": "重置到原始位置"
+    },
     "lightTool": {
       "title": "Point Lights",
       "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",

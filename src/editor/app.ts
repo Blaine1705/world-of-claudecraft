@@ -480,6 +480,8 @@ import {
 } from './model';
 import { EditorApiError, forkMap, type MapFullWire, signedIn, uploadAsset } from './net';
 import { newMapSizeDialog } from './new_map_dialog';
+import { ObjectMoveController } from './object_move_controller';
+import { buildObjectMovePanel } from './object_move_panel';
 import { parseMap, serializeMapCompact } from './persist';
 import { applyScaleEqualize, type EqualizePlan, planScaleEqualize } from './placement_scale_core';
 import {
@@ -580,6 +582,7 @@ import {
   promoteStreetlamps,
   promoteWillows,
   repairDecorBuildingCollision,
+  repairLegacyWorldPropFit,
   repairStretchedWorldProps,
   withoutEditableWorldProps,
   withoutMajorWorldProps,
@@ -1150,6 +1153,29 @@ export class EditorApp {
   // Wheel/nudge bursts coalesce into ONE undo commit (against placementDragBase).
   private readonly transformCoalescer = new CommitCoalescer();
   private transformTimer = 0;
+  /** Select-mode moving of the built-in gameplay objects a map can move
+   *  (farm beds, practice dummies, gather nodes, dungeon doors). */
+  private readonly objectMoves = new ObjectMoveController({
+    getMoves: () => this.map.objectMoves,
+    setMoves: (next) => {
+      if (next) this.map.objectMoves = next;
+      else delete this.map.objectMoves;
+      if (next) this.activeWorld.objectMoves = next;
+      else delete this.activeWorld.objectMoves;
+    },
+    moveLive: (key, before, after) => {
+      this.viewport3d?.setSimObjectMoves(after);
+      this.viewport3d?.objects.moveLive(key, before, after);
+    },
+    showSelection: (key) => this.viewport3d?.objects.setSelected(key),
+    pushUndo: (entry) => this.pushUndo(entry),
+    committed: () => {
+      invalidateStaticColliders();
+      this.map.meta.updatedAt = now();
+      this.markDirty();
+      this.inspector.refresh();
+    },
+  });
   // A 3D drag-move is in flight: single-key tool shortcuts stay suppressed.
   private placementDragging = false;
   // Preview mode (topbar toggle): in-game look, editor overlays hidden.
@@ -1464,6 +1490,7 @@ export class EditorApp {
     promoteWillows(this.map as CustomMap);
     promoteFarshorePalms(this.map as CustomMap);
     promoteFeatureDressing(this.map as CustomMap);
+    repairLegacyWorldPropFit(this.map as CustomMap);
     repairStretchedWorldProps(this.map);
     repairPlacedAssetShapes(this.map);
     repairMissingTreeCollision(this.map, applyDefaultCollision);
@@ -1680,24 +1707,41 @@ export class EditorApp {
       error: (message) => this.toasts.error(message),
     });
     this.buildTransformControls = new BuildTransformControls({
-      getState: () => ({
-        transform:
-          isSelectionTool(this.tool) && this.selectedPlacement !== null
-            ? (this.map.placements[this.selectedPlacement] ?? null)
-            : this.buildingWorkspace.active
-              ? this.buildingWorkspace.transform
-              : this.placeAssetId
-                ? {
-                    rotY: this.tool === 'city' ? this.cityKitRot : this.placeRotation,
-                    scale: this.tool === 'city' ? this.citySettings.kitScale : this.placeScale,
-                  }
-                : null,
-        fineRotation: this.fineBuildRotation,
-        canUndo: this.undo.canUndo,
-        canRedo: this.undo.canRedo,
-      }),
+      getState: () => {
+        const npcKey = this.transformableNpcKey();
+        if (npcKey !== null) {
+          const npc = this.map.content.npcs[npcKey.slice('npc:'.length)];
+          return {
+            transform: npc ? { rotY: npc.facing, scale: 1 } : null,
+            rotateOnly: true,
+            fineRotation: this.fineBuildRotation,
+            canUndo: this.undo.canUndo,
+            canRedo: this.undo.canRedo,
+          };
+        }
+        return {
+          transform:
+            isSelectionTool(this.tool) && this.selectedPlacement !== null
+              ? (this.map.placements[this.selectedPlacement] ?? null)
+              : this.buildingWorkspace.active
+                ? this.buildingWorkspace.transform
+                : this.placeAssetId
+                  ? {
+                      rotY: this.tool === 'city' ? this.cityKitRot : this.placeRotation,
+                      scale: this.tool === 'city' ? this.citySettings.kitScale : this.placeScale,
+                    }
+                  : null,
+          fineRotation: this.fineBuildRotation,
+          canUndo: this.undo.canUndo,
+          canRedo: this.undo.canRedo,
+        };
+      },
       onTransform: (next) => {
-        if (isSelectionTool(this.tool) && this.selectedPlacement !== null) {
+        const npcKey = this.transformableNpcKey();
+        if (npcKey !== null) {
+          this.updateNpcFacing(npcKey, next.rotY, true);
+          this.inspector.refresh();
+        } else if (isSelectionTool(this.tool) && this.selectedPlacement !== null) {
           this.updateSelectedPlacement(next, true);
           this.inspector.refresh();
         } else if (this.buildingWorkspace.active) this.buildingWorkspace.setTransform(next);
@@ -2224,6 +2268,9 @@ export class EditorApp {
       promotedScenery: promotedSceneryFor(map.propsMode, map.placements, map.promotedScenery),
     };
     if (map.playerSpawnArea) world.playerSpawnArea = { ...map.playerSpawnArea };
+    // Moved gameplay objects: the same frozen record the document holds, so
+    // the viewport's Sim, colliders and renderer read the live edits.
+    if (map.objectMoves) world.objectMoves = map.objectMoves;
     if (map.blockers) world.blockers = map.blockers;
     if (map.caves) world.caves = map.caves;
     if (map.holes) world.holes = map.holes;
@@ -2463,6 +2510,9 @@ export class EditorApp {
         onMobDragStart: (id) => this.beginMobDrag(id),
         onMobDragMove: (w) => this.mobSelectDragMove(w),
         onMobDragEnd: () => this.endMobDrag(),
+        onObjectDragStart: (key) => this.beginObjectDrag(key),
+        onObjectDragMove: (w) => this.objectMoves.dragMove(w),
+        onObjectDragEnd: () => this.objectMoves.endDrag(),
         onBoxSelect: (indices, additive) => this.selectPlacements(indices, additive),
         onTransformWheel: (kind, deltaY) => this.transformWheel(kind, deltaY),
         onFlySpeedWheel: (deltaY) => this.flySpeedWheel(deltaY),
@@ -3792,6 +3842,8 @@ export class EditorApp {
     // NPCs select like placements: a pixel-precise body hit wins outright
     // (beating a nearby placement's slack radius); the loose projected pass
     // only runs after placements miss.
+    const objectDirect = additive ? null : this.viewport3d.objects.pick(clientX, clientY, true);
+    if (objectDirect !== null && this.selectObject(objectDirect)) return;
     const npcDirect = this.viewport3d.pickRuntimeNpc(clientX, clientY, true);
     if (npcDirect !== null && this.selectNpcFromTap(npcDirect, additive)) return;
     const mobDirect = this.viewport3d.pickRuntimeMob(clientX, clientY, true);
@@ -3819,10 +3871,13 @@ export class EditorApp {
     if (idx === null) {
       const npcLoose = this.viewport3d.pickRuntimeNpc(clientX, clientY);
       if (npcLoose !== null && this.selectNpcFromTap(npcLoose, false)) return;
+      const objectLoose = this.viewport3d.objects.pick(clientX, clientY, false);
+      if (objectLoose !== null && this.selectObject(objectLoose)) return;
       const mobLoose = this.viewport3d.pickRuntimeMob(clientX, clientY);
       if (mobLoose !== null && this.selectMobFromTap(mobLoose.id, false)) return;
     }
     if (this.selectedNpcKeys.size > 0) this.clearNpcSelection();
+    this.objectMoves.select(null);
     if (this.selectedMobIds.size > 0) {
       this.clearMobSelection();
       this.syncSelectedMobRouteOverlay();
@@ -3847,6 +3902,7 @@ export class EditorApp {
     if (!npc) return false;
     this.flushTransformCommit();
     this.setSelectedPlacement(null);
+    this.objectMoves.select(null);
     if (this.selectedLight !== null) this.setSelectedLight(null);
     this.selectedNpcKeys = toggledKeySelection(this.selectedNpcKeys, key, additive);
     this.selectedKey = this.selectedNpcKeys.has(key)
@@ -3856,6 +3912,31 @@ export class EditorApp {
     this.inspector.refresh();
     this.canvasDirty = true;
     return true;
+  }
+
+  /** Select one movable gameplay object (a tap or a drag start): every other
+   *  selection clears first, the way picking an NPC clears placements. */
+  private selectObject(key: string): boolean {
+    this.flushTransformCommit();
+    this.setSelectedPlacement(null);
+    this.clearNpcSelection();
+    if (this.selectedMobIds.size > 0) {
+      this.clearMobSelection();
+      this.syncSelectedMobRouteOverlay();
+    }
+    if (this.selectedLight !== null) this.setSelectedLight(null);
+    if (this.selectedSound !== null) this.setSelectedSound(null);
+    this.selectedCamp = null;
+    this.selectedKey = null;
+    this.objectMoves.select(key);
+    this.inspector.refresh();
+    return this.objectMoves.selectedKey === key;
+  }
+
+  /** A 3D left-press landed on a movable gameplay object; claim it in Select mode. */
+  private beginObjectDrag(key: string): boolean {
+    if (!isSelectionTool(this.tool) || !this.selectObject(key)) return false;
+    return this.objectMoves.beginDrag(key);
   }
 
   // ---- sculpt strokes --------------------------------------------------------------
@@ -6643,6 +6724,7 @@ export class EditorApp {
   private setSelectedLight(index: number | null): void {
     if (index !== null) {
       this.setSelectedPlacement(null);
+      this.objectMoves.select(null);
       if (this.selectedSound !== null) {
         this.selectedSound = null;
         this.viewport3d?.setSelectedSound(null);
@@ -6853,6 +6935,7 @@ export class EditorApp {
   private setSelectedSound(index: number | null): void {
     if (index !== null) {
       this.setSelectedPlacement(null);
+      this.objectMoves.select(null);
       if (this.selectedLight !== null) {
         this.selectedLight = null;
         this.viewport3d?.setSelectedLight(null);
@@ -13087,6 +13170,7 @@ export class EditorApp {
     if (!npc) return false;
     this.flushTransformCommit();
     this.setSelectedPlacement(null);
+    this.objectMoves.select(null);
     if (!this.selectedNpcKeys.has(key)) {
       // Dragging an unselected NPC selects just it; dragging a member of the
       // multi-selection keeps the group and moves it together.
@@ -13357,7 +13441,10 @@ export class EditorApp {
       return;
     }
     if (this.selectedNpcDefs().length === 0) {
-      if (this.selectedMobCamps.size === 0) return;
+      if (this.selectedMobCamps.size === 0) {
+        if (this.objectMoves.nudge(d.dx, d.dz)) this.scheduleTransformCommit();
+        return;
+      }
       // Mob volley: same debounced one-undo contract as NPCs below.
       if (!this.mobMoveState) {
         this.mobMoveState = {
@@ -13406,6 +13493,7 @@ export class EditorApp {
         // no base is open, drags commit on release instead).
         this.commitNpcMove();
         this.commitMobMove();
+        this.objectMoves.commitPending();
         this.inspector.refresh();
       }
     }, this.transformCoalescer.windowMs);
@@ -13419,6 +13507,7 @@ export class EditorApp {
     this.updateSelectedPlacement({}, true);
     this.commitNpcMove();
     this.commitMobMove();
+    this.objectMoves.commitPending();
   }
 
   private copySelection(): void {
@@ -14051,6 +14140,7 @@ export class EditorApp {
   private clearNpcSelection(): void {
     // An open Select-mode move burst commits before the selection vanishes.
     this.commitNpcMove();
+    this.objectMoves.select(null);
     this.selectedNpcKeys.clear();
     this.npcDragBase = null;
     this.viewport3d?.setSelectedRuntimeNpcs(this.selectedNpcKeys);
@@ -14070,6 +14160,15 @@ export class EditorApp {
       this.syncFootprintOverlay();
       this.viewport3d?.setSelectedRuntimeNpcs(this.selectedNpcKeys);
     });
+  }
+
+  /** The one NPC the Select-mode rotate controls turn: exactly one selected
+   *  map NPC and no selected placement (a placement keeps the controls). */
+  private transformableNpcKey(): string | null {
+    if (!isSelectionTool(this.tool) || this.selectedPlacement !== null) return null;
+    if (this.selectedNpcKeys.size !== 1) return null;
+    const [key] = this.selectedNpcKeys;
+    return key.startsWith('npc:') && this.map.content.npcs[key.slice('npc:'.length)] ? key : null;
   }
 
   /** Live-facing slider for selected NPCs, committed as one undo entry. */
@@ -15044,6 +15143,7 @@ export class EditorApp {
     this.buildingWorkspace?.cancel();
     // An open transform burst commits first, so Ctrl+Z reverts THAT burst.
     this.flushTransformCommit();
+    this.objectMoves.commitPending();
     if (this.undo.undo()) {
       this.markDirty();
       this.inspector.refresh();
@@ -15054,6 +15154,7 @@ export class EditorApp {
   private doRedo(): void {
     this.buildingWorkspace?.cancel();
     this.flushTransformCommit();
+    this.objectMoves.commitPending();
     if (this.undo.redo()) {
       this.markDirty();
       this.inspector.refresh();
@@ -15972,6 +16073,7 @@ export class EditorApp {
 
   // Replace the whole working document and rebuild the editor over its content.
   private loadMap(map: CustomMap, options: { preserveViewportTerrain?: boolean } = {}): boolean {
+    this.objectMoves.select(null);
     // Collision Master may reuse the already-running world renderer. In that
     // case keep the globally active terrain content on the return map too;
     // the scratch placement is detached and never needs to replace it.
@@ -16009,6 +16111,7 @@ export class EditorApp {
     promoteFarshorePalms(map as CustomMap);
     promoteFeatureDressing(map as CustomMap);
     repairDecorBuildingCollision(map);
+    repairLegacyWorldPropFit(map as CustomMap);
     repairStretchedWorldProps(map);
     repairPlacedAssetShapes(map);
     repairMissingTreeCollision(map, applyDefaultCollision);
@@ -16343,7 +16446,8 @@ export class EditorApp {
         this.selectedNpcKeys.size > 0 ||
         this.selectedMobIds.size > 0 ||
         this.selectedLight !== null ||
-        this.selectedMusicArea !== null
+        this.selectedMusicArea !== null ||
+        this.objectMoves.selectedKey !== null
       ) {
         this.setSelectedPlacement(null);
         this.selectedKey = null;
@@ -16383,7 +16487,8 @@ export class EditorApp {
         ev.key === 'ArrowRight') &&
       (this.selectedPlacement !== null ||
         this.selectedNpcDefs().length > 0 ||
-        this.selectedMobCamps.size > 0)
+        this.selectedMobCamps.size > 0 ||
+        this.objectMoves.selectedKey !== null)
     ) {
       ev.preventDefault();
       this.nudgeSelected(ev.key, ev.shiftKey);
@@ -16817,6 +16922,12 @@ export class EditorApp {
       },
       getMapLights: () => this.map.lights ?? [],
       getSelectedLight: () => this.selectedLight,
+      movedObjectPanel: () =>
+        buildObjectMovePanel({
+          selectedKey: () => this.objectMoves.selectedKey,
+          moves: () => this.map.objectMoves,
+          reset: () => this.objectMoves.resetSelected(),
+        }),
       setSelectedLight: (index) => this.setSelectedLight(index),
       updateMapLight: (index, change) => {
         const l = this.map.lights?.[index];

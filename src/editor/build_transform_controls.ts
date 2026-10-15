@@ -13,6 +13,8 @@ import './build_transform_controls.css';
 
 export interface BuildTransformControlsState {
   transform: BuildTransformState | null;
+  /** The target turns but has no size (a selected NPC): resize stands down. */
+  rotateOnly?: boolean;
   fineRotation: boolean;
   canUndo: boolean;
   canRedo: boolean;
@@ -30,7 +32,7 @@ export class BuildTransformControls {
   readonly root: HTMLElement;
   private readonly readout: HTMLElement;
   private readonly fineRotation: HTMLInputElement;
-  private readonly transformButtons: HTMLButtonElement[] = [];
+  private readonly transformButtons = new Map<BuildTransformAction, HTMLButtonElement>();
   private readonly undo: HTMLButtonElement;
   private readonly redo: HTMLButtonElement;
 
@@ -89,13 +91,13 @@ export class BuildTransformControls {
     const control = button(label, () => this.apply(action));
     control.setAttribute(FOCUS_KEY_ATTR, `transform:${action}`);
     control.setAttribute('aria-keyshortcuts', shortcut);
-    this.transformButtons.push(control);
+    this.transformButtons.set(action, control);
     return control;
   }
 
   private apply(action: BuildTransformAction): boolean {
-    const { transform, fineRotation } = this.deps.getState();
-    if (!transform) return false;
+    const { transform, fineRotation, rotateOnly } = this.deps.getState();
+    if (!transform || (rotateOnly && isResize(action))) return false;
     const next = applyBuildTransform(transform, action, fineRotation);
     // A press at the scale limit must not create an empty undo entry.
     if (next.rotY !== transform.rotY || next.scale !== transform.scale) {
@@ -110,7 +112,9 @@ export class BuildTransformControls {
     this.undo.disabled = !state.canUndo;
     this.redo.disabled = !state.canRedo;
     this.fineRotation.checked = state.fineRotation;
-    for (const control of this.transformButtons) control.disabled = !state.transform;
+    for (const [action, control] of this.transformButtons) {
+      control.disabled = !state.transform || (state.rotateOnly === true && isResize(action));
+    }
     this.readout.textContent = state.transform
       ? t('editor.buildMode.transformReadout', {
           degrees: formatNumber((state.transform.rotY * 180) / Math.PI, {
@@ -142,4 +146,8 @@ export class BuildTransformControls {
     event.stopPropagation();
     return true;
   }
+}
+
+function isResize(action: BuildTransformAction): boolean {
+  return action === 'smaller' || action === 'larger';
 }

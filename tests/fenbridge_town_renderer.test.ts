@@ -1203,6 +1203,44 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(overlay.visible).toBe(false);
   });
 
+  it('stands the square dressing down for a document that owns it as placements', () => {
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      placements: [],
+      promotedScenery: { authoredTownDressing: true },
+    });
+    try {
+      const view = fenbridgeTownInternalsForTest.buildFromSources(
+        fixtureSources(),
+        () => 1.2,
+        true,
+      );
+      // the cistern, the provision stall and the muster board are the whole
+      // micro batch, and the boardwalk planks their own instanced set
+      for (const name of [
+        'fenbridgeTownMicroOpaqueBatch',
+        'fenbridgeTownMicroEmissiveBatch',
+        'fenbridgeTownBoardwalkOpaqueInstances',
+        'fenbridgeTownBoardwalkEmissiveInstances',
+      ]) {
+        expect(view.group.getObjectByName(name), name).toBeUndefined();
+      }
+    } finally {
+      setActiveWorldContent(null);
+    }
+    const shipped = fenbridgeTownInternalsForTest.buildFromSources(
+      fixtureSources(),
+      () => 1.2,
+      true,
+    );
+    expect(shipped.group.getObjectByName('fenbridgeTownMicroOpaqueBatch')).toBeInstanceOf(
+      THREE.Mesh,
+    );
+    expect(shipped.group.getObjectByName('fenbridgeTownBoardwalkOpaqueInstances')).toBeInstanceOf(
+      THREE.InstancedMesh,
+    );
+  });
+
   it('omits muster-board overlay evidence when the active-world service is absent', () => {
     setActiveWorldContent({
       ...BUILTIN_WORLD,

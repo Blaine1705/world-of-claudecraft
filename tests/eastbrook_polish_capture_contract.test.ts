@@ -679,6 +679,8 @@ interface AttributionTargetFixture {
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
+  // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -715,7 +717,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // authoritative layout's six building rows and the town runtime leaf moved.
   // No capture was retaken.
   // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
-  'fc42d555d2ae65108aaa79aea5094308a5985022d4939bc1a11a60d4ad1a405b';
+  // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
+  // integration (town dressing + gameplay objects over #4507). No capture was retaken.
+  'f730059759e29f6116e528853e94fb8003bd821bcaff27cf0e12ef1b44731805';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

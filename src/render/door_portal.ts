@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
 import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../sim/forgefather_fortress';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
@@ -1015,7 +1015,7 @@ export function doorArchAuthoredElsewhere(
   // the moment a castle_door is baked into the fortress table AT the keep
   // door; one placed elsewhere is some other site's gate).
   if (dungeonId === 'the_last_keep') {
-    const door = DUNGEONS.the_last_keep.doorPos;
+    const door = activeDungeonDoorPos(DUNGEONS.the_last_keep);
     return placements.some(
       (p) =>
         p.key === 'castle_door' &&
