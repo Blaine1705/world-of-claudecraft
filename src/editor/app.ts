@@ -1680,24 +1680,41 @@ export class EditorApp {
       error: (message) => this.toasts.error(message),
     });
     this.buildTransformControls = new BuildTransformControls({
-      getState: () => ({
-        transform:
-          isSelectionTool(this.tool) && this.selectedPlacement !== null
-            ? (this.map.placements[this.selectedPlacement] ?? null)
-            : this.buildingWorkspace.active
-              ? this.buildingWorkspace.transform
-              : this.placeAssetId
-                ? {
-                    rotY: this.tool === 'city' ? this.cityKitRot : this.placeRotation,
-                    scale: this.tool === 'city' ? this.citySettings.kitScale : this.placeScale,
-                  }
-                : null,
-        fineRotation: this.fineBuildRotation,
-        canUndo: this.undo.canUndo,
-        canRedo: this.undo.canRedo,
-      }),
+      getState: () => {
+        const npcKey = this.transformableNpcKey();
+        if (npcKey !== null) {
+          const npc = this.map.content.npcs[npcKey.slice('npc:'.length)];
+          return {
+            transform: npc ? { rotY: npc.facing, scale: 1 } : null,
+            rotateOnly: true,
+            fineRotation: this.fineBuildRotation,
+            canUndo: this.undo.canUndo,
+            canRedo: this.undo.canRedo,
+          };
+        }
+        return {
+          transform:
+            isSelectionTool(this.tool) && this.selectedPlacement !== null
+              ? (this.map.placements[this.selectedPlacement] ?? null)
+              : this.buildingWorkspace.active
+                ? this.buildingWorkspace.transform
+                : this.placeAssetId
+                  ? {
+                      rotY: this.tool === 'city' ? this.cityKitRot : this.placeRotation,
+                      scale: this.tool === 'city' ? this.citySettings.kitScale : this.placeScale,
+                    }
+                  : null,
+          fineRotation: this.fineBuildRotation,
+          canUndo: this.undo.canUndo,
+          canRedo: this.undo.canRedo,
+        };
+      },
       onTransform: (next) => {
-        if (isSelectionTool(this.tool) && this.selectedPlacement !== null) {
+        const npcKey = this.transformableNpcKey();
+        if (npcKey !== null) {
+          this.updateNpcFacing(npcKey, next.rotY, true);
+          this.inspector.refresh();
+        } else if (isSelectionTool(this.tool) && this.selectedPlacement !== null) {
           this.updateSelectedPlacement(next, true);
           this.inspector.refresh();
         } else if (this.buildingWorkspace.active) this.buildingWorkspace.setTransform(next);
@@ -14070,6 +14087,15 @@ export class EditorApp {
       this.syncFootprintOverlay();
       this.viewport3d?.setSelectedRuntimeNpcs(this.selectedNpcKeys);
     });
+  }
+
+  /** The one NPC the Select-mode rotate controls turn: exactly one selected
+   *  map NPC and no selected placement (a placement keeps the controls). */
+  private transformableNpcKey(): string | null {
+    if (!isSelectionTool(this.tool) || this.selectedPlacement !== null) return null;
+    if (this.selectedNpcKeys.size !== 1) return null;
+    const [key] = this.selectedNpcKeys;
+    return key.startsWith('npc:') && this.map.content.npcs[key.slice('npc:'.length)] ? key : null;
   }
 
   /** Live-facing slider for selected NPCs, committed as one undo entry. */
