@@ -6,10 +6,13 @@
 // Pure and DOM-free; it returns the kind, the line and the bar, and the Sanctum
 // view dresses them.
 //
-// Priority: standing in the painted Trample lane; standing in soulfire; the
-// Tusker stuck in the ice (the damage window); a Trample that will end in an
-// outcrop (you are clear of it); and, for the first seconds of a pull while an
-// outcrop still stands, the one-line lesson of the bait.
+// Priority: you are the Trample's target while its lane still follows you
+// (the main teaching: lead the charge into an ice outcrop, then step aside;
+// its bar counts down to the lock); standing in the painted Trample lane;
+// standing in soulfire; the Tusker stuck in the ice (the damage window); a
+// Trample that will end in an outcrop (you are clear of it); and, for the
+// first seconds of a pull while an outcrop still stands, the one-line lesson
+// of the bait.
 
 import {
   SANCTUM_ICE_OUTCROP,
@@ -19,13 +22,20 @@ import {
   TUSKER_STUCK_EXPOSED,
   TUSKER_TRAMPLE,
 } from '../../../sim/encounters/gravewyrm_sanctum/ids';
-import { inTrail } from '../../../sim/encounters/gravewyrm_sanctum/tusker_road';
+import { inTrail, trampleAimLocked } from '../../../sim/encounters/gravewyrm_sanctum/tusker_road';
 import { planTrampleLaneWorld } from '../../../sim/encounters/gravewyrm_sanctum/tusker_road_world';
 import { formatNumber, t } from '../../i18n';
 
-export type TuskerAlertKind = 'trample' | 'soulfire' | 'stuck' | 'trample-bait' | 'bait-hint';
+export type TuskerAlertKind =
+  | 'trample-lead'
+  | 'trample'
+  | 'soulfire'
+  | 'stuck'
+  | 'trample-bait'
+  | 'bait-hint';
 
 export const TUSKER_ALERT_KINDS: readonly TuskerAlertKind[] = [
+  'trample-lead',
   'trample',
   'soulfire',
   'stuck',
@@ -57,6 +67,7 @@ export interface TuskerAlertEntity {
   castingAbility?: string | null;
   castRemaining?: number;
   castTotal?: number;
+  castTargetId?: number | null;
   inCombat?: boolean;
 }
 
@@ -117,15 +128,34 @@ export function inRoadFire(
   return false;
 }
 
-/** The Tusker's alert for a player standing at `me`, or null when it asks
- *  nothing of them. `now` is the caller's clock (the scene's own). */
+/** The Tusker's alert for a player standing at `me` (entity `selfId`), or
+ *  null when it asks nothing of them. `now` is the caller's clock (the
+ *  scene's own). */
 export function buildTuskerAlert(
   scene: TuskerAlertScene,
   me: { x: number; z: number },
   now: number | undefined,
+  selfId?: number,
 ): TuskerAlert | null {
   const tusker = scene.tusker && !scene.tusker.dead ? scene.tusker : null;
   const pct = formatNumber(Math.round(T.stuckVuln * 100), { maximumFractionDigits: 0 });
+  // You are the Trample's target and its lane still follows you: lead it
+  // into an ice outcrop, then step aside. The bar counts down to the lock.
+  if (
+    tusker &&
+    tusker.castingAbility === TUSKER_TRAMPLE &&
+    selfId !== undefined &&
+    tusker.castTargetId === selfId &&
+    !trampleAimLocked(tusker.castRemaining ?? 0)
+  ) {
+    const left = Math.max(0, (tusker.castRemaining ?? 0) - T.trampleLock);
+    return {
+      kind: 'trample-lead',
+      line: t('hudChrome.sanctumAlert.trampleLeadLine'),
+      progress: share(left, (tusker.castTotal ?? T.trampleCast) - T.trampleLock),
+      seconds: left,
+    };
+  }
   // The painted lane: the plan the sim made, from what the client mirrors.
   let baited = false;
   if (tusker?.pos && tusker.castingAbility === TUSKER_TRAMPLE) {

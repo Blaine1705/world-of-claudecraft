@@ -20652,6 +20652,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // The Sledge Tusker's bait rework (the ice outcrops, Stuck in the Ice, the
   // soulfire trail): the M16 non-Latin fills of its new English.
   'hudChrome.sanctumAlert.trampleTitle': '践踏！',
+  'hudChrome.sanctumAlert.trampleLeadLine': '把冲锋引向冰岩，然后向侧面躲开',
   'hudChrome.sanctumAlert.trampleLine': '在巨牙兽冲锋之前，从标出的路线向侧面离开',
   'hudChrome.sanctumAlert.soulfireTitle': '魂火！',
   'hudChrome.sanctumAlert.soulfireLine': '你正站在燃烧的魂火中。离开它',

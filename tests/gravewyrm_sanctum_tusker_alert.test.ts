@@ -174,6 +174,64 @@ describe("the Tusker's alert", () => {
     expect(kindAt(scene, BEHIND)).toBe('trample');
   });
 
+  it('the Trample target while its lane still follows them: lead it into the ice, then step aside', () => {
+    // The wind-up has just opened on me (selfId 1).
+    const aiming = {
+      castingAbility: TUSKER_TRAMPLE,
+      castRemaining: T.trampleCast - 0.05,
+      castTotal: T.trampleCast,
+      castTargetId: 1,
+    };
+    const scene = scan([tusker(aiming), ...outcrops()]);
+    // Wherever I stand (in the lane, behind the ice, on open road): the lead.
+    for (const at of [BEHIND, leg(12, 0), leg(14, -5)]) {
+      const v = view(scene, at);
+      if (!v.visible) throw new Error('hidden');
+      expect(v.kind).toBe('trample-lead');
+      expect(v.title).toBe(t('hudChrome.sanctumAlert.trampleTitle'));
+      expect(v.line).toBe(t('hudChrome.sanctumAlert.trampleLeadLine'));
+      expect(v.line).toBe('Lead the charge into an ice outcrop, then step aside');
+      // Its bar counts down to the lock, not the charge.
+      expect(v.progress).toBeCloseTo(
+        (T.trampleCast - 0.05 - T.trampleLock) / (T.trampleCast - T.trampleLock),
+        6,
+      );
+    }
+    // Somebody else is its target: no lead for me (the lane rules as before).
+    const theirs = scan([tusker({ ...aiming, castTargetId: 7 }), ...outcrops()]);
+    expect(kindAt(theirs, BEHIND)).toBe('trample-bait');
+    expect(kindAt(theirs, leg(12, 0))).toBe('trample');
+  });
+
+  it('once the lane locks its target is told to step out of it (or that it ends in the ice)', () => {
+    const locked = {
+      castingAbility: TUSKER_TRAMPLE,
+      castRemaining: T.trampleLock - 0.1,
+      castTotal: T.trampleCast,
+      castTargetId: 1,
+    };
+    const scene = scan([tusker(locked), ...outcrops()]);
+    expect(kindAt(scene, leg(12, 0))).toBe('trample');
+    expect(kindAt(scene, BEHIND)).toBe('trample-bait');
+  });
+
+  it('the lead alert is part of the advisory Sanctum family (the hints setting hides it)', () => {
+    expect(TUSKER_ALERT_KINDS[0]).toBe('trample-lead');
+    expect(SANCTUM_ALERT_KINDS).toContain('trample-lead');
+    const scene = scan([
+      tusker({
+        castingAbility: TUSKER_TRAMPLE,
+        castRemaining: T.trampleCast,
+        castTotal: T.trampleCast,
+        castTargetId: 1,
+      }),
+      ...outcrops(),
+    ]);
+    expect(buildTuskerAlert(scene, W(BEHIND), 100, 1)?.kind).toBe('trample-lead');
+    // Without knowing who I am it never claims I am the target.
+    expect(buildTuskerAlert(scene, W(BEHIND), 100)?.kind).toBe('trample-bait');
+  });
+
   it('a plain lane says nothing to a player standing clear of it', () => {
     const down = Math.atan2(42, 21.8);
     const scene = scan([tusker({ ...trampling, pos: W(leg(4)), facing: down }), ...outcrops()]);

@@ -6752,6 +6752,7 @@ export const ko_KR: EnTranslations = {
       "slabTitle": "얼음 덩어리",
       "slabLine": "단단한 얼음: 시야를 가립니다. 뒤에 숨어 시전자의 주문을 피하세요",
       "trampleTitle": "짓밟기!",
+      "trampleLeadLine": "돌진을 얼음 돌출부로 유도한 뒤 옆으로 피하라",
       "trampleLine": "거대엄니가 돌진하기 전에 표시된 선에서 옆으로 벗어나라",
       "soulfireTitle": "영혼불!",
       "soulfireLine": "타오르는 영혼불 위에 서 있다. 밖으로 나와라",

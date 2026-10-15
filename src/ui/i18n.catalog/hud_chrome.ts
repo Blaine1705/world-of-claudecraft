@@ -9718,6 +9718,7 @@ export const hudChromeStrings = {
     // The Sledge Tusker's bait rework (sanctum_tusker_alert_view.ts). Wordy (M16):
     // non-Latin fills in the overlays.
     trampleTitle: 'Trample!',
+    trampleLeadLine: 'Lead the charge into an ice outcrop, then step aside',
     trampleLine: 'Step sideways out of the marked lane before the Tusker charges down it',
     soulfireTitle: 'Soulfire!',
     soulfireLine: 'You are standing in burning soulfire. Step off it',

@@ -21,7 +21,7 @@
 // Sledge-Hauler just threw down near you is solid cover (it blocks line of
 // sight), shown for its first SLAB_HINT_SECONDS. The Sledge Tusker's bait
 // rework sits between the bosses and the trash debuffs (sanctum_tusker_alert_view.ts:
-// its painted Trample lane, soulfire underfoot, its Stuck in the Ice window, a
+// leading its Trample while you are its target, its painted Trample lane, soulfire underfoot, its Stuck in the Ice window, a
 // Trample that will end in an outcrop, and the lesson of the bait). Every bar is the threat's own
 // time left (the caster's bar or the mark; the hint's own seconds). The
 // painter is the shared encounter alert's (encounter_alert_painter.ts).
@@ -330,6 +330,7 @@ function markShare(a: AlertAura): number | null {
 function titleOf(kind: SanctumAlertKind): string {
   switch (kind) {
     case 'trample':
+    case 'trample-lead':
       return t('hudChrome.sanctumAlert.trampleTitle');
     case 'soulfire':
       return t('hudChrome.sanctumAlert.soulfireTitle');
@@ -646,7 +647,7 @@ export function buildSanctumAlertView(input: SanctumAlertInput): SanctumAlertVie
 
   // The Sledge Tusker's road (no boss fights there): its lane, its soulfire,
   // its stuck window, a baited Trample, the lesson (sanctum_tusker_alert_view.ts).
-  const road = buildTuskerAlert(scene, me, input.now);
+  const road = buildTuskerAlert(scene, me, input.now, selfId);
   if (road) return live(road.kind, road.line, road.progress, road.seconds);
 
   // 16. A Goadsmith's brand burning on you: a meltwater pool puts it out.

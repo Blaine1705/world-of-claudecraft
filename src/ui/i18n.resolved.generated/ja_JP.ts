@@ -6752,6 +6752,7 @@ export const ja_JP: EnTranslations = {
       "slabTitle": "氷塊",
       "slabLine": "堅い氷：視線を遮る。その陰に隠れて術者の呪文を避けろ",
       "trampleTitle": "踏みつぶし！",
+      "trampleLeadLine": "突進を氷の露頭へ誘い込み、それから横へよけろ",
       "trampleLine": "巨牙獣が突進する前に、描かれた線から横へ出ろ",
       "soulfireTitle": "魂火！",
       "soulfireLine": "燃える魂火の上に立っている。そこから出ろ",

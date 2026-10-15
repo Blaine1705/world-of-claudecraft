@@ -17264,6 +17264,17 @@
   #sanctum-alert.is-stuck {
     animation: bce-throb 0.45s ease-in-out infinite alternate;
   }
+  /* You are the Trample's target while its lane still follows you: the ice blue of
+     the lane that ends in an outcrop, throbbing (lead it, then step aside). */
+  #sanctum-alert.is-trample-lead {
+    border-color: var(--color-debuff-frost);
+    animation: bce-throb 0.6s ease-in-out infinite alternate;
+  }
+  #sanctum-alert.is-trample-lead .fa-title,
+  #sanctum-alert.is-trample-lead .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
   /* The Ice Slab's cover hint: calm, never a warning (it is shelter). */
   #sanctum-alert.is-slab {
     border-color: var(--color-friendly);

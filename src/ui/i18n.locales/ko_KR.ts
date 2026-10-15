@@ -21714,6 +21714,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // The Sledge Tusker's bait rework (the ice outcrops, Stuck in the Ice, the
   // soulfire trail): the M16 non-Latin fills of its new English.
   'hudChrome.sanctumAlert.trampleTitle': '짓밟기!',
+  'hudChrome.sanctumAlert.trampleLeadLine': '돌진을 얼음 돌출부로 유도한 뒤 옆으로 피하라',
   'hudChrome.sanctumAlert.trampleLine': '거대엄니가 돌진하기 전에 표시된 선에서 옆으로 벗어나라',
   'hudChrome.sanctumAlert.soulfireTitle': '영혼불!',
   'hudChrome.sanctumAlert.soulfireLine': '타오르는 영혼불 위에 서 있다. 밖으로 나와라',

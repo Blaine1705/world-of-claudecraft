@@ -6752,6 +6752,7 @@ export const fr_FR: EnTranslations = {
       "slabTitle": "Ice Slab",
       "slabLine": "Put the ice slab between you and enemy casters to block their line of sight",
       "trampleTitle": "Trample!",
+      "trampleLeadLine": "Lead the charge into an ice outcrop, then step aside",
       "trampleLine": "Step sideways out of the marked lane before the Tusker charges down it",
       "soulfireTitle": "Soulfire!",
       "soulfireLine": "You are standing in burning soulfire. Step off it",

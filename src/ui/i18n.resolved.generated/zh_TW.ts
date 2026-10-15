@@ -6752,6 +6752,7 @@ export const zh_TW: EnTranslations = {
       "slabTitle": "冰塊",
       "slabLine": "堅冰：它會阻擋視線。躲到它後面，避開施法者的法術",
       "trampleTitle": "踐踏！",
+      "trampleLeadLine": "把衝鋒引向冰岩，然後向側面躲開",
       "trampleLine": "在巨牙獸衝鋒之前，從標出的路線向側面離開",
       "soulfireTitle": "魂火！",
       "soulfireLine": "你正站在燃燒的魂火中。離開它",

@@ -16388,6 +16388,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.sanctumAlert.timeAria'
   | 'hudChrome.sanctumAlert.trampleBaitLine'
   | 'hudChrome.sanctumAlert.trampleBaitTitle'
+  | 'hudChrome.sanctumAlert.trampleLeadLine'
   | 'hudChrome.sanctumAlert.trampleLine'
   | 'hudChrome.sanctumAlert.trampleTitle'
   | 'hudChrome.sanctumAlert.trenchLine'
