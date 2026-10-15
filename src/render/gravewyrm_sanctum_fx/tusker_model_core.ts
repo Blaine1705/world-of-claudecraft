@@ -165,7 +165,8 @@ export function sweepClipRate(): number {
   return barLockedRate(TUSKER_CLIP.sweepCross, TUSKER_TUNING.sweepCast);
 }
 
-/** The Trample warning's rate: the head is levelled on the 2 s bar's end. */
+/** The Trample warning's rate: the 2 s clip stretched over the 3 s bar (the
+ *  lane follows its target through it), the head levelled on its end. */
 export function trampleClipRate(): number {
   return barLockedRate(TUSKER_CLIP.levelled, TUSKER_TUNING.trampleCast);
 }
