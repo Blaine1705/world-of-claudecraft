@@ -223,7 +223,6 @@ import {
   ABILITIES,
   ALL_RECIPES,
   arenaOrigin,
-  authoredMapActive,
   CLASSES,
   DELVE_COMPANIONS,
   DELVE_LIST,
@@ -848,6 +847,7 @@ import { PartyMachine } from './social/party';
 import * as pullTimerMod from './social/pull_timer';
 import * as readyCheckMod from './social/ready_check';
 import { SpatialGrid } from './spatial';
+import { spawnProbeStandsOnFloor } from './spawn_footing';
 import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
 import { addThreat, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
@@ -4897,8 +4897,8 @@ export class Sim {
       // height-blind resolve walls every overhead slab (an upper storey, a
       // roof, a balcony), so every NPC authored indoors was shoved out into
       // the street (the Gilded Gull's innkeeper spawned 5 yd from his bar,
-      // the town shops' keepers behind the back wall). Authored maps only: the
-      // built-in world keeps its height-blind resolve, so its spawns never move.
+      // the town shops' keepers behind the back wall). Authored maps and the
+      // built-in walk-in town buildings only (spawn_footing.ts).
       const res = resolvePosition(
         seed,
         px,
@@ -4906,7 +4906,7 @@ export class Sim {
         bodyRadius,
         false,
         undefined,
-        authoredMapActive() ? { y: this.groundPos(px, pz).y, lift: 0 } : undefined,
+        spawnProbeStandsOnFloor(px, pz) ? { y: this.groundPos(px, pz).y, lift: 0 } : undefined,
         this.riftCollisionToken,
       );
       return Math.abs(res.x - px) < 1e-4 && Math.abs(res.z - pz) < 1e-4;
