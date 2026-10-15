@@ -31,8 +31,11 @@ import { AUTHORED_TOWNS, type AuthoredTownFamily } from '../sim/authored_town_re
 import { BUILTIN_WORLD } from '../sim/data';
 import { EASTBROOK_LAYOUT, localToWorld } from '../sim/eastbrook_layout';
 import { emberLilySpots } from '../sim/ember_lilies';
+import { REMOVED_HIGHWATCH_BUILDINGS } from '../sim/highwatch_layout';
 import { MAX_PLACEMENTS, type MapPlacement } from '../sim/map_doc';
+import type { ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
+import { worldMajorPropPlacements } from './world_prop_placements';
 
 /** targetHeightFor() for every /models/props/ path this module emits. */
 const TARGET_HEIGHT = 2.2;
@@ -355,6 +358,30 @@ export function highwatchTownBuildingPlacements(_seed: number): MapPlacement[] {
   return townBuildingPlacementsOf('highwatchTown');
 }
 
+/**
+ * The kit placements the full-world conversion (worldMajorPropPlacements) made
+ * for Highwatch's five old buildings before the painted town replaced them. A
+ * document saved fully editable before that still holds them, and promoting
+ * the painted buildings over them would stand two towns in one place.
+ */
+export function highwatchOldKitPlacements(seed: number): MapPlacement[] {
+  const empty = Object.fromEntries(
+    Object.entries(BUILTIN_WORLD.props).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? [] : value,
+    ]),
+  ) as unknown as ZonePropsDef;
+  const buildings = REMOVED_HIGHWATCH_BUILDINGS.map((record) => ({
+    kind: record.kind,
+    x: record.x,
+    z: record.z,
+    w: record.width,
+    d: record.depth,
+    rot: record.rotation,
+  }));
+  return worldMajorPropPlacements({ ...empty, buildings }, seed);
+}
+
 /** The Weekly Vault's placeable model (public/models/tidehold/vault.glb): the
  *  town-drawn hall's own boxes, authored in real yards, so its largest
  *  dimension over the target height draws it at the hall's size. The buried
@@ -392,6 +419,9 @@ export function eastbrookVaultPlacements(seed: number): MapPlacement[] {
 export const FEATURE_PROMOTIONS: readonly {
   flag: string;
   placements(seed: number): MapPlacement[];
+  /** What an older conversion placed for the things this family replaces:
+   *  each one still standing exactly where it was made is lifted first. */
+  supersedes?(seed: number): MapPlacement[];
 }[] = [
   { flag: 'emberDressing', placements: emberDressingPlacements },
   { flag: 'realmBoulders', placements: realmBoulderPlacements },
@@ -400,8 +430,22 @@ export const FEATURE_PROMOTIONS: readonly {
   { flag: 'jungleCoconuts', placements: jungleCoconutPlacements },
   { flag: 'authoredTowns', placements: authoredTownBuildingPlacements },
   { flag: 'eastbrookVault', placements: eastbrookVaultPlacements },
-  { flag: 'highwatchTown', placements: highwatchTownBuildingPlacements },
+  {
+    flag: 'highwatchTown',
+    placements: highwatchTownBuildingPlacements,
+    supersedes: highwatchOldKitPlacements,
+  },
 ];
+
+/** The same placement, untouched: one asset standing on the spot it was made. */
+function sameSpot(a: MapPlacement, b: MapPlacement): boolean {
+  return (
+    a.assetId === b.assetId &&
+    Math.abs(a.x - b.x) < 1e-6 &&
+    Math.abs(a.z - b.z) < 1e-6 &&
+    Math.abs((a.rotY ?? 0) - (b.rotY ?? 0)) < 1e-6
+  );
+}
 
 /**
  * One-time upgrade for editable-all maps saved before a feature family
@@ -432,7 +476,18 @@ export function promoteFeatureDressing(map: {
     if (map.promotedScenery?.[family.flag]) continue;
     const additions = family.placements(map.meta.seed);
     if (additions.length === 0) continue;
-    if (map.placements.length + additions.length > MAX_PLACEMENTS) continue;
+    const superseded = family.supersedes?.(map.meta.seed) ?? [];
+    const lifted = map.placements.filter((placement) =>
+      superseded.some((old) => sameSpot(old, placement)),
+    ).length;
+    if (map.placements.length - lifted + additions.length > MAX_PLACEMENTS) continue;
+    if (lifted > 0) {
+      // in place: the document's array keeps its identity
+      for (let index = map.placements.length - 1; index >= 0; index--) {
+        const placement = map.placements[index];
+        if (superseded.some((old) => sameSpot(old, placement))) map.placements.splice(index, 1);
+      }
+    }
     map.placements.push(...additions);
     map.promotedScenery = { ...(map.promotedScenery ?? {}), [family.flag]: true };
     promoted++;

@@ -7,13 +7,16 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import {
   authoredTownBuildingPlacements,
   FEATURE_PROMOTIONS,
+  highwatchOldKitPlacements,
   highwatchTownBuildingPlacements,
+  promoteFeatureDressing,
 } from '../src/editor/feature_prop_placements';
 import { isPlacedBuildingAsset } from '../src/render/eastbrook_placed_building';
 import {
   buildingRecordColliders,
   promotedTownBuildingStandsDown,
 } from '../src/sim/authored_town_buildings';
+import { AUTHORED_TOWNS } from '../src/sim/authored_town_registry';
 import { rotY } from '../src/sim/collider_shapes';
 import { isBlocked } from '../src/sim/colliders';
 import { ZONE3_PROPS } from '../src/sim/content/zone3';
@@ -22,9 +25,10 @@ import { isExcludedDecoration } from '../src/sim/decoration_exclusions';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { loadPublishedMap, MAP_SEED } from '../src/sim/maps/eastbrook_rebuild.generated';
 import { distancePointToObb, localToWorld, type Obb2 } from '../src/sim/placed_town_kit';
+import { isResting } from '../src/sim/progression/xp';
 import { Sim } from '../src/sim/sim';
 import { townWalkInPlacements } from '../src/sim/town_walk_in';
-import type { BuildingDef } from '../src/sim/types';
+import type { BuildingDef, Entity, WorldContent } from '../src/sim/types';
 import { generateDecorationsInBounds, groundHeight, terrainHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -440,6 +444,22 @@ describe('placed Highwatch building collision in the built-in world', () => {
       expect(promotedTownBuildingStandsDown({ authoredTowns: true }, record)).toBe(false);
       expect(promotedTownBuildingStandsDown({ highwatchTown: true }, record)).toBe(true);
     }
+    // ...and the Highwatch family never reaches the other towns' buildings
+    const otherIds = new Set(
+      AUTHORED_TOWNS.filter((town) => town.id !== 'highwatch').flatMap((town) =>
+        town.buildings.map((building) => building.id),
+      ),
+    );
+    const others = BUILTIN_WORLD.props.buildings.filter(
+      (record) => record.id !== undefined && otherIds.has(record.id),
+    );
+    expect(others.length).toBeGreaterThanOrEqual(10);
+    for (const record of others) {
+      expect(promotedTownBuildingStandsDown({ highwatchTown: true }, record), record.id).toBe(
+        false,
+      );
+      expect(promotedTownBuildingStandsDown({ authoredTowns: true }, record), record.id).toBe(true);
+    }
   });
 });
 
@@ -526,6 +546,50 @@ describe('walking into the walk-in Highwatch buildings', () => {
 });
 
 describe('Highwatch in WoC Studio', () => {
+  it('rests a traveller in the Studio inn, across its walls, wherever a maker moves it', () => {
+    const inn = BUILDINGS.find((building) => building.kind === 'inn');
+    if (!inn) throw new Error('missing inn');
+    const world = loadPublishedMap();
+    const index = (world.placements ?? []).findIndex((p) => p.path === inn.assetId);
+    expect(index).toBeGreaterThanOrEqual(0);
+    // far enough that the moved inn and its old spot share no ground
+    const SHIFT = 60;
+    const moved: WorldContent = {
+      ...world,
+      placements: (world.placements ?? []).map((p, i) =>
+        i === index ? { ...p, x: p.x + SHIFT } : p,
+      ),
+    };
+    const body = (point: { x: number; z: number }) =>
+      ({ inCombat: false, pos: { x: point.x, y: 0, z: point.z } }) as unknown as Entity;
+    const anchor = { x: inn.placement.x + SHIFT, z: inn.placement.z };
+    const walls = rectOf(inn, inn.footprint);
+    const at = (lx: number, lz: number) => localToWorld(anchor, inn.placement.rotation, lx, lz);
+    setActiveWorldContent(moved);
+    try {
+      // the rest area rides the placement (the built-in record is not in a
+      // Studio document), not the old spot
+      expect(
+        isResting(body(at((walls.x0 + walls.x1) / 2, (walls.z0 + walls.z1) / 2)), [], [], false),
+      ).toBe(true);
+      expect(isResting(body(inn.footprint.center), [], [], false)).toBe(false);
+      // wall-sized: just inside each corner rests, three yards past the front does not
+      for (const [lx, lz] of [
+        [walls.x0 + 1, walls.z0 + 1],
+        [walls.x1 - 1, walls.z0 + 1],
+        [walls.x0 + 1, walls.z1 - 1],
+        [walls.x1 - 1, walls.z1 - 1],
+      ]) {
+        expect(isResting(body(at(lx, lz)), [], [], false), `${lx}, ${lz}`).toBe(true);
+      }
+      expect(isResting(body(at((walls.x0 + walls.x1) / 2, walls.z0 - 3)), [], [], false)).toBe(
+        false,
+      );
+    } finally {
+      setActiveWorldContent(null);
+    }
+  });
+
   it('promotes the five buildings as their own family, placed exactly as the game stands them', () => {
     expect(FEATURE_PROMOTIONS.map((family) => family.flag)).toContain('highwatchTown');
     const placements = highwatchTownBuildingPlacements(WORLD_SEED);
@@ -547,13 +611,65 @@ describe('Highwatch in WoC Studio', () => {
         Math.max(...boundsOf(building).size) / PLACED_TARGET_HEIGHT,
         3,
       );
+      // turned as the game turns it: a flipped yaw would face every door away
+      expect(placement.rotY, building.id).toBeCloseTo(building.placement.rotation, 9);
     }
+    // the family's promotion places exactly these
+    expect(
+      FEATURE_PROMOTIONS.find((family) => family.flag === 'highwatchTown')?.placements(WORLD_SEED),
+    ).toEqual(placements);
     // the older family keeps only Eastbrook and Fenbridge
     expect(
       authoredTownBuildingPlacements(WORLD_SEED).some((placement) =>
         placement.assetId.startsWith('tidehold/highwatch/'),
       ),
     ).toBe(false);
+  });
+
+  it("trades an older document's Highwatch kit houses for the painted town on load", () => {
+    // a fully editable document saved before the rebuild: every other family
+    // promoted, and the full-world conversion's six kit placements for
+    // Highwatch's five old buildings, one of them moved by its maker
+    const oldKit = highwatchOldKitPlacements(WORLD_SEED);
+    expect(oldKit.map((placement) => placement.assetId).sort()).toEqual([
+      'props/bell_tower',
+      'props/blacksmith',
+      'props/house_1',
+      'props/house_2',
+      'props/house_3',
+      'props/inn',
+    ]);
+    const moved = { ...oldKit[0], x: oldKit[0].x + 3 };
+    const keeper = { ...oldKit[1], assetId: 'props/well', x: 40, z: 600 };
+    const doc = {
+      placements: [...oldKit.slice(1), moved, keeper],
+      promotedScenery: Object.fromEntries(
+        FEATURE_PROMOTIONS.filter((family) => family.flag !== 'highwatchTown').map((family) => [
+          family.flag,
+          true,
+        ]),
+      ) as Record<string, boolean>,
+      propsMode: 'editable-all' as const,
+      content: { zones: BUILTIN_WORLD.zones },
+      meta: { seed: WORLD_SEED },
+    };
+    expect(promoteFeatureDressing(doc)).toBe(1);
+    expect(doc.promotedScenery.highwatchTown).toBe(true);
+    // the painted buildings are in, the untouched kit houses are out
+    const painted = doc.placements.filter((placement) =>
+      placement.assetId.startsWith('tidehold/highwatch/'),
+    );
+    expect(painted).toHaveLength(5);
+    for (const old of oldKit.slice(1)) {
+      expect(doc.placements, old.assetId).not.toContainEqual(old);
+    }
+    // what the maker moved, and everything else, stays
+    expect(doc.placements).toContainEqual(moved);
+    expect(doc.placements).toContainEqual(keeper);
+    expect(doc.placements).toHaveLength(2 + 5);
+    // and loading it again changes nothing
+    expect(promoteFeatureDressing(doc)).toBe(0);
+    expect(doc.placements).toHaveLength(2 + 5);
   });
 
   it('ships the rebuilt town in the published Eastbrook Rebuild map', () => {
@@ -565,18 +681,43 @@ describe('Highwatch in WoC Studio', () => {
     expect(placed.map((placement) => placement.path).sort()).toEqual(
       BUILDINGS.map((building) => building.assetId).sort(),
     );
-    for (const building of BUILDINGS) {
+    const studio = highwatchTownBuildingPlacements(WORLD_SEED);
+    for (const [index, building] of BUILDINGS.entries()) {
       const placement = placed.find((candidate) => candidate.path === building.assetId);
       expect(placement?.x, building.id).toBeCloseTo(building.placement.x, 6);
       expect(placement?.z, building.id).toBeCloseTo(building.placement.z, 6);
+      expect(placement?.rotY, building.id).toBeCloseTo(building.placement.rotation, 9);
+      expect(placement?.scale, building.id).toBeCloseTo(studio[index].scale, 6);
     }
     // the inn keeps its rest area as a placement
     const inn = placed.find((placement) => placement.path.endsWith('/tavern_b.glb'));
     expect(inn?.worldPropKind).toBe('inn');
+    // the moved townsfolk stand where the game stands them
+    for (const npc of HIGHWATCH_LAYOUT.services.npcs) {
+      expect(map.npcs[npc.id]?.pos.x, npc.id).toBeCloseTo(npc.position.x, 9);
+      expect(map.npcs[npc.id]?.pos.z, npc.id).toBeCloseTo(npc.position.z, 9);
+      expect(map.npcs[npc.id]?.facing ?? 0, npc.id).toBeCloseTo(npc.facing, 9);
+    }
+    // and the town's roads are the game's, the re-routed Stormcrag road included
+    const touchesTown = (road: readonly { x: number; z: number }[]) =>
+      road.some((point) => Math.hypot(point.x, point.z - 660) < 40);
+    const mapRoads = map.roads.filter(touchesTown);
+    expect(mapRoads.length).toBeGreaterThanOrEqual(4);
+    expect(mapRoads).toEqual(BUILTIN_WORLD.roads.filter(touchesTown));
+    expect(mapRoads).toContainEqual(
+      HIGHWATCH_LAYOUT.roads.stormcrag.map((point) => ({ ...point })),
+    );
     // the map's ground carries the pads its buildings stand on
     for (const pad of HIGHWATCH_LAYOUT.pads) {
       expect(map.terrainEdits ?? []).toContainEqual(pad);
     }
+    // the five painted buildings are what stands where the kit houses stood
+    // (kit placements carry these paths: the regex is live)
+    expect(
+      (map.placements ?? []).some((placement) =>
+        /\/props\/(house_[123]|inn|bell_tower|blacksmith)\.glb$/.test(placement.path),
+      ),
+    ).toBe(true);
     // no old kit building is left standing in the town
     expect(
       (map.placements ?? []).some(
