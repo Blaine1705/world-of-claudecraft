@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { insideHighwatchManorGround } from '../src/render/foliage_core';
 import {
   MANOR_LANE,
+  MANOR_PORTAL_PATH,
   manorLaneFlags,
+  manorPortalPathFlags,
   onHighwatchManorLane,
 } from '../src/render/highwatch_manor_lane_core';
 import { streetlampPlacements } from '../src/sim/colliders';
@@ -68,5 +70,26 @@ describe('the Highwatch manor lane', () => {
     expect(insideHighwatchManorGround(10, mid)).toBe(true);
     expect(onHighwatchManorLane(10, MANOR_LANE.z0 - 0.5)).toBe(false);
     expect(insideHighwatchManorGround(10, MANOR_LANE.z0 - 0.5)).toBe(false);
+  });
+
+  it('paves a walkable way up the bank behind the east wing to the portal bench', () => {
+    const p = MANOR_PORTAL_PATH;
+    const x = (p.x0 + p.x1) / 2;
+    // from the manor's ground up to the bench's lip by the crystal cave portal at (10, 770)
+    expect(terrainHeight(x, p.z0, WORLD_SEED)).toBeCloseTo(12.5, 0);
+    expect(terrainHeight(x, p.z1, WORLD_SEED)).toBeGreaterThan(16.5);
+    expect(Math.hypot(x - 10, p.z1 - 770)).toBeLessThan(6.5);
+    // a walkable grade the whole way (the climb limit is 1.5)
+    for (let z = p.z0; z < p.z1 - 0.5; z += 0.5) {
+      const rise = terrainHeight(x, z + 0.5, WORLD_SEED) - terrainHeight(x, z, WORLD_SEED);
+      expect(rise / 0.5, `z ${z}`).toBeLessThan(1.1);
+    }
+    // clear of the chapel's east wall (the model's x -22.8, world 8.7) and the library's north
+    expect(p.x1).toBeLessThan(manor.position.x - 22.8 - 1);
+    expect(p.z0).toBeGreaterThan(manor.position.z + 5.6);
+    const flags = manorPortalPathFlags();
+    expect(flags.length).toBeGreaterThan(8);
+    for (const f of flags)
+      expect(onHighwatchManorLane((f.x0 + f.x1) / 2, (f.z0 + f.z1) / 2)).toBe(true);
   });
 });

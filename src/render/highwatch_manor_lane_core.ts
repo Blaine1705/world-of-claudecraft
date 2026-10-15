@@ -21,9 +21,24 @@ export const MANOR_LANE = {
   z1: WALL_Z - 0.3,
 } as const;
 
-/** True on the lane's paving (grass and scrub keep off it). */
+/** The path up the bank behind the manor's east wing to the crystal cave portal's bench
+ *  (sim/highwatch_layout.ts PORTAL_BENCH at (10, 770)): from the manor's ground north of the
+ *  library up the bank's gentlest side (a grade under 1, walkable) to the bench's lip, so the
+ *  bank reads as a made way up to the portal, not a raw cut. */
+export const MANOR_PORTAL_PATH = {
+  x0: 3.6,
+  x1: 5.2,
+  z0: 760.4,
+  z1: 769.4,
+} as const;
+
+function within(r: { x0: number; x1: number; z0: number; z1: number }, x: number, z: number) {
+  return x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1;
+}
+
+/** True on the lane's or the portal path's paving (grass and scrub keep off them). */
 export function onHighwatchManorLane(x: number, z: number): boolean {
-  return x >= MANOR_LANE.x0 && x <= MANOR_LANE.x1 && z >= MANOR_LANE.z0 && z <= MANOR_LANE.z1;
+  return within(MANOR_LANE, x, z) || within(MANOR_PORTAL_PATH, x, z);
 }
 
 export interface LaneFlag {
@@ -66,6 +81,30 @@ export function manorLaneFlags(): LaneFlag[] {
       x += len;
       k++;
     }
+  }
+  return out;
+}
+
+/** The portal path's flags: one course up the bank, each flag across the path's width. */
+export function manorPortalPathFlags(): LaneFlag[] {
+  const out: LaneFlag[] = [];
+  const joint = 0.06;
+  let z: number = MANOR_PORTAL_PATH.z0;
+  let k = 0;
+  while (z < MANOR_PORTAL_PATH.z1 - 0.05) {
+    const len = 0.55 + 0.25 * hash(k, 3);
+    const b = Math.min(MANOR_PORTAL_PATH.z1, z + len);
+    if (b - z > 0.2) {
+      out.push({
+        x0: MANOR_PORTAL_PATH.x0 + joint / 2,
+        x1: MANOR_PORTAL_PATH.x1 - joint / 2,
+        z0: z + joint / 2,
+        z1: b - joint / 2,
+        shade: hash(k + 0.5, 11),
+      });
+    }
+    z = b;
+    k++;
   }
   return out;
 }

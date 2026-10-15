@@ -1,7 +1,8 @@
 // The Highwatch manor's lane on screen (its layout is highwatch_manor_lane_core.ts): one merged
-// mesh of dressed flags following the ground from the Sanctum road to the garden gate, each a
-// shallow slab (its top a hand over the ground at each corner, its sides down below the
-// lowest, so it lies along the grade, never floats and never fights the terrain), vertex-coloured greys through a Lambert
+// mesh of dressed flags following the ground from the Sanctum road to the garden gate (and up
+// the bank behind the east wing to the crystal cave portal's bench), each a shallow slab (its
+// top a hand over the ground at each corner, its sides down below the lowest, so it lies along
+// the grade, never floats and never fights the terrain), vertex-coloured greys through a Lambert
 // material.
 //
 // GPU work: built once with the props while the built-in Highwatch town stands, its
@@ -9,7 +10,7 @@
 
 import * as THREE from 'three';
 import { terrainHeight } from '../sim/world';
-import { manorLaneFlags } from './highwatch_manor_lane_core';
+import { manorLaneFlags, manorPortalPathFlags } from './highwatch_manor_lane_core';
 
 // a weathered grey a shade under the manor's flags (the Lambert path lights it brighter)
 const BASE = new THREE.Color(0.3, 0.31, 0.33);
@@ -122,7 +123,7 @@ export function buildHighwatchManorLane(seed: number): THREE.Mesh {
   const nor: number[] = [];
   const col: number[] = [];
   const c = new THREE.Color();
-  for (const f of manorLaneFlags()) {
+  for (const f of [...manorLaneFlags(), ...manorPortalPathFlags()]) {
     // each corner a hand over the ground under it, so the flags lie along the grade
     const lift = 0.07;
     const tops: [number, number, number, number] = [
