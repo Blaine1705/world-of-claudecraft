@@ -12,7 +12,7 @@ flames, lit lantern panes, embers).
 """
 import math
 
-from manor_lib import (GLOW, METAL, PAL, STONE, WOOD, abox, cbox, cyl, disc, flat_face, hashf, pick, tone)
+from manor_lib import (GLOW, LAYER, METAL, PAL, STONE, WOOD, abox, cbox, cyl, disc, flat_face, hashf, pick, tone)
 from manor_plan import (BAY, CHAPEL, CHAPEL_DOOR, DAIS, EAST, FLOOR, HALL, KITCHEN, WEST)
 from manor_shell import chain
 
@@ -43,9 +43,9 @@ def table(p, x, z, lx, lz, y=FLOOR, h=1.0, top=0.12, col=None, cloth=None):
         abox(p, x - 0.08, x + 0.08, y + 0.35, y + 0.5, z - lz / 2 + 0.6, z + lz / 2 - 0.6, PAL['oak_dark'], WOOD)
     if cloth:
         if along_x:
-            abox(p, x - lx / 2 + 0.3, x + lx / 2 - 0.3, y + h, y + h + 0.015, z - 0.5, z + 0.5, cloth, WOOD)
+            abox(p, x - lx / 2 + 0.3, x + lx / 2 - 0.3, y + h, y + h + LAYER, z - 0.5, z + 0.5, cloth, WOOD)
         else:
-            abox(p, x - 0.5, x + 0.5, y + h, y + h + 0.015, z - lz / 2 + 0.3, z + lz / 2 - 0.3, cloth, WOOD)
+            abox(p, x - 0.5, x + 0.5, y + h, y + h + LAYER, z - lz / 2 + 0.3, z + lz / 2 - 0.3, cloth, WOOD)
 
 
 def bench(p, x, z, lx, lz, y=FLOOR, h=0.55, col=None):
@@ -76,43 +76,57 @@ def chair(p, x, z, face, y=FLOOR, high=2.6, col=None, carved=False, cushion=None
         cbox(p, cx, sy + 0.08, cz, sw - 0.12, 0.08, sd - 0.12, cushion, WOOD, yaw=face)
     for (lx, lz) in ((-0.38, -0.36), (0.38, -0.36), (-0.38, 0.36), (0.38, 0.36)):
         px, pz = at(lx, lz)
-        p.prism((px, y, pz), 4, 0.07, 0.07, sy - y, PAL['oak_dark'], WOOD, axis=(0, 1, 0), cap0=False,
+        p.prism((px, y, pz), 4, 0.07, 0.07, sy - 0.05 - y, PAL['oak_dark'], WOOD, axis=(0, 1, 0), cap0=False,
                 cap1=False, phase=math.pi / 4 + face)
     # the back (at local -z: the sitter faces +z local)
-    bx, bz = at(0, -0.4)
-    cbox(p, bx, sy + (high - 0.6) / 2, bz, sw, high - 0.6, 0.1, col, WOOD, yaw=face)
+    bx, bz = at(0, -0.43)
+    # back, posts and crest rail each a layer deeper (and the back a layer narrower) than the
+    # piece behind it, so no two of their faces share a plane
+    cbox(p, bx, sy + (high - 0.6) / 2, bz, sw - 2 * LAYER, high - 0.6, 0.1, col, WOOD, yaw=face)
     if cushion:
         kx, kz = at(0, -0.33)
-        cbox(p, kx, sy + 0.9, kz, sw - 0.2, 1.2, 0.06, cushion, WOOD, yaw=face)
-    for lx in (-0.42, 0.42):
-        px, pz = at(lx, -0.4)
-        cbox(p, px, sy + (high - 0.5) / 2, pz, 0.12, high - 0.5, 0.14, PAL['oak_dark'], WOOD, yaw=face)
+        # the back's cushion stops under the crest rail
+        kh = min(1.2, high - 1.0)
+        cbox(p, kx, sy + 0.3 + kh / 2, kz, sw - 0.2, kh, 0.06, cushion, WOOD, yaw=face)
+    for lx in (-0.44, 0.44):
+        px, pz = at(lx, -0.43)
+        cbox(p, px, sy + (high - 0.45 + LAYER) / 2 - 0.05 - LAYER, pz, 0.12, high - 0.45 + LAYER, 0.1 + 2 * LAYER, PAL['oak_dark'], WOOD, yaw=face)
         if carved:
             ax, az = at(lx, 0.0)
-            cbox(p, ax, sy + 0.4, az, 0.1, 0.08, 0.8, PAL['oak_dark'], WOOD, yaw=face)
-    tx, tz = at(0, -0.4)
-    cbox(p, tx, sy + high - 0.5, tz, sw + 0.15, 0.22, 0.14, PAL['gold_dark'] if carved else PAL['oak_dark'],
+            cbox(p, ax, sy + 0.4, az, 0.12 + 2 * LAYER, 0.08, 0.8, PAL['oak_dark'], WOOD, yaw=face)
+    tx, tz = at(0, -0.43)
+    cbox(p, tx, sy + high - 0.5, tz, sw + 0.15, 0.22, 0.1 + 4 * LAYER, PAL['gold_dark'] if carved else PAL['oak_dark'],
          METAL if carved else WOOD, yaw=face)
     if carved:
-        cbox(p, tx, sy + high - 0.2, tz, 0.35, 0.35, 0.1, PAL['gold'], METAL, yaw=face)
+        cbox(p, tx, sy + high - 0.2, tz, 0.35, 0.35, 0.1 + 6 * LAYER, PAL['gold'], METAL, yaw=face)
 
 
-def rug(p, x0, x1, z0, z1, y=FLOOR + 0.015, field=None, border=None, seed=0):
-    """A woven rug: a field, a border, a row of lozenges down the middle and fringes."""
+def rug(p, x0, x1, z0, z1, y=FLOOR + LAYER, field=None, border=None, seed=0):
+    """A woven rug a layer over the floor: a border round a field in one plane (never one
+    over the other), a row of lozenges a layer above the field, and its edges."""
     field = field or PAL['garnet']
     border = border or PAL['blue_dark']
-    flat_face(p, [(x0, y, z0), (x1, y, z0), (x1, y, z1), (x0, y, z1)], border, WOOD, (0, 1, 0))
     b = min(x1 - x0, z1 - z0) * 0.1
-    flat_face(p, [(x0 + b, y + 0.004, z0 + b), (x1 - b, y + 0.004, z0 + b), (x1 - b, y + 0.004, z1 - b),
-                  (x0 + b, y + 0.004, z1 - b)], field, WOOD, (0, 1, 0))
+    xa, xb, za, zb = x0 + b, x1 - b, z0 + b, z1 - b
+    for quad in (((x0, z0), (x1, z0), (x1, za), (x0, za)), ((x0, zb), (x1, zb), (x1, z1), (x0, z1)),
+                 ((x0, za), (xa, za), (xa, zb), (x0, zb)), ((xb, za), (x1, za), (x1, zb), (xb, zb))):
+        flat_face(p, [(qx, y, qz) for (qx, qz) in quad], border, WOOD, (0, 1, 0))
+    flat_face(p, [(xa, y, za), (xb, y, za), (xb, y, zb), (xa, y, zb)], field, WOOD, (0, 1, 0))
+    # the rug's thickness, so the layer reads as cloth on the floor, not a sheet floating
+    edge = scale_dark(border)
+    for (pa, pb, n) in (((x0, z0), (x1, z0), (0, 0, -1)), ((x1, z0), (x1, z1), (1, 0, 0)),
+                        ((x1, z1), (x0, z1), (0, 0, 1)), ((x0, z1), (x0, z0), (-1, 0, 0))):
+        flat_face(p, [(pa[0], y - LAYER, pa[1]), (pb[0], y - LAYER, pb[1]), (pb[0], y, pb[1]), (pa[0], y, pa[1])],
+                  edge, WOOD, n)
+    y = y + LAYER
     along_x = x1 - x0 >= z1 - z0
     n = max(2, int(max(x1 - x0, z1 - z0) / 1.6))
     for k in range(n):
         f = (k + 0.5) / n
         cx = x0 + (x1 - x0) * f if along_x else (x0 + x1) / 2
         cz = (z0 + z1) / 2 if along_x else z0 + (z1 - z0) * f
-        r = min(x1 - x0, z1 - z0) * 0.22
-        flat_face(p, [(cx - r, y + 0.008, cz), (cx, y + 0.008, cz - r), (cx + r, y + 0.008, cz), (cx, y + 0.008, cz + r)],
+        r = min(min(x1 - x0, z1 - z0) * 0.22, max(x1 - x0, z1 - z0) / n * 0.45)
+        flat_face(p, [(cx - r, y, cz), (cx, y, cz - r), (cx + r, y, cz), (cx, y, cz + r)],
                   PAL['gold_dark'] if k % 2 else PAL['cream'], WOOD, (0, 1, 0))
 
 
@@ -142,19 +156,23 @@ def banner(p, x, z, y_top, normal, width=1.6, length=4.2, field=None, emblem=Tru
     flat_face(p, back, scale_dark(field), WOOD, (-nx, 0, -nz))
     # the border stripes
     for u in (-width / 2 + 0.12, width / 2 - 0.12):
-        flat_face(p, [pt(u - 0.05, y_top - 0.1, 0.01), pt(u + 0.05, y_top - 0.1, 0.01), pt(u + 0.05, yb + 0.2, 0.01),
-                      pt(u - 0.05, yb + 0.2, 0.01)], PAL['gold'], METAL, (nx, 0, nz))
-    flat_face(p, [pt(-width / 2 + 0.1, y_top - 0.25, 0.01), pt(width / 2 - 0.1, y_top - 0.25, 0.01),
-                  pt(width / 2 - 0.1, y_top - 0.35, 0.01), pt(-width / 2 + 0.1, y_top - 0.35, 0.01)], PAL['gold'],
+        flat_face(p, [pt(u - 0.05, y_top - 0.1, LAYER), pt(u + 0.05, y_top - 0.1, LAYER),
+                      pt(u + 0.05, yb + 0.2, LAYER), pt(u - 0.05, yb + 0.2, LAYER)], PAL['gold'], METAL, (nx, 0, nz))
+    flat_face(p, [pt(-width / 2 + 0.1, y_top - 0.25, 2 * LAYER), pt(width / 2 - 0.1, y_top - 0.25, 2 * LAYER),
+                  pt(width / 2 - 0.1, y_top - 0.35, 2 * LAYER), pt(-width / 2 + 0.1, y_top - 0.35, 2 * LAYER)],
+              PAL['gold'],
               METAL, (nx, 0, nz))
     if emblem:
         cy = y_top - length * 0.42
         s = width * 0.28
         for (px, ph) in ((-0.9, 0.9), (0.0, 1.25), (0.9, 0.85)):
-            flat_face(p, [pt(px * s - s * 0.7, cy - s, 0.012), pt(px * s + s * 0.7, cy - s, 0.012),
-                          pt(px * s, cy - s + ph * s * 1.4, 0.012)], PAL['silver'], METAL, (nx, 0, nz))
-        flat_face(p, [pt(0, cy + s * 1.2, 0.013), pt(s * 0.32, cy + s * 0.75, 0.013), pt(0, cy + s * 0.45, 0.013),
-                      pt(-s * 0.32, cy + s * 0.75, 0.013)], PAL['gold'], METAL, (nx, 0, nz))
+            # the middle peak a layer over its neighbours, which it overlaps
+            w_peak = (3 if px == 0.0 else 2) * LAYER
+            flat_face(p, [pt(px * s - s * 0.7, cy - s, w_peak), pt(px * s + s * 0.7, cy - s, w_peak),
+                          pt(px * s, cy - s + ph * s * 1.4, w_peak)], PAL['silver'], METAL, (nx, 0, nz))
+        flat_face(p, [pt(0, cy + s * 1.2, 4 * LAYER), pt(s * 0.32, cy + s * 0.75, 4 * LAYER),
+                      pt(0, cy + s * 0.45, 4 * LAYER), pt(-s * 0.32, cy + s * 0.75, 4 * LAYER)], PAL['gold'], METAL,
+                  (nx, 0, nz))
 
 
 def scale_dark(c):
@@ -168,7 +186,7 @@ def tapestry(p, x, z, y0, y1, normal, width, seed=0):
     ax, az = nz, -nx
 
     def pt(u, v, w=0.0):
-        return (x + ax * u + nx * (0.08 + w), v, z + az * u + nz * (0.08 + w))
+        return (x + ax * u + nx * (0.075 + LAYER + w), v, z + az * u + nz * (0.075 + LAYER + w))
     p.cylinder(pt(-width / 2 - 0.2, y1 + 0.08), pt(width / 2 + 0.2, y1 + 0.08), 0.07, PAL['oak_dark'], WOOD, sides=6)
     flat_face(p, [pt(-width / 2, y0), pt(width / 2, y0), pt(width / 2, y1), pt(-width / 2, y1)], PAL['garnet_dark'],
               WOOD, (nx, 0, nz))
@@ -178,21 +196,23 @@ def tapestry(p, x, z, y0, y1, normal, width, seed=0):
     for (f0, f1, col) in bands:
         va = y0 + b + (y1 - y0 - 2 * b) * f0
         vb = y0 + b + (y1 - y0 - 2 * b) * f1
-        flat_face(p, [pt(-width / 2 + b, va, 0.01), pt(width / 2 - b, va, 0.01), pt(width / 2 - b, vb, 0.01),
-                      pt(-width / 2 + b, vb, 0.01)], tone(col, seed, f0), WOOD, (nx, 0, nz))
+        flat_face(p, [pt(-width / 2 + b, va, LAYER), pt(width / 2 - b, va, LAYER), pt(width / 2 - b, vb, LAYER),
+                      pt(-width / 2 + b, vb, LAYER)], tone(col, seed, f0), WOOD, (nx, 0, nz))
     # hills and trees and a stag-less hunt: a rider-less banner of shapes (blocks), our own
     k = 0
     u = -width / 2 + b + 0.4
     while u < width / 2 - b - 0.4:
         h = 0.6 + 0.6 * hashf(u, seed)
         vb = y0 + b + (y1 - y0 - 2 * b) * 0.35
-        flat_face(p, [pt(u - 0.25, vb, 0.02), pt(u + 0.25, vb, 0.02), pt(u, vb + h, 0.02)], (0.18, 0.3, 0.16), WOOD,
+        flat_face(p, [pt(u - 0.25, vb, 2 * LAYER), pt(u + 0.25, vb, 2 * LAYER), pt(u, vb + h, 2 * LAYER)],
+                  (0.18, 0.3, 0.16), WOOD,
                   (nx, 0, nz))
         u += 0.7 + 0.5 * hashf(k, seed)
         k += 1
     # the sun
     cv = y0 + b + (y1 - y0 - 2 * b) * 0.82
-    flat_face(p, [pt(width * 0.22 + 0.3 * math.cos(math.tau * i / 8), cv + 0.3 * math.sin(math.tau * i / 8), 0.02)
+    flat_face(p, [pt(width * 0.22 + 0.3 * math.cos(math.tau * i / 8), cv + 0.3 * math.sin(math.tau * i / 8),
+                     3 * LAYER)
                   for i in range(8)], PAL['gold'], WOOD, (nx, 0, nz))
     # the fringe
     for i in range(int(width / 0.18)):
@@ -211,11 +231,12 @@ def sword(p, x, y, z, ang, normal, length=2.0):
         return (x + ax * u + nx * w, y + v, z + az * u + nz * w)
     tip = (du * length * 0.62, dv * length * 0.62)
     hilt = (-du * length * 0.38, -dv * length * 0.38)
-    p.beam([pt(0, 0, 0.12), pt(tip[0], tip[1], 0.12)], 0.14, 0.03, PAL['silver'], METAL, up=(nx, 0, nz))
-    p.beam([pt(0, 0, 0.13), pt(hilt[0] * 0.75, hilt[1] * 0.75, 0.13)], 0.07, 0.07, PAL['leather'], WOOD, up=(nx, 0, nz))
+    # crossed over the shield's face (0.2 off the wall), each piece a layer proud of the last
+    p.beam([pt(0, 0, 0.26), pt(tip[0], tip[1], 0.26)], 0.14, 0.03, PAL['silver'], METAL, up=(nx, 0, nz))
+    p.beam([pt(0, 0, 0.27), pt(hilt[0] * 0.75, hilt[1] * 0.75, 0.27)], 0.07, 0.07, PAL['leather'], WOOD, up=(nx, 0, nz))
     gu, gv = math.cos(ang) * 0.36, -math.sin(ang) * 0.36
-    p.beam([pt(-gu, -gv, 0.14), pt(gu, gv, 0.14)], 0.08, 0.08, PAL['gold'], METAL, up=(nx, 0, nz))
-    cx, cz = pt(hilt[0], hilt[1], 0.14)[0], pt(hilt[0], hilt[1], 0.14)[2]
+    p.beam([pt(-gu, -gv, 0.29), pt(gu, gv, 0.29)], 0.08, 0.08, PAL['gold'], METAL, up=(nx, 0, nz))
+    cx, cz = pt(hilt[0], hilt[1], 0.29)[0], pt(hilt[0], hilt[1], 0.29)[2]
     p.box((cx, y + hilt[1], cz), (0.14, 0.14, 0.14), PAL['gold'], METAL)
 
 
@@ -233,7 +254,8 @@ def antlers(p, x, y, z, normal, size=1.0):
     """A trophy: a carved shield-shaped board with a pair of branching antlers."""
     nx, nz = normal
     ax, az = nz, -nx
-    cbox(p, x + nx * 0.1, y, z + nz * 0.1, 0.9 * size if abs(ax) > 0.5 else 0.12, 1.1 * size,
+    # the board stands clear of a banner hung behind it (0.14 off the wall)
+    cbox(p, x + nx * 0.2, y, z + nz * 0.2, 0.9 * size if abs(ax) > 0.5 else 0.12, 1.1 * size,
          0.9 * size if abs(az) > 0.5 else 0.12, PAL['oak_dark'], WOOD)
     for sgn in (-1, 1):
         pts = []
@@ -305,8 +327,10 @@ def shelves(p, x0, x1, z0, z1, y0, y1, face, seed=0, rows=6):
     L = (x1 - x0) if along_x else (z1 - z0)
     depth = (z1 - z0) if along_x else (x1 - x0)
     # carcass front: posts and shelves proud of the back
-    front = (z0 if fz < 0 else z1) if along_x else (x0 if fx < 0 else x1)
     sgn = fz if along_x else fx
+    # the whole case stands clear of the wall's timber posts (0.075 proud of it) by a layer
+    off = 0.075 + LAYER
+    front = ((z0 if fz < 0 else z1) if along_x else (x0 if fx < 0 else x1)) + sgn * off
     back = front - sgn * depth
     if along_x:
         abox(p, x0, x1, y0, y1, min(back, back + sgn * 0.1), max(back, back + sgn * 0.1), dark, WOOD)
@@ -320,11 +344,11 @@ def shelves(p, x0, x1, z0, z1, y0, y1, face, seed=0, rows=6):
         sh = (y1 - y0 - 0.5) / rows
         # the shelf board
         if along_x:
-            abox(p, x0, x1, sy - 0.05, sy, min(front, front - sgn * depth), max(front, front - sgn * depth),
+            abox(p, x0, x1, sy - 0.05, sy, min(front, front - sgn * (depth - 0.1)), max(front, front - sgn * (depth - 0.1)),
                  PAL['oak'][0], WOOD)
         else:
-            abox(p, min(front, front - sgn * depth), max(front, front - sgn * depth), sy - 0.05, sy, z0, z1,
-                 PAL['oak'][0], WOOD)
+            abox(p, min(front, front - sgn * (depth - 0.1)), max(front, front - sgn * (depth - 0.1)), sy - 0.05, sy, z0,
+                 z1, PAL['oak'][0], WOOD)
         # the books: a run of spines a hand back from the shelf's front
         a = 0.08
         k = 0
@@ -350,7 +374,7 @@ def shelves(p, x0, x1, z0, z1, y0, y1, face, seed=0, rows=6):
             flat_face(p, top, PAL['parchment'], WOOD, (0, 1, 0))
             if k % 3 == 0:
                 g0, g1 = sy + bh * 0.78, sy + bh * 0.78 + 0.04
-                wb = w1 + sgn * 0.004
+                wb = w1 + sgn * LAYER
                 if along_x:
                     band = [(x0 + b0, g0, wb), (x0 + b1, g0, wb), (x0 + b1, g1, wb), (x0 + b0, g1, wb)]
                 else:
@@ -422,21 +446,22 @@ def great_hall(p, glow):
         bench(p, cx, -5.35, 6.0, 0.5)
         for k in range(5):
             px = cx - 2.4 + k * 1.2
-            plate(p, px, FLOOR + 1.0, -6.75)
-            plate(p, px + 0.3, FLOOR + 1.0, -6.05)
+            plate(p, px, FLOOR + 1.0 + LAYER, -6.75)
+            plate(p, px + 0.3, FLOOR + 1.0 + LAYER, -6.05)
             if k % 2 == 0:
-                goblet(p, px + 0.25, FLOOR + 1.0, -6.75)
+                goblet(p, px + 0.25, FLOOR + 1.0 + LAYER, -6.75)
             else:
-                food(p, px, FLOOR + 1.02, -6.4, seed=k)
-        candle(glow, p, cx - 1.5, FLOOR + 1.0, -6.4, h=0.4, r=0.07)
-        candle(glow, p, cx + 1.5, FLOOR + 1.0, -6.4, h=0.4, r=0.07)
+                food(p, px, FLOOR + 1.02 + LAYER, -6.4, seed=k)
+        candle(glow, p, cx - 1.5, FLOOR + 1.0 + LAYER, -6.4, h=0.4, r=0.07)
+        candle(glow, p, cx + 1.5, FLOOR + 1.0 + LAYER, -6.4, h=0.4, r=0.07)
         # the north quadrants: a chest and two armour-less weapon racks against the back wall
         chest(p, sx * 9.25, H['z1'] - 0.75, 1.6, 0.9, seed=sx)
         for k in range(2):
             rx = sx * (7.6 + k * 3.3)
             weapon_rack(p, rx, H['z1'] - 0.5)
     # rugs on the hearth's axes, never on its ring
-    rug(p, -1.6, 1.6, -9.6, -4.4, seed=1)
+    # (the door's rug stops short of the gold star inlaid in the floor by the door)
+    rug(p, -1.6, 1.6, -6.0, -4.4, seed=1)
     rug(p, -1.6, 1.6, 4.4, 8.4, field=PAL['blue'], border=PAL['garnet_dark'], seed=2)
     rug(p, 4.6, 9.4, -1.4, 1.4, field=PAL['blue'], border=PAL['garnet_dark'], seed=3)
     rug(p, -9.4, -4.6, -1.4, 1.4, seed=4)
@@ -444,7 +469,8 @@ def great_hall(p, glow):
     for x in (-7.0, 7.0):
         banner(p, x, H['z0'], FLOOR + 9.6, (0, 1), width=1.7, length=4.6,
                field=PAL['blue'] if x > 0 else PAL['garnet'])
-    for x in (-12.0, -6.6, 6.6, 12.0):
+    # (the corner pair a hand short of the gable walls, their rods' finials clear of the plaster)
+    for x in (-11.7, -6.6, 6.6, 11.7):
         banner(p, x, H['z1'], FLOOR + 9.8, (0, -1), width=1.4, length=4.0,
                field=PAL['garnet'] if abs(x) > 10 else PAL['blue'])
     # tapestries on the gable walls either side of the arches
@@ -482,7 +508,8 @@ def sconce(p, glow, x, y, z, normal):
 
 def chest(p, x, z, lx, lz, seed=0):
     abox(p, x - lx / 2, x + lx / 2, FLOOR, FLOOR + 0.8, z - lz / 2, z + lz / 2, tone(PAL['oak'][1], seed), WOOD)
-    p.prism((x - lx / 2, FLOOR + 0.8, z), 8, lz / 2, lz / 2, lx, tone(PAL['oak'][2], seed), WOOD, axis=(1, 0, 0),
+    p.prism((x - lx / 2 - LAYER, FLOOR + 0.8, z), 8, lz / 2, lz / 2, lx + 2 * LAYER, tone(PAL['oak'][2], seed), WOOD,
+            axis=(1, 0, 0),
             squash=0.5)
     for f in (0.2, 0.8):
         abox(p, x - lx / 2 + lx * f - 0.05, x - lx / 2 + lx * f + 0.05, FLOOR, FLOOR + 0.82, z - lz / 2 - 0.02,
@@ -494,8 +521,9 @@ def weapon_rack(p, x, z):
     """A rack against the wall: two posts, a rail, three spears and a halberd standing in it."""
     for dx in (-0.8, 0.8):
         abox(p, x + dx - 0.07, x + dx + 0.07, FLOOR, FLOOR + 2.0, z - 0.35, z + 0.15, PAL['oak_dark'], WOOD)
-    abox(p, x - 0.9, x + 0.9, FLOOR + 1.6, FLOOR + 1.72, z - 0.35, z + 0.15, PAL['oak_dark'], WOOD)
-    abox(p, x - 0.9, x + 0.9, FLOOR, FLOOR + 0.12, z - 0.35, z + 0.15, PAL['oak_dark'], WOOD)
+    # the rails a layer inside the posts' faces
+    abox(p, x - 0.9, x + 0.9, FLOOR + 1.6, FLOOR + 1.72, z - 0.35 + LAYER, z + 0.15 - LAYER, PAL['oak_dark'], WOOD)
+    abox(p, x - 0.9, x + 0.9, FLOOR, FLOOR + 0.12, z - 0.35 + LAYER, z + 0.15 - LAYER, PAL['oak_dark'], WOOD)
     for k in range(4):
         sx = x - 0.6 + k * 0.4
         cyl(p, sx, FLOOR + 0.12, FLOOR + 3.4, z - 0.12, 0.04, PAL['oak'][0], WOOD, sides=5)
@@ -509,16 +537,16 @@ def high_table(p, glow):
     zt = 14.0
     table(p, 0.0, zt, 8.6, 1.4, y=DAIS, cloth=PAL['garnet'])
     # the cloth of state hanging over the table's front
-    abox(p, -4.1, 4.1, DAIS + 0.25, DAIS + 1.0, zt - 0.72, zt - 0.7, PAL['garnet'], WOOD)
-    abox(p, -4.1, 4.1, DAIS + 0.25, DAIS + 0.35, zt - 0.74, zt - 0.72, PAL['gold'], METAL)
+    abox(p, -4.1, 4.1, DAIS + 0.25, DAIS + 1.0, zt - 0.7 - 1.5 * LAYER, zt - 0.7, PAL['garnet'], WOOD)
+    abox(p, -4.1, 4.1, DAIS + 0.25, DAIS + 0.35, zt - 0.7 - 2.5 * LAYER, zt - 0.7 - 1.5 * LAYER, PAL['gold'], METAL)
     for k in range(5):
         px = -3.2 + k * 1.6
-        plate(p, px, DAIS + 1.0, zt - 0.2, r=0.26, col=PAL['gold_dark'] if k == 2 else PAL['pewter'])
-        goblet(p, px + 0.4, DAIS + 1.0, zt - 0.1)
+        plate(p, px, DAIS + 1.0 + LAYER, zt - 0.2, r=0.26, col=PAL['gold_dark'] if k == 2 else PAL['pewter'])
+        goblet(p, px + 0.4, DAIS + 1.0 + LAYER, zt - 0.1)
     for x in (-2.4, 0.0, 2.4):
-        candle(glow, p, x, DAIS + 1.0, zt + 0.3, h=0.5, r=0.08)
-    food(p, -1.2, DAIS + 1.02, zt + 0.25, seed=3)
-    food(p, 1.2, DAIS + 1.02, zt + 0.25, seed=4)
+        candle(glow, p, x, DAIS + 1.0 + LAYER, zt + 0.3, h=0.5, r=0.08)
+    food(p, -1.2, DAIS + 1.02 + LAYER, zt + 0.25, seed=3)
+    food(p, 1.2, DAIS + 1.02 + LAYER, zt + 0.25, seed=4)
     # the lord's chair in the middle, carved and gilded, and four high-backed chairs
     chair(p, 0.0, zt + 1.3, math.pi, y=DAIS, high=3.4, carved=True, cushion=PAL['garnet'])
     for x in (-3.4, -1.7, 1.7, 3.4):
@@ -528,7 +556,7 @@ def high_table(p, glow):
         banner(p, sx * 4.2, B['z1'], DAIS + 8.0, (0, -1), width=1.5, length=5.0,
                field=PAL['blue'] if sx > 0 else PAL['garnet'])
         candelabrum(p, glow, sx * 5.2, zt - 1.4, y=DAIS, h=2.4)
-    rug(p, -4.6, 4.6, 11.3, 16.6, y=DAIS + 0.015, field=PAL['blue'], border=PAL['gold_dark'], seed=8)
+    rug(p, -4.6, 4.6, 11.3, 16.6, y=DAIS + LAYER, field=PAL['blue'], border=PAL['gold_dark'], seed=8)
 
 
 def dining(p, glow):
@@ -546,9 +574,9 @@ def dining(p, glow):
         for sx in (-1, 1):
             plate(p, xc + sx * 0.6, FLOOR + 1.0, zz)
             goblet(p, xc + sx * 0.6, FLOOR + 1.0, zz + 0.35)
-        food(p, xc, FLOOR + 1.02, zz + 0.9, seed=k)
+        food(p, xc, FLOOR + 1.02 + LAYER, zz + 0.9, seed=k)
     for zz in (zc - 3.0, zc, zc + 3.0):
-        candelabrum_small(p, glow, xc, FLOOR + 1.0, zz)
+        candelabrum_small(p, glow, xc, FLOOR + 1.0 + LAYER, zz)
     # the sideboard on the west wall with the plate displayed on it
     sb = (23.1, W['x1'])
     abox(p, sb[0], sb[1], FLOOR, FLOOR + 1.4, -4.2, 2.6, PAL['walnut'], WOOD)
@@ -640,8 +668,10 @@ def library(p, glow):
     E = EAST
     # the east wall of shelves, floor to near the ceiling, and its rolling ladder
     shelves(p, E['x0'], E['x0'] + 0.9, -6.6, 4.2, FLOOR, FLOOR + 6.2, (1, 0), seed=1, rows=7)
-    p.beam([(E['x0'] + 1.05, FLOOR + 6.0, -6.4), (E['x0'] + 1.05, FLOOR + 6.0, 4.0)], 0.05, 0.05, PAL['gold'], METAL)
-    lx = E['x0'] + 1.0
+    # the ladder's rail rides a hand proud of the shelves' posts (their fronts 0.9 + 0.115 + 0.04 out)
+    rail_x = E['x0'] + 0.9 + 0.075 + LAYER + 0.04 + 0.035
+    p.beam([(rail_x, FLOOR + 6.0, -6.4), (rail_x, FLOOR + 6.0, 4.0)], 0.05, 0.05, PAL['gold'], METAL)
+    lx = rail_x - 0.05
     for dz in (-0.3, 0.3):
         p.beam([(lx + 1.0, FLOOR, -1.0 + dz), (lx + 0.05, FLOOR + 6.0, -1.0 + dz)], 0.08, 0.06, PAL['oak'][2], WOOD)
     for k in range(12):
@@ -657,7 +687,7 @@ def library(p, glow):
     for (ex, ez) in ((-1.05, -0.75), (1.05, -0.75), (-1.05, 0.75), (1.05, 0.75)):
         abox(p, dx + ex - 0.08, dx + ex + 0.08, FLOOR, FLOOR + 1.0, dz + ez - 0.08, dz + ez + 0.08, PAL['oak_dark'], WOOD)
     p.box((dx, FLOOR + 1.25, dz), (1.1, 0.06, 0.8), PAL['parchment'], WOOD, pitch=-0.2)
-    p.box((dx, FLOOR + 1.27, dz), (0.04, 0.08, 0.82), PAL['leather'], WOOD, pitch=-0.2)
+    p.box((dx, FLOOR + 1.3, dz), (0.04, 0.08, 0.8 + 2 * LAYER), PAL['leather'], WOOD, pitch=-0.2)
     candle(glow, p, dx + 0.9, FLOOR + 1.12, dz + 0.5, h=0.3)
     chair(p, dx, dz - 1.5, 0.0, high=2.4, cushion=PAL['garnet'])
     gx, gz = -15.8, -4.9
@@ -683,14 +713,14 @@ def chapel(p, glow):
     ax, az = (C['x0'] + C['x1']) / 2, 11.5
     abox(p, ax - 1.2, ax + 1.2, FLOOR, FLOOR + 1.3, az - 0.5, az + 0.5, PAL['ashlar_hi'], STONE)
     abox(p, ax - 1.3, ax + 1.3, FLOOR + 1.3, FLOOR + 1.45, az - 0.6, az + 0.6, PAL['ashlar_hi'], STONE)
-    abox(p, ax - 1.25, ax + 1.25, FLOOR + 1.45, FLOOR + 1.47, az - 0.55, az + 0.55, PAL['cream'], WOOD)
-    abox(p, ax - 0.4, ax + 0.4, FLOOR + 0.6, FLOOR + 1.45, az - 0.62, az - 0.6, PAL['garnet'], WOOD)
-    cyl(p, ax, FLOOR + 1.47, FLOOR + 2.0, az + 0.2, 0.05, PAL['gold'], METAL, sides=6)
+    abox(p, ax - 1.25, ax + 1.25, FLOOR + 1.45, FLOOR + 1.45 + LAYER, az - 0.55, az + 0.55, PAL['cream'], WOOD)
+    abox(p, ax - 0.4, ax + 0.4, FLOOR + 0.6, FLOOR + 1.45 + LAYER, az - 0.6 - 1.5 * LAYER, az - 0.6, PAL['garnet'], WOOD)
+    cyl(p, ax, FLOOR + 1.45 + LAYER, FLOOR + 2.0, az + 0.2, 0.05, PAL['gold'], METAL, sides=6)
     sun = [(math.cos(math.tau * i / 16) * (0.42 if i % 2 else 0.22), math.sin(math.tau * i / 16) * (0.42 if i % 2 else 0.22))
            for i in range(16)]
     flat_face(p, [(ax + a, FLOOR + 2.45 + b, az + 0.18) for (a, b) in sun], PAL['gold'], METAL, (0, 0, -1))
     for k in range(5):
-        candle(glow, p, ax - 1.0 + k * 0.5, FLOOR + 1.47, az - 0.2, h=0.25 + 0.15 * (k % 2), r=0.05)
+        candle(glow, p, ax - 1.0 + k * 0.5, FLOOR + 1.45 + LAYER, az - 0.2, h=0.25 + 0.15 * (k % 2), r=0.05)
     for sx in (1, -1):
         candelabrum(p, glow, ax + sx * 1.9, az - 0.3, h=1.8)
     # two short pews either side of the aisle
@@ -699,8 +729,10 @@ def chapel(p, glow):
             zz = 7.9 + k * 1.3
             abox(p, x0, x1, FLOOR + 0.45, FLOOR + 0.55, zz - 0.25, zz + 0.25, PAL['oak'][1], WOOD)
             abox(p, x0, x1, FLOOR + 0.55, FLOOR + 1.1, zz - 0.3, zz - 0.22, PAL['oak'][1], WOOD)
-            for xx in (x0, x1 - 0.08):
-                abox(p, xx, xx + 0.08, FLOOR, FLOOR + 1.1, zz - 0.3, zz + 0.25, PAL['oak_dark'], WOOD)
+            # the pew ends stand proud of the seat and the back on every side (never flush)
+            for xx in (x0 - LAYER, x1 - 0.08 + LAYER):
+                abox(p, xx, xx + 0.08, FLOOR, FLOOR + 1.1 + 2 * LAYER, zz - 0.3 - LAYER, zz + 0.25 + LAYER,
+                     PAL['oak_dark'], WOOD)
     rug(p, -19.5, -18.1, 6.2, 10.8, field=PAL['garnet'], border=PAL['gold_dark'], seed=17)
     banner(p, C['x0'], 8.8, FLOOR + 6.4, (1, 0), width=1.0, length=2.8, field=PAL['blue'])
     banner(p, C['x1'], 8.8, FLOOR + 6.4, (-1, 0), width=1.0, length=2.8, field=PAL['blue'])

@@ -7,7 +7,7 @@ ManorTrim (gold, iron and the carved crest) and ManorGlow (lit glass).
 """
 import math
 
-from manor_lib import (GLASS, GLOW, METAL, PAL, PLASTER, SLATE, STONE, WOOD, Wall, abox, cbox, cyl, disc,
+from manor_lib import (GLASS, GLOW, LAYER, METAL, PAL, PLASTER, SLATE, STONE, WOOD, Wall, abox, cbox, cyl, disc,
                        flat_face, hashf, hexa, manor_wall, opening_spans, pick, slate_roof, tone, window)
 from manor_plan import (ARCH_DAIS, ARCH_SIDE, BAY, CHAPEL, CHAPEL_DOOR, COLUMN_R, COLUMNS, DAIS,
                         DAIS_FRONT, DOOR, EAST, EAVE_OUT, FLOOR, FOOT, HALL, HALL_PITCH, HATCH, HEARTH,
@@ -70,7 +70,7 @@ def arch_ring(p, wall, u0, u1, spring, t, color=None, n=7, depth=0.3, key=True):
 def flag_floor(p, x0, x1, z0, z1, y, size=1.9, seed=0, colors=None):
     """A flagstone floor: a mortar bed and dressed slabs a hair proud of it, staggered rows."""
     colors = colors or PAL['flag']
-    flat_face(p, [(x0, y - 0.01, z0), (x1, y - 0.01, z0), (x1, y - 0.01, z1), (x0, y - 0.01, z1)], PAL['mortar'],
+    flat_face(p, [(x0, y - LAYER, z0), (x1, y - LAYER, z0), (x1, y - LAYER, z1), (x0, y - LAYER, z1)], PAL['mortar'],
               STONE, (0, 1, 0))
     z = z0
     row = 0
@@ -93,7 +93,7 @@ def flag_floor(p, x0, x1, z0, z1, y, size=1.9, seed=0, colors=None):
 
 def board_floor(p, x0, x1, z0, z1, y, along='z', width=0.42, seed=0):
     """Oak boards: strips with a dark joint between, their butt joints staggered."""
-    flat_face(p, [(x0, y - 0.01, z0), (x1, y - 0.01, z0), (x1, y - 0.01, z1), (x0, y - 0.01, z1)],
+    flat_face(p, [(x0, y - LAYER, z0), (x1, y - LAYER, z0), (x1, y - LAYER, z1), (x0, y - LAYER, z1)],
               PAL['walnut'], WOOD, (0, 1, 0))
     a0, a1, b0, b1 = (x0, x1, z0, z1) if along == 'z' else (z0, z1, x0, x1)
     a = a0
@@ -284,7 +284,7 @@ def hall_walls(p, glow):
         oc = (Z(-1.3), Z(1.3), FLOOR + 15.0, FLOOR + 17.6)
         # the wing's roof covers this face to about 15 yd: the outer frame starts above it
         manor_wall(p, g, t, top, [arch, oc], plinth=STONE_TO, seed=3 + sx,
-                   rails=[STONE_TO + 0.12, FLOOR + 8.0, H['plate'] - 0.15, FLOOR + 14.6])
+                   rails=[STONE_TO + 0.12, FLOOR + 8.0, H['plate'] - 0.21, FLOOR + 14.6])
         arch_ring(p, g, arch[0], arch[1], spring, t, n=7)
         oculus(p, g, (oc[0] + oc[1]) / 2, (oc[2] + oc[3]) / 2, 1.3, t, glow)
         wainscot(p, g, t, 0.9, arch[0] - 0.5)
@@ -330,10 +330,12 @@ def oculus(p, wall, uc, vc, r, t, glow):
             k = sq / max(abs(c), abs(s))
             return c * k, s * k
         ea, eb = edge(ca, sa), edge(cb, sb)
-        pts = [wall.pt(uc + ca * r, vc + sa * r, -half), wall.pt(uc + cb * r, vc + sb * r, -half),
-               wall.pt(uc + eb[0], vc + eb[1], -half), wall.pt(uc + ea[0], vc + ea[1], -half),
-               wall.pt(uc + ca * r, vc + sa * r, half), wall.pt(uc + cb * r, vc + sb * r, half),
-               wall.pt(uc + eb[0], vc + eb[1], half), wall.pt(uc + ea[0], vc + ea[1], half)]
+        # (recessed a layer from both of the wall's plaster faces)
+        fi, fo = -half + LAYER, half - 0.05 - LAYER
+        pts = [wall.pt(uc + ca * r, vc + sa * r, fi), wall.pt(uc + cb * r, vc + sb * r, fi),
+               wall.pt(uc + eb[0], vc + eb[1], fi), wall.pt(uc + ea[0], vc + ea[1], fi),
+               wall.pt(uc + ca * r, vc + sa * r, fo), wall.pt(uc + cb * r, vc + sb * r, fo),
+               wall.pt(uc + eb[0], vc + eb[1], fo), wall.pt(uc + ea[0], vc + ea[1], fo)]
         hexa(p, pts, pick(PAL['plaster'], i), PLASTER)
     # the quatrefoil tracery
     lead = (0.15, 0.14, 0.13)
@@ -351,7 +353,8 @@ def door_frame(p, wall, u0, u1, t):
     for s in (1, -1):
         wa, wb = (half - 0.02, half + 0.22) if s > 0 else (-half - 0.16, -half + 0.02)
         # jambs: big quoins, alternately long and short
-        for (ua, ub, out) in ((u0 - 0.5, u0, -1), (u1, u1 + 0.5, 1)):
+        # (a layer into the opening, so a quoin's face never lies on the wall core's reveal)
+        for (ua, ub, out) in ((u0 - 0.5, u0 + LAYER, -1), (u1 - LAYER, u1 + 0.5, 1)):
             v = FLOOR
             k = 0
             while v < head - 0.05:
@@ -363,7 +366,7 @@ def door_frame(p, wall, u0, u1, t):
                 v = v1
                 k += 1
         # the lintel
-        wall.box(p, u0 - 0.7, u1 + 0.7, head, head + 0.7, wa, wb + (0.06 if s > 0 else 0), PAL['ashlar_hi'], STONE)
+        wall.box(p, u0 - 0.7, u1 + 0.7, head - LAYER, head + 0.7, wa, wb + (0.06 if s > 0 else 0), PAL['ashlar_hi'], STONE)
     # the tympanum: a half disc of dressed stone over the lintel, a gilded sunburst on it (outside)
     r = width / 2 + 0.5
     n = 10
@@ -941,24 +944,29 @@ def crest(p, x, y, z):
         for sgn in (1, -1):
             pts = [(x + sgn * wa, ya, z - 0.1), (x + sgn * (wa + 0.14), ya, z - 0.1),
                    (x + sgn * (wb + 0.14), yb, z - 0.1), (x + sgn * wb, yb, z - 0.1),
-                   (x + sgn * wa, ya, z - 0.22), (x + sgn * (wa + 0.14), ya, z - 0.22),
-                   (x + sgn * (wb + 0.14), yb, z - 0.22), (x + sgn * wb, yb, z - 0.22)]
+                   (x + sgn * wa, ya, z - 0.14 - 2.5 * LAYER), (x + sgn * (wa + 0.14), ya, z - 0.14 - 2.5 * LAYER),
+                   (x + sgn * (wb + 0.14), yb, z - 0.14 - 2.5 * LAYER), (x + sgn * wb, yb, z - 0.14 - 2.5 * LAYER)]
             hexa(p, pts, PAL['gold'], METAL)
-    abox(p, x - w - 0.14, x + w + 0.14, y + hgt / 2 - 0.02, y + hgt / 2 + 0.14, z - 0.22, z, PAL['gold'], METAL)
+    # each charge a layer over the one under it: shield, peaks, their snow, the flame; the
+    # border over the field and the top band over the border
+    abox(p, x - w - 0.14, x + w + 0.14, y + hgt / 2 - 0.02, y + hgt / 2 + 0.14, z - 0.14 - 4 * LAYER, z, PAL['gold'],
+         METAL)
     # three silver peaks
     base = y - 0.45
     for (px, ph, pw) in ((-0.62, 0.9, 0.55), (0.0, 1.25, 0.7), (0.62, 0.85, 0.55)):
-        pts = [(x + px - pw, base, z - 0.15), (x + px + pw, base, z - 0.15), (x + px, base + ph, z - 0.15)]
+        lift = z - 0.14 - (2 if px == 0.0 else 1) * LAYER
+        pts = [(x + px - pw, base, lift), (x + px + pw, base, lift), (x + px, base + ph, lift)]
         flat_face(p, pts, PAL['silver'], METAL, (0, 0, -1))
-        pts = [(x + px - pw * 0.35, base + ph * 0.65, z - 0.16), (x + px + pw * 0.35, base + ph * 0.65, z - 0.16),
-               (x + px, base + ph, z - 0.16)]
+        snow = lift - LAYER
+        pts = [(x + px - pw * 0.35, base + ph * 0.65, snow), (x + px + pw * 0.35, base + ph * 0.65, snow),
+               (x + px, base + ph, snow)]
         flat_face(p, pts, PAL['cream'], METAL, (0, 0, -1))
-    abox(p, x - 1.2, x + 1.2, base - 0.12, base, z - 0.2, z - 0.1, PAL['silver'], METAL)
+    abox(p, x - 1.2, x + 1.2, base - 0.12, base, z - 0.14 - 1.5 * LAYER, z - 0.1, PAL['silver'], METAL)
     # the beacon flame over them
     fy = y + 0.55
     flame = [(0.0, 0.62), (0.2, 0.25), (0.32, 0.0), (0.18, -0.22), (0.0, -0.3), (-0.18, -0.22), (-0.32, 0.0),
              (-0.2, 0.25)]
-    flat_face(p, [(x + fx, fy + fy2, z - 0.17) for (fx, fy2) in flame], PAL['gold'], METAL, (0, 0, -1))
+    flat_face(p, [(x + fx, fy + fy2, z - 0.14 - 4 * LAYER) for (fx, fy2) in flame], PAL['gold'], METAL, (0, 0, -1))
     # the laurel sprays: leaves along two arcs either side
     for sgn in (1, -1):
         for k in range(9):
@@ -1204,10 +1212,7 @@ def wings(p, p_roof, p_trim, glow):
     # the dining hall's floor (oak) and the kitchen's (flags)
     board_floor(p, H['ox1'], W['x1'], W['z0'], W['z1'], FLOOR, along='x', seed=56)
     flag_floor(p, K['x0'], W['x1'], K['z0'], K['z1'], FLOOR, size=1.3, seed=57)
-    # the floor in the doorway
-    flat_face(p, [(KITCHEN_DOOR['x0'], FLOOR, W['z1']), (KITCHEN_DOOR['x1'], FLOOR, W['z1']),
-                  (KITCHEN_DOOR['x1'], FLOOR, K['z0']), (KITCHEN_DOOR['x0'], FLOOR, K['z0'])], PAL['ashlar_hi'],
-              STONE, (0, 1, 0))
+    # (the doorway's floor is inner_door's oak sill)
     # roofs: the dining hall's ridge runs east-west into the hall's gable, hipped at its west end;
     # the kitchen's lower roof is hipped at both ends
     hip_roof(p_roof, H['ox1'] + 0.8, W['ox1'], W['oz0'], W['z1'] + t, plate, 0.72, 'x', hips=(False, True),
@@ -1255,9 +1260,7 @@ def wings(p, p_roof, p_trim, glow):
     # floors: library oak, chapel flags
     board_floor(p, E['x0'], H['ox0'], E['z0'], E['z1'], FLOOR, along='z', seed=67)
     flag_floor(p, C['x0'], C['x1'], C['z0'], C['z1'], FLOOR, size=1.2, seed=68)
-    flat_face(p, [(CHAPEL_DOOR['x0'], FLOOR, E['z1']), (CHAPEL_DOOR['x1'], FLOOR, E['z1']),
-                  (CHAPEL_DOOR['x1'], FLOOR, C['z0']), (CHAPEL_DOOR['x0'], FLOOR, C['z0'])], PAL['ashlar_hi'],
-              STONE, (0, 1, 0))
+    # (the doorway's floor is inner_door's oak sill)
     # roofs: the library like the dining hall; the chapel a steep gable running north
     hip_roof(p_roof, E['ox0'], H['ox0'] - 0.8, E['oz0'], E['z1'] + t, plate, 0.72, 'x', hips=(True, False),
              seed=69)
@@ -1284,13 +1287,16 @@ def inner_door(p, wall, u0, u1, t, arch=False):
     head = SIDE_DOOR_H
     for s in (1, -1):
         wa, wb = (half - 0.02, half + 0.12) if s > 0 else (-half - 0.12, -half + 0.02)
-        wall.box(p, u0 - 0.3, u0, FLOOR, head, wa, wb, PAL['oak_dark'], WOOD)
-        wall.box(p, u1, u1 + 0.3, FLOOR, head, wa, wb, PAL['oak_dark'], WOOD)
+        # (the posts' faces a layer back from the lining's, never on its plane)
+        wall.box(p, u0 - 0.3, u0 - LAYER, FLOOR, head, wa, wb, PAL['oak_dark'], WOOD)
+        wall.box(p, u1 + LAYER, u1 + 0.3, FLOOR, head, wa, wb, PAL['oak_dark'], WOOD)
         wall.box(p, u0 - 0.4, u1 + 0.4, head, head + 0.4, wa, wb, PAL['oak_dark'], WOOD)
     # the jambs' lining through the wall
     wall.box(p, u0 - 0.06, u0, FLOOR, head, -half, half, PAL['oak'][0], WOOD)
     wall.box(p, u1, u1 + 0.06, FLOOR, head, -half, half, PAL['oak'][0], WOOD)
     wall.box(p, u0, u1, head - 0.06, head, -half, half, PAL['oak'][0], WOOD)
+    # an oak sill a layer proud, closed over the wall core's cut and the floors meeting under it
+    wall.box(p, u0 - 0.06, u1 + 0.06, FLOOR - 0.02, FLOOR + LAYER, -half - 0.02, half + 0.02, PAL['oak'][1], WOOD)
     if arch:
         r = (u1 - u0) / 2 + 0.4
         um = (u0 + u1) / 2
@@ -1435,16 +1441,16 @@ def stained_small(p, p_trim, glow, wall, u0, u1, v0, v1, t):
 def hall_floor(p, p_trim):
     flag_floor(p, H['x0'], H['x1'], H['z0'], H['z1'], FLOOR, size=2.0, seed=81)
     # a border of dark stone round the hearth's step and a compass star inlaid in gold at the door
-    for (x0, x1, z0, z1) in ((DOOR['x0'], DOOR['x1'], H['oz0'], H['z0']),
-                             (H['x1'], H['ox1'], ARCH_SIDE['z0'], ARCH_SIDE['z1']),
+    # (the door's own threshold is door_frame's; the side arches get a dressed sill a layer
+    # proud, a closed stone over the wall core's cut)
+    for (x0, x1, z0, z1) in ((H['x1'], H['ox1'], ARCH_SIDE['z0'], ARCH_SIDE['z1']),
                              (H['ox0'], H['x0'], ARCH_SIDE['z0'], ARCH_SIDE['z1'])):
-        flat_face(p, [(x0, FLOOR, z0), (x1, FLOOR, z0), (x1, FLOOR, z1), (x0, FLOOR, z1)], PAL['ashlar_hi'], STONE,
-                  (0, 1, 0))
+        abox(p, x0, x1, FLOOR - 0.02, FLOOR + LAYER, z0, z1, PAL['ashlar_hi'], STONE)
     star = []
     for i in range(16):
         r = 1.3 if i % 2 == 0 else 0.45
         a = math.tau * i / 16
-        star.append((math.cos(a) * r, FLOOR + 0.012, -7.0 + math.sin(a) * r))
+        star.append((math.cos(a) * r, FLOOR + LAYER, -7.6 + math.sin(a) * r))
     flat_face(p_trim, star, PAL['gold'], METAL, (0, 1, 0))
 
 

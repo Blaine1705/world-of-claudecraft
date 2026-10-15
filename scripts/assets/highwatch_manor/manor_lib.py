@@ -21,6 +21,11 @@ from shiplib import EDGE, FLAT, P, PLAIN, scale_color  # noqa: E402,F401
 
 WOOD, METAL, STONE, PLASTER, GLOW, SLATE, GLASS = 0, 1, 2, 3, 4, 5, 6
 
+# The least gap between a decal-like layer and the surface under it (a rug on a floor, a stripe
+# on a banner, a skin on a wall's core): closer than this, two overlapping faces fight in the
+# depth buffer and flicker (pinned by tests/highwatch_manor_asset.test.ts over the shipped GLB).
+LAYER = 0.04
+
 # A glTF material's emission cannot read the vertex colours, so each glowing material carries
 # its own emission colour: the warm amber of lamplight behind glass and of candle flames, and
 # a faint warm light through the coloured glass (whose colours are its vertex colours, lit by
@@ -314,9 +319,9 @@ def manor_wall(p, wall, t, top, openings, plinth=2.4, y0=-1.0, seed=0, bays=3.0,
             s_hi_a = min(plinth, ta) if vb is None else min(plinth, vb)
             s_hi_b = min(plinth, tb) if vb is None else min(plinth, vb)
             if max(s_hi_a, s_hi_b) > va + 1e-3:
-                wall.box(p, ua, ub, va, s_hi_a, -half, half, PAL['mortar'], STONE, v1b=s_hi_b)
+                wall.box(p, ua, ub, va, s_hi_a, -half + LAYER + 0.01, half, PAL['mortar'], STONE, v1b=s_hi_b)
                 if inner and max(s_hi_a, s_hi_b) > max(va, 0.55) + 1e-3:
-                    wall.skin(p, ua, ub, max(va, 0.55), s_hi_a, -half - 0.02, -1,
+                    wall.skin(p, ua, ub, max(va, 0.55), s_hi_a, -half, -1,
                               tone(PAL['ashlar_hi'], seed, k, spread=0.06), STONE, v1b=s_hi_b)
             lo = max(va, plinth)
             if vb is None:
@@ -324,19 +329,21 @@ def manor_wall(p, wall, t, top, openings, plinth=2.4, y0=-1.0, seed=0, bays=3.0,
                     wall.box(p, ua, ub, lo, max(ta, lo + 0.01), -half + 0.05, half - 0.05,
                              pick(PAL['plaster'], seed + k), PLASTER, v1b=max(tb, lo + 0.01))
                     if inner:
-                        wall.skin(p, ua, ub, lo, max(ta, lo + 0.01), -half + 0.03, -1,
+                        wall.skin(p, ua, ub, lo, max(ta, lo + 0.01), -half, -1,
                                   pick(inner_color, seed + k), PLASTER, v1b=max(tb, lo + 0.01))
             elif vb > lo + 1e-3:
                 wall.box(p, ua, ub, lo, vb, -half + 0.05, half - 0.05, pick(PAL['plaster'], seed + k),
                          PLASTER)
                 if inner:
-                    wall.skin(p, ua, ub, lo, vb, -half + 0.03, -1, pick(inner_color, seed + k), PLASTER)
+                    wall.skin(p, ua, ub, lo, vb, -half, -1, pick(inner_color, seed + k), PLASTER)
             k += 1
-    # the ashlar: courses of dressed blocks proud of the core, staggered, each its own tone
+    # the ashlar: courses of dressed blocks proud of the core, staggered, each its own tone (a
+    # partition's plinth stops a hair over the floor: its courses would lie under the floor's
+    # flags, so it has none)
     course = 0.72
     v = y0
     row = 0
-    while v < plinth - 0.05:
+    while v < plinth - 0.05 and plinth > 0.7:
         v1 = min(plinth, v + course)
         off = (row % 2) * 0.55
         for (a, b) in opening_spans(L, openings, (v + v1) / 2):
@@ -363,7 +370,7 @@ def manor_wall(p, wall, t, top, openings, plinth=2.4, y0=-1.0, seed=0, bays=3.0,
     posts = [0.17, L - 0.17]
     for (a, b, v0, v1) in openings:
         if v1 > frame_from + 0.3:
-            posts += [a - 0.17, b + 0.17]
+            posts += [a - 0.35, b + 0.35]
     marks = sorted({0.0, L} | {max(0.0, min(L, a)) for (a, _, _, _) in openings}
                    | {max(0.0, min(L, b)) for (_, b, _, _) in openings})
     for i in range(len(marks) - 1):
@@ -393,7 +400,7 @@ def manor_wall(p, wall, t, top, openings, plinth=2.4, y0=-1.0, seed=0, bays=3.0,
             for (a, b) in opening_spans(L, [(a - 0.17, b + 0.17, v0 - 0.1, v1 + 0.1)
                                             for (a, b, v0, v1) in openings], rv):
                 if b - a > 0.3 and rv < min(top(a), top(b)):
-                    wall.beam(p, a, rv, b, rv, w, 0.26, 0.1, col, hewn=0.02)
+                    wall.beam(p, a, rv, b, rv, w - s * LAYER, 0.26, 0.1, col, hewn=0.02)
         if braces and s > 0 and len(rows) >= 2:
             lo, hi = rows[0], rows[1]
             for i in range(len(posts) - 1):
@@ -403,9 +410,9 @@ def manor_wall(p, wall, t, top, openings, plinth=2.4, y0=-1.0, seed=0, bays=3.0,
                 if any(oa < b and ob > a and v0 < hi and v1 > lo for (oa, ob, v0, v1) in openings):
                     continue
                 if (i + seed) % 2 == 0:
-                    wall.beam(p, a + 0.12, lo + 0.1, b - 0.12, hi - 0.1, w, 0.22, 0.09, col, hewn=0.015)
+                    wall.beam(p, a + 0.12, lo + 0.1, b - 0.12, hi - 0.1, w - s * LAYER, 0.22, 0.09, col, hewn=0.015)
                 else:
-                    wall.beam(p, a + 0.12, hi - 0.1, b - 0.12, lo + 0.1, w, 0.22, 0.09, col, hewn=0.015)
+                    wall.beam(p, a + 0.12, hi - 0.1, b - 0.12, lo + 0.1, w - s * LAYER, 0.22, 0.09, col, hewn=0.015)
     return posts
 
 
@@ -454,8 +461,8 @@ def window(p, wall, u0, u1, v0, v1, t, lit=True, arch=True, bars=2, inner=True, 
     for s in [1]:
         wo = s * half
         wa, wb = (wo - 0.02, wo + 0.12) if s > 0 else (wo - 0.12, wo + 0.02)
-        wall.box(p, u0 - 0.28, u0, v0, top_rect, wa, wb, PAL['ashlar_hi'], STONE)
-        wall.box(p, u1, u1 + 0.28, v0, top_rect, wa, wb, PAL['ashlar_hi'], STONE)
+        wall.box(p, u0 - 0.28, u0 + LAYER, v0, top_rect, wa, wb, PAL['ashlar_hi'], STONE)
+        wall.box(p, u1 - LAYER, u1 + 0.28, v0, top_rect, wa, wb, PAL['ashlar_hi'], STONE)
         if arch:
             n = 5
             r0, r1 = w / 2, w / 2 + 0.3
@@ -519,7 +526,9 @@ def slate_roof(p, e0, along, up, la, lu, seed=0, step=0.66, seg=1.75, thick=0.07
                 a0, a1 = max(lo, a), min(hi, a + seg)
                 if a1 - a0 <= 0.15:
                     continue
-                kick = thick * 1.6
+                # each course's butt kicked well out over the course below (a clear step, never
+                # a near-coplanar overlap of the two)
+                kick = thick * 2.2
                 col = tone(pick(PAL['slate'], int(hashf(r, j, seed) * 6)), r, j, seed, spread=0.16)
                 # the slate's face, and its butt edge kicked out over the course below (4
                 # triangles: the underside is never seen, the boards or a ceiling hide it)

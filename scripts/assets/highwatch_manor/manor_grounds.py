@@ -8,12 +8,13 @@ the paving lies a hair over it. Parts: ManorGrounds and ManorGlow (the lamps' pa
 """
 import math
 
-from manor_lib import GLOW, METAL, PAL, STONE, WOOD, Wall, abox, cyl, disc, flat_face, hashf, pick, tone
+from manor_lib import GLOW, LAYER, METAL, PAL, STONE, WOOD, Wall, abox, cyl, disc, flat_face, hashf, pick, tone
 from manor_plan import (BENCH, EAST, FLOOR, FOUNTAIN, GARDEN, GATE, LAMPS, STEPS, WEST)
 from manor_shell import _ashlar_face, _ball, finial, hanging_lantern
 
 G = GARDEN
-PAVE = 0.07
+# the path's flags a layer over their mortar bed, the bed a layer over the lawn (at 0.03)
+PAVE = 0.03 + 2 * LAYER
 
 
 def garden_wall(p, x0, z0, x1, z1, outward, seed=0):
@@ -88,7 +89,7 @@ def path_and_beds(p):
     # the flagged path from the gate to the steps on a mortar bed, its kerbs
     x0, x1 = -2.1, 2.1
     za, zb = G['z0'] + G['t'], STEPS['z0']
-    flat_face(p, [(x0, PAVE - 0.01, za), (x1, PAVE - 0.01, za), (x1, PAVE - 0.01, zb), (x0, PAVE - 0.01, zb)],
+    flat_face(p, [(x0, PAVE - LAYER, za), (x1, PAVE - LAYER, za), (x1, PAVE - LAYER, zb), (x0, PAVE - LAYER, zb)],
               PAL['mortar'], STONE, (0, 1, 0))
     z = za
     row = 0
@@ -122,8 +123,9 @@ def path_and_beds(p):
     for (bx0, bx1) in ((WEST['x0'] + 0.6, WEST['ox1'] - 0.6), (EAST['ox0'] + 0.6, EAST['x1'] - 0.6)):
         bz0, bz1 = WEST['oz0'] - 2.0, WEST['oz0'] - 0.2
         abox(p, bx0, bx1, -0.1, 0.32, bz0, bz1, PAL['ashlar_hi'], STONE)
-        flat_face(p, [(bx0 + 0.12, 0.33, bz0 + 0.12), (bx1 - 0.12, 0.33, bz0 + 0.12), (bx1 - 0.12, 0.33, bz1 - 0.12),
-                      (bx0 + 0.12, 0.33, bz1 - 0.12)], (0.24, 0.18, 0.12), WOOD, (0, 1, 0))
+        soil = 0.32 + LAYER
+        flat_face(p, [(bx0 + 0.12, soil, bz0 + 0.12), (bx1 - 0.12, soil, bz0 + 0.12), (bx1 - 0.12, soil, bz1 - 0.12),
+                      (bx0 + 0.12, soil, bz1 - 0.12)], (0.24, 0.18, 0.12), WOOD, (0, 1, 0))
         x = bx0 + 0.5
         k = 0
         while x < bx1 - 0.4:

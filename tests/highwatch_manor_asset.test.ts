@@ -10,6 +10,12 @@ import {
   mergeManorCollision,
   sourceFingerprint,
 } from '../scripts/assets/highwatch_manor/build.mjs';
+import {
+  documentTriangles,
+  findCoplanarOverlaps,
+  type ManorTriangle,
+  visibleOverlaps,
+} from '../scripts/assets/highwatch_manor/coplanar.mjs';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { isPlacedBuildingInterior } from '../src/render/eastbrook_placed_building';
 import { HIGHWATCH_BUILDINGS_BY_ID } from '../src/sim/highwatch_layout';
@@ -24,17 +30,17 @@ import { HIGHWATCH_BUILDINGS_BY_ID } from '../src/sim/highwatch_layout';
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, HIGHWATCH_MANOR_ASSET.target);
-const SHIPPED_SHA256 = 'c5f63f43f92ca644060e8af575e41906b51eaf1ebd8de7004cd47409db751dde';
-const SHIPPED_BYTES = 929976;
+const SHIPPED_SHA256 = 'c7572048361f98c9a5aa5070906522fae04364bf424c2a7500c738c4547097cc';
+const SHIPPED_BYTES = 931184;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
-  ManorShell: 25600,
+  ManorShell: 25466,
   ManorRoof: 9254,
   ManorTrim: 3642,
   ManorGrounds: 6744,
   ManorGlow: 2584,
   G_INT_Timber: 3542,
-  G_INT_Furnishings: 18383,
+  G_INT_Furnishings: 18507,
 };
 
 let doc: Document;
@@ -197,4 +203,45 @@ describe('the Highwatch manor GLB', () => {
     const raw = readFileSync(path.join(ROOT, 'data/asset_collision_overrides.json'), 'utf8');
     expect(mergeManorCollision(raw, written.rows)).toBe(raw);
   });
+});
+
+// Two flat squares facing up, `lift` apart (the second smaller, inside the first).
+function stack(lift: number, colorB = [0.9, 0.1, 0.1]): ManorTriangle[] {
+  const quad = (y: number, r: number, color: number[], part: string): ManorTriangle[] => [
+    { part, material: 'M', a: [-r, y, -r], b: [-r, y, r], c: [r, y, r], color },
+    { part, material: 'M', a: [-r, y, -r], b: [r, y, r], c: [r, y, -r], color },
+  ];
+  return [...quad(0, 2, [0.5, 0.5, 0.5], 'floor'), ...quad(lift, 1, colorB, 'rug')];
+}
+
+describe('the Highwatch manor has no coplanar faces fighting in the depth buffer', () => {
+  it('finds a rug a hair over a floor, and lets one a layer over it be', () => {
+    const close = stack(0.01);
+    expect(visibleOverlaps(close, findCoplanarOverlaps(close)).length).toBeGreaterThan(0);
+    const lifted = stack(0.05);
+    expect(findCoplanarOverlaps(lifted)).toEqual([]);
+    // twins (same material, same colour) draw the same pixel either way
+    const twins = stack(0.0, [0.5, 0.5, 0.5]);
+    expect(findCoplanarOverlaps(twins)).toEqual([]);
+  });
+
+  it('finds no overlap a camera can see across the whole shipped model', () => {
+    const triangles = documentTriangles(doc);
+    const all = findCoplanarOverlaps(triangles);
+    // not vacuous: the model is full of flush joints the audit has to weigh
+    expect(all.length).toBeGreaterThan(1000);
+    const visible = visibleOverlaps(triangles, all);
+    const label = (hit: (typeof visible)[number]) =>
+      `${hit.parts.join(' x ')} at ${hit.at.join(', ')} gap ${hit.gap.toFixed(3)}`;
+    // every decal-like piece (rugs, banners, tapestries, the crest, the furniture, the garden's
+    // paving and beds, the glass) stands a real layer clear of what it lies on: none at all
+    const frame = /^(ManorShell|ManorRoof)\//;
+    expect(
+      visible.filter((hit) => !hit.parts.every((part) => frame.test(part))).map(label),
+    ).toEqual([]);
+    // what is left is slivers where a hewn timber meets a wall's face at a joint: each under
+    // a hand's breadth square, all of them together under a square yard, and never more
+    for (const hit of visible) expect(hit.area, label(hit)).toBeLessThan(0.15);
+    expect(visible.reduce((sum, hit) => sum + hit.area, 0)).toBeLessThan(1.0);
+  }, 120000);
 });
