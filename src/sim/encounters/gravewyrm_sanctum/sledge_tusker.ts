@@ -643,7 +643,8 @@ export function tickTusker(
     if (st0.patches.length === 0 && st0.trails.length === 0) tusker.sanctumFight = undefined;
     return;
   }
-  // The outcrops stand on the road before the pull, for the claim's life.
+  // The outcrops stand on the road before the pull, for the claim's life,
+  // from the first time a player comes near it.
   ensureOutcrops(ctx, inst);
   if (!engaged) {
     if (st0) endTuskerFight(ctx, inst, tusker);

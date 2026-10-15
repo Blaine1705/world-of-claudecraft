@@ -8,9 +8,12 @@
 //   broken   a stump: the beast wrenched free and burst it. It takes no more
 //            charges this pull.
 //
-// They are raised once per claim, while its Tusker lives, on the first tick
-// the claim's encounters run, so a group walking the road sees them before
-// the pull. A pull that ends without a kill (an evade, a wipe) stands every
+// They are raised once per claim, while its Tusker lives, the first time a
+// living player comes within `outcropWake` of one (the Gate Landing is close
+// enough, and every yard of the road the Tusker walks is), so a group walking
+// the road sees them before the pull and a run that never comes near mints
+// nothing (never at the claim itself, and never off a pull from afar: a
+// patrol that picks a target across the cirque is no reason to raise them). A pull that ends without a kill (an evade, a wipe) stands every
 // one of them up again; once the Tusker is dead they stay as they fell.
 //
 // Deterministic and draw-free: they stand on fixed spots (ids.ts
@@ -21,7 +24,7 @@
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
-import { spawnSanctumObject } from './claim';
+import { claimPlayers, spawnSanctumObject } from './claim';
 import {
   isIceOutcrop,
   SANCTUM_ICE_OUTCROP,
@@ -43,12 +46,27 @@ export function outcropObjects(ctx: SimContext, inst: InstanceSlot): Entity[] {
   return out;
 }
 
-/** Raise the five outcrops, whole, if this claim has none yet. */
+/** Is a living player of the claim near enough the road to wake them? */
+function roadWatched(ctx: SimContext, inst: InstanceSlot): boolean {
+  const o = ctx.instanceOriginOf(inst);
+  const r2 = T.outcropWake * T.outcropWake;
+  for (const p of claimPlayers(ctx, inst))
+    for (const spot of TUSKER_OUTCROPS) {
+      const dx = p.pos.x - (o.x + spot.x);
+      const dz = p.pos.z - (o.z + spot.z);
+      if (dx * dx + dz * dz <= r2) return true;
+    }
+  return false;
+}
+
+/** Raise the five outcrops, whole, if this claim has none yet and a player
+ *  is near the road. */
 export function ensureOutcrops(ctx: SimContext, inst: InstanceSlot): void {
   for (const id of inst.objectIds) {
     const e = ctx.entities.get(id);
     if (e && isIceOutcrop(e.templateId)) return;
   }
+  if (!roadWatched(ctx, inst)) return;
   const o = ctx.instanceOriginOf(inst);
   for (const spot of TUSKER_OUTCROPS) {
     const obj = spawnSanctumObject(

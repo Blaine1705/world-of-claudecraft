@@ -232,6 +232,23 @@ describe('the ice outcrops stand on the Sledge Road', () => {
     for (const obj of outcropObjects(r.sim.ctx, r.inst)) expect(obj.lootable).toBe(false);
   });
 
+  it('they wait for a player near the road: a claim fought far off mints none (the parity ids)', () => {
+    const r = road();
+    // The whole party across the cirque at the Gravewyrm's lake, and the
+    // Tusker pulled onto one of them from afar: no outcrop rises.
+    put(r, r.me, 0, 152);
+    hold(r);
+    for (let i = 0; i < 5; i++) tickSanctumEncounters(r.sim.ctx);
+    expect(outcropObjects(r.sim.ctx, r.inst)).toHaveLength(0);
+    // Back at the Gate Landing (68 yd from the nearest): they rise.
+    expect(Math.hypot(0 - TUSKER_OUTCROPS[0].x, -224 - TUSKER_OUTCROPS[0].z)).toBeLessThan(
+      T.outcropWake,
+    );
+    put(r, r.me, 0, -224);
+    tickSanctumEncounters(r.sim.ctx);
+    expect(outcropObjects(r.sim.ctx, r.inst)).toHaveLength(5);
+  });
+
   it('every state of an outcrop and the trail are templates the Sanctum draws itself', () => {
     for (const id of [
       SANCTUM_ICE_OUTCROP,

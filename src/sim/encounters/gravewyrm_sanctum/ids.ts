@@ -132,6 +132,12 @@ export const TUSKER_TUNING = {
   /** An outcrop's body: a Trample lane whose strip touches this circle runs
    *  into it (the strip's half width plus this: 4.5 yd off the lane's line). */
   outcropRadius: 2,
+  /** The outcrops rise the first time a living player comes this near one
+   *  (the Gate Landing stands 68 yd from the nearest; every yard of the
+   *  Tusker's road is nearer): never at the claim itself, so a run that never
+   *  walks the road mints no object and every later id of the claim stays
+   *  where it was. */
+  outcropWake: 90,
   /** How far ahead of its centre the tusk tips reach (the model's 6.13 at its
    *  drawn size, render/gravewyrm_sanctum_fx/tusker_model_core.ts): it stops
    *  with them buried in the ice. */
