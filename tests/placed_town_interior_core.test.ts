@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { highwatchTownInternalsForTest } from '../src/render/highwatch_town';
@@ -12,6 +14,7 @@ import { interiorContains, interiorHoldsEye } from '../src/render/interior_camer
 import {
   placedTownCameraInterior,
   placedTownInteriorModels,
+  placedTownModelAir,
   placedTownModelName,
 } from '../src/render/placed_town_interior_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
@@ -208,5 +211,62 @@ describe('the placed-town view registers the air', () => {
     // ...nor does a world without the town
     kit.buildFromSources(new Map(), () => 0, false);
     expect(ids()).toEqual([]);
+  });
+});
+
+describe('the authored air against each model baked collision', () => {
+  interface Row {
+    x: number;
+    y: number;
+    z: number;
+    hx: number;
+    hy: number;
+    hz: number;
+    ry?: number;
+    y0?: number;
+    y1?: number;
+  }
+  const BAKED = JSON.parse(
+    readFileSync(path.join(__dirname, '..', 'data/asset_collision_overrides.json'), 'utf8'),
+  ) as Record<string, { boxes: Row[]; ramps?: Row[] }>;
+  // the largest dimension of each model at authored size (the placed-asset unit)
+  const SIZE: Record<string, number> = {
+    tavern_b: 30.262,
+    hall: 30.5,
+    shop_a: 16.28,
+    smithy: 19.797,
+  };
+
+  it('stands each door under its lintel and each room on its floor deck', () => {
+    for (const name of placedTownInteriorModels()) {
+      const air = placedTownModelAir(name);
+      if (!air) throw new Error(name);
+      const unit = SIZE[name] / 2.2;
+      const rows = BAKED[`tidehold/${name}`];
+      const boxes = rows.boxes.map((b) => {
+        const c = Math.abs(Math.cos(b.ry ?? 0));
+        const s = Math.abs(Math.sin(b.ry ?? 0));
+        const ex = (b.hx * c + b.hz * s) * unit;
+        const ez = (b.hx * s + b.hz * c) * unit;
+        return {
+          x0: b.x * unit - ex,
+          x1: b.x * unit + ex,
+          z0: b.z * unit - ez,
+          z1: b.z * unit + ez,
+          y0: (b.y - b.hy) * unit - 1,
+        };
+      });
+      const decks = (rows.ramps ?? []).map((r) => Math.max(r.y0 ?? 0, r.y1 ?? 0) * unit - 1);
+      const [room, door] = [air.boxes[0], air.boxes[air.openings[0].box]];
+      // the room's floor is one of the model's decks
+      expect(Math.min(...decks.map((d) => Math.abs(d - room[2]))), name).toBeLessThan(0.02);
+      // the door's head is the lowest baked box over the door's middle, in the wall
+      const mx = (door[0] + door[1]) / 2;
+      const mz = door[4] + 0.3; // inside the wall, a hand in from its outside face
+      const over = boxes.filter(
+        (b) => b.x0 <= mx && b.x1 >= mx && b.z0 <= mz && b.z1 >= mz && b.y0 > door[2] + 1,
+      );
+      expect(Math.min(...over.map((b) => b.y0)), name).toBeCloseTo(door[3], 1);
+    }
   });
 });

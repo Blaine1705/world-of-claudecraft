@@ -29,7 +29,7 @@ import {
 /** One piece of air in the model's own axes at authored size: [x0, x1, y0, y1, z0, z1]. */
 type LocalBox = readonly [number, number, number, number, number, number];
 
-interface ModelAir {
+export interface ModelAir {
   readonly boxes: readonly LocalBox[];
   /** The pieces that open onto the world: their index, the model axis (0 x, 2 z) and the
    *  side (-1 the min face, +1 the max face). */
@@ -109,6 +109,11 @@ export interface PlacedTownInteriorBuilding {
 /** The painted model a record draws: `/models/tidehold/<look>/<name>.glb` -> `<name>`. */
 export function placedTownModelName(assetId: string): string {
   return assetId.replace(/^.*\//, '').replace(/\.glb$/, '');
+}
+
+/** One model's authored air (test-only reading: tests pin it against the baked collision). */
+export function placedTownModelAir(name: string): ModelAir | undefined {
+  return MODEL_AIR[name];
 }
 
 /** The models that carry authored air. */
