@@ -1314,8 +1314,12 @@ describe('Eastbrook town renderer', () => {
       'utf8',
     );
     expect(rendererSource).toContain('buildEastbrookTownView(this.sim.cfg.seed)');
-    expect(rendererSource).toContain("setRenderCategory(this.eastbrookTownView.group, 'props')");
-    expect(rendererSource.match(/this\.eastbrookTownView\.update\(/g)).toHaveLength(2);
+    // the rebuilt towns ride one list: mounted, frozen and updated in loops
+    expect(rendererSource).toContain(
+      'this.townViews = [this.eastbrookTownView, this.fenbridgeTownView, highwatch];',
+    );
+    expect(rendererSource).toContain("setRenderCategory(town.group, 'props')");
+    expect(rendererSource.match(/\btown\.update\(/g)).toHaveLength(2);
 
     const propsSource = readFileSync(path.join(__dirname, '..', 'src/render/props.ts'), 'utf8');
     expect(propsSource).toContain('eastbrookTown && isEastbrookRebuildBuilding(b)');

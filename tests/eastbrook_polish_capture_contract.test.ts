@@ -716,7 +716,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the painted Tidehold buildings in the built-in town: the
   // authoritative layout's six building rows and the town runtime leaf moved.
   // No capture was retaken.
-  'c9d804a027f71863e4c7a9c43954797bb99d395f5f8bda6476247d82be1ba4d6';
+  // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
+  // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
+  // integration (town dressing + gameplay objects over #4507). No capture was retaken.
+  'f730059759e29f6116e528853e94fb8003bd821bcaff27cf0e12ef1b44731805';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

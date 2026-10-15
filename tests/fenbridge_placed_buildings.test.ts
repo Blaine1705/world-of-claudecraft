@@ -499,7 +499,12 @@ describe('walking into the walk-in Fenbridge buildings', () => {
   });
 
   it('leaves the floors of a Studio document to its own placements', () => {
-    expect(townWalkInPlacements(BUILTIN_WORLD)).toHaveLength(4);
+    // Highwatch stands its own walk-in floors beside these
+    const fenbridgePaths = new Set(BUILDINGS.map((building) => building.assetId));
+    const builtIn = townWalkInPlacements(BUILTIN_WORLD).filter((placement) =>
+      fenbridgePaths.has(placement.path),
+    );
+    expect(builtIn).toHaveLength(4);
     expect(townWalkInPlacements(loadPublishedMap())).toEqual([]);
   });
 });

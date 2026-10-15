@@ -12160,7 +12160,8 @@ export interface PromotedScenery {
   jungleCoconuts?: boolean;
   /** The authored towns' (Eastbrook Vale / Fenbridge) rebuild BUILDINGS,
    *  the town views' building loops and the record colliders stand down;
-   *  wells, stalls, fences, streets and the harbor stay town-drawn. */
+   *  wells, stalls, fences, streets and the harbor stay town-drawn.
+   *  Highwatch has its own family, highwatchTown. */
   authoredTowns?: boolean;
   /** The Eastbrook Weekly Vault (render/eastbrook_weekly_vault.ts draws it
    *  from EASTBROOK_LAYOUT.weeklyVault, and its record collider rides the
@@ -12175,6 +12176,12 @@ export interface PromotedScenery {
    *  sim/authored_town_dressing.ts). The town wall and the Realm Builder
    *  monument stay town-drawn. */
   authoredTownDressing?: boolean;
+  /** Highwatch's painted rebuild BUILDINGS (sim/highwatch_layout.ts): the
+   *  town view's building loop, the record colliders and the walk-in floors
+   *  stand down. Its own family for the vault's reason: a document promoted
+   *  before Highwatch was rebuilt carries authoredTowns and none of these
+   *  placements, so it keeps the town-drawn buildings. */
+  highwatchTown?: boolean;
 }
 
 /** The resolved storage price tables every sim price read consumes: bank slot

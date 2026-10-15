@@ -1027,7 +1027,11 @@ const MONOLITHS: MonolithRow[] = [
     // Merge of the four dungeon entrances (#4478): both parents' additions combine
     // (ours is the one updateSetPieceOccluders call), exact merged count, within
     // the release/v0.45.0 ceiling the branch was held to.
-    ceiling: 12426,
+    // LOWERED to 12395 when the rebuilt towns became one list (the painted
+    // Highwatch, placed_town_buildings.ts): Eastbrook's and Fenbridge's mount,
+    // reveal-gate and two per-frame update blocks folded into loops over
+    // townViews, which paid for the third town and 31 lines more. wc -l.
+    ceiling: 12395,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -350,6 +350,7 @@ import {
 } from './content/zone3';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
+import { HIGHWATCH_LAYOUT } from './highwatch_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 import { setStudioOverlay, studioOverlayInstalled } from './studio_content';
 
@@ -1061,6 +1062,12 @@ export const BUILTIN_WORLD: WorldContent = {
     ...FORGEFATHER_ISLE_TERRAIN_EDITS,
     // last, as the Studio rebuild map applies them: over the plat and the strand
     ...EASTBROOK_BUILDING_PAD_TERRAIN_EDITS,
+    // Highwatch's painted buildings stand on level pads cut into the shelf's
+    // rim, eased out by wide aprons (sim/highwatch_layout.ts pads); no other
+    // stamp touches that ground. The calm skirts round nearby anchors are sized
+    // from the finished ground, so heights move a little further out too.
+    // Copied: the layout's records are frozen, and edit lists are plain data.
+    ...HIGHWATCH_LAYOUT.pads.map((pad) => ({ ...pad })),
   ],
 };
 
