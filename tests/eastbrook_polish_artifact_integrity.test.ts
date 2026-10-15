@@ -1412,7 +1412,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the painted Tidehold buildings in the built-in town: the
   // authoritative layout and the town runtime leaf moved. No capture was retaken.
   // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
-  'f7cb6ce64a5c0f16c1677665267273189d1fad684212df4a6dd4ac846546d592';
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  'afba037cd42f81ce7517b15306d6ba412e859af1b840e3895803a55976cecb2e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1446,7 +1448,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the painted Tidehold buildings in the built-in town: the
   // authoritative layout and the town runtime leaf moved. No capture was retaken.
   // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
-  'fc42d555d2ae65108aaa79aea5094308a5985022d4939bc1a11a60d4ad1a405b';
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  'eaa3e34c81705e3308fbc53562afcdbcab405a0aafe50c35d01c49bb764f98a4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2839,7 +2843,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // again over the re-swept evidence. No capture was retaken.
       // Merging #4507 into the v0.45.0 integration: recomputed LAST again
       // over the re-swept evidence. No capture was retaken.
-    ).toBe('c7664353397ee5ad552b677c49c4d9084cdf557fa631dd09f34ed833b8a73104');
+      // The walk-in Eastbrook buildings: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+    ).toBe('57d40cae2071ed2ae030e3a74a72f18e6836bd3d1322ba204ccb2a2d86bcec21');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

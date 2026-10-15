@@ -715,7 +715,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // authoritative layout's six building rows and the town runtime leaf moved.
   // No capture was retaken.
   // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
-  'fc42d555d2ae65108aaa79aea5094308a5985022d4939bc1a11a60d4ad1a405b';
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  'eaa3e34c81705e3308fbc53562afcdbcab405a0aafe50c35d01c49bb764f98a4';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

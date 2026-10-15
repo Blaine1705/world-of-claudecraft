@@ -14,7 +14,7 @@
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-    "fingerprint": "fc42d555d2ae65108aaa79aea5094308a5985022d4939bc1a11a60d4ad1a405b",
+    "fingerprint": "eaa3e34c81705e3308fbc53562afcdbcab405a0aafe50c35d01c49bb764f98a4",
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -22,7 +22,7 @@
       },
       "authoritativeLayout": {
         "path": "src/sim/eastbrook_layout.ts",
-        "sha256": "17a47626491e85c9c71d2d655a08cbec4acc1e4a704156e24a8ac43ff0438772"
+        "sha256": "d5f29e07127e66bb4f6da86c16a52089706c47e4ec59e4f5feefba8f7c207713"
       },
       "civicShader": {
         "path": "src/render/realm_builder_monument_fx.ts",
@@ -31,7 +31,7 @@
       "runtimeRender": {
         "town": {
           "path": "src/render/eastbrook_town.ts",
-          "sha256": "b2aee0cb1b6028f8e75034e15a1cabd6cc0d00a50d19b8f0aae28769914ada9a"
+          "sha256": "8eb3c97d01508df0f11934157f90f977db3fa05a924f8ee842ff5777deaa9264"
         },
         "mailbox": {
           "path": "src/render/mailbox.ts",
