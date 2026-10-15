@@ -3,7 +3,10 @@
 // tusks going in, Stuck in the Ice, the outcrop bursting, the soulfire trail a
 // charge leaves, and the sledge tipping at half health). Evidence tooling, not
 // a repo test: it stages each beat with the `/dev sanctum trigger ...`
-// commands and by standing the bodies on the road.
+// commands and by standing the bodies on the road. The L shots are the
+// readability pass: the lane following its target (blue into the ice, red
+// off it), the outcrops' floor circles, the target marker, the crash and a
+// spent outcrop's dark circle.
 //
 //   node scripts/tusker_bait_shot.mjs [outDir] [shotId ...]
 //
@@ -127,6 +130,72 @@ const SHOTS = [
       { hp: 0.49 },
       { wait: 1700 },
     ],
+  },
+  // ---- the readability pass (round 2): run these with the ids L1 to L5 ----
+  {
+    // A Trample following the player who stands behind the fourth outcrop:
+    // the lane reads ice blue and ends in a shard burst, every intact outcrop
+    // glows on its circle (the fourth hardest), the marker floats over the
+    // player; the third outcrop is spent first, its circle dark and broken.
+    id: 'L1_carril_azul',
+    tusker: leg(8),
+    player: leg(27.5, 4.5),
+    look: leg(8, 0),
+    pitch: 0.95,
+    dist: 30,
+    steps: [
+      { place: leg(8) },
+      { trigger: 'burst' },
+      { place: leg(8) },
+      { trigger: 'trample' },
+      { wait: 1100 },
+    ],
+  },
+  {
+    // The same Trample on a player out on open road: red, a plain arrow.
+    id: 'L2_carril_rojo',
+    tusker: leg(8),
+    player: leg(27.5, -5),
+    look: leg(8, 0),
+    pitch: 0.62,
+    dist: 24,
+    steps: [{ trigger: 'trample' }, { wait: 1100 }],
+  },
+  {
+    // The lock, close up: the marker's two side arrows (step aside).
+    id: 'L3_marcador',
+    tusker: leg(8),
+    player: leg(27.5, 4.5),
+    look: leg(8, 0),
+    pitch: 0.28,
+    dist: 9,
+    steps: [{ trigger: 'trample' }, { until: 'locked' }, { wait: 150 }],
+  },
+  {
+    // Led into the ice: the crash.
+    id: 'L4_choque',
+    tusker: leg(8),
+    player: leg(27.5, 4.5),
+    look: leg(22.5, 6),
+    pitch: 0.34,
+    dist: 15,
+    steps: [
+      { trigger: 'trample' },
+      { until: 'locked' },
+      { move: leg(22, -5), look: leg(22.5, 6) },
+      { until: 'stuck' },
+      { wait: 220 },
+    ],
+  },
+  {
+    // A spent outcrop: its circle dark and broken among the lit ones.
+    id: 'L5_roto',
+    tusker: leg(20),
+    player: leg(48, -2),
+    look: leg(22, 2),
+    pitch: 0.62,
+    dist: 22,
+    steps: [{ trigger: 'burst' }, { wait: 900 }],
   },
 ];
 
@@ -318,6 +387,8 @@ async function main() {
       await sleep(900);
       await camera(shot, shot.look);
       for (const step of shot.steps) {
+        // Stand the beast back where the shot wants it (its chase walks it).
+        if (step.place) await place('tusker', step.place, leg(24, 6));
         if (step.trigger) await chat(`/dev sanctum trigger ${step.trigger}`);
         if (step.until)
           await page.waitForFunction(
@@ -329,6 +400,10 @@ async function main() {
                 if (until === 'stuck') return st.stuck !== null;
                 if (until === 'free') return st.stuck === null && st.baits > 0;
                 if (until === 'trail') return st.trails.length > 0 && !st.charge;
+                if (until === 'locked')
+                  return (
+                    e.castingAbility === 'sanctum_tusker_trample' && e.castRemaining <= 0.9 + 1e-9
+                  );
               }
               return false;
             },
