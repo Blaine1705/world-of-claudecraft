@@ -1416,9 +1416,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
   // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
-  // Re-minted for the Highwatch grand-scale experiment: the indoor camera port moved the
-  // renderer leaf. No capture was retaken.
-  'f8e31f464a440b075eb7eed63b61bdb886efcd50b5b5f66f7d80f07bd7d665e7';
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  '035ac6546ae712702bb25dde5c0e9a860562825a09121214545c60856cdc7f60';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1456,9 +1456,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
   // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
-  // Re-minted for the Highwatch grand-scale experiment: the indoor camera port moved the
-  // renderer leaf. No capture was retaken.
-  'cc40556df6c1eb149573d554c664f7ff06a749db0a115635524b62c6efd41868';
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  '5b39ae40fc0f518ae1492f2c763c6540f43978eff3aeee2fbb60b7898f7ea55e';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2853,9 +2853,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // over the re-swept evidence. No capture was retaken.
       // The Studio movable-objects merge with the v0.45.0 integration:
       // recomputed LAST again over the re-swept evidence. No capture was retaken.
-      // The Highwatch grand-scale experiment's indoor camera port: recomputed LAST
-      // again over the re-swept evidence. No capture was retaken.
-    ).toBe('e2cd7fa72d6a64ea6784e2fa772857ef1e3383db8f4e43c9439342830f6c2251');
+      // The walk-in Eastbrook buildings: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+    ).toBe('6606ccecfd4b679edffea7a829990b1acf00d49afd3eca4b6dbd42fb7432383f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

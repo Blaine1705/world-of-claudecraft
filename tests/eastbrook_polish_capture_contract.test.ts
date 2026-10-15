@@ -719,9 +719,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
   // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
-  // Re-minted for the Highwatch grand-scale experiment: the indoor camera port moved the
-  // renderer leaf. No capture was retaken.
-  'cc40556df6c1eb149573d554c664f7ff06a749db0a115635524b62c6efd41868';
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  '5b39ae40fc0f518ae1492f2c763c6540f43978eff3aeee2fbb60b7898f7ea55e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

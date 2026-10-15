@@ -1203,6 +1203,7 @@ function buildFromTemplates(
         sine: Math.sin(building.rotation),
         topY: placed.topY,
         cullRadius: placed.cullRadius,
+        walkIn: building.walkIn,
       });
       buildingGroups.push(placed.group);
       continue;
