@@ -28,6 +28,7 @@ import type { WispMazeState } from './minigames/wisp_maze';
 import type { BastionKitDef } from './mob/trash_kit/bastion_kit_types';
 import type { TempleKitDef, TempleKitState } from './mob/trash_kit/temple_kit_types';
 import type { WildheartKitDef, WildheartKitState } from './mob/trash_kit/wildheart_kit_types';
+import type { ObjectMoves } from './moved_objects';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
 import type {
@@ -12112,6 +12113,11 @@ export interface WorldContent {
   // the same tree is drawn twice, once movable, once not. Absent for the
   // built-in world BY CONSTRUCTION, so the shipped path cannot drift.
   promotedScenery?: PromotedScenery;
+  // Gameplay objects this map moved (farm beds, practice dummies, gather
+  // nodes, dungeon doors), keyed `<kind>:<id>`; every position reader
+  // resolves through sim/moved_objects.ts with the built-in row as the
+  // fallback. Frozen; absent for the built-in world.
+  objectMoves?: ObjectMoves;
 }
 
 /**
@@ -12163,6 +12169,13 @@ export interface PromotedScenery {
    *  promoted before the vault had a placeable model keeps the town-drawn
    *  hall until this family promotes too. */
   eastbrookVault?: boolean;
+  /** The authored towns' square dressing: Eastbrook's market stalls, benches
+   *  and yard fences, and Fenbridge's cistern, provision stall, muster board
+   *  and boardwalks (the town views' micro and boardwalk batches stand down;
+   *  the stall, cistern and fence record colliders ride the same flag through
+   *  sim/authored_town_dressing.ts). The town wall and the Realm Builder
+   *  monument stay town-drawn. */
+  authoredTownDressing?: boolean;
   /** Highwatch's painted rebuild BUILDINGS (sim/highwatch_layout.ts): the
    *  town view's building loop, the record colliders and the walk-in floors
    *  stand down. Its own family for the vault's reason: a document promoted

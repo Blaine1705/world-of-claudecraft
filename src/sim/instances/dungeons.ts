@@ -51,6 +51,7 @@ import {
 import { updateIgnivarRaidProgression } from '../ignivar_raid_progression';
 import { placeOnPatrolPoint, stampDungeonPatrol } from '../mob/patrol';
 import { tickTrashKits } from '../mob/trash_kit';
+import { dungeonDoorPos } from '../moved_objects';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from '../raid_rooms';
@@ -924,9 +925,12 @@ export function detachFromDungeon(
   if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
   const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
+  // A Studio map may move the door (moved_objects.ts): leaving drops the
+  // player in front of where it stands.
+  const door = dungeonDoorPos(ctx.objectMoves, dungeon);
   return {
-    x: dungeon.doorPos.x + drop.x,
-    z: dungeon.doorPos.z + drop.z,
+    x: door.x + drop.x,
+    z: door.z + drop.z,
     facing: Math.atan2(drop.x, drop.z),
   };
 }

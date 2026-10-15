@@ -35,6 +35,7 @@ import { REMOVED_HIGHWATCH_BUILDINGS } from '../sim/highwatch_layout';
 import { MAX_PLACEMENTS, type MapPlacement } from '../sim/map_doc';
 import type { ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
+import { authoredTownDressingPlacements } from './authored_town_dressing_placements';
 import { worldMajorPropPlacements } from './world_prop_placements';
 
 /** targetHeightFor() for every /models/props/ path this module emits. */
@@ -430,6 +431,7 @@ export const FEATURE_PROMOTIONS: readonly {
   { flag: 'jungleCoconuts', placements: jungleCoconutPlacements },
   { flag: 'authoredTowns', placements: authoredTownBuildingPlacements },
   { flag: 'eastbrookVault', placements: eastbrookVaultPlacements },
+  { flag: 'authoredTownDressing', placements: authoredTownDressingPlacements },
   {
     flag: 'highwatchTown',
     placements: highwatchTownBuildingPlacements,

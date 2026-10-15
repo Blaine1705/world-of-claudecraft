@@ -1265,7 +1265,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 11598 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 11634 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 11598,
+    // LOWERED to 11594 by the Studio movable gameplay objects change: the
+    // dev-only healer practice dummy spawn moved to hub_practice.ts, paying for
+    // the moved-objects ctx view and farm-bed resolver. Exact count, zero slack.
+    ceiling: 11594,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

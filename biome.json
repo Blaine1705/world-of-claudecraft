@@ -15,6 +15,7 @@
       "!dist-*",
       "!public",
       "!**/*.generated.ts",
+      "!data/maps",
       "!scripts/ci_shard_weights.generated.json",
       "!src/ui/i18n.resolved.generated",
       "!src/admin/i18n.resolved.generated",

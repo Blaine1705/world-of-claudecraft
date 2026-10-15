@@ -33,7 +33,7 @@
 // uTempleGhost on the frames its fade changes (set_piece_occluders.ts).
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
-import { DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
 import {
   DROWNED_TEMPLE_ENTRANCE_COLLIDERS,
   DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID,
@@ -842,7 +842,7 @@ function moonriseSprites(
 
 /** Build the Moon Stair (world coordinates). */
 export function buildDrownedTempleEntrance(seed: number): DrownedTempleEntranceView {
-  const door = DUNGEONS[DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID].doorPos;
+  const door = activeDungeonDoorPos(DUNGEONS[DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID]);
   const base = terrainHeight(door.x, door.z, seed);
   const ground = (lx: number, lz: number) => terrainHeight(door.x + lx, door.z + lz, seed) - base;
   const group = new THREE.Group();

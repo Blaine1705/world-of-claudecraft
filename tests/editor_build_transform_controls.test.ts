@@ -97,6 +97,36 @@ describe('build transform controls', () => {
     );
   });
 
+  it('turns a rotate-only target (a selected NPC) while resize stands down', () => {
+    const h = harness();
+    h.state.rotateOnly = true;
+    h.controls.refresh();
+    expect(h.control('editor.buildMode.rotateLeft').disabled).toBe(false);
+    expect(h.control('editor.buildMode.rotateRight').disabled).toBe(false);
+    expect(h.control('editor.buildMode.smaller').disabled).toBe(true);
+    expect(h.control('editor.buildMode.larger').disabled).toBe(true);
+    h.control('editor.buildMode.rotateRight').click();
+    expect(h.onTransform).toHaveBeenLastCalledWith({ rotY: Math.PI / 4, scale: 1 }, 'rotateRight');
+    h.control('editor.buildMode.larger').click();
+    expect(h.onTransform).toHaveBeenCalledOnce();
+    const readout = h.controls.root.querySelector('.ed-build-transform-readout');
+    expect(readout?.textContent).toBe(
+      t('editor.buildMode.transformReadout', { degrees: '45', scale: '1' }),
+    );
+  });
+
+  it('leaves resize keys unconsumed for a rotate-only target but takes rotate keys', () => {
+    const h = harness();
+    h.state.rotateOnly = true;
+    h.controls.refresh();
+    const press = (key: string) => h.controls.handleKeydown(new KeyboardEvent('keydown', { key }));
+    expect(press(']')).toBe(false);
+    expect(press('[')).toBe(false);
+    expect(h.onTransform).not.toHaveBeenCalled();
+    expect(press('.')).toBe(true);
+    expect(h.onTransform).toHaveBeenLastCalledWith({ rotY: Math.PI / 4, scale: 1 }, 'rotateRight');
+  });
+
   it('keeps history available with no asset and refreshes button availability after actions', () => {
     const h = harness();
     h.state.transform = null;

@@ -10,7 +10,7 @@
 // *_entrance.ts modules beside this one). Extracted from colliders.ts under
 // the monolith ratchet; the caller passes its camera-top resolver.
 import type { Collider } from './colliders';
-import { DUNGEON_LIST } from './data';
+import { DUNGEON_LIST, getActiveWorldContent } from './data';
 import {
   DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID,
   drownedTempleEntranceColliders,
@@ -19,6 +19,7 @@ import {
   HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID,
   hollowCryptEntranceColliders,
 } from './hollow_crypt_entrance';
+import { dungeonDoorPos } from './moved_objects';
 import {
   DOOR_ARCH_HEIGHT,
   DOOR_ARCH_JAMB_HD,
@@ -41,42 +42,46 @@ export function dungeonDoorJambColliders(
 ): Collider[] {
   const out: Collider[] = [];
   const doorSpots = new Set<string>();
+  // A Studio map may move a door (moved_objects.ts): its jambs or set-piece
+  // colliders travel with it. The shipped position otherwise.
+  const moves = getActiveWorldContent().objectMoves;
   for (const dungeon of DUNGEON_LIST) {
     if (dungeon.overworldDoor === false) continue;
     if (dungeon.id === 'nythraxis_crypt') continue;
-    const key = `${dungeon.doorPos.x},${dungeon.doorPos.z}`;
+    const doorPos = dungeonDoorPos(moves, dungeon);
+    const key = `${doorPos.x},${doorPos.z}`;
     if (doorSpots.has(key)) continue;
     doorSpots.add(key);
     if (dungeon.id === SANCTUM_SEAL_GATE_DUNGEON_ID) {
-      out.push(...sanctumSealGateColliders(seed, dungeon.doorPos));
+      out.push(...sanctumSealGateColliders(seed, doorPos));
       continue;
     }
     if (dungeon.id === SUNKEN_BASTION_ENTRANCE_DUNGEON_ID) {
-      out.push(...sunkenBastionEntranceColliders(seed, dungeon.doorPos));
+      out.push(...sunkenBastionEntranceColliders(seed, doorPos));
       continue;
     }
     if (dungeon.id === HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID) {
-      out.push(...hollowCryptEntranceColliders(seed, dungeon.doorPos));
+      out.push(...hollowCryptEntranceColliders(seed, doorPos));
       continue;
     }
     if (dungeon.id === DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID) {
-      out.push(...drownedTempleEntranceColliders(seed, dungeon.doorPos));
+      out.push(...drownedTempleEntranceColliders(seed, doorPos));
       continue;
     }
     if (dungeon.id === WILDHEART_BASIN_ENTRANCE_DUNGEON_ID) {
-      out.push(...wildheartBasinEntranceColliders(seed, dungeon.doorPos));
+      out.push(...wildheartBasinEntranceColliders(seed, doorPos));
       continue;
     }
     for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {
-      const x = dungeon.doorPos.x + sx;
+      const x = doorPos.x + sx;
       out.push({
         type: 'obb',
         x,
-        z: dungeon.doorPos.z,
+        z: doorPos.z,
         hw: DOOR_ARCH_JAMB_HW,
         hd: DOOR_ARCH_JAMB_HD,
         rot: 0,
-        cameraTopY: topY(seed, x, dungeon.doorPos.z, DOOR_ARCH_HEIGHT),
+        cameraTopY: topY(seed, x, doorPos.z, DOOR_ARCH_HEIGHT),
       });
     }
   }

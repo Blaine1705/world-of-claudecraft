@@ -10849,6 +10849,18 @@ export const ja_JP: EnTranslations = {
       "deleteTitle": "Remove this location",
       "hideBoxes": "Hide area boxes"
     },
+    "objectMove": {
+      "title": "ゲームプレイオブジェクト",
+      "kindFarmBed": "畑の苗床",
+      "kindPracticeDummy": "練習用ダミー",
+      "kindGatherNode": "採集ポイント",
+      "kindDungeonDoor": "ダンジョン入口",
+      "position": "位置：{x}, {z}",
+      "moved": "このマップで移動済みです。",
+      "original": "元の位置にあります。",
+      "hint": "ドラッグするか、矢印キーで微調整します。移動はこのマップにだけ適用され、オブジェクトの識別子は変わらないため、保存された進行状況からも見つかります。",
+      "reset": "元の位置に戻す"
+    },
     "lightTool": {
       "title": "Point Lights",
       "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",

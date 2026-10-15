@@ -41,7 +41,7 @@ import {
   defaultDelveModules,
   delveAt,
   delveModuleLocal,
-  GATHER_NODES,
+  gatherNodesInActiveWorld,
   getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
@@ -92,7 +92,8 @@ export { FENCE_HALF_DEPTH } from './fence_dims';
 // consumer, so only it is imported (not re-exported) for internal use here.
 export { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from './rift_regions';
 
-import { buildingRecordColliders, promotedTownBuildingStandsDown } from './authored_town_buildings';
+import { buildingRecordColliders } from './authored_town_buildings';
+import { promotedColliderProps } from './authored_town_dressing';
 import { pushOut, resolveAgainst } from './collider_pushout';
 import {
   DAWNHOLD_PARAPET_HALF,
@@ -261,15 +262,14 @@ function standsOnNpcSpot(
 function staticWorldColliders(seed: number): Collider[] {
   const out: Collider[] = [];
   const content = getActiveWorldContent();
-  const PROPS = content.props;
+  const PROPS = promotedColliderProps(content.props, content.promotedScenery);
 
   // Render hideables still block movement while their render subsystem fades
   // whichever one crosses the eye-to-camera segment to 20% opacity.
   // A document that owns the authored towns' buildings as placements carries
-  // their (baked) collision itself, without this gate a moved town hall
-  // leaves an invisible record collider standing on the square.
+  // their (baked) collision itself, so PROPS (promotedColliderProps) drops those
+  // records: a moved town hall leaves no invisible record collider behind.
   for (const b of PROPS.buildings) {
-    if (promotedTownBuildingStandsDown(content.promotedScenery, b)) continue;
     if (b.kind === 'chapel' && b.assetId === undefined) {
       // The legacy procedural chapel is COMPOSED (render/props.ts): full-height
       // bell tower at the rear, squat entry hall in front. Collide the two
@@ -616,9 +616,9 @@ function staticWorldColliders(seed: number): Collider[] {
   // Hand-placed GLB decor (src/sim/decor_prop_colliders.ts): a circle or box per
   // PROPS.decorProps row, walk-through without r/hw+hd, standable with standableTop.
   out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
-  // Built-in only: the berths (transport_gates.ts), then the built harbors' rails and props.
+  // Built-in only: the berths (transport_gates.ts); the built harbors' rails and props.
   if (content === BUILTIN_WORLD) out.push(...transportBerthColliders(seed));
-  if (content === BUILTIN_WORLD) out.push(...harborStructureColliders(seed));
+  out.push(...harborStructureColliders(seed)); // built-in-shaped worlds only
 
   // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
   // grid the renderer lays the hedge GLBs from, so the blocked ground IS the
@@ -683,7 +683,7 @@ function staticWorldColliders(seed: number): Collider[] {
   // solid, standable bodies; herb clusters stay soft vegetation on purpose
   // (GATHER_NODE_BODIES). INTERACT_RANGE (5) dwarfs the radii, so collision
   // never pushes a gatherer out of harvesting reach.
-  for (const node of GATHER_NODES) {
+  for (const node of gatherNodesInActiveWorld()) {
     const nodeBody = GATHER_NODE_BODIES[node.type];
     if (!nodeBody) continue;
     const top = topY(seed, node.pos.x, node.pos.z, nodeBody.top);

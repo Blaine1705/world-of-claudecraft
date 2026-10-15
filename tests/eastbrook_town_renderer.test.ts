@@ -1290,6 +1290,33 @@ describe('Eastbrook town renderer', () => {
     ).toHaveLength(8);
   });
 
+  it('stands the square dressing down for a document that owns it as placements', () => {
+    // benches, stalls and yard fences are the whole micro batch; the monument
+    // stays town-drawn, and so does every building
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      placements: [],
+      promotedScenery: { authoredTownDressing: true },
+    });
+    try {
+      const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+      expect(view.group.getObjectByName('eastbrookTownMicroOpaqueBatch')).toBeUndefined();
+      expect(view.group.getObjectByName('eastbrookTownMicroEmissiveBatch')).toBeUndefined();
+      for (const building of EASTBROOK_LAYOUT.buildings) {
+        expect(
+          view.group.getObjectByName(`eastbrookBuilding:${building.id}`),
+          building.id,
+        ).toBeInstanceOf(THREE.Group);
+      }
+    } finally {
+      setActiveWorldContent(null);
+    }
+    const shipped = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    expect(shipped.group.getObjectByName('eastbrookTownMicroOpaqueBatch')).toBeInstanceOf(
+      THREE.Mesh,
+    );
+  });
+
   it('returns an empty stable root for custom worlds before asking for any built-in asset source', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(new Map(), () => 0, false);
     expect(view.group.name).toBe(EASTBROOK_TOWN_ROOT_NAME);

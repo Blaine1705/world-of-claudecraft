@@ -20,7 +20,7 @@ import type { GatheringProfessionId } from '../sim/content/professions';
 import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import {
   activeOverworldDungeons,
-  GATHER_NODES,
+  gatherNodesInActiveWorld,
   getActiveWorldContent,
   isBgPos,
   isDelvePos,
@@ -1160,7 +1160,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const gatherNodes: MapGatherNodeMarker[] = [];
   let bestToolTiers: Map<GatheringProfessionId, number> | null = null;
   let proficiency: Readonly<Record<string, number>> | undefined;
-  for (const node of filters.gather ? GATHER_NODES : []) {
+  for (const node of filters.gather ? gatherNodesInActiveWorld() : []) {
     if (node.zoneId !== zone.id) continue;
     if (!inView(node.pos.x, node.pos.z)) continue;
     bestToolTiers ??= new Map();

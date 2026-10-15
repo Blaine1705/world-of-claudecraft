@@ -169,6 +169,12 @@ function modelSize(json) {
     x: round(Math.max(1e-4, box.max[0] - box.min[0])),
     y: round(Math.max(1e-4, box.max[1] - box.min[1])),
     z: round(Math.max(1e-4, box.max[2] - box.min[2])),
+    // the box's footprint centre and base, in the GLB's own frame: props.ts
+    // recentres every model on these before scaling it, a placement pivots on
+    // the GLB origin, so the editor's world-prop conversion needs both
+    cx: round((box.min[0] + box.max[0]) / 2),
+    cz: round((box.min[2] + box.max[2]) / 2),
+    minY: round(box.min[1]),
   };
 }
 
@@ -199,12 +205,16 @@ const lines = [
   '  x: number;',
   '  y: number;',
   '  z: number;',
+  '  /** Footprint centre and base of the bounding box, in the GLB frame. */',
+  '  cx: number;',
+  '  cz: number;',
+  '  minY: number;',
   '}',
   '',
   'export const PROP_NATURAL_SIZE: Readonly<Record<string, PropNaturalSize>> = {',
   ...Object.entries(sizes).map(
     ([key, s]) =>
-      `  ${/^[A-Za-z_$][\w$]*$/.test(key) ? key : JSON.stringify(key)}: { x: ${s.x}, y: ${s.y}, z: ${s.z} },`,
+      `  ${/^[A-Za-z_$][\w$]*$/.test(key) ? key : JSON.stringify(key)}: { x: ${s.x}, y: ${s.y}, z: ${s.z}, cx: ${s.cx}, cz: ${s.cz}, minY: ${s.minY} },`,
   ),
   '};',
   '',
