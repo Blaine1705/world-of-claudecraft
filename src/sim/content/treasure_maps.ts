@@ -84,7 +84,7 @@ function clampHeadCount(headCount: number): number {
 export interface VaultPayoutDef {
   /** Multiplier on the level-scaled casket copper (src/sim/clue_casket.ts). */
   copperMult: number;
-  /** Units of one Pristine specimen (VAULT_MATERIAL_POOL). */
+  /** Units of one corpse-harvest specimen (VAULT_MATERIAL_POOL). */
   materials: number;
   /** Units of one top-rung consumable (vaultConsumablePool). */
   consumables: number;
@@ -145,16 +145,17 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
   },
 });
 
-/** The material stack every vault payout carries: one of the Pristine
- *  specimens (content/profession_items.ts), the rare corpse-harvest jackpots.
- *  prime_cut is the meat family's specimen but not a Pristine one, so it stays
- *  out. Sell values sit level with the top-tier node yields this pool replaced,
- *  so VAULT_PAYOUTS[r].materials keeps its counts. */
+/** The material stack every vault payout carries: one of the corpse-harvest
+ *  specimens (HARVEST_COMPONENT_SPECIMENS, content/profession_items.ts), the
+ *  four Pristine ones plus the meat family's Prime Cut. Sell values sit level
+ *  with the top-tier node yields this pool replaced, so
+ *  VAULT_PAYOUTS[r].materials keeps its counts. */
 export const VAULT_MATERIAL_POOL: readonly string[] = Object.freeze([
   'pristine_hide',
   'pristine_silk',
   'pristine_venom_gland',
   'pristine_claw',
+  'prime_cut',
 ]);
 
 /** The consumable stack every vault payout carries: the top rung of the

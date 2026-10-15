@@ -2842,7 +2842,7 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // Derived from the live piece list: treasure_vault.ts payOne rolls one piece
   // (at the tier the map buys, each tier discovering its piece through
   // ItemDef.relicOf) when an entrant opens a hoard's reward chest. The same
-  // chest always pays one Pristine specimen stack (rift/hoard_reward_roll.ts).
+  // chest always pays one corpse-harvest specimen stack (rift/hoard_reward_roll.ts).
   buried_hoard: [...HOARD_BASE_ITEM_IDS, ...VAULT_MATERIAL_POOL],
 };
 
@@ -3183,7 +3183,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // 8 = corpse_harvest + the four gathering professions with a jackpot slot
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
   // their Litany board keeper (Phase 21) + buried_hoard, whose reward chest
-  // pays the four Pristine specimens.
+  // pays the five corpse-harvest specimens.
   professions_specimens: 8,
   professions_crucible: 3,
   professions_forgebreaker: 1,

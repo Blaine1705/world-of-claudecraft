@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HOARD_LOOT_CLASS_BIAS } from '../src/sim/content/hoard_loot';
+import { HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
 import {
   VAULT_MATERIAL_POOL,
   VAULT_PAYOUTS,
@@ -54,7 +55,7 @@ describe('rollHoardReward', () => {
       ],
     });
     expect(script.calls).toEqual([
-      ['int', 0, 3],
+      ['int', 0, 4],
       ['int', 0, 2],
       ['chance', VAULT_PAYOUTS.rare.gearChance],
       ['chance', HOARD_LOOT_CLASS_BIAS],
@@ -89,7 +90,7 @@ describe('rollHoardReward', () => {
       ],
     });
     expect(script.calls).toEqual([
-      ['int', 0, 3],
+      ['int', 0, 4],
       ['int', 0, 1],
       ['chance', 0.2],
       ['chance', VAULT_PAYOUTS.epic.markChance],
@@ -129,7 +130,7 @@ describe('rollHoardReward', () => {
     ]);
     expect(reward.copper).toBe(18_450);
     expect(script.calls).toEqual([
-      ['int', 0, 3],
+      ['int', 0, 4],
       ['int', 0, 1],
       ['chance', VAULT_PAYOUTS.common.gearChance],
       ['chance', VAULT_PAYOUTS.common.markChance],
@@ -153,16 +154,20 @@ describe('rollHoardReward', () => {
 });
 
 describe('vault reward pools', () => {
-  it('pays only Pristine specimens as its material', () => {
+  it('pays only corpse-harvest specimens as its material', () => {
     expect([...VAULT_MATERIAL_POOL]).toEqual([
       'pristine_hide',
       'pristine_silk',
       'pristine_venom_gland',
       'pristine_claw',
+      'prime_cut',
     ]);
+    expect([...VAULT_MATERIAL_POOL].sort()).toEqual(
+      Object.values(HARVEST_COMPONENT_SPECIMENS).sort(),
+    );
     for (const id of VAULT_MATERIAL_POOL) {
-      expect(ITEMS[id]?.name.startsWith('Pristine '), id).toBe(true);
-      expect(ITEMS[id].kind, id).toBe('junk');
+      expect(ITEMS[id]?.kind, id).toBe('junk');
+      expect(ITEMS[id].quality, id).toBe('rare');
     }
   });
 

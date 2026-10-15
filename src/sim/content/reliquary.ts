@@ -115,7 +115,7 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  *   keeper's table (content/hoard_loot.ts rollHoardBossDrop) when an entrant
  *   opens the hoard's reward chest. The piece is never on the keeper's own mob
  *   loot, so a boss hint would name a door that does not hold it. The same
- *   chest always pays a stack of one Pristine specimen (VAULT_MATERIAL_POOL,
+ *   chest always pays a stack of one corpse-harvest specimen (VAULT_MATERIAL_POOL,
  *   content/treasure_maps.ts, rolled by src/sim/rift/hoard_reward_roll.ts).
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
@@ -1463,9 +1463,9 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // harvest, which no gathering profession owns, so they name the
     // corpse_harvest activity, the same answer gather_event:perfect_specimen
     // gives (src/sim/interaction.ts awards the mark and these five items
-    // together). The four Pristine ones are also the Buried Hoard chest's
-    // material stack (VAULT_MATERIAL_POOL), so they name buried_hoard as a
-    // second door; prime_cut is not in that pool. The CRAFTED FISHING ROD LADDER closes the angler's
+    // together). All five are also the Buried Hoard chest's material stack
+    // (VAULT_MATERIAL_POOL), so they name buried_hoard as a second door. The
+    // CRAFTED FISHING ROD LADDER closes the angler's
     // chase, and since masterwrought Phase 11i that ladder is three rungs, not
     // two. Engineering crafts all three at the toolworks (ROD_RECIPES in
     // content/recipes.ts), so every one of them names the craft. What differs
