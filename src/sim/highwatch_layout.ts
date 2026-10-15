@@ -271,7 +271,7 @@ const ROAD_GRADE = [14, 22, 30].map((x) => {
 // each reach exactly. The counting house and the smithy cut deepest into the
 // hill, so theirs reach furthest.
 const GROUND = [
-  { building: INN, height: 9, columns: 3, rows: 2, taper: 5, apron: 10 },
+  { building: INN, height: 9, columns: 3, rows: 2, taper: 5, apron: 11 },
   { building: COUNTING_HOUSE, height: 9.3, columns: 2, rows: 2, taper: 4, apron: 14 },
   { building: CHAPEL, height: 8.6, columns: 2, rows: 3, taper: 5, apron: 10 },
   { building: WATCH_HOUSE, height: 7.6, columns: 2, rows: 2, taper: 4, apron: 10 },

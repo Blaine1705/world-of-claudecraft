@@ -25,7 +25,7 @@ import {
 import { findPath, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { distancePointToObb, localToWorld } from '../src/sim/placed_town_kit';
 import { Sim } from '../src/sim/sim';
-import { roadDistance, terrainHeight, waterLevelAt } from '../src/sim/world';
+import { roadDistance, terrainHeight, terrainSteepnessAt, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Highwatch, the hold of Thornpeak Heights, rebuilt with five painted
@@ -229,15 +229,46 @@ describe('the Highwatch layout', () => {
   });
 
   it('re-routes only the Stormcrag road, out of the square and between the inn and the smithy', () => {
-    expect(ZONE3_ROADS[2]).toEqual(HIGHWATCH_LAYOUT.roads.stormcrag.map((point) => ({ ...point })));
-    // it still ends where it always did, and the stables spur still starts on it
-    expect(ZONE3_ROADS[2].at(-1)).toEqual({ x: 110, z: 760 });
-    expect(ZONE3_ROADS[2]).toContainEqual({ x: 70, z: 720 });
-    expect(ZONE3_ROADS[4][0]).toEqual({ x: 70, z: 720 });
-    // the other spokes are untouched
-    expect(ZONE3_ROADS[0].at(-1)).toEqual({ x: 0, z: 660 });
-    expect(ZONE3_ROADS[1][0]).toEqual({ x: -6, z: 666 });
-    expect(ZONE3_ROADS[3][0]).toEqual({ x: 0, z: 676 });
+    // the new first stretch, then the old line from (70, 720) to Stormcrag
+    expect(ZONE3_ROADS[2]).toEqual([
+      { x: 4, z: 674 },
+      { x: 11, z: 687 },
+      { x: 33, z: 690 },
+      { x: 42, z: 695 },
+      { x: 48, z: 700 },
+      { x: 56, z: 707 },
+      { x: 70, z: 720 },
+      { x: 110, z: 760 },
+    ]);
+    // the stables spur still starts on it, and the other spokes are untouched
+    expect(ZONE3_ROADS[4]).toEqual([
+      { x: 70, z: 720 },
+      { x: 79, z: 714 },
+      { x: 91, z: 709 },
+    ]);
+    expect(ZONE3_ROADS[0]).toEqual([
+      { x: 0, z: 320 },
+      { x: 10, z: 450 },
+      { x: 0, z: 540 },
+      { x: 0, z: 660 },
+    ]);
+    expect(ZONE3_ROADS[1]).toEqual([
+      { x: -6, z: 666 },
+      { x: -60, z: 700 },
+      { x: -110, z: 735 },
+    ]);
+    expect(ZONE3_ROADS[3]).toEqual([
+      { x: 0, z: 676 },
+      { x: 0, z: 780 },
+      { x: 0, z: 860 },
+    ]);
+    // it runs between the inn's north end and the smithy's terrace
+    const inn = BUILDINGS.find((building) => building.id === 'highwatch_summit_inn');
+    const smithy = BUILDINGS.find((building) => building.id === 'highwatch_smithy');
+    if (!inn || !smithy) throw new Error('missing inn or smithy');
+    const roadZAt22 = 687 + ((22 - 11) / (33 - 11)) * (690 - 687);
+    expect(roadZAt22).toBeGreaterThan(inn.reach.center.z + inn.reach.halfWidth);
+    expect(roadZAt22).toBeLessThan(smithy.reach.center.z - smithy.reach.halfDepth);
   });
 
   it('keeps every drawn road off every building', () => {
@@ -289,27 +320,32 @@ describe('the Highwatch layout', () => {
     // grade. (Read from the shipped world alone: the calm skirts are sized
     // from the finished ground the first time a process touches them, so a
     // swap to a pad-free world here would measure the wrong skirts.)
+    // Read through the movement gate's own steepness (the gradient a climbing
+    // step is refused on, player_motion.ts), on a half-yard grid.
     let checked = 0;
-    for (let z = 600; z <= 725; z += 1) {
-      for (let x = -50; x <= 55; x += 1) {
+    const tooSteep: string[] = [];
+    for (let z = 600; z <= 725; z += 0.5) {
+      for (let x = -50; x <= 55; x += 0.5) {
         const near = Math.min(
           ...BUILDINGS.map((building) => distancePointToObb({ x, z }, building.reach)),
         );
         if (near < 0.75 || near > 8) continue;
         checked++;
-        const here = terrainHeight(x, z, SEED);
-        const step = Math.max(
-          Math.abs(terrainHeight(x + 1, z, SEED) - here),
-          Math.abs(terrainHeight(x, z + 1, SEED) - here),
-        );
-        expect(step, `${x}, ${z}`).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
+        const steepness = terrainSteepnessAt(x, z, SEED);
+        if (steepness > PLAYER_MAX_CLIMB_SLOPE)
+          tooSteep.push(`${x}, ${z}: ${steepness.toFixed(3)}`);
       }
     }
-    expect(checked).toBeGreaterThan(2000);
+    expect(checked).toBeGreaterThan(10000);
+    expect(tooSteep).toEqual([]);
   });
 
   it('stands no street lamp on a building, and drops the one that stood on the watch house', () => {
     const lamps = streetlampPlacements(SEED);
+    // the town's roads keep their lamps
+    expect(
+      lamps.filter((lamp) => Math.hypot(lamp.x, lamp.z - 660) < 90).length,
+    ).toBeGreaterThanOrEqual(9);
     for (const building of BUILDINGS) {
       for (const lamp of lamps) {
         expect(distancePointToObb(lamp, building.reach), `${building.id} lamp`).toBeGreaterThan(
@@ -317,7 +353,9 @@ describe('the Highwatch layout', () => {
         );
       }
     }
+    // the planned lamp at the watch house's corner is gone, not just listed
     expect(isExcludedStreetlamp(3.8, 628.0621005145729)).toBe(true);
+    expect(lamps.some((lamp) => Math.hypot(lamp.x - 3.8, lamp.z - 628.06) < 1)).toBe(false);
   });
 });
 

@@ -1033,8 +1033,11 @@ export const BUILTIN_WORLD: WorldContent = {
     // last, as the Studio rebuild map applies them: over the plat and the strand
     ...EASTBROOK_BUILDING_PAD_TERRAIN_EDITS,
     // Highwatch's painted buildings stand on level pads cut into the shelf's
-    // rim (sim/highwatch_layout.ts pads); nothing else stamps that ground
-    ...HIGHWATCH_LAYOUT.pads,
+    // rim, eased out by wide aprons (sim/highwatch_layout.ts pads); no other
+    // stamp touches that ground. The calm skirts round nearby anchors are sized
+    // from the finished ground, so heights move a little further out too.
+    // Copied: the layout's records are frozen, and edit lists are plain data.
+    ...HIGHWATCH_LAYOUT.pads.map((pad) => ({ ...pad })),
   ],
 };
 
