@@ -36,13 +36,14 @@ sys.path.insert(0, os.path.join(HERE, '..', 'eastbrook_ferry'))
 sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
-from manor_lib import GLASS, GLOW, SLATE, encode_for_export, make_materials  # noqa: E402
+from manor_lib import EMISSIVE, SLATE, encode_for_export, make_materials  # noqa: E402
 from shiplib import Piece, empty, triangles  # noqa: E402
 
 import manor_furnish as U  # noqa: E402
 import manor_grounds as GR  # noqa: E402
 import manor_plan as PL  # noqa: E402
 import manor_shell as S  # noqa: E402
+from manor_weather import bake_weather  # noqa: E402
 
 PARTS = ('ManorShell', 'ManorRoof', 'ManorTrim', 'ManorGrounds', 'ManorGlow', 'G_INT_Timber',
          'G_INT_Furnishings')
@@ -98,7 +99,7 @@ def bake_warm_light(parts):
         bm = piece.bm
         bm.normal_update()
         for f in bm.faces:
-            if f.material_index in (GLOW, GLASS, SLATE):
+            if f.material_index in EMISSIVE or f.material_index == SLATE:
                 continue
             c = game(f.calc_center_median())
             if not _inside(c.x, c.y, c.z):
@@ -134,6 +135,7 @@ def build_scene():
     U.build(this, parts)
     GR.build(this, parts)
     bake_warm_light(parts)
+    bake_weather(parts, _inside)
     encode_for_export(parts)
     pieces = {}
     for name in PARTS:

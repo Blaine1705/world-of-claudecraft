@@ -37,6 +37,7 @@ export const HIGHWATCH_MANOR_ASSET = {
     'scripts/assets/highwatch_manor/manor_shell.py',
     'scripts/assets/highwatch_manor/manor_furnish.py',
     'scripts/assets/highwatch_manor/manor_grounds.py',
+    'scripts/assets/highwatch_manor/manor_weather.py',
     'scripts/assets/eastbrook_ferry/shiplib.py',
     'scripts/assets/highwatch_manor/build.mjs',
   ],

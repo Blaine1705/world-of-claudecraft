@@ -33,7 +33,11 @@ def garden_wall(p, x0, z0, x1, z1, outward, seed=0):
     for k in range(n + 1):
         u = min(L - 0.4, max(0.4, L * k / n))
         w.box(p, u - 0.4, u + 0.4, -1.0, h + 0.45, -t / 2 - 0.12, t / 2 + 0.12, tone(PAL['ashlar_hi'], u, seed), STONE)
-        w.box(p, u - 0.48, u + 0.48, h + 0.45, h + 0.6, -t / 2 - 0.2, t / 2 + 0.2, PAL['ashlar_hi'], STONE)
+        # the pier's cap, chamfered
+        cx_, _, cz_ = w.pt(u, 0, 0)
+        ha, hw = 0.48, t / 2 + 0.2
+        hx, hz = (ha, hw) if abs(w.dx) > 0.5 else (hw, ha)
+        abox(p, cx_ - hx, cx_ + hx, h + 0.45, h + 0.6, cz_ - hz, cz_ + hz, PAL['ashlar_hi'], STONE, bevel=0.04)
         cx, _, cz = w.pt(u, 0, 0)
         p.prism((cx, h + 0.6, cz), 4, 0.36, 0.05, 0.42, PAL['slate'][1], STONE, axis=(0, 1, 0), phase=math.pi / 4)
 

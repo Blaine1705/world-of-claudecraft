@@ -212,6 +212,22 @@ def hip_roof(p, x0, x1, z0, z1, plate, pitch, ridge_axis, hips=(True, True), see
         if hips[1]:
             for xx in (ex0, ex1):
                 p.beam([(xx, eave_y + 0.12, ez1), (mid, ridge + 0.1, r1)], 0.26, 0.2, PAL['slate_ridge'], SLATE)
+    # gilded finials on the hipped ends of the ridge
+    for (end, on) in zip(ends, hips):
+        if on:
+            finial(p, end[0], end[1] + 0.2, end[2], h=1.2, r=0.16)
+    # timber corbels under the eaves along the open sides, chamfered, a stepped pair each
+    if ridge_axis == 'x':
+        for (zw, sz) in ((z0, -1), (z1, 1)):
+            x = x0 + 0.9
+            while x < x1 - 0.8:
+                zo = zw + sz * (out - 0.18)
+                abox(p, x - 0.12, x + 0.12, plate - 0.62, plate - 0.2, min(zw, zo), max(zw, zo), PAL['timber_dark'],
+                     WOOD, bevel=0.03)
+                zl = zw + sz * (out - 0.45)
+                abox(p, x - 0.08, x + 0.08, plate - 0.95, plate - 0.62, min(zw, zl), max(zw, zl), PAL['timber_dark'],
+                     WOOD, bevel=0.02)
+                x += 1.7
     # the eaves' fascia boards round the open sides
     fy = eave_y - 0.18
     if ridge_axis == 'x':
@@ -500,6 +516,18 @@ def hall_roof(p_roof, p_timber, glow):
         p_roof.beam([(a, ridge + 0.12, 0), (b, ridge + 0.12, 0)], 0.4, 0.3, PAL['slate_ridge'], SLATE)
     for x in (ex0 + 0.1, ex1 - 0.1):
         finial(p_roof, x, ridge + 0.25, 0.0, h=1.8, r=0.2)
+    # wrought cresting along the ridge either side of the lantern: a top rail on uprights,
+    # each upright tipped with a gilded spear point
+    for (a, b) in ((ex0 + 0.9, -LANTERN['r'] - 0.5), (LANTERN['r'] + 0.5, ex1 - 0.9)):
+        y0 = ridge + 0.27
+        p_roof.beam([(a, y0 + 0.5, 0.0), (b, y0 + 0.5, 0.0)], 0.05, 0.05, PAL['iron'], METAL)
+        n = max(2, int((b - a) / 0.6))
+        for k in range(n + 1):
+            x = a + (b - a) * k / n
+            cyl(p_roof, x, y0, y0 + 0.62, 0.0, 0.03, PAL['iron'], METAL, sides=4)
+            p_roof.prism((x, y0 + 0.62, 0.0), 4, 0.07, 0.0, 0.2, PAL['gold'], METAL, axis=(0, 1, 0))
+            if k % 2:
+                p_roof.ring((x, y0 + 0.3, 0.0), 0.16, 0.025, PAL['iron'], 8, axis=(0, 0, 1), mat=METAL)
     # the verges: barge boards along the gables' rakes
     for x in (ex0, ex1):
         for sz in (1, -1):

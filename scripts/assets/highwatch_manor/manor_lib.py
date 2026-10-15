@@ -20,6 +20,8 @@ import bpy  # noqa: E402
 from shiplib import EDGE, FLAT, P, PLAIN, scale_color  # noqa: E402,F401
 
 WOOD, METAL, STONE, PLASTER, GLOW, SLATE, GLASS = 0, 1, 2, 3, 4, 5, 6
+# every glowing material (the weathering and the warm bake leave them alone)
+EMISSIVE = (GLOW, GLASS)
 
 # The least gap between a decal-like layer and the surface under it (a rug on a floor, a stripe
 # on a banner, a skin on a wall's core): closer than this, two overlapping faces fight in the
