@@ -195,8 +195,11 @@ Everything else is a sibling module in one of these families:
   `preserve-angle` interior only shortens the boom along the requested ray); walking in, the
   lens is held under the door's head and follows through the doorway from outside
   (`interiorEntryCap`); bodies outside lose their nameplates and chat bubbles unless seen
-  through an opening. Outdoors it touches nothing. The chase camera's floor (ground, rift
-  tier, maze hedges) is `chase_camera_floor_core.ts`.
+  through an opening. Outdoors it touches nothing. Reference registrant: the placed-town
+  view (`placed_town_buildings.ts`) registers each walk-in painted building's air from
+  `placed_town_interior_core.ts` (rooms and doors per model, at the building's scale and
+  turn). The chase camera's floor (ground, rift tier, maze hedges) is
+  `chase_camera_floor_core.ts`.
 - **Studio (authored maps) and the editor:** two directories, each with its
   own `CLAUDE.md` and `index.ts` barrel. `authored_map/` holds what the
   renderer does ONLY on an authored map (chase-boom clamps and look-up dolly,

@@ -6,7 +6,10 @@
 // buildings stay solid while the player and the camera are both inside, the
 // rule fenbridge_town_visibility_core.ts owns), and its FIRST reveal rides the
 // town's reveal key piecewise, nearest first (town_reveal_core.ts), exactly as
-// the Fenbridge view's buildings do. The town view of Fenbridge or Eastbrook
+// the Fenbridge view's buildings do. Each walk-in building registers its air
+// with the indoor camera (interior_camera.ts, the air in
+// placed_town_interior_core.ts), so the camera keeps to its rooms while the
+// player is inside. The town view of Fenbridge or Eastbrook
 // owns the same building loop beside its own batches; this module is that
 // loop on its own.
 import * as THREE from 'three';
@@ -29,12 +32,14 @@ import {
   newFenbridgeBuildingVisibilityPlan,
 } from './fenbridge_town_visibility_core';
 import { GFX, type GfxSettings } from './gfx';
+import { registerCameraInterior, unregisterCameraInterior } from './interior_camera';
 import {
   advanceOccluderFade,
   type OccluderFadeMat,
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { placedTownCameraInterior } from './placed_town_interior_core';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
@@ -168,6 +173,8 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
    *  the file follows the texture tier (same geometry). */
   const loadedSourceFiles = new Map<string, string>();
   const sourceLoadTasks = new Map<string, Promise<void>>();
+  /** The camera interiors the live view registered (dropped when the next view builds). */
+  const registeredInteriors: string[] = [];
 
   function prepareSource(url: string, tier: PlacedTextureTier = GFX.placedTextureTier) {
     const file = placedTextureTierPath(url, tier, mediaAssetExists);
@@ -241,6 +248,9 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
     group.userData.assetUrls = builtInWorld ? urls : [];
     group.userData.buildingIds = [];
     group.userData.buildingFadeTargetCount = 0;
+    // the previous view's rooms go with it: a world without the town keeps no air
+    for (const id of registeredInteriors) unregisterCameraInterior(id);
+    registeredInteriors.length = 0;
     if (!builtInWorld) return emptyView(group);
 
     const hideTargets: BuildingHideTarget[] = [];
@@ -253,6 +263,14 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
       if (!source) throw new Error(`${spec.town} town building is missing: ${building.assetId}`);
       const built = buildPlacedTownBuilding(spec.town, building, source, groundAt);
       built.group.userData.placementId = building.id;
+      const interior = placedTownCameraInterior(
+        building,
+        groundAt(building.placement.x, building.placement.z),
+      );
+      if (interior) {
+        registerCameraInterior(interior);
+        registeredInteriors.push(interior.id);
+      }
       group.add(built.group);
       hideTargets.push({
         group: built.group,
