@@ -29,6 +29,11 @@ import {
 } from '../src/editor/world_prop_placements';
 import { targetHeightFor } from '../src/render/asset_scale';
 import { PROP_ASSET_DEFS, type PropKey } from '../src/render/props';
+import { EVERGARDEN_PROPS } from '../src/sim/content/evergarden';
+import { NIGHTBLOOM_PROPS } from '../src/sim/content/nightbloom';
+import { PALMREACH_PROPS } from '../src/sim/content/palmreach';
+import { REALM_PROPS } from '../src/sim/content/realm';
+import { WRAITHWOOD_PROPS } from '../src/sim/content/wraithwood';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import type { MapPlacement } from '../src/sim/map_doc';
 import { propPlacementRoll } from '../src/sim/prop_layout';
@@ -245,6 +250,26 @@ describe('the families the editor drew too large', () => {
     ).toBe(true);
   });
 
+  it('converts only the giants a zone module draws (never the Nightbloom elders)', () => {
+    const trees = placements.filter((p) => p.assetId === 'foliage/twisted_1');
+    const drawn = [
+      REALM_PROPS.greatTrees?.[0],
+      ...(PALMREACH_PROPS.greatTrees ?? []),
+      ...(EVERGARDEN_PROPS.greatTrees ?? []),
+      ...(WRAITHWOOD_PROPS.greatTrees ?? []),
+    ].filter((t): t is { x: number; z: number; r: number } => t !== undefined);
+    for (const tree of trees) {
+      expect(
+        drawn.some((t) => t.x === tree.x && t.z === tree.z),
+        tree.name,
+      ).toBe(true);
+    }
+    for (const elder of NIGHTBLOOM_PROPS.greatTrees ?? []) {
+      expect(trees.some((t) => t.x === elder.x && t.z === elder.z)).toBe(false);
+    }
+    expect(trees.length).toBeGreaterThan(0);
+  });
+
   it('measures the great-tree model it relies on', async () => {
     const box = await boundsOf('/models/foliage/twisted_1.glb');
     const maxDim = Math.max(
@@ -294,6 +319,14 @@ describe('older documents', () => {
     expect(map.placements[hutIndex]).toEqual(faithful.get('Mud hut 1'));
     // the maker moved this one: it keeps their edit
     expect(map.placements[movedIndex]).toBe(before);
+    // the first conversion's phantom Nightbloom giants are gone
+    for (const elder of NIGHTBLOOM_PROPS.greatTrees ?? []) {
+      expect(
+        map.placements.some(
+          (p) => p.assetId === 'foliage/twisted_1' && p.x === elder.x && p.z === elder.z,
+        ),
+      ).toBe(false);
+    }
     // and a second load changes nothing more
     expect(repairLegacyWorldPropFit(map)).toBe(0);
   });

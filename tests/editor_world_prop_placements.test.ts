@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { customMapToWorldContent, newCustomMap, newFlatCustomMap } from '../src/editor/custom_map';
-import { GREAT_TREE_MODEL } from '../src/editor/world_prop_conversion';
+import { GREAT_TREE_MODEL, isConvertedGreatTree } from '../src/editor/world_prop_conversion';
 import {
   promoteEditablePalms,
   promoteMajorWorldProps,
@@ -12,6 +12,7 @@ import { targetHeightFor } from '../src/render/asset_scale';
 import { isEastbrookRebuildBuilding } from '../src/render/eastbrook_town';
 import { isFenbridgeRebuildBuilding } from '../src/render/fenbridge_town';
 import { pathCrossesFence } from '../src/sim/colliders';
+import { WRAITHWOOD_PROPS } from '../src/sim/content/wraithwood';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { MAX_PLACEMENTS, type MapPlacement, sanitizeMapDoc } from '../src/sim/map_doc';
 import { isResting } from '../src/sim/progression/xp';
@@ -22,6 +23,13 @@ import { type Entity, emptyZoneProps, type ZonePropsDef } from '../src/sim/types
 // delveMarkers/greatTrees are optional on the type and absent from the factory,
 // but this fork's projection always emits them, so the fixture declares them.
 const EMPTY: ZonePropsDef = { ...emptyZoneProps(), delveMarkers: [], greatTrees: [] };
+// A great tree a zone module really draws (render/haunt_features.ts skips the
+// drowned ones, so the first on dry ground).
+const WRAITHWOOD_GIANT = (() => {
+  const tree = WRAITHWOOD_PROPS.greatTrees?.find((t) => isConvertedGreatTree(t, 20061));
+  if (!tree) throw new Error('the Wraithwood lost its giants');
+  return tree;
+})();
 
 describe('editable overworld scenery', () => {
   afterEach(() => setActiveWorldContent(null));
@@ -59,7 +67,7 @@ describe('editable overworld scenery', () => {
       ruinRings: [{ x: 17, z: 18, ringR: 4, columns: 3 }],
       graveyards: [{ x: 19, z: 20 }],
       delveMarkers: [{ x: 21, z: 22, delveId: 'drowned_litany' }],
-      greatTrees: [{ x: 23, z: 24, r: 4 }],
+      greatTrees: [WRAITHWOOD_GIANT],
     };
 
     const placements = worldMajorPropPlacements(props);
@@ -88,17 +96,17 @@ describe('editable overworld scenery', () => {
   it('sizes promoted great trees the way the zone modules scale the full model', () => {
     const [tree] = worldMajorPropPlacements({
       ...EMPTY,
-      greatTrees: [{ x: 23, z: 24, r: 4 }],
+      greatTrees: [WRAITHWOOD_GIANT],
     });
 
-    // No zone owns this record, so it takes the Wraithwood elders' scale
-    // (render/haunt_features.ts): r * (2.4 + roll * 0.5) on the raw model,
-    // which PlacedAssetsView reaches through its targetHeightFor normalization.
+    // A Wraithwood elder, scaled as render/haunt_features.ts scales it:
+    // r * (2.4 + roll * 0.5) on the raw model, which PlacedAssetsView reaches
+    // through its targetHeightFor normalization.
     expect(tree.assetId).toBe('foliage/twisted_1');
     const raw =
       (targetHeightFor('/models/foliage/twisted_1.glb') / GREAT_TREE_MODEL.maxDim) * tree.scale;
-    expect(raw).toBeGreaterThanOrEqual(4 * 2.4 - 1e-9);
-    expect(raw).toBeLessThanOrEqual(4 * 2.9 + 1e-9);
+    expect(raw).toBeGreaterThanOrEqual(WRAITHWOOD_GIANT.r * 2.4 - 1e-9);
+    expect(raw).toBeLessThanOrEqual(WRAITHWOOD_GIANT.r * 2.9 + 1e-9);
     // the model keeps its authored proportions
     expect(tree.scaleX).toBe(1);
     expect(tree.scaleY).toBe(1);
@@ -153,6 +161,11 @@ describe('editable overworld scenery', () => {
       raceCourse: undefined,
     }).toEqual({
       ...EMPTY,
+      // great trees no zone draws as a model (the Nightbloom's foliage-crowned
+      // elders) stay records, so their trunks keep colliding
+      greatTrees: (BUILTIN_WORLD.props.greatTrees ?? []).filter(
+        (tree) => !isConvertedGreatTree(tree, map.meta.seed),
+      ),
       buildings: [],
       wells: [],
       stalls: [],

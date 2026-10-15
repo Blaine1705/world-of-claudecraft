@@ -25,7 +25,7 @@
 // Not reproducible as placements, and left out: props.ts's hand-built meshes
 // (a mud hut's doorway decal, a mine's dark mouth and lantern glass, the delve
 // arch's animated void) and material-level looks (the cart's stripped awning,
-// a zone's tinted bark).
+// a zone's tinted bark), and the delve approach's hand-built braziers.
 
 import * as THREE from 'three';
 import { targetHeightFor } from '../render/asset_scale';
@@ -206,18 +206,32 @@ const PALISADE_MODULE_LEN = 2.0;
 const PALISADE_SEG = 6.4;
 const WOOD_FENCE_DEPTH = 0.35;
 
+/** render/props.ts's delve-approach rubble (rockLargeD), in the arch's frame. */
+const DELVE_BOULDERS = [
+  { dx: -8.5, dz: -1.8, s: 1.7, rot: 2.1 },
+  { dx: 8.0, dz: 2.2, s: 1.45, rot: 0.7 },
+] as const;
+
 /** The great-tree model (foliage/twisted_1.glb): its largest dimension and
  *  base, measured from the GLB (pinned by tests/world_prop_conversion.test.ts). */
 export const GREAT_TREE_MODEL = { maxDim: 16.4, minY: -0.2015 } as const;
 
-/** One great tree's raw scale and yaw, per the zone module that draws it. */
+/**
+ * One great tree's raw scale and yaw, per the zone module that draws it, or
+ * null when no module draws a giant there: the Nightbloom's elders are trunk
+ * colliders whose crowns come from the zone's foliage pass, and the realm
+ * draws only its first record. Those records stay records
+ * (isConvertedGreatTree, withoutEditableWorldProps keeps them colliding).
+ */
 function greatTreeLook(
   tree: { x: number; z: number; r: number },
   seed: number,
-): { scale: number; rot: number } {
+): { scale: number; rot: number } | null {
   const is = (props: ZonePropsDef) =>
     (props.greatTrees ?? []).some((t) => t.x === tree.x && t.z === tree.z);
-  if (is(REALM_PROPS)) return { scale: 6.5, rot: 0.8 }; // render/realm_flora.ts
+  const realm = REALM_PROPS.greatTrees?.[0];
+  if (realm && realm.x === tree.x && realm.z === tree.z) return { scale: 6.5, rot: 0.8 };
+  if (is(REALM_PROPS)) return null;
   if (is(PALMREACH_PROPS)) {
     // render/jungle_features.ts
     return {
@@ -232,12 +246,27 @@ function greatTreeLook(
       rot: hash2(tree.z, tree.x, seed + 6311) * Math.PI * 2,
     };
   }
-  // render/haunt_features.ts (the Wraithwood); the Nightbloom's elders are "the
-  // same standing giants the Wraithwood keeps" (sim/content/nightbloom.ts).
-  return {
-    scale: tree.r * (2.4 + hash2(tree.x, tree.z, seed + 4101) * 0.5),
-    rot: hash2(tree.z, tree.x, seed + 4111) * Math.PI * 2,
-  };
+  if (is(WRAITHWOOD_PROPS)) {
+    // render/haunt_features.ts
+    return {
+      scale: tree.r * (2.4 + hash2(tree.x, tree.z, seed + 4101) * 0.5),
+      rot: hash2(tree.z, tree.x, seed + 4111) * Math.PI * 2,
+    };
+  }
+  return null;
+}
+
+/** Whether a great-tree record becomes a placement (a zone module draws it,
+ *  on dry ground). The rest stay records, so their trunks keep colliding. */
+export function isConvertedGreatTree(
+  tree: { x: number; z: number; r: number },
+  seed: number,
+): boolean {
+  if (greatTreeLook(tree, seed) === null) return false;
+  // the realm's giant stands wherever it is; the others skip a drowned spot
+  const realm = REALM_PROPS.greatTrees?.[0];
+  const isRealm = realm !== undefined && realm.x === tree.x && realm.z === tree.z;
+  return isRealm || terrainHeight(tree.x, tree.z, seed) >= WATER_LEVEL;
 }
 
 /** Expand the built-in world's renderer-owned scenery into placements. */
@@ -717,6 +746,21 @@ export function worldMajorPropPlacements(
       groupMatrix(dm.x, ground(dm.x, archZ), archZ, facing, DELVE_ARCH_SCALE),
       { scale: 1 },
     );
+    // the mossy boulders flanking the approach
+    const faceSign = delveArchMouthSign(dm.delveId);
+    DELVE_BOULDERS.forEach((rb, i) => {
+      const rx = dm.x + rb.dx;
+      const rz = archZ + faceSign * rb.dz;
+      add(
+        'rockLargeD',
+        `Delve ${dm.delveId || index + 1} boulder ${i + 1}`,
+        groupMatrix(rx, ground(rx, rz) - 0.08, rz),
+        {
+          scale: rb.s,
+          rot: rb.rot,
+        },
+      );
+    });
   });
 
   // ---- marsh reeds
@@ -733,8 +777,9 @@ export function worldMajorPropPlacements(
 
   // ---- great trees: the raw twisted-elder model, scaled per zone module
   (props.greatTrees ?? []).forEach((tree, index) => {
-    if (ground(tree.x, tree.z) < WATER_LEVEL) return; // no zone draws a drowned giant
+    if (!isConvertedGreatTree(tree, seed)) return;
     const look = greatTreeLook(tree, seed);
+    if (!look) return;
     const path = '/models/foliage/twisted_1.glb';
     out.push({
       assetId: 'foliage/twisted_1',

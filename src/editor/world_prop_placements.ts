@@ -33,7 +33,8 @@ import {
   reachPalmSpots,
   terrainHeight,
 } from '../sim/world';
-import { worldMajorPropPlacements } from './world_prop_conversion';
+import { WORLD_SEED } from '../sim/world_seed';
+import { isConvertedGreatTree, worldMajorPropPlacements } from './world_prop_conversion';
 
 const MIN_AXIS_SCALE = 0.05;
 
@@ -898,7 +899,9 @@ export function withoutEditableWorldProps(props: ZonePropsDef): ZonePropsDef {
     fences: town.fences,
     graveyards: [],
     delveMarkers: [],
-    greatTrees: [],
+    // only the giants a zone module draws became placements; the rest (the
+    // Nightbloom's foliage-crowned elders) keep their record trunk colliders
+    greatTrees: (props.greatTrees ?? []).filter((tree) => !isConvertedGreatTree(tree, WORLD_SEED)),
     marshReeds: [],
   };
   // Promoted by decorPropPlacements above: leaving the records here would draw
@@ -1002,8 +1005,9 @@ function sameConvertedTransform(a: MapPlacement, b: MapPlacement): boolean {
  * drew five times the game's size) to the faithful one
  * (world_prop_conversion.ts). Only placements the maker never touched move:
  * same name, same asset, and exactly the transform the old conversion set.
- * Anything moved, turned, resized or renamed keeps the maker's edit. A
- * placement the faithful conversion no longer emits is left as it is.
+ * Anything moved, turned, resized or renamed keeps the maker's edit. An
+ * untouched one the faithful conversion no longer emits (a great tree no zone
+ * draws) is removed, since the game shows nothing there.
  * Idempotent (an upgraded placement no longer matches the old transform);
  * returns how many it upgraded.
  */
@@ -1026,13 +1030,20 @@ export function repairLegacyWorldPropFit(map: {
   const legacy = byName(legacyWorldMajorPropPlacements(BUILTIN_WORLD.props, map.meta.seed, true));
   const faithful = byName(worldMajorPropPlacements(BUILTIN_WORLD.props, map.meta.seed, true));
   let upgraded = 0;
+  const removed = new Set<number>();
   map.placements.forEach((placement, index) => {
     const name = placement.name;
     if (!name) return;
     const old = legacy.get(name);
     const next = faithful.get(name);
-    if (!old || !next || old.assetId !== placement.assetId) return;
+    if (!old || old.assetId !== placement.assetId) return;
     if (!sameConvertedTransform(placement, old)) return;
+    if (!next) {
+      // the game draws nothing there (the Nightbloom's phantom giants)
+      removed.add(index);
+      upgraded++;
+      return;
+    }
     // the two conversions agree on this one (the palms): nothing to upgrade
     if (next.assetId === placement.assetId && sameConvertedTransform(placement, next)) return;
     // Untouched: take the faithful conversion whole, keeping the document's
@@ -1046,6 +1057,7 @@ export function repairLegacyWorldPropFit(map: {
     map.placements[index] = replacement;
     upgraded++;
   });
+  if (removed.size > 0) map.placements = map.placements.filter((_, i) => !removed.has(i));
   return upgraded;
 }
 
