@@ -1031,7 +1031,10 @@ const MONOLITHS: MonolithRow[] = [
     // Highwatch, placed_town_buildings.ts): Eastbrook's and Fenbridge's mount,
     // reveal-gate and two per-frame update blocks folded into loops over
     // townViews, which paid for the third town and 31 lines more. wc -l.
-    ceiling: 12395,
+    // LOWERED 12395 -> 12392 when the chase camera's floor (ground, rift tier, maze
+    // hedges) moved into chase_camera_floor_core.ts, net of the indoor camera clamp's
+    // wiring (interior_camera.ts). wc -l. Exact count.
+    ceiling: 12392,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

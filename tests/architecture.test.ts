@@ -842,6 +842,10 @@ const RENDER_PURE_CORES = [
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
+  // the indoor chase-camera clamp's walk through a building's air (interior_camera.ts)
+  'src/render/interior_camera_core.ts',
+  // the chase camera's floor (ground, rift tier, maze hedges), out of renderer.ts
+  'src/render/chase_camera_floor_core.ts',
   // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
   'src/render/body_emote_core.ts',
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).

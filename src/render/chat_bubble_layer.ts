@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import type { IWorld } from '../world_api';
+import { interiorHidesNameplate } from './interior_camera';
 import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
@@ -85,7 +86,12 @@ export class ChatBubbleLayer {
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
       this.tmpV.y += (v.height + v.mountLift) * e.scale + 1.0;
-      if (!isProjectedNameplateAnchorVisible(camera, this.tmpV, this.tmpV2)) {
+      // indoors, a bubble outside shows only through a doorway (interior_camera.ts)
+      const { x: bx, y: by, z: bz } = this.tmpV;
+      if (
+        !isProjectedNameplateAnchorVisible(camera, this.tmpV, this.tmpV2) ||
+        interiorHidesNameplate(camera, bx, e.pos.y, bz, by)
+      ) {
         b.el.style.display = 'none';
         continue;
       }

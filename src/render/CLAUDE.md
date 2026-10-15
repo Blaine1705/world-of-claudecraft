@@ -186,6 +186,17 @@ Everything else is a sibling module in one of these families:
   moves). All display-only, all gated by the reduced-motion switch; driven
   from `renderer.ts` `updateCamera` and the hud event hooks
   (`tests/camera_*_core.test.ts`).
+- `interior_camera.ts` over `interior_camera_core.ts`: the indoor camera clamp, the ONE
+  scoped exception on the built-in world to the pinned rule that scene geometry never shortens
+  the chase boom (`tests/graphics_overhaul_integration.test.ts`). A walk-in building registers
+  its AIR (boxes, optionally rounded by a vertical cylinder, plus its openings onto the world)
+  with `registerCameraInterior` when it is built and drops it on teardown; while the player's
+  eye stands in it, the drawn camera stays in that air (pull-in at once, eased release, a
+  `preserve-angle` interior only shortens the boom along the requested ray); walking in, the
+  lens is held under the door's head and follows through the doorway from outside
+  (`interiorEntryCap`); bodies outside lose their nameplates and chat bubbles unless seen
+  through an opening. Outdoors it touches nothing. The chase camera's floor (ground, rift
+  tier, maze hedges) is `chase_camera_floor_core.ts`.
 - **Studio (authored maps) and the editor:** two directories, each with its
   own `CLAUDE.md` and `index.ts` barrel. `authored_map/` holds what the
   renderer does ONLY on an authored map (chase-boom clamps and look-up dolly,
