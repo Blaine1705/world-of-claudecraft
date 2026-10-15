@@ -68,6 +68,7 @@ import { placedTextureTierPath } from './placed_texture_tier_core';
 import { adoptDynamicBudgetLight } from './point_light_budget';
 import { buildRockChainModel, buildRockModel, rockSeed } from './rock_gen';
 import { refreshFrozenWorldMatrix } from './static_matrix';
+import { townStyledPlacedTemplate } from './town_styled_placed_assets';
 import { type TreeBuild, treeSeed } from './tree_gen';
 import {
   LEAF_KIND_MUL,
@@ -1931,26 +1932,31 @@ export class PlacedAssetsView {
       const file = placedTextureTierPath(path, GFX.placedTextureTier, mediaAssetExists);
       cached = loadGltf(file, () => this.streamPriority(path))
         .then((gltf) => {
-          const object = gltf.scene;
+          // An authored town's own model draws in its town's look (its own
+          // clones of the town's materials, render/town_styled_placed_assets.ts),
+          // whose emissive response is already the town's: no lift below.
+          const townStyled = townStyledPlacedTemplate(path, gltf.scene);
+          const object = townStyled ?? gltf.scene;
           // Weakly authored emissive channels never cross the bloom threshold;
           // lift them once on the shared template so "glowy" GLB materials
           // actually glow (clones inherit it).
-          object.traverse((o) => {
-            const mesh = o as THREE.Mesh;
-            if (!mesh.isMesh) return;
-            const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-            for (const raw of mats) {
-              const m = raw as THREE.MeshStandardMaterial;
-              if (
-                m.emissive &&
-                (m.emissive.r > 0 || m.emissive.g > 0 || m.emissive.b > 0) &&
-                m.emissiveIntensity > 0 &&
-                m.emissiveIntensity < MIN_NATIVE_EMISSIVE_INTENSITY
-              ) {
-                m.emissiveIntensity = MIN_NATIVE_EMISSIVE_INTENSITY;
+          if (!townStyled)
+            object.traverse((o) => {
+              const mesh = o as THREE.Mesh;
+              if (!mesh.isMesh) return;
+              const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+              for (const raw of mats) {
+                const m = raw as THREE.MeshStandardMaterial;
+                if (
+                  m.emissive &&
+                  (m.emissive.r > 0 || m.emissive.g > 0 || m.emissive.b > 0) &&
+                  m.emissiveIntensity > 0 &&
+                  m.emissiveIntensity < MIN_NATIVE_EMISSIVE_INTENSITY
+                ) {
+                  m.emissiveIntensity = MIN_NATIVE_EMISSIVE_INTENSITY;
+                }
               }
-            }
-          });
+            });
           const box = new THREE.Box3().setFromObject(object);
           const size = new THREE.Vector3();
           box.getSize(size);

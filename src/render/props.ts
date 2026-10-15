@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
+import { isBuiltinShapedWorld } from '../sim/builtin_shaped_world';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
 import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
@@ -1399,6 +1400,7 @@ export function buildProps(
   const transportShips: TransportShipView[] = [];
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
+  const builtInShaped = isBuiltinShapedWorld(activeContent);
   // The authored-town swap is gated on the town's DATA, not on world identity,
   // so an editor copy of the built-in world gets the same art the game draws
   // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
@@ -1719,14 +1721,18 @@ export function buildProps(
         if (wake) group.add(wake.points);
       })
     : null;
-  if (builtInWorld) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
+  // The piers and the built harbors below draw on any copy of the built-in
+  // world too (sim/builtin_shaped_world.ts): the sim walks their decks on every
+  // world. The ferry and its berth markers stay built-in only (it never sails
+  // a copy, transport_ferry.ts).
+  if (builtInShaped) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
   // ...and the route marker at every berth (render/harbor_route_markers.ts)
   if (builtInWorld) group.add(buildHarborRouteMarkers(seed));
   // ...and the Wyrmwatch cliff harbor at the Drakelands berth (render/wyrmwatch_harbor.ts),
   // its Harbormaster's House walls and roof kept out of the merge (they fade one by one for
   // the camera, render/wyrmwatch_harbor_house.ts) and its hearth and lanterns lit like a
   // campfire (root-level, world-positioned, in the fire-light budget)
-  if (builtInWorld) {
+  if (builtInShaped) {
     group.add(buildWyrmwatchHarbor(seed));
     for (const m of harborHouseShellMeshes()) keepFromMerge.add(m);
     for (const light of wyrmwatchHarborHouseLights()) {
@@ -1738,7 +1744,7 @@ export function buildProps(
   }
   // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts),
   // with the rest of the town's wooden harbor in the same wood (render/wickharbor_harbor.ts)
-  if (builtInWorld) {
+  if (builtInShaped) {
     group.add(buildWickharborWharf());
     group.add(buildWickharborHarbor());
   }

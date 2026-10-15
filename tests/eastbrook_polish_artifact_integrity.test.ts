@@ -1377,6 +1377,8 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
+  // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1411,8 +1413,10 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
   // Re-minted for the painted Tidehold buildings in the built-in town: the
   // authoritative layout and the town runtime leaf moved. No capture was retaken.
-  'e2ffe0537ef07979daa6f3c311a9bfb5178f2fc25df5b3ac5052a611012550d8';
+  '9219f5d6a77a0748470a5cb23822efe2669f7f96db84527459fbc9e33fff80d6';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
+  // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
+  // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1444,7 +1448,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
   // Re-minted for the painted Tidehold buildings in the built-in town: the
   // authoritative layout and the town runtime leaf moved. No capture was retaken.
-  '50fa04a27db4bf416edf4d2e5bbd20c152baef8564527e761e448d6add99ebd5';
+  'c9d804a027f71863e4c7a9c43954797bb99d395f5f8bda6476247d82be1ba4d6';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2835,7 +2839,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // over the re-swept evidence. No capture was retaken.
       // The painted Tidehold buildings in the built-in town: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('93b18bd3315d84bbecbc31b2098d27ee90698e01e27211e24f1db3f808d9c9d9');
+    ).toBe('dad20b909e6d0e75fe74cf5c19d80fe055cf7f3ad684028f4112406242f7843b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

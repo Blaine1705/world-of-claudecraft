@@ -33,6 +33,7 @@ import { emberLilySpots } from '../sim/ember_lilies';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { MAX_PLACEMENTS, type MapPlacement } from '../sim/map_doc';
 import { terrainHeight } from '../sim/world';
+import { authoredTownDressingPlacements } from './authored_town_dressing_placements';
 
 /** targetHeightFor() for every /models/props/ path this module emits. */
 const TARGET_HEIGHT = 2.2;
@@ -382,6 +383,7 @@ export const FEATURE_PROMOTIONS: readonly {
   { flag: 'jungleCoconuts', placements: jungleCoconutPlacements },
   { flag: 'authoredTowns', placements: authoredTownBuildingPlacements },
   { flag: 'eastbrookVault', placements: eastbrookVaultPlacements },
+  { flag: 'authoredTownDressing', placements: authoredTownDressingPlacements },
 ];
 
 /**
