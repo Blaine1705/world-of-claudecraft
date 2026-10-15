@@ -28,6 +28,7 @@ import {
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
 import { studioDevGuardMiddleware } from './scripts/lib/studio_dev_guard.mjs';
+import { vitestBoundedRelatedPlugin } from './scripts/lib/vitest_bounded_related.mjs';
 import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
@@ -1212,10 +1213,15 @@ function diagnosticsCapturePlugin() {
 export default defineConfig({
   base: '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
-  // plugin is scoped to Vitest so it cannot affect production client builds.
+  // plugins are scoped to Vitest so they cannot affect production client builds.
+  // The bounded-related plugin swaps `vitest related`'s selection for a
+  // same-result walk with bounded heap (scripts/lib/vitest_bounded_related.mjs):
+  // the stock walk exhausted the CI main process's heap on this suite.
   plugins: [
     svelte(),
-    ...(process.env.VITEST ? [svelteTesting({ autoCleanup: false })] : []),
+    ...(process.env.VITEST
+      ? [svelteTesting({ autoCleanup: false }), vitestBoundedRelatedPlugin()]
+      : []),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     musicEditorSavePlugin(),
