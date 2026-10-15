@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { ASSET_CATALOG } from '../src/editor/asset_catalog.generated';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { placedTextureTierPath } from '../src/render/placed_texture_tier_core';
+import { ASSET_COLLISION_OVERRIDES } from '../src/sim/asset_collision_overrides.generated';
 
 const DIR = path.resolve(__dirname, '..', 'public', 'models', 'tidehold');
 const BUILDINGS = [
@@ -211,6 +212,72 @@ describe('the Fenrire look', () => {
       .find((line) => line.includes('public/models/tidehold/fenrire/'));
     expect(row, 'a CREDITS.md row for the Fenrire look').toBeDefined();
     for (const b of LOOK_BUILDINGS) expect(row, b).toContain(b);
+    expect(row).toContain('.half.glb');
+    expect(row).toContain('.quarter.glb');
+  });
+});
+
+// The Highwatch look (Highwatch's buildings): the same models re-baked wearing
+// the harbour colour set with square slate roofs and ashlar wall stone, the
+// atlases swapped into the default files. The same rule as the Fenrire look:
+// the same model with other pictures and nothing else, since the town's
+// collision boxes, its seat and the Studio's baked rows read the default
+// model's numbers.
+const HIGHWATCH_BUILDINGS = ['hall', 'house_c', 'shop_a', 'smithy', 'tavern_b'];
+
+describe('the Highwatch look', () => {
+  it.each(
+    HIGHWATCH_BUILDINGS.flatMap((b) =>
+      LOOK_TIERS.map((t) => [`highwatch/${b}${t}`, `${b}${t}`] as const),
+    ),
+  )('%s is %s with other pictures and nothing else', (lookFile, baseFile) => {
+    const base = read(baseFile);
+    const look = read(lookFile);
+    expect(shape(look)).toBe(shape(base));
+    expect(images(look)).toEqual(images(base).map((img) => ({ ...img, mime: 'image/ktx2' })));
+    // ...and really repainted: the walls (ashlar) and roof (slates) atlases are
+    // not the default look's bytes
+    const stem = baseFile.replace(/\..*$/, '');
+    for (const atlas of [`${stem}_walls_color`, `${stem}_roof_color`]) {
+      expect(imageBytes(look, atlas).equals(imageBytes(base, atlas)), atlas).toBe(false);
+    }
+  });
+
+  it('every look file is in the media manifest, and each model is a placeable asset', () => {
+    const exists = (p: string) => MEDIA_ASSETS[p.replace(/^\/+/, '')] !== undefined;
+    for (const b of HIGHWATCH_BUILDINGS) {
+      const model = `/models/tidehold/highwatch/${b}.glb`;
+      expect(exists(model), model).toBe(true);
+      expect(placedTextureTierPath(model, 'half', exists)).toBe(
+        `/models/tidehold/highwatch/${b}.half.glb`,
+      );
+      expect(placedTextureTierPath(model, 'quarter', exists)).toBe(
+        `/models/tidehold/highwatch/${b}.quarter.glb`,
+      );
+      expect(
+        ASSET_CATALOG.some((a) => a.id === `tidehold/highwatch/${b}`),
+        b,
+      ).toBe(true);
+    }
+  });
+
+  it('collides as the default model: each collision row is the default row', () => {
+    for (const b of HIGHWATCH_BUILDINGS) {
+      const own = ASSET_COLLISION_OVERRIDES[`tidehold/highwatch/${b}`];
+      expect(own, b).toBeDefined();
+      expect(own, b).toEqual(ASSET_COLLISION_OVERRIDES[`tidehold/${b}`]);
+    }
+  });
+
+  it('is credited, every building and tier', () => {
+    const credits = fs.readFileSync(path.resolve(__dirname, '..', 'CREDITS.md'), 'utf8');
+    const row = credits
+      .split('\n')
+      .find((line) => line.includes('public/models/tidehold/highwatch/'));
+    expect(row, 'a CREDITS.md row for the Highwatch look').toBeDefined();
+    expect(row).toContain(
+      `public/models/tidehold/highwatch/{${HIGHWATCH_BUILDINGS.join(',')}}.glb`,
+    );
     expect(row).toContain('.half.glb');
     expect(row).toContain('.quarter.glb');
   });

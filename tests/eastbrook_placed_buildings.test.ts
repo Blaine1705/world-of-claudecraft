@@ -21,6 +21,7 @@ import { EASTBROOK_BUILDING_PAD_TERRAIN_EDITS, ZONE1_PROPS } from '../src/sim/co
 import { BUILTIN_WORLD, PLAYER_START, setActiveWorldContent } from '../src/sim/data';
 import { isExcludedDecoration, isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
 import { EASTBROOK_LAYOUT, localToWorld, type Obb2 } from '../src/sim/eastbrook_layout';
+import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { generateDecorationsInBounds, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -441,9 +442,20 @@ describe('placed building collision in the built-in world', () => {
 });
 
 describe('the ground under the placed buildings', () => {
-  it('carries the Studio rebuild map level pads, last in the world edit list', () => {
+  it('carries the Studio rebuild map level pads, the last edits on their ground', () => {
     const pads = EASTBROOK_BUILDING_PAD_TERRAIN_EDITS;
-    const mapPads = REBUILD_MAP.terrainEdits.slice(-pads.length);
+    // Highwatch's pads come after them in both lists, on the Thornpeak shelf
+    // far to the north, where no Eastbrook pad reaches
+    const highwatchPads = HIGHWATCH_LAYOUT.pads.length;
+    for (const pad of HIGHWATCH_LAYOUT.pads) {
+      for (const own of pads) {
+        expect(Math.hypot(pad.x - own.x, pad.z - own.z)).toBeGreaterThan(
+          pad.radius + own.radius + 100,
+        );
+      }
+    }
+    expect(REBUILD_MAP.terrainEdits.slice(-highwatchPads)).toEqual(HIGHWATCH_LAYOUT.pads);
+    const mapPads = REBUILD_MAP.terrainEdits.slice(-pads.length - highwatchPads, -highwatchPads);
     expect(pads).toHaveLength(BUILDINGS.length);
     // the smithy's, the tavern's, the shop's and the bank's are the map's own
     for (const index of [1, 2, 3, 4]) {
@@ -481,7 +493,8 @@ describe('the ground under the placed buildings', () => {
     expect(cottagePad.x - cottagePad.radius).toBeGreaterThanOrEqual(QUAY_PAD_EAST_EDGE);
     expect(cottagePad.radius).toBeLessThan(mapCottagePad.radius);
     const edits = BUILTIN_WORLD.terrainEdits ?? [];
-    expect(edits.slice(-pads.length)).toEqual(pads);
+    expect(edits.slice(-pads.length - highwatchPads, -highwatchPads)).toEqual(pads);
+    expect(edits.slice(-highwatchPads)).toEqual(HIGHWATCH_LAYOUT.pads);
   });
 
   it('is level under each building, across its whole reach', () => {
