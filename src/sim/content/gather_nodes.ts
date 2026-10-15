@@ -632,11 +632,14 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 17,
     tier: 3,
   },
+  // Moved off the ground the Highwatch inn's back wall took
+  // (sim/highwatch_layout.ts services.herbs), into the open ground between the
+  // inn, the Cairns and the watch house.
   {
     id: 'herb_thornpeak_t2',
     zoneId: 'thornpeak_heights',
     type: 'herb',
-    pos: { x: 28, z: 658 },
+    pos: { x: 24, z: 645 },
     level: 17,
     tier: 2,
   },
