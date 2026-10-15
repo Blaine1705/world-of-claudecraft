@@ -154,7 +154,7 @@ describe('the pinch hint is the creator panels only', () => {
     expect(inner.hide).toHaveBeenCalledTimes(1);
     hint.hide();
     expect(inner.hide).toHaveBeenCalledTimes(2);
-    // a gesture on any stage counts: the player has found the pinch
+    // every gesture is passed on; the hint counts only one made while it is up
     hint.interacted();
     expect(inner.interacted).toHaveBeenCalledTimes(1);
   });

@@ -43,6 +43,35 @@ function hintSection(): string {
 }
 const stripCssComments = (css: string): string => css.replace(/\/\*[\s\S]*?\*\//g, '');
 
+/** The root rule's declarations, property to value (exact names: `left` is not `border-left`). */
+function rootDeclarations(): Map<string, string> {
+  const css = stripCssComments(hintSection());
+  const body = css.match(/\n {2}\.preview-touch-hint\s*\{([^}]*)\}/)?.[1] ?? '';
+  const decls = new Map<string, string>();
+  for (const part of body.split(';')) {
+    const at = part.indexOf(':');
+    if (at < 0) continue;
+    decls.set(
+      part.slice(0, at).trim(),
+      part
+        .slice(at + 1)
+        .trim()
+        .replace(/\s+/g, ' '),
+    );
+  }
+  return decls;
+}
+
+/** Every selector in `css` whose rule sets `animation: none`. */
+function selectorsWithAnimationNone(css: string): string[] {
+  const out: string[] = [];
+  for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (!/(?:^|;)\s*animation:\s*none\s*;/.test(m[2])) continue;
+    for (const sel of m[1].split(',')) out.push(sel.trim().replace(/\s+/g, ' '));
+  }
+  return out;
+}
+
 /** An in-memory Storage slice that counts its calls. */
 function memoryStorage(initial: Record<string, string> = {}) {
   const map = new Map(Object.entries(initial));
@@ -103,10 +132,15 @@ describe('preview touch hint: showing', () => {
   it('costs no DOM and reads no storage before the first show', () => {
     const { store } = memoryStorage();
     const records = mutationsDuring(document.body, () => {
-      createPreviewTouchHint(document, store);
+      const hint = createPreviewTouchHint(document, store);
+      // the stage's per-frame hide where it never offers the hint (a desktop, the select)
+      for (let i = 0; i < 5; i++) hint.hide();
+      // and a gesture there: nothing to retire, nothing to store
+      hint.interacted();
     });
     expect(records).toHaveLength(0);
     expect(store.reads).toBe(0);
+    expect(store.writes).toBe(0);
   });
 
   it('shows one tab in the stage, with its glyph and its localized label', () => {
@@ -207,13 +241,21 @@ describe('preview touch hint: once, until the first gesture', () => {
     expect(hintsIn(document)).toHaveLength(0);
   });
 
-  it('a gesture before the hint ever showed retires it too (the model was found anyway)', () => {
+  it('a gesture while the tab is off screen leaves it to show (the player never saw it)', () => {
     const { store, map } = memoryStorage();
     const hint = createPreviewTouchHint(document, store);
+    // before it ever showed (a turn on the character select's stage)
     hint.interacted();
-    expect(map.get(PREVIEW_TOUCH_HINT_STORAGE_KEY)).toBe(PREVIEW_TOUCH_HINT_SEEN);
+    expect(map.has(PREVIEW_TOUCH_HINT_STORAGE_KEY)).toBe(false);
     hint.show(stageA);
-    expect(hintsIn(document)).toHaveLength(0);
+    expect(hintsIn(stageA)).toHaveLength(1);
+    // and after it came off for a while (the player went back to the select)
+    hint.hide();
+    hint.interacted();
+    expect(map.has(PREVIEW_TOUCH_HINT_STORAGE_KEY)).toBe(false);
+    hint.show(stageA);
+    expect(hintsIn(stageA)).toHaveLength(1);
+    expect(hintsIn(stageA)[0].dataset.state).toBe('shown');
   });
 
   it('never shows on a device that already moved the model', () => {
@@ -283,30 +325,70 @@ describe('preview touch hint: its shell.css section', () => {
       for (const c of (el.getAttribute('class') ?? '').split(/\s+/)) if (c) classes.add(c);
     }
     expect(classes.size).toBeGreaterThanOrEqual(8);
-    for (const c of classes) expect(css, `.${c} is unstyled`).toContain(`.${c}`);
+    for (const c of classes) {
+      // the whole class name, not a prefix of a longer one (.pth-tip inside .pth-tip-a)
+      const named = new RegExp(`\\.${c}(?![\\w-])`);
+      expect(css, `.${c} is unstyled`).toMatch(named);
+    }
     // the whole section is ONE @layer shell block
     expect(css.trim().startsWith('@layer shell {')).toBe(true);
   });
 
   it('takes no touches, sits on the stage edge beside the model, and under the name plate', () => {
-    const css = stripCssComments(hintSection());
-    const root = css.match(/\.preview-touch-hint\s*\{([^}]*)\}/)?.[1] ?? '';
-    expect(root).toMatch(/pointer-events:\s*none/);
-    expect(root).toMatch(/position:\s*absolute/);
-    expect(root).toMatch(/left:\s*0/);
-    expect(root).toMatch(/top:\s*50%/);
+    const decls = rootDeclarations();
+    expect(decls.get('pointer-events')).toBe('none');
+    expect(decls.get('position')).toBe('absolute');
+    expect(decls.get('left')).toBe('0');
+    expect(decls.get('top')).toBe('50%');
     // over the canvas and the loading silhouette (1), under the name plate (3)
-    expect(root).toMatch(/z-index:\s*2/);
+    expect(decls.get('z-index')).toBe('2');
     // a narrow tab, so the head-and-shoulders model in the middle stays clear
-    const width = Number(root.match(/width:\s*(\d+)px/)?.[1]);
+    const width = Number(decls.get('width')?.match(/^(\d+)px$/)?.[1]);
     expect(width).toBeGreaterThan(0);
     expect(width).toBeLessThanOrEqual(72);
   });
 
-  it('honors reduced motion (the OS setting and the in-game one)', () => {
+  it('stops every animation under reduced motion (the OS setting and the in-game one)', () => {
     const css = stripCssComments(hintSection());
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?animation:\s*none/);
-    expect(css).toMatch(/body\.reduce-motion \.preview-touch-hint[\s\S]*?animation:\s*none/);
+    const media = css.match(
+      /@media \(prefers-reduced-motion: reduce\)\s*\{([\s\S]*?)\n {2}\}/,
+    )?.[1];
+    expect(media, 'the reduced-motion block is missing').toBeTruthy();
+    const animated = ['', ' .pth-ring', ' .pth-arrow', ' .pth-tip-a', ' .pth-tip-b'];
+    for (const part of animated) {
+      const sel = `.preview-touch-hint${part}`;
+      expect(selectorsWithAnimationNone(media ?? ''), `${sel} (OS setting)`).toContain(sel);
+      expect(selectorsWithAnimationNone(css), `${sel} (in-game setting)`).toContain(
+        `body.reduce-motion ${sel}`,
+      );
+    }
+  });
+
+  it('rests the glyph in its spread pose, so a stopped or paused loop still reads as a pinch', () => {
+    const css = stripCssComments(hintSection());
+    const rule = (sel: string) =>
+      css.match(new RegExp(`${sel.replace(/[.]/g, '\\.')}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
+    expect(rule('.preview-touch-hint .pth-tip-a')).toMatch(/transform:\s*translate\(-6px, -6px\);/);
+    expect(rule('.preview-touch-hint .pth-tip-b')).toMatch(/transform:\s*translate\(6px, 6px\);/);
+    expect(rule('.preview-touch-hint .pth-arrow')).not.toMatch(/opacity:\s*0;/);
+    // a paused loop holds its first keyframe: the spread one
+    expect(css).toMatch(
+      /@keyframes pth-tip-a\s*\{\s*0%,\s*22%\s*\{\s*transform: translate\(-6px, -6px\);/,
+    );
+    expect(css).toMatch(
+      /@keyframes pth-tip-b\s*\{\s*0%,\s*22%\s*\{\s*transform: translate\(6px, 6px\);/,
+    );
+    expect(css).toMatch(/@keyframes pth-arrow\s*\{\s*0%,\s*22%\s*\{\s*opacity: 1;/);
+  });
+
+  it('paces the loop by --motion-scale and pauses it with the ambient-animation knob', () => {
+    const css = stripCssComments(hintSection());
+    const block = css.match(
+      /\.preview-touch-hint \.pth-ring,\s*\.preview-touch-hint \.pth-arrow,\s*\.preview-touch-hint \.pth-tip-a,\s*\.preview-touch-hint \.pth-tip-b\s*\{([^}]*)\}/,
+    )?.[1];
+    expect(block, 'the shared loop rule is missing').toBeTruthy();
+    expect(block).toMatch(/animation-duration:\s*calc\(2\.4s \* var\(--motion-scale, 1\)\);/);
+    expect(block).toMatch(/animation-play-state:\s*var\(--fx-ambient-anim, running\);/);
   });
 
   it('uses tokens, never a raw color', () => {

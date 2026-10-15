@@ -270,6 +270,8 @@ export class CharacterPreview {
   private loadingLayer: PreviewLoadingLayer | null = null;
   /** The host's gesture hint (setTouchHint): offered beside a touch creator's drawn model. */
   private touchHint: PreviewTouchHint | null = null;
+  /** syncTouchHint's facts, refilled every frame instead of allocated. */
+  private readonly touchHintFacts = { touch: false, creator: false, visible: false, drawn: false };
 
   // Drag controls
   private isDragging = false;
@@ -1029,13 +1031,13 @@ export class CharacterPreview {
   private syncTouchHint(): void {
     const hint = this.touchHint;
     if (!hint) return;
-    const offered = touchHintOffered({
-      touch: this.touchStage(),
-      creator: this.armorSurface === 'creator',
-      visible: this.renderActive,
-      drawn: this.subjectDrawn(),
-    });
-    if (offered) hint.show(this.container);
+    // one reused facts record: this runs every frame
+    const facts = this.touchHintFacts;
+    facts.touch = this.touchStage();
+    facts.creator = this.armorSurface === 'creator';
+    facts.visible = this.renderActive;
+    facts.drawn = this.subjectDrawn();
+    if (touchHintOffered(facts)) hint.show(this.container);
     else hint.hide();
   }
 

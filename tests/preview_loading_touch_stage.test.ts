@@ -108,6 +108,7 @@ function harness(opts: { touch: boolean; creator: boolean }): Harness {
     touchSolvedFor: { aspect: 0, headY: 0, headH: -1, view: null },
     loadingLayer: null,
     touchHint: null,
+    touchHintFacts: { touch: false, creator: false, visible: false, drawn: false },
   });
   return {
     preview,

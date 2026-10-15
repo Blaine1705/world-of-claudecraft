@@ -3,9 +3,11 @@
 // and the one stored flag that remembers that gesture across visits. DOM-free.
 //
 // The hint teaches a phone player that the creator's 3D model takes a pinch. It shows beside
-// the model until the player first moves it (a pinch, a slide, a turn or a double tap), plays
-// its exit, and never shows on that device again. A visit that ends without a gesture leaves
-// it to show on the next one: it retires on the gesture, not on being seen.
+// the model until the player first moves it while the hint is up (a pinch, a slide, a turn or
+// a double tap), plays its exit, and never shows on that device again. A visit that ends
+// without such a gesture leaves it to show on the next one: it retires on the gesture, not on
+// being seen. A gesture made while the hint is not on screen (on the character select's
+// stage, or before the creator's model draws) does not retire it: the player never saw it.
 //
 // The phases:
 // - idle: not on screen (the stage does not offer it now, or has not yet).
@@ -43,9 +45,9 @@ export function touchHintOnOffer(phase: TouchHintPhase, offered: boolean): Touch
   }
 }
 
-/** The player moved the model: a hint on screen plays its exit, any other retires at once. */
+/** The player moved the model: a hint on screen plays its exit; one off screen is untouched. */
 export function touchHintOnInteract(phase: TouchHintPhase): TouchHintPhase {
-  return phase === 'shown' || phase === 'leaving' ? 'leaving' : 'done';
+  return phase === 'shown' ? 'leaving' : phase;
 }
 
 /** The exit finished. */
@@ -53,7 +55,7 @@ export function touchHintOnLeft(phase: TouchHintPhase): TouchHintPhase {
   return phase === 'leaving' ? 'done' : phase;
 }
 
-/** Whether a gesture in this phase is the first one, the one the hint stores. */
+/** Whether a gesture in this phase is the one the hint stores: the first while it is up. */
 export function touchHintFirstGesture(phase: TouchHintPhase): boolean {
-  return phase === 'idle' || phase === 'shown';
+  return phase === 'shown';
 }

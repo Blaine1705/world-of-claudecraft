@@ -12,9 +12,9 @@ import {
 } from '../src/ui/preview_touch_hint_core';
 
 // The phone creator's one-time pinch hint, its pure half (src/ui/preview_touch_hint_core.ts):
-// it shows while the stage offers it, until the player's first gesture; that gesture plays the
-// exit and retires it for good, and a stored flag keeps it retired on later visits. A visit
-// that ends with no gesture leaves it to show again.
+// it shows while the stage offers it, until the player's first gesture made while it is up;
+// that gesture plays the exit and retires it for good, and a stored flag keeps it retired on
+// later visits. A visit that ends with no such gesture leaves it to show again.
 
 const PHASES: readonly TouchHintPhase[] = ['idle', 'shown', 'leaving', 'done'];
 
@@ -65,13 +65,15 @@ describe('the first gesture', () => {
     expect(touchHintOnLeft(leaving)).toBe('done');
   });
 
-  it('retires a hint that is not on screen at once (a gesture on another panel counts)', () => {
-    expect(touchHintOnInteract('idle')).toBe('done');
+  it('leaves a hint that is not on screen alone (the player never saw it)', () => {
+    // a turn on the character select's stage, or a pinch before the creator's model draws
+    expect(touchHintOnInteract('idle')).toBe('idle');
+    expect(touchHintOnOffer(touchHintOnInteract('idle'), true)).toBe('shown');
   });
 
-  it('is the first gesture only while the hint is not yet retired or leaving', () => {
-    expect(touchHintFirstGesture('idle')).toBe(true);
+  it('counts a gesture only while the hint is on screen', () => {
     expect(touchHintFirstGesture('shown')).toBe(true);
+    expect(touchHintFirstGesture('idle')).toBe(false);
     expect(touchHintFirstGesture('leaving')).toBe(false);
     expect(touchHintFirstGesture('done')).toBe(false);
   });

@@ -10587,7 +10587,10 @@
    takes no touches, so a pinch that starts on it reaches the canvas, and it sits over the
    canvas and the loading silhouette (z-index 1) but under the stage's name plate
    (z-index 3). No glass (backdrop-filter): the phone interface drops it as a compositor cost
-   against the live canvas, so the tab's own fill carries the contrast. Tokens only. */
+   against the live canvas, so the tab's own fill carries the contrast. The glyph's resting
+   pose is the SPREAD one (fingertips apart, chevrons lit), so wherever its loop does not
+   run (reduced motion) or is paused (the ambient-animation knob, --fx-ambient-anim) it still
+   reads as a pinch; the loop rides --motion-scale like the HUD's. Tokens only. */
 @layer shell {
   .preview-touch-hint {
     position: absolute;
@@ -10649,7 +10652,6 @@
     stroke-width: 1.8px;
     stroke-linecap: round;
     stroke-linejoin: round;
-    opacity: 0;
     animation: pth-arrow 2.4s ease-in-out infinite;
   }
   .preview-touch-hint .pth-tip {
@@ -10658,10 +10660,20 @@
     stroke-width: 1.2px;
   }
   .preview-touch-hint .pth-tip-a {
+    transform: translate(-6px, -6px);
     animation: pth-tip-a 2.4s ease-in-out infinite;
   }
   .preview-touch-hint .pth-tip-b {
+    transform: translate(6px, 6px);
     animation: pth-tip-b 2.4s ease-in-out infinite;
+  }
+  /* The loop's pace and the ambient-animation knob, on every looping part. */
+  .preview-touch-hint .pth-ring,
+  .preview-touch-hint .pth-arrow,
+  .preview-touch-hint .pth-tip-a,
+  .preview-touch-hint .pth-tip-b {
+    animation-duration: calc(2.4s * var(--motion-scale, 1));
+    animation-play-state: var(--fx-ambient-anim, running);
   }
   .preview-touch-hint .pth-label {
     font-family: var(--title-font);
@@ -10696,107 +10708,90 @@
       transform: translate(-105%, -50%);
     }
   }
-  /* One pinch every 2.4 s: the fingertips start together, spread out along the diagonal
-     while the ring opens and the chevrons light, hold, then draw back in. */
+  /* One pinch every 2.4 s, starting from the spread pose: hold it, draw the fingertips in
+     along the diagonal while the ring closes and the chevrons fade, hold, then spread them
+     out again as the chevrons light. */
   @keyframes pth-tip-a {
     0%,
-    14% {
-      transform: translate(0, 0);
-    }
-    52%,
-    72% {
+    22% {
       transform: translate(-6px, -6px);
     }
-    100% {
+    50%,
+    64% {
       transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(-6px, -6px);
     }
   }
   @keyframes pth-tip-b {
     0%,
-    14% {
-      transform: translate(0, 0);
-    }
-    52%,
-    72% {
+    22% {
       transform: translate(6px, 6px);
     }
-    100% {
+    50%,
+    64% {
       transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(6px, 6px);
     }
   }
   @keyframes pth-ring {
     0%,
-    14% {
-      opacity: 0.45;
-      transform: scale(0.7);
-    }
-    52%,
-    72% {
+    22% {
       opacity: 1;
       transform: scale(1);
     }
-    100% {
+    50%,
+    64% {
       opacity: 0.45;
       transform: scale(0.7);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
     }
   }
   @keyframes pth-arrow {
     0%,
-    24% {
-      opacity: 0;
-    }
-    52%,
-    72% {
+    22% {
       opacity: 1;
     }
-    90%,
-    100% {
+    38%,
+    74% {
       opacity: 0;
     }
+    96%,
+    100% {
+      opacity: 1;
+    }
   }
-  /* Reduced motion: no slide and no pinch loop; the glyph holds its spread pose with the
-     chevrons lit, and the exit is a plain removal. The OS setting always applies; the
-     in-game one applies wherever the page stamps body.reduce-motion. */
+  /* Reduced motion: no slide and no pinch loop; the glyph rests in its spread pose and the
+     exit is a plain removal. The OS setting always applies; the in-game one applies wherever
+     the page stamps body.reduce-motion. */
   @media (prefers-reduced-motion: reduce) {
     .preview-touch-hint,
     .preview-touch-hint[data-state="leaving"],
     .preview-touch-hint .pth-ring,
-    .preview-touch-hint .pth-arrow {
+    .preview-touch-hint .pth-arrow,
+    .preview-touch-hint .pth-tip-a,
+    .preview-touch-hint .pth-tip-b {
       animation: none;
     }
     .preview-touch-hint[data-state="leaving"] {
       opacity: 0;
     }
-    .preview-touch-hint .pth-arrow {
-      opacity: 1;
-    }
-    .preview-touch-hint .pth-tip-a {
-      animation: none;
-      transform: translate(-6px, -6px);
-    }
-    .preview-touch-hint .pth-tip-b {
-      animation: none;
-      transform: translate(6px, 6px);
-    }
   }
   body.reduce-motion .preview-touch-hint,
   body.reduce-motion .preview-touch-hint[data-state="leaving"],
   body.reduce-motion .preview-touch-hint .pth-ring,
-  body.reduce-motion .preview-touch-hint .pth-arrow {
+  body.reduce-motion .preview-touch-hint .pth-arrow,
+  body.reduce-motion .preview-touch-hint .pth-tip-a,
+  body.reduce-motion .preview-touch-hint .pth-tip-b {
     animation: none;
   }
   body.reduce-motion .preview-touch-hint[data-state="leaving"] {
     opacity: 0;
-  }
-  body.reduce-motion .preview-touch-hint .pth-arrow {
-    opacity: 1;
-  }
-  body.reduce-motion .preview-touch-hint .pth-tip-a {
-    animation: none;
-    transform: translate(-6px, -6px);
-  }
-  body.reduce-motion .preview-touch-hint .pth-tip-b {
-    animation: none;
-    transform: translate(6px, 6px);
   }
 }

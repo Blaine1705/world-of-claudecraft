@@ -11,12 +11,14 @@
 //   decides whether the player still needs it (preview_touch_hint_core.ts).
 // - Called every frame. The stage calls show() or hide() once per frame, so the repeat path
 //   is the hot one: a steady frame (same container, same i18n revision) returns before any
-//   DOM write, and hide() on a hidden hint does nothing. Nothing is created until the first
-//   show(), and a retired hint creates nothing at all.
-// - Once, until a gesture. The first pinch, slide, turn or double tap stores one flag
-//   (PREVIEW_TOUCH_HINT_STORAGE_KEY) and plays the exit; a stored flag means the hint never
-//   shows on that device again. Storage that throws or is missing (a private window, a
-//   blocked origin) only costs the memory: the hint still retires for the visit.
+//   DOM write, and hide() on a hidden hint does nothing. Nothing is created, and storage is
+//   not read, until the first show(); a retired hint creates nothing at all.
+// - Once, until a gesture. The first pinch, slide, turn or double tap made while the tab is
+//   up stores one flag (PREVIEW_TOUCH_HINT_STORAGE_KEY) and plays the exit; a stored flag
+//   means the hint never shows on that device again. A gesture while it is off screen (the
+//   character select's stage, a model still loading) leaves it be: the player never saw it.
+//   Storage that throws or is missing (a private window, a blocked origin) only costs the
+//   memory: the hint still retires for the visit.
 // - It takes no touches: pointer-events: none in shell.css, so a pinch that starts on the
 //   tab reaches the canvas under it.
 // - Accessibility. A role=note with its visible text; the glyph is aria-hidden.
@@ -36,6 +38,7 @@ import {
   touchHintOnOffer,
   touchHintStartPhase,
 } from './preview_touch_hint_core';
+import { safeLocalStorage } from './safe_local_storage';
 
 /** The hint the stage drives (CharacterPreview's PreviewTouchHint, structurally). */
 export interface PreviewTouchHintLayer {
@@ -57,15 +60,6 @@ export interface PreviewTouchHintStorage {
 export const PREVIEW_TOUCH_HINT_CLASS = 'preview-touch-hint';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-
-/** The page's localStorage, or null where reading it throws. */
-function pageStorage(): PreviewTouchHintStorage | null {
-  try {
-    return globalThis.localStorage ?? null;
-  } catch {
-    return null;
-  }
-}
 
 function svgEl<K extends keyof SVGElementTagNameMap>(
   doc: Document,
@@ -104,7 +98,7 @@ function buildGlyph(doc: Document): SVGSVGElement {
  */
 export function createPreviewTouchHint(
   doc: Document = document,
-  storage: PreviewTouchHintStorage | null = pageStorage(),
+  storage: PreviewTouchHintStorage | null = safeLocalStorage(),
 ): PreviewTouchHintLayer {
   let root: HTMLElement | null = null;
   let label: HTMLElement | null = null;
@@ -112,7 +106,8 @@ export function createPreviewTouchHint(
   let host: HTMLElement | null = null;
   /** The i18n revision the label was filled under (-1: not filled yet). */
   let labelRevision = -1;
-  /** Read from storage on first use, so a hint built and never offered reads nothing. */
+  /** Read from storage on the first show(), so a hint never offered (a desktop launcher, the
+   *  character select) reads nothing; null until then. */
   let phase: TouchHintPhase | null = null;
   let leaveTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -173,21 +168,24 @@ export function createPreviewTouchHint(
       }
     },
     hide() {
-      const before = current();
+      // never shown: nothing on screen, nothing to read
+      if (phase === null) return;
+      const before = phase;
       phase = touchHintOnOffer(before, false);
       if (before === 'leaving') stopLeaving();
       if (host) detach();
     },
     interacted() {
-      const before = current();
-      if (!touchHintFirstGesture(before)) return;
+      // only a gesture made while the tab is up retires it (never shown: phase is null)
+      if (phase === null || !touchHintFirstGesture(phase)) return;
       try {
         storage?.setItem(PREVIEW_TOUCH_HINT_STORAGE_KEY, PREVIEW_TOUCH_HINT_SEEN);
       } catch {
         // a blocked write only costs the memory: the hint still retires for this visit
       }
-      phase = touchHintOnInteract(before);
-      if (phase !== 'leaving' || !root || !host) {
+      phase = touchHintOnInteract(phase);
+      if (!root || !host) {
+        // shown means attached; were it ever not, retire without an exit to play
         phase = 'done';
         detach();
         return;
