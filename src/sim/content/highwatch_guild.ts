@@ -31,6 +31,16 @@ export const HIGHWATCH_GUILD_ENTITY_IDS = {
   [GUILD_RECRUITER_NPC_ID]: 1_000_000_016,
 } as const;
 
+/** The residents with a window of their own (contracts, quartermaster, recruiter): the client
+ *  sends them the authoritative interact instead of the gossip menu. The guildmaster only talks. */
+export function isGuildServiceNpc(templateId: string): boolean {
+  return (
+    templateId === CONTRACT_CLERK_NPC_ID ||
+    templateId === GUILD_QUARTERMASTER_NPC_ID ||
+    templateId === GUILD_RECRUITER_NPC_ID
+  );
+}
+
 /** How near a player must stand to deal with a resident (the instructors' reach). */
 export const HIGHWATCH_GUILD_TALK_RANGE = 7;
 

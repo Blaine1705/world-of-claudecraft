@@ -1,3 +1,4 @@
+import { isGuildServiceNpc } from '../../../sim/content/highwatch_guild';
 import { isOnProvingShore } from '../../../sim/content/proving_shore';
 import { DELVES, ITEMS, NPCS, QUESTS } from '../../../sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
@@ -166,7 +167,8 @@ export class QuestDialogController {
       NPCS[npc.templateId]?.banker ||
       NPCS[npc.templateId]?.riftForge ||
       NPCS[npc.templateId]?.weeklyEmissary ||
-      npc.templateId === WEEKLY_KEEPER_ID
+      npc.templateId === WEEKLY_KEEPER_ID ||
+      isGuildServiceNpc(npc.templateId)
     ) {
       world.targetEntity(npc.id);
       world.interact();
