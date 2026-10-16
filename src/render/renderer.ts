@@ -2727,7 +2727,7 @@ export class Renderer {
     // (Highwatch is painted buildings only, placed_town_buildings.ts).
     this.eastbrookTownView = buildEastbrookTownView(this.sim.cfg.seed);
     this.fenbridgeTownView = buildFenbridgeTownView(this.sim.cfg.seed);
-    const highwatch = buildHighwatchTownView(this.sim.cfg.seed);
+    const highwatch = buildHighwatchTownView(this.sim.cfg.seed, this.sim);
     this.townViews = [this.eastbrookTownView, this.fenbridgeTownView, highwatch];
     for (const town of this.townViews) {
       setRenderCategory(town.group, 'props');

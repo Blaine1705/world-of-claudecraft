@@ -4,7 +4,9 @@
 // stalls, station, mailbox, board and the Cairns stay with the props view.
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
 import type { BuildingDef } from '../sim/types';
+import type { IWorld } from '../world_api';
 import type { GfxSettings } from './gfx';
+import { createGuildTrophyRoom } from './highwatch_guild_trophies';
 import { createPlacedTownKit, type PlacedTownView } from './placed_town_buildings';
 
 const ROOT_NAME = 'highwatchTownRebuild';
@@ -23,8 +25,21 @@ if (typeof window !== 'undefined') HIGHWATCH_TOWN.registerPreloads();
 
 export type HighwatchTownView = PlacedTownView;
 
-export function buildHighwatchTownView(seed: number): HighwatchTownView {
-  return HIGHWATCH_TOWN.buildView(seed);
+/** The town view; with the viewing `world`, Lantern Hall's trophy room follows the viewer's
+ *  dungeon clears (highwatch_guild_trophies.ts) on every update. */
+export function buildHighwatchTownView(
+  seed: number,
+  world?: Pick<IWorld, 'deedStats'>,
+): HighwatchTownView {
+  const view = HIGHWATCH_TOWN.buildView(seed);
+  if (!world) return view;
+  const trophies = createGuildTrophyRoom(view.group);
+  const update = view.update.bind(view);
+  view.update = (...args) => {
+    update(...args);
+    trophies.sync(world);
+  };
+  return view;
 }
 
 /** The painted buildings follow the profile's texture tier (the target's). */
