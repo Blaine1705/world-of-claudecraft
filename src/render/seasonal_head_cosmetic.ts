@@ -14,7 +14,7 @@ import { gourdlightAssets } from './seasonal_decor_assets';
 
 /** How far above the head bone's origin the pumpkin's centre sits (yards, for a
  *  player of display scale 1), and how far forward. */
-export const SEASONAL_HEAD_LIFT = 0.16;
+export const SEASONAL_HEAD_LIFT = 0.13;
 export const SEASONAL_HEAD_FORWARD = 0.015;
 /** The pumpkin's size against the authored one (it is built at head size). */
 export const SEASONAL_HEAD_SCALE = 1.0;

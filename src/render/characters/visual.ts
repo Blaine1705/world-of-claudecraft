@@ -662,8 +662,6 @@ export class CharacterVisual {
     return true;
   }
 
-  /** Roster previews have no equipped-item snapshot; keep the manifest kit. A world
-   *  NPC is dressed the same way at birth, its head slot empty (characters/index.ts). */
   /** Wear or take off the Gourdlight Eve pumpkin head (seasonal_head_core.ts
    *  decides who draws one). Its first build waits for the event's assets and
    *  joins hidden until its programs link (revealOnCompile); afterwards a wear
@@ -673,6 +671,7 @@ export class CharacterVisual {
       if (!this.seasonalHead) return false;
       this.seasonalHead.removeFromParent();
       this.seasonalHead = null;
+      this.wocHead?.setHeadless(false);
       return true;
     }
     if (this.seasonalHead || !this.model) return false;
@@ -686,11 +685,17 @@ export class CharacterVisual {
     if (!piece) return false;
     fitSeasonalHead(piece, bone, this.root);
     bone.add(piece);
-    this.revealOnCompile(piece, 'seasonal head');
+    // The pumpkin IS the head: the face, hair and beard under it stop drawing the frame
+    // it shows (never before, so a body is never seen headless while it links).
+    this.revealOnCompile(piece, 'seasonal head', () => {
+      if (this.seasonalHead === piece) this.wocHead?.setHeadless(true);
+    });
     this.seasonalHead = piece;
     return true;
   }
 
+  /** Roster previews have no equipped-item snapshot; keep the manifest kit. A world
+   *  NPC is dressed the same way at birth, its head slot empty (characters/index.ts). */
   setWocDefaultEquipment(helmHidden: boolean): boolean {
     const manifest = this.def.wocCharacter;
     if (!manifest || this.disposed) return false;
