@@ -668,8 +668,12 @@ export const ru_RU: EnTranslations = {
         "task": "{task} («{dungeon}»)"
       },
       "contractLabel": "{kind}: {dungeon}",
-      "reward": "Печати Фонаря: {count}",
-      "rewardOne": "Печать Фонаря: {count}",
+      "reward": {
+        "one": "{count} печать Фонаря",
+        "few": "{count} печати Фонаря",
+        "many": "{count} печатей Фонаря",
+        "other": "{count} печати Фонаря"
+      },
       "done": "Выполнено на этой неделе",
       "open": "Открыт",
       "lifetime": "Выполнено контрактов: {count}",
@@ -677,7 +681,6 @@ export const ru_RU: EnTranslations = {
       "quartermasterIntro": "Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний. Ничто здесь не сделает вас сильнее.",
       "titleOffer": "Звание: {title}",
       "titlePreview": "Отображается как {preview}",
-      "price": "Печати Фонаря: {count}",
       "buy": "Купить",
       "owned": "Есть",
       "needSeals": "Не хватает: {count}",
@@ -687,8 +690,12 @@ export const ru_RU: EnTranslations = {
         "seals": "У вас недостаточно печатей Фонаря.",
         "range": "Чтобы торговать, встаньте рядом с интендантом."
       },
-      "contractDone": "Контракт выполнен: {contract}. Получено печатей Фонаря: {count}.",
-      "contractDoneOne": "Контракт выполнен: {contract}. Получено печатей Фонаря: {count}."
+      "contractDone": {
+        "one": "Контракт выполнен: {contract}. Вы получаете {count} печать Фонаря.",
+        "few": "Контракт выполнен: {contract}. Вы получаете {count} печати Фонаря.",
+        "many": "Контракт выполнен: {contract}. Вы получаете {count} печатей Фонаря.",
+        "other": "Контракт выполнен: {contract}. Вы получаете {count} печати Фонаря."
+      }
     },
     "ferry": {
       "regionLabel": "Расписание парома",

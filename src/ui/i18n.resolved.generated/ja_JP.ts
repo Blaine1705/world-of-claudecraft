@@ -668,8 +668,12 @@ export const ja_JP: EnTranslations = {
         "task": "{task}（{dungeon}）"
       },
       "contractLabel": "{kind}：{dungeon}",
-      "reward": "燈火の印章{count}個",
-      "rewardOne": "燈火の印章{count}個",
+      "reward": {
+        "one": "燈火の印章{count}個",
+        "few": "燈火の印章{count}個",
+        "many": "燈火の印章{count}個",
+        "other": "燈火の印章{count}個"
+      },
       "done": "今週は達成済み",
       "open": "未達成",
       "lifetime": "達成した契約：{count}",
@@ -677,7 +681,6 @@ export const ja_JP: EnTranslations = {
       "quartermasterIntro": "ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号だ。ここにあなたを強くするものは何もない。",
       "titleOffer": "称号：{title}",
       "titlePreview": "表示：{preview}",
-      "price": "燈火の印章{count}個",
       "buy": "購入",
       "owned": "所持済み",
       "needSeals": "あと{count}個必要",
@@ -687,8 +690,12 @@ export const ja_JP: EnTranslations = {
         "seals": "燈火の印章が足りない。",
         "range": "取引するには補給係のそばに立つこと。"
       },
-      "contractDone": "契約達成：{contract}。燈火の印章を{count}個受け取った。",
-      "contractDoneOne": "契約達成：{contract}。燈火の印章を{count}個受け取った。"
+      "contractDone": {
+        "one": "契約達成：{contract}。燈火の印章を{count}個受け取った。",
+        "few": "契約達成：{contract}。燈火の印章を{count}個受け取った。",
+        "many": "契約達成：{contract}。燈火の印章を{count}個受け取った。",
+        "other": "契約達成：{contract}。燈火の印章を{count}個受け取った。"
+      }
     },
     "ferry": {
       "regionLabel": "渡し船の時刻表",

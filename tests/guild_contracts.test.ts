@@ -272,6 +272,8 @@ describe('the quartermaster', () => {
       expect(deed.reward?.kind, offer.id).toBe('title');
       expect(deed.trigger, offer.id).toEqual({ kind: 'manual' });
       expect(offer.seals, offer.id).toBeGreaterThan(0);
+      // the Book's line names the live price, so a price change cannot leave it stale
+      expect(deed.desc, offer.id).toContain(`for ${offer.seals} Lantern Seals.`);
     }
   });
 

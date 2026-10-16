@@ -37,11 +37,21 @@ export function buyGuildCosmetic(ctx: SimContext, offerId: string, pid?: number)
   // never take the seals for a title the Book cannot grant
   if (!Object.hasOwn(DEEDS, offer.deedId)) return;
   if (player.dead) return;
-  const refuse = (reason: 'owned' | 'seals' | 'range') =>
+  const refuse = (reason: 'owned' | 'seals' | 'range'): void => {
     ctx.emit({ type: 'guildCosmeticRefused', offerId, reason, pid: meta.entityId });
-  if (!guildQuartermasterInRange(ctx, player)) return refuse('range');
-  if (meta.deedsEarned.has(offer.deedId)) return refuse('owned');
-  if (ctx.countItem(LANTERN_SEAL_ITEM_ID, meta.entityId) < offer.seals) return refuse('seals');
+  };
+  if (!guildQuartermasterInRange(ctx, player)) {
+    refuse('range');
+    return;
+  }
+  if (meta.deedsEarned.has(offer.deedId)) {
+    refuse('owned');
+    return;
+  }
+  if (ctx.countItem(LANTERN_SEAL_ITEM_ID, meta.entityId) < offer.seals) {
+    refuse('seals');
+    return;
+  }
   if (!grantDeed(ctx, meta, offer.deedId)) return;
   ctx.removeItem(LANTERN_SEAL_ITEM_ID, offer.seals, meta.entityId);
   ctx.emit({ type: 'guildCosmeticBought', offerId, pid: meta.entityId });

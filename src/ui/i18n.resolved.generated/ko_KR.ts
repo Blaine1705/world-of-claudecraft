@@ -668,8 +668,12 @@ export const ko_KR: EnTranslations = {
         "task": "{task} ({dungeon})"
       },
       "contractLabel": "{kind}: {dungeon}",
-      "reward": "등불 인장 {count}개",
-      "rewardOne": "등불 인장 {count}개",
+      "reward": {
+        "one": "등불 인장 {count}개",
+        "few": "등불 인장 {count}개",
+        "many": "등불 인장 {count}개",
+        "other": "등불 인장 {count}개"
+      },
       "done": "이번 주 완료",
       "open": "진행 중",
       "lifetime": "완료한 계약: {count}",
@@ -677,7 +681,6 @@ export const ko_KR: EnTranslations = {
       "quartermasterIntro": "개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호입니다. 여기서 당신을 더 강하게 만드는 것은 없습니다.",
       "titleOffer": "칭호: {title}",
       "titlePreview": "표시: {preview}",
-      "price": "등불 인장 {count}개",
       "buy": "구매",
       "owned": "보유 중",
       "needSeals": "{count}개 더 필요",
@@ -687,8 +690,12 @@ export const ko_KR: EnTranslations = {
         "seals": "등불 인장이 부족합니다.",
         "range": "거래하려면 보급관 곁에 서세요."
       },
-      "contractDone": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.",
-      "contractDoneOne": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다."
+      "contractDone": {
+        "one": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.",
+        "few": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.",
+        "many": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.",
+        "other": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다."
+      }
     },
     "ferry": {
       "regionLabel": "여객선 시간표",

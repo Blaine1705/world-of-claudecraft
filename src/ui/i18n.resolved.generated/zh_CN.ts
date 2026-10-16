@@ -668,8 +668,12 @@ export const zh_CN: EnTranslations = {
         "task": "{task}（{dungeon}）"
       },
       "contractLabel": "{kind}：{dungeon}",
-      "reward": "{count}枚灯火印章",
-      "rewardOne": "{count}枚灯火印章",
+      "reward": {
+        "one": "{count}枚灯火印章",
+        "few": "{count}枚灯火印章",
+        "many": "{count}枚灯火印章",
+        "other": "{count}枚灯火印章"
+      },
       "done": "本周已完成",
       "open": "进行中",
       "lifetime": "已完成契约：{count}",
@@ -677,7 +681,6 @@ export const zh_CN: EnTranslations = {
       "quartermasterIntro": "加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔。这里没有任何东西能让你变得更强。",
       "titleOffer": "头衔：{title}",
       "titlePreview": "显示为{preview}",
-      "price": "{count}枚灯火印章",
       "buy": "购买",
       "owned": "已拥有",
       "needSeals": "还需{count}枚",
@@ -687,8 +690,12 @@ export const zh_CN: EnTranslations = {
         "seals": "你的灯火印章不足。",
         "range": "站到军需官身边才能交易。"
       },
-      "contractDone": "契约完成：{contract}。你获得了{count}枚灯火印章。",
-      "contractDoneOne": "契约完成：{contract}。你获得了{count}枚灯火印章。"
+      "contractDone": {
+        "one": "契约完成：{contract}。你获得了{count}枚灯火印章。",
+        "few": "契约完成：{contract}。你获得了{count}枚灯火印章。",
+        "many": "契约完成：{contract}。你获得了{count}枚灯火印章。",
+        "other": "契约完成：{contract}。你获得了{count}枚灯火印章。"
+      }
     },
     "ferry": {
       "regionLabel": "渡船时刻表",

@@ -25,8 +25,13 @@ export const guildHallStrings = {
     task: '{task} ({dungeon})',
   },
   contractLabel: '{kind}: {dungeon}',
-  reward: '{count} Lantern Seals',
-  rewardOne: '{count} Lantern Seal',
+  // plural forms (tPlural): a locale with more categories fills its own
+  reward: {
+    one: '{count} Lantern Seal',
+    few: '{count} Lantern Seals',
+    many: '{count} Lantern Seals',
+    other: '{count} Lantern Seals',
+  },
   done: 'Completed this week',
   open: 'Open',
   lifetime: 'Contracts completed: {count}',
@@ -35,7 +40,6 @@ export const guildHallStrings = {
     'Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds. Nothing here makes you stronger.',
   titleOffer: 'Title: {title}',
   titlePreview: 'Shown as {preview}',
-  price: '{count} Lantern Seals',
   buy: 'Buy',
   owned: 'Owned',
   needSeals: 'Needs {count} more',
@@ -45,6 +49,10 @@ export const guildHallStrings = {
     seals: 'You do not have enough Lantern Seals.',
     range: 'Stand at the quartermaster to trade.',
   },
-  contractDone: 'Contract complete: {contract}. You receive {count} Lantern Seals.',
-  contractDoneOne: 'Contract complete: {contract}. You receive {count} Lantern Seal.',
+  contractDone: {
+    one: 'Contract complete: {contract}. You receive {count} Lantern Seal.',
+    few: 'Contract complete: {contract}. You receive {count} Lantern Seals.',
+    many: 'Contract complete: {contract}. You receive {count} Lantern Seals.',
+    other: 'Contract complete: {contract}. You receive {count} Lantern Seals.',
+  },
 };

@@ -16,7 +16,7 @@ import type { InvSlot } from '../../../sim/types';
 import { deedDesc, deedName, deedTitleText, titledDisplayName } from '../../deed_i18n';
 import { mobDisplayName } from '../../entity_display_core';
 import { dungeonDisplayName } from '../../entity_i18n';
-import { formatList, formatNumber, t } from '../../i18n';
+import { formatList, formatNumber, t, tPlural } from '../../i18n';
 
 export type GuildHallTab = 'contracts' | 'quartermaster';
 
@@ -74,10 +74,9 @@ export function lanternSeals(inventory: readonly InvSlot[]): number {
   return total;
 }
 
+/** "{count} Lantern Seals", in the locale's own plural form. */
 function sealCount(count: number): string {
-  return count === 1
-    ? t('hudChrome.guildHall.rewardOne', { count: whole(count) })
-    : t('hudChrome.guildHall.reward', { count: whole(count) });
+  return tPlural('hudChrome.guildHall.reward', count, { count: whole(count) });
 }
 
 /** Days and hours until the weekly reset, the locale's own unit words. */
@@ -156,7 +155,7 @@ export function buildGuildHallView(
       preview: t('hudChrome.guildHall.titlePreview', {
         preview: titledDisplayName(world.player.name, offer.deedId),
       }),
-      price: t('hudChrome.guildHall.price', { count: whole(offer.seals) }),
+      price: sealCount(offer.seals),
       owned,
       affordable,
       action: owned

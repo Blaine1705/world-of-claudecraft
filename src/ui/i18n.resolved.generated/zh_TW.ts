@@ -668,8 +668,12 @@ export const zh_TW: EnTranslations = {
         "task": "{task}（{dungeon}）"
       },
       "contractLabel": "{kind}：{dungeon}",
-      "reward": "{count}枚燈火印章",
-      "rewardOne": "{count}枚燈火印章",
+      "reward": {
+        "one": "{count}枚燈火印章",
+        "few": "{count}枚燈火印章",
+        "many": "{count}枚燈火印章",
+        "other": "{count}枚燈火印章"
+      },
       "done": "本週已完成",
       "open": "進行中",
       "lifetime": "已完成契約：{count}",
@@ -677,7 +681,6 @@ export const zh_TW: EnTranslations = {
       "quartermasterIntro": "加里克只用燈火印章換取榮譽：可在功績之書中佩戴的頭銜。這裡沒有任何東西能讓你變得更強。",
       "titleOffer": "頭銜：{title}",
       "titlePreview": "顯示為{preview}",
-      "price": "{count}枚燈火印章",
       "buy": "購買",
       "owned": "已擁有",
       "needSeals": "還需{count}枚",
@@ -687,8 +690,12 @@ export const zh_TW: EnTranslations = {
         "seals": "你的燈火印章不足。",
         "range": "站到軍需官身邊才能交易。"
       },
-      "contractDone": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
-      "contractDoneOne": "契約完成：{contract}。你獲得了{count}枚燈火印章。"
+      "contractDone": {
+        "one": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
+        "few": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
+        "many": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
+        "other": "契約完成：{contract}。你獲得了{count}枚燈火印章。"
+      }
     },
     "ferry": {
       "regionLabel": "渡船時刻表",

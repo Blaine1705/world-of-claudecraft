@@ -668,8 +668,12 @@ export const en_XA: EnTranslations = {
         "task": "[{task} ({dungeon})]"
       },
       "contractLabel": "[{kind}: {dungeon}]",
-      "reward": "[{count} Ļáñţéŕñ Šéáļš]",
-      "rewardOne": "[{count} Ļáñţéŕñ Šéáļ]",
+      "reward": {
+        "one": "[{count} Ļáñţéŕñ Šéáļ]",
+        "few": "[{count} Ļáñţéŕñ Šéáļš]",
+        "many": "[{count} Ļáñţéŕñ Šéáļš]",
+        "other": "[{count} Ļáñţéŕñ Šéáļš]"
+      },
       "done": "[Çóɱþļéţéð ţĥíš ŵééķ]",
       "open": "[Óþéñ]",
       "lifetime": "[Çóñţŕáçţš çóɱþļéţéð: {count}]",
@@ -677,7 +681,6 @@ export const en_XA: EnTranslations = {
       "quartermasterIntro": "[Ĝáŕŕíçķ ţŕáðéš Ļáñţéŕñ Šéáļš ƒóŕ ĥóñóŕš óñļý: ţíţļéš ţó ŵéáŕ íñ ţĥé Ɓóóķ óƒ Ðééðš. Ñóţĥíñĝ ĥéŕé ɱáķéš ýóú šţŕóñĝéŕ.]",
       "titleOffer": "[Ţíţļé: {title}]",
       "titlePreview": "[Šĥóŵñ áš {preview}]",
-      "price": "[{count} Ļáñţéŕñ Šéáļš]",
       "buy": "[Ɓúý]",
       "owned": "[Óŵñéð]",
       "needSeals": "[Ñééðš {count} ɱóŕé]",
@@ -687,8 +690,12 @@ export const en_XA: EnTranslations = {
         "seals": "[Ýóú ðó ñóţ ĥáʋé éñóúĝĥ Ļáñţéŕñ Šéáļš.]",
         "range": "[Šţáñð áţ ţĥé ɋúáŕţéŕɱášţéŕ ţó ţŕáðé.]"
       },
-      "contractDone": "[Çóñţŕáçţ çóɱþļéţé: {contract}. Ýóú ŕéçéíʋé {count} Ļáñţéŕñ Šéáļš.]",
-      "contractDoneOne": "[Çóñţŕáçţ çóɱþļéţé: {contract}. Ýóú ŕéçéíʋé {count} Ļáñţéŕñ Šéáļ.]"
+      "contractDone": {
+        "one": "[Çóñţŕáçţ çóɱþļéţé: {contract}. Ýóú ŕéçéíʋé {count} Ļáñţéŕñ Šéáļ.]",
+        "few": "[Çóñţŕáçţ çóɱþļéţé: {contract}. Ýóú ŕéçéíʋé {count} Ļáñţéŕñ Šéáļš.]",
+        "many": "[Çóñţŕáçţ çóɱþļéţé: {contract}. Ýóú ŕéçéíʋé {count} Ļáñţéŕñ Šéáļš.]",
+        "other": "[Çóñţŕáçţ çóɱþļéţé: {contract}. Ýóú ŕéçéíʋé {count} Ļáñţéŕñ Šéáļš.]"
+      }
     },
     "ferry": {
       "regionLabel": "[Ƒéŕŕý ţíɱéţáƀļé]",

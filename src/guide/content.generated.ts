@@ -7855,6 +7855,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Witness of the Choir"
+      },
+      {
+        "kind": "title",
+        "name": "Writ-Runner"
+      },
+      {
+        "kind": "title",
+        "name": "Hallsworn"
+      },
+      {
+        "kind": "title",
+        "name": "of Lantern Hall"
       }
     ]
   },
