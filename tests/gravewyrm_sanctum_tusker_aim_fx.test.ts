@@ -16,6 +16,7 @@ import { TuskerAimFx } from '../src/render/gravewyrm_sanctum_fx/tusker_aim_fx';
 import {
   OUTCROP_CIRCLE_RADIUS,
   outcropCircleLook,
+  TARGET_MARKER_COLOR,
   TARGET_MARKER_HEIGHT,
   TRAMPLE_AIM_COLORS,
   TRAMPLE_CAP_SIZE,
@@ -126,6 +127,32 @@ describe('the aim plan (pure)', () => {
     for (const f of OUTCROP_FANGS) foot = Math.max(foot, Math.hypot(f.x, f.z) + f.r);
     expect(OUTCROP_CIRCLE_RADIUS * 0.85).toBeGreaterThan(foot);
     expect(OUTCROP_CIRCLE_RADIUS).toBeLessThan(BAIT_RING_RADIUS);
+  });
+
+  it('the target marker wears its own gold, far from both lane answers and the ice', () => {
+    const rgb = (hex: number): [number, number, number] => [
+      (hex >> 16) & 255,
+      (hex >> 8) & 255,
+      hex & 255,
+    ];
+    const distance = (a: number, b: number): number => {
+      const [ar, ag, ab] = rgb(a);
+      const [br, bg, bb] = rgb(b);
+      return Math.hypot(ar - br, ag - bg, ab - bb);
+    };
+    // Far (in 0..255 RGB) from the bait lane, the miss lane, a live circle and
+    // the white-blue of a held one: it never reads as part of the lane.
+    for (const other of [
+      TRAMPLE_AIM_COLORS.bait,
+      TRAMPLE_AIM_COLORS.miss,
+      outcropCircleLook('whole', true, true, 0).color,
+      outcropCircleLook('struck', false, false, 0).color,
+    ])
+      expect(distance(TARGET_MARKER_COLOR, other)).toBeGreaterThan(150);
+    // Warm: red and green high, blue low (gold, not the ice's blue).
+    const [r, g, b] = rgb(TARGET_MARKER_COLOR);
+    expect(Math.min(r, g)).toBeGreaterThan(180);
+    expect(b).toBeLessThan(110);
   });
 
   it('the target marker: lead it, then step aside; it stays a readable size from afar', () => {
@@ -325,18 +352,21 @@ describe('the aim painter', () => {
       expect(marker[0].position.x).toBeCloseTo(player.pos.x, 6);
       expect(marker[0].position.y).toBeGreaterThanOrEqual(44 + TARGET_MARKER_HEIGHT);
       expect(u(marker[0], 'uMode')).toBe(0);
-      expect((u(marker[0], 'uColor') as THREE.Color).getHex()).toBe(TRAMPLE_AIM_COLORS.bait);
+      // The marker is its own gold, never the lane's ice blue it would melt into.
+      expect((u(marker[0], 'uColor') as THREE.Color).getHex()).toBe(TARGET_MARKER_COLOR);
+      const reticle = shown(root, 'sanctum-trample-target-reticle');
+      expect((u(reticle[0], 'uColor') as THREE.Color).getHex()).toBe(TARGET_MARKER_COLOR);
       // Drawn over everything, so it reads from across the road.
       expect((marker[0].material as THREE.Material).depthTest).toBe(false);
       expect(shown(root, 'sanctum-trample-target-reticle')).toHaveLength(1);
 
       // The player walks out to open road and the beast turns with them: the
-      // lane misses the ice (red, a plain arrowhead), and so does the marker.
+      // lane misses the ice (red, a plain arrowhead); the marker stays gold.
       tusker.facing += 0.9;
       step();
       expect(u(cap[0], 'uShard')).toBe(0);
       expect((u(cap[0], 'uColor') as THREE.Color).getHex()).toBe(TRAMPLE_AIM_COLORS.miss);
-      expect((u(marker[0], 'uColor') as THREE.Color).getHex()).toBe(TRAMPLE_AIM_COLORS.miss);
+      expect((u(marker[0], 'uColor') as THREE.Color).getHex()).toBe(TARGET_MARKER_COLOR);
 
       // The lock: the marker says step aside.
       tusker.castRemaining = T.trampleLock - 0.1;

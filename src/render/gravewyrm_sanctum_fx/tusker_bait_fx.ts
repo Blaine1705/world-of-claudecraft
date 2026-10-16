@@ -17,7 +17,8 @@
 //    smoking off its buried tusks, its own pawing (a gesture);
 //  - the soulfire trail: the burning lane's edge on the shared kit (the edge
 //    the sim tests), a river of soulfire flowing on the ice inside it, and
-//    walls of flame taller than a player down its length and across it, racing
+//    walls of flame taller than a player down its length and across it (each
+//    a row of separate soul-green tongues tearing violet at the tip), racing
 //    down the lane as the charge runs it and guttering over its last seconds.
 //
 // Readable on every tier: the outcrops, the two rings, the trail's edge, its
@@ -220,18 +221,26 @@ uniform float uWidth;
 varying vec2 vUv;
 varying float vAlong;
 varying float vSeed;
+varying float vRun;
 void main() {
   // Yards along the wall's own run (a long wall runs the lane, a cross wall
   // spans it), and 0..1 up the flame.
   vUv = vec2(mix(position.x * uWidth, aAlong * uLength, aRun), position.y);
   vAlong = aAlong;
   vSeed = aSeed;
+  vRun = aRun;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
 
-/** A wall of soulfire: tongues of uneven height licking up, pale green at
- *  the foot, violet where they tear at the top. */
+/** A wall of soulfire, drawn the way the game's flame sprites are (the shared
+ *  FIRE_FRAG: teardrop tongues carved by scrolling noise, hot at the root and
+ *  cooling up the ramp): a row of separate tongues, each its own height,
+ *  swaying and flickering, with a shorter row offset in front, so it reads as
+ *  fire with gaps between the flames and never as a flat sheet. Soul-green at
+ *  the root, violet where it tears at the tip; the heat is held below the
+ *  ramp's pale core (no white) and each layer stays dim, because the walls
+ *  overlap and add. */
 const WALL_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uLength;
@@ -240,26 +249,61 @@ uniform float uFlames;
 varying vec2 vUv;
 varying float vAlong;
 varying float vSeed;
+varying float vRun;
 ${NOISE_GLSL}
 ${rampGlsl(SOULFIRE_RAMP, 'soulRamp')}
+float h11(float p) { return fract(sin(p * 78.233) * 43758.5453); }
+// One row of tongues w yards apart: x yards along the wall, y 0..1 up.
+// Returns the tongue's body (0..1); hot is its core (root and spine).
+float tongues(vec2 p, float w, float off, float seed, out float hot) {
+  float u = p.x / w + off;
+  float id = floor(u);
+  float s = h11(id + seed * 37.0);
+  float s2 = h11(id * 1.7 + seed * 11.0 + 3.1);
+  float tall = (0.42 + 0.58 * s) * (0.84 + 0.16 * sin(uTime * (4.0 + 5.0 * s2) + s * 50.0));
+  float y = p.y / max(0.05, tall * uFlames);
+  // The tip bends with the heat; the root holds.
+  float sway = (bNoise(vec2(id * 3.1 + seed * 5.0, uTime * 1.4)) - 0.5) * 0.7 * y * y;
+  // A waver up the tongue (heat shimmer), stronger toward the tip.
+  float waver = (bNoise(vec2(p.y * 3.0 - uTime * 3.2, id * 1.3 + seed)) - 0.5) * 0.28 * y;
+  float x = fract(u) - 0.5 - sway - waver;
+  float n = bNoise(vec2(p.x * 1.5 + seed * 9.0, p.y * 2.2 - uTime * (2.4 + 1.2 * s2))) * 0.75 +
+    bNoise(vec2(p.x * 3.2 + seed * 4.0, p.y * 4.4 - uTime * 4.1)) * 0.25;
+  // Round and wide at the root (the tongues merge there), drawn to a tip.
+  float halfW = mix(0.52, 0.05, smoothstep(0.0, 1.0, sqrt(max(y, 0.0)))) * (0.72 + 0.5 * n);
+  float body = (1.0 - smoothstep(halfW * 0.45, halfW, abs(x))) *
+    (1.0 - smoothstep(0.78, 1.02, y + (n - 0.5) * 0.25));
+  // The tip thins to smoke rather than a hard needle.
+  body *= mix(1.0, 0.45, smoothstep(0.55, 1.0, y));
+  hot = (1.0 - smoothstep(0.0, 0.75, y)) * (1.0 - smoothstep(0.0, halfW * 0.7, abs(x))) * body;
+  return body;
+}
 void main() {
-  float n =
-    bNoise(vec2(vUv.x * 0.9 + vSeed * 17.0, vUv.y * 2.6 - uTime * 3.0)) * 0.6 +
-    bNoise(vec2(vUv.x * 2.4 + vSeed * 5.0, vUv.y * 5.5 - uTime * 5.0)) * 0.4;
-  // Each tongue its own height, flickering; it narrows and tears as it
-  // climbs, hot at the foot and cooling to violet at its tip.
-  float tongue = bNoise(vec2(vUv.x * 0.7 + vSeed * 3.0, uTime * 1.6));
-  float top = max(0.05, (0.34 + 0.66 * tongue) * uFlames);
-  float yn = vUv.y / top;
-  float f = max(0.0, 1.0 - yn) * (0.35 + n);
-  float shape = smoothstep(0.16, 0.4, f);
-  float foot = smoothstep(0.0, 0.03, vUv.y);
-  float heat = clamp(f * 1.25, 0.0, 0.9);
+  float hotA;
+  float hotB;
+  float a1 = tongues(vUv, 1.45, 0.0, vSeed, hotA);
+  float a2 = tongues(vUv * vec2(1.0, 1.35), 1.05, 0.5, vSeed + 0.37, hotB) * 0.85;
+  // A burning bed along the foot that the tongues rise out of, so the row
+  // reads as one fire and never as a picket of separate spikes.
+  float bed = 1.0 - smoothstep(0.03, 0.1, vUv.y + (bNoise(vec2(vUv.x * 1.3, uTime * 1.1 + vSeed * 7.0)) - 0.5) * 0.06);
+  float body = max(max(a1, a2), bed * 0.6);
+  // Root green climbing to violet at the tips; never the pale core.
+  // Soul-green at the root and along each tongue's spine, cooling to violet
+  // only up where the tall tongues tear.
+  float heat = clamp(0.58 + 0.18 * max(hotA, hotB) + 0.05 * body - 0.34 * vUv.y, 0.0, 0.74);
+  float foot = smoothstep(0.0, 0.04, vUv.y);
   float lit = 1.0 - smoothstep(uFront - 0.04, uFront + 0.001, vAlong);
   float along = vAlong * uLength;
   float ends = smoothstep(0.0, 1.2, along) * smoothstep(0.0, 1.2, uLength - along);
-  float a = shape * (0.55 + 0.45 * n) * lit * foot * ends;
-  gl_FragColor = vec4(soulRamp(heat) * 1.6, a * 0.8);
+  float flick = 0.88 + 0.12 * sin(uTime * 23.0 + vSeed * 61.0);
+  // The cross walls add up when seen down the lane: each one dimmer.
+  float layer = mix(0.62, 0.9, vRun);
+  float a = smoothstep(0.12, 0.55, body) * lit * foot * ends * layer * flick;
+  // Squared, the ramp keeps its hue on screen (a soul-green body, violet
+  // tongues) instead of washing out to pastel over the snow.
+  vec3 c = soulRamp(heat);
+  // Dimmer toward each tongue's edge, so the flame has a soft rim.
+  gl_FragColor = vec4(c * c * 1.55 * (0.55 + 0.45 * body), a);
 }
 `;
 
@@ -543,7 +587,10 @@ export class TuskerBaitFx {
         transparent: true,
         depthWrite: false,
         side: THREE.DoubleSide,
-        blending: THREE.AdditiveBlending,
+        // Over: the walls overlap down the lane, and added they burn out to
+        // white on the snow. Laid over, each keeps the soulfire's hue; the
+        // river under them and the flame sprites over them carry the glow.
+        blending: THREE.NormalBlending,
       });
       this.materials.push(stripMat, wallMat);
       const strip = new THREE.Mesh(stripGeo, stripMat);
@@ -653,7 +700,11 @@ export class TuskerBaitFx {
     out.length = 0;
     for (const o of this.outcrops) {
       if (o.objectId < 0 || o.phase !== 'whole') continue;
-      const spot = (this.spotPool[out.length] ??= { id: 0, x: 0, z: 0 });
+      let spot = this.spotPool[out.length];
+      if (!spot) {
+        spot = { id: 0, x: 0, z: 0 };
+        this.spotPool[out.length] = spot;
+      }
       spot.id = o.objectId;
       spot.x = o.x;
       spot.z = o.z;

@@ -11,11 +11,14 @@
 //                  whole fight; through a Trample's aim they all pulse and
 //                  the one the lane runs into pulses hardest; a struck one
 //                  burns white-blue while it holds the beast; a burst one goes
-//                  out (no glow, an unlit grey ring broken in five), so a
-//                  player counts the baits left.
+//                  out (no glow: a dark dead disc, cracked, inside a cold
+//                  grey ring broken in five), so a player counts the baits
+//                  left.
 //   The marker     over the target for the whole bar: a down arrow while the
 //                  lane follows them (lead it), two arrows pointing out to
-//                  either side once it locks (step aside).
+//                  either side once it locks (step aside). Always GOLD inside
+//                  a white and a dark rim, never the lane's colour, so it
+//                  never melts into an ice-blue lane or the ice under it.
 //
 // Never colour-only: every state change is also a change of shape (shard
 // burst or arrowhead, whole ring or broken dark ring, down arrow or side
@@ -107,10 +110,11 @@ export interface OutcropCircleLook {
 
 const CIRCLE_ICE = 0x6ad8ff;
 const CIRCLE_HELD = 0xdff8ff;
-// Spent: an unlit slate grey, light enough to read as a broken ring on the
-// dark road (never the glow of a live one). The circle shader writes the
-// colour as given (no output colour transform), so the hex is set light.
-const CIRCLE_SPENT = 0xc0ccd8;
+// Spent: an unlit cold grey for the broken ring's pieces and the cracks,
+// drawn inside dark rims on a dark dead disc (tusker_aim_fx.ts), so it reads
+// on the dark road and on white snow alike and never as the glow of a live
+// one.
+const CIRCLE_SPENT = 0xa4b0bf;
 
 /**
  * An outcrop's floor circle: its phase, whether a Trample is aiming now and
@@ -146,6 +150,12 @@ export function outcropCircleLook(
 }
 
 // ---- the marker over the target ---------------------------------------------------------
+
+/** The marker's own colour (and its feet reticle's): a hot gold that is
+ *  neither of the lane's two answers (ice blue, lethal red) nor the ice and
+ *  snow it is seen against, so "this one is you" never reads as part of the
+ *  lane. The lane, its cap and the outcrops' circles carry the bait answer. */
+export const TARGET_MARKER_COLOR = 0xffd23f;
 
 /** 0: the lane follows you (a down arrow: lead it); 1: it has locked (two
  *  arrows out to either side: step aside). */

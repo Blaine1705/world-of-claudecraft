@@ -3,8 +3,9 @@
 //  - every ice outcrop's floor circle: an ice-blue ring with turning rune
 //    ticks under each intact outcrop for the whole fight, pulsing through a
 //    Trample's aim (the one the lane runs into hardest), white-blue while it
-//    holds the beast, and an unlit grey broken ring once it has burst, so a
-//    player counts the baits left at a glance;
+//    holds the beast, and once it has burst a dark dead disc, cracked, inside
+//    a cold grey ring broken in five, so a player counts the baits left at a
+//    glance;
 //  - the lane's end cap: an ice-shard burst on the outcrop's face while the
 //    lane would end in the ice, a plain arrowhead with chevrons running down
 //    the lane while it would not (the lane's own colour is the coordinator's,
@@ -12,7 +13,8 @@
 //  - the marker over the Trample's target, readable from across the road: a
 //    bouncing down arrow while the lane follows them (lead it), two arrows
 //    out to either side once it locks (step aside), and a reticle at their
-//    feet, all in the lane's colour.
+//    feet, both in the marker's own gold (TARGET_MARKER_COLOR) inside a white
+//    and a dark rim, so the marker never melts into the ice-blue lane.
 //
 // Every look is a mesh built once under the host's root (it rides the gated
 // attach) whose state is a uniform: it draws on every tier, so no preset ever
@@ -33,6 +35,7 @@ import {
   OUTCROP_CIRCLE_RADIUS,
   type OutcropCircleLook,
   outcropCircleLook,
+  TARGET_MARKER_COLOR,
   TARGET_MARKER_HEIGHT,
   TARGET_MARKER_SIZE,
   TRAMPLE_CAP_SIZE,
@@ -70,7 +73,8 @@ void main() {
 
 /** An outcrop's circle: the ring, rune ticks turning inside it, a frost glow
  *  in its middle and a halo round it, with a dark rim either side so it reads
- *  on white snow. Spent: an unlit grey ring broken in five, cracks across it. */
+ *  on white snow. Spent: no glow; a dark dead disc with pale cracks inside a
+ *  cold grey ring broken in five, every piece in its own dark rim. */
 const CIRCLE_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform float uGlow;
@@ -96,13 +100,20 @@ void main() {
   vec3 navy = vec3(0.015, 0.05, 0.11);
   vec3 col = mix(live, navy, rim);
   float alpha = max(liveA, rim * 0.75 * g);
-  // A spent outcrop: the ring broken in five, cracks across the middle.
+  // A spent outcrop: no glow, no halo, no pulse. A dark dead disc, the ring
+  // broken in five frost-grey pieces each inside its own dark rim, and pale
+  // cracks across the disc: light on dark, so it reads on white snow and on
+  // the dark road alike, and plainly "out" beside a lit one.
   float gap = step(0.2, fract(a / TAU * 5.0 + uSeed));
+  float sBand = smoothstep(0.81, 0.86, r) * (1.0 - smoothstep(0.99, 1.04, r)) * gap;
+  float sRim = smoothstep(0.72, 0.8, r) * (1.0 - smoothstep(1.05, 1.13, r)) * gap * (1.0 - sBand);
+  float disc = 1.0 - smoothstep(0.72, 0.8, r);
   float ang = (fract(a / TAU * 7.0 + uSeed * 3.0) - 0.5) * TAU / 7.0;
-  float crack = (1.0 - smoothstep(0.015, 0.04, abs(r * sin(ang)))) *
-    smoothstep(0.15, 0.3, r) * (1.0 - smoothstep(0.78, 0.86, r));
-  float spentA = clamp((band + rim * 0.6) * gap * 0.85 + crack * 0.5, 0.0, 0.9);
-  vec3 spentCol = uColor * (1.0 - crack * 0.6);
+  float crack = (1.0 - smoothstep(0.02, 0.05, abs(r * sin(ang)))) *
+    smoothstep(0.12, 0.26, r) * (1.0 - smoothstep(0.66, 0.74, r));
+  vec3 dead = vec3(0.02, 0.03, 0.05);
+  vec3 spentCol = mix(dead, uColor, max(sBand, crack * 0.8));
+  float spentA = clamp(max(max(sBand * 0.96, sRim * 0.86), disc * (0.5 + crack * 0.4)), 0.0, 0.96);
   gl_FragColor = vec4(mix(col, spentCol, uSpent), mix(alpha, spentA, uSpent));
 }
 `;
@@ -185,7 +196,7 @@ void main() {
 
 /** The marker's shapes span -1..1 with their outlines; the quad spans a
  *  little more, so no rim is clipped at a tip. */
-const MARKER_SPAN = 1.15;
+const MARKER_SPAN = 1.3;
 
 const MARKER_VERT = /* glsl */ `
 uniform float uSize;
@@ -202,7 +213,9 @@ void main() {
 `;
 
 /** The marker over the target: a down arrow (lead it) or two arrows out to
- *  either side (step aside), the lane's colour inside a white then dark rim. */
+ *  either side (step aside), gold lit from above inside a white rim, a thick
+ *  dark rim and a soft dark halo, so it stands off bright ice, dark road and
+ *  either lane colour alike. */
 const MARKER_FRAG = /* glsl */ `
 uniform vec3 uColor;
 uniform float uMode;
@@ -237,12 +250,16 @@ void main() {
   vec2 p = vUv;
   float down = step(uMode, 0.5);
   float fill = mix(sideArrows(p, 0.0), downArrow(p, 0.0), down);
-  float white = mix(sideArrows(p, 0.07), downArrow(p, 0.07), down);
-  float dark = mix(sideArrows(p, 0.13), downArrow(p, 0.13), down);
-  float flash = mix(0.75 + 0.25 * step(0.5, fract(uTime * 5.0)), 1.0, down);
-  vec3 col = mix(vec3(0.02, 0.03, 0.06), vec3(1.0), white);
-  col = mix(col, uColor * 1.15 * flash, fill);
-  float alpha = max(dark * 0.85, max(white, fill));
+  float white = mix(sideArrows(p, 0.08), downArrow(p, 0.08), down);
+  float dark = mix(sideArrows(p, 0.19), downArrow(p, 0.19), down);
+  float halo = mix(sideArrows(p, 0.3), downArrow(p, 0.3), down);
+  float flash = mix(0.72 + 0.28 * step(0.5, fract(uTime * 5.0)), 1.0, down);
+  // Lit from above: a brighter crown and a deeper foot, so it reads as a
+  // solid token rather than a flat decal.
+  vec3 gold = uColor * mix(0.78, 1.18, clamp(p.y * 0.5 + 0.5, 0.0, 1.0)) * flash;
+  vec3 col = mix(vec3(0.03, 0.02, 0.01), vec3(1.0), white);
+  col = mix(col, gold, fill);
+  float alpha = max(halo * 0.32, max(dark * 0.92, max(white, fill)));
   if (alpha < 0.01) discard;
   gl_FragColor = vec4(col, alpha);
 }
@@ -376,7 +393,7 @@ export class TuskerAimFx {
     this.markerMat = new THREE.ShaderMaterial({
       name: 'sanctumTrampleTargetMarker',
       uniforms: {
-        uColor: { value: new THREE.Color(this.look.color) },
+        uColor: { value: new THREE.Color(TARGET_MARKER_COLOR) },
         uMode: { value: 0 },
         uTime: host.uTime,
         uSize: { value: TARGET_MARKER_SIZE * MARKER_SPAN },
@@ -396,7 +413,7 @@ export class TuskerAimFx {
     host.root.add(this.marker);
     this.reticleMat = new THREE.ShaderMaterial({
       name: 'sanctumTrampleTargetReticle',
-      uniforms: { uColor: { value: new THREE.Color(this.look.color) }, uTime: host.uTime },
+      uniforms: { uColor: { value: new THREE.Color(TARGET_MARKER_COLOR) }, uTime: host.uTime },
       vertexShader: FLAT_VERT,
       fragmentShader: RETICLE_FRAG,
       transparent: true,
@@ -425,7 +442,11 @@ export class TuskerAimFx {
       standing.length = 0;
       for (const o of outcrops) {
         if (o.objectId < 0 || o.phase !== 'whole') continue;
-        const spot = (this.spotPool[standing.length] ??= { id: 0, x: 0, z: 0 });
+        let spot = this.spotPool[standing.length];
+        if (!spot) {
+          spot = { id: 0, x: 0, z: 0 };
+          this.spotPool[standing.length] = spot;
+        }
         spot.id = o.objectId;
         spot.x = o.x;
         spot.z = o.z;
@@ -441,7 +462,7 @@ export class TuskerAimFx {
       const look = trampleAimLook(lane.outcropId, tusker.castRemaining, this.look);
       aimedId = lane.outcropId ?? -1;
       this.paintCap(tusker, lane, look);
-      this.paintTarget(clock, tusker, look);
+      this.paintTarget(clock, tusker);
     } else {
       this.hideAim();
     }
@@ -517,7 +538,7 @@ export class TuskerAimFx {
     }
   }
 
-  private paintTarget(clock: number, tusker: Entity, look: TrampleAimLook): void {
+  private paintTarget(clock: number, tusker: Entity): void {
     const target =
       tusker.castTargetId !== null ? (this.world.entities.get(tusker.castTargetId) ?? null) : null;
     if (!target || target.dead) {
@@ -537,10 +558,7 @@ export class TuskerAimFx {
     );
     this.reticle.position.set(target.pos.x, gy + LIFT, target.pos.z);
     this.reticle.scale.set(RETICLE_RADIUS, 1, RETICLE_RADIUS);
-    const mu = this.markerMat.uniforms;
-    (mu.uColor.value as THREE.Color).setHex(look.color);
-    mu.uMode.value = mode;
-    (this.reticleMat.uniforms.uColor.value as THREE.Color).setHex(look.color);
+    this.markerMat.uniforms.uMode.value = mode;
     if (!this.shown.marker) {
       this.shown.marker = true;
       this.marker.visible = true;

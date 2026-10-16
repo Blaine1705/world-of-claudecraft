@@ -436,6 +436,15 @@ describe('the bait painter', () => {
       expect(river[0].scale.x).toBeCloseTo(T.trailHalfWidth * 2, 6);
       expect(river[0].scale.z).toBeCloseTo(30, 6);
       expect(walls[0].scale.y).toBe(TRAIL_LOOK.flameHeight);
+      // The flame walls overlap down the lane: laid over (never added), so
+      // they keep the soulfire's green and violet instead of burning out to
+      // white on the snow; the river under them still glows (added).
+      expect(((walls[0] as THREE.Mesh).material as THREE.Material).blending).toBe(
+        THREE.NormalBlending,
+      );
+      expect(((river[0] as THREE.Mesh).material as THREE.Material).blending).toBe(
+        THREE.AdditiveBlending,
+      );
       expect(river[0].rotation.y).toBeCloseTo(yaw, 6);
       trail.castRemaining = T.trailSeconds - 3;
       step(4);
