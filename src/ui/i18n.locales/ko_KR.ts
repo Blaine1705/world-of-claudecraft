@@ -8077,6 +8077,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'auth.newCharacter': '새 캐릭터',
   'auth.appearance': '외형',
   'auth.modelLoading': '캐릭터를 불러오는 중...',
+  'auth.previewPinchHint': '핀치로 확대/축소',
   'auth.class': '직업',
   'auth.name': '이름',
   'auth.chromaOption': '색상 {n}',

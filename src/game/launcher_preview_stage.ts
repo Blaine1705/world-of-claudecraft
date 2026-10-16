@@ -14,11 +14,14 @@
 // Until its character draws, the stage shows the yellow loading silhouette
 // (src/ui/preview_loading_silhouette.ts). On the phone interface (body.mobile-touch, read live
 // so an Interface Mode change applies at once) it is a touch stage: pinch, drag and the
-// head-and-shoulders opening shot (render/characters/preview_touch_core.ts).
+// head-and-shoulders opening shot on every panel, the character select's included
+// (render/characters/preview_touch_core.ts), and the creator offers the one-time pinch hint
+// beside its model until the player first moves it (src/ui/preview_touch_hint.ts).
 
 import { CharacterPreview } from '../render/characters';
 import { GFX } from '../render/gfx';
 import { createPreviewLoadingSilhouette } from '../ui/preview_loading_silhouette';
+import { createPreviewTouchHint, type PreviewTouchHintLayer } from '../ui/preview_touch_hint';
 
 /** The launcher panels that show the stage, each with the container it shows it in. */
 export const PREVIEW_PANEL_CONTAINERS: Readonly<Record<string, string>> = {
@@ -43,9 +46,38 @@ export function activePreviewPanel(doc: Pick<Document, 'querySelector'> = docume
   return null;
 }
 
+/** The panels whose stage is a creator (the online and the offline one): the only panels that
+ *  show the pinch hint. The stage offers it beside any creation body, and the character select
+ *  stages one too while its roster is empty or still loading, so the panel decides. */
+export const CREATOR_PREVIEW_PANELS: readonly string[] = ['#charcreate-panel', '#offline-select'];
+
+/** Whether `container` is a creator panel's stage container. */
+export function isCreatorPreviewContainer(container: Pick<Element, 'matches'>): boolean {
+  return CREATOR_PREVIEW_PANELS.some((panel) => container.matches(previewContainerFor(panel)));
+}
+
+/** The hint, shown only in a creator panel's stage container and hidden in any other. The
+ *  answer is kept per container, so the stage's per-frame show matches no selector. */
+export function creatorPanelsOnly(hint: PreviewTouchHintLayer): PreviewTouchHintLayer {
+  let checked: HTMLElement | null = null;
+  let creator = false;
+  return {
+    show(container) {
+      if (container !== checked) {
+        checked = container;
+        creator = isCreatorPreviewContainer(container);
+      }
+      if (creator) hint.show(container);
+      else hint.hide();
+    },
+    hide: () => hint.hide(),
+    interacted: () => hint.interacted(),
+  };
+}
+
 /** Build the stage on `#char-preview-canvas` in its markup home (the char-select container;
- *  the caller moves it to the panel on screen), with the loading silhouette and the phone's
- *  touch stage. Null on a page with no stage. */
+ *  the caller moves it to the panel on screen), with the loading silhouette, the phone's
+ *  touch stage and the creator panels' one-time pinch hint. Null on a page with no stage. */
 export function createLauncherPreview(doc: Document = document): CharacterPreview | null {
   const canvas = doc.querySelector<HTMLCanvasElement>('#char-preview-canvas');
   const home = doc.querySelector<HTMLElement>('#online-preview-container');
@@ -59,5 +91,6 @@ export function createLauncherPreview(doc: Document = document): CharacterPrevie
     touchStage: () => doc.body.classList.contains('mobile-touch'),
   });
   preview.setLoadingLayer(createPreviewLoadingSilhouette(doc));
+  preview.setTouchHint(creatorPanelsOnly(createPreviewTouchHint(doc)));
   return preview;
 }

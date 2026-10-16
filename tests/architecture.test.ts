@@ -410,6 +410,8 @@ const UI_PURE_CORES = [
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
   'src/ui/preview_prewarm_core.ts',
+  // The phone creator's one-time pinch hint: its phases and its stored flag.
+  'src/ui/preview_touch_hint_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/guild_ranks_view.ts',
@@ -3174,6 +3176,9 @@ const UI_DOM_MODULES = [
   // The launcher turntable's loading silhouette: mints its own layer and SVG
   // art (the `= document` default) and moves it between stage containers.
   'src/ui/preview_loading_silhouette.ts',
+  // The phone creator's one-time pinch hint: mints its own tab and glyph (the
+  // `= document` default), remembers the first gesture in localStorage, and times its exit.
+  'src/ui/preview_touch_hint.ts',
   'src/ui/prompt_dialog.ts',
   // The report window body moved whole out of hud.ts (the Phase 9b headroom
   // extraction); it paints #report-window and owns its listeners. Renamed to

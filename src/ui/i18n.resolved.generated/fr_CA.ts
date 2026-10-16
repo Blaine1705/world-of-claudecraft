@@ -12201,6 +12201,7 @@ export const fr_CA: EnTranslations = {
     "newCharacter": "Nouveau personnage",
     "appearance": "Apparence",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Personnaliser",
     "body": "Corps",
     "genderMale": "Homme",

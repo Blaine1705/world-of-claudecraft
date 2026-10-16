@@ -12201,6 +12201,7 @@ export const vi_VN: EnTranslations = {
     "newCharacter": "Nhân Vật Mới",
     "appearance": "Ngoại hình",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Tùy chỉnh",
     "body": "Cơ thể",
     "genderMale": "Nam",

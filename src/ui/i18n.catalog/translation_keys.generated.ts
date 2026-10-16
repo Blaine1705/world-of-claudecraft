@@ -652,6 +652,7 @@ export type TranslationKeyFlat =
   | 'auth.password'
   | 'auth.passwordError'
   | 'auth.passwordPlaceholder'
+  | 'auth.previewPinchHint'
   | 'auth.randomize'
   | 'auth.randomizeShort'
   | 'auth.realm'

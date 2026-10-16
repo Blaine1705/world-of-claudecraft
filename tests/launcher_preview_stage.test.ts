@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   activePreviewPanel,
+  CREATOR_PREVIEW_PANELS,
+  creatorPanelsOnly,
+  isCreatorPreviewContainer,
   PREVIEW_PANEL_CONTAINERS,
   previewContainerFor,
 } from '../src/game/launcher_preview_stage';
@@ -113,5 +116,56 @@ describe('the launcher wiring (src/main.ts)', () => {
     );
     expect(stage).toContain("touchStage: () => doc.body.classList.contains('mobile-touch')");
     expect(stage).toContain('preview.setLoadingLayer(createPreviewLoadingSilhouette(doc));');
+  });
+
+  it('gives the stage the one-time pinch hint, narrowed to the creator panels', () => {
+    const stage = stripComments(
+      readFileSync(new URL('../src/game/launcher_preview_stage.ts', import.meta.url), 'utf8'),
+    );
+    expect(stage).toContain(
+      'preview.setTouchHint(creatorPanelsOnly(createPreviewTouchHint(doc)));',
+    );
+  });
+});
+
+/** A stage container that answers `matches` for its own id only. */
+function containerWithId(id: string): HTMLElement {
+  return { matches: (sel: string) => sel === `#${id}` } as unknown as HTMLElement;
+}
+
+describe('the pinch hint is the creator panels only', () => {
+  it('names the online and the offline creator, never the character select', () => {
+    expect([...CREATOR_PREVIEW_PANELS].sort()).toEqual(['#charcreate-panel', '#offline-select']);
+    expect(isCreatorPreviewContainer(containerWithId('charcreate-preview-container'))).toBe(true);
+    expect(isCreatorPreviewContainer(containerWithId('offline-preview-container'))).toBe(true);
+    // the character select stages a creation body while its roster is empty or loading
+    expect(isCreatorPreviewContainer(containerWithId('online-preview-container'))).toBe(false);
+  });
+
+  it('shows the hint in a creator container and hides it in the character select', () => {
+    const inner = { show: vi.fn(), hide: vi.fn(), interacted: vi.fn() };
+    const hint = creatorPanelsOnly(inner);
+    const creator = containerWithId('charcreate-preview-container');
+    const select = containerWithId('online-preview-container');
+    hint.show(creator);
+    expect(inner.show).toHaveBeenLastCalledWith(creator);
+    hint.show(select);
+    expect(inner.show).toHaveBeenCalledTimes(1);
+    expect(inner.hide).toHaveBeenCalledTimes(1);
+    hint.hide();
+    expect(inner.hide).toHaveBeenCalledTimes(2);
+    // every gesture is passed on; the hint counts only one made while it is up
+    hint.interacted();
+    expect(inner.interacted).toHaveBeenCalledTimes(1);
+  });
+
+  it('matches a container once, not every frame', () => {
+    const matches = vi.fn((sel: string) => sel === '#charcreate-preview-container');
+    const creator = { matches } as unknown as HTMLElement;
+    const hint = creatorPanelsOnly({ show: vi.fn(), hide: vi.fn(), interacted: vi.fn() });
+    hint.show(creator);
+    const calls = matches.mock.calls.length;
+    for (let i = 0; i < 30; i++) hint.show(creator);
+    expect(matches.mock.calls.length).toBe(calls);
   });
 });

@@ -4,12 +4,16 @@
 // camera they produce directly; preview.ts only feeds it pointer positions and writes the
 // pose it returns.
 //
-// The camera rides a path between two framings the stage hands in: NEAR (the creator's head
-// and shoulders, preview_framing.ts touchShouldersPose) and FAR (the whole body, the sheet
-// framing). A pinch moves the distance along that path, and the aim point glides between the
-// two framings' aims with it, so zooming out from the face settles on the whole body instead
-// of the neck. The player's slide and tilt ride on top, clamped so the character can never be
+// The camera rides a path between two framings the stage hands in: NEAR (the head and
+// shoulders, preview_framing.ts touchShouldersPose, the shot every launcher stage opens on,
+// the creator and the roster's pick alike) and FAR (the whole body, the sheet framing). A
+// pinch moves the distance along that path, and the aim point glides between the two
+// framings' aims with it, so zooming out from the face settles on the whole body instead of
+// the neck. The player's slide and tilt ride on top, clamped so the character can never be
 // lost off the stage.
+//
+// The creator also offers a one-time gesture hint beside the model until the player first
+// moves it (touchHintOffered, touchStepMoves; the DOM is src/ui/preview_touch_hint.ts).
 
 import type { PreviewCamPose } from './preview_framing';
 
@@ -74,9 +78,39 @@ export function framingDistance(p: PreviewCamPose): number {
   return Math.hypot(p.z, p.y - p.lookY);
 }
 
-/** The view a stage opens on: the near framing for the creator, the far one elsewhere. */
+/** The view at a framing, with no slide or tilt: a stage opens on its near framing. */
 export function touchViewAt(framing: PreviewCamPose): TouchView {
   return { dist: framingDistance(framing), panX: 0, panY: 0, pitch: 0 };
+}
+
+/** Whether a step moved anything: a drag, a pinch or a slide. A finger landing or lifting
+ *  sends the empty step, which is not the player moving the model. */
+export function touchStepMoves(step: TouchStep): boolean {
+  return (
+    step.dragX !== 0 ||
+    step.dragY !== 0 ||
+    step.pinch !== 1 ||
+    step.slideX !== 0 ||
+    step.slideY !== 0
+  );
+}
+
+/** What the stage knows each frame about offering the gesture hint. */
+export interface TouchHintFacts {
+  /** The stage is a touch stage now (the phone interface). */
+  readonly touch: boolean;
+  /** The stage shows the creator (the hint is the creator's; the roster's pick has none). */
+  readonly creator: boolean;
+  /** The stage is on screen with a size to draw in. */
+  readonly visible: boolean;
+  /** Its character draws (never beside the loading silhouette: the hint names the model). */
+  readonly drawn: boolean;
+}
+
+/** Whether the stage offers the gesture hint this frame. Whether the player has already
+ *  moved the model once (and so never sees it again) is the hint's own to remember. */
+export function touchHintOffered(f: TouchHintFacts): boolean {
+  return f.touch && f.creator && f.visible && f.drawn;
 }
 
 /**

@@ -12201,6 +12201,7 @@ export const sv_SE: EnTranslations = {
     "newCharacter": "Ny karaktär",
     "appearance": "Utseende",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Anpassa",
     "body": "Kropp",
     "genderMale": "Man",

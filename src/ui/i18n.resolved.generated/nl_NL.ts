@@ -12201,6 +12201,7 @@ export const nl_NL: EnTranslations = {
     "newCharacter": "Nieuw personage",
     "appearance": "Uiterlijk",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Aanpassen",
     "body": "Lichaam",
     "genderMale": "Man",

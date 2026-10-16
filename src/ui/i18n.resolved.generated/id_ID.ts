@@ -12201,6 +12201,7 @@ export const id_ID: EnTranslations = {
     "newCharacter": "Karakter Baru",
     "appearance": "Penampilan",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Ubah Suai",
     "body": "Tubuh",
     "genderMale": "Pria",

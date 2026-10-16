@@ -8185,6 +8185,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'auth.newCharacter': 'Новый персонаж',
   'auth.appearance': 'Внешность',
   'auth.modelLoading': 'Загрузка персонажа...',
+  'auth.previewPinchHint': 'Масштаб щипком',
   'auth.class': 'Класс',
   'auth.name': 'Имя',
   'auth.chromaOption': 'Расцветка {n}',
