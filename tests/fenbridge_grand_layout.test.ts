@@ -7,16 +7,18 @@ import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPCS,
 } from '../src/sim/content/world_quest_investigation';
-import { BUILTIN_WORLD, GATHER_NODES, setActiveWorldContent } from '../src/sim/data';
+import { BUILTIN_WORLD, GATHER_NODES, QUESTS, setActiveWorldContent, ZONES } from '../src/sim/data';
 import { isExcludedDecoration, isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
 import { FENBRIDGE_BUILDINGS_BY_ID, FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { loadPublishedMap, MAP_SEED } from '../src/sim/maps/eastbrook_rebuild.generated';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { distancePointToObb, localToWorld, type Obb2 } from '../src/sim/placed_town_kit';
+import { isInTownZone } from '../src/sim/professions/focus';
 import { isResting } from '../src/sim/progression/xp';
 import { GRAVE_COUNT, GRAVE_RADIUS, graveOffset } from '../src/sim/prop_layout';
 import { Sim } from '../src/sim/sim';
+import { isProfessionTrainerNpc, questAnchorNpcIds, townQuestIds } from '../src/sim/town_quests';
 import type { Entity } from '../src/sim/types';
 import { generateDecorationsInBounds, terrainHeight, terrainSteepnessAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -251,9 +253,10 @@ describe('the grand Fenbridge buildings', () => {
         walls: 1.5,
       })),
     ];
-    for (const patch of FARM_PATCHES.filter((candidate) => candidate.id === 'patch_mirefen')) {
-      for (const bed of patch.beds) kept.push({ id: bed.id, point: bed, walls: 4 });
-    }
+    const farm = FARM_PATCHES.find((candidate) => candidate.id === 'patch_mirefen');
+    if (!farm) throw new Error('no Mirefen farm patch');
+    expect(farm.beds.length).toBeGreaterThan(0);
+    for (const bed of farm.beds) kept.push({ id: bed.id, point: bed, walls: 4 });
     expect(kept.length).toBeGreaterThan(20);
     for (const { id, point, walls } of kept) {
       expect(nearestBox(point, SOLIDS), id).toBeGreaterThan(walls);
@@ -281,10 +284,34 @@ describe('the grand Fenbridge buildings', () => {
       expect(distancePointToObb(ledger, building.reach), building.id).toBeGreaterThan(5);
     }
     // ...and every gather node near town keeps clear of the eaves
-    for (const node of GATHER_NODES) {
-      if (Math.hypot(node.pos.x, node.pos.z - 303) > 60) continue;
+    const nearNodes = GATHER_NODES.filter((node) => Math.hypot(node.pos.x, node.pos.z - 303) <= 60);
+    expect(nearNodes.length).toBeGreaterThan(0);
+    for (const node of nearNodes) {
       expect(nearestBox(node.pos, REACHES), node.id).toBeGreaterThan(2);
     }
+  });
+
+  it('keeps every townsfolk who gives or takes a quest inside the hub circle', () => {
+    // A quest counts as one of the town's own errands only while its giver or a
+    // turn-in stands inside the zone's hub circle (sim/town_quests.ts). The
+    // grand bank's stall took Scout Maren's spot; she stays in the circle at
+    // the street's edge, so her troll and cult errands remain Fenbridge's.
+    const zone = ZONES.find((candidate) => candidate.id === FENBRIDGE_LAYOUT.zoneId);
+    if (!zone) throw new Error('no Mirefen zone');
+    const anchors = FENBRIDGE_LAYOUT.services.npcs.filter(
+      (npc) =>
+        !isProfessionTrainerNpc(npc.id) &&
+        Object.values(QUESTS).some((quest) => questAnchorNpcIds(quest).includes(npc.id)),
+    );
+    expect(anchors.map((npc) => npc.id)).toEqual([
+      'warden_fenwick',
+      'brother_aldric_fen',
+      'provisioner_hale',
+      'herbalist_yara',
+      'scout_maren',
+    ]);
+    for (const npc of anchors) expect(isInTownZone(npc.position, zone), npc.id).toBe(true);
+    expect(townQuestIds(zone)).toEqual(expect.arrayContaining(['q_troll_fetishes', 'q_cult_camp']));
   });
 
   it('levels each building on its own pad across its whole reach', () => {
@@ -395,6 +422,12 @@ describe('living in the grand Fenbridge', () => {
     // the far end of the taproom, and the threshold a stride out of the door
     expect(isResting(at(localToWorld(inn.position, inn.rotation, 10, 0)))).toBe(true);
     expect(isResting(at(localToWorld(inn.position, inn.rotation, door.x, door.z - 1)))).toBe(true);
+    // the rest area grew with the inn: a stride and a half past the grand
+    // gable end still rests (12 + the two-yard padding), where the authored
+    // inn's area (10 + 2) stopped short
+    expect(inn.nativeDimensions.width / 2).toBeCloseTo(12, 9);
+    expect(isResting(at(localToWorld(inn.position, inn.rotation, 13.5, 0)))).toBe(true);
+    expect(isResting(at(localToWorld(inn.position, inn.rotation, 14.5, 0)))).toBe(false);
     // the visitor's stand grew with the inn (2.16 yd off the wall), past the
     // two-yard rest padding every inn keeps, as at the grand Highwatch inn
     expect(inn.frontClearance).toBeCloseTo(2.16, 9);
@@ -423,5 +456,10 @@ describe('living in the grand Fenbridge', () => {
     expect(first).not.toEqual(position);
     expect(loadAt()).toEqual(first);
     expect(isBlocked(SEED, first.x, first.z, 0.5)).toBe(false);
+    // the nearest clear ground, just outside the walls: not a graveyard or
+    // the start of the world
+    expect(Math.hypot(first.x - position.x, first.z - position.z)).toBeLessThan(
+      warden.maxCornerRadius + 2,
+    );
   });
 });

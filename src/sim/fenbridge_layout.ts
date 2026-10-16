@@ -791,9 +791,11 @@ function makeNpc(id: string, position: Point2, facing: number, anchorId: string)
 }
 
 // Scout Maren keeps the north entrance, looking down the north street into
-// town: past the bank's north end, where the grand bank's stall now stands on
-// her old spot.
-const SCOUT_POSITION = { x: -3.2, z: 337.5 } as const;
+// town. The grand bank's stall counter stands on her old spot, so she steps
+// a stride and a half out to the street's edge, between the counter and the
+// boardwalk: still inside the hub circle, where a quest giver must stand for
+// her errands to count as the town's own (sim/town_quests.ts).
+const SCOUT_POSITION = { x: -1.4, z: 330 } as const;
 const NPCS = [
   // The warden greets arrivals at his own door, by the south entrance.
   makeNpc(

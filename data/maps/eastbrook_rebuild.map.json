@@ -3868,10 +3868,10 @@
         "name": "Scout Maren",
         "title": "Marshal's Scout",
         "pos": {
-          "x": -3.2,
-          "z": 337.5
+          "x": -1.4,
+          "z": 330
         },
-        "facing": 3.0090411212931194,
+        "facing": 3.0569469092959145,
         "color": 8218120,
         "questIds": ["q_troll_fetishes", "q_cult_camp", "q_olen"],
         "greeting": "Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds."
