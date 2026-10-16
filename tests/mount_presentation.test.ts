@@ -32,6 +32,8 @@ function seatBoneSpec(): MountVisualSpec {
     bobIdle: false,
     bobShape: 'hop',
     fx: 'slime',
+    embers: null,
+    summonFx: 'shimmer',
     lamps: [],
     seatBone: { bone: 'chair', offset: [0, 0, 0] },
     glows: [],

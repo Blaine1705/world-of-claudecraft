@@ -23,6 +23,7 @@
 import type * as THREE from 'three';
 import type { AnimState, CharacterVisual } from './characters/visual';
 import { applyRocketSledAttitude } from './goblin_rocket_sled_fx';
+import { updateMountEmbers } from './mount_embers';
 import { type MountGlows, updateMountGlows } from './mount_glow';
 import { applyMountJumpAttitude } from './mount_jump_attitude';
 import { type MountLamps, updateMountLamps } from './mount_lamps';
@@ -249,12 +250,25 @@ export function updateMountPresentation(
       }
     }
     // Ambient mount particles: the snail paints its slime path while gliding,
-    // the hover cycle streams aether exhaust off its tail.
+    // the hover cycle streams aether exhaust off its tail, the lantern horse strikes sparks.
     if (presented) {
       if (spec.fx === 'slime') {
         if (input.moving) input.vfx.mountSlimeTrail(v.group.position, dt);
       } else if (spec.fx === 'exhaust') {
         input.vfx.mountExhaust(v.group.position, input.facing, dt, input.moving);
+      } else if (spec.fx === 'embers' && spec.embers && v.mountVisual) {
+        // the lantern horse: sparks off each striking hoof, cinders off its swinging lanterns
+        const running = input.anim.running;
+        const groundY = v.group.position.y;
+        updateMountEmbers(
+          v.mountVisual.root,
+          spec.embers,
+          input.vfx,
+          dt,
+          input.moving,
+          running,
+          groundY,
+        );
       } else if (spec.fx === 'pipes' && v.mountSuspension) {
         // Piped exhaust rides the chassis matrix, so it keeps its place through
         // the body's pitch, roll and landing squat.

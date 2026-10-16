@@ -17,7 +17,12 @@ import type { WeaponSkinType } from '../types';
 export type { WeaponSkinType } from '../types';
 
 export type WeaponSkinRarity = 'uncommon' | 'rare' | 'epic' | 'legendary';
-export type WeaponSkinCollection = 'guildmark' | 'emberwrought' | 'hoarfrost' | 'fallen_star';
+export type WeaponSkinCollection =
+  | 'guildmark'
+  | 'emberwrought'
+  | 'hoarfrost'
+  | 'fallen_star'
+  | 'lantern_hall';
 
 export interface WeaponSkinDef {
   /** Store SKU / economy-service item id (kind 'skin'). */
@@ -36,6 +41,10 @@ export interface WeaponSkinDef {
    *  the drawn bow. Guns and launchers aim; they are not drawn. Cosmetic only:
    *  the sim never reads it. */
   handling?: 'crossbow';
+  /** Earned in the world instead of sold in the Claudium Armory: the skin has no economy SKU
+   *  and stays out of the store (STORE_WEAPON_SKIN_LIST). 'lantern_hall': Lantern Hall's
+   *  quartermaster sells it for Lantern Seals (content/guild_contracts.ts). */
+  earnedFrom?: 'lantern_hall';
 }
 
 export const WEAPON_SKIN_TYPES: readonly WeaponSkinType[] = [
@@ -310,10 +319,28 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     model: 'meteorlatch_the_sky_s_last_judgment',
     season: 1,
   },
+
+  // ── Lantern Hall (earned): the guild's own blade, bought for Lantern Seals ──
+  // Rare, so it carries the rare tier's banked-fire weapon glow (src/render/weapon_vfx.ts).
+  lantern_hall_sword: {
+    id: 'lantern_hall_sword',
+    collection: 'lantern_hall',
+    rarity: 'rare',
+    weaponType: 'sword',
+    model: 'lantern_hall_sword',
+    season: 1,
+    earnedFrom: 'lantern_hall',
+  },
 };
 
 export const WEAPON_SKIN_LIST: readonly WeaponSkinDef[] = Object.values(WEAPON_SKINS);
 
+/** The skins the Claudium Armory sells: every skin that is not earned in the world. */
+export const STORE_WEAPON_SKIN_LIST: readonly WeaponSkinDef[] = WEAPON_SKIN_LIST.filter(
+  (skin) => !skin.earnedFrom,
+);
+
+/** The Armory's store collections, in shelf order (the earned Lantern Hall blade is not one). */
 export const WEAPON_SKIN_COLLECTIONS: readonly WeaponSkinCollection[] = [
   S1.guildmark,
   S1.emberwrought,

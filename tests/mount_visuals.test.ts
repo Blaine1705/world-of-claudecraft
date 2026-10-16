@@ -18,6 +18,7 @@ import {
   mountBobY,
   mountLampFlicker,
   mountSeatLift,
+  mountSummonFx,
   mountVisualSpec,
   stepRocketSledJumpPitch,
 } from '../src/render/mount_visuals';
@@ -69,12 +70,13 @@ describe('mount visual specs cover the sim catalog', () => {
     const expected = {
       lanternback_troll: ['chair', 'lantern_l', 'lantern_r'],
       chimeglass_tortoise: ['lens', 'saddle'],
+      lantern_hall_destrier: ['lantern_l', 'lantern_r'],
     } as const;
     for (const [key, expectedBones] of Object.entries(expected)) {
       const spec =
         key === 'chimeglass_tortoise'
           ? MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise
-          : MOUNT_VISUAL_SPECS.lanternback_troll;
+          : MOUNT_VISUAL_SPECS[key as 'lanternback_troll' | 'lantern_hall_destrier'];
       const requested = new Set([
         ...(spec.seatBone ? [spec.seatBone.bone] : []),
         ...spec.lamps.map((lamp) => lamp.bone),
@@ -90,6 +92,40 @@ describe('mount visual specs cover the sim catalog', () => {
       const shipped = new Set((json.nodes ?? []).map((node) => node.name).filter(Boolean));
       for (const bone of requested) expect(shipped.has(bone), `${key} missing ${bone}`).toBe(true);
     }
+  });
+
+  it('the destrier names its ember bones by the RUNTIME node name, all present in its GLB', () => {
+    // GLTFLoader strips '.' from node names (PropertyBinding.sanitizeNodeName), so the spec
+    // names `toes_01l_011` for the GLB's `toes_01.l_011`; a raw name would find no bone at
+    // runtime and the hoof would shed nothing, silently.
+    const spec = MOUNT_VISUAL_SPECS.lantern_hall_destrier;
+    expect(spec.fx).toBe('embers');
+    expect(spec.summonFx).toBe('lanternBurst');
+    const embers = spec.embers;
+    if (!embers) throw new Error('the destrier sheds embers');
+    expect(embers.hooves).toHaveLength(4);
+    const bytes = readFileSync(path.join(__dirname, '..', 'public', VISUALS[spec.visualKey].url));
+    const jsonLength = bytes.readUInt32LE(12);
+    const json = JSON.parse(bytes.subarray(20, 20 + jsonLength).toString('utf8')) as {
+      nodes?: { name?: string }[];
+    };
+    const runtime = new Set(
+      (json.nodes ?? []).map((node) => (node.name ?? '').replace(/[.:/[\]]/g, '')),
+    );
+    for (const bone of [...embers.hooves, ...embers.lanterns.map((l) => l.bone)])
+      expect(runtime.has(bone), `destrier missing ${bone}`).toBe(true);
+    // the lanterns shed from the same glass the lamps burn in
+    expect(embers.lanterns).toEqual(spec.lamps.map((l) => ({ bone: l.bone, offset: l.offset })));
+    // every other mount keeps the shared shimmer and no embers
+    for (const key of MOUNT_KEYS) {
+      if (key === 'lantern_hall_destrier') continue;
+      expect(MOUNT_VISUAL_SPECS[key].embers, key).toBeNull();
+      expect(MOUNT_VISUAL_SPECS[key].summonFx, key).toBe('shimmer');
+    }
+    expect(mountSummonFx('lantern_hall_destrier')).toBe('lanternBurst');
+    expect(mountSummonFx('valorsteed')).toBe('shimmer');
+    expect(mountSummonFx('')).toBe('shimmer');
+    expect(mountSummonFx('mech_bird')).toBe('shimmer');
   });
 
   it('preserves authored vertex colors when Low converts mount materials to Lambert', () => {
@@ -120,6 +156,8 @@ describe('mount visual specs cover the sim catalog', () => {
       bobIdle: false,
       bobShape: 'hop',
       fx: null,
+      embers: null,
+      summonFx: 'shimmer',
       lamps: [],
       seatBone: null,
       glows: [],
@@ -329,11 +367,12 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the goblin rocket sled, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
+  it('carries authored COLOR_0 on exactly the goblin rocket sled, the Lantern Hall Destrier, the Bonebound Rickshaw, the Dreadspark Groundshaker, and the Valorsteed', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
       'models/mounts/goblin_rocket_sled.glb',
+      'models/mounts/lantern_hall_destrier.glb',
       'models/mounts/rickshaw_mount.glb',
       'models/mounts/terrorspark_groundshaker.glb',
       'models/mounts/valorsteed.glb',
@@ -530,7 +569,7 @@ describe('procedural bob math', () => {
     expect(spec.seat).toBeLessThan(2.6);
   });
 
-  it('only the Lanternback and the Chimeglass carry lamps, on their own terms', () => {
+  it('only the Lanternback, the Chimeglass and the Lantern Hall Destrier carry lamps, on their own terms', () => {
     // Catalog mounts and mount SKINS alike: a skin is drawn by the same lamp
     // path, so a new skin shipping stray lamps fails here too.
     const specs: [string, MountVisualSpec][] = [
@@ -552,6 +591,18 @@ describe('procedural bob math', () => {
         for (const lamp of lamps) {
           expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
           expect(lamp.intensity ?? MOUNT_LAMP_INTENSITY).toBe(MOUNT_LAMP_INTENSITY);
+        }
+      } else if (key === 'lantern_hall_destrier') {
+        // Two storm lanterns on their own swinging bones, the glass 0.195 model units down
+        // each (measured by build_steed.py report_spec_offsets). The troll's warm flame,
+        // a little dimmer and tighter: they hang at a rider's hip, not off a throne.
+        expect(lamps.map((l) => l.bone)).toEqual(['lantern_l', 'lantern_r']);
+        for (const lamp of lamps) {
+          expect(lamp.offset).toEqual([0, 0.195, 0]);
+          expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
+          expect(lamp.intensity).toBeLessThan(MOUNT_LAMP_INTENSITY);
+          expect(lamp.distance).toBeLessThan(MOUNT_LAMP_DISTANCE);
+          expect(lamp.flicker ?? 'flame').toBe('flame');
         }
       } else if (key === 'chimeglass_tortoise') {
         // ONE light for the pair of lenses, hung off the single spectacle bone
@@ -611,5 +662,6 @@ describe('procedural bob math', () => {
     expect(MOUNT_VISUAL_SPECS.valorsteed.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.stormfeather_griffin.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.terrorspark_groundshaker.fx).toBeNull();
+    expect(MOUNT_VISUAL_SPECS.lantern_hall_destrier.fx).toBe('embers');
   });
 });

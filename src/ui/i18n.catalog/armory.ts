@@ -6,9 +6,15 @@ export const armoryCollectionStrings = {
   emberwrought: 'Emberwrought',
   hoarfrost: 'Hoarfrost',
   fallen_star: 'Fallen Star',
+  lantern_hall: 'Lantern Hall',
 };
 
 export const armorySkinStrings = {
+  lantern_hall_sword: {
+    name: 'Blade of Lantern Hall',
+    look: 'Broad steel blade with a fuller of banked lantern-fire, gilt cheeks, a caged lantern burning in the crossguard, blue leather grip.',
+    lore: "Garrick Holt will not sell this blade to a stranger. It goes to members who have kept Lantern Hall's contracts week after week, and he hands it over with the same words every time: the lantern in the guard is lit from the hall's own hearth, so wherever you carry it, the hall goes with you. The fire in the fuller is only a look. The promise is the point.",
+  },
   guildmark_arming_sword: {
     name: 'Guildmark Arming Sword',
     look: 'Blued steel blade, bronze fishtail crossguard, teal-dyed leather grip, small stamped guild sigil.',

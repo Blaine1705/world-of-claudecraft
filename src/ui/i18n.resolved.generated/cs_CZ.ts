@@ -679,17 +679,25 @@ export const cs_CZ: EnTranslations = {
       "open": "Open",
       "lifetime": "Contracts completed: {count}",
       "emptyBoard": "The board is being rewritten. Come back after the weekly reset.",
-      "quartermasterIntro": "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds. Nothing here makes you stronger.",
+      "quartermasterIntro": "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds, the guild's sword appearance and its war horse. Nothing here makes you stronger in a fight.",
       "titleOffer": "Title: {title}",
       "titlePreview": "Shown as {preview}",
+      "mountOffer": "Mount: {mount}",
+      "mountPreview": "Ground mount: +{pct}% movement speed while riding. Requires riding training.",
+      "skinOffer": "Sword appearance: {skin}",
+      "skinPreview": "Changes how your equipped sword looks, on every character of your account. Appearance only: no stats.",
       "buy": "Buy",
       "owned": "Owned",
       "needSeals": "Needs {count} more",
       "bought": "You bought the title {title}. Choose it in the Book of Deeds.",
+      "boughtMount": "You bought the {mount}. Its reins are in your bags.",
+      "boughtSkin": "You bought the {skin} appearance. Apply it from the Cosmetics window.",
       "refused": {
         "owned": "You already own that.",
         "seals": "You do not have enough Lantern Seals.",
-        "range": "Stand at the quartermaster to trade."
+        "range": "Stand at the quartermaster to trade.",
+        "riding": "Learn to ride before you buy a mount.",
+        "bags": "Your bags are full."
       },
       "contractDone": {
         "one": "Contract complete: {contract}. You receive {count} Lantern Seal.",
@@ -1151,9 +1159,15 @@ export const cs_CZ: EnTranslations = {
         "guildmark": "Cechovní značka",
         "emberwrought": "Žárem kované",
         "hoarfrost": "Jinovatka",
-        "fallen_star": "Padlá hvězda"
+        "fallen_star": "Padlá hvězda",
+        "lantern_hall": "Lantern Hall"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "Blade of Lantern Hall",
+          "look": "Broad steel blade with a fuller of banked lantern-fire, gilt cheeks, a caged lantern burning in the crossguard, blue leather grip.",
+          "lore": "Garrick Holt will not sell this blade to a stranger. It goes to members who have kept Lantern Hall's contracts week after week, and he hands it over with the same words every time: the lantern in the guard is lit from the hall's own hearth, so wherever you carry it, the hall goes with you. The fire in the fuller is only a look. The promise is the point."
+        },
         "guildmark_arming_sword": {
           "name": "Poboční meč s cechovní značkou",
           "look": "Modřená ocelová čepel, bronzová záštita ve tvaru rybího ocasu, rukojeť z modrozelené kůže a drobná vyražená cechovní značka.",
@@ -2276,6 +2290,7 @@ export const cs_CZ: EnTranslations = {
       "name_avian_strider": "Smaragdový údolní běžec",
       "name_mech_bird": "Mechanický pták Cluckwork",
       "name_lanternback_troll": "Grumbol Lanternback",
+      "name_lantern_hall_destrier": "Lantern Hall Destrier",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kostipoutaná rikša",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
@@ -2295,6 +2310,7 @@ export const cs_CZ: EnTranslations = {
       "desc_avian_strider": "Mohutný sedlový pták, jehož těžké spáry a složená křídla promění každou cestu v hřmící trysk.",
       "desc_mech_bird": "Ručně vyrobené strojové válečné kuře, které sprintuje na cvakací serva, natahovací klíč se stále otáčí.",
       "desc_lanternback_troll": "Horský troll, který lampáři zlomili do jha, nesl přes ramena železný trůn a na obou pažích hořela bouřková lucerna.",
+      "desc_lantern_hall_destrier": "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
       "desc_chimeglass_tortoise": "Solná želva, která překonala tři generace karavanů. Tinkers mu vybrousil brýle z bouřkového skla a pověsil mu na hrdlo bronzový zvon, takže ho cesta slyší dlouho předtím, než ho uvidí.",
       "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
     },
@@ -6927,6 +6943,7 @@ export const cs_CZ: EnTranslations = {
       "sourceActivityMasterworkCraft": "Získáno vytvořením mistrovského díla",
       "sourceActivityRiftFirstClear": "Uděleno každému členu družiny, která zvládne první průchod hodnocenou trhlinou",
       "sourceActivityBuriedHoard": "Nalezeno v odměnném truhlici pohřbeného pokladu, trezoru který mapu vede",
+      "sourceActivityLanternHall": "Bought for Lantern Seals from Lantern Hall's quartermaster",
       "cellMissingSourceAria": "{name}, dosud nenalezeno, {source}",
       "cellOwnedClearsAria": "{name}, zkatalogizováno, poprvé nalezeno při průchodu {count}",
       "searchPlaceholder": "Hledat relikvie",
@@ -23442,6 +23459,9 @@ export const cs_CZ: EnTranslations = {
       },
       "lantern_seal": {
         "name": "Lantern Seal"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "Reins of the Lantern Hall Destrier"
       },
       "wyrmfall_core": {
         "name": "Jádro Wyrmfallu"

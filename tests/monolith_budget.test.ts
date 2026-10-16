@@ -1036,7 +1036,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12395 -> 12392 when the chase camera's floor (ground, rift tier, maze
     // hedges) moved into chase_camera_floor_core.ts, net of the indoor camera clamp's
     // wiring (interior_camera.ts). wc -l. Exact count.
-    ceiling: 12392,
+    // LOWERED 12392 -> 12380 by Lantern Hall's steed and sword: the three fiesta wrappers
+    // folded into one per-frame call (one host instead of three), net of the weapon-skin swing
+    // trail's one-line hook (weapon_skin_trail_core.ts). wc -l. Exact count.
+    ceiling: 12380,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

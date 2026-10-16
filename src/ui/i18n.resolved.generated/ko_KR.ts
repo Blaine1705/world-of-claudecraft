@@ -679,17 +679,25 @@ export const ko_KR: EnTranslations = {
       "open": "진행 중",
       "lifetime": "완료한 계약: {count}",
       "emptyBoard": "게시판을 새로 쓰는 중입니다. 주간 초기화 후에 다시 오세요.",
-      "quartermasterIntro": "개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호입니다. 여기서 당신을 더 강하게 만드는 것은 없습니다.",
+      "quartermasterIntro": "개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호, 길드의 검 외형, 그리고 길드의 군마입니다. 여기서 전투에서 당신을 더 강하게 만드는 것은 없습니다.",
       "titleOffer": "칭호: {title}",
       "titlePreview": "표시: {preview}",
+      "mountOffer": "탈것: {mount}",
+      "mountPreview": "지상 탈것: 탑승 중 이동 속도 +{pct}%. 탈것 훈련이 필요합니다.",
+      "skinOffer": "검 외형: {skin}",
+      "skinPreview": "장착한 검의 모습을 바꿉니다. 계정의 모든 캐릭터에 적용됩니다. 외형 전용: 능력치 없음.",
       "buy": "구매",
       "owned": "보유 중",
       "needSeals": "{count}개 더 필요",
       "bought": "칭호 {title}을(를) 구매했습니다. 위업의 책에서 선택하세요.",
+      "boughtMount": "{mount}을(를) 구매했습니다. 고삐가 가방에 있습니다.",
+      "boughtSkin": "{skin} 외형을 구매했습니다. 외형 창에서 적용하세요.",
       "refused": {
         "owned": "이미 보유하고 있습니다.",
         "seals": "등불 인장이 부족합니다.",
-        "range": "거래하려면 보급관 곁에 서세요."
+        "range": "거래하려면 보급관 곁에 서세요.",
+        "riding": "탈것을 사기 전에 승마를 배우세요.",
+        "bags": "가방이 가득 찼습니다."
       },
       "contractDone": {
         "one": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.",
@@ -1151,9 +1159,15 @@ export const ko_KR: EnTranslations = {
         "guildmark": "길드마크",
         "emberwrought": "엠버로트",
         "hoarfrost": "백상",
-        "fallen_star": "추락한 별"
+        "fallen_star": "추락한 별",
+        "lantern_hall": "등불 회관"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "등불 회관의 검",
+          "look": "홈에 등불의 불길을 담은 넓은 강철 검날, 금박 장식, 코등이에서 타오르는 새장 등불, 푸른 가죽 손잡이.",
+          "lore": "개릭 홀트는 이 검을 낯선 이에게 팔지 않는다. 매주 등불 회관의 계약을 지켜 온 회원에게만 건네며, 그때마다 같은 말을 덧붙인다. 코등이의 등불은 회관의 화로에서 옮겨 붙인 불이니, 어디로 가져가든 회관이 함께한다고. 홈 속의 불은 겉모습일 뿐이다. 중요한 것은 약속이다."
+        },
         "guildmark_arming_sword": {
           "name": "길드마크 무장검",
           "look": "푸르게 처리한 강철 칼날, 청동 물고기 꼬리형 십자 가드, 청록색으로 염색한 가죽 손잡이, 작게 찍힌 길드 문장.",
@@ -2276,6 +2290,7 @@ export const ko_KR: EnTranslations = {
       "name_avian_strider": "비리디안 베일스트라이더",
       "name_mech_bird": "태엽 기계새",
       "name_lanternback_troll": "등불지기 그룸볼",
+      "name_lantern_hall_destrier": "등불 회관 군마",
       "name_chimeglass_tortoise": "종유리의 톨리버",
       "name_rickshaw_mount": "뼈에 묶인 인력거",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
@@ -2295,6 +2310,7 @@ export const ko_KR: EnTranslations = {
       "desc_avian_strider": "우뚝 솟은 탈것 조류로, 육중한 발톱과 접은 날개가 모든 여정을 천둥 같은 질주로 바꾼다.",
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
       "desc_lanternback_troll": "점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.",
+      "desc_lantern_hall_destrier": "등불 회관의 군마. 길드의 푸른 천 아래 참나무와 쇠로 된 마갑을 두르고, 안장에서 흔들리는 두 개의 폭풍 등불이 귀갓길을 밝힌다.",
       "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
       "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다."
     },
@@ -6927,6 +6943,7 @@ export const ko_KR: EnTranslations = {
       "sourceActivityMasterworkCraft": "걸작 제작으로 획득",
       "sourceActivityRiftFirstClear": "등급 균열의 최초 클리어를 차지한 파티 전원에게 수여",
       "sourceActivityBuriedHoard": "보물 지도가 이끄는 묻힌 보물의 보상 상자에서 획득",
+      "sourceActivityLanternHall": "등불 회관 보급관에게서 등불 인장으로 구매",
       "cellMissingSourceAria": "{name}, 아직 없음, {source}",
       "cellOwnedClearsAria": "{name}, 수록됨, 첫 획득은 클리어 {count}회차",
       "searchPlaceholder": "성물 검색",
@@ -23442,6 +23459,9 @@ export const ko_KR: EnTranslations = {
       },
       "lantern_seal": {
         "name": "등불 인장"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "등불 회관 군마의 고삐"
       },
       "wyrmfall_core": {
         "name": "낙룡의 핵"

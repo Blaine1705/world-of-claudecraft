@@ -39,17 +39,26 @@ export const guildHallStrings = {
   lifetime: 'Contracts completed: {count}',
   emptyBoard: 'The board is being rewritten. Come back after the weekly reset.',
   quartermasterIntro:
-    'Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds. Nothing here makes you stronger.',
+    "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds, the guild's sword appearance and its war horse. Nothing here makes you stronger in a fight.",
   titleOffer: 'Title: {title}',
   titlePreview: 'Shown as {preview}',
+  mountOffer: 'Mount: {mount}',
+  mountPreview: 'Ground mount: +{pct}% movement speed while riding. Requires riding training.',
+  skinOffer: 'Sword appearance: {skin}',
+  skinPreview:
+    'Changes how your equipped sword looks, on every character of your account. Appearance only: no stats.',
   buy: 'Buy',
   owned: 'Owned',
   needSeals: 'Needs {count} more',
   bought: 'You bought the title {title}. Choose it in the Book of Deeds.',
+  boughtMount: 'You bought the {mount}. Its reins are in your bags.',
+  boughtSkin: 'You bought the {skin} appearance. Apply it from the Cosmetics window.',
   refused: {
     owned: 'You already own that.',
     seals: 'You do not have enough Lantern Seals.',
     range: 'Stand at the quartermaster to trade.',
+    riding: 'Learn to ride before you buy a mount.',
+    bags: 'Your bags are full.',
   },
   contractDone: {
     one: 'Contract complete: {contract}. You receive {count} Lantern Seal.',

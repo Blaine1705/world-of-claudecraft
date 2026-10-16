@@ -388,6 +388,9 @@ export class Vfx {
   // no Color objects.
   private fwCols: THREE.Color[] = [];
   private fwFlash = new THREE.Color();
+  // scratch colours for the per-frame mount embers (spawn copies the colour, so reuse is safe)
+  private emberSpark = new THREE.Color();
+  private emberFlame = new THREE.Color();
   private rocketExhaustSide = 0;
   private quality = 1;
   /** Gloamveil's pool and dark smoke, which an additive cloud cannot draw. The
@@ -1925,9 +1928,13 @@ export class Vfx {
   /** A quick yellow-orange shimmer ringing a rider as a mount is summoned (and on
    *  a dismount/live swap): tighter and shorter-lived than levelUpPillar so it
    *  reads as a conjure sparkle, not a level-up. Fired on the mountKey-change edge. */
-  mountSummonGlow(targetId: number): void {
+  mountSummonGlow(targetId: number, summonFx: 'shimmer' | 'lanternBurst' = 'shimmer'): void {
     const at = this.anchor(targetId, 0);
     if (!at) return;
+    if (summonFx === 'lanternBurst') {
+      this.mountLanternBurst(at);
+      return;
+    }
     const cream = new THREE.Color(0xffe0a0).multiplyScalar(hdr(1.8));
     const amber = new THREE.Color(0xffb347).multiplyScalar(hdr(1.8));
     const ember = new THREE.Color(0xff9a3c).multiplyScalar(hdr(1.8));
@@ -1946,6 +1953,123 @@ export class Vfx {
         0.75 + Math.random() * 0.3,
         -1,
         i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+  }
+
+  /** Lantern Hall's destrier arriving: the lanterns flare all at once. A hot flash at the
+   *  rider, a ring of sparks thrown out along the ground, a column of embers and warm light
+   *  climbing the rider, and slow cinders settling after. Louder than the shared shimmer on
+   *  purpose (the mount carries its own fire); every count goes through scaledCount, so a
+   *  low graphics tier sheds it first. */
+  private mountLanternBurst(at: THREE.Vector3): void {
+    const white = new THREE.Color(0xfff1d0).multiplyScalar(hdr(2.6));
+    const hot = new THREE.Color(0xffb45e).multiplyScalar(hdr(2.2));
+    const amber = new THREE.Color(0xff8a2a).multiplyScalar(hdr(2.0));
+    const coal = new THREE.Color(0xff5210).multiplyScalar(hdr(1.8));
+    // the flare: two stacked flashes, a tight white core over a wide amber bloom
+    this.spawn(at.x, at.y + 1.6, at.z, 0, 0.4, 0, white, 2.6, 0.32, 0, SPR.flash);
+    this.spawn(at.x, at.y + 1.2, at.z, 0, 0.2, 0, amber, 5.2, 0.55, 0, SPR.glowSoft);
+    // the ground ring: sparks thrown outward low along the ground, falling
+    for (let i = 0, n = this.scaledCount(36); i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + Math.random() * 0.2;
+      const speed = 4.5 + Math.random() * 2.5;
+      this.spawn(
+        at.x + Math.sin(a) * 0.4,
+        at.y + 0.15,
+        at.z + Math.cos(a) * 0.4,
+        Math.sin(a) * speed,
+        1.2 + Math.random() * 1.6,
+        Math.cos(a) * speed,
+        i % 2 ? hot : amber,
+        0.3 + Math.random() * 0.15,
+        0.45 + Math.random() * 0.25,
+        7,
+        SPR.sparkBurst,
+      );
+    }
+    // the column: embers and flame licks climbing the rider and horse
+    for (let i = 0, n = this.scaledCount(48); i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.3 + Math.random() * 1.1;
+      const flame = i % 4 === 0;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 1.4,
+        at.z + Math.cos(a) * r,
+        Math.sin(a) * 0.4,
+        2.4 + Math.random() * 2.6,
+        Math.cos(a) * 0.4,
+        flame ? amber : i % 3 === 0 ? coal : hot,
+        flame ? 0.7 + Math.random() * 0.4 : 0.22 + Math.random() * 0.16,
+        flame ? 0.5 + Math.random() * 0.3 : 0.9 + Math.random() * 0.6,
+        flame ? -0.5 : -1.2,
+        flame ? SPR.flame : i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    // the settle: a few slow cinders drifting down after the flare
+    for (let i = 0, n = this.scaledCount(14); i < n; i++) {
+      this.spawn(
+        at.x + (Math.random() - 0.5) * 2.4,
+        at.y + 2.4 + Math.random() * 1.2,
+        at.z + (Math.random() - 0.5) * 2.4,
+        (Math.random() - 0.5) * 0.3,
+        0.2,
+        (Math.random() - 0.5) * 0.3,
+        coal,
+        0.16 + Math.random() * 0.1,
+        1.6 + Math.random() * 0.8,
+        0.6,
+        SPR.glowSoft,
+      );
+    }
+  }
+
+  /** Sparks struck off a hoof (Lantern Hall's destrier at a gallop, mount_embers.ts): hot
+   *  points kicked up and back that fall fast, now and then a brief flame puff. */
+  mountHoofSparks(at: THREE.Vector3, ratePerSec: number, dt: number): void {
+    const n = this.emitCount(ratePerSec, dt);
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const lateral = 0.6 + Math.random() * 1.4;
+      const puff = Math.random() < 0.18;
+      this.spawn(
+        at.x + (Math.random() - 0.5) * 0.15,
+        at.y + 0.05,
+        at.z + (Math.random() - 0.5) * 0.15,
+        Math.sin(a) * lateral,
+        puff ? 0.6 : 1.6 + Math.random() * 2.2,
+        Math.cos(a) * lateral,
+        puff
+          ? this.emberFlame.setHex(0xff8a2a).multiplyScalar(hdr(1.7))
+          : this.emberSpark
+              .setHex(Math.random() < 0.5 ? 0xffc070 : 0xff7a1e)
+              .multiplyScalar(hdr(2.2)),
+        puff ? 0.42 + Math.random() * 0.2 : 0.13 + Math.random() * 0.1,
+        puff ? 0.28 : 0.35 + Math.random() * 0.3,
+        puff ? -0.6 : 9,
+        puff ? SPR.firePuff : SPR.sparkBurst,
+      );
+    }
+  }
+
+  /** Cinders shaken out of a carried lantern: they rise, wander and fade; at speed they
+   *  stream back behind the glass because the lantern itself is moving on. */
+  mountLanternCinders(at: THREE.Vector3, ratePerSec: number, dt: number, moving: boolean): void {
+    const n = this.emitCount(ratePerSec, dt);
+    for (let i = 0; i < n; i++) {
+      this.spawn(
+        at.x + (Math.random() - 0.5) * 0.12,
+        at.y + 0.08,
+        at.z + (Math.random() - 0.5) * 0.12,
+        (Math.random() - 0.5) * 0.5,
+        (moving ? 0.5 : 0.8) + Math.random() * 0.6,
+        (Math.random() - 0.5) * 0.5,
+        this.emberSpark.setHex(Math.random() < 0.6 ? 0xffa040 : 0xffd27a).multiplyScalar(hdr(2.0)),
+        0.08 + Math.random() * 0.07,
+        0.8 + Math.random() * 0.7,
+        -0.4,
+        Math.random() < 0.3 ? SPR.star : SPR.sparkle,
       );
     }
   }

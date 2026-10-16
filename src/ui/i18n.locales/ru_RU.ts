@@ -87,6 +87,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipDormant':
     'Неактивно: продлите членство, чтобы вернуть характеристики доспехов и бонусы комплекта.',
   'entities.items.lantern_seal.name': 'Печать Фонаря',
+  'entities.items.reins_lantern_hall_destrier.name': 'Поводья боевого коня Зала Фонаря',
   'entities.items.membership_token.name': 'Жетон членства (30 дней)',
   'entities.items.membership_helmet.name': 'Шлем участника',
   'entities.items.membership_shoulder.name': 'Наплечники участника',
@@ -456,6 +457,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': 'Обмотки отбойного течения властителя',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     'Находится в наградном сундуке зарытого клада, к которому ведёт карта сокровищ',
+  'hudChrome.reliquary.sourceActivityLanternHall':
+    'Покупается за печати Фонаря у интенданта Зала Фонаря',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     'Ветер принёс пепел с восточных дюн, а пустой песок пепла не носит. Хранительница гарнизонных складов записывает каждый дозор. Она заговорит, как только её кто-нибудь накормит.',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -2228,6 +2231,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': 'Закалённое углями',
   'hudChrome.wocStore.collections.hoarfrost': 'Иней',
   'hudChrome.wocStore.collections.fallen_star': 'Падшая звезда',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    'Гаррик Холт не продаст этот клинок чужаку. Он отдаёт его тем, кто неделю за неделей выполнял контракты Зала Фонаря, и каждый раз говорит одно и то же: фонарь в гарде зажжён от очага самого зала, так что куда бы вы его ни понесли, зал идёт с вами. Огонь в доле лишь украшение. Главное в нём обещание.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    'Широкий стальной клинок с долом, полным тлеющего огня фонаря, позолоченные щёчки, фонарь в клетке, горящий в гарде, рукоять из синей кожи.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Клинок Зала Фонаря',
+  'hudChrome.wocStore.collections.lantern_hall': 'Зал Фонаря',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Боевой меч с клеймом гильдии',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     'Клинок из воронёной стали, бронзовая гарда «рыбий хвост», рукоять из кожи, окрашенной в бирюзовый цвет, и небольшое клеймо гильдии.',
@@ -13984,6 +13993,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
   'hudChrome.mounts.name_avian_strider': 'Изумрудный Долиноход',
   'hudChrome.mounts.name_lanternback_troll': 'Грумбол Фонареносец',
+  'hudChrome.mounts.name_lantern_hall_destrier': 'Боевой конь Зала Фонаря',
   'hudChrome.mounts.name_chimeglass_tortoise': 'Толливер Звонкостёкл',
   'hudChrome.mounts.desc_drakemaw_raptor':
     'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
@@ -13994,6 +14004,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Огромная верховая птица, чьи тяжёлые когти и сложенные крылья превращают любое путешествие в громоподобный бросок.',
   'hudChrome.mounts.desc_lanternback_troll':
     'Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    'Боевой конь Зала Фонаря в дубово-железной броне под синим сукном гильдии; два штормовых фонаря, качаясь у седла, освещают дорогу домой.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     'Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
@@ -22077,7 +22089,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.lifetime': 'Выполнено контрактов: {count}',
   'hudChrome.guildHall.emptyBoard': 'Доску переписывают. Возвращайтесь после еженедельного сброса.',
   'hudChrome.guildHall.quartermasterIntro':
-    'Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний. Ничто здесь не сделает вас сильнее.',
+    'Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний, облик меча гильдии и её боевого коня. Ничто здесь не сделает вас сильнее в бою.',
   'hudChrome.guildHall.titleOffer': 'Звание: {title}',
   'hudChrome.guildHall.titlePreview': 'Отображается как {preview}',
   'hudChrome.guildHall.buy': 'Купить',
@@ -22086,6 +22098,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.bought': 'Вы купили звание {title}. Выберите его в Книге Деяний.',
   'hudChrome.guildHall.refused.owned': 'У вас это уже есть.',
   'hudChrome.guildHall.refused.seals': 'У вас недостаточно печатей Фонаря.',
+  'hudChrome.guildHall.refused.bags': 'Ваши сумки полны.',
+  'hudChrome.guildHall.refused.riding': 'Сначала научитесь верховой езде.',
+  'hudChrome.guildHall.boughtSkin': 'Вы купили облик «{skin}». Примените его в окне косметики.',
+  'hudChrome.guildHall.boughtMount': 'Вы купили скакуна «{mount}». Поводья в ваших сумках.',
+  'hudChrome.guildHall.skinPreview':
+    'Меняет облик надетого меча у всех персонажей вашей учётной записи. Только внешний вид, без характеристик.',
+  'hudChrome.guildHall.skinOffer': 'Облик меча: {skin}',
+  'hudChrome.guildHall.mountPreview':
+    'Наземный скакун: +{pct}% к скорости передвижения верхом. Требуется навык верховой езды.',
+  'hudChrome.guildHall.mountOffer': 'Скакун: {mount}',
   'hudChrome.guildHall.refused.range': 'Чтобы торговать, встаньте рядом с интендантом.',
   'hudChrome.guildHall.reward.one': '{count} печать Фонаря',
   'hudChrome.guildHall.reward.few': '{count} печати Фонаря',

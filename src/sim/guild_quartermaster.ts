@@ -1,22 +1,62 @@
 // Garrick Holt, Lantern Hall's quartermaster (content/guild_contracts.ts
-// GUILD_QUARTERMASTER_STOCK): Lantern Seals for cosmetics only. Each offer is a Book of Deeds
-// feat whose reward is a title, granted through the one grant path (deeds.ts grantDeed), so the
-// Book and the title picker follow.
+// GUILD_QUARTERMASTER_STOCK): Lantern Seals for cosmetics only. Three kinds of offer:
+//  - a title: a Book of Deeds feat granted through the one grant path (deeds.ts grantDeed), so
+//    the Book and the title picker follow;
+//  - the guild's war horse: its reins into the bags (a mount is owned while its reins are held,
+//    src/sim/mounts.ts mountOwned), behind the same riding gate the stable's own reins keep;
+//  - the guild's sword appearance: an ACCOUNT-wide weapon skin. The sim does not own that
+//    ledger (the server's per-session cosmetics do, and the offline Sim's own mirror stands in
+//    for them), so the host hands in a GuildAccountPort that answers "already owned?" and
+//    performs the grant.
 //
 // Server-authoritative like the Heroic Quartermaster (instances/heroic_vendor.ts): the client
-// only sends intent; everything re-validates here. The price debits the buyer's bags. Refusals
-// are structured events (the client owns every visible string). Draws no rng.
+// only sends intent; everything re-validates here. The reward is granted FIRST and the seals
+// leave the bags only once it has landed, so a refused or failed grant never eats seals.
+// Refusals are structured events (the client owns every visible string). Draws no rng.
 
 import { DEEDS } from './content/deeds';
-import { GUILD_QUARTERMASTER_STOCK_BY_ID, LANTERN_SEAL_ITEM_ID } from './content/guild_contracts';
+import {
+  GUILD_QUARTERMASTER_STOCK_BY_ID,
+  type GuildQuartermasterOffer,
+  LANTERN_SEAL_ITEM_ID,
+} from './content/guild_contracts';
 import {
   GUILD_QUARTERMASTER_NPC_ID,
   HIGHWATCH_GUILD_ENTITY_IDS,
   HIGHWATCH_GUILD_TALK_RANGE,
 } from './content/highwatch_guild';
+import { WEAPON_SKINS } from './content/weapon_skins';
+import { ITEMS } from './data';
 import { grantDeed } from './deeds';
+import { mountOwned } from './mounts';
+import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import type { Entity } from './types';
+import type { Entity, GuildCosmeticRefusal } from './types';
+
+/** The account-wide cosmetics ledger the buyer's host owns. Offline it is the Sim's own
+ *  accountCosmetics mirror; on the server it is the acting session's cosmetics (never the
+ *  realm-wide ctx.accountCosmetics, which no server ownership decision may read). */
+export interface GuildAccountPort {
+  ownsWeaponSkin(skinId: string): boolean;
+  /** Grant the skin to the account. Returns false when it could not be granted, in which case
+   *  the seals are kept. */
+  grantWeaponSkin(skinId: string): boolean;
+}
+
+/** The offline host's port: the Sim's own account cosmetics mirror (replaced whole, never
+ *  mutated in place, so consumers can diff by identity). The server never uses this: its
+ *  ctx.accountCosmetics is realm-wide, so server/quest_command_wire.ts hands in the session's. */
+export function localGuildAccountPort(ctx: SimContext): GuildAccountPort {
+  return {
+    ownsWeaponSkin: (skinId) => ctx.accountCosmetics.weaponSkinIds.includes(skinId),
+    grantWeaponSkin: (skinId) => {
+      const owned = ctx.accountCosmetics.weaponSkinIds;
+      if (!owned.includes(skinId))
+        ctx.accountCosmetics = { ...ctx.accountCosmetics, weaponSkinIds: [...owned, skinId] };
+      return true;
+    },
+  };
+}
 
 /** The quartermaster within reach of the player (alive, beside him, on his floor). */
 export function guildQuartermasterInRange(ctx: SimContext, player: Entity): boolean {
@@ -28,23 +68,60 @@ export function guildQuartermasterInRange(ctx: SimContext, player: Entity): bool
   return Math.abs(player.pos.y - npc.pos.y) <= 3;
 }
 
-export function buyGuildCosmetic(ctx: SimContext, offerId: string, pid?: number): void {
+/** The offer can be granted at all (its title, reins or skin exists in the catalogs). */
+function offerResolves(offer: GuildQuartermasterOffer): boolean {
+  switch (offer.kind) {
+    case 'title':
+      return Object.hasOwn(DEEDS, offer.deedId);
+    case 'mount': {
+      const def = Object.hasOwn(ITEMS, offer.itemId) ? ITEMS[offer.itemId] : undefined;
+      return def?.kind === 'mount';
+    }
+    case 'weaponSkin':
+      return Object.hasOwn(WEAPON_SKINS, offer.skinId);
+  }
+}
+
+/** Whether the buyer already has what the offer grants. */
+export function guildOfferOwned(
+  meta: PlayerMeta,
+  offer: GuildQuartermasterOffer,
+  account: GuildAccountPort,
+): boolean {
+  switch (offer.kind) {
+    case 'title':
+      return meta.deedsEarned.has(offer.deedId);
+    case 'mount': {
+      const def = ITEMS[offer.itemId];
+      return def?.kind === 'mount' && mountOwned(meta, def.mount);
+    }
+    case 'weaponSkin':
+      return account.ownsWeaponSkin(offer.skinId);
+  }
+}
+
+export function buyGuildCosmetic(
+  ctx: SimContext,
+  offerId: string,
+  pid: number | undefined,
+  account: GuildAccountPort = localGuildAccountPort(ctx),
+): void {
   const resolved = ctx.resolve(pid);
   if (!resolved) return;
   const { meta, e: player } = resolved;
   if (!Object.hasOwn(GUILD_QUARTERMASTER_STOCK_BY_ID, offerId)) return;
   const offer = GUILD_QUARTERMASTER_STOCK_BY_ID[offerId];
-  // never take the seals for a title the Book cannot grant
-  if (!Object.hasOwn(DEEDS, offer.deedId)) return;
+  // never take the seals for something the catalogs cannot grant
+  if (!offerResolves(offer)) return;
   if (player.dead) return;
-  const refuse = (reason: 'owned' | 'seals' | 'range'): void => {
+  const refuse = (reason: GuildCosmeticRefusal): void => {
     ctx.emit({ type: 'guildCosmeticRefused', offerId, reason, pid: meta.entityId });
   };
   if (!guildQuartermasterInRange(ctx, player)) {
     refuse('range');
     return;
   }
-  if (meta.deedsEarned.has(offer.deedId)) {
+  if (guildOfferOwned(meta, offer, account)) {
     refuse('owned');
     return;
   }
@@ -52,7 +129,37 @@ export function buyGuildCosmetic(ctx: SimContext, offerId: string, pid?: number)
     refuse('seals');
     return;
   }
-  if (!grantDeed(ctx, meta, offer.deedId)) return;
+  if (offer.kind === 'mount') {
+    // the stable's own gate (items.ts buyItem): reins are no use to a rider who cannot ride
+    if (!meta.ridingTrained) {
+      refuse('riding');
+      return;
+    }
+    if (!ctx.canAddItem(offer.itemId, 1, meta.entityId)) {
+      refuse('bags');
+      return;
+    }
+  }
+  if (!grantOffer(ctx, meta, offer, account)) return;
   ctx.removeItem(LANTERN_SEAL_ITEM_ID, offer.seals, meta.entityId);
   ctx.emit({ type: 'guildCosmeticBought', offerId, pid: meta.entityId });
+}
+
+function grantOffer(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  offer: GuildQuartermasterOffer,
+  account: GuildAccountPort,
+): boolean {
+  switch (offer.kind) {
+    case 'title':
+      return grantDeed(ctx, meta, offer.deedId);
+    case 'mount': {
+      const before = ctx.countItem(offer.itemId, meta.entityId);
+      ctx.addItem(offer.itemId, 1, meta.entityId);
+      return ctx.countItem(offer.itemId, meta.entityId) > before;
+    }
+    case 'weaponSkin':
+      return account.grantWeaponSkin(offer.skinId);
+  }
 }

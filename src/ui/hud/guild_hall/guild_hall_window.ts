@@ -14,10 +14,10 @@ import { t } from '../../i18n';
 import { svgIcon } from '../../ui_icons';
 import {
   buildGuildHallView,
-  GUILD_OFFER_DEED_IDS,
   type GuildContractCardView,
   type GuildHallTab,
   type GuildOfferRowView,
+  guildOfferOwnedFlags,
   guildResetText,
   lanternSeals,
 } from './guild_hall_view';
@@ -68,11 +68,11 @@ export class GuildHallWindow {
     this.openerFocus = null;
   }
 
-  // The repaint signature: the board and progress, the seals, the titles owned, the tab; the
+  // The repaint signature: the board and progress, the seals, the offers owned, the tab; the
   // countdown updates its own text on its minute cadence below, so it stays out of it.
   private sig(): string {
     const world = this.deps.world();
-    const owned = GUILD_OFFER_DEED_IDS.map((id) => world.deedsEarned.has(id));
+    const owned = guildOfferOwnedFlags(world);
     return JSON.stringify([
       world.guildContracts,
       lanternSeals(world.inventory),
@@ -209,7 +209,8 @@ export class GuildHallWindow {
   private offerHtml(row: GuildOfferRowView): string {
     const disabled = row.owned || !row.affordable;
     return (
-      `<section class="gh-offer${row.owned ? ' gh-offer-owned' : ''}" data-gh-offer="${esc(row.id)}">` +
+      `<section class="gh-offer${row.icon ? ' gh-offer-art' : ''}${row.owned ? ' gh-offer-owned' : ''}" data-gh-offer="${esc(row.id)}">` +
+      (row.icon ? `<img class="gh-offer-icon" src="${esc(row.icon)}" alt="" loading="lazy">` : '') +
       `<div class="gh-offer-text"><div class="gh-offer-title">${esc(row.title)}</div>` +
       `<div class="gh-offer-preview">${esc(row.preview)}</div></div>` +
       `<div class="gh-offer-price">${esc(row.price)}</div>` +

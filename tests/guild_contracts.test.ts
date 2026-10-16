@@ -262,9 +262,10 @@ describe('the Lantern Seal and the save shape', () => {
 });
 
 describe('the quartermaster', () => {
-  it('sells cosmetics only: every offer a zero-Renown title feat', () => {
-    expect(GUILD_QUARTERMASTER_STOCK.length).toBeGreaterThan(0);
-    for (const offer of GUILD_QUARTERMASTER_STOCK) {
+  it('sells cosmetics only: every title offer a zero-Renown title feat', () => {
+    const titles = GUILD_QUARTERMASTER_STOCK.filter((offer) => offer.kind === 'title');
+    expect(titles.length).toBeGreaterThan(0);
+    for (const offer of titles) {
       const deed = DEEDS[offer.deedId];
       expect(deed, offer.id).toBeDefined();
       expect(deed.feat, offer.id).toBe(true);
@@ -283,6 +284,7 @@ describe('the quartermaster', () => {
     const meta = s.players.get(pid);
     if (!meta) throw new Error('no meta');
     const offer = GUILD_QUARTERMASTER_STOCK[0];
+    if (offer.kind !== 'title') throw new Error('the first offer is a title');
     const reasons = (): string[] =>
       s
         .tick()
@@ -451,6 +453,7 @@ describe('the quartermaster at the edges', () => {
     const meta = s.players.get(pid);
     if (!meta) throw new Error('no meta');
     const offer = GUILD_QUARTERMASTER_STOCK[0];
+    if (offer.kind !== 'title') throw new Error('the first offer is a title');
     const npc = s.entities.get(HIGHWATCH_GUILD_ENTITY_IDS[GUILD_QUARTERMASTER_NPC_ID]);
     if (!npc) throw new Error('no quartermaster');
     s.ctx.addItem(LANTERN_SEAL_ITEM_ID, offer.seals, pid);

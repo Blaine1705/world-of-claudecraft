@@ -1605,6 +1605,57 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     ],
   },
 
+  // The Blade of Lantern Hall (the guild quartermaster's sword appearance): a fuller of
+  // banked lantern-fire up the steel and a caged lantern burning in the crossguard. Hotter
+  // and louder than the store's rare blades on purpose: it is the guild's showpiece, so the
+  // fire reads from across a courtyard. The window is narrowed to the bright, fully saturated
+  // amber the build paints for fire (scripts/assets/lantern_hall_steed/build_sword.py), so the
+  // deeper gilt of the guard and cheeks stays metal instead of glowing with it.
+  lantern_hall_sword: {
+    tier: 'rare',
+    name: 'Blade of Lantern Hall',
+    type: 'sword',
+    lore: 'Broad steel blade with a fuller of banked lantern-fire, gilt cheeks, a caged lantern burning in the crossguard.',
+    emissive: { minS: 0.8, minL: 0.5, intensity: 1.7, pulse: 0.28, pulseHz: 0.9 },
+    shell: { strength: 0.2 },
+    light: { at: { yF: 0.26 }, intensity: 5.5, distance: 6, flicker: 0.45, hz: 2.6 },
+    fx: [
+      // the lantern in the guard: a hot core that gutters like a wick
+      {
+        kind: 'coreSprite',
+        at: { yF: 0.26 },
+        size: 0.2,
+        color: EMBER.hot,
+        flare: 0.55,
+        hz: 2.2,
+        opacity: 0.6,
+      },
+      // embers lifting off the fuller and out of the cage
+      {
+        kind: 'drift',
+        line: [{ yF: 0.26 }, { yF: 0.88 }],
+        count: 22,
+        vel: [0, 0.22, 0],
+        spread: [0.07, 0.05, 0.06],
+        life: [1.4, 2.8],
+        size: [0.016, 0.036],
+        grow: 0.15,
+        swirl: 0.08,
+        colorA: EMBER.hot,
+        colorB: EMBER.coal,
+        opacity: 0.75,
+      },
+      {
+        kind: 'twinkles',
+        surface: { yMinF: 0.28, count: 24 },
+        size: [0.02, 0.045],
+        rate: [0.5, 1.2],
+        color: EMBER.hot,
+        star: false,
+      },
+    ],
+  },
+
   emberbite: {
     tier: 'rare',
     name: 'Emberbite',

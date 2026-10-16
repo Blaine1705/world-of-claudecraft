@@ -21200,6 +21200,17 @@
     background: var(--gh-card);
     border: 1px solid var(--gh-edge);
   }
+  /* the horse and the sword carry their art at the head of the row */
+  #guild-hall-window .gh-offer-art {
+    grid-template-columns: 48px minmax(0, 1fr) auto auto;
+  }
+  #guild-hall-window .gh-offer-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border: 1px solid var(--gh-edge);
+    border-radius: 4px;
+  }
   #guild-hall-window .gh-offer-title {
     font-size: 15px;
     font-weight: 600;
@@ -21237,6 +21248,12 @@
     }
     #guild-hall-window .gh-offer-price {
       grid-column: 1;
+    }
+    #guild-hall-window .gh-offer-art {
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+    }
+    #guild-hall-window .gh-offer-art .gh-offer-price {
+      grid-column: 2;
     }
   }
   /* Forced colors drop the selected tab's amber text and inset rule, so it keeps a

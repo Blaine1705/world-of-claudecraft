@@ -215,6 +215,7 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   whittler_s_knife: 'VAR_DAGGER',
   winterbite: 'VAR_BOW',
   cinderbrand: 'VAR_SWORD',
+  lantern_hall_sword: 'VAR_SWORD',
   emberbite: 'VAR_AXE',
   smoulderfall: 'VAR_HAMMER',
   ashspark_shiv: 'VAR_DAGGER',

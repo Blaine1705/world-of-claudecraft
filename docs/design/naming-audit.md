@@ -1028,6 +1028,9 @@ The guild hall at the old stable yard (`src/sim/content/highwatch_guild.ts`, the
 | Contract Clerk, Guild Quartermaster, Guild Recruiter, Guildmaster of Lantern Hall | the residents' titles | KEEP. Plain English job titles. |
 | Writ-Runner, Hallsworn | the quartermaster's two bought titles | KEEP. No game title or term of either name found. |
 | of Lantern Hall | the quartermaster's third title | KEEP. Built on the hall's own name above. "Lantern-Bearer" was considered and dropped: Pathfinder's Lantern Bearers are a named order of resurrected adventurers. |
+| Lantern Hall Destrier | the guild's war horse (a mount) | KEEP. No game mount or creature of that name found; built on the hall's own name and the plain English "destrier" (a historical war horse; Warhammer's "Destrier" is a knight war machine, not this phrase). |
+| Reins of the Lantern Hall Destrier | the horse's reins item | KEEP. The repo's own reins pattern (Reins of the Viridian Valestrider) around the name above. |
+| Blade of Lantern Hall | the guild's sword appearance | KEEP. No game weapon of that name found. "Lantern Sword" was considered and dropped: it is a Guild Wars 2 weapon skin; "Lanternblade" and "Lanternguard" were checked and carry no hit, but the hall's own name reads plainer. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 

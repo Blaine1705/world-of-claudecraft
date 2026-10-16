@@ -30,11 +30,19 @@ function board(done: string[] = []): GuildContractsView {
   };
 }
 
-function world(seals: number, owned: string[] = [], done: string[] = []) {
+function world(
+  seals: number,
+  owned: string[] = [],
+  done: string[] = [],
+  mounts: string[] = [],
+  skins: string[] = [],
+) {
   return {
     guildContracts: board(done),
     inventory: seals > 0 ? [{ itemId: LANTERN_SEAL_ITEM_ID, count: seals }] : [],
     deedsEarned: new Map(owned.map((id) => [id, '2026-10-16'])),
+    ownedMounts: () => mounts,
+    accountCosmetics: { weaponSkinIds: skins },
     weeklyQuestResetAtMs: Date.UTC(2026, 9, 20),
     player: { name: 'Wanderer' },
     buyGuildCosmetic: vi.fn(),
@@ -74,6 +82,7 @@ describe('the guild window view core', () => {
 
   it("prices the quartermaster's titles against the seals in the bags, owned ones marked", () => {
     const [first, second] = GUILD_QUARTERMASTER_STOCK;
+    if (first.kind !== 'title') throw new Error('the first offer is a title');
     const view = buildGuildHallView(world(first.seals + 1, [first.deedId]), 0, 'quartermaster');
     expect(view.seals).toBe(first.seals + 1);
     expect(view.sealsText).toBe(`Lantern Seals: ${first.seals + 1}`);
@@ -84,6 +93,48 @@ describe('the guild window view core', () => {
     expect(view.offers[0].title).toBe('Title: Writ-Runner');
     expect(view.offers[0].preview).toContain('Wanderer');
     expect(view.intro).toMatch(/Nothing here makes you stronger/);
+  });
+
+  it('shows the war horse and the sword with their art, speed and owned state', () => {
+    const horse = GUILD_QUARTERMASTER_STOCK.find((o) => o.id === 'mount_lantern_hall_destrier');
+    const sword = GUILD_QUARTERMASTER_STOCK.find((o) => o.id === 'weapon_skin_lantern_hall_sword');
+    if (!horse || !sword) throw new Error('the guild stocks its horse and sword');
+    const row = (v: ReturnType<typeof buildGuildHallView>, id: string) => {
+      const found = v.offers.find((o) => o.id === id);
+      if (!found) throw new Error(`no row ${id}`);
+      return found;
+    };
+    const poor = buildGuildHallView(world(sword.seals), 0, 'quartermaster');
+    expect(row(poor, horse.id)).toMatchObject({
+      kind: 'mount',
+      icon: '/ui/items/reins_lantern_hall_destrier.webp',
+      title: 'Mount: Lantern Hall Destrier',
+      preview: 'Ground mount: +70% movement speed while riding. Requires riding training.',
+      price: '40 Lantern Seals',
+      owned: false,
+      affordable: false,
+      action: `Needs ${horse.seals - sword.seals} more`,
+    });
+    expect(row(poor, sword.id)).toMatchObject({
+      kind: 'weaponSkin',
+      icon: '/ui/store/armory/lantern_hall_sword.webp',
+      title: 'Sword appearance: Blade of Lantern Hall',
+      price: '20 Lantern Seals',
+      owned: false,
+      affordable: true,
+      action: 'Buy',
+    });
+    expect(row(poor, sword.id).preview).toMatch(/Appearance only: no stats\.$/);
+    // owned reads the held mount and the account's skin ledger, not the Book of Deeds
+    const rich = buildGuildHallView(
+      world(99, [], [], ['lantern_hall_destrier'], ['lantern_hall_sword']),
+      0,
+      'quartermaster',
+    );
+    expect(row(rich, horse.id)).toMatchObject({ owned: true, action: 'Owned' });
+    expect(row(rich, sword.id)).toMatchObject({ owned: true, action: 'Owned' });
+    // titles carry no art
+    expect(row(rich, 'title_writ_runner').icon).toBeNull();
   });
 
   it('counts seals across stacks and reads the reset in days and hours', () => {
@@ -124,6 +175,11 @@ describe('the guild window painter', () => {
     const { root, win } = mount(w);
     win.open('quartermaster');
     expect(win.isOpen).toBe(true);
+    // the horse and the sword draw their art; a title draws none
+    expect(root.querySelectorAll('.gh-offer-icon').length).toBe(2);
+    expect(
+      root.querySelector('[data-gh-offer="mount_lantern_hall_destrier"] .gh-offer-icon'),
+    ).not.toBeNull();
     expect(root.style.display).toBe('flex');
     expect(root.querySelectorAll('[data-gh-offer]').length).toBe(GUILD_QUARTERMASTER_STOCK.length);
     const buy = root.querySelector<HTMLButtonElement>(
@@ -161,6 +217,23 @@ describe('the guild window painter', () => {
     expect(root.querySelectorAll('[data-gh-offer]').length).toBe(GUILD_QUARTERMASTER_STOCK.length);
     tab('quartermaster')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home' }));
     expect(document.activeElement).toBe(tab('contracts'));
+  });
+
+  it('repaints when a horse or sword becomes owned', () => {
+    const owned: string[] = [];
+    const w = { ...world(99), ownedMounts: () => owned };
+    const { root, win } = mount(w as ReturnType<typeof world>);
+    win.open('quartermaster');
+    root.querySelector('.gh-offers')?.setAttribute('data-probe', '1');
+    win.refreshIfChanged();
+    expect(root.querySelector('.gh-offers')?.getAttribute('data-probe')).toBe('1');
+    owned.push('lantern_hall_destrier');
+    win.refreshIfChanged();
+    expect(root.querySelector('.gh-offers')?.getAttribute('data-probe')).toBeNull();
+    expect(
+      root.querySelector<HTMLButtonElement>('[data-gh-buy="mount_lantern_hall_destrier"]')
+        ?.disabled,
+    ).toBe(true);
   });
 
   it('repaints only when its signature moves', () => {
@@ -211,11 +284,21 @@ describe("routing the guild's events", () => {
       true,
     );
     expect(h.log.mock.calls[1][0]).toMatch(/Writ-Runner/);
+    send({ type: 'guildCosmeticBought', offerId: 'mount_lantern_hall_destrier' });
+    expect(h.log.mock.calls[2][0]).toBe(
+      'You bought the Lantern Hall Destrier. Its reins are in your bags.',
+    );
+    send({ type: 'guildCosmeticBought', offerId: 'weapon_skin_lantern_hall_sword' });
+    expect(h.log.mock.calls[3][0]).toBe(
+      'You bought the Blade of Lantern Hall appearance. Apply it from the Cosmetics window.',
+    );
     // every refusal reason resolves to its own English line, never a raw key
     for (const [reason, line] of [
       ['seals', 'You do not have enough Lantern Seals.'],
       ['owned', 'You already own that.'],
       ['range', 'Stand at the quartermaster to trade.'],
+      ['riding', 'Learn to ride before you buy a mount.'],
+      ['bags', 'Your bags are full.'],
     ]) {
       expect(send({ type: 'guildCosmeticRefused', offerId: 'x', reason })).toBe(true);
       expect(h.showError).toHaveBeenLastCalledWith(line);

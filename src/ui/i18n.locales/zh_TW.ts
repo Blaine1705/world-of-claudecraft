@@ -78,6 +78,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipRequired': '會員到期後，護甲屬性和套裝加成會停用，續訂後恢復。',
   'itemUi.tooltip.membershipDormant': '未啟用：續訂會員以恢復護甲屬性和套裝加成。',
   'entities.items.lantern_seal.name': '燈火印章',
+  'entities.items.reins_lantern_hall_destrier.name': '燈火大廳戰馬的韁繩',
   'entities.items.membership_token.name': '會員代幣（30天）',
   'entities.items.membership_helmet.name': '會員頭盔',
   'entities.items.membership_shoulder.name': '會員肩甲',
@@ -432,6 +433,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至尊激流裹手',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '在埋藏寶藏的獎勵寶箱中找到，即藏寶圖所指引的寶庫',
+  'hudChrome.reliquary.sourceActivityLanternHall': '在燈火大廳的軍需官處用燈火印章購買',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '風從東邊的沙丘吹來，帶著灰燼，而空蕩蕩的沙地不會吹出灰燼。駐軍倉庫的塞拉記著每一次巡邏。只要有人給她帶點吃的，她就會開口。',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -2200,6 +2202,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': '餘燼鍛造',
   'hudChrome.wocStore.collections.hoarfrost': '白霜',
   'hudChrome.wocStore.collections.fallen_star': '隕星',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    '加里克·霍爾特不會把這把劍賣給陌生人。他只把它交給一週又一週履行燈火大廳契約的成員，每次都說同樣的話：護手裡的燈火取自大廳自己的爐膛，所以無論你把它帶到哪裡，大廳都與你同在。血槽裡的火只是外觀。重要的是承諾。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    '寬闊的鋼製劍身，血槽中燃著燈火，鍍金的護頰，護手中燃著一盞籠中提燈，藍色皮革劍柄。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': '燈火大廳之劍',
+  'hudChrome.wocStore.collections.lantern_hall': '燈火大廳',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '公會印記武裝劍',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '發藍鋼劍刃、青銅魚尾形十字護手、青綠色染皮握柄，以及一枚小巧的公會鋼印。',
@@ -13127,6 +13135,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_drakemaw_raptor': '龍喉迅猛龍',
   'hudChrome.mounts.name_avian_strider': '蒼翠谷行者',
   'hudChrome.mounts.name_lanternback_troll': '提燈背者格倫博',
+  'hudChrome.mounts.name_lantern_hall_destrier': '燈火大廳戰馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。',
@@ -13137,6 +13146,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '高大的坐騎巨鳥，粗壯的利爪與收攏的雙翼讓每一段旅程都化作雷鳴般的疾馳。',
   'hudChrome.mounts.desc_lanternback_troll':
     '被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    '燈火大廳的戰馬，在公會的藍色披布下披掛橡木與鐵製馬鎧，鞍邊搖曳的兩盞風燈照亮歸途。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',
@@ -20634,7 +20645,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.lifetime': '已完成契約：{count}',
   'hudChrome.guildHall.emptyBoard': '告示板正在重寫。請在每週重置後再來。',
   'hudChrome.guildHall.quartermasterIntro':
-    '加里克只用燈火印章換取榮譽：可在功績之書中佩戴的頭銜。這裡沒有任何東西能讓你變得更強。',
+    '加里克只用燈火印章換取榮譽：可在功績之書中佩戴的頭銜、公會之劍的外觀和公會的戰馬。這裡沒有任何東西能讓你在戰鬥中變得更強。',
   'hudChrome.guildHall.titleOffer': '頭銜：{title}',
   'hudChrome.guildHall.titlePreview': '顯示為{preview}',
   'hudChrome.guildHall.buy': '購買',
@@ -20643,6 +20654,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.bought': '你購買了頭銜{title}。請在功績之書中選擇它。',
   'hudChrome.guildHall.refused.owned': '你已經擁有它了。',
   'hudChrome.guildHall.refused.seals': '你的燈火印章不足。',
+  'hudChrome.guildHall.refused.bags': '你的背包已滿。',
+  'hudChrome.guildHall.refused.riding': '先學會騎術，再購買坐騎。',
+  'hudChrome.guildHall.boughtSkin': '你購買了外觀{skin}。請在外觀視窗中套用它。',
+  'hudChrome.guildHall.boughtMount': '你購買了{mount}。它的韁繩在你的背包裡。',
+  'hudChrome.guildHall.skinPreview':
+    '改變你所裝備的劍的樣子，適用於帳號中的所有角色。僅為外觀：沒有屬性。',
+  'hudChrome.guildHall.skinOffer': '劍的外觀：{skin}',
+  'hudChrome.guildHall.mountPreview': '地面坐騎：騎乘時移動速度+{pct}%。需要騎術訓練。',
+  'hudChrome.guildHall.mountOffer': '坐騎：{mount}',
   'hudChrome.guildHall.refused.range': '站到軍需官身邊才能交易。',
   'hudChrome.guildHall.reward.one': '{count}枚燈火印章',
   'hudChrome.guildHall.reward.few': '{count}枚燈火印章',

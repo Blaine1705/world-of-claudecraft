@@ -679,17 +679,25 @@ export const zh_TW: EnTranslations = {
       "open": "進行中",
       "lifetime": "已完成契約：{count}",
       "emptyBoard": "告示板正在重寫。請在每週重置後再來。",
-      "quartermasterIntro": "加里克只用燈火印章換取榮譽：可在功績之書中佩戴的頭銜。這裡沒有任何東西能讓你變得更強。",
+      "quartermasterIntro": "加里克只用燈火印章換取榮譽：可在功績之書中佩戴的頭銜、公會之劍的外觀和公會的戰馬。這裡沒有任何東西能讓你在戰鬥中變得更強。",
       "titleOffer": "頭銜：{title}",
       "titlePreview": "顯示為{preview}",
+      "mountOffer": "坐騎：{mount}",
+      "mountPreview": "地面坐騎：騎乘時移動速度+{pct}%。需要騎術訓練。",
+      "skinOffer": "劍的外觀：{skin}",
+      "skinPreview": "改變你所裝備的劍的樣子，適用於帳號中的所有角色。僅為外觀：沒有屬性。",
       "buy": "購買",
       "owned": "已擁有",
       "needSeals": "還需{count}枚",
       "bought": "你購買了頭銜{title}。請在功績之書中選擇它。",
+      "boughtMount": "你購買了{mount}。它的韁繩在你的背包裡。",
+      "boughtSkin": "你購買了外觀{skin}。請在外觀視窗中套用它。",
       "refused": {
         "owned": "你已經擁有它了。",
         "seals": "你的燈火印章不足。",
-        "range": "站到軍需官身邊才能交易。"
+        "range": "站到軍需官身邊才能交易。",
+        "riding": "先學會騎術，再購買坐騎。",
+        "bags": "你的背包已滿。"
       },
       "contractDone": {
         "one": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
@@ -1151,9 +1159,15 @@ export const zh_TW: EnTranslations = {
         "guildmark": "公會印記",
         "emberwrought": "餘燼鍛造",
         "hoarfrost": "白霜",
-        "fallen_star": "隕星"
+        "fallen_star": "隕星",
+        "lantern_hall": "燈火大廳"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "燈火大廳之劍",
+          "look": "寬闊的鋼製劍身，血槽中燃著燈火，鍍金的護頰，護手中燃著一盞籠中提燈，藍色皮革劍柄。",
+          "lore": "加里克·霍爾特不會把這把劍賣給陌生人。他只把它交給一週又一週履行燈火大廳契約的成員，每次都說同樣的話：護手裡的燈火取自大廳自己的爐膛，所以無論你把它帶到哪裡，大廳都與你同在。血槽裡的火只是外觀。重要的是承諾。"
+        },
         "guildmark_arming_sword": {
           "name": "公會印記武裝劍",
           "look": "發藍鋼劍刃、青銅魚尾形十字護手、青綠色染皮握柄，以及一枚小巧的公會鋼印。",
@@ -2276,6 +2290,7 @@ export const zh_TW: EnTranslations = {
       "name_avian_strider": "蒼翠谷行者",
       "name_mech_bird": "發條機械鳥",
       "name_lanternback_troll": "提燈背者格倫博",
+      "name_lantern_hall_destrier": "燈火大廳戰馬",
       "name_chimeglass_tortoise": "鐘晶的托利弗",
       "name_rickshaw_mount": "白骨人力車",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
@@ -2295,6 +2310,7 @@ export const zh_TW: EnTranslations = {
       "desc_avian_strider": "高大的坐騎巨鳥，粗壯的利爪與收攏的雙翼讓每一段旅程都化作雷鳴般的疾馳。",
       "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。",
       "desc_lanternback_troll": "被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。",
+      "desc_lantern_hall_destrier": "燈火大廳的戰馬，在公會的藍色披布下披掛橡木與鐵製馬鎧，鞍邊搖曳的兩盞風燈照亮歸途。",
       "desc_chimeglass_tortoise": "鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。",
       "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。"
     },
@@ -6927,6 +6943,7 @@ export const zh_TW: EnTranslations = {
       "sourceActivityMasterworkCraft": "製作傑作時獲得",
       "sourceActivityRiftFirstClear": "授予率先通關分級裂隙的隊伍全體成員",
       "sourceActivityBuriedHoard": "在埋藏寶藏的獎勵寶箱中找到，即藏寶圖所指引的寶庫",
+      "sourceActivityLanternHall": "在燈火大廳的軍需官處用燈火印章購買",
       "cellMissingSourceAria": "{name}，尚未獲得，{source}",
       "cellOwnedClearsAria": "{name}，已收錄，首次獲得於第 {count} 次通關",
       "searchPlaceholder": "搜尋聖物",
@@ -23442,6 +23459,9 @@ export const zh_TW: EnTranslations = {
       },
       "lantern_seal": {
         "name": "燈火印章"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "燈火大廳戰馬的韁繩"
       },
       "wyrmfall_core": {
         "name": "墜龍核心"

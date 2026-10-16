@@ -86,6 +86,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipDormant':
     '無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。',
   'entities.items.lantern_seal.name': '燈火の印章',
+  'entities.items.reins_lantern_hall_destrier.name': '燈火の館の軍馬の手綱',
   'entities.items.membership_token.name': 'メンバーシップトークン（30日）',
   'entities.items.membership_helmet.name': 'メンバーシップの兜',
   'entities.items.membership_shoulder.name': 'メンバーシップの肩当て',
@@ -444,6 +445,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至高の離岸流の手巻き',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '宝の地図が導く「埋もれた財宝」の報酬の宝箱から手に入る',
+  'hudChrome.reliquary.sourceActivityLanternHall': '燈火の館の補給係から燈火の印章で購入',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '風は東の砂丘から灰を運んできた。何もない砂から灰は飛んでこない。駐屯地の倉庫のセラが巡回をすべて記録している。誰かが食べ物を持っていけば話してくれるだろう。',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -2198,6 +2200,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': '残り火鍛造',
   'hudChrome.wocStore.collections.hoarfrost': '白霜',
   'hudChrome.wocStore.collections.fallen_star': '墜星',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    'ギャリック・ホルトはこの剣を見知らぬ者には売らない。週ごとに燈火の館の契約を果たしてきた者にだけ渡し、そのたびに同じ言葉を添える。鍔のランタンは館の炉から灯したもの、どこへ持って行こうと館が共にある、と。樋の炎は見た目にすぎない。大切なのは約束だ。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    '樋に灯火の炎を宿した幅広の鋼の刃、金の鍔飾り、鍔に灯る籠入りのランタン、青い革の柄。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': '燈火の館の剣',
+  'hudChrome.wocStore.collections.lantern_hall': '燈火の館',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'ギルドマーク・アーミングソード',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '青焼き鋼の刀身、青銅の魚尾型クロスガード、青緑に染めた革巻きの柄、小さく刻印されたギルドの紋章。',
@@ -13768,6 +13776,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
   'hudChrome.mounts.name_avian_strider': 'ヴィリジアン・ヴェイルストライダー',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
+  'hudChrome.mounts.name_lantern_hall_destrier': '燈火の館の軍馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
@@ -13778,6 +13787,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。',
   'hudChrome.mounts.desc_lanternback_troll':
     '点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    '燈火の館の軍馬。ギルドの青の下に樫と鉄の馬鎧をまとい、鞍から揺れる二つの嵐灯が帰り道を照らす。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
@@ -21673,7 +21684,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.lifetime': '達成した契約：{count}',
   'hudChrome.guildHall.emptyBoard': '掲示板は書き換え中だ。週次リセットの後にまた来てほしい。',
   'hudChrome.guildHall.quartermasterIntro':
-    'ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号だ。ここにあなたを強くするものは何もない。',
+    'ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの剣の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。',
   'hudChrome.guildHall.titleOffer': '称号：{title}',
   'hudChrome.guildHall.titlePreview': '表示：{preview}',
   'hudChrome.guildHall.buy': '購入',
@@ -21682,6 +21693,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.bought': '称号「{title}」を購入した。功績の書で選択できる。',
   'hudChrome.guildHall.refused.owned': 'それはすでに所持している。',
   'hudChrome.guildHall.refused.seals': '燈火の印章が足りない。',
+  'hudChrome.guildHall.refused.bags': 'バッグがいっぱいだ。',
+  'hudChrome.guildHall.refused.riding': 'マウントを買う前に騎乗を学ぶこと。',
+  'hudChrome.guildHall.boughtSkin':
+    '外見「{skin}」を購入した。コスメティックのウィンドウから適用できる。',
+  'hudChrome.guildHall.boughtMount': '{mount}を購入した。手綱はバッグの中にある。',
+  'hudChrome.guildHall.skinPreview':
+    '装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。',
+  'hudChrome.guildHall.skinOffer': '剣の外見：{skin}',
+  'hudChrome.guildHall.mountPreview': '地上マウント：騎乗中の移動速度+{pct}%。騎乗訓練が必要。',
+  'hudChrome.guildHall.mountOffer': 'マウント：{mount}',
   'hudChrome.guildHall.refused.range': '取引するには補給係のそばに立つこと。',
   'hudChrome.guildHall.reward.one': '燈火の印章{count}個',
   'hudChrome.guildHall.reward.few': '燈火の印章{count}個',

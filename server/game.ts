@@ -6190,7 +6190,7 @@ export class GameServer {
     // The world-quest-only family (puzzles, minigames, cloak, accusations,
     // explicit-difficulty starts) is owned by server/quest_command_wire.ts.
     if (questWire.isWorldQuestWireCommand(command))
-      return void questWire.dispatchWorldQuestWire(sim, msg, pid);
+      return void questWire.dispatchWorldQuestWire(sim, msg, pid, this.cosmetics.ledger(session));
     switch (command) {
       case 'courier_dispatch':
         courierWire.dispatchCourierCommand(sim, msg, pid);

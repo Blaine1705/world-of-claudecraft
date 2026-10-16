@@ -1,22 +1,30 @@
 // Pure view core for Lantern Hall's guild window: the week's three contract cards, the
 // quartermaster's rows, the seal count and the reset countdown. DOM-free; the painter
 // (guild_hall_window.ts) renders exactly what this shapes. Reads the world only through the
-// IWorld members it names (guildContracts, inventory, deedsEarned, the weekly reset, the
-// player's name), so a test drives it with a plain object.
+// IWorld members it names (guildContracts, inventory, deedsEarned, ownedMounts, the account's
+// weapon skins, the weekly reset, the player's name), so a test drives it with a plain object.
 
 import {
   GUILD_CONTRACTS_BY_ID,
   GUILD_QUARTERMASTER_STOCK,
   type GuildContractDef,
   type GuildContractKind,
+  type GuildQuartermasterOffer,
   LANTERN_SEAL_ITEM_ID,
 } from '../../../sim/content/guild_contracts';
+import { mountDef } from '../../../sim/content/mounts';
+import { WEAPON_SKINS } from '../../../sim/content/weapon_skins';
+import { ITEMS } from '../../../sim/data';
 import type { GuildContractsView } from '../../../sim/guild_contracts';
 import type { InvSlot } from '../../../sim/types';
+import { localizeWeaponSkin } from '../../armory_labels';
 import { deedDesc, deedName, deedTitleText, titledDisplayName } from '../../deed_i18n';
 import { mobDisplayName } from '../../entity_display_core';
 import { dungeonDisplayName } from '../../entity_i18n';
 import { formatList, formatNumber, t, tPlural } from '../../i18n';
+import { itemImageUrl } from '../../icons';
+import { mountDisplayName } from '../../mount_labels';
+import { armorySkinArt } from '../../woc_store_view';
 
 export type GuildHallTab = 'contracts' | 'quartermaster';
 
@@ -24,6 +32,8 @@ export interface GuildHallWorld {
   readonly guildContracts: GuildContractsView;
   readonly inventory: readonly InvSlot[];
   readonly deedsEarned: ReadonlyMap<string, string>;
+  ownedMounts(): readonly string[];
+  readonly accountCosmetics: { readonly weaponSkinIds: readonly string[] };
   readonly weeklyQuestResetAtMs: number;
   readonly player: { readonly name: string };
 }
@@ -43,6 +53,9 @@ export interface GuildContractCardView {
 
 export interface GuildOfferRowView {
   id: string;
+  kind: GuildQuartermasterOffer['kind'];
+  /** The reward's art (the reins icon, the Armory card), or null for a title. */
+  icon: string | null;
   title: string;
   preview: string;
   price: string;
@@ -129,10 +142,68 @@ export function guildContractLabel(contractId: string): string {
   });
 }
 
-/** The deed ids the quartermaster sells, for the window's repaint signature. */
-export const GUILD_OFFER_DEED_IDS: readonly string[] = GUILD_QUARTERMASTER_STOCK.map(
-  (offer) => offer.deedId,
-);
+/** The catalog mount a reins offer carries ('' when the item is not reins). */
+function offerMountKey(itemId: string): string {
+  const def = ITEMS[itemId];
+  return def?.kind === 'mount' ? def.mount : '';
+}
+
+/** Whether the player already has what an offer grants (the sim's own test, read through the
+ *  world: the earned deed, a held mount, the account's skin ledger). */
+export function guildOfferOwnedInWorld(
+  world: GuildHallWorld,
+  offer: GuildQuartermasterOffer,
+): boolean {
+  switch (offer.kind) {
+    case 'title':
+      return world.deedsEarned.has(offer.deedId);
+    case 'mount':
+      return world.ownedMounts().includes(offerMountKey(offer.itemId));
+    case 'weaponSkin':
+      return world.accountCosmetics.weaponSkinIds.includes(offer.skinId);
+  }
+}
+
+/** Every offer's owned flag, in stock order, for the window's repaint signature. */
+export function guildOfferOwnedFlags(world: GuildHallWorld): boolean[] {
+  return GUILD_QUARTERMASTER_STOCK.map((offer) => guildOfferOwnedInWorld(world, offer));
+}
+
+/** The reward's art, name and one-line description for an offer row. */
+function offerText(
+  world: GuildHallWorld,
+  offer: GuildQuartermasterOffer,
+): { icon: string | null; title: string; preview: string } {
+  switch (offer.kind) {
+    case 'title':
+      return {
+        icon: null,
+        title: t('hudChrome.guildHall.titleOffer', { title: deedTitleText(offer.deedId) }),
+        preview: t('hudChrome.guildHall.titlePreview', {
+          preview: titledDisplayName(world.player.name, offer.deedId),
+        }),
+      };
+    case 'mount': {
+      const key = offerMountKey(offer.itemId);
+      const pct = Math.round((mountDef(key)?.moveSpeedPct ?? 0) * 100);
+      return {
+        icon: itemImageUrl(offer.itemId),
+        title: t('hudChrome.guildHall.mountOffer', { mount: mountDisplayName(key) }),
+        preview: t('hudChrome.guildHall.mountPreview', { pct: whole(pct) }),
+      };
+    }
+    case 'weaponSkin': {
+      const skin = WEAPON_SKINS[offer.skinId];
+      return {
+        icon: armorySkinArt(offer.skinId),
+        title: t('hudChrome.guildHall.skinOffer', {
+          skin: skin ? localizeWeaponSkin(skin).name : '',
+        }),
+        preview: t('hudChrome.guildHall.skinPreview'),
+      };
+    }
+  }
+}
 
 export function buildGuildHallView(
   world: GuildHallWorld,
@@ -146,15 +217,12 @@ export function buildGuildHallView(
     .filter((contract): contract is GuildContractDef => !!contract)
     .map((contract) => buildGuildContractCard(contract, board.done.includes(contract.id)));
   const offers = GUILD_QUARTERMASTER_STOCK.map((offer): GuildOfferRowView => {
-    const owned = world.deedsEarned.has(offer.deedId);
+    const owned = guildOfferOwnedInWorld(world, offer);
     const affordable = seals >= offer.seals;
-    const title = deedTitleText(offer.deedId);
     return {
       id: offer.id,
-      title: t('hudChrome.guildHall.titleOffer', { title }),
-      preview: t('hudChrome.guildHall.titlePreview', {
-        preview: titledDisplayName(world.player.name, offer.deedId),
-      }),
+      kind: offer.kind,
+      ...offerText(world, offer),
       price: sealCount(offer.seals),
       owned,
       affordable,

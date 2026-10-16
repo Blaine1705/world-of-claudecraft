@@ -679,17 +679,25 @@ export const zh_CN: EnTranslations = {
       "open": "进行中",
       "lifetime": "已完成契约：{count}",
       "emptyBoard": "告示板正在重写。请在每周重置后再来。",
-      "quartermasterIntro": "加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔。这里没有任何东西能让你变得更强。",
+      "quartermasterIntro": "加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔、公会之剑的外观和公会的战马。这里没有任何东西能让你在战斗中变得更强。",
       "titleOffer": "头衔：{title}",
       "titlePreview": "显示为{preview}",
+      "mountOffer": "坐骑：{mount}",
+      "mountPreview": "地面坐骑：骑乘时移动速度+{pct}%。需要骑术训练。",
+      "skinOffer": "剑的外观：{skin}",
+      "skinPreview": "改变你所装备的剑的样子，适用于账号中的所有角色。仅为外观：没有属性。",
       "buy": "购买",
       "owned": "已拥有",
       "needSeals": "还需{count}枚",
       "bought": "你购买了头衔{title}。请在功绩之书中选择它。",
+      "boughtMount": "你购买了{mount}。它的缰绳在你的背包里。",
+      "boughtSkin": "你购买了外观{skin}。请在外观窗口中应用它。",
       "refused": {
         "owned": "你已经拥有它了。",
         "seals": "你的灯火印章不足。",
-        "range": "站到军需官身边才能交易。"
+        "range": "站到军需官身边才能交易。",
+        "riding": "先学会骑术，再购买坐骑。",
+        "bags": "你的背包已满。"
       },
       "contractDone": {
         "one": "契约完成：{contract}。你获得了{count}枚灯火印章。",
@@ -1151,9 +1159,15 @@ export const zh_CN: EnTranslations = {
         "guildmark": "公会印记",
         "emberwrought": "余烬锻造",
         "hoarfrost": "白霜",
-        "fallen_star": "陨星"
+        "fallen_star": "陨星",
+        "lantern_hall": "灯火大厅"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "灯火大厅之剑",
+          "look": "宽阔的钢制剑身，血槽中燃着灯火，镀金的护颊，护手中燃着一盏笼中提灯，蓝色皮革剑柄。",
+          "lore": "加里克·霍尔特不会把这把剑卖给陌生人。他只把它交给一周又一周履行灯火大厅契约的成员，每次都说同样的话：护手里的灯火取自大厅自己的炉膛，所以无论你把它带到哪里，大厅都与你同在。血槽里的火只是外观。重要的是承诺。"
+        },
         "guildmark_arming_sword": {
           "name": "公会印记武装剑",
           "look": "发蓝钢剑刃、青铜鱼尾形十字护手、青绿色染皮握柄，以及一枚小巧的公会钢印。",
@@ -2276,6 +2290,7 @@ export const zh_CN: EnTranslations = {
       "name_avian_strider": "苍翠谷行者",
       "name_mech_bird": "发条机械鸟",
       "name_lanternback_troll": "提灯背者格伦博",
+      "name_lantern_hall_destrier": "灯火大厅战马",
       "name_chimeglass_tortoise": "钟晶的托利弗",
       "name_rickshaw_mount": "白骨人力车",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
@@ -2295,6 +2310,7 @@ export const zh_CN: EnTranslations = {
       "desc_avian_strider": "高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。",
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
       "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
+      "desc_lantern_hall_destrier": "灯火大厅的战马，在公会的蓝色披布下披挂橡木与铁制马铠，鞍边摇曳的两盏风灯照亮归途。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
       "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。"
     },
@@ -6927,6 +6943,7 @@ export const zh_CN: EnTranslations = {
       "sourceActivityMasterworkCraft": "制作杰作时获得",
       "sourceActivityRiftFirstClear": "授予率先通关分级裂隙的队伍全体成员",
       "sourceActivityBuriedHoard": "在埋藏宝藏的奖励宝箱中找到，即藏宝图所指引的宝库",
+      "sourceActivityLanternHall": "在灯火大厅的军需官处用灯火印章购买",
       "cellMissingSourceAria": "{name}，尚未获得，{source}",
       "cellOwnedClearsAria": "{name}，已收录，首次获得于第 {count} 次通关",
       "searchPlaceholder": "搜索圣物",
@@ -23442,6 +23459,9 @@ export const zh_CN: EnTranslations = {
       },
       "lantern_seal": {
         "name": "灯火印章"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "灯火大厅战马的缰绳"
       },
       "wyrmfall_core": {
         "name": "坠龙核心"

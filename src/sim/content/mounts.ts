@@ -24,7 +24,8 @@ export type MountKey =
   | 'drakemaw_raptor'
   | 'avian_strider'
   | 'lanternback_troll'
-  | 'terrorspark_groundshaker';
+  | 'terrorspark_groundshaker'
+  | 'lantern_hall_destrier';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -66,6 +67,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   shadowjump_toad: {
     key: 'shadowjump_toad',
     name: 'Kama-Kage the Shadow-Jump Toad',
+    rarity: 'uncommon',
+    moveSpeedPct: 0.7,
+  },
+  // Lantern Hall's war horse, bought from the guild quartermaster for Lantern Seals
+  // (content/guild_contracts.ts). An earned special from five-player dungeon contracts, so it
+  // sits in the five-man heroic drops' tier. PROVISIONAL tier, Jose to confirm.
+  lantern_hall_destrier: {
+    key: 'lantern_hall_destrier',
+    name: 'Lantern Hall Destrier',
     rarity: 'uncommon',
     moveSpeedPct: 0.7,
   },

@@ -86,6 +86,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipDormant':
     '비활성: 멤버십을 갱신하면 방어구 능력치와 세트 효과가 복구됩니다.',
   'entities.items.lantern_seal.name': '등불 인장',
+  'entities.items.reins_lantern_hall_destrier.name': '등불 회관 군마의 고삐',
   'entities.items.membership_token.name': '멤버십 토큰 (30일)',
   'entities.items.membership_helmet.name': '멤버십 투구',
   'entities.items.membership_shoulder.name': '멤버십 견갑',
@@ -445,6 +446,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '지존의 이안류 손싸개',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '보물 지도가 이끄는 묻힌 보물의 보상 상자에서 획득',
+  'hudChrome.reliquary.sourceActivityLanternHall': '등불 회관 보급관에게서 등불 인장으로 구매',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '바람이 동쪽 모래언덕에서 재를 싣고 왔어. 텅 빈 모래에서는 재가 날아오지 않아. 주둔지 창고지기가 순찰을 전부 기록해 두지. 누가 먹을 걸 가져다주면 입을 열 거야.',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -2197,6 +2199,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': '엠버로트',
   'hudChrome.wocStore.collections.hoarfrost': '백상',
   'hudChrome.wocStore.collections.fallen_star': '추락한 별',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    '개릭 홀트는 이 검을 낯선 이에게 팔지 않는다. 매주 등불 회관의 계약을 지켜 온 회원에게만 건네며, 그때마다 같은 말을 덧붙인다. 코등이의 등불은 회관의 화로에서 옮겨 붙인 불이니, 어디로 가져가든 회관이 함께한다고. 홈 속의 불은 겉모습일 뿐이다. 중요한 것은 약속이다.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    '홈에 등불의 불길을 담은 넓은 강철 검날, 금박 장식, 코등이에서 타오르는 새장 등불, 푸른 가죽 손잡이.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': '등불 회관의 검',
+  'hudChrome.wocStore.collections.lantern_hall': '등불 회관',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '길드마크 무장검',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '푸르게 처리한 강철 칼날, 청동 물고기 꼬리형 십자 가드, 청록색으로 염색한 가죽 손잡이, 작게 찍힌 길드 문장.',
@@ -13730,6 +13738,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_drakemaw_raptor': '화산구 랩터',
   'hudChrome.mounts.name_avian_strider': '비리디안 베일스트라이더',
   'hudChrome.mounts.name_lanternback_troll': '등불지기 그룸볼',
+  'hudChrome.mounts.name_lantern_hall_destrier': '등불 회관 군마',
   'hudChrome.mounts.name_chimeglass_tortoise': '종유리의 톨리버',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
@@ -13740,6 +13749,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '우뚝 솟은 탈것 조류로, 육중한 발톱과 접은 날개가 모든 여정을 천둥 같은 질주로 바꾼다.',
   'hudChrome.mounts.desc_lanternback_troll':
     '점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    '등불 회관의 군마. 길드의 푸른 천 아래 참나무와 쇠로 된 마갑을 두르고, 안장에서 흔들리는 두 개의 폭풍 등불이 귀갓길을 밝힌다.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
@@ -21669,7 +21680,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.lifetime': '완료한 계약: {count}',
   'hudChrome.guildHall.emptyBoard': '게시판을 새로 쓰는 중입니다. 주간 초기화 후에 다시 오세요.',
   'hudChrome.guildHall.quartermasterIntro':
-    '개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호입니다. 여기서 당신을 더 강하게 만드는 것은 없습니다.',
+    '개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호, 길드의 검 외형, 그리고 길드의 군마입니다. 여기서 전투에서 당신을 더 강하게 만드는 것은 없습니다.',
   'hudChrome.guildHall.titleOffer': '칭호: {title}',
   'hudChrome.guildHall.titlePreview': '표시: {preview}',
   'hudChrome.guildHall.buy': '구매',
@@ -21678,6 +21689,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.bought': '칭호 {title}을(를) 구매했습니다. 위업의 책에서 선택하세요.',
   'hudChrome.guildHall.refused.owned': '이미 보유하고 있습니다.',
   'hudChrome.guildHall.refused.seals': '등불 인장이 부족합니다.',
+  'hudChrome.guildHall.refused.bags': '가방이 가득 찼습니다.',
+  'hudChrome.guildHall.refused.riding': '탈것을 사기 전에 승마를 배우세요.',
+  'hudChrome.guildHall.boughtSkin': '{skin} 외형을 구매했습니다. 외형 창에서 적용하세요.',
+  'hudChrome.guildHall.boughtMount': '{mount}을(를) 구매했습니다. 고삐가 가방에 있습니다.',
+  'hudChrome.guildHall.skinPreview':
+    '장착한 검의 모습을 바꿉니다. 계정의 모든 캐릭터에 적용됩니다. 외형 전용: 능력치 없음.',
+  'hudChrome.guildHall.skinOffer': '검 외형: {skin}',
+  'hudChrome.guildHall.mountPreview':
+    '지상 탈것: 탑승 중 이동 속도 +{pct}%. 탈것 훈련이 필요합니다.',
+  'hudChrome.guildHall.mountOffer': '탈것: {mount}',
   'hudChrome.guildHall.refused.range': '거래하려면 보급관 곁에 서세요.',
   'hudChrome.guildHall.reward.one': '등불 인장 {count}개',
   'hudChrome.guildHall.reward.few': '등불 인장 {count}개',

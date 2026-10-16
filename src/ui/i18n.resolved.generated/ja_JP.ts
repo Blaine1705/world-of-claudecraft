@@ -679,17 +679,25 @@ export const ja_JP: EnTranslations = {
       "open": "未達成",
       "lifetime": "達成した契約：{count}",
       "emptyBoard": "掲示板は書き換え中だ。週次リセットの後にまた来てほしい。",
-      "quartermasterIntro": "ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号だ。ここにあなたを強くするものは何もない。",
+      "quartermasterIntro": "ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの剣の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。",
       "titleOffer": "称号：{title}",
       "titlePreview": "表示：{preview}",
+      "mountOffer": "マウント：{mount}",
+      "mountPreview": "地上マウント：騎乗中の移動速度+{pct}%。騎乗訓練が必要。",
+      "skinOffer": "剣の外見：{skin}",
+      "skinPreview": "装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。",
       "buy": "購入",
       "owned": "所持済み",
       "needSeals": "あと{count}個必要",
       "bought": "称号「{title}」を購入した。功績の書で選択できる。",
+      "boughtMount": "{mount}を購入した。手綱はバッグの中にある。",
+      "boughtSkin": "外見「{skin}」を購入した。コスメティックのウィンドウから適用できる。",
       "refused": {
         "owned": "それはすでに所持している。",
         "seals": "燈火の印章が足りない。",
-        "range": "取引するには補給係のそばに立つこと。"
+        "range": "取引するには補給係のそばに立つこと。",
+        "riding": "マウントを買う前に騎乗を学ぶこと。",
+        "bags": "バッグがいっぱいだ。"
       },
       "contractDone": {
         "one": "契約達成：{contract}。燈火の印章を{count}個受け取った。",
@@ -1151,9 +1159,15 @@ export const ja_JP: EnTranslations = {
         "guildmark": "ギルドマーク",
         "emberwrought": "残り火鍛造",
         "hoarfrost": "白霜",
-        "fallen_star": "墜星"
+        "fallen_star": "墜星",
+        "lantern_hall": "燈火の館"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "燈火の館の剣",
+          "look": "樋に灯火の炎を宿した幅広の鋼の刃、金の鍔飾り、鍔に灯る籠入りのランタン、青い革の柄。",
+          "lore": "ギャリック・ホルトはこの剣を見知らぬ者には売らない。週ごとに燈火の館の契約を果たしてきた者にだけ渡し、そのたびに同じ言葉を添える。鍔のランタンは館の炉から灯したもの、どこへ持って行こうと館が共にある、と。樋の炎は見た目にすぎない。大切なのは約束だ。"
+        },
         "guildmark_arming_sword": {
           "name": "ギルドマーク・アーミングソード",
           "look": "青焼き鋼の刀身、青銅の魚尾型クロスガード、青緑に染めた革巻きの柄、小さく刻印されたギルドの紋章。",
@@ -2276,6 +2290,7 @@ export const ja_JP: EnTranslations = {
       "name_avian_strider": "ヴィリジアン・ヴェイルストライダー",
       "name_mech_bird": "ゼンマイ・メカバード",
       "name_lanternback_troll": "ランタンバックのグルンボル",
+      "name_lantern_hall_destrier": "燈火の館の軍馬",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
@@ -2295,6 +2310,7 @@ export const ja_JP: EnTranslations = {
       "desc_avian_strider": "巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。",
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
+      "desc_lantern_hall_destrier": "燈火の館の軍馬。ギルドの青の下に樫と鉄の馬鎧をまとい、鞍から揺れる二つの嵐灯が帰り道を照らす。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
     },
@@ -6927,6 +6943,7 @@ export const ja_JP: EnTranslations = {
       "sourceActivityMasterworkCraft": "傑作の製作で入手",
       "sourceActivityRiftFirstClear": "ランク付きリフトの初回クリアを制したパーティーの全員に授与",
       "sourceActivityBuriedHoard": "宝の地図が導く「埋もれた財宝」の報酬の宝箱から手に入る",
+      "sourceActivityLanternHall": "燈火の館の補給係から燈火の印章で購入",
       "cellMissingSourceAria": "{name}、未発見、{source}",
       "cellOwnedClearsAria": "{name}、収蔵済み、初回入手はクリア {count} 回目",
       "searchPlaceholder": "聖遺物を検索",
@@ -23442,6 +23459,9 @@ export const ja_JP: EnTranslations = {
       },
       "lantern_seal": {
         "name": "燈火の印章"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "燈火の館の軍馬の手綱"
       },
       "wyrmfall_core": {
         "name": "竜墜の核"
