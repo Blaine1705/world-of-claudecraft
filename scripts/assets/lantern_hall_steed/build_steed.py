@@ -600,10 +600,11 @@ def saddle():
         return (hit[0].x if hit else 0.3) + 0.075
 
     # The tread sits where the renderer's straddle (mount_visuals.ts, the destrier's `ride`)
-    # puts a rider's foot, measured in game off the seat bone: x 0.29, f 0.1, u 0.92.
+    # puts a rider's foot at the horse's shipped size (4.25), measured in game off the seat
+    # bone: the ball of the foot at x 0.33, f 0.11, u 0.88.
     for sgn in (1, -1):
         top = L(sgn * flank_x(1.1), SADDLE_F + 0.04, 1.1)
-        bot = L(sgn * 0.29, SADDLE_F + 0.06, 0.99)
+        bot = L(sgn * 0.33, SADDLE_F + 0.07, 0.947)
         tube(p, top, bot, 0.011, 'steed_leather', PAL['leather_dark'], R, sides=4)
         c = bot + Vector((0, 0, -0.035))
         torus(p, c, (0, 1, 0), 0.035, 0.008, 'steed_iron', PAL['iron'], R, seg=12, sides=5)

@@ -343,14 +343,14 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // the rider exactly; a seat bone here would buy sub-millimetre motion and pay
   // a per-frame matrix decompose for it.
   avian_strider: spec('mount_avian_strider', 2.62, true, undefined, 0.2),
-  // Lantern Hall's destrier, at 4.6 (the riding horse is 3.8): its rest height is 1.77 model
+  // Lantern Hall's destrier, at 4.25 (the riding horse is 3.8): its rest height is 1.77 model
   // units and the saddle top 1.227 over the hooves (build_steed.py prints both), so the seat
-  // sits just under 4.6 / 1.77 * 1.226 and a hair over the horse's own forward shift. The rider
+  // sits just under 4.25 / 1.77 * 1.226 and a hair over the horse's own forward shift. The rider
   // straddles a broad barded barrel: thighs opened wide over it, shins falling down its flanks
   // past the saddle skirts, toes forward toward the stirrups, both hands on the reins.
   lantern_hall_destrier: spec(
     'mount_lantern_hall_destrier',
-    3.16,
+    2.92,
     true,
     undefined,
     0.12,
