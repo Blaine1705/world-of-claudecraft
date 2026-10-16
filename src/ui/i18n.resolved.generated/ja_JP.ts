@@ -4264,7 +4264,7 @@ export const ja_JP: EnTranslations = {
       "spellHaste": "呪文の詠唱速度が{pct}%上昇する",
       "sated": "別のグループ加速効果を受けられない",
       "cauterizeFatigue": "コーテライズは次の致死ダメージを防げない",
-      "seasonalCosmetic": "Cosmetic only: no effect on combat",
+      "seasonalCosmetic": "見た目のみ：戦闘に影響なし",
       "castShield": "ダメージで詠唱が中断または遅延しない",
       "dmgDone": "与えるダメージを{pct}%上昇させる",
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
@@ -7706,44 +7706,43 @@ export const ja_JP: EnTranslations = {
   "seasonal": {
     "event": {
       "gourdlight_eve": {
-        "name": "Gourdlight Eve",
-        "opened": "Gourdlight Eve has begun: the gourds are lit in Eastbrook, Fenbridge and Highwatch."
+        "name": "ゴードライトの宵"
       }
     },
     "trickOrTreat": {
-      "row": "Trick or treat!",
-      "rowAria": "Say trick or treat to {name}",
-      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
-      "treat": "{name} hands you a treat.",
-      "trick": "{name} plays a trick on you: {trick}!",
-      "alreadyKnocked": "You already trick-or-treated {name} today.",
-      "notActive": "Gourdlight Eve is not running right now.",
-      "tooFar": "Step closer to knock.",
+      "row": "トリック・オア・トリート！",
+      "rowAria": "{name}に「トリック・オア・トリート」と言う",
+      "knockedHint": "今日はもうここの戸を叩いた。デイリーリセット後にまた開く。",
+      "treat": "{name}がお菓子をくれた。",
+      "trick": "{name}がいたずらをした：{trick}！",
+      "alreadyKnocked": "今日はもう{name}にお菓子をねだった。",
+      "notActive": "ゴードライトの宵は今は開催されていない。",
+      "tooFar": "もっと近づいて戸を叩こう。",
       "treatFlash": {
-        "one": "Treat! {count} Gourdlight Sweet",
-        "few": "Treat! {count} Gourdlight Sweets",
-        "many": "Treat! {count} Gourdlight Sweets",
-        "other": "Treat! {count} Gourdlight Sweets"
+        "one": "トリート！ゴードライトの菓子 {count}個",
+        "few": "トリート！ゴードライトの菓子 {count}個",
+        "many": "トリート！ゴードライトの菓子 {count}個",
+        "other": "トリート！ゴードライトの菓子 {count}個"
       },
-      "trickFlash": "Trick! {trick}"
+      "trickFlash": "トリック！{trick}"
     },
     "tricks": {
-      "gourdlight_trick_bat": "Batty",
-      "gourdlight_trick_skeleton": "Rattled Bones",
-      "gourdlight_trick_fumes": "Green Fumes"
+      "gourdlight_trick_bat": "コウモリ化",
+      "gourdlight_trick_skeleton": "カタカタ骨",
+      "gourdlight_trick_fumes": "緑の煙"
     },
     "pumpkinHead": {
-      "on": "You put on the Carved Pumpkin Head.",
-      "off": "You take off the Carved Pumpkin Head."
+      "on": "彫りカボチャの頭をかぶった。",
+      "off": "彫りカボチャの頭を外した。"
     },
-    "jarTrick": "The jar pops open: {trick}!",
+    "jarTrick": "壺がぽんと開いた：{trick}！",
     "itemUse": {
-      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
-      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
-      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
-      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them."
+      "pumpkinHead": "使用：内側から灯る彫りカボチャを兜の上からかぶる・外す。ゴードライトの宵の間のみ。見た目のみ。",
+      "trickJar": "使用：数秒間、無害ないたずらをランダムに自分にかける。ゴードライトの宵の間のみ。見た目のみ。",
+      "pouch": "使用：開けるとゴードライトの菓子を{count}個受け取る。",
+      "sweet": "ゴードライトの宵の間にお菓子をねだって手に入る。イーストブルックのヘスター・ゴードウィックが見た目アイテムと交換してくれる。"
     },
-    "tokenPrice": "{count} {item}"
+    "tokenPrice": "{item} ×{count}"
   },
   "dungeonGuide": {
     "drownedTemple": {
@@ -22958,16 +22957,16 @@ export const ja_JP: EnTranslations = {
         "name": "ムーンラックの杖"
       },
       "gourdlight_sweet": {
-        "name": "Gourdlight Sweet"
+        "name": "ゴードライトの菓子"
       },
       "gourdlight_treat_pouch": {
-        "name": "Gourdlight Treat Pouch"
+        "name": "ゴードライトのお菓子袋"
       },
       "carved_pumpkin_head": {
-        "name": "Carved Pumpkin Head"
+        "name": "彫りカボチャの頭"
       },
       "jar_of_mischief": {
-        "name": "Jar of Mischief"
+        "name": "いたずらの壺"
       },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"
@@ -25565,9 +25564,9 @@ export const ja_JP: EnTranslations = {
         "greeting": "湿気から逃れて中へどうぞ、旅の方。火のそばへ下りる段差に気をつけてね。やかんは火にかけてあるし、長椅子は温かいし、二階の部屋も乾いていますよ。フェンブリッジから来た旅人たちは、湿地の道は昼間なら静かだと口をそろえるけれど、日が暮れてから歩く人はいません。少し座って、足を休めていきなさい。"
       },
       "gourdlight_keeper": {
-        "name": "Hester Gourdwick",
-        "title": "Gourdlight Keeper",
-        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
+        "name": "ヘスター・ゴードウィック",
+        "title": "ゴードライトの番人",
+        "greeting": "カボチャに火が灯り、ランタンも吊るされた。ゴードライトの宵が来たのね。イーストブルック、フェンブリッジ、ハイウォッチの町の人の戸を叩いて、あの言葉を言いなさい。トリック・オア・トリート。たいていはお菓子をくれるけど、いたずらをする人もいるわ。お菓子を持ってきてくれたら、身につけるものと交換してあげる。"
       },
       "patron_amos_eelby": {
         "name": "エイモス・イールビー",
@@ -28209,12 +28208,12 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_gourdlight_rounds": {
-        "title": "Gourdlight Rounds",
-        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
-        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "title": "ゴードライトの見回り",
+        "text": "ゴードライトの宵には、谷の子どもたちが家々を回るの。今年はあなたも一緒よ、{playerName}。私たちの町で五つの戸を叩いて、あの言葉を言って、何をもらえるか見てきて。終わったら戻ってきてね。",
+        "completion": "五つの戸を叩いて、指もちゃんと全部ある。はい、帰り道のお菓子袋よ。明日また来て。戸はまた開くから。",
         "objectives": {
           "0": {
-            "label": "Doors knocked on"
+            "label": "叩いた戸"
           }
         }
       },

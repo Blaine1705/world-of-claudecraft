@@ -18729,7 +18729,6 @@ export type TranslationKeyFlat =
   | 'referralCards.waiting'
   | 'referralCards.yourCard'
   | 'seasonal.event.gourdlight_eve.name'
-  | 'seasonal.event.gourdlight_eve.opened'
   | 'seasonal.itemUse.pouch'
   | 'seasonal.itemUse.pumpkinHead'
   | 'seasonal.itemUse.sweet'

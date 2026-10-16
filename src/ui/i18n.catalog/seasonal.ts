@@ -11,8 +11,6 @@ export const seasonalStrings = {
   event: {
     gourdlight_eve: {
       name: 'Gourdlight Eve',
-      // The banner the world shows when the event opens around the player.
-      opened: 'Gourdlight Eve has begun: the gourds are lit in Eastbrook, Fenbridge and Highwatch.',
     },
   },
   trickOrTreat: {

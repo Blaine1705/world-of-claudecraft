@@ -4264,7 +4264,7 @@ export const zh_TW: EnTranslations = {
       "spellHaste": "施法速度提高 {pct}%",
       "sated": "無法再獲得團隊加速效果",
       "cauterizeFatigue": "灸灼無法再次阻止致命傷害",
-      "seasonalCosmetic": "Cosmetic only: no effect on combat",
+      "seasonalCosmetic": "僅為外觀：不影響戰鬥",
       "castShield": "施法不會因受到傷害而中斷或延遲",
       "dmgDone": "造成的傷害提高 {pct}%",
       "dmgDoneReduce": "造成的傷害降低 {pct}%",
@@ -7706,44 +7706,43 @@ export const zh_TW: EnTranslations = {
   "seasonal": {
     "event": {
       "gourdlight_eve": {
-        "name": "Gourdlight Eve",
-        "opened": "Gourdlight Eve has begun: the gourds are lit in Eastbrook, Fenbridge and Highwatch."
+        "name": "南瓜燈之夜"
       }
     },
     "trickOrTreat": {
-      "row": "Trick or treat!",
-      "rowAria": "Say trick or treat to {name}",
-      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
-      "treat": "{name} hands you a treat.",
-      "trick": "{name} plays a trick on you: {trick}!",
-      "alreadyKnocked": "You already trick-or-treated {name} today.",
-      "notActive": "Gourdlight Eve is not running right now.",
-      "tooFar": "Step closer to knock.",
+      "row": "不給糖就搗蛋！",
+      "rowAria": "對{name}說「不給糖就搗蛋」",
+      "knockedHint": "你今天已經敲過這扇門了。每日重置後這扇門會再次打開。",
+      "treat": "{name}遞給你一份糖果。",
+      "trick": "{name}對你惡作劇：{trick}！",
+      "alreadyKnocked": "你今天已經向{name}討過糖了。",
+      "notActive": "南瓜燈之夜現在沒有舉行。",
+      "tooFar": "走近一點再敲門。",
       "treatFlash": {
-        "one": "Treat! {count} Gourdlight Sweet",
-        "few": "Treat! {count} Gourdlight Sweets",
-        "many": "Treat! {count} Gourdlight Sweets",
-        "other": "Treat! {count} Gourdlight Sweets"
+        "one": "糖果！{count}顆南瓜燈糖",
+        "few": "糖果！{count}顆南瓜燈糖",
+        "many": "糖果！{count}顆南瓜燈糖",
+        "other": "糖果！{count}顆南瓜燈糖"
       },
-      "trickFlash": "Trick! {trick}"
+      "trickFlash": "搗蛋！{trick}"
     },
     "tricks": {
-      "gourdlight_trick_bat": "Batty",
-      "gourdlight_trick_skeleton": "Rattled Bones",
-      "gourdlight_trick_fumes": "Green Fumes"
+      "gourdlight_trick_bat": "變成蝙蝠",
+      "gourdlight_trick_skeleton": "骨頭喀喀",
+      "gourdlight_trick_fumes": "綠色煙霧"
     },
     "pumpkinHead": {
-      "on": "You put on the Carved Pumpkin Head.",
-      "off": "You take off the Carved Pumpkin Head."
+      "on": "你戴上了雕刻南瓜頭。",
+      "off": "你摘下了雕刻南瓜頭。"
     },
-    "jarTrick": "The jar pops open: {trick}!",
+    "jarTrick": "罐子砰地打開了：{trick}！",
     "itemUse": {
-      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
-      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
-      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
-      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them."
+      "pumpkinHead": "使用：戴上或摘下一顆從內部點亮的雕刻南瓜，套在頭盔之上。僅在南瓜燈之夜期間可用。純外觀。",
+      "trickJar": "使用：對你施加一個隨機的無害惡作劇，持續數秒。僅在南瓜燈之夜期間可用。純外觀。",
+      "pouch": "使用：打開後獲得{count}顆南瓜燈糖。",
+      "sweet": "在南瓜燈之夜期間討糖獲得。東溪的赫絲特·葫蘆芯會用外觀物品交換它們。"
     },
-    "tokenPrice": "{count} {item}"
+    "tokenPrice": "{count}個{item}"
   },
   "dungeonGuide": {
     "drownedTemple": {
@@ -22958,16 +22957,16 @@ export const zh_TW: EnTranslations = {
         "name": "月殤法杖"
       },
       "gourdlight_sweet": {
-        "name": "Gourdlight Sweet"
+        "name": "南瓜燈糖"
       },
       "gourdlight_treat_pouch": {
-        "name": "Gourdlight Treat Pouch"
+        "name": "南瓜燈糖果袋"
       },
       "carved_pumpkin_head": {
-        "name": "Carved Pumpkin Head"
+        "name": "雕刻南瓜頭"
       },
       "jar_of_mischief": {
-        "name": "Jar of Mischief"
+        "name": "惡作劇之罐"
       },
       "membership_token": {
         "name": "會員代幣（30天）"
@@ -25565,9 +25564,9 @@ export const zh_TW: EnTranslations = {
         "greeting": "快從濕氣裡進來吧，朋友，下到火邊時當心台階。水壺正燒著，長凳是暖的，樓上的房間也乾爽。從芬橋來的旅人都發誓說沼澤路白天很太平，可天黑以後沒人敢走。坐一會兒，歇歇腳吧。"
       },
       "gourdlight_keeper": {
-        "name": "Hester Gourdwick",
-        "title": "Gourdlight Keeper",
-        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
+        "name": "赫絲特·葫蘆芯",
+        "title": "南瓜燈守護者",
+        "greeting": "南瓜點亮了，燈籠也掛起來了，那一定是南瓜燈之夜到了。去敲東溪、芬橋和高望城鎮民的門，說出那句話：不給糖就搗蛋。大多數人會給你一顆糖，少數人會對你惡作劇。把糖帶給我，我會跟你換些可以穿戴的東西。"
       },
       "patron_amos_eelby": {
         "name": "埃莫斯·伊爾比",
@@ -28209,12 +28208,12 @@ export const zh_TW: EnTranslations = {
         }
       },
       "q_gourdlight_rounds": {
-        "title": "Gourdlight Rounds",
-        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
-        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "title": "南瓜燈巡遊",
+        "text": "每到南瓜燈之夜，谷地的孩子們都會挨家挨戶巡遊，今年你也加入他們吧，{playerName}。在我們的城鎮裡敲五扇門，說出那句話，看看你會得到什麼。完成後回來找我。",
+        "completion": "敲了五扇門，手指還都在。拿著，這袋糖果讓你在回家路上吃。明天再來，門會再次打開。",
         "objectives": {
           "0": {
-            "label": "Doors knocked on"
+            "label": "已敲的門"
           }
         }
       },

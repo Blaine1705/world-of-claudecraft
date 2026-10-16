@@ -4264,7 +4264,7 @@ export const ko_KR: EnTranslations = {
       "spellHaste": "주문 시전 속도가 {pct}% 증가합니다",
       "sated": "다른 파티 가속 효과를 받을 수 없습니다",
       "cauterizeFatigue": "소작이 다음 치명타를 막을 수 없습니다",
-      "seasonalCosmetic": "Cosmetic only: no effect on combat",
+      "seasonalCosmetic": "외형 전용: 전투에 영향 없음",
       "castShield": "피해를 받아도 시전이 방해되거나 지연되지 않습니다",
       "dmgDone": "입히는 피해가 {pct}% 증가합니다",
       "dmgDoneReduce": "입히는 피해가 {pct}% 감소합니다",
@@ -7706,44 +7706,43 @@ export const ko_KR: EnTranslations = {
   "seasonal": {
     "event": {
       "gourdlight_eve": {
-        "name": "Gourdlight Eve",
-        "opened": "Gourdlight Eve has begun: the gourds are lit in Eastbrook, Fenbridge and Highwatch."
+        "name": "고드라이트 축제의 밤"
       }
     },
     "trickOrTreat": {
-      "row": "Trick or treat!",
-      "rowAria": "Say trick or treat to {name}",
-      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
-      "treat": "{name} hands you a treat.",
-      "trick": "{name} plays a trick on you: {trick}!",
-      "alreadyKnocked": "You already trick-or-treated {name} today.",
-      "notActive": "Gourdlight Eve is not running right now.",
-      "tooFar": "Step closer to knock.",
+      "row": "과자 안 주면 장난칠 거야!",
+      "rowAria": "{name}에게 \"과자 안 주면 장난칠 거야\"라고 말하기",
+      "knockedHint": "오늘은 이미 이 문을 두드렸습니다. 일일 초기화 후 다시 열립니다.",
+      "treat": "{name}이(가) 과자를 건네줍니다.",
+      "trick": "{name}이(가) 당신에게 장난을 칩니다: {trick}!",
+      "alreadyKnocked": "오늘은 이미 {name}에게 과자를 받았습니다.",
+      "notActive": "지금은 고드라이트 축제의 밤이 열리지 않습니다.",
+      "tooFar": "문을 두드리려면 더 가까이 가세요.",
       "treatFlash": {
-        "one": "Treat! {count} Gourdlight Sweet",
-        "few": "Treat! {count} Gourdlight Sweets",
-        "many": "Treat! {count} Gourdlight Sweets",
-        "other": "Treat! {count} Gourdlight Sweets"
+        "one": "과자! 고드라이트 사탕 {count}개",
+        "few": "과자! 고드라이트 사탕 {count}개",
+        "many": "과자! 고드라이트 사탕 {count}개",
+        "other": "과자! 고드라이트 사탕 {count}개"
       },
-      "trickFlash": "Trick! {trick}"
+      "trickFlash": "장난! {trick}"
     },
     "tricks": {
-      "gourdlight_trick_bat": "Batty",
-      "gourdlight_trick_skeleton": "Rattled Bones",
-      "gourdlight_trick_fumes": "Green Fumes"
+      "gourdlight_trick_bat": "박쥐 변신",
+      "gourdlight_trick_skeleton": "덜그럭 뼈다귀",
+      "gourdlight_trick_fumes": "초록 연기"
     },
     "pumpkinHead": {
-      "on": "You put on the Carved Pumpkin Head.",
-      "off": "You take off the Carved Pumpkin Head."
+      "on": "조각한 호박 머리를 썼습니다.",
+      "off": "조각한 호박 머리를 벗었습니다."
     },
-    "jarTrick": "The jar pops open: {trick}!",
+    "jarTrick": "항아리가 펑 하고 열립니다: {trick}!",
     "itemUse": {
-      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
-      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
-      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
-      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them."
+      "pumpkinHead": "사용: 안에서 불이 밝혀진 조각 호박을 투구 위에 쓰거나 벗습니다. 고드라이트 축제의 밤 동안에만. 외형 전용.",
+      "trickJar": "사용: 몇 초 동안 무해한 장난을 무작위로 자신에게 겁니다. 고드라이트 축제의 밤 동안에만. 외형 전용.",
+      "pouch": "사용: 열면 고드라이트 사탕 {count}개를 받습니다.",
+      "sweet": "고드라이트 축제의 밤 동안 과자를 얻으러 다니며 받습니다. 이스트브룩의 헤스터 고드윅이 외형 아이템과 교환해 줍니다."
     },
-    "tokenPrice": "{count} {item}"
+    "tokenPrice": "{item} {count}개"
   },
   "dungeonGuide": {
     "drownedTemple": {
@@ -22958,16 +22957,16 @@ export const ko_KR: EnTranslations = {
         "name": "달파멸 지팡이"
       },
       "gourdlight_sweet": {
-        "name": "Gourdlight Sweet"
+        "name": "고드라이트 사탕"
       },
       "gourdlight_treat_pouch": {
-        "name": "Gourdlight Treat Pouch"
+        "name": "고드라이트 과자 주머니"
       },
       "carved_pumpkin_head": {
-        "name": "Carved Pumpkin Head"
+        "name": "조각한 호박 머리"
       },
       "jar_of_mischief": {
-        "name": "Jar of Mischief"
+        "name": "장난의 항아리"
       },
       "membership_token": {
         "name": "멤버십 토큰 (30일)"
@@ -25565,9 +25564,9 @@ export const ko_KR: EnTranslations = {
         "greeting": "눅눅한 바깥에서 어서 들어오세요, 친구. 불가로 내려가는 계단 조심하시고요. 주전자는 올려져 있고, 벤치는 따뜻하고, 위층 방들도 뽀송하답니다. 펜브리지에서 온 여행자들은 늪지 길이 낮에는 조용하다고 장담하지만, 해가 진 뒤에는 아무도 그 길을 걷지 않아요. 잠시 앉아서 발 좀 쉬어 가세요."
       },
       "gourdlight_keeper": {
-        "name": "Hester Gourdwick",
-        "title": "Gourdlight Keeper",
-        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
+        "name": "헤스터 고드윅",
+        "title": "고드라이트 관리인",
+        "greeting": "호박에 불이 켜지고 등불이 걸렸으니 고드라이트 축제의 밤이 온 게 틀림없어요. 이스트브룩, 펜브리지, 하이워치 마을 사람들의 문을 두드리고 그 말을 해 보세요. 과자 안 주면 장난칠 거야. 대부분은 사탕을 주겠지만, 몇몇은 장난을 칠 거예요. 사탕을 가져오면 몸에 걸칠 것과 바꿔 드릴게요."
       },
       "patron_amos_eelby": {
         "name": "에이모스 일비",
@@ -28209,12 +28208,12 @@ export const ko_KR: EnTranslations = {
         }
       },
       "q_gourdlight_rounds": {
-        "title": "Gourdlight Rounds",
-        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
-        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "title": "고드라이트 순회",
+        "text": "고드라이트 축제의 밤마다 골짜기의 아이들이 집집마다 돌아다녀요. 올해는 당신도 함께해요, {playerName}. 우리 마을에서 문 다섯 개를 두드리고 그 말을 한 다음 무엇을 받는지 보세요. 끝나면 저에게 돌아오세요.",
+        "completion": "문 다섯 개를 두드렸는데 손가락도 다 멀쩡하네요. 자, 집에 가는 길에 먹을 과자 주머니예요. 내일 또 오세요. 문은 다시 열리니까요.",
         "objectives": {
           "0": {
-            "label": "Doors knocked on"
+            "label": "두드린 문"
           }
         }
       },

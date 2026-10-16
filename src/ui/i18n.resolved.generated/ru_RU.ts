@@ -4264,7 +4264,7 @@ export const ru_RU: EnTranslations = {
       "spellHaste": "Повышает скорость произнесения заклинаний на {pct}%",
       "sated": "Не позволяет получить другой групповой эффект ускорения",
       "cauterizeFatigue": "Прижигание не может снова предотвратить смертельный удар",
-      "seasonalCosmetic": "Cosmetic only: no effect on combat",
+      "seasonalCosmetic": "Только внешний вид: на бой не влияет",
       "castShield": "Урон не прерывает и не задерживает произнесение заклинаний",
       "dmgDone": "Повышает наносимый урон на {pct}%",
       "dmgDoneReduce": "Снижает наносимый урон на {pct}%",
@@ -7706,44 +7706,43 @@ export const ru_RU: EnTranslations = {
   "seasonal": {
     "event": {
       "gourdlight_eve": {
-        "name": "Gourdlight Eve",
-        "opened": "Gourdlight Eve has begun: the gourds are lit in Eastbrook, Fenbridge and Highwatch."
+        "name": "Ночь Тыквенных Огней"
       }
     },
     "trickOrTreat": {
-      "row": "Trick or treat!",
-      "rowAria": "Say trick or treat to {name}",
-      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
-      "treat": "{name} hands you a treat.",
-      "trick": "{name} plays a trick on you: {trick}!",
-      "alreadyKnocked": "You already trick-or-treated {name} today.",
-      "notActive": "Gourdlight Eve is not running right now.",
-      "tooFar": "Step closer to knock.",
+      "row": "Сладость или гадость!",
+      "rowAria": "Сказать {name}: «Сладость или гадость»",
+      "knockedHint": "Сегодня вы уже стучались сюда. Дверь откроется снова после ежедневного сброса.",
+      "treat": "{name} угощает вас сладостью.",
+      "trick": "{name} подшучивает над вами: {trick}!",
+      "alreadyKnocked": "Сегодня вы уже выпрашивали сладости у {name}.",
+      "notActive": "Ночь Тыквенных Огней сейчас не проходит.",
+      "tooFar": "Подойдите ближе, чтобы постучать.",
       "treatFlash": {
-        "one": "Treat! {count} Gourdlight Sweet",
-        "few": "Treat! {count} Gourdlight Sweets",
-        "many": "Treat! {count} Gourdlight Sweets",
-        "other": "Treat! {count} Gourdlight Sweets"
+        "one": "Сладость! {count} тыквенная конфета",
+        "few": "Сладость! {count} тыквенные конфеты",
+        "many": "Сладость! {count} тыквенных конфет",
+        "other": "Сладость! {count} тыквенной конфеты"
       },
-      "trickFlash": "Trick! {trick}"
+      "trickFlash": "Гадость! {trick}"
     },
     "tricks": {
-      "gourdlight_trick_bat": "Batty",
-      "gourdlight_trick_skeleton": "Rattled Bones",
-      "gourdlight_trick_fumes": "Green Fumes"
+      "gourdlight_trick_bat": "Летучая мышь",
+      "gourdlight_trick_skeleton": "Гремящие кости",
+      "gourdlight_trick_fumes": "Зелёный дым"
     },
     "pumpkinHead": {
-      "on": "You put on the Carved Pumpkin Head.",
-      "off": "You take off the Carved Pumpkin Head."
+      "on": "Вы надеваете резную тыквенную голову.",
+      "off": "Вы снимаете резную тыквенную голову."
     },
-    "jarTrick": "The jar pops open: {trick}!",
+    "jarTrick": "Банка с хлопком открывается: {trick}!",
     "itemUse": {
-      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
-      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
-      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
-      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them."
+      "pumpkinHead": "Использование: надеть или снять резную тыкву со светом внутри поверх шлема. Только во время Ночи Тыквенных Огней. Только внешний вид.",
+      "trickJar": "Использование: на несколько секунд разыгрывает над вами случайную безобидную шутку. Только во время Ночи Тыквенных Огней. Только внешний вид.",
+      "pouch": "Использование: откройте, чтобы получить тыквенные конфеты: {count}.",
+      "sweet": "Выдаётся, когда вы выпрашиваете сладости в Ночь Тыквенных Огней. Хестер Тыквинс в Истбруке обменивает их на предметы внешнего вида."
     },
-    "tokenPrice": "{count} {item}"
+    "tokenPrice": "{item}: {count}"
   },
   "dungeonGuide": {
     "drownedTemple": {
@@ -22958,16 +22957,16 @@ export const ru_RU: EnTranslations = {
         "name": "Посох Лунной погибели"
       },
       "gourdlight_sweet": {
-        "name": "Gourdlight Sweet"
+        "name": "Тыквенная конфета"
       },
       "gourdlight_treat_pouch": {
-        "name": "Gourdlight Treat Pouch"
+        "name": "Мешочек тыквенных сладостей"
       },
       "carved_pumpkin_head": {
-        "name": "Carved Pumpkin Head"
+        "name": "Резная тыквенная голова"
       },
       "jar_of_mischief": {
-        "name": "Jar of Mischief"
+        "name": "Банка проказ"
       },
       "membership_token": {
         "name": "Жетон членства (30 дней)"
@@ -25565,9 +25564,9 @@ export const ru_RU: EnTranslations = {
         "greeting": "Заходите, друг, спасайтесь от сырости, и осторожнее со ступенькой вниз к огню. Чайник уже на огне, скамьи тёплые, а комнаты наверху сухие. Путники из Фенбриджа клянутся, что болотная дорога днём спокойна, но после темноты по ней никто не ходит. Посидите немного, дайте ногам отдохнуть."
       },
       "gourdlight_keeper": {
-        "name": "Hester Gourdwick",
-        "title": "Gourdlight Keeper",
-        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
+        "name": "Хестер Тыквинс",
+        "title": "Хранительница Тыквенных Огней",
+        "greeting": "Тыквы зажжены, фонари развешаны, значит, пришла Ночь Тыквенных Огней. Стучитесь в двери горожан Истбрука, Фенбриджа и Хайуотча и говорите те самые слова: сладость или гадость. Большинство угостит вас конфетой, а кое-кто над вами подшутит. Приносите конфеты мне, и я обменяю их на что-нибудь из одежды."
       },
       "patron_amos_eelby": {
         "name": "Эймос Илби",
@@ -28209,12 +28208,12 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_gourdlight_rounds": {
-        "title": "Gourdlight Rounds",
-        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
-        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "title": "Обход Тыквенных Огней",
+        "text": "Каждую Ночь Тыквенных Огней дети долины обходят дома, и в этом году вы с ними, {playerName}. Постучите в пять дверей наших городов, скажите те самые слова и посмотрите, что вам дадут. Когда закончите, возвращайтесь ко мне.",
+        "completion": "Пять дверей, и все пальцы на месте. Держите мешочек сладостей на дорогу домой. Приходите завтра, двери откроются снова.",
         "objectives": {
           "0": {
-            "label": "Doors knocked on"
+            "label": "Двери, в которые вы постучали"
           }
         }
       },

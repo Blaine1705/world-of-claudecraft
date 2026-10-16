@@ -680,6 +680,7 @@ import { freshCounters, type RewardCounters } from './reward_counters';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
 import * as seasonalMod from './seasonal';
+import { seasonalSaveFragment } from './seasonal/seasonal_state';
 import * as seatingMod from './seating';
 import { persistedResource } from './serialize_resource';
 import { computeCharacterModifiers } from './set_bonus_mods';
@@ -4024,7 +4025,7 @@ export class Sim {
       // above, so a character that never crafted a daily-gated recipe
       // serializes byte-identically to a pre-phase-07 save.
       ...craftDailySaveFragment(meta.craftDaily),
-      ...seasonalMod.seasonalSaveFragment(meta),
+      ...seasonalSaveFragment(meta),
       mailWelcomed: meta.mailWelcomed,
       guildLetterSent: meta.guildLetterSent,
       // All three written only when non-empty/true (zero-default
@@ -4683,7 +4684,6 @@ export class Sim {
   abandonClueHunt(pid?: number): void {
     clueMod.abandonClueHunt(this.ctx, pid);
   }
-  // IWorldSeasonal (seasonal/): the running event and today's knocks.
   get activeSeasonalEvent(): string | null {
     return seasonalMod.activeSeasonalEventOf(this.seasonal);
   }

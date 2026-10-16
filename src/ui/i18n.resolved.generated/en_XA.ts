@@ -7706,8 +7706,7 @@ export const en_XA: EnTranslations = {
   "seasonal": {
     "event": {
       "gourdlight_eve": {
-        "name": "[Ĝóúŕðļíĝĥţ Éʋé]",
-        "opened": "[Ĝóúŕðļíĝĥţ Éʋé ĥáš ƀéĝúñ: ţĥé ĝóúŕðš áŕé ļíţ íñ Éášţƀŕóóķ, Ƒéñƀŕíðĝé áñð Ĥíĝĥŵáţçĥ.]"
+        "name": "[Ĝóúŕðļíĝĥţ Éʋé]"
       }
     },
     "trickOrTreat": {

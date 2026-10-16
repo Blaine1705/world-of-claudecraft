@@ -7706,8 +7706,7 @@ export const sv_SE: EnTranslations = {
   "seasonal": {
     "event": {
       "gourdlight_eve": {
-        "name": "Gourdlight Eve",
-        "opened": "Gourdlight Eve has begun: the gourds are lit in Eastbrook, Fenbridge and Highwatch."
+        "name": "Gourdlight Eve"
       }
     },
     "trickOrTreat": {
