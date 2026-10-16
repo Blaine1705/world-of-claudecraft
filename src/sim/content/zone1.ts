@@ -2195,8 +2195,8 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { key: 'gardenIronFence', x: 23.67, z: -102.49, rot: CHURCHYARD_SIDE_RAIL },
     // a bloom against the west rails
     { key: 'shrubFlowering', x: 47.97, z: -96.06, rot: 0.39, scale: 0.95 },
-    // the two churchyard yews, set out where that map moved them: one north
-    // of the smithy, one above the inn
+    // the two yews that shaded the old churchyard, set out where that map
+    // moved them: one north of the smithy, one above the inn
     { key: 'oakTree', x: -9.39, z: -57.36, rot: -0.366, scale: 1.3, r: 0.8, h: 9 },
     { key: 'oakTree', x: -41.59, z: -43.6, rot: -1.1, scale: 1.2, r: 0.8, h: 9 },
     // The round 6 kitchen gardens and door benches of the harbour quarter's

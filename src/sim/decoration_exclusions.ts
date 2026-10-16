@@ -53,7 +53,7 @@ const EXCLUSIONS = [
   { x: -46.382, z: -120.497 },
   // Under the quay cottage's west gable.
   { x: -55.705, z: -58.456 },
-  // Under the apothecary's back wall.
+  // Inside the apothecary's shop.
   { x: -32.145, z: -128.66 },
   // Under the tavern's north eaves.
   { x: -35.756, z: -58.377 },

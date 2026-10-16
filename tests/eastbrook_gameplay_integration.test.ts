@@ -1061,6 +1061,51 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     }
   });
 
+  it('walks the graveyard route in through the churchyard gap, never through a rail', () => {
+    // The churchyard's iron rails are walk-through dressing, so the clear-path
+    // check above cannot see them; the route to the Pale Keeper still keeps to
+    // the way in (the gap the rails leave at the yard's north-east corner). A
+    // drawn rail runs about 3.85 yd along its own local x; 1.95 is a hair
+    // over its half length.
+    const RAIL_HALF_LENGTH = 1.95;
+    const graveyard = EASTBROOK_LAYOUT.services.graveyard.position;
+    const rails = (ZONE1_PROPS.decorProps ?? [])
+      .filter(
+        (prop) =>
+          prop.key === 'gardenIronFence' &&
+          Math.hypot(prop.x - graveyard.x, prop.z - graveyard.z) < 30,
+      )
+      .map((prop) => ({
+        a: localToWorld(prop, prop.rot ?? 0, -RAIL_HALF_LENGTH, 0),
+        b: localToWorld(prop, prop.rot ?? 0, RAIL_HALF_LENGTH, 0),
+      }));
+    // the yard's fifteen rails, so the sweep below is not vacuous
+    expect(rails).toHaveLength(15);
+    const route = EASTBROOK_LAYOUT.services.routes.find(
+      (candidate) => candidate.id === 'eastbrook_graveyard_route',
+    );
+    if (!route) throw new Error('missing graveyard route');
+    const toRail = (point: { x: number; z: number }, a: typeof point, b: typeof point) => {
+      const abx = b.x - a.x;
+      const abz = b.z - a.z;
+      const t = Math.max(
+        0,
+        Math.min(1, ((point.x - a.x) * abx + (point.z - a.z) * abz) / (abx * abx + abz * abz)),
+      );
+      return Math.hypot(point.x - a.x - abx * t, point.z - a.z - abz * t);
+    };
+    for (const point of samplePolyline(route.points, 0.1)) {
+      for (const rail of rails) {
+        expect(toRail(point, rail.a, rail.b), `route at ${point.x}, ${point.z}`).toBeGreaterThan(
+          route.bodyRadius + 0.5,
+        );
+      }
+    }
+    // and it ends within talking reach of the Pale Keeper over the first stone
+    const end = route.points[route.points.length - 1];
+    expect(Math.hypot(end.x - graveyard.x, end.z - graveyard.z)).toBeLessThan(INTERACT_RANGE);
+  });
+
   // Re-anchored 2026-08-18 for the harbor move (commit d19aa33f76,
   // docs/design/eastbrook-revamp/site-plan.md): the square anchor moved to
   // the new market square and the six retired gate destinations left the
