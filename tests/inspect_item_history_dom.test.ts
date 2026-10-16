@@ -136,6 +136,21 @@ describe('inspect window: Item history on a worn tracked copy', () => {
     expect(root.querySelector('.item-history-action')).toBeNull();
   });
 
+  it('opens the history from the keyboard with Enter on the focusable row', () => {
+    const root = openWith(peer());
+    const tracked = slotRow(root, 'Duskforged Warblade');
+    const plain = slotRow(root, 'Ritual Vestments');
+    expect(tracked.getAttribute('role')).toBe('button');
+    expect(tracked.getAttribute('aria-label')).toBe('Item history for Duskforged Warblade');
+    expect(plain.hasAttribute('role')).toBe(false);
+    const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+    tracked.dispatchEvent(enter);
+    expect(enter.defaultPrevented).toBe(true);
+    const dialog = document.getElementById('item-history-dialog');
+    expect(dialog?.textContent).toContain('Duskforged Warblade: history');
+    expect(dialog?.innerHTML).not.toContain(GUID);
+  });
+
   it('adds the visible button beneath the tracked row on a touch layout', () => {
     document.body.classList.add('mobile-touch');
     const root = openWith(peer());
