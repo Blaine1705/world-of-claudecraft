@@ -21,10 +21,10 @@ const step = (
 describe('the standing rear-up trigger', () => {
   it('starts on the take-off edge of a standing jump, once, and runs its length', () => {
     const s = createMountRearState();
-    expect(step(s, 0, false)).toEqual({ start: false, active: false });
-    expect(step(s, 0.05, true)).toEqual({ start: true, active: true });
+    expect(step(s, 0, false)).toEqual({ start: false, active: false, broke: false });
+    expect(step(s, 0.05, true)).toEqual({ start: true, active: true, broke: false });
     // still airborne next frame: no second start
-    expect(step(s, 0.1, true)).toEqual({ start: false, active: true });
+    expect(step(s, 0.1, true)).toEqual({ start: false, active: true, broke: false });
     expect(step(s, 0.6, false).active).toBe(true);
     expect(step(s, MOUNT_REAR_SECONDS + 0.04, false).active).toBe(true);
     expect(step(s, MOUNT_REAR_SECONDS + 0.06, false).active).toBe(false);
@@ -33,13 +33,17 @@ describe('the standing rear-up trigger', () => {
   it('leaves a moving jump alone', () => {
     const s = createMountRearState();
     step(s, 0, false, true);
-    expect(step(s, 0.05, true, true)).toEqual({ start: false, active: false });
+    expect(step(s, 0.05, true, true)).toEqual({ start: false, active: false, broke: false });
   });
 
   it('never rears a mount that cannot (every mount but the destrier)', () => {
     const s = createMountRearState();
     step(s, 0, false, false, false);
-    expect(step(s, 0.05, true, false, false)).toEqual({ start: false, active: false });
+    expect(step(s, 0.05, true, false, false)).toEqual({
+      start: false,
+      active: false,
+      broke: false,
+    });
   });
 
   it('a second standing jump mid-rear does not restart it', () => {
@@ -47,14 +51,15 @@ describe('the standing rear-up trigger', () => {
     step(s, 0, false);
     step(s, 0.05, true);
     step(s, 0.6, false);
-    expect(step(s, 0.7, true)).toEqual({ start: false, active: true });
+    expect(step(s, 0.7, true)).toEqual({ start: false, active: true, broke: false });
   });
 
-  it('breaks off when the rider moves off', () => {
+  it('breaks off when the rider moves off, flagging the break once', () => {
     const s = createMountRearState();
     step(s, 0, false);
     step(s, 0.05, true);
-    expect(step(s, 0.3, true, true).active).toBe(false);
+    expect(step(s, 0.3, true, true)).toEqual({ start: false, active: false, broke: true });
+    expect(step(s, 0.35, true, true).broke).toBe(false);
   });
 
   it('a rider seen already airborne (first sighting) does not rear', () => {
@@ -71,5 +76,26 @@ describe('the hop cancel', () => {
     expect(mountRearHopCancel(true, 9.9, 10)).toBe(0);
     // not rearing: the hop plays as it always has
     expect(mountRearHopCancel(false, 10.8, 10)).toBe(0);
+  });
+});
+
+describe('the destrier ships the clips its rear and its backing-up walk name', () => {
+  it('names Rear as its flourish and WalkBack as its backpedal, both in its GLB', async () => {
+    const { VISUALS } = await import('../src/render/characters/manifest');
+    const { readFileSync } = await import('node:fs');
+    const path = await import('node:path');
+    const def = VISUALS.mount_lantern_hall_destrier;
+    expect(def.clips.flourish).toBe('Rear');
+    expect(def.clips.walkBack).toBe('WalkBack');
+    // the backpedal matches the walk's own stride, and its cadence ceiling covers the
+    // mounted backpedal speed so the hooves plant
+    expect(def.walkBackRef).toBe(def.walkRef);
+    expect(def.walkTimeScaleMax).toBeGreaterThanOrEqual(3);
+    const bytes = readFileSync(path.join(__dirname, '..', 'public', def.url));
+    const json = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString('utf8')) as {
+      animations: { name: string }[];
+    };
+    const names = json.animations.map((a) => a.name);
+    expect(names).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Run', 'Rear', 'WalkBack']));
   });
 });

@@ -779,6 +779,7 @@ SWING = {
     'Run': (16.0, 6.0, 1, 1),
     # the rear tips the lanterns back as the forehand rises and lets them swing as the forelegs paw
     'Rear': (14.0, 5.0, 2, 1),
+    'WalkBack': (6.0, 3.0, 2, 1),
 }
 
 
@@ -825,6 +826,7 @@ def key_swing():
 #      (restore_rest_trs.mjs) still treats every other joint as untouched.
 # ---------------------------------------------------------------------------
 REAR_FRAMES = 36  # 1.5 s at 24 fps
+HIND_HOOVES = ('toes_01.l_011', 'toes_01.r_018')
 
 
 def keyed_bones(action):
@@ -854,6 +856,8 @@ def author_rear():
     bpy.context.view_layer.update()
     base = {n: pbs[n].matrix_basis.copy() for n in keyed}
     rest = {n: pbs[n].matrix.copy() for n in pbs.keys()}
+    last_q = {}
+    hoof_rest = sum((rest[n].to_translation() for n in HIND_HOOVES), Vector()) / len(HIND_HOOVES)
     act = bpy.data.actions.new('Rear')
     ARM.animation_data.action = act
     for n in keyed:
@@ -905,9 +909,30 @@ def author_rear():
         turn_about(HEAD, math.radians(14) * rise)
         # the tail sweeps down and in rather than into the ground
         turn_about('c_tail_00.x_03', math.radians(30) * rise)
+        # pin the hind hooves: whatever the pose moved them by, the whole body moves back by,
+        # so the horse rises over hooves that stay exactly where they stood (no slide, no sink)
+        now = sum((pbs[n].matrix.to_translation() for n in HIND_HOOVES), Vector()) / len(HIND_HOOVES)
+        drift = now - hoof_rest
+        drift.x = 0.0
+        pbs[ROOT].matrix = Matrix.Translation(-drift) @ pbs[ROOT].matrix
+        bpy.context.view_layer.update()
         for n in keyed:
+            # keep each joint's quaternion on the same hemisphere as its last key: pose-matrix
+            # writes may hand back q or -q, and a key that flips sign makes the curve swing
+            # through the far side between frames
+            q = pbs[n].rotation_quaternion
+            if n in last_q and q.dot(last_q[n]) < 0:
+                pbs[n].rotation_quaternion = -q
+            last_q[n] = pbs[n].rotation_quaternion.copy()
             pbs[n].keyframe_insert('rotation_quaternion', frame=fr, group=n)
             pbs[n].keyframe_insert('location', frame=fr, group=n)
+    # Every frame is a key, so the keys go out LINEAR: Blender's auto-Bezier handles on
+    # per-frame pose keys export as glTF CUBICSPLINE tangents that overshoot between frames,
+    # which in game read as the planted hind legs trembling through the whole rear.
+    bag = act.layers[0].strips[0].channelbag(act.slots[0])
+    for fc in bag.fcurves:
+        for kp in fc.keyframe_points:
+            kp.interpolation = 'LINEAR'
     ARM.animation_data.action = None
     for n in keyed:
         pbs[n].matrix_basis = Matrix.Identity(4)
@@ -916,6 +941,79 @@ def author_rear():
 
 
 author_rear()
+
+
+# ---------------------------------------------------------------------------
+# 10c. Backing up (WalkBack): a horse reverses in diagonal pairs (near hind with off fore, then
+#      the other pair), head up and tucked, weight sitting back on the quarters. Built from the
+#      horse's own walk: the cycle runs in reverse, so every hoof travels from behind to in
+#      front under the body and the body moves backward over planted feet, and the forelegs
+#      are shifted a quarter cycle so each fore steps with its diagonal hind (the walk's lateral
+#      four-beat becomes the two-beat a horse backs in). The stride is the walk's own, so the
+#      renderer matches it to ground speed with walkBackRef = walkRef and nothing slides.
+# ---------------------------------------------------------------------------
+def author_walkback():
+    walk = bpy.data.actions['Walk']
+    keyed = keyed_bones(walk)
+    pbs = ARM.pose.bones
+    ARM.animation_data_create()
+    ARM.data.pose_position = 'POSE'
+    ARM.animation_data.action = walk
+    ARM.animation_data.action_slot = walk.slots[0]
+    f0, f1 = walk.frame_range
+    span = f1 - f0
+    fore = {n for n in keyed if 'dupli' in n}
+
+    def pose_at(phase):
+        fr = f0 + (phase % 1.0) * span
+        bpy.context.scene.frame_set(int(fr), subframe=fr - int(fr))
+        bpy.context.view_layer.update()
+        return {n: pbs[n].matrix_basis.copy() for n in keyed}
+
+    steps = int(round(span))
+    frames = []
+    for k in range(steps + 1):
+        u = k / steps
+        hind = pose_at(1.0 - u)
+        front = pose_at(1.0 - u + 0.25)
+        frames.append({n: (front[n] if n in fore else hind[n]) for n in keyed})
+    act = bpy.data.actions.new('WalkBack')
+    ARM.animation_data.action = act
+    for n in keyed:
+        pbs[n].rotation_mode = 'QUATERNION'
+    last_q = {}
+    for k, basis in enumerate(frames):
+        for n in keyed:
+            pbs[n].matrix_basis = basis[n]
+        bpy.context.view_layer.update()
+        u = k / steps
+        # the head carried up and tucked, a little nod with each diagonal step
+        nod = math.radians(2.5) * math.sin(2 * math.pi * 2 * u)
+        for name, ang in ((SUB1, -math.radians(8)), (NECK, -math.radians(4)),
+                          (HEAD, math.radians(14) + nod)):
+            pb = pbs[name]
+            M = pb.matrix.copy()
+            h = M.to_translation()
+            pb.matrix = Matrix.Translation(h) @ Matrix.Rotation(ang, 4, 'X') @ Matrix.Translation(-h) @ M
+            bpy.context.view_layer.update()
+        for n in keyed:
+            q = pbs[n].rotation_quaternion
+            if n in last_q and q.dot(last_q[n]) < 0:
+                pbs[n].rotation_quaternion = -q
+            last_q[n] = pbs[n].rotation_quaternion.copy()
+            pbs[n].keyframe_insert('rotation_quaternion', frame=k, group=n)
+            pbs[n].keyframe_insert('location', frame=k, group=n)
+            pbs[n].keyframe_insert('scale', frame=k, group=n)
+    bag = act.layers[0].strips[0].channelbag(act.slots[0])
+    for fc in bag.fcurves:
+        for kp in fc.keyframe_points:
+            kp.interpolation = 'LINEAR'
+    ARM.animation_data.action = None
+    for n in keyed:
+        pbs[n].matrix_basis = Matrix.Identity(4)
+
+
+author_walkback()
 key_swing()
 
 

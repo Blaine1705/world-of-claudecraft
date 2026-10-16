@@ -5812,6 +5812,15 @@ export class CharacterVisual {
     return clip ? this.action(clip) : null;
   }
 
+  /** Hand a running flourish back to the base state over `fade` seconds (a mount's rear
+   *  broken off by its rider moving away); a no-op when no flourish is playing. */
+  endFlourish(fade: number): void {
+    const clip = this.def.clips.flourish;
+    if (!clip || !this.currentIsOneShot || this.current?.getClip().name !== clip) return;
+    this.currentIsOneShot = false;
+    this.fadeTo(this.baseAction(), fade, false);
+  }
+
   /** One-shot the flourish clip (skeleton awaken / boss taunt / the dragonkin
    *  brood's Shout and the whelp's hatch pounce), off the 'shout'/'flourish'
    *  spellfx cues. No-op for rigs without a flourish clip. */

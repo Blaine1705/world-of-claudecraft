@@ -265,17 +265,19 @@ export function updateMountPresentation(
           moving: input.moving,
           canRear: true,
         });
+        // moving off mid-rear: blend the clip quickly into the gait instead of a cut
+        if (rear.broke) v.mountVisual.endFlourish(0.25);
         if (rear.start) {
           v.mountVisual.playFlourish();
           const p = v.group.position;
           input.audio.sink?.mountNeigh?.(p.x, p.y, p.z, input.mountKey, input.audio.self);
         }
         const p = v.group.position;
-        v.mountVisual.root.position.y += mountRearHopCancel(
-          rear.active,
-          p.y,
-          input.groundSample(p.x, p.z),
-        );
+        const hold = mountRearHopCancel(rear.active, p.y, input.groundSample(p.x, p.z));
+        v.mountVisual.root.position.y += hold;
+        // and the saddle lift the nameplate and chat bubble ride (body units, so unscaled):
+        // they stay put over the rearing horse instead of bobbing with the hidden hop
+        v.mountLift += hold / (v.group.scale.y || 1);
       }
       if (spec.seatBone) {
         seatRiderOnBone(v.group, riderRoot, v.mountVisual.root, spec, v);

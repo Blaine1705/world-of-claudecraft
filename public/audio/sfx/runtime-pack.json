@@ -1,7 +1,7 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "d1edeecc4c9467a0d59348a4aa55385331c0e55033a15e980b31cfd092a21574",
+  "bundleId": "acf5da5ac6b23b6083bca957233b389136374873af00f9a7e2bd838ceff9b8bc",
   "catalogHash": "6bdc912d3ebb5ad4c83d0eff79f053f88f728a016f2d1f96756462f0a476665d",
   "clips": {
     "amb_birds": {
@@ -4399,13 +4399,19 @@
     "mount_neigh_lantern_hall_destrier": {
       "variants": [
         {
-          "id": "main",
-          "url": "/audio/sfx/mount_neigh_lantern_hall_destrier.mp3?v=47f88c050e7f",
-          "bytes": 40168,
-          "sha256": "47f88c050e7f32b2f5e068db6c224cef04bf69ba3c1b6c35502fd30218fe461a"
+          "id": "1",
+          "url": "/audio/sfx/mount_neigh_lantern_hall_destrier_1.mp3?v=2bcc861ba9d3",
+          "bytes": 49572,
+          "sha256": "2bcc861ba9d39bd262720fa3286dc78ebf02b781bbeb6c8351369f5c66978d99"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mount_neigh_lantern_hall_destrier_2.mp3?v=4b39078de597",
+          "bytes": 49572,
+          "sha256": "4b39078de5971f70c4cc991a028d0c291dbc7bd5f40e4ff88f34c885fcefae70"
         }
       ],
-      "gain": 1.995262,
+      "gain": 1.584893,
       "playbackRate": 1
     },
     "mount_run_aether_hover_cycle": {

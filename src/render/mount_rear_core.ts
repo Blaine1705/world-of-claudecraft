@@ -33,25 +33,31 @@ export interface MountRearInput {
   canRear: boolean;
 }
 
-/** Advance one frame. `start` is true on the one frame a rear begins (play the clip and the
- *  whinny then); `active` while it runs. Moving off breaks it off at once. */
-export function stepMountRear(
-  s: MountRearState,
-  input: MountRearInput,
-): { start: boolean; active: boolean } {
+export interface MountRearStep {
+  /** The one frame a rear begins: play the clip and the whinny then. */
+  start: boolean;
+  /** While it runs. */
+  active: boolean;
+  /** The one frame a running rear is broken off by the rider moving away: blend the clip
+   *  out quickly into the gait rather than letting it play on (or snapping it off). */
+  broke: boolean;
+}
+
+/** Advance one frame. Moving off breaks a running rear (`broke`, once). */
+export function stepMountRear(s: MountRearState, input: MountRearInput): MountRearStep {
   const takeOff = s.seeded && input.airborne && !s.wasAirborne;
   s.wasAirborne = input.airborne;
   s.seeded = true;
+  const running = input.now < s.until;
   if (!input.canRear || input.moving) {
     s.until = Number.NEGATIVE_INFINITY;
-    return { start: false, active: false };
+    return { start: false, active: false, broke: running };
   }
-  const running = input.now < s.until;
   if (takeOff && !running) {
     s.until = input.now + MOUNT_REAR_SECONDS;
-    return { start: true, active: true };
+    return { start: true, active: true, broke: false };
   }
-  return { start: false, active: running };
+  return { start: false, active: running, broke: false };
 }
 
 /** How far to drop the mount's root (world units, never positive) so it stays on the ground

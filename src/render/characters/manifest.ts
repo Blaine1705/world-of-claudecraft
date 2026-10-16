@@ -3211,9 +3211,15 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${MOUNTS_DIR}/lantern_hall_destrier.glb`,
     height: 4.25,
     // its own authored rear (build_steed.py author_rear), played as the flourish on a standing
-    // jump (render/mount_rear_core.ts)
-    clips: { ...MOUNT_RIGGED, flourish: 'Rear' },
+    // jump (render/mount_rear_core.ts), and its own backing-up walk (author_walkback)
+    clips: { ...MOUNT_RIGGED, flourish: 'Rear', walkBack: 'WalkBack' },
     walkRef: 2.57,
+    // WalkBack is the walk's own stride reversed, so it matches at the walk's reference. A
+    // mounted backpedal runs at the sim's BACKPEDAL_MULT of the mount's speed (about 7.8 here,
+    // three times the walk reference), so the walk ceiling is lifted to let the cadence keep up
+    // and the hooves plant instead of sliding; the forward walk never reaches it on a mount.
+    walkBackRef: 2.57,
+    walkTimeScaleMax: 3.2,
     runRef: 13.4,
     lazyPreload: true,
   },
