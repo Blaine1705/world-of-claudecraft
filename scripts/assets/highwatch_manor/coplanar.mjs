@@ -2,7 +2,7 @@
 // same plane, face the same way and overlap in area flickers in the depth buffer (a rug on the
 // floor, a banner on a wall, a tile course on the roof base). The build lifts such pieces by a
 // real gap; this finds any pair that is still closer than that, over the shipped GLB, so a
-// test can pin the count at zero.
+// test can pin what is left and catch anything new (tests/highwatch_manor_asset.test.ts).
 //
 //   node scripts/assets/highwatch_manor/coplanar.mjs [path/to/manor.glb]
 
@@ -24,7 +24,22 @@ function transformPoint(m, p) {
   ];
 }
 
-/** World-space triangles of every mesh in the document: { part, material, a, b, c }. */
+/** A triangle's place in the canonical order: its part, then where it sits (its centre, then
+ *  its corners, to a tenth of a millimetre), then its material and colour. */
+function canonicalKey(t) {
+  const centre = [0, 1, 2].map((k) => ((t.a[k] + t.b[k] + t.c[k]) / 3).toFixed(4)).join(',');
+  const corners = [t.a, t.b, t.c].map((p) => p.map((v) => v.toFixed(4)).join(',')).join(';');
+  const color = t.color.map((v) => v.toFixed(4)).join(',');
+  return `${t.part}|${centre}|${corners}|${t.material}|${color}`;
+}
+
+/**
+ * World-space triangles of every mesh in the document: { part, material, a, b, c }, in a
+ * canonical order (by part, then by where each sits), so the audit weighs the same model the
+ * same way however its faces are split into primitives: a texture pass that files one
+ * builder's material under several painted ones reorders them, and the audit's cover test
+ * breaks ties in the order it meets surfaces.
+ */
 export function documentTriangles(doc) {
   const out = [];
   for (const node of doc.getRoot().listNodes()) {
@@ -58,7 +73,9 @@ export function documentTriangles(doc) {
       }
     }
   }
-  return out;
+  const keyed = out.map((t) => [canonicalKey(t), t]);
+  keyed.sort((p, q) => (p[0] < q[0] ? -1 : p[0] > q[0] ? 1 : 0));
+  return keyed.map((entry) => entry[1]);
 }
 
 const sub = (p, q) => [p[0] - q[0], p[1] - q[1], p[2] - q[2]];
