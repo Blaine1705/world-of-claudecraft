@@ -3754,8 +3754,8 @@
         "name": "Warden Fenwick",
         "title": "Warden of Fenbridge",
         "pos": {
-          "x": 1.62,
-          "z": 283.09999999999997
+          "x": 3.507999999999999,
+          "z": 276.56
         },
         "facing": -1.5707963267948966,
         "color": 8278281,
@@ -3855,8 +3855,8 @@
         "name": "Herbalist Yara",
         "title": "Herbalist",
         "pos": {
-          "x": 2.8999999999999995,
-          "z": 323.5
+          "x": 3.3000000000000007,
+          "z": 327.45
         },
         "facing": -1.5707963267948966,
         "color": 8207512,
@@ -3869,9 +3869,9 @@
         "title": "Marshal's Scout",
         "pos": {
           "x": -3.2,
-          "z": 330
+          "z": 337.5
         },
-        "facing": 2.950031333260667,
+        "facing": 3.0090411212931194,
         "color": 8218120,
         "questIds": ["q_troll_fetishes", "q_cult_camp", "q_olen"],
         "greeting": "Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds."
@@ -3881,8 +3881,8 @@
         "name": "Bursar Petra Vell",
         "title": "The Gilded Strongbox",
         "pos": {
-          "x": -2.9000000000000004,
-          "z": 320.4
+          "x": -3.3000000000000007,
+          "z": 322.90000000000003
         },
         "facing": 1.5707963267948966,
         "color": 13214247,
@@ -3908,10 +3908,10 @@
         "name": "Tanner Hesk",
         "title": "Master of the Tannery",
         "pos": {
-          "x": -18,
-          "z": 322
+          "x": -24,
+          "z": 328.5
         },
-        "facing": 2.0119758072098772,
+        "facing": 2.1293956421384594,
         "color": 9067050,
         "questIds": ["q_prof_workorder_tannery"],
         "greeting": "A hide is only as good as its tanning, $C. The vats are ready when you are.",
@@ -57376,27 +57376,27 @@
     },
     {
       "assetId": "tidehold/fenrire/house_a",
-      "x": 7.4,
-      "z": 281.7,
+      "x": 11.6,
+      "z": 274.6,
       "rotY": 1.5707963267948966,
-      "scale": 5.559090909090909,
+      "scale": 7.782727272727272,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.45,
       "name": "Fenbridge warden gatehouse"
     },
     {
       "assetId": "tidehold/fenrire/tavern",
-      "x": 12.25,
-      "z": 299.9,
+      "x": 13.55,
+      "z": 298,
       "rotY": 1.5707963267948966,
-      "scale": 10.294681818181816,
+      "scale": 12.353618181818181,
       "collide": true,
       "worldPropKind": "inn",
       "worldPropWidth": 1.9428,
       "worldPropDepth": 1.2628,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.25,
       "name": "Fenbridge crooked reed inn"
     },
     {
@@ -57412,24 +57412,24 @@
     },
     {
       "assetId": "tidehold/fenrire/shop_b",
-      "x": 9.2,
-      "z": 322.8,
+      "x": 12.75,
+      "z": 326.4,
       "rotY": 1.5707963267948966,
-      "scale": 8.499999999999998,
+      "scale": 12.749999999999998,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.55,
       "name": "Fenbridge moonwort apothecary"
     },
     {
       "assetId": "tidehold/fenrire/shop_a",
-      "x": -8.9,
-      "z": 322,
+      "x": -12.3,
+      "z": 325.3,
       "rotY": -1.5707963267948966,
-      "scale": 7.399863636363635,
+      "scale": 11.099795454545452,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.55,
       "name": "Fenbridge gilded strongbox"
     },
     {

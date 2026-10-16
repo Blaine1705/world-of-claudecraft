@@ -165,10 +165,21 @@ describe('the five placed Fenbridge buildings', () => {
     }
   });
 
-  it('stand at authored size with their footing buried', () => {
+  it('stand grand, each at its own size, with their footing buried', () => {
+    // the smallest size that clears a door of about five yards
+    // (fenbridge_layout.ts); the chapel's portal already does at authored size
+    expect(BUILDINGS.map((building) => [building.id, building.placement.scale])).toEqual([
+      ['fenbridge_warden_gatehouse', 1.4],
+      ['fenbridge_crooked_reed_inn', 1.2],
+      ['fenbridge_lantern_chapel', 1],
+      ['fenbridge_moonwort_apothecary', 1.5],
+      ['fenbridge_gilded_strongbox', 1.5],
+    ]);
     for (const building of BUILDINGS) {
-      expect(building.placement.scale, building.id).toBe(1);
-      expect(building.placement.lift, building.id).toBe(-1.05);
+      expect(building.placement.lift, building.id).toBeCloseTo(
+        -(building.placement.scale + 0.05),
+        9,
+      );
       // one authored yard of footing, buried, the ground line a hair under the seat
       const groundLine =
         -boundsOf(building).min[1] * building.placement.scale + building.placement.lift;

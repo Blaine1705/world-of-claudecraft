@@ -79,6 +79,9 @@ const EXCLUSIONS = [
   { x: 27.314, z: 648.031 },
   { x: 34.786, z: 673.567 },
   { x: 31.334, z: 708.04 },
+  // Fenbridge's painted buildings stood grand (fenbridge_layout.ts): the tree
+  // the apothecary's back corner now stands on, past the hub's scatter-free ring.
+  { x: 20.594, z: 335.37 },
 ];
 
 /** Scatter keeps this far off the Mirefen tavern's walls (a trunk, a canopy or a rock
@@ -113,6 +116,9 @@ const STREETLAMP_EXCLUSIONS = [
   // chapel's eaves by its bell tower.
   { x: 4.25, z: 297.4690161983138 },
   { x: -13.06878557216685, z: 310.4292763607378 },
+  // ...and, the buildings stood grand, the marsh street's lamp the road plan
+  // now stands under the apothecary's eaves, between its south wall and the street.
+  { x: 12.944393496618803, z: 317.48530764241514 },
   // Highwatch's painted buildings (highwatch_layout.ts): the Fenbridge road's
   // lamp against the watch house's corner at the south gate.
   { x: 3.8, z: 628.0621005145729 },

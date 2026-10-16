@@ -1,7 +1,13 @@
 // Canonical Fenbridge rebuild layout. This is a pure, frozen data/geometry
 // module shared by simulation content, collision, rendering, and acceptance
 // capture. Keep engine imports, randomness, clocks, and mutable runtime state
-// out of this file.
+// out of this file: it imports only the shared town kit, itself pure.
+
+import {
+  makePlacedTownBuilding,
+  placedTownSeat,
+  scalePlacedTownMeasurements,
+} from './placed_town_kit';
 
 export interface Point2 {
   x: number;
@@ -337,137 +343,32 @@ export const REMOVED_FENBRIDGE_PLACEMENTS = deepFreeze({
 const CIVIC_CENTER = { x: 0, z: 303 } as const;
 const FRONT_CLEARANCE = 1.5;
 
-/** Normalize an angle into (-PI, PI]. */
-function wrapAngle(angle: number): number {
-  let wrapped = angle % TAU;
-  if (wrapped <= -Math.PI) wrapped += TAU;
-  if (wrapped > Math.PI) wrapped -= TAU;
-  return wrapped;
-}
-
-// Where a visitor stands at a placed building's door: at the foot of its
-// stoop, 1.8 yd off the wall face on the door's own line, the stand the
-// painted Eastbrook uses (sim/eastbrook_layout.ts PLACED_FRONT_CLEARANCE).
+// The painted Tidehold models are authored in yards with their ground line at
+// y 0 and one yard of footing below it; a visitor stands 1.8 yd off the wall
+// face at a door at authored size, and that step grows with the building (its
+// stoop grows too). Fenbridge stands them GRAND, as Highwatch does
+// (sim/highwatch_layout.ts), each at the smallest size that walks a player
+// (2.6 yd to the crown) in under a door of about five yards. Measured off
+// each model's baked collision (door head and ceiling over its floor deck,
+// authored size):
+//  - the inn (tavern): door 4.4, taproom ceiling 4.9; at 1.2 the door clears
+//    5.3 and the taproom 5.9, as Highwatch's inn (tavern_b, the same door and
+//    ceiling) does;
+//  - the chapel (hall): portal 5.0, nave walls 8.4 over its floor; already a
+//    five-yard door, it keeps its authored size;
+//  - the apothecary (shop_b) and the bank (shop_a): door 3.25, ceiling 4.2,
+//    the smallest; at 1.5 each door clears 4.9 and the shop room 6.3;
+//  - the warden's house (house_a, sealed): a storey of 3.95; at 1.4 it stands
+//    5.5 a storey, as the Highwatch watch house does.
+// Each record's measurements below are the model's at AUTHORED size
+// (scalePlacedTownMeasurements carries them to the building's own scale); the
+// lift buries the scaled footing and sinks the ground line a further 0.05.
 const PLACED_FRONT_CLEARANCE = 1.8;
-// The painted Tidehold models are authored in yards with their ground line
-// at y 0 and one yard of footing below it. Fenbridge stands them at their
-// authored size (Eastbrook's wider streets take them 1.3 times larger): the
-// town's circle is 63 yards across, and at authored size it holds an inn, a
-// chapel, a bank, an apothecary and the warden's house with streets, a
-// square and a barrow between them. The lift buries the yard of footing and
-// sinks the ground line a further 0.05, the seat every placed building
-// takes.
-const PLACED_BUILDING_SCALE = 1;
-const PLACED_BUILDING_LIFT = -1.05;
-
-/**
- * A PLACED building: one of the painted Tidehold models in the Fenrire moss
- * look, stood at `anchor` (where the model's own origin goes) with `rotation`
- * and one uniform size. It is SEALED, like every town building: the record is
- * one solid box. `walls` is the walled body in the model's own axes, in yards
- * at the placed size: `position`, `nativeDimensions` and `footprint` are that
- * rectangle, so collision, the rest area and the map silhouette follow the
- * walls a player sees rather than the eaves above them. `annexes` are the
- * parts outside the wall box that are just as solid (a bell tower, a turret,
- * a stall counter), each one more box in the same axes. `reach` is the whole
- * ground rectangle the model covers (porch, stair, awning and chimney
- * included): the draw cull and the grass clearing read that one. These models
- * face local -Z, so the door and its standing point are on the -Z side.
- * Every number is measured off the shipped file and its baked collision rows
- * (tests/fenbridge_placed_buildings.test.ts).
- */
-function makePlacedBuilding(spec: {
-  id: string;
-  assetId: string;
-  kind: 'house' | 'inn' | 'chapel';
-  anchor: Point2;
-  rotation: number;
-  /** The whole model in its own axes: its centre off the origin, its ground
-   *  extents, and its full height from the bottom of its footing. */
-  reach: { x: number; z: number; width: number; height: number; depth: number };
-  /** The walled body in the model's own axes. */
-  walls: { x: number; z: number; width: number; depth: number };
-  /** Solid parts outside the wall box, in the model's own axes. */
-  annexes?: readonly { name: string; x: number; z: number; width: number; depth: number }[];
-  /** Where the door sits along the front (local -Z) face. */
-  doorX: number;
-  /** An open doorway a player walks through: the record collides on the
-   *  model's own baked walls and stands its floor and entry step as walkable
-   *  ground (sim/town_walk_in.ts), the way the same model does as a Studio
-   *  placement. Without it the record is one sealed box. */
-  walkIn?: boolean;
-}) {
-  const position = localToWorld(spec.anchor, spec.rotation, spec.walls.x, spec.walls.z);
-  const wallFrontZ = spec.walls.z - spec.walls.depth / 2;
-  const annexes: Obb2[] = (spec.annexes ?? []).map((annex) => ({
-    id: `${spec.id}:${annex.name}`,
-    center: localToWorld(spec.anchor, spec.rotation, annex.x, annex.z),
-    halfWidth: annex.width / 2,
-    halfDepth: annex.depth / 2,
-    rotation: spec.rotation,
-  }));
-  const doorSocket = localToWorld(spec.anchor, spec.rotation, spec.doorX, wallFrontZ);
-  const frontStandingPoint = localToWorld(
-    spec.anchor,
-    spec.rotation,
-    spec.doorX,
-    wallFrontZ - PLACED_FRONT_CLEARANCE,
-  );
-  return {
-    id: spec.id,
-    assetId: spec.assetId,
-    kind: spec.kind,
-    walkIn: spec.walkIn === true,
-    position,
-    nativeDimensions: {
-      width: spec.walls.width,
-      // above the ground line: the footing below it is buried
-      height: spec.reach.height + PLACED_BUILDING_LIFT,
-      depth: spec.walls.depth,
-    },
-    rotation: spec.rotation,
-    footprint: {
-      id: spec.id,
-      center: position,
-      halfWidth: spec.walls.width / 2,
-      halfDepth: spec.walls.depth / 2,
-      rotation: spec.rotation,
-    },
-    maxCornerRadius: Math.hypot(spec.walls.width / 2, spec.walls.depth / 2),
-    frontClearance: PLACED_FRONT_CLEARANCE,
-    frontStandingPoint,
-    /** The way a visitor looks standing at the door, facing out of it. */
-    frontFacing: wrapAngle(spec.rotation + Math.PI),
-    sockets: {
-      entrance: {
-        id: `${spec.id}_entrance`,
-        // In the MODEL's own axes: the door on the -Z face.
-        localPosition: { x: spec.doorX, z: wallFrontZ },
-        position: doorSocket,
-        standingPoint: frontStandingPoint,
-      },
-    },
-    placement: {
-      x: spec.anchor.x,
-      z: spec.anchor.z,
-      rotation: spec.rotation,
-      scale: PLACED_BUILDING_SCALE,
-      lift: PLACED_BUILDING_LIFT,
-      /** The model's largest dimension at authored size: its baked collision
-       *  rows are stored in multiples of this over the placed-asset target
-       *  height (sim/town_walk_in.ts). */
-      modelSize: Math.max(spec.reach.width, spec.reach.height, spec.reach.depth),
-    },
-    annexes,
-    reach: {
-      id: spec.id,
-      center: localToWorld(spec.anchor, spec.rotation, spec.reach.x, spec.reach.z),
-      halfWidth: spec.reach.width / 2,
-      halfDepth: spec.reach.depth / 2,
-      rotation: spec.rotation,
-    },
-  };
-}
+const WARDEN_HOUSE_SCALE = 1.4;
+const INN_SCALE = 1.2;
+const CHAPEL_SCALE = 1;
+const APOTHECARY_SCALE = 1.5;
+const BANK_SCALE = 1.5;
 
 // The site plan. Two streets cross in the town's circle, which stands open
 // with no palisade: the main street runs north from the south entrance (the
@@ -480,89 +381,135 @@ function makePlacedBuilding(spec: {
 // and the apothecary face each other up the north street. A quarter turn
 // either way stands a building side-on to the circle with its door on a
 // street: facing the cistern head-on, these models are too deep for it.
+// Stood grand, the buildings keep their streets and their doors and grow
+// outward, away from the square, past the old ring where they must: the
+// warden's house stands at the south entrance itself, the inn steps two yards
+// south and a stride back, and the bank and the apothecary step back off the
+// north street and north off the marsh street, their back ends past the ring.
 const EAST_FACING = Math.PI / 2; // the door looks east (-x), the model turned a quarter
 const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
 // The Fenrire look of the painted set: the same models and geometry as
 // /models/tidehold/, re-baked wearing the moss-grown town maps.
 const PAINTED_SET = '/models/tidehold/fenrire';
 
-const WARDEN_HOUSE = makePlacedBuilding({
-  id: 'fenbridge_warden_gatehouse',
-  assetId: `${PAINTED_SET}/house_a.glb`,
-  kind: 'house',
-  // at the south entrance, west of the main street: the first door in town
-  anchor: { x: 7.4, z: 281.7 },
-  rotation: EAST_FACING,
-  reach: { x: 0.2145, z: 0, width: 11.763, height: 12.23, depth: 9.8 },
-  walls: { x: 0, z: 0, width: 9.36, depth: 7.96 },
-  doorX: -1.4,
-});
-const INN_BASE = makePlacedBuilding({
-  id: 'fenbridge_crooked_reed_inn',
-  assetId: `${PAINTED_SET}/tavern.glb`,
-  kind: 'inn',
-  // west of the cistern, its long front on the main street
-  anchor: { x: 12.25, z: 299.9 },
-  rotation: EAST_FACING,
-  reach: { x: 0.272, z: -0.05, width: 22.648, height: 18.78, depth: 16.8 },
-  walls: { x: 0, z: 0, width: 20, depth: 13 },
-  annexes: [
-    { name: 'front_bench', x: -5.1, z: -7.25, width: 5.4, depth: 0.9 },
-    { name: 'barrels', x: 10.9, z: -4.9, width: 1.1, depth: 2.3 },
-  ],
-  doorX: 0,
-  walkIn: true,
-});
-const CHAPEL_BASE = makePlacedBuilding({
-  id: 'fenbridge_lantern_chapel',
-  assetId: `${PAINTED_SET}/hall.glb`,
-  kind: 'chapel',
-  // east of the cistern, its gable and door facing the inn's
-  anchor: { x: -16.2, z: 299.6 },
-  rotation: WEST_FACING,
-  reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
-  walls: { x: 0, z: 0, width: 12, depth: 22 },
-  annexes: [
-    // at the crossroads corner
-    { name: 'bell_tower', x: 8.25, z: -9, width: 5.4, depth: 5.4 },
-    // the chronicler's archive board, left of the door
-    { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
-  ],
-  doorX: 0,
-  walkIn: true,
-});
-const APOTHECARY = makePlacedBuilding({
-  id: 'fenbridge_moonwort_apothecary',
-  // the potion shop: a flask on its sign, bottles on its street stall
-  assetId: `${PAINTED_SET}/shop_b.glb`,
-  kind: 'house',
-  // north street, west side, facing the bank; its turret on the crossroads
-  anchor: { x: 9.2, z: 322.8 },
-  rotation: EAST_FACING,
-  reach: { x: 0.4745, z: -0.849, width: 13.649, height: 18.7, depth: 12.702 },
-  walls: { x: 0, z: 0, width: 9.4, depth: 9 },
-  annexes: [{ name: 'turret', x: 5.19, z: -4.99, width: 2.66, depth: 2.66 }],
-  doorX: -0.7,
-  walkIn: true,
-});
-const BANK_BASE = makePlacedBuilding({
-  id: 'fenbridge_gilded_strongbox',
-  // the goods shop with the sack sign: the town's counting house
-  assetId: `${PAINTED_SET}/shop_a.glb`,
-  kind: 'house',
-  // north street, east side, its counter and awning on the street
-  anchor: { x: -8.9, z: 322 },
-  rotation: WEST_FACING,
-  reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
-  walls: { x: 0, z: 0, width: 11, depth: 8.4 },
-  annexes: [
-    { name: 'stall_counter', x: 2.375, z: -5.925, width: 3.61, depth: 0.77 },
-    // the barrels at the stall's north end, with the awning post beside them
-    { name: 'stall_barrels', x: 4.885, z: -5.762, width: 1.477, depth: 2.169 },
-  ],
-  doorX: -1.6,
-  walkIn: true,
-});
+const WARDEN_HOUSE = makePlacedTownBuilding(
+  {
+    id: 'fenbridge_warden_gatehouse',
+    assetId: `${PAINTED_SET}/house_a.glb`,
+    kind: 'house',
+    // at the south entrance, west of the main street: the first door in town,
+    // its stoop beside the west muster order
+    anchor: { x: 11.6, z: 274.6 },
+    rotation: EAST_FACING,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 0.2145, z: 0, width: 11.763, height: 12.23, depth: 9.8 },
+        walls: { x: 0, z: 0, width: 9.36, depth: 7.96 },
+        doorX: -1.4,
+      },
+      WARDEN_HOUSE_SCALE,
+    ),
+  },
+  placedTownSeat(WARDEN_HOUSE_SCALE, PLACED_FRONT_CLEARANCE * WARDEN_HOUSE_SCALE),
+);
+const INN_BASE = makePlacedTownBuilding(
+  {
+    id: 'fenbridge_crooked_reed_inn',
+    assetId: `${PAINTED_SET}/tavern.glb`,
+    kind: 'inn',
+    // west of the cistern, its long front on the main street
+    anchor: { x: 13.55, z: 298 },
+    rotation: EAST_FACING,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 0.272, z: -0.05, width: 22.648, height: 18.78, depth: 16.8 },
+        walls: { x: 0, z: 0, width: 20, depth: 13 },
+        annexes: [
+          { name: 'front_bench', x: -5.1, z: -7.25, width: 5.4, depth: 0.9 },
+          { name: 'barrels', x: 10.9, z: -4.9, width: 1.1, depth: 2.3 },
+        ],
+        doorX: 0,
+      },
+      INN_SCALE,
+    ),
+    walkIn: true,
+  },
+  placedTownSeat(INN_SCALE, PLACED_FRONT_CLEARANCE * INN_SCALE),
+);
+const CHAPEL_BASE = makePlacedTownBuilding(
+  {
+    id: 'fenbridge_lantern_chapel',
+    assetId: `${PAINTED_SET}/hall.glb`,
+    kind: 'chapel',
+    // east of the cistern, its gable and door facing the inn's
+    anchor: { x: -16.2, z: 299.6 },
+    rotation: WEST_FACING,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 1.9255, z: -0.254, width: 18.851, height: 30.5, depth: 24.212 },
+        walls: { x: 0, z: 0, width: 12, depth: 22 },
+        annexes: [
+          // at the crossroads corner
+          { name: 'bell_tower', x: 8.25, z: -9, width: 5.4, depth: 5.4 },
+          // the chronicler's archive board, left of the door
+          { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
+        ],
+        doorX: 0,
+      },
+      CHAPEL_SCALE,
+    ),
+    walkIn: true,
+  },
+  placedTownSeat(CHAPEL_SCALE, PLACED_FRONT_CLEARANCE * CHAPEL_SCALE),
+);
+const APOTHECARY = makePlacedTownBuilding(
+  {
+    id: 'fenbridge_moonwort_apothecary',
+    // the potion shop: a flask on its sign, bottles on its street stall
+    assetId: `${PAINTED_SET}/shop_b.glb`,
+    kind: 'house',
+    // north street, west side, facing the bank; its turret on the crossroads
+    anchor: { x: 12.75, z: 326.4 },
+    rotation: EAST_FACING,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 0.4745, z: -0.849, width: 13.649, height: 18.7, depth: 12.702 },
+        walls: { x: 0, z: 0, width: 9.4, depth: 9 },
+        annexes: [{ name: 'turret', x: 5.19, z: -4.99, width: 2.66, depth: 2.66 }],
+        doorX: -0.7,
+      },
+      APOTHECARY_SCALE,
+    ),
+    walkIn: true,
+  },
+  placedTownSeat(APOTHECARY_SCALE, PLACED_FRONT_CLEARANCE * APOTHECARY_SCALE),
+);
+const BANK_BASE = makePlacedTownBuilding(
+  {
+    id: 'fenbridge_gilded_strongbox',
+    // the goods shop with the sack sign: the town's counting house
+    assetId: `${PAINTED_SET}/shop_a.glb`,
+    kind: 'house',
+    // north street, east side, its counter and awning on the street
+    anchor: { x: -12.3, z: 325.3 },
+    rotation: WEST_FACING,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 0, z: -0.8, width: 13.004, height: 16.28, depth: 12.2 },
+        walls: { x: 0, z: 0, width: 11, depth: 8.4 },
+        annexes: [
+          { name: 'stall_counter', x: 2.375, z: -5.925, width: 3.61, depth: 0.77 },
+          // the barrels at the stall's north end, with the awning post beside them
+          { name: 'stall_barrels', x: 4.885, z: -5.762, width: 1.477, depth: 2.169 },
+        ],
+        doorX: -1.6,
+      },
+      BANK_SCALE,
+    ),
+    walkIn: true,
+  },
+  placedTownSeat(BANK_SCALE, PLACED_FRONT_CLEARANCE * BANK_SCALE),
+);
 
 // Provisioner Hale's stall stands on the main street in front of the inn's
 // south half, its counter facing the street (the stall's front is its +Z).
@@ -599,19 +546,24 @@ const INN = {
 };
 
 // The chronicler keeps the chapel's archive at the notice board left of the
-// door: he stands 1.5 yd off its face.
+// door: he stands 1.5 yd off its face (the board is the model's, at the
+// chapel's scale; the stride is a person's).
 const CHAPEL_BOARD = { x: -4.2, z: -11.8, depth: 0.6 } as const;
+const CHAPEL_BOARD_FACE = {
+  x: CHAPEL_BOARD.x * CHAPEL_SCALE,
+  z: (CHAPEL_BOARD.z - CHAPEL_BOARD.depth / 2) * CHAPEL_SCALE,
+} as const;
 const CHAPEL_ARCHIVE_POSITION = localToWorld(
   CHAPEL_BASE.placement,
   CHAPEL_BASE.rotation,
-  CHAPEL_BOARD.x,
-  CHAPEL_BOARD.z - CHAPEL_BOARD.depth / 2,
+  CHAPEL_BOARD_FACE.x,
+  CHAPEL_BOARD_FACE.z,
 );
 const CHAPEL_ARCHIVE_STANDING_POINT = localToWorld(
   CHAPEL_BASE.placement,
   CHAPEL_BASE.rotation,
-  CHAPEL_BOARD.x,
-  CHAPEL_BOARD.z - CHAPEL_BOARD.depth / 2 - FRONT_CLEARANCE,
+  CHAPEL_BOARD_FACE.x,
+  CHAPEL_BOARD_FACE.z - FRONT_CLEARANCE,
 );
 const CHAPEL = {
   ...CHAPEL_BASE,
@@ -619,7 +571,7 @@ const CHAPEL = {
     ...CHAPEL_BASE.sockets,
     archive: {
       id: 'fenbridge_lantern_chapel_archive',
-      localPosition: { x: CHAPEL_BOARD.x, z: CHAPEL_BOARD.z - CHAPEL_BOARD.depth / 2 },
+      localPosition: { x: CHAPEL_BOARD_FACE.x, z: CHAPEL_BOARD_FACE.z },
       position: CHAPEL_ARCHIVE_POSITION,
       standingPoint: CHAPEL_ARCHIVE_STANDING_POINT,
     },
@@ -812,11 +764,13 @@ const MUSTER_ORDERS = [
   blocking: false,
 }));
 
-// Tanner Hesk works an open yard in the north-east corner, between the
-// bank's back and the east entrance: his tanning rack, barrel and crate
-// stand round the station point (sim/town_props.ts STATION_PROP_CLUSTERS), and he
-// keeps his place 2 yd off it (the cluster notes' tannery stand).
-const TANNERY_STATION_POSITION = { x: -20, z: 320.5 } as const;
+// Tanner Hesk works an open yard in the north-east corner, behind the bank's
+// back toward the east entrance: his tanning rack, barrel and crate stand
+// round the station point (sim/town_props.ts STATION_PROP_CLUSTERS), and he
+// keeps his place 2 yd off it (the cluster notes' tannery stand). The grand
+// bank's back wall stands where the tanner used to, so the yard stepped six
+// yards east and north, past the old ring line rather than on it.
+const TANNERY_STATION_POSITION = { x: -26, z: 327 } as const;
 const TANNER_POSITION = {
   x: TANNERY_STATION_POSITION.x + 2,
   z: TANNERY_STATION_POSITION.z + 1.5,
@@ -837,8 +791,9 @@ function makeNpc(id: string, position: Point2, facing: number, anchorId: string)
 }
 
 // Scout Maren keeps the north entrance, looking down the north street into
-// town.
-const SCOUT_POSITION = { x: -3.2, z: 330 } as const;
+// town: past the bank's north end, where the grand bank's stall now stands on
+// her old spot.
+const SCOUT_POSITION = { x: -3.2, z: 337.5 } as const;
 const NPCS = [
   // The warden greets arrivals at his own door, by the south entrance.
   makeNpc(
@@ -934,6 +889,67 @@ const PRESERVED_PROPS = {
 // The town's post pillar stands at the inn's north corner on the crossroads.
 const MAILBOX_POSITION = { x: 3.2, z: 310.2 } as const;
 
+/**
+ * Level pads under the grand buildings (terrain edits the built-in world
+ * applies after its other stamps, sim/data.ts). The town stands on the marsh
+ * hub's plateau (world.ts: level at the marsh hub height out to seven tenths
+ * of the hub radius, eased back into the fen beyond), and the grand buildings
+ * reach past its level ground: each one stands on a pad at the plateau's
+ * height across its whole reach, a row of stamps along its long axis rather
+ * than one circle, so the level ground hugs its walls. Every building first
+ * lays a wide, soft apron at that height, before any pad, so the fen eases
+ * up to it at a walkable grade; the pads, applied after every apron, then
+ * level each reach exactly (the Highwatch recipe, sim/highwatch_layout.ts).
+ */
+const TOWN_GROUND_HEIGHT = 1.2;
+
+function padsAlong(
+  building: (typeof BUILDINGS)[number],
+  columns: number,
+  rows: number,
+  taper: number,
+) {
+  const reach = building.reach;
+  const cellWidth = (reach.halfWidth * 2) / columns;
+  const cellDepth = (reach.halfDepth * 2) / rows;
+  const core = Math.hypot(cellWidth / 2, cellDepth / 2);
+  const radius = core + taper;
+  const pads: { x: number; z: number; radius: number; delta: number; hardness: number }[] = [];
+  for (let column = 0; column < columns; column++) {
+    for (let row = 0; row < rows; row++) {
+      const center = localToWorld(
+        reach.center,
+        reach.rotation,
+        -reach.halfWidth + cellWidth * (column + 0.5),
+        -reach.halfDepth + cellDepth * (row + 0.5),
+      );
+      pads.push({
+        x: center.x,
+        z: center.z,
+        radius,
+        delta: TOWN_GROUND_HEIGHT,
+        hardness: core / radius,
+      });
+    }
+  }
+  return pads;
+}
+
+// Each building's stamp grid (`columns` along its width, `rows` along its
+// depth), its pad's short taper and its apron's soft reach.
+const GROUND = [
+  { building: WARDEN_HOUSE, columns: 2, rows: 2, taper: 4, apron: 10 },
+  { building: INN, columns: 3, rows: 2, taper: 4, apron: 10 },
+  { building: CHAPEL, columns: 2, rows: 3, taper: 4, apron: 10 },
+  { building: APOTHECARY, columns: 2, rows: 2, taper: 4, apron: 10 },
+  { building: BANK, columns: 2, rows: 2, taper: 4, apron: 10 },
+] as const;
+
+const PADS = [
+  ...GROUND.flatMap((g) => padsAlong(g.building, g.columns, g.rows, g.apron)),
+  ...GROUND.flatMap((g) => padsAlong(g.building, g.columns, g.rows, g.taper)),
+].map((pad) => ({ ...pad, falloff: 'smooth' as const, mode: 'level' as const }));
+
 export const FENBRIDGE_LAYOUT = deepFreeze({
   id: 'fenbridge_rebuild_v1',
   zoneId: 'mirefen_marsh',
@@ -996,6 +1012,7 @@ export const FENBRIDGE_LAYOUT = deepFreeze({
     segments: WALL_SEGMENTS,
   },
   roads: ROADS,
+  pads: PADS,
   repeated: {
     boardwalks: BOARDWALKS,
     musterOrders: MUSTER_ORDERS,
