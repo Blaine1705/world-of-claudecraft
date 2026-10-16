@@ -543,7 +543,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 18054 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 18043,
+    // LOWERED to 18025 by Lantern Hall's guild window: the tooltip's weapon-proc effect
+    // text moved to weapon_proc_text.ts, paying for the window's wiring. Exact count.
+    ceiling: 18025,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1271,7 +1273,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 11594 by the Studio movable gameplay objects change: the
     // dev-only healer practice dummy spawn moved to hub_practice.ts, paying for
     // the moved-objects ctx view and farm-bed resolver. Exact count, zero slack.
-    ceiling: 11594,
+    // LOWERED to 11585 by Lantern Hall: the quest half of a plain NPC talk moved to
+    // quests/npc_quest_talk.ts, paying for the guild's talk route and two IWorld members.
+    ceiling: 11585,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
