@@ -578,8 +578,9 @@ export interface PreservedBuildingPlacement {
  * record is one solid box. One whose model bakes an open doorway is
  * `walkIn`, entered the way Fenbridge's are (sim/town_walk_in.ts).
  *
- * `anchor` is where the model's own origin stands. `walls` is the walled body
- * in the model's own axes, in yards at the placed size: `position`,
+ * `anchor` is where the model's own origin stands. Every measurement below is
+ * the model's own at its AUTHORED size, in its own axes; `scale` carries them
+ * to the size the building stands at. `walls` is the walled body: `position`,
  * `nativeDimensions` and `footprint` are that rectangle, so collision, the
  * calm pad, the rest area and the map silhouette all follow the walls a
  * player sees rather than the eaves above them. `annexes` are the parts that
@@ -588,9 +589,9 @@ export interface PreservedBuildingPlacement {
  * record's own box never has to swallow the open ground beside a tower to
  * seal it. `reach` is the whole ground rectangle the model covers (porch,
  * stair, awning and chimney included), which sits off the origin: the draw
- * cull and the grass clearing read that one. These models face local -Z, so
- * the door and its standing point are on the -Z side, the opposite of the kit
- * shells they replaced.
+ * cull, the grass clearing and the level pad read that one. These models face
+ * local -Z, so the door and its standing point are on the -Z side, the
+ * opposite of the kit shells they replaced.
  */
 function makePlacedBuilding(spec: {
   id: string;
@@ -598,6 +599,8 @@ function makePlacedBuilding(spec: {
   kind: 'house' | 'inn' | 'chapel';
   anchor: Point2;
   rotation: number;
+  /** The size the model stands at, in multiples of its authored size. */
+  scale: number;
   /** The whole model in its own axes: its centre off the origin, its ground
    *  extents, and its full height from the bottom of its footing. */
   reach: { x: number; z: number; width: number; height: number; depth: number };
@@ -607,9 +610,9 @@ function makePlacedBuilding(spec: {
   annexes?: readonly { name: string; x: number; z: number; width: number; depth: number }[];
   /** Where the door sits along the front (local -Z) face. */
   doorX: number;
-  /** The model's largest dimension at AUTHORED size, measured off the shipped
-   *  file (`reach` is at the placed size and rounded there, too coarse to
-   *  scale the baked collision rows by). */
+  /** The model's largest dimension at authored size, measured off the shipped
+   *  file (`reach` is rounded, too coarse to scale the baked collision rows
+   *  by). */
   modelSize: number;
   /** An open doorway a player walks through: the record collides on the
    *  model's own baked walls and stands its floor and entry step as walkable
@@ -617,13 +620,29 @@ function makePlacedBuilding(spec: {
    *  placement. Without it the record is one sealed box. */
   walkIn?: boolean;
 }) {
-  const position = localToWorld(spec.anchor, spec.rotation, spec.walls.x, spec.walls.z);
-  const wallFrontZ = spec.walls.z - spec.walls.depth / 2;
+  const size = spec.scale;
+  // the model's yard of footing, buried, with the ground line sunk a further 0.05
+  const lift = -(size + 0.05);
+  const reach = {
+    x: spec.reach.x * size,
+    z: spec.reach.z * size,
+    width: spec.reach.width * size,
+    height: spec.reach.height * size,
+    depth: spec.reach.depth * size,
+  };
+  const walls = {
+    x: spec.walls.x * size,
+    z: spec.walls.z * size,
+    width: spec.walls.width * size,
+    depth: spec.walls.depth * size,
+  };
+  const position = localToWorld(spec.anchor, spec.rotation, walls.x, walls.z);
+  const wallFrontZ = walls.z - walls.depth / 2;
   const annexes: Obb2[] = (spec.annexes ?? []).map((annex) => ({
     id: `${spec.id}:${annex.name}`,
-    center: localToWorld(spec.anchor, spec.rotation, annex.x, annex.z),
-    halfWidth: annex.width / 2,
-    halfDepth: annex.depth / 2,
+    center: localToWorld(spec.anchor, spec.rotation, annex.x * size, annex.z * size),
+    halfWidth: (annex.width * size) / 2,
+    halfDepth: (annex.depth * size) / 2,
     rotation: spec.rotation,
   }));
   return {
@@ -633,33 +652,35 @@ function makePlacedBuilding(spec: {
     walkIn: spec.walkIn === true,
     position,
     nativeDimensions: {
-      width: spec.walls.width,
+      width: walls.width,
       // above the ground line: the footing below it is buried
-      height: spec.reach.height + PLACED_BUILDING_LIFT,
-      depth: spec.walls.depth,
+      height: reach.height + lift,
+      depth: walls.depth,
     },
     rotation: spec.rotation,
     footprint: {
       id: spec.id,
       center: position,
-      halfWidth: spec.walls.width / 2,
-      halfDepth: spec.walls.depth / 2,
+      halfWidth: walls.width / 2,
+      halfDepth: walls.depth / 2,
       rotation: spec.rotation,
     },
-    maxCornerRadius: Math.hypot(spec.walls.width / 2, spec.walls.depth / 2),
+    maxCornerRadius: Math.hypot(walls.width / 2, walls.depth / 2),
     frontClearance: PLACED_FRONT_CLEARANCE,
     frontStandingPoint: localToWorld(
       spec.anchor,
       spec.rotation,
-      spec.doorX,
+      spec.doorX * size,
       wallFrontZ - PLACED_FRONT_CLEARANCE,
     ),
+    /** The way a visitor looks standing at the door, facing out of it. */
+    frontFacing: Math.atan2(Math.sin(spec.rotation + Math.PI), Math.cos(spec.rotation + Math.PI)),
     placement: {
       x: spec.anchor.x,
       z: spec.anchor.z,
       rotation: spec.rotation,
-      scale: PLACED_BUILDING_SCALE,
-      lift: PLACED_BUILDING_LIFT,
+      scale: size,
+      lift,
       /** The model's largest dimension at authored size: its baked collision
        *  rows are stored in multiples of this over the placed-asset target
        *  height (sim/town_walk_in.ts). */
@@ -668,9 +689,9 @@ function makePlacedBuilding(spec: {
     annexes,
     reach: {
       id: spec.id,
-      center: localToWorld(spec.anchor, spec.rotation, spec.reach.x, spec.reach.z),
-      halfWidth: spec.reach.width / 2,
-      halfDepth: spec.reach.depth / 2,
+      center: localToWorld(spec.anchor, spec.rotation, reach.x, reach.z),
+      halfWidth: reach.width / 2,
+      halfDepth: reach.depth / 2,
       rotation: spec.rotation,
     },
   };
@@ -679,27 +700,49 @@ function makePlacedBuilding(spec: {
 // Where a visitor stands at a placed building's door: at the foot of its
 // stoop, 1.8 yd off the wall face on the door's own line. Inside the 2 yd halo
 // an inn's rest area keeps round its walls (building_layout.ts
-// buildingRestPadding), so the tavern's doorstep is where a traveller rests
-// now that nobody walks in.
+// buildingRestPadding), so the tavern's doorstep is where a traveller rests.
 const PLACED_FRONT_CLEARANCE = 1.8;
+const DEGREE = Math.PI / 180;
+
 // The Tidehold models are authored in yards with their ground line at y 0 and
-// one yard of footing below it. The town stands the set at 1.3 times authored
-// size, so the footing is 1.3 yd deep; the lift buries it and sinks the ground
-// line a further 0.05, the seat the Studio map gives every one of them.
-const PLACED_BUILDING_SCALE = 1.3;
-const PLACED_BUILDING_LIFT = -1.35;
+// one yard of footing below it. Eastbrook stands them GRAND, so a player (2.6
+// yd to the crown) walks in under a door of about five yards, the size the
+// Highwatch rebuild settled on (highwatch_layout.ts). Measured off each
+// model's baked collision (door head and ceiling over its floor, authored
+// size), the town's standing size of 1.3 already does it for all but one:
+//  - the bank: door 4.4, hall ceiling 5.4; at 1.3 the door clears 5.7, the
+//    hall 7.0;
+//  - the smithy: door 4.0, ceiling 4.8; at 1.3 the door clears 5.2, the forge
+//    room 6.2;
+//  - the inn (tavern): door 4.4, taproom ceiling 4.9; at 1.3 the door clears
+//    5.7, the taproom 6.4;
+//  - the chapel (hall): door 5.0, nave walls 8.4; at 1.3 the portal clears 6.5;
+//  - the quay cottage (house_b, sealed): a storey of 4.0 over its step, 5.2 at
+//    1.3;
+//  - the apothecary's shop (shop_a): door 3.25, ceiling 4.2, the smallest; at
+//    1.3 its door cleared only 4.2, so it stands at 1.5, the size Highwatch's
+//    counting house (the same model) stands at: the door clears 4.9 and the
+//    shop room 6.3.
+const STANDARD_SCALE = 1.3;
+const APOTHECARY_SCALE = 1.5;
 
 // The Tidehold rebuild: the eleven kit shells gave way to six painted
-// buildings, each several times the ground of the lot it replaced, so the
-// town keeps its services and loses its filler homes: the smithy on the
-// square at the mouth of the main street, the tavern beside the road up from
-// the quay, the chapel on the rise at the harbour end, the bank in the
-// north-east corner, the apothecary's shop on the square's south side, and a
-// cottage by the quay. Building IDS are kept where the role is (the forge
-// ambience keys on the smithy, the rest rule on the inn), so nothing that
-// resolves through an id moved with the mesh. Anchors and turns are the
-// Studio map's placements; reach boxes are the shipped models' bounds at the
-// placed size, and the wall and annex boxes are their baked collision lines
+// buildings round an open middle, set out where the World of ClaudeCraft
+// Studio map (data/maps/world_of_claudecraft.map.json) stands them: the bank
+// with the weekly vault on its flank at the harbour end of the main street,
+// the smithy north of the square on the old chapel rise, the inn up the slope
+// beyond the farm plots, the chapel and its churchyard on the rise west of the
+// square, the apothecary's shop at the crafts lane's end above the strand, and
+// a cottage by the quay. Each stands at the anchor and turn that map gives it
+// (the Studio placement's own x, z and rotY), except where its larger ground
+// crossed something the built-in world keeps: the chapel stands 11.4 yd
+// inland (5 yd west, 10.2 yd north) of the map's spot, whose ground ran out
+// over the strand into the bay; the apothecary's shop 4.5 yd north, off the
+// strand; and the inn 3.5 yd back from its door, clear of the farm plots.
+// Building IDS are kept where the role is (the forge ambience keys on the
+// smithy, the rest rule on the inn), so nothing that resolves through an id
+// moved with the mesh. Reach boxes are the shipped models' bounds, and the
+// wall and annex boxes are their baked collision lines
 // (tests/eastbrook_placed_buildings.test.ts measures all of them off the
 // shipped files). Every one whose model bakes an open doorway (all but the
 // quay cottage) is walk-in.
@@ -708,13 +751,14 @@ const BUILDINGS = [
     id: 'eastbrook_bank',
     assetId: '/models/tidehold/bank.glb',
     kind: 'house',
-    anchor: { x: 30.38, z: -115 },
-    rotation: Math.PI / 2,
-    reach: { x: -0.92, z: 1.01, width: 29.39, height: 29.25, depth: 25.79 },
-    walls: { x: 0, z: 0, width: 23.4, depth: 16.24 },
+    anchor: { x: -61.99, z: -118.33 },
+    rotation: 225 * DEGREE,
+    scale: STANDARD_SCALE,
+    reach: { x: -0.7013, z: 0.7819, width: 22.6067, height: 22.5005, depth: 19.8387 },
+    walls: { x: 0, z: 0, width: 18, depth: 12.4923 },
     annexes: [
-      { name: 'strongroom', x: 0, z: 10.66, width: 7.54, depth: 5.08 },
-      { name: 'turret', x: -12.47, z: -8.9, width: 4.2, depth: 4.2 },
+      { name: 'strongroom', x: 0, z: 8.2, width: 5.8, depth: 3.9077 },
+      { name: 'turret', x: -9.5923, z: -6.8462, width: 3.2308, depth: 3.2308 },
     ],
     doorX: 0,
     modelSize: 22.6067,
@@ -724,14 +768,15 @@ const BUILDINGS = [
     id: 'eastbrook_smithy',
     assetId: '/models/tidehold/smithy.glb',
     kind: 'house',
-    anchor: { x: -34.06, z: -113.48 },
-    rotation: Math.PI,
-    reach: { x: 4.46, z: -0.38, width: 25.74, height: 16.61, depth: 15.2 },
-    walls: { x: 0, z: 0, width: 14.3, depth: 11.7 },
-    // the open forge shelter on its harbour side: a raised deck under a roof,
+    anchor: { x: -4.2, z: -75.2 },
+    rotation: 20 * DEGREE,
+    scale: STANDARD_SCALE,
+    reach: { x: 3.4285, z: -0.295, width: 19.797, height: 12.7809, depth: 11.6901 },
+    walls: { x: 0, z: 0, width: 11, depth: 9 },
+    // the open forge shelter at its west end: a raised deck under a roof,
     // crowded with the forge, the anvil and the quench trough
-    annexes: [{ name: 'forge_shelter', x: 11.86, z: -0.13, width: 9.4, depth: 12.48 }],
-    doorX: -1.56,
+    annexes: [{ name: 'forge_shelter', x: 9.1231, z: -0.1, width: 7.2308, depth: 9.6 }],
+    doorX: -1.2,
     modelSize: 19.797,
     walkIn: true,
   }),
@@ -739,13 +784,14 @@ const BUILDINGS = [
     id: 'eastbrook_inn',
     assetId: '/models/tidehold/tavern.glb',
     kind: 'inn',
-    anchor: { x: -40.51, z: -72.3 },
-    rotation: Math.PI / 2,
-    reach: { x: 0.36, z: -0.07, width: 29.44, height: 24.41, depth: 21.84 },
-    walls: { x: 0, z: 0, width: 26, depth: 16.9 },
+    anchor: { x: -30.34, z: -60.63 },
+    rotation: 24 * DEGREE,
+    scale: STANDARD_SCALE,
+    reach: { x: 0.2721, z: -0.0502, width: 22.6483, height: 18.7798, depth: 16.7997 },
+    walls: { x: 0, z: 0, width: 20, depth: 13 },
     annexes: [
-      { name: 'front_bench', x: -6.63, z: -9.42, width: 7.02, depth: 1.16 },
-      { name: 'barrels', x: 14.17, z: -6.37, width: 1.42, depth: 2.98 },
+      { name: 'front_bench', x: -5.1, z: -7.2462, width: 5.4, depth: 0.8923 },
+      { name: 'barrels', x: 10.9, z: -4.9, width: 1.0923, depth: 2.2923 },
     ],
     doorX: 0,
     modelSize: 22.6483,
@@ -755,13 +801,14 @@ const BUILDINGS = [
     id: 'eastbrook_chapel',
     assetId: '/models/tidehold/hall.glb',
     kind: 'chapel',
-    anchor: { x: -64, z: -115.57 },
-    rotation: Math.PI,
-    reach: { x: 2.51, z: -0.33, width: 24.51, height: 39.65, depth: 31.48 },
-    walls: { x: 0, z: 0, width: 15.6, depth: 28.6 },
+    anchor: { x: 28.2, z: -119.62 },
+    rotation: 125 * DEGREE,
+    scale: STANDARD_SCALE,
+    reach: { x: 1.9255, z: -0.254, width: 18.8515, height: 30.4998, depth: 24.212 },
+    walls: { x: 0, z: 0, width: 12, depth: 22 },
     annexes: [
-      { name: 'bell_tower', x: 10.73, z: -11.7, width: 7.02, depth: 7.02 },
-      { name: 'notice_board', x: -5.46, z: -15.34, width: 2.34, depth: 0.78 },
+      { name: 'bell_tower', x: 8.2538, z: -9, width: 5.4, depth: 5.4 },
+      { name: 'notice_board', x: -4.2, z: -11.8, width: 1.8, depth: 0.6 },
     ],
     doorX: 0,
     modelSize: 30.4998,
@@ -771,16 +818,17 @@ const BUILDINGS = [
     id: 'eastbrook_apothecary',
     assetId: '/models/tidehold/shop_a.glb',
     kind: 'house',
-    anchor: { x: -7.02, z: -82.03 },
-    rotation: 0,
-    reach: { x: 0, z: -1.04, width: 16.91, height: 21.16, depth: 15.86 },
-    walls: { x: 0, z: 0, width: 14.3, depth: 10.92 },
+    anchor: { x: -30.59, z: -125.13 },
+    rotation: 175 * DEGREE,
+    scale: APOTHECARY_SCALE,
+    reach: { x: 0, z: -0.8001, width: 13.004, height: 16.2797, depth: 12.2001 },
+    walls: { x: 0, z: 0, width: 11, depth: 8.4 },
     annexes: [
-      { name: 'stall_counter', x: 3.09, z: -7.7, width: 4.7, depth: 1 },
+      { name: 'stall_counter', x: 2.3769, z: -5.9231, width: 3.6154, depth: 0.7692 },
       // the barrels at the stall's east end, with the awning post beside them
-      { name: 'stall_barrels', x: 6.35, z: -7.49, width: 1.92, depth: 2.82 },
+      { name: 'stall_barrels', x: 4.8846, z: -5.7615, width: 1.4769, depth: 2.1692 },
     ],
-    doorX: -2.08,
+    doorX: -1.6,
     modelSize: 16.2797,
     walkIn: true,
   }),
@@ -788,11 +836,12 @@ const BUILDINGS = [
     id: 'eastbrook_quay_cottage',
     assetId: '/models/tidehold/house_b.glb',
     kind: 'house',
-    anchor: { x: -75, z: -49.9 },
-    rotation: 0,
-    reach: { x: -0.4, z: 0, width: 19.52, height: 20.77, depth: 15.21 },
-    walls: { x: 0, z: 0, width: 16.58, depth: 11.12 },
-    annexes: [{ name: 'crates', x: -9.14, z: -2.37, width: 1.5, depth: 2.92 }],
+    anchor: { x: -59.11, z: -51.35 },
+    rotation: 46 * DEGREE,
+    scale: STANDARD_SCALE,
+    reach: { x: -0.3041, z: 0, width: 15.0123, height: 15.9799, depth: 11.6997 },
+    walls: { x: 0, z: 0, width: 12.7538, depth: 8.5538 },
+    annexes: [{ name: 'crates', x: -7.0308, z: -1.8231, width: 1.1538, depth: 2.2462 }],
     doorX: 0,
     modelSize: 15.9799,
     // no walkIn: the cottage's model bakes a shut door, so it stays one sealed box
@@ -807,16 +856,16 @@ function buildingById(id: string) {
 
 /**
  * The crafts lane's benches and their masters stand where the kit workshops'
- * doors were. Those workshops are gone (the placed smithy on the square took
- * their trade), but the four stations are the lane now, an open yard south of
- * the square, and every station route, master stand and yard fence is still
- * measured from the same workshop lots and the old inn door.
+ * doors were. Those workshops are gone (the placed smithy took their trade),
+ * but the stations are the lane now, an open yard south of the square, and
+ * the forge, the toolworks and the kitchens, their routes, master stands and
+ * yard fence are still measured from the same workshop lots and the old inn
+ * door. The loom left its lot to the apothecary's shop (LOOM_POSITION).
  */
 function lotFront(position: Point2, rotation: number, depth: number, across = 0): Point2 {
   return localToWorld(position, rotation, across, depth / 2 + FRONT_CLEARANCE);
 }
 const FORGE_LOT = { position: { x: -2, z: -122 }, rotation: -2.0344439357957027, depth: 6.6 };
-const LOOM_LOT = { position: { x: -28, z: -122 }, rotation: 2.5535900500422257, depth: 5.6 };
 const TOOLWORKS_LOT = { position: { x: -16, z: -128 }, rotation: 0.5880026035475675, depth: 5.6 };
 const KITCHENS_LOT = { position: { x: -38, z: -88 }, rotation: -2.5535900500422257, depth: 6.9 };
 
@@ -1066,14 +1115,17 @@ function gateCrossing(id: string): Point2 {
 const ROADS = [
   {
     id: 'north',
-    existingRoadPoint: { x: 6, z: -72 },
+    existingRoadPoint: { x: 13.5, z: -69.5 },
     gateId: null,
     halfWidth: 1.5,
+    // Swung west round the smithy's forge shelter, which stands on the old
+    // line, and back onto it north of the smithy.
     points: [
       { x: 14.6, z: -88.6 },
-      { x: 12, z: -85 },
-      { x: 10, z: -80 },
-      { x: 6, z: -72 },
+      { x: 15.8, z: -83 },
+      { x: 17, z: -76 },
+      { x: 13.5, z: -69.5 },
+      { x: 6, z: -63.5 },
       { x: 0, z: -58 },
     ],
   },
@@ -1102,12 +1154,14 @@ const ROADS = [
     existingRoadPoint: { x: -10, z: -112 },
     gateId: null,
     halfWidth: 1.5,
+    // The crafts lane: it stops short of the apothecary's shop, which took
+    // the lane's old end and the loom yard beside it.
     points: [
       { x: -11, z: -105.5 },
       { x: -10, z: -112 },
       { x: -9, z: -119 },
       { x: -12, z: -123 },
-      { x: -22, z: -120.5 },
+      { x: -18.5, z: -121.5 },
     ],
   },
   {
@@ -1156,18 +1210,21 @@ const ROADS = [
       { x: -92, z: -92 },
     ],
   },
-  // A short lane from the inn's door down to the main street, so the inn
-  // square joins the town's spine instead of floating beside it (owner
-  // refinement round 3). APPENDED last: zone1's ZONE1_ROADS spreads these
-  // entries by index, so new roads never land mid-array.
+  // A lane from the inn's door down to the main street, so the inn joins the
+  // town's spine instead of floating beside it (owner refinement round 3; it
+  // reaches up the slope to the door since the inn moved north of the farm
+  // plots). APPENDED last: zone1's ZONE1_ROADS spreads these entries by
+  // index, so new roads never land mid-array.
   {
     id: 'inn_lane',
     existingRoadPoint: { x: -44, z: -98 },
     gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: -40.8, z: -92.2 },
-      { x: -42, z: -95 },
+      { x: -35.75, z: -72.77 },
+      { x: -37, z: -82 },
+      { x: -38.5, z: -90 },
+      { x: -40.5, z: -96 },
       { x: -44, z: -98 },
     ],
   },
@@ -1175,6 +1232,13 @@ const ROADS = [
 
 const BANK = buildingById('eastbrook_bank');
 const CHAPEL = buildingById('eastbrook_chapel');
+const SMITHY = buildingById('eastbrook_smithy');
+
+// The apothecary's shop took the loom yard at the crafts lane's west end, so
+// the loom stands across the lane's last bend, still in the yard south of the
+// square, its weaver on the master's side of the bench (town_props.ts: the
+// loom master stands at station -2, -1).
+const LOOM_POSITION = { x: -18.5, z: -116.5 } as const;
 
 const STATIONS = [
   {
@@ -1196,7 +1260,7 @@ const STATIONS = [
     id: 'station_eastbrook_loom',
     type: 'loom',
     masterNpcId: 'weaver_ottilie',
-    position: lotFront(LOOM_LOT.position, LOOM_LOT.rotation, LOOM_LOT.depth),
+    position: LOOM_POSITION,
     interactionRadius: 20,
   },
   {
@@ -1226,22 +1290,20 @@ const MERCHANT_POSITION = localToWorld(
 // Starter combat givers occupy the civic square with room between each stand.
 // Wilkes keeps his vendor service on the market edge; trades stay at their stations.
 const TRADER_POSITION = { x: -25, z: -94 } as const;
-// The apothecary keeps her shop now: she stands a few strides out from its
-// door on the square's south side, looking out over the square. The Studio
-// rebuild map has her 3 yd further west, at (-12.8, -92.6); here she stays
-// within a short walk of Marshal Redbrook, so the starter combat givers still
-// read as one group around the square (each within 12 yd of another,
-// tests/eastbrook_combat_giver_visibility.test.ts).
-const APOTHECARY_POSITION = { x: -9.5, z: -93.2 } as const;
-// A stride off the smithy's street corner, clear of its door.
+// The apothecary keeps her shop: she stands out from its door toward the
+// square, looking up at it, so the starter combat givers still read as one
+// group round the square (each within 12 yd of another, and none more than
+// 18 yd off it, tests/eastbrook_combat_giver_visibility.test.ts).
+const APOTHECARY_POSITION = { x: -24.5, z: -112.5 } as const;
+// On the main street at the square's corner.
 const BRANDT_POSITION = { x: -22.3, z: -104.6 } as const;
 const ODELL_POSITION = { x: -16, z: -111 } as const;
 // Station cluster props sit at station + world-axis offsets (town_props.ts,
 // no rotation), so the cook's work point derives the same way.
-// Smith Haldren keeps the smithy on the square: he stands at its door on the
-// main street, looking up the street. Forgemistress Darva keeps the crafting
-// station in the yard behind it.
-const SMITH_POSITION = { x: -28, z: -103.7 } as const;
+// Smith Haldren keeps the smithy: he stands at its door north of the square,
+// looking out of it. Forgemistress Darva keeps the crafting station in the
+// crafts lane south of the square.
+const SMITH_POSITION = SMITHY.frontStandingPoint;
 // Round 6b (owner): the forge and toolworks benches sit close together in the
 // crafts lane, so their masters stand out to OPPOSITE sides of their own
 // stations rather than both toward the middle. Each still works its bench;
@@ -1260,13 +1322,15 @@ const COOK_POSITION = {
   x: KITCHENS_STATION.position.x + 0.2,
   z: KITCHENS_STATION.position.z - 1.5,
 } as const;
-const WEAVER_POSITION = localToWorld(LOOM_STATION.position, LOOM_LOT.rotation, 2, 0);
+const WEAVER_POSITION = { x: -20.5, z: -117.5 } as const;
 const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS_LOT.rotation, -3.2, 0);
-const SAUL_POSITION = { x: 10.2, z: -87.5 } as const;
-// Round 6b (owner): off the chapel step, where he stood 7 yd from Brother
-// Aldric. FURY is a service NPC (the honor quartermaster), so he belongs on
-// the town's edge rather than in the churchyard approach.
-const FURY_POSITION = { x: 16, z: -78 } as const;
+// By the north road's corner of the square, a stride off the smithy's forge
+// shelter.
+const SAUL_POSITION = { x: 10.8, z: -91 } as const;
+// Round 6b (owner): FURY is a service NPC (the honor quartermaster), so he
+// belongs on the town's edge rather than in the churchyard approach: between
+// the north road and the coast track where they leave the square.
+const FURY_POSITION = { x: 21, z: -83.5 } as const;
 
 // Marshal stands beside the noticeboard, a full INTERACT_RANGE clear of
 // both the board's body and its posting point so a player posting a notice
@@ -1277,13 +1341,26 @@ const FURY_POSITION = { x: 16, z: -78 } as const;
 // hand's width further south, at z -95.5, which is inside the 2.5 yd the
 // givers keep off the civic link road).
 const MARSHAL_POSITION = { x: 1.5, z: -95.3 } as const;
-// The chapel's door opens north onto the main street; Brother Aldric greets
-// from the foot of its steps. The bursar and the card master flank the bank's
-// door, looking back toward the square.
-const ALDRIC_POSITION = { x: -68.5, z: -97.7 } as const;
-const BURSAR_POSITION = { x: 16.3, z: -119.5 } as const;
-const CARD_MASTER_POSITION = { x: 16.3, z: -109.5 } as const;
-const BANK_DOOR_FACING = -Math.PI / 2;
+// The chapel's door looks across the coast track to the square; Brother
+// Aldric greets from the foot of its steps. The bursar and the card master
+// flank the bank's door, a few strides out from it and either side of its
+// line, looking out of it.
+const ALDRIC_POSITION = CHAPEL.frontStandingPoint;
+const BANK_DOOR_OUT = 4.16;
+const BANK_DOOR_SIDE = 4.5;
+const BURSAR_POSITION = localToWorld(
+  BANK.frontStandingPoint,
+  BANK.rotation,
+  BANK_DOOR_SIDE,
+  -BANK_DOOR_OUT,
+);
+const CARD_MASTER_POSITION = localToWorld(
+  BANK.frontStandingPoint,
+  BANK.rotation,
+  -BANK_DOOR_SIDE,
+  -BANK_DOOR_OUT,
+);
+const BANK_DOOR_FACING = BANK.frontFacing;
 
 const NPCS = [
   makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
@@ -1299,10 +1376,15 @@ const NPCS = [
     facingToward(TRADER_POSITION, CIVIC_CENTER),
     'eastbrook_civic_square',
   ),
-  makeNpc('apothecary_lin', APOTHECARY_POSITION, Math.PI, 'eastbrook_apothecary'),
-  makeNpc('brother_aldric', ALDRIC_POSITION, 0, CHAPEL.id),
-  // The smith looks OUT from his door up the main street, never at his own wall.
-  makeNpc('smith_haldren', SMITH_POSITION, 0, 'eastbrook_smithy'),
+  makeNpc(
+    'apothecary_lin',
+    APOTHECARY_POSITION,
+    facingToward(APOTHECARY_POSITION, CIVIC_CENTER),
+    'eastbrook_apothecary',
+  ),
+  makeNpc('brother_aldric', ALDRIC_POSITION, CHAPEL.frontFacing, CHAPEL.id),
+  // The smith looks OUT from his door, never at his own wall.
+  makeNpc('smith_haldren', SMITH_POSITION, SMITHY.frontFacing, 'eastbrook_smithy'),
   makeNpc(
     'fisherman_brandt',
     BRANDT_POSITION,
@@ -1325,7 +1407,12 @@ const NPCS = [
     facingToward(COOK_POSITION, KITCHENS_FIRE_POINT),
     KITCHENS_STATION.id,
   ),
-  makeNpc('weaver_ottilie', WEAVER_POSITION, LOOM_LOT.rotation, LOOM_STATION.id),
+  makeNpc(
+    'weaver_ottilie',
+    WEAVER_POSITION,
+    facingToward(WEAVER_POSITION, LOOM_STATION.position),
+    LOOM_STATION.id,
+  ),
   makeNpc('tinker_gizzel', TINKER_POSITION, TOOLWORKS_LOT.rotation, TOOLWORKS_STATION.id),
   makeNpc('fury', FURY_POSITION, facingToward(FURY_POSITION, CIVIC_CENTER), 'eastbrook_chapel'),
 ] as const;
@@ -1365,6 +1452,16 @@ const NOTICEBOARD_FRONT_STANDING_POINT = localToWorld(
   1.4,
 );
 
+// The churchyard's first plot: the props graveyard anchor, the Pale Keeper's
+// stone. The second plot (zone1 graveyards) fills the yard's south end.
+const GRAVEYARD_ANCHOR = { x: 37.5, z: -99.3 } as const;
+
+// The Weekly Vault: a stone hall flush against the bank's harbour-side
+// flank, its door looking the way the bank's does, toward the square. Half a
+// yard off the bank's wall so the two boxes never overlap; it stands on the
+// bank's shelf (EASTBROOK_LAYOUT.pads).
+const WEEKLY_VAULT = { x: -73.73, z: -103.4, rot: Math.PI / 4 } as const;
+
 const SERVICES = {
   playerStart: {
     id: 'eastbrook_player_start',
@@ -1403,20 +1500,23 @@ const SERVICES = {
     frontStandingPoint: NOTICEBOARD_FRONT_STANDING_POINT,
     interactionRadius: 4,
   },
+  // The churchyard moved with the chapel, off the rise the smithy took: its
+  // graves stand inside the iron railings beside the chapel's north wall
+  // (zone1 decorProps), the Pale Keeper over the first stone of the grid.
   graveyard: {
     id: 'gy_eastbrook',
-    position: { x: -2, z: -70 },
-    legacyReleasePoint: { x: 0, z: -70 },
+    position: GRAVEYARD_ANCHOR,
+    legacyReleasePoint: { x: GRAVEYARD_ANCHOR.x + 2, z: GRAVEYARD_ANCHOR.z },
     healerTemplateId: 'spirit_healer',
     healerFacing: Math.PI,
-    headstones: [
-      { id: 'gy_eastbrook_headstone_0', position: { x: -2, z: -70 } },
-      { id: 'gy_eastbrook_headstone_1', position: { x: 0.2, z: -70 } },
-      { id: 'gy_eastbrook_headstone_2', position: { x: 2.4, z: -70 } },
-      { id: 'gy_eastbrook_headstone_3', position: { x: -2, z: -67.4 } },
-      { id: 'gy_eastbrook_headstone_4', position: { x: 0.2, z: -67.4 } },
-      { id: 'gy_eastbrook_headstone_5', position: { x: 2.4, z: -67.4 } },
-    ],
+    // six stones on the props graveyard grid (2.2 yd apart in x, 2.6 in z)
+    headstones: [0, 1, 2, 3, 4, 5].map((index) => ({
+      id: `gy_eastbrook_headstone_${index}`,
+      position: {
+        x: GRAVEYARD_ANCHOR.x + (index % 3) * 2.2,
+        z: GRAVEYARD_ANCHOR.z + Math.floor(index / 3) * 2.6,
+      },
+    })),
   },
   rest: { id: 'eastbrook_inn_rest', buildingId: 'eastbrook_inn' },
   stations: STATIONS,
@@ -1450,16 +1550,15 @@ const SERVICES = {
     {
       id: 'eastbrook_graveyard_route',
       bodyRadius: 0.5,
-      // The final approach threads the gap between the headstone columns
-      // (x -14 and -11.8): the stones are solid colliders now, so the walk
-      // may no longer run down the x -14 column straight through the middle
-      // stone. The Spirit Healer's anchor stone itself stays scenery.
+      // Out of the square's west corner and in through the churchyard's open
+      // north side, stopping short of the stones (solid colliders) within
+      // the Pale Keeper's reach.
       points: [
         { x: 14, z: -89 },
-        { x: 12, z: -85 },
-        { x: 9, z: -79 },
-        { x: 3, z: -72.5 },
-        { x: -1, z: -71.4 },
+        { x: 20, z: -91.5 },
+        { x: 27, z: -93.5 },
+        { x: 33, z: -95 },
+        { x: 38.6, z: -94.8 },
       ],
     },
     {
@@ -1490,24 +1589,114 @@ const SERVICES = {
   bankerChestSamplePoints: BANKER_CHEST_SAMPLE_POINTS,
 } as const;
 
+/** One level stamp of a building's pad (the HeightStamp shape, in plain data:
+ *  this module imports nothing). */
+export interface EastbrookPad {
+  x: number;
+  z: number;
+  radius: number;
+  delta: number;
+  falloff: 'smooth';
+  mode: 'level';
+  hardness: number;
+}
+
+/**
+ * Level pads under a rectangle: a grid of stamps whose solid cores just cover
+ * its cells, so the level ground hugs the rectangle instead of spilling round
+ * it in one great disc (the Highwatch pads, highwatch_layout.ts), with
+ * `taper` yards of eased grade beyond. Every stamp levels to `height`.
+ */
+function padsOver(
+  box: { center: Point2; halfWidth: number; halfDepth: number; rotation: number },
+  height: number,
+  columns: number,
+  rows: number,
+  taper: number,
+): EastbrookPad[] {
+  const cellWidth = (box.halfWidth * 2) / columns;
+  const cellDepth = (box.halfDepth * 2) / rows;
+  const core = Math.hypot(cellWidth / 2, cellDepth / 2);
+  const radius = core + taper;
+  const pads: EastbrookPad[] = [];
+  for (let column = 0; column < columns; column++) {
+    for (let row = 0; row < rows; row++) {
+      const center = localToWorld(
+        box.center,
+        box.rotation,
+        -box.halfWidth + cellWidth * (column + 0.5),
+        -box.halfDepth + cellDepth * (row + 0.5),
+      );
+      pads.push({
+        x: center.x,
+        z: center.z,
+        radius,
+        delta: height,
+        falloff: 'smooth',
+        mode: 'level',
+        hardness: core / radius,
+      });
+    }
+  }
+  return pads;
+}
+
+// The ground under the placed buildings: each stands on a level shelf that
+// covers its whole reach (porch, stair and eaves), so nothing grows up
+// through a floor and no footing hangs over a dip, eased into the streets
+// round it. The shelves keep to the town's grade: the bank, the vault on its
+// flank and the apothecary's shop on the strand's lip at the main street's
+// height (-0.7), the chapel on the plat beside the coast track (-0.9), and
+// the smithy, the inn and the quay cottage on the rise north of the square
+// (0.5), cut into it, each with a long taper so the banks behind them stay
+// climbable. Neighbours share a height wherever their tapers overlap, so one
+// pad never tilts another building's floor; the coastal ones keep a short
+// taper that ends on the dry strand (no ground crosses the sea surface). In
+// the built-in world they are the last stamps on their ground (data.ts), the
+// Studio rebuild map carries the same list.
+const BANK_SHELF = -0.7;
+const CHAPEL_SHELF = -0.9;
+const RISE_SHELF = 0.5;
+const PADS: EastbrookPad[] = [
+  ...padsOver(buildingById('eastbrook_bank').reach, BANK_SHELF, 5, 5, 4),
+  // the vault and the apron before its door, on the bank's shelf
+  ...padsOver(
+    {
+      center: localToWorld(WEEKLY_VAULT, WEEKLY_VAULT.rot, 0, 1.75),
+      halfWidth: 7,
+      halfDepth: 7.75,
+      rotation: WEEKLY_VAULT.rot,
+    },
+    BANK_SHELF,
+    2,
+    2,
+    4,
+  ),
+  ...padsOver(buildingById('eastbrook_smithy').reach, RISE_SHELF, 3, 2, 5),
+  ...padsOver(buildingById('eastbrook_inn').reach, RISE_SHELF, 3, 3, 9),
+  ...padsOver(buildingById('eastbrook_chapel').reach, CHAPEL_SHELF, 3, 4, 4),
+  ...padsOver(buildingById('eastbrook_apothecary').reach, BANK_SHELF, 2, 2, 5),
+  ...padsOver(buildingById('eastbrook_quay_cottage').reach, RISE_SHELF, 2, 2, 8),
+];
+
 export const EASTBROOK_LAYOUT = deepFreeze({
   id: 'eastbrook_civic_layout_v2',
   preservedBuildings: [] as readonly PreservedBuildingPlacement[],
   buildings: BUILDINGS,
-  // The Tidehold rebuild moved the vault off the bank's new ground: it stands
-  // on the green south of the civic square (the lot Smith Haldren's kit
-  // workshop left), its door facing north onto the square.
+  pads: PADS,
+  // The vault stands where the Studio map stands it, against the bank's
+  // harbour-side flank (WEEKLY_VAULT).
   weeklyVault: {
     id: 'eastbrook_weekly_vault',
     kind: 'house',
-    x: 0.5,
-    z: -108.75,
+    x: WEEKLY_VAULT.x,
+    z: WEEKLY_VAULT.z,
     w: 14,
     d: 12,
-    rot: 0,
+    rot: WEEKLY_VAULT.rot,
     height: 13,
-    // 3 yd off the front face, east of the door (the map has him half as far)
-    keeper: { x: 4.6, z: -99.75 },
+    // 3 yd off the front face, 4.1 yd along it from the door toward the bank
+    keeper: localToWorld(WEEKLY_VAULT, WEEKLY_VAULT.rot, 4.1, 9),
   },
   civic: {
     center: CIVIC_CENTER,
