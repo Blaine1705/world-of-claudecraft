@@ -15,7 +15,10 @@
 //    forge shelter (an opening too: the shelter is open to the weather);
 //  - manor (the Highwatch manor, built in this repo): the great hall under its hood, the
 //    front door, the dais bay through its arch, and through their arches and doors the
-//    dining hall and the kitchen (west), the library and the chapel (east).
+//    dining hall and the kitchen (west), the library and the chapel (east);
+//  - guild (the Highwatch adventurers' guild, built in this repo): the great hall clear of
+//    the guildmaster's hearth and the quartermaster's shelves, the front door, the arch
+//    and the trophy hall behind it, short of its hearth.
 // A model with no entry here (a sealed one) has no air: the camera stays the open-world one.
 //
 // Interiors are world axis-aligned, so a building turned by anything but a quarter turn
@@ -117,6 +120,22 @@ const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
       [-22.9, -14.15, 0.6, 7.9, -6.95, 3.9],
       [-19.8, -17.8, 0.6, 5.4, 3.8, 5.9],
       [-21.75, -15.85, 0.6, 7.8, 5.85, 12.15],
+    ],
+    openings: [{ box: 1, axis: 2, side: -1 }],
+  },
+  guild: {
+    // scripts/assets/highwatch_guild/guild_plan.py: one storey, the floor at 0.6 everywhere
+    boxes: [
+      // the great hall: inner walls x +-14, z +-10, clear of the hearth's breast and the
+      // shelves on the right wall (x -12.7), under the chandeliers; the open roof's trusses
+      // all stand above 11.6
+      [-12.45, 13.75, 0.6, 9.6, -9.75, 9.75],
+      // the front door through the front wall (z -10.9 to -10), its head at 6.2
+      [-1.6, 1.6, 0.6, 6.2, -11.0, -9.7],
+      // the round arch into the trophy hall, inside its curve, and the trophy hall under its
+      // tie beams, short of its hearth's breast
+      [-2.8, 2.8, 0.6, 7.4, 9.6, 11.2],
+      [-8.25, 8.25, 0.6, 9.1, 10.95, 18.55],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },

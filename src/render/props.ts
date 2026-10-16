@@ -50,6 +50,7 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
+import { highwatchGuildFlames, highwatchGuildLights } from './highwatch_guild_lights';
 import { buildHighwatchManorLane, highwatchManorLanePrewarmPart } from './highwatch_manor_lane';
 import { highwatchManorFlames, highwatchManorLights } from './highwatch_manor_lights';
 import {
@@ -1758,7 +1759,9 @@ export function buildProps(
   // ...and the Highwatch manor's hearth, range and lamps (render/highwatch_manor_lights.ts),
   // lit like a campfire: root-level, world-positioned, in the fire-light budget
   if (highwatchTown) {
-    for (const light of highwatchManorLights(seed)) {
+    // (the adventurers' guild's hearths, lamps and belfry lantern ride the same budget:
+    // render/highwatch_guild_lights.ts)
+    for (const light of [...highwatchManorLights(seed), ...highwatchGuildLights(seed)]) {
       group.add(light);
       fireLights.push(light);
     }
@@ -1771,7 +1774,11 @@ export function buildProps(
     group.add(manorSmoke.mesh);
     keepFromMerge.add(manorSmoke.mesh);
     noShadow.add(manorSmoke.mesh);
-    for (const fire of highwatchManorFlames(seed, usePbr ? EMISSIVE_LIGHT : 1.4)) {
+    const fireGlow = usePbr ? EMISSIVE_LIGHT : 1.4;
+    for (const fire of [
+      ...highwatchManorFlames(seed, fireGlow),
+      ...highwatchGuildFlames(seed, fireGlow),
+    ]) {
       group.add(fire.holder);
       flames.push(fire.flame);
       keepLiveMeshes.add(fire.flame);

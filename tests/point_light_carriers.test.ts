@@ -495,6 +495,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/haunt_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/highwatch_guild_lights.ts':
+    'the Highwatch adventurers guild hearths, lamps and belfry lantern, pushed into the props fireLights budget beside the campfires',
   'render/highwatch_manor_lights.ts':
     'the Highwatch manor hearth, lamps and ridge lantern, pushed into the props fireLights budget beside the campfires',
   'render/ignivar_fire_vfx.ts':

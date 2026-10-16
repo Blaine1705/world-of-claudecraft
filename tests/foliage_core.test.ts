@@ -76,7 +76,9 @@ describe('Eastbrook town grass exclusion', () => {
     // old kit houses had none): 85 to 95.
     // Re-pinned 2026-10 for the Highwatch manor on the north hill: one more
     // placed building, its reach and its door apron: 95 to 97.
-    expect(exclusions).toHaveLength(97);
+    // Re-pinned 2026-10 for the Highwatch adventurers' guild at the old stable yard: one
+    // more placed building, its reach and its door apron: 97 to 99.
+    expect(exclusions).toHaveLength(99);
     for (const building of HIGHWATCH_LAYOUT.buildings) {
       expect(exclusions.some((item) => item.id === building.id)).toBe(true);
       expect(exclusions.some((item) => item.id === `${building.id}:serviceApron`)).toBe(true);

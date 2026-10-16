@@ -316,6 +316,8 @@ const TOWN_BUILDING_NATURAL: Readonly<Record<string, { x: number; y: number; z: 
   'tidehold/highwatch/smithy': { x: 19.797, y: 12.7809, z: 11.6901 },
   // ...and the manor built for Highwatch alone (scripts/assets/highwatch_manor/)
   'tidehold/highwatch/manor': { x: 51.248, y: 34.1, z: 47.155 },
+  // ...and the adventurers' guild (scripts/assets/highwatch_guild/)
+  'tidehold/highwatch/guild': { x: 39.05, y: 35.45, z: 47.75 },
 };
 
 /**

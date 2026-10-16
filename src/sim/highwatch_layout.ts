@@ -237,7 +237,42 @@ const MANOR = makePlacedTownBuilding(
   placedTownSeat(MANOR_SCALE, FRONT_CLEARANCE * MANOR_SCALE),
 );
 
-const BUILDINGS = [INN, CHAPEL, COUNTING_HOUSE, WATCH_HOUSE, SMITHY, MANOR] as const;
+// The adventurers' guild, Lantern Hall, at the old stable yard where the Stormcrag road's spur
+// ends (the yard Marla's stables left when she moved to Galecrest): a walk-in hall of one
+// storey (scripts/assets/highwatch_guild/, built at its own grand size, so it stands at scale
+// 1), its door looking east down the spur at the town. Its great hall is the wall box; the
+// trophy hall behind it, the lantern tower at the front's south corner and the two chimneys
+// are its solid annexes; the porch, the steps and the paved yard lie inside its reach. Its pad
+// and apron touch no camp's ground (the Stormcrag elementals' wander stops north of it, the
+// burrows' kobolds south of the shelf), so no seeded roll moves.
+const GUILD_SCALE = 1;
+const GUILD = makePlacedTownBuilding(
+  {
+    id: 'highwatch_guild',
+    assetId: `${PAINTED_SET}/guild.glb`,
+    kind: 'house',
+    anchor: { x: 111.5, z: 703 },
+    rotation: EAST_FACING,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 2.825, z: -1.375, width: 39.05, height: 35.45, depth: 47.75 },
+        walls: { x: 0, z: 0, width: 29.8, depth: 21.8 },
+        annexes: [
+          { name: 'trophy_hall', x: 0, z: 15.9, width: 18.8, depth: 10 },
+          { name: 'lantern_tower', x: 18.2, z: -7.6, width: 6.6, depth: 6.6 },
+          { name: 'hearth_chimney', x: -15.7, z: 6.6, width: 1.6, depth: 2.6 },
+          { name: 'trophy_chimney', x: 0, z: 21.6, width: 2.2, depth: 1.4 },
+        ],
+        doorX: 0,
+      },
+      GUILD_SCALE,
+    ),
+    walkIn: true,
+  },
+  placedTownSeat(GUILD_SCALE, FRONT_CLEARANCE * GUILD_SCALE),
+);
+
+const BUILDINGS = [INN, CHAPEL, COUNTING_HOUSE, WATCH_HOUSE, SMITHY, MANOR, GUILD] as const;
 
 // The counting house's market counter (the stall annex on its front): the
 // auctioneer keeps it, a stride and a half in front of the boards (the counter
@@ -338,6 +373,10 @@ const INN_HEIGHT = 9;
 // of it, a little over the smithy's terrace
 const MANOR_HEIGHT = 12.5;
 const MANOR_APRON = 14;
+// the guild's pad, the old stable yard's own height; a short apron (the yard is all but level
+// already, and the elementals' ground lies a little way north)
+const GUILD_HEIGHT = 9;
+const GUILD_APRON = 8;
 const SMITHY_HEIGHT = 10.6;
 const INN_NORTH_Z = INN.reach.center.z + INN.reach.halfWidth;
 const SMITHY_SOUTH_Z = SMITHY.reach.center.z - SMITHY.reach.halfDepth;
@@ -371,6 +410,7 @@ const GROUND = [
   { building: WATCH_HOUSE, height: 7.6, columns: 2, rows: 3, taper: 4, apron: 10 },
   { building: SMITHY, height: SMITHY_HEIGHT, columns: 3, rows: 2, taper: 4, apron: 13 },
   { building: MANOR, height: MANOR_HEIGHT, columns: 5, rows: 5, taper: 4, apron: MANOR_APRON },
+  { building: GUILD, height: GUILD_HEIGHT, columns: 4, rows: 5, taper: 4, apron: GUILD_APRON },
 ] as const;
 
 // The aprons reach into the square: this sets the shelf back at its own height

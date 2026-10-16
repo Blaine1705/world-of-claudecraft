@@ -3,6 +3,7 @@ import { activeDungeonDoorPos, DUNGEONS, getActiveWorldContent } from '../sim/da
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
+import { distancePointToObb } from '../sim/placed_town_kit';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 import {
   onWildheartBasinEntranceCauseway,
@@ -58,7 +59,7 @@ export function insidePavedGrassExclusion(x: number, z: number): boolean {
   ) {
     return true;
   }
-  return insideHighwatchManorGround(x, z);
+  return insideHighwatchManorGround(x, z) || insideHighwatchGuildGround(x, z);
 }
 
 // The Highwatch manor (sim/highwatch_layout.ts) is a walk-in house whose model brings its
@@ -67,23 +68,41 @@ export function insidePavedGrassExclusion(x: number, z: number): boolean {
 // only while the active world stands the manor where the layout does (its built-in record,
 // or a Studio placement of its model at the same anchor), cached per world.
 const MANOR = HIGHWATCH_LAYOUT.buildings.find((building) => building.id === 'highwatch_manor');
-const manorStands = new WeakMap<object, boolean>();
+// ...and the adventurers' guild the same way: its floors, porch and paved yard are the model's
+const GUILD = HIGHWATCH_LAYOUT.buildings.find((building) => building.id === 'highwatch_guild');
+const standsCache = new WeakMap<object, Map<string, boolean>>();
 
-function activeWorldStandsManor(): boolean {
-  if (!MANOR) return false;
+function activeWorldStands(building: (typeof HIGHWATCH_LAYOUT.buildings)[number]): boolean {
   const content = getActiveWorldContent();
-  const cached = manorStands.get(content);
+  let perWorld = standsCache.get(content);
+  if (!perWorld) {
+    perWorld = new Map();
+    standsCache.set(content, perWorld);
+  }
+  const cached = perWorld.get(building.id);
   if (cached !== undefined) return cached;
   const stands =
-    (content.props?.buildings ?? []).some((building) => building.id === MANOR.id) ||
+    (content.props?.buildings ?? []).some((record) => record.id === building.id) ||
     (content.placements ?? []).some(
       (placement) =>
-        placement.path === MANOR.assetId &&
-        Math.abs(placement.x - MANOR.placement.x) < 1e-6 &&
-        Math.abs(placement.z - MANOR.placement.z) < 1e-6,
+        placement.path === building.assetId &&
+        Math.abs(placement.x - building.placement.x) < 1e-6 &&
+        Math.abs(placement.z - building.placement.z) < 1e-6,
     );
-  manorStands.set(content, stands);
+  perWorld.set(building.id, stands);
   return stands;
+}
+
+function activeWorldStandsManor(): boolean {
+  return MANOR !== undefined && activeWorldStands(MANOR);
+}
+
+/** True inside the Highwatch guild's reach (a quarter-turned box) while the active world
+ *  stands it. */
+export function insideHighwatchGuildGround(x: number, z: number): boolean {
+  if (!GUILD) return false;
+  if (distancePointToObb({ x, z }, GUILD.reach) > 0) return false;
+  return activeWorldStands(GUILD);
 }
 
 /** True inside the Highwatch manor's reach, or on its lane's paving from the road to the

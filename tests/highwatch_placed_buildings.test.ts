@@ -46,6 +46,9 @@ type Building = (typeof BUILDINGS)[number];
 /** The manor ships only in the Highwatch look, at its own grand size, so it has no default
  *  model of the painted set and stands at scale 1. */
 const MANOR_ID = 'highwatch_manor';
+/** The houses built in this repo for Highwatch alone, each at its own grand size and under
+ *  its own model id (scripts/assets/highwatch_manor/, scripts/assets/highwatch_guild/). */
+const OWN_MODEL_IDS: ReadonlySet<string> = new Set([MANOR_ID, 'highwatch_guild']);
 
 interface BakedBox {
   x: number;
@@ -64,7 +67,7 @@ const BAKED = JSON.parse(
  *  `tidehold/x` on the same geometry, so it shares its rows. */
 function modelIdOf(building: Building): string {
   const name = building.assetId.replace(/^.*\//, '').replace(/\.glb$/, '');
-  return building.id === MANOR_ID ? `tidehold/highwatch/${name}` : `tidehold/${name}`;
+  return OWN_MODEL_IDS.has(building.id) ? `tidehold/highwatch/${name}` : `tidehold/${name}`;
 }
 
 function recordOf(building: Building): BuildingDef {
@@ -170,7 +173,7 @@ function boundsOf(building: Building): NaturalBounds {
  *  of the model's largest dimension over it. */
 const PLACED_TARGET_HEIGHT = 2.2;
 
-describe('the six placed Highwatch buildings', () => {
+describe('the seven placed Highwatch buildings', () => {
   it('are the painted Tidehold set in the Highwatch look', () => {
     expect(BUILDINGS.map((building) => [building.id, modelIdOf(building), building.kind])).toEqual([
       ['highwatch_summit_inn', 'tidehold/tavern_b', 'inn'],
@@ -179,6 +182,7 @@ describe('the six placed Highwatch buildings', () => {
       ['highwatch_watch_house', 'tidehold/house_c', 'house'],
       ['highwatch_smithy', 'tidehold/smithy', 'house'],
       ['highwatch_manor', 'tidehold/highwatch/manor', 'house'],
+      ['highwatch_guild', 'tidehold/highwatch/guild', 'house'],
     ]);
     for (const building of BUILDINGS) {
       expect(isPlacedBuildingAsset(building.assetId), building.id).toBe(true);
@@ -188,7 +192,7 @@ describe('the six placed Highwatch buildings', () => {
 
   it('stand grand, each at its own size, with their footing buried', () => {
     for (const building of BUILDINGS) {
-      if (building.id === MANOR_ID) expect(building.placement.scale).toBe(1);
+      if (OWN_MODEL_IDS.has(building.id)) expect(building.placement.scale, building.id).toBe(1);
       else expect(building.placement.scale, building.id).toBeGreaterThanOrEqual(1.2);
       expect(building.placement.lift, building.id).toBeCloseTo(
         -(building.placement.scale + 0.05),
@@ -233,8 +237,9 @@ describe('the six placed Highwatch buildings', () => {
     for (const building of BUILDINGS) {
       const baked = BAKED[modelIdOf(building)];
       expect(baked, modelIdOf(building)).toBeDefined();
-      // the look carries its default model's rows (the manor IS the look's own model)
-      if (building.id !== MANOR_ID) {
+      // the look carries its default model's rows (the manor and the guild ARE the look's
+      // own models)
+      if (!OWN_MODEL_IDS.has(building.id)) {
         expect(
           BAKED[`tidehold/highwatch/${modelIdOf(building).slice('tidehold/'.length)}`],
         ).toEqual(baked);
@@ -340,6 +345,12 @@ describe('the six placed Highwatch buildings', () => {
         'highwatch_manor:dais_bay',
         'highwatch_manor:kitchen_chimney',
       ],
+      highwatch_guild: [
+        'highwatch_guild:trophy_hall',
+        'highwatch_guild:lantern_tower',
+        'highwatch_guild:hearth_chimney',
+        'highwatch_guild:trophy_chimney',
+      ],
     });
   });
 });
@@ -352,6 +363,7 @@ describe('placed Highwatch building collision in the built-in world', () => {
       'highwatch_counting_house',
       'highwatch_smithy',
       'highwatch_manor',
+      'highwatch_guild',
     ]);
   });
 
@@ -410,8 +422,9 @@ describe('placed Highwatch building collision in the built-in world', () => {
       ).toBe(!building.walkIn);
       const front = building.frontStandingPoint;
       expect(isBlocked(WORLD_SEED, front.x, front.z, 0.5), `${building.id} front`).toBe(false);
-      // (the manor's back wall opens in its middle onto the dais bay: its probe stands off it)
-      const backX = building.id === MANOR_ID ? door.x + 9 : door.x;
+      // (the manor's and the guild's back walls open in their middles onto the dais bay and
+      // the trophy hall: their probes stand off it)
+      const backX = OWN_MODEL_IDS.has(building.id) ? door.x + 9 : door.x;
       const back = localToWorld(anchor, building.placement.rotation, backX, walls.z1 - 0.1);
       expect(isBlocked(WORLD_SEED, back.x, back.z), `${building.id} back wall`).toBe(true);
     }
@@ -434,11 +447,16 @@ describe('placed Highwatch building collision in the built-in world', () => {
       { x: 27.314, z: 648.031 },
       { x: 34.786, z: 673.567 },
       { x: 31.334, z: 708.04 },
+      // the guild at the old stable yard: the pine on its yard's south corner and the
+      // pine on the bank behind its trophy hall
+      { x: 101.428, z: 679.908 },
+      { x: 129.304, z: 692.734 },
     ];
     for (const point of CLEARED) {
       expect(isExcludedDecoration(point.x, point.z), `${point.x}, ${point.z}`).toBe(true);
     }
-    const bounds = { minX: -60, maxX: 70, minZ: 590, maxZ: 740 };
+    // (out west to the guild at the old stable yard)
+    const bounds = { minX: -60, maxX: 140, minZ: 590, maxZ: 740 };
     for (const [name, world, seed] of [
       ['built-in', null, WORLD_SEED],
       ['Studio', loadPublishedMap(), MAP_SEED],
@@ -515,8 +533,8 @@ describe('walking into the walk-in Highwatch buildings', () => {
       } else {
         expect(rise, `${building.id} floor`).toBe(0);
       }
-      // (the manor's street is past its porch and steps)
-      const street = insideBy(building, building.id === MANOR_ID ? -10 : -4);
+      // (the manor's and the guild's streets are past their porches and steps)
+      const street = insideBy(building, OWN_MODEL_IDS.has(building.id) ? -10 : -4);
       expect(groundHeight(street.x, street.z, WORLD_SEED), `${building.id} street`).toBe(
         terrainHeight(street.x, street.z, WORLD_SEED),
       );

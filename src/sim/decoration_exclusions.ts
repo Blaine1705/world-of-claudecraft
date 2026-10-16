@@ -96,6 +96,13 @@ const EXCLUSIONS = [
   { x: 49.798, z: 719.619 },
   { x: 57.96, z: 730.433 },
   { x: 58.224, z: 741.94 },
+  // The Highwatch adventurers' guild (highwatch_layout.ts) at the old stable yard: every
+  // tree and rock on its pad, its yard or under its eaves.
+  { x: 101.428, z: 679.908 },
+  { x: 103.913, z: 707.165 },
+  { x: 113.21, z: 715.414 },
+  { x: 127.18, z: 687.533 },
+  { x: 129.304, z: 692.734 },
 ];
 
 export function isExcludedDecoration(x: number, z: number): boolean {
