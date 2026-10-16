@@ -1134,6 +1134,15 @@ export class PlacedAssetsView {
     return { sizeX: size.x * info.norm, sizeZ: size.z * info.norm, sizeY: size.y * info.norm };
   }
 
+  /** Read-only cached template for bounded editor previews (the pick
+   *  outline). Callers only measure it: never mutate or dispose the source. */
+  async assetPreviewTemplate(
+    path: string,
+  ): Promise<Readonly<{ object: THREE.Object3D; norm: number; minY: number }> | null> {
+    const info = await this.template(path);
+    return info ? { object: info.object, norm: info.norm, minY: info.minY } : null;
+  }
+
   /** Insert (or replace) the placement rendered at this editor index. */
   addPlacement(index: number, placedAsset: PlacedAsset, preload = false): void {
     this.removePlacement(index);

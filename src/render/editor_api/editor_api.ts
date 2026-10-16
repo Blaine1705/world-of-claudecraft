@@ -563,8 +563,8 @@ export class RendererEditorApi {
 
   /** Project the editor brush ring onto the terrain at world (x, z). Uniform
    *  writes only; call per pointer-move. */
-  setEditorBrush(x: number, z: number, radius: number, color?: THREE.ColorRepresentation): void {
-    this.host.terrain.setBrush(x, z, radius, color);
+  setEditorBrush(...args: Parameters<TerrainView['setBrush']>): void {
+    this.host.terrain.setBrush(...args);
   }
 
   /** Hide the editor brush ring. */

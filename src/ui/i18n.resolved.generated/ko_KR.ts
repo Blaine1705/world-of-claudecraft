@@ -10025,6 +10025,33 @@ export const ko_KR: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "대상: {name}",
+      "choose": "겹친 에셋 선택 ({count})",
+      "chooser": "포인터 아래의 에셋 선택",
+      "front": "맨 앞",
+      "behind": "다른 에셋 뒤",
+      "close": "닫기",
+      "keyboard": "이전/다음 또는 화살표 키로 비교하세요. Enter로 선택하고 Escape로 닫습니다.",
+      "hint": "다시 클릭하여 겹친 항목을 전환하거나 이 목록에서 선택하세요.",
+      "asset": "에셋 {number}",
+      "overlapAt": "{name} 위치의 겹친 에셋",
+      "previous": "이전",
+      "next": "다음",
+      "position": "{count}개 중 {current}번째",
+      "details": "항목 {number} · {level}층 · 높이 {height}",
+      "ungroupedDetails": "항목 {number} · 높이 {height}",
+      "hideAbove": "선택한 층 위의 층 숨기기",
+      "allFloors": "모든 층 표시 중",
+      "filteredFloors": "{level}층 위의 층은 숨겨져 있습니다"
+    },
+    "quickActions": {
+      "title": "선택한 에셋",
+      "move": "이동",
+      "frame": "화면에 맞추기",
+      "remove": "제거",
+      "count": "{count}개 선택됨"
+    },
     "buildMode": {
       "materialNames": {
         "WardenStone": "매끄러운 돌",
@@ -10562,6 +10589,8 @@ export const ko_KR: EnTranslations = {
       "lower": "내리기",
       "smooth": "부드럽게",
       "flatten": "평탄화",
+      "slope": "경사",
+      "pond": "연못",
       "tunnel": "Caves",
       "rock": "Rock Gen",
       "build": "Build Model",
@@ -10751,6 +10780,9 @@ export const ko_KR: EnTranslations = {
     },
     "brush": {
       "title": "브러시",
+      "shape": "브러시 모양",
+      "circle": "원형",
+      "square": "정사각형",
       "size": "브러시 크기",
       "strength": "강도",
       "sizeHint": "단축키: [ 와 ] 로 브러시 크기, Shift+[ 와 Shift+] 로 강도 조절.",
@@ -11050,6 +11082,22 @@ export const ko_KR: EnTranslations = {
       "levelHintNone": "지면을 오른쪽 클릭해 그 높이를 고정한 뒤, 어디서든 드래그하면 그 높이로 평탄해집니다. 비워 두면 각 드래그가 시작한 지점의 높이로 평탄해집니다.",
       "levelPicked": "높이를 {height}야드로 고정했습니다."
     },
+    "slope": {
+      "hint": "경사가 시작될 지면을 오른쪽 클릭하세요. 그다음 끝날 지점을 누른 채 경로를 따라 드래그하면 두 높이 사이가 매끄러운 경사로로 이어집니다.",
+      "start": "시작 높이: {height}야드",
+      "noStart": "아직 시작점이 없습니다. 지면을 오른쪽 클릭해 정하세요.",
+      "clearStart": "시작점 지우기",
+      "needStart": "먼저 지면을 오른쪽 클릭해 경사의 시작점을 정하세요.",
+      "startPicked": "경사 시작점을 {height}야드로 정했습니다."
+    },
+    "pond": {
+      "title": "연못 만들기",
+      "add": "연못 추가",
+      "radius": "연못 반경",
+      "depth": "연못 깊이",
+      "hint": "지면을 클릭하면 둥근 연못을 파고 물을 채웁니다. 원에는 완만한 둑도 포함됩니다. 실행 취소는 물과 웅덩이를 함께 되돌립니다.",
+      "invalid": "이 지면에는 연못을 팔 수 없습니다. 다른 곳을 선택하세요."
+    },
     "water": {
       "title": "수면 높이",
       "level": "수면 높이",
@@ -11345,6 +11393,11 @@ export const ko_KR: EnTranslations = {
     },
     "selection": {
       "title": "선택 항목",
+      "heightOffset": "높이 오프셋(야드)",
+      "heightStep": "이동 간격(야드)",
+      "raiseAsset": "올리기",
+      "lowerAsset": "내리기",
+      "heightHint": "음수 값을 사용하면 에셋이 기준 위치 아래로 내려갑니다.",
       "none": "선택된 것이 없습니다. 선택 도구로 배치된 에셋을 클릭하세요.",
       "squareCollision": "Square collision (follows rotation)",
       "asset": "에셋: {name}",
@@ -11857,6 +11910,8 @@ export const ko_KR: EnTranslations = {
     },
     "weather": {
       "title": "Weather",
+      "showSnowfall": "눈 내림 표시",
+      "snowfallHint": "스튜디오 미리 보기 설정이며 이 브라우저에 저장됩니다.",
       "zoneTitle": "Weather in this zone",
       "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
       "auto": "Auto",
@@ -11947,6 +12002,8 @@ export const ko_KR: EnTranslations = {
         "lower": "브러시 아래의 지형을 낮춥니다.",
         "smooth": "굴곡을 주변 평균 높이로 부드럽게 만듭니다.",
         "flatten": "드래그를 시작한 지점의 높이로 지면을 평탄하게 만듭니다.",
+        "slope": "오른쪽 클릭으로 시작 높이를 정한 뒤, 다른 높이에서 드래그하면 매끄러운 경사로가 만들어집니다.",
+        "pond": "클릭하면 독립적인 수면을 가진 연못을 팝니다.",
         "paint": "지역 기본값 위에 생태 지표를 칠합니다.",
         "water": "맵 전체의 수면 높이를 설정합니다.",
         "place": "카탈로그 또는 업로드한 애셋을 지면에 배치합니다.",

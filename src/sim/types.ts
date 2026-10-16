@@ -11089,6 +11089,9 @@ export interface HeightStamp {
    *  Smooth carries its brush strength here so the TARGET can stay the honest
    *  local surface: a planar slope then cancels exactly, at any strength. */
   strength?: number;
+  /** Footprint: 'square' reaches max(|dx|, |dz|) < radius (radius is half
+   *  the side). Absent or 'circle' = the original round brush. */
+  shape?: 'circle' | 'square';
   /** Solid inner-radius ratio. Absent preserves the original fully soft brush. */
   hardness?: number;
   /** Optional deterministic built-in mask. Imported paint masks stay editor-local. */

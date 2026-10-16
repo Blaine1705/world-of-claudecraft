@@ -10025,6 +10025,33 @@ export const ja_JP: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "対象：{name}",
+      "choose": "重なったアセットを選ぶ（{count}）",
+      "chooser": "ポインターの下のアセットを選択",
+      "front": "最前面",
+      "behind": "別のアセットの背後",
+      "close": "閉じる",
+      "keyboard": "前へ・次へ、または矢印キーで比較します。Enterで選択、Escapeで閉じます。",
+      "hint": "再度クリックすると重なったアイテムを切り替えられます。このリストからも選べます。",
+      "asset": "アセット{number}",
+      "overlapAt": "{name}の位置で重なったアセット",
+      "previous": "前へ",
+      "next": "次へ",
+      "position": "{count}件中{current}件目",
+      "details": "アイテム{number} · {level}階 · 高さ{height}",
+      "ungroupedDetails": "アイテム{number} · 高さ{height}",
+      "hideAbove": "選択した階より上を非表示",
+      "allFloors": "すべての階を表示中",
+      "filteredFloors": "{level}階より上は非表示です"
+    },
+    "quickActions": {
+      "title": "選択中のアセット",
+      "move": "移動",
+      "frame": "画面に収める",
+      "remove": "削除",
+      "count": "{count}件選択中"
+    },
     "buildMode": {
       "materialNames": {
         "WardenStone": "滑らかな石",
@@ -10562,6 +10589,8 @@ export const ja_JP: EnTranslations = {
       "lower": "沈降",
       "smooth": "なめらか",
       "flatten": "平坦化",
+      "slope": "斜面",
+      "pond": "池",
       "tunnel": "Caves",
       "rock": "Rock Gen",
       "build": "Build Model",
@@ -10751,6 +10780,9 @@ export const ja_JP: EnTranslations = {
     },
     "brush": {
       "title": "ブラシ",
+      "shape": "ブラシの形",
+      "circle": "円形",
+      "square": "正方形",
       "size": "ブラシサイズ",
       "strength": "強さ",
       "sizeHint": "キー：[ と ] でブラシサイズ、Shift+[ と Shift+] で強さを調整。",
@@ -11050,6 +11082,22 @@ export const ja_JP: EnTranslations = {
       "levelHintNone": "地面を右クリックするとその高さを固定し、どこでもドラッグしてその高さに平らにできます。空欄の場合は、各ドラッグの開始点の高さに平らにします。",
       "levelPicked": "高さを {height} ヤードに固定しました。"
     },
+    "slope": {
+      "hint": "斜面を始めたい地面を右クリックします。次に終点で押したまま道に沿ってドラッグすると、2つの高さの間が滑らかな坂になります。",
+      "start": "始点の高さ：{height} ヤード",
+      "noStart": "始点が未設定です。地面を右クリックして設定してください。",
+      "clearStart": "始点をクリア",
+      "needStart": "先に地面を右クリックして、斜面の始点を設定してください。",
+      "startPicked": "斜面の始点を {height} ヤードに設定しました。"
+    },
+    "pond": {
+      "title": "池を作る",
+      "add": "池を追加",
+      "radius": "池の半径",
+      "depth": "池の深さ",
+      "hint": "地面をクリックすると丸い池を掘って水を入れます。円には緩やかな岸も含まれます。元に戻すと水とくぼみを一緒に取り消します。",
+      "invalid": "この地面には池を掘れません。別の場所を選んでください。"
+    },
     "water": {
       "title": "水面の高さ",
       "level": "水面の高さ",
@@ -11345,6 +11393,11 @@ export const ja_JP: EnTranslations = {
     },
     "selection": {
       "title": "選択",
+      "heightOffset": "高さのオフセット（ヤード）",
+      "heightStep": "移動量（ヤード）",
+      "raiseAsset": "上げる",
+      "lowerAsset": "下げる",
+      "heightHint": "負の値で、アセットを基準位置より下に沈めます。",
       "none": "何も選択されていません。「選択」ツールで配置済みアセットをクリックしてください。",
       "squareCollision": "Square collision (follows rotation)",
       "asset": "アセット：{name}",
@@ -11857,6 +11910,8 @@ export const ja_JP: EnTranslations = {
     },
     "weather": {
       "title": "Weather",
+      "showSnowfall": "降雪を表示",
+      "snowfallHint": "スタジオのプレビュー設定です。このブラウザーに保存されます。",
       "zoneTitle": "Weather in this zone",
       "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
       "auto": "Auto",
@@ -11947,6 +12002,8 @@ export const ja_JP: EnTranslations = {
         "lower": "ブラシの下の地形を下げます。",
         "smooth": "起伏を周囲の平均の高さへならします。",
         "flatten": "ドラッグ開始地点の高さに地面を平らにします。",
+        "slope": "右クリックで始点の高さを決め、別の高さからドラッグすると滑らかな斜面を作れます。",
+        "pond": "クリックすると独立した水面を持つ池を掘ります。",
         "paint": "ゾーンの既定の上にバイオームの地表を塗ります。",
         "water": "マップ全体の水面の高さを設定します。",
         "place": "カタログまたはアップロードしたアセットを地面に配置します。",
