@@ -350,6 +350,7 @@ import {
 } from './content/zone3';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
+import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from './highwatch_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 import { setStudioOverlay, studioOverlayInstalled } from './studio_content';
@@ -1062,6 +1063,12 @@ export const BUILTIN_WORLD: WorldContent = {
   blockers: [...JAIL_BLOCKERS],
   terrainEdits: [
     ...JAIL_TERRAIN_EDITS,
+    // Fenbridge's grand painted buildings reach past the marsh hub's plateau:
+    // each stands on a level pad at the plateau's height, eased out by a soft
+    // apron (sim/fenbridge_layout.ts pads). No other stamp reaches that
+    // ground, so their place in this list moves no height. Copied, as
+    // Highwatch's are.
+    ...FENBRIDGE_LAYOUT.pads.map((pad) => ({ ...pad })),
     ...COPPER_DIG_TERRAIN_EDITS,
     ...TOWN_PLAT_TERRAIN_EDITS,
     ...SOWFIELD_BEACH_TERRAIN_EDITS,

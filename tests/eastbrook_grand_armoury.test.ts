@@ -340,17 +340,24 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     if (!fenbridgeInn) throw new Error('missing Fenbridge inn fixture');
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
-      // the painted tavern on the main street (fenbridge_layout.ts)
+      // the painted tavern on the main street, stood grand at 1.2 (fenbridge_layout.ts)
       assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
-      x: 12.25,
-      z: 299.9,
-      w: 20,
-      d: 13,
+      x: 13.55,
+      z: 298,
+      w: 24,
+      d: 15.6,
       rot: FENBRIDGE_BUILDINGS_BY_ID.fenbridge_crooked_reed_inn.rotation,
     });
 
     const restPadding = buildingRestPadding(fenbridgeInn);
-    const restPoint = authoredInn.frontStandingPoint;
+    // on the door's line, a step inside the padded rest area (the grand inn's
+    // visitor stand is 2.16 yd off its wall, just past it)
+    const restPoint = localToWorld(
+      authoredInn.position,
+      authoredInn.rotation,
+      authoredInn.sockets.entrance.localPosition.x,
+      -(authoredInn.nativeDimensions.depth / 2 + restPadding - 0.25),
+    );
     const outsideRestPoint = localToWorld(
       authoredInn.position,
       authoredInn.rotation,

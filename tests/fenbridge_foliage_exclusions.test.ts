@@ -3,7 +3,7 @@ import {
   eastbrookGrassExclusions,
   insideEastbrookGrassExclusion,
 } from '../src/render/foliage_core';
-import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
+import { distancePointToObb, FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 
 /** Points on the old palisade ring, every quarter yard, all the way round. */
 function oldRingSamples(): { x: number; z: number }[] {
@@ -46,7 +46,9 @@ describe('Fenbridge layout-driven grass exclusions', () => {
     // Fenbridge stands open. The ring's sixteen wing OBBs and eight gate-jamb
     // OBBs used to clear a band of grass round the town; now no exclusion is
     // keyed to a wing or a jamb, and no point of the old ring line (gates
-    // included) sits inside any exclusion, at the padding the grass uses.
+    // included) sits inside any exclusion, at the padding the grass uses,
+    // except where a grand building now stands across the line: there the
+    // grass clears for the building's own drawn reach, never for a wing.
     const exclusions = eastbrookGrassExclusions([], true);
     expect(
       exclusions.filter(
@@ -59,7 +61,15 @@ describe('Fenbridge layout-driven grass exclusions', () => {
     const covered = samples.filter((point) =>
       insideEastbrookGrassExclusion(exclusions, point.x, point.z, 0.35),
     );
-    expect(covered).toEqual([]);
+    const underBuilding = (point: { x: number; z: number }) =>
+      FENBRIDGE_LAYOUT.buildings.some(
+        (building) => distancePointToObb(point, building.reach) <= 0.35 + 1e-9,
+      );
+    expect(covered.filter((point) => !underBuilding(point))).toEqual([]);
+    // the grand buildings cross the line in places, and well over half the
+    // ring still grows grass
+    expect(covered.length).toBeGreaterThan(0);
+    expect(covered.length / samples.length).toBeLessThan(0.4);
   });
 
   it('never injects fixed Fenbridge coordinates into a custom world', () => {

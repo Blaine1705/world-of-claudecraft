@@ -3754,8 +3754,8 @@
         "name": "Warden Fenwick",
         "title": "Warden of Fenbridge",
         "pos": {
-          "x": 1.62,
-          "z": 283.09999999999997
+          "x": 3.507999999999999,
+          "z": 276.56
         },
         "facing": -1.5707963267948966,
         "color": 8278281,
@@ -3855,8 +3855,8 @@
         "name": "Herbalist Yara",
         "title": "Herbalist",
         "pos": {
-          "x": 2.8999999999999995,
-          "z": 323.5
+          "x": 3.3000000000000007,
+          "z": 327.45
         },
         "facing": -1.5707963267948966,
         "color": 8207512,
@@ -3868,10 +3868,10 @@
         "name": "Scout Maren",
         "title": "Marshal's Scout",
         "pos": {
-          "x": -3.2,
+          "x": -1.4,
           "z": 330
         },
-        "facing": 2.950031333260667,
+        "facing": 3.0569469092959145,
         "color": 8218120,
         "questIds": ["q_troll_fetishes", "q_cult_camp", "q_olen"],
         "greeting": "Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds."
@@ -3881,8 +3881,8 @@
         "name": "Bursar Petra Vell",
         "title": "The Gilded Strongbox",
         "pos": {
-          "x": -2.9000000000000004,
-          "z": 320.4
+          "x": -3.3000000000000007,
+          "z": 322.90000000000003
         },
         "facing": 1.5707963267948966,
         "color": 13214247,
@@ -3908,10 +3908,10 @@
         "name": "Tanner Hesk",
         "title": "Master of the Tannery",
         "pos": {
-          "x": -18,
-          "z": 322
+          "x": -24,
+          "z": 328.5
         },
-        "facing": 2.0119758072098772,
+        "facing": 2.1293956421384594,
         "color": 9067050,
         "questIds": ["q_prof_workorder_tannery"],
         "greeting": "A hide is only as good as its tanning, $C. The vats are ready when you are.",
@@ -8966,6 +8966,438 @@
       "delta": 0,
       "falloff": "flat",
       "mode": "level"
+    },
+    {
+      "x": 8.17,
+      "z": 278.41675000000004,
+      "radius": 15.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34890059710123783
+    },
+    {
+      "x": 15.030000000000001,
+      "z": 278.41675000000004,
+      "radius": 15.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34890059710123783
+    },
+    {
+      "x": 8.17,
+      "z": 270.18265,
+      "radius": 15.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34890059710123783
+    },
+    {
+      "x": 15.030000000000001,
+      "z": 270.18265,
+      "radius": 15.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34890059710123783
+    },
+    {
+      "x": 8.45,
+      "z": 306.7328,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 18.53,
+      "z": 306.7328,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 8.45,
+      "z": 297.6736,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 18.53,
+      "z": 297.6736,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 8.45,
+      "z": 288.61440000000005,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 18.53,
+      "z": 288.61440000000005,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": -7.875333333333332,
+      "z": 296.81275000000005,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -15.945999999999998,
+      "z": 296.81275000000005,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -24.016666666666666,
+      "z": 296.81275000000005,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -7.875333333333332,
+      "z": 306.23825,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -15.945999999999998,
+      "z": 306.23825,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -24.016666666666666,
+      "z": 306.23825,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": 6.7132499999999995,
+      "z": 330.806625,
+      "radius": 16.99187479887369,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.411483422614269
+    },
+    {
+      "x": 16.23975,
+      "z": 330.806625,
+      "radius": 16.99187479887369,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.411483422614269
+    },
+    {
+      "x": 6.7132499999999995,
+      "z": 320.56987499999997,
+      "radius": 16.99187479887369,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.411483422614269
+    },
+    {
+      "x": 16.23975,
+      "z": 320.56987499999997,
+      "radius": 16.99187479887369,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.411483422614269
+    },
+    {
+      "x": -6.525000000000002,
+      "z": 320.4235,
+      "radius": 16.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4007174348063826
+    },
+    {
+      "x": -15.675,
+      "z": 320.4235,
+      "radius": 16.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4007174348063826
+    },
+    {
+      "x": -6.525000000000002,
+      "z": 330.17650000000003,
+      "radius": 16.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4007174348063826
+    },
+    {
+      "x": -15.675,
+      "z": 330.17650000000003,
+      "radius": 16.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4007174348063826
+    },
+    {
+      "x": 8.17,
+      "z": 278.41675000000004,
+      "radius": 9.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.57258737644937
+    },
+    {
+      "x": 15.030000000000001,
+      "z": 278.41675000000004,
+      "radius": 9.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.57258737644937
+    },
+    {
+      "x": 8.17,
+      "z": 270.18265,
+      "radius": 9.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.57258737644937
+    },
+    {
+      "x": 15.030000000000001,
+      "z": 270.18265,
+      "radius": 9.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.57258737644937
+    },
+    {
+      "x": 8.45,
+      "z": 306.7328,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 18.53,
+      "z": 306.7328,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 8.45,
+      "z": 297.6736,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 18.53,
+      "z": 297.6736,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 8.45,
+      "z": 288.61440000000005,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 18.53,
+      "z": 288.61440000000005,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": -7.875333333333332,
+      "z": 296.81275000000005,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -15.945999999999998,
+      "z": 296.81275000000005,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -24.016666666666666,
+      "z": 296.81275000000005,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -7.875333333333332,
+      "z": 306.23825,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -15.945999999999998,
+      "z": 306.23825,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -24.016666666666666,
+      "z": 306.23825,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": 6.7132499999999995,
+      "z": 330.806625,
+      "radius": 10.991874798873688,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6360948361229634
+    },
+    {
+      "x": 16.23975,
+      "z": 330.806625,
+      "radius": 10.991874798873688,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6360948361229634
+    },
+    {
+      "x": 6.7132499999999995,
+      "z": 320.56987499999997,
+      "radius": 10.991874798873688,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6360948361229634
+    },
+    {
+      "x": 16.23975,
+      "z": 320.56987499999997,
+      "radius": 10.991874798873688,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6360948361229634
+    },
+    {
+      "x": -6.525000000000002,
+      "z": 320.4235,
+      "radius": 10.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.625700149011292
+    },
+    {
+      "x": -15.675,
+      "z": 320.4235,
+      "radius": 10.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.625700149011292
+    },
+    {
+      "x": -6.525000000000002,
+      "z": 330.17650000000003,
+      "radius": 10.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.625700149011292
+    },
+    {
+      "x": -15.675,
+      "z": 330.17650000000003,
+      "radius": 10.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.625700149011292
     },
     {
       "x": -32,
@@ -57860,27 +58292,27 @@
     },
     {
       "assetId": "tidehold/fenrire/house_a",
-      "x": 7.4,
-      "z": 281.7,
+      "x": 11.6,
+      "z": 274.6,
       "rotY": 1.5707963267948966,
-      "scale": 5.559090909090909,
+      "scale": 7.782727272727272,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.45,
       "name": "Fenbridge warden gatehouse"
     },
     {
       "assetId": "tidehold/fenrire/tavern",
-      "x": 12.25,
-      "z": 299.9,
+      "x": 13.55,
+      "z": 298,
       "rotY": 1.5707963267948966,
-      "scale": 10.294681818181816,
+      "scale": 12.353618181818181,
       "collide": true,
       "worldPropKind": "inn",
       "worldPropWidth": 1.9428,
       "worldPropDepth": 1.2628,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.25,
       "name": "Fenbridge crooked reed inn"
     },
     {
@@ -57896,24 +58328,24 @@
     },
     {
       "assetId": "tidehold/fenrire/shop_b",
-      "x": 9.2,
-      "z": 322.8,
+      "x": 12.75,
+      "z": 326.4,
       "rotY": 1.5707963267948966,
-      "scale": 8.499999999999998,
+      "scale": 12.749999999999998,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.55,
       "name": "Fenbridge moonwort apothecary"
     },
     {
       "assetId": "tidehold/fenrire/shop_a",
-      "x": -8.9,
-      "z": 322,
+      "x": -12.3,
+      "z": 325.3,
       "rotY": -1.5707963267948966,
-      "scale": 7.399863636363635,
+      "scale": 11.099795454545452,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.55,
       "name": "Fenbridge gilded strongbox"
     },
     {

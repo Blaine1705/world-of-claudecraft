@@ -28,6 +28,7 @@ import {
 } from '../src/sim/data';
 import { CRYPT_LAYOUT, DAIS_HEIGHT, tombSlotRoll } from '../src/sim/dungeon_layout';
 import { morthenEntranceHeight } from '../src/sim/encounters/hollow_crypt/ids';
+import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 import {
   CHAPEL_HALL_ROOF_EAVE,
   CHAPEL_HALL_ROOF_TOP,
@@ -113,11 +114,16 @@ function maxStoodHeight(sim: Sim, ticks: number): number {
 }
 
 describe('full-height props reject standing (jump-spam 4s each)', () => {
+  // The Mirefen murloc huts west of Fenbridge (fenbridge_layout.ts keeps them):
+  // the run starts beside the first, facing it. It used to start at (-3, 292),
+  // a spot the huts left long ago, and so walked up Fenbridge's main street,
+  // where the grand bank's standable strongbox now stands in its path.
+  const [mudHutX, mudHutZ] = FENBRIDGE_LAYOUT.preservedProps.mudHuts[0];
   const cases: [string, number, number, number][] = [
     // name, startX, startZ, facing toward the prop
     ['civic well beacon', -0.75, 2 - 3.1, 0],
     ['tent', 62, -61 - 2.8, 0],
-    ['mud hut stem', -3, 292, 0], // zone2 murloc camp (approx; adjust below)
+    ['mud hut stem', mudHutX, mudHutZ - 2.8, 0],
     ['inn wall', -12.5, 16.5 - 4.8, 0],
     ['bank wall', 18 - 5.4, 10.5, Math.PI / 2],
     ['Grand Armoury wall', 12, -5.5, Math.PI / 2],

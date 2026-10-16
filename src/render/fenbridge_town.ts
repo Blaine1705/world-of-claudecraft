@@ -40,6 +40,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { placedTownCullRadius } from './placed_town_buildings';
 import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
@@ -58,9 +59,12 @@ const OVERLAY_NAME = 'fenbridgeCaptureOverlay';
 // static batch (the boardwalks, the cistern, the stall, the muster board)
 // stands inside the hub ring; the margin keeps the circle where the walled
 // town had it (half a palisade wing past the ring), so opening the town moved
-// no cull and no reveal.
+// no cull and no reveal. Stood grand, the north street's shops reach past that
+// circle, so it grows to hold every building's own cull circle whole, the
+// placed-town rule (placed_town_buildings.ts): the town's fog answer never
+// hides a building its own cull still draws.
 const TOWN_CULL_MARGIN_YD = 6;
-const TOWN_CULL_RADIUS = FENBRIDGE_LAYOUT.hub.radius + TOWN_CULL_MARGIN_YD;
+const TOWN_CULL_RADIUS = placedTownCullRadius(FENBRIDGE_LAYOUT, TOWN_CULL_MARGIN_YD);
 /** The one reveal-gate key of the town's static content. */
 const STATIC_REVEAL_KEY = 'fenbridge-town-static';
 
