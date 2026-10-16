@@ -3,9 +3,9 @@
 A walk-in inn on the Fenbridge road in Mirefen Marsh: the first interior in the open world
 built to classic-inn scale for the 2.6 yd player (it reads big when you walk in, and the
 furniture reads right next to you). One storey for players, the common room open to a high
-hammerbeam roof. Original work for this game: the plan, the model and its texture-free palette
-were authored here from a written brief; reference captures of classic inns were studied for
-mood and proportion only and never entered the build.
+hammerbeam roof. Original work for this game: the plan, the model and its palette were authored
+here from a written brief, and it wears the painted town's own hand-painted maps; reference
+captures of classic inns were studied for mood and proportion only and never entered the build.
 
 ## Where and what
 
@@ -133,10 +133,28 @@ mood and proportion only and never entered the build.
 - **Model.** One Blender-built GLB, `public/models/props/mirefen_tavern.glb`, from the sim's own
   layout (`scripts/assets/mirefen_tavern/layout.ts` writes `layout.json`; `build_tavern.py` with
   `tavern_frame.py`, `tavern_shell.py`, `tavern_furnish.py` and `tavern_facade.py` builds it; `build.mjs` validates,
-  fingerprints and compresses it). Vertex-coloured, texture-free, five materials. The warm light
-  of the fires, lanterns, sconces and table candles is baked into the inside's vertex colours
-  (`bake_warm_light`), because the runtime shares its few point lights with the whole world. The
-  floor is whole: every spot a player may stand carries a drawn floor at the walk height
+  fingerprints and compresses it). Vertex-coloured, and painted like the town's painted
+  buildings: each palette family wears one of the painted town's hand-painted tiling maps in the
+  Fenrire (moss) look the painted Fenbridge buildings wear (`tavern_texture.py`,
+  `textures.json`, the maps copied unchanged into `tex/`): the plaster and its damp the
+  limewash, the honey, oak and dark timbers the timber, the boards the floor, the base, the
+  river-stone chimney, the hearth and the cobbles the wall stone, the slates the roof, the
+  garnet textiles the cloth, the flags and the tower's ashlar the dressed stone, each at the town
+  kit's own repeat, planar per face (level for walls and roofs, along the grain for timber and
+  boards). The metal, the glow and whatever no family claims (glass, candles, food, greenery,
+  the dog) stay untextured. The vertex colour stays the multiplier: on a painted face it is the
+  tint over the map (its colour over its family's), so dark timbers stay darker and the garnet
+  shutters stain their wood. The warm light of the fires, lanterns, sconces and table candles is
+  baked into the inside's vertex colours on top of that (`bake_warm_light`), because the runtime
+  shares its few point lights with the whole world. A painted face's colour is stored under a
+  headroom (`textures.json` `headroom`), so that light can lift the paint above the map itself
+  as it lifted the old palette; each painted material's extras name the linear factor the
+  runtime multiplies it back by (`vertexColourScale`, read by
+  `src/render/vertex_colour_glb_parts.ts`). Like the painted buildings it ships in three
+  texture tiers, `mirefen_tavern.glb` and its `.half.glb` and `.quarter.glb` twins (the same
+  model with every map at half and a quarter of its size, KTX2), and the painter loads the file
+  of the profile's texture tier (`placed_texture_tier_core.ts`). The floor is whole: every spot
+  a player may stand carries a drawn floor at the walk height
   (`tests/mirefen_tavern_floor_coverage.test.ts`).
 - **Painter.** `src/render/mirefen_tavern.ts` over the pure core
   `src/render/mirefen_tavern_core.ts`: the walls, roofs, porch and the bar's pillar are separate
@@ -198,11 +216,13 @@ mood and proportion only and never entered the build.
 ```
 npx tsx scripts/assets/mirefen_tavern/layout.ts
 blender --background --python scripts/assets/mirefen_tavern/build_tavern.py
-node scripts/assets/mirefen_tavern/build.mjs
+KTX_BIN="C:\Program Files\KTX-Software\bin" node scripts/assets/mirefen_tavern/build.mjs
 node scripts/build_media_manifest.mjs generate
 ```
 
-Then re-pin the size, hash and per-part triangles in `tests/mirefen_tavern_asset.test.ts`. The
+`build.mjs` writes all three texture tiers and needs the `ktx` tool of KTX-Software 4.3 or later
+on PATH (or its `bin` folder in `KTX_BIN`). Then re-pin the sizes, hashes and per-part triangles
+in `tests/mirefen_tavern_asset.test.ts`. The
 owner's review scene (terrain, player figures, a roof-off copy, warm lights, cameras) comes from
 the same build with `-- --save FILE.blend --context TERRAIN.json` (`tavern_scene.py`), and
 `open_tavern.py` frames it; `scripts/mirefen_tavern_shot.mjs` captures the in-game views (and,

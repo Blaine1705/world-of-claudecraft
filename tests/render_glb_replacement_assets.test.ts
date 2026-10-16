@@ -562,6 +562,12 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('mirefen tavern asset', () => {
     expectAssetExistsAndManifested(mirefenTavernInternalsForTest.assetUrl);
+    // ...and its texture-tier files, which a low or phone profile loads in its place
+    for (const tier of ['half', 'quarter']) {
+      expectAssetExistsAndManifested(
+        mirefenTavernInternalsForTest.assetUrl.replace(/\.glb$/, `.${tier}.glb`),
+      );
+    }
   });
 
   it('gather node assets', () => {
