@@ -417,7 +417,7 @@ describe('generated chunk geometry is stable', () => {
     // smithy, and the moved NPCs carried their calm pads. The quay and the
     // coastline are still pinned by tests/eastbrook_placed_buildings.test.ts.
     // Computed twice in separate processes.
-    expect(digestOf(inRect)).toBe('c31f1fe3614c3cde7907ae9689e60503');
+    expect(digestOf(inRect)).toBe('524a6cac34e20d3be66afb854ef72f50');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

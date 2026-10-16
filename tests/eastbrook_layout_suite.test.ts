@@ -1158,8 +1158,8 @@ describe('wall and road geometry', () => {
       {
         id: 'north',
         existingRoadPoint: {
-          x: 13.5,
-          z: -69.5,
+          x: 12.5,
+          z: -71,
         },
         gateId: null,
         halfWidth: 1.5,
@@ -1177,12 +1177,12 @@ describe('wall and road geometry', () => {
             z: -76,
           },
           {
-            x: 13.5,
-            z: -69.5,
+            x: 12.5,
+            z: -71,
           },
           {
-            x: 6,
-            z: -63.5,
+            x: 4,
+            z: -67,
           },
           {
             x: 0,

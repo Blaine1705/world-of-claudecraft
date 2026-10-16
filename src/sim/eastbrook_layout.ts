@@ -1124,17 +1124,18 @@ function gateCrossing(id: string): Point2 {
 const ROADS = [
   {
     id: 'north',
-    existingRoadPoint: { x: 13.5, z: -69.5 },
+    existingRoadPoint: { x: 12.5, z: -71 },
     gateId: null,
     halfWidth: 1.5,
     // Swung west round the smithy's forge shelter, which stands on the old
-    // line, and back onto it north of the smithy.
+    // line, and back along the smithy's north wall onto it, the silverleaf
+    // patch on the meadow above (herb_eastbrook_4) left off the verge.
     points: [
       { x: 14.6, z: -88.6 },
       { x: 15.8, z: -83 },
       { x: 17, z: -76 },
-      { x: 13.5, z: -69.5 },
-      { x: 6, z: -63.5 },
+      { x: 12.5, z: -71 },
+      { x: 4, z: -67 },
       { x: 0, z: -58 },
     ],
   },
