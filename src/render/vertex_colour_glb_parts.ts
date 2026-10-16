@@ -131,3 +131,36 @@ export function mergeVertexColourBuckets(
   }
   return parts;
 }
+
+/** Set on a material whose colour already carries its factor (a clone carries it too). */
+const VERTEX_COLOUR_SCALED = 'vertexColourScaleApplied';
+
+/**
+ * The painted materials of a parsed GLB that draws with its OWN materials (the Highwatch manor,
+ * a placed town building: the town view clones them per building, eastbrook_placed_building.ts,
+ * and an authored map draws them as they are) brought back above their headroom: each material
+ * whose extras name a `vertexColourScale` has its colour (the glTF base colour factor)
+ * multiplied by it, once however many meshes share it, and is marked so it never is again.
+ * Runs in the loader's parse chain (assets/loader.ts) before any consumer sees the scene; a
+ * converter that builds fresh materials reads the factor itself (vertexColourScaleOf). A GLB
+ * with no such extras is untouched. Returns the number of materials scaled.
+ */
+export function applyVertexColourScale(root: THREE.Object3D): number {
+  // a loader stub in a test may hand over a scene with no graph at all
+  if (typeof root?.traverse !== 'function') return 0;
+  let scaled = 0;
+  root.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+      const mat = material as THREE.MeshStandardMaterial | undefined;
+      if (!mat?.color || mat.userData[VERTEX_COLOUR_SCALED]) continue;
+      const scale = vertexColourScaleOf(mat);
+      if (scale === 1) continue;
+      mat.color.multiplyScalar(scale);
+      mat.userData[VERTEX_COLOUR_SCALED] = true;
+      scaled++;
+    }
+  });
+  return scaled;
+}

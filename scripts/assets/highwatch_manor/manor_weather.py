@@ -1,5 +1,6 @@
 """The Highwatch manor's weathering, baked into the vertex colours after the warm light: the
-painted Tidehold buildings carry their age in the texture, the manor carries it per face.
+painted maps carry the brushwork's own age (lichen, stains, chipped edges), the vertex colours
+the manor's, per face, over the paint.
 
   - ambient occlusion: a fixed fan of short rays off every face against the whole model, so
     corners, reveals, the undersides of copings and the ground under the eaves go darker;
@@ -7,6 +8,12 @@ painted Tidehold buildings carry their age in the texture, the manor carries it 
   - moss: the shaded north faces near the ground take a green cast;
   - eaves: an exterior wall face with a roof right over it sits in the eaves' shadow;
   - sun: exterior tops (copings, sills, the garden wall's cap, slates) bleach a little.
+
+Each rule reads the material the builders gave a face (the painter remembers it), whatever map
+the face now wears; on a painted face the grime, the moss and the sun are mixed in the paint's
+own terms (over its family's reference, under the headroom: manor_texture.Painter.to_paint), so
+they weather the paint as they weathered the palette, and the slates keep a grey tint (their
+blue is the map's).
 
 Deterministic: fixed ray directions, no randomness. Glow and glass keep their colours.
 """
@@ -61,7 +68,7 @@ def _mix(c, target, k):
     return tuple(c[i] + (target[i] - c[i]) * k for i in range(3))
 
 
-def bake_weather(parts, inside, roof_name='ManorRoof'):
+def bake_weather(parts, inside, painter, roof_name='ManorRoof'):
     solid = [n for n in parts if n != 'ManorGlow']
     world = _bvh(parts, solid)
     roofs = _bvh(parts, [roof_name])
@@ -72,7 +79,9 @@ def bake_weather(parts, inside, roof_name='ManorRoof'):
         bm = piece.bm
         bm.normal_update()
         for f in bm.faces:
-            if f.material_index in EMISSIVE:
+            # the builders' material: the stone takes the moss, the slates the sun
+            mat = painter.source_material(piece, f)
+            if mat in EMISSIVE:
                 continue
             n = f.normal.normalized()
             c = f.calc_center_median()
@@ -91,14 +100,14 @@ def bake_weather(parts, inside, roof_name='ManorRoof'):
             exterior = not inside(g.x, g.y, g.z)
             mult = ao
             tint = []
-            if exterior and f.material_index != SLATE:
+            if exterior and mat != SLATE:
                 if abs(gn.y) < 0.5:
                     # rain splash and grime up the lowest yard and a half of the walls
                     k = max(0.0, min(1.0, (1.4 - g.y) / 1.8))
                     mult *= 1.0 - 0.3 * k
                     tint.append((GRIME, 0.24 * k))
                     # moss on the shaded north faces near the ground
-                    if f.material_index == STONE and gn.z > 0.3 and g.y < 1.2:
+                    if mat == STONE and gn.z > 0.3 and g.y < 1.2:
                         tint.append((MOSS, 0.5 * gn.z * max(0.0, min(1.0, (1.2 - g.y) / 1.4))))
                     # the eaves' shadow: a roof right over the face
                     loc, _, _, dist = roofs.ray_cast(o, up, 2.6)
@@ -106,11 +115,13 @@ def bake_weather(parts, inside, roof_name='ManorRoof'):
                         mult *= 0.8 + 0.2 * dist / 2.6
                 elif gn.y > 0.7:
                     tint.append((SUN, 0.1))
-            if exterior and f.material_index == SLATE and gn.y > 0.3:
+            if exterior and mat == SLATE and gn.y > 0.3:
                 tint.append((SUN, 0.06))
+            # each target in the face's own colour terms (the paint's on a painted face)
+            tint = [(painter.to_paint(piece, f, target), k) for (target, k) in tint]
             for loop in f.loops:
                 r, gg, bb, a = loop[piece.col]
                 col = (r, gg, bb)
                 for (target, k) in tint:
                     col = _mix(col, target, k)
-                loop[piece.col] = (min(1.0, col[0] * mult), min(1.0, col[1] * mult), min(1.0, col[2] * mult), a)
+                loop[piece.col] = (*painter.store(f, (col[0] * mult, col[1] * mult, col[2] * mult)), a)

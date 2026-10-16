@@ -5,11 +5,19 @@ the approved proposal, "Salon en T con linterna").
       [--save FILE.blend] [--render OUT_DIR]
 
 Writes manor_source.glb and manor.collision.json beside this file.
-`node scripts/assets/highwatch_manor/build.mjs` ships the GLB (validate, fingerprint, meshopt)
-to public/models/tidehold/highwatch/manor.glb and merges the collision rows into
-data/asset_collision_overrides.json; the town stands it like the painted buildings
-(src/sim/highwatch_layout.ts), so the model frame is the painted set's: yards, origin on the
-ground line, a yard of footing under it, the door on the -z face.
+`node scripts/assets/highwatch_manor/build.mjs` ships the GLB (validate, fingerprint, embed the
+painted maps, KTX2, meshopt) to public/models/tidehold/highwatch/manor.glb and its texture
+tiers, and merges the collision rows into data/asset_collision_overrides.json; the town stands
+it like the painted buildings (src/sim/highwatch_layout.ts), so the model frame is the painted
+set's: yards, origin on the ground line, a yard of footing under it, the door on the -z face.
+
+Painted like the painted Highwatch buildings, by the Mirefen tavern's method: each palette
+family wears one of the painted town's hand-painted tiling maps in Highwatch's Alpine slate look
+(manor_texture.py, textures.json): the plaster the limewash, the timber, the boards, every stone
+(blocks, mortar, trims, flags) the dressed granite, the slates the square slate, the textiles
+the woven cloth; the vertex colours stay the tint, the warm light and the weathering over the
+paint (stored under a headroom the runtime multiplies back, so the light can lift the paint).
+The metal, the glass, the glows and whatever no family claims stay untextured.
 
 Hierarchy (the town view draws the whole; G_INT* parts cast no shadow, the rule the painted
 buildings follow, render/eastbrook_placed_building.ts):
@@ -36,13 +44,14 @@ sys.path.insert(0, os.path.join(HERE, '..', 'eastbrook_ferry'))
 sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
-from manor_lib import EMISSIVE, SLATE, encode_for_export, make_materials  # noqa: E402
-from shiplib import Piece, empty, triangles  # noqa: E402
+from manor_lib import EMISSIVE, SLATE, encode_for_export  # noqa: E402
+from shiplib import empty, triangles  # noqa: E402
 
 import manor_furnish as U  # noqa: E402
 import manor_grounds as GR  # noqa: E402
 import manor_plan as PL  # noqa: E402
 import manor_shell as S  # noqa: E402
+import manor_texture as TX  # noqa: E402
 from manor_weather import bake_weather  # noqa: E402
 
 PARTS = ('ManorShell', 'ManorRoof', 'ManorTrim', 'ManorGrounds', 'ManorGlow', 'G_INT_Timber',
@@ -93,6 +102,12 @@ def _inside(x, y, z):
 
 
 def bake_warm_light(parts):
+    """Warm the colours of every surface inside the manor by the light that reaches it from the
+    hearth, the chandeliers, the lantern and the candles. On a painted face the colour is
+    already its tint over the map, stored under the headroom (manor_texture.py), so the light
+    lifts the paint above the map as it lifted the old palette; should a colour still pass 1 it
+    is brought back by its brightest channel, so near a flame it stays warm rather than clamping
+    white. The slates (the painted roof) stay out of it: all outside."""
     from shiplib import G as game
     sources = _sources()
     for name, piece in parts.items():
@@ -117,25 +132,37 @@ def bake_warm_light(parts):
             light = min(light, 1.1)
             # a warm floor of light indoors, brighter and warmer toward the flames
             mult = (0.92 + light * 0.55, 0.86 + light * 0.44, 0.76 + light * 0.3)
+            painted = f.material_index in TX.PAINTED
             for loop in f.loops:
                 r, g, b, a = loop[piece.col]
-                loop[piece.col] = (min(1.0, r * mult[0]), min(1.0, g * mult[1]), min(1.0, b * mult[2]), a)
+                lit = (r * mult[0], g * mult[1], b * mult[2])
+                if painted:
+                    lit = TX.fit(lit)
+                loop[piece.col] = (min(1.0, lit[0]), min(1.0, lit[1]), min(1.0, lit[2]), a)
 
 
 def build_scene():
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    mats = make_materials()
+    mats = TX.make_materials()
     root = empty('HighwatchManor_ROOT', None, display='ARROWS', size=2.0)
     this = sys.modules[__name__]
-    parts = {name: Piece(name, wear=w, gradient=g) for name, (w, g) in SHADING.items()}
+    # every face is filed under its palette family as it is painted (manor_texture.py)
+    painter = TX.Painter()
+    piece = painter.piece_class()
+    parts = {name: piece(name, wear=w, gradient=g) for name, (w, g) in SHADING.items()}
     shell_parts = {'ManorShell': parts['ManorShell'], 'ManorRoof': parts['ManorRoof'],
                    'ManorTimber': parts['G_INT_Timber'], 'ManorTrim': parts['ManorTrim'],
                    'ManorGlow': parts['ManorGlow']}
     S.build(this, shell_parts)
     U.build(this, parts)
     GR.build(this, parts)
+    # the painted maps: each face onto its material, its colour a tint, its UVs laid; then the
+    # warm light and the weathering over the paint
+    faces = painter.paint_faces(parts)
+    for name, n in zip(TX.MATERIALS, faces):
+        print(f'MATERIAL {name} faces {n}')
     bake_warm_light(parts)
-    bake_weather(parts, _inside)
+    bake_weather(parts, _inside, painter)
     encode_for_export(parts)
     pieces = {}
     for name in PARTS:
@@ -210,10 +237,12 @@ def export(path, objs):
     for o in root.children_recursive:
         o.select_set(True)
     bpy.context.view_layer.objects.active = root
+    # the maps are not embedded here: build.mjs embeds them (textures.json) at each texture tier
     bpy.ops.export_scene.gltf(
         filepath=path, export_format='GLB', use_selection=True, export_apply=True, export_yup=True,
         export_extras=True, export_animations=False, export_cameras=False, export_lights=False,
         export_vertex_color='ACTIVE', export_all_vertex_colors=False, export_morph=False,
+        export_texcoords=True, export_image_format='NONE',
     )
     print('WROTE', path)
 
@@ -240,6 +269,9 @@ if __name__ == '__main__':
           round(coll['size'], 4))
     if arg('--save') or arg('--render'):
         import manor_scene  # noqa: E402
+
+        # the review scene draws the painted colours at the game's own scale (after the export)
+        TX.show_headroom(objs['mats'])
         manor_scene.stage(objs)
         if arg('--save'):
             manor_scene.save(arg('--save'))
