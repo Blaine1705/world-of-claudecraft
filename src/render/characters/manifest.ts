@@ -3214,12 +3214,13 @@ export const VISUALS: Record<string, VisualDef> = {
     // jump (render/mount_rear_core.ts), and its own backing-up walk (author_walkback)
     clips: { ...MOUNT_RIGGED, flourish: 'Rear', walkBack: 'WalkBack' },
     walkRef: 2.57,
-    // WalkBack is the walk's own stride reversed, so it matches at the walk's reference. A
-    // mounted backpedal runs at the sim's BACKPEDAL_MULT of the mount's speed (about 7.8 here,
-    // three times the walk reference), so the walk ceiling is lifted to let the cadence keep up
-    // and the hooves plant instead of sliding; the forward walk never reaches it on a mount.
-    walkBackRef: 2.57,
-    walkTimeScaleMax: 3.2,
+    // WalkBack reaches 1.5 times the walk's stride (build_steed.py STRIDE), so it matches at
+    // 1.5 times the walk's reference. A mounted backpedal runs at the sim's BACKPEDAL_MULT of the
+    // mount's speed (about 7.8 here), which would need twice the clip's cadence to plant every
+    // hoof; that read as pedalling. The cadence is capped near a calm walk instead and the
+    // hooves glide a little: a deliberate back-up, not a scramble.
+    walkBackRef: 3.86,
+    walkTimeScaleMax: 1.3,
     runRef: 13.4,
     lazyPreload: true,
   },

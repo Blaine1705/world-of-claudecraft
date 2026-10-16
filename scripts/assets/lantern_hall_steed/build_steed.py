@@ -33,7 +33,7 @@ import random
 import sys
 
 import bpy
-from mathutils import Matrix, Vector
+from mathutils import Matrix, Quaternion, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import steed_body as SB  # noqa: E402
@@ -949,9 +949,15 @@ author_rear()
 #      horse's own walk: the cycle runs in reverse, so every hoof travels from behind to in
 #      front under the body and the body moves backward over planted feet, and the forelegs
 #      are shifted a quarter cycle so each fore steps with its diagonal hind (the walk's lateral
-#      four-beat becomes the two-beat a horse backs in). The stride is the walk's own, so the
-#      renderer matches it to ground speed with walkBackRef = walkRef and nothing slides.
+#      four-beat becomes the two-beat a horse backs in). Each step reaches STRIDE times the
+#      walk's and the body sways over it, so the mounted backpedal's speed is covered at a calm
+#      cadence (walkBackRef = walkRef * STRIDE in characters/manifest.ts).
 # ---------------------------------------------------------------------------
+# how much farther each backing step reaches than the walk's (the clip's stride, and so its
+# walkBackRef, is the walk's times this)
+STRIDE = 1.5
+
+
 def author_walkback():
     walk = bpy.data.actions['Walk']
     keyed = keyed_bones(walk)
@@ -970,13 +976,35 @@ def author_walkback():
         bpy.context.view_layer.update()
         return {n: pbs[n].matrix_basis.copy() for n in keyed}
 
+    # the reference the legs swing about: the idle's first frame
+    ARM.animation_data.action = bpy.data.actions['Idle']
+    ARM.animation_data.action_slot = bpy.data.actions['Idle'].slots[0]
+    bpy.context.scene.frame_set(0)
+    bpy.context.view_layer.update()
+    idle0 = {n: pbs[n].matrix_basis.copy() for n in keyed}
+    ARM.animation_data.action = walk
+    ARM.animation_data.action_slot = walk.slots[0]
+    legs = {n for n in keyed if any(k in n for k in ('thigh', 'leg_', 'foot', 'toes'))}
+
+    def reach(n, M):
+        # a longer, more deliberate step: every leg joint swings STRIDE times as far from the
+        # idle pose as the walk carries it
+        if n not in legs:
+            return M
+        loc, q, sc = M.decompose()
+        q0 = idle0[n].to_quaternion()
+        d = q0.rotation_difference(q)
+        axis, ang = d.to_axis_angle()
+        q2 = q0 @ Quaternion(axis, ang * STRIDE)
+        return Matrix.LocRotScale(loc, q2, sc)
+
     steps = int(round(span))
     frames = []
     for k in range(steps + 1):
         u = k / steps
         hind = pose_at(1.0 - u)
         front = pose_at(1.0 - u + 0.25)
-        frames.append({n: (front[n] if n in fore else hind[n]) for n in keyed})
+        frames.append({n: reach(n, front[n] if n in fore else hind[n]) for n in keyed})
     act = bpy.data.actions.new('WalkBack')
     ARM.animation_data.action = act
     for n in keyed:
@@ -987,6 +1015,13 @@ def author_walkback():
             pbs[n].matrix_basis = basis[n]
         bpy.context.view_layer.update()
         u = k / steps
+        # the body sways side to side over each diagonal pair as the weight shifts back
+        sway = math.radians(3.0) * math.sin(2 * math.pi * u)
+        pr = pbs[ROOT]
+        M = pr.matrix.copy()
+        h = M.to_translation()
+        pr.matrix = Matrix.Translation(h) @ Matrix.Rotation(sway, 4, 'Y') @ Matrix.Translation(-h) @ M
+        bpy.context.view_layer.update()
         # the head carried up and tucked, a little nod with each diagonal step
         nod = math.radians(2.5) * math.sin(2 * math.pi * 2 * u)
         for name, ang in ((SUB1, -math.radians(8)), (NECK, -math.radians(4)),

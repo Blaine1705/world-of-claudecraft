@@ -87,10 +87,10 @@ describe('the destrier ships the clips its rear and its backing-up walk name', (
     const def = VISUALS.mount_lantern_hall_destrier;
     expect(def.clips.flourish).toBe('Rear');
     expect(def.clips.walkBack).toBe('WalkBack');
-    // the backpedal matches the walk's own stride, and its cadence ceiling covers the
-    // mounted backpedal speed so the hooves plant
-    expect(def.walkBackRef).toBe(def.walkRef);
-    expect(def.walkTimeScaleMax).toBeGreaterThanOrEqual(3);
+    // the backpedal's longer stride (1.5x the walk's) is matched at 1.5x the walk reference,
+    // and its cadence is capped near a calm walk rather than pedalling to keep up
+    expect(def.walkBackRef).toBeCloseTo((def.walkRef ?? 0) * 1.5, 1);
+    expect(def.walkTimeScaleMax).toBeLessThanOrEqual(1.4);
     const bytes = readFileSync(path.join(__dirname, '..', 'public', def.url));
     const json = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString('utf8')) as {
       animations: { name: string }[];

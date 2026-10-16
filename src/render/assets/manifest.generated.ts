@@ -1527,7 +1527,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/mounts/dreadnought.glb": "/media/models/mounts/dreadnought.79abb4ac41b1.glb",
   "models/mounts/goblin_rocket_sled.glb": "/media/models/mounts/goblin_rocket_sled.0957ec5ff7bb.glb",
   "models/mounts/grag_bear.glb": "/media/models/mounts/grag_bear.767ddb38445d.glb",
-  "models/mounts/lantern_hall_destrier.glb": "/media/models/mounts/lantern_hall_destrier.7235ba46f022.glb",
+  "models/mounts/lantern_hall_destrier.glb": "/media/models/mounts/lantern_hall_destrier.e2005a6bae0a.glb",
   "models/mounts/lanternback_troll.glb": "/media/models/mounts/lanternback_troll.4aadd52ff035.glb",
   "models/mounts/mech_bird.glb": "/media/models/mounts/mech_bird.1b92ab1345d5.glb",
   "models/mounts/rallycart_rxt.glb": "/media/models/mounts/rallycart_rxt.adef62058848.glb",
