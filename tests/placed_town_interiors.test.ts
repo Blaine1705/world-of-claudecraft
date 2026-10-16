@@ -37,15 +37,32 @@ describe('a town view registrar of camera interiors', () => {
     expect(interiorCameraInternalsForTest.interiors()).toEqual([air]);
   });
 
-  it('registers nothing for a sealed record, a model with no air, or a turn off the quarters', () => {
+  it('registers nothing for a sealed record or a model with no air', () => {
     const interiors = createPlacedTownInteriors();
     const groundAt = () => 2;
     expect(interiors.add(record('shut_inn', 'tavern', 1, 0, false), groundAt)).toBeNull();
     expect(interiors.add(record('cottage', 'house_b', 1), groundAt)).toBeNull();
     expect(interiors.add(record('vault', 'vault', 1), groundAt)).toBeNull();
-    expect(interiors.add(record('skew_bank', 'bank', 1, 0.3), groundAt)).toBeNull();
     expect(interiors.ids()).toEqual([]);
     expect(registered()).toEqual([]);
+  });
+
+  it('registers a walk-in building at any turn, its air in its own frame', () => {
+    // Eastbrook stands its buildings at the Studio map's own turns (the bank at 225 degrees)
+    const interiors = createPlacedTownInteriors();
+    const groundAt = (x: number, z: number) => 0.5 * x - 0.25 * z;
+    const bank = record('skew_bank', 'bank', 1.3, (225 * Math.PI) / 180);
+    const air = interiors.add(bank, groundAt);
+    expect(air).toEqual(
+      placedTownCameraInterior(bank, groundAt(bank.placement.x, bank.placement.z)),
+    );
+    expect(air?.frame).toMatchObject({
+      x: bank.placement.x,
+      z: bank.placement.z,
+      yaw: bank.placement.rotation,
+    });
+    expect(interiors.ids()).toEqual(['placed_town:skew_bank']);
+    expect(interiorCameraInternalsForTest.interiors()).toEqual([air]);
   });
 
   it('drops what it registered on clear, and only that', () => {

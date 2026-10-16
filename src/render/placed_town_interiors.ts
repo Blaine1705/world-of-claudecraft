@@ -1,6 +1,6 @@
 // The indoor camera's rooms for a town view's walk-in painted buildings: one small registrar
 // per town view. While the view builds, each walk-in building it stands registers its air
-// (placed_town_interior_core.ts, at the record's own scale, quarter turn and seat) with the
+// (placed_town_interior_core.ts, at the record's own scale, turn and seat) with the
 // indoor camera (interior_camera.ts); the next build first drops everything the last one
 // registered, so a rebuilt view replaces its rooms and never doubles them, and a world without
 // the town (or a document that owns its buildings as placements) keeps none. Every town that
@@ -20,9 +20,9 @@ export interface PlacedTownInteriors {
   clear(): void;
   /**
    * Register one placed building's rooms, its anchor standing on `groundAt` (the ground the
-   * view stands the model on). A sealed record, a model with no authored air or a turn off
-   * the quarter turns registers nothing. Returns the air it registered (its doors also feed
-   * the town's camera fade), or null when it registered nothing.
+   * view stands the model on), at whatever turn it stands. A sealed record or a model with no
+   * authored air registers nothing. Returns the air it registered (its doors, in its frame,
+   * also feed the town's camera fade), or null when it registered nothing.
    */
   add(
     building: PlacedTownInteriorBuilding,

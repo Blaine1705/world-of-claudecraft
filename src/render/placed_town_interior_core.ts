@@ -2,7 +2,7 @@
 // layout, sim/placed_town_kit.ts), for the indoor chase camera (interior_camera.ts): the
 // rooms a camera may stand in and the doorways that open them onto the world, read off each
 // model's baked collision (data/asset_collision_overrides.json) at AUTHORED size, then
-// carried to the building's placement: its scale, its quarter turn and its ground.
+// carried to the building's placement: its scale, its turn and its ground.
 //
 // Each piece is a box in the model's own axes, in yards over its ground line (y 0), against
 // the inner wall faces (a quarter yard in from them, clear of the beams, sills and trims the
@@ -25,8 +25,12 @@
 // air: the camera stays the open-world one. Every town that stands these models (Highwatch,
 // Eastbrook, Fenbridge) registers the air through placed_town_interiors.ts.
 //
-// Interiors are world axis-aligned, so a building turned by anything but a quarter turn
-// gets none. Three-, DOM- and i18n-free; built once per town view, never per frame.
+// A building at a quarter turn gets its air in the world's axes, each piece turned into a
+// world box. One at any other angle (Eastbrook stands its buildings at the Studio map's own
+// turns) gets the model's pieces as they are, carried to its scale and ground, in the
+// building's own frame (its anchor and its turn, interior_camera_core.ts InteriorFrame), so
+// its rooms stay square to its walls and every door keeps the model's own axis and side.
+// Three-, DOM- and i18n-free; built once per town view, never per frame.
 
 import { localToWorld } from '../sim/placed_town_kit';
 import {
@@ -224,8 +228,9 @@ const QUARTER = Math.PI / 2;
 /**
  * The camera interior of one walk-in placed building whose anchor stands on ground at
  * `groundY` (the terrain under the anchor, the height the town view stands the model on),
- * or null for a sealed record, a model with no authored air, or a turn that is not a quarter.
- * The model's ground line stands at groundY + scale (the footing) + lift.
+ * or null for a sealed record or a model with no authored air. The model's ground line
+ * stands at groundY + scale (the footing) + lift. A quarter turn gives world boxes; any other
+ * turn gives the model's own boxes in the building's frame (its anchor and its turn).
  */
 export function placedTownCameraInterior(
   building: PlacedTownInteriorBuilding,
@@ -235,10 +240,32 @@ export function placedTownCameraInterior(
   const air = MODEL_AIR[placedTownModelName(building.assetId)];
   if (!air) return null;
   const p = building.placement;
-  const quarters = Math.round(p.rotation / QUARTER);
-  if (Math.abs(p.rotation - quarters * QUARTER) > 1e-6) return null;
   const s = p.scale;
   const lineY = groundY + s + p.lift;
+  const id = `placed_town:${building.id}`;
+  const quarters = Math.round(p.rotation / QUARTER);
+  if (Math.abs(p.rotation - quarters * QUARTER) > 1e-6) {
+    // any other turn: the pieces stay square to the building's own walls, in its frame (the
+    // model's axes at the placed scale, the anchor its origin), and so do its doors
+    const local: InteriorBox[] = air.boxes.map(([x0, x1, y0, y1, z0, z1]) => [
+      x0 * s,
+      x1 * s,
+      lineY + y0 * s,
+      lineY + y1 * s,
+      z0 * s,
+      z1 * s,
+    ]);
+    const doors: InteriorOpening[] = air.openings.map((o) => ({
+      box: o.box,
+      axis: o.axis,
+      side: o.side,
+    }));
+    return cameraInterior(id, local, doors, new Map(), 'preserve-angle', {
+      x: p.x,
+      z: p.z,
+      yaw: p.rotation,
+    });
+  }
   const boxes: InteriorBox[] = air.boxes.map(([x0, x1, y0, y1, z0, z1]) => {
     const a = localToWorld(p, p.rotation, x0 * s, z0 * s);
     const b = localToWorld(p, p.rotation, x1 * s, z1 * s);
@@ -263,5 +290,5 @@ export function placedTownCameraInterior(
     const value = alongX ? local.x : local.z;
     return { box: o.box, axis: alongX ? 0 : 2, side: value > 0 ? 1 : -1 };
   });
-  return cameraInterior(`placed_town:${building.id}`, boxes, openings, new Map(), 'preserve-angle');
+  return cameraInterior(id, boxes, openings, new Map(), 'preserve-angle');
 }

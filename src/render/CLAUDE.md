@@ -189,8 +189,10 @@ Everything else is a sibling module in one of these families:
 - `interior_camera.ts` over `interior_camera_core.ts`: the indoor camera clamp, the ONE
   scoped exception on the built-in world to the pinned rule that scene geometry never shortens
   the chase boom (`tests/graphics_overhaul_integration.test.ts`). A walk-in building registers
-  its AIR (boxes, optionally rounded by a vertical cylinder, plus its openings onto the world)
-  with `registerCameraInterior` when it is built and drops it on teardown; while the player's
+  its AIR (boxes, optionally rounded by a vertical cylinder, plus its openings onto the world;
+  square to the world's axes, or to the building's own `InteriorFrame`, an origin and a turn,
+  for one stood at any other angle: every query still takes world points) with
+  `registerCameraInterior` when it is built and drops it on teardown; while the player's
   eye stands in it, the drawn camera stays in that air (pull-in at once, eased release, the
   least flattening under a lintel or a ceiling, a lift or swing over a cramped spot, a cut to
   the eyes in a corner nothing escapes; a `preserve-angle` interior instead keeps the
@@ -204,10 +206,12 @@ Everything else is a sibling module in one of these families:
   (`placed_town_interiors.ts`: cleared as the view builds, one `add` per building it stands)
   from `placed_town_interior_core.ts` (rooms and doors per model at authored size, carried to
   the record's scale, turn and seat; a new walk-in model needs its entry there, pinned against
-  its baked collision by `tests/placed_town_interior_core.test.ts`), and hands the same doors
-  to the town's camera fade, so a walk-in building stays solid while the player steps in with
-  the lens still outside looking through the door (`fenbridge_town_visibility_core.ts`
-  `doorways`); the Mirefen tavern (`mirefen_tavern.ts`) registers its own from
+  its baked collision by `tests/placed_town_interior_core.test.ts`). The Highwatch and
+  Fenbridge views also hand the same doors to their camera fade, so a walk-in building stays
+  solid while the player steps in with the lens still outside looking through the door
+  (`fenbridge_town_visibility_core.ts` `doorways`, read in `doorwayFrame` for a turned
+  building); Eastbrook's roof fade takes no doors, so there a walk-in building fades while the
+  lens is outside it. The Mirefen tavern (`mirefen_tavern.ts`) registers its own air from
   `mirefen_tavern_interior_core.ts`. The Highwatch manor's fires and lamps
   (`highwatch_manor_lights.ts`) join the props' fire-light budget and the scenery flame pass,
   the campfire's rule. The chase camera's floor (ground, rift tier, maze hedges) is
