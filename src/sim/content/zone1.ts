@@ -150,7 +150,10 @@ export const ZONE1_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
   { x: 52, z: -62, r: 9 },
   { x: 66, z: -79, r: 8 },
   { x: 47, z: -80, r: 7 },
-  { x: -4, z: -73, r: 8 }, // the chapel rise, blooms among the headstones
+  // the churchyard, blooms among the headstones (it moved beside the chapel
+  // with the World of ClaudeCraft Studio map's arrangement; the smithy
+  // stands on the old chapel rise)
+  { x: 36, z: -101, r: 8 },
   { x: -36, z: -103, r: 6 }, // the main-street verge by the market home
   { x: -6, z: -116, r: 6 }, // the beach promenade's east verge
   // Owner refinement round 4: the Wolf Run reads green meadow, not strand.

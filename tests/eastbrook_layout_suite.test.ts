@@ -1701,7 +1701,7 @@ describe('layout clearance and service anchors', () => {
         0.7853981633974481,
         'eastbrook_bank',
       ],
-      ['chronicler_saul', 10.8, -91, 0.5880026035475675, 'mailbox_eastbrook'],
+      ['chronicler_saul', 10.2, -87.5, 0.5880026035475675, 'mailbox_eastbrook'],
       [
         'forgemistress_darva',
         -8.171547617899419,

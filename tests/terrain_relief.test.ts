@@ -90,7 +90,10 @@ describe('the calm field keeps graded features on their exact classic terrain', 
     // level pad (zone1.ts EASTBROOK_BUILDING_PAD_TERRAIN_EDITS, the Studio
     // rebuild map's own) ends 0.45 yd past this point, and its last sliver of
     // taper eases it 5 mm toward the shop's shelf (-0.8902 before).
-    ['vale hub core', -14, -102, -0.8849198759304114],
+    // Re-minted for the World of ClaudeCraft Studio map's arrangement: the
+    // shop moved down to the strand and no building pad reaches the square
+    // now, so the core is back on the plat's own grade.
+    ['vale hub core', -14, -102, -0.8902171227961108],
     ['drakemaw bench n', 390, 2330, 13.5055094022491],
     ['drakemaw bench s', 390, 2308, 13.4],
     ['drakemaw bench e', 402, 2320, 13.4],

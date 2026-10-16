@@ -1261,7 +1261,9 @@ const STATIONS = [
     id: 'station_eastbrook_kitchens',
     type: 'kitchens',
     masterNpcId: 'cook_marlow',
-    // The tavern's kitchen yard, off its southern gable.
+    // The tavern's kitchen yard, beside the inn lane where it meets the main
+    // street (the World of ClaudeCraft Studio map keeps it there as the inn
+    // moves up the slope).
     position: lotFront(KITCHENS_LOT.position, KITCHENS_LOT.rotation, KITCHENS_LOT.depth, 2.5),
     interactionRadius: 20,
   },
@@ -1336,9 +1338,7 @@ const COOK_POSITION = {
 } as const;
 const WEAVER_POSITION = { x: -20.5, z: -117.5 } as const;
 const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS_LOT.rotation, -3.2, 0);
-// By the north road's corner of the square, a stride off the smithy's forge
-// shelter.
-const SAUL_POSITION = { x: 10.8, z: -91 } as const;
+const SAUL_POSITION = { x: 10.2, z: -87.5 } as const;
 // Round 6b (owner): FURY is a service NPC (the honor quartermaster), so he
 // belongs on the town's edge rather than in the churchyard approach: between
 // the north road and the coast track where they leave the square.

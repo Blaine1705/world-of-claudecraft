@@ -483,7 +483,10 @@ describe('Eastbrook town renderer', () => {
     const ground = (x: number, z: number) => terrainHeight(x, z, seed);
     // A bare slope with no level pad under it: every lot drops across its own
     // wall box, which is exactly where the kit and shape paths grew a skirt.
-    const slope = (x: number, z: number) => 0.05 * x - 0.03 * z;
+    // (Tilted the other way along z for the World of ClaudeCraft Studio map's
+    // arrangement: the smithy, the inn and the quay cottage turned so their
+    // depth ran almost level along the old tilt.)
+    const slope = (x: number, z: number) => 0.05 * x + 0.03 * z;
     const stagings = [
       {
         label: 'real terrain',

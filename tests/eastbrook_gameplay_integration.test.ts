@@ -1208,14 +1208,12 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     // square, so the measured face point (saul.pos plus 1.5 yd along his
     // facing, taken from the runtime entity) is far outside mailbox reach
     // rather than a stride from it. The targetless-interact regression this
-    // stages is unchanged. Re-measured for the World of ClaudeCraft Studio
-    // map's arrangement: Saul stepped a stride south, clear of the smithy's
-    // forge shelter, and the face point moved with him.
-    const facePoint = { x: 11.632050294337844, z: -89.75192455849323 };
+    // stages is unchanged.
+    const facePoint = { x: 11.032050294337843, z: -86.25192455849323 };
 
     expect(Math.hypot(facePoint.x - saul.pos.x, facePoint.z - saul.pos.z)).toBeCloseTo(1.5, 12);
     const mailboxDistance = Math.hypot(facePoint.x - mailbox.pos.x, facePoint.z - mailbox.pos.z);
-    expect(mailboxDistance).toBe(23.151163003735885);
+    expect(mailboxDistance).toBe(24.090753748334464);
     expect(mailboxDistance).toBeGreaterThan(INTERACT_RANGE);
 
     const talkToNpc = vi.spyOn(sim, 'talkToNpc');
