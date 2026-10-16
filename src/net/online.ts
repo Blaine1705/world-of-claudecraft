@@ -264,7 +264,13 @@ import {
 import { decodePlayerIdentityWire } from './player_identity_wire';
 import { applyProfessionsSelfMirror } from './professions_self_mirror';
 import { optimisticQuestState } from './quest_state_optimistic';
-import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import {
+  isTransientReconnectRejection,
+  isTransientTimeoutRejection,
+  RECONNECT_BASE_DELAY_MS,
+  RECONNECT_MAX_ATTEMPTS,
+  RECONNECT_MAX_DELAY_MS,
+} from './reconnect_policy';
 import { decodeReferralCardsSnapshot } from './referral_cards_wire';
 import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
@@ -1103,22 +1109,6 @@ export class Api {
 // hold it at its last pose for this window. Short, so a genuine leaver barely lingers.
 const DESPAWN_GRACE_MS = 600;
 
-// Auto-reconnect backoff for an unexpectedly dropped game socket. The server
-// holds the character in-world (linkdead) for five minutes; the retry window
-// is deliberately longer, since past the grace a successful auth simply
-// performs a fresh join from the last save. Roughly 1s, 2s, 4s, 8s, then 15s
-// apart, with each delay spread over a 0.5x to 1.5x jitter band and clamped at
-// the 15s cap (computeBackoffDelay) so many clients dropped by one server blip
-// do not retry in lockstep. The clamp trims the band's upper half once the
-// schedule reaches the cap, so across 40 attempts the total runs from roughly
-// 4.6 minutes (every draw at the floor) to 9.4 minutes (every draw at the
-// ceiling), with an expected total near 8 minutes, before giving up for good.
-// Exported for the reconnect-overlay show-grace pin (tests/reconnect_overlay
-// .test.ts): the grace must clear attempt 1's full jitter band, and a band
-// widened here without that pin would quietly reintroduce the veil blink.
-export const RECONNECT_BASE_DELAY_MS = 1_000;
-export const RECONNECT_MAX_DELAY_MS = 15_000;
-const RECONNECT_MAX_ATTEMPTS = 40;
 // A pre-layout-gate server accepts only `t:'auth'`, so it rejects our current
 // discriminator with this otherwise-generic literal. During a handshake only,
 // turn that legacy response into the same actionable reason a current server

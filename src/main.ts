@@ -128,6 +128,7 @@ import {
   stampGraphicsRebuildProbe,
   updateGraphicsRebuildProbePhase,
 } from './game/graphics_rebuild_crash_guard';
+import { createHoverCursorUpdate } from './game/hover_cursor';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { createGatherEffectConfirm, interactKeyGatherOptions } from './game/interact_key_gather';
@@ -135,9 +136,7 @@ import { stopAutorunForInteraction } from './game/interaction_autorun';
 import { createBgFlagKey } from './game/interaction_input';
 import {
   activePvpOpponentIds,
-  HoverPickGate,
   handlePickedEntity,
-  hoverCursorKind,
   isAttackableEntity,
   shouldApproachPickedEntity,
   shouldDeferPickedCorpseToGatherNode,
@@ -203,7 +202,7 @@ import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { runPetCommand } from './game/pet_commands';
-import { clickPlacedMover, pickPlacedMoverAt } from './game/placed_mover_input';
+import { clickPlacedMover } from './game/placed_mover_input';
 import { mountPlaytestDevPanel } from './game/playtest_dev_panel';
 import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
@@ -4062,65 +4061,13 @@ async function startGame(
     return { mi, facing };
   }
 
-  function partyMemberIds(ids: Set<number>): Set<number> {
-    ids.clear();
-    for (const m of world.partyInfo?.members ?? []) {
-      if (m.pid !== world.playerId) ids.add(m.pid);
-    }
-    return ids;
-  }
-
-  // The scene raycast is the expensive half of the hover cursor; the gate re-picks
-  // on pointer movement (instantly) or every HOVER_REPICK_MS while stationary. The
-  // cursor KIND below still re-resolves every frame from live entity state, so a
-  // hovered mob dying or turning hostile updates without waiting for a re-pick.
-  const hoverPickGate = new HoverPickGate();
-  let hoverPickedId: number | null = null;
-  let hoverOnMover = false;
-  let hoverSeat = false;
-  const hoverPartyMemberIds = new Set<number>();
-  const hoverPvpOpponentIds = new Set<number>();
-
-  function updateHoverCursor(): void {
-    if (!input.hoverActive || input.isDragging() || hud.isModalOpen()) {
-      input.setHoverCursor('default');
-      hud.clearHoverTooltip();
-      return;
-    }
-    if (hoverPickGate.shouldPick(input.hoverX, input.hoverY, performance.now())) {
-      hoverPickedId = renderer.picking.pick(input.hoverX, input.hoverY);
-      // a vault door under the cursor wears the hand, like a friendly NPC
-      hoverOnMover =
-        hoverPickedId === null &&
-        pickPlacedMoverAt(renderer.picking, input.hoverX, input.hoverY) !== null;
-      hoverSeat = hoverPickedId === null && seatInteraction.hover(input.hoverX, input.hoverY);
-    }
-    const entity = hoverPickedId !== null ? world.entities.get(hoverPickedId) : undefined;
-    const pvpOpponents = activePvpOpponentIds(world, hoverPvpOpponentIds);
-    input.setHoverCursor(
-      hoverOnMover
-        ? 'friendly'
-        : !entity && hoverSeat
-          ? 'seat'
-          : hoverCursorKind(
-              entity,
-              world.playerId,
-              partyMemberIds(hoverPartyMemberIds),
-              pvpOpponents,
-            ),
-    );
-    // WoW-style mouseover tooltip (name / level / creature type) for a mob under
-    // the cursor, reusing the same (gated) pick this function already does for
-    // the hover-cursor kind above; the tooltip content still re-resolves every
-    // frame from live entity state, so counts and death update without a re-pick.
-    if (entity && entity.kind === 'mob' && !entity.dead) {
-      hud.showMobHoverTooltip(entity, pvpOpponents);
-    } else if (entity && entity.kind === 'player' && entity.id !== world.playerId && !entity.dead) {
-      hud.showPlayerHoverTooltip(entity);
-    } else {
-      hud.clearHoverTooltip();
-    }
-  }
+  const updateHoverCursor = createHoverCursorUpdate({
+    world,
+    input,
+    hud,
+    picking: renderer.picking,
+    seatHover: (x, y) => seatInteraction.hover(x, y),
+  });
 
   // WoW-style breath mirror bar. Display-only: the HUD steps its own copy of
   // the sim's breath clock (sim/breath.ts constants) from the DISPLAYED self

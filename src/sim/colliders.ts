@@ -616,8 +616,7 @@ function staticWorldColliders(seed: number): Collider[] {
   // Hand-placed GLB decor (src/sim/decor_prop_colliders.ts): a circle or box per
   // PROPS.decorProps row, walk-through without r/hw+hd, standable with standableTop.
   out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
-  // Built-in only: the berths (transport_gates.ts); the built harbors' rails and props
-  // (built-in-shaped worlds) and the tavern (built-in only).
+  // The berths (built-in only); the harbors and the tavern (built_structure_colliders.ts).
   if (content === BUILTIN_WORLD) out.push(...transportBerthColliders(seed));
   out.push(...builtStructureColliders(seed, content === BUILTIN_WORLD));
 

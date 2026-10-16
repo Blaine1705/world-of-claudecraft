@@ -1034,14 +1034,15 @@ const MONOLITHS: MonolithRow[] = [
     // Highwatch, placed_town_buildings.ts): Eastbrook's and Fenbridge's mount,
     // reveal-gate and two per-frame update blocks folded into loops over
     // townViews, which paid for the third town and 31 lines more. wc -l.
-    // LOWERED 12395 -> 12392 when the chase camera's floor (ground, rift tier, maze
+    // LOWERED 12395 -> 12393 when the chase camera's floor (ground, rift tier, maze
     // hedges) moved into chase_camera_floor_core.ts, net of the indoor camera clamp's
-    // wiring (interior_camera.ts). wc -l. Exact count.
+    // wiring (interior_camera.ts) and the turned-room camera fix. wc -l at the
+    // integration merge of #4525. Exact count.
     // LOWERED 12688 -> 12686 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
     // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
     // merged tree. Exact count.
-    ceiling: 12392,
+    ceiling: 12393,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1531,7 +1532,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 10958 when the launcher's 3D stage build (and its panel-to-container
     // map) moved into src/game/launcher_preview_stage.ts, which builds it at once
     // instead of behind charactersReady(). Exact count (wc -l), zero slack.
-    ceiling: 10958,
+    // LOWERED 10958 -> 10924 at the integration merge of #4525 (grand painted towns +
+    // the Mirefen tavern): the world hover cursor and its tooltip moved whole into
+    // src/game/hover_cursor.ts, paying for the tavern's seat wiring. wc -l. Exact count.
+    ceiling: 10924,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -2004,7 +2008,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5356 -> 5355 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's input_signature.ts extraction pays for the tavern's wiring. wc -l on the
     // merged tree. Exact count.
-    ceiling: 5338,
+    // LOWERED 5338 -> 5330 at the integration merge of #4525: the reconnect backoff
+    // schedule moved into reconnect_policy.ts beside its predicates, paying for the
+    // tavern's resting getter and sitOnSeat send. wc -l. Exact count.
+    ceiling: 5330,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
