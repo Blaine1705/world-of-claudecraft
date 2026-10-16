@@ -532,7 +532,7 @@ import {
   syncMountTransitionFx,
   syncMountVisual,
 } from './mount_lifecycle';
-import { borrowRiderLocomotion, updateMountPresentation } from './mount_presentation';
+import { borrowRiderLocomotion, mountAudio, updateMountPresentation } from './mount_presentation';
 import {
   mountPrewarmKeysFor,
   stageMountPrewarmVisual,
@@ -11120,7 +11120,7 @@ export class Renderer {
         present: runCharacterPresentation,
         animate,
         vfx: this.vfx,
-        enginePhase: this.audioSink?.mountEnginePhase(e.id) ?? null,
+        audio: mountAudio(this.audioSink, e.id, e.id === this.sim.playerId),
         groundSample: this.groundSample,
         dt,
       });

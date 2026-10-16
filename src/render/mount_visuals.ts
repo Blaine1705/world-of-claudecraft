@@ -165,6 +165,9 @@ export interface MountVisualSpec {
   glows: readonly MountGlowSpec[];
   /** Straddle pose for the rider, or null to keep the plain seated loop. */
   ride: MountRideSpec | null;
+  /** Rears up on a standing jump (mount_rear_core.ts): the mount's flourish clip plays and the
+   *  in-place hop is held to the ground. False for every mount without a rear clip. */
+  rear: boolean;
 }
 
 const spec = (
@@ -186,6 +189,7 @@ const spec = (
     groundLift?: number;
     embers?: MountEmberSpec;
     summonFx?: 'shimmer' | 'lanternBurst';
+    rear?: boolean;
   } = {},
 ): MountVisualSpec => ({
   visualKey,
@@ -205,6 +209,7 @@ const spec = (
   glows: extra.glows ?? [],
   ride: extra.ride ?? null,
   jumpTips: extra.jumpTips ?? false,
+  rear: extra.rear ?? false,
 });
 
 // The Lanternback's two storm lanterns. Each hangs from the TOP of its chain
@@ -390,6 +395,9 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
         lanterns: DESTRIER_LANTERN_BONES.map((bone) => ({ bone, offset: DESTRIER_LANTERN_OFFSET })),
       },
       summonFx: 'lanternBurst',
+      // a standing jump rears him onto his hind legs with a whinny (the clip is 'Rear',
+      // the manifest's flourish; the take is mount_neigh_lantern_hall_destrier)
+      rear: true,
     },
   ),
   // The Lanternback Troll: the rider sits IN the iron throne strapped across

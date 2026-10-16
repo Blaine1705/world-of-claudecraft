@@ -38,6 +38,7 @@ function seatBoneSpec(): MountVisualSpec {
     seatBone: { bone: 'chair', offset: [0, 0, 0] },
     glows: [],
     ride: null,
+    rear: false,
   };
 }
 
@@ -116,7 +117,7 @@ function inputs(
     present: true,
     animate: true,
     vfx,
-    enginePhase: null,
+    audio: { sink: null, id: 0, self: false },
     groundSample: () => 0,
     dt: 1 / 20,
     ...overrides,

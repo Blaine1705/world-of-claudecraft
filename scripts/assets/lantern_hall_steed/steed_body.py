@@ -27,7 +27,7 @@ from mathutils import Vector
 from mathutils.kdtree import KDTree
 from mathutils.noise import voronoi
 
-from steed_kit import L, fu, rigid, sphere
+from steed_kit import L, fu, rigid, sphere, tube
 
 HAIR_PREFIXES = ('hair_', 'c_tail_')
 
@@ -801,17 +801,61 @@ def hooves_and_feathers(p, sampler, arm, rng):
         feather(p, sampler, arm, foot, toes, r, c, rng)
 
 
-def eyes(p, sampler, arm):
-    """Dark glossy eyes seated in the sockets the source painted."""
-    for name in ('eye.l_036', 'eye.r_037'):
-        h = arm.data.bones[name].head_local
-        out = Vector((1 if h.x > 0 else -1, -0.25, 0.1)).normalized()
-        hit = sampler.ray(h + out * 0.25, -out)
+def ellipsoid(p, c, frame, radii, mat, col, w, seg=12, rings=8):
+    """A sphere stretched along an arbitrary frame (three unit axes) by three radii."""
+    first = len(p.verts)
+    sphere(p, c, 1.0, mat, col, w, seg=seg, rings=rings)
+    for k in range(first, len(p.verts)):
+        dv = p.verts[k] - c
+        p.verts[k] = c + sum((ax * (dv[i] * radii[i]) for i, ax in enumerate(frame)), Vector())
+
+
+def eyes(p, sampler, sockets):
+    """The eyes, seated in the openings of the chanfron's eye guards (`sockets`: the guard
+    ring's point on the plate and its outward normal). Each is a dark glossy eyeball, almond
+    in shape, under a heavy upper lid and a bony brow ridge, with a soft lower lid, a deep
+    brown iris and a bright catchlight high and to the front, so the eye reads as wet and
+    alive even at a rider's distance. All rigid on the head."""
+    W = rigid('head.x_031')
+    for loc, nrm in sockets:
+        hit = sampler.ray(loc + nrm * 0.1, -nrm)
         if not hit:
             continue
-        c = hit[0] - hit[1] * 0.006
-        sphere(p, c, 0.02, 'steed_eye', (0.01, 0.007, 0.005), rigid('head.x_031'), seg=12, rings=8,
-               scale=(1.0, 1.0, 0.82))
+        base, n = hit[0], hit[1].normalized()
+        fwd = Vector((0, -1, -0.35)).normalized()  # down the face, toward the nose
+        fwd = (fwd - n * fwd.dot(n)).normalized()
+        up = n.cross(fwd).normalized()
+        if up.z < 0:
+            up = -up
+        c = base + n * 0.003
+        frame = (fwd, up, n)
+
+        def P(a, b, d=0.0, c=c, fwd=fwd, up=up, n=n):
+            return c + fwd * a + up * b + n * d
+
+        r = 0.03
+        # the eyeball: an almond, longer along the face than it is tall, set into the head
+        ellipsoid(p, c, frame, (r * 1.2, r * 0.82, r * 0.6), 'steed_eye', (0.012, 0.008, 0.006), W,
+                  seg=16, rings=10)
+        # a deep brown iris just under the gloss
+        ellipsoid(p, P(0.003, -0.001, r * 0.42), frame, (r * 0.62, r * 0.5, r * 0.22), 'steed_eye',
+                  (0.07, 0.03, 0.012), W, seg=12, rings=6)
+        ellipsoid(p, P(0.003, -0.001, r * 0.5), frame, (r * 0.36, r * 0.3, r * 0.16), 'steed_eye',
+                  (0.004, 0.003, 0.003), W, seg=10, rings=6)
+        # the catchlight, high and toward the front where the sky sits, and a faint second one
+        ellipsoid(p, P(0.009, 0.008, r * 0.6), frame, (0.0062, 0.0052, 0.0025), 'steed_hair',
+                  (1.0, 0.98, 0.94), W, seg=8, rings=5)
+        ellipsoid(p, P(-0.008, -0.006, r * 0.56), frame, (0.003, 0.0026, 0.0015), 'steed_hair',
+                  (0.75, 0.76, 0.8), W, seg=6, rings=4)
+        # lids: a heavy upper lid arching over the eye, a thinner lower one
+        for (bb, th, col) in ((0.84, 0.0085, (0.03, 0.031, 0.036)), (-0.86, 0.006, (0.055, 0.057, 0.065))):
+            pts = [P(t * r * 1.3, bb * r * (1 - 0.42 * t * t), r * 0.34 * (1 - 0.55 * t * t))
+                   for t in (-1 + 2 * i / 10 for i in range(11))]
+            for a_, b_ in zip(pts, pts[1:]):
+                tube(p, a_, b_, th, 'steed_hide', col, W, sides=6)
+        # the brow ridge: a soft bony shelf above and a little behind the eye
+        ellipsoid(p, P(-0.005, r * 1.45, 0.0), frame, (0.034, 0.012, 0.012), 'steed_hide',
+                  (0.08, 0.083, 0.094), W, seg=10, rings=6)
 
 
 # ---------------------------------------------------------------------------

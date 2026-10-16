@@ -467,6 +467,7 @@ flush(crinet(), ARM, BODY)
 #    eye guards, and the guild's lantern lit on the brow.
 # ---------------------------------------------------------------------------
 GLOW_POINTS = {}
+EYE_SOCKETS = []
 
 
 def chanfron():
@@ -485,6 +486,11 @@ def chanfron():
     def cells(i, j):
         # taper toward the nose: drop the outer columns as the plate narrows
         cut = int(i * 0.35)
+        # and open the plate round each eye, inside its guard ring (the eyes sit at the plate's
+        # vertices (4, 1) and (4, nt - 2)): every cell whose centre falls inside the ring goes
+        mid = sum((w.pts[a, b] for a, b in ((i, j), (i + 1, j), (i, j + 1), (i + 1, j + 1))), Vector()) / 4
+        if min((mid - w.pts[4, 1]).length, (mid - w.pts[4, nt - 2]).length) < 0.07:
+            return False
         return cut <= j < nt - 1 - cut
 
     w.sheet(p, 0.012, lambda i, j: PAL['steel'], 'steed_iron', cells=cells,
@@ -512,9 +518,11 @@ def chanfron():
     for j in (1, nt - 2):
         i = 4
         loc, nrm = w.pts[i, j], w.nrm[i, j]
+        EYE_SOCKETS.append((loc.copy(), nrm.copy()))
         # a flanged eye guard: a steel ring standing off the plate round the eye, gilt-lipped
-        torus(p, loc + nrm * 0.02, nrm, 0.038, 0.011, 'steed_iron', PAL['steel'], rigid(HEAD), seg=14, sides=6)
-        torus(p, loc + nrm * 0.03, nrm, 0.038, 0.005, 'steed_gold', PAL['gold'], rigid(HEAD), seg=14, sides=4)
+        # (wide and shallow, so it frames the eye in its opening rather than hiding it in a tube)
+        torus(p, loc + nrm * 0.008, nrm, 0.054, 0.009, 'steed_iron', PAL['steel'], rigid(HEAD), seg=18, sides=6)
+        torus(p, loc + nrm * 0.014, nrm, 0.054, 0.0045, 'steed_gold', PAL['gold'], rigid(HEAD), seg=18, sides=4)
     # ear cups
     for sgn in (1, -1):
         base = L(sgn * 0.075, 0.66, 1.67)
@@ -752,7 +760,7 @@ def hair():
     SB.forelock(p, S, HEAD)
     SB.tail(p, S, ARM, rnd)
     SB.hooves_and_feathers(p, S, ARM, rnd)
-    SB.eyes(p, S, ARM)
+    SB.eyes(p, S, EYE_SOCKETS)
     return p
 
 
@@ -769,6 +777,8 @@ SWING = {
     'Idle': (2.5, 1.5, 1, 1),
     'Walk': (7.0, 4.0, 2, 1),
     'Run': (16.0, 6.0, 1, 1),
+    # the rear tips the lanterns back as the forehand rises and lets them swing as the forelegs paw
+    'Rear': (14.0, 5.0, 2, 1),
 }
 
 
@@ -802,6 +812,110 @@ def key_swing():
     ARM.animation_data.action = None
 
 
+# ---------------------------------------------------------------------------
+# 10b. The rear: the destrier's own clip, played when its rider jumps standing still
+#      (src/render/mount_rear_core.ts). 1.5 s: the weight settles back onto the
+#      haunches, the forehand rises about 46 degrees on the hind legs, the forelegs
+#      fold and paw the air left-right, the head and neck stay level with the
+#      horizon and the tail sweeps down, then the horse comes back onto its forefeet.
+#      Authored over the rest pose in armature space (Z up, nose -Y): the body pitches
+#      about the root's head (the hip), the hind thighs are held level so the hind
+#      hooves stay planted, and every joint turns about its own head on the X axis.
+#      Only bones the source clips key are keyed, so the glTF rest-TRS repair
+#      (restore_rest_trs.mjs) still treats every other joint as untouched.
+# ---------------------------------------------------------------------------
+REAR_FRAMES = 36  # 1.5 s at 24 fps
+
+
+def keyed_bones(action):
+    slot = action.slots[0]
+    bag = action.layers[0].strips[0].channelbag(slot)
+    return sorted({fc.data_path.split('"')[1] for fc in bag.fcurves if '"' in fc.data_path})
+
+
+def smooth01(a, b, x):
+    t = max(0.0, min(1.0, (x - a) / (b - a)))
+    return t * t * (3 - 2 * t)
+
+
+def author_rear():
+    idle = bpy.data.actions['Idle']
+    keyed = keyed_bones(idle)
+    ARM.animation_data_create()
+    ARM.data.pose_position = 'POSE'
+    pbs = ARM.pose.bones
+    # The imported clips key each joint's FULL glTF local transform (the importer leaves the
+    # bones' Blender rest unrelated to it), so the rear starts from the idle's first frame,
+    # in the clips' own convention, and edits that pose rather than the Blender rest.
+    ARM.animation_data.action = idle
+    if getattr(idle, 'slots', None) and len(idle.slots):
+        ARM.animation_data.action_slot = idle.slots[0]
+    bpy.context.scene.frame_set(0)
+    bpy.context.view_layer.update()
+    base = {n: pbs[n].matrix_basis.copy() for n in keyed}
+    rest = {n: pbs[n].matrix.copy() for n in pbs.keys()}
+    act = bpy.data.actions.new('Rear')
+    ARM.animation_data.action = act
+    for n in keyed:
+        pbs[n].rotation_mode = 'QUATERNION'
+
+    def turn_about(name, angle, base=None):
+        """Turn a bone about the armature X axis through its own head, from its current
+        (already parent-driven) armature matrix, or from `base` when given."""
+        pb = pbs[name]
+        M = base if base is not None else pb.matrix.copy()
+        h = M.to_translation()
+        pb.matrix = Matrix.Translation(h) @ Matrix.Rotation(angle, 4, 'X') @ Matrix.Translation(-h) @ M
+        bpy.context.view_layer.update()
+
+    fore = (('thigh_stretch_dupli_001.l_044', 'leg_stretch_dupli_001.l_045', 'foot_dupli_001.l_00', 0.0),
+            ('thigh_stretch_dupli_001.r_051', 'leg_stretch_dupli_001.r_052', 'foot_dupli_001.r_053', math.pi))
+    for fr in range(REAR_FRAMES + 1):
+        t = fr / REAR_FRAMES
+        for n in keyed:
+            pbs[n].matrix_basis = base[n]
+        bpy.context.view_layer.update()
+        rise = smooth01(0.06, 0.36, t) * (1 - smooth01(0.7, 0.96, t))
+        settle = math.sin(math.pi * smooth01(0.0, 0.16, t)) * (1 - smooth01(0.06, 0.2, t))
+        pitch = math.radians(46) * rise + math.radians(3) * math.sin(2 * math.pi * 2 * t) * rise
+        # the body: pitched up about the hip, after a small settle back onto the haunches
+        R = Matrix.Rotation(-pitch + math.radians(2.5) * settle, 4, 'X')
+        piv = rest[ROOT].to_translation()
+        pbs[ROOT].matrix = Matrix.Translation(piv) @ R @ Matrix.Translation(-piv) @ rest[ROOT]
+        bpy.context.view_layer.update()
+        # hind legs held level: the thigh keeps its rest orientation, carried by the hip
+        for n in ('c_thigh_b.l_07', 'c_thigh_b.r_014'):
+            h = rest[n].to_translation()
+            moved = piv + (R.to_3x3() @ (h - piv))
+            pbs[n].matrix = Matrix.Translation(moved - h) @ rest[n]
+            bpy.context.view_layer.update()
+            # the hocks give a little under the weight
+        for n in ('leg_stretch.l_09', 'leg_stretch.r_016'):
+            turn_about(n, math.radians(10) * rise)
+        # forelegs: tucked up and pawing the air, left and right out of step
+        paw = smooth01(0.22, 0.42, t) * (1 - smooth01(0.68, 0.86, t))
+        for upper, knee, foot, phase in fore:
+            s_ = math.sin(2 * math.pi * 2.0 * t + phase)
+            turn_about(upper, math.radians(-12 - 26 * (0.5 + 0.5 * s_)) * paw)
+            turn_about(knee, math.radians(70 + 40 * (0.5 - 0.5 * s_)) * paw)
+            turn_about(foot, math.radians(25) * paw)
+        # neck and head stay nearer the horizon than the body, the head tucked a little
+        turn_about(SUB1, math.radians(12) * rise)
+        turn_about(NECK, math.radians(10) * rise)
+        turn_about(HEAD, math.radians(14) * rise)
+        # the tail sweeps down and in rather than into the ground
+        turn_about('c_tail_00.x_03', math.radians(30) * rise)
+        for n in keyed:
+            pbs[n].keyframe_insert('rotation_quaternion', frame=fr, group=n)
+            pbs[n].keyframe_insert('location', frame=fr, group=n)
+    ARM.animation_data.action = None
+    for n in keyed:
+        pbs[n].matrix_basis = Matrix.Identity(4)
+    if getattr(act, 'slots', None) is not None and len(act.slots) == 0:
+        pass
+
+
+author_rear()
 key_swing()
 
 
@@ -819,7 +933,10 @@ def consolidate():
         vc = nt.nodes.new('ShaderNodeVertexColor')
         vc.layer_name = 'Color'
         nt.links.new(vc.outputs['Color'], b.inputs['Base Color'])
-    target = {'steed_iron': metal, 'steed_gold': metal, 'lantern_Glow': K.MATS['lantern_Glow']}
+    # the eyes take the metal response: a dark, smooth surface that picks up the sky's light
+    # like a wet eye, at no extra draw
+    target = {'steed_iron': metal, 'steed_gold': metal, 'steed_eye': metal,
+              'lantern_Glow': K.MATS['lantern_Glow']}
     parts = [o for o in bpy.data.objects if o.type == 'MESH' and o is not BODY]
     for o in [BODY] + parts:
         print('TRIS', o.name, sum(len(f.vertices) - 2 for f in o.data.polygons))

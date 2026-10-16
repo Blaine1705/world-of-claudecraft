@@ -842,6 +842,8 @@ const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
   // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
   'src/render/mount_embers_core.ts',
+  // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)
+  'src/render/mount_rear_core.ts',
   // the per-skin swing trail lookup (renderer.ts triggerAttack)
   'src/render/weapon_skin_trail_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.

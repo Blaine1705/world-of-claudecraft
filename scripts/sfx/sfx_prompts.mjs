@@ -242,6 +242,13 @@ export const SFX = [
     custom: true,
   },
   {
+    // The Lantern Hall Destrier's whinny as it rears on its hind legs (a standing jump while
+    // mounted, src/render/mount_rear_core.ts). Original procedural synthesis:
+    // scripts/gen_destrier_neigh_sfx.mjs.
+    key: 'mount_neigh_lantern_hall_destrier',
+    custom: true,
+  },
+  {
     // The Viridian Valestrider's summon call: an authored bird cry played once
     // when the 1.5s summon channel completes and the mount appears.
     // Sfx.mountSummon resolves `mount_summon_<key>` per mount and stays silent

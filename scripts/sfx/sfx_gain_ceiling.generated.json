@@ -3980,6 +3980,17 @@
       }
     ]
   },
+  "mount_neigh_lantern_hall_destrier": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mount_neigh_lantern_hall_destrier.mp3",
+        "sha256": "47f88c050e7f32b2f5e068db6c224cef04bf69ba3c1b6c35502fd30218fe461a",
+        "size": 40168,
+        "peakDb": -7.2
+      }
+    ]
+  },
   "mount_run_aether_hover_cycle": {
     "ceilingDb": 5.2,
     "tracks": [

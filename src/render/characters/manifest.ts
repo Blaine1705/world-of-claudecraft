@@ -3210,7 +3210,9 @@ export const VISUALS: Record<string, VisualDef> = {
   mount_lantern_hall_destrier: {
     url: `${MOUNTS_DIR}/lantern_hall_destrier.glb`,
     height: 4.25,
-    clips: MOUNT_RIGGED,
+    // its own authored rear (build_steed.py author_rear), played as the flourish on a standing
+    // jump (render/mount_rear_core.ts)
+    clips: { ...MOUNT_RIGGED, flourish: 'Rear' },
     walkRef: 2.57,
     runRef: 13.4,
     lazyPreload: true,

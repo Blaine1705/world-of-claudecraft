@@ -1188,6 +1188,18 @@ class Sfx {
    *  listener is the camera, which trails the player, so a positional source at
    *  your own feet is already attenuating by the time you hear it. Other
    *  players' summons stay positional. A mount with no summon take is silent. */
+  /** The whinny a mount gives as it rears up on a standing jump (render/mount_rear_core.ts).
+   *  Keyed by the mount's own look, not its audio donor: the Lantern Hall Destrier gallops on
+   *  the Valorsteed's take but rears with its own voice. Same self/positional split as the
+   *  summon; silent for a mount with no take. */
+  mountNeigh(x: number, y: number, z: number, look: string, self: boolean): void {
+    const key = `mount_neigh_${look}`;
+    if (!(key in SFX_CLIPS)) return;
+    const opts = { cooldown: 0.5, jitter: false };
+    if (self) this.playUi(key, { ...opts, gain: 0.85 });
+    else this.playAt(key, x, y, z, { ...opts, gain: 0.85 });
+  }
+
   mountSummon(
     x: number,
     y: number,

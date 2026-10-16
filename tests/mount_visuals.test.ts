@@ -166,6 +166,7 @@ describe('mount visual specs cover the sim catalog', () => {
       glows: [],
       ride: null,
       jumpTips: false,
+      rear: false,
     });
     expect(VISUALS.mount_mech_bird).toMatchObject({
       url: 'models/mounts/mech_bird.glb',
