@@ -319,7 +319,9 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
       { x: -63, z: -90 },
       { x: -66, z: -94 },
       { x: -70, z: -89 },
-      { x: -76, z: -95 },
+      // a stride north of the Weekly Vault's corner (the vault took the
+      // ground beside it in the Tidehold rebuild)
+      { x: -77, z: -94 },
       { x: -86, z: -90 },
       { x: -68, z: -78 },
     ],

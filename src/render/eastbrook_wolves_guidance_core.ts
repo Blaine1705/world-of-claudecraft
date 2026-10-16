@@ -21,17 +21,19 @@ const MARSHAL_POS = EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position;
 // module-load throw taking the client down; the core test pins the camp.
 const camp = ZONE1_CAMPS.find((c) => c.mobId === 'forest_wolf') ?? null;
 export const WOLF_RUN_CAMP = camp ? { ...camp.center, radius: camp.radius } : null;
-// The trail leaves the square by the north road: round the east end of the
-// apothecary's shop (which stands where the old line ran straight north-west),
-// past the churchyard's open side, and east of the ruin ring's columns before
-// it bends up the Wolf Run. Clear of every collider by more than a body's
-// width even after the trail's curve smoothing, and 2 yd round Chronicler Saul.
+// The trail leaves the square by the north road: round the west end of the
+// smithy's forge shelter (the road swings out round it), and back over the
+// rise behind the smithy, west of the road's lamp, before it bends up the
+// Wolf Run. Clear of every collider by more than a body's width even after
+// the trail's curve smoothing, and 2 yd round Chronicler Saul.
 export const WOLVES_ROUTE: readonly { x: number; z: number }[] = WOLF_RUN_CAMP
   ? [
       MARSHAL_POS,
-      { x: 12, z: -89.5 },
-      { x: 9, z: -77 },
-      { x: 5.5, z: -64 },
+      { x: 13.5, z: -93.5 },
+      { x: 16.3, z: -83 },
+      { x: 17.5, z: -76 },
+      { x: 14, z: -69 },
+      { x: 7.5, z: -61.5 },
       { x: 5, z: -52 },
       WOLF_RUN_CAMP,
     ]

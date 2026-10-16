@@ -395,12 +395,15 @@ describe('Eastbrook authored gameplay data integration', () => {
     // Re-pinned again for owner round 6b: Gorrak's camp joined the main bandit
     // band northeast, so his two tents, his two crates and his fire travelled
     // with the boss to the reunited camp around (115, 42).
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // fisherman's camp moved down the strand to the water's edge, and the two
+    // rowboats beside its old spot went with the move.
     expect(ZONE1_PROPS.tents).toEqual([
       { x: 58, z: 25, rot: 0.4, scale: 1 },
       { x: 68, z: 16, rot: 2.1, scale: 1 },
       { x: 113, z: 47, rot: 1.2, scale: 1.3 },
       { x: 119, z: 39, rot: -0.6, scale: 1 },
-      { x: -90.5, z: -78.5, rot: -0.9, scale: 1 },
+      { x: -104.5, z: -81.9, rot: -1.658, scale: 1 },
     ]);
     expect(ZONE1_PROPS.crates).toEqual([
       [56, 22],
@@ -412,7 +415,7 @@ describe('Eastbrook authored gameplay data integration', () => {
     expect(ZONE1_PROPS.campfires).toEqual([
       [59, 17],
       [111, 46],
-      [-93.5, -76.5],
+      [-101.52, -78.71],
       [-30, 146],
       [-61, 56],
     ]);
@@ -421,11 +424,12 @@ describe('Eastbrook authored gameplay data integration', () => {
       [-78, 54],
       [-69, 55],
     ]);
+    // The chapel-rise ruin (-5, -60) is gone: the smithy of the World of
+    // ClaudeCraft Studio map's arrangement stands on its south columns.
     expect(ZONE1_PROPS.ruinRings).toEqual([
       // the Fallen Chapel stands on this ring's site: it is bare
       // (tests/hollow_crypt_entrance.test.ts)
       { x: 80, z: 78, ringR: 7, columns: 7, bare: true },
-      { x: -5, z: -60, ringR: 8, columns: 6 },
     ]);
     // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76): the
     // Eastbrook graveyard row moved to the chapel green; the second
@@ -437,10 +441,13 @@ describe('Eastbrook authored gameplay data integration', () => {
     // Re-pinned for owner round 6b: the retired Vale Chapel Yard anchor at
     // (4, -56) is gone with its graveyard record, because its Pale Keeper stood
     // 15 yd from the rebuilt Eastbrook Rest and read as a duplicate.
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // churchyard moved with the chapel, its two plots inside the iron rails
+    // beside the chapel's north wall.
     expect(ZONE1_PROPS.graveyards).toEqual([
-      { x: -2, z: -70 },
+      { x: 37.5, z: -99.3 },
       { x: -22, z: 118 },
-      { x: -9, z: -70 },
+      { x: 28.5, z: -107.8 },
     ]);
     // Re-pinned for owner refinement round 6b: the Collapsed Reliquary mouth
     // left the town chapel rise and moved to the Mirror Lake shore, so the
@@ -739,18 +746,21 @@ describe('Eastbrook authored gameplay data integration', () => {
   // Re-pinned for owner round 6b: FURY is the honor quartermaster, a service
   // NPC, so he left the chapel step (7 yd from Brother Aldric) for the town's
   // eastern edge; his facing is still derived, so it moved with him.
+  // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the north
+  // road swings west round the smithy's forge shelter over his old stand, so
+  // he keeps the town's edge between that road and the coast track.
   it('spawns layout-authored FURY under a reserved id without shifting nextId or RNG', () => {
     expect(EASTBROOK_NPC_PLACEMENTS_BY_ID.fury).toEqual({
       id: 'fury',
-      position: { x: 16, z: -78 },
-      facing: -2.2455372690184494,
+      position: { x: 21, z: -83.5 },
+      facing: -2.0570389598824015,
       anchorId: 'eastbrook_chapel',
       bodyRadius: 0.6,
     });
     expect(BUILTIN_WORLD.npcs[FURY_NPC_ID]).toMatchObject({
       id: 'fury',
-      pos: { x: 16, z: -78 },
-      facing: -2.2455372690184494,
+      pos: { x: 21, z: -83.5 },
+      facing: -2.0570389598824015,
       dynamic: true,
     });
     expect(FURY_ENTITY_ID).toBe(1_000_000_001);
@@ -785,12 +795,12 @@ describe('Eastbrook authored gameplay data integration', () => {
       id: 1_000_000_001,
       kind: 'npc',
       templateId: 'fury',
-      x: 16,
-      z: -78,
-      spawnX: 16,
-      spawnZ: -78,
-      facing: -2.2455372690184494,
-      prevFacing: -2.2455372690184494,
+      x: 21,
+      z: -83.5,
+      spawnX: 21,
+      spawnZ: -83.5,
+      facing: -2.0570389598824015,
+      prevFacing: -2.0570389598824015,
     });
     expect([...withFury.entities.keys()].filter((id) => id !== FURY_ENTITY_ID)).toEqual([
       ...withoutFury.entities.keys(),
@@ -875,9 +885,11 @@ describe('Eastbrook authored gameplay data integration', () => {
     // harbor quay and the graveyard contract to the chapel green. Every
     // behavioral test in this file consumes PLAYER_START symbolically, so
     // the moved spawn is re-pinned here as exported data.
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // graveyard moved with the chapel into the churchyard beside it.
     expect(PLAYER_START).toEqual({ x: -94, z: -58 });
-    expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: -2, z: -70 });
-    expect(EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint).toEqual({ x: 0, z: -70 });
+    expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: 37.5, z: -99.3 });
+    expect(EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint).toEqual({ x: 39.5, z: -99.3 });
   });
 });
 
@@ -1331,15 +1343,16 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
 
     // The Weekly Vault's terrain pad is a built-in-world rule
     // (sim/eastbrook_vault_terrain.ts gates on isBuiltinWorldActive), so the
-    // legacy fixture, a custom content object, can never carry it. The
-    // Tidehold rebuild (2026-10) moved the vault onto the green south of the
-    // square, and its pad apron now reaches the return ferry bell at
-    // (-7.5, -100), half a yard off the flat core: measured at this seed the
-    // bell seats at -0.5305 in the rebuilt world and -0.6141 in the fixture,
-    // the pad's own lift and nothing else. So a spawn point standing on the
-    // pad is compared without its ground height (everything else about the
-    // entity still is), and the row below the first comparison pins that the
-    // bell is the ONLY projected entity this covers. Same reach as the pad.
+    // legacy fixture, a custom content object, can never carry it. The vault
+    // stands against the bank at the harbour end of the main street now (the
+    // World of ClaudeCraft Studio map's arrangement), and its pad apron
+    // reaches three of the freight yard's crates beside it, which seat on the
+    // pad in the rebuilt world and on the bare ground in the fixture, the
+    // pad's own lift and nothing else. So a spawn point standing on the pad is
+    // compared without its ground height (everything else about the entity
+    // still is), and the row below the first comparison pins that those
+    // crates are the ONLY projected entities this covers. Same reach as the
+    // pad.
     const onVaultTerrainPad = (point: { x: number; z: number }): boolean => {
       const hall = EASTBROOK_LAYOUT.weeklyVault;
       const dx = point.x - hall.x;
@@ -1390,7 +1403,11 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
         .filter((row) => !('y' in row.spawnPos))
         .map((row) => row.templateId),
       'projected entities standing on the vault terrain pad',
-    ).toEqual(['ground_ps_ferry_bell']);
+    ).toEqual([
+      'ground_eastbrook_freight_crate',
+      'ground_eastbrook_freight_crate',
+      'ground_eastbrook_freight_crate',
+    ]);
     expect(rebuilt.postOffice.mailboxIds).toEqual(legacy.postOffice.mailboxIds);
     expect(rebuilt.entities.get(rebuilt.postOffice.mailboxIds[0])?.pos).toMatchObject({
       x: EASTBROOK_LAYOUT.services.mailbox.position.x,

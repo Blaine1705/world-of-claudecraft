@@ -73,32 +73,41 @@ describe('player pathfinding', () => {
     // Re-staged 2026-08-18 for the Eastbrook harbor move (d19aa33f76): the old
     // blocker at (0,2) was a town building on the now-open vacated ground.
     // Re-staged again for the painted Tidehold town, which took the chapel off
-    // the green at (2,-78): the apothecary's shop at (-7,-82) blocks the
-    // straight line along z -80, with open ground at both ends to detour over.
+    // the green at (2,-78): the apothecary's shop at (-7,-82) blocked the
+    // straight line along z -80. Re-staged for the World of ClaudeCraft Studio
+    // map's arrangement, which moved the shop to the strand: the smithy that
+    // took the old chapel rise blocks the straight line along z -73, with open
+    // ground at both ends to detour over.
     const seed = 20061;
-    const from = { x: -17, z: -80 };
-    const to = { x: 3, z: -80 };
+    const from = { x: -13, z: -73 };
+    const to = { x: 9, z: -73 };
     const path = findPlayerPath(seed, from, to);
 
-    expect(isBlocked(seed, -7, -80)).toBe(true);
+    expect(isBlocked(seed, -2, -73)).toBe(true);
     expect(isBlocked(seed, from.x, from.z)).toBe(false);
     expect(isBlocked(seed, to.x, to.z)).toBe(false);
     expect(path.length).toBeGreaterThan(1);
-    expect(path.some((p) => Math.abs(p.z + 80) > 0.5)).toBe(true);
+    expect(path.some((p) => Math.abs(p.z + 73) > 0.5)).toBe(true);
     expect(path[path.length - 1]).toEqual(to);
   });
 
   it('resolves click destinations inside buildings to the nearest walkable outside point', () => {
+    // Re-staged for the World of ClaudeCraft Studio map's arrangement: on the
+    // walk-in bank a click on the walls' middle now lands on the counting
+    // hall's own walkable floor, which is right for a building you can walk
+    // into. The sealed quay cottage is the case this pins: no floor inside,
+    // so the click comes out past the nearest wall face.
     const seed = 20061;
-    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
-    const center = bank.position;
+    const cottage = EASTBROOK_BUILDINGS_BY_ID.eastbrook_quay_cottage;
+    expect('walkIn' in cottage && cottage.walkIn).toBe(false);
+    const center = cottage.position;
     const target = resolvePlayerDestination(seed, center);
 
     expect(isBlocked(seed, center.x, center.z)).toBe(true);
     expect(isBlocked(seed, target.x, target.z)).toBe(false);
-    // just outside the nearest wall face (the painted bank is 16 yd deep, so
-    // the nearest outside point sits a body width past its half depth)
-    const nearestFace = Math.min(bank.footprint.halfWidth, bank.footprint.halfDepth);
+    // just outside the nearest wall face (the cottage is 11 yd deep, so the
+    // nearest outside point sits a body width past its half depth)
+    const nearestFace = Math.min(cottage.footprint.halfWidth, cottage.footprint.halfDepth);
     const reached = Math.hypot(target.x - center.x, target.z - center.z);
     expect(reached).toBeGreaterThan(nearestFace);
     expect(reached).toBeLessThan(nearestFace + 1.5);

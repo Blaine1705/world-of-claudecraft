@@ -410,7 +410,14 @@ describe('generated chunk geometry is stable', () => {
     // NPCs' calm pads. The quay and the coastline are pinned unchanged by
     // tests/eastbrook_placed_buildings.test.ts (the quay to the bit, no ground
     // crossing the sea surface). Computed twice in separate processes.
-    expect(digestOf(inRect)).toBe('5fa04f7251019490cf387e8d6a6dfd7d');
+    // Re-minted for the World of ClaudeCraft Studio map's arrangement of the
+    // same town: the buildings moved to that map's sites on grids of level
+    // stamps, the churchyard and the strand camp moved with their calm pads,
+    // the chapel-rise ruin and the north road's old line gave way to the
+    // smithy, and the moved NPCs carried their calm pads. The quay and the
+    // coastline are still pinned by tests/eastbrook_placed_buildings.test.ts.
+    // Computed twice in separate processes.
+    expect(digestOf(inRect)).toBe('524a6cac34e20d3be66afb854ef72f50');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

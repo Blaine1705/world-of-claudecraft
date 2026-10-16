@@ -18,7 +18,7 @@ function world(state = 'active'): WolvesGuideReader {
 describe('wolves guidance geometry and visibility', () => {
   it('resolves the authored forest wolf camp (a content rename degrades to no route, never a throw)', () => {
     expect(WOLF_RUN_CAMP).not.toBeNull();
-    expect(WOLVES_ROUTE.length).toBe(6);
+    expect(WOLVES_ROUTE.length).toBe(8);
   });
 
   it('answers a finished quest from questsDone before the zone scan or any questState read', () => {
@@ -85,15 +85,19 @@ describe('wolves guidance geometry and visibility', () => {
     if (!outbound.plan) throw new Error('Expected active wolves route');
     expect(WOLF_RUN_CAMP).toEqual({ x: -10, z: 6, radius: 28.5 });
     expect(outbound.plan?.points).toEqual(WOLVES_ROUTE);
-    // Re-pinned 2026-10 for the Tidehold rebuild: the apothecary's shop stands
-    // on the old line north-west out of the square, so the trail follows the
-    // north road round its east end, past the churchyard's open side and east
-    // of the ruin ring's columns.
+    // Re-pinned 2026-10 for the Tidehold rebuild: the apothecary's shop stood
+    // on the old line north-west out of the square, so the trail followed the
+    // north road round its east end. Re-pinned for the World of ClaudeCraft
+    // Studio map's arrangement: the smithy stands on that line now, so the
+    // trail follows the north road's swing round its forge shelter's west end
+    // and back over the rise behind it, west of the road's lamp.
     expect(WOLVES_ROUTE).toEqual([
       EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position,
-      { x: 12, z: -89.5 },
-      { x: 9, z: -77 },
-      { x: 5.5, z: -64 },
+      { x: 13.5, z: -93.5 },
+      { x: 16.3, z: -83 },
+      { x: 17.5, z: -76 },
+      { x: 14, z: -69 },
+      { x: 7.5, z: -61.5 },
       { x: 5, z: -52 },
       WOLF_RUN_CAMP,
     ]);
