@@ -198,11 +198,15 @@ Everything else is a sibling module in one of these families:
   door's head and follows through the doorway from outside (`interiorEntryCap`, a ray out
   through an opening runs on past it), so nothing is cut away round the player; bodies
   outside lose their nameplates and chat bubbles unless seen through an opening. Outdoors it
-  touches nothing. Reference registrants: the placed-town view (`placed_town_buildings.ts`)
-  registers each walk-in painted building's air from `placed_town_interior_core.ts` (rooms
-  and doors per model, at the building's scale and turn), and hands the same doors to the
-  town's camera fade, so a walk-in building stays solid while the player steps in with the
-  lens still outside looking through the door (`fenbridge_town_visibility_core.ts`
+  touches nothing. Reference registrants: every town view that stands painted buildings (the
+  placed-town view `placed_town_buildings.ts` behind Highwatch, `eastbrook_town.ts`,
+  `fenbridge_town.ts`) registers each walk-in building's air through its own registrar
+  (`placed_town_interiors.ts`: cleared as the view builds, one `add` per building it stands)
+  from `placed_town_interior_core.ts` (rooms and doors per model at authored size, carried to
+  the record's scale, turn and seat; a new walk-in model needs its entry there, pinned against
+  its baked collision by `tests/placed_town_interior_core.test.ts`), and hands the same doors
+  to the town's camera fade, so a walk-in building stays solid while the player steps in with
+  the lens still outside looking through the door (`fenbridge_town_visibility_core.ts`
   `doorways`); the Mirefen tavern (`mirefen_tavern.ts`) registers its own from
   `mirefen_tavern_interior_core.ts`. The Highwatch manor's fires and lamps
   (`highwatch_manor_lights.ts`) join the props' fire-light budget and the scenery flame pass,

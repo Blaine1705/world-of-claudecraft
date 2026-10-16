@@ -29,8 +29,10 @@ import {
 } from '../src/render/eastbrook_town_visibility_core';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
+import { interiorCameraInternalsForTest } from '../src/render/interior_camera';
 import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { isOccluderGhostMaterial } from '../src/render/occluder_ghost_variant_key';
+import { placedTownCameraInterior } from '../src/render/placed_town_interior_core';
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
 import { vertexColorEmissiveInternalsForTest } from '../src/render/vertex_color_emissive';
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../src/sim/building_layout';
@@ -1315,6 +1317,51 @@ describe('Eastbrook town renderer', () => {
     expect(shipped.group.getObjectByName('eastbrookTownMicroOpaqueBatch')).toBeInstanceOf(
       THREE.Mesh,
     );
+  });
+
+  it('keeps the indoor camera to every walk-in building it stands, and drops the rooms with it', () => {
+    // each walk-in painted building registers its air (placed_town_interiors.ts), stood on the
+    // ground the view stands its building on (a slope, so a wrong anchor reads differently);
+    // the quay cottage bakes a shut door and the Weekly Vault is a sealed hall, so neither has
+    // any
+    const ground = (x: number, z: number) => 1.5 + 0.03 * x - 0.02 * z;
+    const rooms = () => interiorCameraInternalsForTest.interiors();
+    const walkIn = EASTBROOK_LAYOUT.buildings.filter((building) => building.walkIn);
+    expect(walkIn.length).toBeGreaterThan(1);
+    interiorCameraInternalsForTest.reset();
+    try {
+      eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms().map((room) => room.id)).toEqual(
+        walkIn.map((building) => `placed_town:${building.id}`),
+      );
+      for (const [index, building] of walkIn.entries()) {
+        expect(rooms()[index], building.id).toEqual(
+          placedTownCameraInterior(building, ground(building.placement.x, building.placement.z)),
+        );
+      }
+      // a rebuild replaces them, never doubles them
+      eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms()).toHaveLength(walkIn.length);
+      // a document that owns the buildings as placements keeps no town air
+      setActiveWorldContent({
+        ...BUILTIN_WORLD,
+        placements: [],
+        promotedScenery: { authoredTowns: true },
+      });
+      try {
+        eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+        expect(rooms()).toEqual([]);
+      } finally {
+        setActiveWorldContent(null);
+      }
+      // ...nor does a world without the town
+      eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms()).toHaveLength(walkIn.length);
+      eastbrookTownInternalsForTest.buildFromSources(new Map(), () => 0, false);
+      expect(rooms()).toEqual([]);
+    } finally {
+      interiorCameraInternalsForTest.reset();
+    }
   });
 
   it('returns an empty stable root for custom worlds before asking for any built-in asset source', () => {

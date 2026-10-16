@@ -40,6 +40,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
@@ -110,6 +111,9 @@ const ASSET_INSTANCE_COUNTS = (() => {
 const loadedSources = new Map<string, THREE.Group>();
 const preparedTemplates = new Map<string, TownAssetTemplate>();
 const sourceLoadTasks = new Map<string, Promise<void>>();
+/** The indoor camera's rooms of the live view's walk-in buildings (dropped when the next
+ *  view builds). */
+const cameraInteriors = createPlacedTownInteriors();
 /** The FILE each resident source was read from. A painted building's URL
  *  names the model; the file follows the profile's texture tier (same
  *  geometry, see placed_texture_tier_core.ts), so everything else here stays
@@ -991,6 +995,8 @@ function buildFromTemplates(
   group.userData.microBatchNames = [];
   group.userData.repeatedBatchNames = [];
   group.userData.boardwalkCount = 0;
+  // the previous view's rooms go with it: a world without the town keeps no air
+  cameraInteriors.clear();
 
   if (!builtInWorld) {
     const setCaptureOverlay = (): void => undefined;
@@ -1028,6 +1034,9 @@ function buildFromTemplates(
     // target like every building, so the two lists stay index-aligned.
     const built = buildPlacedTownBuilding('fenbridge', building, template.raw, groundAt);
     built.group.userData.placementId = building.id;
+    // a walk-in one keeps the indoor camera to its rooms (placed_town_interiors.ts), and its
+    // doors keep it solid while the player steps in looking through one (the Highwatch rule)
+    const interior = cameraInteriors.add(building, groundAt);
     group.add(built.group);
     hideTargets.push({
       group: built.group,
@@ -1043,6 +1052,7 @@ function buildFromTemplates(
       topY: built.topY,
       cullRadius: built.cullRadius,
       walkIn: building.walkIn,
+      doorways: interior?.openings.map((opening) => interior.boxes[opening.box]),
     });
     buildingGroups.push(built.group);
   }
