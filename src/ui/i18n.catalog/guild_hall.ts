@@ -4,12 +4,12 @@
 export const guildHallStrings = {
   title: 'Lantern Hall',
   close: 'Close the guild window',
+  tabsLabel: 'Lantern Hall sections',
   tabs: {
     contracts: 'Contracts',
     quartermaster: 'Quartermaster',
   },
   seals: 'Lantern Seals: {count}',
-  sealsLabel: 'Lantern Seals',
   resetIn: 'New contracts in {time}',
   resetSoon: 'New contracts at the next weekly reset',
   contractsIntro:
@@ -24,6 +24,7 @@ export const guildHallStrings = {
     heroic: 'Clear {dungeon} on Heroic: defeat {boss} on Heroic difficulty.',
     task: '{task} ({dungeon})',
   },
+  contractLabel: '{kind}: {dungeon}',
   reward: '{count} Lantern Seals',
   rewardOne: '{count} Lantern Seal',
   done: 'Completed this week',

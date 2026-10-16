@@ -549,9 +549,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud/guild_hall/guild_hall_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastMinute', 'lastSig'],
     answer: 'this.guildHallWindow.relocalize',
-    why: "the week's board and progress, the seal count, the titles owned, the reset instant and the tab digest into lastSig, none of them text; relocalize() self-gates on the open sheet, clears the latch and rebuilds once, and render() re-latches the signature in the current language",
+    why: "the week's board and progress, the seal count, the titles owned, the reset instant and the tab digest into lastSig, none of them text; lastMinute only gates the countdown's minute rewrite, whose text comes from t() at write time; relocalize() self-gates on the open sheet and rebuilds once in the current language, and render() re-latches both memos",
   },
   {
     file: 'woc_market_window.ts',

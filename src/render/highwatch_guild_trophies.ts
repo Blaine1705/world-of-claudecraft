@@ -13,7 +13,7 @@ import type { IWorld } from '../world_api';
 import {
   GUILD_TROPHY_DUNGEONS,
   guildTrophyNodeNames,
-  guildTrophySignature,
+  guildTrophySignatureOf,
   guildTrophyStates,
 } from './highwatch_guild_trophies_core';
 
@@ -64,10 +64,11 @@ export function createGuildTrophyRoom(townGroup: THREE.Object3D): GuildTrophyRoo
         }
         applied = -1;
       }
-      const states = guildTrophyStates(world.deedStats?.dungeonClears);
-      const sig = guildTrophySignature(states);
+      const records = world.deedStats?.dungeonClears;
+      const sig = guildTrophySignatureOf(records);
       if (sig === applied) return;
       applied = sig;
+      const states = guildTrophyStates(records);
       for (const [i, state] of states.entries()) {
         parts[i].trophy.visible = state.trophy;
         parts[i].gilt.visible = state.gilt;

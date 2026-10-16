@@ -8,7 +8,7 @@ import type { SimEvent } from '../../../sim/types';
 import { HUD_LOG } from '../../hud_tones';
 import { t } from '../../i18n';
 import { type QuestEventPresentation, questEventPresentation } from '../../quest_event_view';
-import { guildContractToast, guildCosmeticToast } from '../guild_hall/guild_hall_toasts';
+import { guildContractToast, guildCosmeticToast } from '../guild_hall';
 
 /** The private Hud members the router drives. */
 interface QuestEventHost {
@@ -109,7 +109,10 @@ function applyGuildHallEvent(h: QuestEventHost, ev: SimEvent): boolean {
       h.guildHallWindow.refreshIfChanged();
       return true;
     case 'guildCosmeticBought':
-      h.log(guildCosmeticToast(ev.offerId), HUD_LOG.PROGRESS);
+      {
+        const line = guildCosmeticToast(ev.offerId);
+        if (line) h.log(line, HUD_LOG.PROGRESS);
+      }
       sfx.playUi('ui_cosmetic_unlock');
       h.guildHallWindow.refreshIfChanged();
       return true;

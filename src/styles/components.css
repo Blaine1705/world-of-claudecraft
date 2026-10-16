@@ -21087,7 +21087,7 @@
   }
   #guild-hall-window .gh-tab {
     flex: 1 1 0;
-    min-height: 36px;
+    min-height: 40px;
     font-family: inherit;
     font-size: 14px;
     letter-spacing: 0.04em;
@@ -21096,9 +21096,14 @@
     border: 1px solid var(--gh-edge);
     cursor: var(--cursor-point);
   }
-  #guild-hall-window .gh-tab-on {
+  #guild-hall-window .gh-tab[aria-selected="true"] {
     color: var(--gh-amber);
     box-shadow: inset 0 -2px 0 var(--gh-amber);
+  }
+  #guild-hall-window .gh-tab:focus-visible,
+  #guild-hall-window .gh-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
   }
   #guild-hall-window .gh-sub {
     display: flex;
@@ -21128,9 +21133,14 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
   }
+  #guild-hall-window .gh-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
   #guild-hall-window .gh-card {
-    display: grid;
-    grid-template-rows: auto auto 1fr auto auto;
+    display: flex;
+    flex-direction: column;
     gap: 6px;
     min-width: 0;
     padding: 12px;
@@ -21151,12 +21161,17 @@
     font-size: 16px;
     font-weight: 600;
   }
-  #guild-hall-window .gh-goal {
+  #guild-hall-window .gh-goal,
+  #guild-hall-window .gh-detail {
     font-size: 13px;
     line-height: 1.4;
     margin: 0;
   }
+  #guild-hall-window .gh-detail {
+    color: var(--gh-muted);
+  }
   #guild-hall-window .gh-reward {
+    margin-top: auto;
     font-size: 13px;
     color: var(--gh-amber);
   }
@@ -21198,7 +21213,7 @@
   }
   #guild-hall-window .gh-btn {
     min-width: 96px;
-    min-height: 36px;
+    min-height: 40px;
     font-family: inherit;
     font-size: 13px;
     color: var(--gh-ink);
@@ -21222,6 +21237,13 @@
     }
     #guild-hall-window .gh-offer-price {
       grid-column: 1;
+    }
+  }
+  /* Forced colors drop the selected tab's amber text and inset rule, so it keeps a
+     system-color edge instead. */
+  @media (forced-colors: active) {
+    #guild-hall-window .gh-tab[aria-selected="true"] {
+      border: 2px solid Highlight;
     }
   }
 

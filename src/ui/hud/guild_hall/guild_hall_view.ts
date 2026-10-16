@@ -34,6 +34,8 @@ export interface GuildContractCardView {
   kindLabel: string;
   dungeon: string;
   goal: string;
+  /** The task's own Book of Deeds condition, a sentence of its own (empty for the rest). */
+  detail: string;
   reward: string;
   done: boolean;
   stateLabel: string;
@@ -95,8 +97,10 @@ function contractGoal(contract: GuildContractDef): string {
   const boss = mobDisplayName(contract.mobId);
   if (contract.kind === 'boss') return t('hudChrome.guildHall.goals.boss', { boss, dungeon });
   if (contract.kind === 'heroic') return t('hudChrome.guildHall.goals.heroic', { boss, dungeon });
-  const deed = contract.taskDeedId ?? '';
-  return `${t('hudChrome.guildHall.goals.task', { task: deedName(deed), dungeon })} ${deedDesc(deed)}`;
+  return t('hudChrome.guildHall.goals.task', {
+    task: deedName(contract.taskDeedId ?? ''),
+    dungeon,
+  });
 }
 
 export function buildGuildContractCard(
@@ -109,6 +113,7 @@ export function buildGuildContractCard(
     kindLabel: t(`hudChrome.guildHall.kinds.${contract.kind}`),
     dungeon: dungeonDisplayName(contract.dungeonId),
     goal: contractGoal(contract),
+    detail: contract.kind === 'task' && contract.taskDeedId ? deedDesc(contract.taskDeedId) : '',
     reward: sealCount(contract.seals),
     done,
     stateLabel: done ? t('hudChrome.guildHall.done') : t('hudChrome.guildHall.open'),
@@ -119,8 +124,16 @@ export function buildGuildContractCard(
 export function guildContractLabel(contractId: string): string {
   const contract = GUILD_CONTRACTS_BY_ID[contractId];
   if (!contract) return '';
-  return `${t(`hudChrome.guildHall.kinds.${contract.kind}`)}: ${dungeonDisplayName(contract.dungeonId)}`;
+  return t('hudChrome.guildHall.contractLabel', {
+    kind: t(`hudChrome.guildHall.kinds.${contract.kind}`),
+    dungeon: dungeonDisplayName(contract.dungeonId),
+  });
 }
+
+/** The deed ids the quartermaster sells, for the window's repaint signature. */
+export const GUILD_OFFER_DEED_IDS: readonly string[] = GUILD_QUARTERMASTER_STOCK.map(
+  (offer) => offer.deedId,
+);
 
 export function buildGuildHallView(
   world: GuildHallWorld,

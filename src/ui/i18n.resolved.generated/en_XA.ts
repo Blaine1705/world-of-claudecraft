@@ -648,12 +648,12 @@ export const en_XA: EnTranslations = {
     "guildHall": {
       "title": "[Ļáñţéŕñ Ĥáļļ]",
       "close": "[Çļóšé ţĥé ĝúíļð ŵíñðóŵ]",
+      "tabsLabel": "[Ļáñţéŕñ Ĥáļļ šéçţíóñš]",
       "tabs": {
         "contracts": "[Çóñţŕáçţš]",
         "quartermaster": "[Ɋúáŕţéŕɱášţéŕ]"
       },
       "seals": "[Ļáñţéŕñ Šéáļš: {count}]",
-      "sealsLabel": "[Ļáñţéŕñ Šéáļš]",
       "resetIn": "[Ñéŵ çóñţŕáçţš íñ {time}]",
       "resetSoon": "[Ñéŵ çóñţŕáçţš áţ ţĥé ñéẋţ ŵééķļý ŕéšéţ]",
       "contractsIntro": "[Ţĥŕéé çóñţŕáçţš á ŵééķ, ţĥé šáɱé ƒóŕ éʋéŕý áðʋéñţúŕéŕ íñ ţĥé ŕéáļɱ. Ñó ñééð ţó šíĝñ: šéé óñé ţĥŕóúĝĥ áñð íţš šéáļš ĝó šţŕáíĝĥţ ţó ýóúŕ ƀáĝš, óñçé éáçĥ ŵééķ.]",
@@ -667,6 +667,7 @@ export const en_XA: EnTranslations = {
         "heroic": "[Çļéáŕ {dungeon} óñ Ĥéŕóíç: ðéƒéáţ {boss} óñ Ĥéŕóíç ðíƒƒíçúļţý.]",
         "task": "[{task} ({dungeon})]"
       },
+      "contractLabel": "[{kind}: {dungeon}]",
       "reward": "[{count} Ļáñţéŕñ Šéáļš]",
       "rewardOne": "[{count} Ļáñţéŕñ Šéáļ]",
       "done": "[Çóɱþļéţéð ţĥíš ŵééķ]",

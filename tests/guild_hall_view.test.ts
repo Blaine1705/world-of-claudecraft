@@ -50,6 +50,10 @@ describe('the guild window view core', () => {
     expect(view.contracts.map((c) => c.done)).toEqual([false, true, false]);
     expect(view.contracts[0].kindLabel).toBe('Bounty');
     expect(view.contracts[1].goal).toMatch(/on Heroic/);
+    // a task card carries its Book of Deeds condition as a sentence of its own
+    expect(view.contracts[2].goal).toMatch(/^.+ \(.+\)$/);
+    expect(view.contracts[2].detail.length).toBeGreaterThan(0);
+    expect(view.contracts[0].detail).toBe('');
     expect(view.contracts[0].reward).toBe('1 Lantern Seal');
     expect(view.contracts[1].reward).toBe('3 Lantern Seals');
     expect(view.lifetimeText).toBe('Contracts completed: 1');
@@ -140,6 +144,25 @@ describe('the guild window painter', () => {
     expect(root.style.display).toBe('none');
   });
 
+  it('is a keyboard tablist: roving tabindex, arrows switch, focus follows, a tabpanel below', () => {
+    const { root, win } = mount(world(0));
+    win.open('contracts');
+    const tab = (id: string) => root.querySelector<HTMLButtonElement>(`[data-gh-tab="${id}"]`);
+    expect(root.querySelector('[role="tablist"]')?.getAttribute('aria-label')).toBe(
+      'Lantern Hall sections',
+    );
+    expect(tab('contracts')?.tabIndex).toBe(0);
+    expect(tab('quartermaster')?.tabIndex).toBe(-1);
+    expect(tab('contracts')?.getAttribute('aria-controls')).toBe('guild-hall-panel');
+    expect(root.querySelector('[id="guild-hall-panel"]')?.getAttribute('role')).toBe('tabpanel');
+    tab('contracts')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    expect(tab('quartermaster')?.getAttribute('aria-selected')).toBe('true');
+    expect(document.activeElement).toBe(tab('quartermaster'));
+    expect(root.querySelectorAll('[data-gh-offer]').length).toBe(GUILD_QUARTERMASTER_STOCK.length);
+    tab('quartermaster')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home' }));
+    expect(document.activeElement).toBe(tab('contracts'));
+  });
+
   it('repaints only when its signature moves', () => {
     const w = world(0);
     const { root, win } = mount(w);
@@ -188,8 +211,19 @@ describe("routing the guild's events", () => {
       true,
     );
     expect(h.log.mock.calls[1][0]).toMatch(/Writ-Runner/);
-    expect(send({ type: 'guildCosmeticRefused', offerId: 'x', reason: 'seals' })).toBe(true);
-    expect(h.showError).toHaveBeenCalledWith('You do not have enough Lantern Seals.');
+    // every refusal reason resolves to its own English line, never a raw key
+    for (const [reason, line] of [
+      ['seals', 'You do not have enough Lantern Seals.'],
+      ['owned', 'You already own that.'],
+      ['range', 'Stand at the quartermaster to trade.'],
+    ]) {
+      expect(send({ type: 'guildCosmeticRefused', offerId: 'x', reason })).toBe(true);
+      expect(h.showError).toHaveBeenLastCalledWith(line);
+    }
+    // an offer this client does not know logs nothing
+    const logged = h.log.mock.calls.length;
+    expect(send({ type: 'guildCosmeticBought', offerId: 'phantom' })).toBe(true);
+    expect(h.log.mock.calls.length).toBe(logged);
   });
 });
 

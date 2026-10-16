@@ -21,7 +21,13 @@ import {
   HIGHWATCH_GUILD_ENTITY_IDS,
 } from '../src/sim/content/highwatch_guild';
 import { DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
-import { FINAL_BOSS_DUNGEONS, FLAWLESS_TASKS, onMobKillCreditForDeeds } from '../src/sim/deeds';
+import {
+  ADD_TASKS,
+  FINAL_BOSS_DUNGEONS,
+  FLAWLESS_TASKS,
+  onMobKillCreditForDeeds,
+  SPLASH_TASKS,
+} from '../src/sim/deeds';
 import {
   guildContractsForWeek,
   onKillForGuildContracts,
@@ -336,5 +342,133 @@ describe('the residents at work', () => {
     s.player.pos = { x: clerk.pos.x + 20, y: clerk.pos.y, z: clerk.pos.z };
     s.talkToNpc(clerk.id);
     expect(s.tick().filter((e: SimEvent) => e.type === 'guildHallOpen')).toEqual([]);
+  });
+});
+
+describe('the contracts across weeks, milestones and the save', () => {
+  it('pins the persisted seal id to its literal', () => {
+    expect(LANTERN_SEAL_ITEM_ID).toBe('lantern_seal');
+  });
+
+  it('pays the same contract again in a later week that posts it, and bumps the wire revision', () => {
+    // two weeks that both post the Morthen bounty
+    const days: string[] = [];
+    for (let week = 0; week < 400 && days.length < 2; week++) {
+      if (guildContractsForWeek(`wk_${week}`).some((c) => c.id === 'gc_boss_morthen'))
+        days.push(new Date(Date.UTC(2026, 8, 1 + week * 7)).toISOString().slice(0, 10));
+    }
+    expect(days).toHaveLength(2);
+    const s = sim(days[0]);
+    const meta = s.players.get(s.player.id);
+    if (!meta) throw new Error('no meta');
+    const rev = meta.wireRev;
+    onMobKillCreditForDeeds(s.ctx, fakeBoss('morthen'), s.player, meta, [meta]);
+    expect(meta.wireRev).toBeGreaterThan(rev);
+    s.resetDay = days[1];
+    onMobKillCreditForDeeds(s.ctx, fakeBoss('morthen'), s.player, meta, [meta]);
+    expect(seals(s)).toBe(2);
+    expect(s.guildContracts.lifetime).toBe(2);
+    expect(s.guildContracts.done).toEqual(['gc_boss_morthen']);
+    expect(s.guildContracts.week).toBe(weeklyQuestWeekForResetDay(days[1]));
+  });
+
+  it('earns the ten and fifty contract milestones on the payment that reaches them', () => {
+    const s = sim(dayPosting('gc_boss_morthen'));
+    const meta = s.players.get(s.player.id);
+    if (!meta) throw new Error('no meta');
+    meta.guildContracts = { week: s.guildContracts.week, done: [], lifetime: 8 };
+    onMobKillCreditForDeeds(s.ctx, fakeBoss('morthen'), s.player, meta, [meta]);
+    expect(meta.deedsEarned.has('dgn_guild_ten_contracts')).toBe(false);
+    meta.guildContracts = { week: s.guildContracts.week, done: [], lifetime: 9 };
+    onMobKillCreditForDeeds(s.ctx, fakeBoss('morthen'), s.player, meta, [meta]);
+    expect(meta.deedsEarned.has('dgn_guild_ten_contracts')).toBe(true);
+    expect(meta.deedsEarned.has('dgn_guild_fifty_contracts')).toBe(false);
+    meta.guildContracts = { week: s.guildContracts.week, done: [], lifetime: 49 };
+    onMobKillCreditForDeeds(s.ctx, fakeBoss('morthen'), s.player, meta, [meta]);
+    expect(meta.deedsEarned.has('dgn_guild_fifty_contracts')).toBe(true);
+    expect(s.guildContracts.lifetime).toBe(50);
+  });
+
+  it('credits a task contract through the deeds kill path when the encounter met it', () => {
+    // every task contract names a deed the kill path collects for its own boss
+    for (const contract of GUILD_TASK_CONTRACTS) {
+      const collected = [FLAWLESS_TASKS, ADD_TASKS, SPLASH_TASKS].some(
+        (table) => table[contract.mobId] === contract.taskDeedId,
+      );
+      expect(collected, contract.id).toBe(true);
+    }
+    const s = sim(dayPosting('gc_task_dgn_vael_thralls'));
+    const meta = s.players.get(s.player.id);
+    if (!meta) throw new Error('no meta');
+    expect(ADD_TASKS.vael_the_mistcaller).toBe('dgn_vael_thralls');
+    onMobKillCreditForDeeds(s.ctx, fakeBoss('vael_the_mistcaller'), s.player, meta, [meta]);
+    expect(s.guildContracts.done).toContain('gc_task_dgn_vael_thralls');
+    expect(seals(s)).toBe(3);
+  });
+
+  it('restores the record from the character save, and an old save restores none', () => {
+    const day = dayPosting('gc_boss_morthen');
+    const s = sim(day);
+    const meta = s.players.get(s.player.id);
+    if (!meta) throw new Error('no meta');
+    onMobKillCreditForDeeds(s.ctx, fakeBoss('morthen'), s.player, meta, [meta]);
+    const state = JSON.parse(JSON.stringify(s.serializeCharacter(s.player.id)));
+    const t = sim(day);
+    const pid = t.addPlayer('warrior', 'Copy', { state });
+    expect(t.players.get(pid)?.guildContracts).toEqual({
+      week: weeklyQuestWeekForResetDay(day),
+      done: ['gc_boss_morthen'],
+      lifetime: 1,
+    });
+    expect(t.ctx.countItem(LANTERN_SEAL_ITEM_ID, pid)).toBe(1);
+    const old = { ...state };
+    delete old.worldQuests;
+    const oldPid = t.addPlayer('warrior', 'Old', { state: old });
+    expect(t.players.get(oldPid)?.guildContracts ?? null).toBeNull();
+  });
+
+  it('bounds every field a tampered save could carry', () => {
+    expect(sanitizeGuildContractProgress([])).toBeNull();
+    expect(sanitizeGuildContractProgress({ week: 3, done: [], lifetime: 1 })).toBeNull();
+    expect(
+      sanitizeGuildContractProgress({ week: 'wk_3', done: 'gc_boss_morthen', lifetime: 2 }),
+    ).toEqual({ week: 'wk_3', done: [], lifetime: 2 });
+    expect(
+      sanitizeGuildContractProgress({ week: 'wk_3', done: [], lifetime: Number.NaN })?.lifetime,
+    ).toBe(0);
+    expect(sanitizeGuildContractProgress({ week: 'wk_3', done: [], lifetime: 2e9 })?.lifetime).toBe(
+      1_000_000,
+    );
+  });
+});
+
+describe('the quartermaster at the edges', () => {
+  it('ignores an unknown offer and a dead buyer, and needs the buyer on its floor', () => {
+    const s = sim('2026-10-13');
+    const pid = s.player.id;
+    const meta = s.players.get(pid);
+    if (!meta) throw new Error('no meta');
+    const offer = GUILD_QUARTERMASTER_STOCK[0];
+    const npc = s.entities.get(HIGHWATCH_GUILD_ENTITY_IDS[GUILD_QUARTERMASTER_NPC_ID]);
+    if (!npc) throw new Error('no quartermaster');
+    s.ctx.addItem(LANTERN_SEAL_ITEM_ID, offer.seals, pid);
+    const guildEvents = (): SimEvent[] =>
+      s.tick().filter((e: SimEvent) => e.type.startsWith('guildCosmetic'));
+    s.player.pos = { x: npc.pos.x + 2, y: npc.pos.y, z: npc.pos.z };
+    s.buyGuildCosmetic('nope');
+    s.buyGuildCosmetic('__proto__');
+    expect(guildEvents()).toEqual([]);
+    // a floor above the quartermaster is out of reach
+    s.player.pos = { x: npc.pos.x + 2, y: npc.pos.y + 4, z: npc.pos.z };
+    s.buyGuildCosmetic(offer.id);
+    expect(guildEvents()).toEqual([
+      expect.objectContaining({ type: 'guildCosmeticRefused', reason: 'range' }),
+    ]);
+    s.player.pos = { x: npc.pos.x + 2, y: npc.pos.y, z: npc.pos.z };
+    s.player.dead = true;
+    s.buyGuildCosmetic(offer.id);
+    expect(guildEvents()).toEqual([]);
+    expect(s.ctx.countItem(LANTERN_SEAL_ITEM_ID, pid)).toBe(offer.seals);
+    expect(meta.deedsEarned.has(offer.deedId)).toBe(false);
   });
 });

@@ -95,6 +95,23 @@ beforeAll(async () => {
 });
 
 describe('the Highwatch guild GLB', () => {
+  it('carries no light, transmission, volume or texture a post-boot building must not add', () => {
+    const used = doc
+      .getRoot()
+      .listExtensionsUsed()
+      .map((ext) => ext.extensionName);
+    for (const banned of [
+      'KHR_lights_punctual',
+      'KHR_materials_transmission',
+      'KHR_materials_volume',
+    ]) {
+      expect(used, banned).not.toContain(banned);
+    }
+    expect(doc.getRoot().listTextures()).toEqual([]);
+    expect(doc.getRoot().listSkins()).toEqual([]);
+    expect(doc.getRoot().listAnimations()).toEqual([]);
+  });
+
   it('ships the pinned bytes, in the media manifest, credited as project art', () => {
     const bytes = readFileSync(GLB);
     expect(bytes.length).toBe(SHIPPED_BYTES);

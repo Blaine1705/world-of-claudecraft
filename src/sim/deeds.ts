@@ -176,7 +176,7 @@ export const FLAWLESS_TASKS: Record<string, string> = {
 };
 
 // Kill-order tasks: at boss death, every add it summoned this attempt is dead.
-const ADD_TASKS: Record<string, string> = {
+export const ADD_TASKS: Record<string, string> = {
   vael_the_mistcaller: 'dgn_vael_thralls',
   ysolei: 'dgn_ysolei_moonspawn',
   grand_necromancer_velkhar: 'dgn_velkhar_bonewalkers',
@@ -186,7 +186,7 @@ const ADD_TASKS: Record<string, string> = {
 // Positioning tasks tainted when the boss's signature splash strikes a player
 // other than its current target (Olen's Reaping Arc cleave; Nythraxis's
 // Gravebreaker frontal arc). One taint flag per boss attempt.
-const SPLASH_TASKS: Record<string, string> = {
+export const SPLASH_TASKS: Record<string, string> = {
   knight_commander_olen: 'dgn_olen_arc',
   nythraxis_scourge_of_thornpeak: 'dgn_nythraxis_gravebreaker',
 };

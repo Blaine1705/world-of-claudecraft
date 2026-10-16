@@ -646,48 +646,49 @@ export const zh_TW: EnTranslations = {
       }
     },
     "guildHall": {
-      "title": "Lantern Hall",
-      "close": "Close the guild window",
+      "title": "燈火大廳",
+      "close": "關閉公會視窗",
+      "tabsLabel": "燈火大廳分頁",
       "tabs": {
-        "contracts": "Contracts",
-        "quartermaster": "Quartermaster"
+        "contracts": "契約",
+        "quartermaster": "軍需官"
       },
-      "seals": "Lantern Seals: {count}",
-      "sealsLabel": "Lantern Seals",
-      "resetIn": "New contracts in {time}",
-      "resetSoon": "New contracts at the next weekly reset",
-      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.",
+      "seals": "燈火印章：{count}",
+      "resetIn": "{time}後發布新契約",
+      "resetSoon": "下次每週重置時發布新契約",
+      "contractsIntro": "每週三份契約，王國中的每位冒險者看到的都一樣。無需簽署：完成其中一份，它的印章就會直接放進你的背包，每週一次。",
       "kinds": {
-        "boss": "Bounty",
-        "heroic": "Heroic Clear",
-        "task": "Execution"
+        "boss": "懸賞",
+        "heroic": "英雄通關",
+        "task": "執行"
       },
       "goals": {
-        "boss": "Defeat {boss} in {dungeon}, on either difficulty.",
-        "heroic": "Clear {dungeon} on Heroic: defeat {boss} on Heroic difficulty.",
-        "task": "{task} ({dungeon})"
+        "boss": "在{dungeon}擊敗{boss}，難度不限。",
+        "heroic": "以英雄難度通關{dungeon}：在英雄難度下擊敗{boss}。",
+        "task": "{task}（{dungeon}）"
       },
-      "reward": "{count} Lantern Seals",
-      "rewardOne": "{count} Lantern Seal",
-      "done": "Completed this week",
-      "open": "Open",
-      "lifetime": "Contracts completed: {count}",
-      "emptyBoard": "The board is being rewritten. Come back after the weekly reset.",
-      "quartermasterIntro": "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds. Nothing here makes you stronger.",
-      "titleOffer": "Title: {title}",
-      "titlePreview": "Shown as {preview}",
-      "price": "{count} Lantern Seals",
-      "buy": "Buy",
-      "owned": "Owned",
-      "needSeals": "Needs {count} more",
-      "bought": "You bought the title {title}. Choose it in the Book of Deeds.",
+      "contractLabel": "{kind}：{dungeon}",
+      "reward": "{count}枚燈火印章",
+      "rewardOne": "{count}枚燈火印章",
+      "done": "本週已完成",
+      "open": "進行中",
+      "lifetime": "已完成契約：{count}",
+      "emptyBoard": "告示板正在重寫。請在每週重置後再來。",
+      "quartermasterIntro": "加里克只用燈火印章換取榮譽：可在功績之書中佩戴的頭銜。這裡沒有任何東西能讓你變得更強。",
+      "titleOffer": "頭銜：{title}",
+      "titlePreview": "顯示為{preview}",
+      "price": "{count}枚燈火印章",
+      "buy": "購買",
+      "owned": "已擁有",
+      "needSeals": "還需{count}枚",
+      "bought": "你購買了頭銜{title}。請在功績之書中選擇它。",
       "refused": {
-        "owned": "You already own that.",
-        "seals": "You do not have enough Lantern Seals.",
-        "range": "Stand at the quartermaster to trade."
+        "owned": "你已經擁有它了。",
+        "seals": "你的燈火印章不足。",
+        "range": "站到軍需官身邊才能交易。"
       },
-      "contractDone": "Contract complete: {contract}. You receive {count} Lantern Seals.",
-      "contractDoneOne": "Contract complete: {contract}. You receive {count} Lantern Seal."
+      "contractDone": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
+      "contractDoneOne": "契約完成：{contract}。你獲得了{count}枚燈火印章。"
     },
     "ferry": {
       "regionLabel": "渡船時刻表",

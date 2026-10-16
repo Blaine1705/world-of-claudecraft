@@ -646,48 +646,49 @@ export const ja_JP: EnTranslations = {
       }
     },
     "guildHall": {
-      "title": "Lantern Hall",
-      "close": "Close the guild window",
+      "title": "燈火の館",
+      "close": "ギルドのウィンドウを閉じる",
+      "tabsLabel": "燈火の館の項目",
       "tabs": {
-        "contracts": "Contracts",
-        "quartermaster": "Quartermaster"
+        "contracts": "契約",
+        "quartermaster": "補給係"
       },
-      "seals": "Lantern Seals: {count}",
-      "sealsLabel": "Lantern Seals",
-      "resetIn": "New contracts in {time}",
-      "resetSoon": "New contracts at the next weekly reset",
-      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.",
+      "seals": "燈火の印章：{count}",
+      "resetIn": "新しい契約まで{time}",
+      "resetSoon": "新しい契約は次の週次リセットで",
+      "contractsIntro": "契約は週に三件、王国のすべての冒険者に同じものが貼り出される。署名は不要：やり遂げれば、その印章は週に一度ずつ直接バッグに届く。",
       "kinds": {
-        "boss": "Bounty",
-        "heroic": "Heroic Clear",
-        "task": "Execution"
+        "boss": "討伐依頼",
+        "heroic": "ヒロイック踏破",
+        "task": "遂行"
       },
       "goals": {
-        "boss": "Defeat {boss} in {dungeon}, on either difficulty.",
-        "heroic": "Clear {dungeon} on Heroic: defeat {boss} on Heroic difficulty.",
-        "task": "{task} ({dungeon})"
+        "boss": "{dungeon}で{boss}を倒す（難易度は問わない）。",
+        "heroic": "ヒロイックで{dungeon}を踏破する：ヒロイック難易度で{boss}を倒す。",
+        "task": "{task}（{dungeon}）"
       },
-      "reward": "{count} Lantern Seals",
-      "rewardOne": "{count} Lantern Seal",
-      "done": "Completed this week",
-      "open": "Open",
-      "lifetime": "Contracts completed: {count}",
-      "emptyBoard": "The board is being rewritten. Come back after the weekly reset.",
-      "quartermasterIntro": "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds. Nothing here makes you stronger.",
-      "titleOffer": "Title: {title}",
-      "titlePreview": "Shown as {preview}",
-      "price": "{count} Lantern Seals",
-      "buy": "Buy",
-      "owned": "Owned",
-      "needSeals": "Needs {count} more",
-      "bought": "You bought the title {title}. Choose it in the Book of Deeds.",
+      "contractLabel": "{kind}：{dungeon}",
+      "reward": "燈火の印章{count}個",
+      "rewardOne": "燈火の印章{count}個",
+      "done": "今週は達成済み",
+      "open": "未達成",
+      "lifetime": "達成した契約：{count}",
+      "emptyBoard": "掲示板は書き換え中だ。週次リセットの後にまた来てほしい。",
+      "quartermasterIntro": "ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号だ。ここにあなたを強くするものは何もない。",
+      "titleOffer": "称号：{title}",
+      "titlePreview": "表示：{preview}",
+      "price": "燈火の印章{count}個",
+      "buy": "購入",
+      "owned": "所持済み",
+      "needSeals": "あと{count}個必要",
+      "bought": "称号「{title}」を購入した。功績の書で選択できる。",
       "refused": {
-        "owned": "You already own that.",
-        "seals": "You do not have enough Lantern Seals.",
-        "range": "Stand at the quartermaster to trade."
+        "owned": "それはすでに所持している。",
+        "seals": "燈火の印章が足りない。",
+        "range": "取引するには補給係のそばに立つこと。"
       },
-      "contractDone": "Contract complete: {contract}. You receive {count} Lantern Seals.",
-      "contractDoneOne": "Contract complete: {contract}. You receive {count} Lantern Seal."
+      "contractDone": "契約達成：{contract}。燈火の印章を{count}個受け取った。",
+      "contractDoneOne": "契約達成：{contract}。燈火の印章を{count}個受け取った。"
     },
     "ferry": {
       "regionLabel": "渡し船の時刻表",

@@ -646,48 +646,49 @@ export const ru_RU: EnTranslations = {
       }
     },
     "guildHall": {
-      "title": "Lantern Hall",
-      "close": "Close the guild window",
+      "title": "Зал Фонаря",
+      "close": "Закрыть окно гильдии",
+      "tabsLabel": "Разделы Зала Фонаря",
       "tabs": {
-        "contracts": "Contracts",
-        "quartermaster": "Quartermaster"
+        "contracts": "Контракты",
+        "quartermaster": "Интендант"
       },
-      "seals": "Lantern Seals: {count}",
-      "sealsLabel": "Lantern Seals",
-      "resetIn": "New contracts in {time}",
-      "resetSoon": "New contracts at the next weekly reset",
-      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.",
+      "seals": "Печати Фонаря: {count}",
+      "resetIn": "Новые контракты через {time}",
+      "resetSoon": "Новые контракты после еженедельного сброса",
+      "contractsIntro": "Три контракта в неделю, одни и те же для всех искателей приключений королевства. Подписывать ничего не нужно: выполните контракт, и его печати сразу попадут в ваши сумки, раз в неделю.",
       "kinds": {
-        "boss": "Bounty",
-        "heroic": "Heroic Clear",
-        "task": "Execution"
+        "boss": "Награда за голову",
+        "heroic": "Героическое прохождение",
+        "task": "Поручение"
       },
       "goals": {
-        "boss": "Defeat {boss} in {dungeon}, on either difficulty.",
-        "heroic": "Clear {dungeon} on Heroic: defeat {boss} on Heroic difficulty.",
-        "task": "{task} ({dungeon})"
+        "boss": "Победите {boss} в подземелье «{dungeon}» на любой сложности.",
+        "heroic": "Пройдите «{dungeon}» на героической сложности: победите {boss} на героической сложности.",
+        "task": "{task} («{dungeon}»)"
       },
-      "reward": "{count} Lantern Seals",
-      "rewardOne": "{count} Lantern Seal",
-      "done": "Completed this week",
-      "open": "Open",
-      "lifetime": "Contracts completed: {count}",
-      "emptyBoard": "The board is being rewritten. Come back after the weekly reset.",
-      "quartermasterIntro": "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds. Nothing here makes you stronger.",
-      "titleOffer": "Title: {title}",
-      "titlePreview": "Shown as {preview}",
-      "price": "{count} Lantern Seals",
-      "buy": "Buy",
-      "owned": "Owned",
-      "needSeals": "Needs {count} more",
-      "bought": "You bought the title {title}. Choose it in the Book of Deeds.",
+      "contractLabel": "{kind}: {dungeon}",
+      "reward": "Печати Фонаря: {count}",
+      "rewardOne": "Печать Фонаря: {count}",
+      "done": "Выполнено на этой неделе",
+      "open": "Открыт",
+      "lifetime": "Выполнено контрактов: {count}",
+      "emptyBoard": "Доску переписывают. Возвращайтесь после еженедельного сброса.",
+      "quartermasterIntro": "Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний. Ничто здесь не сделает вас сильнее.",
+      "titleOffer": "Звание: {title}",
+      "titlePreview": "Отображается как {preview}",
+      "price": "Печати Фонаря: {count}",
+      "buy": "Купить",
+      "owned": "Есть",
+      "needSeals": "Не хватает: {count}",
+      "bought": "Вы купили звание {title}. Выберите его в Книге Деяний.",
       "refused": {
-        "owned": "You already own that.",
-        "seals": "You do not have enough Lantern Seals.",
-        "range": "Stand at the quartermaster to trade."
+        "owned": "У вас это уже есть.",
+        "seals": "У вас недостаточно печатей Фонаря.",
+        "range": "Чтобы торговать, встаньте рядом с интендантом."
       },
-      "contractDone": "Contract complete: {contract}. You receive {count} Lantern Seals.",
-      "contractDoneOne": "Contract complete: {contract}. You receive {count} Lantern Seal."
+      "contractDone": "Контракт выполнен: {contract}. Получено печатей Фонаря: {count}.",
+      "contractDoneOne": "Контракт выполнен: {contract}. Получено печатей Фонаря: {count}."
     },
     "ferry": {
       "regionLabel": "Расписание парома",

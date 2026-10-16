@@ -476,6 +476,11 @@ export const RELIQUARY_HORIZON_TITLES = [
   'exp_clue_ten_caskets',
   // The Drowned Temple lore guide's The Last Verse: Witness of the Choir.
   'dgn_drowned_temple_cantor',
+  // Lantern Hall's quartermaster (guild_contracts.ts): the three titles bought with
+  // Lantern Seals from the guild's weekly dungeon contracts.
+  'feat_guild_writ_runner',
+  'feat_guild_hallsworn',
+  'feat_guild_of_lantern_hall',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

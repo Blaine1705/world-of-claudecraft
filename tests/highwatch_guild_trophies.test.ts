@@ -9,6 +9,7 @@ import {
   GUILD_TROPHY_DUNGEONS,
   guildTrophyNodeNames,
   guildTrophySignature,
+  guildTrophySignatureOf,
   guildTrophyStates,
 } from '../src/render/highwatch_guild_trophies_core';
 
@@ -38,6 +39,17 @@ describe('the trophy states', () => {
       guildTrophySignature(guildTrophyStates({ hollow_crypt: 9, 'sunken_bastion:heroic': 4 })),
     ).toBe(a);
     expect(guildTrophySignature(guildTrophyStates({ hollow_crypt: 1 }))).not.toBe(a);
+    // the painter's allocation-free per-frame signature agrees with the shaped one
+    for (const record of <(Record<string, number> | undefined)[]>[
+      undefined,
+      {},
+      { hollow_crypt: 1 },
+      { 'gravewyrm_sanctum:heroic': 2, wildheart_basin: 1, 'drowned_temple:heroic': -1 },
+      { hollow_crypt: 2, 'sunken_bastion:heroic': 1, drowned_temple: 0 },
+    ]) {
+      expect(guildTrophySignatureOf(record)).toBe(guildTrophySignature(guildTrophyStates(record)));
+    }
+    expect(guildTrophySignatureOf({ 'gravewyrm_sanctum:heroic': 1 })).toBe(0b11 << 8);
   });
 });
 

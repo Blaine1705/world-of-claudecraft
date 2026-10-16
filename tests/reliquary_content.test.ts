@@ -485,7 +485,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Stave and five trinkets on the same page: 495 + 13 = 508.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 558.
     // Two referral reward mounts join Horizons.
-    expect(full).toEqual({ owned: 560, total: 560 });
+    // Lantern Hall's three quartermaster titles join the titles page (+3).
+    expect(full).toEqual({ owned: 563, total: 563 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -520,7 +521,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
     // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529.
-    expect(character).toEqual({ owned: 531, total: 531 });
+    // Lantern Hall's three quartermaster titles are character-scoped feats (+3).
+    expect(character).toEqual({ owned: 534, total: 534 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -586,7 +588,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
-    ).toBe(747); // plus two referral reward mounts
+    ).toBe(750); // plus two referral reward mounts, plus Lantern Hall's three titles
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -3308,7 +3310,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Crucible raid's flawless title + the three faction standing Champion
   // titles + the Clue Scroll Treasure Hunter title + the Drowned Temple lore
   // guide's Witness of the Choir.
-  horizons_titles: 50,
+  horizons_titles: 53, // +3 Lantern Hall's quartermaster titles
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

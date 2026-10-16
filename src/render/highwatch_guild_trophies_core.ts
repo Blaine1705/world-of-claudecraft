@@ -51,6 +51,24 @@ export function guildTrophySignature(states: readonly GuildTrophyState[]): numbe
   return sig;
 }
 
+// the clear-record keys, built once so the per-frame read allocates nothing
+const NORMAL_KEYS: readonly string[] = GUILD_TROPHY_DUNGEONS.map((dungeon) => dungeon);
+const HEROIC_KEYS: readonly string[] = GUILD_TROPHY_DUNGEONS.map((dungeon) => `${dungeon}:heroic`);
+
+/** The same signature straight from the clear records, with no intermediate objects: the
+ *  painter's per-frame check, so the states are shaped only when it moves. */
+export function guildTrophySignatureOf(
+  dungeonClears: Readonly<Record<string, number>> | undefined,
+): number {
+  let sig = 0;
+  for (let i = 0; i < NORMAL_KEYS.length; i++) {
+    const heroic = clears(dungeonClears, HEROIC_KEYS[i]);
+    if (heroic + clears(dungeonClears, NORMAL_KEYS[i]) > 0) sig |= 1 << (2 * i);
+    if (heroic > 0) sig |= 1 << (2 * i + 1);
+  }
+  return sig;
+}
+
 /** The model's part names for one dungeon's trophy and gilding. */
 export function guildTrophyNodeNames(dungeon: GuildTrophyDungeon): {
   trophy: string;

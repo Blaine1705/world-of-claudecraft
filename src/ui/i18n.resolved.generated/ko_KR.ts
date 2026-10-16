@@ -646,48 +646,49 @@ export const ko_KR: EnTranslations = {
       }
     },
     "guildHall": {
-      "title": "Lantern Hall",
-      "close": "Close the guild window",
+      "title": "등불 회관",
+      "close": "길드 창 닫기",
+      "tabsLabel": "등불 회관 항목",
       "tabs": {
-        "contracts": "Contracts",
-        "quartermaster": "Quartermaster"
+        "contracts": "계약",
+        "quartermaster": "보급관"
       },
-      "seals": "Lantern Seals: {count}",
-      "sealsLabel": "Lantern Seals",
-      "resetIn": "New contracts in {time}",
-      "resetSoon": "New contracts at the next weekly reset",
-      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.",
+      "seals": "등불 인장: {count}",
+      "resetIn": "{time} 후 새 계약",
+      "resetSoon": "다음 주간 초기화에 새 계약",
+      "contractsIntro": "계약은 일주일에 세 건, 왕국의 모든 모험가에게 똑같이 게시됩니다. 서명할 필요는 없습니다. 하나를 끝까지 해내면 그 인장이 매주 한 번씩 곧바로 가방에 들어옵니다.",
       "kinds": {
-        "boss": "Bounty",
-        "heroic": "Heroic Clear",
-        "task": "Execution"
+        "boss": "현상금",
+        "heroic": "영웅 돌파",
+        "task": "수행"
       },
       "goals": {
-        "boss": "Defeat {boss} in {dungeon}, on either difficulty.",
-        "heroic": "Clear {dungeon} on Heroic: defeat {boss} on Heroic difficulty.",
+        "boss": "{dungeon}에서 {boss}을(를) 처치하세요(난이도 무관).",
+        "heroic": "영웅 난이도로 {dungeon} 돌파: 영웅 난이도에서 {boss}을(를) 처치하세요.",
         "task": "{task} ({dungeon})"
       },
-      "reward": "{count} Lantern Seals",
-      "rewardOne": "{count} Lantern Seal",
-      "done": "Completed this week",
-      "open": "Open",
-      "lifetime": "Contracts completed: {count}",
-      "emptyBoard": "The board is being rewritten. Come back after the weekly reset.",
-      "quartermasterIntro": "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds. Nothing here makes you stronger.",
-      "titleOffer": "Title: {title}",
-      "titlePreview": "Shown as {preview}",
-      "price": "{count} Lantern Seals",
-      "buy": "Buy",
-      "owned": "Owned",
-      "needSeals": "Needs {count} more",
-      "bought": "You bought the title {title}. Choose it in the Book of Deeds.",
+      "contractLabel": "{kind}: {dungeon}",
+      "reward": "등불 인장 {count}개",
+      "rewardOne": "등불 인장 {count}개",
+      "done": "이번 주 완료",
+      "open": "진행 중",
+      "lifetime": "완료한 계약: {count}",
+      "emptyBoard": "게시판을 새로 쓰는 중입니다. 주간 초기화 후에 다시 오세요.",
+      "quartermasterIntro": "개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호입니다. 여기서 당신을 더 강하게 만드는 것은 없습니다.",
+      "titleOffer": "칭호: {title}",
+      "titlePreview": "표시: {preview}",
+      "price": "등불 인장 {count}개",
+      "buy": "구매",
+      "owned": "보유 중",
+      "needSeals": "{count}개 더 필요",
+      "bought": "칭호 {title}을(를) 구매했습니다. 위업의 책에서 선택하세요.",
       "refused": {
-        "owned": "You already own that.",
-        "seals": "You do not have enough Lantern Seals.",
-        "range": "Stand at the quartermaster to trade."
+        "owned": "이미 보유하고 있습니다.",
+        "seals": "등불 인장이 부족합니다.",
+        "range": "거래하려면 보급관 곁에 서세요."
       },
-      "contractDone": "Contract complete: {contract}. You receive {count} Lantern Seals.",
-      "contractDoneOne": "Contract complete: {contract}. You receive {count} Lantern Seal."
+      "contractDone": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.",
+      "contractDoneOne": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다."
     },
     "ferry": {
       "regionLabel": "여객선 시간표",

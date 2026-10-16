@@ -17,5 +17,7 @@ export function guildCosmeticToast(offerId: string): string {
   const offer = Object.hasOwn(GUILD_QUARTERMASTER_STOCK_BY_ID, offerId)
     ? GUILD_QUARTERMASTER_STOCK_BY_ID[offerId]
     : undefined;
-  return t('hudChrome.guildHall.bought', { title: offer ? deedTitleText(offer.deedId) : '' });
+  // an offer this client does not know logs nothing rather than a line with a hole in it
+  if (!offer) return '';
+  return t('hudChrome.guildHall.bought', { title: deedTitleText(offer.deedId) });
 }

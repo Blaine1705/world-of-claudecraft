@@ -5765,6 +5765,7 @@ const ALL_DELTA_KEYS = [
   'fac',
   'facCur',
   'fplot',
+  'gcon',
   'ggoal',
   'gprof',
   'guildBank',
@@ -7373,8 +7374,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Mirefen world-boss branch's Shardpike self keys (lance, lrest, lguide): 119.
     // The buddy collection adds budOwn and budPend to the integration keys.
     // +1: the dungeon objectives tracker's dgrun (server/dungeon_run_wire.ts), for 122.
-    expect(ALL_DELTA_KEYS).toHaveLength(122);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(122);
+    // +1: Lantern Hall's weekly contract board gcon (server/quest_snapshot_wire.ts), for 123.
+    expect(ALL_DELTA_KEYS).toHaveLength(123);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(123);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7549,7 +7551,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The courier's keys and the Shardpike trial's lance, lrest and lguide self emits make 119.
     // The buddy collection adds budOwn and budPend.
     // The dungeon run's dgrun (the game.ts maybeSerialized emit) makes 122.
-    expect(scraped.size).toBe(122);
+    // Lantern Hall's contract board gcon (quest_snapshot_wire.ts) makes 123.
+    expect(scraped.size).toBe(123);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
