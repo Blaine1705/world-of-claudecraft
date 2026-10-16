@@ -602,7 +602,7 @@ function withProfessions(
   ids: readonly string[],
   professionById: Readonly<Record<string, string>>,
   fallback: ReliquarySourceHint,
-): RelicEntry[] {
+): (readonly [string, ReliquarySourceHint])[] {
   return ids.map((id) => {
     // Own-property read, same reasoning as setMembers below.
     const professionId = Object.hasOwn(professionById, id) ? professionById[id] : undefined;
@@ -612,13 +612,12 @@ function withProfessions(
 }
 
 /** Adds the Buried Hoard door to a specimen the hoard chest also pays. */
-function withHoardMaterialHint(entry: RelicEntry): RelicEntry {
-  if (typeof entry === 'string' || !VAULT_MATERIAL_POOL.includes(entry[0])) return entry;
-  const [id, hints] = entry;
-  const [first, ...rest]: readonly ReliquarySourceHint[] = Array.isArray(hints)
-    ? hints
-    : [hints as ReliquarySourceHint];
-  return [id, [first, ...rest, fromActivity('buried_hoard')]] as const;
+function withHoardMaterialHint(
+  entry: readonly [string, ReliquarySourceHint],
+): readonly [string, ReliquarySourceHints] {
+  const [id, hint] = entry;
+  if (!VAULT_MATERIAL_POOL.includes(id)) return entry;
+  return [id, [hint, fromActivity('buried_hoard')]] as const;
 }
 
 // Epic set members, pinned to the same id lists as col_set_* deeds in

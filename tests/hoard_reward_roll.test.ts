@@ -185,6 +185,36 @@ describe('vault reward pools', () => {
     );
   });
 
+  it('offers the mana draught to exactly the mana classes', () => {
+    // Literal, not the production predicate: the consumable pick is the second
+    // int draw, and its upper bound is the class's pool size minus one.
+    const poolSize: Record<PlayerClass, number> = {
+      warrior: 2,
+      rogue: 2,
+      hunter: 2,
+      mage: 3,
+      paladin: 3,
+      priest: 3,
+      shaman: 3,
+      warlock: 3,
+      druid: 3,
+    };
+    expect(Object.keys(poolSize).sort()).toEqual(Object.keys(CLASSES).sort());
+    for (const cls of Object.keys(poolSize) as PlayerClass[]) {
+      const script = scriptedRng([0, poolSize[cls] - 1], [false, false, false, false]);
+      const reward = rollHoardReward(script.rng, {
+        rarity: 'common',
+        cls,
+        level: 20,
+        owner: true,
+        guestCapped: false,
+        mountOwned: false,
+      });
+      expect(script.calls[1], cls).toEqual(['int', 0, poolSize[cls] - 1]);
+      expect(reward.items[1].itemId === 'sunpetal_mana_draught', cls).toBe(poolSize[cls] === 3);
+    }
+  });
+
   it('grants every rarity a consumable stack sized by its table', () => {
     const rarities = ['common', 'rare', 'epic', 'legendary'] as const;
     expect(rarities.map((r) => VAULT_PAYOUTS[r].consumables)).toEqual([2, 3, 4, 5]);

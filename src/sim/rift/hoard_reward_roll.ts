@@ -37,8 +37,9 @@ export interface HoardReward {
   readonly capped: boolean;
 }
 
-/** Preserve the old draw order even for already-owned mounts and top-tier maps.
- * A capped guest takes no draws; the owner is exempt from that cap. */
+/** Fixed draw order: material, consumable, gear, marks, mount, next map. Every
+ * chance is drawn even for an already-owned mount or a top-tier map. A capped
+ * guest takes no draws; the owner is exempt from that cap. */
 export function rollHoardReward(
   rng: Pick<Rng, 'int' | 'chance'>,
   input: HoardRewardInput,

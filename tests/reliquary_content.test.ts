@@ -3949,6 +3949,19 @@ describe('Reliquary source hints resolve against live content', () => {
     expect([...(bySlotKind.get('rift_first_clear:item') ?? [])].sort()).toEqual(
       [...RIFT_GEAR_ITEM_IDS].sort(),
     );
+    // The Buried Hoard ITEM slots are EXACTLY the hoard pieces plus the five
+    // specimens its reward chest pays, spelled literally so a hint that leaks
+    // onto any other relic fails here.
+    expect([...(bySlotKind.get('buried_hoard:item') ?? [])].sort()).toEqual(
+      [
+        ...HOARD_BASE_ITEM_IDS,
+        'pristine_hide',
+        'pristine_silk',
+        'pristine_venom_gland',
+        'pristine_claw',
+        'prime_cut',
+      ].sort(),
+    );
     // Vacuity floor: five specimens, the two marks, and the three bands.
     expect(checked).toBeGreaterThanOrEqual(10);
   });

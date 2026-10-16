@@ -146,10 +146,11 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
 });
 
 /** The material stack every vault payout carries: one of the corpse-harvest
- *  specimens (HARVEST_COMPONENT_SPECIMENS, content/profession_items.ts), the
- *  four Pristine ones plus the meat family's Prime Cut. Sell values sit level
- *  with the top-tier node yields this pool replaced, so
- *  VAULT_PAYOUTS[r].materials keeps its counts. */
+ *  specimens (HARVEST_COMPONENT_SPECIMENS in content/professions.ts, item
+ *  records in content/profession_items.ts), the four Pristine ones plus the
+ *  meat family's Prime Cut. Their sell values are comparable to the top-tier
+ *  node yields this pool replaced, so VAULT_PAYOUTS[r].materials keeps its
+ *  counts. */
 export const VAULT_MATERIAL_POOL: readonly string[] = Object.freeze([
   'pristine_hide',
   'pristine_silk',
@@ -159,8 +160,9 @@ export const VAULT_MATERIAL_POOL: readonly string[] = Object.freeze([
 ]);
 
 /** The consumable stack every vault payout carries: the top rung of the
- *  crafted potion and elixir ladders (content/profession_items.ts), sized for
- *  the level 20 to 28 hoards. A mana draught is only offered to a mana class. */
+ *  crafted potion and elixir ladders (content/profession_items.ts). None carries
+ *  a level requirement, so every entrant from HOARD_MIN_LEVEL can use them. A
+ *  mana draught is only offered to a mana class. */
 const VAULT_CONSUMABLES = Object.freeze(['sunpetal_healing_draught', 'elixir_of_the_serpent']);
 const VAULT_MANA_CONSUMABLES = Object.freeze([...VAULT_CONSUMABLES, 'sunpetal_mana_draught']);
 
