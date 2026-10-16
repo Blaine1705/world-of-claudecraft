@@ -285,6 +285,7 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
         cullRadius: built.cullRadius,
         walkIn: building.walkIn,
         doorways,
+        doorwayFrame: interior?.frame,
       });
       roots.push(built.group);
     }

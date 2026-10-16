@@ -1057,6 +1057,7 @@ function buildFromTemplates(
       cullRadius: built.cullRadius,
       walkIn: building.walkIn,
       doorways: interior?.openings.map((opening) => interior.boxes[opening.box]),
+      doorwayFrame: interior?.frame,
     });
     buildingGroups.push(built.group);
   }

@@ -16,11 +16,21 @@ export interface FenbridgeBuildingVisibilityTarget {
   /** A building with an open doorway the player walks into
    *  (fenbridge_layout.ts `walkIn`). */
   walkIn?: boolean;
-  /** A walk-in building's doorways as world boxes [x0, x1, y0, y1, z0, z1] (its camera
-   *  interior's openings, placed_town_interior_core.ts). A player stepping in with the camera
-   *  still outside sees in through the door: the building stays solid while the line from the
-   *  eye to the camera leaves the walls through one of these. */
+  /** A walk-in building's doorways as boxes [x0, x1, y0, y1, z0, z1] (its camera interior's
+   *  openings, placed_town_interior_core.ts), in the world's axes or in `doorwayFrame`. A
+   *  player stepping in with the camera still outside sees in through the door: the building
+   *  stays solid while the line from the eye to the camera leaves the walls through one of
+   *  these. */
   doorways?: readonly (readonly [number, number, number, number, number, number])[];
+  /** The frame the doorways are authored in, the camera interior's own (a building at any
+   *  turn but a quarter, interior_camera_core.ts InteriorFrame): its origin and the cosine
+   *  and sine of its turn. Absent: the doorways are world boxes. */
+  doorwayFrame?: {
+    readonly x: number;
+    readonly z: number;
+    readonly cos: number;
+    readonly sin: number;
+  };
 }
 
 export interface FenbridgeBuildingVisibilityPlan {
@@ -129,9 +139,17 @@ function exitsThroughDoorway(
   // where the segment, walked from the camera, enters the footprint
   const t = segmentFootprintEntry(target, camX, camZ, eyeX, eyeZ);
   if (!Number.isFinite(t) || t < 0 || t > 1) return false;
-  const x = camX + (eyeX - camX) * t;
+  let x = camX + (eyeX - camX) * t;
   const y = camY + (eyeY - camY) * t;
-  const z = camZ + (eyeZ - camZ) * t;
+  let z = camZ + (eyeZ - camZ) * t;
+  // a turned building's doorways are square to its own frame: read the point there
+  const frame = target.doorwayFrame;
+  if (frame) {
+    const dx = x - frame.x;
+    const dz = z - frame.z;
+    x = dx * frame.cos - dz * frame.sin;
+    z = dx * frame.sin + dz * frame.cos;
+  }
   const margin = 0.05;
   for (const [x0, x1, y0, y1, z0, z1] of doorways) {
     if (

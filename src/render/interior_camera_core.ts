@@ -1,12 +1,17 @@
 // The indoor chase-camera clamp's pure decisions (the driver is interior_camera.ts). A walk-in
-// building registers its INTERIOR as the air a camera may occupy: a union of axis-aligned
-// boxes in world yards (its rooms, the doorways and arches between them, a round tower),
-// each box authored against the inner wall faces, the floors and the ceilings. While the
-// player's eye stands in that air, the camera is kept in it: the chase ray from the look
-// point to the desired camera is walked through the union, and the camera is pulled IN to
-// the first point where the ray would leave the air, less a near-plane pad, the classic MMO
-// indoor camera. The outer shell is then never between the lens and the player, so it never
-// has to open onto the outside.
+// building registers its INTERIOR as the air a camera may occupy: a union of boxes in yards
+// (its rooms, the doorways and arches between them, a round tower), each box authored against
+// the inner wall faces, the floors and the ceilings. While the player's eye stands in that
+// air, the camera is kept in it: the chase ray from the look point to the desired camera is
+// walked through the union, and the camera is pulled IN to the first point where the ray
+// would leave the air, less a near-plane pad, the classic MMO indoor camera. The outer shell
+// is then never between the lens and the player, so it never has to open onto the outside.
+//
+// The boxes are square to the world's axes, or, for a building stood at any other angle, to
+// its own FRAME (InteriorFrame: an origin on the ground and a turn about the vertical), so a
+// turned room keeps its air square to its own walls. Every query still takes world points:
+// it turns them into the frame first and answers there (a fraction, a weight, a rise or a
+// framing reads the same in either frame).
 //
 // This is the ONE sanctioned exception to the pinned rule that scene geometry never changes
 // the chase camera's distance (tests/graphics_overhaul_integration.test.ts): outdoors nothing
@@ -36,18 +41,35 @@
 // Three-, DOM- and i18n-free, deterministic, allocation-free per call: slab and circle tests
 // on a handful of pieces, with the last walk's exit written to module scratch.
 
-/** One box of air, world yards: [x0, x1, y0, y1, z0, z1]. */
+/** One box of air, yards: [x0, x1, y0, y1, z0, z1], in the world's axes or the interior's
+ *  own frame (CameraInterior.frame; y is the world's height either way). */
 export type InteriorBox = readonly [number, number, number, number, number, number];
 
-/** A vertical cylinder that rounds one box's air: its axis (x, z) and radius, world yards. */
+/** A vertical cylinder that rounds one box's air: its axis (x, z) and radius, yards, in the
+ *  same axes as the boxes. */
 export type InteriorRound = readonly [number, number, number];
 
 /** A face of one box that opens onto the world outside (a front door): the box's index in
- *  the interior, the axis (0 x, 1 y, 2 z) and the side (+1 the max face, -1 the min face). */
+ *  the interior, the axis (0 x, 1 y, 2 z, the boxes' own) and the side (+1 the max face, -1
+ *  the min face). */
 export interface InteriorOpening {
   box: number;
   axis: 0 | 1 | 2;
   side: 1 | -1;
+}
+
+/**
+ * A building's own frame on the ground: its origin (world x, z), its turn about the vertical
+ * (yaw, radians, as three's rotation.y and the placed-town kit's localToWorld turn it) and
+ * that turn's cosine and sine. A point (x, z) of the frame stands in the world at
+ * (origin.x + x cos + z sin, origin.z - x sin + z cos).
+ */
+export interface InteriorFrame {
+  readonly x: number;
+  readonly z: number;
+  readonly yaw: number;
+  readonly cos: number;
+  readonly sin: number;
 }
 
 /** A registered interior: its air and its openings onto the world. */
@@ -66,6 +88,10 @@ export interface CameraInterior {
   thresholds: readonly number[];
   /** The union's bounds: a point outside them is outside every box. */
   bounds: InteriorBox;
+  /** The frame the boxes, rounds, openings and bounds are authored in (absent: the world's
+   *  axes, the air of a building square to them). Every query below still takes and gives
+   *  world points; only the air is read in the frame. */
+  frame?: InteriorFrame;
 }
 
 /** An opening's threshold: from its outside face in to where the other boxes that share its
@@ -92,12 +118,18 @@ function openingThreshold(boxes: readonly InteriorBox[], o: InteriorOpening): nu
   return Math.abs(face - reach);
 }
 
+/**
+ * An interior from its air: boxes, openings and rounds in the world's axes, or, given a
+ * `frame` (an origin on the ground and a turn about the vertical, a building stood at any
+ * angle), in that frame's.
+ */
 export function cameraInterior(
   id: string,
   boxes: readonly InteriorBox[],
   openings: readonly InteriorOpening[] = [],
   rounds: ReadonlyMap<number, InteriorRound> = new Map(),
   framing: CameraInterior['framing'] = 'adaptive',
+  frame?: { readonly x: number; readonly z: number; readonly yaw: number },
 ): CameraInterior {
   const b = [Infinity, -Infinity, Infinity, -Infinity, Infinity, -Infinity];
   for (const box of boxes) {
@@ -106,7 +138,7 @@ export function cameraInterior(
       b[a * 2 + 1] = Math.max(b[a * 2 + 1], box[a * 2 + 1]);
     }
   }
-  return {
+  const vol: CameraInterior = {
     id,
     framing,
     boxes,
@@ -115,9 +147,53 @@ export function cameraInterior(
     thresholds: openings.map((o) => openingThreshold(boxes, o)),
     bounds: [b[0], b[1], b[2], b[3], b[4], b[5]],
   };
+  // an interior in the world's axes carries no frame at all (its queries read no turn)
+  if (frame) {
+    vol.frame = {
+      x: frame.x,
+      z: frame.z,
+      yaw: frame.yaw,
+      cos: Math.cos(frame.yaw),
+      sin: Math.sin(frame.yaw),
+    };
+  }
+  return vol;
 }
 
-/** Whether a point stands in piece `i`, `pad` yards clear of its faces. */
+// a world point or direction turned into an interior's frame (module scratch: no allocation
+// per call)
+let frameX = 0;
+let frameZ = 0;
+
+/** The world point (x, z) in `vol`'s frame, written to frameX, frameZ (as it is, with no
+ *  frame). */
+function pointToFrame(vol: CameraInterior, x: number, z: number): void {
+  const f = vol.frame;
+  if (!f) {
+    frameX = x;
+    frameZ = z;
+    return;
+  }
+  const dx = x - f.x;
+  const dz = z - f.z;
+  frameX = dx * f.cos - dz * f.sin;
+  frameZ = dx * f.sin + dz * f.cos;
+}
+
+/** The world direction (dx, dz) in `vol`'s frame, written to frameX, frameZ. */
+function directionToFrame(vol: CameraInterior, dx: number, dz: number): void {
+  const f = vol.frame;
+  if (!f) {
+    frameX = dx;
+    frameZ = dz;
+    return;
+  }
+  frameX = dx * f.cos - dz * f.sin;
+  frameZ = dx * f.sin + dz * f.cos;
+}
+
+/** Whether a point stands in piece `i`, `pad` yards clear of its faces (the point in the
+ *  interior's own axes). */
 function inPiece(vol: CameraInterior, i: number, x: number, y: number, z: number, pad: number) {
   const b = vol.boxes[i];
   if (
@@ -141,11 +217,14 @@ function inPiece(vol: CameraInterior, i: number, x: number, y: number, z: number
 /** Whether a point stands in the air, `pad` yards clear of every face. */
 export function interiorContains(
   vol: CameraInterior,
-  x: number,
+  wx: number,
   y: number,
-  z: number,
+  wz: number,
   pad = 0,
 ): boolean {
+  pointToFrame(vol, wx, wz);
+  const x = frameX;
+  const z = frameZ;
   const u = vol.bounds;
   if (x < u[0] || x > u[1] || y < u[2] || y > u[3] || z < u[4] || z > u[5]) return false;
   for (let i = 0; i < vol.boxes.length; i++) if (inPiece(vol, i, x, y, z, pad)) return true;
@@ -157,7 +236,10 @@ export function interiorContains(
  * opening's (a body in the front doorway's thickness is still on the threshold: the camera
  * is left exactly as it is, and every blend in starts from nothing past the threshold).
  */
-export function interiorHoldsEye(vol: CameraInterior, x: number, y: number, z: number): boolean {
+export function interiorHoldsEye(vol: CameraInterior, wx: number, y: number, wz: number): boolean {
+  pointToFrame(vol, wx, wz);
+  const x = frameX;
+  const z = frameZ;
   const u = vol.bounds;
   if (x < u[0] || x > u[1] || y < u[2] || y > u[3] || z < u[4] || z > u[5]) return false;
   for (let i = 0; i < vol.boxes.length; i++) {
@@ -179,7 +261,8 @@ let slabExitSide = 1;
 const ROUND_FACE = 3;
 
 /** The segment's parameter interval inside one piece shrunk by `pad` (slab test, then the
- *  circle for a round piece), written to the scratch above; false when the line misses. */
+ *  circle for a round piece), written to the scratch above; false when the line misses. The
+ *  segment is in the piece's own axes (the interior's frame). */
 function slabPiece(
   b: InteriorBox,
   round: InteriorRound | null,
@@ -239,7 +322,8 @@ function slabPiece(
 }
 
 /** Where the last walk left the air: the box (-1 when it never did, or never started in
- *  it) and that box's face; `open` when that face is an opening's onto the world. */
+ *  it) and that box's face (its axis and side in the interior's own axes); `open` when that
+ *  face is an opening's onto the world. */
 export const interiorExit = { box: -1, axis: 0, side: 1, open: false };
 
 const EPS = 1e-6;
@@ -261,22 +345,27 @@ function exitIsOpening(vol: CameraInterior): boolean {
  * band into the box, never the other way. The exit is left in `interiorExit`. A segment that
  * leaves through an opening's face onto the world runs on past it by `through` (0 to 1) of
  * the rest: the whole of it at 1 (the camera may stand outside, seeing in through the
- * doorway), none at 0.
+ * doorway), none at 0. A turned interior walks the segment in its own frame: the fraction is
+ * the same in either.
  */
 export function interiorSegmentFraction(
   vol: CameraInterior,
-  ax: number,
+  wax: number,
   ay: number,
-  az: number,
-  bx: number,
+  waz: number,
+  wbx: number,
   by: number,
-  bz: number,
+  wbz: number,
   pad: number,
   through = 0,
 ): number {
-  const dx = bx - ax;
+  pointToFrame(vol, wax, waz);
+  const ax = frameX;
+  const az = frameZ;
+  pointToFrame(vol, wbx, wbz);
+  const dx = frameX - ax;
   const dy = by - ay;
-  const dz = bz - az;
+  const dz = frameZ - az;
   interiorExit.box = -1;
   interiorExit.open = false;
   let t = 0;
@@ -481,7 +570,8 @@ export function interiorEntryWeight(vol: CameraInterior, x: number, y: number, z
 /** The nearest opening to an eye, written by interiorEntryCap, interiorEntryWeight and
  *  interiorOpeningDepth: its box's top (world y), the eye's depth past its threshold (0 on the
  *  threshold and out), that depth along the opening's own axis alone, and how far the eye
- *  stands out to the side of the doorway (across the axis, the height aside). */
+ *  stands out to the side of the doorway (across the axis, the height aside); the axis and
+ *  side are the interior's own (its frame's, for a turned one). */
 export const interiorNearestOpening = {
   top: Infinity,
   depth: Infinity,
@@ -491,7 +581,10 @@ export const interiorNearestOpening = {
   side: 1,
 };
 
-function nearestOpening(vol: CameraInterior, x: number, y: number, z: number): void {
+function nearestOpening(vol: CameraInterior, wx: number, y: number, wz: number): void {
+  pointToFrame(vol, wx, wz);
+  const x = frameX;
+  const z = frameZ;
   let nearest = Infinity;
   let top = Infinity;
   let sill = 0;
@@ -599,7 +692,9 @@ export function interiorEntryCap(
   const rise = Math.max(0.2, top - pad - y);
   interiorEntryHold.rise = rise;
   const o = interiorNearestOpening;
-  const toward = o.side * (o.axis === 0 ? dx : o.axis === 1 ? dy : dz);
+  // the boom along the door's own axis (a turned interior's door is square to its frame)
+  directionToFrame(vol, dx, dz);
+  const toward = o.side * (o.axis === 0 ? frameX : o.axis === 1 ? dy : frameZ);
   const cos = behind > 1e-9 ? toward / behind : 0;
   const e =
     smoothstep01(
@@ -629,16 +724,20 @@ export const INTERIOR_LOOK_BLEND = 1.2;
  *  building rather than across it). */
 export function interiorSegmentTouches(
   vol: CameraInterior,
-  ax: number,
+  wax: number,
   ay: number,
-  az: number,
-  bx: number,
+  waz: number,
+  wbx: number,
   by: number,
-  bz: number,
+  wbz: number,
 ): boolean {
-  const dx = bx - ax;
+  pointToFrame(vol, wax, waz);
+  const ax = frameX;
+  const az = frameZ;
+  pointToFrame(vol, wbx, wbz);
+  const dx = frameX - ax;
   const dy = by - ay;
-  const dz = bz - az;
+  const dz = frameZ - az;
   for (let i = 0; i < vol.boxes.length; i++) {
     if (!slabPiece(vol.boxes[i], vol.rounds[i], 0, ax, ay, az, dx, dy, dz)) continue;
     if (slabEnter <= 1 && slabExit >= 0) return true;
@@ -831,7 +930,10 @@ function boomAlong(
  * slides under rather than pulling in. Then none when that boom is comfortable (or the
  * requested one is shorter than comfort anyway), else the first framing of INTERIOR_FRAMINGS
  * that gives a comfortable boom, trying first the side the camera already swings to (`side`,
- * so it never flips about a corner), else the longest. Written to interiorFramingChoice.
+ * so it never flips about a corner), else the longest. Written to interiorFramingChoice. A
+ * swing turns the boom about the vertical and a lift only changes its elevation, so both
+ * commute with a building's turn: a turned interior's choice is its unturned twin's (each
+ * probe walks in the interior's own frame).
  */
 export function chooseInteriorFraming(
   vol: CameraInterior,

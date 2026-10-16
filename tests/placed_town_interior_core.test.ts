@@ -14,8 +14,13 @@ import {
   type CameraInterior,
   interiorCameraPadding,
   interiorContains,
+  interiorEntryWeight,
+  interiorExit,
   interiorHoldsEye,
+  interiorSegmentFraction,
 } from '../src/render/interior_camera_core';
+import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
+import { createPlacedTownKit } from '../src/render/placed_town_buildings';
 import {
   type PlacedTownInteriorBuilding,
   placedTownCameraInterior,
@@ -101,11 +106,34 @@ describe('the air of a walk-in placed building', () => {
     const watch = BUILDINGS.find((building) => building.id === 'highwatch_watch_house');
     if (!watch) throw new Error('no watch house');
     expect(placedTownCameraInterior(watch, 9)).toBeNull();
-    // a record turned off the quarter turns gets none (the air is world axis-aligned)
+    // a quarter turn keeps its air in the world's axes, as it always has: no frame at all
     const inn = WALK_IN[0];
-    expect(
-      placedTownCameraInterior({ ...inn, placement: { ...inn.placement, rotation: 0.3 } }, 9),
-    ).toBeNull();
+    expect(airOf(inn)).not.toHaveProperty('frame');
+    // a record at any other turn gets its air in its own frame: the anchor its origin, the
+    // turn its yaw, the model's own pieces at the placed scale over its ground line, and its
+    // door the model's own (the front, local -z)
+    const p = { ...inn.placement, rotation: 0.3 };
+    const skew = placedTownCameraInterior({ ...inn, placement: p }, 9);
+    expect(skew?.id).toBe(`placed_town:${inn.id}`);
+    expect(skew?.framing).toBe('preserve-angle');
+    expect(skew?.frame).toEqual({
+      x: p.x,
+      z: p.z,
+      yaw: 0.3,
+      cos: Math.cos(0.3),
+      sin: Math.sin(0.3),
+    });
+    const s = p.scale;
+    const line = 9 + s + p.lift;
+    expect(skew?.boxes[0]).toEqual([
+      -11.0 * s,
+      12.15 * s,
+      line + 0.45 * s,
+      line + 5.0 * s,
+      -6.65 * s,
+      6.65 * s,
+    ]);
+    expect(skew?.openings).toEqual([{ box: 1, axis: 2, side: -1 }]);
   });
 
   it('opens at the door, a grand one, and holds the eye only past the threshold', () => {
@@ -242,6 +270,65 @@ describe('the placed-town view registers the air', () => {
     kit.buildFromSources(new Map(), () => 0, false);
     expect(ids()).toEqual([]);
   });
+
+  it('hands a turned building doors to its camera fade in its own frame', () => {
+    // the Eastbrook bank (225 degrees) stood alone by the shared placed-town view: with the lens
+    // out on the step behind a player who has just walked in, its sight line in through the
+    // door, the bank stays solid; a lens off along the front, looking through the wall beside
+    // the door, fades it
+    const bank = EASTBROOK_LAYOUT.buildings.find((building) => building.id === 'eastbrook_bank');
+    if (!bank) throw new Error('no Eastbrook bank');
+    setDitherFadeEnabledForTest(false);
+    try {
+      const kit = createPlacedTownKit({
+        town: 'eastbrook',
+        layoutId: 'turned_probe',
+        rootName: 'turnedProbe',
+        revealKey: 'turned-probe-static',
+        hub: { center: bank.position, radius: 20 },
+        buildings: [bank],
+        promotedBy: 'highwatchTown',
+      });
+      const source = new THREE.Group();
+      source.add(
+        new THREE.Mesh(
+          new THREE.BoxGeometry(6, 5, 4).translate(0, 1.5, 0),
+          new THREE.MeshBasicMaterial(),
+        ),
+      );
+      const view = kit.buildFromSources(new Map([[bank.assetId, source]]), () => 4, true);
+      const [air] = interiorCameraInternalsForTest.interiors();
+      expect(air.id).toBe(`placed_town:${bank.id}`);
+      expect(air.frame?.yaw).toBe(bank.placement.rotation);
+      const group = view.group.getObjectByName(`eastbrookBuilding:${bank.id}`);
+      if (!group) throw new Error('no bank group');
+      const opacities: number[] = [];
+      const drawn = () => {
+        opacities.length = 0;
+        group.traverse((child) => {
+          if (child instanceof THREE.Mesh)
+            opacities.push((child.material as THREE.Material).opacity);
+        });
+        return opacities;
+      };
+      const door = doorway(air);
+      const eyeY = door.box[2] + 2;
+      const inside = air.thresholds[0] + 0.5;
+      const eye = { x: door.x + door.inX * inside, z: door.z + door.inZ * inside };
+      expect(interiorHoldsEye(air, eye.x, eyeY, eye.z)).toBe(true);
+      const step = { x: door.x - door.inX * 6, z: door.z - door.inZ * 6 };
+      view.update(step.x, eyeY + 1.5, step.z, eye.x, eyeY, eye.z, 400, 0.05);
+      expect(drawn().length).toBeGreaterThan(0);
+      expect(drawn().every((opacity) => opacity === 1)).toBe(true);
+      // fifteen yards along the front from the step: the sight line crosses the front wall
+      // beyond the door's jamb
+      const aside = { x: step.x - door.inZ * 15, z: step.z + door.inX * 15 };
+      view.update(aside.x, eyeY + 1.5, aside.z, eye.x, eyeY, eye.z, 400, 0.05);
+      expect(drawn().every((opacity) => opacity < 1)).toBe(true);
+    } finally {
+      setDitherFadeEnabledForTest(null);
+    }
+  });
 });
 
 /** Whether a baked wall's footprint holds the world point (x, z). */
@@ -256,20 +343,42 @@ function wallHolds(c: Collider, x: number, y: number, z: number): boolean {
   return footprintHolds(c, x, z) && y >= (c.baseY ?? -Infinity) && y <= (c.moveTopY ?? Infinity);
 }
 
-/** An opening's box, the middle of its outside face and the way in (a unit step, world). */
+/** A point (x, z) of an interior's own axes, its boxes', in the world: as it is for air in the
+ *  world's axes, through the frame for a building at any other turn. */
+function airPoint(air: CameraInterior, x: number, z: number): { x: number; z: number } {
+  const f = air.frame;
+  return f ? localToWorld(f, f.yaw, x, z) : { x, z };
+}
+
+/** A world point (x, z) in an interior's own axes. */
+function airLocal(air: CameraInterior, x: number, z: number): { x: number; z: number } {
+  const f = air.frame;
+  return f ? rotY(x - f.x, z - f.z, -f.yaw) : { x, z };
+}
+
+/** An opening's box (in the interior's own axes), the middle of its outside face and the way
+ *  in (a unit step), both in the world, and `point`: the world point `into` yards in from that
+ *  face and `at` across the doorway (along the box's own `across` axis). */
 function doorway(air: CameraInterior, index = 0) {
   const o = air.openings[index];
   const box = air.boxes[o.box];
   const across = o.axis === 0 ? 2 : 0;
   const face = o.side > 0 ? box[o.axis * 2 + 1] : box[o.axis * 2];
   const mid = (box[across * 2] + box[across * 2 + 1]) / 2;
+  const inX = o.axis === 0 ? -o.side : 0;
+  const inZ = o.axis === 2 ? -o.side : 0;
+  const point = (at: number, into: number) =>
+    airPoint(air, o.axis === 0 ? face + inX * into : at, o.axis === 2 ? face + inZ * into : at);
+  const centre = point(mid, 0);
+  const inward = air.frame ? localToWorld({ x: 0, z: 0 }, air.frame.yaw, inX, inZ) : null;
   return {
     box,
     across,
-    x: o.axis === 0 ? face : mid,
-    z: o.axis === 2 ? face : mid,
-    inX: o.axis === 0 ? -o.side : 0,
-    inZ: o.axis === 2 ? -o.side : 0,
+    x: centre.x,
+    z: centre.z,
+    inX: inward ? inward.x : inX,
+    inZ: inward ? inward.z : inZ,
+    point,
   };
 }
 
@@ -288,9 +397,17 @@ describe('the authored air against each model baked collision', () => {
     manor: 51.248,
   };
   // the sizes the towns stand the models at (authored size, and the grand towns' 1.2 to 1.5),
-  // at every quarter turn
+  // at every quarter turn (air in the world's axes) and at two of the free turns Eastbrook
+  // stands its buildings at (the smithy's 20 degrees, the bank's 225: air in its own frame)
   const SCALES = [1, 1.3, 1.5];
-  const TURNS = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
+  const TURNS = [
+    0,
+    Math.PI / 2,
+    Math.PI,
+    -Math.PI / 2,
+    (20 * Math.PI) / 180,
+    (225 * Math.PI) / 180,
+  ];
   /** The ground under a probe building's anchor. */
   const GROUND = 7.25;
   /** The tall pieces a room's air is cut round, each named by a point inside its baked box at
@@ -376,7 +493,8 @@ describe('the authored air against each model baked collision', () => {
       const { air, walls, deckAt } = stand(name, scale, turn);
       const room = air.boxes[0];
       // the room's floor is the deck the sim walks under its middle
-      const middle = deckAt((room[0] + room[1]) / 2, (room[4] + room[5]) / 2);
+      const centre = airPoint(air, (room[0] + room[1]) / 2, (room[4] + room[5]) / 2);
+      const middle = deckAt(centre.x, centre.z);
       expect(Math.abs(middle - room[2]), at).toBeLessThan(0.01);
       for (let index = 0; index < air.openings.length; index++) {
         const door = doorway(air, index);
@@ -385,10 +503,7 @@ describe('the authored air against each model baked collision', () => {
         // a hand into the wall from the doorway's outside face (a tenth of a yard out from
         // the wall's own, at authored size)
         const into = 0.3 * scale;
-        const point = (across: number) =>
-          door.across === 0
-            ? { x: across, z: door.z + door.inZ * into }
-            : { x: door.x + door.inX * into, z: across };
+        const point = (across: number) => door.point(across, into);
         const lo = box[door.across * 2];
         const hi = box[door.across * 2 + 1];
         const mid = point((lo + hi) / 2);
@@ -428,19 +543,22 @@ describe('the authored air against each model baked collision', () => {
         expect(solid.length, `${at}: ${what} is baked`).toBeGreaterThan(0);
         for (const c of solid) {
           if (c.type !== 'obb') continue;
-          const cos = Math.abs(Math.cos(c.rot));
-          const sin = Math.abs(Math.sin(c.rot));
+          // the baked box in the air's own axes (as it is for air in the world's)
+          const centre = airLocal(air, c.x, c.z);
+          const rot = c.rot - (air.frame?.yaw ?? 0);
+          const cos = Math.abs(Math.cos(rot));
+          const sin = Math.abs(Math.sin(rot));
           const ex = c.hw * cos + c.hd * sin;
           const ez = c.hw * sin + c.hd * cos;
           const [y0, y1] = [c.baseY ?? -Infinity, c.moveTopY ?? Infinity];
           for (const piece of air.boxes) {
             const overlaps =
-              piece[0] < c.x + ex &&
-              piece[1] > c.x - ex &&
+              piece[0] < centre.x + ex &&
+              piece[1] > centre.x - ex &&
               piece[2] < y1 &&
               piece[3] > y0 &&
-              piece[4] < c.z + ez &&
-              piece[5] > c.z - ez;
+              piece[4] < centre.z + ez &&
+              piece[5] > centre.z - ez;
             expect(overlaps, `${at}: the air stands clear of ${what}`).toBe(false);
           }
         }
@@ -531,7 +649,7 @@ describe('every walk-in painted building of the built-in towns', () => {
       const at = `${town}: ${building.id}`;
       const air = townAir(building);
       const room = air.boxes[0];
-      const middle = { x: (room[0] + room[1]) / 2, z: (room[4] + room[5]) / 2 };
+      const middle = airPoint(air, (room[0] + room[1]) / 2, (room[4] + room[5]) / 2);
       expect(
         Math.abs(placementRampFloorAt(content, WORLD_SEED, middle.x, middle.z) - room[2]),
         at,
@@ -595,6 +713,175 @@ describe('every walk-in painted building of the built-in towns', () => {
       expect(interiorLensInAir(), at).toBe(true);
       const c = camera.position;
       expect(interiorContains(air, c.x, c.y, c.z), at).toBe(true);
+    }
+  });
+});
+
+describe('a walk-in painted building at any turn', () => {
+  // Every painted model stood at a free turn (the Eastbrook smithy's 20 degrees, the bank's
+  // 225) keeps the air its unturned twin has, carried round its anchor: rooms square to its
+  // own walls, doors where its doors are, and the real clamp walks a player in through its
+  // front door exactly as through the twin's.
+  const TURNS = [(20 * Math.PI) / 180, (225 * Math.PI) / 180];
+  const ANCHOR = { x: -61.99, z: -118.33 };
+  const GROUND = 4.4;
+  const SCALE = 1.3;
+
+  function standAt(name: string, rotation: number): CameraInterior {
+    const air = placedTownCameraInterior(
+      {
+        id: `turned_${name}`,
+        assetId:
+          name === 'manor'
+            ? '/models/tidehold/highwatch/manor.glb'
+            : `/models/tidehold/${name}.glb`,
+        walkIn: true,
+        placement: { x: ANCHOR.x, z: ANCHOR.z, rotation, scale: SCALE, lift: -(SCALE + 0.05) },
+      },
+      GROUND,
+    );
+    if (!air) throw new Error(`no air for ${name}`);
+    return air;
+  }
+
+  /** Where the building turned `rotation` stands the world point (x, z) of its unturned twin. */
+  const turnedPoint = (rotation: number, x: number, z: number) =>
+    localToWorld(ANCHOR, rotation, x - ANCHOR.x, z - ANCHOR.z);
+  /** The world point (x, z) of the turned building back where its unturned twin has it. */
+  const untwisted = (rotation: number, x: number, z: number) => {
+    const local = rotY(x - ANCHOR.x, z - ANCHOR.z, -rotation);
+    return { x: ANCHOR.x + local.x, z: ANCHOR.z + local.z };
+  };
+
+  it('reads every point and sight line of the turned air as its twin reads the one it came from', () => {
+    for (const name of placedTownInteriorModels()) {
+      const flat = standAt(name, 0);
+      // the unturned twin is in the world's axes, as every quarter turn is
+      expect(flat).not.toHaveProperty('frame');
+      const u = flat.bounds;
+      for (const rotation of TURNS) {
+        const air = standAt(name, rotation);
+        expect(air.frame?.yaw, name).toBe(rotation);
+        let held = 0;
+        let out = 0;
+        let stopped = 0;
+        for (let x = u[0] - 2.13; x <= u[1] + 2; x += 1.1) {
+          for (let z = u[4] - 2.71; z <= u[5] + 2; z += 0.9) {
+            for (const rise of [1.37, 3.9]) {
+              const y = u[2] + rise;
+              const p = turnedPoint(rotation, x, z);
+              const at = `${name} turned ${rotation}: ${x}, ${y}, ${z}`;
+              const inside = interiorContains(flat, x, y, z);
+              expect(interiorContains(air, p.x, y, p.z), at).toBe(inside);
+              expect(interiorHoldsEye(air, p.x, y, p.z), at).toBe(interiorHoldsEye(flat, x, y, z));
+              expect(interiorEntryWeight(air, p.x, y, p.z), at).toBeCloseTo(
+                interiorEntryWeight(flat, x, y, z),
+                9,
+              );
+              if (!inside) {
+                out++;
+                continue;
+              }
+              held++;
+              // a sight line out of the building from here, toward each side and the door
+              for (const [fx, fz] of [
+                [x + 31, z + 3.7],
+                [x - 4.3, z - 29],
+                [x + 2.9, z + 33],
+              ]) {
+                const flatWalk = interiorSegmentFraction(flat, x, y, z, fx, y + 1.1, fz, 0.4, 1);
+                const exit = { ...interiorExit };
+                const f = turnedPoint(rotation, fx, fz);
+                const walk = interiorSegmentFraction(air, p.x, y, p.z, f.x, y + 1.1, f.z, 0.4, 1);
+                expect(walk, at).toBeCloseTo(flatWalk, 9);
+                expect({ ...interiorExit }, at).toEqual(exit);
+                if (flatWalk < 1) stopped++;
+              }
+            }
+          }
+        }
+        expect(held, name).toBeGreaterThan(20);
+        expect(out, name).toBeGreaterThan(20);
+        expect(stopped, name).toBeGreaterThan(20);
+      }
+    }
+  });
+
+  it('walks a player in through each door at a free turn, the camera following and keeping inside', () => {
+    // every opening: the front doors (along each model's own z) and the smithy's side arch onto
+    // its forge shelter (along its own x)
+    const doors = placedTownInteriorModels().flatMap((name) =>
+      standAt(name, 0).openings.map((_, index) => ({ name, index })),
+    );
+    expect(doors.length).toBeGreaterThan(placedTownInteriorModels().length);
+    for (const { name, index } of doors) {
+      const flat = standAt(name, 0);
+      // the walk in through the twin's door (world axes), its feet on the door's floor
+      const door = doorway(flat, index);
+      const floor = door.box[2];
+      const start = { x: door.x - door.inX * 8, z: door.z - door.inZ * 8 };
+      const depth = flat.thresholds[index] + 3.5;
+      const end = { x: door.x + door.inX * depth, z: door.z + door.inZ * depth };
+      const steps = 240;
+      const pitch = 0.45;
+      const dist = 12;
+      const poses: [THREE.Vector3, THREE.Vector3][] = [];
+      for (let i = 0; i <= steps + 120; i++) {
+        const t = Math.min(1, i / steps);
+        const x = start.x + (end.x - start.x) * t;
+        const z = start.z + (end.z - start.z) * t;
+        // the chase camera behind the player, along the way in
+        poses.push([
+          new THREE.Vector3(x, floor, z),
+          new THREE.Vector3(
+            x - door.inX * Math.cos(pitch) * dist,
+            floor + 2 + Math.sin(pitch) * dist,
+            z - door.inZ * Math.cos(pitch) * dist,
+          ),
+        ]);
+      }
+      /** The walk over `vol` turned `rotation` (0: the twin as it is): per frame, the drawn
+       *  camera where the twin has it, and whether the eye is indoors and the lens in the air. */
+      const walk = (vol: CameraInterior, rotation: number) => {
+        interiorCameraInternalsForTest.reset();
+        registerCameraInterior(vol);
+        const camera = new THREE.PerspectiveCamera(70, 16 / 9, 0.2, 950);
+        return poses.map(([feet, want]) => {
+          const f = turnedPoint(rotation, feet.x, feet.z);
+          const c = turnedPoint(rotation, want.x, want.z);
+          const self = new THREE.Vector3(f.x, feet.y, f.z);
+          const look = new THREE.Vector3(f.x, feet.y + 2, f.z);
+          camera.position.set(c.x, want.y, c.z);
+          clampChaseCameraToInterior(camera, look, self, 1 / 60, false);
+          const p = camera.position;
+          const back = untwisted(rotation, p.x, p.z);
+          return {
+            at: new THREE.Vector3(back.x, p.y, back.z),
+            indoors: activeCameraInterior()?.id === vol.id,
+            inAir: interiorLensInAir(),
+            contained: interiorContains(vol, p.x, p.y, p.z),
+          };
+        });
+      };
+      const twin = walk(flat, 0);
+      for (const rotation of TURNS) {
+        const at = `${name} door ${index} turned ${rotation}`;
+        const air = standAt(name, rotation);
+        const frames = walk(air, rotation);
+        expect(frames.filter((f) => f.indoors).length, at).toBeGreaterThan(60);
+        // standing inside, the lens has come in to the turned room's air
+        const last = frames[frames.length - 1];
+        expect([last.indoors, last.inAir, last.contained], at).toEqual([true, true, true]);
+        // and every frame of the way in drew the camera where the twin's walk drew it
+        for (const [i, f] of frames.entries()) {
+          expect(f.at.distanceTo(twin[i].at), `${at}, frame ${i}`).toBeLessThan(1e-6);
+          expect([f.indoors, f.inAir, f.contained], `${at}, frame ${i}`).toEqual([
+            twin[i].indoors,
+            twin[i].inAir,
+            twin[i].contained,
+          ]);
+        }
+      }
     }
   });
 });
