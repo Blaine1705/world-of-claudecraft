@@ -27,7 +27,7 @@
 // reduced-motion switch) from the mist's onBeforeRender.
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
-import { DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
 import { HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID } from '../sim/hollow_crypt_entrance';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -643,7 +643,7 @@ function spiritSprites(tier: CryptEffectsTier): THREE.InstancedMesh {
 
 /** Build the Fallen Chapel (world coordinates). */
 export function buildHollowCryptEntrance(seed: number): HollowCryptEntranceView {
-  const door = DUNGEONS[HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID].doorPos;
+  const door = activeDungeonDoorPos(DUNGEONS[HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID]);
   const base = terrainHeight(door.x, door.z, seed);
   const group = new THREE.Group();
   group.name = 'hollowCryptEntrance';

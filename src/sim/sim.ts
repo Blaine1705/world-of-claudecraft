@@ -68,6 +68,7 @@ import * as vehicleMod from './vehicles';
 export type { CharacterState, PetState } from './character_state';
 
 import { type AccountEarner, type AccountLedger, freshAccountLedger } from './account_ledger';
+import { spawnBuiltWorldKeepers } from './built_world_keepers';
 import { campPrivateRng } from './camp_private_rng';
 import { buildCivicServicePlacements } from './civic_service_placements';
 import * as clueMod from './clue_scrolls';
@@ -223,7 +224,6 @@ import {
   ABILITIES,
   ALL_RECIPES,
   arenaOrigin,
-  authoredMapActive,
   CLASSES,
   DELVE_COMPANIONS,
   DELVE_LIST,
@@ -292,7 +292,7 @@ import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import { spawnHealingTrainingGround } from './healing_training';
-import { spawnHubPractice } from './hub_practice';
+import { spawnDevHealerPracticeDummy, spawnHubPractice } from './hub_practice';
 import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import * as inventoryConsumption from './inventory_consumption';
@@ -427,6 +427,7 @@ import {
   mountTrainBegin as mountTrainBeginImpl,
   tickMountTraining as tickMountTrainingImpl,
 } from './mounts_training';
+import { farmPatchesFor } from './moved_objects';
 import { savedGearFor } from './muster_pike';
 import * as nythraxisReadouts from './nythraxis_raid_readouts';
 import {
@@ -644,7 +645,7 @@ import {
   switchTalentLoadout,
   talentPointBudget,
 } from './progression/talents';
-import { prestige as prestigeImpl, updateRested } from './progression/xp';
+import { isResting, prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
 import * as hillMod from './pvp/hill';
@@ -677,6 +678,7 @@ import type { ResolvedAbility } from './resolved_ability';
 import { freshCounters, type RewardCounters } from './reward_counters';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
+import * as seatingMod from './seating';
 import { persistedResource } from './serialize_resource';
 import { computeCharacterModifiers } from './set_bonus_mods';
 import {
@@ -720,7 +722,6 @@ import {
   WORLD_BOSSES,
 } from './world_boss';
 import { spawnDevBoss, spawnWorldBoss } from './world_boss_spawn';
-import { spawnHarborHouseKeeper } from './wyrmwatch_harbor_house';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -848,6 +849,7 @@ import { PartyMachine } from './social/party';
 import * as pullTimerMod from './social/pull_timer';
 import * as readyCheckMod from './social/ready_check';
 import { SpatialGrid } from './spatial';
+import { spawnProbeStandsOnFloor } from './spawn_footing';
 import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
 import { addThreat, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
@@ -886,7 +888,6 @@ import {
   type InvSlot,
   type ItemInstancePayload,
   type ItemUseResult,
-  isConsuming,
   isDungeonDifficulty,
   isEquipSlot,
   isNonSpellCast,
@@ -2287,7 +2288,7 @@ export class Sim {
       resolvedAbility: (abilityId, pid) => this.resolvedAbility(abilityId, pid),
       platform: (p) => ferryMod.ferryDeckPlatform(this.ctx, p), // a sailing ship's deck
       cancelCast: (p) => this.cancelCast(p),
-      standUp: (p) => this.standUp(p),
+      standUp: (p) => seatingMod.standUp(this.ctx, p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
         const wasAlive = !target.dead;
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
@@ -2406,13 +2407,17 @@ export class Sim {
         // Pure geometry on the already-rolled point: it draws no rng, so the spawn
         // loop's own draw order is untouched (mob positions do shift, which moves
         // their later idle-wander draws, but that is downstream in the drive phase).
-        const cleared = projectOutsideDungeonDoors(camp.center.x + off.x, camp.center.z + off.z);
+        const cleared = projectOutsideDungeonDoors(
+          camp.center.x + off.x,
+          camp.center.z + off.z,
+          worldContent.objectMoves,
+        );
         // findSafePos's inward spiral can walk a shore-side ring-edge point back
         // toward land, i.e. back INTO the ring; re-project the safe point so the
         // "never inside a door ring" guarantee holds for every seed, not just the
         // shipped one. Still pure and rng-free.
         const grounded = this.findSafePos(cleared.x, cleared.z, minHeight);
-        const safe = projectOutsideDungeonDoors(grounded.x, grounded.z);
+        const safe = projectOutsideDungeonDoors(grounded.x, grounded.z, worldContent.objectMoves);
         const pos = this.groundPos(safe.x, safe.z);
         const level = campRng.int(template.minLevel, template.maxLevel);
         const mob = spawnOpenWorldMob(this.nextId++, template, level, pos);
@@ -2543,7 +2548,7 @@ export class Sim {
     }
 
     spawnRealmBuilderMonument(this.ctx, this.worldContent.props);
-    if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
+    if (cfg.noPlayer && this.devCommands) spawnDevHealerPracticeDummy(this.ctx);
 
     if (!cfg.noPlayer) {
       this.ownPlayerPid = this.addPlayer(this.cfg.playerClass, this.cfg.playerName, {
@@ -2571,23 +2576,11 @@ export class Sim {
       }
     }
 
-    // Escorts, the practice yards, the harbormaster: rng-free, trailing or reserved ids.
+    // Escorts, the practice yards, the built world's keepers: rng-free, trailing or reserved ids.
     initEscortsImpl(this.ctx);
     spawnHubPractice(this.ctx, worldContent);
     spawnHealingTrainingGround(this.ctx, worldContent);
-    spawnHarborHouseKeeper(this.ctx, worldContent);
-  }
-
-  private spawnHealerPracticeDummy(): void {
-    const pos = this.groundPos(-34, 648);
-    const dummy = createMob(this.nextId++, MOBS.training_dummy, 20, pos);
-    dummy.name = 'Healing Dummy';
-    dummy.color = 0x74c476;
-    dummy.hostile = false;
-    dummy.friendlyPracticeTarget = true;
-    dummy.facing = 0;
-    dummy.prevFacing = 0;
-    this.addEntity(dummy);
+    spawnBuiltWorldKeepers(this.ctx, worldContent);
   }
 
   private lockoutNowMs(): number {
@@ -4568,6 +4561,9 @@ export class Sim {
   get restedXp(): number {
     return this.primary.restedXp;
   }
+  get resting(): boolean {
+    return isResting(this.player);
+  }
   // IWorldProgressionXp.playtimeSeconds: the running lifetime played total
   // (persisted baseline + this session's elapsed sim time), the same figure
   // /playtime reports and serializeCharacter folds at save. Sim-clock derived,
@@ -4897,8 +4893,8 @@ export class Sim {
       // height-blind resolve walls every overhead slab (an upper storey, a
       // roof, a balcony), so every NPC authored indoors was shoved out into
       // the street (the Gilded Gull's innkeeper spawned 5 yd from his bar,
-      // the town shops' keepers behind the back wall). Authored maps only: the
-      // built-in world keeps its height-blind resolve, so its spawns never move.
+      // the town shops' keepers behind the back wall). Authored maps and the
+      // built-in walk-in town buildings only (spawn_footing.ts).
       const res = resolvePosition(
         seed,
         px,
@@ -4906,7 +4902,7 @@ export class Sim {
         bodyRadius,
         false,
         undefined,
-        authoredMapActive() ? { y: this.groundPos(px, pz).y, lift: 0 } : undefined,
+        spawnProbeStandsOnFloor(px, pz) ? { y: this.groundPos(px, pz).y, lift: 0 } : undefined,
         this.riftCollisionToken,
       );
       return Math.abs(res.x - px) < 1e-4 && Math.abs(res.z - pz) < 1e-4;
@@ -4991,6 +4987,9 @@ export class Sim {
       },
       get stationPlacements() {
         return sim.stationPlacements;
+      },
+      get objectMoves() {
+        return sim.worldContent.objectMoves;
       },
       get primaryId() {
         return sim.primaryId;
@@ -5646,7 +5645,7 @@ export class Sim {
       lineOfSightBlocked: sim.lineOfSightBlocked.bind(sim),
       stopFollow: sim.stopFollow.bind(sim),
       tameError: sim.tameError.bind(sim),
-      standUp: sim.standUp.bind(sim),
+      standUp: (p) => seatingMod.standUp(sim.ctx, p),
       breakGhostWolf: sim.breakGhostWolf.bind(sim),
       forceDismount: sim.forceDismountPlayer.bind(sim),
       startAutoAttack: sim.startAutoAttack.bind(sim),
@@ -6493,7 +6492,7 @@ export class Sim {
     };
     if (!target || target.dead || p.chargeTimeLeft <= 0 || isRooted(p)) return done(false);
     if (dist2d(p.pos, target.pos) <= CHARGE_ARRIVE_RANGE) return done(true);
-    if (p.sitting) this.standUp(p);
+    if (p.sitting) seatingMod.standUp(this.ctx, p);
     // re-route when the target has run well away from where the path ends
     const pathEnd = p.chargePath[p.chargePath.length - 1];
     if (!pathEnd || dist2d(pathEnd, target.pos) > 4) p.chargePath = this.findChargePath(p, target);
@@ -6603,15 +6602,6 @@ export class Sim {
     // (moveSpeedMult, resolveMove, cancelCast/standUp/dealDamage), preserving rng order.
     stepPlayerMotion(this.playerMotionDeps, p, meta.moveInput);
     unstuckMod.noteBattlegroundWallPressure(this.ctx, meta, p);
-  }
-
-  private standUp(p: Entity): void {
-    p.sitting = false;
-    if (isConsuming(p)) {
-      p.eating = null;
-      p.drinking = null;
-      this.emit({ type: 'log', text: 'You stand up.', color: '#999', pid: p.id });
-    }
   }
 
   // -------------------------------------------------------------------------
@@ -7415,6 +7405,9 @@ export class Sim {
   // abilities untouched — strictly cosmetic, zero power change (FR-6.1/6.3).
   prestige(pid?: number): boolean {
     return prestigeImpl(this.ctx, pid);
+  }
+  sitOnSeat(seatId: string, pid?: number): void {
+    seatingMod.sitOnSeat(this.ctx, seatId, pid);
   }
 
   // L1 loot distribution (party-loot strategy, rollLoot, copper split, need-greed
@@ -11471,9 +11464,9 @@ export class Sim {
     return this.toolEffectSlotsFor(this.primaryId);
   }
 
-  // Static garden-bed geography (content/farm_patches.ts), by shared readonly reference.
+  // Garden beds with this world's moved beds (sim/moved_objects.ts), by shared reference.
   get farmPatches(): readonly FarmPatchDef[] {
-    return FARM_PATCHES;
+    return farmPatchesFor(this.worldContent.objectMoves, FARM_PATCHES);
   }
 
   // The viewer's farm plots, projected for the seam: explicit pid (the

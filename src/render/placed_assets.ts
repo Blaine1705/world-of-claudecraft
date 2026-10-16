@@ -30,6 +30,7 @@ import {
   TREE_PATH,
   WATERFALL_PATH,
 } from '../sim/map_doc';
+import { cloneMaterialFinishes } from '../sim/material_finishes';
 import type { AssetFireEmitter, PlacedAsset } from '../sim/types';
 import { cloneWallFinishes } from '../sim/wall_finishes';
 import { terrainHeight } from '../sim/world';
@@ -50,6 +51,7 @@ import {
 } from './grass_patch';
 import { type InteriorSpec, interiorSpecFor, revealState } from './interior_reveal';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { applyMaterialFinishes, type MaterialSlot, materialSlots } from './material_finishes';
 import { mergeStaticMeshes } from './mesh_merge';
 import { buildModelMesh } from './model_gen';
 import {
@@ -68,6 +70,7 @@ import { placedTextureTierPath } from './placed_texture_tier_core';
 import { adoptDynamicBudgetLight } from './point_light_budget';
 import { buildRockChainModel, buildRockModel, rockSeed } from './rock_gen';
 import { refreshFrozenWorldMatrix } from './static_matrix';
+import { townStyledPlacedTemplate } from './town_styled_placed_assets';
 import { type TreeBuild, treeSeed } from './tree_gen';
 import {
   LEAF_KIND_MUL,
@@ -564,6 +567,7 @@ interface Entry {
   // clones the shared template materials ONCE so overrides never leak).
   ownMats: THREE.Material[] | null;
   wallFinishView: WallFinishView | null;
+  materialFinishView: WallFinishView | null;
   // Animated fire effect (placement.fire): flame mesh + ember glow.
   fireFx: THREE.Group | null;
   // Distance-culled this frame (model kept, just hidden).
@@ -1130,6 +1134,15 @@ export class PlacedAssetsView {
     return { sizeX: size.x * info.norm, sizeZ: size.z * info.norm, sizeY: size.y * info.norm };
   }
 
+  /** Read-only cached template for bounded editor previews (the pick
+   *  outline). Callers only measure it: never mutate or dispose the source. */
+  async assetPreviewTemplate(
+    path: string,
+  ): Promise<Readonly<{ object: THREE.Object3D; norm: number; minY: number }> | null> {
+    const info = await this.template(path);
+    return info ? { object: info.object, norm: info.norm, minY: info.minY } : null;
+  }
+
   /** Insert (or replace) the placement rendered at this editor index. */
   addPlacement(index: number, placedAsset: PlacedAsset, preload = false): void {
     this.removePlacement(index);
@@ -1142,6 +1155,7 @@ export class PlacedAssetsView {
       footprint: null,
       ownMats: null,
       wallFinishView: null,
+      materialFinishView: null,
       fireFx: null,
       lodHidden: false,
       fireHidden: false,
@@ -1447,6 +1461,24 @@ export class PlacedAssetsView {
     if (preload) registerPreload(task);
   }
 
+  /** The material slots of a placed model (null when nothing is placed at
+   *  that index, empty while its GLB is still loading). A batched entry's
+   *  proxy has no meshes, so its slots come from the merged template its
+   *  clone is struck from once a finish un-batches it. That re-instance
+   *  briefly leaves no model: the already-merged template answers then. */
+  materialSlots(index: number): MaterialSlot[] | null {
+    const entry = this.entries.get(index);
+    if (!entry) return null;
+    if (!entry.model) {
+      const merged = this.mergedTemplates.get(entry.placement.path);
+      return merged ? materialSlots(merged) : [];
+    }
+    if (entry.batched && entry.info) {
+      return materialSlots(this.mergedTemplate(entry.placement.path, entry.info.object));
+    }
+    return materialSlots(entry.model);
+  }
+
   /** Move/rotate/rescale the placement at `index` (fields left undefined keep).
    *  `collideRadius` is the EFFECTIVE footprint radius (0 or less = none), so
    *  the editor's collide/radius edits repaint the ring without a rebuild. */
@@ -1472,6 +1504,7 @@ export class PlacedAssetsView {
       glow?: number | null;
       glowStrength?: number | null;
       wallFinishes?: PlacedAsset['wallFinishes'] | null;
+      materialFinishes?: PlacedAsset['materialFinishes'] | null;
       fire?: boolean | null;
       fireEffects?: readonly AssetFireEmitter[] | null;
       collideCustom?: boolean;
@@ -1501,6 +1534,10 @@ export class PlacedAssetsView {
     let matsTouched = false;
     if (change.wallFinishes !== undefined) {
       p.wallFinishes = cloneWallFinishes(change.wallFinishes ?? undefined);
+      matsTouched = true;
+    }
+    if (change.materialFinishes !== undefined) {
+      p.materialFinishes = cloneMaterialFinishes(change.materialFinishes ?? undefined);
       matsTouched = true;
     }
     for (const key of ['tint', 'opacity', 'glow', 'glowStrength'] as const) {
@@ -1603,6 +1640,7 @@ export class PlacedAssetsView {
         if ((o as THREE.Sprite).isSprite) (o as THREE.Sprite).material.dispose();
       });
     }
+    entry.materialFinishView?.dispose();
     entry.wallFinishView?.dispose();
     if (entry.ownMats) for (const m of entry.ownMats) m.dispose();
     this.dropFireFx(entry);
@@ -1931,26 +1969,31 @@ export class PlacedAssetsView {
       const file = placedTextureTierPath(path, GFX.placedTextureTier, mediaAssetExists);
       cached = loadGltf(file, () => this.streamPriority(path))
         .then((gltf) => {
-          const object = gltf.scene;
+          // An authored town's own model draws in its town's look (its own
+          // clones of the town's materials, render/town_styled_placed_assets.ts),
+          // whose emissive response is already the town's: no lift below.
+          const townStyled = townStyledPlacedTemplate(path, gltf.scene);
+          const object = townStyled ?? gltf.scene;
           // Weakly authored emissive channels never cross the bloom threshold;
           // lift them once on the shared template so "glowy" GLB materials
           // actually glow (clones inherit it).
-          object.traverse((o) => {
-            const mesh = o as THREE.Mesh;
-            if (!mesh.isMesh) return;
-            const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-            for (const raw of mats) {
-              const m = raw as THREE.MeshStandardMaterial;
-              if (
-                m.emissive &&
-                (m.emissive.r > 0 || m.emissive.g > 0 || m.emissive.b > 0) &&
-                m.emissiveIntensity > 0 &&
-                m.emissiveIntensity < MIN_NATIVE_EMISSIVE_INTENSITY
-              ) {
-                m.emissiveIntensity = MIN_NATIVE_EMISSIVE_INTENSITY;
+          if (!townStyled)
+            object.traverse((o) => {
+              const mesh = o as THREE.Mesh;
+              if (!mesh.isMesh) return;
+              const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+              for (const raw of mats) {
+                const m = raw as THREE.MeshStandardMaterial;
+                if (
+                  m.emissive &&
+                  (m.emissive.r > 0 || m.emissive.g > 0 || m.emissive.b > 0) &&
+                  m.emissiveIntensity > 0 &&
+                  m.emissiveIntensity < MIN_NATIVE_EMISSIVE_INTENSITY
+                ) {
+                  m.emissiveIntensity = MIN_NATIVE_EMISSIVE_INTENSITY;
+                }
               }
-            }
-          });
+            });
           const box = new THREE.Box3().setFromObject(object);
           const size = new THREE.Vector3();
           box.getSize(size);
@@ -1990,6 +2033,8 @@ export class PlacedAssetsView {
   private applyMaterialOverride(entry: Entry): void {
     // Restore the ordinary clones before updating tint/glow, then install the
     // finish last so a later appearance edit never drops its shader hooks.
+    entry.materialFinishView?.dispose();
+    entry.materialFinishView = null;
     entry.wallFinishView?.dispose();
     entry.wallFinishView = null;
     const model = entry.model;
@@ -2005,7 +2050,8 @@ export class PlacedAssetsView {
       p.opacity !== undefined ||
       p.glow !== undefined ||
       p.glowStrength !== undefined ||
-      p.wallFinishes !== undefined;
+      p.wallFinishes !== undefined ||
+      p.materialFinishes !== undefined;
     if (!has && !entry.ownMats) return;
     if (!entry.ownMats) {
       const clones: THREE.Material[] = [];
@@ -2085,6 +2131,16 @@ export class PlacedAssetsView {
         this.prepareModel,
         p.tint,
         p.building?.wallAxis,
+      );
+    }
+    if (p.materialFinishes) {
+      // Chained behind the wall finishes, so it clones what the mesh ends up with.
+      entry.materialFinishView = applyMaterialFinishes(
+        model,
+        p.materialFinishes,
+        this.prepareModel,
+        p.tint,
+        entry.wallFinishView?.ready,
       );
     }
   }

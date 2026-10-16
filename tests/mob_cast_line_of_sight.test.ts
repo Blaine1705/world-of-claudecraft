@@ -663,23 +663,30 @@ describe('the hold and the leash still rule a caster no route reaches', () => {
 
 // The same sight rule in the open world, on a world caster (Corrupted Priest
 // Malric's Mindfracture, an instant petSpell) with one of the world's own
-// props between him and his target: on this seed something solid stands on the
-// x axis 5 yd east of the origin. Out here no route is planned (chase_route.ts
-// keeps routes to instances): he closes straight, the slide fan rounds the
-// prop, and the leash and the stall are what they always were.
+// props between him and his target: on this seed a tree stands 5 yd east of the
+// player's spot (the prop 5 yd east of the origin is gone since #4525 moved
+// Eastbrook, so the pair moved to the tree at (27, -13)). Out here no route is
+// planned (chase_route.ts keeps routes to instances): he closes straight, the
+// slide fan rounds the prop, and the leash and the stall are what they always were.
 describe('in the open world', () => {
   const WORLD_SEED_WITH_PROP = 7788;
+  const SPOT = { x: 22, z: -13 };
 
   function field(dist: number): { sim: Sim; player: Entity; caster: Entity } {
     const sim = new Sim({ seed: WORLD_SEED_WITH_PROP, playerClass: 'warrior' });
     const player = sim.player;
-    player.pos = sim.ctx.groundPos(0, 0);
+    player.pos = sim.ctx.groundPos(SPOT.x, SPOT.z);
     player.prevPos = { ...player.pos };
     player.maxHp = 1e7;
     player.hp = 1e7;
     sim.ctx.rebucket(player);
     const template = MOBS.corrupted_priest_malric;
-    const caster = createMob(sim.ctx.nextId++, template, 5, sim.ctx.groundPos(dist, 0));
+    const caster = createMob(
+      sim.ctx.nextId++,
+      template,
+      5,
+      sim.ctx.groundPos(SPOT.x + dist, SPOT.z),
+    );
     caster.hostile = true;
     caster.maxHp = 1e7;
     caster.hp = 1e7;

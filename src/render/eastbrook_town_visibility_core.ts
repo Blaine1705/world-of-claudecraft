@@ -15,6 +15,9 @@ export interface EastbrookRoofVisibilityTarget {
   sine: number;
   topY: number;
   cullRadius: number;
+  /** A building with an open doorway the player walks into
+   *  (eastbrook_layout.ts `walkIn`). */
+  walkIn?: boolean;
 }
 
 export interface EastbrookRoofVisibilityPlan {
@@ -117,12 +120,15 @@ export function eastbrookCameraSegmentHitsRoof(
   camZ: number,
 ): boolean {
   if (occluderFadesDisabled()) return false;
-  if (
-    (eyeY < target.topY && pointInsideRoof(target, eyeX, eyeZ)) ||
-    (camY < target.topY && pointInsideRoof(target, camX, camZ))
-  ) {
-    return true;
-  }
+  const eyeInside = eyeY < target.topY && pointInsideRoof(target, eyeX, eyeZ);
+  const cameraInside = camY < target.topY && pointInsideRoof(target, camX, camZ);
+  // A walk-in building is a room the player stands in: while the camera is in
+  // there too, nothing of the building stands between them, so it stays solid
+  // (the same rule as Fenbridge's, fenbridge_town_visibility_core.ts). A
+  // camera that ends up outside its walls or over its roof line still fades
+  // it, so the player is never lost behind a wall.
+  if (target.walkIn && eyeInside) return !cameraInside;
+  if (eyeInside || cameraInside) return true;
   const entry = segmentRoofEntry(target, eyeX, eyeZ, camX, camZ);
   return entry >= 0 && entry <= 1 && eyeY + (camY - eyeY) * entry < target.topY;
 }

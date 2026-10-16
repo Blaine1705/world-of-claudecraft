@@ -24,6 +24,7 @@ import { setOccluderFadesDisabled } from '../../render/occluder_fade_core';
 import { type SeatRegion, unionRegion } from '../../render/placed_assets';
 import { Renderer } from '../../render/renderer';
 import { setSwayDisabledAssets } from '../../render/tree_sway';
+import { setStudioSnowVisible } from '../../render/weather';
 import type { BakedCollisionBox } from '../../sim/asset_collision';
 import {
   COLLIDER_DEFAULT_SIZE,
@@ -51,6 +52,7 @@ import {
   MIN_COLLIDER_SIZE,
   MIN_COLLIDER_SIZE_Y,
 } from '../../sim/map_doc';
+import type { ObjectMoves } from '../../sim/moved_objects';
 import { Sim } from '../../sim/sim';
 import { cutBounds, cutSdfAt, cutVerticalBounds } from '../../sim/terrain_cuts';
 import type {
@@ -63,9 +65,11 @@ import type {
   NpcDef,
   PlacedAsset,
   TerrainHole,
+  WorldContent,
 } from '../../sim/types';
 import { terrainHeight, zoneBiomeAt } from '../../sim/world';
-import { t } from '../../ui/i18n';
+import { formatNumber, t } from '../../ui/i18n';
+import { assetById } from '../asset_catalog.generated';
 import { buildingPlacementVisible } from '../building_core';
 import { buildCampPreviewEntities } from '../camp_preview';
 import { cityGridLayout } from '../city_build_core';
@@ -85,6 +89,13 @@ import {
   setRuntimeNpcFacing,
 } from '../entity_edit_core';
 import { localAssetUrl } from '../local_assets';
+import {
+  cyclePlacementPick,
+  exactPlacementCandidates,
+  type PlacementPickChoice,
+  type PlacementTapCycle,
+  resolvePlacementPick,
+} from '../placement_pick_core';
 import { PLACEMENT_SCALE_MAX, PLACEMENT_SCALE_MIN, wrapAngle } from '../placement_transform_core';
 import { userAssetPath } from '../user_assets';
 import {
@@ -95,8 +106,21 @@ import {
 import { dominantCameraPlane, projectCameraAxes } from './camera_axis_widget';
 import { type CmComponentPick, CmMeshView, type CmSurfacePick } from './cm_mesh_view';
 import { type CameraAxisView, EditorCamera, shouldAcceptCameraMovementKey } from './editor_camera';
+import { createFluidPickMaterial, volumeOverlayMaterial } from './fluid_pick_proxy';
 import { HitboxHandles, type HitboxSubMode } from './hitbox_handles';
+import {
+  createLocationGrid,
+  createLocationGridMaterial,
+  disposeLocationGrids,
+} from './location_grid';
+import { MovableObjectsView } from './movable_objects_view';
 import { EditorPerfOverlay, type PerfOverlayConfig } from './perf_overlay';
+import {
+  PlacementPickProjectionCache,
+  placementTemplateBounds,
+  projectPlacementPickBounds,
+} from './placement_pick_bounds';
+import { PlacementPickPanel, type PlacementPickRow } from './placement_pick_panel';
 import {
   type GizmoAxis,
   type GizmoConfig,
@@ -114,6 +138,11 @@ export interface EditRegion {
 }
 
 export interface Editor3DHooks {
+  placementLabel?(index: number): string;
+  /** Discovery remains available while Build owns ordinary placement clicks. */
+  placementPickingEnabled?(): boolean;
+  onChoosePlacement?(index: number, additive: boolean): void;
+  onPickFloorVisibilityChange?(hideAbove: boolean): void;
   // The active tool wants left-click/drag for editing (so the viewport must not
   // orbit on the left button). Right-drag always orbits; middle/shift-drag pans.
   toolActive(): boolean;
@@ -135,12 +164,18 @@ export interface Editor3DHooks {
     world: { x: number; z: number } | null,
     additive: boolean,
   ): void;
+  // A right-click that did not turn into a drag (right-DRAG still orbits),
+  // with the terrain point under the cursor or null off-terrain. The Flatten
+  // tool picks its locked level here.
+  onRightTap(world: { x: number; z: number } | null): void;
   // Direct manipulation of placements in Select mode. When enabled, a left
   // pointerdown on a pickable placement offers the drag to the app; a true
   // return claims it (the app selects the placement) and the viewport streams
-  // the terrain point under the cursor until release. A false return falls
+  // a start-relative point on the placement height until release. A false return falls
   // back to the normal orbit.
   placementDragEnabled(): boolean;
+  /** Rotate and Scale consume the actual cursor position around the pivot. */
+  placementDragUsesCursor?(): boolean;
   onPlacementDragStart(index: number): boolean;
   onPlacementDragMove(world: { x: number; z: number }): void;
   onPlacementDragEnd(): void;
@@ -155,6 +190,12 @@ export interface Editor3DHooks {
   onMobDragStart(id: number): boolean;
   onMobDragMove(world: { x: number; z: number }): void;
   onMobDragEnd(): void;
+  // And the built-in gameplay objects a map can move (farm beds, practice
+  // dummies, gather nodes, dungeon doors), same contract again; the key is
+  // the object's `<kind>:<id>` (editor/object_moves_core.ts).
+  onObjectDragStart(key: string): boolean;
+  onObjectDragMove(world: { x: number; z: number }): void;
+  onObjectDragEnd(): void;
   // Ctrl+left-drag marquee in Select mode: every placement index whose anchor
   // projected inside the released box (empty = clear the selection). Holding
   // Shift too adds the box to the existing placement selection.
@@ -370,12 +411,7 @@ const COLLIDER_COLOR = 0x3ddc6a;
 // solid so the chrome stays legible.
 const WIREFRAME_MAP_CATEGORIES = new Set(['terrain', 'water', 'foliage', 'fish', 'props']);
 const TAP_SLOP_PX = 5;
-// Repeated-click cycling through overlapping placements (DCC style): a second tap
-// near the SAME screen point within the window advances to the next candidate
-// under the cursor instead of re-picking the nearest one, wrapping back to the
-// closest after CYCLE_MAX_DEPTH. A 2s window so unhurried clicks still cycle.
-const CYCLE_WINDOW_MS = 1400;
-const CYCLE_SLOP_PX = 16;
+// Bound overlap discovery for both released-click cycling and the named chooser.
 const CYCLE_MAX_DEPTH = 16;
 // Map-light bulb badges pick by projected screen distance (see pickMapLight);
 // a click lands if it is within this many pixels of the badge center.
@@ -473,8 +509,8 @@ export class Editor3DViewport {
   // User "hide collision volumes" toggle (Collider tab): keeps the group built
   // (and pickable through the same meshes) but drops it from the scene render.
   private collidersUserHidden = false;
-  // User "hide area boxes" toggle (Zone tool): drops the blue named-location
-  // rects from the render, same pattern as collidersUserHidden above.
+  // User "hide area boxes" toggle (Zone tool): hides named-location grid
+  // guides, same pattern as collidersUserHidden above.
   private locationsUserHidden = false;
   private readonly colliderMat = new THREE.MeshBasicMaterial({
     color: COLLIDER_COLOR,
@@ -490,6 +526,7 @@ export class Editor3DViewport {
     depthWrite: false,
     side: THREE.DoubleSide,
   });
+  private readonly fluidPickMat = createFluidPickMaterial();
   private readonly picker = new THREE.Raycaster();
   private readonly pickNdc = new THREE.Vector2(); // scratch, per pointer-move
 
@@ -574,6 +611,8 @@ export class Editor3DViewport {
     | 'movenpc'
     | 'mobpending'
     | 'movemob'
+    | 'objectpending'
+    | 'moveobject'
     | 'gizmo'
     | 'hitboxhandle'
     | 'marquee' = 'none';
@@ -585,11 +624,41 @@ export class Editor3DViewport {
   // 'placepending' until the pointer passes TAP_SLOP_PX: past it, it promotes to a
   // move-drag; a release before it is a tap (select / overlap-cycle).
   private pendingPlaceIdx: number | null = null;
+  private placementDragPlane: {
+    plane: THREE.Plane;
+    origin: { x: number; z: number };
+    press: { x: number; z: number };
+  } | null = null;
   // Same deferred-press contract for an authored NPC under the cursor: NPCs
   // move like placements in Select mode, no separate tool needed.
   private pendingNpcKey: string | null = null;
   // And for a rendered camp mob (entity id), same contract again.
   private pendingMobId: number | null = null;
+  // And for a movable built-in gameplay object (its `<kind>:<id>` key).
+  private pendingObjectKey: string | null = null;
+  /** The world the viewport Sim was built over (a copy without placements),
+   *  kept so a live object move reaches the Sim's own readers too. */
+  private simWorld: WorldContent | null = null;
+  /** Picks, live moves and the selection ring for the built-in gameplay
+   *  objects a map can move (movable_objects_view.ts). */
+  readonly objects = new MovableObjectsView({
+    renderer: () => this.renderer,
+    sim: () => this.sim,
+    seed: () => this.seed,
+    canvas: () => this.canvas,
+    moves: () => this.map.objectMoves,
+    // A linked map is a district of the full world at an offset: its moves
+    // would not land where the maker sees them, so the objects stay put there.
+    enabled: () => !this.map.worldAnchor,
+  });
+
+  /** The live record for the viewport Sim's own readers (its farm beds,
+   *  gather range, door exits) as well as the active world's. */
+  setSimObjectMoves(moves: ObjectMoves | undefined): void {
+    if (!this.simWorld) return;
+    if (moves) this.simWorld.objectMoves = moves;
+    else delete this.simWorld.objectMoves;
+  }
   // Ctrl+drag box select: client-space corners + whether Ctrl/Cmd+Shift should
   // accumulate this box into the existing placement selection.
   private marquee: {
@@ -603,27 +672,32 @@ export class Editor3DViewport {
   private lastPointer = { x: 0, y: 0 };
   private dragDist = 0;
   private lastHoverPickAt = 0;
+  private hoverPickTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingHoverPick: { x: number; y: number } | null = null;
   // True only after a surface-aware tool has drawn a hover brush. Selection
   // and camera tools never need a terrain ray-march on ordinary pointer move;
   // this lets us clear the previous brush once rather than doing that work on
   // every mouse event.
   private hoverSurfaceActive = false;
-  // Click-cycle state for overlapping-placement selection (pickPlacementCycling).
-  private tapCycle: {
-    x: number;
-    y: number;
-    candidates: number[];
-    cursor: number;
-    at: number;
-  } | null = null;
+  private pickChoice: PlacementPickChoice | null = null;
+  private tapCycle: PlacementTapCycle | null = null;
+  private pickPanel: PlacementPickPanel | null = null;
+  private pickFeedbackGeneration = 0;
+  private pickPreviewKey = '';
+  private readonly pickProjectionCache = new PlacementPickProjectionCache();
+  private pickCanvasSize = { width: 0, height: 0 };
+  private pickResizeObserver: ResizeObserver | null = null;
+  private pickPoint = { x: 0, y: 0 };
   // Pointerdown resolves the pick before deciding between click and drag;
-  // pointerup asks for the same candidates again to apply rapid-click cycling.
+  // pointerup asks for the same exact candidates to complete the selection.
   // Retain that exact result briefly so one click pays for one mesh raycast.
   private placementPickCache: {
     x: number;
     y: number;
     at: number;
     candidates: number[];
+    width: number;
+    height: number;
   } | null = null;
   private readonly keys = new Set<string>();
   // Free-Fly mode: WASD/QE move whenever toggled on (not just mid-drag), and a
@@ -738,13 +812,7 @@ export class Editor3DViewport {
   private cutGhostCut: TerrainHole | null = null;
   // Rock-tool bridge/ridge chain preview (blue points + dotted connector).
   private rockChainGroup: THREE.Group | null = null;
-  private readonly locationMat = new THREE.MeshBasicMaterial({
-    color: 0x46b1ff,
-    transparent: true,
-    opacity: 0.16,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-  });
+  private readonly locationMat = createLocationGridMaterial();
   private musicGroup: THREE.Group | null = null;
   // Music-area overlays draw only while the Music tool is active (the rects
   // are authoring chrome, not world content); the selected one highlights.
@@ -823,6 +891,7 @@ export class Editor3DViewport {
   private createSurfaces(): void {
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'editor-3d-canvas';
+    this.canvas.tabIndex = 0;
     this.nameplates = document.createElement('div');
     this.nameplates.className = 'editor-3d-nameplates';
     this.axisWidget = document.createElement('div');
@@ -863,6 +932,26 @@ export class Editor3DViewport {
     this.axisWidget.style.display = this.axisWidgetVisible ? '' : 'none';
     this.syncAxisWidget();
     this.parent.append(this.canvas, this.nameplates, this.axisWidget);
+    this.pickResizeObserver?.disconnect();
+    this.pickCanvasSize = { width: 0, height: 0 };
+    this.pickResizeObserver = new ResizeObserver((entries) => {
+      const rect = entries[0]?.contentRect;
+      if (!rect) return;
+      this.pickCanvasSize = { width: rect.width, height: rect.height };
+      this.pickPreviewKey = '';
+      this.pickFeedbackGeneration++;
+    });
+    this.pickResizeObserver.observe(this.canvas);
+    this.pickPanel?.dispose();
+    this.pickPanel = new PlacementPickPanel(
+      this.parent,
+      (index, additive) => this.choosePlacementOverlap(index, additive),
+      (index) => {
+        void this.previewPlacementPick(index);
+      },
+      () => this.canvas.focus(),
+      (hideAbove) => this.hooks.onPickFloorVisibilityChange?.(hideAbove),
+    );
   }
 
   /** Rotate and depth-sort the view gimbal from the live orbit camera. */
@@ -935,10 +1024,11 @@ export class Editor3DViewport {
     if (this.disposed || gen !== this.generation) return;
     // The live PlacedAssetsView owns placements, so strip them from the Sim's
     // world or the Renderer ctor would build a second, frozen copy.
+    this.simWorld = { ...world, placements: undefined };
     this.sim = new Sim({
       seed: this.seed,
       playerClass: 'warrior',
-      world: { ...world, placements: undefined },
+      world: this.simWorld,
     });
     this.authoredCampMobIds.clear();
     for (const entity of this.sim.entities.values()) {
@@ -1469,12 +1559,14 @@ export class Editor3DViewport {
   /** Blender-style lens toggle. Orbit/fly pose stays untouched; only projection
    *  and pointer rays switch, so returning to perspective is exactly reversible. */
   setOrthographic(on: boolean): void {
+    this.resetTapCycle();
     this.orthographic = on;
     this.renderer?.editor.setEditorOrthographic(on, this.orthographicViewHeight());
   }
 
   /** Free-Fly camera mode (WASD/QE always live, drags mouse-look). */
   setFreeFly(on: boolean): void {
+    this.resetTapCycle();
     this.freeFly = on;
     this.cam.flyDistIndependent = on;
     if (!on) this.keys.clear();
@@ -1555,6 +1647,12 @@ export class Editor3DViewport {
     this.renderer?.editor.setEditorWeather(weather);
   }
 
+  /** Studio preview preference (render/weather.ts setStudioSnowVisible): a
+   *  browser-wide view setting, so it survives map and renderer reloads. */
+  setSnowEnabled(on: boolean): void {
+    setStudioSnowVisible(on);
+  }
+
   /** Show/remove the playtest player model (the loop enforces it per frame). */
   setShowPlayer(on: boolean): void {
     this.showPlayer = on;
@@ -1603,7 +1701,11 @@ export class Editor3DViewport {
       const geo = new THREE.RingGeometry(radius - 0.18, radius, 36);
       geo.rotateX(-Math.PI / 2);
       const mesh = new THREE.Mesh(geo, this.multiSelMat);
-      mesh.position.set(p.x, terrainHeight(p.x, p.z, this.seed) + 0.12, p.z);
+      mesh.position.set(
+        p.x,
+        (p.detached ? (p.groundY ?? 0) : terrainHeight(p.x, p.z, this.seed)) + (p.y ?? 0) + 0.12,
+        p.z,
+      );
       mesh.renderOrder = 2;
       group.add(mesh);
     }
@@ -1704,8 +1806,9 @@ export class Editor3DViewport {
    * and dolly to fit, so orbiting now revolves around it. `extent` is the
    * subject's rough half-size in yards.
    */
-  focusOn(x: number, z: number, extent: number): void {
-    const ground = terrainHeight(x, z, this.seed);
+  focusOn(x: number, z: number, extent: number, targetY?: number): void {
+    this.resetTapCycle();
+    const ground = targetY ?? terrainHeight(x, z, this.seed);
     this.cam.target.set(x, ground + Math.min(4, extent * 0.4), z);
     this.cam.dist = Math.min(500, Math.max(6, extent * 4));
   }
@@ -1714,6 +1817,7 @@ export class Editor3DViewport {
    *  subject tight instead of with headroom. `targetY` overrides the terrain seat
    *  so a detached/floating object is centred at its actual height. */
   focusClose(x: number, z: number, extent: number, targetY?: number): void {
+    this.resetTapCycle();
     const base = targetY ?? terrainHeight(x, z, this.seed);
     this.cam.target.set(x, base + Math.min(4, extent * 0.4), z);
     this.cam.dist = Math.min(500, Math.max(3, extent * 1.8));
@@ -1735,6 +1839,7 @@ export class Editor3DViewport {
    *  its current facing, zoom distance, and height above the local terrain. */
   teleportCamera(x: number, z: number): void {
     if (!Number.isFinite(x) || !Number.isFinite(z)) return;
+    this.resetTapCycle();
     this.keys.clear();
     const current = this.cam.pose().pos;
     const clearance = Math.max(4, current.y - terrainHeight(current.x, current.z, this.seed));
@@ -1842,8 +1947,14 @@ export class Editor3DViewport {
   }
 
   /** Project the brush ring at world (x, z); pass per pointer-move. */
-  setBrush(x: number, z: number, radius: number, color?: number): void {
-    this.renderer?.editor.setEditorBrush(x, z, radius, color);
+  setBrush(
+    x: number,
+    z: number,
+    radius: number,
+    color?: number,
+    shape: 'circle' | 'square' = 'circle',
+  ): void {
+    this.renderer?.editor.setEditorBrush(x, z, radius, color, shape);
   }
 
   clearBrush(): void {
@@ -1886,6 +1997,7 @@ export class Editor3DViewport {
     const prior = this.buildingFloorFilter;
     if (prior.id === buildingId && prior.level === level && prior.hideAbove === hideAbove) return;
     this.buildingFloorFilter = { id: buildingId, level, hideAbove };
+    this.pickPanel?.setFloorVisibility(buildingId ? level : null, hideAbove);
     this.rebuildPlacements();
     this.refreshMultiSelection();
     if (this.selectedIndex !== null) {
@@ -1895,8 +2007,7 @@ export class Editor3DViewport {
   }
 
   placementAdded(index: number): void {
-    this.tapCycle = null;
-    this.placementPickCache = null;
+    this.resetTapCycle();
     if (!this.visible) {
       this.hiddenPlacements = true;
       return;
@@ -1907,6 +2018,12 @@ export class Editor3DViewport {
       this.renderer?.placedAssets.removePlacement(index);
     this.updateColliderVolume(index);
     this.refreshFluidsIfNeeded(index);
+  }
+
+  /** A placed model's material slots (render/material_finishes.ts), null
+   *  when nothing renders at that index. */
+  placementMaterialSlots(index: number): { key: string; label: string }[] | null {
+    return this.renderer?.placedAssets.materialSlots(index) ?? null;
   }
 
   placementUpdated(
@@ -1934,9 +2051,10 @@ export class Editor3DViewport {
       fireEffects?: readonly AssetFireEmitter[] | null;
       collideCustom?: boolean;
       hitboxes?: PlacedAsset['hitboxes'] | null;
+      materialFinishes?: PlacedAsset['materialFinishes'] | null;
     },
   ): void {
-    this.placementPickCache = null;
+    this.resetTapCycle();
     if (!this.visible) {
       this.hiddenPlacements = true;
       return;
@@ -1958,8 +2076,7 @@ export class Editor3DViewport {
   /** Surgical single removal at a DOCUMENT index: the view drops that slot and
    *  shifts the survivors down by one, without re-cloning every model. */
   placementRemoved(index: number): void {
-    this.tapCycle = null;
-    this.placementPickCache = null;
+    this.resetTapCycle();
     const shifted = [...this.buildingFilteredIndices]
       .filter((i) => i !== index)
       .map((i) => (i > index ? i - 1 : i));
@@ -1990,8 +2107,7 @@ export class Editor3DViewport {
 
   /** Full re-instance (mid-list insert / paste / undo / bulk edits). */
   rebuildPlacements(): void {
-    this.tapCycle = null;
-    this.placementPickCache = null;
+    this.resetTapCycle();
     if (!this.visible) {
       this.hiddenPlacements = true;
       return;
@@ -2018,8 +2134,7 @@ export class Editor3DViewport {
     this.buildingFloorFilter = { id: null, level: 0, hideAbove: false };
     this.map = map;
     this.seed = map.meta.seed;
-    this.tapCycle = null;
-    this.placementPickCache = null;
+    this.resetTapCycle();
     this.selectedIndex = null;
     this.fireEditState = null;
     this.multiSelIndices = [];
@@ -2046,14 +2161,32 @@ export class Editor3DViewport {
     }
     const prev = this.selectedIndex;
     this.selectedIndex = index;
+    if (index !== null && this.map.placements[index] && this.pickPanel && this.pickingEnabled()) {
+      this.pickPanel?.setSelected(index, this.placementPickRow(index));
+      void this.previewPlacementPick(index);
+    } else if (index === null) this.pickPanel?.hide();
     // Collider overlay highlight tracks the selection by material swap.
     if (prev !== null) {
       const m = this.colliderMeshes.get(prev);
-      if (m) m.material = this.colliderMat;
+      if (m)
+        m.material = volumeOverlayMaterial(
+          this.map.placements[prev]?.assetId ?? '',
+          false,
+          this.colliderMat,
+          this.colliderSelMat,
+          this.fluidPickMat,
+        );
     }
     if (index !== null) {
       const m = this.colliderMeshes.get(index);
-      if (m) m.material = this.colliderSelMat;
+      if (m)
+        m.material = volumeOverlayMaterial(
+          this.map.placements[index]?.assetId ?? '',
+          true,
+          this.colliderMat,
+          this.colliderSelMat,
+          this.fluidPickMat,
+        );
     }
     // A pending hidden structural rebuild means the view's slots are stale:
     // the flush reapplies this selection after its rebuildAll.
@@ -2148,11 +2281,14 @@ export class Editor3DViewport {
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
-  /** Which placement a click lands on. The first result is always the nearest
-   * actual model/collider geometry touched by the pointer ray; small nearby
-   * props only participate after it in the rapid-click cycle. */
+  /** Ordinary clicks land on exact visible geometry or an explicitly chosen overlap. */
   pickPlacement(clientX: number, clientY: number): number | null {
-    return this.pickPlacementCandidates(clientX, clientY)[0] ?? null;
+    return resolvePlacementPick(
+      this.pickPlacementCandidates(clientX, clientY),
+      this.pickChoice,
+      clientX,
+      clientY,
+    );
   }
 
   /** Paint only a wall actually struck by the ray; nearby selection halos do not paint. */
@@ -2184,20 +2320,14 @@ export class Editor3DViewport {
   }
 
   /**
-   * Every placement under/near the cursor as an ordered candidate list. Actual
-   * rendered geometry hits lead front-to-back; then a tight screen-space halo
-   * adds small neighboring assets front-to-back for repeated-click cycling.
+   * Exact rendered geometry under the cursor, ordered front-to-back. Broad
+   * discovery halos never participate in automatic selection or dragging.
    */
   private pickPlacementCandidates(clientX: number, clientY: number): number[] {
     if (!this.renderer) return [];
     const now = performance.now();
     const cached = this.placementPickCache;
-    if (
-      cached &&
-      now - cached.at <= 350 &&
-      Math.abs(clientX - cached.x) <= 3 &&
-      Math.abs(clientY - cached.y) <= 3
-    ) {
+    if (cached && now - cached.at <= 350 && clientX === cached.x && clientY === cached.y) {
       return cached.candidates;
     }
     const rect = this.canvas.getBoundingClientRect();
@@ -2216,8 +2346,9 @@ export class Editor3DViewport {
     const direct = placed.filter((candidate) => candidate.direct);
     // Collider overlays are authored geometry too. Merge them into the exact
     // hit band by ray distance so a visible wall/volume picks by identity.
-    if (this.collidersGroup) {
+    if (this.collidersGroup?.visible) {
       for (const hit of this.picker.intersectObjects(this.collidersGroup.children, false)) {
+        if (!hit.object.visible) continue;
         for (const [index, mesh] of this.colliderMeshes) {
           if (mesh === hit.object) {
             direct.push({ index, distance: hit.distance, direct: true });
@@ -2226,68 +2357,157 @@ export class Editor3DViewport {
         }
       }
     }
-    direct.sort((a, b) => a.distance - b.distance || a.index - b.index);
-    const ordered = [...direct, ...placed.filter((candidate) => !candidate.direct)];
-    const candidates: number[] = [];
-    const seen = new Set<number>();
-    for (const candidate of ordered) {
-      const placement = this.map.placements[candidate.index];
-      if (seen.has(candidate.index) || !placement || !this.buildingPlacementIsVisible(placement))
-        continue;
-      seen.add(candidate.index);
-      candidates.push(candidate.index);
-      if (candidates.length >= CYCLE_MAX_DEPTH) break;
-    }
-    this.placementPickCache = { x: clientX, y: clientY, at: now, candidates };
+    const candidates = exactPlacementCandidates(
+      direct,
+      (index) => {
+        const placement = this.map.placements[index];
+        return !!placement && !placement.hidden && this.buildingPlacementIsVisible(placement);
+      },
+      CYCLE_MAX_DEPTH,
+    );
+    this.pickCanvasSize = { width: rect.width, height: rect.height };
+    this.placementPickCache = {
+      x: clientX,
+      y: clientY,
+      at: now,
+      candidates,
+      width: rect.width,
+      height: rect.height,
+    };
     return candidates;
   }
 
-  /**
-   * A Select-mode tap resolved through the overlap cycle: the first tap picks the
-   * front-most candidate under the cursor; each repeat tap near the SAME point
-   * within CYCLE_WINDOW_MS advances to the next overlapping candidate (wrapping),
-   * so stacked objects become reachable. Returns the chosen document index or null.
-   */
+  /** A release cycles only at the same stationary click spot and candidate set. */
   pickPlacementCycling(clientX: number, clientY: number): number | null {
-    // Cap the rotation at the CYCLE_MAX_DEPTH closest: past that the cursor
-    // wraps back to the front-most instead of digging into far scenery.
     const candidates = this.pickPlacementCandidates(clientX, clientY);
-    if (candidates.length === 0) {
-      this.tapCycle = null;
-      return null;
-    }
-    const now = performance.now();
-    const c = this.tapCycle;
-    const sameSpot =
-      c !== null &&
-      Math.abs(clientX - c.x) <= CYCLE_SLOP_PX &&
-      Math.abs(clientY - c.y) <= CYCLE_SLOP_PX;
-    const inWindow = c !== null && now - c.at <= CYCLE_WINDOW_MS;
-    if (c && sameSpot && inWindow) {
-      // Preserve the original near-to-far order even if an async GLB finishes
-      // loading between two rapid clicks. Drop removed entries and append any
-      // newly visible neighbor without unexpectedly restarting at the front.
-      const current = new Set(candidates);
-      c.candidates = c.candidates.filter((index) => current.has(index));
-      for (const index of candidates) if (!c.candidates.includes(index)) c.candidates.push(index);
-      if (c.candidates.length === 0) {
-        this.tapCycle = null;
-        return null;
-      }
-      c.cursor = (c.cursor + 1) % c.candidates.length;
-      c.at = now;
-      c.x = clientX;
-      c.y = clientY;
-      return c.candidates[c.cursor];
-    }
-    this.tapCycle = { x: clientX, y: clientY, candidates, cursor: 0, at: now };
-    return candidates[0];
+    this.tapCycle = cyclePlacementPick(candidates, this.tapCycle, clientX, clientY);
+    this.pickChoice = this.tapCycle;
+    this.updatePickFeedback(clientX, clientY, true);
+    return this.tapCycle?.index ?? null;
   }
 
-  /** Drop the click-cycle state (structural placement change shifts indices). */
+  private pickingEnabled(): boolean {
+    return this.hooks.placementPickingEnabled?.() ?? this.hooks.placementDragEnabled();
+  }
+
+  private placementPickRow(index: number): PlacementPickRow {
+    const p = this.map.placements[index];
+    const values = {
+      number: formatNumber(index + 1),
+      height: formatNumber(
+        (p.detached ? (p.groundY ?? 0) : terrainHeight(p.x, p.z, this.seed)) + (p.y ?? 0),
+        { maximumFractionDigits: 2 },
+      ),
+      level: formatNumber((p.building?.level ?? 0) + 1),
+    };
+    return {
+      index,
+      label:
+        this.hooks.placementLabel?.(index) ??
+        (p.name?.trim() || undefined) ??
+        assetById(p.assetId)?.label ??
+        t('editor.picking.asset', { number: values.number }),
+      details: t(p.building ? 'editor.picking.details' : 'editor.picking.ungroupedDetails', values),
+    };
+  }
+
+  /** Structural edits and camera motion invalidate both the ray and chooser. */
   resetTapCycle(): void {
+    this.cancelPendingHoverPick();
+    this.pickChoice = null;
     this.tapCycle = null;
     this.placementPickCache = null;
+    this.pickFeedbackGeneration++;
+    this.pickPreviewKey = '';
+    this.pickPanel?.hide();
+  }
+
+  private updatePickFeedback(clientX: number, clientY: number, pin = false): void {
+    if (!this.pickPanel || (this.pickPanel.isOpen && !pin)) return;
+    const candidates = this.pickPlacementCandidates(clientX, clientY);
+    const index = resolvePlacementPick(candidates, this.pickChoice, clientX, clientY);
+    const changed = this.pickPanel.update(
+      candidates.map((candidate) => this.placementPickRow(candidate)),
+      index,
+      pin,
+    );
+    if (changed) this.pickPoint = { x: clientX, y: clientY };
+    void this.previewPlacementPick(changed ? index : this.pickPanel.currentIndex, candidates[0]);
+  }
+
+  private choosePlacementOverlap(index: number, additive: boolean): void {
+    const point = this.pickPoint;
+    // Revalidate after loading, deletion, filtering or document replacement.
+    this.placementPickCache = null;
+    if (!this.pickingEnabled() || !this.pickPlacementCandidates(point.x, point.y).includes(index))
+      return;
+    this.pickChoice = { index, ...point };
+    this.tapCycle = {
+      ...this.pickChoice,
+      candidates: this.pickPlacementCandidates(point.x, point.y),
+    };
+    if (this.hooks.onChoosePlacement) this.hooks.onChoosePlacement(index, additive);
+    else this.hooks.onBoxSelect([index], additive);
+    this.updatePickFeedback(point.x, point.y, true);
+  }
+
+  private async previewPlacementPick(index: number | null, frontIndex?: number): Promise<void> {
+    const panel = this.pickPanel;
+    const renderer = this.renderer;
+    const placement = index === null ? null : this.map.placements[index];
+    if (
+      !panel ||
+      !renderer ||
+      index === null ||
+      !placement ||
+      placement.hidden ||
+      !this.buildingPlacementIsVisible(placement)
+    ) {
+      this.pickFeedbackGeneration++;
+      this.pickPreviewKey = '';
+      panel?.setOutline(null);
+      return;
+    }
+    if (this.pickCanvasSize.width <= 0 || this.pickCanvasSize.height <= 0) {
+      const rect = this.canvas.getBoundingClientRect();
+      this.pickCanvasSize = { width: rect.width, height: rect.height };
+    }
+    const dimensions = this.pickCanvasSize;
+    const front = frontIndex ?? this.placementPickCache?.candidates[0];
+    if (
+      !this.pickProjectionCache.update(
+        index,
+        front,
+        placement,
+        renderer.camera,
+        dimensions.width,
+        dimensions.height,
+        !this.pickPreviewKey,
+      )
+    )
+      return;
+    this.pickPreviewKey = 'current';
+    const path = placementsToRenderAssets([placement])[0]?.path;
+    if (!path || !path.includes('.glb')) {
+      this.pickFeedbackGeneration++;
+      panel.setOutline(null);
+      return;
+    }
+    const generation = ++this.pickFeedbackGeneration;
+    panel.setOutline(null);
+    const info = await renderer.placedAssets.assetPreviewTemplate(path).catch(() => null);
+    if (!info || generation !== this.pickFeedbackGeneration || renderer !== this.renderer) return;
+    const box = projectPlacementPickBounds(
+      placementTemplateBounds(info.object),
+      placement,
+      info.norm,
+      info.minY,
+      terrainHeight(placement.x, placement.z, this.seed),
+      renderer.camera,
+      dimensions.width,
+      dimensions.height,
+    );
+    panel.setOutline(box, front !== index);
   }
 
   // ---- spawn marker ----------------------------------------------------------
@@ -2363,7 +2583,7 @@ export class Editor3DViewport {
       }
       return null;
     };
-    this.locationsGroup = drop(this.locationsGroup);
+    this.locationsGroup = disposeLocationGrids(this.locationsGroup);
     this.markersGroup = drop(this.markersGroup);
     this.musicGroup = drop(this.musicGroup);
     if (this.lightsGroup) {
@@ -2400,14 +2620,10 @@ export class Editor3DViewport {
       const g = new THREE.Group();
       g.name = 'editor-locations';
       for (const l of locs) {
-        const geo = new THREE.PlaneGeometry(l.maxX - l.minX, l.maxZ - l.minZ);
-        geo.rotateX(-Math.PI / 2);
-        const mesh = new THREE.Mesh(geo, this.locationMat);
         const cx = (l.minX + l.maxX) / 2;
         const cz = (l.minZ + l.maxZ) / 2;
-        mesh.position.set(cx, terrainHeight(cx, cz, this.seed) + 0.25, cz);
-        mesh.renderOrder = 2;
-        g.add(mesh);
+        const grid = createLocationGrid(l, terrainHeight(cx, cz, this.seed), this.locationMat);
+        if (grid) g.add(grid);
       }
       g.visible = !this.locationsUserHidden && !this.previewMode;
       this.locationsGroup = g;
@@ -5023,7 +5239,7 @@ export class Editor3DViewport {
     if (this.collidersGroup) this.collidersGroup.visible = !hidden && !this.previewMode;
   }
 
-  /** Show/hide the blue named-location area boxes without rebuilding them (Zone
+  /** Show/hide the named-location grid guides without rebuilding them (Zone
    *  tool toggle). Editor chrome only; the locations themselves are unchanged. */
   setLocationsHidden(hidden: boolean): void {
     this.locationsUserHidden = hidden;
@@ -5077,7 +5293,16 @@ export class Editor3DViewport {
       geo = new THREE.BoxGeometry(v.sizeX, v.sizeY, v.sizeZ);
       y = ground + yOff + v.sizeY / 2;
     }
-    const mesh = new THREE.Mesh(geo, selected ? this.colliderSelMat : this.colliderMat);
+    const mesh = new THREE.Mesh(
+      geo,
+      volumeOverlayMaterial(
+        p.assetId,
+        selected,
+        this.colliderMat,
+        this.colliderSelMat,
+        this.fluidPickMat,
+      ),
+    );
     mesh.position.set(v.x, y, v.z);
     // Euler 'XYZ' (three default), the same composition groundHeight() uses to
     // walk a tilted plane; boxes/spheres never carry rotX/rotZ.
@@ -5121,6 +5346,7 @@ export class Editor3DViewport {
     if (v === this.visible) return;
     this.visible = v;
     if (!v) {
+      this.resetTapCycle();
       cancelAnimationFrame(this.raf);
       this.raf = 0;
       return;
@@ -5213,20 +5439,25 @@ export class Editor3DViewport {
     cancelAnimationFrame(this.raf);
     this.detachEvents();
     this.teardownEngine();
+    this.locationMat.dispose();
+    this.fluidPickMat.dispose();
     this.perfOverlay?.dispose();
     this.perfOverlay = null;
+    this.objects.dispose();
     setOccluderFadesDisabled(false);
   }
 
   // Free the GL context and remove the surfaces. A fresh canvas is needed for a
   // later start() because forceContextLoss() permanently kills this context.
   private teardownEngine(): void {
+    this.cancelPendingHoverPick();
     cancelAnimationFrame(this.raf);
     this.raf = 0;
     this.buildingPreview?.dispose();
     this.buildingPreview = null;
     this.buildingPlane = null;
     this.buildingFilteredIndices.clear();
+    this.locationsGroup = disposeLocationGrids(this.locationsGroup);
     if (this.renderer) {
       const renderer = this.renderer;
       renderer.editorCam = null;
@@ -5267,6 +5498,10 @@ export class Editor3DViewport {
     this.gizmo = null;
     this.gizmoDrag = null;
     this.grabFollow = false;
+    this.pickPanel?.dispose();
+    this.pickPanel = null;
+    this.pickResizeObserver?.disconnect();
+    this.pickResizeObserver = null;
     this.canvas?.remove();
     this.nameplates?.remove();
     this.axisWidget?.remove();
@@ -5281,6 +5516,9 @@ export class Editor3DViewport {
     const dt = Math.min(0.05, (now - this.lastT) / 1000);
     this.lastT = now;
 
+    if (this.pickPanel?.isVisible && (this.previewMode || !this.pickingEnabled())) {
+      this.resetTapCycle();
+    }
     this.applyKeys(dt);
     if (this.cam.advanceAxisTransition(dt)) this.resetTapCycle();
     // The camera ignores the terrain entirely (Blender-style): the pivot and
@@ -5308,6 +5546,7 @@ export class Editor3DViewport {
     this.syncGizmo();
     this.syncMobSelectionRings();
     this.syncNpcSelectionRings();
+    this.objects.syncRing();
     // Preview mode re-hides overlays each frame: refreshAuthoredOverlays and
     // friends rebuild their groups visible, so a one-shot hide would leak.
     if (this.previewMode) this.applyPreviewHide();
@@ -5328,6 +5567,23 @@ export class Editor3DViewport {
     // 60 FPS, 6x on a 120 Hz display.
     if (this.studio) this.enforceStudioHiding();
     this.renderer.sync(1, dt, null);
+    if (
+      this.selectedIndex !== null &&
+      !this.previewMode &&
+      !this.studio &&
+      this.pickingEnabled() &&
+      !this.pickPanel?.isOpen
+    ) {
+      const selected = this.map.placements[this.selectedIndex];
+      if (selected && !selected.hidden && this.buildingPlacementIsVisible(selected)) {
+        if (!this.pickPanel?.isVisible)
+          this.pickPanel?.setSelected(
+            this.selectedIndex,
+            this.placementPickRow(this.selectedIndex),
+          );
+        void this.previewPlacementPick(this.selectedIndex, this.selectedIndex);
+      }
+    }
     this.updatePerfOverlay(dt);
     // Free rock/cave texture sets no placement/cave uses anymore (a maker
     // cycling the picker streams a full PBR set per pick). Throttled: the scan
@@ -5440,6 +5696,7 @@ export class Editor3DViewport {
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
     window.removeEventListener('blur', this.onInputBlur);
+    this.resetTapCycle();
     this.keys.clear();
     this.dragMode = 'none';
     this.pendingPlaceIdx = null;
@@ -5448,6 +5705,7 @@ export class Editor3DViewport {
   }
 
   private onInputBlur = (): void => {
+    this.resetTapCycle();
     this.keys.clear();
   };
 
@@ -5455,11 +5713,31 @@ export class Editor3DViewport {
     if (this.dragMode === 'edit') this.onPointerUp(ev);
   };
 
-  private onContext = (e: Event): void => e.preventDefault();
+  // The browser menu never shows. The overlap chooser opens from the right
+  // button's RELEASE (openPickChooser): macOS and Linux fire contextmenu on
+  // press, which would open it at the start of every right-drag.
+  private onContext = (event: MouseEvent): void => event.preventDefault();
+
+  /** A stationary right-click: list the overlapping assets under the cursor.
+   *  Free-Fly (the default navigation) offers it too, since only a right-DRAG
+   *  mouse-looks. */
+  private openPickChooser(clientX: number, clientY: number): void {
+    if (this.previewMode || !this.pickingEnabled()) return;
+    this.placementPickCache = null;
+    this.updatePickFeedback(clientX, clientY, true);
+    this.pickPanel?.open();
+  }
 
   private onPointerDown = (ev: PointerEvent): void => {
+    this.cancelPendingHoverPick();
     this.lastPointer = { x: ev.clientX, y: ev.clientY };
     this.dragDist = 0;
+    this.placementDragPlane = null;
+    if (this.pickPanel?.isOpen) this.pickPanel.hide();
+    this.pickFeedbackGeneration++;
+    this.pickPreviewKey = '';
+    this.pickPanel?.setOutline(null);
+    this.placementPickCache = null;
     // A Shift+D grab in flight: the next left press confirms where the copies
     // landed (before any navigation/tool routing).
     if (this.grabFollow && ev.button === 0) {
@@ -5507,6 +5785,7 @@ export class Editor3DViewport {
     if (ev.button === 0 && this.gizmo?.group.visible) {
       const axis = this.gizmoPick(ev.clientX, ev.clientY);
       if (axis !== null && this.beginGizmoDrag(axis, ev.clientX, ev.clientY)) {
+        this.resetTapCycle();
         this.canvas.setPointerCapture(ev.pointerId);
         return;
       }
@@ -5548,11 +5827,19 @@ export class Editor3DViewport {
     }
     // Select-mode direct move: a left press on a pickable placement DEFERS,
     // it only becomes a move once the pointer moves past the tap threshold
-    // (onPointerMove). A stationary release stays a tap so repeated clicks cycle
-    // through overlapping objects (onPointerUp). Empty ground orbits as before.
+    // (onPointerMove). A stationary release selects the same previewed target
+    // (onPointerUp). Empty ground orbits as before.
     if (ev.button === 0 && !this.hooks.toolActive() && this.hooks.placementDragEnabled()) {
-      // Pixel-precise NPC/mob body hits first: they beat a nearby placement's
-      // slack radius. Both behave exactly like placements from here on.
+      // A movable gameplay object first (a practice dummy is a mob the camp
+      // path would refuse), then pixel-precise NPC/mob body hits. All behave
+      // like placements from here.
+      const objectDirect = this.objects.pick(ev.clientX, ev.clientY, true);
+      if (objectDirect !== null) {
+        this.pendingObjectKey = objectDirect;
+        this.dragMode = 'objectpending';
+        this.canvas.setPointerCapture(ev.pointerId);
+        return;
+      }
       const npcDirect = this.pickRuntimeNpc(ev.clientX, ev.clientY, true);
       if (npcDirect !== null) {
         this.pendingNpcKey = npcDirect;
@@ -5570,6 +5857,19 @@ export class Editor3DViewport {
       const idx = this.pickPlacement(ev.clientX, ev.clientY);
       if (idx !== null) {
         this.pendingPlaceIdx = idx;
+        const placement = this.map.placements[idx];
+        const y =
+          (placement.detached
+            ? (placement.groundY ?? 0)
+            : terrainHeight(placement.x, placement.z, this.seed)) + (placement.y ?? 0);
+        const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -y);
+        const press = this.planeHit(ev.clientX, ev.clientY, plane);
+        if (press)
+          this.placementDragPlane = {
+            plane,
+            press: { x: press.x, z: press.z },
+            origin: { x: placement.x, z: placement.z },
+          };
         this.dragMode = 'placepending';
         this.canvas.setPointerCapture(ev.pointerId);
         return;
@@ -5579,6 +5879,13 @@ export class Editor3DViewport {
       if (npcLoose !== null) {
         this.pendingNpcKey = npcLoose;
         this.dragMode = 'npcpending';
+        this.canvas.setPointerCapture(ev.pointerId);
+        return;
+      }
+      const objectLoose = this.objects.pick(ev.clientX, ev.clientY, false);
+      if (objectLoose !== null) {
+        this.pendingObjectKey = objectLoose;
+        this.dragMode = 'objectpending';
         this.canvas.setPointerCapture(ev.pointerId);
         return;
       }
@@ -5643,21 +5950,21 @@ export class Editor3DViewport {
     } else if (this.dragMode === 'placepending') {
       // Promote a deferred placement press to an actual move once it passes the
       // tap threshold; the app claims it (selecting the placement) and we stream
-      // the ground point from here on.
+      // a point on its original height plane from here on.
       if (this.dragDist > TAP_SLOP_PX && this.pendingPlaceIdx !== null) {
         const idx = this.pendingPlaceIdx;
         this.pendingPlaceIdx = null;
         if (this.hooks.onPlacementDragStart(idx)) {
           this.dragMode = 'moveplacement';
           this.canvas.style.cursor = 'grabbing';
-          const w = this.surfaceAt(ev.clientX, ev.clientY);
+          const w = this.placementDragPoint(ev.clientX, ev.clientY);
           if (w) this.hooks.onPlacementDragMove(w);
         } else {
           this.dragMode = 'orbit';
         }
       }
     } else if (this.dragMode === 'moveplacement') {
-      const w = this.surfaceAt(ev.clientX, ev.clientY);
+      const w = this.placementDragPoint(ev.clientX, ev.clientY);
       if (w) this.hooks.onPlacementDragMove(w);
     } else if (this.dragMode === 'npcpending') {
       // Same promotion contract as placepending: past the tap threshold the
@@ -5693,6 +6000,22 @@ export class Editor3DViewport {
     } else if (this.dragMode === 'movemob') {
       const w = this.surfaceAt(ev.clientX, ev.clientY);
       if (w) this.hooks.onMobDragMove(w);
+    } else if (this.dragMode === 'objectpending') {
+      if (this.dragDist > TAP_SLOP_PX && this.pendingObjectKey !== null) {
+        const key = this.pendingObjectKey;
+        this.pendingObjectKey = null;
+        if (this.hooks.onObjectDragStart(key)) {
+          this.dragMode = 'moveobject';
+          this.canvas.style.cursor = 'grabbing';
+          const w = this.surfaceAt(ev.clientX, ev.clientY);
+          if (w) this.hooks.onObjectDragMove(w);
+        } else {
+          this.dragMode = 'orbit';
+        }
+      }
+    } else if (this.dragMode === 'moveobject') {
+      const w = this.surfaceAt(ev.clientX, ev.clientY);
+      if (w) this.hooks.onObjectDragMove(w);
     } else if (this.grabFollow) {
       // Shift+D grab: the duplicates chase the cursor with no button held.
       const w = this.surfaceAt(ev.clientX, ev.clientY);
@@ -5713,35 +6036,65 @@ export class Editor3DViewport {
     }
   };
 
-  /** Grab-cursor feedback over pickable placements (Select mode, throttled). */
+  private cancelPendingHoverPick(): void {
+    if (this.hoverPickTimer !== null) clearTimeout(this.hoverPickTimer);
+    this.hoverPickTimer = null;
+    this.pendingHoverPick = null;
+  }
+
+  /** Hover previews use the same exact target as the next click or drag. */
   private updateHoverCursor(clientX: number, clientY: number): void {
-    if (!this.hooks.placementDragEnabled()) {
+    if (!this.pickingEnabled() || this.previewMode) {
+      this.resetTapCycle();
       if (this.canvas.style.cursor) this.canvas.style.cursor = '';
       return;
     }
+    if (!this.renderer || this.pickPanel?.isOpen) {
+      this.cancelPendingHoverPick();
+      return;
+    }
     const now = performance.now();
-    if (now - this.lastHoverPickAt < HOVER_PICK_MS) return;
+    const remaining = HOVER_PICK_MS - (now - this.lastHoverPickAt);
+    if (remaining > 0) {
+      this.pendingHoverPick = { x: clientX, y: clientY };
+      if (this.hoverPickTimer === null) {
+        this.hoverPickTimer = setTimeout(() => {
+          this.hoverPickTimer = null;
+          const point = this.pendingHoverPick;
+          this.pendingHoverPick = null;
+          if (point && !this.disposed && this.visible && this.dragMode === 'none') {
+            this.updateHoverCursor(point.x, point.y);
+          }
+        }, remaining);
+      }
+      return;
+    }
+    this.cancelPendingHoverPick();
     this.lastHoverPickAt = now;
-    if (!this.renderer) return;
-    const rect = this.canvas.getBoundingClientRect();
-    this.pickNdc.set(
-      ((clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1,
-      -((clientY - rect.top) / Math.max(1, rect.height)) * 2 + 1,
-    );
-    this.renderer.editor.setRaycasterFromCamera(this.picker, this.pickNdc);
-    const overPlacement = this.renderer.placedAssets.hasCandidateNearRay(
-      this.picker,
-      rect.height,
-      EDITOR_VERTICAL_FOV_DEG,
-      this.orthographic ? this.orthographicViewHeight() : undefined,
-    );
-    const want = overPlacement ? 'grab' : '';
+    const overPlacement = this.pickPlacement(clientX, clientY) !== null;
+    const want = overPlacement && this.hooks.placementDragEnabled() ? 'grab' : '';
     if (this.canvas.style.cursor !== want) this.canvas.style.cursor = want;
+    this.updatePickFeedback(clientX, clientY);
   }
 
   private onPointerLeave = (): void => {
+    this.cancelPendingHoverPick();
     if (this.dragMode === 'none') this.hooks.onHover(null);
+    this.pickFeedbackGeneration++;
+    this.pickPreviewKey = '';
+    if (this.selectedIndex !== null) void this.previewPlacementPick(this.selectedIndex);
+    else if (!this.pickPanel?.isPinned) this.pickPanel?.setOutline(null);
   };
+
+  private placementDragPoint(clientX: number, clientY: number): { x: number; z: number } | null {
+    const drag = this.placementDragPlane;
+    if (!drag) return null;
+    const hit = this.planeHit(clientX, clientY, drag.plane);
+    if (hit && this.hooks.placementDragUsesCursor?.()) return { x: hit.x, z: hit.z };
+    return hit
+      ? { x: drag.origin.x + hit.x - drag.press.x, z: drag.origin.z + hit.z - drag.press.z }
+      : null;
+  }
 
   private onPointerUp = (ev: PointerEvent): void => {
     if (this.dragMode === 'marquee') {
@@ -5792,6 +6145,9 @@ export class Editor3DViewport {
     } else if (this.dragMode === 'movemob') {
       this.hooks.onMobDragEnd();
       this.canvas.style.cursor = '';
+    } else if (this.dragMode === 'moveobject') {
+      this.hooks.onObjectDragEnd();
+      this.canvas.style.cursor = '';
     } else if (this.dragMode === 'placepending' && ev.button === 0) {
       // A press on a placement that never moved past the tap threshold: a
       // Select-mode tap. Route through onTap so repeated clicks on overlapping
@@ -5806,6 +6162,15 @@ export class Editor3DViewport {
       // A stationary press on a mob: a Select-mode tap (select it).
       this.pendingMobId = null;
       this.hooks.onTap(ev.clientX, ev.clientY, null, false);
+    } else if (this.dragMode === 'objectpending' && ev.button === 0) {
+      // A stationary press on a movable gameplay object: a tap (select it).
+      this.pendingObjectKey = null;
+      this.hooks.onTap(ev.clientX, ev.clientY, null, false);
+    } else if (this.dragMode === 'orbit' && ev.button === 2 && this.dragDist <= TAP_SLOP_PX) {
+      // A right press that never orbited: a right-click on the ground (the
+      // Flatten level / Slope start), or the overlap chooser in Select.
+      this.hooks.onRightTap(this.surfaceAt(ev.clientX, ev.clientY));
+      this.openPickChooser(ev.clientX, ev.clientY);
     } else if (
       (this.dragMode === 'orbit' || this.dragMode === 'pan') &&
       ev.button === 0 &&
@@ -5816,6 +6181,7 @@ export class Editor3DViewport {
       this.hooks.onTap(ev.clientX, ev.clientY, null, this.dragMode === 'pan');
     }
     this.dragMode = 'none';
+    this.placementDragPlane = null;
   };
 
   private onWheel = (ev: WheelEvent): void => {

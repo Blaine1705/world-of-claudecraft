@@ -350,6 +350,7 @@ import {
 } from './content/zone3';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
+import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from './highwatch_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 import { setStudioOverlay, studioOverlayInstalled } from './studio_content';
@@ -373,8 +374,11 @@ import { FARM_PATTERN_ITEMS } from './content/farm_patterns';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { HIGHWATCH_MANOR_NPCS } from './content/highwatch_manor';
 import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
+import { MIREFEN_TAVERN_NPCS } from './content/mirefen_tavern';
+import { MIREFEN_TAVERN_PATRON_NPCS } from './content/mirefen_tavern_patrons';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { SEASON2_ITEMS } from './content/pvp_honor_season2';
@@ -382,6 +386,7 @@ import { REFERRAL_STAMP_ITEMS } from './content/referral_rewards';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
+import { dungeonDoorPos, freezeObjectMoves, gatherNodesFor } from './moved_objects';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
   const merged = Object.assign({}, ...parts);
@@ -562,9 +567,15 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
+  ...HIGHWATCH_MANOR_NPCS,
   // The Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
   // dynamic, spawned per Temple claim, appended last so no placed NPC moves.
   ...CANTOR_NPCS,
+  // The Mirefen tavern's innkeeper (content/mirefen_tavern.ts), a dynamic singleton under a
+  // reserved id, appended last for the same reason.
+  ...MIREFEN_TAVERN_NPCS,
+  // Its seated patrons (content/mirefen_tavern_patrons.ts), dynamic singletons too.
+  ...MIREFEN_TAVERN_PATRON_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -729,7 +740,9 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...WORLD_QUEST_OBJECTS,
 ];
 
-export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
+// The content table itself (deep-frozen there), so every reader resolves a
+// map's moved nodes against ONE memo key (moved_objects.ts gatherNodesFor).
+export const GATHER_NODES: GatherNodeDef[] = GATHER_NODES_CONTENT;
 
 /**
  * The gathering veins that exist in the world the player is actually standing
@@ -743,7 +756,24 @@ export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
  * on ore inside its stadium.
  */
 export function activeGatherNodes(): GatherNodeDef[] {
-  return usesOverworldSiteDressing(getActiveWorldContent().presentationMode) ? GATHER_NODES : [];
+  return usesOverworldSiteDressing(getActiveWorldContent().presentationMode)
+    ? gatherNodesInActiveWorld()
+    : [];
+}
+
+/**
+ * GATHER_NODES as the active world places them: any node a Studio map moved
+ * (moved_objects.ts) at its new spot, the shipped table itself otherwise.
+ * UNGATED, unlike activeGatherNodes: this is the table the by-id lookups and
+ * the collider build read, which never filtered by presentation.
+ */
+export function gatherNodesInActiveWorld(): GatherNodeDef[] {
+  return gatherNodesFor(getActiveWorldContent().objectMoves, GATHER_NODES);
+}
+
+/** One node of gatherNodesInActiveWorld by id (a click pick), or undefined. */
+export function activeGatherNodeById(id: string): GatherNodeDef | undefined {
+  return gatherNodesInActiveWorld().find((node) => node.id === id);
 }
 
 /** The dungeons the WORLD MAP may draw an overworld portal for.
@@ -764,6 +794,16 @@ export function activeGatherNodes(): GatherNodeDef[] {
 const NO_NAMED_AREAS: NonNullable<WorldContent['locations']> = [];
 export function activeNamedAreas(): NonNullable<WorldContent['locations']> {
   return getActiveWorldContent().locations ?? NO_NAMED_AREAS;
+}
+
+/** A dungeon's overworld door as the active world stands it: a Studio map may
+ *  move a door (moved_objects.ts), and its entrance set piece, map portal and
+ *  finder pin follow. The shipped doorPos otherwise. */
+export function activeDungeonDoorPos(dungeon: Pick<DungeonDef, 'id' | 'doorPos'>): {
+  readonly x: number;
+  readonly z: number;
+} {
+  return dungeonDoorPos(getActiveWorldContent().objectMoves, dungeon);
 }
 
 export function activeOverworldDungeons(): readonly DungeonDef[] {
@@ -1023,6 +1063,12 @@ export const BUILTIN_WORLD: WorldContent = {
   blockers: [...JAIL_BLOCKERS],
   terrainEdits: [
     ...JAIL_TERRAIN_EDITS,
+    // Fenbridge's grand painted buildings reach past the marsh hub's plateau:
+    // each stands on a level pad at the plateau's height, eased out by a soft
+    // apron (sim/fenbridge_layout.ts pads). No other stamp reaches that
+    // ground, so their place in this list moves no height. Copied, as
+    // Highwatch's are.
+    ...FENBRIDGE_LAYOUT.pads.map((pad) => ({ ...pad })),
     ...COPPER_DIG_TERRAIN_EDITS,
     ...TOWN_PLAT_TERRAIN_EDITS,
     ...SOWFIELD_BEACH_TERRAIN_EDITS,
@@ -1075,6 +1121,14 @@ export function isBuiltinWorldActive(): boolean {
 // through getActiveWorldContent. Spawns come from SimConfig.world too (sim.ts ctor).
 export function setActiveWorldContent(world: WorldContent | null): void {
   activeWorld = world ?? BUILTIN_WORLD;
+  // A world that arrived as JSON (a playtest handoff, a published map) carries
+  // a plain moves record: freeze it once here so every moved-object resolver
+  // (moved_objects.ts) memoizes on it instead of rebuilding per read.
+  if (activeWorld.objectMoves) {
+    const frozen = freezeObjectMoves(activeWorld.objectMoves);
+    if (frozen) activeWorld.objectMoves = frozen;
+    else delete activeWorld.objectMoves;
+  }
   refreshAuthoredMapGate();
   contentGeneration++;
 }

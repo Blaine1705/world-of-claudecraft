@@ -195,3 +195,47 @@ export function makePlacedTownBuilding<Kind extends 'house' | 'inn' | 'chapel'>(
 }
 
 export type PlacedTownBuilding = ReturnType<typeof makePlacedTownBuilding>;
+
+/** The shape of a placed building's measurements in the model's own axes. */
+export interface PlacedTownMeasurements {
+  reach: { x: number; z: number; width: number; height: number; depth: number };
+  walls: { x: number; z: number; width: number; depth: number };
+  annexes?: readonly { name: string; x: number; z: number; width: number; depth: number }[];
+  doorX: number;
+}
+
+/** A building's measurements taken at the model's AUTHORED size, carried to a placed
+ *  `scale` (every length grows with it, the anchor stays where the model's origin is). */
+export function scalePlacedTownMeasurements<T extends PlacedTownMeasurements>(
+  spec: T,
+  scale: number,
+): T {
+  const r = spec.reach;
+  const w = spec.walls;
+  return {
+    ...spec,
+    reach: {
+      x: r.x * scale,
+      z: r.z * scale,
+      width: r.width * scale,
+      height: r.height * scale,
+      depth: r.depth * scale,
+    },
+    walls: { x: w.x * scale, z: w.z * scale, width: w.width * scale, depth: w.depth * scale },
+    annexes: spec.annexes?.map((annex) => ({
+      name: annex.name,
+      x: annex.x * scale,
+      z: annex.z * scale,
+      width: annex.width * scale,
+      depth: annex.depth * scale,
+    })),
+    doorX: spec.doorX * scale,
+  };
+}
+
+/** The seat of a painted Tidehold model (one yard of footing under its ground line at
+ *  authored size) stood at `scale`: the lift buries the scaled footing and sinks the
+ *  ground line a further 0.05, the seat every town gives them. */
+export function placedTownSeat(scale: number, frontClearance: number): PlacedTownSeat {
+  return { scale, lift: -(scale + 0.05), frontClearance };
+}

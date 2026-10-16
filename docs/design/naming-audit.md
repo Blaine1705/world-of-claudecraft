@@ -1002,6 +1002,16 @@ candidates collided and were replaced before shipping; the ids never shipped und
 | Spadeworn Gauntlets, Rimewreath Coif, Knellbound Hauberk, Candlewatch Jerkin, Lanternwick Sash, Cellwatch Belt, Portcullis Girdle, Brinewarden Robe, Merecleaver, Mereskin Hood, Mere-Crested Helm, Merewater Cowl, Lamenting Veil, Robe of the Unquiet Rite, Turnkey's Shank | the new names with a coined or distinctive token | CLEAR. No match for any full name or coined token. |
 | Bellrope Mitts, Gravedirt Grips, Rime-Laced Hood, Cantor's Stole, Chorister's Spaulders, Choirward Pauldrons, Gaolyard Jerkin, Fogbinder's Rod, Pale Chorus Slippers, Conchplate Sabatons, Prism-Etched Handwraps, Moonburn Grips, Tideglass Gauntlets, Moonwrack Stave, Gravecaller's Rod | built on this game's own shipped tokens (Bellrope, Gravedirt, Rime-Laced, Cantor, Chorister, Choirward, Gaolyard, Fogbinder, Pale Chorus, Conchplate, Prism-Etched, Moonburn, Tideglass, Moonwrack, Gravecaller) | CLEAR. No match for any full name; the tokens are already recorded GENERIC or CLEAR in this audit's rework tables. |
 
+### The Highwatch manor's steward (web-checked 2026-10-15)
+
+The manor's resident (`src/sim/content/highwatch_manor.ts`). The manor itself carries no new
+proper noun ("Highwatch" is the existing town).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Ansel Hale | the manor steward NPC | KEEP. No full-name hit on the web or any game wiki searched (warcraft.wiki.gg, Wowhead, Fallout and RuneScape wikis). "Ansel" alone is a real given name: RuneScape Dragonwilds has a knight called Ansel and WoW has a High Executor Anselm, neither a match. "Hale" is a common English surname (Fallout 76 has an Emerson Hale). Shared English, no coined token. "Odric" was considered and dropped: Sir Odric is a named Magic: The Gathering character. |
+| Steward of the Manor | his NPC title | KEEP. Plain English job title, no distinctive match. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

@@ -17,6 +17,8 @@ import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { ZONE2_PROPS } from '../src/sim/content/zone2';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld, type Obb2 } from '../src/sim/fenbridge_layout';
+import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
+import { JAIL_TERRAIN_EDITS } from '../src/sim/jail';
 import { loadPublishedMap, MAP_SEED } from '../src/sim/maps/eastbrook_rebuild.generated';
 import { isResting } from '../src/sim/progression/xp';
 import { Sim } from '../src/sim/sim';
@@ -165,15 +167,32 @@ describe('the five placed Fenbridge buildings', () => {
     }
   });
 
-  it('stand at authored size with their footing buried', () => {
+  it('stand grand, each at its own size, with their footing buried', () => {
+    // the smallest size that clears a door of about five yards
+    // (fenbridge_layout.ts); the chapel's portal already does at authored size
+    expect(BUILDINGS.map((building) => [building.id, building.placement.scale])).toEqual([
+      ['fenbridge_warden_gatehouse', 1.4],
+      ['fenbridge_crooked_reed_inn', 1.2],
+      ['fenbridge_lantern_chapel', 1],
+      ['fenbridge_moonwort_apothecary', 1.5],
+      ['fenbridge_gilded_strongbox', 1.5],
+    ]);
     for (const building of BUILDINGS) {
-      expect(building.placement.scale, building.id).toBe(1);
-      expect(building.placement.lift, building.id).toBe(-1.05);
+      expect(building.placement.lift, building.id).toBeCloseTo(
+        -(building.placement.scale + 0.05),
+        9,
+      );
       // one authored yard of footing, buried, the ground line a hair under the seat
       const groundLine =
         -boundsOf(building).min[1] * building.placement.scale + building.placement.lift;
       expect(groundLine, `${building.id} ground line`).toBeLessThan(0);
       expect(groundLine, `${building.id} ground line`).toBeGreaterThan(-0.06);
+      // the walk-in rule reads the model's largest AUTHORED dimension, whatever
+      // size the record stands at (its baked rows are stored in multiples of it)
+      expect(building.placement.modelSize, building.id).toBeCloseTo(
+        Math.max(...boundsOf(building).size),
+        2,
+      );
     }
   });
 
@@ -499,7 +518,7 @@ describe('walking into the walk-in Fenbridge buildings', () => {
   });
 
   it('leaves the floors of a Studio document to its own placements', () => {
-    // Highwatch stands its own walk-in floors beside these
+    // Eastbrook and Highwatch stand their own walk-in floors beside these
     const fenbridgePaths = new Set(BUILDINGS.map((building) => building.assetId));
     const builtIn = townWalkInPlacements(BUILTIN_WORLD).filter((placement) =>
       fenbridgePaths.has(placement.path),
@@ -584,6 +603,7 @@ const REBUILD_MAP = JSON.parse(
     npcs: Record<string, { pos: { x: number; z: number }; facing?: number }>;
     roads: { x: number; z: number }[][];
   };
+  terrainEdits: Record<string, unknown>[];
 };
 
 /** The kit buildings the rebuild retired (their models stay shipped for Studio). */
@@ -671,6 +691,43 @@ describe('Fenbridge in Studio', () => {
     const gameStreets = BUILTIN_WORLD.roads.filter(touchesTown);
     expect(gameStreets.length).toBeGreaterThan(0);
     expect(REBUILD_MAP.content.roads.filter(touchesTown)).toEqual(gameStreets);
+  });
+
+  it('levels the Studio map ground under the grand buildings with the pads the game stamps', () => {
+    // every pad, in the layout's own order, where the built-in world stamps
+    // them: straight after the moderation cage's
+    const pads = FENBRIDGE_LAYOUT.pads;
+    expect(pads.length).toBeGreaterThan(0);
+    const after = JAIL_TERRAIN_EDITS.length;
+    const at = pads.map((pad) =>
+      REBUILD_MAP.terrainEdits.findIndex(
+        (edit) =>
+          edit.x === pad.x &&
+          edit.z === pad.z &&
+          edit.radius === pad.radius &&
+          edit.delta === pad.delta &&
+          edit.hardness === pad.hardness &&
+          edit.falloff === pad.falloff &&
+          edit.mode === pad.mode,
+      ),
+    );
+    expect(at).toEqual(pads.map((_, index) => after + index));
+    const builtIn = BUILTIN_WORLD.terrainEdits ?? [];
+    expect(builtIn.slice(after, after + pads.length)).toEqual([...pads]);
+    // ...and no other stamp of the map reaches the town's ground, so the pads
+    // have the last word there wherever they sit in the list
+    const others = [
+      ...REBUILD_MAP.terrainEdits.slice(0, after),
+      ...REBUILD_MAP.terrainEdits.slice(after + pads.length),
+    ] as unknown as { x: number; z: number; radius: number }[];
+    expect(others.length).toBeGreaterThan(HIGHWATCH_LAYOUT.pads.length);
+    for (const edit of others) {
+      const near = Math.hypot(
+        Math.max(-60 - edit.x, 0, edit.x - 60),
+        Math.max(240 - edit.z, 0, edit.z - 370),
+      );
+      expect(near, `Studio stamp at ${edit.x}, ${edit.z}`).toBeGreaterThanOrEqual(edit.radius);
+    }
   });
 
   it('hands the game copy of the Studio map current town records, so its record walls stand down', () => {

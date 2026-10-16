@@ -28,6 +28,7 @@ import type { WispMazeState } from './minigames/wisp_maze';
 import type { BastionKitDef } from './mob/trash_kit/bastion_kit_types';
 import type { TempleKitDef, TempleKitState } from './mob/trash_kit/temple_kit_types';
 import type { WildheartKitDef, WildheartKitState } from './mob/trash_kit/wildheart_kit_types';
+import type { ObjectMoves } from './moved_objects';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
 import type {
@@ -4521,6 +4522,9 @@ export interface NpcDef {
   // A banker: talking to this NPC opens the player's bank (deposit box). The bank
   // deposit/withdraw/buy-slots commands gate on standing near one of these.
   banker?: true;
+  // An innkeeper (the Mirefen tavern's): the nameplate's role line reads Innkeeper whatever
+  // food and drink she also sells (src/sim/npc_role.ts).
+  innkeeper?: true;
   // The Heroic Quartermaster: talking to this NPC opens the Heroic Marks
   // shop (src/sim/content/heroic_vendor.ts) instead of a copper vendor stock.
   heroicVendor?: boolean;
@@ -11088,6 +11092,9 @@ export interface HeightStamp {
    *  Smooth carries its brush strength here so the TARGET can stay the honest
    *  local surface: a planar slope then cancels exactly, at any strength. */
   strength?: number;
+  /** Footprint: 'square' reaches max(|dx|, |dz|) < radius (radius is half
+   *  the side). Absent or 'circle' = the original round brush. */
+  shape?: 'circle' | 'square';
   /** Solid inner-radius ratio. Absent preserves the original fully soft brush. */
   hardness?: number;
   /** Optional deterministic built-in mask. Imported paint masks stay editor-local. */
@@ -11151,6 +11158,7 @@ export interface AssetFireEmitter {
 
 export interface PlacedAsset {
   wallFinishes?: import('./wall_finishes').WallFinishes;
+  materialFinishes?: import('./material_finishes').MaterialFinishes;
   building?: import('./building').BuildingMembership;
   path: string; // public GLB url, e.g. "/models/props/well.glb"
   x: number;
@@ -11820,7 +11828,8 @@ export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // Static world services use their own namespace above the sequential allocator
 // and reserved 1_000_000_x singleton ids (the Vale Cup groundskeeper, FURY in
 // Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, the
-// Wyrmwatch harbormaster, the Eastbrook vault keeper, practice dummies; each id
+// Wyrmwatch harbormaster, the Eastbrook vault keeper, the Highwatch manor
+// steward, practice dummies, the Mirefen innkeeper; each id
 // is taken ONCE, tests/reserved_singleton_entity_ids.test.ts pins the band). A singleton NPC takes a reserved id AND
 // `dynamic: true` so the generic world-init loop skips it: that loop allocates
 // ids by iterating the merged NPC table in insertion order, so a plain
@@ -12112,6 +12121,11 @@ export interface WorldContent {
   // the same tree is drawn twice, once movable, once not. Absent for the
   // built-in world BY CONSTRUCTION, so the shipped path cannot drift.
   promotedScenery?: PromotedScenery;
+  // Gameplay objects this map moved (farm beds, practice dummies, gather
+  // nodes, dungeon doors), keyed `<kind>:<id>`; every position reader
+  // resolves through sim/moved_objects.ts with the built-in row as the
+  // fallback. Frozen; absent for the built-in world.
+  objectMoves?: ObjectMoves;
 }
 
 /**
@@ -12163,6 +12177,13 @@ export interface PromotedScenery {
    *  promoted before the vault had a placeable model keeps the town-drawn
    *  hall until this family promotes too. */
   eastbrookVault?: boolean;
+  /** The authored towns' square dressing: Eastbrook's market stalls, benches
+   *  and yard fences, and Fenbridge's cistern, provision stall, muster board
+   *  and boardwalks (the town views' micro and boardwalk batches stand down;
+   *  the stall, cistern and fence record colliders ride the same flag through
+   *  sim/authored_town_dressing.ts). The town wall and the Realm Builder
+   *  monument stay town-drawn. */
+  authoredTownDressing?: boolean;
   /** Highwatch's painted rebuild BUILDINGS (sim/highwatch_layout.ts): the
    *  town view's building loop, the record colliders and the walk-in floors
    *  stand down. Its own family for the vault's reason: a document promoted

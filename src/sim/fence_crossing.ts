@@ -4,6 +4,7 @@
 // (click-to-move auto-jump, pathfind). Moved verbatim out of colliders.ts (the
 // monolith ratchet); the Studio fence-placement arm rides with it.
 
+import { promotedColliderProps } from './authored_town_dressing';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import { getActiveWorldContent } from './data';
 import { FENCE_END_PAD } from './fence_dims';
@@ -50,8 +51,10 @@ export function crossesFence(
     return along >= -endPad - r && along <= len + endPad + r;
   };
 
-  const props = getActiveWorldContent().props;
-  for (const f of props.fences) {
+  const content = getActiveWorldContent();
+  const props = content.props;
+  // A promoted town fence crosses as its placement below, not as its record.
+  for (const f of promotedColliderProps(props, content.promotedScenery).fences) {
     if (crossesSegment(f.x1, f.z1, f.x2, f.z2, f.width === undefined ? undefined : f.width / 2)) {
       return true;
     }
@@ -62,7 +65,7 @@ export function crossesFence(
   // placement's local x axis keeps the jump-aware crossing (click-to-move
   // auto-jump, pathfind) on them. Only authored maps carry placements, so the
   // built-in world skips the loop entirely.
-  for (const p of getActiveWorldContent().placements ?? []) {
+  for (const p of content.placements ?? []) {
     if (p.worldPropKind !== 'fence' || !p.worldPropWidth) continue;
     const half = (p.worldPropWidth * p.scale * (p.scaleX ?? 1)) / 2;
     const dx = Math.cos(p.rotY) * half;

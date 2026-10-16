@@ -1,8 +1,13 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { BUILDING_TERRAIN_SAMPLE_STEP } from '../sim/building_layout';
 import { getActiveWorldContent } from '../sim/data';
 import { FENBRIDGE_BUILDINGS_BY_ID, FENBRIDGE_LAYOUT, localToWorld } from '../sim/fenbridge_layout';
+import {
+  forEachSegmentFootprintSample,
+  type PitchedSegmentPlacement,
+  pitchedSegmentPlacement,
+  type SegmentPoint,
+} from '../sim/pitched_segment';
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
@@ -35,6 +40,8 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { placedTownCullRadius } from './placed_town_buildings';
+import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import { prepareSceneryDetailRoot } from './scenery_detail';
@@ -53,9 +60,12 @@ const OVERLAY_NAME = 'fenbridgeCaptureOverlay';
 // static batch (the boardwalks, the cistern, the stall, the muster board)
 // stands inside the hub ring; the margin keeps the circle where the walled
 // town had it (half a palisade wing past the ring), so opening the town moved
-// no cull and no reveal.
+// no cull and no reveal. Stood grand, the north street's shops reach past that
+// circle, so it grows to hold every building's own cull circle whole, the
+// placed-town rule (placed_town_buildings.ts): the town's fog answer never
+// hides a building its own cull still draws.
 const TOWN_CULL_MARGIN_YD = 6;
-const TOWN_CULL_RADIUS = FENBRIDGE_LAYOUT.hub.radius + TOWN_CULL_MARGIN_YD;
+const TOWN_CULL_RADIUS = placedTownCullRadius(FENBRIDGE_LAYOUT, TOWN_CULL_MARGIN_YD);
 /** The one reveal-gate key of the town's static content. */
 const STATIC_REVEAL_KEY = 'fenbridge-town-static';
 
@@ -106,6 +116,9 @@ const ASSET_INSTANCE_COUNTS = (() => {
 const loadedSources = new Map<string, THREE.Group>();
 const preparedTemplates = new Map<string, TownAssetTemplate>();
 const sourceLoadTasks = new Map<string, Promise<void>>();
+/** The indoor camera's rooms of the live view's walk-in buildings (dropped when the next
+ *  view builds). */
+const cameraInteriors = createPlacedTownInteriors();
 /** The FILE each resident source was read from. A painted building's URL
  *  names the model; the file follows the profile's texture tier (same
  *  geometry, see placed_texture_tier_core.ts), so everything else here stays
@@ -497,68 +510,6 @@ function placementMatrix(
   );
 }
 
-type SegmentPoint = Readonly<{ x: number; z: number }>;
-
-interface PitchedSegmentPlacement {
-  centerX: number;
-  centerY: number;
-  centerZ: number;
-  rotation: number;
-  pitch: number;
-  spatialLength: number;
-  terrainOffset: number;
-}
-
-function forEachSegmentFootprintSample(
-  start: SegmentPoint,
-  end: SegmentPoint,
-  width: number,
-  visit: (x: number, z: number, progress: number) => void,
-): void {
-  const dx = end.x - start.x;
-  const dz = end.z - start.z;
-  const length = Math.hypot(dx, dz);
-  const alongSteps = Math.max(1, Math.ceil(length / BUILDING_TERRAIN_SAMPLE_STEP));
-  const acrossSteps = Math.max(1, Math.ceil(width / BUILDING_TERRAIN_SAMPLE_STEP));
-  const normalX = length > 1e-8 ? -dz / length : 0;
-  const normalZ = length > 1e-8 ? dx / length : 1;
-  for (let along = 0; along <= alongSteps; along++) {
-    const progress = along / alongSteps;
-    const centerX = start.x + dx * progress;
-    const centerZ = start.z + dz * progress;
-    for (let across = 0; across <= acrossSteps; across++) {
-      const lateral = -width / 2 + (width * across) / acrossSteps;
-      visit(centerX + normalX * lateral, centerZ + normalZ * lateral, progress);
-    }
-  }
-}
-
-function pitchedSegmentPlacement(
-  start: SegmentPoint,
-  end: SegmentPoint,
-  width: number,
-  groundAt: GroundAt,
-): PitchedSegmentPlacement {
-  const startY = groundAt(start.x, start.z);
-  const endY = groundAt(end.x, end.z);
-  const horizontalLength = Math.hypot(end.x - start.x, end.z - start.z);
-  const deltaY = endY - startY;
-  let minimumResidual = 0;
-  forEachSegmentFootprintSample(start, end, width, (x, z, progress) => {
-    const pitchedBottomY = startY + deltaY * progress;
-    minimumResidual = Math.min(minimumResidual, groundAt(x, z) - pitchedBottomY);
-  });
-  return {
-    centerX: (start.x + end.x) / 2,
-    centerY: (startY + endY) / 2 + minimumResidual,
-    centerZ: (start.z + end.z) / 2,
-    rotation: Math.atan2(-(end.z - start.z), end.x - start.x),
-    pitch: Math.atan2(deltaY, horizontalLength),
-    spatialLength: Math.hypot(horizontalLength, deltaY),
-    terrainOffset: minimumResidual,
-  };
-}
-
 function pitchedFootprintPlacement(
   center: SegmentPoint,
   rotation: number,
@@ -572,6 +523,10 @@ function pitchedFootprintPlacement(
 }
 
 function microPlacements() {
+  // A document that owns the square's dressing as placements
+  // (promotedScenery.authoredTownDressing) draws the cistern, the stall and
+  // the muster board itself.
+  if (activeWorldPromoted('authoredTownDressing')) return [];
   const cistern = FENBRIDGE_LAYOUT.civic.cistern;
   const stall = FENBRIDGE_LAYOUT.civic.provisionStall;
   const board = FENBRIDGE_LAYOUT.civic.musterBoard;
@@ -731,7 +686,10 @@ function buildBoardwalkBatches(
   groundAt: GroundAt,
   textures: SurfaceTextures,
 ): THREE.InstancedMesh[] {
-  const placements = FENBRIDGE_LAYOUT.repeated.boardwalks.map((boardwalk) => {
+  const boardwalks = activeWorldPromoted('authoredTownDressing')
+    ? []
+    : FENBRIDGE_LAYOUT.repeated.boardwalks;
+  const placements = boardwalks.map((boardwalk) => {
     const terrain = pitchedFootprintPlacement(
       boardwalk.position,
       boardwalk.rotation,
@@ -1042,6 +1000,8 @@ function buildFromTemplates(
   group.userData.microBatchNames = [];
   group.userData.repeatedBatchNames = [];
   group.userData.boardwalkCount = 0;
+  // the previous view's rooms go with it: a world without the town keeps no air
+  cameraInteriors.clear();
 
   if (!builtInWorld) {
     const setCaptureOverlay = (): void => undefined;
@@ -1079,6 +1039,9 @@ function buildFromTemplates(
     // target like every building, so the two lists stay index-aligned.
     const built = buildPlacedTownBuilding('fenbridge', building, template.raw, groundAt);
     built.group.userData.placementId = building.id;
+    // a walk-in one keeps the indoor camera to its rooms (placed_town_interiors.ts), and its
+    // doors keep it solid while the player steps in looking through one (the Highwatch rule)
+    const interior = cameraInteriors.add(building, groundAt);
     group.add(built.group);
     hideTargets.push({
       group: built.group,
@@ -1094,6 +1057,8 @@ function buildFromTemplates(
       topY: built.topY,
       cullRadius: built.cullRadius,
       walkIn: building.walkIn,
+      doorways: interior?.openings.map((opening) => interior.boxes[opening.box]),
+      doorwayFrame: interior?.frame,
     });
     buildingGroups.push(built.group);
   }
@@ -1416,6 +1381,35 @@ export const fenbridgeTownInternalsForTest = {
     });
   },
 };
+
+/**
+ * One town model as a standalone object drawn exactly as the town draws it
+ * (the Eastbrook twin is eastbrookStyledPlacedObject): the extracted,
+ * semantic-recoloured geometry under the town's surface materials, for the
+ * Fenbridge-only models a Studio document promotes to placements. Both
+ * materials are hook-preserving clones, never the shared entries the town's
+ * batches draw with (placed batching patches whatever it is handed), and the
+ * object is null until the town's atlas has loaded.
+ */
+export function fenbridgeStyledPlacedObject(
+  source: THREE.Object3D,
+  url: string,
+): THREE.Object3D | null {
+  const textures = runtimeSurfaceTextures();
+  if (!textures.atlas) return null;
+  const template = extractTemplate(source, url);
+  const group = new THREE.Group();
+  if (template.opaque) {
+    const mesh = new THREE.Mesh(template.opaque, townMaterial(false, textures, true));
+    mesh.castShadow = GFX.dynamicShadows;
+    mesh.receiveShadow = GFX.dynamicShadows;
+    group.add(mesh);
+  }
+  if (template.emissive) {
+    group.add(new THREE.Mesh(template.emissive, townMaterial(true, textures, true)));
+  }
+  return group;
+}
 
 export const FENBRIDGE_TOWN_ROOT_NAME = ROOT_NAME;
 export const FENBRIDGE_CAPTURE_OVERLAY_NAME = OVERLAY_NAME;

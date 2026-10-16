@@ -29,8 +29,10 @@ import {
 } from '../src/render/eastbrook_town_visibility_core';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
+import { interiorCameraInternalsForTest } from '../src/render/interior_camera';
 import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { isOccluderGhostMaterial } from '../src/render/occluder_ghost_variant_key';
+import { placedTownCameraInterior } from '../src/render/placed_town_interior_core';
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
 import { vertexColorEmissiveInternalsForTest } from '../src/render/vertex_color_emissive';
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../src/sim/building_layout';
@@ -483,7 +485,10 @@ describe('Eastbrook town renderer', () => {
     const ground = (x: number, z: number) => terrainHeight(x, z, seed);
     // A bare slope with no level pad under it: every lot drops across its own
     // wall box, which is exactly where the kit and shape paths grew a skirt.
-    const slope = (x: number, z: number) => 0.05 * x - 0.03 * z;
+    // (Tilted the other way along z for the World of ClaudeCraft Studio map's
+    // arrangement: the smithy, the inn and the quay cottage turned so their
+    // depth ran almost level along the old tilt.)
+    const slope = (x: number, z: number) => 0.05 * x + 0.03 * z;
     const stagings = [
       {
         label: 'real terrain',
@@ -796,6 +801,17 @@ describe('Eastbrook town renderer', () => {
     // eye on one point, so the only way to ghost a building is to be inside
     // its box, and every material of the building must answer together (one
     // fade record per material and mesh shape).
+    // Split for the walk-in buildings (eastbrook_layout.ts walkIn): every
+    // building but the quay cottage is a room a player walks into, so with
+    // the eye inside one it ghosts only once the camera is outside its wall
+    // box or over its roof line; eye and camera both inside keep it solid. A
+    // camera inside the box with the eye outside still ghosts it. The sealed
+    // cottage keeps the rule above unchanged (eastbrook_town_visibility_core.ts).
+    expect(
+      EASTBROOK_LAYOUT.buildings
+        .filter((building) => !building.walkIn)
+        .map((building) => building.id),
+    ).toEqual(['eastbrook_quay_cottage']);
     const groundY = 1.5;
     const view = eastbrookTownInternalsForTest.buildFromSources(
       fixtureSources(),
@@ -830,23 +846,50 @@ describe('Eastbrook town renderer', () => {
       const halfDepth = building.nativeDimensions.depth / 2;
       const roofY = groundY + building.nativeDimensions.height;
       const wallBox = { center: building.position, rotation: building.rotation };
+      const belowRoof = groundY + 2;
       // Stand well over the roof first (so each probe starts from the authored
-      // state), then on the probe point.
-      const stateAt = (point: { x: number; z: number }, y: number): string => {
-        view.update(point.x, roofY + 20, point.z, point.x, roofY + 20, point.z, 200, 10);
+      // state), then put the camera and the eye where the probe says.
+      const stateWith = (
+        camera: { x: number; y: number; z: number },
+        eye: { x: number; y: number; z: number },
+      ): string => {
+        view.update(eye.x, roofY + 20, eye.z, eye.x, roofY + 20, eye.z, 200, 10);
         expect(fadeState(materials), `${building.id} cleared`).toBe('solid');
-        view.update(point.x, y, point.z, point.x, y, point.z, 200, 10);
+        view.update(camera.x, camera.y, camera.z, eye.x, eye.y, eye.z, 200, 10);
         return fadeState(materials);
       };
+      const stateAt = (point: { x: number; z: number }, y: number): string =>
+        stateWith({ x: point.x, y, z: point.z }, { x: point.x, y, z: point.z });
 
       for (const [signX, signZ] of corners) {
         // A step inside each corner of the wall box: the box is the whole
-        // footprint, not a patch around the door.
+        // footprint, not a patch around the door. A sealed building ghosts;
+        // a walk-in room with the eye and the camera both in it stays solid.
         const inside = pointIn(wallBox, signX * (halfWidth - 0.05), signZ * (halfDepth - 0.05));
         expect(insideWallBox(building, inside)).toBe(true);
-        expect(stateAt(inside, groundY + 2), `${building.id} inside ${signX},${signZ}`).toBe(
-          'ghost',
+        expect(stateAt(inside, belowRoof), `${building.id} inside ${signX},${signZ}`).toBe(
+          building.walkIn ? 'solid' : 'ghost',
         );
+        if (!building.walkIn) continue;
+        // The walk-in room still ghosts when the camera leaves its box with
+        // the eye inside, and when the camera backs into it from an eye
+        // outside: three yards out past the same corner, under the roof line.
+        const outPastCorner = pointIn(wallBox, signX * (halfWidth + 3), signZ * (halfDepth + 3));
+        expect(insideWallBox(building, outPastCorner)).toBe(false);
+        expect(
+          stateWith(
+            { x: outPastCorner.x, y: belowRoof, z: outPastCorner.z },
+            { x: inside.x, y: belowRoof, z: inside.z },
+          ),
+          `${building.id} camera out past ${signX},${signZ}`,
+        ).toBe('ghost');
+        expect(
+          stateWith(
+            { x: inside.x, y: belowRoof, z: inside.z },
+            { x: outPastCorner.x, y: belowRoof, z: outPastCorner.z },
+          ),
+          `${building.id} camera backed in at ${signX},${signZ}`,
+        ).toBe('ghost');
       }
       // A step outside each wall: still under the model's eaves, never a ghost.
       for (const [localX, localZ] of [
@@ -870,12 +913,27 @@ describe('Eastbrook town renderer', () => {
         expect(stateAt(point, groundY + 2), `${building.id} under the eaves`).toBe('solid');
       }
       // The roof line is the model's own top over the ground under its anchor.
+      // Eye and camera together just under it: a sealed building ghosts, a
+      // walk-in room stays solid. Just over it, neither ghosts.
       expect(stateAt(building.position, roofY - 0.05), `${building.id} under the roof`).toBe(
-        'ghost',
+        building.walkIn ? 'solid' : 'ghost',
       );
       expect(stateAt(building.position, roofY + 0.05), `${building.id} over the roof`).toBe(
         'solid',
       );
+      if (building.walkIn) {
+        // With the eye in the room, the same roof line decides by the camera:
+        // still under it keeps the room solid, over it ghosts the room.
+        const eye = { x: building.position.x, y: belowRoof, z: building.position.z };
+        expect(
+          stateWith({ x: eye.x, y: roofY - 0.05, z: eye.z }, eye),
+          `${building.id} camera under the roof`,
+        ).toBe('solid');
+        expect(
+          stateWith({ x: eye.x, y: roofY + 0.05, z: eye.z }, eye),
+          `${building.id} camera over the roof`,
+        ).toBe('ghost');
+      }
       // The merged microgeometry is never a roof-hide target.
       expect((micro.material as THREE.Material).transparent).toBe(false);
       expect((micro.material as THREE.Material).opacity).toBe(1);
@@ -1235,6 +1293,78 @@ describe('Eastbrook town renderer', () => {
         shipped.group.getObjectByName('eastbrookBuilding:eastbrook_weekly_vault') as THREE.Object3D,
       ),
     ).toHaveLength(8);
+  });
+
+  it('stands the square dressing down for a document that owns it as placements', () => {
+    // benches, stalls and yard fences are the whole micro batch; the monument
+    // stays town-drawn, and so does every building
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      placements: [],
+      promotedScenery: { authoredTownDressing: true },
+    });
+    try {
+      const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+      expect(view.group.getObjectByName('eastbrookTownMicroOpaqueBatch')).toBeUndefined();
+      expect(view.group.getObjectByName('eastbrookTownMicroEmissiveBatch')).toBeUndefined();
+      for (const building of EASTBROOK_LAYOUT.buildings) {
+        expect(
+          view.group.getObjectByName(`eastbrookBuilding:${building.id}`),
+          building.id,
+        ).toBeInstanceOf(THREE.Group);
+      }
+    } finally {
+      setActiveWorldContent(null);
+    }
+    const shipped = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    expect(shipped.group.getObjectByName('eastbrookTownMicroOpaqueBatch')).toBeInstanceOf(
+      THREE.Mesh,
+    );
+  });
+
+  it('keeps the indoor camera to every walk-in building it stands, and drops the rooms with it', () => {
+    // each walk-in painted building registers its air (placed_town_interiors.ts), stood on the
+    // ground the view stands its building on (a slope, so a wrong anchor reads differently);
+    // the quay cottage bakes a shut door and the Weekly Vault is a sealed hall, so neither has
+    // any
+    const ground = (x: number, z: number) => 1.5 + 0.03 * x - 0.02 * z;
+    const rooms = () => interiorCameraInternalsForTest.interiors();
+    const walkIn = EASTBROOK_LAYOUT.buildings.filter((building) => building.walkIn);
+    expect(walkIn.length).toBeGreaterThan(1);
+    interiorCameraInternalsForTest.reset();
+    try {
+      eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms().map((room) => room.id)).toEqual(
+        walkIn.map((building) => `placed_town:${building.id}`),
+      );
+      for (const [index, building] of walkIn.entries()) {
+        expect(rooms()[index], building.id).toEqual(
+          placedTownCameraInterior(building, ground(building.placement.x, building.placement.z)),
+        );
+      }
+      // a rebuild replaces them, never doubles them
+      eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms()).toHaveLength(walkIn.length);
+      // a document that owns the buildings as placements keeps no town air
+      setActiveWorldContent({
+        ...BUILTIN_WORLD,
+        placements: [],
+        promotedScenery: { authoredTowns: true },
+      });
+      try {
+        eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+        expect(rooms()).toEqual([]);
+      } finally {
+        setActiveWorldContent(null);
+      }
+      // ...nor does a world without the town
+      eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms()).toHaveLength(walkIn.length);
+      eastbrookTownInternalsForTest.buildFromSources(new Map(), () => 0, false);
+      expect(rooms()).toEqual([]);
+    } finally {
+      interiorCameraInternalsForTest.reset();
+    }
   });
 
   it('returns an empty stable root for custom worlds before asking for any built-in asset source', () => {

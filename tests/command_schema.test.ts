@@ -193,8 +193,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Buddy collection integration adds four sends and five dispatches: the retired
 // buddy_cosmetic token is dispatch-only; buddy_rename is sent and dispatched.
 // The Studio merge adds no command, so the v0.45.0 integration stays at 262/276.
-const EXPECTED_SEND_COUNT = 262;
-const EXPECTED_DISPATCH_COUNT = 276;
+// The tavern's seats add sit_seat (sent by ClientWorld.sitOnSeat, dispatched to
+// Sim.sitOnSeat) on feature/walkable-tavern-aaa: 248/262/14 on its own. Merged with
+// the v0.45.0 integration's 262/276: 263/277/14.
+const EXPECTED_SEND_COUNT = 263;
+const EXPECTED_DISPATCH_COUNT = 277;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch
@@ -330,12 +333,14 @@ describe('command schema parity (W0b)', () => {
     expect(dispatchSet.has('unstuck')).toBe(true);
   });
   it('appends courier dispatch as a complete client/server command pair', () => {
-    // The integration adds the dungeon guide answer, then the buddy rename command.
-    expect(COMMAND_NAMES.slice(-4)).toEqual([
+    // The integration adds the dungeon guide answer, then the buddy rename command; the
+    // Mirefen tavern's seat command (sit_seat) follows them.
+    expect(COMMAND_NAMES.slice(-5)).toEqual([
       'courier_dispatch',
       'dungeon_guide_answer',
       'buddy_rename',
       'referralCards',
+      'sit_seat',
     ]);
     expect(sendSet.has('courier_dispatch')).toBe(true);
     expect(dispatchSet.has('courier_dispatch')).toBe(true);

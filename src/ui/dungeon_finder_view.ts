@@ -23,7 +23,7 @@ import {
 } from '../sim/content/dungeon_finder';
 import { HEROIC_BOSS_LOOT } from '../sim/content/heroic_loot';
 import { FIRST_TALENT_LEVEL, type Role } from '../sim/content/talents';
-import { DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
 import { lootEntryRollsOnClaim } from '../sim/loot/loot_difficulty_gate';
 import { compatibleFinderRoles } from '../sim/social/dungeon_finder';
 import type { DungeonDifficulty, PlayerClass } from '../sim/types';
@@ -349,7 +349,8 @@ function buildDetail(
   specRole: Role | null,
   lockouts: RaidLockout[],
 ): FinderActivityDetailView {
-  const door = DUNGEONS[activity.entranceDungeonId]?.doorPos ?? { x: 0, z: 0 };
+  const entrance = DUNGEONS[activity.entranceDungeonId];
+  const door = entrance ? activeDungeonDoorPos(entrance) : { x: 0, z: 0 };
   const tuning = HEROIC_DUNGEON_TUNING[activity.dungeonId];
   const blocked = blockReasonFor(activity, level, specRole);
   return {

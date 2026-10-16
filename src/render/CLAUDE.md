@@ -195,6 +195,36 @@ Everything else is a sibling module in one of these families:
   moves). All display-only, all gated by the reduced-motion switch; driven
   from `renderer.ts` `updateCamera` and the hud event hooks
   (`tests/camera_*_core.test.ts`).
+- `interior_camera.ts` over `interior_camera_core.ts`: the indoor camera clamp, the ONE
+  scoped exception on the built-in world to the pinned rule that scene geometry never shortens
+  the chase boom (`tests/graphics_overhaul_integration.test.ts`). A walk-in building registers
+  its AIR (boxes, optionally rounded by a vertical cylinder, plus its openings onto the world;
+  square to the world's axes, or to the building's own `InteriorFrame`, an origin and a turn,
+  for one stood at any other angle: every query still takes world points) with
+  `registerCameraInterior` when it is built and drops it on teardown; while the player's
+  eye stands in it, the drawn camera stays in that air (pull-in at once, eased release, the
+  least flattening under a lintel or a ceiling, a lift or swing over a cramped spot, a cut to
+  the eyes in a corner nothing escapes; a `preserve-angle` interior instead keeps the
+  requested ray and only shortens the boom along it); walking in, the lens is held under the
+  door's head and follows through the doorway from outside (`interiorEntryCap`, a ray out
+  through an opening runs on past it), so nothing is cut away round the player; bodies
+  outside lose their nameplates and chat bubbles unless seen through an opening. Outdoors it
+  touches nothing. Reference registrants: every town view that stands painted buildings (the
+  placed-town view `placed_town_buildings.ts` behind Highwatch, `eastbrook_town.ts`,
+  `fenbridge_town.ts`) registers each walk-in building's air through its own registrar
+  (`placed_town_interiors.ts`: cleared as the view builds, one `add` per building it stands)
+  from `placed_town_interior_core.ts` (rooms and doors per model at authored size, carried to
+  the record's scale, turn and seat; a new walk-in model needs its entry there, pinned against
+  its baked collision by `tests/placed_town_interior_core.test.ts`). The Highwatch and
+  Fenbridge views also hand the same doors to their camera fade, so a walk-in building stays
+  solid while the player steps in with the lens still outside looking through the door
+  (`fenbridge_town_visibility_core.ts` `doorways`, read in `doorwayFrame` for a turned
+  building); Eastbrook's roof fade takes no doors, so there a walk-in building fades while the
+  lens is outside it. The Mirefen tavern (`mirefen_tavern.ts`) registers its own air from
+  `mirefen_tavern_interior_core.ts`. The Highwatch manor's fires and lamps
+  (`highwatch_manor_lights.ts`) join the props' fire-light budget and the scenery flame pass,
+  the campfire's rule. The chase camera's floor (ground, rift tier, maze hedges) is
+  `chase_camera_floor_core.ts`.
 - **Studio (authored maps) and the editor:** two directories, each with its
   own `CLAUDE.md` and `index.ts` barrel. `authored_map/` holds what the
   renderer does ONLY on an authored map (chase-boom clamps and look-up dolly,
@@ -210,6 +240,16 @@ Everything else is a sibling module in one of these families:
   (`target_cone_overlay.ts`), god-ray shafts (`god_ray_shafts.ts`), and the
   per-biome fog/light/god-ray tables (`outdoor_biome_presets.ts`). A new
   public picking method lands on its facade, not on `Renderer`.
+- **Sitting on furniture** (the seats are `src/sim/seat_anchor.ts`): the sim keeps a seated
+  body on its seat's STAND spot; `seated_pose.ts` over the pure `seated_pose_core.ts` draws it
+  in the seat (the root at the seat anchor, turned to the seat, the rig ROOT lifted onto the
+  seat surface so the group's step smoothing never eases over a seat) and walks it in and out.
+  Two hooks and nothing else: `entityRenderPose` (`deck_frame.ts`) calls `applySeatedPose`,
+  the animation fill calls `applySeatAnim`. The chair clips (`sit_anims.glb`, wired by
+  `manifest.ts` `seats()` onto every Rig_Medium body, chosen by `characters/seat_clips.ts`)
+  are authored in the seat's anchor space, so the visual SNAPS (never crossfades) into and
+  out of the seated states. The pointer's seat pick is `seat_pick.ts` over
+  `seat_pick_core.ts`, driven by `src/game/seat_interact.ts`.
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,

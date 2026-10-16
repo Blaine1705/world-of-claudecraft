@@ -36,6 +36,7 @@ import {
 } from '../render/terrain';
 import { MAX_PAINT_SLOTS, paintTextureSlotUsage } from '../render/terrain_paint_layers';
 import { naturalSwayKindForAssetPath } from '../render/tree_sway';
+import type { BrushShape } from '../sim/brush_shape';
 import {
   CAVE_MAX_MULT,
   CAVE_MAX_RADIUS,
@@ -248,6 +249,11 @@ import {
   WATERFALL_ASSET_ID,
   type WallRunDef,
 } from '../sim/map_doc';
+import {
+  cloneMaterialFinishes,
+  type MaterialFinishes,
+  withMaterialFinish,
+} from '../sim/material_finishes';
 import { hash2 } from '../sim/rng';
 import type { TreeParams } from '../sim/tree_params';
 import {
@@ -276,6 +282,7 @@ import {
   type WorldContent,
   type ZoneAtmosphere,
 } from '../sim/types';
+import type { WallFinish } from '../sim/wall_finishes';
 import {
   biomeAt,
   generateDecorationsInBounds,
@@ -292,6 +299,7 @@ import { Editor3DViewport, type GizmoCutChange, type GizmoHitboxChange } from '.
 import { AssetBrowser } from './asset_browser';
 import { ASSET_CATALOG, assetById } from './asset_catalog.generated';
 import { classifyCell, isTownStructure, makeRetexNoise, RETEX_SWATCHES } from './auto_retexture';
+import { visitBiomeBrushCells } from './biome_brush_core';
 import { finestPaintCell, growBiomePaint, resampleBiomePaint } from './biome_paint_core';
 import { nearestBlockerIndex } from './blocker_core';
 import { brushAlphaById, importBrushAlpha, sampleBrushAlpha } from './brush_alphas';
@@ -440,6 +448,14 @@ import {
   ambientDecorationsToPlacements,
   closestAmbientDecorations,
 } from './foliage_edit_core';
+import {
+  applyGroundSeat,
+  flattenStrokeTarget,
+  type GroundSeat,
+  groundSeatOf,
+  isOnGround,
+  seatOnGround,
+} from './ground_level_core';
 import { bakeImportedModelCollision, bakeTrueModelCollision } from './import_collision';
 import {
   BIOME_OPTIONS,
@@ -480,6 +496,8 @@ import {
 } from './model';
 import { EditorApiError, forkMap, type MapFullWire, signedIn, uploadAsset } from './net';
 import { newMapSizeDialog } from './new_map_dialog';
+import { ObjectMoveController } from './object_move_controller';
+import { buildObjectMovePanel } from './object_move_panel';
 import { parseMap, serializeMapCompact } from './persist';
 import { applyScaleEqualize, type EqualizePlan, planScaleEqualize } from './placement_scale_core';
 import {
@@ -505,6 +523,18 @@ import {
   savePlaytestRecoveryDraft,
 } from './playtest';
 import { DEFAULT_POINT_SOUND } from './point_sounds';
+import { createPondCommand } from './pond_commands';
+import {
+  DEFAULT_POND_DEPTH,
+  DEFAULT_POND_RADIUS,
+  POND_BANK_RADIUS_FACTOR,
+  POND_DEPTH_MAX,
+  POND_DEPTH_MIN,
+  POND_RADIUS_MAX,
+  POND_RADIUS_MIN,
+  planPond,
+  pondTerrainMatches,
+} from './pond_core';
 import {
   applyCollisionShare,
   type PrefabAuthoredCollision,
@@ -532,8 +562,10 @@ import {
   pastePlacementSelection,
   toggledKeySelection,
 } from './selection_clipboard';
+import { SelectionQuickActions, type SelectionQuickActionsDeps } from './selection_quick_actions';
 import { editorErrorKey } from './server_errors_core';
 import { createShippedMap } from './shipped_maps';
+import { type SlopePoint, type SlopeRamp, slopeStamp } from './slope_core';
 import { appendSpan, removeSpan } from './span_core';
 import {
   erasePlacementIndex,
@@ -580,6 +612,7 @@ import {
   promoteStreetlamps,
   promoteWillows,
   repairDecorBuildingCollision,
+  repairLegacyWorldPropFit,
   repairStretchedWorldProps,
   withoutEditableWorldProps,
   withoutMajorWorldProps,
@@ -610,7 +643,13 @@ function isSelectionTool(tool: EditorTool): boolean {
  *  Shift while stroking applies the OPPOSITE sub-mode (raise<->lower,
  *  smooth<->flatten). */
 function isSculptTool(tool: EditorTool): boolean {
-  return tool === 'raise' || tool === 'lower' || tool === 'smooth' || tool === 'flatten';
+  return (
+    tool === 'raise' ||
+    tool === 'lower' ||
+    tool === 'smooth' ||
+    tool === 'flatten' ||
+    tool === 'slope'
+  );
 }
 // The built-in meadow grass's perceived blade hue/lightness (render
 // grass_patch.ts DEFAULT_HUE / TINT_L): the foliage brush's defaults, so
@@ -627,6 +666,7 @@ const AUTOSAVE_PREF_KEY = 'woc_editor_autosave';
 const FREE_FLY_PREF_KEY = 'woc_editor_freefly';
 const SHOW_BOUNDARY_PREF_KEY = 'woc_editor_show_boundary';
 const BIRDS_PREF_KEY = 'woc_editor_birds';
+const SNOWFALL_PREF_KEY = 'woc_editor_snowfall';
 const INVERT_PAN_PREF_KEY = 'woc_editor_invert_pan';
 const SHOW_PLAYER_PREF_KEY = 'woc_editor_show_player';
 const LIGHTING_PREF_KEY = 'woc_editor_lighting';
@@ -802,6 +842,7 @@ const BRUSH_COLOR: Partial<Record<EditorTool, number>> = {
   lower: 0x5aa0ff,
   smooth: 0x9fdc7f,
   flatten: 0xd8c27a,
+  slope: 0xe0a85a,
   erase: 0xe0503c,
   place: 0x3fd0ff,
   foliage: 0x69d84f,
@@ -1026,6 +1067,8 @@ export class EditorApp {
   private collidersHiddenOn = readPref(HIDE_COLLIDERS_PREF_KEY);
   // Named-location area boxes; shown by default, hideable from the Zone tool.
   private locationsHiddenOn = readPref(HIDE_LOCATIONS_PREF_KEY);
+  // Preview-only snowfall visibility, remembered without changing the map.
+  private snowfallOn = readPrefDefaultOn(SNOWFALL_PREF_KEY);
   // "Scale all copies" range (Selection panel): a random scale in [min, max] is
   // rolled onto every placement of the selected asset. Session state, not saved.
   private cloneScaleMin = 0.8;
@@ -1150,6 +1193,29 @@ export class EditorApp {
   // Wheel/nudge bursts coalesce into ONE undo commit (against placementDragBase).
   private readonly transformCoalescer = new CommitCoalescer();
   private transformTimer = 0;
+  /** Select-mode moving of the built-in gameplay objects a map can move
+   *  (farm beds, practice dummies, gather nodes, dungeon doors). */
+  private readonly objectMoves = new ObjectMoveController({
+    getMoves: () => this.map.objectMoves,
+    setMoves: (next) => {
+      if (next) this.map.objectMoves = next;
+      else delete this.map.objectMoves;
+      if (next) this.activeWorld.objectMoves = next;
+      else delete this.activeWorld.objectMoves;
+    },
+    moveLive: (key, before, after) => {
+      this.viewport3d?.setSimObjectMoves(after);
+      this.viewport3d?.objects.moveLive(key, before, after);
+    },
+    showSelection: (key) => this.viewport3d?.objects.setSelected(key),
+    pushUndo: (entry) => this.pushUndo(entry),
+    committed: () => {
+      invalidateStaticColliders();
+      this.map.meta.updatedAt = now();
+      this.markDirty();
+      this.inspector.refresh();
+    },
+  });
   // A 3D drag-move is in flight: single-key tool shortcuts stay suppressed.
   private placementDragging = false;
   // Preview mode (topbar toggle): in-game look, editor overlays hidden.
@@ -1213,6 +1279,16 @@ export class EditorApp {
   } | null = null;
   // The Fluid tool's armed pool kind (preset).
   private fluidKind: FluidKind = 'lava';
+  private pondRadius = DEFAULT_POND_RADIUS;
+  private pondDepth = DEFAULT_POND_DEPTH;
+  // Brush footprints, kept apart so a square paint brush never squares sculpt.
+  private paintBrushShape: BrushShape = 'circle';
+  private sculptBrushShape: BrushShape = 'circle';
+  // Slope tool: the right-clicked start, and the ramp the current stroke
+  // follows (its end is the press point, set at stroke begin).
+  private slopeStart: SlopePoint | null = null;
+  private slopeRamp: SlopeRamp | null = null;
+  private selectionQuickActions!: SelectionQuickActions;
   // Caves tool sub-mode: lay cave rig nodes, CARVE real interiors, cut sheet
   // openings, patch ground back, paint remesh detail, run the volumetric
   // Dig/Fill sculpt brushes, or the edge-rounding Smooth brush.
@@ -1396,6 +1472,11 @@ export class EditorApp {
   private paintCreatedGrid = false;
   private lastStamp: Vec2 | null = null;
   private flattenTarget = 0;
+  /** Flatten's locked level (right-click picks it); null = each stroke levels
+   *  to the height where it starts. */
+  private flattenLock: number | null = null;
+  /** Moving an asset re-seats it on the ground instead of detaching it. */
+  private snapToGroundOnMove = false;
   private eraseLast: Vec2 | null = null;
 
   // water
@@ -1464,6 +1545,7 @@ export class EditorApp {
     promoteWillows(this.map as CustomMap);
     promoteFarshorePalms(this.map as CustomMap);
     promoteFeatureDressing(this.map as CustomMap);
+    repairLegacyWorldPropFit(this.map as CustomMap);
     repairStretchedWorldProps(this.map);
     repairPlacedAssetShapes(this.map);
     repairMissingTreeCollision(this.map, applyDefaultCollision);
@@ -1669,6 +1751,7 @@ export class EditorApp {
       },
       refresh: () => {
         this.buildTransformControls?.refresh();
+        this.selectionQuickActions?.refresh();
         this.inspector.refresh();
       },
       arm: () => this.setTool('building'),
@@ -1680,24 +1763,41 @@ export class EditorApp {
       error: (message) => this.toasts.error(message),
     });
     this.buildTransformControls = new BuildTransformControls({
-      getState: () => ({
-        transform:
-          isSelectionTool(this.tool) && this.selectedPlacement !== null
-            ? (this.map.placements[this.selectedPlacement] ?? null)
-            : this.buildingWorkspace.active
-              ? this.buildingWorkspace.transform
-              : this.placeAssetId
-                ? {
-                    rotY: this.tool === 'city' ? this.cityKitRot : this.placeRotation,
-                    scale: this.tool === 'city' ? this.citySettings.kitScale : this.placeScale,
-                  }
-                : null,
-        fineRotation: this.fineBuildRotation,
-        canUndo: this.undo.canUndo,
-        canRedo: this.undo.canRedo,
-      }),
+      getState: () => {
+        const npcKey = this.transformableNpcKey();
+        if (npcKey !== null) {
+          const npc = this.map.content.npcs[npcKey.slice('npc:'.length)];
+          return {
+            transform: npc ? { rotY: npc.facing, scale: 1 } : null,
+            rotateOnly: true,
+            fineRotation: this.fineBuildRotation,
+            canUndo: this.undo.canUndo,
+            canRedo: this.undo.canRedo,
+          };
+        }
+        return {
+          transform:
+            isSelectionTool(this.tool) && this.selectedPlacement !== null
+              ? (this.map.placements[this.selectedPlacement] ?? null)
+              : this.buildingWorkspace.active
+                ? this.buildingWorkspace.transform
+                : this.placeAssetId
+                  ? {
+                      rotY: this.tool === 'city' ? this.cityKitRot : this.placeRotation,
+                      scale: this.tool === 'city' ? this.citySettings.kitScale : this.placeScale,
+                    }
+                  : null,
+          fineRotation: this.fineBuildRotation,
+          canUndo: this.undo.canUndo,
+          canRedo: this.undo.canRedo,
+        };
+      },
       onTransform: (next) => {
-        if (isSelectionTool(this.tool) && this.selectedPlacement !== null) {
+        const npcKey = this.transformableNpcKey();
+        if (npcKey !== null) {
+          this.updateNpcFacing(npcKey, next.rotY, true);
+          this.inspector.refresh();
+        } else if (isSelectionTool(this.tool) && this.selectedPlacement !== null) {
           this.updateSelectedPlacement(next, true);
           this.inspector.refresh();
         } else if (this.buildingWorkspace.active) this.buildingWorkspace.setTransform(next);
@@ -1715,6 +1815,9 @@ export class EditorApp {
       onUndo: () => this.doUndo(),
       onRedo: () => this.doRedo(),
     });
+
+    this.selectionQuickActions = new SelectionQuickActions(this.selectionQuickActionsDeps());
+    stageWrap.append(this.selectionQuickActions.root);
 
     this.cmBar = new CollisionMasterBar(stageWrap, {
       getMode: () => this.cmSubMode,
@@ -2224,6 +2327,9 @@ export class EditorApp {
       promotedScenery: promotedSceneryFor(map.propsMode, map.placements, map.promotedScenery),
     };
     if (map.playerSpawnArea) world.playerSpawnArea = { ...map.playerSpawnArea };
+    // Moved gameplay objects: the same frozen record the document holds, so
+    // the viewport's Sim, colliders and renderer read the live edits.
+    if (map.objectMoves) world.objectMoves = map.objectMoves;
     if (map.blockers) world.blockers = map.blockers;
     if (map.caves) world.caves = map.caves;
     if (map.holes) world.holes = map.holes;
@@ -2443,17 +2549,21 @@ export class EditorApp {
         toolActive: () => this.toolWantsPointer(),
         // Vertices mode claims Shift+drag too: without it the camera pan wins
         // and a Shift rubber band never reaches the tool at all.
+        // Slope has no inverted mode, so Shift+drag keeps panning with it.
         shiftEditsTool: () =>
-          isSculptTool(this.tool) || (this.tool === 'meshfix' && this.meshFixVertexMode),
+          (isSculptTool(this.tool) && this.tool !== 'slope') ||
+          (this.tool === 'meshfix' && this.meshFixVertexMode),
         onEditStart: (w, ev) => this.editStart(w, ev),
         onEditMove: (w, ev) => this.editMove(w, ev),
         onEditEnd: (ev) => this.editEnd(ev),
         onHover: (w) => this.hover3d(w),
         onTap: (cx, cy, w, additive) => this.tap3d(cx, cy, w, additive),
+        onRightTap: (w) => this.rightTap3d(w),
         // Collision Master: the workbench asset never drags; clicks pick
         // volumes/components instead.
         placementDragEnabled: () =>
           isSelectionTool(this.tool) && !this.hitboxEdit && !this.meshEditActive(),
+        ...this.placementPickingHooks(),
         onPlacementDragStart: (index) => this.beginPlacementDrag(index),
         onPlacementDragMove: (w) => this.placementDragMove(w),
         onPlacementDragEnd: () => this.endPlacementDrag(),
@@ -2463,7 +2573,16 @@ export class EditorApp {
         onMobDragStart: (id) => this.beginMobDrag(id),
         onMobDragMove: (w) => this.mobSelectDragMove(w),
         onMobDragEnd: () => this.endMobDrag(),
+        onObjectDragStart: (key) => this.beginObjectDrag(key),
+        onObjectDragMove: (w) => this.objectMoves.dragMove(w),
+        onObjectDragEnd: () => this.objectMoves.endDrag(),
         onBoxSelect: (indices, additive) => this.selectPlacements(indices, additive),
+        placementLabel: (index) => {
+          const placement = this.map.placements[index];
+          return placement
+            ? placement.name?.trim() || this.placementLabel(placement.assetId)
+            : t('editor.picking.asset', { number: formatNumber(index + 1) });
+        },
         onTransformWheel: (kind, deltaY) => this.transformWheel(kind, deltaY),
         onFlySpeedWheel: (deltaY) => this.flySpeedWheel(deltaY),
         gizmoMode: () =>
@@ -2501,6 +2620,7 @@ export class EditorApp {
       this.viewport3d.setShowPlayer(this.showPlayerOn);
       this.viewport3d.setCollidersHidden(this.collidersHiddenOn);
       this.viewport3d.setLocationsHidden(this.locationsHiddenOn);
+      this.viewport3d.setSnowEnabled(this.snowfallOn);
       this.viewport3d.setWireframe(this.wireframeOn);
       this.viewport3d.setXray(this.xrayOn);
       this.viewport3d.setCameraSpeeds(this.cameraSpeeds);
@@ -2733,6 +2853,7 @@ export class EditorApp {
     if (tool !== 'city') this.cityToolReset();
     this.buildingWorkspace?.syncView();
     this.buildTransformControls?.refresh();
+    this.selectionQuickActions?.refresh();
     if (tool === 'spawn') this.viewport3d?.setZonePreview(this.map.playerSpawnArea ?? null);
     else if (this.tool !== 'zone' && this.tool !== 'music') this.viewport3d?.setZonePreview(null);
     this.viewport3d?.clearBrush();
@@ -2777,6 +2898,7 @@ export class EditorApp {
     this.previewOn = on;
     this.topbar.setPreview(on);
     this.viewport3d?.setPreviewMode(on);
+    this.selectionQuickActions?.refresh();
     this.syncFootprintOverlay();
   }
 
@@ -3065,6 +3187,7 @@ export class EditorApp {
       this.tool === 'lower' ||
       this.tool === 'smooth' ||
       this.tool === 'flatten' ||
+      this.tool === 'slope' ||
       this.tool === 'paint' ||
       this.tool === 'foliage' ||
       this.tool === 'clutter' ||
@@ -3104,6 +3227,7 @@ export class EditorApp {
       case 'lower':
       case 'smooth':
       case 'flatten':
+      case 'slope':
         if (this.tool === 'raise' && this.sculptGrab && ev) {
           this.grabBegin(w, ev);
           break;
@@ -3146,6 +3270,9 @@ export class EditorApp {
         break;
       case 'collider':
         this.insertColliderAt(w);
+        break;
+      case 'pond':
+        this.insertPondAt(w);
         break;
       case 'fluid':
         this.insertFluidAt(w);
@@ -3350,6 +3477,7 @@ export class EditorApp {
       case 'lower':
       case 'smooth':
       case 'flatten':
+      case 'slope':
         if (this.grabSession) {
           if (ev) this.grabStep(ev);
           this.brushRing(w);
@@ -3528,6 +3656,7 @@ export class EditorApp {
       case 'lower':
       case 'smooth':
       case 'flatten':
+      case 'slope':
         if (this.grabSession) {
           this.grabCommit();
           this.inspector.refresh();
@@ -3724,6 +3853,9 @@ export class EditorApp {
           : 0xffd100;
     } else if (this.tool === 'place') {
       radius = Math.max(0.8, this.placeScale * 0.9);
+    } else if (this.tool === 'pond') {
+      radius = this.pondRadius * POND_BANK_RADIUS_FACTOR;
+      color = 0x4aa6d8;
     } else if (this.tool === 'collider') {
       radius = 2;
     } else if (this.tool === 'camp') {
@@ -3749,7 +3881,13 @@ export class EditorApp {
       this.viewport3d.clearBrush();
       return;
     }
-    this.viewport3d.setBrush(w.x, w.z, radius, color);
+    this.viewport3d.setBrush(w.x, w.z, radius, color, this.brushShapeForTool());
+  }
+
+  /** The active tool's brush footprint (Paint and the sculpt family only). */
+  private brushShapeForTool(): BrushShape {
+    if (this.tool === 'paint') return this.paintBrushShape;
+    return isSculptTool(this.tool) ? this.sculptBrushShape : 'circle';
   }
 
   private tap3d(clientX: number, clientY: number, w: Vec2 | null, additive: boolean): void {
@@ -3792,6 +3930,8 @@ export class EditorApp {
     // NPCs select like placements: a pixel-precise body hit wins outright
     // (beating a nearby placement's slack radius); the loose projected pass
     // only runs after placements miss.
+    const objectDirect = additive ? null : this.viewport3d.objects.pick(clientX, clientY, true);
+    if (objectDirect !== null && this.selectObject(objectDirect)) return;
     const npcDirect = this.viewport3d.pickRuntimeNpc(clientX, clientY, true);
     if (npcDirect !== null && this.selectNpcFromTap(npcDirect, additive)) return;
     const mobDirect = this.viewport3d.pickRuntimeMob(clientX, clientY, true);
@@ -3819,10 +3959,13 @@ export class EditorApp {
     if (idx === null) {
       const npcLoose = this.viewport3d.pickRuntimeNpc(clientX, clientY);
       if (npcLoose !== null && this.selectNpcFromTap(npcLoose, false)) return;
+      const objectLoose = this.viewport3d.objects.pick(clientX, clientY, false);
+      if (objectLoose !== null && this.selectObject(objectLoose)) return;
       const mobLoose = this.viewport3d.pickRuntimeMob(clientX, clientY);
       if (mobLoose !== null && this.selectMobFromTap(mobLoose.id, false)) return;
     }
     if (this.selectedNpcKeys.size > 0) this.clearNpcSelection();
+    this.objectMoves.select(null);
     if (this.selectedMobIds.size > 0) {
       this.clearMobSelection();
       this.syncSelectedMobRouteOverlay();
@@ -3847,6 +3990,7 @@ export class EditorApp {
     if (!npc) return false;
     this.flushTransformCommit();
     this.setSelectedPlacement(null);
+    this.objectMoves.select(null);
     if (this.selectedLight !== null) this.setSelectedLight(null);
     this.selectedNpcKeys = toggledKeySelection(this.selectedNpcKeys, key, additive);
     this.selectedKey = this.selectedNpcKeys.has(key)
@@ -3856,6 +4000,31 @@ export class EditorApp {
     this.inspector.refresh();
     this.canvasDirty = true;
     return true;
+  }
+
+  /** Select one movable gameplay object (a tap or a drag start): every other
+   *  selection clears first, the way picking an NPC clears placements. */
+  private selectObject(key: string): boolean {
+    this.flushTransformCommit();
+    this.setSelectedPlacement(null);
+    this.clearNpcSelection();
+    if (this.selectedMobIds.size > 0) {
+      this.clearMobSelection();
+      this.syncSelectedMobRouteOverlay();
+    }
+    if (this.selectedLight !== null) this.setSelectedLight(null);
+    if (this.selectedSound !== null) this.setSelectedSound(null);
+    this.selectedCamp = null;
+    this.selectedKey = null;
+    this.objectMoves.select(key);
+    this.inspector.refresh();
+    return this.objectMoves.selectedKey === key;
+  }
+
+  /** A 3D left-press landed on a movable gameplay object; claim it in Select mode. */
+  private beginObjectDrag(key: string): boolean {
+    if (!isSelectionTool(this.tool) || !this.selectObject(key)) return false;
+    return this.objectMoves.beginDrag(key);
   }
 
   // ---- sculpt strokes --------------------------------------------------------------
@@ -3868,7 +4037,22 @@ export class EditorApp {
     this.lastStamp = null;
     // Captured for EVERY sculpt tool: a Shift-inverted Smooth stroke becomes
     // Flatten mid-gesture and needs the press-point height as its target.
-    this.flattenTarget = terrainHeight(w.x, w.z, this.map.meta.seed);
+    // The locked level only steers the Flatten tool's own level mode, where
+    // its field is on screen.
+    this.flattenTarget = flattenStrokeTarget(
+      this.tool === 'flatten' && !this.flattenSmooth ? this.flattenLock : null,
+      terrainHeight(w.x, w.z, this.map.meta.seed),
+    );
+    // Slope: the press point and the ground under it are the ramp's END, read
+    // before this stroke changes anything. No start yet = nothing to climb to.
+    this.slopeRamp =
+      this.tool === 'slope' && this.slopeStart
+        ? {
+            start: this.slopeStart,
+            end: { x: w.x, z: w.z, y: terrainHeight(w.x, w.z, this.map.meta.seed) },
+          }
+        : null;
+    if (this.tool === 'slope' && !this.slopeStart) this.toasts.info(t('editor.slope.needStart'));
     // One Noise pattern per stroke, keyed off the press point and the edit
     // count so two strokes never repeat each other.
     this.strokeNoiseSeed = Math.floor(
@@ -6077,6 +6261,7 @@ export class EditorApp {
   // ---- Grab sculpt (snake hook) ---------------------------------------------------
 
   private shapeSculptStamp(stamp: HeightStamp): HeightStamp {
+    if (this.sculptBrushShape === 'square') stamp.shape = 'square';
     stamp.hardness = Math.max(0, Math.min(1, this.sculptHardness / 100));
     if (this.sculptAlphaId) stamp.alpha = this.sculptAlphaId;
     return stamp;
@@ -6226,6 +6411,7 @@ export class EditorApp {
   }
 
   private strokeStep(w: Vec2): void {
+    if (this.tool === 'slope' && !this.slopeRamp) return;
     const spacing = this.brushRadius * 0.5;
     if (this.lastStamp) {
       const dx = w.x - this.lastStamp.x;
@@ -6243,7 +6429,17 @@ export class EditorApp {
     // ids still route here for safety. Holding Shift (strokeInvert) flips the
     // active sub-mode for this stamp: raise<->lower and smooth<->flatten.
     const isLevelTool = this.tool === 'smooth' || this.tool === 'flatten';
-    if (isLevelTool) {
+    if (this.tool === 'slope' && this.slopeRamp) {
+      // Slope eases toward the ramp plane at Flatten's per-stamp pace.
+      stamp = slopeStamp(
+        w.x,
+        w.z,
+        this.brushRadius,
+        this.slopeRamp,
+        SCULPT_POWER_SCALE,
+        this.flattenHardEdge,
+      );
+    } else if (isLevelTool) {
       // Base mode: Smooth tool smooths; Flatten tool smooths only when its
       // "smooth mode" checkbox is on. Shift inverts that choice.
       let smoothing = this.tool === 'smooth' || (this.tool === 'flatten' && this.flattenSmooth);
@@ -6643,6 +6839,7 @@ export class EditorApp {
   private setSelectedLight(index: number | null): void {
     if (index !== null) {
       this.setSelectedPlacement(null);
+      this.objectMoves.select(null);
       if (this.selectedSound !== null) {
         this.selectedSound = null;
         this.viewport3d?.setSelectedSound(null);
@@ -6853,6 +7050,7 @@ export class EditorApp {
   private setSelectedSound(index: number | null): void {
     if (index !== null) {
       this.setSelectedPlacement(null);
+      this.objectMoves.select(null);
       if (this.selectedLight !== null) {
         this.selectedLight = null;
         this.viewport3d?.setSelectedLight(null);
@@ -7262,58 +7460,28 @@ export class EditorApp {
     // Optional brush alpha: a grayscale mask across the brush footprint that
     // modulates the stamp coverage (splatter, streaks, ...).
     const alphaMask = brushAlphaById(this.paintAlphaId);
-    const c0 = Math.floor((w.x - r - bp.originX) / bp.cell);
-    const c1 = Math.floor((w.x + r - bp.originX) / bp.cell);
-    const r0 = Math.floor((w.z - r - bp.originZ) / bp.cell);
-    const r1 = Math.floor((w.z + r - bp.originZ) / bp.cell);
     let touched = false;
-    for (let row = r0; row <= r1; row++) {
-      for (let col = c0; col <= c1; col++) {
-        if (col < 0 || col >= bp.cols || row < 0 || row >= bp.rows) continue;
-        const cx = bp.originX + (col + 0.5) * bp.cell;
-        const cz = bp.originZ + (row + 0.5) * bp.cell;
-        const dx = cx - w.x;
-        const dz = cz - w.z;
-        const d2 = dx * dx + dz * dz;
-        if (d2 > r * r) continue;
-        // Stamp coverage at this cell: the alpha mask value (1 with none),
-        // faded by the quadratic hardness falloff across the rim; one
-        // deterministic per-cell gate decides, so undo/redo never flickers.
-        let coverage = alphaMask ? sampleBrushAlpha(alphaMask, dx / r, dz / r) : 1;
-        if (hard < 1) {
-          const d = Math.sqrt(d2) / r;
-          if (d > hard) {
-            const t = (d - hard) / Math.max(0.001, 1 - hard);
-            coverage *= 1 - t * t;
-          }
-        }
-        if (coverage <= 0) continue;
-        if (coverage < 1) {
-          // Partial coverage is stored as a DITHER: one cell holds one swatch,
-          // so a 40%-covered rim cell is 40% of the rim's cells taking the
-          // paint. Which cells matters. The old hash gate was white noise, so
-          // the rim clumped into salt-and-pepper blotches; the R2 quasirandom
-          // sequence (Roberts' generalisation of the golden ratio) spreads the
-          // chosen cells about as evenly as a point set can be, which is what
-          // makes the rim resolve into a clean ramp under the shader's blend
-          // kernel instead of speckle. Still a pure function of (col, row), so
-          // undo/redo and a re-stroke land on exactly the same cells.
-          const gate = (col * 0.7548776662466927 + row * 0.5698402909980532) % 1;
-          if (gate >= coverage) continue;
-        }
-        const idx = row * bp.cols + col;
-        if (bp.ids[idx] === this.paintBiome) continue;
+    // Coverage per cell (mask, hardness rim, the R2 dither gate) lives in
+    // biome_brush_core.ts; it visits only cells that actually change.
+    visitBiomeBrushCells(
+      bp,
+      {
+        x: w.x,
+        z: w.z,
+        radius: r,
+        shape: this.paintBrushShape,
+        hardness: hard,
+        sampleAlpha: alphaMask ? (u, v) => sampleBrushAlpha(alphaMask, u, v) : undefined,
+      },
+      this.paintBiome,
+      (idx) => {
         const change = this.paintChanges.get(idx);
         if (change) change.next = this.paintBiome;
-        else
-          this.paintChanges.set(idx, {
-            prev: bp.ids[idx],
-            next: this.paintBiome,
-          });
+        else this.paintChanges.set(idx, { prev: bp.ids[idx], next: this.paintBiome });
         bp.ids[idx] = this.paintBiome;
         touched = true;
-      }
-    }
+      },
+    );
     if (touched) {
       const region = {
         minX: w.x - r,
@@ -8886,6 +9054,7 @@ export class EditorApp {
       this.flushTransformCommit();
       this.placementDragBase = null;
       this.groupDragBase = null;
+      this.materialFinishBase = null;
       this.selectedFireEmitter = null;
       this.viewport3d?.setFireEmitterEdit(null, null);
     }
@@ -8915,6 +9084,7 @@ export class EditorApp {
     this.viewport3d?.setMultiSelection(
       [...this.selectedSet].filter((i) => i !== this.selectedPlacement),
     );
+    this.selectionQuickActions?.refresh();
   }
 
   /** Select one fire source for detailed editing. Entering this mode switches
@@ -9089,6 +9259,102 @@ export class EditorApp {
       this.setTool('move');
     }
     this.inspector.refresh();
+  }
+
+  /** Pond tool: dig a round basin and fill it with a local water volume, as
+   *  ONE undo step; refused when authored terrain would leave it floating. */
+  private insertPondAt(w: Vec2): void {
+    const seed = this.map.meta.seed;
+    const plan = planPond({ ...w, radius: this.pondRadius, depth: this.pondDepth }, (x, z) =>
+      terrainHeight(x, z, seed),
+    );
+    if (!plan) {
+      this.toasts.error(t('editor.pond.invalid'));
+      return;
+    }
+    const command = createPondCommand(this.map, plan, (region) => {
+      this.terrainEditsMutated();
+      this.setSelectedPlacement(null);
+      this.refreshTerrain(region);
+      this.viewport3d?.rebuildPlacements();
+      this.canvasDirty = true;
+    });
+    if (!command) {
+      this.toasts.error(
+        this.map.placements.length >= MAX_PLACEMENTS
+          ? t('editor.status.placementCapReached', { max: MAX_PLACEMENTS })
+          : t('editor.status.terrainCapReached', { max: MAX_TERRAIN_EDITS }),
+      );
+      return;
+    }
+    command.redo();
+    if (!pondTerrainMatches(plan, (x, z) => terrainHeight(x, z, seed))) {
+      command.undo();
+      this.toasts.error(t('editor.pond.invalid'));
+      return;
+    }
+    this.map.meta.updatedAt = now();
+    this.pushUndo(command);
+  }
+
+  /** The floating Selected asset box: quick actions on the selected placement
+   *  through the same commands the inspector uses. */
+  private selectionQuickActionsDeps(): SelectionQuickActionsDeps {
+    return {
+      getState: () => {
+        const p =
+          this.selectedPlacement === null ? null : this.map.placements[this.selectedPlacement];
+        if (
+          !p ||
+          !isSelectionTool(this.tool) ||
+          this.previewOn ||
+          this.hitboxEdit ||
+          this.meshEditActive()
+        )
+          return null;
+        return {
+          label: p.name?.trim() || this.placementLabel(p.assetId),
+          count: Math.max(
+            1,
+            [...this.selectedSet].filter((index) => this.map.placements[index]).length,
+          ),
+          transform: { rotY: p.rotY, scale: p.scale },
+          fineRotation: this.fineBuildRotation,
+        };
+      },
+      onMove: () => this.setTool('move'),
+      onFrame: () => this.focusSelection(),
+      onDuplicate: () => this.duplicateSelectedPlacement(),
+      onRemove: () => this.removeSelectedPlacements(),
+      onTransform: (next) => {
+        this.updateSelectedPlacement(next, true);
+        this.inspector.refresh();
+      },
+    };
+  }
+
+  /** Precise picking and the overlap chooser (viewport placement_pick_*). */
+  private placementPickingHooks() {
+    return {
+      placementPickingEnabled: () =>
+        (isSelectionTool(this.tool) || this.tool === 'building') &&
+        !this.previewOn &&
+        !this.hitboxEdit &&
+        !this.meshEditActive(),
+      onChoosePlacement: (index: number, additive: boolean) => {
+        if (!this.map.placements[index]) return;
+        if (!isSelectionTool(this.tool)) this.setTool('move');
+        if (additive) this.togglePlacementInSelection(index);
+        else {
+          this.setSelectedPlacement(index);
+          this.inspector.refresh();
+          this.canvasDirty = true;
+        }
+      },
+      onPickFloorVisibilityChange: (hideAbove: boolean) =>
+        this.buildingWorkspace.panelDeps().setHideAbove(hideAbove),
+      placementDragUsesCursor: () => this.tool === 'rotate' || this.tool === 'scale',
+    };
   }
 
   private insertFluidAt(w: Vec2): void {
@@ -10095,6 +10361,134 @@ export class EditorApp {
     this.inspector.refresh();
   }
 
+  /** A moved placement's seat: detached to float where it is (the default),
+   *  or re-seated on the ground under its new spot when snapping is on. */
+  private moveSeat(index: number): void {
+    if (!this.snapToGroundOnMove) {
+      this.detachPlacement(index);
+      return;
+    }
+    const p = this.map.placements[index];
+    if (!p || isOnGround(p)) return;
+    seatOnGround(p);
+    this.viewport3d?.placementUpdated(index, { detached: false, y: 0 });
+  }
+
+  /** Flatten: a right-click on the ground locks the level every drag
+   *  flattens to. */
+  private rightTap3d(w: Vec2 | null): void {
+    if (!w) return;
+    if (this.tool === 'slope') {
+      this.slopeStart = { x: w.x, z: w.z, y: terrainHeight(w.x, w.z, this.map.meta.seed) };
+      this.toasts.info(
+        t('editor.slope.startPicked', {
+          height: formatNumber(this.slopeStart.y, { maximumFractionDigits: 2 }),
+        }),
+      );
+      this.inspector.refresh();
+      return;
+    }
+    if (this.tool !== 'flatten' || this.flattenSmooth) return;
+    this.flattenLock = terrainHeight(w.x, w.z, this.map.meta.seed);
+    this.toasts.info(
+      t('editor.flatten.levelPicked', {
+        height: formatNumber(this.flattenLock, { maximumFractionDigits: 2 }),
+      }),
+    );
+    this.inspector.refresh();
+  }
+
+  /** The pre-gesture finishes of a live material edit (one undo per gesture),
+   *  keyed to the placement it was taken from; cleared on selection change. */
+  private materialFinishBase: { index: number; value: MaterialFinishes | undefined } | null = null;
+
+  /** Set or clear one material slot's finish on the selected placement.
+   *  `commit` closes the gesture with one undo step; live edits (a color
+   *  drag) only repaint. */
+  private setMaterialFinish(key: string, finish: WallFinish | null, commit: boolean): void {
+    const index = this.selectedPlacement;
+    if (index === null || !this.map.placements[index]) return;
+    if (this.materialFinishBase?.index !== index) {
+      this.materialFinishBase = {
+        index,
+        value: cloneMaterialFinishes(this.map.placements[index]?.materialFinishes),
+      };
+    }
+    const apply = (value: MaterialFinishes | undefined): void => {
+      const p = this.map.placements[index];
+      if (!p) return;
+      if (value) p.materialFinishes = value;
+      else delete p.materialFinishes;
+      this.viewport3d?.placementUpdated(index, { materialFinishes: value ?? null });
+      this.canvasDirty = true;
+    };
+    const next = withMaterialFinish(this.map.placements[index]?.materialFinishes, key, finish);
+    apply(next);
+    if (!commit) return;
+    const before = this.materialFinishBase.value;
+    this.materialFinishBase = null;
+    this.pushUndo({
+      label: 'material-finish',
+      undo: () => {
+        apply(before);
+        this.inspector.refresh();
+      },
+      redo: () => {
+        apply(next);
+        this.inspector.refresh();
+      },
+    });
+    this.map.meta.updatedAt = now();
+    this.inspector.refresh();
+  }
+
+  /** Cave and rock rig markers: their elevation is part of the rig. */
+  private isRigMarkerAsset(assetId: string): boolean {
+    return (
+      assetId === CAVE_ENTRANCE_ASSET_ID ||
+      assetId === CAVE_EXIT_ASSET_ID ||
+      assetId === CAVE_POINT_ASSET_ID ||
+      assetId === ROCK_POINT_ASSET_ID
+    );
+  }
+
+  /** Seat every selected placement on the terrain under it (one undo step). */
+  private setSelectionToGround(): void {
+    const indices = new Set(this.selectedSet);
+    if (this.selectedPlacement !== null) indices.add(this.selectedPlacement);
+    const changed: { index: number; before: GroundSeat }[] = [];
+    for (const index of indices) {
+      const p = this.map.placements[index];
+      // Rig markers keep their anchored elevation (see updateSelectedPlacement).
+      if (!p || isOnGround(p) || this.isRigMarkerAsset(p.assetId)) continue;
+      changed.push({ index, before: groundSeatOf(p) });
+    }
+    if (changed.length === 0) return;
+    const push = (seat: (index: number) => GroundSeat | null): void => {
+      for (const { index } of changed) {
+        const p = this.map.placements[index];
+        if (!p) continue;
+        const s = seat(index);
+        if (s) applyGroundSeat(p, s);
+        else seatOnGround(p);
+        this.viewport3d?.placementUpdated(index, {
+          detached: p.detached === true,
+          groundY: p.groundY,
+          y: p.y ?? 0,
+        });
+      }
+      this.canvasDirty = true;
+      this.inspector.refresh();
+    };
+    push(() => null);
+    this.pushUndo({
+      label: 'set-to-ground',
+      undo: () => push((index) => changed.find((c) => c.index === index)?.before ?? null),
+      redo: () => push(() => null),
+    });
+    this.map.meta.updatedAt = now();
+  }
+
   /** Detach a placement from its terrain seat (Move tool): freeze the ground
    *  height at its CURRENT position so the model floats there instead of
    *  re-snapping as it moves. No-op once already detached; pushes the flag to the
@@ -10141,6 +10535,7 @@ export class EditorApp {
       this.setHitboxes(index, this.materializeHitboxes(p), 'edit-hitboxes');
     }
     this.hitboxEdit = { index, selected: new Set() };
+    this.selectionQuickActions?.refresh();
     this.syncFootprintOverlay();
     this.syncHitboxEditView();
     this.inspector.refresh();
@@ -10149,6 +10544,7 @@ export class EditorApp {
   private exitHitboxEdit(): void {
     if (!this.hitboxEdit) return;
     this.hitboxEdit = null;
+    this.selectionQuickActions?.refresh();
     this.hitboxDragBase = null;
     this.viewport3d?.setHitboxEdit(null);
     this.syncFootprintOverlay();
@@ -12554,7 +12950,7 @@ export class EditorApp {
       p.assetId === CAVE_ENTRANCE_ASSET_ID ||
       p.assetId === CAVE_EXIT_ASSET_ID ||
       p.assetId === CAVE_POINT_ASSET_ID;
-    const isRigMarker = isCaveMarker || p.assetId === ROCK_POINT_ASSET_ID;
+    const isRigMarker = this.isRigMarkerAsset(p.assetId);
     // Cave markers are ANCHORED (frozen ground): their elevation is absolute
     // so the tube ignores whatever the terrain does. Heal markers from older
     // sessions on first touch by freezing the CURRENT surface under them ?
@@ -12572,7 +12968,7 @@ export class EditorApp {
       opts?.detachOnMove === true &&
       !isRigMarker &&
       (change.x !== undefined || change.z !== undefined);
-    if (detachMove) this.detachPlacement(index);
+    if (detachMove) this.moveSeat(index);
     // Group transform: moving/rotating/scaling the active placement carries the
     // other multi-selection members along (Blender-style). The group translates
     // by the same delta and rotates/scales as a unit about the active
@@ -12609,7 +13005,7 @@ export class EditorApp {
         if (!snap || !q) continue;
         // Detach each member too (before moving it, so the frozen ground is the
         // pre-move height), the whole group floats free consistently.
-        if (detachMove) this.detachPlacement(gi);
+        if (detachMove) this.moveSeat(gi);
         const pt = groupMemberPoint(snap.x, snap.z, prev.x, prev.z, dx, dz, dRot, ratio);
         q.x = pt.x;
         q.z = pt.z;
@@ -13087,6 +13483,7 @@ export class EditorApp {
     if (!npc) return false;
     this.flushTransformCommit();
     this.setSelectedPlacement(null);
+    this.objectMoves.select(null);
     if (!this.selectedNpcKeys.has(key)) {
       // Dragging an unselected NPC selects just it; dragging a member of the
       // multi-selection keeps the group and moves it together.
@@ -13357,7 +13754,10 @@ export class EditorApp {
       return;
     }
     if (this.selectedNpcDefs().length === 0) {
-      if (this.selectedMobCamps.size === 0) return;
+      if (this.selectedMobCamps.size === 0) {
+        if (this.objectMoves.nudge(d.dx, d.dz)) this.scheduleTransformCommit();
+        return;
+      }
       // Mob volley: same debounced one-undo contract as NPCs below.
       if (!this.mobMoveState) {
         this.mobMoveState = {
@@ -13406,6 +13806,7 @@ export class EditorApp {
         // no base is open, drags commit on release instead).
         this.commitNpcMove();
         this.commitMobMove();
+        this.objectMoves.commitPending();
         this.inspector.refresh();
       }
     }, this.transformCoalescer.windowMs);
@@ -13419,6 +13820,7 @@ export class EditorApp {
     this.updateSelectedPlacement({}, true);
     this.commitNpcMove();
     this.commitMobMove();
+    this.objectMoves.commitPending();
   }
 
   private copySelection(): void {
@@ -13527,8 +13929,12 @@ export class EditorApp {
     if (copies.length === 0) return;
     const start = this.map.placements.length;
     this.appendPlacements(copies, 'duplicate-placement');
+    // At the placement cap only some (or none) of the copies land: select
+    // exactly those, and keep the current selection when nothing was added.
+    const added = this.map.placements.length - start;
+    if (added <= 0) return;
     this.setSelectedPlacement(start);
-    this.selectedSet = new Set(copies.map((_, k) => start + k));
+    this.selectedSet = new Set(Array.from({ length: added }, (_, k) => start + k));
     this.syncMultiSelectionView();
     this.inspector.refresh();
   }
@@ -14051,6 +14457,7 @@ export class EditorApp {
   private clearNpcSelection(): void {
     // An open Select-mode move burst commits before the selection vanishes.
     this.commitNpcMove();
+    this.objectMoves.select(null);
     this.selectedNpcKeys.clear();
     this.npcDragBase = null;
     this.viewport3d?.setSelectedRuntimeNpcs(this.selectedNpcKeys);
@@ -14070,6 +14477,15 @@ export class EditorApp {
       this.syncFootprintOverlay();
       this.viewport3d?.setSelectedRuntimeNpcs(this.selectedNpcKeys);
     });
+  }
+
+  /** The one NPC the Select-mode rotate controls turn: exactly one selected
+   *  map NPC and no selected placement (a placement keeps the controls). */
+  private transformableNpcKey(): string | null {
+    if (!isSelectionTool(this.tool) || this.selectedPlacement !== null) return null;
+    if (this.selectedNpcKeys.size !== 1) return null;
+    const [key] = this.selectedNpcKeys;
+    return key.startsWith('npc:') && this.map.content.npcs[key.slice('npc:'.length)] ? key : null;
   }
 
   /** Live-facing slider for selected NPCs, committed as one undo entry. */
@@ -15031,6 +15447,7 @@ export class EditorApp {
     this.topbar.setUndoDepth(this.undo.depth);
     this.topbar.setUndoState(this.undo.canUndo, this.undo.canRedo);
     this.buildTransformControls?.refresh();
+    this.selectionQuickActions?.refresh();
     this.buildingWorkspace?.syncView();
   }
 
@@ -15044,6 +15461,7 @@ export class EditorApp {
     this.buildingWorkspace?.cancel();
     // An open transform burst commits first, so Ctrl+Z reverts THAT burst.
     this.flushTransformCommit();
+    this.objectMoves.commitPending();
     if (this.undo.undo()) {
       this.markDirty();
       this.inspector.refresh();
@@ -15054,6 +15472,7 @@ export class EditorApp {
   private doRedo(): void {
     this.buildingWorkspace?.cancel();
     this.flushTransformCommit();
+    this.objectMoves.commitPending();
     if (this.undo.redo()) {
       this.markDirty();
       this.inspector.refresh();
@@ -15972,6 +16391,7 @@ export class EditorApp {
 
   // Replace the whole working document and rebuild the editor over its content.
   private loadMap(map: CustomMap, options: { preserveViewportTerrain?: boolean } = {}): boolean {
+    this.objectMoves.select(null);
     // Collision Master may reuse the already-running world renderer. In that
     // case keep the globally active terrain content on the return map too;
     // the scratch placement is detached and never needs to replace it.
@@ -16009,10 +16429,15 @@ export class EditorApp {
     promoteFarshorePalms(map as CustomMap);
     promoteFeatureDressing(map as CustomMap);
     repairDecorBuildingCollision(map);
+    repairLegacyWorldPropFit(map as CustomMap);
     repairStretchedWorldProps(map);
     repairPlacedAssetShapes(map);
     repairMissingTreeCollision(map, applyDefaultCollision);
     this.map = map;
+    this.flattenLock = null;
+    this.slopeStart = null;
+    this.slopeRamp = null;
+    this.materialFinishBase = null;
     this.buildingWorkspace?.reset();
     // A region map (Open -> Shipped -> Ravenrift) can be written back to the
     // game; every other document cannot, so the action only exists for it.
@@ -16343,7 +16768,8 @@ export class EditorApp {
         this.selectedNpcKeys.size > 0 ||
         this.selectedMobIds.size > 0 ||
         this.selectedLight !== null ||
-        this.selectedMusicArea !== null
+        this.selectedMusicArea !== null ||
+        this.objectMoves.selectedKey !== null
       ) {
         this.setSelectedPlacement(null);
         this.selectedKey = null;
@@ -16383,14 +16809,16 @@ export class EditorApp {
         ev.key === 'ArrowRight') &&
       (this.selectedPlacement !== null ||
         this.selectedNpcDefs().length > 0 ||
-        this.selectedMobCamps.size > 0)
+        this.selectedMobCamps.size > 0 ||
+        this.objectMoves.selectedKey !== null)
     ) {
       ev.preventDefault();
       this.nudgeSelected(ev.key, ev.shiftKey);
       return;
     }
     if (ev.key === '[' || ev.key === '{') {
-      if (ev.shiftKey) this.brushStrength = Math.max(1, this.brushStrength - 1);
+      if (this.tool === 'pond') this.pondRadius = Math.max(POND_RADIUS_MIN, this.pondRadius - 0.5);
+      else if (ev.shiftKey) this.brushStrength = Math.max(1, this.brushStrength - 1);
       // Proportional steps so the keys stay useful across the whole 0.4-300yd
       // range (matching the log brush slider).
       else this.brushRadius = Math.max(0.4, Math.round((this.brushRadius / 1.12) * 100) / 100);
@@ -16398,7 +16826,8 @@ export class EditorApp {
       return;
     }
     if (ev.key === ']' || ev.key === '}') {
-      if (ev.shiftKey) this.brushStrength = Math.min(50, this.brushStrength + 1);
+      if (this.tool === 'pond') this.pondRadius = Math.min(POND_RADIUS_MAX, this.pondRadius + 0.5);
+      else if (ev.shiftKey) this.brushStrength = Math.min(50, this.brushStrength + 1);
       else this.brushRadius = Math.min(300, Math.round(this.brushRadius * 1.12 * 100) / 100);
       this.inspector.refresh();
       return;
@@ -16506,7 +16935,8 @@ export class EditorApp {
       const extent = volume
         ? Math.max(volume.sizeX, volume.sizeY, volume.sizeZ) / 2
         : Math.max(1.5, p.scale * 2);
-      this.viewport3d.focusOn(p.x, p.z, extent);
+      const baseY = p.detached ? (p.groundY ?? 0) : terrainHeight(p.x, p.z, this.map.meta.seed);
+      this.viewport3d.focusOn(p.x, p.z, extent, baseY + (p.y ?? 0));
       return;
     }
     const b = this.worldBounds();
@@ -16761,6 +17191,21 @@ export class EditorApp {
         return this.buildTransformControls.root;
       },
       cityBuild: () => this.cityPanelDeps(),
+      getBrushShape: () => (this.tool === 'paint' ? this.paintBrushShape : this.sculptBrushShape),
+      setBrushShape: (shape) => {
+        if (shape !== 'circle' && shape !== 'square') return;
+        if (this.tool === 'paint') this.paintBrushShape = shape;
+        else this.sculptBrushShape = shape;
+        this.canvasDirty = true;
+        if (this.cursorWorld) this.brushRing(this.cursorWorld);
+        this.inspector.refresh();
+      },
+      getSlopeStart: () => this.slopeStart,
+      clearSlopeStart: () => {
+        this.slopeStart = null;
+        this.slopeRamp = null;
+        this.inspector.refresh();
+      },
       getBrushRadius: () => this.brushRadius,
       setBrushRadius: (v) => {
         this.brushRadius = v;
@@ -16817,6 +17262,12 @@ export class EditorApp {
       },
       getMapLights: () => this.map.lights ?? [],
       getSelectedLight: () => this.selectedLight,
+      movedObjectPanel: () =>
+        buildObjectMovePanel({
+          selectedKey: () => this.objectMoves.selectedKey,
+          moves: () => this.map.objectMoves,
+          reset: () => this.objectMoves.resetSelected(),
+        }),
       setSelectedLight: (index) => this.setSelectedLight(index),
       updateMapLight: (index, change) => {
         const l = this.map.lights?.[index];
@@ -16908,6 +17359,24 @@ export class EditorApp {
       setFlattenSmooth: (on) => {
         this.flattenSmooth = on;
       },
+      getFlattenLock: () => this.flattenLock,
+      setFlattenLock: (level) => {
+        this.flattenLock = level;
+      },
+      getSnapToGround: () => this.snapToGroundOnMove,
+      setSnapToGround: (on) => {
+        this.snapToGroundOnMove = on;
+      },
+      setSelectionToGround: () => this.setSelectionToGround(),
+      getMaterialSlots: () =>
+        this.selectedPlacement === null
+          ? null
+          : (this.viewport3d?.placementMaterialSlots(this.selectedPlacement) ?? null),
+      getMaterialFinishes: () =>
+        this.selectedPlacement === null
+          ? undefined
+          : this.map.placements[this.selectedPlacement]?.materialFinishes,
+      setMaterialFinish: (key, finish, commit) => this.setMaterialFinish(key, finish, commit),
       getFlattenHardEdge: () => this.flattenHardEdge,
       setFlattenHardEdge: (on) => {
         this.flattenHardEdge = on;
@@ -16916,6 +17385,17 @@ export class EditorApp {
         this.placeAssetId = WATERFALL_ASSET_ID;
         this.placeAssetLabel = t('editor.water.waterfallLabel');
         this.setTool('place');
+      },
+      armPond: () => this.setTool('pond'),
+      getPondRadius: () => this.pondRadius,
+      setPondRadius: (value) => {
+        this.pondRadius = Math.min(POND_RADIUS_MAX, Math.max(POND_RADIUS_MIN, value));
+        this.canvasDirty = true;
+        if (this.cursorWorld) this.brushRing(this.cursorWorld);
+      },
+      getPondDepth: () => this.pondDepth,
+      setPondDepth: (value) => {
+        this.pondDepth = Math.min(POND_DEPTH_MAX, Math.max(POND_DEPTH_MIN, value));
       },
       getWaterLevel: () => this.map.waterLevel ?? WATER_LEVEL,
       previewWaterLevel: (v) => this.previewWater(v),
@@ -17334,6 +17814,8 @@ export class EditorApp {
         };
       },
       updateSelection: (change, commit) => this.updateSelectedPlacement(change, commit),
+      getSelectionHeights: () => [...this.selectedSet].map((i) => this.map.placements[i]?.y ?? 0),
+      commitSelectionTransform: () => this.flushTransformCommit(),
       getSelectedFireEmitter: () => this.selectedFireEmitter,
       setSelectedFireEmitter: (index) => this.setSelectedFireEmitter(index),
       setAssetSway: (on) => this.setAssetSway(on),
@@ -17482,6 +17964,12 @@ export class EditorApp {
       focusSelection: () => this.focusSelection(),
       getWeather: () => this.resolvedWeather(),
       setWeather: (w) => this.setMapWeather(w),
+      getSnowfallEnabled: () => this.snowfallOn,
+      setSnowfallEnabled: (on) => {
+        this.snowfallOn = on;
+        this.viewport3d?.setSnowEnabled(on);
+        writePref(SNOWFALL_PREF_KEY, on);
+      },
       getMusic: () => ({
         zoneTrack: this.map.music?.zoneTrack ?? null,
         areas: this.map.music?.areas ?? [],
@@ -17792,12 +18280,16 @@ export class EditorApp {
         spawn: this.map.playerStart ?? null,
         spawnArea: this.spawnAreaPreview ?? this.map.playerSpawnArea ?? null,
         brush:
-          this.isDragTool() && this.cursorWorld
+          (this.isDragTool() || this.tool === 'pond') && this.cursorWorld
             ? {
                 x: this.cursorWorld.x,
                 z: this.cursorWorld.z,
-                radius: this.brushRadius,
-                raise: this.tool !== 'lower',
+                radius:
+                  this.tool === 'pond'
+                    ? this.pondRadius * POND_BANK_RADIUS_FACTOR
+                    : this.brushRadius,
+                raise: this.tool !== 'lower' && this.tool !== 'pond',
+                shape: this.brushShapeForTool(),
               }
             : null,
       });

@@ -22,13 +22,24 @@ import { BUILTIN_WORLD, PLAYER_START, setActiveWorldContent } from '../src/sim/d
 import { isExcludedDecoration, isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
 import { EASTBROOK_LAYOUT, localToWorld, type Obb2 } from '../src/sim/eastbrook_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
-import { generateDecorationsInBounds, terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import { Sim } from '../src/sim/sim';
+import {
+  generateDecorationsInBounds,
+  groundHeight,
+  terrainHeight,
+  terrainSteepnessAt,
+  WATER_LEVEL,
+} from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The built-in Eastbrook stands six painted Tidehold buildings where the
-// Studio rebuild map (data/maps/eastbrook_rebuild.map.json) places them. This
-// suite measures the layout's numbers off the things they were copied from:
-// that map, the shipped model files, and the models' baked collision rows.
+// World of ClaudeCraft Studio map (data/maps/world_of_claudecraft.map.json)
+// sets them out, and the Studio rebuild map (data/maps/eastbrook_rebuild.map.json)
+// carries the same placements. This suite measures the layout's numbers off
+// the things they were copied from: those maps, the shipped model files, and
+// the models' baked collision rows, and walks a player through every open
+// doorway (sim/town_walk_in.ts).
 
 const ROOT = path.join(__dirname, '..');
 const BUILDINGS = EASTBROOK_LAYOUT.buildings;
@@ -49,6 +60,9 @@ interface MapDoc {
 }
 const REBUILD_MAP = JSON.parse(
   readFileSync(path.join(ROOT, 'data/maps/eastbrook_rebuild.map.json'), 'utf8'),
+) as MapDoc;
+const WORLD_MAP = JSON.parse(
+  readFileSync(path.join(ROOT, 'data/maps/world_of_claudecraft.map.json'), 'utf8'),
 ) as MapDoc;
 
 interface BakedBox {
@@ -218,6 +232,117 @@ describe('the six placed Eastbrook buildings', () => {
     }
   });
 
+  it('sets out the town where the World of ClaudeCraft map does, nudged only where documented', () => {
+    // Each building stands at that map's anchor (to the centimetre) and turn,
+    // except where its ground crossed something the built-in world keeps
+    // (eastbrook_layout.ts BUILDINGS): the chapel 5 yd west and 10.2 yd north,
+    // out of the bay; the apothecary's shop 2 yd north, so its shelf eases
+    // down before the strand meets the water; the inn 3.5 yd back from its
+    // door, clear of the farm plots; the vault half a yard off the bank's wall.
+    const nudges: Record<string, { x: number; z: number }> = {
+      eastbrook_chapel: { x: 5, z: 10.2 },
+      eastbrook_apothecary: { x: 0, z: 2 },
+      eastbrook_inn: { x: 1.42, z: 3.2 },
+    };
+    const theirs = (assetId: string) => {
+      const found = WORLD_MAP.placements.find((p) => p.assetId === assetId);
+      if (!found) throw new Error(`that map places no ${assetId}`);
+      return found;
+    };
+    for (const building of BUILDINGS) {
+      const placed = theirs(assetIdOf(building));
+      const nudge = nudges[building.id] ?? { x: 0, z: 0 };
+      expect(building.placement.x - nudge.x, `${building.id} x`).toBeCloseTo(placed.x, 1);
+      expect(building.placement.z - nudge.z, `${building.id} z`).toBeCloseTo(placed.z, 1);
+      const turn = building.placement.rotation - (placed.rotY ?? 0);
+      expect(
+        Math.abs(Math.atan2(Math.sin(turn), Math.cos(turn))),
+        `${building.id} turn`,
+      ).toBeLessThan(1e-9);
+    }
+    // the inn's nudge is straight back from its door (local +Z)
+    const inn = BUILDINGS.find((building) => building.id === 'eastbrook_inn');
+    if (!inn) throw new Error('missing inn');
+    const tavern = theirs('tidehold/tavern');
+    const back = toModelAxes(inn, { x: tavern.x, z: tavern.z });
+    expect(Math.abs(back.x)).toBeLessThan(0.01);
+    expect(back.z).toBeCloseTo(-3.5, 1);
+    const vault = theirs('tidehold/vault');
+    expect(
+      Math.hypot(
+        EASTBROOK_LAYOUT.weeklyVault.x - vault.x,
+        EASTBROOK_LAYOUT.weeklyVault.z - vault.z,
+      ),
+    ).toBeCloseTo(0.5, 1);
+    expect(EASTBROOK_LAYOUT.weeklyVault.rot).toBeCloseTo(vault.rotY ?? 0, 9);
+  });
+
+  it('stands each building at its own grand size: five yards of door for a 2.6 yd player', () => {
+    // Every building stands at the town's 1.3, which already clears a door of
+    // about five yards (the bank 5.7, the smithy 5.2, the inn 5.7, the chapel
+    // 6.5), except the apothecary's shop: its door is 3.25 yd at authored
+    // size, so it stands at 1.5 (4.9 yd), as Highwatch's counting house does.
+    expect(BUILDINGS.map((building) => [building.id, building.placement.scale])).toEqual([
+      ['eastbrook_bank', 1.3],
+      ['eastbrook_smithy', 1.3],
+      ['eastbrook_inn', 1.3],
+      ['eastbrook_chapel', 1.3],
+      ['eastbrook_apothecary', 1.5],
+      ['eastbrook_quay_cottage', 1.3],
+    ]);
+    const doorHeads: Record<string, number> = {
+      eastbrook_bank: 4.4,
+      eastbrook_smithy: 4.0,
+      eastbrook_inn: 4.4,
+      eastbrook_chapel: 5.0,
+      eastbrook_apothecary: 3.25,
+    };
+    for (const building of BUILDINGS.filter((candidate) => candidate.walkIn)) {
+      const baked = BAKED[assetIdOf(building)];
+      // baked rows are in multiples of the model's largest dimension over the
+      // placed-asset target height, at authored size
+      const unit = building.placement.modelSize / PLACED_TARGET_HEIGHT;
+      const toRow = (yards: number) => yards / building.placement.scale / unit;
+      const door = toModelAxes(building, building.frontStandingPoint);
+      const doorX = toRow(door.x);
+      const front = toRow(rectOf(building, building.footprint).z0);
+      // the floor the door opens onto (the threshold deck a stride inside the
+      // front wall, on the door's line), and the lowest box over the doorway
+      const inside = { x: doorX, z: front + toRow(0.6) };
+      const floor = Math.max(
+        ...(baked.ramps ?? [])
+          .filter((deck) => {
+            const quarter = Math.abs(Math.abs(deck.ry ?? 0) - Math.PI / 2) < 0.01;
+            const hx = quarter ? deck.hz : deck.hx;
+            const hz = quarter ? deck.hx : deck.hz;
+            return Math.abs(deck.x - inside.x) <= hx && Math.abs(deck.z - inside.z) <= hz;
+          })
+          .map((deck) => {
+            const rise = deck as BakedDeck & { y0: number; y1: number };
+            return Math.max(rise.y0, rise.y1);
+          }),
+      );
+      const heads = baked.boxes
+        .filter((box) => {
+          const quarter = Math.abs(Math.abs(box.ry ?? 0) - Math.PI / 2) < 0.01;
+          const hx = quarter ? box.hz : box.hx;
+          const hz = quarter ? box.hx : box.hz;
+          return (
+            Math.abs(box.x - doorX) < hx &&
+            Math.abs(box.z - front) < hz + 0.05 &&
+            box.y - box.hy > floor + 0.05
+          );
+        })
+        .map((box) => box.y - box.hy);
+      const authored = (Math.min(...heads) - floor) * unit;
+      expect(authored, `${building.id} door at authored size`).toBeCloseTo(
+        doorHeads[building.id],
+        1,
+      );
+      expect(authored * building.placement.scale, `${building.id} door`).toBeGreaterThan(4.85);
+    }
+  });
+
   it('keeps the Weekly Vault where that map stands it', () => {
     const placed = REBUILD_MAP.placements.find((p) => p.assetId === 'tidehold/vault');
     expect(placed).toBeDefined();
@@ -249,6 +374,11 @@ describe('the six placed Eastbrook buildings', () => {
       const groundLine = -bounds.min[1] * scale + building.placement.lift;
       expect(groundLine, `${building.id} ground line`).toBeLessThan(0);
       expect(groundLine, `${building.id} ground line`).toBeGreaterThan(-0.06);
+      // the authored size the baked collision rows scale by is the file's own
+      expect(building.placement.modelSize, `${building.id} model size`).toBeCloseTo(
+        Math.max(...bounds.size),
+        3,
+      );
     }
   });
 
@@ -368,13 +498,20 @@ describe('placed building collision in the built-in world', () => {
     return record;
   };
 
-  it('gives each record its wall box plus one box per annex', () => {
+  it('gives each sealed record its wall box plus one box per annex', () => {
     for (const building of BUILDINGS) {
       const record = recordOf(building);
       expect(record.x).toBe(building.position.x);
       expect(record.z).toBe(building.position.z);
       expect(record.w).toBe(building.nativeDimensions.width);
       expect(record.d).toBe(building.nativeDimensions.depth);
+      // with no seed every record is sealed; with one, only the shut-door model is
+      if (!building.walkIn) {
+        expect(
+          buildingRecordColliders(record, 30, () => 0, WORLD_SEED),
+          building.id,
+        ).toEqual(buildingRecordColliders(record, 30, () => 0));
+      }
       const colliders = buildingRecordColliders(record, 30, () => 0);
       expect(colliders, building.id).toHaveLength(1 + building.annexes.length);
       expect(colliders[0]).toMatchObject({
@@ -412,19 +549,63 @@ describe('placed building collision in the built-in world', () => {
     expect(placedBuildingAnnexes({ ...EASTBROOK_LAYOUT.weeklyVault })).toHaveLength(0);
   });
 
-  it('seals the doorway and every annex, and leaves the street in front open', () => {
+  it('makes every building with an open doorway walk-in, and keeps the quay cottage shut', () => {
+    expect(BUILDINGS.filter((building) => building.walkIn).map((building) => building.id)).toEqual([
+      'eastbrook_bank',
+      'eastbrook_smithy',
+      'eastbrook_inn',
+      'eastbrook_chapel',
+      'eastbrook_apothecary',
+    ]);
+  });
+
+  it('collides a walk-in record on its own model baked boxes, seated on the terrain', () => {
+    for (const building of BUILDINGS.filter((candidate) => candidate.walkIn)) {
+      const record = recordOf(building);
+      const colliders = buildingRecordColliders(record, 30, () => 0, WORLD_SEED);
+      const baked = BAKED[assetIdOf(building)].boxes;
+      expect(colliders, building.id).toHaveLength(baked.length);
+      // the placement rule: the model stands on the terrain under its anchor,
+      // never on the ground query, which already carries its own floor deck
+      const unit = (building.placement.scale * building.placement.modelSize) / PLACED_TARGET_HEIGHT;
+      const seat =
+        terrainHeight(building.placement.x, building.placement.z, WORLD_SEED) +
+        building.placement.lift;
+      const lowestBox = Math.min(...baked.map((box) => box.y - box.hy));
+      const lowestCollider = Math.min(
+        ...colliders.map((collider) => (collider as { baseY?: number }).baseY ?? Infinity),
+      );
+      expect(lowestCollider, building.id).toBeCloseTo(seat + lowestBox * unit, 6);
+      // a record a custom world moved is one sealed box again, annexes left behind
+      expect(
+        buildingRecordColliders({ ...record, x: record.x + 4 }, 30, () => 0, WORLD_SEED),
+        building.id,
+      ).toHaveLength(1);
+    }
+  });
+
+  it('opens the doorway of each walk-in building, keeps its walls, and seals the rest', () => {
     for (const building of BUILDINGS) {
       const anchor = { x: building.placement.x, z: building.placement.z };
       const walls = rectOf(building, building.footprint);
       const door = toModelAxes(building, building.frontStandingPoint);
-      // one stride inside the front wall, on the door's own line
+      // one stride inside the front wall, on the door's own line, asked for a
+      // body standing on the ground there (the lintel and the storey above a
+      // doorway are overhead, not in its way)
       const inside = localToWorld(anchor, building.placement.rotation, door.x, walls.z0 + 1);
-      expect(isBlocked(WORLD_SEED, inside.x, inside.z), `${building.id} doorway`).toBe(true);
+      const standing = { y: groundHeight(inside.x, inside.z, WORLD_SEED), lift: 0 };
+      expect(
+        isBlocked(WORLD_SEED, inside.x, inside.z, 0.5, false, undefined, 0, standing),
+        `${building.id} doorway`,
+      ).toBe(!building.walkIn);
       const front = building.frontStandingPoint;
       expect(isBlocked(WORLD_SEED, front.x, front.z), `${building.id} front`).toBe(false);
       for (const annex of building.annexes) {
         expect(isBlocked(WORLD_SEED, annex.center.x, annex.center.z), annex.id).toBe(true);
       }
+      // the back wall still stands, straight across from the door
+      const back = localToWorld(anchor, building.placement.rotation, door.x, walls.z1 - 0.1);
+      expect(isBlocked(WORLD_SEED, back.x, back.z), `${building.id} back wall`).toBe(true);
     }
   });
 
@@ -441,8 +622,100 @@ describe('placed building collision in the built-in world', () => {
   });
 });
 
+describe('walking into the walk-in Eastbrook buildings', () => {
+  const insideBy = (building: Building, depth: number) => {
+    const walls = rectOf(building, building.footprint);
+    const door = toModelAxes(building, building.frontStandingPoint);
+    return localToWorld(
+      { x: building.placement.x, z: building.placement.z },
+      building.placement.rotation,
+      door.x,
+      walls.z0 + depth,
+    );
+  };
+
+  it('raises the ground to the floor inside each walk-in building, and nowhere else', () => {
+    for (const building of BUILDINGS) {
+      const inside = insideBy(building, 2);
+      const rise =
+        groundHeight(inside.x, inside.z, WORLD_SEED) -
+        terrainHeight(inside.x, inside.z, WORLD_SEED);
+      if (building.walkIn) {
+        // the painted floors stand a step to most of a yard over the ground line
+        expect(rise, `${building.id} floor`).toBeGreaterThan(0.25);
+        expect(rise, `${building.id} floor`).toBeLessThan(1.5);
+      } else {
+        expect(rise, `${building.id} floor`).toBe(0);
+      }
+      // four strides out of the door the street is the plain ground again
+      const street = insideBy(building, -4);
+      expect(groundHeight(street.x, street.z, WORLD_SEED), `${building.id} street`).toBe(
+        terrainHeight(street.x, street.z, WORLD_SEED),
+      );
+    }
+  });
+
+  it('walks a player from the street through each open door onto its floor', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const body = sim.player;
+    const meta = sim.players.get(body.id);
+    if (!meta) throw new Error('missing player meta');
+    for (const building of BUILDINGS.filter((candidate) => candidate.walkIn)) {
+      const start = building.frontStandingPoint;
+      const goal = insideBy(building, 3);
+      body.pos.x = start.x;
+      body.pos.z = start.z;
+      body.pos.y = groundHeight(start.x, start.z, WORLD_SEED);
+      body.prevPos = { ...body.pos };
+      body.facing = Math.atan2(goal.x - start.x, goal.z - start.z);
+      for (let i = 0; i < 20 * 2; i++) {
+        Object.assign(meta.moveInput, {
+          forward: true,
+          back: false,
+          turnLeft: false,
+          turnRight: false,
+          strafeLeft: false,
+          strafeRight: false,
+          jump: false,
+          dive: false,
+          surface: false,
+        });
+        sim.tick();
+      }
+      Object.assign(meta.moveInput, { forward: false });
+      for (let i = 0; i < 20; i++) sim.tick();
+      const walls = rectOf(building, building.footprint);
+      const local = toModelAxes(building, body.pos);
+      expect(local.z, `${building.id}: got past the door`).toBeGreaterThan(walls.z0 + 1.5);
+      expect(local.x, building.id).toBeGreaterThan(walls.x0);
+      expect(local.x, building.id).toBeLessThan(walls.x1);
+      // standing on the raised floor, not sunk to the ground line under it
+      expect(body.pos.y, building.id).toBeCloseTo(
+        groundHeight(body.pos.x, body.pos.z, WORLD_SEED),
+        3,
+      );
+      expect(body.pos.y - terrainHeight(body.pos.x, body.pos.z, WORLD_SEED)).toBeGreaterThan(0.25);
+
+      // and back out: turned round, the same door lets them down onto the street
+      body.facing = Math.atan2(start.x - body.pos.x, start.z - body.pos.z);
+      for (let i = 0; i < 20 * 2; i++) {
+        Object.assign(meta.moveInput, { forward: true });
+        sim.tick();
+      }
+      Object.assign(meta.moveInput, { forward: false });
+      for (let i = 0; i < 20; i++) sim.tick();
+      const out = toModelAxes(building, body.pos);
+      expect(out.z, `${building.id}: got back out of the door`).toBeLessThan(walls.z0 - 1);
+      expect(body.pos.y, `${building.id}: down on the street`).toBeCloseTo(
+        terrainHeight(body.pos.x, body.pos.z, WORLD_SEED),
+        3,
+      );
+    }
+  });
+});
+
 describe('the ground under the placed buildings', () => {
-  it('carries the Studio rebuild map level pads, the last edits on their ground', () => {
+  it('carries the layout level pads, the last edits on their ground, as the rebuild map does', () => {
     const pads = EASTBROOK_BUILDING_PAD_TERRAIN_EDITS;
     // Highwatch's pads come after them in both lists, on the Thornpeak shelf
     // far to the north, where no Eastbrook pad reaches
@@ -456,42 +729,19 @@ describe('the ground under the placed buildings', () => {
     }
     expect(REBUILD_MAP.terrainEdits.slice(-highwatchPads)).toEqual(HIGHWATCH_LAYOUT.pads);
     const mapPads = REBUILD_MAP.terrainEdits.slice(-pads.length - highwatchPads, -highwatchPads);
-    expect(pads).toHaveLength(BUILDINGS.length);
-    // the smithy's, the tavern's, the shop's and the bank's are the map's own
-    for (const index of [1, 2, 3, 4]) {
-      const mapPad = mapPads[index];
-      expect(pads[index], `pad ${index}`).toEqual({
-        x: mapPad.x,
-        z: mapPad.z,
-        radius: mapPad.radius,
-        delta: mapPad.delta,
-        falloff: 'smooth',
-        mode: 'level',
-        hardness: mapPad.hardness,
-      });
+    // a grid of level stamps under every building (and the vault on the bank's
+    // shelf), copied plain from the layout, and the map carries the same list
+    expect(pads).toEqual(EASTBROOK_LAYOUT.pads.map((pad) => ({ ...pad })));
+    expect(mapPads).toEqual(pads);
+    for (const pad of pads) {
+      expect(pad.mode).toBe('level');
+      expect(pad.falloff).toBe('smooth');
     }
-    // The chapel's keeps the map's centre and shelf height, drawn in so its
-    // taper stops at the harbour bluff (the waterline test below).
-    const chapelPad = pads[0];
-    expect({ ...chapelPad, radius: 0, hardness: 0 }).toEqual({
-      x: mapPads[0].x,
-      z: mapPads[0].z,
-      radius: 0,
-      delta: mapPads[0].delta,
-      falloff: 'smooth',
-      mode: 'level',
-      hardness: 0,
-    });
-    expect(chapelPad.radius).toBeLessThan(mapPads[0].radius);
-    // The quay cottage's stamp is the one that is not the map's at all: same
-    // shelf height, moved east and drawn in so it ends at the quay pad's east
-    // edge.
-    const cottagePad = pads[pads.length - 1];
-    const mapCottagePad = mapPads[mapPads.length - 1];
-    expect(cottagePad.mode).toBe('level');
-    expect(cottagePad.delta).toBe(mapCottagePad.delta);
-    expect(cottagePad.x - cottagePad.radius).toBeGreaterThanOrEqual(QUAY_PAD_EAST_EDGE);
-    expect(cottagePad.radius).toBeLessThan(mapCottagePad.radius);
+    // the shelf heights: the harbour end at the main street's height, the
+    // chapel on the plat, the rise north of the square a little above it
+    expect([...new Set(pads.map((pad) => pad.delta))].sort((a, b) => a - b)).toEqual([
+      -0.9, -0.7, 0.5,
+    ]);
     const edits = BUILTIN_WORLD.terrainEdits ?? [];
     expect(edits.slice(-pads.length - highwatchPads, -highwatchPads)).toEqual(pads);
     expect(edits.slice(-highwatchPads)).toEqual(HIGHWATCH_LAYOUT.pads);
@@ -500,10 +750,7 @@ describe('the ground under the placed buildings', () => {
   it('is level under each building, across its whole reach', () => {
     for (const building of BUILDINGS) {
       const seat = terrainHeight(building.placement.x, building.placement.z, WORLD_SEED);
-      // The quay cottage stands half on the shelf and half over the fall to the
-      // quay: its walls are measured, and its footing has to cover the drop.
-      const onQuayEdge = building.id === 'eastbrook_quay_cottage';
-      const box = onQuayEdge ? building.footprint : building.reach;
+      const box = building.reach;
       let low = Infinity;
       let high = -Infinity;
       for (let lx = -box.halfWidth; lx <= box.halfWidth + 1e-6; lx += 0.5) {
@@ -514,17 +761,11 @@ describe('the ground under the placed buildings', () => {
           high = Math.max(high, y);
         }
       }
-      // never above the ground line: nothing grows up through a floor (the
-      // cottage's own stamp starts its taper inside the west end of its walls)
-      expect(high - seat, `${building.id} high ground`).toBeLessThan(onQuayEdge ? 0.01 : 1e-6);
+      // never above the ground line: nothing grows up through a floor
+      expect(high - seat, `${building.id} high ground`).toBeLessThan(1e-6);
       const footing = -boundsOf(building).min[1] * building.placement.scale;
       expect(footing, `${building.id} footing`).toBeGreaterThan(1.25);
-      if (onQuayEdge) {
-        expect(seat - low, `${building.id} drop to the quay`).toBeGreaterThan(0.3);
-        expect(seat - low, `${building.id} drop to the quay`).toBeLessThan(footing - 0.3);
-      } else {
-        expect(seat - low, `${building.id} low ground`).toBeLessThan(1e-6);
-      }
+      expect(seat - low, `${building.id} low ground`).toBeLessThan(1e-6);
     }
   });
 
@@ -597,6 +838,56 @@ describe('the ground under the placed buildings', () => {
     expect(crossed).toBe(0);
   });
 
+  it('never leaves a bank too steep to climb round a building where the pads shaped it', () => {
+    // A pad's taper carries its shelf into the ground round it; cut into the
+    // rise north of the square or built out over the strand, that ease must
+    // stay walkable. Read through the movement gate's own steepness (the
+    // gradient a climbing step is refused on, player_motion.ts) on a half-yard
+    // grid 0.75 to 8 yd round every reach, and compared with the same world
+    // without the building pads: the harbour bluff below the bank is as steep
+    // as it always was, and a pad only answers for the slopes it made.
+    const cells: { x: number; z: number; steepness: number }[] = [];
+    for (let z = -150; z <= -30; z += 0.5) {
+      for (let x = -100; x <= 60; x += 0.5) {
+        const near = Math.min(
+          ...BUILDINGS.map((building) => {
+            const local = toModelAxes(building, { x, z });
+            const reach = rectOf(building, building.reach);
+            return Math.hypot(
+              Math.max(reach.x0 - local.x, 0, local.x - reach.x1),
+              Math.max(reach.z0 - local.z, 0, local.z - reach.z1),
+            );
+          }),
+        );
+        if (near < 0.75 || near > 8) continue;
+        cells.push({ x, z, steepness: terrainSteepnessAt(x, z, WORLD_SEED) });
+      }
+    }
+    expect(cells.length).toBeGreaterThan(10000);
+    const pads = new Set<unknown>(EASTBROOK_BUILDING_PAD_TERRAIN_EDITS);
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      terrainEdits: (BUILTIN_WORLD.terrainEdits ?? []).filter((edit) => !pads.has(edit)),
+    });
+    const tooSteep: string[] = [];
+    let shaped = 0;
+    try {
+      for (const cell of cells) {
+        const before = terrainSteepnessAt(cell.x, cell.z, WORLD_SEED);
+        if (Math.abs(cell.steepness - before) < 1e-9) continue;
+        shaped++;
+        if (cell.steepness > PLAYER_MAX_CLIMB_SLOPE && cell.steepness > before) {
+          tooSteep.push(`${cell.x}, ${cell.z}: ${cell.steepness.toFixed(3)}`);
+        }
+      }
+    } finally {
+      setActiveWorldContent(null);
+    }
+    expect(shaped).toBeGreaterThan(1000);
+    if (process.env.PRINT_STEEP) console.log(tooSteep.join(' | '));
+    expect(tooSteep).toEqual([]);
+  });
+
   it('clears the scatter the rebuild map clears, and nothing grows on a building', () => {
     for (const key of REBUILD_MAP.decorationExclusions) {
       const [, x, z] = key.split(':');
@@ -626,15 +917,30 @@ describe('the ground under the placed buildings', () => {
     }
   });
 
-  it('keeps the road lamp off the smithy door step', () => {
-    const smithy = BUILDINGS.find((building) => building.id === 'eastbrook_smithy');
-    if (!smithy) throw new Error('missing smithy');
-    expect(isExcludedStreetlamp(-33.44783716157823, -103.6111100755925)).toBe(true);
-    for (const lamp of streetlampPlacements(WORLD_SEED)) {
+  it('keeps the road lamps off every door step and out of every building', () => {
+    // The main street lamp the smithy's old door step stood on is planted
+    // again now the smithy stands north of the square.
+    expect(isExcludedStreetlamp(-33.44783716157823, -103.6111100755925)).toBe(false);
+    const lamps = streetlampPlacements(WORLD_SEED);
+    expect(lamps.some((lamp) => Math.hypot(lamp.x + 33.448, lamp.z + 103.611) < 0.01)).toBe(true);
+    const vault = EASTBROOK_LAYOUT.weeklyVault;
+    for (const lamp of lamps) {
+      const fromVault = {
+        x: (lamp.x - vault.x) * Math.cos(vault.rot) - (lamp.z - vault.z) * Math.sin(vault.rot),
+        z: (lamp.x - vault.x) * Math.sin(vault.rot) + (lamp.z - vault.z) * Math.cos(vault.rot),
+      };
       expect(
-        Math.hypot(lamp.x - smithy.frontStandingPoint.x, lamp.z - smithy.frontStandingPoint.z),
-      ).toBeGreaterThan(3);
+        Math.abs(fromVault.x) > vault.w / 2 + 0.5 || Math.abs(fromVault.z) > vault.d / 2 + 0.5,
+        `lamp at ${lamp.x.toFixed(2)}, ${lamp.z.toFixed(2)} in the vault`,
+      ).toBe(true);
       for (const building of BUILDINGS) {
+        expect(
+          Math.hypot(
+            lamp.x - building.frontStandingPoint.x,
+            lamp.z - building.frontStandingPoint.z,
+          ),
+          `lamp at ${lamp.x.toFixed(2)}, ${lamp.z.toFixed(2)} by the door of ${building.id}`,
+        ).toBeGreaterThan(3);
         const local = toModelAxes(building, lamp);
         const reach = rectOf(building, building.reach);
         const within =

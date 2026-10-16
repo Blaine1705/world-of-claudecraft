@@ -1431,7 +1431,8 @@ export const ja_JP: EnTranslations = {
       "drowning": "溺れています！"
     },
     "rest": {
-      "resting": "休息中"
+      "resting": "休息中",
+      "restArea": "休息中：ここは休息所で、休息経験値がたまります。"
     },
     "paladin": {
       "devotion": "献身",
@@ -4552,7 +4553,8 @@ export const ja_JP: EnTranslations = {
         "foodVendor": "飲食物商人",
         "potionVendor": "ポーション商人",
         "stableMaster": "厩舎長",
-        "generalGoods": "雑貨商人"
+        "generalGoods": "雑貨商人",
+        "innkeeper": "宿屋の主人"
       }
     },
     "mobTooltip": {
@@ -10025,6 +10027,33 @@ export const ja_JP: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "対象：{name}",
+      "choose": "重なったアセットを選ぶ（{count}）",
+      "chooser": "ポインターの下のアセットを選択",
+      "front": "最前面",
+      "behind": "別のアセットの背後",
+      "close": "閉じる",
+      "keyboard": "前へ・次へ、または矢印キーで比較します。Enterで選択、Escapeで閉じます。",
+      "hint": "再度クリックすると重なったアイテムを切り替えられます。このリストからも選べます。",
+      "asset": "アセット{number}",
+      "overlapAt": "{name}の位置で重なったアセット",
+      "previous": "前へ",
+      "next": "次へ",
+      "position": "{count}件中{current}件目",
+      "details": "アイテム{number} · {level}階 · 高さ{height}",
+      "ungroupedDetails": "アイテム{number} · 高さ{height}",
+      "hideAbove": "選択した階より上を非表示",
+      "allFloors": "すべての階を表示中",
+      "filteredFloors": "{level}階より上は非表示です"
+    },
+    "quickActions": {
+      "title": "選択中のアセット",
+      "move": "移動",
+      "frame": "画面に収める",
+      "remove": "削除",
+      "count": "{count}件選択中"
+    },
     "buildMode": {
       "materialNames": {
         "WardenStone": "滑らかな石",
@@ -10562,6 +10591,8 @@ export const ja_JP: EnTranslations = {
       "lower": "沈降",
       "smooth": "なめらか",
       "flatten": "平坦化",
+      "slope": "斜面",
+      "pond": "池",
       "tunnel": "Caves",
       "rock": "Rock Gen",
       "build": "Build Model",
@@ -10751,6 +10782,9 @@ export const ja_JP: EnTranslations = {
     },
     "brush": {
       "title": "ブラシ",
+      "shape": "ブラシの形",
+      "circle": "円形",
+      "square": "正方形",
       "size": "ブラシサイズ",
       "strength": "強さ",
       "sizeHint": "キー：[ と ] でブラシサイズ、Shift+[ と Shift+] で強さを調整。",
@@ -10848,6 +10882,18 @@ export const ja_JP: EnTranslations = {
       "none": "No named locations yet.",
       "deleteTitle": "Remove this location",
       "hideBoxes": "Hide area boxes"
+    },
+    "objectMove": {
+      "title": "ゲームプレイオブジェクト",
+      "kindFarmBed": "畑の苗床",
+      "kindPracticeDummy": "練習用ダミー",
+      "kindGatherNode": "採集ポイント",
+      "kindDungeonDoor": "ダンジョン入口",
+      "position": "位置：{x}, {z}",
+      "moved": "このマップで移動済みです。",
+      "original": "元の位置にあります。",
+      "hint": "ドラッグするか、矢印キーで微調整します。移動はこのマップにだけ適用され、オブジェクトの識別子は変わらないため、保存された進行状況からも見つかります。",
+      "reset": "元の位置に戻す"
     },
     "lightTool": {
       "title": "Point Lights",
@@ -11001,6 +11047,16 @@ export const ja_JP: EnTranslations = {
       "autoTexSteep": "Steep ground texture",
       "autoTexNone": "Leave as is"
     },
+    "materials": {
+      "title": "マテリアル",
+      "hint": "このモデルの各パーツのテクスチャを選びます。テクスチャはワールド空間でタイル表示され、モデルのUVは使わず、マップと一緒に保存されます。",
+      "loading": "モデルを読み込み中です。少ししてからもう一度選択するとマテリアルを編集できます。",
+      "original": "オリジナル",
+      "texture": "テクスチャ",
+      "tile": "テクスチャの縮尺（1タイルあたりのヤード）",
+      "color": "Tint",
+      "reset": "元に戻す"
+    },
     "flatten": {
       "style": {
         "smooth": "Smooth",
@@ -11020,7 +11076,29 @@ export const ja_JP: EnTranslations = {
       "hint": "平坦化は、ドラッグ開始時のカーソル下の高さに地面をならします。",
       "hardEdge": "ハードエッジ",
       "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke."
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "目標の高さ（ヤード）",
+      "levelPlaceholder": "ドラッグ開始点",
+      "levelClear": "クリア",
+      "levelHint": "ドラッグするたびに地面をこの高さに平らにします。地面を右クリックすると別の高さを選べます。",
+      "levelHintNone": "地面を右クリックするとその高さを固定し、どこでもドラッグしてその高さに平らにできます。空欄の場合は、各ドラッグの開始点の高さに平らにします。",
+      "levelPicked": "高さを {height} ヤードに固定しました。"
+    },
+    "slope": {
+      "hint": "斜面を始めたい地面を右クリックします。次に終点で押したまま道に沿ってドラッグすると、2つの高さの間が滑らかな坂になります。",
+      "start": "始点の高さ：{height} ヤード",
+      "noStart": "始点が未設定です。地面を右クリックして設定してください。",
+      "clearStart": "始点をクリア",
+      "needStart": "先に地面を右クリックして、斜面の始点を設定してください。",
+      "startPicked": "斜面の始点を {height} ヤードに設定しました。"
+    },
+    "pond": {
+      "title": "池を作る",
+      "add": "池を追加",
+      "radius": "池の半径",
+      "depth": "池の深さ",
+      "hint": "地面をクリックすると丸い池を掘って水を入れます。円には緩やかな岸も含まれます。元に戻すと水とくぼみを一緒に取り消します。",
+      "invalid": "この地面には池を掘れません。別の場所を選んでください。"
     },
     "water": {
       "title": "水面の高さ",
@@ -11317,6 +11395,11 @@ export const ja_JP: EnTranslations = {
     },
     "selection": {
       "title": "選択",
+      "heightOffset": "高さのオフセット（ヤード）",
+      "heightStep": "移動量（ヤード）",
+      "raiseAsset": "上げる",
+      "lowerAsset": "下げる",
+      "heightHint": "負の値で、アセットを基準位置より下に沈めます。",
       "none": "何も選択されていません。「選択」ツールで配置済みアセットをクリックしてください。",
       "squareCollision": "Square collision (follows rotation)",
       "asset": "アセット：{name}",
@@ -11327,6 +11410,9 @@ export const ja_JP: EnTranslations = {
       "selectAllOfAsset": "Select all of this asset ({count})",
       "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
       "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "地面に合わせる",
+      "setGroundTitle": "選択したアセットを真下の地形に戻し、浮きや持ち上げを解除します",
+      "snapGround": "移動時に地面に合わせる",
       "rotation": "回転",
       "scale": "スケール",
       "collide": "移動をブロック",
@@ -11826,6 +11912,8 @@ export const ja_JP: EnTranslations = {
     },
     "weather": {
       "title": "Weather",
+      "showSnowfall": "降雪を表示",
+      "snowfallHint": "スタジオのプレビュー設定です。このブラウザーに保存されます。",
       "zoneTitle": "Weather in this zone",
       "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
       "auto": "Auto",
@@ -11916,6 +12004,8 @@ export const ja_JP: EnTranslations = {
         "lower": "ブラシの下の地形を下げます。",
         "smooth": "起伏を周囲の平均の高さへならします。",
         "flatten": "ドラッグ開始地点の高さに地面を平らにします。",
+        "slope": "右クリックで始点の高さを決め、別の高さからドラッグすると滑らかな斜面を作れます。",
+        "pond": "クリックすると独立した水面を持つ池を掘ります。",
         "paint": "ゾーンの既定の上にバイオームの地表を塗ります。",
         "water": "マップ全体の水面の高さを設定します。",
         "place": "カタログまたはアップロードしたアセットを地面に配置します。",
@@ -12187,6 +12277,7 @@ export const ja_JP: EnTranslations = {
     "newCharacter": "新規キャラクター",
     "appearance": "外見",
     "modelLoading": "キャラクターを読み込み中...",
+    "previewPinchHint": "ピンチでズーム",
     "customize": "カスタマイズ",
     "body": "体型",
     "genderMale": "男性",
@@ -25413,6 +25504,31 @@ export const ja_JP: EnTranslations = {
         "title": "ワームウォッチ波止場の番人",
         "greeting": "波止場から中へどうぞ、手を温めていきなさい。うちの桟橋の船は長い東の海岸を北へ上ってウィックハーバーへ向かい、また戻ってきます。はるか西では、もう一隻の渡し船がイーストブルックとナイトブルームの間を行き来しています。壁の地図に二つの航路が描いてありますよ。ワームウォッチへ登る前に、火のそばでひと休みしていきなさい。"
       },
+      "innkeeper_maudie": {
+        "name": "モーディ・タップライト",
+        "title": "宿屋の女将",
+        "greeting": "湿気から逃れて中へどうぞ、旅の方。火のそばへ下りる段差に気をつけてね。やかんは火にかけてあるし、長椅子は温かいし、二階の部屋も乾いていますよ。フェンブリッジから来た旅人たちは、湿地の道は昼間なら静かだと口をそろえるけれど、日が暮れてから歩く人はいません。少し座って、足を休めていきなさい。"
+      },
+      "patron_amos_eelby": {
+        "name": "エイモス・イールビー",
+        "title": "ウナギ漁師",
+        "greeting": "長椅子に座りな、{className}。このグリセルはフェンブリッジの下の大ウナギなんぞ作り話だと言い張るがな、わしは二度もあいつに手をかけたんだ。二度だぞ！徴税人みたいにぬるぬるで、この長椅子くらいの長さはあったわい。"
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "グリセル・セッジワース",
+        "title": "泥炭掘り",
+        "greeting": "エイモスの話は気にしなくていいよ。四十年泥炭を掘ってきたけど、この沼からは、あの人が釣ったウナギより妙な物をたくさん掘り出してきたさ。長靴に骨に、中の頭がまだ心配そうな兜までね。温まっていきな、火はただだよ。"
+      },
+      "patron_ned_oxley": {
+        "name": "ネッド・オクスリー",
+        "title": "牛追い",
+        "greeting": "土手道で牛を四十頭追ってきたが、フェンブリッジの手前で二頭を泥沼に取られた。この道で男を裏切らないのはモーディのエールだけさ。自分の分は自分で払えよ。"
+      },
+      "patron_hester_quillby": {
+        "name": "ヘスター・クウィルビー",
+        "title": "地図職人",
+        "greeting": "この湿地の地図は、買ったものがどれも一季節もたずに間違いになったわ。水が道を動かして、道が水を動かすの。だから自分で描いて、インクが乾くまで、ここの乾いた席に座っているのよ。"
+      },
       "reeve_ottoline": {
         "name": "代官オトリーヌ",
         "title": "ランタンミアの代官",
@@ -25637,6 +25753,11 @@ export const ja_JP: EnTranslations = {
         "name": "錬金術師ヴェレーン",
         "title": "薬房の主",
         "greeting": "二度量って一度で注ぐ、{className}。薬房ではこぼした試薬に容赦はしない。"
+      },
+      "steward_ansel_hale": {
+        "name": "アンセル・ヘイル",
+        "title": "館の家令",
+        "greeting": "館へようこそ、{className}。炉辺で温まっていくといい。絨毯に気をつけて、上座の卓には触れぬように。広場の者が家路を見失わぬよう、灯籠は夜通し灯している。"
       },
       "farmer_jessica": {
         "name": "農婦ジェシカ",

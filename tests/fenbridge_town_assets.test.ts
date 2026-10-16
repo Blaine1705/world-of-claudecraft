@@ -895,13 +895,18 @@ describe('Fenbridge shipping asset family', () => {
     // its teller window three yards apart along its front. The painted bank
     // has one door and Petra keeps it, so the teller IS the entrance socket
     // under its own id: the door on the model's front (-Z) wall face, in the
-    // MODEL's own axes, and the stand 1.8 yd straight out of it.
+    // MODEL's own axes at the bank's placed size, and the stand straight out
+    // of it, 1.8 yd at authored size, grown with the building.
     const { bank } = FENBRIDGE_LAYOUT.services;
     const bankBuilding = FENBRIDGE_BUILDINGS_BY_ID[bank.buildingId];
     expect(bankBuilding.id).toBe('fenbridge_gilded_strongbox');
     expect(bankBuilding.assetId).toMatch(/\/tidehold\/(?:fenrire\/)?shop_a\.glb$/);
     expect(bank.entrance).toBe(bankBuilding.sockets.entrance);
-    expect(bank.entrance.localPosition).toEqual({ x: -1.6, z: -4.2 });
+    // the authored door (-1.6, -4.2) at the grand bank's 1.5
+    const scale = bankBuilding.placement.scale;
+    expect(scale).toBe(1.5);
+    expect(bank.entrance.localPosition.x).toBeCloseTo(-1.6 * scale, 9);
+    expect(bank.entrance.localPosition.z).toBeCloseTo(-4.2 * scale, 9);
     expect(bank.teller).toEqual({ ...bank.entrance, id: 'fenbridge_gilded_strongbox_teller' });
     expect(bank.teller.id).not.toBe(bank.entrance.id);
 
@@ -910,10 +915,11 @@ describe('Fenbridge shipping asset family', () => {
     expect(bank.entrance.position.x).toBeCloseTo(door.x, 9);
     expect(bank.entrance.position.z).toBeCloseTo(door.z, 9);
     // The door is on the wall line: the wall box reads it at 0, and the stand
-    // straight out of it reads the full 1.8, which a door set back inside the
+    // straight out of it reads the full step, which a door set back inside the
     // walls could not.
+    const step = 1.8 * scale;
     expect(distancePointToObb(bank.entrance.position, bankBuilding.footprint)).toBeCloseTo(0, 9);
-    const stand = localToWorld(bankBuilding.placement, bankBuilding.rotation, x, z - 1.8);
+    const stand = localToWorld(bankBuilding.placement, bankBuilding.rotation, x, z - step);
     expect(bank.teller.standingPoint.x).toBeCloseTo(stand.x, 9);
     expect(bank.teller.standingPoint.z).toBeCloseTo(stand.z, 9);
     expect(
@@ -921,9 +927,9 @@ describe('Fenbridge shipping asset family', () => {
         bank.teller.standingPoint.x - bank.entrance.position.x,
         bank.teller.standingPoint.z - bank.entrance.position.z,
       ),
-    ).toBeCloseTo(1.8, 9);
+    ).toBeCloseTo(step, 9);
     expect(distancePointToObb(bank.teller.standingPoint, bankBuilding.footprint)).toBeCloseTo(
-      1.8,
+      step,
       9,
     );
   });

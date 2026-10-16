@@ -8,6 +8,7 @@
 // mode 'level' pulls the height toward the absolute height `delta`, weighted by
 // the falloff (1 at the centre for 'smooth', constant 1 for 'flat').
 
+import { brushDistanceSquared } from '../sim/brush_shape';
 import { NOISE_SIZE_MAX, NOISE_SIZE_MIN, NOISE_STROKE_OVERLAP } from '../sim/terrain_noise_brush';
 import type { HeightStamp } from '../sim/types';
 import type { AssetPlacement } from './custom_map';
@@ -343,7 +344,7 @@ export function eraseStampIndex(stamps: readonly HeightStamp[], x: number, z: nu
     const s = stamps[i];
     const dx = x - s.x;
     const dz = z - s.z;
-    if (dx * dx + dz * dz <= s.radius * s.radius) return i;
+    if (brushDistanceSquared(dx, dz, s.shape) <= s.radius * s.radius) return i;
   }
   return -1;
 }

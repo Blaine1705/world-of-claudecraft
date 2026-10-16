@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
+import { isBuiltinShapedWorld } from '../sim/builtin_shaped_world';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
 import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
@@ -49,6 +50,13 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
+import { buildHighwatchManorLane, highwatchManorLanePrewarmPart } from './highwatch_manor_lane';
+import { highwatchManorFlames, highwatchManorLights } from './highwatch_manor_lights';
+import {
+  buildHighwatchManorSmoke,
+  highwatchManorSmokePrewarmPart,
+  type ManorSmokeView,
+} from './highwatch_manor_smoke';
 import { isHighwatchRebuildBuilding } from './highwatch_town';
 import {
   type KitSurfaceFamily,
@@ -56,6 +64,14 @@ import {
   splitKitSurfacesByUv,
 } from './kit_uv_surface_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
+import {
+  buildMirefenTavern,
+  clearMirefenTavernShell,
+  mirefenTavernFlameSpots,
+  mirefenTavernLights,
+  mirefenTavernPrewarmParts,
+  updateMirefenTavernShell,
+} from './mirefen_tavern';
 import { MUSTER_KIT_PROP_DEFS, MUSTER_LOW_TIER_KIT_KEYS, renderDecorProps } from './muster_camps';
 import {
   advanceOccluderFade,
@@ -456,7 +472,7 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   ...MUSTER_KIT_PROP_DEFS,
 };
 
-type PropKey = keyof typeof PROP_ASSET_DEFS;
+export type PropKey = keyof typeof PROP_ASSET_DEFS;
 
 const loadedProps = new Map<string, GLTF>();
 const propLoadTasks = new Map<string, Promise<void>>();
@@ -1052,14 +1068,18 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
   // moored transport ships draw their own merged, vertex-coloured meshes
   // (transport_ship.ts), and so do the berths' route markers
   // (harbor_route_markers.ts), the Wyrmwatch cliff harbor (wyrmwatch_harbor.ts), the
-  // Wickharbor ferry wharf (wickharbor_wharf.ts) and the rest of Wickharbor's harbor
-  // (wickharbor_harbor.ts): one twin per distinct program, shadow variant included
+  // Wickharbor ferry wharf (wickharbor_wharf.ts), the rest of Wickharbor's harbor
+  // (wickharbor_harbor.ts) and the Mirefen tavern (mirefen_tavern.ts): one twin per
+  // distinct program, shadow variant included
   for (const part of [
     ...transportShipPrewarmParts(),
     ...harborRouteMarkerPrewarmParts(),
     ...wyrmwatchHarborPrewarmParts(),
     ...wickharborWharfPrewarmParts(),
     ...wickharborHarborPrewarmParts(),
+    ...mirefenTavernPrewarmParts(),
+    highwatchManorSmokePrewarmPart(),
+    highwatchManorLanePrewarmPart(),
   ]) {
     const mesh = new THREE.Mesh(part.geometry, part.material);
     mesh.castShadow = true;
@@ -1086,7 +1106,7 @@ const propRand = propPlacementRoll;
 // building becomes is always the asset it really renders as.
 const HOUSE_POOL: PropKey[] = ['house1', 'house2', 'blacksmith'];
 const HOUSE_POOL_HOLLOW: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
-const HOUSE_HEIGHT: Record<string, number> = {
+export const HOUSE_HEIGHT: Readonly<Record<string, number>> = {
   house1: 8.0,
   house2: 7.6,
   blacksmith: 6.6,
@@ -1139,7 +1159,7 @@ export function chapelTowerWorldCenter(b: { x: number; z: number; rot: number })
  * impostor collector, so a far sprite can never disagree with the model it
  * hands off to.
  */
-function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] }): PropKey {
+export function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] }): PropKey {
   const key = b.x * 13.7 + b.z * 3.1;
   const pool = b.kind === 'hollowHouse' ? HOUSE_POOL_HOLLOW : HOUSE_POOL;
   return KIND_ASSET[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
@@ -1399,8 +1419,10 @@ export function buildProps(
   // moored transport ships (render/transport_ship.ts): live, idle-animated,
   // their own LODs; ticked from update() below, never merged or ghosted
   const transportShips: TransportShipView[] = [];
+  let manorSmoke: ManorSmokeView | null = null;
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
+  const builtInShaped = isBuiltinShapedWorld(activeContent);
   // The authored-town swap is gated on the town's DATA, not on world identity,
   // so an editor copy of the built-in world gets the same art the game draws
   // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
@@ -1723,14 +1745,18 @@ export function buildProps(
         if (wake) group.add(wake.points);
       })
     : null;
-  if (builtInWorld) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
+  // The piers and the built harbors below draw on any copy of the built-in
+  // world too (sim/builtin_shaped_world.ts): the sim walks their decks on every
+  // world. The ferry and its berth markers stay built-in only (it never sails
+  // a copy, transport_ferry.ts).
+  if (builtInShaped) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
   // ...and the route marker at every berth (render/harbor_route_markers.ts)
   if (builtInWorld) group.add(buildHarborRouteMarkers(seed));
   // ...and the Wyrmwatch cliff harbor at the Drakelands berth (render/wyrmwatch_harbor.ts),
   // its Harbormaster's House walls and roof kept out of the merge (they fade one by one for
   // the camera, render/wyrmwatch_harbor_house.ts) and its hearth and lanterns lit like a
   // campfire (root-level, world-positioned, in the fire-light budget)
-  if (builtInWorld) {
+  if (builtInShaped) {
     group.add(buildWyrmwatchHarbor(seed));
     for (const m of harborHouseShellMeshes()) keepFromMerge.add(m);
     for (const light of wyrmwatchHarborHouseLights()) {
@@ -1740,11 +1766,57 @@ export function buildProps(
   } else {
     clearHarborHouseShell();
   }
+  // ...and the Highwatch manor's hearth, range and lamps (render/highwatch_manor_lights.ts),
+  // lit like a campfire: root-level, world-positioned, in the fire-light budget
+  if (highwatchTown) {
+    for (const light of highwatchManorLights(seed)) {
+      group.add(light);
+      fireLights.push(light);
+    }
+    // ...its lane from the Sanctum road to the garden gate (paving, not a road record)
+    const lane = buildHighwatchManorLane(seed);
+    group.add(lane);
+    keepFromMerge.add(lane);
+    // ...and its kitchen chimney's smoke (cosmetic: the painter draws none on the low tier)
+    manorSmoke = buildHighwatchManorSmoke(seed);
+    group.add(manorSmoke.mesh);
+    keepFromMerge.add(manorSmoke.mesh);
+    noShadow.add(manorSmoke.mesh);
+    for (const fire of highwatchManorFlames(seed, usePbr ? EMISSIVE_LIGHT : 1.4)) {
+      group.add(fire.holder);
+      flames.push(fire.flame);
+      keepLiveMeshes.add(fire.flame);
+      noShadow.add(fire.flame);
+      if (fire.core) {
+        keepLiveMeshes.add(fire.core);
+        noShadow.add(fire.core);
+      }
+    }
+  }
   // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts),
   // with the rest of the town's wooden harbor in the same wood (render/wickharbor_harbor.ts)
-  if (builtInWorld) {
+  if (builtInShaped) {
     group.add(buildWickharborWharf());
     group.add(buildWickharborHarbor());
+  }
+  // ...and the Mirefen tavern on the Fenbridge road (render/mirefen_tavern.ts): its walls,
+  // roofs, gallery and partitions fade one by one for the camera, its fires, chandelier and lanterns lit like a campfire (root-level,
+  // world-positioned, in the fire-light budget)
+  if (builtInWorld) {
+    // the whole tavern stays out of the band merge: it is already one mesh per material (the
+    // shell parts one per part), so a re-bake would only hold a second copy of its geometry
+    // beside the one the prewarm and the live draw share
+    const tavern = buildMirefenTavern();
+    group.add(tavern);
+    tavern.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) keepFromMerge.add(o as THREE.Mesh);
+    });
+    for (const light of mirefenTavernLights()) {
+      group.add(light);
+      fireLights.push(light);
+    }
+  } else {
+    clearMirefenTavernShell();
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
@@ -1928,6 +2000,26 @@ export function buildProps(
     g.position.set(x, y, z);
     group.add(shadowed(g));
     registerHideable(g, circleFootprint(x, z, 0.85, y + 1.45, 2.4));
+  }
+  // the Mirefen tavern's round hearth and wall fire burn with the built-in campfires' live
+  // flame (the legacy lathe, built-in world only), each in a sized holder (the flicker writes
+  // the flame's own scale; render/mirefen_tavern.ts)
+  if (legacyFlameGeo) {
+    for (const spot of mirefenTavernFlameSpots()) {
+      const flame = buildLegacyCampfireFlame(legacyFlameGeo, {
+        color: 0xffaa33,
+        emissive: 0xff6600,
+        emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
+      });
+      const holder = new THREE.Group();
+      holder.position.set(spot.x, spot.y, spot.z);
+      holder.scale.set(spot.scale, spot.scale, spot.scale * (spot.depthZ ?? 1));
+      holder.add(flame);
+      group.add(holder);
+      flames.push(flame);
+      keepLiveMeshes.add(flame);
+      noShadow.add(flame);
+    }
   }
 
   // ---- bandit/war tents: Kenney ridge tents, opening on +z, hideable -------
@@ -2661,10 +2753,12 @@ export function buildProps(
     ): void {
       const fogFarSq = fogFar * fogFar;
       scheduledShips?.sync(dt);
+      manorSmoke?.update(camX, camZ, dt);
       for (let i = 0; i < transportShips.length; i++) {
         transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
       }
       updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, fogFar);
+      updateMirefenTavernShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, fogFar);
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
       // approach holds until the gate has linked its programs, and an arrival
       // among the bands holds too, with its compiles submitted at the imminent

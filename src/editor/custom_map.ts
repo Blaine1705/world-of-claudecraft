@@ -1,3 +1,4 @@
+import { cloneMaterialFinishes } from '../sim/material_finishes';
 import { cloneWallFinishes } from '../sim/wall_finishes';
 import { WORLD_SEED } from '../sim/world_seed';
 // The CustomMap document: the editor's canonical, serializable map. The type and
@@ -34,6 +35,7 @@ import {
   WATERFALL_PATH,
 } from '../sim/map_doc';
 import { mapObjectivesFromPlacements } from '../sim/map_objectives';
+import { freezeObjectMoves } from '../sim/moved_objects';
 import {
   emptyZoneProps,
   type PlacedAsset,
@@ -511,6 +513,11 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
     promotedScenery: promotedSceneryFor(map.propsMode, map.placements, map.promotedScenery),
   };
   if (map.playerSpawnArea) world.playerSpawnArea = { ...map.playerSpawnArea };
+  // The built-in gameplay objects this map moved (farm beds, practice dummies,
+  // gather nodes, dungeon doors): the playtest and the published map read
+  // the same frozen record the editor viewport does (sim/moved_objects.ts).
+  const objectMoves = freezeObjectMoves(map.objectMoves);
+  if (objectMoves) world.objectMoves = objectMoves;
   if (map.blockers && map.blockers.length > 0) world.blockers = deepClone(map.blockers);
   // Imported-model collision bakes ride into the play world so the sim's
   // placement colliders resolve 'local/<sha>' / 'user/<sha>' paths.
@@ -881,6 +888,7 @@ export function placementsToRenderAssets(
     }
     if (p.modelTexId !== undefined) placed.modelTexId = p.modelTexId;
     if (p.wallFinishes) placed.wallFinishes = cloneWallFinishes(p.wallFinishes);
+    if (p.materialFinishes) placed.materialFinishes = cloneMaterialFinishes(p.materialFinishes);
     if (p.building) placed.building = { ...p.building };
     if (p.modelTexTile !== undefined) placed.modelTexTile = p.modelTexTile;
     if (p.modelHue !== undefined) placed.modelHue = p.modelHue;

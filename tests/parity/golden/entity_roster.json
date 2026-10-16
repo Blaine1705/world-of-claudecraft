@@ -374,7 +374,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1014,
-      "state": "d99410a7",
+      "state": "c9f9b2d7",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -513,9 +513,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -2,
-            "y": -0.453488,
-            "z": -70
+            "x": 37.5,
+            "y": -0.251617,
+            "z": -99.3
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -546,7 +546,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1014,
-      "state": "2d2b65f9",
+      "state": "ff264465",
       "events": "557f26d5",
       "rng": {
         "draws": 4,
@@ -692,9 +692,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -2,
-            "y": -0.453488,
-            "z": -70
+            "x": 37.5,
+            "y": -0.251617,
+            "z": -99.3
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -725,7 +725,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 1014,
-      "state": "e0d9fded",
+      "state": "892a529f",
       "events": "0eaaa8ed",
       "rng": {
         "draws": 4,
@@ -736,7 +736,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 1014,
-      "state": "4de0cbec",
+      "state": "4a2e8fbe",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -875,7 +875,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0535,
           "facing": 1.570796,
-          "fallStartY": -0.453488,
+          "fallStartY": -0.251617,
           "fiveSecondRule": 99.35,
           "healPower": 2,
           "hp": 44,
@@ -891,9 +891,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -2,
-            "y": -0.453488,
-            "z": -70
+            "x": 37.5,
+            "y": -0.251617,
+            "z": -99.3
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

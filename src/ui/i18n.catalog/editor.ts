@@ -9,6 +9,33 @@
 // live solely in the overlays.
 
 export const editorStrings = {
+  picking: {
+    target: 'Target: {name}',
+    choose: 'Choose overlapping asset ({count})',
+    chooser: 'Choose an asset under the pointer',
+    front: 'Frontmost',
+    behind: 'Behind another asset',
+    close: 'Close',
+    keyboard: 'Use Previous/Next or arrow keys to compare. Enter selects; Escape closes.',
+    hint: 'Click again to cycle overlapping items, or choose from this list.',
+    asset: 'Asset {number}',
+    overlapAt: 'Overlaps at {name}',
+    previous: 'Previous',
+    next: 'Next',
+    position: '{current} of {count}',
+    details: 'Item {number} · Floor {level} · Height {height}',
+    ungroupedDetails: 'Item {number} · Height {height}',
+    hideAbove: 'Hide floors above selected level',
+    allFloors: 'All floors visible',
+    filteredFloors: 'Floors above level {level} are hidden',
+  },
+  quickActions: {
+    title: 'Selected asset',
+    move: 'Move',
+    frame: 'Frame',
+    remove: 'Remove',
+    count: '{count} selected',
+  },
   buildMode: {
     materialNames: {
       WardenStone: 'Smooth Stone',
@@ -598,6 +625,8 @@ export const editorStrings = {
     lower: 'Lower',
     smooth: 'Smooth',
     flatten: 'Flatten / Smooth',
+    slope: 'Slope',
+    pond: 'Pond',
     tunnel: 'Caves',
     rock: 'Rock Gen',
     build: 'Build Model',
@@ -808,6 +837,9 @@ export const editorStrings = {
 
   brush: {
     title: 'Brush',
+    shape: 'Brush shape',
+    circle: 'Circle',
+    square: 'Square',
     size: 'Brush size',
     strength: 'Strength',
     sizeHint: 'Keys: [ and ] resize the brush; Shift+[ and Shift+] change strength.',
@@ -924,6 +956,19 @@ export const editorStrings = {
     none: 'No named locations yet.',
     deleteTitle: 'Remove this location',
     hideBoxes: 'Hide area boxes',
+  },
+
+  objectMove: {
+    title: 'Gameplay Object',
+    kindFarmBed: 'Farm bed',
+    kindPracticeDummy: 'Practice dummy',
+    kindGatherNode: 'Gather node',
+    kindDungeonDoor: 'Dungeon door',
+    position: 'Position: {x}, {z}',
+    moved: 'Moved on this map.',
+    original: 'At its original spot.',
+    hint: 'Drag it, or nudge it with the arrow keys. The move applies to this map only and the object keeps its identity, so saved progress still finds it.',
+    reset: 'Reset to original spot',
   },
 
   lightTool: {
@@ -1089,6 +1134,17 @@ export const editorStrings = {
     autoTexNone: 'Leave as is',
   },
 
+  materials: {
+    title: 'Materials',
+    hint: 'Pick a texture for each part of this model. Textures tile in world space, ignore the model UVs, and save with the map.',
+    loading: 'The model is still loading. Select it again in a moment to edit its materials.',
+    original: 'Original',
+    texture: 'Texture',
+    tile: 'Texture scale (yards per tile)',
+    color: 'Tint',
+    reset: 'Restore original',
+  },
+
   flatten: {
     style: {
       smooth: 'Smooth',
@@ -1111,6 +1167,32 @@ export const editorStrings = {
     hardEdge: 'Hard edge',
     smoothMode: 'Smooth instead of flatten',
     shiftHint: 'Hold Shift while dragging to swap flatten and smooth for that stroke.',
+    levelTitle: 'Level height (yards)',
+    levelPlaceholder: 'Drag start',
+    levelClear: 'Clear',
+    levelHint:
+      'Every drag levels the ground to this height. Right-click the ground to pick another.',
+    levelHintNone:
+      'Right-click the ground to lock its height, then drag anywhere to level to it. Empty: each drag levels to where it starts.',
+    levelPicked: 'Level locked at {height} yards.',
+  },
+
+  slope: {
+    hint: 'Right-click the ground where the slope should start. Then press where it should end and drag along the path: the ground eases into a smooth ramp between the two heights.',
+    start: 'Start height: {height} yards',
+    noStart: 'No start set yet. Right-click the ground to set one.',
+    clearStart: 'Clear start',
+    needStart: 'Right-click the ground first to set where the slope starts.',
+    startPicked: 'Slope start set at {height} yards.',
+  },
+
+  pond: {
+    title: 'Create a pond',
+    add: 'Add pond',
+    radius: 'Pond radius',
+    depth: 'Pond depth',
+    hint: 'Click the ground to dig a round pond and fill it with water. The circle includes the softly sloping bank. Undo removes the water and basin together.',
+    invalid: 'Cannot dig a pond on this ground. Choose another spot.',
   },
 
   water: {
@@ -1444,6 +1526,11 @@ export const editorStrings = {
 
   selection: {
     title: 'Selection',
+    heightOffset: 'Height offset (yards)',
+    heightStep: 'Step (yards)',
+    raiseAsset: 'Raise',
+    lowerAsset: 'Lower',
+    heightHint: 'Negative offsets sink assets below their base.',
     none: 'Nothing selected. Use Select and click a placed asset.',
     squareCollision: 'Square collision (follows rotation)',
     asset: 'Asset: {name}',
@@ -1456,6 +1543,10 @@ export const editorStrings = {
       'Select every placement of this asset on the map, so a move, delete or property change applies to all of them.',
     multiHint:
       'Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.',
+    setGround: 'Set to ground',
+    setGroundTitle:
+      'Seat the selected assets back on the terrain under them, removing any float or lift',
+    snapGround: 'Snap to ground when moving',
     rotation: 'Rotation',
     scale: 'Scale',
     collide: 'Blocks movement',
@@ -2028,6 +2119,8 @@ export const editorStrings = {
 
   weather: {
     title: 'Weather',
+    showSnowfall: 'Show snowfall',
+    snowfallHint: 'A Studio preview setting, remembered in this browser.',
     zoneTitle: 'Weather in this zone',
     zoneHint:
       "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
@@ -2131,6 +2224,9 @@ export const editorStrings = {
       smooth: 'Smooth bumps toward the local average height.',
       flatten:
         'Level the ground to the drag-start height, or smooth bumps (checkbox picks the mode).',
+      slope:
+        'Right-click to set the start height, then drag from another height to lay a smooth ramp.',
+      pond: 'Click to dig a local pond with its own water surface.',
       paint: 'Paint biome ground cover over the zone default.',
       water: "Set a declared lake's water level.",
       place: 'Place catalog or uploaded assets on the ground.',

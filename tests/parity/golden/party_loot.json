@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1014,
-      "state": "aa0096c8",
+      "state": "405d7c31",
       "events": "54c1ac8e",
       "rng": {
         "draws": 2,
@@ -255,7 +255,6 @@
           "healPower": 5,
           "hp": 100,
           "id": 1011,
-          "inCombat": true,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

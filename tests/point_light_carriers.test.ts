@@ -495,6 +495,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/haunt_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/highwatch_manor_lights.ts':
+    'the Highwatch manor hearth, lamps and ridge lantern, pushed into the props fireLights budget beside the campfires',
   'render/ignivar_fire_vfx.ts':
     'Ignivar flame light on the model bone inside the entity view, a view light marked on reconcile',
   'render/ignivar_model_vfx.ts':
@@ -543,6 +545,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'fall and impact lights handed to registerBudgetPointLight, born hidden, marked on the rank rebuild',
   'render/weapon_vfx.ts':
     'weapon-skin light: in the world a hidden view light marked on reconcile; in a preview canvas the only point lights of that scene, all driven live together',
+  'render/mirefen_tavern.ts':
+    'the Mirefen tavern hearth, wall fire, chandelier and lantern lights, pushed into the props fireLights by buildProps and mass hidden with them',
   'render/wyrmwatch_harbor_house.ts':
     'the Harbormaster House hearth and lantern lights, pushed into the props fireLights by buildProps and mass hidden with them',
   'render/yumi_maze.ts': 'maze brazier lights pushed through the fireLights adopter sink',

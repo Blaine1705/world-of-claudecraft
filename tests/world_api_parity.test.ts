@@ -75,6 +75,7 @@ import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
 import type { IWorldReliquary } from '../src/world_api/reliquary';
+import type { IWorldSeating } from '../src/world_api/seating';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
 import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
@@ -620,6 +621,10 @@ export const IWORLD_MEMBERS = [
   { name: 'worldPvpInfo', kind: 'data' },
   { name: 'setWorldPvpFlag', kind: 'method' },
   { name: 'hillInfo', kind: 'data' },
+  // The classic inn "Resting" state (IWorldProgressionXp): derived in both worlds.
+  { name: 'resting', kind: 'data' },
+  // IWorldSeating (seating.ts): sit on a piece of furniture by its seat id.
+  { name: 'sitOnSeat', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -970,6 +975,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
+    // Plus the release's faction currencies and treasure map reads (+2 data) and
+    // hoardBossCues (+1 method): 424/126/298.
     // Plus the Mirefen world-boss branch's lance_trial facet (lanceTrial,
     // lanceRestRemaining, lanceGuidance data; lanceBrace, lanceThrust, lanceRelease
     // methods): 430/129/301 on its own, 437/131/306 on the v0.45.0 integration
@@ -978,9 +985,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Buddy collection contributes six methods and no data members.
     // The Studio merge adds no member: 448/131/317. The dungeon objectives
     // tracker's dungeonRun adds one data member: 449/132/317.
-    expect(IWORLD_MEMBERS.length).toBe(449);
-    expect(DATA_MEMBERS.length).toBe(132);
-    expect(METHOD_MEMBERS.length).toBe(317);
+    // Plus the tavern's inn state (resting, data) and the seating facet's
+    // sitOnSeat (method) on feature/mirefen-tavern: 426/127/299 on its own,
+    // 451/133/318 merged into the v0.45.0 integration.
+    expect(IWORLD_MEMBERS.length).toBe(451);
+    expect(DATA_MEMBERS.length).toBe(133);
+    expect(METHOD_MEMBERS.length).toBe(318);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1328,6 +1338,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'respec',
       'respondToResurrection',
       'restedXp',
+      'resting',
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
@@ -1365,6 +1376,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setTownFocus',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sitOnSeat',
       'slotToolEffect',
       'socialBlocksPage',
       'socialFriendsPage',
@@ -1548,6 +1560,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryRecent',
       'renown',
       'restedXp',
+      'resting',
       'riftCollisionToken',
       'riftFloor',
       'socialInfo',
@@ -1851,6 +1864,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setTownFocus',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sitOnSeat',
       'slotToolEffect',
       'socialBlocksPage',
       'socialFriendsPage',
@@ -2170,6 +2184,7 @@ const FACET_PROGRESSION_XP = [
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
+  'resting',
   'playtimeSeconds',
   'craftSkills',
   'gatheringProficiency',
@@ -2614,6 +2629,9 @@ type _ExhaustWorldPvp = AssertNever<
   Exclude<keyof IWorldWorldPvp, (typeof FACET_WORLD_PVP)[number]>
 >;
 
+const FACET_SEATING = ['sitOnSeat'] as const satisfies readonly (keyof IWorldSeating)[];
+type _ExhaustSeating = AssertNever<Exclude<keyof IWorldSeating, (typeof FACET_SEATING)[number]>>;
+
 // The facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   entityRoster: FACET_ENTITY_ROSTER,
@@ -2654,6 +2672,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   lanceTrial: FACET_LANCE_TRIAL,
   transport: FACET_TRANSPORT,
   worldPvp: FACET_WORLD_PVP,
+  seating: FACET_SEATING,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
@@ -2672,7 +2691,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // 36 at the fourth release/v0.44.0 base merge: plus the release's transport.ts.
     // 37 with the Mirefen world-boss branch's lance_trial.ts.
     // Buddy collection contributes IWorldBuddies.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(38);
+    // 37 on feature/walkable-tavern-aaa: plus seating.ts (sit on furniture); 39 merged
+    // into the v0.45.0 integration (its 38 plus seating.ts).
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(39);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2754,9 +2775,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
     // The integration includes the five-dungeon rework, six buddy methods and
-    // the dungeon objectives tracker's dungeonRun (one data member).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(449);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(449);
+    // the dungeon objectives tracker's dungeonRun (one data member); the tavern
+    // adds resting (data) and sitOnSeat (the seating facet's method).
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(451);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(451);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

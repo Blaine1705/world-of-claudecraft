@@ -165,11 +165,16 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   (a tier already resident is attached at build, like any resident file); pinned
   by the creator cases of `tests/preview_armor_detail.test.ts`. A TOUCH stage
   (`CharacterPreviewOptions.touchStage`, the launcher on the phone interface)
-  opens the creator on the head and shoulders (`preview_framing.ts`
-  `touchShouldersPose`), never eases to a category's close-up, and takes
-  pinch, two-finger slide, one-finger turn and tilt, and a double tap to reset:
-  the pure camera is `preview_touch_core.ts`, the finger tracking
-  `preview_touch_input.ts` (`tests/preview_touch_core.test.ts`).
+  opens every stage on the head and shoulders, the creator and the character
+  select's pick alike (`preview_framing.ts` `touchShouldersPose`), never eases
+  to a category's close-up, and takes pinch, two-finger slide, one-finger turn
+  and tilt, and a double tap to reset: the pure camera is `preview_touch_core.ts`,
+  the finger tracking `preview_touch_input.ts` (`tests/preview_touch_core.test.ts`).
+  Beside a drawn creator body it offers a one-time gesture hint
+  (`setTouchHint`, structural like the loading layer; `touchHintOffered`), which
+  the first moving step or double tap retires (`touchStepMoves`); the DOM and the
+  stored flag are `src/ui/preview_touch_hint.ts`, and the launcher narrows it to
+  the creator panels (`tests/preview_loading_touch_stage.test.ts`).
 - Portraits: `portrait.ts` (offscreen-WebGL headshot factory, caches data
   URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`) +
   `portrait_prewarm_core.ts` (the async capture's step order) +

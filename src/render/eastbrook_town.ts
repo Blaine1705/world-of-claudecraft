@@ -3,6 +3,11 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../sim/building_layout';
 import { BUILTIN_WORLD, getActiveWorldContent } from '../sim/data';
 import { EASTBROOK_LAYOUT, localToWorld, wallSegmentMirrored } from '../sim/eastbrook_layout';
+import {
+  forEachSegmentFootprintSample,
+  pitchedSegmentPlacement,
+  type SegmentPoint,
+} from '../sim/pitched_segment';
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
@@ -41,6 +46,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import {
   buildRealmBuilderMonumentBody,
@@ -107,6 +113,9 @@ const ASSET_INSTANCE_COUNTS = (() => {
 const loadedSources = new Map<string, THREE.Group>();
 const preparedTemplates = new Map<string, TownAssetTemplate>();
 const sourceLoadTasks = new Map<string, Promise<void>>();
+/** The indoor camera's rooms of the live view's walk-in buildings (dropped when the next
+ *  view builds). */
+const cameraInteriors = createPlacedTownInteriors();
 /** The FILE each resident source was read from. A placed building's URL names
  *  the model; the file follows the profile's texture tier (same geometry, see
  *  placed_texture_tier_core.ts), so everything else here stays keyed on the
@@ -883,68 +892,6 @@ function placementMatrix(
   );
 }
 
-type SegmentPoint = Readonly<{ x: number; z: number }>;
-
-interface PitchedSegmentPlacement {
-  centerX: number;
-  centerY: number;
-  centerZ: number;
-  rotation: number;
-  pitch: number;
-  spatialLength: number;
-  terrainOffset: number;
-}
-
-function forEachSegmentFootprintSample(
-  start: SegmentPoint,
-  end: SegmentPoint,
-  width: number,
-  visit: (x: number, z: number, progress: number) => void,
-): void {
-  const dx = end.x - start.x;
-  const dz = end.z - start.z;
-  const length = Math.hypot(dx, dz);
-  const alongSteps = Math.max(1, Math.ceil(length / BUILDING_TERRAIN_SAMPLE_STEP));
-  const acrossSteps = Math.max(1, Math.ceil(width / BUILDING_TERRAIN_SAMPLE_STEP));
-  const normalX = length > 1e-8 ? -dz / length : 0;
-  const normalZ = length > 1e-8 ? dx / length : 1;
-  for (let along = 0; along <= alongSteps; along++) {
-    const progress = along / alongSteps;
-    const centerX = start.x + dx * progress;
-    const centerZ = start.z + dz * progress;
-    for (let across = 0; across <= acrossSteps; across++) {
-      const lateral = -width / 2 + (width * across) / acrossSteps;
-      visit(centerX + normalX * lateral, centerZ + normalZ * lateral, progress);
-    }
-  }
-}
-
-function pitchedSegmentPlacement(
-  start: SegmentPoint,
-  end: SegmentPoint,
-  width: number,
-  groundAt: GroundAt,
-): PitchedSegmentPlacement {
-  const startY = groundAt(start.x, start.z);
-  const endY = groundAt(end.x, end.z);
-  const horizontalLength = Math.hypot(end.x - start.x, end.z - start.z);
-  const deltaY = endY - startY;
-  let minimumResidual = 0;
-  forEachSegmentFootprintSample(start, end, width, (x, z, progress) => {
-    const pitchedBottomY = startY + deltaY * progress;
-    minimumResidual = Math.min(minimumResidual, groundAt(x, z) - pitchedBottomY);
-  });
-  return {
-    centerX: (start.x + end.x) / 2,
-    centerY: (startY + endY) / 2 + minimumResidual,
-    centerZ: (start.z + end.z) / 2,
-    rotation: Math.atan2(-(end.z - start.z), end.x - start.x),
-    pitch: Math.atan2(deltaY, horizontalLength),
-    spatialLength: Math.hypot(horizontalLength, deltaY),
-    terrainOffset: minimumResidual,
-  };
-}
-
 function reflectedGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
   const geometry = source.clone().applyMatrix4(new THREE.Matrix4().makeScale(-1, 1, 1));
   const index = geometry.getIndex();
@@ -1008,7 +955,15 @@ function buildMicroBatches(
   // in the town is selected by the civic emissive mask, so it now selects
   // nothing at all (see the note on the civic flag in addPlacedCivicEmissiveGeometry).
 
-  for (const bench of EASTBROOK_LAYOUT.civic.benches) {
+  // A document that owns the square's dressing as placements
+  // (promotedScenery.authoredTownDressing) draws the benches, stalls and yard
+  // fences itself, so these three loops stand down together.
+  const dressingPromoted = activeWorldPromoted('authoredTownDressing');
+  const benches = dressingPromoted ? [] : EASTBROOK_LAYOUT.civic.benches;
+  const stalls = dressingPromoted ? [] : EASTBROOK_LAYOUT.market.stalls;
+  const fences = dressingPromoted ? [] : EASTBROOK_LAYOUT.fences;
+
+  for (const bench of benches) {
     const template = templates.get(bench.assetId);
     if (!template) throw new Error(`Eastbrook town template is missing: ${bench.assetId}`);
     const horizontalScale = Math.min(bench.width / template.size.x, bench.depth / template.size.z);
@@ -1027,7 +982,7 @@ function buildMicroBatches(
     );
   }
 
-  for (const stall of EASTBROOK_LAYOUT.market.stalls) {
+  for (const stall of stalls) {
     const template = templates.get(stall.assetId);
     if (!template) throw new Error(`Eastbrook town template is missing: ${stall.assetId}`);
     add(
@@ -1045,7 +1000,7 @@ function buildMicroBatches(
     );
   }
 
-  for (const fence of EASTBROOK_LAYOUT.fences) {
+  for (const fence of fences) {
     const template = templates.get(fence.assetId);
     if (!template) throw new Error(`Eastbrook town template is missing: ${fence.assetId}`);
     const placement = pitchedSegmentPlacement(fence.start, fence.end, fence.width, groundAt);
@@ -1214,6 +1169,8 @@ function buildFromTemplates(
     textureUuid: null,
     materialBindings: 0,
   };
+  // the previous view's rooms go with it: a world without the town keeps no air
+  cameraInteriors.clear();
   if (!builtInWorld) {
     group.userData.drawStats = eastbrookTownDrawStats(group);
     return {
@@ -1239,6 +1196,8 @@ function buildFromTemplates(
       // (eastbrook_placed_building.ts). A reveal root and a roof-hide target
       // like every other building, so the two lists stay index-aligned.
       const placed = buildEastbrookPlacedBuilding(building, kitTemplate.raw, groundAt);
+      // a walk-in one keeps the indoor camera to its rooms (placed_town_interiors.ts)
+      cameraInteriors.add(building, groundAt);
       group.add(placed.group);
       roofHideTargets.push({
         group: placed.group,
@@ -1253,6 +1212,7 @@ function buildFromTemplates(
         sine: Math.sin(building.rotation),
         topY: placed.topY,
         cullRadius: placed.cullRadius,
+        walkIn: building.walkIn,
       });
       buildingGroups.push(placed.group);
       continue;
@@ -1645,6 +1605,39 @@ export function eastbrookTownTriangleBudget(
     meetsTarget: maximumRuntimeTriangles <= target,
     assets,
   };
+}
+
+/**
+ * One town model as a standalone object drawn exactly as the town draws it:
+ * the same extracted, semantic-recoloured geometry (base centred, bottom at
+ * y = 0) under the town's atlas materials. Placed assets
+ * (render/town_styled_placed_assets.ts) use it for the Eastbrook-only models a
+ * Studio document promotes, so a moved market stall keeps its painted look.
+ *
+ * Both materials are hook-preserving CLONES (the same program key as the
+ * town's shared entries until a placed-asset patch lands): placed batching
+ * installs its fade on whatever material it is handed, and that must never be
+ * the shared entry the town's own batches still draw with. Null until the
+ * town's atlas has loaded, so a template never caches an atlas-less look.
+ */
+export function eastbrookStyledPlacedObject(
+  source: THREE.Object3D,
+  url: string,
+): THREE.Object3D | null {
+  const atlas = eastbrookSurfaceAtlasTexture();
+  if (!atlas) return null;
+  const template = extractTemplate(source, url);
+  const group = new THREE.Group();
+  if (template.opaque) {
+    const mesh = new THREE.Mesh(template.opaque, townMaterial(false, atlas, true));
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+  if (template.emissive) {
+    group.add(new THREE.Mesh(template.emissive, townMaterial(true, atlas, true)));
+  }
+  return group;
 }
 
 /** Test-only access to the tier-independent preload and deterministic build contract. */

@@ -861,7 +861,10 @@ describe('resolveWorldDirectPick', () => {
     expect(main.split('renderer.picking.pick(x, y, true)').length).toBe(2);
     // The click, the hover cursor and the gather tooltip's entity probe ask without it.
     expect(main).toContain('let id = renderer.picking.pickDirect(x, y);');
-    expect(main).toContain('hoverPickedId = renderer.picking.pick(input.hoverX, input.hoverY);');
+    // The hover cursor lives in src/game/hover_cursor.ts, handed renderer.picking.
+    const hover = readFileSync(new URL('../src/game/hover_cursor.ts', import.meta.url), 'utf8');
+    expect(hover).toContain('hoverPickedId = picking.pick(input.hoverX, input.hoverY);');
+    expect(main).toContain('picking: renderer.picking,');
     expect(main).toContain('(x, y) => renderer.picking.pick(x, y),');
   });
 

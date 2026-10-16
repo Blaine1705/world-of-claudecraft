@@ -1431,7 +1431,8 @@ export const zh_CN: EnTranslations = {
       "drowning": "溺水！"
     },
     "rest": {
-      "resting": "休息中"
+      "resting": "休息中",
+      "restArea": "休息中：你正处于休息区，会在这里获得休息经验。"
     },
     "paladin": {
       "devotion": "虔诚",
@@ -4552,7 +4553,8 @@ export const zh_CN: EnTranslations = {
         "foodVendor": "食物和饮料商人",
         "potionVendor": "药水商人",
         "stableMaster": "马厩管理员",
-        "generalGoods": "杂货商人"
+        "generalGoods": "杂货商人",
+        "innkeeper": "旅店老板"
       }
     },
     "mobTooltip": {
@@ -10025,6 +10027,33 @@ export const zh_CN: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "目标：{name}",
+      "choose": "选择重叠资源（{count}）",
+      "chooser": "选择指针下的资源",
+      "front": "最前方",
+      "behind": "位于其他资源后方",
+      "close": "关闭",
+      "keyboard": "使用上一个/下一个或方向键比较。按 Enter 选择，按 Escape 关闭。",
+      "hint": "再次点击可切换重叠物件，也可从此列表中选择。",
+      "asset": "资源 {number}",
+      "overlapAt": "{name} 处的重叠资源",
+      "previous": "上一个",
+      "next": "下一个",
+      "position": "第 {current} 个，共 {count} 个",
+      "details": "物件 {number} · 第 {level} 层 · 高度 {height}",
+      "ungroupedDetails": "物件 {number} · 高度 {height}",
+      "hideAbove": "隐藏所选楼层以上的楼层",
+      "allFloors": "所有楼层均可见",
+      "filteredFloors": "第 {level} 层以上的楼层已隐藏"
+    },
+    "quickActions": {
+      "title": "已选资产",
+      "move": "移动",
+      "frame": "居中查看",
+      "remove": "移除",
+      "count": "已选 {count} 个"
+    },
     "buildMode": {
       "materialNames": {
         "WardenStone": "光滑石材",
@@ -10562,6 +10591,8 @@ export const zh_CN: EnTranslations = {
       "lower": "下压",
       "smooth": "平滑",
       "flatten": "压平",
+      "slope": "斜坡",
+      "pond": "池塘",
       "tunnel": "Caves",
       "rock": "Rock Gen",
       "build": "Build Model",
@@ -10751,6 +10782,9 @@ export const zh_CN: EnTranslations = {
     },
     "brush": {
       "title": "笔刷",
+      "shape": "笔刷形状",
+      "circle": "圆形",
+      "square": "正方形",
       "size": "笔刷大小",
       "strength": "强度",
       "sizeHint": "快捷键：[ 和 ] 调整笔刷大小；Shift+[ 和 Shift+] 调整强度。",
@@ -10848,6 +10882,18 @@ export const zh_CN: EnTranslations = {
       "none": "No named locations yet.",
       "deleteTitle": "Remove this location",
       "hideBoxes": "Hide area boxes"
+    },
+    "objectMove": {
+      "title": "游戏物件",
+      "kindFarmBed": "农田苗床",
+      "kindPracticeDummy": "训练假人",
+      "kindGatherNode": "采集点",
+      "kindDungeonDoor": "地下城入口",
+      "position": "位置：{x}, {z}",
+      "moved": "已在此地图中移动。",
+      "original": "位于原始位置。",
+      "hint": "拖动它，或用方向键微调。移动只作用于此地图，物件保持原有身份，因此已保存的进度仍能找到它。",
+      "reset": "重置到原始位置"
     },
     "lightTool": {
       "title": "Point Lights",
@@ -11001,6 +11047,16 @@ export const zh_CN: EnTranslations = {
       "autoTexSteep": "Steep ground texture",
       "autoTexNone": "Leave as is"
     },
+    "materials": {
+      "title": "材质",
+      "hint": "为此模型的每个部分选择纹理。纹理按世界空间平铺，不使用模型UV，并随地图保存。",
+      "loading": "模型仍在加载。稍后再次选中它即可编辑材质。",
+      "original": "原始",
+      "texture": "纹理",
+      "tile": "纹理比例（每块码数）",
+      "color": "Tint",
+      "reset": "恢复原始"
+    },
     "flatten": {
       "style": {
         "smooth": "Smooth",
@@ -11020,7 +11076,29 @@ export const zh_CN: EnTranslations = {
       "hint": "压平会将地面拉平到拖动开始时光标下的高度。",
       "hardEdge": "硬边缘",
       "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke."
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "目标高度（码）",
+      "levelPlaceholder": "拖动起点",
+      "levelClear": "清除",
+      "levelHint": "每次拖动都会把地面压平到这个高度。右键点击地面可选取其他高度。",
+      "levelHintNone": "右键点击地面锁定该处高度，然后在任意位置拖动即可压平到该高度。留空时，每次拖动压平到起点的高度。",
+      "levelPicked": "已锁定高度：{height} 码。"
+    },
+    "slope": {
+      "hint": "右键点击斜坡起点处的地面。然后在终点处按下并沿路径拖动：地面会在两个高度之间平滑过渡成坡道。",
+      "start": "起点高度：{height} 码",
+      "noStart": "尚未设置起点。右键点击地面即可设置。",
+      "clearStart": "清除起点",
+      "needStart": "请先右键点击地面，设置斜坡的起点。",
+      "startPicked": "斜坡起点已设为 {height} 码。"
+    },
+    "pond": {
+      "title": "创建池塘",
+      "add": "添加池塘",
+      "radius": "池塘半径",
+      "depth": "池塘深度",
+      "hint": "点击地面即可挖出圆形池塘并注水。圆圈包含缓坡岸边。撤销会同时移除水面和凹地。",
+      "invalid": "无法在此处挖池塘。请选择其他位置。"
     },
     "water": {
       "title": "水面高度",
@@ -11317,6 +11395,11 @@ export const zh_CN: EnTranslations = {
     },
     "selection": {
       "title": "选中项",
+      "heightOffset": "高度偏移（码）",
+      "heightStep": "步长（码）",
+      "raiseAsset": "升高",
+      "lowerAsset": "降低",
+      "heightHint": "使用负偏移量可将资产沉入基准位置下方。",
       "none": "未选中任何内容。使用“选择”工具点击已放置的资源。",
       "squareCollision": "Square collision (follows rotation)",
       "asset": "资源：{name}",
@@ -11327,6 +11410,9 @@ export const zh_CN: EnTranslations = {
       "selectAllOfAsset": "Select all of this asset ({count})",
       "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
       "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "贴合地面",
+      "setGroundTitle": "让所选资源重新落在其下方的地形上，取消悬浮或抬高",
+      "snapGround": "移动时贴合地面",
       "rotation": "旋转",
       "scale": "缩放",
       "collide": "阻挡移动",
@@ -11826,6 +11912,8 @@ export const zh_CN: EnTranslations = {
     },
     "weather": {
       "title": "Weather",
+      "showSnowfall": "显示降雪",
+      "snowfallHint": "此设置仅用于工作室预览，并保存在此浏览器中。",
       "zoneTitle": "Weather in this zone",
       "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
       "auto": "Auto",
@@ -11916,6 +12004,8 @@ export const zh_CN: EnTranslations = {
         "lower": "降低笔刷下方的地形。",
         "smooth": "将起伏平滑到局部平均高度。",
         "flatten": "将地面推平到拖动起点的高度。",
+        "slope": "右键点击设置起点高度，然后从另一个高度拖动，铺出平滑的斜坡。",
+        "pond": "点击即可挖出拥有独立水面的池塘。",
         "paint": "在区域默认地表上涂刷生态群系。",
         "water": "设置全图水面高度。",
         "place": "将目录资产或上传的资产放置到地面上。",
@@ -12187,6 +12277,7 @@ export const zh_CN: EnTranslations = {
     "newCharacter": "新建角色",
     "appearance": "外观",
     "modelLoading": "正在加载角色...",
+    "previewPinchHint": "双指缩放",
     "customize": "自定义",
     "body": "体型",
     "genderMale": "男性",
@@ -25413,6 +25504,31 @@ export const zh_CN: EnTranslations = {
         "title": "望龙哨码头看守",
         "greeting": "从码头进来暖暖手吧。停在我们码头的船沿着漫长的东岸北上驶往烛港，再原路返回。在遥远的西边，另一艘渡船往返于东溪与夜绽花野之间。墙上的地图画着这两条航线。攀登望龙哨之前，先在火边歇一歇吧。"
       },
+      "innkeeper_maudie": {
+        "name": "莫迪·塔普赖特",
+        "title": "旅店老板",
+        "greeting": "快从湿气里进来吧，朋友，下到火边时当心台阶。水壶正烧着，长凳是暖的，楼上的房间也干爽。从芬桥来的旅人都发誓说沼泽路白天很太平，可天黑以后没人敢走。坐一会儿，歇歇脚吧。"
+      },
+      "patron_amos_eelby": {
+        "name": "埃莫斯·伊尔比",
+        "title": "捕鳗人",
+        "greeting": "拉条长凳坐下吧，{className}。格丽塞尔这人硬说芬桥底下的大鳗鱼是瞎编的。我可亲手摸到过它两回。两回！滑得跟收税官似的，差不多有这条长凳那么长。"
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "格丽塞尔·塞奇沃斯",
+        "title": "泥炭工",
+        "greeting": "别理埃莫斯。我挖了四十年泥炭，从这片沼泽里挖出来的怪东西比他钓的鳗鱼还多：靴子、骨头，还有一顶头盔，里头那颗脑袋到现在还一脸发愁。烤烤火吧，火不要钱。"
+      },
+      "patron_ned_oxley": {
+        "name": "内德·奥克斯利",
+        "title": "赶牲人",
+        "greeting": "我沿着堤道赶了四十头牛，还没到芬桥就有两头陷进了泥沼。这条路上从不让人失望的，只有莫迪的麦酒。你的酒自己付钱。"
+      },
+      "patron_hester_quillby": {
+        "name": "赫丝特·奎尔比",
+        "title": "制图师",
+        "greeting": "我买过的每一张这片沼泽的地图，不出一季就不准了。水会挪动小路，小路又会挪动水。所以我自己画，趁墨迹未干，就坐在这儿干爽的地方。"
+      },
       "reeve_ottoline": {
         "name": "镇务官奥托琳",
         "title": "灯湖镇镇务官",
@@ -25637,6 +25753,11 @@ export const zh_CN: EnTranslations = {
         "name": "韦兰炼金术士",
         "title": "药坊大师",
         "greeting": "量两次，倒一次，{className}。药坊里容不得洒掉的药剂。"
+      },
+      "steward_ansel_hale": {
+        "name": "安塞尔·黑尔",
+        "title": "庄园管家",
+        "greeting": "欢迎来到庄园，{className}。到炉火边暖暖身子吧，留心脚下的地毯，别碰主桌。灯楼彻夜长明，好让广场上的人找得到回家的路。"
       },
       "farmer_jessica": {
         "name": "农妇杰西卡",

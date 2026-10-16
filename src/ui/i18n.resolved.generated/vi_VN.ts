@@ -1431,7 +1431,8 @@ export const vi_VN: EnTranslations = {
       "drowning": "Đang chết đuối!"
     },
     "rest": {
-      "resting": "Đang Nghỉ Ngơi"
+      "resting": "Đang Nghỉ Ngơi",
+      "restArea": "Resting: you are in a rest area and gain rested experience here."
     },
     "paladin": {
       "devotion": "Sùng Tín",
@@ -4552,7 +4553,8 @@ export const vi_VN: EnTranslations = {
         "foodVendor": "Nhà cung cấp Thực phẩm & Đồ uống",
         "potionVendor": "Nhà cung cấp thuốc",
         "stableMaster": "Bậc thầy ổn định",
-        "generalGoods": "Hàng Tổng Hợp"
+        "generalGoods": "Hàng Tổng Hợp",
+        "innkeeper": "Innkeeper"
       }
     },
     "mobTooltip": {
@@ -10025,6 +10027,33 @@ export const vi_VN: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "Target: {name}",
+      "choose": "Choose overlapping asset ({count})",
+      "chooser": "Choose an asset under the pointer",
+      "front": "Frontmost",
+      "behind": "Behind another asset",
+      "close": "Close",
+      "keyboard": "Use Previous/Next or arrow keys to compare. Enter selects; Escape closes.",
+      "hint": "Click again to cycle overlapping items, or choose from this list.",
+      "asset": "Asset {number}",
+      "overlapAt": "Overlaps at {name}",
+      "previous": "Previous",
+      "next": "Next",
+      "position": "{current} of {count}",
+      "details": "Item {number} · Floor {level} · Height {height}",
+      "ungroupedDetails": "Item {number} · Height {height}",
+      "hideAbove": "Hide floors above selected level",
+      "allFloors": "All floors visible",
+      "filteredFloors": "Floors above level {level} are hidden"
+    },
+    "quickActions": {
+      "title": "Selected asset",
+      "move": "Move",
+      "frame": "Frame",
+      "remove": "Remove",
+      "count": "{count} selected"
+    },
     "buildMode": {
       "materialNames": {
         "WardenStone": "Smooth Stone",
@@ -10562,6 +10591,8 @@ export const vi_VN: EnTranslations = {
       "lower": "Hạ Thấp",
       "smooth": "Làm Mịn",
       "flatten": "San Phẳng",
+      "slope": "Slope",
+      "pond": "Pond",
       "tunnel": "Caves",
       "rock": "Rock Gen",
       "build": "Build Model",
@@ -10751,6 +10782,9 @@ export const vi_VN: EnTranslations = {
     },
     "brush": {
       "title": "Cọ",
+      "shape": "Brush shape",
+      "circle": "Circle",
+      "square": "Square",
       "size": "Cỡ cọ",
       "strength": "Cường độ",
       "sizeHint": "Phím: [ và ] đổi cỡ cọ; Shift+[ và Shift+] đổi cường độ.",
@@ -10848,6 +10882,18 @@ export const vi_VN: EnTranslations = {
       "none": "No named locations yet.",
       "deleteTitle": "Remove this location",
       "hideBoxes": "Hide area boxes"
+    },
+    "objectMove": {
+      "title": "Gameplay Object",
+      "kindFarmBed": "Farm bed",
+      "kindPracticeDummy": "Practice dummy",
+      "kindGatherNode": "Gather node",
+      "kindDungeonDoor": "Dungeon door",
+      "position": "Position: {x}, {z}",
+      "moved": "Moved on this map.",
+      "original": "At its original spot.",
+      "hint": "Drag it, or nudge it with the arrow keys. The move applies to this map only and the object keeps its identity, so saved progress still finds it.",
+      "reset": "Reset to original spot"
     },
     "lightTool": {
       "title": "Point Lights",
@@ -11001,6 +11047,16 @@ export const vi_VN: EnTranslations = {
       "autoTexSteep": "Steep ground texture",
       "autoTexNone": "Leave as is"
     },
+    "materials": {
+      "title": "Materials",
+      "hint": "Pick a texture for each part of this model. Textures tile in world space, ignore the model UVs, and save with the map.",
+      "loading": "The model is still loading. Select it again in a moment to edit its materials.",
+      "original": "Original",
+      "texture": "Texture",
+      "tile": "Texture scale (yards per tile)",
+      "color": "Tint",
+      "reset": "Restore original"
+    },
     "flatten": {
       "style": {
         "smooth": "Smooth",
@@ -11020,7 +11076,29 @@ export const vi_VN: EnTranslations = {
       "hint": "San Phẳng đưa mặt đất về độ cao dưới con trỏ tại thời điểm bắt đầu kéo.",
       "hardEdge": "Cạnh cứng",
       "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke."
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "Level height (yards)",
+      "levelPlaceholder": "Drag start",
+      "levelClear": "Clear",
+      "levelHint": "Every drag levels the ground to this height. Right-click the ground to pick another.",
+      "levelHintNone": "Right-click the ground to lock its height, then drag anywhere to level to it. Empty: each drag levels to where it starts.",
+      "levelPicked": "Level locked at {height} yards."
+    },
+    "slope": {
+      "hint": "Right-click the ground where the slope should start. Then press where it should end and drag along the path: the ground eases into a smooth ramp between the two heights.",
+      "start": "Start height: {height} yards",
+      "noStart": "No start set yet. Right-click the ground to set one.",
+      "clearStart": "Clear start",
+      "needStart": "Right-click the ground first to set where the slope starts.",
+      "startPicked": "Slope start set at {height} yards."
+    },
+    "pond": {
+      "title": "Create a pond",
+      "add": "Add pond",
+      "radius": "Pond radius",
+      "depth": "Pond depth",
+      "hint": "Click the ground to dig a round pond and fill it with water. The circle includes the softly sloping bank. Undo removes the water and basin together.",
+      "invalid": "Cannot dig a pond on this ground. Choose another spot."
     },
     "water": {
       "title": "Mực Nước",
@@ -11317,6 +11395,11 @@ export const vi_VN: EnTranslations = {
     },
     "selection": {
       "title": "Lựa Chọn",
+      "heightOffset": "Height offset (yards)",
+      "heightStep": "Step (yards)",
+      "raiseAsset": "Raise",
+      "lowerAsset": "Lower",
+      "heightHint": "Negative offsets sink assets below their base.",
       "none": "Chưa chọn gì. Hãy dùng công cụ Chọn và nhấp vào một vật thể đã đặt.",
       "squareCollision": "Square collision (follows rotation)",
       "asset": "Vật thể: {name}",
@@ -11327,6 +11410,9 @@ export const vi_VN: EnTranslations = {
       "selectAllOfAsset": "Select all of this asset ({count})",
       "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
       "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "Set to ground",
+      "setGroundTitle": "Seat the selected assets back on the terrain under them, removing any float or lift",
+      "snapGround": "Snap to ground when moving",
       "rotation": "Góc xoay",
       "scale": "Tỷ lệ",
       "collide": "Chặn di chuyển",
@@ -11826,6 +11912,8 @@ export const vi_VN: EnTranslations = {
     },
     "weather": {
       "title": "Weather",
+      "showSnowfall": "Show snowfall",
+      "snowfallHint": "A Studio preview setting, remembered in this browser.",
       "zoneTitle": "Weather in this zone",
       "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
       "auto": "Auto",
@@ -11916,6 +12004,8 @@ export const vi_VN: EnTranslations = {
         "lower": "Hạ thấp địa hình dưới cọ.",
         "smooth": "Làm mịn các gồ ghề về độ cao trung bình quanh đó.",
         "flatten": "San mặt đất về độ cao tại điểm bắt đầu kéo.",
+        "slope": "Right-click to set the start height, then drag from another height to lay a smooth ramp.",
+        "pond": "Click to dig a local pond with its own water surface.",
         "paint": "Tô lớp phủ quần xã đè lên mặc định của vùng.",
         "water": "Đặt mực nước cho toàn bản đồ.",
         "place": "Đặt vật thể từ danh mục hoặc đã tải lên xuống mặt đất.",
@@ -12187,6 +12277,7 @@ export const vi_VN: EnTranslations = {
     "newCharacter": "Nhân Vật Mới",
     "appearance": "Ngoại hình",
     "modelLoading": "Loading character...",
+    "previewPinchHint": "Pinch to zoom",
     "customize": "Tùy chỉnh",
     "body": "Cơ thể",
     "genderMale": "Nam",
@@ -25413,6 +25504,31 @@ export const vi_VN: EnTranslations = {
         "title": "Người Giữ Bến Tàu Wyrmwatch",
         "greeting": "Hãy bước vào từ bến tàu và sưởi ấm tay bạn. Chiếc tàu tại bến của chúng tôi đi lên bờ biển phía đông dài và quay trở lại. Phía tây xa, chiếc phà khác chạy giữa Eastbrook và Nightbloom. Bản đồ trên tường chỉ cả hai lộ trình. Hãy nghỉ ngơi bên lửa trước khi leo lên Wyrmwatch."
       },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
+      "patron_amos_eelby": {
+        "name": "Amos Eelby",
+        "title": "Eel Fisher",
+        "greeting": "Pull up a bench, {className}. Grissel here swears the big eel under Fenbridge is a myth. I've had my hand on him twice. Twice! Slippery as a tax collector, and near as long as this bench."
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "Grissel Sedgeworth",
+        "title": "Peat Cutter",
+        "greeting": "Don't mind Amos. Forty years cutting peat and I've pulled more strange things out of this bog than he's pulled eels: boots, bones, a helmet with the head still worried about it. Warm yourself, the fire's free."
+      },
+      "patron_ned_oxley": {
+        "name": "Ned Oxley",
+        "title": "Drover",
+        "greeting": "Drove forty head down the causeway and lost two to the mire before Fenbridge. Maudie's ale is the only thing on this road that never lets a man down. Buy your own, mind."
+      },
+      "patron_hester_quillby": {
+        "name": "Hester Quillby",
+        "title": "Mapmaker",
+        "greeting": "Every map of this marsh I've ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it's dry while the ink sets."
+      },
       "reeve_ottoline": {
         "name": "Xã Trưởng Ottoline",
         "title": "Xã Trưởng Của Lanternmere",
@@ -25637,6 +25753,11 @@ export const vi_VN: EnTranslations = {
         "name": "Nhà giả kim Verane",
         "title": "Bậc thầy của nhà bào chế thuốc",
         "greeting": "Đo hai lần và đổ một lần, {className}. Người bào chế thuốc không có kiên nhẫn với thuốc thử bị đổ."
+      },
+      "steward_ansel_hale": {
+        "name": "Ansel Hale",
+        "title": "Steward of the Manor",
+        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
       },
       "farmer_jessica": {
         "name": "Nông Dân Jessica",

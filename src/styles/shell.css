@@ -10576,3 +10576,227 @@
     fill: color-mix(in srgb, var(--color-gold-300) 18%, transparent);
   }
 }
+
+/* ---------- character preview touch hint ---------- */
+/* The phone creator's one-time gesture hint (src/ui/preview_touch_hint.ts): a slim tab
+   docked to the 3D stage's left edge, beside the model and never over it, where two
+   fingertips spread apart along a diagonal (a pinch) over the words "Pinch to zoom". It
+   slides out of the stage's edge a beat after the model draws, and back into it the moment
+   the player first moves the model; after that it never shows on the device again. Only a
+   touch stage offers it (CharacterPreview, preview_touch_core.ts touchHintOffered). It
+   takes no touches, so a pinch that starts on it reaches the canvas, and it sits over the
+   canvas and the loading silhouette (z-index 1) but under the stage's name plate
+   (z-index 3). No glass (backdrop-filter): the phone interface drops it as a compositor cost
+   against the live canvas, so the tab's own fill carries the contrast. The glyph's resting
+   pose is the SPREAD one (fingertips apart, chevrons lit), so wherever its loop does not
+   run (reduced motion) or is paused (the ambient-animation knob, --fx-ambient-anim) it still
+   reads as a pinch; the loop rides --motion-scale like the HUD's. Tokens only. */
+@layer shell {
+  .preview-touch-hint {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    box-sizing: border-box;
+    width: 70px;
+    padding: 9px 6px 10px 4px;
+    border: 1px solid color-mix(in srgb, var(--gold) 42%, transparent);
+    border-left: 0;
+    border-radius: 0 16px 16px 0;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-bg-dark) 92%, transparent),
+      color-mix(in srgb, var(--color-bg-dark) 70%, transparent)
+    );
+    box-shadow:
+      0 0 16px color-mix(in srgb, var(--gold) 18%, transparent),
+      inset -1px 0 0 color-mix(in srgb, var(--color-gold-300) 22%, transparent);
+    color: var(--color-gold-300);
+    pointer-events: none;
+    transform: translate(0, -50%);
+    animation: pth-dock-in 520ms cubic-bezier(0.2, 0.9, 0.3, 1.12) 450ms both;
+  }
+  /* The exit: back into the stage's edge (the container clips it), then the node goes
+     (PREVIEW_TOUCH_HINT_LEAVE_MS covers this run). */
+  .preview-touch-hint[data-state="leaving"] {
+    animation: pth-dock-out 300ms ease-in both;
+  }
+  .preview-touch-hint .pth-glyph {
+    display: block;
+    width: 32px;
+    height: 32px;
+    overflow: visible;
+  }
+  .preview-touch-hint .pth-ring {
+    fill: color-mix(in srgb, var(--gold) 6%, transparent);
+    stroke: color-mix(in srgb, var(--gold) 38%, transparent);
+    stroke-width: 1.2px;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: pth-ring 2.4s ease-in-out infinite;
+  }
+  .preview-touch-hint .pth-trail {
+    fill: none;
+    stroke: color-mix(in srgb, var(--color-gold-300) 40%, transparent);
+    stroke-width: 1px;
+    stroke-linecap: round;
+    stroke-dasharray: 1.5 2.5;
+  }
+  .preview-touch-hint .pth-arrow {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 1.8px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: pth-arrow 2.4s ease-in-out infinite;
+  }
+  .preview-touch-hint .pth-tip {
+    fill: var(--color-gold-300);
+    stroke: var(--gold);
+    stroke-width: 1.2px;
+  }
+  .preview-touch-hint .pth-tip-a {
+    transform: translate(-6px, -6px);
+    animation: pth-tip-a 2.4s ease-in-out infinite;
+  }
+  .preview-touch-hint .pth-tip-b {
+    transform: translate(6px, 6px);
+    animation: pth-tip-b 2.4s ease-in-out infinite;
+  }
+  /* The loop's pace and the ambient-animation knob, on every looping part. */
+  .preview-touch-hint .pth-ring,
+  .preview-touch-hint .pth-arrow,
+  .preview-touch-hint .pth-tip-a,
+  .preview-touch-hint .pth-tip-b {
+    animation-duration: calc(2.4s * var(--motion-scale, 1));
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  .preview-touch-hint .pth-label {
+    font-family: var(--title-font);
+    font-size: 9.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-transform: uppercase;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    color: var(--color-gold-300);
+    text-shadow: 0 1px 3px var(--color-bg-dark);
+  }
+  /* Korean breaks between syllables by default; keep its words whole (each one fits). The
+     page's lang follows the chosen language (main.ts translatePage). */
+  .preview-touch-hint .pth-label:lang(ko) {
+    word-break: keep-all;
+  }
+  @keyframes pth-dock-in {
+    from {
+      opacity: 0;
+      transform: translate(-105%, -50%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(0, -50%);
+    }
+  }
+  @keyframes pth-dock-out {
+    from {
+      opacity: 1;
+      transform: translate(0, -50%);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-105%, -50%);
+    }
+  }
+  /* One pinch every 2.4 s, starting from the spread pose: hold it, draw the fingertips in
+     along the diagonal while the ring closes and the chevrons fade, hold, then spread them
+     out again as the chevrons light. */
+  @keyframes pth-tip-a {
+    0%,
+    22% {
+      transform: translate(-6px, -6px);
+    }
+    50%,
+    64% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(-6px, -6px);
+    }
+  }
+  @keyframes pth-tip-b {
+    0%,
+    22% {
+      transform: translate(6px, 6px);
+    }
+    50%,
+    64% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(6px, 6px);
+    }
+  }
+  @keyframes pth-ring {
+    0%,
+    22% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50%,
+    64% {
+      opacity: 0.45;
+      transform: scale(0.7);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes pth-arrow {
+    0%,
+    22% {
+      opacity: 1;
+    }
+    38%,
+    74% {
+      opacity: 0;
+    }
+    96%,
+    100% {
+      opacity: 1;
+    }
+  }
+  /* Reduced motion: no slide and no pinch loop; the glyph rests in its spread pose and the
+     exit is a plain removal. The OS setting always applies; the in-game one applies wherever
+     the page stamps body.reduce-motion. */
+  @media (prefers-reduced-motion: reduce) {
+    .preview-touch-hint,
+    .preview-touch-hint[data-state="leaving"],
+    .preview-touch-hint .pth-ring,
+    .preview-touch-hint .pth-arrow,
+    .preview-touch-hint .pth-tip-a,
+    .preview-touch-hint .pth-tip-b {
+      animation: none;
+    }
+    .preview-touch-hint[data-state="leaving"] {
+      opacity: 0;
+    }
+  }
+  body.reduce-motion .preview-touch-hint,
+  body.reduce-motion .preview-touch-hint[data-state="leaving"],
+  body.reduce-motion .preview-touch-hint .pth-ring,
+  body.reduce-motion .preview-touch-hint .pth-arrow,
+  body.reduce-motion .preview-touch-hint .pth-tip-a,
+  body.reduce-motion .preview-touch-hint .pth-tip-b {
+    animation: none;
+  }
+  body.reduce-motion .preview-touch-hint[data-state="leaving"] {
+    opacity: 0;
+  }
+}

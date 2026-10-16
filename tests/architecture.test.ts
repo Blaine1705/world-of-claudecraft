@@ -410,6 +410,8 @@ const UI_PURE_CORES = [
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
   'src/ui/preview_prewarm_core.ts',
+  // The phone creator's one-time pinch hint: its phases and its stored flag.
+  'src/ui/preview_touch_hint_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/guild_ranks_view.ts',
@@ -842,6 +844,16 @@ const RENDER_PURE_CORES = [
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
+  // the indoor chase-camera clamp's walk through a building's air (interior_camera.ts)
+  'src/render/interior_camera_core.ts',
+  // the chase camera's floor (ground, rift tier, maze hedges), out of renderer.ts
+  'src/render/chase_camera_floor_core.ts',
+  // the air of a walk-in placed town building (its rooms and doors) for the indoor camera
+  'src/render/placed_town_interior_core.ts',
+  // the Highwatch manor's chimney smoke: each puff's place, size and opacity at a moment
+  'src/render/highwatch_manor_smoke_core.ts',
+  // the Highwatch manor's lane: its paving's rectangle and flags, road to gate
+  'src/render/highwatch_manor_lane_core.ts',
   // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
   'src/render/body_emote_core.ts',
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
@@ -987,6 +999,9 @@ const RENDER_PURE_CORES = [
   'src/render/drowned_temple/temple_lure_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
+  // where a body sitting on a seat is drawn, and which seat a screen ray points at
+  'src/render/seated_pose_core.ts',
+  'src/render/seat_pick_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
@@ -1048,6 +1063,14 @@ const RENDER_PURE_CORES = [
   'src/render/wickharbor_wharf_core.ts',
   'src/render/wickharbor_harbor_core.ts',
   'src/render/wyrmwatch_harbor_house_core.ts',
+  'src/render/mirefen_tavern_core.ts',
+  // the tavern's air for the indoor chase camera (interior_camera_core.ts is registered above)
+  'src/render/mirefen_tavern_interior_core.ts',
+  // the tavern's dog breathing on its porch and its chimney smoke
+  'src/render/mirefen_tavern_dog_core.ts',
+  'src/render/mirefen_tavern_smoke_core.ts',
+  // the tavern's wall fire laid out in its fireplace's mouth
+  'src/render/mirefen_tavern_wall_fire_core.ts',
   'src/render/ship_wake_core.ts',
   'src/render/water_approach_core.ts',
   'src/render/view_candidate_scan_core.ts',
@@ -3163,6 +3186,9 @@ const UI_DOM_MODULES = [
   // The launcher turntable's loading silhouette: mints its own layer and SVG
   // art (the `= document` default) and moves it between stage containers.
   'src/ui/preview_loading_silhouette.ts',
+  // The phone creator's one-time pinch hint: mints its own tab and glyph (the
+  // `= document` default), remembers the first gesture in localStorage, and times its exit.
+  'src/ui/preview_touch_hint.ts',
   'src/ui/prompt_dialog.ts',
   // The report window body moved whole out of hud.ts (the Phase 9b headroom
   // extraction); it paints #report-window and owns its listeners. Renamed to
