@@ -117,7 +117,7 @@ Quests are one-time; dungeons are 25–45 minute social commitments. Players lev
 
 ### 6.4 Pet stow & restore (definitive)
 
-- **FR-4.1** On `enterDelve`: **Hunter**: the live pet comes along (`delveKeepsPet`, `src/sim/delves/delve_pet.ts`) and is set down beside its owner on every delve teleport (entry, module advance, exit, eject); it walks its owner's run for room collision, and the in-delve respawn hands back the pet the death took. **Warlock / frost mage**: serialize the live pet into `delvePetStash` and despawn it. Stowed state survives module transitions.
+- **FR-4.1** On `enterDelve`: **Hunter**: the live pet comes along (`delveKeepsPet`, `src/sim/delves/delve_pet.ts`) and is set down beside its owner on every delve teleport (entry, module advance, exit, eject); it walks its owner's run for room collision and heels in a straight line there (the path planner does not know the run's seeded rooms), and the in-delve respawn or a dead member's eject hands back the pet the death took. A pet any class summons inside a delve is carried the same way. **Warlock / frost mage**: serialize the live pet into `delvePetStash` and despawn it. Stowed state survives module transitions.
 - **FR-4.2** On `leaveDelve` and `completeDelve`: restore a stowed pet from `delvePetStash` via `restorePet()`.
 - **FR-4.3** Delve companion (`companion_tessa`) uses a separate spawn path and fights alongside a hunter's pet; pet lookups (`petOf`) exclude the companion.
 - **FR-4.4** Block `enterDelve` if pet state cannot be stowed (document edge case: pet in unrecoverable state — treat as despawn + restore attempt on exit).

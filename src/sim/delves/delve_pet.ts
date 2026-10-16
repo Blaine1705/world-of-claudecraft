@@ -41,16 +41,17 @@ export function stowPetUnlessKept(ctx: SimContext, pid: number): void {
 }
 
 /**
- * Set the owner's living pet down beside them after a delve teleport. Call AFTER
- * the owner's body has been placed. The pet arrives out of combat with no stale
- * route or target, since whatever it was fighting stayed behind. A dead pet is
- * left where it fell (Revive Pet, or the owner's own resurrection, brings it back
- * to the owner from anywhere).
+ * Set the owner's pet down beside them after a delve teleport. Call AFTER the
+ * owner's body has been placed. The pet arrives out of combat with no stale route
+ * or target, since whatever it was fighting stayed behind. A dead pet's corpse is
+ * carried too, so it is never stranded in a room the owner has left (Revive Pet
+ * then stands it up where the owner is). Class-agnostic: a pet any class summons
+ * inside the delve follows the same way.
  */
 export function bringPetToOwner(ctx: SimContext, pid: number): void {
   const owner = ctx.entities.get(pid);
   if (!owner) return;
-  const pet = petOf(ctx, pid);
+  const pet = petOf(ctx, pid, true);
   if (!pet) return;
   pet.pos = ctx.groundPos(owner.pos.x + DELVE_PET_HEEL_OFFSET_X, owner.pos.z);
   pet.prevPos = { ...pet.pos };

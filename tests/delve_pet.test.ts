@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DELVES, isDelvePos } from '../src/sim/data';
 import { delveKeepsPet } from '../src/sim/delves/delve_pet';
+import { isPrimaryOwnedPetEntity } from '../src/sim/pet/pet_selection';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -138,6 +139,58 @@ describe('hunter pet inside a delve', () => {
     expect(sim.petOf(sim.playerId)?.id).toBe(pet.id);
     expect(isDelvePos(pet.pos.x)).toBe(false);
     expect(dist2d(pet.pos, sim.player.pos)).toBeLessThan(3);
+  });
+
+  it('a dead member ejected by a failed run gets the pet their death took', () => {
+    const sim = makeSim();
+    const pet = tameBoar(sim);
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    killPlayer(sim);
+    expect(pet.dead).toBe(true);
+    // The run fails while this member still lies dead (a party wipe shape).
+    (sim as any).failDelveRun(run);
+    expect(sim.player.dead).toBe(false);
+    expect(isDelvePos(sim.player.pos.x)).toBe(false);
+    expect(pet.dead).toBe(false);
+    expect(dist2d(pet.pos, sim.player.pos)).toBeLessThan(3);
+  });
+
+  it('a dead pet corpse moves with its owner into the next room', () => {
+    const sim = makeSim();
+    const pet = tameBoar(sim);
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    (sim as any).dealDamage(null, pet, pet.maxHp + 100, false, 'physical', null, 'hit', true);
+    expect(pet.dead).toBe(true);
+    run.exitPortalOpen = true;
+    (sim as any).advanceDelveModule(run);
+    expect(sim.petOf(sim.playerId, true)?.id).toBe(pet.id);
+    expect(dist2d(pet.pos, sim.player.pos)).toBeLessThan(3);
+  });
+
+  it('heels in a straight line inside a delve instead of a default-layout A* route', () => {
+    const sim = makeSim();
+    const pet = tameBoar(sim);
+    enterReliquary(sim);
+    pet.pos = { ...sim.player.pos, z: sim.player.pos.z + 8 };
+    pet.prevPos = { ...pet.pos };
+    const before = dist2d(pet.pos, sim.player.pos);
+    for (let i = 0; i < 10; i++) {
+      sim.tick();
+      expect(pet.petPath).toEqual([]);
+    }
+    expect(dist2d(pet.pos, sim.player.pos)).toBeLessThan(before);
+  });
+
+  it('the HUD pet identity never resolves to the delve companion', () => {
+    const sim = makeSim();
+    const pet = tameBoar(sim);
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const tessa = sim.entities.get(run.companion!.entityId)!;
+    expect(isPrimaryOwnedPetEntity(tessa, sim.playerId)).toBe(false);
+    expect(isPrimaryOwnedPetEntity(pet, sim.playerId)).toBe(true);
   });
 
   it('a mid-delve save persists the live pet', () => {

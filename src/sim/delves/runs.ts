@@ -49,6 +49,7 @@ import {
 import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash } from '../pet/pet_commands';
+import { restorePetOnOwnerRevive } from '../pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { delveExitDropZ } from '../prop_layout';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -208,9 +209,10 @@ function ejectStaleDelveOccupants(ctx: SimContext, run: DelveRun, pids: readonly
 }
 
 export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
-  // A player's pet walks its owner's run, so it collides with the same room walls
-  // and doors. It is never in run.mobIds, and the player lookup below keys on the
-  // entity's own id. The delve companion keeps its existing (unclamped) movement.
+  // A player's owned mob (a hunter's beast, a pet or guardian summoned inside the
+  // delve) walks its owner's run, so it collides with the same room walls and doors.
+  // It is never in run.mobIds, and the player lookup below keys on the entity's own
+  // id. The delve companion keeps its existing (unclamped) movement.
   if (e.kind === 'mob' && e.ownerId !== null && !ctx.isDelveCompanionMob(e)) {
     return delveRunForPlayer(ctx, e.ownerId);
   }
@@ -733,6 +735,7 @@ export function ejectToDelveDoor(
   const p = r.e;
   // A live free eject (nobody died) still displaces: end any session first.
   cancelProfessionSessionOnDisplacement(ctx, p);
+  const wasDead = p.dead;
   p.dead = false;
   const door = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.pos = delveMemberSpawnPos(ctx, door, slotIndex);
@@ -762,6 +765,9 @@ export function ejectToDelveDoor(
   p.inCombat = false;
   p.autoAttack = false;
   Object.assign(r.meta.moveInput, emptyMoveInput());
+  // Ejecting a dead member (a party run that fails while they lie dead) stands them
+  // back up, so it hands back the pet their death took, like every resurrection.
+  if (wasDead) restorePetOnOwnerRevive(ctx, p);
   bringPetToOwner(ctx, pid);
 }
 
