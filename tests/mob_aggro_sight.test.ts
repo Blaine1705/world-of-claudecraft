@@ -140,9 +140,11 @@ describe('proximity aggro needs a line of sight: the Mirefen tavern', () => {
   }
 
   it('control: the same hostile pulls a player at the same distance with nothing between', () => {
-    // due west of the tavern, out in the open marsh: the scan itself still works
+    // due west of the tavern, out in the open marsh: the scan itself still works (2 yd
+    // south of the first spot, where a marsh prop on the integration branch stands on
+    // the player's square and breaks the line)
     const troll = nearestTroll();
-    const m = { x: TAVERN_ORIGIN.x - 50, z: TAVERN_ORIGIN.z - 20 };
+    const m = { x: TAVERN_ORIGIN.x - 50, z: TAVERN_ORIGIN.z - 22 };
     holdIdle(troll, m.x, m.z);
     standAt(sim.player, m.x + 8, m.z);
     expect(pulls(troll)).toBe(true);

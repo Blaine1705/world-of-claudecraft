@@ -4194,7 +4194,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1097,
-      "state": "59a22b88",
+      "state": "b7316139",
       "events": "04f48354",
       "rng": {
         "draws": 76,
@@ -4410,7 +4410,6 @@
           "healPower": 5,
           "hp": 50000,
           "id": 1011,
-          "inCombat": true,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -8360,7 +8359,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1097,
-      "state": "62834348",
+      "state": "b7e9216b",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8371,7 +8370,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1097,
-      "state": "cd4662d0",
+      "state": "f871621d",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8382,7 +8381,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1097,
-      "state": "281b4985",
+      "state": "11862bae",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8393,7 +8392,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1097,
-      "state": "96c3d0ce",
+      "state": "8b159819",
       "events": "3f5a7a0c",
       "rng": {
         "draws": 76,
@@ -8404,7 +8403,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 1097,
-      "state": "516d0b63",
+      "state": "f1dcbd08",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8626,7 +8625,6 @@
           "healPower": 5,
           "hp": 50000,
           "id": 1011,
-          "inCombat": true,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -8723,7 +8721,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 1097,
-      "state": "516d0b63",
+      "state": "f1dcbd08",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -8945,7 +8943,6 @@
           "healPower": 5,
           "hp": 50000,
           "id": 1011,
-          "inCombat": true,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

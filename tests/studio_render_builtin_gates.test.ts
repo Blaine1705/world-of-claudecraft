@@ -62,7 +62,8 @@ describe('campfire flames', () => {
     expect(props).toContain(
       'const legacyFlameGeo = builtInWorld ? legacyCampfireFlameGeometry() : null;',
     );
-    expect(props.match(/buildLegacyCampfireFlame\(legacyFlameGeo/g)).toHaveLength(2);
+    // the campfires, the Mirefen tavern's hearth fires and the braziers
+    expect(props.match(/buildLegacyCampfireFlame\(legacyFlameGeo/g)).toHaveLength(3);
   });
 });
 
