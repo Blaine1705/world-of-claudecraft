@@ -23,9 +23,9 @@ const camp = ZONE1_CAMPS.find((c) => c.mobId === 'forest_wolf') ?? null;
 export const WOLF_RUN_CAMP = camp ? { ...camp.center, radius: camp.radius } : null;
 // The trail leaves the square by the north road: round the west end of the
 // smithy's forge shelter (the road swings out round it), and back over the
-// rise behind the smithy before it bends up the Wolf Run. Clear of every
-// collider by more than a body's width even after the trail's curve
-// smoothing, and 2 yd round Chronicler Saul.
+// rise behind the smithy, west of the road's lamp, before it bends up the
+// Wolf Run. Clear of every collider by more than a body's width even after
+// the trail's curve smoothing, and 2 yd round Chronicler Saul.
 export const WOLVES_ROUTE: readonly { x: number; z: number }[] = WOLF_RUN_CAMP
   ? [
       MARSHAL_POS,
@@ -33,8 +33,8 @@ export const WOLVES_ROUTE: readonly { x: number; z: number }[] = WOLF_RUN_CAMP
       { x: 16.3, z: -83 },
       { x: 17.5, z: -76 },
       { x: 14, z: -69 },
-      { x: 6, z: -62 },
-      { x: 3, z: -52 },
+      { x: 7.5, z: -61.5 },
+      { x: 5, z: -52 },
       WOLF_RUN_CAMP,
     ]
   : [];

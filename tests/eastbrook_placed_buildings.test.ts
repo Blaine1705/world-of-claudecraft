@@ -236,12 +236,12 @@ describe('the six placed Eastbrook buildings', () => {
     // Each building stands at that map's anchor (to the centimetre) and turn,
     // except where its ground crossed something the built-in world keeps
     // (eastbrook_layout.ts BUILDINGS): the chapel 5 yd west and 10.2 yd north,
-    // off the strand and out of the bay; the apothecary's shop 4.5 yd north,
-    // off the strand; the inn 3.5 yd back from its door, clear of the farm plots;
-    // the vault half a yard off the bank's wall.
+    // out of the bay; the apothecary's shop 2 yd north, so its shelf eases
+    // down before the strand meets the water; the inn 3.5 yd back from its
+    // door, clear of the farm plots; the vault half a yard off the bank's wall.
     const nudges: Record<string, { x: number; z: number }> = {
       eastbrook_chapel: { x: 5, z: 10.2 },
-      eastbrook_apothecary: { x: 0, z: 4.5 },
+      eastbrook_apothecary: { x: 0, z: 2 },
       eastbrook_inn: { x: 1.42, z: 3.2 },
     };
     const theirs = (assetId: string) => {

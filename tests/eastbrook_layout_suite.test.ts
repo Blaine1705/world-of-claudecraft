@@ -684,7 +684,7 @@ describe('authoritative Eastbrook replacement plan', () => {
         kind: 'house',
         position: {
           x: -30.59,
-          z: -125.13,
+          z: -127.63,
         },
         nativeDimensions: {
           width: 16.5,
@@ -693,14 +693,14 @@ describe('authoritative Eastbrook replacement plan', () => {
         },
         rotation: 3.0543261909900767,
         maxCornerRadius: 10.380390166077573,
-        frontClearance: 1.8,
+        frontClearance: 2.0769230769230766,
         frontStandingPoint: {
-          x: -28.905094240835844,
-          z: -116.85164916286249,
+          x: -28.92922967728904,
+          z: -119.07577986185245,
         },
         placement: {
           x: -30.59,
-          z: -125.13,
+          z: -127.63,
           rotation: 3.0543261909900767,
           scale: 1.5,
           lift: -1.55,
@@ -711,7 +711,7 @@ describe('authoritative Eastbrook replacement plan', () => {
             id: 'eastbrook_apothecary:stall_counter',
             center: {
               x: -34.91613103664438,
-              z: -116.58989950300453,
+              z: -119.08989950300453,
             },
             halfWidth: 2.71155,
             halfDepth: 0.5769,
@@ -721,7 +721,7 @@ describe('authoritative Eastbrook replacement plan', () => {
             id: 'eastbrook_apothecary:stall_barrels',
             center: {
               x: -38.64224065120936,
-              z: -117.15921778195442,
+              z: -119.65921778195442,
             },
             halfWidth: 1.107675,
             halfDepth: 1.6269,
@@ -732,7 +732,7 @@ describe('authoritative Eastbrook replacement plan', () => {
           id: 'eastbrook_apothecary',
           center: {
             x: -30.6945999646586,
-            z: -123.93441693308519,
+            z: -126.43441693308519,
           },
           halfWidth: 9.753,
           halfDepth: 9.150075000000001,
@@ -821,7 +821,14 @@ describe('authoritative Eastbrook replacement plan', () => {
       const front = toModelAxes(anchor, turn, building.frontStandingPoint);
       const wallFront = walls.z - building.nativeDimensions.depth / 2;
       expect(front.z, `${building.id} front`).toBeCloseTo(wallFront - building.frontClearance, 9);
-      expect(building.frontClearance, `${building.id} clearance`).toBeLessThan(2);
+      // the step grows with the building: exactly 1.8 yd at the town's 1.3
+      // (inside the 2 yd rest halo at the inn), 2.08 at the apothecary's 1.5,
+      // whose grown stoop would stand in a body's way at 1.8
+      expect(building.frontClearance, `${building.id} clearance`).toBe(
+        1.8 * (building.placement.scale / 1.3),
+      );
+      if (building.placement.scale === 1.3) expect(building.frontClearance).toBe(1.8);
+      if (building.kind === 'inn') expect(building.frontClearance).toBeLessThan(2);
       expect(front.z, `${building.id} faces -Z`).toBeLessThan(wallFront);
       // at the stoop: never more than a stride out past the model's own front
       // edge (the chapel's point is at the very foot of its stair)
@@ -1679,7 +1686,7 @@ describe('layout clearance and service anchors', () => {
         'eastbrook_smithy',
       ],
       ['fisherman_brandt', -22.3, -104.6, 1.2672255874712333, 'eastbrook_civic_square'],
-      ['foreman_odell', -16, -111, 0.21866894587394195, 'eastbrook_civic_square'],
+      ['foreman_odell', -3.5, -104.5, -1.3370531459259951, 'eastbrook_civic_square'],
       [
         'bursar_fernando',
         -55.21592057176678,

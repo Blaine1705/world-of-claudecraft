@@ -623,6 +623,9 @@ function makePlacedBuilding(spec: {
   const size = spec.scale;
   // the model's yard of footing, buried, with the ground line sunk a further 0.05
   const lift = -(size + 0.05);
+  // the stoop grows with the building, so a grander one's step stands further
+  // out (exactly the town's 1.8 at its standing size)
+  const frontClearance = PLACED_FRONT_CLEARANCE * (size / STANDARD_SCALE);
   const reach = {
     x: spec.reach.x * size,
     z: spec.reach.z * size,
@@ -666,12 +669,12 @@ function makePlacedBuilding(spec: {
       rotation: spec.rotation,
     },
     maxCornerRadius: Math.hypot(walls.width / 2, walls.depth / 2),
-    frontClearance: PLACED_FRONT_CLEARANCE,
+    frontClearance,
     frontStandingPoint: localToWorld(
       spec.anchor,
       spec.rotation,
       spec.doorX * size,
-      wallFrontZ - PLACED_FRONT_CLEARANCE,
+      wallFrontZ - frontClearance,
     ),
     /** The way a visitor looks standing at the door, facing out of it. */
     frontFacing: Math.atan2(Math.sin(spec.rotation + Math.PI), Math.cos(spec.rotation + Math.PI)),
@@ -698,9 +701,11 @@ function makePlacedBuilding(spec: {
 }
 
 // Where a visitor stands at a placed building's door: at the foot of its
-// stoop, 1.8 yd off the wall face on the door's own line. Inside the 2 yd halo
-// an inn's rest area keeps round its walls (building_layout.ts
-// buildingRestPadding), so the tavern's doorstep is where a traveller rests.
+// stoop, 1.8 yd off the wall face on the door's own line at the town's
+// standing size, further at a grander one (the apothecary's shop at 1.5: at
+// 1.8 its grown stoop stands in a body's way). Inside the 2 yd halo an inn's
+// rest area keeps round its walls (building_layout.ts buildingRestPadding),
+// so the tavern's doorstep is where a traveller rests.
 const PLACED_FRONT_CLEARANCE = 1.8;
 const DEGREE = Math.PI / 180;
 
@@ -735,10 +740,14 @@ const APOTHECARY_SCALE = 1.5;
 // square, the apothecary's shop at the crafts lane's end above the strand, and
 // a cottage by the quay. Each stands at the anchor and turn that map gives it
 // (the Studio placement's own x, z and rotY), except where its larger ground
-// crossed something the built-in world keeps: the chapel stands 11.4 yd
-// inland (5 yd west, 10.2 yd north) of the map's spot, whose ground ran out
-// over the strand into the bay; the apothecary's shop 4.5 yd north, off the
-// strand; and the inn 3.5 yd back from its door, clear of the farm plots.
+// crossed something the built-in world keeps, and then only as far as that
+// needs: the chapel stands 11.4 yd inland (5 yd west, 10.2 yd north) of the
+// map's spot, where a sixth of its ground lay under the bay and its level
+// shelf could not be seated without lifting seabed out of the sea (about 11
+// yd is the least that clears it); the apothecary's shop 2 yd north, whose
+// seaward eaves stood under 4 yd off the waterline, too close for its shelf
+// to ease back down to the strand before the water; and the inn 3.5 yd back
+// from its door, so its walls stand outside the farm beds' working reach.
 // Building IDS are kept where the role is (the forge ambience keys on the
 // smithy, the rest rule on the inn), so nothing that resolves through an id
 // moved with the mesh. Reach boxes are the shipped models' bounds, and the
@@ -818,7 +827,7 @@ const BUILDINGS = [
     id: 'eastbrook_apothecary',
     assetId: '/models/tidehold/shop_a.glb',
     kind: 'house',
-    anchor: { x: -30.59, z: -125.13 },
+    anchor: { x: -30.59, z: -127.63 },
     rotation: 175 * DEGREE,
     scale: APOTHECARY_SCALE,
     reach: { x: 0, z: -0.8001, width: 13.004, height: 16.2797, depth: 12.2001 },
@@ -1297,7 +1306,10 @@ const TRADER_POSITION = { x: -25, z: -94 } as const;
 const APOTHECARY_POSITION = { x: -24.5, z: -112.5 } as const;
 // On the main street at the square's corner.
 const BRANDT_POSITION = { x: -22.3, z: -104.6 } as const;
-const ODELL_POSITION = { x: -16, z: -111 } as const;
+// On the open ground south-west of the square the Weekly Vault left (it
+// stands at the bank now), within a short walk of Marshal Redbrook: with the
+// apothecary's door down the crafts lane, he is the marshal's near neighbour.
+const ODELL_POSITION = { x: -3.5, z: -104.5 } as const;
 // Station cluster props sit at station + world-axis offsets (town_props.ts,
 // no rotation), so the cook's work point derives the same way.
 // Smith Haldren keeps the smithy: he stands at its door north of the square,
@@ -1675,7 +1687,9 @@ const PADS: EastbrookPad[] = [
   ...padsOver(buildingById('eastbrook_smithy').reach, RISE_SHELF, 3, 2, 5),
   ...padsOver(buildingById('eastbrook_inn').reach, RISE_SHELF, 3, 3, 9),
   ...padsOver(buildingById('eastbrook_chapel').reach, CHAPEL_SHELF, 3, 4, 4),
-  ...padsOver(buildingById('eastbrook_apothecary').reach, BANK_SHELF, 2, 2, 5),
+  // a finer grid, so the shelf hugs the shop's seaward eaves and its taper is
+  // spent before the strand reaches the water
+  ...padsOver(buildingById('eastbrook_apothecary').reach, BANK_SHELF, 4, 4, 4),
   ...padsOver(buildingById('eastbrook_quay_cottage').reach, RISE_SHELF, 2, 2, 8),
 ];
 

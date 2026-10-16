@@ -959,7 +959,7 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     id: 'npc_church_order_quartermaster',
     name: 'Templar Althea',
     title: 'Church Order Quartermaster',
-    pos: { x: 13.29, z: -113.54 },
+    pos: { x: 13.29, z: -112.84 },
     facing: -0.96,
     color: 0xecd57a,
     questIds: [],
@@ -1015,7 +1015,7 @@ export const FACTION_HUB_LANDINGS: Readonly<
   church_order: Object.freeze({
     x: 12.55,
     y: 0,
-    z: -109.36,
+    z: -108.66,
     facing: -0.96,
     name: 'Eastbrook Vale',
   }),
