@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { buildingRecordColliders } from '../src/sim/authored_town_buildings';
 import {
   bankerChestSpots,
   colliderInternalsForTest,
@@ -289,11 +290,18 @@ describe('Fenbridge canonical pure layout', () => {
     const { center } = FENBRIDGE_LAYOUT.civic;
     const { radius } = FENBRIDGE_LAYOUT.wall;
     // No palisade wing, gate jamb or arch stands on or beside the old ring
-    // line: the only colliders there are the grand buildings' own walls,
-    // which reach past it now (inside a building's drawn reach).
-    const inBuilding = (point: { x: number; z: number }) =>
-      FENBRIDGE_LAYOUT.buildings.some(
-        (building) => distancePointToObb(point, building.reach) === 0,
+    // line: the only colliders there are the grand buildings' own walls (the
+    // ones their records stand), which reach past it now.
+    const ownWalls = FENBRIDGE_LAYOUT.buildings.flatMap((building) => {
+      const record = BUILTIN_WORLD.props.buildings.find(
+        (candidate) => candidate.id === building.id,
+      );
+      if (!record) throw new Error(`no props record for ${building.id}`);
+      return buildingRecordColliders(record, 0, () => 0, SEED);
+    });
+    const isOwnWall = (collider: { x: number; z: number }) =>
+      ownWalls.some(
+        (wall) => Math.abs(wall.x - collider.x) < 1e-6 && Math.abs(wall.z - collider.z) < 1e-6,
       );
     const onRing = colliderInternalsForTest
       .staticWorldColliders(SEED)
@@ -302,7 +310,7 @@ describe('Fenbridge canonical pure layout', () => {
           Math.abs(Math.hypot(collider.x - center.x, collider.z - center.z) - radius) < 1.5,
       );
     expect(onRing.length).toBeGreaterThan(0);
-    expect(onRing.filter((collider) => !inBuilding(collider))).toEqual([]);
+    expect(onRing.filter((collider) => !isOwnWall(collider))).toEqual([]);
     for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
       expect(isBlocked(SEED, gate.crossing.x, gate.crossing.z, 0.8), gate.id).toBe(false);
     }
@@ -310,10 +318,11 @@ describe('Fenbridge canonical pure layout', () => {
     // the four stretches the ring line is clear for the largest body, and a
     // body walks straight across it, out of town and back in, with nothing
     // to stop it or slide it. Two stretches now carry a grand building over
-    // the line (the apothecary on the north-west, the bank on the north-east):
-    // there the walls stand across it, and the traversal suite below walks to
-    // the doors and the tannery yard past their back ends; the other two
-    // stretches stay open.
+    // the line at their middles (the apothecary on the north-west, the bank on
+    // the north-east): there the walls stand across it, and the traversal
+    // suite below walks round behind every building instead. The middles of
+    // the other two stay open (the warden house's walls cross the south-west
+    // stretch too, but nearer the south entrance than its middle).
     const sorted = [...FENBRIDGE_LAYOUT.wall.gates].sort((left, right) => left.angle - right.angle);
     const at = (angle: number, distance: number) => ({
       x: center.x + Math.cos(angle) * distance,
@@ -1026,6 +1035,30 @@ describe('Fenbridge runtime safety and traversal', () => {
       for (const destination of destinations) {
         expectPath(`${destination.id}:out:${bodyRadius}`, square, destination.point, bodyRadius);
         expectPath(`${destination.id}:back:${bodyRadius}`, destination.point, square, bodyRadius);
+      }
+    }
+
+    // Round the back of every building, three yards past its drawn reach,
+    // from the nearest entrance just outside the town: stood grand, the
+    // buildings stand over the old ring line, and a body still walks behind
+    // each one and back out.
+    const entrances = destinations.slice(0, FENBRIDGE_LAYOUT.wall.gates.length);
+    for (const building of FENBRIDGE_LAYOUT.buildings) {
+      const behind = localToWorld(
+        building.reach.center,
+        building.reach.rotation,
+        0,
+        building.reach.halfDepth + 3,
+      );
+      const nearest = [...entrances].sort(
+        (left, right) =>
+          Math.hypot(left.point.x - behind.x, left.point.z - behind.z) -
+          Math.hypot(right.point.x - behind.x, right.point.z - behind.z),
+      )[0];
+      for (const bodyRadius of [0.5, 0.8]) {
+        const label = `${building.id}:behind from ${nearest.id}:${bodyRadius}`;
+        expectPath(`${label}:out`, nearest.point, behind, bodyRadius);
+        expectPath(`${label}:back`, behind, nearest.point, bodyRadius);
       }
     }
   });

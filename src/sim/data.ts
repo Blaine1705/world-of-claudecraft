@@ -1062,9 +1062,10 @@ export const BUILTIN_WORLD: WorldContent = {
   terrainEdits: [
     ...JAIL_TERRAIN_EDITS,
     // Fenbridge's grand painted buildings reach past the marsh hub's plateau:
-    // each stands on a level pad at its height, eased out by a soft apron
-    // (sim/fenbridge_layout.ts pads). No other stamp reaches that ground, so
-    // their place in this list moves no height. Copied, as Highwatch's are.
+    // each stands on a level pad at the plateau's height, eased out by a soft
+    // apron (sim/fenbridge_layout.ts pads). No other stamp reaches that
+    // ground, so their place in this list moves no height. Copied, as
+    // Highwatch's are.
     ...FENBRIDGE_LAYOUT.pads.map((pad) => ({ ...pad })),
     ...COPPER_DIG_TERRAIN_EDITS,
     ...TOWN_PLAT_TERRAIN_EDITS,
