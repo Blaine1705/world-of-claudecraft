@@ -562,6 +562,28 @@ describe("the Highwatch adventurers' guild at the old stable yard", () => {
   // the model's own axes (scripts/assets/highwatch_guild/guild_plan.py) carried into the world
   const at = (x: number, z: number) => localToWorld(guild.placement, guild.rotation, x, z);
 
+  it('cuts back the rock knob in front of its door to an open, walkable meadow', () => {
+    // the knob rose about 20 yd over the yard at (70, 690); the view out of the door is open
+    for (let x = 62; x <= 80; x += 2) {
+      for (let z = 684; z <= 698; z += 2) {
+        expect(terrainHeight(x, z, WORLD_SEED), `${x},${z}`).toBeLessThan(11);
+      }
+    }
+    expect(terrainHeight(70, 690, WORLD_SEED)).toBeCloseTo(9, 1);
+    // graded, never a cut seam: a player walks every step from the yard over the old knob
+    for (let x = 58; x <= 88; x += 1.5) {
+      for (let z = 678; z <= 704; z += 1.5) {
+        expect(terrainSteepnessAt(x, z, WORLD_SEED), `${x},${z}`).toBeLessThan(
+          PLAYER_MAX_CLIMB_SLOPE,
+        );
+      }
+    }
+    // the cut sits before the portal bench, so the bench keeps its own ground
+    const pads = HIGHWATCH_LAYOUT.pads;
+    const cut = pads.findIndex((p) => p.x === 71 && p.z === 691);
+    expect(cut).toBe(pads.length - 2);
+  });
+
   it('looks east down the stables spur at the town, and stands clear of every other building', () => {
     // the door (the model's -z) looks east (-x), toward the square
     expect(guild.frontStandingPoint.x).toBeLessThan(guild.position.x);

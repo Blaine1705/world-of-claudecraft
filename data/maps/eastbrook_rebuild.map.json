@@ -12982,6 +12982,15 @@
       "hardness": 0.6306014617881656
     },
     {
+      "x": 71,
+      "z": 691,
+      "radius": 16,
+      "delta": 9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.55
+    },
+    {
       "x": 10,
       "z": 770,
       "radius": 10.6,

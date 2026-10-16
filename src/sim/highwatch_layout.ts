@@ -432,11 +432,18 @@ const SQUARE_RELEVEL = {
 // open corner of the manor's reach behind the chapel, where the model has no wall).
 const PORTAL_BENCH = { x: 10, z: 770, radius: 10.6, delta: 17.3, hardness: 0.5 };
 
+// The rock knob that rose straight out of the meadow in front of the guild's door (a 20 yd
+// crag at about (70, 690), south of the spur) blocked the view and the approach from the
+// porch. One soft level stamp at the yard's own height cuts it back to the meadow: a flat core
+// over the knob, then a long smooth fall into the ground around it, so no cut seam shows.
+const GUILD_FRONT_CUT = { x: 71, z: 691, radius: 16, delta: GUILD_HEIGHT, hardness: 0.55 };
+
 const PADS = [
   ...GROUND.flatMap((g) => padsAlong(g.building, g.height, g.columns, g.rows, g.apron)),
   SQUARE_RELEVEL,
   ...ROAD_GRADE,
   ...GROUND.flatMap((g) => padsAlong(g.building, g.height, g.columns, g.rows, g.taper)),
+  GUILD_FRONT_CUT,
   PORTAL_BENCH,
 ].map((pad) => ({ ...pad, falloff: 'smooth' as const, mode: 'level' as const }));
 
