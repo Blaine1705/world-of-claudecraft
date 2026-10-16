@@ -122,6 +122,26 @@ const ARMORY_SKIN_KEYS = {
     look: 'hudChrome.wocStore.skins.lantern_hall_sword.look',
     lore: 'hudChrome.wocStore.skins.lantern_hall_sword.lore',
   },
+  hearthbrand_sword: {
+    name: 'hudChrome.wocStore.skins.hearthbrand_sword.name',
+    look: 'hudChrome.wocStore.skins.hearthbrand_sword.look',
+    lore: 'hudChrome.wocStore.skins.hearthbrand_sword.lore',
+  },
+  squallcrest_sword: {
+    name: 'hudChrome.wocStore.skins.squallcrest_sword.name',
+    look: 'hudChrome.wocStore.skins.squallcrest_sword.look',
+    lore: 'hudChrome.wocStore.skins.squallcrest_sword.lore',
+  },
+  rimelight_staff: {
+    name: 'hudChrome.wocStore.skins.rimelight_staff.name',
+    look: 'hudChrome.wocStore.skins.rimelight_staff.look',
+    lore: 'hudChrome.wocStore.skins.rimelight_staff.lore',
+  },
+  duskwick_staff: {
+    name: 'hudChrome.wocStore.skins.duskwick_staff.name',
+    look: 'hudChrome.wocStore.skins.duskwick_staff.look',
+    lore: 'hudChrome.wocStore.skins.duskwick_staff.lore',
+  },
   cinderbrand_sword: {
     name: 'hudChrome.wocStore.skins.cinderbrand_sword.name',
     look: 'hudChrome.wocStore.skins.cinderbrand_sword.look',

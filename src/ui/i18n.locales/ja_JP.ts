@@ -2205,6 +2205,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     '樋に灯火の炎を宿した幅広の鋼の刃、金の鍔飾り、鍔に灯る籠入りのランタン、青い革の柄。',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '燈火の館の剣',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火の剣',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look': '鍛冶の熱を帯びた両刃と、両面を枝分かれして走る溶けた継ぎ目を持つ、黒ずんだ鋼の炎形の刃。燃える石を囲む青銅の炎の鍔、牛血色の柄。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore': '燈火の館には、館が建って以来一度も消えたことのない炉がある。ギャリック・ホルトは、この刃はその熾火で焼き入れされたと言い張る。これを携える者たちは、どれほど寒い夜番でも柄は温かいままだと言う。刃に沿う炎は見た目にすぎない。',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': '嵐波の剣',
+  'hudChrome.wocStore.skins.squallcrest_sword.look': '砕ける波のように輝く刃縁を持つ海青色の長い刃。枝分かれした稲妻を宿す嵐の溝、刃元を越える金の波、片側の刃縁に沿うひれ、嵐の真珠を囲む金の砕け波の鍔。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore': 'ギルドのために航海したある船長が、帆柱を奪い船を鐘のように鳴り響かせた嵐からこの刃を持ち帰った。ギャリックは印章と引き換えにしか売らず、買う者には必ず、嵐の前にはうなるぞと忠告する。稲妻と海の光は見た目にすぎない。',
+  'hudChrome.wocStore.skins.rimelight_staff.name': '霧氷灯の杖',
+  'hudChrome.wocStore.skins.rimelight_staff.look': '銀で締められ、光る霧氷が巻きつく淡い柄。頂には氷の破片の冠の中で冷たい光の大きな結晶をつかむ銀の爪があり、襟からはつららが垂れる。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore': '燈火の館の冬の見張りは、このような杖を携えて高い街道を歩き、雪に迷う旅人のために頂を灯した。ギャリックは印章に余裕のある者のために一本を棚に置いている。霜とその冷たい光は見た目にすぎない。',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '黄昏灯芯の杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look': '鉄で締められた二本のねじれた黒い木の柄。頂には二本の巻いた角の間で紫の黄昏の炎を燃やす吹き抜けの鉄のランタンがあり、その底から鎖が揺れる。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore': '館のランタンはどれも明るく燃える、ただ一つを除いて。黄昏の炎は夜の館を守るために灯されたもので、ほかのランタンが光を放つところで影を放つ。ギャリックはその芯を自ら切りそろえる。煙と紫の輝きは見た目にすぎない。',
   'hudChrome.wocStore.collections.lantern_hall': '燈火の館',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'ギルドマーク・アーミングソード',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
@@ -21683,8 +21695,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.open': '未達成',
   'hudChrome.guildHall.lifetime': '達成した契約：{count}',
   'hudChrome.guildHall.emptyBoard': '掲示板は書き換え中だ。週次リセットの後にまた来てほしい。',
-  'hudChrome.guildHall.quartermasterIntro':
-    'ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの剣の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。',
+  'hudChrome.guildHall.quartermasterIntro': 'ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの武器の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。',
   'hudChrome.guildHall.titleOffer': '称号：{title}',
   'hudChrome.guildHall.titlePreview': '表示：{preview}',
   'hudChrome.guildHall.buy': '購入',
@@ -21701,6 +21712,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.skinPreview':
     '装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。',
   'hudChrome.guildHall.skinOffer': '剣の外見：{skin}',
+  'hudChrome.guildHall.staffSkinOffer': '杖の外見：{skin}',
+  'hudChrome.guildHall.staffSkinPreview': '装備中の杖の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。',
   'hudChrome.guildHall.mountPreview': '地上マウント：騎乗中の移動速度+{pct}%。騎乗訓練が必要。',
   'hudChrome.guildHall.mountOffer': 'マウント：{mount}',
   'hudChrome.guildHall.refused.range': '取引するには補給係のそばに立つこと。',

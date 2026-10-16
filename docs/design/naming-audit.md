@@ -1031,6 +1031,10 @@ The guild hall at the old stable yard (`src/sim/content/highwatch_guild.ts`, the
 | Lantern Hall Destrier | the guild's war horse (a mount) | KEEP. No game mount or creature of that name found; built on the hall's own name and the plain English "destrier" (a historical war horse; Warhammer's "Destrier" is a knight war machine, not this phrase). |
 | Reins of the Lantern Hall Destrier | the horse's reins item | KEEP. The repo's own reins pattern (Reins of the Viridian Valestrider) around the name above. |
 | Blade of Lantern Hall | the guild's sword appearance | KEEP. No game weapon of that name found. "Lantern Sword" was considered and dropped: it is a Guild Wars 2 weapon skin; "Lanternblade" and "Lanternguard" were checked and carry no hit, but the hall's own name reads plainer. |
+| Hearthbrand | the guild's fire sword appearance | KEEP. Exact-phrase searches (game wikis, wiki.gg, Wowhead, Fandom) found no game weapon, item or term of that name; the nearest hits are unrelated (Minecraft Dungeons' Hawkbrand, a Skyrim mod's Hjaltbrand). Plain English hearth plus brand (a sword). |
+| Squallcrest | the guild's sea-storm sword appearance | KEEP. No game weapon, place or term of that name found. Inspired only in feel by an ornate sea-themed sword from another game; no name, silhouette or texture of it is used. |
+| Rimelight Staff | the guild's frost staff appearance | KEEP. No game staff or item of that name found (Rimlight Studios is an unrelated developer name, Rimelands an unrelated game). |
+| Duskwick Staff | the guild's shadow staff appearance | KEEP. No game staff or item of that name found (only a community roleplay town). "Nightwick Staff" was considered and dropped: Nightwick Abbey is a published tabletop setting. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 

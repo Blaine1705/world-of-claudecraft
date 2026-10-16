@@ -487,7 +487,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Two referral reward mounts join Horizons.
     // Lantern Hall's three quartermaster titles join the titles page (+3).
     // Lantern Hall's quartermaster adds the guild's horse (Horizons mounts) and sword (skins).
-    expect(full).toEqual({ owned: 565, total: 565 });
+    // Its four elemental weapon appearances join the skins page (+4).
+    expect(full).toEqual({ owned: 569, total: 569 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -590,7 +591,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
-    ).toBe(752); // plus Lantern Hall's horse and sword, plus two referral reward mounts, plus Lantern Hall's three titles
+    ).toBe(756); // plus Lantern Hall's horse and sword, plus two referral reward mounts, plus Lantern Hall's three titles, plus its four elemental arms
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2941,8 +2942,16 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
   buried_hoard: HOARD_BASE_ITEM_IDS,
   referral_cards: ['reins_referral_raptor', 'reins_referral_tank'],
-  // src/sim/guild_quartermaster.ts grants the guild's reins and its account-wide blade
-  lantern_hall_quartermaster: ['reins_lantern_hall_destrier', 'lantern_hall_sword'],
+  // src/sim/guild_quartermaster.ts grants the guild's reins, its account-wide blade and its four
+  // account-wide elemental arms
+  lantern_hall_quartermaster: [
+    'reins_lantern_hall_destrier',
+    'lantern_hall_sword',
+    'hearthbrand_sword',
+    'squallcrest_sword',
+    'rimelight_staff',
+    'duskwick_staff',
+  ],
 };
 
 /**
@@ -4304,8 +4313,9 @@ describe('Reliquary source hint coverage', () => {
     expect(RELIQUARY_PROFESSION_MARKS.masterworkByCraft).toContain('masterwork:engineering');
     // And the skins page really is fully answered now, which is the half of the
     // executed ruling this row can no longer show.
-    // 29 store skins plus Lantern Hall's earned blade, each row naming its own door
-    expect(RELIQUARY_HORIZON_WEAPON_SKINS.length).toBe(30);
+    // 29 store skins plus Lantern Hall's earned blade and four elemental arms, each row naming
+    // its own door
+    expect(RELIQUARY_HORIZON_WEAPON_SKINS.length).toBe(34);
     // two doors now, so no page default: every row names its own
     expect(RELIQUARY_PAGES_BY_ID.horizons_weapon_skins.sourceDefault).toBeUndefined();
     const skins = RELIQUARY_PAGES_BY_ID.horizons_weapon_skins;
@@ -4317,9 +4327,17 @@ describe('Reliquary source hint coverage', () => {
     expect(row('cinderbrand_sword')).toEqual([
       { sourceKind: 'store', sourceId: RELIQUARY_STORE_SOURCE_ID },
     ]);
-    expect(row('lantern_hall_sword')).toEqual([
-      { sourceKind: 'activity', sourceId: 'lantern_hall_quartermaster' },
-    ]);
+    for (const id of [
+      'lantern_hall_sword',
+      'hearthbrand_sword',
+      'squallcrest_sword',
+      'rimelight_staff',
+      'duskwick_staff',
+    ]) {
+      expect(row(id), id).toEqual([
+        { sourceKind: 'activity', sourceId: 'lantern_hall_quartermaster' },
+      ]);
+    }
   });
 
   it('multi-source pages give every relic its OWN hint (no inherited stragglers)', () => {

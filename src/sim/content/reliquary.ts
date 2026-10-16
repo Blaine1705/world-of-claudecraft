@@ -400,6 +400,10 @@ export const RELIQUARY_HORIZON_WEAPON_SKINS = [
   'encore_bow',
   'meteorlatch_crossbow',
   'lantern_hall_sword',
+  'hearthbrand_sword',
+  'squallcrest_sword',
+  'rimelight_staff',
+  'duskwick_staff',
 ] as const;
 
 // The skins NOT sold by the store (WeaponSkinDef.earnedFrom), each naming where it is earned.
@@ -409,6 +413,10 @@ const WEAPON_SKIN_SOURCES: Readonly<
   Partial<Record<(typeof RELIQUARY_HORIZON_WEAPON_SKINS)[number], ReliquarySourceHints>>
 > = {
   lantern_hall_sword: fromActivity('lantern_hall_quartermaster'),
+  hearthbrand_sword: fromActivity('lantern_hall_quartermaster'),
+  squallcrest_sword: fromActivity('lantern_hall_quartermaster'),
+  rimelight_staff: fromActivity('lantern_hall_quartermaster'),
+  duskwick_staff: fromActivity('lantern_hall_quartermaster'),
 };
 
 function weaponSkinEntries(
@@ -1788,8 +1796,8 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // deed, or in-world vendor NPC, and the 'store' kind now names it. One
     // storefront awards every skin on the page, which is exactly the condition
     // a page default was for. Lantern Hall's earned blade gave the page a second door, so every
-    // row now names its own (weaponSkinEntries): the 29 store rows the store, the blade the
-    // guild's quartermaster.
+    // row now names its own (weaponSkinEntries): the store rows the store, the guild's blade and
+    // its four elemental arms the guild's quartermaster.
     relics: weaponSkins(...weaponSkinEntries(RELIQUARY_HORIZON_WEAPON_SKINS)),
   },
   {

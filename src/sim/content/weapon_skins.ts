@@ -320,7 +320,7 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     season: 1,
   },
 
-  // ── Lantern Hall (earned): the guild's own blade, bought for Lantern Seals ──
+  // ── Lantern Hall (earned): the guild's own arms, bought for Lantern Seals ──
   // Rare, so it carries the rare tier's banked-fire weapon glow (src/render/weapon_vfx.ts).
   lantern_hall_sword: {
     id: 'lantern_hall_sword',
@@ -328,6 +328,46 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     rarity: 'rare',
     weaponType: 'sword',
     model: 'lantern_hall_sword',
+    season: 1,
+    earnedFrom: 'lantern_hall',
+  },
+  // The guild's four elemental arms, sold beside the blade. Epic, so each carries the epic
+  // tier's stronger glow, rim and cast light under its own element's VFX row
+  // (src/render/weapon_vfx.ts): fire and a sea storm for sword users, frost and a dusk-flame
+  // for staff users. Built by scripts/assets/lantern_hall_arms/.
+  hearthbrand_sword: {
+    id: 'hearthbrand_sword',
+    collection: 'lantern_hall',
+    rarity: 'epic',
+    weaponType: 'sword',
+    model: 'hearthbrand',
+    season: 1,
+    earnedFrom: 'lantern_hall',
+  },
+  squallcrest_sword: {
+    id: 'squallcrest_sword',
+    collection: 'lantern_hall',
+    rarity: 'epic',
+    weaponType: 'sword',
+    model: 'squallcrest',
+    season: 1,
+    earnedFrom: 'lantern_hall',
+  },
+  rimelight_staff: {
+    id: 'rimelight_staff',
+    collection: 'lantern_hall',
+    rarity: 'epic',
+    weaponType: 'staff',
+    model: 'rimelight_staff',
+    season: 1,
+    earnedFrom: 'lantern_hall',
+  },
+  duskwick_staff: {
+    id: 'duskwick_staff',
+    collection: 'lantern_hall',
+    rarity: 'epic',
+    weaponType: 'staff',
+    model: 'duskwick_staff',
     season: 1,
     earnedFrom: 'lantern_hall',
   },

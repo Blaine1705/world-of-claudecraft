@@ -2236,6 +2236,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Широкий стальной клинок с долом, полным тлеющего огня фонаря, позолоченные щёчки, фонарь в клетке, горящий в гарде, рукоять из синей кожи.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Клинок Зала Фонаря',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Пламя Очага',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look': 'Пламевидный клинок из воронёной стали с раскалёнными кромками, расплавленный шов ветвится по обеим сторонам, гарда из бронзовых языков пламени вокруг горящего камня, рукоять цвета бычьей крови.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore': 'В Зале Фонаря есть очаг, который не гас с тех пор, как зал был построен, и Гаррик Холт клянётся, что этот клинок закаляли в его углях. Те, кто его носит, говорят, что рукоять остаётся тёплой в самый холодный дозор. Огонь вдоль кромок лишь украшение.',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': 'Гребень Шквала',
+  'hudChrome.wocStore.skins.squallcrest_sword.look': 'Длинный клинок цвета морской синевы с кромками, яркими, как разбивающаяся волна, грозовой дол с раздвоенной молнией, позолоченная волна над пятой клинка, плавник вдоль одной кромки и гарда из позолоченных бурунов вокруг грозовой жемчужины.',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore': 'Капитан, ходившая под парусом ради гильдии, привезла этот клинок из шквала, который сломал ей мачту и заставил корабль звенеть, как колокол. Гаррик продаёт его только за печати и предупреждает каждого покупателя, что перед бурей клинок гудит. Молния и морское сияние лишь украшение.',
+  'hudChrome.wocStore.skins.rimelight_staff.name': 'Посох Инейного Света',
+  'hudChrome.wocStore.skins.rimelight_staff.look': 'Светлое древко, окованное серебром и обвитое светящимся инеем, увенчано серебряной лапой, что держит большой кристалл холодного света в короне ледяных осколков; с воротника свисают сосульки.',
+  'hudChrome.wocStore.skins.rimelight_staff.lore': 'Зимний дозор Зала Фонаря ходил с такими посохами по горной дороге, зажигая их навершия для путников, заблудившихся в снегу. Гаррик держит один на стойке для тех, у кого есть лишние печати. Иней и его холодный свет лишь украшение.',
+  'hudChrome.wocStore.skins.duskwick_staff.name': 'Посох Сумеречного Фитиля',
+  'hudChrome.wocStore.skins.duskwick_staff.look': 'Две скрученные пряди чёрного дерева, окованные железом, увенчаны открытым железным фонарём, в котором между двумя загнутыми рогами горит фиолетовое сумеречное пламя; с его дна свисают цепи.',
+  'hudChrome.wocStore.skins.duskwick_staff.lore': 'Все фонари зала горят ярко, кроме одного. Сумеречное пламя зажгли, чтобы стеречь зал по ночам, и там, где другие дают свет, оно даёт тень; Гаррик сам подрезает его фитиль. Дым и фиолетовое сияние лишь украшение.',
   'hudChrome.wocStore.collections.lantern_hall': 'Зал Фонаря',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Боевой меч с клеймом гильдии',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
@@ -22088,8 +22100,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.open': 'Открыт',
   'hudChrome.guildHall.lifetime': 'Выполнено контрактов: {count}',
   'hudChrome.guildHall.emptyBoard': 'Доску переписывают. Возвращайтесь после еженедельного сброса.',
-  'hudChrome.guildHall.quartermasterIntro':
-    'Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний, облик меча гильдии и её боевого коня. Ничто здесь не сделает вас сильнее в бою.',
+  'hudChrome.guildHall.quartermasterIntro': 'Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний, облики оружия гильдии и её боевого коня. Ничто здесь не сделает вас сильнее в бою.',
   'hudChrome.guildHall.titleOffer': 'Звание: {title}',
   'hudChrome.guildHall.titlePreview': 'Отображается как {preview}',
   'hudChrome.guildHall.buy': 'Купить',
@@ -22105,6 +22116,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.skinPreview':
     'Меняет облик надетого меча у всех персонажей вашей учётной записи. Только внешний вид, без характеристик.',
   'hudChrome.guildHall.skinOffer': 'Облик меча: {skin}',
+  'hudChrome.guildHall.staffSkinOffer': 'Облик посоха: {skin}',
+  'hudChrome.guildHall.staffSkinPreview': 'Меняет облик надетого посоха у всех персонажей вашей учётной записи. Только внешний вид, без характеристик.',
   'hudChrome.guildHall.mountPreview':
     'Наземный скакун: +{pct}% к скорости передвижения верхом. Требуется навык верховой езды.',
   'hudChrome.guildHall.mountOffer': 'Скакун: {mount}',

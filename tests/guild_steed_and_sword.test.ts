@@ -67,7 +67,10 @@ describe('the catalog records', () => {
   it('stocks the horse at 40 seals and the sword at 20, both after the titles', () => {
     expect(LANTERN_HALL_DESTRIER_SEALS).toBe(40);
     expect(LANTERN_HALL_SWORD_SEALS).toBe(20);
-    expect(GUILD_QUARTERMASTER_STOCK.map((o) => o.id).slice(-2)).toEqual([SWORD, HORSE]);
+    // the sword leads the weapon rows, the four elemental arms follow it, the horse closes
+    const ids = GUILD_QUARTERMASTER_STOCK.map((o) => o.id);
+    expect(ids.slice(3, 4)).toEqual([SWORD]);
+    expect(ids.at(-1)).toBe(HORSE);
     expect(GUILD_QUARTERMASTER_STOCK_BY_ID[HORSE]).toEqual({
       id: HORSE,
       kind: 'mount',
@@ -117,7 +120,8 @@ describe('the catalog records', () => {
       earnedFrom: 'lantern_hall',
     });
     expect(STORE_WEAPON_SKIN_LIST.some((s) => s.id === LANTERN_HALL_SWORD_SKIN_ID)).toBe(false);
-    expect(STORE_WEAPON_SKIN_LIST.length).toBe(Object.keys(WEAPON_SKINS).length - 1);
+    // the blade and the guild's four elemental arms are the five earned skins
+    expect(STORE_WEAPON_SKIN_LIST.length).toBe(Object.keys(WEAPON_SKINS).length - 5);
   });
 });
 

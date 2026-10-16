@@ -30,10 +30,15 @@ const ROOT = join(__dirname, '..');
 describe('season 1 weapon skin catalog', () => {
   it('ships exactly the 29 paid skins: 7 per collection plus the Fallen Star encore', () => {
     expect(STORE_WEAPON_SKIN_LIST.length).toBe(29);
-    // plus the one earned skin, Lantern Hall's blade, outside the store's collections
-    expect(WEAPON_SKIN_LIST.length).toBe(30);
+    // plus the five earned skins, Lantern Hall's blade and its four elemental arms, outside the
+    // store's collections
+    expect(WEAPON_SKIN_LIST.length).toBe(34);
     expect(WEAPON_SKIN_LIST.filter((s) => s.earnedFrom).map((s) => s.id)).toEqual([
       'lantern_hall_sword',
+      'hearthbrand_sword',
+      'squallcrest_sword',
+      'rimelight_staff',
+      'duskwick_staff',
     ]);
     expect(WEAPON_SKIN_COLLECTIONS).not.toContain('lantern_hall');
     for (const collection of WEAPON_SKIN_COLLECTIONS) {

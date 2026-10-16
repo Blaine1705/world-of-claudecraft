@@ -137,6 +137,39 @@ describe('the guild window view core', () => {
     expect(row(rich, 'title_writ_runner').icon).toBeNull();
   });
 
+  it('names the weapon each elemental appearance dresses: two swords, two staves', () => {
+    const view = buildGuildHallView(world(20, [], [], [], ['rimelight_staff']), 0, 'quartermaster');
+    const row = (id: string) => {
+      const found = view.offers.find((o) => o.id === id);
+      if (!found) throw new Error(`no row ${id}`);
+      return found;
+    };
+    expect(row('weapon_skin_hearthbrand_sword')).toMatchObject({
+      kind: 'weaponSkin',
+      icon: '/ui/store/armory/hearthbrand_sword.webp',
+      title: 'Sword appearance: Hearthbrand',
+      price: '20 Lantern Seals',
+      affordable: true,
+      owned: false,
+    });
+    expect(row('weapon_skin_squallcrest_sword').title).toBe('Sword appearance: Squallcrest');
+    expect(row('weapon_skin_squallcrest_sword').preview).toMatch(/equipped sword/);
+    expect(row('weapon_skin_rimelight_staff')).toMatchObject({
+      icon: '/ui/store/armory/rimelight_staff.webp',
+      title: 'Staff appearance: Rimelight Staff',
+      owned: true,
+      action: 'Owned',
+    });
+    expect(row('weapon_skin_duskwick_staff')).toMatchObject({
+      title: 'Staff appearance: Duskwick Staff',
+      owned: false,
+      action: 'Buy',
+    });
+    // a staff look says staff, never sword, and stays a look
+    expect(row('weapon_skin_duskwick_staff').preview).toMatch(/equipped staff/);
+    expect(row('weapon_skin_duskwick_staff').preview).toMatch(/Appearance only: no stats\.$/);
+  });
+
   it('counts seals across stacks and reads the reset in days and hours', () => {
     expect(
       lanternSeals([
@@ -175,8 +208,8 @@ describe('the guild window painter', () => {
     const { root, win } = mount(w);
     win.open('quartermaster');
     expect(win.isOpen).toBe(true);
-    // the horse and the sword draw their art; a title draws none
-    expect(root.querySelectorAll('.gh-offer-icon').length).toBe(2);
+    // the horse and the five weapon appearances draw their art; a title draws none
+    expect(root.querySelectorAll('.gh-offer-icon').length).toBe(6);
     expect(
       root.querySelector('[data-gh-offer="mount_lantern_hall_destrier"] .gh-offer-icon'),
     ).not.toBeNull();

@@ -194,12 +194,17 @@ function offerText(
     }
     case 'weaponSkin': {
       const skin = WEAPON_SKINS[offer.skinId];
+      const staffSkin = skin?.weaponType === 'staff';
       return {
         icon: armorySkinArt(offer.skinId),
-        title: t('hudChrome.guildHall.skinOffer', {
-          skin: skin ? localizeWeaponSkin(skin).name : '',
-        }),
-        preview: t('hudChrome.guildHall.skinPreview'),
+        // the row names the weapon the look dresses: a staff look for staff users
+        title: t(
+          staffSkin ? 'hudChrome.guildHall.staffSkinOffer' : 'hudChrome.guildHall.skinOffer',
+          { skin: skin ? localizeWeaponSkin(skin).name : '' },
+        ),
+        preview: t(
+          staffSkin ? 'hudChrome.guildHall.staffSkinPreview' : 'hudChrome.guildHall.skinPreview',
+        ),
       };
     }
   }

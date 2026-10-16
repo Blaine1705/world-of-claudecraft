@@ -562,11 +562,11 @@ describe('weapon skin held models', () => {
     expect(offhandModelUrl(null, 'frostbite_dagger')).toBeNull();
   });
 
-  it("ships 30 distinct skin model urls (the store's 29 and Lantern Hall's blade), all in the boot preload manifest", () => {
+  it("ships 34 distinct skin model urls (the store's 29, Lantern Hall's blade and its four elemental arms), all in the boot preload manifest", () => {
     const urls = weaponSkinModelUrls();
     expect(urls.length).toBe(WEAPON_SKIN_LIST.length);
-    expect(urls.length).toBe(30);
-    expect(new Set(urls).size).toBe(30);
+    expect(urls.length).toBe(34);
+    expect(new Set(urls).size).toBe(34);
     const manifest = new Set(manifestUrls());
     for (const url of urls) {
       expect(url.startsWith('models/weapons/'), url).toBe(true);
