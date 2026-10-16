@@ -213,6 +213,8 @@ function requiredClipNames(clips: ClipMap): string[] {
     // snap-in entries name clips too: a typo would bring the crossfaded,
     // looping rise back (a figure popping in upright, then dropping)
     ...(clips.castSnapIn ?? []),
+    // the chair clips (seat_clips.ts): every name must bind on the sitting rig
+    ...(clips.seat ? Object.values(clips.seat) : []),
   ].filter((name): name is string => !!name);
 }
 
@@ -334,6 +336,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'stowPlaysWhole',
   'dualWieldPair',
   'contacts',
+  'seat',
 ]);
 
 /**

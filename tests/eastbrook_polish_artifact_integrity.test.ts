@@ -1418,7 +1418,11 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
   // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
   // the town runtime leaf moved. No capture was retaken.
-  '6a2e9a2473ef4e3201bbe7e99dbebb2439f228341928cbe343695ff92d296b92';
+  // Re-minted for merging #4258 (the Mirefen tavern) over #4516 (grand Highwatch):
+  // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
+  // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
+  // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
+  '40513e6c48fc7d01cfc146a9bdfd5736baf1cd0afd935e6146b894317eae9310';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1458,7 +1462,11 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
   // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
   // the town runtime leaf moved. No capture was retaken.
-  '4dddd373786bea5ec02e6d7c5de42ff4eb8c0872f82a8dd564b00a2cdc581ab8';
+  // Re-minted for merging #4258 (the Mirefen tavern) over #4516 (grand Highwatch):
+  // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
+  // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
+  // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
+  '0b41d509e319b55d9626a4730bb1d57a7db02bbcb430509750bad08b81c949f9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2855,7 +2863,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // recomputed LAST again over the re-swept evidence. No capture was retaken.
       // The walk-in Eastbrook buildings: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('7e3ced6dd43cfbd1550e84fbbe62cb9c0d103ac24b1ee1d4498c6fa2cbadbccf');
+      // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
+      // over the re-swept evidence, then again for the towns preview. No capture was retaken.
+    ).toBe('20ba24191fe4c7168cd66ccb95ab9636cb05664aebd8635647cc854e3bc947ce');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

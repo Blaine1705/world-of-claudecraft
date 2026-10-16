@@ -6,7 +6,10 @@
 // buildings stay solid while the player and the camera are both inside, the
 // rule fenbridge_town_visibility_core.ts owns), and its FIRST reveal rides the
 // town's reveal key piecewise, nearest first (town_reveal_core.ts), exactly as
-// the Fenbridge view's buildings do. The town view of Fenbridge or Eastbrook
+// the Fenbridge view's buildings do. Each walk-in building registers its air
+// with the indoor camera (placed_town_interiors.ts, the air in
+// placed_town_interior_core.ts), so the camera keeps to its rooms while the
+// player is inside. The town view of Fenbridge or Eastbrook
 // owns the same building loop beside its own batches; this module is that
 // loop on its own.
 import * as THREE from 'three';
@@ -35,6 +38,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
@@ -119,10 +123,14 @@ const TOWN_CULL_MARGIN_YD = 12;
  * holds every building's own cull circle whole. A building standing past it
  * would be hidden by the town's fog answer, or revealed without the imminent
  * priority, while its own cull still wants it drawn (Highwatch's smithy stands
- * on a terrace about 44 yards out).
+ * on a terrace about 44 yards out). A town keeping its own margin past the
+ * hub ring passes it (Fenbridge's six yards, render/fenbridge_town.ts).
  */
-export function placedTownCullRadius(spec: Pick<PlacedTownSpec, 'hub' | 'buildings'>): number {
-  let radius = spec.hub.radius + TOWN_CULL_MARGIN_YD;
+export function placedTownCullRadius(
+  spec: Pick<PlacedTownSpec, 'hub' | 'buildings'>,
+  margin = TOWN_CULL_MARGIN_YD,
+): number {
+  let radius = spec.hub.radius + margin;
   for (const building of spec.buildings) {
     const out =
       Math.hypot(building.position.x - spec.hub.center.x, building.position.z - spec.hub.center.z) +
@@ -168,6 +176,8 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
    *  the file follows the texture tier (same geometry). */
   const loadedSourceFiles = new Map<string, string>();
   const sourceLoadTasks = new Map<string, Promise<void>>();
+  /** The camera interiors the live view registered (dropped when the next view builds). */
+  const interiors = createPlacedTownInteriors();
 
   function prepareSource(url: string, tier: PlacedTextureTier = GFX.placedTextureTier) {
     const file = placedTextureTierPath(url, tier, mediaAssetExists);
@@ -241,6 +251,8 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
     group.userData.assetUrls = builtInWorld ? urls : [];
     group.userData.buildingIds = [];
     group.userData.buildingFadeTargetCount = 0;
+    // the previous view's rooms go with it: a world without the town keeps no air
+    interiors.clear();
     if (!builtInWorld) return emptyView(group);
 
     const hideTargets: BuildingHideTarget[] = [];
@@ -253,6 +265,10 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
       if (!source) throw new Error(`${spec.town} town building is missing: ${building.assetId}`);
       const built = buildPlacedTownBuilding(spec.town, building, source, groundAt);
       built.group.userData.placementId = building.id;
+      // its rooms go to the indoor camera (placed_town_interiors.ts), and its doors to the
+      // fade: a player stepping in sees in through one (fenbridge_town_visibility_core.ts)
+      const interior = interiors.add(building, groundAt);
+      const doorways = interior?.openings.map((opening) => interior.boxes[opening.box]);
       group.add(built.group);
       hideTargets.push({
         group: built.group,
@@ -268,6 +284,8 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
         topY: built.topY,
         cullRadius: built.cullRadius,
         walkIn: building.walkIn,
+        doorways,
+        doorwayFrame: interior?.frame,
       });
       roots.push(built.group);
     }

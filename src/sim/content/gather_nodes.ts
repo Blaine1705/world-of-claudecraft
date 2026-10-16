@@ -458,11 +458,14 @@ const GATHER_NODE_ROWS: GatherNodeDef[] = [
     tier: 1,
   },
 
+  // Moved off the ground the grand Highwatch inn's south end took (its reach in
+  // sim/highwatch_layout.ts), past its turret into the lane between the inn and
+  // the watch house; tests/highwatch_layout_suite.test.ts keeps it clear.
   {
     id: 'herb_thornpeak_1',
     zoneId: 'thornpeak_heights',
     type: 'herb',
-    pos: { x: 18, z: 648 },
+    pos: { x: 30, z: 645.5 },
     level: 17,
     tier: 1,
   },

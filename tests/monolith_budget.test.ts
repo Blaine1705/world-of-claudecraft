@@ -543,6 +543,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 18054 minus that removal. Exact merged count (wc -l), zero slack.
+    // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
+    // wc -l on the merged tree. Exact count.
     ceiling: 18043,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
@@ -1031,7 +1034,14 @@ const MONOLITHS: MonolithRow[] = [
     // Highwatch, placed_town_buildings.ts): Eastbrook's and Fenbridge's mount,
     // reveal-gate and two per-frame update blocks folded into loops over
     // townViews, which paid for the third town and 31 lines more. wc -l.
-    ceiling: 12395,
+    // LOWERED 12395 -> 12392 when the chase camera's floor (ground, rift tier, maze
+    // hedges) moved into chase_camera_floor_core.ts, net of the indoor camera clamp's
+    // wiring (interior_camera.ts). wc -l. Exact count.
+    // LOWERED 12688 -> 12686 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
+    // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
+    // merged tree. Exact count.
+    ceiling: 12392,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1268,6 +1278,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 11594 by the Studio movable gameplay objects change: the
     // dev-only healer practice dummy spawn moved to hub_practice.ts, paying for
     // the moved-objects ctx view and farm-bed resolver. Exact count, zero slack.
+    // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
+    // (bound straight into the context and the motion deps), paying for the sitOnSeat and
+    // resting delegates. Exact count.
     ceiling: 11594,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
@@ -1789,6 +1802,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 9758 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 9764 minus that removal. Exact merged count (wc -l), zero slack.
+    // LOWERED 9840 -> 9835 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's tick_perf_log.ts mobZonePhase extraction pays for the tavern's wiring. wc -l
+    // on the merged tree. Exact count.
     ceiling: 9758,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
@@ -1985,6 +2001,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 5338 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 5341 minus that removal. Exact merged count (wc -l), zero slack.
+    // LOWERED 5356 -> 5355 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's input_signature.ts extraction pays for the tavern's wiring. wc -l on the
+    // merged tree. Exact count.
     ceiling: 5338,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },

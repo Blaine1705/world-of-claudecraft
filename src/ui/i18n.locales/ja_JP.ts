@@ -1945,6 +1945,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.npcRole.armorVendor': '防具商人',
   'hudChrome.nameplate.npcRole.armsDealer': '武具商人',
   'hudChrome.nameplate.npcRole.foodVendor': '飲食物商人',
+  'hudChrome.nameplate.npcRole.innkeeper': '宿屋の主人',
   'hudChrome.nameplate.npcRole.potionVendor': 'ポーション商人',
   'hudChrome.nameplate.npcRole.stableMaster': '厩舎長',
   'hudChrome.nameplate.npcRole.generalGoods': '雑貨商人',
@@ -6403,6 +6404,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':
     '安らかに、魂よ。亡骸に戻すことはできるが、戻る道のりで弱ってしまうだろう。',
+  'entities.npcs.steward_ansel_hale.greeting':
+    '館へようこそ、{className}。炉辺で温まっていくといい。絨毯に気をつけて、上座の卓には触れぬように。広場の者が家路を見失わぬよう、灯籠は夜通し灯している。',
+  'entities.npcs.steward_ansel_hale.name': 'アンセル・ヘイル',
+  'entities.npcs.steward_ansel_hale.title': '館の家令',
   'entities.npcs.the_merchant.name': '商人',
   'entities.npcs.the_merchant.title': '世界市場の守り手',
   'entities.npcs.the_merchant.greeting':
@@ -8434,6 +8439,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': '標的',
   'hudChrome.mobile.toggleHaptics': '振動を切り替え',
   'hudChrome.rest.resting': '休息中',
+  'hudChrome.rest.restArea': '休息中：ここは休息所で、休息経験値がたまります。',
   'hudChrome.swing.ready': '攻撃',
   'hudChrome.swing.seconds': '{seconds}秒',
   'hudChrome.widgets.clockTitle': '現地時刻 - クリックで12/24時間表記を切り替え',
@@ -14386,6 +14392,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '波止場から中へどうぞ、手を温めていきなさい。うちの桟橋の船は長い東の海岸を北へ上ってウィックハーバーへ向かい、また戻ってきます。はるか西では、もう一隻の渡し船がイーストブルックとナイトブルームの間を行き来しています。壁の地図に二つの航路が描いてありますよ。ワームウォッチへ登る前に、火のそばでひと休みしていきなさい。',
   'entities.npcs.harbormaster_tamsin.name': '港務長タムシン',
   'entities.npcs.harbormaster_tamsin.title': 'ワームウォッチ波止場の番人',
+  'entities.npcs.innkeeper_maudie.greeting':
+    '湿気から逃れて中へどうぞ、旅の方。火のそばへ下りる段差に気をつけてね。やかんは火にかけてあるし、長椅子は温かいし、二階の部屋も乾いていますよ。フェンブリッジから来た旅人たちは、湿地の道は昼間なら静かだと口をそろえるけれど、日が暮れてから歩く人はいません。少し座って、足を休めていきなさい。',
+  'entities.npcs.innkeeper_maudie.name': 'モーディ・タップライト',
+  'entities.npcs.innkeeper_maudie.title': '宿屋の女将',
+  'entities.npcs.patron_amos_eelby.greeting':
+    '長椅子に座りな、{className}。このグリセルはフェンブリッジの下の大ウナギなんぞ作り話だと言い張るがな、わしは二度もあいつに手をかけたんだ。二度だぞ！徴税人みたいにぬるぬるで、この長椅子くらいの長さはあったわい。',
+  'entities.npcs.patron_amos_eelby.name': 'エイモス・イールビー',
+  'entities.npcs.patron_amos_eelby.title': 'ウナギ漁師',
+  'entities.npcs.patron_grissel_sedgeworth.greeting':
+    'エイモスの話は気にしなくていいよ。四十年泥炭を掘ってきたけど、この沼からは、あの人が釣ったウナギより妙な物をたくさん掘り出してきたさ。長靴に骨に、中の頭がまだ心配そうな兜までね。温まっていきな、火はただだよ。',
+  'entities.npcs.patron_grissel_sedgeworth.name': 'グリセル・セッジワース',
+  'entities.npcs.patron_grissel_sedgeworth.title': '泥炭掘り',
+  'entities.npcs.patron_ned_oxley.greeting':
+    '土手道で牛を四十頭追ってきたが、フェンブリッジの手前で二頭を泥沼に取られた。この道で男を裏切らないのはモーディのエールだけさ。自分の分は自分で払えよ。',
+  'entities.npcs.patron_ned_oxley.name': 'ネッド・オクスリー',
+  'entities.npcs.patron_ned_oxley.title': '牛追い',
+  'entities.npcs.patron_hester_quillby.greeting':
+    'この湿地の地図は、買ったものがどれも一季節もたずに間違いになったわ。水が道を動かして、道が水を動かすの。だから自分で描いて、インクが乾くまで、ここの乾いた席に座っているのよ。',
+  'entities.npcs.patron_hester_quillby.name': 'ヘスター・クウィルビー',
+  'entities.npcs.patron_hester_quillby.title': '地図職人',
   'entities.npcs.head_gardener_amaranth.name': '庭園長アマランス',
   'entities.npcs.head_gardener_amaranth.title': 'エバーガーデンの庭園長',
   'entities.npcs.head_gardener_amaranth.greeting':

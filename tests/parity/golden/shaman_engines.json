@@ -11,8 +11,8 @@
     "Spiritmend Tidecall deposit and Cascading Mend consumption",
     "Shaman spec state in deterministic headless snapshots"
   ],
-  "draws": 2558,
-  "drawDigest": "050a9f40",
+  "draws": 2562,
+  "drawDigest": "dd4f7e30",
   "frames": [
     {
       "tick": 0,
@@ -2656,8 +2656,8 @@
       "state": "2b378763",
       "events": "aef5c0ab",
       "rng": {
-        "draws": 2010,
-        "digest": "2524f6e4"
+        "draws": 2011,
+        "digest": "4d9a5bf6"
       }
     },
     {
@@ -2667,41 +2667,41 @@
       "state": "57c2ff8a",
       "events": "a1d3d845",
       "rng": {
-        "draws": 2150,
-        "digest": "24aba1b4"
+        "draws": 2146,
+        "digest": "def184db"
       }
     },
     {
       "tick": 280,
       "time": 14,
       "nextId": 1016,
-      "state": "0a657124",
-      "events": "a15682d3",
+      "state": "75f9937d",
+      "events": "1dac7a16",
       "rng": {
-        "draws": 2328,
-        "digest": "5ff2b7d4"
+        "draws": 2320,
+        "digest": "e10eabf4"
       }
     },
     {
       "tick": 300,
       "time": 15,
       "nextId": 1016,
-      "state": "4cd36034",
+      "state": "c791be01",
       "events": "333b7cc5",
       "rng": {
-        "draws": 2507,
-        "digest": "a5c6fb23"
+        "draws": 2508,
+        "digest": "67bd6c75"
       }
     },
     {
       "tick": 306,
       "time": 15.3,
       "nextId": 1016,
-      "state": "218c4bb9",
+      "state": "81abd94c",
       "events": "741638a5",
       "rng": {
-        "draws": 2558,
-        "digest": "050a9f40"
+        "draws": 2562,
+        "digest": "dd4f7e30"
       },
       "label": "spiritmend-consume",
       "players": [
@@ -3474,7 +3474,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 114.3,
           "healPower": 5,
-          "hp": 732,
+          "hp": 733,
           "id": 1014,
           "kind": "player",
           "level": 20,
@@ -3573,11 +3573,11 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 1016,
-      "state": "218c4bb9",
+      "state": "81abd94c",
       "events": "741638a5",
       "rng": {
-        "draws": 2558,
-        "digest": "050a9f40"
+        "draws": 2562,
+        "digest": "dd4f7e30"
       },
       "label": "final",
       "players": [
@@ -4350,7 +4350,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 114.3,
           "healPower": 5,
-          "hp": 732,
+          "hp": 733,
           "id": 1014,
           "kind": "player",
           "level": 20,

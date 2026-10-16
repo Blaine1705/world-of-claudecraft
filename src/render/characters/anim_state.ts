@@ -1,4 +1,5 @@
 import type { LocoState, LocoStrafe } from '../locomotion';
+import type { SeatAnimInfo } from '../seated_pose_core';
 import type { AuraIdFact } from './aura_idle_core';
 import type { StunAuraFact } from './stun_idle_core';
 
@@ -58,6 +59,9 @@ export interface AnimState {
    *  body down (player_motion.wadeSpeedMult). */
   wading: boolean;
   sitting: boolean;
+  /** Sitting on a seat (render/seated_pose.ts): the seat's clip family, its idle and
+   *  whether the body is getting up. Absent or null: a plain floor sit. */
+  seat?: SeatAnimInfo | null;
   /** Concealed by an existing stealth aura. Only rigs with prowl clips use it. */
   stealthed?: boolean;
   /** A flying rig that is currently ON THE GROUND (the dragon world boss's
@@ -150,6 +154,8 @@ export type BaseState =
   | 'swimIdle'
   | 'wade'
   | 'sit'
+  /** Getting up out of a seat: the seat's stand-up clip, held on its last frame. */
+  | 'sitUp'
   | 'jump'
   | 'fall';
 
@@ -625,7 +631,7 @@ export function desiredBaseState(
   if (s.airborne) return s.falling ? 'fall' : 'jump';
   if (s.spinning) return 'spin';
   if (s.casting) return 'cast';
-  if (s.sitting) return 'sit';
+  if (s.sitting) return s.seat?.rising ? 'sitUp' : 'sit';
   if (s.moving) {
     // Shallow water is still walking, just against resistance: one cycle covers
     // both gaits, because nobody sprints through knee-deep water.

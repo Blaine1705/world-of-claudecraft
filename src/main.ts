@@ -208,6 +208,7 @@ import { mountPlaytestDevPanel } from './game/playtest_dev_panel';
 import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { startRealmBuilderRollLoad } from './game/realm_builder_boot';
+import { wireSeatInteraction } from './game/seat_interact_wiring';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -3406,6 +3407,16 @@ async function startGame(
     setReticle: (reticle) => renderer.setGroundAimReticle(reticle),
   });
 
+  const seatInteraction = wireSeatInteraction({
+    world,
+    camera: renderer.camera,
+    canvas,
+    input,
+    showError: (text) => hud.showError(text),
+    resolveTarget: resolvedClickMoveTarget,
+    pathTo: clickMovePathTo,
+  });
+
   function handlePick(x: number, y: number, button: number): void {
     if (hud.isGroundAimActive()) {
       if (button === 2) {
@@ -3425,6 +3436,7 @@ async function startGame(
     // ground-click/click-to-move fallback. A click that lands on a node
     // harvests it; it does not also walk you there or deselect your target.
     let id = renderer.picking.pickDirect(x, y);
+    if (id === null && seatInteraction.click(x, y)) return; // sit on a seat (seat_interact.ts)
     const directEntity = id !== null ? world.entities.get(id) : undefined;
     const deferDirectCorpseToNode = shouldDeferPickedCorpseToGatherNode(
       directEntity,
@@ -3937,6 +3949,7 @@ async function startGame(
     const flight = glider.resolveGliderMove(world, input);
     if (flight) return flight;
     attackMoveTick();
+    seatInteraction.tick();
     const mi = input.readMoveInput();
     let facing: number | null = mouselook ? input.camYaw : null;
     // A teleport (door, portal, spirit release) invalidates any pending
@@ -3953,7 +3966,8 @@ async function startGame(
         mouselook,
         movementSuspended: input.suspendMovement,
         playerDead: movementFrozen(),
-        enabled: settings.get('clickToMove') > 0 || settings.get('attackMove'),
+        enabled:
+          settings.get('clickToMove') > 0 || settings.get('attackMove') || input.clickMoveForced,
       });
       if (action === 'cancel') {
         input.clearClickMove();
@@ -4063,6 +4077,7 @@ async function startGame(
   const hoverPickGate = new HoverPickGate();
   let hoverPickedId: number | null = null;
   let hoverOnMover = false;
+  let hoverSeat = false;
   const hoverPartyMemberIds = new Set<number>();
   const hoverPvpOpponentIds = new Set<number>();
 
@@ -4078,18 +4093,21 @@ async function startGame(
       hoverOnMover =
         hoverPickedId === null &&
         pickPlacedMoverAt(renderer.picking, input.hoverX, input.hoverY) !== null;
+      hoverSeat = hoverPickedId === null && seatInteraction.hover(input.hoverX, input.hoverY);
     }
     const entity = hoverPickedId !== null ? world.entities.get(hoverPickedId) : undefined;
     const pvpOpponents = activePvpOpponentIds(world, hoverPvpOpponentIds);
     input.setHoverCursor(
       hoverOnMover
         ? 'friendly'
-        : hoverCursorKind(
-            entity,
-            world.playerId,
-            partyMemberIds(hoverPartyMemberIds),
-            pvpOpponents,
-          ),
+        : !entity && hoverSeat
+          ? 'seat'
+          : hoverCursorKind(
+              entity,
+              world.playerId,
+              partyMemberIds(hoverPartyMemberIds),
+              pvpOpponents,
+            ),
     );
     // WoW-style mouseover tooltip (name / level / creature type) for a mob under
     // the cursor, reusing the same (gated) pick this function already does for
@@ -4167,6 +4185,7 @@ async function startGame(
 
   function renderFacingOverride(): number | null {
     if (glider.gliderControlsActive(world)) return glider.gliderCameraFacing(input);
+    if (world.player.sitting) return null; // a seated body keeps its seat's facing
     // A ghost (dead && ghost) is not movement-frozen and keeps camera-driven
     // facing; only a corpse-bound dead player loses it, so pass movementFrozen().
     return isCameraDrivenFacingActive(

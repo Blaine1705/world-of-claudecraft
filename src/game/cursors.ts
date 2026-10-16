@@ -1,6 +1,6 @@
 // Game cursor PNGs live in public/ui/cursors/ (served from ./ui/cursors/ at runtime).
 
-export type HoverCursorKind = 'default' | 'attack' | 'friendly';
+export type HoverCursorKind = 'default' | 'attack' | 'friendly' | 'seat';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -20,6 +20,9 @@ export const CURSOR_ATTACK = pngCursor('gauntlet.png', 6, 4, 'pointer');
 /** Players, party members and friendly NPCs — also the gauntlet finger. */
 export const CURSOR_FRIENDLY = pngCursor('gauntlet.png', 6, 4, 'pointer');
 
+/** A seat under the pointer (a click sits you there): the ornate chair. */
+export const CURSOR_SEAT = pngCursor('seat-chair.png', 4, 3, 'pointer');
+
 export function cursorForHover(kind: HoverCursorKind, draggingCamera: boolean): string {
   if (draggingCamera) return CURSOR_GRAB;
   switch (kind) {
@@ -27,6 +30,8 @@ export function cursorForHover(kind: HoverCursorKind, draggingCamera: boolean): 
       return CURSOR_ATTACK;
     case 'friendly':
       return CURSOR_FRIENDLY;
+    case 'seat':
+      return CURSOR_SEAT;
     default:
       return CURSOR_HAND;
   }

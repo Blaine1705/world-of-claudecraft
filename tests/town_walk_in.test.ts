@@ -64,6 +64,7 @@ describe('the walk-in town placement', () => {
       'highwatch_gate_chapel',
       'highwatch_counting_house',
       'highwatch_smithy',
+      'highwatch_manor',
     ]);
   });
 

@@ -1,13 +1,23 @@
 import { isEastbrookGrandArmoury } from '../sim/building_layout';
-import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
+import {
+  TAVERN_HALL,
+  TAVERN_PORCH,
+  TAVERN_STEPS_MAX_RUN,
+  TAVERN_TOWER,
+  TAVERN_WING,
+  tavernToWorld,
+} from '../sim/content/mirefen_tavern';
+import { activeDungeonDoorPos, DUNGEONS, getActiveWorldContent } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
+import { tavernGroundsRects } from '../sim/mirefen_tavern_grounds';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 import {
   onWildheartBasinEntranceCauseway,
   WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
 } from '../sim/wildheart_basin_entrance';
+import { onHighwatchManorLane } from './highwatch_manor_lane_core';
 
 /** The foliage placement hash: a deterministic [0, 1) value per (a, b, salt k).
  *  Shared by foliage.ts and the dressing-spot generator (foliage_dressing_spots.ts). */
@@ -51,10 +61,53 @@ export function insideGrassHubExclusion(
  *  reads as paving at every distance. */
 export function insidePavedGrassExclusion(x: number, z: number): boolean {
   const dungeon = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID];
-  return (
+  if (
     dungeon !== undefined &&
     onWildheartBasinEntranceCauseway(activeDungeonDoorPos(dungeon), x, z, 0.3)
-  );
+  ) {
+    return true;
+  }
+  return insideHighwatchManorGround(x, z);
+}
+
+// The Highwatch manor (sim/highwatch_layout.ts) is a walk-in house whose model brings its
+// own ground: flagged floors a hand over the pad, the porch, the garden's lawn, path and
+// beds. The meadow must not grow through any of it, so its whole reach is paving. Asked
+// only while the active world stands the manor where the layout does (its built-in record,
+// or a Studio placement of its model at the same anchor), cached per world.
+const MANOR = HIGHWATCH_LAYOUT.buildings.find((building) => building.id === 'highwatch_manor');
+const manorStands = new WeakMap<object, boolean>();
+
+function activeWorldStandsManor(): boolean {
+  if (!MANOR) return false;
+  const content = getActiveWorldContent();
+  const cached = manorStands.get(content);
+  if (cached !== undefined) return cached;
+  const stands =
+    (content.props?.buildings ?? []).some((building) => building.id === MANOR.id) ||
+    (content.placements ?? []).some(
+      (placement) =>
+        placement.path === MANOR.assetId &&
+        Math.abs(placement.x - MANOR.placement.x) < 1e-6 &&
+        Math.abs(placement.z - MANOR.placement.z) < 1e-6,
+    );
+  manorStands.set(content, stands);
+  return stands;
+}
+
+/** True inside the Highwatch manor's reach, or on its lane's paving from the road to the
+ *  gate (highwatch_manor_lane_core.ts), while the active world stands it. */
+export function insideHighwatchManorGround(x: number, z: number): boolean {
+  if (!MANOR) return false;
+  const reach = MANOR.reach;
+  if (
+    (Math.abs(x - reach.center.x) > reach.halfWidth ||
+      Math.abs(z - reach.center.z) > reach.halfDepth) &&
+    !onHighwatchManorLane(x, z)
+  ) {
+    return false;
+  }
+  return activeWorldStandsManor();
 }
 
 /** Hub and camp clearings for bushes/ferns, sourced from the active world only. */
@@ -265,6 +318,7 @@ export function eastbrookGrassExclusions(
       });
     }
   }
+  if (builtInWorld) exclusions.push(...mirefenTavernGrassExclusions());
 
   for (const board of noticeboards) {
     exclusions.push({
@@ -285,6 +339,46 @@ export function eastbrookGrassExclusions(
     });
   }
   return exclusions;
+}
+
+/** The Mirefen tavern's floor keeps its grass out (sim/content/mirefen_tavern.ts): the hall,
+ *  the wing, the round tower, the porch and the run of its steps, and its grounds
+ *  (sim/mirefen_tavern_grounds.ts: the cobbled forecourt, the stable's floor and the pieces on
+ *  the terrain). The tavern's local axes run along the world's (its door faces +x), so each
+ *  rectangle is a plain one. */
+export function mirefenTavernGrassExclusions(): EastbrookGrassExclusion[] {
+  const rect = (id: string, x0: number, x1: number, z0: number, z1: number) => {
+    const a = tavernToWorld(x0, z0);
+    const b = tavernToWorld(x1, z1);
+    return {
+      kind: 'obb' as const,
+      id,
+      x: (a.x + b.x) / 2,
+      z: (a.z + b.z) / 2,
+      halfWidth: Math.abs(b.x - a.x) / 2,
+      halfDepth: Math.abs(b.z - a.z) / 2,
+      rotation: 0,
+    };
+  };
+  const tower = tavernToWorld(TAVERN_TOWER.x, TAVERN_TOWER.z);
+  const H = TAVERN_HALL;
+  const W = TAVERN_WING;
+  const P = TAVERN_PORCH;
+  return [
+    rect('mirefen_tavern:hall', H.x0, H.x1, H.z0, H.z1),
+    rect('mirefen_tavern:wing', W.x0, W.x1, W.z0, W.z1),
+    {
+      kind: 'circle',
+      id: 'mirefen_tavern:tower',
+      x: tower.x,
+      z: tower.z,
+      radius: TAVERN_TOWER.rOut,
+    },
+    rect('mirefen_tavern:porch', P.x0, P.x1, P.z0, P.z1 + TAVERN_STEPS_MAX_RUN),
+    ...tavernGroundsRects().map((r, i) =>
+      rect(`mirefen_tavern:grounds:${i}`, r[0], r[1], r[2], r[3]),
+    ),
+  ];
 }
 
 /** Pure candidate check used by streamed chunks after the one-time snapshot. */

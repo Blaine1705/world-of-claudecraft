@@ -11,6 +11,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GFX } from '../gfx';
 import { applyTextureAnisotropy } from '../texture_anisotropy';
+import { applyVertexColourScale } from '../vertex_colour_glb_parts';
 import { applyFoliageEdgeFade } from './foliage_edge_fade';
 import { classifyGltfKtx2Textures, dismissKtx2Source } from './ktx2_mip_release';
 import { ktx2Loader } from './ktx2_support';
@@ -257,6 +258,9 @@ export function loadGltf(
         // the mip-release registry only ever sees the survivors.
         shareKitTextures(gltf.scene, resolved);
         polishGltfTextures(gltf);
+        // A painted, vertex-coloured model's colours back above the headroom they are
+        // stored under (vertex_colour_glb_parts.ts), before anything clones its materials.
+        applyVertexColourScale(gltf.scene);
         // The Tidehold town kit's per-building weathering masks (town_smart_material.ts).
         applyTownSmartToScene(gltf.scene);
         // Transmissive materials become translucent (transmission_neutralize.ts).

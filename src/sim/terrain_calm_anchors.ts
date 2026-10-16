@@ -23,6 +23,8 @@
 import { FARSHORE_HULL_FRAGMENT_PLACEMENT } from './content/farshore_shipwreck_layout';
 import { OVERWORLD_GRAVEYARDS } from './content/graveyards';
 import { MAILBOXES } from './content/mailboxes';
+import { TAVERN_KEEPER_NPC_ID } from './content/mirefen_tavern';
+import { TAVERN_PATRON_NPC_IDS } from './content/mirefen_tavern_patrons';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import { TRANSPORT_ROUTES } from './content/transport_ships';
 import { TUNNELS } from './content/tunnels';
@@ -170,6 +172,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
     // Studio rows (studio_content.ts) never shape terrain: the calm tables are
     // cached per seed, not per content, and must stay the release's.
     if (isStudioOverlayRow('npc', id)) continue;
+    // the Mirefen tavern's innkeeper and patrons stand on the tavern's own floor, never the
+    // terrain: their pads would only reshape the ground under the building (no terrain edit)
+    if (id === TAVERN_KEEPER_NPC_ID || TAVERN_PATRON_NPC_IDS.includes(id)) continue;
     const npc = NPCS[id];
     // A fixed-post NPC (the Muster Commander) is raised by its owning system on ground
     // that system measured as it stands; calming it would re-grade a camp already fitted

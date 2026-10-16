@@ -16,7 +16,7 @@ import {
   WATER_LEVEL,
   zoneBiomeAt,
 } from '../sim/world';
-import { hashAt, insideDressingExclusion } from './foliage_core';
+import { hashAt, insideDressingExclusion, insideHighwatchManorGround } from './foliage_core';
 import { parterreBushSpots } from './garden_parterre_core';
 import { GFX } from './gfx';
 
@@ -213,6 +213,8 @@ export function generateDressing(seed: number): DressingSpot[] {
       const x = gx + (hashAt(gx, gz, 42) - 0.5) * step;
       const z = gz + (hashAt(gx, gz, 43) - 0.5) * step;
       if (insideDressingExclusion(activeContent.zones, activeContent.camps, x, z)) continue;
+      // the Highwatch manor's model brings its own floors, porch and garden: no scrub through them
+      if (insideHighwatchManorGround(x, z)) continue;
       if (roadDistance(x, z) < 4) continue;
       const dressH = terrainHeight(x, z, seed);
       if (dressH < WATER_LEVEL + 1.2) continue;

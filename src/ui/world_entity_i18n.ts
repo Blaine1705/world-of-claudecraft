@@ -528,6 +528,12 @@ const NPC_IDS = [
   'quartermaster_sela',
   'scout_yerrin',
   'harbormaster_tamsin', // the Harbormaster's House at the Wyrmwatch cliff harbor
+  'innkeeper_maudie', // the Mirefen tavern on the Fenbridge road
+  // ...and its seated regulars (src/sim/content/mirefen_tavern_patrons.ts)
+  'patron_amos_eelby',
+  'patron_grissel_sedgeworth',
+  'patron_ned_oxley',
+  'patron_hester_quillby',
   // Lanternmere, the Amberfall
   'reeve_ottoline',
   'waywatcher_sorrel',
@@ -583,6 +589,7 @@ const NPC_IDS = [
   'tinker_gizzel', // crafting-station master: toolworks (Eastbrook, zone 1)
   'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
   'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
+  'steward_ansel_hale', // the Highwatch manor's steward (zone 3)
   // The farmer NPCs (the farming go-live), one per farming hub, in the same
   // tier order as the corresponding FARM_PATCHES rows.
   'farmer_jessica', // Eastbrook allotments (zone 1, tier 1)
