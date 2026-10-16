@@ -647,6 +647,7 @@ export const zh_TW: EnTranslations = {
     },
     "guildHall": {
       "title": "燈火大廳",
+      "signSubtitle": "冒險者公會",
       "close": "關閉公會視窗",
       "tabsLabel": "燈火大廳分頁",
       "tabs": {

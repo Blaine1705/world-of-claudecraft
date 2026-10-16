@@ -21693,4 +21693,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '契約達成：{contract}。燈火の印章を{count}個受け取った。',
   'hudChrome.guildHall.contractDone.other':
     '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.signSubtitle': '冒険者ギルド',
 };

@@ -647,6 +647,7 @@ export const pl_PL: EnTranslations = {
     },
     "guildHall": {
       "title": "Lantern Hall",
+      "signSubtitle": "Adventurers' Guild",
       "close": "Close the guild window",
       "tabsLabel": "Lantern Hall sections",
       "tabs": {

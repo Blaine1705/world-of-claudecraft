@@ -21691,4 +21691,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.',
   'hudChrome.guildHall.contractDone.other':
     '계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.',
+  'hudChrome.guildHall.signSubtitle': '모험가 길드',
 };

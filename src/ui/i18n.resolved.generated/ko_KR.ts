@@ -647,6 +647,7 @@ export const ko_KR: EnTranslations = {
     },
     "guildHall": {
       "title": "등불 회관",
+      "signSubtitle": "모험가 길드",
       "close": "길드 창 닫기",
       "tabsLabel": "등불 회관 항목",
       "tabs": {

@@ -18,6 +18,7 @@ import {
 } from '../scripts/assets/highwatch_manor/coplanar.mjs';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { isPlacedBuildingInterior } from '../src/render/eastbrook_placed_building';
+import { HIGHWATCH_GUILD_SIGN } from '../src/render/highwatch_guild_sign';
 import { HIGHWATCH_BUILDINGS_BY_ID } from '../src/sim/highwatch_layout';
 
 // The shipped Highwatch adventurers' guild GLB (public/models/tidehold/highwatch/guild.glb),
@@ -32,15 +33,15 @@ import { HIGHWATCH_BUILDINGS_BY_ID } from '../src/sim/highwatch_layout';
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, HIGHWATCH_GUILD_ASSET.target);
-const SHIPPED_SHA256 = 'd8e9a421ca4954499620585574e5404c88c7c341c7e2831cc62431aa677017a5';
-const SHIPPED_BYTES = 703344;
+const SHIPPED_SHA256 = '07e7b456540a424e5d9f3a2737ac7c7dc5a18a6a970ce882482c63e44e7a4225';
+const SHIPPED_BYTES = 718960;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   GuildShell: 20378,
   GuildRoof: 11360,
   GuildTrim: 2179,
-  GuildYard: 1718,
-  GuildGlow: 692,
+  GuildYard: 3046,
+  GuildGlow: 708,
   G_INT_Timber: 1968,
   G_INT_Furnishings: 10356,
   G_INT_Trophy_hollow_crypt: 508,
@@ -84,6 +85,7 @@ interface GuildExtras {
   hall: { plate: number; ridge: number; truss: number };
   tower: number[];
   trophies: string[];
+  sign: { x: number; y: number; z: number; width: number; height: number; face: number };
 }
 
 beforeAll(async () => {
@@ -233,6 +235,11 @@ describe('the Highwatch guild GLB', () => {
     // the belfry lantern stands over the great roof's ridge
     expect(extras.tower[1]).toBeGreaterThan(extras.hall.ridge);
     expect([...extras.trophies].sort()).toEqual([...GUILD_TROPHY_DUNGEONS].sort());
+    // the gateway's name board: the painted lettering stands where the model's board hangs,
+    // well over a player's head, a real gap proud of the board's faces
+    expect(extras.sign).toEqual({ ...HIGHWATCH_GUILD_SIGN });
+    expect(extras.sign.y - extras.sign.height / 2).toBeGreaterThan(3);
+    expect(extras.sign.face).toBeGreaterThanOrEqual(0.09 + 0.04);
   });
 
   it('ships the collision rows the Blender run wrote, under the model id', () => {

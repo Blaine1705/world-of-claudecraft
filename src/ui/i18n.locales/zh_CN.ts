@@ -20634,4 +20634,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.contractDone.few': '契约完成：{contract}。你获得了{count}枚灯火印章。',
   'hudChrome.guildHall.contractDone.many': '契约完成：{contract}。你获得了{count}枚灯火印章。',
   'hudChrome.guildHall.contractDone.other': '契约完成：{contract}。你获得了{count}枚灯火印章。',
+  'hudChrome.guildHall.signSubtitle': '冒险者公会',
 };

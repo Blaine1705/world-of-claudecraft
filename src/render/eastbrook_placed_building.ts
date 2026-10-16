@@ -149,12 +149,16 @@ export function buildPlacedTownBuilding(
   building: PlacedTownBuildingRecord,
   source: THREE.Object3D,
   groundAt: (x: number, z: number) => number,
+  extras: readonly THREE.Object3D[] = [],
 ): PlacedBuildingBuild {
   const { placement } = building;
   const clone = source.clone(true);
   // Bounds while the clone is parentless at the origin: the model's own frame.
   clone.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(clone);
+  // A town's own additions to a model (in the model's frame, inside its bounds): they join
+  // the building before its materials convert, so they fade, cull and reveal with it.
+  for (const extra of extras) clone.add(extra);
 
   const mats: OccluderFadeMat[] = [];
   clone.traverse((child) => {

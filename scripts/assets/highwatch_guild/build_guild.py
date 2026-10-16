@@ -21,7 +21,7 @@ buildings follow, render/eastbrook_placed_building.ts):
     GuildShell                      walls, floors, porch, trophy hall, tower, chimneys
     GuildRoof                       the slate, the spire, everything over the plates outside
     GuildTrim                       gold, iron, the crest, the door's ironwork
-    GuildYard                       the paved yard: lamps, the signpost, the hitching rail
+    GuildYard                       the paved yard: the lamp, the gateway, the hitching rail
     GuildGlow                       lit glass, lantern panes, flames and embers
     G_INT_Timber                    the hall's open roof: trusses, purlins, boards
     G_INT_Furnishings               everything that furnishes the rooms, the plaque boards
@@ -157,6 +157,10 @@ def build_scene():
         'hall': {'plate': PL.HALL['plate'], 'ridge': PL.HALL['ridge'], 'truss': PL.HALL['truss']},
         'tower': [PL.TOWER['cx'], PL.TOWER['belfry'] - 1.6, PL.TOWER['cz']],
         'trophies': list(PL.TROPHY_SLOTS),
+        # the gateway's name board: its centre, the painted area and the faces' offset from
+        # the centre (render/highwatch_guild_sign.ts pins its own copy equal)
+        'sign': {'x': PL.GATE['x'], 'y': PL.GATE['text_y'], 'z': PL.GATE['z'], 'width': PL.GATE['text_w'],
+                 'height': PL.GATE['text_h'], 'face': round(PL.GATE['board_t'] / 2 + 0.05, 4)},
     }
     return dict(root=root, pieces=pieces, mats=mats)
 

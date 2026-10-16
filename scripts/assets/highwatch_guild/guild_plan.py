@@ -62,8 +62,17 @@ COLUMN_R = 0.5
 
 # --- the yard ---------------------------------------------------------------------------------
 YARD = dict(x0=-16.0, x1=TOWER['x1'] + 0.6, z0=-25.0, z1=HALL['oz0'])
-YARD_LAMPS = [(-9.0, -23.4), (9.0, -23.4)]
-SIGNPOST = dict(x=12.6, z=-22.6)
+# the right-hand lamp frames the steps; the left one gave way to the guild's gateway
+YARD_LAMPS = [(9.0, -23.4)]
+# The guild's gateway, where the spur road comes into the yard (the road crosses the yard's
+# front edge about x -8): two oak posts on ashlar feet, a carved beam with iron straps, the
+# name board hung under it on chains (render/highwatch_guild_sign.ts paints the localized
+# name on both faces, at the text anchor below), the guild's seal standing on the beam, and an
+# iron lantern at either end. The posts stand clear of the road's width; the board hangs
+# well over head height.
+GATE = dict(x=-8.0, z=-24.3, half=4.6, post=0.56, foot=1.15, foot_h=0.95, top=6.1,
+            beam_y0=5.15, beam_y1=5.85, board_x=3.1, board_y0=3.35, board_y1=4.75, board_t=0.18,
+            text_w=5.6, text_h=1.18, text_y=4.05, lantern_y=4.75)
 HITCH = dict(x=-12.6, z0=-21.0, z1=-15.0)          # the old stable yard's hitching rail
 TROUGH = dict(x=-12.6, z=-12.8, lx=1.3, lz=3.2)
 CRATES = dict(x=14.0, z=-13.0)
@@ -145,7 +154,11 @@ def collision_boxes():
     # the yard: lamps, the signpost, the hitching rail, the trough, the crates
     for i, (lx, lz) in enumerate(YARD_LAMPS):
         add(f'yard_lamp_{i}', lx - 0.3, lx + 0.3, FOOT, 4.2, lz - 0.3, lz + 0.3)
-    add('signpost', SIGNPOST['x'] - 0.3, SIGNPOST['x'] + 0.3, FOOT, 5.5, SIGNPOST['z'] - 0.3, SIGNPOST['z'] + 0.3)
+    g = GATE
+    for i, sx in enumerate((-1, 1)):
+        px = g['x'] + sx * g['half']
+        add(f'gate_post_{i}', px - g['foot'] / 2, px + g['foot'] / 2, FOOT, g['top'], g['z'] - g['foot'] / 2,
+            g['z'] + g['foot'] / 2)
     add('hitch_rail', HITCH['x'] - 0.2, HITCH['x'] + 0.2, FOOT, 1.2, HITCH['z0'], HITCH['z1'])
     add('trough', TROUGH['x'] - TROUGH['lx'] / 2, TROUGH['x'] + TROUGH['lx'] / 2, FOOT, 0.9,
         TROUGH['z'] - TROUGH['lz'] / 2, TROUGH['z'] + TROUGH['lz'] / 2)

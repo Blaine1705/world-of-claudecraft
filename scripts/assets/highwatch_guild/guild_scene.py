@@ -33,12 +33,35 @@ CAMERAS = {
     'trophy_right': ((5.0, 4.2, 12.0), (-8.0, 5.0, 15.6), 20, False),
     'aerial': ((-44.0, 48.0, -54.0), (2.0, 4.0, -2.0), 30, False),
     'back': ((-18.0, 28.0, 52.0), (0.0, 8.0, 6.0), 30, False),
+    'gate_day': ((-13.0, 2.6, -37.0), (-8.0, 4.6, -24.3), 26, False),
+    'gate_night': ((-13.0, 2.6, -37.0), (-8.0, 4.6, -24.3), 26, True),
+    'gate_wide': ((-22.0, 6.0, -44.0), (-4.0, 6.0, -18.0), 26, False),
 }
 FIGURES = {
     'Yard': (-2.0, 0.11, -23.0), 'Porch': (-1.2, FLOOR, -13.6), 'Board': (9.2, FLOOR, -0.6),
     'Counter': (-9.0, FLOOR, 0.4), 'Table': (7.3, FLOOR, 8.6), 'Fireside': (-9.2, FLOOR, 6.6),
     'Trophy': (1.4, FLOOR, 14.0),
+    'Gate': (-7.0, 0.11, -27.0),
 }
+
+
+def sign_preview(coll):
+    """Review-only lettering on the gateway's road face (the game paints the localized name
+    at runtime, render/highwatch_guild_sign.ts): the name and the line under it."""
+    from guild_plan import GATE as G
+    ink = _mat('SignInk', (0.95, 0.74, 0.32), 0.4)
+    face = G['board_t'] / 2 + 0.05
+    for label, dy, size in (('LANTERN HALL', 0.16, 0.56), ("ADVENTURERS' GUILD", -0.34, 0.24)):
+        curve = bpy.data.curves.new(f'Sign_{label}', 'FONT')
+        curve.body = label
+        curve.align_x = 'CENTER'
+        curve.align_y = 'CENTER'
+        curve.size = size
+        obj = bpy.data.objects.new(f'SignPreview_{label}', curve)
+        coll.objects.link(obj)
+        obj.data.materials.append(ink)
+        obj.location = P(G['x'], G['text_y'] + dy, G['z'] - face - 0.01)
+        obj.rotation_euler = (math.pi / 2, 0.0, math.pi)
 
 
 def stage(objs):
@@ -59,8 +82,11 @@ def stage(objs):
     point_light('TrophyHall', 0.0, FLOOR + 6.6, 15.0, warm, 1800, 0.8, lights)
     point_light('Porch', 0.0, FLOOR + 5.6, -14.4, warm, 900, 0.4, lights)
     point_light('Tower', 18.2, FLOOR + 22.2, -7.6, (1.0, 0.7, 0.36), 4000, 0.6, lights)
-    for (lx, lz) in ((-9.0, -23.4), (9.0, -23.4)):
+    for (lx, lz) in ((9.0, -23.4),):
         point_light('YardLamp', lx, 3.4, lz, warm, 260, 0.2, lights)
+    for sx in (-1, 1):
+        point_light('GateLantern', -8.0 + sx * 5.45, 4.6, -24.3, warm, 420, 0.25, lights)
+    sign_preview(looks)
     sun = bpy.data.lights.new('Sun', 'SUN')
     sun.energy = 3.2
     sun.angle = math.radians(3)

@@ -647,6 +647,7 @@ export const it_IT: EnTranslations = {
     },
     "guildHall": {
       "title": "Lantern Hall",
+      "signSubtitle": "Adventurers' Guild",
       "close": "Close the guild window",
       "tabsLabel": "Lantern Hall sections",
       "tabs": {

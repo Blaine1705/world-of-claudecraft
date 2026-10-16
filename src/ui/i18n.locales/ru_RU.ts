@@ -22099,4 +22099,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Контракт выполнен: {contract}. Вы получаете {count} печатей Фонаря.',
   'hudChrome.guildHall.contractDone.other':
     'Контракт выполнен: {contract}. Вы получаете {count} печати Фонаря.',
+  'hudChrome.guildHall.signSubtitle': 'Гильдия искателей приключений',
 };

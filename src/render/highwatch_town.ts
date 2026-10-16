@@ -2,10 +2,12 @@
 // painted buildings and nothing else, so it is the shared placed-town view
 // (placed_town_buildings.ts) over the layout's buildings. The square's well,
 // stalls, station, mailbox, board and the Cairns stay with the props view.
+import type * as THREE from 'three';
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
 import type { BuildingDef } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { GfxSettings } from './gfx';
+import { buildHighwatchGuildSign } from './highwatch_guild_sign';
 import { createGuildTrophyRoom } from './highwatch_guild_trophies';
 import { createPlacedTownKit, type PlacedTownView } from './placed_town_buildings';
 
@@ -19,11 +21,17 @@ const HIGHWATCH_TOWN = createPlacedTownKit({
   hub: HIGHWATCH_LAYOUT.hub,
   buildings: HIGHWATCH_LAYOUT.buildings,
   promotedBy: 'highwatchTown',
+  decorate: highwatchBuildingExtras,
 });
 
 if (typeof window !== 'undefined') HIGHWATCH_TOWN.registerPreloads();
 
 export type HighwatchTownView = PlacedTownView;
+
+/** What the town adds to its own models: the guild's localized name on its gateway's board. */
+export function highwatchBuildingExtras(buildingId: string): THREE.Object3D[] {
+  return buildingId === 'highwatch_guild' ? [buildHighwatchGuildSign()] : [];
+}
 
 /** The town view; with the viewing `world`, Lantern Hall's trophy room follows the viewer's
  *  dungeon clears (highwatch_guild_trophies.ts) on every update. */

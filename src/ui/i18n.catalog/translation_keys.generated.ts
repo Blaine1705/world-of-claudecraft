@@ -14241,6 +14241,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.guildHall.reward.one'
   | 'hudChrome.guildHall.reward.other'
   | 'hudChrome.guildHall.seals'
+  | 'hudChrome.guildHall.signSubtitle'
   | 'hudChrome.guildHall.tabs.contracts'
   | 'hudChrome.guildHall.tabs.quartermaster'
   | 'hudChrome.guildHall.tabsLabel'

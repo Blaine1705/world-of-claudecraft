@@ -48,6 +48,25 @@ export const HIGHWATCH_GUILD_LIGHTS: readonly GuildLightSpec[] = [
   { name: 'guildPorch', x: 0, y: 6.0, z: -14.4, color: 0xffc070, intensity: 7, distance: 11 },
   // the great lantern in the tower's belfry: lights the belfry's arches and the spire
   { name: 'guildTower', x: 18.2, y: 22.8, z: -7.6, color: 0xffc878, intensity: 14, distance: 18 },
+  // the gateway's two lanterns at its beam's ends, over the road into the yard
+  {
+    name: 'guildGateLeft',
+    x: -13.45,
+    y: 4.5,
+    z: -24.3,
+    color: 0xffc070,
+    intensity: 6,
+    distance: 10,
+  },
+  {
+    name: 'guildGateRight',
+    x: -2.55,
+    y: 4.5,
+    z: -24.3,
+    color: 0xffc070,
+    intensity: 6,
+    distance: 10,
+  },
 ];
 
 /** A live flame in the model frame: where it stands and how big it burns. */

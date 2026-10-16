@@ -647,6 +647,7 @@ export const ru_RU: EnTranslations = {
     },
     "guildHall": {
       "title": "Зал Фонаря",
+      "signSubtitle": "Гильдия искателей приключений",
       "close": "Закрыть окно гильдии",
       "tabsLabel": "Разделы Зала Фонаря",
       "tabs": {

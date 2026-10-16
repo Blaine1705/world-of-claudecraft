@@ -3,6 +3,8 @@
 // the maintainer fills every locale at release.
 export const guildHallStrings = {
   title: 'Lantern Hall',
+  // the line under the name on the gateway's board in the yard (render/highwatch_guild_sign.ts)
+  signSubtitle: "Adventurers' Guild",
   close: 'Close the guild window',
   tabsLabel: 'Lantern Hall sections',
   tabs: {

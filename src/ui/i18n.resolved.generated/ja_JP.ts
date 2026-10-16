@@ -647,6 +647,7 @@ export const ja_JP: EnTranslations = {
     },
     "guildHall": {
       "title": "燈火の館",
+      "signSubtitle": "冒険者ギルド",
       "close": "ギルドのウィンドウを閉じる",
       "tabsLabel": "燈火の館の項目",
       "tabs": {

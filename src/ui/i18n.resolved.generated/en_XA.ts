@@ -647,6 +647,7 @@ export const en_XA: EnTranslations = {
     },
     "guildHall": {
       "title": "[Ļáñţéŕñ Ĥáļļ]",
+      "signSubtitle": "[Áðʋéñţúŕéŕš' Ĝúíļð]",
       "close": "[Çļóšé ţĥé ĝúíļð ŵíñðóŵ]",
       "tabsLabel": "[Ļáñţéŕñ Ĥáļļ šéçţíóñš]",
       "tabs": {
