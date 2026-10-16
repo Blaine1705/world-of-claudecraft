@@ -88,6 +88,7 @@ import type {
   TerrainBrushAlphaId,
   WeatherPrecipMode,
 } from '../sim/types';
+import type { WallFinish } from '../sim/wall_finishes';
 import { captureFocusKey, findFocusKey, restoreFirstEnabled } from '../ui/focus_restore';
 import { formatNumber, t } from '../ui/i18n';
 import { assetById } from './asset_catalog.generated';
@@ -119,6 +120,8 @@ import {
   catalogMatches,
   type MobCatalogOption,
 } from './entity_authoring';
+import { FLATTEN_LEVEL_LIMIT, parseLevelInput } from './ground_level_core';
+import { finishTextureOptions } from './material_finish_options';
 import { PLACEMENT_SCALE_MAX, PLACEMENT_SCALE_MIN } from './placement_transform_core';
 import { POINT_SOUND_CLIPS, pointSoundLabel } from './point_sounds';
 import { adjustedSwatchColor } from './swatch_color';
@@ -522,6 +525,22 @@ export interface InspectorDeps {
   setFlattenSmooth(on: boolean): void;
   getFlattenHardEdge(): boolean;
   setFlattenHardEdge(on: boolean): void;
+  /** Flatten's locked level (yards), or null when each stroke levels to its
+   *  own start height. */
+  getFlattenLock(): number | null;
+  setFlattenLock(level: number | null): void;
+  /** Moving an asset re-seats it on the ground instead of detaching it. */
+  getSnapToGround(): boolean;
+  setSnapToGround(on: boolean): void;
+  /** Seat every selected asset on the terrain under it. */
+  setSelectionToGround(): void;
+  /** The selected model's material slots: null for no model, empty while
+   *  it loads. */
+  getMaterialSlots(): { key: string; label: string }[] | null;
+  getMaterialFinishes(): Record<string, WallFinish> | undefined;
+  /** Set (null clears) one slot's finish; `commit` closes the edit with one
+   *  undo step. */
+  setMaterialFinish(key: string, finish: WallFinish | null, commit: boolean): void;
 
   getWaterLevel(): number;
   previewWaterLevel(v: number): void;
@@ -3678,6 +3697,45 @@ export class Inspector {
     s.appendChild(this.paintIdSelect(cfg.steepId, (id) => d.setAutoTexture({ steepId: id })));
   }
 
+  /** Flatten's locked level: right-click the ground to pick it, type it, or
+   *  clear it to level each stroke to where it starts. */
+  private flattenLevelControls(s: HTMLElement): void {
+    const d = this.deps;
+    const lock = d.getFlattenLock();
+    const row = el('div', 'ed-row');
+    const label = el('label', 'ed-field');
+    label.appendChild(el('span', '', t('editor.flatten.levelTitle')));
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.step = '0.1';
+    input.min = String(-FLATTEN_LEVEL_LIMIT);
+    input.max = String(FLATTEN_LEVEL_LIMIT);
+    input.value = lock === null ? '' : String(Math.round(lock * 100) / 100);
+    input.placeholder = t('editor.flatten.levelPlaceholder');
+    input.addEventListener('change', () => {
+      d.setFlattenLock(parseLevelInput(input.value));
+      this.refresh();
+    });
+    label.appendChild(input);
+    row.appendChild(label);
+    if (lock !== null) {
+      row.appendChild(
+        button(
+          t('editor.flatten.levelClear'),
+          () => {
+            d.setFlattenLock(null);
+            this.refresh();
+          },
+          'small',
+        ),
+      );
+    }
+    s.appendChild(row);
+    s.appendChild(
+      hint(t(lock === null ? 'editor.flatten.levelHintNone' : 'editor.flatten.levelHint')),
+    );
+  }
+
   private flattenPanel(): void {
     const d = this.deps;
     const s = section(t('editor.tool.flatten'));
@@ -3738,6 +3796,7 @@ export class Inspector {
           d.setFlattenHardEdge(on),
         ).root,
       );
+      this.flattenLevelControls(s);
     }
     s.appendChild(hint(t('editor.flatten.shiftHint')));
     this.autoTextureControls(s);
@@ -5863,6 +5922,21 @@ export class Inspector {
           d.updateSelection({ z: v }, true);
         }),
       );
+      const groundRow = el('div', 'ed-row');
+      groundRow.appendChild(
+        button(
+          t('editor.selection.setGround'),
+          () => d.setSelectionToGround(),
+          'small',
+          t('editor.selection.setGroundTitle'),
+        ),
+      );
+      s.appendChild(groundRow);
+      s.appendChild(
+        checkbox(t('editor.selection.snapGround'), d.getSnapToGround(), (on) =>
+          d.setSnapToGround(on),
+        ).root,
+      );
       s.appendChild(
         slider(t('editor.selection.rotation'), {
           min: 0,
@@ -6072,6 +6146,75 @@ export class Inspector {
       checkbox(t('editor.selection.footprints'), d.getFootprints(), (on) => d.setFootprints(on))
         .root,
     );
+    this.root.appendChild(s);
+    if (sel && d.getSelectionCount() <= 1) this.materialsPanel();
+  }
+
+  /** Per-part textures for the selected model: one row per material slot. */
+  private materialsPanel(): void {
+    const d = this.deps;
+    const slots = d.getMaterialSlots();
+    if (slots === null) return;
+    const s = section(t('editor.materials.title'));
+    if (slots.length === 0) {
+      s.appendChild(hint(t('editor.materials.loading')));
+      this.root.appendChild(s);
+      return;
+    }
+    s.appendChild(hint(t('editor.materials.hint')));
+    const finishes = d.getMaterialFinishes() ?? {};
+    const options = [
+      { value: '', label: t('editor.materials.original') },
+      ...finishTextureOptions(),
+    ];
+    for (const slot of slots) {
+      const finish = finishes[slot.key];
+      s.appendChild(el('h4', 'ed-sub-title', slot.label));
+      s.appendChild(
+        selectRow(t('editor.materials.texture'), options, finish?.texture ?? '', (value) => {
+          d.setMaterialFinish(
+            slot.key,
+            value === '' ? null : { ...(finish ?? {}), texture: value },
+            true,
+          );
+        }).root,
+      );
+      if (!finish) continue;
+      // Scale and tint apply on release: each apply rebuilds the slot's
+      // material clone, which would flicker if driven by every drag sample.
+      s.appendChild(
+        slider(t('editor.materials.tile'), {
+          min: 0.5,
+          max: 16,
+          step: 0.5,
+          value: finish.tileSize ?? 4,
+          onInput: () => {},
+          onChange: (v) => d.setMaterialFinish(slot.key, { ...finish, tileSize: v }, true),
+          format: num1,
+        }).root,
+      );
+      const row = el('label', 'ed-field');
+      row.appendChild(el('span', undefined, t('editor.materials.color')));
+      const color = document.createElement('input');
+      color.type = 'color';
+      color.value = `#${(finish.color ?? 0xffffff).toString(16).padStart(6, '0')}`;
+      const read = (): number | undefined => {
+        const v = Number.parseInt(color.value.slice(1), 16);
+        return Number.isFinite(v) ? v : undefined;
+      };
+      color.addEventListener('change', () =>
+        d.setMaterialFinish(slot.key, { ...finish, color: read() }, true),
+      );
+      row.appendChild(color);
+      s.appendChild(row);
+      s.appendChild(
+        button(
+          t('editor.materials.reset'),
+          () => d.setMaterialFinish(slot.key, null, true),
+          'small',
+        ),
+      );
+    }
     this.root.appendChild(s);
   }
 

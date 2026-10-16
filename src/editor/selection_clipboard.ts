@@ -11,6 +11,9 @@ export function cloneAssetPlacement(placement: AssetPlacement): AssetPlacement {
     ...placement,
     building: placement.building ? { ...placement.building } : undefined,
     wallFinishes: placement.wallFinishes ? structuredClone(placement.wallFinishes) : undefined,
+    materialFinishes: placement.materialFinishes
+      ? structuredClone(placement.materialFinishes)
+      : undefined,
     hitboxes: placement.hitboxes?.map((hitbox) => ({ ...hitbox })),
     ramps: placement.ramps?.map((ramp) => ({ ...ramp })),
   };

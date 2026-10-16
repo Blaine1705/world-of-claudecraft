@@ -11594,6 +11594,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'editor.flatten.hint':
     'Выравнивание приводит землю к высоте под курсором в момент начала перетаскивания.',
   'editor.flatten.hardEdge': 'Резкий край',
+  'editor.flatten.levelTitle': 'Целевая высота (ярды)',
+  'editor.flatten.levelPlaceholder': 'Начало перетаскивания',
+  'editor.flatten.levelClear': 'Сбросить',
+  'editor.flatten.levelHint':
+    'Каждое перетаскивание выравнивает землю до этой высоты. Щёлкните правой кнопкой по земле, чтобы выбрать другую.',
+  'editor.flatten.levelHintNone':
+    'Щёлкните правой кнопкой по земле, чтобы зафиксировать её высоту, затем перетаскивайте в любом месте, чтобы выровнять до неё. Пусто: каждое перетаскивание выравнивает до высоты точки начала.',
+  'editor.flatten.levelPicked': 'Высота зафиксирована: {height} ярдов.',
+  'editor.selection.setGround': 'Опустить на землю',
+  'editor.selection.setGroundTitle':
+    'Вернуть выбранные объекты на рельеф под ними, убрав парение и подъём',
+  'editor.selection.snapGround': 'Прижимать к земле при перемещении',
+  'editor.materials.title': 'Материалы',
+  'editor.materials.hint':
+    'Выберите текстуру для каждой части модели. Текстуры повторяются в мировых координатах, не используют UV модели и сохраняются вместе с картой.',
+  'editor.materials.loading':
+    'Модель ещё загружается. Выберите её снова чуть позже, чтобы изменить материалы.',
+  'editor.materials.original': 'Исходный',
+  'editor.materials.texture': 'Текстура',
+  'editor.materials.tile': 'Масштаб текстуры (ярдов на плитку)',
+  'editor.materials.reset': 'Вернуть исходный',
   'editor.water.title': 'Уровень воды',
   'editor.water.level': 'Уровень воды',
   'editor.water.hint': 'Задает высоту поверхности воды для всей карты, от {min} до {max} ярдов.',

@@ -20,7 +20,9 @@ interface ImportedTexture {
 
 const importedTextures = new Map<string, ImportedTexture>();
 
-function acquireFinishTexture(ref: string | undefined): TextureHold {
+/** Hold a finish texture (a library key or `custom:<sha>`); shared with the
+ *  per-material finishes (render/material_finishes.ts). */
+export function acquireFinishTexture(ref: string | undefined): TextureHold {
   if (!ref) return { texture: Promise.resolve(null), release() {} };
   if (!ref.startsWith('custom:')) {
     const path = terrainTexturePath(ref, 'color');

@@ -11350,6 +11350,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'editor.biome.clearConfirm': '이 맵에서 칠한 생태 칸을 모두 제거할까요?',
   'editor.flatten.hint': '평탄화는 드래그를 시작할 때 커서 아래의 높이로 지면을 고릅니다.',
   'editor.flatten.hardEdge': '경계 선명하게',
+  'editor.flatten.levelTitle': '목표 높이(야드)',
+  'editor.flatten.levelPlaceholder': '드래그 시작점',
+  'editor.flatten.levelClear': '지우기',
+  'editor.flatten.levelHint':
+    '드래그할 때마다 지면을 이 높이로 평탄하게 만듭니다. 지면을 오른쪽 클릭하면 다른 높이를 고를 수 있습니다.',
+  'editor.flatten.levelHintNone':
+    '지면을 오른쪽 클릭해 그 높이를 고정한 뒤, 어디서든 드래그하면 그 높이로 평탄해집니다. 비워 두면 각 드래그가 시작한 지점의 높이로 평탄해집니다.',
+  'editor.flatten.levelPicked': '높이를 {height}야드로 고정했습니다.',
+  'editor.selection.setGround': '지면에 맞추기',
+  'editor.selection.setGroundTitle':
+    '선택한 에셋을 아래 지형 위로 다시 놓고, 떠 있거나 들어 올린 상태를 없앱니다',
+  'editor.selection.snapGround': '이동할 때 지면에 맞추기',
+  'editor.materials.title': '재질',
+  'editor.materials.hint':
+    '이 모델의 각 부분에 사용할 텍스처를 고르세요. 텍스처는 월드 공간에 타일로 깔리며 모델 UV를 쓰지 않고, 맵과 함께 저장됩니다.',
+  'editor.materials.loading':
+    '모델을 아직 불러오는 중입니다. 잠시 후 다시 선택하면 재질을 편집할 수 있습니다.',
+  'editor.materials.original': '원본',
+  'editor.materials.texture': '텍스처',
+  'editor.materials.tile': '텍스처 배율(타일당 야드)',
+  'editor.materials.reset': '원본으로 되돌리기',
   'editor.water.title': '수면 높이',
   'editor.water.level': '수면 높이',
   'editor.water.hint': '맵 전체의 수면 높이를 설정합니다 ({min}에서 {max} 야드까지).',
