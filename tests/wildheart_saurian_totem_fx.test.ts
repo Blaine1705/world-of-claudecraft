@@ -352,14 +352,19 @@ describe('saurian totem painter', () => {
     });
   }
 
-  it('hides the rider flare once the howdah has broken', () => {
-    const { host, root } = fakeHost(1, false);
-    const { world, add } = stubWorld();
-    const fx = new SaurianTotemFx(host, world, undefined, () => false);
-    add({ id: 10, templateId: GREAT_SAURIAN_ID, scale: 3.2 });
-    scan(fx, world);
-    fx.update(0.05, 0.05);
-    expect(drawn(root, 'wildheart-sap-rider').length).toBe(0);
+  it('shows the rider flare while the howdah stands, and hides it once it has broken', () => {
+    const flare = (howdahWhole: boolean): number => {
+      const { host, root } = fakeHost(1, false);
+      const { world, add } = stubWorld();
+      const fx = new SaurianTotemFx(host, world, undefined, () => howdahWhole);
+      add({ id: 10, templateId: GREAT_SAURIAN_ID, scale: 3.2 });
+      scan(fx, world);
+      fx.update(0.05, 0.05);
+      return drawn(root, 'wildheart-sap-rider').length;
+    };
+    // The same scene either way: only the howdah's state decides it.
+    expect(flare(true)).toBe(1);
+    expect(flare(false)).toBe(0);
   });
 
   it('disposes its own geometry and materials, never the shared surface', () => {

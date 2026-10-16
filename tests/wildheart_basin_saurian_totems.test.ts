@@ -28,6 +28,7 @@ import {
   SAURIAN_WAR_DRUM,
   sapTotems,
   SAURIAN_TUNING as T,
+  tickWildheartEncounters,
   WILDHEART_DEV_TRIGGERS,
 } from '../src/sim/encounters/wildheart_basin';
 import type { Entity, SaurianFightState, SimEvent } from '../src/sim/types';
@@ -142,6 +143,8 @@ describe('the Sunbone Sap Totem (the body)', () => {
 
 describe('the rider throws from the howdah', () => {
   it('the first totem 5 s into the pull, then one every 10 s, each 14 yd off on the ford', () => {
+    expect(T.totemFirst).toBe(5);
+    expect(T.totemEvery).toBe(10);
     const { f, s } = pull();
     const st = state(s);
     run(f, T.totemFirst - 0.2);
@@ -197,7 +200,9 @@ describe('the rider throws from the howdah', () => {
     run(f, T.totemRetry + 0.2);
     expect(live(f, SAP_TOTEM_ID)).toHaveLength(3);
     expect(st.totemsThrown).toBe(4);
-  });
+    // A long real-time pull (about 38 s of a party's ticks): its own budget,
+    // so a contended gate run never times it out.
+  }, 120_000);
 
   it('the pick is hashed, never rolled: the same pull throws the same totems to the same spots', () => {
     const spots = (): string[] => {
@@ -222,6 +227,8 @@ describe('a standing totem mends the Saurian', () => {
     st.totemTimer = 999;
     const per = Math.round(s.maxHp * T.totemHealPct);
     expect(T.totemHealPct).toBe(0.008);
+    expect(T.totemArm).toBe(4);
+    expect(T.totemHealEvery).toBe(2);
     expect(watchHeals(f, s, T.totemArm - 0.2)).toHaveLength(0);
     const heals = watchHeals(f, s, 0.3 + 2 * T.totemHealEvery);
     expect(heals).toHaveLength(3);
@@ -469,7 +476,10 @@ describe('heroic: the drum', () => {
     expect(st.stompTimer).toBeCloseTo(100 - 3, 1);
     expect(count(f, SAURIAN_DRUM_BEAT)).toBe(beats);
     expect(aura(s, SAURIAN_DRUM_SILENCED)?.remaining).toBeCloseTo(T.drumSilence - 3, 0);
-    run(f, T.drumSilence - 3 + 0.2);
+    // Still silent near the end of its 6 s, beating again just past it.
+    run(f, T.drumSilence - 3 - 0.3);
+    expect(drumBeating(st)).toBe(false);
+    run(f, 0.5);
     expect(drumBeating(st)).toBe(true);
     expect(aura(s, SAURIAN_DRUM_SILENCED)).toBeUndefined();
     expect(aura(s, SAURIAN_WAR_DRUM)).toBeDefined();
@@ -500,6 +510,14 @@ describe('heroic: the drum', () => {
     const drummed = stomp();
     expect(drummed).toBeGreaterThanOrEqual(Math.floor(T.stompMin * mult * T.drumStompScale) - 1);
     expect(drummed).toBeLessThanOrEqual(Math.ceil(T.stompMax * mult * T.drumStompScale) + 1);
+    // Silenced but still aboard: the price holds (the 0.98 budget counts on
+    // every Stomp while the drummer rides, beating or not).
+    dev(f, '/dev wildheart trigger silence');
+    expect(drumBeating(st)).toBe(false);
+    expect(st.drum).not.toBeNull();
+    const hushed = stomp();
+    expect(hushed).toBeGreaterThanOrEqual(Math.floor(T.stompMin * mult * T.drumStompScale) - 1);
+    expect(hushed).toBeLessThanOrEqual(Math.ceil(T.stompMax * mult * T.drumStompScale) + 1);
     dev(f, '/dev wildheart trigger howdah');
     expect(st.drum).toBeNull();
     expect(aura(s, SAURIAN_WAR_DRUM)).toBeUndefined();
@@ -539,5 +557,44 @@ describe('/dev wildheart trigger: the totem rework', () => {
     dev(f, '/dev wildheart trigger silence');
     expect(drumBeating(st)).toBe(false);
     expect(aura(s, SAURIAN_DRUM_SILENCED)).toBeDefined();
+  });
+});
+
+describe('a lost target (the fight paused, never ended)', () => {
+  it('the totems still mend, and one broken meanwhile still snaps back and silences the drum', () => {
+    const { f, s } = pull('heroic');
+    const st = state(s);
+    s.hp = Math.round(s.maxHp * 0.9);
+    dev(f, '/dev wildheart trigger totem');
+    st.totemTimer = 999;
+    run(f, T.totemArm + 0.1);
+    const [totem] = sapTotems(f.sim.ctx, st);
+    expect(drumBeating(st)).toBe(true);
+    // The Saurian loses its target for a moment (a Vanish, the tank down):
+    // still in combat, chasing nothing. The encounter pass alone, as the
+    // Tusker's paused tests drive it, so the mob AI cannot re-take a target.
+    s.aggroTargetId = null;
+    s.aiState = 'chase';
+    s.inCombat = true;
+    const blip = (seconds: number): void => {
+      for (let t = 0; t < seconds - 0.025; t += 0.05) tickWildheartEncounters(f.sim.ctx);
+    };
+    const stomp = st.stompTimer;
+    const before = s.hp;
+    blip(T.totemHealEvery + 0.2);
+    // Paused, not ended: the Stomp's clock held (the paused branch ran)...
+    expect(st.stompTimer).toBe(stomp);
+    expect(s.wildheartFight).toBe(st);
+    expect(st.totems).toHaveLength(1);
+    // ...and the armed totem still mended.
+    expect(s.hp).toBe(before + Math.round(s.maxHp * T.totemHealPct));
+    const mended = s.hp;
+    breakTotem(f, totem);
+    blip(0.05);
+    // The backlash: exactly the totem's own health, off the Saurian.
+    expect(s.hp).toBe(mended - totem.maxHp);
+    expect(drumBeating(st)).toBe(false);
+    expect(aura(s, SAURIAN_DRUM_SILENCED)).toBeDefined();
+    expect(st.totems).toHaveLength(0);
   });
 });
