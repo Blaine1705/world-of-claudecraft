@@ -124,10 +124,14 @@ const TOWN_CULL_MARGIN_YD = 12;
  * holds every building's own cull circle whole. A building standing past it
  * would be hidden by the town's fog answer, or revealed without the imminent
  * priority, while its own cull still wants it drawn (Highwatch's smithy stands
- * on a terrace about 44 yards out).
+ * on a terrace about 44 yards out). A town keeping its own margin past the
+ * hub ring passes it (Fenbridge's six yards, render/fenbridge_town.ts).
  */
-export function placedTownCullRadius(spec: Pick<PlacedTownSpec, 'hub' | 'buildings'>): number {
-  let radius = spec.hub.radius + TOWN_CULL_MARGIN_YD;
+export function placedTownCullRadius(
+  spec: Pick<PlacedTownSpec, 'hub' | 'buildings'>,
+  margin = TOWN_CULL_MARGIN_YD,
+): number {
+  let radius = spec.hub.radius + margin;
   for (const building of spec.buildings) {
     const out =
       Math.hypot(building.position.x - spec.hub.center.x, building.position.z - spec.hub.center.z) +
