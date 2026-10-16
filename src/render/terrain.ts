@@ -691,6 +691,7 @@ function terrainNormalTexture(): THREE.DataTexture {
 interface BrushUniforms {
   uBrushCenter: { value: THREE.Vector2 };
   uBrushRadius: { value: number };
+  uBrushSquare: { value: number };
   uBrushColor: { value: THREE.Color };
 }
 
@@ -698,18 +699,23 @@ function makeBrushUniforms(): BrushUniforms {
   return {
     uBrushCenter: { value: new THREE.Vector2(0, 0) },
     uBrushRadius: { value: 0 },
+    uBrushSquare: { value: 0 },
     uBrushColor: { value: new THREE.Color(0x6fd2ff) },
   };
 }
 
 // Two smoothsteps: a feathered rise to the radius and a feathered fall past it.
+// A square brush (uBrushSquare = 1) measures max(|dx|, |dz|), matching the
+// sim's square stamps (sim/brush_shape.ts).
 const BRUSH_RING_GLSL = /* glsl */ `
 uniform vec2 uBrushCenter;
 uniform float uBrushRadius;
+uniform float uBrushSquare;
 uniform vec3 uBrushColor;
 vec3 wocBrushRing(vec2 p) {
   if (uBrushRadius <= 0.0) return vec3(0.0);
-  float d = distance(p, uBrushCenter);
+  vec2 delta = abs(p - uBrushCenter);
+  float d = uBrushSquare > 0.5 ? max(delta.x, delta.y) : length(delta);
   float w = max(0.28, uBrushRadius * 0.055);
   float ring = smoothstep(uBrushRadius - w, uBrushRadius, d)
              * (1.0 - smoothstep(uBrushRadius, uBrushRadius + w, d));
@@ -2550,7 +2556,13 @@ export interface TerrainView {
    * (yards) onto both terrain materials. Writes uniform values only (no
    * material rebuild). Radius <= 0 hides the ring, as does clearBrush().
    */
-  setBrush(x: number, z: number, radius: number, color?: THREE.ColorRepresentation): void;
+  setBrush(
+    x: number,
+    z: number,
+    radius: number,
+    color?: THREE.ColorRepresentation,
+    shape?: 'circle' | 'square',
+  ): void;
   /** Editor-only: hide the brush ring. */
   clearBrush(): void;
   /**
@@ -3532,9 +3544,16 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       );
       normalTex.needsUpdate = true;
     },
-    setBrush(x: number, z: number, radius: number, color?: THREE.ColorRepresentation): void {
+    setBrush(
+      x: number,
+      z: number,
+      radius: number,
+      color?: THREE.ColorRepresentation,
+      shape: 'circle' | 'square' = 'circle',
+    ): void {
       brush.uBrushCenter.value.set(x, z);
       brush.uBrushRadius.value = Math.max(0, radius);
+      brush.uBrushSquare.value = shape === 'square' ? 1 : 0;
       if (color !== undefined) brush.uBrushColor.value.set(color);
     },
     clearBrush(): void {

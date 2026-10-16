@@ -8,6 +8,7 @@
 // no DOM. The bucket index below is a cache whose iteration order is part of
 // the determinism contract (terrain height feeds the parity goldens).
 
+import { brushContains, brushDistanceSquared } from './brush_shape';
 import { getActiveWorldContent } from './data';
 import { terrainBrushAlpha, terrainBrushWeight } from './terrain_brush';
 import { noiseStampWeight } from './terrain_noise_brush';
@@ -78,7 +79,8 @@ function buildTerrainEditIndex(edits: HeightStamp[]): TerrainEditIndex {
     }
     // One guard cell on every side: sqrt rounding can put a point with
     // d < radius up to ~1 ulp outside the bbox cells at an exact cell
-    // boundary. Extra candidates are harmless (applyStamp re-checks d).
+    // boundary. Extra candidates are harmless (applyHeightStamp re-checks d).
+    // A square stamp's footprint is exactly this bounding box.
     const c0 = Math.floor((e.x - e.radius) / EDIT_INDEX_CELL) - 1;
     const c1 = Math.floor((e.x + e.radius) / EDIT_INDEX_CELL) + 1;
     const r0 = Math.floor((e.z - e.radius) / EDIT_INDEX_CELL) - 1;
@@ -99,12 +101,14 @@ function buildTerrainEditIndex(edits: HeightStamp[]): TerrainEditIndex {
 }
 
 // One stamp's contribution, shared verbatim by the indexed and linear paths so
-// they are bit-identical.
-function applyStamp(e: HeightStamp, x: number, z: number, h: number): number {
+// they are bit-identical. A square stamp measures distance as max(|dx|, |dz|)
+// (radius is half its side); a circle, or a stamp with no shape, keeps the
+// original Euclidean distance bit for bit.
+export function applyHeightStamp(e: HeightStamp, x: number, z: number, h: number): number {
   if (e.radius <= 0) return h;
   const dx = x - e.x;
   const dz = z - e.z;
-  const d = Math.sqrt(dx * dx + dz * dz);
+  const d = Math.sqrt(brushDistanceSquared(dx, dz, e.shape));
   if (d >= e.radius) return h;
   const t = d / e.radius; // 0 at centre, 1 at edge
   // 'flat' = full delta out to the edge (shaped by the brush alpha when one is
@@ -141,7 +145,7 @@ export function applyEditLayer(x: number, z: number, h0: number): number {
   }
   let h = h0;
   if (index.linear) {
-    for (const e of edits) h = applyStamp(e, x, z, h);
+    for (const e of edits) h = applyHeightStamp(e, x, z, h);
     return h;
   }
   const key = `${Math.floor(x / EDIT_INDEX_CELL)},${Math.floor(z / EDIT_INDEX_CELL)}`;
@@ -150,7 +154,7 @@ export function applyEditLayer(x: number, z: number, h0: number): number {
   // Any stamp with d < radius has |x - e.x| < radius, so its bounding-box cells
   // cover the query cell: the bucket holds every contributing stamp, in
   // ascending array index, exactly once.
-  for (const i of bucket) h = applyStamp(edits[i], x, z, h);
+  for (const i of bucket) h = applyHeightStamp(edits[i], x, z, h);
   return h;
 }
 
@@ -165,7 +169,10 @@ export function inAuthoredHeightStamp(x: number, z: number): boolean {
     index = buildTerrainEditIndex(edits);
     terrainEditIndexCache.set(edits, index);
   }
-  const hit = (e: HeightStamp): boolean => (x - e.x) ** 2 + (z - e.z) ** 2 < e.radius ** 2;
+  const hit = (e: HeightStamp): boolean =>
+    e.shape === 'square'
+      ? brushContains(x - e.x, z - e.z, e.radius, e.shape)
+      : (x - e.x) ** 2 + (z - e.z) ** 2 < e.radius ** 2;
   if (index.linear) return edits.some(hit);
   const bucket = index.buckets.get(
     `${Math.floor(x / EDIT_INDEX_CELL)},${Math.floor(z / EDIT_INDEX_CELL)}`,

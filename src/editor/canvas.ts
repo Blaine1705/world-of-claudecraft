@@ -23,6 +23,7 @@ const BIOME_PAINT_COLOR = [
 type Roads = readonly (readonly Vec2[])[];
 
 export interface BrushCursor {
+  shape?: 'circle' | 'square';
   x: number;
   z: number;
   radius: number;
@@ -281,6 +282,11 @@ function drawTerrainEdits(
     const c = cam.worldToScreen(e, vp);
     const r = e.radius * cam.pxPerYard;
     if (c.sx + r < 0 || c.sx - r > vp.width || c.sy + r < 0 || c.sy - r > vp.height) continue;
+    if (e.shape === 'square') {
+      ctx.fillStyle = e.delta >= 0 ? 'rgba(255,150,60,0.15)' : 'rgba(70,150,230,0.15)';
+      ctx.fillRect(c.sx - r, c.sy - r, r * 2, r * 2);
+      continue;
+    }
     const sprite = e.delta >= 0 ? editSprites.raise : editSprites.lower;
     const rr = Math.max(1, r);
     ctx.drawImage(sprite, c.sx - rr, c.sy - rr, rr * 2, rr * 2);
@@ -362,7 +368,7 @@ function drawHolePatches(
   ctx.restore();
 }
 
-function drawBrush(
+export function drawBrush(
   ctx: CanvasRenderingContext2D,
   cam: Camera,
   vp: Viewport,
@@ -372,7 +378,8 @@ function drawBrush(
   const r = brush.radius * cam.pxPerYard;
   ctx.save();
   ctx.beginPath();
-  ctx.arc(c.sx, c.sy, r, 0, Math.PI * 2);
+  if (brush.shape === 'square') ctx.rect(c.sx - r, c.sy - r, r * 2, r * 2);
+  else ctx.arc(c.sx, c.sy, r, 0, Math.PI * 2);
   ctx.strokeStyle = brush.raise ? 'rgba(255,170,90,0.9)' : 'rgba(110,180,255,0.9)';
   ctx.lineWidth = 2;
   ctx.stroke();

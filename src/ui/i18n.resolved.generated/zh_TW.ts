@@ -10027,6 +10027,33 @@ export const zh_TW: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "目標：{name}",
+      "choose": "選擇重疊資源（{count}）",
+      "chooser": "選擇指標下的資源",
+      "front": "最前方",
+      "behind": "位於其他資源後方",
+      "close": "關閉",
+      "keyboard": "使用上一個/下一個或方向鍵比較。按 Enter 選取，按 Escape 關閉。",
+      "hint": "再次點擊可切換重疊物件，也可從此清單中選取。",
+      "asset": "資源 {number}",
+      "overlapAt": "{name} 位置的重疊資源",
+      "previous": "上一個",
+      "next": "下一個",
+      "position": "第 {current} 個，共 {count} 個",
+      "details": "物件 {number} · 第 {level} 層 · 高度 {height}",
+      "ungroupedDetails": "物件 {number} · 高度 {height}",
+      "hideAbove": "隱藏所選樓層以上的樓層",
+      "allFloors": "所有樓層均可見",
+      "filteredFloors": "第 {level} 層以上的樓層已隱藏"
+    },
+    "quickActions": {
+      "title": "已選資產",
+      "move": "移動",
+      "frame": "置中檢視",
+      "remove": "移除",
+      "count": "已選 {count} 個"
+    },
     "buildMode": {
       "materialNames": {
         "WardenStone": "光滑石材",
@@ -10564,6 +10591,8 @@ export const zh_TW: EnTranslations = {
       "lower": "下壓",
       "smooth": "平滑",
       "flatten": "壓平",
+      "slope": "斜坡",
+      "pond": "池塘",
       "tunnel": "Caves",
       "rock": "Rock Gen",
       "build": "Build Model",
@@ -10753,6 +10782,9 @@ export const zh_TW: EnTranslations = {
     },
     "brush": {
       "title": "筆刷",
+      "shape": "筆刷形狀",
+      "circle": "圓形",
+      "square": "正方形",
       "size": "筆刷大小",
       "strength": "強度",
       "sizeHint": "快捷鍵：[ 和 ] 調整筆刷大小；Shift+[ 和 Shift+] 調整強度。",
@@ -11052,6 +11084,22 @@ export const zh_TW: EnTranslations = {
       "levelHintNone": "右鍵點擊地面鎖定該處高度，然後在任意位置拖曳即可壓平到該高度。留空時，每次拖曳壓平到起點的高度。",
       "levelPicked": "已鎖定高度：{height} 碼。"
     },
+    "slope": {
+      "hint": "右鍵點擊斜坡起點處的地面。然後在終點處按下並沿路徑拖曳：地面會在兩個高度之間平滑過渡成坡道。",
+      "start": "起點高度：{height} 碼",
+      "noStart": "尚未設定起點。右鍵點擊地面即可設定。",
+      "clearStart": "清除起點",
+      "needStart": "請先右鍵點擊地面，設定斜坡的起點。",
+      "startPicked": "斜坡起點已設為 {height} 碼。"
+    },
+    "pond": {
+      "title": "建立池塘",
+      "add": "新增池塘",
+      "radius": "池塘半徑",
+      "depth": "池塘深度",
+      "hint": "點擊地面即可挖出圓形池塘並注水。圓圈包含緩坡岸邊。復原會同時移除水面和凹地。",
+      "invalid": "無法在此處挖池塘。請選擇其他位置。"
+    },
     "water": {
       "title": "水面高度",
       "level": "水面高度",
@@ -11347,6 +11395,11 @@ export const zh_TW: EnTranslations = {
     },
     "selection": {
       "title": "選取項目",
+      "heightOffset": "高度偏移（碼）",
+      "heightStep": "步長（碼）",
+      "raiseAsset": "升高",
+      "lowerAsset": "降低",
+      "heightHint": "使用負偏移量可將資產沉入基準位置下方。",
       "none": "未選取任何內容。使用「選取」工具點擊已放置的資源。",
       "squareCollision": "Square collision (follows rotation)",
       "asset": "資源：{name}",
@@ -11859,6 +11912,8 @@ export const zh_TW: EnTranslations = {
     },
     "weather": {
       "title": "Weather",
+      "showSnowfall": "顯示降雪",
+      "snowfallHint": "此設定僅用於工作室預覽，並儲存在此瀏覽器中。",
       "zoneTitle": "Weather in this zone",
       "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
       "auto": "Auto",
@@ -11949,6 +12004,8 @@ export const zh_TW: EnTranslations = {
         "lower": "降低筆刷下方的地形。",
         "smooth": "將起伏平滑到局部平均高度。",
         "flatten": "將地面整平到拖曳起點的高度。",
+        "slope": "右鍵點擊設定起點高度，然後從另一個高度拖曳，鋪出平滑的斜坡。",
+        "pond": "點擊即可挖出擁有獨立水面的池塘。",
         "paint": "在區域預設地表上塗刷生態域。",
         "water": "設定全圖水面高度。",
         "place": "將目錄資產或上傳的資產放置到地面上。",

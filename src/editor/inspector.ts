@@ -22,6 +22,7 @@ import {
 import { TREE_PRESETS, treeVolumesFor } from '../render/tree_gen';
 import { TRUNKS } from '../render/tree_trunks.generated';
 import { autoCollideRadius } from '../sim/asset_collision';
+import type { BrushShape } from '../sim/brush_shape';
 import {
   DEFAULT_MOB_RESPAWN_SECONDS,
   MAX_AUTHORED_CAMP_LEVEL,
@@ -93,6 +94,7 @@ import { captureFocusKey, findFocusKey, restoreFirstEnabled } from '../ui/focus_
 import { formatNumber, t } from '../ui/i18n';
 import { assetById } from './asset_catalog.generated';
 import { BUILTIN_ALPHAS, brushAlphaThumb, listBrushAlphas, removeBrushAlpha } from './brush_alphas';
+import { brushShapeButtons } from './brush_shape_panel';
 import { type BuildingPanelDeps, buildBuildModePanel } from './building_panel';
 import { STREAM_ZONE_COUNT } from './camera_zone_core';
 import { DIG_ALPHA_KINDS, type DigAlpha } from './carve_voxel_core';
@@ -122,8 +124,12 @@ import {
 } from './entity_authoring';
 import { FLATTEN_LEVEL_LIMIT, parseLevelInput } from './ground_level_core';
 import { finishTextureOptions } from './material_finish_options';
+import { DEFAULT_PLACEMENT_HEIGHT_STEP } from './placement_height_core';
+import { placementHeightPanel } from './placement_height_panel';
 import { PLACEMENT_SCALE_MAX, PLACEMENT_SCALE_MIN } from './placement_transform_core';
 import { POINT_SOUND_CLIPS, pointSoundLabel } from './point_sounds';
+import { type PondPanelDeps, pondPanel } from './pond_panel';
+import type { SlopePoint } from './slope_core';
 import { adjustedSwatchColor } from './swatch_color';
 import { buildModal } from './toasts';
 import type { EditorTool } from './toolbar';
@@ -296,7 +302,7 @@ export interface ResolvedWeather {
   aurora: number;
 }
 
-export interface InspectorDeps {
+export interface InspectorDeps extends PondPanelDeps {
   buildingWorkspace(): BuildingPanelDeps | null;
   buildTransformControls(): HTMLElement | null;
   getTool(): EditorTool;
@@ -305,6 +311,12 @@ export interface InspectorDeps {
   /** The City Build workspace panel's dependency bag (city_build_panel.ts). */
   cityBuild(): CityBuildPanelDeps;
 
+  /** The active brush's footprint (Paint keeps its own from sculpting). */
+  getBrushShape(): BrushShape;
+  setBrushShape(value: BrushShape): void;
+  /** The Slope tool's right-clicked start, or null before one is set. */
+  getSlopeStart(): SlopePoint | null;
+  clearSlopeStart(): void;
   getBrushRadius(): number;
   setBrushRadius(v: number): void;
   getBrushStrength(): number;
@@ -542,6 +554,8 @@ export interface InspectorDeps {
    *  undo step. */
   setMaterialFinish(key: string, finish: WallFinish | null, commit: boolean): void;
 
+  /** Arm the Pond tool (the Water panel's Add pond button). */
+  armPond(): void;
   getWaterLevel(): number;
   previewWaterLevel(v: number): void;
   commitWaterLevel(v: number): void;
@@ -764,6 +778,9 @@ export interface InspectorDeps {
   setColliderShape(kind: ColliderVolumeKind): void;
 
   getSelection(): PlacementSelection | null;
+  /** The selection's height offsets, so a group raise keeps inside the cap. */
+  getSelectionHeights(): readonly number[];
+  commitSelectionTransform(): void;
   getSelectedFireEmitter(): number | null;
   setSelectedFireEmitter(index: number | null): void;
   /** Turn wind sway on/off for the selected placement's ASSET. Per-asset, not
@@ -1031,6 +1048,9 @@ export interface InspectorDeps {
   /** Map weather, resolved with defaults (mode auto, intensity 1, no clouds). */
   getWeather(): ResolvedWeather;
   setWeather(w: ResolvedWeather): void;
+  /** Studio-only snowfall preview, remembered in this browser. */
+  getSnowfallEnabled(): boolean;
+  setSnowfallEnabled(on: boolean): void;
 
   /** Authored soundtrack: map-wide track, area rects, next-area pick. */
   getMusic(): {
@@ -1298,6 +1318,7 @@ export class Inspector {
   /** Which inspector tab is showing (3D only; Lighting lives on its own tab). */
   private panelTab: 'tool' | 'camera' | 'lighting' | 'scene' = 'tool';
   private buildingSettingsOpen = false;
+  private placementHeightStep: number = DEFAULT_PLACEMENT_HEIGHT_STEP;
   // Scene tree expand/collapse state, per session (zone ids / zoneId+group).
   private readonly sceneOpenZones = new Set<string>();
   private readonly sceneOpenGroups = new Set<string>();
@@ -1449,6 +1470,11 @@ export class Inspector {
         this.sculptBrushShapePanel();
         this.flattenPanel();
         break;
+      case 'slope':
+        this.brushPanel(false, true);
+        this.sculptBrushShapePanel();
+        this.slopePanel();
+        break;
       case 'tunnel':
         this.brushPanel(false, true);
         this.tunnelPanel();
@@ -1465,6 +1491,9 @@ export class Inspector {
         break;
       case 'water':
         this.waterPanel();
+        break;
+      case 'pond':
+        this.root.appendChild(pondPanel(this.deps));
         break;
       case 'fluid':
         this.fluidToolPanel();
@@ -1573,6 +1602,10 @@ export class Inspector {
   private brushPanel(withStrength: boolean, withWater = false): void {
     const d = this.deps;
     const s = section(t('editor.brush.title'));
+    // Sculpt tools show the footprint in their Brush shape section instead.
+    if (d.getTool() === 'paint') {
+      s.appendChild(brushShapeButtons(d.getBrushShape(), (shape) => d.setBrushShape(shape)));
+    }
     // Brush size on a LOG scale: fine sub-yard steps at the small end
     // (0.4yd, 10x smaller than the old minimum) through region-sized 300yd
     // sweeps at the top, all on one comfortable track.
@@ -3583,6 +3616,7 @@ export class Inspector {
   private sculptBrushShapePanel(): void {
     const d = this.deps;
     const s = section(t('editor.sculpt.shapeTitle'));
+    s.appendChild(brushShapeButtons(d.getBrushShape(), (shape) => d.setBrushShape(shape), false));
     s.appendChild(
       slider(t('editor.sculpt.hardness'), {
         min: 0,
@@ -3695,6 +3729,35 @@ export class Inspector {
     s.appendChild(this.paintIdSelect(cfg.flatId, (id) => d.setAutoTexture({ flatId: id })));
     s.appendChild(el('p', 'ed-hint', t('editor.sculpt.autoTexSteep')));
     s.appendChild(this.paintIdSelect(cfg.steepId, (id) => d.setAutoTexture({ steepId: id })));
+  }
+
+  /** The Slope tool: its start readout and the hard-edge choice it shares
+   *  with Flatten. The ramp's end is wherever each stroke is pressed. */
+  private slopePanel(): void {
+    const d = this.deps;
+    const s = section(t('editor.tool.slope'));
+    s.appendChild(hint(t('editor.slope.hint')));
+    const start = d.getSlopeStart();
+    s.appendChild(
+      el(
+        'p',
+        'ed-hint',
+        start
+          ? t('editor.slope.start', {
+              height: formatNumber(start.y, { maximumFractionDigits: 2 }),
+            })
+          : t('editor.slope.noStart'),
+      ),
+    );
+    if (start) {
+      s.appendChild(button(t('editor.slope.clearStart'), () => d.clearSlopeStart(), 'small'));
+    }
+    s.appendChild(
+      checkbox(t('editor.flatten.hardEdge'), d.getFlattenHardEdge(), (on) =>
+        d.setFlattenHardEdge(on),
+      ).root,
+    );
+    this.root.appendChild(s);
   }
 
   /** Flatten's locked level: right-click the ground to pick it, type it, or
@@ -4371,6 +4434,7 @@ export class Inspector {
   private waterPanel(): void {
     const d = this.deps;
     const s = section(t('editor.water.title'));
+    s.appendChild(button(t('editor.pond.add'), () => d.armPond(), 'small ed-pond-add'));
     s.appendChild(
       slider(t('editor.water.level'), {
         min: MIN_WATER_LEVEL,
@@ -5913,8 +5977,12 @@ export class Inspector {
         }),
       );
       s.appendChild(
-        this.coordField(t('editor.selection.y'), sel.y ?? 0, (v) => {
-          d.updateSelection({ y: v }, true);
+        placementHeightPanel({
+          ...d,
+          getStep: () => this.placementHeightStep,
+          setStep: (value) => {
+            this.placementHeightStep = value;
+          },
         }),
       );
       s.appendChild(
@@ -6761,6 +6829,14 @@ export class Inspector {
     const L = d.getLighting();
     const p = L.profile;
     const s = section(t('editor.lighting.title'));
+    const snowfall = checkbox(t('editor.weather.showSnowfall'), d.getSnowfallEnabled(), (on) =>
+      d.setSnowfallEnabled(on),
+    );
+    snowfall.root.classList.add('ed-snowfall-toggle');
+    const snowfallHint = hint(t('editor.weather.snowfallHint'));
+    snowfallHint.id = 'ed-snowfall-hint';
+    snowfall.input.setAttribute('aria-describedby', snowfallHint.id);
+    s.append(snowfall.root, snowfallHint);
     const row = el('div', 'ed-row ed-wrap');
     row.setAttribute('role', 'radiogroup');
     row.setAttribute('aria-label', t('editor.lighting.presetLabel'));

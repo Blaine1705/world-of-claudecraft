@@ -36,6 +36,7 @@ import {
 } from '../render/terrain';
 import { MAX_PAINT_SLOTS, paintTextureSlotUsage } from '../render/terrain_paint_layers';
 import { naturalSwayKindForAssetPath } from '../render/tree_sway';
+import type { BrushShape } from '../sim/brush_shape';
 import {
   CAVE_MAX_MULT,
   CAVE_MAX_RADIUS,
@@ -298,6 +299,7 @@ import { Editor3DViewport, type GizmoCutChange, type GizmoHitboxChange } from '.
 import { AssetBrowser } from './asset_browser';
 import { ASSET_CATALOG, assetById } from './asset_catalog.generated';
 import { classifyCell, isTownStructure, makeRetexNoise, RETEX_SWATCHES } from './auto_retexture';
+import { visitBiomeBrushCells } from './biome_brush_core';
 import { finestPaintCell, growBiomePaint, resampleBiomePaint } from './biome_paint_core';
 import { nearestBlockerIndex } from './blocker_core';
 import { brushAlphaById, importBrushAlpha, sampleBrushAlpha } from './brush_alphas';
@@ -521,6 +523,18 @@ import {
   savePlaytestRecoveryDraft,
 } from './playtest';
 import { DEFAULT_POINT_SOUND } from './point_sounds';
+import { createPondCommand } from './pond_commands';
+import {
+  DEFAULT_POND_DEPTH,
+  DEFAULT_POND_RADIUS,
+  POND_BANK_RADIUS_FACTOR,
+  POND_DEPTH_MAX,
+  POND_DEPTH_MIN,
+  POND_RADIUS_MAX,
+  POND_RADIUS_MIN,
+  planPond,
+  pondTerrainMatches,
+} from './pond_core';
 import {
   applyCollisionShare,
   type PrefabAuthoredCollision,
@@ -548,8 +562,10 @@ import {
   pastePlacementSelection,
   toggledKeySelection,
 } from './selection_clipboard';
+import { SelectionQuickActions, type SelectionQuickActionsDeps } from './selection_quick_actions';
 import { editorErrorKey } from './server_errors_core';
 import { createShippedMap } from './shipped_maps';
+import { type SlopePoint, type SlopeRamp, slopeStamp } from './slope_core';
 import { appendSpan, removeSpan } from './span_core';
 import {
   erasePlacementIndex,
@@ -627,7 +643,13 @@ function isSelectionTool(tool: EditorTool): boolean {
  *  Shift while stroking applies the OPPOSITE sub-mode (raise<->lower,
  *  smooth<->flatten). */
 function isSculptTool(tool: EditorTool): boolean {
-  return tool === 'raise' || tool === 'lower' || tool === 'smooth' || tool === 'flatten';
+  return (
+    tool === 'raise' ||
+    tool === 'lower' ||
+    tool === 'smooth' ||
+    tool === 'flatten' ||
+    tool === 'slope'
+  );
 }
 // The built-in meadow grass's perceived blade hue/lightness (render
 // grass_patch.ts DEFAULT_HUE / TINT_L): the foliage brush's defaults, so
@@ -644,6 +666,7 @@ const AUTOSAVE_PREF_KEY = 'woc_editor_autosave';
 const FREE_FLY_PREF_KEY = 'woc_editor_freefly';
 const SHOW_BOUNDARY_PREF_KEY = 'woc_editor_show_boundary';
 const BIRDS_PREF_KEY = 'woc_editor_birds';
+const SNOWFALL_PREF_KEY = 'woc_editor_snowfall';
 const INVERT_PAN_PREF_KEY = 'woc_editor_invert_pan';
 const SHOW_PLAYER_PREF_KEY = 'woc_editor_show_player';
 const LIGHTING_PREF_KEY = 'woc_editor_lighting';
@@ -819,6 +842,7 @@ const BRUSH_COLOR: Partial<Record<EditorTool, number>> = {
   lower: 0x5aa0ff,
   smooth: 0x9fdc7f,
   flatten: 0xd8c27a,
+  slope: 0xe0a85a,
   erase: 0xe0503c,
   place: 0x3fd0ff,
   foliage: 0x69d84f,
@@ -1043,6 +1067,8 @@ export class EditorApp {
   private collidersHiddenOn = readPref(HIDE_COLLIDERS_PREF_KEY);
   // Named-location area boxes; shown by default, hideable from the Zone tool.
   private locationsHiddenOn = readPref(HIDE_LOCATIONS_PREF_KEY);
+  // Preview-only snowfall visibility, remembered without changing the map.
+  private snowfallOn = readPrefDefaultOn(SNOWFALL_PREF_KEY);
   // "Scale all copies" range (Selection panel): a random scale in [min, max] is
   // rolled onto every placement of the selected asset. Session state, not saved.
   private cloneScaleMin = 0.8;
@@ -1253,6 +1279,16 @@ export class EditorApp {
   } | null = null;
   // The Fluid tool's armed pool kind (preset).
   private fluidKind: FluidKind = 'lava';
+  private pondRadius = DEFAULT_POND_RADIUS;
+  private pondDepth = DEFAULT_POND_DEPTH;
+  // Brush footprints, kept apart so a square paint brush never squares sculpt.
+  private paintBrushShape: BrushShape = 'circle';
+  private sculptBrushShape: BrushShape = 'circle';
+  // Slope tool: the right-clicked start, and the ramp the current stroke
+  // follows (its end is the press point, set at stroke begin).
+  private slopeStart: SlopePoint | null = null;
+  private slopeRamp: SlopeRamp | null = null;
+  private selectionQuickActions!: SelectionQuickActions;
   // Caves tool sub-mode: lay cave rig nodes, CARVE real interiors, cut sheet
   // openings, patch ground back, paint remesh detail, run the volumetric
   // Dig/Fill sculpt brushes, or the edge-rounding Smooth brush.
@@ -1715,6 +1751,7 @@ export class EditorApp {
       },
       refresh: () => {
         this.buildTransformControls?.refresh();
+        this.selectionQuickActions?.refresh();
         this.inspector.refresh();
       },
       arm: () => this.setTool('building'),
@@ -1778,6 +1815,9 @@ export class EditorApp {
       onUndo: () => this.doUndo(),
       onRedo: () => this.doRedo(),
     });
+
+    this.selectionQuickActions = new SelectionQuickActions(this.selectionQuickActionsDeps());
+    stageWrap.append(this.selectionQuickActions.root);
 
     this.cmBar = new CollisionMasterBar(stageWrap, {
       getMode: () => this.cmSubMode,
@@ -2509,8 +2549,10 @@ export class EditorApp {
         toolActive: () => this.toolWantsPointer(),
         // Vertices mode claims Shift+drag too: without it the camera pan wins
         // and a Shift rubber band never reaches the tool at all.
+        // Slope has no inverted mode, so Shift+drag keeps panning with it.
         shiftEditsTool: () =>
-          isSculptTool(this.tool) || (this.tool === 'meshfix' && this.meshFixVertexMode),
+          (isSculptTool(this.tool) && this.tool !== 'slope') ||
+          (this.tool === 'meshfix' && this.meshFixVertexMode),
         onEditStart: (w, ev) => this.editStart(w, ev),
         onEditMove: (w, ev) => this.editMove(w, ev),
         onEditEnd: (ev) => this.editEnd(ev),
@@ -2521,6 +2563,7 @@ export class EditorApp {
         // volumes/components instead.
         placementDragEnabled: () =>
           isSelectionTool(this.tool) && !this.hitboxEdit && !this.meshEditActive(),
+        ...this.placementPickingHooks(),
         onPlacementDragStart: (index) => this.beginPlacementDrag(index),
         onPlacementDragMove: (w) => this.placementDragMove(w),
         onPlacementDragEnd: () => this.endPlacementDrag(),
@@ -2534,6 +2577,12 @@ export class EditorApp {
         onObjectDragMove: (w) => this.objectMoves.dragMove(w),
         onObjectDragEnd: () => this.objectMoves.endDrag(),
         onBoxSelect: (indices, additive) => this.selectPlacements(indices, additive),
+        placementLabel: (index) => {
+          const placement = this.map.placements[index];
+          return placement
+            ? placement.name?.trim() || this.placementLabel(placement.assetId)
+            : t('editor.picking.asset', { number: formatNumber(index + 1) });
+        },
         onTransformWheel: (kind, deltaY) => this.transformWheel(kind, deltaY),
         onFlySpeedWheel: (deltaY) => this.flySpeedWheel(deltaY),
         gizmoMode: () =>
@@ -2571,6 +2620,7 @@ export class EditorApp {
       this.viewport3d.setShowPlayer(this.showPlayerOn);
       this.viewport3d.setCollidersHidden(this.collidersHiddenOn);
       this.viewport3d.setLocationsHidden(this.locationsHiddenOn);
+      this.viewport3d.setSnowEnabled(this.snowfallOn);
       this.viewport3d.setWireframe(this.wireframeOn);
       this.viewport3d.setXray(this.xrayOn);
       this.viewport3d.setCameraSpeeds(this.cameraSpeeds);
@@ -2803,6 +2853,7 @@ export class EditorApp {
     if (tool !== 'city') this.cityToolReset();
     this.buildingWorkspace?.syncView();
     this.buildTransformControls?.refresh();
+    this.selectionQuickActions?.refresh();
     if (tool === 'spawn') this.viewport3d?.setZonePreview(this.map.playerSpawnArea ?? null);
     else if (this.tool !== 'zone' && this.tool !== 'music') this.viewport3d?.setZonePreview(null);
     this.viewport3d?.clearBrush();
@@ -2847,6 +2898,7 @@ export class EditorApp {
     this.previewOn = on;
     this.topbar.setPreview(on);
     this.viewport3d?.setPreviewMode(on);
+    this.selectionQuickActions?.refresh();
     this.syncFootprintOverlay();
   }
 
@@ -3135,6 +3187,7 @@ export class EditorApp {
       this.tool === 'lower' ||
       this.tool === 'smooth' ||
       this.tool === 'flatten' ||
+      this.tool === 'slope' ||
       this.tool === 'paint' ||
       this.tool === 'foliage' ||
       this.tool === 'clutter' ||
@@ -3174,6 +3227,7 @@ export class EditorApp {
       case 'lower':
       case 'smooth':
       case 'flatten':
+      case 'slope':
         if (this.tool === 'raise' && this.sculptGrab && ev) {
           this.grabBegin(w, ev);
           break;
@@ -3216,6 +3270,9 @@ export class EditorApp {
         break;
       case 'collider':
         this.insertColliderAt(w);
+        break;
+      case 'pond':
+        this.insertPondAt(w);
         break;
       case 'fluid':
         this.insertFluidAt(w);
@@ -3420,6 +3477,7 @@ export class EditorApp {
       case 'lower':
       case 'smooth':
       case 'flatten':
+      case 'slope':
         if (this.grabSession) {
           if (ev) this.grabStep(ev);
           this.brushRing(w);
@@ -3598,6 +3656,7 @@ export class EditorApp {
       case 'lower':
       case 'smooth':
       case 'flatten':
+      case 'slope':
         if (this.grabSession) {
           this.grabCommit();
           this.inspector.refresh();
@@ -3794,6 +3853,9 @@ export class EditorApp {
           : 0xffd100;
     } else if (this.tool === 'place') {
       radius = Math.max(0.8, this.placeScale * 0.9);
+    } else if (this.tool === 'pond') {
+      radius = this.pondRadius * POND_BANK_RADIUS_FACTOR;
+      color = 0x4aa6d8;
     } else if (this.tool === 'collider') {
       radius = 2;
     } else if (this.tool === 'camp') {
@@ -3819,7 +3881,13 @@ export class EditorApp {
       this.viewport3d.clearBrush();
       return;
     }
-    this.viewport3d.setBrush(w.x, w.z, radius, color);
+    this.viewport3d.setBrush(w.x, w.z, radius, color, this.brushShapeForTool());
+  }
+
+  /** The active tool's brush footprint (Paint and the sculpt family only). */
+  private brushShapeForTool(): BrushShape {
+    if (this.tool === 'paint') return this.paintBrushShape;
+    return isSculptTool(this.tool) ? this.sculptBrushShape : 'circle';
   }
 
   private tap3d(clientX: number, clientY: number, w: Vec2 | null, additive: boolean): void {
@@ -3975,6 +4043,16 @@ export class EditorApp {
       this.tool === 'flatten' && !this.flattenSmooth ? this.flattenLock : null,
       terrainHeight(w.x, w.z, this.map.meta.seed),
     );
+    // Slope: the press point and the ground under it are the ramp's END, read
+    // before this stroke changes anything. No start yet = nothing to climb to.
+    this.slopeRamp =
+      this.tool === 'slope' && this.slopeStart
+        ? {
+            start: this.slopeStart,
+            end: { x: w.x, z: w.z, y: terrainHeight(w.x, w.z, this.map.meta.seed) },
+          }
+        : null;
+    if (this.tool === 'slope' && !this.slopeStart) this.toasts.info(t('editor.slope.needStart'));
     // One Noise pattern per stroke, keyed off the press point and the edit
     // count so two strokes never repeat each other.
     this.strokeNoiseSeed = Math.floor(
@@ -6183,6 +6261,7 @@ export class EditorApp {
   // ---- Grab sculpt (snake hook) ---------------------------------------------------
 
   private shapeSculptStamp(stamp: HeightStamp): HeightStamp {
+    if (this.sculptBrushShape === 'square') stamp.shape = 'square';
     stamp.hardness = Math.max(0, Math.min(1, this.sculptHardness / 100));
     if (this.sculptAlphaId) stamp.alpha = this.sculptAlphaId;
     return stamp;
@@ -6332,6 +6411,7 @@ export class EditorApp {
   }
 
   private strokeStep(w: Vec2): void {
+    if (this.tool === 'slope' && !this.slopeRamp) return;
     const spacing = this.brushRadius * 0.5;
     if (this.lastStamp) {
       const dx = w.x - this.lastStamp.x;
@@ -6349,7 +6429,17 @@ export class EditorApp {
     // ids still route here for safety. Holding Shift (strokeInvert) flips the
     // active sub-mode for this stamp: raise<->lower and smooth<->flatten.
     const isLevelTool = this.tool === 'smooth' || this.tool === 'flatten';
-    if (isLevelTool) {
+    if (this.tool === 'slope' && this.slopeRamp) {
+      // Slope eases toward the ramp plane at Flatten's per-stamp pace.
+      stamp = slopeStamp(
+        w.x,
+        w.z,
+        this.brushRadius,
+        this.slopeRamp,
+        SCULPT_POWER_SCALE,
+        this.flattenHardEdge,
+      );
+    } else if (isLevelTool) {
       // Base mode: Smooth tool smooths; Flatten tool smooths only when its
       // "smooth mode" checkbox is on. Shift inverts that choice.
       let smoothing = this.tool === 'smooth' || (this.tool === 'flatten' && this.flattenSmooth);
@@ -7370,58 +7460,28 @@ export class EditorApp {
     // Optional brush alpha: a grayscale mask across the brush footprint that
     // modulates the stamp coverage (splatter, streaks, ...).
     const alphaMask = brushAlphaById(this.paintAlphaId);
-    const c0 = Math.floor((w.x - r - bp.originX) / bp.cell);
-    const c1 = Math.floor((w.x + r - bp.originX) / bp.cell);
-    const r0 = Math.floor((w.z - r - bp.originZ) / bp.cell);
-    const r1 = Math.floor((w.z + r - bp.originZ) / bp.cell);
     let touched = false;
-    for (let row = r0; row <= r1; row++) {
-      for (let col = c0; col <= c1; col++) {
-        if (col < 0 || col >= bp.cols || row < 0 || row >= bp.rows) continue;
-        const cx = bp.originX + (col + 0.5) * bp.cell;
-        const cz = bp.originZ + (row + 0.5) * bp.cell;
-        const dx = cx - w.x;
-        const dz = cz - w.z;
-        const d2 = dx * dx + dz * dz;
-        if (d2 > r * r) continue;
-        // Stamp coverage at this cell: the alpha mask value (1 with none),
-        // faded by the quadratic hardness falloff across the rim; one
-        // deterministic per-cell gate decides, so undo/redo never flickers.
-        let coverage = alphaMask ? sampleBrushAlpha(alphaMask, dx / r, dz / r) : 1;
-        if (hard < 1) {
-          const d = Math.sqrt(d2) / r;
-          if (d > hard) {
-            const t = (d - hard) / Math.max(0.001, 1 - hard);
-            coverage *= 1 - t * t;
-          }
-        }
-        if (coverage <= 0) continue;
-        if (coverage < 1) {
-          // Partial coverage is stored as a DITHER: one cell holds one swatch,
-          // so a 40%-covered rim cell is 40% of the rim's cells taking the
-          // paint. Which cells matters. The old hash gate was white noise, so
-          // the rim clumped into salt-and-pepper blotches; the R2 quasirandom
-          // sequence (Roberts' generalisation of the golden ratio) spreads the
-          // chosen cells about as evenly as a point set can be, which is what
-          // makes the rim resolve into a clean ramp under the shader's blend
-          // kernel instead of speckle. Still a pure function of (col, row), so
-          // undo/redo and a re-stroke land on exactly the same cells.
-          const gate = (col * 0.7548776662466927 + row * 0.5698402909980532) % 1;
-          if (gate >= coverage) continue;
-        }
-        const idx = row * bp.cols + col;
-        if (bp.ids[idx] === this.paintBiome) continue;
+    // Coverage per cell (mask, hardness rim, the R2 dither gate) lives in
+    // biome_brush_core.ts; it visits only cells that actually change.
+    visitBiomeBrushCells(
+      bp,
+      {
+        x: w.x,
+        z: w.z,
+        radius: r,
+        shape: this.paintBrushShape,
+        hardness: hard,
+        sampleAlpha: alphaMask ? (u, v) => sampleBrushAlpha(alphaMask, u, v) : undefined,
+      },
+      this.paintBiome,
+      (idx) => {
         const change = this.paintChanges.get(idx);
         if (change) change.next = this.paintBiome;
-        else
-          this.paintChanges.set(idx, {
-            prev: bp.ids[idx],
-            next: this.paintBiome,
-          });
+        else this.paintChanges.set(idx, { prev: bp.ids[idx], next: this.paintBiome });
         bp.ids[idx] = this.paintBiome;
         touched = true;
-      }
-    }
+      },
+    );
     if (touched) {
       const region = {
         minX: w.x - r,
@@ -9024,6 +9084,7 @@ export class EditorApp {
     this.viewport3d?.setMultiSelection(
       [...this.selectedSet].filter((i) => i !== this.selectedPlacement),
     );
+    this.selectionQuickActions?.refresh();
   }
 
   /** Select one fire source for detailed editing. Entering this mode switches
@@ -9198,6 +9259,102 @@ export class EditorApp {
       this.setTool('move');
     }
     this.inspector.refresh();
+  }
+
+  /** Pond tool: dig a round basin and fill it with a local water volume, as
+   *  ONE undo step; refused when authored terrain would leave it floating. */
+  private insertPondAt(w: Vec2): void {
+    const seed = this.map.meta.seed;
+    const plan = planPond({ ...w, radius: this.pondRadius, depth: this.pondDepth }, (x, z) =>
+      terrainHeight(x, z, seed),
+    );
+    if (!plan) {
+      this.toasts.error(t('editor.pond.invalid'));
+      return;
+    }
+    const command = createPondCommand(this.map, plan, (region) => {
+      this.terrainEditsMutated();
+      this.setSelectedPlacement(null);
+      this.refreshTerrain(region);
+      this.viewport3d?.rebuildPlacements();
+      this.canvasDirty = true;
+    });
+    if (!command) {
+      this.toasts.error(
+        this.map.placements.length >= MAX_PLACEMENTS
+          ? t('editor.status.placementCapReached', { max: MAX_PLACEMENTS })
+          : t('editor.status.terrainCapReached', { max: MAX_TERRAIN_EDITS }),
+      );
+      return;
+    }
+    command.redo();
+    if (!pondTerrainMatches(plan, (x, z) => terrainHeight(x, z, seed))) {
+      command.undo();
+      this.toasts.error(t('editor.pond.invalid'));
+      return;
+    }
+    this.map.meta.updatedAt = now();
+    this.pushUndo(command);
+  }
+
+  /** The floating Selected asset box: quick actions on the selected placement
+   *  through the same commands the inspector uses. */
+  private selectionQuickActionsDeps(): SelectionQuickActionsDeps {
+    return {
+      getState: () => {
+        const p =
+          this.selectedPlacement === null ? null : this.map.placements[this.selectedPlacement];
+        if (
+          !p ||
+          !isSelectionTool(this.tool) ||
+          this.previewOn ||
+          this.hitboxEdit ||
+          this.meshEditActive()
+        )
+          return null;
+        return {
+          label: p.name?.trim() || this.placementLabel(p.assetId),
+          count: Math.max(
+            1,
+            [...this.selectedSet].filter((index) => this.map.placements[index]).length,
+          ),
+          transform: { rotY: p.rotY, scale: p.scale },
+          fineRotation: this.fineBuildRotation,
+        };
+      },
+      onMove: () => this.setTool('move'),
+      onFrame: () => this.focusSelection(),
+      onDuplicate: () => this.duplicateSelectedPlacement(),
+      onRemove: () => this.removeSelectedPlacements(),
+      onTransform: (next) => {
+        this.updateSelectedPlacement(next, true);
+        this.inspector.refresh();
+      },
+    };
+  }
+
+  /** Precise picking and the overlap chooser (viewport placement_pick_*). */
+  private placementPickingHooks() {
+    return {
+      placementPickingEnabled: () =>
+        (isSelectionTool(this.tool) || this.tool === 'building') &&
+        !this.previewOn &&
+        !this.hitboxEdit &&
+        !this.meshEditActive(),
+      onChoosePlacement: (index: number, additive: boolean) => {
+        if (!this.map.placements[index]) return;
+        if (!isSelectionTool(this.tool)) this.setTool('move');
+        if (additive) this.togglePlacementInSelection(index);
+        else {
+          this.setSelectedPlacement(index);
+          this.inspector.refresh();
+          this.canvasDirty = true;
+        }
+      },
+      onPickFloorVisibilityChange: (hideAbove: boolean) =>
+        this.buildingWorkspace.panelDeps().setHideAbove(hideAbove),
+      placementDragUsesCursor: () => this.tool === 'rotate' || this.tool === 'scale',
+    };
   }
 
   private insertFluidAt(w: Vec2): void {
@@ -10220,7 +10377,18 @@ export class EditorApp {
   /** Flatten: a right-click on the ground locks the level every drag
    *  flattens to. */
   private rightTap3d(w: Vec2 | null): void {
-    if (this.tool !== 'flatten' || this.flattenSmooth || !w) return;
+    if (!w) return;
+    if (this.tool === 'slope') {
+      this.slopeStart = { x: w.x, z: w.z, y: terrainHeight(w.x, w.z, this.map.meta.seed) };
+      this.toasts.info(
+        t('editor.slope.startPicked', {
+          height: formatNumber(this.slopeStart.y, { maximumFractionDigits: 2 }),
+        }),
+      );
+      this.inspector.refresh();
+      return;
+    }
+    if (this.tool !== 'flatten' || this.flattenSmooth) return;
     this.flattenLock = terrainHeight(w.x, w.z, this.map.meta.seed);
     this.toasts.info(
       t('editor.flatten.levelPicked', {
@@ -10367,6 +10535,7 @@ export class EditorApp {
       this.setHitboxes(index, this.materializeHitboxes(p), 'edit-hitboxes');
     }
     this.hitboxEdit = { index, selected: new Set() };
+    this.selectionQuickActions?.refresh();
     this.syncFootprintOverlay();
     this.syncHitboxEditView();
     this.inspector.refresh();
@@ -10375,6 +10544,7 @@ export class EditorApp {
   private exitHitboxEdit(): void {
     if (!this.hitboxEdit) return;
     this.hitboxEdit = null;
+    this.selectionQuickActions?.refresh();
     this.hitboxDragBase = null;
     this.viewport3d?.setHitboxEdit(null);
     this.syncFootprintOverlay();
@@ -13759,8 +13929,12 @@ export class EditorApp {
     if (copies.length === 0) return;
     const start = this.map.placements.length;
     this.appendPlacements(copies, 'duplicate-placement');
+    // At the placement cap only some (or none) of the copies land: select
+    // exactly those, and keep the current selection when nothing was added.
+    const added = this.map.placements.length - start;
+    if (added <= 0) return;
     this.setSelectedPlacement(start);
-    this.selectedSet = new Set(copies.map((_, k) => start + k));
+    this.selectedSet = new Set(Array.from({ length: added }, (_, k) => start + k));
     this.syncMultiSelectionView();
     this.inspector.refresh();
   }
@@ -15273,6 +15447,7 @@ export class EditorApp {
     this.topbar.setUndoDepth(this.undo.depth);
     this.topbar.setUndoState(this.undo.canUndo, this.undo.canRedo);
     this.buildTransformControls?.refresh();
+    this.selectionQuickActions?.refresh();
     this.buildingWorkspace?.syncView();
   }
 
@@ -16260,6 +16435,8 @@ export class EditorApp {
     repairMissingTreeCollision(map, applyDefaultCollision);
     this.map = map;
     this.flattenLock = null;
+    this.slopeStart = null;
+    this.slopeRamp = null;
     this.materialFinishBase = null;
     this.buildingWorkspace?.reset();
     // A region map (Open -> Shipped -> Ravenrift) can be written back to the
@@ -16640,7 +16817,8 @@ export class EditorApp {
       return;
     }
     if (ev.key === '[' || ev.key === '{') {
-      if (ev.shiftKey) this.brushStrength = Math.max(1, this.brushStrength - 1);
+      if (this.tool === 'pond') this.pondRadius = Math.max(POND_RADIUS_MIN, this.pondRadius - 0.5);
+      else if (ev.shiftKey) this.brushStrength = Math.max(1, this.brushStrength - 1);
       // Proportional steps so the keys stay useful across the whole 0.4-300yd
       // range (matching the log brush slider).
       else this.brushRadius = Math.max(0.4, Math.round((this.brushRadius / 1.12) * 100) / 100);
@@ -16648,7 +16826,8 @@ export class EditorApp {
       return;
     }
     if (ev.key === ']' || ev.key === '}') {
-      if (ev.shiftKey) this.brushStrength = Math.min(50, this.brushStrength + 1);
+      if (this.tool === 'pond') this.pondRadius = Math.min(POND_RADIUS_MAX, this.pondRadius + 0.5);
+      else if (ev.shiftKey) this.brushStrength = Math.min(50, this.brushStrength + 1);
       else this.brushRadius = Math.min(300, Math.round(this.brushRadius * 1.12 * 100) / 100);
       this.inspector.refresh();
       return;
@@ -16756,7 +16935,8 @@ export class EditorApp {
       const extent = volume
         ? Math.max(volume.sizeX, volume.sizeY, volume.sizeZ) / 2
         : Math.max(1.5, p.scale * 2);
-      this.viewport3d.focusOn(p.x, p.z, extent);
+      const baseY = p.detached ? (p.groundY ?? 0) : terrainHeight(p.x, p.z, this.map.meta.seed);
+      this.viewport3d.focusOn(p.x, p.z, extent, baseY + (p.y ?? 0));
       return;
     }
     const b = this.worldBounds();
@@ -17011,6 +17191,21 @@ export class EditorApp {
         return this.buildTransformControls.root;
       },
       cityBuild: () => this.cityPanelDeps(),
+      getBrushShape: () => (this.tool === 'paint' ? this.paintBrushShape : this.sculptBrushShape),
+      setBrushShape: (shape) => {
+        if (shape !== 'circle' && shape !== 'square') return;
+        if (this.tool === 'paint') this.paintBrushShape = shape;
+        else this.sculptBrushShape = shape;
+        this.canvasDirty = true;
+        if (this.cursorWorld) this.brushRing(this.cursorWorld);
+        this.inspector.refresh();
+      },
+      getSlopeStart: () => this.slopeStart,
+      clearSlopeStart: () => {
+        this.slopeStart = null;
+        this.slopeRamp = null;
+        this.inspector.refresh();
+      },
       getBrushRadius: () => this.brushRadius,
       setBrushRadius: (v) => {
         this.brushRadius = v;
@@ -17190,6 +17385,17 @@ export class EditorApp {
         this.placeAssetId = WATERFALL_ASSET_ID;
         this.placeAssetLabel = t('editor.water.waterfallLabel');
         this.setTool('place');
+      },
+      armPond: () => this.setTool('pond'),
+      getPondRadius: () => this.pondRadius,
+      setPondRadius: (value) => {
+        this.pondRadius = Math.min(POND_RADIUS_MAX, Math.max(POND_RADIUS_MIN, value));
+        this.canvasDirty = true;
+        if (this.cursorWorld) this.brushRing(this.cursorWorld);
+      },
+      getPondDepth: () => this.pondDepth,
+      setPondDepth: (value) => {
+        this.pondDepth = Math.min(POND_DEPTH_MAX, Math.max(POND_DEPTH_MIN, value));
       },
       getWaterLevel: () => this.map.waterLevel ?? WATER_LEVEL,
       previewWaterLevel: (v) => this.previewWater(v),
@@ -17608,6 +17814,8 @@ export class EditorApp {
         };
       },
       updateSelection: (change, commit) => this.updateSelectedPlacement(change, commit),
+      getSelectionHeights: () => [...this.selectedSet].map((i) => this.map.placements[i]?.y ?? 0),
+      commitSelectionTransform: () => this.flushTransformCommit(),
       getSelectedFireEmitter: () => this.selectedFireEmitter,
       setSelectedFireEmitter: (index) => this.setSelectedFireEmitter(index),
       setAssetSway: (on) => this.setAssetSway(on),
@@ -17756,6 +17964,12 @@ export class EditorApp {
       focusSelection: () => this.focusSelection(),
       getWeather: () => this.resolvedWeather(),
       setWeather: (w) => this.setMapWeather(w),
+      getSnowfallEnabled: () => this.snowfallOn,
+      setSnowfallEnabled: (on) => {
+        this.snowfallOn = on;
+        this.viewport3d?.setSnowEnabled(on);
+        writePref(SNOWFALL_PREF_KEY, on);
+      },
       getMusic: () => ({
         zoneTrack: this.map.music?.zoneTrack ?? null,
         areas: this.map.music?.areas ?? [],
@@ -18066,12 +18280,16 @@ export class EditorApp {
         spawn: this.map.playerStart ?? null,
         spawnArea: this.spawnAreaPreview ?? this.map.playerSpawnArea ?? null,
         brush:
-          this.isDragTool() && this.cursorWorld
+          (this.isDragTool() || this.tool === 'pond') && this.cursorWorld
             ? {
                 x: this.cursorWorld.x,
                 z: this.cursorWorld.z,
-                radius: this.brushRadius,
-                raise: this.tool !== 'lower',
+                radius:
+                  this.tool === 'pond'
+                    ? this.pondRadius * POND_BANK_RADIUS_FACTOR
+                    : this.brushRadius,
+                raise: this.tool !== 'lower' && this.tool !== 'pond',
+                shape: this.brushShapeForTool(),
               }
             : null,
       });

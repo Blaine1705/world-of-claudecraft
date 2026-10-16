@@ -10027,6 +10027,33 @@ export const en_CA: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "Target: {name}",
+      "choose": "Choose overlapping asset ({count})",
+      "chooser": "Choose an asset under the pointer",
+      "front": "Frontmost",
+      "behind": "Behind another asset",
+      "close": "Close",
+      "keyboard": "Use Previous/Next or arrow keys to compare. Enter selects; Escape closes.",
+      "hint": "Click again to cycle overlapping items, or choose from this list.",
+      "asset": "Asset {number}",
+      "overlapAt": "Overlaps at {name}",
+      "previous": "Previous",
+      "next": "Next",
+      "position": "{current} of {count}",
+      "details": "Item {number} · Floor {level} · Height {height}",
+      "ungroupedDetails": "Item {number} · Height {height}",
+      "hideAbove": "Hide floors above selected level",
+      "allFloors": "All floors visible",
+      "filteredFloors": "Floors above level {level} are hidden"
+    },
+    "quickActions": {
+      "title": "Selected asset",
+      "move": "Move",
+      "frame": "Frame",
+      "remove": "Remove",
+      "count": "{count} selected"
+    },
     "buildMode": {
       "materialNames": {
         "WardenStone": "Smooth Stone",
@@ -10564,6 +10591,8 @@ export const en_CA: EnTranslations = {
       "lower": "Lower",
       "smooth": "Smooth",
       "flatten": "Flatten / Smooth",
+      "slope": "Slope",
+      "pond": "Pond",
       "tunnel": "Caves",
       "rock": "Rock Gen",
       "build": "Build Model",
@@ -10753,6 +10782,9 @@ export const en_CA: EnTranslations = {
     },
     "brush": {
       "title": "Brush",
+      "shape": "Brush shape",
+      "circle": "Circle",
+      "square": "Square",
       "size": "Brush size",
       "strength": "Strength",
       "sizeHint": "Keys: [ and ] resize the brush; Shift+[ and Shift+] change strength.",
@@ -11052,6 +11084,22 @@ export const en_CA: EnTranslations = {
       "levelHintNone": "Right-click the ground to lock its height, then drag anywhere to level to it. Empty: each drag levels to where it starts.",
       "levelPicked": "Level locked at {height} yards."
     },
+    "slope": {
+      "hint": "Right-click the ground where the slope should start. Then press where it should end and drag along the path: the ground eases into a smooth ramp between the two heights.",
+      "start": "Start height: {height} yards",
+      "noStart": "No start set yet. Right-click the ground to set one.",
+      "clearStart": "Clear start",
+      "needStart": "Right-click the ground first to set where the slope starts.",
+      "startPicked": "Slope start set at {height} yards."
+    },
+    "pond": {
+      "title": "Create a pond",
+      "add": "Add pond",
+      "radius": "Pond radius",
+      "depth": "Pond depth",
+      "hint": "Click the ground to dig a round pond and fill it with water. The circle includes the softly sloping bank. Undo removes the water and basin together.",
+      "invalid": "Cannot dig a pond on this ground. Choose another spot."
+    },
     "water": {
       "title": "Water Level",
       "level": "Water level",
@@ -11347,6 +11395,11 @@ export const en_CA: EnTranslations = {
     },
     "selection": {
       "title": "Selection",
+      "heightOffset": "Height offset (yards)",
+      "heightStep": "Step (yards)",
+      "raiseAsset": "Raise",
+      "lowerAsset": "Lower",
+      "heightHint": "Negative offsets sink assets below their base.",
       "none": "Nothing selected. Use Select and click a placed asset.",
       "squareCollision": "Square collision (follows rotation)",
       "asset": "Asset: {name}",
@@ -11859,6 +11912,8 @@ export const en_CA: EnTranslations = {
     },
     "weather": {
       "title": "Weather",
+      "showSnowfall": "Show snowfall",
+      "snowfallHint": "A Studio preview setting, remembered in this browser.",
       "zoneTitle": "Weather in this zone",
       "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
       "auto": "Auto",
@@ -11949,6 +12004,8 @@ export const en_CA: EnTranslations = {
         "lower": "Lower the terrain under the brush.",
         "smooth": "Smooth bumps toward the local average height.",
         "flatten": "Level the ground to the drag-start height, or smooth bumps (checkbox picks the mode).",
+        "slope": "Right-click to set the start height, then drag from another height to lay a smooth ramp.",
+        "pond": "Click to dig a local pond with its own water surface.",
         "paint": "Paint biome ground cover over the zone default.",
         "water": "Set a declared lake's water level.",
         "place": "Place catalog or uploaded assets on the ground.",

@@ -981,6 +981,7 @@ function sanitizeStamp(v: unknown): HeightStamp | null {
     delta: clamp(num(s.delta, 0), -200, 200),
     falloff: s.falloff === 'flat' ? 'flat' : 'smooth',
   };
+  if (s.shape === 'circle' || s.shape === 'square') stamp.shape = s.shape;
   if (s.mode === 'level') stamp.mode = 'level';
   // Level-target slope (Smooth's local trend plane). Clamped to a sane grade so
   // a corrupt document cannot tilt a stamp into the sky.
