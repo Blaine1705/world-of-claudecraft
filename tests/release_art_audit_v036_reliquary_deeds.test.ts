@@ -286,6 +286,14 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_ilvane_hush',
       // Morthen the Gravecaller's Rite.
       'dgn_morthen_candlelight',
+      // Lantern Hall's three contract milestones and three bought titles ride
+      // their category crest until their paintings are commissioned.
+      'dgn_guild_first_contract',
+      'dgn_guild_ten_contracts',
+      'dgn_guild_fifty_contracts',
+      'feat_guild_writ_runner',
+      'feat_guild_hallsworn',
+      'feat_guild_of_lantern_hall',
     ]);
     // RE-PINNED at the Mirefen world-boss forward-port onto release/v0.44.0:
     // 302 live (counted directly off the resolved src/sim/content/deeds.ts
@@ -300,7 +308,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // catch (2026-09-28 merge), also pending: still 289 painted. 322 with the
     // Mirefen world-boss branch's three combat deeds, all pending.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
-    expect(DEED_ORDER).toHaveLength(346);
+    // 352 with Lantern Hall's six, all on the pending ledger: still 289 painted.
+    expect(DEED_ORDER).toHaveLength(352);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

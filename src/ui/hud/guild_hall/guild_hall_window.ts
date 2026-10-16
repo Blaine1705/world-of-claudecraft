@@ -9,6 +9,7 @@ import { audio } from '../../../game/audio';
 import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
 import { esc } from '../../esc';
+import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { t } from '../../i18n';
 import { svgIcon } from '../../ui_icons';
 import {
@@ -119,8 +120,9 @@ export class GuildHallWindow {
 
   /** The key of the control holding focus, so a rebuild can hand focus back to its twin. */
   private focusedKey(root: HTMLElement): string | null {
-    const active = root.ownerDocument.activeElement as HTMLElement | null;
-    if (!active || !root.contains(active)) return null;
+    // focusedWithin refuses a parked dialog root, so a parked sheet resolves nothing
+    const active = focusedWithin(root);
+    if (!active) return null;
     if (active.dataset.ghTab) return `[data-gh-tab="${active.dataset.ghTab}"]`;
     if (active.dataset.ghBuy) return `[data-gh-buy="${active.dataset.ghBuy}"]`;
     if (active.hasAttribute('data-close')) return '[data-close]';
@@ -183,7 +185,12 @@ export class GuildHallWindow {
     });
     const target =
       focus === 'open' ? '[data-close]' : focus === 'tab' ? `[data-gh-tab="${this.tab}"]` : keep;
-    if (target) root.querySelector<HTMLElement>(target)?.focus();
+    // a control the rebuild disabled (a title just bought) hands focus to Close
+    if (target)
+      restoreFirstEnabled([
+        root.querySelector<HTMLButtonElement>(target),
+        root.querySelector<HTMLButtonElement>('[data-close]'),
+      ]);
   }
 
   private cardHtml(card: GuildContractCardView): string {

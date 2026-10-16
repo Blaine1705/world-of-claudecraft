@@ -721,7 +721,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
   // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
   // the town runtime leaf moved. No capture was retaken.
-  '5b39ae40fc0f518ae1492f2c763c6540f43978eff3aeee2fbb60b7898f7ea55e';
+  // Re-minted for Lantern Hall (the Highwatch adventurers' guild): the renderer leaf moved
+  // (buildHighwatchTownView takes the world for the trophy room). No capture was retaken.
+  'f9f2260c78c41a9e4efc09a8956412b5ff3492aecf46bdd2343ff077ff7bcee5';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
