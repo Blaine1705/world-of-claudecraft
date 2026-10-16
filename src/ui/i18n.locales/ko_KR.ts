@@ -21730,7 +21730,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.event.gourdlight_eve.name': '고드라이트 축제의 밤',
   'seasonal.trickOrTreat.row': '과자 안 주면 장난칠 거야!',
   'seasonal.trickOrTreat.rowAria': '{name}에게 "과자 안 주면 장난칠 거야"라고 말하기',
-  'seasonal.trickOrTreat.knockedHint': '오늘은 이미 이 문을 두드렸습니다. 일일 초기화 후 다시 열립니다.',
+  'seasonal.trickOrTreat.knockedHint':
+    '오늘은 이미 이 문을 두드렸습니다. 일일 초기화 후 다시 열립니다.',
   'seasonal.trickOrTreat.treat': '{name}이(가) 과자를 건네줍니다.',
   'seasonal.trickOrTreat.trick': '{name}이(가) 당신에게 장난을 칩니다: {trick}!',
   'seasonal.trickOrTreat.alreadyKnocked': '오늘은 이미 {name}에게 과자를 받았습니다.',
@@ -21747,10 +21748,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkinHead.on': '조각한 호박 머리를 썼습니다.',
   'seasonal.pumpkinHead.off': '조각한 호박 머리를 벗었습니다.',
   'seasonal.jarTrick': '항아리가 펑 하고 열립니다: {trick}!',
-  'seasonal.itemUse.pumpkinHead': '사용: 안에서 불이 밝혀진 조각 호박을 투구 위에 쓰거나 벗습니다. 고드라이트 축제의 밤 동안에만. 외형 전용.',
-  'seasonal.itemUse.trickJar': '사용: 몇 초 동안 무해한 장난을 무작위로 자신에게 겁니다. 고드라이트 축제의 밤 동안에만. 외형 전용.',
+  'seasonal.itemUse.pumpkinHead':
+    '사용: 안에서 불이 밝혀진 조각 호박을 투구 위에 쓰거나 벗습니다. 고드라이트 축제의 밤 동안에만. 외형 전용.',
+  'seasonal.itemUse.trickJar':
+    '사용: 몇 초 동안 무해한 장난을 무작위로 자신에게 겁니다. 고드라이트 축제의 밤 동안에만. 외형 전용.',
   'seasonal.itemUse.pouch': '사용: 열면 고드라이트 사탕 {count}개를 받습니다.',
-  'seasonal.itemUse.sweet': '고드라이트 축제의 밤 동안 과자를 얻으러 다니며 받습니다. 이스트브룩의 헤스터 고드윅이 외형 아이템과 교환해 줍니다.',
+  'seasonal.itemUse.sweet':
+    '고드라이트 축제의 밤 동안 과자를 얻으러 다니며 받습니다. 이스트브룩의 헤스터 고드윅이 외형 아이템과 교환해 줍니다.',
   'seasonal.tokenPrice': '{item} {count}개',
   'entities.items.gourdlight_sweet.name': '고드라이트 사탕',
   'entities.items.gourdlight_treat_pouch.name': '고드라이트 과자 주머니',
@@ -21758,9 +21762,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.jar_of_mischief.name': '장난의 항아리',
   'entities.npcs.gourdlight_keeper.name': '헤스터 고드윅',
   'entities.npcs.gourdlight_keeper.title': '고드라이트 관리인',
-  'entities.npcs.gourdlight_keeper.greeting': '호박에 불이 켜지고 등불이 걸렸으니 고드라이트 축제의 밤이 온 게 틀림없어요. 이스트브룩, 펜브리지, 하이워치 마을 사람들의 문을 두드리고 그 말을 해 보세요. 과자 안 주면 장난칠 거야. 대부분은 사탕을 주겠지만, 몇몇은 장난을 칠 거예요. 사탕을 가져오면 몸에 걸칠 것과 바꿔 드릴게요.',
+  'entities.npcs.gourdlight_keeper.greeting':
+    '호박에 불이 켜지고 등불이 걸렸으니 고드라이트 축제의 밤이 온 게 틀림없어요. 이스트브룩, 펜브리지, 하이워치 마을 사람들의 문을 두드리고 그 말을 해 보세요. 과자 안 주면 장난칠 거야. 대부분은 사탕을 주겠지만, 몇몇은 장난을 칠 거예요. 사탕을 가져오면 몸에 걸칠 것과 바꿔 드릴게요.',
   'entities.quests.q_gourdlight_rounds.title': '고드라이트 순회',
-  'entities.quests.q_gourdlight_rounds.text': '고드라이트 축제의 밤마다 골짜기의 아이들이 집집마다 돌아다녀요. 올해는 당신도 함께해요, {playerName}. 우리 마을에서 문 다섯 개를 두드리고 그 말을 한 다음 무엇을 받는지 보세요. 끝나면 저에게 돌아오세요.',
-  'entities.quests.q_gourdlight_rounds.completion': '문 다섯 개를 두드렸는데 손가락도 다 멀쩡하네요. 자, 집에 가는 길에 먹을 과자 주머니예요. 내일 또 오세요. 문은 다시 열리니까요.',
+  'entities.quests.q_gourdlight_rounds.text':
+    '고드라이트 축제의 밤마다 골짜기의 아이들이 집집마다 돌아다녀요. 올해는 당신도 함께해요, {playerName}. 우리 마을에서 문 다섯 개를 두드리고 그 말을 한 다음 무엇을 받는지 보세요. 끝나면 저에게 돌아오세요.',
+  'entities.quests.q_gourdlight_rounds.completion':
+    '문 다섯 개를 두드렸는데 손가락도 다 멀쩡하네요. 자, 집에 가는 길에 먹을 과자 주머니예요. 내일 또 오세요. 문은 다시 열리니까요.',
   'entities.quests.q_gourdlight_rounds.objectives.0.label': '두드린 문',
 };

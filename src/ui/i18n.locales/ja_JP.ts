@@ -21752,10 +21752,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkinHead.on': '彫りカボチャの頭をかぶった。',
   'seasonal.pumpkinHead.off': '彫りカボチャの頭を外した。',
   'seasonal.jarTrick': '壺がぽんと開いた：{trick}！',
-  'seasonal.itemUse.pumpkinHead': '使用：内側から灯る彫りカボチャを兜の上からかぶる・外す。ゴードライトの宵の間のみ。見た目のみ。',
-  'seasonal.itemUse.trickJar': '使用：数秒間、無害ないたずらをランダムに自分にかける。ゴードライトの宵の間のみ。見た目のみ。',
+  'seasonal.itemUse.pumpkinHead':
+    '使用：内側から灯る彫りカボチャを兜の上からかぶる・外す。ゴードライトの宵の間のみ。見た目のみ。',
+  'seasonal.itemUse.trickJar':
+    '使用：数秒間、無害ないたずらをランダムに自分にかける。ゴードライトの宵の間のみ。見た目のみ。',
   'seasonal.itemUse.pouch': '使用：開けるとゴードライトの菓子を{count}個受け取る。',
-  'seasonal.itemUse.sweet': 'ゴードライトの宵の間にお菓子をねだって手に入る。イーストブルックのヘスター・ゴードウィックが見た目アイテムと交換してくれる。',
+  'seasonal.itemUse.sweet':
+    'ゴードライトの宵の間にお菓子をねだって手に入る。イーストブルックのヘスター・ゴードウィックが見た目アイテムと交換してくれる。',
   'seasonal.tokenPrice': '{item} ×{count}',
   'entities.items.gourdlight_sweet.name': 'ゴードライトの菓子',
   'entities.items.gourdlight_treat_pouch.name': 'ゴードライトのお菓子袋',
@@ -21763,9 +21766,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.jar_of_mischief.name': 'いたずらの壺',
   'entities.npcs.gourdlight_keeper.name': 'ヘスター・ゴードウィック',
   'entities.npcs.gourdlight_keeper.title': 'ゴードライトの番人',
-  'entities.npcs.gourdlight_keeper.greeting': 'カボチャに火が灯り、ランタンも吊るされた。ゴードライトの宵が来たのね。イーストブルック、フェンブリッジ、ハイウォッチの町の人の戸を叩いて、あの言葉を言いなさい。トリック・オア・トリート。たいていはお菓子をくれるけど、いたずらをする人もいるわ。お菓子を持ってきてくれたら、身につけるものと交換してあげる。',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'カボチャに火が灯り、ランタンも吊るされた。ゴードライトの宵が来たのね。イーストブルック、フェンブリッジ、ハイウォッチの町の人の戸を叩いて、あの言葉を言いなさい。トリック・オア・トリート。たいていはお菓子をくれるけど、いたずらをする人もいるわ。お菓子を持ってきてくれたら、身につけるものと交換してあげる。',
   'entities.quests.q_gourdlight_rounds.title': 'ゴードライトの見回り',
-  'entities.quests.q_gourdlight_rounds.text': 'ゴードライトの宵には、谷の子どもたちが家々を回るの。今年はあなたも一緒よ、{playerName}。私たちの町で五つの戸を叩いて、あの言葉を言って、何をもらえるか見てきて。終わったら戻ってきてね。',
-  'entities.quests.q_gourdlight_rounds.completion': '五つの戸を叩いて、指もちゃんと全部ある。はい、帰り道のお菓子袋よ。明日また来て。戸はまた開くから。',
+  'entities.quests.q_gourdlight_rounds.text':
+    'ゴードライトの宵には、谷の子どもたちが家々を回るの。今年はあなたも一緒よ、{playerName}。私たちの町で五つの戸を叩いて、あの言葉を言って、何をもらえるか見てきて。終わったら戻ってきてね。',
+  'entities.quests.q_gourdlight_rounds.completion':
+    '五つの戸を叩いて、指もちゃんと全部ある。はい、帰り道のお菓子袋よ。明日また来て。戸はまた開くから。',
   'entities.quests.q_gourdlight_rounds.objectives.0.label': '叩いた戸',
 };

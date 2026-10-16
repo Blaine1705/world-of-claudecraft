@@ -20708,8 +20708,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkinHead.on': '你戴上了雕刻南瓜頭。',
   'seasonal.pumpkinHead.off': '你摘下了雕刻南瓜頭。',
   'seasonal.jarTrick': '罐子砰地打開了：{trick}！',
-  'seasonal.itemUse.pumpkinHead': '使用：戴上或摘下一顆從內部點亮的雕刻南瓜，套在頭盔之上。僅在南瓜燈之夜期間可用。純外觀。',
-  'seasonal.itemUse.trickJar': '使用：對你施加一個隨機的無害惡作劇，持續數秒。僅在南瓜燈之夜期間可用。純外觀。',
+  'seasonal.itemUse.pumpkinHead':
+    '使用：戴上或摘下一顆從內部點亮的雕刻南瓜，套在頭盔之上。僅在南瓜燈之夜期間可用。純外觀。',
+  'seasonal.itemUse.trickJar':
+    '使用：對你施加一個隨機的無害惡作劇，持續數秒。僅在南瓜燈之夜期間可用。純外觀。',
   'seasonal.itemUse.pouch': '使用：打開後獲得{count}顆南瓜燈糖。',
   'seasonal.itemUse.sweet': '在南瓜燈之夜期間討糖獲得。東溪的赫絲特·葫蘆芯會用外觀物品交換它們。',
   'seasonal.tokenPrice': '{count}個{item}',
@@ -20719,9 +20721,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.jar_of_mischief.name': '惡作劇之罐',
   'entities.npcs.gourdlight_keeper.name': '赫絲特·葫蘆芯',
   'entities.npcs.gourdlight_keeper.title': '南瓜燈守護者',
-  'entities.npcs.gourdlight_keeper.greeting': '南瓜點亮了，燈籠也掛起來了，那一定是南瓜燈之夜到了。去敲東溪、芬橋和高望城鎮民的門，說出那句話：不給糖就搗蛋。大多數人會給你一顆糖，少數人會對你惡作劇。把糖帶給我，我會跟你換些可以穿戴的東西。',
+  'entities.npcs.gourdlight_keeper.greeting':
+    '南瓜點亮了，燈籠也掛起來了，那一定是南瓜燈之夜到了。去敲東溪、芬橋和高望城鎮民的門，說出那句話：不給糖就搗蛋。大多數人會給你一顆糖，少數人會對你惡作劇。把糖帶給我，我會跟你換些可以穿戴的東西。',
   'entities.quests.q_gourdlight_rounds.title': '南瓜燈巡遊',
-  'entities.quests.q_gourdlight_rounds.text': '每到南瓜燈之夜，谷地的孩子們都會挨家挨戶巡遊，今年你也加入他們吧，{playerName}。在我們的城鎮裡敲五扇門，說出那句話，看看你會得到什麼。完成後回來找我。',
-  'entities.quests.q_gourdlight_rounds.completion': '敲了五扇門，手指還都在。拿著，這袋糖果讓你在回家路上吃。明天再來，門會再次打開。',
+  'entities.quests.q_gourdlight_rounds.text':
+    '每到南瓜燈之夜，谷地的孩子們都會挨家挨戶巡遊，今年你也加入他們吧，{playerName}。在我們的城鎮裡敲五扇門，說出那句話，看看你會得到什麼。完成後回來找我。',
+  'entities.quests.q_gourdlight_rounds.completion':
+    '敲了五扇門，手指還都在。拿著，這袋糖果讓你在回家路上吃。明天再來，門會再次打開。',
   'entities.quests.q_gourdlight_rounds.objectives.0.label': '已敲的門',
 };
