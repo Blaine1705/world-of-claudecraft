@@ -968,6 +968,10 @@ export const COMMAND_NAMES = [
   // Rename a specific summoned buddy; the sim verifies its current owner.
   'buddy_rename',
   'referralCards',
+  // Lantern Hall's quartermaster: buy one cosmetic for Lantern Seals
+  // (IWorldQuests.buyGuildCosmetic; src/sim/guild_quartermaster.ts). Appended at the END
+  // because wire tokens are never reordered.
+  'guild_buy_cosmetic',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

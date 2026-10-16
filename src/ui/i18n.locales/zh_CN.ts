@@ -77,6 +77,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '装备全部{pieces}件会员护甲，经验获取量提高{percent}%。需要有效会员资格。',
   'itemUi.tooltip.membershipRequired': '会员到期后，护甲属性和套装加成会停用，续订后恢复。',
   'itemUi.tooltip.membershipDormant': '未激活：续订会员以恢复护甲属性和套装加成。',
+  'entities.items.lantern_seal.name': '灯火印章',
   'entities.items.membership_token.name': '会员代币（30天）',
   'entities.items.membership_helmet.name': '会员头盔',
   'entities.items.membership_shoulder.name': '会员肩甲',

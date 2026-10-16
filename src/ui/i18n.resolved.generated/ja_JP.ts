@@ -23387,6 +23387,9 @@ export const ja_JP: EnTranslations = {
       "heroic_mark": {
         "name": "英雄の証"
       },
+      "lantern_seal": {
+        "name": "燈火の印章"
+      },
       "wyrmfall_core": {
         "name": "竜墜の核"
       },

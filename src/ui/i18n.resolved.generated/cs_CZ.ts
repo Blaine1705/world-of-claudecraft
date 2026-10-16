@@ -23387,6 +23387,9 @@ export const cs_CZ: EnTranslations = {
       "heroic_mark": {
         "name": "Hrdinská značka"
       },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
       "wyrmfall_core": {
         "name": "Jádro Wyrmfallu"
       },

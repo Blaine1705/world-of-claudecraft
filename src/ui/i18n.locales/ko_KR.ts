@@ -85,6 +85,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '멤버십이 만료되면 방어구 능력치와 세트 효과가 비활성화되며, 갱신하면 다시 활성화됩니다.',
   'itemUi.tooltip.membershipDormant':
     '비활성: 멤버십을 갱신하면 방어구 능력치와 세트 효과가 복구됩니다.',
+  'entities.items.lantern_seal.name': '등불 인장',
   'entities.items.membership_token.name': '멤버십 토큰 (30일)',
   'entities.items.membership_helmet.name': '멤버십 투구',
   'entities.items.membership_shoulder.name': '멤버십 견갑',

@@ -6182,6 +6182,51 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_guild_first_contract",
+    "name": "Writ Signed",
+    "category": "dungeon",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "dgn_guild_ten_contracts",
+    "name": "Regular at the Board",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_guild_fifty_contracts",
+    "name": "Contract Veteran",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false
+  },
+  {
+    "id": "feat_guild_writ_runner",
+    "name": "Writ-Runner",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Writ-Runner"
+  },
+  {
+    "id": "feat_guild_hallsworn",
+    "name": "Hallsworn",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Hallsworn"
+  },
+  {
+    "id": "feat_guild_of_lantern_hall",
+    "name": "Of Lantern Hall",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "of Lantern Hall"
   }
 ];
 

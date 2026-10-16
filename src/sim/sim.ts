@@ -290,7 +290,10 @@ import { formatMoney } from './format_money';
 import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
+import { type GuildContractsView, guildContractsView } from './guild_contracts';
+import { buyGuildCosmetic } from './guild_quartermaster';
 import { spawnHealingTrainingGround } from './healing_training';
+import { talkToGuildResident } from './highwatch_guild';
 import { spawnDevHealerPracticeDummy, spawnHubPractice } from './hub_practice';
 import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
@@ -658,6 +661,7 @@ import {
 import * as worldPvpMod from './pvp/world_pvp';
 import { savedWorldPvpFields } from './pvp/world_pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
+import { turnInOrAcceptAtNpc } from './quests/npc_quest_talk';
 import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
 import {
   accountReliquaryOwnershipOpts,
@@ -892,7 +896,6 @@ import {
   isEquipSlot,
   isNonSpellCast,
   isPetClass,
-  isQuestTurnInNpc,
   type LootRollChoice,
   type LootRollGroupStatus,
   type LootRollPrompt,
@@ -8818,28 +8821,9 @@ export class Sim {
     clueMod.onNpcTalkedForClueHunt(this.ctx, meta, p, npc);
     if (worldQuestMod.talkToWorldQuestInstructor(this.ctx, npc, meta, p)) return;
     if (weeklyQuestMod.talkToWeeklyEmissary(this.ctx, npc, meta, p)) return;
+    if (talkToGuildResident(this.ctx, npc, meta, p)) return;
     if (this.interactNpcForQuests(npc, meta)) return;
-    for (const qid of npc.questIds) {
-      const quest = QUESTS[qid];
-      if (
-        quest &&
-        isQuestTurnInNpc(quest, npc.templateId) &&
-        meta.questLog.get(qid)?.state === 'ready'
-      ) {
-        this.turnInQuest(qid, meta.entityId);
-        return;
-      }
-    }
-    for (const qid of npc.questIds) {
-      if (
-        QUESTS[qid].giverNpcId === npc.templateId &&
-        !QUESTS[qid].completionEffect &&
-        this.questState(qid, meta.entityId) === 'available'
-      ) {
-        this.acceptQuest(qid, meta.entityId);
-        return;
-      }
-    }
+    turnInOrAcceptAtNpc(this.ctx, npc, meta);
   }
   private interactNpcForQuests(npc: Entity, meta: PlayerMeta): boolean {
     return interactNpcForQuests(this.ctx, npc, meta);
@@ -8871,6 +8855,13 @@ export class Sim {
 
   commendWeeklyQuest(factionId: string, pid?: number): void {
     weeklyQuestMod.commendWeeklyQuest(this.ctx, factionId, pid);
+  }
+  /** Lantern Hall's weekly contracts for the primary player (src/sim/guild_contracts.ts). */
+  get guildContracts(): GuildContractsView {
+    return guildContractsView(this.ctx, this.primary);
+  }
+  buyGuildCosmetic(offerId: string, pid?: number): void {
+    buyGuildCosmetic(this.ctx, offerId, pid);
   }
   get weeklyQuest() {
     weeklyQuestMod.resetWeeklyQuestIfNeeded(this.ctx, this.primary);

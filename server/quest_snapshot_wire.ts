@@ -1,3 +1,4 @@
+import { guildContractsView } from '../src/sim/guild_contracts';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -103,4 +104,7 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
   emit('wqrep', meta.worldQuestReplacements ?? {});
   emit('wkq', meta.weeklyQuest);
   emit('wkexp', sim.weeklyQuestResetAtMs);
+  // Lantern Hall's contracts: the week's board and this character's progress on it (every
+  // payment bumps wireRev, and a new week re-diffs the board on the next heavy pass).
+  emit('gcon', guildContractsView(sim, meta));
 }

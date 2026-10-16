@@ -23387,6 +23387,9 @@ export const zh_TW: EnTranslations = {
       "heroic_mark": {
         "name": "英雄徽記"
       },
+      "lantern_seal": {
+        "name": "燈火印章"
+      },
       "wyrmfall_core": {
         "name": "墜龍核心"
       },

@@ -5327,6 +5327,7 @@ export type TranslationKeyFlat =
   | 'entities.items.korgaths_chainwraps.name'
   | 'entities.items.laden_hearth.name'
   | 'entities.items.lamenting_veil.name'
+  | 'entities.items.lantern_seal.name'
   | 'entities.items.lanternwick_sash.name'
   | 'entities.items.last_flame_lantern.name'
   | 'entities.items.last_keep_signet.name'

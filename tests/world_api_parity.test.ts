@@ -142,6 +142,8 @@ export const IWORLD_MEMBERS = [
   { name: 'weeklyQuestResetAtMs', kind: 'data' },
   { name: 'chooseWeeklyQuest', kind: 'method' },
   { name: 'commendWeeklyQuest', kind: 'method' },
+  { name: 'guildContracts', kind: 'data' },
+  { name: 'buyGuildCosmetic', kind: 'method' },
   { name: 'worldQuestLeaderboard', kind: 'method' }, // async
   { name: 'worldQuestLog', kind: 'data' },
   { name: 'worldQuestTime', kind: 'data' },
@@ -978,9 +980,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Buddy collection contributes six methods and no data members.
     // The Studio merge adds no member: 448/131/317. The dungeon objectives
     // tracker's dungeonRun adds one data member: 449/132/317.
-    expect(IWORLD_MEMBERS.length).toBe(449);
-    expect(DATA_MEMBERS.length).toBe(132);
-    expect(METHOD_MEMBERS.length).toBe(317);
+    // Lantern Hall's guildContracts (data) and buyGuildCosmetic (method): 451/133/318.
+    expect(IWORLD_MEMBERS.length).toBe(451);
+    expect(DATA_MEMBERS.length).toBe(133);
+    expect(METHOD_MEMBERS.length).toBe(318);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1054,6 +1057,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'boostWorldQuestGlider',
       'buyBackItem',
       'buyCrucibleVendorItem',
+      'buyGuildCosmetic',
       'buyHeroicVendorItem',
       'buyItem',
       'canRerollWorldQuest',
@@ -1168,6 +1172,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildBankWithdraw',
       'guildBankWithdrawGold',
       'guildBuyRosterPage',
+      'guildContracts',
       'guildCreate',
       'guildDecline',
       'guildDemote',
@@ -1505,6 +1510,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'gatheringGoal',
       'gatheringProficiency',
       'guildBankInfo',
+      'guildContracts',
       'harvestPreference',
       'hillInfo',
       'hobbyCraft',
@@ -1616,6 +1622,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'boostWorldQuestGlider',
       'buyBackItem',
       'buyCrucibleVendorItem',
+      'buyGuildCosmetic',
       'buyHeroicVendorItem',
       'buyItem',
       'canRerollWorldQuest',
@@ -2131,6 +2138,8 @@ const FACET_QUESTS = [
   'questsDone',
   'chooseWeeklyQuest',
   'commendWeeklyQuest',
+  'guildContracts',
+  'buyGuildCosmetic',
   'weeklyQuest',
   'weeklyQuestResetAtMs',
   'worldQuestCycle',
@@ -2755,8 +2764,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // must always agree.
     // The integration includes the five-dungeon rework, six buddy methods and
     // the dungeon objectives tracker's dungeonRun (one data member).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(449);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(449);
+    // Plus Lantern Hall's guildContracts and buyGuildCosmetic.
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(451);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(451);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

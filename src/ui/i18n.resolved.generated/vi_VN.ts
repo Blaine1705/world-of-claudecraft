@@ -23387,6 +23387,9 @@ export const vi_VN: EnTranslations = {
       "heroic_mark": {
         "name": "Dấu Ấn Anh Hùng"
       },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
       "wyrmfall_core": {
         "name": "Lõi Long Lạc"
       },

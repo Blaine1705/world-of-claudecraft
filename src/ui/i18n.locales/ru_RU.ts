@@ -86,6 +86,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Характеристики доспехов и бонусы комплекта отключаются по окончании членства и возвращаются после продления.',
   'itemUi.tooltip.membershipDormant':
     'Неактивно: продлите членство, чтобы вернуть характеристики доспехов и бонусы комплекта.',
+  'entities.items.lantern_seal.name': 'Печать Фонаря',
   'entities.items.membership_token.name': 'Жетон членства (30 дней)',
   'entities.items.membership_helmet.name': 'Шлем участника',
   'entities.items.membership_shoulder.name': 'Наплечники участника',

@@ -36,6 +36,7 @@ import { REFERRAL_TITLE } from './content/referral_rewards';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
+import { onKillForGuildContracts } from './guild_contracts';
 import { MUSTER_PIKE_MAX_LEVEL } from './lance_balance_core';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import { emitReferralBossEvidence } from './referral_evidence';
@@ -1921,9 +1922,12 @@ export function onMobKillCreditForDeeds(
       ? playersInRoom(ctx, mob, roomRadius, ctx.instanceOriginOf(inst))
       : playersInInstance(ctx, inst)
     : eligible;
+  // the tasks this kill met, for Lantern Hall's task contracts (guild_contracts.ts) below
+  const tasksMet: string[] = [];
   const flawlessDeed = FLAWLESS_TASKS[mob.templateId];
   if (flawlessDeed && inst?.difficulty === 'heroic' && !st?.deathTainted) {
     for (const meta of taskRecipients) grantDeed(ctx, meta, flawlessDeed);
+    tasksMet.push(flawlessDeed);
   }
   const trioDeed = TRIO_TASKS[mob.templateId];
   if (trioDeed) {
@@ -1945,11 +1949,15 @@ export function onMobKillCreditForDeeds(
         const add = ctx.entities.get(id);
         return !add || add.dead;
       });
-    if (allDead) for (const meta of taskRecipients) grantDeed(ctx, meta, addDeed);
+    if (allDead) {
+      for (const meta of taskRecipients) grantDeed(ctx, meta, addDeed);
+      tasksMet.push(addDeed);
+    }
   }
   const splashDeed = SPLASH_TASKS[mob.templateId];
   if (splashDeed && !st?.splashTainted) {
     for (const meta of taskRecipients) grantDeed(ctx, meta, splashDeed);
+    tasksMet.push(splashDeed);
   }
   const bellDeed = BELL_TASKS[mob.templateId];
   if (bellDeed && !st?.bellTainted) {
@@ -1958,6 +1966,17 @@ export function onMobKillCreditForDeeds(
   if (mob.templateId === 'nythraxis_scourge_of_thornpeak' && !st?.rageResolved) {
     for (const meta of taskRecipients) grantDeed(ctx, meta, 'dgn_nythraxis_wardens');
   }
+  // Lantern Hall's weekly contracts ride the same credit: the kill's eligible roster, the
+  // encounter's recipients and the tasks met (src/sim/guild_contracts.ts)
+  onKillForGuildContracts(
+    ctx,
+    mob,
+    inst?.difficulty === 'heroic',
+    eligible,
+    taskRecipients,
+    tasksMet,
+    (meta, deedId) => grantDeed(ctx, meta, deedId),
+  );
   ctx.deedRuntime.encounters.delete(mob.id);
 }
 

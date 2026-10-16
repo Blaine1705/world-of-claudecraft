@@ -23387,6 +23387,9 @@ export const en_XA: EnTranslations = {
       "heroic_mark": {
         "name": "[Ĥéŕóíç Ɱáŕķ]"
       },
+      "lantern_seal": {
+        "name": "[Ļáñţéŕñ Šéáļ]"
+      },
       "wyrmfall_core": {
         "name": "[Ŵýŕɱƒáļļ Çóŕé]"
       },

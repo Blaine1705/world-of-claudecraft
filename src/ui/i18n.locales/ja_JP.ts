@@ -85,6 +85,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'メンバーシップが切れると防具の能力値とセット効果は無効になり、更新すると再び有効になります。',
   'itemUi.tooltip.membershipDormant':
     '無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。',
+  'entities.items.lantern_seal.name': '燈火の印章',
   'entities.items.membership_token.name': 'メンバーシップトークン（30日）',
   'entities.items.membership_helmet.name': 'メンバーシップの兜',
   'entities.items.membership_shoulder.name': 'メンバーシップの肩当て',

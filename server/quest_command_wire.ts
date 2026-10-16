@@ -90,6 +90,13 @@ export function commendWeeklyQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
   sim.commendWeeklyQuest(msg.faction, pid);
 }
 
+/** Lantern Hall's quartermaster: one cosmetic for Lantern Seals (the sim re-validates all). */
+export function buyGuildCosmeticWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
+  const offer = (msg as unknown as { offer?: unknown }).offer;
+  if (typeof offer !== 'string' || offer.length > 64) return;
+  sim.buyGuildCosmetic(offer, pid);
+}
+
 /** The world-quest-only command family; game.ts routes every member here. */
 const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_glider_boost',
@@ -104,6 +111,8 @@ const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_weekly_choose',
   'world_quest_weekly_commend',
   'clue_hunt_abandon',
+  // Lantern Hall (the weekly guild contracts' quartermaster) rides the same owner family
+  'guild_buy_cosmetic',
 ] as const;
 export type WorldQuestWireCommand = (typeof WORLD_QUEST_WIRE_COMMANDS)[number];
 const WORLD_QUEST_WIRE_COMMAND_SET: ReadonlySet<unknown> = new Set(WORLD_QUEST_WIRE_COMMANDS);
@@ -148,6 +157,9 @@ export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
       break;
     case 'world_quest_accuse':
       accuseWorldQuestSuspectWire(sim, msg, pid);
+      break;
+    case 'guild_buy_cosmetic':
+      buyGuildCosmeticWire(sim, msg, pid);
       break;
     case 'clue_hunt_abandon':
       sim.abandonClueHunt(pid);

@@ -23387,6 +23387,9 @@ export const de_DE: EnTranslations = {
       "heroic_mark": {
         "name": "Heroische Marke"
       },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
       "wyrmfall_core": {
         "name": "Wyrmfall-Kern"
       },

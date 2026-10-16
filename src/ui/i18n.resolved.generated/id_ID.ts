@@ -23387,6 +23387,9 @@ export const id_ID: EnTranslations = {
       "heroic_mark": {
         "name": "Tanda Heroik"
       },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
       "wyrmfall_core": {
         "name": "Inti Kejatuhan Wyrm"
       },

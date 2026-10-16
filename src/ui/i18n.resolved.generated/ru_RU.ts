@@ -23387,6 +23387,9 @@ export const ru_RU: EnTranslations = {
       "heroic_mark": {
         "name": "Героический знак"
       },
+      "lantern_seal": {
+        "name": "Печать Фонаря"
+      },
       "wyrmfall_core": {
         "name": "Ядро драконопада"
       },

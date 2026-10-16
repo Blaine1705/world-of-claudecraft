@@ -23387,6 +23387,9 @@ export const fr_CA: EnTranslations = {
       "heroic_mark": {
         "name": "Marque héroïque"
       },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
       "wyrmfall_core": {
         "name": "Cœur de la Chute-du-wyrm"
       },

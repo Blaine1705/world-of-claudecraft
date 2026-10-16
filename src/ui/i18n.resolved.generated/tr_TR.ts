@@ -23387,6 +23387,9 @@ export const tr_TR: EnTranslations = {
       "heroic_mark": {
         "name": "Kahramanca Nişan"
       },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
       "wyrmfall_core": {
         "name": "Wyrmfall Özü"
       },

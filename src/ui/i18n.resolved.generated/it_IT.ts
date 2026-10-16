@@ -23387,6 +23387,9 @@ export const it_IT: EnTranslations = {
       "heroic_mark": {
         "name": "Marchio Eroico"
       },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
       "wyrmfall_core": {
         "name": "Nucleo Caduta del Wyrm"
       },

@@ -23387,6 +23387,9 @@ export const sv_SE: EnTranslations = {
       "heroic_mark": {
         "name": "Heroiskt märke"
       },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
       "wyrmfall_core": {
         "name": "Wyrmfall-kärna"
       },

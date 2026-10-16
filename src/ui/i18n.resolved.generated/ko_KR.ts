@@ -23387,6 +23387,9 @@ export const ko_KR: EnTranslations = {
       "heroic_mark": {
         "name": "영웅의 징표"
       },
+      "lantern_seal": {
+        "name": "등불 인장"
+      },
       "wyrmfall_core": {
         "name": "낙룡의 핵"
       },

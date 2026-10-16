@@ -1996,6 +1996,8 @@ export const en = {
       clue_scroll: { name: 'Clue Scroll' },
       treasure_casket: { name: 'Treasure Casket' },
       heroic_mark: { name: 'Heroic Mark' },
+      // Lantern Hall's contract currency (content/guild_contracts.ts).
+      lantern_seal: { name: 'Lantern Seal' },
       wyrmfall_core: { name: 'Wyrmfall Core' },
       sundered_essence: { name: 'Sundered Essence' },
       makers_ember: { name: "Maker's Ember" },

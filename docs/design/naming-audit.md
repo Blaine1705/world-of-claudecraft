@@ -1028,7 +1028,6 @@ The guild hall at the old stable yard (`src/sim/content/highwatch_guild.ts`, the
 | Contract Clerk, Guild Quartermaster, Guild Recruiter, Guildmaster of Lantern Hall | the residents' titles | KEEP. Plain English job titles. |
 | Writ-Runner, Hallsworn | the quartermaster's two bought titles | KEEP. No game title or term of either name found. |
 | of Lantern Hall | the quartermaster's third title | KEEP. Built on the hall's own name above. "Lantern-Bearer" was considered and dropped: Pathfinder's Lantern Bearers are a named order of resurrected adventurers. |
-| Lantern Hall Heraldry | the quartermaster's border | KEEP. The hall's name and a plain noun. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
