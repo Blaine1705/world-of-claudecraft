@@ -598,3 +598,26 @@ describe('a lost target (the fight paused, never ended)', () => {
     expect(st.totems).toHaveLength(0);
   });
 });
+
+describe('same seed, same ford', () => {
+  it('two heroic pulls agree on every throw, mending, beat, backlash and health', () => {
+    const play = (): string => {
+      const { f, s } = pull('heroic');
+      s.hp = Math.round(s.maxHp * 0.9);
+      run(f, T.totemFirst + T.totemEvery + T.totemArm + 0.5);
+      const [first] = live(f, SAP_TOTEM_ID);
+      breakTotem(f, first);
+      run(f, 8);
+      return JSON.stringify({
+        totems: live(f, SAP_TOTEM_ID).map((t) => [t.id, t.pos.x.toFixed(4), t.pos.z.toFixed(4)]),
+        hp: s.hp,
+        fx: f.fx,
+        hits: f.hits.map((h) => `${h.ability}:${h.amount}`),
+        drum: state(s).drum,
+      });
+    };
+    const a = play();
+    expect(JSON.parse(a).fx).toContain(SAURIAN_SAP_BACKLASH);
+    expect(play()).toBe(a);
+  });
+});

@@ -1490,3 +1490,32 @@ describe('the road never closes (a scripted pull on the real road)', () => {
     expect(checked).toBeGreaterThan(200);
   });
 });
+
+describe('same seed, same road', () => {
+  it('two runs of the same baited pull agree on every bait, trail, burn and health', () => {
+    const play = (): string => {
+      const r = road();
+      baitSetup(r);
+      r.tusker.maxHp = 1e6;
+      r.tusker.hp = 1e6;
+      // A bait into the ice, its window and burst, then a plain charge whose
+      // trail burns (the trail's damage is rolled through the shared rng).
+      run(r, T.trampleFirst + T.trampleCast + T.trampleRun + T.stuckSeconds + 1);
+      put(r, r.me, OPEN.x, OPEN.z);
+      run(r, T.trampleEvery + T.trampleCast + 4);
+      const st = state(r);
+      const damage = r.events
+        .filter((e) => e.type === 'damage')
+        .map((e) => (e.type === 'damage' ? `${e.ability}:${e.amount}` : ''));
+      return JSON.stringify({
+        baits: st.baits,
+        trails: st.trails.map((t) => [t.x.toFixed(4), t.z.toFixed(4), t.length.toFixed(4)]),
+        hp: [r.tusker.hp, r.me.hp],
+        damage,
+      });
+    };
+    const a = play();
+    expect(JSON.parse(a).baits).toBe(1);
+    expect(play()).toBe(a);
+  });
+});
