@@ -14578,6 +14578,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.itemHistoryEarlierHidden.many': '更早的 {count} 次轉手未顯示。',
   'hudChrome.plurals.itemHistoryEarlierHidden.other': '更早的 {count} 次轉手未顯示。',
   'hudChrome.itemHistory.close': '關閉',
+  'hudChrome.itemHistory.openAria': '{item}的物品歷史',
   'devCommand.actions.kit.description':
     '為指定專精穿上聖所前的20級預設裝備，優先裝備背包。僅限裝備。',
   'devCommand.actions.kit.label': '裝備新手20級套裝',

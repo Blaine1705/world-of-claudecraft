@@ -40,6 +40,7 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isTransferLockedInstance, publicInstanceView } from './item_instance_transfer';
+import { publicProvenanceView } from './item_provenance';
 import { recordTrackedWithdrawal } from './item_tracking';
 import { materialItemIds } from './material_ids';
 import type { MaterialPayloadIdentity } from './material_payload_identity';
@@ -1328,6 +1329,14 @@ function guildBankSlotView(slot: InvSlot): InvSlot {
   const view = cloneInvSlot(slot);
   if (view.instance && guildBankPipeRefusal(slot) !== null) {
     view.instance = publicInstanceView(view.instance);
+  }
+  // A tracked copy's history is readable by every member (the Item history
+  // door, docs/design/item-tracking.md), but only its public view: names,
+  // dates and sources. The copy's guid and every character id stay off the
+  // guild-wide wire; withdraw is by slot index and never reads either.
+  if (view.instance?.guid !== undefined || view.instance?.provenance !== undefined) {
+    const { guid: _guid, provenance, ...rest } = view.instance;
+    view.instance = provenance ? { ...rest, provenance: publicProvenanceView(provenance) } : rest;
   }
   return view;
 }

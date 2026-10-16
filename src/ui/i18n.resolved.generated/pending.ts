@@ -12,6 +12,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -27,6 +28,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -42,6 +44,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -57,6 +60,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -73,6 +77,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -88,6 +93,7 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -107,6 +113,7 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -123,6 +130,7 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -138,6 +146,7 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -153,6 +162,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -168,6 +178,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -183,6 +194,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -198,6 +210,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -213,6 +226,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",
@@ -228,6 +242,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "hudChrome.itemHistory.close",
     "hudChrome.itemHistory.noTransfers",
+    "hudChrome.itemHistory.openAria",
     "hudChrome.itemHistory.passedTo",
     "hudChrome.itemHistory.title",
     "hudChrome.itemMenu.itemHistory",

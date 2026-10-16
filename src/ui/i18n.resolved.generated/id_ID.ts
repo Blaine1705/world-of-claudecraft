@@ -5637,7 +5637,8 @@ export const id_ID: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "close": "Close"
+      "close": "Close",
+      "openAria": "Item history for {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Pelajari formulanya sebelum menerapkan enchant ini.",

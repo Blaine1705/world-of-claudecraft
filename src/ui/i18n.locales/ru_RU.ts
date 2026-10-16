@@ -15561,6 +15561,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.itemHistoryEarlierHidden.many': 'Ещё {count} ранних передач не показаны.',
   'hudChrome.plurals.itemHistoryEarlierHidden.other': 'Ещё {count} ранней передачи не показаны.',
   'hudChrome.itemHistory.close': 'Закрыть',
+  'hudChrome.itemHistory.openAria': 'История предмета: {item}',
   'devCommand.actions.kit.description':
     'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',
   'devCommand.actions.kit.label': 'Экипировать комплект свежего 20 уровня',

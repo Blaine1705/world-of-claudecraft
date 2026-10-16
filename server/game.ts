@@ -256,6 +256,7 @@ import { isUpdateDue } from './entity_update_cadence';
 // every test that partial-mocks the db, the known overlay-mock breakage class.
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
+import { equippedHistoryJson } from './equipped_history_wire';
 import { equippedInstanceWire } from './equipped_instance_wire';
 import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
@@ -413,9 +414,10 @@ import {
   type EntityWireCache,
   type EntityWireVariantCache,
   type EntityWireView,
-  emptyWireVariant,
+  emptyEntityWireCache,
   fullEntityJson,
   liteEntityJson,
+  splicedIdentityJson,
 } from './entity_wire_cache';
 import { observeEventRecords } from './event_record_observers';
 import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
@@ -439,7 +441,7 @@ import { buildRealmSimConfig } from './sim_boot_config';
 import { feedRealmCalendar } from './sim_calendar_feed';
 import {
   jsonWithField,
-  StableAuraWireCache,
+  type StableAuraWireCache,
   StableSelfTimerWireCache,
   wireAura,
 } from './snapshot_timer_wire';
@@ -8185,18 +8187,7 @@ export class GameServer {
   private entityWireCacheFor(e: Entity): EntityWireCache {
     let cache = this.wireCache.get(e.id);
     if (!cache) {
-      cache = {
-        tick: -1,
-        baseIdJson: '',
-        idJson: '',
-        appJson: null,
-        baseDynJson: '',
-        idVer: 0,
-        baseDynVer: 0,
-        auraCache: new StableAuraWireCache(),
-        legacy: emptyWireVariant(),
-        stable: emptyWireVariant(),
-      };
+      cache = emptyEntityWireCache();
       this.wireCache.set(e.id, cache);
     }
     return cache;
@@ -8234,14 +8225,16 @@ export class GameServer {
       cache.tick = this.sim.tickCount;
       const baseIdJson = JSON.stringify(identityFields(e));
       const baseDynJson = JSON.stringify(dynamicFields(e, false));
-      if (baseIdJson !== cache.baseIdJson) {
+      // The worn history (`eqh`) is memoized per worn set, so this read is O(1).
+      const eqhJson = e.kind === 'player' ? equippedHistoryJson(e) : null;
+      if (baseIdJson !== cache.baseIdJson || eqhJson !== cache.eqhJson) {
         cache.baseIdJson = baseIdJson;
-        // The look is spliced rather than composed into identityFields so the
-        // per-tick stringify above never walks it (see appearanceWireJson).
-        // Splicing here, inside the change arm, means even the concat only runs
-        // when the rest of the identity actually moved.
-        const appJson = this.appearanceWireJson(e);
-        cache.idJson = appJson === null ? baseIdJson : jsonWithField(baseIdJson, 'app', appJson);
+        cache.eqhJson = eqhJson;
+        // The look and the worn history are spliced rather than composed into
+        // identityFields so the per-tick stringify above never walks them (see
+        // appearanceWireJson, equipped_history_wire.ts). Splicing here, inside
+        // the change arm, means even the concat only runs when one moved.
+        cache.idJson = splicedIdentityJson(baseIdJson, this.appearanceWireJson(e), eqhJson);
         cache.idVer++;
       }
       if (baseDynJson !== cache.baseDynJson) {

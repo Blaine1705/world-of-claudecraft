@@ -14575,6 +14575,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.itemHistoryEarlierHidden.many': '更早的 {count} 次转手未显示。',
   'hudChrome.plurals.itemHistoryEarlierHidden.other': '更早的 {count} 次转手未显示。',
   'hudChrome.itemHistory.close': '关闭',
+  'hudChrome.itemHistory.openAria': '{item}的物品历史',
   'devCommand.actions.kit.description': '为该专精穿上圣所前20级预设装备，背包优先。仅限装备。',
   'devCommand.actions.kit.label': '装备新晋20级预设',
   'devCommand.fields.spec': '专精',

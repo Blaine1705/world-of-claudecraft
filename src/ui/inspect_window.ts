@@ -15,7 +15,13 @@
 // char_view's arrays via the pure core, so inspect inherits the sheet's 6/6 split.
 
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, ItemInstancePayload, PlayerClass, SkinCatalog } from '../sim/types';
+import type {
+  EquipSlot,
+  ItemInstancePayload,
+  ItemProvenance,
+  PlayerClass,
+  SkinCatalog,
+} from '../sim/types';
 import { attachAvatarFallback } from './avatar_fallback';
 import type { PaperdollSlot } from './char_view';
 import { CURATOR_SIGIL_GLOW, curatorSigilBadgeClass, curatorSigilDataUrl } from './curator_sigil';
@@ -56,6 +62,12 @@ import {
   type InspectHeaderModel,
   type InspectHolderModel,
 } from './inspect_view';
+import { type ItemHistoryHolder, itemHistoryProvenanceFor } from './item_history_access_view';
+import {
+  appendItemHistoryActionAfter,
+  attachItemHistoryContextMenu,
+  closeItemHistoryDialogForOwner,
+} from './item_history_dialog';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, type ModularLook, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
@@ -153,6 +165,7 @@ export class InspectWindow {
   close(): void {
     const el = this.deps.root();
     if (el.style.display !== 'block') return;
+    closeItemHistoryDialogForOwner(el);
     el.style.display = 'none';
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
@@ -259,12 +272,21 @@ export class InspectWindow {
         img.src = discordStatusBadgeDataUrl(e.discordTier ?? 0);
       });
     }
-    const leftCol = el.querySelector('#inspect-equip-left');
-    const rightCol = el.querySelector('#inspect-equip-right');
-    for (const cell of model.gear.left) leftCol?.appendChild(this.buildSlotRow(cell));
-    for (const cell of model.gear.right) rightCol?.appendChild(this.buildSlotRow(cell));
-    const weaponsRow = el.querySelector('#inspect-equip-weapons');
-    for (const cell of model.gear.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell));
+    // A worn tracked copy's Item history reads the RAW worn payload (the cell's
+    // instance is the stripped tooltip trim): the public projection for another
+    // player's gear, the viewer's own record on a self-inspect.
+    const worn = selfEquippedInstances ?? e.equippedInstances;
+    const holder: ItemHistoryHolder = selfEquippedInstances ? 'self' : 'other';
+    const addSlots = (col: Element | null, cells: readonly PaperdollSlot[]) => {
+      for (const cell of cells) {
+        const row = this.buildSlotRow(cell);
+        col?.appendChild(row);
+        this.attachSlotHistory(row, cell, itemHistoryProvenanceFor(worn[cell.slot], holder));
+      }
+    };
+    addSlots(el.querySelector('#inspect-equip-left'), model.gear.left);
+    addSlots(el.querySelector('#inspect-equip-right'), model.gear.right);
+    addSlots(el.querySelector('#inspect-equip-weapons'), model.gear.weapons);
     const stage = el.querySelector<HTMLElement>('#inspect-model-preview');
     if (stage) {
       this.deps.mountPreview(stage, {
@@ -308,6 +330,23 @@ export class InspectWindow {
     hydratePortraits(el);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     el.style.display = 'block';
+  }
+
+  // The Item history doors on a worn tracked copy's row (the bank cell rule,
+  // item_history_access_view.ts 'gridCell'): the row becomes focusable so the
+  // Context Menu key reaches it, right-click opens it on desktop, and touch
+  // layouts get the visible button beneath it. A paperdoll column has no room
+  // for a desktop button per slot.
+  private attachSlotHistory(
+    row: HTMLElement,
+    cell: PaperdollSlot,
+    history: ItemProvenance | null,
+  ): void {
+    if (!cell.item || history === null) return;
+    const name = wornItemCellParts(cell.item, cell.instance).name;
+    row.tabIndex = 0;
+    attachItemHistoryContextMenu(row, name, history);
+    appendItemHistoryActionAfter(row, name, history, 'gridCell');
   }
 
   private panelTitleHtml(): string {

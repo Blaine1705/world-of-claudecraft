@@ -5637,7 +5637,8 @@ export const de_DE: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "close": "Close"
+      "close": "Close",
+      "openAria": "Item history for {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Lerne die Formel, bevor du diese Verzauberung anwendest.",

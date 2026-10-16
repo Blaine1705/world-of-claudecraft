@@ -1661,7 +1661,10 @@ export interface ItemInstancePayload {
    *  obtained it, when (host epoch ms), from what source and where, plus the
    *  bounded chain of later holders the hub appends on every grant that
    *  changes hands (`movement` grants to a different character). Stamped
-   *  beside `guid` and judged atomically on load. Owner-only, like `guid`. */
+   *  beside `guid` and judged atomically on load. The full record is
+   *  owner-only; other players read its publicProvenanceView, shipped beside
+   *  the payload (a market row's `history`, the inspect `eqh` key) and never
+   *  inside the public trims, so no payload equality moves. */
   provenance?: ItemProvenance;
   /** Permanent enemy-drop quality, independent of rarity, enchants and upgrades. */
   lootQuality?: LootQualityDescriptor;

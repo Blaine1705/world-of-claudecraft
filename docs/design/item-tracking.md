@@ -42,10 +42,37 @@ fields:
   (the most recent `MAX_ITEM_OWNER_HISTORY` hands, oldest first) and the true
   `transfers` count.
 
-Both are owner-only on the wire: the peer inspect allowlist
+The history is meant to show the path a copy took to get where it is, so
+other players can read it; the `guid` is never displayed to anyone, and the
+full `provenance` record (with character ids and `derivedFrom`) stays with
+the holder, with one exception below. The peer inspect allowlist
 (`server/equipped_instance_wire.ts`) and `publicInstanceView`
-(`src/sim/item_instance_transfer.ts`) leave them out, so an inspecting player
-or a market browse row never sees them.
+(`src/sim/item_instance_transfer.ts`) leave both out, so the display trims and
+every payload equality they feed are unchanged. What other players read is
+`publicProvenanceView` (`src/sim/item_provenance.ts`: names, dates, source,
+zone, the owner chain and the transfer count; no character id, no
+`derivedFrom`), shipped BESIDE the payload, never inside it:
+
+- **World Market browse rows** carry it as `MarketListingView.history`
+  (`src/sim/market.ts` `marketInfoFor`), so a buyer opens Item history from
+  the row (right-click or the Context Menu key, plus a visible button).
+- **Inspect** carries it as the terse `eqh` identity key, one record per worn
+  tracked copy (`server/equipped_history_wire.ts`), memoized per worn set and
+  spliced into the cached identity JSON like the authored look, so the
+  per-tick identity stringify never walks it. The client folds it into the
+  `Entity.equippedInstances` mirror (`src/net/equipped_instances_wire.ts`,
+  re-validated and re-projected), the same place the offline Sim keeps it,
+  and the inspect window's worn rows open it (right-click or the Context Menu
+  key on the focusable row, a button beneath it on touch layouts).
+- **The guild bank** member snapshot (`guildBankSlotView`,
+  `src/sim/guild_bank.ts`) replaces a slot's `provenance` with its public
+  view and drops the `guid`; the live book keeps both for the next
+  withdrawer, and withdraw is by slot index.
+- **The trade window** is the exception: the counterparty's client receives
+  the staged copies' full payloads (`stagedOfferSlots`,
+  `src/sim/social/trade.ts`), because the `$WOC` directed-offer pin
+  (`itemCopyPin`) fingerprints the whole copy. The window shows it only
+  through `publicProvenanceView` and never displays the `guid`.
 
 ## Where the stamps happen
 
@@ -170,6 +197,14 @@ showing the origin line (looted by, quest reward to, or obtained by), one
 row per later hand, and the count of earlier hands that rolled off the
 bounded chain. The tooltip itself carries no tracking lines.
 
+Other players weighing a copy open the same prompt. In the trade window
+every tracked row on either side has a visible "Item history" button and a
+right-click door; in the guild bank any member, read-only or not, opens it
+by right-click or the Context Menu key on the cell, plus a button under the
+cell on touch layouts. `src/ui/item_history_access_view.ts` decides the
+doors and the record: a copy the viewer does not hold reaches the dialog as
+`publicProvenanceView` (names and dates, no character id).
+
 ## Pins
 
 `tests/item_provenance.test.ts` (the leaf), `tests/item_tracking.test.ts`
@@ -178,7 +213,14 @@ duplicate guard), `tests/item_lineage_modify.test.ts` (the in-place rows),
 `tests/item_tracking_consume.test.ts` (the end-of-life and derive rows),
 `tests/server/character_delete_item_ledger.test.ts` (the delete rows),
 `tests/item_history_view.test.ts` and `tests/item_history_dialog_dom.test.ts`
-(the right-click history), `tests/server/item_ledger.test.ts` (the ledger
+(the right-click history), `tests/item_history_access_view.test.ts`,
+`tests/trade_item_history_dom.test.ts` and
+`tests/guild_bank_item_history_dom.test.ts`,
+`tests/market_item_history.test.ts`, `tests/market_item_history_dom.test.ts`,
+`tests/inspect_item_history_wire.test.ts` and
+`tests/inspect_item_history_dom.test.ts` (the other-player doors and wires),
+the public guild bank snapshot case in `tests/guild_bank.test.ts`,
+`tests/server/item_ledger.test.ts` (the ledger
 and the event frame), `tests/server/admin_runtime_restore_lineage.test.ts`
 (the restore derive), and the admin route cases in
 `tests/server/admin.test.ts`.

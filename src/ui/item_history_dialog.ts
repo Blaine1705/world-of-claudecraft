@@ -6,9 +6,20 @@
 // set inert behind it, Escape and the close buttons dismiss and return
 // focus. The lines come from the pure item_history_view.ts core; nothing
 // here reads the item ID, which never reaches a player surface.
+//
+// The trade window and the guild bank reach the same dialog through the two
+// affordance helpers at the bottom (the material sources dialog's
+// attach/append pair, same doors): a right-click / Context Menu key door and
+// a visible button. Which record a viewer reads and which door shows where
+// is decided by the pure item_history_access_view.ts core.
 
 import type { ItemProvenance } from '../sim/types';
 import { t } from './i18n';
+import {
+  contextMenuOpensItemHistory,
+  type ItemHistorySurface,
+  itemHistoryButtonShown,
+} from './item_history_access_view';
 import { itemHistoryModel } from './item_history_view';
 import { installPromptDialog, type PromptDialogHandle } from './prompt_dialog';
 import { svgIcon } from './ui_icons';
@@ -153,4 +164,70 @@ export function closeItemHistoryDialogForOwner(owner: HTMLElement): boolean {
 export function openItemHistoryDialog(options: ItemHistoryDialogOptions): void {
   sharedDialog ??= new ItemHistoryDialog();
   sharedDialog.open(options);
+}
+
+function touchLayout(): boolean {
+  return document.body.classList.contains('mobile-touch');
+}
+
+/** The right-click door onto an item row/cell outside the bags (the trade
+ *  window, the guild bank): desktop right-click and the native Context Menu
+ *  key open the history; a touch long-press stays the row's tooltip peek
+ *  (item_history_access_view.ts decides both). `provenance` is the record the
+ *  caller already resolved for this viewer (itemHistoryProvenanceFor), so a
+ *  copy someone else holds arrives here as the public projection; null wires
+ *  nothing. */
+export function attachItemHistoryContextMenu(
+  element: HTMLElement,
+  itemName: string,
+  provenance: ItemProvenance | null,
+): void {
+  if (provenance === null) return;
+  element.addEventListener('contextmenu', (event) => {
+    if (!contextMenuOpensItemHistory((event as PointerEvent).pointerType, touchLayout())) return;
+    event.preventDefault();
+    openItemHistoryDialog({ itemName, provenance, opener: element });
+  });
+}
+
+/** The visible "Item history" button beside a row/cell: on every layout for
+ *  a list row, on touch layouts only for a grid cell
+ *  (itemHistoryButtonShown). It joins the row's existing row-plus-action
+ *  wrapper when the material sources button already made one, else mints the
+ *  same wrapper (the shared `.material-source-item` layout family, so the
+ *  pair lays out exactly like a Sources row). Returns the button, or null when
+ *  none renders. */
+export function appendItemHistoryActionAfter(
+  element: HTMLElement,
+  itemName: string,
+  provenance: ItemProvenance | null,
+  surface: ItemHistorySurface,
+): HTMLButtonElement | null {
+  if (provenance === null) return null;
+  if (!itemHistoryButtonShown(surface, touchLayout())) return null;
+  const parent = element.parentElement;
+  if (!parent) return null;
+  const button = document.createElement('button');
+  button.type = 'button';
+  // The material sources action's sizing (40px floor, focus ring) is the
+  // family look for a per-row action; the second class is this door's hook.
+  button.className = 'btn material-sources-action item-history-action';
+  button.setAttribute('aria-haspopup', 'dialog');
+  button.textContent = t('hudChrome.itemMenu.itemHistory');
+  button.setAttribute('aria-label', t('hudChrome.itemHistory.openAria', { item: itemName }));
+  button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openItemHistoryDialog({ itemName, provenance, opener: button });
+  });
+  if (parent.classList.contains('material-source-item')) {
+    parent.appendChild(button);
+    return button;
+  }
+  const wrapper = document.createElement('div');
+  wrapper.className = 'material-source-item';
+  if (element.classList.contains('bank-item')) wrapper.classList.add('material-source-item-cell');
+  if (element.classList.contains('trade-item')) wrapper.classList.add('material-source-item-trade');
+  parent.insertBefore(wrapper, element);
+  wrapper.append(element, button);
+  return button;
 }

@@ -1717,6 +1717,45 @@ describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
     expect(book(sim).inventory[0].instance?.signer).toBe('Ana');
   });
 
+  it('ships a tracked copy with its public history only: no guid, no character ids', () => {
+    const sim = makeOfficerSim();
+    const guid = '0f8fad5b-d9cb-469f-a165-70867728950e';
+    const parent = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
+    book(sim).inventory.push({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: {
+        guid,
+        signer: 'Ana',
+        provenance: {
+          at: 1_000,
+          by: 'Ana',
+          byId: 11,
+          source: 'mob:forest_wolf',
+          zone: 'elwynn',
+          derivedFrom: parent,
+          owners: [{ at: 2_000, by: 'Bram', byId: 22 }],
+          transfers: 1,
+        },
+      },
+    });
+    const slot = sim.guildBankInfoFor(sim.playerId)?.slots[0];
+    expect(slot?.instance).toEqual({
+      signer: 'Ana',
+      provenance: {
+        at: 1_000,
+        by: 'Ana',
+        source: 'mob:forest_wolf',
+        zone: 'elwynn',
+        owners: [{ at: 2_000, by: 'Bram' }],
+        transfers: 1,
+      },
+    });
+    // The live book keeps the full record for the next withdrawer.
+    expect(book(sim).inventory[0].instance?.guid).toBe(guid);
+    expect(book(sim).inventory[0].instance?.provenance?.byId).toBe(11);
+  });
+
   it('reports a null nextExpansionPrice once the ladder is exhausted', () => {
     const sim = makeOfficerSim({ purchasedSlots: 60 });
     expect(sim.guildBankInfoFor(sim.playerId)?.nextExpansionPrice).toBeNull();

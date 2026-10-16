@@ -15259,6 +15259,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.itemHistoryEarlierHidden.many': '이전 {count}건의 양도는 표시되지 않습니다.',
   'hudChrome.plurals.itemHistoryEarlierHidden.other': '이전 {count}건의 양도는 표시되지 않습니다.',
   'hudChrome.itemHistory.close': '닫기',
+  'hudChrome.itemHistory.openAria': '{item}의 아이템 이력',
   'devCommand.actions.kit.description':
     '특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다.',
   'devCommand.actions.kit.label': '20레벨 초기 장비 세트 착용',

@@ -5637,7 +5637,8 @@ export const ja_JP: EnTranslations = {
       "title": "{item}：履歴",
       "passedTo": "{date} に {name} へ譲渡",
       "noTransfers": "このアイテムは一度も持ち主が変わっていません。",
-      "close": "閉じる"
+      "close": "閉じる",
+      "openAria": "{item}のアイテム履歴"
     },
     "enchanting": {
       "recipeNotLearned": "この付呪を施すには、先に製法書で習得してください。",

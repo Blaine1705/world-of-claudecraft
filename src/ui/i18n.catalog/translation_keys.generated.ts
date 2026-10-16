@@ -11421,6 +11421,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.itemHeroicTag'
   | 'hudChrome.itemHistory.close'
   | 'hudChrome.itemHistory.noTransfers'
+  | 'hudChrome.itemHistory.openAria'
   | 'hudChrome.itemHistory.passedTo'
   | 'hudChrome.itemHistory.title'
   | 'hudChrome.itemMasterwrought'

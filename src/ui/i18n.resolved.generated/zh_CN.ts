@@ -5637,7 +5637,8 @@ export const zh_CN: EnTranslations = {
       "title": "{item}：历史",
       "passedTo": "{date} 转交给 {name}",
       "noTransfers": "此物品从未易手。",
-      "close": "关闭"
+      "close": "关闭",
+      "openAria": "{item}的物品历史"
     },
     "enchanting": {
       "recipeNotLearned": "施加此附魔前，请先学习配方。",

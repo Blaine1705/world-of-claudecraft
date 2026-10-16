@@ -15300,6 +15300,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.itemHistoryEarlierHidden.other':
     'それ以前の {count} 件の譲渡は表示されません。',
   'hudChrome.itemHistory.close': '閉じる',
+  'hudChrome.itemHistory.openAria': '{item}のアイテム履歴',
   'devCommand.actions.kit.description':
     '指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。',
   'devCommand.actions.kit.label': '新規20キットを装備',

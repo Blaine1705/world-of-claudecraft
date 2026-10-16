@@ -5637,7 +5637,8 @@ export const ru_RU: EnTranslations = {
       "title": "{item}: история",
       "passedTo": "Передано: {name}, {date}",
       "noTransfers": "Этот предмет никогда не менял владельца.",
-      "close": "Закрыть"
+      "close": "Закрыть",
+      "openAria": "История предмета: {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Изучите формулу, прежде чем накладывать эти чары.",

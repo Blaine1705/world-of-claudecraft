@@ -215,6 +215,9 @@ const UI_PURE_CORES = [
   // The tracked epic/legendary copy's history lines (origin, every later
   // hand); the right-click Item history dialog renders them.
   'src/ui/item_history_view.ts',
+  // Which record a viewer's Item history reads (the public projection for a
+  // copy someone else holds) and which door a trade row / bank cell shows.
+  'src/ui/item_history_access_view.ts',
   'src/ui/item_combat_tooltip_view.ts',
   'src/ui/trinket_tooltip_view.ts',
   // The trinket auras' tooltip descriptor and their item-icon art map.

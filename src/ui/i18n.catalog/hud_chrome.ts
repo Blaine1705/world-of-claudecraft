@@ -8194,6 +8194,11 @@ export const hudChromeStrings = {
     passedTo: 'Passed to {name} on {date}',
     noTransfers: 'This item has never changed hands.',
     close: 'Close',
+    // The accessible name of the visible "Item history" button beside a
+    // trade offer row or a guild bank cell (item_history_dialog.ts
+    // appendItemHistoryActionAfter): the visible label plus the item, so two
+    // rows' buttons never share a name.
+    openAria: 'Item history for {item}',
   },
   // Enchanting actions (Professions 2.0): the result toasts for the
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each

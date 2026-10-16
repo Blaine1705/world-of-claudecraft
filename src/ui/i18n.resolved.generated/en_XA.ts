@@ -5637,7 +5637,8 @@ export const en_XA: EnTranslations = {
       "title": "[{item}: ĥíšţóŕý]",
       "passedTo": "[Þáššéð ţó {name} óñ {date}]",
       "noTransfers": "[Ţĥíš íţéɱ ĥáš ñéʋéŕ çĥáñĝéð ĥáñðš.]",
-      "close": "[Çļóšé]"
+      "close": "[Çļóšé]",
+      "openAria": "[Íţéɱ ĥíšţóŕý ƒóŕ {item}]"
     },
     "enchanting": {
       "recipeNotLearned": "[Ļéáŕñ ţĥé ƒóŕɱúļá ƀéƒóŕé áþþļýíñĝ ţĥíš éñçĥáñţ.]",

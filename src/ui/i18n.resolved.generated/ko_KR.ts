@@ -5637,7 +5637,8 @@ export const ko_KR: EnTranslations = {
       "title": "{item}: 이력",
       "passedTo": "{date}에 {name}에게 넘어감",
       "noTransfers": "이 아이템은 주인이 바뀐 적이 없습니다.",
-      "close": "닫기"
+      "close": "닫기",
+      "openAria": "{item}의 아이템 이력"
     },
     "enchanting": {
       "recipeNotLearned": "이 마법부여를 적용하려면 먼저 공식을 배워야 합니다.",
