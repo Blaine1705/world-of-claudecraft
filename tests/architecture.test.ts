@@ -848,6 +848,10 @@ const RENDER_PURE_CORES = [
   'src/render/chase_camera_floor_core.ts',
   // the air of a walk-in placed town building (its rooms and doors) for the indoor camera
   'src/render/placed_town_interior_core.ts',
+  // the Highwatch manor's chimney smoke: each puff's place, size and opacity at a moment
+  'src/render/highwatch_manor_smoke_core.ts',
+  // the Highwatch manor's lane: its paving's rectangle and flags, road to gate
+  'src/render/highwatch_manor_lane_core.ts',
   // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
   'src/render/body_emote_core.ts',
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).

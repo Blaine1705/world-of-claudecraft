@@ -6369,6 +6369,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.spirit_healer.title': '죽은 자의 수호자',
   'entities.npcs.spirit_healer.greeting':
     '편히 쉬게, 영혼이여. 그대를 육신으로 돌려보낼 수 있으나, 돌아오는 길은 그대를 약하게 만들 것이네.',
+  'entities.npcs.steward_ansel_hale.greeting':
+    '저택에 온 것을 환영하오, {className}. 화롯가에서 몸을 녹이시오. 양탄자를 조심하고, 상석의 식탁에는 손대지 마시오. 광장 사람들이 집으로 가는 길을 찾도록 등불은 밤새 타오르오.',
+  'entities.npcs.steward_ansel_hale.name': '안셀 헤일',
+  'entities.npcs.steward_ansel_hale.title': '저택의 집사',
   'entities.npcs.the_merchant.name': '상인',
   'entities.npcs.the_merchant.title': '세계 시장 관리자',
   'entities.npcs.the_merchant.greeting':

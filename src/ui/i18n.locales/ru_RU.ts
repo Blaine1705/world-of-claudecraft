@@ -6466,6 +6466,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.spirit_healer.title': 'Хранитель мёртвых',
   'entities.npcs.spirit_healer.greeting':
     'Покойся, дух. Я могу вернуть тебя в тело, но обратный путь оставит тебя ослабленным.',
+  'entities.npcs.steward_ansel_hale.greeting':
+    'Добро пожаловать в усадьбу, {className}. Погрейтесь у очага, берегите ковры и не трогайте высокий стол. Фонарь горит всю ночь, чтобы площадь не сбилась с пути домой.',
+  'entities.npcs.steward_ansel_hale.name': 'Ансель Хейл',
+  'entities.npcs.steward_ansel_hale.title': 'Управляющий усадьбы',
   'entities.npcs.the_merchant.name': 'Торговец',
   'entities.npcs.the_merchant.title': 'Хранитель мирового рынка',
   'entities.npcs.the_merchant.greeting':

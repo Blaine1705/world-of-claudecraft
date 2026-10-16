@@ -6171,6 +6171,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.spirit_healer.title': '亡者的守护者',
   'entities.npcs.spirit_healer.greeting':
     '安息吧，灵魂。我可以让你重返躯体，但归途会让你变得虚弱。',
+  'entities.npcs.steward_ansel_hale.greeting':
+    '欢迎来到庄园，{className}。到炉火边暖暖身子吧，留心脚下的地毯，别碰主桌。灯楼彻夜长明，好让广场上的人找得到回家的路。',
+  'entities.npcs.steward_ansel_hale.name': '安塞尔·黑尔',
+  'entities.npcs.steward_ansel_hale.title': '庄园管家',
   'entities.npcs.the_merchant.name': '商人',
   'entities.npcs.the_merchant.title': '世界市场守护者',
   'entities.npcs.the_merchant.greeting':

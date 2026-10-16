@@ -25677,6 +25677,11 @@ export const ja_JP: EnTranslations = {
         "title": "薬房の主",
         "greeting": "二度量って一度で注ぐ、{className}。薬房ではこぼした試薬に容赦はしない。"
       },
+      "steward_ansel_hale": {
+        "name": "アンセル・ヘイル",
+        "title": "館の家令",
+        "greeting": "館へようこそ、{className}。炉辺で温まっていくといい。絨毯に気をつけて、上座の卓には触れぬように。広場の者が家路を見失わぬよう、灯籠は夜通し灯している。"
+      },
       "farmer_jessica": {
         "name": "農婦ジェシカ",
         "title": "菜園の管理人",

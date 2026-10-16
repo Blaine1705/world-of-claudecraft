@@ -25677,6 +25677,11 @@ export const de_DE: EnTranslations = {
         "title": "Meister der Apotheke",
         "greeting": "Zweimal messen, einmal gießen, {className}. In der Apotheke hat niemand Geduld mit verschütteten Reagenzien."
       },
+      "steward_ansel_hale": {
+        "name": "Ansel Hale",
+        "title": "Steward of the Manor",
+        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
+      },
       "farmer_jessica": {
         "name": "Bäuerin Jessica",
         "title": "Hüterin der Parzellen",

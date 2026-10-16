@@ -5,8 +5,11 @@ import {
   insideDressingExclusion,
   insideEastbrookGrassExclusion,
   insideGrassHubExclusion,
+  insideHighwatchManorGround,
+  insidePavedGrassExclusion,
 } from '../src/render/foliage_core';
-import { BUILTIN_WORLD, PROPS } from '../src/sim/data';
+import { generateDressing } from '../src/render/foliage_dressing_spots';
+import { BUILTIN_WORLD, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { tavernGroundsRects } from '../src/sim/mirefen_tavern_grounds';
@@ -17,6 +20,7 @@ import {
   EASTBROOK_NOTICEBOARD_TEMPLATE_ID,
   type NoticeboardDef,
 } from '../src/sim/types';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 const PADDING = 0.35;
 const BOUNDARY_EPSILON = 0.01;
@@ -71,12 +75,15 @@ describe('Eastbrook town grass exclusion', () => {
     // Re-pinned 2026-10 for the painted Highwatch: its five placed buildings
     // clear their reach and door apron the Fenbridge way (two rows each; its
     // old kit houses had none): 85 to 95.
+    // Re-pinned 2026-10 for the Highwatch manor on the north hill: one more
+    // placed building, its reach and its door apron: 95 to 97.
     // The Mirefen tavern keeps grass off its floor: the hall, the wing, the tower and the
     // porch with its steps (mirefenTavernGrassExclusions): 4 more, and one per rectangle of
     // its grounds (sim/mirefen_tavern_grounds.ts tavernGroundsRects: the forecourt, the stable
     // and each piece outside). On its own branch that was 129 plus the grounds (the release's
-    // 125 plus 4); merged with the rebuilt towns above: 95 plus 4, plus the grounds.
-    expect(exclusions).toHaveLength(99 + tavernGroundsRects().length);
+    // 125 plus 4); merged with the rebuilt towns and the manor above: 97 plus 4, plus the
+    // grounds.
+    expect(exclusions).toHaveLength(101 + tavernGroundsRects().length);
     expect(tavernGroundsRects().length).toBe(27);
     for (const building of HIGHWATCH_LAYOUT.buildings) {
       expect(exclusions.some((item) => item.id === building.id)).toBe(true);
@@ -480,5 +487,67 @@ describe('Eastbrook town grass exclusion', () => {
     expect(source).toMatch(
       /if \(insideEastbrookGrassExclusion\(townExclusions, x, z, GRASS_BUILDING_PADDING\)\)\s*continue;/,
     );
+  });
+});
+
+describe('the Highwatch manor grows no meadow', () => {
+  const manor = HIGHWATCH_LAYOUT.buildings.find((building) => building.id === 'highwatch_manor');
+  if (!manor) throw new Error('no manor');
+  const reach = manor.reach;
+
+  it('is paving across its whole reach in a world that stands it, and only there', () => {
+    // its floors, porch, garden lawn and path are the model's own: every grass system asks
+    // the paving exclusion (the tuft ring and both blade carpets)
+    for (const [dx, dz] of [
+      [0, 0],
+      [reach.halfWidth - 0.1, reach.halfDepth - 0.1],
+      [-reach.halfWidth + 0.1, -reach.halfDepth + 0.1],
+    ]) {
+      const x = reach.center.x + dx;
+      const z = reach.center.z + dz;
+      expect(insideHighwatchManorGround(x, z), `${x}, ${z}`).toBe(true);
+      expect(insidePavedGrassExclusion(x, z), `${x}, ${z}`).toBe(true);
+    }
+    expect(insideHighwatchManorGround(reach.center.x + reach.halfWidth + 0.5, reach.center.z)).toBe(
+      false,
+    );
+    expect(insideHighwatchManorGround(0, 660)).toBe(false);
+  });
+
+  it('lets the meadow grow back in a world without the manor', () => {
+    try {
+      setActiveWorldContent({
+        ...BUILTIN_WORLD,
+        props: {
+          ...BUILTIN_WORLD.props,
+          buildings: BUILTIN_WORLD.props.buildings.filter((b) => b.id !== manor.id),
+        },
+      });
+      expect(insideHighwatchManorGround(reach.center.x, reach.center.z)).toBe(false);
+    } finally {
+      setActiveWorldContent(null);
+    }
+  });
+
+  it('grows no bush or fern through its floors, and the scrub comes back without it', () => {
+    const inReach = (spots: readonly { x: number; z: number }[]) =>
+      spots.filter(
+        (spot) =>
+          Math.abs(spot.x - reach.center.x) <= reach.halfWidth &&
+          Math.abs(spot.z - reach.center.z) <= reach.halfDepth,
+      );
+    expect(inReach(generateDressing(WORLD_SEED))).toEqual([]);
+    try {
+      setActiveWorldContent({
+        ...BUILTIN_WORLD,
+        props: {
+          ...BUILTIN_WORLD.props,
+          buildings: BUILTIN_WORLD.props.buildings.filter((b) => b.id !== manor.id),
+        },
+      });
+      expect(inReach(generateDressing(WORLD_SEED)).length).toBeGreaterThan(0);
+    } finally {
+      setActiveWorldContent(null);
+    }
   });
 });

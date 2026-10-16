@@ -2576,7 +2576,7 @@ export class Sim {
       }
     }
 
-    // Escorts, the practice yards, the harbormaster: rng-free, trailing or reserved ids.
+    // Escorts, the practice yards, the built world's keepers: rng-free, trailing or reserved ids.
     initEscortsImpl(this.ctx);
     spawnHubPractice(this.ctx, worldContent);
     spawnHealingTrainingGround(this.ctx, worldContent);

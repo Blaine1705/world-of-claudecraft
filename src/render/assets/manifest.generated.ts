@@ -1987,6 +1987,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/tidehold/highwatch/house_c.glb": "/media/models/tidehold/highwatch/house_c.60322b8bc2e3.glb",
   "models/tidehold/highwatch/house_c.half.glb": "/media/models/tidehold/highwatch/house_c.half.1edf08a627fc.glb",
   "models/tidehold/highwatch/house_c.quarter.glb": "/media/models/tidehold/highwatch/house_c.quarter.d865bb75a3be.glb",
+  "models/tidehold/highwatch/manor.glb": "/media/models/tidehold/highwatch/manor.ddae2cee9d55.glb",
   "models/tidehold/highwatch/shop_a.glb": "/media/models/tidehold/highwatch/shop_a.489269f8b65c.glb",
   "models/tidehold/highwatch/shop_a.half.glb": "/media/models/tidehold/highwatch/shop_a.half.be1f958ee88b.glb",
   "models/tidehold/highwatch/shop_a.quarter.glb": "/media/models/tidehold/highwatch/shop_a.quarter.a8075f8e8579.glb",

@@ -373,6 +373,7 @@ import { FARM_PATTERN_ITEMS } from './content/farm_patterns';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { HIGHWATCH_MANOR_NPCS } from './content/highwatch_manor';
 import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
 import { MIREFEN_TAVERN_NPCS } from './content/mirefen_tavern';
@@ -565,6 +566,7 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
+  ...HIGHWATCH_MANOR_NPCS,
   // The Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
   // dynamic, spawned per Temple claim, appended last so no placed NPC moves.
   ...CANTOR_NPCS,

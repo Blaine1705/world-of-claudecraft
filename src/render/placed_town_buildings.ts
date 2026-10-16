@@ -271,6 +271,8 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
         registerCameraInterior(interior);
         registeredInteriors.push(interior.id);
       }
+      // its doors: a player stepping in sees in through one (fenbridge_town_visibility_core.ts)
+      const doorways = interior?.openings.map((opening) => interior.boxes[opening.box]);
       group.add(built.group);
       hideTargets.push({
         group: built.group,
@@ -286,6 +288,7 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
         topY: built.topY,
         cullRadius: built.cullRadius,
         walkIn: building.walkIn,
+        doorways,
       });
       roots.push(built.group);
     }

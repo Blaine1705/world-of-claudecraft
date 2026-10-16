@@ -25677,6 +25677,11 @@ export const it_IT: EnTranslations = {
         "title": "Maestro dello speziale",
         "greeting": "Misura due volte e versa una volta, {className}. Il farmacista non ha pazienza per i reagenti versati."
       },
+      "steward_ansel_hale": {
+        "name": "Ansel Hale",
+        "title": "Steward of the Manor",
+        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
+      },
       "farmer_jessica": {
         "name": "Contadina Jessica",
         "title": "Custode degli Appezzamenti",

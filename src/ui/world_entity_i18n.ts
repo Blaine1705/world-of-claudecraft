@@ -589,6 +589,7 @@ const NPC_IDS = [
   'tinker_gizzel', // crafting-station master: toolworks (Eastbrook, zone 1)
   'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
   'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
+  'steward_ansel_hale', // the Highwatch manor's steward (zone 3)
   // The farmer NPCs (the farming go-live), one per farming hub, in the same
   // tier order as the corresponding FARM_PATCHES rows.
   'farmer_jessica', // Eastbrook allotments (zone 1, tier 1)

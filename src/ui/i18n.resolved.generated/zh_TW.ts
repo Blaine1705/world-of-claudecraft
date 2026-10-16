@@ -25677,6 +25677,11 @@ export const zh_TW: EnTranslations = {
         "title": "藥坊大師",
         "greeting": "量兩次，倒一次，{className}。藥坊裡容不得灑掉的藥劑。"
       },
+      "steward_ansel_hale": {
+        "name": "安塞爾·黑爾",
+        "title": "莊園管家",
+        "greeting": "歡迎來到莊園，{className}。到爐火邊暖暖身子吧，留心腳下的地毯，別碰主桌。燈樓徹夜長明，好讓廣場上的人找得到回家的路。"
+      },
       "farmer_jessica": {
         "name": "農婦潔西卡",
         "title": "菜園管事",

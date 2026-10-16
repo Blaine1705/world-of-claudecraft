@@ -6404,6 +6404,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':
     '安らかに、魂よ。亡骸に戻すことはできるが、戻る道のりで弱ってしまうだろう。',
+  'entities.npcs.steward_ansel_hale.greeting':
+    '館へようこそ、{className}。炉辺で温まっていくといい。絨毯に気をつけて、上座の卓には触れぬように。広場の者が家路を見失わぬよう、灯籠は夜通し灯している。',
+  'entities.npcs.steward_ansel_hale.name': 'アンセル・ヘイル',
+  'entities.npcs.steward_ansel_hale.title': '館の家令',
   'entities.npcs.the_merchant.name': '商人',
   'entities.npcs.the_merchant.title': '世界市場の守り手',
   'entities.npcs.the_merchant.greeting':

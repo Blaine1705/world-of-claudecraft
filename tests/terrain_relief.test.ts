@@ -124,9 +124,11 @@ describe('the relief actually shapes the world', () => {
     // The floor sits at 2.5%: the placement-integrity calm pads (dungeon
     // doors, the Duskfall portal, graveyards, camps) legitimately level the
     // ground gameplay stands on, which trims the steep fraction without
-    // touching the crags between pads.
+    // touching the crags between pads. The Highwatch manor's pad (highwatch_layout.ts)
+    // levels the hillside west of the Sanctum road the same way (five of the 5-yd
+    // samples, from 2.50% to 2.36%), so the floor sits at 2.3%.
     expect(maxH).toBeGreaterThan(38);
-    expect(steep / n).toBeGreaterThan(0.025);
+    expect(steep / n).toBeGreaterThan(0.023);
   });
 
   it('the wetlands stay calm', () => {

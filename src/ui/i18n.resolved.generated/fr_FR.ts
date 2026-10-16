@@ -25677,6 +25677,11 @@ export const fr_FR: EnTranslations = {
         "title": "Maître de l'apothicaire",
         "greeting": "Mesurez deux fois et versez une fois, {className}. L'apothicaire n'a aucune patience pour les réactifs renversés."
       },
+      "steward_ansel_hale": {
+        "name": "Ansel Hale",
+        "title": "Steward of the Manor",
+        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
+      },
       "farmer_jessica": {
         "name": "Fermière Jessica",
         "title": "Gérante des parcelles",
