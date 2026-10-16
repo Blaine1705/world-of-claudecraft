@@ -1128,8 +1128,10 @@ const ROADS = [
     gateId: null,
     halfWidth: 1.5,
     // Swung west round the smithy's forge shelter, which stands on the old
-    // line, and back along the smithy's north wall onto it, the silverleaf
-    // patch on the meadow above (herb_eastbrook_4) left off the verge.
+    // line, so it leaves the square beside the coast track (the two run as
+    // one wide way for a dozen yards) before turning back along the smithy's
+    // north wall onto the old line, the silverleaf patch on the meadow above
+    // (herb_eastbrook_4) left off the verge.
     points: [
       { x: 14.6, z: -88.6 },
       { x: 15.8, z: -83 },
@@ -1341,8 +1343,9 @@ const WEAVER_POSITION = { x: -20.5, z: -117.5 } as const;
 const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS_LOT.rotation, -3.2, 0);
 const SAUL_POSITION = { x: 10.2, z: -87.5 } as const;
 // Round 6b (owner): FURY is a service NPC (the honor quartermaster), so he
-// belongs on the town's edge rather than in the churchyard approach: between
-// the north road and the coast track where they leave the square.
+// belongs on the town's edge rather than in the churchyard approach: a few
+// strides west of where the north road and the coast track leave the square
+// side by side.
 const FURY_POSITION = { x: 21, z: -83.5 } as const;
 
 // Marshal stands beside the noticeboard, a full INTERACT_RANGE clear of
@@ -1565,15 +1568,18 @@ const SERVICES = {
     {
       id: 'eastbrook_graveyard_route',
       bodyRadius: 0.5,
-      // Out of the square's west corner and in through the churchyard's open
-      // north side, stopping short of the stones (solid colliders) within
-      // the Pale Keeper's reach.
+      // Out of the square's west corner, round the north end of the
+      // churchyard's east rails and in through the gap the rails leave at its
+      // north-east corner, toward the square (the rails are walk-through
+      // dressing, but a walk to the graves keeps to the way in), stopping
+      // short of the stones (solid colliders) within the Pale Keeper's reach.
       points: [
         { x: 14, z: -89 },
-        { x: 20, z: -91.5 },
-        { x: 27, z: -93.5 },
-        { x: 33, z: -95 },
-        { x: 38.6, z: -94.8 },
+        { x: 20, z: -90.5 },
+        { x: 26.5, z: -89.5 },
+        { x: 33.6, z: -90.8 },
+        { x: 37, z: -94 },
+        { x: 38.6, z: -95.2 },
       ],
     },
     {
