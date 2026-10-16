@@ -82,4 +82,15 @@ describe('practice dummies cannot be knocked back', () => {
     expect(dummy.pos).toEqual(dummyBefore);
     expect(Math.hypot(wolf.pos.x - wolfBefore.x, wolf.pos.z - wolfBefore.z)).toBeGreaterThan(1);
   });
+
+  it('still knocks back a real boss (only dummies are planted)', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'druid', world: EMPTY_TEST_WORLD });
+    const bossId = Object.values(MOBS).find(
+      (template) => template.boss === true && template.dummy !== true,
+    )?.id;
+    if (!bossId) throw new Error('no non-dummy boss template');
+    const boss = addMob(sim, bossId);
+
+    expect(sim.ctx.applyKnockback(sim.player, boss, 6)).toBeGreaterThan(0);
+  });
 });

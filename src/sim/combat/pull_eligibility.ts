@@ -15,5 +15,5 @@ export function isPullEligible(target: Entity): boolean {
 // any kind (pull, chain, grip, or knockback) may move one. Narrower than
 // isPullEligible on purpose: bosses still take knockbacks.
 export function isPlantedPracticeDummy(target: Entity): boolean {
-  return target.kind === 'mob' && MOBS[target.templateId]?.dummy === true;
+  return MOBS[target.templateId]?.dummy === true;
 }
