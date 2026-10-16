@@ -33,6 +33,12 @@ export function layTrail(
   lane: TuskerLane,
 ): boolean {
   if (lane.length < T.trailMinLength) return false;
+  // Never more than trailMax at once: the oldest goes out first (in play the
+  // 16 s Trample clock against the 30 s burn already keeps it to two).
+  while (st.trails.length >= T.trailMax) {
+    const oldest = st.trails.shift();
+    if (oldest) dropEncounterObject(ctx, inst, oldest.objectId);
+  }
   const o = ctx.instanceOriginOf(inst);
   const x = o.x + lane.x;
   const z = o.z + lane.z;

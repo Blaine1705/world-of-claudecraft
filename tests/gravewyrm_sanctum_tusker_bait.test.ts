@@ -350,6 +350,7 @@ function runToLock(r: Road): void {
 describe('the Trample follows its target until the lock (the readability pass)', () => {
   it('the bar runs 3 s and its lane locks for the last 0.9 s', () => {
     expect(T.trampleCast).toBe(3);
+    expect(T.trampleLock).toBe(0.9);
     expect(T.trampleLock).toBeGreaterThanOrEqual(0.6);
     expect(T.trampleLock).toBeLessThanOrEqual(1);
     // Steering time: a few yards at a run, at least.
@@ -465,6 +466,22 @@ describe('the Trample follows its target until the lock (the readability pass)',
     // Ported out: far outside the instance (still alive, still an entity).
     r.me.pos = { x: r.ox + 5000, y: r.me.pos.y, z: r.oz + 5000 };
     r.me.prevPos = { ...r.me.pos };
+    run(r, 0.3);
+    expect(trampleAimLocked(r.tusker.castRemaining)).toBe(false);
+    expect(st.lane).toEqual(before);
+  });
+
+  it('a target who dies leaves the lane where it last pointed', () => {
+    const r = road();
+    baitSetup(r);
+    run(r, T.trampleFirst + 0.05);
+    const st = state(r);
+    const before = { ...(st.lane as NonNullable<typeof st.lane>) };
+    // Dead where the lane pointed, then dragged across the road: a corpse
+    // steers nothing.
+    r.me.hp = 0;
+    r.me.dead = true;
+    put(r, r.me, OPEN.x, OPEN.z);
     run(r, 0.3);
     expect(trampleAimLocked(r.tusker.castRemaining)).toBe(false);
     expect(st.lane).toEqual(before);
@@ -788,6 +805,7 @@ describe('the soulfire trail', () => {
     r.tusker.maxHp = 1e6;
     r.tusker.hp = 1e6;
     run(r, T.trampleFirst + T.trampleCast + 0.1);
+    expect(T.trailSeconds).toBe(30);
     const [trail] = objectsOf(r, SANCTUM_SOULFIRE_TRAIL);
     run(r, 10);
     expect(trail.castRemaining).toBeGreaterThan(T.trailSeconds - 10.3);
@@ -821,6 +839,29 @@ describe('the soulfire trail', () => {
       }
     }
     expect(most).toBe(2);
+  });
+
+  it('a third trail puts the oldest out: never more than two, whatever lays them', () => {
+    expect(T.trailMax).toBe(2);
+    expect(T.trailHalfWidth).toBe(2);
+    const r = road();
+    r.tusker.maxHp = 1e6;
+    r.tusker.hp = 1e6;
+    plainCharge(r);
+    run(r, 0.1);
+    state(r).trampleTimer = 999;
+    dev(r, '/dev sanctum trigger trail');
+    const [first] = objectsOf(r, SANCTUM_SOULFIRE_TRAIL);
+    expect(first).toBeDefined();
+    dev(r, '/dev sanctum trigger trail');
+    expect(objectsOf(r, SANCTUM_SOULFIRE_TRAIL)).toHaveLength(2);
+    // The dev trigger ignores the Trample's clock: only the cap holds it.
+    dev(r, '/dev sanctum trigger trail');
+    const now = objectsOf(r, SANCTUM_SOULFIRE_TRAIL);
+    expect(now).toHaveLength(2);
+    expect(state(r).trails).toHaveLength(2);
+    expect(now.map((e) => e.id)).not.toContain(first.id);
+    expect(state(r).trails.map((t) => t.objectId)).not.toContain(first.id);
   });
 
   it('a baited charge leaves a trail only as far as the beast ran', () => {

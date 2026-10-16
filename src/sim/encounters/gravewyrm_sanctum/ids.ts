@@ -147,9 +147,12 @@ export const TUSKER_TUNING = {
   outcropRadius: 2,
   /** The outcrops rise the first time a living player comes this near one
    *  (the Gate Landing stands 68 yd from the nearest; every yard of the
-   *  Tusker's road is nearer): never at the claim itself, so a run that never
-   *  walks the road mints no object and every later id of the claim stays
-   *  where it was. */
+   *  Tusker's road is nearer): never at the claim's own tick, only on the
+   *  first tick a living player stands within reach. A party that walks in
+   *  through the Gate Landing therefore mints the five (and every later id of
+   *  the claim moves up by five, the same on every host); a run that is
+   *  staged elsewhere and never comes near mints none, which is what keeps
+   *  the heroic five-man parity golden (staged onto Korzul) where it was. */
   outcropWake: 90,
   /** How far ahead of its centre the tusk tips reach (the model's 6.13 at its
    *  drawn size, render/gravewyrm_sanctum_fx/tusker_model_core.ts): it stops
@@ -183,6 +186,9 @@ export const TUSKER_TUNING = {
    *  1,300 (tests/gravewyrm_sanctum_tusker_bait.test.ts walks a solo player
    *  and a group of four through a whole pull on it). */
   trailSeconds: 30,
+  /** The timing above keeps it to two; this is the hard cap, so a dev
+   *  trigger or a retune can never stack a third (the oldest goes out). */
+  trailMax: 2,
   trailTick: 1,
   /** A charge shorter than this leaves no trail (a lunge spills nothing). */
   trailMinLength: 3,
