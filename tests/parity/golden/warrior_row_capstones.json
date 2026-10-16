@@ -9,8 +9,8 @@
     "victory rush on-kill window + selfHealPctMax",
     "bladestorm self-centered channel ticks"
   ],
-  "draws": 1007,
-  "drawDigest": "3af861b9",
+  "draws": 1013,
+  "drawDigest": "7ad1000e",
   "frames": [
     {
       "tick": 0,
@@ -2270,7 +2270,7 @@
       "tick": 48,
       "time": 2.4,
       "nextId": 1017,
-      "state": "26a6ce2f",
+      "state": "c8d595ba",
       "events": "741638a5",
       "rng": {
         "draws": 84,
@@ -2281,7 +2281,7 @@
       "tick": 52,
       "time": 2.6,
       "nextId": 1017,
-      "state": "66501736",
+      "state": "02c902e9",
       "events": "741638a5",
       "rng": {
         "draws": 108,
@@ -2292,7 +2292,7 @@
       "tick": 56,
       "time": 2.8,
       "nextId": 1017,
-      "state": "ea7a5f59",
+      "state": "60193f1e",
       "events": "50f52df7",
       "rng": {
         "draws": 133,
@@ -2303,242 +2303,242 @@
       "tick": 60,
       "time": 3,
       "nextId": 1017,
-      "state": "8414b08b",
-      "events": "eda1b834",
+      "state": "bd2d4349",
+      "events": "cf4d2012",
       "rng": {
-        "draws": 164,
-        "digest": "730bbad5"
+        "draws": 162,
+        "digest": "6efd8d13"
       }
     },
     {
       "tick": 64,
       "time": 3.2,
       "nextId": 1017,
-      "state": "dfcafaf7",
+      "state": "8446dad9",
       "events": "741638a5",
       "rng": {
-        "draws": 210,
-        "digest": "7b99ccd0"
+        "draws": 208,
+        "digest": "3f123666"
       }
     },
     {
       "tick": 68,
       "time": 3.4,
       "nextId": 1017,
-      "state": "9bbbeb76",
+      "state": "850b2a94",
       "events": "741638a5",
       "rng": {
-        "draws": 240,
-        "digest": "2f571605"
+        "draws": 238,
+        "digest": "0e72c810"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 1017,
-      "state": "c4859829",
-      "events": "460a2abc",
+      "state": "c2ae5015",
+      "events": "741638a5",
       "rng": {
-        "draws": 270,
-        "digest": "72f71823"
+        "draws": 265,
+        "digest": "7878c183"
       }
     },
     {
       "tick": 76,
       "time": 3.8,
       "nextId": 1017,
-      "state": "15b3b6f8",
+      "state": "842d8883",
       "events": "741638a5",
       "rng": {
-        "draws": 298,
-        "digest": "3f16109d"
+        "draws": 293,
+        "digest": "363f6729"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 1017,
-      "state": "cf71f02e",
-      "events": "7aa01616",
+      "state": "c74e4ef5",
+      "events": "4534012a",
       "rng": {
-        "draws": 337,
-        "digest": "ed84449e"
+        "draws": 329,
+        "digest": "bc95b1d5"
       }
     },
     {
       "tick": 84,
       "time": 4.2,
       "nextId": 1017,
-      "state": "c055b19f",
-      "events": "c49fcfd3",
+      "state": "d42acb97",
+      "events": "6c314d53",
       "rng": {
-        "draws": 369,
-        "digest": "7dd150f5"
+        "draws": 361,
+        "digest": "e01c9788"
       }
     },
     {
       "tick": 88,
       "time": 4.4,
       "nextId": 1017,
-      "state": "16fb3ca5",
+      "state": "571aa0cc",
       "events": "741638a5",
       "rng": {
-        "draws": 409,
-        "digest": "bffaccaf"
+        "draws": 401,
+        "digest": "e3b4e737"
       }
     },
     {
       "tick": 92,
       "time": 4.6,
       "nextId": 1017,
-      "state": "80139a64",
+      "state": "25d2e3da",
       "events": "741638a5",
       "rng": {
-        "draws": 463,
-        "digest": "1be8d4cd"
+        "draws": 455,
+        "digest": "b0e0cfec"
       }
     },
     {
       "tick": 96,
       "time": 4.8,
       "nextId": 1017,
-      "state": "92decbf1",
-      "events": "0413129c",
+      "state": "4929b2d7",
+      "events": "09eae756",
       "rng": {
-        "draws": 503,
-        "digest": "1674fb7c"
+        "draws": 493,
+        "digest": "9748f7a4"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 1017,
-      "state": "1ba098b4",
-      "events": "4534012a",
+      "state": "06503049",
+      "events": "5e44e107",
       "rng": {
-        "draws": 548,
-        "digest": "408384eb"
+        "draws": 539,
+        "digest": "52ba3f92"
       }
     },
     {
       "tick": 104,
       "time": 5.2,
       "nextId": 1017,
-      "state": "297320b9",
+      "state": "ee53b758",
       "events": "741638a5",
       "rng": {
-        "draws": 581,
-        "digest": "8409de62"
+        "draws": 572,
+        "digest": "aa0768c8"
       }
     },
     {
       "tick": 108,
       "time": 5.4,
       "nextId": 1017,
-      "state": "b414c479",
+      "state": "87a073f1",
       "events": "741638a5",
       "rng": {
-        "draws": 626,
-        "digest": "ee77294c"
+        "draws": 615,
+        "digest": "2316e66d"
       }
     },
     {
       "tick": 112,
       "time": 5.6,
       "nextId": 1017,
-      "state": "e47692a2",
-      "events": "847297ad",
+      "state": "c2a80af4",
+      "events": "e97052a4",
       "rng": {
-        "draws": 669,
-        "digest": "86b26f0a"
+        "draws": 660,
+        "digest": "875a2246"
       }
     },
     {
       "tick": 116,
       "time": 5.8,
       "nextId": 1017,
-      "state": "c9ee46d9",
+      "state": "292dcef9",
       "events": "741638a5",
       "rng": {
-        "draws": 719,
-        "digest": "72fe3122"
+        "draws": 709,
+        "digest": "c2207c5e"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 1017,
-      "state": "3b15e4b2",
-      "events": "10724eca",
+      "state": "5875db1f",
+      "events": "f89af7de",
       "rng": {
-        "draws": 755,
-        "digest": "66b1e7c4"
+        "draws": 744,
+        "digest": "61476ef1"
       }
     },
     {
       "tick": 124,
       "time": 6.2,
       "nextId": 1017,
-      "state": "c63c12f8",
-      "events": "741638a5",
+      "state": "e797949f",
+      "events": "1f5f57aa",
       "rng": {
-        "draws": 802,
-        "digest": "305711e7"
+        "draws": 800,
+        "digest": "0c8a7e7e"
       }
     },
     {
       "tick": 128,
       "time": 6.4,
       "nextId": 1017,
-      "state": "a6fbaecf",
+      "state": "fb82f829",
       "events": "7cecd312",
       "rng": {
-        "draws": 844,
-        "digest": "cd55f8e1"
+        "draws": 847,
+        "digest": "68d6fc30"
       }
     },
     {
       "tick": 132,
       "time": 6.6,
       "nextId": 1017,
-      "state": "c2db2066",
+      "state": "fdd1e491",
       "events": "741638a5",
       "rng": {
-        "draws": 892,
-        "digest": "3dac7eb7"
+        "draws": 898,
+        "digest": "3b2116da"
       }
     },
     {
       "tick": 136,
       "time": 6.8,
       "nextId": 1017,
-      "state": "0f106492",
+      "state": "c504faaf",
       "events": "8ffb0093",
       "rng": {
-        "draws": 928,
-        "digest": "0d316e79"
+        "draws": 933,
+        "digest": "fd3dbfcf"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 1017,
-      "state": "558376e6",
+      "state": "214cd198",
       "events": "741638a5",
       "rng": {
-        "draws": 972,
-        "digest": "3339f0e9"
+        "draws": 980,
+        "digest": "d28f3044"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 1017,
-      "state": "558376e6",
+      "state": "214cd198",
       "events": "741638a5",
       "rng": {
-        "draws": 972,
-        "digest": "3339f0e9"
+        "draws": 980,
+        "digest": "d28f3044"
       },
       "label": "bladestorm-done",
       "players": [
@@ -2569,16 +2569,16 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 1250,
-            "damageTaken": 34,
-            "kills": 2
+            "damageDealt": 1194,
+            "damageTaken": 58,
+            "kills": 1
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 1250,
-              "kills": 2
+              "damageDealt": 1194,
+              "kills": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2772,15 +2772,6 @@
               "remaining": 3593,
               "school": "physical",
               "sourceId": 1004
-            },
-            {
-              "duration": 20,
-              "id": "victory_rush",
-              "kind": "victory_rush",
-              "name": "Victor's Surge",
-              "remaining": 16.95,
-              "school": "physical",
-              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -2789,7 +2780,7 @@
           "channelTickEvery": 1,
           "channelTickTimer": 1,
           "chargeTimeLeft": 2.4,
-          "combatTimer": 1.05,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "cooldowns": [
             [
@@ -2816,7 +2807,7 @@
           "fallStartY": 6.672031,
           "fiveSecondRule": 106,
           "healPower": 5,
-          "hp": 641,
+          "hp": 617,
           "id": 1004,
           "inCombat": true,
           "kind": "player",
@@ -2835,7 +2826,7 @@
             "z": 17.534589
           },
           "potionCooldownUntil": -1,
-          "resource": 80.0875,
+          "resource": 80.5,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -2868,7 +2859,7 @@
               "id": "pack_frenzy",
               "kind": "buff_haste",
               "name": "Pack Frenzy",
-              "remaining": 4.95,
+              "remaining": 3,
               "school": "physical",
               "sourceId": 1012,
               "value": 1.3
@@ -2884,7 +2875,7 @@
           "fallStartY": 6.549558,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 7974,
+          "hp": 7977,
           "id": 1012,
           "inCombat": true,
           "kind": "mob",
@@ -2920,7 +2911,7 @@
           "threat": [
             [
               1004,
-              57.5
+              54.5
             ]
           ],
           "weapon": {
@@ -2938,7 +2929,7 @@
               "id": "pack_frenzy",
               "kind": "buff_haste",
               "name": "Pack Frenzy",
-              "remaining": 4.95,
+              "remaining": 3,
               "school": "physical",
               "sourceId": 1013,
               "value": 1.3
@@ -2949,7 +2940,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.569429,
+          "facing": -2.56012,
           "fallStartY": 6.549558,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -2970,9 +2961,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -7.307326,
-            "y": 2.181034,
-            "z": 24.885609
+            "x": -7.228729,
+            "y": 2.168011,
+            "z": 24.857002
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3114,20 +3105,8 @@
         {
           "aggroTargetId": 1004,
           "aiState": "attack",
-          "auras": [
-            {
-              "duration": 8,
-              "id": "pack_frenzy",
-              "kind": "buff_haste",
-              "name": "Pack Frenzy",
-              "remaining": 4.95,
-              "school": "physical",
-              "sourceId": 1016,
-              "value": 1.3
-            }
-          ],
           "autoAttack": true,
-          "combatTimer": 1.05,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3136,7 +3115,7 @@
           "fallStartY": 6.672031,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 8875,
+          "hp": 8883,
           "id": 1016,
           "inCombat": true,
           "kind": "mob",
@@ -3166,13 +3145,13 @@
           "stats": {
             "armor": 70
           },
-          "swingTimer": 0.138462,
+          "swingTimer": 1.05,
           "tappedById": 1004,
           "templateId": "forest_wolf",
           "threat": [
             [
               1004,
-              146.5
+              138.5
             ]
           ],
           "weapon": {
@@ -3187,22 +3166,22 @@
       "tick": 144,
       "time": 7.2,
       "nextId": 1017,
-      "state": "519cf023",
-      "events": "bd7696af",
+      "state": "6bb34f82",
+      "events": "5a97aca7",
       "rng": {
-        "draws": 1007,
-        "digest": "3af861b9"
+        "draws": 1013,
+        "digest": "7ad1000e"
       }
     },
     {
       "tick": 144,
       "time": 7.2,
       "nextId": 1017,
-      "state": "519cf023",
+      "state": "6bb34f82",
       "events": "741638a5",
       "rng": {
-        "draws": 1007,
-        "digest": "3af861b9"
+        "draws": 1013,
+        "digest": "7ad1000e"
       },
       "label": "final",
       "players": [
@@ -3233,16 +3212,16 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 1250,
-            "damageTaken": 44,
-            "kills": 2
+            "damageDealt": 1194,
+            "damageTaken": 58,
+            "kills": 1
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 1250,
-              "kills": 2
+              "damageDealt": 1194,
+              "kills": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3436,15 +3415,6 @@
               "remaining": 3592.8,
               "school": "physical",
               "sourceId": 1004
-            },
-            {
-              "duration": 20,
-              "id": "victory_rush",
-              "kind": "victory_rush",
-              "name": "Victor's Surge",
-              "remaining": 16.75,
-              "school": "physical",
-              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -3453,7 +3423,7 @@
           "channelTickEvery": 1,
           "channelTickTimer": 1,
           "chargeTimeLeft": 2.4,
-          "combatTimer": 0.05,
+          "combatTimer": 1.15,
           "comboUntil": -1,
           "cooldowns": [
             [
@@ -3480,7 +3450,7 @@
           "fallStartY": 6.672031,
           "fiveSecondRule": 106.2,
           "healPower": 5,
-          "hp": 631,
+          "hp": 617,
           "id": 1004,
           "inCombat": true,
           "kind": "player",
@@ -3499,7 +3469,7 @@
             "z": 17.534589
           },
           "potionCooldownUntil": -1,
-          "resource": 81.4625,
+          "resource": 80.5,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -3532,7 +3502,7 @@
               "id": "pack_frenzy",
               "kind": "buff_haste",
               "name": "Pack Frenzy",
-              "remaining": 4.75,
+              "remaining": 2.8,
               "school": "physical",
               "sourceId": 1012,
               "value": 1.3
@@ -3548,7 +3518,7 @@
           "fallStartY": 6.549558,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 7974,
+          "hp": 7977,
           "id": 1012,
           "inCombat": true,
           "kind": "mob",
@@ -3584,7 +3554,7 @@
           "threat": [
             [
               1004,
-              57.5
+              54.5
             ]
           ],
           "weapon": {
@@ -3602,7 +3572,7 @@
               "id": "pack_frenzy",
               "kind": "buff_haste",
               "name": "Pack Frenzy",
-              "remaining": 4.75,
+              "remaining": 2.8,
               "school": "physical",
               "sourceId": 1013,
               "value": 1.3
@@ -3613,7 +3583,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.569429,
+          "facing": -2.56012,
           "fallStartY": 6.549558,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -3634,9 +3604,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -8.17365,
-            "y": 3.119012,
-            "z": 23.540439
+            "x": -8.107537,
+            "y": 3.106483,
+            "z": 23.519955
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -3778,20 +3748,8 @@
         {
           "aggroTargetId": 1004,
           "aiState": "attack",
-          "auras": [
-            {
-              "duration": 8,
-              "id": "pack_frenzy",
-              "kind": "buff_haste",
-              "name": "Pack Frenzy",
-              "remaining": 4.75,
-              "school": "physical",
-              "sourceId": 1016,
-              "value": 1.3
-            }
-          ],
           "autoAttack": true,
-          "combatTimer": 0.05,
+          "combatTimer": 1.15,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3800,7 +3758,7 @@
           "fallStartY": 6.672031,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 8875,
+          "hp": 8883,
           "id": 1016,
           "inCombat": true,
           "kind": "mob",
@@ -3830,13 +3788,13 @@
           "stats": {
             "armor": 70
           },
-          "swingTimer": 1.488462,
+          "swingTimer": 0.85,
           "tappedById": 1004,
           "templateId": "forest_wolf",
           "threat": [
             [
               1004,
-              146.5
+              138.5
             ]
           ],
           "weapon": {
