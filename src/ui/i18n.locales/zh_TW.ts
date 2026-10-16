@@ -1500,6 +1500,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.saltwrack_shoulderguards.name': '鹽骸護肩',
   'entities.items.saltwrack_pauldrons.name': '鹽骸肩甲',
   'entities.items.saltwrack_epaulets.name': '鹽骸肩飾',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    '每週三份契約，每次重置時張貼。無需簽字，也不收費：完成一份，印章就歸你了。',
+  'entities.npcs.contract_clerk_tobias_wren.name': '托拜厄斯·雷恩',
+  'entities.npcs.contract_clerk_tobias_wren.title': '契約文書',
   'entities.npcs.glider_apprentice.name': '絲凱',
   'guide.arenaPage.vanguardBody':
     '先鋒裝備是戰爭裝備的第二季，由同樣兩位軍需官在原本品級之上一併販售，原本品級依然在架上。每個專精都有自己專屬的先鋒套裝，共五件：頭部、肩部、胸部、腿部與手部，商店只會列出你的職業能穿的三套先鋒套裝，其後才是你能揮舞的先鋒武器。先鋒裝備件帶有與原本品級相同的戰爭評級，只是物品等級更高，而每套套裝都有兩件式與四件式加成，會改變你專精的一項技能。與原本的套裝不同，這些加成在任何地方都會生效，連對付怪物也不例外，但它們是為了對抗玩家而打造的，所以在團隊副本中，團隊套裝依然是更好的選擇。',
@@ -6169,6 +6173,18 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '確定嗎？靈魂醫者會在此復活你。你還不到10級，所以這次復活後遺症不會削弱你。',
   'hudChrome.death.spiritHealerAlive': '靈魂醫者只看護逝者。你仍是生者。',
   'hudChrome.death.ghostHint': '跑回你死亡的地點，或與靈魂醫者交談以復活',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    '用印章換榮譽，朋友。我的貨架上沒有能磨利刀刃的東西，但高望的每座大廳都會知道你是在哪裡贏得的。',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': '加里克·霍爾特',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': '公會軍需官',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    '在找隊伍嗎？這張地圖上的每座墓穴、堡壘和神殿都在我的名單上。告訴我你要去哪兒。',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': '米拉·費爾韋瑟',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': '公會招募官',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    '歡迎來到燈火大廳，{className}。托拜厄斯把本週的契約貼在告示板上，加里克用我們的印章換取值得佩戴的榮譽，米拉能為你找到前往山下任何一扇門的隊伍。帶回一件戰利品，它就會掛在我身後的大廳裡。',
+  'entities.npcs.guildmaster_hesper_dunmore.name': '赫斯珀·鄧莫爾',
+  'entities.npcs.guildmaster_hesper_dunmore.title': '燈火大廳會長',
   'entities.npcs.spirit_healer.name': '靈魂醫者',
   'entities.npcs.spirit_healer.title': '亡者的守護者',
   'entities.npcs.spirit_healer.greeting':

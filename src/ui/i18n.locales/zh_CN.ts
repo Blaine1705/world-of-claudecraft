@@ -1348,6 +1348,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.saltwrack_shoulderguards.name': '盐骸护肩',
   'entities.items.saltwrack_pauldrons.name': '盐骸肩甲',
   'entities.items.saltwrack_epaulets.name': '盐骸肩饰',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    '每周三份契约，每次重置时张贴。无需签字，也不收费：完成一份，印章就归你了。',
+  'entities.npcs.contract_clerk_tobias_wren.name': '托拜厄斯·雷恩',
+  'entities.npcs.contract_clerk_tobias_wren.title': '契约文书',
   'entities.npcs.glider_apprentice.name': '斯凯',
   'devCommand.actions.hillend.description': '让当前山丘立即回落。',
   'devCommand.actions.hillend.label': '结束山丘',
@@ -6166,6 +6170,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '确定吗？灵魂医者会在此复活你。你还不到10级，所以这次复活后遗症不会削弱你。',
   'hudChrome.death.spiritHealerAlive': '灵魂医者只看护逝者。你仍是生者。',
   'hudChrome.death.ghostHint': '跑回你死亡的地点，或与灵魂医者交谈以复活',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    '用印章换荣誉，朋友。我的货架上没有能磨利刀刃的东西，但高望的每座大厅都会知道你是在哪里赢得的。',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': '加里克·霍尔特',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': '公会军需官',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    '在找队伍吗？这张地图上的每座墓穴、堡垒和神殿都在我的名单上。告诉我你要去哪儿。',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': '米拉·费尔韦瑟',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': '公会招募官',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    '欢迎来到灯火大厅，{className}。托拜厄斯把本周的契约贴在告示板上，加里克用我们的印章换取值得佩戴的荣誉，米拉能为你找到前往山下任何一扇门的队伍。带回一件战利品，它就会挂在我身后的大厅里。',
+  'entities.npcs.guildmaster_hesper_dunmore.name': '赫斯珀·邓莫尔',
+  'entities.npcs.guildmaster_hesper_dunmore.title': '灯火大厅会长',
   'entities.npcs.spirit_healer.name': '灵魂医者',
   'entities.npcs.spirit_healer.title': '亡者的守护者',
   'entities.npcs.spirit_healer.greeting':

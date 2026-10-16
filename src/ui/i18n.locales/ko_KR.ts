@@ -1543,6 +1543,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.saltwrack_shoulderguards.name': '소금난파 어깨받이',
   'entities.items.saltwrack_pauldrons.name': '소금난파 어깨갑옷',
   'entities.items.saltwrack_epaulets.name': '소금난파 견장',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    '계약은 일주일에 세 건, 초기화될 때마다 붙입니다. 서명도 수수료도 없어요. 끝까지 해내면 인장은 당신 겁니다.',
+  'entities.npcs.contract_clerk_tobias_wren.name': '토바이어스 렌',
+  'entities.npcs.contract_clerk_tobias_wren.title': '계약 담당관',
   'entities.npcs.glider_apprentice.name': '스카이',
   'guide.arenaPage.vanguardBody':
     '선봉대 장비는 워페어 장비의 두 번째 시즌으로, 판매를 이어 가는 기존 등급 위에 같은 두 병참장교가 판매합니다. 전문화마다 고유한 선봉대 세트가 머리, 어깨, 가슴, 다리, 손 다섯 부위로 갖춰져 있으며, 상점에는 자신의 직업이 입을 수 있는 세 세트만 나열되고 그 뒤로 사용할 수 있는 선봉대 무기가 이어집니다. 선봉대 부위는 기존 등급과 같은 워페어 수치를 더 높은 아이템 레벨로 지니며, 각 세트에는 두 부위와 네 부위를 채웠을 때 전문화 기술 하나를 바꾸는 보너스가 있습니다. 기존 세트와 달리 이 보너스는 몬스터를 포함해 어디서나 작동하지만, 원래 플레이어와 싸우기 위해 설계된 것이므로 공격대 안에서는 여전히 공격대용 세트가 더 나은 선택입니다.',
@@ -6364,6 +6368,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '정말입니까? 영혼 치유사가 여기서 당신을 부활시킵니다. 당신은 10레벨 미만이므로 이번에는 부활 후유증으로 약해지지 않습니다.',
   'hudChrome.death.spiritHealerAlive': '영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다.',
   'hudChrome.death.ghostHint': '죽은 장소로 달려가거나 영혼 치유사에게 말을 걸어 부활하세요',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    '인장을 명예로 바꿔 주지, 친구. 내 선반엔 칼날을 벼릴 물건은 없지만, 하이워치의 모든 전당이 자네가 어디서 그걸 얻었는지 알게 될 걸세.',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': '개릭 홀트',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': '길드 병참관',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    '동료를 찾나요? 이 지도에 있는 모든 묘지와 요새와 신전이 내 명단에 있어요. 어디로 가는지 말해 줘요.',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': '미라 페어웨더',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': '길드 모집관',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    '등불 회관에 온 것을 환영하네, {className}. 이번 주 계약은 토바이어스가 게시판에 붙여 두었고, 개릭은 우리 인장을 걸칠 만한 명예와 바꿔 주지. 미라는 산 아래 어느 문으로 가든 동료를 찾아 줄 걸세. 전리품을 가져오면 내 뒤의 전당에 걸리게 될 거야.',
+  'entities.npcs.guildmaster_hesper_dunmore.name': '헤스퍼 던모어',
+  'entities.npcs.guildmaster_hesper_dunmore.title': '등불 회관의 길드장',
   'entities.npcs.spirit_healer.name': '영혼 치유사',
   'entities.npcs.spirit_healer.title': '죽은 자의 수호자',
   'entities.npcs.spirit_healer.greeting':

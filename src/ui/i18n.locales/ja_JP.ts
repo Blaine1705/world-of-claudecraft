@@ -1546,6 +1546,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.saltwrack_shoulderguards.name': '塩の難破のショルダーガード',
   'entities.items.saltwrack_pauldrons.name': '塩の難破の肩甲',
   'entities.items.saltwrack_epaulets.name': '塩の難破のエポレット',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    '契約は週に三件、更新のたびに貼り出す。署名も手数料もいらない。やり遂げれば印章はあなたのものだ。',
+  'entities.npcs.contract_clerk_tobias_wren.name': 'トバイアス・レン',
+  'entities.npcs.contract_clerk_tobias_wren.title': '契約係',
   'entities.npcs.glider_apprentice.name': 'スカイ',
   'guide.arenaPage.vanguardBody':
     'ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ二人の補給官が元の階層に加えて販売し続けます。元の階層も販売終了にはなりません。どのスペックにも頭、肩、胸、脚、手の五部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる三つのセットだけが並び、続けて装備できるヴァンガードの武器が並びます。ヴァンガードの部位は元の階層と同じウォーフェアレーティングを、より高いアイテムレベルで備えており、各セットには2点と4点でスペックのアビリティの一つを変化させる二つのボーナスがあります。元のセットと違い、それらのボーナスはモンスター相手を含めどこでも機能しますが、対プレイヤー戦向けに作られているため、レイド内ではレイドセットの方が依然として優れた選択です。',
@@ -6399,6 +6403,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。',
   'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
   'hudChrome.death.ghostHint': '死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    '印章と栄誉の交換だ、友よ。俺の棚に刃を研ぐものはないが、ハイウォッチ中の館があんたがどこで手に入れたか知ることになる。',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': 'ギャリック・ホルト',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': 'ギルドの補給係',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    '仲間を探してる？この地図にある墓所も砦も神殿も、みんな私のリストに名前があるわ。どこへ行くのか教えて。',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': 'ミラ・フェアウェザー',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': 'ギルドの募集係',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    '燈火の館へようこそ、{className}。今週の契約はトバイアスが掲示板に貼っている。ギャリックは我らの印章を身につける価値のある栄誉と交換し、ミラは山の下のどの扉へ向かう仲間でも見つけてくれる。戦利品を持ち帰れば、私の後ろの広間に飾られるだろう。',
+  'entities.npcs.guildmaster_hesper_dunmore.name': 'ヘスパー・ダンモア',
+  'entities.npcs.guildmaster_hesper_dunmore.title': '燈火の館のギルドマスター',
   'entities.npcs.spirit_healer.name': '霊魂の癒し手',
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':

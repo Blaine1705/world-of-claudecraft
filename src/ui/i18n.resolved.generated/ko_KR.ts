@@ -25655,6 +25655,26 @@ export const ko_KR: EnTranslations = {
         "title": "저택의 집사",
         "greeting": "저택에 온 것을 환영하오, {className}. 화롯가에서 몸을 녹이시오. 양탄자를 조심하고, 상석의 식탁에는 손대지 마시오. 광장 사람들이 집으로 가는 길을 찾도록 등불은 밤새 타오르오."
       },
+      "guildmaster_hesper_dunmore": {
+        "name": "헤스퍼 던모어",
+        "title": "등불 회관의 길드장",
+        "greeting": "등불 회관에 온 것을 환영하네, {className}. 이번 주 계약은 토바이어스가 게시판에 붙여 두었고, 개릭은 우리 인장을 걸칠 만한 명예와 바꿔 주지. 미라는 산 아래 어느 문으로 가든 동료를 찾아 줄 걸세. 전리품을 가져오면 내 뒤의 전당에 걸리게 될 거야."
+      },
+      "contract_clerk_tobias_wren": {
+        "name": "토바이어스 렌",
+        "title": "계약 담당관",
+        "greeting": "계약은 일주일에 세 건, 초기화될 때마다 붙입니다. 서명도 수수료도 없어요. 끝까지 해내면 인장은 당신 겁니다."
+      },
+      "guild_quartermaster_garrick_holt": {
+        "name": "개릭 홀트",
+        "title": "길드 병참관",
+        "greeting": "인장을 명예로 바꿔 주지, 친구. 내 선반엔 칼날을 벼릴 물건은 없지만, 하이워치의 모든 전당이 자네가 어디서 그걸 얻었는지 알게 될 걸세."
+      },
+      "guild_recruiter_mira_fairweather": {
+        "name": "미라 페어웨더",
+        "title": "길드 모집관",
+        "greeting": "동료를 찾나요? 이 지도에 있는 모든 묘지와 요새와 신전이 내 명단에 있어요. 어디로 가는지 말해 줘요."
+      },
       "farmer_jessica": {
         "name": "농부 제시카",
         "title": "텃밭 지기",

@@ -25655,6 +25655,26 @@ export const zh_CN: EnTranslations = {
         "title": "庄园管家",
         "greeting": "欢迎来到庄园，{className}。到炉火边暖暖身子吧，留心脚下的地毯，别碰主桌。灯楼彻夜长明，好让广场上的人找得到回家的路。"
       },
+      "guildmaster_hesper_dunmore": {
+        "name": "赫斯珀·邓莫尔",
+        "title": "灯火大厅会长",
+        "greeting": "欢迎来到灯火大厅，{className}。托拜厄斯把本周的契约贴在告示板上，加里克用我们的印章换取值得佩戴的荣誉，米拉能为你找到前往山下任何一扇门的队伍。带回一件战利品，它就会挂在我身后的大厅里。"
+      },
+      "contract_clerk_tobias_wren": {
+        "name": "托拜厄斯·雷恩",
+        "title": "契约文书",
+        "greeting": "每周三份契约，每次重置时张贴。无需签字，也不收费：完成一份，印章就归你了。"
+      },
+      "guild_quartermaster_garrick_holt": {
+        "name": "加里克·霍尔特",
+        "title": "公会军需官",
+        "greeting": "用印章换荣誉，朋友。我的货架上没有能磨利刀刃的东西，但高望的每座大厅都会知道你是在哪里赢得的。"
+      },
+      "guild_recruiter_mira_fairweather": {
+        "name": "米拉·费尔韦瑟",
+        "title": "公会招募官",
+        "greeting": "在找队伍吗？这张地图上的每座墓穴、堡垒和神殿都在我的名单上。告诉我你要去哪儿。"
+      },
       "farmer_jessica": {
         "name": "农妇杰西卡",
         "title": "菜园管事",

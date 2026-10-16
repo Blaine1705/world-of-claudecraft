@@ -584,6 +584,10 @@ const NPC_IDS = [
   'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
   'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
   'steward_ansel_hale', // the Highwatch manor's steward (zone 3)
+  'guildmaster_hesper_dunmore', // the Highwatch guild's guildmaster (zone 3)
+  'contract_clerk_tobias_wren', // the Highwatch guild's contract clerk (zone 3)
+  'guild_quartermaster_garrick_holt', // the Highwatch guild's quartermaster (zone 3)
+  'guild_recruiter_mira_fairweather', // the Highwatch guild's recruiter (zone 3)
   // The farmer NPCs (the farming go-live), one per farming hub, in the same
   // tier order as the corresponding FARM_PATCHES rows.
   'farmer_jessica', // Eastbrook allotments (zone 1, tier 1)

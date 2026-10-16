@@ -1036,6 +1036,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunderstorm.name': 'Раскол бури',
   'entities.abilities.thunderstorm.description':
     'Призывает раскат грома, нанося {damage} урона от природы врагам в пределах 10 м и замедляя их на 50% на 5 сек. Восстанавливает 8% от максимального запаса маны. Урон растёт с силой заклинаний. (Стихии)',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    'Три контракта в неделю, вывешиваю после каждого сброса. Ни подписей, ни сборов: выполни один, и печати твои.',
+  'entities.npcs.contract_clerk_tobias_wren.name': 'Тобиас Рен',
+  'entities.npcs.contract_clerk_tobias_wren.title': 'Писарь контрактов',
   'entities.npcs.glider_apprentice.name': 'Скай',
   'entities.items.vanguard_druid_balance_chest.name': 'Жилет звёздного стража',
   'entities.items.vanguard_druid_balance_gloves.name': 'Перчатки звёздного стража',
@@ -6461,6 +6465,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.spiritHealerAlive': 'Целитель душ оберегает мёртвых. Вы всё ещё среди живых.',
   'hudChrome.death.ghostHint':
     'Бегите к месту своей гибели или поговорите с Целителем душ, чтобы воскреснуть',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    'Печати на почести, друг. На моих полках нет ничего, что заточит клинок, но каждый зал Хайвотча узнает, где ты это заслужил.',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': 'Гаррик Холт',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': 'Интендант гильдии',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    'Ищешь отряд? У каждого склепа, бастиона и храма на этой карте есть имя в моём списке. Скажи, куда держишь путь.',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': 'Мира Фэйрвезер',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': 'Вербовщица гильдии',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    'Добро пожаловать в Зал Фонаря, {className}. Тобиас вывешивает контракты недели на доску, Гаррик меняет наши печати на почести, которые не стыдно носить, а Мира найдёт тебе отряд к любой двери под горой. Принеси трофей, и он повиснет в зале за моей спиной.',
+  'entities.npcs.guildmaster_hesper_dunmore.name': 'Геспер Данмор',
+  'entities.npcs.guildmaster_hesper_dunmore.title': 'Глава гильдии Зала Фонаря',
   'entities.npcs.spirit_healer.name': 'Целитель душ',
   'entities.npcs.spirit_healer.title': 'Хранитель мёртвых',
   'entities.npcs.spirit_healer.greeting':

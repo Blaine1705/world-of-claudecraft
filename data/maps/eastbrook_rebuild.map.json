@@ -4317,6 +4317,62 @@
         "greeting": "Welcome to the manor, $C. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home.",
         "dynamic": true
       },
+      "guildmaster_hesper_dunmore": {
+        "id": "guildmaster_hesper_dunmore",
+        "name": "Hesper Dunmore",
+        "title": "Guildmaster of Lantern Hall",
+        "pos": {
+          "x": 118.1,
+          "z": 710
+        },
+        "facing": -2.077894831187234,
+        "color": 3099258,
+        "questIds": [],
+        "greeting": "Welcome to Lantern Hall, $C. Tobias keeps the week's contracts on the board, Garrick trades our seals for honors worth wearing, and Mira will find you a party for any door below the mountain. Bring back a trophy and it hangs in the hall behind me.",
+        "dynamic": true
+      },
+      "contract_clerk_tobias_wren": {
+        "id": "contract_clerk_tobias_wren",
+        "name": "Tobias Wren",
+        "title": "Contract Clerk",
+        "pos": {
+          "x": 111.5,
+          "z": 690.4
+        },
+        "facing": 0,
+        "color": 5917234,
+        "questIds": [],
+        "greeting": "Three contracts a week, posted every reset. No signing, no fees: see one through and the seals are yours.",
+        "dynamic": true
+      },
+      "guild_quartermaster_garrick_holt": {
+        "id": "guild_quartermaster_garrick_holt",
+        "name": "Garrick Holt",
+        "title": "Guild Quartermaster",
+        "pos": {
+          "x": 110.9,
+          "z": 715.4
+        },
+        "facing": 3.141592653589793,
+        "color": 6961706,
+        "questIds": [],
+        "greeting": "Seals for honors, friend. Nothing on my shelves will sharpen a blade, but every hall in Highwatch will know where you earned it.",
+        "dynamic": true
+      },
+      "guild_recruiter_mira_fairweather": {
+        "id": "guild_recruiter_mira_fairweather",
+        "name": "Mira Fairweather",
+        "title": "Guild Recruiter",
+        "pos": {
+          "x": 120.1,
+          "z": 695.7
+        },
+        "facing": -1.5707963267948966,
+        "color": 3828298,
+        "questIds": [],
+        "greeting": "Looking for a party? Every crypt, bastion and temple on this map has a name on my list. Tell me where you are headed.",
+        "dynamic": true
+      },
       "tidewatcher_ondrel": {
         "id": "tidewatcher_ondrel",
         "name": "Ondrel Vane",

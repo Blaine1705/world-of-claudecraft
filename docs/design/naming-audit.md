@@ -1012,6 +1012,24 @@ proper noun ("Highwatch" is the existing town).
 | Ansel Hale | the manor steward NPC | KEEP. No full-name hit on the web or any game wiki searched (warcraft.wiki.gg, Wowhead, Fallout and RuneScape wikis). "Ansel" alone is a real given name: RuneScape Dragonwilds has a knight called Ansel and WoW has a High Executor Anselm, neither a match. "Hale" is a common English surname (Fallout 76 has an Emerson Hale). Shared English, no coined token. "Odric" was considered and dropped: Sir Odric is a named Magic: The Gathering character. |
 | Steward of the Manor | his NPC title | KEEP. Plain English job title, no distinctive match. |
 
+### The Highwatch adventurers' guild (web-checked 2026-10-16)
+
+The guild hall at the old stable yard (`src/sim/content/highwatch_guild.ts`, the contracts in
+`src/sim/content/guild_contracts.ts`). Exact-phrase web searches plus the major game wikis.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Lantern Hall | the guild hall | KEEP. No game, guild or location of that name found; the hits were Guild Wars 2 guild-hall lantern decorations (items, not a hall) and a homebrew Exalted city "Lanterntown". Shared English. |
+| Lantern Seal | the guild's contract currency | KEEP. No game item of that name; the nearest hit is the puzzle game Lantern Push's "Ember Seals". "Guild Seal" was considered and dropped: it is Gems of War's guild-only currency, distinctive enough to avoid. |
+| Hesper Dunmore | the guildmaster | KEEP. No full-name hit; Dunmore is a Scottish place name and surname (the Earls of Dunmore, the novelist Helen Dunmore), Hesper a real given name. |
+| Tobias Wren | the contract clerk | KEEP. No full-name hit in any game or wiki; several unrelated single-name Tobiases (Redguard, Dying Light, Saints Row). Shared English. |
+| Garrick Holt | the guild quartermaster | KEEP. No full-name hit; a Garrick appears in the novel Fourth Wing under another surname. |
+| Mira Fairweather | the guild recruiter | KEEP. No full-name hit. "Lysa Fairweather" was considered and dropped: the given name too readily recalls Lysa Arryn of A Song of Ice and Fire. |
+| Contract Clerk, Guild Quartermaster, Guild Recruiter, Guildmaster of Lantern Hall | the residents' titles | KEEP. Plain English job titles. |
+| Writ-Runner, Hallsworn | the quartermaster's two bought titles | KEEP. No game title or term of either name found. |
+| of Lantern Hall | the quartermaster's third title | KEEP. Built on the hall's own name above. "Lantern-Bearer" was considered and dropped: Pathfinder's Lantern Bearers are a named order of resurrected adventurers. |
+| Lantern Hall Heraldry | the quartermaster's border | KEEP. The hall's name and a plain noun. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.
