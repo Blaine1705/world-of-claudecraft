@@ -88,18 +88,27 @@ async function shot(name) {
   await page.screenshot({ path: `${OUT}/${name}.png` });
   console.log('SHOT', name);
 }
-/** Stand at (x, z) facing `facing`, the camera pulled back behind. */
-async function standAt(x, z, facing, dist = 9, pitch = 0.32, camYaw = 0) {
+/** Stand at (x, z) facing `facing`, the camera boom `camTurn` off the facing
+ *  (0 = over the shoulder, PI = in front, looking back at the character). */
+async function standAt(x, z, facing, dist = 9, pitch = 0.32, camTurn = 0) {
   await page.evaluate(
-    `(()=>{const g=window.__game;const p=g.sim.player;g.sim.setPlayerLevel(30);p.pos.x=${x};p.pos.z=${z};p.pos.y=g.sim.groundPos(${x},${z}).y;p.prevPos={...p.pos};p.facing=${facing};p.prevFacing=${facing};
-      const i=g.input;i.camDist=${dist};i.camPitch=${pitch};i.camYaw=${camYaw};})()`,
+    `(()=>{const g=window.__game;const p=g.sim.player;p.pos.x=${x};p.pos.z=${z};p.pos.y=g.sim.groundPos(${x},${z}).y;p.prevPos={...p.pos};p.facing=${facing};p.prevFacing=${facing};
+      const i=g.input;i.camDist=${dist};i.camPitch=${pitch};i.camYaw=${facing + camTurn};})()`,
   );
   await frames(8, 300);
 }
 /** Face from (x, z) toward (tx, tz). */
 const toward = (x, z, tx, tz) => Math.atan2(tx - x, tz - z);
+const wearHead = () =>
+  page.evaluate(
+    `(()=>{const g=window.__game;const p=g.sim.player;p.auras=p.auras.filter(a=>a.kind!=='seasonal_cosmetic');g.sim.addItem('carved_pumpkin_head',1);g.sim.useItem('carved_pumpkin_head');})()`,
+  );
 
 await page.evaluate(`window.__game.sim.setPlayerLevel(30)`);
+// the new-character tutorial card never belongs in an art shot
+await page.evaluate(
+  `(()=>{for(const b of document.querySelectorAll('button')){if(/skip tutorial/i.test(b.textContent||''))b.click();}})()`,
+);
 await chat('/dev season on');
 await frames(10, 400);
 // Wait for the event's kit to load and attach.
@@ -112,28 +121,32 @@ for (let i = 0; i < 40; i++) {
 }
 
 const views = {
-  // Vantages searched against the colliders (open ground, a clear camera boom),
-  // each looking at one of the city's garlands.
-  eastbrook: { x: -6, z: -114, look: [-20, -95] },
-  fenbridge: { x: -34.9, z: 327.1, look: [-34.9, 320.1] },
-  highwatch: { x: -11.7, z: 668.5, look: [-11.7, 661.5] },
+  // Gameplay-camera vantages, each over a dressed stretch of its city: Eastbrook's
+  // square round the statue and its lantern street, Fenbridge's market lane,
+  // Highwatch's square.
+  eastbrook: { x: -9, z: -107, look: [-20, -95] },
+  eastbrook_street: { x: -38, z: -88, look: [-44, -96] },
+  fenbridge: { x: -2, z: 288, look: [0, 305] },
+  highwatch: { x: 4, z: 670, look: [-10, 660] },
 };
 for (const [city, v] of Object.entries(views)) {
   for (const time of ['day', 'night']) {
     if (ONLY && !ONLY.has(`${city}_${time}`)) continue;
     await chat(`/daynight ${time === 'day' ? 'noon' : 'midnight'}`);
-    await standAt(v.x, v.z, toward(v.x, v.z, v.look[0], v.look[1]), 9, 0.38);
+    await standAt(v.x, v.z, toward(v.x, v.z, v.look[0], v.look[1]), 10, 0.3);
     await shot(`${city}_${time}`);
   }
 }
 
-// The keeper and her shop (night, Eastbrook).
+// The keeper and her shop (dusk, Eastbrook).
 await chat('/daynight dusk');
 const keeper = await page.evaluate(
   `(()=>{const e=[...window.__game.sim.entities.values()].find(e=>e.templateId==='gourdlight_keeper');return e?{id:e.id,x:e.pos.x,z:e.pos.z}:null;})()`,
 );
 if (keeper) {
-  await standAt(keeper.x, keeper.z + 4, Math.PI, 6, 0.25);
+  const kx = keeper.x + 1.5;
+  const kz = keeper.z - 4;
+  await standAt(kx, kz, toward(kx, kz, keeper.x, keeper.z), 4.5, 0.3, 0.3);
   await shot('keeper');
   await page.evaluate(
     `(()=>{const g=window.__game;g.sim.addItem('gourdlight_sweet',60);g.sim.targetEntity(${keeper.id});g.hud.questDialog?.open?.(${keeper.id});})()`,
@@ -150,7 +163,7 @@ const wilkes = await page.evaluate(
   `(()=>{const e=[...window.__game.sim.entities.values()].find(e=>e.templateId==='trader_wilkes');return e?{id:e.id,x:e.pos.x,z:e.pos.z}:null;})()`,
 );
 if (wilkes) {
-  await standAt(wilkes.x + 2.5, wilkes.z, -Math.PI / 2, 6, 0.22);
+  await standAt(wilkes.x + 2.5, wilkes.z, -Math.PI / 2, 6, 0.22, Math.PI / 2);
   await page.evaluate(
     `(()=>{const g=window.__game;g.sim.targetEntity(${wilkes.id});g.hud.questDialog?.open?.(${wilkes.id});})()`,
   );
@@ -160,7 +173,7 @@ if (wilkes) {
   );
   await shot('trick_or_treat_answer');
 }
-// A trick, forced: the Jar of Mischief until each body shows.
+// A trick, forced: each harmless body in turn.
 for (const trick of [
   'gourdlight_trick_bat',
   'gourdlight_trick_skeleton',
@@ -168,19 +181,27 @@ for (const trick of [
 ]) {
   if (ONLY && !ONLY.has(trick)) continue;
   await page.evaluate(
-    `(()=>{const g=window.__game;const p=g.sim.player;p.auras=p.auras.filter(a=>a.kind!=='seasonal_cosmetic'||a.id==='gourdlight_pumpkin_head');p.auras.push({id:'${trick}',name:'trick',kind:'seasonal_cosmetic',value:0,remaining:20,duration:20,sourceId:p.id,school:'physical',undispellable:true});})()`,
+    `(()=>{const g=window.__game;const p=g.sim.player;p.auras=p.auras.filter(a=>a.kind!=='seasonal_cosmetic');p.auras.push({id:'${trick}',name:'trick',kind:'seasonal_cosmetic',value:0,remaining:20,duration:20,sourceId:p.id,school:'physical',undispellable:true});})()`,
   );
   await frames(14, 300);
   await shot(trick);
 }
-// The pumpkin head, worn, by night.
-await page.evaluate(
-  `(()=>{const g=window.__game;const p=g.sim.player;p.auras=p.auras.filter(a=>a.kind!=='seasonal_cosmetic');g.sim.addItem('carved_pumpkin_head',1);g.sim.useItem('carved_pumpkin_head');})()`,
-);
-await chat('/daynight midnight');
-await standAt(-14, -96, 0, 3.2, 0.12);
-await shot('pumpkin_head_night');
-await chat('/daynight noon');
-await frames(4);
-await shot('pumpkin_head_day');
+// The pumpkin head, worn: from the front by night and by day, from the side, on
+// the male body and then the female one.
+await wearHead();
+for (const body of ['male', 'female']) {
+  // a body swap mid-wear: the pumpkin must follow onto the new body
+  await page.evaluate(
+    `(()=>{window.__game.sim.player.modularAppearance=${body === 'female' ? "{gender:'female',skinHue:28,skinLight:0.5}" : 'null'};})()`,
+  );
+  await frames(10, 300);
+  await chat('/daynight midnight');
+  await standAt(-14, -96, 0, 3.4, 0.1, Math.PI);
+  await shot(`pumpkin_head_${body}_night`);
+  await chat('/daynight noon');
+  await frames(4);
+  await shot(`pumpkin_head_${body}_day`);
+  await standAt(-14, -96, 0, 3.4, 0.1, Math.PI / 2);
+  await shot(`pumpkin_head_${body}_side`);
+}
 await browser.close();
