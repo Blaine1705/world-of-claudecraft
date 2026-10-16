@@ -70,6 +70,9 @@ describe('seasonal decor placement against the live world', () => {
       expect(garlands.length, `${rule.zoneId} garlands`).toBeGreaterThanOrEqual(2);
       expect(lanterns.length, `${rule.zoneId} lanterns`).toBeGreaterThanOrEqual(3);
       expect(ground.filter((p) => p.anchor.startsWith('npc:')).length).toBeGreaterThanOrEqual(3);
+      // the rest of the townsfolk and the lamp clusters dress the street beyond the doors
+      expect(ground.filter((p) => p.anchor.startsWith('folk:')).length).toBeGreaterThanOrEqual(3);
+      expect(ground.filter((p) => /^lamp:\d+:c$/.test(p.anchor)).length).toBeGreaterThanOrEqual(3);
       // Every lantern hangs on a real post of the lamp plan.
       for (const l of lanterns) {
         const index = Number(l.anchor.split(':')[1]);

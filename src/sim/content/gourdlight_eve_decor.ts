@@ -8,6 +8,7 @@
 //     a paper lantern on each post, a leaf garland wound round it, gourds at its foot;
 //   - the event's trick-or-treat townsfolk (content/gourdlight_eve.ts): a lit
 //     pumpkin at each knocking door, so the doors to knock on read at a glance;
+//   - every other townsfolk in reach: a gourd pair at their side;
 //   - the event keeper: a pile of gourds round her stand;
 //   - the town hub (the zone's own centre): a ring of gourds in the square.
 // The resolver nudges every piece off colliders, roads and NPC spots, and drops
@@ -25,7 +26,7 @@ export interface SeasonalCityDecorRule {
 }
 
 export const GOURDLIGHT_DECOR_CITIES: readonly SeasonalCityDecorRule[] = Object.freeze([
-  { zoneId: 'eastbrook_vale', radius: 62, square: { count: 5, ring: 6 } },
-  { zoneId: 'mirefen_marsh', radius: 62, square: { count: 4, ring: 5 } },
-  { zoneId: 'thornpeak_heights', radius: 58, square: { count: 4, ring: 5 } },
+  { zoneId: 'eastbrook_vale', radius: 62, square: { count: 8, ring: 6.5 } },
+  { zoneId: 'mirefen_marsh', radius: 62, square: { count: 6, ring: 5 } },
+  { zoneId: 'thornpeak_heights', radius: 58, square: { count: 6, ring: 5.5 } },
 ]);

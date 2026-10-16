@@ -39,7 +39,7 @@ export interface SeasonalGroundPiece {
   z: number;
   yaw: number;
   scale: number;
-  /** What it hangs off ('lamp:<i>', 'npc:<id>', 'keeper', 'square:<zone>'). */
+  /** What it hangs off ('lamp:<i>', 'npc:<id>', 'folk:<id>', 'keeper', 'square:<zone>'). */
   anchor: string;
 }
 
@@ -229,17 +229,22 @@ function cityDecor(
     const bx = lamp.x + Math.sin(back) * 1.25;
     const bz = lamp.z + Math.cos(back) * 1.25;
     seat(probe, layout.ground, 'pumpkin_lit', bx, bz, `${anchor}:a`, 1, lamp.roadYaw);
-    if (anchorHash(anchor, 2) < 0.6) {
-      const ox = Math.sin(back + 0.9) * 1.7;
-      const oz = Math.cos(back + 0.9) * 1.7;
+    // ...and a harvest cluster round it: a gourd pair to one side, a small carved
+    // pumpkin to the other (which side each takes turns on the anchor's hash).
+    const flip = anchorHash(anchor, 2) < 0.5 ? 1 : -1;
+    for (const [slot, kind, turn, reach, size] of [
+      ['b', 'gourd', 0.9, 1.7, 0.9],
+      ['c', 'pumpkin_small', -0.85, 1.75, 0.85],
+    ] as const) {
+      const a = back + turn * flip;
       seat(
         probe,
         layout.ground,
-        'gourd',
-        lamp.x + ox,
-        lamp.z + oz,
-        `${anchor}:b`,
-        0.9,
+        kind,
+        lamp.x + Math.sin(a) * reach,
+        lamp.z + Math.cos(a) * reach,
+        `${anchor}:${slot}`,
+        size,
         lamp.roadYaw,
       );
     }
@@ -331,6 +336,24 @@ function cityDecor(
       npc.facing,
     );
   }
+  // Every other townsfolk's stand gets a gourd pair at their side, so the whole
+  // street reads dressed, not only the doors to knock on.
+  const knockers = new Set<string>(TRICK_OR_TREAT_NPC_IDS);
+  for (const npc of Object.values(NPCS).sort((a, b) => (a.id < b.id ? -1 : 1))) {
+    if (knockers.has(npc.id) || npc.id === GOURDLIGHT_KEEPER_NPC.id) continue;
+    if (!inTown(npc.pos.x, npc.pos.z)) continue;
+    const a = npc.facing - Math.PI / 2;
+    seat(
+      probe,
+      layout.ground,
+      'gourd',
+      npc.pos.x + Math.sin(a) * 1.5,
+      npc.pos.z + Math.cos(a) * 1.5,
+      `folk:${npc.id}`,
+      0.85,
+      npc.facing,
+    );
+  }
   // The square: a ring of gourds round the hub.
   for (let k = 0; k < rule.square.count; k++) {
     const a = (k / rule.square.count) * Math.PI * 2 + anchorHash(rule.zoneId, 3) * Math.PI;
@@ -366,11 +389,14 @@ export function resolveSeasonalDecor(seed: number): SeasonalDecorLayout {
     [0, -1.9],
     [1, 1.9],
     [2, -2.6],
+    [3, 2.6],
+    [4, -3.3],
   ] as const) {
     const a = k.facing + Math.PI / 2;
     const fx = Math.sin(k.facing) * -0.6;
     const fz = Math.cos(k.facing) * -0.6;
-    const kind: SeasonalGroundKind = i === 2 ? 'gourd' : 'pumpkin_lit';
+    const kind: SeasonalGroundKind =
+      i === 2 || i === 4 ? 'gourd' : i === 3 ? 'pumpkin_small' : 'pumpkin_lit';
     seat(
       probe,
       layout.ground,
@@ -378,7 +404,7 @@ export function resolveSeasonalDecor(seed: number): SeasonalDecorLayout {
       k.pos.x + Math.sin(a) * off + fx,
       k.pos.z + Math.cos(a) * off + fz,
       `keeper:${i}`,
-      i === 2 ? 1.2 : 1.25,
+      kind === 'pumpkin_lit' ? 1.25 : 1.1,
       k.facing,
     );
   }
