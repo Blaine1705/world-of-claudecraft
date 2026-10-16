@@ -45,9 +45,9 @@ PAL = {
     'oak': (0.30, 0.165, 0.07),
     'oak_dark': (0.16, 0.085, 0.035),
     'oak_light': (0.42, 0.25, 0.11),
-    'iron': (0.20, 0.21, 0.23),
-    'iron_dark': (0.09, 0.095, 0.105),
-    'steel': (0.55, 0.57, 0.60),
+    'iron': (0.075, 0.08, 0.095),
+    'iron_dark': (0.03, 0.032, 0.04),
+    'steel': (0.2, 0.21, 0.235),
     'gold': (0.9, 0.55, 0.12),
     'gold_dark': (0.48, 0.30, 0.09),
     'blue': (0.025, 0.06, 0.20),
@@ -81,6 +81,9 @@ def make_materials():
         return mat
 
     m('steed_hide', 0.0, 0.78)
+    m('steed_hair', 0.0, 0.7)
+    m('steed_hoof', 0.0, 0.5)
+    m('steed_eye', 0.0, 0.15)
     m('steed_cloth', 0.0, 0.9)
     m('steed_wood', 0.0, 0.62)
     m('steed_iron', 0.85, 0.42)
@@ -227,8 +230,10 @@ def flush(p, arm, body, bevel=0.0, solid=None):
     for poly, (idx, mat, c), sm in zip(me.polygons, p.faces, p.smooth):
         poly.material_index = mats.index(mat)
         poly.use_smooth = sm
-        for li in poly.loop_indices:
-            col.data[li].color = (*c, 1.0)
+        # a face takes one colour, or one per corner (a list, for gradients down a lock of hair)
+        per_corner = isinstance(c, list)
+        for k, li in enumerate(poly.loop_indices):
+            col.data[li].color = (*(c[k] if per_corner else c), 1.0)
     groups = {}
     for i, w in enumerate(p.weights):
         for bone, wt in w.items():

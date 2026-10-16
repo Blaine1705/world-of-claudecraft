@@ -17,6 +17,7 @@ import {
   type MountVisualSpec,
   mountBobY,
   mountLampFlicker,
+  mountLampSummonFlare,
   mountSeatLift,
   mountSummonFx,
   mountVisualSpec,
@@ -595,12 +596,13 @@ describe('procedural bob math', () => {
       } else if (key === 'lantern_hall_destrier') {
         // Two storm lanterns on their own swinging bones, the glass 0.195 model units down
         // each (measured by build_steed.py report_spec_offsets). The troll's warm flame,
-        // a little dimmer and tighter: they hang at a rider's hip, not off a throne.
+        // burning HOTTER (they are the horse's identity at night and hang low, at a rider's
+        // hip, so they must pool real light on the road) but reaching a little less far.
         expect(lamps.map((l) => l.bone)).toEqual(['lantern_l', 'lantern_r']);
         for (const lamp of lamps) {
           expect(lamp.offset).toEqual([0, 0.195, 0]);
           expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
-          expect(lamp.intensity).toBeLessThan(MOUNT_LAMP_INTENSITY);
+          expect(lamp.intensity).toBeGreaterThan(MOUNT_LAMP_INTENSITY);
           expect(lamp.distance).toBeLessThan(MOUNT_LAMP_DISTANCE);
           expect(lamp.flicker ?? 'flame').toBe('flame');
         }
@@ -654,6 +656,25 @@ describe('procedural bob math', () => {
       maxSplit = Math.max(maxSplit, Math.abs(mountLampFlicker(t, 0) - mountLampFlicker(t, 1)));
     }
     expect(maxSplit).toBeGreaterThan(0.15);
+  });
+
+  it('flares the lamps on a summon and settles them back to their plain flame', () => {
+    // the burst the destrier arrives in is light: its lanterns open past three times their level
+    expect(mountLampSummonFlare(0)).toBeCloseTo(3.4, 6);
+    // and fall away monotonically over about a second and a half
+    let prev = mountLampSummonFlare(0);
+    for (let t = 0.05; t < 2.5; t += 0.05) {
+      const v = mountLampSummonFlare(t);
+      expect(v).toBeLessThan(prev);
+      expect(v).toBeGreaterThan(1);
+      prev = v;
+    }
+    expect(mountLampSummonFlare(1.5)).toBeLessThan(1.1);
+    // a lamp never summoned (a rider already mounted when he came into view) burns plain
+    expect(mountLampSummonFlare(Number.POSITIVE_INFINITY)).toBe(1);
+    expect(mountLampSummonFlare(2.5)).toBe(1);
+    expect(mountLampSummonFlare(Number.NaN)).toBe(1);
+    expect(mountLampSummonFlare(-1)).toBe(1);
   });
 
   it('pins the ambient particle effects: snail slime, hover-cycle exhaust', () => {

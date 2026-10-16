@@ -275,17 +275,20 @@ const LENS_GLOW = {
 // each bone runs straight down from its hook, the glass centre 0.195 model units along it.
 const DESTRIER_LANTERN_OFFSET = [0, 0.195, 0] as const;
 const DESTRIER_LANTERN_BONES = ['lantern_l', 'lantern_r'] as const;
-/** A storm lantern on a horse: the troll's flame, a little smaller and tighter, because it hangs
- *  at a rider's hip on a 4.5-unit horse, not off a throne on a 7-unit troll. */
-const DESTRIER_LAMP = { intensity: 5.2, distance: 12 } as const;
+/** A storm lantern on a war horse: hotter than the troll's flame, because these two lanterns
+ *  are the destrier's whole identity at night and hang low, at a rider's hip, so they have to
+ *  pool real light on the road and the barding around them; still a touch tighter than the
+ *  troll's reach, which hangs its pair off a throne on a 7-unit creature. */
+const DESTRIER_LAMP = { intensity: 10, distance: 15 } as const;
 /** The halo on each lantern's glass: a flame, so it breathes faster and deeper than the
- *  tortoise's enchanted lenses. Radius in model units against a 0.05-unit glass. */
+ *  tortoise's enchanted lenses, and wide enough to read as a burning lantern from a distance.
+ *  Radius in model units against a 0.05-unit glass. */
 const DESTRIER_LANTERN_GLOW = {
   color: MOUNT_LAMP_COLOR,
-  opacity: 0.9,
-  pulse: 0.32,
+  opacity: 1,
+  pulse: 0.34,
   pulseHz: 1.6,
-  radius: 0.12,
+  radius: 0.2,
 } as const;
 
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
@@ -332,13 +335,14 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // the rider exactly; a seat bone here would buy sub-millimetre motion and pay
   // a per-frame matrix decompose for it.
   avian_strider: spec('mount_avian_strider', 2.62, true, undefined, 0.2),
-  // Lantern Hall's destrier: the valorsteed body at 4.5 (the horse is 3.8), so the saddle top
-  // (1.21 model units over the hooves) sits at 4.5 / 1.76 * 1.21 and the seat a hair over the
-  // horse's own forward shift. The rider straddles a broad barded barrel: legs open over the
-  // caparison and down past the saddle skirts, toes toward the stirrups.
+  // Lantern Hall's destrier, at 5.0 (the riding horse is 3.8): its rest height is 1.77 model
+  // units and the saddle top 1.227 over the hooves (build_steed.py prints both), so the seat
+  // sits just under 5.0 / 1.77 * 1.227 and a hair over the horse's own forward shift. The rider
+  // straddles a broad barded barrel: legs open wide over the caparison and down past the saddle
+  // skirts, toes toward the stirrups.
   lantern_hall_destrier: spec(
     'mount_lantern_hall_destrier',
-    3.05,
+    3.42,
     true,
     undefined,
     0.12,
@@ -355,7 +359,7 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
         offset: DESTRIER_LANTERN_OFFSET,
         ...DESTRIER_LANTERN_GLOW,
       })),
-      ride: { spread: 0.5, thigh: 0.45, knee: 0.55, ankle: -0.3, hips: -0.05 },
+      ride: { spread: 0.6, thigh: 0.45, knee: 0.55, ankle: -0.3, hips: -0.05 },
       embers: {
         hooves: [
           'toes_01l_011',
@@ -575,6 +579,19 @@ export function mountLampFlicker(timeSec: number, index: number): number {
   const a = Math.sin(timeSec * 7.3 + phase);
   const b = Math.sin(timeSec * 11.9 + phase * 1.7);
   return 0.96 + 0.12 * a + 0.06 * b;
+}
+
+/**
+ * The lanterns' flare on a summon, as a multiplier on a lamp's level: the burst the destrier
+ * arrives in (summonFx 'lanternBurst') is LIGHT, not only sparks, so its lamps open at more
+ * than three times their burning level and settle back over about a second and a half.
+ * `ageSec` is the time since the summon edge; a lamp that was never summoned (a rider already
+ * mounted when he came into view) passes Infinity and burns at its plain level. Pure and
+ * allocation-free like the flicker, so tests/mount_visuals.test.ts can pin the curve.
+ */
+export function mountLampSummonFlare(ageSec: number): number {
+  if (!(ageSec >= 0) || ageSec >= 2.5) return 1;
+  return 1 + 2.4 * Math.exp(-ageSec * 2.2);
 }
 
 /**

@@ -19,9 +19,9 @@ export interface MountEmberRates {
  *  standing, the lanterns only breathe the odd cinder up. Hooves spark only at a run: a walk
  *  is quiet footing, and sparks at every step read as a bug, not a war horse. */
 export function mountEmberRates(moving: boolean, running: boolean): MountEmberRates {
-  if (moving && running) return { hoof: 26, lantern: 16 };
-  if (moving) return { hoof: 0, lantern: 5 };
-  return { hoof: 0, lantern: 1.6 };
+  if (moving && running) return { hoof: 44, lantern: 26 };
+  if (moving) return { hoof: 0, lantern: 8 };
+  return { hoof: 0, lantern: 3 };
 }
 
 /**

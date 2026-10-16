@@ -65,6 +65,8 @@ export interface MountPresentationHost {
   mountWheels?: Parameters<typeof spinMountWheels>[0]['mountWheels'];
   mountPullerVisual: Parameters<typeof updateRickshawPuller>[0]['mountPullerVisual'];
   mountLamps: MountLamps | null;
+  /** The last summon edge (MountViewState.mountSummonAt): the clock a summon flare runs from. */
+  mountSummonAt?: number;
   mountGlows: MountGlows | null;
   mountSeatBone: THREE.Object3D | null;
   /** True while the current mount root's swapped-in materials are still
@@ -286,7 +288,14 @@ export function updateMountPresentation(
         });
       }
     }
-    if (v.mountLamps) updateMountLamps(v.mountLamps, input.time);
+    if (v.mountLamps) {
+      // a mount whose summon burst is light opens its lamps wide as it arrives
+      const flareAge =
+        spec.summonFx === 'lanternBurst' && v.mountSummonAt !== undefined
+          ? performance.now() / 1000 - v.mountSummonAt
+          : Infinity;
+      updateMountLamps(v.mountLamps, input.time, flareAge);
+    }
     if (v.mountGlows) updateMountGlows(v.mountGlows, input.time);
     // Last: the puller is parented into the cart, so it reads the attitude
     // this pass just wrote rather than last frame's.

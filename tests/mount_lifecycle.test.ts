@@ -426,6 +426,26 @@ describe('mount transition effects', () => {
     expect(swap.engineReset).toHaveBeenCalledOnce();
   });
 
+  it('stamps the summon clock on a mount appearing, never on a dismount or a skin swap', () => {
+    // mount_presentation.ts runs a lamp-bearing mount's summon flare from this stamp
+    const state: Parameters<typeof syncMountTransitionFx>[0] = {
+      lastMountKey: '',
+      lastMountLook: '',
+      wasMountCasting: false,
+    };
+    syncMountTransitionFx(state, transitionInputs({ mountKey: 'lantern_hall_destrier' }));
+    const stamped = state.mountSummonAt;
+    expect(stamped).toBeTypeOf('number');
+    expect(Math.abs((stamped ?? 0) - performance.now() / 1000)).toBeLessThan(5);
+    // the same mount next frame is no edge: the stamp holds
+    syncMountTransitionFx(state, transitionInputs({ mountKey: 'lantern_hall_destrier' }));
+    expect(state.mountSummonAt).toBe(stamped);
+    // a dismount is an edge but no summon: the stamp is left alone
+    state.mountSummonAt = -1;
+    syncMountTransitionFx(state, transitionInputs({ mountKey: '' }));
+    expect(state.mountSummonAt).toBe(-1);
+  });
+
   it('preloads and plays the call pose once on a summon-cast edge', () => {
     const state = { lastMountKey: '', wasMountCasting: false };
     const summon = transitionInputs({

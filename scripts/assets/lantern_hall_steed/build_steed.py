@@ -1,29 +1,42 @@
 """The Lantern Hall Destrier: Lantern Hall's war horse, sold by its quartermaster.
 
-Built over our own valorsteed body, rig and gait clips (public/models/mounts/valorsteed.glb):
-the hide is repainted a dark iron grey and the barrel thickened into a heavier war horse, then
-dressed in oak-and-iron barding (a steel chanfron with the guild's lit lantern on the brow,
-lamellar crinet plates down the neck, an oak peytral across the chest carrying the guild's
-crest, an oak crupper over the rump), a blue caparison dagged and trimmed in gold with the crest
-on each flank, a high war saddle, a bridle and reins, and two storm lanterns that hang from
-crooks behind the saddle on their own swinging bones.
+Built on our own valorsteed rig and gait clips (public/models/mounts/valorsteed.glb), with a new
+body: the riding horse's hide is regrown into a heavy draught-built destrier (steed_body.py: a
+smooth remeshed skin carrying the source's weights, a deep barrel, a broad chest and croup, a
+thick crested neck, heavy legs on feathered hooves, an iron dapple grey coat with black points, a
+silver mane and tail riding the rig's own hair and tail bones). It is dressed in oak-and-iron
+barding (a steel chanfron with the guild's lit lantern on the brow, shingled crinet lames down
+the neck, an oak peytral across the chest carrying the guild's crest), a blue caparison dagged
+and trimmed in gold with an embroidered border and the crest on each flank, a high war saddle
+with its stirrups, a bridle and reins, and two storm lanterns that hang from crooks behind the
+saddle on their own swinging bones. Ambient occlusion is baked into the vertex colours last.
 
 Conforming pieces are wrapped onto the hide by rays and copy their skin weights from the hide
 beneath them, so they move exactly as the horse does; hard pieces are bound rigidly to one bone.
 Original procedural work for this project (no imported meshes beyond our own horse, no
 reference art).
 
-  blender --background --factory-startup --python \
-      scripts/assets/lantern_hall_steed/build_steed.py -- <valorsteed.glb> <out.glb> [out.blend]
+The shipping pipeline, from the repo root:
+
+  blender --background --factory-startup --python       scripts/assets/lantern_hall_steed/build_steed.py -- public/models/mounts/valorsteed.glb       tmp/asset_src/lantern_hall_destrier/destrier_source.glb [destrier.blend]
+  node scripts/assets/build_assets.mjs scripts/assets/specs/lantern_hall_destrier.json
+  node scripts/assets/lantern_hall_steed/restore_rest_trs.mjs public/models/mounts/valorsteed.glb       public/models/mounts/lantern_hall_destrier.glb
+  node scripts/build_media_manifest.mjs generate
+
+The SPEC lines it prints are the renderer's measured numbers (the lamp offsets, the rest height
+and the seat top: src/render/mount_visuals.ts and characters/manifest.ts). render_steed.py
+renders the review shots from the saved .blend.
 """
 import math
 import os
+import random
 import sys
 
 import bpy
 from mathutils import Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import steed_body as SB  # noqa: E402
 import steed_kit as K  # noqa: E402
 from steed_kit import PAL, L, Part, box, flush, rigid, sphere, torus, tube  # noqa: E402
 
@@ -38,7 +51,6 @@ for o in list(bpy.data.objects):
         bpy.data.objects.remove(o)
 ARM = next(o for o in bpy.data.objects if o.type == 'ARMATURE')
 BODY = next(o for o in bpy.data.objects if o.type == 'MESH')
-BODY.name = 'DestrierHide'
 ARM.data.pose_position = 'REST'
 K.make_materials()
 
@@ -49,57 +61,35 @@ CLAV_L, CLAV_R = 'clavicle.l_042', 'clavicle.r_049'
 TRUNK = {SPINE1, SPINE2, ROOT, CLAV_L, CLAV_R}
 
 
-def smoothstep(a, b, x):
-    t = max(0.0, min(1.0, (x - a) / (b - a)))
-    return t * t * (3 - 2 * t)
-
-
 # ---------------------------------------------------------------------------
-# 1. The hide. A destrier is a heavier animal than the riding horse it is built
-#    from: the barrel, chest and crest of the neck are widened, easing to nothing
-#    toward the legs so every joint keeps the skin it was weighted for. Then the
-#    coat is repainted by the source palette's families, so every light and shade
-#    step the original painter left in the chestnut survives as a step in the grey.
+# 1. The hide. The valorsteed's riding-horse body is regrown into a destrier
+#    (steed_body.py): remeshed smooth, its weights carried over, grown bone by bone
+#    into a deep barrel, a broad chest, a heavy crested neck and draught legs, then
+#    painted an iron dapple grey with black points. The old body goes; the new hide
+#    takes its place under the same armature.
 # ---------------------------------------------------------------------------
-def bulk_body():
-    for v in BODY.data.vertices:
-        x, f, u = K.fu(v.co)
-        trunk = smoothstep(0.66, 0.9, u) * (1 - smoothstep(0.62, 0.8, f)) * smoothstep(-0.66, -0.5, f)
-        neck = smoothstep(0.3, 0.45, f) * (1 - smoothstep(0.6, 0.7, f)) * smoothstep(1.05, 1.2, u)
-        k = 1 + 0.16 * trunk + 0.12 * neck
-        v.co.x = x * k
+def build_hide():
+    hide = SB.make_hide(BODY)
+    SB.grow(hide, ARM)
+    SB.shape_details(hide)
+    SB.relax(hide, 0.5, 3)
+    SB.decimate(hide, HIDE_TRIS)
+    SB.paint_coat(hide)
+    hide.data.materials.clear()
+    hide.data.materials.append(K.MATS['steed_hide'])
+    hide.parent = ARM
+    hide.matrix_world = BODY.matrix_world.copy()
+    mod = hide.modifiers.new('Armature', 'ARMATURE')
+    mod.object = ARM
+    return hide
 
 
-def recolour_body():
-    me = BODY.data
-    col = me.attributes['Color']
-    for poly in me.polygons:
-        cz = sum((me.vertices[v].co.z for v in poly.vertices)) / len(poly.vertices) - K.Z0
-        for li in poly.loop_indices:
-            r, g, b, a = col.data[li].color
-            if r > 0.3 and g < 0.22 and r > 2.4 * g:  # the chestnut coat
-                k = max(0.0, min(1.0, (r - 0.34) / (0.6 - 0.34)))
-                belly = max(0.0, min(1.0, (0.95 - cz) / 0.35))
-                c = Vector(PAL['coat_dark']).lerp(Vector(PAL['coat']), k)
-                c = c.lerp(Vector(PAL['coat_light']), belly * 0.5)
-                col.data[li].color = (*c, 1)
-            elif r > 0.6 and 0.3 < g < 0.5 and b < 0.3:  # mane and tail
-                k = (r - 0.6) / 0.15
-                c = Vector(PAL['mane']) * (0.8 + 0.6 * k)
-                col.data[li].color = (*c, 1)
-            elif 0.7 < r < 0.8 and 0.3 < g < 0.4:  # inner ear
-                col.data[li].color = (0.05, 0.035, 0.035, 1)
-            elif r > 0.85 and g > 0.75:  # socks and muzzle
-                col.data[li].color = (*(PAL['muzzle'] if cz > 1.0 else PAL['sock']), 1)
-            elif 0.35 < r < 0.42 and 0.25 < g < 0.32:  # hooves
-                col.data[li].color = (*PAL['hoof'], 1)
-    me.materials.clear()
-    me.materials.append(K.MATS['steed_hide'])
-
-
-bulk_body()
-recolour_body()
-S = K.BodySampler(BODY, skip_prefixes=('c_tail_',))
+# the hide's triangle budget: smooth at a rider's distance, light enough for a crowd of mounts
+HIDE_TRIS = 9500
+NEW_HIDE = build_hide()
+bpy.data.objects.remove(BODY)
+BODY = NEW_HIDE
+S = K.BodySampler(BODY)
 
 
 # ---------------------------------------------------------------------------
@@ -179,7 +169,7 @@ class Wrap:
 
 
 def stud(p, loc, nrm, w, r=0.011, col=None):
-    sphere(p, loc + nrm * (r * 0.3), r, 'steed_gold', col or PAL['gold'], w, seg=8, rings=4,
+    sphere(p, loc + nrm * (r * 0.3), r, 'steed_gold', col or PAL['gold'], w, seg=6, rings=3,
            scale=(1, 1, 0.7))
 
 
@@ -232,6 +222,9 @@ def caparison():
             return PAL['garnet']
         if i in (0, ns - 2):
             return PAL['gold']
+        # an embroidered border above the garnet stripe: gilt lozenges on deep blue
+        if j in (2, nt - 4):
+            return PAL['gold'] if i % 3 == 1 else PAL['blue_dark']
         # vertical pleats: every other column a shade deeper, the cloth darkening toward the hem
         k = 0.88 if i % 2 else 1.0
         low = min(j, nt - 1 - j) / (nt / 2)
@@ -434,27 +427,35 @@ def crupper():
 #    mane, each lame riding the neck bone beneath it.
 # ---------------------------------------------------------------------------
 def crinet():
+    """Shingled steel lames down the crest of the neck, each overlapping the one below it like
+    roof slates (its lower edge stands proud and catches the light), gilt-edged, riveted along
+    the lower edge, split at the crest for the mane, each riding the neck bone beneath it."""
     p = Part('Crinet')
     a0, a1 = L(0, 0.5, 1.16), L(0, 0.57, 1.6)
     axis = lambda s: a0.lerp(a1, s)  # noqa: E731
     keep = {SUB1, SUB2, NECK, SPINE2}
-    n_lames = 6
-    nt = 15
-    t_rng = (-1.55, 1.55)
+    n_lames = 7
+    nt = 17
+    t_rng = (-1.6, 1.6)
+    step = 0.94 / n_lames
     for k in range(n_lames):
-        s0 = 0.02 + k * 0.15
-        w = Wrap(axis, lambda s: (0, 1, 0), 3, nt, (s0, s0 + 0.17), t_rng, 0.016 + 0.004 * (n_lames - k),
-                 keep=keep, smooth=2, reach=0.6)
+        s0 = 0.02 + k * step
+        base = 0.014 + 0.003 * (n_lames - k)
+        w = Wrap(axis, lambda s: (0, 1, 0), 4, nt, (s0, s0 + step * 1.25), t_rng,
+                 lambda uu, vv, base=base: base + 0.014 * (1 - uu),
+                 keep=keep, smooth=3, reach=0.6)
 
         def cells(i, j):
             t = t_rng[0] + (t_rng[1] - t_rng[0]) * (j + 0.5) / (nt - 1)
-            return abs(t) > 0.42  # the slot the mane rises through
+            return abs(t) > 0.4  # the slot the mane rises through
 
-        col = PAL['steel'] if k % 2 == 0 else PAL['iron']
-        w.sheet(p, 0.012, lambda i, j: col, 'steed_iron', cells=cells, rim=PAL['gold_dark'],
-                rim_mat='steed_gold')
-        for j in (2, 5, nt - 6, nt - 3):
-            stud(p, w.pts[0, j] + w.nrm[0, j] * 0.012, w.nrm[0, j], w.w[0, j], r=0.008)
+        def shade(i, j):
+            # each lame darkens up under the one that overlaps it
+            return tuple(c * (1.0 - 0.3 * i / 3) for c in PAL['steel'])
+
+        w.sheet(p, 0.008, shade, 'steed_iron', cells=cells, rim=PAL['gold'], rim_mat='steed_gold')
+        for j in (1, 3, 5, nt - 6, nt - 4, nt - 2):
+            stud(p, w.pts[0, j] + w.nrm[0, j] * 0.008, w.nrm[0, j], w.w[0, j], r=0.0075)
     return p
 
 
@@ -592,10 +593,15 @@ def saddle():
                 hook = pts[-1] - Vector((0, 0, 0.012))
                 torus(p, hook, (0, 1, 0), 0.012, 0.004, 'steed_iron', PAL['iron_dark'], R, seg=8, sides=4)
                 LANTERN_HOOKS['lantern_l' if sgn > 0 else 'lantern_r'] = hook - Vector((0, 0, 0.012))
-    # stirrups on their leathers
+    # stirrups on their leathers, hung clear of the caparison over the broad barrel: each one
+    # measured off the hide (plus the cloth's lift and the skirt) at its own height
+    def flank_x(u):
+        hit = S.ray(L(0.9, SADDLE_F + 0.02, u), Vector((-1, 0, 0)))
+        return (hit[0].x if hit else 0.3) + 0.075
+
     for sgn in (1, -1):
-        top = L(sgn * 0.215, SADDLE_F + 0.02, 1.05)
-        bot = L(sgn * 0.235, SADDLE_F + 0.02, 0.74)
+        top = L(sgn * flank_x(1.0), SADDLE_F + 0.02, 1.05)
+        bot = L(sgn * (flank_x(0.8) + 0.012), SADDLE_F + 0.02, 0.74)
         tube(p, top, bot, 0.011, 'steed_leather', PAL['leather_dark'], R, sides=4)
         c = bot + Vector((0, 0, -0.035))
         torus(p, c, (0, 1, 0), 0.035, 0.008, 'steed_iron', PAL['iron'], R, seg=12, sides=5)
@@ -603,7 +609,7 @@ def saddle():
     return p
 
 
-flush(saddle(), ARM, BODY)
+SADDLE_OB = flush(saddle(), ARM, BODY)
 
 
 # ---------------------------------------------------------------------------
@@ -720,6 +726,24 @@ flush(bridle(), ARM, BODY)
 
 
 # ---------------------------------------------------------------------------
+# 9b. Hair, hooves and eyes (steed_body.py): a heavy silver mane over the crinet, a
+#     forelock, a full tail, big hooves under white feathering, glossy eyes.
+# ---------------------------------------------------------------------------
+def hair():
+    p = Part('Hair')
+    rnd = random.Random(1705).random
+    SB.mane(p, S, rnd)
+    SB.forelock(p, S, HEAD)
+    SB.tail(p, S, ARM, rnd)
+    SB.hooves_and_feathers(p, S, ARM, rnd)
+    SB.eyes(p, S, ARM)
+    return p
+
+
+flush(hair(), ARM, BODY)
+
+
+# ---------------------------------------------------------------------------
 # 10. The lanterns' swing, keyed into every clip the horse already ships. A
 #     pendulum lags the body: it rocks fore-and-aft with the stride and side to
 #     side with the roll, a whole number of times per clip so every loop closes.
@@ -781,6 +805,8 @@ def consolidate():
         nt.links.new(vc.outputs['Color'], b.inputs['Base Color'])
     target = {'steed_iron': metal, 'steed_gold': metal, 'lantern_Glow': K.MATS['lantern_Glow']}
     parts = [o for o in bpy.data.objects if o.type == 'MESH' and o is not BODY]
+    for o in [BODY] + parts:
+        print('TRIS', o.name, sum(len(f.vertices) - 2 for f in o.data.polygons))
     for o in bpy.data.objects:
         o.select_set(o in parts or o is BODY)
     bpy.context.view_layer.objects.active = BODY
@@ -796,11 +822,14 @@ def consolidate():
     for poly, idx in zip(me.polygons, per_face):
         poly.material_index = idx
     BODY.name = 'LanternHallDestrier'
+    # the lofted hair and hem panels leave a few degenerate edges: clean them before export
+    me.validate(clean_customdata=False)
 
 
 def export():
-    ARM.data.pose_position = 'POSE'
     consolidate()
+    SB.bake_ao(BODY, skip_materials=('lantern_Glow',))
+    ARM.data.pose_position = 'POSE'
     bpy.ops.export_scene.gltf(
         filepath=OUT,
         export_format='GLB',
@@ -822,6 +851,12 @@ def report_spec_offsets():
     for bone, point in GLOW_POINTS.items():
         local = ARM.data.bones[bone].matrix_local.inverted() @ point
         print('SPEC', bone, tuple(round(c, 4) for c in local))
+    # the renderer sizes the mount by its REST height (characters/assets.ts), and the rider's
+    # seat lift is that scale times the seat's height over the hooves
+    zs = [v.co.z for o in bpy.data.objects if o.type == 'MESH' for v in o.data.vertices]
+    seat = max(K.fu(v.co)[2] for v in SADDLE_OB.data.vertices if abs(K.fu(v.co)[1] - SADDLE_F) < 0.03
+               and abs(v.co.x) < 0.03)
+    print('SPEC rest_height', round(max(zs) - min(zs), 4), 'seat_top', round(seat, 4))
 
 
 report_spec_offsets()

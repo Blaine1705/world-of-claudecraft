@@ -8,9 +8,9 @@ import { hoofStrikeWeight, mountEmberRates } from '../src/render/mount_embers_co
 
 describe('the ember rates', () => {
   it('sparks the hooves only at a gallop, and lets the lanterns breathe at every gait', () => {
-    expect(mountEmberRates(true, true)).toEqual({ hoof: 26, lantern: 16 });
-    expect(mountEmberRates(true, false)).toEqual({ hoof: 0, lantern: 5 });
-    expect(mountEmberRates(false, false)).toEqual({ hoof: 0, lantern: 1.6 });
+    expect(mountEmberRates(true, true)).toEqual({ hoof: 44, lantern: 26 });
+    expect(mountEmberRates(true, false)).toEqual({ hoof: 0, lantern: 8 });
+    expect(mountEmberRates(false, false)).toEqual({ hoof: 0, lantern: 3 });
     // standing still with a stale running flag is still standing
     expect(mountEmberRates(false, true).hoof).toBe(0);
   });
@@ -63,8 +63,8 @@ describe('the emitter', () => {
     const { s, sparks, cinders } = sink();
     updateMountEmbers(root, spec, s, 1 / 60, true, true, 0);
     // the lifted hoof and the missing bone shed nothing; the planted one at full rate
-    expect(sparks).toEqual([{ at: [0.5, 0.02, 0], rate: 26 }]);
-    expect(cinders).toEqual([{ at: [0.8, 2.5, 0], rate: 16, moving: true }]);
+    expect(sparks).toEqual([{ at: [0.5, 0.02, 0], rate: 44 }]);
+    expect(cinders).toEqual([{ at: [0.8, 2.5, 0], rate: 26, moving: true }]);
   });
 
   it('standing, the hooves are quiet and the lanterns breathe', () => {
@@ -72,6 +72,6 @@ describe('the emitter', () => {
     const { s, sparks, cinders } = sink();
     updateMountEmbers(root, spec, s, 1 / 60, false, false, 0);
     expect(sparks).toEqual([]);
-    expect(cinders.map((c) => [c.rate, c.moving])).toEqual([[1.6, false]]);
+    expect(cinders.map((c) => [c.rate, c.moving])).toEqual([[3, false]]);
   });
 });

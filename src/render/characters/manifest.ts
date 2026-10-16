@@ -3202,17 +3202,17 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 12,
     lazyPreload: true,
   },
-  // Lantern Hall's war horse (scripts/assets/lantern_hall_steed/build_steed.py): the
-  // valorsteed's own body, rig and authored clips under oak-and-iron barding, scaled up to a
-  // destrier that stands over its rider. Same gait refs as the horse it is built from (the
-  // clips are the same strides) scaled by the size ratio (4.5 / 3.8), so the longer legs
-  // take slower strides and the hooves keep their plant at the larger size.
+  // Lantern Hall's war horse (scripts/assets/lantern_hall_steed/build_steed.py): a heavy
+  // draught-built destrier regrown on the valorsteed's rig (steed_body.py), playing its authored
+  // clips under oak-and-iron barding, sized well over its rider. Same gait refs as the horse it
+  // is built from (the clips are the same strides) scaled by the size ratio (5.0 / 3.8), so the
+  // longer legs take slower strides and the hooves keep their plant at the larger size.
   mount_lantern_hall_destrier: {
     url: `${MOUNTS_DIR}/lantern_hall_destrier.glb`,
-    height: 4.5,
+    height: 5.0,
     clips: MOUNT_RIGGED,
-    walkRef: 2.72,
-    runRef: 14.2,
+    walkRef: 3.03,
+    runRef: 15.8,
     lazyPreload: true,
   },
   mount_grag_bear: {

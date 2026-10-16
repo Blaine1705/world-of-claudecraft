@@ -1967,11 +1967,30 @@ export class Vfx {
     const hot = new THREE.Color(0xffb45e).multiplyScalar(hdr(2.2));
     const amber = new THREE.Color(0xff8a2a).multiplyScalar(hdr(2.0));
     const coal = new THREE.Color(0xff5210).multiplyScalar(hdr(1.8));
-    // the flare: two stacked flashes, a tight white core over a wide amber bloom
-    this.spawn(at.x, at.y + 1.6, at.z, 0, 0.4, 0, white, 2.6, 0.32, 0, SPR.flash);
-    this.spawn(at.x, at.y + 1.2, at.z, 0, 0.2, 0, amber, 5.2, 0.55, 0, SPR.glowSoft);
+    // the flare: stacked flashes, a tight white core over a wide amber bloom, and a low warm
+    // wash over the ground the horse lands on (its lanterns flare with it: mount_lamps.ts)
+    this.spawn(at.x, at.y + 1.6, at.z, 0, 0.4, 0, white, 3.8, 0.4, 0, SPR.flash);
+    this.spawn(at.x, at.y + 1.3, at.z, 0, 0.2, 0, amber, 8, 0.75, 0, SPR.glowSoft);
+    this.spawn(at.x, at.y + 0.3, at.z, 0, 0, 0, hot, 7, 0.9, 0, SPR.glowSoft);
+    // a ring of flame licks round the hooves, rising as they fade
+    for (let i = 0, n = this.scaledCount(16); i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      this.spawn(
+        at.x + Math.sin(a) * 1.2,
+        at.y + 0.2,
+        at.z + Math.cos(a) * 1.2,
+        Math.sin(a) * 0.8,
+        1.6 + Math.random() * 0.8,
+        Math.cos(a) * 0.8,
+        i % 2 ? amber : hot,
+        0.9 + Math.random() * 0.4,
+        0.55 + Math.random() * 0.2,
+        -0.4,
+        SPR.flame,
+      );
+    }
     // the ground ring: sparks thrown outward low along the ground, falling
-    for (let i = 0, n = this.scaledCount(36); i < n; i++) {
+    for (let i = 0, n = this.scaledCount(60); i < n; i++) {
       const a = (i / n) * Math.PI * 2 + Math.random() * 0.2;
       const speed = 4.5 + Math.random() * 2.5;
       this.spawn(
@@ -1989,7 +2008,7 @@ export class Vfx {
       );
     }
     // the column: embers and flame licks climbing the rider and horse
-    for (let i = 0, n = this.scaledCount(48); i < n; i++) {
+    for (let i = 0, n = this.scaledCount(80); i < n; i++) {
       const a = Math.random() * Math.PI * 2;
       const r = 0.3 + Math.random() * 1.1;
       const flame = i % 4 === 0;
@@ -2007,8 +2026,8 @@ export class Vfx {
         flame ? SPR.flame : i % 3 === 0 ? SPR.star : SPR.sparkle,
       );
     }
-    // the settle: a few slow cinders drifting down after the flare
-    for (let i = 0, n = this.scaledCount(14); i < n; i++) {
+    // the settle: slow cinders drifting down after the flare
+    for (let i = 0, n = this.scaledCount(26); i < n; i++) {
       this.spawn(
         at.x + (Math.random() - 0.5) * 2.4,
         at.y + 2.4 + Math.random() * 1.2,
@@ -2031,22 +2050,22 @@ export class Vfx {
     const n = this.emitCount(ratePerSec, dt);
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2;
-      const lateral = 0.6 + Math.random() * 1.4;
-      const puff = Math.random() < 0.18;
+      const lateral = 0.8 + Math.random() * 1.8;
+      const puff = Math.random() < 0.22;
       this.spawn(
         at.x + (Math.random() - 0.5) * 0.15,
         at.y + 0.05,
         at.z + (Math.random() - 0.5) * 0.15,
         Math.sin(a) * lateral,
-        puff ? 0.6 : 1.6 + Math.random() * 2.2,
+        puff ? 0.7 : 2 + Math.random() * 2.6,
         Math.cos(a) * lateral,
         puff
           ? this.emberFlame.setHex(0xff8a2a).multiplyScalar(hdr(1.7))
           : this.emberSpark
               .setHex(Math.random() < 0.5 ? 0xffc070 : 0xff7a1e)
               .multiplyScalar(hdr(2.2)),
-        puff ? 0.42 + Math.random() * 0.2 : 0.13 + Math.random() * 0.1,
-        puff ? 0.28 : 0.35 + Math.random() * 0.3,
+        puff ? 0.55 + Math.random() * 0.25 : 0.18 + Math.random() * 0.13,
+        puff ? 0.32 : 0.4 + Math.random() * 0.35,
         puff ? -0.6 : 9,
         puff ? SPR.firePuff : SPR.sparkBurst,
       );
@@ -2065,9 +2084,9 @@ export class Vfx {
         (Math.random() - 0.5) * 0.5,
         (moving ? 0.5 : 0.8) + Math.random() * 0.6,
         (Math.random() - 0.5) * 0.5,
-        this.emberSpark.setHex(Math.random() < 0.6 ? 0xffa040 : 0xffd27a).multiplyScalar(hdr(2.0)),
-        0.08 + Math.random() * 0.07,
-        0.8 + Math.random() * 0.7,
+        this.emberSpark.setHex(Math.random() < 0.6 ? 0xffa040 : 0xffd27a).multiplyScalar(hdr(2.2)),
+        0.11 + Math.random() * 0.09,
+        0.9 + Math.random() * 0.8,
         -0.4,
         Math.random() < 0.3 ? SPR.star : SPR.sparkle,
       );
