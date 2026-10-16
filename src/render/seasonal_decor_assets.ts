@@ -33,12 +33,39 @@ export type GourdlightDecorNode = (typeof GOURDLIGHT_DECOR_NODES)[number];
 
 /** Glow materials and their strength and flicker family (the paper and the
  *  rind flicker on different phases, so a street never pulses in unison). */
-const GLOW_MATERIALS: Readonly<Record<string, { base: number; phase: number }>> = {
-  GourdGlow: { base: 1.4, phase: 0 },
-  GourdInner: { base: 1.0, phase: 0.4 },
-  GourdFlesh: { base: 0.7, phase: 0.8 },
-  LanternPaper: { base: 0.42, phase: 2.1 },
+const GLOW_MATERIALS: Readonly<
+  Record<string, { base: number; phase: number; rim: number; paper: boolean }>
+> = {
+  GourdGlow: { base: 1.4, phase: 0, rim: 0.7, paper: false },
+  GourdInner: { base: 1.0, phase: 0.4, rim: 0.55, paper: false },
+  GourdFlesh: { base: 0.7, phase: 0.8, rim: 0.6, paper: false },
+  LanternPaper: { base: 0.32, phase: 2.1, rim: 0.36, paper: true },
 };
+
+/** Shape a glow material's light the way a lit shell reads (the standard tier only;
+ *  Lambert keeps the flat glow): brightest where the surface faces the eye, dimmer
+ *  toward its silhouette (`rim`), and on paper darker along the ribs and the caps,
+ *  read off the vertex colour the factory painted, so a lantern at night is a glowing
+ *  ribbed globe instead of a flat disc. One extra cached program per glow material. */
+function shapeGlow(material: THREE.MeshStandardMaterial, rim: number, paper: boolean): void {
+  const tag = `woc-seasonal-glow:${rim}:${paper ? 1 : 0}`;
+  material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <emissivemap_fragment>',
+      `#include <emissivemap_fragment>
+      {
+        float wocFace = clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0);
+        float wocShape = mix(${rim.toFixed(3)}, 1.0, wocFace);
+        #if ${paper ? 1 : 0} && defined( USE_COLOR )
+          float wocLum = dot(vColor.rgb, vec3(0.299, 0.587, 0.114));
+          wocShape *= clamp(wocLum * 1.7, 0.3, 1.15);
+        #endif
+        totalEmissiveRadiance *= wocShape;
+      }`,
+    );
+  };
+  material.customProgramCacheKey = () => tag;
+}
 
 export interface SeasonalPart {
   geometry: THREE.BufferGeometry;
@@ -74,6 +101,10 @@ function prepareMaterial(source: THREE.Material): THREE.Material {
         metalness: src.metalness ?? 0,
       })
     : new THREE.MeshLambertMaterial(opts);
+  // the glow's shape first: the haze chains onto whatever hook the material carries
+  if (glow && material instanceof THREE.MeshStandardMaterial) {
+    shapeGlow(material, glow.rim, glow.paper);
+  }
   attachBiomeHaze(material);
   if (glow) registerSeasonalGlowMaterial(material, glow.base, glow.phase);
   sharedMaterials.set(source, material);
