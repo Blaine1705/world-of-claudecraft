@@ -11015,6 +11015,16 @@ export const zh_CN: EnTranslations = {
       "autoTexSteep": "Steep ground texture",
       "autoTexNone": "Leave as is"
     },
+    "materials": {
+      "title": "材质",
+      "hint": "为此模型的每个部分选择纹理。纹理按世界空间平铺，不使用模型UV，并随地图保存。",
+      "loading": "模型仍在加载。稍后再次选中它即可编辑材质。",
+      "original": "原始",
+      "texture": "纹理",
+      "tile": "纹理比例（每块码数）",
+      "color": "Tint",
+      "reset": "恢复原始"
+    },
     "flatten": {
       "style": {
         "smooth": "Smooth",
@@ -11034,7 +11044,13 @@ export const zh_CN: EnTranslations = {
       "hint": "压平会将地面拉平到拖动开始时光标下的高度。",
       "hardEdge": "硬边缘",
       "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke."
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "目标高度（码）",
+      "levelPlaceholder": "拖动起点",
+      "levelClear": "清除",
+      "levelHint": "每次拖动都会把地面压平到这个高度。右键点击地面可选取其他高度。",
+      "levelHintNone": "右键点击地面锁定该处高度，然后在任意位置拖动即可压平到该高度。留空时，每次拖动压平到起点的高度。",
+      "levelPicked": "已锁定高度：{height} 码。"
     },
     "water": {
       "title": "水面高度",
@@ -11341,6 +11357,9 @@ export const zh_CN: EnTranslations = {
       "selectAllOfAsset": "Select all of this asset ({count})",
       "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
       "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "贴合地面",
+      "setGroundTitle": "让所选资源重新落在其下方的地形上，取消悬浮或抬高",
+      "snapGround": "移动时贴合地面",
       "rotation": "旋转",
       "scale": "缩放",
       "collide": "阻挡移动",

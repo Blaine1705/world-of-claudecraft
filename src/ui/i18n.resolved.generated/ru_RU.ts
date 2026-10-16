@@ -11015,6 +11015,16 @@ export const ru_RU: EnTranslations = {
       "autoTexSteep": "Steep ground texture",
       "autoTexNone": "Leave as is"
     },
+    "materials": {
+      "title": "Материалы",
+      "hint": "Выберите текстуру для каждой части модели. Текстуры повторяются в мировых координатах, не используют UV модели и сохраняются вместе с картой.",
+      "loading": "Модель ещё загружается. Выберите её снова чуть позже, чтобы изменить материалы.",
+      "original": "Исходный",
+      "texture": "Текстура",
+      "tile": "Масштаб текстуры (ярдов на плитку)",
+      "color": "Tint",
+      "reset": "Вернуть исходный"
+    },
     "flatten": {
       "style": {
         "smooth": "Smooth",
@@ -11034,7 +11044,13 @@ export const ru_RU: EnTranslations = {
       "hint": "Выравнивание приводит землю к высоте под курсором в момент начала перетаскивания.",
       "hardEdge": "Резкий край",
       "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke."
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "Целевая высота (ярды)",
+      "levelPlaceholder": "Начало перетаскивания",
+      "levelClear": "Сбросить",
+      "levelHint": "Каждое перетаскивание выравнивает землю до этой высоты. Щёлкните правой кнопкой по земле, чтобы выбрать другую.",
+      "levelHintNone": "Щёлкните правой кнопкой по земле, чтобы зафиксировать её высоту, затем перетаскивайте в любом месте, чтобы выровнять до неё. Пусто: каждое перетаскивание выравнивает до высоты точки начала.",
+      "levelPicked": "Высота зафиксирована: {height} ярдов."
     },
     "water": {
       "title": "Уровень воды",
@@ -11341,6 +11357,9 @@ export const ru_RU: EnTranslations = {
       "selectAllOfAsset": "Select all of this asset ({count})",
       "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
       "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "Опустить на землю",
+      "setGroundTitle": "Вернуть выбранные объекты на рельеф под ними, убрав парение и подъём",
+      "snapGround": "Прижимать к земле при перемещении",
       "rotation": "Поворот",
       "scale": "Масштаб",
       "collide": "Блокирует движение",

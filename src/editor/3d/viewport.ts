@@ -138,6 +138,10 @@ export interface Editor3DHooks {
     world: { x: number; z: number } | null,
     additive: boolean,
   ): void;
+  // A right-click that did not turn into a drag (right-DRAG still orbits),
+  // with the terrain point under the cursor or null off-terrain. The Flatten
+  // tool picks its locked level here.
+  onRightTap(world: { x: number; z: number } | null): void;
   // Direct manipulation of placements in Select mode. When enabled, a left
   // pointerdown on a pickable placement offers the drag to the app; a true
   // return claims it (the app selects the placement) and the viewport streams
@@ -1946,6 +1950,12 @@ export class Editor3DViewport {
     this.refreshFluidsIfNeeded(index);
   }
 
+  /** A placed model's material slots (render/material_finishes.ts), null
+   *  when nothing renders at that index. */
+  placementMaterialSlots(index: number): { key: string; label: string }[] | null {
+    return this.renderer?.placedAssets.materialSlots(index) ?? null;
+  }
+
   placementUpdated(
     index: number,
     change: {
@@ -1971,6 +1981,7 @@ export class Editor3DViewport {
       fireEffects?: readonly AssetFireEmitter[] | null;
       collideCustom?: boolean;
       hitboxes?: PlacedAsset['hitboxes'] | null;
+      materialFinishes?: PlacedAsset['materialFinishes'] | null;
     },
   ): void {
     this.placementPickCache = null;
@@ -5883,6 +5894,9 @@ export class Editor3DViewport {
       // A stationary press on a movable gameplay object: a tap (select it).
       this.pendingObjectKey = null;
       this.hooks.onTap(ev.clientX, ev.clientY, null, false);
+    } else if (this.dragMode === 'orbit' && ev.button === 2 && this.dragDist <= TAP_SLOP_PX) {
+      // A right press that never orbited: a right-click on the ground.
+      this.hooks.onRightTap(this.surfaceAt(ev.clientX, ev.clientY));
     } else if (
       (this.dragMode === 'orbit' || this.dragMode === 'pan') &&
       ev.button === 0 &&

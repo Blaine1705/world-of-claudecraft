@@ -11155,6 +11155,7 @@ export interface AssetFireEmitter {
 
 export interface PlacedAsset {
   wallFinishes?: import('./wall_finishes').WallFinishes;
+  materialFinishes?: import('./material_finishes').MaterialFinishes;
   building?: import('./building').BuildingMembership;
   path: string; // public GLB url, e.g. "/models/props/well.glb"
   x: number;

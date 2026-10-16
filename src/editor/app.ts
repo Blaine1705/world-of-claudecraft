@@ -248,6 +248,11 @@ import {
   WATERFALL_ASSET_ID,
   type WallRunDef,
 } from '../sim/map_doc';
+import {
+  cloneMaterialFinishes,
+  type MaterialFinishes,
+  withMaterialFinish,
+} from '../sim/material_finishes';
 import { hash2 } from '../sim/rng';
 import type { TreeParams } from '../sim/tree_params';
 import {
@@ -276,6 +281,7 @@ import {
   type WorldContent,
   type ZoneAtmosphere,
 } from '../sim/types';
+import type { WallFinish } from '../sim/wall_finishes';
 import {
   biomeAt,
   generateDecorationsInBounds,
@@ -440,6 +446,14 @@ import {
   ambientDecorationsToPlacements,
   closestAmbientDecorations,
 } from './foliage_edit_core';
+import {
+  applyGroundSeat,
+  flattenStrokeTarget,
+  type GroundSeat,
+  groundSeatOf,
+  isOnGround,
+  seatOnGround,
+} from './ground_level_core';
 import { bakeImportedModelCollision, bakeTrueModelCollision } from './import_collision';
 import {
   BIOME_OPTIONS,
@@ -1422,6 +1436,11 @@ export class EditorApp {
   private paintCreatedGrid = false;
   private lastStamp: Vec2 | null = null;
   private flattenTarget = 0;
+  /** Flatten's locked level (right-click picks it); null = each stroke levels
+   *  to the height where it starts. */
+  private flattenLock: number | null = null;
+  /** Moving an asset re-seats it on the ground instead of detaching it. */
+  private snapToGroundOnMove = false;
   private eraseLast: Vec2 | null = null;
 
   // water
@@ -2497,6 +2516,7 @@ export class EditorApp {
         onEditEnd: (ev) => this.editEnd(ev),
         onHover: (w) => this.hover3d(w),
         onTap: (cx, cy, w, additive) => this.tap3d(cx, cy, w, additive),
+        onRightTap: (w) => this.rightTap3d(w),
         // Collision Master: the workbench asset never drags; clicks pick
         // volumes/components instead.
         placementDragEnabled: () =>
@@ -3949,7 +3969,12 @@ export class EditorApp {
     this.lastStamp = null;
     // Captured for EVERY sculpt tool: a Shift-inverted Smooth stroke becomes
     // Flatten mid-gesture and needs the press-point height as its target.
-    this.flattenTarget = terrainHeight(w.x, w.z, this.map.meta.seed);
+    // The locked level only steers the Flatten tool's own level mode, where
+    // its field is on screen.
+    this.flattenTarget = flattenStrokeTarget(
+      this.tool === 'flatten' && !this.flattenSmooth ? this.flattenLock : null,
+      terrainHeight(w.x, w.z, this.map.meta.seed),
+    );
     // One Noise pattern per stroke, keyed off the press point and the edit
     // count so two strokes never repeat each other.
     this.strokeNoiseSeed = Math.floor(
@@ -8969,6 +8994,7 @@ export class EditorApp {
       this.flushTransformCommit();
       this.placementDragBase = null;
       this.groupDragBase = null;
+      this.materialFinishBase = null;
       this.selectedFireEmitter = null;
       this.viewport3d?.setFireEmitterEdit(null, null);
     }
@@ -10176,6 +10202,123 @@ export class EditorApp {
       },
     });
     this.inspector.refresh();
+  }
+
+  /** A moved placement's seat: detached to float where it is (the default),
+   *  or re-seated on the ground under its new spot when snapping is on. */
+  private moveSeat(index: number): void {
+    if (!this.snapToGroundOnMove) {
+      this.detachPlacement(index);
+      return;
+    }
+    const p = this.map.placements[index];
+    if (!p || isOnGround(p)) return;
+    seatOnGround(p);
+    this.viewport3d?.placementUpdated(index, { detached: false, y: 0 });
+  }
+
+  /** Flatten: a right-click on the ground locks the level every drag
+   *  flattens to. */
+  private rightTap3d(w: Vec2 | null): void {
+    if (this.tool !== 'flatten' || this.flattenSmooth || !w) return;
+    this.flattenLock = terrainHeight(w.x, w.z, this.map.meta.seed);
+    this.toasts.info(
+      t('editor.flatten.levelPicked', {
+        height: formatNumber(this.flattenLock, { maximumFractionDigits: 2 }),
+      }),
+    );
+    this.inspector.refresh();
+  }
+
+  /** The pre-gesture finishes of a live material edit (one undo per gesture),
+   *  keyed to the placement it was taken from; cleared on selection change. */
+  private materialFinishBase: { index: number; value: MaterialFinishes | undefined } | null = null;
+
+  /** Set or clear one material slot's finish on the selected placement.
+   *  `commit` closes the gesture with one undo step; live edits (a color
+   *  drag) only repaint. */
+  private setMaterialFinish(key: string, finish: WallFinish | null, commit: boolean): void {
+    const index = this.selectedPlacement;
+    if (index === null || !this.map.placements[index]) return;
+    if (this.materialFinishBase?.index !== index) {
+      this.materialFinishBase = {
+        index,
+        value: cloneMaterialFinishes(this.map.placements[index]?.materialFinishes),
+      };
+    }
+    const apply = (value: MaterialFinishes | undefined): void => {
+      const p = this.map.placements[index];
+      if (!p) return;
+      if (value) p.materialFinishes = value;
+      else delete p.materialFinishes;
+      this.viewport3d?.placementUpdated(index, { materialFinishes: value ?? null });
+      this.canvasDirty = true;
+    };
+    const next = withMaterialFinish(this.map.placements[index]?.materialFinishes, key, finish);
+    apply(next);
+    if (!commit) return;
+    const before = this.materialFinishBase.value;
+    this.materialFinishBase = null;
+    this.pushUndo({
+      label: 'material-finish',
+      undo: () => {
+        apply(before);
+        this.inspector.refresh();
+      },
+      redo: () => {
+        apply(next);
+        this.inspector.refresh();
+      },
+    });
+    this.map.meta.updatedAt = now();
+    this.inspector.refresh();
+  }
+
+  /** Cave and rock rig markers: their elevation is part of the rig. */
+  private isRigMarkerAsset(assetId: string): boolean {
+    return (
+      assetId === CAVE_ENTRANCE_ASSET_ID ||
+      assetId === CAVE_EXIT_ASSET_ID ||
+      assetId === CAVE_POINT_ASSET_ID ||
+      assetId === ROCK_POINT_ASSET_ID
+    );
+  }
+
+  /** Seat every selected placement on the terrain under it (one undo step). */
+  private setSelectionToGround(): void {
+    const indices = new Set(this.selectedSet);
+    if (this.selectedPlacement !== null) indices.add(this.selectedPlacement);
+    const changed: { index: number; before: GroundSeat }[] = [];
+    for (const index of indices) {
+      const p = this.map.placements[index];
+      // Rig markers keep their anchored elevation (see updateSelectedPlacement).
+      if (!p || isOnGround(p) || this.isRigMarkerAsset(p.assetId)) continue;
+      changed.push({ index, before: groundSeatOf(p) });
+    }
+    if (changed.length === 0) return;
+    const push = (seat: (index: number) => GroundSeat | null): void => {
+      for (const { index } of changed) {
+        const p = this.map.placements[index];
+        if (!p) continue;
+        const s = seat(index);
+        if (s) applyGroundSeat(p, s);
+        else seatOnGround(p);
+        this.viewport3d?.placementUpdated(index, {
+          detached: p.detached === true,
+          groundY: p.groundY,
+          y: p.y ?? 0,
+        });
+      }
+      this.canvasDirty = true;
+      this.inspector.refresh();
+    };
+    push(() => null);
+    this.pushUndo({
+      label: 'set-to-ground',
+      undo: () => push((index) => changed.find((c) => c.index === index)?.before ?? null),
+      redo: () => push(() => null),
+    });
+    this.map.meta.updatedAt = now();
   }
 
   /** Detach a placement from its terrain seat (Move tool): freeze the ground
@@ -12637,7 +12780,7 @@ export class EditorApp {
       p.assetId === CAVE_ENTRANCE_ASSET_ID ||
       p.assetId === CAVE_EXIT_ASSET_ID ||
       p.assetId === CAVE_POINT_ASSET_ID;
-    const isRigMarker = isCaveMarker || p.assetId === ROCK_POINT_ASSET_ID;
+    const isRigMarker = this.isRigMarkerAsset(p.assetId);
     // Cave markers are ANCHORED (frozen ground): their elevation is absolute
     // so the tube ignores whatever the terrain does. Heal markers from older
     // sessions on first touch by freezing the CURRENT surface under them ?
@@ -12655,7 +12798,7 @@ export class EditorApp {
       opts?.detachOnMove === true &&
       !isRigMarker &&
       (change.x !== undefined || change.z !== undefined);
-    if (detachMove) this.detachPlacement(index);
+    if (detachMove) this.moveSeat(index);
     // Group transform: moving/rotating/scaling the active placement carries the
     // other multi-selection members along (Blender-style). The group translates
     // by the same delta and rotates/scales as a unit about the active
@@ -12692,7 +12835,7 @@ export class EditorApp {
         if (!snap || !q) continue;
         // Detach each member too (before moving it, so the frozen ground is the
         // pre-move height), the whole group floats free consistently.
-        if (detachMove) this.detachPlacement(gi);
+        if (detachMove) this.moveSeat(gi);
         const pt = groupMemberPoint(snap.x, snap.z, prev.x, prev.z, dx, dz, dRot, ratio);
         q.x = pt.x;
         q.z = pt.z;
@@ -16116,6 +16259,8 @@ export class EditorApp {
     repairPlacedAssetShapes(map);
     repairMissingTreeCollision(map, applyDefaultCollision);
     this.map = map;
+    this.flattenLock = null;
+    this.materialFinishBase = null;
     this.buildingWorkspace?.reset();
     // A region map (Open -> Shipped -> Ravenrift) can be written back to the
     // game; every other document cannot, so the action only exists for it.
@@ -17019,6 +17164,24 @@ export class EditorApp {
       setFlattenSmooth: (on) => {
         this.flattenSmooth = on;
       },
+      getFlattenLock: () => this.flattenLock,
+      setFlattenLock: (level) => {
+        this.flattenLock = level;
+      },
+      getSnapToGround: () => this.snapToGroundOnMove,
+      setSnapToGround: (on) => {
+        this.snapToGroundOnMove = on;
+      },
+      setSelectionToGround: () => this.setSelectionToGround(),
+      getMaterialSlots: () =>
+        this.selectedPlacement === null
+          ? null
+          : (this.viewport3d?.placementMaterialSlots(this.selectedPlacement) ?? null),
+      getMaterialFinishes: () =>
+        this.selectedPlacement === null
+          ? undefined
+          : this.map.placements[this.selectedPlacement]?.materialFinishes,
+      setMaterialFinish: (key, finish, commit) => this.setMaterialFinish(key, finish, commit),
       getFlattenHardEdge: () => this.flattenHardEdge,
       setFlattenHardEdge: (on) => {
         this.flattenHardEdge = on;

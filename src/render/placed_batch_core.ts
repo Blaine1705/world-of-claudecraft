@@ -40,7 +40,8 @@ export function placementBatchable(p: PlacedAsset): boolean {
     p.opacity === undefined &&
     p.glow === undefined &&
     p.glowStrength === undefined &&
-    p.wallFinishes === undefined
+    p.wallFinishes === undefined &&
+    p.materialFinishes === undefined
   );
 }
 

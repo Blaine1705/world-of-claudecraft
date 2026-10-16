@@ -11015,6 +11015,16 @@ export const ja_JP: EnTranslations = {
       "autoTexSteep": "Steep ground texture",
       "autoTexNone": "Leave as is"
     },
+    "materials": {
+      "title": "マテリアル",
+      "hint": "このモデルの各パーツのテクスチャを選びます。テクスチャはワールド空間でタイル表示され、モデルのUVは使わず、マップと一緒に保存されます。",
+      "loading": "モデルを読み込み中です。少ししてからもう一度選択するとマテリアルを編集できます。",
+      "original": "オリジナル",
+      "texture": "テクスチャ",
+      "tile": "テクスチャの縮尺（1タイルあたりのヤード）",
+      "color": "Tint",
+      "reset": "元に戻す"
+    },
     "flatten": {
       "style": {
         "smooth": "Smooth",
@@ -11034,7 +11044,13 @@ export const ja_JP: EnTranslations = {
       "hint": "平坦化は、ドラッグ開始時のカーソル下の高さに地面をならします。",
       "hardEdge": "ハードエッジ",
       "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke."
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "目標の高さ（ヤード）",
+      "levelPlaceholder": "ドラッグ開始点",
+      "levelClear": "クリア",
+      "levelHint": "ドラッグするたびに地面をこの高さに平らにします。地面を右クリックすると別の高さを選べます。",
+      "levelHintNone": "地面を右クリックするとその高さを固定し、どこでもドラッグしてその高さに平らにできます。空欄の場合は、各ドラッグの開始点の高さに平らにします。",
+      "levelPicked": "高さを {height} ヤードに固定しました。"
     },
     "water": {
       "title": "水面の高さ",
@@ -11341,6 +11357,9 @@ export const ja_JP: EnTranslations = {
       "selectAllOfAsset": "Select all of this asset ({count})",
       "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
       "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "地面に合わせる",
+      "setGroundTitle": "選択したアセットを真下の地形に戻し、浮きや持ち上げを解除します",
+      "snapGround": "移動時に地面に合わせる",
       "rotation": "回転",
       "scale": "スケール",
       "collide": "移動をブロック",

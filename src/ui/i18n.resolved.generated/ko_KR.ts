@@ -11015,6 +11015,16 @@ export const ko_KR: EnTranslations = {
       "autoTexSteep": "Steep ground texture",
       "autoTexNone": "Leave as is"
     },
+    "materials": {
+      "title": "재질",
+      "hint": "이 모델의 각 부분에 사용할 텍스처를 고르세요. 텍스처는 월드 공간에 타일로 깔리며 모델 UV를 쓰지 않고, 맵과 함께 저장됩니다.",
+      "loading": "모델을 아직 불러오는 중입니다. 잠시 후 다시 선택하면 재질을 편집할 수 있습니다.",
+      "original": "원본",
+      "texture": "텍스처",
+      "tile": "텍스처 배율(타일당 야드)",
+      "color": "Tint",
+      "reset": "원본으로 되돌리기"
+    },
     "flatten": {
       "style": {
         "smooth": "Smooth",
@@ -11034,7 +11044,13 @@ export const ko_KR: EnTranslations = {
       "hint": "평탄화는 드래그를 시작할 때 커서 아래의 높이로 지면을 고릅니다.",
       "hardEdge": "경계 선명하게",
       "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke."
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "목표 높이(야드)",
+      "levelPlaceholder": "드래그 시작점",
+      "levelClear": "지우기",
+      "levelHint": "드래그할 때마다 지면을 이 높이로 평탄하게 만듭니다. 지면을 오른쪽 클릭하면 다른 높이를 고를 수 있습니다.",
+      "levelHintNone": "지면을 오른쪽 클릭해 그 높이를 고정한 뒤, 어디서든 드래그하면 그 높이로 평탄해집니다. 비워 두면 각 드래그가 시작한 지점의 높이로 평탄해집니다.",
+      "levelPicked": "높이를 {height}야드로 고정했습니다."
     },
     "water": {
       "title": "수면 높이",
@@ -11341,6 +11357,9 @@ export const ko_KR: EnTranslations = {
       "selectAllOfAsset": "Select all of this asset ({count})",
       "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
       "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "지면에 맞추기",
+      "setGroundTitle": "선택한 에셋을 아래 지형 위로 다시 놓고, 떠 있거나 들어 올린 상태를 없앱니다",
+      "snapGround": "이동할 때 지면에 맞추기",
       "rotation": "회전",
       "scale": "크기",
       "collide": "이동 차단",

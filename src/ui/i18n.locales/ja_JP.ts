@@ -11372,6 +11372,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.biome.clearConfirm': 'このマップの塗られたバイオームのマスをすべて削除しますか？',
   'editor.flatten.hint': '平坦化は、ドラッグ開始時のカーソル下の高さに地面をならします。',
   'editor.flatten.hardEdge': 'ハードエッジ',
+  'editor.flatten.levelTitle': '目標の高さ（ヤード）',
+  'editor.flatten.levelPlaceholder': 'ドラッグ開始点',
+  'editor.flatten.levelClear': 'クリア',
+  'editor.flatten.levelHint':
+    'ドラッグするたびに地面をこの高さに平らにします。地面を右クリックすると別の高さを選べます。',
+  'editor.flatten.levelHintNone':
+    '地面を右クリックするとその高さを固定し、どこでもドラッグしてその高さに平らにできます。空欄の場合は、各ドラッグの開始点の高さに平らにします。',
+  'editor.flatten.levelPicked': '高さを {height} ヤードに固定しました。',
+  'editor.selection.setGround': '地面に合わせる',
+  'editor.selection.setGroundTitle':
+    '選択したアセットを真下の地形に戻し、浮きや持ち上げを解除します',
+  'editor.selection.snapGround': '移動時に地面に合わせる',
+  'editor.materials.title': 'マテリアル',
+  'editor.materials.hint':
+    'このモデルの各パーツのテクスチャを選びます。テクスチャはワールド空間でタイル表示され、モデルのUVは使わず、マップと一緒に保存されます。',
+  'editor.materials.loading':
+    'モデルを読み込み中です。少ししてからもう一度選択するとマテリアルを編集できます。',
+  'editor.materials.original': 'オリジナル',
+  'editor.materials.texture': 'テクスチャ',
+  'editor.materials.tile': 'テクスチャの縮尺（1タイルあたりのヤード）',
+  'editor.materials.reset': '元に戻す',
   'editor.water.title': '水面の高さ',
   'editor.water.level': '水面の高さ',
   'editor.water.hint': 'マップ全体の水面の高さを設定します（{min} から {max} ヤード）。',

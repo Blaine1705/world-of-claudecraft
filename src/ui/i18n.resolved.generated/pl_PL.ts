@@ -11015,6 +11015,16 @@ export const pl_PL: EnTranslations = {
       "autoTexSteep": "Steep ground texture",
       "autoTexNone": "Leave as is"
     },
+    "materials": {
+      "title": "Materials",
+      "hint": "Pick a texture for each part of this model. Textures tile in world space, ignore the model UVs, and save with the map.",
+      "loading": "The model is still loading. Select it again in a moment to edit its materials.",
+      "original": "Original",
+      "texture": "Texture",
+      "tile": "Texture scale (yards per tile)",
+      "color": "Tint",
+      "reset": "Restore original"
+    },
     "flatten": {
       "style": {
         "smooth": "Smooth",
@@ -11034,7 +11044,13 @@ export const pl_PL: EnTranslations = {
       "hint": "Spłaszczanie wyrównuje teren do wysokości pod kursorem w chwili rozpoczęcia przeciągania.",
       "hardEdge": "Twarda krawędź",
       "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke."
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "Level height (yards)",
+      "levelPlaceholder": "Drag start",
+      "levelClear": "Clear",
+      "levelHint": "Every drag levels the ground to this height. Right-click the ground to pick another.",
+      "levelHintNone": "Right-click the ground to lock its height, then drag anywhere to level to it. Empty: each drag levels to where it starts.",
+      "levelPicked": "Level locked at {height} yards."
     },
     "water": {
       "title": "Poziom wody",
@@ -11341,6 +11357,9 @@ export const pl_PL: EnTranslations = {
       "selectAllOfAsset": "Select all of this asset ({count})",
       "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
       "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "Set to ground",
+      "setGroundTitle": "Seat the selected assets back on the terrain under them, removing any float or lift",
+      "snapGround": "Snap to ground when moving",
       "rotation": "Obrót",
       "scale": "Skala",
       "collide": "Blokuje ruch",
