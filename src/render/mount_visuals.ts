@@ -88,6 +88,14 @@ export interface MountRideSpec {
   /** Extra chest pitch ON TOP of the clip, positive = forward. Additive, so
    *  the torso keeps breathing with the seated loop. */
   lean?: number;
+  /** The shin's own outward opening, when it should hang closer to vertical than
+   *  the thigh: a rider astride a broad barrel opens the thighs wide over it and
+   *  lets the shins fall down its flanks. Defaults to `spread`. */
+  shinSpread?: number;
+  /** Take up the reins: the arms reach forward and down so both fists meet low
+   *  over the pommel (characters/ride_pose.ts), instead of the seated loop's
+   *  fists-on-knees. Yields to any attack or cast the rider plays. */
+  reins?: boolean;
 }
 
 /** A seat carried on the mount's own skeleton, for mounts whose saddle MOVES
@@ -335,14 +343,14 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // the rider exactly; a seat bone here would buy sub-millimetre motion and pay
   // a per-frame matrix decompose for it.
   avian_strider: spec('mount_avian_strider', 2.62, true, undefined, 0.2),
-  // Lantern Hall's destrier, at 5.0 (the riding horse is 3.8): its rest height is 1.77 model
+  // Lantern Hall's destrier, at 4.6 (the riding horse is 3.8): its rest height is 1.77 model
   // units and the saddle top 1.227 over the hooves (build_steed.py prints both), so the seat
-  // sits just under 5.0 / 1.77 * 1.227 and a hair over the horse's own forward shift. The rider
-  // straddles a broad barded barrel: legs open wide over the caparison and down past the saddle
-  // skirts, toes toward the stirrups.
+  // sits just under 4.6 / 1.77 * 1.226 and a hair over the horse's own forward shift. The rider
+  // straddles a broad barded barrel: thighs opened wide over it, shins falling down its flanks
+  // past the saddle skirts, toes forward toward the stirrups, both hands on the reins.
   lantern_hall_destrier: spec(
     'mount_lantern_hall_destrier',
-    3.42,
+    3.16,
     true,
     undefined,
     0.12,
@@ -359,7 +367,15 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
         offset: DESTRIER_LANTERN_OFFSET,
         ...DESTRIER_LANTERN_GLOW,
       })),
-      ride: { spread: 0.6, thigh: 0.45, knee: 0.55, ankle: -0.3, hips: -0.05 },
+      ride: {
+        spread: 1.15,
+        thigh: 0.38,
+        knee: 0.45,
+        shinSpread: 0.6,
+        ankle: -0.2,
+        hips: -0.05,
+        reins: true,
+      },
       embers: {
         hooves: [
           'toes_01l_011',

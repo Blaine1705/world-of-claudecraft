@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { tintedMaterial } from '../src/render/characters/assets';
 import { VISUALS } from '../src/render/characters/manifest';
+import { rideLegDirections } from '../src/render/characters/ride_pose';
 import { CharacterVisual } from '../src/render/characters/visual';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import {
@@ -262,30 +263,24 @@ describe('Chimeglass rider straddle', () => {
     visual.setRidePose(ride);
     visual.applyRidePose(0.125);
 
-    expectQuaternion(
-      boneNamed(bones, 'upperlegl').quaternion,
-      [0.8683345493323961, 0.30716195257435025, 0.12986599060280818, 0.3671259590537949],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'upperlegr').quaternion,
-      [0.8683345493323961, -0.30716195257435025, -0.12986599060280818, 0.3671259590537949],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'lowerlegl').quaternion,
-      [0.29552020666133955, 0, 0, 0.955336489125606],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'lowerlegr').quaternion,
-      [0.29552020666133955, 0, 0, 0.955336489125606],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'footl').quaternion,
-      [-0.22310636213174545, 0, 0, 0.9747941070689433],
-    );
-    expectQuaternion(
-      boneNamed(bones, 'footr').quaternion,
-      [-0.22310636213174545, 0, 0, 0.9747941070689433],
-    );
+    // every bone is AIMED (characters/ride_pose.ts): the harness bones hang straight off the
+    // model, so each leg bone's +Y must land on the direction the spec asks of it
+    for (const [name, side] of [
+      ['l', 1],
+      ['r', -1],
+    ] as const) {
+      const thigh = new THREE.Vector3();
+      const shin = new THREE.Vector3();
+      const foot = new THREE.Vector3();
+      rideLegDirections(ride, side, thigh, shin, foot);
+      const t = boneNamed(bones, `upperleg${name}`).quaternion;
+      const s = boneNamed(bones, `lowerleg${name}`).quaternion;
+      const f = boneNamed(bones, `foot${name}`).quaternion;
+      const axis = (q: THREE.Quaternion) => new THREE.Vector3(0, 1, 0).applyQuaternion(q);
+      expect(axis(t).distanceTo(thigh)).toBeLessThan(1e-9);
+      expect(axis(t.clone().multiply(s)).distanceTo(shin)).toBeLessThan(1e-9);
+      expect(axis(t.clone().multiply(s).multiply(f)).distanceTo(foot)).toBeLessThan(1e-9);
+    }
     expect(boneNamed(bones, 'hips').rotation.x).toBeCloseTo(-0.18, 12);
   });
 

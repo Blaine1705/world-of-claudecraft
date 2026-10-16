@@ -308,7 +308,12 @@ def grow(ob, arm):
                 d = Vector((r.x * (k - 1), r.y * (k * 0.96 - 1), 0.0))
             elif mode == 'trunk':
                 down = r.z if r.z < 0 else 0.0
-                d = Vector((r.x * (kl - 1), 0.0, down * (kv - 1)))
+                # the barrel swells below; the top of the back, where the saddle sits and the
+                # rider's thighs close round it, stays near the riding horse's width so a rider
+                # can straddle it with his knees outside the barding
+                top = smoothstep(0.92, 1.12, fu(p)[2])
+                kx = 1 + (kl - 1) * (1 - 0.65 * top)
+                d = Vector((r.x * (kx - 1), 0.0, down * (kv - 1)))
             else:  # round the bone's own axis, wider across than deep
                 ax = (b - a).normalized()
                 rr = r - ax * r.dot(ax)
