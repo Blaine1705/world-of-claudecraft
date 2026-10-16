@@ -2,9 +2,16 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
-import { PerspectiveCamera, Raycaster, Vector3 } from 'three';
+import {
+  CompressedTexture,
+  PerspectiveCamera,
+  Raycaster,
+  RGBA_S3TC_DXT1_Format,
+  Vector3,
+} from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { VERTEX_COLOUR_SCALE } from '../scripts/assets/mirefen_tavern/build.mjs';
 import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
 import {
   activeCameraInterior,
@@ -16,6 +23,7 @@ import {
   buildMirefenTavern,
   MIREFEN_TAVERN_FLAMES,
   MIREFEN_TAVERN_LIGHTS,
+  mirefenTavernFile,
   mirefenTavernInternalsForTest,
   mirefenTavernLights,
   mirefenTavernPrewarmParts,
@@ -108,6 +116,18 @@ function part(name: string) {
   return r;
 }
 
+/**
+ * A stand-in for three's KTX2 loader (Node has no transcoder): every painted map the model
+ * carries (KHR_texture_basisu) arrives as a small compressed texture, named by the loader
+ * after its image, so the painter's handling of the maps is the real one.
+ */
+const stubKtx2Loader = {
+  load(_url: string, onLoad: (texture: THREE.Texture) => void): void {
+    const level = { data: new Uint8Array(8), width: 4, height: 4 };
+    onLoad(new CompressedTexture([level], 4, 4, RGBA_S3TC_DXT1_Format));
+  },
+};
+
 beforeAll(async () => {
   await MeshoptDecoder.ready;
   const bytes = readFileSync(GLB);
@@ -115,8 +135,18 @@ beforeAll(async () => {
     bytes.byteOffset,
     bytes.byteOffset + bytes.byteLength,
   ) as ArrayBuffer;
-  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-  gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
+  // the loader reads an embedded image through `self.URL` (a browser global; Node has URL)
+  const scope = globalThis as { self?: unknown };
+  const hadSelf = 'self' in scope;
+  if (!hadSelf) scope.self = globalThis;
+  const loader = new GLTFLoader()
+    .setMeshoptDecoder(MeshoptDecoder)
+    .setKTX2Loader(stubKtx2Loader as unknown as Parameters<GLTFLoader['setKTX2Loader']>[0]);
+  try {
+    gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
+  } finally {
+    if (!hadSelf) delete scope.self;
+  }
 });
 
 beforeEach(() => setDitherFadeEnabledForTest(false));
@@ -205,6 +235,74 @@ describe('mirefen tavern painter', () => {
     });
     const warmed = new Set(mirefenTavernPrewarmParts().map((p) => p.material));
     for (const m of drawn) expect(warmed.has(m)).toBe(true);
+  });
+
+  it('draws the painted maps over the vertex colours, the UVs on painted faces only', () => {
+    for (const standard of [true, false]) {
+      activateGfxProfile({
+        ...originalProfile,
+        settings: { ...GFX, effectsTier: 'high', standardMaterials: standard },
+      });
+      internals.setLoadedGltfForTest(gltf);
+      const tavern = buildMirefenTavern();
+      const painted = new Set<string>();
+      let plain = 0;
+      tavern.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        // (the chimney smoke and the wall fire are the painter's own, not the model's)
+        if (!mesh.isMesh || /^mirefenTavern(Smoke|WallFire)/.test(mesh.name)) return;
+        const mat = mesh.material as THREE.MeshStandardMaterial;
+        // every surface keeps its vertex colours: the tint and the baked warm light
+        expect(mat.vertexColors, mesh.name).toBe(true);
+        if (!mat.map) {
+          plain++;
+          expect(mesh.geometry.getAttribute('uv'), mesh.name).toBeUndefined();
+          // an untextured surface draws its vertex colours as they are
+          expect(mat.color.r, mesh.name).toBe(1);
+          return;
+        }
+        // the painted town's map (the loader names it after its image), a normal map on the
+        // standard tier only, and the UVs it is laid on
+        expect(mat.map.name, mesh.name).toMatch(/^Tavern[A-Za-z]+_color$/);
+        painted.add(mat.map.name);
+        expect(!!mat.normalMap, mesh.name).toBe(standard && mat.map.name !== 'TavernCloth_color');
+        if (mat.normalMap) {
+          expect(mat.normalMap.name).toBe(mat.map.name.replace('_color', '_normal'));
+          // the loader's normal scale for a mesh without tangents (y flipped), kept
+          expect(mat.normalScale.toArray(), mesh.name).toEqual([1, -1]);
+        }
+        expect(mesh.geometry.getAttribute('uv')?.itemSize, mesh.name).toBe(2);
+        // the vertex colours multiplied back above the headroom the GLB stores them under
+        expect(mat.color.toArray(), mesh.name).toEqual([
+          VERTEX_COLOUR_SCALE,
+          VERTEX_COLOUR_SCALE,
+          VERTEX_COLOUR_SCALE,
+        ]);
+      });
+      expect([...painted].sort(), String(standard)).toEqual([
+        'TavernCloth_color',
+        'TavernDressed_color',
+        'TavernFloor_color',
+        'TavernPlaster_color',
+        'TavernRoof_color',
+        'TavernStone_color',
+        'TavernTimber_color',
+      ]);
+      expect(plain).toBeGreaterThan(0);
+      // the wall fire's logs draw with a plain material (they carry no UVs)
+      const logs = tavern.getObjectByName('mirefenTavernWallFireLogs') as THREE.Mesh | undefined;
+      expect((logs?.material as THREE.MeshStandardMaterial | undefined)?.map ?? null).toBeNull();
+    }
+  });
+
+  it('loads the file of the profile texture tier, the same model with smaller maps', () => {
+    expect(mirefenTavernFile('full')).toBe(internals.assetUrl);
+    expect(mirefenTavernFile('half')).toBe('/models/props/mirefen_tavern.half.glb');
+    expect(mirefenTavernFile('quarter')).toBe('/models/props/mirefen_tavern.quarter.glb');
+    // a build reads whichever file is loaded: its templates are keyed by it
+    internals.setLoadedGltfForTest(gltf, '/models/props/mirefen_tavern.half.glb');
+    expect(internals.loadedFile()).toBe('/models/props/mirefen_tavern.half.glb');
+    expect(buildMirefenTavern().getObjectByName('mirefenTavernModel')).toBeDefined();
   });
 
   it('draws each shell part with its own material clones, never the shared ones', () => {

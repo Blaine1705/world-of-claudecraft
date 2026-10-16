@@ -229,6 +229,8 @@ describe('graphics profile asset preparation', () => {
     expect(mocks.town).toHaveBeenCalledWith(target);
     expect(mocks.fenbridgeTown).toHaveBeenCalledWith(target);
     expect(mocks.highwatchTown).toHaveBeenCalledWith(target);
+    // ...and so does the painted Mirefen tavern (its .half / .quarter texture-tier files)
+    expect(mocks.mirefenTavern).toHaveBeenCalledWith(target);
     for (const prepare of [
       mocks.armoury,
       mocks.mailbox,

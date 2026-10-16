@@ -45,6 +45,12 @@ hammer beams (HALL['truss']): the camera's air stays well under every roof timbe
 Original procedural work for this project. The palette is the tavern's own: honey wood,
 ochre plaster, blue-grey stone at the base and the hearth, a dark green slate roof, river
 stones in the chimney, copper at the hood, and one accent colour, garnet, in the textiles.
+Each palette family wears one of the painted town's hand-painted tiling maps, in the Fenrire
+look the painted Fenbridge buildings wear (tavern_texture.py, textures.json): the plaster the
+limewash, the timber, the boards, the wall stone, the slates, the cloth and the dressed stone,
+the vertex colours left as the tint and the warm light over the paint (stored under a headroom
+the runtime multiplies back, so the light can lift the paint). The metal, the glow and
+whatever no family claims stay untextured.
 """
 import json
 import math
@@ -57,7 +63,7 @@ sys.path.insert(0, os.path.join(HERE, '..', 'eastbrook_ferry'))
 sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
-from shiplib import EDGE, FLAT, P, PLAIN, Piece, empty, scale_color, triangles  # noqa: E402
+from shiplib import EDGE, FLAT, P, PLAIN, empty, scale_color, triangles  # noqa: E402
 from shiplib import G as game_of  # noqa: E402
 
 WOOD, METAL, STONE, PLASTER, GLOW = 0, 1, 2, 3, 4
@@ -122,16 +128,6 @@ PAL = dict(
     tread=[(0.6, 0.58, 0.55), (0.56, 0.55, 0.53), (0.63, 0.6, 0.56), (0.58, 0.56, 0.52)],
     bone=(0.9, 0.86, 0.74),
 )
-
-MATERIAL_SPECS = (
-    # name, roughness, metallic, emission; indexed WOOD, METAL, STONE, PLASTER, GLOW
-    ('TavernWood', 0.8, 0.0, 0.0),
-    ('TavernMetal', 0.45, 0.55, 0.0),
-    ('TavernStone', 0.92, 0.0, 0.0),
-    ('TavernPlaster', 0.95, 0.0, 0.0),
-    ('TavernGlow', 0.5, 0.0, 2.4),
-)
-
 
 def pick(seq, i):
     return seq[int(i) % len(seq)]
@@ -586,25 +582,6 @@ def slate_plane(p, e0, along, up, la, lu, seed=0, step=0.72, seg=4.6, thick=0.09
             j += 1
 
 
-def make_materials():
-    mats = []
-    for name, rough, metal, emission in MATERIAL_SPECS:
-        mat = bpy.data.materials.new(name)
-        mat.use_nodes = True
-        bsdf = mat.node_tree.nodes.get('Principled BSDF')
-        bsdf.inputs['Roughness'].default_value = rough
-        bsdf.inputs['Metallic'].default_value = metal
-        attr = mat.node_tree.nodes.new('ShaderNodeVertexColor')
-        attr.layer_name = 'Col'
-        mat.node_tree.links.new(attr.outputs['Color'], bsdf.inputs['Base Color'])
-        if emission:
-            mat.node_tree.links.new(attr.outputs['Color'], bsdf.inputs['Emission Color'])
-            bsdf.inputs['Emission Strength'].default_value = emission
-        mat.use_backface_culling = True
-        mats.append(mat)
-    return mats
-
-
 # ---------------------------------------------------------------------------
 # Scene
 # ---------------------------------------------------------------------------
@@ -614,6 +591,7 @@ import tavern_grounds as GR  # noqa: E402
 import tavern_frame as F  # noqa: E402
 import tavern_furnish as U  # noqa: E402
 import tavern_shell as S  # noqa: E402
+import tavern_texture as TX  # noqa: E402
 import tavern_weather as WX  # noqa: E402
 
 SHELL = ('HallWallFront', 'HallWallFrontLeft', 'HallWallFrontRight', 'HallWallBack', 'HallWallLeft',
@@ -683,14 +661,21 @@ def _inside(x, y, z):
 def bake_warm_light(parts):
     """Warm the colours of every surface inside the tavern by the light that reaches it from
     the fires, lanterns and candles: brighter and warmer near a flame, a soft golden floor
-    of light everywhere indoors, the far corners left a little dim."""
+    of light everywhere indoors, the far corners left a little dim. On a painted face the
+    colour is already its tint over the map, stored under the headroom (tavern_texture.py), so
+    the light lifts the paint above the map as it lifted the old palette; should a colour still
+    pass 1 it is brought back by its brightest channel, so near a flame it stays warm rather
+    than clamping white. The roofs' covering (its slates, mossy slates and ridge cappers, the
+    painted roof) is all outside and stays out of the bake: the hall's box reaches up under
+    the ridge, so it took the lanterns' warmth through the sarking and wore the grey moss
+    slates brick red."""
     from shiplib import G as game
     sources = _warm_sources()
     for piece in parts.values():
         bm = piece.bm
         bm.normal_update()
         for f in bm.faces:
-            if f.material_index == GLOW or f in SKY_FACES:
+            if f.material_index in (GLOW, TX.ROOF) or f in SKY_FACES:
                 continue
             c = game(f.calc_center_median())
             if not _inside(c.x, c.y, c.z):
@@ -707,9 +692,13 @@ def bake_warm_light(parts):
                 light += k * fall * (0.35 + 0.65 * max(0.0, facing))
             light = min(light, 1.1)
             mult = (0.9 + light * 0.55, 0.85 + light * 0.46, 0.78 + light * 0.34)
+            painted = f.material_index in TX.PAINTED
             for loop in f.loops:
                 r, g, b, a = loop[piece.col]
-                loop[piece.col] = (min(1.0, r * mult[0]), min(1.0, g * mult[1]), min(1.0, b * mult[2]), a)
+                lit = (r * mult[0], g * mult[1], b * mult[2])
+                if painted:
+                    lit = TX.fit(lit)
+                loop[piece.col] = (min(1.0, lit[0]), min(1.0, lit[1]), min(1.0, lit[2]), a)
 
 
 def split_part(parts, src_name, rules):
@@ -763,6 +752,7 @@ def split_part(parts, src_name, rules):
             nf.material_index = f.material_index
             nf[dst.tag] = f[src.tag]
             nf[dst.soft] = f[src.soft]
+            nf[dst.fam] = f[src.fam]
             for la, lb in zip(f.loops, nf.loops):
                 lb[dst.col] = la[src.col]
             if f in closed:
@@ -786,10 +776,13 @@ def encode_for_export(parts):
 
 def build_scene():
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    mats = make_materials()
+    mats = TX.make_materials()
     root = empty('MirefenTavern_ROOT', None, display='ARROWS', size=2.0)
     this = sys.modules[__name__]
-    parts = {name: Piece(name, wear=w, gradient=g) for name, (w, g) in PART_SHADING.items()}
+    # every face is filed under its palette family as it is painted (tavern_texture.py)
+    painter = TX.Painter(this)
+    piece = painter.piece_class()
+    parts = {name: piece(name, wear=w, gradient=g) for name, (w, g) in PART_SHADING.items()}
     F.build(this, parts)
     S.build(this, parts)
     U.build(this, parts)
@@ -801,6 +794,11 @@ def build_scene():
     # only the side between it and the player
     split_part(parts, 'HallWallFront', [('HallWallFrontLeft', lambda c: c.x < -FRONT_SPLIT),
                                          ('HallWallFrontRight', lambda c: c.x > FRONT_SPLIT)])
+    # the painted maps: each face onto its material, its colour a tint, its UVs laid; then the
+    # warm light over the paint
+    faces = painter.paint_faces(parts)
+    for name, n in zip(TX.MATERIALS, faces):
+        print(f'MATERIAL {name} faces {n}')
     bake_warm_light(parts)
     encode_for_export(parts)
     pieces = {}
@@ -840,10 +838,12 @@ def export(path, objs):
     for o in root.children_recursive:
         o.select_set(True)
     bpy.context.view_layer.objects.active = root
+    # the maps are not embedded here: build.mjs embeds them (textures.json) at each texture tier
     bpy.ops.export_scene.gltf(
         filepath=path, export_format='GLB', use_selection=True, export_apply=True, export_yup=True,
         export_extras=True, export_animations=False, export_cameras=False, export_lights=False,
         export_vertex_color='ACTIVE', export_all_vertex_colors=False, export_morph=False,
+        export_texcoords=True, export_image_format='NONE',
     )
     print('WROTE', path)
 
@@ -863,5 +863,7 @@ if __name__ == '__main__':
     if arg('--save'):
         import tavern_scene  # noqa: E402
 
+        # the review scene draws the painted colours at the game's own scale (after the export)
+        TX.show_headroom(objs['mats'])
         tavern_scene.stage(objs, arg('--context'))
         tavern_scene.save(arg('--save'))

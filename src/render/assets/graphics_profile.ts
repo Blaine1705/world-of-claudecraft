@@ -87,7 +87,8 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
       prepareWyrmwatchHarborAssets(),
       prepareWickharborWharfAssets(),
       prepareWickharborHarborAssets(),
-      prepareMirefenTavernAssets(),
+      // the painted tavern follows the target profile's texture tier, like the towns
+      prepareMirefenTavernAssets(target),
     ]).then(() => undefined),
 ];
 

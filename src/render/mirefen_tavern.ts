@@ -12,12 +12,23 @@
 // effects tier (GFX.effectsTier), never the frame-rate governor, and a graphics-profile
 // change rebuilds the props (the resetter below, registered in assets/graphics_profile.ts).
 //
+// Painted like the town's painted buildings: the model wears the painted town's hand-painted
+// tiling maps in the Fenrire look (scripts/assets/mirefen_tavern/textures.json), its vertex
+// colours the tint and the baked warm light over the paint. Like a placed painted building it
+// loads the file of the profile's texture tier (placed_texture_tier_core.ts: the model, or its
+// .half / .quarter twin with every map at half or a quarter of the size, the same geometry),
+// and a profile change loads the target tier's file before the rebuild (the preparer below,
+// registered in assets/graphics_profile.ts) and drops the retired one's cache entry.
+//
 // GPU work: the tavern is built into the props root at world build (props.ts), so the
 // world-entry compile links it with the rest of the props, and its distinct (geometry,
 // material) programs join the props material prewarm (mirefenTavernPrewarmParts), so a
-// tavern first seen after the curtain links nothing in a live frame. The kept parts merge
+// tavern first seen after the curtain links nothing in a live frame; its maps are KTX2 (the
+// entry's texture uploads take them with the scene's, and their transcoded mips are released
+// after upload like every world model's, assets/ktx2_mip_release.ts). The kept parts merge
 // into one mesh per material (the surface family's vertex-coloured standard/lambert,
-// vertex_colour_glb_parts.ts: the harbors' programs); each shell part draws with per-part
+// vertex_colour_glb_parts.ts: the harbors' programs, with the painted maps on the painted
+// materials); each shell part draws with per-part
 // CLONES of those materials (cloneMaterialWithHooks: the same opaque programs), and their
 // transparent twins are asked for through the occluder fade gate before the first fade
 // (prefetchOccluderFadeWithin); a fade that would draw a twin still cold waits for the link
@@ -49,9 +60,10 @@ import {
   tavernToWorld,
 } from '../sim/content/mirefen_tavern';
 import { TAVERN_TERRACE_LIGHTS } from '../sim/content/mirefen_tavern_grounds';
-import { loadGltf } from './assets/loader';
+import { loadGltf, releaseGltf } from './assets/loader';
+import { mediaAssetExists } from './assets/media';
 import { registerDeferredPreload } from './assets/preload';
-import { GFX } from './gfx';
+import { GFX, type GfxSettings } from './gfx';
 import {
   activeCameraInterior,
   interiorCameraRunning,
@@ -87,6 +99,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
 import {
   addToBucket,
   mergeVertexColourBuckets,
@@ -98,24 +111,55 @@ import {
 const TAVERN_URL = '/models/props/mirefen_tavern.glb';
 
 let loaded: GLTF | null = null;
-let loadTask: Promise<void> | null = null;
+/** The file `loaded` was read from: the model, or one of its texture-tier files. */
+let loadedFile: string | null = null;
+/** The file last asked for (a load that lands after a newer ask is dropped, not adopted). */
+let wantedFile: string | null = null;
+const loadTasks = new Map<string, Promise<void>>();
 
-export function prepareMirefenTavernAssets(): Promise<void> {
-  if (loaded) return Promise.resolve();
-  if (loadTask) return loadTask;
-  loadTask = loadGltf(TAVERN_URL)
-    .then((gltf) => {
-      loaded = gltf;
-      loadTask = null;
-    })
-    .catch((err) => {
-      loadTask = null;
-      throw err;
-    });
-  return loadTask;
+/** The file the tavern loads at a texture tier: the model with every painted map at the
+ *  tier's size (placed_texture_tier_core.ts); the geometry is the same in every file. */
+export function mirefenTavernFile(tier: PlacedTextureTier): string {
+  return placedTextureTierPath(TAVERN_URL, tier, mediaAssetExists);
 }
 
-if (typeof window !== 'undefined') registerDeferredPreload(prepareMirefenTavernAssets);
+/**
+ * Load the tavern at a profile's texture tier. `target` is the profile about to be activated:
+ * a rebuild prepares its assets BEFORE the live settings switch, so the tier comes from the
+ * target (the boot preload reads the live profile).
+ */
+export function prepareMirefenTavernAssets(
+  target: Pick<GfxSettings, 'placedTextureTier'> = GFX,
+): Promise<void> {
+  const file = mirefenTavernFile(target.placedTextureTier);
+  wantedFile = file;
+  if (loaded && loadedFile === file) return Promise.resolve();
+  const pending = loadTasks.get(file);
+  if (pending) return pending;
+  const task = loadGltf(file)
+    .then((gltf) => {
+      loadTasks.delete(file);
+      // a newer ask wants another tier: this file is not adopted (unless nothing is loaded)
+      if (loaded && file !== wantedFile) {
+        if (file !== loadedFile) releaseGltf(file);
+        return;
+      }
+      const retired = loadedFile;
+      loaded = gltf;
+      loadedFile = file;
+      // the tier this replaces is no longer wanted: drop its cache entry (the live build's
+      // meshes keep its maps until the next build replaces them)
+      if (retired !== null && retired !== file) releaseGltf(retired);
+    })
+    .catch((err) => {
+      loadTasks.delete(file);
+      throw err;
+    });
+  loadTasks.set(file, task);
+  return task;
+}
+
+if (typeof window !== 'undefined') registerDeferredPreload(() => prepareMirefenTavernAssets());
 
 interface TavernTemplate {
   /** The kept non-shell parts merged into one geometry per material, in the model's frame. */
@@ -127,7 +171,7 @@ interface TavernTemplate {
   dogAt: THREE.Vector3;
 }
 
-/** Templates by `effectsTier|standard`: a preset change converts anew. */
+/** Templates by `file|effectsTier|standard`: a preset or texture-tier change converts anew. */
 const templates = new Map<string, TavernTemplate>();
 const materials = vertexColourMaterialConverter();
 let lastParts: VertexColourPart[] = [];
@@ -200,7 +244,7 @@ function buildTemplate(gltf: GLTF, keep: readonly string[]): TavernTemplate {
 }
 
 function templateFor(): TavernTemplate {
-  const key = `${GFX.effectsTier}|${GFX.standardMaterials ? 's' : 'l'}`;
+  const key = `${loadedFile}|${GFX.effectsTier}|${GFX.standardMaterials ? 's' : 'l'}`;
   let template = templates.get(key);
   if (!template) {
     if (!loaded) throw new Error(`mirefen tavern model was not preloaded: ${TAVERN_URL}`);
@@ -244,11 +288,16 @@ function buildShell(parts: ReadonlyMap<TavernShellPart, readonly VertexColourPar
 }
 
 /** The wall fire over the model's own materials: its plain vertex-coloured one for the logs
- *  and its glow for the embers (none when the model carries no glow). */
+ *  (no map: the logs carry no UVs, and no metal) and its glow for the embers (none when the
+ *  model carries no such pair). */
 function buildTavernWallFire(parts: readonly VertexColourPart[]): TavernWallFireView | null {
   const glows = (p: VertexColourPart) =>
     ((p.material as THREE.MeshLambertMaterial).emissive?.getHex() ?? 0) !== 0;
-  const wood = parts.find((p) => !glows(p));
+  const plain = (p: VertexColourPart) => {
+    const m = p.material as THREE.MeshStandardMaterial;
+    return !m.map && (m.metalness ?? 0) === 0;
+  };
+  const wood = parts.find((p) => !glows(p) && plain(p));
   const glow = parts.find(glows);
   if (!wood || !glow) return null;
   const colour = wood.geometry.getAttribute('color');
@@ -541,8 +590,13 @@ export const mirefenTavernInternalsForTest = {
   dog: (): THREE.Group | null => dogGroup,
   smoke: (): TavernSmokeView | null => smoke,
   /** Hand a parsed GLB to the preload slot (Node tests have no fetch path). */
-  setLoadedGltfForTest(gltf: GLTF | null): void {
+  setLoadedGltfForTest(gltf: GLTF | null, file: string | null = gltf ? TAVERN_URL : null): void {
     loaded = gltf;
+    loadedFile = file;
+    wantedFile = file;
+    loadTasks.clear();
     resetMirefenTavernCaches();
   },
+  /** The file the loaded model was read from. */
+  loadedFile: (): string | null => loadedFile,
 };
