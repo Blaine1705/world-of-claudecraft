@@ -67,7 +67,7 @@ describe('the trophy room painter', () => {
     room.sync(world);
     root.add(guild);
     // the retry cadence: the next attempts wait, then the bind lands
-    for (let i = 0; i < 40; i++) room.sync(world);
+    for (let i = 0; i < 12; i++) room.sync(world);
     expect(parts.G_INT_Trophy_gravewyrm_sanctum.visible).toBe(true);
     expect(parts.G_INT_TrophyGilt_gravewyrm_sanctum.visible).toBe(false);
     expect(parts.G_INT_Trophy_hollow_crypt.visible).toBe(false);

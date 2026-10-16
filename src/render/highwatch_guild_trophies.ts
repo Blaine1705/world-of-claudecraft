@@ -19,7 +19,7 @@ import {
 
 const GUILD_GROUP_NAME = 'highwatchBuilding:highwatch_guild';
 /** Frames between attempts to find the guild's parts while its model is still loading. */
-const BIND_RETRY_FRAMES = 30;
+const BIND_RETRY_FRAMES = 8;
 
 interface BoundParts {
   readonly trophy: THREE.Object3D;
