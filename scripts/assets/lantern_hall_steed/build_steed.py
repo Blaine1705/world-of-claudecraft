@@ -599,9 +599,11 @@ def saddle():
         hit = S.ray(L(0.9, SADDLE_F + 0.02, u), Vector((-1, 0, 0)))
         return (hit[0].x if hit else 0.3) + 0.075
 
+    # The tread sits where the renderer's straddle (mount_visuals.ts, the destrier's `ride`)
+    # puts a rider's foot, measured in game off the seat bone: x 0.29, f 0.1, u 0.92.
     for sgn in (1, -1):
-        top = L(sgn * flank_x(1.0), SADDLE_F + 0.02, 1.05)
-        bot = L(sgn * (flank_x(0.8) + 0.012), SADDLE_F + 0.02, 0.74)
+        top = L(sgn * flank_x(1.1), SADDLE_F + 0.04, 1.1)
+        bot = L(sgn * 0.29, SADDLE_F + 0.06, 0.99)
         tube(p, top, bot, 0.011, 'steed_leather', PAL['leather_dark'], R, sides=4)
         c = bot + Vector((0, 0, -0.035))
         torus(p, c, (0, 1, 0), 0.035, 0.008, 'steed_iron', PAL['iron'], R, seg=12, sides=5)
@@ -610,6 +612,9 @@ def saddle():
 
 
 SADDLE_OB = flush(saddle(), ARM, BODY)
+# where the seat bone stands: on the centre line, at the deepest point of the seat
+SEAT_POINT = L(0, SADDLE_F, max(K.fu(v.co)[2] for v in SADDLE_OB.data.vertices
+                                if abs(K.fu(v.co)[1] - SADDLE_F) < 0.03 and abs(v.co.x) < 0.03))
 
 
 # ---------------------------------------------------------------------------
@@ -635,6 +640,16 @@ def add_lantern_bones():
         b.roll = 0
         b.parent = eb[SPINE1]
         b.use_deform = True
+    # the seat: a bone standing straight up out of the saddle, roll 0, so its frame is the
+    # horse's own (up, forward) at rest. The renderer hangs the rider off it
+    # (MountVisualSpec.seatBone), so he rides the saddle through every bob and pitch of the
+    # gallop instead of sitting at a fixed height the back rises through.
+    b = eb.new('saddle')
+    b.head = SEAT_POINT
+    b.tail = SEAT_POINT + Vector((0, 0, 0.1))
+    b.roll = 0
+    b.parent = eb[SPINE1]
+    b.use_deform = False
     bpy.ops.object.mode_set(mode='OBJECT')
 
 

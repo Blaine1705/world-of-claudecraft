@@ -312,7 +312,12 @@ def grow(ob, arm):
                 # rider's thighs close round it, stays near the riding horse's width so a rider
                 # can straddle it with his knees outside the barding
                 top = smoothstep(0.92, 1.12, fu(p)[2])
-                kx = 1 + (kl - 1) * (1 - 0.65 * top)
+                # and the girth, under the saddle where the rider's legs hang, stays close to
+                # the riding horse's: the heavy chest and quarters carry the destrier's bulk, a
+                # barrel as broad as them would leave no rider's legs room to close round it
+                fg = fu(p)[1]
+                girth = smoothstep(-0.36, -0.2, fg) * (1 - smoothstep(0.2, 0.36, fg))
+                kx = 1 + (kl - 1) * (1 - 0.65 * top) * (1 - 0.8 * girth)
                 d = Vector((r.x * (kx - 1), 0.0, down * (kv - 1)))
             else:  # round the bone's own axis, wider across than deep
                 ax = (b - a).normalized()

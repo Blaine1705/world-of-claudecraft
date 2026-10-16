@@ -72,7 +72,8 @@ describe('mount visual specs cover the sim catalog', () => {
     const expected = {
       lanternback_troll: ['chair', 'lantern_l', 'lantern_r'],
       chimeglass_tortoise: ['lens', 'saddle'],
-      lantern_hall_destrier: ['lantern_l', 'lantern_r'],
+      // the destrier rides its saddle bone through the gallop instead of a fixed lift
+      lantern_hall_destrier: ['lantern_l', 'lantern_r', 'saddle'],
     } as const;
     for (const [key, expectedBones] of Object.entries(expected)) {
       const spec =

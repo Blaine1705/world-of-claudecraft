@@ -360,7 +360,11 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
       offset: DESTRIER_LANTERN_OFFSET,
       ...DESTRIER_LAMP,
     })),
-    null,
+    // The saddle bone (build_steed.py): it stands straight up out of the seat on the spine,
+    // so the rider rides the back through every bob and pitch of the gallop instead of
+    // holding a fixed lift the back rises through. `seat`/`seatFwd` above stay the fallback
+    // and the nameplate anchor; measured in game, the fixed seat sits on this bone's head.
+    { bone: 'saddle', offset: [0, -0.02, 0] },
     {
       glows: DESTRIER_LANTERN_BONES.map((bone) => ({
         bone,
@@ -368,11 +372,11 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
         ...DESTRIER_LANTERN_GLOW,
       })),
       ride: {
-        spread: 1.15,
-        thigh: 0.38,
-        knee: 0.45,
-        shinSpread: 0.6,
-        ankle: -0.2,
+        spread: 0.72,
+        thigh: 0.3,
+        knee: 0.22,
+        shinSpread: 0.38,
+        ankle: 0.2,
         hips: -0.05,
         reins: true,
       },
