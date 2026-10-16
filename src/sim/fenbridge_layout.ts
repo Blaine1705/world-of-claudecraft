@@ -890,16 +890,18 @@ const PRESERVED_PROPS = {
 const MAILBOX_POSITION = { x: 3.2, z: 310.2 } as const;
 
 /**
- * Level pads under the grand buildings (terrain edits the built-in world
- * applies after its other stamps, sim/data.ts). The town stands on the marsh
- * hub's plateau (world.ts: level at the marsh hub height out to seven tenths
- * of the hub radius, eased back into the fen beyond), and the grand buildings
- * reach past its level ground: each one stands on a pad at the plateau's
- * height across its whole reach, a row of stamps along its long axis rather
- * than one circle, so the level ground hugs its walls. Every building first
- * lays a wide, soft apron at that height, before any pad, so the fen eases
- * up to it at a walkable grade; the pads, applied after every apron, then
- * level each reach exactly (the Highwatch recipe, sim/highwatch_layout.ts).
+ * Level pads under the grand buildings (terrain edits the built-in world,
+ * sim/data.ts, and the Studio rebuild map both stamp; no other stamp reaches
+ * the town's ground, so their place in either list moves no height). The town
+ * stands on the marsh hub's plateau (world.ts: level at the marsh hub height
+ * out to seven tenths of the hub radius, eased back into the fen beyond), and
+ * the grand buildings reach past its level ground: each one stands on a pad
+ * at the plateau's height across its whole reach, a row of stamps along its
+ * long axis rather than one circle, so the level ground hugs its walls. Every
+ * building first lays a wide, soft apron at that height, before any pad, so
+ * the fen eases up to it at a walkable grade; the pads, applied after every
+ * apron, then level each reach exactly (the Highwatch recipe,
+ * sim/highwatch_layout.ts).
  */
 const TOWN_GROUND_HEIGHT = 1.2;
 
