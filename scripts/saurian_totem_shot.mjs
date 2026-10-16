@@ -9,9 +9,10 @@
 //
 // Env: SHOT_URL (http://127.0.0.1:5184/), SHOT_PRESET (4; 1 is the low
 // preset), SHOT_W / SHOT_H (1600x900), SHOT_GPU=0 to force SwiftShader,
-// SHOT_PREFIX (default ""), SHOT_DIFFICULTY (normal; the drum shots start the
-// drum with its own trigger on either difficulty), SHOT_DRY=1 to stage and
-// log every beat without taking a picture.
+// SHOT_PREFIX (default ""), SHOT_DIFFICULTY (normal; the drum shots 5 and 6
+// start the drum with its own trigger on either difficulty, the H shots need
+// heroic and start nothing), SHOT_DRY=1 to stage and log every beat without
+// taking a picture.
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -107,6 +108,32 @@ const SHOTS = [
     ],
     pitch: 0.12,
     dist: 8,
+  },
+  // ---- heroic as it plays (run with SHOT_DIFFICULTY=heroic, ids H1 and H2):
+  // no drum trigger, the drum starts with the pull on its own; the player
+  // targets the Saurian, so the alert's drum rule shows; the camera stands
+  // back and up so the howdah's roof, the drummer and the beat's ring fit.
+  {
+    // The drum beating from the pull: a beat landing.
+    id: 'H1_tambor_heroico',
+    steps: [{ frame: { orbit: 2.3, at: 34 }, target: true }, { wait: 1500 }, { untilBeat: 0 }],
+    pitch: 0.04,
+    dist: 12,
+  },
+  {
+    // A broken totem knocks the drummer off his beat (the totem's own
+    // backlash, never the silence trigger).
+    id: 'H2_tambor_heroico_silenciado',
+    steps: [
+      { trigger: 'totem' },
+      { wait: 500 },
+      { frame: { orbit: 2.3, at: 34 }, target: true },
+      { wait: 1200 },
+      { breakTotem: true },
+      { wait: 1600 },
+    ],
+    pitch: 0.04,
+    dist: 12,
   },
 ];
 
@@ -255,7 +282,7 @@ async function main() {
           if (e.dead) continue;
           if (e.templateId === 'great_saurian')
             out.push(
-              `beast feet ${at(e.pos.x, e.pos.y, e.pos.z)} deck ${at(e.pos.x, e.pos.y + 10.5, e.pos.z)}`,
+              `beast feet ${at(e.pos.x, e.pos.y, e.pos.z)} deck ${at(e.pos.x, e.pos.y + 10.5, e.pos.z)} roof ${at(e.pos.x, e.pos.y + 15, e.pos.z)}`,
             );
           if (e.templateId === 'sunbone_sap_totem')
             out.push(`totem ${at(e.pos.x, e.pos.y + 4, e.pos.z)}`);
@@ -334,6 +361,13 @@ async function main() {
           const r = await frame(step.frame, shot);
           if (r !== 'ok') console.log('FRAME', shot.id, r);
         }
+        if (step.target)
+          await page.evaluate(() => {
+            const sim = window.__game.world;
+            for (const e of sim.entities.values())
+              if (e.kind === 'mob' && !e.dead && e.templateId === 'great_saurian')
+                sim.player.targetId = e.id;
+          });
         if (step.breakTotem)
           await page.evaluate(() => {
             const sim = window.__game.world;
