@@ -333,12 +333,14 @@ describe('command schema parity (W0b)', () => {
     expect(dispatchSet.has('unstuck')).toBe(true);
   });
   it('appends courier dispatch as a complete client/server command pair', () => {
-    // The integration adds the dungeon guide answer, then the buddy rename command.
-    expect(COMMAND_NAMES.slice(-4)).toEqual([
+    // The integration adds the dungeon guide answer, then the buddy rename command; the
+    // Mirefen tavern's seat command (sit_seat) follows them.
+    expect(COMMAND_NAMES.slice(-5)).toEqual([
       'courier_dispatch',
       'dungeon_guide_answer',
       'buddy_rename',
       'referralCards',
+      'sit_seat',
     ]);
     expect(sendSet.has('courier_dispatch')).toBe(true);
     expect(dispatchSet.has('courier_dispatch')).toBe(true);
