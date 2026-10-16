@@ -32,8 +32,8 @@ import { HIGHWATCH_BUILDINGS_BY_ID } from '../src/sim/highwatch_layout';
 
 const ROOT = path.join(__dirname, '..');
 const GLB = path.join(ROOT, HIGHWATCH_GUILD_ASSET.target);
-const SHIPPED_SHA256 = '21681ee07e45433b2062afa4bde99d93de97ccc69e3c7acaa0d4fb3975fb4569';
-const SHIPPED_BYTES = 703012;
+const SHIPPED_SHA256 = 'd8e9a421ca4954499620585574e5404c88c7c341c7e2831cc62431aa677017a5';
+const SHIPPED_BYTES = 703344;
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
   GuildShell: 20378,

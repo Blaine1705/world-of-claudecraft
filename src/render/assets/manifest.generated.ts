@@ -1979,7 +1979,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/tidehold/hall.lod.half.glb": "/media/models/tidehold/hall.lod.half.d53a0251dd3d.glb",
   "models/tidehold/hall.parts.glb": "/media/models/tidehold/hall.parts.5b3deaaf8daa.glb",
   "models/tidehold/hall.quarter.glb": "/media/models/tidehold/hall.quarter.24709ed9eace.glb",
-  "models/tidehold/highwatch/guild.glb": "/media/models/tidehold/highwatch/guild.21681ee07e45.glb",
+  "models/tidehold/highwatch/guild.glb": "/media/models/tidehold/highwatch/guild.d8e9a421ca49.glb",
   "models/tidehold/highwatch/hall.glb": "/media/models/tidehold/highwatch/hall.d6291da08ce0.glb",
   "models/tidehold/highwatch/hall.half.glb": "/media/models/tidehold/highwatch/hall.half.ba9d8f368fae.glb",
   "models/tidehold/highwatch/hall.quarter.glb": "/media/models/tidehold/highwatch/hall.quarter.5e4d328c8bcc.glb",

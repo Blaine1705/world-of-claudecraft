@@ -632,8 +632,9 @@ def trophy_room(p, glow, trophies, gilt):
         seed=5)
     for sx in (1, -1):
         bench(p, sx * 4.4, 15.4, 0.6, 3.2, col=PAL['oak'][2])
+    # (in the back corners beside the hearth, clear of the way in through the arch)
     for sx in (1, -1):
-        candelabrum(p, glow, sx * 3.4, H['oz1'] + 1.2, h=2.6)
+        candelabrum(p, glow, sx * 5.4, T['z1'] - TROPHY_HEARTH['depth'] - 0.6, h=2.4)
     for dungeon, slot in TROPHY_SLOTS.items():
         big = dungeon == 'gravewyrm_sanctum'
         w, h, front = plaque(p, slot, big=big)

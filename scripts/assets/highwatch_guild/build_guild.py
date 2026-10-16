@@ -82,7 +82,7 @@ def _sources():
            ((11.1, F + 1.6, -0.9), 0.3, 4.0),                          # the clerk's candle
            ((9.4, F + 2.8, 8.3), 0.45, 6.0),                           # the recruitment candelabrum
            ((0.0, F + 1.0, PL.TROPHY['z1'] - 0.7), 1.0, 11.0),          # the trophy hall's fire
-           ((3.4, F + 2.8, PL.HALL['oz1'] + 1.2), 0.35, 5.0), ((-3.4, F + 2.8, PL.HALL['oz1'] + 1.2), 0.35, 5.0),
+           ((5.4, F + 2.6, PL.TROPHY['z1'] - 1.8), 0.35, 5.0), ((-5.4, F + 2.6, PL.TROPHY['z1'] - 1.8), 0.35, 5.0),
            ((0.0, F + 6.2, -14.2), 0.45, 7.0)]                          # the porch lantern
     for x in (-10.5, 10.5):
         for sz in (1, -1):

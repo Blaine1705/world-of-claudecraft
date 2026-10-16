@@ -21088,7 +21088,9 @@
   #guild-hall-window .gh-tab {
     flex: 1 1 0;
     min-height: 36px;
+    font-family: inherit;
     font-size: 14px;
+    letter-spacing: 0.04em;
     color: var(--gh-muted);
     background: var(--gh-card);
     border: 1px solid var(--gh-edge);
@@ -21197,6 +21199,7 @@
   #guild-hall-window .gh-btn {
     min-width: 96px;
     min-height: 36px;
+    font-family: inherit;
     font-size: 13px;
     color: var(--gh-ink);
     background: var(--gh-sheet-top);
