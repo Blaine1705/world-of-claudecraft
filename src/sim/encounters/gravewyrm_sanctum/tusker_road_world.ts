@@ -11,12 +11,24 @@ import type { TuskerLane } from '../../types';
 import { SANCTUM_DUNGEON } from './ids';
 import { type OutcropSpot, planTrampleLane } from './tusker_road';
 
-/** The origin of the Sanctum instance a world z lies in. */
-export function sanctumOriginAt(z: number): { x: number; z: number } {
+/** The origin of the Sanctum instance a world z lies in. Read-only: the same
+ *  object comes back for every call on that slot (built once per slot), so
+ *  the painters and the HUD that plan the lane every frame allocate nothing. */
+export function sanctumOriginAt(z: number): Readonly<{ x: number; z: number }> {
   const def = DUNGEONS[SANCTUM_DUNGEON];
-  if (!def) return { x: 0, z: 0 };
-  return instanceOrigin(def.index, instanceSlotForZ(z));
+  if (!def) return NO_ORIGIN;
+  const slot = instanceSlotForZ(z);
+  let o = ORIGINS[slot];
+  if (!o) {
+    o = instanceOrigin(def.index, slot);
+    ORIGINS[slot] = o;
+  }
+  return o;
 }
+
+const NO_ORIGIN: Readonly<{ x: number; z: number }> = { x: 0, z: 0 };
+/** The Sanctum's instance origins by slot (fixed for the process). */
+const ORIGINS: { x: number; z: number }[] = [];
 
 /**
  * The Trample lane from a world spot along `yaw`, given the standing outcrops
@@ -52,7 +64,11 @@ export function planTrampleLaneWorld(
   return lane;
 }
 
-/** The reused instance-local spots of planTrampleLaneWorld (client only:
- *  the encounter plans in its own frame and never calls it). */
+/** The reused instance-local spots of planTrampleLaneWorld. Client only:
+ *  the encounter plans in its own frame and never calls it, and it must never
+ *  be called from the sim tick (these are shared by every caller in the
+ *  process). Every call is synchronous and its outcrop list is consumed
+ *  before it returns, so a caller may keep the returned lane (its own `out`)
+ *  but never this module's spots. */
 const POOL: OutcropSpot[] = [];
 const LOCAL: OutcropSpot[] = [];

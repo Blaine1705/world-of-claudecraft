@@ -22,9 +22,25 @@ import {
   TUSKER_STUCK_EXPOSED,
   TUSKER_TRAMPLE,
 } from '../../../sim/encounters/gravewyrm_sanctum/ids';
-import { inTrail, trampleAimLocked } from '../../../sim/encounters/gravewyrm_sanctum/tusker_road';
+import {
+  inTrail,
+  type OutcropSpot,
+  trampleAimLocked,
+} from '../../../sim/encounters/gravewyrm_sanctum/tusker_road';
 import { planTrampleLaneWorld } from '../../../sim/encounters/gravewyrm_sanctum/tusker_road_world';
+import type { TuskerLane } from '../../../sim/types';
 import { formatNumber, t } from '../../i18n';
+
+/** The share Stuck in the Ice adds to the damage it takes, for the lines. */
+function stuckPct(): string {
+  return formatNumber(Math.round(T.stuckVuln * 100), { maximumFractionDigits: 0 });
+}
+
+// Reused every frame of a Trample bar (the view runs each frame): the
+// standing outcrops, their spot pool and the planned lane.
+const STANDING: OutcropSpot[] = [];
+const SPOTS: OutcropSpot[] = [];
+const LANE: TuskerLane = { x: 0, z: 0, yaw: 0, length: 0, reach: 0, outcropId: null };
 
 export type TuskerAlertKind =
   | 'trample-lead'
@@ -138,7 +154,6 @@ export function buildTuskerAlert(
   selfId?: number,
 ): TuskerAlert | null {
   const tusker = scene.tusker && !scene.tusker.dead ? scene.tusker : null;
-  const pct = formatNumber(Math.round(T.stuckVuln * 100), { maximumFractionDigits: 0 });
   // You are the Trample's target and its lane still follows you: lead it
   // into an ice outcrop, then step aside. The bar counts down to the lock.
   // With every outcrop spent there is nothing to lead it into: the plain
@@ -162,12 +177,22 @@ export function buildTuskerAlert(
   // The painted lane: the plan the sim made, from what the client mirrors.
   let baited = false;
   if (tusker?.pos && tusker.castingAbility === TUSKER_TRAMPLE) {
-    const standing: { id: number; x: number; z: number }[] = [];
-    for (const o of scene.outcrops)
-      if (o.templateId === SANCTUM_ICE_OUTCROP && o.pos && o.id !== undefined)
-        standing.push({ id: o.id, x: o.pos.x, z: o.pos.z });
+    const standing = STANDING;
+    standing.length = 0;
+    for (const o of scene.outcrops) {
+      if (o.templateId !== SANCTUM_ICE_OUTCROP || !o.pos || o.id === undefined) continue;
+      let spot = SPOTS[standing.length];
+      if (!spot) {
+        spot = { id: 0, x: 0, z: 0 };
+        SPOTS[standing.length] = spot;
+      }
+      spot.id = o.id;
+      spot.x = o.pos.x;
+      spot.z = o.pos.z;
+      standing.push(spot);
+    }
     const yaw = tusker.facing ?? 0;
-    const lane = planTrampleLaneWorld(tusker.pos.x, tusker.pos.z, yaw, standing);
+    const lane = planTrampleLaneWorld(tusker.pos.x, tusker.pos.z, yaw, standing, LANE);
     if (inStrip(tusker.pos, yaw, lane.reach, T.trampleHalfWidth + EDGE_MARGIN, me))
       return {
         kind: 'trample',
@@ -189,7 +214,7 @@ export function buildTuskerAlert(
   if (stuck)
     return {
       kind: 'stuck',
-      line: t('hudChrome.sanctumAlert.stuckLine', { pct }),
+      line: t('hudChrome.sanctumAlert.stuckLine', { pct: stuckPct() }),
       progress: share(stuck.remaining, stuck.duration),
       seconds: stuck.remaining ?? null,
     };
@@ -208,7 +233,7 @@ export function buildTuskerAlert(
   return {
     kind: 'bait-hint',
     line: t('hudChrome.sanctumAlert.baitHintLine', {
-      pct,
+      pct: stuckPct(),
       seconds: formatNumber(T.stuckSeconds, { maximumFractionDigits: 0 }),
     }),
     progress: 1 - age / TUSKER_HINT_SECONDS,

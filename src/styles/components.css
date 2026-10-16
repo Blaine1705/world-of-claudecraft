@@ -17121,7 +17121,8 @@
     --bar-color: var(--color-hostile);
   }
   @media (prefers-reduced-motion: reduce) {
-    #wildheart-alert {
+    #wildheart-alert,
+    #wildheart-alert[class*="is-"] {
       animation: none;
     }
   }
@@ -17265,7 +17266,9 @@
     animation: bce-throb 0.45s ease-in-out infinite alternate;
   }
   /* You are the Trample's target while its lane still follows you: the ice blue of
-     the lane that ends in an outcrop, throbbing (lead it, then step aside). */
+     the lane that ends in an outcrop, throbbing (lead it, then step aside). The
+     marker over you in the world is gold instead (it must stand off that blue
+     lane); here the panel is off the road, so it names the goal's colour. */
   #sanctum-alert.is-trample-lead {
     border-color: var(--color-debuff-frost);
     animation: bce-throb 0.6s ease-in-out infinite alternate;
@@ -17285,7 +17288,8 @@
     --bar-color: var(--color-friendly);
   }
   @media (prefers-reduced-motion: reduce) {
-    #sanctum-alert {
+    #sanctum-alert,
+    #sanctum-alert[class*="is-"] {
       animation: none;
     }
   }

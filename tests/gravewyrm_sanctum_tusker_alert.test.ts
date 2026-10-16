@@ -359,6 +359,26 @@ describe("the Tusker's alert", () => {
     );
     // Stuck over the lesson.
     expect(kindAt(scan([tusker({ auras: stuckAuras }), ...outcrops()], 100), leg(2))).toBe('stuck');
+    // Stuck over the bait: a stuck beast still wearing a Trample bar, the
+    // player behind the outcrop its lane runs into.
+    expect(kindAt(scan([tusker({ ...trampling, auras: stuckAuras }), ...outcrops()]), BEHIND)).toBe(
+      'stuck',
+    );
+    // The bait over the lesson: a baited lane inside the lesson's window
+    // (the same scene with no bar shows the lesson there).
+    expect(kindAt(scan([tusker(), ...outcrops()], 100), BEHIND, { now: 102 })).toBe('bait-hint');
+    expect(kindAt(scan([tusker(trampling), ...outcrops()], 100), BEHIND, { now: 102 })).toBe(
+      'trample-bait',
+    );
+    // The lead over the fire: the Trample's target standing in a burning trail
+    // while the lane still follows them.
+    const leading = {
+      castingAbility: TUSKER_TRAMPLE,
+      castRemaining: T.trampleCast - 0.05,
+      castTotal: T.trampleCast,
+      castTargetId: 1,
+    };
+    expect(kindAt(scan([tusker(leading), trail, ...outcrops()]), inLane)).toBe('trample-lead');
     // The Tusker's alerts outrank a trash debuff.
     expect(
       kindAt(scan([tusker(trampling), ...outcrops()]), inLane, {

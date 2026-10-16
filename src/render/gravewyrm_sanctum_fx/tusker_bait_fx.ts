@@ -130,7 +130,10 @@ varying float vH;
 #include <fog_pars_fragment>
 ${NOISE_GLSL}
 void main() {
-  vec3 N = normalize(cross(dFdx(vView), dFdy(vView)));
+  // Guarded: an edge-on pixel's derivatives cross to zero, and a NaN normal
+  // would reach the bloom.
+  vec3 fc = cross(dFdx(vView), dFdy(vView));
+  vec3 N = fc * inversesqrt(max(dot(fc, fc), 1e-20));
   vec3 V = normalize(-vView);
   if (dot(N, V) < 0.0) N = -N;
   vec3 L = normalize((viewMatrix * vec4(uKeyDir, 0.0)).xyz);
@@ -279,22 +282,29 @@ float tongues(vec2 p, float w, float off, float seed, out float hot) {
   return body;
 }
 void main() {
+  // The cheap masks first: a pixel the fire has not reached yet, past the
+  // strip's ends, or above the tallest tongue the flames can stand at costs
+  // nothing more (the quad is mostly air above the tongues).
+  float lit = 1.0 - smoothstep(uFront - 0.04, uFront + 0.001, vAlong);
+  float along = vAlong * uLength;
+  float ends = smoothstep(0.0, 1.2, along) * smoothstep(0.0, 1.2, uLength - along);
+  float foot = smoothstep(0.0, 0.04, vUv.y);
+  if (lit * ends * foot < 0.004 || vUv.y > uFlames * 1.15) discard;
   float hotA;
-  float hotB;
+  float hotB = 0.0;
   float a1 = tongues(vUv, 1.45, 0.0, vSeed, hotA);
-  float a2 = tongues(vUv * vec2(1.0, 1.35), 1.05, 0.5, vSeed + 0.37, hotB) * 0.85;
+  // The shorter second row only on the long walls: a cross wall is seen
+  // edge-on or stacked down the lane, where one row reads the same.
+  float a2 = 0.0;
+  if (vRun > 0.5) a2 = tongues(vUv * vec2(1.0, 1.35), 1.05, 0.5, vSeed + 0.37, hotB) * 0.85;
   // A burning bed along the foot that the tongues rise out of, so the row
   // reads as one fire and never as a picket of separate spikes.
   float bed = 1.0 - smoothstep(0.03, 0.1, vUv.y + (bNoise(vec2(vUv.x * 1.3, uTime * 1.1 + vSeed * 7.0)) - 0.5) * 0.06);
   float body = max(max(a1, a2), bed * 0.6);
-  // Root green climbing to violet at the tips; never the pale core.
+  if (body < 0.12) discard;
   // Soul-green at the root and along each tongue's spine, cooling to violet
   // only up where the tall tongues tear.
   float heat = clamp(0.58 + 0.18 * max(hotA, hotB) + 0.05 * body - 0.34 * vUv.y, 0.0, 0.74);
-  float foot = smoothstep(0.0, 0.04, vUv.y);
-  float lit = 1.0 - smoothstep(uFront - 0.04, uFront + 0.001, vAlong);
-  float along = vAlong * uLength;
-  float ends = smoothstep(0.0, 1.2, along) * smoothstep(0.0, 1.2, uLength - along);
   float flick = 0.88 + 0.12 * sin(uTime * 23.0 + vSeed * 61.0);
   // The cross walls add up when seen down the lane: each one dimmer.
   float layer = mix(0.62, 0.9, vRun);
@@ -598,7 +608,10 @@ export class TuskerBaitFx {
       strip.name = 'sanctumSoulfireTrailRiver';
       walls.name = 'sanctumSoulfireTrailWalls';
       strip.renderOrder = floorVfxRenderOrder('encounter', 3);
-      walls.renderOrder = floorVfxRenderOrder('encounter', 9);
+      // Under the coordinator's particle pools (smoke 6, soulfire 7, glow 8):
+      // laid over (normal blending), the walls must never paint over the
+      // flame sprites and embers in front of them.
+      walls.renderOrder = floorVfxRenderOrder('encounter', 5);
       for (const mesh of [strip, walls]) {
         mesh.frustumCulled = false;
         mesh.visible = false;
@@ -1087,10 +1100,10 @@ export class TuskerBaitFx {
       total > 0 ? total : TUSKER_TUNING.trailSeconds,
       this.presence,
     );
-    for (const m of [t.stripMat, t.wallMat]) {
-      m.uniforms.uFront.value = p.front;
-      m.uniforms.uFlames.value = p.flames;
-    }
+    t.stripMat.uniforms.uFront.value = p.front;
+    t.stripMat.uniforms.uFlames.value = p.flames;
+    t.wallMat.uniforms.uFront.value = p.front;
+    t.wallMat.uniforms.uFlames.value = p.flames;
     const length = Math.max(0.5, obj.scale);
     // The edge the sim tests, as an outline: the river is the strip's body.
     this.paint.fill = 0;
