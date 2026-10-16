@@ -46,6 +46,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import {
   buildRealmBuilderMonumentBody,
@@ -111,6 +112,9 @@ const ASSET_INSTANCE_COUNTS = (() => {
 const loadedSources = new Map<string, THREE.Group>();
 const preparedTemplates = new Map<string, TownAssetTemplate>();
 const sourceLoadTasks = new Map<string, Promise<void>>();
+/** The indoor camera's rooms of the live view's walk-in buildings (dropped when the next
+ *  view builds). */
+const cameraInteriors = createPlacedTownInteriors();
 /** The FILE each resident source was read from. A placed building's URL names
  *  the model; the file follows the profile's texture tier (same geometry, see
  *  placed_texture_tier_core.ts), so everything else here stays keyed on the
@@ -1164,6 +1168,8 @@ function buildFromTemplates(
     textureUuid: null,
     materialBindings: 0,
   };
+  // the previous view's rooms go with it: a world without the town keeps no air
+  cameraInteriors.clear();
   if (!builtInWorld) {
     group.userData.drawStats = eastbrookTownDrawStats(group);
     return {
@@ -1189,6 +1195,8 @@ function buildFromTemplates(
       // (eastbrook_placed_building.ts). A reveal root and a roof-hide target
       // like every other building, so the two lists stay index-aligned.
       const placed = buildEastbrookPlacedBuilding(building, kitTemplate.raw, groundAt);
+      // a walk-in one keeps the indoor camera to its rooms (placed_town_interiors.ts)
+      cameraInteriors.add(building, groundAt);
       group.add(placed.group);
       roofHideTargets.push({
         group: placed.group,

@@ -44,8 +44,10 @@ import {
 } from '../src/render/fenbridge_town_visibility_core';
 import { GFX, gfxInternalsForTest } from '../src/render/gfx';
 import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
+import { interiorCameraInternalsForTest } from '../src/render/interior_camera';
 import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { isOccluderGhostMaterial } from '../src/render/occluder_ghost_variant_key';
+import { placedTownCameraInterior } from '../src/render/placed_town_interior_core';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
@@ -1239,6 +1241,49 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(shipped.group.getObjectByName('fenbridgeTownBoardwalkOpaqueInstances')).toBeInstanceOf(
       THREE.InstancedMesh,
     );
+  });
+
+  it('keeps the indoor camera to every walk-in building it stands, and drops the rooms with it', () => {
+    // each walk-in painted building registers its air (placed_town_interiors.ts), stood on the
+    // ground the view stands its building on (a slope, so a wrong anchor reads differently)
+    const ground = (x: number, z: number) => 1.2 + 0.03 * x - 0.02 * z;
+    const rooms = () => interiorCameraInternalsForTest.interiors();
+    const walkIn = FENBRIDGE_LAYOUT.buildings.filter((building) => building.walkIn);
+    expect(walkIn.length).toBeGreaterThan(1);
+    interiorCameraInternalsForTest.reset();
+    try {
+      fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms().map((room) => room.id)).toEqual(
+        walkIn.map((building) => `placed_town:${building.id}`),
+      );
+      for (const [index, building] of walkIn.entries()) {
+        expect(rooms()[index], building.id).toEqual(
+          placedTownCameraInterior(building, ground(building.placement.x, building.placement.z)),
+        );
+      }
+      // a rebuild replaces them, never doubles them
+      fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms()).toHaveLength(walkIn.length);
+      // a document that owns the buildings as placements keeps no town air
+      setActiveWorldContent({
+        ...BUILTIN_WORLD,
+        placements: [],
+        promotedScenery: { authoredTowns: true },
+      });
+      try {
+        fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+        expect(rooms()).toEqual([]);
+      } finally {
+        setActiveWorldContent(null);
+      }
+      // ...nor does a world without the town
+      fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms()).toHaveLength(walkIn.length);
+      fenbridgeTownInternalsForTest.buildFromSources(new Map(), () => 0, false);
+      expect(rooms()).toEqual([]);
+    } finally {
+      interiorCameraInternalsForTest.reset();
+    }
   });
 
   it('omits muster-board overlay evidence when the active-world service is absent', () => {
