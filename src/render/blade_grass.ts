@@ -25,7 +25,15 @@ import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion, insidePavedGrassExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { GFX, sharedUniforms } from './gfx';
+import {
+  MEADOW_MAX_STRETCH,
+  meadowBladeScale,
+  meadowCellGrows,
+  meadowFullness,
+  meadowHeightStretch,
+} from './meadow_fullness_core';
 import { MEADOW_CARPET_FADE_START } from './meadow_tuning';
+import { paletteLabEnabled } from './palette_lab';
 import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { GRASS_WIND_TIME_SCALE } from './tree_sway';
@@ -193,7 +201,9 @@ export function clusterPlacementPad(geo: THREE.BufferGeometry): number {
     const d = x * x + y * y + z * z;
     if (d > maxSq) maxSq = d;
   }
-  return (Math.sqrt(maxSq) + CLUSTER_SWAY_REACH) * CLUSTER_MAX_SCALE;
+  // A palette-lab session may stretch clusters up to MEADOW_MAX_STRETCH.
+  const labReach = paletteLabEnabled() ? MEADOW_MAX_STRETCH : 1;
+  return (Math.sqrt(maxSq) + CLUSTER_SWAY_REACH) * CLUSTER_MAX_SCALE * labReach;
 }
 
 /**
@@ -345,7 +355,7 @@ export function buildBladeGrass(
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
       // higher floor + gain than the tufts: coverage is the carpet's job,
       // the patch structure just modulates it
-      ok = r1 < (0.44 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
+      ok = meadowCellGrows(r1, lush, biomeDensity);
       if (ok) ok = roadDistance(x, z) > 2.4;
       // The maker's painted no-grass discs (sim/grass_clear.ts). They had a
       // spatial index, a document field, an editor brush and a sanitizer, and
@@ -369,10 +379,7 @@ export function buildBladeGrass(
           // clumps, so the meadow reads as one grown surface. A hash-gated
           // size class turns ~10% of cells into taller tufts (x1.5 to x1.8)
           // that punctuate the fine carpet the rest of the cells lay down.
-          const lushHere = 0.5 + lush * 0.6;
-          let s = (0.22 + hash(ci, cj, 3) * 0.34) * lushHere;
-          const rTuft = hash(ci, cj, 4);
-          if (rTuft < 0.1) s *= 1.5 + rTuft * 3.0;
+          const s = meadowBladeScale(hash(ci, cj, 3), hash(ci, cj, 4), lush);
           q.setFromAxisAngle(up, r1 * 12.9);
           // whole-cluster lean, a hashed direction and up to ~12 degrees:
           // neighbouring tufts tip different ways instead of standing in a
@@ -382,7 +389,8 @@ export function buildBladeGrass(
           q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
           // per-cluster height jitter on top of the blade-level length spread
           const hJit = 0.82 + hash(ci, cj, 6) * 0.36;
-          m.compose(v.set(x, h - 0.02, z), q, sv.set(s, s * (0.85 + lush * 0.5) * hJit, s));
+          const sw = s * meadowFullness().width;
+          m.compose(v.set(x, h - 0.02, z), q, sv.set(sw, s * meadowHeightStretch(lush, hJit), sw));
           groundGrassColorAt(x, z, seed, c);
           // slight lift over the raw ground tint: blades catch more sky
           // than the soil they stand on

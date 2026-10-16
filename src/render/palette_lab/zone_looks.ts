@@ -17,7 +17,7 @@
 // yellow-green in the light and teal-green in the shade, and a grade that
 // lifts the blacks a touch toward the shadow tint instead of crushing them.
 
-import type { LookPatch } from './zone_look_core';
+import type { LookPatch, LookRender } from './zone_look_core';
 
 // Recurring water sets.
 const LAGOON = { deep: 0x0b4a78, shallow: 0x2aa6a8, sky: 0x9fd2ee, scatter: 0x22907f };
@@ -143,7 +143,7 @@ const ROSE_SKY = {
   intensity: 1.35,
 };
 
-export const ZONE_LOOKS: Readonly<Record<string, readonly LookPatch[]>> = {
+const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
   // ---------------------------------------------------------------- vale ---
   eastbrook_vale: [
     {
@@ -2226,3 +2226,78 @@ export const ZONE_LOOKS: Readonly<Record<string, readonly LookPatch[]>> = {
     },
   ],
 };
+
+// Beyond colour (zone_look_core.ts LookRender): every curated look takes one
+// of three render families from its mood, so the rim, AO tint, shadow weight,
+// meadow fullness and canopy lift agree with its light. A look that names its
+// own `render` fields overrides its family's.
+//
+// Daylight: a cool sky-coloured rim and blue AO (Genshin and TOTK shade with
+// colour, never black), lighter shadows, a full meadow.
+const DAY_RENDER: Partial<LookRender> = {
+  rim: 0.35,
+  rimPower: 3.2,
+  aoTint: 0x1b2a5a,
+  aoScale: 1.1,
+  shadowStrength: 0.82,
+  meadowCoverage: 0.65,
+  meadowHeight: 1.15,
+  meadowWidth: 1.4,
+  canopyLift: 1.12,
+};
+// Golden and dawn light: a warmer, wider rim against the low sun, violet AO.
+const GOLDEN_RENDER: Partial<LookRender> = {
+  rim: 0.45,
+  rimPower: 2.8,
+  aoTint: 0x2a1c52,
+  aoScale: 1.1,
+  shadowStrength: 0.86,
+  meadowCoverage: 0.55,
+  meadowHeight: 1.1,
+  meadowWidth: 1.3,
+  canopyLift: 1.06,
+};
+// Night, murk and the dark below: a faint rim, deep AO, full shadow weight.
+const MOODY_RENDER: Partial<LookRender> = {
+  rim: 0.3,
+  rimPower: 3.4,
+  aoTint: 0x120c1c,
+  aoScale: 1.2,
+  shadowStrength: 1,
+  meadowCoverage: 0.35,
+  meadowHeight: 1,
+  meadowWidth: 1.15,
+  canopyLift: 0.96,
+};
+
+const MOODY_ZONES = new Set(['nightbloom', 'wraithwood']);
+const MOODY_LOOKS = new Set([
+  'misty-peat',
+  'witchwater',
+  'stormlight',
+  'amethyst-hour',
+  'arena-noir',
+  'ashfall',
+  'starlit-indigo',
+]);
+const GOLDEN_LOOK =
+  /dusk|sunset|sunrise|dawn|golden|gilded|evening|alpenglow|haze|gala|blaze|autumn|cliffs|winter|sulfur|hour|willow-gold|humid|cloudsea|rosewater/;
+
+/** The render family a look falls in (exported for the data test). */
+export function renderFamily(zoneId: string, lookId: string): 'day' | 'golden' | 'moody' {
+  if (MOODY_ZONES.has(zoneId) || MOODY_LOOKS.has(lookId)) return 'moody';
+  if (GOLDEN_LOOK.test(lookId)) return 'golden';
+  return 'day';
+}
+
+const FAMILY_RENDER = { day: DAY_RENDER, golden: GOLDEN_RENDER, moody: MOODY_RENDER } as const;
+
+export const ZONE_LOOKS: Readonly<Record<string, readonly LookPatch[]>> = Object.fromEntries(
+  Object.entries(CURATED).map(([zoneId, looks]) => [
+    zoneId,
+    looks.map((look) => ({
+      ...look,
+      render: { ...FAMILY_RENDER[renderFamily(zoneId, look.id)], ...look.render },
+    })),
+  ]),
+);

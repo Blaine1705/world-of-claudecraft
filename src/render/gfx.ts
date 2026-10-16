@@ -16,6 +16,9 @@ import type { SceneryDetailBands } from './scenery_detail_core';
 // gives characters/preview.ts, characters/portrait.ts and armory_preview.ts
 // the guard, transitively: they reach it via gfx.ts, never call it directly.
 import './final_color_nan_guard';
+// The palette lab's rim-light arm: a module-scope chunk patch like the two
+// above, inert unless the dev-only `?palette=on` flag is set.
+import './palette_lab/lab_lighting';
 import { CANOPY_TAPS_AO_ONLY, CANOPY_TAPS_FULL, CANOPY_TAPS_OFF } from './canopy_detail_tier_core';
 // The opt-in cel-shading look (`?cel=on`): importing installs its light ramp
 // at module scope, for the same reason as the NaN guard above; the material
