@@ -5,7 +5,7 @@
     "name": "Eastbrook Rebuild",
     "description": "The shipped world with the towns of Eastbrook Vale, Fenbridge and Highwatch rebuilt from the Tidehold buildings. Every building is an ordinary placement: select it and move it.",
     "createdAt": 1791882000000,
-    "updatedAt": 1792054800000,
+    "updatedAt": 1792108800000,
     "seed": 20061,
     "parentId": ""
   },
@@ -3452,9 +3452,9 @@
         "title": "Town Marshal",
         "pos": {
           "x": 1.5,
-          "z": -95.5
+          "z": -95.3
         },
-        "facing": -2.1763409903998667,
+        "facing": -1.9787985229559204,
         "color": 12031243,
         "questIds": [
           "q_wolves",
@@ -3500,10 +3500,10 @@
         "name": "Apothecary Lin",
         "title": "Herbalist",
         "pos": {
-          "x": -12.8,
-          "z": -92.6
+          "x": -9.5,
+          "z": -93.2
         },
-        "facing": 3.1416,
+        "facing": 3.141592653589793,
         "color": 8207512,
         "questIds": ["q_spiders"],
         "greeting": "Careful where you step in the northeastern woods, friend."
@@ -3562,7 +3562,7 @@
           "x": -22.3,
           "z": -104.6
         },
-        "facing": 1.3909428270024184,
+        "facing": 1.2672255874712333,
         "color": 2388387,
         "questIds": ["q_murlocs"],
         "greeting": "Blrb-glub... sorry, been listening to those fish-men too long.",
@@ -3587,7 +3587,7 @@
         "title": "Weekly Rewards",
         "pos": {
           "x": 4.6,
-          "z": -101.3
+          "z": -99.75
         },
         "facing": 0,
         "color": 13214247,
@@ -3733,8 +3733,8 @@
         "name": "Farmer Jessica",
         "title": "Allotment Keeper",
         "pos": {
-          "x": -17,
-          "z": -82
+          "x": -15.5,
+          "z": -81.5
         },
         "facing": -1.5707963267948966,
         "color": 11043898,
@@ -13068,14 +13068,14 @@
     },
     {
       "assetId": "tidehold/highwatch/manor",
-      "name": "Highwatch manor",
       "x": 31.5,
       "z": 746,
-      "y": -1.05,
       "rotY": 0,
       "scale": 23.294545454545453,
       "collide": true,
-      "collisionMode": "baked"
+      "collisionMode": "baked",
+      "y": -1.05,
+      "name": "Highwatch manor"
     },
     {
       "assetId": "props/inn",
@@ -39497,6 +39497,21 @@
     },
     {
       "assetId": "props/streetlamp_eastbrook_civic",
+      "x": 5.181669502428349,
+      "z": -78.8603973193559,
+      "rotY": 1.133377535596812,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 0.45,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 297"
+    },
+    {
+      "assetId": "props/streetlamp_eastbrook_civic",
       "x": 3.3717879576019167,
       "z": -52.703396091812266,
       "rotY": -1.8699963681582306,
@@ -39554,6 +39569,36 @@
       "scaleZ": 1,
       "y": 0,
       "name": "Streetlamp 5"
+    },
+    {
+      "assetId": "props/streetlamp_eastbrook_civic",
+      "x": -5.329768054889458,
+      "z": -117.82156593068498,
+      "rotY": -1.6068704064264627,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 0.45,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 298"
+    },
+    {
+      "assetId": "props/streetlamp_eastbrook_civic",
+      "x": 15.245025324165349,
+      "z": -113.31083019319513,
+      "rotY": -1.331394010308239,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 0.45,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 299"
     },
     {
       "assetId": "props/streetlamp_eastbrook_civic",
@@ -39872,9 +39917,9 @@
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 6.817507519750961,
-      "z": 687.2477036265213,
-      "rotY": 2.4530709859435027,
+      "x": 6.054015117322601,
+      "z": 687.3873455881968,
+      "rotY": 2.1420738871721445,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.08,
@@ -39887,9 +39932,9 @@
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 36.83989732691958,
-      "z": 687.2714509483782,
-      "rotY": -0.2646676562806689,
+      "x": 34.66199042907467,
+      "z": 688.0690968290764,
+      "rotY": -0.16486655365574793,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.08,
@@ -39902,9 +39947,9 @@
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 52.96752833158015,
-      "z": 709.3959065511816,
-      "rotY": 2.470050173488176,
+      "x": 52.14941528033816,
+      "z": 708.6800576313449,
+      "rotY": 2.46208372763697,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.08,
@@ -39917,9 +39962,9 @@
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 77.06440320629967,
-      "z": 721.6903916692819,
-      "rotY": -0.698018383476948,
+      "x": 76.2957197081537,
+      "z": 720.9217081711358,
+      "rotY": -0.7422080797594113,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.08,
