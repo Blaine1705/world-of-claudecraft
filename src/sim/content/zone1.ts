@@ -134,7 +134,10 @@ export const SOWFIELD_SEABED_TERRAIN_EDITS: HeightStamp[] = [
 // the vault on the bank's shelf. Applied LAST (array order is application
 // order), after the plat, the quay and the strand; the Studio rebuild map
 // carries the same list. None reaches the quay's working pad or the player
-// start, and none lifts a cell of sea out of the water.
+// start, and none lifts a cell of sea out of the water. A grid, not one disc
+// per building: a disc whose core covers a whole reach spills well past its
+// long sides, and on the World of ClaudeCraft Studio map's sites those discs
+// (the bank's above all) lifted the harbour seabed out of the sea.
 // Copied: the layout's records are frozen, and edit lists are plain data.
 export const EASTBROOK_BUILDING_PAD_TERRAIN_EDITS: HeightStamp[] = EASTBROOK_LAYOUT.pads.map(
   (pad) => ({ ...pad }),
@@ -2246,8 +2249,12 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // entrance, src/sim/hollow_crypt_entrance.ts) and brings its own nave piers,
     // so the ring is bare: it keeps only its terrain pad and clearings.
     { x: 80, z: 78, ringR: 7, columns: 7, bare: true },
-    // The chapel-rise ruin (-5, -60) is gone: the smithy stands on its south
-    // columns (the World of ClaudeCraft Studio map clears it the same way).
+    // The chapel-rise ruin (-5, -60) is gone: the smithy's eaves reach over
+    // its south column. The World of ClaudeCraft Studio map takes down the
+    // same five columns, the statue and the fallen column, and keeps one
+    // broken stump, carried off to (-14.1, -66.9); a ring here draws its
+    // relics with any column it keeps, so the built-in town lets the stump
+    // go with the rest.
   ],
   fences: EASTBROOK_LAYOUT.fences.map((fence) => ({
     id: fence.id,

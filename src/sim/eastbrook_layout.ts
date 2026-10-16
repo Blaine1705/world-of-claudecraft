@@ -1348,8 +1348,9 @@ const FURY_POSITION = { x: 21, z: -83.5 } as const;
 // both the board's body and its posting point so a player posting a notice
 // is never handed his dialogue (tests/noticeboard_interaction.test.ts and
 // the layout suite pin that clearance), facing the square that holds the
-// other combat givers. A step out from the apothecary's shopfront, which
-// took the ground he used to stand on (the Studio rebuild map has him a
+// other combat givers. He keeps the step he took out from the apothecary's
+// shopfront when the first Tidehold layout stood the shop on his old ground
+// (the shop is down on the strand now; the Studio rebuild map has him a
 // hand's width further south, at z -95.5, which is inside the 2.5 yd the
 // givers keep off the civic link road).
 const MARSHAL_POSITION = { x: 1.5, z: -95.3 } as const;
@@ -1469,8 +1470,9 @@ const NOTICEBOARD_FRONT_STANDING_POINT = localToWorld(
 const GRAVEYARD_ANCHOR = { x: 37.5, z: -99.3 } as const;
 
 // The Weekly Vault: a stone hall flush against the bank's harbour-side
-// flank, its door looking the way the bank's does, toward the square. Half a
-// yard off the bank's wall so the two boxes never overlap; it stands on the
+// flank, its door looking the way the bank's does, toward the square. At the
+// Studio map's own spot its box ran 0.34 yd into the bank's wall, so it
+// stands half a yard further out along its own width; it stands on the
 // bank's shelf (EASTBROOK_LAYOUT.pads).
 const WEEKLY_VAULT = { x: -73.73, z: -103.4, rot: Math.PI / 4 } as const;
 
