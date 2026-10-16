@@ -1422,7 +1422,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  '8344eedd154cb24135a721d925b00de585954ba539ad646b50b6fab207735ea2';
+  '40513e6c48fc7d01cfc146a9bdfd5736baf1cd0afd935e6146b894317eae9310';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1466,7 +1466,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  'a5ef6509bad12e4e4e3d6a4f449909a34237cada02257b5a02accb00be1cf575';
+  '0b41d509e319b55d9626a4730bb1d57a7db02bbcb430509750bad08b81c949f9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2865,7 +2865,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
-    ).toBe('70530d5ef75b52f5a196ee6f63b6daced7c73e3b8b2c66dcc6ac8ecc661d7ac4');
+    ).toBe('20ba24191fe4c7168cd66ccb95ab9636cb05664aebd8635647cc854e3bc947ce');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
