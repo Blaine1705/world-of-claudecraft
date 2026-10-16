@@ -357,12 +357,8 @@ def hall_hearth(p, p_trim, glow):
     for k, zz in enumerate((hz0 + 1.2, (hz0 + hz1) / 2, hz1 - 1.2)):
         p.cylinder((xw + 0.5, FLOOR + 0.3, zz - 0.7), (xw + 0.75, FLOOR + 0.32, zz + 0.7), 0.16, tone(PAL['oak_dark'], k),
                    WOOD, sides=6)
-    for k in range(7):
-        zz = hz0 + 0.8 + (hz1 - hz0 - 1.6) * k / 6
-        hgt = 0.45 + 0.3 * ((k * 5) % 3) / 2
-        glow.prism((xw + 0.6 + 0.12 * (k % 2), FLOOR + 0.38, zz), 5, 0.17, 0.01, hgt, PAL['fire'], GLOW, axis=(0, 1, 0))
-        glow.prism((xw + 0.66 + 0.12 * (k % 2), FLOOR + 0.38, zz), 4, 0.08, 0.0, hgt * 0.6, PAL['candle'], GLOW_LANTERN,
-                   axis=(0, 1, 0))
+    # (the fire itself is the campfire's live flame, render/highwatch_guild_lights.ts: the
+    # model keeps the logs and the glowing bed of embers under it)
     flat_face(glow, [(xw + 0.3, FLOOR + 0.16, hz0 + 0.7), (xf - 0.2, FLOOR + 0.16, hz0 + 0.7),
                      (xf - 0.2, FLOOR + 0.16, hz1 - 0.7), (xw + 0.3, FLOOR + 0.16, hz1 - 0.7)], PAL['ember'], GLOW,
               (0, 1, 0))
@@ -449,12 +445,7 @@ def trophy_hall(p, p_roof, p_trim, glow):
     abox(p, th['x0'] - 0.25, th['x1'] + 0.25, th['mantel'] - 0.25, th['mantel'], zf - 0.4, zw, PAL['ashlar_hi'], STONE)
     abox(p_trim, th['x0'] + 0.2, th['x1'] - 0.2, th['mantel'] - 0.42, th['mantel'] - 0.3, zf - 0.02 - LAYER, zf - LAYER,
          PAL['gold'], METAL)
-    for k in range(6):
-        xx = th['x0'] + 0.95 + (th['x1'] - th['x0'] - 1.9) * k / 5
-        hgt = 0.4 + 0.25 * (k % 3) / 2
-        glow.prism((xx, FLOOR + 0.32, zw - 0.6 - 0.1 * (k % 2)), 5, 0.15, 0.01, hgt, PAL['fire'], GLOW, axis=(0, 1, 0))
-        glow.prism((xx, FLOOR + 0.32, zw - 0.66 - 0.1 * (k % 2)), 4, 0.07, 0.0, hgt * 0.6, PAL['candle'], GLOW_LANTERN,
-                   axis=(0, 1, 0))
+    # (its fire is the campfire's live flame too: render/highwatch_guild_lights.ts)
     for xx in (-0.9, 0.9):
         p.cylinder((xx - 0.6, FLOOR + 0.25, zw - 0.55), (xx + 0.6, FLOOR + 0.27, zw - 0.7), 0.14, PAL['oak_dark'], WOOD,
                    sides=6)
