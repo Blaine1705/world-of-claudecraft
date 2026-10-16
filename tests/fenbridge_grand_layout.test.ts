@@ -7,13 +7,17 @@ import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPCS,
 } from '../src/sim/content/world_quest_investigation';
-import { BUILTIN_WORLD, GATHER_NODES } from '../src/sim/data';
+import { BUILTIN_WORLD, GATHER_NODES, setActiveWorldContent } from '../src/sim/data';
 import { isExcludedDecoration, isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
-import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
+import { FENBRIDGE_BUILDINGS_BY_ID, FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
+import { loadPublishedMap, MAP_SEED } from '../src/sim/maps/eastbrook_rebuild.generated';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { distancePointToObb, localToWorld, type Obb2 } from '../src/sim/placed_town_kit';
+import { isResting } from '../src/sim/progression/xp';
 import { GRAVE_COUNT, GRAVE_RADIUS, graveOffset } from '../src/sim/prop_layout';
+import { Sim } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
 import { generateDecorationsInBounds, terrainHeight, terrainSteepnessAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -34,6 +38,8 @@ type Building = (typeof BUILDINGS)[number];
 const PLACED_TARGET_HEIGHT = 2.2;
 /** About five yards: the Highwatch counting house's 4.9 yd door counts. */
 const FIVE_YARD_DOOR = 4.85;
+/** The Mirefen watch quest's ledger clue (content/world_quest_investigation.ts). */
+const LEDGER = 'wq_infiltrator_ledger';
 
 interface BakedBox {
   x: number;
@@ -239,10 +245,7 @@ describe('the grand Fenbridge buildings', () => {
         };
       }),
       ...INVESTIGATION_NPCS.map((npc) => ({ id: npc.id, point: npc.pos, walls: 1.2 })),
-      // the standing orders by the south entrance (the watch ledger keeps the
-      // spot it always had at the chapel's front corner, which this re-lay
-      // left where it stood)
-      ...INVESTIGATION_CLUES.filter((clue) => clue.z < 290).map((clue) => ({
+      ...INVESTIGATION_CLUES.filter((clue) => clue.objectItemId !== LEDGER).map((clue) => ({
         id: clue.objectItemId,
         point: { x: clue.x, z: clue.z },
         walls: 1.5,
@@ -261,8 +264,21 @@ describe('the grand Fenbridge buildings', () => {
     for (const npc of INVESTIGATION_NPCS) {
       expect(isBlocked(SEED, npc.pos.x, npc.pos.z, 0.6), npc.id).toBe(false);
     }
-    for (const clue of INVESTIGATION_CLUES.filter((candidate) => candidate.z < 290)) {
+    for (const clue of INVESTIGATION_CLUES.filter(
+      (candidate) => candidate.objectItemId !== LEDGER,
+    )) {
       expect(isBlocked(SEED, clue.x, clue.z, 0.4), clue.objectItemId).toBe(false);
+    }
+    // The watch ledger is the one clue set against a building: it lies at the
+    // chapel's front corner, as it did before the town stood grand, because
+    // the chapel (its portal already five yards) kept its size and its spot.
+    const ledger = INVESTIGATION_CLUES.find((clue) => clue.objectItemId === LEDGER);
+    if (!ledger) throw new Error('no watch ledger clue');
+    const chapel = FENBRIDGE_BUILDINGS_BY_ID.fenbridge_lantern_chapel;
+    expect(chapel.placement).toMatchObject({ x: -16.2, z: 299.6, scale: 1 });
+    expect(distancePointToObb(ledger, chapel.footprint)).toBe(0);
+    for (const building of BUILDINGS.filter((candidate) => candidate !== chapel)) {
+      expect(distancePointToObb(ledger, building.reach), building.id).toBeGreaterThan(5);
     }
     // ...and every gather node near town keeps clear of the eaves
     for (const node of GATHER_NODES) {
@@ -275,10 +291,21 @@ describe('the grand Fenbridge buildings', () => {
     const edits = BUILTIN_WORLD.terrainEdits ?? [];
     const pads = FENBRIDGE_LAYOUT.pads;
     expect(pads.length).toBeGreaterThan(0);
-    // applied after every other stamp but Highwatch's (that town's own pads
-    // close the list)
-    const before = edits.length - HIGHWATCH_LAYOUT.pads.length;
-    expect(edits.slice(before - pads.length, before)).toEqual([...pads]);
+    // stamped by the built-in world, apron and pad in the layout's order...
+    const start = edits.findIndex((edit) => JSON.stringify(edit) === JSON.stringify(pads[0]));
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(edits.slice(start, start + pads.length)).toEqual([...pads]);
+    // ...and no other stamp of the world reaches the town's ground, so the
+    // pads have the last word there wherever they sit in the list
+    const others = [...edits.slice(0, start), ...edits.slice(start + pads.length)];
+    expect(others.length).toBeGreaterThan(HIGHWATCH_LAYOUT.pads.length);
+    for (const edit of others) {
+      const near = Math.hypot(
+        Math.max(-60 - edit.x, 0, edit.x - 60),
+        Math.max(240 - edit.z, 0, edit.z - 370),
+      );
+      expect(near, `stamp at ${edit.x}, ${edit.z}`).toBeGreaterThanOrEqual(edit.radius);
+    }
     for (const building of BUILDINGS) {
       for (const point of samplesOf(building.reach, 1)) {
         expect(terrainHeight(point.x, point.z, SEED), building.id).toBeCloseTo(1.2, 2);
@@ -328,24 +355,73 @@ describe('the grand Fenbridge buildings', () => {
     expect(lamps.some((lamp) => Math.hypot(lamp.x - 12.944, lamp.z - 317.485) < 1)).toBe(false);
   });
 
-  it('clears the scatter the grand buildings stand on', () => {
+  it('clears the scatter the grand buildings stand on, in the game and in the Studio map', () => {
     // the scatter keeps clear of the hub's ring only, and the apothecary's
     // back corner reaches past it onto a tree
     expect(isExcludedDecoration(20.594, 335.37)).toBe(true);
-    const scatter = generateDecorationsInBounds(SEED, {
-      minX: -60,
-      maxX: 60,
-      minZ: 245,
-      maxZ: 365,
-    });
-    expect(scatter.length).toBeGreaterThan(20);
-    for (const decoration of scatter) {
-      // a crown spreads about 3 yd, a boulder's shoulder 1.5
-      const clearance = decoration.kind === 'rock' ? 1.5 : 3;
-      expect(
-        nearestBox(decoration, REACHES),
-        `${decoration.kind} at ${decoration.x.toFixed(2)}, ${decoration.z.toFixed(2)}`,
-      ).toBeGreaterThan(clearance);
+    const bounds = { minX: -60, maxX: 60, minZ: 245, maxZ: 365 };
+    for (const [name, world, seed] of [
+      ['built-in', null, SEED],
+      ['Studio', loadPublishedMap(), MAP_SEED],
+    ] as const) {
+      setActiveWorldContent(world);
+      try {
+        const scatter = generateDecorationsInBounds(seed, bounds);
+        expect(scatter.length, name).toBeGreaterThan(20);
+        for (const decoration of scatter) {
+          // a crown spreads about 3 yd, a boulder's shoulder 1.5
+          const clearance = decoration.kind === 'rock' ? 1.5 : 3;
+          expect(
+            nearestBox(decoration, REACHES),
+            `${name}: ${decoration.kind} at ${decoration.x.toFixed(2)}, ${decoration.z.toFixed(2)}`,
+          ).toBeGreaterThan(clearance);
+        }
+      } finally {
+        setActiveWorldContent(null);
+      }
     }
+  });
+});
+
+describe('living in the grand Fenbridge', () => {
+  it('rests a traveller inside the grand inn and on its threshold, not out at the stand', () => {
+    const inn = FENBRIDGE_BUILDINGS_BY_ID.fenbridge_crooked_reed_inn;
+    const at = (point: { x: number; z: number }) =>
+      ({
+        inCombat: false,
+        pos: { x: point.x, y: terrainHeight(point.x, point.z, SEED), z: point.z },
+      }) as Entity;
+    const door = inn.sockets.entrance.localPosition;
+    // the far end of the taproom, and the threshold a stride out of the door
+    expect(isResting(at(localToWorld(inn.position, inn.rotation, 10, 0)))).toBe(true);
+    expect(isResting(at(localToWorld(inn.position, inn.rotation, door.x, door.z - 1)))).toBe(true);
+    // the visitor's stand grew with the inn (2.16 yd off the wall), past the
+    // two-yard rest padding every inn keeps, as at the grand Highwatch inn
+    expect(inn.frontClearance).toBeCloseTo(2.16, 9);
+    expect(isResting(at(inn.frontStandingPoint))).toBe(false);
+  });
+
+  it('moves a save from the ground the sealed warden house now stands on to clear ground', () => {
+    // open ground south of the old gatehouse, now inside the grand one's walls
+    const warden = FENBRIDGE_BUILDINGS_BY_ID.fenbridge_warden_gatehouse;
+    const position = { x: warden.placement.x, z: warden.placement.z };
+    expect(distancePointToObb(position, warden.footprint)).toBe(0);
+    expect(isBlocked(SEED, position.x, position.z, 0.5)).toBe(true);
+    const source = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const state = source.serializeCharacter(source.playerId);
+    if (!state) throw new Error('no persisted-position fixture');
+    const loadAt = () => {
+      const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+      const pid = sim.addPlayer('warrior', 'Saved', {
+        state: { ...structuredClone(state), pos: { ...position } },
+      });
+      const player = sim.entities.get(pid);
+      if (!player) throw new Error('the saved player did not load');
+      return { x: player.pos.x, z: player.pos.z };
+    };
+    const first = loadAt();
+    expect(first).not.toEqual(position);
+    expect(loadAt()).toEqual(first);
+    expect(isBlocked(SEED, first.x, first.z, 0.5)).toBe(false);
   });
 });

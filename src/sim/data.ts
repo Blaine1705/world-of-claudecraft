@@ -1061,6 +1061,11 @@ export const BUILTIN_WORLD: WorldContent = {
   blockers: [...JAIL_BLOCKERS],
   terrainEdits: [
     ...JAIL_TERRAIN_EDITS,
+    // Fenbridge's grand painted buildings reach past the marsh hub's plateau:
+    // each stands on a level pad at its height, eased out by a soft apron
+    // (sim/fenbridge_layout.ts pads). No other stamp reaches that ground, so
+    // their place in this list moves no height. Copied, as Highwatch's are.
+    ...FENBRIDGE_LAYOUT.pads.map((pad) => ({ ...pad })),
     ...COPPER_DIG_TERRAIN_EDITS,
     ...TOWN_PLAT_TERRAIN_EDITS,
     ...SOWFIELD_BEACH_TERRAIN_EDITS,
@@ -1070,10 +1075,6 @@ export const BUILTIN_WORLD: WorldContent = {
     ...FORGEFATHER_ISLE_TERRAIN_EDITS,
     // last, as the Studio rebuild map applies them: over the plat and the strand
     ...EASTBROOK_BUILDING_PAD_TERRAIN_EDITS,
-    // Fenbridge's grand painted buildings reach past the marsh hub's plateau:
-    // each stands on a level pad at its height, eased out by a soft apron
-    // (sim/fenbridge_layout.ts pads). Copied, as Highwatch's below are.
-    ...FENBRIDGE_LAYOUT.pads.map((pad) => ({ ...pad })),
     // Highwatch's painted buildings stand on level pads cut into the shelf's
     // rim, eased out by wide aprons (sim/highwatch_layout.ts pads); no other
     // stamp touches that ground. The calm skirts round nearby anchors are sized

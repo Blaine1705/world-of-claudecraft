@@ -398,7 +398,7 @@ const WARDEN_HOUSE = makePlacedTownBuilding(
     assetId: `${PAINTED_SET}/house_a.glb`,
     kind: 'house',
     // at the south entrance, west of the main street: the first door in town,
-    // its stoop beside the west muster order
+    // its stoop beside the muster order on this side of the causeway
     anchor: { x: 11.6, z: 274.6 },
     rotation: EAST_FACING,
     ...scalePlacedTownMeasurements(

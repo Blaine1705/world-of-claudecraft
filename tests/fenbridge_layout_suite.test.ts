@@ -310,8 +310,10 @@ describe('Fenbridge canonical pure layout', () => {
     // the four stretches the ring line is clear for the largest body, and a
     // body walks straight across it, out of town and back in, with nothing
     // to stop it or slide it. Two stretches now carry a grand building over
-    // the line (the apothecary on the north-west, the bank on the north-east),
-    // so a body walks round their back ends instead; the other two stay open.
+    // the line (the apothecary on the north-west, the bank on the north-east):
+    // there the walls stand across it, and the traversal suite below walks to
+    // the doors and the tannery yard past their back ends; the other two
+    // stretches stay open.
     const sorted = [...FENBRIDGE_LAYOUT.wall.gates].sort((left, right) => left.angle - right.angle);
     const at = (angle: number, distance: number) => ({
       x: center.x + Math.cos(angle) * distance,

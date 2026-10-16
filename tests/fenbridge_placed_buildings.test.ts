@@ -595,6 +595,7 @@ const REBUILD_MAP = JSON.parse(
     npcs: Record<string, { pos: { x: number; z: number }; facing?: number }>;
     roads: { x: number; z: number }[][];
   };
+  terrainEdits: Record<string, unknown>[];
 };
 
 /** The kit buildings the rebuild retired (their models stay shipped for Studio). */
@@ -682,6 +683,28 @@ describe('Fenbridge in Studio', () => {
     const gameStreets = BUILTIN_WORLD.roads.filter(touchesTown);
     expect(gameStreets.length).toBeGreaterThan(0);
     expect(REBUILD_MAP.content.roads.filter(touchesTown)).toEqual(gameStreets);
+  });
+
+  it('levels the Studio map ground under the grand buildings with the pads the game stamps', () => {
+    // every pad, in the layout's own order, where the built-in world stamps
+    // them: straight after the moderation cage's
+    const pads = FENBRIDGE_LAYOUT.pads;
+    expect(pads.length).toBeGreaterThan(0);
+    const at = pads.map((pad) =>
+      REBUILD_MAP.terrainEdits.findIndex(
+        (edit) =>
+          edit.x === pad.x &&
+          edit.z === pad.z &&
+          edit.radius === pad.radius &&
+          edit.delta === pad.delta &&
+          edit.hardness === pad.hardness &&
+          edit.falloff === pad.falloff &&
+          edit.mode === pad.mode,
+      ),
+    );
+    expect(at).toEqual(pads.map((_, index) => index + 1));
+    const builtIn = BUILTIN_WORLD.terrainEdits ?? [];
+    expect(builtIn.slice(1, 1 + pads.length)).toEqual([...pads]);
   });
 
   it('hands the game copy of the Studio map current town records, so its record walls stand down', () => {
