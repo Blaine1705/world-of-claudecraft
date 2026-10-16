@@ -36,7 +36,11 @@ export function planTrampleLaneWorld(
   const local = LOCAL;
   local.length = outcrops.length;
   for (let i = 0; i < outcrops.length; i++) {
-    const spot = (POOL[i] ??= { id: 0, x: 0, z: 0 });
+    let spot = POOL[i];
+    if (!spot) {
+      spot = { id: 0, x: 0, z: 0 };
+      POOL[i] = spot;
+    }
     spot.id = outcrops[i].id;
     spot.x = outcrops[i].x - o.x;
     spot.z = outcrops[i].z - o.z;
