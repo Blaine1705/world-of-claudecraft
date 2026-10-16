@@ -153,6 +153,22 @@ export function isLoadableItemProvenance(value: unknown): value is ItemProvenanc
   return true;
 }
 
+/** The history another player sees (a trade partner, a guild member, a
+ *  market buyer, an inspector): the path the copy took, by name and date,
+ *  so anyone weighing the item can read where it has been. Character ids and
+ *  the parent copy's guid stay with the holder and the operators; the copy's
+ *  own guid never rides beside it. A fresh deep copy, never an alias. */
+export function publicProvenanceView(src: ItemProvenance): ItemProvenance {
+  return {
+    at: src.at,
+    by: src.by,
+    source: src.source,
+    ...(src.zone !== undefined && { zone: src.zone }),
+    ...(Array.isArray(src.owners) && { owners: src.owners.map((o) => ({ at: o.at, by: o.by })) }),
+    ...(src.transfers !== undefined && { transfers: src.transfers }),
+  };
+}
+
 /** Deep copy: the owner chain is a mutable array on a mutable record, so a
  *  shallow spread would alias it between a live payload and its saved or
  *  loaded twin (the cloneItemInstancePayload doctrine, types.ts). Total over
