@@ -10,6 +10,7 @@ import { courierStrings } from './courier';
 
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 import { cosmeticsStrings } from './cosmetics';
+import { guildHallStrings } from './guild_hall';
 import { professionTrainerStrings } from './profession_trainers';
 import { weeklyRewardStrings } from './weekly_rewards';
 
@@ -60,6 +61,7 @@ export const hudChromeStrings = {
   },
   professionTrainers: professionTrainerStrings,
   weeklyRewards: weeklyRewardStrings,
+  guildHall: guildHallStrings,
   // The scheduled ferries (Eastbrook to Moonrest, Wickharbor to Wyrmwatch;
   // src/ui/hud/transport/):
   // the timetable panel near the docked ship and the sailing line aboard.

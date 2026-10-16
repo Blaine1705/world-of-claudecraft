@@ -645,6 +645,50 @@ export const zh_CN: EnTranslations = {
         "pvp": "战争装备"
       }
     },
+    "guildHall": {
+      "title": "Lantern Hall",
+      "close": "Close the guild window",
+      "tabs": {
+        "contracts": "Contracts",
+        "quartermaster": "Quartermaster"
+      },
+      "seals": "Lantern Seals: {count}",
+      "sealsLabel": "Lantern Seals",
+      "resetIn": "New contracts in {time}",
+      "resetSoon": "New contracts at the next weekly reset",
+      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.",
+      "kinds": {
+        "boss": "Bounty",
+        "heroic": "Heroic Clear",
+        "task": "Execution"
+      },
+      "goals": {
+        "boss": "Defeat {boss} in {dungeon}, on either difficulty.",
+        "heroic": "Clear {dungeon} on Heroic: defeat {boss} on Heroic difficulty.",
+        "task": "{task} ({dungeon})"
+      },
+      "reward": "{count} Lantern Seals",
+      "rewardOne": "{count} Lantern Seal",
+      "done": "Completed this week",
+      "open": "Open",
+      "lifetime": "Contracts completed: {count}",
+      "emptyBoard": "The board is being rewritten. Come back after the weekly reset.",
+      "quartermasterIntro": "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds. Nothing here makes you stronger.",
+      "titleOffer": "Title: {title}",
+      "titlePreview": "Shown as {preview}",
+      "price": "{count} Lantern Seals",
+      "buy": "Buy",
+      "owned": "Owned",
+      "needSeals": "Needs {count} more",
+      "bought": "You bought the title {title}. Choose it in the Book of Deeds.",
+      "refused": {
+        "owned": "You already own that.",
+        "seals": "You do not have enough Lantern Seals.",
+        "range": "Stand at the quartermaster to trade."
+      },
+      "contractDone": "Contract complete: {contract}. You receive {count} Lantern Seals.",
+      "contractDoneOne": "Contract complete: {contract}. You receive {count} Lantern Seal."
+    },
     "ferry": {
       "regionLabel": "渡船时刻表",
       "departsIn": "前往{dest}的渡船将在{time}后起航",

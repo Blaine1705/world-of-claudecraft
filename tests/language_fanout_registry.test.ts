@@ -136,6 +136,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.syncDailyRewardsSurfaceLabels|',
   'this.wocMarketWindow.relocalize|',
   'this.weeklyQuestsWindow.relocalize|',
+  'this.guildHallWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
   // The dungeon objectives tracker: its text gate is the view core's `rev`
@@ -545,6 +546,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig'],
     answer: 'this.weeklyQuestsWindow.relocalize',
     why: 'the held pick, the reset instant, the dialog and the standing map digest into lastSig, none of them text; relocalize() self-gates on the open sheet, clears the latch and rebuilds once, and render() re-latches the signature in the current language',
+  },
+  {
+    file: 'hud/guild_hall/guild_hall_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.guildHallWindow.relocalize',
+    why: "the week's board and progress, the seal count, the titles owned, the reset instant and the tab digest into lastSig, none of them text; relocalize() self-gates on the open sheet, clears the latch and rebuilds once, and render() re-latches the signature in the current language",
   },
   {
     file: 'woc_market_window.ts',

@@ -1460,6 +1460,19 @@
       var(--unit-frame-bar-gap) +
       70px
     );
+    /* Lantern Hall's guild window (src/ui/hud/guild_hall/): the Highwatch slate blue under
+       lamplit amber and gilt, named here so the sheet holds no raw literal. */
+    --gh-sheet-top: #1b2640;
+    --gh-sheet-bottom: #0c1222;
+    --gh-card: #15203a;
+    --gh-card-done: #1a2d22;
+    --gh-edge: #9a7432;
+    --gh-amber: #f0b45a;
+    --gh-amber-glow: #f0b45a33;
+    --gh-ink: #d9dfee;
+    --gh-muted: #96a2c0;
+    --gh-done-text: #8fdc7a;
+    --gh-shadow: #000b;
     /* The weekly emissary window (src/ui/weekly_quests_window.ts): its own
        violet-and-gilt palette, named here so the sheet holds no raw literal. */
     --wk-black: #000;

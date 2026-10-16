@@ -485,6 +485,7 @@ import { DungeonTrackerPainter } from './hud/dungeon/dungeon_tracker_painter';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
+import { GuildHallWindow } from './hud/guild_hall';
 import { buildHillBarView, HillBar } from './hud/hill';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
@@ -954,7 +955,8 @@ import { visibleVendorStock } from './vendor_stock_gate_core';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
 import { requestWalletVerify } from './wallet_verify_request';
-import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
+import { weaponProcEffectText } from './weapon_proc_text';
+import { weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
 import { WeeklyQuestsWindow } from './weekly_quests_window';
 import { promptWikiVisit } from './wiki_link';
@@ -3638,6 +3640,9 @@ export class Hud {
       case 'weekly-quests-window':
         this.weeklyQuestsWindow.close();
         break;
+      case 'guild-hall-window':
+        this.guildHallWindow.close();
+        break;
       case 'calendar-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.calendarWindow.close();
@@ -5564,6 +5569,13 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#weekly-quests-window'),
     ...this.windowFocus('#weekly-quests-window'),
   });
+  // Lantern Hall's guild window (hud/guild_hall/): the contracts and the quartermaster.
+  private readonly guildHallWindow = new GuildHallWindow({
+    root: () => $('#guild-hall-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#guild-hall-window'),
+    ...this.windowFocus('#guild-hall-window'),
+  });
   // Ashen Coliseum window painter (arena_window_view.ts offline/live model +
   // arena_window.ts painter). It owns the selected bracket, the all-time-ladder
   // cache + fetch throttle, the render-skip signature, and focus-return; Hud
@@ -6689,7 +6701,7 @@ export class Hud {
     if (!lines.length) return '';
     let html = '';
     for (const line of lines) {
-      const effect = line.effects.map((e) => this.procEffectText(e)).join(' ');
+      const effect = line.effects.map((e) => weaponProcEffectText(e)).join(' ');
       const triggerKey =
         // onMeleeHit is the legacy key id; its English reads the generic "Chance on
         // hit", correct for a weaponHit proc that fires on melee AND hunter ranged.
@@ -6706,38 +6718,6 @@ export class Hud {
       )}</div>`;
     }
     return html;
-  }
-
-  // One effect fragment (chain arc / attack slow / dot / hot) as localized text.
-  private procEffectText(e: WeaponProcEffectDesc): string {
-    const n = (v: number | undefined): string => formatNumber(v ?? 0, { maximumFractionDigits: 0 });
-    switch (e.kind) {
-      case 'chainArc':
-        return t('hudChrome.itemProc.chainArc', {
-          school: e.school ?? '',
-          name: e.name ?? '',
-          damage: n(e.damage),
-          jumps: n(e.jumps),
-        });
-      case 'attackSlow':
-        return t('hudChrome.itemProc.attackSlow', {
-          pct: n(e.slowPct),
-          duration: n(e.duration),
-        });
-      case 'dot':
-        return t('hudChrome.itemProc.dot', {
-          name: e.name ?? '',
-          school: e.school ?? '',
-          total: n(e.total),
-          duration: n(e.duration),
-        });
-      case 'hot':
-        return t('hudChrome.itemProc.hot', {
-          name: e.name ?? '',
-          total: n(e.total),
-          duration: n(e.duration),
-        });
-    }
   }
 
   // How many equipped pieces belong to the given set (read from IWorld.equipment
@@ -6902,6 +6882,7 @@ export class Hud {
     this.syncDailyRewardsSurfaceLabels();
     this.wocMarketWindow.relocalize();
     this.weeklyQuestsWindow.relocalize();
+    this.guildHallWindow.relocalize();
     // Self-gated on its own open check (root src/ui/CLAUDE.md); refreshes the
     // root accessible name and row labels, preserving the uncommitted draft
     // and exact focus (Intentional Gathering PR3).
@@ -9635,6 +9616,7 @@ export class Hud {
     if (slowHud) this.trackerStackAnchor.apply();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud && this.weeklyQuestsWindow.isOpen) this.weeklyQuestsWindow.refreshIfChanged();
+    if (slowHud && this.guildHallWindow.isOpen) this.guildHallWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
   }

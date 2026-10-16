@@ -21054,6 +21054,174 @@
     filter: brightness(1.08);
   }
 
+  /* ---------- lantern hall guild window ---------- */
+  /* Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts): two tabs (the week's
+     three contract cards, the quartermaster's title rows) over the Highwatch slate blue. A
+     flex column under the base window shell; the card grid collapses to one column on a
+     narrow viewport (the container query below). */
+  #guild-hall-window {
+    width: min(980px, calc(100vw - 32px));
+    max-height: calc(var(--app-vh, 100vh) * 0.9 - 16px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden auto;
+    min-height: 0;
+    container-type: inline-size;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, var(--gh-amber-glow), transparent 60%),
+      linear-gradient(180deg, var(--gh-sheet-top), var(--gh-sheet-bottom));
+    border-color: var(--gh-edge);
+    color: var(--gh-ink);
+    padding: clamp(10px, 1.6cqw, 22px) clamp(12px, 2cqw, 26px);
+  }
+  #guild-hall-window .gh-title span:first-child {
+    font-size: clamp(18px, 3cqw, 30px);
+    letter-spacing: 0.03em;
+    color: var(--gh-amber);
+    text-shadow: 0 1px 0 var(--gh-shadow);
+  }
+  #guild-hall-window .gh-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  #guild-hall-window .gh-tab {
+    flex: 1 1 0;
+    min-height: 36px;
+    font-size: 14px;
+    color: var(--gh-muted);
+    background: var(--gh-card);
+    border: 1px solid var(--gh-edge);
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-tab-on {
+    color: var(--gh-amber);
+    box-shadow: inset 0 -2px 0 var(--gh-amber);
+  }
+  #guild-hall-window .gh-sub {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 16px;
+    font-size: 14px;
+  }
+  #guild-hall-window .gh-seals {
+    color: var(--gh-amber);
+    font-weight: 600;
+  }
+  #guild-hall-window .gh-reset,
+  #guild-hall-window .gh-intro,
+  #guild-hall-window .gh-foot,
+  #guild-hall-window .gh-empty,
+  #guild-hall-window .gh-offer-preview {
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-intro {
+    font-size: 13px;
+    line-height: 1.45;
+    margin: 8px 0 12px;
+  }
+  #guild-hall-window .gh-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  #guild-hall-window .gh-card {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    gap: 6px;
+    min-width: 0;
+    padding: 12px;
+    background: var(--gh-card);
+    border: 1px solid var(--gh-edge);
+    box-shadow: 0 8px 18px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-card-done {
+    background: var(--gh-card-done);
+  }
+  #guild-hall-window .gh-kind {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-dungeon {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  #guild-hall-window .gh-goal {
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0;
+  }
+  #guild-hall-window .gh-reward {
+    font-size: 13px;
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-state {
+    font-size: 12px;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-card-done .gh-state {
+    color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-foot {
+    margin-top: 10px;
+    font-size: 13px;
+    text-align: center;
+  }
+  #guild-hall-window .gh-offers {
+    display: grid;
+    gap: 8px;
+  }
+  #guild-hall-window .gh-offer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--gh-card);
+    border: 1px solid var(--gh-edge);
+  }
+  #guild-hall-window .gh-offer-title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  #guild-hall-window .gh-offer-preview {
+    font-size: 12px;
+  }
+  #guild-hall-window .gh-offer-price {
+    font-size: 13px;
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-btn {
+    min-width: 96px;
+    min-height: 36px;
+    font-size: 13px;
+    color: var(--gh-ink);
+    background: var(--gh-sheet-top);
+    border: 1px solid var(--gh-edge);
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-btn:disabled {
+    color: var(--gh-muted);
+    cursor: default;
+  }
+  #guild-hall-window .gh-offer-owned .gh-btn {
+    color: var(--gh-done-text);
+  }
+  @container (max-width: 640px) {
+    #guild-hall-window .gh-cards {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    #guild-hall-window .gh-offer {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    #guild-hall-window .gh-offer-price {
+      grid-column: 1;
+    }
+  }
+
   /* ---------- event calendar ---------- */
   /* The weekly emissary's window (weekly_quests_window.ts): four offer cards
      over the town's violet-and-gold ledger chrome, plus the inner confirm

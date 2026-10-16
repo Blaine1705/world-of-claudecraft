@@ -1359,6 +1359,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the weekly emissary window (charge progress and the reset clock, minute-granular)',
   },
   {
+    call: 'this.guildHallWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.guildHallWindow.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'hud/guild_hall/guild_hall_window.ts', proof: SIG_RETURN },
+    why: "Lantern Hall's guild window (the week's contracts, the seals, the titles owned and the reset clock, minute-granular)",
+  },
+  {
     call: 'this.wocMarketWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.wocMarketWindow.isOpen',
@@ -1922,7 +1930,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 52, 99.
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
-    ).toEqual({ window: 53, chrome: 100, none: 18 });
+      // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
+    ).toEqual({ window: 54, chrome: 100, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1946,7 +1955,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // this one: it gained a corpseSig latch when the popup started
       // refreshing instead of only closing.
       // The courier window owns both revision and content signature guards.
-      module: 30,
+      // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
+      module: 31,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -2034,6 +2044,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
         'weekly_quests_window.ts: if (sig === this.lastSig) return;',
+        'hud/guild_hall/guild_hall_window.ts: if (sig === this.lastSig) return;',
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
       ].sort(),
     );
