@@ -173,6 +173,7 @@ import {
 import {
   addCharacterEffectAura,
   CHARACTER_EFFECT_RECKLESSNESS,
+  CHARACTER_EFFECT_SEASONAL_FUMES,
   CHARACTER_EFFECT_SOUL_REND,
   hasCharacterEffect,
 } from './character_effects_core';
@@ -236,6 +237,7 @@ import {
 } from './characters/form_visual_selection_core';
 import { visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
+import { effectiveHelmHidden } from './characters/seasonal_head_core';
 import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
@@ -775,6 +777,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
+import { SeasonalDecor } from './seasonal_decor';
 import { applySeatAnim } from './seated_pose';
 import { drapeRingLocalY, reticleShownUnder, selectionRingScale } from './selection_ring';
 import {
@@ -884,6 +887,7 @@ import {
 } from './view_create_budget_core';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { createViewVfxPoseFill } from './view_vfx_pose';
+import { measureCanvasViewport } from './viewport_measure';
 import {
   routeWarlockMeteorSpellfxAt,
   WarlockMeteorFx,
@@ -1722,6 +1726,7 @@ export class Renderer {
   private amberFeatures: AmberFeaturesView | null = null;
   private nightFeatures: NightFeaturesView | null = null;
   private streetlamps: StreetlampsView | null = null;
+  private seasonalDecor: SeasonalDecor | null = null; // seasonal_decor.ts (event-gated)
   private emberPools: EmberPoolsView | null = null;
   private campBraziers: CampBraziersView | null = null;
   private decorTorchFx: DecorTorchFxView | null = null;
@@ -2834,6 +2839,8 @@ export class Renderer {
     // in submits draws; its point lights join the shared fire-light budget.
     this.streetlamps = buildStreetlamps(this.sim.cfg.seed);
     this.attachZoneFeature(this.streetlamps);
+    const seasonalEvent = () => this.sim.activeSeasonalEvent; // built on the event's first open
+    this.seasonalDecor = new SeasonalDecor(this.scene, this.sim.cfg.seed, seasonalEvent, this.worldCompileGate());
     // Warm ground pools under nearby characters after dark. Camera-band sized
     // and rewritten every frame from the entity loop, so it is NOT a zone
     // feature: it is a pooled overlay the sync loop fills.
@@ -3494,22 +3501,7 @@ export class Renderer {
   }
 
   private measureViewport(): { width: number; height: number } {
-    const rect = this.webgl.domElement.getBoundingClientRect();
-    const stableMobileGameViewport =
-      document.body.classList.contains('game-active') &&
-      document.body.classList.contains('mobile-touch');
-    const vv = stableMobileGameViewport ? null : window.visualViewport;
-    const width = Math.round(
-      stableMobileGameViewport
-        ? rect.width || window.innerWidth
-        : (vv?.width ?? (rect.width || window.innerWidth)),
-    );
-    const height = Math.round(
-      stableMobileGameViewport
-        ? rect.height || window.innerHeight
-        : (vv?.height ?? (rect.height || window.innerHeight)),
-    );
-    return { width: Math.max(1, width), height: Math.max(1, height) };
+    return measureCanvasViewport(this.webgl.domElement); // viewport_measure.ts
   }
 
   private captureGlIdentity(): void {
@@ -8272,7 +8264,7 @@ export class Renderer {
       weaponStowed: false,
       // Born with the CURRENT bit: unlike the stow pose there is no transition
       // to replay, createCharacterVisual composed with it just now.
-      helmHidden: e.helmHidden,
+      helmHidden: effectiveHelmHidden(e),
       // Born with the CURRENT look, for the same reason: createCharacterVisual
       // composed with it just now, so there is nothing to reconcile yet.
       modularAppearance: e.modularAppearance,
@@ -11222,6 +11214,8 @@ export class Renderer {
         // motes, Gloamveil's pool and smoke (gloam_field.ts). Suppressed for the dead
         // (the auras themselves drop, but a corpse must not smolder for a frame).
         if (!e.dead) {
+          if (hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SEASONAL_FUMES))
+            this.vfx.fluidSmoke(ax, ay + 0.6, az, 0x7bdc4e, dt, 16); // a seasonal trick's fumes
           if (hasLegacyMetamorphAura) this.vfx.formAura(e.id, 'metamorph', dt);
           else if (hasLichAura && !this.reducedMotion()) {
             this.vfx.lichAura(e.id, dt, soulFragments);
@@ -11452,6 +11446,7 @@ export class Renderer {
     this.emberPools?.update(lampGlow, this.time);
     this.campBraziers?.update(lampGlow, this.time);
     this.decorTorchFx?.update(lampGlow, this.time);
+    this.seasonalDecor?.update(lampGlow, this.time, p.pos.x, p.pos.z);
     // The night light field: every lamp and camp fire plus the nearby bodies
     // collected above, packed into the terrain shader's uniform slots. Indoors
     // the world clock does not govern the ground either, so the same fogState

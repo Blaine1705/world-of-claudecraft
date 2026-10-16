@@ -529,6 +529,7 @@ const NPC_IDS = [
   'scout_yerrin',
   'harbormaster_tamsin', // the Harbormaster's House at the Wyrmwatch cliff harbor
   'innkeeper_maudie', // the Mirefen tavern on the Fenbridge road
+  'gourdlight_keeper', // Gourdlight Eve's keeper (content/gourdlight_eve.ts), Eastbrook
   // ...and its seated regulars (src/sim/content/mirefen_tavern_patrons.ts)
   'patron_amos_eelby',
   'patron_grissel_sedgeworth',
@@ -849,6 +850,8 @@ const QUEST_IDS = [
   // the Eastbrook hub dummy lesson (content/practice_dummies.ts)
   'q_hub_know_your_numbers',
   'q_hub_healing_numbers',
+  // Gourdlight Eve's daily rounds (content/gourdlight_eve.ts)
+  'q_gourdlight_rounds',
 ] as const;
 
 const ZONE_IDS = [

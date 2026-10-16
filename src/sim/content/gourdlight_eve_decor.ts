@@ -1,0 +1,31 @@
+// Gourdlight Eve's city dressing, as ANCHOR RULES (data only; the resolver is
+// src/sim/seasonal_decor_layout.ts, the drawing src/render/seasonal_decor.ts).
+//
+// The cities change: open PRs add and move buildings all the time, so nothing
+// here is a coordinate beside today's buildings. Every piece hangs off something
+// that moves with the city:
+//   - the town's streetlamps (the sim's lamp plan, src/sim/streetlamp_layout.ts):
+//     a paper lantern on each post, a leaf garland wound round it, gourds at its foot;
+//   - the event's trick-or-treat townsfolk (content/gourdlight_eve.ts): a lit
+//     pumpkin at each knocking door, so the doors to knock on read at a glance;
+//   - the event keeper: a pile of gourds round her stand;
+//   - the town hub (the zone's own centre): a ring of gourds in the square.
+// The resolver nudges every piece off colliders, roads and NPC spots, and drops
+// what it cannot seat; tests/seasonal_decor_layout.test.ts pins the result
+// against the live world, so a city rework that buries a pumpkin turns red.
+// A city rework that moves the square or the lamps needs no edit here at all.
+
+export interface SeasonalCityDecorRule {
+  /** The zone whose hub is the city (ZoneDef.id). */
+  zoneId: string;
+  /** Reach from the hub that counts as town for the lamp and NPC anchors (yards). */
+  radius: number;
+  /** Gourds in the square: how many, on what ring round the hub (yards). */
+  square: { count: number; ring: number };
+}
+
+export const GOURDLIGHT_DECOR_CITIES: readonly SeasonalCityDecorRule[] = Object.freeze([
+  { zoneId: 'eastbrook_vale', radius: 62, square: { count: 5, ring: 6 } },
+  { zoneId: 'mirefen_marsh', radius: 62, square: { count: 4, ring: 5 } },
+  { zoneId: 'thornpeak_heights', radius: 58, square: { count: 4, ring: 5 } },
+]);

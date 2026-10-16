@@ -147,6 +147,11 @@ import {
   GALECREST_ZONE,
 } from './content/galecrest';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
+import {
+  GOURDLIGHT_EVE_ITEMS,
+  GOURDLIGHT_EVE_NPCS,
+  GOURDLIGHT_EVE_QUESTS,
+} from './content/gourdlight_eve';
 import { GRAVEWYRM_SANCTUM_MOBS } from './content/gravewyrm_sanctum';
 import { GRAVEWYRM_SANCTUM_ITEMS } from './content/gravewyrm_sanctum_items';
 import {
@@ -466,6 +471,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
   QUEST_LEVELING_GEAR_ITEMS,
+  GOURDLIGHT_EVE_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -576,6 +582,9 @@ export const NPCS: Record<string, NpcDef> = {
   ...MIREFEN_TAVERN_NPCS,
   // Its seated patrons (content/mirefen_tavern_patrons.ts), dynamic singletons too.
   ...MIREFEN_TAVERN_PATRON_NPCS,
+  // Gourdlight Eve's keeper (content/gourdlight_eve.ts): a dynamic singleton under a
+  // reserved id, raised only while the event runs (seasonal/seasonal_tick.ts).
+  ...GOURDLIGHT_EVE_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -608,6 +617,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...PROVING_SHORE_QUESTS,
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
+  ...GOURDLIGHT_EVE_QUESTS,
 };
 
 // The choose-one leveling gear rides on the quest records (QuestDef.choiceRewards),

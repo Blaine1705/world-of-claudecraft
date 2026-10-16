@@ -7975,6 +7975,21 @@
         "charm_stag_gilded"
       ],
       "commonPrompt": "Not a text-to-image prompt: the whistle_stag.webp still multiplied 50% toward the look's tint (acorn 0xb8863b, gilded 0xffd700), re-encoded at 128px."
+    },
+    {
+      "batchId": "gourdlight-eve-icons-2026-10-16",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py): the Carved Pumpkin Head is the shipped in-game model (model.py), the sweet, the treat pouch and the jar are modelled in the same script for their icons. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/icons.py",
+      "itemIds": [
+        "carved_pumpkin_head",
+        "gourdlight_sweet",
+        "gourdlight_treat_pouch",
+        "jar_of_mischief"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
     }
   ]
 }

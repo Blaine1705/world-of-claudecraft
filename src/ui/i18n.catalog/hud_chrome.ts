@@ -5496,6 +5496,8 @@ export const hudChromeStrings = {
     spellHaste: 'Increases spell casting speed by {pct}%',
     sated: 'Cannot benefit from another group haste effect',
     cauterizeFatigue: 'Cauterize cannot prevent another lethal hit',
+    // A seasonal event's look (src/sim/seasonal/): the pumpkin head and the tricks.
+    seasonalCosmetic: 'Cosmetic only: no effect on combat',
     castShield: 'Casting cannot be interrupted or delayed by damage',
     // wordy (M16): filled in the five non-Latin locales in this change.
     dmgDone: 'Increases damage dealt by {pct}%',

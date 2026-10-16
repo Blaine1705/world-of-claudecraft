@@ -3939,6 +3939,12 @@ const ITEM_ENTITY_IDS = [
   'merewater_cowl',
   'merecleaver',
   'moonwrack_stave',
+  // Gourdlight Eve, the autumn seasonal event (content/gourdlight_eve.ts),
+  // appended under the same append-only contract, resolved BY KEY.
+  'gourdlight_sweet',
+  'gourdlight_treat_pouch',
+  'carved_pumpkin_head',
+  'jar_of_mischief',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3948,6 +3954,11 @@ type ItemEntityTranslation = { name: string };
 type ItemEntityTranslations = Record<ItemEntityId, ItemEntityTranslation>;
 
 const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
+  // Gourdlight Eve (content/gourdlight_eve.ts).
+  gourdlight_sweet: 'Gourdlight Sweet',
+  gourdlight_treat_pouch: 'Gourdlight Treat Pouch',
+  carved_pumpkin_head: 'Carved Pumpkin Head',
+  jar_of_mischief: 'Jar of Mischief',
   // Mirefen world-boss spoils.
   foremans_barrowmaul: "Foreman's Barrowmaul",
   // The quest tool the world boss's level-spread mechanic runs on, not a spoil.

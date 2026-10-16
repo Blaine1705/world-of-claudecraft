@@ -6182,6 +6182,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "feat_gourdlight_guise",
+    "name": "Gourdlight Guise",
+    "category": "feat",
+    "renown": 0,
+    "feat": true
   }
 ];
 

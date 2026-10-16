@@ -4264,6 +4264,7 @@ export const zh_CN: EnTranslations = {
       "spellHaste": "施法速度提高 {pct}%",
       "sated": "无法再获得团队急速效果",
       "cauterizeFatigue": "灸灼无法再次阻止致命伤害",
+      "seasonalCosmetic": "Cosmetic only: no effect on combat",
       "castShield": "施法不会因受到伤害而中断或延迟",
       "dmgDone": "造成的伤害提高 {pct}%",
       "dmgDoneReduce": "造成的伤害降低 {pct}%",
@@ -7701,6 +7702,48 @@ export const zh_CN: EnTranslations = {
         "2": "原来是磨坊把你一路送到了海岸路上。灯塔还藏着最后一个秘密：在它西北方，就在小路旁，草皮被切开又铺了回去。就在那里挖。"
       }
     }
+  },
+  "seasonal": {
+    "event": {
+      "gourdlight_eve": {
+        "name": "Gourdlight Eve",
+        "opened": "Gourdlight Eve has begun: the gourds are lit in Eastbrook, Fenbridge and Highwatch."
+      }
+    },
+    "trickOrTreat": {
+      "row": "Trick or treat!",
+      "rowAria": "Say trick or treat to {name}",
+      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
+      "treat": "{name} hands you a treat.",
+      "trick": "{name} plays a trick on you: {trick}!",
+      "alreadyKnocked": "You already trick-or-treated {name} today.",
+      "notActive": "Gourdlight Eve is not running right now.",
+      "tooFar": "Step closer to knock.",
+      "treatFlash": {
+        "one": "Treat! {count} Gourdlight Sweet",
+        "few": "Treat! {count} Gourdlight Sweets",
+        "many": "Treat! {count} Gourdlight Sweets",
+        "other": "Treat! {count} Gourdlight Sweets"
+      },
+      "trickFlash": "Trick! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Batty",
+      "gourdlight_trick_skeleton": "Rattled Bones",
+      "gourdlight_trick_fumes": "Green Fumes"
+    },
+    "pumpkinHead": {
+      "on": "You put on the Carved Pumpkin Head.",
+      "off": "You take off the Carved Pumpkin Head."
+    },
+    "jarTrick": "The jar pops open: {trick}!",
+    "itemUse": {
+      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
+      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
+      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
+      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them."
+    },
+    "tokenPrice": "{count} {item}"
   },
   "dungeonGuide": {
     "drownedTemple": {
@@ -22914,6 +22957,18 @@ export const zh_CN: EnTranslations = {
       "moonwrack_stave": {
         "name": "月殇法杖"
       },
+      "gourdlight_sweet": {
+        "name": "Gourdlight Sweet"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Gourdlight Treat Pouch"
+      },
+      "carved_pumpkin_head": {
+        "name": "Carved Pumpkin Head"
+      },
+      "jar_of_mischief": {
+        "name": "Jar of Mischief"
+      },
       "membership_token": {
         "name": "会员代币（30天）"
       },
@@ -25508,6 +25563,11 @@ export const zh_CN: EnTranslations = {
         "name": "莫迪·塔普赖特",
         "title": "旅店老板",
         "greeting": "快从湿气里进来吧，朋友，下到火边时当心台阶。水壶正烧着，长凳是暖的，楼上的房间也干爽。从芬桥来的旅人都发誓说沼泽路白天很太平，可天黑以后没人敢走。坐一会儿，歇歇脚吧。"
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Gourdlight Keeper",
+        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
       },
       "patron_amos_eelby": {
         "name": "埃莫斯·伊尔比",
@@ -28145,6 +28205,16 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "在治疗假人身上打出一次有效治疗"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Gourdlight Rounds",
+        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
+        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "objectives": {
+          "0": {
+            "label": "Doors knocked on"
           }
         }
       },

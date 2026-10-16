@@ -7795,6 +7795,9 @@ export class GameServer {
         sim.collectDelveChestLoot(msg.objectId, pid);
         break;
       }
+      case 'trick_or_treat': // the seasonal knock (src/sim/seasonal/trick_or_treat.ts)
+        if (typeof msg.npcId === 'number') sim.trickOrTreat(msg.npcId, pid);
+        break;
       // The Shardpike trial's three no-argument verbs (lance_wire.ts).
       case 'lance_brace':
       case 'lance_thrust':

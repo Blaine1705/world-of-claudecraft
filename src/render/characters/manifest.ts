@@ -211,6 +211,7 @@ import type { GlowPulseSet } from './glow_pulse_core';
 import { NPC_PROP_SET_IDS, type NpcLook, type NpcPropSet, npcLookFor } from './npc_looks';
 import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks';
 import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
+import { seasonalTrickLooks } from './seasonal_trick_looks';
 import type { SeatClipSet } from './seat_clips';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
@@ -7857,6 +7858,8 @@ Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
 Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
 // The Gravewyrm Sanctum's three bosses (sanctum_boss_looks.ts).
 Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
+// Gourdlight Eve's trick bodies, the bat and the skeleton (seasonal_trick_looks.ts).
+Object.assign(VISUALS, seasonalTrickLooks(VISUALS));
 
 /** The composed-body variant of a class visual (every class has one). */
 export function modularVisualKey(cls: PlayerClass): string {

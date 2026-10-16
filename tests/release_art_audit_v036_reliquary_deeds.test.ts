@@ -286,6 +286,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_ilvane_hush',
       // Morthen the Gravecaller's Rite.
       'dgn_morthen_candlelight',
+      // Gourdlight Eve's seasonal Feat.
+      'feat_gourdlight_guise',
     ]);
     // RE-PINNED at the Mirefen world-boss forward-port onto release/v0.44.0:
     // 302 live (counted directly off the resolved src/sim/content/deeds.ts
@@ -300,7 +302,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // catch (2026-09-28 merge), also pending: still 289 painted. 322 with the
     // Mirefen world-boss branch's three combat deeds, all pending.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
-    expect(DEED_ORDER).toHaveLength(346);
+    // 347 with Gourdlight Eve's seasonal Feat, pending: still 289 painted.
+    expect(DEED_ORDER).toHaveLength(347);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

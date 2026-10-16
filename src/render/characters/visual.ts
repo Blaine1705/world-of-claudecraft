@@ -5,6 +5,7 @@
 // releases mixer bindings, this clone's Skeletons, and the visual's claims
 // on the shared tinted-material cache (which disposes a clone only once no
 // visual mounts it).
+
 import * as THREE from 'three';
 import {
   mainhandShowsWeaponSkin,
@@ -21,6 +22,7 @@ import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
 import type { MountRideSpec } from '../mount_visuals';
+import { buildSeasonalHeadPiece, fitSeasonalHead } from '../seasonal_head_cosmetic';
 import type { SeatAnimInfo } from '../seated_pose_core';
 import {
   stoneboundShardMaterialOptions,
@@ -662,6 +664,33 @@ export class CharacterVisual {
 
   /** Roster previews have no equipped-item snapshot; keep the manifest kit. A world
    *  NPC is dressed the same way at birth, its head slot empty (characters/index.ts). */
+  /** Wear or take off the Gourdlight Eve pumpkin head (seasonal_head_core.ts
+   *  decides who draws one). Its first build waits for the event's assets and
+   *  joins hidden until its programs link (revealOnCompile); afterwards a wear
+   *  or a removal is a parent flip. True when the drawn body changed. */
+  setSeasonalHead(on: boolean): boolean {
+    if (!on) {
+      if (!this.seasonalHead) return false;
+      this.seasonalHead.removeFromParent();
+      this.seasonalHead = null;
+      return true;
+    }
+    if (this.seasonalHead || !this.model) return false;
+    if (this.seasonalHeadBone === undefined) {
+      this.seasonalHeadBone =
+        this.model.getObjectByName('head') ?? this.model.getObjectByName('Head') ?? null;
+    }
+    const bone = this.seasonalHeadBone;
+    if (!bone) return false;
+    const piece = buildSeasonalHeadPiece();
+    if (!piece) return false;
+    fitSeasonalHead(piece, bone, this.root);
+    bone.add(piece);
+    this.revealOnCompile(piece, 'seasonal head');
+    this.seasonalHead = piece;
+    return true;
+  }
+
   setWocDefaultEquipment(helmHidden: boolean): boolean {
     const manifest = this.def.wocCharacter;
     if (!manifest || this.disposed) return false;
@@ -1248,6 +1277,10 @@ export class CharacterVisual {
   private chargeGlow: ChargeGlow | null = null;
   /** A permanently lit eye, for a VisualDef that declares one. */
   private eyeGlow: EyeGlow | null = null;
+  // The worn seasonal head (seasonal_head_cosmetic.ts): built on first wear and
+  // hung on the head bone (resolved once; null on a rig without one).
+  private seasonalHead: THREE.Object3D | null = null;
+  private seasonalHeadBone: THREE.Object3D | null | undefined = undefined;
   /**
    * The Shardpike aim reticle around that same eye. Built alongside the glow because it
    * shares its measured offset: the ring and the thing it rings must never drift apart.
@@ -4962,6 +4995,9 @@ export class CharacterVisual {
     this.templarsVerdictFx = null;
     this.templarsVerdictAction = null;
     this.formAdornments?.dispose();
+    // shared geometry and glow materials (seasonal_decor_assets.ts): only detach
+    this.seasonalHead?.removeFromParent();
+    this.seasonalHead = null;
     this.disposeWeaponAura();
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();

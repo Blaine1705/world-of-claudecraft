@@ -4264,6 +4264,7 @@ export const ja_JP: EnTranslations = {
       "spellHaste": "呪文の詠唱速度が{pct}%上昇する",
       "sated": "別のグループ加速効果を受けられない",
       "cauterizeFatigue": "コーテライズは次の致死ダメージを防げない",
+      "seasonalCosmetic": "Cosmetic only: no effect on combat",
       "castShield": "ダメージで詠唱が中断または遅延しない",
       "dmgDone": "与えるダメージを{pct}%上昇させる",
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
@@ -7701,6 +7702,48 @@ export const ja_JP: EnTranslations = {
         "2": "風車があなたを海沿いの道へ送ったか。灯台には最後の秘密がひとつある。北西、小道のすぐ脇で、芝が切られて元に戻されている。そこを掘れ。"
       }
     }
+  },
+  "seasonal": {
+    "event": {
+      "gourdlight_eve": {
+        "name": "Gourdlight Eve",
+        "opened": "Gourdlight Eve has begun: the gourds are lit in Eastbrook, Fenbridge and Highwatch."
+      }
+    },
+    "trickOrTreat": {
+      "row": "Trick or treat!",
+      "rowAria": "Say trick or treat to {name}",
+      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
+      "treat": "{name} hands you a treat.",
+      "trick": "{name} plays a trick on you: {trick}!",
+      "alreadyKnocked": "You already trick-or-treated {name} today.",
+      "notActive": "Gourdlight Eve is not running right now.",
+      "tooFar": "Step closer to knock.",
+      "treatFlash": {
+        "one": "Treat! {count} Gourdlight Sweet",
+        "few": "Treat! {count} Gourdlight Sweets",
+        "many": "Treat! {count} Gourdlight Sweets",
+        "other": "Treat! {count} Gourdlight Sweets"
+      },
+      "trickFlash": "Trick! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Batty",
+      "gourdlight_trick_skeleton": "Rattled Bones",
+      "gourdlight_trick_fumes": "Green Fumes"
+    },
+    "pumpkinHead": {
+      "on": "You put on the Carved Pumpkin Head.",
+      "off": "You take off the Carved Pumpkin Head."
+    },
+    "jarTrick": "The jar pops open: {trick}!",
+    "itemUse": {
+      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
+      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
+      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
+      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them."
+    },
+    "tokenPrice": "{count} {item}"
   },
   "dungeonGuide": {
     "drownedTemple": {
@@ -22914,6 +22957,18 @@ export const ja_JP: EnTranslations = {
       "moonwrack_stave": {
         "name": "ムーンラックの杖"
       },
+      "gourdlight_sweet": {
+        "name": "Gourdlight Sweet"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Gourdlight Treat Pouch"
+      },
+      "carved_pumpkin_head": {
+        "name": "Carved Pumpkin Head"
+      },
+      "jar_of_mischief": {
+        "name": "Jar of Mischief"
+      },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"
       },
@@ -25508,6 +25563,11 @@ export const ja_JP: EnTranslations = {
         "name": "モーディ・タップライト",
         "title": "宿屋の女将",
         "greeting": "湿気から逃れて中へどうぞ、旅の方。火のそばへ下りる段差に気をつけてね。やかんは火にかけてあるし、長椅子は温かいし、二階の部屋も乾いていますよ。フェンブリッジから来た旅人たちは、湿地の道は昼間なら静かだと口をそろえるけれど、日が暮れてから歩く人はいません。少し座って、足を休めていきなさい。"
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Gourdlight Keeper",
+        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
       },
       "patron_amos_eelby": {
         "name": "エイモス・イールビー",
@@ -28145,6 +28205,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "治療用ダミーに有効な治療が当たった"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Gourdlight Rounds",
+        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
+        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "objectives": {
+          "0": {
+            "label": "Doors knocked on"
           }
         }
       },

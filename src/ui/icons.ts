@@ -5688,6 +5688,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_lady_nobody_hanging',
   'dgn_ilvane_hush',
   'dgn_morthen_candlelight',
+  // Gourdlight Eve's seasonal Feat: the feat crest until its painting lands.
+  'feat_gourdlight_guise',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

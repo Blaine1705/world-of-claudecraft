@@ -4264,6 +4264,7 @@ export const ru_RU: EnTranslations = {
       "spellHaste": "Повышает скорость произнесения заклинаний на {pct}%",
       "sated": "Не позволяет получить другой групповой эффект ускорения",
       "cauterizeFatigue": "Прижигание не может снова предотвратить смертельный удар",
+      "seasonalCosmetic": "Cosmetic only: no effect on combat",
       "castShield": "Урон не прерывает и не задерживает произнесение заклинаний",
       "dmgDone": "Повышает наносимый урон на {pct}%",
       "dmgDoneReduce": "Снижает наносимый урон на {pct}%",
@@ -7701,6 +7702,48 @@ export const ru_RU: EnTranslations = {
         "2": "Значит, мельница отправила вас по прибрежной дороге. У маяка осталась последняя тайна: к северо-западу от него, у самой тропы, дёрн срезали и уложили обратно. Копайте там."
       }
     }
+  },
+  "seasonal": {
+    "event": {
+      "gourdlight_eve": {
+        "name": "Gourdlight Eve",
+        "opened": "Gourdlight Eve has begun: the gourds are lit in Eastbrook, Fenbridge and Highwatch."
+      }
+    },
+    "trickOrTreat": {
+      "row": "Trick or treat!",
+      "rowAria": "Say trick or treat to {name}",
+      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
+      "treat": "{name} hands you a treat.",
+      "trick": "{name} plays a trick on you: {trick}!",
+      "alreadyKnocked": "You already trick-or-treated {name} today.",
+      "notActive": "Gourdlight Eve is not running right now.",
+      "tooFar": "Step closer to knock.",
+      "treatFlash": {
+        "one": "Treat! {count} Gourdlight Sweet",
+        "few": "Treat! {count} Gourdlight Sweets",
+        "many": "Treat! {count} Gourdlight Sweets",
+        "other": "Treat! {count} Gourdlight Sweets"
+      },
+      "trickFlash": "Trick! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Batty",
+      "gourdlight_trick_skeleton": "Rattled Bones",
+      "gourdlight_trick_fumes": "Green Fumes"
+    },
+    "pumpkinHead": {
+      "on": "You put on the Carved Pumpkin Head.",
+      "off": "You take off the Carved Pumpkin Head."
+    },
+    "jarTrick": "The jar pops open: {trick}!",
+    "itemUse": {
+      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
+      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
+      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
+      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them."
+    },
+    "tokenPrice": "{count} {item}"
   },
   "dungeonGuide": {
     "drownedTemple": {
@@ -22914,6 +22957,18 @@ export const ru_RU: EnTranslations = {
       "moonwrack_stave": {
         "name": "Посох Лунной погибели"
       },
+      "gourdlight_sweet": {
+        "name": "Gourdlight Sweet"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Gourdlight Treat Pouch"
+      },
+      "carved_pumpkin_head": {
+        "name": "Carved Pumpkin Head"
+      },
+      "jar_of_mischief": {
+        "name": "Jar of Mischief"
+      },
       "membership_token": {
         "name": "Жетон членства (30 дней)"
       },
@@ -25508,6 +25563,11 @@ export const ru_RU: EnTranslations = {
         "name": "Моди Тапрайт",
         "title": "Хозяйка таверны",
         "greeting": "Заходите, друг, спасайтесь от сырости, и осторожнее со ступенькой вниз к огню. Чайник уже на огне, скамьи тёплые, а комнаты наверху сухие. Путники из Фенбриджа клянутся, что болотная дорога днём спокойна, но после темноты по ней никто не ходит. Посидите немного, дайте ногам отдохнуть."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Gourdlight Keeper",
+        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
       },
       "patron_amos_eelby": {
         "name": "Эймос Илби",
@@ -28145,6 +28205,16 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Эффективное исцеление нанесено Лечебному манекену"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Gourdlight Rounds",
+        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
+        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "objectives": {
+          "0": {
+            "label": "Doors knocked on"
           }
         }
       },

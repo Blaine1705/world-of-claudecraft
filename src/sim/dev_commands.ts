@@ -71,6 +71,7 @@ import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftFloor, generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
+import { handleSeasonalDevChat } from './seasonal';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
@@ -203,6 +204,7 @@ export function handleDevChat(
     return null;
   }
   if (handleFerryDevChat(ctx, raw, pid)) return null; // /dev ferry (dev/ferry_dev.ts)
+  if (handleSeasonalDevChat(ctx, raw, pid)) return null; // /dev season (seasonal/seasonal_dev.ts)
   if (handleHollowCryptDevChat(ctx, raw, pid)) return null; // /dev crypt (dev/hollow_crypt_dev.ts)
   if (handleSunkenBastionDevChat(ctx, raw, pid)) return null; // /dev bastion (dev/sunken_bastion_dev.ts)
   if (handleDrownedTempleDevChat(ctx, raw, pid)) return null; // /dev temple (dev/drowned_temple_dev.ts)

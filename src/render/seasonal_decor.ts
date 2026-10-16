@@ -1,0 +1,221 @@
+// The seasonal city dressing (Gourdlight Eve's pumpkins, lanterns, festival
+// poles and strung garlands), drawn exactly where the sim's resolver put them
+// (src/sim/seasonal_decor_layout.ts: anchored to lamps, townsfolk and the town
+// square, nudged off colliders and roads). This module only paints that list.
+//
+// Lifetime: nothing is fetched or built until the world first reports the event
+// open. Then the kit loads (seasonal_decor_assets.ts), each city's pieces are
+// instanced once (one InstancedMesh per glTF primitive per piece kind, plus one
+// merged rope per city), and the whole root attaches through the renderer's
+// compile gate (gated_scene_attach.ts): hidden until its programs link, so the
+// first lit frame never links on a live frame. After that the event's open and
+// close only flip visibility; a closed event costs one boolean per frame.
+//
+// Each city is its own group, shown only within DRAW_RANGE of the camera's
+// subject, so a city out of reach submits no draws. The glow (dim by day,
+// bright at night, a candle flicker) is the shared driver in seasonal_glow.ts,
+// written once per frame for every pumpkin, lantern and worn head together.
+import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { GOURDLIGHT_EVE_ID } from '../sim/content/gourdlight_eve';
+import { GOURDLIGHT_DECOR_CITIES } from '../sim/content/gourdlight_eve_decor';
+import { getActiveWorldContent } from '../sim/data';
+import {
+  type SeasonalDecorLayout,
+  type SeasonalGarland,
+  seasonalDecorLayout,
+} from '../sim/seasonal_decor_layout';
+import { attachSceneGroupGated } from './gated_scene_attach';
+import { GFX } from './gfx';
+import {
+  type GourdlightAssets,
+  type GourdlightDecorNode,
+  gourdlightAssets,
+} from './seasonal_decor_assets';
+import { garlandOrnaments, garlandPolyline } from './seasonal_garland_core';
+import { driveSeasonalGlow } from './seasonal_glow';
+
+/** A city's dressing draws within this reach of the player (yards, squared below). */
+const DRAW_RANGE = 240;
+const DRAW_RANGE_SQ = DRAW_RANGE * DRAW_RANGE;
+const ROPE_RADIUS = 0.03;
+/** The lanterns and the garland's ornaments read at street distance only bigger
+ *  than their authored size (a festival lantern, not a desk lamp). */
+const LANTERN_SCALE = 1.6;
+const ORNAMENT_SCALE = 1.8;
+
+export type SeasonalDecorCompileGate = (target: THREE.Object3D) => Promise<unknown>;
+
+interface CityView {
+  group: THREE.Group;
+  x: number;
+  z: number;
+}
+
+interface Placement {
+  x: number;
+  y: number;
+  z: number;
+  yaw: number;
+  scale: number;
+  tilt?: number;
+}
+
+export class SeasonalDecor {
+  readonly root = new THREE.Group();
+  private cities: CityView[] = [];
+  private built = false;
+  private ropeMaterial: THREE.Material | null = null;
+
+  constructor(
+    private readonly scene: THREE.Object3D,
+    private readonly seed: number,
+    private readonly activeEvent: () => string | null,
+    private readonly compileGate?: SeasonalDecorCompileGate,
+  ) {
+    this.root.name = 'seasonal-decor';
+  }
+
+  /** Per frame: the event's state, the night amount (0 day .. 1 night), the
+   *  clock, and the player's position for the per-city reach. */
+  update(night: number, time: number, px: number, pz: number): void {
+    const active = this.activeEvent() === GOURDLIGHT_EVE_ID;
+    if (!active) {
+      if (this.built) this.root.visible = false;
+      return;
+    }
+    if (!this.built) {
+      const assets = gourdlightAssets();
+      if (!assets) return;
+      this.build(assets);
+    }
+    this.root.visible = true;
+    for (const city of this.cities) {
+      const dx = city.x - px;
+      const dz = city.z - pz;
+      city.group.visible = dx * dx + dz * dz <= DRAW_RANGE_SQ;
+    }
+    driveSeasonalGlow(night, time);
+  }
+
+  private build(assets: GourdlightAssets): void {
+    this.built = true;
+    const layout = seasonalDecorLayout(this.seed);
+    const zones = getActiveWorldContent().zones;
+    const hubs = GOURDLIGHT_DECOR_CITIES.map((rule) => zones.find((z) => z.id === rule.zoneId)?.hub)
+      .filter((hub): hub is NonNullable<typeof hub> => hub !== undefined)
+      .map((hub) => ({ x: hub.x, z: hub.z }));
+    if (hubs.length === 0) return;
+    const nearestHub = (x: number, z: number) => {
+      let best = 0;
+      let bestD = Number.POSITIVE_INFINITY;
+      hubs.forEach((hub, i) => {
+        const d = (hub.x - x) ** 2 + (hub.z - z) ** 2;
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+      });
+      return best;
+    };
+    const perCity = hubs.map(() => emptyCity());
+    for (const p of layout.ground) perCity[nearestHub(p.x, p.z)].ground.push(p);
+    for (const l of layout.lanterns) perCity[nearestHub(l.x, l.z)].lanterns.push(l);
+    for (const g of layout.garlands) perCity[nearestHub(g.ax, g.az)].garlands.push(g);
+    this.ropeMaterial = this.makeRopeMaterial();
+    hubs.forEach((hub, i) => {
+      const group = this.buildCity(assets, perCity[i], i);
+      group.name = `seasonal-decor-city-${i}`;
+      this.root.add(group);
+      this.cities.push({ group, x: hub.x, z: hub.z });
+    });
+    void attachSceneGroupGated(this.scene, this.root, this.compileGate).catch(() => {});
+  }
+
+  private makeRopeMaterial(): THREE.Material {
+    const opts = { color: 0x3b2a18 };
+    return GFX.standardMaterials
+      ? new THREE.MeshStandardMaterial({ ...opts, roughness: 0.92, metalness: 0 })
+      : new THREE.MeshLambertMaterial(opts);
+  }
+
+  private buildCity(assets: GourdlightAssets, city: SeasonalDecorLayout, cityIndex: number) {
+    const group = new THREE.Group();
+    const byKind = new Map<GourdlightDecorNode, Placement[]>();
+    const add = (kind: GourdlightDecorNode, p: Placement) => {
+      const list = byKind.get(kind) ?? [];
+      list.push(p);
+      byKind.set(kind, list);
+    };
+    for (const p of city.ground)
+      add(p.kind, { x: p.x, y: p.y, z: p.z, yaw: p.yaw, scale: p.scale });
+    for (const l of city.lanterns) {
+      add('lantern', { x: l.x, y: l.y, z: l.z, yaw: l.yaw, scale: LANTERN_SCALE });
+    }
+    city.garlands.forEach((g, gi) => {
+      for (const o of garlandOrnaments(g, cityIndex * 1000 + gi)) {
+        add(o.kind === 'leaf' ? 'garland_leaf' : 'garland_bead', {
+          x: o.x,
+          y: o.y,
+          z: o.z,
+          yaw: o.kind === 'leaf' ? o.spin : o.yaw,
+          scale: o.scale * ORNAMENT_SCALE,
+        });
+      }
+    });
+    for (const [kind, placements] of byKind) {
+      for (const part of assets.decor[kind]) group.add(instanced(part, placements));
+    }
+    const rope = this.buildRope(city.garlands);
+    if (rope) group.add(rope);
+    return group;
+  }
+
+  private buildRope(garlands: readonly SeasonalGarland[]): THREE.Mesh | null {
+    if (garlands.length === 0 || !this.ropeMaterial) return null;
+    const pieces: THREE.BufferGeometry[] = [];
+    for (const g of garlands) {
+      const pts = garlandPolyline(g).map((p) => new THREE.Vector3(p.x, p.y, p.z));
+      const curve = new THREE.CatmullRomCurve3(pts);
+      pieces.push(new THREE.TubeGeometry(curve, pts.length * 2, ROPE_RADIUS, 5, false));
+    }
+    const merged = mergeGeometries(pieces, false);
+    for (const piece of pieces) piece.dispose();
+    if (!merged) return null;
+    const mesh = new THREE.Mesh(merged, this.ropeMaterial);
+    mesh.name = 'seasonal-garland-rope';
+    mesh.matrixAutoUpdate = false;
+    return mesh;
+  }
+}
+
+function emptyCity(): SeasonalDecorLayout {
+  return { ground: [], lanterns: [], garlands: [] };
+}
+
+const scratchMatrix = new THREE.Matrix4();
+const scratchQuat = new THREE.Quaternion();
+const scratchPos = new THREE.Vector3();
+const scratchScale = new THREE.Vector3();
+const UP = new THREE.Vector3(0, 1, 0);
+
+/** One InstancedMesh for one glTF primitive of a piece, at every placement. */
+function instanced(
+  part: { geometry: THREE.BufferGeometry; material: THREE.Material },
+  placements: readonly Placement[],
+): THREE.InstancedMesh {
+  const mesh = new THREE.InstancedMesh(part.geometry, part.material, placements.length);
+  placements.forEach((p, i) => {
+    scratchQuat.setFromAxisAngle(UP, p.yaw);
+    scratchPos.set(p.x, p.y, p.z);
+    scratchScale.setScalar(p.scale);
+    scratchMatrix.compose(scratchPos, scratchQuat, scratchScale);
+    mesh.setMatrixAt(i, scratchMatrix);
+  });
+  mesh.instanceMatrix.needsUpdate = true;
+  mesh.computeBoundingSphere();
+  mesh.matrixAutoUpdate = false;
+  mesh.castShadow = false;
+  mesh.receiveShadow = false;
+  return mesh;
+}
