@@ -42,6 +42,8 @@ const ADD_GLB = resolve(ROOT, 'public/models/creatures/gourdlight_strawling.glb'
 const MANIFEST = readFileSync(resolve(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
 
 function glbJson(path: string): {
+  meshes?: Array<{ primitives: Array<{ indices?: number }> }>;
+  accessors?: Array<{ count: number }>;
   animations?: Array<{ name?: string }>;
   materials?: Array<{ name?: string }>;
   skins?: Array<{ joints: number[] }>;
@@ -82,6 +84,28 @@ describe('the shipped GLBs', () => {
     expect(add).toContain('ScarecrowGlow');
     expect(MANIFEST).toContain("selfLitMaterial: 'GourdGlow'");
     expect(MANIFEST).toContain("selfLitMaterial: 'ScarecrowGlow'");
+  });
+});
+
+describe('the draw budget', () => {
+  const budget = (path: string) => {
+    const j = glbJson(path);
+    const prims = (j.meshes ?? []).flatMap((m) => m.primitives);
+    const tris = prims.reduce(
+      (sum, p) => sum + (j.accessors?.[p.indices ?? -1]?.count ?? 0) / 3,
+      0,
+    );
+    return { prims: prims.length, tris };
+  };
+
+  it('stays a large-boss body and a light add (one matte material, glow kept apart)', () => {
+    const boss = budget(BOSS_GLB);
+    const add = budget(ADD_GLB);
+    // Balgath's cyclops is ~52.6k; a dungeon trash body 24k to 44k
+    expect(boss.tris).toBeLessThan(50_000);
+    expect(add.tris).toBeLessThan(20_000);
+    expect(boss.prims).toBeLessThanOrEqual(8);
+    expect(add.prims).toBeLessThanOrEqual(2);
   });
 });
 

@@ -12,8 +12,9 @@
 //    only the particle density scales.
 // Plus the crows bursting off him at his call's peak and straw puffs as he collapses.
 //
-// GPU work: the gourd shares the seasonal decor kit's own geometry and materials (already
-// linked by the decor view's gated attach, seasonal_decor.ts), and the patch disc is ONE
+// GPU work: the gourd flies as one-instance InstancedMeshes over the seasonal decor kit's own
+// geometry and materials, the instanced variant the decor view already links behind its
+// gate (seasonal_decor.ts; his field's ring seats the same piece), and the patch disc is ONE
 // shared additive material built with this layer's root and attached through the world
 // compile gate (attachSceneGroupGated). Every particle rides the pooled point cloud (vfx.ts).
 import * as THREE from 'three';
@@ -95,6 +96,7 @@ interface Patch {
 const SHARD_COLORS = [0xff8a1a, 0xffb347, 0xd9561a, 0xfff0a8] as const;
 const FEATHER_COLORS = [0x15141a, 0x24222b, 0x0a0a0d] as const;
 const STRAW_COLOR = 0xd8b25a;
+const IDENTITY = new THREE.Matrix4();
 const CHAFF_DENSITY = 0.6;
 const SMOKE = 0x2a2420;
 
@@ -165,7 +167,7 @@ export class ScarecrowFx {
     private readonly scene: THREE.Object3D,
     private readonly particles: ScarecrowParticles,
     private readonly groundY: (x: number, z: number) => number,
-    private readonly entities: () => Iterable<[number, EntityLike]>,
+    private readonly entities: () => ReadonlyMap<number, EntityLike>,
     private readonly entity: (id: number) => EntityLike | undefined,
     private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>,
   ) {}
@@ -199,14 +201,29 @@ export class ScarecrowFx {
     return root;
   }
 
-  /** A shared-material copy of the decor kit's small carved pumpkin, or a bare group when
-   *  the kit is not loaded (the embers still trail the flight). */
+  /** The decor kit's small carved pumpkin, flown as ONE-instance InstancedMeshes over the
+   *  kit's own geometry and materials: the instanced program variant is exactly the one the
+   *  decor view links behind its gate (his field's ring seats this very piece), so a throw
+   *  links nothing new. A bare group when the kit is not loaded (the embers still trail). */
   private gourdMesh(): THREE.Group {
     const group = new THREE.Group();
     const parts = gourdlightAssets()?.decor.pumpkin_small ?? [];
-    for (const part of parts) group.add(new THREE.Mesh(part.geometry, part.material));
+    for (const part of parts) {
+      const mesh = new THREE.InstancedMesh(part.geometry, part.material, 1);
+      mesh.setMatrixAt(0, IDENTITY);
+      // the instance sits at the group's origin, but its bounds are the geometry's alone
+      mesh.frustumCulled = false;
+      group.add(mesh);
+    }
     group.scale.setScalar(1.6);
     return group;
+  }
+
+  /** Release a flown gourd's per-flight instance buffers (the kit's geometry and materials
+   *  are shared and never disposed here). */
+  private retireGourd(group: THREE.Group): void {
+    group.removeFromParent();
+    for (const child of group.children) (child as THREE.InstancedMesh).dispose?.();
   }
 
   /** The sim's spellfxAt for his abilities. True when this layer CLAIMS the event (the
@@ -364,7 +381,7 @@ export class ScarecrowFx {
       if (this.time < f.start) continue;
       const t = (this.time - f.start) / Math.max(0.05, f.end - f.start);
       if (t >= 1) {
-        f.mesh.removeFromParent();
+        this.retireGourd(f.mesh);
         this.flights.splice(i, 1);
         continue;
       }
@@ -418,25 +435,29 @@ export class ScarecrowFx {
       this.particles.fluidSmoke(patch.x, patch.y, patch.z, SMOKE, dt, 2.5 * k);
     }
     // his collapse into straw: a puff as the stakes fold and another as the heap lands
-    for (const [id, e] of this.entities()) {
-      if (e.templateId !== THATCHGRIN_TEMPLATE) continue;
-      this.ensureRoot();
-      if (!e.dead) {
-        this.deadSeen.delete(id);
-        continue;
-      }
-      if (this.deadSeen.has(id)) continue;
-      this.deadSeen.add(id);
-      const { x, y, z } = e.pos;
-      this.particles.burstLater(DEATH_FOLD_SEC, x, y + 2.2, z, 'nature', 36, 1.6, STRAW_COLOR);
-      this.particles.burstLater(DEATH_HEAP_SEC, x, y + 0.6, z, 'nature', 48, 1.9, STRAW_COLOR);
-      this.particles.burstLater(DEATH_HEAP_SEC, x, y + 0.4, z, 'nature', 24, 1.2, 0x8a6a34);
-    }
+    this.entities().forEach(this.watchDeath);
   }
 
+  /** Per entity, per frame: allocation-free (a bound method over Map.forEach). */
+  private readonly watchDeath = (e: EntityLike, id: number): void => {
+    if (e.templateId !== THATCHGRIN_TEMPLATE) return;
+    this.ensureRoot();
+    if (!e.dead) {
+      this.deadSeen.delete(id);
+      return;
+    }
+    if (this.deadSeen.has(id)) return;
+    this.deadSeen.add(id);
+    const { x, y, z } = e.pos;
+    this.particles.burstLater(DEATH_FOLD_SEC, x, y + 2.2, z, 'nature', 36, 1.6, STRAW_COLOR);
+    this.particles.burstLater(DEATH_HEAP_SEC, x, y + 0.6, z, 'nature', 48, 1.9, STRAW_COLOR);
+    this.particles.burstLater(DEATH_HEAP_SEC, x, y + 0.4, z, 'nature', 24, 1.2, 0x8a6a34);
+  };
+
   dispose(): void {
+    if (this.disposed) return;
     this.disposed = true;
-    for (const f of this.flights) f.mesh.removeFromParent();
+    for (const f of this.flights) this.retireGourd(f.mesh);
     this.flights.length = 0;
     for (const p of this.patches) p.disc.geometry.dispose();
     this.patches.length = 0;
@@ -444,6 +465,9 @@ export class ScarecrowFx {
     this.discMaterial?.dispose();
     this.discGeometry?.dispose();
     this.discTexture?.dispose();
+    this.discMaterial = null;
+    this.discGeometry = null;
+    this.discTexture = null;
     this.root = null;
   }
 }

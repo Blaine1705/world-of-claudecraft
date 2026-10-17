@@ -58,8 +58,14 @@ M.MATERIAL_DEFS.update(
         "Feather": {"rough": 0.55, "metal": 0.0},
         "Beak": {"rough": 0.6, "metal": 0.0},
         "ScarecrowGlow": {"rough": 0.5, "metal": 0.0, "emit": (1.0, 0.55, 0.12)},
+        "ScarecrowMatte": {"rough": 0.93, "metal": 0.0},
     }
 )
+
+# Every vertex-coloured matte surface (cloth, straw, wood, rope, felt, feathers, beaks) ships
+# as ONE material: the colour lives in the vertices, so splitting them only cost draw calls.
+# The glow materials (driven by name) and the metal blade keep their own.
+MERGED_MATTE = {"Burlap", "BurlapDark", "Rope", "Straw", "Wood", "Felt", "Feather", "Beak"}
 
 # palette (sRGB, authored)
 BURLAP = (0.62, 0.48, 0.3)
@@ -1067,7 +1073,7 @@ def finish_part(part, layout_names):
     part.bm.free()
     obj = bpy.data.objects.new(part.name, me)
     bpy.context.scene.collection.objects.link(obj)
-    obj.data.materials.append(M.material(part.mat))
+    obj.data.materials.append(M.material("ScarecrowMatte" if part.mat in MERGED_MATTE else part.mat))
     color_part(obj, part.tint)
     weight_part(obj, part.weights, layout_names)
     return obj
