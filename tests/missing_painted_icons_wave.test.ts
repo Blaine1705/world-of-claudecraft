@@ -706,7 +706,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 347 with Gourdlight Eve's feat (feat_gourdlight_guise), its crest painted
     // (rendered from the shipped head, scripts/assets/gourdlight_eve/crest.py).
     // 348 with its field boss's feat (feat_old_thatchgrin), its crest painted too.
-    expect(DEED_ORDER).toHaveLength(348);
+    // 351 with its three title-writ feats, their crests painted too.
+    expect(DEED_ORDER).toHaveLength(351);
+    expect(DEED_IMAGE_IDS.has('feat_title_hollow_grinned')).toBe(true);
     expect(DEED_ART_PENDING.has('feat_gourdlight_guise')).toBe(false);
     expect(DEED_ART_PENDING.has('feat_old_thatchgrin')).toBe(false);
     expect(DEED_IMAGE_IDS.has('feat_old_thatchgrin')).toBe(true);

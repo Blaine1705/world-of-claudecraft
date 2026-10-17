@@ -210,6 +210,8 @@ const AUTHORED_ATLAS_DEFS = [
   // The Knucklebone of Balgath's Shape of the Foreman: his own authored stone body.
   'form_foreman',
   'mount_avian_strider',
+  // Gourdlight Eve's Blender-built Emberbristle Broom (its KTX2 BroomAtlas).
+  'mount_emberbristle_broom',
   // the Blender-built dungeon bosses and bodies: the Sunken Bastion's Vael,
   // Iron Cage, Drowned Anchor and Gaol Turnkey, and the Hollow Crypt's Lich
   // Bishop (Morthen); and the Bastion's sculpted drowned (the Revenant first)

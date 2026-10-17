@@ -385,8 +385,9 @@ describe('Book of Deeds webp icons', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
     // 347 with Gourdlight Eve's seasonal Feat, its crest painted: 290 painted.
     // 348 with its field boss's Feat (feat_old_thatchgrin), its crest painted: 291.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(348);
-    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(291);
+    // 351 with its three title-writ Feats, each crest painted: 294.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(351);
+    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(294);
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57 pending, Morthen's last.
     // Gourdlight Eve's seasonal Feat (feat_gourdlight_guise) ships its painted crest.
     expect(DEED_ART_PENDING_IDS).toHaveLength(57);

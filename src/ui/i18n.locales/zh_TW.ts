@@ -20737,5 +20737,32 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.strawling_charm.name': '稻草小人護符',
   'entities.mobs.gourdlight_thatchgrin.name': '老稻草獰笑',
   'entities.mobs.gourdlight_crow.name': '南瓜燈烏鴉',
+  'hudChrome.mounts.name_emberbristle_broom': '餘燼鬃毛掃帚',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    '一把繫著橙色緞帶的收穫掃帚，懸浮在離地一掌高的地方，鬃毛不斷灑落餘燼。南瓜燈之夜結束時，它會化回一堆稻草。',
+  'seasonal.tricks.gourdlight_costume_skeleton': '骷髏裝扮',
+  'seasonal.tricks.gourdlight_costume_ghost': '幽靈裝扮',
+  'seasonal.tricks.gourdlight_costume_bat': '蝙蝠裝扮',
+  'seasonal.costume': '你喝下藥劑，模樣變了：{trick}！',
+  'seasonal.titleGranted': '你讀完了令狀。獲得新頭銜：{title}。',
+  'seasonal.titleKnown': '你已經擁有這個頭銜，令狀留在你身上。',
+  'seasonal.boundItemGone': '南瓜燈之夜結束了，你的{item}化回了稻草。',
+  'seasonal.itemUse.costumeSkeleton':
+    '使用：變成一具喀喀作響的骷髏，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。',
+  'seasonal.itemUse.costumeGhost':
+    '使用：變成一個飄蕩的幽靈，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。',
+  'seasonal.itemUse.costumeBat':
+    '使用：變成一隻撲騰的蝙蝠，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。',
+  'seasonal.itemUse.titleWrit':
+    '使用：為這個角色獲得頭銜{title}，可在功績之書中佩戴。使用後消耗。僅限南瓜燈之夜期間。如果你已擁有該頭銜，令狀會保留。',
+  'seasonal.itemUse.broom': '老稻草獰笑的紀念品。它只在南瓜燈之夜期間存在，活動結束時會化為稻草。',
+  'entities.items.rattlebone_draught.name': '骨響藥劑',
+  'entities.items.haunting_draught.name': '幽魂藥劑',
+  'entities.items.batwing_draught.name': '振翅藥劑',
+  'entities.items.writ_of_the_gourdlit.name': '南瓜燈輝令狀',
+  'entities.items.writ_of_the_trickster.name': '搗蛋鬼令狀',
+  'entities.items.writ_of_the_hollow_grin.name': '空洞笑臉令狀',
+  'entities.items.reins_emberbristle_broom.name': '餘燼鬃毛掃帚',
+  'entities.mobs.gourdlight_swelling_gourd.name': '膨脹巨瓜',
   'entities.mobs.gourdlight_strawling.name': '稻草小人',
 };

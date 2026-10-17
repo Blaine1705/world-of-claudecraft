@@ -338,10 +338,12 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
     name: 'Emberbristle Broom',
     kind: 'mount',
     mount: GOURDLIGHT_BROOM_MOUNT,
-    quality: 'epic',
+    // the card's tier (content/mounts.ts emberbristle_broom: the base horse's 60%)
+    quality: 'common',
     seasonalEvent: GOURDLIGHT_EVE_ID,
     unique: true,
     soulbound: true,
+    noDiscard: true,
     noVendorSell: true,
     noSalvage: true,
     sellValue: 0,

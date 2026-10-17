@@ -6205,7 +6205,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "feat",
     "renown": 0,
     "feat": true,
-    "rewardTitle": "the Gourdlit"
+    "rewardTitle": "the Gourdlit",
+    "crest": "/ui/deeds/feat_title_gourdlit.webp"
   },
   {
     "id": "feat_title_trickster",
@@ -6213,7 +6214,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "feat",
     "renown": 0,
     "feat": true,
-    "rewardTitle": "Trickster"
+    "rewardTitle": "Trickster",
+    "crest": "/ui/deeds/feat_title_trickster.webp"
   },
   {
     "id": "feat_title_hollow_grinned",
@@ -6221,7 +6223,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "feat",
     "renown": 0,
     "feat": true,
-    "rewardTitle": "the Hollow-Grinned"
+    "rewardTitle": "the Hollow-Grinned",
+    "crest": "/ui/deeds/feat_title_hollow_grinned.webp"
   }
 ];
 
@@ -7520,6 +7523,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Friendship Tank"
+      },
+      {
+        "kind": "mount",
+        "name": "Emberbristle Broom"
       }
     ]
   },
@@ -7850,6 +7857,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Witness of the Choir"
+      },
+      {
+        "kind": "title",
+        "name": "the Gourdlit"
+      },
+      {
+        "kind": "title",
+        "name": "Trickster"
+      },
+      {
+        "kind": "title",
+        "name": "the Hollow-Grinned"
       }
     ]
   },

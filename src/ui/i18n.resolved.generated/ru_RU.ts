@@ -2226,7 +2226,7 @@ export const ru_RU: EnTranslations = {
       "name_lanternback_troll": "Грумбол Фонареносец",
       "name_chimeglass_tortoise": "Толливер Звонкостёкл",
       "name_rickshaw_mount": "Костяная рикша",
-      "name_emberbristle_broom": "Emberbristle Broom",
+      "name_emberbristle_broom": "Метла Тлеющей Щетины",
       "desc_valorsteed": "Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.",
       "desc_grag_bear": "Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.",
       "desc_stalkglider_snail": "Стойкая неторопливая улитка, повышающая скорость передвижения.",
@@ -2246,7 +2246,7 @@ export const ru_RU: EnTranslations = {
       "desc_lanternback_troll": "Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.",
       "desc_chimeglass_tortoise": "Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.",
       "desc_rickshaw_mount": "Дребезжащая костяная повозка, к оглоблям которой впряжен костлявый воин-скелет, тащащий вас во весь опор.",
-      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends."
+      "desc_emberbristle_broom": "Метла для жатвы, перевязанная оранжевой лентой. Парит в ладони над землёй и роняет угли с прутьев. Когда Ночь Тыквенных Огней заканчивается, она рассыпается в солому."
     },
     "mountTraining": {
       "mountPrompt": "Нажми {key}, чтобы оседлать учебного Доблестного скакуна.",
@@ -7733,9 +7733,9 @@ export const ru_RU: EnTranslations = {
       "gourdlight_trick_skeleton": "Гремящие кости",
       "gourdlight_trick_fumes": "Зелёный дым",
       "gourdlight_trick_strawling": "Облик соломенника",
-      "gourdlight_costume_skeleton": "Skeleton Costume",
-      "gourdlight_costume_ghost": "Ghost Costume",
-      "gourdlight_costume_bat": "Bat Costume"
+      "gourdlight_costume_skeleton": "Костюм скелета",
+      "gourdlight_costume_ghost": "Костюм призрака",
+      "gourdlight_costume_bat": "Костюм летучей мыши"
     },
     "pumpkinHead": {
       "on": "Вы надеваете резную тыквенную голову.",
@@ -7743,21 +7743,21 @@ export const ru_RU: EnTranslations = {
     },
     "jarTrick": "Банка с хлопком открывается: {trick}!",
     "guise": "Оберег трещит, и солома ползёт по вам: {trick}!",
-    "costume": "You drink the draught and change: {trick}!",
-    "titleGranted": "You read the writ. New title earned: {title}.",
-    "titleKnown": "You already hold that title, so you keep the writ.",
-    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
+    "costume": "Вы выпиваете зелье и меняетесь: {trick}!",
+    "titleGranted": "Вы прочли грамоту. Получено новое звание: {title}.",
+    "titleKnown": "У вас уже есть это звание, поэтому грамота остаётся у вас.",
+    "boundItemGone": "Ночь Тыквенных Огней закончилась, и ваш предмет «{item}» рассыпался в солому.",
     "itemUse": {
       "pumpkinHead": "Использование: надеть или снять резную тыкву со светом внутри поверх шлема. Только во время Ночи Тыквенных Огней. Только внешний вид.",
       "trickJar": "Использование: на несколько секунд разыгрывает над вами случайную безобидную шутку. Только во время Ночи Тыквенных Огней. Только внешний вид.",
       "pouch": "Использование: откройте, чтобы получить тыквенные конфеты: {count}.",
       "strawlingCharm": "Использование: превращает вас в соломенника Старого Соломозуба на {seconds} сек. Нельзя в бою, только во время Ночи Тыквенных Огней. Не расходуется. Только внешний вид.",
       "sweet": "Выдаётся, когда вы выпрашиваете сладости в Ночь Тыквенных Огней. Хестер Тыквинс в Истбруке обменивает их на предметы внешнего вида.",
-      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
-      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
-      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
-      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
-      "broom": "Old Thatchgrin's keepsake. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends."
+      "costumeSkeleton": "Использование: превращает в гремящего скелета на {minutes} мин. Расходуется. Нельзя использовать в бою, вступление в бой прерывает эффект. Только во время Ночи Тыквенных Огней. Только внешний вид.",
+      "costumeGhost": "Использование: превращает в парящего призрака на {minutes} мин. Расходуется. Нельзя использовать в бою, вступление в бой прерывает эффект. Только во время Ночи Тыквенных Огней. Только внешний вид.",
+      "costumeBat": "Использование: превращает в порхающую летучую мышь на {minutes} мин. Расходуется. Нельзя использовать в бою, вступление в бой прерывает эффект. Только во время Ночи Тыквенных Огней. Только внешний вид.",
+      "titleWrit": "Использование: этот персонаж получает звание {title}, которое можно носить из Книги деяний. Расходуется. Только во время Ночи Тыквенных Огней. Если звание уже есть, грамота остаётся.",
+      "broom": "Памятный трофей Старого Соломозуба. Существует только во время Ночи Тыквенных Огней и рассыпается в солому, когда праздник заканчивается."
     },
     "tokenPrice": "{item}: {count}"
   },
@@ -22992,25 +22992,25 @@ export const ru_RU: EnTranslations = {
         "name": "Оберег соломенника"
       },
       "rattlebone_draught": {
-        "name": "Rattlebone Draught"
+        "name": "Зелье гремящих костей"
       },
       "haunting_draught": {
-        "name": "Haunting Draught"
+        "name": "Зелье призрака"
       },
       "batwing_draught": {
-        "name": "Fluttering Draught"
+        "name": "Зелье трепета крыльев"
       },
       "writ_of_the_gourdlit": {
-        "name": "Writ of the Gourdlit"
+        "name": "Грамота Тыквосветного"
       },
       "writ_of_the_trickster": {
-        "name": "Writ of the Trickster"
+        "name": "Грамота Проказника"
       },
       "writ_of_the_hollow_grin": {
-        "name": "Writ of the Hollow Grin"
+        "name": "Грамота Пустой Ухмылки"
       },
       "reins_emberbristle_broom": {
-        "name": "Emberbristle Broom"
+        "name": "Метла Тлеющей Щетины"
       },
       "membership_token": {
         "name": "Жетон членства (30 дней)"
@@ -24563,7 +24563,7 @@ export const ru_RU: EnTranslations = {
         "name": "Соломенник"
       },
       "gourdlight_swelling_gourd": {
-        "name": "Swelling Gourd"
+        "name": "Набухающая тыква"
       },
       "stable_horse": {
         "name": "Конюшенная лошадь"

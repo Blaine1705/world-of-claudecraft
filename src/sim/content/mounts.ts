@@ -136,6 +136,17 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  // Gourdlight Eve's broom (content/gourdlight_eve.ts GOURDLIGHT_BROOM_ID), Old
+  // Thatchgrin's keepsake. It hovers a hand's breadth over the ground (a ground mount
+  // like every other, it never flies) and its reins are EVENT-BOUND: they leave the
+  // bags when the event closes. The event grants no power or speed edge, so it rides at the
+  // base horse's 60%, never a faster tier.
+  emberbristle_broom: {
+    key: 'emberbristle_broom',
+    name: 'Emberbristle Broom',
+    rarity: 'common',
+    moveSpeedPct: 0.6,
+  },
   referral_tank: {
     key: 'referral_tank',
     name: 'Friendship Tank',
@@ -147,17 +158,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     name: 'Friendship Raptor',
     rarity: 'epic',
     moveSpeedPct: 0.8,
-  },
-  // Gourdlight Eve's broom (content/gourdlight_eve.ts GOURDLIGHT_BROOM_ID), Old
-  // Thatchgrin's keepsake. It hovers a hand's breadth over the ground (a ground mount
-  // like every other, it never flies) and its reins are EVENT-BOUND: they leave the
-  // bags when the event closes. Everything in the event is cosmetic, so it rides at the
-  // base horse's 60%, never a faster tier.
-  emberbristle_broom: {
-    key: 'emberbristle_broom',
-    name: 'Emberbristle Broom',
-    rarity: 'common',
-    moveSpeedPct: 0.6,
   },
   // The Bonebound Rickshaw left this catalog with the v0.42.0 cosmetics
   // change: it is a mount SKIN now (content/mount_skins.ts, id rickshaw_mount),

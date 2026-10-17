@@ -21778,5 +21778,33 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.strawling_charm.name': '짚인형 부적',
   'entities.mobs.gourdlight_thatchgrin.name': '올드 대치그린',
   'entities.mobs.gourdlight_crow.name': '고드라이트 까마귀',
+  'hudChrome.mounts.name_emberbristle_broom': '잉걸갈기 빗자루',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    '주황색 리본을 감은 수확용 빗자루. 땅에서 한 뼘 위에 떠서 솔 끝으로 불씨를 흩뿌린다. 고드라이트 축제의 밤이 끝나면 다시 짚으로 부서진다.',
+  'seasonal.tricks.gourdlight_costume_skeleton': '해골 분장',
+  'seasonal.tricks.gourdlight_costume_ghost': '유령 분장',
+  'seasonal.tricks.gourdlight_costume_bat': '박쥐 분장',
+  'seasonal.costume': '물약을 마시자 모습이 바뀝니다: {trick}!',
+  'seasonal.titleGranted': '증서를 읽었습니다. 새 칭호 획득: {title}.',
+  'seasonal.titleKnown': '이미 그 칭호를 가지고 있으므로 증서는 그대로 남습니다.',
+  'seasonal.boundItemGone': '고드라이트 축제의 밤이 끝나 {item}이(가) 다시 짚으로 부서졌습니다.',
+  'seasonal.itemUse.costumeSkeleton':
+    '사용: {minutes}분 동안 덜그럭거리는 해골로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
+  'seasonal.itemUse.costumeGhost':
+    '사용: {minutes}분 동안 떠도는 유령으로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
+  'seasonal.itemUse.costumeBat':
+    '사용: {minutes}분 동안 날갯짓하는 박쥐로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
+  'seasonal.itemUse.titleWrit':
+    '사용: 이 캐릭터의 칭호 {title}을(를) 획득하며, 업적의 서에서 착용할 수 있습니다. 사용 시 소모됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 이미 칭호가 있으면 증서가 남습니다.',
+  'seasonal.itemUse.broom':
+    '올드 대치그린의 기념품. 고드라이트 축제의 밤 동안에만 남아 있으며, 행사가 끝나면 짚으로 부서집니다.',
+  'entities.items.rattlebone_draught.name': '덜그럭뼈 물약',
+  'entities.items.haunting_draught.name': '떠도는 혼 물약',
+  'entities.items.batwing_draught.name': '날갯짓 물약',
+  'entities.items.writ_of_the_gourdlit.name': '고드릿의 증서',
+  'entities.items.writ_of_the_trickster.name': '장난꾼의 증서',
+  'entities.items.writ_of_the_hollow_grin.name': '텅 빈 미소의 증서',
+  'entities.items.reins_emberbristle_broom.name': '잉걸갈기 빗자루',
+  'entities.mobs.gourdlight_swelling_gourd.name': '부푸는 박',
   'entities.mobs.gourdlight_strawling.name': '짚인형',
 };

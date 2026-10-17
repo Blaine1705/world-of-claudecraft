@@ -3425,6 +3425,8 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 4,
     runRef: 11,
     lazyPreload: true,
+    // its KTX2 BroomAtlas carries authored roughness and emissive embers
+    authoredAtlas: true,
   },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.

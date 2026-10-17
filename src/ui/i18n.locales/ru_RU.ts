@@ -22189,5 +22189,34 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.strawling_charm.name': 'Оберег соломенника',
   'entities.mobs.gourdlight_thatchgrin.name': 'Старый Соломозуб',
   'entities.mobs.gourdlight_crow.name': 'Ворона Тыквенных Огней',
+  'hudChrome.mounts.name_emberbristle_broom': 'Метла Тлеющей Щетины',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'Метла для жатвы, перевязанная оранжевой лентой. Парит в ладони над землёй и роняет угли с прутьев. Когда Ночь Тыквенных Огней заканчивается, она рассыпается в солому.',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'Костюм скелета',
+  'seasonal.tricks.gourdlight_costume_ghost': 'Костюм призрака',
+  'seasonal.tricks.gourdlight_costume_bat': 'Костюм летучей мыши',
+  'seasonal.costume': 'Вы выпиваете зелье и меняетесь: {trick}!',
+  'seasonal.titleGranted': 'Вы прочли грамоту. Получено новое звание: {title}.',
+  'seasonal.titleKnown': 'У вас уже есть это звание, поэтому грамота остаётся у вас.',
+  'seasonal.boundItemGone':
+    'Ночь Тыквенных Огней закончилась, и ваш предмет «{item}» рассыпался в солому.',
+  'seasonal.itemUse.costumeSkeleton':
+    'Использование: превращает в гремящего скелета на {minutes} мин. Расходуется. Нельзя использовать в бою, вступление в бой прерывает эффект. Только во время Ночи Тыквенных Огней. Только внешний вид.',
+  'seasonal.itemUse.costumeGhost':
+    'Использование: превращает в парящего призрака на {minutes} мин. Расходуется. Нельзя использовать в бою, вступление в бой прерывает эффект. Только во время Ночи Тыквенных Огней. Только внешний вид.',
+  'seasonal.itemUse.costumeBat':
+    'Использование: превращает в порхающую летучую мышь на {minutes} мин. Расходуется. Нельзя использовать в бою, вступление в бой прерывает эффект. Только во время Ночи Тыквенных Огней. Только внешний вид.',
+  'seasonal.itemUse.titleWrit':
+    'Использование: этот персонаж получает звание {title}, которое можно носить из Книги деяний. Расходуется. Только во время Ночи Тыквенных Огней. Если звание уже есть, грамота остаётся.',
+  'seasonal.itemUse.broom':
+    'Памятный трофей Старого Соломозуба. Существует только во время Ночи Тыквенных Огней и рассыпается в солому, когда праздник заканчивается.',
+  'entities.items.rattlebone_draught.name': 'Зелье гремящих костей',
+  'entities.items.haunting_draught.name': 'Зелье призрака',
+  'entities.items.batwing_draught.name': 'Зелье трепета крыльев',
+  'entities.items.writ_of_the_gourdlit.name': 'Грамота Тыквосветного',
+  'entities.items.writ_of_the_trickster.name': 'Грамота Проказника',
+  'entities.items.writ_of_the_hollow_grin.name': 'Грамота Пустой Ухмылки',
+  'entities.items.reins_emberbristle_broom.name': 'Метла Тлеющей Щетины',
+  'entities.mobs.gourdlight_swelling_gourd.name': 'Набухающая тыква',
   'entities.mobs.gourdlight_strawling.name': 'Соломенник',
 };

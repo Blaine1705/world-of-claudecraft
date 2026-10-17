@@ -21782,5 +21782,33 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.strawling_charm.name': '藁人形のお守り',
   'entities.mobs.gourdlight_thatchgrin.name': 'オールド・サッチグリン',
   'entities.mobs.gourdlight_crow.name': 'ゴードライトのカラス',
+  'hudChrome.mounts.name_emberbristle_broom': 'エンバーブリッスルの箒',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'オレンジのリボンを巻いた収穫の箒。地面から手のひらひとつ分浮かび、穂先から燠火をこぼす。ゴードライトの宵が終わると藁に戻って崩れ落ちる。',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'スケルトンの仮装',
+  'seasonal.tricks.gourdlight_costume_ghost': 'ゴーストの仮装',
+  'seasonal.tricks.gourdlight_costume_bat': 'コウモリの仮装',
+  'seasonal.costume': '薬を飲むと姿が変わった：{trick}！',
+  'seasonal.titleGranted': '証書を読んだ。新しい称号を獲得：{title}。',
+  'seasonal.titleKnown': 'その称号はすでに持っているので、証書は手元に残る。',
+  'seasonal.boundItemGone': 'ゴードライトの宵が終わり、{item}は藁に戻って崩れ落ちた。',
+  'seasonal.itemUse.costumeSkeleton':
+    '使用：{minutes}分間、カタカタ鳴るスケルトンに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。',
+  'seasonal.itemUse.costumeGhost':
+    '使用：{minutes}分間、漂うゴーストに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。',
+  'seasonal.itemUse.costumeBat':
+    '使用：{minutes}分間、羽ばたくコウモリに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。',
+  'seasonal.itemUse.titleWrit':
+    '使用：このキャラクターの称号{title}を獲得し、功績の書から付けられる。消費される。ゴードライトの宵の期間のみ。称号をすでに持っている場合は証書が残る。',
+  'seasonal.itemUse.broom':
+    'オールド・サッチグリンの形見。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。',
+  'entities.items.rattlebone_draught.name': 'ガラガラ骨の薬',
+  'entities.items.haunting_draught.name': 'さまよう霊の薬',
+  'entities.items.batwing_draught.name': 'はばたきの薬',
+  'entities.items.writ_of_the_gourdlit.name': 'ゴードリットの証書',
+  'entities.items.writ_of_the_trickster.name': 'トリックスターの証書',
+  'entities.items.writ_of_the_hollow_grin.name': 'うつろな笑みの証書',
+  'entities.items.reins_emberbristle_broom.name': 'エンバーブリッスルの箒',
+  'entities.mobs.gourdlight_swelling_gourd.name': '膨れ瓜',
   'entities.mobs.gourdlight_strawling.name': '藁人形',
 };

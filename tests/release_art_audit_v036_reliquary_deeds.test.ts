@@ -302,8 +302,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
     // 347 with Gourdlight Eve's seasonal Feat, its crest painted: 290 painted.
     // 348 with its field boss's Feat (feat_old_thatchgrin), painted too: 291.
-    expect(DEED_ORDER).toHaveLength(348);
-    expect(DEED_IMAGE_IDS.size).toBe(291);
+    // 351 with its three title-writ Feats, all painted: 294.
+    expect(DEED_ORDER).toHaveLength(351);
+    expect(DEED_IMAGE_IDS.size).toBe(294);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),

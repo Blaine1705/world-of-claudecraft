@@ -153,7 +153,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, 3810.
     // + Gourdlight Eve's zero-Renown Feat (feat_gourdlight_guise): 347, 3810.
     // + Old Thatchgrin's zero-Renown Feat (feat_old_thatchgrin): 348, 3810.
-    expect(DEED_ORDER.length).toBe(348);
+    // + Gourdlight Eve's three zero-Renown title-writ Feats (feat_title_*): 351, 3810.
+    expect(DEED_ORDER.length).toBe(351);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3810);
   });
 
@@ -206,7 +207,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       exploration: 22,
       // +1 Gourdlight Eve's seasonal Feat (feat_gourdlight_guise).
       // +1 its field boss's Feat (feat_old_thatchgrin).
-      feat: 5,
+      // +3 its title writs (feat_title_gourdlit, _trickster, _hollow_grinned).
+      feat: 8,
       hidden: 10,
     });
   });
@@ -467,6 +469,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'feat_gourdlight_guise',
       // ...and its field boss's (content/gourdlight_eve_scarecrow.ts).
       'feat_old_thatchgrin',
+      // ...and the three title writs Hester sells (GOURDLIGHT_TITLE_WRITS).
+      'feat_title_gourdlit',
+      'feat_title_trickster',
+      'feat_title_hollow_grinned',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -864,12 +870,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
     // one more, and the Drowned Temple lore guide's Witness of the Choir
-    // (dgn_drowned_temple_cantor) one more.
-    expect(titles.length).toBe(52);
+    // (dgn_drowned_temple_cantor) one more, and Gourdlight Eve's three title
+    // writs (the Gourdlit, Trickster, the Hollow-Grinned) three more.
+    expect(titles.length).toBe(55);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(52);
+    expect(new Set(titleTexts).size).toBe(55);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1111,7 +1118,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // auditable way: the 9e4d4f50... literal rotated down into PRE_APPEND_CATALOG_SHA256.
   // Re-baselined for Old Thatchgrin's one appended Feat (feat_old_thatchgrin), the
   // auditable way: the 4f56af60... literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = '7ce9116dd46fdbca75bb16207144ad5cb0928420f76b989692615e217c2572aa';
+  // Re-baselined for Gourdlight Eve's three appended title-writ Feats (feat_title_*),
+  // the auditable way: the 7ce9116d... literal rotated down into PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = '64e2a09b0eec1c96d8c84618f12745edbb8003d3a8c3e5085c27f7e30616e49d';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1192,10 +1201,17 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // literal (rotated down here), and stripping the one id must reproduce it exactly.
   //
   // Its field boss (phase 2) appends feat_old_thatchgrin after the Guise; the previous
-  // mint is the Guise's 4f56af60... literal (rotated down here).
+  // mint is the Guise's 4f56af60... literal.
+  //
+  // Its three title writs (phase 3) append after the field boss's Feat; the previous
+  // mint is the field boss's 7ce9116d... literal (rotated down here).
   const PRE_APPEND_CATALOG_SHA256 =
-    '4f56af600e224916fcac4afae85ddc971ed43730c8986c76d7e906ffd0a7b87e';
-  const APPENDED_SINCE: readonly string[] = ['feat_old_thatchgrin'];
+    '7ce9116dd46fdbca75bb16207144ad5cb0928420f76b989692615e217c2572aa';
+  const APPENDED_SINCE: readonly string[] = [
+    'feat_title_gourdlit',
+    'feat_title_trickster',
+    'feat_title_hollow_grinned',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1206,8 +1222,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // the ferry round trip. Pin the two predecessors too: an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_morthen_candlelight',
       'feat_gourdlight_guise',
+      'feat_old_thatchgrin',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1437,13 +1453,15 @@ describe('table shape', () => {
     // Clue Scroll casket pair, then the release's ferry round trip, then the
     // Mirefen world-boss branch's three combat deeds, then (v0.45.0 integration) the
     // five-dungeon rework's 24, Morthen's Every Candle Lit last.
-    // Gourdlight Eve's Feat appends after Morthen's, its field boss's Feat last.
-    expect(DEED_ORDER[DEED_ORDER.length - 30]).toBe('exp_harbor_to_harbor');
-    expect(DEED_ORDER[DEED_ORDER.length - 28]).toBe('cmb_balgath_ten');
-    expect(DEED_ORDER[DEED_ORDER.length - 27]).toBe('cmb_point_taken');
-    expect(DEED_ORDER[DEED_ORDER.length - 3]).toBe('dgn_morthen_candlelight');
-    expect(DEED_ORDER[DEED_ORDER.length - 2]).toBe('feat_gourdlight_guise');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_old_thatchgrin');
+    // Gourdlight Eve's Feat appends after Morthen's, then its field boss's Feat, then
+    // its three title writs last.
+    expect(DEED_ORDER[DEED_ORDER.length - 33]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 31]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 30]).toBe('cmb_point_taken');
+    expect(DEED_ORDER[DEED_ORDER.length - 6]).toBe('dgn_morthen_candlelight');
+    expect(DEED_ORDER[DEED_ORDER.length - 5]).toBe('feat_gourdlight_guise');
+    expect(DEED_ORDER[DEED_ORDER.length - 4]).toBe('feat_old_thatchgrin');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_title_hollow_grinned');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -1811,6 +1829,11 @@ describe('trigger references resolve against the real content tables', () => {
       // Reviewed at Gourdlight Eve: the seasonal Feat's trigger is exactly the
       // carved_pumpkin_head item, so naming the Carved Pumpkin Head is right.
       'feat_gourdlight_guise:Carved Pumpkin Head',
+      // Reviewed at Gourdlight Eve phase 3: each title Feat is granted by reading
+      // exactly the writ its desc names (GOURDLIGHT_TITLE_WRITS maps writ to deed).
+      'feat_title_gourdlit:Writ of the Gourdlit',
+      'feat_title_hollow_grinned:Writ of the Hollow Grin',
+      'feat_title_trickster:Writ of the Trickster',
       'hid_codfather:The Codfather',
       // Reviewed at masterwrought Phase 13: the promotion capstone's desc
       // names the Deed of Making, and resolvePerfectingAttempt's promotion branch really does

@@ -2226,7 +2226,7 @@ export const ja_JP: EnTranslations = {
       "name_lanternback_troll": "ランタンバックのグルンボル",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
-      "name_emberbristle_broom": "Emberbristle Broom",
+      "name_emberbristle_broom": "エンバーブリッスルの箒",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -2246,7 +2246,7 @@ export const ja_JP: EnTranslations = {
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。",
-      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends."
+      "desc_emberbristle_broom": "オレンジのリボンを巻いた収穫の箒。地面から手のひらひとつ分浮かび、穂先から燠火をこぼす。ゴードライトの宵が終わると藁に戻って崩れ落ちる。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -7733,9 +7733,9 @@ export const ja_JP: EnTranslations = {
       "gourdlight_trick_skeleton": "カタカタ骨",
       "gourdlight_trick_fumes": "緑の煙",
       "gourdlight_trick_strawling": "藁人形の扮装",
-      "gourdlight_costume_skeleton": "Skeleton Costume",
-      "gourdlight_costume_ghost": "Ghost Costume",
-      "gourdlight_costume_bat": "Bat Costume"
+      "gourdlight_costume_skeleton": "スケルトンの仮装",
+      "gourdlight_costume_ghost": "ゴーストの仮装",
+      "gourdlight_costume_bat": "コウモリの仮装"
     },
     "pumpkinHead": {
       "on": "彫りカボチャの頭をかぶった。",
@@ -7743,21 +7743,21 @@ export const ja_JP: EnTranslations = {
     },
     "jarTrick": "壺がぽんと開いた：{trick}！",
     "guise": "お守りがぱちぱちと鳴り、藁が体を這い上がる：{trick}！",
-    "costume": "You drink the draught and change: {trick}!",
-    "titleGranted": "You read the writ. New title earned: {title}.",
-    "titleKnown": "You already hold that title, so you keep the writ.",
-    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
+    "costume": "薬を飲むと姿が変わった：{trick}！",
+    "titleGranted": "証書を読んだ。新しい称号を獲得：{title}。",
+    "titleKnown": "その称号はすでに持っているので、証書は手元に残る。",
+    "boundItemGone": "ゴードライトの宵が終わり、{item}は藁に戻って崩れ落ちた。",
     "itemUse": {
       "pumpkinHead": "使用：内側から灯る彫りカボチャを兜の上からかぶる・外す。ゴードライトの宵の間のみ。見た目のみ。",
       "trickJar": "使用：数秒間、無害ないたずらをランダムに自分にかける。ゴードライトの宵の間のみ。見た目のみ。",
       "pouch": "使用：開けるとゴードライトの菓子を{count}個受け取る。",
       "strawlingCharm": "使用：{seconds}秒間、オールド・サッチグリンの藁人形の姿になる。戦闘中は使えず、ゴードライトの宵の間のみ。消費されない。見た目のみ。",
       "sweet": "ゴードライトの宵の間にお菓子をねだって手に入る。イーストブルックのヘスター・ゴードウィックが見た目アイテムと交換してくれる。",
-      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
-      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
-      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
-      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
-      "broom": "Old Thatchgrin's keepsake. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends."
+      "costumeSkeleton": "使用：{minutes}分間、カタカタ鳴るスケルトンに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。",
+      "costumeGhost": "使用：{minutes}分間、漂うゴーストに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。",
+      "costumeBat": "使用：{minutes}分間、羽ばたくコウモリに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。",
+      "titleWrit": "使用：このキャラクターの称号{title}を獲得し、功績の書から付けられる。消費される。ゴードライトの宵の期間のみ。称号をすでに持っている場合は証書が残る。",
+      "broom": "オールド・サッチグリンの形見。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。"
     },
     "tokenPrice": "{item} ×{count}"
   },
@@ -22992,25 +22992,25 @@ export const ja_JP: EnTranslations = {
         "name": "藁人形のお守り"
       },
       "rattlebone_draught": {
-        "name": "Rattlebone Draught"
+        "name": "ガラガラ骨の薬"
       },
       "haunting_draught": {
-        "name": "Haunting Draught"
+        "name": "さまよう霊の薬"
       },
       "batwing_draught": {
-        "name": "Fluttering Draught"
+        "name": "はばたきの薬"
       },
       "writ_of_the_gourdlit": {
-        "name": "Writ of the Gourdlit"
+        "name": "ゴードリットの証書"
       },
       "writ_of_the_trickster": {
-        "name": "Writ of the Trickster"
+        "name": "トリックスターの証書"
       },
       "writ_of_the_hollow_grin": {
-        "name": "Writ of the Hollow Grin"
+        "name": "うつろな笑みの証書"
       },
       "reins_emberbristle_broom": {
-        "name": "Emberbristle Broom"
+        "name": "エンバーブリッスルの箒"
       },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"
@@ -24563,7 +24563,7 @@ export const ja_JP: EnTranslations = {
         "name": "藁人形"
       },
       "gourdlight_swelling_gourd": {
-        "name": "Swelling Gourd"
+        "name": "膨れ瓜"
       },
       "stable_horse": {
         "name": "厩舎の馬"

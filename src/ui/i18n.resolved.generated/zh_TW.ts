@@ -2226,7 +2226,7 @@ export const zh_TW: EnTranslations = {
       "name_lanternback_troll": "提燈背者格倫博",
       "name_chimeglass_tortoise": "鐘晶的托利弗",
       "name_rickshaw_mount": "白骨人力車",
-      "name_emberbristle_broom": "Emberbristle Broom",
+      "name_emberbristle_broom": "餘燼鬃毛掃帚",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
@@ -2246,7 +2246,7 @@ export const zh_TW: EnTranslations = {
       "desc_lanternback_troll": "被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。",
       "desc_chimeglass_tortoise": "鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。",
       "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。",
-      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends."
+      "desc_emberbristle_broom": "一把繫著橙色緞帶的收穫掃帚，懸浮在離地一掌高的地方，鬃毛不斷灑落餘燼。南瓜燈之夜結束時，它會化回一堆稻草。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -7733,9 +7733,9 @@ export const zh_TW: EnTranslations = {
       "gourdlight_trick_skeleton": "骨頭喀喀",
       "gourdlight_trick_fumes": "綠色煙霧",
       "gourdlight_trick_strawling": "稻草人偽裝",
-      "gourdlight_costume_skeleton": "Skeleton Costume",
-      "gourdlight_costume_ghost": "Ghost Costume",
-      "gourdlight_costume_bat": "Bat Costume"
+      "gourdlight_costume_skeleton": "骷髏裝扮",
+      "gourdlight_costume_ghost": "幽靈裝扮",
+      "gourdlight_costume_bat": "蝙蝠裝扮"
     },
     "pumpkinHead": {
       "on": "你戴上了雕刻南瓜頭。",
@@ -7743,21 +7743,21 @@ export const zh_TW: EnTranslations = {
     },
     "jarTrick": "罐子砰地打開了：{trick}！",
     "guise": "護符劈啪作響，稻草爬滿了你的全身：{trick}！",
-    "costume": "You drink the draught and change: {trick}!",
-    "titleGranted": "You read the writ. New title earned: {title}.",
-    "titleKnown": "You already hold that title, so you keep the writ.",
-    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
+    "costume": "你喝下藥劑，模樣變了：{trick}！",
+    "titleGranted": "你讀完了令狀。獲得新頭銜：{title}。",
+    "titleKnown": "你已經擁有這個頭銜，令狀留在你身上。",
+    "boundItemGone": "南瓜燈之夜結束了，你的{item}化回了稻草。",
     "itemUse": {
       "pumpkinHead": "使用：戴上或摘下一顆從內部點亮的雕刻南瓜，套在頭盔之上。僅在南瓜燈之夜期間可用。純外觀。",
       "trickJar": "使用：對你施加一個隨機的無害惡作劇，持續數秒。僅在南瓜燈之夜期間可用。純外觀。",
       "pouch": "使用：打開後獲得{count}顆南瓜燈糖。",
       "strawlingCharm": "使用：變成老稻草獰笑的稻草小人，持續{seconds}秒。戰鬥中無法使用，僅限南瓜燈之夜期間。不會消耗。僅外觀。",
       "sweet": "在南瓜燈之夜期間討糖獲得。東溪的赫絲特·葫蘆芯會用外觀物品交換它們。",
-      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
-      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
-      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
-      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
-      "broom": "Old Thatchgrin's keepsake. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends."
+      "costumeSkeleton": "使用：變成一具喀喀作響的骷髏，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。",
+      "costumeGhost": "使用：變成一個飄蕩的幽靈，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。",
+      "costumeBat": "使用：變成一隻撲騰的蝙蝠，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。",
+      "titleWrit": "使用：為這個角色獲得頭銜{title}，可在功績之書中佩戴。使用後消耗。僅限南瓜燈之夜期間。如果你已擁有該頭銜，令狀會保留。",
+      "broom": "老稻草獰笑的紀念品。它只在南瓜燈之夜期間存在，活動結束時會化為稻草。"
     },
     "tokenPrice": "{count}個{item}"
   },
@@ -22992,25 +22992,25 @@ export const zh_TW: EnTranslations = {
         "name": "稻草小人護符"
       },
       "rattlebone_draught": {
-        "name": "Rattlebone Draught"
+        "name": "骨響藥劑"
       },
       "haunting_draught": {
-        "name": "Haunting Draught"
+        "name": "幽魂藥劑"
       },
       "batwing_draught": {
-        "name": "Fluttering Draught"
+        "name": "振翅藥劑"
       },
       "writ_of_the_gourdlit": {
-        "name": "Writ of the Gourdlit"
+        "name": "南瓜燈輝令狀"
       },
       "writ_of_the_trickster": {
-        "name": "Writ of the Trickster"
+        "name": "搗蛋鬼令狀"
       },
       "writ_of_the_hollow_grin": {
-        "name": "Writ of the Hollow Grin"
+        "name": "空洞笑臉令狀"
       },
       "reins_emberbristle_broom": {
-        "name": "Emberbristle Broom"
+        "name": "餘燼鬃毛掃帚"
       },
       "membership_token": {
         "name": "會員代幣（30天）"
@@ -24563,7 +24563,7 @@ export const zh_TW: EnTranslations = {
         "name": "稻草小人"
       },
       "gourdlight_swelling_gourd": {
-        "name": "Swelling Gourd"
+        "name": "膨脹巨瓜"
       },
       "stable_horse": {
         "name": "廄馬"
