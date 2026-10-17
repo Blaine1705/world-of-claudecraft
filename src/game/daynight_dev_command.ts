@@ -64,13 +64,17 @@ export function parsePhaseArg(
   return Number.isFinite(n) ? ((n % 1) + 1) % 1 : null;
 }
 
-export function tryDayNightDevCommand(raw: string, hud: DayNightDevHud): boolean {
+export function tryDayNightDevCommand(
+  raw: string,
+  hud: DayNightDevHud,
+  devCommandsAvailable = import.meta.env.DEV,
+): boolean {
   const m = raw.trim().match(/^\/(?:dev\s+time|dev\s+daynight|daynight)\b\s*(.*)$/i);
   if (!m) return false;
-  // Dev builds only: a per-client phase override is brighter-night-for-me,
-  // exactly the actionable-visibility class the graphics-fairness rule bans.
-  // Harmless while DAY_ONLY pins day, but gate it before that ever flips.
-  if (!import.meta.env.DEV) return false;
+  // Dev builds or realms advertising ALLOW_DEV_COMMANDS=1 (dev/PBE) only: a
+  // per-client phase override is brighter-night-for-me, which is banned on
+  // production realms where devCommandsAvailable is false.
+  if (!import.meta.env.DEV && !devCommandsAvailable) return false;
   const arg = m[1].trim().toLowerCase();
   if (!arg) {
     hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
