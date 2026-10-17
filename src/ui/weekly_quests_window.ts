@@ -191,11 +191,7 @@ export class WeeklyQuestsWindow {
       .join('');
     return (
       `<section class="wk-commend"><span class="wk-commend-copy"><b class="wk-commend-heading">${esc(view.heading)}</b> ` +
-      `<span class="wk-commend-note">${esc(view.claimedText ?? view.note)}</span>` +
-      (view.carryNote
-        ? ` <span class="wk-commend-note wk-commend-carry">${esc(view.carryNote)}</span>`
-        : '') +
-      '</span>' +
+      `<span class="wk-commend-note">${esc(view.claimedText ?? view.note)}</span></span>` +
       `<span class="wk-commend-options">${options}</span></section>`
     );
   }

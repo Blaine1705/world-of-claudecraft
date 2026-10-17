@@ -98,12 +98,7 @@ describe('weekly quests window', () => {
       ['automatons', false],
     ]);
     expect(r.el.querySelector('.wk-foot')).toBeNull();
-    const notes = [...r.el.querySelectorAll('.wk-commend-note')].map((n) => n.textContent);
-    expect(notes).toHaveLength(2);
-    expect(notes[0]).toContain('1,000');
-    expect(r.el.querySelector('.wk-commend-carry')?.textContent).toBe(
-      'An unclaimed commendation carries past the reset. You cannot take a new charge until you claim it.',
-    );
+    expect(r.el.querySelector('.wk-commend-note')?.textContent).toContain('1,000');
     buttons[1].click();
     expect(r.commendWeeklyQuest).toHaveBeenCalledExactlyOnceWith('church_order');
     // Once the mirror carries the claim, every button is inert and the line names it.
@@ -118,8 +113,8 @@ describe('weekly quests window', () => {
     expect(
       [...r.el.querySelectorAll<HTMLButtonElement>('[data-wk-commend]')].every((b) => b.disabled),
     ).toBe(true);
-    expect([...r.el.querySelectorAll('.wk-commend-note')].map((n) => n.textContent)).toEqual([
+    expect(r.el.querySelector('.wk-commend-note')?.textContent).toBe(
       "This week's commendation went to the Church Order.",
-    ]);
+    );
   });
 });

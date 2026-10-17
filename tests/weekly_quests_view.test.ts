@@ -106,9 +106,6 @@ describe('the commendation view', () => {
       ['automatons', false, false],
     ]);
     expect(view.commendation?.claimedText).toBeNull();
-    expect(view.commendation?.carryNote).toBe(
-      'An unclaimed commendation carries past the reset. You cannot take a new charge until you claim it.',
-    );
   });
 
   it('marks the claimed faction and names it once the choice is made', () => {
@@ -133,10 +130,9 @@ describe('the commendation view', () => {
     expect(view.commendation?.claimedText).toBe(
       "This week's commendation went to the Church Order.",
     );
-    expect(view.commendation?.carryNote).toBeNull();
   });
 
-  it('words a pick carried past the reset as last week, and drops the carry promise when capped', () => {
+  it('words a pick carried past the reset as last week, in the same one-line note', () => {
     const carried = buildWeeklyQuestsView(
       {
         weeklyQuest: {
@@ -153,13 +149,13 @@ describe('the commendation view', () => {
       0,
     );
     expect(carried.cards.map((card) => [card.id, card.buttonLabel])).toEqual([
-      ['wk_dungeons', 'Claim the commendation first'],
+      ['wk_dungeons', 'Claim first'],
       ['wk_raid', 'Completed last week'],
-      ['wk_battlegrounds', 'Claim the commendation first'],
-      ['wk_worldboss', 'Claim the commendation first'],
+      ['wk_battlegrounds', 'Claim first'],
+      ['wk_worldboss', 'Claim first'],
     ]);
-    expect(carried.commendation?.carryNote).toBe(
-      "Claim last week's commendation to choose this week's charge.",
+    expect(carried.commendation?.note).toBe(
+      '1,000 standing from last week, still unclaimed. Claim it to choose a new charge.',
     );
     // An online mirror with no carried mark reads as this week's pick.
     const thisWeek = buildWeeklyQuestsView(
@@ -177,18 +173,8 @@ describe('the commendation view', () => {
       'Locked this week',
       'Locked this week',
     ]);
-    // Every faction capped: no claim is possible and the sim lets it lapse, so
-    // the strip makes no carry promise.
-    const capped = buildWeeklyQuestsView(
-      {
-        weeklyQuest: { questId: 'wk_raid', week: 'wk_2', count: 1, state: 'completed' },
-        weeklyQuestResetAtMs: 0,
-        factions: { rift_watch: 3000, church_order: 3000, automatons: 3000 },
-        player: { level: 10 },
-      },
-      0,
+    expect(thisWeek.commendation?.note).toBe(
+      '1,000 standing to one faction of your choice, once a week.',
     );
-    expect(capped.commendation?.options.every((option) => option.capped)).toBe(true);
-    expect(capped.commendation?.carryNote).toBeNull();
   });
 });

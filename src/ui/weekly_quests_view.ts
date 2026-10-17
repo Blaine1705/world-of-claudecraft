@@ -54,9 +54,6 @@ export interface WeeklyCommendationView {
   options: WeeklyCommendationOption[];
   /** Set once claimed; every option is then inert. */
   claimedText: string | null;
-  /** While unclaimed and claimable: it outlives the reset and blocks the next
-   *  charge until claimed (worded for a pick already carried past one). */
-  carryNote: string | null;
 }
 
 export interface WeeklyQuestsView {
@@ -124,7 +121,9 @@ export function buildWeeklyCommendation(world: WeeklyWorld): WeeklyCommendationV
   );
   return {
     heading: t('hudChrome.weekly.commendHeading'),
-    note: t('hudChrome.weekly.commendNote', {
+    // A pick carried past the reset says so in this same line, so the strip
+    // keeps its height (the cards above it have no room to give).
+    note: t(held.carried ? 'hudChrome.weekly.commendCarriedNote' : 'hudChrome.weekly.commendNote', {
       amount: whole(WEEKLY_QUEST_REWARD.commendationStanding),
     }),
     options,
@@ -132,16 +131,6 @@ export function buildWeeklyCommendation(world: WeeklyWorld): WeeklyCommendationV
       claimed === null
         ? null
         : t('hudChrome.weekly.commendClaimed', { faction: factionLabel(claimed as FactionId) }),
-    // Only while a faction can still take it: with every option capped the
-    // sim lets it lapse at the reset, so promising a carry would be false.
-    carryNote:
-      claimed !== null || options.every((option) => option.capped)
-        ? null
-        : t(
-            held.carried
-              ? 'hudChrome.weekly.commendCarriedNote'
-              : 'hudChrome.weekly.commendCarryNote',
-          ),
   };
 }
 
