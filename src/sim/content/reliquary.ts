@@ -397,7 +397,9 @@ export const RELIQUARY_HORIZON_WEAPON_SKINS = [
 // a hidden deed's existence is itself the secret, so a placeholder row would
 // spoil it just as loudly as the name. The Book of Deeds is their only home,
 // where they stay invisible until earned. Keep this list to non-hidden title
-// rewards; tests/reliquary_content.test.ts pins both directions.
+// rewards except new seasonal Feats: seasonal titles must never gate completion.
+// The shipped Vale Cup title remains grandfathered in its existing slot.
+// tests/reliquary_content.test.ts pins both directions.
 /** Deeds that grant a title reward (real DEEDS ids only; no invented titles). */
 export const RELIQUARY_HORIZON_TITLES = [
   'prog_veteran',

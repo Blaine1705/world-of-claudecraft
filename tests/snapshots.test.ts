@@ -86,6 +86,7 @@ import {
 } from '../src/sim/combat/priest/presentation';
 import { CLUE_HUNTS } from '../src/sim/content/clue_hunts';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { GOURDLIGHT_PUMPKINS } from '../src/sim/content/gourdlight_pumpkins';
 import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { CRAFT_RING, STATION_RADIUS } from '../src/sim/content/professions';
@@ -5772,6 +5773,7 @@ const ALL_DELTA_KEYS = [
   'hill',
   'hirat',
   'honor',
+  'hpf',
   'hpref',
   'hpw',
   'hrat',
@@ -5919,6 +5921,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   guildBank: 'guildBankInfo',
   hill: 'hillInfo',
   hirat: 'hitRating',
+  hpf: 'hauntedPumpkinsFound',
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
   inv: 'inventory',
@@ -6083,6 +6086,7 @@ function dirtyEveryDeltaField(): {
   sim.seasonal.devOverride = 'gourdlight_eve';
   meta.seasonalDay = sim.resetDay;
   meta.seasonalKnocked.add('gourdlight_keeper');
+  meta.hauntedPumpkins.add(GOURDLIGHT_PUMPKINS[0].id);
   // `cvault`: craftVaultStockFor is gated on the craft-draw context predicate,
   // not the banker. This harness player carries a live DELVE RUN (the drun
   // key's seeding below), which the gate refuses by design, so cvault's
@@ -7382,9 +7386,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The buddy collection adds budOwn and budPend to the integration keys.
     // +1: the dungeon objectives tracker's dgrun (server/dungeon_run_wire.ts), for 122.
     // +2: Gourdlight Eve's seasonal self keys season and tot (server/quest_snapshot_wire.ts
-    // emitActivitySelfKeys), for 124.
-    expect(ALL_DELTA_KEYS).toHaveLength(124);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(124);
+    // emitActivitySelfKeys), plus personal pumpkin discoveries, for 125.
+    expect(ALL_DELTA_KEYS).toHaveLength(125);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(125);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7559,8 +7563,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The courier's keys and the Shardpike trial's lance, lrest and lguide self emits make 119.
     // The buddy collection adds budOwn and budPend.
     // The dungeon run's dgrun (the game.ts maybeSerialized emit) makes 122.
-    // The seasonal season and tot keys (quest_snapshot_wire.ts) make 124.
-    expect(scraped.size).toBe(124);
+    // The seasonal season, tot and hpf keys (quest_snapshot_wire.ts) make 125.
+    expect(scraped.size).toBe(125);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

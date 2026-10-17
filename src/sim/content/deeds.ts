@@ -3887,6 +3887,16 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'stat', stat: 'thatchgrinKills', count: 1 },
     feat: true,
   },
+  feat_pumpkin_hunter: {
+    id: 'feat_pumpkin_hunter',
+    name: 'Pumpkin Hunter',
+    desc: 'Find every Haunted Pumpkin hidden around the world during Gourdlight Eve.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    feat: true,
+    reward: { kind: 'title', text: 'the Hollow' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

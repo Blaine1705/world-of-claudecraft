@@ -1,6 +1,7 @@
 // The seasonal-event core (barrel): the public surface Sim, items.ts, dev
 // commands and tests import. Module map and rules: ./CLAUDE.md.
 
+export { hauntedPumpkinForEntity } from './haunted_pumpkins';
 export { clearThatchgrin, spawnThatchgrin, updateScarecrow } from './scarecrow';
 export { handleScarecrowDevChat } from './scarecrow_dev';
 export { resolveScarecrowField, type ScarecrowField } from './scarecrow_field';
@@ -21,6 +22,7 @@ export {
   activeSeasonalEventOf,
   freshSeasonalPlayerState,
   freshSeasonalWorldState,
+  hauntedPumpkinsFoundView,
   knockedToday,
   knockedTodayView,
   restoreSeasonalState,

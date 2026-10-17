@@ -1,5 +1,5 @@
 import { livePlaytimeSeconds } from '../src/sim/playtime';
-import { knockedTodayView } from '../src/sim/seasonal';
+import { hauntedPumpkinsFoundView, knockedTodayView } from '../src/sim/seasonal';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import {
@@ -51,6 +51,8 @@ export function emitActivitySelfKeys(
   // tiny and change rarely, so the per-tick delta elides them almost always.
   emit('season', sim.activeSeasonalEvent);
   emit('tot', knockedTodayView(meta, sim.resetDay));
+  // This personal ledger is bounded by the GOURDLIGHT_PUMPKINS content catalog.
+  emit('hpf', hauntedPumpkinsFoundView(meta));
 }
 /** Per-viewer, unconditional snapshot suffix: absence is an explicit clear. */
 export { activePublicWorldQuestTracePids, PUBLIC_WORLD_QUEST_TRACE_RADIUS };

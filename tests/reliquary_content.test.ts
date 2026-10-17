@@ -2687,13 +2687,15 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('title page lists every non-hidden deed with a title reward and only those', () => {
+  it('title page lists permanent title rewards and preserves its legacy Vale Cup slot', () => {
     const page = RELIQUARY_PAGES_BY_ID.horizons_titles;
     const ids = page.relics.filter((r) => r.kind === 'title').map((r) => r.deedId);
     expect(ids).toEqual([...RELIQUARY_HORIZON_TITLES]);
     // Bidirectional: the hand list is exactly the live non-hidden title rewards, so a new
     // title deed must be added here and a hidden one can never silently re-enter.
-    // ONE exclusion: col_reliquary_complete rewards a title but must stay OFF
+    // New seasonal Feat titles stay out so limited event windows cannot gate completion.
+    // The previously shipped Vale Cup Feat keeps its existing catalog slot.
+    // col_reliquary_complete rewards a title but must stay OFF
     // the page, because its trigger is owned === total over the character
     // catalog; listing its own title would grow total by one the player
     // cannot own before the grant, deadlocking completion (the
@@ -2701,7 +2703,10 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     // exclusion so a future hand-add reds a test, not just review.
     const liveTitles = DEED_ORDER.filter(
       (id) =>
-        DEEDS[id].reward?.kind === 'title' && !DEEDS[id].hidden && id !== 'col_reliquary_complete',
+        DEEDS[id].reward?.kind === 'title' &&
+        !DEEDS[id].hidden &&
+        (!DEEDS[id].feat || id === 'pvp_vcup_wins_25') &&
+        id !== 'col_reliquary_complete',
     );
     expect([...ids].sort()).toEqual([...liveTitles].sort());
     // The exclusion arm, both premise halves: the deed really rewards a title
@@ -2711,6 +2716,9 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     expect(DEEDS.col_reliquary_complete.hidden).toBeFalsy();
     expect(RELIQUARY_HORIZON_TITLES).not.toContain('col_reliquary_complete');
     expect(ids).not.toContain('col_reliquary_complete');
+    expect(DEEDS.feat_pumpkin_hunter.reward).toEqual({ kind: 'title', text: 'the Hollow' });
+    expect(DEEDS.feat_pumpkin_hunter.feat).toBe(true);
+    expect(ids).not.toContain('feat_pumpkin_hunter');
     for (const id of ids) {
       expect(DEEDS[id], id).toBeDefined();
       expect(DEEDS[id].reward?.kind).toBe('title');

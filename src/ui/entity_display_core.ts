@@ -15,6 +15,7 @@
 // this module (the Phase 18 frontend review round), and were deleted with that
 // last import; every consumer names this path.
 import { isNecromancyUndead } from '../sim/combat/necromancy';
+import { HAUNTED_PUMPKIN_TEMPLATE } from '../sim/content/gourdlight_pumpkins';
 import { DUNGEON_LIST, ITEMS, MOBS, QUESTS } from '../sim/data';
 import { isBuddyMob } from '../sim/pet/buddy_ai';
 import type { Entity, PlayerClass } from '../sim/types';
@@ -178,6 +179,7 @@ export function flagObjectDisplayName(templateId: string, name: string): string 
 
 export function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'object') {
+    if (entity.templateId === HAUNTED_PUMPKIN_TEMPLATE) return t('seasonal.pumpkins.name');
     // World-quest objects first: an investigation clue, a forge station, and
     // the two cannon emplacements carry their own localized names.
     const questObjectId = entity.objectItemId ?? entity.templateId;
