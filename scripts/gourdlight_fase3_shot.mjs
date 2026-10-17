@@ -148,9 +148,11 @@ try {
     await chat('/daynight noon');
     await frames(6, 250);
     // on the move: hold forward for a moment, the trail streaming behind
-    await ev(`window.__game.input.camYaw=window.__game.sim.player.facing+Math.PI*0.7`);
+    await standAt(96, -30, 96, -10, 9, 0.18, 0, 4);
     await page.keyboard.down('w');
-    await frames(10, 150);
+    await frames(4, 150);
+    await camera(8, 0.15, Math.PI * 0.42);
+    await frames(3, 120);
     await shot('broom_moving', 0);
     await page.keyboard.up('w');
   }
@@ -225,13 +227,13 @@ try {
       const p = front(15, 5);
       await standAt(p.x, p.z, b.x, b.z, 22, 0.55, 0.3, 3);
       await chat('/dev scarecrow rain');
-      await sleep(500);
+      await sleep(300);
       await shot('rain_telegraph', 0);
-      await sleep(1250);
+      await sleep(900);
       await shot('rain_falling', 0);
-      await sleep(450);
+      await sleep(200);
       await shot('rain_falling_late', 0);
-      await sleep(500);
+      await sleep(250);
       await shot('rain_burst', 0);
       await sleep(1200);
       await shot('rain_chaff', 0);

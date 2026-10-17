@@ -22998,7 +22998,7 @@ export const en_XA: EnTranslations = {
         "name": "[Ĥáúñţíñĝ Ðŕáúĝĥţ]"
       },
       "batwing_draught": {
-        "name": "[Ɓáţŵíñĝ Ðŕáúĝĥţ]"
+        "name": "[Ƒļúţţéŕíñĝ Ðŕáúĝĥţ]"
       },
       "writ_of_the_gourdlit": {
         "name": "[Ŵŕíţ óƒ ţĥé Ĝóúŕðļíţ]"

@@ -10,6 +10,10 @@
 # Old Thatchgrin's two spoils: his sweet sack (the pouch's bigger, darker sackcloth
 # cousin, tied with straw, sweets spilling at its foot) and the Strawling Charm (a
 # little straw doll bound with orange ribbon, two ember beads for eyes).
+# The shop's costume draughts (a round flask, its liquid glowing, a charm at its neck: a
+# skull, a wisp, a bat) and title writs (a sealed parchment roll), and the Emberbristle
+# Broom's reins (the shipped broom itself, appended from broom.py's review .blend,
+# `--broom-blend <file>`), are built here too.
 # `--only <id,id>` renders just those subjects.
 # Writes <dir>/<item-id>.png at 512x512 (the master); scripts/convert_item_icons_webp.mjs
 # encodes the 128px shipping WebP.
@@ -318,6 +322,166 @@ def build_jar(col):
     return root
 
 
+def lathe(bm, profile, segs=28):
+    """A solid of revolution round Z from (radius, z) pairs, bottom to top, capped."""
+    rings = []
+    for r, z in profile:
+        rings.append([bm.verts.new((math.cos(a / segs * TAU) * r, math.sin(a / segs * TAU) * r, z)) for a in range(segs)])
+    for i in range(len(rings) - 1):
+        for k in range(segs):
+            bm.faces.new((rings[i][k], rings[i][(k + 1) % segs], rings[i + 1][(k + 1) % segs], rings[i + 1][k]))
+    bm.faces.new(list(reversed(rings[0])))
+    bm.faces.new(rings[-1])
+    return rings
+
+
+def build_draught(col, tag, liquid, glow, extra):
+    """A costume draught: a round-bellied glass flask with a long neck, a cork tied with
+    twine, the liquid glowing faintly inside, and a little charm hung at its neck that says
+    which costume it holds (`extra`: 'skull', 'wisp' or 'bat')."""
+    root = bpy.data.objects.new("draught_" + tag, None)
+    col.objects.link(root)
+    glass = principled("DraughtGlass_" + tag, (0.75, 0.85, 0.82), rough=0.05, alpha=0.3)
+    liq = principled("DraughtLiquid_" + tag, liquid, rough=0.2, emit=glow, emit_strength=0.35)
+    cork = principled("DraughtCork_" + tag, (0.5, 0.34, 0.18), rough=0.85)
+    twine = principled("DraughtTwine_" + tag, (0.62, 0.5, 0.3), rough=0.9)
+    profile = [(0.02, 0.0), (0.3, 0.03), (0.42, 0.18), (0.46, 0.36), (0.42, 0.56), (0.28, 0.7), (0.13, 0.8), (0.12, 1.02), (0.14, 1.06)]
+    bm = bmesh.new()
+    lathe(bm, profile)
+    obj_from_bm("draught_glass_" + tag, bm, glass, col).parent = root
+    bm = bmesh.new()
+    lathe(bm, [(0.02, 0.03), (0.27, 0.06), (0.39, 0.19), (0.42, 0.36), (0.38, 0.52), (0.25, 0.62), (0.02, 0.63)])
+    obj_from_bm("draught_liquid_" + tag, bm, liq, col).parent = root
+    bm = bmesh.new()
+    lathe(bm, [(0.1, 0.98), (0.11, 1.05), (0.13, 1.16), (0.12, 1.2), (0.02, 1.21)], 16)
+    obj_from_bm("draught_cork_" + tag, bm, cork, col).parent = root
+    bm = bmesh.new()
+    pts = [Vector((math.cos(a / 20 * TAU) * 0.135, math.sin(a / 20 * TAU) * 0.135, 0.9)) for a in range(21)]
+    tube(bm, pts, 0.018)
+    tube(bm, [Vector((0.12, -0.05, 0.9)), Vector((0.2, -0.12, 0.78)), Vector((0.24, -0.16, 0.62))], 0.012)
+    obj_from_bm("draught_twine_" + tag, bm, twine, col).parent = root
+    charm_at = Vector((0.25, -0.18, 0.56))
+    if extra == "skull":
+        bone = principled("DraughtBone", (0.92, 0.88, 0.76), rough=0.6)
+        bm = bmesh.new()
+        bmesh.ops.create_icosphere(bm, subdivisions=3, radius=0.12, matrix=Matrix.Translation(charm_at))
+        bmesh.ops.create_cube(bm, size=0.12, matrix=Matrix.Translation(charm_at + Vector((0, 0, -0.07))) @ Matrix.Diagonal((0.9, 0.7, 0.6, 1)))
+        obj_from_bm("draught_skull", bm, bone, col).parent = root
+        eye = principled("DraughtSkullEye", (0.02, 0.02, 0.02), rough=0.9)
+        bm = bmesh.new()
+        for s in (-1, 1):
+            bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.032, matrix=Matrix.Translation(charm_at + Vector((s * 0.045, -0.1, 0.0))))
+        obj_from_bm("draught_skull_eyes", bm, eye, col).parent = root
+    elif extra == "wisp":
+        wisp = principled("DraughtWisp", (0.85, 0.92, 1.0), rough=0.3, emit=(0.7, 0.85, 1.0), emit_strength=2.5)
+        bm = bmesh.new()
+        bmesh.ops.create_icosphere(bm, subdivisions=3, radius=0.08, matrix=Matrix.Translation(charm_at))
+        tube(bm, [charm_at + Vector((0, 0, -0.04)), charm_at + Vector((0.03, 0.02, -0.12)), charm_at + Vector((-0.02, 0.0, -0.19))], 0.045)
+        obj_from_bm("draught_wisp", bm, wisp, col).parent = root
+        # a curl of mist rising from the cork
+        bm = bmesh.new()
+        tube(bm, [Vector((0.05 * math.sin(t * 5.5), -0.02, 1.22 + 0.42 * t)) for t in [i / 12 for i in range(13)]], 0.03)
+        obj_from_bm("draught_mist", bm, wisp, col).parent = root
+    else:
+        wing = principled("DraughtBatWing", (0.12, 0.05, 0.14), rough=0.6)
+        bm = bmesh.new()
+        for s in (-1, 1):
+            verts = [bm.verts.new(charm_at + Vector((0, -0.01, 0)))]
+            for i in range(6):
+                t = i / 5
+                verts.append(bm.verts.new(charm_at + Vector((s * (0.04 + 0.16 * t), -0.01, 0.06 - 0.04 * math.sin(t * math.pi * 2.5) - 0.05 * t))))
+            for i in range(1, len(verts) - 1):
+                bm.faces.new((verts[0], verts[i], verts[i + 1]))
+        bmesh.ops.create_icosphere(bm, subdivisions=2, radius=0.045, matrix=Matrix.Translation(charm_at))
+        bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.01)
+        obj_from_bm("draught_bat", bm, wing, col).parent = root
+    root.rotation_euler = (0.0, 0.08, 0.35)
+    return root
+
+
+def build_writ(col, tag, ribbon_rgb, seal_rgb, seal_glow):
+    """A title writ: a rolled parchment scroll, its edge unfurled a little, tied with a
+    ribbon and closed with a wax seal pressed with a carved pumpkin."""
+    root = bpy.data.objects.new("writ_" + tag, None)
+    col.objects.link(root)
+    paper = principled("WritPaper_" + tag, (0.86, 0.76, 0.56), rough=0.9)
+    ribbon = principled("WritRibbon_" + tag, ribbon_rgb, rough=0.5)
+    wax = principled("WritWax_" + tag, seal_rgb, rough=0.35, emit=seal_glow, emit_strength=0.4)
+    bm = bmesh.new()
+    segs = 28
+    rings = []
+    for i in range(9):
+        x = -0.75 + 1.5 * i / 8
+        r = 0.2 + 0.015 * math.sin(i * 1.7)
+        rings.append([bm.verts.new((x, math.cos(a / segs * TAU) * r, math.sin(a / segs * TAU) * r)) for a in range(segs)])
+    for i in range(8):
+        for k in range(segs):
+            bm.faces.new((rings[i][k], rings[i][(k + 1) % segs], rings[i + 1][(k + 1) % segs], rings[i + 1][k]))
+    for end in (rings[0], rings[-1]):
+        bm.faces.new(end)
+    obj_from_bm("writ_roll_" + tag, bm, paper, col).parent = root
+    # the unfurled tongue of parchment hanging off the roll
+    bm = bmesh.new()
+    vs = []
+    for i in range(7):
+        t = i / 6
+        y = -0.2 - 0.35 * t
+        z = -0.05 - 0.25 * t * t
+        vs.append((bm.verts.new((-0.7, y, z)), bm.verts.new((0.7, y, z))))
+    for i in range(6):
+        bm.faces.new((vs[i][0], vs[i][1], vs[i + 1][1], vs[i + 1][0]))
+    bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.012)
+    obj_from_bm("writ_tongue_" + tag, bm, paper, col).parent = root
+    bm = bmesh.new()
+    for x in (-0.05, 0.05):
+        pts = [Vector((x, math.cos(a / 24 * TAU) * 0.215, math.sin(a / 24 * TAU) * 0.215)) for a in range(25)]
+        tube(bm, pts, 0.03)
+    tube(bm, [Vector((0, -0.21, -0.05)), Vector((-0.12, -0.3, -0.3)), Vector((-0.18, -0.34, -0.52))], 0.028)
+    tube(bm, [Vector((0, -0.21, -0.05)), Vector((0.1, -0.31, -0.32)), Vector((0.14, -0.35, -0.55))], 0.028)
+    obj_from_bm("writ_ribbon_" + tag, bm, ribbon, col).parent = root
+    # the seal: a wax disc, its rim spread, a carved pumpkin pressed into it
+    bm = bmesh.new()
+    seal_c = Vector((0, -0.24, 0.0))
+    bmesh.ops.create_cone(bm, cap_ends=True, segments=24, radius1=0.21, radius2=0.19, depth=0.05,
+                          matrix=Matrix.Translation(seal_c) @ Matrix.Rotation(math.pi / 2, 4, "X"))
+    for k in range(8):
+        a = k / 8 * TAU
+        bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.04, matrix=Matrix.Translation(seal_c + Vector((math.cos(a) * 0.21, -0.005, math.sin(a) * 0.21))))
+    obj_from_bm("writ_seal_" + tag, bm, wax, col).parent = root
+    face = principled("WritSealFace_" + tag, tuple(c * 0.4 for c in seal_rgb), rough=0.4)
+    bm = bmesh.new()
+    for s in (-1, 1):
+        bmesh.ops.create_cone(bm, cap_ends=True, segments=3, radius1=0.03, radius2=0.03, depth=0.02,
+                              matrix=Matrix.Translation(seal_c + Vector((s * 0.045, -0.03, 0.03))) @ Matrix.Rotation(math.pi / 2, 4, "X"))
+    bmesh.ops.create_cube(bm, size=1.0, matrix=Matrix.Translation(seal_c + Vector((0, -0.03, -0.04))) @ Matrix.Diagonal((0.12, 0.02, 0.025, 1)))
+    obj_from_bm("writ_seal_face_" + tag, bm, face, col).parent = root
+    root.rotation_euler = (0.25, 0.0, 0.5)
+    return root
+
+
+def build_broom(col, blend):
+    """The Emberbristle Broom's reins icon: the shipped broom itself, appended from the
+    factory's review .blend (broom.py), laid on a slant so its whole length reads."""
+    with bpy.data.libraries.load(blend, link=False) as (src, dst):
+        dst.objects = [n for n in src.objects if n == "Broom"]
+    root = bpy.data.objects.new("broom_icon", None)
+    col.objects.link(root)
+    for o in dst.objects:
+        if o is None:
+            continue
+        o.modifiers.clear()
+        o.parent = None
+        col.objects.link(o)
+        o.parent = root
+        for m in o.data.materials:
+            b = next((n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None) if m else None
+            if b and m.name in ("BroomEmber", "GourdGlow", "GourdInner", "GourdFlesh"):
+                b.inputs["Emission Strength"].default_value = 4.0
+    # lengthwise across the card, tipped on a diagonal, crook to the upper left
+    root.matrix_world = Matrix.Rotation(-0.62, 4, "Y") @ Matrix.Rotation(math.pi / 2, 4, "Z") @ Matrix.Rotation(0.35, 4, "Y")
+    return root
+
+
 def painted_ground(col):
     """The dark painted backdrop: a cyclorama card with a warm-to-umber falloff."""
     mat = bpy.data.materials.new("Backdrop")
@@ -417,7 +581,18 @@ def main():
         "jar_of_mischief": build_jar(col),
         "thatchgrin_sweet_sack": build_sack(col),
         "strawling_charm": build_charm(col),
+        # the shop's costume draughts and title writs, and Old Thatchgrin's broom
+        "rattlebone_draught": build_draught(col, "skel", (0.62, 0.56, 0.36), (0.5, 0.45, 0.25), "skull"),
+        "haunting_draught": build_draught(col, "ghost", (0.3, 0.52, 0.78), (0.35, 0.6, 1.0), "wisp"),
+        "batwing_draught": build_draught(col, "bat", (0.2, 0.03, 0.26), (0.45, 0.08, 0.55), "bat"),
+        "writ_of_the_gourdlit": build_writ(col, "gourdlit", (1.0, 0.42, 0.04), (0.9, 0.36, 0.05), (1.0, 0.5, 0.1)),
+        "writ_of_the_trickster": build_writ(col, "trickster", (0.2, 0.55, 0.12), (0.18, 0.5, 0.12), (0.3, 0.9, 0.2)),
+        "writ_of_the_hollow_grin": build_writ(col, "hollow", (0.06, 0.05, 0.07), (0.32, 0.05, 0.08), (0.6, 0.1, 0.1)),
     }
+    broom_blend = argv[argv.index("--broom-blend") + 1] if "--broom-blend" in argv else os.path.join(
+        HERE, "..", "..", "..", "tmp", "asset_src", "gourdlight_eve", "broom.blend")
+    if os.path.exists(broom_blend):
+        subjects["reins_emberbristle_broom"] = build_broom(col, broom_blend)
     for o in subjects.values():
         o.hide_render = True
         for c in o.children_recursive:
@@ -428,7 +603,7 @@ def main():
         o.hide_render = False
         for c in o.children_recursive:
             c.hide_render = False
-        frame(cam, o, 1.25 if item_id != "gourdlight_sweet" else 1.15)
+        frame(cam, o, 1.25 if item_id not in ("gourdlight_sweet", "reins_emberbristle_broom") else 1.1)
         scene.render.filepath = os.path.join(out, item_id + ".png")
         bpy.ops.render.render(write_still=True)
         o.hide_render = True

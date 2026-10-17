@@ -10,6 +10,11 @@
 # `--subject thatchgrin` paints the field-boss Feat instead (feat_old_thatchgrin): his
 # rusted scythe crossed behind his own carved head, straw at its foot, on an ember field.
 #
+# `--subject title_gourdlit|title_trickster|title_hollow` paints the three title-writ Feats
+# (feat_title_gourdlit, feat_title_trickster, feat_title_hollow_grinned): the sealed
+# parchment writ crossed behind the head, each on its own field (amber, a trickster's
+# green, a hollow crimson).
+#
 # Writes <dir>/<deed id>.png (512x512, transparent outside the frame); scripts/convert_deed_icons_webp.mjs <dir> encodes the shipping 128px
 # WebP and regenerates src/ui/deed_image_ids.ts. Deterministic: no clock, no
 # `random`.
@@ -173,6 +178,49 @@ def thatchgrin_scythe(col):
     return sc
 
 
+TITLE_FIELDS = {
+    "title_gourdlit": [(0.05, 0.02, 0.004, 1), (0.42, 0.19, 0.03, 1), (0.16, 0.07, 0.012, 1)],
+    "title_trickster": [(0.008, 0.03, 0.01, 1), (0.08, 0.3, 0.07, 1), (0.02, 0.1, 0.03, 1)],
+    "title_hollow": [(0.03, 0.004, 0.008, 1), (0.3, 0.02, 0.05, 1), (0.1, 0.006, 0.02, 1)],
+}
+TITLE_RIBBON = {
+    "title_gourdlit": (1.0, 0.42, 0.04),
+    "title_trickster": (0.2, 0.6, 0.12),
+    "title_hollow": (0.08, 0.06, 0.08),
+}
+TITLE_DEEDS = {
+    "title_gourdlit": "feat_title_gourdlit",
+    "title_trickster": "feat_title_trickster",
+    "title_hollow": "feat_title_hollow_grinned",
+}
+
+
+def title_writ(col, subject):
+    """The writ behind the head: a parchment roll laid on a diagonal, a ribbon round it."""
+    paper = principled("CrestParchment", (0.88, 0.78, 0.56), rough=0.85)
+    ribbon = principled("CrestRibbon", TITLE_RIBBON[subject], rough=0.45)
+    bm = bmesh.new()
+    segs = 24
+    rings = []
+    for i in range(9):
+        x = -0.82 + 1.64 * i / 8
+        r = 0.13 + 0.01 * math.sin(i * 1.9)
+        rings.append([bm.verts.new((x, 0.12 + math.cos(a / segs * TAU) * r, math.sin(a / segs * TAU) * r)) for a in range(segs)])
+    for i in range(8):
+        for k in range(segs):
+            bm.faces.new((rings[i][k], rings[i][(k + 1) % segs], rings[i + 1][(k + 1) % segs], rings[i + 1][k]))
+    for end in (rings[0], rings[-1]):
+        bm.faces.new(end)
+    roll = obj("crest_writ", bm, paper, col)
+    rb = bmesh.new()
+    for x in (-0.38, 0.38):
+        pts = [(x, 0.12 + math.cos(a / 20 * TAU) * 0.15, math.sin(a / 20 * TAU) * 0.15) for a in range(21)]
+        model.tube_bm(rb, pts, 0.03, 6)
+    rib = obj("crest_writ_ribbon", rb, ribbon, col)
+    for o in (roll, rib):
+        o.rotation_euler = (0.0, 0.62, 0.0)
+
+
 def build(col):
     gold = principled("Gold", (1.0, 0.72, 0.3), rough=0.3, metal=1.0)
     gold_dark = principled("GoldDark", (0.9, 0.6, 0.24), rough=0.36, metal=1.0)
@@ -187,9 +235,18 @@ def build(col):
         b = next(n for n in field.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
         field.node_tree.links.new(ramp.outputs["Color"], b.inputs["Emission Color"])
         b.inputs["Emission Strength"].default_value = 1.6
+    if SUBJECT[0] in TITLE_FIELDS:
+        ramp = next(n for n in field.node_tree.nodes if n.type == "VALTORGB")
+        for el, tone in zip(ramp.color_ramp.elements, TITLE_FIELDS[SUBJECT[0]]):
+            el.color = tone
+        b = next(n for n in field.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        field.node_tree.links.new(ramp.outputs["Color"], b.inputs["Emission Color"])
+        b.inputs["Emission Strength"].default_value = 1.3
     obj("field", disc(0.92, 0.05, 0.06), field, col)
     if SUBJECT[0] == "thatchgrin":
         thatchgrin_scythe(col)
+    if SUBJECT[0] in TITLE_FIELDS:
+        title_writ(col, SUBJECT[0])
     gbm = bmesh.new()
     bmesh.ops.create_circle(gbm, cap_ends=True, segments=64, radius=0.7,
                             matrix=Matrix.Translation((0, 0.025, -0.02)) @ Matrix.Rotation(math.pi / 2, 4, "X"))
@@ -201,6 +258,10 @@ def build(col):
     obj("frame_gold", bm, gold, col)
     if SUBJECT[0] == "thatchgrin":
         band.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.2, 0.035, 0.01, 1)
+    if SUBJECT[0] in TITLE_FIELDS:
+        tone = TITLE_FIELDS[SUBJECT[0]][1]
+        band.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (
+            tone[0] * 0.55, tone[1] * 0.55, tone[2] * 0.55, 1)
     obj("frame_band", disc(1.03, 0.06, 0.02), band, col)
     bm = bmesh.new()
     for i in range(16):
@@ -325,7 +386,9 @@ def setup(out):
     cam.rotation_euler = (math.pi / 2, 0.0, 0.0)
     scene.collection.objects.link(cam)
     scene.camera = cam
-    name = "feat_old_thatchgrin" if SUBJECT[0] == "thatchgrin" else "feat_gourdlight_guise"
+    name = TITLE_DEEDS.get(SUBJECT[0]) or (
+        "feat_old_thatchgrin" if SUBJECT[0] == "thatchgrin" else "feat_gourdlight_guise"
+    )
     scene.render.filepath = os.path.join(out, name + ".png")
 
 

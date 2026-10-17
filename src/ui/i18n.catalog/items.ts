@@ -3976,7 +3976,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // Gourdlight Eve's shop additions and the broom (content/gourdlight_eve.ts).
   rattlebone_draught: 'Rattlebone Draught',
   haunting_draught: 'Haunting Draught',
-  batwing_draught: 'Batwing Draught',
+  batwing_draught: 'Fluttering Draught',
   writ_of_the_gourdlit: 'Writ of the Gourdlit',
   writ_of_the_trickster: 'Writ of the Trickster',
   writ_of_the_hollow_grin: 'Writ of the Hollow Grin',

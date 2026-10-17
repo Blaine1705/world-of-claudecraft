@@ -47,7 +47,7 @@ export const GOURDLIGHT_COSTUMES = Object.freeze([
   },
   {
     itemId: 'batwing_draught',
-    itemName: 'Batwing Draught',
+    itemName: 'Fluttering Draught',
     auraId: 'gourdlight_costume_bat',
     name: 'Bat Costume',
     duration: 600,

@@ -22998,7 +22998,7 @@ export const fr_CA: EnTranslations = {
         "name": "Haunting Draught"
       },
       "batwing_draught": {
-        "name": "Batwing Draught"
+        "name": "Fluttering Draught"
       },
       "writ_of_the_gourdlit": {
         "name": "Writ of the Gourdlit"
