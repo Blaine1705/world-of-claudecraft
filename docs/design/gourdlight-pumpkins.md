@@ -14,7 +14,8 @@ the same object independently. Repeated clicks cannot earn additional sweets.
 The quest tracker and touch strip show local-zone and worldwide progress without
 publishing locations. Completion grants the zero-Renown seasonal Feat
 `feat_pumpkin_hunter` (Pumpkin Hunter), whose permanent cosmetic title is
-`the Hollow`. Seasonal titles stay outside normal Reliquary completion.
+`the Hollow`. Like the Gourdlight title writs, it pages on the Reliquary Titles page
+under the locked every-non-hidden-title rule (`docs/design/reliquary.md`).
 
 `HAUNTED_PUMPKIN_EDITION` owns the edition independently of daily reset. A bounded,
 allowlisted current-edition ledger travels in the existing seasonal character

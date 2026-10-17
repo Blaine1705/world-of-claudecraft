@@ -169,6 +169,7 @@ export const DEED_IMAGE_IDS: ReadonlySet<string> = new Set([
   'feat_era_cap',
   'feat_gourdlight_guise',
   'feat_old_thatchgrin',
+  'feat_pumpkin_hunter',
   'feat_title_gourdlit',
   'feat_title_hollow_grinned',
   'feat_title_trickster',

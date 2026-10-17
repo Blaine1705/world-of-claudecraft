@@ -211,18 +211,13 @@ as the score and tie-break on that row. Cross-surface agreement is pinned by
    `ACH_<UPPER_SNAKE>` mapping in `server/steam/achievement_map.ts` (hard
    cap 100 registered names; API names are stable forever).
 
-A non-Feat deed whose reward is a TITLE carries a same-change twin: its `DeedDef` in
+A deed whose reward is a TITLE carries a same-change twin: its `DeedDef` in
 `src/sim/content/deeds.ts` AND a slot on the `horizons_titles` page in
 `src/sim/content/reliquary.ts`. The coupling is pinned bidirectionally by
 `tests/reliquary_content.test.ts` (the page must list exactly the live
-non-hidden title rewards, excluding `col_reliquary_complete` and new seasonal
-Feat titles), so a title deed without its Reliquary slot reds the pin rather
+non-hidden title rewards, with `col_reliquary_complete` as the one pinned
+exclusion), so a title deed without its Reliquary slot reds the pin rather
 than shipping unlisted.
-
-Seasonal Feat titles stay in the Book of Deeds and the title picker, outside
-the Reliquary title page. Their earning window must never gate permanent
-Reliquary completion. `feat_pumpkin_hunter` is the first such title; its
-`the Hollow` reward remains selectable after Gourdlight Eve closes.
 
 Every new piece of conquerable content (a dungeon, delve, raid, world boss,
 zone, or rare) authors its deeds in the SAME change that adds the content;

@@ -15,6 +15,9 @@
 # parchment writ crossed behind the head, each on its own field (amber, a trickster's
 # green, a hollow crimson).
 #
+# `--subject pumpkin_hunter` paints the Haunted Pumpkin hunt's Feat (feat_pumpkin_hunter):
+# the lit head on a moonlit midnight field, a row of dark unfound pumpkins at its foot.
+#
 # Writes <dir>/<deed id>.png (512x512, transparent outside the frame); scripts/convert_deed_icons_webp.mjs <dir> encodes the shipping 128px
 # WebP and regenerates src/ui/deed_image_ids.ts. Deterministic: no clock, no
 # `random`.
@@ -221,6 +224,23 @@ def title_writ(col, subject):
         o.rotation_euler = (0.0, 0.62, 0.0)
 
 
+PUMPKIN_HUNTER_FIELD = [(0.004, 0.012, 0.03, 1), (0.05, 0.16, 0.3, 1), (0.015, 0.05, 0.1, 1)]
+
+
+def hunter_row(col):
+    """The hunt itself: small dark pumpkins, still unlit, along the field's lower rim."""
+    skin = principled("HuntSkin", (0.34, 0.13, 0.035), rough=0.55)
+    stem = principled("HuntStem", (0.12, 0.09, 0.04), rough=0.8)
+    for i, (x, z, rad) in enumerate(((-0.56, -0.5, 0.14), (0.56, -0.5, 0.14), (-0.28, -0.68, 0.12), (0.28, -0.68, 0.12))):
+        bm = model.pumpkin_bm("crest-hunt-%d" % i, rad, rad * 1.6, 8, 24, 12)
+        o = obj("hunt_pumpkin_%d" % i, bm, skin, col)
+        o.location = (x, -0.75, z)
+        sbm = bmesh.new()
+        model.tube_bm(sbm, [(0.0, 0.0, 0.0), (0.01, 0.0, rad * 0.45)], rad * 0.14, 6)
+        st = obj("hunt_stem_%d" % i, sbm, stem, col)
+        st.location = (x, -0.75, z + rad * 0.6)
+
+
 def build(col):
     gold = principled("Gold", (1.0, 0.72, 0.3), rough=0.3, metal=1.0)
     gold_dark = principled("GoldDark", (0.9, 0.6, 0.24), rough=0.36, metal=1.0)
@@ -242,7 +262,16 @@ def build(col):
         b = next(n for n in field.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
         field.node_tree.links.new(ramp.outputs["Color"], b.inputs["Emission Color"])
         b.inputs["Emission Strength"].default_value = 1.3
+    if SUBJECT[0] == "pumpkin_hunter":
+        ramp = next(n for n in field.node_tree.nodes if n.type == "VALTORGB")
+        for el, tone in zip(ramp.color_ramp.elements, PUMPKIN_HUNTER_FIELD):
+            el.color = tone
+        b = next(n for n in field.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        field.node_tree.links.new(ramp.outputs["Color"], b.inputs["Emission Color"])
+        b.inputs["Emission Strength"].default_value = 1.3
     obj("field", disc(0.92, 0.05, 0.06), field, col)
+    if SUBJECT[0] == "pumpkin_hunter":
+        hunter_row(col)
     if SUBJECT[0] == "thatchgrin":
         thatchgrin_scythe(col)
     if SUBJECT[0] in TITLE_FIELDS:
@@ -258,6 +287,10 @@ def build(col):
     obj("frame_gold", bm, gold, col)
     if SUBJECT[0] == "thatchgrin":
         band.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.2, 0.035, 0.01, 1)
+    if SUBJECT[0] == "pumpkin_hunter":
+        tone = PUMPKIN_HUNTER_FIELD[1]
+        band.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (
+            tone[0] * 0.55, tone[1] * 0.55, tone[2] * 0.55, 1)
     if SUBJECT[0] in TITLE_FIELDS:
         tone = TITLE_FIELDS[SUBJECT[0]][1]
         band.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (
@@ -386,7 +419,7 @@ def setup(out):
     cam.rotation_euler = (math.pi / 2, 0.0, 0.0)
     scene.collection.objects.link(cam)
     scene.camera = cam
-    name = TITLE_DEEDS.get(SUBJECT[0]) or (
+    name = TITLE_DEEDS.get(SUBJECT[0]) or ("feat_pumpkin_hunter" if SUBJECT[0] == "pumpkin_hunter" else None) or (
         "feat_old_thatchgrin" if SUBJECT[0] == "thatchgrin" else "feat_gourdlight_guise"
     )
     scene.render.filepath = os.path.join(out, name + ".png")

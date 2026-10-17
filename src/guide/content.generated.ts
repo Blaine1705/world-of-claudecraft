@@ -6232,7 +6232,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "feat",
     "renown": 0,
     "feat": true,
-    "rewardTitle": "the Hollow"
+    "rewardTitle": "the Hollow",
+    "crest": "/ui/deeds/feat_pumpkin_hunter.webp"
   }
 ];
 
@@ -7877,6 +7878,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "the Hollow-Grinned"
+      },
+      {
+        "kind": "title",
+        "name": "the Hollow"
       }
     ]
   },

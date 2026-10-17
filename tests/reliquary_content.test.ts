@@ -486,7 +486,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 558.
     // Two referral reward mounts join Horizons.
     // Gourdlight Eve: the Emberbristle Broom's mount slot and the three writ titles: 564.
-    expect(full).toEqual({ owned: 564, total: 564 });
+    // The Haunted Pumpkin hunt's title (the Hollow) on the titles page: 565.
+    expect(full).toEqual({ owned: 565, total: 565 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -521,8 +522,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
     // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529.
-    // Gourdlight Eve's broom slot and three writ titles: 535.
-    expect(character).toEqual({ owned: 535, total: 535 });
+    // Gourdlight Eve's broom slot and three writ titles: 535. The Haunted Pumpkin
+    // hunt's title slot (character-scoped like every title): 536.
+    expect(character).toEqual({ owned: 536, total: 536 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -589,7 +591,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
       // + Gourdlight Eve's broom mount slot and its three writ titles: 751.
-    ).toBe(751); // plus two referral reward mounts
+      // + the Haunted Pumpkin hunt's title: 752.
+    ).toBe(752); // plus two referral reward mounts
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2707,9 +2710,7 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     expect(ids).toEqual([...RELIQUARY_HORIZON_TITLES]);
     // Bidirectional: the hand list is exactly the live non-hidden title rewards, so a new
     // title deed must be added here and a hidden one can never silently re-enter.
-    // TWO exclusions. The Haunted Pumpkin hunt's title (feat_pumpkin_hunter) stays off
-    // so a full limited-window collection never gates completion (the Gourdlight title
-    // writs, bought with sweets, still page). And col_reliquary_complete rewards a title but must stay OFF
+    // ONE exclusion: col_reliquary_complete rewards a title but must stay OFF
     // the page, because its trigger is owned === total over the character
     // catalog; listing its own title would grow total by one the player
     // cannot own before the grant, deadlocking completion (the
@@ -2719,7 +2720,6 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
       (id) =>
         DEEDS[id].reward?.kind === 'title' &&
         !DEEDS[id].hidden &&
-        id !== 'feat_pumpkin_hunter' &&
         id !== 'col_reliquary_complete',
     );
     expect([...ids].sort()).toEqual([...liveTitles].sort());
@@ -2732,7 +2732,8 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     expect(ids).not.toContain('col_reliquary_complete');
     expect(DEEDS.feat_pumpkin_hunter.reward).toEqual({ kind: 'title', text: 'the Hollow' });
     expect(DEEDS.feat_pumpkin_hunter.feat).toBe(true);
-    expect(ids).not.toContain('feat_pumpkin_hunter');
+    // Seasonal Feat titles page like every other non-hidden title (the locked rule).
+    expect(ids).toContain('feat_pumpkin_hunter');
     for (const id of ids) {
       expect(DEEDS[id], id).toBeDefined();
       expect(DEEDS[id].reward?.kind).toBe('title');
@@ -3338,8 +3339,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
   // Crucible raid's flawless title + the three faction standing Champion
   // titles + the Clue Scroll Treasure Hunter title + the Drowned Temple lore
-  // guide's Witness of the Choir + Gourdlight Eve's three writ titles.
-  horizons_titles: 53,
+  // guide's Witness of the Choir + Gourdlight Eve's three writ titles + the
+  // Haunted Pumpkin hunt's the Hollow.
+  horizons_titles: 54,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

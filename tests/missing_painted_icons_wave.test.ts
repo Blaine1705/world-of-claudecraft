@@ -707,7 +707,11 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // (rendered from the shipped head, scripts/assets/gourdlight_eve/crest.py).
     // 348 with its field boss's feat (feat_old_thatchgrin), its crest painted too.
     // 351 with its three title-writ feats, their crests painted too.
-    expect(DEED_ORDER).toHaveLength(351);
+    // 352 with the Haunted Pumpkin hunt's Feat (feat_pumpkin_hunter), its crest
+    // painted from the same Blender crest (crest.py --subject pumpkin_hunter).
+    expect(DEED_ORDER).toHaveLength(352);
+    expect(DEED_IMAGE_IDS.has('feat_pumpkin_hunter')).toBe(true);
+    expect(DEED_ART_PENDING.has('feat_pumpkin_hunter')).toBe(false);
     expect(DEED_IMAGE_IDS.has('feat_title_hollow_grinned')).toBe(true);
     expect(DEED_ART_PENDING.has('feat_gourdlight_guise')).toBe(false);
     expect(DEED_ART_PENDING.has('feat_old_thatchgrin')).toBe(false);

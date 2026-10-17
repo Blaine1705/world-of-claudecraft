@@ -894,8 +894,10 @@ describe('real catalog integration', () => {
     // the world-boss branch's three.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 336.
     // + Gourdlight Eve's feat (feat_gourdlight_guise, feat-flagged: a bucket row, never
-    // the visibleTotal above): 337.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(337);
+    // the visibleTotal above): 337. + its field boss's Feat (feat_old_thatchgrin): 338.
+    // + its three title-writ Feats: 341. + the Haunted Pumpkin hunt's Feat
+    // (feat_pumpkin_hunter): 342. All feat-flagged, so visibleTotal stays 314.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(342);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

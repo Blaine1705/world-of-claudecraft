@@ -860,7 +860,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
   });
 
-  it('ships exactly 53 titles and 4 borders', () => {
+  it('ships exactly 56 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
