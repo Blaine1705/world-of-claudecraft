@@ -1,4 +1,4 @@
-# Old Thatchgrin's clip set (shared by his strawlings): every clip keyed on the one rig
+# Old Thatchgrin's clip set (his strawlings share the rig and all but the swings): every clip keyed on the one rig
 # scarecrow.py builds, so the boss and his adds share their motion and nothing drifts.
 #
 # Poses are authored in ARMATURE space and converted to each bone's local frame, so the
@@ -26,6 +26,10 @@
 #   Summon     2.0 s       arms flung wide, head thrown back, the crows burst off him and
 #                          settle (peak 1.4 s, when the call lands)
 #   Hit        0.45 s      a jolt back
+#   Claw       1.1 s       (strawling only) THE RAKE: both claws up over its shoulders, raked
+#                          down across its front in an X (impact 0.42 s)
+#   Lunge      1.3 s       (strawling only) THE POUNCE: a crouch, a spring forward with both
+#                          arms thrust out (impact 0.5 s), a hop back
 #   Death      3.2 s       sags, the stakes fold, the body slumps into the stubble, the head
 #                          rolls off, the hat falls, the scythe drops; the crows fly off
 import math
@@ -173,6 +177,10 @@ def scythe_reap(yaw):
     return [("Z", 90), ("X", 72), ("Z", yaw)]
 
 
+# False while a strawling's clips are keyed: no scythe, so no scythe line in its right hand.
+ARMED = [True]
+
+
 def rest_pose():
     """His standing rest: the T of a scarecrow slumped into a hang. Arms droop from the
     yoke, the elbows sag, the head lolls a touch to his right, the knees soft."""
@@ -182,7 +190,11 @@ def rest_pose():
     p.set("L_Hand", r=(0, 20, 0))
     p.set("R_UpperArm", r=(0, -30, -10))
     p.set("R_Forearm", r=(0, -12, -14))
-    p.set("R_Hand", a=SCYTHE_UP)
+    if ARMED[0]:
+        p.set("R_Hand", a=SCYTHE_UP)
+    else:
+        # nothing in it (a strawling): the right hand hangs like the left
+        p.set("R_Hand", r=(0, -20, 0))
     p.set("Spine", r=(5, 0, 0))
     p.set("Chest", r=(6, 0, 0))
     p.set("Neck", r=(4, -6, 0))
@@ -488,6 +500,69 @@ def death_keys():
             (3.2, heap, "auto")]
 
 
+def claw_keys():
+    """THE RAKE (a strawling's own swing: it carries no scythe). One idea: both twig-clawed
+    hands thrown up and back over its shoulders, then raked down and across its front in
+    an X at a player's chest (impact 0.42 s), the body crunching into the blow, then a
+    shake back to rest. Arm turns are relative to the rest pose."""
+    base = rest_pose()
+    wind = base.copy()
+    wind.set("Hips", r=(-4, 0, 0), l=(0, 0.06, -0.1))
+    wind.set("Spine", r=(-8, 0, 0)).set("Chest", r=(-16, 0, 0)).set("Neck", r=(-4, 0, 0)).set("Head", r=(-12, 0, 0))
+    wind.set("L_UpperArm", r=(0, -78, 34)).set("L_Forearm", r=(0, -34, -22)).set("L_Hand", r=(0, -24, 0))
+    wind.set("R_UpperArm", r=(0, 74, -34)).set("R_Forearm", r=(0, 34, 22))
+    wind.set("L_Thigh", r=(-14, 0, 0)).set("L_Shin", r=(22, 0, 0)).set("R_Thigh", r=(-10, 0, 0)).set("R_Shin", r=(18, 0, 0))
+    wind.set("Coat_B", r=(6, 0, 0))
+    cock = wind.copy()
+    cock.set("Chest", r=(-5, 0, 0)).set("L_UpperArm", r=(0, -8, 6)).set("R_UpperArm", r=(0, 8, -6)).set("Hips", l=(0, 0, -0.03))
+    rake = base.copy()
+    rake.set("Hips", r=(10, 0, 0), l=(0, -0.16, -0.14))
+    rake.set("Spine", r=(10, 0, 0)).set("Chest", r=(14, 0, 0)).set("Neck", r=(4, 0, 0)).set("Head", r=(12, 0, 0))
+    rake.set("L_UpperArm", r=(0, -22, -86)).set("L_Forearm", r=(0, 8, -26)).set("L_Hand", r=(0, 18, -10))
+    rake.set("R_UpperArm", r=(0, 22, 86)).set("R_Forearm", r=(0, -8, 26))
+    rake.set("L_Thigh", r=(-26, 0, 0)).set("L_Shin", r=(30, 0, 0)).set("R_Thigh", r=(10, 0, 0)).set("R_Shin", r=(12, 0, 0))
+    rake.set("Coat_B", r=(-14, 0, 0))
+    through = rake.copy()
+    through.set("L_UpperArm", r=(0, 10, -14)).set("R_UpperArm", r=(0, -10, 14)).set("Chest", r=(4, 0, 0))
+    shake = base.copy()
+    shake.set("Hips", l=(0, -0.06, -0.05)).set("Chest", r=(8, 0, 6)).set("Head", r=(4, 8, -6))
+    shake.set("L_UpperArm", r=(0, 6, -20)).set("R_UpperArm", r=(0, -6, 20))
+    return [(0.0, base, "inout"), (0.28, wind, "out"), (0.34, cock, "in"), (0.42, rake, "linear"),
+            (0.56, through, "out"), (0.8, shake, "inout"), (1.1, base, "auto")]
+
+
+def lunge_keys():
+    """THE POUNCE (a strawling's other swing). One idea: it drops into a crouch with both
+    claws drawn back, springs forward off its stakes with both arms thrust out at the
+    player (impact 0.5 s), hangs there a beat, and hops back to where it stood."""
+    base = rest_pose()
+    crouch = base.copy()
+    crouch.set("Hips", r=(8, 0, 0), l=(0, 0.12, -0.3))
+    crouch.set("Spine", r=(18, 0, 0)).set("Chest", r=(10, 0, 0)).set("Head", r=(-18, 0, 0))
+    crouch.set("L_Thigh", r=(-44, 0, 0)).set("L_Shin", r=(64, 0, 0)).set("R_Thigh", r=(-36, 0, 0)).set("R_Shin", r=(58, 0, 0))
+    crouch.set("L_Foot", r=(-14, 0, 0)).set("R_Foot", r=(-12, 0, 0))
+    crouch.set("L_UpperArm", r=(0, 10, 48)).set("L_Forearm", r=(0, -16, 24))
+    crouch.set("R_UpperArm", r=(0, -10, -48)).set("R_Forearm", r=(0, 16, -24))
+    crouch.set("Coat_B", r=(10, 0, 0)).set("Coat_L", r=(6, 0, 0)).set("Coat_R", r=(6, 0, 0))
+    spring = base.copy()
+    spring.set("Hips", r=(28, 0, 0), l=(0, -0.62, 0.06))
+    spring.set("Spine", r=(14, 0, 0)).set("Chest", r=(6, 0, 0)).set("Neck", r=(-10, 0, 0)).set("Head", r=(-22, 0, 0))
+    spring.set("L_Thigh", r=(-50, 0, 0)).set("L_Shin", r=(34, 0, 0)).set("R_Thigh", r=(38, 0, 0)).set("R_Shin", r=(8, 0, 0))
+    spring.set("L_Foot", r=(10, 0, 0)).set("R_Foot", r=(30, 0, 0))
+    spring.set("L_UpperArm", r=(0, -28, -84)).set("L_Forearm", r=(0, -6, -10)).set("L_Hand", r=(0, -10, 0))
+    spring.set("R_UpperArm", r=(0, 28, 84)).set("R_Forearm", r=(0, 6, 10))
+    spring.set("Coat_B", r=(-30, 0, 0)).set("Coat_L", r=(-18, 0, 0)).set("Coat_R", r=(-18, 0, 0))
+    hang = spring.copy()
+    hang.set("Hips", l=(0, -0.04, -0.04)).set("Chest", r=(4, 0, 0)).set("L_UpperArm", r=(0, 8, 0)).set("R_UpperArm", r=(0, -8, 0))
+    hop = base.copy()
+    hop.set("Hips", r=(6, 0, 0), l=(0, -0.2, 0.1)).set("Chest", r=(-6, 0, 0))
+    hop.set("L_Thigh", r=(-10, 0, 0)).set("R_Thigh", r=(-8, 0, 0)).set("L_Shin", r=(16, 0, 0)).set("R_Shin", r=(14, 0, 0))
+    hop.set("L_UpperArm", r=(0, 4, -20)).set("R_UpperArm", r=(0, -4, 20))
+    return [(0.0, base, "inout"), (0.32, crouch, "out"), (0.5, spring, "out"), (0.64, hang, "inout"),
+            (0.92, hop, "inout"), (1.3, base, "auto")]
+
+
+# The boss's clip set...
 CLIPS = [
     ("Idle", idle_keys),
     ("Walk", lambda: gait_keys(1.2, 22, 0.08, 4)),
@@ -499,11 +574,24 @@ CLIPS = [
     ("Hit", hit_keys),
     ("Death", death_keys),
 ]
+# ...and a strawling's: the same gait, hit and death on the same rig, but its own two
+# unarmed swings (it carries no scythe, owner note 2026-10-18) and no throw or call.
+STRAWLING_CLIPS = [
+    ("Idle", idle_keys),
+    ("Walk", lambda: gait_keys(1.2, 22, 0.08, 4)),
+    ("Run", lambda: gait_keys(0.85, 30, 0.12, 10)),
+    ("Claw", claw_keys),
+    ("Lunge", lunge_keys),
+    ("Hit", hit_keys),
+    ("Death", death_keys),
+]
 
 
 def build_clips(arm, s, boss):
-    for name, fn in CLIPS:
+    ARMED[0] = boss
+    for name, fn in CLIPS if boss else STRAWLING_CLIPS:
         make_clip(arm, prefix(boss) + name, fn(), s)
+    ARMED[0] = True
     arm.animation_data.action = bpy.data.actions[prefix(boss) + "Idle"]
 
 

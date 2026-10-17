@@ -1154,11 +1154,12 @@ export const BALGATH_SCALE = 4.2;
  */
 export const MUSTER_EFFIGY_HEIGHT = 6.7;
 
-// Old Thatchgrin's clip map (scripts/assets/gourdlight_eve/scarecrow_clips.py), shared by
-// his strawlings (same rig). The two auto swings rotate; his telegraphs play off the windup
-// cue his kit emits (seasonal/scarecrow_kit.ts): the throw's release lands at 1.0 s of its
-// 2.2 s timeline (he hurls a lit gourd at the sky and Gourdfall rains after it: the first
-// pumpkin lands at 2.4 s, so he is upright as they burst), and the summon peaks at 1.4 s,
+// Old Thatchgrin's clip map (scripts/assets/gourdlight_eve/scarecrow_clips.py); his
+// strawlings share the rig and keep their own map (STRAWLING, below). The two auto
+// swings rotate; his telegraphs play off the windup cue his kit emits
+// (seasonal/scarecrow_kit.ts): the throw's release lands at 1.0 s of its 2.2 s timeline
+// (he hurls a lit gourd at the sky and Gourdfall rains after it: the first pumpkin
+// lands at 2.4 s, so he is upright as they burst), and the summon peaks at 1.4 s,
 // the call's windup, as the adds land. Both play unscaled. The two auto swings are one
 // idea each at 30 fps: Swipe the flat reap (impact 0.66 s), Chop the overhead slam into
 // the ground (impact 0.78 s).
@@ -1175,6 +1176,17 @@ const THATCHGRIN: ClipMap = {
     mob_thatchgrin_gourd: 1,
     mob_thatchgrin_summon: 1,
   },
+  hit: ['Hit'],
+  death: 'Death',
+};
+// A strawling's own clip map: the same gait, hit and death on the boss's rig, but its own
+// two unarmed swings, because it carries no scythe (owner note, 2026-10-18): Claw the
+// overhead double rake (impact 0.42 s), Lunge the pounce (impact 0.5 s), both at 30 fps.
+const STRAWLING: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Claw', 'Lunge'],
   hit: ['Hit'],
   death: 'Death',
 };
@@ -6615,11 +6627,12 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_gourdlight_strawling: {
     url: `${CREATURES}/gourdlight_strawling.glb`,
     height: STRAWLING_HEIGHT,
-    clips: THATCHGRIN,
+    clips: STRAWLING,
     deathTimeScale: 1.3,
     eyeGlow: {
       bone: 'Head',
-      offset: [0, 0.144, 0.122],
+      // the ember eyes on the sack's front (scarecrow.py sack_front)
+      offset: [0, 0.144, 0.17],
       color: 0xffa040,
       radius: 0.05,
       pulseHz: 1.1,

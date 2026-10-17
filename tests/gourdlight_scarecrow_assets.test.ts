@@ -59,11 +59,35 @@ const joints = (path: string) => {
 };
 
 const CLIP_SET = ['Chop', 'Death', 'Hit', 'Idle', 'Run', 'Summon', 'Swipe', 'Throw', 'Walk'];
+// A strawling carries no scythe (owner note 2026-10-18): the boss's gait, hit and death on
+// the shared rig, its own two unarmed swings, no throw and no call.
+const STRAWLING_CLIP_SET = ['Claw', 'Death', 'Hit', 'Idle', 'Lunge', 'Run', 'Walk'];
 
 describe('the shipped GLBs', () => {
-  it('carry the one shared clip set on both bodies', () => {
+  it('carry the boss clip set, and the strawling its own unarmed one', () => {
     expect(clips(BOSS_GLB)).toEqual(CLIP_SET);
-    expect(clips(ADD_GLB)).toEqual(CLIP_SET);
+    expect(clips(ADD_GLB)).toEqual(STRAWLING_CLIP_SET);
+    // the strawling never plays a scythe swing with an empty hand
+    expect(clips(ADD_GLB)).not.toContain('Swipe');
+    expect(clips(ADD_GLB)).not.toContain('Chop');
+  });
+
+  it('dresses only the boss in the woven sackcloth, as KTX2', () => {
+    const boss = glbJson(BOSS_GLB) as ReturnType<typeof glbJson> & {
+      images?: Array<{ mimeType?: string }>;
+      materials?: Array<{
+        name?: string;
+        normalTexture?: unknown;
+        pbrMetallicRoughness?: { baseColorTexture?: unknown };
+      }>;
+    };
+    const cloth = boss.materials?.find((m) => m.name === 'ScarecrowCloth');
+    expect(cloth?.pbrMetallicRoughness?.baseColorTexture).toBeDefined();
+    expect(cloth?.normalTexture).toBeDefined();
+    expect(boss.images?.length).toBe(2);
+    for (const img of boss.images ?? []) expect(img.mimeType).toBe('image/ktx2');
+    const add = glbJson(ADD_GLB) as { images?: unknown[] };
+    expect(add.images ?? []).toEqual([]);
   });
 
   it('share one rig: the boss adds only the crows, the strawling nothing', () => {
@@ -111,8 +135,14 @@ describe('the two attacks (owner note 2026-10-17: one clear idea each, at 30 fps
   // scarecrow_clips.py swipe_keys (THE REAP: impact 0.66 s) and chop_keys (THE SLAM: impact
   // 0.78 s), sampled at the pipeline's 30 fps. A re-author that changes either length, or a
   // rebake at another rate, turns this red.
-  const ATTACKS = { Swipe: 1.5, Chop: 1.7 } as const;
-  for (const path of [BOSS_GLB, ADD_GLB]) {
+  const BOSS_ATTACKS = { Swipe: 1.5, Chop: 1.7 } as const;
+  // scarecrow_clips.py claw_keys (THE RAKE, impact 0.42 s) and lunge_keys (THE POUNCE,
+  // impact 0.5 s): a strawling's own swings
+  const STRAWLING_ATTACKS = { Claw: 1.1, Lunge: 1.3 } as const;
+  for (const [path, ATTACKS] of [
+    [BOSS_GLB, BOSS_ATTACKS],
+    [ADD_GLB, STRAWLING_ATTACKS],
+  ] as const) {
     it(`keys the reap and the slam at their authored lengths, 30 keys a second (${path.split(/[/]/).pop()})`, () => {
       const timing = clipTiming(path);
       for (const [clip, seconds] of Object.entries(ATTACKS)) {
@@ -128,8 +158,10 @@ describe('the two attacks (owner note 2026-10-17: one clear idea each, at 30 fps
       expect(timing.Run?.seconds).toBeCloseTo(0.85, 1); // 0.85 s lands on the 30 fps grid at 0.833
       expect(timing.Hit?.seconds).toBeCloseTo(0.45, 1);
       expect(timing.Death?.seconds).toBeCloseTo(3.2, 2);
-      expect(timing.Throw?.seconds).toBeCloseTo(2.2, 2);
-      expect(timing.Summon?.seconds).toBeCloseTo(2, 2);
+      if (path === BOSS_GLB) {
+        expect(timing.Throw?.seconds).toBeCloseTo(2.2, 2);
+        expect(timing.Summon?.seconds).toBeCloseTo(2, 2);
+      }
     });
   }
 });
@@ -161,6 +193,17 @@ describe('the manifest wiring', () => {
     MANIFEST.indexOf('const THATCHGRIN: ClipMap = {'),
     MANIFEST.indexOf('\n};', MANIFEST.indexOf('const THATCHGRIN: ClipMap = {')),
   );
+
+  const strawlingStart = MANIFEST.indexOf('const STRAWLING: ClipMap = {');
+  const strawlingMap = MANIFEST.slice(strawlingStart, MANIFEST.indexOf('\n};', strawlingStart));
+
+  it('gives the strawling its own map, naming only its own clips', () => {
+    expect(strawlingMap).toContain("attack: ['Claw', 'Lunge']");
+    for (const name of strawlingMap.matchAll(/'([A-Z][A-Za-z]+)'/g))
+      expect(STRAWLING_CLIP_SET).toContain(name[1]);
+    const def = MANIFEST.slice(MANIFEST.indexOf('mob_gourdlight_strawling: {'));
+    expect(def.slice(0, def.indexOf('},'))).toContain('clips: STRAWLING');
+  });
 
   it('names only clips the GLB carries, and keys the telegraphs by the kit ability ids', () => {
     for (const name of map.matchAll(/'([A-Z][A-Za-z]+)'/g)) expect(CLIP_SET).toContain(name[1]);
