@@ -50,8 +50,9 @@ import {
 } from './scarecrow_state';
 import { clearSwellingGourd, tickSwellingGourd } from './scarecrow_swell';
 
-/** Recorded SFX already in the manifest (sfx_manifest.generated.ts). */
-export const GOURD_BURST_SFX = 'impact_fire';
+/** Gourdfall's landing (its own cue, scripts/sfx/gourdlight_sfx.mjs; the fall whistle
+ *  before it is the renderer's, scarecrow_fx.ts). */
+export const GOURD_BURST_SFX = 'impact_gourdfall';
 export const GOURD_THROW_SFX = 'proj_fire';
 export const CALL_SFX = 'spell_nova';
 

@@ -1221,6 +1221,16 @@ export const SFX = [
   { key: 'rift_ice_glide', custom: true, loop: true }, // point-source loop for a player currently gliding
   { key: 'rift_ice_stop', custom: true }, // skidding to a halt off the ice
   { key: 'rift_lava_tick', custom: true }, // the 1 Hz lava/blackwater hazard burn tick
+  // Gourdlight Eve: synthesized from scratch by scripts/sfx/gourdlight_sfx.mjs (original,
+  // no samples; CREDITS.md). Old Thatchgrin's Gourdfall and Swelling Gourd ride the
+  // spellfxAt sfxKey (the impacts) and the renderer's scarecrow layer (the whistle, the
+  // ripening pulse); the Emberbristle Broom's own stride and hover hum.
+  { key: 'proj_gourdfall_whistle', custom: true },
+  { key: 'impact_gourdfall', custom: true },
+  { key: 'spell_swelling_gourd_pulse', custom: true },
+  { key: 'impact_swelling_gourd_burst', custom: true },
+  { key: 'mount_run_emberbristle_broom', custom: true },
+  { key: 'mount_idle_emberbristle_broom', custom: true, loop: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

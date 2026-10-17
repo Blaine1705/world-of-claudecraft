@@ -28,6 +28,7 @@
 // hidden twin so its program links before its first use. Every particle rides the pooled
 // point cloud (vfx.ts). A rain reuses the pools (only a chaff patch builds its tiny disc).
 import * as THREE from 'three';
+import type { SpatialAudioSink } from './audio_sink';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import {
   bodyLocalToWorld,
@@ -43,11 +44,15 @@ import {
   GOURD_ABILITY,
   GOURD_HAND_LOCAL,
   GOURD_RELEASE_SEC,
+  GOURDFALL_WHISTLE_SFX,
   SUMMON_ABILITY,
   SUMMON_PEAK_SEC,
   SWELL_ABILITY,
+  SWELL_PULSE_SFX,
   SWELLING_GOURD_TEMPLATE,
   swellGlow,
+  swellPulseGain,
+  swellPulseInterval,
   swellScale,
   swellThrob,
   THATCHGRIN_TEMPLATE,
@@ -104,6 +109,8 @@ interface FallSlot {
   start: number;
   end: number;
   spin: number;
+  /** Its fall whistle has sounded (once, the frame it starts to drop). */
+  whistled: boolean;
 }
 
 interface Patch {
@@ -306,6 +313,8 @@ export class ScarecrowFx {
   private readonly deadSeen = new Set<number>();
   /** The sim time-ish clock each live gourd rose at (by entity id), for its heave. */
   private readonly gourdBorn = new Map<number, number>();
+  /** When each live gourd's next heartbeat sounds (this layer's clock). */
+  private readonly gourdPulseAt = new Map<number, number>();
   private time = 0;
   private frameDt = 1 / 60;
   private rootBorn = 0;
@@ -321,6 +330,8 @@ export class ScarecrowFx {
     private readonly entities: () => ReadonlyMap<number, EntityLike>,
     private readonly entity: (id: number) => EntityLike | undefined,
     private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    /** The spatial audio seam (the renderer's injected sink): this layer's own timed cues. */
+    private readonly audio: () => SpatialAudioSink | null = () => null,
   ) {
     for (let i = 0; i < FALL_CAP; i++) {
       this.falls.push({
@@ -331,6 +342,7 @@ export class ScarecrowFx {
         start: 0,
         end: 0,
         spin: 0,
+        whistled: false,
       });
     }
   }
@@ -580,6 +592,7 @@ export class ScarecrowFx {
     slot.start = w.start;
     slot.end = w.end;
     slot.spin = 3 + (Math.abs(ev.x * 7.3 + ev.z * 3.1) % 3);
+    slot.whistled = false;
   }
 
   private pumpkinBurst(x: number, z: number, radius: number): void {
@@ -735,6 +748,12 @@ export class ScarecrowFx {
     if (this.gourdBorn.size > 0) {
       for (const id of this.gourdBorn.keys()) if (!this.entity(id)) this.gourdBorn.delete(id);
     }
+    if (this.gourdPulseAt.size > 0) {
+      for (const id of this.gourdPulseAt.keys()) {
+        const g = this.entity(id);
+        if (!g || g.dead) this.gourdPulseAt.delete(id);
+      }
+    }
   }
 
   private updateFalls(dt: number, reducedMotion: boolean): void {
@@ -754,6 +773,14 @@ export class ScarecrowFx {
         } else {
           shown = true;
           any = true;
+          if (!f.up && !f.whistled) {
+            // the whistle starts as it drops out of the sky, heard where it will land
+            f.whistled = true;
+            this.audio()?.playAt?.(GOURDFALL_WHISTLE_SFX, f.to.x, f.to.y, f.to.z, {
+              gain: 0.8,
+              cooldown: 0.05,
+            });
+          }
           const p = f.up
             ? fallPoint(f.from, f.to, 1 - (1 - t) * (1 - t))
             : fallPoint(f.from, f.to, t);
@@ -894,6 +921,16 @@ export class ScarecrowFx {
       const swell = this.bodySwell(e, id);
       const cy = e.pos.y + 1.9 * swell;
       const glow = swellGlow(p, this.time);
+      // its heartbeat, quickening as it ripens (the throb's sound)
+      const next = this.gourdPulseAt.get(id);
+      if (next === undefined) this.gourdPulseAt.set(id, this.time + swellPulseInterval(p));
+      else if (this.time >= next) {
+        this.gourdPulseAt.set(id, this.time + swellPulseInterval(p));
+        this.audio()?.playAt?.(SWELL_PULSE_SFX, e.pos.x, cy, e.pos.z, {
+          gain: swellPulseGain(p),
+          cooldown: 0.1,
+        });
+      }
       // a hot core seen through its carved face and seams, kept small and soft so the gourd
       // itself (its grin, its rind) still reads through it
       this.placeHalo(

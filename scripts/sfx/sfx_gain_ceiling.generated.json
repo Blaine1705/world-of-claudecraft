@@ -788,6 +788,17 @@
       }
     ]
   },
+  "impact_gourdfall": {
+    "ceilingDb": 4.5,
+    "tracks": [
+      {
+        "filename": "impact_gourdfall.mp3",
+        "sha256": "a5ff8f3fc49b8673f137b5677539607a30709a81215f48f170879d2a3fd1f777",
+        "size": 31391,
+        "peakDb": -5.5
+      }
+    ]
+  },
   "impact_holy": {
     "ceilingDb": 6.5,
     "tracks": [
@@ -887,6 +898,17 @@
         "sha256": "1b746f7ec984ca5368462bc3747f8135057ebf209f565828df12bb061358d584",
         "size": 30763,
         "peakDb": -7.1
+      }
+    ]
+  },
+  "impact_swelling_gourd_burst": {
+    "ceilingDb": 4.5,
+    "tracks": [
+      {
+        "filename": "impact_swelling_gourd_burst.mp3",
+        "sha256": "e7a7f216d13c68621eb9cbe379d36ab6dcd2206da6c447395be2f45a093b2519",
+        "size": 63991,
+        "peakDb": -5.5
       }
     ]
   },
@@ -3861,6 +3883,17 @@
       }
     ]
   },
+  "mount_idle_emberbristle_broom": {
+    "ceilingDb": 5.9,
+    "tracks": [
+      {
+        "filename": "mount_idle_emberbristle_broom.mp3",
+        "sha256": "8df6d8f47f178b78fe2eef1d2319fdeb12ee6e14f50e0f824038735c0831a11f",
+        "size": 73395,
+        "peakDb": -6.9
+      }
+    ]
+  },
   "mount_idle_mech_bird": {
     "ceilingDb": 9.5,
     "tracks": [
@@ -4051,6 +4084,17 @@
         "sha256": "b01e419b817154035271ee47bf23e051fda675a6ab9ef61ebefbfabbf3379e2c",
         "size": 11328,
         "peakDb": -6.2
+      }
+    ]
+  },
+  "mount_run_emberbristle_broom": {
+    "ceilingDb": 4.8,
+    "tracks": [
+      {
+        "filename": "mount_run_emberbristle_broom.mp3",
+        "sha256": "1648d8106f48efe309004cd56aad6f33068c5526300f495b7232dc3029c8c651",
+        "size": 15090,
+        "peakDb": -5.8
       }
     ]
   },
@@ -4695,6 +4739,17 @@
       }
     ]
   },
+  "proj_gourdfall_whistle": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "proj_gourdfall_whistle.mp3",
+        "sha256": "f65ad928ef327d715e8be25d41867a45bec007a7141f2791b4d2077527593565",
+        "size": 24494,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "proj_holy": {
     "ceilingDb": 5.6,
     "tracks": [
@@ -4945,6 +5000,17 @@
         "sha256": "a235d6378e504a68ee6607776047017d3d5b31fb900a3d7ac851827bbb576857",
         "size": 43301,
         "peakDb": -7.5
+      }
+    ]
+  },
+  "spell_swelling_gourd_pulse": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "spell_swelling_gourd_pulse.mp3",
+        "sha256": "b9fcd3895f2069dc5c666ad5de8dd6a4b28a829af2de9cd9508cc25bfd576e23",
+        "size": 16344,
+        "peakDb": -6.3
       }
     ]
   },

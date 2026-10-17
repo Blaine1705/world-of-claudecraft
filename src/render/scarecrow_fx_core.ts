@@ -147,6 +147,26 @@ export function swellThrob(p: number, time: number): number {
   return Math.sin(time * hz * Math.PI * 2) * late;
 }
 
+/** The render layer's own timed cues (scripts/sfx/gourdlight_sfx.mjs): the whistle a
+ *  burning pumpkin makes as it starts to fall, and the Swelling Gourd's ripening pulse. */
+export const GOURDFALL_WHISTLE_SFX = 'proj_gourdfall_whistle';
+export const SWELL_PULSE_SFX = 'spell_swelling_gourd_pulse';
+
+/** Seconds between two of the ripening gourd's heartbeats at fuse progress `p`: a slow
+ *  beat as it rises (1.4 s), quickening as it ripens, racing in the last quarter of the
+ *  fuse (down to 0.28 s), the same read as its throb. */
+export function swellPulseInterval(p: number): number {
+  const q = Math.max(0, Math.min(1, p));
+  if (q < 0.75) return 1.4 - 0.55 * (q / 0.75);
+  return 0.85 - 0.57 * ((q - 0.75) / 0.25);
+}
+
+/** The heartbeat's gain: soft as it rises, loud as it is about to go. */
+export function swellPulseGain(p: number): number {
+  const q = Math.max(0, Math.min(1, p));
+  return 0.45 + 0.55 * q;
+}
+
 /** The gourd's inner glow (halo opacity 0..1): a low ember at its rise, blazing at its
  *  burst, pulsing with the throb. */
 export function swellGlow(p: number, time: number): number {

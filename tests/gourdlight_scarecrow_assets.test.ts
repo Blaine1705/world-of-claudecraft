@@ -73,7 +73,7 @@ describe('the shipped GLBs', () => {
   });
 
   it('dresses only the boss in the woven sackcloth, as KTX2', () => {
-    const boss = glbJson(BOSS_GLB) as ReturnType<typeof glbJson> & {
+    const boss = glbJson(BOSS_GLB) as unknown as {
       images?: Array<{ mimeType?: string }>;
       materials?: Array<{
         name?: string;

@@ -33,7 +33,8 @@ import type { ScarecrowState } from './scarecrow_state';
 export const HARVEST_WARD_AURA_ID = 'thatchgrin_harvest_ward';
 export const UPROOTED_AURA_ID = 'thatchgrin_uprooted';
 export const SPLIT_RIND_AURA_ID = 'thatchgrin_split_rind';
-export const GOURD_BURST_SFX = 'impact_fire';
+/** The Swelling Gourd's burst (its own cue, scripts/sfx/gourdlight_sfx.mjs). */
+export const GOURD_BURST_SFX = 'impact_swelling_gourd_burst';
 export const GOURD_RISE_SFX = 'spell_nova';
 
 const EPS = 1e-6;
