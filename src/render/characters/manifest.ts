@@ -1085,6 +1085,10 @@ const MOUNT_MECH_BIRD: ClipMap = {
 // breathing Idle: he looks about him, rears up to paw the air, and stamps his
 // front feet one at a time. Each ends back on the idle pose so the hand-off is
 // seamless.
+// The Emberbristle Broom ships Idle / Walk / Run only: a ridden broom never plays a
+// death (the summon strips on death first), so death holds Idle like the Mech Bird.
+const MOUNT_BROOM: ClipMap = { ...MOUNT_RIGGED, death: 'Idle' };
+
 const MOUNT_TORTOISE: ClipMap = {
   ...MOUNT_RIGGED,
   idleVariants: ['Idle_Look', 'Idle_Rear', 'Idle_Stamp', 'Idle_Groove'],
@@ -3421,7 +3425,7 @@ export const VISUALS: Record<string, VisualDef> = {
   mount_emberbristle_broom: {
     url: `${MOUNTS_DIR}/emberbristle_broom.glb`,
     height: 1.05,
-    clips: MOUNT_RIGGED,
+    clips: MOUNT_BROOM,
     walkRef: 4,
     runRef: 11,
     lazyPreload: true,

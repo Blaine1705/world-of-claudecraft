@@ -8,9 +8,11 @@
 //   - once for each character the first tick it spends in a world whose running event
 //     is not the item's: a login after the event ended (the broom is already gone from
 //     every character online at the close; this catches the ones who were offline).
-//   - again every BOUND_RECHECK_TICKS for every character: a broom that arrives after
-//     its character was checked (personal loot taken off a corpse after the close, a
-//     mail or a grant) still leaves within seconds.
+//   - again every BOUND_RECHECK_TICKS for every character, bags and courier cargo only:
+//     a broom that arrives after its character was checked (personal loot taken off a
+//     corpse after the close, a mail or a grant) lands in the bags and still leaves
+//     within seconds. The bank is never re-walked on a quiet tick (it only grows by a
+//     deposit, which takes from the bags first), so a large bank costs nothing.
 // A character swept since the last edge is remembered in a WeakMap on the world state,
 // so a quiet tick costs one map lookup per character and no container scan.
 //
@@ -54,10 +56,11 @@ export function sweepEventBoundItems(
   ctx: SimContext,
   meta: PlayerMeta,
   active: string | null,
+  withBank = true,
 ): string[] {
   const gone: string[] = [];
   strip(meta.inventory, active, gone);
-  const bank = strip(meta.bank.inventory, active, gone);
+  const bank = withBank ? strip(meta.bank.inventory, active, gone) : false;
   const cargo = meta.courier ? strip(meta.courier.cargo, active, gone) : false;
   if (gone.length === 0) return gone;
   // wireRev on any removal: the heavy self block (inv, mntOwn) keys on it, and a broom
@@ -90,6 +93,6 @@ export function updateEventBoundItems(ctx: SimContext, active: string | null, ed
     const at = state.boundSwept.get(meta);
     if (at !== undefined && now - at < BOUND_RECHECK_TICKS) continue;
     state.boundSwept.set(meta, now);
-    sweepEventBoundItems(ctx, meta, active);
+    sweepEventBoundItems(ctx, meta, active, at === undefined);
   }
 }
