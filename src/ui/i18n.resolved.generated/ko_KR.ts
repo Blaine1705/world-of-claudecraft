@@ -10893,7 +10893,21 @@ export const ko_KR: EnTranslations = {
       "moved": "이 맵에서 이동되었습니다.",
       "original": "원래 위치에 있습니다.",
       "hint": "드래그하거나 화살표 키로 미세 조정하세요. 이동은 이 맵에만 적용되며 오브젝트의 식별자는 그대로이므로 저장된 진행 상황에서도 찾을 수 있습니다.",
-      "reset": "원래 위치로 되돌리기"
+      "reset": "원래 위치로 되돌리기",
+      "edited": "이 맵에서 변경됨.",
+      "rotation": "회전(도)",
+      "size": "크기",
+      "resetAll": "원래대로",
+      "delete": "이 맵에서 삭제",
+      "deleteHint": "이 맵에서만 삭제합니다. 나중에 삭제된 오브젝트 목록에서 복원할 수 있습니다.",
+      "doorDeleteHint": "던전 문을 삭제하면 이 맵에서 지상 입구가 사라집니다.",
+      "dummyDeleteHint": "헤일의 연습 수업은 이 허수아비를 사용합니다. 하나를 삭제하면 이 맵에서 해당 수업을 끝낼 수 없습니다.",
+      "doorFixed": "던전 문은 이동하거나 삭제할 수만 있고, 회전하거나 크기를 바꿀 수는 없습니다.",
+      "deletedTitle": "삭제된 게임플레이 오브젝트",
+      "deletedHint": "이 맵에서 삭제되었습니다. 복원하면 원래 자리로 돌아옵니다.",
+      "deletedRow": "{kind}: {name}",
+      "restore": "복원",
+      "restoredLater": "복원했습니다. 맵을 다시 불러오면 화면에 나타납니다."
     },
     "lightTool": {
       "title": "Point Lights",

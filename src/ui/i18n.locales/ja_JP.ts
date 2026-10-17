@@ -11372,6 +11372,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.biome.clearConfirm': 'このマップの塗られたバイオームのマスをすべて削除しますか？',
   'editor.flatten.hint': '平坦化は、ドラッグ開始時のカーソル下の高さに地面をならします。',
   'editor.flatten.hardEdge': 'ハードエッジ',
+  'editor.objectMove.edited': 'このマップで変更済みです。',
+  'editor.objectMove.rotation': '回転（度）',
+  'editor.objectMove.size': 'サイズ',
+  'editor.objectMove.resetAll': '元に戻す',
+  'editor.objectMove.delete': 'このマップから削除',
+  'editor.objectMove.deleteHint':
+    'このマップからのみ削除します。削除済みオブジェクトの一覧からあとで復元できます。',
+  'editor.objectMove.doorDeleteHint':
+    'ダンジョンの扉を削除すると、このマップの地上の入口がなくなります。',
+  'editor.objectMove.dummyDeleteHint':
+    'ヘイルの練習レッスンはこれらの人形を使います。削除すると、このマップではそのレッスンを完了できなくなります。',
+  'editor.objectMove.doorFixed': 'ダンジョンの扉は移動と削除のみで、回転やサイズ変更はできません。',
+  'editor.objectMove.deletedTitle': '削除済みのゲームプレイオブジェクト',
+  'editor.objectMove.deletedHint': 'このマップから削除済みです。復元すると元の場所に戻ります。',
+  'editor.objectMove.deletedRow': '{kind}：{name}',
+  'editor.objectMove.restore': '復元',
+  'editor.objectMove.restoredLater': '復元しました。マップを再読み込みすると表示されます。',
   'editor.selection.heightOffset': '高さのオフセット（ヤード）',
   'editor.selection.heightStep': '移動量（ヤード）',
   'editor.selection.raiseAsset': '上げる',

@@ -10893,7 +10893,21 @@ export const zh_TW: EnTranslations = {
       "moved": "已在此地圖中移動。",
       "original": "位於原始位置。",
       "hint": "拖曳它，或用方向鍵微調。移動只作用於此地圖，物件保留原有身分，因此已儲存的進度仍能找到它。",
-      "reset": "重設到原始位置"
+      "reset": "重設到原始位置",
+      "edited": "已在此地圖上變更。",
+      "rotation": "旋轉（度）",
+      "size": "大小",
+      "resetAll": "恢復原樣",
+      "delete": "從此地圖刪除",
+      "deleteHint": "僅從此地圖刪除。之後可在已刪除物件清單中復原。",
+      "doorDeleteHint": "刪除地城入口門會移除其在此地圖上的地表入口。",
+      "dummyDeleteHint": "黑爾的練習課程會用到這些假人：刪除其中一個後，此地圖上對應的課程將無法完成。",
+      "doorFixed": "地城入口門可以移動或刪除，但不能旋轉或縮放。",
+      "deletedTitle": "已刪除的玩法物件",
+      "deletedHint": "已從此地圖刪除。復原後會回到原本的位置。",
+      "deletedRow": "{kind}：{name}",
+      "restore": "復原",
+      "restoredLater": "已復原。地圖重新載入後會顯示在視圖中。"
     },
     "lightTool": {
       "title": "Point Lights",

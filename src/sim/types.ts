@@ -4690,6 +4690,10 @@ export interface GatherNodeDef {
   zoneId: string;
   type: GatherNodeType;
   pos: { x: number; z: number };
+  // A Studio map's turn (radians) and size multiplier for this node
+  // (sim/moved_objects.ts). Built-in rows never carry them.
+  rotY?: number;
+  scale?: number;
   // Effective content level for the profession-XP green/gray curve
   // (professions/profession_xp.ts gatherActionXp), snapshotted at authoring
   // time as the CEIL of the node's zone levelRange midpoint rather than

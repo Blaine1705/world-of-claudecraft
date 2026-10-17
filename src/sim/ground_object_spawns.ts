@@ -5,7 +5,7 @@
 import { DUNGEON_LIST, INSTANCE_SLOT_COUNT } from './data';
 import { createGroundObject } from './entity';
 import { freshInstanceSlot } from './instances/instance_slot';
-import { dungeonDoorPos } from './moved_objects';
+import { dungeonDoorPos, objectRemoved } from './moved_objects';
 import type { InstanceSlot } from './sim';
 import type { Entity, GroundObjectDef, Vec3, WorldContent } from './types';
 import { STABLE_GROUND_OBJECT_ENTITY_ID_MIN } from './types';
@@ -95,9 +95,18 @@ export function spawnStaticWorldObjects(world: WorldContent, deps: StaticObjectS
   for (const dungeon of DUNGEON_LIST) {
     if (dungeon.overworldDoor !== false) {
       // A Studio map may move the door (moved_objects.ts); same slot, same id.
+      // A deleted door still consumes its id so every later entity keeps its
+      // own; its dungeon is then reachable only by other means.
+      const doorId = deps.allocateEntityId();
+      if (objectRemoved(world.objectMoves, 'dungeonDoor', dungeon.id)) {
+        for (let slot = 0; slot < INSTANCE_SLOT_COUNT; slot++) {
+          deps.instances.push(freshInstanceSlot(dungeon.id, slot));
+        }
+        continue;
+      }
       const doorPos = dungeonDoorPos(world.objectMoves, dungeon);
       const door = createGroundObject(
-        deps.allocateEntityId(),
+        doorId,
         '',
         dungeon.id === 'nythraxis_crypt' ? 'Abandoned Crypt' : dungeon.name,
         deps.groundPos(doorPos.x, doorPos.z),
