@@ -2718,9 +2718,7 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     // exclusion so a future hand-add reds a test, not just review.
     const liveTitles = DEED_ORDER.filter(
       (id) =>
-        DEEDS[id].reward?.kind === 'title' &&
-        !DEEDS[id].hidden &&
-        id !== 'col_reliquary_complete',
+        DEEDS[id].reward?.kind === 'title' && !DEEDS[id].hidden && id !== 'col_reliquary_complete',
     );
     expect([...ids].sort()).toEqual([...liveTitles].sort());
     // The exclusion arm, both premise halves: the deed really rewards a title
