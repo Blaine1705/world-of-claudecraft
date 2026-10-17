@@ -1,7 +1,9 @@
 // Screenshot rig for Gourdlight Eve (the autumn seasonal event, src/sim/seasonal/):
 // boots an offline character, opens the event with /dev season on, and shoots
-// each dressed city by day and by night, the trick-or-treat gossip row and its
-// answer, a trick, the keeper's shop and the worn pumpkin head.
+// each dressed city by day and by night, the keeper's stall by day, dusk and
+// night, a street of lit pumpkins seen from behind, the trick-or-treat gossip
+// row and its answer, a trick, the keeper's shop and the worn pumpkin head on
+// several bodies.
 //
 //   GAME_URL=http://localhost:5192 OUT=tmp/gourdlight [SHOTS=a,b] [PRESET=1] \
 //     node scripts/gourdlight_eve_shot.mjs
@@ -124,29 +126,50 @@ const views = {
   // Gameplay-camera vantages, each over a dressed stretch of its city: Eastbrook's
   // square round the statue and its lantern street, Fenbridge's market lane,
   // Highwatch's square.
-  eastbrook: { x: -9, z: -107, look: [-20, -95] },
+  // the square from its south-west corner: the statue, the lanterned street and
+  // the keeper's stall beyond
+  eastbrook: { x: -22, z: -96, look: [-13.9, -101.9], dist: 14, pitch: 0.42 },
   eastbrook_street: { x: -38, z: -88, look: [-44, -96] },
-  fenbridge: { x: -2, z: 288, look: [0, 305] },
+  fenbridge: { x: -2, z: 284, look: [-1, 305] },
   highwatch: { x: 4, z: 670, look: [-10, 660] },
 };
 for (const [city, v] of Object.entries(views)) {
   for (const time of ['day', 'night']) {
     if (ONLY && !ONLY.has(`${city}_${time}`)) continue;
     await chat(`/daynight ${time === 'day' ? 'noon' : 'midnight'}`);
-    await standAt(v.x, v.z, toward(v.x, v.z, v.look[0], v.look[1]), 10, 0.3);
+    await standAt(v.x, v.z, toward(v.x, v.z, v.look[0], v.look[1]), v.dist ?? 10, v.pitch ?? 0.3);
     await shot(`${city}_${time}`);
   }
 }
 
-// The keeper and her shop (dusk, Eastbrook).
-await chat('/daynight dusk');
+// Lit pumpkins seen from BEHIND at night: the rind, the lid's cut and the halo
+// carry the candle from every side, not only the carved face.
+if (!ONLY || ONLY.has('pumpkins_behind_night')) {
+  await chat('/daynight midnight');
+  await standAt(-2, 296, Math.PI, 9, 0.35);
+  await shot('pumpkins_behind_night');
+}
+
+// The keeper at her stall: the whole booth by day, dusk and night, then close.
 const keeper = await page.evaluate(
-  `(()=>{const e=[...window.__game.sim.entities.values()].find(e=>e.templateId==='gourdlight_keeper');return e?{id:e.id,x:e.pos.x,z:e.pos.z}:null;})()`,
+  `(()=>{const e=[...window.__game.sim.entities.values()].find(e=>e.templateId==='gourdlight_keeper');return e?{id:e.id,x:e.pos.x,z:e.pos.z,f:e.facing}:null;})()`,
 );
 if (keeper) {
-  const kx = keeper.x + 1.5;
-  const kz = keeper.z - 4;
-  await standAt(kx, kz, toward(kx, kz, keeper.x, keeper.z), 4.5, 0.3, 0.3);
+  // out in front of the counter, a little to one side so the player never hides her
+  const fx = Math.sin(keeper.f);
+  const fz = Math.cos(keeper.f);
+  const sx = keeper.x + fx * 9.8 - fz * 1.5;
+  const sz = keeper.z + fz * 9.8 + fx * 1.5;
+  for (const time of ['day', 'dusk', 'night']) {
+    if (ONLY && !ONLY.has(`stall_${time}`)) continue;
+    await chat(`/daynight ${time === 'day' ? 'noon' : time === 'dusk' ? 'dusk' : 'midnight'}`);
+    await standAt(sx, sz, toward(sx, sz, keeper.x, keeper.z), 9, 0.36);
+    await shot(`stall_${time}`);
+  }
+  await chat('/daynight dusk');
+  const kx = keeper.x + fx * 4.2 + fz * 1.6;
+  const kz = keeper.z + fz * 4.2 - fx * 1.6;
+  await standAt(kx, kz, toward(kx, kz, keeper.x, keeper.z), 4.2, 0.22, 0.35);
   await shot('keeper');
   await page.evaluate(
     `(()=>{const g=window.__game;g.sim.addItem('gourdlight_sweet',60);g.sim.targetEntity(${keeper.id});g.hud.questDialog?.open?.(${keeper.id});})()`,
@@ -187,13 +210,19 @@ for (const trick of [
   await shot(trick);
 }
 // The pumpkin head, worn: from the front by night and by day, from the side, on
-// the male body and then the female one.
+// the male body, the female one, and a tall bearded build and a slight dark-skinned
+// one (the head and its fit must hold on every body and face the builder makes).
 await wearHead();
-for (const body of ['male', 'female']) {
+const BODIES = {
+  male: 'null',
+  female: "{gender:'female',skinHue:28,skinLight:0.5}",
+  male_tall_bearded: "{gender:'male',bodyScale:1.05,headBeard:'long',skinHue:20,skinLight:0.62}",
+  female_slight: "{gender:'female',bodyScale:0.95,skinHue:24,skinLight:0.28}",
+};
+for (const [body, look] of Object.entries(BODIES)) {
+  if (ONLY && ![...ONLY].some((n) => n.startsWith(`pumpkin_head_${body}_`))) continue;
   // a body swap mid-wear: the pumpkin must follow onto the new body
-  await page.evaluate(
-    `(()=>{window.__game.sim.player.modularAppearance=${body === 'female' ? "{gender:'female',skinHue:28,skinLight:0.5}" : 'null'};})()`,
-  );
+  await page.evaluate(`(()=>{window.__game.sim.player.modularAppearance=${look};})()`);
   await frames(10, 300);
   await chat('/daynight midnight');
   await standAt(-14, -96, 0, 3.4, 0.1, Math.PI);
