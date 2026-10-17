@@ -266,6 +266,47 @@ describe('the keeper, the shop and the pumpkin head', () => {
     expect(head()).toBe(false);
   });
 
+  it('a worn head whose item is gone comes off for good, never stuck on the body', () => {
+    const sim = world();
+    open(sim);
+    sim.addItem(CARVED_PUMPKIN_HEAD_ID, 1);
+    sim.tick();
+    sim.useItem(CARVED_PUMPKIN_HEAD_ID);
+    sim.tick();
+    const head = () => sim.player.auras.some((a) => a.id === PUMPKIN_HEAD_AURA_ID);
+    expect(head()).toBe(true);
+    sim.removeItem(CARVED_PUMPKIN_HEAD_ID, 1);
+    sim.tick();
+    expect(head()).toBe(false);
+    expect(sim.serializeCharacter(sim.playerId)?.seasonal?.head).toBeUndefined();
+    // a new head starts off: wearing is a fresh choice
+    sim.addItem(CARVED_PUMPKIN_HEAD_ID, 1);
+    sim.tick();
+    expect(head()).toBe(false);
+  });
+
+  it('no trick body in a fight: the Jar refuses in combat, and combat ends a running trick', () => {
+    const sim = world();
+    open(sim);
+    sim.addItem(JAR_OF_MISCHIEF_ID, 2);
+    sim.tick();
+    sim.player.inCombat = true;
+    sim.useItem(JAR_OF_MISCHIEF_ID);
+    sim.tick();
+    const tricked = () => sim.player.auras.some((a) => a.kind === 'seasonal_cosmetic');
+    expect(tricked()).toBe(false);
+    expect(sim.countItem(JAR_OF_MISCHIEF_ID)).toBe(2);
+    sim.player.inCombat = false;
+    sim.player.combatTimer = 999;
+    sim.useItem(JAR_OF_MISCHIEF_ID);
+    sim.tick();
+    expect(tricked()).toBe(true);
+    sim.player.inCombat = true;
+    sim.player.combatTimer = 0;
+    sim.tick();
+    expect(tricked()).toBe(false);
+  });
+
   it('plays a trick from the Jar of Mischief and spends it', () => {
     const sim = world();
     open(sim);
@@ -347,5 +388,36 @@ describe('the seasonal save shape', () => {
     const other = world();
     const pid = other.addPlayer('mage', 'Copy', { state: state ?? undefined });
     expect(other.players.get(pid)?.seasonalKnocked.has('trader_wilkes')).toBe(true);
+  });
+});
+
+describe('the seasonal aura names localize (buff frame, combat log)', () => {
+  it('maps every trick and the worn head through the catalog, in English and a fill', async () => {
+    const { localizeSimAuraName } = await import('../src/ui/sim_i18n');
+    const { ensureLocaleLoaded, setLanguage } = await import('../src/ui/i18n');
+    const { pumpkinHeadAura, trickAura } = await import('../src/sim/seasonal/seasonal_cosmetics');
+    const { GOURDLIGHT_TRICKS } = await import('../src/sim/content/gourdlight_eve');
+    setLanguage('en');
+    expect(localizeSimAuraName(pumpkinHeadAura(1).name)).toBe('Carved Pumpkin Head');
+    GOURDLIGHT_TRICKS.forEach((trick, i) => {
+      expect(localizeSimAuraName(trickAura(i, 1).name)).toBe(trick.name);
+    });
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    try {
+      expect(localizeSimAuraName('Batty')).toBe('コウモリ化');
+      expect(localizeSimAuraName('Carved Pumpkin Head')).toBe('彫りカボチャの頭');
+    } finally {
+      setLanguage('en');
+    }
+  });
+});
+
+describe('the seasonal cosmetics stay off the raid frames', () => {
+  it('neither the worn head nor a trick spends a party frame aura slot', async () => {
+    const { isPartyFrameRelevantAura } = await import('../src/sim/aura_classify');
+    const { pumpkinHeadAura, trickAura } = await import('../src/sim/seasonal/seasonal_cosmetics');
+    expect(isPartyFrameRelevantAura(pumpkinHeadAura(1))).toBe(false);
+    expect(isPartyFrameRelevantAura(trickAura(0, 1))).toBe(false);
   });
 });

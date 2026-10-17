@@ -529,12 +529,12 @@ const NPC_IDS = [
   'scout_yerrin',
   'harbormaster_tamsin', // the Harbormaster's House at the Wyrmwatch cliff harbor
   'innkeeper_maudie', // the Mirefen tavern on the Fenbridge road
-  'gourdlight_keeper', // Gourdlight Eve's keeper (content/gourdlight_eve.ts), Eastbrook
   // ...and its seated regulars (src/sim/content/mirefen_tavern_patrons.ts)
   'patron_amos_eelby',
   'patron_grissel_sedgeworth',
   'patron_ned_oxley',
   'patron_hester_quillby',
+  'gourdlight_keeper', // Gourdlight Eve's keeper (content/gourdlight_eve.ts), Eastbrook
   // Lanternmere, the Amberfall
   'reeve_ottoline',
   'waywatcher_sorrel',

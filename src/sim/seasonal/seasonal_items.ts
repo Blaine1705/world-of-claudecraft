@@ -46,6 +46,13 @@ export function useSeasonalItem(
     meta.wireRev++;
     return;
   }
+  // A trick body hides a fighter's class, weapon and casts: never mid-fight (the
+  // fairness rule), and a trick already running drops the moment combat starts
+  // (seasonal_tick.ts). Refused before any rng draw.
+  if (p.inCombat) {
+    ctx.error(meta.entityId, "You can't do that while in combat.");
+    return;
+  }
   consumeOne();
   const index = ctx.rng.int(0, GOURDLIGHT_TRICKS.length - 1);
   const trick = playTrick(ctx, p, index, p.id);

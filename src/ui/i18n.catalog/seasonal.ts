@@ -51,6 +51,6 @@ export const seasonalStrings = {
     sweet:
       'Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them.',
   },
-  // The vendor row's token price: "{count} x {item}" ({count} pre-formatted).
+  // The vendor row's token price: "{count} {item}" ({count} pre-formatted).
   tokenPrice: '{count} {item}',
 };

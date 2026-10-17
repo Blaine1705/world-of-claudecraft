@@ -25563,11 +25563,6 @@ export const vi_VN: EnTranslations = {
         "title": "Innkeeper",
         "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
       },
-      "gourdlight_keeper": {
-        "name": "Hester Gourdwick",
-        "title": "Gourdlight Keeper",
-        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
-      },
       "patron_amos_eelby": {
         "name": "Amos Eelby",
         "title": "Eel Fisher",
@@ -25587,6 +25582,11 @@ export const vi_VN: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Mapmaker",
         "greeting": "Every map of this marsh I've ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it's dry while the ink sets."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Gourdlight Keeper",
+        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
       },
       "reeve_ottoline": {
         "name": "Xã Trưởng Ottoline",

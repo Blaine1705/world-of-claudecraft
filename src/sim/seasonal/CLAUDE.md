@@ -36,6 +36,16 @@ NPCs and town hubs, rejects or nudges anything overlapping a collider or standin
 on a road) in `src/sim/seasonal_decor_layout.ts`, pinned against the live world by
 `tests/seasonal_decor_layout.test.ts`; the renderer draws the resolved list.
 
+Fairness and replay rules:
+- A trick body (bat, skeleton) hides class, weapon and casts, so the Jar refuses in
+  combat and `updateSeasonal` strips a running trick the tick its body enters combat.
+  Cosmetic auras stay off raid frames (`PARTY_FRAME_EXCLUDED_KINDS`).
+- The worn head follows ownership: a character who no longer holds the item (bags or
+  bank) loses the flag, so a destroyed head is never stuck on.
+- Opening an event adds the keeper entity and cosmetic auras (draw-order inputs), so
+  a recorded server trace that crosses an open or close only replays with the same
+  `hostEventId` feed, the same contract as `resetDay`.
+
 ## Adding the next event
 1. A content file with the event id, keeper `NpcDef` (dynamic, reserved id), items,
    quests (`seasonalEvent` + `repeatable` + `dailyReset`), decor rules.

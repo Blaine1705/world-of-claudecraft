@@ -1,4 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import {
+  GOURDLIGHT_EVE_ID,
+  GOURDLIGHT_KEEPER_ENTITY_ID,
+  GOURDLIGHT_KEEPER_NPC_ID,
+} from '../src/sim/content/gourdlight_eve';
 import { LAST_KEEP_SPIRIT_HEALER_ENTITY_ID } from '../src/sim/content/graveyards';
 import { HEALING_TRAINING_ENTITY_IDS } from '../src/sim/content/healing_training';
 import { HIGHWATCH_STEWARD_ENTITY_ID } from '../src/sim/content/highwatch_manor';
@@ -30,6 +35,7 @@ const RESERVED: Record<string, number> = {
   WEEKLY_KEEPER_ENTITY_ID,
   TAVERN_KEEPER_ENTITY_ID,
   HIGHWATCH_STEWARD_ENTITY_ID,
+  GOURDLIGHT_KEEPER_ENTITY_ID,
   ...Object.fromEntries(
     Object.entries(HEALING_TRAINING_ENTITY_IDS).map(([id, n]) => [`HEALING_TRAINING:${id}`, n]),
   ),
@@ -66,5 +72,18 @@ describe('reserved singleton entity ids', () => {
       );
       expect(copies, templateId).toHaveLength(1);
     }
+  });
+  it('the Gourdlight keeper spawns under her own id while the event runs, and only then', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    expect(sim.entities.get(GOURDLIGHT_KEEPER_ENTITY_ID)).toBeUndefined();
+    sim.seasonal.hostEventId = GOURDLIGHT_EVE_ID;
+    sim.tick();
+    expect(sim.entities.get(GOURDLIGHT_KEEPER_ENTITY_ID)?.templateId).toBe(
+      GOURDLIGHT_KEEPER_NPC_ID,
+    );
+    const copies = [...sim.entities.values()].filter(
+      (e) => e.kind === 'npc' && e.templateId === GOURDLIGHT_KEEPER_NPC_ID,
+    );
+    expect(copies).toHaveLength(1);
   });
 });

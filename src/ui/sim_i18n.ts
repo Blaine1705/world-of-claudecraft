@@ -12,6 +12,7 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
+import { CARVED_PUMPKIN_HEAD_ID, GOURDLIGHT_TRICKS } from '../sim/content/gourdlight_eve';
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import {
   FACTION_IDS,
@@ -18631,7 +18632,18 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
   'Muster Standard': 'muster_standard',
 };
 
+// Gourdlight Eve's cosmetic auras (src/sim/seasonal/seasonal_cosmetics.ts): each trick
+// by its id's catalog name, the worn head by its item's name.
+const SEASONAL_TRICK_AURA_IDS: ReadonlyMap<string, string> = new Map(
+  GOURDLIGHT_TRICKS.map((trick) => [trick.name, trick.id]),
+);
+
 export function localizeSimAuraName(name: string): string | null {
+  const trickId = SEASONAL_TRICK_AURA_IDS.get(name);
+  if (trickId) return t(`seasonal.tricks.${trickId}` as TranslationKey);
+  if (name === 'Carved Pumpkin Head') {
+    return tEntity({ kind: 'item', id: CARVED_PUMPKIN_HEAD_ID, field: 'name' });
+  }
   if (name === 'Friendship') return t('referralCards.friendshipAura');
   if (name === 'Protective Charm') return t('referralCards.protectiveCharm');
   const key = AURA_NAME_KEY[name];
