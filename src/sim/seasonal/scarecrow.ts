@@ -86,7 +86,9 @@ export function clearThatchgrin(ctx: SimContext, st: ScarecrowState): void {
   const boss = st.bossId !== null ? ctx.entities.get(st.bossId) : undefined;
   if (boss) {
     resetScarecrowKit(ctx, boss, st);
-    for (const addId of boss.summonedIds) ctx.dropEntity(addId);
+    // the shared despawn (existence checks, targets cleared), then whatever a corpse kept
+    ctx.despawnSummonedAdds(boss);
+    for (const addId of boss.summonedIds) if (ctx.entities.has(addId)) ctx.dropEntity(addId);
     ctx.dropEntity(boss.id);
   }
   st.bossId = null;

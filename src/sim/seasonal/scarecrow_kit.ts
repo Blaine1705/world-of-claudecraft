@@ -17,7 +17,10 @@
 // `spacing`, and a due throw waits for it. Numbers are content (THATCHGRIN_KIT, sourced in
 // content/gourdlight_eve_scarecrow.ts).
 //
-// Determinism: every draw is ctx.rng, in a fixed order: the gourd victims (players sorted
+// Only players in his fight (his hate table, or who hurt him this pull) are aimed at or
+// struck, so a passer-by on the road is never caught.
+//
+// Determinism: every draw is ctx.rng, in a fixed order: the gourd victims (fighters sorted
 // by entity id, a partial Fisher-Yates over them), then one damage roll per player struck,
 // per gourd in throw order, then per chaff patch in list order. Nothing here runs outside
 // his pull, and he only exists while Gourdlight Eve runs, so no shipped trace moves.
@@ -47,11 +50,19 @@ export function scarecrowEngaged(boss: Entity): boolean {
   return !boss.dead && boss.inCombat && (boss.aiState === 'chase' || boss.aiState === 'attack');
 }
 
-function livingPlayersSorted(ctx: SimContext): Entity[] {
+/** The players in HIS fight, alive, in id order: anyone on his hate table (a pet's threat
+ *  counts for its owner) or who has hurt him this pull. A passer-by who never joined is
+ *  never his target and never caught in his fire. */
+function fightersSorted(ctx: SimContext, boss: Entity): Entity[] {
+  const ids = new Set<number>(boss.bossDamagers);
+  for (const id of boss.threat.keys()) {
+    const e = ctx.entities.get(id);
+    ids.add(e && e.ownerId !== null ? e.ownerId : id);
+  }
   const out: Entity[] = [];
-  for (const meta of ctx.players.values()) {
-    const p = ctx.entities.get(meta.entityId);
-    if (p && !p.dead) out.push(p);
+  for (const id of ids) {
+    const p = ctx.entities.get(id);
+    if (p && p.kind === 'player' && !p.dead) out.push(p);
   }
   return out.sort((a, b) => a.id - b.id);
 }
@@ -82,7 +93,7 @@ function strike(
  *  `playersPerGourd` of them (at least one, at most `maxCount`), picked by partial shuffle. */
 export function pickGourdVictims(ctx: SimContext, boss: Entity): Entity[] {
   const g = THATCHGRIN_KIT.gourd;
-  const pool = livingPlayersSorted(ctx).filter((p) => dist2d(p.pos, boss.pos) <= g.maxRange);
+  const pool = fightersSorted(ctx, boss).filter((p) => dist2d(p.pos, boss.pos) <= g.maxRange);
   if (pool.length === 0) return [];
   const count = Math.min(g.maxCount, Math.max(1, Math.ceil(pool.length / g.playersPerGourd)));
   const picks = Math.min(count, pool.length);
@@ -139,7 +150,7 @@ function landGourds(ctx: SimContext, boss: Entity, st: ScarecrowState): void {
   if (!kit) return;
   const g = THATCHGRIN_KIT.gourd;
   const c = THATCHGRIN_KIT.chaff;
-  const players = livingPlayersSorted(ctx);
+  const players = fightersSorted(ctx, boss);
   for (let i = 0; i + 1 < kit.gourdAims.length; i += 2) {
     const x = kit.gourdAims[i];
     const z = kit.gourdAims[i + 1];
@@ -189,7 +200,7 @@ function tickChaff(ctx: SimContext, boss: Entity, st: ScarecrowState): void {
     let burn = kit.chaff[i + 3] - DT;
     if (burn <= EPS) {
       burn += c.interval;
-      players ??= livingPlayersSorted(ctx);
+      players ??= fightersSorted(ctx, boss);
       for (const p of players) {
         if (p.dead || dist2d(p.pos, { x, y: 0, z }) > c.radius) continue;
         strike(ctx, boss, p, c.min, c.max, c.school, c.name);

@@ -5,7 +5,7 @@
 // scarecrow_kit.ts runs his fight, scarecrow_field.ts finds his field).
 //
 // TUNING, sourced, never invented (the root CLAUDE.md rule):
-//   - Melee, armour and the health ladder are THE WAKING WARDEN's (content/realm.ts):
+//   - Melee, armour, speed and the health ladder are THE WAKING WARDEN's (content/realm.ts):
 //     the shipped level-20 named open-world elite built for "bring a friend, bring two",
 //     run through the open-world curve (mob/open_world_tuning.ts) at spawn exactly as a
 //     camp spawn of it is. That curved level-20 pool is his SOLO pool.
@@ -16,8 +16,14 @@
 //   - The enrage is the Warden's (below 30%, x1.35 damage, x1.25 haste).
 //   - Every telegraphed hit borrows the matching Balgath number (content/zone2.ts), with
 //     Balgath's own level scale (x3 at level 20, mob/mechanic_level_scale.ts): the thrown
-//     gourd is his Boulder Toss (windup, radius, range), the burning chaff is his Molten
-//     Fen pool (seconds, interval, damage).
+//     gourd is his Boulder Toss (cadence, windup, radius, range, damage), the burning chaff
+//     is his Molten Fen pool (seconds, interval, damage) at his geyser fissure's radius, and
+//     the quiet between telegraphs is his ranged-kit spacing.
+//   - DESIGN values, not balance formulas, flagged for maintainer review: the gourd's school
+//     (fire, the theme; Balgath's boulder is physical, and armour does not reduce either), the
+//     first throw's delay, the gourd count (one per two players in reach, up to three, where
+//     Balgath throws a fixed two at the farthest), the call thresholds and add counts, and the
+//     call's windup (matched to the Summon clip).
 //   - The crows ride the Hollow Crypt's Carrion Crow ladder, the strawlings the Crow
 //     Caller's (content/hollow_crypt_trash.ts), both at the boss's level band and
 //     without the elite flag: they are encounter adds, which keep authored health.
@@ -59,7 +65,7 @@ export const THATCHGRIN_KIT = Object.freeze({
   /** Kindled Gourd: Balgath's Boulder Toss, re-aimed at anyone (not only the far). */
   gourd: {
     name: 'Kindled Gourd',
-    every: 16,
+    every: 20,
     /** First throw this long into the pull, so the opener is a melee read. */
     first: 7,
     windup: 2.2,
@@ -133,7 +139,7 @@ export const GOURDLIGHT_SCARECROW_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 4.0,
     attackSpeed: 2.1,
     armorPerLevel: 32,
-    moveSpeed: 6,
+    moveSpeed: 7,
     aggroRadius: 10,
     // He towers: about three players tall, so a player's melee reaches him from his
     // body's edge and his scythe from one yard past it (combat/player_attack_reach.ts).

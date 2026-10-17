@@ -484,9 +484,6 @@ export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 
 export const MOBS: Record<string, MobTemplate> = {
   ...BUDDY_MOBS,
-  // Gourdlight Eve's field boss and his adds (raised only while the event runs,
-  // seasonal/scarecrow.ts; in no camp and no world-boss slot).
-  ...GOURDLIGHT_SCARECROW_MOBS,
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
   ...MUSTER_MOBS,
@@ -523,6 +520,9 @@ export const MOBS: Record<string, MobTemplate> = {
   ...FARSHORE_MOBS,
   ...PROVING_SHORE_MOBS,
   ...WORLD_QUEST_MOBS,
+  // Gourdlight Eve's field boss and his adds (raised only while the event runs,
+  // seasonal/scarecrow.ts; in no camp and no world-boss slot). Appended last.
+  ...GOURDLIGHT_SCARECROW_MOBS,
 };
 
 // Heroic upgraded drop variants: generated from the base item + mob loot tables and

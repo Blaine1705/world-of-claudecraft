@@ -2305,12 +2305,16 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
       thunzharr_waking_peak: 'conquerors_thunzharr',
       balgath_cyclops: 'conquerors_balgath',
     };
-    // A SEASONAL field boss (MobTemplate.seasonalEvent, Gourdlight Eve's Old Thatchgrin)
-    // is not paged: it stands only while its event runs and drops no gear, only event
-    // currency and a cosmetic toy, and the catalog never lists a tool (the token carve-out
-    // above). The sweep stays live for every year-round world boss.
+    // A world boss whose EVERY drop is a tool has nothing the catalog lists (the token
+    // carve-out above): Gourdlight Eve's Old Thatchgrin pays only event currency and a
+    // cosmetic toy. Keyed on the drops, not on any flag, so a boss that drops even one
+    // piece of gear stays in the sweep, seasonal or not.
+    const nothingToPage = (m: (typeof MOBS)[string]) =>
+      m.loot.length > 0 &&
+      m.loot.every((e) => e.itemId !== undefined && isRedemptionTokenId(e.itemId));
+    expect(nothingToPage(MOBS.gourdlight_thatchgrin)).toBe(true);
     const bossIds = Object.values(MOBS)
-      .filter((m) => m.worldBoss === true && !m.seasonalEvent)
+      .filter((m) => m.worldBoss === true && !nothingToPage(m))
       .map((m) => m.id);
     // Keeps the worldBoss filter arm live (the repo's only world boss today).
     expect(bossIds).toContain('thunzharr_waking_peak');

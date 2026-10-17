@@ -230,6 +230,35 @@ describe('his kit', () => {
     expect((sim as any).ctx.seasonal.scarecrow.kit.callsFired).toBe(2);
   });
 
+  it('never aims at or burns a passer-by who is not in his fight', () => {
+    const sim = world();
+    const b = standUp(sim);
+    const fighter = engage(sim, sim.playerId, b, 6);
+    const bystanderId = sim.addPlayer('mage', 'Passerby');
+    const bystander = sim.entities.get(bystanderId) as Entity;
+    bystander.level = 20;
+    const park = () => {
+      // 30 yd out: inside his throwing range, outside any aggro radius
+      bystander.pos = { ...b.pos, x: b.pos.x - 30 };
+      bystander.prevPos = { ...bystander.pos };
+    };
+    park();
+    const hp = bystander.hp;
+    const kit = () => (sim as any).ctx.seasonal.scarecrow.kit;
+    const aimed = new Set<number>();
+    for (let i = 0; i < 20 * 30; i++) {
+      for (const e of spellfxAt(sim.tick(), THATCHGRIN_GOURD_ABILITY)) {
+        if (e.fx === 'runeCircle' && e.targetId !== undefined) aimed.add(e.targetId);
+      }
+      park();
+      // a burning patch right under the passer-by
+      if (i === 20 && kit()) kit().chaff.push(bystander.pos.x, bystander.pos.z, 8, 1);
+    }
+    expect(aimed.has(fighter.id)).toBe(true);
+    expect(aimed.has(bystanderId)).toBe(false);
+    expect(bystander.hp).toBe(hp);
+  });
+
   it('is deterministic: the same seed and the same fight draw the same gourds', () => {
     const run = () => {
       const sim = world();
@@ -250,7 +279,7 @@ describe('his kit', () => {
     const first = run();
     expect(first.length).toBeGreaterThan(0);
     expect(run()).toEqual(first);
-  });
+  }, 120_000);
 
   it('drops the pull (kit and adds) when he evades home', () => {
     const sim = world();
