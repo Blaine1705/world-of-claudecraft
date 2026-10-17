@@ -28,18 +28,24 @@ export const GOURDLIGHT_DECOR_NODES = [
   'garland_pole',
   'garland_leaf',
   'garland_bead',
+  'keeper_stall',
+  'corn_shock',
+  'hay_bale',
 ] as const;
 export type GourdlightDecorNode = (typeof GOURDLIGHT_DECOR_NODES)[number];
 
 /** Glow materials and their strength and flicker family (the paper and the
  *  rind flicker on different phases, so a street never pulses in unison). */
 const GLOW_MATERIALS: Readonly<
-  Record<string, { base: number; phase: number; rim: number; paper: boolean }>
+  Record<string, { base: number; phase: number; rim: number; paper: boolean; skin?: boolean }>
 > = {
   GourdGlow: { base: 1.4, phase: 0, rim: 0.7, paper: false },
   GourdInner: { base: 1.0, phase: 0.4, rim: 0.55, paper: false },
   GourdFlesh: { base: 0.7, phase: 0.8, rim: 0.6, paper: false },
   LanternPaper: { base: 0.32, phase: 2.1, rim: 0.36, paper: true },
+  // a carved pumpkin's rind: the candle inside showing faintly through it after
+  // dark, tinted by the rind's own painted colour (so the grooves stay darker)
+  GourdLitSkin: { base: 0.13, phase: 0.2, rim: 0.75, paper: false, skin: true },
 };
 
 /** Shape a glow material's light the way a lit shell reads (the standard tier only;
@@ -47,8 +53,13 @@ const GLOW_MATERIALS: Readonly<
  *  toward its silhouette (`rim`), and on paper darker along the ribs and the caps,
  *  read off the vertex colour the factory painted, so a lantern at night is a glowing
  *  ribbed globe instead of a flat disc. One extra cached program per glow material. */
-function shapeGlow(material: THREE.MeshStandardMaterial, rim: number, paper: boolean): void {
-  const tag = `woc-seasonal-glow:${rim}:${paper ? 1 : 0}`;
+function shapeGlow(
+  material: THREE.MeshStandardMaterial,
+  rim: number,
+  paper: boolean,
+  skin = false,
+): void {
+  const tag = `woc-seasonal-glow:${rim}:${paper ? 1 : 0}:${skin ? 1 : 0}`;
   material.onBeforeCompile = (shader) => {
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <emissivemap_fragment>',
@@ -59,6 +70,10 @@ function shapeGlow(material: THREE.MeshStandardMaterial, rim: number, paper: boo
         #if ${paper ? 1 : 0} && defined( USE_COLOR )
           float wocLum = dot(vColor.rgb, vec3(0.299, 0.587, 0.114));
           wocShape *= clamp(wocLum * 1.7, 0.3, 1.15);
+        #endif
+        #if ${skin ? 1 : 0} && defined( USE_COLOR )
+          // light through the rind takes the rind's colour, deepest in the grooves
+          totalEmissiveRadiance *= vColor.rgb * 1.8;
         #endif
         totalEmissiveRadiance *= wocShape;
       }`,
@@ -108,7 +123,7 @@ function prepareMaterial(source: THREE.Material): THREE.Material {
     : new THREE.MeshLambertMaterial(opts);
   // the glow's shape first: the haze chains onto whatever hook the material carries
   if (glow && material instanceof THREE.MeshStandardMaterial) {
-    shapeGlow(material, glow.rim, glow.paper);
+    shapeGlow(material, glow.rim, glow.paper, glow.skin === true);
   }
   attachBiomeHaze(material);
   if (glow) registerSeasonalGlowMaterial(material, glow.base, glow.phase);
@@ -116,20 +131,26 @@ function prepareMaterial(source: THREE.Material): THREE.Material {
   return material;
 }
 
-/** A copy whose position and normal attributes are plain floats: the optimizer
- *  quantizes them (normalized integers), and baking a transform into a
- *  normalized attribute would clamp it back into [-1, 1]. */
-function floatGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
+/** A copy whose attributes are plain, non-interleaved floats: the optimizer
+ *  quantizes them (normalized integers) and, on a big mesh, interleaves them;
+ *  baking a transform into a normalized attribute would clamp it back into
+ *  [-1, 1], and an interleaved one would be skipped. Read through the
+ *  accessor getters, which denormalize either kind. */
+const COMPONENT = ['getX', 'getY', 'getZ', 'getW'] as const;
+export function floatGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
   const geometry = source.clone();
   for (const name of Object.keys(geometry.attributes)) {
     const attr = geometry.getAttribute(name);
-    if (!(attr instanceof THREE.BufferAttribute)) continue;
-    if (!attr.normalized && attr.array instanceof Float32Array) continue;
-    const out = new Float32Array(attr.count * attr.itemSize);
+    const plain = attr instanceof THREE.BufferAttribute;
+    if (plain && !attr.normalized && attr.array instanceof Float32Array) continue;
+    const size = attr.itemSize;
+    const out = new Float32Array(attr.count * size);
     for (let i = 0; i < attr.count; i++) {
-      for (let k = 0; k < attr.itemSize; k++) out[i * attr.itemSize + k] = attr.getComponent(i, k);
+      for (let k = 0; k < size; k++) {
+        out[i * size + k] = k < COMPONENT.length ? attr[COMPONENT[k]](i) : attr.getComponent(i, k);
+      }
     }
-    geometry.setAttribute(name, new THREE.BufferAttribute(out, attr.itemSize));
+    geometry.setAttribute(name, new THREE.BufferAttribute(out, size));
   }
   return geometry;
 }
