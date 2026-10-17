@@ -8,15 +8,22 @@
 //   - once for each character the first tick it spends in a world whose running event
 //     is not the item's: a login after the event ended (the broom is already gone from
 //     every character online at the close; this catches the ones who were offline).
-// A character swept since the last edge is remembered in a WeakSet on the world state,
-// so a quiet tick costs one set lookup per character and no container scan.
+//   - again every BOUND_RECHECK_TICKS for every character: a broom that arrives after
+//     its character was checked (personal loot taken off a corpse after the close, a
+//     mail or a grant) still leaves within seconds.
+// A character swept since the last edge is remembered in a WeakMap on the world state,
+// so a quiet tick costs one map lookup per character and no container scan.
 //
 // Draws no rng and reads no clock: the running event is the seasonal state's one field.
+import { bumpBankWireRev } from '../bank';
 import { ITEMS } from '../data';
 import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { InvSlot } from '../types';
+
+/** How often (sweep ticks, 5 s at 20 Hz) each character is re-checked between edges. */
+export const BOUND_RECHECK_TICKS = 100;
 
 /** The event an item is bound to, or null for an ordinary item. */
 export function itemSeasonalEvent(itemId: string): string | null {
@@ -49,12 +56,16 @@ export function sweepEventBoundItems(
   active: string | null,
 ): string[] {
   const gone: string[] = [];
-  const bags = strip(meta.inventory, active, gone);
+  strip(meta.inventory, active, gone);
   const bank = strip(meta.bank.inventory, active, gone);
   const cargo = meta.courier ? strip(meta.courier.cargo, active, gone) : false;
   if (gone.length === 0) return gone;
-  if (bags || cargo) meta.wireRev++;
-  if (bank) meta.bankWireRev++;
+  // wireRev on any removal: the heavy self block (inv, mntOwn) keys on it, and a broom
+  // only in the bank still counts toward owned mounts. The courier projection keys on
+  // its own revision, so a cargo strip bumps that too.
+  meta.wireRev++;
+  if (bank) bumpBankWireRev(meta);
+  if (cargo && meta.courier) meta.courier.revision++;
   ctx.onInventoryChangedForQuests(meta);
   const e = ctx.entities.get(meta.entityId);
   if (e?.mountKey) {
@@ -73,10 +84,12 @@ export function sweepEventBoundItems(
  *  changed, which forgets who was swept so everyone is checked against the new event. */
 export function updateEventBoundItems(ctx: SimContext, active: string | null, edge: boolean): void {
   const state = ctx.seasonal;
-  if (edge) state.boundSwept = new WeakSet();
+  if (edge) state.boundSwept = new WeakMap();
+  const now = ++state.boundTick;
   for (const meta of ctx.players.values()) {
-    if (state.boundSwept.has(meta)) continue;
-    state.boundSwept.add(meta);
+    const at = state.boundSwept.get(meta);
+    if (at !== undefined && now - at < BOUND_RECHECK_TICKS) continue;
+    state.boundSwept.set(meta, now);
     sweepEventBoundItems(ctx, meta, active);
   }
 }

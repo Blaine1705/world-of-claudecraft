@@ -47,6 +47,10 @@ import {
   swellingBurstDamage,
   UPROOTED_AURA_ID,
 } from '../src/sim/seasonal/scarecrow_swell';
+import {
+  BOUND_RECHECK_TICKS,
+  sweepEventBoundItems,
+} from '../src/sim/seasonal/seasonal_bound_items';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { worldBossLockoutId } from '../src/sim/world_boss';
@@ -553,6 +557,17 @@ describe('the Swelling Gourd', () => {
     expect(live()).toHaveLength(0);
     b.hp = Math.floor(b.maxHp * (THATCHGRIN_KIT.swell.atHpPct[1] - 0.01));
     sim.tick();
+    // under the next threshold already, but the break bought its window: no ward back
+    // while he is Uprooted or split open
+    expect(live()).toHaveLength(0);
+    expect(b.auras.some((x) => x.id === SPLIT_RIND_AURA_ID)).toBe(true);
+    for (let i = 0; i < 400 && live().length === 0; i++) {
+      b.hp = Math.floor(b.maxHp * (THATCHGRIN_KIT.swell.atHpPct[1] - 0.01));
+      sim.tick();
+    }
+    expect(b.auras.some((x) => x.id === SPLIT_RIND_AURA_ID || x.id === UPROOTED_AURA_ID)).toBe(
+      false,
+    );
     const second = live()[0];
     expect(second).toBeDefined();
     expect(kit(sim).swellsRisen).toBe(2);
@@ -640,6 +655,35 @@ describe('the event-bound broom', () => {
     expect(ev.some((e) => e.type === 'seasonal' && e.what === 'boundItemGone')).toBe(true);
   });
 
+  it('bumps every revision the wire and the courier projection key on', () => {
+    const sim = world();
+    sim.chat('/dev season on');
+    sim.tick();
+    const meta = (sim as any).players.get(sim.playerId);
+    // a bank-only broom still counts toward owned mounts (mntOwn rides wireRev)
+    meta.bank.inventory.push({ itemId: GOURDLIGHT_BROOM_ID, count: 1 });
+    meta.courier = {
+      phase: 'outbound',
+      x: 0,
+      z: 0,
+      bankerId: null,
+      travelDistance: 0,
+      cargo: [{ itemId: GOURDLIGHT_BROOM_ID, count: 1 }],
+      withdrawals: [],
+      revision: 7,
+      retryRemaining: 0,
+    };
+    const wire = meta.wireRev;
+    const bankRev = meta.bankWireRev;
+    // the sweep itself, so no courier tick moves the revision under it
+    const gone = sweepEventBoundItems((sim as any).ctx, meta, null);
+    expect(gone).toEqual([GOURDLIGHT_BROOM_ID]);
+    expect(meta.courier.cargo).toEqual([]);
+    expect(meta.courier.revision).toBe(8);
+    expect(meta.wireRev).toBeGreaterThan(wire);
+    expect(meta.bankWireRev).toBeGreaterThan(bankRev);
+  });
+
   it('is swept on the first tick of a character who logs in after the event ended', () => {
     const sim = world();
     for (let i = 0; i < 3; i++) sim.tick();
@@ -648,6 +692,19 @@ describe('the event-bound broom', () => {
     meta.inventory.push({ itemId: GOURDLIGHT_BROOM_ID, count: 1 });
     sim.tick();
     expect(sim.countItem(GOURDLIGHT_BROOM_ID, pid)).toBe(0);
+  });
+
+  it('leaves within seconds when it arrives after its character was checked', () => {
+    const sim = world();
+    sim.chat('/dev season on');
+    sim.tick();
+    sim.chat('/dev season off');
+    sim.tick();
+    // a broom that lands after the close sweep (loot taken off his corpse late, a grant)
+    sim.addItem(GOURDLIGHT_BROOM_ID, 1);
+    expect(sim.countItem(GOURDLIGHT_BROOM_ID)).toBe(1);
+    for (let i = 0; i < BOUND_RECHECK_TICKS + 1; i++) sim.tick();
+    expect(sim.countItem(GOURDLIGHT_BROOM_ID)).toBe(0);
   });
 
   it('stays while the event runs, and leaves ordinary items alone', () => {

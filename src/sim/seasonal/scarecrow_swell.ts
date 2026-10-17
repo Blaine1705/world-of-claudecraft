@@ -272,5 +272,9 @@ export function tickSwellingGourd(ctx: SimContext, boss: Entity, st: ScarecrowSt
   }
   const at = THATCHGRIN_KIT.swell.atHpPct[kit.swellsRisen];
   if (at === undefined) return;
+  // breaking a gourd buys its whole window: the next one never rises (and wards him
+  // again) while he is still Uprooted or his rind still split, even if he is already
+  // under its threshold; it rises the tick the window closes
+  if (boss.auras.some((a) => a.id === UPROOTED_AURA_ID || a.id === SPLIT_RIND_AURA_ID)) return;
   if (boss.hp / Math.max(1, boss.maxHp) <= at) raiseSwellingGourd(ctx, boss, st);
 }

@@ -12,7 +12,11 @@
 // The sim spawns her at the resolved spot (seasonal/seasonal_tick.ts) and the renderer
 // draws the stall from the same answer, so the NPC and her counter can never drift apart.
 // Pure and deterministic: no rng, no clock, no Three. Memoized per world and seed.
-import { GOURDLIGHT_KEEPER_POSTS, type GourdlightKeeperPost } from './content/gourdlight_eve';
+import {
+  GOURDLIGHT_KEEPER_NPC_ID,
+  GOURDLIGHT_KEEPER_POSTS,
+  type GourdlightKeeperPost,
+} from './content/gourdlight_eve';
 import { getActiveWorldContent, NPCS } from './data';
 import { resolveSeasonalStall, type SeasonalStall } from './seasonal_decor_stall';
 
@@ -33,7 +37,7 @@ const KEEPER_POST_BEARINGS = 16;
 /** Every placed NPC's standing spot except the keeper's own template. */
 function otherNpcSpots(): { x: number; z: number }[] {
   return Object.values(NPCS)
-    .filter((n) => n.id !== 'gourdlight_keeper')
+    .filter((n) => n.id !== GOURDLIGHT_KEEPER_NPC_ID)
     .map((n) => ({ x: n.pos.x, z: n.pos.z }));
 }
 

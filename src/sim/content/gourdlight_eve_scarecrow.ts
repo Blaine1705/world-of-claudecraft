@@ -17,8 +17,8 @@
 //     (world_boss.ts: 3 500 on a 24 000 base) and caps at Balgath's cap ratio, the way
 //     every world boss scales with a crowd.
 //   - The enrage is the Warden's (below 30%, x1.35 damage, x1.25 haste).
-//   - The rain's cadence and opening delay are Balgath's Boulder Toss (content/zone2.ts),
-//     the burning chaff his Molten Fen pool (seconds, interval), and every mechanic hit
+//   - The rain's cadence (every 20 s) is Balgath's Boulder Toss (content/zone2.ts), the
+//     burning chaff ticks once a second like his Molten Fen pool, and every mechanic hit
 //     rides Balgath's level scale (mob/mechanic_level_scale.ts), measured against the
 //     TARGET's level: a level-10 player takes about half of what a level-20 player does.
 //   - The adds ride the Hollow Crypt's ladders (content/hollow_crypt_trash.ts): the crows
@@ -27,9 +27,11 @@
 //   - THATCHGRIN_LEVEL (12, so a level-10 group meets him inside the classic hit table),
 //     THATCHGRIN_HP_MULT (x4 over the curved Warden pool: "very high health") and
 //     THATCHGRIN_DAMAGE_MULT (x0.55 on his melee: "low damage").
-//   - The rain's shape: one burning pumpkin on each fighter (up to five) plus a few on
-//     open ground, the ring radius, the stagger between landings, and its damage (about
-//     half of Balgath's boulder, the owner's "low damage").
+//   - The rain's opening delay (7 s), its shape: one burning pumpkin on each fighter (up
+//     to five) plus a few on open ground, the ring radius, the stagger between landings,
+//     and its damage (about half of Balgath's boulder, the owner's "low damage").
+//   - The chaff's duration (6 s, shorter than Molten Fen's 8 so the field clears between
+//     rains), its radius (2.5) and its tick (6 to 9).
 //   - The Swelling Gourd: when it grows (70% and 35%), its fuse (30 s), its pool (a share
 //     of his current pool, so it scales with the crowd too), the ward while it lives (80%
 //     less damage), the stun and the opening when it falls (6 s stunned, then 50% more
@@ -93,7 +95,7 @@ export const THATCHGRIN_KIT = Object.freeze({
   /** Gourdfall: he hurls a lit gourd at the sky and burning pumpkins rain on his field. */
   rain: {
     name: 'Gourdfall',
-    /** Balgath's Boulder Toss cadence and opening delay (sourced). */
+    /** Balgath's Boulder Toss cadence (sourced); the opening delay is DESIGN. */
     every: 20,
     first: 7,
     /** Seconds from the cue to the FIRST landing (the Throw clip's release plus the fall). */
@@ -118,7 +120,8 @@ export const THATCHGRIN_KIT = Object.freeze({
     max: 30,
     school: 'fire' as const,
   },
-  /** Smoldering Chaff: each pumpkin's landing burns on as Balgath's Molten Fen pool. */
+  /** Smoldering Chaff: each pumpkin's landing burns on, ticking each second like Balgath's
+   *  Molten Fen pool (the tick cadence sourced; duration, radius and damage DESIGN). */
   chaff: {
     name: 'Smoldering Chaff',
     seconds: 6,
