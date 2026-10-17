@@ -646,6 +646,8 @@ export const QUEST_ORDER: string[] = [
   ...PROVING_SHORE_QUEST_ORDER,
   ...IGNIVAR_RAID_LORE_QUEST_ORDER,
   ...HUB_PRACTICE_QUEST_ORDER,
+  // the seasonal events' quests (open only while their event runs)
+  ...Object.keys(GOURDLIGHT_EVE_QUESTS),
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported

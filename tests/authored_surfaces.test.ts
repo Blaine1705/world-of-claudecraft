@@ -128,6 +128,10 @@ const LEGACY_POLISHED_HELD_MODELS = new Set([
 const AUTHORED_ATLAS_DEFS = [
   'buddy_sapling',
   'form_cat',
+  // Gourdlight Eve's trick bodies (seasonal_trick_looks.ts): resized copies of the
+  // swarmling bat and the skeleton minion, carrying their authored atlas with them.
+  'form_trick_bat',
+  'form_trick_skeleton',
   // The one authored PLAYER body: the WOC warrior (woc_warrior.glb, its own
   // baked Tripo atlases on the artist's rig, never a KayKit palette), which the
   // loop below exempts from the "never a player body" rule by its wocCharacter

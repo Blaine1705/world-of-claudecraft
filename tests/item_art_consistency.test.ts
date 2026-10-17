@@ -858,7 +858,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2169.
     // The restored legacy whistle and charm definitions add 36 item ids.
     // Five referral rewards reuse existing art while their own paintings are pending.
-    expect(Object.keys(ITEMS)).toHaveLength(2210);
+    // + Gourdlight Eve's four event items: 2214.
+    expect(Object.keys(ITEMS)).toHaveLength(2214);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1084,11 +1085,13 @@ describe('item-art consistency accepted-art provenance', () => {
     // integration: 1,890 owners over 2,043 items.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005, 2169.
     // Buddy provenance contributes 34 additional owners.
-    expect(new Set(currentOwnerIds).size).toBe(2039);
-    expect(shippingIds).toHaveLength(2039);
+    // + Gourdlight Eve's four painted event items: 2043.
+    expect(new Set(currentOwnerIds).size).toBe(2043);
+    expect(shippingIds).toHaveLength(2043);
     // The restored legacy whistle and charm definitions add 36 item ids.
     // Five referral rewards reuse existing art while their own paintings are pending.
-    expect(Object.keys(ITEMS)).toHaveLength(2210);
+    // + Gourdlight Eve's four event items: 2214.
+    expect(Object.keys(ITEMS)).toHaveLength(2214);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1344,6 +1347,8 @@ describe('item-art consistency accepted-art provenance', () => {
               'gravewyrm-sanctum-icons-2026-10-03',
               'hollow-crypt-icons-2026-10-03',
               'lower-dungeon-blues-icons-2026-10-08',
+              // Gourdlight Eve's four event items (Blender renders)
+              'gourdlight-eve-icons-2026-10-16',
             ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1522,8 +1527,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // (balgath-boss, shardpike-mechanic, foremans-wage, muster-shardpike, balgath-loot)
     // bring it to 51 on the v0.45.0 integration.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57.
-    // Buddy whistle and charm provenance add two batches.
-    expect(mapping.generatedBatches).toHaveLength(59);
+    // Buddy whistle and charm provenance add two batches; Gourdlight Eve's icons one more.
+    expect(mapping.generatedBatches).toHaveLength(60);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1599,15 +1604,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // and referral armour 7: 1345. The Mirefen world-boss branch's 15 batch ids: 1360.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
     // Buddy batches add 34 owner ids to the integration inventory.
-    expect(priorGeneratedIds).toHaveLength(1509);
+    // Gourdlight Eve's icon batch adds 4: 1513.
+    expect(priorGeneratedIds).toHaveLength(1513);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    expect(allCurrentOwnerIds).toHaveLength(2039);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2039);
+    expect(allCurrentOwnerIds).toHaveLength(2043);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2043);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1628,7 +1634,7 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Mirefen world-boss branch's 15 = 1360.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
       // Plus 34 restored buddy provenance owners.
-      priorGenerated: 1509,
+      priorGenerated: 1513,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1737,6 +1743,7 @@ describe('item-art consistency accepted-art provenance', () => {
                 'hollow-crypt-icons-2026-10-03',
                 // The lower dungeons' normal blues.
                 'lower-dungeon-blues-icons-2026-10-08',
+                'gourdlight-eve-icons-2026-10-16',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1908,9 +1915,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    if (ownerIds.length !== 2039)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2039`);
-    if (fileIds.length !== 2039) violations.push(`shipping WebP count: ${fileIds.length} != 2039`);
+    if (ownerIds.length !== 2043)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2043`);
+    if (fileIds.length !== 2043) violations.push(`shipping WebP count: ${fileIds.length} != 2043`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

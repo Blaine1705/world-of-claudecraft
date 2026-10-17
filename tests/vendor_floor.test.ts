@@ -844,6 +844,9 @@ describe('stock rows: the phase 11n pulls', () => {
       // The Mirefen tavern's innkeeper (feature/walkable-tavern-aaa): bread and water
       // for the road and the marsh's own fare, six existing food and drink rows.
       innkeeper_maudie: 6,
+      // Gourdlight Eve's keeper (content/gourdlight_eve.ts): the pumpkin head and the
+      // Jar of Mischief, both priced in sweets.
+      gourdlight_keeper: 2,
     });
   });
 });

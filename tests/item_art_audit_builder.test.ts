@@ -878,11 +878,12 @@ describe('item-art audit builder', () => {
       // 2005 / 2034 on 42 sheet pages with the five-dungeon rework (PR 4352) on the v0.45.0
       // integration, re-measured.
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
-      catalogSha256: '432503f1b9cd93e304acec6fae601d6eda0b621a3be304351a5c709c0d1a5ee9',
-      catalogBytes: 1112221,
+      // 2043 / 2072 with Gourdlight Eve's four event items, re-measured the same way.
+      catalogSha256: '36d41f42c9932adf71a6fe4d19d64a8ceeb532c5e9048ad9dfd1611bf608cbdb',
+      catalogBytes: 1114297,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2039,
-      liveItemCount: 2068,
+      catalogCount: 2043,
+      liveItemCount: 2072,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -900,7 +901,7 @@ describe('item-art audit builder', () => {
         identity: 44,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '2a34c06963c60cdff8a9ab277ab5b5b8264dfe4146edb7ca23a9220c2b4f6e3b',
+      shippingCatalogSha256: 'd2bcab8659a83ec7b149fe1c519680b9cfc63f182123e8c1a9ba10a5c3bfce04',
       machineChecksPassed: true,
       verdict: null,
     });

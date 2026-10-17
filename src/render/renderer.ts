@@ -11214,13 +11214,13 @@ export class Renderer {
         // motes, Gloamveil's pool and smoke (gloam_field.ts). Suppressed for the dead
         // (the auras themselves drop, but a corpse must not smolder for a frame).
         if (!e.dead) {
-          if (hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SEASONAL_FUMES))
-            this.vfx.fluidSmoke(ax, ay + 0.6, az, 0x7bdc4e, dt, 16); // a seasonal trick's fumes
           if (hasLegacyMetamorphAura) this.vfx.formAura(e.id, 'metamorph', dt);
           else if (hasLichAura && !this.reducedMotion()) {
             this.vfx.lichAura(e.id, dt, soulFragments);
           } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
           else if (hasShadowform) this.vfx.gloam.wearer(e.id, active.gloamCue(), settled, d2, ay);
+          if (hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SEASONAL_FUMES))
+            this.vfx.fluidSmoke(ax, ay + 0.6, az, 0x7bdc4e, dt, 16); // a seasonal trick's fumes
           // orange worn-gear motes: STATIC-preset-gated sheddable prestige
           if (e.kind === 'player' && gfxTierAtLeast(GFX.effectsTier, 'medium')) {
             if (v.legendaryRegaliaRef !== e.equippedInstances) {
