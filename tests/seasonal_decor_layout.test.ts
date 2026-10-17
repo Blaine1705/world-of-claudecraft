@@ -8,7 +8,9 @@ import { describe, expect, it } from 'vitest';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { GOURDLIGHT_KEEPER_POSTS } from '../src/sim/content/gourdlight_eve';
 import { GOURDLIGHT_DECOR_CITIES } from '../src/sim/content/gourdlight_eve_decor';
+import { GOURDLIGHT_PUMPKINS } from '../src/sim/content/gourdlight_pumpkins';
 import { getActiveWorldContent, NPCS } from '../src/sim/data';
+import { resolveScarecrowField } from '../src/sim/seasonal/scarecrow_field';
 import {
   DECOR_MIN_SPACING,
   DECOR_NPC_CLEARANCE,
@@ -17,6 +19,7 @@ import {
   groundSpotProblem,
   narrowsPassage,
   resolveSeasonalDecor,
+  SCARECROW_FIELD_RING,
   seasonalDecorLayout,
 } from '../src/sim/seasonal_decor_layout';
 import {
@@ -212,6 +215,32 @@ describe('seasonal decor placement against the live world', () => {
     const p = stallLocalToWorld(10, 20, Math.PI / 2, 0, 2);
     expect(p.x).toBeCloseTo(12, 9);
     expect(p.z).toBeCloseTo(20, 9);
+  });
+
+  // The Haunted Pumpkin hunt (content/gourdlight_pumpkins.ts) shares the world with the
+  // keeper's stalls, the city dressing and Old Thatchgrin's field: a hunt pumpkin buried
+  // in a stall, hidden among the decor or standing in the boss arena would steal or
+  // block the click that lights it, so every anchor keeps clear of all three.
+  it('keeps every Haunted Pumpkin clear of the stalls, the decor and the scarecrow field', () => {
+    const field = resolveScarecrowField(WORLD_SEED);
+    expect(field).not.toBeNull();
+    const problems: string[] = [];
+    for (const p of GOURDLIGHT_PUMPKINS) {
+      for (const stall of layout.stalls) {
+        if (insideStall(stall, p.x, p.z, 2)) problems.push(`${p.id} inside ${stall.anchor}`);
+      }
+      for (const post of resolvedKeeperPosts(WORLD_SEED)) {
+        if (Math.hypot(post.pos.x - p.x, post.pos.z - p.z) < 4)
+          problems.push(`${p.id} on keeper post ${post.post.id}`);
+      }
+      for (const g of layout.ground) {
+        if (Math.hypot(g.x - p.x, g.z - p.z) < DECOR_MIN_SPACING + decorKindRadius(g.kind))
+          problems.push(`${p.id} among decor ${g.anchor}`);
+      }
+      if (field && Math.hypot(field.x - p.x, field.z - p.z) < SCARECROW_FIELD_RING.outer + 3)
+        problems.push(`${p.id} in the scarecrow field`);
+    }
+    expect(problems).toEqual([]);
   });
 
   it('is deterministic and memoized per seed', () => {

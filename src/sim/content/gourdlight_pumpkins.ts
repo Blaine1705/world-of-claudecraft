@@ -8,12 +8,12 @@ export interface GourdlightPumpkin {
   z: number;
 }
 export const GOURDLIGHT_PUMPKINS: readonly GourdlightPumpkin[] = [
-  { id: 'eastbrook_vale_1', zoneId: 'eastbrook_vale', x: -3, z: -93 }, // Eastbrook
+  { id: 'eastbrook_vale_1', zoneId: 'eastbrook_vale', x: -3, z: -90 }, // Eastbrook (clear of the square's dressing)
   { id: 'eastbrook_vale_2', zoneId: 'eastbrook_vale', x: -10, z: 4 }, // Wolf Run
   { id: 'eastbrook_vale_3', zoneId: 'eastbrook_vale', x: 69, z: -76 }, // Boar Meadow
   { id: 'eastbrook_vale_4', zoneId: 'eastbrook_vale', x: -71, z: -5 }, // Sableweb
   { id: 'eastbrook_vale_5', zoneId: 'eastbrook_vale', x: -21, z: 149 }, // Copper Dig
-  { id: 'mirefen_marsh_1', zoneId: 'mirefen_marsh', x: 11, z: 312 }, // Fenbridge
+  { id: 'mirefen_marsh_1', zoneId: 'mirefen_marsh', x: 16, z: 312 }, // Fenbridge (clear of the street dressing)
   { id: 'mirefen_marsh_2', zoneId: 'mirefen_marsh', x: -52, z: 238 }, // Prowler Reeds
   { id: 'mirefen_marsh_3', zoneId: 'mirefen_marsh', x: 89, z: 303 }, // Widow Thicket
   { id: 'mirefen_marsh_4', zoneId: 'mirefen_marsh', x: 89, z: 426 }, // Drowned Chapel
