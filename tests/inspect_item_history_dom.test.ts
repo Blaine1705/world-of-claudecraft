@@ -157,6 +157,9 @@ describe('inspect window: Item history on a worn tracked copy', () => {
     const buttons = root.querySelectorAll<HTMLButtonElement>('.item-history-action');
     expect(buttons).toHaveLength(1);
     expect(buttons[0].parentElement?.contains(slotRow(root, 'Duskforged Warblade'))).toBe(true);
+    // The paperdoll-slot modifier centers the button under its row instead of
+    // letting a bare wrapper push it to the column's left edge.
+    expect(buttons[0].parentElement?.classList.contains('material-source-item-slot')).toBe(true);
     buttons[0].click();
     expect(document.getElementById('item-history-dialog')?.textContent).toContain(
       'Quest reward to Alice on ',

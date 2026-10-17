@@ -446,6 +446,15 @@ export function itemHistoryDoorTargets({ beforeLoad, dismissOverlays }) {
         const hasDoors = await treeHasDoors(page);
         if (variant.mobile) {
           await assertDoors(page, `#inspect-window ${DOOR}`, 'inspect-mobile');
+          // The weapons row sits below the fold on a phone: bring the worn
+          // Warblade row (and the button under it) into view.
+          await page.evaluate(() => {
+            const rows = [...document.querySelectorAll('#inspect-equip-weapons > *')];
+            rows
+              .find((el) => /Duskforged Warblade/.test(el.textContent ?? ''))
+              ?.scrollIntoView({ block: 'center' });
+          });
+          await wait(400);
           return finish(page, '#inspect-window');
         }
         const row = await page.evaluate(() => {
