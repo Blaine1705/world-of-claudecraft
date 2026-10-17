@@ -2020,9 +2020,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // The inherited scarecrow phase adds 102: its deed (35), kill counter
     // (25), and two discovered item IDs (24 + 18). Keep that attribution
     // separate from Pumpkin Hunter rather than widening the historical band.
-    expect(baselineBytes).toBe(258650);
+    // The phase 3 title writs, costume draughts and broom add 270: three Feat rows (112)
+    // and seven discovered item ids (158), so the Halloween branch's whole Gourdlight
+    // Eve term here is 143 + 102 + 270 + 35 = 550 over the integration's 258,370.
+    expect(baselineBytes).toBe(258920);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(266934);
+    expect(bytes).toBe(267204);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2265,12 +2268,59 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       Buffer.byteLength(JSON.stringify(withoutPumpkinHunter), 'utf8') -
       Buffer.byteLength(JSON.stringify(withoutSeasonalBoss), 'utf8');
     expect(seasonalBossBytes).toBe(102);
+    // The rest of Gourdlight Eve (feature/halloween-event), stripped the same way so the
+    // historical ledger below replays the v0.45.0 integration's own catalogue exactly.
+    // Phase 1 adds 143: the rounds quest id (22), feat_gourdlight_guise's deed row (37)
+    // and four discovered item ids (84). Phase 3 adds 270: the three title-writ Feat rows
+    // (112) and seven discovered item ids, three draughts, three writs and the broom's
+    // reins (158). Ids are listed literally so a new Gourdlight row reds here by name.
+    const gourdlightDeeds = new Set([
+      'feat_gourdlight_guise',
+      'feat_title_gourdlit',
+      'feat_title_trickster',
+      'feat_title_hollow_grinned',
+    ]);
+    const gourdlightItems = new Set([
+      'carved_pumpkin_head',
+      'gourdlight_sweet',
+      'gourdlight_treat_pouch',
+      'jar_of_mischief',
+      'rattlebone_draught',
+      'haunting_draught',
+      'batwing_draught',
+      'writ_of_the_gourdlit',
+      'writ_of_the_trickster',
+      'writ_of_the_hollow_grin',
+      'reins_emberbristle_broom',
+    ]);
+    const withoutGourdlightEve: CharacterState = {
+      ...withoutSeasonalBoss,
+      questsDone: (withoutSeasonalBoss.questsDone ?? []).filter(
+        (id) => id !== 'q_gourdlight_rounds',
+      ),
+      deeds: Object.fromEntries(
+        Object.entries(withoutSeasonalBoss.deeds ?? {}).filter(([id]) => !gourdlightDeeds.has(id)),
+      ),
+      deedStats: {
+        ...withoutSeasonalBoss.deedStats,
+        itemsDiscovered: (withoutSeasonalBoss.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => !gourdlightItems.has(id),
+        ),
+      },
+    };
+    const gourdlightRestBytes =
+      Buffer.byteLength(JSON.stringify(withoutSeasonalBoss), 'utf8') -
+      Buffer.byteLength(JSON.stringify(withoutGourdlightEve), 'utf8');
+    expect(gourdlightRestBytes).toBe(143 + 270);
+    // Every Gourdlight Eve byte in this fixture: 35 + 102 + 143 + 270 = 550.
+    const gourdlightEveBytes = pumpkinHunterBytes + seasonalBossBytes + gourdlightRestBytes;
+    expect(gourdlightEveBytes).toBe(550);
     // Attribute the stamp-card feature independently from the historical ledger:
     // twenty more bank slots, five discoverable item ids and the Sapling buddy. Mount relics reuse
     // an existing illuminated page and add no character-save key in this fixture.
     const stampIds = new Set(Object.keys(REFERRAL_STAMP_ITEMS));
     const beforeStampCards: CharacterState = {
-      ...withoutSeasonalBoss,
+      ...withoutGourdlightEve,
       buddies: {
         ...s2.buddies!,
         owned: s2.buddies!.owned!.filter((id) => id !== 'sapling'),
@@ -2284,18 +2334,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         inventory: s2.bank!.inventory.slice(0, -20),
       },
       deedStats: {
-        ...withoutSeasonalBoss.deedStats,
-        itemsDiscovered: (withoutSeasonalBoss.deedStats?.itemsDiscovered ?? []).filter(
+        ...withoutGourdlightEve.deedStats,
+        itemsDiscovered: (withoutGourdlightEve.deedStats?.itemsDiscovered ?? []).filter(
           (id) => !stampIds.has(id),
         ),
       },
     };
     expect(stampIds.size).toBe(5);
     const stampCardBytes =
-      bytes -
-      pumpkinHunterBytes -
-      seasonalBossBytes -
-      Buffer.byteLength(JSON.stringify(beforeStampCards), 'utf8');
+      bytes - gourdlightEveBytes - Buffer.byteLength(JSON.stringify(beforeStampCards), 'utf8');
     const bankRewardBytes =
       20 * (Buffer.byteLength(JSON.stringify(s2.bank!.inventory[0]), 'utf8') + 1);
     const stampDiscoveryBytes = [...stampIds].reduce((sum, id) => sum + id.length + 3, 0);
@@ -2323,10 +2370,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // quest gear (+5,019), quest blues (+1,688) and role fill (+1,541) underneath.
     // 242,954 on the v0.45.0 integration: plus the Mirefen world-boss branch (+1,191).
     // 246,084 with the five-dungeon rework's attributed +3,130 (PR 4352).
+    // With every Gourdlight Eve term stripped above, this measures 249,939: byte-identical
+    // to the v0.45.0 integration tip itself (d1637abc96, CI run 38863328972 reds on the
+    // same 249,939). The +3,855 over this literal predates the Halloween branch (it
+    // already measures 249,054 at the PR 4352 merge that minted it) and is the
+    // integration's to attribute and re-base, never this branch's to absorb.
     expect(beforeReferralBytes).toBe(246084);
-    expect(
-      bytes - pumpkinHunterBytes - seasonalBossBytes - stampCardBytes - beforeReferralBytes,
-    ).toBe(122);
+    expect(bytes - gourdlightEveBytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
     ).toBe(122);
@@ -3049,12 +3099,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 246,206 bytes = 243,076 + 3,089 + 41, attributed above. Floor at measurement
     // minus 380, edge at measurement plus one: 245826..246207.
     // Buddy discovery and collection fields add 885 bytes; keep the 381-byte band.
-    expect(bytes - pumpkinHunterBytes - seasonalBossBytes - stampCardBytes, reMint).toBeGreaterThan(
-      246711,
-    );
-    expect(bytes - pumpkinHunterBytes - seasonalBossBytes - stampCardBytes, reMint).toBeLessThan(
-      247092,
-    );
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeGreaterThan(246711);
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeLessThan(247092);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
