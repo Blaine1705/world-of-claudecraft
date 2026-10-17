@@ -847,6 +847,8 @@ const RENDER_PURE_CORES = [
   'src/render/seasonal_glow_core.ts',
   // the strung seasonal garland's catenary and the spacing of its leaves and beads
   'src/render/seasonal_garland_core.ts',
+  // where the seasonal dressing's candlelight is: its halos and ground-light sites
+  'src/render/seasonal_glow_sites_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',

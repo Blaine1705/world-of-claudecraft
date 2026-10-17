@@ -18,6 +18,8 @@
 // subject, so a city out of reach submits no draws. The glow (dim by day,
 // bright at night, a candle flicker) is the shared driver in seasonal_glow.ts,
 // written once per frame for every pumpkin, lantern and worn head together.
+// The light those candles throw (halos, ground light, a couple of budgeted point
+// lights near the player) is seasonal_decor_lights.ts.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { GOURDLIGHT_EVE_ID } from '../sim/content/gourdlight_eve';
@@ -30,13 +32,16 @@ import {
 } from '../sim/seasonal_decor_layout';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX } from './gfx';
+import type { BudgetPointLightRegistry } from './point_light_budget';
 import {
   type GourdlightAssets,
   type GourdlightDecorNode,
   gourdlightAssets,
 } from './seasonal_decor_assets';
+import { SeasonalDecorLights } from './seasonal_decor_lights';
 import { garlandOrnaments, garlandPolyline } from './seasonal_garland_core';
 import { driveSeasonalGlow } from './seasonal_glow';
+import { seasonalHalos, seasonalLightSites } from './seasonal_glow_sites_core';
 
 /** A city's dressing draws within this reach of the player (yards, squared below). */
 const DRAW_RANGE = 240;
@@ -73,12 +78,14 @@ export class SeasonalDecor {
   private cities: CityView[] = [];
   private built = false;
   private ropeMaterial: THREE.Material | null = null;
+  private lights: SeasonalDecorLights | null = null;
 
   constructor(
     private readonly scene: THREE.Object3D,
     private readonly seed: number,
     private readonly activeEvent: () => string | null,
     private readonly compileGate?: SeasonalDecorCompileGate,
+    private readonly pointLights: BudgetPointLightRegistry | null = null,
   ) {
     this.root.name = 'seasonal-decor';
     this.content.name = 'seasonal-decor-content';
@@ -92,6 +99,7 @@ export class SeasonalDecor {
     const active = this.activeEvent() === GOURDLIGHT_EVE_ID;
     if (!active) {
       if (this.built) this.content.visible = false;
+      this.lights?.hide();
       return;
     }
     if (!this.built) {
@@ -106,6 +114,8 @@ export class SeasonalDecor {
       city.group.visible = dx * dx + dz * dz <= DRAW_RANGE_SQ;
     }
     driveSeasonalGlow(night, time);
+    // the gate owns root's visibility: no candle light before the kit is linked
+    this.lights?.update(night, time, px, pz, this.root.visible);
   }
 
   private build(assets: GourdlightAssets): void {
@@ -132,9 +142,15 @@ export class SeasonalDecor {
     for (const p of layout.ground) perCity[nearestHub(p.x, p.z)].ground.push(p);
     for (const l of layout.lanterns) perCity[nearestHub(l.x, l.z)].lanterns.push(l);
     for (const g of layout.garlands) perCity[nearestHub(g.ax, g.az)].garlands.push(g);
+    if (layout.stall) perCity[nearestHub(layout.stall.x, layout.stall.z)].stall = layout.stall;
     this.ropeMaterial = this.makeRopeMaterial();
+    const lights = new SeasonalDecorLights(this.scene, this.pointLights, this.seed);
+    this.lights = lights;
+    lights.setSites(seasonalLightSites(layout));
     hubs.forEach((hub, i) => {
       const group = this.buildCity(assets, perCity[i], i);
+      for (const o of lights.buildCity(seasonalHalos(perCity[i]), seasonalLightSites(perCity[i])))
+        group.add(o);
       group.name = `seasonal-decor-city-${i}`;
       this.content.add(group);
       this.cities.push({ group, x: hub.x, z: hub.z });
@@ -161,6 +177,11 @@ export class SeasonalDecor {
     };
     for (const p of city.ground)
       add(p.kind, { x: p.x, y: p.y, z: p.z, yaw: p.yaw, scale: p.scale });
+    // the keeper's stall: one instance, on its resolved footprint
+    if (city.stall) {
+      const s = city.stall;
+      add('keeper_stall', { x: s.x, y: s.y, z: s.z, yaw: s.yaw, scale: s.scale });
+    }
     for (const l of city.lanterns) {
       add('lantern', { x: l.x, y: l.y, z: l.z, yaw: l.yaw, scale: LANTERN_SCALE });
     }
@@ -204,6 +225,8 @@ export class SeasonalDecor {
     this.owned.length = 0;
     this.ropeMaterial?.dispose();
     this.ropeMaterial = null;
+    this.lights?.dispose();
+    this.lights = null;
     this.cities = [];
   }
 
@@ -226,7 +249,7 @@ export class SeasonalDecor {
 }
 
 function emptyCity(): SeasonalDecorLayout {
-  return { ground: [], lanterns: [], garlands: [] };
+  return { ground: [], lanterns: [], garlands: [], stall: null };
 }
 
 const scratchMatrix = new THREE.Matrix4();

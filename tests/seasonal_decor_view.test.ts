@@ -17,11 +17,16 @@ vi.mock('../src/render/seasonal_decor_assets', () => {
     garland_pole: [part()],
     garland_leaf: [part()],
     garland_bead: [part()],
+    keeper_stall: [part(), part()],
+    corn_shock: [part()],
+    hay_bale: [part()],
   };
   return { gourdlightAssets: () => ({ decor, head: [] }) };
 });
 
+import { nightLightStaticCount } from '../src/render/night_light_field';
 import { SeasonalDecor } from '../src/render/seasonal_decor';
+import { SEASONAL_POINT_LIGHTS } from '../src/render/seasonal_decor_lights';
 import { GOURDLIGHT_EVE_ID } from '../src/sim/content/gourdlight_eve';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -38,6 +43,16 @@ describe('SeasonalDecor', () => {
     // built and toggled on, but the gate has not settled: nothing draws
     view.update(1, 0.05, -14, -100);
     expect(view.root.visible).toBe(false);
+    // at night but unlinked: no candle light may hold a budget slot yet
+    const candles: THREE.PointLight[] = [];
+    scene.traverse((o) => {
+      if (o instanceof THREE.PointLight) candles.push(o);
+    });
+    expect(candles.length).toBeGreaterThan(0);
+    for (const l of candles) {
+      expect(l.intensity).toBe(0);
+      expect(l.parent?.visible).toBe(false);
+    }
     release();
     await new Promise((r) => setTimeout(r, 0));
     expect(view.root.visible).toBe(true);
@@ -66,5 +81,66 @@ describe('SeasonalDecor', () => {
     // a disposed view never rebuilds or re-attaches
     view.update(0, 0, -14, -100);
     expect(view.root.parent).toBeNull();
+  });
+
+  it('draws the keeper stall once, on its resolved footprint', () => {
+    const scene = new THREE.Scene();
+    const view = new SeasonalDecor(scene, WORLD_SEED, () => GOURDLIGHT_EVE_ID);
+    view.update(0, 0, -14, -100);
+    const singles: THREE.InstancedMesh[] = [];
+    view.root.traverse((o) => {
+      if (o instanceof THREE.InstancedMesh && o.count === 1) singles.push(o);
+    });
+    // the mocked stall has two parts, one instance each
+    expect(singles.length).toBeGreaterThanOrEqual(2);
+    view.dispose();
+  });
+
+  it('lights the candles only after dark, through budgeted lights it releases on dispose', () => {
+    const scene = new THREE.Scene();
+    const registered: THREE.PointLight[] = [];
+    const released: THREE.PointLight[] = [];
+    const registry = {
+      register: (l: THREE.PointLight) => registered.push(l),
+      release: (l: THREE.PointLight) => released.push(l),
+    };
+    let active: string | null = GOURDLIGHT_EVE_ID;
+    const view = new SeasonalDecor(scene, WORLD_SEED, () => active, undefined, registry);
+    // by day: halos hidden, the pool lights dark, the field sites registered
+    view.update(0, 0, -4.2, -112);
+    expect(registered).toHaveLength(SEASONAL_POINT_LIGHTS);
+    for (const l of registered) {
+      // under its own holder on the scene, hidden while dark: no carrier slot held
+      expect(l.parent?.parent).toBe(scene);
+      expect(l.parent?.visible).toBe(false);
+      // a carrier source, never a light three gathers itself
+      expect(l.userData.budgetDynamic).toBe(true);
+      expect(l.intensity).toBe(0);
+    }
+    const halos: THREE.Object3D[] = [];
+    view.root.traverse((o) => {
+      if (o.name === 'seasonal-halos') halos.push(o);
+    });
+    expect(halos.length).toBeGreaterThan(0);
+    expect(halos.every((h) => !h.visible)).toBe(true);
+    const fieldSites = nightLightStaticCount();
+    expect(fieldSites).toBeGreaterThan(0);
+    // at night by the keeper's stall: halos up, the nearest lights lit
+    view.update(1, 0.5, -4.2, -112);
+    expect(halos.every((h) => h.visible)).toBe(true);
+    expect(registered.some((l) => l.intensity > 0)).toBe(true);
+    // only a lit light's holder shows: a dark one stays out of the budget ranking
+    for (const l of registered) expect(l.parent?.visible).toBe(l.intensity > 0);
+    // the event closing takes every light and field site away
+    active = null;
+    view.update(1, 0.6, -4.2, -112);
+    for (const l of registered) {
+      expect(l.intensity).toBe(0);
+      expect(l.parent?.visible).toBe(false);
+    }
+    expect(nightLightStaticCount()).toBe(0);
+    view.dispose();
+    expect(released).toEqual(registered);
+    for (const l of registered) expect(l.parent).toBeNull();
   });
 });

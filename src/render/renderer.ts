@@ -2840,7 +2840,7 @@ export class Renderer {
     this.streetlamps = buildStreetlamps(this.sim.cfg.seed);
     this.attachZoneFeature(this.streetlamps);
     const seasonalEvent = () => this.sim.activeSeasonalEvent; // built on the event's first open
-    this.seasonalDecor = new SeasonalDecor(this.scene, this.sim.cfg.seed, seasonalEvent, this.worldCompileGate());
+    this.seasonalDecor = new SeasonalDecor(this.scene, this.sim.cfg.seed, seasonalEvent, this.worldCompileGate(), this.budgetLights);
     // Warm ground pools under nearby characters after dark. Camera-band sized
     // and rewritten every frame from the entity loop, so it is NOT a zone
     // feature: it is a pooled overlay the sync loop fills.
