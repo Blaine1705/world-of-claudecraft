@@ -9,6 +9,7 @@
 //     contributor to walk over and take their personal spoils, then it goes and he
 //     stands again THATCHGRIN_RESPAWN_SECONDS later.
 //   - Event closed: he and his adds leave at once, alive or not.
+//   - Event open: the meadow's idle wildlife keeps out of his field (scarecrow_field_ward.ts).
 //
 // He is a `worldBoss` template, so the kill reuses the world-boss rules wholesale: personal
 // loot rolled for every contributor (damage or threat), the loot lockout written when a
@@ -36,6 +37,7 @@ import type { SimContext } from '../sim_context';
 import type { Entity, MobTemplate } from '../types';
 import { scaleWorldBossHp, type WorldBossDef } from '../world_boss';
 import { resolveScarecrowField } from './scarecrow_field';
+import { wardScarecrowField } from './scarecrow_field_ward';
 import { resetScarecrowKit, tickScarecrowKit } from './scarecrow_kit';
 import type { ScarecrowState } from './scarecrow_state';
 
@@ -108,6 +110,8 @@ export function updateScarecrow(ctx: SimContext, active: string | null): void {
     st.respawnAt = 0;
     return;
   }
+  // The meadow's wildlife keeps out of his patch while the event runs (zero rng).
+  wardScarecrowField(ctx);
   if (st.bossId !== null) {
     const boss = ctx.entities.get(st.bossId);
     if (!boss || boss.templateId !== THATCHGRIN_ID) {

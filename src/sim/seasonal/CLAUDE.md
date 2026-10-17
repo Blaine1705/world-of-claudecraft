@@ -29,6 +29,7 @@ event, e.g. `gourdlight_eve.ts`); this directory holds the rules. Public surface
 | `seasonal_cosmetics.ts` | the `seasonal_cosmetic` auras (pumpkin head, tricks): no sim effect at all, `undispellable` so only their own item / timer removes them |
 | `seasonal_items.ts` | item use arms: pumpkin head toggle, Jar of Mischief, the treat pouch |
 | `seasonal_quests.ts` | seasonal quests close with their event through the shared repeat-blocked set |
+| `scarecrow_field_ward.ts` | while Gourdlight Eve runs, idle wild mobs keep out of Old Thatchgrin's field (wander targets pushed onto its rim, crossings skirted). Zero rng, never touches Boar Meadow outside the event |
 | `seasonal_dev.ts` | `/dev season [on [event]|off|auto|knocks]` (ALLOW_DEV_COMMANDS only) |
 
 City decorations are presentation: the anchor rules live in
