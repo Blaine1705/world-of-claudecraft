@@ -56,16 +56,16 @@ const LIGHT_STRENGTH: Readonly<Partial<Record<SeasonalGroundKind, number>>> = {
   hay_bale: 0.45,
 };
 
-/** The keeper's stall, in ITS frame (three axes, before its scale): the three
- *  paper lanterns under the overhang, the crest's carved face and its two little
- *  lanterns, the lit pumpkin on the counter, the big one on the hay bales. */
+/** The keeper's stall, in ITS frame (three axes, before its scale): the two paper
+ *  lanterns under the raised overhang (one over each end of the counter), the crest's
+ *  carved face and its two little lanterns, the lit pumpkin on the counter, the big one
+ *  on the hay bales. Heights follow scripts/assets/gourdlight_eve/stall.py FRONT_TOP. */
 const STALL_HALOS: readonly { lx: number; ly: number; lz: number; size: number }[] = [
-  { lx: -1.55, ly: 2.0, lz: 1.35, size: 1.1 },
-  { lx: 0, ly: 1.92, lz: 1.35, size: 1.1 },
-  { lx: 1.55, ly: 2.0, lz: 1.35, size: 1.1 },
-  { lx: 0, ly: 3.02, lz: 1.18, size: 1.0 },
-  { lx: -1.0, ly: 2.82, lz: 1.15, size: 0.55 },
-  { lx: 1.0, ly: 2.82, lz: 1.15, size: 0.55 },
+  { lx: -1.75, ly: 2.55, lz: 1.35, size: 1.1 },
+  { lx: 1.75, ly: 2.55, lz: 1.35, size: 1.1 },
+  { lx: 0, ly: 3.57, lz: 1.18, size: 1.0 },
+  { lx: -1.0, ly: 3.37, lz: 1.15, size: 0.55 },
+  { lx: 1.0, ly: 3.37, lz: 1.15, size: 0.55 },
   { lx: 0.42, ly: 1.3, lz: 1.0, size: 0.75 },
   { lx: -3.08, ly: 1.15, lz: -0.2, size: 1.1 },
 ];
@@ -123,8 +123,7 @@ export function seasonalHalos(layout: SeasonalDecorLayout): SeasonalHalo[] {
       out.push({ x: o.x, y: o.y, z: o.z, size: 0.5 * HALO_ORNAMENT_SCALE * o.scale });
     }
   });
-  const s = layout.stall;
-  if (s) {
+  for (const s of layout.stalls) {
     for (const h of STALL_HALOS) {
       const o = turn(s.yaw, h.lx * s.scale, h.lz * s.scale);
       out.push({ x: s.x + o.x, y: s.y + h.ly * s.scale, z: s.z + o.z, size: h.size * s.scale });
@@ -138,8 +137,7 @@ export function seasonalHalos(layout: SeasonalDecorLayout): SeasonalHalo[] {
  *  with every lamp in town). */
 export function seasonalLightSites(layout: SeasonalDecorLayout): SeasonalLightSite[] {
   const raw: SeasonalLightSite[] = [];
-  const s = layout.stall;
-  if (s) {
+  for (const s of layout.stalls) {
     for (const l of STALL_LIGHTS) {
       const o = turn(s.yaw, l.lx * s.scale, l.lz * s.scale);
       raw.push({

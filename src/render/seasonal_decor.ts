@@ -142,7 +142,7 @@ export class SeasonalDecor {
     for (const p of layout.ground) perCity[nearestHub(p.x, p.z)].ground.push(p);
     for (const l of layout.lanterns) perCity[nearestHub(l.x, l.z)].lanterns.push(l);
     for (const g of layout.garlands) perCity[nearestHub(g.ax, g.az)].garlands.push(g);
-    if (layout.stall) perCity[nearestHub(layout.stall.x, layout.stall.z)].stall = layout.stall;
+    for (const st of layout.stalls) perCity[nearestHub(st.x, st.z)].stalls.push(st);
     this.ropeMaterial = this.makeRopeMaterial();
     const lights = new SeasonalDecorLights(this.scene, this.pointLights, this.seed);
     this.lights = lights;
@@ -177,9 +177,8 @@ export class SeasonalDecor {
     };
     for (const p of city.ground)
       add(p.kind, { x: p.x, y: p.y, z: p.z, yaw: p.yaw, scale: p.scale });
-    // the keeper's stall: one instance, on its resolved footprint
-    if (city.stall) {
-      const s = city.stall;
+    // the keeper's stall: one instance per city, on its resolved footprint
+    for (const s of city.stalls) {
       add('keeper_stall', { x: s.x, y: s.y, z: s.z, yaw: s.yaw, scale: s.scale });
     }
     for (const l of city.lanterns) {
@@ -249,7 +248,7 @@ export class SeasonalDecor {
 }
 
 function emptyCity(): SeasonalDecorLayout {
-  return { ground: [], lanterns: [], garlands: [], stall: null };
+  return { ground: [], lanterns: [], garlands: [], stalls: [] };
 }
 
 const scratchMatrix = new THREE.Matrix4();

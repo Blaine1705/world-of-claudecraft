@@ -136,6 +136,7 @@ import {
 } from './paladin_bastion_sweep_clip';
 import { PaladinBastionSweepFx } from './paladin_bastion_sweep_fx';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
+import { applyRideGrip } from './ride_grip_ik';
 import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
 import { type SeatClipPhase, seatClip } from './seat_clips';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
@@ -1376,6 +1377,9 @@ export class CharacterVisual {
   private climbTarget: number | null = null;
   private climbArmBones: (THREE.Object3D | null)[] | undefined;
   private climbForearmBones: (THREE.Object3D | null)[] | undefined;
+  /** The broom ride's arm chains (resolveRideArmChain), resolved once; null on a rig
+   *  without them. */
+  private rideArmChain: Parameters<typeof applyRideGrip>[1] | null | undefined;
   private climbLegBones: (THREE.Object3D | null)[] | undefined;
   private climbShinBones: (THREE.Object3D | null)[] | undefined;
   private climbTorsoBone: THREE.Object3D | null | undefined;
@@ -2673,6 +2677,26 @@ export class CharacterVisual {
       }
       if (this.climbTorsoBone) this.climbTorsoBone.rotation.x += spec.lean * k;
     }
+    // Hands onto a handle ahead (a broom): a two-bone reach to the grip, solved per
+    // body so a tall or a slight rider both hold the same shaft (ride_grip_ik.ts).
+    if (spec.grip) {
+      if (this.rideArmChain === undefined) this.rideArmChain = this.resolveRideArmChain();
+      if (this.rideArmChain) applyRideGrip(this.root, this.rideArmChain, spec.grip, k);
+    }
+  }
+
+  /** Each arm's upper arm, forearm and hand, the hand being the forearm's first child
+   *  joint (named differently across rigs, always down the limb). Null when absent. */
+  private resolveRideArmChain(): Parameters<typeof applyRideGrip>[1] | null {
+    const chain: (THREE.Object3D | null)[] = [];
+    for (let i = 0; i < 2; i++) {
+      const upper = this.model.getObjectByName(CLIMB_ARM_BONES[i]) ?? null;
+      const fore = this.model.getObjectByName(CLIMB_FOREARM_BONES[i]) ?? null;
+      const hand = fore?.children.find((c) => (c as THREE.Bone).isBone) ?? null;
+      if (!upper || !fore || !hand) return null;
+      chain.push(upper, fore, hand);
+    }
+    return chain as unknown as Parameters<typeof applyRideGrip>[1];
   }
 
   /** Ease the extra arm raise in toward the swap moment and back out after it;

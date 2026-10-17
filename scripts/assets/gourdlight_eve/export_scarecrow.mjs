@@ -5,7 +5,8 @@
 // 1. Runs the Blender factory (scarecrow.py) once per character in --background (one
 //    rig per process, so the glTF exporter's action-per-rig matching can never mix the
 //    two clip sets): the raw GLBs land in tmp/asset_src/gourdlight_eve/, then a third
-//    run saves the review .blend with both side by side.
+//    run saves the review .blend with both side by side, and a fourth builds the
+//    Swelling Gourd (swelling_gourd.py).
 // 2. Optimizes them through scripts/assets/build_assets.mjs with
 //    specs/gourdlight_scarecrow.json into public/models/creatures/.
 // Then regenerate the media manifest:
@@ -51,6 +52,18 @@ run(BLENDER, [
   '--',
   '--blend',
   path.join(RAW_DIR, 'scarecrow.blend'),
+]);
+// the Swelling Gourd, his giant pumpkin add (its own small factory, the same kit)
+run(BLENDER, [
+  '--background',
+  '--factory-startup',
+  '--python',
+  path.join(HERE, 'swelling_gourd.py'),
+  '--',
+  '--out',
+  path.join(RAW_DIR, 'gourdlight_swelling_gourd.glb'),
+  '--blend',
+  path.join(RAW_DIR, 'swelling_gourd.blend'),
 ]);
 run(process.execPath, [
   path.join(ROOT, 'scripts/assets/build_assets.mjs'),

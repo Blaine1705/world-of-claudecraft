@@ -756,28 +756,75 @@ def build_arms(s, B, boss):
             add("ArmRope_%s%d" % (side, k), bm, "Rope", flat_tint(ROPE, tag="arr%s%d" % (side, k)),
                 rigid(side + ("_UpperArm" if k == 0 else "_Forearm")))
         # the hand: a bound straw bundle bursting from the cuff, and long twig claws
+        grip = side == "R" and boss
+        if grip:
+            build_grip_hand(s, side, sx, wr)
+            continue
         add("HandStraw_" + side, straw_tuft("hand" + side, wr + Vector((0.08 * sx * s, 0, 0)), (sx, 0, -0.3), 70, 0.34 * s, 0.6, 0.012 * s, 0.35),
             "Straw", straw_tint("hand" + side), rigid(side + "_Hand"))
         bm = bmesh.new()
         base = wr + Vector((0.2 * sx * s, 0, 0))
-        grip = side == "R" and boss
         claws = [(-0.4, 0.05), (-0.14, -0.02), (0.14, -0.04), (0.4, 0.0), (0.0, -0.7)]
         for ci, (spread, down) in enumerate(claws):
             length = (0.58 if ci < 4 else 0.34) * s
             pts = []
             for k in range(7):
                 t = k / 6
-                if grip:
-                    # curled round the snath: the twigs wrap forward and back round it
-                    ang = t * 2.4
-                    p = base + Vector((sx * 0.05 * s * t, -math.sin(ang) * 0.11 * s, (spread * 0.42 - 0.04) * s + (math.cos(ang) - 1) * 0.11 * s))
-                else:
-                    p = base + Vector((sx * length * t, spread * 0.3 * s * t + (-0.25 * s if ci == 4 else 0) * t,
-                                       (down - 0.5 * t * t) * 0.32 * s * t))
+                p = base + Vector((sx * length * t, spread * 0.3 * s * t + (-0.25 * s if ci == 4 else 0) * t,
+                                   (down - 0.5 * t * t) * 0.32 * s * t))
                 p += Vector((0, 0.016 * s * hs("claw", side, ci, k), 0.016 * s * hs("clawz", side, ci, k)))
                 pts.append(p)
             tube(bm, pts, [0.026 * s, 0.024 * s, 0.021 * s, 0.017 * s, 0.013 * s, 0.008 * s, 0.002 * s], sides=5)
         add("Claws_" + side, bm, "Wood", wood_tint("claws" + side, base=(0.26, 0.17, 0.1)), rigid(side + "_Hand"))
+
+
+# The scythe hand's palm: where the snath runs, out past the cuff in the middle of the straw
+# fist, so the haft sits IN his hand and not at his wrist (owner note, 2026-10-17).
+SNATH_RADIUS = 0.045
+
+
+def grip_center(s):
+    return Vector((-2.36, 0.0, 3.08)) * s
+
+
+def build_grip_hand(s, side, sx, wr):
+    """The right hand closed round the scythe: a short straw fist packed round the haft, four
+    twig fingers wrapped round it in the horizontal plane (the haft is upright), stacked down
+    its length like a real grip, and a thumb hooked over the top from the other side."""
+    c = grip_center(s)
+    # the straw fist: packed tight round the haft, bursting a little past it and out of the
+    # cuff, never the long splay of the open hand (it would bury the grip)
+    add("HandStraw_" + side, straw_tuft("handgrip" + side, wr + Vector((0.06 * sx * s, 0, 0)), (sx, 0, -0.08), 44, 0.27 * s, 0.42, 0.012 * s, 0.1),
+        "Straw", straw_tint("hand" + side), rigid(side + "_Hand"))
+    bm = bmesh.new()
+    wrap = SNATH_RADIUS * s + 0.022 * s
+    # (height on the haft, start angle, sweep, knuckle reach): angle 0 points back at his
+    # wrist (+X), the fingers sweep forward round the front (-Y) and close on the far side
+    # each finger a jointed twig: three phalanges bent at knuckles round the haft (angular,
+    # not a smooth ring), each a touch shorter than the last, the tip digging in
+    fingers = [(0.135, 0.1, 4.2, 0.12), (0.045, 0.05, 4.4, 0.13), (-0.045, 0.1, 4.25, 0.13), (-0.13, 0.2, 3.8, 0.11)]
+    for fi, (dz, a0, sweep, reach) in enumerate(fingers):
+        pts = []
+        root = c + Vector((reach * s, 0.035 * s, dz * s))
+        pts.append(root + Vector((0.06 * s, 0.01 * s, 0.01 * s)))
+        pts.append(root)
+        joints = [0.0, 0.34, 0.62, 0.84, 1.0]
+        for k, t in enumerate(joints):
+            a = a0 + sweep * t
+            r = wrap * (1.22 - 0.2 * t) * (1.08 if 0 < k < len(joints) - 1 else 1.0)
+            jitter = 0.008 * s * hs("grip", fi, k)
+            pts.append(c + Vector((math.cos(a) * r, -math.sin(a) * r, dz * s + jitter - 0.018 * s * t)))
+        radii = [0.034 * s, 0.033 * s, 0.031 * s, 0.028 * s, 0.023 * s, 0.016 * s, 0.004 * s]
+        tube(bm, pts, radii, sides=6)
+    # the thumb: hooked over the top of the fist from the other side, the way a hand holds a pole
+    pts = []
+    for k in range(7):
+        t = k / 6
+        a = -0.5 - 3.2 * t
+        r = wrap * (1.15 - 0.1 * t)
+        pts.append(c + Vector((math.cos(a) * r + 0.05 * s * (1 - t), -math.sin(a) * r, (0.2 + 0.03 * math.sin(t * math.pi)) * s)))
+    tube(bm, pts, [0.028 * s, 0.026 * s, 0.023 * s, 0.019 * s, 0.014 * s, 0.009 * s, 0.003 * s], sides=5)
+    add("Claws_" + side, bm, "Wood", wood_tint("claws" + side, base=(0.26, 0.17, 0.1)), rigid(side + "_Hand"))
 
 
 def strip_material(obj, name):
@@ -934,7 +981,7 @@ def build_hat(s, B):
 def build_scythe(s, B):
     """A long scythe upright in his right fist: a curved snath with two grips, a ferrule,
     and a long rusted blade sweeping out in front of him from the top."""
-    hand = Vector((-2.18, 0, 3.1)) * s
+    hand = grip_center(s)
     bm = bmesh.new()
 
     def bend(t):

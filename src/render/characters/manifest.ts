@@ -1153,8 +1153,11 @@ export const MUSTER_EFFIGY_HEIGHT = 6.7;
 // Old Thatchgrin's clip map (scripts/assets/gourdlight_eve/scarecrow_clips.py), shared by
 // his strawlings (same rig). The two auto swings rotate; his telegraphs play off the windup
 // cue his kit emits (seasonal/scarecrow_kit.ts): the throw's release lands at 1.0 s of its
-// 2.2 s timeline, which IS the Kindled Gourd's windup, so he is upright as it bursts, and
-// the summon peaks at 1.4 s, the call's windup, as the adds land. Both play unscaled.
+// 2.2 s timeline (he hurls a lit gourd at the sky and Gourdfall rains after it: the first
+// pumpkin lands at 2.4 s, so he is upright as they burst), and the summon peaks at 1.4 s,
+// the call's windup, as the adds land. Both play unscaled. The two auto swings are one
+// idea each at 30 fps: Swipe the flat reap (impact 0.66 s), Chop the overhead slam into
+// the ground (impact 0.78 s).
 const THATCHGRIN: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
@@ -1175,6 +1178,9 @@ const THATCHGRIN: ClipMap = {
  *  taller than one. The Blender bodies are 5.1 m and 2.35 m; prepareVisual normalizes. */
 export const THATCHGRIN_HEIGHT = 7.4;
 export const STRAWLING_HEIGHT = 3.0;
+/** The Swelling Gourd stands half again a player's height at its rise (its 1.85 m model,
+ *  stem included); its fuse swells it further. */
+export const SWELLING_GOURD_HEIGHT = 3.9;
 // Gait references, from the authored cycles (scarecrow_clips.py gait_keys): the walk's
 // stakes swing 22 degrees over a 1.2 s cycle, two steps of 2 x 1.9 m x sin 22, so 2.37 m/s,
 // the run 30 degrees over 0.85 s, 4.47 m/s; times the normalize (7.4 / 5.1) for the boss,
@@ -3404,6 +3410,20 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_TORTOISE,
     walkRef: 3.6,
     runRef: 10,
+    lazyPreload: true,
+  },
+  // The Emberbristle Broom (Gourdlight Eve, scripts/assets/gourdlight_eve/broom.py): a
+  // hovering harvest broom, its clips only the secondary motion (the straw head swaying,
+  // the ribbon tails streaming, the lantern swinging), since the hover bob that carries
+  // the rider is the renderer's (mount_visuals.ts). `height` is its posed bbox (0.859 m
+  // of model, the stirrups and lantern under the handle to the crook's curl): 1.05 draws
+  // the whole broom 4.2 yd long, well over half again a player's height.
+  mount_emberbristle_broom: {
+    url: `${MOUNTS_DIR}/emberbristle_broom.glb`,
+    height: 1.05,
+    clips: MOUNT_RIGGED,
+    walkRef: 4,
+    runRef: 11,
     lazyPreload: true,
   },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
@@ -6604,6 +6624,23 @@ export const VISUALS: Record<string, VisualDef> = {
     // a scurrying little thing on short stakes: its gait has to spin far past 1x
     runTimeScaleMax: 2.8,
   },
+  // The Swelling Gourd (scripts/assets/gourdlight_eve/swelling_gourd.py), Old Thatchgrin's
+  // giant pumpkin add: well over a player's height before it even starts to swell (the
+  // renderer grows it over its fuse, scarecrow_fx.ts bodySwell), its candle lit like his.
+  mob_gourdlight_swelling_gourd: {
+    url: `${CREATURES}/gourdlight_swelling_gourd.glb`,
+    height: SWELLING_GOURD_HEIGHT,
+    clips: { idle: 'Idle', walk: 'Idle', run: 'Idle', attack: [], death: 'Death' },
+    deathTimeScale: 1,
+    eyeGlow: {
+      bone: 'Body',
+      offset: [0, 0.62, 0.0],
+      color: 0xff7a1e,
+      radius: 0.16,
+      pulseHz: 0.9,
+      selfLitMaterial: 'GourdGlow',
+    },
+  },
   npc_chronicler: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
@@ -8048,6 +8085,7 @@ const MOB_KEYS: Record<string, string> = {
   gourdlight_thatchgrin: 'mob_gourdlight_thatchgrin',
   gourdlight_strawling: 'mob_gourdlight_strawling',
   gourdlight_crow: 'mob_crypt_crow',
+  gourdlight_swelling_gourd: 'mob_gourdlight_swelling_gourd',
   drakemaw_broodlord: 'mob_dragonkin_broodlord',
   cindraleth_maw_matriarch: 'mob_dragonkin_matriarch',
   dragonkin_broodguard: 'mob_dragonkin_broodguard',

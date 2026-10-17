@@ -765,7 +765,7 @@ import { createRiftAwareGroundSampler } from './rift_ground_sample';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
-import { ScarecrowFx } from './scarecrow_fx';
+import { entityDisplayScale, ScarecrowFx } from './scarecrow_fx';
 import {
   captureSceneCensus,
   createHitchTracker,
@@ -9932,7 +9932,7 @@ export class Renderer {
       const _stealthed = hasStealth;
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
-      const displayScale = e.scale * (this.riftDeathZoneVisuals?.bodySwell(e.id) ?? 1);
+      const displayScale = entityDisplayScale(e, this.riftDeathZoneVisuals, this.scarecrowFx);
       if (displayScale !== v.liveScale) {
         v.liveScale = displayScale;
         v.group.scale.setScalar(displayScale);

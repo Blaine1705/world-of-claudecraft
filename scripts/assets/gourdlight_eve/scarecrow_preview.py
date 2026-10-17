@@ -109,7 +109,7 @@ for r in targets:
             r.animation_data.action_slot = r.animation_data.action.slots[0]
 
 for t in frames:
-    scene.frame_set(int(round(1 + t * 24)))
+    scene.frame_set(int(round(1 + t * scene.render.fps)))
     bpy.context.view_layer.update()
     pts = []
     for r in targets:

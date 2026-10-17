@@ -76,3 +76,80 @@ export function chaffStrength(age: number, total: number): number {
 export function chaffFlameCalls(quality: number): number {
   return Math.max(3, Math.round(3 + 5 * Math.max(0, Math.min(1, quality))));
 }
+
+// ---------------------------------------------------------------------------
+// Gourdfall (the pumpkin rain) and the Swelling Gourd (seasonal/scarecrow_kit.ts,
+// scarecrow_swell.ts): the pure timing and shaping scarecrow_fx.ts draws from.
+// ---------------------------------------------------------------------------
+
+export const SWELL_ABILITY = 'mob_thatchgrin_swell';
+export const SWELLING_GOURD_TEMPLATE = 'gourdlight_swelling_gourd';
+
+/** Seconds a falling pumpkin is visible before it lands: it drops out of the sky on a
+ *  steep slant, so the ring reads first and the pumpkin arrives on the ring's last frame. */
+export const FALL_SEC = 0.85;
+/** Where a falling pumpkin starts, relative to its ring: high overhead, a little off to
+ *  one side so the trail reads as a slant, not a stalk. */
+export const FALL_HEIGHT = 26;
+export const FALL_SLANT = 7;
+
+/** The visible window of the i-th pumpkin of a rain whose ring went down at `ringAt` and
+ *  lands `landIn` seconds later: it appears FALL_SEC before landing (never before the ring). */
+export function fallWindow(ringAt: number, landIn: number): { start: number; end: number } {
+  const end = ringAt + Math.max(0.05, landIn);
+  return { start: Math.max(ringAt, end - FALL_SEC), end };
+}
+
+/** A falling pumpkin's point at t (0..1): a straight slanted drop, gently accelerating. */
+export function fallPoint(
+  from: { x: number; y: number; z: number },
+  to: { x: number; y: number; z: number },
+  t: number,
+): { x: number; y: number; z: number } {
+  const k = Math.max(0, Math.min(1, t));
+  const e = k * k * 0.35 + k * 0.65;
+  return {
+    x: from.x + (to.x - from.x) * e,
+    y: from.y + (to.y - from.y) * e,
+    z: from.z + (to.z - from.z) * e,
+  };
+}
+
+/** The sky point a pumpkin falls from, for a ring at (x, z) on ground y, slanted by an
+ *  angle derived from the ring itself (deterministic, so two clients agree). */
+export function fallOrigin(x: number, y: number, z: number): { x: number; y: number; z: number } {
+  const a = (Math.sin(x * 12.9898 + z * 78.233) * 43758.5453) % (Math.PI * 2);
+  return { x: x + Math.cos(a) * FALL_SLANT, y: y + FALL_HEIGHT, z: z + Math.sin(a) * FALL_SLANT };
+}
+
+/** Seconds the gourd heaves up out of the stubble at its rise. */
+export const SWELL_RISE_SEC = 0.9;
+
+/** The Swelling Gourd's drawn size, from its fuse progress `p` (0 at the rise, 1 at the
+ *  burst), the seconds since it rose, and a free-running clock `time`: it heaves up from
+ *  the ground with a little overshoot, then swells steadily as it ripens, and in the last
+ *  quarter of its fuse throbs faster and faster, the read that it is about to go. */
+export function swellScale(p: number, sinceRise: number, time: number): number {
+  const q = Math.max(0, Math.min(1, p));
+  const r = Math.max(0, Math.min(1, sinceRise / SWELL_RISE_SEC));
+  const back = 1 + 2.2 * (r - 1) ** 3 + 1.2 * (r - 1) ** 2;
+  const rise = 0.2 + 0.8 * back;
+  const swell = 1 + 0.42 * q ** 1.5;
+  return rise * swell * (1 + swellThrob(q, time) * 0.05);
+}
+
+/** The late-fuse throb, -1..1 (0 for the first three quarters of the fuse): its rate
+ *  climbs from 3 to 13 beats a second as the fuse runs out. */
+export function swellThrob(p: number, time: number): number {
+  const late = Math.max(0, (Math.max(0, Math.min(1, p)) - 0.75) / 0.25);
+  if (late <= 0) return 0;
+  const hz = 3 + 10 * late;
+  return Math.sin(time * hz * Math.PI * 2) * late;
+}
+
+/** The gourd's inner glow (halo opacity 0..1): a low ember at its rise, blazing at its
+ *  burst, pulsing with the throb. */
+export function swellGlow(p: number, time: number): number {
+  const q = Math.max(0, Math.min(1, p));
+  return Math.max(0, Math.min(1, 0.3 + 0.6 * q + 0.15 * swellThrob(q, time)));
+}

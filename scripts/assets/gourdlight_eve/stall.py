@@ -9,10 +9,11 @@
 #                  way every carved face in the kit looks). A plank deck, a slatted
 #                  counter piled with crates of gourds and a basket of sweets, a
 #                  back wall of shelves, a striped orange and plum awning with a
-#                  scalloped valance, three paper lanterns, a painted pumpkin
-#                  crest board (no lettering: the name plate is the game's own),
+#                  scalloped valance, two paper lanterns (one over each end of
+#                  the counter, the middle open so her face reads), a painted
+#                  pumpkin crest board (no lettering: the name plate is the game's own),
 #                  corn shocks lashed to the front posts, hay bales and a crate
-#                  stack outside. About 4.7 yd wide and 3.9 yd to the crest: well
+#                  stack outside. About 4.7 yd wide and 4.5 yd to the crest: well
 #                  over twice a character's height.
 #   corn_shock     a lashed bundle of dried corn stalks, about 2.2 yd tall.
 #   hay_bale       a bound hay bale with a small lit pumpkin and a gourd on it.
@@ -30,8 +31,10 @@ TAU = math.pi * 2.0
 STALL_W = 4.6
 FRONT_Y = -1.05
 BACK_Y = 1.15
-FRONT_TOP = 2.55
-BACK_TOP = 3.2
+# The awning stands tall enough that the keeper behind the counter reads from a normal
+# camera, her face clear of its valance and lanterns (owner note, 2026-10-17: raised 0.55).
+FRONT_TOP = 3.1
+BACK_TOP = 3.75
 COUNTER_H = 1.05
 DECK_TOP = 0.1
 OVERHANG = 0.55
@@ -707,9 +710,11 @@ def build_stall(m, collection):
     parts += build_crest(m, collection)
     # paper lanterns hung under the overhang on cords
     cbm = bmesh.new()
-    for i, x in enumerate((-1.55, 0.0, 1.55)):
+    # two, one over each end of the counter: the middle stays open, so nothing hangs
+    # in front of the keeper's face
+    for i, x in enumerate((-1.75, 1.75)):
         lan = m.build_lantern(collection, "stall_lantern_%d" % i, 1.35, with_bracket=False, lean=True)
-        cz = FRONT_TOP - 0.55 - 0.08 * (i == 1)
+        cz = FRONT_TOP - 0.55
         transform_apply(m, lan, loc=(x, FRONT_Y - 0.3, cz))
         parts.append(lan)
         top = FRONT_TOP - 0.02 - (0.3 * 0.42)

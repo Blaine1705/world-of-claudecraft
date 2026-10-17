@@ -13,8 +13,14 @@
 #   Idle       4.0 s loop  a hanging sway, the hat nodding, the crows shuffling
 #   Walk       1.2 s loop  a stiff-legged lurch on his two stakes
 #   Run        0.85 s loop the same lurch driven harder
-#   Swipe      1.3 s       the scythe reaped across in front (impact 0.55 s)
-#   Chop       1.5 s       the scythe raised in both fists and brought down (impact 0.7 s)
+#   Swipe      1.5 s       THE REAP: one flat horizontal sweep. He coils to his right, the
+#                          blade trailing low behind him (0.42 s, held to 0.52), whips it
+#                          flat across his front at a player's waist (impact 0.66 s),
+#                          follows through to his left and settles (1.5 s)
+#   Chop       1.7 s       THE SLAM: one overhead blow. He rises on his stakes with the
+#                          scythe high behind his head (0.5 s, hangs to 0.62), drives it
+#                          down into the ground in front of him (impact 0.78 s), holds it
+#                          buried, wrenches it free and settles (1.7 s)
 #   Throw      2.2 s       pluck a gourd off his shoulder, wind, hurl (release 1.0 s): the
 #                          Kindled Gourd's whole windup, so he is upright as it lands
 #   Summon     2.0 s       arms flung wide, head thrown back, the crows burst off him and
@@ -27,7 +33,9 @@ import math
 import bpy
 from mathutils import Euler, Quaternion, Vector
 
-FPS = 24
+# Every clip is keyed in SECONDS and sampled at 30 fps (the model pipeline's rate); the two
+# attacks were re-authored at it (owner note, 2026-10-17), the rest only resampled.
+FPS = 30
 
 EASE = {
     "auto": ("BEZIER", "AUTO"),
@@ -276,44 +284,106 @@ def gait_keys(period, swing, bob, lean):
     return keys
 
 
+def reap_line(yaw, dip):
+    """The scythe flat for the reap: haft pointing ahead and DOWN by `dip` degrees, the
+    blade lying horizontal and leading the sweep (to his left), turned about the vertical
+    by `yaw` (negative: round to his right and behind)."""
+    return [("Z", 90), ("X", 90 + dip), ("Z", yaw)]
+
+
 def swipe_keys():
-    """The reap: the scythe drawn back to his right, swept across in front, followed through."""
+    """THE REAP. One idea: a single flat horizontal sweep at a player's waist, right to left.
+    Anticipation coils him to his right with the blade trailing low behind; the strike whips
+    the torso through and the blade across his whole front; the follow-through carries it
+    round to his left; the recovery settles him back to rest. Arm turns are RELATIVE to the
+    torso, so a twisted chest carries the arm round with it."""
     base = rest_pose()
     crows(base, 0.0)
-    wind = base.copy()
-    wind.set("Chest", r=(-4, 0, -32)).set("Spine", r=(0, 0, -14)).set("Hips", r=(0, 0, -8))
-    wind.set("R_UpperArm", r=(0, 40, 50)).set("R_Forearm", r=(0, 10, 30)).set("R_Hand", a=scythe_reap(-75))
-    wind.set("L_UpperArm", r=(0, -20, -30)).set("Head", r=(0, 0, -15))
-    hit = base.copy()
-    hit.set("Chest", r=(12, 0, 38)).set("Spine", r=(6, 0, 16)).set("Hips", r=(0, 0, 10))
-    hit.set("R_UpperArm", r=(0, 30, -70)).set("R_Forearm", r=(0, 4, -40)).set("R_Hand", a=scythe_reap(40))
-    hit.set("L_UpperArm", r=(0, 10, 25)).set("Head", r=(4, 0, 18))
-    hit.set("R_Thigh", r=(-10, 0, 0)).set("L_Thigh", r=(6, 0, 0))
-    follow = hit.copy()
-    follow.set("Chest", r=(0, 0, 8)).set("R_UpperArm", r=(0, -6, -12)).set("R_Hand", a=scythe_reap(85))
-    for p in (wind, hit, follow):
-        p.set("Coat_B", r=(-8, 0, 0))
-    return [(0.0, base, "inout"), (0.38, wind, "in"), (0.55, hit, "out"), (0.85, follow, "inout"), (1.3, base, "auto")]
+    # anticipation: coiled right (60 degrees through hips, spine and chest), crouched, the
+    # scythe trailing low behind his right hip, the free arm thrown across for balance, the
+    # head turned back toward the sweep's path
+    coil = base.copy()
+    coil.set("Hips", r=(2, 0, -16), l=(0.04, 0.1, -0.2))
+    coil.set("Spine", r=(0, -4, -22)).set("Chest", r=(-4, -8, -32)).set("Neck", r=(0, 0, 12)).set("Head", r=(-2, 4, 26))
+    coil.set("R_UpperArm", r=(0, 14, 70)).set("R_Forearm", r=(0, 14, 26)).set("R_Hand", a=reap_line(-142, -22))
+    coil.set("L_UpperArm", r=(0, -24, -48)).set("L_Forearm", r=(0, -6, -34))
+    coil.set("R_Thigh", r=(-14, 0, 0)).set("R_Shin", r=(24, 0, 0))
+    coil.set("L_Thigh", r=(10, 0, 0)).set("L_Shin", r=(14, 0, 0))
+    coil.set("Coat_B", r=(-6, 6, 0)).set("Coat_L", r=(-6, 0, 0)).set("Coat_R", r=(-12, 0, 0))
+    # the tension hold: a touch more coil, so the release reads as a release
+    hold = coil.copy()
+    hold.set("Chest", r=(-2, 0, -7)).set("Spine", r=(0, 0, -3)).set("R_Hand", a=reap_line(-150, -26))
+    hold.set("Hips", l=(0, 0, -0.03))
+    # impact: whipped through to his left, the blade dead ahead and flat at a player's waist
+    strike = base.copy()
+    strike.set("Hips", r=(6, 0, 12), l=(0, -0.12, -0.26))
+    strike.set("Spine", r=(6, 2, 14)).set("Chest", r=(10, 3, 22)).set("Neck", r=(2, 0, -6)).set("Head", r=(6, 0, -12))
+    strike.set("R_UpperArm", r=(0, -30, 52)).set("R_Forearm", r=(0, -4, 16)).set("R_Hand", a=reap_line(-4, 10))
+    strike.set("L_UpperArm", r=(0, -16, 30)).set("L_Forearm", r=(0, -4, 22))
+    strike.set("L_Thigh", r=(-22, 0, 0)).set("L_Shin", r=(28, 0, 0))
+    strike.set("R_Thigh", r=(14, 0, 0)).set("R_Shin", r=(16, 0, 0))
+    strike.set("Coat_B", r=(-14, -8, 0)).set("Coat_L", r=(-10, 0, 0)).set("Coat_R", r=(4, 0, 0))
+    # follow-through: carried round to his left and behind, over-rotated, the coat swinging
+    follow = strike.copy()
+    follow.set("Hips", r=(0, 0, 6)).set("Spine", r=(0, 0, 6)).set("Chest", r=(-4, 0, 8))
+    follow.set("R_UpperArm", r=(0, 6, 8)).set("R_Forearm", r=(0, 2, 6)).set("R_Hand", a=reap_line(82, 16))
+    follow.set("Head", r=(-4, 0, -8))
+    follow.set("Coat_B", r=(6, -10, 0)).set("Coat_R", r=(-8, 0, 0))
+    # settle: the weight comes back over the stakes, the blade swinging home upright
+    settle = base.copy()
+    settle.set("Hips", r=(3, 0, 5), l=(0, -0.04, -0.08)).set("Chest", r=(5, 0, 8)).set("Spine", r=(2, 0, 4))
+    settle.set("R_UpperArm", r=(0, -4, 10)).set("R_Hand", a=[("Y", 10), ("Z", 20)])
+    return [(0.0, base, "inout"), (0.42, coil, "out"), (0.52, hold, "in"), (0.66, strike, "linear"),
+            (0.84, follow, "out"), (1.1, settle, "inout"), (1.5, base, "auto")]
+
+
+def slam_line(pitch):
+    """The scythe in the slam, turned about his shoulders' axis by `pitch` degrees: negative
+    tips the haft back over his head with the blade curling forward above it (the reaper's
+    raised scythe); about +95 lays the haft out ahead with the blade driven straight down."""
+    return [("X", pitch)]
 
 
 def chop_keys():
-    """Both fists raise the scythe overhead and bring it down in front of him."""
+    """THE SLAM. One idea: a single overhead blow driven into the ground in front of him.
+    Anticipation lifts him tall on his stakes with the scythe raised high over his head, the
+    blade curling forward above it; the strike crunches him down and buries the blade in
+    the ground ahead; he holds it there a beat, wrenches it free, and settles back to rest.
+    Arm turns are totals over his rest pose (rest_pose), so they read as targets."""
     base = rest_pose()
     crows(base, 1.0)
-    up = base.copy()
-    up.set("Chest", r=(-18, 0, 0)).set("Spine", r=(-8, 0, 0)).set("Head", r=(-14, 0, 0))
-    up.set("R_UpperArm", r=(30, 70, -20)).set("R_Forearm", r=(40, 30, 0))
-    up.set("L_UpperArm", r=(30, -70, 20)).set("L_Forearm", r=(40, -30, 0))
-    up.set("Hips", l=(0, 0, 0.06)).set("R_Hand", a=[("X", -35)])
-    down = base.copy()
-    down.set("Chest", r=(30, 0, 0)).set("Spine", r=(14, 0, 0)).set("Head", r=(12, 0, 0))
-    down.set("R_UpperArm", r=(-40, 10, -40)).set("R_Forearm", r=(-30, 0, -10))
-    down.set("L_UpperArm", r=(-40, -10, 40)).set("L_Forearm", r=(-30, 0, 10))
-    down.set("Hips", l=(0, 0, -0.12)).set("L_Thigh", r=(-14, 0, 0)).set("R_Thigh", r=(10, 0, 0))
-    down.set("L_Shin", r=(18, 0, 0)).set("R_Shin", r=(12, 0, 0)).set("R_Hand", a=[("X", 105)])
-    for p in (up, down):
-        p.set("Coat_B", r=(-12, 0, 0))
-    return [(0.0, base, "inout"), (0.45, up, "in"), (0.7, down, "out"), (1.05, down, "inout"), (1.5, base, "auto")]
+    # anticipation: up on his stakes, chest arched back, both arms raising the scythe high
+    # over his head, the blade curled forward above him
+    rise = base.copy()
+    rise.set("Hips", r=(-6, 0, 0), l=(0, 0.06, 0.14))
+    rise.set("Spine", r=(-10, 0, 0)).set("Chest", r=(-18, 0, 0)).set("Neck", r=(-6, 0, 0)).set("Head", r=(-14, 0, 0)).set("Hat", r=(-8, 0, 0))
+    rise.set("R_UpperArm", r=(0, 110, -35)).set("R_Forearm", r=(0, 12, 14)).set("R_Hand", a=slam_line(-38))
+    rise.set("L_UpperArm", r=(0, -114, 39)).set("L_Forearm", r=(0, -16, 8)).set("L_Hand", r=(0, -20, 0))
+    rise.set("L_Thigh", r=(4, 0, 0)).set("R_Thigh", r=(4, 0, 0))
+    rise.set("Coat_B", r=(8, 0, 0)).set("Coat_L", r=(4, 0, 0)).set("Coat_R", r=(4, 0, 0))
+    # the hang at the top: a breath more arch and reach, then the drop
+    top = rise.copy()
+    top.set("Chest", r=(-5, 0, 0)).set("Spine", r=(-2, 0, 0)).set("R_Hand", a=slam_line(-50)).set("Hips", l=(0, 0, 0.04))
+    # impact: crunched forward over the blow, knees driven down, both arms thrown down ahead,
+    # the blade buried in the ground in front of him
+    slam = base.copy()
+    slam.set("Hips", r=(14, 0, 0), l=(0, -0.16, -0.42))
+    slam.set("Spine", r=(12, 0, 0)).set("Chest", r=(20, 0, 0)).set("Neck", r=(4, 0, 0)).set("Head", r=(8, 0, 0)).set("Hat", r=(10, 0, 0))
+    slam.set("R_UpperArm", r=(0, -24, 108)).set("R_Forearm", r=(0, 12, 24)).set("R_Hand", a=slam_line(122))
+    slam.set("L_UpperArm", r=(0, 20, -104)).set("L_Forearm", r=(0, -16, -14))
+    slam.set("L_Thigh", r=(-30, 0, 0)).set("L_Shin", r=(40, 0, 0))
+    slam.set("R_Thigh", r=(-12, 0, 0)).set("R_Shin", r=(30, 0, 0))
+    slam.set("Coat_B", r=(-20, 0, 0)).set("Coat_L", r=(-12, 0, 0)).set("Coat_R", r=(-12, 0, 0))
+    # held buried, a shudder through him
+    stuck = slam.copy()
+    stuck.set("Chest", r=(-3, 0, 2)).set("Hips", l=(0, 0, 0.02))
+    # the wrench: he hauls it out, leaning back, the blade coming up out of the ground
+    wrench = base.copy()
+    wrench.set("Hips", r=(4, 0, 0), l=(0, -0.06, -0.2)).set("Chest", r=(-6, 0, 0)).set("Spine", r=(2, 0, 0))
+    wrench.set("R_UpperArm", r=(0, -10, 60)).set("R_Forearm", r=(0, 6, 10)).set("R_Hand", a=slam_line(40))
+    wrench.set("L_UpperArm", r=(0, 10, -56)).set("L_Forearm", r=(0, -8, 6))
+    return [(0.0, base, "inout"), (0.5, rise, "out"), (0.62, top, "in"), (0.78, slam, "out"),
+            (1.0, stuck, "inout"), (1.22, wrench, "inout"), (1.7, base, "auto")]
 
 
 def throw_keys():

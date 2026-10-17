@@ -72,13 +72,19 @@ export type CharacterFormAssetKey =
   | 'form_toad'
   | 'form_foreman'
   | 'form_trick_bat'
-  | 'form_trick_skeleton';
+  | 'form_trick_skeleton'
+  | 'form_costume_ghost';
 
 /** The Gourdlight Eve tricks that wear a body (seasonal_trick_looks.ts): kind
  *  'seasonal_cosmetic', a LOOK on the polymorph slot with no control behind it. */
 const TRICK_FORM_ASSETS: Readonly<Record<string, CharacterFormAssetKey>> = {
   [GOURDLIGHT_TRICKS[0].id]: 'form_trick_bat',
   [GOURDLIGHT_TRICKS[1].id]: 'form_trick_skeleton',
+  // the costume draughts (content/gourdlight_eve.ts GOURDLIGHT_COSTUMES), the same bodies
+  // for ten minutes, and the ghost of their own
+  gourdlight_costume_skeleton: 'form_trick_skeleton',
+  gourdlight_costume_ghost: 'form_costume_ghost',
+  gourdlight_costume_bat: 'form_trick_bat',
 };
 
 function trickFormAsset(aura: AuraIdentity): CharacterFormAssetKey | null {
