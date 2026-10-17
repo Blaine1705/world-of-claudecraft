@@ -1377,7 +1377,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf, and again for its candle-light registry, and for its field boss's effects layer. No capture was retaken.
+  // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf, and again for its candle-light registry, for its field boss's effects layer, and for its phase 3 rain and broom. No capture was retaken.
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
@@ -1423,7 +1423,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  'd5bde76d201a3873c1e7942c052cc5e52369ee68d979baa76dc502fa4f561b32';
+  '0c6893045a469f6f6e234ef89c0a9e6cf2c4045759e53086085e537871e097fd';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1468,7 +1468,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for Gourdlight Eve's renderer wiring. No capture was retaken.
-  '5894a470e9b351033ff477755d435a25d37a0c8011ded4e795e13a13ccdc32b6';
+  '840a0c4c6f965d304bbcde59a935dd83e1321e28b1e11e94f2ce34f8e98f7802';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2868,7 +2868,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
       // Gourdlight Eve's renderer wiring: recomputed LAST again. No capture was retaken.
-    ).toBe('8b238becf8f7432375b76ac113fa7c68e71abe203f3ba02604a824bf9c0c898d');
+    ).toBe('158e3599ffa4f8ed45b274205ba735b7a77838bd4c38f4601ff8e902ae03ffe0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
