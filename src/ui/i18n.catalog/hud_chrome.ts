@@ -9688,6 +9688,8 @@ export const hudChromeStrings = {
     choose: 'Choose quest',
     inProgress: 'In progress ({count}/{required})',
     completed: 'Completed this week',
+    completedLastWeek: 'Completed last week',
+    claimFirst: 'Claim the commendation first',
     lockedThisWeek: 'Locked this week',
     footerPick: 'You may hold one weekly charge at a time. Pick a card to read its terms.',
     footerHeld: 'Your charge for the week is set. The other three unlock at the reset.',
@@ -9732,7 +9734,8 @@ export const hudChromeStrings = {
     commendHeading: "Emissary's commendation",
     commendNote: '{amount} standing to one faction of your choice, once a week.',
     commendCarryNote:
-      'If unclaimed, it waits past the reset. Claim it before taking your next charge.',
+      'An unclaimed commendation carries past the reset. You cannot take a new charge until you claim it.',
+    commendCarriedNote: "Claim last week's commendation to choose this week's charge.",
     commendClaimed: "This week's commendation went to the {faction}.",
     commendRewardLine: '{amount} standing with a faction of your choice',
     // Chat and banner lines for the emissary's events.

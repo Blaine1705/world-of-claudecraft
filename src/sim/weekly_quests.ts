@@ -1,5 +1,7 @@
 // Weekly quests: one charge per week chosen at the emissary, credited by the
-// game's own completion signals, paid once, and rolled every Tuesday.
+// game's own completion signals, paid once, and rolled every Tuesday (a
+// finished charge whose commendation is unclaimed is held past the roll
+// until it is claimed).
 //
 // The module owns the whole rule set behind the SimContext seam: the week
 // identity (derived from the host-fed reset day, so every host agrees), the
@@ -56,8 +58,9 @@ function commendationRedeemable(meta: PlayerMeta, level: number): boolean {
 
 /** A pick from an earlier week is over, done or not: the ledger starts clean.
  *  The one exception is a finished charge whose commendation was never
- *  claimed: it is held until it is redeemed (and a new pick waits for that),
- *  unless no faction could take the standing, so it never blocks the week. */
+ *  claimed: it is held (marked `carried`) until it is redeemed, and a new pick
+ *  waits for that. It lapses at any check where no faction could take the
+ *  standing, so it can never block the weekly for good. */
 export function resetWeeklyQuestIfNeeded(
   ctx: Pick<SimContext, 'resetDay' | 'entities'>,
   meta: PlayerMeta,
@@ -67,7 +70,13 @@ export function resetWeeklyQuestIfNeeded(
   if (progress.state === 'completed' && !progress.commended) {
     // Without the body there is no level to judge headroom by: keep it.
     const player = ctx.entities.get(meta.entityId);
-    if (!player || commendationRedeemable(meta, player.level)) return;
+    if (!player || commendationRedeemable(meta, player.level)) {
+      if (!progress.carried) {
+        progress.carried = true;
+        meta.wireRev++;
+      }
+      return;
+    }
   }
   meta.weeklyQuest = null;
   meta.wireRev++;
@@ -142,7 +151,8 @@ export function chooseWeeklyQuest(ctx: SimContext, questId: string, pid?: number
 
 /** The emissary's commendation: once the week's charge is finished, one
  *  faction of the owner's choice receives WEEKLY_QUEST_REWARD.commendationStanding.
- *  One claim per week; a faction with no standing headroom at this level is
+ *  One claim per finished charge, redeemable in a later week if it was held
+ *  over; a faction with no standing headroom at this level is
  *  refused and the choice stays open. The award rides awardFactionReputation,
  *  so the tier plate, the chat line and the standing deeds all follow. */
 export function commendWeeklyQuest(ctx: SimContext, factionId: string, pid?: number): void {
@@ -162,8 +172,10 @@ export function commendWeeklyQuest(ctx: SimContext, factionId: string, pid?: num
   if (result.gained <= 0) return;
   progress.commended = factionId;
   // A commendation held over from an earlier week was all that kept its
-  // charge open; once redeemed, this week's pick opens.
-  if (progress.week !== currentWeeklyQuestWeek(ctx)) meta.weeklyQuest = null;
+  // charge open; once redeemed, this week's pick opens. With no calendar fed
+  // yet the week is unknown, so the record stays rather than reopening a pick.
+  const week = currentWeeklyQuestWeek(ctx);
+  if (week && progress.week !== week) meta.weeklyQuest = null;
   meta.wireRev++;
   ctx.markDeedsDirty(meta.entityId);
   ctx.emit({
@@ -257,12 +269,14 @@ export function sanitizeWeeklyQuestProgress(value: unknown): WeeklyQuestProgress
     (FACTION_IDS as readonly string[]).includes(row.commended)
       ? row.commended
       : undefined;
+  const carried = row.state === 'completed' && commended === undefined && row.carried === true;
   return {
     questId: quest.id,
     week: row.week,
     count: row.state === 'completed' ? quest.count : count,
     state: row.state,
     ...(commended === undefined ? {} : { commended }),
+    ...(carried ? { carried: true as const } : {}),
   };
 }
 

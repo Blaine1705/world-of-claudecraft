@@ -10,54 +10,99 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "es_ES": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "fr_FR": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "fr_CA": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "de_DE": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "nl_NL": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "pl_PL": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "id_ID": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "tr_TR": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "sv_SE": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "vi_VN": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ],
   "da_DK": [
-    "hudChrome.weekly.commendCarryNote"
+    "hudChrome.weekly.claimFirst",
+    "hudChrome.weekly.commendCarriedNote",
+    "hudChrome.weekly.commendCarryNote",
+    "hudChrome.weekly.completedLastWeek"
   ]
 };

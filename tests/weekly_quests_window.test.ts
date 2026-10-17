@@ -101,8 +101,8 @@ describe('weekly quests window', () => {
     const notes = [...r.el.querySelectorAll('.wk-commend-note')].map((n) => n.textContent);
     expect(notes).toHaveLength(2);
     expect(notes[0]).toContain('1,000');
-    expect(notes[1]).toBe(
-      'If unclaimed, it waits past the reset. Claim it before taking your next charge.',
+    expect(r.el.querySelector('.wk-commend-carry')?.textContent).toBe(
+      'An unclaimed commendation carries past the reset. You cannot take a new charge until you claim it.',
     );
     buttons[1].click();
     expect(r.commendWeeklyQuest).toHaveBeenCalledExactlyOnceWith('church_order');

@@ -54,7 +54,8 @@ export interface WeeklyCommendationView {
   options: WeeklyCommendationOption[];
   /** Set once claimed; every option is then inert. */
   claimedText: string | null;
-  /** While unclaimed: it outlives the reset and must be claimed before the next charge. */
+  /** While unclaimed and claimable: it outlives the reset and blocks the next
+   *  charge until claimed (worded for a pick already carried past one). */
   carryNote: string | null;
 }
 
@@ -131,7 +132,16 @@ export function buildWeeklyCommendation(world: WeeklyWorld): WeeklyCommendationV
       claimed === null
         ? null
         : t('hudChrome.weekly.commendClaimed', { faction: factionLabel(claimed as FactionId) }),
-    carryNote: claimed === null ? t('hudChrome.weekly.commendCarryNote') : null,
+    // Only while a faction can still take it: with every option capped the
+    // sim lets it lapse at the reset, so promising a carry would be false.
+    carryNote:
+      claimed !== null || options.every((option) => option.capped)
+        ? null
+        : t(
+            held.carried
+              ? 'hudChrome.weekly.commendCarriedNote'
+              : 'hudChrome.weekly.commendCarryNote',
+          ),
   };
 }
 
@@ -145,7 +155,12 @@ function cardState(quest: WeeklyQuestDef, held: WeeklyQuestProgress | null): Wee
   return held.state === 'completed' ? 'completed' : 'active';
 }
 
-function buttonLabel(state: WeeklyQuestCardState, count: number, required: number): string {
+function buttonLabel(
+  state: WeeklyQuestCardState,
+  count: number,
+  required: number,
+  carried: boolean,
+): string {
   const tally = {
     count: formatNumber(count, { maximumFractionDigits: 0 }),
     required: formatNumber(required, { maximumFractionDigits: 0 }),
@@ -154,9 +169,10 @@ function buttonLabel(state: WeeklyQuestCardState, count: number, required: numbe
     case 'active':
       return t('hudChrome.weekly.inProgress', tally);
     case 'completed':
-      return t('hudChrome.weekly.completed');
+      return t(carried ? 'hudChrome.weekly.completedLastWeek' : 'hudChrome.weekly.completed');
     case 'locked':
-      return t('hudChrome.weekly.lockedThisWeek');
+      // A carried pick holds the cards only until its commendation is claimed.
+      return t(carried ? 'hudChrome.weekly.claimFirst' : 'hudChrome.weekly.lockedThisWeek');
     default:
       return t('hudChrome.weekly.choose');
   }
@@ -185,7 +201,7 @@ export function buildWeeklyQuestsView(world: WeeklyWorld, nowMs: number): Weekly
       art: `${WEEKLY_ART_DIR}/${quest.kind}.webp`,
       medal: `${WEEKLY_ART_DIR}/medal_${quest.kind}.webp`,
       state,
-      buttonLabel: buttonLabel(state, count, quest.count),
+      buttonLabel: buttonLabel(state, count, quest.count, held?.carried === true),
       count,
       required: quest.count,
     };

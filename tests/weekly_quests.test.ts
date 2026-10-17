@@ -199,6 +199,19 @@ describe('the emissary', () => {
     expect(
       sanitizeWeeklyQuestProgress({ questId: 'wk_raid', week: 'wk_1', count: 9, state: 'active' }),
     ).toEqual({ questId: 'wk_raid', week: 'wk_1', count: 1, state: 'active' });
+    // The carried mark survives only on a finished, unclaimed pick.
+    const finishedRow = { questId: 'wk_raid', week: 'wk_1', count: 1, state: 'completed' };
+    expect(sanitizeWeeklyQuestProgress({ ...finishedRow, carried: true })).toEqual({
+      ...finishedRow,
+      carried: true,
+    });
+    expect(
+      sanitizeWeeklyQuestProgress({ ...finishedRow, commended: 'rift_watch', carried: true }),
+    ).toEqual({ ...finishedRow, commended: 'rift_watch' });
+    expect(sanitizeWeeklyQuestProgress({ ...finishedRow, state: 'active', carried: true })).toEqual(
+      { ...finishedRow, count: 1, state: 'active' },
+    );
+    expect(sanitizeWeeklyQuestProgress({ ...finishedRow, carried: 'yes' })).toEqual(finishedRow);
   });
 });
 
@@ -254,23 +267,25 @@ describe('the commendation', () => {
     const sim = finished();
     const meta = sim.meta(sim.playerId)!;
     sim.resetDay = '2026-09-16';
-    expect(sim.weeklyQuest).toEqual({
+    const held = {
       questId: 'wk_dungeons',
       week: 'wk_1',
       count: 3,
       state: 'completed',
-    });
-    // A new charge waits for the claim, and this week's clears credit nothing.
-    const copper = meta.copper;
+      carried: true,
+    };
+    expect(sim.weeklyQuest).toEqual(held);
+    // A new charge waits for the claim (even the same kind), and this week's
+    // clears credit nothing.
     sim.chooseWeeklyQuest('wk_raid');
+    sim.chooseWeeklyQuest('wk_dungeons');
     onDungeonClearedForWeeklyQuests(sim.ctx, 'hollow_crypt', [meta]);
-    expect(meta.weeklyQuest).toEqual({
-      questId: 'wk_dungeons',
-      week: 'wk_1',
-      count: 3,
-      state: 'completed',
-    });
-    expect(meta.copper).toBe(copper);
+    const weeklyEvents = sim
+      .tick()
+      .filter((event) => event.type.startsWith('worldQuestWeekly'))
+      .map((event) => event.type);
+    expect(weeklyEvents).toEqual([]);
+    expect(meta.weeklyQuest).toEqual(held);
     // A relog in the later week keeps it too.
     const state = sim.serializeCharacter(sim.playerId);
     if (!state) throw new Error('Missing serialized character');
@@ -278,8 +293,7 @@ describe('the commendation', () => {
     restored.resetDay = '2026-09-16';
     const restoredMeta = restored.meta(restored.addPlayer('warrior', 'Held', { state }))!;
     resetWeeklyQuestIfNeeded(restored.ctx, restoredMeta);
-    expect(restoredMeta.weeklyQuest?.week).toBe('wk_1');
-    expect(restoredMeta.weeklyQuest?.state).toBe('completed');
+    expect(restoredMeta.weeklyQuest).toEqual(held);
     // The claim pays, then last week's charge is over and this week's pick opens.
     sim.commendWeeklyQuest('church_order');
     expect(eventsOf(sim, 'loot').map((event) => (event as { text: string }).text)).toContain(
@@ -318,6 +332,45 @@ describe('the commendation', () => {
     partial.tick();
     partial.resetDay = '2026-09-16';
     expect(partial.weeklyQuest?.week).toBe('wk_1');
+    // ...whichever faction it is.
+    const middle = finished();
+    middle.chat(`/dev rep rift_watch ${MAX_STANDING}`);
+    middle.chat(`/dev rep automatons ${MAX_STANDING}`);
+    middle.tick();
+    middle.resetDay = '2026-09-16';
+    expect(middle.weeklyQuest?.week).toBe('wk_1');
+  });
+
+  it('judges headroom at the owner level: level 20 still has room above the low cap', () => {
+    const sim = finished();
+    for (const factionId of FACTION_IDS) {
+      sim.chat(`/dev rep ${factionId} ${LOW_LEVEL_MAX_STANDING}`);
+    }
+    sim.tick();
+    sim.resetDay = '2026-09-16';
+    expect(sim.weeklyQuest?.week).toBe('wk_1');
+  });
+
+  it('keeps a held pick when the body is missing, since there is no level to judge by', () => {
+    const sim = finished();
+    const meta = sim.meta(sim.playerId)!;
+    for (const factionId of FACTION_IDS) sim.chat(`/dev rep ${factionId} ${MAX_STANDING}`);
+    sim.tick();
+    meta.weeklyQuest!.carried = true;
+    const rev = meta.wireRev;
+    resetWeeklyQuestIfNeeded({ resetDay: '2026-09-16', entities: new Map() }, meta);
+    expect(meta.weeklyQuest?.week).toBe('wk_1');
+    expect(meta.wireRev).toBe(rev);
+  });
+
+  it('keeps the record after a claim while no calendar has been fed', () => {
+    const sim = armed('');
+    const meta = sim.meta(sim.playerId)!;
+    meta.weeklyQuest = { questId: 'wk_dungeons', week: 'wk_1', count: 3, state: 'completed' };
+    sim.commendWeeklyQuest('rift_watch');
+    expect(meta.factions.rift_watch).toBe(1000);
+    // The week is unknown, so the spent pick stays rather than reopening one.
+    expect(meta.weeklyQuest?.commended).toBe('rift_watch');
   });
 
   it('keeps a held commendation open when the claim names a capped faction', () => {
