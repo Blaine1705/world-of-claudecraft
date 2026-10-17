@@ -6579,7 +6579,7 @@ export const VISUALS: Record<string, VisualDef> = {
       bone: 'Head',
       offset: [0, 0.23, -0.07],
       color: 0xff7a1e,
-      radius: 0.09,
+      radius: 0.13,
       pulseHz: 0.6,
       selfLitMaterial: 'GourdGlow',
     },

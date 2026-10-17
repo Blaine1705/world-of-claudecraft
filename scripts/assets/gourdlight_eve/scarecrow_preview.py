@@ -76,7 +76,7 @@ scene.collection.objects.link(gobj)
 # the 1.8 m reference figure (a capsule) beside him
 ref = None
 if "--scale" in argv:
-    bpy.ops.mesh.primitive_cylinder_add(radius=0.25, depth=1.8, location=(1.6, -0.9, 0.9))
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.25, depth=1.8, location=(1.25, 0.15, 0.9))
     ref = bpy.context.active_object
     rm = bpy.data.materials.new("refmat")
     rm.use_nodes = True
@@ -121,7 +121,7 @@ for t in frames:
                 pts += [c.matrix_world @ me.vertices[i].co for i in range(0, len(me.vertices), 7)]
                 ev.to_mesh_clear()
     if ref is not None:
-        pts += [Vector((1.6, -0.9, 0)), Vector((1.6, -0.9, 1.8))]
+        pts += [Vector((1.25, 0.15, 0)), Vector((1.25, 0.15, 1.8))]
     lo = Vector((min(p.x for p in pts), min(p.y for p in pts), 0))
     hi = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
     ctr = (lo + hi) / 2

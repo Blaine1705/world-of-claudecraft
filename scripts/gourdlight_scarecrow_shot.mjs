@@ -4,7 +4,7 @@
 // of his kit (the gourd's ring, its flight, the burst, the burning chaff), his call (crows,
 // then strawlings), a strawling up close, and his collapse.
 //
-//   GAME_URL=http://127.0.0.1:5192 OUT=tmp/scarecrow [SHOTS=a,b] [PRESET=4] \
+//   GAME_URL=http://127.0.0.1:5192 OUT=tmp/scarecrow [SHOTS=a,b] [PRESET=4] [MOBILE=1] [BEFORE=1] \
 //     node scripts/gourdlight_scarecrow_shot.mjs
 //
 // GPU only (the system ANGLE backend, never SwiftShader).
@@ -120,7 +120,20 @@ await page.evaluate(
 );
 await chat('/dev kit');
 await chat('/dev immortal');
+// BEFORE=1: the same meadow with the event closed (the PR's before shot), then stop.
+if (process.env.BEFORE === '1') {
+  await chat('/daynight noon');
+  await chat('/dev tp 102 -26');
+  await frames(12, 400);
+  await curtainDown();
+  await standAt(102, -26, 109.5, -39.9, 16, 0.32, 0, 8);
+  await shot('before_field');
+  await browser.close();
+  process.exit(0);
+}
 await chat('/dev scarecrow');
+// he holds still for the portraits (no pull), then the fight starts fresh
+await chat('/dev noaggro');
 await frames(16, 400);
 await curtainDown();
 // the decor kit (the field's ring and the gourd's model) loads on the event's open
@@ -131,7 +144,7 @@ for (let i = 0; i < 40; i++) {
   if (ready) break;
   await frames(1, 300);
 }
-const b = await boss();
+let b = await boss();
 if (!b) throw new Error('no Thatchgrin');
 console.log('BOSS', JSON.stringify(b));
 // where the player stands to look at him: out in front of him (he faces the town)
@@ -151,14 +164,31 @@ for (const time of ['noon', 'dusk', 'midnight']) {
   await shot(`field_${time}`);
 }
 await chat('/daynight noon');
-// Close: the head, the hat, the crows.
+// Close: the head, the hat, the crows, looking up at him from just outside his reach.
 {
-  const p = front(7, -2);
-  await standAt(p.x, p.z, b.x, b.z, 4, -0.32, Math.PI * 0.85, 8);
+  const p = front(10.5, 1.5);
+  await standAt(p.x, p.z, b.x, b.z, 6, -0.38, 0.15, 8);
   await shot('closeup_head');
 }
 
+// Side by side: the player a few strides to his left, both seen from the front, so the
+// heights compare at one distance from the camera.
+await chat('/daynight noon');
+{
+  const p = { x: b.x + Math.cos(b.f) * 4.5, z: b.z - Math.sin(b.f) * 4.5 };
+  const ahead = { x: p.x + Math.sin(b.f) * 10, z: p.z + Math.cos(b.f) * 10 };
+  await standAt(p.x, p.z, ahead.x, ahead.z, 16, 0.08, Math.PI * 0.86, 8);
+  await shot('scale_side');
+  await chat('/daynight midnight');
+  await frames(6, 300);
+  await shot('scale_side_night');
+}
+
 // The fight.
+await chat('/dev noaggro');
+await chat('/dev scarecrow reset');
+await frames(6, 300);
+b = await boss();
 await chat('/daynight dusk');
 {
   const p = front(9, 2);

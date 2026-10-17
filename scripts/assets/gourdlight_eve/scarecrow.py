@@ -254,25 +254,64 @@ def loft(bm, center_at, radius_at, rings, sides, tag, close_top=False, close_bot
     return verts
 
 
+def vnoise(tag, x, y, z):
+    """Smooth value noise in [0, 1): sha256 lattice values, trilinearly blended."""
+    xi, yi, zi = math.floor(x), math.floor(y), math.floor(z)
+    fx, fy, fz = smooth(x - xi), smooth(y - yi), smooth(z - zi)
+
+    def v(i, j, k):
+        return h01(tag, xi + i, yi + j, zi + k)
+
+    x00 = lerp(v(0, 0, 0), v(1, 0, 0), fx)
+    x10 = lerp(v(0, 1, 0), v(1, 1, 0), fx)
+    x01 = lerp(v(0, 0, 1), v(1, 0, 1), fx)
+    x11 = lerp(v(0, 1, 1), v(1, 1, 1), fx)
+    return lerp(lerp(x00, x10, fy), lerp(x01, x11, fy), fz)
+
+
 def burlap_tint(tag, base=BURLAP, patch_rate=0.0, dirt_z=None):
-    """Woven sackcloth: a fine weave (two crossed ripples), coarse blotches, darker
-    seams low down where the field dirt climbs, and per-face jitter so it reads as
-    hand-painted cloth rather than a gradient."""
+    """Old sackcloth, painted: two octaves of soft mottling, dark water and soot stains
+    that pool in blotches, faint vertical sun-streaks, field dirt climbing from the hem,
+    undersides in shadow, and a per-face jitter so it reads hand-painted, not a gradient."""
 
     def tint(co, nrm, fi):
-        weave = 0.07 * math.sin(co.x * 160.0 + co.z * 3.0) * math.sin(co.z * 160.0 + co.y * 4.0)
-        blotch = 0.12 * hs(tag, "b", round(co.x * 3.0), round(co.y * 3.0), round(co.z * 3.0))
-        jitter = 0.06 * hs(tag, "f", fi)
-        k = 1.0 + weave + blotch + jitter
+        n1 = vnoise(tag, co.x * 2.2, co.y * 2.2, co.z * 2.2)
+        n2 = vnoise(tag + "b", co.x * 7.0, co.y * 7.0, co.z * 7.0)
+        stain = smooth((vnoise(tag + "s", co.x * 1.4, co.y * 1.4, co.z * 1.4) - 0.6) * 6.0)
+        streak = 0.05 * math.sin(co.x * 23.0 + 2.0 * n1) * math.sin(co.y * 19.0 + 3.0 * n2)
+        jitter = 0.05 * hs(tag, "f", fi)
+        k = 1.0 + 0.2 * (n1 - 0.5) + 0.12 * (n2 - 0.5) + streak + jitter
         c = (base[0] * k, base[1] * k, base[2] * k)
+        c = mix(c, (c[0] * 0.55, c[1] * 0.5, c[2] * 0.42), stain * 0.55)
         if dirt_z is not None:
             d = smooth((dirt_z - co.z) / max(dirt_z, 0.01))
-            c = mix(c, (0.24, 0.18, 0.11), d * 0.6)
-        # creases face down and away from the light: darken undersides a touch
-        c = mix(c, (c[0] * 0.6, c[1] * 0.6, c[2] * 0.6), smooth(-nrm.z) * 0.35)
+            c = mix(c, (0.2, 0.15, 0.09), d * 0.6)
+        c = mix(c, (c[0] * 0.55, c[1] * 0.55, c[2] * 0.55), smooth(-nrm.z) * 0.4)
         return c
 
     return tint
+
+
+def rag_strips(tag, roots, length, width, s, droop=(0, 0, -1)):
+    """Torn cloth strips hanging from `roots` (Vectors): each a thin, twisting, tapering
+    ribbon with a ragged end, so the edges of his clothes fray into the wind."""
+    bm = bmesh.new()
+    d = Vector(droop).normalized()
+    for i, root in enumerate(roots):
+        ln = length * (0.6 + 0.6 * h01(tag, "l", i))
+        side = Vector((math.cos(h01(tag, "a", i) * TAU), math.sin(h01(tag, "a", i) * TAU), 0)) * width * 0.5
+        rows = []
+        n = 6
+        for k in range(n + 1):
+            t = k / n
+            w = (1.0 - 0.6 * t) * (1.0 + 0.3 * hs(tag, "w", i, k))
+            sway = Vector((0.04 * hs(tag, "sx", i, k), 0.04 * hs(tag, "sy", i, k), 0)) * s * t
+            q = Vector(root) + d * ln * t + sway
+            rows.append((bm.verts.new(q + side * w), bm.verts.new(q - side * w)))
+        for k in range(n):
+            bm.faces.new((rows[k][0], rows[k][1], rows[k + 1][1], rows[k + 1][0]))
+    bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.008 * s)
+    return bm
 
 
 def straw_tint(tag):
@@ -581,6 +620,16 @@ def build_torso(s, B, boss):
     add("CollarStraw", straw_tuft("collar", (0, -0.02 * s, 3.5 * s), (0, 0, 1), 90 if boss else 50, 0.28 * s, 1.0, 0.012 * s, 0.5),
         "Straw", straw_tint("collar"), rigid("Chest"))
     if boss:
+        # an ember heart smouldering behind the tear in his chest, showing between the straws
+        hbm = bmesh.new()
+        bmesh.ops.create_icosphere(hbm, subdivisions=2, radius=1.0)
+        for v in hbm.verts:
+            v.co = Vector((0.06 * s + v.co.x * 0.11 * s, -0.43 * s + v.co.y * 0.05 * s, 2.86 * s + v.co.z * 0.14 * s))
+        add("EmberHeart", hbm, "ScarecrowGlow", flat_tint((1.0, 0.5, 0.12), 0.0), rigid("Chest"))
+        # frayed strips at his shoulders and the coat's open front
+        roots = [Vector((sx * (0.5 + 0.05 * k) * s, (-0.2 + 0.18 * k) * s, 3.3 * s)) for sx in (1, -1) for k in range(3)]
+        add("ShoulderRags", rag_strips("shrag", roots, 0.5 * s, 0.09 * s, s), "BurlapDark",
+            burlap_tint("shrag", base=COAT), envelope(B, ["Chest", "L_UpperArm", "R_UpperArm"], power=6))
         add("ChestStraw", straw_tuft("chest", (0.06 * s, -0.5 * s, 2.86 * s), (0.2, -1, 0.1), 40, 0.28 * s, 0.6, 0.012 * s, 0.2),
             "Straw", straw_tint("chest"), rigid("Chest"))
         add("BackStraw", straw_tuft("back", (-0.12 * s, 0.33 * s, 2.7 * s), (0, 1, -0.2), 34, 0.26 * s, 0.6, 0.012 * s, 0.25),
@@ -687,6 +736,11 @@ def build_arms(s, B, boss):
                 bm.faces.new(q if sx < 0 else tuple(reversed(q)))
         add("ElbowPatch_" + side, bm, "Burlap", burlap_tint("ep" + side, base=PATCH_TONES[1 if sx > 0 else 2]),
             envelope(B, [side + "_UpperArm", side + "_Forearm"], power=8))
+        # frayed strips hanging off the torn cuff
+        cuff = wr - Vector((0.02 * sx * s, 0, 0))
+        roots = [cuff + Vector((0, math.cos(a) * 0.17 * s, math.sin(a) * 0.17 * s)) for a in (3.6, 4.2, 4.8, 5.5, 0.4)]
+        add("CuffRags_" + side, rag_strips("cuff" + side, roots, 0.42 * s, 0.07 * s, s), "BurlapDark",
+            burlap_tint("cuffrag" + side, base=COAT), rigid(side + "_Forearm"))
         # rope bindings at the elbow and the cuff
         for k, x in enumerate((el, wr - Vector((0.03 * sx * s, 0, 0)))):
             bm = bmesh.new()
@@ -846,6 +900,13 @@ def build_hat(s, B):
         return {"Head": 1.0 - t, "Hat": t} if t > 0 else {"Head": 1.0}
 
     add("Hat", bm, "Felt", tint, hw)
+    roots = []
+    for k in range(7):
+        a = math.pi * (0.25 + 0.5 * k / 6)
+        x, y = math.cos(a) * 0.86 * s, math.sin(a) * 0.82 * s
+        roots.append(Vector((x, y, brim_z(x, y, s) - 0.01 * s)))
+    add("BrimRags", rag_strips("brimrag", roots, 0.34 * s, 0.08 * s, s), "Felt",
+        flat_tint(FELT, 0.15, "brimrag"), rigid("Head"))
     add("HatBand", ring_rope((0, 0.02 * s, cz + 0.06 * s), 0.335 * s, 0.32 * s, 0.032 * s, n=28, wobble=0.015 * s, tag="band"),
         "Rope", flat_tint((0.5, 0.2, 0.08), tag="band"), rigid("Head"))
     # two crow feathers stuck in the band

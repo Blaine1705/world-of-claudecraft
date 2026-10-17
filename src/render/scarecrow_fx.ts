@@ -109,9 +109,12 @@ function emberTexture(): THREE.Texture | null {
   const ctx = canvas.getContext('2d');
   if (ctx) {
     const mid = size / 2;
+    // an alpha map reads the GREEN channel, so paint grey on opaque black
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, size, size);
     const g = ctx.createRadialGradient(mid, mid, 0, mid, mid, mid);
-    g.addColorStop(0, 'rgba(255,255,255,0.28)');
-    g.addColorStop(0.75, 'rgba(255,255,255,0.32)');
+    g.addColorStop(0, 'rgba(255,255,255,0.16)');
+    g.addColorStop(0.75, 'rgba(255,255,255,0.22)');
     g.addColorStop(0.9, 'rgba(255,255,255,0.95)');
     g.addColorStop(0.96, 'rgba(255,255,255,0.6)');
     g.addColorStop(1, 'rgba(255,255,255,0)');
@@ -174,9 +177,9 @@ export class ScarecrowFx {
     root.name = 'scarecrow-fx';
     this.discTexture = emberTexture();
     this.discMaterial = new THREE.MeshBasicMaterial({
-      color: 0xff6a1e,
+      color: 0xd8480e,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.85,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       alphaMap: this.discTexture ?? undefined,
