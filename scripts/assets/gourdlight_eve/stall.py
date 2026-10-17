@@ -15,12 +15,14 @@
 #                  corn shocks lashed to the front posts, hay bales and a crate
 #                  stack outside. About 4.7 yd wide and 4.5 yd to the crest: well
 #                  over twice a character's height.
-#   corn_shock     a lashed bundle of dried corn stalks, about 2.2 yd tall.
+#   corn_shock     a lashed bundle of dried corn stalks, 2.2 yd as authored (corn_shock.py;
+#                  the street draws it half again as big, well over a player's head).
 #   hay_bale       a bound hay bale with a small lit pumpkin and a gourd on it.
 #
 # Determinism: no clock, no `random`; variety is m.h01 of a tag.
 
 import math
+import sys
 
 import bmesh
 from mathutils import Matrix, Vector
@@ -133,103 +135,12 @@ def transform_apply(m, obj, loc=None, rot=None, scale=None):
 # ---------------------------------------------------------------------------
 
 
-def corn_shock_bm(tag, height=2.2, stalks=34, tie_z=0.95):
-    """Dried corn stalks stood up in a cone and lashed at the waist: each stalk
-    a thin flat blade (two faces so it reads from both sides), splayed at the
-    foot, gathered at the tie, flared and drooping at the top."""
-    bm = bmesh.new()
-    for s in range(stalks):
-        a = s / stalks * TAU + 0.4 * (0.5 - (s * 0.618) % 1.0)
-        jit = (s * 0.7548) % 1.0
-        foot_r = 0.32 + 0.12 * jit
-        top_r = 0.34 + 0.22 * ((s * 0.3819) % 1.0)
-        h = height * (0.82 + 0.22 * ((s * 0.5698) % 1.0))
-        w = 0.035 + 0.015 * jit
-        segs = 9
-        prev = None
-        for i in range(segs + 1):
-            t = i / segs
-            z = h * t
-            if z <= tie_z:
-                r = foot_r + (0.1 - foot_r) * (z / tie_z) ** 0.8
-            else:
-                u = (z - tie_z) / (h - tie_z)
-                r = 0.1 + (top_r - 0.1) * u ** 1.3
-            # the top third droops outward and down a little
-            droop = max(0.0, t - 0.7) / 0.3
-            z -= 0.18 * droop * droop
-            r += 0.12 * droop * droop
-            ax = math.cos(a) * r
-            ay = math.sin(a) * r
-            # the blade faces outward from the bundle's axis
-            tx, ty = -math.sin(a), math.cos(a)
-            ww = w * (1.0 - 0.6 * t)
-            v0 = bm.verts.new((ax - tx * ww, ay - ty * ww, z))
-            v1 = bm.verts.new((ax + tx * ww, ay + ty * ww, z))
-            if prev:
-                bm.faces.new((prev[0], prev[1], v1, v0))
-            prev = (v0, v1)
-        # a long dry leaf peeling off each stalk partway up
-        if s % 2 == 0:
-            la = a + 0.5
-            z0 = tie_z + 0.25 + 0.5 * jit
-            base = Vector((math.cos(a) * 0.14, math.sin(a) * 0.14, z0))
-            prev = None
-            for i in range(7):
-                t = i / 6
-                out = 0.55 * t
-                p = base + Vector((math.cos(la) * out, math.sin(la) * out, 0.22 * t - 0.5 * t * t))
-                tx, ty = -math.sin(la), math.cos(la)
-                ww = 0.05 * math.sin(math.pi * min(0.95, t + 0.05))
-                v0 = bm.verts.new((p.x - tx * ww, p.y - ty * ww, p.z))
-                v1 = bm.verts.new((p.x + tx * ww, p.y + ty * ww, p.z))
-                if prev:
-                    bm.faces.new((prev[0], prev[1], v1, v0))
-                prev = (v0, v1)
-    return bm
-
-
 def corn_shock(m, collection, name, tag, height=2.2):
-    shock = part(
-        m,
-        name + "_stalks",
-        corn_shock_bm(tag, height),
-        collection,
-        ["Straw"],
-        lambda mn, co, fc, pi: m.mix(
-            STRAW_DARK, STRAW, 0.35 + 0.55 * m.h01(tag, "stalk", pi // 9) + 0.1 * min(1.0, co.z / height)
-        ),
-    )
-    # the lashing at the waist: two turns of orange cord and one of twine
-    tbm = bmesh.new()
-    for k, (z, r) in enumerate(((0.92, 0.135), (1.0, 0.125), (1.07, 0.12))):
-        pts = [(math.cos(i / 16 * TAU) * r, math.sin(i / 16 * TAU) * r, z) for i in range(17)]
-        m.tube_bm(tbm, pts, 0.018, 6)
-    tie = part(
-        m,
-        name + "_tie",
-        tbm,
-        collection,
-        ["Ribbon"],
-        lambda mn, co, fc, pi: (0.95, 0.42, 0.05) if fc.z < 1.04 else (0.42, 0.32, 0.16),
-    )
-    # two ears of corn tucked into the bundle, husks peeled back
-    ebm = bmesh.new()
-    for k, (a, z) in enumerate(((0.6, 1.2), (3.1, 1.32))):
-        c = Vector((math.cos(a) * 0.17, math.sin(a) * 0.17, z))
-        mat = Matrix.Translation(c) @ Matrix.Rotation(a, 4, "Z") @ Matrix.Rotation(-0.5, 4, "Y")
-        bmesh.ops.create_uvsphere(ebm, u_segments=8, v_segments=8, radius=1.0,
-                                  matrix=mat @ Matrix.Diagonal((0.05, 0.05, 0.14, 1)))
-    ears = part(
-        m,
-        name + "_ears",
-        ebm,
-        collection,
-        ["GourdSkin"],
-        lambda mn, co, fc, pi: m.mix((0.7, 0.35, 0.08), (0.9, 0.62, 0.12), m.h01("ear", pi)),
-        smooth=True,
-    )
-    return m.join([shock, tie, ears], name)
+    """A volumetric corn shock (corn_shock.py): a fluted core under round stalks, creased
+    leaves, a twisted two-band lashing with its knot, and ears tucked under the tie."""
+    import corn_shock as cs
+
+    return cs.build(m, sys.modules[__name__], collection, name, tag, height)
 
 
 def hay_bale_bm(tag, size=(1.05, 0.55, 0.48)):
@@ -755,7 +666,7 @@ def build_stall(m, collection):
     # outside: corn shocks lashed to the front posts, hay bales stacked left with
     # a big lit pumpkin on top, a crate stack with pumpkins right
     for i, x in enumerate((-STALL_W / 2 - 0.1, STALL_W / 2 + 0.1)):
-        shock = corn_shock(m, collection, "stall_shock_%d" % i, "stall-shock-%d" % i, 2.35)
+        shock = corn_shock(m, collection, "stall_shock_%d" % i, "stall-shock-%d" % i, 2.8)
         transform_apply(m, shock, loc=(x, FRONT_Y - 0.28, 0.0), rot=(0, 0, 0.7 * i))
         parts.append(shock)
     b1 = hay_bale_part(m, collection, "stall_bale_a", "stall-bale-a")

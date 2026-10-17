@@ -96,7 +96,8 @@ export const DECOR_KIND_SCALE: Readonly<Record<SeasonalGroundKind, number>> = {
   pumpkin_small: 1.5,
   gourd: 1.7,
   garland_pole: 1.15,
-  corn_shock: 1.0,
+  // a shock stands well over a player's head (2.2 authored, so 3.3 against a 2.6 body)
+  corn_shock: 1.5,
   hay_bale: 1.2,
 };
 /** A piece's own clear radius against colliders, where it is wider than the
