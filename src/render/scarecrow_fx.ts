@@ -26,7 +26,7 @@
 // sprites and the shockwave ring are built with this layer's root (on the first sight of
 // him) and attached through the world compile gate (attachSceneGroupGated), each with a
 // hidden twin so its program links before its first use. Every particle rides the pooled
-// point cloud (vfx.ts). No per-throw allocation of GPU objects: a rain reuses the pools.
+// point cloud (vfx.ts). A rain reuses the pools (only a chaff patch builds its tiny disc).
 import * as THREE from 'three';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import {
@@ -288,6 +288,11 @@ export class ScarecrowFx {
   private cometGeo: THREE.BufferGeometry | null = null;
   private comets: THREE.InstancedMesh | null = null;
   private pumpkins: THREE.InstancedMesh[] | null = null;
+  /** The pumpkin pool's own gated group, and the kit parts it was built over. */
+  private pumpkinGroup: THREE.Group | null = null;
+  private pumpkinParts: unknown = null;
+  private pumpkinsReady = false;
+  private fallsIdle = false;
   private haloTexture: THREE.Texture | null = null;
   private halos: THREE.Sprite[] = [];
   private ringMaterial: THREE.MeshBasicMaterial | null = null;
@@ -423,18 +428,43 @@ export class ScarecrowFx {
    *  pumpkin, FALL_CAP instances each, over the kit's own geometry and materials (the
    *  instanced variant the decor view already links). Null until the kit has loaded. */
   private ensurePumpkins(): THREE.InstancedMesh[] | null {
-    if (this.pumpkins) return this.pumpkins;
     const parts = gourdlightAssets()?.decor.pumpkin_small;
+    if (this.pumpkins && parts === this.pumpkinParts)
+      return this.pumpkinsReady ? this.pumpkins : null;
+    // a material-tier rebuild of the kit retires the pool built over its old materials
+    this.releasePumpkins();
     if (!parts || !this.root) return null;
+    const group = new THREE.Group();
+    group.name = 'scarecrow-fx-pumpkins';
     this.pumpkins = parts.map((part) => {
       const mesh = new THREE.InstancedMesh(part.geometry, part.material, FALL_CAP);
       for (let i = 0; i < FALL_CAP; i++) mesh.setMatrixAt(i, HIDDEN);
       mesh.frustumCulled = false;
-      mesh.name = 'scarecrow-fx-pumpkins';
-      this.root?.add(mesh);
+      mesh.visible = false;
+      group.add(mesh);
       return mesh;
     });
-    return this.pumpkins;
+    this.pumpkinParts = parts;
+    this.pumpkinGroup = group;
+    // its own gate: the kit may finish loading mid-fight, before the decor's gate settles
+    const mine = group;
+    const retired = () => this.disposed || this.pumpkinGroup !== mine;
+    void attachSceneGroupGated(this.root, group, this.compileGate, retired)
+      .then(() => {
+        if (!retired()) this.pumpkinsReady = true;
+      })
+      .catch(() => {});
+    return null;
+  }
+
+  private releasePumpkins(): void {
+    // the geometry and materials are the decor kit's: only the instance buffers go
+    if (this.pumpkins) for (const m of this.pumpkins) m.dispose();
+    this.pumpkinGroup?.removeFromParent();
+    this.pumpkins = null;
+    this.pumpkinGroup = null;
+    this.pumpkinParts = null;
+    this.pumpkinsReady = false;
   }
 
   private takeSlot(): FallSlot | null {
@@ -710,6 +740,9 @@ export class ScarecrowFx {
   private updateFalls(dt: number, reducedMotion: boolean): void {
     if (!this.comets) return;
     const pumpkins = this.ensurePumpkins();
+    const twins = this.time - this.rootBorn < TWIN_SEC;
+    // an idle pool past its twin window was hidden last frame: nothing to rewrite
+    if (this.fallsIdle && !twins && !this.falls.some((f) => f.active)) return;
     let any = false;
     for (let i = 0; i < this.falls.length; i++) {
       const f = this.falls[i];
@@ -758,9 +791,9 @@ export class ScarecrowFx {
     this.comets.instanceMatrix.needsUpdate = true;
     if (pumpkins) for (const m of pumpkins) m.instanceMatrix.needsUpdate = true;
     // an idle pool draws nothing (its programs linked with the root's gated attach)
-    const twins = this.time - this.rootBorn < TWIN_SEC;
     this.comets.visible = any || twins;
     if (pumpkins) for (const m of pumpkins) m.visible = any;
+    this.fallsIdle = !any && !twins && pumpkins !== null;
   }
 
   private updatePatches(dt: number): void {
@@ -958,8 +991,7 @@ export class ScarecrowFx {
     this.cometMaterial?.dispose();
     this.cometGeo?.dispose();
     this.comets?.dispose();
-    // the pumpkins' geometry and materials are the decor kit's: only the instance buffers
-    if (this.pumpkins) for (const m of this.pumpkins) m.dispose();
+    this.releasePumpkins();
     this.haloTexture?.dispose();
     for (const s of this.halos) (s.material as THREE.SpriteMaterial).dispose();
     this.ringMaterial?.dispose();
@@ -974,7 +1006,6 @@ export class ScarecrowFx {
     this.cometMaterial = null;
     this.cometGeo = null;
     this.comets = null;
-    this.pumpkins = null;
     this.halos = [];
     this.ring = null;
     this.ringMaterial = null;

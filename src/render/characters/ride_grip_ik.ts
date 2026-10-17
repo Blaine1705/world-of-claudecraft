@@ -11,7 +11,8 @@
 // "aim" that needs no knowledge of the rig's local bone axes, only that a joint's child
 // joint lies down its limb. Blended by `k` (the ride pose's own fade).
 //
-// Per frame, per rider ON such a mount only; no allocation (module scratch).
+// Per frame, per rider ON such a mount only; no allocation (module scratch), and only
+// the arm chains' world matrices are recomputed.
 import * as THREE from 'three';
 
 export interface RideGrip {
@@ -116,9 +117,15 @@ export function applyRideGrip(
   grip: RideGrip,
   k: number,
 ): void {
-  root.updateMatrixWorld(true);
+  // a rig frozen off-screen (rig_visibility_freeze.ts) stays frozen: no solve
+  if (!root.matrixWorldAutoUpdate) return;
+  root.updateWorldMatrix(true, false);
   root.getWorldQuaternion(rootQ);
   const [ul, fl, hl, ur, fr, hr] = arms;
+  // only the two arm chains are brought current (their ancestors and the arm below),
+  // never the whole rider subtree the scene pass updates anyway
+  ul?.updateWorldMatrix(true, true);
+  ur?.updateWorldMatrix(true, true);
   if (ul && fl && hl) {
     gripLocal.set(0.04, grip.up, grip.forward - grip.stagger * 0.5);
     root.localToWorld(gripWorld.copy(gripLocal));
