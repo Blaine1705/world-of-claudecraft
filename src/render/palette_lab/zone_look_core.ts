@@ -95,6 +95,46 @@ export interface LookBloom {
   threshold: number;
 }
 
+/**
+ * Beyond colour: the lab's render arms. Stock values change nothing, so the
+ * stock look keeps the shipped frame exactly.
+ */
+export interface LookRender {
+  /** Rim light strength on rounded shapes (0 is off; lab_lighting.ts). */
+  rim: number;
+  /** Rim falloff power (higher is a thinner edge). */
+  rimPower: number;
+  /** Rim colour (scene hex); null takes the look's sky fill, lifted to white. */
+  rimColor: number | null;
+  /** Ambient-occlusion tint (sRGB hex); black is the shipped AO. */
+  aoTint: number;
+  /** Multiplier on the shipped AO intensity. */
+  aoScale: number;
+  /** Sun shadow strength, 0 (none) to 1 (shipped). */
+  shadowStrength: number;
+  /** Meadow fullness: grass coverage 0 (shipped patches) to 1 (full carpet). */
+  meadowCoverage: number;
+  /** Grass blade height multiplier (1 is shipped). */
+  meadowHeight: number;
+  /** Grass cluster width multiplier (1 is shipped). */
+  meadowWidth: number;
+  /** Tree and bush canopy brightness multiplier (1 is shipped). */
+  canopyLift: number;
+}
+
+export const STOCK_RENDER: LookRender = {
+  rim: 0,
+  rimPower: 3,
+  rimColor: null,
+  aoTint: 0x000000,
+  aoScale: 1,
+  shadowStrength: 1,
+  meadowCoverage: 0,
+  meadowHeight: 1,
+  meadowWidth: 1,
+  canopyLift: 1,
+};
+
 export interface ZoneLook {
   id: string;
   name: string;
@@ -108,6 +148,7 @@ export interface ZoneLook {
   water: LookWater;
   grade: LookGrade;
   bloom: LookBloom;
+  render: LookRender;
 }
 
 type Patch<T> = { [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K] };
@@ -212,6 +253,7 @@ export function stockLookFor(
     water: { ...water },
     grade: { ...NEUTRAL_GRADE },
     bloom: { ...bloom },
+    render: { ...STOCK_RENDER },
   };
 }
 
@@ -233,6 +275,7 @@ export function applyLookPatch(base: ZoneLook, patch: LookPatch): ZoneLook {
     water: { ...base.water, ...patch.water },
     grade: { ...base.grade, ...patch.grade },
     bloom: { ...base.bloom, ...patch.bloom },
+    render: { ...base.render, ...patch.render },
   };
 }
 
@@ -481,6 +524,17 @@ export function groundKey(g: LookGround): string {
   return `${g.grass},${g.grassDark},${g.grassYellow},${g.dirt},${g.sand}`;
 }
 
+/** The rim's linear colour: its own hex, else the sky fill lifted halfway to white. */
+export function rimColorLinear(look: ZoneLook): [number, number, number] {
+  const hex = look.render.rimColor ?? lerpHexToWhite(look.light.hemiSky, 0.5);
+  return hexToLinear(hex);
+}
+
+function lerpHexToWhite(hex: number, t: number): number {
+  const c = hexToSrgb01(hex).map((v) => Math.round((v + (1 - v) * t) * 255));
+  return (c[0] << 16) | (c[1] << 8) | c[2];
+}
+
 // Shipping --------------------------------------------------------------------
 
 const hx = (n: number): string => `0x${(n & 0xffffff).toString(16).padStart(6, '0')}`;
@@ -518,5 +572,6 @@ export function lookToShippingSnippet(
     `// water: { deep: ${hx(w.deep)}, shallow: ${hx(w.shallow)}, sky: ${hx(w.sky)}, scatter: ${hx(w.scatter)} }`,
     `// bloom: { strength: ${num(look.bloom.strength)}, threshold: ${num(look.bloom.threshold)} }`,
     `// grade: { exposure: ${num(gr.exposure)}, temperature: ${num(gr.temperature)}, tint: ${num(gr.tint)}, contrast: ${num(gr.contrast)}, saturation: ${num(gr.saturation)}, vibrance: ${num(gr.vibrance)}, shadowTint: ${hx(gr.shadowTint)}, shadowAmt: ${num(gr.shadowAmt)}, highlightTint: ${hx(gr.highlightTint)}, highlightAmt: ${num(gr.highlightAmt)}, lift: ${num(gr.lift)}, greenHue: ${num(gr.greenHue)}, greenSat: ${num(gr.greenSat)}, greenVal: ${num(gr.greenVal)} }`,
+    `// render: { rim: ${num(look.render.rim)}, rimPower: ${num(look.render.rimPower)}, rimColor: ${look.render.rimColor === null ? 'null' : hx(look.render.rimColor)}, aoTint: ${hx(look.render.aoTint)}, aoScale: ${num(look.render.aoScale)}, shadowStrength: ${num(look.render.shadowStrength)}, meadowCoverage: ${num(look.render.meadowCoverage)}, meadowHeight: ${num(look.render.meadowHeight)}, meadowWidth: ${num(look.render.meadowWidth)}, canopyLift: ${num(look.render.canopyLift)} }`,
   ].join('\n');
 }

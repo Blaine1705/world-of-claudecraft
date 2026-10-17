@@ -5,6 +5,11 @@
 // flag builds the stock shaders byte for byte and pays nothing.
 //
 // Hosts without a location (Node, the headless env) always run stock.
+//
+// A LEAF on purpose: the shader arms (gfx.ts, post.ts, sky.ts, the grass)
+// import it, and the guide and editor pages reach gfx.ts too, so it must
+// never pull the runtime into their module graph. The runtime boots from
+// palette_lab_boot.ts, which only the game's composer (post.ts) imports.
 
 function readFlag(): boolean {
   // Dev builds only (`npm run dev`): a shipped build never offers it, since
@@ -21,12 +26,4 @@ const enabled = readFlag();
 /** True when `?palette=on` (or `=1`) opted this session into the palette lab. */
 export function paletteLabEnabled(): boolean {
   return enabled;
-}
-
-// Boot. This module is imported by the two shader arms (post.ts, sky.ts), so
-// it loads with the renderer; the runtime and its panel are a separate chunk
-// fetched only for a lab session in a page with a DOM. The runtime itself
-// waits for the live world (`window.__game`) before it touches anything.
-if (enabled && typeof document !== 'undefined') {
-  void import('./palette_lab_runtime').then((m) => m.startPaletteLab());
 }

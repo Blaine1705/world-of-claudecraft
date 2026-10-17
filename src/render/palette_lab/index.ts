@@ -3,6 +3,7 @@
 // bloom registration. The runtime and its panel are NOT here: they load by
 // dynamic import from palette_lab_flag.ts, only in a lab session.
 
+export { setPaletteAoPass } from './lab_lighting';
 export { setPaletteBloomPass } from './palette_bloom';
 export { PALETTE_GRADE_GLSL, paletteGradeUniforms } from './palette_grade';
 export { paletteLabEnabled } from './palette_lab_flag';

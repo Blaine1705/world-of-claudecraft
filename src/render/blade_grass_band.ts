@@ -51,6 +51,12 @@ import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { GFX, sharedUniforms } from './gfx';
 import { getGrassGroundBake } from './grass_ground_bake';
 import {
+  meadowBladeScale,
+  meadowCellGrows,
+  meadowFullness,
+  meadowHeightStretch,
+} from './meadow_fullness_core';
+import {
   GRASS_PAINT_TRIM,
   MEADOW_BAND_BASE_RECOVER_Y,
   MEADOW_BAND_BASE_SINK,
@@ -220,7 +226,7 @@ export function buildBladeGrassBand(
     if (ok) {
       const lush = groundLushnessAt(x, z, seed);
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
-      ok = r1 < (0.44 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
+      ok = meadowCellGrows(r1, lush, biomeDensity);
       if (ok) ok = roadDistance(x, z) > 2.4;
       // The maker's painted no-grass discs, same as the near carpet: a city
       // floor has to be clear in BOTH bands or the meadow reappears the moment
@@ -235,16 +241,14 @@ export function buildBladeGrassBand(
         if (ok) ok = !terrainCutAtHeight(x, z, h);
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
-          const lushHere = 0.5 + lush * 0.6;
-          let s = (0.22 + hash(ci, cj, 3) * 0.34) * lushHere;
-          const rTuft = hash(ci, cj, 4);
-          if (rTuft < 0.1) s *= 1.5 + rTuft * 3.0;
+          const s = meadowBladeScale(hash(ci, cj, 3), hash(ci, cj, 4), lush);
           q.setFromAxisAngle(up, r1 * 12.9);
           const rLean = hash(ci, cj, 5);
           leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
           q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
           const hJit = 0.82 + hash(ci, cj, 6) * 0.36;
-          m.compose(v.set(x, h - 0.02, z), q, sv.set(s, s * (0.85 + lush * 0.5) * hJit, s));
+          const sw = s * meadowFullness().width;
+          m.compose(v.set(x, h - 0.02, z), q, sv.set(sw, s * meadowHeightStretch(lush, hJit), sw));
           groundGrassColorAt(x, z, seed, c);
           c.multiplyScalar(1.18);
           sectorPool.place(slot, m, c);

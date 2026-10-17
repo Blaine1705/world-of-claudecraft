@@ -167,7 +167,6 @@ describe('live graphics profile architecture', () => {
 
     const directDeferredProfiles = [
       ['terrain.ts', 'prepareTerrainProfileAssets'],
-      ['water.ts', 'prepareWaterProfileAssets'],
       ['detail_normals.ts', 'prepareStoneDetailProfileAssets'],
       ['worn_stone.ts', 'prepareSurfaceDetailProfileAssets'],
       ['canopy_detail.ts', 'prepareCanopyDetailProfileAssets'],
@@ -1219,7 +1218,12 @@ const RENDER_PURE_CORES = [
   // Palette lab (?palette=on dev tool): per-zone ground overrides the terrain
   // caches re-read, and the zone-look model, display solver and export.
   'src/render/ground_palette_override_core.ts',
+  'src/render/meadow_fullness_core.ts',
   'src/render/palette_lab/zone_look_core.ts',
+  'src/render/ocean/ocean_spectrum_core.ts',
+  'src/render/ocean/ocean_foam_core.ts',
+  'src/render/ocean/water_character_core.ts',
+  'src/render/ocean/water_liveness_core.ts',
   'src/render/battleground_core.ts',
   'src/render/battleground_fx_core.ts',
   'src/render/battleground_lantern_fx_core.ts',
@@ -1372,7 +1376,6 @@ const RENDER_PURE_CORES = [
   'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
   'src/render/water_coverage_core.ts',
-  'src/render/water_wave_core.ts',
   'src/render/weather_field_core.ts',
   'src/render/water_flora_core.ts',
   'src/render/water_flora_shader_core.ts',

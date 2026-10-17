@@ -21,6 +21,7 @@
 // surfaces plus module-level shared uniforms, never a private field:
 // renderer.ts and main.ts carry no line for the lab at all.
 
+import type * as THREE from 'three';
 import {
   DUNGEON_X_THRESHOLD,
   STRIP_MAX_X,
@@ -46,10 +47,12 @@ import {
   groundPaletteVersion,
   setGroundPaletteOverrides,
 } from '../ground_palette_override_core';
+import { setMeadowFullness } from '../meadow_fullness_core';
 import { BIOME_FOG, BIOME_GOD_RAYS, BIOME_LIGHT } from '../outdoor_biome_presets';
 import { BLOOM_STRENGTH, BLOOM_THRESHOLD } from '../post';
 import { setWaterPalette, stockWaterPalette } from '../water';
 import { precipForBiome } from '../weather_field_core';
+import { livePaletteAoPass, setLabRim } from './lab_lighting';
 import { livePaletteBloomPass } from './palette_bloom';
 import { paletteGradeUniforms } from './palette_grade';
 import { mountPaletteLabPanel, type PaletteLabPanel } from './palette_lab_panel';
@@ -60,6 +63,7 @@ import {
   fogSceneHex,
   gradeUniformValues,
   groundKey,
+  hexToSrgb01,
   type LookBloom,
   type LookGround,
   type LookPatch,
@@ -67,6 +71,7 @@ import {
   lookDisplayModel,
   lookToShippingSnippet,
   parseSelections,
+  rimColorLinear,
   STOCK_LOOK_ID,
   skyUniformValues,
   stockLookFor,
@@ -94,10 +99,27 @@ const LIVE = {
   exposure: 28,
   bloomStrength: 29,
   bloomThreshold: 30,
+  rim: 31,
+  rimPower: 32,
+  rimColor: 33,
+  aoTint: 36,
+  aoScale: 39,
+  shadowStrength: 40,
+  canopyLift: 41,
 } as const;
+// Leaf and bush materials the canopy lift brightens (GLB material names), and
+// the far sprites that stand in for them, which must move together or the
+// handoff between a real tree and its sprite shows.
+const CANOPY_MATERIAL = /^(Leaves(_.*)?|foliage:impostor-(tree|dress).*)$/;
+// How often the canopy walk looks for leaf materials a streamed zone added.
+const CANOPY_REWALK_MS = 4000;
+// How much of a surface's own colour the rim takes: high, so a leaf's rim is a
+// lighter leaf green and a cloak's a lighter cloak, never a white frost.
+const RIM_ALBEDO = 0.85;
 
 interface LabRendererHandle {
   webgl: { toneMappingExposure: number };
+  scene: THREE.Scene;
   editor: {
     recolorGround(
       region: { minX: number; minZ: number; maxX: number; maxZ: number },
@@ -172,6 +194,15 @@ class PaletteLabRuntime implements PaletteLabApi {
   private groundBusy = false;
   private sweepBusy = false;
   private readonly stockWater = stockWaterPalette();
+  private aoPass: unknown = null;
+  private aoBase = 1;
+  private sun: THREE.DirectionalLight | null = null;
+  private sunFor: LabRendererHandle | null = null;
+  private canopyFor: LabRendererHandle | null = null;
+  private canopyRewalkAt = 0;
+  private canopyLiftWritten = Number.NaN;
+  private readonly canopyBase = new WeakMap<THREE.Material, THREE.Color>();
+  private readonly canopyMats = new Set<THREE.MeshStandardMaterial>();
   private nextSweepAt = 0;
   private lastFrame = 0;
   private status = '';
@@ -481,6 +512,75 @@ class PaletteLabRuntime implements PaletteLabApi {
     const next = this.exposureBase * v[LIVE.exposure];
     renderer.webgl.toneMappingExposure = next;
     this.exposureWritten = next;
+
+    setLabRim(
+      v[LIVE.rim],
+      v[LIVE.rimPower],
+      [v[LIVE.rimColor], v[LIVE.rimColor + 1], v[LIVE.rimColor + 2]],
+      RIM_ALBEDO,
+    );
+    this.applyAo(v);
+    this.applyShadow(renderer, v[LIVE.shadowStrength]);
+    this.applyCanopy(renderer, v[LIVE.canopyLift]);
+  }
+
+  /** AO tint and strength (N8AO chains only; other tiers have no AO pass). */
+  private applyAo(v: readonly number[]): void {
+    const ao = livePaletteAoPass();
+    if (!ao) return;
+    if (ao !== this.aoPass) {
+      this.aoPass = ao;
+      this.aoBase = ao.configuration.intensity;
+    }
+    const hex =
+      (Math.round(v[LIVE.aoTint] * 255) << 16) |
+      (Math.round(v[LIVE.aoTint + 1] * 255) << 8) |
+      Math.round(v[LIVE.aoTint + 2] * 255);
+    // In place: a fresh Color would go through the pass's setter, which
+    // restarts its accumulation every frame.
+    ao.configuration.color.set(hex);
+    const intensity = this.aoBase * v[LIVE.aoScale];
+    if (ao.configuration.intensity !== intensity) ao.configuration.intensity = intensity;
+  }
+
+  /** Sun shadow strength (three mixes the shadow toward lit by 1 - this). */
+  private applyShadow(renderer: LabRendererHandle, strength: number): void {
+    if (this.sunFor !== renderer) {
+      this.sunFor = renderer;
+      this.sun = null;
+      renderer.scene.traverse((o) => {
+        if (!this.sun && (o as THREE.DirectionalLight).isDirectionalLight && o.castShadow) {
+          this.sun = o as THREE.DirectionalLight;
+        }
+      });
+    }
+    if (this.sun) this.sun.shadow.intensity = strength;
+  }
+
+  /** Brighten the canopy materials (their authored colour times the lift). */
+  private applyCanopy(renderer: LabRendererHandle, lift: number): void {
+    const now = performance.now();
+    if (this.canopyFor !== renderer || now >= this.canopyRewalkAt) {
+      if (this.canopyFor !== renderer) this.canopyMats.clear();
+      this.canopyFor = renderer;
+      this.canopyRewalkAt = now + CANOPY_REWALK_MS;
+      renderer.scene.traverse((o) => {
+        const mats = (o as THREE.Mesh).material;
+        if (!mats) return;
+        for (const m of Array.isArray(mats) ? mats : [mats]) {
+          const mat = m as THREE.MeshStandardMaterial;
+          if (!mat.color || !CANOPY_MATERIAL.test(mat.name) || this.canopyBase.has(mat)) continue;
+          this.canopyBase.set(mat, mat.color.clone());
+          this.canopyMats.add(mat);
+        }
+      });
+    }
+    if (lift === this.canopyLiftWritten && this.canopyFor === renderer) return;
+    for (const mat of this.canopyMats) {
+      const base = this.canopyBase.get(mat);
+      if (base) mat.color.copy(base).multiplyScalar(lift);
+    }
+    this.canopyLiftWritten = lift;
   }
 
   private isStockWater(w: ZoneLook['water']): boolean {
@@ -507,6 +607,13 @@ class PaletteLabRuntime implements PaletteLabApi {
       look.grade.exposure,
       look.bloom.strength,
       look.bloom.threshold,
+      look.render.rim,
+      look.render.rimPower,
+      ...rimColorLinear(look),
+      ...hexToSrgb01(look.render.aoTint),
+      look.render.aoScale,
+      look.render.shadowStrength,
+      look.render.canopyLift,
     ];
     this.targetCache.set(look, flat);
     return flat;
@@ -516,6 +623,24 @@ class PaletteLabRuntime implements PaletteLabApi {
 
   /** Publish the ground override table and queue every zone whose palette moved. */
   private syncGround(): void {
+    // Meadow fullness follows the zone the player stands in (the near carpet
+    // and band only reach the ground around the player).
+    const zone = this.zone;
+    const render = zone ? this.groundLook(zone).render : null;
+    if (
+      setMeadowFullness(
+        render
+          ? {
+              coverage: render.meadowCoverage,
+              height: render.meadowHeight,
+              width: render.meadowWidth,
+            }
+          : null,
+      )
+    ) {
+      recolorLiveBladeGrassView();
+      recolorLiveBladeGrassBandView();
+    }
     const table: Record<string, LookGround> = {};
     for (const zone of ZONES) {
       const look = this.groundLook(zone);

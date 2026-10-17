@@ -11,7 +11,10 @@ import {
   GPU_TIMER_SCENE_BRACKET,
   labelGpuTimerPass,
 } from './gpu_timer_probe_core';
-import { paletteLabEnabled, setPaletteBloomPass } from './palette_lab';
+import { setOceanShedRung } from './ocean/ocean_shed';
+import { paletteLabEnabled, setPaletteAoPass, setPaletteBloomPass } from './palette_lab';
+// The lab's runtime boots with the game composer only (never the guide/editor).
+import './palette_lab/palette_lab_boot';
 import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
@@ -302,6 +305,7 @@ export function buildComposer(
     composer.addPass(bloom);
   }
   setPaletteBloomPass(bloom);
+  setPaletteAoPass(ao);
   // RenderPass writes readBuffer, and bloom does not swap it before the grade.
   // Read it at grade draw time: the swapping tail can alternate the scene's
   // target each frame. Capturing `target` would sample stale depth (or the
@@ -456,6 +460,12 @@ export function buildComposer(
     },
     setShedLevel(level: number): void {
       shed.apply(level);
+      // The water's per-frame extras answer to the same rungs: its simulation
+      // steps slower once bloom is shed, and with AO shed the opaque-scene copy
+      // stops, so the sea (and the ability VFX) take their unsampled arms.
+      const rung = shed.rung();
+      setOceanShedRung(rung);
+      sceneCapture?.setSuppressed(rung === 'ao-off');
     },
     shedRung(): PostShedRung | 'full' {
       return shed.rung();
