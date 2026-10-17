@@ -40,6 +40,7 @@ from mathutils import Matrix, Quaternion, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import model as M  # noqa: E402  (the shared helpers and the carved pumpkin)
+import burlap_weave as W  # noqa: E402  (the sackcloth weave, box UVs, baked occlusion)
 import scarecrow_clips as C  # noqa: E402  (the clip set)
 
 TAU = math.pi * 2.0
@@ -66,6 +67,12 @@ M.MATERIAL_DEFS.update(
 # as ONE material: the colour lives in the vertices, so splitting them only cost draw calls.
 # The glow materials (driven by name) and the metal blade keep their own.
 MERGED_MATTE = {"Burlap", "BurlapDark", "Rope", "Straw", "Wood", "Felt", "Feather", "Beak"}
+# ...except the boss's sackcloth, which carries the weave texture (burlap_weave.py) on a
+# material of its own: one extra draw on a body the size of a house, none on a strawling
+# (its budget is two). CLOTH_TILE is metres of cloth per weave tile.
+CLOTH_PARTS = {"Burlap", "BurlapDark"}
+CLOTH = [False]
+CLOTH_TILE = 0.42
 
 # palette (sRGB, authored)
 BURLAP = (0.62, 0.48, 0.3)
@@ -285,7 +292,9 @@ def burlap_tint(tag, base=BURLAP, patch_rate=0.0, dirt_z=None):
         n2 = vnoise(tag + "b", co.x * 7.0, co.y * 7.0, co.z * 7.0)
         stain = smooth((vnoise(tag + "s", co.x * 1.4, co.y * 1.4, co.z * 1.4) - 0.6) * 6.0)
         streak = 0.05 * math.sin(co.x * 23.0 + 2.0 * n1) * math.sin(co.y * 19.0 + 3.0 * n2)
-        jitter = 0.05 * hs(tag, "f", fi)
+        # a fine mottle that runs smoothly across faces (owner note 2026-10-18: a jitter
+        # per face read as facets up close); the weave texture carries the fine grain
+        jitter = 0.06 * (vnoise(tag + "j", co.x * 16.0, co.y * 16.0, co.z * 16.0) - 0.5)
         k = 1.0 + 0.2 * (n1 - 0.5) + 0.12 * (n2 - 0.5) + streak + jitter
         c = (base[0] * k, base[1] * k, base[2] * k)
         c = mix(c, (c[0] * 0.55, c[1] * 0.5, c[2] * 0.42), stain * 0.55)
@@ -295,6 +304,8 @@ def burlap_tint(tag, base=BURLAP, patch_rate=0.0, dirt_z=None):
         c = mix(c, (c[0] * 0.55, c[1] * 0.55, c[2] * 0.55), smooth(-nrm.z) * 0.4)
         return c
 
+    # painted per VERTEX with the smooth vertex normal (color_part), so it shades like cloth
+    tint.smooth = True
     return tint
 
 
@@ -875,17 +886,26 @@ def build_head(s, B, boss):
         tube(bm, polyline((0.3 * sx * s, -0.04 * s, 4.05 * s), (0.46 * sx * s, -0.02 * s, 4.18 * s), 4,
                           bend=lambda t: Vector((0, 0, -0.06 * s * t * t))), [0.07 * s, 0.06 * s, 0.05 * s, 0.035 * s, 0.01 * s], sides=7)
         add("SackEar%d" % sx, bm, "Burlap", burlap_tint("ear%d" % sx, base=(0.55, 0.42, 0.27)), rigid("Head"))
+    # the face sits ON the sack's front (owner note 2026-10-18: set at -0.33 it was buried
+    # inside the head, so a strawling read faceless and its portrait looked turned away)
+    def sack_front(x, z):
+        t = (z / s - 3.45) / 0.75
+        r = (0.13 + 0.33 * math.sin(min(1.0, t * 1.05) * math.pi) ** 0.7) * s
+        ry = r * 0.9
+        return -0.04 * s - ry * math.sqrt(max(0.0, 1.0 - (x / r) ** 2))
+
     bm = bmesh.new()
     for sx in (1, -1):
-        bmesh.ops.create_icosphere(bm, subdivisions=2, radius=0.065 * s,
-                                   matrix=Matrix.Translation((0.12 * sx * s, -0.33 * s, 3.92 * s)))
+        ex, ez = 0.12 * sx * s, 3.92 * s
+        bmesh.ops.create_icosphere(bm, subdivisions=2, radius=0.07 * s,
+                                   matrix=Matrix.Translation((ex, sack_front(ex, ez) + 0.01 * s, ez)))
     add("EmberEyes", bm, "ScarecrowGlow", flat_tint((1.0, 0.62, 0.2), 0.0), rigid("Head"))
     bm = bmesh.new()
     pts = []
     for i in range(9):
         x = lerp(-0.17, 0.17, i / 8) * s
         z = 3.72 * s - 0.035 * s * math.sin(i / 8 * math.pi)
-        pts.append(Vector((x, -0.33 * s + 0.03 * s * abs(i / 8 - 0.5), z)))
+        pts.append(Vector((x, sack_front(x, z) - 0.008 * s, z)))
     for i in range(len(pts) - 1):
         stitch_line(bm, pts[i], pts[i + 1], 1, s, 0.045)
     tube(bm, pts, [0.009 * s] * len(pts), sides=4)
@@ -1120,7 +1140,12 @@ def finish_part(part, layout_names):
     part.bm.free()
     obj = bpy.data.objects.new(part.name, me)
     bpy.context.scene.collection.objects.link(obj)
-    obj.data.materials.append(M.material("ScarecrowMatte" if part.mat in MERGED_MATTE else part.mat))
+    if CLOTH[0] and part.mat in CLOTH_PARTS:
+        # the boss's sackcloth: its own material with the weave (burlap_weave.py)
+        obj.data.materials.append(W.cloth_material())
+        W.box_uvs(obj, CLOTH_TILE)
+    else:
+        obj.data.materials.append(M.material("ScarecrowMatte" if part.mat in MERGED_MATTE else part.mat))
     color_part(obj, part.tint)
     weight_part(obj, part.weights, layout_names)
     return obj
@@ -1134,10 +1159,14 @@ def color_part(obj, tint):
     me.color_attributes.active_color_index = 0
     me.color_attributes.render_color_index = 0
     data = []
+    smooth_tint = getattr(tint, "smooth", False)
     for poly in me.polygons:
         for li in poly.loop_indices:
-            co = me.vertices[me.loops[li].vertex_index].co
-            c = M.lin(tint(co, poly.normal, poly.index))
+            v = me.vertices[me.loops[li].vertex_index]
+            if smooth_tint:
+                c = M.lin(tint(v.co, v.normal, v.index))
+            else:
+                c = M.lin(tint(v.co, poly.normal, poly.index))
             data.extend((max(0.0, c[0]), max(0.0, c[1]), max(0.0, c[2]), 1.0))
     col.data.foreach_set("color", data)
 
@@ -1172,6 +1201,7 @@ def build_character(kind):
     boss = kind == "thatchgrin"
     s = 1.0 if boss else 0.46
     STRAW_DENSITY[0] = 1.0 if boss else 0.4
+    CLOTH[0] = boss
     layout = bone_layout(s) + (crow_bones() if boss else [])
     B = {b[0]: b for b in layout}
     build_legs(s, B)
@@ -1192,6 +1222,8 @@ def build_character(kind):
         objs.append(head_obj)
     body = join(objs, "Thatchgrin" if boss else "Strawling")
     M.shade_smooth(body, 0.9)
+    # the folds sit in their own shade: occlusion baked into the vertex colour (rest pose)
+    W.bake_occlusion(body, strength=0.7 if boss else 0.55, distance=0.6 * s)
     arm = build_armature("Thatchgrin" if boss else "Strawling", layout)
     body.parent = arm
     mod = body.modifiers.new("Armature", "ARMATURE")
@@ -1236,7 +1268,7 @@ def export(arm, body, path):
         export_vertex_color_name="Col",
         export_all_vertex_colors=False,
         export_normals=True,
-        export_texcoords=False,
+        export_texcoords=True,
         export_tangents=False,
         export_materials="EXPORT",
         export_animations=True,

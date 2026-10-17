@@ -60,7 +60,9 @@ gm.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.2,
 ground.materials.append(gm)
 scene.collection.objects.link(gobj)
 
-rig = next(o for o in bpy.data.objects if o.type == "ARMATURE" and o.name.lower().startswith("thatch"))
+RIG = opt("--rig", "thatchgrin")
+rig = next(o for o in bpy.data.objects if o.type == "ARMATURE" and o.name.lower().startswith(RIG[:6]))
+PREFIX = "Thatchgrin" if RIG.startswith("thatch") else "Strawling"
 for o in bpy.data.objects:
     if o.type == "ARMATURE" and o is not rig:
         o.hide_render = True
@@ -75,7 +77,7 @@ def look(target, direction, dist, lens=50):
 
 
 def set_clip(name):
-    act = next((a for a in bpy.data.actions if a.name.endswith("|" + name) and a.name.startswith("Thatchgrin")), None)
+    act = next((a for a in bpy.data.actions if a.name.endswith("|" + name) and a.name.startswith(PREFIX)), None)
     rig.animation_data.action = act
     if act is not None and act.slots:
         rig.animation_data.action_slot = act.slots[0]
@@ -114,6 +116,25 @@ if "--measure" in argv:
         print("MEASURE t=%.2f " % t + " ".join("%s=(%.2f,%.2f,%.2f)" % (k, v.x, v.y, v.z) for k, v in pts.items()))
     sys.exit(0)
 
+if "--coat" in argv:
+    # the coat up close: chest, flank, back and the skirt's tails, in the idle pose
+    set_clip("Idle")
+    scene.frame_set(1)
+    bpy.context.view_layer.update()
+    chest = bone_world("Chest")
+    hips = bone_world("Hips")
+    for tag, c, d, dist in (
+        ("chest", chest + Vector((0, 0, -0.1)), Vector((-0.25, -1, 0.15)), 2.4),
+        ("flank", (chest + hips) / 2, Vector((-1, -0.35, 0.1)), 2.6),
+        ("back", (chest + hips) / 2, Vector((0.35, 1, 0.2)), 2.8),
+        ("skirt", hips + Vector((0, 0, -0.6)), Vector((0.6, 0.8, 0.05)), 2.6),
+        ("whole", (chest + hips) / 2, Vector((-0.7, -1, 0.25)), 5.5),
+    ):
+        look(c, d, dist, 50)
+        scene.render.filepath = os.path.join(out, "%scoat_%s.png" % (opt("--prefix", ""), tag))
+        bpy.ops.render.render(write_still=True)
+    sys.exit(0)
+
 if "--hand" in argv:
     set_clip(opt("--clip", "Idle"))
     scene.frame_set(int(round(1 + float(opt("--at", "0")) * fps)))
@@ -145,7 +166,9 @@ rm.use_nodes = True
 rm.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.15, 0.4, 0.85, 1)
 ref.data.materials.append(rm)
 set_clip(clip)
-target = Vector((0, -1.0, 2.1))
+target = Vector((0, -1.0, 2.1)) if PREFIX == "Thatchgrin" else Vector((0, -0.4, 1.0))
+if PREFIX != "Thatchgrin":
+    ref.location = (-0.8, -1.6, 0.9)
 for t in frames:
     scene.frame_set(int(round(1 + t * fps)))
     bpy.context.view_layer.update()

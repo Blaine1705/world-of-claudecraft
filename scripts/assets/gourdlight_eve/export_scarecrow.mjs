@@ -9,12 +9,20 @@
 //    Swelling Gourd (swelling_gourd.py).
 // 2. Optimizes them through scripts/assets/build_assets.mjs with
 //    specs/gourdlight_scarecrow.json into public/models/creatures/.
+// 3. KTX2: Old Thatchgrin's sackcloth weave (scarecrow.py + burlap_weave.py) goes to
+//    KTX2, the albedo tile ETC1S and the normal tile UASTC (KTX_BIN=<KTX-Software bin>).
 // Then regenerate the media manifest:
 //   node scripts/build_media_manifest.mjs generate
 import { spawnSync } from 'node:child_process';
-import { mkdirSync } from 'node:fs';
+import fs, { mkdirSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { Mode, toktx } from '@gltf-transform/cli';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { meshopt } from '@gltf-transform/functions';
+import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
@@ -69,3 +77,31 @@ run(process.execPath, [
   path.join(ROOT, 'scripts/assets/build_assets.mjs'),
   path.join(ROOT, 'scripts/assets/specs/gourdlight_scarecrow.json'),
 ]);
+
+// 3. the weave tiles to KTX2 (the boss GLB is the only one that carries textures)
+if (process.env.KTX_BIN) {
+  process.env.PATH = `${process.env.PATH ?? ''}${path.delimiter}${process.env.KTX_BIN}`;
+}
+const rootRequire = createRequire(import.meta.url);
+const cliRequire = createRequire(rootRequire.resolve('@gltf-transform/cli'));
+const sharp = (await import(pathToFileURL(cliRequire.resolve('sharp')).href)).default;
+await MeshoptDecoder.ready;
+await MeshoptEncoder.ready;
+const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
+  'meshopt.decoder': MeshoptDecoder,
+  'meshopt.encoder': MeshoptEncoder,
+});
+io.setLogger({ debug() {}, info() {}, warn() {}, error: (m) => console.error(m) });
+const BOSS = path.join(ROOT, 'public/models/creatures/gourdlight_thatchgrin.glb');
+const doc = await io.readBinary(fs.readFileSync(BOSS));
+await doc.transform(
+  toktx({ mode: Mode.UASTC, slots: /normalTexture/, jobs: 1, encoder: sharp }),
+  toktx({ mode: Mode.ETC1S, slots: /baseColorTexture/, jobs: 1, encoder: sharp }),
+  meshopt({ encoder: MeshoptEncoder, level: 'high' }),
+);
+const buf = Buffer.from(await io.writeBinary(doc));
+const json = JSON.parse(buf.toString('utf8', 20, 20 + buf.readUInt32LE(12)));
+const left = (json.images ?? []).filter((i) => i.mimeType !== 'image/ktx2');
+if (left.length) throw new Error(`${BOSS}: ${left.length} textures were not converted to KTX2`);
+fs.writeFileSync(BOSS, buf);
+console.log(path.relative(ROOT, BOSS), `${(buf.length / 1024).toFixed(0)}KB`, 'images', json.images?.length ?? 0);
