@@ -398,10 +398,10 @@ const HDRI_SUN_U: Record<SkyKey, number> = {
 // sunset gold, day blue), so the heavy grades that faked those moods over
 // shared photographs are retired.
 const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
-  vale: [1, 1, 1],
+  vale: [0.94, 1.04, 1.14],
   marsh: [1, 1, 1],
-  peaks: [1, 1, 1],
-  beach: [1, 1, 1],
+  peaks: [0.95, 1.03, 1.12],
+  beach: [0.94, 1.05, 1.14],
   desert: [1, 1, 1],
   volcano: [1, 1, 1],
   cave: [1, 1, 1],
@@ -409,13 +409,13 @@ const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
   ember: [1, 1, 1],
   frost: [1, 1, 1],
   amber: [1, 1, 1],
-  fen: [1, 1, 1],
+  fen: [0.95, 1.04, 1.12],
   night: [1, 1, 1],
   haunt: [1, 1, 1],
-  jungle: [1, 1, 1],
-  garden: [1, 1, 1],
-  gale: [1, 1, 1],
-  farshore: [1, 1, 1],
+  jungle: [0.95, 1.04, 1.1],
+  garden: [0.95, 1.04, 1.12],
+  gale: [0.95, 1.03, 1.12],
+  farshore: [0.94, 1.05, 1.14],
 };
 
 const hdriStore: Partial<Record<SkyKey, THREE.Texture>> = {};

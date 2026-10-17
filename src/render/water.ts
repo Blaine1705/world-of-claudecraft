@@ -225,13 +225,13 @@ const WATER_CHOP_EDGE_FEATHER_YARDS = 14;
 const WATER_APRON_SWELL_GATE_MARGIN_YARDS = 1;
 const WATER_PLANE_SWELL_GATE_MARGIN_YARDS = 0;
 /** Sun-through-swell scattering tint: the turquoise a lit wave face glows. */
-const SCATTER_COLOR = new THREE.Color(0.09, 0.38, 0.33);
+const SCATTER_COLOR = new THREE.Color(0.14, 0.64, 0.6);
 
-const DEEP_COLOR = new THREE.Color(0x0d3a52);
+const DEEP_COLOR = new THREE.Color(0x115898);
 /** Canonical shallow-water tint, exported for surfaces that must match the
  *  sea palette without the full shader (the Wildheart waterfall ribbons). */
-export const SHALLOW_COLOR = new THREE.Color(0x2d8077);
-const SKY_TINT = new THREE.Color(0x7fb2e0); // matches the sky horizon band
+export const SHALLOW_COLOR = new THREE.Color(0x32d0cc);
+const SKY_TINT = new THREE.Color(0xace0fa); // matches the sky horizon band
 const SUN_COLOR = new THREE.Color(0xfff0d4);
 
 /** The four water tones, sRGB hex (the palette lab's water row). */
@@ -539,10 +539,10 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   // shared-LCG call order in textures.ts for everything generated after
   waterNormalMaps();
   const simulation = renderer ? new WaterSimulation(renderer) : null;
-  // The waterRipples setting, applied via setWavesEnabled. Starts false to
+  // The waterRipples setting, applied via setWavesEnabled. Starts true to
   // match the setting's default; the renderer syncs the persisted value right
-  // after construction, so a player who opted in never sees a calm frame.
-  let wavesEnabled = false;
+  // after construction.
+  let wavesEnabled = true;
   const wave = simulation ? simulation.uniforms : zeroWaveUniforms();
   // The FFT sea and the sky it reflects. Both need the world renderer; without
   // one (tests, a surface built for a thumbnail) the surface draws calm water.
@@ -1409,15 +1409,75 @@ function buildPhongWater(): WaterView {
   const tex = waterNormalish();
   const [norm] = waterNormalMaps();
   const mat = new THREE.MeshPhongMaterial({
-    color: 0x2a6a96,
+    color: 0x1e98be,
     transparent: true,
-    opacity: 0.8,
-    shininess: 140,
-    specular: 0xd8ecff,
+    opacity: 0.78,
+    shininess: 180,
+    specular: 0xfff2d6,
     map: tex,
     normalMap: norm,
-    normalScale: new THREE.Vector2(0.8, 0.8),
+    normalScale: new THREE.Vector2(0.85, 0.85),
   });
+  mat.onBeforeCompile = (sh) => {
+    sh.uniforms.uWocShallow = { value: SHALLOW_COLOR };
+    sh.uniforms.uWocDeep = { value: DEEP_COLOR };
+    sh.uniforms.uWocSky = { value: SKY_TINT };
+    sh.uniforms.uWocSunCol = { value: SUN_COLOR };
+    sh.uniforms.uWocSunDir = WATER_SUN_UNIFORM;
+    sh.uniforms.uWocWaterTime = WATER_TIME;
+    sh.vertexShader = sh.vertexShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vWocWaterWPos;`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+        vWocWaterWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`,
+      );
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vWocWaterWPos;
+        uniform vec3 uWocShallow;
+        uniform vec3 uWocDeep;
+        uniform vec3 uWocSky;
+        uniform vec3 uWocSunCol;
+        uniform vec3 uWocSunDir;
+        uniform float uWocWaterTime;`,
+      )
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+        vec3 wocViewVec = cameraPosition - vWocWaterWPos;
+        float wocDist = length(wocViewVec);
+        vec3 wocV = wocViewVec / max(wocDist, 1e-4);
+        float wocGraze = 1.0 - clamp(wocV.y, 0.0, 1.0);
+        float wocFresnel = 0.08 + 0.92 * wocGraze * wocGraze * wocGraze;
+        float wocDistW = smoothstep(14.0, 240.0, wocDist);
+        float wocLane = sin(vWocWaterWPos.x * 0.045 + vWocWaterWPos.z * 0.038 + uWocWaterTime * 0.9)
+          * cos(vWocWaterWPos.x * 0.028 - vWocWaterWPos.z * 0.052 - uWocWaterTime * 0.7) * 0.5 + 0.5;
+        vec3 wocSeaCol = mix(uWocShallow, uWocDeep, clamp(wocDistW * 0.72 + wocLane * 0.24, 0.0, 1.0));
+        wocSeaCol = mix(wocSeaCol, uWocSky, min(wocFresnel * 0.55, 0.38));
+        diffuseColor.rgb = mix(diffuseColor.rgb * wocSeaCol * 1.35, wocSeaCol, 0.68);
+        diffuseColor.a = clamp(mix(0.56, 0.88, clamp(wocDistW * 0.55 + wocFresnel * 0.45, 0.0, 1.0)), 0.0, 1.0);`,
+      )
+      .replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+        totalEmissiveRadiance += mix(uWocShallow, uWocDeep, wocDistW) * 0.22;
+        vec3 wocWaveN = normalize(vec3(
+          sin(vWocWaterWPos.x * 1.3 + uWocWaterTime * 2.2) * 0.08,
+          1.0,
+          cos(vWocWaterWPos.z * 1.1 - uWocWaterTime * 1.9) * 0.08
+        ));
+        vec3 wocRefl = reflect(-normalize(uWocSunDir), wocWaveN);
+        float wocGlint = exp2(48.0 * log2(max(dot(wocRefl, wocV), 1e-8)));
+        totalEmissiveRadiance += uWocSunCol * wocGlint * 0.55;`,
+      );
+  };
   // low tier gets the same to-the-horizon apron by simply oversizing the
   // one plane (the tiled texture keeps its density via the repeat bump)
   const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z + 2400;
@@ -1437,6 +1497,7 @@ function buildPhongWater(): WaterView {
     // The low tier has no height field at all: a Phong plane cannot sample one,
     // and the tier exists precisely to skip that GPU work.
     update(time: number): number {
+      WATER_TIME.value = time % OCEAN_LOOP_SECONDS;
       tex.offset.x = time * 0.008;
       tex.offset.y = time * 0.011;
       norm.offset.x = time * 0.006;

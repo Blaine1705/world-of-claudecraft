@@ -1104,8 +1104,7 @@ const SWIM_STRIDE = 2.4;
 // Surface kick: beats per second at a standstill, quickening with swim speed,
 // and how far behind the pivot the prone body's feet trail (as a fraction of
 // stand height, the authored stroke lays the legs out behind the hips).
-const SWIM_KICK_HZ = 2.6;
-const SWIM_FOOT_TRAIL = 0.19;
+const SWIM_KICK_HZ = 1 / 1.667;
 // fire/torch point lights beyond this never shine (their falloff range is
 // shorter anyway); the nearest GFX.maxPointLights within it win the budget
 const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
@@ -1162,8 +1161,8 @@ const WARM_SUN_COLOR = 0xff7a28;
 // call site, so none of this warmth reaches the moonlit night.
 const WARM_HEMI_SKY_COLOR = 0xffdfbd;
 const WARM_HEMI_GROUND_COLOR = 0x725038;
-const DAY_HEMI_SKY_WARMTH = 0.3;
-const DAY_HEMI_GROUND_WARMTH = 0.22;
+const DAY_HEMI_SKY_WARMTH = 0.12;
+const DAY_HEMI_GROUND_WARMTH = 0.1;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
@@ -1694,11 +1693,11 @@ export class Renderer {
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
   private waterView: WaterView;
   private lastWaterSimulationPasses = 0;
-  // The waterRipples setting (default off), threaded in via setWaterRipples
+  // The waterRipples setting (default on), threaded in via setWaterRipples
   // because render modules never read the settings store directly. Held here
   // so an editor water rebuild re-applies the player's choice to the fresh
   // WaterView.
-  private waterRipplesEnabled = false;
+  private waterRipplesEnabled = true;
   private terrainView: TerrainView;
   // Map-editor placed GLB assets; null when the world has none and the editor
   // never asked for the view (the shipped game with the built-in world).
@@ -2642,19 +2641,12 @@ export class Renderer {
     setRenderCategory(this.motes.group, 'ambient');
     this.scene.add(this.motes.group);
     // near-field solid-blade carpet; the card tufts own the mid/far field
-    this.bladeGrass = buildBladeGrass(
-      this.sim.cfg.seed,
-      this.sim.player.pos.x,
-      this.sim.player.pos.z,
-    );
+    const editorCarpet = options.editorClutter === true;
+    this.bladeGrass = buildBladeGrass(this.sim.cfg.seed, this.sim.player.pos.x, this.sim.player.pos.z, editorCarpet);
     this.scene.add(this.bladeGrass.group);
     // the meadow-continuum blade band: the same clusters carried out to the
     // band radius over the painted ground (blade_grass_band.ts)
-    this.bladeGrassBand = buildBladeGrassBand(
-      this.sim.cfg.seed,
-      this.sim.player.pos.x,
-      this.sim.player.pos.z,
-    );
+    this.bladeGrassBand = buildBladeGrassBand(this.sim.cfg.seed, this.sim.player.pos.x, this.sim.player.pos.z, editorCarpet);
     this.scene.add(this.bladeGrassBand.group);
     // boulders on the steep-slope band; cliffs stop being bare wedges
     this.cliffScree = buildCliffScree(this.sim.cfg.seed);
@@ -5016,14 +5008,13 @@ export class Renderer {
     this.time += dt;
     sharedUniforms.uTime.value = this.time;
     // the paint-free carpet ring the terrain splat reads (see terrain.ts)
-    sharedUniforms.uCarpetRing.value.set(p.pos.x, p.pos.z, GFX.bladeCarpetRadius);
+    const focusX = this.editorCam ? this.editorCam.target.x : p.pos.x;
+    const focusZ = this.editorCam ? this.editorCam.target.z : p.pos.z;
+    sharedUniforms.uCarpetRing.value.set(focusX, focusZ, GFX.bladeCarpetRadius || (this.editorCam ? 34 : 0));
     // The sway/wind/rock gate ranks from the free-cam LOOK-AT in the editor
     // (the applyZoneAtmosphere rule): the dummy player rides the camera, and a
     // maker inspecting a ship from 120 yards out would see it frozen.
-    updateTreeSwayPlayer(
-      this.editorCam ? this.cameraLookAt.x : p.pos.x,
-      this.editorCam ? this.cameraLookAt.z : p.pos.z,
-    ); // the placed sway/wind gate (tree_sway.ts)
+    updateTreeSwayPlayer(focusX, focusZ); // the placed sway/wind gate (tree_sway.ts)
     this.tmpV.set(p.pos.x, p.pos.y, p.pos.z);
     this.updateCamera(this.tmpV, dt);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
@@ -9392,14 +9383,14 @@ export class Renderer {
       // lowness ramp runs the warm all the way to 1 at the horizon so sunrise
       // and sunset go genuinely orange, and the gate takes the whole warm off
       // below it so the moonlight never picks up a sunset tint.
-      // The base sits at 0.58 rather than the first cut's 0.52: standing
-      // daylight read clinical, and this is a couple hundred kelvin of golden
-      // bias (a vale noon key lands near rgb 255,182,144 instead of
-      // 255,189,152), not an orange midday. The lowness ramp reaches full at
+      // The base sits at 0.18 (was 0.58): the painted look wants a clean,
+      // near-white noon key so sand reads khaki and grass yellow-green, not
+      // peach (0.58 landed a vale noon key near rgb 255,182,144); dawn and
+      // dusk keep their full orange through the lowness ramp, which reaches full at
       // y 0.12 rather than 0.08 so the key light is already at its sunset
       // orange while the gate still passes it at full strength, which is what
       // makes the golden hour read as a band rather than an instant.
-      const warmAmt = sunsetWarmGate(sunElev) * (0.58 + lowness * 0.42);
+      const warmAmt = sunsetWarmGate(sunElev) * (0.18 + lowness * 0.82);
       // The realm's own night hue, as a luminance-neutral multiplier. Applied
       // to the key light and both hemisphere halves AFTER they cool toward the
       // moon, so a realm keeps tinting the world it lights after dark: the
@@ -9786,15 +9777,10 @@ export class Renderer {
     this.time += dt;
     sharedUniforms.uTime.value = this.time;
     // the paint-free carpet ring the terrain splat reads (see terrain.ts)
-    sharedUniforms.uCarpetRing.value.set(
-      this.sim.player.pos.x,
-      this.sim.player.pos.z,
-      GFX.bladeCarpetRadius,
-    );
-    updateTreeSwayPlayer(
-      this.editorCam ? this.cameraLookAt.x : this.sim.player.pos.x,
-      this.editorCam ? this.cameraLookAt.z : this.sim.player.pos.z,
-    );
+    const focusX = this.editorCam ? this.editorCam.target.x : this.sim.player.pos.x;
+    const focusZ = this.editorCam ? this.editorCam.target.z : this.sim.player.pos.z;
+    sharedUniforms.uCarpetRing.value.set(focusX, focusZ, GFX.bladeCarpetRadius || (this.editorCam ? 34 : 0));
+    updateTreeSwayPlayer(focusX, focusZ);
     for (const [id, remaining] of this.waterJetVisualChannels) {
       const next = remaining - dt;
       if (next <= 0) this.waterJetVisualChannels.delete(id);
@@ -11022,11 +11008,11 @@ export class Renderer {
             v.waterContactX = ax;
             v.waterContactZ = az;
             v.waterContactAccum = 0;
-          } else if (waterDistanceSq > 0.0016 && v.waterContactAccum >= 1 / 24) {
+          } else if (!swimming && waterDistanceSq > 0.0225 && v.waterContactAccum >= 0.24) {
             const contactSpeed = Math.sqrt(waterDistanceSq) / Math.max(v.waterContactAccum, 0.001);
             const wakeStrength = Math.min(
-              1.6,
-              Math.max(0.28, (0.34 + contactSpeed * 0.095) * (0.45 + contactImmersion * 0.75)),
+              0.85,
+              Math.max(0.2, (0.22 + contactSpeed * 0.06) * (0.4 + contactImmersion * 0.5)),
             );
             this.waterView.moveContact(
               v.waterContactX,
@@ -11056,7 +11042,7 @@ export class Renderer {
             releaseHalfLength,
             contactAxisX,
             contactAxisZ,
-            0.68,
+            0.85,
           );
         }
         v.waterContactActive = false;
@@ -11064,19 +11050,22 @@ export class Renderer {
         v.waterContactX = ax;
         v.waterContactZ = az;
       }
-      // Surface swimmers churn the water where their feet kick. A SUBMERGED
-      // swimmer emits nothing at all: there is no surface up there to break,
-      // and the quiet is the point of going under.
-      if (swimming && !submerged && !visuallyDead && charOnScreen && Number.isFinite(wl)) {
-        v.swimKickPhase += dt * SWIM_KICK_HZ * (0.55 + Math.min(1.1, loco.speed / 3.2));
+      // Surface swimmers emit one Genshin-style wake VFX + ripple per
+      // breaststroke pull (1.667s cycle); waders emit spray on stride cadence.
+      if (swimming && moving && !submerged && !visuallyDead && charOnScreen && Number.isFinite(wl)) {
+        if (!v.wasSwimming || v.swimKickPhase <= 0) v.swimKickPhase = 0.76;
+        v.swimKickPhase += dt * SWIM_KICK_HZ * THREE.MathUtils.clamp(loco.speed / 4.55, 0.55, 1.4);
         if (v.swimKickPhase >= 1) {
           v.swimKickPhase -= 1;
-          const trail = active.height * e.scale * SWIM_FOOT_TRAIL;
-          const footX = ax - contactAxisX * trail;
-          const footZ = az - contactAxisZ * trail;
-          const kick = Math.min(1.3, 0.5 + loco.speed * 0.09);
-          this.vfx.swimKickSplash(footX, wl, footZ, contactAxisX, contactAxisZ, kick);
-          this.waterView.addSplash(footX, footZ, contactRadius * 0.8, kick * 0.5);
+          const kick = Math.min(1.35, 0.65 + loco.speed * 0.08);
+          this.vfx.swimKickSplash(ax, wl, az, contactAxisX, contactAxisZ, kick);
+          this.waterView.addSplash(ax, az, contactRadius * 0.95, kick * 0.48);
+        }
+      } else if (touchesWater && !swimming && moving && !airborne && !visuallyDead && charOnScreen && Number.isFinite(wl)) {
+        v.swimKickPhase += dt * SWIM_KICK_HZ * 1.45 * THREE.MathUtils.clamp(loco.speed / 5.5, 0.6, 1.3);
+        if (v.swimKickPhase >= 1) {
+          v.swimKickPhase -= 1;
+          this.vfx.swimKickSplash(ax, wl, az, contactAxisX, contactAxisZ, 0.75);
         }
       } else {
         v.swimKickPhase = 0;
@@ -11714,10 +11703,10 @@ export class Renderer {
       p.pos.x,
       p.pos.z,
     );
-    this.bladeGrass.update(p.pos.x, p.pos.z);
+    this.bladeGrass.update(focusX, focusZ);
     // fogFar here is subsystemCullFar(): the residency-clamped detail
     // horizon, so band blades never stand past unbuilt ground
-    this.bladeGrassBand.update(p.pos.x, p.pos.z, fogFar, this.fogState === 'outdoor');
+    this.bladeGrassBand.update(focusX, focusZ, fogFar, this.fogState === 'outdoor');
     this.cliffScree.update(p.pos.x, p.pos.z);
     this.cityClutter.update(this.camera.position.x, this.camera.position.z);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'ambientScenery', worldStart);

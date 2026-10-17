@@ -12,6 +12,7 @@ import {
 import { GFX, SCENERY_DETAIL_BANDS } from './gfx';
 import { GHOST_HIDE_ATTRIBUTE } from './instanced_dither_fade';
 import { LowSceneryBands, type SceneryBandsRenderer, sceneryBandsHost } from './scenery_bands';
+import { LOW_SCENERY_BUDGET } from './scenery_bands/policy_core';
 import { SceneryDetailBatches } from './scenery_detail_batches';
 import {
   inSceneryRegion,
@@ -686,6 +687,12 @@ export function sceneryFar(
   distance: number,
 ): number {
   return sceneryCullFar(horizon.sceneryCullFar(distance));
+}
+export function isLowSceneryCullActive(fogFar: number): boolean {
+  return !!lowBands || fogFar <= LOW_SCENERY_BUDGET.full;
+}
+export function sceneryStructureFar(fogFar: number): number {
+  return isLowSceneryCullActive(fogFar) ? Math.max(fogFar, LOW_SCENERY_BUDGET.far) : fogFar;
 }
 export function sceneryDetailSnapshot(): object | null {
   if (lowBands) return lowBands.snapshot();

@@ -412,3 +412,26 @@ export function insideEastbrookGrassExclusion(
   }
   return false;
 }
+
+/** True when a grass candidate falls inside any placed building's footprint. */
+export function insideAnyBuildingFootprint(
+  buildings: readonly BuildingDef[],
+  x: number,
+  z: number,
+  padding: number,
+): boolean {
+  for (let i = 0; i < buildings.length; i++) {
+    const b = buildings[i];
+    const dx = x - b.x;
+    const dz = z - b.z;
+    const cos = Math.cos(b.rot);
+    const sin = Math.sin(b.rot);
+    const localX = dx * cos - dz * sin;
+    const localZ = dx * sin + dz * cos;
+    if (Math.abs(localX) < b.w * 0.5 + padding && Math.abs(localZ) < b.d * 0.5 + padding) {
+      return true;
+    }
+  }
+  return false;
+}
+

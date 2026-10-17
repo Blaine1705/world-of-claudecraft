@@ -67,9 +67,12 @@ describe('celShadingFromQuery', () => {
     expect(celShadingFromQuery('?zonehaze=off&celbands=3')).toBeNull();
   });
 
-  it('opts in on cel=on or cel=1 with the defaults', () => {
+  it('opts in on cel=on or cel=1 with the defaults, or by default when defaultOn is true', () => {
     expect(celShadingFromQuery('?cel=on')).toEqual(CEL_SHADING_DEFAULTS);
     expect(celShadingFromQuery('?gfx=ultra&cel=1')).toEqual(CEL_SHADING_DEFAULTS);
+    expect(celShadingFromQuery('', true)).toEqual(CEL_SHADING_DEFAULTS);
+    expect(celShadingFromQuery('?cel=off', true)).toBeNull();
+    expect(celShadingFromQuery('?cel=0', true)).toBeNull();
   });
 
   it('reads and clamps every tuning knob', () => {

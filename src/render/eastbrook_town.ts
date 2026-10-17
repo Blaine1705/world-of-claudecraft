@@ -46,6 +46,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { placedTownCullRadius } from './placed_town_buildings';
 import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import {
@@ -53,7 +54,11 @@ import {
   buildRealmBuilderMonumentFx,
 } from './realm_builder_monument_fx';
 import type { RevealGateCore } from './reveal_gate_core';
-import { prepareSceneryDetailRoot } from './scenery_detail';
+import {
+  isLowSceneryCullActive,
+  prepareSceneryDetailRoot,
+  sceneryStructureFar,
+} from './scenery_detail';
 import {
   newTownPiecewiseReveal,
   orderTownRootsNearestFirst,
@@ -74,8 +79,17 @@ const FOUNDATION_COLOR = 0x46505e;
 // authored windows. Panes derived from the real window frames sit exactly in
 // the models' openings; the earlier bounding-box guesses floated off walls.
 const KIT_WINDOW_AMBER = 0xffb45a;
-const TOWN_CULL_RADIUS =
-  EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
+const TOWN_CULL_RADIUS = Math.max(
+  placedTownCullRadius(
+    {
+      hub: { center: { x: 0, z: 0 }, radius: EASTBROOK_LAYOUT.wall.radius },
+      buildings: EASTBROOK_LAYOUT.buildings,
+    },
+    EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2,
+  ),
+  Math.hypot(EASTBROOK_LAYOUT.weeklyVault.x, EASTBROOK_LAYOUT.weeklyVault.z) +
+    Math.hypot(EASTBROOK_LAYOUT.weeklyVault.w / 2, EASTBROOK_LAYOUT.weeklyVault.d / 2),
+);
 /** The one reveal-gate key of the town's static content. */
 const STATIC_REVEAL_KEY = 'eastbrook-town-static';
 
@@ -1386,12 +1400,16 @@ function buildFromTemplates(
       monumentFx.update(reducedMotion, monumentDistance);
       lastCamX = camX;
       lastCamZ = camZ;
+      const lowCull = isLowSceneryCullActive(fogFar);
+      const structureFar = sceneryStructureFar(fogFar);
+      const cullX = lowCull ? eyeX : camX;
+      const cullZ = lowCull ? eyeZ : camZ;
       // Eastbrook is centred on the world origin, so the camera's distance
       // squared to the town centre is camX^2 + camZ^2.
       const reveal = townStaticReveal(
-        eastbrookFogVisible(camX, camZ, 0, 0, fogFar, TOWN_CULL_RADIUS),
+        eastbrookFogVisible(cullX, cullZ, 0, 0, structureFar, TOWN_CULL_RADIUS),
         staticRevealed,
-        camX * camX + camZ * camZ,
+        cullX * cullX + cullZ * cullZ,
         TOWN_CULL_RADIUS,
         revealGate,
         STATIC_REVEAL_KEY,
@@ -1421,7 +1439,9 @@ function buildFromTemplates(
           eyeX,
           eyeY,
           eyeZ,
-          fogFar,
+          structureFar,
+          cullX,
+          cullZ,
         );
         target.group.visible =
           roofVisibilityPlan.visible &&
@@ -1643,6 +1663,7 @@ export function eastbrookStyledPlacedObject(
 /** Test-only access to the tier-independent preload and deterministic build contract. */
 export const eastbrookTownInternalsForTest = {
   rootName: ROOT_NAME,
+  townCullRadius: TOWN_CULL_RADIUS,
   newAssetUrls: NEW_ASSET_URLS,
   supportAssetUrls: SUPPORT_ASSET_URLS,
   allAssetUrls: ALL_ASSET_URLS,

@@ -45,6 +45,7 @@ import {
 import {
   eastbrookGrassExclusions,
   hashAt,
+  insideAnyBuildingFootprint,
   insideEastbrookGrassExclusion,
   insideGrassHubExclusion,
   insidePavedGrassExclusion,
@@ -106,6 +107,7 @@ import {
   shadowVolumeMoved,
 } from './foliage_shadow_core';
 import { foliageShoreSkip } from './foliage_shore_gate_core';
+import { resolveTreeLeafColor, sculptFoliageTreeGeometry } from './foliage_tree_sculpt';
 import {
   gardenLushGrassAt,
   gardenMeadowTintAt,
@@ -187,7 +189,7 @@ export { setFoliageFarPlacements } from './foliage_editor_scope';
 
 const GRASS_CHUNK_SIZE = 48;
 const GRASS_CHUNK_BUILD_BUDGET_MS = 2.2;
-const GRASS_DENSITY_LOW = 0.38;
+const GRASS_DENSITY_LOW = 0.48;
 const GRASS_DENSITY_HIGH = 0.5;
 // Per-biome grass density multipliers over the base above. The Reach is bare
 // snow (no blades, and with them no ground flowers); the Wraithwood's floor is
@@ -226,7 +228,7 @@ const GRASS_WIND_STRENGTH = 0.16;
 // N·L under a high sun and flattened whole canopies into one value; the
 // sphere target keeps the shaded side lit through the sky term while giving
 // the canopy a real lit side and shade side.
-const LEAF_UP_NORMAL_BLEND = 0.7;
+const LEAF_UP_NORMAL_BLEND = 0.04;
 // two x-halves x 240u z-bands: bucket count x variants-per-bucket is the
 // foliage draw budget — see the perBucket caps in the species specs
 const BUCKET_DEPTH = 240;
@@ -386,10 +388,10 @@ export const foliagePreloadInternalsForTest = {
 // their own hue, so tints are lerped most of the way to white before use
 // (raw tints multiply into the albedo and read as grime).
 const PINE_TINT: Record<BiomeId, number> = {
-  vale: 0x9bb48d,
+  vale: 0x5c9e44,
   marsh: 0x87966b,
-  peaks: 0x6f8a7a,
-  beach: 0xa8b878,
+  peaks: 0x629e74,
+  beach: 0x92d462,
   desert: 0xa8a468,
   volcano: 0x6a5f52,
   cave: 0x77837a,
@@ -397,18 +399,18 @@ const PINE_TINT: Record<BiomeId, number> = {
   ember: 0x93a06b,
   frost: 0x7e99a2, // frosted but dark: pines hold their shape at distance
   amber: 0xb89a52, // autumn-burnished pines
-  fen: 0x8fae7e,
+  fen: 0x72ba64,
   night: 0x8040e0, // dream-violet boughs (saturated: soften + green albedo wash it out)
   haunt: 0x36443a, // dead dark needles
   jungle: 0x3f9450, // deep tropical green
-  garden: 0x4a8a4e, // clipped evergreen
-  gale: 0x5a8a58, // wind-hardened scrub
+  garden: 0x58a852, // clipped evergreen
+  gale: 0x68a862, // wind-hardened scrub
 };
 const OAK_TINT: Record<BiomeId, number> = {
-  vale: 0xa7b886,
+  vale: 0x64be4a,
   marsh: 0x8d9865,
-  peaks: 0x92a37f,
-  beach: 0xb2bd7e,
+  peaks: 0x7eb46e,
+  beach: 0x98d25e,
   desert: 0xb0a468,
   volcano: 0x74624f,
   cave: 0x84907f,
@@ -416,18 +418,18 @@ const OAK_TINT: Record<BiomeId, number> = {
   ember: 0xa8a060,
   frost: 0x84989e,
   amber: 0xd8852f, // fire-orange canopy
-  fen: 0x9dc47e, // lush wetland green
+  fen: 0x86ca64, // lush wetland green
   night: 0xb03cf0, // vivid orchid canopy (soften + green albedo wash it out)
   haunt: 0x424c38, // gnarled grey-green canopy
   jungle: 0x46b04e, // lush broadleaf canopy
-  garden: 0x55a655, // specimen-tree green
-  gale: 0x669660, // stunted wind-bent crowns
+  garden: 0x68bc58, // specimen-tree green
+  gale: 0x78b464, // stunted wind-bent crowns
 };
 const ROCK_TINT: Record<BiomeId, number> = {
-  vale: 0x8d8d85,
+  vale: 0x989a94,
   marsh: 0x565c4e,
-  peaks: 0x878e99,
-  beach: 0xb0a894,
+  peaks: 0x949ca8,
+  beach: 0xc2b89e,
   desert: 0xb08d6a,
   volcano: 0x4a4038,
   cave: 0x6a6a66,
@@ -435,15 +437,15 @@ const ROCK_TINT: Record<BiomeId, number> = {
   ember: 0x9a7a62,
   frost: 0x9aa8b8,
   amber: 0x9a8a70,
-  fen: 0x7e8a76,
+  fen: 0x8e9688,
   night: 0xa094c8,
   haunt: 0x565a50,
   jungle: 0x7e8a6a,
-  garden: 0x9a9a92, // marble and pale stone
-  gale: 0x8a8e90, // salt-grey sea rock
+  garden: 0xa2a49c, // marble and pale stone
+  gale: 0x929698, // salt-grey sea rock
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
-  vale: 0xffffff,
+  vale: 0xecdfcc,
   marsh: 0xd2d8bc,
   peaks: 0xd9dde4,
   beach: 0xf2e4c8,
@@ -462,15 +464,13 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   gale: 0x9a8a74,
 };
 // Per-biome grass accents, normalized against the vale entry at build time:
-// the per-instance tuft tint starts from the ground colour under the tuft
-// (same palette zone blend and patch noise the terrain vertex colours use),
-// then multiplies in the biome accent so authored casts survive (night stays
-// orchid, jungle stays wet-bright) while the base still tracks the meadow.
+// the per-instance tuft tint starts from the ground colour under the tuft,
+// then multiplies in the biome accent so authored casts survive.
 const GRASS_TINT: Record<BiomeId, number> = {
-  vale: 0xdde4c0,
+  vale: 0xc2e29a,
   marsh: 0xbfc492,
   peaks: 0xc2cec8,
-  beach: 0xe8e2b0,
+  beach: 0xecf0b4,
   desert: 0xdcc890,
   volcano: 0x8a7a68,
   cave: 0xa2a89c,
@@ -478,16 +478,15 @@ const GRASS_TINT: Record<BiomeId, number> = {
   ember: 0xd8c890,
   frost: 0xdde8f2,
   amber: 0xe8cf8a,
-  fen: 0xcfe4b0,
+  fen: 0xd2eeb0,
   night: 0xe598ff, // orchid dream grass (green blade albedo mutes it)
   haunt: 0x99a382, // sickly pale grass
   jungle: 0xc4ec96, // bright wet tropical grass
   garden: 0xd0eeb0, // mown lawn
-  gale: 0xb8d09a, // wind-silvered grass
+  gale: 0xc0dc9e, // wind-silvered grass
 };
 // The cards are lit with up normals (see applyGrassShader), so no N.L
-// compensation is needed; per-channel because the grass photo the ground
-// multiplies in is not neutral against the tuft map.
+// compensation is needed; match the 1.18 lift of the 3D blade carpet.
 const GRASS_TINT_GAIN: readonly [number, number, number] = [1.08, 1.0, 0.7];
 const tuftTintChannel = (ground: number, gain: number): number =>
   Math.min(1, gain * (0.65 + 0.7 * ground));
@@ -510,7 +509,7 @@ const GRASS_ACCENT: Partial<Record<BiomeId, [number, number, number]>> = (() => 
 // Bush/fern dressing tint gain over the ground grass colour (same curve as
 // GRASS_TINT_GAIN); above 1 because the kit albedo is much darker than the
 // meadow it stands in.
-const DRESS_GROUND_GAIN: readonly [number, number, number] = [1.7, 1.55, 1.15];
+const DRESS_GROUND_GAIN: readonly [number, number, number] = [1.82, 1.72, 1.18];
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
 const DUSK_BLOOM_TINTS = [0x9e94ba, 0xd88fb0, 0xe8d8a0, 0x8fb8d8, 0xc88fd8];
@@ -528,10 +527,10 @@ const GARDEN_BLOOM_TINTS = [0xe84a6a, 0xf2a8c8, 0xffffff, 0xf2d0a0, 0xf2c94c, 0x
 // the Galecrest blooms sea thrift and campion: pink, white, pale violet
 const GALE_BLOOM_TINTS = [0xf29ab0, 0xffffff, 0xd8b0f2];
 const DRESS_TINT: Record<BiomeId, number> = {
-  vale: 0xaebf8e,
+  vale: 0x8ed25c,
   marsh: 0x8d9865,
-  peaks: 0x93a78f,
-  beach: 0xc2c188,
+  peaks: 0x84b67c,
+  beach: 0xa4d668,
   desert: 0xc0aa74,
   volcano: 0x7a6a58,
   cave: 0x8a948a,
@@ -539,16 +538,16 @@ const DRESS_TINT: Record<BiomeId, number> = {
   ember: 0xb8a878,
   frost: 0xc8d8e0,
   amber: 0xd8a860,
-  fen: 0xa8c48e,
+  fen: 0x8ad06a,
   night: 0xc078f2,
   haunt: 0x707a5e,
   jungle: 0x6cc064,
-  garden: 0x8cc27a,
-  gale: 0x84a878,
+  garden: 0x78c864,
+  gale: 0x80b86c,
 };
 // how far the authored-tint dressing path collapses toward white
-const DRESS_TINT_SOFTEN = 0.65;
-const DRESS_TINT_SOFTEN_LOW = 0.56;
+const DRESS_TINT_SOFTEN = 0.52;
+const DRESS_TINT_SOFTEN_LOW = 0.46;
 // Same accent normalization as GRASS_ACCENT: dressing tints ride on the
 // ground colour so bushes stop reading as flat biome-constant clumps, while
 // authored casts (violet night shrubs, jungle greens) survive the ride.
@@ -562,7 +561,7 @@ const DRESS_ACCENT: Partial<Record<BiomeId, [number, number, number]>> = (() => 
   return out;
 })();
 // how far tints collapse toward white (1 = no tint at all)
-const LEAF_TINT_SOFTEN = 0.6;
+const LEAF_TINT_SOFTEN = 0.38;
 // The night realm's exception: soften(violet) x green albedo can only land
 // on green, so its canopies take the orchid tint nearly raw and multiply
 // down to dark dream-plum instead
@@ -838,7 +837,7 @@ function addWind(mat: THREE.Material, strength: number, upNormalBlend = 0): void
         // where a straight-up bend gave every card the same N·L and flattened
         // the whole tree to one value. Model-local position: tree base at the
         // origin, so no instance transform is needed for the pivot.
-        vec3 canopyRad = vec3(position.x, (position.y - uCanopyPivotY) * 0.75 + 0.55, position.z);
+        vec3 canopyRad = vec3(position.x, max(0.38, (position.y - uCanopyPivotY) * 0.55 + 0.85), position.z);
         vec3 canopyDir = canopyRad / max(length(canopyRad), 1e-4);
         objectNormal = normalize(mix(objectNormal, canopyDir, uUpNormalBlend));`,
       )
@@ -1049,7 +1048,7 @@ function extractParts(url: string): ModelPart[] {
     const mesh = obj as THREE.Mesh;
     if (!mesh.isMesh) return;
     const srcMat = mesh.material as THREE.Material;
-    const geometry = bakeGeometry(mesh);
+    const geometry = sculptFoliageTreeGeometry(url, srcMat.name, bakeGeometry(mesh));
     parts.push({
       geometry,
       material: foliageMaterial(
@@ -1116,9 +1115,9 @@ function softTint(
 ): THREE.Color {
   out.setHex(hex).lerp(tmpWhite, soften);
   out.offsetHSL(
-    (hashAt(x, z, 1) - 0.5) * 0.05 * jitter,
-    (hashAt(x, z, 2) - 0.5) * 0.12 * jitter,
-    (hashAt(x, z, 3) - 0.5) * 0.1 * jitter,
+    (hashAt(x, z, 1) - 0.5) * 0.085 * jitter,
+    (hashAt(x, z, 2) - 0.5) * 0.16 * jitter,
+    (hashAt(x, z, 3) - 0.5) * 0.12 * jitter,
   );
   return out;
 }
@@ -1530,7 +1529,7 @@ function placeSpecies(
     lod: BucketMesh['lod'],
     minDist?: number,
     maxDist?: number,
-    atDetail?: { min?: boolean; max?: boolean },
+    atDetail?: { min?: boolean; max?: boolean; nearEdge?: boolean },
     spriteCategory?: ImpostorCategory,
     shadow?: ShadowCasterRow,
   ) => void,
@@ -1597,12 +1596,8 @@ function placeSpecies(
         const s = d.scale * spec.baseScale;
         const heightJitter = 1 + (hashAt(d.x, d.z, 31) - 0.5) * 0.18;
         const yaw = d.variant * 2.1 + hashAt(d.x, d.z, 11) * Math.PI * 2;
-        const tintHex =
-          spec.spriteTint === 'trunk'
-            ? TRUNK_TINT[d.biome]
-            : typeof spec.leafTint === 'number'
-              ? spec.leafTint
-              : spec.leafTint[d.biome];
+        const baseHex =
+          typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
         impostorBucket.add(
           row,
           d.x,
@@ -1611,14 +1606,9 @@ function placeSpecies(
           yaw,
           s,
           heightJitter,
-          softTint(
-            d.x,
-            d.z,
-            tintHex,
-            c,
-            spec.spriteTint === 'trunk' ? BARK_TINT_SOFTEN : leafSoften(d.biome),
-            spec.spriteTint === 'trunk' ? 0.5 : 1,
-          ),
+          spec.spriteTint === 'trunk'
+            ? softTint(d.x, d.z, TRUNK_TINT[d.biome], c, BARK_TINT_SOFTEN, 0.5)
+            : resolveTreeLeafColor(d.biome, d.x, d.z, baseHex, c, leafSoften(d.biome)),
         );
       };
       for (const group of handlesByLod) for (const d of group.items) addSprite(d);
@@ -1634,8 +1624,12 @@ function placeSpecies(
           im.setMatrixAt(i, m);
           group.handles[i].parts.push({ mesh: im, index: i, visibleMatrix: m.clone() });
           if (part.isLeaf) {
-            const hex = typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
-            im.setColorAt(i, softTint(d.x, d.z, hex, c, leafSoften(d.biome)));
+            const baseHex =
+              typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
+            im.setColorAt(
+              i,
+              resolveTreeLeafColor(d.biome, d.x, d.z, baseHex, c, leafSoften(d.biome)),
+            );
           } else {
             im.setColorAt(i, softTint(d.x, d.z, TRUNK_TINT[d.biome], c, BARK_TINT_SOFTEN, 0.5));
           }
@@ -1656,7 +1650,10 @@ function placeSpecies(
         if (group.maxDist !== undefined && !impostorsActive()) numericCaps.push(group.maxDist);
         if (cullBark) numericCaps.push(barkFar);
         const maxDist = numericCaps.length > 0 ? Math.min(...numericCaps) : undefined;
-        register(im, group.lod, undefined, maxDist, { max: true });
+        register(im, group.lod, undefined, maxDist, {
+          max: true,
+          nearEdge: group.lod === 'near-fill' && !impostorsActive() ? true : undefined,
+        });
         if (GFX.standardMaterials && !impostorsActive() && !part.isLeaf && spec.farTrunkProxy) {
           const proxyGeo = ghostHideGeometry(farTrunkGeo(part.geometry), n);
           const proxy = cloneInstancedTo(im, proxyGeo, part.material);
@@ -1754,12 +1751,12 @@ function buildTrees(
   const oakSets = modelUrls.oak.map(extractParts);
   for (const parts of oakSets) {
     for (const part of parts) {
-      if (part.isLeaf) (part.material as THREE.MeshStandardMaterial).color.setRGB(1.35, 1.25, 1.1);
+      if (part.isLeaf) (part.material as THREE.MeshStandardMaterial).color.setRGB(1.45, 1.14, 1.15);
     }
   }
   const oakSpec: SpeciesSpec = {
     sets: oakSets,
-    perBucket: treeVariants,
+    perBucket: GFX.leanFoliage ? 1 : 3,
     salt: 54,
     baseScale: 1.15,
     sink: 0.05,
@@ -1840,7 +1837,7 @@ function buildTrees(
     ]);
     return [...singles, cluster]; // [single x3, cluster]
   };
-  const mossRocks = colorway(new THREE.Color(0.62, 0.82, 0.45));
+  const mossRocks = colorway(new THREE.Color(0.58, 0.88, 0.42));
   const snowRocks = colorway(new THREE.Color(1.5, 1.55, 1.65));
   const rockPart = (geometry: THREE.BufferGeometry) => [
     { geometry, material: rockMat as THREE.Material, isLeaf: false },
@@ -1860,10 +1857,16 @@ function buildTrees(
     const { items } = bucket;
     // A farOnly record names its model outright (farSpecies): the biome/hash
     // routing below is for procedural records that never chose one.
-    const pines = items.filter((d) => (d.farSpecies ? d.farSpecies === 'pine' : d.kind === 'tree'));
+    const broadleafMeadow = (d: Decoration) =>
+      d.biome === 'vale' || d.biome === 'fen' || d.biome === 'amber';
+    const pines = items.filter((d) =>
+      d.farSpecies ? d.farSpecies === 'pine' : d.kind === 'tree' && !broadleafMeadow(d),
+    );
     const gnarled = (d: Decoration) => d.biome === 'marsh' || d.biome === 'dusk';
     const oaks = items.filter((d) =>
-      d.farSpecies ? d.farSpecies === 'oak' : d.kind === 'tree2' && !gnarled(d),
+      d.farSpecies
+        ? d.farSpecies === 'oak'
+        : (d.kind === 'tree2' && !gnarled(d)) || (d.kind === 'tree' && broadleafMeadow(d)),
     );
     const swamps = items.filter((d) => !d.farSpecies && d.kind === 'tree2' && gnarled(d));
     // marsh swamp trees split between twisted (mossy) and dead (bare) models;
@@ -2017,7 +2020,7 @@ function buildTrees(
           rockMesh.setMatrixAt(i, m);
           // low-altitude peaks rocks drop the icy blue-gray for a warm field
           // stone — pale rocks on green foothill grass read as eggs
-          const rockHex = r.biome === 'peaks' && !isSnowy(r) ? 0x6f6e62 : ROCK_TINT[r.biome];
+          const rockHex = r.biome === 'peaks' && !isSnowy(r) ? 0x82847c : ROCK_TINT[r.biome];
           rockMesh.setColorAt(i, softTint(r.x, r.z, rockHex, c, ROCK_TINT_SOFTEN));
           // The rock's sprite mirrors the placement (yaw, footprint, seated
           // height, tint); the tilt folds into the baked views well enough at
@@ -2140,20 +2143,11 @@ function buildDressing(
     fern: extractParts(modelUrls.fern[0]),
     mushroom: extractParts(modelUrls.mushroom[0]),
   };
-  // Mild dressing lift. Like the oak lift above, the old 6.5x here came from
-  // a transparent-texel-diluted atlas average; over visible texels the bush
-  // canopy is (0.000, 0.139, 0.025) linear and fern (0.221, 0.260, 0.067).
-  // The old loop was also unfiltered, so the 'Flowers' material, already at
-  // (0.79, 0.58, 0.56), reached 5.2/3.2/2.2 and flowering bushes were the
-  // most blown-out surface in the world. Leaves get a gentle lift; Flowers
-  // get none (their authored albedo is correct).
+  // Mild dressing lift. Leaves get a warm Genshin lift; Flowers get none.
   const albedoLift: Partial<Record<DressKind, [number, number, number]>> = {
-    // 1.6/1.5 read as neon against the calmer round-8 ground: the bush sheet
-    // is pure green (red 0), so brightness is the only lever here. The
-    // saturation itself is tamed by canopy_detail's desat luma mix.
-    bush: [1.35, 1.22, 1.08],
-    bushFlowers: [1.35, 1.22, 1.08],
-    fern: [1.15, 1.15, 1.15],
+    bush: [1.06, 0.98, 0.78],
+    bushFlowers: [1.06, 0.98, 0.78],
+    fern: [1.06, 1.02, 0.88],
   };
   for (const kind of ['bush', 'bushFlowers', 'fern'] as const) {
     const lift = albedoLift[kind];
@@ -2604,7 +2598,7 @@ function buildGrassRing(
   const geo = mergeGeometries(parts);
   geo.deleteAttribute('normal');
 
-  const tuftTex = grassTuftTexture(lush ? 30 : 18);
+  const tuftTex = grassTuftTexture(lush ? 30 : 28);
   let quality = 1;
   const minRadiusScale = lush ? 0.58 : 0.48;
   const activeRadius = (): number =>
@@ -2841,7 +2835,7 @@ function buildGrassRing(
               ? 0.8
               : fieldChunk || stableBandChunk || chunkBiome === 'ember' || meadowsInChunk.length > 0
                 ? 0.45
-                : 0.14),
+                : 0.24),
       ),
     );
     const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
@@ -2890,7 +2884,7 @@ function buildGrassRing(
         const density =
           (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW) *
           (gardenBedTuft ? 0.9 : (GRASS_BIOME_DENSITY[tuftBiome] ?? 1)) *
-          (0.25 + 1.7 * lushness * lushness);
+          ((lush ? 0.52 : 0.42) + 1.7 * lushness * lushness);
         if (r > density) continue;
         const h = terrainHeight(x, z, seed);
         if (foliageShoreSkip(x, z, h, seed)) continue;
@@ -2902,8 +2896,9 @@ function buildGrassRing(
         // The maker's painted no-grass discs. Third and last consumer of the
         // layer (sim/grass_clear.ts), which until now had none at all.
         if (grassClearedAt(activeContent.grassClear, x, z)) continue;
-        if (roadDistance(x, z) < 3.2 || insidePavedGrassExclusion(x, z)) continue;
+        if (roadDistance(x, z) < 2.2 || insidePavedGrassExclusion(x, z)) continue;
         if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
+        if (insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85)) continue;
         // the stable yard is worked dirt; deck planks grow nothing through
         if (tuftBiome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
         // Dawnhold's bailey is paved wall to wall: no tuft, and so no flower
@@ -2915,14 +2910,10 @@ function buildGrassRing(
         // anchors too, the frost/garden idiom, which is not what fen wants)
         const fenTuft = tuftBiome === 'fen';
         if (!fenTuft) {
-          // r is the density hash, so it only ever reaches the density cap:
-          // the lush scale tops out near 0.95 rather than sprouting monsters.
-          // Patch cores grow tall and patch edges stay short. With the sparse
-          // areas' accepted hashes skewing small, stragglers between patches
-          // come out smallest of all.
-          const s = ((lush ? 0.55 : 0.45) + r * (lush ? 0.8 : 1)) * (0.72 + lushness * 0.55);
+          const sx = ((lush ? 0.74 : 0.82) + r * (lush ? 0.96 : 1.04)) * (0.75 + lushness * 0.55);
+          const sy = sx * (0.75 + lushness * 0.25);
           q.setFromAxisAngle(up, r * 12.4);
-          m.compose(v.set(x, h, z), q, sv.set(s, s, s));
+          m.compose(v.set(x, h, z), q, sv.set(sx, sy, sx));
           im.setMatrixAt(n, m);
           const accent = GRASS_ACCENT[tuftBiome] ?? [1, 1, 1];
           groundGrassColorAt(x, z, seed, c);
@@ -2934,15 +2925,15 @@ function buildGrassRing(
           // small enough to read as patches (the ground noise already
           // carries those) rather than per-tuft confetti
           c.offsetHSL(
-            (hashAt(i, j, 3) - 0.5) * 0.024,
-            (hashAt(i, j, 4) - 0.5) * 0.06,
-            (hashAt(i, j, 5) - 0.5) * 0.07,
+            (hashAt(i, j, 3) - 0.5) * 0.018,
+            (hashAt(i, j, 4) - 0.5) * 0.04,
+            (hashAt(i, j, 5) - 0.5) * 0.03,
           );
           im.setColorAt(n, c);
           n++;
         }
         if (FLOWERLESS_BIOMES.has(tuftBiome)) continue;
-        // roughly one tuft in nine sprouts a flower cluster beside it; in
+        // roughly one tuft in five sprouts a flower cluster beside it; in
         // the field realms, coarse field cells bloom into dense drifts, and
         // the authored meadow circles (flower_meadows_core) always bloom
         const fieldCell = fieldChunk ? hashAt(Math.floor(x / 22), Math.floor(z / 22), 13) : 1;
@@ -2969,10 +2960,10 @@ function buildGrassRing(
               : fieldChunk
                 ? fenTuft
                   ? 0.32
-                  : 0.05
+                  : 0.08
                 : tuftBiome === 'jungle'
-                  ? 0.2
-                  : 0.11;
+                  ? 0.24
+                  : 0.22;
         const reps = inMeadow ? 4 : stableBloom ? 3 : inField ? (fenTuft ? 4 : 3) : 1;
         if (hashAt(i, j, 6) < flowerChance) {
           for (let rep = 0; rep < reps && fn < flowerCap; rep++) {
@@ -2981,7 +2972,7 @@ function buildGrassRing(
             const fh = terrainHeight(fx, fz, seed);
             if (foliageShoreSkip(fx, fz, fh, seed)) continue;
             if (terrainCutAtHeight(fx, fz, fh)) continue;
-            if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) continue;
+            if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 2.2) continue;
             // a band-edge bloom must not stray into the worked yard
             if (tuftBiome === 'gale' && inStableYard(fx, fz)) continue;
             if (tuftBiome === 'garden' && inDawnholdBailey(fx, fz, 0.5)) continue;

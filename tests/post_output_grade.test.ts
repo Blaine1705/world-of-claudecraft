@@ -16,7 +16,7 @@ describe('fused output and grade shader', () => {
     const liftAt = shader.indexOf('c = pow(max(vec3(0.0), c * GAIN + LIFT), GAMMA);');
     const curveAt = shader.indexOf('c = mix(c, c * c * (3.0 - 2.0 * c), 0.23);');
     const saturationAt = shader.indexOf('c = mix(vec3(l), c, 1.07);');
-    const vignetteAt = shader.indexOf('c *= 1.0 - 0.20 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);');
+    const vignetteAt = shader.indexOf('c *= 1.0 - 0.08 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);');
     const grainAt = shader.indexOf(
       'c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;',
     );

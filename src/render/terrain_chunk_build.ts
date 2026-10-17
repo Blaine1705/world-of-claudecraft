@@ -35,10 +35,16 @@ import {
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
+import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { fbm2 } from '../sim/rng';
 import { cutBounds, cutsInRect, cutsSdfAt, inTerrainCut } from '../sim/terrain_cuts';
 import type { TerrainCut, TerrainKnockout } from '../sim/types';
-import { roadDistance, waterLevel, zoneBiomeAt } from '../sim/world';
+import {
+  generateDecorationsInBounds,
+  roadDistance,
+  waterLevel,
+  zoneBiomeAt,
+} from '../sim/world';
 import { groundPaletteFor, groundPaletteVersion } from './ground_palette_override_core';
 import { type ImpactCraterTerrainBlend, impactCraterTerrainBlend } from './impact_terrain';
 import { clamp01 } from './num_clamp';
@@ -84,12 +90,13 @@ const emberForestC = new THREE.Color(TERRAIN_TONES.emberForest); // the Drakelan
 const emberScorchC = new THREE.Color(TERRAIN_TONES.emberScorch); // volcanic ground near the Drakemaw
 const emberBasaltC = new THREE.Color(TERRAIN_TONES.emberBasalt); // the cones' dark volcanic rock
 const cobbleC = new THREE.Color(TERRAIN_TONES.cobble); // the Amberfall's laid stone
-const cobbleDarkC = new THREE.Color(0x6e6b66); // ...its mortar-shadow cells
-const duskCliffC = new THREE.Color(0x544d58); // dark weathered sea-cliff stone
-const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
+const cobbleDarkC = new THREE.Color(0x7c7a74); // ...its mortar-shadow cells
+const duskCliffC = new THREE.Color(0x6c727c); // cool slate-limestone cliff shadow tone
+const duskStrataC = new THREE.Color(0xb0b2aa); // pale warm chalk-limestone strata bands
 const snowCapC = new THREE.Color(TERRAIN_TONES.snowCap);
 const lowSunC = new THREE.Color(0xe7d9a5);
 const lowShadeC = new THREE.Color(0x60745b);
+const lowCanopyShadowC = new THREE.Color(0x183022);
 // Paint-layer scratch (centre-tap bridge: see the paint block below).
 const paintC = new THREE.Color();
 const zonePalettes = ZONES.map((zn) => {
@@ -331,16 +338,14 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   // green sheet (noise-modulated splat rule; the groomed garden and the
   // snowbound frost keep their even cover).
   if (biome !== 'garden' && biome !== 'frost') {
-    // two uncorrelated scales: broad worn regions (~80yd) carrying smaller
-    // bare patches (~38yd), so the wear reads fractal instead of one dot size
+    // Broad sunlit chartreuse-gold meadow swells instead of brown dirt blotches,
+    // keeping the grass splat continuous across open meadows.
     const dry =
       fbm2(x * 0.026, z * 0.026, seed + 83, 2) * 0.62 +
       fbm2(x * 0.012, z * 0.012, seed + 89, 2) * 0.38;
-    const dryW = clamp01((dry - 0.58) * 3.2);
+    const dryW = clamp01((dry - 0.56) * 3.0);
     if (dryW > 0) {
-      cTmp.lerp(dirtC, dryW * 0.5);
-      cTmp.lerp(grassYellowC, dryW * 0.35);
-      lerpSplat(w, 1, dryW * 0.45);
+      cTmp.lerp(grassYellowC, dryW * 0.52);
     }
   }
   let isleRock = 0;
@@ -388,7 +393,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   // (shore_water_gate_core), so a dry inland dip at beach elevation (the Wolf
   // Run basin) reads as plain ground instead of a pale coast.
   const wl = waterLevel();
-  let shore = autoShoreSand ? clamp01((wl + 1.6 - h) / 1.6) : 0;
+  let shore = autoShoreSand ? clamp01((wl + 1.8 - h) / 1.8) : 0;
   if (shore > 0) shore *= shoreWaterGate(x, z, h, wl, shoreProbeFor(seed));
   if (biome === 'marsh') {
     cTmp.lerp(dirtDarkC, shore);
@@ -412,10 +417,10 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   }
   // New Eastbrook's strand (owner refinement): the vale's beach band reads as
   // full sand well above the wet lip, so the shore is unambiguous sand rather
-  // than the base cover showing through. Fades out by ~2.2yd above the
+  // than the base cover showing through. Fades out by ~2.5yd above the
   // waterline, under the quay pad's working grade.
   if (biome === 'vale') {
-    let strand = clamp01((wl + 2.5 - h) / 1.3);
+    let strand = clamp01((wl + 2.8 - h) / 1.5);
     if (strand > 0) strand *= shoreWaterGate(x, z, h, wl, shoreProbeFor(seed));
     if (strand > 0) {
       cTmp.lerp(sandC, Math.min(1, strand));
@@ -436,7 +441,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
         cTmp.lerp(cobbleDarkC, cell * 0.45 * hubT);
         lerpSplat(w, 2, 0.75 * hubT);
       } else {
-        cTmp.lerp(dirtDarkC, 0.7 * hubT);
+        cTmp.lerp(dirtC, 0.72 * hubT);
         lerpSplat(w, 1, 0.75 * hubT);
       }
       break;
@@ -446,19 +451,22 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   // the Amberfall paves its ways: cobblestone, cell-jittered so the vertex
   // grid reads as laid stones rather than one grey ribbon (rock splat)
   const cobbles = biome === 'amber';
-  if (rd < 2.0) {
+  if (rd < 1.9) {
     if (cobbles) {
       const cell = (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
       cTmp.lerp(cobbleC, 0.9);
       cTmp.lerp(cobbleDarkC, cell * 0.5);
       lerpSplat(w, 2, 0.85);
     } else {
-      cTmp.lerp(dirtC, 0.85);
-      lerpSplat(w, 1, 0.85);
+      cTmp.lerp(dirtC, 0.88);
+      cTmp.lerp(sandC, 0.18);
+      lerpSplat(w, 1, 0.88);
     }
-  } else if (rd < 3.4) {
-    const t = 0.85 * (1 - (rd - 2.0) / 1.4);
+  } else if (rd < 3.6) {
+    const u = 1 - (rd - 1.9) / 1.7;
+    const t = 0.88 * u * u * (3 - 2 * u);
     cTmp.lerp(cobbles ? cobbleC : dirtC, t);
+    if (!cobbles) cTmp.lerp(sandC, t * 0.14);
     lerpSplat(w, cobbles ? 2 : 1, t);
   }
   // Break up the rock/snow blend so cliffs read as striated stone and snow
@@ -467,19 +475,16 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   const snowPatch = fbm2(x * 0.06, z * 0.06, seed + 47, 3);
   const rockStart = ROCK_SLOPE_START[biome];
   // Curvature accents (see curv above): a convex break sheds its cover to
-  // exposed stone even before the slope threshold, and a concave fold pools
-  // darker soil. Both are gated by real gradient so flat ground never
-  // mottles, and both come BEFORE the slope-rock arm so a true cliff still
-  // ends at full rock.
-  const exposeW = autoSlopeRock ? clamp01(-curv * 0.85 - 0.1) * clamp01((slope - 0.3) * 2.2) : 0;
+  // exposed stone even before the slope threshold, and a concave fold deepens
+  // the emerald turf shade without splatting muddy dirt into meadows.
+  const exposeW = autoSlopeRock ? clamp01(-curv * 0.85 - 0.1) * clamp01((slope - 0.34) * 2.2) : 0;
   if (exposeW > 0) {
-    cTmp.lerp(rockC, Math.min(1, exposeW) * 0.55);
-    lerpSplat(w, 2, Math.min(1, exposeW) * 0.5);
+    cTmp.lerp(rockC, Math.min(1, exposeW) * 0.5);
+    lerpSplat(w, 2, Math.min(1, exposeW) * 0.45);
   }
   const poolW = clamp01(curv * 0.8 - 0.1) * clamp01((0.95 - slope) * 2) * (1 - shore);
   if (poolW > 0) {
-    cTmp.lerp(dirtDarkC, Math.min(1, poolW) * 0.3);
-    lerpSplat(w, 1, Math.min(1, poolW) * 0.3);
+    cTmp.lerp(grassDarkC, Math.min(1, poolW) * 0.28);
   }
   // Noise-dithered rock margin: the grass-to-stone boundary wanders with the
   // streak field instead of tracing one smooth slope contour, and the blend
@@ -490,7 +495,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     const t = Math.min(1, (slope - rockEdge) * 2.6);
     rockTintW = t;
     cTmp.lerp(rockC, t);
-    cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.5);
+    cTmp.lerp(duskCliffC, t * Math.max(0, 0.5 - rockStreak) * 0.45);
     lerpSplat(w, 2, t);
     // (the Great Maze's hedge walls are modeled props over flat lawn now:
     // no steep terrain faces remain inside the maze to restyle)
@@ -502,12 +507,10 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
       cTmp.lerp(duskCliffC, t * nearSea * (0.45 + band * 0.35));
       cTmp.lerp(duskStrataC, t * nearSea * (1 - band) * 0.3);
     } else {
-      // every other realm's stone carries warm strata: height-keyed bands
-      // wobbled by the streak noise, so cliff faces and crags read as
-      // layered geology instead of one smooth pour
+      // Clean limestone strata: cool slate-grey and warm chalk bands, never brown dirt.
       const band = (Math.sin(h * 0.52 + (rockStreak - 0.5) * 5.2) + 1) * 0.5;
-      cTmp.lerp(dirtDarkC, t * band * 0.3);
-      cTmp.lerp(duskStrataC, t * (1 - band) * 0.18);
+      cTmp.lerp(duskCliffC, t * band * 0.22);
+      cTmp.lerp(duskStrataC, t * (1 - band) * 0.24);
     }
   }
   // high ground (ridges, peaks) goes rocky then snowy (the Drakelands' high
@@ -552,8 +555,8 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     snow = biome === 'ember' ? 0 : clamp01((h - 34 + (snowPatch - 0.5) * 14) / 26) * 0.85;
     if (biome !== 'ember') {
       const band = (Math.sin(h * 0.52 + (rockStreak - 0.5) * 5.2) + 1) * 0.5;
-      cTmp.lerp(dirtDarkC, rockT * (1 - snow) * band * 0.26);
-      cTmp.lerp(duskStrataC, rockT * (1 - snow) * (1 - band) * 0.14);
+      cTmp.lerp(duskCliffC, rockT * (1 - snow) * band * 0.2);
+      cTmp.lerp(duskStrataC, rockT * (1 - snow) * (1 - band) * 0.22);
     }
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - highH) / 10) * 0.8);
@@ -645,6 +648,13 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     cTmp.lerp(lowShadeC, 0.07 * ridge + 0.05 * lowland * mud);
     cTmp.lerp(lowSunC, 0.035 * (1 - shore) + 0.045 * upland);
     cTmp.multiplyScalar(0.98 + upland * 0.04 - ridge * 0.025);
+    if (state.lowOccluders) {
+      const shade = lowCanopyAndBuildingShade(state.lowOccluders, x, z);
+      if (shade > 0) {
+        cTmp.lerp(lowCanopyShadowC, shade * 0.56);
+        cTmp.multiplyScalar(1 - shade * 0.24);
+      }
+    }
   }
   return {
     height: h,
@@ -654,6 +664,155 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     splat: w,
     extra: [mud, snow, impact.scorch, impact.ash],
   };
+}
+
+interface LowTreeOccluder {
+  x: number;
+  z: number;
+  sx: number;
+  sz: number;
+  r: number;
+  trunkR: number;
+}
+
+interface LowBoxOccluder {
+  x: number;
+  z: number;
+  sx: number;
+  sz: number;
+  hw: number;
+  hd: number;
+  cos: number;
+  sin: number;
+  boundR: number;
+}
+
+interface LowChunkOccluders {
+  trees: readonly LowTreeOccluder[];
+  boxes: readonly LowBoxOccluder[];
+}
+
+function buildLowChunkOccluders(
+  x0: number,
+  z0: number,
+  size: number,
+  seed: number,
+): LowChunkOccluders {
+  const margin = 12;
+  const minX = x0 - margin;
+  const maxX = x0 + size + margin;
+  const minZ = z0 - margin;
+  const maxZ = z0 + size + margin;
+  const decos = generateDecorationsInBounds(seed, { minX, maxX, minZ, maxZ });
+  const trees: LowTreeOccluder[] = [];
+  for (let i = 0; i < decos.length; i++) {
+    const d = decos[i];
+    if (d.kind !== 'tree' && d.kind !== 'tree2') continue;
+    const baseR = d.kind === 'tree2' ? 6.0 : 4.6;
+    const r = baseR * d.scale;
+    trees.push({
+      x: d.x,
+      z: d.z,
+      sx: d.x - 1.8 * d.scale,
+      sz: d.z - 1.6 * d.scale,
+      r,
+      trunkR: Math.max(1.8, r * 0.45),
+    });
+  }
+  const boxes: LowBoxOccluder[] = [];
+  const pushBox = (
+    cx: number,
+    cz: number,
+    hw: number,
+    hd: number,
+    rot: number,
+    castScale = 1,
+  ): void => {
+    const boundR = Math.hypot(hw, hd) + 6.5;
+    if (cx + boundR < x0 || cx - boundR > x0 + size || cz + boundR < z0 || cz - boundR > z0 + size) {
+      return;
+    }
+    boxes.push({
+      x: cx,
+      z: cz,
+      sx: cx - 2.4 * castScale,
+      sz: cz - 2.1 * castScale,
+      hw,
+      hd,
+      cos: Math.cos(rot),
+      sin: Math.sin(rot),
+      boundR,
+    });
+  };
+  const activeProps = getActiveWorldContent().props;
+  for (const b of activeProps.buildings) {
+    pushBox(b.x, b.z, b.w * 0.5, b.d * 0.5, b.rot, 1.0);
+  }
+  if (isBuiltinWorldActive()) {
+    for (const b of EASTBROOK_LAYOUT.buildings) {
+      const f = b.reach;
+      pushBox(f.center.x, f.center.z, f.halfWidth, f.halfDepth, f.rotation, 1.15);
+    }
+    for (const w of EASTBROOK_LAYOUT.wall.segments) {
+      const f = w.footprint;
+      pushBox(f.center.x, f.center.z, f.halfWidth, f.halfDepth, f.rotation, 0.75);
+    }
+  }
+  return { trees, boxes };
+}
+
+function lowCanopyAndBuildingShade(occ: LowChunkOccluders, x: number, z: number): number {
+  let shade = 0;
+  const { trees, boxes } = occ;
+  for (let i = 0; i < trees.length; i++) {
+    const t = trees[i];
+    const sdx = x - t.sx;
+    if (sdx > t.r || sdx < -t.r) continue;
+    const sdz = z - t.sz;
+    if (sdz > t.r || sdz < -t.r) continue;
+    const sd2 = sdx * sdx + sdz * sdz;
+    const r2 = t.r * t.r;
+    if (sd2 < r2) {
+      const u = 1 - Math.sqrt(sd2) / t.r;
+      const canopy = u * u * (3 - 2 * u) * 0.78;
+      if (canopy > shade) shade = canopy;
+    }
+    const tdx = x - t.x;
+    const tdz = z - t.z;
+    const td2 = tdx * tdx + tdz * tdz;
+    const tr2 = t.trunkR * t.trunkR;
+    if (td2 < tr2) {
+      const u = 1 - Math.sqrt(td2) / t.trunkR;
+      const trunk = u * u * 0.92;
+      if (trunk > shade) shade = trunk;
+    }
+  }
+  for (let i = 0; i < boxes.length; i++) {
+    const b = boxes[i];
+    const dx = x - b.x;
+    if (dx > b.boundR || dx < -b.boundR) continue;
+    const dz = z - b.z;
+    if (dz > b.boundR || dz < -b.boundR) continue;
+    const lx = Math.abs(dx * b.cos - dz * b.sin) - b.hw;
+    const lz = Math.abs(dx * b.sin + dz * b.cos) - b.hd;
+    const contactDist = Math.hypot(Math.max(0, lx), Math.max(0, lz)) + Math.min(0, Math.max(lx, lz));
+    if (contactDist < 2.8) {
+      const u = clamp01(1 - Math.max(0, contactDist) / 2.8);
+      const ao = u * u * 0.72;
+      if (ao > shade) shade = ao;
+    }
+    const sdx = x - b.sx;
+    const sdz = z - b.sz;
+    const slx = Math.abs(sdx * b.cos - sdz * b.sin) - b.hw;
+    const slz = Math.abs(sdx * b.sin + sdz * b.cos) - b.hd;
+    const castDist = Math.hypot(Math.max(0, slx), Math.max(0, slz)) + Math.min(0, Math.max(slx, slz));
+    if (castDist < 4.8) {
+      const u = clamp01(1 - Math.max(0, castDist) / 4.8);
+      const cast = u * u * (3 - 2 * u) * 0.68;
+      if (cast > shade) shade = cast;
+    }
+  }
+  return shade;
 }
 
 // ---------------------------------------------------------------------------
@@ -746,9 +905,11 @@ export interface ChunkGeometryBuildState extends Omit<ChunkGeometryArrays, 'rim'
   seed: number;
   skirtSpan: number;
   worldDepth: number;
-  /** GFX.lowPlus && !GFX.terrainSplat, resolved by the CALLER: gfx.ts reads
+  /** !GFX.terrainSplat, resolved by the CALLER: gfx.ts reads
    *  document/navigator, so a worker would resolve a different tier. */
   lowShade: boolean;
+  /** Chunk-local tree canopy and building contact occluders when lowShade is true. */
+  lowOccluders?: LowChunkOccluders | null;
   /** The map's automatic-texturing switches (MapDoc.terrainStyle), resolved
    *  ONCE per chunk - sampleVertex runs per vertex and must not touch the
    *  active content. Every rule defaults ON, so the shipped world and every
@@ -853,6 +1014,7 @@ export function beginChunkGeometry(
     skirtSpan,
     worldDepth: WORLD_MAX_Z - WORLD_MIN_Z,
     lowShade,
+    lowOccluders: lowShade ? buildLowChunkOccluders(x0, z0, size, seed) : null,
     autoSlopeRock: style?.slopeRock !== false,
     autoSnowCaps: style?.snowCaps !== false,
     autoShoreSand: style?.shoreSand !== false,

@@ -96,6 +96,16 @@ export async function buildSceneryBand(options: BandBuildOptions): Promise<Scene
           if (options.localCoordinates !== false) addSceneryLocalAttributes(geometry, part.matrix);
           geometry.applyMatrix4(part.matrix);
           const count = geometry.attributes.position.count;
+          if (options.localCoordinates === false && /^Leaves_/.test(part.source.material.name)) {
+            const nrm = geometry.attributes.normal as THREE.BufferAttribute;
+            for (let i = 0; i < count; i++) {
+              const nx = nrm.getX(i);
+              const ny = Math.max(0.48, Math.abs(nrm.getY(i)));
+              const nz = nrm.getZ(i);
+              const inv = 1 / Math.max(1e-4, Math.hypot(nx, ny, nz));
+              nrm.setXYZ(i, nx * inv, ny * inv, nz * inv);
+            }
+          }
           if (!geometry.attributes.uv)
             geometry.setAttribute(
               'uv',

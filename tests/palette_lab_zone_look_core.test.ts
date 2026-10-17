@@ -3,6 +3,8 @@ import { BIOME_FOG, BIOME_LIGHT } from '../src/render/outdoor_biome_presets';
 import {
   applyLookPatch,
   cycleLookId,
+  DEFAULT_ZONE_NIGHT_SELECTIONS,
+  DEFAULT_ZONE_SELECTIONS,
   displayFromRadiance,
   fogSceneHex,
   gradeUniformValues,
@@ -13,6 +15,7 @@ import {
   NEUTRAL_GRADE,
   parseSelections,
   radianceForDisplay,
+  resolveZoneLookId,
   STOCK_GRADE_GAIN,
   STOCK_LOOK_ID,
   skyUniformValues,
@@ -153,6 +156,65 @@ describe('selections', () => {
     expect(text).toContain('BIOME_PALETTE.vale');
     expect(text).toContain(`color: 0x${BIOME_FOG.vale.color.toString(16).padStart(6, '0')}`);
     expect(text).toContain('BIOME_LIGHT.vale');
+  });
+
+  it('resolves every default zone selection and switches Thornpeak between Alpine Clear (day) and Sky Island Gold (night)', () => {
+    for (const [zoneId, lookId] of Object.entries(DEFAULT_ZONE_SELECTIONS)) {
+      const looks = ZONE_LOOKS[zoneId] ?? [];
+      expect(
+        looks.some((l) => l.id === lookId),
+        `${zoneId}/${lookId}`,
+      ).toBe(true);
+      expect(
+        resolveZoneLookId(zoneId, DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, false),
+      ).toBe(lookId);
+    }
+    for (const [zoneId, lookId] of Object.entries(DEFAULT_ZONE_NIGHT_SELECTIONS)) {
+      const looks = ZONE_LOOKS[zoneId] ?? [];
+      expect(
+        looks.some((l) => l.id === lookId),
+        `${zoneId}/${lookId}`,
+      ).toBe(true);
+    }
+    expect(
+      resolveZoneLookId(
+        'thornpeak_heights',
+        DEFAULT_ZONE_SELECTIONS,
+        DEFAULT_ZONE_NIGHT_SELECTIONS,
+        false,
+      ),
+    ).toBe('alpine-clear');
+    expect(
+      resolveZoneLookId(
+        'thornpeak_heights',
+        DEFAULT_ZONE_SELECTIONS,
+        DEFAULT_ZONE_NIGHT_SELECTIONS,
+        true,
+      ),
+    ).toBe('sky-island-gold');
+    expect(
+      resolveZoneLookId(
+        'drakelands',
+        DEFAULT_ZONE_SELECTIONS,
+        DEFAULT_ZONE_NIGHT_SELECTIONS,
+        false,
+      ),
+    ).toBe('ashfall');
+    expect(
+      resolveZoneLookId('drakelands', DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, true),
+    ).toBe('obsidian-teal');
+    expect(
+      resolveZoneLookId('frostveil', DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, false),
+    ).toBe('glacier-teal');
+    expect(
+      resolveZoneLookId('frostveil', DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, true),
+    ).toBe('violet-whiteout');
+    expect(
+      resolveZoneLookId('amberfall', DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, false),
+    ).toBe('sky-island-gold');
+    expect(
+      resolveZoneLookId('amberfall', DEFAULT_ZONE_SELECTIONS, DEFAULT_ZONE_NIGHT_SELECTIONS, true),
+    ).toBe('sky-island-gold');
   });
 });
 

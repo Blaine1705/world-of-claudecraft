@@ -23,6 +23,7 @@
 
 import * as THREE from 'three';
 import {
+  BUILTIN_WORLD,
   getActiveWorldContent,
   isBuiltinWorldActive,
   WORLD_MAX_X,
@@ -30,13 +31,7 @@ import {
   WORLD_MIN_Z,
 } from '../sim/data';
 import { grassClearedAt } from '../sim/grass_clear';
-import {
-  roadDistance,
-  terrainCutAtHeight,
-  terrainHeight,
-  WATER_LEVEL,
-  zoneBiomeAt,
-} from '../sim/world';
+import { roadDistance, terrainCutAtHeight, terrainHeight, zoneBiomeAt } from '../sim/world';
 import { bladeSwayGlsl, clusterGeometry, clusterPlacementPad, mulberry32 } from './blade_grass';
 import {
   activateDenseSlot,
@@ -46,16 +41,17 @@ import {
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
 import { GRASS_BIOME_DENSITY } from './foliage';
-import { insideGrassHubExclusion, insidePavedGrassExclusion } from './foliage_core';
+import {
+  eastbrookGrassExclusions,
+  insideAnyBuildingFootprint,
+  insideEastbrookGrassExclusion,
+  insideGrassHubExclusion,
+  insidePavedGrassExclusion,
+} from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
+import { foliageShoreSkip } from './foliage_shore_gate_core';
 import { GFX, sharedUniforms } from './gfx';
 import { getGrassGroundBake } from './grass_ground_bake';
-import {
-  meadowBladeScale,
-  meadowCellGrows,
-  meadowFullness,
-  meadowHeightStretch,
-} from './meadow_fullness_core';
 import {
   GRASS_PAINT_TRIM,
   MEADOW_BAND_BASE_RECOVER_Y,
@@ -64,6 +60,11 @@ import {
   MEADOW_BAND_FADE_START,
   MEADOW_BAND_PLACE_BUDGET,
   MEADOW_BAND_RADIUS,
+  MEADOW_CAMERA_CLEAR_FAR,
+  MEADOW_CAMERA_CLEAR_NEAR,
+  meadowClusterHeight,
+  meadowClusterScale,
+  meadowCoverage,
 } from './meadow_tuning';
 import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
@@ -95,6 +96,7 @@ export function buildBladeGrassBand(
   seed: number,
   initialPx: number,
   initialPz: number,
+  forceEditorCarpet = false,
 ): BladeGrassBandView {
   const group = new THREE.Group();
   group.name = 'bladeGrassBand';
@@ -102,7 +104,7 @@ export function buildBladeGrassBand(
   // carpet keep their existing look. ?meadowband=off is the dev
   // perf-attribution kill switch.
   const RADIUS = MEADOW_BAND_RADIUS;
-  if (GFX.bladeCarpetRadius <= 0 || renderLayerDisabled('meadowband')) {
+  if ((GFX.bladeCarpetRadius <= 0 && !forceEditorCarpet) || renderLayerDisabled('meadowband')) {
     // A tier without the carpet still replaces the live view, so a rebuild
     // never keeps the old carpet's buffers reachable from here.
     liveView = { group, update: () => undefined, recolor: () => undefined };
@@ -179,12 +181,24 @@ export function buildBladeGrassBand(
           float bgFade = 1.0 - smoothstep(uBandFar * ${MEADOW_BAND_FADE_START.toFixed(2)},
             uBandFar, distance(bgOrigin.xz, uPlayerPos));
           transformed *= bgFade;
+          // camera-near collapse: blades within a few yards of the eye shrink
+          // to their roots, so a low chase camera never looks through a wall
+          // of oversized near blades (the painted-meadow trick)
+          transformed *= smoothstep(${MEADOW_CAMERA_CLEAR_NEAR.toFixed(1)}, ${MEADOW_CAMERA_CLEAR_FAR.toFixed(1)},
+            distance(bgOrigin, cameraPosition));
           // the carpet's sway, shared: one meadow, one wind; branched around
           // once the fade has collapsed the blade
           ${bladeSwayGlsl(classicSway)}
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
+    sh.fragmentShader = sh.fragmentShader.replace(
+      '#include <normal_fragment_begin>',
+      `#include <normal_fragment_begin>
+      #ifdef DOUBLE_SIDED
+        normal *= faceDirection;
+      #endif`,
+    );
   };
 
   // the carpet's sector split, verbatim: one mesh per sector of the slot grid,
@@ -215,6 +229,13 @@ export function buildBladeGrassBand(
     return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
   };
 
+  const activeContent = getActiveWorldContent();
+  const townExclusions = eastbrookGrassExclusions(
+    activeContent.props.buildings,
+    activeContent === BUILTIN_WORLD,
+    activeContent.services?.noticeboards ?? [],
+  );
+
   // The carpet's placeSlot, at the band's cell size: same coverage gate,
   // same road/water/slope/hub rules, same size classes, same tint. The two
   // systems must stay one look; if a rule changes there, change it here.
@@ -226,29 +247,30 @@ export function buildBladeGrassBand(
     if (ok) {
       const lush = groundLushnessAt(x, z, seed);
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
-      ok = meadowCellGrows(r1, lush, biomeDensity);
+      ok = r1 < meadowCoverage(lush) * Math.min(biomeDensity, 1.2);
       if (ok) ok = roadDistance(x, z) > 2.4;
       // The maker's painted no-grass discs, same as the near carpet: a city
       // floor has to be clear in BOTH bands or the meadow reappears the moment
       // the player steps back from it.
-      if (ok) ok = !grassClearedAt(getActiveWorldContent().grassClear, x, z);
-      if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
+      if (ok) ok = !grassClearedAt(activeContent.grassClear, x, z);
+      if (ok) ok = !insideGrassHubExclusion(activeContent.zones, x, z);
       if (ok) ok = !insidePavedGrassExclusion(x, z);
+      if (ok) ok = !insideEastbrookGrassExclusion(townExclusions, x, z, 0.85);
+      if (ok) ok = !insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85);
       if (ok) {
         const h = terrainHeight(x, z, seed);
-        ok = h > WATER_LEVEL + 1.4;
+        ok = !foliageShoreSkip(x, z, h, seed);
         // no band tufts floating over a boolean cut (mirrors the near carpet)
         if (ok) ok = !terrainCutAtHeight(x, z, h);
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
-          const s = meadowBladeScale(hash(ci, cj, 3), hash(ci, cj, 4), lush);
+          const s = meadowClusterScale(lush, hash(ci, cj, 3), hash(ci, cj, 4));
           q.setFromAxisAngle(up, r1 * 12.9);
           const rLean = hash(ci, cj, 5);
           leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
           q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
-          const hJit = 0.82 + hash(ci, cj, 6) * 0.36;
-          const sw = s * meadowFullness().width;
-          m.compose(v.set(x, h - 0.02, z), q, sv.set(sw, s * meadowHeightStretch(lush, hJit), sw));
+          const sy = meadowClusterHeight(s, lush, hash(ci, cj, 6));
+          m.compose(v.set(x, h - 0.02, z), q, sv.set(s, sy, s));
           groundGrassColorAt(x, z, seed, c);
           c.multiplyScalar(1.18);
           sectorPool.place(slot, m, c);

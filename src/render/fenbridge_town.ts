@@ -44,7 +44,11 @@ import { placedTownCullRadius } from './placed_town_buildings';
 import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
-import { prepareSceneryDetailRoot } from './scenery_detail';
+import {
+  isLowSceneryCullActive,
+  prepareSceneryDetailRoot,
+  sceneryStructureFar,
+} from './scenery_detail';
 import {
   newTownPiecewiseReveal,
   orderTownRootsNearestFirst,
@@ -1181,15 +1185,19 @@ function buildFromTemplates(
     ): void {
       lastCamX = camX;
       lastCamZ = camZ;
-      const hubDx = camX - FENBRIDGE_LAYOUT.hub.center.x;
-      const hubDz = camZ - FENBRIDGE_LAYOUT.hub.center.z;
+      const lowCull = isLowSceneryCullActive(fogFar);
+      const structureFar = sceneryStructureFar(fogFar);
+      const cullX = lowCull ? eyeX : camX;
+      const cullZ = lowCull ? eyeZ : camZ;
+      const hubDx = cullX - FENBRIDGE_LAYOUT.hub.center.x;
+      const hubDz = cullZ - FENBRIDGE_LAYOUT.hub.center.z;
       const reveal = townStaticReveal(
         fenbridgeFogVisible(
-          camX,
-          camZ,
+          cullX,
+          cullZ,
           FENBRIDGE_LAYOUT.hub.center.x,
           FENBRIDGE_LAYOUT.hub.center.z,
-          fogFar,
+          structureFar,
           TOWN_CULL_RADIUS,
         ),
         staticRevealed,
@@ -1223,7 +1231,9 @@ function buildFromTemplates(
           eyeX,
           eyeY,
           eyeZ,
-          fogFar,
+          structureFar,
+          cullX,
+          cullZ,
         );
         target.group.visible =
           visibilityPlan.visible &&

@@ -496,6 +496,46 @@ export function skyUniformValues(
 /** Zone id to the chosen look id (a zone missing here runs stock). */
 export type LookSelections = Record<string, string>;
 
+/** The chosen default look per zone (day / general). */
+export const DEFAULT_ZONE_SELECTIONS: Readonly<LookSelections> = {
+  proving_shore: 'skyward-isles',
+  eastbrook_vale: 'skyward-isles',
+  mirefen_marsh: 'jade-wetland',
+  thornpeak_heights: 'alpine-clear',
+  farshore_isle: 'tropic-lagoon',
+  galecrest: 'skyward-isles',
+  evergarden: 'afternoon-reverie',
+  willowfen: 'spring-watercolour',
+  palmreach: 'lagoon-turquoise',
+  veiled_hollow: 'rosewater-twilight',
+  nightbloom: 'fae-pink',
+  drakelands: 'ashfall',
+  frostveil: 'glacier-teal',
+  amberfall: 'sky-island-gold',
+};
+
+/** Per-zone night look override when a zone's night look differs from day. */
+export const DEFAULT_ZONE_NIGHT_SELECTIONS: Readonly<LookSelections> = {
+  thornpeak_heights: 'sky-island-gold',
+  drakelands: 'obsidian-teal',
+  frostveil: 'violet-whiteout',
+  amberfall: 'sky-island-gold',
+};
+
+/** Resolve the active look id for `zoneId` at the current time of day. */
+export function resolveZoneLookId(
+  zoneId: string,
+  daySelections: Readonly<LookSelections>,
+  nightSelections: Readonly<LookSelections>,
+  isNight: boolean,
+): string {
+  if (isNight) {
+    const nightId = nightSelections[zoneId];
+    if (nightId) return nightId;
+  }
+  return daySelections[zoneId] ?? STOCK_LOOK_ID;
+}
+
 /** Parse persisted selections, dropping anything malformed. */
 export function parseSelections(raw: string | null): LookSelections {
   if (!raw) return {};

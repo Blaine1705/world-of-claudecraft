@@ -16,14 +16,14 @@
 // same way at a smaller magnitude, and concave folds stay clean. Ink fades out
 // with distance so far terrain does not dissolve into hatching.
 
-export const CEL_INK_FADE_NEAR = 60;
-export const CEL_INK_FADE_FAR = 170;
+export const CEL_INK_FADE_NEAR = 6;
+export const CEL_INK_FADE_FAR = 15;
 // The relative second difference at which a silhouette starts / is full ink.
-const CEL_INK_EDGE_START = 0.06;
-const CEL_INK_EDGE_FULL = 0.22;
+const CEL_INK_EDGE_START = 0.12;
+const CEL_INK_EDGE_FULL = 0.34;
 // How dark the ink is: the line keeps this fraction of the colour under it, so
 // it reads as a deep tone of the surface rather than a flat black stroke.
-export const CEL_INK_TONE = 0.18;
+export const CEL_INK_TONE = 0.48;
 
 function f(value: number): string {
   const text = String(value);

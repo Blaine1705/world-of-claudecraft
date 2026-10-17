@@ -11,19 +11,32 @@
 // never pull the runtime into their module graph. The runtime boots from
 // palette_lab_boot.ts, which only the game's composer (post.ts) imports.
 
+function readMode(): string | null {
+  if (typeof location === 'undefined') return null;
+  return new URLSearchParams(location.search).get('palette');
+}
+
 function readFlag(): boolean {
-  // Dev builds only (`npm run dev`): a shipped build never offers it, since
-  // the lab can move fog distances and freeze the sky clock, the same
-  // dev-only scope as `/daynight` (src/game/dev_chat_hooks.ts).
-  if (!import.meta.env.DEV) return false;
   if (typeof location === 'undefined') return false;
-  const mode = new URLSearchParams(location.search).get('palette');
+  const mode = readMode();
+  return mode !== 'off' && mode !== '0';
+}
+
+function readPanelFlag(): boolean {
+  if (!import.meta.env.DEV) return false;
+  const mode = readMode();
   return mode === 'on' || mode === '1';
 }
 
 const enabled = readFlag();
+const panelEnabled = readPanelFlag();
 
-/** True when `?palette=on` (or `=1`) opted this session into the palette lab. */
+/** True when the per-zone palette look runtime is active (on by default in browser, off via `?palette=off`). */
 export function paletteLabEnabled(): boolean {
   return enabled;
+}
+
+/** True when `?palette=on` (or `=1`) opted this dev session into the interactive Palette Lab UI panel. */
+export function paletteLabPanelEnabled(): boolean {
+  return panelEnabled;
 }

@@ -14,7 +14,7 @@ describe('palette lab grade arm', () => {
     // The look's grade runs after the stock saturation, before the vignette.
     const call = shader.indexOf('c = paletteGrade(c);');
     expect(call).toBeGreaterThan(shader.indexOf('c = mix(vec3(l), c, 1.07);'));
-    expect(call).toBeLessThan(shader.indexOf('c *= 1.0 - 0.20 * smoothstep'));
+    expect(call).toBeLessThan(shader.indexOf('c *= 1.0 - 0.08 * smoothstep'));
   });
 
   it('shares ONE uniform block across every grade pass that opts in', () => {

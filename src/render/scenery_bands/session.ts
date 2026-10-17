@@ -274,16 +274,18 @@ export class LowSceneryBands {
             items,
             include: (item) => placementDistance(item, x, z) <= [190, 310, 630][index],
             reduction: (item, part) => {
-              const regional = palmBudgetTree(
-                item.x,
-                item.z,
-                item.owner.name,
-                part.source.material.name,
-                palm,
+              const matName = part.source.material.name;
+              const regional = palmBudgetTree(item.x, item.z, item.owner.name, matName, palm);
+              if (index === 0) {
+                return { triangles: regional ? 256 : 512, mode: regional ? 'palm' : 'quality' };
+              }
+              const isLeaf = /leaves|foliage|canopy|needle|palm|frond|bush|fern|vine/i.test(
+                matName,
               );
-              return index === 0
-                ? { triangles: regional ? 256 : 512, mode: regional ? 'palm' : 'quality' }
-                : { triangles: index === 1 ? 32 : 12, mode: 'coarse' };
+              return {
+                triangles: index === 1 ? (isLeaf ? 160 : 32) : isLeaf ? 64 : 12,
+                mode: 'coarse',
+              };
             },
             material: lowSceneryBandMaterial,
             localCoordinates: false,

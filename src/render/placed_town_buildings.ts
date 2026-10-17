@@ -41,6 +41,7 @@ import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_
 import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
+import { isLowSceneryCullActive, sceneryStructureFar } from './scenery_detail';
 import {
   newTownPiecewiseReveal,
   orderTownRootsNearestFirst,
@@ -339,10 +340,21 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
         if (hideTargets.length === 0) return;
         lastCamX = camX;
         lastCamZ = camZ;
-        const hubDx = camX - spec.hub.center.x;
-        const hubDz = camZ - spec.hub.center.z;
+        const lowCull = isLowSceneryCullActive(fogFar);
+        const structureFar = sceneryStructureFar(fogFar);
+        const cullX = lowCull ? eyeX : camX;
+        const cullZ = lowCull ? eyeZ : camZ;
+        const hubDx = cullX - spec.hub.center.x;
+        const hubDz = cullZ - spec.hub.center.z;
         const reveal = townStaticReveal(
-          fenbridgeFogVisible(camX, camZ, spec.hub.center.x, spec.hub.center.z, fogFar, cullRadius),
+          fenbridgeFogVisible(
+            cullX,
+            cullZ,
+            spec.hub.center.x,
+            spec.hub.center.z,
+            structureFar,
+            cullRadius,
+          ),
           revealed,
           hubDx * hubDx + hubDz * hubDz,
           cullRadius,
@@ -365,7 +377,9 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
             eyeX,
             eyeY,
             eyeZ,
-            fogFar,
+            structureFar,
+            cullX,
+            cullZ,
           );
           target.group.visible =
             visibilityPlan.visible && townRootVisible(reveal, piecewise, index);

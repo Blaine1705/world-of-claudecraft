@@ -40,7 +40,12 @@ import { type BiomeHazePreset, hazeLightLevel } from '../biome_haze_field_core';
 import { recolorLiveBladeGrassView } from '../blade_grass';
 import { recolorLiveBladeGrassBandView } from '../blade_grass_band';
 import { celShadingSettings } from '../cel_shading';
-import { dayNightPhaseOverride, setDayNightPhaseOverride } from '../day_night_clock';
+import {
+  currentDayNightPhase,
+  dayNightPhaseOverride,
+  setDayNightPhaseOverride,
+} from '../day_night_clock';
+import { globalDayness } from '../day_night_core';
 import { FAR_WORLD_MARGIN } from '../far_terrain_core';
 import {
   type GroundPaletteTable,
@@ -55,11 +60,14 @@ import { precipForBiome } from '../weather_field_core';
 import { livePaletteAoPass, setLabRim } from './lab_lighting';
 import { livePaletteBloomPass } from './palette_bloom';
 import { paletteGradeUniforms } from './palette_grade';
+import { paletteLabPanelEnabled } from './palette_lab_flag';
 import { mountPaletteLabPanel, type PaletteLabPanel } from './palette_lab_panel';
 import { paletteSkyUniforms } from './palette_sky';
 import {
   applyLookPatch,
   cycleLookId,
+  DEFAULT_ZONE_NIGHT_SELECTIONS,
+  DEFAULT_ZONE_SELECTIONS,
   fogSceneHex,
   gradeUniformValues,
   groundKey,
@@ -71,6 +79,7 @@ import {
   lookDisplayModel,
   lookToShippingSnippet,
   parseSelections,
+  resolveZoneLookId,
   rimColorLinear,
   STOCK_LOOK_ID,
   skyUniformValues,
@@ -79,7 +88,8 @@ import {
 } from './zone_look_core';
 import { ZONE_LOOKS } from './zone_looks';
 
-const STORAGE_KEY = 'woc.paletteLab.selections.v1';
+const STORAGE_KEY = 'woc.paletteLab.selections.v3';
+const NIGHT_STORAGE_KEY = 'woc.paletteLab.nightSelections.v3';
 // Ground margin past a zone's rect: the palette blends over 65 yards either
 // side of a border, so chunks that far out also carry the zone's colour.
 const GROUND_BLEND_MARGIN = 70;
@@ -136,21 +146,35 @@ interface LabGameHandle {
   world?: { player?: { pos: { x: number; z: number } } | null };
 }
 
-function game(): LabGameHandle | null {
-  return (window as unknown as { __game?: LabGameHandle }).__game ?? null;
+interface LabEditorHandle {
+  viewport3d?: {
+    renderer?: LabRendererHandle | null;
+    sim?: { player?: { pos: { x: number; z: number } } | null } | null;
+  } | null;
 }
 
-function readStorage(): string | null {
+function game(): LabGameHandle | null {
+  const w = window as unknown as { __game?: LabGameHandle; __editor?: LabEditorHandle };
+  if (w.__game) return w.__game;
+  const v3d = w.__editor?.viewport3d;
+  if (!v3d?.renderer) return null;
+  return {
+    renderer: v3d.renderer,
+    world: v3d.sim ?? undefined,
+  };
+}
+
+function readStorage(key = STORAGE_KEY): string | null {
   try {
-    return localStorage.getItem(STORAGE_KEY);
+    return localStorage.getItem(key);
   } catch {
     return null;
   }
 }
 
-function writeStorage(value: string): void {
+function writeStorage(value: string, key = STORAGE_KEY): void {
   try {
-    localStorage.setItem(STORAGE_KEY, value);
+    localStorage.setItem(key, value);
   } catch {
     // Private mode or blocked storage: the selections just do not persist.
   }
@@ -171,7 +195,14 @@ export interface PaletteLabApi {
 }
 
 class PaletteLabRuntime implements PaletteLabApi {
-  private readonly selections: LookSelections = parseSelections(readStorage());
+  private readonly selections: LookSelections = {
+    ...DEFAULT_ZONE_SELECTIONS,
+    ...parseSelections(readStorage(STORAGE_KEY)),
+  };
+  private readonly nightSelections: LookSelections = {
+    ...DEFAULT_ZONE_NIGHT_SELECTIONS,
+    ...parseSelections(readStorage(NIGHT_STORAGE_KEY)),
+  };
   private readonly lookCache = new Map<string, ZoneLook[]>();
   private readonly zonesById = new Map(ZONES.map((z) => [z.id, z]));
   private stockBloom: LookBloom | null = null;
@@ -181,6 +212,7 @@ class PaletteLabRuntime implements PaletteLabApi {
   // Inside an instanced interior (dungeon, raid, rift): the stock look, since
   // an overworld zone's grade has no business recolouring a crypt.
   private indoors = false;
+  private wasNight = false;
   private rowsDirty = true;
   private snapNext = true;
   private liveNow: number[] = [];
@@ -209,6 +241,8 @@ class PaletteLabRuntime implements PaletteLabApi {
   private panel: PaletteLabPanel | null = null;
 
   start(): void {
+    this.wasNight = this.isNight();
+    this.seedGroundTable();
     const frame = (now: number): void => {
       const dt = this.lastFrame > 0 ? Math.min(0.25, (now - this.lastFrame) / 1000) : 0;
       this.lastFrame = now;
@@ -219,9 +253,23 @@ class PaletteLabRuntime implements PaletteLabApi {
     requestAnimationFrame(frame);
   }
 
-  /** The panel mounts with the first live world, never on the launcher. */
+  private isNight(): boolean {
+    return globalDayness(currentDayNightPhase()) < 0.45;
+  }
+
+  private seedGroundTable(): void {
+    const table: Record<string, LookGround> = {};
+    for (const zone of ZONES) {
+      const look = this.groundLook(zone);
+      if (look.id !== STOCK_LOOK_ID) table[zone.id] = look.ground;
+      this.appliedGround.set(zone.id, groundKey(look.ground));
+    }
+    setGroundPaletteOverrides(Object.keys(table).length > 0 ? (table as GroundPaletteTable) : null);
+  }
+
+  /** The panel mounts with the first live world when `?palette=on`, never on the launcher. */
   private ensurePanel(): void {
-    if (this.panel) return;
+    if (!paletteLabPanelEnabled() || this.panel) return;
     this.panel = mountPaletteLabPanel({
       onSelect: (id) => this.apply(id),
       onCycle: (step) => this.cycle(step),
@@ -264,7 +312,7 @@ class PaletteLabRuntime implements PaletteLabApi {
   }
 
   private selectedId(zone: ZoneDef): string {
-    return this.selections[zone.id] ?? STOCK_LOOK_ID;
+    return resolveZoneLookId(zone.id, this.selections, this.nightSelections, this.isNight());
   }
 
   /** The look a zone shows right now (stock while comparing). */
@@ -292,9 +340,14 @@ class PaletteLabRuntime implements PaletteLabApi {
   select(zoneId: string, lookId: string): boolean {
     const zone = this.zonesById.get(zoneId);
     if (!zone || !this.looksFor(zone).some((l) => l.id === lookId)) return false;
-    if (lookId === STOCK_LOOK_ID) delete this.selections[zoneId];
-    else this.selections[zoneId] = lookId;
-    writeStorage(JSON.stringify(this.selections));
+    const target =
+      this.isNight() && (zoneId in this.nightSelections || zoneId in DEFAULT_ZONE_NIGHT_SELECTIONS)
+        ? this.nightSelections
+        : this.selections;
+    const storageKey = target === this.nightSelections ? NIGHT_STORAGE_KEY : STORAGE_KEY;
+    if (lookId === STOCK_LOOK_ID) delete target[zoneId];
+    else target[zoneId] = lookId;
+    writeStorage(JSON.stringify(target), storageKey);
     this.rowsDirty = true;
     this.snapNext = true;
     this.refreshPanel();
@@ -359,12 +412,22 @@ class PaletteLabRuntime implements PaletteLabApi {
   }
 
   private resetZone(): void {
-    if (this.zone) this.select(this.zone.id, STOCK_LOOK_ID);
+    if (!this.zone) return;
+    const zoneId = this.zone.id;
+    const defId =
+      this.isNight() && zoneId in DEFAULT_ZONE_NIGHT_SELECTIONS
+        ? DEFAULT_ZONE_NIGHT_SELECTIONS[zoneId]
+        : (DEFAULT_ZONE_SELECTIONS[zoneId] ?? STOCK_LOOK_ID);
+    this.select(zoneId, defId);
   }
 
   private resetAll(): void {
     for (const id of Object.keys(this.selections)) delete this.selections[id];
-    writeStorage('{}');
+    Object.assign(this.selections, DEFAULT_ZONE_SELECTIONS);
+    for (const id of Object.keys(this.nightSelections)) delete this.nightSelections[id];
+    Object.assign(this.nightSelections, DEFAULT_ZONE_NIGHT_SELECTIONS);
+    writeStorage('{}', STORAGE_KEY);
+    writeStorage('{}', NIGHT_STORAGE_KEY);
     this.rowsDirty = true;
     this.snapNext = true;
     this.refreshPanel();
@@ -410,6 +473,12 @@ class PaletteLabRuntime implements PaletteLabApi {
       this.indoors = indoors;
       this.rowsDirty = true;
       this.snapNext = true;
+    }
+    const night = this.isNight();
+    if (night !== this.wasNight) {
+      this.wasNight = night;
+      this.rowsDirty = true;
+      this.refreshPanel();
     }
     const zone = zoneAt(pos.x, pos.z);
     if (zone.id !== this.zone?.id) {
@@ -653,7 +722,7 @@ class PaletteLabRuntime implements PaletteLabApi {
     const changed = setGroundPaletteOverrides(
       Object.keys(table).length > 0 ? (table as GroundPaletteTable) : null,
     );
-    if (!changed || this.pendingGroundZones.size === 0) return;
+    if (!changed && this.pendingGroundZones.size === 0) return;
     // The blades read the palette cache directly: re-place them now.
     recolorLiveBladeGrassView();
     recolorLiveBladeGrassBandView();

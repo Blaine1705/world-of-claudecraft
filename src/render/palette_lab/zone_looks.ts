@@ -20,9 +20,9 @@
 import type { LookPatch, LookRender } from './zone_look_core';
 
 // Recurring water sets.
-const LAGOON = { deep: 0x0b4a78, shallow: 0x2aa6a8, sky: 0x9fd2ee, scatter: 0x22907f };
-const COBALT = { deep: 0x0b3f78, shallow: 0x2f9fc8, sky: 0x8cc4ee, scatter: 0x1f8fa8 };
-const TEAL_LAKE = { deep: 0x0d4a5c, shallow: 0x3a9e93, sky: 0x8ec8de, scatter: 0x22897c };
+const LAGOON = { deep: 0x105898, shallow: 0x32d0cc, sky: 0xace0fa, scatter: 0x24b4a8 };
+const COBALT = { deep: 0x0e4f90, shallow: 0x30c6d4, sky: 0xa2d8f6, scatter: 0x22a8bc };
+const TEAL_LAKE = { deep: 0x105a74, shallow: 0x36c8b6, sky: 0xa4dcf0, scatter: 0x26aa9a };
 const GOLDEN_SEA = { deep: 0x123f66, shallow: 0x3f9aa0, sky: 0xf2c89a, scatter: 0x5aa08a };
 const ROSE_SEA = { deep: 0x2a2f66, shallow: 0x5a86a8, sky: 0xf0b6c6, scatter: 0x6a8ab0 };
 const MURK = { deep: 0x1a2f26, shallow: 0x3f6a4c, sky: 0x9fb8a0, scatter: 0x3a6a4a };
@@ -76,19 +76,19 @@ const STORYBOOK = {
   greenVal: 1.0,
 };
 const HIGH_KEY = {
-  exposure: 1.0,
+  exposure: 0.96,
   temperature: 0.02,
-  contrast: 1.02,
-  saturation: 1.05,
-  vibrance: 0.32,
-  shadowTint: 0x3a72b0,
-  shadowAmt: 0.13,
+  contrast: 1.08,
+  saturation: 1.0,
+  vibrance: 0.12,
+  shadowTint: 0x3a6ca8,
+  shadowAmt: 0.1,
   highlightTint: 0xfff2d8,
   highlightAmt: 0.04,
-  lift: 0.025,
-  greenHue: -6,
-  greenSat: 1.08,
-  greenVal: 1.06,
+  lift: 0.004,
+  greenHue: -3,
+  greenSat: 0.96,
+  greenVal: 0.98,
 };
 const POP = {
   exposure: 0.98,
@@ -115,11 +115,11 @@ const CYAN_SKY = {
   intensity: 1.45,
 };
 const ISLAND_SKY = {
-  zenith: 0x3b97ea,
-  horizon: 0xe2f4fb,
-  amount: 0.85,
+  zenith: 0x2d7fe0,
+  horizon: 0xd4ecfa,
+  amount: 0.74,
   cloudKeep: 1,
-  intensity: 1.6,
+  intensity: 1.32,
 };
 const PLAINS_DUSK_SKY = {
   zenith: 0x5aa2dc,
@@ -201,25 +201,25 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
       name: 'Skyward Isles',
       note: 'High-key, airy sky-island daylight; pale cyan air, white clouds, cobalt water (#39, #41).',
       ground: {
-        grass: 0x84b44a,
-        grassDark: 0x4c884a,
-        grassYellow: 0xcace6a,
-        dirt: 0xa88e66,
-        sand: 0xe6dcb8,
+        grass: 0x5d943f,
+        grassDark: 0x3b6833,
+        grassYellow: 0x86a248,
+        dirt: 0x8e7149,
+        sand: 0xd0be90,
       },
-      fog: { color: 0xb8dbf2, near: 75, far: 820 },
+      fog: { color: 0xb6d6f0, near: 145, far: 780 },
       light: {
-        hemiSky: 0xd6ebff,
-        hemiGround: 0x6a8a52,
-        sun: 0xfff7e8,
-        sunScale: 1.06,
-        hemiScale: 4.56,
-        envScale: 1.8,
+        hemiSky: 0xcfe4ff,
+        hemiGround: 0x4c6e3c,
+        sun: 0xfff4e0,
+        sunScale: 1.02,
+        hemiScale: 2.15,
+        envScale: 1.25,
       },
       sky: ISLAND_SKY,
-      water: COBALT,
+      water: LAGOON,
       grade: HIGH_KEY,
-      bloom: { strength: 0.5, threshold: 1.2 },
+      bloom: { strength: 0.28, threshold: 1.38 },
     },
     {
       id: 'painted-storybook',
@@ -442,6 +442,31 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
       sky: CYAN_SKY,
       water: LAGOON,
       grade: CLEAR_DAY,
+    },
+    {
+      id: 'skyward-isles',
+      name: 'Skyward Isles',
+      note: 'High-key, airy sky-island daylight; pale cyan air, white clouds, cobalt water (#39, #41).',
+      ground: {
+        grass: 0x5d943f,
+        grassDark: 0x3b6833,
+        grassYellow: 0x86a248,
+        dirt: 0x8e7149,
+        sand: 0xd0be90,
+      },
+      fog: { color: 0xb6d6f0, near: 145, far: 780 },
+      light: {
+        hemiSky: 0xcfe4ff,
+        hemiGround: 0x4c6e3c,
+        sun: 0xfff4e0,
+        sunScale: 1.02,
+        hemiScale: 2.15,
+        envScale: 1.25,
+      },
+      sky: ISLAND_SKY,
+      water: LAGOON,
+      grade: HIGH_KEY,
+      bloom: { strength: 0.28, threshold: 1.38 },
     },
     {
       id: 'painted-storybook',
@@ -876,7 +901,7 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
         envScale: 1.8,
       },
       sky: ISLAND_SKY,
-      water: COBALT,
+      water: LAGOON,
       grade: HIGH_KEY,
     },
   ],

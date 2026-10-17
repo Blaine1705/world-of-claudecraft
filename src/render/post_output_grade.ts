@@ -304,7 +304,7 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
       c = paletteGrade(c);
     #endif
     vec2 d = vUv - 0.5;
-    c *= 1.0 - 0.20 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);
+    c *= 1.0 - 0.08 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);
     c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;
     #ifdef CEL_INK
       // Cel-shading R&D ink + saturation (post_cel_ink_glsl.ts): after the

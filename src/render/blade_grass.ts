@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {
+  BUILTIN_WORLD,
   getActiveWorldContent,
   isBuiltinWorldActive,
   WORLD_MAX_X,
@@ -7,13 +8,7 @@ import {
   WORLD_MIN_Z,
 } from '../sim/data';
 import { grassClearedAt } from '../sim/grass_clear';
-import {
-  roadDistance,
-  terrainCutAtHeight,
-  terrainHeight,
-  WATER_LEVEL,
-  zoneBiomeAt,
-} from '../sim/world';
+import { roadDistance, terrainCutAtHeight, terrainHeight, zoneBiomeAt } from '../sim/world';
 import {
   activateDenseSlot,
   type DenseSlotState,
@@ -22,17 +17,25 @@ import {
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
 import { GRASS_BIOME_DENSITY } from './foliage';
-import { insideGrassHubExclusion, insidePavedGrassExclusion } from './foliage_core';
-import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
-import { GFX, sharedUniforms } from './gfx';
 import {
-  MEADOW_MAX_STRETCH,
-  meadowBladeScale,
-  meadowCellGrows,
-  meadowFullness,
-  meadowHeightStretch,
-} from './meadow_fullness_core';
-import { MEADOW_CARPET_FADE_START } from './meadow_tuning';
+  eastbrookGrassExclusions,
+  insideAnyBuildingFootprint,
+  insideEastbrookGrassExclusion,
+  insideGrassHubExclusion,
+  insidePavedGrassExclusion,
+} from './foliage_core';
+import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
+import { foliageShoreSkip } from './foliage_shore_gate_core';
+import { GFX, sharedUniforms } from './gfx';
+import { MEADOW_MAX_STRETCH } from './meadow_fullness_core';
+import {
+  MEADOW_CAMERA_CLEAR_FAR,
+  MEADOW_CAMERA_CLEAR_NEAR,
+  MEADOW_CARPET_FADE_START,
+  meadowClusterHeight,
+  meadowClusterScale,
+  meadowCoverage,
+} from './meadow_tuning';
 import { paletteLabEnabled } from './palette_lab';
 import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
@@ -112,22 +115,22 @@ export function clusterGeometry(rng: () => number): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
   const indices: number[] = [];
-  const BLADES = 5;
+  const BLADES = 9;
   for (let b = 0; b < BLADES; b++) {
-    // even fan for coverage, heavy jitter so no two blades pair up
-    const yaw = (b / BLADES) * Math.PI * 2 + (rng() - 0.5) * 2.4;
+    // even fan for coverage, jittered so blades overlap into a lush patch clump
+    const yaw = (b / BLADES) * Math.PI * 2 + (rng() - 0.5) * 1.4;
     const cos = Math.cos(yaw);
     const sin = Math.sin(yaw);
-    const ox = (rng() - 0.5) * 0.4;
-    const oz = (rng() - 0.5) * 0.4;
-    // each blade leaves the ground at its own angle: a straight base tilt
-    // (some near-vertical, some well leant) plus a bow the tip eases into
-    const tilt = rng() * 0.38;
-    const bow = 0.1 + rng() * 0.45;
-    const len = 0.55 + rng() * 0.55;
-    const w0 = 0.042 + rng() * 0.022;
-    const w1 = w0 * 0.62;
-    const w2 = w0 * 0.34;
+    const ox = (rng() - 0.5) * 0.26;
+    const oz = (rng() - 0.5) * 0.26;
+    // each blade leaves the ground at its own angle: a base tilt plus a graceful
+    // outward bow so the 9 wide ribbons fountain into a cohesive Genshin patch
+    const tilt = 0.08 + rng() * 0.36;
+    const bow = 0.12 + rng() * 0.42;
+    const len = 0.58 + rng() * 0.52;
+    const w0 = 0.095 + rng() * 0.045;
+    const w1 = w0 * 0.74;
+    const w2 = w0 * 0.42;
     const base = positions.length / 3;
     // widths run perpendicular to the lean so the silhouette shows the bow
     const px = -sin;
@@ -141,13 +144,13 @@ export function clusterGeometry(rng: () => number): THREE.BufferGeometry {
       // from the ground it grows in
       colors.push(shade, shade, shade);
     };
-    put(-w0, 0, 0.62);
-    put(w0, 0, 0.62);
-    put(-w1, 0.45, 0.86);
-    put(w1, 0.45, 0.86);
-    put(-w2, 0.76, 1.04);
-    put(w2, 0.76, 1.04);
-    put(0, 1.0, 1.18);
+    put(-w0, 0, 0.86);
+    put(w0, 0, 0.86);
+    put(-w1, 0.45, 0.95);
+    put(w1, 0.45, 0.95);
+    put(-w2, 0.78, 1.03);
+    put(w2, 0.78, 1.03);
+    put(0, 1.0, 1.1);
     indices.push(
       base,
       base + 1,
@@ -252,6 +255,7 @@ export function buildBladeGrass(
   seed: number,
   initialPx: number,
   initialPz: number,
+  forceEditorCarpet = false,
 ): BladeGrassView {
   const group = new THREE.Group();
   group.name = 'bladeGrass';
@@ -261,7 +265,7 @@ export function buildBladeGrass(
   // Foliage Density dial maps onto the same radius knob.
   // ?bladegrass=off is the dev-only perf-attribution kill switch
   // (render_dev_flags.ts).
-  const RADIUS = GFX.bladeCarpetRadius;
+  const RADIUS = GFX.bladeCarpetRadius > 0 ? GFX.bladeCarpetRadius : forceEditorCarpet ? 34 : 0;
   if (RADIUS <= 0 || renderLayerDisabled('bladegrass')) {
     // A tier without the carpet still replaces the live view, so a rebuild
     // never keeps the old carpet's buffers reachable from here.
@@ -306,10 +310,22 @@ export function buildBladeGrass(
           // sort; shrinking toward the root is invisible in motion
           float bgFade = 1.0 - smoothstep(${(RADIUS * FADE_START).toFixed(1)}, ${RADIUS.toFixed(1)}, distance(bgOrigin.xz, uPlayerPos));
           transformed *= bgFade;
+          // camera-near collapse: blades within a few yards of the eye shrink
+          // to their roots, so a low chase camera never looks through a wall
+          // of oversized near blades (the painted-meadow trick)
+          transformed *= smoothstep(${MEADOW_CAMERA_CLEAR_NEAR.toFixed(1)}, ${MEADOW_CAMERA_CLEAR_FAR.toFixed(1)},
+            distance(bgOrigin, cameraPosition));
           ${bladeSwayGlsl(classicSway)}
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
+    sh.fragmentShader = sh.fragmentShader.replace(
+      '#include <normal_fragment_begin>',
+      `#include <normal_fragment_begin>
+      #ifdef DOUBLE_SIDED
+        normal *= faceDirection;
+      #endif`,
+    );
   };
   const uPlayerPos = { value: new THREE.Vector2(1e9, 1e9) };
 
@@ -343,6 +359,13 @@ export function buildBladeGrass(
     return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
   };
 
+  const activeContent = getActiveWorldContent();
+  const townExclusions = eastbrookGrassExclusions(
+    activeContent.props.buildings,
+    activeContent === BUILTIN_WORLD,
+    activeContent.services?.noticeboards ?? [],
+  );
+
   function placeSlot(slot: number, ci: number, cj: number): void {
     const r1 = hash(ci, cj, 1);
     const x = ci * CELL + (r1 - 0.5) * CELL * 1.3;
@@ -355,19 +378,21 @@ export function buildBladeGrass(
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
       // higher floor + gain than the tufts: coverage is the carpet's job,
       // the patch structure just modulates it
-      ok = meadowCellGrows(r1, lush, biomeDensity);
+      ok = r1 < meadowCoverage(lush) * Math.min(biomeDensity, 1.2);
       if (ok) ok = roadDistance(x, z) > 2.4;
       // The maker's painted no-grass discs (sim/grass_clear.ts). They had a
       // spatial index, a document field, an editor brush and a sanitizer, and
       // no consumer anywhere in the render, so a paved plaza still grew a
       // meadow through it. This is that consumer: the blade carpet is what
       // actually shows on a city floor.
-      if (ok) ok = !grassClearedAt(getActiveWorldContent().grassClear, x, z);
-      if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
+      if (ok) ok = !grassClearedAt(activeContent.grassClear, x, z);
+      if (ok) ok = !insideGrassHubExclusion(activeContent.zones, x, z);
       if (ok) ok = !insidePavedGrassExclusion(x, z);
+      if (ok) ok = !insideEastbrookGrassExclusion(townExclusions, x, z, 0.85);
+      if (ok) ok = !insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85);
       if (ok) {
         const h = terrainHeight(x, z, seed);
-        ok = h > WATER_LEVEL + 1.4;
+        ok = !foliageShoreSkip(x, z, h, seed);
         // a boolean cut removes the ground sheet: no carpet floating over the
         // opening (same evaluator the mesher drops quads with)
         if (ok) ok = !terrainCutAtHeight(x, z, h);
@@ -375,11 +400,7 @@ export function buildBladeGrass(
         // shader fades its relief (planar smear territory)
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
-          // smaller blades at higher count: ground COVER, not standalone
-          // clumps, so the meadow reads as one grown surface. A hash-gated
-          // size class turns ~10% of cells into taller tufts (x1.5 to x1.8)
-          // that punctuate the fine carpet the rest of the cells lay down.
-          const s = meadowBladeScale(hash(ci, cj, 3), hash(ci, cj, 4), lush);
+          const s = meadowClusterScale(lush, hash(ci, cj, 3), hash(ci, cj, 4));
           q.setFromAxisAngle(up, r1 * 12.9);
           // whole-cluster lean, a hashed direction and up to ~12 degrees:
           // neighbouring tufts tip different ways instead of standing in a
@@ -387,10 +408,8 @@ export function buildBladeGrass(
           const rLean = hash(ci, cj, 5);
           leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
           q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
-          // per-cluster height jitter on top of the blade-level length spread
-          const hJit = 0.82 + hash(ci, cj, 6) * 0.36;
-          const sw = s * meadowFullness().width;
-          m.compose(v.set(x, h - 0.02, z), q, sv.set(sw, s * meadowHeightStretch(lush, hJit), sw));
+          const sy = meadowClusterHeight(s, lush, hash(ci, cj, 6));
+          m.compose(v.set(x, h - 0.02, z), q, sv.set(s, sy, s));
           groundGrassColorAt(x, z, seed, c);
           // slight lift over the raw ground tint: blades catch more sky
           // than the soil they stand on

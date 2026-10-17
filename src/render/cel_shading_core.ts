@@ -88,10 +88,10 @@ function readNumber(
  * look. `?cel=on` (or `1`) opts in; the tuning knobs are `cellight=off`, `celbands=2|3`, `celedge`,
  * `cellit`, `celmid`, `celink`, `celinkwidth` and `celsat`.
  */
-export function celShadingFromQuery(search: string): CelShadingSettings | null {
+export function celShadingFromQuery(search: string, defaultOn = false): CelShadingSettings | null {
   const params = new URLSearchParams(search);
   const mode = params.get('cel');
-  if (mode !== 'on' && mode !== '1') return null;
+  if (defaultOn ? mode === 'off' || mode === '0' : mode !== 'on' && mode !== '1') return null;
   const d = CEL_SHADING_DEFAULTS;
   const lit = readNumber(params, 'cellit', d.lit, 0.2, 1.5);
   return {
