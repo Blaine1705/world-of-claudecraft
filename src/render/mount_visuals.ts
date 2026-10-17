@@ -222,19 +222,20 @@ const LENS_GLOW_RADIUS = 0.105;
 const BROOM_LANTERN_OFFSET = [0, 0.2, 0] as const;
 
 /** Astride a broom handle: the legs close round a thin shaft (a small spread), the thighs
- *  forward, the shins hanging back toward the stirrups, the pelvis tipped forward and the
- *  chest leaning into the ride. */
+ *  forward, the shins hanging back toward the stirrups, and the rider sitting up: the
+ *  pelvis plumb and only a breath of forward chest, so the torso reads near vertical and
+ *  relaxed while the grip reach brings the hands forward onto the handle. */
 const BROOM_RIDE: MountRideSpec = {
   spread: 0.22,
   thigh: 0.95,
   knee: 2.15,
   ankle: -0.55,
-  hips: 0.24,
-  lean: 0.42,
+  hips: 0.02,
+  lean: 0.06,
   // the grip's centre: the wrapped leather 0.82 m of model ahead of the broom's origin
   // (1.0 at the drawn scale), the rider sitting 0.13 behind it; its height the handle's,
   // 0.164 over the rider's root (the handle 0.584 over the broom's root, the seat 0.42)
-  grip: { forward: 1.13, up: 0.164, stagger: 0.26 },
+  grip: { forward: 0.66, up: 0.15, stagger: 0.22 },
 };
 
 /** Default colour of a carried lamp's point light: sodium-warm, matching the
