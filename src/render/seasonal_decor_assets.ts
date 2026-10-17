@@ -14,7 +14,7 @@ import * as THREE from 'three';
 import { loadGltf } from './assets/loader';
 import { attachBiomeHaze } from './biome_haze_field';
 import { GFX } from './gfx';
-import { registerSeasonalGlowMaterial } from './seasonal_glow';
+import { registerSeasonalGlowMaterial, resetSeasonalGlowMaterials } from './seasonal_glow';
 
 export const GOURDLIGHT_DECOR_URL = '/models/props/gourdlight_decor.glb';
 export const GOURDLIGHT_HEAD_URL = '/models/props/gourdlight_pumpkin_head.glb';
@@ -81,6 +81,9 @@ type LoadState = 'idle' | 'loading' | 'ready' | 'failed';
 let state: LoadState = 'idle';
 let assets: GourdlightAssets | null = null;
 const sharedMaterials = new Map<THREE.Material, THREE.Material>();
+/** The material tier the ready kit was built for (GFX.standardMaterials): a graphics
+ *  rebuild that changes it rebuilds the kit's materials on the next ask. */
+let builtTier: boolean | null = null;
 
 function prepareMaterial(source: THREE.Material): THREE.Material {
   const cached = sharedMaterials.get(source);
@@ -93,6 +96,8 @@ function prepareMaterial(source: THREE.Material): THREE.Material {
     vertexColors: true,
     emissive: glow ? (src.emissive?.clone() ?? new THREE.Color(1, 0.5, 0.1)) : new THREE.Color(0),
     emissiveIntensity: glow ? 1 : 0,
+    // the factory authors every shell (paper, leaves, the cut rind) two sided
+    side: source.side,
   };
   const material = GFX.standardMaterials
     ? new THREE.MeshStandardMaterial({
@@ -153,6 +158,14 @@ function partsOf(node: THREE.Object3D): SeasonalPart[] {
 
 /** The event's assets once loaded, or null; the first ask starts the fetch. */
 export function gourdlightAssets(): GourdlightAssets | null {
+  if (state === 'ready' && builtTier !== GFX.standardMaterials) {
+    // a tier change since the build: the loader's cache re-serves the files
+    for (const material of sharedMaterials.values()) material.dispose();
+    sharedMaterials.clear();
+    resetSeasonalGlowMaterials();
+    assets = null;
+    state = 'idle';
+  }
   if (state === 'ready') return assets;
   if (state === 'idle') {
     state = 'loading';
@@ -165,6 +178,7 @@ export function gourdlightAssets(): GourdlightAssets | null {
         }
         const headNode = headGltf.scene.getObjectByName('pumpkin_head') ?? headGltf.scene;
         assets = { decor, head: partsOf(headNode) };
+        builtTier = GFX.standardMaterials;
         state = 'ready';
       })
       .catch((err) => {

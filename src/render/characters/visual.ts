@@ -686,11 +686,12 @@ export class CharacterVisual {
     fitSeasonalHead(piece, bone, this.root);
     bone.add(piece);
     // The pumpkin IS the head: the face, hair and beard under it stop drawing the frame
-    // it shows (never before, so a body is never seen headless while it links).
+    // it shows (never before, so a body is never seen headless while it links). Set
+    // first: without a gate the reveal calls back on this very stack.
+    this.seasonalHead = piece;
     this.revealOnCompile(piece, 'seasonal head', () => {
       if (this.seasonalHead === piece) this.wocHead?.setHeadless(true);
     });
-    this.seasonalHead = piece;
     return true;
   }
 

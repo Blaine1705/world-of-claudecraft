@@ -31,3 +31,8 @@ export function driveSeasonalGlow(night: number, time: number): void {
     e.material.emissiveIntensity = seasonalGlowIntensity(night, time, e.phase, e.base);
   }
 }
+
+/** Forget every registered glow (the kit's materials were rebuilt for a new tier). */
+export function resetSeasonalGlowMaterials(): void {
+  entries.length = 0;
+}

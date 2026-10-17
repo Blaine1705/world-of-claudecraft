@@ -8,8 +8,11 @@
 // instanced once (one InstancedMesh per glTF primitive per piece kind, plus one
 // merged rope per city), and the whole root attaches through the renderer's
 // compile gate (gated_scene_attach.ts): hidden until its programs link, so the
-// first lit frame never links on a live frame. After that the event's open and
-// close only flip visibility; a closed event costs one boolean per frame.
+// first lit frame never links on a live frame. The gate owns the ROOT's visibility;
+// the event's open and close flip an inner content group, so a toggle can never
+// reveal the kit before it is linked. A closed event costs one boolean per frame.
+// The renderer's teardown disposes what this view built (dispose); the shared
+// parts belong to seasonal_decor_assets.ts.
 //
 // Each city is its own group, shown only within DRAW_RANGE of the camera's
 // subject, so a city out of reach submits no draws. The glow (dim by day,
@@ -63,6 +66,10 @@ interface Placement {
 
 export class SeasonalDecor {
   readonly root = new THREE.Group();
+  /** The event's toggle (the gate drives `root`, never this). */
+  private readonly content = new THREE.Group();
+  private readonly owned: THREE.Mesh[] = [];
+  private disposed = false;
   private cities: CityView[] = [];
   private built = false;
   private ropeMaterial: THREE.Material | null = null;
@@ -74,14 +81,17 @@ export class SeasonalDecor {
     private readonly compileGate?: SeasonalDecorCompileGate,
   ) {
     this.root.name = 'seasonal-decor';
+    this.content.name = 'seasonal-decor-content';
+    this.root.add(this.content);
   }
 
   /** Per frame: the event's state, the night amount (0 day .. 1 night), the
    *  clock, and the player's position for the per-city reach. */
   update(night: number, time: number, px: number, pz: number): void {
+    if (this.disposed) return;
     const active = this.activeEvent() === GOURDLIGHT_EVE_ID;
     if (!active) {
-      if (this.built) this.root.visible = false;
+      if (this.built) this.content.visible = false;
       return;
     }
     if (!this.built) {
@@ -89,7 +99,7 @@ export class SeasonalDecor {
       if (!assets) return;
       this.build(assets);
     }
-    this.root.visible = true;
+    this.content.visible = true;
     for (const city of this.cities) {
       const dx = city.x - px;
       const dz = city.z - pz;
@@ -126,10 +136,12 @@ export class SeasonalDecor {
     hubs.forEach((hub, i) => {
       const group = this.buildCity(assets, perCity[i], i);
       group.name = `seasonal-decor-city-${i}`;
-      this.root.add(group);
+      this.content.add(group);
       this.cities.push({ group, x: hub.x, z: hub.z });
     });
-    void attachSceneGroupGated(this.scene, this.root, this.compileGate).catch(() => {});
+    void attachSceneGroupGated(this.scene, this.root, this.compileGate, () => this.disposed).catch(
+      () => {},
+    );
   }
 
   private makeRopeMaterial(): THREE.Material {
@@ -164,11 +176,35 @@ export class SeasonalDecor {
       }
     });
     for (const [kind, placements] of byKind) {
-      for (const part of assets.decor[kind]) group.add(instanced(part, placements));
+      for (const part of assets.decor[kind]) {
+        const mesh = instanced(part, placements);
+        this.owned.push(mesh);
+        group.add(mesh);
+      }
     }
     const rope = this.buildRope(city.garlands);
-    if (rope) group.add(rope);
+    if (rope) {
+      group.add(rope);
+      this.owned.push(rope);
+    }
     return group;
+  }
+
+  /** Terminal: detach and free what this view built (its instance buffers, the
+   *  merged ropes and their material); the shared parts stay with the kit cache.
+   *  Idempotent. */
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.root.removeFromParent();
+    for (const mesh of this.owned) {
+      if (mesh instanceof THREE.InstancedMesh) mesh.dispose();
+      else mesh.geometry.dispose();
+    }
+    this.owned.length = 0;
+    this.ropeMaterial?.dispose();
+    this.ropeMaterial = null;
+    this.cities = [];
   }
 
   private buildRope(garlands: readonly SeasonalGarland[]): THREE.Mesh | null {
