@@ -103,9 +103,11 @@ export const GOURDLIGHT_KEEPER_NPC: NpcDef = {
   id: GOURDLIGHT_KEEPER_NPC_ID,
   name: 'Hester Gourdwick',
   title: 'Gourdlight Keeper',
-  // Eastbrook's square, on the open flags south of the market stalls.
-  pos: { x: -11.5, z: -108.5 },
-  facing: Math.PI,
+  // Eastbrook's square, on the open ground east of the road past the statue,
+  // facing west across it: her stall (seasonal_decor_stall.ts) stands round
+  // this spot, with her behind its counter.
+  pos: { x: -4.2, z: -110.5 },
+  facing: -Math.PI / 2,
   color: 0xd9741c,
   questIds: [GOURDLIGHT_ROUNDS_QUEST_ID],
   vendorItems: [CARVED_PUMPKIN_HEAD_ID, JAR_OF_MISCHIEF_ID],

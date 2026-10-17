@@ -9,7 +9,10 @@
 //   - the event's trick-or-treat townsfolk (content/gourdlight_eve.ts): a lit
 //     pumpkin at each knocking door, so the doors to knock on read at a glance;
 //   - every other townsfolk in reach: a gourd pair at their side;
-//   - the event keeper: a pile of gourds round her stand;
+//   - the event keeper: her market stall (src/sim/seasonal_decor_stall.ts), its
+//     footprint checked like everything else; a pile of gourds if it cannot fit;
+//   - the shoulders of the town's own roads: corn shocks, hay bales and lit
+//     pumpkins along the street between the lamps;
 //   - the town hub (the zone's own centre): a ring of gourds in the square.
 // The resolver nudges every piece off colliders, roads and NPC spots, and drops
 // what it cannot seat; tests/seasonal_decor_layout.test.ts pins the result
@@ -23,10 +26,28 @@ export interface SeasonalCityDecorRule {
   radius: number;
   /** Gourds in the square: how many, on what ring round the hub (yards). */
   square: { count: number; ring: number };
+  /** Harvest pieces along the town's road shoulders: at most `max`, at least
+   *  `spacing` yards apart (the anchor is the road itself). */
+  street?: { max: number; spacing: number };
 }
 
 export const GOURDLIGHT_DECOR_CITIES: readonly SeasonalCityDecorRule[] = Object.freeze([
-  { zoneId: 'eastbrook_vale', radius: 62, square: { count: 8, ring: 6.5 } },
-  { zoneId: 'mirefen_marsh', radius: 62, square: { count: 6, ring: 5 } },
-  { zoneId: 'thornpeak_heights', radius: 58, square: { count: 6, ring: 5.5 } },
+  {
+    zoneId: 'eastbrook_vale',
+    radius: 62,
+    square: { count: 8, ring: 6.5 },
+    street: { max: 14, spacing: 9 },
+  },
+  {
+    zoneId: 'mirefen_marsh',
+    radius: 62,
+    square: { count: 6, ring: 5 },
+    street: { max: 18, spacing: 6 },
+  },
+  {
+    zoneId: 'thornpeak_heights',
+    radius: 58,
+    square: { count: 6, ring: 5.5 },
+    street: { max: 12, spacing: 9 },
+  },
 ]);

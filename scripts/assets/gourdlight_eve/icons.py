@@ -332,6 +332,10 @@ def main():
         if m.name in ("GourdFlesh", "GourdInner", "GourdGlow"):
             b = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
             b.inputs["Emission Strength"].default_value = 5.0
+        elif m.name == "GourdLitSkin":
+            # the rind's night glow is the game's to drive; the painting is lit by day
+            b = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+            b.inputs["Emission Strength"].default_value = 0.0
     head.rotation_euler = (0.0, 0.0, -0.35)
     subjects = {
         "carved_pumpkin_head": head,

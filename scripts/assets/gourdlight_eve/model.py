@@ -39,6 +39,11 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import stall  # noqa: E402  (the keeper's stall and the harvest props)
+
+this = sys.modules[__name__]
+
 TAU = math.pi * 2.0
 
 
@@ -76,6 +81,9 @@ def smooth(t):
 
 MATERIAL_DEFS = {
     "GourdSkin": {"rough": 0.46, "metal": 0.0},
+    # a carved pumpkin's rind: the candle inside shows through it faintly at
+    # night (the renderer drives it, tinted by the vertex colour)
+    "GourdLitSkin": {"rough": 0.46, "metal": 0.0, "emit": (1.0, 0.45, 0.12)},
     "GourdStem": {"rough": 0.82, "metal": 0.0},
     "GourdFlesh": {"rough": 0.72, "metal": 0.0, "emit": (1.0, 0.52, 0.12)},
     "GourdInner": {"rough": 0.85, "metal": 0.0, "emit": (1.0, 0.42, 0.06)},
@@ -85,6 +93,9 @@ MATERIAL_DEFS = {
     "Iron": {"rough": 0.58, "metal": 0.55},
     "Leaf": {"rough": 0.7, "metal": 0.0},
     "Ribbon": {"rough": 0.64, "metal": 0.0},
+    "Cloth": {"rough": 0.9, "metal": 0.0},
+    "Straw": {"rough": 0.95, "metal": 0.0},
+    "Paint": {"rough": 0.7, "metal": 0.0},
 }
 
 
@@ -165,10 +176,10 @@ def rib_profile(phi, ribs):
     return abs(math.cos(ribs * 0.5 * phi))
 
 
-def pumpkin_bm(tag, radius, height, ribs, segs, rings, squash_top=0.24):
+def pumpkin_bm(tag, radius, height, ribs, segs, rings, squash_top=0.24, tilt=True):
     bm = bmesh.new()
     bmesh.ops.create_uvsphere(bm, u_segments=segs, v_segments=rings, radius=1.0)
-    tilt = hs(tag, "tilt") * 0.05
+    tilt = hs(tag, "tilt") * 0.05 if tilt else 0.0
     for v in bm.verts:
         x, y, z = v.co
         phi = math.atan2(y, x)
@@ -206,7 +217,7 @@ def color_pumpkin(obj, tag, radius, height, ribs, palette, skin_index=0):
         for li in poly.loop_indices:
             vi = me.loops[li].vertex_index
             co = me.vertices[vi].co
-            if mname == "GourdSkin":
+            if mname in ("GourdSkin", "GourdLitSkin"):
                 phi = math.atan2(co.y, co.x)
                 lobe = rib_profile(phi, ribs)
                 zn = co.z / (height * 0.5)
@@ -365,9 +376,10 @@ def ensure_ccw(pts):
 
 
 def carved_pumpkin(name, tag, collection, radius, height, ribs, style, segs, rings,
-                   palette, neck_hole=0.0, shell=0.05, glow_r=0.3):
-    body = new_object(name, pumpkin_bm(tag, radius, height, ribs, segs, rings), collection)
-    set_materials(body, ["GourdSkin", "GourdInner", "GourdFlesh"])
+                   palette, neck_hole=0.0, shell=0.05, glow_r=0.3, face_lift=0.06, tilt=True,
+                   face_scale=(0.92, 0.62)):
+    body = new_object(name, pumpkin_bm(tag, radius, height, ribs, segs, rings, tilt=tilt), collection)
+    set_materials(body, ["GourdLitSkin", "GourdInner", "GourdFlesh"])
     shade_smooth(body, 1.2)
     sol = body.modifiers.new("shell", "SOLIDIFY")
     sol.thickness = shell
@@ -380,7 +392,7 @@ def carved_pumpkin(name, tag, collection, radius, height, ribs, style, segs, rin
     cbm = bmesh.new()
     for pts in face_shapes(style):
         prism_from_polygon(cbm, ensure_ccw(pts), -radius * 1.6, -radius * 0.15,
-                           radius * 0.92, height * 0.62, height * 0.06)
+                           radius * face_scale[0], height * face_scale[1], height * face_lift)
     if neck_hole > 0:
         bmesh.ops.create_cone(cbm, cap_ends=True, segments=24, radius1=neck_hole,
                               radius2=neck_hole, depth=height * 0.8,
@@ -402,12 +414,49 @@ def carved_pumpkin(name, tag, collection, radius, height, ribs, style, segs, rin
                                matrix=Matrix.Translation((0, radius * 0.05, -height * 0.12)))
     glow = new_object(name + "_glow", gbm, collection)
     set_materials(glow, ["GourdGlow"])
+    lid = lid_seam(name, tag, body, collection, radius, height)
     stem = new_object(name + "_stem", stem_bm(tag, radius, height, height * 0.36, radius * 0.12), collection)
     set_materials(stem, ["GourdStem"])
     shade_smooth(stem, 1.0)
-    obj = join([body, glow, stem], name)
+    obj = join([body, glow, lid, stem], name)
     color_pumpkin(obj, tag, radius, height, ribs, palette)
     return obj
+
+
+def lid_seam(name, tag, body, collection, radius, height):
+    """The lid's cut round the stem, a zigzag line of candlelight showing
+    through it: what keeps a carved pumpkin reading as LIT from behind and from
+    above, where the face cannot be seen. A thin ribbon laid on the rind,
+    found by casting down onto the carved body."""
+    from mathutils.bvhtree import BVHTree
+
+    bpy.context.view_layer.update()
+    bvh = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())
+    n = 36
+    pts = []
+    for k in range(n + 1):
+        a = k / n * TAU + h01(tag, "lid") * TAU
+        zig = 1.0 + (0.13 if k % 2 else -0.13)
+        d = radius * 0.4 * zig
+        hit = bvh.ray_cast(Vector((math.cos(a) * d, math.sin(a) * d, height)), Vector((0, 0, -1)))
+        if hit[0] is None:
+            continue
+        pts.append((hit[0], hit[1]))
+    bm = bmesh.new()
+    prev = None
+    w = radius * 0.035
+    for i, (p, nrm) in enumerate(pts):
+        q = pts[min(len(pts) - 1, i + 1)][0] - pts[max(0, i - 1)][0]
+        side = nrm.cross(q).normalized() * w
+        base = p + nrm * 0.004
+        v0 = bm.verts.new(base - side)
+        v1 = bm.verts.new(base + side)
+        if prev:
+            bm.faces.new((prev[0], prev[1], v1, v0))
+        prev = (v0, v1)
+    lid = new_object(name + "_lid", bm, collection)
+    set_materials(lid, ["GourdGlow"])
+    return lid
 
 
 def plain_gourd(name, tag, collection, radius, height, ribs, palette, offset, segs=32, rings=16):
@@ -555,14 +604,15 @@ def tube_bm(bm, points, radius, sides=6):
 LANTERN_RIBS = 8
 
 
-def build_lantern(collection, name="lantern", scale=1.0, with_bracket=True):
+def build_lantern(collection, name="lantern", scale=1.0, with_bracket=True, lean=False):
+    """`lean`: a lighter mesh for a lantern that is one of many on a big prop."""
     parts = []
     body_z = -0.44 if with_bracket else 0.0
     body_y = -0.38 if with_bracket else 0.0
     rx, rz = 0.15, 0.19
     # the paper: a squat globe whose panels belly out between the ribs
     bm = bmesh.new()
-    bmesh.ops.create_uvsphere(bm, u_segments=LANTERN_RIBS * 4, v_segments=16, radius=1.0)
+    bmesh.ops.create_uvsphere(bm, u_segments=LANTERN_RIBS * (2 if lean else 4), v_segments=10 if lean else 16, radius=1.0)
     for v in bm.verts:
         x, y, z = v.co
         phi = math.atan2(y, x)
@@ -578,13 +628,14 @@ def build_lantern(collection, name="lantern", scale=1.0, with_bracket=True):
     for k in range(LANTERN_RIBS):
         phi = k / LANTERN_RIBS * TAU
         pts = []
-        for i in range(13):
-            th = lerp(-1.25, 1.25, i / 12)
+        steps = 6 if lean else 12
+        for i in range(steps + 1):
+            th = lerp(-1.25, 1.25, i / steps)
             z = math.sin(th)
             r = math.cos(th) * 1.02
             cap = 1.0 - 0.22 * max(0.0, abs(z) - 0.72) / 0.28
             pts.append((math.cos(phi) * r * rx * cap * 0.93, body_y + math.sin(phi) * r * rx * cap * 0.93, body_z + z * rz))
-        tube_bm(rbm, pts, 0.0055, 4)
+        tube_bm(rbm, pts, 0.0055, 3 if lean else 4)
     # lacquered caps, the cord, the tassel
     for zc, r in ((rz * 0.93, 0.072), (-rz * 0.93, 0.086)):
         bmesh.ops.create_cone(rbm, cap_ends=True, segments=16, radius1=r, radius2=r * 0.9, depth=0.04,
@@ -741,13 +792,13 @@ def build_garland_bead(collection):
     bmesh.ops.create_uvsphere(bm, u_segments=10, v_segments=7, radius=1.0)
     for v in bm.verts:
         x, y, z = v.co
-        v.co = Vector((x * 0.07, y * 0.07, z * 0.085))
+        v.co = Vector((x * 0.095, y * 0.095, z * 0.11))
     paper = new_object("garland_bead_paper", bm, collection)
     set_materials(paper, ["LanternPaper"])
     shade_smooth(paper, 1.2)
     cbm = bmesh.new()
-    for zc in (0.08, -0.08):
-        bmesh.ops.create_cone(cbm, cap_ends=True, segments=8, radius1=0.035, radius2=0.03, depth=0.018,
+    for zc in (0.105, -0.105):
+        bmesh.ops.create_cone(cbm, cap_ends=True, segments=8, radius1=0.045, radius2=0.04, depth=0.02,
                               matrix=Matrix.Translation((0, 0, zc)))
     caps = new_object("garland_bead_caps", cbm, collection)
     set_materials(caps, ["Iron"])
@@ -768,10 +819,13 @@ def build_decor(collection):
         build_pole(collection),
         build_garland_leaf(collection),
         build_garland_bead(collection),
+        stall.build_stall(this, collection),
+        stall.corn_shock(this, collection, "corn_shock", "street-shock"),
+        stall.build_hay_bale(this, collection),
     ]
     # Every ground piece sits ON its origin: its lowest point at z = 0.
     for p in pieces:
-        if p.name in ("lantern", "garland_pole", "garland_leaf", "garland_bead"):
+        if p.name in ("lantern", "garland_pole", "garland_leaf", "garland_bead", "keeper_stall"):
             continue
         min_z = min(v.co.z for v in p.data.vertices)
         for v in p.data.vertices:
@@ -784,8 +838,13 @@ def build_decor(collection):
 def build_head(collection):
     root = bpy.data.objects.new("GourdlightPumpkinHead", None)
     collection.objects.link(root)
+    # no tilt (the face must be symmetric on a head) and the face set lower and
+    # a touch larger than a street pumpkin's, so both eyes sit whole on the
+    # front of the rind, under the shoulder where the top flattens toward the
+    # stem; cut that high, an eye's outer tip ran off the curve.
     head = carved_pumpkin("pumpkin_head", "pumpkin-head", collection, 0.3, 0.46, 10, "fang", 44, 24,
-                          PALETTE_ORANGE, neck_hole=0.13, shell=0.035, glow_r=0.26)
+                          PALETTE_ORANGE, neck_hole=0.13, shell=0.035, glow_r=0.26, face_lift=-0.03,
+                          tilt=False, face_scale=(0.98, 0.6))
     head.parent = root
     return root, [head]
 
