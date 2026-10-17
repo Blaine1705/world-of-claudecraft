@@ -4,7 +4,7 @@ import { applyTextureAnisotropy } from '../texture_anisotropy';
 import type { WaterWaveUniforms } from '../water_simulation';
 import { buildOceanFoamTexels, OCEAN_FOAM_SIZE } from './ocean_foam_core';
 import type { OceanSurfaceUniforms } from './ocean_simulation';
-import { oceanSurfaceFragment, oceanSurfaceVertex } from './ocean_surface_glsl';
+import { oceanDepthFragment, oceanSurfaceFragment, oceanSurfaceVertex } from './ocean_surface_glsl';
 import { waterCharacterUniforms } from './water_character_field';
 
 // The ShaderMaterial every water surface draws with. One instance serves every
@@ -102,11 +102,25 @@ function sceneSamplePlaceholders(): Record<string, THREE.IUniform> {
   };
 }
 
+/** The fine sheets the horizon apron must not draw under (see `apron`). */
+export interface OceanSheetRects {
+  /** Up to OCEAN_MAX_SHEET_RECTS entries: (minX, minZ, maxX, maxZ). */
+  uSheetRects: THREE.IUniform<THREE.Vector4[]>;
+  uSheetRectCount: THREE.IUniform<number>;
+}
+
 export interface OceanMaterialOptions {
   underside?: boolean;
   shoreEdgeFade?: boolean;
   /** Screen-space reflection steps; 0 or absent compiles the trace out. */
   ssrSteps?: number;
+  /**
+   * The horizon apron's own variant: it discards every pixel inside a built
+   * fine sheet, so the sheet alone draws there whatever the two surfaces'
+   * displacement does (they sample different grids and cannot agree to the
+   * hundredth of a unit a depth test would need).
+   */
+  apron?: OceanSheetRects;
 }
 
 export function createOceanSurfaceMaterial(
@@ -125,6 +139,7 @@ export function createOceanSurfaceMaterial(
     zoneHaze,
     // From below there is nothing to trace: the ceiling has no capture arm.
     ssrSteps: opts?.underside ? 0 : Math.max(0, Math.floor(opts?.ssrSteps ?? 0)),
+    apron: opts?.apron !== undefined,
   };
   const samplers: Record<string, THREE.IUniform> = {};
   ocean.shade.forEach((u, i) => {
@@ -134,12 +149,13 @@ export function createOceanSurfaceMaterial(
   // (crest height); a one-cascade plan reuses the first for the second.
   samplers.uOceanDisp0 = ocean.disp[0];
   samplers.uOceanDisp1 = ocean.disp[1] ?? ocean.disp[0];
-  return new THREE.ShaderMaterial({
+  const material = new THREE.ShaderMaterial({
     defines: {
       ...(shaderOpts.underside ? { WATER_UNDERSIDE: '' } : {}),
       ...(shaderOpts.shoreEdgeFade ? { WATER_SHORE_EDGE_FADE: '' } : {}),
       ...(zoneHaze ? { WOC_ZONE_HAZE: '' } : {}),
       ...(oceanDebugRequested() ? { OCEAN_DEBUG_TERMS: '' } : {}),
+      ...(shaderOpts.apron ? { OCEAN_APRON: '' } : {}),
     },
     uniforms: {
       ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
@@ -160,16 +176,71 @@ export function createOceanSurfaceMaterial(
       uWaveEnabled: wave.uWaveEnabled,
       uWaveOrigin: wave.uWaveOrigin,
       uWaveSize: wave.uWaveSize,
+      ...(opts?.apron ?? {}),
     },
     vertexShader: oceanSurfaceVertex(shaderOpts),
     fragmentShader: oceanSurfaceFragment(shaderOpts),
     transparent: true,
-    // The front surface writes depth so the horizon apron, drawn after the
-    // zone sheets, fails the depth test wherever a sheet already covers it:
-    // the expensive surface is shaded once per pixel, never twice. The
-    // from-below ceiling stays a plain overlay.
-    depthWrite: !shaderOpts.underside,
+    // NO depth writes, by rule: floor marks a player reacts to (boss
+    // telegraphs, draped rings, decals) draw after the water and must show
+    // through shallow water on every tier exactly as on the Phong plane, and
+    // AO and the cel ink must not outline the waterline. Overdraw against the
+    // apron is handled by the apron's own discard instead.
+    depthWrite: false,
     side: shaderOpts.underside ? THREE.BackSide : THREE.FrontSide,
     fog: true,
   });
+  material.name = shaderOpts.underside
+    ? 'ocean:surface-underside'
+    : shaderOpts.apron
+      ? 'ocean:surface-apron'
+      : 'ocean:surface';
+  return material;
+}
+
+/** Paint order of the depth-only pass: after every transparent draw. */
+export const OCEAN_DEPTH_RENDER_ORDER = 10_000;
+
+/**
+ * The water's depth-only twin material (ocean_surface_glsl.ts
+ * oceanDepthFragment): the same vertex stage, the same uniform objects, no
+ * colour. Draw it at OCEAN_DEPTH_RENDER_ORDER on a mesh sharing the surface's
+ * geometry.
+ */
+export function createOceanDepthMaterial(
+  ocean: OceanSurfaceUniforms,
+  wave: WaterWaveUniforms,
+  opts?: { apron?: OceanSheetRects },
+): THREE.ShaderMaterial {
+  const cascades = ocean.shade.length;
+  const material = new THREE.ShaderMaterial({
+    defines: opts?.apron ? { OCEAN_APRON: '' } : {},
+    uniforms: {
+      uOceanDisp0: ocean.disp[0],
+      uOceanDisp1: ocean.disp[1] ?? ocean.disp[0],
+      uOceanCascade: ocean.cascade,
+      uOceanDispScale: OCEAN_DISP_SCALE,
+      ...waterCharacterUniforms(),
+      uWaveState: wave.uWaveState,
+      uWaveEnabled: wave.uWaveEnabled,
+      uWaveOrigin: wave.uWaveOrigin,
+      uWaveSize: wave.uWaveSize,
+      ...(opts?.apron ?? {}),
+    },
+    vertexShader: oceanSurfaceVertex({
+      cascades,
+      underside: false,
+      shoreEdgeFade: false,
+      zoneHaze: false,
+      ssrSteps: 0,
+      apron: opts?.apron !== undefined,
+    }),
+    fragmentShader: oceanDepthFragment({ apron: opts?.apron !== undefined }),
+    transparent: true,
+    colorWrite: false,
+    depthWrite: true,
+    fog: false,
+  });
+  material.name = opts?.apron ? 'ocean:depth-apron' : 'ocean:depth';
+  return material;
 }

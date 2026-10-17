@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { zoneAt } from '../../sim/data';
+import { getActiveWorldContent, STRIP_MAX_X, STRIP_MIN_X, zoneAt } from '../../sim/data';
 import {
   buildWaterCharacterField,
   WATER_CHARACTERS,
@@ -10,10 +10,12 @@ import {
 } from './water_character_core';
 
 // The water character field as a texture: one small three-layer array texture
-// over the world (water_character_core.ts holds the table and the bake), and
-// the shared uniforms every water surface reads it through. Built once, on the
-// first surface that asks; a session that never builds water never pays for
-// it. Half floats, so the sampler filters it on every WebGL2 device.
+// over the active map (water_character_core.ts holds the table and the bake),
+// and the shared uniforms every water surface reads it through. The uniform
+// OBJECTS live for the page, so materials keep them by reference; the texture
+// behind them is rebaked whenever the water itself is rebuilt (a map switch,
+// an editor rebuild), so a realm's water follows the map that is loaded.
+// Half floats, so the sampler filters it on every WebGL2 device.
 
 interface FieldUniforms {
   uWaterChar: THREE.IUniform<THREE.DataArrayTexture>;
@@ -39,29 +41,33 @@ function arrayTexture(data: Float32Array, width: number, height: number): THREE.
   return tex;
 }
 
-/** The shared field uniforms, baking the field on first use. */
+/** The shared field uniforms; the first call bakes the field for the active map. */
 export function waterCharacterUniforms(): FieldUniforms {
-  if (uniforms) return uniforms;
-  const layout = waterFieldLayout();
+  if (!uniforms) {
+    uniforms = {
+      uWaterChar: { value: arrayTexture(waterCharacterTexels(WATER_CHARACTERS.vale), 1, 1) },
+      uWaterCharRect: { value: new THREE.Vector4(0, 0, 1, 1) },
+    };
+    rebakeWaterCharacterField();
+  }
+  return uniforms;
+}
+
+/** Rebake the field for the map that is active now (the water's own rebuild calls this). */
+export function rebakeWaterCharacterField(): void {
+  const target = uniforms ?? waterCharacterUniforms();
+  const layout = waterFieldLayout(getActiveWorldContent().zones, STRIP_MIN_X, STRIP_MAX_X);
   const data = buildWaterCharacterField(layout, (x, z) => {
     const zone = zoneAt(x, z);
     return waterCharacterFor(zone.id, zone.biome);
   });
-  uniforms = {
-    uWaterChar: { value: arrayTexture(data, layout.width, layout.height) },
-    uWaterCharRect: {
-      value: new THREE.Vector4(
-        layout.minX,
-        layout.minZ,
-        1 / (layout.width * layout.cell),
-        1 / (layout.height * layout.cell),
-      ),
-    },
-  };
-  return uniforms;
-}
-
-/** A one-texel field of the open sea, for a surface that must not bake the world. */
-export function openSeaCharacterTexture(): THREE.DataArrayTexture {
-  return arrayTexture(waterCharacterTexels(WATER_CHARACTERS.vale), 1, 1);
+  const previous = target.uWaterChar.value;
+  target.uWaterChar.value = arrayTexture(data, layout.width, layout.height);
+  target.uWaterCharRect.value.set(
+    layout.minX,
+    layout.minZ,
+    1 / (layout.width * layout.cell),
+    1 / (layout.height * layout.cell),
+  );
+  previous.dispose();
 }

@@ -48,6 +48,8 @@ export interface OceanPlan {
    * (high and up); 0 leaves reflections to the sky probe alone.
    */
   ssrSteps: number;
+  /** Simulated steps per second at most (the waves move far slower than a frame). */
+  stepHz: number;
 }
 
 /**
@@ -58,13 +60,16 @@ export interface OceanPlan {
  * the sun road sparkle up close.
  */
 const TIER_PATCHES: Record<
-  Exclude<OceanTier, 'low'>,
-  { resolution: number; sizes: number[]; ssrSteps: number }
+  OceanTier,
+  { resolution: number; sizes: number[]; ssrSteps: number; stepHz: number }
 > = {
-  medium: { resolution: 128, sizes: [331, 61, 11.3], ssrSteps: 0 },
-  high: { resolution: 256, sizes: [331, 61, 11.3], ssrSteps: 16 },
-  ultra: { resolution: 256, sizes: [331, 79, 19.1, 4.7], ssrSteps: 22 },
-  insane: { resolution: 256, sizes: [331, 79, 19.1, 4.7], ssrSteps: 22 },
+  // The lowest Water Quality on a shader preset (the Advanced mix): still a
+  // moving sea, on the smallest grids, stepped at half rate.
+  low: { resolution: 64, sizes: [331, 61, 11.3], ssrSteps: 0, stepHz: 30 },
+  medium: { resolution: 128, sizes: [331, 61, 11.3], ssrSteps: 0, stepHz: 30 },
+  high: { resolution: 256, sizes: [331, 61, 11.3], ssrSteps: 16, stepHz: 45 },
+  ultra: { resolution: 256, sizes: [331, 79, 19.1, 4.7], ssrSteps: 22, stepHz: 60 },
+  insane: { resolution: 256, sizes: [331, 79, 19.1, 4.7], ssrSteps: 22, stepHz: 60 },
 };
 
 /**
@@ -74,13 +79,15 @@ const TIER_PATCHES: Record<
  */
 export const CASCADE_HANDOVER = 4;
 
-/** The ocean simulation plan for a graphics tier; null where water is the flat Phong sheet. */
+/**
+ * The ocean simulation plan for a water tier (the Phong sheet of the low
+ * GRAPHICS tier never asks); null only for a value that is no tier at all,
+ * which draws the calm surface with no simulation behind it.
+ */
 export function oceanPlanForTier(tier: OceanTier): OceanPlan | null {
-  // Anything but a known shader tier (low, or a value a stub hands in) draws
-  // the calm surface with no simulation behind it.
-  const entry = tier === 'low' ? undefined : TIER_PATCHES[tier];
+  const entry = TIER_PATCHES[tier];
   if (!entry) return null;
-  const { resolution, sizes, ssrSteps } = entry;
+  const { resolution, sizes, ssrSteps, stepHz } = entry;
   const cascades = sizes.map((size, i) => {
     const kLow = i === 0 ? 0 : (TWO_PI / sizes[i]) * CASCADE_HANDOVER;
     const next = sizes[i + 1];
@@ -89,7 +96,7 @@ export function oceanPlanForTier(tier: OceanTier): OceanPlan | null {
       next === undefined ? (Math.PI * resolution) / size : (TWO_PI / next) * CASCADE_HANDOVER;
     return { size, kLow, kHigh };
   });
-  return { resolution, cascades, ssrSteps };
+  return { resolution, cascades, ssrSteps, stepHz };
 }
 
 /** The wind sea and swell the spectrum is built from. */
@@ -318,6 +325,57 @@ export function buildCascadeSpectrum(
     }
   }
   return { h0, waves, heightVariance, slopeVariance };
+}
+
+/**
+ * Horizontal displacement factor applied to the choppy terms. NEGATIVE on
+ * purpose: with the transform's +i exponent, -i k/|k| h is the gradient
+ * direction, and a surface point must move TOWARD the crest above it (the
+ * Gerstner shape: sharp crests, broad troughs), so it moves against it.
+ */
+export const OCEAN_CHOP_SIGN = -1;
+
+/**
+ * One texel of the GPU time step (ocean_fft_glsl.ts OCEAN_EVOLVE_FRAG), line
+ * for line: from h0 / conj(h0(-k)) and the wave texel to the two packed
+ * outputs, A = (Dx + i Dy, Dz + i dDx/dz), B = (dDy/dx + i dDy/dz,
+ * dDx/dx + i dDz/dz). The tests transform it on the CPU to pin the signs.
+ */
+export function oceanEvolveTexel(
+  h0: readonly [number, number, number, number],
+  wave: readonly [number, number, number, number],
+  loopT: number,
+  choppiness: number,
+): { a: [number, number, number, number]; b: [number, number, number, number] } {
+  const cycles = wave[2] * loopT;
+  const phase = TWO_PI * (cycles - Math.floor(cycles)); // GLSL fract
+  const ec = Math.cos(phase);
+  const es = Math.sin(phase);
+  const hr = h0[0] * ec - h0[1] * es + (h0[2] * ec + h0[3] * es);
+  const hi = h0[0] * es + h0[1] * ec + (-h0[2] * es + h0[3] * ec);
+  const [kx, kz, , invK] = wave;
+  const chop = choppiness * OCEAN_CHOP_SIGN;
+  // -i h and i h
+  const mr = hi;
+  const mi = -hr;
+  const ir = -hi;
+  const ii = hr;
+  const dx: [number, number] = [mr * kx * invK * chop, mi * kx * invK * chop];
+  const dz: [number, number] = [mr * kz * invK * chop, mi * kz * invK * chop];
+  const dydx: [number, number] = [ir * kx, ii * kx];
+  const dydz: [number, number] = [ir * kz, ii * kz];
+  const dxdx: [number, number] = [hr * kx * kx * invK * chop, hi * kx * kx * invK * chop];
+  const dzdz: [number, number] = [hr * kz * kz * invK * chop, hi * kz * kz * invK * chop];
+  const dxdz: [number, number] = [hr * kx * kz * invK * chop, hi * kx * kz * invK * chop];
+  const pack = (p: [number, number], q: [number, number]): [number, number] => [
+    p[0] - q[1],
+    p[1] + q[0],
+  ];
+  const c0 = pack(dx, [hr, hi]);
+  const c1 = pack(dz, dxdz);
+  const c2 = pack(dydx, dydz);
+  const c3 = pack(dxdx, dzdz);
+  return { a: [c0[0], c0[1], c1[0], c1[1]], b: [c2[0], c2[1], c3[0], c3[1]] };
 }
 
 /**

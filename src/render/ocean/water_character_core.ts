@@ -10,19 +10,17 @@
 //
 // Four numbers per realm drive the physics, three colours drive the look:
 //   deep     the light the water body scatters back up (sRGB), its "colour"
-//   shallow  the tint shallow water lays over the seabed it shows (sRGB)
-//   scatter  the glow of a lit crest the low sun shines through (sRGB)
+//   shallow  the tint shallow water lays over the seabed it shows (sRGB); the
+//            glow of a lit crest is derived from it and deep in the shader
 //   absorb   light lost per world unit of path, red, green, blue: clarity
 //   chop     wave-slope scale: 1 is the open sea, under 1 sheltered water
 //   foam     whitecap and surf scale
 
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z } from '../../sim/data';
 import type { BiomeId } from '../../sim/types';
 
 export interface WaterCharacter {
   deep: number;
   shallow: number;
-  scatter: number;
   absorb: readonly [number, number, number];
   chop: number;
   foam: number;
@@ -32,7 +30,6 @@ export interface WaterCharacter {
 const OPEN_SEA: WaterCharacter = {
   deep: 0x0d3a5a,
   shallow: 0x2d8a86,
-  scatter: 0x1f8f80,
   absorb: [0.42, 0.11, 0.075],
   chop: 1,
   foam: 1,
@@ -40,7 +37,6 @@ const OPEN_SEA: WaterCharacter = {
 const TROPICAL: WaterCharacter = {
   deep: 0x0a4c75,
   shallow: 0x2cb8ac,
-  scatter: 0x22a890,
   absorb: [0.34, 0.06, 0.05],
   chop: 0.85,
   foam: 0.9,
@@ -54,7 +50,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   marsh: {
     deep: 0x242b19,
     shallow: 0x4a5430,
-    scatter: 0x4f6a34,
     absorb: [1.1, 0.62, 0.95],
     chop: 0.45,
     foam: 0.3,
@@ -62,7 +57,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   fen: {
     deep: 0x1e2e26,
     shallow: 0x4e6a44,
-    scatter: 0x4f8a5a,
     absorb: [0.8, 0.42, 0.6],
     chop: 0.4,
     foam: 0.3,
@@ -71,7 +65,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   peaks: {
     deep: 0x0b3a4e,
     shallow: 0x2e8e92,
-    scatter: 0x2a9a9a,
     absorb: [0.44, 0.1, 0.08],
     chop: 0.6,
     foam: 0.6,
@@ -79,7 +72,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   frost: {
     deep: 0x0d3c5c,
     shallow: 0x4cb6d2,
-    scatter: 0x46b4cc,
     absorb: [0.5, 0.11, 0.06],
     chop: 0.75,
     foam: 0.9,
@@ -87,7 +79,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   gale: {
     deep: 0x0b3350,
     shallow: 0x2f8a8c,
-    scatter: 0x2a9a90,
     absorb: [0.46, 0.13, 0.09],
     chop: 1.45,
     foam: 1.7,
@@ -96,7 +87,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   garden: {
     deep: 0x0e465a,
     shallow: 0x3aa294,
-    scatter: 0x2e9a86,
     absorb: [0.4, 0.1, 0.085],
     chop: 0.6,
     foam: 0.6,
@@ -104,7 +94,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   amber: {
     deep: 0x173a3e,
     shallow: 0x4f856a,
-    scatter: 0x5a9a6a,
     absorb: [0.52, 0.22, 0.26],
     chop: 0.7,
     foam: 0.7,
@@ -112,7 +101,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   dusk: {
     deep: 0x18244e,
     shallow: 0x4a6aa4,
-    scatter: 0x5a74c0,
     absorb: [0.5, 0.3, 0.15],
     chop: 0.6,
     foam: 0.6,
@@ -120,7 +108,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   night: {
     deep: 0x0f1c44,
     shallow: 0x355c8e,
-    scatter: 0x4a6ad0,
     absorb: [0.55, 0.25, 0.12],
     chop: 0.5,
     foam: 0.5,
@@ -128,7 +115,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   haunt: {
     deep: 0x13221f,
     shallow: 0x3c5a4c,
-    scatter: 0x4a6a58,
     absorb: [0.85, 0.48, 0.58],
     chop: 0.5,
     foam: 0.4,
@@ -137,7 +123,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   ember: {
     deep: 0x232f2a,
     shallow: 0x6e7c46,
-    scatter: 0x7a8a40,
     absorb: [0.72, 0.46, 0.72],
     chop: 0.8,
     foam: 0.6,
@@ -145,7 +130,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   volcano: {
     deep: 0x232f2a,
     shallow: 0x6e7c46,
-    scatter: 0x7a8a40,
     absorb: [0.72, 0.46, 0.72],
     chop: 0.8,
     foam: 0.6,
@@ -153,7 +137,6 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   cave: {
     deep: 0x0c1e26,
     shallow: 0x2c5a5e,
-    scatter: 0x2a6a6a,
     absorb: [0.6, 0.25, 0.2],
     chop: 0.3,
     foam: 0.3,
@@ -191,8 +174,6 @@ export const WATER_FIELD_LAYERS = 3;
  *   0: deep (linear rgb), chop
  *   1: absorb (rgb), foam
  *   2: shallow (linear rgb), unused
- * The scatter colour rides in layer 2's alpha as nothing: it is derived from
- * shallow in the shader (it was always a brighter, greener shallow).
  */
 export function waterCharacterTexels(c: WaterCharacter): Float32Array {
   const out = new Float32Array(WATER_FIELD_LAYERS * 4);
@@ -216,11 +197,45 @@ export interface WaterFieldLayout {
   cell: number;
 }
 
-export function waterFieldLayout(): WaterFieldLayout {
-  const minX = WORLD_MIN_X - WATER_FIELD_MARGIN;
-  const minZ = WORLD_MIN_Z - WATER_FIELD_MARGIN;
-  const width = Math.ceil((WORLD_MAX_X + WATER_FIELD_MARGIN - minX) / WATER_FIELD_CELL);
-  const height = Math.ceil((WORLD_MAX_Z + WATER_FIELD_MARGIN - minZ) / WATER_FIELD_CELL);
+/** A zone's footprint (a strip zone has no x bounds and spans the strip). */
+export interface WaterFieldZoneRect {
+  xMin?: number;
+  xMax?: number;
+  zMin: number;
+  zMax: number;
+}
+
+/**
+ * The field's grid over a map's zones plus a margin, so the sea outside the
+ * world clamps to its nearest coast's water. Taken from the zones of the map
+ * that is ACTIVE when the water builds (a Studio map can reach far past the
+ * built-in world).
+ */
+export function waterFieldLayout(
+  zones: readonly WaterFieldZoneRect[],
+  stripMinX: number,
+  stripMaxX: number,
+): WaterFieldLayout {
+  let x0 = Number.POSITIVE_INFINITY;
+  let x1 = Number.NEGATIVE_INFINITY;
+  let z0 = Number.POSITIVE_INFINITY;
+  let z1 = Number.NEGATIVE_INFINITY;
+  for (const zone of zones) {
+    x0 = Math.min(x0, zone.xMin ?? stripMinX);
+    x1 = Math.max(x1, zone.xMax ?? stripMaxX);
+    z0 = Math.min(z0, zone.zMin);
+    z1 = Math.max(z1, zone.zMax);
+  }
+  if (!Number.isFinite(x0)) {
+    x0 = stripMinX;
+    x1 = stripMaxX;
+    z0 = 0;
+    z1 = WATER_FIELD_CELL;
+  }
+  const minX = x0 - WATER_FIELD_MARGIN;
+  const minZ = z0 - WATER_FIELD_MARGIN;
+  const width = Math.ceil((x1 + WATER_FIELD_MARGIN - minX) / WATER_FIELD_CELL);
+  const height = Math.ceil((z1 + WATER_FIELD_MARGIN - minZ) / WATER_FIELD_CELL);
   return { minX, minZ, width, height, cell: WATER_FIELD_CELL };
 }
 

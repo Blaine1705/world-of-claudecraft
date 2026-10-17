@@ -11,25 +11,30 @@ import {
 } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
 import { waterLevel } from '../sim/world';
-import { loadTexture } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { activeFarFieldPolicy } from './foliage_impostor';
 import { GFX, type GfxSettings, SUN_DIR } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import {
+  advanceWaterLiveness,
   calmOceanUniforms,
+  createOceanDepthMaterial,
   createOceanSurfaceMaterial,
+  createWaterLiveness,
   DEFAULT_SEA_STATE,
+  OCEAN_DEPTH_RENDER_ORDER,
   OCEAN_LOOP_SECONDS,
+  OCEAN_MAX_SHEET_RECTS,
   OCEAN_PALETTE_OVERRIDE,
+  type OceanSheetRects,
   OceanSimulation,
   type OceanSkyUniforms,
   type OceanSurfaceUniforms,
   oceanPlanForTier,
+  rebakeWaterCharacterField,
   SkyReflectionProbe,
+  supportsSkyProbe,
 } from './ocean';
 import { bindSceneSamples } from './scene_sampling';
-import { applyTextureAnisotropy } from './texture_anisotropy';
 import { waterNormalish, waterNormalMaps } from './textures';
 import {
   bakeSwellGate,
@@ -105,18 +110,26 @@ const WATER_GAP_RECTS = waterCoverageGaps(
 const WATER_ROWS_PER_IDLE_SLICE = 4;
 const WATER_IDLE_TIMEOUT_MS = 200;
 const WATER_VERTEX_ROWS = Array.from({ length: SEGMENTS_PER_ZONE + 1 }, (_, row) => row);
-// The apron runs UNDER every zone plane (0.02 lower) and both ride one
-// transparent material that WRITES depth. The zone sheets draw FIRST, so the
-// apron fails the depth test wherever a sheet already covers it: the sea is
-// shaded once per pixel, never twice, and the sheet (with the real shoreline)
-// always wins. Left to three.js's transparent sort that order would come from
-// each object's bounding-sphere centre, and the apron's is a world-scale sheet
-// near the origin, so merely orbiting the camera would reorder them. Pin it so
-// it can never depend on where the camera happens to be.
+// The apron runs UNDER every zone plane (0.02 lower). Neither writes depth (a
+// floor mark a player reacts to must show through shallow water on every
+// tier), so the depth buffer cannot arbitrate between them: the apron DISCARDS
+// its pixels inside every built, visible sheet instead (its own material
+// variant, ocean_material.ts `apron`), so the sea is shaded once per pixel and
+// the sheet with the real shoreline always wins. Its paint order is still
+// pinned under the sheets' (for the thin overlap strip along each sheet edge,
+// and for the from-below ceilings, which copy these orders), because left to
+// three.js's transparent sort the order would come from each object's
+// bounding-sphere centre, and the apron's is a world-scale sheet near the
+// origin, so merely orbiting the camera would reorder them. Floor marks start
+// at 1, above both.
+const WATER_APRON_RENDER_ORDER = -1;
 const WATER_SURFACE_RENDER_ORDER = 0;
-const WATER_APRON_RENDER_ORDER = 1;
-/** Seconds the surface stays "live" after its last draw (sim, probe, capture). */
-const WATER_LIVE_HOLD_SECONDS = 2;
+/**
+ * How far inside a sheet's rect the apron starts discarding. The two surfaces
+ * displace from different grids, so a seam exactly at the rect edge could
+ * open a hairline crack; a strip of overlap closes it.
+ */
+const WATER_APRON_DISCARD_INSET = 1.5;
 
 /**
  * The one shared, wrapped water clock every water material binds as uTime.
@@ -176,42 +189,19 @@ const APRON_TERRAIN_FADE_YARDS = 240;
  */
 const WATER_APRON_TILES_PER_SIDE = 5;
 
-// Real water normal maps, fetched at module import and gated by the boot
-// preload only for the shader tier. Low/mobile uses generated canvas water
-// so it does not pay network/decode/upload cost for water detail.
-const WATER_TEX: Record<string, THREE.Texture> = {};
-const waterTexTasks = new Map<string, Promise<void>>();
-function prepareWaterTex(key: string, file: string): Promise<void> {
-  if (WATER_TEX[key]) return Promise.resolve();
-  const existing = waterTexTasks.get(key);
-  if (existing) return existing;
-  const task = loadTexture(`/textures/water/${file}`, { repeat: true })
-    .then((tex) => {
-      applyTextureAnisotropy(tex, 'normal');
-      WATER_TEX[key] = tex;
-    })
-    .catch((err) => {
-      waterTexTasks.delete(key);
-      throw err;
-    });
-  waterTexTasks.set(key, task);
-  return task;
+/**
+ * The shader water needs no downloaded asset: its waves, foam and sky are all
+ * built on the GPU (ocean/), so a failed fetch can never drop a player to the
+ * Phong plane. Kept as the graphics-profile switch's preparer (it has nothing
+ * to prepare).
+ */
+export function prepareWaterProfileAssets(_target: Readonly<GfxSettings>): Promise<void> {
+  return Promise.resolve();
 }
 
-/** Prepare the water texture channel selected by an explicit target profile. */
-export function prepareWaterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  if (!target.standardMaterials) return Promise.resolve();
-  return Promise.all([
-    prepareWaterTex('n1', 'water_1_normal.jpg'),
-    prepareWaterTex('n2', 'water_2_normal.jpg'),
-    prepareWaterTex('broad', 'waternormals.jpg'),
-  ]).then(() => undefined);
-}
-
-registerDeferredPreload(() => prepareWaterProfileAssets(GFX));
-
+/** Always true: the shader tier reads no image asset (see above). */
 export function hasWaterShaderAssets(): boolean {
-  return Boolean(WATER_TEX.n1 && WATER_TEX.n2 && WATER_TEX.broad);
+  return true;
 }
 
 /**
@@ -431,9 +421,15 @@ function disposeOwned(meshes: THREE.Mesh[]): void {
 
 /** Inert wave uniforms for surfaces with no interactive height field (no
  *  renderer to run the simulation, or an interior pool outside its window). */
+let zeroWaveTexture: THREE.DataTexture | null = null;
 export function zeroWaveUniforms(): WaterWaveUniforms {
+  if (!zeroWaveTexture) {
+    zeroWaveTexture = new THREE.DataTexture(new Uint8Array(4), 1, 1);
+    zeroWaveTexture.name = 'water-wave-calm';
+    zeroWaveTexture.needsUpdate = true;
+  }
   return {
-    uWaveState: { value: WATER_TEX.n1 },
+    uWaveState: { value: zeroWaveTexture },
     uWaveEnabled: { value: 0 },
     uWaveOrigin: { value: new THREE.Vector2() },
     uWaveSize: { value: 1 },
@@ -473,7 +469,7 @@ const WATER_SHARED_UNIFORMS = {
  * geometry fed to it must carry aShoreDepth/aShoreSlope attributes (aSwellW
  * and aSwellGate are optional: a geometry that omits them reads 0 and stays
  * displacement-still, which is what an interior pool wants). Callers gate on
- * GFX.standardMaterials && hasWaterShaderAssets() exactly like buildWater.
+ * GFX.standardMaterials exactly like buildWater.
  *
  * `shoreEdgeFade` fades the surface to nothing where the baked depth reaches
  * zero, so the WATERLINE follows the terrain contour instead of the geometry
@@ -481,7 +477,7 @@ const WATER_SHARED_UNIFORMS = {
  */
 export function createWaterSurfaceMaterial(
   wave: WaterWaveUniforms,
-  opts?: { shoreEdgeFade?: boolean; underside?: boolean },
+  opts?: { shoreEdgeFade?: boolean; underside?: boolean; apron?: OceanSheetRects },
 ): THREE.ShaderMaterial {
   return createOceanSurfaceMaterial(
     oceanForSurfaces(),
@@ -490,9 +486,20 @@ export function createWaterSurfaceMaterial(
     WATER_SHARED_UNIFORMS,
     {
       ...opts,
-      ssrSteps: oceanPlanForTier(GFX.waterTier)?.ssrSteps ?? 0,
+      // The trace reads the opaque-scene capture, which only the AO (n8ao)
+      // chains build; anywhere else it would compile for nothing.
+      ssrSteps: GFX.ao ? (oceanWaterPlan()?.ssrSteps ?? 0) : 0,
     },
   );
+}
+
+/**
+ * The simulation plan for this profile. A constrained-memory profile (an
+ * Android phone on a shader tier) never runs more than the medium grids.
+ */
+function oceanWaterPlan() {
+  const tier = GFX.constrainedMemory && GFX.waterTier !== 'low' ? 'medium' : GFX.waterTier;
+  return oceanPlanForTier(tier);
 }
 
 /**
@@ -539,30 +546,62 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   const wave = simulation ? simulation.uniforms : zeroWaveUniforms();
   // The FFT sea and the sky it reflects. Both need the world renderer; without
   // one (tests, a surface built for a thumbnail) the surface draws calm water.
-  const plan = oceanPlanForTier(GFX.waterTier);
+  const plan = oceanWaterPlan();
   const ocean =
     renderer && plan ? new OceanSimulation(renderer, plan, DEFAULT_SEA_STATE, seed) : null;
   if (ocean?.enabled) liveOcean = ocean.uniforms;
-  const probe = renderer ? new SkyReflectionProbe(renderer) : null;
+  const probe = renderer && supportsSkyProbe(renderer) ? new SkyReflectionProbe(renderer) : null;
+  // Each realm's water character follows the map that is loaded now.
+  rebakeWaterCharacterField();
   if (probe) {
     SKY_PROBE_UNIFORMS.uSkyProbe.value = probe.target.texture;
     SKY_PROBE_UNIFORMS.uSkyProbeLod.value = probe.maxLod;
     SKY_PROBE_UNIFORMS.uSkyProbeReady.value = 0;
   }
-  // ONE material for every zone plane and the apron, so the field's uniform
-  // objects (shared by reference, like uTime) drive the whole surface.
+  // ONE material for every zone plane, so the field's uniform objects (shared
+  // by reference, like uTime) drive the whole surface; the apron's variant
+  // shares every uniform object and adds only the sheet rects it discards in.
   const material = createWaterSurfaceMaterial(wave);
+  const sheetRects: OceanSheetRects = {
+    uSheetRects: {
+      value: Array.from({ length: OCEAN_MAX_SHEET_RECTS }, () => new THREE.Vector4()),
+    },
+    uSheetRectCount: { value: 0 },
+  };
+  const apronMaterial = createWaterSurfaceMaterial(wave, { apron: sheetRects });
   const undersideMaterial = createWaterSurfaceMaterial(wave, { underside: true });
-  // LIVENESS: the simulation, the sky probe and the opaque-scene capture all
-  // cost GPU work every frame, and none of it is worth anything while no water
-  // is drawn (inside a dungeon, an interior, the far side of a mountain). Every
-  // water draw marks the frame; update() keeps the expensive work running for
-  // WATER_LIVE_HOLD_SECONDS past the last draw, and starts live so the first
-  // frames under the curtain draw the finished look.
-  let drawnSinceUpdate = false;
-  let lastDrawnTime = Number.POSITIVE_INFINITY;
+  // The depth-only twins (ocean_material.ts createOceanDepthMaterial): each
+  // front sheet carries one as a CHILD, so it is compiled with the sheet's
+  // own prepare, hides with it and leaves with it.
+  const depthMaterial = createOceanDepthMaterial(oceanForSurfaces(), wave);
+  const apronDepthMaterial = createOceanDepthMaterial(oceanForSurfaces(), wave, {
+    apron: sheetRects,
+  });
+  // LIVENESS (ocean/water_liveness_core.ts): every water draw marks the frame,
+  // and the simulation, the sky probe and the opaque-scene capture run only
+  // while water has drawn recently, so a frame with no water pays for none.
+  const liveness = createWaterLiveness();
   const markDrawn = (): void => {
-    drawnSinceUpdate = true;
+    liveness.drawnSinceUpdate = true;
+  };
+  // The sheets the apron must not draw under: every built front sheet that is
+  // visible (a sheet staged hidden for its prewarm must not leave a hole).
+  const sheetFronts = new Set<THREE.Mesh>();
+  const syncSheetRects = (): void => {
+    let count = 0;
+    for (const mesh of sheetFronts) {
+      if (!mesh.visible || count >= OCEAN_MAX_SHEET_RECTS) continue;
+      const box = mesh.geometry.boundingBox;
+      if (!box) continue;
+      sheetRects.uSheetRects.value[count].set(
+        box.min.x + WATER_APRON_DISCARD_INSET,
+        box.min.z + WATER_APRON_DISCARD_INSET,
+        box.max.x - WATER_APRON_DISCARD_INSET,
+        box.max.z - WATER_APRON_DISCARD_INSET,
+      );
+      count++;
+    }
+    sheetRects.uSheetRectCount.value = count;
   };
   // The opaque-scene capture (scene_sampling.ts) copies the scene's colour and
   // depth before the first transparent draw whenever a bound consumer is
@@ -588,9 +627,13 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       );
     }
   };
-  const addFront = (mesh: THREE.Mesh): void => {
+  const addFront = (mesh: THREE.Mesh, depth: THREE.ShaderMaterial): void => {
     fronts.add(mesh);
     mesh.onBeforeRender = markDrawn;
+    const twin = new THREE.Mesh(mesh.geometry, depth);
+    twin.name = 'water-depth';
+    twin.renderOrder = OCEAN_DEPTH_RENDER_ORDER;
+    mesh.add(twin);
   };
   const dropFront = (mesh: THREE.Mesh): void => {
     fronts.delete(mesh);
@@ -827,7 +870,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       );
       tileGeo.boundingSphere = new THREE.Sphere();
       tileGeo.boundingBox.getBoundingSphere(tileGeo.boundingSphere);
-      const tile = new THREE.Mesh(tileGeo, material);
+      const tile = new THREE.Mesh(tileGeo, apronMaterial);
       tile.position.y = waterLevel() - 0.02;
       tile.renderOrder = WATER_APRON_RENDER_ORDER;
       // A block with no wet quad at all (buried under the world's land, or off
@@ -838,7 +881,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       tile.visible = index.length > 0;
       meshes.push(tile);
       group.add(tile);
-      addFront(tile);
+      addFront(tile, apronDepthMaterial);
       addUnderside(tile);
       apronTiles.push({ mesh: tile, geometry: tileGeo, region });
     }
@@ -1093,7 +1136,8 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     mesh.visible = opts.visible;
     meshes.push(mesh);
     group.add(mesh);
-    addFront(mesh);
+    addFront(mesh, depthMaterial);
+    sheetFronts.add(mesh);
     addUnderside(mesh);
     refits.push({
       mesh,
@@ -1213,12 +1257,13 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
         pair.under.position.y = pair.front.position.y;
         pair.under.visible = !undersideHeld && under && pair.front.visible;
       }
-      if (drawnSinceUpdate || lastDrawnTime === Number.POSITIVE_INFINITY) lastDrawnTime = _time;
-      drawnSinceUpdate = false;
-      const live = group.visible && _time - lastDrawnTime < WATER_LIVE_HOLD_SECONDS;
-      bindFronts(live);
+      syncSheetRects();
+      const live = advanceWaterLiveness(liveness, _time, group.visible);
+      bindFronts(live.capture);
       let passes = 0;
-      if (live) {
+      if (live.work) {
+        // Back from an idle spell: the whole sky cube is stale, not one face.
+        if (live.resumed) probe?.refreshAll();
         if (probe) {
           passes += probe.update();
           SKY_PROBE_UNIFORMS.uSkyProbeReady.value = probe.ready ? 1 : 0;
@@ -1310,6 +1355,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       if (!front) return;
       zoneFrontMesh.delete(zoneId);
       dropFront(front);
+      sheetFronts.delete(front);
       const pairIndex = underPairs.findIndex((pair) => pair.front === front);
       const under = pairIndex === -1 ? null : underPairs[pairIndex].under;
       if (pairIndex !== -1) underPairs.splice(pairIndex, 1);
@@ -1324,16 +1370,37 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       if (refitIndex !== -1) refits.splice(refitIndex, 1);
     },
     dispose(): void {
-      for (const mesh of [...fronts]) dropFront(mesh);
-      simulation?.dispose();
-      if (ocean && liveOcean === ocean.uniforms) liveOcean = null;
-      ocean?.dispose();
-      if (probe && SKY_PROBE_UNIFORMS.uSkyProbe.value === probe.target.texture) {
-        SKY_PROBE_UNIFORMS.uSkyProbe.value = null;
-        SKY_PROBE_UNIFORMS.uSkyProbeReady.value = 0;
+      // Best effort, step by step: one throwing release must not leak the
+      // render targets of the others.
+      const steps: (() => void)[] = [
+        () => {
+          for (const mesh of [...fronts]) dropFront(mesh);
+        },
+        () => simulation?.dispose(),
+        () => {
+          if (ocean && liveOcean === ocean.uniforms) liveOcean = null;
+          ocean?.dispose();
+        },
+        () => {
+          if (probe && SKY_PROBE_UNIFORMS.uSkyProbe.value === probe.target.texture) {
+            SKY_PROBE_UNIFORMS.uSkyProbe.value = null;
+            SKY_PROBE_UNIFORMS.uSkyProbeReady.value = 0;
+          }
+          probe?.dispose();
+        },
+        () => disposeOwned(meshes),
+        () => {
+          depthMaterial.dispose();
+          apronDepthMaterial.dispose();
+        },
+      ];
+      for (const step of steps) {
+        try {
+          step();
+        } catch (error) {
+          console.warn('[water] dispose step failed', error);
+        }
       }
-      probe?.dispose();
-      disposeOwned(meshes);
     },
   };
 }
@@ -1401,7 +1468,5 @@ function buildPhongWater(): WaterView {
 }
 
 export function buildWater(seed: number, renderer?: THREE.WebGLRenderer): WaterView {
-  return GFX.standardMaterials && hasWaterShaderAssets()
-    ? buildShaderWater(seed, renderer)
-    : buildPhongWater();
+  return GFX.standardMaterials ? buildShaderWater(seed, renderer) : buildPhongWater();
 }

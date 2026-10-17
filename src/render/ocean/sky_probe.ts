@@ -14,6 +14,15 @@ import { liveSkyDome } from '../sky';
 
 const PROBE_SIZE = 128;
 
+/** Whether this context can render the probe's half-float cube at all. */
+export function supportsSkyProbe(renderer: THREE.WebGLRenderer): boolean {
+  return (
+    renderer.capabilities.isWebGL2 &&
+    (renderer.extensions.has('EXT_color_buffer_float') ||
+      renderer.extensions.has('EXT_color_buffer_half_float'))
+  );
+}
+
 export class SkyReflectionProbe {
   readonly target: THREE.WebGLCubeRenderTarget;
   private readonly scene = new THREE.Scene();
@@ -21,6 +30,9 @@ export class SkyReflectionProbe {
   private readonly mesh = new THREE.Mesh();
   private face = 0;
   private complete = false;
+  // A restored context comes back with every face blank: redraw all six on the
+  // next update instead of letting five black faces ride for five frames.
+  private readonly onRestore = (): void => this.refreshAll();
 
   constructor(private readonly renderer: THREE.WebGLRenderer) {
     this.target = new THREE.WebGLCubeRenderTarget(PROBE_SIZE, {
@@ -36,6 +48,13 @@ export class SkyReflectionProbe {
     this.mesh.frustumCulled = false;
     this.scene.add(this.mesh);
     this.scene.add(this.cubeCamera);
+    renderer.domElement?.addEventListener?.('webglcontextrestored', this.onRestore);
+  }
+
+  /** Redraw every face on the next update (after a restore, or a long idle). */
+  refreshAll(): void {
+    this.complete = false;
+    this.face = 0;
   }
 
   /** The highest mip level the surface may read (1x1). */
@@ -85,6 +104,7 @@ export class SkyReflectionProbe {
   }
 
   dispose(): void {
+    this.renderer.domElement?.removeEventListener?.('webglcontextrestored', this.onRestore);
     this.target.dispose();
   }
 }

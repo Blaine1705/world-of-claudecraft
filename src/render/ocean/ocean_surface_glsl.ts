@@ -52,7 +52,12 @@ export interface OceanSurfaceShaderOptions {
    * opaque-scene capture, so it only ever runs where that capture is live.
    */
   ssrSteps: number;
+  /** The horizon apron's variant: discard inside every built fine sheet. */
+  apron: boolean;
 }
+
+/** How many fine-sheet rects the apron variant can test (zones plus gaps). */
+export const OCEAN_MAX_SHEET_RECTS = 40;
 
 /** GLSL needs a decimal point on every float literal. */
 const f = (n: number): string => (Number.isInteger(n) ? `${n}.0` : String(n));
@@ -118,6 +123,12 @@ uniform float uWaveSize;
 function ssrGlsl(steps: number): string {
   return /* glsl */ `
 uniform mat4 projectionMatrix;
+// Depth inside the march loop reads an explicit LOD: implicit-gradient reads in
+// data-dependent loops are what some D3D11 translations unroll slowly.
+float oceanSsrDepth(vec2 uv) {
+  float d = textureLod(uOpaqueDepth, uv, 0.0).r;
+  return uSceneClip.x * uSceneClip.y / (uSceneClip.y - d * (uSceneClip.y - uSceneClip.x));
+}
 vec2 oceanSsrUv(vec3 p, out bool inside) {
   vec4 clip = projectionMatrix * vec4(p, 1.0);
   vec2 ndc = clip.xy / max(clip.w, 1e-4);
@@ -137,7 +148,7 @@ vec3 oceanSsr(vec3 startV, vec3 dirV, float jitter, out float conf) {
     bool inside;
     vec2 uv = oceanSsrUv(p, inside);
     if (!inside) return vec3(0.0);
-    float sceneZ = sceneDepth(uv * uSceneExtent.zw);
+    float sceneZ = oceanSsrDepth(uv * uSceneExtent.zw);
     float dz = -p.z - sceneZ;
     if (dz > 0.0 && dz < max(0.8, t * 0.14)) {
       // Bisect between the last miss and this hit.
@@ -148,15 +159,15 @@ vec3 oceanSsr(vec3 startV, vec3 dirV, float jitter, out float conf) {
         vec3 q = startV + dirV * mid;
         bool qIn;
         vec2 quv = oceanSsrUv(q, qIn);
-        if (-q.z - sceneDepth(quv * uSceneExtent.zw) > 0.0) hi = mid;
+        if (-q.z - oceanSsrDepth(quv * uSceneExtent.zw) > 0.0) hi = mid;
         else lo = mid;
       }
       bool hitIn;
       vec2 huv = oceanSsrUv(startV + dirV * hi, hitIn);
       vec2 edge = min(huv, vec2(1.0) - huv);
       conf = away * smoothstep(0.0, 0.08, min(edge.x, edge.y)) * (1.0 - smoothstep(70.0, 130.0, hi));
-      return texture2D(uOpaqueColor, clamp(huv * uSceneExtent.zw,
-        uSceneExtent.xy * 0.5, uSceneExtent.zw - uSceneExtent.xy * 0.5)).rgb;
+      return textureLod(uOpaqueColor, clamp(huv * uSceneExtent.zw,
+        uSceneExtent.xy * 0.5, uSceneExtent.zw - uSceneExtent.xy * 0.5), 0.0).rgb;
     }
     tPrev = t;
     t *= 1.32;
@@ -237,6 +248,38 @@ ${
 `;
 }
 
+/**
+ * The depth-only pass (ocean_material.ts createOceanDepthMaterial): the same
+ * displaced surface, writing depth and no colour, drawn after every
+ * transparent object. Floor marks a player reacts to have already drawn
+ * through the water by then; what reads the depth afterwards (AO, the cel ink)
+ * sees a solid sea instead of the seabed's contours under it. The apron's
+ * variant discards inside the built sheets exactly as its colour pass does.
+ */
+export function oceanDepthFragment(opts: Pick<OceanSurfaceShaderOptions, 'apron'>): string {
+  return /* glsl */ `
+varying vec2 vOceanXZ;
+${
+  opts.apron
+    ? `uniform vec4 uSheetRects[${OCEAN_MAX_SHEET_RECTS}];
+uniform int uSheetRectCount;`
+    : ''
+}
+void main() {
+${
+  opts.apron
+    ? `  for (int i = 0; i < ${OCEAN_MAX_SHEET_RECTS}; i++) {
+    if (i >= uSheetRectCount) break;
+    vec4 r = uSheetRects[i];
+    if (vOceanXZ.x >= r.x && vOceanXZ.x <= r.z && vOceanXZ.y >= r.y && vOceanXZ.y <= r.w) discard;
+  }`
+    : ''
+}
+  gl_FragColor = vec4(0.0);
+}
+`;
+}
+
 export function oceanSurfaceFragment(opts: OceanSurfaceShaderOptions): string {
   const n = opts.cascades;
   const idx = cascadeIndices(n);
@@ -285,6 +328,10 @@ uniform vec3 uShallow;
 uniform vec3 uScatter;
 uniform float uWaterPalette;
 uniform vec4 uOceanLook;
+#ifdef OCEAN_APRON
+uniform vec4 uSheetRects[${OCEAN_MAX_SHEET_RECTS}];
+uniform int uSheetRectCount;
+#endif
 #ifdef OCEAN_DEBUG_TERMS
 uniform int uOceanDebug;
 #endif
@@ -329,10 +376,19 @@ float oceanFresnel(float cosTheta) {
 
 ${opts.ssrSteps > 0 ? ssrGlsl(opts.ssrSteps) : ''}
 void main() {
+  vec2 xz = vOceanXZ;
+#ifdef OCEAN_APRON
+  // A built fine sheet owns every pixel inside its rect; the apron draws only
+  // the open sea and the coasts no sheet covers.
+  for (int i = 0; i < ${OCEAN_MAX_SHEET_RECTS}; i++) {
+    if (i >= uSheetRectCount) break;
+    vec4 r = uSheetRects[i];
+    if (xz.x >= r.x && xz.x <= r.z && xz.y >= r.y && xz.y <= r.w) discard;
+  }
+#endif
   vec3 toCam = cameraPosition - vWPos;
   float camDist = length(toCam);
   vec3 V = toCam / max(camDist, 1e-4);
-  vec2 xz = vOceanXZ;
   float fetch = vFetch;
   // Wind-gust lanes: a slow world-space field that varies the short waves, so
   // no two reaches of sea carry the same chop and no cascade reads as a tile.
@@ -374,7 +430,9 @@ ${cascadeBlock}
     wakeSlope = wave.ba * waveW;
     wakeEnergy = (abs(wave.g) * 0.9 + length(wave.ba) * 0.4) * waveW;
   }
-  slope += wakeSlope * 1.8;
+  // The wake field's slope at the weight the old surface gave it (9.5 over a
+  // 3.1 normal), so a wade or a splash reads as strongly as it always did.
+  slope += wakeSlope * 3.0;
 
   // What this pixel cannot resolve becomes roughness.
   float footprint = max(length(fwidth(xz)), 1e-4);
@@ -615,21 +673,18 @@ ${
   float cover = max(edge, foamCov * clamp(edge * 3.0, 0.0, 1.0));
   float alpha;
   if (captured) {
-    // Composite against the captured scene ourselves: the edge hands back the
+    // Composite against the captured scene ourselves (after fog and haze,
+    // below: the capture is already fogged): the edge hands back the
     // untouched beach, and the frame blends nothing.
-    col = mix(texture2D(uOpaqueColor, sceneUv()).rgb, col, cover);
     alpha = 1.0;
   } else {
     // out = col + background * keep, spelled for straight alpha blending.
     alpha = (1.0 - keep) * cover;
     col = col / max(1.0 - keep, 0.02);
-    // This surface writes depth; a fragment that shows nothing must not, or
-    // the geometric waterline under the thinned film would read as an edge.
-    if (alpha < 0.015) discard;
   }
 #endif
   gl_FragColor = vec4(col, alpha);
-#ifdef OCEAN_DEBUG_TERMS
+#if defined(OCEAN_DEBUG_TERMS) && !defined(WATER_UNDERSIDE)
   if (uOceanDebug == 1) gl_FragColor = vec4(vec3(F), 1.0);
   if (uOceanDebug == 2) gl_FragColor = vec4(reflection, 1.0);
   if (uOceanDebug == 3) gl_FragColor = vec4(under, 1.0);
@@ -643,6 +698,11 @@ ${
   #include <colorspace_fragment>
 ${opts.zoneHaze ? biomeHazeFragmentGlsl('vWPos.xz') : ''}
   #include <fog_fragment>
+#ifndef WATER_UNDERSIDE
+  if (captured && cover < 1.0) {
+    gl_FragColor.rgb = mix(texture2D(uOpaqueColor, sceneUv()).rgb, gl_FragColor.rgb, cover);
+  }
+#endif
 }
 `;
 }

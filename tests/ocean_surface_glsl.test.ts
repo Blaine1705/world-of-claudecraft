@@ -12,6 +12,7 @@ const opts = (over: Partial<OceanSurfaceShaderOptions> = {}): OceanSurfaceShader
   shoreEdgeFade: false,
   zoneHaze: true,
   ssrSteps: 22,
+  apron: false,
   ...over,
 });
 
@@ -62,5 +63,16 @@ describe('ocean surface shader', () => {
         expect(Number(m[1]), m[0]).toBeLessThan(Number(m[2]));
       }
     }
+  });
+
+  it('compiles the apron discard only into the apron variant', () => {
+    expect(oceanSurfaceFragment(opts())).toContain('#ifdef OCEAN_APRON');
+    expect(oceanSurfaceFragment(opts())).toContain('if (i >= uSheetRectCount) break;');
+  });
+
+  it('never lets the debug switch read terms the from-below arm lacks', () => {
+    expect(oceanSurfaceFragment(opts())).toContain(
+      '#if defined(OCEAN_DEBUG_TERMS) && !defined(WATER_UNDERSIDE)',
+    );
   });
 });

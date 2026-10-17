@@ -6,6 +6,7 @@ import {
   OCEAN_FFT_FRAG,
   OCEAN_PASS_VERT,
 } from './ocean_fft_glsl';
+import { oceanShedStepScale } from './ocean_shed';
 import {
   buildCascadeSpectrum,
   OCEAN_LOOP_SECONDS,
@@ -31,8 +32,8 @@ import {
 // against the target it will draw into, and restores the renderer's bound
 // target after every pass.
 
-/** Simulated frames per second at most; the waves move far slower than a frame. */
-const OCEAN_MAX_STEP_HZ = 60;
+/** FFT axes, horizontal first (hoisted: update() runs every simulated frame). */
+const FFT_AXES = [1, 0] as const;
 /** Seconds a whitecap takes to fade to a third. */
 const FOAM_LIFETIME_SECONDS = 2.6;
 /** Jacobian below which a crest is fully white, and where foam starts. */
@@ -161,8 +162,12 @@ export class OceanSimulation {
     this.h0.name = 'ocean-h0';
     this.waves.name = 'ocean-waves';
 
-    const pass = (fragmentShader: string, uniforms: Record<string, THREE.IUniform>) =>
-      new THREE.RawShaderMaterial({
+    const pass = (
+      name: string,
+      fragmentShader: string,
+      uniforms: Record<string, THREE.IUniform>,
+    ) => {
+      const material = new THREE.RawShaderMaterial({
         glslVersion: THREE.GLSL3,
         vertexShader: OCEAN_PASS_VERT,
         fragmentShader,
@@ -171,20 +176,24 @@ export class OceanSimulation {
         depthWrite: false,
         blending: THREE.NoBlending,
       });
-    this.evolve = pass(OCEAN_EVOLVE_FRAG, {
+      // Named so a live-program or census entry reads as the ocean, not a key.
+      material.name = name;
+      return material;
+    };
+    this.evolve = pass('ocean:evolve', OCEAN_EVOLVE_FRAG, {
       uH0: { value: this.h0 },
       uWaves: { value: this.waves },
       uLoopT: { value: 0 },
       uChop: { value: sea.choppiness },
     });
-    this.fft = pass(OCEAN_FFT_FRAG, {
+    this.fft = pass('ocean:fft', OCEAN_FFT_FRAG, {
       uInA: { value: null },
       uInB: { value: null },
       uStage: { value: 1 },
       uN: { value: this.n },
       uHorizontal: { value: 1 },
     });
-    this.assemble = pass(OCEAN_ASSEMBLE_FRAG, {
+    this.assemble = pass('ocean:assemble', OCEAN_ASSEMBLE_FRAG, {
       uInA: { value: null },
       uInB: { value: null },
       uPrevShade: { value: null },
@@ -229,12 +238,18 @@ export class OceanSimulation {
    */
   update(time: number): number {
     if (!this.enabled || !this.renderer || !this.atlasA || !this.atlasB) return 0;
+    // The tier's step rate, slowed further while the render budget is shedding
+    // post (ocean_shed.ts): the waves move far slower than a frame.
+    const minStep = 1 / (this.plan.stepHz * oceanShedStepScale());
     const dt = time - this.lastStep;
-    if (dt >= 0 && dt < 1 / OCEAN_MAX_STEP_HZ) return 0;
-    const step = dt > 0 && dt < 1 ? dt : 1 / OCEAN_MAX_STEP_HZ;
+    if (dt >= 0 && dt < minStep) return 0;
+    const step = dt > 0 && dt < 1 ? dt : minStep;
     this.lastStep = time;
     const renderer = this.renderer;
     const previous = renderer.getRenderTarget();
+    // Every pass overwrites its whole target, so the per-render clear is waste.
+    const autoClear = renderer.autoClear;
+    renderer.autoClear = false;
     let passes = 0;
     try {
       this.evolve.uniforms.uLoopT.value =
@@ -244,7 +259,7 @@ export class OceanSimulation {
       passes++;
       let src = this.atlasA;
       let dst = this.atlasB;
-      for (const horizontal of [1, 0]) {
+      for (const horizontal of FFT_AXES) {
         for (let p = 1; p < this.n; p *= 2) {
           const u = this.fft.uniforms;
           u.uInA.value = src.textures[0];
@@ -275,6 +290,7 @@ export class OceanSimulation {
         this.uniforms.shade[c].value = out.read.textures[1];
       }
     } finally {
+      renderer.autoClear = autoClear;
       renderer.setRenderTarget(previous);
     }
     return passes;

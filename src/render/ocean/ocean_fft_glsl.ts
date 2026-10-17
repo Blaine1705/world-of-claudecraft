@@ -21,7 +21,8 @@ void main() {
 `;
 
 /**
- * The time step: h(k, t) = h0(k) e^(i w t) + conj(h0(-k)) e^(-i w t), then the
+ * The time step (ocean_spectrum_core.ts oceanEvolveTexel is its CPU mirror,
+ * line for line): h(k, t) = h0(k) e^(i w t) + conj(h0(-k)) e^(-i w t), then the
  * four packed field spectra. `uLoopT` is the wrapped clock as a fraction of
  * the loop, and every w is a whole number of cycles per loop (`waves.z`), so
  * the phase is exact and the wrap is seamless.
@@ -51,13 +52,16 @@ void main() {
   vec2 kz = vec2(w.y * w.w);          // kz / |k|
   vec2 minusIH = vec2(h.y, -h.x);     // -i h
   vec2 iH = vec2(-h.y, h.x);          // i h
-  vec2 dx = minusIH * kx * uChop;
-  vec2 dz = minusIH * kz * uChop;
+  // Points move TOWARD the crest above them (ocean_spectrum_core
+  // OCEAN_CHOP_SIGN), so the choppy terms carry a negative scale.
+  float chop = -uChop;
+  vec2 dx = minusIH * kx * chop;
+  vec2 dz = minusIH * kz * chop;
   vec2 dydx = iH * w.x;
   vec2 dydz = iH * w.y;
-  vec2 dxdx = h * (w.x * w.x * w.w) * uChop;
-  vec2 dzdz = h * (w.y * w.y * w.w) * uChop;
-  vec2 dxdz = h * (w.x * w.y * w.w) * uChop;
+  vec2 dxdx = h * (w.x * w.x * w.w) * chop;
+  vec2 dzdz = h * (w.y * w.y * w.w) * chop;
+  vec2 dxdz = h * (w.x * w.y * w.w) * chop;
   outA = vec4(pack2(dx, h), pack2(dz, dxdz));
   outB = vec4(pack2(dydx, dydz), pack2(dxdx, dzdz));
 }

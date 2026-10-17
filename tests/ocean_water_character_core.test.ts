@@ -48,8 +48,22 @@ describe('water character', () => {
     expect(hexToLinear(0x000000)).toEqual([0, 0, 0]);
   });
 
+  it('sizes the field from the active map, past its edges by a margin', () => {
+    const layout = waterFieldLayout(
+      [
+        { zMin: 0, zMax: 360 },
+        { xMin: 180, xMax: 900, zMin: 0, zMax: 720 },
+      ],
+      -180,
+      180,
+    );
+    expect(layout.minX).toBeLessThan(-180);
+    expect(layout.minX + layout.width * layout.cell).toBeGreaterThan(900);
+    expect(layout.minZ + layout.height * layout.cell).toBeGreaterThan(720);
+  });
+
   it('bakes a field that keeps each realm and cross-fades a border', () => {
-    const layout = waterFieldLayout();
+    const layout = waterFieldLayout([{ zMin: 0, zMax: 1200 }], -600, 600);
     const west: WaterCharacter = WATER_CHARACTERS.vale;
     const east: WaterCharacter = WATER_CHARACTERS.marsh;
     const borderX = layout.minX + layout.width * layout.cell * 0.5;
