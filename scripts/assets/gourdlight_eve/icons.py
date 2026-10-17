@@ -6,7 +6,11 @@
 #     scripts/assets/gourdlight_eve/icons.py -- --out <dir>
 #
 # The carved pumpkin head is the shipped model itself (model.py); the sweet, the
-# treat pouch and the Jar of Mischief are built here for their icons only.
+# treat pouch and the Jar of Mischief are built here for their icons only, and so are
+# Old Thatchgrin's two spoils: his sweet sack (the pouch's bigger, darker sackcloth
+# cousin, tied with straw, sweets spilling at its foot) and the Strawling Charm (a
+# little straw doll bound with orange ribbon, two ember beads for eyes).
+# `--only <id,id>` renders just those subjects.
 # Writes <dir>/<item-id>.png at 512x512 (the master); scripts/convert_item_icons_webp.mjs
 # encodes the 128px shipping WebP.
 
@@ -180,6 +184,74 @@ def build_pouch(col):
     return root
 
 
+def build_sack(col):
+    """Old Thatchgrin's sweet sack: the pouch's shape, bigger and darker, a straw tie at
+    the neck, three wrapped sweets spilling round its foot."""
+    root = build_pouch(col)
+    for c in root.children:
+        for m in c.data.materials:
+            b = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+            if m.name.startswith("PouchCloth"):
+                b.inputs["Base Color"].default_value = (0.3, 0.2, 0.11, 1.0)
+            elif m.name.startswith("PouchPatch"):
+                b.inputs["Base Color"].default_value = (0.08, 0.06, 0.05, 1.0)
+                b.inputs["Emission Color"].default_value = (1.0, 0.45, 0.08, 1.0)
+                b.inputs["Emission Strength"].default_value = 0.6
+    import scarecrow
+
+    straw = principled("SackStraw", (0.86, 0.68, 0.32), rough=0.9)
+    tuft = scarecrow.straw_tuft("sack-icon", (0.0, 0.0, 0.47), (0, -0.2, 1), 40, 0.32, 0.9, 0.012, 0.3)
+    obj_from_bm("sack_straw", tuft, straw, col).parent = root
+    for i, (x, y, rz) in enumerate(((-0.62, -0.4, 0.4), (0.55, -0.48, -0.6), (0.05, -0.72, 1.2))):
+        sweet = build_sweet(col)
+        sweet.scale = (0.42, 0.42, 0.42)
+        sweet.location = (x, y, -0.48)
+        sweet.rotation_euler = (0.3, 0.0, rz)
+        sweet.parent = root
+    root.scale = (1.05, 1.05, 1.05)
+    return root
+
+
+def build_charm(col):
+    """The Strawling Charm: a little straw doll, its head, arms and legs bound off with
+    orange ribbon, two ember beads for eyes."""
+    import scarecrow
+
+    straw = principled("CharmStraw", (0.9, 0.72, 0.34), rough=0.85)
+    ribbon = principled("CharmRibbon", (1.0, 0.34, 0.02), rough=0.5)
+    ember = principled("CharmEmber", (1.0, 0.6, 0.2), emit=(1.0, 0.5, 0.1), emit_strength=8.0)
+    root = bpy.data.objects.new("charm", None)
+    col.objects.link(root)
+    parts = [
+        ("charm_tuft", (0, 0, 0.8), (0, 0.1, 1), 40, 0.16, 0.5),
+        ("charm_body", (0, 0, 0.55), (0, 0, -1), 90, 0.34, 0.1),
+        ("charm_leg_l", (0.035, 0, 0.22), (0.25, 0, -1), 40, 0.3, 0.08),
+        ("charm_leg_r", (-0.035, 0, 0.22), (-0.25, 0, -1), 40, 0.3, 0.08),
+        ("charm_arm_l", (0.03, 0, 0.44), (1, 0, -0.55), 30, 0.32, 0.08),
+        ("charm_arm_r", (-0.03, 0, 0.44), (-1, 0, -0.55), 30, 0.32, 0.08),
+    ]
+    for name, o, d, n, ln, spread in parts:
+        bm = scarecrow.straw_tuft(name, o, d, n, ln, spread, 0.016, 0.02)
+        obj_from_bm(name, bm, straw, col).parent = root
+    hbm = bmesh.new()
+    bmesh.ops.create_icosphere(hbm, subdivisions=3, radius=0.17, matrix=Matrix.Translation((0, 0, 0.68)))
+    obj_from_bm("charm_skull", hbm, straw, col).parent = root
+    rbm = bmesh.new()
+    for z, r in ((0.53, 0.055), (0.27, 0.07)):
+        pts = [Vector((math.cos(a / 20 * TAU) * r, math.sin(a / 20 * TAU) * r, z)) for a in range(21)]
+        tube(rbm, pts, 0.025)
+    for side in (-1, 1):
+        pts = [Vector((side * (0.03 + 0.05 * t), -0.06 - 0.05 * t, 0.53 - 0.22 * t)) for t in [i / 8 for i in range(9)]]
+        tube(rbm, pts, 0.02)
+    obj_from_bm("charm_ribbon", rbm, ribbon, col).parent = root
+    ebm = bmesh.new()
+    for side in (-1, 1):
+        bmesh.ops.create_icosphere(ebm, subdivisions=2, radius=0.03, matrix=Matrix.Translation((side * 0.06, -0.15, 0.7)))
+    obj_from_bm("charm_eyes", ebm, ember, col).parent = root
+    root.rotation_euler = (0.0, 0.2, 0.3)
+    return root
+
+
 def build_jar(col):
     """A squat glass jar, cork stopper tied with black ribbon, green fumes
     swirling inside it and leaking from under the cork."""
@@ -318,6 +390,7 @@ def frame(cam, obj, pad=1.3):
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     out = argv[argv.index("--out") + 1]
+    only = set(argv[argv.index("--only") + 1].split(",")) if "--only" in argv else None
     os.makedirs(out, exist_ok=True)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene, cam = setup_scene()
@@ -342,12 +415,16 @@ def main():
         "gourdlight_sweet": build_sweet(col),
         "gourdlight_treat_pouch": build_pouch(col),
         "jar_of_mischief": build_jar(col),
+        "thatchgrin_sweet_sack": build_sack(col),
+        "strawling_charm": build_charm(col),
     }
     for o in subjects.values():
         o.hide_render = True
         for c in o.children_recursive:
             c.hide_render = True
     for item_id, o in subjects.items():
+        if only is not None and item_id not in only:
+            continue
         o.hide_render = False
         for c in o.children_recursive:
             c.hide_render = False

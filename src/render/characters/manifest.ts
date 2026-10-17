@@ -1149,6 +1149,40 @@ export const BALGATH_SCALE = 4.2;
  * about half of Balgath's 3.2 x 4.2. MUST match the file (prepareVisual normalizes by it).
  */
 export const MUSTER_EFFIGY_HEIGHT = 6.7;
+
+// Old Thatchgrin's clip map (scripts/assets/gourdlight_eve/scarecrow_clips.py), shared by
+// his strawlings (same rig). The two auto swings rotate; his telegraphs play off the windup
+// cue his kit emits (seasonal/scarecrow_kit.ts): the throw's release lands at 1.0 s of its
+// 2.2 s timeline, which IS the Kindled Gourd's windup, so he is upright as it bursts, and
+// the summon peaks at 1.4 s, the call's windup, as the adds land. Both play unscaled.
+const THATCHGRIN: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Swipe', 'Chop'],
+  attackByAbility: {
+    mob_thatchgrin_gourd: 'Throw',
+    mob_thatchgrin_summon: 'Summon',
+  },
+  attackTimeScaleByAbility: {
+    mob_thatchgrin_gourd: 1,
+    mob_thatchgrin_summon: 1,
+  },
+  hit: ['Hit'],
+  death: 'Death',
+};
+/** World heights: the boss nearly three players tall (HUMANOID_H 2.6), a strawling a head
+ *  taller than one. The Blender bodies are 5.1 m and 2.35 m; prepareVisual normalizes. */
+export const THATCHGRIN_HEIGHT = 7.4;
+export const STRAWLING_HEIGHT = 3.0;
+// Gait references, from the authored cycles (scarecrow_clips.py gait_keys): the walk's
+// stakes swing 22 degrees over a 1.2 s cycle, two steps of 2 x 1.9 m x sin 22, so 2.37 m/s,
+// the run 30 degrees over 0.85 s, 4.47 m/s; times the normalize (7.4 / 5.1) for the boss,
+// the strawling's at its 0.46 build scale and 3.0 / 2.35 normalize.
+const THATCHGRIN_WALK_REF = 3.44;
+const THATCHGRIN_RUN_REF = 6.5;
+const STRAWLING_WALK_REF = 1.39;
+const STRAWLING_RUN_REF = 2.63;
 const BALGATH_WALK_REF = 4.05;
 const BALGATH_RUN_REF = 7.95;
 
@@ -6527,6 +6561,49 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0xa8a496,
     tintStrength: 0.06,
   },
+  // Old Thatchgrin, Gourdlight Eve's field boss, and his strawlings
+  // (content/gourdlight_eve_scarecrow.ts): Blender-built on ONE rig and ONE clip set
+  // (scripts/assets/gourdlight_eve/scarecrow.py + scarecrow_clips.py, shipped by
+  // export_scarecrow.mjs), pinned by tests/gourdlight_scarecrow_assets.test.ts.
+  mob_gourdlight_thatchgrin: {
+    url: `${CREATURES}/gourdlight_thatchgrin.glb`,
+    height: THATCHGRIN_HEIGHT,
+    clips: THATCHGRIN,
+    // The death collapses into straw on its authored timeline (the head rolls clear at
+    // 1.9 s): played as authored, not the shared 1.15x.
+    deathTimeScale: 1,
+    // The candle inside his carved head: the halo that makes the face read at range and
+    // gutters out with him. `GourdGlow` is the candle core itself. Offset MEASURED off the
+    // exported GLB (scripts/assets/balgath_cyclops/measure_eye.mjs, the pumpkin's glow core).
+    eyeGlow: {
+      bone: 'Head',
+      offset: [0, 0.23, -0.07],
+      color: 0xff7a1e,
+      radius: 0.09,
+      pulseHz: 0.6,
+      selfLitMaterial: 'GourdGlow',
+    },
+    walkRef: THATCHGRIN_WALK_REF,
+    runRef: THATCHGRIN_RUN_REF,
+  },
+  mob_gourdlight_strawling: {
+    url: `${CREATURES}/gourdlight_strawling.glb`,
+    height: STRAWLING_HEIGHT,
+    clips: THATCHGRIN,
+    deathTimeScale: 1.3,
+    eyeGlow: {
+      bone: 'Head',
+      offset: [0, 0.144, 0.122],
+      color: 0xffa040,
+      radius: 0.05,
+      pulseHz: 1.1,
+      selfLitMaterial: 'ScarecrowGlow',
+    },
+    walkRef: STRAWLING_WALK_REF,
+    runRef: STRAWLING_RUN_REF,
+    // a scurrying little thing on short stakes: its gait has to spin far past 1x
+    runTimeScaleMax: 2.8,
+  },
   npc_chronicler: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
@@ -7967,6 +8044,10 @@ const MOB_KEYS: Record<string, string> = {
   // (no camp entry, no world-boss registration); they exist so the two silhouettes can
   // be compared in motion via ?boss=foreman|cyclops (src/game/boss_test_drive.ts).
   balgath_cyclops: 'mob_balgath_cyclops',
+  // Gourdlight Eve's field boss and his adds (the crows wear the crypt's carrion crow)
+  gourdlight_thatchgrin: 'mob_gourdlight_thatchgrin',
+  gourdlight_strawling: 'mob_gourdlight_strawling',
+  gourdlight_crow: 'mob_crypt_crow',
   drakemaw_broodlord: 'mob_dragonkin_broodlord',
   cindraleth_maw_matriarch: 'mob_dragonkin_matriarch',
   dragonkin_broodguard: 'mob_dragonkin_broodguard',

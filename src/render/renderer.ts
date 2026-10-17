@@ -706,7 +706,7 @@ import {
   syncRaidEncounterAnchorVisuals,
   syncRaidEncounterRigVisuals,
 } from './raid_encounter_visuals';
-import { isOwnedPetHostile } from './reaction';
+import { isHostileSelectionTarget } from './reaction';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
   RenderBudgetGovernor,
@@ -765,6 +765,7 @@ import { createRiftAwareGroundSampler } from './rift_ground_sample';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
+import { ScarecrowFx } from './scarecrow_fx';
 import {
   captureSceneCensus,
   createHitchTracker,
@@ -1997,6 +1998,7 @@ export class Renderer {
   ) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private worldBoss!: WorldBossLayer; // Balgath's fx, far sprites, ward badges
+  private scarecrowFx!: ScarecrowFx; // Gourdlight Eve's field boss (scarecrow_fx.ts)
   private mageGroundFx!: MageGroundFx;
   private varkhulForgestormVisuals?: VarkhulForgestormVisuals;
   private nythraxisMechanicVisuals?: NythraxisMechanicVisuals;
@@ -2349,7 +2351,7 @@ export class Renderer {
       showOwnNameplate: () => this.showOwnNameplate,
       showPlayerNameplates: () => this.showPlayerNameplates,
       showPetNames: () => this.showPetNames,
-      isHostilePlayer: (e) => this.isHostilePlayer(e),
+      isHostilePlayer: (e) => isPvpHostilePlayer(this.sim, e),
     });
 
     // Boot values match the vale/low presets; updateAmbience eases from here.
@@ -3156,6 +3158,7 @@ export class Renderer {
     const offsetVfxAnchor = createOffsetVfxAnchor(fillVfxPose);
     bd('scene-misc');
     this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor, this.groundSample, gate);
+    this.scarecrowFx = new ScarecrowFx(this.scene, this.vfx, (x, z) => groundHeight(x, z, this.sim.cfg.seed), () => this.sim.entities, (id) => this.sim.entities.get(id), gate);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
     this.farmPatchVisuals = new FarmPatchVisuals(
@@ -5100,6 +5103,7 @@ export class Renderer {
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.worldBoss.fx.update(dt, this.reducedMotion(), this.sim.entities.values());
+    this.scarecrowFx.update(dt, this.reducedMotion());
     this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
@@ -7329,6 +7333,7 @@ export class Renderer {
           break;
         }
         if (ev.fx === 'windup') {
+          this.scarecrowFx.handleWindup(ev.sourceId, ev.ability);
           // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
           // the clip's release pose. `ability` rides along so a mob one-shot
@@ -7503,6 +7508,7 @@ export class Renderer {
       case 'spellfxAt': {
         if (ev.fx === 'hoardDig') break;
         if (routeBalgathSpellfxAt(ev, this.worldBoss?.fx, () => this.sim.entities.values())) break;
+        if (this.scarecrowFx.handleSpellfxAt(ev)) break;
         if (ev.fx === 'soulTravel') {
           if (ev.targetId !== undefined) {
             const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
@@ -8742,24 +8748,6 @@ export class Renderer {
   triggerHit(entityId: number): void {
     const v = this.views.get(entityId);
     if (v) this.activeVisual(v)?.playHit();
-  }
-
-  private isHostileSelectionTarget(target: Entity): boolean {
-    // A controlled pet inherits its owner's reaction (a player's pet is hostile
-    // only in PvP), so route mobs through the owner-aware helper; everything
-    // else falls back to the player-vs-player verdict.
-    if (target.kind === 'mob') {
-      return target.ownerId !== null
-        ? isOwnedPetHostile(target, this.sim.entities, (p) => this.isHostilePlayer(p))
-        : target.hostile;
-    }
-    return this.isHostilePlayer(target);
-  }
-
-  // The shared client verdict (src/ui/pvp_hostile_core.ts): duel, ranked
-  // arena, Thornhollow Fields, and the open-world /pvp flag pair rule.
-  private isHostilePlayer(target: Entity): boolean {
-    return isPvpHostilePlayer(this.sim, target);
   }
 
   // -------------------------------------------------------------------------
@@ -11344,7 +11332,13 @@ export class Renderer {
         }
         this.selectionRingTicks.rotation.y += dt * SELECTION_RING_SPIN; // slow reticle spin
         const ringMat = this.selectionRingMat;
-        ringMat.color.setHex(this.isHostileSelectionTarget(target) ? 0xcc2222 : 0xd4af37);
+        ringMat.color.setHex(
+          isHostileSelectionTarget(target, this.sim.entities, (p) =>
+            isPvpHostilePlayer(this.sim, p),
+          )
+            ? 0xcc2222
+            : 0xd4af37,
+        );
         if (!this.lowGfx) ringMat.color.multiplyScalar(SELECTION_RING_BOOST); // subtle bloom edge
         ringMat.opacity = 0.78 + 0.2 * Math.sin(this.time * 4.5); // gentle pulse
         this.selectionRing.visible = reticleShownUnder(tv.group, this.selectionRing);
@@ -11488,6 +11482,7 @@ export class Renderer {
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.worldBoss.fx.update(dt, this.reducedMotion(), this.sim.entities.values());
+    this.scarecrowFx.update(dt, this.reducedMotion());
     this.worldBoss.syncImpostors(
       this.webgl,
       this.sim.entities.values(),
@@ -12131,6 +12126,7 @@ export class Renderer {
     this.riftDeathZoneVisuals?.dispose();
     this.blobShadows?.dispose();
     this.worldBoss.dispose();
+    this.scarecrowFx.dispose();
     this.authoredLayers?.dispose();
     this.editor.dispose();
   }

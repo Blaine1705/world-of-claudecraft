@@ -7,8 +7,10 @@
 #   blender --background --factory-startup --python \
 #     scripts/assets/gourdlight_eve/crest.py -- --out <dir>
 #
-# Writes <dir>/feat_gourdlight_guise.png (512x512, transparent outside the
-# frame); scripts/convert_deed_icons_webp.mjs <dir> encodes the shipping 128px
+# `--subject thatchgrin` paints the field-boss Feat instead (feat_old_thatchgrin): his
+# rusted scythe crossed behind his own carved head, straw at its foot, on an ember field.
+#
+# Writes <dir>/<deed id>.png (512x512, transparent outside the frame); scripts/convert_deed_icons_webp.mjs <dir> encodes the shipping 128px
 # WebP and regenerates src/ui/deed_image_ids.ts. Deterministic: no clock, no
 # `random`.
 
@@ -143,11 +145,51 @@ def disc(radius, depth, y):
     return bm
 
 
+SUBJECT = ["guise"]
+
+
+def thatchgrin_scythe(col):
+    """Old Thatchgrin's scythe (scarecrow.py), laid diagonally behind the head."""
+    import scarecrow
+
+    scarecrow.PARTS.clear()
+    scarecrow.build_scythe(1.0, {})
+    objs = [scarecrow.finish_part(p, []) for p in scarecrow.PARTS]
+    for o in objs:
+        for c in o.users_collection:
+            c.objects.unlink(o)
+        col.objects.link(o)
+    sc = scarecrow.join(objs, "crest_scythe")
+    # the snath runs up through the hand at (-2.18, 0, 3.1): centre it and lay it across
+    k = 0.5
+    # the hand (where the snath is gripped) to the crest's middle, the blade swung to lie
+    # flat across the field (it is authored pointing at the viewer), tilted on a diagonal
+    m = (Matrix.Translation((0.0, -0.08, 0.05)) @ Matrix.Rotation(-0.75, 4, "Y")
+         @ Matrix.Scale(k, 4) @ Matrix.Rotation(-math.pi / 2, 4, "Z")
+         @ Matrix.Translation((2.18, 0.0, -3.1 - 0.3)))
+    sc.data.transform(m)
+    for poly in sc.data.polygons:
+        poly.use_smooth = True
+    return sc
+
+
 def build(col):
     gold = principled("Gold", (1.0, 0.72, 0.3), rough=0.3, metal=1.0)
     gold_dark = principled("GoldDark", (0.9, 0.6, 0.24), rough=0.36, metal=1.0)
     band = principled("RimBand", (0.04, 0.05, 0.11), rough=0.55, metal=0.3)
-    obj("field", disc(0.92, 0.05, 0.06), field_material(), col)
+    field = field_material()
+    if SUBJECT[0] == "thatchgrin":
+        # an ember field rather than the night violet: his burning stubble
+        ramp = next(n for n in field.node_tree.nodes if n.type == "VALTORGB")
+        tones = [(0.03, 0.008, 0.004, 1), (0.3, 0.07, 0.015, 1), (0.1, 0.025, 0.01, 1)]
+        for el, tone in zip(ramp.color_ramp.elements, tones):
+            el.color = tone
+        b = next(n for n in field.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        field.node_tree.links.new(ramp.outputs["Color"], b.inputs["Emission Color"])
+        b.inputs["Emission Strength"].default_value = 1.6
+    obj("field", disc(0.92, 0.05, 0.06), field, col)
+    if SUBJECT[0] == "thatchgrin":
+        thatchgrin_scythe(col)
     gbm = bmesh.new()
     bmesh.ops.create_circle(gbm, cap_ends=True, segments=64, radius=0.7,
                             matrix=Matrix.Translation((0, 0.025, -0.02)) @ Matrix.Rotation(math.pi / 2, 4, "X"))
@@ -157,6 +199,8 @@ def build(col):
     ring(bm, 0.93, 0.045, -0.02)
     ring(bm, 1.07, 0.05, -0.02)
     obj("frame_gold", bm, gold, col)
+    if SUBJECT[0] == "thatchgrin":
+        band.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.2, 0.035, 0.01, 1)
     obj("frame_band", disc(1.03, 0.06, 0.02), band, col)
     bm = bmesh.new()
     for i in range(16):
@@ -281,12 +325,15 @@ def setup(out):
     cam.rotation_euler = (math.pi / 2, 0.0, 0.0)
     scene.collection.objects.link(cam)
     scene.camera = cam
-    scene.render.filepath = os.path.join(out, "feat_gourdlight_guise.png")
+    name = "feat_old_thatchgrin" if SUBJECT[0] == "thatchgrin" else "feat_gourdlight_guise"
+    scene.render.filepath = os.path.join(out, name + ".png")
 
 
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     out = argv[argv.index("--out") + 1]
+    if "--subject" in argv:
+        SUBJECT[0] = argv[argv.index("--subject") + 1]
     os.makedirs(out, exist_ok=True)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     col = bpy.data.collections.new("Crest")
