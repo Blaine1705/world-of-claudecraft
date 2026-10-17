@@ -297,6 +297,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
         duration: samples.length / SR,
         ffmpegPath: FFMPEG_PATH,
         channels: 1,
+        // custom: true in the catalog: the synth's own mix is the master (peak-safe only),
+        // never loudness-targeted like a generated clip
+        preserveLoudness: true,
       });
     } finally {
       rmSync(tmp, { force: true });

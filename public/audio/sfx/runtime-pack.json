@@ -1,7 +1,7 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "ed3fe9cd9f0d2afe5dd2f6cff27e8ab86663046ed1bedff383e6145251747c27",
+  "bundleId": "ce88d0a6db1f564a393bd91f9b14a15b7004bb1f99b27d676ed56dc9a487b749",
   "catalogHash": "02e4be760cf95fb325bfce733c145c4e6e4df3a6119c5f876660313f51ea9f9d",
   "clips": {
     "amb_birds": {
@@ -1028,9 +1028,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/impact_gourdfall.mp3?v=a5ff8f3fc49b",
+          "url": "/audio/sfx/impact_gourdfall.mp3?v=290c876bd9a8",
           "bytes": 31391,
-          "sha256": "a5ff8f3fc49b8673f137b5677539607a30709a81215f48f170879d2a3fd1f777"
+          "sha256": "290c876bd9a83d4f5d42fa6f7dbe6417284ed21ee57e6311f7889c202458cd44"
         }
       ],
       "gain": 1,
@@ -1148,9 +1148,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/impact_swelling_gourd_burst.mp3?v=e7a7f216d13c",
+          "url": "/audio/sfx/impact_swelling_gourd_burst.mp3?v=22d856bdb1da",
           "bytes": 63991,
-          "sha256": "e7a7f216d13c68621eb9cbe379d36ab6dcd2206da6c447395be2f45a093b2519"
+          "sha256": "22d856bdb1dae9ab31695ecbe88981073e91e72564f1b9a37316688e043a9bf6"
         }
       ],
       "gain": 1,
@@ -4298,9 +4298,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/mount_idle_emberbristle_broom.mp3?v=8df6d8f47f17",
+          "url": "/audio/sfx/mount_idle_emberbristle_broom.mp3?v=37ff72477f0b",
           "bytes": 73395,
-          "sha256": "8df6d8f47f178b78fe2eef1d2319fdeb12ee6e14f50e0f824038735c0831a11f"
+          "sha256": "37ff72477f0b36590161849de8132556e6dc38f7c468595959b756b120e94647"
         }
       ],
       "gain": 1,
@@ -5210,9 +5210,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/proj_gourdfall_whistle.mp3?v=f65ad928ef32",
+          "url": "/audio/sfx/proj_gourdfall_whistle.mp3?v=f5f9e6df5162",
           "bytes": 24494,
-          "sha256": "f65ad928ef327d715e8be25d41867a45bec007a7141f2791b4d2077527593565"
+          "sha256": "f5f9e6df5162f643ca09bce4192ba73fb5fb2bf4186a92c05732f286c82f4995"
         }
       ],
       "gain": 1,

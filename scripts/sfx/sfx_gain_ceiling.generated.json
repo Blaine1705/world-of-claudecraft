@@ -789,13 +789,13 @@
     ]
   },
   "impact_gourdfall": {
-    "ceilingDb": 4.5,
+    "ceilingDb": 6.7,
     "tracks": [
       {
         "filename": "impact_gourdfall.mp3",
-        "sha256": "a5ff8f3fc49b8673f137b5677539607a30709a81215f48f170879d2a3fd1f777",
+        "sha256": "290c876bd9a83d4f5d42fa6f7dbe6417284ed21ee57e6311f7889c202458cd44",
         "size": 31391,
-        "peakDb": -5.5
+        "peakDb": -7.7
       }
     ]
   },
@@ -902,13 +902,13 @@
     ]
   },
   "impact_swelling_gourd_burst": {
-    "ceilingDb": 4.5,
+    "ceilingDb": 6.2,
     "tracks": [
       {
         "filename": "impact_swelling_gourd_burst.mp3",
-        "sha256": "e7a7f216d13c68621eb9cbe379d36ab6dcd2206da6c447395be2f45a093b2519",
+        "sha256": "22d856bdb1dae9ab31695ecbe88981073e91e72564f1b9a37316688e043a9bf6",
         "size": 63991,
-        "peakDb": -5.5
+        "peakDb": -7.2
       }
     ]
   },
@@ -3884,13 +3884,13 @@
     ]
   },
   "mount_idle_emberbristle_broom": {
-    "ceilingDb": 5.9,
+    "ceilingDb": 6.1,
     "tracks": [
       {
         "filename": "mount_idle_emberbristle_broom.mp3",
-        "sha256": "8df6d8f47f178b78fe2eef1d2319fdeb12ee6e14f50e0f824038735c0831a11f",
+        "sha256": "37ff72477f0b36590161849de8132556e6dc38f7c468595959b756b120e94647",
         "size": 73395,
-        "peakDb": -6.9
+        "peakDb": -7.1
       }
     ]
   },
@@ -4740,13 +4740,13 @@
     ]
   },
   "proj_gourdfall_whistle": {
-    "ceilingDb": 5.2,
+    "ceilingDb": 5.8,
     "tracks": [
       {
         "filename": "proj_gourdfall_whistle.mp3",
-        "sha256": "f65ad928ef327d715e8be25d41867a45bec007a7141f2791b4d2077527593565",
+        "sha256": "f5f9e6df5162f643ca09bce4192ba73fb5fb2bf4186a92c05732f286c82f4995",
         "size": 24494,
-        "peakDb": -6.2
+        "peakDb": -6.8
       }
     ]
   },
