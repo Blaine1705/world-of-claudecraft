@@ -367,7 +367,6 @@ export class ScarecrowFx {
     pos.needsUpdate = true;
     const disc = new THREE.Mesh(geometry, this.discMaterial);
     disc.position.set(x, y, z);
-    disc.renderOrder = 2;
     disc.visible = false;
     root.add(disc);
     this.patches.push({ disc, x, y, z, radius, born: this.time, total, flameClock: 0 });

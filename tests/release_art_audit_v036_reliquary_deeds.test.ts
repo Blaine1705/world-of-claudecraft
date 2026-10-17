@@ -301,8 +301,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // Mirefen world-boss branch's three combat deeds, all pending.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
     // 347 with Gourdlight Eve's seasonal Feat, its crest painted: 290 painted.
-    expect(DEED_ORDER).toHaveLength(347);
-    expect(DEED_IMAGE_IDS.size).toBe(290);
+    // 348 with its field boss's Feat (feat_old_thatchgrin), painted too: 291.
+    expect(DEED_ORDER).toHaveLength(348);
+    expect(DEED_IMAGE_IDS.size).toBe(291);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),
