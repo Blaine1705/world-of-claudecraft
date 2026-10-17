@@ -93,8 +93,9 @@ function templateHasPetSpecial(templateId: string): boolean {
 
 // A live pet check fails while inside a delve for owners whose pet is stowed for
 // the run (see stowPetForDelve/restorePetFromDelveStash), so the surfaced error
-// must say why instead of implying the pet was lost. A hunter's beast is not
-// stowed (delves/delve_pet.ts), so a petless hunter gets the plain message.
+// must say why instead of implying the pet was lost. A hunter's beast and a
+// warlock's demon are not stowed (delves/delve_pet.ts), so a petless one gets the
+// plain message.
 function petStowedInDelve(ctx: SimContext, e: Entity): boolean {
   return isDelvePos(e.pos.x) && ctx.delvePetStash.has(e.id);
 }

@@ -408,7 +408,7 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): boolean {
     ctx.spawnDelveCompanion(run, pid, delve.autoCompanionId);
   }
   // The delve respawn is a resurrection like any other (spirit.ts reviveAt), so the
-  // pet the death took comes back beside its owner: a hunter's beast fights in
+  // pet the death took comes back beside its owner: hunter and warlock pets fight in
   // delves (delves/delve_pet.ts). A no-op when the death took no pet.
   restorePetOnOwnerRevive(ctx, p);
   ctx.emit({ type: 'respawn', pid });

@@ -6,10 +6,11 @@ import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
-// A hunter's beast comes along into a delve and fights beside the delve companion
-// (src/sim/delves/delve_pet.ts). Every other pet class is still stowed for the run.
+// A hunter's beast and a warlock's demon come along into a delve and fight beside
+// the delve companion (src/sim/delves/delve_pet.ts). The frost mage's Water
+// Elemental is still stowed for the run.
 
-function makeSim(cls: 'hunter' | 'warlock' = 'hunter', seed = 42) {
+function makeSim(cls: 'hunter' | 'warlock' | 'mage' = 'hunter', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
 }
 
@@ -32,6 +33,15 @@ function tameBoar(sim: Sim): Entity {
   return pet!;
 }
 
+function summonImp(sim: Sim): Entity {
+  sim.setPlayerLevel(10);
+  sim.castAbility('summon_imp');
+  for (let i = 0; i < 20 * 12 && sim.player.castingAbility; i++) sim.tick();
+  const imp = sim.petOf(sim.playerId);
+  expect(imp?.templateId).toBe('emberkin');
+  return imp!;
+}
+
 function enterReliquary(sim: Sim) {
   const door = DELVES.collapsed_reliquary.doorPos;
   teleport(sim, door.x, door.z);
@@ -52,9 +62,9 @@ function killPlayer(sim: Sim) {
 }
 
 describe('delveKeepsPet', () => {
-  it('keeps the hunter pet and stows every other pet class', () => {
+  it('keeps hunter and warlock pets and stows the mage elemental', () => {
     expect(delveKeepsPet('hunter')).toBe(true);
-    expect(delveKeepsPet('warlock')).toBe(false);
+    expect(delveKeepsPet('warlock')).toBe(true);
     expect(delveKeepsPet('mage')).toBe(false);
   });
 });
@@ -217,16 +227,54 @@ describe('hunter pet inside a delve', () => {
   });
 });
 
-describe('non-hunter pets are still stowed', () => {
-  it('a warlock demon is parked on enter and serialized from the stash mid-delve', () => {
+describe('warlock demon inside a delve', () => {
+  it('enters beside its owner, alongside the companion', () => {
     const sim = makeSim('warlock');
+    const imp = summonImp(sim);
+    enterReliquary(sim);
+    expect(sim.petOf(sim.playerId)?.id).toBe(imp.id);
+    expect((sim as any).delvePetStash.has(sim.playerId)).toBe(false);
+    expect(isDelvePos(imp.pos.x)).toBe(true);
+    expect(dist2d(imp.pos, sim.player.pos)).toBeLessThan(3);
+    expect(sim.delveRunForPlayer(sim.playerId)?.companion?.companionId).toBe('companion_tessa');
+  });
+
+  it('follows its owner into the next room and back out on leave', () => {
+    const sim = makeSim('warlock');
+    const imp = summonImp(sim);
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.exitPortalOpen = true;
+    (sim as any).advanceDelveModule(run);
+    expect(dist2d(imp.pos, sim.player.pos)).toBeLessThan(3);
+    sim.leaveDelve();
+    expect(sim.petOf(sim.playerId)?.id).toBe(imp.id);
+    expect(isDelvePos(imp.pos.x)).toBe(false);
+    expect(dist2d(imp.pos, sim.player.pos)).toBeLessThan(3);
+  });
+
+  it('returns with its owner on the in-delve respawn', () => {
+    const sim = makeSim('warlock');
+    summonImp(sim);
+    enterReliquary(sim);
+    killPlayer(sim);
+    sim.releaseSpirit();
+    expect(sim.player.dead).toBe(false);
+    const imp = sim.petOf(sim.playerId);
+    expect(imp?.templateId).toBe('emberkin');
+    expect(dist2d(imp!.pos, sim.player.pos)).toBeLessThan(3);
+  });
+});
+
+describe('the mage elemental is still stowed', () => {
+  it('is parked on enter and serialized from the stash mid-delve', () => {
+    const sim = makeSim('mage');
     sim.setPlayerLevel(10);
-    sim.castAbility('summon_imp');
-    for (let i = 0; i < 20 * 12 && sim.player.castingAbility; i++) sim.tick();
-    expect(sim.petOf(sim.playerId)).not.toBeNull();
+    (sim as any).summonPet(sim.player, 'water_elemental');
+    expect(sim.petOf(sim.playerId)?.templateId).toBe('water_elemental');
     enterReliquary(sim);
     expect(sim.petOf(sim.playerId)).toBeNull();
     expect((sim as any).delvePetStash.has(sim.playerId)).toBe(true);
-    expect((sim as any).serializePet(sim.playerId)?.templateId).toBe('emberkin');
+    expect((sim as any).serializePet(sim.playerId)?.templateId).toBe('water_elemental');
   });
 });

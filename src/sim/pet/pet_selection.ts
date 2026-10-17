@@ -9,8 +9,8 @@ const DELVE_COMPANION_TEMPLATES: ReadonlySet<string> = new Set(
 
 /**
  * Pure owner/pet identity shared by the authoritative command path and its
- * offline/online HUD mirrors. A hunter's beast and the delve companion share a
- * delve (delves/delve_pet.ts), so the companion is excluded here as well as in
+ * offline/online HUD mirrors. A kept pet (hunter beast, warlock demon) and the
+ * delve companion share a delve (delves/delve_pet.ts), so the companion is excluded here as well as in
  * petOf().
  */
 export function isPrimaryOwnedPetEntity(entity: Entity, ownerId: number): boolean {

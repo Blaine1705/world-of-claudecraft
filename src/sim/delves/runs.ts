@@ -209,8 +209,8 @@ function ejectStaleDelveOccupants(ctx: SimContext, run: DelveRun, pids: readonly
 }
 
 export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
-  // A player's owned mob (a hunter's beast, a pet or guardian summoned inside the
-  // delve) walks its owner's run, so it collides with the same room walls and doors.
+  // A player's owned mob (a hunter's beast, a warlock's demon, a pet or guardian
+  // summoned inside the delve) walks its owner's run, so it collides with the same room walls and doors.
   // It is never in run.mobIds, and the player lookup below keys on the entity's own
   // id. The delve companion keeps its existing (unclamped) movement.
   if (e.kind === 'mob' && e.ownerId !== null && !ctx.isDelveCompanionMob(e)) {

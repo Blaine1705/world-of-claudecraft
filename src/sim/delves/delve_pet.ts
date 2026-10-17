@@ -1,9 +1,9 @@
 // Delve pet handling: which pets come along into a delve, and keeping a kept pet
 // at its owner's heel across every delve teleport.
 //
-// A HUNTER's beast now fights beside its owner inside a delve, alongside the delve
-// companion (Acolyte Tessa on a solo run). Every other pet class (warlock demon,
-// frost mage elemental) is still parked in the delvePetStash on entry and handed
+// A HUNTER's beast and a WARLOCK's demon now fight beside their owner inside a
+// delve, alongside the delve companion (Acolyte Tessa on a solo run). The frost
+// mage's Water Elemental is still parked in the delvePetStash on entry and handed
 // back on exit by stowPetForDelve/restorePetFromDelveStash (pet/pet_commands.ts).
 //
 // A delve moves its players by teleport (the board door into the first room, room
@@ -26,7 +26,7 @@ const DELVE_PET_HEEL_OFFSET_X = -1.5;
 
 /** True when this class's pet comes along into a delve instead of being stowed. */
 export function delveKeepsPet(cls: PlayerClass): boolean {
-  return cls === 'hunter';
+  return cls === 'hunter' || cls === 'warlock';
 }
 
 /**
