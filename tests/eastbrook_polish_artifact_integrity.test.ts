@@ -1377,7 +1377,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf. No capture was retaken.
+  // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf, and again for its candle-light registry. No capture was retaken.
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
@@ -1423,7 +1423,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  '55a075a3bcb99951215ea41bbb29f52a9264a2394f53bac5b6d0ccff8d30815e';
+  'e5deec8091b727c727028b9e7b1860ee4ef4dcc0e33d4d3e63c26f078d53f22b';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1468,7 +1468,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for Gourdlight Eve's renderer wiring. No capture was retaken.
-  '8361821d8eb1b7f072b513958129b6a57d3c569ad71bb7896f00717de01c582d';
+  'f4df0a0ab0b5b103d1424d7e17e40eb59e4614a9e208163140ee6b6e9a4bfefc';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2868,7 +2868,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
       // Gourdlight Eve's renderer wiring: recomputed LAST again. No capture was retaken.
-    ).toBe('64d730381664e4de7a4e841bb25762a5c13e32a51c56f069582b385c8cbea298');
+    ).toBe('d7f1c541898ce05309a31f5ba343b4c351f723828f0b2a40b99578ede3138cf6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
