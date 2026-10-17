@@ -60,16 +60,16 @@ describe('water paint order is pinned, not camera-derived', () => {
     vi.restoreAllMocks();
   });
 
-  it('draws the horizon apron under every zone surface plane', () => {
-    // Both are transparent with depth writes off, so paint order alone decides.
+  it('draws the zone sheets before the horizon apron, which then fails depth under them', () => {
+    // One transparent material that writes depth: the sheet paints first and
+    // the apron (0.02 lower) is rejected wherever a sheet already covers it,
+    // so the sea is shaded once per pixel and the real shoreline always wins.
     const material = zonePlaneA.material as THREE.Material;
     expect(material.transparent).toBe(true);
-    expect(material.depthWrite).toBe(false);
+    expect(material.depthWrite).toBe(true);
     expect(apron.material).toBe(material); // one shared material, one program
-
-    // The apron carries a constant deep shore depth and no foam; the zone plane
-    // carries the real shoreline. The zone plane must win, at every camera angle.
-    expect(apron.renderOrder).toBeLessThan(zonePlaneA.renderOrder);
+    expect(zonePlaneA.renderOrder).toBeLessThan(apron.renderOrder);
+    expect(apron.position.y).toBeLessThan(zonePlaneA.position.y);
   });
 
   it('gives every zone surface plane the same order, so zones cannot reorder', async () => {

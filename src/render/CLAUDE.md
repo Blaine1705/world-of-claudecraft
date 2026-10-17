@@ -19,7 +19,8 @@ Everything else is a sibling module in one of these families:
   owns: `terrain.ts` (chunked LOD + PBR splat), `props.ts`/`foliage.ts`/
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
   shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
-  facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`.
+  facing-aligned character volume wakes in `water_simulation.ts`; the surface
+  itself is the FFT ocean in `ocean/`, see its `CLAUDE.md`), `sky.ts`.
   Event/minigame scenes follow the same pattern: `jail_scene.ts`,
   `yumi_*.ts`, `battleground*.ts` (Thornhollow Fields:
   kit-module field from the pure `battleground_core.ts` manifest, entity props

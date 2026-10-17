@@ -35,10 +35,10 @@ const RIM_GLSL = /* glsl */ `
 // ${LAB_RIM_MARKER}
 if ( uWocLabRim.x > 0.0 ) {
 	vec3 wocRimN = normalize( nonPerturbedNormal );
-	float wocRimFacing = 1.0 - saturate( dot( wocRimN, geometryViewDir ) );
+	float wocRimFacing = saturate( dot( wocRimN, geometryViewDir ) );
 	float wocRimCurve = smoothstep( uWocLabRim.z, uWocLabRim.w, length( fwidth( wocRimN ) ) / max( length( fwidth( vViewPosition ) ), 1e-4 ) );
 	float wocRimNear = 1.0 - smoothstep( 50.0, 110.0, length( vViewPosition ) );
-	float wocRim = pow( wocRimFacing, uWocLabRim.y ) * wocRimCurve * wocRimNear * uWocLabRim.x;
+	float wocRim = pow( 1.0 - saturate( wocRimFacing ), uWocLabRim.y ) * wocRimCurve * wocRimNear * uWocLabRim.x;
 	reflectedLight.directDiffuse += uWocLabRimColor.rgb * wocRim * mix( vec3( 1.0 ), material.diffuseColor, uWocLabRimColor.a );
 }
 `;

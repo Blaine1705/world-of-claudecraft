@@ -556,6 +556,18 @@ export function ensureSkyBiomeAssets(
 // release can never blank the sky that is on screen.
 const domeBindings = new Set<() => readonly SkyKey[]>();
 
+// The dome the world renderer draws, for surfaces that reflect the live sky
+// (the ocean's reflection probe renders this exact mesh's geometry and
+// material, so a reflection carries the biome blend, the day/night grade, the
+// dusk glow and the horizon fog band the dome itself shows). The most recently
+// built dome wins; its view's dispose clears it.
+let liveDome: THREE.Mesh | null = null;
+
+/** The live sky dome, or null before the world built one. */
+export function liveSkyDome(): THREE.Mesh | null {
+  return liveDome;
+}
+
 /** Every biome currently bound into a live sky dome's uniforms. */
 export function currentDomeBiomes(): SkyKey[] {
   const bound = new Set<SkyKey>();
@@ -1120,6 +1132,7 @@ export function buildSky(
     // Draw after opaque geometry at far depth. Covered fragments fail depth
     // before the texture sample while untouched background pixels stay exact.
     dome.renderOrder = SKY_BACKGROUND_RENDER_ORDER;
+    liveDome = dome;
     return {
       dome,
       setCameraPos: (x, z) => {
@@ -1137,7 +1150,9 @@ export function buildSky(
       currentBiomeBlend: () => current,
       // The canvas dome samples skyTexture(), never the HDR stores, so it binds
       // nothing and has nothing to unbind.
-      dispose: () => {},
+      dispose: () => {
+        if (liveDome === dome) liveDome = null;
+      },
     };
   }
 
@@ -1197,6 +1212,7 @@ export function buildSky(
   });
   const dome = new THREE.Mesh(new THREE.SphereGeometry(DOME_RADIUS, 32, 20), material);
   dome.renderOrder = SKY_BACKGROUND_RENDER_ORDER;
+  liveDome = dome;
 
   const current = createEnvironmentBlend(start);
   let boundFrom = start.from;
@@ -1270,6 +1286,7 @@ export function buildSky(
     currentBiomeBlend: () => current,
     dispose(): void {
       domeBindings.delete(readBinding);
+      if (liveDome === dome) liveDome = null;
     },
   };
 }

@@ -30,7 +30,7 @@ const INSTANCE_DIRS = [
 
 /** Shader modules left on the old form on purpose, with the reason. */
 const LEFT_ON_PURPOSE: Record<string, string> = {
-  'src/render/water.ts':
+  'src/render/ocean/ocean_surface_glsl.ts':
     'overworld water bodies only; a few thousand yards out the product is exact',
   'src/render/props.ts':
     'the delve-mouth portal: an upright sheet in the overworld, never on a floor',

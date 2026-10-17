@@ -126,6 +126,8 @@ const CONSUMERS: ReadonlyArray<readonly [string, number]> = [
   ['src/render/detail_normals.ts', 1],
   ['src/render/canopy_detail.ts', 1],
   ['src/render/water.ts', 1],
+  ['src/render/ocean/ocean_simulation.ts', 1],
+  ['src/render/ocean/ocean_material.ts', 1],
   ['src/render/worn_stone.ts', 1],
   ['src/render/characters/stubble.ts', 1],
   ['src/render/characters/makeup.ts', 1],
