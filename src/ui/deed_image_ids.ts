@@ -167,6 +167,7 @@ export const DEED_IMAGE_IDS: ReadonlySet<string> = new Set([
   'feat_book_complete',
   'feat_brightwood_relic',
   'feat_era_cap',
+  'feat_gourdlight_guise',
   'hid_bountiful_coffer',
   'hid_codfather',
   'hid_companion_save',

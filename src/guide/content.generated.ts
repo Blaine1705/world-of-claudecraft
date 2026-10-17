@@ -6188,7 +6188,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Gourdlight Guise",
     "category": "feat",
     "renown": 0,
-    "feat": true
+    "feat": true,
+    "crest": "/ui/deeds/feat_gourdlight_guise.webp"
   }
 ];
 
