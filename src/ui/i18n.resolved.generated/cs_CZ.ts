@@ -6641,6 +6641,7 @@ export const cs_CZ: EnTranslations = {
       },
       "commendHeading": "Doporučení vyslance",
       "commendNote": "{amount} postavení u frakce dle vlastního výběru, jednou týdně.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "Doporučení tohoto týdne připadlo frakci {faction}.",
       "commendRewardLine": "{amount} postavení u frakce dle vlastního výběru",
       "chosen": "Přijat týdenní úkol: {category}",

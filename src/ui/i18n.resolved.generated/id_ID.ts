@@ -6641,6 +6641,7 @@ export const id_ID: EnTranslations = {
       },
       "commendHeading": "Komendasi Utusan",
       "commendNote": "{amount} berdiri pada salah satu faksi pilihanmu, sekali seminggu.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "Komendasi minggu ini pergi ke {faction}.",
       "commendRewardLine": "{amount} berdiri dengan faksi pilihanmu",
       "chosen": "Misi mingguan diambil: {category}",

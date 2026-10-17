@@ -54,6 +54,8 @@ export interface WeeklyCommendationView {
   options: WeeklyCommendationOption[];
   /** Set once claimed; every option is then inert. */
   claimedText: string | null;
+  /** While unclaimed: it outlives the reset and must be claimed before the next charge. */
+  carryNote: string | null;
 }
 
 export interface WeeklyQuestsView {
@@ -129,6 +131,7 @@ export function buildWeeklyCommendation(world: WeeklyWorld): WeeklyCommendationV
       claimed === null
         ? null
         : t('hudChrome.weekly.commendClaimed', { faction: factionLabel(claimed as FactionId) }),
+    carryNote: claimed === null ? t('hudChrome.weekly.commendCarryNote') : null,
   };
 }
 

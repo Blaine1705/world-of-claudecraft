@@ -18671,6 +18671,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.done': '週間クエスト完了：{category}',
   'hudChrome.weekly.commendHeading': '使者の推挙',
   'hudChrome.weekly.commendNote': '選んだ一つの勢力に評判{amount}、週に一度。',
+  'hudChrome.weekly.commendCarryNote':
+    '受け取らなかった推挙はリセット後も残ります。次の任務を受ける前に受け取ってください。',
   'hudChrome.weekly.commendClaimed': '今週の推挙は{faction}に贈られました。',
   'hudChrome.weekly.commendRewardLine': '選んだ勢力との評判{amount}',
   'hudChrome.reputation.standingGained': '{faction}の評判 +{amount}',

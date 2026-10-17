@@ -24,6 +24,7 @@ import {
   FACTION_IDS,
   type FactionId,
   factionDisplayName,
+  maxStandingForLevel,
 } from './factions';
 import { formatMoney } from './format_money';
 import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from './instances/dungeons';
@@ -46,17 +47,30 @@ export function currentWeeklyQuestWeek(ctx: Pick<SimContext, 'resetDay'>): strin
   return weeklyQuestWeekForResetDay(ctx.resetDay);
 }
 
-/** A pick from an earlier week is over, done or not: the ledger starts clean. */
+/** True while some faction can still take standing at this level, so an
+ *  unclaimed commendation is worth holding. */
+function commendationRedeemable(meta: PlayerMeta, level: number): boolean {
+  const cap = maxStandingForLevel(level);
+  return FACTION_IDS.some((factionId) => (meta.factions?.[factionId] ?? 0) < cap);
+}
+
+/** A pick from an earlier week is over, done or not: the ledger starts clean.
+ *  The one exception is a finished charge whose commendation was never
+ *  claimed: it is held until it is redeemed (and a new pick waits for that),
+ *  unless no faction could take the standing, so it never blocks the week. */
 export function resetWeeklyQuestIfNeeded(
-  ctx: Pick<SimContext, 'resetDay'>,
+  ctx: Pick<SimContext, 'resetDay' | 'entities'>,
   meta: PlayerMeta,
 ): void {
   const progress = meta.weeklyQuest;
-  if (!progress) return;
-  if (progress.week !== currentWeeklyQuestWeek(ctx)) {
-    meta.weeklyQuest = null;
-    meta.wireRev++;
+  if (!progress || progress.week === currentWeeklyQuestWeek(ctx)) return;
+  if (progress.state === 'completed' && !progress.commended) {
+    // Without the body there is no level to judge headroom by: keep it.
+    const player = ctx.entities.get(meta.entityId);
+    if (!player || commendationRedeemable(meta, player.level)) return;
   }
+  meta.weeklyQuest = null;
+  meta.wireRev++;
 }
 
 export function weeklyQuestRewardCopper(level: number): number {
@@ -109,7 +123,8 @@ export function talkToWeeklyEmissary(
 }
 
 /** The authoritative pick: alive, beside the emissary, a real offer, and no
- *  charge taken yet this week (a finished one counts as taken). */
+ *  charge taken yet this week (a finished one counts as taken), nor an earlier
+ *  week's commendation still waiting to be claimed. */
 export function chooseWeeklyQuest(ctx: SimContext, questId: string, pid?: number): void {
   const resolved = ctx.resolve(pid);
   if (!resolved) return;
@@ -146,6 +161,9 @@ export function commendWeeklyQuest(ctx: SimContext, factionId: string, pid?: num
   );
   if (result.gained <= 0) return;
   progress.commended = factionId;
+  // A commendation held over from an earlier week was all that kept its
+  // charge open; once redeemed, this week's pick opens.
+  if (progress.week !== currentWeeklyQuestWeek(ctx)) meta.weeklyQuest = null;
   meta.wireRev++;
   ctx.markDeedsDirty(meta.entityId);
   ctx.emit({
@@ -156,7 +174,7 @@ export function commendWeeklyQuest(ctx: SimContext, factionId: string, pid?: num
 }
 
 function activeWeeklyQuest(
-  ctx: Pick<SimContext, 'resetDay'>,
+  ctx: Pick<SimContext, 'resetDay' | 'entities'>,
   meta: PlayerMeta,
 ): { quest: WeeklyQuestDef; progress: WeeklyQuestProgress } | null {
   resetWeeklyQuestIfNeeded(ctx, meta);

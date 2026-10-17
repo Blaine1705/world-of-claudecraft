@@ -13866,6 +13866,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.weekly.choose'
   | 'hudChrome.weekly.chosen'
   | 'hudChrome.weekly.close'
+  | 'hudChrome.weekly.commendCarryNote'
   | 'hudChrome.weekly.commendClaimed'
   | 'hudChrome.weekly.commendHeading'
   | 'hudChrome.weekly.commendNote'

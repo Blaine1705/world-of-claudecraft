@@ -6641,6 +6641,7 @@ export const fr_CA: EnTranslations = {
       },
       "commendHeading": "Recommandation de l'émissaire",
       "commendNote": "{amount} de réputation avec la faction de votre choix, une fois par semaine.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "La recommandation de cette semaine est allée à la {faction}.",
       "commendRewardLine": "{amount} de réputation avec une faction de votre choix",
       "chosen": "Quête hebdomadaire prise : {category}",

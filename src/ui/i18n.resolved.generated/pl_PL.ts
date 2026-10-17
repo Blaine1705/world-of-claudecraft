@@ -6641,6 +6641,7 @@ export const pl_PL: EnTranslations = {
       },
       "commendHeading": "Pochwały emisariusza",
       "commendNote": "{amount} zasług dla frakcji do wyboru, raz na tydzień.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "To tygodniowe pochwały dostał {faction}.",
       "commendRewardLine": "{amount} zasług z wybraną frakcją",
       "chosen": "Tygodniowe zadanie wzięte: {category}",

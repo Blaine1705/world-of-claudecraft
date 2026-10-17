@@ -18632,6 +18632,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.done': '주간 퀘스트 완료: {category}',
   'hudChrome.weekly.commendHeading': '사절의 표창',
   'hudChrome.weekly.commendNote': '선택한 진영 하나에 평판 {amount}, 주 1회.',
+  'hudChrome.weekly.commendCarryNote':
+    '받지 않은 표창은 초기화 후에도 남습니다. 다음 임무를 맡기 전에 받으세요.',
   'hudChrome.weekly.commendClaimed': '이번 주 표창은 {faction}에게 돌아갔습니다.',
   'hudChrome.weekly.commendRewardLine': '선택한 진영과의 평판 {amount}',
   'hudChrome.reputation.standingGained': '{faction} 평판 +{amount}',

@@ -9,12 +9,14 @@ import {
   WEEKLY_QUESTS,
 } from '../src/sim/content/weekly_quests';
 import { NPCS } from '../src/sim/data';
+import { FACTION_IDS, LOW_LEVEL_MAX_STANDING, MAX_STANDING } from '../src/sim/factions';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import {
   onBattlegroundMatchForWeeklyQuests,
   onDungeonClearedForWeeklyQuests,
   onWorldBossKilledForWeeklyQuests,
+  resetWeeklyQuestIfNeeded,
   sanitizeWeeklyQuestProgress,
   weeklyQuestRewardCopper,
   weeklyQuestWeekForResetDay,
@@ -246,6 +248,111 @@ describe('the commendation', () => {
     sim.commendWeeklyQuest('church_order');
     expect(sim.meta(sim.playerId)?.factions.church_order).toBe(1000);
     expect(sim.meta(sim.playerId)?.weeklyQuest?.commended).toBe('church_order');
+  });
+
+  it('holds an unclaimed commendation past the weekly reset until it is redeemed', () => {
+    const sim = finished();
+    const meta = sim.meta(sim.playerId)!;
+    sim.resetDay = '2026-09-16';
+    expect(sim.weeklyQuest).toEqual({
+      questId: 'wk_dungeons',
+      week: 'wk_1',
+      count: 3,
+      state: 'completed',
+    });
+    // A new charge waits for the claim, and this week's clears credit nothing.
+    const copper = meta.copper;
+    sim.chooseWeeklyQuest('wk_raid');
+    onDungeonClearedForWeeklyQuests(sim.ctx, 'hollow_crypt', [meta]);
+    expect(meta.weeklyQuest).toEqual({
+      questId: 'wk_dungeons',
+      week: 'wk_1',
+      count: 3,
+      state: 'completed',
+    });
+    expect(meta.copper).toBe(copper);
+    // A relog in the later week keeps it too.
+    const state = sim.serializeCharacter(sim.playerId);
+    if (!state) throw new Error('Missing serialized character');
+    const restored = new Sim({ seed: 4711, playerClass: 'warrior', noPlayer: true });
+    restored.resetDay = '2026-09-16';
+    const restoredMeta = restored.meta(restored.addPlayer('warrior', 'Held', { state }))!;
+    resetWeeklyQuestIfNeeded(restored.ctx, restoredMeta);
+    expect(restoredMeta.weeklyQuest?.week).toBe('wk_1');
+    expect(restoredMeta.weeklyQuest?.state).toBe('completed');
+    // The claim pays, then last week's charge is over and this week's pick opens.
+    sim.commendWeeklyQuest('church_order');
+    expect(eventsOf(sim, 'loot').map((event) => (event as { text: string }).text)).toContain(
+      '+1000 Church Order Standing.',
+    );
+    expect(meta.factions.church_order).toBe(1000);
+    expect(meta.weeklyQuest).toBeNull();
+    sim.chooseWeeklyQuest('wk_raid');
+    expect(sim.weeklyQuest).toEqual({
+      questId: 'wk_raid',
+      week: 'wk_2',
+      count: 0,
+      state: 'active',
+    });
+  });
+
+  it('still rolls a claimed charge, and lets an unclaimable one lapse at the reset', () => {
+    const claimed = finished();
+    claimed.commendWeeklyQuest('rift_watch');
+    claimed.resetDay = '2026-09-16';
+    expect(claimed.weeklyQuest).toBeNull();
+    // Every faction at the cap: nothing could ever redeem it, so it never
+    // blocks the next week's pick.
+    const capped = finished();
+    for (const factionId of FACTION_IDS) capped.chat(`/dev rep ${factionId} ${MAX_STANDING}`);
+    capped.tick();
+    capped.resetDay = '2026-09-16';
+    expect(capped.weeklyQuest).toBeNull();
+    capped.chooseWeeklyQuest('wk_raid');
+    expect(capped.weeklyQuest?.week).toBe('wk_2');
+    // One faction with headroom is enough to keep it held.
+    const partial = finished();
+    for (const factionId of FACTION_IDS.slice(1)) {
+      partial.chat(`/dev rep ${factionId} ${MAX_STANDING}`);
+    }
+    partial.tick();
+    partial.resetDay = '2026-09-16';
+    expect(partial.weeklyQuest?.week).toBe('wk_1');
+  });
+
+  it('keeps a held commendation open when the claim names a capped faction', () => {
+    const sim = finished();
+    const meta = sim.meta(sim.playerId)!;
+    sim.chat(`/dev rep rift_watch ${MAX_STANDING}`);
+    sim.tick();
+    sim.resetDay = '2026-09-16';
+    sim.commendWeeklyQuest('rift_watch');
+    expect(meta.weeklyQuest?.week).toBe('wk_1');
+    expect(meta.weeklyQuest?.commended).toBeUndefined();
+    sim.chooseWeeklyQuest('wk_raid');
+    expect(meta.weeklyQuest?.questId).toBe('wk_dungeons');
+    sim.commendWeeklyQuest('automatons');
+    expect(meta.factions.automatons).toBe(1000);
+    expect(meta.weeklyQuest).toBeNull();
+  });
+
+  it('judges headroom by the low-level cap, and lapses once the last faction caps', () => {
+    // Level 1 stops at the low-level cap rather than MAX_STANDING.
+    const sim = armed();
+    const meta = sim.meta(sim.playerId)!;
+    sim.chooseWeeklyQuest('wk_dungeons');
+    for (let i = 0; i < 3; i++) sim.chat('/dev weekly credit');
+    sim.chat(`/dev rep rift_watch ${LOW_LEVEL_MAX_STANDING}`);
+    sim.chat(`/dev rep church_order ${LOW_LEVEL_MAX_STANDING}`);
+    sim.tick();
+    sim.resetDay = '2026-09-16';
+    expect(sim.weeklyQuest?.week).toBe('wk_1');
+    // Held at one check, then the last faction reaches the cap: nothing could
+    // redeem it any more, so the next check lets it go.
+    sim.chat(`/dev rep automatons ${LOW_LEVEL_MAX_STANDING}`);
+    sim.tick();
+    expect(meta.weeklyQuest?.week).toBe('wk_1');
+    expect(sim.weeklyQuest).toBeNull();
   });
 
   it('rides the character save and drops a malformed claim on restore', () => {

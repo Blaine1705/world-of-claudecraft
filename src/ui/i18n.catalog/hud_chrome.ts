@@ -9731,6 +9731,8 @@ export const hudChromeStrings = {
     // claimed from the window once the charge is finished.
     commendHeading: "Emissary's commendation",
     commendNote: '{amount} standing to one faction of your choice, once a week.',
+    commendCarryNote:
+      'If unclaimed, it waits past the reset. Claim it before taking your next charge.',
     commendClaimed: "This week's commendation went to the {faction}.",
     commendRewardLine: '{amount} standing with a faction of your choice',
     // Chat and banner lines for the emissary's events.

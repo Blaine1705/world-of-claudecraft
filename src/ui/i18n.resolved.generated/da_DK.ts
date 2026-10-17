@@ -6641,6 +6641,7 @@ export const da_DK: EnTranslations = {
       },
       "commendHeading": "Sendebuds tilkendegivelse",
       "commendNote": "{amount} anseelse til en fraktion efter dit valg, én gang om ugen.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "Denne uges tilkendegivelse gik til {faction}.",
       "commendRewardLine": "{amount} anseelse med en fraktion efter dit valg",
       "chosen": "Ugentlig quest taget: {category}",

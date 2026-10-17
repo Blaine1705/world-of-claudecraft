@@ -6641,6 +6641,7 @@ export const it_IT: EnTranslations = {
       },
       "commendHeading": "Elogio dell'Emissario",
       "commendNote": "{amount} di reputazione con una fazione a tua scelta, una volta a settimana.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "L'elogio di questa settimana è andato alla fazione: {faction}.",
       "commendRewardLine": "{amount} di reputazione con una fazione a tua scelta",
       "chosen": "Missione settimanale presa: {category}",

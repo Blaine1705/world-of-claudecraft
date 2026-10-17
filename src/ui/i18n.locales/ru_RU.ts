@@ -18994,6 +18994,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.done': 'Еженедельное задание выполнено: {category}',
   'hudChrome.weekly.commendHeading': 'Рекомендация эмиссара',
   'hudChrome.weekly.commendNote': '{amount} репутации одной фракции на ваш выбор, раз в неделю.',
+  'hudChrome.weekly.commendCarryNote':
+    'Неполученная рекомендация сохраняется после обновления. Получите её, прежде чем брать следующее поручение.',
   'hudChrome.weekly.commendClaimed': 'Рекомендация этой недели досталась фракции {faction}.',
   'hudChrome.weekly.commendRewardLine': '{amount} репутации с фракцией на ваш выбор',
   'hudChrome.reputation.standingGained': 'Репутация с фракцией {faction}: +{amount}.',

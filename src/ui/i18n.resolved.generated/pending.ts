@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "es_ES": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "fr_FR": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "fr_CA": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "de_DE": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "nl_NL": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "pl_PL": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "id_ID": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "tr_TR": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "sv_SE": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "vi_VN": [
+    "hudChrome.weekly.commendCarryNote"
+  ],
+  "da_DK": [
+    "hudChrome.weekly.commendCarryNote"
+  ]
 };

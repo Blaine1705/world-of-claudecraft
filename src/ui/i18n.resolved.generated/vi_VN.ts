@@ -6641,6 +6641,7 @@ export const vi_VN: EnTranslations = {
       },
       "commendHeading": "Giới thiệu của sứ giả",
       "commendNote": "{amount} danh vọng cho một phe phái của lựa chọn của bạn, một lần mỗi tuần.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "Giới thiệu của tuần này đã trao cho {faction}.",
       "commendRewardLine": "{amount} danh vọng với một phe phái của lựa chọn của bạn",
       "chosen": "Nhiệm vụ hàng tuần đã chọn: {category}",

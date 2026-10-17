@@ -6641,6 +6641,7 @@ export const sv_SE: EnTranslations = {
       },
       "commendHeading": "Utsändingens kommendation",
       "commendNote": "{amount} anseende till en välkommen jakt av ditt val, en gång i veckan.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "Den här veckan kommendation gick till {faction}.",
       "commendRewardLine": "{amount} anseende med en valbar välkommen jakt",
       "chosen": "Veckouppdrag taget: {category}",

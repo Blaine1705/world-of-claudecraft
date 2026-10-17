@@ -6641,6 +6641,7 @@ export const zh_CN: EnTranslations = {
       },
       "commendHeading": "使者的嘉奖",
       "commendNote": "{amount}点声望，赠予你选择的一个阵营，每周一次。",
+      "commendCarryNote": "未领取的嘉奖会保留到重置之后。接受下一项委托前请先领取。",
       "commendClaimed": "本周的嘉奖已授予{faction}。",
       "commendRewardLine": "{amount}点声望，阵营由你选择",
       "chosen": "已接取每周任务：{category}",

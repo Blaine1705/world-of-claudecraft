@@ -17771,6 +17771,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.done': '每週任務完成：{category}',
   'hudChrome.weekly.commendHeading': '使者的嘉獎',
   'hudChrome.weekly.commendNote': '{amount}點聲望，贈予你選擇的一個陣營，每週一次。',
+  'hudChrome.weekly.commendCarryNote': '未領取的嘉獎會保留到重置之後。接受下一項委託前請先領取。',
   'hudChrome.weekly.commendClaimed': '本週的嘉獎已授予{faction}。',
   'hudChrome.weekly.commendRewardLine': '{amount}點聲望，陣營由你選擇',
   'hudChrome.reputation.standingGained': '{faction}聲望 +{amount}',

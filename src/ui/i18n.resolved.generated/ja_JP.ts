@@ -6641,6 +6641,7 @@ export const ja_JP: EnTranslations = {
       },
       "commendHeading": "使者の推挙",
       "commendNote": "選んだ一つの勢力に評判{amount}、週に一度。",
+      "commendCarryNote": "受け取らなかった推挙はリセット後も残ります。次の任務を受ける前に受け取ってください。",
       "commendClaimed": "今週の推挙は{faction}に贈られました。",
       "commendRewardLine": "選んだ勢力との評判{amount}",
       "chosen": "週間クエストを受注：{category}",

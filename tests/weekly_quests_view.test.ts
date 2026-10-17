@@ -106,6 +106,9 @@ describe('the commendation view', () => {
       ['automatons', false, false],
     ]);
     expect(view.commendation?.claimedText).toBeNull();
+    expect(view.commendation?.carryNote).toBe(
+      'If unclaimed, it waits past the reset. Claim it before taking your next charge.',
+    );
   });
 
   it('marks the claimed faction and names it once the choice is made', () => {
@@ -130,5 +133,6 @@ describe('the commendation view', () => {
     expect(view.commendation?.claimedText).toBe(
       "This week's commendation went to the Church Order.",
     );
+    expect(view.commendation?.carryNote).toBeNull();
   });
 });

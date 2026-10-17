@@ -6641,6 +6641,7 @@ export const tr_TR: EnTranslations = {
       },
       "commendHeading": "Elçinin temeddüsü",
       "commendNote": "Seçtiğin bir fraksiyona karşı {amount} itibar, haftada bir.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "Bu haftanın temeddüsü {faction} tarafına gitti.",
       "commendRewardLine": "Seçtiğin bir fraksiyona karşı {amount} itibar",
       "chosen": "Haftalık görev seçildi: {category}",

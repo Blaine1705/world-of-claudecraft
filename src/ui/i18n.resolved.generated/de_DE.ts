@@ -6641,6 +6641,7 @@ export const de_DE: EnTranslations = {
       },
       "commendHeading": "Empfehlung des Gesandten",
       "commendNote": "{amount} Ruf bei einer Fraktion deiner Wahl, einmal pro Woche.",
+      "commendCarryNote": "If unclaimed, it waits past the reset. Claim it before taking your next charge.",
       "commendClaimed": "Die Empfehlung dieser Woche ging an die {faction}.",
       "commendRewardLine": "{amount} Ruf bei einer Fraktion deiner Wahl",
       "chosen": "Wochenquest angenommen: {category}",

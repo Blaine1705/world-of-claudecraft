@@ -6641,6 +6641,7 @@ export const en_XA: EnTranslations = {
       },
       "commendHeading": "[Éɱíššáŕý'š çóɱɱéñðáţíóñ]",
       "commendNote": "[{amount} šţáñðíñĝ ţó óñé ƒáçţíóñ óƒ ýóúŕ çĥóíçé, óñçé á ŵééķ.]",
+      "commendCarryNote": "[Íƒ úñçļáíɱéð, íţ ŵáíţš þášţ ţĥé ŕéšéţ. Çļáíɱ íţ ƀéƒóŕé ţáķíñĝ ýóúŕ ñéẋţ çĥáŕĝé.]",
       "commendClaimed": "[Ţĥíš ŵééķ'š çóɱɱéñðáţíóñ ŵéñţ ţó ţĥé {faction}.]",
       "commendRewardLine": "[{amount} šţáñðíñĝ ŵíţĥ á ƒáçţíóñ óƒ ýóúŕ çĥóíçé]",
       "chosen": "[Ŵééķļý ɋúéšţ ţáķéñ: {category}]",
