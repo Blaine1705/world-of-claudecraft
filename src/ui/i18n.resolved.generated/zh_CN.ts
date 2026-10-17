@@ -2243,6 +2243,8 @@ export const zh_CN: EnTranslations = {
       "showPetFrame": "显示你的宠物",
       "showNameplateDots": "在姓名板上显示我的减益",
       "nameplateDotScale": "姓名板减益图标大小",
+      "showNameplateCooldowns": "在姓名板上显示敌方冷却",
+      "nameplateCooldownScale": "姓名板敌方冷却图标大小",
       "showTargetDots": "显示目标减益追踪",
       "showDefensivesTrack": "显示防御性冷却",
       "showSelfBuffTrack": "显示我的增益",

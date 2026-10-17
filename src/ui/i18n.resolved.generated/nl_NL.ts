@@ -2243,6 +2243,8 @@ export const nl_NL: EnTranslations = {
       "showPetFrame": "Je huisdier tonen",
       "showNameplateDots": "Toon mijn punten op naamplaatjes",
       "nameplateDotScale": "Naamplaatje Puntgrootte",
+      "showNameplateCooldowns": "Show Enemy Cooldowns on Nameplates",
+      "nameplateCooldownScale": "Nameplate Cooldown Size",
       "showTargetDots": "Doelpunten weergeven",
       "showDefensivesTrack": "Defensieve afkoeltijden tonen",
       "showSelfBuffTrack": "Mijn versterkingen tonen",

@@ -2706,6 +2706,12 @@ export const hudChromeStrings = {
     // (plate-native) to 300%. Wordy (M16): the five non-Latin fills land in this
     // same change.
     nameplateDotScale: 'Nameplate Dot Size',
+    // Interface > Combat (on by default): a hostile player's tracked cooldowns (the
+    // PvP medallion once used, defensives, offensives) as an icon row above their
+    // name, plus its size slider. Wordy (M16): the five non-Latin fills land in this
+    // same change.
+    showNameplateCooldowns: 'Show Enemy Cooldowns on Nameplates',
+    nameplateCooldownScale: 'Nameplate Cooldown Size',
     showTargetDots: 'Show Target Dots',
     // Interface > Combat rows for the six aura tracks. All wordy (M16): the five
     // non-Latin fills land in this same change.

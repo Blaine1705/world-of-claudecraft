@@ -13838,6 +13838,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
   'hudChrome.options.showNameplateDots': 'Показывать мои эффекты на полосах имён',
   'hudChrome.options.nameplateDotScale': 'Размер эффектов на полосах имён',
+  'hudChrome.options.showNameplateCooldowns': 'Показывать перезарядки врагов на полосах имён',
+  'hudChrome.options.nameplateCooldownScale': 'Размер перезарядок врагов на полосах имён',
   'hudChrome.options.showTargetDots': 'Показывать эффекты на целях',
   'hudChrome.targetDots.title': 'Эффекты на целях',
   'hudChrome.targetDots.overflow': 'ещё {count}, не показаны',

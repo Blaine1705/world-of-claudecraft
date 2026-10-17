@@ -2243,6 +2243,8 @@ export const de_DE: EnTranslations = {
       "showPetFrame": "Euren Begleiter anzeigen",
       "showNameplateDots": "Zeigen Sie meine Punkte auf Namensschildern",
       "nameplateDotScale": "Punktgröße des Typenschilds",
+      "showNameplateCooldowns": "Show Enemy Cooldowns on Nameplates",
+      "nameplateCooldownScale": "Nameplate Cooldown Size",
       "showTargetDots": "Zielpunkte anzeigen",
       "showDefensivesTrack": "Defensive Abklingzeiten anzeigen",
       "showSelfBuffTrack": "Meine Stärkungen anzeigen",
