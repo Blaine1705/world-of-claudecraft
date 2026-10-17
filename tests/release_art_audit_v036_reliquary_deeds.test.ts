@@ -303,8 +303,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // 347 with Gourdlight Eve's seasonal Feat, its crest painted: 290 painted.
     // 348 with its field boss's Feat (feat_old_thatchgrin), painted too: 291.
     // 351 with its three title-writ Feats, all painted: 294.
-    expect(DEED_ORDER).toHaveLength(351);
-    expect(DEED_IMAGE_IDS.size).toBe(294);
+    // 352 with the Haunted Pumpkin hunt's Feat (feat_pumpkin_hunter), painted: 295.
+    expect(DEED_ORDER).toHaveLength(352);
+    expect(DEED_IMAGE_IDS.size).toBe(295);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),

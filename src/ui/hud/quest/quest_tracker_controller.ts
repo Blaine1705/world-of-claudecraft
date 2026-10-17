@@ -276,11 +276,15 @@ export class QuestTrackerController {
         ],
       });
     }
-    const pumpkinRow = hauntedPumpkinTrackerRow(
-      world.activeSeasonalEvent,
-      world.hauntedPumpkinsFound ?? [],
-      zoneAt(world.player.pos.x, world.player.pos.z).id,
-    );
+    // The zone lookup only runs while an event is open: closed, the row is absent anyway
+    // and the per-frame update stays free of it.
+    const pumpkinRow = world.activeSeasonalEvent
+      ? hauntedPumpkinTrackerRow(
+          world.activeSeasonalEvent,
+          world.hauntedPumpkinsFound ?? [],
+          zoneAt(world.player.pos.x, world.player.pos.z).id,
+        )
+      : null;
     if (pumpkinRow) quests.push(pumpkinRow);
     // A section with no rows paints no header, so a stale collapse there would
     // hide the next row to arrive behind a header the player never saw close:
