@@ -104,4 +104,9 @@ const json = JSON.parse(buf.toString('utf8', 20, 20 + buf.readUInt32LE(12)));
 const left = (json.images ?? []).filter((i) => i.mimeType !== 'image/ktx2');
 if (left.length) throw new Error(`${BOSS}: ${left.length} textures were not converted to KTX2`);
 fs.writeFileSync(BOSS, buf);
-console.log(path.relative(ROOT, BOSS), `${(buf.length / 1024).toFixed(0)}KB`, 'images', json.images?.length ?? 0);
+console.log(
+  path.relative(ROOT, BOSS),
+  `${(buf.length / 1024).toFixed(0)}KB`,
+  'images',
+  json.images?.length ?? 0,
+);
