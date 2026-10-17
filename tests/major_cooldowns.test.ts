@@ -4,6 +4,7 @@ import {
   MAJOR_COOLDOWN_MIN_SEC,
   majorCooldownBaseSec,
   majorCooldownGroup,
+  majorCooldownKeyForAura,
   majorCooldownTable,
   PVP_MEDALLION_COOLDOWN_KEY,
 } from '../src/sim/major_cooldowns';
@@ -143,5 +144,49 @@ describe('major cooldown classifier', () => {
     expect(majorCooldownBaseSec('barkskin')).toBe(60);
     expect(majorCooldownBaseSec('recklessness')).toBe(180);
     expect(majorCooldownBaseSec('not_an_ability')).toBe(0);
+  });
+});
+
+describe('aura id to cooldown key', () => {
+  it('maps every form a tracked buff aura takes back to its ability', () => {
+    // The bare ability id (selfBuff, buffTarget, absorb, partyMeleeBuff, haste burst).
+    expect(majorCooldownKeyForAura('barkskin')).toBe('barkskin');
+    expect(majorCooldownKeyForAura('martyrs_aegis')).toBe('martyrs_aegis');
+    expect(majorCooldownKeyForAura('perfect_moment')).toBe('perfect_moment');
+    expect(majorCooldownKeyForAura('elemental_mastery')).toBe('elemental_mastery');
+    // Companions: a second selfBuff kind, a group effect's suffixed id.
+    expect(majorCooldownKeyForAura('icy_veins_cast_shield')).toBe('icy_veins');
+    expect(majorCooldownKeyForAura('deterrence_buff_dr')).toBe('deterrence');
+    expect(majorCooldownKeyForAura('rallying_cry_hp')).toBe('rallying_cry');
+    expect(majorCooldownKeyForAura('emboldening_roar_crit')).toBe('emboldening_roar');
+    expect(majorCooldownKeyForAura('power_infusion_buff_dmg_done_1')).toBe('power_infusion');
+    expect(majorCooldownKeyForAura('bloodlust_spell')).toBe('bloodlust');
+    // A per-caster stamp.
+    expect(majorCooldownKeyForAura('aegis_first_dawn_dr:42')).toBe('aegis_first_dawn');
+    // Handler constants.
+    expect(majorCooldownKeyForAura('feral_instinct_energy')).toBe('feral_charge');
+    expect(majorCooldownKeyForAura('howling_rage_empower')).toBe('bestial_wrath');
+    expect(majorCooldownKeyForAura('shaman_primal_exaltation')).toBe('primal_exaltation');
+  });
+
+  it('leaves untracked auras untracked', () => {
+    for (const id of ['rend', 'berserker_rage', 'sated', 'dash', 'stealth_x', 'evocation']) {
+      const key = majorCooldownKeyForAura(id);
+      if (id === 'evocation') expect(key).toBe('evocation');
+      else expect(key, id).toBeNull();
+    }
+  });
+
+  it('agrees with the handler constants it aliases', async () => {
+    const { HOWLING_RAGE_EMPOWER_ID } = await import('../src/sim/combat/hunter_packlord');
+    const { PRIMAL_EXALTATION_ID } = await import('../src/sim/combat/shaman_talents');
+    const { PRIMAL_MASTERY_ID } = await import('../src/sim/combat/shaman_thundercall');
+    const { PERFECT_MOMENT_ID } = await import('../src/sim/combat/chronomancy');
+    const { PALADIN_AEGIS_ID } = await import('../src/sim/combat/paladin_aegis');
+    expect(majorCooldownKeyForAura(HOWLING_RAGE_EMPOWER_ID)).toBe('bestial_wrath');
+    expect(majorCooldownKeyForAura(PRIMAL_EXALTATION_ID)).toBe('primal_exaltation');
+    expect(majorCooldownKeyForAura(PRIMAL_MASTERY_ID)).toBe('elemental_mastery');
+    expect(majorCooldownKeyForAura(PERFECT_MOMENT_ID)).toBe('perfect_moment');
+    expect(majorCooldownKeyForAura(`${PALADIN_AEGIS_ID}_dr:7`)).toBe('aegis_first_dawn');
   });
 });

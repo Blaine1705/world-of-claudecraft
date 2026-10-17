@@ -155,6 +155,49 @@ export function majorCooldownGroup(key: string): MajorCooldownGroup | null {
   return majorCooldownTable().get(key) ?? null;
 }
 
+// Handler-specific aura ids that name neither the ability nor an `<id>_<suffix>`
+// companion of it: each is written by the ability's own effect handler.
+const AURA_ALIASES: Readonly<Record<string, string>> = {
+  feral_instinct_energy: 'feral_charge', // Primal Surge, Cat Form energy regen
+  howling_rage_empower: 'bestial_wrath', // Howling Rage (hunter_packlord.ts)
+  shaman_primal_exaltation: 'primal_exaltation', // PRIMAL_EXALTATION_ID
+};
+
+/**
+ * The tracked cooldown key an aura belongs to, or null. Most tracked buffs carry
+ * the bare ability id; the rest are a companion `<ability>_<suffix>` (Valor
+ * Roar's `rallying_cry_hp`, a second selfBuff kind), a per-caster
+ * `<id>:<casterId>` stamp (Aegis of the First Dawn's `aegis_first_dawn_dr:<id>`),
+ * or a handler constant listed in AURA_ALIASES. Pinned against every tracked
+ * buff's real aura id by tests/major_cooldowns.test.ts.
+ */
+export function majorCooldownKeyForAura(auraId: string): string | null {
+  // Memoized: the row asks per aura per frame, and the id space is content-bounded.
+  const memo = auraKeyMemo.get(auraId);
+  if (memo !== undefined) return memo;
+  const key = resolveAuraKey(auraId);
+  auraKeyMemo.set(auraId, key);
+  return key;
+}
+
+const auraKeyMemo = new Map<string, string | null>();
+
+function resolveAuraKey(auraId: string): string | null {
+  const table = majorCooldownTable();
+  if (table.has(auraId)) return auraId;
+  const alias = AURA_ALIASES[auraId];
+  if (alias !== undefined) return alias;
+  const colon = auraId.indexOf(':');
+  let id = colon >= 0 ? auraId.slice(0, colon) : auraId;
+  if (table.has(id)) return id;
+  // Companion: strip trailing `_<suffix>` segments until a tracked key remains.
+  for (let cut = id.lastIndexOf('_'); cut > 0; cut = id.lastIndexOf('_')) {
+    id = id.slice(0, cut);
+    if (table.has(id)) return id;
+  }
+  return null;
+}
+
 /** The full base cooldown of a tracked key in seconds, for the swipe fraction.
  *  Talent reductions are not visible to other players, so a talented cooldown
  *  simply starts its swipe part-way; the countdown itself is always exact. */

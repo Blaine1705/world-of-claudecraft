@@ -27,6 +27,7 @@ import {
   type MajorCooldownGroup,
   majorCooldownBaseSec,
   majorCooldownGroup,
+  majorCooldownKeyForAura,
 } from '../sim/major_cooldowns';
 import {
   NAMEPLATE_DOT_GAP,
@@ -175,9 +176,12 @@ export function nameplateCooldownsInto(
   out.count = 0;
   for (const aura of auras) {
     if (!(aura.remaining > 0)) continue;
-    const group = majorCooldownGroup(aura.id);
-    if (group === null) continue;
-    const existing = findSlot(out, aura.id);
+    // The aura's id names its ability directly or through a companion form
+    // (majorCooldownKeyForAura), so the slot is keyed by the cooldown it belongs to.
+    const key = majorCooldownKeyForAura(aura.id);
+    const group = key === null ? null : majorCooldownGroup(key);
+    if (key === null || group === null) continue;
+    const existing = findSlot(out, key);
     if (existing) {
       // Two casters' copies of one buff: count the longer.
       if (aura.remaining > existing.remaining) {
@@ -186,7 +190,7 @@ export function nameplateCooldownsInto(
       }
       continue;
     }
-    const slot = slotAt(out, out.count++, aura.id);
+    const slot = slotAt(out, out.count++, key);
     slot.group = group;
     slot.active = true;
     slot.fraction = 0;

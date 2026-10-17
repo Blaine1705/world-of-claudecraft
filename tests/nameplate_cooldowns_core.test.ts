@@ -80,6 +80,16 @@ describe('nameplate cooldowns core', () => {
     expect(p.slots[0]).toMatchObject({ key: 'martyrs_aegis', group: 'defensive', active: true });
   });
 
+  it('shows a buff whose aura id is a companion or handler form of its ability', () => {
+    const p = plan({ rallying_cry: 170 }, [
+      { id: 'rallying_cry_hp', remaining: 9 },
+      { id: 'aegis_first_dawn_dr:42', remaining: 4 },
+      { id: 'howling_rage_empower', remaining: 12 },
+    ]);
+    expect(keys(p)).toEqual(['aegis_first_dawn', 'rallying_cry', 'bestial_wrath']);
+    for (let i = 0; i < p.count; i++) expect(p.slots[i].active).toBe(true);
+  });
+
   it('counts the longer copy when two casters put the same buff up', () => {
     const p = plan({}, [
       { id: 'power_infusion', remaining: 3 },
