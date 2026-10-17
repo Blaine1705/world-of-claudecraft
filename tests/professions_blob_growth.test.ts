@@ -2014,9 +2014,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const baselineBytes = Buffer.byteLength(JSON.stringify(baseline));
     // +143 for Gourdlight Eve (feature/halloween-event): one questsDone id (22), one
     // deed row feat_gourdlight_guise (37) and four discovered item ids (84).
-    expect(baselineBytes).toBe(258513);
+    // Pumpkin Hunter adds exactly 35: its 19-character deed id and the fixed
+    // earn date's 16 bytes of JSON punctuation/date. No seasonal ledger is armed
+    // by maximalCharacterSim, so there is no collectible save-state term here.
+    // The inherited scarecrow phase adds 102: its deed (35), kill counter
+    // (25), and two discovered item IDs (24 + 18). Keep that attribution
+    // separate from Pumpkin Hunter rather than widening the historical band.
+    expect(baselineBytes).toBe(258650);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(266797);
+    expect(bytes).toBe(266934);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2223,12 +2229,48 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // pure content-table arithmetic with no shape question in them: `deeds`
     // (10,369), `questsDone` (4,620) and `raidLockouts` (541).
     const bytes = Buffer.byteLength(JSON.stringify(s2), 'utf8');
+    // The maximal fixture fills every DEEDS row. Isolate the new seasonal Feat
+    // before replaying the historical content ledger: exactly 35 bytes for
+    // `"feat_pumpkin_hunter":"2026-08-08",`. This does not change any ceiling.
+    const withoutPumpkinHunter: CharacterState = {
+      ...s2,
+      deeds: Object.fromEntries(
+        Object.entries(s2.deeds ?? {}).filter(([id]) => id !== 'feat_pumpkin_hunter'),
+      ),
+    };
+    expect(s2.deeds?.feat_pumpkin_hunter).toBe('2026-08-08');
+    const pumpkinHunterBytes =
+      bytes - Buffer.byteLength(JSON.stringify(withoutPumpkinHunter), 'utf8');
+    expect(pumpkinHunterBytes).toBe(35);
+    const withoutSeasonalBoss: CharacterState = {
+      ...withoutPumpkinHunter,
+      deeds: Object.fromEntries(
+        Object.entries(withoutPumpkinHunter.deeds ?? {}).filter(
+          ([id]) => id !== 'feat_old_thatchgrin',
+        ),
+      ),
+      deedStats: {
+        ...withoutPumpkinHunter.deedStats,
+        counters: Object.fromEntries(
+          Object.entries(withoutPumpkinHunter.deedStats?.counters ?? {}).filter(
+            ([id]) => id !== 'thatchgrinKills',
+          ),
+        ),
+        itemsDiscovered: (withoutPumpkinHunter.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => id !== 'thatchgrin_sweet_sack' && id !== 'strawling_charm',
+        ),
+      },
+    };
+    const seasonalBossBytes =
+      Buffer.byteLength(JSON.stringify(withoutPumpkinHunter), 'utf8') -
+      Buffer.byteLength(JSON.stringify(withoutSeasonalBoss), 'utf8');
+    expect(seasonalBossBytes).toBe(102);
     // Attribute the stamp-card feature independently from the historical ledger:
     // twenty more bank slots, five discoverable item ids and the Sapling buddy. Mount relics reuse
     // an existing illuminated page and add no character-save key in this fixture.
     const stampIds = new Set(Object.keys(REFERRAL_STAMP_ITEMS));
     const beforeStampCards: CharacterState = {
-      ...s2,
+      ...withoutSeasonalBoss,
       buddies: {
         ...s2.buddies!,
         owned: s2.buddies!.owned!.filter((id) => id !== 'sapling'),
@@ -2242,12 +2284,18 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         inventory: s2.bank!.inventory.slice(0, -20),
       },
       deedStats: {
-        ...s2.deedStats,
-        itemsDiscovered: (s2.deedStats?.itemsDiscovered ?? []).filter((id) => !stampIds.has(id)),
+        ...withoutSeasonalBoss.deedStats,
+        itemsDiscovered: (withoutSeasonalBoss.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => !stampIds.has(id),
+        ),
       },
     };
     expect(stampIds.size).toBe(5);
-    const stampCardBytes = bytes - Buffer.byteLength(JSON.stringify(beforeStampCards), 'utf8');
+    const stampCardBytes =
+      bytes -
+      pumpkinHunterBytes -
+      seasonalBossBytes -
+      Buffer.byteLength(JSON.stringify(beforeStampCards), 'utf8');
     const bankRewardBytes =
       20 * (Buffer.byteLength(JSON.stringify(s2.bank!.inventory[0]), 'utf8') + 1);
     const stampDiscoveryBytes = [...stampIds].reduce((sum, id) => sum + id.length + 3, 0);
@@ -2276,7 +2324,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 242,954 on the v0.45.0 integration: plus the Mirefen world-boss branch (+1,191).
     // 246,084 with the five-dungeon rework's attributed +3,130 (PR 4352).
     expect(beforeReferralBytes).toBe(246084);
-    expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
+    expect(
+      bytes - pumpkinHunterBytes - seasonalBossBytes - stampCardBytes - beforeReferralBytes,
+    ).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
     ).toBe(122);
@@ -2999,8 +3049,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 246,206 bytes = 243,076 + 3,089 + 41, attributed above. Floor at measurement
     // minus 380, edge at measurement plus one: 245826..246207.
     // Buddy discovery and collection fields add 885 bytes; keep the 381-byte band.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(246711);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(247092);
+    expect(bytes - pumpkinHunterBytes - seasonalBossBytes - stampCardBytes, reMint).toBeGreaterThan(
+      246711,
+    );
+    expect(bytes - pumpkinHunterBytes - seasonalBossBytes - stampCardBytes, reMint).toBeLessThan(
+      247092,
+    );
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

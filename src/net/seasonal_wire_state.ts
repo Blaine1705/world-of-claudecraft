@@ -1,11 +1,12 @@
 // The seasonal-event ClientWorld mirror (the IWorldSeasonal facet, online half),
 // one more link in the wire-state base-class chain (QuestWorldWireState ->
 // LanceWireState -> SeasonalWireState -> ReconWireState -> ClientWorld), so
-// online.ts stays under its monolith ceiling. It owns the `season` and `tot` self
-// delta keys (server/seasonal_wire.ts emitSeasonalSelfKeys) and the knock verb.
+// online.ts stays under its monolith ceiling. It owns the `season`, `tot` and
+// `hpf` self delta keys (server/quest_snapshot_wire.ts) and the knock verb.
 //
 // Presentation only: the server decides whether an event runs and what a knock
 // hands over; this mirrors the answers and sends the request.
+import { GOURDLIGHT_PUMPKINS } from '../sim/content/gourdlight_pumpkins';
 import { LanceWireState } from './lance_wire_state';
 import type { QuestWorldWireState } from './quest_world_wire_state';
 
@@ -25,16 +26,30 @@ export function decodeTrickOrTreatWire(value: unknown): readonly string[] {
   );
 }
 
+const PUMPKIN_IDS = new Set(GOURDLIGHT_PUMPKINS.map((pumpkin) => pumpkin.id));
+
+/** Only inspect a catalog-bounded prefix, accepting each known stable id once. */
+export function decodeHauntedPumpkinsWire(value: unknown): readonly string[] {
+  if (!Array.isArray(value)) return Object.freeze([]);
+  const found = new Set<string>();
+  for (let i = 0; i < Math.min(value.length, GOURDLIGHT_PUMPKINS.length); i++) {
+    const id: unknown = value[i];
+    if (typeof id === 'string' && PUMPKIN_IDS.has(id)) found.add(id);
+  }
+  return Object.freeze([...found].sort());
+}
+
 export class SeasonalWireState extends LanceWireState {
   activeSeasonalEvent: string | null = null;
   trickOrTreatedToday: readonly string[] = Object.freeze([]);
+  hauntedPumpkinsFound: readonly string[] = Object.freeze([]);
 
   trickOrTreat(npcId: number): void {
     if (!Number.isSafeInteger(npcId)) return;
     this.sendQuestWorldCommand({ cmd: 'trick_or_treat', npcId });
   }
 
-  /** The lance family's self apply, then the two seasonal keys of the same record. */
+  /** The lance family's self apply, then the seasonal keys of the same record. */
   override applyQuestSelfSnapshot(
     self: Parameters<QuestWorldWireState['applyQuestSelfSnapshot']>[0] & {
       lance?: unknown;
@@ -42,12 +57,14 @@ export class SeasonalWireState extends LanceWireState {
       lguide?: unknown;
       season?: unknown;
       tot?: unknown;
+      hpf?: unknown;
     },
     simTime?: unknown,
   ): void {
     super.applyQuestSelfSnapshot(self, simTime);
     if (self.season !== undefined) this.activeSeasonalEvent = decodeSeasonWire(self.season);
     if (self.tot !== undefined) this.trickOrTreatedToday = decodeTrickOrTreatWire(self.tot);
+    if (self.hpf !== undefined) this.hauntedPumpkinsFound = decodeHauntedPumpkinsWire(self.hpf);
   }
 
   /** A fresh session starts closed until the server's first self record says
@@ -56,5 +73,6 @@ export class SeasonalWireState extends LanceWireState {
     super.resetQuestWorldWireState();
     this.activeSeasonalEvent = null;
     this.trickOrTreatedToday = Object.freeze([]);
+    this.hauntedPumpkinsFound = Object.freeze([]);
   }
 }

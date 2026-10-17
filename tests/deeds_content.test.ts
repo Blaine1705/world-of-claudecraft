@@ -153,7 +153,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, 3810.
     // + Gourdlight Eve's zero-Renown Feat (feat_gourdlight_guise): 347, 3810.
     // + Old Thatchgrin's zero-Renown Feat (feat_old_thatchgrin): 348, 3810.
-    expect(DEED_ORDER.length).toBe(348);
+    expect(DEED_ORDER.length).toBe(349);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3810);
   });
 
@@ -206,7 +206,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       exploration: 22,
       // +1 Gourdlight Eve's seasonal Feat (feat_gourdlight_guise).
       // +1 its field boss's Feat (feat_old_thatchgrin).
-      feat: 5,
+      feat: 6,
       hidden: 10,
     });
   });
@@ -467,6 +467,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'feat_gourdlight_guise',
       // ...and its field boss's (content/gourdlight_eve_scarecrow.ts).
       'feat_old_thatchgrin',
+      'feat_pumpkin_hunter',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -850,7 +851,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
   });
 
-  it('ships exactly 46 titles and 4 borders', () => {
+  it('ships exactly 53 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
@@ -865,11 +866,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
     // one more, and the Drowned Temple lore guide's Witness of the Choir
     // (dgn_drowned_temple_cantor) one more.
-    expect(titles.length).toBe(52);
+    expect(titles.length).toBe(53);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(52);
+    expect(new Set(titleTexts).size).toBe(53);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1111,7 +1112,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // auditable way: the 9e4d4f50... literal rotated down into PRE_APPEND_CATALOG_SHA256.
   // Re-baselined for Old Thatchgrin's one appended Feat (feat_old_thatchgrin), the
   // auditable way: the 4f56af60... literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = '7ce9116dd46fdbca75bb16207144ad5cb0928420f76b989692615e217c2572aa';
+  const FROZEN_CATALOG_SHA256 = 'ec758a2d22cada6bd9c82c8611655503c9462a6391bf12869a62b1ec47227dd7';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1192,10 +1193,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // literal (rotated down here), and stripping the one id must reproduce it exactly.
   //
   // Its field boss (phase 2) appends feat_old_thatchgrin after the Guise; the previous
-  // mint is the Guise's 4f56af60... literal (rotated down here).
+  // mint is the Guise's 4f56af60... literal. Pumpkin Hunter now appends after
+  // that boss Feat; removing it preserves the previous 7ce9116d... digest.
   const PRE_APPEND_CATALOG_SHA256 =
-    '4f56af600e224916fcac4afae85ddc971ed43730c8986c76d7e906ffd0a7b87e';
-  const APPENDED_SINCE: readonly string[] = ['feat_old_thatchgrin'];
+    '7ce9116dd46fdbca75bb16207144ad5cb0928420f76b989692615e217c2572aa';
+  const APPENDED_SINCE: readonly string[] = ['feat_pumpkin_hunter'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1206,8 +1208,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // the ferry round trip. Pin the two predecessors too: an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_morthen_candlelight',
       'feat_gourdlight_guise',
+      'feat_old_thatchgrin',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1438,12 +1440,13 @@ describe('table shape', () => {
     // Mirefen world-boss branch's three combat deeds, then (v0.45.0 integration) the
     // five-dungeon rework's 24, Morthen's Every Candle Lit last.
     // Gourdlight Eve's Feat appends after Morthen's, its field boss's Feat last.
-    expect(DEED_ORDER[DEED_ORDER.length - 30]).toBe('exp_harbor_to_harbor');
-    expect(DEED_ORDER[DEED_ORDER.length - 28]).toBe('cmb_balgath_ten');
-    expect(DEED_ORDER[DEED_ORDER.length - 27]).toBe('cmb_point_taken');
-    expect(DEED_ORDER[DEED_ORDER.length - 3]).toBe('dgn_morthen_candlelight');
-    expect(DEED_ORDER[DEED_ORDER.length - 2]).toBe('feat_gourdlight_guise');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_old_thatchgrin');
+    expect(DEED_ORDER[DEED_ORDER.length - 31]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 29]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 28]).toBe('cmb_point_taken');
+    expect(DEED_ORDER[DEED_ORDER.length - 4]).toBe('dgn_morthen_candlelight');
+    expect(DEED_ORDER[DEED_ORDER.length - 3]).toBe('feat_gourdlight_guise');
+    expect(DEED_ORDER[DEED_ORDER.length - 2]).toBe('feat_old_thatchgrin');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_pumpkin_hunter');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

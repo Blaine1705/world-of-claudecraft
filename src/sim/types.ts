@@ -9368,7 +9368,12 @@ export type SimEvent = { pid?: number } & (
         | 'pumpkinOff'
         | 'jarTrick'
         // the Strawling Charm (Old Thatchgrin's cosmetic) put its guise on the user
-        | 'guise';
+        | 'guise'
+        | 'pumpkinFound';
+      pumpkinId?: string;
+      zoneId?: string;
+      count?: number;
+      total?: number;
       npc?: string;
       sweets?: number;
       trick?: string;

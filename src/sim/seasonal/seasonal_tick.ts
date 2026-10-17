@@ -19,6 +19,7 @@ import {
 import { createNpc } from '../entity';
 import type { SimContext } from '../sim_context';
 import type { NpcDef } from '../types';
+import { updateHauntedPumpkins } from './haunted_pumpkins';
 import { updateScarecrow } from './scarecrow';
 import {
   pumpkinHeadAura,
@@ -53,6 +54,7 @@ export function updateSeasonal(ctx: SimContext): void {
   const state = ctx.seasonal;
   const active = activeSeasonalEventOf(state);
   if (active !== state.lastActive) {
+    updateHauntedPumpkins(ctx, active);
     dismissKeeper(ctx, state.lastActive);
     state.lastActive = active;
     if (active === null) {
