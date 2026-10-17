@@ -87,6 +87,53 @@ describe('the shipped GLBs', () => {
   });
 });
 
+/** Each clip's length (seconds) and key count, read off its samplers' input accessors. */
+function clipTiming(path: string): Record<string, { seconds: number; keys: number }> {
+  const j = glbJson(path) as ReturnType<typeof glbJson> & {
+    animations?: Array<{ name?: string; samplers: Array<{ input: number }> }>;
+    accessors?: Array<{ count: number; max?: number[] }>;
+  };
+  const out: Record<string, { seconds: number; keys: number }> = {};
+  for (const a of j.animations ?? []) {
+    let seconds = 0;
+    let keys = 0;
+    for (const sampler of a.samplers) {
+      const acc = j.accessors?.[sampler.input];
+      seconds = Math.max(seconds, acc?.max?.[0] ?? 0);
+      keys = Math.max(keys, acc?.count ?? 0);
+    }
+    out[a.name ?? ''] = { seconds, keys };
+  }
+  return out;
+}
+
+describe('the two attacks (owner note 2026-10-17: one clear idea each, at 30 fps)', () => {
+  // scarecrow_clips.py swipe_keys (THE REAP: impact 0.66 s) and chop_keys (THE SLAM: impact
+  // 0.78 s), sampled at the pipeline's 30 fps. A re-author that changes either length, or a
+  // rebake at another rate, turns this red.
+  const ATTACKS = { Swipe: 1.5, Chop: 1.7 } as const;
+  for (const path of [BOSS_GLB, ADD_GLB]) {
+    it(`keys the reap and the slam at their authored lengths, 30 keys a second (${path.split(/[/]/).pop()})`, () => {
+      const timing = clipTiming(path);
+      for (const [clip, seconds] of Object.entries(ATTACKS)) {
+        expect(timing[clip]?.seconds, clip).toBeCloseTo(seconds, 2);
+        // the optimizer drops a redundant end key here and there, so the densest channel
+        // carries between a 24 fps and a 30 fps count: only a 30 fps bake gets past 24
+        expect(timing[clip]?.keys, clip).toBeGreaterThan(Math.round(seconds * 24) + 1);
+        expect(timing[clip]?.keys, clip).toBeLessThanOrEqual(Math.round(seconds * 30) + 1);
+      }
+      // the clips the owner kept are resampled, never re-timed
+      expect(timing.Idle?.seconds).toBeCloseTo(4, 2);
+      expect(timing.Walk?.seconds).toBeCloseTo(1.2, 2);
+      expect(timing.Run?.seconds).toBeCloseTo(0.85, 1); // 0.85 s lands on the 30 fps grid at 0.833
+      expect(timing.Hit?.seconds).toBeCloseTo(0.45, 1);
+      expect(timing.Death?.seconds).toBeCloseTo(3.2, 2);
+      expect(timing.Throw?.seconds).toBeCloseTo(2.2, 2);
+      expect(timing.Summon?.seconds).toBeCloseTo(2, 2);
+    });
+  }
+});
+
 describe('the draw budget', () => {
   const budget = (path: string) => {
     const j = glbJson(path);
@@ -132,7 +179,7 @@ describe('the manifest wiring', () => {
   });
 
   it('times the throw so the gourd leaves his hand inside the windup and lands on its end', () => {
-    expect(GOURD_RELEASE_SEC).toBeLessThan(THATCHGRIN_KIT.gourd.windup);
+    expect(GOURD_RELEASE_SEC).toBeLessThan(THATCHGRIN_KIT.rain.windup);
     expect(SUMMON_PEAK_SEC).toBeCloseTo(THATCHGRIN_KIT.callWindup, 5);
   });
 });

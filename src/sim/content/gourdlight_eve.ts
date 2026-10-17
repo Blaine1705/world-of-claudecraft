@@ -20,6 +20,65 @@ export const GOURDLIGHT_TREAT_POUCH_ID = 'gourdlight_treat_pouch';
 export const CARVED_PUMPKIN_HEAD_ID = 'carved_pumpkin_head';
 export const JAR_OF_MISCHIEF_ID = 'jar_of_mischief';
 
+/** Old Thatchgrin's keepsake: the reins of a hovering broom (content/mounts.ts
+ *  'emberbristle_broom'). Event-bound (ItemDef.seasonalEvent): it lives in the bags
+ *  only while Gourdlight Eve runs and is swept away when the event closes. */
+export const GOURDLIGHT_BROOM_ID = 'reins_emberbristle_broom';
+export const GOURDLIGHT_BROOM_MOUNT = 'emberbristle_broom';
+
+/** The costume draughts: drink one and wear a skeleton's, a ghost's or a bat's body for
+ *  ten minutes. A look only (a seasonal_cosmetic aura the client draws as a body swap,
+ *  the tricks' own path), and like every trick body it never fights: refused in combat,
+ *  and combat starting ends it (seasonal/seasonal_tick.ts). */
+export const GOURDLIGHT_COSTUMES = Object.freeze([
+  {
+    itemId: 'rattlebone_draught',
+    itemName: 'Rattlebone Draught',
+    auraId: 'gourdlight_costume_skeleton',
+    name: 'Skeleton Costume',
+    duration: 600,
+  },
+  {
+    itemId: 'haunting_draught',
+    itemName: 'Haunting Draught',
+    auraId: 'gourdlight_costume_ghost',
+    name: 'Ghost Costume',
+    duration: 600,
+  },
+  {
+    itemId: 'batwing_draught',
+    itemName: 'Batwing Draught',
+    auraId: 'gourdlight_costume_bat',
+    name: 'Bat Costume',
+    duration: 600,
+  },
+] as const);
+export type GourdlightCostume = (typeof GOURDLIGHT_COSTUMES)[number];
+
+/** The title writs: read one and the title is yours for good (a Book of Deeds Feat
+ *  with a title reward, content/deeds.ts). Bought with sweets, never earned power. */
+export const GOURDLIGHT_TITLE_WRITS = Object.freeze([
+  {
+    itemId: 'writ_of_the_gourdlit',
+    itemName: 'Writ of the Gourdlit',
+    deedId: 'feat_title_gourdlit',
+    title: 'the Gourdlit',
+  },
+  {
+    itemId: 'writ_of_the_trickster',
+    itemName: 'Writ of the Trickster',
+    deedId: 'feat_title_trickster',
+    title: 'Trickster',
+  },
+  {
+    itemId: 'writ_of_the_hollow_grin',
+    itemName: 'Writ of the Hollow Grin',
+    deedId: 'feat_title_hollow_grinned',
+    title: 'the Hollow-Grinned',
+  },
+] as const);
+export type GourdlightTitleWrit = (typeof GOURDLIGHT_TITLE_WRITS)[number];
+
 /** The worn head cosmetic's aura id (and the render key it draws by). */
 export const PUMPKIN_HEAD_AURA_ID = 'gourdlight_pumpkin_head';
 
@@ -86,35 +145,96 @@ export const TRICK_OR_TREAT_NPC_IDS: ReadonlySet<string> = new Set(
   Object.values(TRICK_OR_TREAT_NPCS).flat(),
 );
 
-/** The keeper's reserved singleton entity id (types.ts
+/** The keeper's reserved singleton entity ids (types.ts
  *  STATIC_WORLD_SERVICE_ENTITY_ID_MIN's note; pinned in
- *  tests/reserved_singleton_entity_ids.test.ts). She stands only while the event
- *  runs, spawned and removed by src/sim/seasonal/seasonal_tick.ts. */
+ *  tests/reserved_singleton_entity_ids.test.ts). Hester keeps a stall in each of the
+ *  three main cities, one entity per city under the one NPC template, so her quest, her
+ *  shop and her name are the same wherever a player meets her. She stands only while
+ *  the event runs, spawned and removed by src/sim/seasonal/seasonal_tick.ts. */
 export const GOURDLIGHT_KEEPER_ENTITY_ID = 1_000_000_066;
+export const GOURDLIGHT_KEEPER_FENBRIDGE_ENTITY_ID = 1_000_000_067;
+export const GOURDLIGHT_KEEPER_HIGHWATCH_ENTITY_ID = 1_000_000_068;
 export const GOURDLIGHT_KEEPER_NPC_ID = 'gourdlight_keeper';
 
+/** One of the keeper's stalls: the city it dresses, the entity that works it, and the
+ *  spot she PREFERS (her standing spot behind the counter, and the way she faces). The
+ *  spot is only a preference: src/sim/seasonal_keeper_posts.ts checks the stall's whole
+ *  footprint against the live city and, when a rework has built over it, walks out in
+ *  rings until the stall fits, so a moved building moves her stall instead of burying it. */
+export interface GourdlightKeeperPost {
+  id: string;
+  zoneId: string;
+  entityId: number;
+  pos: { x: number; z: number };
+  facing: number;
+}
+
+export const GOURDLIGHT_KEEPER_POSTS: readonly GourdlightKeeperPost[] = Object.freeze([
+  // Eastbrook's square, on the open ground east of the road past the statue, facing
+  // west across it.
+  {
+    id: 'eastbrook',
+    zoneId: 'eastbrook_vale',
+    entityId: GOURDLIGHT_KEEPER_ENTITY_ID,
+    pos: { x: -4.2, z: -110.5 },
+    facing: -Math.PI / 2,
+  },
+  // Fenbridge: at the south end of the market lane, facing north up it, so the whole
+  // lane walks toward her counter.
+  {
+    id: 'fenbridge',
+    zoneId: 'mirefen_marsh',
+    entityId: GOURDLIGHT_KEEPER_FENBRIDGE_ENTITY_ID,
+    pos: { x: -3.6, z: 286.5 },
+    facing: 0,
+  },
+  // Highwatch: the square's west side, facing east across it.
+  {
+    id: 'highwatch',
+    zoneId: 'thornpeak_heights',
+    entityId: GOURDLIGHT_KEEPER_HIGHWATCH_ENTITY_ID,
+    pos: { x: -7.7, z: 657.9 },
+    facing: Math.PI / 2,
+  },
+]);
+
 /** The keeper's shop: price in sweets per purchase (ItemDef.priceItem). */
+// Daily income is about 20 to 25 sweets (the rounds pouch, the knocks, his sack), so a
+// draught is half a day and a title three to five days of rounds.
 export const GOURDLIGHT_SHOP_PRICES: Readonly<Record<string, number>> = Object.freeze({
   [CARVED_PUMPKIN_HEAD_ID]: 40,
   [JAR_OF_MISCHIEF_ID]: 3,
+  rattlebone_draught: 10,
+  haunting_draught: 10,
+  batwing_draught: 10,
+  writ_of_the_gourdlit: 60,
+  writ_of_the_trickster: 80,
+  writ_of_the_hollow_grin: 100,
 });
+
+/** What the keeper sells, in shelf order. */
+export const GOURDLIGHT_SHOP_ITEMS: readonly string[] = Object.freeze([
+  CARVED_PUMPKIN_HEAD_ID,
+  JAR_OF_MISCHIEF_ID,
+  ...GOURDLIGHT_COSTUMES.map((c) => c.itemId),
+  ...GOURDLIGHT_TITLE_WRITS.map((w) => w.itemId),
+]);
 
 export const GOURDLIGHT_KEEPER_NPC: NpcDef = {
   id: GOURDLIGHT_KEEPER_NPC_ID,
   name: 'Hester Gourdwick',
   title: 'Gourdlight Keeper',
-  // Eastbrook's square, on the open ground east of the road past the statue,
-  // facing west across it: her stall (seasonal_decor_stall.ts) stands round
-  // this spot, with her behind its counter.
+  // Her Eastbrook post (GOURDLIGHT_KEEPER_POSTS[0]); the other cities' entities take
+  // their own spots from the post table, never from here.
   pos: { x: -4.2, z: -110.5 },
   facing: -Math.PI / 2,
   color: 0xd9741c,
   questIds: [GOURDLIGHT_ROUNDS_QUEST_ID],
-  vendorItems: [CARVED_PUMPKIN_HEAD_ID, JAR_OF_MISCHIEF_ID],
+  vendorItems: [...GOURDLIGHT_SHOP_ITEMS],
   dynamic: true,
   seasonalKeeper: true,
   greeting:
-    'The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear.',
+    'The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me, at any of my stalls, and I will trade you something to wear.',
 };
 
 export const GOURDLIGHT_EVE_NPCS: Record<string, NpcDef> = {
@@ -173,6 +293,58 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noVendorSell: true,
     noSalvage: true,
+  },
+  ...Object.fromEntries(
+    GOURDLIGHT_COSTUMES.map((c): [string, ItemDef] => [
+      c.itemId,
+      {
+        id: c.itemId,
+        name: c.itemName,
+        kind: 'tool',
+        quality: 'uncommon',
+        use: { type: 'seasonal', action: 'costume' },
+        priceItem: { itemId: GOURDLIGHT_SWEET_ID, count: GOURDLIGHT_SHOP_PRICES[c.itemId] },
+        stackSize: 20,
+        sellValue: 0,
+        soulbound: true,
+        noVendorSell: true,
+        noSalvage: true,
+      },
+    ]),
+  ),
+  ...Object.fromEntries(
+    GOURDLIGHT_TITLE_WRITS.map((w): [string, ItemDef] => [
+      w.itemId,
+      {
+        id: w.itemId,
+        name: w.itemName,
+        kind: 'tool',
+        quality: 'epic',
+        use: { type: 'seasonal', action: 'titleWrit' },
+        priceItem: { itemId: GOURDLIGHT_SWEET_ID, count: GOURDLIGHT_SHOP_PRICES[w.itemId] },
+        unique: true,
+        sellValue: 0,
+        soulbound: true,
+        noVendorSell: true,
+        noSalvage: true,
+      },
+    ]),
+  ),
+  // Old Thatchgrin's keepsake (content/gourdlight_eve_scarecrow.ts loot): the one
+  // soulbound player mount, because it is EVENT-BOUND (swept when Gourdlight Eve
+  // closes), and a tradable copy could outlive its event in another player's bags.
+  [GOURDLIGHT_BROOM_ID]: {
+    id: GOURDLIGHT_BROOM_ID,
+    name: 'Emberbristle Broom',
+    kind: 'mount',
+    mount: GOURDLIGHT_BROOM_MOUNT,
+    quality: 'epic',
+    seasonalEvent: GOURDLIGHT_EVE_ID,
+    unique: true,
+    soulbound: true,
+    noVendorSell: true,
+    noSalvage: true,
+    sellValue: 0,
   },
 };
 

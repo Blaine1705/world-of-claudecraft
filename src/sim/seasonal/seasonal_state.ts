@@ -23,6 +23,9 @@ export interface SeasonalWorldState {
   lastActive: string | null;
   /** Gourdlight Eve's field boss (scarecrow.ts): who stands in the field, and when next. */
   scarecrow: ScarecrowState;
+  /** Characters whose event-bound items were checked since the running event last
+   *  changed (seasonal_bound_items.ts). Identity-keyed, never persisted. */
+  boundSwept: WeakSet<object>;
 }
 
 export function freshSeasonalWorldState(): SeasonalWorldState {
@@ -31,6 +34,7 @@ export function freshSeasonalWorldState(): SeasonalWorldState {
     devOverride: undefined,
     lastActive: null,
     scarecrow: freshScarecrowState(),
+    boundSwept: new WeakSet(),
   };
 }
 

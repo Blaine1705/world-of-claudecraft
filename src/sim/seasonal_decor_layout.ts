@@ -28,12 +28,8 @@ import {
 import { getActiveWorldContent, NPCS } from './data';
 import { hash2 } from './rng';
 import { resolveScarecrowField } from './seasonal/scarecrow_field';
-import {
-  insideStall,
-  resolveSeasonalStall,
-  type SeasonalStall,
-  stallLocalToWorld,
-} from './seasonal_decor_stall';
+import { insideStall, type SeasonalStall, stallLocalToWorld } from './seasonal_decor_stall';
+import { type ResolvedKeeperPost, resolvedKeeperPosts } from './seasonal_keeper_posts';
 import type { PlacedStreetlamp } from './streetlamp_layout';
 import { STREETLAMP_COLLIDER_RADIUS, type StreetlampStyleId } from './streetlamp_style';
 import { groundHeight, roadDistance, WATER_LEVEL } from './world';
@@ -86,8 +82,9 @@ export interface SeasonalDecorLayout {
   ground: SeasonalGroundPiece[];
   lanterns: SeasonalLantern[];
   garlands: SeasonalGarland[];
-  /** The keeper's market stall, or null where her spot cannot take one. */
-  stall: SeasonalStall | null;
+  /** The keeper's market stalls, one per city whose post takes one (her posts:
+   *  seasonal_keeper_posts.ts). */
+  stalls: SeasonalStall[];
 }
 
 /** Body radius a ground piece claims (the big carved pumpkin's footprint). */
@@ -179,7 +176,7 @@ interface Probe {
   seed: number;
   npcSpots: readonly { x: number; z: number }[];
   placed: { x: number; z: number }[];
-  stall: SeasonalStall | null;
+  stalls: readonly SeasonalStall[];
 }
 
 /** Why a ground spot is refused, or null when it is clear (exported for the test). */
@@ -189,14 +186,16 @@ export function groundSpotProblem(
   z: number,
   npcSpots: readonly { x: number; z: number }[],
   placed: readonly { x: number; z: number }[],
-  stall: SeasonalStall | null = null,
+  stalls: readonly SeasonalStall[] = [],
   radius = DECOR_GROUND_RADIUS,
 ): 'collider' | 'road' | 'npc' | 'water' | 'crowded' | 'stall' | null {
   if (groundHeight(x, z, seed) < WATER_LEVEL + 0.4) return 'water';
   if (roadDistance(x, z) < DECOR_ROAD_CLEARANCE) return 'road';
   for (const n of npcSpots) if (Math.hypot(n.x - x, n.z - z) < DECOR_NPC_CLEARANCE) return 'npc';
   for (const p of placed) if (Math.hypot(p.x - x, p.z - z) < DECOR_MIN_SPACING) return 'crowded';
-  if (stall && insideStall(stall, x, z, STALL_MARGIN + radius)) return 'stall';
+  for (const stall of stalls) {
+    if (insideStall(stall, x, z, STALL_MARGIN + radius)) return 'stall';
+  }
   if (isBlocked(seed, x, z, radius)) return 'collider';
   return null;
 }
@@ -245,7 +244,7 @@ function seat(
       pz,
       probe.npcSpots,
       probe.placed,
-      probe.stall,
+      probe.stalls,
       decorKindRadius(kind),
     );
     if (problem !== null) continue;
@@ -267,7 +266,7 @@ function garlandClear(
   g: SeasonalGarland,
   skipA: number,
   skipB: number,
-  stall: SeasonalStall | null,
+  stalls: readonly SeasonalStall[],
 ): boolean {
   const span = Math.hypot(g.bx - g.ax, g.bz - g.az);
   for (let d = skipA; d <= span - skipB; d += GARLAND_SAMPLE_STEP) {
@@ -275,7 +274,7 @@ function garlandClear(
     const x = g.ax + (g.bx - g.ax) * t;
     const z = g.az + (g.bz - g.az) * t;
     if (isBlocked(seed, x, z, 0.2)) return false;
-    if (stall && insideStall(stall, x, z, STALL_MARGIN)) return false;
+    for (const stall of stalls) if (insideStall(stall, x, z, STALL_MARGIN)) return false;
   }
   return true;
 }
@@ -364,7 +363,8 @@ function cityDecor(
       sag: Math.min(1.6, 0.35 + best.d * 0.05),
       anchor: `garland:${key}`,
     };
-    if (!garlandClear(seed, g, postSkip(a.style), postSkip(best.lamp.style), probe.stall)) continue;
+    if (!garlandClear(seed, g, postSkip(a.style), postSkip(best.lamp.style), probe.stalls))
+      continue;
     strung.add(key);
     layout.garlands.push(g);
   }
@@ -379,7 +379,7 @@ function cityDecor(
       for (const reach of POLE_REACH) {
         const px = lamp.x + Math.sin(dir) * reach;
         const pz = lamp.z + Math.cos(dir) * reach;
-        if (groundSpotProblem(seed, px, pz, probe.npcSpots, probe.placed, probe.stall) !== null)
+        if (groundSpotProblem(seed, px, pz, probe.npcSpots, probe.placed, probe.stalls) !== null)
           continue;
         const py = groundHeight(px, pz, seed);
         if (Math.abs(py - lamp.y) > GARLAND_MAX_RISE) continue;
@@ -393,7 +393,7 @@ function cityDecor(
           sag: 0.35 + reach * 0.05,
           anchor: `garland:lamp:${index}`,
         };
-        if (!garlandClear(seed, g, postSkip(lamp.style), GARLAND_END_SKIP, probe.stall)) continue;
+        if (!garlandClear(seed, g, postSkip(lamp.style), GARLAND_END_SKIP, probe.stalls)) continue;
         const anchor = `pole:${index}`;
         layout.ground.push({
           kind: 'garland_pole',
@@ -550,14 +550,13 @@ function streetDecor(
 export function resolveSeasonalDecor(seed: number): SeasonalDecorLayout {
   const content = getActiveWorldContent();
   const npcSpots = Object.values(NPCS).map((n) => ({ x: n.pos.x, z: n.pos.z }));
-  const k = GOURDLIGHT_KEEPER_NPC;
-  // The keeper's stall first: it claims its footprint before any piece is seated.
-  const others = Object.values(NPCS)
-    .filter((n) => n.id !== k.id)
-    .map((n) => ({ x: n.pos.x, z: n.pos.z }));
-  const stall = resolveSeasonalStall(seed, k, others);
-  const layout: SeasonalDecorLayout = { ground: [], lanterns: [], garlands: [], stall };
-  const probe: Probe = { seed, npcSpots, placed: [], stall };
+  // The keeper's stalls first: each claims its footprint before any piece is seated. Her
+  // own standing spots join the NPC spots, so nothing is seated on her.
+  const posts = resolvedKeeperPosts(seed);
+  const stalls = posts.flatMap((p) => (p.stall ? [p.stall] : []));
+  for (const p of posts) npcSpots.push({ x: p.pos.x, z: p.pos.z });
+  const layout: SeasonalDecorLayout = { ground: [], lanterns: [], garlands: [], stalls };
+  const probe: Probe = { seed, npcSpots, placed: [], stalls };
   const lamps = streetlampPlacements(seed);
   for (const rule of GOURDLIGHT_DECOR_CITIES) {
     const zone = content.zones.find((z) => z.id === rule.zoneId);
@@ -565,11 +564,20 @@ export function resolveSeasonalDecor(seed: number): SeasonalDecorLayout {
     cityDecor(seed, rule, zone.hub, lamps, probe, layout);
   }
   scarecrowFieldDecor(seed, probe, layout);
+  for (const post of posts) keeperDressing(post, probe, layout);
+  return layout;
+}
+
+/** A stall's own front dressing (lit pumpkins at each end of the counter, where the
+ *  customers stand), or, where her post took no stall, a pile of gourds either side
+ *  of her. Anchors carry the post id, so each city's pieces stay its own. */
+function keeperDressing(post: ResolvedKeeperPost, probe: Probe, layout: SeasonalDecorLayout): void {
+  const id = post.post.id;
+  const stall = post.stall;
   if (stall) {
-    // Lit pumpkins out front at each end of the counter, where the customers
-    // stand: part of the stall's own dressing, so its keep-clear margin does not
-    // apply to them (everything else still does).
-    const front: Probe = { ...probe, stall: null };
+    // part of the stall's own dressing, so its keep-clear margin does not apply to them
+    // (every other stall's still does, and everything else does)
+    const front: Probe = { ...probe, stalls: probe.stalls.filter((s) => s !== stall) };
     for (const [i, lx] of [
       [0, -2.1],
       [1, 2.2],
@@ -581,11 +589,10 @@ export function resolveSeasonalDecor(seed: number): SeasonalDecorLayout {
         lx * stall.scale,
         2.55 * stall.scale,
       );
-      seat(front, layout.ground, 'pumpkin_lit', p.x, p.z, `keeper:${i}`, 1, stall.yaw);
+      seat(front, layout.ground, 'pumpkin_lit', p.x, p.z, `keeper:${id}:${i}`, 1, stall.yaw);
     }
-    return layout;
+    return;
   }
-  // No room for her stall: a pile of gourds either side of her instead.
   for (const [i, off] of [
     [0, -1.9],
     [1, 1.9],
@@ -593,23 +600,22 @@ export function resolveSeasonalDecor(seed: number): SeasonalDecorLayout {
     [3, 2.6],
     [4, -3.3],
   ] as const) {
-    const a = k.facing + Math.PI / 2;
-    const fx = Math.sin(k.facing) * -0.6;
-    const fz = Math.cos(k.facing) * -0.6;
+    const a = post.facing + Math.PI / 2;
+    const fx = Math.sin(post.facing) * -0.6;
+    const fz = Math.cos(post.facing) * -0.6;
     const kind: SeasonalGroundKind =
       i === 2 || i === 4 ? 'gourd' : i === 3 ? 'pumpkin_small' : 'pumpkin_lit';
     seat(
       probe,
       layout.ground,
       kind,
-      k.pos.x + Math.sin(a) * off + fx,
-      k.pos.z + Math.cos(a) * off + fz,
-      `keeper:${i}`,
+      post.pos.x + Math.sin(a) * off + fx,
+      post.pos.z + Math.cos(a) * off + fz,
+      `keeper:${id}:${i}`,
       kind === 'pumpkin_lit' ? 1.25 : 1.1,
-      k.facing,
+      post.facing,
     );
   }
-  return layout;
 }
 
 /** Old Thatchgrin's pumpkin patch (seasonal/scarecrow_field.ts): corn shocks, hay bales and

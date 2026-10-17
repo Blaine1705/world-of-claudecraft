@@ -4,8 +4,12 @@
 //
 //   /dev scarecrow            open Gourdlight Eve if it is closed, stand him up now if his
 //                             field is empty, and put you twenty yards in front of him
-//   /dev scarecrow gourd      he throws a Kindled Gourd now (he must be in a fight)
+//   /dev scarecrow rain       Gourdfall now: the burning pumpkins rain (he must be in a
+//                             fight; `gourd` is kept as an alias)
 //   /dev scarecrow call       his next call (crows or strawlings) starts now
+//   /dev scarecrow swell      a Swelling Gourd heaves up behind him now
+//   /dev scarecrow burst      the standing gourd's fuse runs down to its last second
+//   /dev scarecrow break      the standing gourd breaks now (he reels: stun, split rind)
 //   /dev scarecrow reset      clear him and stand him up fresh at full health
 //   /dev scarecrow lockout    forget your daily spoils lockout, so his corpse pays you again
 import { GOURDLIGHT_EVE_ID } from '../content/gourdlight_eve';
@@ -15,10 +19,15 @@ import type { SimContext } from '../sim_context';
 import { worldBossLockoutId } from '../world_boss';
 import { clearThatchgrin, spawnThatchgrin } from './scarecrow';
 import { resolveScarecrowField } from './scarecrow_field';
-import { scarecrowEngaged, startCall, startKindledGourd } from './scarecrow_kit';
+import { scarecrowEngaged, startCall, startGourdfall } from './scarecrow_kit';
+import { raiseSwellingGourd } from './scarecrow_swell';
 import { activeSeasonalEventOf } from './seasonal_state';
 
-const USAGE = '[dev] Usage: /dev scarecrow [gourd|call|reset|lockout].';
+const USAGE = '[dev] Usage: /dev scarecrow [rain|call|swell|burst|break|reset|lockout].';
+
+function me(ctx: SimContext, pid: number) {
+  return ctx.entities.get(pid) ?? null;
+}
 
 export function handleScarecrowDevChat(ctx: SimContext, raw: string, pid: number): boolean {
   const m = /^\/dev\s+scarecrow(?:\s+(\S+))?\s*$/i.exec(raw);
@@ -54,7 +63,8 @@ export function handleScarecrowDevChat(ctx: SimContext, raw: string, pid: number
     );
     return true;
   }
-  if (verb === 'gourd' || verb === 'call') {
+  const fightVerbs = ['rain', 'gourd', 'call', 'swell', 'burst', 'break'];
+  if (fightVerbs.includes(verb)) {
     if (
       !boss ||
       boss.dead ||
@@ -65,11 +75,24 @@ export function handleScarecrowDevChat(ctx: SimContext, raw: string, pid: number
       ctx.error(pid, '[dev] Pull Old Thatchgrin first.');
       return true;
     }
-    if (st.kit.gourdWindup > 0 || st.kit.callWindup > 0) {
-      ctx.error(pid, '[dev] He is already winding one up.');
-      return true;
+    const kit = st.kit;
+    let ok = false;
+    if (verb === 'rain' || verb === 'gourd' || verb === 'call') {
+      if (kit.rain.length > 0 || kit.callWindup > 0) {
+        ctx.error(pid, '[dev] He is already winding one up.');
+        return true;
+      }
+      ok = verb === 'call' ? startCall(ctx, boss, st) : startGourdfall(ctx, boss, st);
+    } else if (verb === 'swell') {
+      ok = raiseSwellingGourd(ctx, boss, st) !== null;
+    } else {
+      const gourd = kit.swellId !== null ? ctx.entities.get(kit.swellId) : undefined;
+      if (gourd && !gourd.dead) {
+        ok = true;
+        if (verb === 'burst') kit.swellFuse = Math.min(kit.swellFuse, 1);
+        else ctx.dealDamage(me(ctx, pid), gourd, gourd.hp + 1, false, 'physical', null, 'hit');
+      }
     }
-    const ok = verb === 'gourd' ? startKindledGourd(ctx, boss, st) : startCall(ctx, boss, st);
     log(ok ? `[dev] Old Thatchgrin: ${verb} now.` : '[dev] Nothing to do that with.');
     return true;
   }

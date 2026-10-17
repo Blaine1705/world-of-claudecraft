@@ -5,8 +5,11 @@
 // market all say the same thing.
 import {
   CARVED_PUMPKIN_HEAD_ID,
+  GOURDLIGHT_BROOM_ID,
+  GOURDLIGHT_COSTUMES,
   GOURDLIGHT_POUCH_SWEETS,
   GOURDLIGHT_SWEET_ID,
+  GOURDLIGHT_TITLE_WRITS,
   GOURDLIGHT_TREAT_POUCH_ID,
   JAR_OF_MISCHIEF_ID,
 } from '../sim/content/gourdlight_eve';
@@ -17,12 +20,29 @@ import {
   THATCHGRIN_SACK_SWEETS,
 } from '../sim/content/gourdlight_eve_scarecrow';
 import type { ItemDef } from '../sim/types';
-import { formatNumber, t } from './i18n';
+import { deedTitleText } from './deed_i18n';
+import { formatNumber, type TranslationKey, t } from './i18n';
 import { createTooltipLine } from './tooltip_line';
+
+/** Each costume draught's own sentence (catalog keys by aura id). */
+const COSTUME_USE_KEYS: Readonly<Record<string, TranslationKey>> = {
+  gourdlight_costume_skeleton: 'seasonal.itemUse.costumeSkeleton',
+  gourdlight_costume_ghost: 'seasonal.itemUse.costumeGhost',
+  gourdlight_costume_bat: 'seasonal.itemUse.costumeBat',
+};
 
 /** The use or purpose line for a seasonal item, or null for any other item. */
 export function seasonalItemTooltipText(item: Pick<ItemDef, 'id'>): string | null {
+  const costume = GOURDLIGHT_COSTUMES.find((c) => c.itemId === item.id);
+  if (costume) {
+    const key = COSTUME_USE_KEYS[costume.auraId];
+    return key ? t(key, { minutes: formatNumber(costume.duration / 60) }) : null;
+  }
+  const writ = GOURDLIGHT_TITLE_WRITS.find((w) => w.itemId === item.id);
+  if (writ) return t('seasonal.itemUse.titleWrit', { title: deedTitleText(writ.deedId) });
   switch (item.id) {
+    case GOURDLIGHT_BROOM_ID:
+      return t('seasonal.itemUse.broom');
     case CARVED_PUMPKIN_HEAD_ID:
       return t('seasonal.itemUse.pumpkinHead');
     case JAR_OF_MISCHIEF_ID:

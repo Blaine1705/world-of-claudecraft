@@ -8,12 +8,12 @@
 export interface ScarecrowKitState {
   /** The boss entity this pull belongs to (a respawn is a new pull). */
   bossId: number;
-  /** Seconds until the next Kindled Gourd may start. */
-  gourdTimer: number;
-  /** Seconds left on the gourds in flight (0 = none). */
-  gourdWindup: number;
-  /** Where the gourds in flight land, as x, z pairs (snapshot at the throw). */
-  gourdAims: number[];
+  /** Seconds until the next Gourdfall may start. */
+  rainTimer: number;
+  /** Pumpkins in the air, as x, z, seconds to landing (RAIN_STRIDE each). */
+  rain: number[];
+  /** Pumpkins landed this pull (every other one carries the blast sound). */
+  rainLanded: number;
   /** Live Smoldering Chaff patches, as x, z, seconds left, seconds to the next burn. */
   chaff: number[];
   /** How many of the kit's calls have fired this pull (they fire in order). */
@@ -22,6 +22,12 @@ export interface ScarecrowKitState {
   callWindup: number;
   /** Seconds of quiet after a telegraph lands, before the next may start. */
   spacing: number;
+  /** How many Swelling Gourds have risen this pull (they rise in threshold order). */
+  swellsRisen: number;
+  /** The live Swelling Gourd's entity id, null when none stands. */
+  swellId: number | null;
+  /** Seconds left on its fuse (its cast bar). */
+  swellFuse: number;
 }
 
 export interface ScarecrowState {
@@ -38,18 +44,23 @@ export function freshScarecrowState(): ScarecrowState {
   return { bossId: null, respawnAt: 0, hpScale: null, kit: null };
 }
 
-export function freshScarecrowKit(bossId: number, firstGourd: number): ScarecrowKitState {
+export function freshScarecrowKit(bossId: number, firstRain: number): ScarecrowKitState {
   return {
     bossId,
-    gourdTimer: firstGourd,
-    gourdWindup: 0,
-    gourdAims: [],
+    rainTimer: firstRain,
+    rain: [],
+    rainLanded: 0,
     chaff: [],
     callsFired: 0,
     callWindup: 0,
     spacing: 0,
+    swellsRisen: 0,
+    swellId: null,
+    swellFuse: 0,
   };
 }
 
 /** Stride of one patch in `ScarecrowKitState.chaff`. */
 export const CHAFF_STRIDE = 4;
+/** Stride of one falling pumpkin in `ScarecrowKitState.rain`. */
+export const RAIN_STRIDE = 3;

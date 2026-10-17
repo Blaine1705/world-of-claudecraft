@@ -36,6 +36,10 @@ export const seasonalStrings = {
     gourdlight_trick_skeleton: 'Rattled Bones',
     gourdlight_trick_fumes: 'Green Fumes',
     gourdlight_trick_strawling: 'Strawling Guise',
+    // the costume draughts' looks (content/gourdlight_eve.ts GOURDLIGHT_COSTUMES)
+    gourdlight_costume_skeleton: 'Skeleton Costume',
+    gourdlight_costume_ghost: 'Ghost Costume',
+    gourdlight_costume_bat: 'Bat Costume',
   },
   pumpkinHead: {
     on: 'You put on the Carved Pumpkin Head.',
@@ -43,6 +47,10 @@ export const seasonalStrings = {
   },
   jarTrick: 'The jar pops open: {trick}!',
   guise: 'The charm crackles and the straw climbs over you: {trick}!',
+  costume: 'You drink the draught and change: {trick}!',
+  titleGranted: 'You read the writ. New title earned: {title}.',
+  titleKnown: 'You already hold that title, so you keep the writ.',
+  boundItemGone: 'Gourdlight Eve is over, and your {item} crumbles back into straw.',
   // Item tooltip "Use:" lines (the item tooltip appends them to the event items).
   itemUse: {
     pumpkinHead:
@@ -53,7 +61,18 @@ export const seasonalStrings = {
     strawlingCharm:
       "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat, and only during Gourdlight Eve. Never consumed. Cosmetic.",
     sweet:
-      'Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them.',
+      'Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick trades cosmetics for them at her stalls in Eastbrook, Fenbridge and Highwatch.',
+    // One sentence per costume (a noun spliced into a sentence cannot be localized).
+    costumeSkeleton:
+      'Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.',
+    costumeGhost:
+      'Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.',
+    costumeBat:
+      'Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.',
+    titleWrit:
+      'Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.',
+    broom:
+      "Old Thatchgrin's keepsake. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.",
   },
   // The vendor row's token price: "{count} {item}" ({count} pre-formatted).
   tokenPrice: '{count} {item}',

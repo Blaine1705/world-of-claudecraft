@@ -22,7 +22,9 @@
 import { GOURDLIGHT_EVE_ID } from '../content/gourdlight_eve';
 import {
   THATCHGRIN_CORPSE_SECONDS,
+  THATCHGRIN_DAMAGE_MULT,
   THATCHGRIN_HP_CAP_RATIO,
+  THATCHGRIN_HP_MULT,
   THATCHGRIN_HP_STEP_RATIO,
   THATCHGRIN_ID,
   THATCHGRIN_RESPAWN_SECONDS,
@@ -37,16 +39,19 @@ import { resolveScarecrowField } from './scarecrow_field';
 import { resetScarecrowKit, tickScarecrowKit } from './scarecrow_kit';
 import type { ScarecrowState } from './scarecrow_state';
 
-/** His template on the open-world curve at his level: the Warden ladder a camp spawn of
- *  the Warden would carry (health, melee, armour), worldBoss flags untouched. */
+/** His template on the open-world curve at his level (the Warden ladder a camp spawn of
+ *  the Warden would carry: health, melee, armour), then the owner's design multipliers on
+ *  health ("very high") and melee ("low"). worldBoss flags untouched. */
 export function thatchgrinSpawnTemplate(template: MobTemplate): MobTemplate {
   const s = openWorldMobScale(template.maxLevel);
+  const hp = s.health * THATCHGRIN_HP_MULT;
+  const dmg = s.damage * THATCHGRIN_DAMAGE_MULT;
   return {
     ...template,
-    hpBase: template.hpBase * s.health,
-    hpPerLevel: template.hpPerLevel * s.health,
-    dmgBase: template.dmgBase * s.damage,
-    dmgPerLevel: template.dmgPerLevel * s.damage,
+    hpBase: template.hpBase * hp,
+    hpPerLevel: template.hpPerLevel * hp,
+    dmgBase: template.dmgBase * dmg,
+    dmgPerLevel: template.dmgPerLevel * dmg,
     armorPerLevel: template.armorPerLevel * s.armor,
   };
 }

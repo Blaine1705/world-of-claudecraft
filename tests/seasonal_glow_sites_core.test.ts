@@ -24,7 +24,7 @@ function piece(
 }
 
 function layoutOf(ground: SeasonalGroundPiece[]): SeasonalDecorLayout {
-  return { ground, lanterns: [], garlands: [], stall: null };
+  return { ground, lanterns: [], garlands: [], stalls: [] };
 }
 
 describe('seasonal glow sites', () => {
@@ -75,10 +75,9 @@ describe('seasonal glow sites', () => {
 
   it('lights and haloes the keeper stall in the shipped world, turned with it', () => {
     const layout = resolveSeasonalDecor(WORLD_SEED);
-    const stall = layout.stall;
-    expect(stall).not.toBeNull();
-    if (!stall) return;
-    const only: SeasonalDecorLayout = { ground: [], lanterns: [], garlands: [], stall };
+    expect(layout.stalls.length).toBeGreaterThanOrEqual(3);
+    const stall = layout.stalls[0];
+    const only: SeasonalDecorLayout = { ground: [], lanterns: [], garlands: [], stalls: [stall] };
     const halos = seasonalHalos(only);
     expect(halos.length).toBeGreaterThanOrEqual(6);
     // every stall halo stands over the booth, within its reach

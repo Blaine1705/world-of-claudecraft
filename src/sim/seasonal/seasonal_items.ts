@@ -4,8 +4,10 @@
 
 import { bagsFullError } from '../bags';
 import {
+  GOURDLIGHT_COSTUMES,
   GOURDLIGHT_POUCH_SWEETS,
   GOURDLIGHT_SWEET_ID,
+  GOURDLIGHT_TITLE_WRITS,
   GOURDLIGHT_TRICKS,
   PUMPKIN_HEAD_AURA_ID,
 } from '../content/gourdlight_eve';
@@ -14,6 +16,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload } from '../types';
 import {
+  playCostume,
   playStrawlingGuise,
   playTrick,
   pumpkinHeadAura,
@@ -21,7 +24,12 @@ import {
 } from './seasonal_cosmetics';
 import { activeSeasonalEventOf } from './seasonal_state';
 
-export type SeasonalItemAction = 'pumpkinHead' | 'trickJar' | 'strawlingCharm';
+export type SeasonalItemAction =
+  | 'pumpkinHead'
+  | 'trickJar'
+  | 'strawlingCharm'
+  | 'costume'
+  | 'titleWrit';
 
 function eventClosed(ctx: SimContext, meta: PlayerMeta): boolean {
   if (activeSeasonalEventOf(ctx.seasonal) !== null) return false;
@@ -30,15 +38,23 @@ function eventClosed(ctx: SimContext, meta: PlayerMeta): boolean {
 }
 
 /** The Carved Pumpkin Head toggles on and off (never consumed); the Jar of
- *  Mischief plays a random trick on its user and is spent. */
+ *  Mischief plays a random trick on its user and is spent; a costume draught wears its
+ *  body for ten minutes and is spent; a title writ grants its title Feat and is spent
+ *  (refused, unspent, when the title is already earned). */
 export function useSeasonalItem(
   ctx: SimContext,
   meta: PlayerMeta,
   p: Entity,
   action: SeasonalItemAction,
   consumeOne: () => ItemInstancePayload | undefined,
+  itemId = '',
 ): void {
   if (eventClosed(ctx, meta)) return;
+  // A writ is paperwork, not a body swap: readable anywhere, in combat too.
+  if (action === 'titleWrit') {
+    useTitleWrit(ctx, meta, itemId, consumeOne);
+    return;
+  }
   if (action === 'pumpkinHead') {
     if (meta.pumpkinHeadWorn) {
       meta.pumpkinHeadWorn = false;
@@ -59,6 +75,15 @@ export function useSeasonalItem(
     ctx.error(meta.entityId, "You can't do that while in combat.");
     return;
   }
+  // A costume draught: its body for ten minutes, the draught spent. No rng.
+  if (action === 'costume') {
+    const costume = GOURDLIGHT_COSTUMES.find((c) => c.itemId === itemId);
+    if (!costume) return;
+    consumeOne();
+    const aura = playCostume(ctx, p, costume);
+    ctx.emit({ type: 'seasonal', what: 'costume', trick: aura, pid: meta.entityId });
+    return;
+  }
   // The Strawling Charm (Old Thatchgrin's cosmetic): reusable, never consumed, no rng.
   if (action === 'strawlingCharm') {
     const guise = playStrawlingGuise(ctx, p);
@@ -69,6 +94,25 @@ export function useSeasonalItem(
   const index = ctx.rng.int(0, GOURDLIGHT_TRICKS.length - 1);
   const trick = playTrick(ctx, p, index, p.id);
   ctx.emit({ type: 'seasonal', what: 'jarTrick', trick, pid: meta.entityId });
+}
+
+/** A title writ: its Feat (and so its title) is granted, the writ spent. A writ for a
+ *  title already earned is refused and kept, so nothing is ever wasted. */
+function useTitleWrit(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  itemId: string,
+  consumeOne: () => ItemInstancePayload | undefined,
+): void {
+  const writ = GOURDLIGHT_TITLE_WRITS.find((w) => w.itemId === itemId);
+  if (!writ) return;
+  if (meta.deedsEarned.has(writ.deedId)) {
+    ctx.emit({ type: 'seasonal', what: 'titleKnown', pid: meta.entityId });
+    return;
+  }
+  if (!ctx.grantDeed(meta, writ.deedId)) return;
+  consumeOne();
+  ctx.emit({ type: 'seasonal', what: 'titleGranted', trick: writ.deedId, pid: meta.entityId });
 }
 
 /** Old Thatchgrin's sweet sack, opened like the rounds pouch (a full bag keeps it). */

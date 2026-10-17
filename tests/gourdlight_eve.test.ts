@@ -5,15 +5,20 @@
 // shop's token price, the seasonal quest gate, the daily lock and the save shape.
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
+import { DEEDS } from '../src/sim/content/deeds';
 import {
   CARVED_PUMPKIN_HEAD_ID,
+  GOURDLIGHT_COSTUMES,
   GOURDLIGHT_EVE_ID,
   GOURDLIGHT_KEEPER_ENTITY_ID,
   GOURDLIGHT_KEEPER_NPC,
+  GOURDLIGHT_KEEPER_POSTS,
   GOURDLIGHT_ROUNDS_DOORS,
   GOURDLIGHT_ROUNDS_QUEST_ID,
+  GOURDLIGHT_SHOP_ITEMS,
   GOURDLIGHT_SHOP_PRICES,
   GOURDLIGHT_SWEET_ID,
+  GOURDLIGHT_TITLE_WRITS,
   GOURDLIGHT_TRICKS,
   JAR_OF_MISCHIEF_ID,
   PUMPKIN_HEAD_AURA_ID,
@@ -26,7 +31,13 @@ import {
   freshSeasonalPlayerState,
   restoreSeasonalState,
   seasonalSaveFragment,
+  updateSeasonal,
 } from '../src/sim/seasonal';
+import {
+  KEEPER_POST_RINGS,
+  resolvedKeeperPosts,
+  resolveKeeperPost,
+} from '../src/sim/seasonal_keeper_posts';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -417,5 +428,149 @@ describe('the seasonal cosmetics stay off the raid frames', () => {
     const { pumpkinHeadAura, trickAura } = await import('../src/sim/seasonal/seasonal_cosmetics');
     expect(isPartyFrameRelevantAura(pumpkinHeadAura(1))).toBe(false);
     expect(isPartyFrameRelevantAura(trickAura(0, 1))).toBe(false);
+  });
+});
+
+describe('a stall in each city', () => {
+  it('raises Hester at a stall in Eastbrook, Fenbridge and Highwatch, each under her own id', () => {
+    const sim = world();
+    open(sim);
+    const zones = getActiveWorldContent().zones;
+    const posts = resolvedKeeperPosts(WORLD_SEED);
+    expect(posts.map((p) => p.post.zoneId)).toEqual([
+      'eastbrook_vale',
+      'mirefen_marsh',
+      'thornpeak_heights',
+    ]);
+    for (const p of posts) {
+      const npc = sim.entities.get(p.post.entityId);
+      expect(npc?.templateId, p.post.id).toBe(GOURDLIGHT_KEEPER_NPC.id);
+      expect(npc?.pos.x).toBeCloseTo(p.pos.x, 5);
+      expect(npc?.pos.z).toBeCloseTo(p.pos.z, 5);
+      expect(npc?.facing).toBeCloseTo(p.facing, 5);
+      const hub = zones.find((z) => z.id === p.post.zoneId)?.hub;
+      expect(Math.hypot(p.pos.x - (hub?.x ?? 0), p.pos.z - (hub?.z ?? 0))).toBeLessThan(45);
+    }
+    expect(new Set(GOURDLIGHT_KEEPER_POSTS.map((p) => p.entityId)).size).toBe(3);
+    sim.chat('/dev season off');
+    sim.tick();
+    for (const p of GOURDLIGHT_KEEPER_POSTS) expect(sim.entities.has(p.entityId)).toBe(false);
+  });
+
+  it('seats a whole stall at every post today, on her own spot (no rework has moved her)', () => {
+    new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    for (const p of resolvedKeeperPosts(WORLD_SEED)) {
+      expect(p.stall, p.post.id).not.toBeNull();
+      expect(p.moved, p.post.id).toBe(false);
+      expect(isBlocked(WORLD_SEED, p.pos.x, p.pos.z, 0.5), p.post.id).toBe(false);
+    }
+  });
+
+  it('walks out to the nearest spot that takes the stall when a rework builds over hers', () => {
+    new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const post = GOURDLIGHT_KEEPER_POSTS[1];
+    // an NPC planted on her counter: her own spot no longer takes the stall
+    const resolved = resolveKeeperPost(WORLD_SEED, post, [{ x: post.pos.x, z: post.pos.z + 1.5 }]);
+    expect(resolved.moved).toBe(true);
+    expect(resolved.stall).not.toBeNull();
+    const d = Math.hypot(resolved.pos.x - post.pos.x, resolved.pos.z - post.pos.z);
+    expect(d).toBeGreaterThan(0);
+    expect(d).toBeLessThanOrEqual(KEEPER_POST_RINGS[KEEPER_POST_RINGS.length - 1] + 1e-6);
+  });
+
+  it('sells the same shelf and hands out the same quest at every stall', () => {
+    const sim = world();
+    open(sim);
+    for (const p of GOURDLIGHT_KEEPER_POSTS) {
+      const npc = sim.entities.get(p.entityId) as Entity;
+      expect(npc.questIds).toEqual([GOURDLIGHT_ROUNDS_QUEST_ID]);
+    }
+    expect(GOURDLIGHT_KEEPER_NPC.vendorItems).toEqual([...GOURDLIGHT_SHOP_ITEMS]);
+  });
+});
+
+describe('the costume draughts', () => {
+  it('cost about half a day of sweets and wear their body for ten minutes, spent on use', () => {
+    const sim = world();
+    open(sim);
+    for (const c of GOURDLIGHT_COSTUMES) {
+      expect(GOURDLIGHT_SHOP_PRICES[c.itemId]).toBe(10);
+      expect(ITEMS[c.itemId].priceItem).toEqual({ itemId: GOURDLIGHT_SWEET_ID, count: 10 });
+      sim.addItem(c.itemId, 1);
+      sim.useItem(c.itemId);
+      const aura = sim.player.auras.find((a) => a.id === c.auraId);
+      expect(aura?.kind, c.itemId).toBe('seasonal_cosmetic');
+      expect(aura?.remaining).toBe(600);
+      expect(sim.countItem(c.itemId)).toBe(0);
+    }
+    // one body at a time: the last one drunk is the one worn
+    const worn = sim.player.auras.filter((a) => GOURDLIGHT_COSTUMES.some((c) => c.auraId === a.id));
+    expect(worn.map((a) => a.id)).toEqual([GOURDLIGHT_COSTUMES[2].auraId]);
+  });
+
+  it('never in a fight: refused in combat (kept), and combat starting takes the body off', () => {
+    const sim = world();
+    open(sim);
+    const c = GOURDLIGHT_COSTUMES[0];
+    sim.addItem(c.itemId, 1);
+    sim.player.inCombat = true;
+    sim.useItem(c.itemId);
+    expect(sim.countItem(c.itemId)).toBe(1);
+    sim.player.inCombat = false;
+    sim.useItem(c.itemId);
+    expect(sim.player.auras.some((a) => a.id === c.auraId)).toBe(true);
+    sim.player.inCombat = true;
+    updateSeasonal((sim as any).ctx);
+    expect(sim.player.auras.some((a) => a.id === c.auraId)).toBe(false);
+  });
+
+  it('comes off when the event closes, and is refused while it is closed', () => {
+    const sim = world();
+    open(sim);
+    const c = GOURDLIGHT_COSTUMES[1];
+    sim.addItem(c.itemId, 2);
+    sim.useItem(c.itemId);
+    sim.chat('/dev season off');
+    sim.tick();
+    expect(sim.player.auras.some((a) => a.id === c.auraId)).toBe(false);
+    sim.useItem(c.itemId);
+    expect(sim.countItem(c.itemId)).toBe(1);
+  });
+});
+
+describe('the title writs', () => {
+  it('cost 60 to 100 sweets and grant their title Feat once, spent on use', () => {
+    const sim = world();
+    open(sim);
+    const meta = (sim as any).players.get(sim.playerId);
+    for (const w of GOURDLIGHT_TITLE_WRITS) {
+      const price = GOURDLIGHT_SHOP_PRICES[w.itemId];
+      expect(price).toBeGreaterThanOrEqual(60);
+      expect(price).toBeLessThanOrEqual(100);
+      const deed = DEEDS[w.deedId];
+      expect(deed?.reward).toEqual({ kind: 'title', text: w.title });
+      expect(deed?.feat).toBe(true);
+      expect(deed?.renown).toBe(0);
+      sim.addItem(w.itemId, 1);
+      sim.useItem(w.itemId);
+      expect(meta.deedsEarned.has(w.deedId)).toBe(true);
+      expect(sim.countItem(w.itemId)).toBe(0);
+      // the title is wearable through the one title validator
+      sim.setActiveTitle(w.deedId);
+      expect(sim.player.title).toBe(w.deedId);
+    }
+  });
+
+  it('refuses a second writ for a title already earned, keeping it', () => {
+    const sim = world();
+    open(sim);
+    const w = GOURDLIGHT_TITLE_WRITS[0];
+    sim.addItem(w.itemId, 1);
+    sim.useItem(w.itemId);
+    sim.addItem(w.itemId, 1);
+    sim.useItem(w.itemId);
+    const ev = seasonalEvents(sim.tick());
+    expect(sim.countItem(w.itemId)).toBe(1);
+    expect(ev.some((e) => e.what === 'titleKnown')).toBe(true);
   });
 });

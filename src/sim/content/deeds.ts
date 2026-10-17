@@ -3887,6 +3887,40 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'stat', stat: 'thatchgrinKills', count: 1 },
     feat: true,
   },
+  // Gourdlight Eve's three title writs (content/gourdlight_eve.ts GOURDLIGHT_TITLE_WRITS):
+  // Feats for the same reason as the Guise above (sold only while the event runs), granted
+  // by reading the writ (seasonal/seasonal_items.ts), cosmetic titles only. Appended at
+  // the END.
+  feat_title_gourdlit: {
+    id: 'feat_title_gourdlit',
+    name: 'The Gourdlit',
+    desc: 'Read a Writ of the Gourdlit, traded from Hester Gourdwick for Gourdlight Sweets while Gourdlight Eve runs.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'the Gourdlit' },
+    feat: true,
+  },
+  feat_title_trickster: {
+    id: 'feat_title_trickster',
+    name: 'Trickster',
+    desc: 'Read a Writ of the Trickster, traded from Hester Gourdwick for Gourdlight Sweets while Gourdlight Eve runs.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Trickster' },
+    feat: true,
+  },
+  feat_title_hollow_grinned: {
+    id: 'feat_title_hollow_grinned',
+    name: 'The Hollow-Grinned',
+    desc: 'Read a Writ of the Hollow Grin, traded from Hester Gourdwick for Gourdlight Sweets while Gourdlight Eve runs.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'the Hollow-Grinned' },
+    feat: true,
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -6,6 +6,7 @@
 // after other PRs merge catches it.
 import { describe, expect, it } from 'vitest';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
+import { GOURDLIGHT_KEEPER_POSTS } from '../src/sim/content/gourdlight_eve';
 import { GOURDLIGHT_DECOR_CITIES } from '../src/sim/content/gourdlight_eve_decor';
 import { getActiveWorldContent, NPCS } from '../src/sim/data';
 import {
@@ -26,6 +27,7 @@ import {
   stallLocalToWorld,
   stallSpotProblem,
 } from '../src/sim/seasonal_decor_stall';
+import { resolvedKeeperPosts } from '../src/sim/seasonal_keeper_posts';
 import { INTERACT_RANGE } from '../src/sim/types';
 import { groundHeight, roadDistance } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -38,12 +40,10 @@ describe('seasonal decor placement against the live world', () => {
     for (const [i, p] of layout.ground.entries()) {
       if (isBlocked(WORLD_SEED, p.x, p.z, decorKindRadius(p.kind)))
         problems.push(`${p.anchor} collider`);
-      if (
-        layout.stall &&
-        !p.anchor.startsWith('keeper:') &&
-        insideStall(layout.stall, p.x, p.z, 0.5)
-      )
-        problems.push(`${p.anchor} inside the stall`);
+      for (const stall of layout.stalls) {
+        if (!p.anchor.startsWith('keeper:') && insideStall(stall, p.x, p.z, 0.5))
+          problems.push(`${p.anchor} inside ${stall.anchor}`);
+      }
       // the free-standing pieces (street shoulders, townsfolk sides) never squeeze a walkway
       if (/^(street|folk):/.test(p.anchor) && narrowsPassage(WORLD_SEED, p.x, p.z))
         problems.push(`${p.anchor} narrows a passage`);
@@ -70,8 +70,8 @@ describe('seasonal decor placement against the live world', () => {
         const x = g.ax + (g.bx - g.ax) * t;
         const z = g.az + (g.bz - g.az) * t;
         expect(isBlocked(WORLD_SEED, x, z, 0.15), `${g.anchor} at ${d.toFixed(1)}`).toBe(false);
-        if (layout.stall) {
-          expect(insideStall(layout.stall, x, z), `${g.anchor} over the stall`).toBe(false);
+        for (const stall of layout.stalls) {
+          expect(insideStall(stall, x, z), `${g.anchor} over ${stall.anchor}`).toBe(false);
         }
       }
     }
@@ -142,45 +142,61 @@ describe('seasonal decor placement against the live world', () => {
     }
   });
 
-  it('stands the keeper behind the counter of her stall, its whole footprint clear', () => {
-    const keeper = NPCS.gourdlight_keeper;
-    const stall = layout.stall;
-    expect(stall, 'the shipped square takes her stall').not.toBeNull();
-    if (!stall) return;
-    expect(stall.anchor).toBe('stall:gourdlight_keeper');
-    expect(stall.scale).toBe(STALL_SCALE);
-    // she stands inside it, between the back wall and the counter
-    expect(insideStall(stall, keeper.pos.x, keeper.pos.z)).toBe(true);
-    const others = Object.values(NPCS)
-      .filter((n) => n.id !== keeper.id)
-      .map((n) => n.pos);
-    expect(stallSpotProblem(WORLD_SEED, stall.x, stall.z, stall.yaw, others)).toBeNull();
-    for (const n of others) expect(insideStall(stall, n.x, n.z)).toBe(false);
-    // it sits on the lowest ground under it: never a floating corner
-    const f = STALL_FOOTPRINT;
-    for (const [lx, lz] of [
-      [f.minX, f.minZ],
-      [f.maxX, f.minZ],
-      [f.minX, f.maxZ],
-      [f.maxX, f.maxZ],
-    ]) {
-      const c = stallLocalToWorld(stall.x, stall.z, stall.yaw, lx * STALL_SCALE, lz * STALL_SCALE);
-      expect(groundHeight(c.x, c.z, WORLD_SEED)).toBeGreaterThanOrEqual(stall.y - 1e-9);
+  it('stands the keeper behind the counter of her stall in every city, its whole footprint clear', () => {
+    const posts = resolvedKeeperPosts(WORLD_SEED);
+    expect(layout.stalls).toHaveLength(GOURDLIGHT_KEEPER_POSTS.length);
+    for (const post of posts) {
+      const keeper = post.pos;
+      const stall = post.stall;
+      expect(stall, `${post.post.id}: the shipped city takes her stall`).not.toBeNull();
+      if (!stall) continue;
+      expect(layout.stalls).toContain(stall);
+      expect(stall.anchor).toBe(`stall:${post.post.id}`);
+      expect(stall.scale).toBe(STALL_SCALE);
+      // she stands inside it, between the back wall and the counter
+      expect(insideStall(stall, keeper.x, keeper.z)).toBe(true);
+      const others = Object.values(NPCS)
+        .filter((n) => n.id !== 'gourdlight_keeper')
+        .map((n) => n.pos);
+      expect(stallSpotProblem(WORLD_SEED, stall.x, stall.z, stall.yaw, others)).toBeNull();
+      for (const n of others) expect(insideStall(stall, n.x, n.z)).toBe(false);
+      // it sits on the lowest ground under it: never a floating corner
+      const f = STALL_FOOTPRINT;
+      for (const [lx, lz] of [
+        [f.minX, f.minZ],
+        [f.maxX, f.minZ],
+        [f.minX, f.maxZ],
+        [f.maxX, f.maxZ],
+      ]) {
+        const c = stallLocalToWorld(
+          stall.x,
+          stall.z,
+          stall.yaw,
+          lx * STALL_SCALE,
+          lz * STALL_SCALE,
+        );
+        expect(groundHeight(c.x, c.z, WORLD_SEED)).toBeGreaterThanOrEqual(stall.y - 1e-9);
+      }
+      // a customer can reach her: a clear walkable spot in front of the counter, outside
+      // the stall, within talking range
+      const front = stallLocalToWorld(
+        stall.x,
+        stall.z,
+        stall.yaw,
+        0,
+        (STALL_FOOTPRINT.maxZ + 0.6) * STALL_SCALE,
+      );
+      expect(insideStall(stall, front.x, front.z)).toBe(false);
+      expect(isBlocked(WORLD_SEED, front.x, front.z, 0.4), post.post.id).toBe(false);
+      expect(Math.hypot(front.x - keeper.x, front.z - keeper.z)).toBeLessThan(INTERACT_RANGE);
+      // two lit pumpkins out front, where her customers stand
+      const lit = layout.ground.filter((p) => p.anchor.startsWith(`keeper:${post.post.id}:`));
+      expect(lit, post.post.id).toHaveLength(2);
     }
-    // a customer can reach her: a clear, off-road-or-on-road walkable spot in
-    // front of the counter, outside the stall, within talking range
-    const front = stallLocalToWorld(
-      stall.x,
-      stall.z,
-      stall.yaw,
-      0,
-      (STALL_FOOTPRINT.maxZ + 0.6) * STALL_SCALE,
-    );
-    expect(insideStall(stall, front.x, front.z)).toBe(false);
-    expect(isBlocked(WORLD_SEED, front.x, front.z, 0.4)).toBe(false);
-    expect(Math.hypot(front.x - keeper.pos.x, front.z - keeper.pos.z)).toBeLessThan(INTERACT_RANGE);
-    // two lit pumpkins out front, where her customers stand
-    expect(layout.ground.filter((p) => /^keeper:\d$/.test(p.anchor))).toHaveLength(2);
+    // no two cities' stalls overlap anything of each other's
+    for (const s of layout.stalls) {
+      for (const t of layout.stalls) if (s !== t) expect(insideStall(s, t.x, t.z, 2)).toBe(false);
+    }
   });
 
   it('turns the stall down where her spot cannot take it (the resolver rule itself)', () => {

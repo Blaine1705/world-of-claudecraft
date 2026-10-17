@@ -1111,7 +1111,12 @@ export type ItemUse =
   | { type: 'container'; container: 'emissary_cache' | 'gourdlight_pouch' | 'thatchgrin_sack' }
   // A seasonal event toy (src/sim/seasonal/seasonal_items.ts): the worn pumpkin
   // head toggle and the Jar of Mischief. Refused while its event is closed.
-  | { type: 'seasonal'; action: 'pumpkinHead' | 'trickJar' | 'strawlingCharm' };
+  | {
+      type: 'seasonal';
+      // costume: a ten-minute skeleton, ghost or bat body (content/gourdlight_eve.ts
+      // GOURDLIGHT_COSTUMES); titleWrit: grants its title Feat (GOURDLIGHT_TITLE_WRITS).
+      action: 'pumpkinHead' | 'trickJar' | 'strawlingCharm' | 'costume' | 'titleWrit';
+    };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -1223,6 +1228,11 @@ interface BaseItemDef {
   // sweets) debits `count` copies of `itemId` from the buyer's bags per
   // purchase (items.ts buyItem). Per-purchase like Honor, never stack-multiplied.
   priceItem?: { itemId: string; count: number };
+  // EVENT-BOUND: the item exists only while this seasonal event runs. When the event is
+  // closed the seasonal tick sweeps it out of the owner's bags, bank and courier cargo
+  // (src/sim/seasonal/seasonal_bound_items.ts), at the close and again on the first tick
+  // a character spends in a closed world (a login after the event ended).
+  seasonalEvent?: string;
   use?: ItemUse;
   /**
    * A quest implement every class may equip, weapon-proficiency rules notwithstanding
@@ -2107,6 +2117,11 @@ export interface LootEntry {
   // source level and stats; listing it here must not promote it to the
   // bespoke heroic equipment tier or seed the higher-tier rift reward pool.
   preserveSourceTier?: true;
+  // WORLD-BOSS PERSONAL LOOT ONLY (world_boss.ts rollWorldBossLoot): a keepsake the
+  // contributor never gets twice. The entry is still ROLLED for everyone (the draw order
+  // stays a function of the roster), and the win is discarded for a contributor who
+  // already holds the item in bags, bank or courier cargo.
+  unlessOwned?: true;
   // WORLD-BOSS PERSONAL LOOT ONLY (world_boss.ts rollWorldBossLoot): the entry is
   // rolled only for a contributor whose level is at or below this. The locals' share
   // of a boss placed in their zone: gear a level-eight can wear, which the level-twenty
@@ -9368,7 +9383,15 @@ export type SimEvent = { pid?: number } & (
         | 'pumpkinOff'
         | 'jarTrick'
         // the Strawling Charm (Old Thatchgrin's cosmetic) put its guise on the user
-        | 'guise';
+        | 'guise'
+        // a costume draught put its body on the user (`trick` is the costume aura id)
+        | 'costume'
+        // a title writ granted its Feat (`trick` is the deed id), or was refused because
+        // the title is already earned
+        | 'titleGranted'
+        | 'titleKnown'
+        // an event-bound item was swept away because its event closed (`trick` = item id)
+        | 'boundItemGone';
       npc?: string;
       sweets?: number;
       trick?: string;

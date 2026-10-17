@@ -5,7 +5,12 @@
 // fumes as a smoke cloud). `undispellable` keeps every player counter (dispel,
 // cleanse, right-click cancel) off them: the head comes off with its own item,
 // a trick runs out on its own short timer.
-import { GOURDLIGHT_TRICKS, PUMPKIN_HEAD_AURA_ID } from '../content/gourdlight_eve';
+import {
+  GOURDLIGHT_COSTUMES,
+  GOURDLIGHT_TRICKS,
+  type GourdlightCostume,
+  PUMPKIN_HEAD_AURA_ID,
+} from '../content/gourdlight_eve';
 import { STRAWLING_GUISE } from '../content/gourdlight_eve_scarecrow';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
@@ -15,12 +20,14 @@ export const SEASONAL_COSMETIC_AURA_IDS: ReadonlySet<string> = new Set([
   PUMPKIN_HEAD_AURA_ID,
   ...GOURDLIGHT_TRICKS.map((trick) => trick.id),
   STRAWLING_GUISE.id,
+  ...GOURDLIGHT_COSTUMES.map((costume) => costume.auraId),
 ]);
 
-/** Every body-swap look a seasonal toy or trick plays (one at a time). */
+/** Every body-swap look a seasonal toy, trick or costume plays (one at a time). */
 const TRICK_AURA_IDS: readonly string[] = [
   ...GOURDLIGHT_TRICKS.map((trick) => trick.id),
   STRAWLING_GUISE.id,
+  ...GOURDLIGHT_COSTUMES.map((costume) => costume.auraId),
 ];
 
 export function pumpkinHeadAura(sourceId: number): Aura {
@@ -101,4 +108,26 @@ export function playTrick(
   const aura = trickAura(trickIndex, sourceId);
   ctx.applyAura(e, aura);
   return aura.id;
+}
+
+/** A costume draught's look: its body for the costume's duration (ten minutes). */
+export function costumeAura(costume: GourdlightCostume, sourceId: number): Aura {
+  return {
+    id: costume.auraId,
+    name: costume.name,
+    kind: 'seasonal_cosmetic',
+    value: 0,
+    remaining: costume.duration,
+    duration: costume.duration,
+    undispellable: true,
+    sourceId,
+    school: 'physical',
+  };
+}
+
+/** Wear a costume (replacing any trick, guise or costume already playing). */
+export function playCostume(ctx: SimContext, e: Entity, costume: GourdlightCostume): string {
+  stripTricks(ctx, e);
+  ctx.applyAura(e, costumeAura(costume, e.id));
+  return costume.auraId;
 }

@@ -2226,6 +2226,7 @@ export const cs_CZ: EnTranslations = {
       "name_lanternback_troll": "Grumbol Lanternback",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kostipoutaná rikša",
+      "name_emberbristle_broom": "Emberbristle Broom",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
@@ -2244,7 +2245,8 @@ export const cs_CZ: EnTranslations = {
       "desc_mech_bird": "Ručně vyrobené strojové válečné kuře, které sprintuje na cvakací serva, natahovací klíč se stále otáčí.",
       "desc_lanternback_troll": "Horský troll, který lampáři zlomili do jha, nesl přes ramena železný trůn a na obou pažích hořela bouřková lucerna.",
       "desc_chimeglass_tortoise": "Solná želva, která překonala tři generace karavanů. Tinkers mu vybrousil brýle z bouřkového skla a pověsil mu na hrdlo bronzový zvon, takže ho cesta slyší dlouho předtím, než ho uvidí.",
-      "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
+      "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem.",
+      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -7730,7 +7732,10 @@ export const cs_CZ: EnTranslations = {
       "gourdlight_trick_bat": "Batty",
       "gourdlight_trick_skeleton": "Rattled Bones",
       "gourdlight_trick_fumes": "Green Fumes",
-      "gourdlight_trick_strawling": "Strawling Guise"
+      "gourdlight_trick_strawling": "Strawling Guise",
+      "gourdlight_costume_skeleton": "Skeleton Costume",
+      "gourdlight_costume_ghost": "Ghost Costume",
+      "gourdlight_costume_bat": "Bat Costume"
     },
     "pumpkinHead": {
       "on": "You put on the Carved Pumpkin Head.",
@@ -7738,12 +7743,21 @@ export const cs_CZ: EnTranslations = {
     },
     "jarTrick": "The jar pops open: {trick}!",
     "guise": "The charm crackles and the straw climbs over you: {trick}!",
+    "costume": "You drink the draught and change: {trick}!",
+    "titleGranted": "You read the writ. New title earned: {title}.",
+    "titleKnown": "You already hold that title, so you keep the writ.",
+    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
     "itemUse": {
       "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
       "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
       "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
       "strawlingCharm": "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat, and only during Gourdlight Eve. Never consumed. Cosmetic.",
-      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them."
+      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick trades cosmetics for them at her stalls in Eastbrook, Fenbridge and Highwatch.",
+      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
+      "broom": "Old Thatchgrin's keepsake. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends."
     },
     "tokenPrice": "{count} {item}"
   },
@@ -22977,6 +22991,27 @@ export const cs_CZ: EnTranslations = {
       "strawling_charm": {
         "name": "Strawling Charm"
       },
+      "rattlebone_draught": {
+        "name": "Rattlebone Draught"
+      },
+      "haunting_draught": {
+        "name": "Haunting Draught"
+      },
+      "batwing_draught": {
+        "name": "Batwing Draught"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Writ of the Gourdlit"
+      },
+      "writ_of_the_trickster": {
+        "name": "Writ of the Trickster"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Writ of the Hollow Grin"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Emberbristle Broom"
+      },
       "membership_token": {
         "name": "Membership Token (30 Days)"
       },
@@ -24527,6 +24562,9 @@ export const cs_CZ: EnTranslations = {
       "gourdlight_strawling": {
         "name": "Strawling"
       },
+      "gourdlight_swelling_gourd": {
+        "name": "Swelling Gourd"
+      },
       "stable_horse": {
         "name": "Stájový kůň"
       },
@@ -25604,7 +25642,7 @@ export const cs_CZ: EnTranslations = {
       "gourdlight_keeper": {
         "name": "Hester Gourdwick",
         "title": "Gourdlight Keeper",
-        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me and I will trade you something to wear."
+        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me, at any of my stalls, and I will trade you something to wear."
       },
       "reeve_ottoline": {
         "name": "Rychtářka Ottoline",

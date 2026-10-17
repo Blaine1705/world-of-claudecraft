@@ -6198,6 +6198,30 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": true,
     "crest": "/ui/deeds/feat_old_thatchgrin.webp"
+  },
+  {
+    "id": "feat_title_gourdlit",
+    "name": "The Gourdlit",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "the Gourdlit"
+  },
+  {
+    "id": "feat_title_trickster",
+    "name": "Trickster",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Trickster"
+  },
+  {
+    "id": "feat_title_hollow_grinned",
+    "name": "The Hollow-Grinned",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "the Hollow-Grinned"
   }
 ];
 

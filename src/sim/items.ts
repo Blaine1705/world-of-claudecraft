@@ -1000,7 +1000,7 @@ export function useItem(
   }
   // Seasonal toys (seasonal/seasonal_items.ts): refused while the event is closed.
   if (def.use?.type === 'seasonal') {
-    useSeasonalItem(ctx, meta, p, def.use.action, consumeOneUnit);
+    useSeasonalItem(ctx, meta, p, def.use.action, consumeOneUnit, def.id);
     return;
   }
   if (def.use?.type === 'throw') {

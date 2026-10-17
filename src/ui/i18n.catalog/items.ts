@@ -3948,6 +3948,14 @@ const ITEM_ENTITY_IDS = [
   // Old Thatchgrin's spoils (content/gourdlight_eve_scarecrow.ts).
   'thatchgrin_sweet_sack',
   'strawling_charm',
+  // Gourdlight Eve's shop additions and Old Thatchgrin's broom (content/gourdlight_eve.ts).
+  'rattlebone_draught',
+  'haunting_draught',
+  'batwing_draught',
+  'writ_of_the_gourdlit',
+  'writ_of_the_trickster',
+  'writ_of_the_hollow_grin',
+  'reins_emberbristle_broom',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3965,6 +3973,14 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // Old Thatchgrin (content/gourdlight_eve_scarecrow.ts).
   thatchgrin_sweet_sack: "Thatchgrin's Sweet Sack",
   strawling_charm: 'Strawling Charm',
+  // Gourdlight Eve's shop additions and the broom (content/gourdlight_eve.ts).
+  rattlebone_draught: 'Rattlebone Draught',
+  haunting_draught: 'Haunting Draught',
+  batwing_draught: 'Batwing Draught',
+  writ_of_the_gourdlit: 'Writ of the Gourdlit',
+  writ_of_the_trickster: 'Writ of the Trickster',
+  writ_of_the_hollow_grin: 'Writ of the Hollow Grin',
+  reins_emberbristle_broom: 'Emberbristle Broom',
   // Mirefen world-boss spoils.
   foremans_barrowmaul: "Foreman's Barrowmaul",
   // The quest tool the world boss's level-spread mechanic runs on, not a spoil.

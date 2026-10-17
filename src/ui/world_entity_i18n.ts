@@ -248,6 +248,7 @@ const MOB_IDS = [
   'gourdlight_thatchgrin',
   'gourdlight_crow',
   'gourdlight_strawling',
+  'gourdlight_swelling_gourd',
   // Ambient Highwatch Stables horse (zone 3)
   'stable_horse',
   // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless

@@ -2226,6 +2226,7 @@ export const zh_CN: EnTranslations = {
       "name_lanternback_troll": "提灯背者格伦博",
       "name_chimeglass_tortoise": "钟晶的托利弗",
       "name_rickshaw_mount": "白骨人力车",
+      "name_emberbristle_broom": "Emberbristle Broom",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
@@ -2244,7 +2245,8 @@ export const zh_CN: EnTranslations = {
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
       "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
-      "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。"
+      "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。",
+      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends."
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
@@ -7730,7 +7732,10 @@ export const zh_CN: EnTranslations = {
       "gourdlight_trick_bat": "变成蝙蝠",
       "gourdlight_trick_skeleton": "骨头咔咔",
       "gourdlight_trick_fumes": "绿色烟雾",
-      "gourdlight_trick_strawling": "稻草人伪装"
+      "gourdlight_trick_strawling": "稻草人伪装",
+      "gourdlight_costume_skeleton": "Skeleton Costume",
+      "gourdlight_costume_ghost": "Ghost Costume",
+      "gourdlight_costume_bat": "Bat Costume"
     },
     "pumpkinHead": {
       "on": "你戴上了雕刻南瓜头。",
@@ -7738,12 +7743,21 @@ export const zh_CN: EnTranslations = {
     },
     "jarTrick": "罐子砰地打开了：{trick}！",
     "guise": "护符噼啪作响，稻草爬满了你的全身：{trick}！",
+    "costume": "You drink the draught and change: {trick}!",
+    "titleGranted": "You read the writ. New title earned: {title}.",
+    "titleKnown": "You already hold that title, so you keep the writ.",
+    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
     "itemUse": {
       "pumpkinHead": "使用：戴上或摘下一颗从内部点亮的雕刻南瓜，套在头盔之上。仅在南瓜灯之夜期间可用。纯外观。",
       "trickJar": "使用：对你施加一个随机的无害恶作剧，持续数秒。仅在南瓜灯之夜期间可用。纯外观。",
       "pouch": "使用：打开后获得{count}颗南瓜灯糖。",
       "strawlingCharm": "使用：变成老稻草狞笑的稻草小人，持续{seconds}秒。战斗中无法使用，仅限南瓜灯之夜期间。不会消耗。仅外观。",
-      "sweet": "在南瓜灯之夜期间讨糖获得。东溪的赫丝特·葫芦芯会用外观物品交换它们。"
+      "sweet": "在南瓜灯之夜期间讨糖获得。东溪的赫丝特·葫芦芯会用外观物品交换它们。",
+      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
+      "broom": "Old Thatchgrin's keepsake. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends."
     },
     "tokenPrice": "{count}个{item}"
   },
@@ -22977,6 +22991,27 @@ export const zh_CN: EnTranslations = {
       "strawling_charm": {
         "name": "稻草小人护符"
       },
+      "rattlebone_draught": {
+        "name": "Rattlebone Draught"
+      },
+      "haunting_draught": {
+        "name": "Haunting Draught"
+      },
+      "batwing_draught": {
+        "name": "Batwing Draught"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Writ of the Gourdlit"
+      },
+      "writ_of_the_trickster": {
+        "name": "Writ of the Trickster"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Writ of the Hollow Grin"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Emberbristle Broom"
+      },
       "membership_token": {
         "name": "会员代币（30天）"
       },
@@ -24526,6 +24561,9 @@ export const zh_CN: EnTranslations = {
       },
       "gourdlight_strawling": {
         "name": "稻草小人"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Swelling Gourd"
       },
       "stable_horse": {
         "name": "厩马"

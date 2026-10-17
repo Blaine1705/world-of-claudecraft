@@ -2226,6 +2226,7 @@ export const ko_KR: EnTranslations = {
       "name_lanternback_troll": "등불지기 그룸볼",
       "name_chimeglass_tortoise": "종유리의 톨리버",
       "name_rickshaw_mount": "뼈에 묶인 인력거",
+      "name_emberbristle_broom": "Emberbristle Broom",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
@@ -2244,7 +2245,8 @@ export const ko_KR: EnTranslations = {
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
       "desc_lanternback_troll": "점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.",
       "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
-      "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다."
+      "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다.",
+      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -7730,7 +7732,10 @@ export const ko_KR: EnTranslations = {
       "gourdlight_trick_bat": "박쥐 변신",
       "gourdlight_trick_skeleton": "덜그럭 뼈다귀",
       "gourdlight_trick_fumes": "초록 연기",
-      "gourdlight_trick_strawling": "짚인형 변장"
+      "gourdlight_trick_strawling": "짚인형 변장",
+      "gourdlight_costume_skeleton": "Skeleton Costume",
+      "gourdlight_costume_ghost": "Ghost Costume",
+      "gourdlight_costume_bat": "Bat Costume"
     },
     "pumpkinHead": {
       "on": "조각한 호박 머리를 썼습니다.",
@@ -7738,12 +7743,21 @@ export const ko_KR: EnTranslations = {
     },
     "jarTrick": "항아리가 펑 하고 열립니다: {trick}!",
     "guise": "부적이 타닥거리더니 짚이 몸을 타고 올라옵니다: {trick}!",
+    "costume": "You drink the draught and change: {trick}!",
+    "titleGranted": "You read the writ. New title earned: {title}.",
+    "titleKnown": "You already hold that title, so you keep the writ.",
+    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
     "itemUse": {
       "pumpkinHead": "사용: 안에서 불이 밝혀진 조각 호박을 투구 위에 쓰거나 벗습니다. 고드라이트 축제의 밤 동안에만. 외형 전용.",
       "trickJar": "사용: 몇 초 동안 무해한 장난을 무작위로 자신에게 겁니다. 고드라이트 축제의 밤 동안에만. 외형 전용.",
       "pouch": "사용: 열면 고드라이트 사탕 {count}개를 받습니다.",
       "strawlingCharm": "사용: {seconds}초 동안 올드 대치그린의 짚인형으로 변합니다. 전투 중에는 사용할 수 없으며 고드라이트 축제의 밤 동안에만 사용할 수 있습니다. 소모되지 않습니다. 외형 전용.",
-      "sweet": "고드라이트 축제의 밤 동안 과자를 얻으러 다니며 받습니다. 이스트브룩의 헤스터 고드윅이 외형 아이템과 교환해 줍니다."
+      "sweet": "고드라이트 축제의 밤 동안 과자를 얻으러 다니며 받습니다. 이스트브룩의 헤스터 고드윅이 외형 아이템과 교환해 줍니다.",
+      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
+      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
+      "broom": "Old Thatchgrin's keepsake. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends."
     },
     "tokenPrice": "{item} {count}개"
   },
@@ -22977,6 +22991,27 @@ export const ko_KR: EnTranslations = {
       "strawling_charm": {
         "name": "짚인형 부적"
       },
+      "rattlebone_draught": {
+        "name": "Rattlebone Draught"
+      },
+      "haunting_draught": {
+        "name": "Haunting Draught"
+      },
+      "batwing_draught": {
+        "name": "Batwing Draught"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Writ of the Gourdlit"
+      },
+      "writ_of_the_trickster": {
+        "name": "Writ of the Trickster"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Writ of the Hollow Grin"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Emberbristle Broom"
+      },
       "membership_token": {
         "name": "멤버십 토큰 (30일)"
       },
@@ -24526,6 +24561,9 @@ export const ko_KR: EnTranslations = {
       },
       "gourdlight_strawling": {
         "name": "짚인형"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Swelling Gourd"
       },
       "stable_horse": {
         "name": "마구간 말"
