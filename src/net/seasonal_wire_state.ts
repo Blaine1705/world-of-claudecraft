@@ -5,8 +5,12 @@
 // `hpf` self delta keys (server/quest_snapshot_wire.ts) and the knock verb.
 //
 // Presentation only: the server decides whether an event runs and what a knock
-// hands over; this mirrors the answers and sends the request.
+// hands over; this mirrors the answers and sends the request. The one local effect of
+// the mirrored season is collision: the event's solid dressing joins this client's
+// collider grid while it runs (seasonal_decor_colliders.ts), so self-prediction walks
+// round the same stalls and bales the server's Sim does.
 import { GOURDLIGHT_PUMPKINS } from '../sim/content/gourdlight_pumpkins';
+import { syncSeasonalDecorColliders } from '../sim/seasonal_decor_colliders';
 import { LanceWireState } from './lance_wire_state';
 import type { QuestWorldWireState } from './quest_world_wire_state';
 
@@ -40,6 +44,8 @@ export function decodeHauntedPumpkinsWire(value: unknown): readonly string[] {
 }
 
 export class SeasonalWireState extends LanceWireState {
+  /** The world's seed (ClientWorld's own cfg), for the decor collider gate. */
+  declare cfg: { seed: number };
   activeSeasonalEvent: string | null = null;
   trickOrTreatedToday: readonly string[] = Object.freeze([]);
   hauntedPumpkinsFound: readonly string[] = Object.freeze([]);
@@ -62,7 +68,10 @@ export class SeasonalWireState extends LanceWireState {
     simTime?: unknown,
   ): void {
     super.applyQuestSelfSnapshot(self, simTime);
-    if (self.season !== undefined) this.activeSeasonalEvent = decodeSeasonWire(self.season);
+    if (self.season !== undefined) {
+      this.activeSeasonalEvent = decodeSeasonWire(self.season);
+      this.syncSeasonalColliders();
+    }
     if (self.tot !== undefined) this.trickOrTreatedToday = decodeTrickOrTreatWire(self.tot);
     if (self.hpf !== undefined) this.hauntedPumpkinsFound = decodeHauntedPumpkinsWire(self.hpf);
   }
@@ -74,5 +83,11 @@ export class SeasonalWireState extends LanceWireState {
     this.activeSeasonalEvent = null;
     this.trickOrTreatedToday = Object.freeze([]);
     this.hauntedPumpkinsFound = Object.freeze([]);
+    this.syncSeasonalColliders();
+  }
+
+  /** The mirrored season's collider gate (a reset before cfg exists has nothing to close). */
+  private syncSeasonalColliders(): void {
+    if (this.cfg) syncSeasonalDecorColliders(this.cfg.seed, this.activeSeasonalEvent);
   }
 }

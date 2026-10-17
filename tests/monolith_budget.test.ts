@@ -2388,7 +2388,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 2327 -> 2288 with the open Fenbridge: the palisade's
     // full-height wall arm and the gate-arch jamb block retired with the
     // ring. wc -l. Exact count.
-    ceiling: 2288,
+    // LOWERED 2288 -> 2286 with Gourdlight Eve's decor collision: the mine
+    // mound footprint moved to mine_mound.ts, paying for setColliderGateOpen's
+    // late-built gate (the decor set itself is seasonal_decor_colliders.ts).
+    // wc -l. Exact count.
+    ceiling: 2286,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

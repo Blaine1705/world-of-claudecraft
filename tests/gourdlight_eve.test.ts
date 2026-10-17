@@ -33,6 +33,7 @@ import {
   seasonalSaveFragment,
   updateSeasonal,
 } from '../src/sim/seasonal';
+import { syncSeasonalDecorColliders } from '../src/sim/seasonal_decor_colliders';
 import {
   KEEPER_POST_RINGS,
   resolvedKeeperPosts,
@@ -104,7 +105,15 @@ describe('the seasonal core', () => {
 
   it('places the keeper clear of every collider', () => {
     const { x, z } = GOURDLIGHT_KEEPER_NPC.pos;
+    // the town's own colliders (an earlier test left the event's dressing standing: the
+    // collider grid is shared per seed in one process, so close its gate first)...
+    syncSeasonalDecorColliders(WORLD_SEED, null);
     expect(isBlocked(WORLD_SEED, x, z, 0.5)).toBe(false);
+    // ...while with the event's dressing up she stands inside her own booth, behind the
+    // counter, where no customer walks
+    syncSeasonalDecorColliders(WORLD_SEED, GOURDLIGHT_EVE_ID);
+    expect(isBlocked(WORLD_SEED, x, z, 0.5)).toBe(true);
+    syncSeasonalDecorColliders(WORLD_SEED, null);
   });
 });
 

@@ -36,7 +36,12 @@ City decorations are presentation: the anchor rules live in
 `src/sim/content/gourdlight_eve_decor.ts`, the placement resolver (anchors to lamps,
 NPCs and town hubs, rejects or nudges anything overlapping a collider or standing
 on a road) in `src/sim/seasonal_decor_layout.ts`, pinned against the live world by
-`tests/seasonal_decor_layout.test.ts`; the renderer draws the resolved list.
+`tests/seasonal_decor_layout.test.ts`; the renderer draws the resolved list. The solid
+pieces (stalls, hay bales, big lit pumpkins, corn shocks) also COLLIDE while the event
+runs: `src/sim/seasonal_decor_colliders.ts` builds them off the same resolved list into
+one gated set of the static collider grid (`setColliderGateOpen`), re-applied every tick
+by `updateSeasonal` and on every `season` change by the online mirror; pinned (never on a
+road, never cutting a town off) by `tests/seasonal_decor_colliders.test.ts`.
 
 Fairness and replay rules:
 - A trick body (bat, skeleton) hides class, weapon and casts, so the Jar refuses in
