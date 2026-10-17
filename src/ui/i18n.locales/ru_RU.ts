@@ -22181,4 +22181,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gourdlight_rounds.completion':
     'Пять дверей, и все пальцы на месте. Держите мешочек сладостей на дорогу домой. Приходите завтра, двери откроются снова.',
   'entities.quests.q_gourdlight_rounds.objectives.0.label': 'Двери, в которые вы постучали',
+  'seasonal.tricks.gourdlight_trick_strawling': 'Облик соломенника',
+  'seasonal.guise': 'Оберег трещит, и солома ползёт по вам: {trick}!',
+  'seasonal.itemUse.strawlingCharm':
+    'Использование: превращает вас в соломенника Старого Соломозуба на {seconds} сек. Нельзя в бою, только во время Ночи Тыквенных Огней. Не расходуется. Только внешний вид.',
+  'entities.items.thatchgrin_sweet_sack.name': 'Мешок конфет Соломозуба',
+  'entities.items.strawling_charm.name': 'Оберег соломенника',
+  'entities.mobs.gourdlight_thatchgrin.name': 'Старый Соломозуб',
+  'entities.mobs.gourdlight_crow.name': 'Ворона Тыквенных Огней',
+  'entities.mobs.gourdlight_strawling.name': 'Соломенник',
 };

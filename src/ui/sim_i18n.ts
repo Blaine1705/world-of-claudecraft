@@ -13,6 +13,7 @@
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
 import { CARVED_PUMPKIN_HEAD_ID, GOURDLIGHT_TRICKS } from '../sim/content/gourdlight_eve';
+import { STRAWLING_GUISE } from '../sim/content/gourdlight_eve_scarecrow';
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import {
   FACTION_IDS,
@@ -1656,6 +1657,10 @@ const baseEnTable = {
   'mechanic.balgathMoltenFen': 'Molten Fen',
   // The meteor volley the eruption calls down (mob/boss_starwake_meteors.ts).
   'mechanic.balgathStarDebris': 'Star Debris',
+  // Old Thatchgrin's thrown gourd and the burning stubble it leaves
+  // (seasonal/scarecrow_kit.ts, content/gourdlight_eve_scarecrow.ts THATCHGRIN_KIT).
+  'mechanic.thatchgrinKindledGourd': 'Kindled Gourd',
+  'mechanic.thatchgrinSmolderingChaff': 'Smoldering Chaff',
   // The drill yard's effigy: its plank hide, and a player's own open window on it
   // (src/sim/muster_effigy.ts EFFIGY_WARD_NAME / EFFIGY_OPENED_NAME).
   'aura.effigyPlankHide': 'Plank Hide',
@@ -17915,6 +17920,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Wake of the Fallen Star': 'mechanic.balgathStarwake',
   'Molten Fen': 'mechanic.balgathMoltenFen',
   'Star Debris': 'mechanic.balgathStarDebris',
+  // Old Thatchgrin's kit; byte-identical to THATCHGRIN_KIT.gourd.name and .chaff.name.
+  'Kindled Gourd': 'mechanic.thatchgrinKindledGourd',
+  'Smoldering Chaff': 'mechanic.thatchgrinSmolderingChaff',
   // The Straw Foreman's plank hide and a player's window on it (muster_effigy.ts);
   // byte-identical to EFFIGY_WARD_NAME and EFFIGY_OPENED_NAME.
   'Plank Hide': 'aura.effigyPlankHide',
@@ -18634,9 +18642,11 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
 
 // Gourdlight Eve's cosmetic auras (src/sim/seasonal/seasonal_cosmetics.ts): each trick
 // by its id's catalog name, the worn head by its item's name.
-const SEASONAL_TRICK_AURA_IDS: ReadonlyMap<string, string> = new Map(
-  GOURDLIGHT_TRICKS.map((trick) => [trick.name, trick.id]),
-);
+const SEASONAL_TRICK_AURA_IDS: ReadonlyMap<string, string> = new Map([
+  ...GOURDLIGHT_TRICKS.map((trick): [string, string] => [trick.name, trick.id]),
+  // the Strawling Charm's look (Old Thatchgrin's cosmetic)
+  [STRAWLING_GUISE.name, STRAWLING_GUISE.id],
+]);
 
 export function localizeSimAuraName(name: string): string | null {
   const trickId = SEASONAL_TRICK_AURA_IDS.get(name);

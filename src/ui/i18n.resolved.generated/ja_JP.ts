@@ -7729,17 +7729,20 @@ export const ja_JP: EnTranslations = {
     "tricks": {
       "gourdlight_trick_bat": "コウモリ化",
       "gourdlight_trick_skeleton": "カタカタ骨",
-      "gourdlight_trick_fumes": "緑の煙"
+      "gourdlight_trick_fumes": "緑の煙",
+      "gourdlight_trick_strawling": "藁人形の扮装"
     },
     "pumpkinHead": {
       "on": "彫りカボチャの頭をかぶった。",
       "off": "彫りカボチャの頭を外した。"
     },
     "jarTrick": "壺がぽんと開いた：{trick}！",
+    "guise": "お守りがぱちぱちと鳴り、藁が体を這い上がる：{trick}！",
     "itemUse": {
       "pumpkinHead": "使用：内側から灯る彫りカボチャを兜の上からかぶる・外す。ゴードライトの宵の間のみ。見た目のみ。",
       "trickJar": "使用：数秒間、無害ないたずらをランダムに自分にかける。ゴードライトの宵の間のみ。見た目のみ。",
       "pouch": "使用：開けるとゴードライトの菓子を{count}個受け取る。",
+      "strawlingCharm": "使用：{seconds}秒間、オールド・サッチグリンの藁人形の姿になる。戦闘中は使えず、ゴードライトの宵の間のみ。消費されない。見た目のみ。",
       "sweet": "ゴードライトの宵の間にお菓子をねだって手に入る。イーストブルックのヘスター・ゴードウィックが見た目アイテムと交換してくれる。"
     },
     "tokenPrice": "{item} ×{count}"
@@ -22968,6 +22971,12 @@ export const ja_JP: EnTranslations = {
       "jar_of_mischief": {
         "name": "いたずらの壺"
       },
+      "thatchgrin_sweet_sack": {
+        "name": "サッチグリンの菓子袋"
+      },
+      "strawling_charm": {
+        "name": "藁人形のお守り"
+      },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"
       },
@@ -24508,6 +24517,15 @@ export const ja_JP: EnTranslations = {
       },
       "muster_effigy": {
         "name": "藁の監督"
+      },
+      "gourdlight_thatchgrin": {
+        "name": "オールド・サッチグリン"
+      },
+      "gourdlight_crow": {
+        "name": "ゴードライトのカラス"
+      },
+      "gourdlight_strawling": {
+        "name": "藁人形"
       },
       "stable_horse": {
         "name": "厩舎の馬"

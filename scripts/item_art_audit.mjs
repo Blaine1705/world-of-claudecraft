@@ -165,8 +165,9 @@ const build = await buildItemArtAudit({
     // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
     // + Gourdlight Eve's four painted event items (gourdlight-eve-icons-2026-10-16):
     // 2043 / 2072, measured with `--verify-only`.
-    catalogCount: 2043,
-    liveItemCount: 2072,
+    // + Old Thatchgrin's two spoils (gourdlight-eve-thatchgrin-icons-2026-10-17): 2045 / 2074.
+    catalogCount: 2045,
+    liveItemCount: 2074,
     // Five referral rewards reuse existing art until their own paintings land.
     pendingArtCount: 142,
     generatedHeroicDefinitions: 116,

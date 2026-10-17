@@ -879,11 +879,12 @@ describe('item-art audit builder', () => {
       // integration, re-measured.
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
       // 2043 / 2072 with Gourdlight Eve's four event items, re-measured the same way.
-      catalogSha256: '36d41f42c9932adf71a6fe4d19d64a8ceeb532c5e9048ad9dfd1611bf608cbdb',
-      catalogBytes: 1114297,
+      // 2045 / 2074 with Old Thatchgrin's two spoils, re-measured the same way.
+      catalogSha256: '2953c889770fa1e28eef92381bb8829687fd3502c5f7629ddf53645c2f349567',
+      catalogBytes: 1115331,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2043,
-      liveItemCount: 2072,
+      catalogCount: 2045,
+      liveItemCount: 2074,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -901,7 +902,7 @@ describe('item-art audit builder', () => {
         identity: 44,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'd2bcab8659a83ec7b149fe1c519680b9cfc63f182123e8c1a9ba10a5c3bfce04',
+      shippingCatalogSha256: '5353e345958309d7a7e37d23ad7d63b05e8a28dc44b3ae1f91a86cba66a5e096',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -152,6 +152,10 @@ import {
   GOURDLIGHT_EVE_NPCS,
   GOURDLIGHT_EVE_QUESTS,
 } from './content/gourdlight_eve';
+import {
+  GOURDLIGHT_SCARECROW_ITEMS,
+  GOURDLIGHT_SCARECROW_MOBS,
+} from './content/gourdlight_eve_scarecrow';
 import { GRAVEWYRM_SANCTUM_MOBS } from './content/gravewyrm_sanctum';
 import { GRAVEWYRM_SANCTUM_ITEMS } from './content/gravewyrm_sanctum_items';
 import {
@@ -472,6 +476,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   HOARD_ITEMS,
   QUEST_LEVELING_GEAR_ITEMS,
   GOURDLIGHT_EVE_ITEMS,
+  GOURDLIGHT_SCARECROW_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -479,6 +484,9 @@ export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 
 export const MOBS: Record<string, MobTemplate> = {
   ...BUDDY_MOBS,
+  // Gourdlight Eve's field boss and his adds (raised only while the event runs,
+  // seasonal/scarecrow.ts; in no camp and no world-boss slot).
+  ...GOURDLIGHT_SCARECROW_MOBS,
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
   ...MUSTER_MOBS,

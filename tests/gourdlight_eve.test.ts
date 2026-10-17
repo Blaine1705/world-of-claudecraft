@@ -88,9 +88,7 @@ describe('the seasonal core', () => {
     sim.chat('/dev season auto');
     sim.tick();
     expect(sim.activeSeasonalEvent).toBe(GOURDLIGHT_EVE_ID);
-    expect(
-      activeSeasonalEventOf({ hostEventId: 'x', devOverride: undefined, lastActive: null }),
-    ).toBe('x');
+    expect(activeSeasonalEventOf({ hostEventId: 'x', devOverride: undefined })).toBe('x');
   });
 
   it('places the keeper clear of every collider', () => {

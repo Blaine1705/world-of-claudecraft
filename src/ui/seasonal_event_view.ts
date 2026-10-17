@@ -58,6 +58,13 @@ export function seasonalEventPresentation(event: SeasonalEvent): SeasonalEventPr
         flashText: t('seasonal.trickOrTreat.trickFlash', { trick }),
       };
     }
+    case 'guise': {
+      const trick = seasonalTrickName(event.trick);
+      return {
+        logText: t('seasonal.guise', { trick }),
+        flashText: t('seasonal.trickOrTreat.trickFlash', { trick }),
+      };
+    }
     default:
       return null;
   }

@@ -3876,6 +3876,17 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'collectItems', itemIds: ['carved_pumpkin_head'] },
     feat: true,
   },
+  // Old Thatchgrin, Gourdlight Eve's field boss (seasonal/scarecrow.ts): a Feat for the
+  // same reason as the Guise above, he stands only while the event runs. Appended at the END.
+  feat_old_thatchgrin: {
+    id: 'feat_old_thatchgrin',
+    name: 'Stubble and Ash',
+    desc: 'Help bring down Old Thatchgrin in his pumpkin patch past Boar Meadow while Gourdlight Eve runs.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'stat', stat: 'thatchgrinKills', count: 1 },
+    feat: true,
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

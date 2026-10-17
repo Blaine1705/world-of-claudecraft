@@ -19,6 +19,7 @@ import {
 import { createNpc } from '../entity';
 import type { SimContext } from '../sim_context';
 import type { NpcDef } from '../types';
+import { updateScarecrow } from './scarecrow';
 import {
   pumpkinHeadAura,
   SEASONAL_COSMETIC_AURA_IDS,
@@ -62,6 +63,8 @@ export function updateSeasonal(ctx: SimContext): void {
       }
     }
   }
+  // The field boss rises and leaves with his event (and runs his fight while he lives).
+  updateScarecrow(ctx, active);
   if (active === null) return;
   raiseKeeper(ctx, active);
   for (const meta of ctx.players.values()) {

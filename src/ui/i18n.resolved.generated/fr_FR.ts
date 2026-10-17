@@ -7729,17 +7729,20 @@ export const fr_FR: EnTranslations = {
     "tricks": {
       "gourdlight_trick_bat": "Batty",
       "gourdlight_trick_skeleton": "Rattled Bones",
-      "gourdlight_trick_fumes": "Green Fumes"
+      "gourdlight_trick_fumes": "Green Fumes",
+      "gourdlight_trick_strawling": "Strawling Guise"
     },
     "pumpkinHead": {
       "on": "You put on the Carved Pumpkin Head.",
       "off": "You take off the Carved Pumpkin Head."
     },
     "jarTrick": "The jar pops open: {trick}!",
+    "guise": "The charm crackles and the straw climbs over you: {trick}!",
     "itemUse": {
       "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Only during Gourdlight Eve. Cosmetic.",
       "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.",
       "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
+      "strawlingCharm": "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat, and only during Gourdlight Eve. Never consumed. Cosmetic.",
       "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them."
     },
     "tokenPrice": "{count} {item}"
@@ -22968,6 +22971,12 @@ export const fr_FR: EnTranslations = {
       "jar_of_mischief": {
         "name": "Jar of Mischief"
       },
+      "thatchgrin_sweet_sack": {
+        "name": "Thatchgrin's Sweet Sack"
+      },
+      "strawling_charm": {
+        "name": "Strawling Charm"
+      },
       "membership_token": {
         "name": "Membership Token (30 Days)"
       },
@@ -24508,6 +24517,15 @@ export const fr_FR: EnTranslations = {
       },
       "muster_effigy": {
         "name": "Straw Foreman"
+      },
+      "gourdlight_thatchgrin": {
+        "name": "Old Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Gourdlight Crow"
+      },
+      "gourdlight_strawling": {
+        "name": "Strawling"
       },
       "stable_horse": {
         "name": "Cheval d'écurie"

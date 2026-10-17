@@ -6167,7 +6167,7 @@ export class Sim {
     worldPvpMod.updateWorldPvp(this.ctx); // the /pvp clock, zone pass + books sweep; zero rng
     lap?.('worldPvp');
     hillMod.updateHill(this.ctx); // King of the Hill (pvp/hill.ts): spawns draw a PRIVATE rng
-    seasonalMod.updateSeasonal(this.ctx); // seasonal events open/close (zero rng)
+    seasonalMod.updateSeasonal(this.ctx); // seasonal events + field boss (rng only in his pull)
     lap?.('hill');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
     // matching on the sim clock), so appending it here cannot fork the draw order.

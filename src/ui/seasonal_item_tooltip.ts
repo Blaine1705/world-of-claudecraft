@@ -10,6 +10,12 @@ import {
   GOURDLIGHT_TREAT_POUCH_ID,
   JAR_OF_MISCHIEF_ID,
 } from '../sim/content/gourdlight_eve';
+import {
+  STRAWLING_CHARM_ID,
+  STRAWLING_GUISE,
+  THATCHGRIN_SACK_ID,
+  THATCHGRIN_SACK_SWEETS,
+} from '../sim/content/gourdlight_eve_scarecrow';
 import type { ItemDef } from '../sim/types';
 import { formatNumber, t } from './i18n';
 import { createTooltipLine } from './tooltip_line';
@@ -25,6 +31,12 @@ export function seasonalItemTooltipText(item: Pick<ItemDef, 'id'>): string | nul
       return t('seasonal.itemUse.pouch', { count: formatNumber(GOURDLIGHT_POUCH_SWEETS) });
     case GOURDLIGHT_SWEET_ID:
       return t('seasonal.itemUse.sweet');
+    case THATCHGRIN_SACK_ID:
+      return t('seasonal.itemUse.pouch', { count: formatNumber(THATCHGRIN_SACK_SWEETS) });
+    case STRAWLING_CHARM_ID:
+      return t('seasonal.itemUse.strawlingCharm', {
+        seconds: formatNumber(STRAWLING_GUISE.duration),
+      });
     default:
       return null;
   }

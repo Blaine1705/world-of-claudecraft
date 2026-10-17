@@ -6190,6 +6190,14 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": true,
     "crest": "/ui/deeds/feat_gourdlight_guise.webp"
+  },
+  {
+    "id": "feat_old_thatchgrin",
+    "name": "Stubble and Ash",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "crest": "/ui/deeds/feat_old_thatchgrin.webp"
   }
 ];
 

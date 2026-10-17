@@ -7990,6 +7990,19 @@
         "jar_of_mischief"
       ],
       "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-thatchgrin-icons-2026-10-17",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py): Old Thatchgrin's sweet sack (the treat pouch's sackcloth shape with the shipped sweets) and the Strawling Charm (a straw doll built from the scarecrow factory's own straw, scripts/assets/gourdlight_eve/scarecrow.py), modelled in the same script for their icons. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/icons.py",
+      "itemIds": [
+        "strawling_charm",
+        "thatchgrin_sweet_sack"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
     }
   ]
 }

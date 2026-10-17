@@ -7729,17 +7729,20 @@ export const en_XA: EnTranslations = {
     "tricks": {
       "gourdlight_trick_bat": "[Ɓáţţý]",
       "gourdlight_trick_skeleton": "[Ŕáţţļéð Ɓóñéš]",
-      "gourdlight_trick_fumes": "[Ĝŕééñ Ƒúɱéš]"
+      "gourdlight_trick_fumes": "[Ĝŕééñ Ƒúɱéš]",
+      "gourdlight_trick_strawling": "[Šţŕáŵļíñĝ Ĝúíšé]"
     },
     "pumpkinHead": {
       "on": "[Ýóú þúţ óñ ţĥé Çáŕʋéð Þúɱþķíñ Ĥéáð.]",
       "off": "[Ýóú ţáķé óƒƒ ţĥé Çáŕʋéð Þúɱþķíñ Ĥéáð.]"
     },
     "jarTrick": "[Ţĥé ĵáŕ þóþš óþéñ: {trick}!]",
+    "guise": "[Ţĥé çĥáŕɱ çŕáçķļéš áñð ţĥé šţŕáŵ çļíɱƀš óʋéŕ ýóú: {trick}!]",
     "itemUse": {
       "pumpkinHead": "[Úšé: Þúţ óñ óŕ ţáķé óƒƒ á çáŕʋéð þúɱþķíñ ļíţ ƒŕóɱ íñšíðé, ŵóŕñ óʋéŕ ýóúŕ ĥéļɱéţ. Óñļý ðúŕíñĝ Ĝóúŕðļíĝĥţ Éʋé. Çóšɱéţíç.]",
       "trickJar": "[Úšé: Þļáýš á ŕáñðóɱ ĥáŕɱļéšš ţŕíçķ óñ ýóú ƒóŕ á ƒéŵ šéçóñðš. Óñļý ðúŕíñĝ Ĝóúŕðļíĝĥţ Éʋé. Çóšɱéţíç.]",
       "pouch": "[Úšé: Óþéñ íţ ţó ŕéçéíʋé {count} Ĝóúŕðļíĝĥţ Šŵééţš.]",
+      "strawlingCharm": "[Úšé: Ɓéçóɱé óñé óƒ Óļð Ţĥáţçĥĝŕíñ'š šţŕáŵļíñĝš ƒóŕ {seconds} šéçóñðš. Ñóţ íñ çóɱƀáţ, áñð óñļý ðúŕíñĝ Ĝóúŕðļíĝĥţ Éʋé. Ñéʋéŕ çóñšúɱéð. Çóšɱéţíç.]",
       "sweet": "[Éáŕñéð ƀý ţŕíçķ-óŕ-ţŕéáţíñĝ ðúŕíñĝ Ĝóúŕðļíĝĥţ Éʋé. Ĥéšţéŕ Ĝóúŕðŵíçķ íñ Éášţƀŕóóķ ţŕáðéš çóšɱéţíçš ƒóŕ ţĥéɱ.]"
     },
     "tokenPrice": "[{count} {item}]"
@@ -22968,6 +22971,12 @@ export const en_XA: EnTranslations = {
       "jar_of_mischief": {
         "name": "[Ĵáŕ óƒ Ɱíšçĥíéƒ]"
       },
+      "thatchgrin_sweet_sack": {
+        "name": "[Ţĥáţçĥĝŕíñ'š Šŵééţ Šáçķ]"
+      },
+      "strawling_charm": {
+        "name": "[Šţŕáŵļíñĝ Çĥáŕɱ]"
+      },
       "membership_token": {
         "name": "[Ɱéɱƀéŕšĥíþ Ţóķéñ (30 Ðáýš)]"
       },
@@ -24508,6 +24517,15 @@ export const en_XA: EnTranslations = {
       },
       "muster_effigy": {
         "name": "[Šţŕáŵ Ƒóŕéɱáñ]"
+      },
+      "gourdlight_thatchgrin": {
+        "name": "[Óļð Ţĥáţçĥĝŕíñ]"
+      },
+      "gourdlight_crow": {
+        "name": "[Ĝóúŕðļíĝĥţ Çŕóŵ]"
+      },
+      "gourdlight_strawling": {
+        "name": "[Šţŕáŵļíñĝ]"
       },
       "stable_horse": {
         "name": "[Šţáƀļé Ĥóŕšé]"

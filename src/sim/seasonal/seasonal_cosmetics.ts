@@ -6,6 +6,7 @@
 // cleanse, right-click cancel) off them: the head comes off with its own item,
 // a trick runs out on its own short timer.
 import { GOURDLIGHT_TRICKS, PUMPKIN_HEAD_AURA_ID } from '../content/gourdlight_eve';
+import { STRAWLING_GUISE } from '../content/gourdlight_eve_scarecrow';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 
@@ -13,7 +14,14 @@ import type { Aura, Entity } from '../types';
 export const SEASONAL_COSMETIC_AURA_IDS: ReadonlySet<string> = new Set([
   PUMPKIN_HEAD_AURA_ID,
   ...GOURDLIGHT_TRICKS.map((trick) => trick.id),
+  STRAWLING_GUISE.id,
 ]);
+
+/** Every body-swap look a seasonal toy or trick plays (one at a time). */
+const TRICK_AURA_IDS: readonly string[] = [
+  ...GOURDLIGHT_TRICKS.map((trick) => trick.id),
+  STRAWLING_GUISE.id,
+];
 
 export function pumpkinHeadAura(sourceId: number): Aura {
   return {
@@ -57,7 +65,29 @@ export function stripSeasonalAura(ctx: SimContext, e: Entity, auraId: string): b
 
 /** Any trick currently playing on this body (one at a time: a new trick replaces it). */
 export function stripTricks(ctx: SimContext, e: Entity): void {
-  for (const trick of GOURDLIGHT_TRICKS) stripSeasonalAura(ctx, e, trick.id);
+  for (const id of TRICK_AURA_IDS) stripSeasonalAura(ctx, e, id);
+}
+
+/** The Strawling Charm's look: Old Thatchgrin's own strawling body, for a short while. */
+export function strawlingGuiseAura(sourceId: number): Aura {
+  return {
+    id: STRAWLING_GUISE.id,
+    name: STRAWLING_GUISE.name,
+    kind: 'seasonal_cosmetic',
+    value: 0,
+    remaining: STRAWLING_GUISE.duration,
+    duration: STRAWLING_GUISE.duration,
+    undispellable: true,
+    sourceId,
+    school: 'physical',
+  };
+}
+
+/** Wear the strawling guise (replacing any trick already playing). */
+export function playStrawlingGuise(ctx: SimContext, e: Entity): string {
+  stripTricks(ctx, e);
+  ctx.applyAura(e, strawlingGuiseAura(e.id));
+  return STRAWLING_GUISE.id;
 }
 
 /** Play trick `trickIndex` on `e` (replacing any trick already playing). */

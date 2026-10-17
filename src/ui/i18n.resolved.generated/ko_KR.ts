@@ -7729,17 +7729,20 @@ export const ko_KR: EnTranslations = {
     "tricks": {
       "gourdlight_trick_bat": "박쥐 변신",
       "gourdlight_trick_skeleton": "덜그럭 뼈다귀",
-      "gourdlight_trick_fumes": "초록 연기"
+      "gourdlight_trick_fumes": "초록 연기",
+      "gourdlight_trick_strawling": "짚인형 변장"
     },
     "pumpkinHead": {
       "on": "조각한 호박 머리를 썼습니다.",
       "off": "조각한 호박 머리를 벗었습니다."
     },
     "jarTrick": "항아리가 펑 하고 열립니다: {trick}!",
+    "guise": "부적이 타닥거리더니 짚이 몸을 타고 올라옵니다: {trick}!",
     "itemUse": {
       "pumpkinHead": "사용: 안에서 불이 밝혀진 조각 호박을 투구 위에 쓰거나 벗습니다. 고드라이트 축제의 밤 동안에만. 외형 전용.",
       "trickJar": "사용: 몇 초 동안 무해한 장난을 무작위로 자신에게 겁니다. 고드라이트 축제의 밤 동안에만. 외형 전용.",
       "pouch": "사용: 열면 고드라이트 사탕 {count}개를 받습니다.",
+      "strawlingCharm": "사용: {seconds}초 동안 올드 대치그린의 짚인형으로 변합니다. 전투 중에는 사용할 수 없으며 고드라이트 축제의 밤 동안에만 사용할 수 있습니다. 소모되지 않습니다. 외형 전용.",
       "sweet": "고드라이트 축제의 밤 동안 과자를 얻으러 다니며 받습니다. 이스트브룩의 헤스터 고드윅이 외형 아이템과 교환해 줍니다."
     },
     "tokenPrice": "{item} {count}개"
@@ -22968,6 +22971,12 @@ export const ko_KR: EnTranslations = {
       "jar_of_mischief": {
         "name": "장난의 항아리"
       },
+      "thatchgrin_sweet_sack": {
+        "name": "대치그린의 사탕 자루"
+      },
+      "strawling_charm": {
+        "name": "짚인형 부적"
+      },
       "membership_token": {
         "name": "멤버십 토큰 (30일)"
       },
@@ -24508,6 +24517,15 @@ export const ko_KR: EnTranslations = {
       },
       "muster_effigy": {
         "name": "짚 감독관"
+      },
+      "gourdlight_thatchgrin": {
+        "name": "올드 대치그린"
+      },
+      "gourdlight_crow": {
+        "name": "고드라이트 까마귀"
+      },
+      "gourdlight_strawling": {
+        "name": "짚인형"
       },
       "stable_horse": {
         "name": "마구간 말"

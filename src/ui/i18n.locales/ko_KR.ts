@@ -21770,4 +21770,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gourdlight_rounds.completion':
     '문 다섯 개를 두드렸는데 손가락도 다 멀쩡하네요. 자, 집에 가는 길에 먹을 과자 주머니예요. 내일 또 오세요. 문은 다시 열리니까요.',
   'entities.quests.q_gourdlight_rounds.objectives.0.label': '두드린 문',
+  'seasonal.tricks.gourdlight_trick_strawling': '짚인형 변장',
+  'seasonal.guise': '부적이 타닥거리더니 짚이 몸을 타고 올라옵니다: {trick}!',
+  'seasonal.itemUse.strawlingCharm':
+    '사용: {seconds}초 동안 올드 대치그린의 짚인형으로 변합니다. 전투 중에는 사용할 수 없으며 고드라이트 축제의 밤 동안에만 사용할 수 있습니다. 소모되지 않습니다. 외형 전용.',
+  'entities.items.thatchgrin_sweet_sack.name': '대치그린의 사탕 자루',
+  'entities.items.strawling_charm.name': '짚인형 부적',
+  'entities.mobs.gourdlight_thatchgrin.name': '올드 대치그린',
+  'entities.mobs.gourdlight_crow.name': '고드라이트 까마귀',
+  'entities.mobs.gourdlight_strawling.name': '짚인형',
 };

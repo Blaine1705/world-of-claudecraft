@@ -106,7 +106,7 @@ import { placeMobileStationFromItem } from './professions/mobile_station';
 import { useRecipePatternItem } from './professions/pattern_items';
 import { refreshModsForEquipmentChange } from './progression/talents';
 import { useForgebreakerEmber } from './quests/forgebreaker_ember';
-import { openGourdlightPouch, useSeasonalItem } from './seasonal';
+import { openGourdlightPouch, openThatchgrinSack, useSeasonalItem } from './seasonal';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { usePassingStone } from './tutorial/death_lesson';
@@ -994,6 +994,7 @@ export function useItem(
   if (p.dead) return;
   if (def.use?.type === 'container') {
     if (def.use.container === 'gourdlight_pouch') openGourdlightPouch(ctx, meta, consumeOneUnit);
+    else if (def.use.container === 'thatchgrin_sack') openThatchgrinSack(ctx, meta, consumeOneUnit);
     else openEmissaryCache(ctx, meta, consumeOneUnit);
     return;
   }

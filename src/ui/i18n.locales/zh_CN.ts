@@ -20711,4 +20711,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gourdlight_rounds.completion':
     '敲了五扇门，手指还都在。拿着，这袋糖果让你在回家路上吃。明天再来，门会再次打开。',
   'entities.quests.q_gourdlight_rounds.objectives.0.label': '已敲的门',
+  'seasonal.tricks.gourdlight_trick_strawling': '稻草人伪装',
+  'seasonal.guise': '护符噼啪作响，稻草爬满了你的全身：{trick}！',
+  'seasonal.itemUse.strawlingCharm':
+    '使用：变成老稻草狞笑的稻草小人，持续{seconds}秒。战斗中无法使用，仅限南瓜灯之夜期间。不会消耗。仅外观。',
+  'entities.items.thatchgrin_sweet_sack.name': '稻草狞笑的糖果袋',
+  'entities.items.strawling_charm.name': '稻草小人护符',
+  'entities.mobs.gourdlight_thatchgrin.name': '老稻草狞笑',
+  'entities.mobs.gourdlight_crow.name': '南瓜灯乌鸦',
+  'entities.mobs.gourdlight_strawling.name': '稻草小人',
 };

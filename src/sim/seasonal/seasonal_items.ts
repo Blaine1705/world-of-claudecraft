@@ -9,13 +9,19 @@ import {
   GOURDLIGHT_TRICKS,
   PUMPKIN_HEAD_AURA_ID,
 } from '../content/gourdlight_eve';
+import { THATCHGRIN_SACK_SWEETS } from '../content/gourdlight_eve_scarecrow';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload } from '../types';
-import { playTrick, pumpkinHeadAura, stripSeasonalAura } from './seasonal_cosmetics';
+import {
+  playStrawlingGuise,
+  playTrick,
+  pumpkinHeadAura,
+  stripSeasonalAura,
+} from './seasonal_cosmetics';
 import { activeSeasonalEventOf } from './seasonal_state';
 
-export type SeasonalItemAction = 'pumpkinHead' | 'trickJar';
+export type SeasonalItemAction = 'pumpkinHead' | 'trickJar' | 'strawlingCharm';
 
 function eventClosed(ctx: SimContext, meta: PlayerMeta): boolean {
   if (activeSeasonalEventOf(ctx.seasonal) !== null) return false;
@@ -53,10 +59,30 @@ export function useSeasonalItem(
     ctx.error(meta.entityId, "You can't do that while in combat.");
     return;
   }
+  // The Strawling Charm (Old Thatchgrin's cosmetic): reusable, never consumed, no rng.
+  if (action === 'strawlingCharm') {
+    const guise = playStrawlingGuise(ctx, p);
+    ctx.emit({ type: 'seasonal', what: 'guise', trick: guise, pid: meta.entityId });
+    return;
+  }
   consumeOne();
   const index = ctx.rng.int(0, GOURDLIGHT_TRICKS.length - 1);
   const trick = playTrick(ctx, p, index, p.id);
   ctx.emit({ type: 'seasonal', what: 'jarTrick', trick, pid: meta.entityId });
+}
+
+/** Old Thatchgrin's sweet sack, opened like the rounds pouch (a full bag keeps it). */
+export function openThatchgrinSack(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  consumeOne: () => ItemInstancePayload | undefined,
+): void {
+  if (!ctx.canAddItem(GOURDLIGHT_SWEET_ID, THATCHGRIN_SACK_SWEETS, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId, GOURDLIGHT_SWEET_ID);
+    return;
+  }
+  consumeOne();
+  ctx.addItem(GOURDLIGHT_SWEET_ID, THATCHGRIN_SACK_SWEETS, meta.entityId);
 }
 
 /** The rounds quest's pouch: opened, it hands over its sweets and is spent. A

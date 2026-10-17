@@ -21774,4 +21774,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gourdlight_rounds.completion':
     '五つの戸を叩いて、指もちゃんと全部ある。はい、帰り道のお菓子袋よ。明日また来て。戸はまた開くから。',
   'entities.quests.q_gourdlight_rounds.objectives.0.label': '叩いた戸',
+  'seasonal.tricks.gourdlight_trick_strawling': '藁人形の扮装',
+  'seasonal.guise': 'お守りがぱちぱちと鳴り、藁が体を這い上がる：{trick}！',
+  'seasonal.itemUse.strawlingCharm':
+    '使用：{seconds}秒間、オールド・サッチグリンの藁人形の姿になる。戦闘中は使えず、ゴードライトの宵の間のみ。消費されない。見た目のみ。',
+  'entities.items.thatchgrin_sweet_sack.name': 'サッチグリンの菓子袋',
+  'entities.items.strawling_charm.name': '藁人形のお守り',
+  'entities.mobs.gourdlight_thatchgrin.name': 'オールド・サッチグリン',
+  'entities.mobs.gourdlight_crow.name': 'ゴードライトのカラス',
+  'entities.mobs.gourdlight_strawling.name': '藁人形',
 };

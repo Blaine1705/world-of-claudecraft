@@ -3945,6 +3945,9 @@ const ITEM_ENTITY_IDS = [
   'gourdlight_treat_pouch',
   'carved_pumpkin_head',
   'jar_of_mischief',
+  // Old Thatchgrin's spoils (content/gourdlight_eve_scarecrow.ts).
+  'thatchgrin_sweet_sack',
+  'strawling_charm',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3959,6 +3962,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gourdlight_treat_pouch: 'Gourdlight Treat Pouch',
   carved_pumpkin_head: 'Carved Pumpkin Head',
   jar_of_mischief: 'Jar of Mischief',
+  // Old Thatchgrin (content/gourdlight_eve_scarecrow.ts).
+  thatchgrin_sweet_sack: "Thatchgrin's Sweet Sack",
+  strawling_charm: 'Strawling Charm',
   // Mirefen world-boss spoils.
   foremans_barrowmaul: "Foreman's Barrowmaul",
   // The quest tool the world boss's level-spread mechanic runs on, not a spoil.

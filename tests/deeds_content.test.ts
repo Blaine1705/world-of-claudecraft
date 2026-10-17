@@ -152,7 +152,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // release/v0.45.0 merge over the Buried Hoards Coinsack catch.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, 3810.
     // + Gourdlight Eve's zero-Renown Feat (feat_gourdlight_guise): 347, 3810.
-    expect(DEED_ORDER.length).toBe(347);
+    // + Old Thatchgrin's zero-Renown Feat (feat_old_thatchgrin): 348, 3810.
+    expect(DEED_ORDER.length).toBe(348);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3810);
   });
 
@@ -204,7 +205,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the release's ferry round trip (exp_harbor_to_harbor).
       exploration: 22,
       // +1 Gourdlight Eve's seasonal Feat (feat_gourdlight_guise).
-      feat: 4,
+      // +1 its field boss's Feat (feat_old_thatchgrin).
+      feat: 5,
       hidden: 10,
     });
   });
@@ -463,6 +465,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_morthen_candlelight',
       // Gourdlight Eve's seasonal Feat (content/gourdlight_eve.ts).
       'feat_gourdlight_guise',
+      // ...and its field boss's (content/gourdlight_eve_scarecrow.ts).
+      'feat_old_thatchgrin',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1105,7 +1109,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // without the Mirefen three ahead of them, so it does not apply on this branch.
   // Re-baselined for Gourdlight Eve's one appended Feat (feat_gourdlight_guise), the
   // auditable way: the 9e4d4f50... literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = '4f56af600e224916fcac4afae85ddc971ed43730c8986c76d7e906ffd0a7b87e';
+  // Re-baselined for Old Thatchgrin's one appended Feat (feat_old_thatchgrin), the
+  // auditable way: the 4f56af60... literal rotated down into PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = '7ce9116dd46fdbca75bb16207144ad5cb0928420f76b989692615e217c2572aa';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1184,9 +1190,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Gourdlight Eve (the autumn seasonal event) appends feat_gourdlight_guise after
   // dgn_morthen_candlelight; the previous mint is the integration's 9e4d4f50...
   // literal (rotated down here), and stripping the one id must reproduce it exactly.
+  //
+  // Its field boss (phase 2) appends feat_old_thatchgrin after the Guise; the previous
+  // mint is the Guise's 4f56af60... literal (rotated down here).
   const PRE_APPEND_CATALOG_SHA256 =
-    '9e4d4f506fe6510ad0da7fa87440a88ac57b199ec8e9b1e49258f8f37923d5e5';
-  const APPENDED_SINCE: readonly string[] = ['feat_gourdlight_guise'];
+    '4f56af600e224916fcac4afae85ddc971ed43730c8986c76d7e906ffd0a7b87e';
+  const APPENDED_SINCE: readonly string[] = ['feat_old_thatchgrin'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1197,8 +1206,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // the ferry round trip. Pin the two predecessors too: an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_ilvane_hush',
       'dgn_morthen_candlelight',
+      'feat_gourdlight_guise',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1428,12 +1437,13 @@ describe('table shape', () => {
     // Clue Scroll casket pair, then the release's ferry round trip, then the
     // Mirefen world-boss branch's three combat deeds, then (v0.45.0 integration) the
     // five-dungeon rework's 24, Morthen's Every Candle Lit last.
-    // Gourdlight Eve's Feat appends last, after Morthen's.
-    expect(DEED_ORDER[DEED_ORDER.length - 29]).toBe('exp_harbor_to_harbor');
-    expect(DEED_ORDER[DEED_ORDER.length - 27]).toBe('cmb_balgath_ten');
-    expect(DEED_ORDER[DEED_ORDER.length - 26]).toBe('cmb_point_taken');
-    expect(DEED_ORDER[DEED_ORDER.length - 2]).toBe('dgn_morthen_candlelight');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_gourdlight_guise');
+    // Gourdlight Eve's Feat appends after Morthen's, its field boss's Feat last.
+    expect(DEED_ORDER[DEED_ORDER.length - 30]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 28]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 27]).toBe('cmb_point_taken');
+    expect(DEED_ORDER[DEED_ORDER.length - 3]).toBe('dgn_morthen_candlelight');
+    expect(DEED_ORDER[DEED_ORDER.length - 2]).toBe('feat_gourdlight_guise');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_old_thatchgrin');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

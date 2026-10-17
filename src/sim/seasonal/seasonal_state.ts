@@ -10,6 +10,7 @@
 //
 // Reused for every seasonal event (the autumn Gourdlight Eve first, winter next):
 // nothing in this file names a particular event.
+import { freshScarecrowState, type ScarecrowState } from './scarecrow_state';
 
 /** The world-wide seasonal state. Lives on Sim, reached by modules through the
  *  `ctx.seasonal` live view. */
@@ -20,14 +21,23 @@ export interface SeasonalWorldState {
   devOverride: string | null | undefined;
   /** The event the last seasonal tick saw active: the edge detector for open/close. */
   lastActive: string | null;
+  /** Gourdlight Eve's field boss (scarecrow.ts): who stands in the field, and when next. */
+  scarecrow: ScarecrowState;
 }
 
 export function freshSeasonalWorldState(): SeasonalWorldState {
-  return { hostEventId: null, devOverride: undefined, lastActive: null };
+  return {
+    hostEventId: null,
+    devOverride: undefined,
+    lastActive: null,
+    scarecrow: freshScarecrowState(),
+  };
 }
 
 /** The event running right now: the dev override when one is set, else the host's. */
-export function activeSeasonalEventOf(state: SeasonalWorldState): string | null {
+export function activeSeasonalEventOf(
+  state: Pick<SeasonalWorldState, 'hostEventId' | 'devOverride'>,
+): string | null {
   return state.devOverride !== undefined ? state.devOverride : state.hostEventId;
 }
 

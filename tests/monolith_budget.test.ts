@@ -1046,7 +1046,10 @@ const MONOLITHS: MonolithRow[] = [
     // viewport measure moved to viewport_measure.ts, paying for the seasonal decor
     // view's field, build and per-frame update, the trick fumes and the born helm bit.
     // Exact count (wc -l after biome).
-    ceiling: 12388,
+    // LOWERED 12388 -> 12384 by Gourdlight Eve phase 2: the selection ring's hostility
+    // verdict moved to reaction.ts (isHostileSelectionTarget), paying for the field
+    // boss's fx layer (scarecrow_fx.ts) field, build, two routes, two updates and dispose.
+    ceiling: 12384,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -7729,17 +7729,20 @@ export const zh_TW: EnTranslations = {
     "tricks": {
       "gourdlight_trick_bat": "變成蝙蝠",
       "gourdlight_trick_skeleton": "骨頭喀喀",
-      "gourdlight_trick_fumes": "綠色煙霧"
+      "gourdlight_trick_fumes": "綠色煙霧",
+      "gourdlight_trick_strawling": "稻草人偽裝"
     },
     "pumpkinHead": {
       "on": "你戴上了雕刻南瓜頭。",
       "off": "你摘下了雕刻南瓜頭。"
     },
     "jarTrick": "罐子砰地打開了：{trick}！",
+    "guise": "護符劈啪作響，稻草爬滿了你的全身：{trick}！",
     "itemUse": {
       "pumpkinHead": "使用：戴上或摘下一顆從內部點亮的雕刻南瓜，套在頭盔之上。僅在南瓜燈之夜期間可用。純外觀。",
       "trickJar": "使用：對你施加一個隨機的無害惡作劇，持續數秒。僅在南瓜燈之夜期間可用。純外觀。",
       "pouch": "使用：打開後獲得{count}顆南瓜燈糖。",
+      "strawlingCharm": "使用：變成老稻草獰笑的稻草小人，持續{seconds}秒。戰鬥中無法使用，僅限南瓜燈之夜期間。不會消耗。僅外觀。",
       "sweet": "在南瓜燈之夜期間討糖獲得。東溪的赫絲特·葫蘆芯會用外觀物品交換它們。"
     },
     "tokenPrice": "{count}個{item}"
@@ -22968,6 +22971,12 @@ export const zh_TW: EnTranslations = {
       "jar_of_mischief": {
         "name": "惡作劇之罐"
       },
+      "thatchgrin_sweet_sack": {
+        "name": "稻草獰笑的糖果袋"
+      },
+      "strawling_charm": {
+        "name": "稻草小人護符"
+      },
       "membership_token": {
         "name": "會員代幣（30天）"
       },
@@ -24508,6 +24517,15 @@ export const zh_TW: EnTranslations = {
       },
       "muster_effigy": {
         "name": "稻草工頭"
+      },
+      "gourdlight_thatchgrin": {
+        "name": "老稻草獰笑"
+      },
+      "gourdlight_crow": {
+        "name": "南瓜燈烏鴉"
+      },
+      "gourdlight_strawling": {
+        "name": "稻草小人"
       },
       "stable_horse": {
         "name": "廄馬"

@@ -27,6 +27,7 @@ import {
 } from './content/gourdlight_eve_decor';
 import { getActiveWorldContent, NPCS } from './data';
 import { hash2 } from './rng';
+import { resolveScarecrowField } from './seasonal/scarecrow_field';
 import {
   insideStall,
   resolveSeasonalStall,
@@ -563,6 +564,7 @@ export function resolveSeasonalDecor(seed: number): SeasonalDecorLayout {
     if (!zone) continue;
     cityDecor(seed, rule, zone.hub, lamps, probe, layout);
   }
+  scarecrowFieldDecor(seed, probe, layout);
   if (stall) {
     // Lit pumpkins out front at each end of the counter, where the customers
     // stand: part of the stall's own dressing, so its keep-clear margin does not
@@ -608,6 +610,42 @@ export function resolveSeasonalDecor(seed: number): SeasonalDecorLayout {
     );
   }
   return layout;
+}
+
+/** Old Thatchgrin's pumpkin patch (seasonal/scarecrow_field.ts): corn shocks, hay bales and
+ *  lit pumpkins ringing the fight's edge, never inside it, anchored to the field itself so
+ *  they move with it. The ring is the arena's boundary as much as its dressing. */
+export const SCARECROW_FIELD_RING = { inner: 13.5, outer: 16.5, count: 22 } as const;
+const FIELD_KINDS: readonly SeasonalGroundKind[] = [
+  'corn_shock',
+  'pumpkin_lit',
+  'gourd',
+  'corn_shock',
+  'pumpkin_small',
+  'hay_bale',
+];
+
+function scarecrowFieldDecor(seed: number, probe: Probe, layout: SeasonalDecorLayout): void {
+  const field = resolveScarecrowField(seed);
+  if (!field) return;
+  const ring = SCARECROW_FIELD_RING;
+  for (let i = 0; i < ring.count; i++) {
+    const anchor = `field:${i}`;
+    const a = (i / ring.count) * Math.PI * 2 + (anchorHash(anchor, 2) - 0.5) * 0.18;
+    const r = ring.inner + (ring.outer - ring.inner) * anchorHash(anchor, 3);
+    const kind = FIELD_KINDS[i % FIELD_KINDS.length];
+    // every piece faces the middle of the field, where he stands
+    seat(
+      probe,
+      layout.ground,
+      kind,
+      field.x + Math.sin(a) * r,
+      field.z + Math.cos(a) * r,
+      anchor,
+      1,
+      a + Math.PI,
+    );
+  }
 }
 
 const layoutMemo = new WeakMap<object, Map<number, SeasonalDecorLayout>>();

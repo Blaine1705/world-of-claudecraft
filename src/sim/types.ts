@@ -1108,10 +1108,10 @@ export type ItemUse =
   | { type: 'armorKit' }
   // A container: using it hands the owner its contents and consumes one unit
   // (src/sim/emissary_cache.ts owns the one container shipped so far).
-  | { type: 'container'; container: 'emissary_cache' | 'gourdlight_pouch' }
+  | { type: 'container'; container: 'emissary_cache' | 'gourdlight_pouch' | 'thatchgrin_sack' }
   // A seasonal event toy (src/sim/seasonal/seasonal_items.ts): the worn pumpkin
   // head toggle and the Jar of Mischief. Refused while its event is closed.
-  | { type: 'seasonal'; action: 'pumpkinHead' | 'trickJar' };
+  | { type: 'seasonal'; action: 'pumpkinHead' | 'trickJar' | 'strawlingCharm' };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -2201,6 +2201,10 @@ export interface MobTemplate {
   // who damaged it (gated to once per day per boss). The spawn schedule + location
   // live in src/sim/world_boss.ts; the loot roll runs through rollWorldBossLoot.
   worldBoss?: boolean;
+  // A seasonal event's field boss (src/sim/seasonal/scarecrow.ts): exists only while
+  // this event runs. A world boss in every rule above, except that his kill never
+  // counts toward the weekly world-boss quest (a seasonal window must not gate it).
+  seasonalEvent?: string;
   // Suppresses the per-mechanic combat-log barks ("<Name> unleashes <Mechanic>!"
   // and "<Name> becomes enraged!") for a mob whose only voice should be its
   // periodic zone-wide battle cry (a world boss). The mechanics still fire, with
@@ -9362,7 +9366,9 @@ export type SimEvent = { pid?: number } & (
         | 'tooFar'
         | 'pumpkinOn'
         | 'pumpkinOff'
-        | 'jarTrick';
+        | 'jarTrick'
+        // the Strawling Charm (Old Thatchgrin's cosmetic) put its guise on the user
+        | 'guise';
       npc?: string;
       sweets?: number;
       trick?: string;
@@ -12629,7 +12635,10 @@ export type DeedStatKey =
   | 'legendariesForged'
   // Coinsack Scurriers caught in a Buried Hoard (rift/hoard_goblin.ts): bumped
   // for every player paid off one, feeding cmb_coinsack_caught.
-  | 'hoardGoblinKills';
+  | 'hoardGoblinKills'
+  // Old Thatchgrin slain (Gourdlight Eve's field boss, seasonal/scarecrow.ts): bumped
+  // for every contributor, feeding feat_old_thatchgrin.
+  | 'thatchgrinKills';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -12664,6 +12673,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'tutorialGraduations',
   'legendariesForged',
   'hoardGoblinKills',
+  'thatchgrinKills',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new

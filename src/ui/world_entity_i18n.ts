@@ -244,6 +244,10 @@ const MOB_IDS = [
   // The command camp's drill yard: the mallet man and the training effigy.
   'muster_drillmaster',
   'muster_effigy',
+  // Gourdlight Eve's field boss and his adds (content/gourdlight_eve_scarecrow.ts)
+  'gourdlight_thatchgrin',
+  'gourdlight_crow',
+  'gourdlight_strawling',
   // Ambient Highwatch Stables horse (zone 3)
   'stable_horse',
   // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless

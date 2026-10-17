@@ -35,12 +35,14 @@ export const seasonalStrings = {
     gourdlight_trick_bat: 'Batty',
     gourdlight_trick_skeleton: 'Rattled Bones',
     gourdlight_trick_fumes: 'Green Fumes',
+    gourdlight_trick_strawling: 'Strawling Guise',
   },
   pumpkinHead: {
     on: 'You put on the Carved Pumpkin Head.',
     off: 'You take off the Carved Pumpkin Head.',
   },
   jarTrick: 'The jar pops open: {trick}!',
+  guise: 'The charm crackles and the straw climbs over you: {trick}!',
   // Item tooltip "Use:" lines (the item tooltip appends them to the event items).
   itemUse: {
     pumpkinHead:
@@ -48,6 +50,8 @@ export const seasonalStrings = {
     trickJar:
       'Use: Plays a random harmless trick on you for a few seconds. Only during Gourdlight Eve. Cosmetic.',
     pouch: 'Use: Open it to receive {count} Gourdlight Sweets.',
+    strawlingCharm:
+      "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat, and only during Gourdlight Eve. Never consumed. Cosmetic.",
     sweet:
       'Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick in Eastbrook trades cosmetics for them.',
   },
