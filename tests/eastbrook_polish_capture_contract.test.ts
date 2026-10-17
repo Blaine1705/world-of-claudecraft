@@ -726,7 +726,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  '840a0c4c6f965d304bbcde59a935dd83e1321e28b1e11e94f2ce34f8e98f7802';
+  'ce0c7826ab2406e8e92c7e81595a9963aeb3eb72642e78c6075bde0d6e85268b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
