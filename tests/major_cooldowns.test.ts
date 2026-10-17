@@ -20,24 +20,29 @@ const DEFENSIVE = [
   'cinderhide',
   'cloak_of_shadows',
   'dark_pact',
+  'desperate_prayer',
   'deterrence',
   'die_by_sword',
   'divine_protection',
   'elemental_trance',
   'evasion',
   'faithforged_guard',
+  'frenzied_regeneration',
   'furious_mending',
   'guardian_covenant',
   'ice_barrier',
   'ice_block',
+  'lay_on_hands',
   'life_covenant',
   'martyrs_aegis',
   'mass_barrier',
   'primal_reflexes',
   'rallying_cry',
   'sacred_bulwark',
+  'sacrifice_undead',
   'shellskin',
   'smoke_screen',
+  'wildheart',
 ];
 const OFFENSIVE = [
   'arcane_power',
@@ -103,15 +108,13 @@ describe('major cooldown classifier', () => {
     expect(majorCooldownGroup('mortal_strike')).toBeNull();
   });
 
-  it('leaves out direct damage, crowd control, heals, resource grants and mobility', () => {
+  it('leaves out direct damage, crowd control, group heals, resource grants and mobility', () => {
     for (const key of [
       'fire_blast', // Cinderfall: deals damage, does not raise it
       'storm_bolt', // a stun
       'psychic_scream', // a fear
-      'desperate_prayer', // a self-heal
-      'wildheart',
-      'frenzied_regeneration',
-      'lay_on_hands',
+      'tranquility', // a group heal, not an emergency self-heal
+      'choir_of_deliverance',
       'adrenaline_rush', // instant energy
       'innervate', // Lifesap: resource over time
       'enrage',
@@ -131,6 +134,18 @@ describe('major cooldown classifier', () => {
       'soulwell',
     ]) {
       expect(majorCooldownGroup(key), key).toBeNull();
+    }
+  });
+
+  it('counts the emergency self-heals as defensives: a spent one means none left', () => {
+    for (const key of [
+      'desperate_prayer',
+      'wildheart',
+      'frenzied_regeneration',
+      'lay_on_hands',
+      'sacrifice_undead',
+    ]) {
+      expect(majorCooldownGroup(key), key).toBe('defensive');
     }
   });
 

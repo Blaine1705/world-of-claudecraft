@@ -7,12 +7,13 @@
 //
 // The rule, decided per ability from what it DOES rather than from a hand list:
 // a class ability with a base cooldown of at least MAJOR_COOLDOWN_MIN_SEC that
-// either protects the caster (damage reduction, dodge, armor, absorb, immunity)
-// or raises their damage (damage, attack or spell power, crit, haste, attack
-// speed, energy regen rate). Group cooldowns count when the caster is one of the
-// people buffed, buffs cast on an ally count (they show on that ally), and damage
-// summons count as offensive. Self-heals, resource grants, crowd control,
-// mobility and direct damage never count. The PvP medallion is its own group.
+// either protects the caster (damage reduction, dodge, armor, absorb, immunity,
+// and the emergency self-heals: a spent one means no defensive left) or raises
+// their damage (damage, attack or spell power, crit, haste, attack speed, energy
+// regen rate). Group cooldowns count when the caster is one of the people
+// buffed, buffs cast on an ally count (they show on that ally), and damage
+// summons count as offensive. Resource grants, crowd control, mobility and
+// direct damage never count. The PvP medallion is its own group.
 //
 // Custom effect types the kind tables cannot read are listed explicitly in
 // EFFECT_TYPE_GROUP; abilities whose effects say nothing (an empty effect list
@@ -80,6 +81,9 @@ const EFFECT_TYPE_GROUP: Readonly<Record<string, 'defensive' | 'offensive'>> = {
   aoeAllyAbsorb: 'defensive',
   aoeAllyMaxHp: 'defensive',
   paladinAegis: 'defensive',
+  // Emergency self-heals (Last Prayer, Wildheart; Sacrifice Undead's own type).
+  selfHealPctMax: 'defensive',
+  sacrificeUndead: 'defensive',
   aoeAllyHaste: 'offensive',
   aoeAllySureCrit: 'offensive',
   partyMeleeBuff: 'offensive',
@@ -100,6 +104,10 @@ const ABILITY_OVERRIDES: Readonly<Record<string, MajorCooldownGroup | null>> = {
   summon_tithefiend: 'offensive',
   primal_exaltation: 'offensive',
   elemental_mastery: 'offensive',
+  // Emergency heals whose effect type is shared with ordinary heals: Savage
+  // Mending (a self heal-over-time) and Last Rite (a full-health heal).
+  frenzied_regeneration: 'defensive',
+  lay_on_hands: 'defensive',
   // An 18-point shield riding a gap closer: mobility, not a defensive.
   intervene: null,
 };
