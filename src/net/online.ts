@@ -2576,7 +2576,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
     this.stableTimerTime = rawTime;
     this.refreshStableSelfTimers(rawTime);
-    agePeerMajorCooldowns(this.entities.values(), rawTime); // enemy nameplate cooldown row
+    agePeerMajorCooldowns(this.entities.values(), rawTime, this.playerId); // enemy cooldown row
     return { mode, time: rawTime };
   }
 
@@ -2932,8 +2932,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
       const wireAuras = (Array.isArray(w.auras) ? w.auras : []) as ClientWireAura[];
       if (snapshotCarriesAuras(timerWire, w.auras)) {
         e.auras = applyAuraWire(e.auras, wireAuras, timerWire);
+        applyPeerMajorCooldownWire(e, w.mcd, timerWire.time ?? NaN, w.id === this.playerId);
       }
-      if (w.id !== this.playerId) applyPeerMajorCooldownWire(e, w.mcd, timerWire.time ?? NaN);
       e.loot = w.lootList ?? null;
       return e;
     };

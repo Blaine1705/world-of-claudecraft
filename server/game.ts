@@ -342,7 +342,6 @@ import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips'
 import { isPickAction } from './lockpick_action';
 import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
 import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
-import { writeMajorCooldownWire } from './major_cooldown_wire';
 import { dispatchMarketCommand, marketWirePromptCommand } from './market_commands';
 import { dispatchInventoryGroupingCommand } from './material_stack_wire';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
@@ -1358,9 +1357,9 @@ function identityFields(e: Entity): Record<string, unknown> {
   return out;
 }
 
-// Dynamic fields are re-sent whole in every full or lite record (absent means unset).
-// `simTime` (peer cache only) adds a player's tracked cooldowns (major_cooldown_wire.ts).
-function dynamicFields(e: Entity, includeAuras = true, simTime?: number): Record<string, unknown> {
+// Dynamic fields are re-sent whole in every full or lite record, so the
+// conditional ones keep their absent-means-unset semantics.
+function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> {
   const out: Record<string, unknown> = {
     x: round2(e.pos.x),
     y: round2(e.pos.y),
@@ -1400,7 +1399,6 @@ function dynamicFields(e: Entity, includeAuras = true, simTime?: number): Record
   // edge, trading one swing's worth of first-frame fill accuracy for not adding a second
   // field to every broadcast tick for every auto-attacking entity in interest range.
   if (e.autoAttack) out.swing = round2(e.swingTimer);
-  if (simTime !== undefined) writeMajorCooldownWire(e, simTime, out);
   // Mount summon/dismount transition, so every client can time the summon FX / call
   // pose and the self-extrapolator can root the local player in lockstep. Volatile
   // (rides the per-tick dynamic fields, not identity): mcr omitted when idle (0), mck
@@ -8233,7 +8231,7 @@ export class GameServer {
     if (cache.tick !== this.sim.tickCount) {
       cache.tick = this.sim.tickCount;
       const baseIdJson = JSON.stringify(identityFields(e));
-      const baseDynJson = JSON.stringify(dynamicFields(e, false, this.sim.time));
+      const baseDynJson = JSON.stringify(dynamicFields(e, false));
       if (baseIdJson !== cache.baseIdJson) {
         cache.baseIdJson = baseIdJson;
         // The look is spliced rather than composed into identityFields so the
@@ -8260,9 +8258,11 @@ export class GameServer {
       variant.tick = this.sim.tickCount;
       if (stableTimerWire) {
         const aura = cache.auraCache.encode(e.auras, this.sim.time, e.dead);
+        // Enemy cooldown deadlines share the aura channel and its version (major_cooldown_wire.ts).
+        const mcd = variant.mcd.encode(e, this.sim.time, aura.revision);
         variant.dynJson = cache.baseDynJson;
         variant.dynVer = cache.baseDynVer;
-        variant.auraVer = aura.revision;
+        variant.auraVer = mcd.revision;
 
         const baseChanged =
           variant.builtIdVer !== cache.idVer || variant.builtDynVer !== variant.dynVer;
@@ -8272,7 +8272,7 @@ export class GameServer {
           variant.liteJson = liteEntityJson(e.id, variant.dynJson);
         }
         if (baseChanged || auraChanged) {
-          const dynWithAuras = jsonWithField(variant.dynJson, 'auras', aura.json);
+          const dynWithAuras = mcd.splice(jsonWithField(variant.dynJson, 'auras', aura.json));
           variant.fullAuraJson = fullEntityJson(e.id, cache.idJson, dynWithAuras);
           variant.liteAuraJson = liteEntityJson(e.id, dynWithAuras);
           if (this.perfDetailActive) this.bcStableSerializes++;
