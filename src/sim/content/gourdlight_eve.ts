@@ -179,21 +179,24 @@ export const GOURDLIGHT_KEEPER_POSTS: readonly GourdlightKeeperPost[] = Object.f
     pos: { x: -4.2, z: -110.5 },
     facing: -Math.PI / 2,
   },
-  // Fenbridge: at the south end of the market lane, facing north up it, so the whole
-  // lane walks toward her counter.
+  // Fenbridge: on the open green where the Eastbrook road comes into town, west of the
+  // road, facing the arrivals across it (the market lane between the houses had no room
+  // to stand and put the camera inside the walls: owner note 2026-10-18).
   {
     id: 'fenbridge',
     zoneId: 'mirefen_marsh',
     entityId: GOURDLIGHT_KEEPER_FENBRIDGE_ENTITY_ID,
-    pos: { x: -3.6, z: 286.5 },
-    facing: 0,
+    pos: { x: -8, z: 266 },
+    facing: (Math.PI * 5) / 8,
   },
-  // Highwatch: the square's west side, facing east across it.
+  // Highwatch: the square's west side, facing east across it (two yards south of the
+  // first spot, where the booth clears the house on its north side and her customers'
+  // apron and the camera lane stay open: the room rule, seasonal_decor_stall.ts).
   {
     id: 'highwatch',
     zoneId: 'thornpeak_heights',
     entityId: GOURDLIGHT_KEEPER_HIGHWATCH_ENTITY_ID,
-    pos: { x: -7.7, z: 657.9 },
+    pos: { x: -8.47, z: 656.05 },
     facing: Math.PI / 2,
   },
 ]);

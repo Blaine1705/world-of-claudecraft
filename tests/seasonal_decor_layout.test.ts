@@ -28,6 +28,7 @@ import {
   STALL_FOOTPRINT,
   STALL_SCALE,
   stallLocalToWorld,
+  stallRoomProblem,
   stallSpotProblem,
 } from '../src/sim/seasonal_decor_stall';
 import { resolvedKeeperPosts } from '../src/sim/seasonal_keeper_posts';
@@ -200,6 +201,35 @@ describe('seasonal decor placement against the live world', () => {
     for (const s of layout.stalls) {
       for (const t of layout.stalls) if (s !== t) expect(insideStall(s, t.x, t.z, 2)).toBe(false);
     }
+  });
+
+  // Owner note 2026-10-18: Fenbridge's booth stood wedged in the market lane between two
+  // houses, so nobody had room to stand at it and the chase camera sat inside the walls.
+  // The room rule (an open apron for her customers, a camera lane clear of buildings, no
+  // wall against either side) now turns such a spot down, and every shipped stall has room.
+  it('gives every shipped stall room to stand and a clear camera lane', () => {
+    for (const post of resolvedKeeperPosts(WORLD_SEED)) {
+      const stall = post.stall;
+      if (!stall) continue;
+      expect(stallRoomProblem(WORLD_SEED, stall.x, stall.z, stall.yaw), post.post.id).toBeNull();
+    }
+    // the old Fenbridge spot in the market lane: the footprint itself fitted, the room did not
+    expect(stallRoomProblem(WORLD_SEED, -3.6, 286.5, 0)).toBe('cramped');
+    expect(
+      stallSpotProblem(
+        WORLD_SEED,
+        -3.6,
+        286.5,
+        0,
+        Object.values(NPCS)
+          .filter((n) => n.id !== 'gourdlight_keeper')
+          .map((n) => n.pos),
+      ),
+    ).toBe('cramped');
+    // Fenbridge's booth now stands out on the green where the Eastbrook road comes in
+    const fen = resolvedKeeperPosts(WORLD_SEED).find((p) => p.post.id === 'fenbridge');
+    expect(fen?.moved).toBe(false);
+    expect(fen?.stall).not.toBeNull();
   });
 
   it('turns the stall down where her spot cannot take it (the resolver rule itself)', () => {
