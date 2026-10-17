@@ -297,6 +297,7 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_instructor_view.ts',
   'src/ui/quest_event_view.ts',
   'src/ui/seasonal_event_view.ts',
+  'src/ui/haunted_pumpkin_view.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
   'src/ui/aura_strip_order_core.ts',
@@ -851,6 +852,7 @@ const RENDER_PURE_CORES = [
   'src/render/scarecrow_fx_core.ts',
   // where the seasonal dressing's candlelight is: its halos and ground-light sites
   'src/render/seasonal_glow_sites_core.ts',
+  'src/render/haunted_pumpkin_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',

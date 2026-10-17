@@ -402,7 +402,11 @@ export const RELIQUARY_HORIZON_WEAPON_SKINS = [
 // a hidden deed's existence is itself the secret, so a placeholder row would
 // spoil it just as loudly as the name. The Book of Deeds is their only home,
 // where they stay invisible until earned. Keep this list to non-hidden title
-// rewards; tests/reliquary_content.test.ts pins both directions.
+// rewards. ONE seasonal exclusion: the Haunted Pumpkin hunt's title (feat_pumpkin_hunter,
+// the Hollow) needs every pumpkin of an edition found inside the event window, so it
+// stays off the page and never gates completion (docs/design/gourdlight-pumpkins.md).
+// The Gourdlight title writs are bought with sweets and page here as usual.
+// tests/reliquary_content.test.ts pins both directions.
 /** Deeds that grant a title reward (real DEEDS ids only; no invented titles). */
 export const RELIQUARY_HORIZON_TITLES = [
   'prog_veteran',

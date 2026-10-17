@@ -9391,7 +9391,13 @@ export type SimEvent = { pid?: number } & (
         | 'titleGranted'
         | 'titleKnown'
         // an event-bound item was swept away because its event closed (`trick` = item id)
-        | 'boundItemGone';
+        | 'boundItemGone'
+        // a Haunted Pumpkin was found and lit for this player (count of total)
+        | 'pumpkinFound';
+      pumpkinId?: string;
+      zoneId?: string;
+      count?: number;
+      total?: number;
       npc?: string;
       sweets?: number;
       trick?: string;

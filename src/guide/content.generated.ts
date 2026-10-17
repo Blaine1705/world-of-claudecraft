@@ -6225,6 +6225,14 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": true,
     "rewardTitle": "the Hollow-Grinned",
     "crest": "/ui/deeds/feat_title_hollow_grinned.webp"
+  },
+  {
+    "id": "feat_pumpkin_hunter",
+    "name": "Pumpkin Hunter",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "the Hollow"
   }
 ];
 

@@ -24,6 +24,7 @@ event, e.g. `gourdlight_eve.ts`); this directory holds the rules. Public surface
 |--------|------|
 | `seasonal_state.ts` | world state (host id, dev override, open/close edge), per-character ledger (`seasonalDay`, `seasonalKnocked`, `pumpkinHeadWorn`), save fragment + sanitizing restore, the day roll on `ctx.resetDay` |
 | `seasonal_tick.ts` | `updateSeasonal`: raises / dismisses each event's keeper NPC (reserved singleton id), strips every seasonal cosmetic on close, re-applies a worn pumpkin head. Zero rng |
+| `haunted_pumpkins.ts` | fixed event-only objects, personal once-per-edition discovery and cosmetic completion Feat; no RNG or entity allocator draws |
 | `trick_or_treat.ts` | the knock: once per NPC per reset day, treat (sweets) or trick (cosmetic aura + one sweet), credits the rounds quest's `event` objective. Draws world rng only on an accepted knock |
 | `seasonal_cosmetics.ts` | the `seasonal_cosmetic` auras (pumpkin head, tricks): no sim effect at all, `undispellable` so only their own item / timer removes them |
 | `seasonal_items.ts` | item use arms: pumpkin head toggle, Jar of Mischief, the treat pouch |

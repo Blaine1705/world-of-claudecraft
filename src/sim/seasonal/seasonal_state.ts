@@ -10,6 +10,7 @@
 //
 // Reused for every seasonal event (the autumn Gourdlight Eve first, winter next):
 // nothing in this file names a particular event.
+import { GOURDLIGHT_PUMPKINS, HAUNTED_PUMPKIN_EDITION } from '../content/gourdlight_pumpkins';
 import { freshScarecrowState, type ScarecrowState } from './scarecrow_state';
 
 /** The world-wide seasonal state. Lives on Sim, reached by modules through the
@@ -58,10 +59,16 @@ export interface SeasonalPlayerState {
   /** The worn pumpkin head: the character's choice, re-applied as an aura while
    *  its event runs (and after a death), dropped from the body when it closes. */
   pumpkinHeadWorn: boolean;
+  hauntedPumpkins: Set<string>;
 }
 
 export function freshSeasonalPlayerState(): SeasonalPlayerState {
-  return { seasonalDay: '', seasonalKnocked: new Set(), pumpkinHeadWorn: false };
+  return {
+    seasonalDay: '',
+    seasonalKnocked: new Set(),
+    pumpkinHeadWorn: false,
+    hauntedPumpkins: new Set(),
+  };
 }
 
 /** The persisted shape (CharacterState.seasonal). Written only when non-empty, so
@@ -70,6 +77,7 @@ export interface SavedSeasonalState {
   day?: string;
   knocked?: string[];
   head?: true;
+  pumpkins?: { edition: string; found: string[] };
 }
 
 /** Bounded so a hostile or corrupt save can never balloon the ledger. */
@@ -83,11 +91,18 @@ export function restoreSeasonalState(
   meta.seasonalDay = fresh.seasonalDay;
   meta.seasonalKnocked = fresh.seasonalKnocked;
   meta.pumpkinHeadWorn = fresh.pumpkinHeadWorn;
+  meta.hauntedPumpkins = fresh.hauntedPumpkins;
   if (!saved || typeof saved !== 'object') return;
   if (typeof saved.day === 'string' && saved.day.length <= 32) meta.seasonalDay = saved.day;
   if (Array.isArray(saved.knocked)) {
     for (const id of saved.knocked.slice(0, MAX_KNOCKED)) {
       if (typeof id === 'string' && id.length > 0 && id.length <= 64) meta.seasonalKnocked.add(id);
+    }
+  }
+  if (saved.pumpkins?.edition === HAUNTED_PUMPKIN_EDITION && Array.isArray(saved.pumpkins.found)) {
+    const allowed = new Set(GOURDLIGHT_PUMPKINS.map((p) => p.id));
+    for (const id of saved.pumpkins.found.slice(0, GOURDLIGHT_PUMPKINS.length)) {
+      if (allowed.has(id)) meta.hauntedPumpkins.add(id);
     }
   }
   if (saved.head === true) meta.pumpkinHeadWorn = true;
@@ -100,7 +115,30 @@ export function seasonalSaveFragment(meta: SeasonalPlayerState): {
   if (meta.seasonalDay !== '') out.day = meta.seasonalDay;
   if (meta.seasonalKnocked.size > 0) out.knocked = [...meta.seasonalKnocked].sort();
   if (meta.pumpkinHeadWorn) out.head = true;
+  const found = hauntedPumpkinsFoundView(meta);
+  if (found.length) out.pumpkins = { edition: HAUNTED_PUMPKIN_EDITION, found: [...found] };
   return Object.keys(out).length > 0 ? { seasonal: out } : {};
+}
+
+// Derived read-only projection only. Writers add discoveries, clear the ledger,
+// or replace its Set on restore; never replace members at the same cardinality.
+const EMPTY_PUMPKINS: readonly string[] = Object.freeze([]);
+const pumpkinViews = new WeakMap<
+  SeasonalPlayerState,
+  { set: Set<string>; size: number; view: readonly string[] }
+>();
+export function hauntedPumpkinsFoundView(meta: SeasonalPlayerState): readonly string[] {
+  const set = meta.hauntedPumpkins;
+  if (set.size === 0) return EMPTY_PUMPKINS;
+  const cached = pumpkinViews.get(meta);
+  if (cached?.set === set && cached.size === set.size) return cached.view;
+  const view = Object.freeze(
+    GOURDLIGHT_PUMPKINS.filter((p) => set.has(p.id))
+      .map((p) => p.id)
+      .sort(),
+  );
+  pumpkinViews.set(meta, { set, size: set.size, view });
+  return view;
 }
 
 /** Roll the knock ledger onto `resetDay`. An empty key (no calendar) never rolls,

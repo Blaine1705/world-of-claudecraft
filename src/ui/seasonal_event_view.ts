@@ -6,12 +6,13 @@
 import type { SimEvent } from '../sim/types';
 import { deedTitleText } from './deed_i18n';
 import { npcDisplayName } from './entity_display_core';
-import { tEntity } from './entity_i18n';
+import { tEntity, zoneDisplayName } from './entity_i18n';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 
 export interface SeasonalEventPresentation {
   logText: string;
   flashText?: string;
+  sound?: 'quest_ready';
 }
 
 type SeasonalEvent = Extract<SimEvent, { type: 'seasonal' }>;
@@ -27,6 +28,19 @@ export function seasonalTrickName(trickId: string | undefined): string {
 export function seasonalEventPresentation(event: SeasonalEvent): SeasonalEventPresentation | null {
   const name = event.npc ? npcDisplayName(event.npc) : '';
   switch (event.what) {
+    case 'pumpkinFound': {
+      const values = {
+        zone: zoneDisplayName(event.zoneId ?? ''),
+        count: formatNumber(event.count ?? 0),
+        total: formatNumber(event.total ?? 0),
+        sweets: formatNumber(event.sweets ?? 0),
+      };
+      return {
+        logText: t('seasonal.pumpkins.found', values),
+        flashText: t('seasonal.pumpkins.flash', values),
+        sound: 'quest_ready',
+      };
+    }
     case 'treat': {
       const count = event.sweets ?? 0;
       return {

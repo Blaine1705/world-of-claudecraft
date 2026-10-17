@@ -22219,4 +22219,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_emberbristle_broom.name': 'Метла Тлеющей Щетины',
   'entities.mobs.gourdlight_swelling_gourd.name': 'Набухающая тыква',
   'entities.mobs.gourdlight_strawling.name': 'Соломенник',
+  'seasonal.pumpkins.name': 'Призрачная тыква',
+  'seasonal.pumpkins.title': 'Призрачные тыквы',
+  'seasonal.pumpkins.world': 'Мир',
+  'seasonal.pumpkins.found':
+    'Вы зажгли призрачную тыкву ({zone}): {count}/{total}. Получено тыквенных конфет: {sweets}.',
+  'seasonal.pumpkins.flash': 'Призрачная тыква найдена! {count}/{total}',
 };

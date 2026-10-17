@@ -70,6 +70,7 @@ export type { CharacterState, PetState } from './character_state';
 import { type AccountEarner, type AccountLedger, freshAccountLedger } from './account_ledger';
 import { spawnBuiltWorldKeepers } from './built_world_keepers';
 import { campPrivateRng } from './camp_private_rng';
+import { savedCharacterCalendar } from './character_calendar_save';
 import { buildCivicServicePlacements } from './civic_service_placements';
 import * as clueMod from './clue_scrolls';
 import {
@@ -496,11 +497,7 @@ import {
   storedCraftResult,
 } from './professions/crafting';
 import { craftingIdentityFor as craftingIdentityForImpl } from './professions/crafting_identity';
-import {
-  craftDailySaveFragment,
-  sanitizeDailyGateLoad,
-  wyrmfallDailySaveFragment,
-} from './professions/daily_gate_load';
+import { sanitizeDailyGateLoad } from './professions/daily_gate_load';
 import {
   type ApplyEnchantResult,
   applyEnchant as applyEnchantImpl,
@@ -680,7 +677,6 @@ import { freshCounters, type RewardCounters } from './reward_counters';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
 import * as seasonalMod from './seasonal';
-import { seasonalSaveFragment } from './seasonal/seasonal_state';
 import * as seatingMod from './seating';
 import { persistedResource } from './serialize_resource';
 import { computeCharacterModifiers } from './set_bonus_mods';
@@ -4010,22 +4006,7 @@ export class Sim {
       delveClears: { ...meta.delveClears },
       companionUpgrades: { ...meta.companionUpgrades },
       delveLoreUnlocked: [...meta.delveLoreUnlocked],
-      delveDaily: {
-        date: meta.delveDaily.date,
-        firstClearXp: [...meta.delveDaily.firstClearXp],
-        markClears: meta.delveDaily.markClears,
-      },
-      heroicDaily: { date: meta.heroicDaily.date, marked: [...meta.heroicDaily.marked] },
-      // Masterwrought materials: zero-default omission (the honor idiom), so
-      // a character the faucets never paid serializes byte-identically to a
-      // pre-materials save.
-      ...wyrmfallDailySaveFragment(meta.wyrmfallDaily),
-      ...(meta.emberWeekAnchor !== '' ? { emberWeekAnchor: meta.emberWeekAnchor } : {}),
-      // The oncePerDay craft stamp: zero-default omission like wyrmfallDaily
-      // above, so a character that never crafted a daily-gated recipe
-      // serializes byte-identically to a pre-phase-07 save.
-      ...craftDailySaveFragment(meta.craftDaily),
-      ...seasonalSaveFragment(meta),
+      ...savedCharacterCalendar(meta),
       mailWelcomed: meta.mailWelcomed,
       guildLetterSent: meta.guildLetterSent,
       // All three written only when non-empty/true (zero-default
@@ -4686,6 +4667,9 @@ export class Sim {
   }
   get activeSeasonalEvent(): string | null {
     return seasonalMod.activeSeasonalEventOf(this.seasonal);
+  }
+  get hauntedPumpkinsFound(): readonly string[] {
+    return seasonalMod.hauntedPumpkinsFoundView(this.primary);
   }
   get trickOrTreatedToday(): readonly string[] {
     return seasonalMod.knockedTodayView(this.primary, this.resetDay);

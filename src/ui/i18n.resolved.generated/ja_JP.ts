@@ -7706,6 +7706,14 @@ export const ja_JP: EnTranslations = {
     }
   },
   "seasonal": {
+    "pumpkins": {
+      "name": "幽霊カボチャ",
+      "title": "幽霊カボチャ",
+      "world": "世界",
+      "progress": "{label}: {current}/{total}",
+      "found": "{zone}の幽霊カボチャに火を灯した：{count}/{total}。ゴードライトの菓子を受け取った：{sweets}。",
+      "flash": "幽霊カボチャを発見！{count}/{total}"
+    },
     "event": {
       "gourdlight_eve": {
         "name": "ゴードライトの宵"

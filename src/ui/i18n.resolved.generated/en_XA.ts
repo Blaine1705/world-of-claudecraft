@@ -7706,6 +7706,14 @@ export const en_XA: EnTranslations = {
     }
   },
   "seasonal": {
+    "pumpkins": {
+      "name": "[Ĥáúñţéð Þúɱþķíñ]",
+      "title": "[Ĥáúñţéð Þúɱþķíñš]",
+      "world": "[Ŵóŕļð]",
+      "progress": "[{label}: {current}/{total}]",
+      "found": "[Ýóú ļíĝĥţ á Ĥáúñţéð Þúɱþķíñ íñ {zone}: {count}/{total}. Ĝóúŕðļíĝĥţ Šŵééţš ŕéçéíʋéð: {sweets}.]",
+      "flash": "[Ĥáúñţéð Þúɱþķíñ ƒóúñð! {count}/{total}]"
+    },
     "event": {
       "gourdlight_eve": {
         "name": "[Ĝóúŕðļíĝĥţ Éʋé]"

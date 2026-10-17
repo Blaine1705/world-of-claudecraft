@@ -8,6 +8,15 @@
 // per-locale blocks (no `as const`), so an event's prose is an English-only add.
 
 export const seasonalStrings = {
+  pumpkins: {
+    name: 'Haunted Pumpkin',
+    title: 'Haunted Pumpkins',
+    world: 'World',
+    progress: '{label}: {current}/{total}',
+    found:
+      'You light a Haunted Pumpkin in {zone}: {count}/{total}. Gourdlight Sweets received: {sweets}.',
+    flash: 'Haunted Pumpkin found! {count}/{total}',
+  },
   event: {
     gourdlight_eve: {
       name: 'Gourdlight Eve',

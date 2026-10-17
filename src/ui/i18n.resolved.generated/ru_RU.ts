@@ -7706,6 +7706,14 @@ export const ru_RU: EnTranslations = {
     }
   },
   "seasonal": {
+    "pumpkins": {
+      "name": "Призрачная тыква",
+      "title": "Призрачные тыквы",
+      "world": "Мир",
+      "progress": "{label}: {current}/{total}",
+      "found": "Вы зажгли призрачную тыкву ({zone}): {count}/{total}. Получено тыквенных конфет: {sweets}.",
+      "flash": "Призрачная тыква найдена! {count}/{total}"
+    },
     "event": {
       "gourdlight_eve": {
         "name": "Ночь Тыквенных Огней"

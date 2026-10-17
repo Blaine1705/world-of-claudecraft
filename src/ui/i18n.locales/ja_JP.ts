@@ -21811,4 +21811,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_emberbristle_broom.name': 'エンバーブリッスルの箒',
   'entities.mobs.gourdlight_swelling_gourd.name': '膨れ瓜',
   'entities.mobs.gourdlight_strawling.name': '藁人形',
+  'seasonal.pumpkins.name': '幽霊カボチャ',
+  'seasonal.pumpkins.title': '幽霊カボチャ',
+  'seasonal.pumpkins.world': '世界',
+  'seasonal.pumpkins.found':
+    '{zone}の幽霊カボチャに火を灯した：{count}/{total}。ゴードライトの菓子を受け取った：{sweets}。',
+  'seasonal.pumpkins.flash': '幽霊カボチャを発見！{count}/{total}',
 };

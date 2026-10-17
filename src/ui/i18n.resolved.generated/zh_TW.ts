@@ -7706,6 +7706,14 @@ export const zh_TW: EnTranslations = {
     }
   },
   "seasonal": {
+    "pumpkins": {
+      "name": "鬧鬼南瓜",
+      "title": "鬧鬼南瓜",
+      "world": "世界",
+      "progress": "{label}: {current}/{total}",
+      "found": "你點亮了{zone}的一隻鬧鬼南瓜：{count}/{total}。獲得南瓜燈糖：{sweets}。",
+      "flash": "找到鬧鬼南瓜！{count}/{total}"
+    },
     "event": {
       "gourdlight_eve": {
         "name": "南瓜燈之夜"

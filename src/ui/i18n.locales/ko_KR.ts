@@ -21807,4 +21807,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_emberbristle_broom.name': '잉걸갈기 빗자루',
   'entities.mobs.gourdlight_swelling_gourd.name': '부푸는 박',
   'entities.mobs.gourdlight_strawling.name': '짚인형',
+  'seasonal.pumpkins.name': '유령 호박',
+  'seasonal.pumpkins.title': '유령 호박',
+  'seasonal.pumpkins.world': '세계',
+  'seasonal.pumpkins.found':
+    '{zone}의 유령 호박에 불을 밝혔습니다: {count}/{total}. 고드라이트 사탕 획득: {sweets}.',
+  'seasonal.pumpkins.flash': '유령 호박 발견! {count}/{total}',
 };

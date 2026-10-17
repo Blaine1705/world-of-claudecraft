@@ -21,6 +21,7 @@ import { createNpc } from '../entity';
 import { resolvedKeeperPosts } from '../seasonal_keeper_posts';
 import type { SimContext } from '../sim_context';
 import type { NpcDef } from '../types';
+import { updateHauntedPumpkins } from './haunted_pumpkins';
 import { updateScarecrow } from './scarecrow';
 import { updateEventBoundItems } from './seasonal_bound_items';
 import {
@@ -67,6 +68,7 @@ export function updateSeasonal(ctx: SimContext): void {
   const active = activeSeasonalEventOf(state);
   const edge = active !== state.lastActive;
   if (edge) {
+    updateHauntedPumpkins(ctx, active);
     dismissKeeper(ctx, state.lastActive);
     state.lastActive = active;
     if (active === null) {

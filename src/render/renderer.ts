@@ -453,9 +453,11 @@ import {
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
 } from './ground_object_pool';
+import { buildGroundObjectSparkle, groundObjectSparkleMaterial } from './ground_object_sparkle';
 import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
+import { buildHauntedPumpkin, syncHauntedPumpkin } from './haunted_pumpkin';
 import { usedJsHeapMb } from './heap_sample';
 import { buildHighwatchTownView, type HighwatchTownView } from './highwatch_town';
 import { HillRingVisuals } from './hill_ring';
@@ -809,7 +811,7 @@ import {
   shadowTexelWorldSize,
   snapShadowAnchor,
 } from './shadow_texel_snap_core';
-import { disposeUnsharedMeshResources, markSharedMaterial } from './shared_resource';
+import { disposeUnsharedMeshResources } from './shared_resource';
 import { shipShadowHold } from './ship_shadow_hold';
 import {
   buildSky,
@@ -855,7 +857,6 @@ import { refreshTextureAnisotropy } from './texture_anisotropy';
 import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { uploadDataTextureInChunks } from './texture_upload';
-import { sparkleTexture } from './textures';
 import {
   groundSpeedFromFrame,
   hasTravelFormAura,
@@ -1118,7 +1119,6 @@ const SELECTION_RING_BOOST = 1.5;
 const SELECTION_RING_SPIN = 0.6; // rad/s, slow classic target-reticle rotation
 
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
-const SPARKLE_BOOST = 1.5;
 // Third-person camera obstruction is opacity-only. Anything registered as a
 // hideable crosses the eye-to-camera segment through the shared fade policy.
 // The requested chase-camera distance is never changed by scene geometry.
@@ -8023,6 +8023,11 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body;
+    } else if (e.kind === 'object' && e.templateId === 'ground_haunted_pumpkin') {
+      const built = buildHauntedPumpkin(this.sim, e);
+      if (!built) return;
+      body = objectMesh = built.group;
+      height = built.height;
     } else if (e.kind === 'object' && e.objectItemId === 'soulwell') {
       // Temporary Warlock party utility: bespoke procedural prop today, kept
       // behind buildSoulwell so a generated GLB can replace it later.
@@ -8052,19 +8057,8 @@ export class Renderer {
         e.templateId !== 'delve_locked_door' &&
         e.templateId !== 'delve_destructible_wall'
       ) {
-        if (!this.sparkleMat) {
-          this.sparkleMat = markSharedMaterial(
-            new THREE.SpriteMaterial({
-              map: sparkleTexture(),
-              transparent: true,
-              depthWrite: false,
-            }),
-          );
-          if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST);
-        }
-        sparkle = new THREE.Sprite(this.sparkleMat);
-        sparkle.scale.set(0.9, 0.9, 1);
-        sparkle.position.y = 1.35;
+        this.sparkleMat ??= groundObjectSparkleMaterial(this.lowGfx);
+        sparkle = buildGroundObjectSparkle(this.sparkleMat);
         group.add(sparkle);
       }
     } else if (
@@ -8103,19 +8097,8 @@ export class Renderer {
       if (result.reused) body.rotation.y = groundQuestObjectYaw(e.objectItemId ?? '', e.id);
       objectMesh = body;
       if (!e.objectItemId?.startsWith('forge_')) {
-        if (!this.sparkleMat) {
-          this.sparkleMat = markSharedMaterial(
-            new THREE.SpriteMaterial({
-              map: sparkleTexture(),
-              transparent: true,
-              depthWrite: false,
-            }),
-          );
-          if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST); // gold glint via bloom
-        }
-        sparkle = new THREE.Sprite(this.sparkleMat);
-        sparkle.scale.set(0.9, 0.9, 1);
-        sparkle.position.y = 1.35;
+        this.sparkleMat ??= groundObjectSparkleMaterial(this.lowGfx);
+        sparkle = buildGroundObjectSparkle(this.sparkleMat);
         group.add(sparkle);
       }
     } else {
@@ -10181,6 +10164,8 @@ export class Renderer {
             }
           }
         }
+        if (vis && e.templateId === 'ground_haunted_pumpkin' && v.objectMesh)
+          syncHauntedPumpkin(v.objectMesh, this.sim, e, this.time, this.reducedMotion(), this.vfx);
         if (vis && e.objectItemId === 'soulwell' && v.objectMesh) {
           syncSoulwellVisual(v.objectMesh, this.time, e.id);
         }

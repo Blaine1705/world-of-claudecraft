@@ -7706,6 +7706,14 @@ export const es_ES: EnTranslations = {
     }
   },
   "seasonal": {
+    "pumpkins": {
+      "name": "Haunted Pumpkin",
+      "title": "Haunted Pumpkins",
+      "world": "World",
+      "progress": "{label}: {current}/{total}",
+      "found": "You light a Haunted Pumpkin in {zone}: {count}/{total}. Gourdlight Sweets received: {sweets}.",
+      "flash": "Haunted Pumpkin found! {count}/{total}"
+    },
     "event": {
       "gourdlight_eve": {
         "name": "Gourdlight Eve"

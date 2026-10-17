@@ -3921,6 +3921,19 @@ export const DEEDS: Record<string, DeedDef> = {
     reward: { kind: 'title', text: 'the Hollow-Grinned' },
     feat: true,
   },
+  // Gourdlight Eve's Haunted Pumpkin hunt (seasonal/haunted_pumpkins.ts): a zero-Renown
+  // Feat granted when every pumpkin of the edition is found, cosmetic title only.
+  // Appended at the END, after the title writs.
+  feat_pumpkin_hunter: {
+    id: 'feat_pumpkin_hunter',
+    name: 'Pumpkin Hunter',
+    desc: 'Find every Haunted Pumpkin hidden around the world during Gourdlight Eve.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    feat: true,
+    reward: { kind: 'title', text: 'the Hollow' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -20747,4 +20747,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_emberbristle_broom.name': '余烬鬃毛扫帚',
   'entities.mobs.gourdlight_swelling_gourd.name': '膨胀巨瓜',
   'entities.mobs.gourdlight_strawling.name': '稻草小人',
+  'seasonal.pumpkins.name': '闹鬼南瓜',
+  'seasonal.pumpkins.title': '闹鬼南瓜',
+  'seasonal.pumpkins.world': '世界',
+  'seasonal.pumpkins.found':
+    '你点亮了{zone}的一只闹鬼南瓜：{count}/{total}。获得南瓜灯糖：{sweets}。',
+  'seasonal.pumpkins.flash': '找到闹鬼南瓜！{count}/{total}',
 };

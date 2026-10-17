@@ -7706,6 +7706,14 @@ export const ko_KR: EnTranslations = {
     }
   },
   "seasonal": {
+    "pumpkins": {
+      "name": "유령 호박",
+      "title": "유령 호박",
+      "world": "세계",
+      "progress": "{label}: {current}/{total}",
+      "found": "{zone}의 유령 호박에 불을 밝혔습니다: {count}/{total}. 고드라이트 사탕 획득: {sweets}.",
+      "flash": "유령 호박 발견! {count}/{total}"
+    },
     "event": {
       "gourdlight_eve": {
         "name": "고드라이트 축제의 밤"
