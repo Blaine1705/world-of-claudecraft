@@ -1645,7 +1645,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/garden_iron_pillar.glb": "/media/models/props/garden_iron_pillar.0e2c4eab8030.glb",
   "models/props/goldcrest_bank_reference.glb": "/media/models/props/goldcrest_bank_reference.27bf35619542.glb",
   "models/props/golden_horse_statue.glb": "/media/models/props/golden_horse_statue.ee400170bf77.glb",
-  "models/props/gourdlight_decor.glb": "/media/models/props/gourdlight_decor.4fd33157f222.glb",
+  "models/props/gourdlight_decor.glb": "/media/models/props/gourdlight_decor.aa6c3b87514c.glb",
   "models/props/gourdlight_pumpkin_head.glb": "/media/models/props/gourdlight_pumpkin_head.a95805fb1d9c.glb",
   "models/props/gravestone_bevel.glb": "/media/models/props/gravestone_bevel.75484e36b17c.glb",
   "models/props/gravestone_cross.glb": "/media/models/props/gravestone_cross.e5e80d10917f.glb",

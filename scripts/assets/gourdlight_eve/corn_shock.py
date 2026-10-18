@@ -99,8 +99,8 @@ def sweep(bm, pts, radii, sides, cap_start=True, cap_end=True):
 def core_bm(m, tag, shape):
     """The fluted hourglass under the stalks, closed top and bottom."""
     bm = bmesh.new()
-    sides = 30
-    zs = [0.0, 0.08, 0.2, 0.36, 0.55, 0.72, 0.84, 0.92, 1.0]
+    sides = 22
+    zs = [0.0, 0.12, 0.3, 0.55, 0.72, 0.86, 1.0]
     top = shape.h * 0.76
     rings = []
     for zi, zf in enumerate(zs):
@@ -140,7 +140,7 @@ def stalk_path(m, tag, shape, s, count, inner=False):
     out = 0.012 + 0.025 * m.h01(tag, "out", s)
     break_at = 0.68 + 0.16 * m.h01(tag, "brk", s, inner)
     droop = 0.18 + 0.4 * m.h01(tag, "drp", s, inner)
-    segs = 6
+    segs = 5
     pts = []
     for i in range(segs + 1):
         t = i / segs
@@ -174,7 +174,7 @@ def stalks_bm(m, tag, shape, count, inner_count):
     return bm
 
 
-def leaf_strip(bm, base, direction, length, width, curl, twist, segs=6):
+def leaf_strip(bm, base, direction, length, width, curl, twist, segs=5):
     """A creased dry leaf: three verts across (edge, midrib, edge) so it catches light on
     both halves, tapering to a point, arcing out and down by `curl`, twisting along."""
     d = Vector(direction).normalized()
@@ -215,15 +215,15 @@ def leaves_into(m, tag, shape, bm, count):
             1.6 * m.hs(tag, "lt", i),
         )
     # a few short broken blades low on the skirt, hanging down over the foot
-    for i in range(6):
-        a = (i + 0.5) / 6 * TAU + 0.4 * m.hs(tag, "sa", i)
+    for i in range(4):
+        a = (i + 0.5) / 4 * TAU + 0.4 * m.hs(tag, "sa", i)
         z = shape.tie * (0.35 + 0.4 * m.h01(tag, "sz", i))
         r = shape.radius(z) + 0.015
         base = (math.cos(a) * r, math.sin(a) * r, z)
         leaf_strip(bm, base, (math.cos(a), math.sin(a), -0.6), 0.26, 0.04, 0.3, 0.8 * m.hs(tag, "st", i), 4)
 
 
-def rope_into(m, tag, shape, bm, z, bite, strands, seg=30, sides=4, strand_r=0.0115, lay=0.013, turns=9):
+def rope_into(m, tag, shape, bm, z, bite, strands, seg=18, sides=3, strand_r=0.0115, lay=0.013, turns=9):
     """A lashing round the waist at height `z`: `strands` twisted strands on a ring that
     bites `bite` into the bundle, wobbling with the stalks under it."""
     # it sits ON the stalk layer (their centreline plus a stalk's radius), biting a little
@@ -268,7 +268,7 @@ def ears_bm(m, tag, shape):
         c = Vector((math.cos(a) * r, math.sin(a) * r, z))
         tilt = Matrix.Rotation(a, 4, "Z") @ Matrix.Rotation(-0.5, 4, "Y")
         mat = Matrix.Translation(c) @ tilt
-        ret = bmesh.ops.create_uvsphere(bm, u_segments=10, v_segments=8, radius=1.0,
+        ret = bmesh.ops.create_uvsphere(bm, u_segments=8, v_segments=6, radius=1.0,
                                         matrix=mat @ Matrix.Diagonal((0.042, 0.042, 0.17, 1)))
         # the kernel rows: a fine ridged surface (the vertex colour paints the kernels)
         inv = mat.inverted()
@@ -299,12 +299,12 @@ FLINT = [
 def build(m, stall, collection, name, tag, height=2.2):
     """The finished shock: three parts joined (Straw, Ribbon, GourdSkin)."""
     shape = Shape(height)
-    count = 44
+    count = 38
     # the core and the stalks and leaves: one Straw part
     sbm = core_bm(m, tag, shape)
     core_faces = len(sbm.faces)
-    stb = stalks_bm(m, tag, shape, count, 14)
-    leaves_into(m, tag, shape, stb, 22)
+    stb = stalks_bm(m, tag, shape, count, 10)
+    leaves_into(m, tag, shape, stb, 16)
     tmp = stall_join_bm(sbm, stb)
 
     def straw_tint(mn, co, fc, pi):
@@ -338,7 +338,7 @@ def build(m, stall, collection, name, tag, height=2.2):
     rope_into(m, tag + "-cord", shape, rbm, shape.tie + 0.03, 0.004, 2, strand_r=0.017, lay=0.016)
     rope_into(m, tag + "-cord2", shape, rbm, shape.tie + 0.1, 0.004, 2, strand_r=0.017, lay=0.016)
     cord_faces = len(rbm.faces)
-    rope_into(m, tag + "-twine", shape, rbm, shape.tie - 0.07, 0.004, 2, seg=28, strand_r=0.01, lay=0.011, turns=11)
+    rope_into(m, tag + "-twine", shape, rbm, shape.tie - 0.07, 0.004, 2, seg=18, strand_r=0.01, lay=0.011, turns=11)
     knot_into(m, tag, shape, rbm, shape.tie + 0.065)
 
     def rope_tint(mn, co, fc, pi):
