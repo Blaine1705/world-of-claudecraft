@@ -19,6 +19,12 @@ import {
   stepEnvironmentBlend,
 } from './environment_transition_core';
 import { GFX, type GfxSettings } from './gfx';
+import {
+  PALETTE_SKY_DECLARATIONS,
+  PALETTE_SKY_GLSL,
+  paletteLabEnabled,
+  paletteSkyUniforms,
+} from './palette_lab';
 import type { SkyResidencyRegion } from './sky_residency_core';
 import { skyTexture } from './textures';
 
@@ -392,10 +398,10 @@ const HDRI_SUN_U: Record<SkyKey, number> = {
 // sunset gold, day blue), so the heavy grades that faked those moods over
 // shared photographs are retired.
 const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
-  vale: [1, 1, 1],
+  vale: [0.94, 1.04, 1.14],
   marsh: [1, 1, 1],
-  peaks: [1, 1, 1],
-  beach: [1, 1, 1],
+  peaks: [0.95, 1.03, 1.12],
+  beach: [0.94, 1.05, 1.14],
   desert: [1, 1, 1],
   volcano: [1, 1, 1],
   cave: [1, 1, 1],
@@ -403,13 +409,13 @@ const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
   ember: [1, 1, 1],
   frost: [1, 1, 1],
   amber: [1, 1, 1],
-  fen: [1, 1, 1],
+  fen: [0.95, 1.04, 1.12],
   night: [1, 1, 1],
   haunt: [1, 1, 1],
-  jungle: [1, 1, 1],
-  garden: [1, 1, 1],
-  gale: [1, 1, 1],
-  farshore: [1, 1, 1],
+  jungle: [0.95, 1.04, 1.1],
+  garden: [0.95, 1.04, 1.12],
+  gale: [0.95, 1.03, 1.12],
+  farshore: [0.94, 1.05, 1.14],
 };
 
 const hdriStore: Partial<Record<SkyKey, THREE.Texture>> = {};
@@ -549,6 +555,18 @@ export function ensureSkyBiomeAssets(
 // This is the second line of defense behind the renderer's pinned set, so a
 // release can never blank the sky that is on screen.
 const domeBindings = new Set<() => readonly SkyKey[]>();
+
+// The dome the world renderer draws, for surfaces that reflect the live sky
+// (the ocean's reflection probe renders this exact mesh's geometry and
+// material, so a reflection carries the biome blend, the day/night grade, the
+// dusk glow and the horizon fog band the dome itself shows). The most recently
+// built dome wins; its view's dispose clears it.
+let liveDome: THREE.Mesh | null = null;
+
+/** The live sky dome, or null before the world built one. */
+export function liveSkyDome(): THREE.Mesh | null {
+  return liveDome;
+}
 
 /** Every biome currently bound into a live sky dome's uniforms. */
 export function currentDomeBiomes(): SkyKey[] {
@@ -792,9 +810,9 @@ const SKY_VERT = /* glsl */ `
 // directional horizon-band tint; without a field the string is byte-identical
 // to the legacy shader. Decided once, before the material compiles, exactly
 // like the geometry consumers gate on hasBiomeHazeField().
-const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
+const skyFrag = (zoneHaze: boolean, paletteSky = false): string => /* glsl */ `${
   zoneHaze ? BIOME_HAZE_DECLARATIONS : ''
-}
+}${paletteSky ? PALETTE_SKY_DECLARATIONS : ''}
   uniform sampler2D uSkyA;
   uniform sampler2D uSkyB;
   uniform float uMix;
@@ -893,7 +911,7 @@ const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
       c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
     }
     c *= mix(uTintA, uTintB, uMix); // biome grade
-    // Cycle sky grading, between the biome grade and the dark night multiply:
+${paletteSky ? PALETTE_SKY_GLSL : ''}    // Cycle sky grading, between the biome grade and the dark night multiply:
     // (1) desaturate toward night, so the day HDRI greys out to moonlight
     // instead of reading as a dimmed daytime photograph; (2) pour a warm
     // dawn/dusk glow into the horizon band around the live sun azimuth while
@@ -1114,6 +1132,7 @@ export function buildSky(
     // Draw after opaque geometry at far depth. Covered fragments fail depth
     // before the texture sample while untouched background pixels stay exact.
     dome.renderOrder = SKY_BACKGROUND_RENDER_ORDER;
+    liveDome = dome;
     return {
       dome,
       setCameraPos: (x, z) => {
@@ -1131,7 +1150,9 @@ export function buildSky(
       currentBiomeBlend: () => current,
       // The canvas dome samples skyTexture(), never the HDR stores, so it binds
       // nothing and has nothing to unbind.
-      dispose: () => {},
+      dispose: () => {
+        if (liveDome === dome) liveDome = null;
+      },
     };
   }
 
@@ -1174,16 +1195,24 @@ export function buildSky(
   // field before buildSky runs), so the dome's tint follows the same camera
   // and day/night grade with zero per-frame writes of its own.
   const zoneHaze = hasBiomeHazeField();
+  // The palette lab's gradient arm (`?palette=on` only): absent, the dome
+  // compiles the shipped string byte for byte.
+  const paletteSky = paletteLabEnabled();
   const material = new THREE.ShaderMaterial({
-    uniforms: { ...uniforms, ...(zoneHaze ? biomeHazeUniforms() : {}) },
+    uniforms: {
+      ...uniforms,
+      ...(zoneHaze ? biomeHazeUniforms() : {}),
+      ...(paletteSky ? paletteSkyUniforms() : {}),
+    },
     vertexShader: SKY_VERT,
-    fragmentShader: skyFrag(zoneHaze),
+    fragmentShader: skyFrag(zoneHaze, paletteSky),
     side: THREE.BackSide,
     fog: false,
     depthWrite: false,
   });
   const dome = new THREE.Mesh(new THREE.SphereGeometry(DOME_RADIUS, 32, 20), material);
   dome.renderOrder = SKY_BACKGROUND_RENDER_ORDER;
+  liveDome = dome;
 
   const current = createEnvironmentBlend(start);
   let boundFrom = start.from;
@@ -1257,6 +1286,7 @@ export function buildSky(
     currentBiomeBlend: () => current,
     dispose(): void {
       domeBindings.delete(readBinding);
+      if (liveDome === dome) liveDome = null;
     },
   };
 }

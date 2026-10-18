@@ -2092,9 +2092,8 @@ export class EditorApp {
     // shipped version is still seeded into the store in the background (kept
     // alongside their maps, never opened over them), so an updated default
     // is one click away in Open rather than hijacking the boot.
-    let autoloaded = resumed ? null : this.loadMostRecentSave();
-    if (!resumed && !autoloaded) autoloaded = await this.seedDefaultMap();
-    else if (!resumed) void this.seedDefaultMap();
+    let autoloaded = resumed ? null : await this.seedDefaultMap();
+    if (!resumed && !autoloaded) autoloaded = this.loadMostRecentSave();
     const opened = resumed ?? autoloaded;
     if (opened) {
       // Consume a one-shot return pose left by an older reload-based Collision
@@ -2201,7 +2200,7 @@ export class EditorApp {
     // public/maps/default-world.wocmap.zip changes materially. Re-seeding is
     // non-destructive: it saves the new default alongside the maker's own maps
     // (their work is keyed by its own meta.id) and simply opens the newer one.
-    const SEEDED_KEY = 'woc-editor-default-world-seeded-v041h';
+    const SEEDED_KEY = 'woc-editor-default-world-seeded-v045-genshin1';
     try {
       if (localStorage.getItem(SEEDED_KEY)) return null;
     } catch {
@@ -2223,19 +2222,24 @@ export class EditorApp {
         console.warn(`[default-map] import returned null for ${bytes.length}-byte bundle`);
         return null;
       }
-      // A copy of this map already in the store is the MAKER'S, their edits
-      // (paint, moves, deletions) saved onto it. Never clobber it with the
-      // fresh bundle: the load-time promote*/repair* passes bring their copy
-      // up to date instead, and only the seeded flag advances. The one
-      // exception is a PRE-decorProps save (no promoted realm dressing):
-      // those have no load-time upgrade, withoutEditableWorldProps would
-      // empty their decor with nothing taking over, so they still take the
-      // fresh bundle, the same trade the v041b bump made.
       const existing = this.io.store.load(map.meta.id);
       const existingHasDecor = existing?.placements.some(
         (p) => p.assetId === 'biome/hexb_home_a' || p.assetId.startsWith('props/flower_bed'),
       );
-      if (existing && existingHasDecor) {
+      const existingUnedited = existing?.meta.updatedAt === map.meta.updatedAt;
+      if (existing && existingHasDecor && !existingUnedited) {
+        existing.placements = existing.placements.filter(
+          (p) =>
+            !(
+              (p.assetId === 'biome/hexb_barracks' && p.x === 17.5 && p.z === -5.5) ||
+              (p.assetId === 'biome/hexb_watchtower' && p.x === 27 && p.z === -13)
+            ),
+        );
+        if (existing.content.npcs.proving_shore_guide) {
+          existing.content.npcs.proving_shore_guide.dynamic = true;
+        }
+        this.io.saveLocal(existing);
+        this.io.draftClear(map.meta.id);
         try {
           localStorage.setItem(SEEDED_KEY, '1');
         } catch {
@@ -2246,6 +2250,7 @@ export class EditorApp {
       // Persist it so loadMostRecentSave reopens it next boot (and the maker's
       // edits save back onto it, not a throwaway).
       this.io.saveLocal(map);
+      this.io.draftClear(map.meta.id);
       try {
         localStorage.setItem(SEEDED_KEY, '1');
       } catch {
@@ -16435,6 +16440,18 @@ export class EditorApp {
     repairStretchedWorldProps(map);
     repairPlacedAssetShapes(map);
     repairMissingTreeCollision(map, applyDefaultCollision);
+    if (map.meta.id === 'woc-v041-world') {
+      map.placements = map.placements.filter(
+        (p) =>
+          !(
+            (p.assetId === 'biome/hexb_barracks' && p.x === 17.5 && p.z === -5.5) ||
+            (p.assetId === 'biome/hexb_watchtower' && p.x === 27 && p.z === -13)
+          ),
+      );
+      if (map.content.npcs.proving_shore_guide) {
+        map.content.npcs.proving_shore_guide.dynamic = true;
+      }
+    }
     this.map = map;
     this.flattenLock = null;
     this.slopeStart = null;
