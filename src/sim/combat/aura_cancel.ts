@@ -8,7 +8,7 @@ import { DIVINE_ASCENSION_AURA_ID } from '../paladin_devotion';
 import type { Aura } from '../types';
 
 type CancelableAura = Pick<Aura, 'id' | 'kind' | 'value'> &
-  Partial<Pick<Aura, 'sourceId' | 'unbreakableControl' | 'undispellable'>>;
+  Partial<Pick<Aura, 'sourceId' | 'unbreakableControl' | 'undispellable' | 'encounterOwned'>>;
 
 // A debuff is anything in the harmful set, OR a stat aura riding a `buff_*` kind
 // with a negative value (an enfeeble / wither drain reuses a buff_* kind but saps
@@ -45,7 +45,7 @@ export function isCancelableAura(a: CancelableAura): boolean {
     a.id !== 'beacon_of_light' &&
     a.id !== 'veilbound_march' &&
     (a.kind !== 'internal_cd' || CANCELABLE_INTERNAL_CD_IDS.has(a.id)) &&
-    (a.kind === 'seasonal_cosmetic' || isPlayerRemovableAura(a)) &&
+    ((a.kind === 'seasonal_cosmetic' && a.encounterOwned !== true) || isPlayerRemovableAura(a)) &&
     !isDebuffAura(a)
   );
 }

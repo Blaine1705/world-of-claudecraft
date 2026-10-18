@@ -15,6 +15,7 @@ import {
   THATCHGRIN_PUPPET_ABILITY,
 } from '../src/sim/content/gourdlight_eve_scarecrow';
 import { MOBS } from '../src/sim/data';
+import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
 import {
   puppetCandidates,
   puppetVictimCount,
@@ -156,6 +157,10 @@ describe('Thatchbound: the cast and the curse', () => {
     expect(k.puppetCast).toBeNull();
   });
 
+  it('is on the interruptible list, so a real kick fizzles it', () => {
+    expect(SCRIPTED_INTERRUPTIBLE_CHANNELS[P.name]?.school).toBe('shadow');
+  });
+
   it('runs its full hold, then lets go', () => {
     const { sim, k } = pull(2);
     castAndLand(sim, k);
@@ -260,6 +265,30 @@ describe('Thatchbound: the puppet', () => {
     b.aggroTargetId = sim.playerId;
     sim.chat('/dev scarecrow puppet');
     expect(b.castingAbility).toBe(P.name);
+  });
+});
+
+describe('Thatchbound: a stronger hold wins', () => {
+  it('a rooted puppet stays put (the fear walk rule)', () => {
+    const { sim, k } = pull(2);
+    castAndLand(sim, k);
+    const [puppet] = puppets(sim);
+    // walk it far from its friend, then root it
+    puppet.pos = { ...puppet.pos, x: puppet.pos.x + 15 };
+    puppet.prevPos = { ...puppet.pos };
+    puppet.auras.push({
+      id: 'probe_root',
+      name: 'Root',
+      kind: 'root',
+      value: 0,
+      remaining: 5,
+      duration: 5,
+      sourceId: 0,
+      school: 'nature',
+    });
+    const x = puppet.pos.x;
+    for (let i = 0; i < 20; i++) sim.tick();
+    expect(puppet.pos.x).toBeCloseTo(x, 3);
   });
 });
 

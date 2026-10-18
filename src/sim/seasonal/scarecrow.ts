@@ -39,6 +39,7 @@ import { scaleWorldBossHp, type WorldBossDef } from '../world_boss';
 import { resolveScarecrowField } from './scarecrow_field';
 import { wardScarecrowField } from './scarecrow_field_ward';
 import { resetScarecrowKit, tickScarecrowKit } from './scarecrow_kit';
+import { freeAllPuppets } from './scarecrow_puppet';
 import type { ScarecrowState } from './scarecrow_state';
 
 /** His template on the open-world curve at his level (the Warden ladder a camp spawn of
@@ -115,6 +116,8 @@ export function updateScarecrow(ctx: SimContext, active: string | null): void {
   if (st.bossId !== null) {
     const boss = ctx.entities.get(st.bossId);
     if (!boss || boss.templateId !== THATCHGRIN_ID) {
+      // his puppets go free with him (the kit's strings snap)
+      freeAllPuppets(ctx, st);
       st.bossId = null;
       st.kit = null;
       st.respawnAt = ctx.time + THATCHGRIN_RESPAWN_SECONDS;

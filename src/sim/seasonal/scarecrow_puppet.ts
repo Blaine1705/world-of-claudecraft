@@ -24,6 +24,8 @@
 // order (ctx.rng.int per pick), drawn only when a cast starts; then one damage roll per
 // swing that lands, in puppet order. Nothing here runs outside his pull, and he only
 // exists while Gourdlight Eve runs, so no shipped trace moves.
+
+import { hasUnbreakableMovementLock } from '../combat/cc';
 import {
   THATCHBOUND_AURA_IDS,
   THATCHBOUND_CROW_AURA_ID,
@@ -300,7 +302,11 @@ export function thatchboundCasting(st: ScarecrowState): boolean {
  * this body is a puppet (the caller skips the player's own movement). Draws no rng.
  */
 export function updatePuppetMovement(ctx: SimContext, p: Entity): boolean {
-  if (p.kind !== 'player' || !thatchboundAura(p)) return false;
+  if (p.kind !== 'player') return false;
+  const aura = thatchboundAura(p);
+  if (!aura) return false;
+  // a stronger hold wins, the fear walk's rule: a root or an unbreakable lock keeps it put
+  if (p.auras.some((a) => a.kind === 'root') || hasUnbreakableMovementLock(p, aura)) return true;
   const kit = ctx.seasonal.scarecrow.kit;
   if (!kit) return true;
   for (let i = 0; i + PUPPET_STRIDE - 1 < kit.puppets.length; i += PUPPET_STRIDE) {

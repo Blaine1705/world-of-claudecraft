@@ -87,5 +87,14 @@ describe('right-click cancel of the Gourdlight Eve cosmetics', () => {
     };
     expect(isCancelableAura(base)).toBe(false);
     expect(isCancelableAura({ ...base, kind: 'seasonal_cosmetic' as const, value: 0 })).toBe(true);
+    // an encounter-owned look is the encounter's to lift, never its wearer's
+    expect(
+      isCancelableAura({
+        ...base,
+        kind: 'seasonal_cosmetic' as const,
+        value: 0,
+        encounterOwned: true as const,
+      }),
+    ).toBe(false);
   });
 });

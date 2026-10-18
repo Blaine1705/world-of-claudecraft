@@ -17,11 +17,6 @@
 //                   crow and swing at their friends for 8 s (scarecrow_puppet.ts).
 //                   Answered by a Magic dispel, by enough damage to snap the strings, or
 //                   by kicking his cast.
-//   THATCHBOUND     Every 35 s he takes one or two of his fighters on strings (never his
-//                   tank, never when fought alone): they turn into a little scarecrow or a
-//                   crow and swing at their friends for 8 s (scarecrow_puppet.ts).
-//                   Answered by a Magic dispel, by enough damage to snap the strings, or
-//                   by kicking his cast.
 //   SWELLING GOURD  Twice a pull his patch heaves up a giant pumpkin behind him
 //                   (scarecrow_swell.ts): while it lives he shrugs off most of every hit,
 //                   and if its fuse runs out it bursts over the whole fight. Answered by
