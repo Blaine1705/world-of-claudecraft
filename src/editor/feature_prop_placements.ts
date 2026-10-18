@@ -33,6 +33,7 @@ import { EASTBROOK_LAYOUT, localToWorld } from '../sim/eastbrook_layout';
 import { emberLilySpots } from '../sim/ember_lilies';
 import { REMOVED_HIGHWATCH_BUILDINGS } from '../sim/highwatch_layout';
 import { MAX_PLACEMENTS, type MapPlacement } from '../sim/map_doc';
+import { PAINTED_TOWNS } from '../sim/painted_towns';
 import type { ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { authoredTownDressingPlacements } from './authored_town_dressing_placements';
@@ -300,6 +301,12 @@ const TOWN_BUILDING_NATURAL: Readonly<Record<string, { x: number; y: number; z: 
   'tidehold/bank': { x: 22.6067, y: 22.5005, z: 19.8387 },
   'tidehold/shop_a': { x: 13.004, y: 16.2797, z: 12.2001 },
   'tidehold/house_b': { x: 15.0123, y: 15.9799, z: 11.6997 },
+  // ...and the rest of the default look the painted towns may stand
+  // (sim/painted_towns/models.ts): the same models the looks below re-bake.
+  'tidehold/tavern_b': { x: 30.262, y: 22.3513, z: 20.4279 },
+  'tidehold/shop_b': { x: 13.6495, y: 18.7, z: 12.7017 },
+  'tidehold/house_a': { x: 11.7628, y: 12.23, z: 9.8009 },
+  'tidehold/house_c': { x: 12.7632, y: 19.5804, z: 16.2637 },
   // Fenbridge stands the same set in the Fenrire moss look: the same models
   // re-baked with other maps, so the same sizes.
   'tidehold/fenrire/house_a': { x: 11.7628, y: 12.23, z: 9.8009 },
@@ -385,6 +392,30 @@ export function highwatchOldKitPlacements(seed: number): MapPlacement[] {
   return worldMajorPropPlacements({ ...empty, buildings }, seed);
 }
 
+/** The painted towns' rebuild BUILDINGS (sim/painted_towns/): one family. */
+export function paintedTownBuildingPlacements(_seed: number): MapPlacement[] {
+  return townBuildingPlacementsOf('paintedTowns');
+}
+
+/**
+ * The kit placements the full-world conversion made for the painted towns' old
+ * buildings (each layout's replacedKitBuildings, exactly as its zone file had
+ * them), lifted before the painted buildings are promoted over them: the
+ * Highwatch rule for every painted town.
+ */
+export function paintedTownsOldKitPlacements(seed: number): MapPlacement[] {
+  const empty = Object.fromEntries(
+    Object.entries(BUILTIN_WORLD.props).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? [] : value,
+    ]),
+  ) as unknown as ZonePropsDef;
+  const buildings = PAINTED_TOWNS.flatMap((town) =>
+    town.replacedKitBuildings.map((record) => ({ ...record })),
+  );
+  return worldMajorPropPlacements({ ...empty, buildings }, seed);
+}
+
 /** The Weekly Vault's placeable model (public/models/tidehold/vault.glb): the
  *  town-drawn hall's own boxes, authored in real yards, so its largest
  *  dimension over the target height draws it at the hall's size. The buried
@@ -438,6 +469,11 @@ export const FEATURE_PROMOTIONS: readonly {
     flag: 'highwatchTown',
     placements: highwatchTownBuildingPlacements,
     supersedes: highwatchOldKitPlacements,
+  },
+  {
+    flag: 'paintedTowns',
+    placements: paintedTownBuildingPlacements,
+    supersedes: paintedTownsOldKitPlacements,
   },
 ];
 

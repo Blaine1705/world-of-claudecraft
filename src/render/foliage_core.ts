@@ -12,6 +12,7 @@ import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
 import { tavernGroundsRects } from '../sim/mirefen_tavern_grounds';
+import { PAINTED_TOWNS } from '../sim/painted_towns';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 import {
   onWildheartBasinEntranceCauseway,
@@ -305,9 +306,11 @@ export function eastbrookGrassExclusions(
   }
 
   if (builtInWorld) {
-    // Highwatch's painted buildings clear their whole reach and their door
-    // aprons, the Fenbridge rule; the rest of its square is the props view's.
-    for (const building of HIGHWATCH_LAYOUT.buildings) {
+    // Highwatch's painted buildings, and every painted town's after it
+    // (sim/painted_towns/), clear their whole reach and their door aprons, the
+    // Fenbridge rule; the rest of each square is the props view's.
+    const placed = [...HIGHWATCH_LAYOUT.buildings, ...PAINTED_TOWNS.flatMap((t) => t.buildings)];
+    for (const building of placed) {
       exclusions.push(layoutObb(building.id, building.reach));
       exclusions.push({
         kind: 'circle',

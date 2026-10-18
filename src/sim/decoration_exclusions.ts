@@ -1,6 +1,48 @@
 import { isBuiltinWorldActive } from './data';
 import { mirefenTavernCovers } from './mirefen_tavern_floor';
 import { mirefenTavernGroundsCovers } from './mirefen_tavern_grounds';
+import { PAINTED_TOWNS } from './painted_towns';
+import { distancePointToObb, type Obb2 } from './placed_town_kit';
+
+/** Scatter keeps this far off a painted town building's reach (sim/painted_towns/):
+ *  a trunk, a canopy or a rock beside it would stand through its eaves. */
+export const PAINTED_TOWN_SCATTER_PAD = 3;
+/** ...and a road lamp this far off it, so no post stands against a wall. */
+export const PAINTED_TOWN_LAMP_PAD = 1;
+
+/** Each painted town that stands buildings, with one circle round every reach, so
+ *  a point far from every town costs one distance test per town. Derived once from
+ *  the frozen layouts; read-only after. */
+const PAINTED_TOWN_REACHES: readonly {
+  readonly x: number;
+  readonly z: number;
+  readonly radius: number;
+  readonly reaches: readonly Obb2[];
+}[] = PAINTED_TOWNS.filter((town) => town.buildings.length > 0).map((town) => {
+  const { x, z } = town.hub.center;
+  let radius = 0;
+  for (const building of town.buildings) {
+    const reach = building.reach;
+    radius = Math.max(
+      radius,
+      Math.hypot(reach.center.x - x, reach.center.z - z) +
+        Math.hypot(reach.halfWidth, reach.halfDepth),
+    );
+  }
+  return { x, z, radius, reaches: town.buildings.map((building) => building.reach) };
+});
+
+/** Whether (x, z) lies within `pad` yards of a painted town building's reach. */
+export function paintedTownReachCovers(x: number, z: number, pad: number): boolean {
+  for (const town of PAINTED_TOWN_REACHES) {
+    if (Math.hypot(x - town.x, z - town.z) > town.radius + pad) continue;
+    const point = { x, z };
+    for (const reach of town.reaches) {
+      if (distancePointToObb(point, reach) < pad) return true;
+    }
+  }
+  return false;
+}
 
 /** Authored clearings remove only named scatter, never terrain anchors or heights.
  * Both collision and rendering consume this same deterministic placement gate. */
@@ -126,6 +168,8 @@ export function isExcludedDecoration(x: number, z: number): boolean {
   ) {
     return true;
   }
+  // the painted towns clear their whole ground, not named points (sim/painted_towns/)
+  if (paintedTownReachCovers(x, z, PAINTED_TOWN_SCATTER_PAD)) return true;
   return EXCLUSIONS.some((point) => Math.hypot(x - point.x, z - point.z) < 1.2);
 }
 
@@ -150,5 +194,6 @@ const STREETLAMP_EXCLUSIONS = [
 ];
 
 export function isExcludedStreetlamp(x: number, z: number): boolean {
+  if (paintedTownReachCovers(x, z, PAINTED_TOWN_LAMP_PAD)) return true;
   return STREETLAMP_EXCLUSIONS.some((point) => Math.hypot(x - point.x, z - point.z) < 0.01);
 }

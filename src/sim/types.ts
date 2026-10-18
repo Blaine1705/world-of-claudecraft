@@ -12194,6 +12194,11 @@ export interface PromotedScenery {
    *  before Highwatch was rebuilt carries authoredTowns and none of these
    *  placements, so it keeps the town-drawn buildings. */
   highwatchTown?: boolean;
+  /** The painted towns' rebuild BUILDINGS (sim/painted_towns/, every town
+   *  after Highwatch): the town views' building loops, the record colliders
+   *  and the walk-in floors stand down. One family for all of them (they
+   *  arrived together), its own for the vault's reason. */
+  paintedTowns?: boolean;
 }
 
 /** The resolved storage price tables every sim price read consumes: bank slot

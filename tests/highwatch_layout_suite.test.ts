@@ -22,6 +22,7 @@ import {
   HIGHWATCH_NPC_PLACEMENTS_BY_ID,
   REMOVED_HIGHWATCH_BUILDINGS,
 } from '../src/sim/highwatch_layout';
+import { PAINTED_TOWNS } from '../src/sim/painted_towns';
 import { findPath, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { distancePointToObb, localToWorld } from '../src/sim/placed_town_kit';
 import { Sim } from '../src/sim/sim';
@@ -302,8 +303,12 @@ describe('the Highwatch layout', () => {
   it('levels each building on its own pad across its whole reach', () => {
     const edits = BUILTIN_WORLD.terrainEdits ?? [];
     const pads = HIGHWATCH_LAYOUT.pads;
-    // applied last, after every other stamp of the built-in world
-    expect(edits.slice(-pads.length)).toEqual([...pads]);
+    // applied after every other stamp of the built-in world but the painted
+    // towns' (sim/painted_towns/), which follow it on their own ground
+    const after = PAINTED_TOWNS.reduce((count, town) => count + town.pads.length, 0);
+    expect(edits.slice(edits.length - after - pads.length, edits.length - after)).toEqual([
+      ...pads,
+    ]);
     const expected: Record<string, number> = {
       highwatch_summit_inn: 9,
       highwatch_gate_chapel: 8.8,

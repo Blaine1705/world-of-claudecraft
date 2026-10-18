@@ -278,6 +278,7 @@ describe('graphics profile derived-cache reset', () => {
       'eastbrook_town',
       'fenbridge_town',
       'highwatch_town',
+      'painted_towns',
       'banker_chest',
       'mailbox',
       'noticeboard',

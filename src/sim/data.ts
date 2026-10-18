@@ -353,6 +353,7 @@ import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from './highwatch_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
+import { PAINTED_TOWNS } from './painted_towns';
 import { setStudioOverlay, studioOverlayInstalled } from './studio_content';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -1084,6 +1085,9 @@ export const BUILTIN_WORLD: WorldContent = {
     // from the finished ground, so heights move a little further out too.
     // Copied: the layout's records are frozen, and edit lists are plain data.
     ...HIGHWATCH_LAYOUT.pads.map((pad) => ({ ...pad })),
+    // ...and every painted town after it (sim/painted_towns/), town by town in
+    // the list's order, each on its own ground far from every other stamp.
+    ...PAINTED_TOWNS.flatMap((town) => town.pads.map((pad) => ({ ...pad }))),
   ],
 };
 

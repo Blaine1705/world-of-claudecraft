@@ -16,6 +16,7 @@
 //     threshold, exactly as a placed asset's is;
 //   - the file: the profile's texture tier of the model, same geometry.
 import * as THREE from 'three';
+import type { PaintedTownId } from '../sim/painted_towns';
 import { GFX } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeRecordFor } from './occluder_fade';
@@ -48,7 +49,7 @@ export interface PlacedTownBuildingRecord {
 }
 
 /** Which town stands the building: names its group and its id field. */
-export type PlacedTown = 'eastbrook' | 'fenbridge' | 'highwatch';
+export type PlacedTown = 'eastbrook' | 'fenbridge' | 'highwatch' | PaintedTownId;
 
 const PLACED_BUILDING_ASSET_PREFIX = '/models/tidehold/';
 

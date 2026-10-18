@@ -81,6 +81,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { occluderFadesDisabled } from './occluder_fade_core';
+import { isPaintedTownRebuildBuilding } from './painted_towns';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import {
   newPropCullPass,
@@ -1429,6 +1430,7 @@ export function buildProps(
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
   const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
+  const paintedTowns = activeWorldHasAuthoredTown(isPaintedTownRebuildBuilding);
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
@@ -1588,6 +1590,7 @@ export function buildProps(
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
     if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
     if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
+    if (paintedTowns && isPaintedTownRebuildBuilding(b)) continue;
     // roof Y mirrors the camera collider height in colliders.ts, through the
     // same shared helper, so an authored per-building height override cannot
     // leave the hideable top and the camera top disagreeing.
@@ -3229,6 +3232,7 @@ export function collectBuildingImpostors(seed: number): {
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
   const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
+  const paintedTowns = activeWorldHasAuthoredTown(isPaintedTownRebuildBuilding);
   const used = new Map<string, PropAsset>();
   const instances: BuildingImpostorInstance[] = [];
   const use = (key: PropKey): PropAsset => {
@@ -3242,6 +3246,7 @@ export function collectBuildingImpostors(seed: number): {
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
     if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
     if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
+    if (paintedTowns && isPaintedTownRebuildBuilding(b)) continue;
     const y = terrainHeight(b.x, b.z, seed);
     if (b.kind === 'chapel') {
       const tower = use('bellTower');
