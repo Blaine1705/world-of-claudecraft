@@ -21,6 +21,7 @@
 // An idle pool is hidden once its twin window is over, costing no draw. Particles ride the
 // pooled point cloud (vfx.ts) through the boss layer's particle seam.
 import * as THREE from 'three';
+import { THATCHGRIN_KIT } from '../sim/content/gourdlight_eve_scarecrow';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import {
   BARS_PER_PUPPET,
@@ -56,6 +57,7 @@ interface PuppetEntity {
   facing: number;
   dead: boolean;
   auras?: readonly { id: string }[];
+  castingAbility?: string | null;
 }
 
 interface MarkLike {
@@ -328,48 +330,57 @@ export class ThatchboundFx {
     return ability === PUPPET_ABILITY;
   }
 
-  update(dt: number, reducedMotion: boolean): void {
+  /** Per frame. `bossNear`: his body is in the world this frame (ScarecrowFx's scan saw
+   *  it): the root is built then, before his first cast, so its gate has settled by the
+   *  time the strings must show; and with no boss and no puppet, no entity scan runs. */
+  update(dt: number, reducedMotion: boolean, bossNear: boolean): void {
     if (this.disposed) return;
     this.time += dt;
-    // who is a puppet this frame
-    for (const slot of this.puppets.values()) slot.seen = false;
-    this.entities().forEach((e, id) => {
-      if (e.dead || !e.auras || e.auras.length === 0) return;
-      let auraId: string | null = null;
-      for (const a of e.auras) {
-        if (PUPPET_AURA_IDS.has(a.id)) {
-          auraId = a.id;
-          break;
-        }
+    if (bossNear) this.ensureRoot();
+    if (bossNear || this.puppets.size > 0) {
+      // who is a puppet this frame
+      for (const slot of this.puppets.values()) slot.seen = false;
+      this.entities().forEach(this.watchPuppet);
+      for (const [id, slot] of this.puppets) {
+        if (slot.seen) continue;
+        this.freed(slot.last);
+        this.puppets.delete(id);
       }
-      if (auraId === null) return;
-      let slot = this.puppets.get(id);
-      if (!slot) {
-        if (this.puppets.size >= PUPPET_CAP) return;
-        this.ensureRoot();
-        slot = {
-          born: this.time,
-          phase: (id % 97) * 0.37,
-          auraId,
-          swirlClock: 0,
-          seen: true,
-          last: new THREE.Vector3(e.pos.x, e.pos.y, e.pos.z),
-        };
-        this.puppets.set(id, slot);
-        this.landed(e);
-      }
-      slot.seen = true;
-      slot.auraId = auraId;
-      slot.last.set(e.pos.x, e.pos.y, e.pos.z);
-    });
-    for (const [id, slot] of this.puppets) {
-      if (slot.seen) continue;
-      this.freed(slot.last);
-      this.puppets.delete(id);
     }
     if (!this.root) return;
     this.draw(dt, reducedMotion);
   }
+
+  /** One entity of the frame's scan (a stable bound callback: no closure per frame). */
+  private readonly watchPuppet = (e: PuppetEntity, id: number): void => {
+    if (e.dead || !e.auras || e.auras.length === 0) return;
+    let auraId: string | null = null;
+    for (const a of e.auras) {
+      if (PUPPET_AURA_IDS.has(a.id)) {
+        auraId = a.id;
+        break;
+      }
+    }
+    if (auraId === null) return;
+    let slot = this.puppets.get(id);
+    if (!slot) {
+      if (this.puppets.size >= PUPPET_CAP) return;
+      this.ensureRoot();
+      slot = {
+        born: this.time,
+        phase: (id % 97) * 0.37,
+        auraId,
+        swirlClock: 0,
+        seen: true,
+        last: new THREE.Vector3(e.pos.x, e.pos.y, e.pos.z),
+      };
+      this.puppets.set(id, slot);
+      this.landed(e);
+    }
+    slot.seen = true;
+    slot.auraId = auraId;
+    slot.last.set(e.pos.x, e.pos.y, e.pos.z);
+  };
 
   /** The curse lands on a body: feathers and straw burst off it, a shockwave rolls out. */
   private landed(e: PuppetEntity): void {
@@ -417,13 +428,21 @@ export class ThatchboundFx {
     // drop the finished cast strings and shockwaves
     for (let i = this.casts.length - 1; i >= 0; i--) {
       const c = this.casts[i];
-      if (this.time - c.start > c.duration + 0.15) this.casts.splice(i, 1);
+      // a kicked cast (his bar cleared before it lands) takes its strings with it
+      const boss = this.entity(c.bossId);
+      const fizzled =
+        this.time - c.start > 0.15 &&
+        this.time - c.start < c.duration - 0.1 &&
+        boss?.castingAbility !== undefined &&
+        boss.castingAbility !== THATCHGRIN_KIT.puppet.name;
+      if (fizzled || this.time - c.start > c.duration + 0.15) this.casts.splice(i, 1);
     }
     for (let i = this.shockList.length - 1; i >= 0; i--) {
       if (this.time - this.shockList[i].born > SHOCK_SEC) this.shockList.splice(i, 1);
     }
     const active = this.puppets.size > 0 || this.casts.length > 0 || this.shockList.length > 0;
-    if (!active && this.idle && !twins) return;
+    // idle past the twin window, and its pools already hidden: nothing to draw
+    if (!active && !twins && this.idle) return;
     let seg = 0;
     let sigil = 0;
     let eye = 0;
@@ -552,7 +571,8 @@ export class ThatchboundFx {
     segs.visible = twins || seg > 0;
     sigils.visible = twins || sigil > 0;
     shocks.visible = twins || shock > 0;
-    this.idle = !active;
+    // only a frame that HID everything (no activity, past the twins) may skip the next
+    this.idle = !active && !twins;
   }
 
   dispose(): void {

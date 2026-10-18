@@ -33,7 +33,11 @@ import {
   type SeasonalGarland,
   seasonalDecorLayout,
 } from '../sim/seasonal_decor_layout';
-import { interiorPumpkins } from '../sim/seasonal_interior_pumpkins';
+import {
+  type InteriorPumpkinJob,
+  interiorPumpkinJob,
+  interiorPumpkins,
+} from '../sim/seasonal_interior_pumpkins';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX } from './gfx';
 import type { BudgetPointLightRegistry } from './point_light_budget';
@@ -85,6 +89,7 @@ export class SeasonalDecor {
   private ropeMaterial: THREE.Material | null = null;
   private lights: SeasonalDecorLights | null = null;
   private wisps: SeasonalInteriorWisps | null = null;
+  private indoorJob: InteriorPumpkinJob | null = null;
 
   constructor(
     private readonly scene: THREE.Object3D,
@@ -100,7 +105,7 @@ export class SeasonalDecor {
 
   /** Per frame: the event's state, the night amount (0 day .. 1 night), the
    *  clock, and the player's position for the per-city reach. */
-  update(night: number, time: number, px: number, pz: number): void {
+  update(night: number, time: number, px: number, pz: number, reducedMotion = false): void {
     if (this.disposed) return;
     const active = this.activeEvent() === GOURDLIGHT_EVE_ID;
     if (!active) {
@@ -109,8 +114,12 @@ export class SeasonalDecor {
       return;
     }
     if (!this.built) {
+      // the indoor pumpkins resolve one house a frame (never one long stall), while the
+      // kit loads; the dressing builds once both are ready
+      this.indoorJob ??= interiorPumpkinJob(this.seed);
+      const indoorDone = this.indoorJob.step();
       const assets = gourdlightAssets();
-      if (!assets) return;
+      if (!assets || !indoorDone) return;
       this.build(assets);
     }
     this.content.visible = true;
@@ -120,7 +129,7 @@ export class SeasonalDecor {
       city.group.visible = dx * dx + dz * dz <= DRAW_RANGE_SQ;
     }
     driveSeasonalGlow(night, time);
-    this.wisps?.update(time, false);
+    this.wisps?.update(time, reducedMotion);
     // the gate owns root's visibility: no candle light before the kit is linked
     this.lights?.update(night, time, px, pz, this.root.visible);
   }
@@ -128,7 +137,7 @@ export class SeasonalDecor {
   private build(assets: GourdlightAssets): void {
     this.built = true;
     const street = seasonalDecorLayout(this.seed);
-    const indoor = interiorPumpkins(this.seed);
+    const indoor = this.indoorJob?.result ?? interiorPumpkins(this.seed);
     const layout = { ...street, ground: [...street.ground, ...indoor] };
     const zones = getActiveWorldContent().zones;
     const hubs = GOURDLIGHT_DECOR_CITIES.map((rule) => zones.find((z) => z.id === rule.zoneId)?.hub)

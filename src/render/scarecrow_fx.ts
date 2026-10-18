@@ -88,6 +88,7 @@ interface EntityLike {
   castRemaining?: number;
   castTotal?: number;
   auras?: readonly { id: string }[];
+  castingAbility?: string | null;
 }
 
 interface SpellfxAtLike {
@@ -324,6 +325,8 @@ export class ScarecrowFx {
   private disposed = false;
   private readonly scratch = new THREE.Vector3();
   private readonly scratch2 = new THREE.Vector3();
+  /** Whether this frame's scan saw him standing (Thatchbound's root and scan key on it). */
+  private bossNear = false;
   /** Thatchbound's strings, eyes and sigils (his mind control). */
   private readonly thatchbound: ThatchboundFx;
 
@@ -742,12 +745,14 @@ export class ScarecrowFx {
     this.time += dt;
     this.frameDt = dt;
     this.updateFalls(dt, reducedMotion);
-    this.thatchbound.update(dt, reducedMotion);
     this.updatePatches(dt);
     this.updateShockwave();
     this.halosUsed = 0;
     // his collapse into straw, his gourds' glow, his reel
+    this.bossNear = false;
     this.entities().forEach(this.watchEntity);
+    // his strings: built on the first sight of him, scanned only while he or a puppet is near
+    this.thatchbound.update(dt, reducedMotion, this.bossNear);
     const twins = this.time - this.rootBorn < TWIN_SEC;
     for (let i = this.halosUsed; i < this.halos.length; i++) {
       const s = this.halos[i];
@@ -923,6 +928,7 @@ export class ScarecrowFx {
 
   /** Per entity, per frame: allocation-free (a bound method over Map.forEach). */
   private readonly watchEntity = (e: EntityLike, id: number): void => {
+    if (e.templateId === THATCHGRIN_TEMPLATE && !e.dead) this.bossNear = true;
     if (e.templateId === SWELLING_GOURD_TEMPLATE) {
       this.ensureRoot();
       if (e.dead) return;

@@ -11425,7 +11425,7 @@ export class Renderer {
     this.emberPools?.update(lampGlow, this.time);
     this.campBraziers?.update(lampGlow, this.time);
     this.decorTorchFx?.update(lampGlow, this.time);
-    this.seasonalDecor?.update(lampGlow, this.time, p.pos.x, p.pos.z);
+    this.seasonalDecor?.update(lampGlow, this.time, p.pos.x, p.pos.z, this.reducedMotion());
     // The night light field: every lamp and camp fire plus the nearby bodies
     // collected above, packed into the terrain shader's uniform slots. Indoors
     // the world clock does not govern the ground either, so the same fogState

@@ -118,22 +118,59 @@ interface Candidate {
 
 /** Every indoor pumpkin for the built-in world at `seed`, in a fixed order. */
 export function resolveInteriorPumpkins(seed: number): InteriorPumpkin[] {
+  const job = interiorPumpkinJob(seed, false);
+  while (!job.step()) {
+    // one house a step; run to the end
+  }
+  return job.result ? [...job.result] : [];
+}
+
+/** The resolve cut into one house per step, so a client spreads it over frames instead
+ *  of stalling one (the decor view steps it once a frame until it is done). The result
+ *  is the same list in the same order as the one-shot resolve; `memoize` stores it in
+ *  the per-seed memo when the job finishes. */
+export interface InteriorPumpkinJob {
+  /** Resolve the next house; true once every city is done (and on every later call). */
+  step(): boolean;
+  /** The finished list, or null while the job still runs. */
+  readonly result: readonly InteriorPumpkin[] | null;
+}
+
+export function interiorPumpkinJob(seed: number, memoize = true): InteriorPumpkinJob {
+  const cached = memo.get(seed);
+  if (cached) return { step: () => true, result: cached };
   const npcSpots = Object.values(NPCS).map((n) => n.pos);
-  const out: InteriorPumpkin[] = [];
-  for (const town of AUTHORED_TOWNS) {
-    const picks: InteriorPumpkin[] = [];
-    const houses = town.buildings
+  const queue = AUTHORED_TOWNS.flatMap((town, townIndex) =>
+    town.buildings
       .filter((b) => b.walkIn === true)
       .slice()
-      .sort((a, b) => hash2(hashId(a.id), 3, 0x51) - hash2(hashId(b.id), 3, 0x51));
-    for (const house of houses) {
-      if (picks.length >= INTERIOR_PUMPKINS_PER_CITY) break;
-      const best = houseSpot(seed, house, npcSpots);
-      if (best) picks.push(best);
-    }
-    out.push(...picks);
-  }
-  return out;
+      .sort((a, b) => hash2(hashId(a.id), 3, 0x51) - hash2(hashId(b.id), 3, 0x51))
+      .map((house) => ({ townIndex, house })),
+  );
+  const perTown = AUTHORED_TOWNS.map((): InteriorPumpkin[] => []);
+  let next = 0;
+  const job = {
+    result: null as InteriorPumpkin[] | null,
+    step(): boolean {
+      if (job.result) return true;
+      // skip the houses of a town that already has its share (no probe spent on them)
+      while (
+        next < queue.length &&
+        perTown[queue[next].townIndex].length >= INTERIOR_PUMPKINS_PER_CITY
+      )
+        next++;
+      if (next < queue.length) {
+        const { townIndex, house } = queue[next++];
+        const best = houseSpot(seed, house, npcSpots);
+        if (best) perTown[townIndex].push(best);
+        return false;
+      }
+      job.result = perTown.flat();
+      if (memoize) memo.set(seed, job.result);
+      return true;
+    },
+  };
+  return job;
 }
 
 function hashId(id: string): number {

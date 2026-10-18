@@ -15,6 +15,7 @@ import {
   enclosedAt,
   INTERIOR_PUMPKIN_RADIUS,
   INTERIOR_PUMPKINS_PER_CITY,
+  interiorPumpkinJob,
   interiorPumpkins,
   resolveInteriorPumpkins,
 } from '../src/sim/seasonal_interior_pumpkins';
@@ -107,5 +108,16 @@ describe('the indoor pumpkins', () => {
     const a = wispPose(1, 2, 3, 0.8, 4.2, 0.5, false);
     expect(a.y).toBeGreaterThan(2.3);
     expect(wispPose(1, 2, 3, 0.8, 4.2, 0.5, true)).toEqual(wispPose(1, 2, 3, 0.8, 9.9, 0.5, true));
+  });
+});
+
+describe('the indoor pumpkins, a house a step', () => {
+  it('the stepped job lands the same list as the one-shot resolve, one house per step', () => {
+    const job = interiorPumpkinJob(WORLD_SEED + 1, false);
+    let steps = 0;
+    while (!job.step()) steps++;
+    expect(steps).toBeGreaterThan(3);
+    expect(job.result).toEqual(resolveInteriorPumpkins(WORLD_SEED + 1));
+    expect(job.step()).toBe(true);
   });
 });
