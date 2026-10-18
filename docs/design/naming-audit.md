@@ -1012,6 +1012,20 @@ proper noun ("Highwatch" is the existing town).
 | Ansel Hale | the manor steward NPC | KEEP. No full-name hit on the web or any game wiki searched (warcraft.wiki.gg, Wowhead, Fallout and RuneScape wikis). "Ansel" alone is a real given name: RuneScape Dragonwilds has a knight called Ansel and WoW has a High Executor Anselm, neither a match. "Hale" is a common English surname (Fallout 76 has an Emerson Hale). Shared English, no coined token. "Odric" was considered and dropped: Sir Odric is a named Magic: The Gathering character. |
 | Steward of the Manor | his NPC title | KEEP. Plain English job title, no distinctive match. |
 
+### Hester's Gourdlight Eve toys (web-checked 2026-10-19)
+
+The five toys Hester sells for sweets (`src/sim/content/gourdlight_eve.ts` GOURDLIGHT_TOYS).
+Each name was searched as an exact phrase and by its coined token against the open web and
+the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild Wars 2).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Pranker's Pumpkin | the prank toy | KEEP. No exact-phrase hit in any game; generic English. Nearest neighbours are unnamed Halloween pumpkins (Team Fortress 2, Dead by Daylight, RuneScape), none a match. |
+| Wanderwisp Lantern | the ghost lantern | KEEP. "Wanderwisp" has no hit; the nearest are the itch.io prototypes "The Wandering Wisp" and "Wizard's Wisp", not the coined token. |
+| Sack of Startled Bats | the bat toy | KEEP. No hit on Wowhead or warcraft.wiki.gg (only bat reagents such as Bat Ear); plain English. |
+| Murmurwick Candle | the whispering candle | KEEP. "Murmurwick" has no hit; the nearest is the unrelated title "No Murders in Grimwick" and ESO's "Murkmire Candle" furnishings, different tokens. |
+| Sparkbristle Play Broom | the toy broom | KEEP. "Sparkbristle" has no hit in any game or wiki searched. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.
