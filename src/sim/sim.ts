@@ -720,7 +720,7 @@ import {
   WORLD_BOSSES,
 } from './world_boss';
 import { spawnDevBoss, spawnWorldBoss } from './world_boss_spawn';
-import * as ferryMod from './world_gates';
+import * as gatesMod from './world_gates';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -2278,7 +2278,7 @@ export class Sim {
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
     this.ctx = this.buildSimContext(cfg.vaultConsumptionAdmission, cfg.courierBankExchange);
-    ferryMod.syncWorldGates(this.ctx); // this world's own gates before any placement query
+    gatesMod.syncWorldGates(this.ctx); // this world's own gates before any placement query
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
       seed: this.cfg.seed,
@@ -2286,7 +2286,7 @@ export class Sim {
       resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
         this.resolveMove(fromX, fromZ, nx, nz, r, e, ignoreFences),
       resolvedAbility: (abilityId, pid) => this.resolvedAbility(abilityId, pid),
-      platform: (p) => ferryMod.ferryDeckPlatform(this.ctx, p), // a sailing ship's deck
+      platform: (p) => gatesMod.ferryDeckPlatform(this.ctx, p), // a sailing ship's deck
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => seatingMod.standUp(this.ctx, p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
@@ -3888,7 +3888,7 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
+      pos: gatesMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
       facing: e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
@@ -4101,7 +4101,7 @@ export class Sim {
 
   // --- IWorldTransport ---
   ferryView(): TransportFerryView | null {
-    return ferryMod.transportFerryView(this.ctx, this.entities.get(this.primaryId));
+    return gatesMod.transportFerryView(this.ctx, this.entities.get(this.primaryId));
   }
 
   // --- IWorldMounts ---
@@ -5950,7 +5950,7 @@ export class Sim {
     lap?.('respawns');
     this.updateWorldBosses();
     lap?.('worldBosses');
-    ferryMod.updateWorldGates(this.ctx); // ferry timetable + seasonal decor gate, pre-movement
+    gatesMod.updateWorldGates(this.ctx); // ferry timetable + seasonal decor gate, pre-movement
     tickGroundAoEs(this.ctx);
     lap?.('groundAoEs');
     tickFrozenOrbs(this.ctx);

@@ -65,6 +65,10 @@ function authoredMaterialsOf(file: string): string[] {
  *  authored rig here instead of flagging it is a conscious choice, not the
  *  default: a new Tripo or Blender creature sets `authoredAtlas: true`. */
 const LEGACY_UNFLAGGED_DEFS = new Set([
+  // Old Thatchgrin: his colour is painted in the vertices; the sackcloth's map is a
+  // near-white burlap weave detail tile multiplied over it (burlap_weave.py), not an
+  // authored atlas, so the body keeps the kit polish and the uniform low-tier floor.
+  'mob_gourdlight_thatchgrin',
   // Retained buddies keep their existing low-tier material response.
   'buddy_horse',
   'buddy_crystal_lich',

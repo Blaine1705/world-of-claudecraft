@@ -1377,7 +1377,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf, and again for its candle-light registry, for its field boss's effects layer, for its phase 3 rain and broom, and for the Haunted Pumpkin hunt's renderer hooks. No capture was retaken.
+  // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf, and again for its candle-light registry, for its field boss's effects layer, for its phase 3 rain and broom, for the Haunted Pumpkin hunt's renderer hooks, and for the polish pass's scarecrow audio sink. No capture was retaken.
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
@@ -1423,7 +1423,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  'b25d1393faae7abc8662e9601fe7fbfa9892f7e440fb4415dd3fb9a0b33c3328';
+  '51d40fbcbeb49ef60cbc4c301b6d01f249f74b7db93022e96be8cf4c7e63423d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1468,8 +1468,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for Gourdlight Eve's renderer wiring, and again for the Haunted Pumpkin
-  // hunt's renderer hooks. No capture was retaken.
-  'ce0c7826ab2406e8e92c7e81595a9963aeb3eb72642e78c6075bde0d6e85268b';
+  // hunt's renderer hooks, and for the polish pass's scarecrow audio sink. No capture was
+  // retaken.
+  'e62122e332b21bc7f95d489d531e46b5dc1325de87b61b4552ed44981283d4ac';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2869,8 +2870,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
       // Gourdlight Eve's renderer wiring: recomputed LAST again, and again for the
-      // Haunted Pumpkin hunt's renderer hooks. No capture was retaken.
-    ).toBe('62cb8b2adac3ffe52418e1b8014683cfd0b7be2844d786600c86dbe8a44f48f2');
+      // Haunted Pumpkin hunt's renderer hooks, and for the polish pass's scarecrow audio
+      // sink. No capture was retaken.
+    ).toBe('933b4ff7c59c4349983c27342cc899d794b06be686b3c6ba5868ea39f807d846');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

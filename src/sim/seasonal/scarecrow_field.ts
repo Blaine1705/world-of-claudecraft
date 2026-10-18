@@ -103,7 +103,9 @@ export function measureScarecrowField(seed: number, x: number, z: number): Scare
   const near: Collider[] = [];
   queryOpenWorldColliders(seed, x - open, z - open, x + open, z + open, near);
   let obstacles = 0;
-  for (const c of near) if (Math.hypot(c.x - x, c.z - z) < open) obstacles++;
+  // a gated set (the event's own dressing, a docked ship) is not the land: never counted
+  for (const c of near)
+    if (c.gate === undefined && Math.hypot(c.x - x, c.z - z) < open) obstacles++;
   let shore = false;
   for (let k = 0; k < 16; k++) {
     const a = (k / 16) * Math.PI * 2;
@@ -157,12 +159,20 @@ export function scarecrowFieldPasses(check: ScarecrowFieldCheck): boolean {
   );
 }
 
-let memo: { key: string; field: ScarecrowField | null } | null = null;
+// One answer per (active content, seed), like the decor layout's memo: two worlds on
+// different seeds in one process never evict each other's field.
+const memo = new WeakMap<object, Map<string, ScarecrowField | null>>();
 
 /** The field, or null when the world has no spot that passes. */
 export function resolveScarecrowField(seed: number): ScarecrowField | null {
+  const content = getActiveWorldContent();
+  let bySeed = memo.get(content);
+  if (!bySeed) {
+    bySeed = new Map();
+    memo.set(content, bySeed);
+  }
   const key = `${seed}:${getContentGeneration()}`;
-  if (memo && memo.key === key) return memo.field;
+  if (bySeed.has(key)) return bySeed.get(key) ?? null;
   const zone = getActiveWorldContent().zones.find((zn) => zn.id === SCARECROW_FIELD_ZONE);
   const anchor = zone?.pois?.find((p) => p.id === SCARECROW_FIELD_ANCHOR_POI) ?? zone?.hub;
   let field: ScarecrowField | null = null;
@@ -184,6 +194,6 @@ export function resolveScarecrowField(seed: number): ScarecrowField | null {
       }
     }
   }
-  memo = { key, field };
+  bySeed.set(key, field);
   return field;
 }

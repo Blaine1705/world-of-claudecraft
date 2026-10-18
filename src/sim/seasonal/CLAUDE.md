@@ -40,7 +40,9 @@ on a road) in `src/sim/seasonal_decor_layout.ts`, pinned against the live world 
 pieces (stalls, hay bales, big lit pumpkins, corn shocks) also COLLIDE while the event
 runs: `src/sim/seasonal_decor_colliders.ts` builds them off the same resolved list into
 one gated set of the static collider grid (`setColliderGateOpen`), re-applied every tick
-by `updateSeasonal` and on every `season` change by the online mirror; pinned (never on a
+at construction and the top of every tick by `src/sim/world_gates.ts` (beside the ferry
+berths) and on every `season` change by the online mirror (built-in world only); the boss
+field ring stays open; pinned (never on a
 road, never cutting a town off) by `tests/seasonal_decor_colliders.test.ts`.
 
 Fairness and replay rules:
