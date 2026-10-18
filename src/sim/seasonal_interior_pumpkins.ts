@@ -14,6 +14,7 @@
 //     snug against a wall or a piece of furniture, never out in the walkway;
 //   - CLEAR: off every furniture collider at the pumpkin's own radius, and off every
 //     townsfolk's spot.
+// Never in a chapel (seasonal_decor_exclusions.ts keeps the street dressing off it too).
 // One pumpkin per house at most, a few per city, taken in a fixed order. Pinned against
 // the live world by tests/seasonal_interior_pumpkins.test.ts. Pure: no rng, no clock.
 
@@ -142,7 +143,8 @@ export function interiorPumpkinJob(seed: number, memoize = true): InteriorPumpki
   const npcSpots = Object.values(NPCS).map((n) => n.pos);
   const queue = AUTHORED_TOWNS.flatMap((town, townIndex) =>
     town.buildings
-      .filter((b) => b.walkIn === true)
+      // never in a chapel: no event dressing at or in it (owner note 2026-10-18)
+      .filter((b) => b.walkIn === true && b.kind !== 'chapel')
       .slice()
       .sort((a, b) => hash2(hashId(a.id), 3, 0x51) - hash2(hashId(b.id), 3, 0x51))
       .map((house) => ({ townIndex, house })),

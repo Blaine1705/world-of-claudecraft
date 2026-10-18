@@ -36,18 +36,18 @@ export const GOURDLIGHT_DECOR_CITIES: readonly SeasonalCityDecorRule[] = Object.
     zoneId: 'eastbrook_vale',
     radius: 62,
     square: { count: 8, ring: 6.5 },
-    street: { max: 8, spacing: 12 },
+    street: { max: 11, spacing: 11 },
   },
   {
     zoneId: 'mirefen_marsh',
     radius: 62,
     square: { count: 6, ring: 5 },
-    street: { max: 9, spacing: 10 },
+    street: { max: 15, spacing: 9 },
   },
   {
     zoneId: 'thornpeak_heights',
     radius: 58,
     square: { count: 6, ring: 5.5 },
-    street: { max: 7, spacing: 12 },
+    street: { max: 11, spacing: 10 },
   },
 ]);

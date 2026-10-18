@@ -29,6 +29,7 @@ import { GOURDLIGHT_PUMPKINS } from './content/gourdlight_pumpkins';
 import { getActiveWorldContent, NPCS } from './data';
 import { hash2 } from './rng';
 import { resolveScarecrowField } from './seasonal/scarecrow_field';
+import { chapelAt } from './seasonal_decor_exclusions';
 import { insideStall, type SeasonalStall, stallLocalToWorld } from './seasonal_decor_stall';
 import { type ResolvedKeeperPost, resolvedKeeperPosts } from './seasonal_keeper_posts';
 import type { PlacedStreetlamp } from './streetlamp_layout';
@@ -121,6 +122,10 @@ const DOOR_SHOCK_SHARE = 0.5;
 const FOLK_BALE_SHARE = 0.1;
 /** Room kept round the keeper's stall for everything else (yards). */
 const STALL_MARGIN = 0.6;
+/** A free-standing piece or a festival pole keeps a walkable lane from the stall: the
+ *  stall's own collider is gated (closed while the resolver runs), so the passage probe
+ *  cannot see it and a piece snug to it could close a pocket off. */
+const STALL_PASSAGE_MARGIN = 2.4;
 /** A free-standing piece never leaves a squeeze between itself and a wall: a
  *  wall nearer than PASSAGE_MIN means it stands snug against it; one between
  *  that and PASSAGE_MAX would leave a gap too narrow to walk, so it is refused. */
@@ -131,8 +136,28 @@ const PASSAGE_RINGS: readonly number[] = [0.9, 1.35, 1.9, 2.5, 3.2, 4];
 export const DECOR_NPC_CLEARANCE = 1.3;
 /** Never on the painted track: at least this far from the road centre line. */
 export const DECOR_ROAD_CLEARANCE = 3.2;
-/** Two ground pieces never closer than this (centre to centre). */
-export const DECOR_MIN_SPACING = 1.5;
+/** Two ground pieces of different families never closer than this (centre to centre). */
+export const DECOR_MIN_SPACING = 2.8;
+/** The decor families: two pieces of one family keep a wider berth than DECOR_MIN_SPACING,
+ *  so the dressing spreads along the street instead of heaping into piles (owner note
+ *  2026-10-18: the pumpkins and the straw read bunched together). */
+export type SeasonalDecorFamily = 'pumpkin' | 'straw' | 'pole';
+export function decorFamily(kind: SeasonalGroundKind): SeasonalDecorFamily {
+  if (kind === 'corn_shock' || kind === 'hay_bale') return 'straw';
+  if (kind === 'garland_pole') return 'pole';
+  return 'pumpkin';
+}
+/** Centre-to-centre berth between two pieces of the SAME family (yards). */
+export const DECOR_FAMILY_SPACING: Readonly<Record<SeasonalDecorFamily, number>> = {
+  pumpkin: 3.6,
+  straw: 7,
+  pole: 6,
+};
+/** The berth two pieces keep, by their kinds (exported for the pin). */
+export function decorSpacing(a: SeasonalGroundKind, b: SeasonalGroundKind): number {
+  const fa = decorFamily(a);
+  return fa === decorFamily(b) ? DECOR_FAMILY_SPACING[fa] : DECOR_MIN_SPACING;
+}
 /** How far from a post's centre its shaft's surface is at lantern height, per
  *  fixture (yards): the bracket's back plate sits against the shaft, not in air.
  *  Measured off the shipped fixtures; an unlisted style takes 0.16. */
@@ -146,14 +171,22 @@ export const DECOR_LANTERN_HEIGHT = 2.7;
 /** Garland attach height on its posts, above each foot. */
 export const DECOR_GARLAND_HEIGHT = 3.7;
 /** The longest garland run strung between two posts (yards). */
-export const DECOR_GARLAND_MAX_SPAN = 30;
+export const DECOR_GARLAND_MAX_SPAN = 24;
+/** A garland never hangs over the painted track: every point of its run stays at
+ *  least this far from the road's centre line (the lamps themselves stand 3 yd or
+ *  more off it, so a run between two posts on one side clears it; a run that
+ *  crosses to the far side dips to zero and is refused). */
+export const DECOR_GARLAND_ROAD_CLEARANCE = 2.8;
 /** A festival pole's garland attach height above its foot (the pole is a little taller). */
 export const DECOR_POLE_GARLAND_HEIGHT = 3.5 * 1.15;
 /** How far across its road a lamp's festival pole may stand (yards from the post). */
 const POLE_REACH: readonly number[] = [8, 9, 10, 11, 12, 7, 13];
-/** Which way from the post the pole is tried: across the road first, then
- *  along the roadside either way (a garland beside the road, not over it). */
-const POLE_TURNS: readonly number[] = [0, Math.PI / 2, -Math.PI / 2, Math.PI];
+/** Which way from the post the pole is tried: along the roadside either way, then
+ *  back from the road. Never across it: a garland runs beside the road, not over it. */
+const POLE_TURNS: readonly number[] = [Math.PI / 2, -Math.PI / 2, Math.PI];
+/** Two lamps strung together face their road the same way (the cosine of the angle
+ *  between their road yaws is at least this): both stand on the same side of it. */
+const SAME_SIDE_MIN_COS = 0.5;
 const GARLAND_MIN_SPAN = 6;
 const GARLAND_MAX_RISE = 3;
 const GARLAND_SAMPLE_STEP = 1;
@@ -186,10 +219,16 @@ function anchorHash(anchor: string, salt: number): number {
   return hash2(h, salt, 0x6f2d);
 }
 
+interface PlacedPiece {
+  x: number;
+  z: number;
+  kind: SeasonalGroundKind;
+}
+
 interface Probe {
   seed: number;
   npcSpots: readonly { x: number; z: number }[];
-  placed: { x: number; z: number }[];
+  placed: PlacedPiece[];
   stalls: readonly SeasonalStall[];
 }
 
@@ -199,14 +238,17 @@ export function groundSpotProblem(
   x: number,
   z: number,
   npcSpots: readonly { x: number; z: number }[],
-  placed: readonly { x: number; z: number }[],
+  placed: readonly PlacedPiece[],
   stalls: readonly SeasonalStall[] = [],
   radius = DECOR_GROUND_RADIUS,
-): 'collider' | 'road' | 'npc' | 'water' | 'crowded' | 'stall' | null {
+  kind: SeasonalGroundKind = 'pumpkin_lit',
+): 'collider' | 'road' | 'npc' | 'water' | 'crowded' | 'stall' | 'chapel' | null {
   if (groundHeight(x, z, seed) < WATER_LEVEL + 0.4) return 'water';
   if (roadDistance(x, z) < DECOR_ROAD_CLEARANCE) return 'road';
+  if (chapelAt(x, z) !== null) return 'chapel';
   for (const n of npcSpots) if (Math.hypot(n.x - x, n.z - z) < DECOR_NPC_CLEARANCE) return 'npc';
-  for (const p of placed) if (Math.hypot(p.x - x, p.z - z) < DECOR_MIN_SPACING) return 'crowded';
+  for (const p of placed)
+    if (Math.hypot(p.x - x, p.z - z) < decorSpacing(kind, p.kind)) return 'crowded';
   for (const stall of stalls) {
     if (insideStall(stall, x, z, STALL_MARGIN + radius)) return 'stall';
   }
@@ -232,6 +274,10 @@ export function narrowsPassage(seed: number, x: number, z: number): boolean {
   return nearest > PASSAGE_MIN && nearest < PASSAGE_MAX;
 }
 
+function besideStall(stalls: readonly SeasonalStall[], x: number, z: number): boolean {
+  return stalls.some((stall) => insideStall(stall, x, z, STALL_PASSAGE_MARGIN));
+}
+
 /** A ground piece's own collider radius (exported for the pin). */
 export function decorKindRadius(kind: SeasonalGroundKind): number {
   return DECOR_KIND_RADIUS[kind] ?? DECOR_GROUND_RADIUS;
@@ -252,6 +298,7 @@ function seat(
     const px = x + n.dx;
     const pz = z + n.dz;
     if (freeStanding && narrowsPassage(probe.seed, px, pz)) continue;
+    if (freeStanding && besideStall(probe.stalls, px, pz)) continue;
     // the Haunted Pumpkin hunt's own spots stay clear, so a hidden pumpkin is never
     // buried in the dressing
     const r = DECOR_MIN_SPACING + decorKindRadius(kind);
@@ -264,21 +311,36 @@ function seat(
       probe.placed,
       probe.stalls,
       decorKindRadius(kind),
+      kind,
     );
     if (problem !== null) continue;
     // A carved face turns toward whoever walks past (`face`), give or take a little.
     const yaw = face + (anchorHash(anchor, 1) - 0.5) * 0.6;
     const size = scale * DECOR_KIND_SCALE[kind];
     out.push({ kind, x: px, y: groundHeight(px, pz, probe.seed), z: pz, yaw, scale: size, anchor });
-    probe.placed.push({ x: px, z: pz });
+    probe.placed.push({ x: px, z: pz, kind });
     return true;
   }
   return false;
 }
 
+/** True when no point of the run hangs over the painted road or inside a chapel's
+ *  keep-clear zone, sampled every half yard end to end (exported for the pin). */
+export function garlandOffRoad(g: SeasonalGarland): boolean {
+  const span = Math.hypot(g.bx - g.ax, g.bz - g.az);
+  const n = Math.max(1, Math.ceil(span * 2));
+  for (let i = 0; i <= n; i++) {
+    const x = g.ax + ((g.bx - g.ax) * i) / n;
+    const z = g.az + ((g.bz - g.az) * i) / n;
+    if (roadDistance(x, z) < DECOR_GARLAND_ROAD_CLEARANCE) return false;
+    if (chapelAt(x, z) !== null) return false;
+  }
+  return true;
+}
+
 /** The run's own posts are colliders: skip each end by its post's radius. A
  *  run never crosses the keeper's stall either (its crest stands above a
- *  garland's height). */
+ *  garland's height), never hangs over the road and never reaches a chapel. */
 function garlandClear(
   seed: number,
   g: SeasonalGarland,
@@ -286,6 +348,7 @@ function garlandClear(
   skipB: number,
   stalls: readonly SeasonalStall[],
 ): boolean {
+  if (!garlandOffRoad(g)) return false;
   const span = Math.hypot(g.bx - g.ax, g.bz - g.az);
   for (let d = skipA; d <= span - skipB; d += GARLAND_SAMPLE_STEP) {
     const t = d / span;
@@ -308,9 +371,10 @@ function cityDecor(
   const inTown = (x: number, z: number) => Math.hypot(x - hub.x, z - hub.z) <= rule.radius;
   // Lamps in town, by stable plan index (the anchor id survives a re-plan that
   // only moves posts, and a new post simply joins the list).
+  // A lamp at a chapel carries no dressing at all (seasonal_decor_exclusions.ts).
   const town = lamps
     .map((lamp, index) => ({ lamp, index }))
-    .filter(({ lamp }) => inTown(lamp.x, lamp.z));
+    .filter(({ lamp }) => inTown(lamp.x, lamp.z) && chapelAt(lamp.x, lamp.z) === null);
   for (const { lamp, index } of town) {
     const anchor = `lamp:${index}`;
     // The post's road side: roadYaw points from the post at the road. The
@@ -330,36 +394,44 @@ function cityDecor(
     const bx = lamp.x + Math.sin(back) * 1.25;
     const bz = lamp.z + Math.cos(back) * 1.25;
     seat(probe, layout.ground, 'pumpkin_lit', bx, bz, `${anchor}:a`, 1, lamp.roadYaw);
-    // ...and a harvest cluster round it: a gourd pair to one side, a small carved
-    // pumpkin to the other (which side each takes turns on the anchor's hash).
+    // ...and a harvest run along the roadside from it: a gourd pair a few yards
+    // one way, a small carved pumpkin a few yards the other (which way each goes
+    // turns on the anchor's hash), spread out so a post is never a heap.
     const flip = anchorHash(anchor, 2) < 0.5 ? 1 : -1;
     // at a few posts a hay bale stands in for the small pumpkin, and a few get a
     // corn shock behind the cluster, so a street of lamps is never one stamp
     // repeated. Kept sparse (owner note 2026-10-18: the straw read as litter):
     // the lamps' own dressing is gourds and pumpkins, the straw an accent.
     const bale = anchorHash(anchor, 4) < LAMP_BALE_SHARE;
+    // [slot, kind, yards back from the road, yards along it, size]
     const slots: [string, SeasonalGroundKind, number, number, number][] = [
-      ['b', 'gourd', 0.9, 1.7, 0.9],
-      bale ? ['c', 'hay_bale', -0.95, 2.0, 0.9] : ['c', 'pumpkin_small', -0.85, 1.75, 0.85],
+      ['b', 'gourd', 1.4, 4.2 * flip, 0.9],
+      bale
+        ? ['c', 'hay_bale', 1.8, -4.6 * flip, 0.9]
+        : ['c', 'pumpkin_small', 1.5, -4.4 * flip, 0.85],
     ];
     if (anchorHash(anchor, 5) < LAMP_SHOCK_SHARE)
-      slots.push(['d', 'corn_shock', 0.25 * flip, 2.35, 1]);
-    for (const [slot, kind, turn, reach, size] of slots) {
-      const a = back + turn * flip;
+      slots.push(['d', 'corn_shock', 3.9, 1.2 * flip, 1]);
+    const along = lamp.roadYaw + Math.PI / 2;
+    for (const [slot, kind, out, run, size] of slots) {
       seat(
         probe,
         layout.ground,
         kind,
-        lamp.x + Math.sin(a) * reach,
-        lamp.z + Math.cos(a) * reach,
+        lamp.x + Math.sin(back) * out + Math.sin(along) * run,
+        lamp.z + Math.cos(back) * out + Math.cos(along) * run,
         `${anchor}:${slot}`,
         size,
         lamp.roadYaw,
+        // the tall shock stands out behind the post: it must never close a walkway
+        kind === 'corn_shock',
       );
     }
   }
-  // Garlands: each post strung to its nearest neighbour (once per pair), when
-  // the run is a sensible street width and every yard of it is clear.
+  // Garlands: each post strung to its nearest neighbour ON ITS OWN SIDE of the
+  // road (once per pair), when the run is short, never hangs over the road and
+  // every yard of it is clear. A post with no such neighbour is left unstrung
+  // here (the festival poles below may still dress it along its roadside).
   const strung = new Set<string>();
   for (const { lamp: a, index: ia } of town) {
     let best: { lamp: (typeof town)[number]['lamp']; index: number; d: number } | null = null;
@@ -368,6 +440,7 @@ function cityDecor(
       const d = Math.hypot(b.x - a.x, b.z - a.z);
       if (d < GARLAND_MIN_SPAN || d > DECOR_GARLAND_MAX_SPAN) continue;
       if (Math.abs(b.y - a.y) > GARLAND_MAX_RISE) continue;
+      if (Math.cos(b.roadYaw - a.roadYaw) < SAME_SIDE_MIN_COS) continue;
       if (!best || d < best.d) best = { lamp: b, index: ib, d };
     }
     if (!best) continue;
@@ -389,7 +462,8 @@ function cityDecor(
     layout.garlands.push(g);
   }
   // Festival poles: every town lamp not already strung to a neighbour is strung
-  // ACROSS its road to a pole on the far side, so the streets read as dressed.
+  // ALONG its roadside to a pole a few yards up or down the street (never across
+  // the road), so the streets read as dressed.
   for (const { lamp, index } of town) {
     if ([...strung].some((key) => key.split('-').includes(String(index)))) continue;
     let done = false;
@@ -399,8 +473,17 @@ function cityDecor(
       for (const reach of POLE_REACH) {
         const px = lamp.x + Math.sin(dir) * reach;
         const pz = lamp.z + Math.cos(dir) * reach;
-        if (groundSpotProblem(seed, px, pz, probe.npcSpots, probe.placed, probe.stalls) !== null)
-          continue;
+        const problem = groundSpotProblem(
+          seed,
+          px,
+          pz,
+          probe.npcSpots,
+          probe.placed,
+          probe.stalls,
+          DECOR_GROUND_RADIUS,
+          'garland_pole',
+        );
+        if (problem !== null || besideStall(probe.stalls, px, pz)) continue;
         const py = groundHeight(px, pz, seed);
         if (Math.abs(py - lamp.y) > GARLAND_MAX_RISE) continue;
         const g: SeasonalGarland = {
@@ -424,7 +507,7 @@ function cityDecor(
           scale: DECOR_KIND_SCALE.garland_pole,
           anchor,
         });
-        probe.placed.push({ x: px, z: pz });
+        probe.placed.push({ x: px, z: pz, kind: 'garland_pole' });
         layout.garlands.push(g);
         done = true;
         break;
@@ -648,13 +731,15 @@ function keeperDressing(post: ResolvedKeeperPost, probe: Probe, layout: Seasonal
  *  lit pumpkins ringing the fight's edge, never inside it, anchored to the field itself so
  *  they move with it. The ring is the arena's boundary as much as its dressing. */
 export const SCARECROW_FIELD_RING = { inner: 13.5, outer: 16.5, count: 22 } as const;
+// Straw every other piece at most, so two straw pieces on the ring stand a full
+// family berth apart (DECOR_FAMILY_SPACING) and the ring never heaps.
 const FIELD_KINDS: readonly SeasonalGroundKind[] = [
   'corn_shock',
   'pumpkin_lit',
+  'hay_bale',
   'gourd',
   'corn_shock',
   'pumpkin_small',
-  'hay_bale',
 ];
 
 function scarecrowFieldDecor(seed: number, probe: Probe, layout: SeasonalDecorLayout): void {

@@ -5,6 +5,7 @@
 // red when a city rework drops a building onto the dressing: re-running the gate
 // after other PRs merge catches it.
 import { afterEach, describe, expect, it } from 'vitest';
+import { AUTHORED_TOWN_BUILDINGS } from '../src/sim/authored_town_registry';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { GOURDLIGHT_KEEPER_POSTS } from '../src/sim/content/gourdlight_eve';
 import { GOURDLIGHT_DECOR_CITIES } from '../src/sim/content/gourdlight_eve_decor';
@@ -13,10 +14,21 @@ import { getActiveWorldContent, NPCS } from '../src/sim/data';
 import { resolveScarecrowField } from '../src/sim/seasonal/scarecrow_field';
 import { syncSeasonalDecorColliders } from '../src/sim/seasonal_decor_colliders';
 import {
+  CHAPEL_DECOR_CLEARANCE,
+  chapelAt,
+  SEASONAL_CHAPEL_IDS,
+} from '../src/sim/seasonal_decor_exclusions';
+import {
+  DECOR_FAMILY_SPACING,
+  DECOR_GARLAND_MAX_SPAN,
+  DECOR_GARLAND_ROAD_CLEARANCE,
   DECOR_MIN_SPACING,
   DECOR_NPC_CLEARANCE,
   DECOR_ROAD_CLEARANCE,
+  decorFamily,
   decorKindRadius,
+  decorSpacing,
+  garlandOffRoad,
   groundSpotProblem,
   narrowsPassage,
   resolveSeasonalDecor,
@@ -62,7 +74,7 @@ describe('seasonal decor placement against the live world', () => {
           problems.push(`${p.anchor} on NPC ${n.id}`);
       }
       for (const q of layout.ground.slice(i + 1)) {
-        if (Math.hypot(q.x - p.x, q.z - p.z) < DECOR_MIN_SPACING)
+        if (Math.hypot(q.x - p.x, q.z - p.z) < decorSpacing(p.kind, q.kind))
           problems.push(`${p.anchor} overlaps ${q.anchor}`);
       }
       expect(p.y).toBeCloseTo(groundHeight(p.x, p.z, WORLD_SEED), 5);
@@ -311,5 +323,163 @@ describe('seasonal decor placement against the live world', () => {
   it('is deterministic and memoized per seed', () => {
     expect(resolveSeasonalDecor(WORLD_SEED)).toEqual(layout);
     expect(seasonalDecorLayout(WORLD_SEED)).toBe(seasonalDecorLayout(WORLD_SEED));
+  });
+
+  // Owner note 2026-10-18 (Eastbrook): a string of lights hung between two lamps on
+  // OPPOSITE sides of the road ran diagonally over the middle of the walkway. A garland
+  // now only joins posts on one side of their road, never hangs over the painted track,
+  // and stays short.
+  it('strings no garland across a road in any event city', () => {
+    const lamps = streetlampPlacements(WORLD_SEED);
+    const onLamp = (x: number, z: number) => lamps.find((l) => Math.hypot(l.x - x, l.z - z) < 0.01);
+    const problems: string[] = [];
+    for (const g of layout.garlands) {
+      const span = Math.hypot(g.bx - g.ax, g.bz - g.az);
+      expect(span, g.anchor).toBeLessThanOrEqual(DECOR_GARLAND_MAX_SPAN);
+      for (let d = 0; d <= span; d += 0.25) {
+        const t = d / span;
+        const r = roadDistance(g.ax + (g.bx - g.ax) * t, g.az + (g.bz - g.az) * t);
+        if (r < DECOR_GARLAND_ROAD_CLEARANCE) {
+          problems.push(`${g.anchor} over the road at ${d.toFixed(2)} (${r.toFixed(2)})`);
+          break;
+        }
+      }
+      // two lamps strung together face their road the same way: one side of it
+      const a = onLamp(g.ax, g.az);
+      const b = onLamp(g.bx, g.bz);
+      if (a && b && Math.cos(a.roadYaw - b.roadYaw) < 0.5)
+        problems.push(`${g.anchor} joins posts on opposite sides`);
+    }
+    expect(problems).toEqual([]);
+    // every event city still has strung garlands
+    const zones = getActiveWorldContent().zones;
+    for (const rule of GOURDLIGHT_DECOR_CITIES) {
+      const hub = zones.find((z) => z.id === rule.zoneId)?.hub;
+      if (!hub) continue;
+      const mine = layout.garlands.filter(
+        (g) => Math.hypot(g.ax - hub.x, g.az - hub.z) <= rule.radius + 3,
+      );
+      expect(mine.length, rule.zoneId).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('refuses a garland strung across the road (the resolver rule itself)', () => {
+    const lamps = streetlampPlacements(WORLD_SEED);
+    const hub = getActiveWorldContent().zones.find((z) => z.id === 'eastbrook_vale')?.hub;
+    expect(hub).toBeDefined();
+    if (!hub) return;
+    const lamp = lamps.find(
+      (l) => Math.hypot(l.x - hub.x, l.z - hub.z) < 62 && chapelAt(l.x, l.z) === null,
+    );
+    expect(lamp).toBeDefined();
+    if (!lamp) return;
+    // the mirror of the post across its road: the run passes over the centre line
+    const reach = roadDistance(lamp.x, lamp.z) * 2;
+    const across = {
+      ax: lamp.x,
+      ay: lamp.y + 3.7,
+      az: lamp.z,
+      bx: lamp.x + Math.sin(lamp.roadYaw) * reach,
+      by: lamp.y + 3.7,
+      bz: lamp.z + Math.cos(lamp.roadYaw) * reach,
+      sag: 1,
+      anchor: 'probe',
+    };
+    expect(garlandOffRoad(across)).toBe(false);
+    // the same run turned back from the road stays off it
+    const away = {
+      ...across,
+      bx: lamp.x - Math.sin(lamp.roadYaw) * 6,
+      bz: lamp.z - Math.cos(lamp.roadYaw) * 6,
+    };
+    expect(garlandOffRoad(away)).toBe(true);
+  });
+
+  // Owner note 2026-10-18: no pumpkins at the church. Every event city's chapel is a
+  // quiet place: no ground piece, lantern or garland at it, round it or inside it.
+  it('keeps every piece of dressing away from the chapels', () => {
+    const chapels = AUTHORED_TOWN_BUILDINGS.filter((b) => b.kind === 'chapel');
+    expect(chapels.map((c) => c.id).sort()).toEqual([...SEASONAL_CHAPEL_IDS].sort());
+    expect(chapels.length).toBe(3);
+    for (const c of chapels) {
+      // the chapel itself and a point just inside the margin are in the zone; a point
+      // past the margin is not
+      expect(chapelAt(c.position.x, c.position.z), c.id).toBe(c.id);
+      const r = c.reach;
+      const cos = Math.cos(r.rotation);
+      const sin = Math.sin(r.rotation);
+      // local +x back to world (the inverse of the zone's own frame)
+      const at = (lx: number) => chapelAt(r.center.x + lx * cos, r.center.z - lx * sin);
+      expect(at(r.halfWidth + CHAPEL_DECOR_CLEARANCE - 0.5), `${c.id} margin`).toBe(c.id);
+      expect(at(r.halfWidth + CHAPEL_DECOR_CLEARANCE + 0.5), `${c.id} past it`).toBeNull();
+      expect(
+        groundSpotProblem(WORLD_SEED, r.center.x, r.center.z, [], []),
+        `${c.id} refused`,
+      ).not.toBeNull();
+    }
+    const problems: string[] = [];
+    for (const p of layout.ground) {
+      const at = chapelAt(p.x, p.z);
+      if (at) problems.push(`${p.anchor} (${p.kind}) at ${at}`);
+    }
+    for (const l of layout.lanterns) {
+      const at = chapelAt(l.x, l.z);
+      if (at) problems.push(`${l.anchor} lantern at ${at}`);
+    }
+    for (const g of layout.garlands) {
+      for (let t = 0; t <= 1; t += 0.02) {
+        const at = chapelAt(g.ax + (g.bx - g.ax) * t, g.az + (g.bz - g.az) * t);
+        if (at) {
+          problems.push(`${g.anchor} garland at ${at}`);
+          break;
+        }
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
+  // Owner note 2026-10-18: the pumpkins and the straw stood bunched in piles. Two pieces
+  // of one family keep a wide berth, any two pieces a smaller one, and every city keeps
+  // about the round-5 amount of dressing (spread out, not cut).
+  it('spreads the dressing out in every city: a berth per family, about the same count', () => {
+    expect(DECOR_FAMILY_SPACING.pumpkin).toBeGreaterThanOrEqual(3.5);
+    expect(DECOR_FAMILY_SPACING.straw).toBeGreaterThanOrEqual(7);
+    expect(DECOR_MIN_SPACING).toBeGreaterThanOrEqual(2.4);
+    expect(decorSpacing('pumpkin_lit', 'gourd')).toBe(DECOR_FAMILY_SPACING.pumpkin);
+    expect(decorSpacing('corn_shock', 'hay_bale')).toBe(DECOR_FAMILY_SPACING.straw);
+    expect(decorSpacing('corn_shock', 'pumpkin_small')).toBe(DECOR_MIN_SPACING);
+    // the resolver rule itself: a gourd 3 yd from a lit pumpkin is crowded out, a shock
+    // at the same 3 yd is not (a different family)
+    const lamp = streetlampPlacements(WORLD_SEED)[0];
+    const placed = [{ x: lamp.x + 20, z: lamp.z + 20, kind: 'pumpkin_lit' as const }];
+    const px = placed[0].x + 3;
+    const pz = placed[0].z;
+    expect(
+      groundSpotProblem(WORLD_SEED, px, pz, [], placed, [], decorKindRadius('gourd'), 'gourd'),
+    ).toBe('crowded');
+    expect(groundSpotProblem(WORLD_SEED, px, pz, [], placed, [], 0.2, 'corn_shock')).not.toBe(
+      'crowded',
+    );
+    const zones = getActiveWorldContent().zones;
+    for (const rule of GOURDLIGHT_DECOR_CITIES) {
+      const hub = zones.find((z) => z.id === rule.zoneId)?.hub;
+      if (!hub) continue;
+      const ground = layout.ground.filter(
+        (p) => Math.hypot(p.x - hub.x, p.z - hub.z) <= rule.radius + 3,
+      );
+      // round 5 dressed each city with 52 to 63 pieces: keep roughly that
+      expect(ground.length, `${rule.zoneId} count`).toBeGreaterThanOrEqual(42);
+      expect(ground.length, `${rule.zoneId} count`).toBeLessThanOrEqual(66);
+      for (const [i, p] of ground.entries()) {
+        for (const q of ground.slice(i + 1)) {
+          const fp = decorFamily(p.kind);
+          const need = fp === decorFamily(q.kind) ? DECOR_FAMILY_SPACING[fp] : DECOR_MIN_SPACING;
+          expect(
+            Math.hypot(q.x - p.x, q.z - p.z),
+            `${rule.zoneId}: ${p.anchor} and ${q.anchor}`,
+          ).toBeGreaterThanOrEqual(need);
+        }
+      }
+    }
   });
 });

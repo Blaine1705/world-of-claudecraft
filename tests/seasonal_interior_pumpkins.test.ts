@@ -10,6 +10,7 @@ import { AUTHORED_TOWNS } from '../src/sim/authored_town_registry';
 import { isBlocked, supportHeightAt } from '../src/sim/colliders';
 import { GOURDLIGHT_PUMPKINS } from '../src/sim/content/gourdlight_pumpkins';
 import { NPCS } from '../src/sim/data';
+import { chapelAt } from '../src/sim/seasonal_decor_exclusions';
 import { seasonalDecorLayout } from '../src/sim/seasonal_decor_layout';
 import {
   enclosedAt,
@@ -86,6 +87,17 @@ describe('the indoor pumpkins', () => {
           1.3,
         );
       }
+    }
+  });
+
+  // Owner note 2026-10-18: no pumpkins at the church, inside included.
+  it('never stand in a chapel', () => {
+    const chapels = AUTHORED_TOWNS.flatMap((t) => t.buildings).filter((b) => b.kind === 'chapel');
+    expect(chapels.length).toBe(3);
+    for (const p of list) {
+      const house = AUTHORED_TOWNS.flatMap((t) => t.buildings).find((b) => b.id === p.buildingId);
+      expect(house?.kind, p.anchor).not.toBe('chapel');
+      expect(chapelAt(p.x, p.z), p.anchor).toBeNull();
     }
   });
 
