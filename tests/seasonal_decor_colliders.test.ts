@@ -3,7 +3,7 @@
 // event runs, never stand on a road, and never cut anyone off from anywhere: every dressed
 // town is walked both ways (dressing gone, dressing standing) and the only ground lost is
 // the ground under the pieces themselves; every NPC is still in reach.
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { pushOut } from '../src/sim/collider_pushout';
 import type { Collider } from '../src/sim/collider_shapes';
 import { isBlocked, queryOpenWorldColliders } from '../src/sim/colliders';
@@ -25,6 +25,10 @@ import { roadDistance } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const seed = WORLD_SEED;
+
+// The collider grid is shared per seed in one process: never leave the gate open for the
+// next suite in this worker.
+afterEach(() => syncSeasonalDecorColliders(seed, null));
 
 function boundary(c: Collider): { x: number; z: number }[] {
   const out: { x: number; z: number }[] = [{ x: c.x, z: c.z }];
@@ -88,6 +92,24 @@ describe('the dressing collides only while the event runs', () => {
     for (const p of spots) expect(liveDecorAt(p.x, p.z)).toEqual([]);
   });
 
+  it('syncs at the top of the tick, before movement, and at construction', () => {
+    const shock = seasonalDecorLayout(seed).ground.find(
+      (p) => p.kind === 'corn_shock' && !p.anchor.startsWith('field:'),
+    );
+    if (!shock) throw new Error('no corn shock');
+    // another world in this process left the gate open...
+    syncSeasonalDecorColliders(seed, GOURDLIGHT_EVE_ID);
+    expect(liveDecorAt(shock.x, shock.z).length).toBeGreaterThan(0);
+    // ...a fresh world with the event closed closes it before any query of its own
+    new Sim({ seed, playerClass: 'warrior' });
+    expect(liveDecorAt(shock.x, shock.z)).toEqual([]);
+    // and a world whose event is open opens it on its first tick, before movement
+    const sim = new Sim({ seed, playerClass: 'warrior', devCommands: true });
+    sim.chat('/dev season on');
+    sim.tick();
+    expect(liveDecorAt(shock.x, shock.z).length).toBeGreaterThan(0);
+  });
+
   it('opens and closes the same gate for the online mirror (the season key)', () => {
     const shock = seasonalDecorLayout(seed).ground.find((p) => p.kind === 'corn_shock');
     if (!shock) throw new Error('no corn shock');
@@ -101,7 +123,9 @@ describe('the dressing collides only while the event runs', () => {
 
   it('gives a body to every solid piece and every stall, and none to the light ones', () => {
     const layout = seasonalDecorLayout(seed);
-    const solid = layout.ground.filter((p) => decorPieceIsSolid(p.kind));
+    const solid = layout.ground.filter(
+      (p) => decorPieceIsSolid(p.kind) && !p.anchor.startsWith('field:'),
+    );
     const colliders = seasonalDecorColliders(seed);
     expect(colliders.length).toBe(solid.length + layout.stalls.length * 6);
     expect(decorPieceIsSolid('gourd')).toBe(false);
@@ -113,6 +137,15 @@ describe('the dressing collides only while the event runs', () => {
       expect(c.cameraTopY).toBeDefined();
       expect(c.underY).toBeDefined();
     }
+  });
+});
+
+describe('his field ring', () => {
+  it('stays open round the boss arena (dressing, not a fence)', () => {
+    syncSeasonalDecorColliders(seed, GOURDLIGHT_EVE_ID);
+    const ring = seasonalDecorLayout(seed).ground.filter((p) => p.anchor.startsWith('field:'));
+    expect(ring.length).toBeGreaterThan(0);
+    for (const p of ring) expect(liveDecorAt(p.x, p.z, 0.3), p.anchor).toEqual([]);
   });
 });
 

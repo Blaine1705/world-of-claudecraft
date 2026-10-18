@@ -2,7 +2,7 @@
 // in his field only while the event runs (host-fed or /dev), his field resolves against
 // the live world, his kit telegraphs and lands deterministically, every contributor gets
 // personal spoils once per daily reset, and what he pays is cosmetic or currency.
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   CARVED_PUMPKIN_HEAD_ID,
   GOURDLIGHT_BROOM_ID,
@@ -51,10 +51,15 @@ import {
   BOUND_RECHECK_TICKS,
   sweepEventBoundItems,
 } from '../src/sim/seasonal/seasonal_bound_items';
+import { syncSeasonalDecorColliders } from '../src/sim/seasonal_decor_colliders';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { worldBossLockoutId } from '../src/sim/world_boss';
 import { WORLD_SEED } from '../src/sim/world_seed';
+
+// The collider grid is shared per seed in one process: close the event's decor gate
+// after each test so no other suite in this worker walks into a stall.
+afterEach(() => syncSeasonalDecorColliders(WORLD_SEED, null));
 
 function world(): Sim {
   const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });

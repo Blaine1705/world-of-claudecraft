@@ -5,8 +5,8 @@
 // On open: the event's keeper NPC is raised at each city's stall, each under her own
 // reserved singleton id.
 // On close: the keeper leaves and every seasonal cosmetic comes off every body.
-// Every tick: the event's solid city dressing (stalls, bales, big pumpkins, corn shocks)
-// collides exactly while it runs (seasonal_decor_colliders.ts, a gated collider set).
+// The event's solid city dressing collides exactly while it runs: its gate is synced at
+// the top of every tick, beside the ferry berths (world_gates.ts), never here.
 // While open: a worn pumpkin head is put back on a body that lost it (a death, a
 // relog), so wearing it is the character's standing choice for the whole event,
 // for as long as the character still owns one (bags or bank): a head destroyed
@@ -20,7 +20,6 @@ import {
   PUMPKIN_HEAD_AURA_ID,
 } from '../content/gourdlight_eve';
 import { createNpc } from '../entity';
-import { syncSeasonalDecorColliders } from '../seasonal_decor_colliders';
 import { resolvedKeeperPosts } from '../seasonal_keeper_posts';
 import type { SimContext } from '../sim_context';
 import type { NpcDef } from '../types';
@@ -69,9 +68,6 @@ function dismissKeeper(ctx: SimContext, eventId: string | null): void {
 export function updateSeasonal(ctx: SimContext): void {
   const state = ctx.seasonal;
   const active = activeSeasonalEventOf(state);
-  // The event's solid dressing collides only while it runs (re-applied every tick: the
-  // grid is shared per seed in one process, the transport gates' contract). Zero rng.
-  syncSeasonalDecorColliders(ctx.cfg.seed, active);
   const edge = active !== state.lastActive;
   if (edge) {
     updateHauntedPumpkins(ctx, active);

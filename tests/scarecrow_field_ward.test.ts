@@ -2,7 +2,7 @@
 // Meadow's idle wildlife (the level-2 boars, Mogger) keeps out of Old Thatchgrin's pumpkin
 // patch; outside the event the meadow wanders exactly as before. Zero rng: the ward only
 // rewrites wander targets.
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { STRAWLING_ID } from '../src/sim/content/gourdlight_eve_scarecrow';
 import { resolveScarecrowField } from '../src/sim/seasonal/scarecrow_field';
 import {
@@ -13,9 +13,14 @@ import {
   walkCrossesWard,
   wardedByScarecrowField,
 } from '../src/sim/seasonal/scarecrow_field_ward';
+import { syncSeasonalDecorColliders } from '../src/sim/seasonal_decor_colliders';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
+
+// The collider grid is shared per seed in one process: close the event's decor gate
+// after each test so no other suite in this worker walks into a stall.
+afterEach(() => syncSeasonalDecorColliders(WORLD_SEED, null));
 
 function world(season: boolean): Sim {
   const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });

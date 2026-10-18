@@ -9,14 +9,16 @@
 // every cell the moment it closes. Every collision consumer (movement, support, sight,
 // the online client's self-prediction) reads those cells, so the event's furniture is
 // there or gone for all of them at once. The owning world re-applies its own answer
-// every tick (the Sim, seasonal/seasonal_tick.ts) or on every season change (the online
-// ClientWorld, net/seasonal_wire_state.ts), the transport gates' contract.
+// at the top of every tick and at construction (the Sim, world_gates.ts) or on every
+// season change (the online ClientWorld, net/seasonal_wire_state.ts), the transport
+// gates' contract. Built-in world only (the dressing is resolved against its towns).
 //
 // Never a trap: the shapes sit a little inside each piece's drawn silhouette (a body
 // brushes past a skirt of straw instead of snagging on it), the low ones (bales, big
 // pumpkins) can be jumped (moveTopY), and the layout already keeps every piece off the
 // roads, off NPC spots and out of narrow passages; tests/seasonal_decor_colliders.test.ts
-// walks every dressed town both ways and pins that nothing reachable gets cut off.
+// walks every dressed town both ways and pins that nothing reachable gets cut off. Old
+// Thatchgrin's field ring is dressing only (no collision): it rings a boss arena.
 //
 // Pure and deterministic: no rng, no clock, no Three. The layout read is memoized.
 import type { Collider } from './collider_shapes';
@@ -122,6 +124,9 @@ export function seasonalDecorColliders(seed: number): Collider[] {
   const out: Collider[] = [];
   for (const stall of layout.stalls) stallColliders(stall, out);
   for (const p of layout.ground) {
+    // Old Thatchgrin's field ring stays open: a wall of tall shocks round a boss arena would
+    // block casters' sight lines and snag players kiting his rain; it is dressing, not a fence
+    if (p.anchor.startsWith('field:')) continue;
     const c = pieceCollider(p);
     if (c) out.push(c);
   }

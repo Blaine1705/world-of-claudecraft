@@ -10,6 +10,7 @@
 // collider grid while it runs (seasonal_decor_colliders.ts), so self-prediction walks
 // round the same stalls and bales the server's Sim does.
 import { GOURDLIGHT_PUMPKINS } from '../sim/content/gourdlight_pumpkins';
+import { isBuiltinWorldActive } from '../sim/data';
 import { syncSeasonalDecorColliders } from '../sim/seasonal_decor_colliders';
 import { LanceWireState } from './lance_wire_state';
 import type { QuestWorldWireState } from './quest_world_wire_state';
@@ -88,6 +89,7 @@ export class SeasonalWireState extends LanceWireState {
 
   /** The mirrored season's collider gate (a reset before cfg exists has nothing to close). */
   private syncSeasonalColliders(): void {
-    if (this.cfg) syncSeasonalDecorColliders(this.cfg.seed, this.activeSeasonalEvent);
+    if (!this.cfg || !isBuiltinWorldActive()) return;
+    syncSeasonalDecorColliders(this.cfg.seed, this.activeSeasonalEvent);
   }
 }

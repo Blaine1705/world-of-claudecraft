@@ -4,13 +4,14 @@
 // along its whole run, and each city actually dressed. This is the pin that turns
 // red when a city rework drops a building onto the dressing: re-running the gate
 // after other PRs merge catches it.
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { GOURDLIGHT_KEEPER_POSTS } from '../src/sim/content/gourdlight_eve';
 import { GOURDLIGHT_DECOR_CITIES } from '../src/sim/content/gourdlight_eve_decor';
 import { GOURDLIGHT_PUMPKINS } from '../src/sim/content/gourdlight_pumpkins';
 import { getActiveWorldContent, NPCS } from '../src/sim/data';
 import { resolveScarecrowField } from '../src/sim/seasonal/scarecrow_field';
+import { syncSeasonalDecorColliders } from '../src/sim/seasonal_decor_colliders';
 import {
   DECOR_MIN_SPACING,
   DECOR_NPC_CLEARANCE,
@@ -35,6 +36,10 @@ import { resolvedKeeperPosts } from '../src/sim/seasonal_keeper_posts';
 import { INTERACT_RANGE } from '../src/sim/types';
 import { groundHeight, roadDistance } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
+
+// The collider grid is shared per seed in one process: close the event's decor gate
+// after each test so no other suite in this worker walks into a stall.
+afterEach(() => syncSeasonalDecorColliders(WORLD_SEED, null));
 
 const layout = resolveSeasonalDecor(WORLD_SEED);
 

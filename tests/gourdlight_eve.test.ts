@@ -3,7 +3,7 @@
 // trick-or-treat knock (once per NPC per reset day, treat or trick, both paid in
 // sweets, the rounds quest credited), the pumpkin head worn and re-worn, the
 // shop's token price, the seasonal quest gate, the daily lock and the save shape.
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import { DEEDS } from '../src/sim/content/deeds';
 import {
@@ -42,6 +42,10 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
+
+// The collider grid is shared per seed in one process: close the event's decor gate
+// after each test so no other suite in this worker walks into a stall.
+afterEach(() => syncSeasonalDecorColliders(WORLD_SEED, null));
 
 function world(): Sim {
   const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });

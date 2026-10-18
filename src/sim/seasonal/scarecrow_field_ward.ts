@@ -16,8 +16,10 @@
 // Boar Meadow is byte-identical the rest of the year.
 //
 // Draws no rng and allocates no entity: it only rewrites `wanderTarget` (and the wander
-// timeout a fresh target carries), so the shared stream cannot move. Runs once a tick from
-// updateScarecrow, after every mob has stepped, over one small grid window.
+// timeout a fresh target carries). That still shifts WHEN a warded mob's locomotion rolls
+// its next wander pause, so while the event runs the meadow's draw timing differs from a
+// closed event's; it stays deterministic (same seed and feed, same draws). Runs once a
+// tick from updateScarecrow, after every mob has stepped, over one small grid window.
 
 import {
   GOURDLIGHT_CROW_ID,

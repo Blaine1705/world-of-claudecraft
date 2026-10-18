@@ -707,7 +707,6 @@ import {
   CURRENT_CHARACTER_CONTENT_REVISION,
   migrateCharacterTalentsV2,
 } from './talent_save_migration';
-import * as ferryMod from './transport_ferry';
 import type { TransportFerryView } from './transport_schedule';
 import { updateAbilityDrill } from './tutorial/ability_drill';
 import { updateGauntletRuns } from './tutorial/gauntlet_run';
@@ -721,6 +720,7 @@ import {
   WORLD_BOSSES,
 } from './world_boss';
 import { spawnDevBoss, spawnWorldBoss } from './world_boss_spawn';
+import * as ferryMod from './world_gates';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -2278,7 +2278,7 @@ export class Sim {
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
     this.ctx = this.buildSimContext(cfg.vaultConsumptionAdmission, cfg.courierBankExchange);
-    ferryMod.syncFerryGates(this.ctx); // this world's own deck gates before any placement query
+    ferryMod.syncWorldGates(this.ctx); // this world's own gates before any placement query
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
       seed: this.cfg.seed,
@@ -5950,7 +5950,7 @@ export class Sim {
     lap?.('respawns');
     this.updateWorldBosses();
     lap?.('worldBosses');
-    ferryMod.updateTransportFerries(this.ctx); // the ferry timetable: board, carry, set down
+    ferryMod.updateWorldGates(this.ctx); // ferry timetable + seasonal decor gate, pre-movement
     tickGroundAoEs(this.ctx);
     lap?.('groundAoEs');
     tickFrozenOrbs(this.ctx);
