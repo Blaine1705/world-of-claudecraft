@@ -7,18 +7,25 @@
 // same composed-look path the paperdoll eye toggle drives. A stealthed body
 // never draws the pumpkin: a glowing head floating where an unseen rogue walks
 // would hand out the one thing stealth hides (the graphics fairness rule).
+//
+// Pranker's Pumpkin (one of Hester's toys) puts the same lit pumpkin on its TARGET's head
+// for half a minute, once the thrown pumpkin has landed (seasonal_toys_fx_core.ts times
+// the flight off the aura's own clock, so the head and the splat arrive together).
 import { PUMPKIN_HEAD_AURA_ID } from '../../sim/content/gourdlight_eve';
+import { wearsPrankHead } from '../seasonal_toys_fx_core';
 
 interface AuraLike {
   id: string;
   kind: string;
+  remaining?: number;
+  duration?: number;
 }
 
-/** Whether these auras carry the worn pumpkin head. */
+/** Whether these auras carry the worn pumpkin head (or a landed prank's). */
 export function wearsSeasonalHead(auras: readonly AuraLike[]): boolean {
   for (const a of auras)
     if (a.id === PUMPKIN_HEAD_AURA_ID && a.kind === 'seasonal_cosmetic') return true;
-  return false;
+  return wearsPrankHead(auras);
 }
 
 /** The helm-hidden bit the composed look uses: the paperdoll eye, or a worn head. */

@@ -18,7 +18,9 @@
 //    ember glow through the split in his chest for as long as he is split open); unbroken,
 //    it bursts in a fireball with a shockwave rolling out over the whole field;
 // plus the crows bursting off him at his call's peak and straw puffs as he collapses,
-// and THATCHBOUND, his mind control: its own layer (thatchbound_fx.ts), composed here.
+// and THATCHBOUND, his mind control: its own layer (thatchbound_fx.ts), composed here,
+// and Hester's TOYS (seasonal_toys_fx.ts), composed here too: this is the event's one layer
+// the renderer ticks, scans entities for and routes spellfxAt to.
 //
 // GPU work: every falling pumpkin (and the gourd thrown at the sky) is one instance of a
 // pooled InstancedMesh per part of the decor kit's small carved pumpkin, the instanced
@@ -59,10 +61,11 @@ import {
   THATCHGRIN_TEMPLATE,
 } from './scarecrow_fx_core';
 import { gourdlightAssets } from './seasonal_decor_assets';
+import { SeasonalToysFx, type ToyEntityLike, type ToyParticles } from './seasonal_toys_fx';
 import { ThatchboundFx } from './thatchbound_fx';
 
 /** The pooled particle calls this layer uses (vfx.ts). */
-export interface ScarecrowParticles {
+export interface ScarecrowParticles extends ToyParticles {
   burst(at: THREE.Vector3, school: string, count?: number, power?: number, color?: number): void;
   burstLater(
     seconds: number,
@@ -80,14 +83,10 @@ export interface ScarecrowParticles {
   fluidSmoke(x: number, y: number, z: number, color: number, dt: number, rate: number): void;
 }
 
-interface EntityLike {
+interface EntityLike extends ToyEntityLike {
   templateId: string;
-  pos: { x: number; y: number; z: number };
-  facing: number;
-  dead: boolean;
   castRemaining?: number;
   castTotal?: number;
-  auras?: readonly { id: string }[];
   castingAbility?: string | null;
 }
 
@@ -329,6 +328,8 @@ export class ScarecrowFx {
   private bossNear = false;
   /** Thatchbound's eyes, sigils and swirl (his mind control). */
   private readonly thatchbound: ThatchboundFx;
+  /** Hester's toys (seasonal_toys_fx.ts): fed by this layer's own entity scan. */
+  private readonly toys: SeasonalToysFx;
 
   constructor(
     private readonly scene: THREE.Object3D,
@@ -341,6 +342,7 @@ export class ScarecrowFx {
     private readonly audio: () => SpatialAudioSink | null = () => null,
   ) {
     this.thatchbound = new ThatchboundFx(scene, particles, entities, entity, compileGate);
+    this.toys = new SeasonalToysFx(scene, particles, groundY, entity, compileGate, audio);
     for (let i = 0; i < FALL_CAP; i++) {
       this.falls.push({
         active: false,
@@ -496,6 +498,7 @@ export class ScarecrowFx {
    *  renderer's generic arms skip it); false lets the shared rune / impact draw too. */
   handleSpellfxAt(ev: SpellfxAtLike): boolean {
     if (this.disposed) return false;
+    if (SeasonalToysFx.claims(ev.ability)) return this.toys.handleCue(ev);
     if (ThatchboundFx.claims(ev.ability)) {
       this.thatchbound.handleMark(ev);
       return false; // the shared encounter rune circle marks the victim's feet
@@ -750,7 +753,9 @@ export class ScarecrowFx {
     this.halosUsed = 0;
     // his collapse into straw, his gourds' glow, his reel
     this.bossNear = false;
+    this.toys.begin(dt, reducedMotion);
     this.entities().forEach(this.watchEntity);
+    this.toys.end();
     // his curse: built on the first sight of him, scanned only while he or a puppet is near
     this.thatchbound.update(dt, reducedMotion, this.bossNear);
     const twins = this.time - this.rootBorn < TWIN_SEC;
@@ -928,6 +933,7 @@ export class ScarecrowFx {
 
   /** Per entity, per frame: allocation-free (a bound method over Map.forEach). */
   private readonly watchEntity = (e: EntityLike, id: number): void => {
+    this.toys.watch(e, id);
     if (e.templateId === THATCHGRIN_TEMPLATE && !e.dead) this.bossNear = true;
     if (e.templateId === SWELLING_GOURD_TEMPLATE) {
       this.ensureRoot();
@@ -1036,6 +1042,7 @@ export class ScarecrowFx {
     if (this.disposed) return;
     this.disposed = true;
     this.thatchbound.dispose();
+    this.toys.dispose();
     for (const p of this.patches) p.disc.geometry.dispose();
     this.patches.length = 0;
     this.root?.removeFromParent();

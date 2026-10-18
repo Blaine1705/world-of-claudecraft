@@ -858,6 +858,9 @@ const RENDER_PURE_CORES = [
   'src/render/seasonal_glow_sites_core.ts',
   // the road lanterns' draw runs (seasonal_decor.ts ranges each run like a city)
   'src/render/seasonal_road_lanterns_core.ts',
+  // Hester's toys' plan: the prank's arc and head timing, the ghost's orbit, the bats'
+  // flight, the candle's mist and the play broom's pose (seasonal_toys_fx.ts)
+  'src/render/seasonal_toys_fx_core.ts',
   'src/render/haunted_pumpkin_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
