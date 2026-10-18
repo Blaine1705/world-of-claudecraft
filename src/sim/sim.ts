@@ -82,7 +82,7 @@ import {
 } from './colliders';
 import { applyAbilityCostTail, resolveAbilityChain } from './combat/ability_resolution';
 import { clearAfflictionState } from './combat/affliction';
-import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
+import { cancelPlayerAura } from './combat/aura_cancel_command';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
   cleanseFriendlyNpcAuras,
@@ -145,10 +145,6 @@ import { clearHunterTalentState, hunterPetDamageMultiplier } from './combat/hunt
 import { tickNaturesFury } from './combat/natures_fury';
 import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
-import {
-  PALADIN_DEVOTION_ABILITY_IDS,
-  stripPaladinDevotionsFromSource,
-} from './combat/paladin_support';
 import {
   completeVeilboundMarch,
   updateVeilboundMarchMovement,
@@ -6764,35 +6760,9 @@ export class Sim {
   }
 
   // Voluntarily cancel one of a player's own helpful auras (the HUD right-click-a-buff
-  // action). Authoritative: the pure predicate refuses debuffs, so a player can never
-  // strip a silence/hex/root off themselves. Mirrors clearAurasFromSource's fade-event
-  // + conditional stat recalc so a stripped buff_*/form_* actually un-folds.
+  // action). Authoritative; the body lives in combat/aura_cancel_command.ts.
   cancelAura(auraId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { e, meta } = r;
-    // The battleground's carried-flag buff is a DROP affordance wearing a buff's
-    // clothes, so it is offered to its owner FIRST: cancelling it must route
-    // through the authoritative flag drop (flag at the runner's feet, catchable,
-    // the bgFlag 'dropped' call to all ten), never the generic splice below,
-    // which would strip the buff and leave the flag carried.
-    if (this.ctx.bgCancelFlagAura(e, auraId)) return;
-    const isPaladinDevotion = PALADIN_DEVOTION_ABILITY_IDS.has(auraId);
-    const removed = removeCancelableAura(e.auras, auraId, isPaladinDevotion ? e.id : undefined);
-    if (!removed) return;
-    if (auraId === 'divine_ascension' && e.paladinDevotion) {
-      e.paladinDevotion.ascensionCharges = 0;
-      e.paladinDevotion.ascensionRemaining = 0;
-    }
-    this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
-    if (isPaladinDevotion) stripPaladinDevotionsFromSource(this.ctx, e.id, auraId);
-    if (removed.kind === 'stealth') {
-      e.stealthed = e.auras.some((a) => a.kind === 'stealth');
-    }
-    applyGreaterInvisibilityAftereffect(this.ctx, e, removed);
-    if (auraAffectsStats(removed)) {
-      recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta), meta.equipmentInstance);
-    }
+    cancelPlayerAura(this.ctx, auraId, pid);
   }
 
   private spendResource(p: Entity, cost: number): void {

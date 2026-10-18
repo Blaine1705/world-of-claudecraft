@@ -2,9 +2,9 @@
 // tricks. Every one is kind 'seasonal_cosmetic', which no sim rule reads: no stat
 // fold, no control, no damage. The client draws them (render: the head piece on
 // the head bone, the bat and skeleton through the polymorph slot's look, the
-// fumes as a smoke cloud). `undispellable` keeps every player counter (dispel,
-// cleanse, right-click cancel) off them: the head comes off with its own item,
-// a trick runs out on its own short timer.
+// fumes as a smoke cloud). `undispellable` keeps every counter (dispel, cleanse,
+// steal) off them; only their wearer may take one off, with its own item, its own
+// timer, or a right-click cancel (seasonal_cancel.ts).
 import {
   GOURDLIGHT_COSTUMES,
   GOURDLIGHT_TRICKS,

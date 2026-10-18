@@ -36,12 +36,16 @@ const CANCELABLE_INTERNAL_CD_IDS: ReadonlySet<string> = new Set([DIVINE_ASCENSIO
 // form aura reverts to caster form) since none of those are harmful. The
 // player-removable test is the same one the dispel and cleanse executors answer to,
 // so an aura no counter may shed is no more cancelable than it is dispellable.
+// The one opt-in past that test is a `seasonal_cosmetic` (a costume, trick, guise or
+// the worn pumpkin head): undispellable so no counter strips it off someone else,
+// but a pure look with no sim effect, so its wearer may take it off
+// (seasonal/seasonal_cancel.ts does the ledger side).
 export function isCancelableAura(a: CancelableAura): boolean {
   return (
     a.id !== 'beacon_of_light' &&
     a.id !== 'veilbound_march' &&
     (a.kind !== 'internal_cd' || CANCELABLE_INTERNAL_CD_IDS.has(a.id)) &&
-    isPlayerRemovableAura(a) &&
+    (a.kind === 'seasonal_cosmetic' || isPlayerRemovableAura(a)) &&
     !isDebuffAura(a)
   );
 }
