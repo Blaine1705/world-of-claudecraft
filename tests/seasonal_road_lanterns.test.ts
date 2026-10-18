@@ -14,12 +14,13 @@ import {
   GOURDLIGHT_DECOR_CITIES,
   GOURDLIGHT_ROAD_LANTERNS,
 } from '../src/sim/content/gourdlight_eve_decor';
-import { getActiveWorldContent } from '../src/sim/data';
+import { CAMPS, getActiveWorldContent } from '../src/sim/data';
 import { resolveScarecrowField } from '../src/sim/seasonal/scarecrow_field';
 import { chapelAt } from '../src/sim/seasonal_decor_exclusions';
 import { DECOR_ROAD_CLEARANCE } from '../src/sim/seasonal_decor_layout';
 import {
   ROAD_LANTERN_BAND,
+  ROAD_LANTERN_CAMP_HEART,
   ROAD_LANTERN_COLLIDER_CLEARANCE,
   ROAD_LANTERN_FIELD_CLEARANCE,
   ROAD_LANTERN_MIN_SPACING,
@@ -84,6 +85,12 @@ describe('the road lanterns between the Gourdlight Eve cities', () => {
       expect(groundHeight(l.x, l.z, WORLD_SEED), l.anchor).toBeGreaterThan(WATER_LEVEL + 0.6);
       expect(l.y).toBeCloseTo(groundHeight(l.x, l.z, WORLD_SEED), 5);
       expect(chapelAt(l.x, l.z), l.anchor).toBeNull();
+      // never in the heart of a mob camp
+      for (const c of CAMPS) {
+        expect(Math.hypot(c.center.x - l.x, c.center.z - l.z), l.anchor).toBeGreaterThanOrEqual(
+          c.radius * ROAD_LANTERN_CAMP_HEART,
+        );
+      }
       const t = ROAD_LANTERN_TREE_CLEARANCE;
       const trees = generateDecorationsInBounds(WORLD_SEED, {
         minX: l.x - t,

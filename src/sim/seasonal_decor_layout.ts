@@ -104,7 +104,8 @@ export const DECOR_KIND_SCALE: Readonly<Record<SeasonalGroundKind, number>> = {
   // a shock stands well over a player's head (2.2 authored, so 3.3 against a 2.6 body)
   corn_shock: 1.5,
   hay_bale: 1.2,
-  road_lantern: 1,
+  // read at road distance: a festival lantern, a little over its authored size
+  road_lantern: 1.3,
 };
 /** A piece's own clear radius against colliders, where it is wider than the
  *  carved pumpkin's (a dressed hay bale is a long body). */

@@ -35,11 +35,11 @@ import {
   type SeasonalRoadLanternRoute,
 } from './content/gourdlight_eve_decor';
 import { GOURDLIGHT_PUMPKINS } from './content/gourdlight_pumpkins';
-import { getActiveWorldContent, NPCS } from './data';
+import { CAMPS, getActiveWorldContent, NPCS } from './data';
 import { hash2 } from './rng';
 import { resolveScarecrowField, SCARECROW_FIELD_RADIUS } from './seasonal/scarecrow_field';
 import { chapelAt } from './seasonal_decor_exclusions';
-import type { SeasonalGroundPiece } from './seasonal_decor_layout';
+import { DECOR_KIND_SCALE, type SeasonalGroundPiece } from './seasonal_decor_layout';
 import {
   generateDecorationsInBounds,
   groundHeight,
@@ -53,11 +53,14 @@ export const ROAD_LANTERN_BAND: readonly [number, number] = [4.6, 6.4];
 /** Never closer than this to another road lantern (yards). */
 export const ROAD_LANTERN_MIN_SPACING = 24;
 /** A post keeps a building's berth from every static collider (yards). */
-export const ROAD_LANTERN_COLLIDER_CLEARANCE = 1.6;
+export const ROAD_LANTERN_COLLIDER_CLEARANCE = 3;
 /** ...and from a tree's or a rock's centre (the canopy, not just the trunk). */
-export const ROAD_LANTERN_TREE_CLEARANCE = 2.6;
+export const ROAD_LANTERN_TREE_CLEARANCE = 4.5;
 /** ...and from a streetlamp, an NPC, a gather node or a hunt pumpkin. */
 export const ROAD_LANTERN_PROP_CLEARANCE = 3;
+/** ...and out of the heart of every mob camp: the inner share of its radius, where its
+ *  mobs stand (many roads run through a camp's outskirts, so the rim stays allowed). */
+export const ROAD_LANTERN_CAMP_HEART = 0.6;
 /** No lantern within this reach of a bridge: the road under the way stays dry this far
  *  either side of the post's own stretch (yards along the way). */
 export const ROAD_LANTERN_BRIDGE_REACH = 12;
@@ -75,7 +78,7 @@ const FIELD_ROAD_REACH = 75;
 /** The way is resampled every this many yards. */
 const WAY_STEP = 2;
 /** How far the post may slide along the road from its nominal spot (yards). */
-const SLIDES: readonly number[] = [0, 3, -3, 6, -6, 9, -9];
+const SLIDES: readonly number[] = [0, 3, -3, 6, -6, 9, -9, 12, -12, 15, -15];
 
 export interface SeasonalRoadLantern extends SeasonalGroundPiece {
   kind: 'road_lantern';
@@ -279,6 +282,7 @@ export type RoadLanternProblem =
   | 'chapel'
   | 'town'
   | 'slope'
+  | 'camp'
   | 'crowded';
 
 /** Why a post spot is refused, or null when it is clear (exported for the pin). `roadAt`
@@ -301,6 +305,9 @@ export function roadLanternProblem(
   if (isCliffFace(x, z, seed)) return 'slope';
   if (inDressedGround(seed, x, z)) return 'town';
   if (chapelAt(x, z) !== null) return 'chapel';
+  for (const c of CAMPS)
+    if (Math.hypot(c.center.x - x, c.center.z - z) < c.radius * ROAD_LANTERN_CAMP_HEART)
+      return 'camp';
   for (const p of placed)
     if (Math.hypot(p.x - x, p.z - z) < ROAD_LANTERN_MIN_SPACING) return 'crowded';
   for (const p of props)
@@ -384,7 +391,7 @@ function routeLanterns(
           y: groundHeight(spot.x, spot.z, seed),
           z: spot.z,
           yaw,
-          scale: 1,
+          scale: DECOR_KIND_SCALE.road_lantern,
           anchor: `road:${route.id}:${n}`,
           route: route.id,
           side: s,

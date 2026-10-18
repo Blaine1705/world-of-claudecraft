@@ -47,7 +47,7 @@ const KIND_GLOW: Readonly<
   // the lantern hung from the festival pole's crossbar
   garland_pole: { lx: 0.22, ly: 3.24, lz: 0, size: 0.55 },
   // the jack-o'-lantern hung from a road post's crook, out over the verge toward the road
-  road_lantern: { lx: 0, ly: 1.44, lz: 0.56, size: 1.0 },
+  road_lantern: { lx: 0, ly: 1.44, lz: 0.56, size: 1.15 },
 };
 
 /** The ground-light kinds: what pools light on the street (a lantern on a pole
@@ -57,7 +57,7 @@ const LIGHT_STRENGTH: Readonly<Partial<Record<SeasonalGroundKind, number>>> = {
   pumpkin_small: 0.55,
   hay_bale: 0.45,
   // hung at shoulder height, so a softer pool than a pumpkin on the ground
-  road_lantern: 0.5,
+  road_lantern: 0.75,
 };
 
 /** The keeper's stall, in ITS frame (three axes, before its scale): the two paper
