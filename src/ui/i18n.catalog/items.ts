@@ -3962,6 +3962,8 @@ const ITEM_ENTITY_IDS = [
   'crabapple_chew',
   'owlwatch_fudge',
   'lantern_mint_drop',
+  // Old Thatchgrin's daily broom token (content/gourdlight_eve.ts GOURDLIGHT_SHEAF_ID).
+  'emberwoven_sheaf',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3993,6 +3995,8 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   crabapple_chew: 'Crabapple Chew',
   owlwatch_fudge: 'Owlwatch Fudge',
   lantern_mint_drop: 'Lantern Mint Drop',
+  // Old Thatchgrin's daily broom token (content/gourdlight_eve.ts).
+  emberwoven_sheaf: 'Emberwoven Sheaf',
   // Mirefen world-boss spoils.
   foremans_barrowmaul: "Foreman's Barrowmaul",
   // The quest tool the world boss's level-spread mechanic runs on, not a spoil.

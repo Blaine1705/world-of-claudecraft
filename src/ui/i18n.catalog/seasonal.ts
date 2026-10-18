@@ -81,7 +81,9 @@ export const seasonalStrings = {
     titleWrit:
       'Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.',
     broom:
-      "Old Thatchgrin's keepsake. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.",
+      'Bought from Hester Gourdwick for {count} Emberwoven Sheaves. Riding it requires the riding skill. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.',
+    sheaf:
+      'Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Crumbles to straw when Gourdlight Eve ends.',
   },
   // The vendor row's token price: "{count} {item}" ({count} pre-formatted).
   tokenPrice: '{count} {item}',

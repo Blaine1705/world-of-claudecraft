@@ -8037,6 +8037,18 @@
         "owlwatch_fudge"
       ],
       "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-sheaf-icon-2026-10-18",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py): the Emberwoven Sheaf, a bundle of straw built from the scarecrow factory's own straw (scripts/assets/gourdlight_eve/scarecrow.py), bound with the event's orange ribbon in a bow, embers caught in it and a glow kindled at its heart, modelled for its icon only. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/icons.py",
+      "itemIds": [
+        "emberwoven_sheaf"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
     }
   ]
 }

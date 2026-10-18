@@ -23,11 +23,20 @@ export const GOURDLIGHT_TREAT_POUCH_ID = 'gourdlight_treat_pouch';
 export const CARVED_PUMPKIN_HEAD_ID = 'carved_pumpkin_head';
 export const JAR_OF_MISCHIEF_ID = 'jar_of_mischief';
 
-/** Old Thatchgrin's keepsake: the reins of a hovering broom (content/mounts.ts
- *  'emberbristle_broom'). Event-bound (ItemDef.seasonalEvent): it lives in the bags
- *  only while Gourdlight Eve runs and is swept away when the event closes. */
+/** The reins of a hovering broom (content/mounts.ts 'emberbristle_broom'), sold by
+ *  Hester for Emberwoven Sheaves. Event-bound (ItemDef.seasonalEvent): it lives in the
+ *  bags only while Gourdlight Eve runs and is swept away when the event closes. */
 export const GOURDLIGHT_BROOM_ID = 'reins_emberbristle_broom';
 export const GOURDLIGHT_BROOM_MOUNT = 'emberbristle_broom';
+
+/** The broom's token: a bundle of enchanted straw Old Thatchgrin pays once a day (his
+ *  world-boss daily lockout, content/gourdlight_eve_scarecrow.ts loot), never to a
+ *  character who already keeps the broom. Event-bound like the broom, so a sheaf left
+ *  over when the event closes crumbles with it. */
+export const GOURDLIGHT_SHEAF_ID = 'emberwoven_sheaf';
+/** Sheaves Hester asks for the broom: five daily kills (owner direction 2026-10-18: the
+ *  broom takes five days of a roughly two-week event, not one kill). */
+export const GOURDLIGHT_BROOM_SHEAVES = 5;
 
 /** The costume draughts: drink one and wear a skeleton's, a ghost's or a bat's body for
  *  ten minutes. A look only (a seasonal_cosmetic aura the client draws as a body swap,
@@ -235,13 +244,15 @@ export const GOURDLIGHT_SHOP_PRICES: Readonly<Record<string, number>> = Object.f
   ...Object.fromEntries(GOURDLIGHT_CANDIES.map((c) => [c.itemId, c.price])),
 });
 
-/** What the keeper sells, in shelf order. */
+/** What the keeper sells, in shelf order. Every row costs sweets except the broom,
+ *  which costs Emberwoven Sheaves (GOURDLIGHT_BROOM_SHEAVES). */
 export const GOURDLIGHT_SHOP_ITEMS: readonly string[] = Object.freeze([
   CARVED_PUMPKIN_HEAD_ID,
   JAR_OF_MISCHIEF_ID,
   ...GOURDLIGHT_CANDIES.map((c) => c.itemId),
   ...GOURDLIGHT_COSTUMES.map((c) => c.itemId),
   ...GOURDLIGHT_TITLE_WRITS.map((w) => w.itemId),
+  GOURDLIGHT_BROOM_ID,
 ]);
 
 export const GOURDLIGHT_KEEPER_NPC: NpcDef = {
@@ -272,6 +283,18 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
     kind: 'tool',
     quality: 'uncommon',
     stackSize: 200,
+    sellValue: 0,
+    soulbound: true,
+    noVendorSell: true,
+    noSalvage: true,
+  },
+  [GOURDLIGHT_SHEAF_ID]: {
+    id: GOURDLIGHT_SHEAF_ID,
+    name: 'Emberwoven Sheaf',
+    kind: 'tool',
+    quality: 'rare',
+    seasonalEvent: GOURDLIGHT_EVE_ID,
+    stackSize: 10,
     sellValue: 0,
     soulbound: true,
     noVendorSell: true,
@@ -378,14 +401,15 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
       },
     ]),
   ),
-  // Old Thatchgrin's keepsake (content/gourdlight_eve_scarecrow.ts loot): the one
-  // soulbound player mount, because it is EVENT-BOUND (swept when Gourdlight Eve
-  // closes), and a tradable copy could outlive its event in another player's bags.
+  // Hester's broom, bought for five Emberwoven Sheaves (Old Thatchgrin's daily token):
+  // the one soulbound player mount, because it is EVENT-BOUND (swept when Gourdlight
+  // Eve closes), and a tradable copy could outlive its event in another player's bags.
   [GOURDLIGHT_BROOM_ID]: {
     id: GOURDLIGHT_BROOM_ID,
     name: 'Emberbristle Broom',
     kind: 'mount',
     mount: GOURDLIGHT_BROOM_MOUNT,
+    priceItem: { itemId: GOURDLIGHT_SHEAF_ID, count: GOURDLIGHT_BROOM_SHEAVES },
     // the card's tier (content/mounts.ts emberbristle_broom: the base horse's 60%)
     quality: 'common',
     seasonalEvent: GOURDLIGHT_EVE_ID,

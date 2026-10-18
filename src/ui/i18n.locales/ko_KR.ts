@@ -21799,7 +21799,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.itemUse.titleWrit':
     '사용: 이 캐릭터의 칭호 {title}을(를) 획득하며, 업적의 서에서 착용할 수 있습니다. 사용 시 소모됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 이미 칭호가 있으면 증서가 남습니다.',
   'seasonal.itemUse.broom':
-    '올드 대치그린의 기념품. 고드라이트 축제의 밤 동안에만 남아 있으며, 행사가 끝나면 짚으로 부서집니다.',
+    '헤스터 고드윅에게서 잉걸엮음 짚단 {count}개로 구입합니다. 타려면 탈것 기술이 필요합니다. 고드라이트 축제의 밤 동안에만 남아 있으며, 행사가 끝나면 짚으로 부서집니다.',
+  'seasonal.itemUse.sheaf':
+    '올드 대치그린을 처치하고 전리품을 챙기면 하루에 하나씩 받으며, 잉걸갈기 빗자루를 얻을 때까지 이어집니다. 헤스터 고드윅이 이스트브룩, 펜브리지, 하이워치의 노점에서 {count}개를 빗자루와 교환해 줍니다. 고드라이트 축제의 밤이 끝나면 짚으로 부서집니다.',
   'entities.items.rattlebone_draught.name': '덜그럭뼈 물약',
   'entities.items.haunting_draught.name': '떠도는 혼 물약',
   'entities.items.batwing_draught.name': '날갯짓 물약',
@@ -21807,6 +21809,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.writ_of_the_trickster.name': '장난꾼의 증서',
   'entities.items.writ_of_the_hollow_grin.name': '텅 빈 미소의 증서',
   'entities.items.reins_emberbristle_broom.name': '잉걸갈기 빗자루',
+  'entities.items.emberwoven_sheaf.name': '잉걸엮음 짚단',
   'entities.items.hearthroot_toffee.name': '화로뿌리 토피',
   'entities.items.gourdseed_brittle.name': '호박씨 브리틀',
   'entities.items.crabapple_chew.name': '꽃사과 캐러멜',

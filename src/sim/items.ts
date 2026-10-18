@@ -1445,12 +1445,17 @@ export function buyItem(
   // (ridingTrained, purchased from Marla for 80g), a hard level-20 gate, and a
   // one-per-account ownership check (owning the reins item IS owning the mount).
   // Placed after the vendor stock/price checks, before payment.
+  // An EVENT-BOUND reins row (ItemDef.seasonalEvent: Hester's Emberbristle Broom, bought
+  // with the tokens a level-10 crowd earns at Old Thatchgrin) skips the riding and
+  // level-20 gates: it is a keepsake that leaves with its event, and riding it still
+  // needs the riding skill (mounts.ts). The one-copy ownership check always applies.
   if (def.kind === 'mount') {
-    if (!meta.ridingTrained) {
+    const eventKeepsake = !!def.seasonalEvent;
+    if (!eventKeepsake && !meta.ridingTrained) {
       ctx.error(meta.entityId, 'You must learn to ride first. Find a riding trainer.');
       return;
     }
-    if (p.level < 20) {
+    if (!eventKeepsake && p.level < 20) {
       ctx.error(meta.entityId, 'You must be level 20 to buy a mount.');
       return;
     }

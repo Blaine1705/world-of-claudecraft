@@ -49,7 +49,8 @@
 //     swing (8 to 12 every 2 s, before his mechanic level scale: about a third of his
 //     chaff's burn per second, the owner's "hits soft").
 //   - The charm's drop chance, in the buddy-drop convention (content/buddy_sources.ts:
-//     CALIBRATE). The pumpkin head and the broom are guaranteed but never duplicated.
+//     CALIBRATE). The pumpkin head is guaranteed but never duplicated; the broom is
+//     bought from Hester for five Emberwoven Sheaves, one per daily kill.
 //
 // Everything he pays is cosmetic or event currency: no stat, no gear, no power.
 import type { ItemDef, MobTemplate } from '../types';
@@ -58,6 +59,7 @@ import {
   GOURDLIGHT_BROOM_ID,
   GOURDLIGHT_EVE_ID,
   GOURDLIGHT_POUCH_SWEETS,
+  GOURDLIGHT_SHEAF_ID,
 } from './gourdlight_eve';
 
 export const THATCHGRIN_ID = 'gourdlight_thatchgrin';
@@ -260,14 +262,17 @@ export const GOURDLIGHT_SCARECROW_MOBS: Record<string, MobTemplate> = {
       summon: 'Up, up, little ones! Pick them clean!',
       enrage: 'Burn the stubble! Burn it ALL!',
     },
-    // Personal loot (world_boss.ts rollWorldBossLoot): the sack always, the charm rarely,
-    // and the two keepsakes a contributor does not own yet, never a second copy: the
-    // Carved Pumpkin Head (so a first kill always pays it) and the Emberbristle Broom.
+    // Personal loot (world_boss.ts rollWorldBossLoot), once a day per player under his
+    // world-boss lockout: the sack always, the charm rarely, the Carved Pumpkin Head
+    // when the contributor does not own one (so a first kill always pays it), and one
+    // Emberwoven Sheaf, the broom's token (Hester trades five for the Emberbristle
+    // Broom), for every contributor who does not keep the broom yet. The broom itself
+    // never drops: it takes five days of kills.
     loot: [
       { itemId: THATCHGRIN_SACK_ID, chance: 1 },
       { itemId: STRAWLING_CHARM_ID, chance: STRAWLING_CHARM_CHANCE },
       { itemId: CARVED_PUMPKIN_HEAD_ID, chance: 1, unlessOwned: true },
-      { itemId: GOURDLIGHT_BROOM_ID, chance: 1, unlessOwned: true },
+      { itemId: GOURDLIGHT_SHEAF_ID, chance: 1, unlessOwnedItem: GOURDLIGHT_BROOM_ID },
     ],
     // Falls apart into a heap of straw and lies in the stubble for his corpse window,
     // then settles into it rather than blinking out (mob/boss_corpse_sink.ts).

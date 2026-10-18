@@ -604,11 +604,13 @@ describe('his keepsakes', () => {
   const mine = (sim: Sim, b: Entity) =>
     (b.loot?.items ?? []).filter((s) => s.personalFor?.includes(sim.playerId)).map((s) => s.itemId);
 
-  it('pays the pumpkin head and the broom on a first kill', () => {
+  // The broom is no longer his to drop: each daily kill pays an Emberwoven Sheaf and
+  // Hester sells it for five (tests/gourdlight_broom_sheaf.test.ts).
+  it('pays the pumpkin head on a first kill, and never the broom', () => {
     const sim = world();
     const b = kill(sim);
     expect(mine(sim, b)).toContain(CARVED_PUMPKIN_HEAD_ID);
-    expect(mine(sim, b)).toContain(GOURDLIGHT_BROOM_ID);
+    expect(mine(sim, b)).not.toContain(GOURDLIGHT_BROOM_ID);
   });
 
   it('never a second copy: owned in the bags or the bank, it is not paid again', () => {

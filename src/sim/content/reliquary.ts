@@ -280,9 +280,10 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'terrorspark_groundshaker',
   'referral_raptor',
   'referral_tank',
-  // Gourdlight Eve's Emberbristle Broom: Old Thatchgrin's first-kill keepsake. Its
-  // reins are event-bound (swept when the event closes), so the slot reads owned only
-  // while Gourdlight Eve runs and drops back to unowned after, like any lost reins.
+  // Gourdlight Eve's Emberbristle Broom: Hester's, for five of Old Thatchgrin's daily
+  // Emberwoven Sheaves. Its reins are event-bound (swept when the event closes), so the
+  // slot reads owned only while Gourdlight Eve runs and drops back to unowned after,
+  // like any lost reins.
   'emberbristle_broom',
 ] as const;
 
@@ -352,7 +353,8 @@ const MOUNT_SOURCES: Readonly<
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
   drakemaw_raptor: fromBoss('balgath_cyclops'),
-  emberbristle_broom: fromBoss('gourdlight_thatchgrin'),
+  // Hester sells it for five Emberwoven Sheaves (one per daily Old Thatchgrin kill).
+  emberbristle_broom: fromVendor('gourdlight_keeper'),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS

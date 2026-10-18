@@ -7768,7 +7768,8 @@ export const en_CA: EnTranslations = {
       "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
       "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.",
       "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
-      "broom": "Old Thatchgrin's keepsake. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends."
+      "broom": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves. Riding it requires the riding skill. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.",
+      "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Crumbles to straw when Gourdlight Eve ends."
     },
     "tokenPrice": "{count} {item}"
   },
@@ -23037,6 +23038,9 @@ export const en_CA: EnTranslations = {
       },
       "lantern_mint_drop": {
         "name": "Lantern Mint Drop"
+      },
+      "emberwoven_sheaf": {
+        "name": "Emberwoven Sheaf"
       },
       "membership_token": {
         "name": "Membership Token (30 Days)"

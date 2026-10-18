@@ -20757,7 +20757,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使用：變成一隻撲騰的蝙蝠，持續{minutes}分鐘。使用後消耗。戰鬥中無法使用，進入戰鬥會結束效果。僅限南瓜燈之夜期間。純外觀。',
   'seasonal.itemUse.titleWrit':
     '使用：為這個角色獲得頭銜{title}，可在功績之書中佩戴。使用後消耗。僅限南瓜燈之夜期間。如果你已擁有該頭銜，令狀會保留。',
-  'seasonal.itemUse.broom': '老稻草獰笑的紀念品。它只在南瓜燈之夜期間存在，活動結束時會化為稻草。',
+  'seasonal.itemUse.broom':
+    '從赫絲特·葫蘆芯處用{count}個餘燼編織草束購買。騎乘需要騎術技能。它只在南瓜燈之夜期間存在，活動結束時會化為稻草。',
+  'seasonal.itemUse.sheaf':
+    '每天拾取老稻草獰笑的戰利品時獲得一個，直到你擁有餘燼鬃毛掃帚為止。赫絲特·葫蘆芯在東溪、芬橋和高望的攤位用{count}個交換掃帚。南瓜燈之夜結束時會化為稻草。',
   'entities.items.rattlebone_draught.name': '骨響藥劑',
   'entities.items.haunting_draught.name': '幽魂藥劑',
   'entities.items.batwing_draught.name': '振翅藥劑',
@@ -20765,6 +20768,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.writ_of_the_trickster.name': '搗蛋鬼令狀',
   'entities.items.writ_of_the_hollow_grin.name': '空洞笑臉令狀',
   'entities.items.reins_emberbristle_broom.name': '餘燼鬃毛掃帚',
+  'entities.items.emberwoven_sheaf.name': '餘燼編織草束',
   'entities.items.hearthroot_toffee.name': '爐根太妃糖',
   'entities.items.gourdseed_brittle.name': '南瓜籽脆糖',
   'entities.items.crabapple_chew.name': '海棠果軟糖',

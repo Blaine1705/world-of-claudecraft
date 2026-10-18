@@ -1,13 +1,16 @@
 // The seasonal event items' tooltip lines (src/sim/content/gourdlight_eve.ts):
-// what the pumpkin head, the Jar of Mischief, the treat pouch and the sweet do,
-// stated from the live content (the pouch's count is read off the sim constant).
+// what the pumpkin head, the Jar of Mischief, the treat pouch, the sweet, the broom and
+// its Emberwoven Sheaf do, stated from the live content (the pouch's count and the
+// broom's sheaf price are read off the sim constants).
 // One small view the item tooltip composes, so the bags, the vendor and the
 // market all say the same thing.
 import {
   CARVED_PUMPKIN_HEAD_ID,
   GOURDLIGHT_BROOM_ID,
+  GOURDLIGHT_BROOM_SHEAVES,
   GOURDLIGHT_COSTUMES,
   GOURDLIGHT_POUCH_SWEETS,
+  GOURDLIGHT_SHEAF_ID,
   GOURDLIGHT_SWEET_ID,
   GOURDLIGHT_TITLE_WRITS,
   GOURDLIGHT_TREAT_POUCH_ID,
@@ -42,7 +45,9 @@ export function seasonalItemTooltipText(item: Pick<ItemDef, 'id'>): string | nul
   if (writ) return t('seasonal.itemUse.titleWrit', { title: deedTitleText(writ.deedId) });
   switch (item.id) {
     case GOURDLIGHT_BROOM_ID:
-      return t('seasonal.itemUse.broom');
+      return t('seasonal.itemUse.broom', { count: formatNumber(GOURDLIGHT_BROOM_SHEAVES) });
+    case GOURDLIGHT_SHEAF_ID:
+      return t('seasonal.itemUse.sheaf', { count: formatNumber(GOURDLIGHT_BROOM_SHEAVES) });
     case CARVED_PUMPKIN_HEAD_ID:
       return t('seasonal.itemUse.pumpkinHead');
     case JAR_OF_MISCHIEF_ID:

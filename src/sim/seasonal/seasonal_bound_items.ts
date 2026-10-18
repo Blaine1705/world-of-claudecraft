@@ -9,8 +9,8 @@
 //     is not the item's: a login after the event ended (the broom is already gone from
 //     every character online at the close; this catches the ones who were offline).
 //   - again every BOUND_RECHECK_TICKS for every character, bags and courier cargo only:
-//     a broom that arrives after its character was checked (personal loot taken off a
-//     corpse after the close, a mail or a grant) lands in the bags and still leaves
+//     a broom or sheaf that arrives after its character was checked (a sheaf taken off
+//     a corpse after the close, a mail or a grant) lands in the bags and still leaves
 //     within seconds. The bank is never re-walked on a quiet tick (it only grows by a
 //     deposit, which takes from the bags first), so a large bank costs nothing.
 // A character swept since the last edge is remembered in a WeakMap on the world state,

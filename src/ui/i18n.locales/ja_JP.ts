@@ -21803,7 +21803,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.itemUse.titleWrit':
     '使用：このキャラクターの称号{title}を獲得し、功績の書から付けられる。消費される。ゴードライトの宵の期間のみ。称号をすでに持っている場合は証書が残る。',
   'seasonal.itemUse.broom':
-    'オールド・サッチグリンの形見。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。',
+    'ヘスター・ゴードウィックからエンバーウーブンの藁束{count}個で購入する。乗るには騎乗スキルが必要。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。',
+  'seasonal.itemUse.sheaf':
+    'オールド・サッチグリンを倒して戦利品を受け取るたび、1日に1つもらえる。エンバーブリッスルの箒を手に入れるまで続く。ヘスター・ゴードウィックがイーストブルック、フェンブリッジ、ハイウォッチの屋台で{count}個を箒と交換してくれる。ゴードライトの宵が終わると藁になって崩れる。',
   'entities.items.rattlebone_draught.name': 'ガラガラ骨の薬',
   'entities.items.haunting_draught.name': 'さまよう霊の薬',
   'entities.items.batwing_draught.name': 'はばたきの薬',
@@ -21811,6 +21813,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.writ_of_the_trickster.name': 'トリックスターの証書',
   'entities.items.writ_of_the_hollow_grin.name': 'うつろな笑みの証書',
   'entities.items.reins_emberbristle_broom.name': 'エンバーブリッスルの箒',
+  'entities.items.emberwoven_sheaf.name': 'エンバーウーブンの藁束',
   'entities.items.hearthroot_toffee.name': '炉根のトフィー',
   'entities.items.gourdseed_brittle.name': 'かぼちゃの種のブリトル',
   'entities.items.crabapple_chew.name': '姫りんごのチュウ',

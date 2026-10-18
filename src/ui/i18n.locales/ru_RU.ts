@@ -22211,7 +22211,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'seasonal.itemUse.titleWrit':
     'Использование: этот персонаж получает звание {title}, которое можно носить из Книги деяний. Расходуется. Только во время Ночи Тыквенных Огней. Если звание уже есть, грамота остаётся.',
   'seasonal.itemUse.broom':
-    'Памятный трофей Старого Соломозуба. Существует только во время Ночи Тыквенных Огней и рассыпается в солому, когда праздник заканчивается.',
+    'Покупается у Хестер Тыквинс за снопы Тлеющего Плетения: {count}. Чтобы ездить на ней, нужен навык верховой езды. Существует только во время Ночи Тыквенных Огней и рассыпается в солому, когда праздник заканчивается.',
+  'seasonal.itemUse.sheaf':
+    'Старый Соломозуб даёт один сноп в день, когда вы забираете его добычу, пока у вас нет Метлы Тлеющей Щетины. Хестер Тыквинс обменивает снопы на метлу ({count} шт.) у своих прилавков в Истбруке, Фенбридже и Хайуотче. Рассыпается в солому, когда Ночь Тыквенных Огней заканчивается.',
   'entities.items.rattlebone_draught.name': 'Зелье гремящих костей',
   'entities.items.haunting_draught.name': 'Зелье призрака',
   'entities.items.batwing_draught.name': 'Зелье трепета крыльев',
@@ -22219,6 +22221,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.writ_of_the_trickster.name': 'Грамота Проказника',
   'entities.items.writ_of_the_hollow_grin.name': 'Грамота Пустой Ухмылки',
   'entities.items.reins_emberbristle_broom.name': 'Метла Тлеющей Щетины',
+  'entities.items.emberwoven_sheaf.name': 'Сноп Тлеющего Плетения',
   'entities.items.hearthroot_toffee.name': 'Ирис «Очажный корень»',
   'entities.items.gourdseed_brittle.name': 'Тыквенный грильяж',
   'entities.items.crabapple_chew.name': 'Райская жевательная конфета',

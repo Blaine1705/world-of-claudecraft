@@ -858,8 +858,9 @@ describe('stock rows: the phase 11n pulls', () => {
       innkeeper_maudie: 6,
       // Gourdlight Eve's keeper (content/gourdlight_eve.ts): the pumpkin head and the
       // Jar of Mischief, both priced in sweets, then (phase 3) the three costume
-      // draughts and the three title writs, then (phase 5) the five candies.
-      gourdlight_keeper: 13,
+      // draughts and the three title writs, then (phase 5) the five candies, then
+      // (round 7) the Emberbristle Broom, priced in Emberwoven Sheaves.
+      gourdlight_keeper: 14,
     });
   });
 });

@@ -9,7 +9,9 @@
 # treat pouch and the Jar of Mischief are built here for their icons only, and so are
 # Old Thatchgrin's two spoils: his sweet sack (the pouch's bigger, darker sackcloth
 # cousin, tied with straw, sweets spilling at its foot) and the Strawling Charm (a
-# little straw doll bound with orange ribbon, two ember beads for eyes).
+# little straw doll bound with orange ribbon, two ember beads for eyes), and his daily
+# Emberwoven Sheaf (a bundle of his straw bound in an orange bow, embers caught in it,
+# a glow kindled at its heart: the broom's token).
 # The shop's costume draughts (a round flask, its liquid glowing, a charm at its neck: a
 # skull, a wisp, a bat) and title writs (a sealed parchment roll), and the Emberbristle
 # Broom's reins (the shipped broom itself, appended from broom.py's review .blend,
@@ -254,6 +256,72 @@ def build_charm(col):
         bmesh.ops.create_icosphere(ebm, subdivisions=2, radius=0.03, matrix=Matrix.Translation((side * 0.06, -0.15, 0.7)))
     obj_from_bm("charm_eyes", ebm, ember, col).parent = root
     root.rotation_euler = (0.0, 0.2, 0.3)
+    return root
+
+
+def build_sheaf(col):
+    """The Emberwoven Sheaf: a bundle of harvest straw bound at the waist with the
+    event's orange ribbon in a bow, its ends splayed, embers caught in the straw and a
+    warm glow kindled in its heart (the stuff Hester binds into a broom)."""
+    import scarecrow
+
+    straw = principled("SheafStraw", (0.86, 0.6, 0.24), rough=0.8, emit=(1.0, 0.45, 0.08), emit_strength=0.3)
+    pale = principled("SheafStrawPale", (0.96, 0.84, 0.5), rough=0.85, emit=(1.0, 0.6, 0.15), emit_strength=0.25)
+    ribbon = principled("SheafRibbon", (1.0, 0.3, 0.02), rough=0.45)
+    band = principled("SheafBand", (0.07, 0.05, 0.05), rough=0.6)
+    ember = principled("SheafEmber", (1.0, 0.3, 0.02), emit=(1.0, 0.32, 0.03), emit_strength=3.0)
+    core = principled("SheafCore", (1.0, 0.5, 0.1), emit=(1.0, 0.5, 0.1), emit_strength=6.0)
+    root = bpy.data.objects.new("sheaf", None)
+    col.objects.link(root)
+    waist = (0.0, 0.0, 0.5)
+    tufts = [
+        ("sheaf_top", straw, waist, (0, 0, 1), 190, 0.62, 0.42, 0.022, 0.05),
+        ("sheaf_top_pale", pale, waist, (0.05, 0, 1), 90, 0.66, 0.36, 0.019, 0.08),
+        ("sheaf_foot", straw, waist, (0, 0, -1), 160, 0.5, 0.26, 0.022, 0.0),
+        ("sheaf_foot_pale", pale, waist, (0, 0.05, -1), 60, 0.48, 0.22, 0.019, 0.0),
+    ]
+    for name, mat, o, d, n, ln, spread, w, droop in tufts:
+        bm = scarecrow.straw_tuft(name, o, d, n, ln, spread, w, droop)
+        obj_from_bm(name, bm, mat, col).parent = root
+    # the binding: a dark cord under the ribbon, the ribbon round the waist, then a bow
+    # with two loops and two tails hanging down the front
+    cbm = bmesh.new()
+    for z, r in ((0.47, 0.115), (0.53, 0.112)):
+        pts = [Vector((math.cos(a / 24 * TAU) * r, math.sin(a / 24 * TAU) * r, z)) for a in range(25)]
+        tube(cbm, pts, 0.012)
+    obj_from_bm("sheaf_cord", cbm, band, col).parent = root
+    rbm = bmesh.new()
+    pts = [Vector((math.cos(a / 28 * TAU) * 0.125, math.sin(a / 28 * TAU) * 0.125, 0.5)) for a in range(29)]
+    tube(rbm, pts, 0.032)
+    knot = Vector((0.0, -0.14, 0.5))
+    for side in (-1, 1):
+        loop = []
+        for k in range(17):
+            t = k / 16 * TAU
+            loop.append(knot + Vector((side * (0.11 - 0.11 * math.cos(t)), -0.03 * math.sin(t), 0.06 * math.sin(t) + side * 0.02 * (1 - math.cos(t)))))
+        tube(rbm, loop, 0.022)
+        tail = [knot + Vector((side * 0.03 * k / 6 + side * 0.012 * math.sin(k), -0.02 - 0.01 * k / 6, -0.05 * k)) for k in range(7)]
+        tube(rbm, tail, 0.02)
+    bmesh.ops.create_icosphere(rbm, subdivisions=2, radius=0.04, matrix=Matrix.Translation(knot))
+    obj_from_bm("sheaf_ribbon", rbm, ribbon, col).parent = root
+    # embers caught in the splayed straw, and the kindled heart behind the ribbon
+    ebm = bmesh.new()
+    specks = ((0.12, -0.16, 0.86), (-0.18, -0.1, 0.95), (0.03, -0.2, 1.02), (0.22, -0.05, 0.74),
+              (-0.1, -0.18, 0.72), (0.16, -0.12, 0.2), (-0.13, -0.14, 0.26), (-0.26, 0.0, 0.84))
+    for i, p in enumerate(specks):
+        bmesh.ops.create_icosphere(ebm, subdivisions=2, radius=0.022 + 0.008 * (i % 3), matrix=Matrix.Translation(p))
+    obj_from_bm("sheaf_embers", ebm, ember, col).parent = root
+    hbm = bmesh.new()
+    bmesh.ops.create_icosphere(hbm, subdivisions=3, radius=0.07, matrix=Matrix.Translation((0, 0, 0.62)))
+    obj_from_bm("sheaf_core", hbm, core, col).parent = root
+    glow = bpy.data.objects.new("sheaf_glow", bpy.data.lights.new("sheaf_glow", "POINT"))
+    glow.data.energy = 26
+    glow.data.color = (1.0, 0.55, 0.15)
+    glow.data.shadow_soft_size = 0.2
+    glow.location = (0.0, -0.22, 0.66)
+    col.objects.link(glow)
+    glow.parent = root
+    root.rotation_euler = (0.0, 0.12, 0.35)
     return root
 
 
@@ -582,6 +650,8 @@ def main():
         "jar_of_mischief": build_jar(col),
         "thatchgrin_sweet_sack": build_sack(col),
         "strawling_charm": build_charm(col),
+        # the event token Old Thatchgrin pays each day; Hester binds five into the broom
+        "emberwoven_sheaf": build_sheaf(col),
         # the shop's costume draughts and title writs, and Old Thatchgrin's broom
         "rattlebone_draught": build_draught(col, "skel", (0.62, 0.56, 0.36), (0.5, 0.45, 0.25), "skull"),
         "haunting_draught": build_draught(col, "ghost", (0.3, 0.52, 0.78), (0.35, 0.6, 1.0), "wisp"),

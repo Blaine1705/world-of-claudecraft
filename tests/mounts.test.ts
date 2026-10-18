@@ -296,19 +296,20 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
       if (REFERRAL_REWARD_MOUNTS.includes(key)) continue; // transactional milestone delivery, referral_rewards.test.ts
       const itemId = mountItemId(key)!;
-      // SEASONAL FIELD-BOSS KEEPSAKE: the Emberbristle Broom is Old Thatchgrin's
-      // first-kill keepsake, a certain personal draw gated to characters who hold no
-      // copy (LootEntry.unlessOwned), and event-bound, so it cannot be farmed or kept
-      // past Gourdlight Eve. His is the ONE table it rides, he is a world boss (raid
-      // kill, personal loot, daily lockout), and it is no faster than the horse.
+      // SEASONAL KEEPSAKE: the Emberbristle Broom rides NO mob table. Hester sells it
+      // for five Emberwoven Sheaves, the token Old Thatchgrin (a world boss: personal
+      // loot, daily lockout) pays once a day to a character who does not keep the
+      // broom, so it takes five days. Event-bound, so it cannot be kept past Gourdlight
+      // Eve, and it is no faster than the horse.
       if (itemId === 'reins_emberbristle_broom') {
         const holders = Object.values(MOBS).filter((m) => m.loot.some((l) => l.itemId === itemId));
-        expect(holders.map((m) => m.id)).toEqual(['gourdlight_thatchgrin']);
-        expect(holders[0].worldBoss).toBe(true);
-        const row = holders[0].loot.find((l) => l.itemId === itemId);
-        expect(row?.chance).toBe(1);
-        expect(row?.unlessOwned).toBe(true);
-        expect(row?.rollGroup).toBeUndefined();
+        expect(holders).toEqual([]);
+        expect(NPCS.gourdlight_keeper.vendorItems).toContain(itemId);
+        expect(ITEMS[itemId].priceItem).toEqual({ itemId: 'emberwoven_sheaf', count: 5 });
+        const sheaf = MOBS.gourdlight_thatchgrin.loot.find((l) => l.itemId === 'emberwoven_sheaf');
+        expect(MOBS.gourdlight_thatchgrin.worldBoss).toBe(true);
+        expect(sheaf?.chance).toBe(1);
+        expect(sheaf?.unlessOwnedItem).toBe(itemId);
         expect(ITEMS[itemId].seasonalEvent).toBe('gourdlight_eve');
         expect(MOUNTS[key].moveSpeedPct).toBe(MOUNTS.valorsteed.moveSpeedPct);
         continue;

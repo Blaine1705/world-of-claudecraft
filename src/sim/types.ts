@@ -2134,6 +2134,11 @@ export interface LootEntry {
   // stays a function of the roster), and the win is discarded for a contributor who
   // already holds the item in bags, bank or courier cargo.
   unlessOwned?: true;
+  // WORLD-BOSS PERSONAL LOOT ONLY (world_boss.ts rollWorldBossLoot): like unlessOwned,
+  // but keyed on ANOTHER item: the win is discarded for a contributor who already holds
+  // this item in bags, bank or courier cargo (a token stops once its purchase is kept:
+  // Old Thatchgrin's Emberwoven Sheaf and the broom it buys). Still rolled for everyone.
+  unlessOwnedItem?: string;
   // WORLD-BOSS PERSONAL LOOT ONLY (world_boss.ts rollWorldBossLoot): the entry is
   // rolled only for a contributor whose level is at or below this. The locals' share
   // of a boss placed in their zone: gear a level-eight can wear, which the level-twenty
