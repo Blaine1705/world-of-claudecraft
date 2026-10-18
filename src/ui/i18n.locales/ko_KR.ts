@@ -21319,6 +21319,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '열린 담금질 물속: 이동 속도가 {slow}% 감소하고 매초 {damage}의 피해(영웅 난이도 {heroic})로 불탑니다. 아무 얼음판이나 물가로 헤엄치십시오.',
   'hudChrome.auraEffect.sanctum.shardFlare':
     '심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다.',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    '올드 대치그린이 당신을 조종합니다. 행동할 수 없으며, 가장 가까운 아군에게 걸어가 {every}초마다 {min}~{max}의 피해를 줍니다 (레벨 {level} 아군에게는 최대 {mult}배). 최대 생명력의 {pct}%에 해당하는 피해를 받거나 아군이 해제하면 (마법) 일찍 끝납니다.',
   'hudChrome.auraEffect.wildheart.packBond':
     '짝이 가까이 있는 동안 받는 피해가 {pct}% 감소합니다. 야수조련사와 재규어를 떼어 놓으면 유대가 끊어집니다.',
   'hudChrome.auraEffect.wildheart.packBondFury':

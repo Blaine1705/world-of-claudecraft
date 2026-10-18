@@ -4174,7 +4174,7 @@ export const ko_KR: EnTranslations = {
     },
     "auraEffect": {
       "gourdlight": {
-        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+        "thatchbound": "올드 대치그린이 당신을 조종합니다. 행동할 수 없으며, 가장 가까운 아군에게 걸어가 {every}초마다 {min}~{max}의 피해를 줍니다 (레벨 {level} 아군에게는 최대 {mult}배). 최대 생명력의 {pct}%에 해당하는 피해를 받거나 아군이 해제하면 (마법) 일찍 끝납니다."
       },
       "wildheart": {
         "packBond": "짝이 가까이 있는 동안 받는 피해가 {pct}% 감소합니다. 야수조련사와 재규어를 떼어 놓으면 유대가 끊어집니다.",

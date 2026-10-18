@@ -21327,6 +21327,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '開いた焼き入れの水の中：移動速度が{slow}%低下し、毎秒{damage}のダメージ（ヒロイックでは{heroic}）で焼かれる。どれかの氷板か岸まで泳げ。',
   'hudChrome.auraEffect.sanctum.shardFlare':
     '心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'オールド・サッチグリンに操られています。行動できず、最も近い味方のもとへ歩かされ、{every}秒ごとに{min}から{max}のダメージを与えます（レベル{level}の味方には最大{mult}倍）。最大HPの{pct}%に相当するダメージを受けるか、味方に解呪（魔法）されると早めに解除されます。',
   'hudChrome.auraEffect.wildheart.packBond':
     '相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。',
   'hudChrome.auraEffect.wildheart.packBondFury':
@@ -21468,7 +21470,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '聖歌隊員が彼女の受けるダメージを{pct}%減らしている：先に聖歌隊員を倒せ',
   'hudChrome.cryptAlert.timeAria': '残り{seconds}秒',
   'hudChrome.auraEffect.crypt.measured':
-    'これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。',
+    'これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。',
   'hudChrome.auraEffect.crypt.graveDirt':
     '開いた墓の中に立っている：移動速度が{slow}%低下し、毎秒{damage}の闇ダメージ（ヒロイックでは{heroic}）。ヒロイックでは墓の中に{linger}秒留まると安らがぬ骨が這い出る。墓から出ること。',
   'hudChrome.auraEffect.crypt.dirtInEyes':
@@ -21480,7 +21482,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.crypt.tolling':
     '鐘の綱へ歩み寄り埋葬の鐘を鳴らしている間、ダメージを受けない。鳴らし終えると全員に{min}～{max}の闇ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、開いた墓すべてから安らがぬ骨が這い出る。',
   'hudChrome.auraEffect.crypt.embraced':
-    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
+    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}から{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
   'hudChrome.auraEffect.crypt.lament':
     '花嫁の哀歌が終わると、灯った墓のランタンから{radius}ヤード以内にいない全員に{min}～{max}の冷気ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。ランタンが守るのは最も近い{cap}人だけで、その後は消えて次の哀歌を守れない。',
   'hudChrome.auraEffect.crypt.lingering':

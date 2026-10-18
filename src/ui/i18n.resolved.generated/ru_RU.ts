@@ -4174,7 +4174,7 @@ export const ru_RU: EnTranslations = {
     },
     "auraEffect": {
       "gourdlight": {
-        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+        "thatchbound": "Старый Соломозуб дёргает за ваши нити. Вы не можете действовать: вас ведут к ближайшему союзнику, и вы бьёте его каждые {every} сек. на от {min} до {max} ед. урона (до {mult} раз больше по союзнику {level}-го уровня). Эффект заканчивается раньше, если вы получите урон, равный {pct}% от максимального здоровья, или если союзник его рассеет (магия)."
       },
       "wildheart": {
         "packBond": "Получает на {pct}% меньше урона, пока напарник рядом. Разведите Повелителя клыков и его ягуара, чтобы разорвать узы.",

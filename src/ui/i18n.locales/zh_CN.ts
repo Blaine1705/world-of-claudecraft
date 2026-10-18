@@ -20308,6 +20308,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '身处开阔的淬火之水：移动速度降低{slow}%，每秒受到{damage}点灼烧伤害（英雄难度{heroic}点）。游向任意冰板或岸边。',
   'hudChrome.auraEffect.sanctum.shardFlare':
     '心之碎片闪耀：墓穴吐息每{breath}秒一次，振翼狂风每{gale}秒一次。',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    '老稻草狞笑正在操纵你。你无法行动：你会被带到最近的盟友身边，每{every}秒对其造成{min}到{max}点伤害（对{level}级盟友最多{mult}倍）。当你受到相当于最大生命值{pct}%的伤害，或被盟友驱散（魔法）时提前结束。',
   'hudChrome.auraEffect.wildheart.packBond':
     '伙伴靠近时受到的伤害降低{pct}%。将驯兽师和他的美洲豹拉开即可打破羁绊。',
   'hudChrome.auraEffect.wildheart.packBondFury': '伙伴靠近时造成的伤害提高{pct}%。',

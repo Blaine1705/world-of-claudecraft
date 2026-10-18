@@ -4174,7 +4174,7 @@ export const zh_CN: EnTranslations = {
     },
     "auraEffect": {
       "gourdlight": {
-        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+        "thatchbound": "老稻草狞笑正在操纵你。你无法行动：你会被带到最近的盟友身边，每{every}秒对其造成{min}到{max}点伤害（对{level}级盟友最多{mult}倍）。当你受到相当于最大生命值{pct}%的伤害，或被盟友驱散（魔法）时提前结束。"
       },
       "wildheart": {
         "packBond": "伙伴靠近时受到的伤害降低{pct}%。将驯兽师和他的美洲豹拉开即可打破羁绊。",
