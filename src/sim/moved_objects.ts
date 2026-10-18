@@ -8,7 +8,10 @@
 //
 // IDS NEVER MOVE: a farm bed id is a persisted save key (farm_patches.ts), a
 // gather node id keys the per-viewer respawn timers, a practice dummy keeps
-// its spawn slot, a door keeps its dungeon. Only x/z change, per map.
+// its spawn slot, a door keeps its dungeon. Per map, an entry may change the
+// object's x/z, turn it (rotY: beds, dummies, nodes), resize it (scale: beds,
+// nodes; OBJECT_EDIT_CAPS) or delete it (removed). A deleted dummy or door
+// still consumes its entity id at spawn, so every later id stays the same.
 //
 // THE BUILT-IN WORLD CANNOT DRIFT: it carries no objectMoves, and every
 // resolver hands back the very table object it was given when a world moves
@@ -38,6 +41,12 @@ import type { DungeonDef, GatherNodeDef } from './types';
 export interface ObjectMove {
   readonly x: number;
   readonly z: number;
+  /** Yaw in radians; absent = the object's built-in facing. */
+  readonly rotY?: number;
+  /** Uniform size multiplier; absent = 1. */
+  readonly scale?: number;
+  /** The map deleted the object: no entity, collider, drawing or use. */
+  readonly removed?: true;
 }
 
 /** Moved objects keyed `<kind>:<id>` (objectMoveKey). Only moved entries are
@@ -56,6 +65,61 @@ export const MOVABLE_OBJECT_KINDS: readonly MovableObjectKind[] = [
 /** A document carries at most this many moves (every movable object in the
  *  built-in world is a few hundred; the cap only bounds a hostile document). */
 export const MAX_OBJECT_MOVES = 1024;
+
+/** The size range an edited object may take. */
+export const MIN_OBJECT_SCALE = 0.25;
+export const MAX_OBJECT_SCALE = 4;
+
+/** What each kind may change besides its position (every kind can be moved
+ *  and deleted). A door's arch, jambs, set piece and exit drop are built on
+ *  world axes, and a mob's size is its template's, so those stay fixed. */
+export const OBJECT_EDIT_CAPS: Readonly<
+  Record<MovableObjectKind, { readonly rotate: boolean; readonly scale: boolean }>
+> = {
+  farmBed: { rotate: true, scale: true },
+  practiceDummy: { rotate: true, scale: false },
+  gatherNode: { rotate: true, scale: true },
+  dungeonDoor: { rotate: false, scale: false },
+};
+
+/** An angle folded into (-PI, PI]. */
+export function wrapObjectAngle(a: number): number {
+  const twoPi = Math.PI * 2;
+  let r = a % twoPi;
+  if (r <= -Math.PI) r += twoPi;
+  else if (r > Math.PI) r -= twoPi;
+  return r;
+}
+
+/** One frozen entry with only the fields its kind may carry. A size of 1
+ *  and removed: false are every object's defaults and are dropped. A turn is
+ *  kept whenever present, even 0: some objects face elsewhere by default (the
+ *  healing-ground dummies face west), so 0 can be a real turn. */
+function freezeMove(kind: MovableObjectKind, m: ObjectMove): ObjectMove {
+  const caps = OBJECT_EDIT_CAPS[kind];
+  const out: { x: number; z: number; rotY?: number; scale?: number; removed?: true } = {
+    x: m.x,
+    z: m.z,
+  };
+  if (caps.rotate && typeof m.rotY === 'number' && Number.isFinite(m.rotY)) {
+    out.rotY = wrapObjectAngle(m.rotY);
+  }
+  if (caps.scale && typeof m.scale === 'number' && Number.isFinite(m.scale)) {
+    const scale = Math.min(MAX_OBJECT_SCALE, Math.max(MIN_OBJECT_SCALE, m.scale));
+    if (scale !== 1) out.scale = scale;
+  }
+  if (m.removed === true) out.removed = true;
+  return Object.freeze(out);
+}
+
+/** Whether the map deleted this object. */
+export function objectRemoved(
+  moves: ObjectMoves | undefined,
+  kind: MovableObjectKind,
+  id: string,
+): boolean {
+  return moves?.[`${kind}:${id}`]?.removed === true;
+}
 
 const KEY_PATTERN = /^(farmBed|practiceDummy|gatherNode|dungeonDoor):([a-z0-9_]{1,64})$/;
 
@@ -81,12 +145,19 @@ export function sanitizeObjectMoves(raw: unknown, bound: number): ObjectMoves | 
   let count = 0;
   for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
     if (count >= MAX_OBJECT_MOVES) break;
-    if (!parseObjectMoveKey(key) || !value || typeof value !== 'object') continue;
-    const { x, z } = value as { x?: unknown; z?: unknown };
+    const parsed = parseObjectMoveKey(key);
+    if (!parsed || !value || typeof value !== 'object') continue;
+    const { x, z, rotY, scale, removed } = value as Record<string, unknown>;
     if (typeof x !== 'number' || typeof z !== 'number') continue;
     if (!Number.isFinite(x) || !Number.isFinite(z)) continue;
     if (Math.abs(x) > bound || Math.abs(z) > bound) continue;
-    out[key] = Object.freeze({ x, z });
+    out[key] = freezeMove(parsed.kind, {
+      x,
+      z,
+      rotY: typeof rotY === 'number' ? rotY : undefined,
+      scale: typeof scale === 'number' ? scale : undefined,
+      removed: removed === true ? true : undefined,
+    });
     count++;
   }
   return count > 0 ? Object.freeze(out) : undefined;
@@ -103,7 +174,12 @@ export function freezeObjectMoves(
   if (keys.length === 0) return undefined;
   if (Object.isFrozen(moves) && keys.every((key) => Object.isFrozen(moves[key]))) return moves;
   const out: Record<string, ObjectMove> = {};
-  for (const key of keys) out[key] = Object.freeze({ x: moves[key].x, z: moves[key].z });
+  for (const key of keys) {
+    const parsed = parseObjectMoveKey(key);
+    out[key] = parsed
+      ? freezeMove(parsed.kind, moves[key])
+      : Object.freeze({ x: moves[key].x, z: moves[key].z });
+  }
   return Object.freeze(out);
 }
 
@@ -164,32 +240,66 @@ export function farmPatchesFor(
   patches: readonly FarmPatchDef[],
 ): readonly FarmPatchDef[] {
   if (!moves || !hasKind(moves, 'farmBed')) return patches;
-  return memoized(FARM_MEMO, moves, patches, () =>
-    Object.freeze(
-      patches.map((patch) => {
-        if (!patch.beds.some((bed) => moves[objectMoveKey('farmBed', bed.id)])) return patch;
-        const beds = Object.freeze(
-          patch.beds.map((bed) => {
-            const move = moves[objectMoveKey('farmBed', bed.id)];
-            return move ? Object.freeze({ id: bed.id, x: move.x, z: move.z }) : bed;
-          }),
-        );
-        const x = beds.reduce((sum, bed) => sum + bed.x, 0) / beds.length;
-        const z = beds.reduce((sum, bed) => sum + bed.z, 0) / beds.length;
-        return Object.freeze({ ...patch, x, z, beds });
-      }),
-    ),
-  );
+  return memoized(FARM_MEMO, moves, patches, () => {
+    const out: FarmPatchDef[] = [];
+    for (const patch of patches) {
+      if (!patch.beds.some((bed) => moves[objectMoveKey('farmBed', bed.id)])) {
+        out.push(patch);
+        continue;
+      }
+      const beds = Object.freeze(
+        patch.beds
+          .filter((bed) => moves[objectMoveKey('farmBed', bed.id)]?.removed !== true)
+          .map((bed) => farmBedFor(moves, bed) as FarmBedDef),
+      );
+      // Every bed deleted: the patch (its pin, bin and quest area) goes too.
+      if (beds.length === 0) continue;
+      // Re-centre the anchor only when a bed moved or left; a turn or a
+      // resize keeps the patch's authored pin exactly where it was.
+      const shifted = patch.beds.some((bed) => {
+        const move = moves[objectMoveKey('farmBed', bed.id)];
+        return move !== undefined && (move.removed || move.x !== bed.x || move.z !== bed.z);
+      });
+      if (!shifted) {
+        out.push(Object.freeze({ ...patch, beds }));
+        continue;
+      }
+      const x = beds.reduce((sum, bed) => sum + bed.x, 0) / beds.length;
+      const z = beds.reduce((sum, bed) => sum + bed.z, 0) / beds.length;
+      out.push(Object.freeze({ ...patch, x, z, beds }));
+    }
+    return Object.freeze(out);
+  });
 }
 
 /** A bed's row in this world (the plant/harvest range check): the built-in
- *  row, or a frozen copy at its moved position. Undefined stays undefined. */
+ *  row, or a frozen copy at its moved position with its turn and size.
+ *  Undefined for a deleted bed (so planting and harvesting it are refused),
+ *  and undefined stays undefined. */
 export function farmBedFor(
   moves: ObjectMoves | undefined,
   bed: FarmBedDef | undefined,
 ): FarmBedDef | undefined {
   const move = bed && moves?.[objectMoveKey('farmBed', bed.id)];
-  return move && bed ? Object.freeze({ id: bed.id, x: move.x, z: move.z }) : bed;
+  if (!move || !bed) return bed;
+  if (move.removed) return undefined;
+  const row: { id: string; x: number; z: number; rotY?: number; scale?: number } = {
+    id: bed.id,
+    x: move.x,
+    z: move.z,
+  };
+  if (move.rotY !== undefined) row.rotY = move.rotY;
+  if (move.scale !== undefined) row.scale = move.scale;
+  return Object.freeze(row);
+}
+
+/** A practice dummy's facing on this map, or `builtin` when untouched. */
+export function practiceDummyFacing(
+  moves: ObjectMoves | undefined,
+  mobId: string,
+  builtin: number,
+): number {
+  return moves?.[objectMoveKey('practiceDummy', mobId)]?.rotY ?? builtin;
 }
 
 /** A practice dummy's spawn mark (keyed by its mob template id). */
@@ -208,20 +318,23 @@ export function gatherNodesFor(
   nodes: GatherNodeDef[],
 ): GatherNodeDef[] {
   if (!moves || !hasKind(moves, 'gatherNode')) return nodes;
-  return memoized(
-    GATHER_MEMO,
-    moves,
-    nodes,
-    () =>
-      Object.freeze(
-        nodes.map((node) => {
-          const move = moves[objectMoveKey('gatherNode', node.id)];
-          return move
-            ? Object.freeze({ ...node, pos: Object.freeze({ x: move.x, z: move.z }) })
-            : node;
-        }),
-      ) as GatherNodeDef[],
-  );
+  return memoized(GATHER_MEMO, moves, nodes, () => {
+    const out: GatherNodeDef[] = [];
+    for (const node of nodes) {
+      const move = moves[objectMoveKey('gatherNode', node.id)];
+      if (!move) {
+        out.push(node);
+        continue;
+      }
+      // A deleted node leaves every table: no collider, drawing or harvest.
+      if (move.removed) continue;
+      const row: GatherNodeDef = { ...node, pos: Object.freeze({ x: move.x, z: move.z }) };
+      if (move.rotY !== undefined) row.rotY = move.rotY;
+      if (move.scale !== undefined) row.scale = move.scale;
+      out.push(Object.freeze(row));
+    }
+    return Object.freeze(out) as GatherNodeDef[];
+  });
 }
 
 /** An overworld dungeon door's position in this world. */

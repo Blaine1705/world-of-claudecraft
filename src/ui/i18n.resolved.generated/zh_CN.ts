@@ -10893,7 +10893,21 @@ export const zh_CN: EnTranslations = {
       "moved": "已在此地图中移动。",
       "original": "位于原始位置。",
       "hint": "拖动它，或用方向键微调。移动只作用于此地图，物件保持原有身份，因此已保存的进度仍能找到它。",
-      "reset": "重置到原始位置"
+      "reset": "重置到原始位置",
+      "edited": "已在此地图上更改。",
+      "rotation": "旋转（度）",
+      "size": "大小",
+      "resetAll": "恢复原样",
+      "delete": "从此地图删除",
+      "deleteHint": "仅从此地图删除。之后可在已删除对象列表中恢复。",
+      "doorDeleteHint": "删除地下城入口门会移除其在此地图上的地表入口。",
+      "dummyDeleteHint": "黑尔的练习课程会用到这些假人：删除其中一个后，此地图上对应的课程将无法完成。",
+      "doorFixed": "地下城入口门可以移动或删除，但不能旋转或缩放。",
+      "deletedTitle": "已删除的玩法对象",
+      "deletedHint": "已从此地图删除。恢复后会回到原来的位置。",
+      "deletedRow": "{kind}：{name}",
+      "restore": "恢复",
+      "restoredLater": "已恢复。地图重新加载后会显示在视图中。"
     },
     "lightTool": {
       "title": "Point Lights",

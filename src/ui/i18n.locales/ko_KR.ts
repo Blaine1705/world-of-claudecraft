@@ -11357,6 +11357,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'editor.biome.clearConfirm': '이 맵에서 칠한 생태 칸을 모두 제거할까요?',
   'editor.flatten.hint': '평탄화는 드래그를 시작할 때 커서 아래의 높이로 지면을 고릅니다.',
   'editor.flatten.hardEdge': '경계 선명하게',
+  'editor.objectMove.edited': '이 맵에서 변경됨.',
+  'editor.objectMove.rotation': '회전(도)',
+  'editor.objectMove.size': '크기',
+  'editor.objectMove.resetAll': '원래대로',
+  'editor.objectMove.delete': '이 맵에서 삭제',
+  'editor.objectMove.deleteHint':
+    '이 맵에서만 삭제합니다. 나중에 삭제된 오브젝트 목록에서 복원할 수 있습니다.',
+  'editor.objectMove.doorDeleteHint': '던전 문을 삭제하면 이 맵에서 지상 입구가 사라집니다.',
+  'editor.objectMove.dummyDeleteHint':
+    '헤일의 연습 수업은 이 허수아비를 사용합니다. 하나를 삭제하면 이 맵에서 해당 수업을 끝낼 수 없습니다.',
+  'editor.objectMove.doorFixed':
+    '던전 문은 이동하거나 삭제할 수만 있고, 회전하거나 크기를 바꿀 수는 없습니다.',
+  'editor.objectMove.deletedTitle': '삭제된 게임플레이 오브젝트',
+  'editor.objectMove.deletedHint': '이 맵에서 삭제되었습니다. 복원하면 원래 자리로 돌아옵니다.',
+  'editor.objectMove.deletedRow': '{kind}: {name}',
+  'editor.objectMove.restore': '복원',
+  'editor.objectMove.restoredLater': '복원했습니다. 맵을 다시 불러오면 화면에 나타납니다.',
   'editor.selection.heightOffset': '높이 오프셋(야드)',
   'editor.selection.heightStep': '이동 간격(야드)',
   'editor.selection.raiseAsset': '올리기',

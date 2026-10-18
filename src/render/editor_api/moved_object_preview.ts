@@ -1,14 +1,16 @@
-// The map editor's live preview of a moved built-in gameplay object
-// (sim/moved_objects.ts): shift what the renderer already drew, in place, by
-// the move's offset, so the maker sees a farm bed, a gather node or a dungeon
-// entrance land where they dropped it without rebuilding the world.
+// The map editor's live preview of an edited built-in gameplay object
+// (sim/moved_objects.ts): move, turn, resize or hide what the renderer already
+// drew, in place, so the maker sees a farm bed, a gather node or a dungeon
+// entrance change the moment they edit it, without rebuilding the world.
 //
 // Editor-only and approximate on purpose: the beds and nodes are instanced
-// batches baked at build time, so the preview translates one instance (its
-// ground tilt is the old spot's), and an entrance set piece moves as a whole
-// rather than re-seating every stone. The next build of the renderer reads
-// the moved tables (Sim.farmPatches, activeGatherNodes, activeDungeonDoorPos)
-// and draws everything exactly. The shipped game never calls this.
+// batches baked at build time, so the preview re-poses one instance about its
+// base point (its ground tilt is the old spot's), and an entrance set piece
+// moves as a whole rather than re-seating every stone. A deleted object
+// collapses to zero size, its last pose kept on the mesh so a restore (undo)
+// brings it back. The next build of the renderer reads the edited tables
+// (Sim.farmPatches, activeGatherNodes, activeDungeonDoorPos) and draws
+// everything exactly. The shipped game never calls this.
 
 import * as THREE from 'three';
 import { DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID } from '../../sim/drowned_temple_entrance';
@@ -18,10 +20,27 @@ import { SUNKEN_BASTION_ENTRANCE_DUNGEON_ID } from '../../sim/sunken_bastion_ent
 import { WILDHEART_BASIN_ENTRANCE_DUNGEON_ID } from '../../sim/wildheart_basin_entrance';
 
 export type MovedObjectPreview =
-  | { readonly kind: 'farmBed'; readonly patchId: string; readonly bedIndex: number }
+  | {
+      readonly kind: 'farmBed';
+      readonly patchId: string;
+      /** The bed's id: its instance is found through the mesh's farmBedIds. */
+      readonly bedId?: string;
+      /** Fallback slot when a mesh carries no id table. */
+      readonly bedIndex?: number;
+    }
   | { readonly kind: 'farmBin'; readonly patchId: string }
   | { readonly kind: 'gatherNode'; readonly id: string }
   | { readonly kind: 'dungeonDoor'; readonly dungeonId: string };
+
+/** One state of an edited object: where it stands, its turn and size, and
+ *  whether the map deleted it. Plain {x, z} is an untouched pose. */
+export interface PreviewPose {
+  readonly x: number;
+  readonly z: number;
+  readonly rotY?: number;
+  readonly scale?: number;
+  readonly removed?: boolean;
+}
 
 /** The entrance set pieces each built door carries (static_world_features.ts),
  *  by the root group name its builder gives it. */
@@ -33,52 +52,110 @@ const DOOR_SET_PIECE_GROUPS: Readonly<Record<string, string>> = {
   [WILDHEART_BASIN_ENTRANCE_DUNGEON_ID]: 'wildheartBasinEntrance',
 };
 
-function shiftInstance(mesh: THREE.InstancedMesh, index: number, d: THREE.Vector3): boolean {
+const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
+
+/** The world transform that carries the `from` pose onto the `to` pose: about
+ *  the base point, turn by the yaw change and resize by the size ratio, then
+ *  translate (ground height included). */
+function poseDelta(
+  from: PreviewPose,
+  to: PreviewPose,
+  ground: (x: number, z: number) => number,
+): THREE.Matrix4 {
+  const y0 = ground(from.x, from.z);
+  const y1 = ground(to.x, to.z);
+  const turn = (to.rotY ?? 0) - (from.rotY ?? 0);
+  const ratio = (to.scale ?? 1) / (from.scale ?? 1);
+  return new THREE.Matrix4()
+    .makeTranslation(to.x, y1, to.z)
+    .multiply(new THREE.Matrix4().makeRotationY(turn))
+    .multiply(new THREE.Matrix4().makeScale(ratio, ratio, ratio))
+    .multiply(new THREE.Matrix4().makeTranslation(-from.x, -y0, -from.z));
+}
+
+function poseChanged(from: PreviewPose, to: PreviewPose): boolean {
+  return (
+    from.x !== to.x ||
+    from.z !== to.z ||
+    (from.rotY ?? 0) !== (to.rotY ?? 0) ||
+    (from.scale ?? 1) !== (to.scale ?? 1) ||
+    (from.removed === true) !== (to.removed === true)
+  );
+}
+
+function editInstance(
+  mesh: THREE.InstancedMesh,
+  index: number,
+  from: PreviewPose,
+  to: PreviewPose,
+  ground: (x: number, z: number) => number,
+): boolean {
   if (index < 0 || index >= mesh.instanceMatrix.count) return false;
+  const hidden: Map<number, THREE.Matrix4> = mesh.userData.removedInstances ?? new Map();
+  mesh.userData.removedInstances = hidden;
   const m = new THREE.Matrix4();
-  mesh.getMatrixAt(index, m);
-  m.elements[12] += d.x;
-  m.elements[13] += d.y;
-  m.elements[14] += d.z;
-  mesh.setMatrixAt(index, m);
+  // A hidden instance re-poses from the pose it had when it was deleted.
+  const stashed = hidden.get(index);
+  if (stashed) m.copy(stashed);
+  else mesh.getMatrixAt(index, m);
+  m.premultiply(poseDelta(from, to, ground));
+  if (to.removed) {
+    hidden.set(index, m);
+    mesh.setMatrixAt(index, ZERO);
+  } else {
+    hidden.delete(index);
+    mesh.setMatrixAt(index, m);
+  }
   mesh.instanceMatrix.needsUpdate = true;
   mesh.computeBoundingBox();
   mesh.computeBoundingSphere();
   return true;
 }
 
-function shiftObject(object: THREE.Object3D, d: THREE.Vector3): void {
-  object.position.add(d);
+function editObject(
+  object: THREE.Object3D,
+  from: PreviewPose,
+  to: PreviewPose,
+  ground: (x: number, z: number) => number,
+): void {
+  const stashed: THREE.Vector3 | undefined = object.userData.removedScale;
+  if (stashed) object.scale.copy(stashed);
+  const y0 = ground(from.x, from.z);
+  const y1 = ground(to.x, to.z);
+  object.position.add(new THREE.Vector3(to.x - from.x, y1 - y0, to.z - from.z));
+  object.rotation.y += (to.rotY ?? 0) - (from.rotY ?? 0);
+  object.scale.multiplyScalar((to.scale ?? 1) / (from.scale ?? 1));
+  if (to.removed) {
+    object.userData.removedScale = object.scale.clone();
+    object.scale.setScalar(0);
+  } else {
+    delete object.userData.removedScale;
+  }
   // The static dressing freezes its matrices, so recompute them by hand.
   object.updateMatrix();
   object.updateMatrixWorld(true);
 }
 
 /**
- * Translate the drawn instance(s) of `target` from `from` to `to` (ground
- * height from `ground`). Returns how many objects or instances moved, so a
- * caller can tell a preview from a miss (a node the map does not draw, a door
- * with no set piece).
+ * Re-pose the drawn instance(s) of `target` from the `from` pose to the `to`
+ * pose (ground height from `ground`). Returns how many objects or instances
+ * changed, so a caller can tell a preview from a miss (a node the map does
+ * not draw, a door with no set piece).
  */
 export function shiftMovedObjectInScene(
   scene: THREE.Object3D,
   target: MovedObjectPreview,
-  from: { readonly x: number; readonly z: number },
-  to: { readonly x: number; readonly z: number },
+  from: PreviewPose,
+  to: PreviewPose,
   ground: (x: number, z: number) => number,
 ): number {
-  const d = new THREE.Vector3(
-    to.x - from.x,
-    ground(to.x, to.z) - ground(from.x, from.z),
-    to.z - from.z,
-  );
-  if (d.lengthSq() === 0) return 0;
+  if (!poseChanged(from, to)) return 0;
   let moved = 0;
   if (target.kind === 'dungeonDoor') {
     const name = DOOR_SET_PIECE_GROUPS[target.dungeonId];
     const group = name ? scene.getObjectByName(name) : undefined;
     if (group) {
-      shiftObject(group, d);
+      editObject(group, from, to, ground);
       moved++;
     }
     return moved;
@@ -91,18 +168,25 @@ export function shiftMovedObjectInScene(
         : null;
   scene.traverse((object) => {
     if (instanceName !== null) {
-      if (object instanceof THREE.InstancedMesh && object.name === instanceName) {
-        if (shiftInstance(object, target.kind === 'farmBed' ? target.bedIndex : 0, d)) moved++;
+      if (!(object instanceof THREE.InstancedMesh) || object.name !== instanceName) return;
+      let index = 0;
+      if (target.kind === 'farmBed') {
+        const ids = object.userData.farmBedIds;
+        index =
+          Array.isArray(ids) && target.bedId !== undefined
+            ? ids.indexOf(target.bedId)
+            : (target.bedIndex ?? -1);
       }
+      if (editInstance(object, index, from, to, ground)) moved++;
       return;
     }
     if (target.kind !== 'gatherNode') return;
     const ids = object.userData.gatherNodeIds;
     if (object instanceof THREE.InstancedMesh && Array.isArray(ids)) {
       const index = ids.indexOf(target.id);
-      if (index >= 0 && shiftInstance(object, index, d)) moved++;
+      if (index >= 0 && editInstance(object, index, from, to, ground)) moved++;
     } else if (object.userData.gatherNodeId === target.id) {
-      shiftObject(object, d);
+      editObject(object, from, to, ground);
       moved++;
     }
   });

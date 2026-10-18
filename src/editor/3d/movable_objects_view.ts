@@ -11,13 +11,20 @@ import { farmCompostBinPosition } from '../../render/farm_patches_core';
 import type { Renderer } from '../../render/renderer';
 import { FARM_PATCHES } from '../../sim/content/farm_patches';
 import { activeGatherNodes } from '../../sim/data';
+import { DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID } from '../../sim/drowned_temple_entrance';
+import { HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID } from '../../sim/hollow_crypt_entrance';
 import { farmPatchesFor, type ObjectMoves } from '../../sim/moved_objects';
+import { SANCTUM_SEAL_GATE_DUNGEON_ID } from '../../sim/sanctum_seal_gate';
 import type { Sim } from '../../sim/sim';
+import { SUNKEN_BASTION_ENTRANCE_DUNGEON_ID } from '../../sim/sunken_bastion_entrance';
+import type { Entity } from '../../sim/types';
+import { WILDHEART_BASIN_ENTRANCE_DUNGEON_ID } from '../../sim/wildheart_basin_entrance';
 import { terrainHeight } from '../../sim/world';
 import {
   type MovableObject,
   movableObjectByKey,
   nearestMovableObject,
+  objectPose,
   objectPosition,
   practiceDummyKeyForTemplate,
 } from '../object_moves_core';
@@ -37,6 +44,9 @@ export interface MovableObjectsViewHost {
 
 export class MovableObjectsView {
   private selectedKey: string | null = null;
+  /** The live entities of deleted dummies and doors, kept so undo or Restore
+   *  puts the very same entity back (keyed `<kind>:<id>`). */
+  private readonly removedEntities = new Map<string, Entity>();
   private ring: THREE.Mesh | null = null;
   private readonly ringMat = new THREE.MeshBasicMaterial({
     color: 0xffc04d,
@@ -80,47 +90,71 @@ export class MovableObjectsView {
     return this.nearest(clientX, clientY, LOOSE_PICK_PX, (o) => this.drawn(o))?.key ?? null;
   }
 
-  /** Move the object's live representation from where `before` stood it to
-   *  where `after` does: the Sim entity for a dummy or a door, the renderer's
-   *  drawn instance for a bed (and its patch's compost bin), a node, or a
-   *  door's entrance set piece. Colliders are the caller's (one rebuild per
-   *  gesture, not per sample). */
-  moveLive(key: string, before: ObjectMoves | undefined, after: ObjectMoves | undefined): void {
+  /** Re-pose the object's live representation from how `before` had it to
+   *  how `after` does (moved, turned, resized, deleted or restored): the Sim
+   *  entity for a dummy or a door, the renderer's drawn instance for a bed
+   *  (and its patch's compost bin), a node, or a door's entrance set piece.
+   *  Colliders are the caller's (one rebuild per gesture, not per sample).
+   *  False when a restored object has nothing live to bring back (it was
+   *  already deleted when the view was built), so the caller can say it
+   *  appears after the next rebuild. */
+  moveLive(key: string, before: ObjectMoves | undefined, after: ObjectMoves | undefined): boolean {
     const object = movableObjectByKey(key);
     const sim = this.host.sim();
     const renderer = this.host.renderer();
-    if (!object) return;
-    const from = objectPosition(before, object);
-    const to = objectPosition(after, object);
-    if (from.x === to.x && from.z === to.z) return;
+    if (!object) return true;
+    const from = objectPose(before, object);
+    const to = objectPose(after, object);
+    let shown = true;
     const seed = this.host.seed();
     const ground = { x: to.x, y: terrainHeight(to.x, to.z, seed), z: to.z };
-    if (object.kind === 'practiceDummy' && sim) {
+    if ((object.kind === 'practiceDummy' || object.kind === 'dungeonDoor') && sim) {
+      const matches = (entity: Entity): boolean =>
+        object.kind === 'practiceDummy'
+          ? entity.kind === 'mob' && entity.ownerId === null && entity.templateId === object.id
+          : entity.templateId === 'dungeon_door' && entity.dungeonId === object.id;
+      if (to.removed && !from.removed) {
+        for (const entity of [...sim.entities.values()]) {
+          if (!matches(entity)) continue;
+          this.removedEntities.set(key, entity);
+          sim.removeEntity(entity.id);
+        }
+      } else if (from.removed && !to.removed) {
+        const entity = this.removedEntities.get(key);
+        this.removedEntities.delete(key);
+        if (entity && !sim.entities.has(entity.id)) sim.addEntity(entity);
+        else if (!entity) shown = false;
+      }
       for (const entity of sim.entities.values()) {
-        if (entity.kind !== 'mob' || entity.ownerId !== null) continue;
-        if (entity.templateId !== object.id) continue;
+        if (!matches(entity)) continue;
         Object.assign(entity.pos, ground);
         Object.assign(entity.prevPos, ground);
-        Object.assign(entity.spawnPos, ground);
-        if (entity.leashAnchor) Object.assign(entity.leashAnchor, ground);
-      }
-    } else if (object.kind === 'dungeonDoor') {
-      if (sim) {
-        for (const entity of sim.entities.values()) {
-          if (entity.templateId !== 'dungeon_door' || entity.dungeonId !== object.id) continue;
-          Object.assign(entity.pos, ground);
-          Object.assign(entity.prevPos, ground);
+        if (object.kind === 'practiceDummy') {
+          Object.assign(entity.spawnPos, ground);
+          if (entity.leashAnchor) Object.assign(entity.leashAnchor, ground);
+          entity.facing = to.rotY;
+          entity.prevFacing = to.rotY;
         }
       }
-      renderer?.editor.previewObjectMove({ kind: 'dungeonDoor', dungeonId: object.id }, from, to);
-    } else if (object.kind === 'gatherNode') {
-      renderer?.editor.previewObjectMove({ kind: 'gatherNode', id: object.id }, from, to);
-    } else if (object.kind === 'farmBed' && object.patchId !== undefined && renderer) {
-      renderer.editor.previewObjectMove(
-        { kind: 'farmBed', patchId: object.patchId, bedIndex: object.bedIndex ?? 0 },
+    }
+    if (object.kind === 'dungeonDoor') {
+      const n = renderer?.editor.previewObjectMove(
+        { kind: 'dungeonDoor', dungeonId: object.id },
         from,
         to,
       );
+      // A door with a set piece that was built hidden cannot come back live.
+      if (from.removed && !to.removed && n === 0 && this.hasSetPiece(object.id)) shown = false;
+    } else if (object.kind === 'gatherNode') {
+      const n = renderer?.editor.previewObjectMove({ kind: 'gatherNode', id: object.id }, from, to);
+      if (from.removed && !to.removed && n === 0) shown = false;
+    } else if (object.kind === 'farmBed' && object.patchId !== undefined && renderer) {
+      const n = renderer.editor.previewObjectMove(
+        { kind: 'farmBed', patchId: object.patchId, bedId: object.id },
+        from,
+        to,
+      );
+      if (from.removed && !to.removed && n === 0) shown = false;
       const binFrom = this.binOf(before, object.patchId);
       const binTo = this.binOf(after, object.patchId);
       if (binFrom && binTo) {
@@ -132,6 +166,18 @@ export class MovableObjectsView {
       }
     }
     this.syncRing();
+    return shown;
+  }
+
+  /** Whether a door carries an entrance set piece (the five built ones). */
+  private hasSetPiece(dungeonId: string): boolean {
+    return [
+      SANCTUM_SEAL_GATE_DUNGEON_ID,
+      SUNKEN_BASTION_ENTRANCE_DUNGEON_ID,
+      HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID,
+      DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID,
+      WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
+    ].includes(dungeonId);
   }
 
   /** Ring the selected object (or clear it with null). */

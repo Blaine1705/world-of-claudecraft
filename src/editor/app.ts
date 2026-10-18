@@ -497,7 +497,7 @@ import {
 import { EditorApiError, forkMap, type MapFullWire, signedIn, uploadAsset } from './net';
 import { newMapSizeDialog } from './new_map_dialog';
 import { ObjectMoveController } from './object_move_controller';
-import { buildObjectMovePanel } from './object_move_panel';
+import { buildObjectMovePanel, buildRemovedObjectsPanel } from './object_move_panel';
 import { parseMap, serializeMapCompact } from './persist';
 import { applyScaleEqualize, type EqualizePlan, planScaleEqualize } from './placement_scale_core';
 import {
@@ -1205,7 +1205,9 @@ export class EditorApp {
     },
     moveLive: (key, before, after) => {
       this.viewport3d?.setSimObjectMoves(after);
-      this.viewport3d?.objects.moveLive(key, before, after);
+      const shown = this.viewport3d?.objects.moveLive(key, before, after) ?? true;
+      // A restore of an object the view was built without cannot appear live.
+      if (!shown) this.toasts.info(t('editor.objectMove.restoredLater'));
     },
     showSelection: (key) => this.viewport3d?.objects.setSelected(key),
     pushUndo: (entry) => this.pushUndo(entry),
@@ -16788,6 +16790,8 @@ export class EditorApp {
     }
     if (ev.key === 'Delete') {
       if (this.hitboxEdit && this.hitboxEdit.selected.size > 0) this.deleteSelectedHitboxes();
+      // A selected built-in gameplay object (bed, dummy, node, door).
+      else if (this.objectMoves.selectedKey !== null) this.objectMoves.deleteSelected();
       // Collision Master: the scene's one placement is the workbench, never a
       // delete target, Delete/X only ever remove collision boxes there.
       else if (this.selectedPlacement !== null && !this.meshEditActive()) {
@@ -17267,6 +17271,14 @@ export class EditorApp {
           selectedKey: () => this.objectMoves.selectedKey,
           moves: () => this.map.objectMoves,
           reset: () => this.objectMoves.resetSelected(),
+          turn: (rotY, commit) => this.objectMoves.turnSelected(rotY, commit),
+          resize: (scale, commit) => this.objectMoves.resizeSelected(scale, commit),
+          remove: () => this.objectMoves.deleteSelected(),
+        }),
+      removedObjectsPanel: () =>
+        buildRemovedObjectsPanel({
+          moves: () => this.map.objectMoves,
+          restore: (key) => this.objectMoves.restore(key),
         }),
       setSelectedLight: (index) => this.setSelectedLight(index),
       updateMapLight: (index, change) => {

@@ -686,12 +686,12 @@ function staticWorldColliders(seed: number): Collider[] {
   for (const node of gatherNodesInActiveWorld()) {
     const nodeBody = GATHER_NODE_BODIES[node.type];
     if (!nodeBody) continue;
-    const top = topY(seed, node.pos.x, node.pos.z, nodeBody.top);
+    const top = topY(seed, node.pos.x, node.pos.z, nodeBody.top * (node.scale ?? 1));
     out.push({
       type: 'circle',
       x: node.pos.x,
       z: node.pos.z,
-      r: nodeBody.r,
+      r: nodeBody.r * (node.scale ?? 1),
       cameraTopY: top,
       moveTopY: top,
       standable: true,
