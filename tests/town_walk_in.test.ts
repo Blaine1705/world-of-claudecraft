@@ -16,6 +16,7 @@ import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { loadPublishedMap } from '../src/sim/maps/eastbrook_rebuild.generated';
+import { PAINTED_TOWNS } from '../src/sim/painted_towns';
 import { decksMayStand } from '../src/sim/placement_ramps';
 import { nearTownWalkIn, townWalkInPlacements, walkInPlacementFor } from '../src/sim/town_walk_in';
 import type { BuildingDef, WorldContent } from '../src/sim/types';
@@ -34,6 +35,18 @@ const TOWN_BUILDINGS = [
 ];
 const WALK_IN = TOWN_BUILDINGS.filter((building) => building.walkIn);
 const HIGHWATCH_WALK_IN = HIGHWATCH_LAYOUT.buildings.filter((building) => building.walkIn);
+// The painted towns (sim/painted_towns/) stand their walk-in buildings through the
+// same placement, all under the paintedTowns family: the built-in world lists them
+// after Highwatch's, in its zone files' order, so they come from the town list rather
+// than a re-pin per town.
+const PAINTED_WALK_IN_IDS = new Set(
+  PAINTED_TOWNS.flatMap((town) => town.buildings)
+    .filter((building) => building.walkIn)
+    .map((building) => building.id),
+);
+const PAINTED_WALK_IN_PATHS = BUILTIN_WORLD.props.buildings
+  .filter((record) => record.id !== undefined && PAINTED_WALK_IN_IDS.has(record.id))
+  .map((record) => record.assetId);
 
 function recordOf(id: string): BuildingDef {
   const record = [
@@ -114,34 +127,44 @@ describe('the walk-in town placement', () => {
   });
 
   it('stands the floors of a world that keeps the town records, never of one that owns them', () => {
-    expect(townWalkInPlacements(BUILTIN_WORLD).map((p) => p.path)).toEqual(
-      WALK_IN.map((building) => building.assetId),
-    );
+    expect(townWalkInPlacements(BUILTIN_WORLD).map((p) => p.path)).toEqual([
+      ...WALK_IN.map((building) => building.assetId),
+      ...PAINTED_WALK_IN_PATHS,
+    ]);
     // a plain copy of the built-in world keeps the records, and their floors
-    expect(townWalkInPlacements({ ...BUILTIN_WORLD } as WorldContent)).toHaveLength(WALK_IN.length);
+    expect(townWalkInPlacements({ ...BUILTIN_WORLD } as WorldContent)).toHaveLength(
+      WALK_IN.length + PAINTED_WALK_IN_PATHS.length,
+    );
     // a document that took a town's buildings over as placements stands that
     // town's records down: Eastbrook and Fenbridge under authoredTowns,
-    // Highwatch under its own family
+    // Highwatch under its own family, the painted towns under theirs
     expect(
       townWalkInPlacements({
         ...BUILTIN_WORLD,
         promotedScenery: { authoredTowns: true },
       } as WorldContent).map((p) => p.path),
-    ).toEqual(HIGHWATCH_WALK_IN.map((building) => building.assetId));
+    ).toEqual([...HIGHWATCH_WALK_IN.map((building) => building.assetId), ...PAINTED_WALK_IN_PATHS]);
     expect(
       townWalkInPlacements({
         ...BUILTIN_WORLD,
         promotedScenery: { highwatchTown: true },
       } as WorldContent).map((p) => p.path),
-    ).toEqual(
-      [...EASTBROOK_LAYOUT.buildings, ...FENBRIDGE_LAYOUT.buildings]
+    ).toEqual([
+      ...[...EASTBROOK_LAYOUT.buildings, ...FENBRIDGE_LAYOUT.buildings]
         .filter((building) => building.walkIn)
         .map((building) => building.assetId),
-    );
+      ...PAINTED_WALK_IN_PATHS,
+    ]);
     expect(
       townWalkInPlacements({
         ...BUILTIN_WORLD,
         promotedScenery: { authoredTowns: true, highwatchTown: true },
+      } as WorldContent).map((p) => p.path),
+    ).toEqual(PAINTED_WALK_IN_PATHS);
+    expect(
+      townWalkInPlacements({
+        ...BUILTIN_WORLD,
+        promotedScenery: { authoredTowns: true, highwatchTown: true, paintedTowns: true },
       } as WorldContent),
     ).toEqual([]);
     expect(townWalkInPlacements(loadPublishedMap())).toEqual([]);
