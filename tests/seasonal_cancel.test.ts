@@ -83,7 +83,7 @@ describe('right-click cancel of the Gourdlight Eve cosmetics', () => {
       id: 'x',
       kind: 'buff_ap' as const,
       value: 10,
-      undispellable: true,
+      undispellable: true as const,
     };
     expect(isCancelableAura(base)).toBe(false);
     expect(isCancelableAura({ ...base, kind: 'seasonal_cosmetic' as const, value: 0 })).toBe(true);
