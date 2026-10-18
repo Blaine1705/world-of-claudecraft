@@ -1114,8 +1114,9 @@ export type ItemUse =
   | {
       type: 'seasonal';
       // costume: a ten-minute skeleton, ghost or bat body (content/gourdlight_eve.ts
-      // GOURDLIGHT_COSTUMES); titleWrit: grants its title Feat (GOURDLIGHT_TITLE_WRITS).
-      action: 'pumpkinHead' | 'trickJar' | 'strawlingCharm' | 'costume' | 'titleWrit';
+      // GOURDLIGHT_COSTUMES); titleWrit: grants its title Feat (GOURDLIGHT_TITLE_WRITS);
+      // toy: one of Hester's reusable toys (GOURDLIGHT_TOYS, seasonal/seasonal_toys.ts).
+      action: 'pumpkinHead' | 'trickJar' | 'strawlingCharm' | 'costume' | 'titleWrit' | 'toy';
     };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
@@ -9416,7 +9417,17 @@ export type SimEvent = { pid?: number } & (
         | 'boo'
         | 'booNoCostume'
         | 'booAlready'
-        | 'booNotOnErrand';
+        | 'booNotOnErrand'
+        // one of Hester's toys played (`trick` = the toy's item id; `who` = the prank's
+        // target), the prank's splat landed on this player (`who` = the thrower), or a
+        // toy was refused: the prank needs another player out of combat, or the user
+        // is hidden in stealth (a toy would give them away)
+        | 'toy'
+        | 'pranked'
+        | 'prankNeedsPlayer'
+        | 'toyHidden';
+      /** A player's name (the toys: the prank's target or thrower). */
+      who?: string;
       pumpkinId?: string;
       zoneId?: string;
       count?: number;

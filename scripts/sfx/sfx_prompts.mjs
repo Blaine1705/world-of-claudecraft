@@ -1231,6 +1231,15 @@ export const SFX = [
   { key: 'impact_swelling_gourd_burst', custom: true },
   { key: 'mount_run_emberbristle_broom', custom: true },
   { key: 'mount_idle_emberbristle_broom', custom: true, loop: true },
+  // Hester's toys (src/sim/seasonal/seasonal_toys.ts): the spellfxAt sfxKey (the lantern,
+  // the bats, the candle, the broom) and the render toy layer (the prank's splat on landing,
+  // the candle's whisper loop at its spot).
+  { key: 'impact_prank_pumpkin_splat', custom: true },
+  { key: 'spell_wanderwisp_lantern', custom: true },
+  { key: 'spell_startled_bats', custom: true },
+  { key: 'spell_murmurwick_candle', custom: true },
+  { key: 'murmurwick_whispers_loop', custom: true, loop: true },
+  { key: 'spell_sparkbristle_sweep', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

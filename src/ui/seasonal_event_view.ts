@@ -3,6 +3,7 @@
 // head toggle and the Jar of Mischief. The sim sends ids and numbers only; every
 // sentence is composed here from the `seasonal.*` catalog. Pure (no DOM), so a
 // Vitest drives it directly; quest_event_view.ts routes the event here.
+import { gourdlightToy } from '../sim/content/gourdlight_eve';
 import type { SimEvent } from '../sim/types';
 import { deedTitleText } from './deed_i18n';
 import { npcDisplayName } from './entity_display_core';
@@ -16,6 +17,15 @@ export interface SeasonalEventPresentation {
 }
 
 type SeasonalEvent = Extract<SimEvent, { type: 'seasonal' }>;
+
+/** Each toy's log line when it plays (catalog keys by effect). */
+const TOY_LOG_KEYS: Readonly<Record<string, TranslationKey>> = {
+  prank: 'seasonal.toy.prank',
+  lantern: 'seasonal.toy.lantern',
+  bats: 'seasonal.toy.bats',
+  candle: 'seasonal.toy.candle',
+  broom: 'seasonal.toy.broom',
+};
 
 /** A trick's display name; an unknown id (a newer server) falls back to the
  *  generic Gourdlight Eve name rather than printing an id. */
@@ -110,6 +120,19 @@ export function seasonalEventPresentation(event: SeasonalEvent): SeasonalEventPr
       return { logText: t('seasonal.boo.already', { name }) };
     case 'booNotOnErrand':
       return { logText: t('seasonal.boo.notOnErrand') };
+    case 'toy': {
+      const key = TOY_LOG_KEYS[gourdlightToy(event.trick ?? '')?.effect ?? ''];
+      return key ? { logText: t(key, { name: event.who ?? '' }) } : null;
+    }
+    case 'pranked':
+      return {
+        logText: t('seasonal.toy.pranked', { name: event.who ?? '' }),
+        flashText: t('seasonal.toy.prankedFlash', { name: event.who ?? '' }),
+      };
+    case 'prankNeedsPlayer':
+      return { logText: t('seasonal.toy.prankNeedsPlayer') };
+    case 'toyHidden':
+      return { logText: t('seasonal.toy.hidden') };
     default:
       return null;
   }

@@ -7,6 +7,7 @@
 // timer, or a right-click cancel (seasonal_cancel.ts).
 import {
   GOURDLIGHT_COSTUMES,
+  GOURDLIGHT_TOYS,
   GOURDLIGHT_TRICKS,
   type GourdlightCostume,
   PUMPKIN_HEAD_AURA_ID,
@@ -21,6 +22,8 @@ export const SEASONAL_COSMETIC_AURA_IDS: ReadonlySet<string> = new Set([
   ...GOURDLIGHT_TRICKS.map((trick) => trick.id),
   STRAWLING_GUISE.id,
   ...GOURDLIGHT_COSTUMES.map((costume) => costume.auraId),
+  // Hester's toys (seasonal_toys.ts): stripped on close, right-click cancellable
+  ...GOURDLIGHT_TOYS.map((toy) => toy.auraId),
 ]);
 
 /** Every body-swap look a seasonal toy, trick or costume plays (one at a time). */

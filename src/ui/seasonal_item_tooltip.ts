@@ -1,5 +1,5 @@
 // The seasonal event items' tooltip lines (src/sim/content/gourdlight_eve.ts):
-// what the pumpkin head, the Jar of Mischief, the treat pouch, the sweet, the broom and
+// what the pumpkin head, the Jar of Mischief, Hester's toys, the treat pouch, the sweet, the broom and
 // its Emberwoven Sheaf do, stated from the live content (the pouch's count and the
 // broom's sheaf price are read off the sim constants).
 // One small view the item tooltip composes, so the bags, the vendor and the
@@ -14,6 +14,8 @@ import {
   GOURDLIGHT_SWEET_ID,
   GOURDLIGHT_TITLE_WRITS,
   GOURDLIGHT_TREAT_POUCH_ID,
+  type GourdlightToy,
+  gourdlightToy,
   JAR_OF_MISCHIEF_ID,
 } from '../sim/content/gourdlight_eve';
 import {
@@ -34,8 +36,25 @@ const COSTUME_USE_KEYS: Readonly<Record<string, TranslationKey>> = {
   gourdlight_costume_bat: 'seasonal.itemUse.costumeBat',
 };
 
+/** Each toy's own sentence (catalog keys by effect). */
+const TOY_USE_KEYS: Readonly<Record<GourdlightToy['effect'], TranslationKey>> = {
+  prank: 'seasonal.itemUse.toyPrank',
+  lantern: 'seasonal.itemUse.toyLantern',
+  bats: 'seasonal.itemUse.toyBats',
+  candle: 'seasonal.itemUse.toyCandle',
+  broom: 'seasonal.itemUse.toyBroom',
+};
+
 /** The use or purpose line for a seasonal item, or null for any other item. */
 export function seasonalItemTooltipText(item: Pick<ItemDef, 'id'>): string | null {
+  const toy = gourdlightToy(item.id);
+  if (toy) {
+    return t(TOY_USE_KEYS[toy.effect], {
+      seconds: formatNumber(toy.duration),
+      cooldown: formatNumber(toy.cooldown),
+      range: formatNumber(toy.range ?? 0),
+    });
+  }
   const costume = GOURDLIGHT_COSTUMES.find((c) => c.itemId === item.id);
   if (costume) {
     const key = COSTUME_USE_KEYS[costume.auraId];

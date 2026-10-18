@@ -17,6 +17,17 @@
 //                                 breathing hum with embers ticking (a seamless loop)
 //   mount_run_emberbristle_broom  one stride of the broom on the move: a soft swish of
 //                                 bristles through the air with an ember flare
+//   impact_prank_pumpkin_splat    Pranker's Pumpkin lands on a head: a hollow bonk, a wet
+//                                 splat and seeds pattering off
+//   spell_wanderwisp_lantern      the Wanderwisp Lantern set down: a glassy chime and a
+//                                 little ghost's rising "ooo"
+//   spell_startled_bats           the Sack of Startled Bats opened: cloth, a flurry of
+//                                 wings and a scatter of squeaks
+//   spell_murmurwick_candle       the Murmurwick Candle lit: a match strike, a green
+//                                 whoomp and a faint giggle
+//   murmurwick_whispers_loop       its whispers and soft laughter (a seamless 6 s loop)
+//   spell_sparkbristle_sweep      the Sparkbristle Play Broom: two sweeps and crackling
+//                                 sparks
 //
 // Deterministic: a fixed seed per cue (mulberry32), no clock. Original work, recorded in
 // CREDITS.md.
@@ -249,6 +260,229 @@ const CUES = {
       const hum = Math.sin(TAU * 110 * t) * 0.12 * swell;
       const ember = fire(t, 1100, 0.18 * swell, 0.3 * swell);
       return swish + rustle + hum + ember;
+    });
+  },
+  // ---- Hester's toys (round 9) ----
+
+  impact_prank_pumpkin_splat: () => {
+    // a soft pumpkin bursting on a head: a hollow bonk, a wet splat, seeds pattering off
+    const rand = rng(707);
+    const wet = biquad('bp');
+    const wet2 = biquad('bp');
+    const pat = biquad('bp');
+    const seeds = [];
+    for (let i = 0; i < 18; i++)
+      seeds.push([0.09 + rand() * 0.55, 900 + rand() * 1600, 0.2 + rand() * 0.3]);
+    return render(0.9, (t) => {
+      const bonk = thump(t, 260, 150, 0.025, 0.07) * 0.8 + thump(t, 120, 70, 0.04, 0.12) * 0.6;
+      const splat =
+        wet(rand() * 2 - 1, 1100 - 700 * Math.min(1, t / 0.12), 1.2) * env(t, 0.002, 0.06) * 2.2;
+      const squelch =
+        wet2(rand() * 2 - 1, 420 + 260 * Math.sin(TAU * 9 * t), 3.5) *
+        env(t - 0.03, 0.02, 0.14) *
+        1.4;
+      let d = 0;
+      for (const [at, hz, lv] of seeds) {
+        const dt = t - at;
+        if (dt >= 0 && dt < 0.05) d += Math.sin(TAU * hz * dt) * Math.exp(-dt / 0.008) * lv;
+      }
+      const patter = pat(d, 1500, 0.9) * 1.2;
+      const fade = Math.min(1, (0.9 - t) / 0.08);
+      return (bonk + splat + squelch + patter) * fade;
+    });
+  },
+
+  spell_wanderwisp_lantern: () => {
+    // the lantern set down with a glassy chime, and a little ghost's rising "ooo" drifting out
+    const rand = rng(808);
+    const air = biquad('bp');
+    const oo1 = biquad('bp');
+    const oo2 = biquad('bp');
+    const dur = 2.2;
+    const bells = [
+      [0.0, 1318.5, 0.5],
+      [0.07, 1975.5, 0.3],
+      [0.15, 2637, 0.18],
+    ];
+    return render(dur, (t) => {
+      let chime = 0;
+      for (const [at, hz, lv] of bells) {
+        const dt = t - at;
+        if (dt >= 0)
+          chime +=
+            (Math.sin(TAU * hz * dt) +
+              0.4 * Math.sin(TAU * hz * 2.76 * dt) * Math.exp(-dt / 0.15)) *
+            Math.exp(-dt / 0.55) *
+            lv;
+      }
+      // the ghost: a breathy voice gliding up and back down through an "oo" formant
+      const g = t - 0.35;
+      let voice = 0;
+      if (g > 0) {
+        const u = Math.min(1, g / 1.6);
+        const f = 330 + 220 * Math.sin(Math.PI * u) + 8 * Math.sin(TAU * 5.5 * g);
+        const src = Math.sin(TAU * f * g) * 0.5 + (rand() * 2 - 1) * 0.6;
+        const shape = Math.sin(Math.PI * u) ** 1.3;
+        voice = (oo1(src, 320, 5) * 1.3 + oo2(src, 800, 6) * 0.5) * shape * 1.6;
+      }
+      const shimmer = air(rand() * 2 - 1, 5200, 3) * env(t, 0.05, 0.9) * 0.18;
+      const fade = Math.min(1, (dur - t) / 0.2);
+      return (chime * 0.6 + voice + shimmer) * fade;
+    });
+  },
+
+  spell_startled_bats: () => {
+    // the sack's cloth, then a flurry of wings and a scatter of squeaks
+    const rand = rng(909);
+    const cloth = biquad('bp');
+    const wing = biquad('bp');
+    const sq = biquad('hp');
+    const dur = 2.4;
+    const flaps = [];
+    for (let i = 0; i < 70; i++) {
+      const at = 0.18 + rand() ** 1.6 * 1.9;
+      flaps.push([at, 260 + rand() * 520, 0.4 + rand() * 0.6, 0.012 + rand() * 0.02]);
+    }
+    const squeaks = [];
+    for (let i = 0; i < 16; i++)
+      squeaks.push([
+        0.25 + rand() * 1.7,
+        4200 + rand() * 3800,
+        0.04 + rand() * 0.06,
+        0.3 + rand() * 0.5,
+      ]);
+    return render(dur, (t) => {
+      const rustle = cloth(rand() * 2 - 1, 1800, 0.9) * env(t, 0.01, 0.12) * 0.9;
+      let w = 0;
+      const n = rand() * 2 - 1;
+      for (const [at, hz, lv, len] of flaps) {
+        const dt = t - at;
+        if (dt >= 0 && dt < len * 4)
+          w += n * Math.exp(-dt / len) * lv * (1 + 0.5 * Math.sin(TAU * hz * dt));
+      }
+      const wings = wing(w, 700, 0.8) * 1.1;
+      let s = 0;
+      for (const [at, hz, len, lv] of squeaks) {
+        const dt = t - at;
+        if (dt >= 0 && dt < len) {
+          const u = dt / len;
+          const f = hz * (1 - 0.35 * u);
+          s += Math.sin(TAU * f * dt + 2 * Math.sin(TAU * 60 * dt)) * Math.sin(Math.PI * u) * lv;
+        }
+      }
+      const squeak = sq(s, 2500, 0.7) * 0.9;
+      const fade = Math.min(1, (dur - t) / 0.3);
+      return (rustle + wings + squeak) * fade;
+    });
+  },
+
+  spell_murmurwick_candle: () => {
+    // a match struck, the wick catching in a soft green whoomp, a faint giggle in the dark
+    const rand = rng(1010);
+    const scratch = biquad('bp');
+    const flare = biquad('lp');
+    const giggle = biquad('bp');
+    const fire = makeFire(rand, 40);
+    const dur = 1.9;
+    return render(dur, (t) => {
+      const strike =
+        scratch(rand() * 2 - 1, 3200, 1.2) * (t < 0.14 ? Math.sin((Math.PI * t) / 0.14) : 0) * 1.2;
+      const whoomp =
+        flare(rand() * 2 - 1, 500 + 1600 * Math.exp(-Math.max(0, t - 0.14) / 0.08), 0.9) *
+        env(t - 0.14, 0.03, 0.25) *
+        1.4;
+      const flame = fire(t, 900, 0.25 * env(t - 0.2, 0.1, 0.9), 0.15 * env(t - 0.2, 0.1, 0.9));
+      // the giggle: five quick breathy "hee" pulses, falling in pitch
+      let g = 0;
+      for (let k = 0; k < 5; k++) {
+        const dt = t - 0.75 - k * 0.11;
+        if (dt >= 0 && dt < 0.09) {
+          const src = Math.sin(TAU * (620 - k * 40) * dt) * 0.4 + (rand() * 2 - 1) * 0.8;
+          g += src * Math.sin((Math.PI * dt) / 0.09) * (1 - k * 0.12);
+        }
+      }
+      const laugh = giggle(g, 1900, 2.5) * 1.1;
+      const fade = Math.min(1, (dur - t) / 0.2);
+      return (strike + whoomp + flame + laugh) * fade;
+    });
+  },
+
+  murmurwick_whispers_loop: () => {
+    // the candle's whispers and soft laughter, a seamless 6 s loop: syllables of shaped,
+    // formant-filtered breath from two voices, a giggle now and then
+    const P = 6;
+    const rand = rng(1111);
+    const N = Math.round(P * SR);
+    const voices = [
+      [biquad('bp'), biquad('bp'), 2400, 1200],
+      [biquad('bp'), biquad('bp'), 3100, 1600],
+    ];
+    const syll = [];
+    for (let i = 0; i < 26; i++)
+      syll.push([
+        rand() * (P + 0.6),
+        0.08 + rand() * 0.16,
+        rand() < 0.5 ? 0 : 1,
+        0.4 + rand() * 0.6,
+      ]);
+    const laughs = [
+      [1.7, 0],
+      [4.4, 1],
+    ];
+    const room = biquad('lp');
+    const raw = render(P + 0.6, (t) => {
+      let out = 0;
+      const n0 = rand() * 2 - 1;
+      for (const [at, len, v, lv] of syll) {
+        const dt = t - at;
+        if (dt >= 0 && dt < len) {
+          const [f1, f2, c1, c2] = voices[v];
+          const shape = Math.sin((Math.PI * dt) / len) ** 1.5;
+          out += (f1(n0, c1, 4) + f2(n0, c2, 5) * 0.6) * shape * lv;
+        }
+      }
+      for (const [at, v] of laughs) {
+        for (let k = 0; k < 4; k++) {
+          const dt = t - at - k * 0.13;
+          if (dt >= 0 && dt < 0.1) {
+            const src = Math.sin(TAU * (540 - 30 * k + 120 * v) * dt) * 0.5 + n0 * 0.7;
+            out += src * Math.sin((Math.PI * dt) / 0.1) * 0.5;
+          }
+        }
+      }
+      return out * 0.9 + room(n0, 300, 0.7) * 0.05;
+    });
+    const xf = Math.round(0.6 * SR);
+    return render(P, (_t, i) => {
+      if (i >= xf) return raw[i];
+      const k = i / xf;
+      return raw[i] * k + raw[i + N] * (1 - k);
+    });
+  },
+
+  spell_sparkbristle_sweep: () => {
+    // two brisk sweeps of a straw broom across the ground, sparks crackling off the bristles
+    const rand = rng(1212);
+    const bp = biquad('bp');
+    const hp = biquad('hp');
+    const fire = makeFire(rand, 260);
+    const dur = 1.05;
+    const strokes = [
+      [0.0, 0.38],
+      [0.45, 0.42],
+    ];
+    return render(dur, (t) => {
+      let swish = 0;
+      for (const [at, len] of strokes) {
+        const dt = t - at;
+        if (dt >= 0 && dt < len) swish += Math.sin((Math.PI * dt) / len) ** 1.2;
+      }
+      const n = rand() * 2 - 1;
+      const brush = bp(n, 900 + 2400 * swish, 0.9) * swish * 1.2;
+      const grain = hp(n, 4500, 0.7) * swish * (0.5 + 0.5 * Math.sin(TAU * 52 * t)) * 0.45;
+      const sparks = fire(t, 2400, 0.0, 0.7 * (0.3 + swish));
+      const fade = Math.min(1, (dur - t) / 0.1);
+      return (brush + grain + sparks) * fade;
     });
   },
 };

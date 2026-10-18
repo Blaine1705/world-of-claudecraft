@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "ce88d0a6db1f564a393bd91f9b14a15b7004bb1f99b27d676ed56dc9a487b749",
-  "catalogHash": "02e4be760cf95fb325bfce733c145c4e6e4df3a6119c5f876660313f51ea9f9d",
+  "bundleId": "0e4ed52302c3ed8fdbaf974dcaf1d2efe60f0396a99ea359199a068ef01be99c",
+  "catalogHash": "abde19597da9e8643cce105ab69e96bbb9f0d5e90487aa2621f3d74fd3b3219f",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1130,6 +1130,18 @@
         }
       ],
       "gain": 1.698244,
+      "playbackRate": 1
+    },
+    "impact_prank_pumpkin_splat": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_prank_pumpkin_splat.mp3?v=92cca71b3e05",
+          "bytes": 23240,
+          "sha256": "92cca71b3e05f80ed557f4a4dc94bba131ff5b03fd88f393e65da933d6cdac1a"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "impact_shadow": {
@@ -4996,6 +5008,18 @@
       "gain": 2.018366,
       "playbackRate": 1
     },
+    "murmurwick_whispers_loop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/murmurwick_whispers_loop.mp3?v=2b4001796ab8",
+          "bytes": 145493,
+          "sha256": "2b4001796ab81a27a4f9283e064a8c24f7c36ee9f6bd2da40cb2f49af0a64198"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "piercing_howl": {
       "variants": [
         {
@@ -5482,6 +5506,18 @@
       "gain": 2.660725,
       "playbackRate": 1
     },
+    "spell_murmurwick_candle": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_murmurwick_candle.mp3?v=425a2a94f07a",
+          "bytes": 47064,
+          "sha256": "425a2a94f07aaa946c20cded9bce85a45c7931be0f25acf7d5322443b4f33869"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "spell_nova": {
       "variants": [
         {
@@ -5494,6 +5530,30 @@
       "gain": 1.678804,
       "playbackRate": 1
     },
+    "spell_sparkbristle_sweep": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_sparkbristle_sweep.mp3?v=bbd6ecbda442",
+          "bytes": 27002,
+          "sha256": "bbd6ecbda442109911320cc64b21811d4ae51568ead3c3e0c6fdd6cebd6898db"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "spell_startled_bats": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_startled_bats.mp3?v=5da405af9cc4",
+          "bytes": 58976,
+          "sha256": "5da405af9cc44925db65a1bcc8db5845fa4cd9d4964e2fc5a0c9cfe0174841f3"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "spell_swelling_gourd_pulse": {
       "variants": [
         {
@@ -5501,6 +5561,18 @@
           "url": "/audio/sfx/spell_swelling_gourd_pulse.mp3?v=b9fcd3895f20",
           "bytes": 16344,
           "sha256": "b9fcd3895f2069dc5c666ad5de8dd6a4b28a829af2de9cd9508cc25bfd576e23"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "spell_wanderwisp_lantern": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_wanderwisp_lantern.mp3?v=5e8318607528",
+          "bytes": 54587,
+          "sha256": "5e83186075285d7847ff8a1e5047c849bc005d8f22e2a7c5cf47f45231dd14d0"
         }
       ],
       "gain": 1,

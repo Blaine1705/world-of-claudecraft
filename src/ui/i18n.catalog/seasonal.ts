@@ -78,12 +78,35 @@ export const seasonalStrings = {
       'Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.',
     costumeBat:
       'Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Only during Gourdlight Eve. Cosmetic.',
+    // Hester's toys (content/gourdlight_eve.ts GOURDLIGHT_TOYS; seasonal/seasonal_toys.ts)
+    toyPrank:
+      "Use: Throw it at another visible player within {range} yards. Their head becomes a glowing jack-o'-lantern for {seconds} seconds, and they can right-click it off. Neither of you can be in combat, and you cannot be stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
+    toyLantern:
+      'Use: Set the lantern down in front of you. A small ghost circles you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.',
+    toyBats:
+      'Use: Open the sack. A squeaking swarm of bats bursts out and scatters around you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.',
+    toyCandle:
+      'Use: Light the candle in front of you. For {seconds} seconds, everyone nearby hears soft whispers and laughter, and a low green mist spreads around it. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.',
+    toyBroom:
+      'Use: Sweep along with it. For {seconds} seconds, you leave a trail of orange sparks as you walk. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.',
     titleWrit:
       'Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.',
     broom:
       'Bought from Hester Gourdwick for {count} Emberwoven Sheaves. Riding it requires the riding skill. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.',
     sheaf:
       'Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Crumbles to straw when Gourdlight Eve ends.',
+  },
+  // Hester's toys at play (SimEvent 'seasonal' what 'toy' | 'pranked' | refusals).
+  toy: {
+    prank: 'You throw the pumpkin. It splats onto {name}!',
+    lantern: 'You set the lantern down, and a little ghost drifts out to keep you company.',
+    bats: 'You open the sack, and a swarm of startled bats bursts out!',
+    candle: 'You light the candle. Something in the dark begins to whisper.',
+    broom: 'You start sweeping, and sparks fly from the bristles.',
+    pranked: '{name} splats a pumpkin on your head! Right-click it off, or wear it proudly.',
+    prankedFlash: 'Pranked by {name}!',
+    prankNeedsPlayer: 'The pumpkin only splats on another player who is not in combat.',
+    hidden: 'Step out of the shadows first: a toy would give you away.',
   },
   // Item tooltip source lines: where an item comes from, when no shop sells it.
   itemSource: {

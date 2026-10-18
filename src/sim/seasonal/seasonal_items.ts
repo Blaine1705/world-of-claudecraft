@@ -23,13 +23,15 @@ import {
   stripSeasonalAura,
 } from './seasonal_cosmetics';
 import { activeSeasonalEventOf } from './seasonal_state';
+import { useGourdlightToy } from './seasonal_toys';
 
 export type SeasonalItemAction =
   | 'pumpkinHead'
   | 'trickJar'
   | 'strawlingCharm'
   | 'costume'
-  | 'titleWrit';
+  | 'titleWrit'
+  | 'toy';
 
 function eventClosed(ctx: SimContext, meta: PlayerMeta): boolean {
   if (activeSeasonalEventOf(ctx.seasonal) !== null) return false;
@@ -53,6 +55,11 @@ export function useSeasonalItem(
   // A writ is paperwork, not a body swap: readable anywhere, in combat too.
   if (action === 'titleWrit') {
     useTitleWrit(ctx, meta, itemId, consumeOne);
+    return;
+  }
+  // Hester's toys: reusable, never consumed, each on its own cooldown (seasonal_toys.ts).
+  if (action === 'toy') {
+    useGourdlightToy(ctx, meta, p, itemId);
     return;
   }
   if (action === 'pumpkinHead') {

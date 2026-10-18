@@ -39,4 +39,11 @@ export {
   seasonalSaveFragment,
 } from './seasonal_state';
 export { KNOWN_SEASONAL_EVENTS, updateSeasonal } from './seasonal_tick';
+export {
+  prankRefusal,
+  TOY_FX_ABILITY_PREFIX,
+  TOY_SFX,
+  toyAura,
+  useGourdlightToy,
+} from './seasonal_toys';
 export { isTrickOrTreatNpc, type TrickOrTreatOutcome, trickOrTreat } from './trick_or_treat';

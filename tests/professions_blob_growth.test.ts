@@ -2023,9 +2023,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // The phase 3 title writs, costume draughts and broom add 270: three Feat rows (112)
     // and seven discovered item ids (158), so the Halloween branch's whole Gourdlight
     // Eve term here is 143 + 102 + 270 + 35 = 550 over the integration's 258,370.
-    expect(baselineBytes).toBe(258920);
+    // Round 9's five toys add 110: five discovered item ids (95 characters, 15 bytes
+    // of quotes and commas), so 660 in all.
+    expect(baselineBytes).toBe(259030);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(267204);
+    expect(bytes).toBe(267314);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2273,7 +2275,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Phase 1 adds 143: the rounds quest id (22), feat_gourdlight_guise's deed row (37)
     // and four discovered item ids (84). Phase 3 adds 270: the three title-writ Feat rows
     // (112) and seven discovered item ids, three draughts, three writs and the broom's
-    // reins (158). Ids are listed literally so a new Gourdlight row reds here by name.
+    // reins (158). Round 9 adds 110: Hester's five toys as discovered item ids.
+    // Ids are listed literally so a new Gourdlight row reds here by name.
     const gourdlightDeeds = new Set([
       'feat_gourdlight_guise',
       'feat_title_gourdlit',
@@ -2292,6 +2295,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       'writ_of_the_trickster',
       'writ_of_the_hollow_grin',
       'reins_emberbristle_broom',
+      'prankers_pumpkin',
+      'wanderwisp_lantern',
+      'sack_of_startled_bats',
+      'murmurwick_candle',
+      'sparkbristle_play_broom',
     ]);
     const withoutGourdlightEve: CharacterState = {
       ...withoutSeasonalBoss,
@@ -2311,10 +2319,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const gourdlightRestBytes =
       Buffer.byteLength(JSON.stringify(withoutSeasonalBoss), 'utf8') -
       Buffer.byteLength(JSON.stringify(withoutGourdlightEve), 'utf8');
-    expect(gourdlightRestBytes).toBe(143 + 270);
-    // Every Gourdlight Eve byte in this fixture: 35 + 102 + 143 + 270 = 550.
+    expect(gourdlightRestBytes).toBe(143 + 270 + 110);
+    // Every Gourdlight Eve byte in this fixture: 35 + 102 + 143 + 270 + 110 = 660.
     const gourdlightEveBytes = pumpkinHunterBytes + seasonalBossBytes + gourdlightRestBytes;
-    expect(gourdlightEveBytes).toBe(550);
+    expect(gourdlightEveBytes).toBe(660);
     // Attribute the stamp-card feature independently from the historical ledger:
     // twenty more bank slots, five discoverable item ids and the Sapling buddy. Mount relics reuse
     // an existing illuminated page and add no character-save key in this fixture.

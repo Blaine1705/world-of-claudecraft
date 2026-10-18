@@ -890,6 +890,17 @@
       }
     ]
   },
+  "impact_prank_pumpkin_splat": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "impact_prank_pumpkin_splat.mp3",
+        "sha256": "92cca71b3e05f80ed557f4a4dc94bba131ff5b03fd88f393e65da933d6cdac1a",
+        "size": 23240,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "impact_shadow": {
     "ceilingDb": 6.1,
     "tracks": [
@@ -4540,6 +4551,17 @@
       }
     ]
   },
+  "murmurwick_whispers_loop": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "murmurwick_whispers_loop.mp3",
+        "sha256": "2b4001796ab81a27a4f9283e064a8c24f7c36ee9f6bd2da40cb2f49af0a64198",
+        "size": 145493,
+        "peakDb": -6.5
+      }
+    ]
+  },
   "piercing_howl": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -4992,6 +5014,17 @@
       }
     ]
   },
+  "spell_murmurwick_candle": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "spell_murmurwick_candle.mp3",
+        "sha256": "425a2a94f07aaa946c20cded9bce85a45c7931be0f25acf7d5322443b4f33869",
+        "size": 47064,
+        "peakDb": -7.2
+      }
+    ]
+  },
   "spell_nova": {
     "ceilingDb": 6.5,
     "tracks": [
@@ -5003,6 +5036,28 @@
       }
     ]
   },
+  "spell_sparkbristle_sweep": {
+    "ceilingDb": 6,
+    "tracks": [
+      {
+        "filename": "spell_sparkbristle_sweep.mp3",
+        "sha256": "bbd6ecbda442109911320cc64b21811d4ae51568ead3c3e0c6fdd6cebd6898db",
+        "size": 27002,
+        "peakDb": -7
+      }
+    ]
+  },
+  "spell_startled_bats": {
+    "ceilingDb": 6,
+    "tracks": [
+      {
+        "filename": "spell_startled_bats.mp3",
+        "sha256": "5da405af9cc44925db65a1bcc8db5845fa4cd9d4964e2fc5a0c9cfe0174841f3",
+        "size": 58976,
+        "peakDb": -7
+      }
+    ]
+  },
   "spell_swelling_gourd_pulse": {
     "ceilingDb": 5.3,
     "tracks": [
@@ -5011,6 +5066,17 @@
         "sha256": "b9fcd3895f2069dc5c666ad5de8dd6a4b28a829af2de9cd9508cc25bfd576e23",
         "size": 16344,
         "peakDb": -6.3
+      }
+    ]
+  },
+  "spell_wanderwisp_lantern": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "spell_wanderwisp_lantern.mp3",
+        "sha256": "5e83186075285d7847ff8a1e5047c849bc005d8f22e2a7c5cf47f45231dd14d0",
+        "size": 54587,
+        "peakDb": -7.2
       }
     ]
   },

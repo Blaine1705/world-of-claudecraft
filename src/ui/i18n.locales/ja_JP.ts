@@ -21883,4 +21883,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.boo.noCostume': '仮装なしでは、{name}は笑うだけだ。まず仮装をしよう。',
   'seasonal.boo.already': '{name}は今日はもう十分に驚かされた。',
   'seasonal.boo.notOnErrand': '今日はヘスターから誰かを驚かせる頼みを受けていない。',
+  'entities.items.prankers_pumpkin.name': 'いたずら者のカボチャ',
+  'entities.items.wanderwisp_lantern.name': 'さまよう鬼火のランタン',
+  'entities.items.sack_of_startled_bats.name': '驚いたコウモリの袋',
+  'entities.items.murmurwick_candle.name': 'ささやき芯のろうそく',
+  'entities.items.sparkbristle_play_broom.name': '火花ぼうきのおもちゃ',
+  'seasonal.itemUse.toyPrank':
+    '使用：{range}ヤード以内の見えている別のプレイヤーに投げつける。相手の頭が{seconds}秒間、光るジャック・オー・ランタンになり、相手は右クリックで外せる。どちらも戦闘中は使えず、ステルス中も使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.toyLantern':
+    '使用：目の前にランタンを置く。小さな幽霊が{seconds}秒間、あなたの周りを回る。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.toyBats':
+    '使用：袋を開ける。キーキー鳴くコウモリの群れが飛び出し、{seconds}秒間あなたの周りに散っていく。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.toyCandle':
+    '使用：目の前でろうそくを灯す。{seconds}秒間、近くにいる全員に小さなささやきと笑い声が聞こえ、周りに低い緑の霧が広がる。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.toyBroom':
+    '使用：ほうきで掃きながら歩く。{seconds}秒間、歩いた跡にオレンジ色の火花が残る。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.toy.prank': 'カボチャを投げた。{name}に命中してべちゃっと割れた！',
+  'seasonal.toy.lantern': 'ランタンを置くと、小さな幽霊がふわりと出てきて付き添ってくれる。',
+  'seasonal.toy.bats': '袋を開けると、驚いたコウモリの群れが飛び出した！',
+  'seasonal.toy.candle': 'ろうそくを灯した。暗がりの何かがささやき始める。',
+  'seasonal.toy.broom': '掃き始めると、穂先から火花が飛び散る。',
+  'seasonal.toy.pranked':
+    '{name}があなたの頭にカボチャをぶつけた！右クリックで外すか、堂々とかぶっていよう。',
+  'seasonal.toy.prankedFlash': '{name}のいたずら！',
+  'seasonal.toy.prankNeedsPlayer': 'カボチャは戦闘中でない別のプレイヤーにしか当たらない。',
+  'seasonal.toy.hidden': 'まず物陰から出よう。おもちゃを使えば居場所がばれてしまう。',
 };

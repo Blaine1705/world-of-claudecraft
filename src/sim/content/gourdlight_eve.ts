@@ -107,6 +107,95 @@ export const GOURDLIGHT_CANDIES = Object.freeze([
 ] as const);
 export type GourdlightCandy = (typeof GOURDLIGHT_CANDIES)[number];
 
+/** Hester's toys (round 9): five reusable playthings, each a short `seasonal_cosmetic`
+ *  aura and nothing else (no stat, no control, no damage), bought for a few sweets and
+ *  swept from the bags when the event closes like the broom (ItemDef.seasonalEvent).
+ *  Each has its own cooldown (content/item_cooldowns.ts mirrors it for the bar swipe),
+ *  none works in combat, and the rules live in seasonal/seasonal_toys.ts.
+ *    prank   thrown at another player in reach: their head becomes a lit jack-o'-lantern
+ *            (the Carved Pumpkin Head's look) for `duration`; they can right-click it off
+ *    lantern set down at the user's feet: a small ghost circles the user for `duration`
+ *    bats    opened: a swarm of bats bursts up and scatters round the user
+ *    candle  lit at the user's feet: whispers and laughter and a low green mist there
+ *    broom   swept along: a trail of orange sparks behind the user as they walk
+ *  The lantern and the candle carry their spot on the aura (value2 = x, value3 = z), so
+ *  every client, and a player who walks up later, draws them where they were set down. */
+export type GourdlightToyEffect = 'prank' | 'lantern' | 'bats' | 'candle' | 'broom';
+export interface GourdlightToy {
+  itemId: string;
+  itemName: string;
+  auraId: string;
+  effect: GourdlightToyEffect;
+  /** Seconds the look plays. */
+  duration: number;
+  /** Seconds before the toy can be used again. */
+  cooldown: number;
+  /** Price in Gourdlight Sweets (around the Jar of Mischief's). */
+  price: number;
+  /** Reach in yards to the target (the prank only). */
+  range?: number;
+}
+export const PRANKERS_PUMPKIN_ID = 'prankers_pumpkin';
+export const WANDERWISP_LANTERN_ID = 'wanderwisp_lantern';
+export const STARTLED_BATS_ID = 'sack_of_startled_bats';
+export const MURMURWICK_CANDLE_ID = 'murmurwick_candle';
+export const PLAY_BROOM_ID = 'sparkbristle_play_broom';
+export const GOURDLIGHT_TOYS: readonly GourdlightToy[] = Object.freeze([
+  {
+    itemId: PRANKERS_PUMPKIN_ID,
+    itemName: "Pranker's Pumpkin",
+    auraId: 'gourdlight_toy_prank_head',
+    effect: 'prank',
+    duration: 30,
+    cooldown: 60,
+    price: 4,
+    range: 15,
+  },
+  {
+    itemId: WANDERWISP_LANTERN_ID,
+    itemName: 'Wanderwisp Lantern',
+    auraId: 'gourdlight_toy_wanderwisp',
+    effect: 'lantern',
+    duration: 60,
+    cooldown: 120,
+    price: 5,
+  },
+  {
+    itemId: STARTLED_BATS_ID,
+    itemName: 'Sack of Startled Bats',
+    auraId: 'gourdlight_toy_startled_bats',
+    effect: 'bats',
+    duration: 6,
+    cooldown: 30,
+    price: 3,
+  },
+  {
+    itemId: MURMURWICK_CANDLE_ID,
+    itemName: 'Murmurwick Candle',
+    auraId: 'gourdlight_toy_murmurwick',
+    effect: 'candle',
+    duration: 30,
+    cooldown: 90,
+    price: 5,
+  },
+  {
+    itemId: PLAY_BROOM_ID,
+    itemName: 'Sparkbristle Play Broom',
+    auraId: 'gourdlight_toy_play_broom',
+    effect: 'broom',
+    duration: 30,
+    cooldown: 60,
+    price: 4,
+  },
+]);
+/** The spellfxAt ability tag a toy's cue carries (`<prefix><effect>`): the sim's
+ *  seasonal/seasonal_toys.ts emits it, the render toy layer claims it. */
+export const GOURDLIGHT_TOY_FX_PREFIX = 'gourdlight_toy:';
+/** A toy's record by item id, or undefined for any other item. */
+export function gourdlightToy(itemId: string): GourdlightToy | undefined {
+  return GOURDLIGHT_TOYS.find((toy) => toy.itemId === itemId);
+}
+
 /** The worn head cosmetic's aura id (and the render key it draws by). */
 export const PUMPKIN_HEAD_AURA_ID = 'gourdlight_pumpkin_head';
 
@@ -257,6 +346,7 @@ export const GOURDLIGHT_KEEPER_POSTS: readonly GourdlightKeeperPost[] = Object.f
 // only source (owner direction 2026-10-18, content/gourdlight_eve_scarecrow.ts loot).
 export const GOURDLIGHT_SHOP_PRICES: Readonly<Record<string, number>> = Object.freeze({
   [JAR_OF_MISCHIEF_ID]: 3,
+  ...Object.fromEntries(GOURDLIGHT_TOYS.map((toy) => [toy.itemId, toy.price])),
   rattlebone_draught: 10,
   haunting_draught: 10,
   batwing_draught: 10,
@@ -270,6 +360,7 @@ export const GOURDLIGHT_SHOP_PRICES: Readonly<Record<string, number>> = Object.f
  *  which costs Emberwoven Sheaves (GOURDLIGHT_BROOM_SHEAVES). */
 export const GOURDLIGHT_SHOP_ITEMS: readonly string[] = Object.freeze([
   JAR_OF_MISCHIEF_ID,
+  ...GOURDLIGHT_TOYS.map((toy) => toy.itemId),
   ...GOURDLIGHT_CANDIES.map((c) => c.itemId),
   ...GOURDLIGHT_COSTUMES.map((c) => c.itemId),
   ...GOURDLIGHT_TITLE_WRITS.map((w) => w.itemId),
@@ -361,6 +452,26 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     noSalvage: true,
   },
+  // Hester's toys (GOURDLIGHT_TOYS): reusable, one of each, gone when the event closes.
+  ...Object.fromEntries(
+    GOURDLIGHT_TOYS.map((toy): [string, ItemDef] => [
+      toy.itemId,
+      {
+        id: toy.itemId,
+        name: toy.itemName,
+        kind: 'tool',
+        quality: 'uncommon',
+        use: { type: 'seasonal', action: 'toy' },
+        priceItem: { itemId: GOURDLIGHT_SWEET_ID, count: GOURDLIGHT_SHOP_PRICES[toy.itemId] },
+        seasonalEvent: GOURDLIGHT_EVE_ID,
+        unique: true,
+        sellValue: 0,
+        soulbound: true,
+        noVendorSell: true,
+        noSalvage: true,
+      },
+    ]),
+  ),
   ...Object.fromEntries(
     GOURDLIGHT_COSTUMES.map((c): [string, ItemDef] => [
       c.itemId,

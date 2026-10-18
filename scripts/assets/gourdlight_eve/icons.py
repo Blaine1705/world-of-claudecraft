@@ -16,7 +16,8 @@
 # skull, a wisp, a bat) and title writs (a sealed parchment roll), and the Emberbristle
 # Broom's reins (the shipped broom itself, appended from broom.py's review .blend,
 # `--broom-blend <file>`), are built here too. Hester's five candies come from the
-# sibling candies.py.
+# sibling candies.py, the dailies' errand items from daily_icons.py and Hester's five toys
+# from toy_icons.py.
 # `--only <id,id>` renders just those subjects.
 # Writes <dir>/<item-id>.png at 512x512 (the master); scripts/convert_item_icons_webp.mjs
 # encodes the 128px shipping WebP.
@@ -669,6 +670,11 @@ def main():
     import daily_icons
 
     for item_id, build in daily_icons.BUILDERS.items():
+        subjects[item_id] = build(col, principled, obj_from_bm, tube, lathe, model)
+    # Hester's toys (toy_icons.py)
+    import toy_icons
+
+    for item_id, build in toy_icons.BUILDERS.items():
         subjects[item_id] = build(col, principled, obj_from_bm, tube, lathe, model)
     broom_blend = argv[argv.index("--broom-blend") + 1] if "--broom-blend" in argv else os.path.join(
         HERE, "..", "..", "..", "tmp", "asset_src", "gourdlight_eve", "broom.blend")

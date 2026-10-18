@@ -3964,6 +3964,12 @@ const ITEM_ENTITY_IDS = [
   'lantern_mint_drop',
   // Old Thatchgrin's daily broom token (content/gourdlight_eve.ts GOURDLIGHT_SHEAF_ID).
   'emberwoven_sheaf',
+  // Hester's toys (content/gourdlight_eve.ts GOURDLIGHT_TOYS).
+  'prankers_pumpkin',
+  'wanderwisp_lantern',
+  'sack_of_startled_bats',
+  'murmurwick_candle',
+  'sparkbristle_play_broom',
   // Gourdlight Eve's rotating dailies (content/gourdlight_eve_dailies.ts).
   'thatchgrin_patch_pumpkin',
   'cursed_candle_stub',
@@ -4001,6 +4007,12 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   lantern_mint_drop: 'Lantern Mint Drop',
   // Old Thatchgrin's daily broom token (content/gourdlight_eve.ts).
   emberwoven_sheaf: 'Emberwoven Sheaf',
+  // Hester's toys (content/gourdlight_eve.ts GOURDLIGHT_TOYS).
+  prankers_pumpkin: "Pranker's Pumpkin",
+  wanderwisp_lantern: 'Wanderwisp Lantern',
+  sack_of_startled_bats: 'Sack of Startled Bats',
+  murmurwick_candle: 'Murmurwick Candle',
+  sparkbristle_play_broom: 'Sparkbristle Play Broom',
   // Gourdlight Eve's rotating dailies (content/gourdlight_eve_dailies.ts).
   thatchgrin_patch_pumpkin: 'Patch Pumpkin',
   cursed_candle_stub: 'Cursed Candle Stub',

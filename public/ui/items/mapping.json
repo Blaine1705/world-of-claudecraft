@@ -8063,6 +8063,22 @@
         "gourdlight_crow_feather"
       ],
       "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-toy-icons-2026-10-18",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py with toy_icons.py): Hester's five toys, each modelled for its icon only: a small carved pumpkin with a fanged grin, a green bow and pulp on its chin; a little iron lantern with a tiny ghost inside its pale glass; a burlap sack with three bats bursting out; three green-flamed candles on an iron dish in a ring of mist; and a straw play broom bound in orange with sparks at its bristles. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/toy_icons.py",
+      "itemIds": [
+        "prankers_pumpkin",
+        "wanderwisp_lantern",
+        "sack_of_startled_bats",
+        "murmurwick_candle",
+        "sparkbristle_play_broom"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
     }
   ]
 }

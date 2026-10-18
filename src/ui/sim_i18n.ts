@@ -15,6 +15,7 @@
 import {
   CARVED_PUMPKIN_HEAD_ID,
   GOURDLIGHT_COSTUMES,
+  GOURDLIGHT_TOYS,
   GOURDLIGHT_TRICKS,
 } from '../sim/content/gourdlight_eve';
 import { STRAWLING_GUISE } from '../sim/content/gourdlight_eve_scarecrow';
@@ -18672,9 +18673,16 @@ const SEASONAL_TRICK_AURA_IDS: ReadonlyMap<string, string> = new Map([
   ...GOURDLIGHT_COSTUMES.map((costume): [string, string] => [costume.name, costume.auraId]),
 ]);
 
+// Hester's toys' looks: each aura wears its toy's item name.
+const TOY_AURA_ITEM_IDS: ReadonlyMap<string, string> = new Map(
+  GOURDLIGHT_TOYS.map((toy): [string, string] => [toy.itemName, toy.itemId]),
+);
+
 export function localizeSimAuraName(name: string): string | null {
   const trickId = SEASONAL_TRICK_AURA_IDS.get(name);
   if (trickId) return t(`seasonal.tricks.${trickId}` as TranslationKey);
+  const toyItemId = TOY_AURA_ITEM_IDS.get(name);
+  if (toyItemId) return tEntity({ kind: 'item', id: toyItemId, field: 'name' });
   if (name === 'Carved Pumpkin Head') {
     return tEntity({ kind: 'item', id: CARVED_PUMPKIN_HEAD_ID, field: 'name' });
   }

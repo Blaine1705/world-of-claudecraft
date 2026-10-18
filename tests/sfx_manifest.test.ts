@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps release cues, Warrior recordings, hoard cues, the tavern bed and Gourdlight Eve in 400 keys', () => {
+  it('keeps release cues, Warrior recordings, hoard cues, the tavern bed and Gourdlight Eve in 406 keys', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
     // Release inventory: 319 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
@@ -182,9 +182,10 @@ describe('buildManifest', () => {
     // room bed, amb_tavern, makes 394. Gourdlight Eve's six synthesized cues
     // (scripts/sfx/gourdlight_sfx.mjs: Gourdfall's whistle and impact, the Swelling
     // Gourd's pulse and burst, the Emberbristle Broom's stride and hover hum) make 400;
-    // two of them are mount cues, 40 -> 42.
+    // two of them are mount cues, 40 -> 42. Hester's toys add six more (the prank's
+    // splat, the lantern, the bats, the candle and its whisper loop, the broom's sweep): 406.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(400);
+    expect(keys.size).toBe(406);
     expect([...keys].filter((key) => key.startsWith('hoard_')).sort()).toEqual([
       'hoard_entrance_hum',
       'hoard_entrance_open',
@@ -295,7 +296,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(400);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(406);
     expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });

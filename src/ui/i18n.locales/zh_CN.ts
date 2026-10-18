@@ -20819,4 +20819,28 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'seasonal.boo.noCostume': '没穿装扮，{name}只是冲你笑。先换上一套吧。',
   'seasonal.boo.already': '{name}今天已经被吓够了。',
   'seasonal.boo.notOnErrand': '赫丝特今天没让你去吓唬谁。',
+  'entities.items.prankers_pumpkin.name': '捣蛋鬼的南瓜',
+  'entities.items.wanderwisp_lantern.name': '游荡鬼火提灯',
+  'entities.items.sack_of_startled_bats.name': '一袋受惊的蝙蝠',
+  'entities.items.murmurwick_candle.name': '低语烛芯蜡烛',
+  'entities.items.sparkbristle_play_broom.name': '火花鬃玩具扫帚',
+  'seasonal.itemUse.toyPrank':
+    '使用：扔向{range}码内另一名可见的玩家。对方的头会变成发光的南瓜灯，持续{seconds}秒，对方可以右键点击取下。你们双方都不能处于战斗中，你也不能处于潜行状态。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后会从背包中消失。仅外观。',
+  'seasonal.itemUse.toyLantern':
+    '使用：把灯笼放在你面前。一个小幽灵会绕着你飘{seconds}秒。战斗中或潜行时无法使用。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后会从背包中消失。仅外观。',
+  'seasonal.itemUse.toyBats':
+    '使用：打开袋子。一群吱吱叫的蝙蝠冲出来，在你周围四散飞舞{seconds}秒。战斗中或潜行时无法使用。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后会从背包中消失。仅外观。',
+  'seasonal.itemUse.toyCandle':
+    '使用：在你面前点燃蜡烛。{seconds}秒内，附近的所有人都会听到轻声低语和笑声，一层低低的绿雾在周围蔓延。战斗中或潜行时无法使用。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后会从背包中消失。仅外观。',
+  'seasonal.itemUse.toyBroom':
+    '使用：拿着扫帚边走边扫。{seconds}秒内，你走过的地方会留下一串橙色火花。战斗中或潜行时无法使用。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后会从背包中消失。仅外观。',
+  'seasonal.toy.prank': '你扔出南瓜，啪地砸在了{name}身上！',
+  'seasonal.toy.lantern': '你放下提灯，一个小幽灵飘了出来陪着你。',
+  'seasonal.toy.bats': '你打开袋子，一群受惊的蝙蝠冲了出来！',
+  'seasonal.toy.candle': '你点燃了蜡烛。黑暗中有什么东西开始低语。',
+  'seasonal.toy.broom': '你开始扫地，火花从鬃毛间飞溅出来。',
+  'seasonal.toy.pranked': '{name}把一个南瓜砸在了你头上！右键点击取下，或者骄傲地戴着吧。',
+  'seasonal.toy.prankedFlash': '被{name}捉弄了！',
+  'seasonal.toy.prankNeedsPlayer': '南瓜只能砸向另一名不在战斗中的玩家。',
+  'seasonal.toy.hidden': '先从阴影里出来：玩具会暴露你的位置。',
 };

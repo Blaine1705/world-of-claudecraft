@@ -859,7 +859,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // The restored legacy whistle and charm definitions add 36 item ids.
     // Five referral rewards reuse existing art while their own paintings are pending.
     // + Gourdlight Eve's four event items: 2214; + Old Thatchgrin's two spoils: 2216.
-    expect(Object.keys(ITEMS)).toHaveLength(2216);
+    // + the Gourdlight Eve shop's costume draughts (3), title writs (3) and candies (5), the
+    // broom and its Emberwoven Sheaf (2), the dailies' errand items (3) and Hester's five
+    // toys: 2237.
+    expect(Object.keys(ITEMS)).toHaveLength(2237);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1087,12 +1090,17 @@ describe('item-art consistency accepted-art provenance', () => {
     // Buddy provenance contributes 34 additional owners.
     // + Gourdlight Eve's four painted event items: 2043.
     // + Old Thatchgrin's two spoils: 2045.
-    expect(new Set(currentOwnerIds).size).toBe(2045);
-    expect(shippingIds).toHaveLength(2045);
+    // + the rest of Gourdlight Eve's painted items (the shop rows, the broom and its sheaf,
+    // the dailies' errand items and Hester's toys): 2066.
+    expect(new Set(currentOwnerIds).size).toBe(2066);
+    expect(shippingIds).toHaveLength(2066);
     // The restored legacy whistle and charm definitions add 36 item ids.
     // Five referral rewards reuse existing art while their own paintings are pending.
     // + Gourdlight Eve's four event items: 2214; + Old Thatchgrin's two spoils: 2216.
-    expect(Object.keys(ITEMS)).toHaveLength(2216);
+    // + the Gourdlight Eve shop's costume draughts (3), title writs (3) and candies (5), the
+    // broom and its Emberwoven Sheaf (2), the dailies' errand items (3) and Hester's five
+    // toys: 2237.
+    expect(Object.keys(ITEMS)).toHaveLength(2237);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1351,6 +1359,13 @@ describe('item-art consistency accepted-art provenance', () => {
               // Gourdlight Eve's four event items (Blender renders)
               'gourdlight-eve-icons-2026-10-16',
               'gourdlight-eve-thatchgrin-icons-2026-10-17',
+              // ...and its later rounds: the shop's draughts, writs and broom, the candies,
+              // the broom's sheaf, the dailies' errand items and Hester's toys
+              'gourdlight-eve-shop-and-broom-icons-2026-10-17',
+              'gourdlight-eve-candy-icons-2026-10-18',
+              'gourdlight-eve-sheaf-icon-2026-10-18',
+              'gourdlight-eve-daily-icons-2026-10-18',
+              'gourdlight-eve-toy-icons-2026-10-18',
             ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1531,7 +1546,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57.
     // Buddy whistle and charm provenance add two batches; Gourdlight Eve's icons one more.
     // Old Thatchgrin's spoils one more: 61.
-    expect(mapping.generatedBatches).toHaveLength(61);
+    // Gourdlight Eve's later icon batches (the shop, the broom and sheaf, the candies, the
+    // dailies, Hester's toys): 66.
+    expect(mapping.generatedBatches).toHaveLength(66);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1608,16 +1625,17 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
     // Buddy batches add 34 owner ids to the integration inventory.
     // Gourdlight Eve's icon batch adds 4: 1513.
-    // Old Thatchgrin's batch adds 2: 1515.
-    expect(priorGeneratedIds).toHaveLength(1515);
+    // Old Thatchgrin's batch adds 2: 1515. Gourdlight Eve's later batches add 21: 1536.
+    expect(priorGeneratedIds).toHaveLength(1536);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    expect(allCurrentOwnerIds).toHaveLength(2045);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2045);
+    // + the rest of Gourdlight Eve's painted items: 2066.
+    expect(allCurrentOwnerIds).toHaveLength(2066);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2066);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1638,7 +1656,7 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Mirefen world-boss branch's 15 = 1360.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
       // Plus 34 restored buddy provenance owners.
-      priorGenerated: 1515,
+      priorGenerated: 1536,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1749,6 +1767,12 @@ describe('item-art consistency accepted-art provenance', () => {
                 'lower-dungeon-blues-icons-2026-10-08',
                 'gourdlight-eve-icons-2026-10-16',
                 'gourdlight-eve-thatchgrin-icons-2026-10-17',
+                // Gourdlight Eve's later rounds (shop and broom, candies, sheaf, dailies, toys)
+                'gourdlight-eve-shop-and-broom-icons-2026-10-17',
+                'gourdlight-eve-candy-icons-2026-10-18',
+                'gourdlight-eve-sheaf-icon-2026-10-18',
+                'gourdlight-eve-daily-icons-2026-10-18',
+                'gourdlight-eve-toy-icons-2026-10-18',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1921,9 +1945,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
     // + Old Thatchgrin's two spoils: 2045.
-    if (ownerIds.length !== 2045)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2045`);
-    if (fileIds.length !== 2045) violations.push(`shipping WebP count: ${fileIds.length} != 2045`);
+    // + the rest of Gourdlight Eve's painted items (the shop rows, the broom and its sheaf,
+    // the dailies' errand items and Hester's toys): 2066.
+    if (ownerIds.length !== 2066)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2066`);
+    if (fileIds.length !== 2066) violations.push(`shipping WebP count: ${fileIds.length} != 2066`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);
