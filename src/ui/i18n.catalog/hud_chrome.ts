@@ -5344,6 +5344,11 @@ export const hudChromeStrings = {
     },
   },
   auraEffect: {
+    // Gourdlight Eve's encounter auras (src/ui/gourdlight_aura_effect.ts).
+    gourdlight: {
+      thatchbound:
+        'Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic).',
+    },
     // The Wildheart Basin's marks and boss auras (src/ui/wildheart_aura_effect.ts).
     wildheart: {
       packBond:

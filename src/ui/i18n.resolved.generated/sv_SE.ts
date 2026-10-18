@@ -4173,6 +4173,9 @@ export const sv_SE: EnTranslations = {
       }
     },
     "auraEffect": {
+      "gourdlight": {
+        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+      },
       "wildheart": {
         "packBond": "Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.",
         "packBondFury": "Deals {pct}% more damage while its partner stands close.",

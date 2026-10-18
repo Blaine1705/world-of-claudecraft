@@ -11861,6 +11861,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.funeralHarvestLock'
   | 'hudChrome.auraEffect.galeheartWeapon'
   | 'hudChrome.auraEffect.gloam'
+  | 'hudChrome.auraEffect.gourdlight.thatchbound'
   | 'hudChrome.auraEffect.guardianWard'
   | 'hudChrome.auraEffect.haste'
   | 'hudChrome.auraEffect.healAbsorb'

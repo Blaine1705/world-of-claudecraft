@@ -1,4 +1,8 @@
 import { GOURDLIGHT_TRICKS } from '../../sim/content/gourdlight_eve';
+import {
+  THATCHBOUND_CROW_AURA_ID,
+  THATCHBOUND_STRAWLING_AURA_ID,
+} from '../../sim/content/gourdlight_eve_scarecrow';
 import { WILDHEART_TOADED } from '../../sim/mob/trash_kit/wildheart_cast_ids';
 
 export const CHARACTER_FORM_FLAG = {
@@ -73,7 +77,9 @@ export type CharacterFormAssetKey =
   | 'form_foreman'
   | 'form_trick_bat'
   | 'form_trick_skeleton'
-  | 'form_costume_ghost';
+  | 'form_costume_ghost'
+  | 'form_puppet_strawling'
+  | 'form_puppet_crow';
 
 /** The Gourdlight Eve tricks that wear a body (seasonal_trick_looks.ts): kind
  *  'seasonal_cosmetic', a LOOK on the polymorph slot with no control behind it. */
@@ -86,6 +92,18 @@ const TRICK_FORM_ASSETS: Readonly<Record<string, CharacterFormAssetKey>> = {
   gourdlight_costume_ghost: 'form_costume_ghost',
   gourdlight_costume_bat: 'form_trick_bat',
 };
+
+/** Thatchbound's puppet bodies (Old Thatchgrin's mind control): kind 'incapacitate', a
+ *  real control, drawn on the polymorph slot like a polymorph is. */
+const PUPPET_FORM_ASSETS: Readonly<Record<string, CharacterFormAssetKey>> = {
+  [THATCHBOUND_STRAWLING_AURA_ID]: 'form_puppet_strawling',
+  [THATCHBOUND_CROW_AURA_ID]: 'form_puppet_crow',
+};
+
+function puppetFormAsset(aura: AuraIdentity): CharacterFormAssetKey | null {
+  if (aura.kind !== 'incapacitate' || aura.id === undefined) return null;
+  return PUPPET_FORM_ASSETS[aura.id] ?? null;
+}
 
 function trickFormAsset(aura: AuraIdentity): CharacterFormAssetKey | null {
   if (aura.kind !== 'seasonal_cosmetic' || aura.id === undefined) return null;
@@ -108,6 +126,11 @@ export function characterFormAssetKey(
     // A real polymorph (control) outranks a trick's look; a trick shows only alone.
     if (auras.some(isToadPolymorph)) return 'form_toad';
     if (!auras.some((aura) => aura.kind === 'polymorph')) {
+      // a puppet's body (a control) outranks a trick's look
+      for (const aura of auras) {
+        const puppet = puppetFormAsset(aura);
+        if (puppet) return puppet;
+      }
       for (const aura of auras) {
         const trick = trickFormAsset(aura);
         if (trick) return trick;
@@ -134,6 +157,8 @@ export function characterFormMaskForAura(aura: AuraIdentity): number {
   if (aura.kind === 'polymorph') return CHARACTER_FORM_FLAG.sheep;
   // A Gourdlight Eve trick body borrows the polymorph slot's look (no control).
   if (trickFormAsset(aura)) return CHARACTER_FORM_FLAG.sheep;
+  // Thatchbound's puppet bodies ride the same slot (a real control, like a polymorph).
+  if (puppetFormAsset(aura)) return CHARACTER_FORM_FLAG.sheep;
   if (aura.kind === 'form_bear') return CHARACTER_FORM_FLAG.bear;
   if (aura.kind === 'form_cat' || aura.id === 'ghost_wolf') {
     return CHARACTER_FORM_FLAG.cat;

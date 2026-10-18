@@ -32,5 +32,14 @@ export function seasonalTrickLooks(
       tintStrength: 0.55,
     };
   }
+  // Thatchbound's puppets (Old Thatchgrin's mind control, src/sim/seasonal/scarecrow_puppet.ts):
+  // the first victim of a cast becomes a little straw scarecrow, his own strawling's rig a
+  // touch shorter than a player (its ember eyes lit, the read that it is HIS), the second a
+  // crow, the crypt crow's rig grown to a player's size and dropped near the ground so it
+  // stalks its friend rather than circling overhead.
+  const strawling = visuals.mob_gourdlight_strawling;
+  if (strawling) out.form_puppet_strawling = { ...strawling, height: 1.85 };
+  const crow = visuals.mob_crypt_crow;
+  if (crow) out.form_puppet_crow = { ...crow, height: 1.6, hover: 0.7 };
   return out;
 }

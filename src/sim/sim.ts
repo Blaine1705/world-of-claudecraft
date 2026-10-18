@@ -673,6 +673,7 @@ import { freshCounters, type RewardCounters } from './reward_counters';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
 import * as seasonalMod from './seasonal';
+import { updatePuppetMovement } from './seasonal/scarecrow_puppet';
 import * as seatingMod from './seating';
 import { persistedResource } from './serialize_resource';
 import { computeCharacterModifiers } from './set_bonus_mods';
@@ -6568,7 +6569,7 @@ export class Sim {
     if (advanceExclusiveMovement(this.ctx, p, meta, this.playerMotionDeps)) return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
-    if (this.updateFearMovement(p)) return;
+    if (updatePuppetMovement(this.ctx, p) || this.updateFearMovement(p)) return;
     // The rest of the step (turn integration, wish vector, slope gates, swept
     // static collision, the vertical pass with fall damage) moved VERBATIM to
     // player_motion.ts (MV1), which also eases the body off terrain walls at the

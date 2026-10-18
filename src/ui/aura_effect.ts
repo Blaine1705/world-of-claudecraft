@@ -121,6 +121,7 @@ import {
 } from '../sim/varkhul_shared_pyre';
 import { bastionAuraEffectDescriptor } from './bastion_aura_effect';
 import { cryptAuraEffectDescriptor } from './crypt_aura_effect';
+import { gourdlightAuraEffectDescriptor } from './gourdlight_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
 import { wildheartAuraEffectDescriptor } from './wildheart_aura_effect';
@@ -183,6 +184,9 @@ export function auraEffectDescriptor(
   // not say what the trinket does with it).
   const trinket = trinketAuraEffectDescriptor(a, viewer);
   if (trinket) return trinket;
+  // Gourdlight Eve's encounter auras say their rule (gourdlight_aura_effect.ts).
+  const gourdlight = gourdlightAuraEffectDescriptor(a);
+  if (gourdlight) return gourdlight;
   // The Wildheart Basin's marks and boss auras say their rule (wildheart_aura_effect.ts).
   const basin = wildheartAuraEffectDescriptor(a);
   if (basin) return basin;

@@ -10,20 +10,44 @@
 //   /dev scarecrow swell      a Swelling Gourd heaves up behind him now
 //   /dev scarecrow burst      the standing gourd's fuse runs down to its last second
 //   /dev scarecrow break      the standing gourd breaks now (he reels: stun, split rind)
+//   /dev scarecrow puppet     Thatchbound now; fought alone, two sturdy dev bots join his
+//                             fight first, so there is someone to curse and someone to hit
 //   /dev scarecrow reset      clear him and stand him up fresh at full health
 //   /dev scarecrow lockout    forget your daily spoils lockout, so his corpse pays you again
 import { GOURDLIGHT_EVE_ID } from '../content/gourdlight_eve';
 import { THATCHGRIN_ID } from '../content/gourdlight_eve_scarecrow';
 import { displacePlayerForDev } from '../dev/dev_displace';
 import type { SimContext } from '../sim_context';
+import type { Entity } from '../types';
 import { worldBossLockoutId } from '../world_boss';
 import { clearThatchgrin, spawnThatchgrin } from './scarecrow';
 import { resolveScarecrowField } from './scarecrow_field';
+import { scarecrowFighters } from './scarecrow_fighters';
 import { scarecrowEngaged, startCall, startGourdfall } from './scarecrow_kit';
+import { startThatchbound } from './scarecrow_puppet';
 import { raiseSwellingGourd } from './scarecrow_swell';
 import { activeSeasonalEventOf } from './seasonal_state';
 
-const USAGE = '[dev] Usage: /dev scarecrow [rain|call|swell|burst|break|reset|lockout].';
+const USAGE = '[dev] Usage: /dev scarecrow [rain|call|swell|burst|break|puppet|reset|lockout].';
+
+/** Two sturdy dev bots join his fight beside the caller (so Thatchbound has a crowd). */
+function joinDevFighters(ctx: SimContext, boss: Entity, pid: number): void {
+  const caller = ctx.entities.get(pid);
+  if (!caller) return;
+  const names = ['Strawfriend Ada', 'Strawfriend Bo'];
+  names.forEach((name, i) => {
+    const botId = ctx.spawnDevBot(name);
+    const bot = botId >= 0 ? ctx.entities.get(botId) : undefined;
+    if (!bot) return;
+    const side = i === 0 ? 1 : -1;
+    bot.pos = ctx.groundPos(caller.pos.x + side * 4, caller.pos.z + 2);
+    bot.prevPos = { ...bot.pos };
+    bot.level = 20;
+    bot.maxHp = 20_000;
+    bot.hp = 20_000;
+    ctx.dealDamage(bot, boss, 1, false, 'physical', null, 'hit', true);
+  });
+}
 
 function me(ctx: SimContext, pid: number) {
   return ctx.entities.get(pid) ?? null;
@@ -63,7 +87,7 @@ export function handleScarecrowDevChat(ctx: SimContext, raw: string, pid: number
     );
     return true;
   }
-  const fightVerbs = ['rain', 'gourd', 'call', 'swell', 'burst', 'break'];
+  const fightVerbs = ['rain', 'gourd', 'call', 'swell', 'burst', 'break', 'puppet'];
   if (fightVerbs.includes(verb)) {
     if (
       !boss ||
@@ -83,6 +107,10 @@ export function handleScarecrowDevChat(ctx: SimContext, raw: string, pid: number
         return true;
       }
       ok = verb === 'call' ? startCall(ctx, boss, st) : startGourdfall(ctx, boss, st);
+    } else if (verb === 'puppet') {
+      if (scarecrowFighters(ctx, boss).length < 2) joinDevFighters(ctx, boss, pid);
+      kit.puppetLast = [];
+      ok = startThatchbound(ctx, boss, st);
     } else if (verb === 'swell') {
       ok = raiseSwellingGourd(ctx, boss, st) !== null;
     } else {

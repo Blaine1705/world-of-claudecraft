@@ -1297,7 +1297,10 @@ const MONOLITHS: MonolithRow[] = [
     // Exact count (wc -l after biome).
     // LOWERED for Haunted Pumpkins: character_calendar_save.ts owns the
     // unchanged calendar-ledger save projection, including seasonal progress.
-    ceiling: 11569,
+    // LOWERED 11569 -> 11540 by Gourdlight Eve round 5: the right-click cancel command
+    // moved whole into combat/aura_cancel_command.ts, paying for the one-line puppet
+    // movement hook (seasonal/scarecrow_puppet.ts). Exact count (wc -l after biome).
+    ceiling: 11540,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

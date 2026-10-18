@@ -28,6 +28,15 @@ export interface ScarecrowKitState {
   swellId: number | null;
   /** Seconds left on its fuse (its cast bar). */
   swellFuse: number;
+  /** Seconds until the next Thatchbound may start (scarecrow_puppet.ts). */
+  puppetTimer: number;
+  /** A Thatchbound cast in flight: its marked victims, in pick order, and its clock. */
+  puppetCast: { victims: number[]; elapsed: number } | null;
+  /** Live puppets, as player id, the friend it is turned on, seconds to its next swing
+   *  (PUPPET_STRIDE each). */
+  puppets: number[];
+  /** The last cast's victims (spared the next one when anyone else is free). */
+  puppetLast: number[];
 }
 
 export interface ScarecrowState {
@@ -44,7 +53,11 @@ export function freshScarecrowState(): ScarecrowState {
   return { bossId: null, respawnAt: 0, hpScale: null, kit: null };
 }
 
-export function freshScarecrowKit(bossId: number, firstRain: number): ScarecrowKitState {
+export function freshScarecrowKit(
+  bossId: number,
+  firstRain: number,
+  firstPuppet = 0,
+): ScarecrowKitState {
   return {
     bossId,
     rainTimer: firstRain,
@@ -57,10 +70,16 @@ export function freshScarecrowKit(bossId: number, firstRain: number): ScarecrowK
     swellsRisen: 0,
     swellId: null,
     swellFuse: 0,
+    puppetTimer: firstPuppet,
+    puppetCast: null,
+    puppets: [],
+    puppetLast: [],
   };
 }
 
 /** Stride of one patch in `ScarecrowKitState.chaff`. */
 export const CHAFF_STRIDE = 4;
+/** Stride of one puppet in `ScarecrowKitState.puppets`. */
+export const PUPPET_STRIDE = 3;
 /** Stride of one falling pumpkin in `ScarecrowKitState.rain`. */
 export const RAIN_STRIDE = 3;

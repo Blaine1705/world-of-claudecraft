@@ -314,3 +314,24 @@ describe('character form readiness vs the compile gate (the stand-in invariant)'
     expect(characterFormReadyMask(null, null, null, null, null, sheep.root)).toBe(0);
   });
 });
+
+describe("Thatchbound's puppet bodies", () => {
+  const strawling = { kind: 'incapacitate', id: 'thatchbound_strawling' };
+  const crow = { kind: 'incapacitate', id: 'thatchbound_crow' };
+  it('ride the polymorph slot with their own rigs', () => {
+    expect(requestedCharacterForm(maskFor([strawling]))).toBe('sheep');
+    expect(requestedCharacterForm(maskFor([crow]))).toBe('sheep');
+    expect(characterFormAssetKey('form_sheep', [strawling])).toBe('form_puppet_strawling');
+    expect(characterFormAssetKey('form_sheep', [crow])).toBe('form_puppet_crow');
+  });
+  it('outrank a trick look, and a real polymorph outranks them', () => {
+    const trick = { kind: 'seasonal_cosmetic', id: 'gourdlight_costume_bat' };
+    expect(characterFormAssetKey('form_sheep', [trick, crow])).toBe('form_puppet_crow');
+    expect(
+      characterFormAssetKey('form_sheep', [crow, { kind: 'polymorph', id: 'polymorph' }]),
+    ).toBe('form_sheep');
+  });
+  it('an ordinary incapacitate (a gouge, a fear) wears no body', () => {
+    expect(maskFor([{ kind: 'incapacitate', id: 'fear_incap' }])).toBe(0);
+  });
+});

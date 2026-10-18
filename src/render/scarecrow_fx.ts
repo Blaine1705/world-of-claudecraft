@@ -17,7 +17,8 @@
 //    splits in a spray of pulp and seeds and he reels (dizzy sparks round his head, an
 //    ember glow through the split in his chest for as long as he is split open); unbroken,
 //    it bursts in a fireball with a shockwave rolling out over the whole field;
-// plus the crows bursting off him at his call's peak and straw puffs as he collapses.
+// plus the crows bursting off him at his call's peak and straw puffs as he collapses,
+// and THATCHBOUND, his mind control: its own layer (thatchbound_fx.ts), composed here.
 //
 // GPU work: every falling pumpkin (and the gourd thrown at the sky) is one instance of a
 // pooled InstancedMesh per part of the decor kit's small carved pumpkin, the instanced
@@ -58,6 +59,7 @@ import {
   THATCHGRIN_TEMPLATE,
 } from './scarecrow_fx_core';
 import { gourdlightAssets } from './seasonal_decor_assets';
+import { ThatchboundFx } from './thatchbound_fx';
 
 /** The pooled particle calls this layer uses (vfx.ts). */
 export interface ScarecrowParticles {
@@ -322,6 +324,8 @@ export class ScarecrowFx {
   private disposed = false;
   private readonly scratch = new THREE.Vector3();
   private readonly scratch2 = new THREE.Vector3();
+  /** Thatchbound's strings, eyes and sigils (his mind control). */
+  private readonly thatchbound: ThatchboundFx;
 
   constructor(
     private readonly scene: THREE.Object3D,
@@ -333,6 +337,7 @@ export class ScarecrowFx {
     /** The spatial audio seam (the renderer's injected sink): this layer's own timed cues. */
     private readonly audio: () => SpatialAudioSink | null = () => null,
   ) {
+    this.thatchbound = new ThatchboundFx(scene, particles, entities, entity, compileGate);
     for (let i = 0; i < FALL_CAP; i++) {
       this.falls.push({
         active: false,
@@ -488,6 +493,10 @@ export class ScarecrowFx {
    *  renderer's generic arms skip it); false lets the shared rune / impact draw too. */
   handleSpellfxAt(ev: SpellfxAtLike): boolean {
     if (this.disposed) return false;
+    if (ThatchboundFx.claims(ev.ability)) {
+      this.thatchbound.handleMark(ev);
+      return false; // the shared encounter rune circle marks the victim's feet
+    }
     if (ev.ability === GOURD_ABILITY && ev.fx === 'runeCircle') {
       this.scheduleFall(ev);
       return false; // the shared encounter rune circle is the ring, at its true radius
@@ -733,6 +742,7 @@ export class ScarecrowFx {
     this.time += dt;
     this.frameDt = dt;
     this.updateFalls(dt, reducedMotion);
+    this.thatchbound.update(dt, reducedMotion);
     this.updatePatches(dt);
     this.updateShockwave();
     this.halosUsed = 0;
@@ -1019,6 +1029,7 @@ export class ScarecrowFx {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.thatchbound.dispose();
     for (const p of this.patches) p.disc.geometry.dispose();
     this.patches.length = 0;
     this.root?.removeFromParent();

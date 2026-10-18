@@ -4173,6 +4173,9 @@ export const ko_KR: EnTranslations = {
       }
     },
     "auraEffect": {
+      "gourdlight": {
+        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+      },
       "wildheart": {
         "packBond": "짝이 가까이 있는 동안 받는 피해가 {pct}% 감소합니다. 야수조련사와 재규어를 떼어 놓으면 유대가 끊어집니다.",
         "packBondFury": "짝이 가까이 있는 동안 주는 피해가 {pct}% 증가합니다.",

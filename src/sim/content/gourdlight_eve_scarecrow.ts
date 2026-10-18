@@ -38,6 +38,16 @@
 //     damage for 10 s), and its burst (75% of each fighter's maximum health, CLAMPED one
 //     point short of it so it can never kill a fighter at full health).
 //   - The calls' thresholds and add counts, the call's windup (matched to the Summon clip).
+//   - Thatchbound, his mind control (phase 5, owner direction: "curse one or two players,
+//     turn them into a crow or a little scarecrow, they lose control and swing at their
+//     friends for a few seconds"): its cadence (first at 25 s, then every 35 s), its 2.5 s
+//     cast, who it takes (one victim in a pair, two from three fighters up, never his
+//     current target, never the same player twice running when anyone else is free, and
+//     nobody at all when he is fought alone, since a lone puppet has nobody to turn on),
+//     its 8 s hold, its ways out (an ally's Magic dispel, or taking 15% of maximum health
+//     in damage from any source, the classic break-on-damage threshold) and the puppet's
+//     swing (8 to 12 every 2 s, before his mechanic level scale: about a third of his
+//     chaff's burn per second, the owner's "hits soft").
 //   - The charm's drop chance, in the buddy-drop convention (content/buddy_sources.ts:
 //     CALIBRATE). The pumpkin head and the broom are guaranteed but never duplicated.
 //
@@ -79,6 +89,19 @@ export const THATCHGRIN_CHAFF_ABILITY = 'mob_thatchgrin_chaff';
 export const THATCHGRIN_SUMMON_ABILITY = 'mob_thatchgrin_summon';
 /** The Swelling Gourd's cues: it bursts out of the stubble, its burst, its fall. */
 export const THATCHGRIN_SWELL_ABILITY = 'mob_thatchgrin_swell';
+/** Thatchbound's cues: the cast's mark on each victim, the curse landing, the puppet's
+ *  swing and the strings snapping (scarecrow_puppet.ts). */
+export const THATCHGRIN_PUPPET_ABILITY = 'mob_thatchgrin_puppet';
+
+/** Thatchbound's two bodies: a victim is turned into a little straw scarecrow or a crow
+ *  (the first victim of a cast the scarecrow, the second the crow). Kind 'incapacitate'
+ *  (the victim's own control is gone); the client draws the body from the id. */
+export const THATCHBOUND_STRAWLING_AURA_ID = 'thatchbound_strawling';
+export const THATCHBOUND_CROW_AURA_ID = 'thatchbound_crow';
+export const THATCHBOUND_AURA_IDS: readonly string[] = Object.freeze([
+  THATCHBOUND_STRAWLING_AURA_ID,
+  THATCHBOUND_CROW_AURA_ID,
+]);
 
 /** DESIGN: his level, so a level-10 group meets him inside the classic hit table. */
 export const THATCHGRIN_LEVEL = 12;
@@ -160,6 +183,26 @@ export const THATCHGRIN_KIT = Object.freeze({
     { atHpPct: 0.4, mobId: GOURDLIGHT_CROW_ID, count: 3, name: 'Crowcall' },
     { atHpPct: 0.2, mobId: STRAWLING_ID, count: 2, name: 'Chaff Rising' },
   ],
+  /** Thatchbound, his mind control (DESIGN, header; scarecrow_puppet.ts). */
+  puppet: {
+    name: 'Thatchbound',
+    /** Seconds into a pull before the first, then between casts. */
+    first: 25,
+    every: 35,
+    /** The cast bar (an interrupt that clears it fizzles the curse). */
+    cast: 2.5,
+    /** Reach of the curse from him (yards). */
+    range: 40,
+    /** One victim from two fighters, two from three or more, never more. */
+    maxVictims: 2,
+    twoFrom: 3,
+    /** The hold, and the share of maximum health in damage that snaps the strings. */
+    seconds: 8,
+    breakShare: 0.15,
+    /** The puppet's swing at its friend: reach, cadence, first swing, damage. */
+    swing: { name: "Puppet's Flail", reach: 4, every: 2, first: 0.6, min: 8, max: 12 },
+    school: 'shadow' as const,
+  },
   /** The summon's raised-arms windup before the adds land (his cast, his bark). */
   callWindup: 1.4,
   /** Seconds of quiet each telegraph holds after it lands (no two wind-ups share the ground). */

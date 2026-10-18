@@ -4173,6 +4173,9 @@ export const ja_JP: EnTranslations = {
       }
     },
     "auraEffect": {
+      "gourdlight": {
+        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+      },
       "wildheart": {
         "packBond": "相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。",
         "packBondFury": "相棒が近くにいる間、与えるダメージが{pct}%増加する。",

@@ -1671,6 +1671,9 @@ const baseEnTable = {
   'mechanic.thatchgrinHarvestWard': 'Harvest Ward',
   'mechanic.thatchgrinUprooted': 'Uprooted',
   'mechanic.thatchgrinSplitRind': 'Split Rind',
+  // Thatchbound, his mind control, and the puppet's swing (seasonal/scarecrow_puppet.ts).
+  'mechanic.thatchgrinThatchbound': 'Thatchbound',
+  'mechanic.thatchgrinPuppetsFlail': "Puppet's Flail",
   // The drill yard's effigy: its plank hide, and a player's own open window on it
   // (src/sim/muster_effigy.ts EFFIGY_WARD_NAME / EFFIGY_OPENED_NAME).
   'aura.effigyPlankHide': 'Plank Hide',
@@ -17939,6 +17942,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Harvest Ward': 'mechanic.thatchgrinHarvestWard',
   Uprooted: 'mechanic.thatchgrinUprooted',
   'Split Rind': 'mechanic.thatchgrinSplitRind',
+  // byte-identical to THATCHGRIN_KIT.puppet.name and .swing.name
+  Thatchbound: 'mechanic.thatchgrinThatchbound',
+  "Puppet's Flail": 'mechanic.thatchgrinPuppetsFlail',
   // The Straw Foreman's plank hide and a player's window on it (muster_effigy.ts);
   // byte-identical to EFFIGY_WARD_NAME and EFFIGY_OPENED_NAME.
   'Plank Hide': 'aura.effigyPlankHide',

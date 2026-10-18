@@ -1,4 +1,4 @@
-// Old Thatchgrin's fight: four reads, each answered a different way.
+// Old Thatchgrin's fight: five reads, each answered a different way.
 //
 //   GOURDFALL       He rips a lit gourd off his shoulders and hurls it at the sky, and the
 //                   sky answers: burning pumpkins rain on his field, one on every fighter
@@ -12,6 +12,16 @@
 //   THE CALLS       At falling health he throws his arms wide: first his crows burst off
 //                   him (Crowcall), then strawlings climb out of the stubble (Chaff Rising),
 //                   twice each, once per pull. Answered by turning to the adds.
+//   THATCHBOUND     Every 35 s he takes one or two of his fighters on strings (never his
+//                   tank, never when fought alone): they turn into a little scarecrow or a
+//                   crow and swing at their friends for 8 s (scarecrow_puppet.ts).
+//                   Answered by a Magic dispel, by enough damage to snap the strings, or
+//                   by kicking his cast.
+//   THATCHBOUND     Every 35 s he takes one or two of his fighters on strings (never his
+//                   tank, never when fought alone): they turn into a little scarecrow or a
+//                   crow and swing at their friends for 8 s (scarecrow_puppet.ts).
+//                   Answered by a Magic dispel, by enough damage to snap the strings, or
+//                   by kicking his cast.
 //   SWELLING GOURD  Twice a pull his patch heaves up a giant pumpkin behind him
 //                   (scarecrow_swell.ts): while it lives he shrugs off most of every hit,
 //                   and if its fuse runs out it bursts over the whole fight. Answered by
@@ -42,6 +52,12 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { DT, dist2d } from '../types';
 import { scarecrowFighters } from './scarecrow_fighters';
+import {
+  freeAllPuppets,
+  startThatchbound,
+  thatchboundCasting,
+  tickThatchbound,
+} from './scarecrow_puppet';
 import {
   CHAFF_STRIDE,
   freshScarecrowKit,
@@ -303,6 +319,7 @@ function landCall(ctx: SimContext, boss: Entity, st: ScarecrowState): void {
 export function resetScarecrowKit(ctx: SimContext, boss: Entity | null, st: ScarecrowState): void {
   if (!st.kit) return;
   clearSwellingGourd(ctx, boss, st);
+  freeAllPuppets(ctx, st);
   st.kit = null;
   if (boss && !boss.dead) ctx.despawnSummonedAdds(boss);
 }
@@ -320,13 +337,15 @@ export function tickScarecrowKit(ctx: SimContext, boss: Entity, st: ScarecrowSta
     return;
   }
   if (!st.kit || st.kit.bossId !== boss.id)
-    st.kit = freshScarecrowKit(boss.id, THATCHGRIN_KIT.rain.first);
+    st.kit = freshScarecrowKit(boss.id, THATCHGRIN_KIT.rain.first, THATCHGRIN_KIT.puppet.first);
   const kit = st.kit;
   // Aftermath first: what is already on the ground resolves wherever he has walked.
   tickChaff(ctx, boss, st);
   tickRain(ctx, boss, st);
   // The gourd's fuse runs on its own clock, stunned or not: a burst is never delayed.
   tickSwellingGourd(ctx, boss, st);
+  // Thatchbound's bar and its puppets run on their own clock too.
+  tickThatchbound(ctx, boss, st);
   if (kit.callWindup > 0) {
     kit.callWindup -= DT;
     if (kit.callWindup <= EPS) {
@@ -337,7 +356,8 @@ export function tickScarecrowKit(ctx: SimContext, boss: Entity, st: ScarecrowSta
   if (kit.spacing > 0) kit.spacing = Math.max(0, kit.spacing - DT);
   if (kit.rainTimer > 0) kit.rainTimer = Math.max(0, kit.rainTimer - DT);
   if (stunned(boss)) return;
-  if (kit.rain.length > 0 || kit.callWindup > 0 || kit.spacing > 0) return;
+  if (kit.rain.length > 0 || kit.callWindup > 0 || kit.spacing > 0 || thatchboundCasting(st))
+    return;
   // A due call outranks a due rain: the health thresholds are the fight's beats.
   const call = THATCHGRIN_KIT.calls[kit.callsFired];
   const hpFrac = boss.hp / Math.max(1, boss.maxHp);
@@ -345,5 +365,7 @@ export function tickScarecrowKit(ctx: SimContext, boss: Entity, st: ScarecrowSta
     startCall(ctx, boss, st);
     return;
   }
+  // Then his strings (they wait for a second fighter: fought alone, he never casts them).
+  if (kit.puppetTimer <= 0 && startThatchbound(ctx, boss, st)) return;
   if (kit.rainTimer <= 0) startGourdfall(ctx, boss, st);
 }
