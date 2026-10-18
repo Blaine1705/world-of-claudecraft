@@ -37,7 +37,7 @@ import { PAINTED_TOWNS } from '../sim/painted_towns';
 import type { ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { authoredTownDressingPlacements } from './authored_town_dressing_placements';
-import { worldMajorPropPlacements } from './world_prop_placements';
+import { decorPropPlacements, worldMajorPropPlacements } from './world_prop_placements';
 
 /** targetHeightFor() for every /models/props/ path this module emits. */
 const TARGET_HEIGHT = 2.2;
@@ -413,7 +413,14 @@ export function paintedTownsOldKitPlacements(seed: number): MapPlacement[] {
   const buildings = PAINTED_TOWNS.flatMap((town) =>
     town.replacedKitBuildings.map((record) => ({ ...record })),
   );
-  return worldMajorPropPlacements({ ...empty, buildings }, seed);
+  // ...and the hex-kit buildings a town replaced from its decor rows
+  const decorProps = PAINTED_TOWNS.flatMap((town) =>
+    town.replacedDecorProps.map((row) => ({ ...row })),
+  );
+  return [
+    ...worldMajorPropPlacements({ ...empty, buildings }, seed),
+    ...decorPropPlacements({ ...empty, decorProps }),
+  ];
 }
 
 /** The Weekly Vault's placeable model (public/models/tidehold/vault.glb): the

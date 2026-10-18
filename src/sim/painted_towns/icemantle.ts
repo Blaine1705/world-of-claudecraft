@@ -12,6 +12,7 @@ export const ICEMANTLE_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: -30, z: 1560 }, radius: 22 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

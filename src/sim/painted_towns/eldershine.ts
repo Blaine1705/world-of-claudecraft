@@ -12,6 +12,7 @@ export const ELDERSHINE_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: -40, z: 1030 }, radius: 30 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

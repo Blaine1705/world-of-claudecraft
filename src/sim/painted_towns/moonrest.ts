@@ -12,6 +12,7 @@ export const MOONREST_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: -370, z: 1420 }, radius: 18 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

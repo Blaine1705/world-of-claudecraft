@@ -12,6 +12,7 @@ export const WICKHARBOR_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: 420, z: 360 }, radius: 16 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

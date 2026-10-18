@@ -12,6 +12,7 @@ export const DRIFTHAVEN_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: -300, z: 820 }, radius: 16 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

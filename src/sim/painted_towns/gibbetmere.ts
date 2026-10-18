@@ -12,6 +12,7 @@ export const GIBBETMERE_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: 360, z: 1430 }, radius: 17 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

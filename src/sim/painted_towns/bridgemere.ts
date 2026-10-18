@@ -12,6 +12,7 @@ export const BRIDGEMERE_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: -360, z: 362 }, radius: 20 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

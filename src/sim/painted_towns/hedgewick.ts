@@ -12,6 +12,7 @@ export const HEDGEWICK_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: 320, z: 810 }, radius: 16 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

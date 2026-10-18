@@ -75,6 +75,7 @@ export {
 export type {
   PaintedTownId,
   PaintedTownLayout,
+  ReplacedDecorProp,
   ReplacedKitBuilding,
   TownNpcStand,
   TownPad,

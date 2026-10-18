@@ -12,6 +12,7 @@ export const GULLHAVEN_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: 305, z: 70 }, radius: 15 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

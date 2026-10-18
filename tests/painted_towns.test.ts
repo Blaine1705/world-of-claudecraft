@@ -102,6 +102,12 @@ function squareSpot(town: PaintedTownLayout): { x: number; z: number } {
   throw new Error(`${town.id}: no free spot within 10 yd of the hub`);
 }
 
+/** The hex kit's town buildings (any colourway): the houses, taverns, halls,
+ *  markets and workshops a painted town replaces. Towers, windmills, barracks,
+ *  stables, docks and the castle are not town houses and may stay. */
+const HEX_TOWN_BUILDING =
+  /^hex[br]?(HomeA|HomeB|Tavern|Townhall|Market|Workshop|Church|Blacksmith)$/;
+
 function nearTown(town: PaintedTownLayout, x: number, z: number, margin: number): boolean {
   return Math.hypot(x - town.hub.center.x, z - town.hub.center.z) <= town.hub.radius + margin;
 }
@@ -231,6 +237,19 @@ function describePaintedTown(town: PaintedTownLayout): void {
           !(record.id && painted.has(record.id)) && nearTown(town, record.x, record.z, 40),
       );
       expect(kit.map((record) => `${record.kind} at ${record.x}, ${record.z}`)).toEqual([]);
+      // ...nor a hex-kit (KayKit Medieval Hexagon) town building standing as decor
+      const decor = BUILTIN_WORLD.props.decorProps ?? [];
+      for (const old of town.replacedDecorProps) {
+        const left = decor.find(
+          (row) =>
+            row.key === old.key && Math.abs(row.x - old.x) < 1e-6 && Math.abs(row.z - old.z) < 1e-6,
+        );
+        expect(left, `${old.key} at ${old.x}, ${old.z}`).toBeUndefined();
+      }
+      const hexTown = decor.filter(
+        (row) => HEX_TOWN_BUILDING.test(row.key) && nearTown(town, row.x, row.z, 40),
+      );
+      expect(hexTown.map((row) => `${row.key} at ${row.x}, ${row.z}`)).toEqual([]);
     });
 
     it('keeps every building clear of every other one', () => {

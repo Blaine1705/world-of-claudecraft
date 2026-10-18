@@ -12,6 +12,7 @@ export const LANTERNMERE_LAYOUT: PaintedTownLayout = deepFreeze({
   hub: { center: { x: -360, z: 2072 }, radius: 24 },
   buildings: [],
   replacedKitBuildings: [],
+  replacedDecorProps: [],
   pads: [],
   npcs: [],
 });

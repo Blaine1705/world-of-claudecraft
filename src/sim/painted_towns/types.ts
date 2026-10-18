@@ -3,7 +3,7 @@
 // only, so the town modules and the barrel share them without a cycle.
 
 import type { makeTownNpc, PlacedTownBuilding, Point2, TownPadStamp } from '../placed_town_kit';
-import type { BuildingDef } from '../types';
+import type { BuildingDef, ZonePropsDef } from '../types';
 
 /** The towns rebuilt through this directory, in the registry's order. */
 export type PaintedTownId =
@@ -28,6 +28,10 @@ export interface ReplacedKitBuilding {
   readonly rot: number;
 }
 
+/** A decor row a layout replaced (a hex-kit house, tavern or hall standing as
+ *  `decorProps` dressing), exactly as its zone file had it. */
+export type ReplacedDecorProp = NonNullable<ZonePropsDef['decorProps']>[number];
+
 /** One NPC stand a layout owns (sim/placed_town_kit.ts makeTownNpc). */
 export type TownNpcStand = ReturnType<typeof makeTownNpc>;
 
@@ -46,6 +50,9 @@ export interface PaintedTownLayout {
   /** The kit records this layout replaced, exactly as the zone file had them:
    *  Studio lifts their old conversions out of documents saved before. */
   readonly replacedKitBuildings: readonly ReplacedKitBuilding[];
+  /** The hex-kit buildings standing as decor rows that this layout replaced,
+   *  exactly as the zone file had them (Studio lifts their conversions too). */
+  readonly replacedDecorProps: readonly ReplacedDecorProp[];
   /** Level ground under the buildings, appended to the built-in world's
    *  terrain edits after every other town's. */
   readonly pads: readonly TownPad[];
