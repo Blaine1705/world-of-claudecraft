@@ -1,49 +1,42 @@
 // Thatchbound's visual layer (Old Thatchgrin's mind control, sim:
 // src/sim/seasonal/scarecrow_puppet.ts), composed by ScarecrowFx (scarecrow_fx.ts):
 //
-//  - THE CAST: glowing strings reach out of his raised hand toward each marked victim over
-//    the cast bar (the mark under the victim is the shared encounter rune circle);
+//  - THE CAST: a violet sigil grows under each chosen victim over the cast bar (over the
+//    shared encounter rune circle that marks them), full size the moment the curse lands;
 //  - THE CURSE LANDING: a burst of crow feathers and straw off the victim and a dark-ember
 //    shockwave (the curse's violet, never his fire's orange) rolling out round them;
-//  - THE PUPPET, for as long as it is held: marionette strings from a swaying control bar
-//    high above down to its head, hands and back, two burning eyes, a spinning violet sigil
-//    under its feet, and a swirl of straw and feathers climbing its body;
-//  - FREED: the strings snap in a spray of straw.
-// The strings, eyes and sigil are the read of WHO is controlled (allies act on it), so
-// they draw at every graphics tier; only the swirl's particle rate thins (reduced motion).
+//  - THE PUPPET, for as long as it is held: two burning eyes, a spinning violet sigil under
+//    its feet, and a dense dark swirl of straw and crow feathers winding round its body
+//    (two bands turning opposite ways, up to the shoulders). Nothing hangs above its head:
+//    the marionette strings and control bar are gone (owner note 2026-10-18);
+//  - FREED: the curse breaks off the body in a spray of straw and feathers.
+// The eyes and the sigil are the read of WHO is controlled (allies act on it), so they
+// draw at every graphics tier; only the swirl's particle rate thins (reduced motion).
 //
 // GPU work: one root group built on the first sight of a puppet or a mark, attached through
-// the world compile gate (attachSceneGroupGated). Every string and bar is one instance of a
-// single pooled InstancedMesh (an additive core plus a wider dim sheath per segment), the
-// sigils and the shockwaves are two more pooled InstancedMeshes, and the eyes are a small
-// fixed pool of sprites sharing one material. Instance colours carry the fade (additive:
-// darker is fainter), set before the first link so the program variant is the one used.
+// the world compile gate (attachSceneGroupGated). The sigils (the puppets' and the cast's)
+// and the shockwaves are two pooled InstancedMeshes, and the eyes are a small fixed pool of
+// sprites sharing one material. Instance colours carry the fade (additive: darker is
+// fainter), set before the first link so the program variant is the one used.
 // An idle pool is hidden once its twin window is over, costing no draw. Particles ride the
 // pooled point cloud (vfx.ts) through the boss layer's particle seam.
 import * as THREE from 'three';
 import { THATCHGRIN_KIT } from '../sim/content/gourdlight_eve_scarecrow';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import {
-  BARS_PER_PUPPET,
-  BOSS_HAND_UP,
-  CAST_STRING_CAP,
-  castReach,
+  CAST_MARK_CAP,
+  castGrow,
   eyeSize,
   PUPPET_ABILITY,
   PUPPET_AURA_IDS,
   PUPPET_CAP,
-  puppetBars,
   puppetBody,
   puppetEyes,
-  puppetStrings,
   SHOCK_SEC,
-  STRINGS_PER_PUPPET,
   shockwave,
   sigilState,
-  stringGlow,
   swirlPoint,
   swirlRate,
-  type Vec3Like,
 } from './thatchbound_fx_core';
 
 /** The pooled particle calls this layer uses (vfx.ts, through ScarecrowFx's seam). */
@@ -71,11 +64,13 @@ interface PuppetSlot {
   phase: number;
   auraId: string;
   swirlClock: number;
+  /** Swirl motes thrown so far: alternates the two bands and varies each mote. */
+  swirlCount: number;
   seen: boolean;
   last: THREE.Vector3;
 }
 
-interface CastString {
+interface CastMark {
   bossId: number;
   victimId: number;
   start: number;
@@ -89,9 +84,6 @@ interface Shock {
   born: number;
 }
 
-const STRING_EMBER = new THREE.Color(0xffb060);
-const SHEATH_EMBER = new THREE.Color(0x3a1406);
-const BAR_EMBER = new THREE.Color(0x8a3a10);
 // the curse's colour: a sickly violet, never the orange of his burning ground (a sigil under
 // a friend must not read as fire to step out of)
 const SIGIL_EMBER = new THREE.Color(0xa050ff);
@@ -99,14 +91,13 @@ const SHOCK_EMBER = new THREE.Color(0x8a40e0);
 const EYE_EMBER = 0xff5a10;
 const STRAW = 0xd8b25a;
 const FEATHERS = [0x15141a, 0x24222b, 0x0a0a0d] as const;
-const SEGMENTS_PER_PUPPET = STRINGS_PER_PUPPET + BARS_PER_PUPPET;
-/** Core plus sheath per segment, for every puppet and every cast string. */
-const SEGMENT_CAP = (PUPPET_CAP * SEGMENTS_PER_PUPPET + CAST_STRING_CAP) * 2;
+/** One sigil per puppet plus one growing under each chosen victim of a cast. */
+const SIGIL_CAP = PUPPET_CAP + CAST_MARK_CAP;
 const SHOCK_CAP = PUPPET_CAP;
-const STRING_WIDTH = 0.018;
-const SHEATH_WIDTH = 0.07;
-const BAR_WIDTH = 0.05;
 const SIGIL_RADIUS = 1.9;
+/** The cast's sigil runs a little dimmer than a held puppet's, and spins faster. */
+const CAST_SIGIL_GLOW = 0.8;
+const CAST_SIGIL_SPIN = 2.4;
 const TWIN_SEC = 3;
 
 const HIDDEN = new THREE.Matrix4().makeScale(0, 0, 0);
@@ -114,7 +105,6 @@ const BLACK = new THREE.Color(0, 0, 0);
 const UP = new THREE.Vector3(0, 1, 0);
 const scratchMat = new THREE.Matrix4();
 const scratchQuat = new THREE.Quaternion();
-const scratchDir = new THREE.Vector3();
 const scratchPos = new THREE.Vector3();
 const scratchScale = new THREE.Vector3();
 const scratchColor = new THREE.Color();
@@ -200,9 +190,6 @@ function eyeTexture(): THREE.Texture | null {
 
 export class ThatchboundFx {
   private root: THREE.Group | null = null;
-  private segGeo: THREE.CylinderGeometry | null = null;
-  private segMat: THREE.MeshBasicMaterial | null = null;
-  private segs: THREE.InstancedMesh | null = null;
   private sigilGeo: THREE.CircleGeometry | null = null;
   private sigilTex: THREE.Texture | null = null;
   private sigilMat: THREE.MeshBasicMaterial | null = null;
@@ -214,7 +201,7 @@ export class ThatchboundFx {
   private eyeMat: THREE.SpriteMaterial | null = null;
   private eyes: THREE.Sprite[] = [];
   private readonly puppets = new Map<number, PuppetSlot>();
-  private readonly casts: CastString[] = [];
+  private readonly casts: CastMark[] = [];
   private readonly shockList: Shock[] = [];
   private time = 0;
   private rootBorn = 0;
@@ -233,24 +220,7 @@ export class ThatchboundFx {
     if (this.root) return;
     const root = new THREE.Group();
     root.name = 'thatchbound-fx';
-    // strings and bars: a unit cylinder standing on its base, stretched along each segment
-    this.segGeo = new THREE.CylinderGeometry(1, 1, 1, 6, 1, true);
-    this.segGeo.translate(0, 0.5, 0);
-    this.segMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    });
-    this.segs = new THREE.InstancedMesh(this.segGeo, this.segMat, SEGMENT_CAP);
-    for (let i = 0; i < SEGMENT_CAP; i++) {
-      this.segs.setMatrixAt(i, HIDDEN);
-      this.segs.setColorAt(i, BLACK);
-    }
-    this.segs.frustumCulled = false;
-    this.segs.name = 'thatchbound-strings';
-    root.add(this.segs);
-    // the sigils under the puppets
+    // the sigils under the puppets and under the cast's chosen
     this.sigilTex = sigilTexture();
     this.sigilGeo = new THREE.CircleGeometry(1, 48);
     this.sigilGeo.rotateX(-Math.PI / 2);
@@ -263,8 +233,8 @@ export class ThatchboundFx {
       polygonOffset: true,
       polygonOffsetFactor: -2,
     });
-    this.sigils = new THREE.InstancedMesh(this.sigilGeo, this.sigilMat, PUPPET_CAP);
-    for (let i = 0; i < PUPPET_CAP; i++) {
+    this.sigils = new THREE.InstancedMesh(this.sigilGeo, this.sigilMat, SIGIL_CAP);
+    for (let i = 0; i < SIGIL_CAP; i++) {
       this.sigils.setMatrixAt(i, HIDDEN);
       this.sigils.setColorAt(i, BLACK);
     }
@@ -312,11 +282,11 @@ export class ThatchboundFx {
     );
   }
 
-  /** A Thatchbound mark (the cast's spellfxAt on a victim): a string reaches for it. */
+  /** A Thatchbound mark (the cast's spellfxAt on a victim): a sigil grows under it. */
   handleMark(ev: MarkLike): void {
     if (this.disposed || ev.sourceId === undefined || ev.targetId === undefined) return;
     this.ensureRoot();
-    if (this.casts.length >= CAST_STRING_CAP) this.casts.shift();
+    if (this.casts.length >= CAST_MARK_CAP) this.casts.shift();
     this.casts.push({
       bossId: ev.sourceId,
       victimId: ev.targetId,
@@ -332,7 +302,7 @@ export class ThatchboundFx {
 
   /** Per frame. `bossNear`: his body is in the world this frame (ScarecrowFx's scan saw
    *  it): the root is built then, before his first cast, so its gate has settled by the
-   *  time the strings must show; and with no boss and no puppet, no entity scan runs. */
+   *  time the cast's sigils must show; and with no boss and no puppet, no entity scan runs. */
   update(dt: number, reducedMotion: boolean, bossNear: boolean): void {
     if (this.disposed) return;
     this.time += dt;
@@ -371,6 +341,7 @@ export class ThatchboundFx {
         phase: (id % 97) * 0.37,
         auraId,
         swirlClock: 0,
+        swirlCount: 0,
         seen: true,
         last: new THREE.Vector3(e.pos.x, e.pos.y, e.pos.z),
       };
@@ -394,41 +365,21 @@ export class ThatchboundFx {
     this.shockList.push({ x: e.pos.x, y: e.pos.y, z: e.pos.z, born: this.time });
   }
 
-  /** The strings snap: a spray of straw where the puppet stood. */
+  /** The curse breaks: straw and feathers spray off the body where the puppet stood. */
   private freed(at: THREE.Vector3): void {
-    this.particles.burst(scratchPos.set(at.x, at.y + 3.5, at.z), 'nature', 26, 1.2, STRAW);
-    this.particles.burst(scratchPos.set(at.x, at.y + 1.2, at.z), 'nature', 14, 0.8, STRAW);
-  }
-
-  private segment(index: number, a: Vec3Like, b: Vec3Like, width: number, color: THREE.Color) {
-    if (!this.segs) return;
-    scratchDir.set(b.x - a.x, b.y - a.y, b.z - a.z);
-    const len = scratchDir.length();
-    if (len < 1e-4) {
-      this.segs.setMatrixAt(index, HIDDEN);
-      return;
-    }
-    scratchDir.divideScalar(len);
-    scratchQuat.setFromUnitVectors(UP, scratchDir);
-    scratchMat.compose(
-      scratchPos.set(a.x, a.y, a.z),
-      scratchQuat,
-      scratchScale.set(width, len, width),
-    );
-    this.segs.setMatrixAt(index, scratchMat);
-    this.segs.setColorAt(index, color);
+    this.particles.burst(scratchPos.set(at.x, at.y + 1.6, at.z), 'nature', 26, 1.2, STRAW);
+    this.particles.burst(scratchPos.set(at.x, at.y + 1.0, at.z), 'shadow', 14, 1.0, FEATHERS[0]);
   }
 
   private draw(dt: number, reducedMotion: boolean): void {
-    const segs = this.segs;
     const sigils = this.sigils;
     const shocks = this.shocks;
-    if (!segs || !sigils || !shocks) return;
+    if (!sigils || !shocks) return;
     const twins = this.time - this.rootBorn < TWIN_SEC;
-    // drop the finished cast strings and shockwaves
+    // drop the finished cast marks and shockwaves
     for (let i = this.casts.length - 1; i >= 0; i--) {
       const c = this.casts[i];
-      // a kicked cast (his bar cleared before it lands) takes its strings with it
+      // a kicked cast (his bar cleared before it lands) takes its sigils with it
       const boss = this.entity(c.bossId);
       const fizzled =
         this.time - c.start > 0.15 &&
@@ -443,41 +394,12 @@ export class ThatchboundFx {
     const active = this.puppets.size > 0 || this.casts.length > 0 || this.shockList.length > 0;
     // idle past the twin window, and its pools already hidden: nothing to draw
     if (!active && !twins && this.idle) return;
-    let seg = 0;
     let sigil = 0;
     let eye = 0;
     for (const [id, slot] of this.puppets) {
       const e = this.entity(id);
       if (!e) continue;
       const body = puppetBody(slot.auraId);
-      const glow = stringGlow(this.time - slot.born, this.time, slot.phase);
-      const strings = puppetStrings(e.pos, e.facing, body, this.time, slot.phase);
-      for (const [a, b] of strings) {
-        this.segment(
-          seg++,
-          a,
-          b,
-          STRING_WIDTH,
-          scratchColor.copy(STRING_EMBER).multiplyScalar(glow),
-        );
-        this.segment(
-          seg++,
-          a,
-          b,
-          SHEATH_WIDTH,
-          scratchColor.copy(SHEATH_EMBER).multiplyScalar(glow),
-        );
-      }
-      for (const [a, b] of puppetBars(e.pos, e.facing, this.time, slot.phase)) {
-        this.segment(seg++, a, b, BAR_WIDTH, scratchColor.copy(BAR_EMBER).multiplyScalar(glow));
-        this.segment(
-          seg++,
-          a,
-          b,
-          SHEATH_WIDTH * 1.4,
-          scratchColor.copy(SHEATH_EMBER).multiplyScalar(glow * 0.6),
-        );
-      }
       // the sigil under its feet
       const s = sigilState(this.time, slot.phase);
       scratchQuat.setFromAxisAngle(UP, s.spin);
@@ -498,13 +420,15 @@ export class ThatchboundFx {
         sprite.position.set(p.x, p.y, p.z);
         sprite.scale.setScalar(size);
       }
-      // the swirl of straw and feathers climbing it
+      // the dark swirl of straw and crow feathers winding round it: two bands turning
+      // opposite ways, mostly feathers, up to the shoulders
       slot.swirlClock += dt * swirlRate(reducedMotion);
       while (slot.swirlClock >= 1) {
         slot.swirlClock -= 1;
-        const k = Math.floor(this.time * 61 + slot.phase * 13);
-        const p = swirlPoint(e.pos, this.time, k);
-        const feather = k % 3 !== 0;
+        slot.swirlCount++;
+        const k = Math.floor(this.time * 61 + slot.phase * 13) + slot.swirlCount;
+        const p = swirlPoint(e.pos, this.time, k, slot.swirlCount % 2 === 0 ? 1 : -1);
+        const feather = k % 4 !== 0;
         this.particles.burst(
           scratchPos.set(p.x, p.y, p.z),
           feather ? 'shadow' : 'nature',
@@ -514,36 +438,30 @@ export class ThatchboundFx {
         );
       }
     }
-    // the cast's strings reaching out of his hand toward each marked victim
+    // the cast's sigil growing under each chosen victim (a victim already held keeps
+    // its own sigil; this one only draws until the curse lands)
     for (const c of this.casts) {
-      const boss = this.entity(c.bossId);
+      if (sigil >= SIGIL_CAP) break;
+      if (this.puppets.has(c.victimId)) continue;
       const victim = this.entity(c.victimId);
-      if (!boss || !victim) continue;
-      const reach = castReach(this.time - c.start, c.duration);
-      const a = { x: boss.pos.x, y: boss.pos.y + BOSS_HAND_UP, z: boss.pos.z };
-      const tip = {
-        x: a.x + (victim.pos.x - a.x) * reach,
-        y: a.y + (victim.pos.y + 1.8 - a.y) * reach,
-        z: a.z + (victim.pos.z - a.z) * reach,
-      };
-      const flick = 0.75 + 0.25 * Math.sin(this.time * 14 + c.victimId);
-      this.segment(
-        seg++,
-        a,
-        tip,
-        STRING_WIDTH * 1.3,
-        scratchColor.copy(STRING_EMBER).multiplyScalar(flick),
+      if (!victim || victim.dead) continue;
+      const grow = castGrow(this.time - c.start, c.duration);
+      if (grow <= 0.01) continue;
+      const flick = 0.85 + 0.15 * Math.sin(this.time * 14 + c.victimId);
+      scratchQuat.setFromAxisAngle(UP, this.time * CAST_SIGIL_SPIN + c.victimId);
+      scratchMat.compose(
+        scratchPos.set(victim.pos.x, victim.pos.y + 0.06, victim.pos.z),
+        scratchQuat,
+        scratchScale.setScalar(SIGIL_RADIUS * grow),
       );
-      this.segment(
-        seg++,
-        a,
-        tip,
-        SHEATH_WIDTH,
-        scratchColor.copy(SHEATH_EMBER).multiplyScalar(flick),
+      sigils.setMatrixAt(sigil, scratchMat);
+      sigils.setColorAt(
+        sigil,
+        scratchColor.copy(SIGIL_EMBER).multiplyScalar(CAST_SIGIL_GLOW * flick * grow),
       );
+      sigil++;
     }
-    for (let i = seg; i < SEGMENT_CAP; i++) segs.setMatrixAt(i, HIDDEN);
-    for (let i = sigil; i < PUPPET_CAP; i++) sigils.setMatrixAt(i, HIDDEN);
+    for (let i = sigil; i < SIGIL_CAP; i++) sigils.setMatrixAt(i, HIDDEN);
     for (let i = eye; i < this.eyes.length; i++) {
       const sprite = this.eyes[i];
       sprite.scale.setScalar(0.001);
@@ -563,12 +481,11 @@ export class ThatchboundFx {
       shock++;
     }
     for (let i = shock; i < SHOCK_CAP; i++) shocks.setMatrixAt(i, HIDDEN);
-    for (const mesh of [segs, sigils, shocks]) {
+    for (const mesh of [sigils, shocks]) {
       mesh.instanceMatrix.needsUpdate = true;
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     }
     // an idle pool past its twin window costs no draw
-    segs.visible = twins || seg > 0;
     sigils.visible = twins || sigil > 0;
     shocks.visible = twins || shock > 0;
     // only a frame that HID everything (no activity, past the twins) may skip the next
@@ -579,9 +496,6 @@ export class ThatchboundFx {
     if (this.disposed) return;
     this.disposed = true;
     this.root?.removeFromParent();
-    this.segs?.dispose();
-    this.segGeo?.dispose();
-    this.segMat?.dispose();
     this.sigils?.dispose();
     this.sigilGeo?.dispose();
     this.sigilTex?.dispose();
@@ -596,7 +510,6 @@ export class ThatchboundFx {
     this.casts.length = 0;
     this.shockList.length = 0;
     this.root = null;
-    this.segs = null;
     this.sigils = null;
     this.shocks = null;
   }

@@ -132,7 +132,7 @@ export function startThatchbound(ctx: SimContext, boss: Entity, st: ScarecrowSta
   boss.castRemaining = PUPPET.cast;
   boss.castTargetId = victims[0].id;
   boss.channeling = false;
-  // his hand clip and the strings reaching out (the renderer's windup arm)
+  // his hand clip (the renderer's windup arm; each victim's mark grows its sigil)
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,

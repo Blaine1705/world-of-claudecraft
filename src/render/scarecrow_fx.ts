@@ -327,7 +327,7 @@ export class ScarecrowFx {
   private readonly scratch2 = new THREE.Vector3();
   /** Whether this frame's scan saw him standing (Thatchbound's root and scan key on it). */
   private bossNear = false;
-  /** Thatchbound's strings, eyes and sigils (his mind control). */
+  /** Thatchbound's eyes, sigils and swirl (his mind control). */
   private readonly thatchbound: ThatchboundFx;
 
   constructor(
@@ -751,7 +751,7 @@ export class ScarecrowFx {
     // his collapse into straw, his gourds' glow, his reel
     this.bossNear = false;
     this.entities().forEach(this.watchEntity);
-    // his strings: built on the first sight of him, scanned only while he or a puppet is near
+    // his curse: built on the first sight of him, scanned only while he or a puppet is near
     this.thatchbound.update(dt, reducedMotion, this.bossNear);
     const twins = this.time - this.rootBorn < TWIN_SEC;
     for (let i = this.halosUsed; i < this.halos.length; i++) {

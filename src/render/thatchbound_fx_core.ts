@@ -1,11 +1,14 @@
-// Thatchbound's visual plan, the pure half (no Three, no DOM): where a puppet's marionette
-// strings run, how its control bar sways above it, where its eyes burn, and how the cast's
-// reaching strings and the curse's shockwave grow and fade. thatchbound_fx.ts owns the
-// objects and reads these. Sim: src/sim/seasonal/scarecrow_puppet.ts.
+// Thatchbound's visual plan, the pure half (no Three, no DOM): where a puppet's eyes burn,
+// how its violet sigil spins, how the cast's sigil grows under each chosen victim, how the
+// curse's shockwave rolls out, and the dark swirl of straw and crow feathers that wraps
+// its body. thatchbound_fx.ts owns the objects and reads these. Sim:
+// src/sim/seasonal/scarecrow_puppet.ts. Nothing hangs over the puppet's head (owner note
+// 2026-10-18: no marionette strings, no control bar).
 //
 // Fairness: who is a puppet is actionable information (allies must find and free them),
-// so the strings, the eyes and the ground sigil draw at every graphics tier; only the
-// swirl of straw and feathers thins under reduced motion.
+// so the eyes and the ground sigil draw at every graphics tier (and the body itself is
+// the scarecrow or crow look); only the swirl of straw and feathers thins under reduced
+// motion.
 
 export const PUPPET_ABILITY = 'mob_thatchgrin_puppet';
 export const STRAWLING_PUPPET_AURA = 'thatchbound_strawling';
@@ -17,16 +20,8 @@ export const PUPPET_AURA_IDS: ReadonlySet<string> = new Set([
 
 /** Puppets drawn at once (a cast takes two; two casts can overlap at the edges). */
 export const PUPPET_CAP = 4;
-/** Strings per puppet (head, both hands, the back) plus the control bar's two sticks. */
-export const STRINGS_PER_PUPPET = 4;
-export const BARS_PER_PUPPET = 2;
-/** The cast's reaching strings at once (one per marked victim). */
-export const CAST_STRING_CAP = 4;
-
-/** How high above the puppet's feet its control bar hangs (yards). */
-export const BAR_HEIGHT = 7.5;
-/** Where the boss's hand is when he pulls (his raised hand, above his feet). */
-export const BOSS_HAND_UP = 6.2;
+/** The cast's marks at once (one per chosen victim): a sigil grows under each. */
+export const CAST_MARK_CAP = 4;
 
 export interface Vec3Like {
   x: number;
@@ -34,93 +29,14 @@ export interface Vec3Like {
   z: number;
 }
 
-/** The body's attach points in its own frame: up, and left/right of its facing. */
+/** The body's head height over its feet: the little scarecrow stands, the crow hovers low. */
 export interface PuppetBody {
   head: number;
-  hands: number;
-  handSpread: number;
-  back: number;
 }
 
-/** Each look's body: the little scarecrow stands, the crow hovers low. */
+/** Each look's body. */
 export function puppetBody(auraId: string): PuppetBody {
-  return auraId === CROW_PUPPET_AURA
-    ? { head: 1.9, hands: 1.5, handSpread: 0.9, back: 1.7 }
-    : { head: 1.75, hands: 1.15, handSpread: 0.55, back: 1.35 };
-}
-
-/** The control bar's sway: a slow lazy circle plus a jerk on each swing, so the strings
- *  read as pulled by a hand rather than rigid. */
-export function barSway(time: number, phase: number): { x: number; z: number; tilt: number } {
-  return {
-    x: Math.sin(time * 1.3 + phase) * 0.35,
-    z: Math.cos(time * 1.1 + phase * 1.7) * 0.3,
-    tilt: Math.sin(time * 2.1 + phase) * 0.25,
-  };
-}
-
-/** The four string segments for a puppet at `pos` facing `facing`, from the bar down to
- *  head, left hand, right hand and back. Each is [top, bottom]. */
-export function puppetStrings(
-  pos: Vec3Like,
-  facing: number,
-  body: PuppetBody,
-  time: number,
-  phase: number,
-): [Vec3Like, Vec3Like][] {
-  const sway = barSway(time, phase);
-  const top = { x: pos.x + sway.x, y: pos.y + BAR_HEIGHT, z: pos.z + sway.z };
-  // the body's left is (cos f, -sin f) for a facing f (the rig convention)
-  const lx = Math.cos(facing);
-  const lz = -Math.sin(facing);
-  const fx = Math.sin(facing);
-  const fz = Math.cos(facing);
-  const bar = 0.9;
-  const tl = { x: top.x + lx * bar, y: top.y + sway.tilt, z: top.z + lz * bar };
-  const tr = { x: top.x - lx * bar, y: top.y - sway.tilt, z: top.z - lz * bar };
-  const tb = { x: top.x - fx * bar, y: top.y, z: top.z - fz * bar };
-  const jig = Math.sin(time * 6 + phase) * 0.12;
-  return [
-    [top, { x: pos.x, y: pos.y + body.head, z: pos.z }],
-    [
-      tl,
-      {
-        x: pos.x + lx * body.handSpread,
-        y: pos.y + body.hands + jig,
-        z: pos.z + lz * body.handSpread,
-      },
-    ],
-    [
-      tr,
-      {
-        x: pos.x - lx * body.handSpread,
-        y: pos.y + body.hands - jig,
-        z: pos.z - lz * body.handSpread,
-      },
-    ],
-    [tb, { x: pos.x - fx * 0.25, y: pos.y + body.back, z: pos.z - fz * 0.25 }],
-  ];
-}
-
-/** The control bar's two crossed sticks, as segments (drawn with the strings). */
-export function puppetBars(pos: Vec3Like, facing: number, time: number, phase: number) {
-  const sway = barSway(time, phase);
-  const top = { x: pos.x + sway.x, y: pos.y + BAR_HEIGHT, z: pos.z + sway.z };
-  const lx = Math.cos(facing);
-  const lz = -Math.sin(facing);
-  const fx = Math.sin(facing);
-  const fz = Math.cos(facing);
-  const bar = 1.0;
-  return [
-    [
-      { x: top.x + lx * bar, y: top.y + sway.tilt, z: top.z + lz * bar },
-      { x: top.x - lx * bar, y: top.y - sway.tilt, z: top.z - lz * bar },
-    ],
-    [
-      { x: top.x + fx * bar * 0.6, y: top.y, z: top.z + fz * bar * 0.6 },
-      { x: top.x - fx * bar, y: top.y, z: top.z - fz * bar },
-    ],
-  ] as [Vec3Like, Vec3Like][];
+  return auraId === CROW_PUPPET_AURA ? { head: 1.9 } : { head: 1.75 };
 }
 
 /** The two burning eyes: just in front of the head, a hand apart. */
@@ -138,14 +54,6 @@ export function puppetEyes(pos: Vec3Like, facing: number, body: PuppetBody): [Ve
   ];
 }
 
-/** The strings' brightness over a puppet's life: they snap taut as it lands, hold with a
- *  heartbeat flicker, and stay bright to the last frame (no fade hides who is taken). */
-export function stringGlow(age: number, time: number, phase: number): number {
-  const land = Math.min(1, age / 0.25);
-  const flicker = 0.85 + 0.15 * Math.sin(time * 9 + phase);
-  return Math.max(0.6, land) * flicker;
-}
-
 /** The eyes' size pulse (world yards). */
 export function eyeSize(time: number, phase: number): number {
   return 0.2 + 0.05 * Math.sin(time * 5 + phase);
@@ -156,8 +64,9 @@ export function sigilState(time: number, phase: number): { spin: number; glow: n
   return { spin: time * 0.9 + phase, glow: 0.75 + 0.25 * Math.sin(time * 3 + phase) };
 }
 
-/** A cast string's reach toward its victim, 0..1 over the cast, eased in. */
-export function castReach(elapsed: number, duration: number): number {
+/** The cast's sigil under a chosen victim: how far it has grown, 0..1 over the cast,
+ *  eased in (full size the moment the curse lands). */
+export function castGrow(elapsed: number, duration: number): number {
   const t = Math.max(0, Math.min(1, elapsed / Math.max(0.05, duration)));
   return 1 - (1 - t) * (1 - t);
 }
@@ -169,15 +78,21 @@ export function shockwave(age: number): { radius: number; glow: number } {
   return { radius: 0.6 + 3.6 * (1 - (1 - t) ** 3), glow: (1 - t) ** 1.6 };
 }
 
-/** Straw and feathers the swirl throws per second, by motion preference. */
+/** Straw and feathers the swirl throws per second, by motion preference: a dense dark
+ *  wrap that carries the curse's weight now that nothing hangs above the body. */
 export function swirlRate(reducedMotion: boolean): number {
-  return reducedMotion ? 6 : 26;
+  return reducedMotion ? 8 : 48;
 }
 
-/** A point on the swirl round the puppet: a tightening helix climbing its body. */
-export function swirlPoint(pos: Vec3Like, t: number, k: number): Vec3Like {
-  const a = t * 5.5 + k * 2.39996;
-  const h = ((t * 0.8 + k * 0.37) % 1) * 2.6;
-  const r = 1.25 - h * 0.25;
-  return { x: pos.x + Math.cos(a) * r, y: pos.y + 0.2 + h, z: pos.z + Math.sin(a) * r };
+/** How high the swirl climbs (yards over the feet): it wraps the body and stops at the
+ *  shoulders, never over the head. */
+export const SWIRL_TOP = 1.9;
+
+/** A point on the swirl round the puppet: a tightening helix climbing its body. `spin` is
+ *  +1 or -1: two bands wind opposite ways, so the wrap reads as a churning cage. */
+export function swirlPoint(pos: Vec3Like, t: number, k: number, spin = 1): Vec3Like {
+  const a = spin * (t * 5.5 + k * 2.39996);
+  const h = ((t * 0.8 + k * 0.37) % 1) * SWIRL_TOP;
+  const r = (spin > 0 ? 1.2 : 0.85) - h * 0.22;
+  return { x: pos.x + Math.cos(a) * r, y: pos.y + 0.15 + h, z: pos.z + Math.sin(a) * r };
 }

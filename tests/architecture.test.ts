@@ -850,7 +850,7 @@ const RENDER_PURE_CORES = [
   'src/render/seasonal_garland_core.ts',
   // Old Thatchgrin's gourd arc, burning-patch fade and timing (scarecrow_fx.ts).
   'src/render/scarecrow_fx_core.ts',
-  // Thatchbound's strings, eyes, sigil and shockwave plan (thatchbound_fx.ts).
+  // Thatchbound's eyes, sigils, swirl and shockwave plan (thatchbound_fx.ts).
   'src/render/thatchbound_fx_core.ts',
   // the indoor pumpkins' wisps: their drift and breath (seasonal_interior_wisps.ts)
   'src/render/seasonal_interior_wisps_core.ts',
