@@ -67,8 +67,18 @@ export function seasonalItemTooltipText(item: Pick<ItemDef, 'id'>): string | nul
   }
 }
 
-/** The line as tooltip HTML (empty for any other item). */
+/** Where a seasonal item comes from, for the items no shop sells (the Carved Pumpkin
+ *  Head is Old Thatchgrin's first-kill drop only), or null for any other item. */
+export function seasonalItemSourceText(item: Pick<ItemDef, 'id'>): string | null {
+  return item.id === CARVED_PUMPKIN_HEAD_ID ? t('seasonal.itemSource.pumpkinHead') : null;
+}
+
+/** The lines as tooltip HTML (empty for any other item). */
 export function seasonalItemTooltipLines(item: Pick<ItemDef, 'id'>): string {
   const text = seasonalItemTooltipText(item);
-  return text ? createTooltipLine(text, 'tt-desc').outerHTML : '';
+  const source = seasonalItemSourceText(item);
+  return (
+    (text ? createTooltipLine(text, 'tt-desc').outerHTML : '') +
+    (source ? createTooltipLine(source, 'tt-desc').outerHTML : '')
+  );
 }

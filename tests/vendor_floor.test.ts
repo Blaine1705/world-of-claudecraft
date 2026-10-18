@@ -859,8 +859,9 @@ describe('stock rows: the phase 11n pulls', () => {
       // Gourdlight Eve's keeper (content/gourdlight_eve.ts): the pumpkin head and the
       // Jar of Mischief, both priced in sweets, then (phase 3) the three costume
       // draughts and the three title writs, then (phase 5) the five candies, then
-      // (round 7) the Emberbristle Broom, priced in Emberwoven Sheaves.
-      gourdlight_keeper: 14,
+      // (round 7) the Emberbristle Broom, priced in Emberwoven Sheaves; (round 8) the
+      // pumpkin head left the shelf (Old Thatchgrin's first-kill drop is its one source).
+      gourdlight_keeper: 13,
     });
   });
 });

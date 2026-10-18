@@ -7771,6 +7771,9 @@ export const zh_TW: EnTranslations = {
       "broom": "從赫絲特·葫蘆芯處用{count}個餘燼編織草束購買。騎乘需要騎術技能。它只在南瓜燈之夜期間存在，活動結束時會化為稻草。",
       "sheaf": "每天拾取老稻草獰笑的戰利品時獲得一個，直到你擁有餘燼鬃毛掃帚為止。赫絲特·葫蘆芯在東溪、芬橋和高望的攤位用{count}個交換掃帚。南瓜燈之夜結束時會化為稻草。"
     },
+    "itemSource": {
+      "pumpkinHead": "首次拾取野豬草甸外南瓜田裡老稻草獰笑的戰利品時掉落。沒有商人出售。"
+    },
     "tokenPrice": "{count}個{item}"
   },
   "dungeonGuide": {

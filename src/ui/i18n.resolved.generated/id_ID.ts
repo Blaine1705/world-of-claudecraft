@@ -7771,6 +7771,9 @@ export const id_ID: EnTranslations = {
       "broom": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves. Riding it requires the riding skill. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.",
       "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Crumbles to straw when Gourdlight Eve ends."
     },
+    "itemSource": {
+      "pumpkinHead": "Dropped by Old Thatchgrin, in his pumpkin field past Boar Meadow, the first time you loot him. No vendor sells it."
+    },
     "tokenPrice": "{count} {item}"
   },
   "dungeonGuide": {

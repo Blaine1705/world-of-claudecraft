@@ -22235,4 +22235,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.found':
     'Вы зажгли призрачную тыкву ({zone}): {count}/{total}. Получено тыквенных конфет: {sweets}.',
   'seasonal.pumpkins.flash': 'Призрачная тыква найдена! {count}/{total}',
+  'seasonal.itemSource.pumpkinHead':
+    'Выпадает со Старого Соломозуба на тыквенном поле за Кабаньим Лугом, когда вы впервые забираете его добычу. Торговцы её не продают.',
 };

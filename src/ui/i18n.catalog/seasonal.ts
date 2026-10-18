@@ -85,6 +85,11 @@ export const seasonalStrings = {
     sheaf:
       'Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Crumbles to straw when Gourdlight Eve ends.',
   },
+  // Item tooltip source lines: where an item comes from, when no shop sells it.
+  itemSource: {
+    pumpkinHead:
+      'Dropped by Old Thatchgrin, in his pumpkin field past Boar Meadow, the first time you loot him. No vendor sells it.',
+  },
   // The vendor row's token price: "{count} {item}" ({count} pre-formatted).
   tokenPrice: '{count} {item}',
 };

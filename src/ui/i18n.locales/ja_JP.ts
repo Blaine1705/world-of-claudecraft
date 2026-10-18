@@ -21827,4 +21827,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.found':
     '{zone}の幽霊カボチャに火を灯した：{count}/{total}。ゴードライトの菓子を受け取った：{sweets}。',
   'seasonal.pumpkins.flash': '幽霊カボチャを発見！{count}/{total}',
+  'seasonal.itemSource.pumpkinHead':
+    'ボアメドウの先にあるカボチャ畑のオールド・サッチグリンから、初めて戦利品を受け取ったときに手に入る。商人は売っていない。',
 };

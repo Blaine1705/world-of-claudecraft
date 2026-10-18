@@ -20764,4 +20764,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.found':
     '你点亮了{zone}的一只闹鬼南瓜：{count}/{total}。获得南瓜灯糖：{sweets}。',
   'seasonal.pumpkins.flash': '找到闹鬼南瓜！{count}/{total}',
+  'seasonal.itemSource.pumpkinHead':
+    '首次拾取野猪草甸外南瓜田里老稻草狞笑的战利品时掉落。没有商人出售。',
 };

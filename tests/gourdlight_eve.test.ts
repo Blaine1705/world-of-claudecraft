@@ -235,22 +235,31 @@ describe('trick-or-treat', () => {
 });
 
 describe('the keeper, the shop and the pumpkin head', () => {
-  it('sells the pumpkin head for sweets, and refuses a buyer who cannot pay', () => {
+  it('never sells the pumpkin head (Old Thatchgrin is its one source), and refuses a buyer who cannot pay', () => {
     const sim = world();
     open(sim);
     const keeper = sim.entities.get(GOURDLIGHT_KEEPER_ENTITY_ID) as Entity;
     standBeside(sim, keeper);
-    const price = GOURDLIGHT_SHOP_PRICES[CARVED_PUMPKIN_HEAD_ID];
+    // Off the shelf and unpriced: a buy request for it is refused even with sweets.
+    expect(GOURDLIGHT_SHOP_ITEMS).not.toContain(CARVED_PUMPKIN_HEAD_ID);
+    expect(GOURDLIGHT_SHOP_PRICES[CARVED_PUMPKIN_HEAD_ID]).toBeUndefined();
+    expect(ITEMS[CARVED_PUMPKIN_HEAD_ID]?.priceItem).toBeUndefined();
+    sim.addItem(GOURDLIGHT_SWEET_ID, 200);
     sim.buyItem(keeper.id, CARVED_PUMPKIN_HEAD_ID);
     sim.tick();
     expect(sim.countItem(CARVED_PUMPKIN_HEAD_ID)).toBe(0);
-    sim.addItem(GOURDLIGHT_SWEET_ID, price + 2);
-    const copper = sim.copper;
-    sim.buyItem(keeper.id, CARVED_PUMPKIN_HEAD_ID);
+    expect(sim.countItem(GOURDLIGHT_SWEET_ID)).toBe(200);
+    sim.removeItem(GOURDLIGHT_SWEET_ID, 200);
+    // A buyer short of sweets is refused.
+    const jar = GOURDLIGHT_SHOP_PRICES[JAR_OF_MISCHIEF_ID];
+    sim.addItem(GOURDLIGHT_SWEET_ID, jar - 1);
+    sim.buyItem(keeper.id, JAR_OF_MISCHIEF_ID);
     sim.tick();
-    expect(sim.countItem(CARVED_PUMPKIN_HEAD_ID)).toBe(1);
-    expect(sim.countItem(GOURDLIGHT_SWEET_ID)).toBe(2);
-    expect(sim.copper).toBe(copper);
+    expect(sim.countItem(JAR_OF_MISCHIEF_ID)).toBe(0);
+    expect(sim.countItem(GOURDLIGHT_SWEET_ID)).toBe(jar - 1);
+    sim.removeItem(GOURDLIGHT_SWEET_ID, jar - 1);
+    const copper = sim.copper;
+    sim.addItem(GOURDLIGHT_SWEET_ID, 2);
     // A count request on a token row still buys one.
     sim.addItem(GOURDLIGHT_SWEET_ID, 30);
     sim.buyItem(keeper.id, JAR_OF_MISCHIEF_ID, { count: 5 });
@@ -259,6 +268,7 @@ describe('the keeper, the shop and the pumpkin head', () => {
     expect(sim.countItem(GOURDLIGHT_SWEET_ID)).toBe(
       32 - GOURDLIGHT_SHOP_PRICES[JAR_OF_MISCHIEF_ID],
     );
+    expect(sim.copper).toBe(copper);
   });
 
   it('wears the head while the event runs, puts it back after a strip, and takes it off on close', () => {

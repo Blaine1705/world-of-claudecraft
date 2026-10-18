@@ -232,8 +232,9 @@ export const GOURDLIGHT_KEEPER_POSTS: readonly GourdlightKeeperPost[] = Object.f
 /** The keeper's shop: price in sweets per purchase (ItemDef.priceItem). */
 // Daily income is about 20 to 25 sweets (the rounds pouch, the knocks, his sack), so a
 // draught is half a day and a title three to five days of rounds.
+// The Carved Pumpkin Head is not on the shelf: Old Thatchgrin's first-kill drop is its
+// only source (owner direction 2026-10-18, content/gourdlight_eve_scarecrow.ts loot).
 export const GOURDLIGHT_SHOP_PRICES: Readonly<Record<string, number>> = Object.freeze({
-  [CARVED_PUMPKIN_HEAD_ID]: 40,
   [JAR_OF_MISCHIEF_ID]: 3,
   rattlebone_draught: 10,
   haunting_draught: 10,
@@ -247,7 +248,6 @@ export const GOURDLIGHT_SHOP_PRICES: Readonly<Record<string, number>> = Object.f
 /** What the keeper sells, in shelf order. Every row costs sweets except the broom,
  *  which costs Emberwoven Sheaves (GOURDLIGHT_BROOM_SHEAVES). */
 export const GOURDLIGHT_SHOP_ITEMS: readonly string[] = Object.freeze([
-  CARVED_PUMPKIN_HEAD_ID,
   JAR_OF_MISCHIEF_ID,
   ...GOURDLIGHT_CANDIES.map((c) => c.itemId),
   ...GOURDLIGHT_COSTUMES.map((c) => c.itemId),
@@ -318,10 +318,7 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
     kind: 'tool',
     quality: 'rare',
     use: { type: 'seasonal', action: 'pumpkinHead' },
-    priceItem: {
-      itemId: GOURDLIGHT_SWEET_ID,
-      count: GOURDLIGHT_SHOP_PRICES[CARVED_PUMPKIN_HEAD_ID],
-    },
+    // No price: never sold. Old Thatchgrin's first-kill drop is the one source.
     unique: true,
     sellValue: 0,
     soulbound: true,

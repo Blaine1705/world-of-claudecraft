@@ -18754,6 +18754,7 @@ export type TranslationKeyFlat =
   | 'seasonal.costume'
   | 'seasonal.event.gourdlight_eve.name'
   | 'seasonal.guise'
+  | 'seasonal.itemSource.pumpkinHead'
   | 'seasonal.itemUse.broom'
   | 'seasonal.itemUse.costumeBat'
   | 'seasonal.itemUse.costumeGhost'

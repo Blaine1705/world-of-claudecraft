@@ -21823,4 +21823,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.found':
     '{zone}의 유령 호박에 불을 밝혔습니다: {count}/{total}. 고드라이트 사탕 획득: {sweets}.',
   'seasonal.pumpkins.flash': '유령 호박 발견! {count}/{total}',
+  'seasonal.itemSource.pumpkinHead':
+    '보어 메도 너머 호박밭의 올드 대치그린에게서 처음 전리품을 챙길 때 얻습니다. 상인은 팔지 않습니다.',
 };
