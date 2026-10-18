@@ -23,6 +23,9 @@
 // The indoor pumpkins (a candle-lit jack-o'-lantern on a table or by a wall inside the
 // walk-in houses, src/sim/seasonal_interior_pumpkins.ts) join the street list at build,
 // so they ride the same instancing, glow, halos and budgeted candle light.
+// The road lanterns between the cities (src/sim/seasonal_road_lanterns.ts) build with the
+// same kit in short runs (seasonal_road_lanterns_core.ts), each its own ranged group under
+// the same gated root, with their halos and candle light; never a separate attach.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { GOURDLIGHT_EVE_ID } from '../sim/content/gourdlight_eve';
@@ -38,6 +41,7 @@ import {
   interiorPumpkinJob,
   interiorPumpkins,
 } from '../sim/seasonal_interior_pumpkins';
+import { seasonalRoadLanterns } from '../sim/seasonal_road_lanterns';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX } from './gfx';
 import type { BudgetPointLightRegistry } from './point_light_budget';
@@ -51,6 +55,7 @@ import { garlandOrnaments, garlandPolyline } from './seasonal_garland_core';
 import { driveSeasonalGlow } from './seasonal_glow';
 import { seasonalHalos, seasonalLightSites } from './seasonal_glow_sites_core';
 import { SeasonalInteriorWisps } from './seasonal_interior_wisps';
+import { roadLanternSegments } from './seasonal_road_lanterns_core';
 
 /** A city's dressing draws within this reach of the player (yards, squared below). */
 const DRAW_RANGE = 240;
@@ -162,9 +167,15 @@ export class SeasonalDecor {
     for (const g of layout.garlands) perCity[nearestHub(g.ax, g.az)].garlands.push(g);
     for (const st of layout.stalls) perCity[nearestHub(st.x, st.z)].stalls.push(st);
     this.ropeMaterial = this.makeRopeMaterial();
+    const roads = roadLanternSegments(seasonalRoadLanterns(this.seed));
     const lights = new SeasonalDecorLights(this.scene, this.pointLights, this.seed);
     this.lights = lights;
-    lights.setSites(seasonalLightSites(layout));
+    lights.setSites(
+      seasonalLightSites({
+        ...layout,
+        ground: [...layout.ground, ...roads.flatMap((r) => r.lanterns)],
+      }),
+    );
     hubs.forEach((hub, i) => {
       const group = this.buildCity(assets, perCity[i], i);
       for (const o of lights.buildCity(seasonalHalos(perCity[i]), seasonalLightSites(perCity[i])))
@@ -178,6 +189,15 @@ export class SeasonalDecor {
       group.name = `seasonal-decor-city-${i}`;
       this.content.add(group);
       this.cities.push({ group, x: hub.x, z: hub.z });
+    });
+    // the road lanterns: one ranged group per run, the same kit, halos and candle light
+    roads.forEach((run, i) => {
+      const part: SeasonalDecorLayout = { ...emptyCity(), ground: run.lanterns };
+      const group = this.buildCity(assets, part, hubs.length + i);
+      for (const o of lights.buildCity(seasonalHalos(part), seasonalLightSites(part))) group.add(o);
+      group.name = `seasonal-decor-road-${i}`;
+      this.content.add(group);
+      this.cities.push({ group, x: run.x, z: run.z });
     });
     void attachSceneGroupGated(this.scene, this.root, this.compileGate, () => this.disposed).catch(
       () => {},

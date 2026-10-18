@@ -51,3 +51,38 @@ export const GOURDLIGHT_DECOR_CITIES: readonly SeasonalCityDecorRule[] = Object.
     street: { max: 11, spacing: 10 },
   },
 ]);
+
+/** Where a road-lantern route ends: an event city (its zone id, the hub the city decor
+ *  dresses) or Old Thatchgrin's field (seasonal/scarecrow_field.ts, resolved live). */
+export type SeasonalRoadEnd = { zoneId: string } | { scarecrowField: true };
+
+/** One road the event lights: the lanterns follow the world's own road network from
+ *  one end to the other (src/sim/seasonal_road_lanterns.ts finds the way along the live
+ *  roads), so a moved road moves its lanterns and nothing here is a coordinate. */
+export interface SeasonalRoadLanternRoute {
+  id: string;
+  from: SeasonalRoadEnd;
+  to: SeasonalRoadEnd;
+}
+
+/** Carved-pumpkin lanterns on short crook posts along the roads BETWEEN the event
+ *  cities (the towns themselves are dressed above), and down the road to Old
+ *  Thatchgrin's field past Boar Meadow. One every `spacing` yards (a hash picks the
+ *  gap inside the range), alternating sides of the road. */
+export const GOURDLIGHT_ROAD_LANTERNS = Object.freeze({
+  routes: Object.freeze([
+    {
+      id: 'eastbrook_fenbridge',
+      from: { zoneId: 'eastbrook_vale' },
+      to: { zoneId: 'mirefen_marsh' },
+    },
+    {
+      id: 'fenbridge_highwatch',
+      from: { zoneId: 'mirefen_marsh' },
+      to: { zoneId: 'thornpeak_heights' },
+    },
+    { id: 'eastbrook_field', from: { zoneId: 'eastbrook_vale' }, to: { scarecrowField: true } },
+  ] as readonly SeasonalRoadLanternRoute[]),
+  /** The gap between two lanterns along the road (yards, min and max). */
+  spacing: Object.freeze([32, 46] as const),
+});

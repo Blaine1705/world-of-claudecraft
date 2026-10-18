@@ -14,6 +14,8 @@
 #                          crossbar and a finial (origin = its foot)
 #     garland_leaf         one cluster of autumn leaves for the strung garland
 #     garland_bead         one small paper lantern bead for the strung garland
+#     road_lantern         a small carved pumpkin hung from a short crook post, for a
+#                          road's verge between the towns (origin = the post's foot)
 #   gourdlight_pumpkin_head.glb  the wearable head: hollow, a neck opening, the
 #     carved face lit from inside (origin = the centre of the pumpkin)
 #
@@ -765,6 +767,140 @@ def build_pole(collection):
     return obj
 
 
+ROAD_POST_H = 1.95
+ROAD_ARM_REACH = 0.58
+ROAD_HANG_Z = 1.42
+
+
+def build_road_lantern(collection):
+    """A carved pumpkin hung from a short crook post, for a road's verge between the
+    towns (origin = the post's foot; the face and the arm look down Blender -Y, the
+    way the decor turns a piece to face its road). A weathered stake driven in with
+    two wedges, an orange ribbon tied under a wrought hook, a short chain, and a
+    small carved jack-o'-lantern swinging from it, lit from inside."""
+    parts = []
+    tag = "road-lantern"
+    # the stake: an eight-sided post, tapering and leaning a touch, a split top
+    bm = bmesh.new()
+    sides = 8
+    rings = []
+    lean = 0.035
+    steps = 9
+    for i in range(steps + 1):
+        t = i / steps
+        z = t * ROAD_POST_H
+        r = lerp(0.078, 0.056, t) * (1.0 + 0.05 * hs(tag, "knot", i))
+        cx = lean * t * t
+        ring = []
+        for k in range(sides):
+            a = k / sides * TAU + 0.2
+            ring.append(bm.verts.new((cx + math.cos(a) * r, math.sin(a) * r, z)))
+        rings.append(ring)
+    for a, b in zip(rings, rings[1:]):
+        for k in range(sides):
+            bm.faces.new((a[k], a[(k + 1) % sides], b[(k + 1) % sides], b[k]))
+    bm.faces.new(list(reversed(rings[0])))
+    top = bm.faces.new(rings[-1])
+    # a chamfered, weathered cap: pull the top ring's centre up into a low point
+    res = bmesh.ops.poke(bm, faces=[top])
+    for v in res["verts"]:
+        v.co.z += 0.05
+    # two wedges driven in at the foot
+    for k, a in enumerate((0.7, 0.7 + math.pi * 0.95)):
+        m = (Matrix.Translation((math.cos(a) * 0.1, math.sin(a) * 0.1, 0.06))
+             @ Matrix.Rotation(a, 4, "Z") @ Matrix.Rotation(math.radians(-24), 4, "Y"))
+        bmesh.ops.create_cube(bm, size=1.0, matrix=m @ Matrix.Diagonal((0.05, 0.07, 0.17, 1)))
+    post = new_object("road_lantern_post", bm, collection)
+    set_materials(post, ["Wood"])
+    color_flat(post, lambda m, co, vi: tuple(
+        ch * (0.82 + 0.18 * math.sin(co.z * 11.0 + h01(tag, "grain", vi) * 2.5)) for ch in (0.29, 0.2, 0.12)))
+    parts.append(post)
+    # the wrought hook: a bar out from the post's head toward the road, a curl at its
+    # tip, a stay under it, and a short chain of three links down to the pumpkin
+    ibm = bmesh.new()
+    head_x = lean
+    arm = []
+    for i in range(14):
+        t = i / 13
+        y = -ROAD_ARM_REACH * t
+        z = ROAD_POST_H - 0.12 + 0.07 * math.sin(t * math.pi)
+        arm.append((head_x, y, z))
+    curl = []
+    for i in range(16):
+        t = i / 15
+        a = -math.pi * 0.5 + t * TAU * 0.8
+        r = 0.06 * (1.0 - 0.5 * t)
+        curl.append((head_x, -ROAD_ARM_REACH - 0.02 + math.cos(a) * r, ROAD_POST_H - 0.06 + math.sin(a) * r))
+    tube_bm(ibm, arm, 0.014, 7)
+    tube_bm(ibm, curl, 0.009, 6)
+    tube_bm(ibm, [(head_x, -0.04, ROAD_POST_H - 0.42), (head_x, -0.22, ROAD_POST_H - 0.24),
+                  (head_x, -0.36, ROAD_POST_H - 0.14)], 0.009, 6)
+    # two straps round the post holding the bar
+    for zc in (ROAD_POST_H - 0.12, ROAD_POST_H - 0.42):
+        bmesh.ops.create_cone(ibm, cap_ends=True, segments=10, radius1=0.068, radius2=0.068, depth=0.03,
+                              matrix=Matrix.Translation((head_x * (zc / ROAD_POST_H) ** 2, 0, zc)))
+    hook_y = -ROAD_ARM_REACH + 0.02
+    link_top = ROAD_POST_H - 0.11
+    for k in range(3):
+        zc = link_top - 0.045 - k * 0.07
+        rot = Matrix.Rotation(math.pi * 0.5 * (k % 2), 4, "Z") @ Matrix.Rotation(math.pi * 0.5, 4, "X")
+        bmesh.ops.create_cone(ibm, cap_ends=False, segments=8, radius1=0.028, radius2=0.028, depth=0.012,
+                              matrix=Matrix.Translation((head_x, hook_y, zc)) @ rot)
+    iron = new_object("road_lantern_iron", ibm, collection)
+    set_materials(iron, ["Iron"])
+    shade_smooth(iron, 0.9)
+    color_flat(iron, lambda m, co, vi: (0.075, 0.065, 0.06))
+    parts.append(iron)
+    # the ribbon: an orange band round the post under the bar, two tails fluttering
+    rbm = bmesh.new()
+    zb = ROAD_POST_H - 0.55
+    prev = None
+    first = None
+    for k in range(sides + 1):
+        a = k / sides * TAU
+        r = 0.066
+        p = Vector((head_x * 0.6 + math.cos(a) * r, math.sin(a) * r, zb))
+        v0 = rbm.verts.new(p + Vector((0, 0, -0.035)))
+        v1 = rbm.verts.new(p + Vector((0, 0, 0.035)))
+        if prev:
+            rbm.faces.new((prev[0], v0, v1, prev[1]))
+        else:
+            first = (v0, v1)
+        prev = (v0, v1)
+    for sgn in (-1, 1):
+        prev = None
+        for i in range(7):
+            t = i / 6
+            p = Vector((head_x * 0.6 + sgn * (0.03 + 0.05 * t), 0.07 + 0.05 * t,
+                        zb - 0.02 - 0.24 * t + 0.03 * math.sin(t * 5.0 + sgn)))
+            v0 = rbm.verts.new(p + Vector((-0.028, 0, 0)))
+            v1 = rbm.verts.new(p + Vector((0.028, 0, 0)))
+            if prev:
+                rbm.faces.new((prev[0], v0, v1, prev[1]))
+            prev = (v0, v1)
+    ribbon = new_object("road_lantern_ribbon", rbm, collection)
+    set_materials(ribbon, ["Ribbon"])
+    color_flat(ribbon, lambda m, co, vi: (0.95, 0.4, 0.04))
+    parts.append(ribbon)
+    # the jack-o'-lantern: a small carved pumpkin, its stem tied to the chain
+    radius, height = 0.24, 0.34
+    pk = carved_pumpkin("road_lantern_pumpkin", "road-lantern-pumpkin", collection, radius, height, 8, "grin",
+                        28, 14, PALETTE_ORANGE, shell=0.035, glow_r=0.34)
+    pk.location = (head_x, hook_y, ROAD_HANG_Z)
+    bpy.context.view_layer.objects.active = pk
+    pk.select_set(True)
+    bpy.ops.object.transform_apply(location=True)
+    pk.select_set(False)
+    parts.append(pk)
+    cbm = bmesh.new()
+    tube_bm(cbm, [(head_x, hook_y, link_top - 0.2), (head_x, hook_y, ROAD_HANG_Z + height * 0.5 + 0.02)], 0.008, 5)
+    cord = new_object("road_lantern_cord", cbm, collection)
+    set_materials(cord, ["Iron"])
+    color_flat(cord, lambda m, co, vi: (0.075, 0.065, 0.06))
+    parts.append(cord)
+    return join(parts, "road_lantern")
+
+
 def build_garland_leaf(collection):
     leaves = []
     for i in range(4):
@@ -822,6 +958,7 @@ def build_decor(collection):
         stall.build_stall(this, collection),
         stall.corn_shock(this, collection, "corn_shock", "street-shock"),
         stall.build_hay_bale(this, collection),
+        build_road_lantern(collection),
     ]
     # Every ground piece sits ON its origin: its lowest point at z = 0.
     for p in pieces:

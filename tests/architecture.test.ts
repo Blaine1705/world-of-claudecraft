@@ -856,6 +856,8 @@ const RENDER_PURE_CORES = [
   'src/render/seasonal_interior_wisps_core.ts',
   // where the seasonal dressing's candlelight is: its halos and ground-light sites
   'src/render/seasonal_glow_sites_core.ts',
+  // the road lanterns' draw runs (seasonal_decor.ts ranges each run like a city)
+  'src/render/seasonal_road_lanterns_core.ts',
   'src/render/haunted_pumpkin_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',

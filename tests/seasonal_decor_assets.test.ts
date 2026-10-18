@@ -60,6 +60,8 @@ describe('the Gourdlight decor kit triangle budget', () => {
     lantern: 2400,
     garland_pole: 2700,
     keeper_stall: 42000,
+    // the road lantern: a crook post, its hook and chain, a small carved pumpkin
+    road_lantern: 3200,
   };
   it('keeps every street piece inside its pinned ceiling', () => {
     const buf = readFileSync(resolve(__dirname, '..', 'public/models/props/gourdlight_decor.glb'));

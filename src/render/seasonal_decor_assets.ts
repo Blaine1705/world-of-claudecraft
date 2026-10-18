@@ -31,6 +31,7 @@ export const GOURDLIGHT_DECOR_NODES = [
   'keeper_stall',
   'corn_shock',
   'hay_bale',
+  'road_lantern',
 ] as const;
 export type GourdlightDecorNode = (typeof GOURDLIGHT_DECOR_NODES)[number];
 

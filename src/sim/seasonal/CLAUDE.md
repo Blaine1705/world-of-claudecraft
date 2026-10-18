@@ -52,6 +52,15 @@ berths) and on every `season` change by the online mirror (built-in world only);
 field ring stays open; pinned (never on a
 road, never cutting a town off) by `tests/seasonal_decor_colliders.test.ts`.
 
+Road lanterns (a carved pumpkin hung from a short crook post on the verge, every 30 to
+50 yd, alternating sides) light the roads between the event cities and the road to Old
+Thatchgrin's field: the routes are data (`GOURDLIGHT_ROAD_LANTERNS` in
+`src/sim/content/gourdlight_eve_decor.ts`, city or field ends, never coordinates), the
+resolver `src/sim/seasonal_road_lanterns.ts` walks the live road polylines and seats each
+post on the verge band clear of colliders, trees, water, bridges, towns and the field;
+cosmetic and never solid. Pinned by `tests/seasonal_road_lanterns.test.ts`; drawn by the
+decor view in ranged runs (`src/render/seasonal_road_lanterns_core.ts`).
+
 Fairness and replay rules:
 - A trick body (bat, skeleton) hides class, weapon and casts, so the Jar refuses in
   combat and `updateSeasonal` strips a running trick the tick its body enters combat.

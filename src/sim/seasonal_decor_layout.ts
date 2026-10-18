@@ -42,7 +42,10 @@ export type SeasonalGroundKind =
   | 'gourd'
   | 'garland_pole'
   | 'corn_shock'
-  | 'hay_bale';
+  | 'hay_bale'
+  // a carved pumpkin hung from a short crook post on a road's verge between the event
+  // cities (seasonal_road_lanterns.ts; never in a town's own list)
+  | 'road_lantern';
 
 export type { SeasonalStall } from './seasonal_decor_stall';
 
@@ -101,6 +104,7 @@ export const DECOR_KIND_SCALE: Readonly<Record<SeasonalGroundKind, number>> = {
   // a shock stands well over a player's head (2.2 authored, so 3.3 against a 2.6 body)
   corn_shock: 1.5,
   hay_bale: 1.2,
+  road_lantern: 1,
 };
 /** A piece's own clear radius against colliders, where it is wider than the
  *  carved pumpkin's (a dressed hay bale is a long body). */

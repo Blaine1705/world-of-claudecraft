@@ -20,6 +20,7 @@ vi.mock('../src/render/seasonal_decor_assets', () => {
     keeper_stall: [part(), part()],
     corn_shock: [part()],
     hay_bale: [part()],
+    road_lantern: [part()],
   };
   return { gourdlightAssets: () => ({ decor, head: [] }) };
 });
@@ -28,7 +29,14 @@ import { nightLightStaticCount } from '../src/render/night_light_field';
 import { SeasonalDecor } from '../src/render/seasonal_decor';
 import { SEASONAL_POINT_LIGHTS } from '../src/render/seasonal_decor_lights';
 import { GOURDLIGHT_EVE_ID } from '../src/sim/content/gourdlight_eve';
+import { seasonalRoadLanterns } from '../src/sim/seasonal_road_lanterns';
 import { WORLD_SEED } from '../src/sim/world_seed';
+
+/** Step the view until it builds: the indoor pumpkins resolve one house a frame first
+ *  (seasonal_interior_pumpkins.ts interiorPumpkinJob), so one update is not enough. */
+function buildView(view: SeasonalDecor, night: number, x: number, z: number): void {
+  for (let i = 0; i < 200 && !view.root.parent; i++) view.update(night, i * 0.05, x, z);
+}
 
 describe('SeasonalDecor', () => {
   it('stays hidden until its programs link, however the event toggles meanwhile', async () => {
@@ -37,7 +45,7 @@ describe('SeasonalDecor', () => {
     const gate = vi.fn(() => new Promise<void>((resolve) => (release = resolve)));
     let active: string | null = GOURDLIGHT_EVE_ID;
     const view = new SeasonalDecor(scene, WORLD_SEED, () => active, gate);
-    view.update(1, 0, -14, -100);
+    buildView(view, 1, -14, -100);
     expect(view.root.parent).toBe(scene);
     expect(gate).toHaveBeenCalledTimes(1);
     // built and toggled on, but the gate has not settled: nothing draws
@@ -67,7 +75,7 @@ describe('SeasonalDecor', () => {
   it('dispose detaches the view and frees its instance buffers once', () => {
     const scene = new THREE.Scene();
     const view = new SeasonalDecor(scene, WORLD_SEED, () => GOURDLIGHT_EVE_ID);
-    view.update(0, 0, -14, -100);
+    buildView(view, 0, -14, -100);
     const meshes: THREE.InstancedMesh[] = [];
     view.root.traverse((o) => {
       if (o instanceof THREE.InstancedMesh) meshes.push(o);
@@ -86,7 +94,7 @@ describe('SeasonalDecor', () => {
   it('draws the keeper stall once, on its resolved footprint', () => {
     const scene = new THREE.Scene();
     const view = new SeasonalDecor(scene, WORLD_SEED, () => GOURDLIGHT_EVE_ID);
-    view.update(0, 0, -14, -100);
+    buildView(view, 0, -14, -100);
     const singles: THREE.InstancedMesh[] = [];
     view.root.traverse((o) => {
       if (o instanceof THREE.InstancedMesh && o.count === 1) singles.push(o);
@@ -107,6 +115,7 @@ describe('SeasonalDecor', () => {
     let active: string | null = GOURDLIGHT_EVE_ID;
     const view = new SeasonalDecor(scene, WORLD_SEED, () => active, undefined, registry);
     // by day: halos hidden, the pool lights dark, the field sites registered
+    buildView(view, 0, -4.2, -112);
     view.update(0, 0, -4.2, -112);
     expect(registered).toHaveLength(SEASONAL_POINT_LIGHTS);
     for (const l of registered) {
@@ -142,5 +151,48 @@ describe('SeasonalDecor', () => {
     view.dispose();
     expect(released).toEqual(registered);
     for (const l of registered) expect(l.parent).toBeNull();
+  });
+
+  it('draws the road lanterns only while the event runs, each run ranged like a city', () => {
+    const scene = new THREE.Scene();
+    let active: string | null = null;
+    const view = new SeasonalDecor(scene, WORLD_SEED, () => active);
+    // closed: nothing is built, nothing attached
+    view.update(1, 0, 0, 100);
+    expect(view.root.parent).toBeNull();
+    expect(view.root.getObjectByName('seasonal-decor-road-0')).toBeUndefined();
+    active = GOURDLIGHT_EVE_ID;
+    buildView(view, 1, 0, 100);
+    const lanterns = seasonalRoadLanterns(WORLD_SEED);
+    const runs: THREE.Object3D[] = [];
+    view.root.traverse((o) => {
+      if (o.name.startsWith('seasonal-decor-road-')) runs.push(o);
+    });
+    expect(runs.length).toBeGreaterThan(0);
+    // every post is drawn once: the runs' instance counts add up to the resolved list
+    let drawn = 0;
+    for (const run of runs) {
+      for (const child of run.children) {
+        if (child instanceof THREE.InstancedMesh && child.name !== 'seasonal-halos')
+          drawn += child.count;
+      }
+    }
+    expect(drawn).toBe(lanterns.length);
+    // standing on the Eastbrook to Fenbridge road, the run beside you shows and a run
+    // on the far side of Fenbridge does not
+    view.update(1, 1, lanterns[2].x, lanterns[2].z);
+    const near = runs.find((r) => r.visible);
+    expect(near).toBeDefined();
+    const here = lanterns[2];
+    const far = lanterns.reduce((a, b) =>
+      Math.hypot(b.x - here.x, b.z - here.z) > Math.hypot(a.x - here.x, a.z - here.z) ? b : a,
+    );
+    expect(Math.hypot(far.x - lanterns[2].x, far.z - lanterns[2].z)).toBeGreaterThan(300);
+    expect(runs.some((r) => !r.visible)).toBe(true);
+    // the event closing hides every run with the rest of the dressing
+    active = null;
+    view.update(1, 2, lanterns[2].x, lanterns[2].z);
+    expect(view.root.getObjectByName('seasonal-decor-content')?.visible).toBe(false);
+    view.dispose();
   });
 });
