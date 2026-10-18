@@ -13,6 +13,7 @@ import { BUILTIN_WORLD, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { tavernGroundsRects } from '../src/sim/mirefen_tavern_grounds';
+import { PAINTED_TOWNS } from '../src/sim/painted_towns';
 import {
   EASTBROOK_NOTICEBOARD_ASSET_ID,
   EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
@@ -83,9 +84,13 @@ describe('Eastbrook town grass exclusion', () => {
     // and each piece outside). On its own branch that was 129 plus the grounds (the release's
     // 125 plus 4); merged with the rebuilt towns and the manor above: 97 plus 4, plus the
     // grounds.
-    expect(exclusions).toHaveLength(101 + tavernGroundsRects().length);
+    // The painted towns (sim/painted_towns/) clear their buildings the Highwatch way: two
+    // rows each, the reach and the door apron (their old kit houses had none), so the
+    // count follows the town list rather than a re-pin per town.
+    const painted = PAINTED_TOWNS.flatMap((town) => town.buildings);
+    expect(exclusions).toHaveLength(101 + tavernGroundsRects().length + 2 * painted.length);
     expect(tavernGroundsRects().length).toBe(27);
-    for (const building of HIGHWATCH_LAYOUT.buildings) {
+    for (const building of [...HIGHWATCH_LAYOUT.buildings, ...painted]) {
       expect(exclusions.some((item) => item.id === building.id)).toBe(true);
       expect(exclusions.some((item) => item.id === `${building.id}:serviceApron`)).toBe(true);
     }
