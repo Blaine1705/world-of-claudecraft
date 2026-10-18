@@ -8763,7 +8763,7 @@ export class Hud {
         inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
         entities: sim.entities.values(),
         riftFloor: sim.riftFloor,
-        ...authoredMapMusicInput(),
+        ...authoredMapMusicInput(sim),
       });
     }
 
