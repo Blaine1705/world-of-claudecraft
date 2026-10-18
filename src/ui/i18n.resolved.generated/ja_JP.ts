@@ -23020,6 +23020,21 @@ export const ja_JP: EnTranslations = {
       "reins_emberbristle_broom": {
         "name": "エンバーブリッスルの箒"
       },
+      "hearthroot_toffee": {
+        "name": "炉根のトフィー"
+      },
+      "gourdseed_brittle": {
+        "name": "かぼちゃの種のブリトル"
+      },
+      "crabapple_chew": {
+        "name": "姫りんごのチュウ"
+      },
+      "owlwatch_fudge": {
+        "name": "フクロウ見張りのファッジ"
+      },
+      "lantern_mint_drop": {
+        "name": "ランタンミントドロップ"
+      },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"
       },

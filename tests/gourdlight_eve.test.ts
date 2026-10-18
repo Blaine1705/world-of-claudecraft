@@ -8,6 +8,8 @@ import { isBlocked } from '../src/sim/colliders';
 import { DEEDS } from '../src/sim/content/deeds';
 import {
   CARVED_PUMPKIN_HEAD_ID,
+  GOURDLIGHT_CANDIES,
+  GOURDLIGHT_CANDY_RUNG,
   GOURDLIGHT_COSTUMES,
   GOURDLIGHT_EVE_ID,
   GOURDLIGHT_KEEPER_ENTITY_ID,
@@ -585,5 +587,67 @@ describe('the title writs', () => {
     const ev = seasonalEvents(sim.tick());
     expect(sim.countItem(w.itemId)).toBe(1);
     expect(ev.some((e) => e.what === 'titleKnown')).toBe(true);
+  });
+});
+
+describe("Hester's candy shelf", () => {
+  it('mirrors the cooking ladder entry rung exactly, one candy per primary stat, 2 to 4 sweets', () => {
+    // the entry rung itself, read off the live dish rather than re-typed
+    const rung = ITEMS.eastbrook_glazed_carrots;
+    expect(rung.kind).toBe('food');
+    if (rung.kind !== 'food' || !rung.wellFed) throw new Error('rung moved');
+    expect(GOURDLIGHT_CANDY_RUNG).toEqual({
+      foodHp: rung.foodHp,
+      value: rung.wellFed.value,
+      duration: rung.wellFed.duration,
+    });
+    expect(new Set(GOURDLIGHT_CANDIES.map((c) => c.kind))).toEqual(
+      new Set(['buff_sta', 'buff_str', 'buff_agi', 'buff_int', 'buff_spi']),
+    );
+    for (const c of GOURDLIGHT_CANDIES) {
+      const def = ITEMS[c.itemId];
+      expect(def.kind, c.itemId).toBe('food');
+      if (def.kind !== 'food') continue;
+      expect(def.foodHp).toBe(rung.foodHp);
+      expect(def.wellFed).toEqual({ ...rung.wellFed, kind: c.kind });
+      expect(GOURDLIGHT_SHOP_PRICES[c.itemId]).toBeGreaterThanOrEqual(2);
+      expect(GOURDLIGHT_SHOP_PRICES[c.itemId]).toBeLessThanOrEqual(4);
+      expect(def.priceItem).toEqual({
+        itemId: GOURDLIGHT_SWEET_ID,
+        count: GOURDLIGHT_SHOP_PRICES[c.itemId],
+      });
+      expect(GOURDLIGHT_SHOP_ITEMS).toContain(c.itemId);
+    }
+  });
+
+  it('buys a candy for sweets and eating it to the end leaves Well Fed with its stat', () => {
+    const sim = world();
+    open(sim);
+    const keeper = sim.entities.get(GOURDLIGHT_KEEPER_ENTITY_ID) as Entity;
+    standBeside(sim, keeper);
+    const candy = GOURDLIGHT_CANDIES.find((c) => c.kind === 'buff_str');
+    if (!candy) throw new Error('no strength candy');
+    sim.addItem(GOURDLIGHT_SWEET_ID, candy.price);
+    sim.buyItem(keeper.id, candy.itemId);
+    sim.tick();
+    expect(sim.countItem(candy.itemId)).toBe(1);
+    expect(sim.countItem(GOURDLIGHT_SWEET_ID)).toBe(0);
+    const strBefore = sim.player.stats.str;
+    sim.useItem(candy.itemId);
+    for (let i = 0; i < 22 * 20; i++) sim.tick();
+    const fed = sim.player.auras.filter((a) => a.id === 'well_fed');
+    expect(fed).toHaveLength(1);
+    expect(fed[0].kind).toBe('buff_str');
+    expect(fed[0].value).toBe(GOURDLIGHT_CANDY_RUNG.value);
+    expect(sim.player.stats.str).toBe(strBefore + GOURDLIGHT_CANDY_RUNG.value);
+    // the one well_fed id: a second candy of another stat replaces the first
+    const other = GOURDLIGHT_CANDIES.find((c) => c.kind === 'buff_spi');
+    if (!other) throw new Error('no spirit candy');
+    sim.addItem(other.itemId, 1);
+    sim.useItem(other.itemId);
+    for (let i = 0; i < 22 * 20; i++) sim.tick();
+    const after = sim.player.auras.filter((a) => a.id === 'well_fed');
+    expect(after.map((a) => a.kind)).toEqual(['buff_spi']);
+    expect(sim.player.stats.str).toBe(strBefore);
   });
 });

@@ -1156,13 +1156,20 @@ export type ItemKind =
 // whole AuraKind let a content author write one of those into a food or elixir
 // record and get no compiler complaint at all.
 //
-// The set is exactly the three kinds the live carriers use (the elixir, scroll
-// and flask defs plus the seven buff foods), derived rather than re-typed so it
-// cannot drift from AuraKind's own spelling. Widening it means auditing the
-// singleton strip in the same change, not just adding a row; FlaskAuraKind below
-// carries the same warning over the same three kinds, and
-// tests/wellfed.test.ts pins that the two stay identical.
-export type TimedStatBuffAuraKind = Extract<AuraKind, 'buff_sta' | 'buff_ap' | 'buff_int'>;
+// The set is exactly the kinds the live carriers use (the elixir, scroll and
+// flask defs, the seven buff foods, and Gourdlight Eve's five candies, which
+// add the three remaining primaries: Strength, Agility, Spirit), derived rather
+// than re-typed so it cannot drift from AuraKind's own spelling. Widening it
+// means auditing the singleton strip in the same change, not just adding a row:
+// the candy widening was audited (str, agi and spi are flat buffs that
+// recalcPlayerStats folds straight off the aura, src/sim/entity.ts, so the
+// splice-and-recalc strip is correct for them). FlaskAuraKind below carries
+// the same warning over the same kinds, and tests/wellfed.test.ts pins that the
+// two stay identical.
+export type TimedStatBuffAuraKind = Extract<
+  AuraKind,
+  'buff_sta' | 'buff_ap' | 'buff_int' | 'buff_str' | 'buff_agi' | 'buff_spi'
+>;
 
 // What a successful `useItem` reports back to its caller when the use did more
 // than consume the item. `undefined` is the ordinary answer (a potion, a food,
@@ -1641,15 +1648,20 @@ export interface ScrollItemDef extends BaseItemDef {
 // ceiling (value <= 12, duration <= 900): the ceiling binds the elixir/scroll
 // bands, which is exactly what a flask is meant to beat.
 //
-// The effect kind is NARROWED to the three flat stat axes the shipped rung
-// uses, deliberately, and it is the type that enforces it rather than a
+// The effect kind is NARROWED to the flat stat axes (the three the shipped
+// flask rung uses, plus Strength, Agility and Spirit, which the timed-buff
+// payload carries for Gourdlight Eve's candies; still flat, still recalc-safe),
+// deliberately, and it is the type that enforces it rather than a
 // comment: the one-flask singleton strip (src/sim/items.ts useItem) sheds a
 // worn flask by splicing the aura and recalculating stats, which is correct for
 // a flat stat buff and silently WRONG for a kind whose removal owes more than a
 // stat recalc (a stealth or invisibility aura, a percent-scaled buff). Those
 // omissions are known-inert only because no such flask can exist; widening this
 // union means auditing that strip in the same change, not just adding a row.
-export type FlaskAuraKind = Extract<AuraKind, 'buff_sta' | 'buff_ap' | 'buff_int'>;
+export type FlaskAuraKind = Extract<
+  AuraKind,
+  'buff_sta' | 'buff_ap' | 'buff_int' | 'buff_str' | 'buff_agi' | 'buff_spi'
+>;
 
 export interface FlaskItemDef extends BaseItemDef {
   kind: 'flask';

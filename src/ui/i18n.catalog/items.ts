@@ -3956,6 +3956,12 @@ const ITEM_ENTITY_IDS = [
   'writ_of_the_trickster',
   'writ_of_the_hollow_grin',
   'reins_emberbristle_broom',
+  // Gourdlight Eve's candy shelf (content/gourdlight_eve.ts GOURDLIGHT_CANDIES).
+  'hearthroot_toffee',
+  'gourdseed_brittle',
+  'crabapple_chew',
+  'owlwatch_fudge',
+  'lantern_mint_drop',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3981,6 +3987,12 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   writ_of_the_trickster: 'Writ of the Trickster',
   writ_of_the_hollow_grin: 'Writ of the Hollow Grin',
   reins_emberbristle_broom: 'Emberbristle Broom',
+  // Gourdlight Eve's candy shelf (content/gourdlight_eve.ts).
+  hearthroot_toffee: 'Hearthroot Toffee',
+  gourdseed_brittle: 'Gourdseed Brittle',
+  crabapple_chew: 'Crabapple Chew',
+  owlwatch_fudge: 'Owlwatch Fudge',
+  lantern_mint_drop: 'Lantern Mint Drop',
   // Mirefen world-boss spoils.
   foremans_barrowmaul: "Foreman's Barrowmaul",
   // The quest tool the world boss's level-spread mechanic runs on, not a spoil.

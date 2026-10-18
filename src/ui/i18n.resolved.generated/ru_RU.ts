@@ -23020,6 +23020,21 @@ export const ru_RU: EnTranslations = {
       "reins_emberbristle_broom": {
         "name": "Метла Тлеющей Щетины"
       },
+      "hearthroot_toffee": {
+        "name": "Ирис «Очажный корень»"
+      },
+      "gourdseed_brittle": {
+        "name": "Тыквенный грильяж"
+      },
+      "crabapple_chew": {
+        "name": "Райская жевательная конфета"
+      },
+      "owlwatch_fudge": {
+        "name": "Помадка «Совиный дозор»"
+      },
+      "lantern_mint_drop": {
+        "name": "Фонарный мятный леденец"
+      },
       "membership_token": {
         "name": "Жетон членства (30 дней)"
       },

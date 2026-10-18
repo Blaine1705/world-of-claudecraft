@@ -23020,6 +23020,21 @@ export const zh_CN: EnTranslations = {
       "reins_emberbristle_broom": {
         "name": "余烬鬃毛扫帚"
       },
+      "hearthroot_toffee": {
+        "name": "炉根太妃糖"
+      },
+      "gourdseed_brittle": {
+        "name": "南瓜籽脆糖"
+      },
+      "crabapple_chew": {
+        "name": "海棠果软糖"
+      },
+      "owlwatch_fudge": {
+        "name": "鸮望台软糖"
+      },
+      "lantern_mint_drop": {
+        "name": "灯笼薄荷糖"
+      },
       "membership_token": {
         "name": "会员代币（30天）"
       },

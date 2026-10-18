@@ -23020,6 +23020,21 @@ export const id_ID: EnTranslations = {
       "reins_emberbristle_broom": {
         "name": "Emberbristle Broom"
       },
+      "hearthroot_toffee": {
+        "name": "Hearthroot Toffee"
+      },
+      "gourdseed_brittle": {
+        "name": "Gourdseed Brittle"
+      },
+      "crabapple_chew": {
+        "name": "Crabapple Chew"
+      },
+      "owlwatch_fudge": {
+        "name": "Owlwatch Fudge"
+      },
+      "lantern_mint_drop": {
+        "name": "Lantern Mint Drop"
+      },
       "membership_token": {
         "name": "Membership Token (30 Days)"
       },

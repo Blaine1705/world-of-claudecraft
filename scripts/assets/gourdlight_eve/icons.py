@@ -13,7 +13,8 @@
 # The shop's costume draughts (a round flask, its liquid glowing, a charm at its neck: a
 # skull, a wisp, a bat) and title writs (a sealed parchment roll), and the Emberbristle
 # Broom's reins (the shipped broom itself, appended from broom.py's review .blend,
-# `--broom-blend <file>`), are built here too.
+# `--broom-blend <file>`), are built here too. Hester's five candies come from the
+# sibling candies.py.
 # `--only <id,id>` renders just those subjects.
 # Writes <dir>/<item-id>.png at 512x512 (the master); scripts/convert_item_icons_webp.mjs
 # encodes the 128px shipping WebP.
@@ -589,6 +590,11 @@ def main():
         "writ_of_the_trickster": build_writ(col, "trickster", (0.2, 0.55, 0.12), (0.18, 0.5, 0.12), (0.3, 0.9, 0.2)),
         "writ_of_the_hollow_grin": build_writ(col, "hollow", (0.06, 0.05, 0.07), (0.32, 0.05, 0.08), (0.6, 0.1, 0.1)),
     }
+    # Hester's candy shelf (phase 5): one sweet per primary stat (candies.py)
+    import candies
+
+    for item_id, build in candies.BUILDERS.items():
+        subjects[item_id] = build(col, principled, obj_from_bm, tube)
     broom_blend = argv[argv.index("--broom-blend") + 1] if "--broom-blend" in argv else os.path.join(
         HERE, "..", "..", "..", "tmp", "asset_src", "gourdlight_eve", "broom.blend")
     if os.path.exists(broom_blend):

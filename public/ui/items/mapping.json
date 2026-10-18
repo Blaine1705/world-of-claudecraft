@@ -8021,6 +8021,22 @@
         "writ_of_the_trickster"
       ],
       "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-candy-icons-2026-10-18",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py with candies.py): Hester's five candies (a toffee stack on red paper, a seed brittle slab, a caramel crabapple on a twig, an owl-faced fudge square and a glowing mint drop), modelled for their icons only. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/candies.py",
+      "itemIds": [
+        "crabapple_chew",
+        "gourdseed_brittle",
+        "hearthroot_toffee",
+        "lantern_mint_drop",
+        "owlwatch_fudge"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
     }
   ]
 }

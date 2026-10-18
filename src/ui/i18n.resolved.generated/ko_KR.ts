@@ -23020,6 +23020,21 @@ export const ko_KR: EnTranslations = {
       "reins_emberbristle_broom": {
         "name": "잉걸갈기 빗자루"
       },
+      "hearthroot_toffee": {
+        "name": "화로뿌리 토피"
+      },
+      "gourdseed_brittle": {
+        "name": "호박씨 브리틀"
+      },
+      "crabapple_chew": {
+        "name": "꽃사과 캐러멜"
+      },
+      "owlwatch_fudge": {
+        "name": "올빼미망루 퍼지"
+      },
+      "lantern_mint_drop": {
+        "name": "랜턴 박하사탕"
+      },
       "membership_token": {
         "name": "멤버십 토큰 (30일)"
       },

@@ -23020,6 +23020,21 @@ export const en_XA: EnTranslations = {
       "reins_emberbristle_broom": {
         "name": "[Éɱƀéŕƀŕíšţļé Ɓŕóóɱ]"
       },
+      "hearthroot_toffee": {
+        "name": "[Ĥéáŕţĥŕóóţ Ţóƒƒéé]"
+      },
+      "gourdseed_brittle": {
+        "name": "[Ĝóúŕðšééð Ɓŕíţţļé]"
+      },
+      "crabapple_chew": {
+        "name": "[Çŕáƀáþþļé Çĥéŵ]"
+      },
+      "owlwatch_fudge": {
+        "name": "[Óŵļŵáţçĥ Ƒúðĝé]"
+      },
+      "lantern_mint_drop": {
+        "name": "[Ļáñţéŕñ Ɱíñţ Ðŕóþ]"
+      },
       "membership_token": {
         "name": "[Ɱéɱƀéŕšĥíþ Ţóķéñ (30 Ðáýš)]"
       },

@@ -3,8 +3,11 @@
 // the event offers: its keeper, the townsfolk who answer a trick-or-treat, the
 // treats and tricks, the small shop, and the daily rounds quest.
 //
-// Everything here is cosmetic. The currency buys looks and toys, never power: no
-// stat, no consumable that heals or buffs, nothing a fight can read.
+// Almost everything here is cosmetic: looks, toys and titles. The one exception is
+// the candy shelf (GOURDLIGHT_CANDIES): five sweets that are ordinary Well Fed
+// food, a 1:1 mirror of the cooking ladder's ENTRY rung (Eastbrook Glazed Carrots:
+// 90 health over the 18s sit, +2 of one stat for ten minutes, under the one shared
+// well_fed aura id), so they never outrank anything a cook can make.
 //
 // WHEN the event runs is not data here and never a clock in the sim: the
 // authoritative server owns the window (server/seasonal_calendar.ts) and feeds the
@@ -78,6 +81,22 @@ export const GOURDLIGHT_TITLE_WRITS = Object.freeze([
   },
 ] as const);
 export type GourdlightTitleWrit = (typeof GOURDLIGHT_TITLE_WRITS)[number];
+
+/** Hester's candy shelf: five sweets, each ordinary Well Fed food (kind 'food', the
+ *  18s sit-restore, the buff minted when the meal completes, the one shared
+ *  'well_fed' id so the newest meal replaces the last). Every number is the cooking
+ *  ladder's entry rung verbatim (content/profession_items.ts eastbrook_glazed_carrots:
+ *  foodHp 90, +2, 600s), one candy per primary stat, so none outranks a crafted
+ *  dish; the price is a sweet or two above the Jar of Mischief. */
+export const GOURDLIGHT_CANDY_RUNG = Object.freeze({ foodHp: 90, value: 2, duration: 600 });
+export const GOURDLIGHT_CANDIES = Object.freeze([
+  { itemId: 'hearthroot_toffee', itemName: 'Hearthroot Toffee', kind: 'buff_sta', price: 3 },
+  { itemId: 'gourdseed_brittle', itemName: 'Gourdseed Brittle', kind: 'buff_str', price: 3 },
+  { itemId: 'crabapple_chew', itemName: 'Crabapple Chew', kind: 'buff_agi', price: 3 },
+  { itemId: 'owlwatch_fudge', itemName: 'Owlwatch Fudge', kind: 'buff_int', price: 3 },
+  { itemId: 'lantern_mint_drop', itemName: 'Lantern Mint Drop', kind: 'buff_spi', price: 3 },
+] as const);
+export type GourdlightCandy = (typeof GOURDLIGHT_CANDIES)[number];
 
 /** The worn head cosmetic's aura id (and the render key it draws by). */
 export const PUMPKIN_HEAD_AURA_ID = 'gourdlight_pumpkin_head';
@@ -213,12 +232,14 @@ export const GOURDLIGHT_SHOP_PRICES: Readonly<Record<string, number>> = Object.f
   writ_of_the_gourdlit: 60,
   writ_of_the_trickster: 80,
   writ_of_the_hollow_grin: 100,
+  ...Object.fromEntries(GOURDLIGHT_CANDIES.map((c) => [c.itemId, c.price])),
 });
 
 /** What the keeper sells, in shelf order. */
 export const GOURDLIGHT_SHOP_ITEMS: readonly string[] = Object.freeze([
   CARVED_PUMPKIN_HEAD_ID,
   JAR_OF_MISCHIEF_ID,
+  ...GOURDLIGHT_CANDIES.map((c) => c.itemId),
   ...GOURDLIGHT_COSTUMES.map((c) => c.itemId),
   ...GOURDLIGHT_TITLE_WRITS.map((w) => w.itemId),
 ]);
@@ -306,6 +327,30 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
         kind: 'tool',
         quality: 'uncommon',
         use: { type: 'seasonal', action: 'costume' },
+        priceItem: { itemId: GOURDLIGHT_SWEET_ID, count: GOURDLIGHT_SHOP_PRICES[c.itemId] },
+        stackSize: 20,
+        sellValue: 0,
+        soulbound: true,
+        noVendorSell: true,
+        noSalvage: true,
+      },
+    ]),
+  ),
+  ...Object.fromEntries(
+    GOURDLIGHT_CANDIES.map((c): [string, ItemDef] => [
+      c.itemId,
+      {
+        id: c.itemId,
+        name: c.itemName,
+        kind: 'food',
+        quality: 'common',
+        foodHp: GOURDLIGHT_CANDY_RUNG.foodHp,
+        wellFed: {
+          aura: 'Well Fed',
+          kind: c.kind,
+          value: GOURDLIGHT_CANDY_RUNG.value,
+          duration: GOURDLIGHT_CANDY_RUNG.duration,
+        },
         priceItem: { itemId: GOURDLIGHT_SWEET_ID, count: GOURDLIGHT_SHOP_PRICES[c.itemId] },
         stackSize: 20,
         sellValue: 0,
