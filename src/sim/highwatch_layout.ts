@@ -17,6 +17,7 @@ import {
   localToWorld,
   makePlacedTownBuilding,
   makeTownNpc,
+  padsAlong,
   placedTownSeat,
   scalePlacedTownMeasurements,
 } from './placed_town_kit';
@@ -254,43 +255,16 @@ const STORMCRAG_ROAD = [
   { x: 110, z: 760 },
 ] as const;
 
-/**
- * Level pads under the buildings (terrain edits, applied after the built-in
- * world's other stamps): each building stands on level ground across its
- * whole reach, and the taper beyond carries the grade change into the
- * streets. The shelf is a disc of level ground at y 9; the inn and the
- * counting house stand at its height, cut into the rising ground behind them,
- * the chapel and the watch house a little lower where the road falls toward
- * the gate, the smithy on its terrace above. Each building gets a row of
- * stamps along its long axis rather than one circle, so the level ground
- * hugs its walls instead of spilling across the square.
- */
-function padsAlong(
-  building: (typeof BUILDINGS)[number],
-  height: number,
-  columns: number,
-  rows: number,
-  taper: number,
-) {
-  const reach = building.reach;
-  const cellWidth = (reach.halfWidth * 2) / columns;
-  const cellDepth = (reach.halfDepth * 2) / rows;
-  const core = Math.hypot(cellWidth / 2, cellDepth / 2);
-  const radius = core + taper;
-  const pads: { x: number; z: number; radius: number; delta: number; hardness: number }[] = [];
-  for (let column = 0; column < columns; column++) {
-    for (let row = 0; row < rows; row++) {
-      const center = localToWorld(
-        reach.center,
-        reach.rotation,
-        -reach.halfWidth + cellWidth * (column + 0.5),
-        -reach.halfDepth + cellDepth * (row + 0.5),
-      );
-      pads.push({ x: center.x, z: center.z, radius, delta: height, hardness: core / radius });
-    }
-  }
-  return pads;
-}
+// Level pads under the buildings (terrain edits, applied after the built-in
+// world's other stamps): each building stands on level ground across its
+// whole reach, and the taper beyond carries the grade change into the
+// streets. The shelf is a disc of level ground at y 9; the inn and the
+// counting house stand at its height, cut into the rising ground behind them,
+// the chapel and the watch house a little lower where the road falls toward
+// the gate, the smithy on its terrace above. Each building gets a row of
+// stamps along its long axis rather than one circle (placed_town_kit.ts
+// padsAlong), so the level ground hugs its walls instead of spilling across
+// the square.
 
 // The Stormcrag road climbs out of the square's north-west corner between the
 // inn (level with the square) and the smithy's terrace: three tilted stamps
