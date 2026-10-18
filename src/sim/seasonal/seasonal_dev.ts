@@ -12,7 +12,9 @@
 //   /dev season daily [pick]    the rotating daily: show today's, or pick one by its
 //                               number (1-6) or id, `next` to step on, `auto` to follow
 //                               the reset day again, `reset` to clear today's turn-ins
-//                               (the rounds and the dailies) so they can be redone
+//                               (the rounds and the dailies) so they can be redone.
+//                               The pick is world state: on a server it changes the
+//                               day's errand for every player on the realm.
 import { GOURDLIGHT_EVE_ID, GOURDLIGHT_ROUNDS_QUEST_ID } from '../content/gourdlight_eve';
 import { GOURDLIGHT_DAILY_POOL } from '../content/gourdlight_eve_dailies';
 import { weeklyQuestLockoutId } from '../quests/weekly_quest_lock';

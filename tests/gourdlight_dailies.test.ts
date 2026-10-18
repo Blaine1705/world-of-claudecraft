@@ -4,12 +4,14 @@
 // the rounds' pouch; their world pieces stand only during the event, resolved against
 // the live world and seen only by a player on the errand.
 import { afterEach, describe, expect, it } from 'vitest';
+import { decodeTrickOrTreatWire } from '../src/net/seasonal_wire_state';
 import { isBlocked } from '../src/sim/colliders';
 import {
   GOURDLIGHT_KEEPER_ENTITY_ID,
   GOURDLIGHT_KEEPER_NPC,
   GOURDLIGHT_ROUNDS_QUEST_ID,
   GOURDLIGHT_TREAT_POUCH_ID,
+  TRICK_OR_TREAT_NPC_IDS,
   TRICK_OR_TREAT_NPCS,
 } from '../src/sim/content/gourdlight_eve';
 import {
@@ -30,8 +32,16 @@ import {
 import { GOURDLIGHT_CROW_ID } from '../src/sim/content/gourdlight_eve_scarecrow';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { isQuestGatedEntityHidden } from '../src/sim/quest_gated_entity';
-import { resolveScarecrowField } from '../src/sim/seasonal';
-import { gourdlightDailyForDay } from '../src/sim/seasonal/gourdlight_dailies';
+import * as seasonalMod from '../src/sim/seasonal';
+import {
+  freshSeasonalPlayerState,
+  knockedToday,
+  knockedTodayView,
+  resolveScarecrowField,
+  restoreSeasonalState,
+  seasonalSaveFragment,
+} from '../src/sim/seasonal';
+import { booLedgerKey, gourdlightDailyForDay } from '../src/sim/seasonal/gourdlight_dailies';
 import { DAILY_SITE_ROAD_CLEARANCE, gourdlightDailySites } from '../src/sim/seasonal_daily_sites';
 import { syncSeasonalDecorColliders } from '../src/sim/seasonal_decor_colliders';
 import { chapelAt } from '../src/sim/seasonal_decor_exclusions';
@@ -349,5 +359,62 @@ describe('Baskets for the Neighbours', () => {
       sim.tick();
     }
     expect(sim.questState(GOURDLIGHT_DAILY_BASKETS_QUEST_ID)).toBe('ready');
+  });
+});
+
+describe('the fright and the town credit keep the replay contract', () => {
+  // biome-ignore lint/suspicious/noExplicitAny: the rng's raw state, for the draw-count pin
+  const rngState = (sim: Sim) => (sim as any).rng.s as number;
+
+  it('a BOO draws no rng, landed or refused', () => {
+    const sim = world();
+    open(sim);
+    take(sim, GOURDLIGHT_DAILY_BOO_QUEST_ID);
+    sim.addItem('haunting_draught', 1);
+    sim.useItem('haunting_draught');
+    sim.tick();
+    const npc = npcEntity(sim, TRICK_OR_TREAT_NPCS.eastbrook_vale[0]);
+    standBeside(sim, npc);
+    for (let i = 0; i < 2; i++) {
+      const before = rngState(sim);
+      seasonalMod.knockOrBoo(sim.ctx, npc.id, true);
+      expect(rngState(sim)).toBe(before);
+    }
+  });
+
+  it('a knock draws exactly what it drew before round 8 (the town credit draws nothing)', () => {
+    const run = (withErrand: boolean) => {
+      const sim = world();
+      open(sim);
+      if (withErrand) take(sim, GOURDLIGHT_DAILY_TOWNS_QUEST_ID);
+      const npc = npcEntity(sim, TRICK_OR_TREAT_NPCS.eastbrook_vale[1]);
+      standBeside(sim, npc);
+      const before = rngState(sim);
+      seasonalMod.knockOrBoo(sim.ctx, npc.id, false);
+      return { before, after: rngState(sim) };
+    };
+    const plain = run(false);
+    const credited = run(true);
+    // same advance from the same start, credit or not
+    expect(credited.after - credited.before).toBe(plain.after - plain.before);
+  });
+
+  it('a fright survives save and load, and the knock wire carries it', () => {
+    const meta = freshSeasonalPlayerState();
+    knockedToday(meta, DAY).add(booLedgerKey('trader_wilkes'));
+    knockedToday(meta, DAY).add('smith_haldren');
+    const saved = seasonalSaveFragment(meta).seasonal;
+    const back = freshSeasonalPlayerState();
+    restoreSeasonalState(back, JSON.parse(JSON.stringify(saved)));
+    expect(knockedTodayView(back, DAY)).toEqual(['boo_trader_wilkes', 'smith_haldren']);
+    expect(decodeTrickOrTreatWire(knockedTodayView(back, DAY))).toEqual([
+      'boo_trader_wilkes',
+      'smith_haldren',
+    ]);
+  });
+
+  it('a whole day of knocks and frights fits the ledger cap', () => {
+    // every townsperson knocked AND frightened, under the saved ledger's bound (64)
+    expect(TRICK_OR_TREAT_NPC_IDS.size * 2).toBeLessThanOrEqual(64);
   });
 });

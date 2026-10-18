@@ -423,8 +423,7 @@ export interface RoadLanternJob {
   readonly result: readonly SeasonalRoadLantern[] | null;
 }
 
-function memoFor(): Map<number, readonly SeasonalRoadLantern[]> {
-  const content = getActiveWorldContent();
+function memoFor(content = getActiveWorldContent()): Map<number, readonly SeasonalRoadLantern[]> {
   let bySeed = memo.get(content);
   if (!bySeed) {
     bySeed = new Map();
@@ -434,7 +433,9 @@ function memoFor(): Map<number, readonly SeasonalRoadLantern[]> {
 }
 
 export function roadLanternJob(seed: number): RoadLanternJob {
-  const bySeed = memoFor();
+  // the world the job was opened for: its roads and its memo stay one answer
+  const content = getActiveWorldContent();
+  const bySeed = memoFor(content);
   let result: readonly SeasonalRoadLantern[] | null = bySeed.get(seed) ?? null;
   let graph: RoadGraph | null = null;
   let props: Point[] = [];
@@ -449,7 +450,7 @@ export function roadLanternJob(seed: number): RoadLanternJob {
     step(): boolean {
       if (result) return true;
       if (!graph) {
-        graph = buildRoadGraph(getActiveWorldContent().roads);
+        graph = buildRoadGraph(content.roads);
         props = propSpots(seed);
         return false;
       }
