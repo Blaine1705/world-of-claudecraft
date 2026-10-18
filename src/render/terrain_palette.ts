@@ -16,11 +16,11 @@ export const BIOME_PALETTE: Record<
   { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }
 > = {
   vale: {
-    grass: 0x5d943f,
-    grassDark: 0x3b6833,
-    grassYellow: 0x86a248,
-    dirt: 0x8e7149,
-    sand: 0xd0be90,
+    grass: 0x72b444,
+    grassDark: 0x468844,
+    grassYellow: 0xadd058,
+    dirt: 0xb49668,
+    sand: 0xe4d4a8,
   },
   marsh: {
     grass: 0x5aa04a,
@@ -178,8 +178,8 @@ export const ROCK_SLOPE_START: Record<BiomeId, number> = {
 // Fixed ground tones shared by the near splat tint pass and the far-vista
 // color recipe (hex mirrors of terrain_chunk_build.ts's scratch colors).
 export const TERRAIN_TONES = {
-  dirtDark: 0x96784c,
-  rock: 0x969892,
+  dirtDark: 0xa88a5e,
+  rock: 0x9ea4a8,
   wetRock: 0x686e6c, // wet-rock shoreline (peaks/volcano/cave)
   hazyPeak: 0x94c2ec, // world-rim mountains, atmospheric
   emberForest: 0x76a250, // the Drakelands' green gatewood

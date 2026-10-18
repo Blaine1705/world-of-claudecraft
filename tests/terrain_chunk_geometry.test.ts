@@ -414,7 +414,7 @@ describe('generated chunk geometry is stable', () => {
     // same town plus the Genshin Impact terrain palette, meadow splat, beach
     // sand strand, road verge, non-directional cliff stone mottling, and Low-tier
     // baked canopy and building contact shadows.
-    expect(digestOf(inRect)).toBe('f3a0a514adf8f0a5168559873a82c83a');
+    expect(digestOf(inRect)).toBe('ae70fd63f5dd1113739c93f883d2f05b');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

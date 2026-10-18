@@ -94,7 +94,7 @@ export const BIOME_LIGHT: Record<
     envScale?: number;
   }
 > = {
-  vale: { hemiSky: 0xd8f2ff, hemiGround: 0x5c8e4e, sun: 0xfff5dc },
+  vale: { hemiSky: 0xd8f2ff, hemiGround: 0x689656, sun: 0xfff5dc },
   marsh: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
   peaks: { hemiSky: 0xd8f2ff, hemiGround: 0x5c8e4e, sun: 0xfff5dc },
   dusk: { hemiSky: 0xffc9dd, hemiGround: 0x4d3f63, sun: 0xffb072 },
