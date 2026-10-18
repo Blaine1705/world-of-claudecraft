@@ -92,12 +92,16 @@ const EYE_EMBER = 0xff5a10;
 const STRAW = 0xd8b25a;
 const FEATHERS = [0x15141a, 0x24222b, 0x0a0a0d] as const;
 /** One sigil per puppet plus one growing under each chosen victim of a cast. */
-const SIGIL_CAP = PUPPET_CAP + CAST_MARK_CAP;
+export const THATCHBOUND_SIGIL_CAP = PUPPET_CAP + CAST_MARK_CAP;
+const SIGIL_CAP = THATCHBOUND_SIGIL_CAP;
 const SHOCK_CAP = PUPPET_CAP;
 const SIGIL_RADIUS = 1.9;
-/** The cast's sigil runs a little dimmer than a held puppet's, and spins faster. */
-const CAST_SIGIL_GLOW = 0.8;
-const CAST_SIGIL_SPIN = 2.4;
+
+/** A body's sigil phase: the cast's growing sigil and the held puppet's share it, so the
+ *  one hands off to the other without a jump in spin or glow. */
+function sigilPhase(id: number): number {
+  return (id % 97) * 0.37;
+}
 const TWIN_SEC = 3;
 
 const HIDDEN = new THREE.Matrix4().makeScale(0, 0, 0);
@@ -338,7 +342,7 @@ export class ThatchboundFx {
       this.ensureRoot();
       slot = {
         born: this.time,
-        phase: (id % 97) * 0.37,
+        phase: sigilPhase(id),
         auraId,
         swirlClock: 0,
         swirlCount: 0,
@@ -447,18 +451,15 @@ export class ThatchboundFx {
       if (!victim || victim.dead) continue;
       const grow = castGrow(this.time - c.start, c.duration);
       if (grow <= 0.01) continue;
-      const flick = 0.85 + 0.15 * Math.sin(this.time * 14 + c.victimId);
-      scratchQuat.setFromAxisAngle(UP, this.time * CAST_SIGIL_SPIN + c.victimId);
+      const s = sigilState(this.time, sigilPhase(c.victimId));
+      scratchQuat.setFromAxisAngle(UP, s.spin);
       scratchMat.compose(
         scratchPos.set(victim.pos.x, victim.pos.y + 0.06, victim.pos.z),
         scratchQuat,
         scratchScale.setScalar(SIGIL_RADIUS * grow),
       );
       sigils.setMatrixAt(sigil, scratchMat);
-      sigils.setColorAt(
-        sigil,
-        scratchColor.copy(SIGIL_EMBER).multiplyScalar(CAST_SIGIL_GLOW * flick * grow),
-      );
+      sigils.setColorAt(sigil, scratchColor.copy(SIGIL_EMBER).multiplyScalar(s.glow * grow));
       sigil++;
     }
     for (let i = sigil; i < SIGIL_CAP; i++) sigils.setMatrixAt(i, HIDDEN);
