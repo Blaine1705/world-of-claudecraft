@@ -9,7 +9,7 @@
 import { AUTHORED_TOWN_BUILDINGS } from './authored_town_registry';
 
 /** How far past a chapel's reach box the dressing keeps away (yards). */
-export const CHAPEL_DECOR_CLEARANCE = 5;
+export const CHAPEL_DECOR_CLEARANCE = 8;
 
 interface ChapelBox {
   id: string;

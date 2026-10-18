@@ -42,7 +42,7 @@ export const GOURDLIGHT_DECOR_CITIES: readonly SeasonalCityDecorRule[] = Object.
     zoneId: 'mirefen_marsh',
     radius: 62,
     square: { count: 6, ring: 5 },
-    street: { max: 15, spacing: 9 },
+    street: { max: 18, spacing: 8 },
   },
   {
     zoneId: 'thornpeak_heights',
