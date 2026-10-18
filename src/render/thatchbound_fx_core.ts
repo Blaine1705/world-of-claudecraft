@@ -148,7 +148,7 @@ export function stringGlow(age: number, time: number, phase: number): number {
 
 /** The eyes' size pulse (world yards). */
 export function eyeSize(time: number, phase: number): number {
-  return 0.38 + 0.08 * Math.sin(time * 5 + phase);
+  return 0.2 + 0.05 * Math.sin(time * 5 + phase);
 }
 
 /** The ground sigil's spin (radians) and its glow. */
@@ -166,7 +166,7 @@ export function castReach(elapsed: number, duration: number): number {
 export const SHOCK_SEC = 0.9;
 export function shockwave(age: number): { radius: number; glow: number } {
   const t = Math.max(0, Math.min(1, age / SHOCK_SEC));
-  return { radius: 0.6 + 6.4 * (1 - (1 - t) ** 3), glow: (1 - t) ** 1.6 };
+  return { radius: 0.6 + 3.6 * (1 - (1 - t) ** 3), glow: (1 - t) ** 1.6 };
 }
 
 /** Straw and feathers the swirl throws per second, by motion preference. */

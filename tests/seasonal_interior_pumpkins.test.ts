@@ -51,13 +51,21 @@ describe('the indoor pumpkins', () => {
     expect(new Set(list.map((p) => p.buildingId)).size).toBe(list.length);
   });
 
-  it('sit inside a walk-in house, walled on all four sides, off the door line', () => {
+  it('sit inside a walk-in house body (never an annex), walled on all four sides', () => {
     for (const p of list) {
       const house = AUTHORED_TOWNS.flatMap((t) => t.buildings).find((b) => b.id === p.buildingId);
       expect(house?.walkIn, p.anchor).toBe(true);
       if (!house) continue;
-      expect(inBox(house.reach, p.x, p.z), p.anchor).toBe(true);
-      expect(enclosedAt(WORLD_SEED, p.x, p.z, house.reach.rotation), p.anchor).toBe(true);
+      const walls = {
+        center: house.position,
+        halfWidth: house.nativeDimensions.width / 2,
+        halfDepth: house.nativeDimensions.depth / 2,
+        rotation: house.rotation,
+      };
+      expect(inBox(walls, p.x, p.z), p.anchor).toBe(true);
+      for (const annex of house.annexes)
+        expect(inBox(annex, p.x, p.z), `${p.anchor} in ${annex.id}`).toBe(false);
+      expect(enclosedAt(WORLD_SEED, p.x, p.z, house.rotation), p.anchor).toBe(true);
     }
   });
 

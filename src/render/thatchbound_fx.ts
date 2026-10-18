@@ -4,9 +4,9 @@
 //  - THE CAST: glowing strings reach out of his raised hand toward each marked victim over
 //    the cast bar (the mark under the victim is the shared encounter rune circle);
 //  - THE CURSE LANDING: a burst of crow feathers and straw off the victim and a dark-ember
-//    shockwave rolling out over the ground round them;
+//    shockwave (the curse's violet, never his fire's orange) rolling out round them;
 //  - THE PUPPET, for as long as it is held: marionette strings from a swaying control bar
-//    high above down to its head, hands and back, two burning eyes, a spinning ember sigil
+//    high above down to its head, hands and back, two burning eyes, a spinning violet sigil
 //    under its feet, and a swirl of straw and feathers climbing its body;
 //  - FREED: the strings snap in a spray of straw.
 // The strings, eyes and sigil are the read of WHO is controlled (allies act on it), so
@@ -87,11 +87,13 @@ interface Shock {
   born: number;
 }
 
-const STRING_EMBER = new THREE.Color(0xffa040);
-const SHEATH_EMBER = new THREE.Color(0x6a2a08);
-const BAR_EMBER = new THREE.Color(0xd0601a);
-const SIGIL_EMBER = new THREE.Color(0xff5a1a);
-const SHOCK_EMBER = new THREE.Color(0xff7a2a);
+const STRING_EMBER = new THREE.Color(0xffb060);
+const SHEATH_EMBER = new THREE.Color(0x3a1406);
+const BAR_EMBER = new THREE.Color(0x8a3a10);
+// the curse's colour: a sickly violet, never the orange of his burning ground (a sigil under
+// a friend must not read as fire to step out of)
+const SIGIL_EMBER = new THREE.Color(0xa050ff);
+const SHOCK_EMBER = new THREE.Color(0x8a40e0);
 const EYE_EMBER = 0xff5a10;
 const STRAW = 0xd8b25a;
 const FEATHERS = [0x15141a, 0x24222b, 0x0a0a0d] as const;
@@ -99,9 +101,9 @@ const SEGMENTS_PER_PUPPET = STRINGS_PER_PUPPET + BARS_PER_PUPPET;
 /** Core plus sheath per segment, for every puppet and every cast string. */
 const SEGMENT_CAP = (PUPPET_CAP * SEGMENTS_PER_PUPPET + CAST_STRING_CAP) * 2;
 const SHOCK_CAP = PUPPET_CAP;
-const STRING_WIDTH = 0.035;
-const SHEATH_WIDTH = 0.16;
-const BAR_WIDTH = 0.09;
+const STRING_WIDTH = 0.018;
+const SHEATH_WIDTH = 0.07;
+const BAR_WIDTH = 0.05;
 const SIGIL_RADIUS = 1.9;
 const TWIN_SEC = 3;
 

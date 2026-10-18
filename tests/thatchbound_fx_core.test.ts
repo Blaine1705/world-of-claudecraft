@@ -50,7 +50,7 @@ describe('thatchbound fx core', () => {
     expect(a.z).toBeGreaterThan(0);
     expect(b.z).toBeGreaterThan(0);
     expect(Math.abs(a.x - b.x)).toBeGreaterThan(0.1);
-    expect(eyeSize(1, 0)).toBeGreaterThan(0.2);
+    expect(eyeSize(1, 0)).toBeGreaterThan(0.1);
   });
 
   it('never fades the read while held; only the swirl thins under reduced motion', () => {

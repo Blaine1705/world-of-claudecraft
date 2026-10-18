@@ -36,15 +36,20 @@ function joinDevFighters(ctx: SimContext, boss: Entity, pid: number): void {
   if (!caller) return;
   const names = ['Strawfriend Ada', 'Strawfriend Bo'];
   names.forEach((name, i) => {
-    const botId = ctx.spawnDevBot(name);
+    // a bot from an earlier call keeps its name: reuse it
+    let botId = ctx.spawnDevBot(name);
+    if (botId < 0) {
+      for (const meta of ctx.players.values()) if (meta.name === name) botId = meta.entityId;
+    }
     const bot = botId >= 0 ? ctx.entities.get(botId) : undefined;
     if (!bot) return;
     const side = i === 0 ? 1 : -1;
-    bot.pos = ctx.groundPos(caller.pos.x + side * 4, caller.pos.z + 2);
+    bot.pos = ctx.groundPos(caller.pos.x + side * 7, caller.pos.z + 3);
     bot.prevPos = { ...bot.pos };
     bot.level = 20;
     bot.maxHp = 20_000;
     bot.hp = 20_000;
+    bot.dead = false;
     ctx.dealDamage(bot, boss, 1, false, 'physical', null, 'hit', true);
   });
 }

@@ -6,8 +6,9 @@
 // Like the street dressing, nothing here is a coordinate: every piece is found inside a
 // walk-in building record (sim/authored_town_registry.ts) against the live colliders, so a
 // house that moves or is refurnished re-seats its pumpkins on its own. Per house, a spot is:
-//   - INDOORS: walls on all four sides of it within reach (a probe outward along the
-//     building's own axes meets a wall each way), never in line with the door;
+//   - INDOORS: inside the house's walled body (never its eaves or an open annex such as
+//     a smithy's forge shelter), with walls on all four sides of it within reach (a probe
+//     outward along the building's own axes meets a wall each way), off the door line;
 //   - ON A SURFACE: a table, counter or shelf top (a standable furniture top a hand to a
 //     chest high over the floor, wide enough for the whole pumpkin), or else the floor
 //     snug against a wall or a piece of furniture, never out in the walkway;
@@ -38,8 +39,8 @@ const NPC_CLEARANCE = 1.4;
 const GRID_STEP = 0.4;
 const INSET = 0.6;
 /** The drawn sizes: a lit pumpkin on a table, a bigger one on the floor. */
-const TABLE_SCALE = 0.62;
-const FLOOR_SCALE = 0.8;
+const TABLE_SCALE = 0.78;
+const FLOOR_SCALE = 1.05;
 
 export interface InteriorPumpkin extends SeasonalGroundPiece {
   /** What it stands on. */
@@ -146,15 +147,18 @@ function houseSpot(
   house: (typeof AUTHORED_TOWNS)[number]['buildings'][number],
   npcSpots: readonly { x: number; z: number }[],
 ): InteriorPumpkin | null {
-  const reach = house.reach;
-  const rot = reach.rotation;
+  // the walled body (the record's footprint: its position and its walls' own size),
+  // never the model's whole reach, which takes in the eaves and any open annex
+  const rot = house.rotation;
   const door = house.frontStandingPoint;
-  const centre = reach.center;
+  const centre = house.position;
+  const halfW = house.nativeDimensions.width / 2;
+  const halfD = house.nativeDimensions.depth / 2;
   // The house's grid cells in a fixed hashed order; each test runs lazily down it, so a
   // furnished house stops at its first good table (the probes are the cost).
   const cells: { x: number; z: number; order: number }[] = [];
-  const hw = reach.halfWidth - INSET;
-  const hd = reach.halfDepth - INSET;
+  const hw = halfW - INSET;
+  const hd = halfD - INSET;
   for (let lx = -hw; lx <= hw; lx += GRID_STEP) {
     for (let lz = -hd; lz <= hd; lz += GRID_STEP) {
       const { x, z } = toWorld(centre.x, centre.z, rot, lx, lz);
