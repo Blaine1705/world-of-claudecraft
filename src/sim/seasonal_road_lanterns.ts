@@ -414,6 +414,57 @@ function routeLanterns(
   return out;
 }
 
+/** The resolve as a stepper: the road graph on the first step, then one route a step, so
+ *  the decor view can spread it over frames (the indoor pumpkins' rule: never one long
+ *  stall on the frame the event opens). A world already resolved finishes on step one. */
+export interface RoadLanternJob {
+  /** Do one slice; true once the posts are resolved (then `result` is set). */
+  step(): boolean;
+  readonly result: readonly SeasonalRoadLantern[] | null;
+}
+
+function memoFor(): Map<number, readonly SeasonalRoadLantern[]> {
+  const content = getActiveWorldContent();
+  let bySeed = memo.get(content);
+  if (!bySeed) {
+    bySeed = new Map();
+    memo.set(content, bySeed);
+  }
+  return bySeed;
+}
+
+export function roadLanternJob(seed: number): RoadLanternJob {
+  const bySeed = memoFor();
+  let result: readonly SeasonalRoadLantern[] | null = bySeed.get(seed) ?? null;
+  let graph: RoadGraph | null = null;
+  let props: Point[] = [];
+  const placed: Point[] = [];
+  const out: SeasonalRoadLantern[] = [];
+  let next = 0;
+  const routes = GOURDLIGHT_ROAD_LANTERNS.routes;
+  return {
+    get result() {
+      return result;
+    },
+    step(): boolean {
+      if (result) return true;
+      if (!graph) {
+        graph = buildRoadGraph(getActiveWorldContent().roads);
+        props = propSpots(seed);
+        return false;
+      }
+      if (next < routes.length) {
+        out.push(...routeLanterns(seed, graph, routes[next], placed, props));
+        next++;
+        if (next < routes.length) return false;
+      }
+      result = out;
+      bySeed.set(seed, out);
+      return true;
+    },
+  };
+}
+
 /** Resolve every road lantern for the active world at `seed` (route order). */
 export function resolveSeasonalRoadLanterns(seed: number): SeasonalRoadLantern[] {
   const graph = buildRoadGraph(getActiveWorldContent().roads);
@@ -430,12 +481,7 @@ const memo = new WeakMap<object, Map<number, readonly SeasonalRoadLantern[]>>();
 
 /** The memoized road lanterns per active world and seed. */
 export function seasonalRoadLanterns(seed: number): readonly SeasonalRoadLantern[] {
-  const content = getActiveWorldContent();
-  let bySeed = memo.get(content);
-  if (!bySeed) {
-    bySeed = new Map();
-    memo.set(content, bySeed);
-  }
+  const bySeed = memoFor();
   let list = bySeed.get(seed);
   if (!list) {
     list = resolveSeasonalRoadLanterns(seed);

@@ -41,7 +41,7 @@ import {
   interiorPumpkinJob,
   interiorPumpkins,
 } from '../sim/seasonal_interior_pumpkins';
-import { seasonalRoadLanterns } from '../sim/seasonal_road_lanterns';
+import { type RoadLanternJob, roadLanternJob } from '../sim/seasonal_road_lanterns';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX } from './gfx';
 import type { BudgetPointLightRegistry } from './point_light_budget';
@@ -95,6 +95,7 @@ export class SeasonalDecor {
   private lights: SeasonalDecorLights | null = null;
   private wisps: SeasonalInteriorWisps | null = null;
   private indoorJob: InteriorPumpkinJob | null = null;
+  private roadJob: RoadLanternJob | null = null;
 
   constructor(
     private readonly scene: THREE.Object3D,
@@ -123,8 +124,11 @@ export class SeasonalDecor {
       // kit loads; the dressing builds once both are ready
       this.indoorJob ??= interiorPumpkinJob(this.seed);
       const indoorDone = this.indoorJob.step();
+      // ...and the road lanterns one route a frame (seasonal_road_lanterns.ts), after it
+      this.roadJob ??= roadLanternJob(this.seed);
+      const roadDone = indoorDone && this.roadJob.step();
       const assets = gourdlightAssets();
-      if (!assets || !indoorDone) return;
+      if (!assets || !indoorDone || !roadDone) return;
       this.build(assets);
     }
     this.content.visible = true;
@@ -167,7 +171,7 @@ export class SeasonalDecor {
     for (const g of layout.garlands) perCity[nearestHub(g.ax, g.az)].garlands.push(g);
     for (const st of layout.stalls) perCity[nearestHub(st.x, st.z)].stalls.push(st);
     this.ropeMaterial = this.makeRopeMaterial();
-    const roads = roadLanternSegments(seasonalRoadLanterns(this.seed));
+    const roads = roadLanternSegments(this.roadJob?.result ?? []);
     const lights = new SeasonalDecorLights(this.scene, this.pointLights, this.seed);
     this.lights = lights;
     lights.setSites(

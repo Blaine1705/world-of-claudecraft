@@ -27,6 +27,7 @@ import {
   ROAD_LANTERN_TOWN_MARGIN,
   ROAD_LANTERN_TREE_CLEARANCE,
   resolveSeasonalRoadLanterns,
+  roadLanternJob,
   seasonalRoadLanterns,
 } from '../src/sim/seasonal_road_lanterns';
 import {
@@ -143,6 +144,19 @@ describe('the road lanterns between the Gourdlight Eve cities', () => {
 
   it('is deterministic (the same world and seed resolve the same posts)', () => {
     expect(resolveSeasonalRoadLanterns(WORLD_SEED)).toEqual([...lanterns]);
+  });
+
+  it('resolves over several frames as a job (graph, then one route a step), same answer', () => {
+    const seed = WORLD_SEED + 7;
+    const job = roadLanternJob(seed);
+    let steps = 0;
+    while (!job.step()) steps++;
+    expect(steps).toBe(GOURDLIGHT_ROAD_LANTERNS.routes.length);
+    expect(job.result).toEqual(resolveSeasonalRoadLanterns(seed));
+    // a resolved world finishes on its first step
+    const again = roadLanternJob(seed);
+    expect(again.step()).toBe(true);
+    expect(again.result).toBe(job.result);
   });
 });
 
