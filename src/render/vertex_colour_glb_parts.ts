@@ -136,9 +136,9 @@ export function mergeVertexColourBuckets(
 const VERTEX_COLOUR_SCALED = 'vertexColourScaleApplied';
 
 /**
- * The painted materials of a parsed GLB that draws with its OWN materials (the Highwatch manor,
- * a placed town building: the town view clones them per building, eastbrook_placed_building.ts,
- * and an authored map draws them as they are) brought back above their headroom: each material
+ * The painted materials of a parsed GLB that draws with its OWN materials (an authored map draws
+ * a placed model's materials as they are, and a town view clones them per building,
+ * eastbrook_placed_building.ts) brought back above their headroom: each material
  * whose extras name a `vertexColourScale` has its colour (the glTF base colour factor)
  * multiplied by it, once however many meshes share it, and is marked so it never is again.
  * Runs in the loader's parse chain (assets/loader.ts) before any consumer sees the scene; a

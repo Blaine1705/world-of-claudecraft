@@ -50,13 +50,6 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
-import { buildHighwatchManorLane, highwatchManorLanePrewarmPart } from './highwatch_manor_lane';
-import { highwatchManorFlames, highwatchManorLights } from './highwatch_manor_lights';
-import {
-  buildHighwatchManorSmoke,
-  highwatchManorSmokePrewarmPart,
-  type ManorSmokeView,
-} from './highwatch_manor_smoke';
 import { isHighwatchRebuildBuilding } from './highwatch_town';
 import {
   type KitSurfaceFamily,
@@ -1078,8 +1071,6 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     ...wickharborWharfPrewarmParts(),
     ...wickharborHarborPrewarmParts(),
     ...mirefenTavernPrewarmParts(),
-    highwatchManorSmokePrewarmPart(),
-    highwatchManorLanePrewarmPart(),
   ]) {
     const mesh = new THREE.Mesh(part.geometry, part.material);
     mesh.castShadow = true;
@@ -1419,7 +1410,6 @@ export function buildProps(
   // moored transport ships (render/transport_ship.ts): live, idle-animated,
   // their own LODs; ticked from update() below, never merged or ghosted
   const transportShips: TransportShipView[] = [];
-  let manorSmoke: ManorSmokeView | null = null;
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
   const builtInShaped = isBuiltinShapedWorld(activeContent);
@@ -1767,33 +1757,6 @@ export function buildProps(
     }
   } else {
     clearHarborHouseShell();
-  }
-  // ...and the Highwatch manor's hearth, range and lamps (render/highwatch_manor_lights.ts),
-  // lit like a campfire: root-level, world-positioned, in the fire-light budget
-  if (highwatchTown) {
-    for (const light of highwatchManorLights(seed)) {
-      group.add(light);
-      fireLights.push(light);
-    }
-    // ...its lane from the Sanctum road to the garden gate (paving, not a road record)
-    const lane = buildHighwatchManorLane(seed);
-    group.add(lane);
-    keepFromMerge.add(lane);
-    // ...and its kitchen chimney's smoke (cosmetic: the painter draws none on the low tier)
-    manorSmoke = buildHighwatchManorSmoke(seed);
-    group.add(manorSmoke.mesh);
-    keepFromMerge.add(manorSmoke.mesh);
-    noShadow.add(manorSmoke.mesh);
-    for (const fire of highwatchManorFlames(seed, usePbr ? EMISSIVE_LIGHT : 1.4)) {
-      group.add(fire.holder);
-      flames.push(fire.flame);
-      keepLiveMeshes.add(fire.flame);
-      noShadow.add(fire.flame);
-      if (fire.core) {
-        keepLiveMeshes.add(fire.core);
-        noShadow.add(fire.core);
-      }
-    }
   }
   // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts),
   // with the rest of the town's wooden harbor in the same wood (render/wickharbor_harbor.ts)
@@ -2754,7 +2717,6 @@ export function buildProps(
     ): void {
       const fogFarSq = fogFar * fogFar;
       scheduledShips?.sync(dt);
-      manorSmoke?.update(camX, camZ, dt);
       for (let i = 0; i < transportShips.length; i++) {
         transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
       }

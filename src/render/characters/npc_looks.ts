@@ -2233,27 +2233,6 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     },
     props: 'none',
   },
-  // Ansel Hale, the steward of the Highwatch manor: a greying household man, keys at
-  // his belt and a ledger's patience in his face.
-  steward_ansel_hale: {
-    cls: 'priest',
-    app: {
-      gender: 'male',
-      ...head('waves', 'moustache', 'relaxed', 'default', 'broad', 'default'),
-      ...skin(12, 0.42, 0.4),
-      ...hair(9, 0.03, 0.62),
-      ...eyes(210, 0.35, 0.35),
-      headShape: shape({
-        eyeSpacing: 0.3,
-        eyeSize: -0.4,
-        eyeTilt: 0.05,
-        browHeight: 0.08,
-        chinWidth: 0.45,
-      }),
-      bodyScale: 1.0,
-    },
-    props: 'none',
-  },
   // Reeve Ottoline, Reeve of Lanternmere.
   reeve_ottoline: {
     cls: 'druid',
