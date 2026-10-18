@@ -125,7 +125,7 @@ building them separately means writing the water shader three times.
 
 | | Lines | What it does |
 |---|---|---|
-| `render/water.ts` + `water_simulation` + `water_wave_core` + `water_core` + coverage/flora/underwater | ~3,900 | the world's water: wave simulation, shore blending, coverage, flora, underwater state, ripple/wake field |
+| `render/water.ts` + `water_simulation` + `ocean/` + `water_core` + coverage/flora/underwater | ~3,900 | the world's water: wave simulation, shore blending, coverage, flora, underwater state, ripple/wake field |
 | `render/fluid_surfaces.ts` | 302 | the editor's fluid pools: an ellipse disc with a tinted surface |
 | `render/waterfall.ts` | 265 | a curved sheet + foam disc + mist sprites, self-contained, hard-coded 5×2.6 yd source size |
 

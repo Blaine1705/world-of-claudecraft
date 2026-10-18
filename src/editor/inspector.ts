@@ -358,6 +358,8 @@ export interface InspectorDeps extends PondPanelDeps {
   /** The selected built-in gameplay object's panel (object_move_panel.ts), or
    *  null when none is selected. */
   movedObjectPanel?(): HTMLElement | null;
+  /** The list of gameplay objects this map deleted, with Restore, or null. */
+  removedObjectsPanel?(): HTMLElement | null;
   setSelectedLight(index: number | null): void;
   updateMapLight(
     index: number,
@@ -1444,6 +1446,8 @@ export class Inspector {
           const moved = d.movedObjectPanel?.() ?? null;
           if (moved) this.root.appendChild(moved);
           else this.selectPanel();
+          const removed = d.removedObjectsPanel?.() ?? null;
+          if (removed) this.root.appendChild(removed);
         }
         break;
       case 'move':
@@ -1453,6 +1457,8 @@ export class Inspector {
         const moved = d.movedObjectPanel?.() ?? null;
         if (moved) this.root.appendChild(moved);
         else this.selectPanel();
+        const removed = d.removedObjectsPanel?.() ?? null;
+        if (removed) this.root.appendChild(removed);
         break;
       }
       case 'raise':

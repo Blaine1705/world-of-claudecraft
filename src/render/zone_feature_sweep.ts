@@ -7,6 +7,8 @@
 // state beyond that list, which is why it lives beside the renderer and not
 // in it.
 import type * as THREE from 'three';
+import { GFX } from './gfx';
+import { updateSceneryGeometryLod } from './scenery_geometry_lod';
 import {
   type FeatureFootprint,
   isZoneFeatureInReach,
@@ -76,15 +78,21 @@ export function sweepZoneFeatures(
   entries: readonly ZoneFeatureEntry[],
   camX: number,
   camZ: number,
-  cullFar: number,
+  cullFar: number | ((group: THREE.Group) => number),
   shadowHalfExtent: number,
   isolate: { minX: number; maxX: number; minZ: number; maxZ: number } | null = null,
 ): void {
   for (const entry of entries) {
+    updateSceneryGeometryLod(entry.group, camX, camZ, GFX.sceneryGeometryLodDistance);
     entry.inReach = isZoneFeatureInReach(entry.footprint, camX, camZ, entry.reach, entry.inReach);
     entry.group.visible =
       entry.inReach &&
-      isZoneFeatureVisible(entry.footprint, camX, camZ, cullFar) &&
+      isZoneFeatureVisible(
+        entry.footprint,
+        camX,
+        camZ,
+        typeof cullFar === 'number' ? cullFar : cullFar(entry.group),
+      ) &&
       (!isolate || isZoneFeatureInRect(entry.footprint, isolate));
     const casting = isZoneFeatureShadowCasting(
       entry.footprint,

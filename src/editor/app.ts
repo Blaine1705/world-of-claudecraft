@@ -497,7 +497,7 @@ import {
 import { EditorApiError, forkMap, type MapFullWire, signedIn, uploadAsset } from './net';
 import { newMapSizeDialog } from './new_map_dialog';
 import { ObjectMoveController } from './object_move_controller';
-import { buildObjectMovePanel } from './object_move_panel';
+import { buildObjectMovePanel, buildRemovedObjectsPanel } from './object_move_panel';
 import { parseMap, serializeMapCompact } from './persist';
 import { applyScaleEqualize, type EqualizePlan, planScaleEqualize } from './placement_scale_core';
 import {
@@ -1205,7 +1205,9 @@ export class EditorApp {
     },
     moveLive: (key, before, after) => {
       this.viewport3d?.setSimObjectMoves(after);
-      this.viewport3d?.objects.moveLive(key, before, after);
+      const shown = this.viewport3d?.objects.moveLive(key, before, after) ?? true;
+      // A restore of an object the view was built without cannot appear live.
+      if (!shown) this.toasts.info(t('editor.objectMove.restoredLater'));
     },
     showSelection: (key) => this.viewport3d?.objects.setSelected(key),
     pushUndo: (entry) => this.pushUndo(entry),
@@ -2090,9 +2092,8 @@ export class EditorApp {
     // shipped version is still seeded into the store in the background (kept
     // alongside their maps, never opened over them), so an updated default
     // is one click away in Open rather than hijacking the boot.
-    let autoloaded = resumed ? null : this.loadMostRecentSave();
-    if (!resumed && !autoloaded) autoloaded = await this.seedDefaultMap();
-    else if (!resumed) void this.seedDefaultMap();
+    let autoloaded = resumed ? null : await this.seedDefaultMap();
+    if (!resumed && !autoloaded) autoloaded = this.loadMostRecentSave();
     const opened = resumed ?? autoloaded;
     if (opened) {
       // Consume a one-shot return pose left by an older reload-based Collision
@@ -2199,7 +2200,7 @@ export class EditorApp {
     // public/maps/default-world.wocmap.zip changes materially. Re-seeding is
     // non-destructive: it saves the new default alongside the maker's own maps
     // (their work is keyed by its own meta.id) and simply opens the newer one.
-    const SEEDED_KEY = 'woc-editor-default-world-seeded-v041h';
+    const SEEDED_KEY = 'woc-editor-default-world-seeded-v045-genshin1';
     try {
       if (localStorage.getItem(SEEDED_KEY)) return null;
     } catch {
@@ -2221,19 +2222,24 @@ export class EditorApp {
         console.warn(`[default-map] import returned null for ${bytes.length}-byte bundle`);
         return null;
       }
-      // A copy of this map already in the store is the MAKER'S, their edits
-      // (paint, moves, deletions) saved onto it. Never clobber it with the
-      // fresh bundle: the load-time promote*/repair* passes bring their copy
-      // up to date instead, and only the seeded flag advances. The one
-      // exception is a PRE-decorProps save (no promoted realm dressing):
-      // those have no load-time upgrade, withoutEditableWorldProps would
-      // empty their decor with nothing taking over, so they still take the
-      // fresh bundle, the same trade the v041b bump made.
       const existing = this.io.store.load(map.meta.id);
       const existingHasDecor = existing?.placements.some(
         (p) => p.assetId === 'biome/hexb_home_a' || p.assetId.startsWith('props/flower_bed'),
       );
-      if (existing && existingHasDecor) {
+      const existingUnedited = existing?.meta.updatedAt === map.meta.updatedAt;
+      if (existing && existingHasDecor && !existingUnedited) {
+        existing.placements = existing.placements.filter(
+          (p) =>
+            !(
+              (p.assetId === 'biome/hexb_barracks' && p.x === 17.5 && p.z === -5.5) ||
+              (p.assetId === 'biome/hexb_watchtower' && p.x === 27 && p.z === -13)
+            ),
+        );
+        if (existing.content.npcs.proving_shore_guide) {
+          existing.content.npcs.proving_shore_guide.dynamic = true;
+        }
+        this.io.saveLocal(existing);
+        this.io.draftClear(map.meta.id);
         try {
           localStorage.setItem(SEEDED_KEY, '1');
         } catch {
@@ -2244,6 +2250,7 @@ export class EditorApp {
       // Persist it so loadMostRecentSave reopens it next boot (and the maker's
       // edits save back onto it, not a throwaway).
       this.io.saveLocal(map);
+      this.io.draftClear(map.meta.id);
       try {
         localStorage.setItem(SEEDED_KEY, '1');
       } catch {
@@ -16433,6 +16440,18 @@ export class EditorApp {
     repairStretchedWorldProps(map);
     repairPlacedAssetShapes(map);
     repairMissingTreeCollision(map, applyDefaultCollision);
+    if (map.meta.id === 'woc-v041-world') {
+      map.placements = map.placements.filter(
+        (p) =>
+          !(
+            (p.assetId === 'biome/hexb_barracks' && p.x === 17.5 && p.z === -5.5) ||
+            (p.assetId === 'biome/hexb_watchtower' && p.x === 27 && p.z === -13)
+          ),
+      );
+      if (map.content.npcs.proving_shore_guide) {
+        map.content.npcs.proving_shore_guide.dynamic = true;
+      }
+    }
     this.map = map;
     this.flattenLock = null;
     this.slopeStart = null;
@@ -16788,6 +16807,8 @@ export class EditorApp {
     }
     if (ev.key === 'Delete') {
       if (this.hitboxEdit && this.hitboxEdit.selected.size > 0) this.deleteSelectedHitboxes();
+      // A selected built-in gameplay object (bed, dummy, node, door).
+      else if (this.objectMoves.selectedKey !== null) this.objectMoves.deleteSelected();
       // Collision Master: the scene's one placement is the workbench, never a
       // delete target, Delete/X only ever remove collision boxes there.
       else if (this.selectedPlacement !== null && !this.meshEditActive()) {
@@ -17267,6 +17288,14 @@ export class EditorApp {
           selectedKey: () => this.objectMoves.selectedKey,
           moves: () => this.map.objectMoves,
           reset: () => this.objectMoves.resetSelected(),
+          turn: (rotY, commit) => this.objectMoves.turnSelected(rotY, commit),
+          resize: (scale, commit) => this.objectMoves.resizeSelected(scale, commit),
+          remove: () => this.objectMoves.deleteSelected(),
+        }),
+      removedObjectsPanel: () =>
+        buildRemovedObjectsPanel({
+          moves: () => this.map.objectMoves,
+          restore: (key) => this.objectMoves.restore(key),
         }),
       setSelectedLight: (index) => this.setSelectedLight(index),
       updateMapLight: (index, change) => {

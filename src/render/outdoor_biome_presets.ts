@@ -33,12 +33,12 @@ export const BIOME_FOG: Record<BiomeId, { color: number; near: number; far: numb
   // cutout-crisp, with the same saturation at 400 yd as at 40. 700 puts real
   // aerial perspective on the far third while costing nothing near (and
   // fog-far drives culling, so the trim is a small draw-count win too).
-  vale: { color: 0x7095bd, near: 55, far: 700 },
+  vale: { color: 0x82b8e8, near: 55, far: 700 },
   // pale sage matched to the marsh horizon sky: the dome renders fog-free,
   // so a darker murk left every fully fogged silhouette as a cutout band
   marsh: { color: 0xc2cbb6, near: 75, far: 165 },
-  peaks: { color: 0x8bb0d4, near: 55, far: 700 },
-  beach: { color: 0x7ea6c9, near: 50, far: 700 },
+  peaks: { color: 0x8ec2ea, near: 55, far: 700 },
+  beach: { color: 0x86c0ec, near: 50, far: 700 },
   desert: { color: 0xd8c9a8, near: 50, far: 700 },
   volcano: { color: 0x8a7468, near: 60, far: 145 },
   cave: { color: 0x76807c, near: 48, far: 125 },
@@ -54,18 +54,18 @@ export const BIOME_FOG: Record<BiomeId, { color: number; near: number; far: numb
   // (deepened from 0xcfe2dc: the near-white haze tonemapped to a white
   // cutout band on the horizon instead of reading as distance, with the same
   // lesson as the blue-sky biomes above)
-  fen: { color: 0xb7d0c6, near: 140, far: 510 },
+  fen: { color: 0x9ed4dc, near: 140, far: 510 },
   // the Nightbloom: a lavender dream-haze over the violet downs, deepened
   // to twilight with the realm's new dimmed light level
   night: { color: 0x8d7fc0, near: 110, far: 460 },
   // the Wraithwood: dead-grey murk, the tightest sightlines outdoors
   haunt: { color: 0x454c46, near: 85, far: 265 },
   // the Palmreach: bright humid haze, the clearest air in the world
-  jungle: { color: 0xc2e0d0, near: 165, far: 600 },
+  jungle: { color: 0xb4e2d8, near: 165, far: 600 },
   // the Evergarden: crystal parkland air with the faintest green cast
-  garden: { color: 0xc6ddc6, near: 175, far: 630 },
+  garden: { color: 0xb6dcea, near: 175, far: 630 },
   // the Galecrest: scrubbed salt air, dawn-lit haze off the sea
-  gale: { color: 0xccc9d8, near: 170, far: 645 },
+  gale: { color: 0xbcd4ec, near: 170, far: 645 },
 };
 
 export const BATTLEGROUND_FOG = { color: 0xaecbe0, near: 70, far: 210 };
@@ -74,7 +74,7 @@ export const BATTLEGROUND_FOG = { color: 0xaecbe0, near: 70, far: 210 };
 // tier, so fog distance sheds only cosmetic scenery). Takes the same
 // readability pass on `near`, with `far` held nearly still so the tier keeps
 // paying for itself.
-export const LOW_FOG = { color: 0xa6c6e0, near: 115, far: 340 };
+export const LOW_FOG = { color: 0x9ec8ea, near: 115, far: 340 };
 
 // Per-biome outdoor light grade, eased alongside fog in updateAmbience.
 // The three original biomes keep the exact constants the lights were
@@ -94,14 +94,14 @@ export const BIOME_LIGHT: Record<
     envScale?: number;
   }
 > = {
-  vale: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+  vale: { hemiSky: 0xd8f2ff, hemiGround: 0x689656, sun: 0xfff5dc },
   marsh: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
-  peaks: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+  peaks: { hemiSky: 0xd8f2ff, hemiGround: 0x5c8e4e, sun: 0xfff5dc },
   dusk: { hemiSky: 0xffc9dd, hemiGround: 0x4d3f63, sun: 0xffb072 },
   ember: { hemiSky: 0xe89070, hemiGround: 0x422424, sun: 0xff7440 },
   frost: { hemiSky: 0x9cb6d6, hemiGround: 0x66748a, sun: 0xccdaea },
   amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
-  fen: { hemiSky: 0xdceeff, hemiGround: 0x51704e, sun: 0xfff0d2 },
+  fen: { hemiSky: 0xd8f2ff, hemiGround: 0x5e8e58, sun: 0xfff5dc },
   // the Nightbloom: dreamlight. A cool rose sun over lavender sky bounce
   // and deep violet ground: luminous, but at a twilight level. At full
   // day strength its canopies and downs rendered in ordinary daylight
@@ -118,15 +118,15 @@ export const BIOME_LIGHT: Record<
   // well as grey now that the rig has an intensity knob
   haunt: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66, sunScale: 0.8, envScale: 0.8 },
   // the Palmreach: hard tropical daylight over deep green bounce
-  jungle: { hemiSky: 0xeafcff, hemiGround: 0x3a6a42, sun: 0xfff4d8 },
+  jungle: { hemiSky: 0xeafcff, hemiGround: 0x488252, sun: 0xfff6dc },
   // the Evergarden: soft perfect afternoon over clipped lawns
-  garden: { hemiSky: 0xe8f8ff, hemiGround: 0x4a7a44, sun: 0xfff2d0 },
+  garden: { hemiSky: 0xe8f8ff, hemiGround: 0x588c52, sun: 0xfff5d8 },
   // the Galecrest: cool dawn light, sea-grey bounce off the downs
-  gale: { hemiSky: 0xe4e8f2, hemiGround: 0x4e6a52, sun: 0xffe8c8 },
+  gale: { hemiSky: 0xe2f0fc, hemiGround: 0x587c60, sun: 0xfff0d4 },
   // paint-only biomes (map editor, never a built-in realm): beach reuses the
   // neutral vale grade, desert the amber warmth, volcano the ember glow, cave
   // the wraithwood gloom.
-  beach: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+  beach: { hemiSky: 0xd8f2ff, hemiGround: 0x867c58, sun: 0xfff6dc },
   desert: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
   volcano: { hemiSky: 0xe89070, hemiGround: 0x422424, sun: 0xff7440 },
   cave: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66, sunScale: 0.8, envScale: 0.8 },

@@ -102,7 +102,6 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mount_chimeglass_tortoise',
   'mount_drakemaw_raptor',
   'mount_grag_bear',
-  'mount_lanternback_troll',
   'mount_rickshaw_mount',
   'mount_shadowjump_toad',
   'mount_stalkglider_snail',
@@ -216,6 +215,7 @@ const AUTHORED_ATLAS_DEFS = [
   'mount_avian_strider',
   // Gourdlight Eve's Blender-built Emberbristle Broom (its KTX2 BroomAtlas).
   'mount_emberbristle_broom',
+  'mount_lanternback_troll',
   // the Blender-built dungeon bosses and bodies: the Sunken Bastion's Vael,
   // Iron Cage, Drowned Anchor and Gaol Turnkey, and the Hollow Crypt's Lich
   // Bishop (Morthen); and the Bastion's sculpted drowned (the Revenant first)

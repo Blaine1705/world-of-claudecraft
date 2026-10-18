@@ -262,6 +262,8 @@ export function buildFarmPatchProps(
   const holder = new THREE.Matrix4();
   const pos = new THREE.Vector3();
   const one = new THREE.Vector3(1, 1, 1);
+  const bedScale = new THREE.Vector3();
+  const yawQuat = new THREE.Quaternion();
   const tint = new THREE.Color();
 
   for (const patch of patches) {
@@ -273,6 +275,9 @@ export function buildFarmPatchProps(
         WORLD_UP,
         groundNormal(bed.x, bed.z, seed),
       );
+      // A Studio map may turn a bed (sim/moved_objects.ts): the turn is about
+      // the bed's own up after the ground tilt, and its crops seat with it.
+      if (bed.rotY !== undefined) quat.multiply(yawQuat.setFromAxisAngle(WORLD_UP, bed.rotY));
       seats.set(bed.id, {
         x: bed.x,
         y,
@@ -282,7 +287,7 @@ export function buildFarmPatchProps(
         zoneId: patch.zoneId,
       });
       pos.set(bed.x, y, bed.z);
-      holder.compose(pos, quat, one);
+      holder.compose(pos, quat, bed.scale === undefined ? one : bedScale.setScalar(bed.scale));
       bedMatrices.push(holder.clone());
     }
     addInstancedParts(
@@ -293,6 +298,12 @@ export function buildFarmPatchProps(
       matrix,
       tint.setHex(palette.soil),
     );
+    // The editor's live preview addresses a bed's instance by its id: a map
+    // that deleted a bed builds fewer instances than the content table.
+    const bedIds = patch.beds.map((bed) => bed.id);
+    for (const child of group.children) {
+      if (child.name === `farmPatches:bed:${patch.id}`) child.userData.farmBedIds = bedIds;
+    }
 
     // One compost bin per patch, just outside the west edge of the grid.
     const bin = farmCompostBinPosition(patch);

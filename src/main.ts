@@ -1529,6 +1529,16 @@ async function startGame(
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
     renderer.showPetNames = settings.get('showPetNames');
     setNameplateDotScale(settings.nameplateDotRenderScale());
+    if (GFX.standardMaterials) {
+      try {
+        if (!localStorage.getItem('woc_water_ripples_v2')) {
+          localStorage.setItem('woc_water_ripples_v2', '1');
+          settings.set('waterRipples', true);
+        }
+      } catch {
+        /* storage unavailable */
+      }
+    }
     renderer.setWaterRipples(settings.get('waterRipples'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).

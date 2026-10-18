@@ -22,6 +22,9 @@ import {
   GRASS_BAKE_PATCH_YARDS,
   GRASS_BAKE_SOIL_SHADE,
   GRASS_BAKE_TEXTURE_SIZE,
+  meadowClusterHeight,
+  meadowClusterScale,
+  meadowCoverage,
 } from './meadow_tuning';
 
 export interface GrassGroundBake {
@@ -110,18 +113,15 @@ export function bakeGrassGroundTexture(
       // neutral patch, and lushness structure comes from the per-vertex
       // tint, not the texture
       const lush = 0.55;
-      if (r1 >= (0.44 + 1.7 * lush * lush) * 1.05) continue;
+      if (r1 >= meadowCoverage(lush)) continue;
       const x = (ci + 0.5) * CELL + (r1 - 0.5) * CELL * 1.3;
       const z = (cj + 0.5) * CELL + (hash(ci, cj, 12) - 0.5) * CELL * 1.3;
-      const lushHere = 0.5 + lush * 0.6;
-      let s = (0.22 + hash(ci, cj, 13) * 0.34) * lushHere;
-      const rTuft = hash(ci, cj, 14);
-      if (rTuft < 0.1) s *= 1.5 + rTuft * 3.0;
+      const s = meadowClusterScale(lush, hash(ci, cj, 13), hash(ci, cj, 14));
       placements.push({
         x,
         z,
         s,
-        sy: s * (0.85 + lush * 0.5) * (0.82 + hash(ci, cj, 16) * 0.36),
+        sy: meadowClusterHeight(s, lush, hash(ci, cj, 16)),
         yaw: r1 * 12.9,
         grey: 1 + (hash(ci, cj, 15) - 0.5) * 2 * GRASS_BAKE_CLUSTER_JITTER,
       });

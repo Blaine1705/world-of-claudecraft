@@ -11602,6 +11602,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'editor.flatten.hint':
     'Выравнивание приводит землю к высоте под курсором в момент начала перетаскивания.',
   'editor.flatten.hardEdge': 'Резкий край',
+  'editor.objectMove.edited': 'Изменено на этой карте.',
+  'editor.objectMove.rotation': 'Поворот (градусы)',
+  'editor.objectMove.size': 'Размер',
+  'editor.objectMove.resetAll': 'Вернуть исходное',
+  'editor.objectMove.delete': 'Удалить с этой карты',
+  'editor.objectMove.deleteHint':
+    'Удаляет только с этой карты. Позже его можно восстановить из списка удалённых объектов.',
+  'editor.objectMove.doorDeleteHint':
+    'Удаление двери подземелья убирает её вход на поверхности с этой карты.',
+  'editor.objectMove.dummyDeleteHint':
+    'Уроки Хейла используют эти манекены: если удалить один, его урок на этой карте нельзя будет завершить.',
+  'editor.objectMove.doorFixed':
+    'Двери подземелий можно перемещать и удалять, но не поворачивать и не менять размер.',
+  'editor.objectMove.deletedTitle': 'Удалённые игровые объекты',
+  'editor.objectMove.deletedHint':
+    'Удалены с этой карты. Восстановите объект, чтобы вернуть его на прежнее место.',
+  'editor.objectMove.deletedRow': '{kind}: {name}',
+  'editor.objectMove.restore': 'Восстановить',
+  'editor.objectMove.restoredLater': 'Восстановлено. Объект появится после перезагрузки карты.',
   'editor.selection.heightOffset': 'Смещение по высоте (ярды)',
   'editor.selection.heightStep': 'Шаг (ярды)',
   'editor.selection.raiseAsset': 'Поднять',

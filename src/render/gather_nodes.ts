@@ -229,6 +229,7 @@ function addInstancedBatch(
   const placement = new THREE.Matrix4();
   const tierMatrix = new THREE.Matrix4();
   const instanceMatrix = new THREE.Matrix4();
+  const scaleVec = new THREE.Vector3();
   const partBox = new THREE.Box3();
   const nodeIds = batch.nodes.map((node) => node.id);
   // The UNSCALED template bounds, per BUILD and not module-level: the GLBs
@@ -280,13 +281,17 @@ function addInstancedBatch(
       // the base (s - 1) * |minY| deeper and a tier-3 prop sinks visibly
       // into the terrain. Compensate so the base sits at the same height
       // above ground at every tier.
-      const tierScale = nodeTierScale(node.tier);
+      // A Studio map's size and turn (sim/moved_objects.ts) ride the same
+      // base-anchored scale; built-in rows carry neither, so their matrices
+      // are exactly the tier scale they always were.
+      const tierScale = nodeTierScale(node.tier) * (node.scale ?? 1);
       placement.makeTranslation(
         node.pos.x,
         y + NODE_Y_OFFSET[node.type] - (tierScale - 1) * minY,
         node.pos.z,
       );
-      tierMatrix.makeScale(tierScale, tierScale, tierScale);
+      if (node.rotY === undefined) tierMatrix.makeScale(tierScale, tierScale, tierScale);
+      else tierMatrix.makeRotationY(node.rotY).scale(scaleVec.setScalar(tierScale));
       instanceMatrix.multiplyMatrices(placement, tierMatrix).multiply(part.matrix);
       mesh.setMatrixAt(instanceId, instanceMatrix);
     }
@@ -325,8 +330,9 @@ function addIndividualNode(
   // prop base sits at the same height above ground at every tier.
   const templateBox = new THREE.Box3().setFromObject(obj);
   const minY = Number.isFinite(templateBox.min.y) ? templateBox.min.y : 0;
-  const tierScale = nodeTierScale(node.tier);
+  const tierScale = nodeTierScale(node.tier) * (node.scale ?? 1);
   obj.scale.setScalar(tierScale);
+  if (node.rotY !== undefined) obj.rotation.y = node.rotY;
   obj.position.set(node.pos.x, y + NODE_Y_OFFSET[node.type] - (tierScale - 1) * minY, node.pos.z);
   obj.name = node.id;
   obj.userData.gatherNodeId = node.id;

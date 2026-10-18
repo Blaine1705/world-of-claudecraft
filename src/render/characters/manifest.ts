@@ -3403,6 +3403,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_RIGGED,
     walkRef: 5.6,
     runRef: 12.6,
+    authoredAtlas: true,
     lazyPreload: true,
   },
   // The Chimeglass Tortoise. Low and broad: 3.6 puts the crown of his shell

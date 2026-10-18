@@ -10994,7 +10994,21 @@ export const cs_CZ: EnTranslations = {
       "moved": "Moved on this map.",
       "original": "At its original spot.",
       "hint": "Drag it, or nudge it with the arrow keys. The move applies to this map only and the object keeps its identity, so saved progress still finds it.",
-      "reset": "Reset to original spot"
+      "reset": "Reset to original spot",
+      "edited": "Changed on this map.",
+      "rotation": "Rotation (degrees)",
+      "size": "Size",
+      "resetAll": "Reset to original",
+      "delete": "Delete from this map",
+      "deleteHint": "Deletes it from this map only. Restore it later from the deleted objects list.",
+      "doorDeleteHint": "Deleting a dungeon door removes its overworld entrance from this map.",
+      "dummyDeleteHint": "Hale's practice lessons use these dummies: deleting one leaves its lesson unfinishable on this map.",
+      "doorFixed": "Dungeon doors can be moved or deleted, but not turned or resized.",
+      "deletedTitle": "Deleted Gameplay Objects",
+      "deletedHint": "Deleted from this map. Restore one to bring it back where it stood.",
+      "deletedRow": "{kind}: {name}",
+      "restore": "Restore",
+      "restoredLater": "Restored. It appears in the view after the map reloads."
     },
     "lightTool": {
       "title": "Point Lights",

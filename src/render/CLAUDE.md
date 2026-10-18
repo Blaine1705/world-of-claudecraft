@@ -19,7 +19,8 @@ Everything else is a sibling module in one of these families:
   owns: `terrain.ts` (chunked LOD + PBR splat), `props.ts`/`foliage.ts`/
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
   shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
-  facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`.
+  facing-aligned character volume wakes in `water_simulation.ts`; the surface
+  itself is the FFT ocean in `ocean/`, see its `CLAUDE.md`), `sky.ts`.
   Event/minigame scenes follow the same pattern: `jail_scene.ts`,
   `yumi_*.ts`, `battleground*.ts` (Thornhollow Fields:
   kit-module field from the pure `battleground_core.ts` manifest, entity props
@@ -142,6 +143,15 @@ Everything else is a sibling module in one of these families:
   reference view, so a one-off giant keeps its whole group to the horizon with nothing
   to write anywhere. Never on a collider-backed family (the distance rule alone), never
   a per-family distance table.
+- **Low coconut batches:** `jungle_features.ts` builds coconut parts through
+  `static_instance_cells.ts` before zone attach, preparation and shadow registration.
+  `GFX.coconutCellSize` controls the build-time grid (`?gfxo=coconutCellSize:0`
+  restores one batch per part). Cells share the original geometry/material and keep
+  every placement; only ordinary full-bounds frustum rejection changes. They do not
+  register separate distance or apparent-size culls. The jungle view disposes its
+  cell buffers and rebaked coconut geometry through `renderer_resource_lifecycle.ts`,
+  never borrowed GLB materials. Tests: `static_instance_cells.test.ts` and
+  `jungle_feature_cells.test.ts`.
 - **Zone streaming + residency:** `zone_streaming.ts` (pure policy: WHICH
   zones to materialize and in what order, feeding the renderer's background
   prepare queue), `chunk_residency_core.ts` (chunk-level "how far can the
@@ -866,6 +876,32 @@ GPU work signs. Each rule names its seam and its guard.
   `src/dev/outfit_audit.ts`): a call sited inside `initGfxTier` alone reaches only the
   world renderer, and a per-site call is easy to miss on one of the others. Guard:
   `tests/final_color_nan_guard.test.ts`.
+- **Cel-shading R&D look (`?cel=on`, opt-in, reload to flip).** `cel_shading_core.ts`
+  reads the URL knobs (`cellight=off`, `celbands=2|3`, `celedge`, `cellit`, `celmid`,
+  `celink`, `celinkwidth`, `celsat`) and builds the toon ramp, a patch over the
+  DIRECTIONAL loop of `lights_fragment_begin` only (point lights and the hemisphere
+  fill stay smooth); `cel_shading.ts` installs it at module scope (the template above).
+  Exactly one outline path draws per chain. With an output grade (Medium and up), the
+  depth-based ink is the grade's `CEL_INK` arm (`post_cel_ink_glsl.ts`, wired like the
+  FXAA arm: no pass, no target, taps clamped to the region); it reads N8AO's beauty
+  depth, or on any RenderPass chain (including AO-off High and up) the current
+  composer read buffer's own depth texture. The look
+  turns the grade on for Low (`celNeedsGradePass`, applied in `settingsFor` before the
+  `?gfxo=` overrides), so Low draws the same ink as Medium. iOS keeps its memory-driven
+  no-grade profile; there `syncCelMaterialInk` (driven from `activateGfxProfile`)
+  inserts a material ink block into `opaque_fragment` instead: a rim on the geometric
+  normal gated on curvature per yard and on distance, plus the saturation. It reads
+  weakly on hard-edged low-poly models, which is why Low takes the grade instead. No flag means the stock chunks byte
+  for byte and no ink define. Guards: `tests/cel_shading_core.test.ts`,
+  `tests/post_output_grade.test.ts` and the real-WebGL
+  `tests/browser/cel_shading.browser.test.ts`.
+- **Palette lab (`?palette=on`, dev tool).** `palette_lab/` swaps a zone's whole colour
+  look live (ground palette, fog/light rows, sky gradient, water, bloom, display grade);
+  its own `CLAUDE.md` has the model. Every shader arm it adds is compile-time behind the
+  flag (the grade's `PALETTE_GRADE` define, the dome's gradient block), so a normal session
+  builds the stock shaders byte for byte. The ground re-bake rides
+  `ground_palette_override_core.ts` (main thread, the zone build worker and the far vista
+  re-read it by version) and `renderer.editor.recolorGround` (colour buffers only).
 - **No new queue, no new lane, no fourth gate.** New work rides
   `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
   `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),

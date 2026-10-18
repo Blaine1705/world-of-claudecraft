@@ -1051,6 +1051,8 @@ const MONOLITHS: MonolithRow[] = [
     // boss's fx layer (scarecrow_fx.ts) field, build, two routes, two updates and dispose.
     // LOWERED for Haunted Pumpkins: shared loot sparkles moved into
     // ground_object_sparkle.ts, paying for the personal pumpkin view hooks.
+    // Merge of feature/v045-integration (genshin artstyle, ceiling 12405) into the
+    // Halloween branch: renderer.ts is unchanged by that side, exact merged count stands.
     ceiling: 12369,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
@@ -1553,7 +1555,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 10958 -> 10924 at the integration merge of #4525 (grand painted towns +
     // the Mirefen tavern): the world hover cursor and its tooltip moved whole into
     // src/game/hover_cursor.ts, paying for the tavern's seat wiring. wc -l. Exact count.
-    ceiling: 10924,
+    // Re-pinned at the merge of origin/feature/v045-integration (tip 43f0cfd0c04) into
+    // feature/genshin-artstyle: both parents' non-overlapping additions compose to 10934
+    // (wc -l < src/main.ts). Exact merged count, zero slack.
+    ceiling: 10934,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -2293,7 +2298,10 @@ const MONOLITHS: MonolithRow[] = [
     // Merge of the four dungeon entrances (#4478): both parents' additions combine
     // (ours is the paved causeway import), exact merged count, within the
     // release/v0.45.0 ceiling the branch was held to.
-    ceiling: 3864,
+    // v0.45 integration sync at 78c350c8d55 into cel-shading-rnd:
+    // parent pins 3996 and 3864; combined existing wiring,
+    // exact merged count with no new coordinator behavior or slack.
+    ceiling: 3867,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

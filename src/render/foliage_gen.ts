@@ -25,7 +25,9 @@ import {
 import type { TreeVolume } from '../sim/tree_params';
 import { clusterGeometry, mulberry32 } from './blade_grass';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
+import { sharedUniforms } from './gfx';
 import { buildLeafCanopy, buildTreeModel, type TreeBuild, treeSeed } from './tree_gen';
+import { GRASS_WIND_TIME_SCALE } from './tree_sway';
 
 export type { FoliageKind, FoliageParams } from '../sim/foliage_params';
 export { treeSeed as foliageSeed };
@@ -34,10 +36,6 @@ export { treeSeed as foliageSeed };
  *  tree (placements, the editor preview, the GLB bake) takes a generated bush
  *  with no branching. */
 export type FoliageBuild = TreeBuild;
-
-/** Blade-cluster geometry is shared across a whole clump, so a grass plant is
- *  one InstancedMesh however many clusters it scatters. */
-const GRASS_CLUSTER_COLOR = 0x6f8f4a;
 
 const clamp = (v: number, lo: number, hi: number): number => (v < lo ? lo : v > hi ? hi : v);
 
@@ -193,8 +191,9 @@ function buildGrassClump(p: ResolvedFoliageParams): FoliageBuild {
   const rng = mulberry32((p.seed | 0) + 991);
   const geometry = clusterGeometry(rng);
   const count = Math.max(1, Math.round(p.clumps));
+  const baseColor = new THREE.Color(p.leafTint > 0 ? p.leafTint : 0x72c848);
   const mat = new THREE.MeshLambertMaterial({
-    color: GRASS_CLUSTER_COLOR,
+    color: 0xffffff,
     vertexColors: true,
     side: THREE.DoubleSide,
   });
@@ -204,8 +203,33 @@ function buildGrassClump(p: ResolvedFoliageParams): FoliageBuild {
   // Without the patch the attribute falls back to WebGL's default (0,0,0), the
   // normalize in the lighting chunk goes to NaN, and a whole clump renders
   // solid black. blade_grass.ts and blade_grass_band.ts do exactly this.
+  const swayAmp = 0.085 * p.sway;
   mat.onBeforeCompile = (sh) => {
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
+    if (swayAmp > 0) {
+      sh.uniforms.uTime = sharedUniforms.uTime;
+      sh.vertexShader = sh.vertexShader
+        .replace(
+          '#include <common>',
+          `#include <common>
+          uniform float uTime;`,
+        )
+        .replace(
+          '#include <begin_vertex>',
+          `#include <begin_vertex>
+          #ifdef USE_INSTANCING
+            vec2 tuftBase = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
+          #else
+            vec2 tuftBase = vec2(0.0);
+          #endif
+          float grassT = uTime * ${GRASS_WIND_TIME_SCALE.toFixed(4)};
+          float windPhase = tuftBase.x * 0.31 + tuftBase.y * 0.27;
+          float windAmt = (sin(grassT * 1.7 + windPhase) + 0.5 * sin(grassT * 3.1 + windPhase * 1.3))
+            * ${swayAmp.toFixed(4)} * smoothstep(0.0, 0.7, transformed.y);
+          transformed.x += windAmt;
+          transformed.z += windAmt * 0.6;`,
+        );
+    }
     // ...and the double-sided chunk then flips that up normal to a DOWN one on
     // every backfacing blade, which is half of them on a fan: those went black
     // even once the vertex stage was right. Undoing the flip keeps up pointing
@@ -219,7 +243,7 @@ function buildGrassClump(p: ResolvedFoliageParams): FoliageBuild {
       #endif`,
     );
   };
-  mat.customProgramCacheKey = () => 'woc-grass-clump-upnormal';
+  mat.customProgramCacheKey = () => `woc-grass-clump-upnormal-${swayAmp.toFixed(3)}`;
   const mesh = new THREE.InstancedMesh(geometry, mat, count);
   mesh.name = 'grass-blades';
   mesh.castShadow = false;
@@ -230,6 +254,7 @@ function buildGrassClump(p: ResolvedFoliageParams): FoliageBuild {
   const pos = new THREE.Vector3();
   const scale = new THREE.Vector3();
   const lean = new THREE.Vector3();
+  const c = new THREE.Color();
   // clusterGeometry builds a tuft roughly one yard tall, so plantHeight is a
   // straight multiplier on it.
   const heightScale = p.plantHeight / 1;
@@ -240,7 +265,7 @@ function buildGrassClump(p: ResolvedFoliageParams): FoliageBuild {
     const rad = Math.sqrt(rng()) * p.footprint;
     pos.set(Math.cos(a) * rad, 0, Math.sin(a) * rad);
     const s = heightScale * (0.7 + rng() * 0.6);
-    scale.set(s, s, s);
+    scale.set(s * 1.16, s, s * 1.16);
     // splay tips each tuft outward from the clump centre, so a dense clump
     // domes rather than standing as a flat brush.
     const tilt = p.splay * 0.5 * (rad / Math.max(0.001, p.footprint));
@@ -249,8 +274,13 @@ function buildGrassClump(p: ResolvedFoliageParams): FoliageBuild {
     q.multiply(new THREE.Quaternion().setFromAxisAngle(up, rng() * Math.PI * 2));
     m.compose(pos, q, scale);
     mesh.setMatrixAt(i, m);
+    c.copy(baseColor);
+    const highlight = (1 - rad / Math.max(0.1, p.footprint)) * 0.06;
+    c.offsetHSL(-highlight * 0.25, 0.04, highlight);
+    mesh.setColorAt(i, c);
   }
   mesh.instanceMatrix.needsUpdate = true;
+  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   group.add(mesh);
   return {
     group,

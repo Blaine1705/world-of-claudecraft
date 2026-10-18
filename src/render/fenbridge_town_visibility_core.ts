@@ -205,8 +205,10 @@ export function fenbridgeBuildingVisibilityPlanInto(
   eyeY: number,
   eyeZ: number,
   fogFar: number,
+  cullX = camX,
+  cullZ = camZ,
 ): FenbridgeBuildingVisibilityPlan {
-  out.visible = fenbridgeFogVisible(camX, camZ, target.x, target.z, fogFar, target.cullRadius);
+  out.visible = fenbridgeFogVisible(cullX, cullZ, target.x, target.z, fogFar, target.cullRadius);
   if (!out.visible) {
     out.hidden = wasHidden;
     out.hiddenChanged = false;
