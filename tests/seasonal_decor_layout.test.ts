@@ -278,6 +278,36 @@ describe('seasonal decor placement against the live world', () => {
     expect(problems).toEqual([]);
   });
 
+  // Owner note 2026-10-18: the straw read as litter. A broken anchor hash pinned every
+  // share to 0, so every lamp, knocking door and townsfolk took a bale or a shock.
+  // The straw is now an accent: a ceiling per city, a minority of every city's pieces,
+  // and the lamp clusters genuinely varied (some posts with straw, most without).
+  it('keeps the straw an accent in every city, not litter', () => {
+    const zones = getActiveWorldContent().zones;
+    const straw = (k: string) => k === 'corn_shock' || k === 'hay_bale';
+    for (const rule of GOURDLIGHT_DECOR_CITIES) {
+      const hub = zones.find((z) => z.id === rule.zoneId)?.hub;
+      if (!hub) continue;
+      const ground = layout.ground.filter(
+        (p) => Math.hypot(p.x - hub.x, p.z - hub.z) <= rule.radius + 3,
+      );
+      const strawCount = ground.filter((p) => straw(p.kind)).length;
+      expect(strawCount, `${rule.zoneId} straw pieces`).toBeLessThanOrEqual(16);
+      expect(strawCount / ground.length, `${rule.zoneId} straw share`).toBeLessThan(0.3);
+      const lampClusters = new Set(
+        ground.filter((p) => /^lamp:\d+:a$/.test(p.anchor)).map((p) => p.anchor.split(':')[1]),
+      );
+      const strawLamps = new Set(
+        ground
+          .filter((p) => /^lamp:\d+:[cd]$/.test(p.anchor) && straw(p.kind))
+          .map((p) => p.anchor.split(':')[1]),
+      );
+      expect(strawLamps.size, `${rule.zoneId} lamps with straw`).toBeLessThan(
+        lampClusters.size / 2,
+      );
+    }
+  });
+
   it('is deterministic and memoized per seed', () => {
     expect(resolveSeasonalDecor(WORLD_SEED)).toEqual(layout);
     expect(seasonalDecorLayout(WORLD_SEED)).toBe(seasonalDecorLayout(WORLD_SEED));

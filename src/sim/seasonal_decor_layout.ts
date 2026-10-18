@@ -25,6 +25,7 @@ import {
   GOURDLIGHT_DECOR_CITIES,
   type SeasonalCityDecorRule,
 } from './content/gourdlight_eve_decor';
+import { GOURDLIGHT_PUMPKINS } from './content/gourdlight_pumpkins';
 import { getActiveWorldContent, NPCS } from './data';
 import { hash2 } from './rng';
 import { resolveScarecrowField } from './seasonal/scarecrow_field';
@@ -109,6 +110,15 @@ const DECOR_KIND_RADIUS: Readonly<Partial<Record<SeasonalGroundKind, number>>> =
 const STREET_BAND: readonly [number, number] = [3.5, 4.7];
 /** A street piece keeps this far from a lamp (its own cluster dresses it). */
 const STREET_LAMP_GAP = 4.5;
+// How much straw (corn shocks, hay bales) the town dressing carries: the share of
+// lamp posts with a bale or a shock in their cluster, of knocking doors framed by
+// a shock, and of townsfolk with a bale at their side. Kept low so the cities read
+// dressed, not littered (owner note 2026-10-18); pinned by the straw ceiling in
+// tests/seasonal_decor_layout.test.ts.
+const LAMP_BALE_SHARE = 0.18;
+const LAMP_SHOCK_SHARE = 0.15;
+const DOOR_SHOCK_SHARE = 0.5;
+const FOLK_BALE_SHARE = 0.1;
 /** Room kept round the keeper's stall for everything else (yards). */
 const STALL_MARGIN = 0.6;
 /** A free-standing piece never leaves a squeeze between itself and a wall: a
@@ -167,10 +177,13 @@ const NUDGES: readonly { dx: number; dz: number }[] = (() => {
   return out;
 })();
 
+// hash2 already returns [0, 1): the hash is used as is. (It was once divided by
+// 2^32 a second time, which pinned every share to 0, so every lamp, door and
+// townsfolk took a bale or a shock and the cities read littered with straw.)
 function anchorHash(anchor: string, salt: number): number {
   let h = 0;
   for (let i = 0; i < anchor.length; i++) h = (h * 31 + anchor.charCodeAt(i)) | 0;
-  return hash2(h, salt, 0x6f2d) / 4294967296;
+  return hash2(h, salt, 0x6f2d);
 }
 
 interface Probe {
@@ -239,6 +252,10 @@ function seat(
     const px = x + n.dx;
     const pz = z + n.dz;
     if (freeStanding && narrowsPassage(probe.seed, px, pz)) continue;
+    // the Haunted Pumpkin hunt's own spots stay clear, so a hidden pumpkin is never
+    // buried in the dressing
+    const r = DECOR_MIN_SPACING + decorKindRadius(kind);
+    if (GOURDLIGHT_PUMPKINS.some((h) => Math.hypot(h.x - px, h.z - pz) < r)) continue;
     const problem = groundSpotProblem(
       probe.seed,
       px,
@@ -316,15 +333,17 @@ function cityDecor(
     // ...and a harvest cluster round it: a gourd pair to one side, a small carved
     // pumpkin to the other (which side each takes turns on the anchor's hash).
     const flip = anchorHash(anchor, 2) < 0.5 ? 1 : -1;
-    // at some posts a hay bale stands in for the small pumpkin, and about half
-    // of them get a corn shock behind the cluster, so a street of lamps is never
-    // one stamp repeated
-    const bale = anchorHash(anchor, 4) < 0.45;
+    // at a few posts a hay bale stands in for the small pumpkin, and a few get a
+    // corn shock behind the cluster, so a street of lamps is never one stamp
+    // repeated. Kept sparse (owner note 2026-10-18: the straw read as litter):
+    // the lamps' own dressing is gourds and pumpkins, the straw an accent.
+    const bale = anchorHash(anchor, 4) < LAMP_BALE_SHARE;
     const slots: [string, SeasonalGroundKind, number, number, number][] = [
       ['b', 'gourd', 0.9, 1.7, 0.9],
       bale ? ['c', 'hay_bale', -0.95, 2.0, 0.9] : ['c', 'pumpkin_small', -0.85, 1.75, 0.85],
     ];
-    if (anchorHash(anchor, 5) < 0.42) slots.push(['d', 'corn_shock', 0.25 * flip, 2.35, 1]);
+    if (anchorHash(anchor, 5) < LAMP_SHOCK_SHARE)
+      slots.push(['d', 'corn_shock', 0.25 * flip, 2.35, 1]);
     for (const [slot, kind, turn, reach, size] of slots) {
       const a = back + turn * flip;
       seat(
@@ -427,7 +446,9 @@ function cityDecor(
       1,
       npc.facing,
     );
-    // ...and a corn shock on the door's other side: a knocking door is framed
+    // ...and at about every other knocking door, a corn shock on its other side:
+    // the door is framed, the street never a wall of straw
+    if (anchorHash(id, 10) >= DOOR_SHOCK_SHARE) continue;
     const b = npc.facing - Math.PI / 2;
     seat(
       probe,
@@ -447,7 +468,7 @@ function cityDecor(
     if (knockers.has(npc.id) || npc.id === GOURDLIGHT_KEEPER_NPC.id) continue;
     if (!inTown(npc.pos.x, npc.pos.z)) continue;
     const a = npc.facing - Math.PI / 2;
-    const bale = anchorHash(npc.id, 6) < 0.3;
+    const bale = anchorHash(npc.id, 6) < FOLK_BALE_SHARE;
     seat(
       probe,
       layout.ground,
@@ -463,7 +484,8 @@ function cityDecor(
   // The square: a ring round the hub, lit pumpkins between harvest pieces.
   for (let k = 0; k < rule.square.count; k++) {
     const a = (k / rule.square.count) * Math.PI * 2 + anchorHash(rule.zoneId, 3) * Math.PI;
-    const kind: SeasonalGroundKind = k % 2 === 0 ? 'pumpkin_lit' : RING_HARVEST[(k >> 1) % 3];
+    const kind: SeasonalGroundKind =
+      k % 2 === 0 ? 'pumpkin_lit' : RING_HARVEST[(k >> 1) % RING_HARVEST.length];
     seat(
       probe,
       layout.ground,
@@ -478,9 +500,12 @@ function cityDecor(
   streetDecor(rule, hub, town, probe, layout);
 }
 
-const RING_HARVEST: readonly SeasonalGroundKind[] = ['gourd', 'corn_shock', 'hay_bale'];
+const RING_HARVEST: readonly SeasonalGroundKind[] = ['gourd', 'corn_shock', 'gourd', 'hay_bale'];
+// Weighted toward the lit pieces: one straw kind in three street picks.
 const STREET_KINDS: readonly SeasonalGroundKind[] = [
   'corn_shock',
+  'pumpkin_lit',
+  'gourd',
   'pumpkin_lit',
   'hay_bale',
   'gourd',
