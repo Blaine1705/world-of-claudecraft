@@ -74,7 +74,9 @@ describe('the painted town views', () => {
       expect(body, name).toContain(
         'const paintedTowns = activeWorldHasAuthoredTown(isPaintedTownRebuildBuilding);',
       );
-      expect(body, name).toContain('if (paintedTowns && isPaintedTownRebuildBuilding(b)) continue;');
+      expect(body, name).toContain(
+        'if (paintedTowns && isPaintedTownRebuildBuilding(b)) continue;',
+      );
     }
   });
 });
@@ -144,9 +146,7 @@ PAINTED_TOWNS.forEach((town, index) => {
         ...BUILTIN_WORLD,
         promotedScenery: { paintedTowns: true },
       } as WorldContent);
-      expect(kit.buildFromSources(sources(), () => 5, true).group.userData.buildingIds).toEqual(
-        [],
-      );
+      expect(kit.buildFromSources(sources(), () => 5, true).group.userData.buildingIds).toEqual([]);
       setActiveWorldContent({
         ...BUILTIN_WORLD,
         promotedScenery: { authoredTowns: true, highwatchTown: true },
