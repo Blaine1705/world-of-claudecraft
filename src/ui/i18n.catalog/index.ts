@@ -692,6 +692,9 @@ export const en = {
     resetShort: 'Reset',
     // The customizer's Share tab: every changeable feature serialized as a
     // named value in one line (the design code), exported and imported there.
+    // The face builder uses the same word for its footer toggle button and as
+    // the title of the Share page it opens (the face code), so keep it a verb
+    // that reads on a button.
     shareTab: 'Share',
     designCode: 'Design code',
     designCodeHint:
