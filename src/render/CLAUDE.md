@@ -212,10 +212,8 @@ Everything else is a sibling module in one of these families:
   (`fenbridge_town_visibility_core.ts` `doorways`, read in `doorwayFrame` for a turned
   building); Eastbrook's roof fade takes no doors, so there a walk-in building fades while the
   lens is outside it. The Mirefen tavern (`mirefen_tavern.ts`) registers its own air from
-  `mirefen_tavern_interior_core.ts`. The Highwatch manor's fires and lamps
-  (`highwatch_manor_lights.ts`) join the props' fire-light budget and the scenery flame pass,
-  the campfire's rule. The chase camera's floor (ground, rift tier, maze hedges) is
-  `chase_camera_floor_core.ts`.
+  `mirefen_tavern_interior_core.ts`. The chase camera's floor (ground, rift tier, maze hedges)
+  is `chase_camera_floor_core.ts`.
 - **Studio (authored maps) and the editor:** two directories, each with its
   own `CLAUDE.md` and `index.ts` barrel. `authored_map/` holds what the
   renderer does ONLY on an authored map (chase-boom clamps and look-up dolly,
