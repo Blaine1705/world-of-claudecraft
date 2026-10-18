@@ -1048,7 +1048,12 @@ function extractParts(url: string): ModelPart[] {
     const mesh = obj as THREE.Mesh;
     if (!mesh.isMesh) return;
     const srcMat = mesh.material as THREE.Material;
-    const geometry = sculptFoliageTreeGeometry(url, srcMat.name, bakeGeometry(mesh));
+    const geometry = sculptFoliageTreeGeometry(
+      url,
+      srcMat.name,
+      bakeGeometry(mesh),
+      GFX.leanFoliage,
+    );
     parts.push({
       geometry,
       material: foliageMaterial(
@@ -1518,6 +1523,38 @@ function buildShadowCasters(
   return { mesh, row };
 }
 
+const instancedMeshBounds = new WeakMap<
+  THREE.InstancedMesh,
+  { x: number; z: number; radius: number }
+>();
+
+function recordMeshBounds(
+  mesh: THREE.InstancedMesh,
+  items: readonly { x: number; z: number }[],
+  margin: number,
+): { x: number; z: number; radius: number } {
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minZ = Infinity;
+  let maxZ = -Infinity;
+  for (let i = 0; i < items.length; i++) {
+    const d = items[i];
+    if (d.x < minX) minX = d.x;
+    if (d.x > maxX) maxX = d.x;
+    if (d.z < minZ) minZ = d.z;
+    if (d.z > maxZ) maxZ = d.z;
+  }
+  const bounds = {
+    x: (minX + maxX) / 2,
+    z: (minZ + maxZ) / 2,
+    radius: Math.hypot(maxX - minX, maxZ - minZ) / 2 + margin,
+  };
+  instancedMeshBounds.set(mesh, bounds);
+  mesh.computeBoundingBox();
+  mesh.computeBoundingSphere();
+  return bounds;
+}
+
 function placeSpecies(
   parent: THREE.Group,
   seed: number,
@@ -1560,7 +1597,7 @@ function placeSpecies(
     const farOnlyItems: Decoration[] = [];
     const realList: Decoration[] = [];
     for (const d of list) (d.farOnly ? farOnlyItems : realList).push(d);
-    const coreRatio = GFX.leanFoliage ? 0.42 : 0.5;
+    const coreRatio = GFX.tier === 'low' ? 1 : GFX.leanFoliage ? 0.42 : 0.5;
     for (const d of realList) {
       if (realList.length < 4 || hashAt(d.x, d.z, spec.salt + 91) < coreRatio) coreItems.push(d);
       else nearFillItems.push(d);
@@ -1596,8 +1633,7 @@ function placeSpecies(
         const s = d.scale * spec.baseScale;
         const heightJitter = 1 + (hashAt(d.x, d.z, 31) - 0.5) * 0.18;
         const yaw = d.variant * 2.1 + hashAt(d.x, d.z, 11) * Math.PI * 2;
-        const baseHex =
-          typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
+        const baseHex = typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
         impostorBucket.add(
           row,
           d.x,
@@ -1636,6 +1672,7 @@ function placeSpecies(
         });
         im.castShadow = false;
         im.receiveShadow = true;
+        recordMeshBounds(im, group.items, 18);
         parent.add(im);
         const cullBark =
           GFX.standardMaterials && !part.isLeaf && (spec.cullBarkFar || spec.farTrunkProxy);
@@ -1666,6 +1703,7 @@ function placeSpecies(
               visibleMatrix: source.visibleMatrix,
             });
           }
+          recordMeshBounds(proxy, group.items, 18);
           parent.add(proxy);
           register(proxy, 'proxy', barkFar, group.maxDist, { max: true });
         }
@@ -1716,7 +1754,7 @@ function buildTrees(
     : decos.filter((d) => survivesLeanDecimation(d, hashAt(d.x, d.z, 83), GFX.standardMaterials));
   const buckets = new Map<string, Bucket>();
   for (const d of sourceDecos) {
-    const col = d.x < 0 ? 0 : 1;
+    const col = GFX.leanFoliage ? Math.floor(d.x / BUCKET_DEPTH) : d.x < 0 ? 0 : 1;
     const band = Math.floor((d.z - WORLD_MIN_Z) / BUCKET_DEPTH);
     const key = `${band}:${col}`;
     let bucket = buckets.get(key);
@@ -1904,11 +1942,12 @@ function buildTrees(
       spriteCategory?: ImpostorCategory,
       shadow?: ShadowCasterRow,
     ): void => {
+      const mBounds = instancedMeshBounds.get(mesh);
       registry.push({
         mesh,
-        x: bx,
-        z: bz,
-        radius: bRadius,
+        x: mBounds ? mBounds.x : bx,
+        z: mBounds ? mBounds.z : bz,
+        radius: mBounds ? mBounds.radius : bRadius,
         minDist,
         maxDist,
         minAtDetail: atDetail?.min,
@@ -2042,6 +2081,7 @@ function buildTrees(
         });
         // no rock shadows cast: sub-pixel at typical camera range, real draw cost
         rockMesh.receiveShadow = true;
+        recordMeshBounds(rockMesh, realRocks, 10);
         parent.add(rockMesh);
         if (impostorsActive()) {
           // Radius-aware cull against the rock swap (spriteCategory routes it
@@ -2170,7 +2210,8 @@ function buildDressing(
   const buckets = new Map<string, DressingSpot[]>();
   for (const spot of generateDressing(seed)) {
     if (outsideFoliageBounds(spot.x, spot.z)) continue;
-    const key = `${Math.floor((spot.z - WORLD_MIN_Z) / BUCKET_DEPTH)}:${spot.x < 0 ? 0 : 1}`;
+    const col = GFX.leanFoliage ? Math.floor(spot.x / BUCKET_DEPTH) : spot.x < 0 ? 0 : 1;
+    const key = `${Math.floor((spot.z - WORLD_MIN_Z) / BUCKET_DEPTH)}:${col}`;
     const list = buckets.get(key);
     if (list) list.push(spot);
     else buckets.set(key, [spot]);
@@ -2243,13 +2284,14 @@ function buildDressing(
           im.setColorAt(i, dressingSpotTint(kind, s, seed, c));
         });
         im.receiveShadow = true; // dressing casts nothing: too small to matter
+        const kBounds = recordMeshBounds(im, list, 6);
         parent.add(im);
         const spriteBacked = spriteRow !== null && dressSprites !== null;
         registry.push({
           mesh: im,
-          x: bx,
-          z: bz,
-          radius: bRadius,
+          x: kBounds.x,
+          z: kBounds.z,
+          radius: kBounds.radius,
           // Sprite-backed kinds cull radius-aware against the dress swap
           // (spriteCategory routes it in update()); ferns and mushrooms have
           // no sprite side and keep the numeric cap.

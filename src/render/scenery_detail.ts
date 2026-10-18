@@ -66,6 +66,7 @@ interface Entry {
   colorVersion: number;
   hideVersion: number;
   readyLevels: number;
+  lastMaterial?: THREE.Material | THREE.Material[];
   restoreShadow: () => void;
   placements?: SceneryDetailPlacement[];
 }
@@ -396,9 +397,12 @@ export class SceneryDetailSession {
       const source = entry.mesh as THREE.InstancedMesh;
       // Camera occlusion can replace a prop material with its existing fade
       // clone. Follow that owner in the same frame, even at a fixed camera.
-      if (entry.colorMesh) entry.colorMesh.material = source.material;
-      for (const batch of entry.batches) batch.mesh.material = source.material;
-      const hide = entry.source.getAttribute(GHOST_HIDE_ATTRIBUTE) as
+      if (entry.lastMaterial !== source.material) {
+        entry.lastMaterial = source.material;
+        if (entry.colorMesh) entry.colorMesh.material = source.material;
+        for (const batch of entry.batches) batch.mesh.material = source.material;
+      }
+      const hide = entry.source.attributes[GHOST_HIDE_ATTRIBUTE] as
         | THREE.InstancedBufferAttribute
         | undefined;
       const matrixVersion = source.instanceMatrix?.version ?? 0;
@@ -691,8 +695,13 @@ export function sceneryFar(
 export function isLowSceneryCullActive(fogFar: number): boolean {
   return !!lowBands || fogFar <= LOW_SCENERY_BUDGET.full;
 }
+export function sceneryClutterFar(fogFar: number): number {
+  return isLowSceneryCullActive(fogFar)
+    ? Math.max(fogFar, LOW_SCENERY_BUDGET.full + LOW_SCENERY_BUDGET.placementMargin)
+    : fogFar;
+}
 export function sceneryStructureFar(fogFar: number): number {
-  return isLowSceneryCullActive(fogFar) ? Math.max(fogFar, LOW_SCENERY_BUDGET.far) : fogFar;
+  return isLowSceneryCullActive(fogFar) ? Math.max(fogFar, LOW_SCENERY_BUDGET.middle) : fogFar;
 }
 export function sceneryDetailSnapshot(): object | null {
   if (lowBands) return lowBands.snapshot();

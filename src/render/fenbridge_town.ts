@@ -47,6 +47,7 @@ import type { RevealGateCore } from './reveal_gate_core';
 import {
   isLowSceneryCullActive,
   prepareSceneryDetailRoot,
+  sceneryClutterFar,
   sceneryStructureFar,
 } from './scenery_detail';
 import {
@@ -203,6 +204,8 @@ interface SurfaceTextures {
 interface BuildingHideTarget extends FenbridgeBuildingVisibilityTarget {
   group: THREE.Group;
   materials: OccluderFadeMat[];
+  interiors: readonly THREE.Object3D[];
+  interiorsVisible: boolean;
   hidden: boolean;
   alpha: number;
 }
@@ -1050,6 +1053,8 @@ function buildFromTemplates(
     hideTargets.push({
       group: built.group,
       materials: built.mats,
+      interiors: built.interiors,
+      interiorsVisible: true,
       hidden: false,
       alpha: 1,
       x: building.position.x,
@@ -1068,6 +1073,7 @@ function buildFromTemplates(
   }
 
   const microBatches = buildMicroBatches(templates, groundAt, textures);
+  const microBatchCount = microBatches.length;
   for (const batch of microBatches) group.add(batch);
 
   const boardwalkUrl = FENBRIDGE_LAYOUT.repeated.boardwalks[0].assetId;
@@ -1186,11 +1192,20 @@ function buildFromTemplates(
       lastCamX = camX;
       lastCamZ = camZ;
       const lowCull = isLowSceneryCullActive(fogFar);
+      const clutterFar = sceneryClutterFar(fogFar);
       const structureFar = sceneryStructureFar(fogFar);
       const cullX = lowCull ? eyeX : camX;
       const cullZ = lowCull ? eyeZ : camZ;
       const hubDx = cullX - FENBRIDGE_LAYOUT.hub.center.x;
       const hubDz = cullZ - FENBRIDGE_LAYOUT.hub.center.z;
+      const microVisible = fenbridgeFogVisible(
+        cullX,
+        cullZ,
+        FENBRIDGE_LAYOUT.hub.center.x,
+        FENBRIDGE_LAYOUT.hub.center.z,
+        clutterFar,
+        TOWN_CULL_RADIUS,
+      );
       const reveal = townStaticReveal(
         fenbridgeFogVisible(
           cullX,
@@ -1211,7 +1226,9 @@ function buildFromTemplates(
       // nearest first: the whole town no longer waits for its slowest program.
       townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);
       for (let index = 0; index < staticCullTargets.length; index++) {
-        staticCullTargets[index].visible = townRootVisible(reveal, staticPiecewise, index);
+        staticCullTargets[index].visible =
+          (index >= microBatchCount || microVisible) &&
+          townRootVisible(reveal, staticPiecewise, index);
       }
       // Buildings keep their own fog cull and camera fade, but their FIRST
       // reveal rides the same hold as the batches: while the gate compiles
@@ -1239,6 +1256,19 @@ function buildFromTemplates(
           visibilityPlan.visible &&
           townRootVisible(reveal, staticPiecewise, buildingRootBase + index);
         if (!visibilityPlan.visible) continue;
+        const bDx = cullX - target.x;
+        const bDz = cullZ - target.z;
+        const interiorReach = target.cullRadius + 6;
+        const showInteriors =
+          !lowCull ||
+          visibilityPlan.hidden ||
+          bDx * bDx + bDz * bDz <= interiorReach * interiorReach;
+        if (target.interiorsVisible !== showInteriors) {
+          target.interiorsVisible = showInteriors;
+          for (let i = 0; i < target.interiors.length; i++) {
+            target.interiors[i].visible = showInteriors;
+          }
+        }
         prefetchOccluderFadeWithin(target.materials, target.x, target.z, camX, camZ);
         target.hidden = visibilityPlan.hidden;
         target.alpha = advanceOccluderFade(

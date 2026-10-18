@@ -412,9 +412,9 @@ describe('generated chunk geometry is stable', () => {
     // crossing the sea surface). Computed twice in separate processes.
     // Re-minted for the World of ClaudeCraft Studio map's arrangement of the
     // same town plus the Genshin Impact terrain palette, meadow splat, beach
-    // sand strand, road verge, limestone cliff strata, and Low-tier baked
-    // canopy and building contact shadows.
-    expect(digestOf(inRect)).toBe('8c85d8763d5e875d155226d01b1cd996');
+    // sand strand, road verge, non-directional cliff stone mottling, and Low-tier
+    // baked canopy and building contact shadows.
+    expect(digestOf(inRect)).toBe('f3a0a514adf8f0a5168559873a82c83a');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

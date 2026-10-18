@@ -40,7 +40,9 @@ describe('palette lab rim light', () => {
     setLabRim(0.4, 3, [1, 0.5, 0.25], 0.85);
     expect((cloned.uWocLabRim.value as Float32Array)[0]).toBeCloseTo(0.4);
     const color = cloned.uWocLabRimColor.value as Float32Array;
-    [1, 0.5, 0.25, 0.85].forEach((want, i) => expect(color[i]).toBeCloseTo(want, 6));
+    [1, 0.5, 0.25, 0.85].forEach((want, i) => {
+      expect(color[i]).toBeCloseTo(want, 6);
+    });
     setLabRim(0, 3, [0.8, 0.9, 1], 0.5);
   });
 });

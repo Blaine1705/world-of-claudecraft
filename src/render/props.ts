@@ -94,6 +94,7 @@ import type { RevealGateCore } from './reveal_gate_core';
 import {
   isLowSceneryCullActive,
   prepareSceneryDetailRoot,
+  sceneryClutterFar,
   sceneryStructureFar,
 } from './scenery_detail';
 import { shipWakePrewarmParts } from './ship_wake';
@@ -2756,8 +2757,9 @@ export function buildProps(
       reducedMotion = false,
     ): void {
       const lowCull = isLowSceneryCullActive(fogFar);
+      const clutterFar = sceneryClutterFar(fogFar);
+      const clutterFarSq = clutterFar * clutterFar;
       const structureFar = sceneryStructureFar(fogFar);
-      const structureFarSq = structureFar * structureFar;
       const cullX = lowCull ? eyeX : camX;
       const cullZ = lowCull ? eyeZ : camZ;
       scheduledShips?.sync(dt);
@@ -2786,8 +2788,8 @@ export function buildProps(
         cullables,
         cullX,
         cullZ,
-        structureFar,
-        structureFarSq,
+        clutterFar,
+        clutterFarSq,
         bandRevealGate,
         cullPass,
       );

@@ -4,7 +4,10 @@ import { EntryDetailHorizonAdmission } from '../src/render/entry_detail_horizon'
 import {
   advanceEntryDetailHorizon,
   createEntryDetailHorizonState,
+  ENTRY_DETAIL_HORIZON_FAR_HEADROOM_MS,
   ENTRY_DETAIL_HORIZON_HEADROOM_MS,
+  ENTRY_DETAIL_HORIZON_SHED_FRAMES,
+  ENTRY_DETAIL_HORIZON_SHED_MS,
   ENTRY_DETAIL_HORIZON_STABLE_FRAMES,
   ENTRY_DETAIL_HORIZON_STEPS,
   entrySceneryCullFar,
@@ -149,6 +152,58 @@ describe('entry detail horizon admission', () => {
       });
     }
     expect(state.cap).toBe(ENTRY_DETAIL_HORIZON_STEPS[1]);
+  });
+
+  it('requires high-refresh headroom to expand beyond 360 yards and sheds back to 360 yards under sustained load', () => {
+    const admission = new EntryDetailHorizonAdmission(700);
+    admission.arm(700, true);
+    // 17 ms (~58.8 FPS) opens the 240 -> 360 yd ring, then holds at 360 yd.
+    for (let i = 0; i < ENTRY_DETAIL_HORIZON_STABLE_FRAMES * 4; i++) {
+      admission.advanceFromFrame(true, 700, null, 700, ENTRY_DETAIL_HORIZON_FAR_HEADROOM_MS + 4.5);
+    }
+    expect(admission.snapshot()).toMatchObject({
+      active: true,
+      cap: 360,
+      sceneryCap: 360,
+      holdReason: 'frame',
+    });
+
+    // High-refresh headroom (<= 12.5 ms) expands through 520 yd to 700 yd (complete).
+    for (let i = 0; i < ENTRY_DETAIL_HORIZON_STABLE_FRAMES * 2; i++) {
+      admission.advanceFromFrame(true, 700, null, 700, 10);
+    }
+    expect(admission.snapshot()).toMatchObject({
+      active: false,
+      cap: 700,
+      sceneryCap: null,
+      holdReason: 'advanced',
+    });
+
+    // Returning to a heavy zone (> 18.5 ms) sheds 700 -> 520 -> 360 yd and floors at 360 yd
+    // without touching compile records.
+    const poisonRecords = new Proxy([] as never[], {
+      get() {
+        throw new Error('settled horizon scanned compile records during shed');
+      },
+    });
+    for (let i = 0; i < ENTRY_DETAIL_HORIZON_SHED_FRAMES; i++) {
+      admission.advanceFromFrame(true, 700, poisonRecords, 700, ENTRY_DETAIL_HORIZON_SHED_MS + 2);
+    }
+    expect(admission.snapshot()).toMatchObject({
+      active: true,
+      cap: 520,
+      sceneryCap: 520,
+      holdReason: 'frame',
+    });
+    for (let i = 0; i < ENTRY_DETAIL_HORIZON_SHED_FRAMES * 3; i++) {
+      admission.advanceFromFrame(true, 700, poisonRecords, 700, ENTRY_DETAIL_HORIZON_SHED_MS + 2);
+    }
+    expect(admission.snapshot()).toMatchObject({
+      active: true,
+      cap: 360,
+      sceneryCap: 360,
+      holdReason: 'frame',
+    });
   });
 
   describe('scenery cull far while the horizon expands', () => {

@@ -1,14 +1,15 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import {
-  resolveTreeLeafColor,
-  sculptFoliageTreeGeometry,
-} from '../src/render/foliage_tree_sculpt';
+import { resolveTreeLeafColor, sculptFoliageTreeGeometry } from '../src/render/foliage_tree_sculpt';
 
 describe('foliage_tree_sculpt', () => {
   it('sculpts broadleaf oak canopies into multi-dome cumulus geometry with vertex colors', () => {
     const raw = new THREE.BoxGeometry(1, 1, 1);
-    const sculpted = sculptFoliageTreeGeometry('/models/foliage/oak_1.glb', 'Leaves_NormalTree', raw);
+    const sculpted = sculptFoliageTreeGeometry(
+      '/models/foliage/oak_1.glb',
+      'Leaves_NormalTree',
+      raw,
+    );
     expect(sculpted).not.toBe(raw);
     const pos = sculpted.getAttribute('position');
     const nrm = sculpted.getAttribute('normal');
@@ -23,6 +24,43 @@ describe('foliage_tree_sculpt', () => {
     const sculpted = sculptFoliageTreeGeometry('/models/foliage/oak_2.glb', 'Bark_NormalTree', raw);
     expect(sculpted).toBe(raw);
     expect(sculpted.boundingBox).not.toBeNull();
+  });
+
+  it('replaces dense field trunks and trims canopy cards in lean mode', () => {
+    const denseOakBark = new THREE.CylinderGeometry(0.2, 0.3, 4, 32, 32);
+    expect((denseOakBark.index?.count ?? 0) / 3).toBeGreaterThan(1000);
+    const leanOakBark = sculptFoliageTreeGeometry(
+      '/models/foliage/oak_1.glb',
+      'Bark_NormalTree',
+      denseOakBark,
+      true,
+    );
+    expect(leanOakBark).toBe(denseOakBark);
+    expect((leanOakBark.index?.count ?? 0) / 3).toBeLessThanOrEqual(140);
+
+    const densePineBark = new THREE.CylinderGeometry(0.2, 0.3, 5, 32, 32);
+    const leanPineBark = sculptFoliageTreeGeometry(
+      '/models/foliage/pine_1.glb',
+      'Bark_NormalTree',
+      densePineBark,
+      true,
+    );
+    expect(leanPineBark).toBe(densePineBark);
+    expect((leanPineBark.index?.count ?? 0) / 3).toBeLessThanOrEqual(60);
+
+    const fullCanopy = sculptFoliageTreeGeometry(
+      '/models/foliage/oak_1.glb',
+      'Leaves_NormalTree',
+      new THREE.BoxGeometry(1, 1, 1),
+      false,
+    );
+    const leanCanopy = sculptFoliageTreeGeometry(
+      '/models/foliage/oak_1.glb',
+      'Leaves_NormalTree',
+      new THREE.BoxGeometry(1, 1, 1),
+      true,
+    );
+    expect((leanCanopy.index?.count ?? 0) / 3).toBeLessThan((fullCanopy.index?.count ?? 0) / 3);
   });
 
   it('produces multi-colored Genshin foliage palette across Eastbrook Vale coordinates', () => {

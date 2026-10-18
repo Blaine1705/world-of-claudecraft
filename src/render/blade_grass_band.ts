@@ -115,7 +115,7 @@ export function buildBladeGrassBand(
   const POOL = GRID_W * GRID_W;
 
   const rng = mulberry32(seed ^ 0x6b1a);
-  const geo = clusterGeometry(rng);
+  const geo = clusterGeometry(rng, 2);
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 0.92,
@@ -314,6 +314,7 @@ export function buildBladeGrassBand(
   let lastBaseI = initialBaseI;
   let lastBaseJ = initialBaseJ;
   let pending = false;
+  let fastRefill = false;
 
   const view: BladeGrassBandView = {
     group,
@@ -329,12 +330,19 @@ export function buildBladeGrassBand(
       const baseI = Math.floor(px / CELL) - (GRID_W >> 1);
       const baseJ = Math.floor(pz / CELL) - (GRID_W >> 1);
       if (baseI === lastBaseI && baseJ === lastBaseJ && !pending) return;
+      if (Math.abs(baseI - lastBaseI) >= GRID_W || Math.abs(baseJ - lastBaseJ) >= GRID_W) {
+        fastRefill = true;
+      }
       lastBaseI = baseI;
       lastBaseJ = baseJ;
       // re-placed slots this frame. Ranges are queued per sector, never
       // cleared here: the renderer clears them after it actually uploads, so
       // a skipped frame keeps its pending spans alive.
-      pending = scanTargetBlock(baseI, baseJ, MEADOW_BAND_PLACE_BUDGET);
+      const budget = fastRefill
+        ? Math.max(MEADOW_BAND_PLACE_BUDGET, Math.ceil(POOL / 4))
+        : MEADOW_BAND_PLACE_BUDGET;
+      pending = scanTargetBlock(baseI, baseJ, budget);
+      if (!pending) fastRefill = false;
       sectorPool.queueUploads();
       sectorPool.syncSectors();
     },

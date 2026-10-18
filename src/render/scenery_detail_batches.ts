@@ -8,6 +8,7 @@ interface Pool {
   owners: THREE.Object3D[];
   selected: boolean[];
   versions: number[];
+  frustumPass: (boolean | undefined)[];
 }
 
 function visible(object: THREE.Object3D): boolean {
@@ -22,6 +23,8 @@ export class SceneryDetailBatches {
   private pools: Pool[] = [];
   private frustum = new THREE.Frustum();
   private projection = new THREE.Matrix4();
+  private lastProjection = new THREE.Matrix4();
+  private hasLastProjection = false;
   private sphere = new THREE.Sphere();
   private disposed = false;
   private ready = false;
@@ -108,6 +111,7 @@ export class SceneryDetailBatches {
         owners: children.map((child) => owners.get(child)!),
         selected: [],
         versions: [],
+        frustumPass: [],
       });
     }
   }
@@ -136,8 +140,14 @@ export class SceneryDetailBatches {
   update(camera: THREE.Camera): void {
     if (!this.ready || this.disposed) return;
     this.projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    this.frustum.setFromProjectionMatrix(this.projection);
+    const cameraMoved = !this.hasLastProjection || !this.projection.equals(this.lastProjection);
+    if (cameraMoved) {
+      this.lastProjection.copy(this.projection);
+      this.hasLastProjection = true;
+      this.frustum.setFromProjectionMatrix(this.projection);
+    }
     for (const pool of this.pools) {
+      if (cameraMoved) pool.frustumPass.length = 0;
       let changed = false;
       let count = 0;
       for (let i = 0; i < pool.children.length; i++) {
@@ -161,8 +171,13 @@ export class SceneryDetailBatches {
           owner.matrix.equals(pool.mesh.matrix);
         let selected = compatible && child.count > 0 && visible(owner);
         if (selected && child.frustumCulled && child.boundingSphere) {
-          this.sphere.copy(child.boundingSphere).applyMatrix4(owner.matrixWorld);
-          selected = this.frustum.intersectsSphere(this.sphere);
+          let pass = pool.frustumPass[i];
+          if (pass === undefined) {
+            this.sphere.copy(child.boundingSphere).applyMatrix4(owner.matrixWorld);
+            pass = this.frustum.intersectsSphere(this.sphere);
+            pool.frustumPass[i] = pass;
+          }
+          selected = pass;
         }
         const version =
           child.instanceMatrix.version +

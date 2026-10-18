@@ -36,7 +36,7 @@ import {
   meadowClusterScale,
   meadowCoverage,
 } from './meadow_tuning';
-import { paletteLabEnabled } from './palette_lab';
+import { paletteLabPanelEnabled } from './palette_lab';
 import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { GRASS_WIND_TIME_SCALE } from './tree_sway';
@@ -111,7 +111,7 @@ export function mulberry32(seed: number): () => number {
 // Exported (geometry unchanged): the mid-band (blade_grass_band.ts) and the
 // ground bake (grass_ground_bake.ts) must use these EXACT clusters so the
 // carpet, the band, and the painted ground are one look by construction.
-export function clusterGeometry(rng: () => number): THREE.BufferGeometry {
+export function clusterGeometry(rng: () => number, segments: 2 | 3 = 3): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
   const indices: number[] = [];
@@ -144,30 +144,50 @@ export function clusterGeometry(rng: () => number): THREE.BufferGeometry {
       // from the ground it grows in
       colors.push(shade, shade, shade);
     };
-    put(-w0, 0, 0.86);
-    put(w0, 0, 0.86);
-    put(-w1, 0.45, 0.95);
-    put(w1, 0.45, 0.95);
-    put(-w2, 0.78, 1.03);
-    put(w2, 0.78, 1.03);
-    put(0, 1.0, 1.1);
-    indices.push(
-      base,
-      base + 1,
-      base + 2,
-      base + 1,
-      base + 3,
-      base + 2,
-      base + 2,
-      base + 3,
-      base + 4,
-      base + 3,
-      base + 5,
-      base + 4,
-      base + 4,
-      base + 5,
-      base + 6,
-    );
+    if (segments === 2) {
+      const wMid = w0 * 0.62;
+      put(-w0, 0, 0.86);
+      put(w0, 0, 0.86);
+      put(-wMid, 0.56, 0.98);
+      put(wMid, 0.56, 0.98);
+      put(0, 1.0, 1.1);
+      indices.push(
+        base,
+        base + 1,
+        base + 2,
+        base + 1,
+        base + 3,
+        base + 2,
+        base + 2,
+        base + 3,
+        base + 4,
+      );
+    } else {
+      put(-w0, 0, 0.86);
+      put(w0, 0, 0.86);
+      put(-w1, 0.45, 0.95);
+      put(w1, 0.45, 0.95);
+      put(-w2, 0.78, 1.03);
+      put(w2, 0.78, 1.03);
+      put(0, 1.0, 1.1);
+      indices.push(
+        base,
+        base + 1,
+        base + 2,
+        base + 1,
+        base + 3,
+        base + 2,
+        base + 2,
+        base + 3,
+        base + 4,
+        base + 3,
+        base + 5,
+        base + 4,
+        base + 4,
+        base + 5,
+        base + 6,
+      );
+    }
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
@@ -204,8 +224,8 @@ export function clusterPlacementPad(geo: THREE.BufferGeometry): number {
     const d = x * x + y * y + z * z;
     if (d > maxSq) maxSq = d;
   }
-  // A palette-lab session may stretch clusters up to MEADOW_MAX_STRETCH.
-  const labReach = paletteLabEnabled() ? MEADOW_MAX_STRETCH : 1;
+  // A palette-lab panel session may stretch clusters up to MEADOW_MAX_STRETCH.
+  const labReach = paletteLabPanelEnabled() ? MEADOW_MAX_STRETCH : 1;
   return (Math.sqrt(maxSq) + CLUSTER_SWAY_REACH) * CLUSTER_MAX_SCALE * labReach;
 }
 
@@ -466,6 +486,7 @@ export function buildBladeGrass(
   let lastBaseI = initialBaseI;
   let lastBaseJ = initialBaseJ;
   let pending = false;
+  let fastRefill = false;
 
   const view: BladeGrassView = {
     group,
@@ -479,12 +500,17 @@ export function buildBladeGrass(
       const baseI = Math.floor(px / CELL) - (GRID_W >> 1);
       const baseJ = Math.floor(pz / CELL) - (GRID_W >> 1);
       if (baseI === lastBaseI && baseJ === lastBaseJ && !pending) return;
+      if (Math.abs(baseI - lastBaseI) >= GRID_W || Math.abs(baseJ - lastBaseJ) >= GRID_W) {
+        fastRefill = true;
+      }
       lastBaseI = baseI;
       lastBaseJ = baseJ;
       // re-placed slots this frame. Ranges are queued per sector, never
       // cleared here: the renderer clears them after it actually uploads, so
       // a skipped frame keeps its pending spans alive.
-      pending = scanTargetBlock(baseI, baseJ, PLACE_BUDGET);
+      const budget = fastRefill ? Math.max(PLACE_BUDGET, Math.ceil(POOL / 4)) : PLACE_BUDGET;
+      pending = scanTargetBlock(baseI, baseJ, budget);
+      if (!pending) fastRefill = false;
       sectorPool.queueUploads();
       sectorPool.syncSectors();
     },

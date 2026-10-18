@@ -390,15 +390,15 @@ export function insideEastbrookGrassExclusion(
 ): boolean {
   for (let index = 0; index < exclusions.length; index++) {
     const exclusion = exclusions[index];
+    const dx = x - exclusion.x;
+    const dz = z - exclusion.z;
     if (exclusion.kind === 'circle') {
-      const dx = x - exclusion.x;
-      const dz = z - exclusion.z;
       const radius = exclusion.radius + padding;
       if (dx * dx + dz * dz < radius * radius) return true;
       continue;
     }
-    const dx = x - exclusion.x;
-    const dz = z - exclusion.z;
+    const maxSpan = exclusion.halfWidth + exclusion.halfDepth + padding;
+    if (Math.abs(dx) > maxSpan || Math.abs(dz) > maxSpan) continue;
     const cosine = Math.cos(exclusion.rotation);
     const sine = Math.sin(exclusion.rotation);
     const localX = dx * cosine - dz * sine;
@@ -424,6 +424,8 @@ export function insideAnyBuildingFootprint(
     const b = buildings[i];
     const dx = x - b.x;
     const dz = z - b.z;
+    const maxSpan = (b.w + b.d) * 0.5 + padding;
+    if (Math.abs(dx) > maxSpan || Math.abs(dz) > maxSpan) continue;
     const cos = Math.cos(b.rot);
     const sin = Math.sin(b.rot);
     const localX = dx * cos - dz * sin;
@@ -434,4 +436,3 @@ export function insideAnyBuildingFootprint(
   }
   return false;
 }
-

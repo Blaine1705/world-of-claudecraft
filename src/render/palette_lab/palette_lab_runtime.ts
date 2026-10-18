@@ -231,6 +231,7 @@ class PaletteLabRuntime implements PaletteLabApi {
   private sun: THREE.DirectionalLight | null = null;
   private sunFor: LabRendererHandle | null = null;
   private canopyFor: LabRendererHandle | null = null;
+  private canopySceneChildren = 0;
   private canopyRewalkAt = 0;
   private canopyLiftWritten = Number.NaN;
   private readonly canopyBase = new WeakMap<THREE.Material, THREE.Color>();
@@ -629,17 +630,24 @@ class PaletteLabRuntime implements PaletteLabApi {
   /** Brighten the canopy materials (their authored colour times the lift). */
   private applyCanopy(renderer: LabRendererHandle, lift: number): void {
     const now = performance.now();
-    if (this.canopyFor !== renderer || now >= this.canopyRewalkAt) {
+    const sceneChildren = renderer.scene.children.length;
+    const needsWalk =
+      this.canopyFor !== renderer ||
+      sceneChildren !== this.canopySceneChildren ||
+      (this.canopyMats.size === 0 && now >= this.canopyRewalkAt);
+    if (needsWalk) {
       if (this.canopyFor !== renderer) this.canopyMats.clear();
       this.canopyFor = renderer;
+      this.canopySceneChildren = sceneChildren;
       this.canopyRewalkAt = now + CANOPY_REWALK_MS;
+      this.canopyLiftWritten = Number.NaN;
       renderer.scene.traverse((o) => {
         const mats = (o as THREE.Mesh).material;
         if (!mats) return;
         for (const m of Array.isArray(mats) ? mats : [mats]) {
           const mat = m as THREE.MeshStandardMaterial;
-          if (!mat.color || !CANOPY_MATERIAL.test(mat.name) || this.canopyBase.has(mat)) continue;
-          this.canopyBase.set(mat, mat.color.clone());
+          if (!mat.color || !CANOPY_MATERIAL.test(mat.name)) continue;
+          if (!this.canopyBase.has(mat)) this.canopyBase.set(mat, mat.color.clone());
           this.canopyMats.add(mat);
         }
       });
@@ -696,20 +704,15 @@ class PaletteLabRuntime implements PaletteLabApi {
     // and band only reach the ground around the player).
     const zone = this.zone;
     const render = zone ? this.groundLook(zone).render : null;
-    if (
-      setMeadowFullness(
-        render
-          ? {
-              coverage: render.meadowCoverage,
-              height: render.meadowHeight,
-              width: render.meadowWidth,
-            }
-          : null,
-      )
-    ) {
-      recolorLiveBladeGrassView();
-      recolorLiveBladeGrassBandView();
-    }
+    setMeadowFullness(
+      render
+        ? {
+            coverage: render.meadowCoverage,
+            height: render.meadowHeight,
+            width: render.meadowWidth,
+          }
+        : null,
+    );
     const table: Record<string, LookGround> = {};
     for (const zone of ZONES) {
       const look = this.groundLook(zone);

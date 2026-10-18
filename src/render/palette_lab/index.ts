@@ -6,5 +6,5 @@
 export { setPaletteAoPass } from './lab_lighting';
 export { setPaletteBloomPass } from './palette_bloom';
 export { PALETTE_GRADE_GLSL, paletteGradeUniforms } from './palette_grade';
-export { paletteLabEnabled } from './palette_lab_flag';
+export { paletteLabEnabled, paletteLabPanelEnabled } from './palette_lab_flag';
 export { PALETTE_SKY_DECLARATIONS, PALETTE_SKY_GLSL, paletteSkyUniforms } from './palette_sky';

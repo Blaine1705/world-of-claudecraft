@@ -39,7 +39,7 @@ if ( uWocLabRim.x > 0.0 ) {
 	float wocRimCurve = smoothstep( uWocLabRim.z, uWocLabRim.w, length( fwidth( wocRimN ) ) / max( length( fwidth( vViewPosition ) ), 1e-4 ) );
 	float wocRimNear = 1.0 - smoothstep( 50.0, 110.0, length( vViewPosition ) );
 	float wocRim = pow( 1.0 - saturate( wocRimFacing ), uWocLabRim.y ) * wocRimCurve * wocRimNear * uWocLabRim.x;
-	reflectedLight.directDiffuse += uWocLabRimColor.rgb * wocRim * mix( vec3( 1.0 ), material.diffuseColor, uWocLabRimColor.a );
+	reflectedLight.directDiffuse += material.diffuseColor * mix( vec3( 1.0 ), uWocLabRimColor.rgb, uWocLabRimColor.a ) * ( wocRim * 0.32 );
 }
 `;
 

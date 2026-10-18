@@ -5010,7 +5010,11 @@ export class Renderer {
     // the paint-free carpet ring the terrain splat reads (see terrain.ts)
     const focusX = this.editorCam ? this.editorCam.target.x : p.pos.x;
     const focusZ = this.editorCam ? this.editorCam.target.z : p.pos.z;
-    sharedUniforms.uCarpetRing.value.set(focusX, focusZ, GFX.bladeCarpetRadius || (this.editorCam ? 34 : 0));
+    sharedUniforms.uCarpetRing.value.set(
+      focusX,
+      focusZ,
+      GFX.bladeCarpetRadius || (this.editorCam ? 34 : 0),
+    );
     // The sway/wind/rock gate ranks from the free-cam LOOK-AT in the editor
     // (the applyZoneAtmosphere rule): the dummy player rides the camera, and a
     // maker inspecting a ship from 120 yards out would see it frozen.
@@ -9779,7 +9783,11 @@ export class Renderer {
     // the paint-free carpet ring the terrain splat reads (see terrain.ts)
     const focusX = this.editorCam ? this.editorCam.target.x : this.sim.player.pos.x;
     const focusZ = this.editorCam ? this.editorCam.target.z : this.sim.player.pos.z;
-    sharedUniforms.uCarpetRing.value.set(focusX, focusZ, GFX.bladeCarpetRadius || (this.editorCam ? 34 : 0));
+    sharedUniforms.uCarpetRing.value.set(
+      focusX,
+      focusZ,
+      GFX.bladeCarpetRadius || (this.editorCam ? 34 : 0),
+    );
     updateTreeSwayPlayer(focusX, focusZ);
     for (const [id, remaining] of this.waterJetVisualChannels) {
       const next = remaining - dt;
@@ -11052,7 +11060,14 @@ export class Renderer {
       }
       // Surface swimmers emit one Genshin-style wake VFX + ripple per
       // breaststroke pull (1.667s cycle); waders emit spray on stride cadence.
-      if (swimming && moving && !submerged && !visuallyDead && charOnScreen && Number.isFinite(wl)) {
+      if (
+        swimming &&
+        moving &&
+        !submerged &&
+        !visuallyDead &&
+        charOnScreen &&
+        Number.isFinite(wl)
+      ) {
         if (!v.wasSwimming || v.swimKickPhase <= 0) v.swimKickPhase = 0.76;
         v.swimKickPhase += dt * SWIM_KICK_HZ * THREE.MathUtils.clamp(loco.speed / 4.55, 0.55, 1.4);
         if (v.swimKickPhase >= 1) {
@@ -11061,8 +11076,17 @@ export class Renderer {
           this.vfx.swimKickSplash(ax, wl, az, contactAxisX, contactAxisZ, kick);
           this.waterView.addSplash(ax, az, contactRadius * 0.95, kick * 0.48);
         }
-      } else if (touchesWater && !swimming && moving && !airborne && !visuallyDead && charOnScreen && Number.isFinite(wl)) {
-        v.swimKickPhase += dt * SWIM_KICK_HZ * 1.45 * THREE.MathUtils.clamp(loco.speed / 5.5, 0.6, 1.3);
+      } else if (
+        touchesWater &&
+        !swimming &&
+        moving &&
+        !airborne &&
+        !visuallyDead &&
+        charOnScreen &&
+        Number.isFinite(wl)
+      ) {
+        v.swimKickPhase +=
+          dt * SWIM_KICK_HZ * 1.45 * THREE.MathUtils.clamp(loco.speed / 5.5, 0.6, 1.3);
         if (v.swimKickPhase >= 1) {
           v.swimKickPhase -= 1;
           this.vfx.swimKickSplash(ax, wl, az, contactAxisX, contactAxisZ, 0.75);

@@ -2538,14 +2538,14 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
           wocVergeW * 0.58
         );
         float wocCliffW = 1.0 - smoothstep(0.55, 0.80, wocSlopeUp);
-        float wocStrata = sin(vWocWPos.y * 1.35 + vWocWPos.x * 0.07 + vWocWPos.z * 0.06) * 0.5 + 0.5;
-        float wocRockGrain = sin(vWocWPos.x * 1.9 - vWocWPos.y * 2.3 + vWocWPos.z * 1.7) * 0.5 + 0.5;
+        float wocRockPatch = sin(vWocWPos.x * 0.11 + vWocWPos.z * 0.09 + sin(vWocWPos.z * 0.05 - vWocWPos.x * 0.06) * 1.6) * 0.5 + 0.5;
+        float wocRockGrain = sin(vWocWPos.x * 0.42 + vWocWPos.z * 0.37) * cos(vWocWPos.x * 0.31 - vWocWPos.z * 0.46) * 0.5 + 0.5;
         vec3 wocCliffTone = mix(
-          vec3(0.22, 0.27, 0.32),
-          vec3(0.45, 0.46, 0.42),
-          wocStrata * 0.72 + wocRockGrain * 0.28
+          vec3(0.28, 0.32, 0.36),
+          vec3(0.40, 0.41, 0.39),
+          wocRockPatch * 0.65 + wocRockGrain * 0.35 * wocDetailFade
         );
-        diffuseColor.rgb = mix(diffuseColor.rgb, mix(diffuseColor.rgb, wocCliffTone, 0.54), wocCliffW);
+        diffuseColor.rgb = mix(diffuseColor.rgb, mix(diffuseColor.rgb, wocCliffTone, 0.42), wocCliffW);
         float wocSunFace = dot(wocLowN, normalize(vec3(0.45, 0.78, 0.42)));
         float wocSlopeRelief = clamp((1.0 - wocSlopeUp) * 2.2, 0.0, 1.0);
         diffuseColor.rgb *= mix(1.0, clamp(0.76 + 0.34 * wocSunFace, 0.68, 1.12), wocSlopeRelief);

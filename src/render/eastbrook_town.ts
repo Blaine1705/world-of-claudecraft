@@ -57,6 +57,7 @@ import type { RevealGateCore } from './reveal_gate_core';
 import {
   isLowSceneryCullActive,
   prepareSceneryDetailRoot,
+  sceneryClutterFar,
   sceneryStructureFar,
 } from './scenery_detail';
 import {
@@ -201,6 +202,8 @@ interface TownAssetTemplate {
 interface RoofHideTarget extends EastbrookRoofVisibilityTarget {
   group: THREE.Group;
   mats: OccluderFadeMat[];
+  interiors?: readonly THREE.Object3D[];
+  interiorsVisible?: boolean;
   hidden: boolean;
   alpha: number;
 }
@@ -1216,6 +1219,8 @@ function buildFromTemplates(
       roofHideTargets.push({
         group: placed.group,
         mats: placed.mats,
+        interiors: placed.interiors,
+        interiorsVisible: true,
         hidden: false,
         alpha: 1,
         x: building.position.x,
@@ -1254,6 +1259,7 @@ function buildFromTemplates(
   buildingGroups.push(weeklyVault.group);
   const microBuild = buildMicroBatches(templates, groundAt, atlas);
   const microBatches = microBuild.batches;
+  const microBatchCount = microBatches.length;
   for (const batch of microBatches) group.add(batch);
   // The monument's living half: the honouree's name projected off both honour
   // plates, and the lantern halos and embers. Additive and text, which a merged
@@ -1401,9 +1407,11 @@ function buildFromTemplates(
       lastCamX = camX;
       lastCamZ = camZ;
       const lowCull = isLowSceneryCullActive(fogFar);
+      const clutterFar = sceneryClutterFar(fogFar);
       const structureFar = sceneryStructureFar(fogFar);
       const cullX = lowCull ? eyeX : camX;
       const cullZ = lowCull ? eyeZ : camZ;
+      const microVisible = eastbrookFogVisible(cullX, cullZ, 0, 0, clutterFar, TOWN_CULL_RADIUS);
       // Eastbrook is centred on the world origin, so the camera's distance
       // squared to the town centre is camX^2 + camZ^2.
       const reveal = townStaticReveal(
@@ -1419,7 +1427,9 @@ function buildFromTemplates(
       // nearest first: the whole town no longer waits for its slowest program.
       townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);
       for (let index = 0; index < staticCullTargets.length; index++) {
-        staticCullTargets[index].visible = townRootVisible(reveal, staticPiecewise, index);
+        staticCullTargets[index].visible =
+          (index >= microBatchCount || microVisible) &&
+          townRootVisible(reveal, staticPiecewise, index);
       }
       // Buildings keep their own fog cull and roof fade, but their FIRST
       // reveal rides the same hold as the batches: while the gate compiles
@@ -1447,6 +1457,21 @@ function buildFromTemplates(
           roofVisibilityPlan.visible &&
           townRootVisible(reveal, staticPiecewise, buildingRootBase + index);
         if (!roofVisibilityPlan.visible) continue;
+        if (target.interiors && target.interiors.length > 0) {
+          const bDx = cullX - target.x;
+          const bDz = cullZ - target.z;
+          const interiorReach = target.cullRadius + 6;
+          const showInteriors =
+            !lowCull ||
+            roofVisibilityPlan.hidden ||
+            bDx * bDx + bDz * bDz <= interiorReach * interiorReach;
+          if (target.interiorsVisible !== showInteriors) {
+            target.interiorsVisible = showInteriors;
+            for (let i = 0; i < target.interiors.length; i++) {
+              target.interiors[i].visible = showInteriors;
+            }
+          }
+        }
         prefetchOccluderFadeWithin(target.mats, target.x, target.z, camX, camZ);
         target.hidden = roofVisibilityPlan.hidden;
         target.alpha = advanceOccluderFade(

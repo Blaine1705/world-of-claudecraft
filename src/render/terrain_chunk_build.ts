@@ -39,12 +39,7 @@ import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { fbm2 } from '../sim/rng';
 import { cutBounds, cutsInRect, cutsSdfAt, inTerrainCut } from '../sim/terrain_cuts';
 import type { TerrainCut, TerrainKnockout } from '../sim/types';
-import {
-  generateDecorationsInBounds,
-  roadDistance,
-  waterLevel,
-  zoneBiomeAt,
-} from '../sim/world';
+import { generateDecorationsInBounds, roadDistance, waterLevel, zoneBiomeAt } from '../sim/world';
 import { groundPaletteFor, groundPaletteVersion } from './ground_palette_override_core';
 import { type ImpactCraterTerrainBlend, impactCraterTerrainBlend } from './impact_terrain';
 import { clamp01 } from './num_clamp';
@@ -503,12 +498,12 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     // the coast walls look like rugged wave-cut rock instead of smooth clay
     if (biome === 'dusk') {
       const nearSea = clamp01((16 - h) / 12);
-      const band = (Math.sin(h * 1.7 + x * 0.06 + z * 0.045) + 1) / 2;
+      const band = rockStreak;
       cTmp.lerp(duskCliffC, t * nearSea * (0.45 + band * 0.35));
       cTmp.lerp(duskStrataC, t * nearSea * (1 - band) * 0.3);
     } else {
-      // Clean limestone strata: cool slate-grey and warm chalk bands, never brown dirt.
-      const band = (Math.sin(h * 0.52 + (rockStreak - 0.5) * 5.2) + 1) * 0.5;
+      // Clean limestone mottling: cool slate-grey and warm chalk patches, never horizontal stripes.
+      const band = rockStreak;
       cTmp.lerp(duskCliffC, t * band * 0.22);
       cTmp.lerp(duskStrataC, t * (1 - band) * 0.24);
     }
@@ -546,7 +541,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   }
   // The high-rock altitude band's onset wanders with the streak noise (a
   // dithered elevation band, not a striped cutoff), and the stone above it
-  // takes the same warm strata as the slope rock so summits read layered.
+  // takes the same warm mottling as the slope rock so summits read naturally.
   const highH = 22 + (rockStreak - 0.5) * 7;
   if (autoSnowCaps && h > highH) {
     const rockT = clamp01((h - highH) / 10) * (0.6 + rockStreak * 0.25);
@@ -554,7 +549,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     cTmp.lerp(biome === 'ember' ? emberBasaltC : rockC, rockT);
     snow = biome === 'ember' ? 0 : clamp01((h - 34 + (snowPatch - 0.5) * 14) / 26) * 0.85;
     if (biome !== 'ember') {
-      const band = (Math.sin(h * 0.52 + (rockStreak - 0.5) * 5.2) + 1) * 0.5;
+      const band = rockStreak;
       cTmp.lerp(duskCliffC, rockT * (1 - snow) * band * 0.2);
       cTmp.lerp(duskStrataC, rockT * (1 - snow) * (1 - band) * 0.22);
     }
@@ -729,7 +724,12 @@ function buildLowChunkOccluders(
     castScale = 1,
   ): void => {
     const boundR = Math.hypot(hw, hd) + 6.5;
-    if (cx + boundR < x0 || cx - boundR > x0 + size || cz + boundR < z0 || cz - boundR > z0 + size) {
+    if (
+      cx + boundR < x0 ||
+      cx - boundR > x0 + size ||
+      cz + boundR < z0 ||
+      cz - boundR > z0 + size
+    ) {
       return;
     }
     boxes.push({
@@ -795,7 +795,8 @@ function lowCanopyAndBuildingShade(occ: LowChunkOccluders, x: number, z: number)
     if (dz > b.boundR || dz < -b.boundR) continue;
     const lx = Math.abs(dx * b.cos - dz * b.sin) - b.hw;
     const lz = Math.abs(dx * b.sin + dz * b.cos) - b.hd;
-    const contactDist = Math.hypot(Math.max(0, lx), Math.max(0, lz)) + Math.min(0, Math.max(lx, lz));
+    const contactDist =
+      Math.hypot(Math.max(0, lx), Math.max(0, lz)) + Math.min(0, Math.max(lx, lz));
     if (contactDist < 2.8) {
       const u = clamp01(1 - Math.max(0, contactDist) / 2.8);
       const ao = u * u * 0.72;
@@ -805,7 +806,8 @@ function lowCanopyAndBuildingShade(occ: LowChunkOccluders, x: number, z: number)
     const sdz = z - b.sz;
     const slx = Math.abs(sdx * b.cos - sdz * b.sin) - b.hw;
     const slz = Math.abs(sdx * b.sin + sdz * b.cos) - b.hd;
-    const castDist = Math.hypot(Math.max(0, slx), Math.max(0, slz)) + Math.min(0, Math.max(slx, slz));
+    const castDist =
+      Math.hypot(Math.max(0, slx), Math.max(0, slz)) + Math.min(0, Math.max(slx, slz));
     if (castDist < 4.8) {
       const u = clamp01(1 - Math.max(0, castDist) / 4.8);
       const cast = u * u * (3 - 2 * u) * 0.68;

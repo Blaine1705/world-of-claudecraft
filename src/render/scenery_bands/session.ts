@@ -276,14 +276,16 @@ export class LowSceneryBands {
             reduction: (item, part) => {
               const matName = part.source.material.name;
               const regional = palmBudgetTree(item.x, item.z, item.owner.name, matName, palm);
+              const isBark = /^Bark_/i.test(matName);
               if (index === 0) {
+                if (isBark) return { triangles: 48, mode: 'coarse' };
                 return { triangles: regional ? 256 : 512, mode: regional ? 'palm' : 'quality' };
               }
               const isLeaf = /leaves|foliage|canopy|needle|palm|frond|bush|fern|vine/i.test(
                 matName,
               );
               return {
-                triangles: index === 1 ? (isLeaf ? 160 : 32) : isLeaf ? 64 : 12,
+                triangles: index === 1 ? (isLeaf ? 64 : 24) : isLeaf ? 24 : 12,
                 mode: 'coarse',
               };
             },

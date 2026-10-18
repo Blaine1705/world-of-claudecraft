@@ -41,7 +41,11 @@ import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_
 import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
-import { isLowSceneryCullActive, sceneryStructureFar } from './scenery_detail';
+import {
+  isLowSceneryCullActive,
+  prepareSceneryDetailRoot,
+  sceneryStructureFar,
+} from './scenery_detail';
 import {
   newTownPiecewiseReveal,
   orderTownRootsNearestFirst,
@@ -108,6 +112,8 @@ export interface PlacedTownDrawStats {
 interface BuildingHideTarget extends FenbridgeBuildingVisibilityTarget {
   group: THREE.Group;
   materials: OccluderFadeMat[];
+  interiors: THREE.Object3D[];
+  interiorsVisible: boolean;
   hidden: boolean;
   alpha: number;
 }
@@ -274,6 +280,8 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
       hideTargets.push({
         group: built.group,
         materials: built.mats,
+        interiors: built.interiors,
+        interiorsVisible: true,
         hidden: false,
         alpha: 1,
         x: building.position.x,
@@ -293,6 +301,7 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
     group.userData.buildingIds = buildings.map((building) => building.id);
     group.userData.buildingFadeTargetCount = hideTargets.length;
     group.userData.drawStats = placedTownDrawStats(group);
+    for (const root of roots) prepareSceneryDetailRoot(root);
 
     // Every root is a building, anchored at its own footprint, so each can
     // take the reach floor (town_reveal_core.ts).
@@ -384,6 +393,19 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
           target.group.visible =
             visibilityPlan.visible && townRootVisible(reveal, piecewise, index);
           if (!visibilityPlan.visible) continue;
+          const bDx = cullX - target.x;
+          const bDz = cullZ - target.z;
+          const interiorReach = target.cullRadius + 6;
+          const showInteriors =
+            !lowCull ||
+            visibilityPlan.hidden ||
+            bDx * bDx + bDz * bDz <= interiorReach * interiorReach;
+          if (target.interiorsVisible !== showInteriors) {
+            target.interiorsVisible = showInteriors;
+            for (let i = 0; i < target.interiors.length; i++) {
+              target.interiors[i].visible = showInteriors;
+            }
+          }
           prefetchOccluderFadeWithin(target.materials, target.x, target.z, camX, camZ);
           target.hidden = visibilityPlan.hidden;
           target.alpha = advanceOccluderFade(

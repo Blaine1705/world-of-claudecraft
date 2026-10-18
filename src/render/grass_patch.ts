@@ -141,14 +141,12 @@ export function buildGrassPatchModel(
     q.setFromAxisAngle(up, rnd() * Math.PI * 2);
     const rLean = rnd();
     leanAxis.set(Math.cos(ang), 0, -Math.sin(ang));
-    q.premultiply(qLean.setFromAxisAngle(leanAxis, (0.06 + rLean * 0.14) * (rad / Math.max(0.25, radius))));
+    q.premultiply(
+      qLean.setFromAxisAngle(leanAxis, (0.06 + rLean * 0.14) * (rad / Math.max(0.25, radius))),
+    );
     const sxz = tuftScale * 1.18;
     const sy = tuftScale * (0.94 + rnd() * 0.28);
-    m.compose(
-      v.set(Math.sin(ang) * rad, -0.02, Math.cos(ang) * rad),
-      q,
-      sv.set(sxz, sy, sxz),
-    );
+    m.compose(v.set(Math.sin(ang) * rad, -0.02, Math.cos(ang) * rad), q, sv.set(sxz, sy, sxz));
     im.setMatrixAt(i, m);
     c.copy(base);
     c.offsetHSL((rnd() - 0.5) * 0.045, (rnd() - 0.5) * 0.1, (rnd() - 0.42) * 0.08);
