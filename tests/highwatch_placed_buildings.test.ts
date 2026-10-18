@@ -452,21 +452,19 @@ describe('placed Highwatch building collision in the built-in world', () => {
       expect(promotedTownBuildingStandsDown({ authoredTowns: true }, record)).toBe(false);
       expect(promotedTownBuildingStandsDown({ highwatchTown: true }, record)).toBe(true);
     }
-    // ...and the Highwatch family never reaches the other towns' buildings
-    const otherIds = new Set(
-      AUTHORED_TOWNS.filter((town) => town.id !== 'highwatch').flatMap((town) =>
-        town.buildings.map((building) => building.id),
-      ),
-    );
-    const others = BUILTIN_WORLD.props.buildings.filter(
-      (record) => record.id !== undefined && otherIds.has(record.id),
+    // ...and the Highwatch family never reaches the other towns' buildings, each of
+    // which stands down under its own town's family (authoredTowns, paintedTowns)
+    const others = AUTHORED_TOWNS.filter((town) => town.id !== 'highwatch').flatMap((town) =>
+      BUILTIN_WORLD.props.buildings
+        .filter((record) => town.buildings.some((building) => building.id === record.id))
+        .map((record) => ({ record, family: town.promotedBy })),
     );
     expect(others.length).toBeGreaterThanOrEqual(10);
-    for (const record of others) {
+    for (const { record, family } of others) {
       expect(promotedTownBuildingStandsDown({ highwatchTown: true }, record), record.id).toBe(
         false,
       );
-      expect(promotedTownBuildingStandsDown({ authoredTowns: true }, record), record.id).toBe(true);
+      expect(promotedTownBuildingStandsDown({ [family]: true }, record), record.id).toBe(true);
     }
   });
 });
