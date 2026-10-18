@@ -128,27 +128,6 @@ const EXCLUSIONS = [
   { x: 27.314, z: 648.031 },
   { x: 34.786, z: 673.567 },
   { x: 31.334, z: 708.04 },
-  // The Highwatch manor (highwatch_layout.ts) on the rise west of the Sanctum
-  // road: every tree and rock on its pad, its garden or under its eaves.
-  { x: 10.388, z: 722.589 },
-  { x: 13.969, z: 735.35 },
-  { x: 11.17, z: 741.783 },
-  { x: 17.564, z: 763.438 },
-  { x: 19.588, z: 722.875 },
-  { x: 24.105, z: 730.809 },
-  { x: 26.149, z: 739.186 },
-  { x: 19.115, z: 755.539 },
-  { x: 34.173, z: 719.749 },
-  { x: 32.304, z: 731.396 },
-  { x: 36.432, z: 739.914 },
-  { x: 33.162, z: 755.436 },
-  { x: 46.103, z: 721.131 },
-  { x: 45.686, z: 741.538 },
-  { x: 46.511, z: 755.358 },
-  { x: 54.766, z: 715.761 },
-  { x: 49.798, z: 719.619 },
-  { x: 57.96, z: 730.433 },
-  { x: 58.224, z: 741.94 },
   // Fenbridge's painted buildings stood grand (fenbridge_layout.ts): the tree
   // the apothecary's back corner now stands on, past the hub's scatter-free ring.
   { x: 20.594, z: 335.37 },

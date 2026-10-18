@@ -25768,11 +25768,6 @@ export const sv_SE: EnTranslations = {
         "title": "Apotekerns mästare",
         "greeting": "Mät två gånger och häll en gång, {className}. Apotekaren har inget tålamod för utspillda reagenser."
       },
-      "steward_ansel_hale": {
-        "name": "Ansel Hale",
-        "title": "Steward of the Manor",
-        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
-      },
       "farmer_jessica": {
         "name": "Bonden Jessica",
         "title": "Odlottsföreståndare",

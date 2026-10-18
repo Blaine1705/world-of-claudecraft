@@ -25768,11 +25768,6 @@ export const nl_NL: EnTranslations = {
         "title": "Meester van de apotheek",
         "greeting": "Meet twee keer en giet één keer, {className}. De apotheker heeft geen geduld voor gemorste reagentia."
       },
-      "steward_ansel_hale": {
-        "name": "Ansel Hale",
-        "title": "Steward of the Manor",
-        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
-      },
       "farmer_jessica": {
         "name": "Landbouwer Jessica",
         "title": "Toezichthouder van de volkstuinen",

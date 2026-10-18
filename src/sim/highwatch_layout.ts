@@ -17,6 +17,7 @@ import {
   localToWorld,
   makePlacedTownBuilding,
   makeTownNpc,
+  padsAlong,
   placedTownSeat,
   scalePlacedTownMeasurements,
 } from './placed_town_kit';
@@ -200,44 +201,7 @@ const SMITHY = makePlacedTownBuilding(
   placedTownSeat(SMITHY_SCALE, FRONT_CLEARANCE * SMITHY_SCALE),
 );
 
-// The lord's manor on the rise west of the Sanctum road, north of the smithy's
-// terrace: a walk-in house of one storey (scripts/assets/highwatch_manor/,
-// built at its own grand size, so it stands at scale 1). Its great hall is the
-// wall box, its door looks south over the smithy at the square; the two wings,
-// the dais bay behind the hall and the kitchen's chimney are its solid
-// annexes. The porch, the steps and the walled garden in front lie inside its
-// reach. It stands clear of the Sanctum road and its two lamps on this side,
-// of the smithy and the Stormcrag road, and its pad and aprons touch no
-// camp's ground: the hill east of the road is the ogres' (a camp's wandering
-// draws the shared rng, so its ground must not change).
-const MANOR_SCALE = 1;
-const MANOR = makePlacedTownBuilding(
-  {
-    id: 'highwatch_manor',
-    assetId: `${PAINTED_SET}/manor.glb`,
-    kind: 'house',
-    anchor: { x: 31.5, z: 746 },
-    rotation: SOUTH_FACING,
-    ...scalePlacedTownMeasurements(
-      {
-        reach: { x: 0, z: -4.7075, width: 51.248, height: 34.1, depth: 47.155 },
-        walls: { x: 0, z: 0, width: 27.8, depth: 21.8 },
-        annexes: [
-          { name: 'west_wing', x: 19.3, z: 3.7, width: 10.8, depth: 23.4 },
-          { name: 'east_wing', x: -19.3, z: 2.6, width: 10.8, depth: 21.2 },
-          { name: 'dais_bay', x: 0, z: 14.6, width: 13.8, depth: 7.4 },
-          { name: 'kitchen_chimney', x: 20.3, z: 15.9, width: 3.8, depth: 1 },
-        ],
-        doorX: 0,
-      },
-      MANOR_SCALE,
-    ),
-    walkIn: true,
-  },
-  placedTownSeat(MANOR_SCALE, FRONT_CLEARANCE * MANOR_SCALE),
-);
-
-const BUILDINGS = [INN, CHAPEL, COUNTING_HOUSE, WATCH_HOUSE, SMITHY, MANOR] as const;
+const BUILDINGS = [INN, CHAPEL, COUNTING_HOUSE, WATCH_HOUSE, SMITHY] as const;
 
 // The counting house's market counter (the stall annex on its front): the
 // auctioneer keeps it, a stride and a half in front of the boards (the counter
@@ -291,53 +255,22 @@ const STORMCRAG_ROAD = [
   { x: 110, z: 760 },
 ] as const;
 
-/**
- * Level pads under the buildings (terrain edits, applied after the built-in
- * world's other stamps): each building stands on level ground across its
- * whole reach, and the taper beyond carries the grade change into the
- * streets. The shelf is a disc of level ground at y 9; the inn and the
- * counting house stand at its height, cut into the rising ground behind them,
- * the chapel and the watch house a little lower where the road falls toward
- * the gate, the smithy on its terrace above. Each building gets a row of
- * stamps along its long axis rather than one circle, so the level ground
- * hugs its walls instead of spilling across the square.
- */
-function padsAlong(
-  building: (typeof BUILDINGS)[number],
-  height: number,
-  columns: number,
-  rows: number,
-  taper: number,
-) {
-  const reach = building.reach;
-  const cellWidth = (reach.halfWidth * 2) / columns;
-  const cellDepth = (reach.halfDepth * 2) / rows;
-  const core = Math.hypot(cellWidth / 2, cellDepth / 2);
-  const radius = core + taper;
-  const pads: { x: number; z: number; radius: number; delta: number; hardness: number }[] = [];
-  for (let column = 0; column < columns; column++) {
-    for (let row = 0; row < rows; row++) {
-      const center = localToWorld(
-        reach.center,
-        reach.rotation,
-        -reach.halfWidth + cellWidth * (column + 0.5),
-        -reach.halfDepth + cellDepth * (row + 0.5),
-      );
-      pads.push({ x: center.x, z: center.z, radius, delta: height, hardness: core / radius });
-    }
-  }
-  return pads;
-}
+// Level pads under the buildings (terrain edits, applied after the built-in
+// world's other stamps): each building stands on level ground across its
+// whole reach, and the taper beyond carries the grade change into the
+// streets. The shelf is a disc of level ground at y 9; the inn and the
+// counting house stand at its height, cut into the rising ground behind them,
+// the chapel and the watch house a little lower where the road falls toward
+// the gate, the smithy on its terrace above. Each building gets a row of
+// stamps along its long axis rather than one circle (placed_town_kit.ts
+// padsAlong), so the level ground hugs its walls instead of spilling across
+// the square.
 
 // The Stormcrag road climbs out of the square's north-west corner between the
 // inn (level with the square) and the smithy's terrace: three tilted stamps
 // along it grade the lane from the one to the other, applied over the aprons
 // and before the pads, so the buildings' own pads keep their ground.
 const INN_HEIGHT = 9;
-// the manor's pad, cut into the road's shoulder and filled over the hollow west
-// of it, a little over the smithy's terrace
-const MANOR_HEIGHT = 12.5;
-const MANOR_APRON = 14;
 const SMITHY_HEIGHT = 10.6;
 const INN_NORTH_Z = INN.reach.center.z + INN.reach.halfWidth;
 const SMITHY_SOUTH_Z = SMITHY.reach.center.z - SMITHY.reach.halfDepth;
@@ -370,7 +303,6 @@ const GROUND = [
   { building: CHAPEL, height: 8.8, columns: 2, rows: 3, taper: 5, apron: 10 },
   { building: WATCH_HOUSE, height: 7.6, columns: 2, rows: 3, taper: 4, apron: 10 },
   { building: SMITHY, height: SMITHY_HEIGHT, columns: 3, rows: 2, taper: 4, apron: 13 },
-  { building: MANOR, height: MANOR_HEIGHT, columns: 5, rows: 5, taper: 4, apron: MANOR_APRON },
 ] as const;
 
 // The aprons reach into the square: this sets the shelf back at its own height
@@ -385,19 +317,11 @@ const SQUARE_RELEVEL = {
   hardness: SQUARE_FLAT / (SQUARE_FLAT + 2),
 };
 
-// The crystal cave portal (content/realm.ts, the duskfall_passage side a) sits on its own
-// level bench at (10, 770), just past the chapel's back wall: the manor's pads would carry
-// it down to the manor's ground, so the bench goes back at its own height after them,
-// banking down to the manor's ground before the chapel's back wall (the bank takes the
-// open corner of the manor's reach behind the chapel, where the model has no wall).
-const PORTAL_BENCH = { x: 10, z: 770, radius: 10.6, delta: 17.3, hardness: 0.5 };
-
 const PADS = [
   ...GROUND.flatMap((g) => padsAlong(g.building, g.height, g.columns, g.rows, g.apron)),
   SQUARE_RELEVEL,
   ...ROAD_GRADE,
   ...GROUND.flatMap((g) => padsAlong(g.building, g.height, g.columns, g.rows, g.taper)),
-  PORTAL_BENCH,
 ].map((pad) => ({ ...pad, falloff: 'smooth' as const, mode: 'level' as const }));
 
 export const HIGHWATCH_LAYOUT = deepFreeze({
