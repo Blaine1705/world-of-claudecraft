@@ -1,7 +1,14 @@
 // The seasonal-event core (barrel): the public surface Sim, items.ts, dev
 // commands and tests import. Module map and rules: ./CLAUDE.md.
 
+export {
+  type BooOutcome,
+  booTownsfolk,
+  gourdlightDailyForDay,
+  gourdlightDailyToday,
+} from './gourdlight_dailies';
 export { hauntedPumpkinForEntity } from './haunted_pumpkins';
+export { knockOrBoo } from './knock_or_boo';
 export { clearThatchgrin, spawnThatchgrin, updateScarecrow } from './scarecrow';
 export { handleScarecrowDevChat } from './scarecrow_dev';
 export { resolveScarecrowField, type ScarecrowField } from './scarecrow_field';

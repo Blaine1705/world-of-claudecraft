@@ -11,10 +11,12 @@
 export interface IWorldSeasonal {
   /** The seasonal event running now (e.g. 'gourdlight_eve'), or null. */
   readonly activeSeasonalEvent: string | null;
-  /** NPC template ids the local player already trick-or-treated this reset day. */
+  /** NPC template ids the local player already trick-or-treated this reset day, and
+   *  `boo_<id>` for each townsperson they frightened today (the Boo! daily). */
   readonly trickOrTreatedToday: readonly string[];
   /** Stable pumpkin ids discovered by the local player this event edition. */
   readonly hauntedPumpkinsFound: readonly string[];
-  /** Say "trick or treat" to an NPC entity. Feedback arrives as `seasonal` events. */
-  trickOrTreat(npcId: number): void;
+  /** Say "trick or treat" to an NPC entity, or with `boo` a costumed BOO (the Boo!
+   *  daily). Feedback arrives as `seasonal` events. */
+  trickOrTreat(npcId: number, boo?: boolean): void;
 }

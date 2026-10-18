@@ -30,6 +30,9 @@ export interface SeasonalWorldState {
   boundSwept: WeakMap<object, number>;
   /** The bound-item sweep's own tick counter (re-checks are counted in it). */
   boundTick: number;
+  /** The /dev pick of the day's rotating daily (gourdlight_dailies.ts): null follows
+   *  the reset day. Never persisted. */
+  devDaily: string | null;
 }
 
 export function freshSeasonalWorldState(): SeasonalWorldState {
@@ -40,6 +43,7 @@ export function freshSeasonalWorldState(): SeasonalWorldState {
     scarecrow: freshScarecrowState(),
     boundSwept: new WeakMap(),
     boundTick: 0,
+    devDaily: null,
   };
 }
 

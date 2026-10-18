@@ -51,9 +51,11 @@ export class SeasonalWireState extends LanceWireState {
   trickOrTreatedToday: readonly string[] = Object.freeze([]);
   hauntedPumpkinsFound: readonly string[] = Object.freeze([]);
 
-  trickOrTreat(npcId: number): void {
+  trickOrTreat(npcId: number, boo = false): void {
     if (!Number.isSafeInteger(npcId)) return;
-    this.sendQuestWorldCommand({ cmd: 'trick_or_treat', npcId });
+    this.sendQuestWorldCommand(
+      boo ? { cmd: 'trick_or_treat', npcId, boo: true } : { cmd: 'trick_or_treat', npcId },
+    );
   }
 
   /** The lance family's self apply, then the seasonal keys of the same record. */

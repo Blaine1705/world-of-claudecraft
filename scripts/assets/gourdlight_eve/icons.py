@@ -665,6 +665,11 @@ def main():
 
     for item_id, build in candies.BUILDERS.items():
         subjects[item_id] = build(col, principled, obj_from_bm, tube)
+    # the rotating dailies' errand items (daily_icons.py)
+    import daily_icons
+
+    for item_id, build in daily_icons.BUILDERS.items():
+        subjects[item_id] = build(col, principled, obj_from_bm, tube, lathe, model)
     broom_blend = argv[argv.index("--broom-blend") + 1] if "--broom-blend" in argv else os.path.join(
         HERE, "..", "..", "..", "tmp", "asset_src", "gourdlight_eve", "broom.blend")
     if os.path.exists(broom_blend):

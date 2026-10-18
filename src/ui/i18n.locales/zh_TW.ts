@@ -20784,4 +20784,57 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.flash': '找到鬧鬼南瓜！{count}/{total}',
   'seasonal.itemSource.pumpkinHead':
     '首次拾取野豬草甸外南瓜田裡老稻草獰笑的戰利品時掉落。沒有商人出售。',
+  'entities.items.cursed_candle_stub.name': '詛咒蠟燭殘頭',
+  'entities.items.gourdlight_crow_feather.name': '南瓜燈烏鴉羽毛',
+  'entities.items.thatchgrin_patch_pumpkin.name': '南瓜田的南瓜',
+  'entities.quests.q_gourdlight_daily_patch.title': '南瓜田裡的南瓜',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    '野豬草甸外，老稻草獰笑的南瓜田結滿了南瓜，有一半都滾出了他的稻草圈，小心些就能搆到。給我帶五個來，{playerName}。離那個老稻草人遠一點，他每一個都數著呢。',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    '五個圓滾滾的，一口都沒被啃過。夠整個谷地做餡餅了。拿著，辛苦費。',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': '南瓜田的南瓜',
+  'entities.quests.q_gourdlight_daily_boo.title': '哇！',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    '這幾個鎮子裡，一整年都沒人被好好嚇過一回了，{playerName}。沒有驚嚇的南瓜燈之夜，不過是個冷夜罷了。穿上裝扮，我的藥劑哪種都行，要是你贏到了那顆南瓜頭也可以。然後悄悄靠近三位鎮民，衝他們大喊一聲「哇！」',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    '三個？我在廣場另一頭都聽見廚子把鍋掉地上了。做得好。這是你的那份。',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': '被嚇到的鎮民',
+  'entities.quests.q_gourdlight_daily_wicks.title': '邪惡的燭芯',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    '有人在我們的路燈腳下放了燃著綠火的蠟燭。它們燒著卻不融化，你一轉身它們就低聲細語。去掐滅六根吧，{playerName}，三個鎮子哪裡都行，把殘頭帶回來給我。',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    '六個殘頭，冷得像霜。點火的人還得再加把勁才行。拿著這個，去洗洗手。',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': '掐滅的詛咒蠟燭',
+  'entities.quests.q_gourdlight_daily_towns.title': '每個鎮子敲一扇門',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    '孩子們說，真正的南瓜燈行者會在天亮前把每個鎮子的門都敲一遍。去證明他們說得對吧，{playerName}。在東溪、芬橋和高望各找一扇門說不給糖就搗蛋。路上的燈籠會為你照路。',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    '一夜跑了三個鎮子！這份獎勵你的靴子比你更配得上。',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': '在東溪敲過的門',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': '在芬橋敲過的門',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': '在高望敲過的門',
+  'entities.quests.q_gourdlight_daily_feathers.title': '為篝火取羽',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    '老稻草獰笑被逼急了，就會喚來烏鴉撲向敲打他稻草的人。牠們的羽毛在爐火裡會燒出綠焰，今晚的篝火我需要四根。去他的田裡參加一場戰鬥，{playerName}，從他的烏鴉身上拔下羽毛。',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    '黑得像沒有月亮的田野，已經帶著煙味了。篝火一定很壯觀。謝謝你。',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': '烏鴉羽毛',
+  'entities.quests.q_gourdlight_daily_baskets.title': '給鄰居的籃子',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    '每年南瓜燈之夜，我都會給每個鎮子的一位老朋友裝一籃糖果，可我的膝蓋大不如前了。替我送過去吧，{playerName}：東溪的Cook Marlow、芬橋的草藥師Yara，還有高望的Loremaster Caddis。',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    '三籃都送到了，聽說Marlow還哭了。他每次都哭。來，這一籃是你的。',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': '交給Cook Marlow的籃子',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label': '交給草藥師Yara的籃子',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label': '交給Loremaster Caddis的籃子',
+  'seasonal.boo.row': '哇！',
+  'seasonal.boo.rowAria': '跳到{name}面前大喊一聲哇',
+  'seasonal.boo.needsCostume':
+    '先穿上裝扮：裝扮藥劑、蝙蝠或骷髏惡作劇、稻草小人護符，或雕刻南瓜頭。',
+  'seasonal.boo.frightenedHint': '{name}還被你上次嚇得心驚膽戰。去找別人吧。',
+  'seasonal.boo.landed': '你跳到{name}面前大喊一聲哇！對方尖叫一聲，差點把東西全掉了。',
+  'seasonal.boo.flash': '哇！{name}被嚇到了！',
+  'seasonal.boo.noCostume': '沒穿裝扮，{name}只是衝你笑。先換上一套吧。',
+  'seasonal.boo.already': '{name}今天已經被嚇夠了。',
+  'seasonal.boo.notOnErrand': '赫絲特今天沒讓你去嚇唬誰。',
 };

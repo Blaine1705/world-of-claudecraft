@@ -90,6 +90,20 @@ export const seasonalStrings = {
     pumpkinHead:
       'Dropped by Old Thatchgrin, in his pumpkin field past Boar Meadow, the first time you loot him. No vendor sells it.',
   },
+  // The Boo! daily (src/sim/seasonal/gourdlight_dailies.ts): the gossip row at a
+  // townsperson, its hints, and the fright's feedback lines.
+  boo: {
+    row: 'Boo!',
+    rowAria: 'Leap out at {name} and shout boo',
+    needsCostume:
+      'Put on a costume first: a costume draught, a bat or skeleton trick, the Strawling Charm or the Carved Pumpkin Head.',
+    frightenedHint: '{name} is still jumpy from your last fright. Find someone else.',
+    landed: 'You leap out at {name} with a BOO! They shriek and nearly drop everything.',
+    flash: 'BOO! {name} is frightened!',
+    noCostume: 'Without a costume, {name} only laughs at you. Put one on first.',
+    already: '{name} has had enough frights for one day.',
+    notOnErrand: 'Hester has not asked you to frighten anyone today.',
+  },
   // The vendor row's token price: "{count} {item}" ({count} pre-formatted).
   tokenPrice: '{count} {item}',
 };

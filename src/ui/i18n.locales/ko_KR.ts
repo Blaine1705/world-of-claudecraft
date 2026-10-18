@@ -21825,4 +21825,60 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.flash': '유령 호박 발견! {count}/{total}',
   'seasonal.itemSource.pumpkinHead':
     '보어 메도 너머 호박밭의 올드 대치그린에게서 처음 전리품을 챙길 때 얻습니다. 상인은 팔지 않습니다.',
+  'entities.items.cursed_candle_stub.name': '저주받은 양초 토막',
+  'entities.items.gourdlight_crow_feather.name': '고드라이트 까마귀 깃털',
+  'entities.items.thatchgrin_patch_pumpkin.name': '밭 호박',
+  'entities.quests.q_gourdlight_daily_patch.title': '밭에서 굴러온 호박',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    '보어 메도 너머 올드 대치그린의 밭은 호박으로 가득한데, 절반은 그의 짚 울타리 밖으로 굴러 나와 조심하면 손이 닿아요. 다섯 개만 가져다줘요, {playerName}. 그 늙은 허수아비한테는 가까이 가지 말고요. 하나하나 다 세고 있거든요.',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    '동글동글한 게 다섯 개, 갉아먹은 자국도 없네요. 골짜기 사람들 다 먹을 파이가 되겠어요. 자, 수고비예요.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': '밭 호박',
+  'entities.quests.q_gourdlight_daily_boo.title': '워!',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    '이 마을들에선 일 년 내내 제대로 놀란 사람이 없어요, {playerName}. 깜짝 놀랄 일 없는 고드라이트 축제의 밤은 그냥 추운 밤일 뿐이죠. 분장을 해요. 내 물약이면 아무거나 되고, 그 호박 머리를 얻었다면 그것도 좋아요. 그리고 마을 사람 셋에게 몰래 다가가서 크게 워 하고 놀래 주세요.',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    '셋이나요? 광장 건너편에서 요리사가 냄비 떨어뜨리는 소리가 들렸어요. 잘했어요. 이건 당신 몫이에요.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': '놀란 마을 사람',
+  'entities.quests.q_gourdlight_daily_wicks.title': '사악한 심지',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    '누군가 가로등 발치에 초록 불꽃 양초를 놓고 다녀요. 녹지도 않고 타면서, 등을 돌리면 속삭인답니다. 세 마을 어디서든 여섯 개를 꺼 주고 토막을 가져다줘요, {playerName}.',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    '서리처럼 차가운 토막 여섯 개. 불을 붙인 자는 더 애써야겠네요. 이걸 받고, 손 좀 씻어요.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': '꺼 버린 저주받은 양초',
+  'entities.quests.q_gourdlight_daily_towns.title': '마을마다 문 하나씩',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    '아이들 말로는 진짜 고드라이트 순례자는 밤이 가기 전에 모든 마을에서 문을 두드린대요. 그 말이 맞다는 걸 보여줘요, {playerName}. 이스트브룩, 펜브리지, 하이워치에서 문 하나씩 두드리며 사탕을 달라고 외쳐요. 길가의 등불이 길을 밝혀 줄 거예요.',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    '하룻밤에 세 마을이라니! 이건 당신보다 당신 장화가 더 받을 자격이 있네요.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': '이스트브룩에서 두드린 문',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': '펜브리지에서 두드린 문',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': '하이워치에서 두드린 문',
+  'entities.quests.q_gourdlight_daily_feathers.title': '모닥불을 위한 깃털',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    '올드 대치그린은 궁지에 몰리면 자기 짚을 두들기는 자들에게 까마귀를 불러내요. 그 깃털은 화로에서 초록색으로 타는데, 오늘 밤 모닥불에 네 개가 필요해요. 그의 밭에서 싸움에 끼어서, {playerName}, 까마귀에게서 깃털을 뽑아 와요.',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    '달 없는 밭처럼 새까맣고, 벌써 연기 냄새가 나네요. 모닥불이 장관이겠어요. 고마워요.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': '까마귀 깃털',
+  'entities.quests.q_gourdlight_daily_baskets.title': '이웃에게 보내는 바구니',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    '고드라이트 축제의 밤마다 마을마다 오랜 친구에게 사탕 바구니를 채워 보내는데, 이제 무릎이 예전 같지 않아요. 대신 전해 줘요, {playerName}. 이스트브룩의 Cook Marlow, 펜브리지의 약초상 Yara, 그리고 하이워치의 Loremaster Caddis에게요.',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    '셋 다 전했군요. Marlow가 울었다면서요. 그 사람은 늘 울어요. 자, 당신 몫의 바구니예요.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Cook Marlow에게 전한 바구니',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label': '약초상 Yara에게 전한 바구니',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label':
+    'Loremaster Caddis에게 전한 바구니',
+  'seasonal.boo.row': '워!',
+  'seasonal.boo.rowAria': '{name} 앞으로 뛰어나가 워 하고 외치기',
+  'seasonal.boo.needsCostume':
+    '먼저 분장을 하세요: 분장 물약, 박쥐나 해골 장난, 짚인형 부적, 또는 조각한 호박 머리.',
+  'seasonal.boo.frightenedHint':
+    '{name}은(는) 지난번 놀람에 아직도 움찔거립니다. 다른 사람을 찾아보세요.',
+  'seasonal.boo.landed':
+    '{name} 앞으로 뛰어나가 워! 하고 외쳤습니다. 비명을 지르며 들고 있던 걸 떨어뜨릴 뻔했습니다.',
+  'seasonal.boo.flash': '워! {name}이(가) 놀랐습니다!',
+  'seasonal.boo.noCostume': '분장 없이는 {name}이(가) 웃기만 합니다. 먼저 분장을 하세요.',
+  'seasonal.boo.already': '{name}은(는) 오늘 이미 충분히 놀랐습니다.',
+  'seasonal.boo.notOnErrand': '헤스터는 오늘 누구를 놀래 주라고 부탁하지 않았습니다.',
 };

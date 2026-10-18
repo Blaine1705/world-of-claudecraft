@@ -9410,7 +9410,13 @@ export type SimEvent = { pid?: number } & (
         // an event-bound item was swept away because its event closed (`trick` = item id)
         | 'boundItemGone'
         // a Haunted Pumpkin was found and lit for this player (count of total)
-        | 'pumpkinFound';
+        | 'pumpkinFound'
+        // the Boo! daily (seasonal/gourdlight_dailies.ts): a costumed fright landed on
+        // `npc`, or was refused (no costume, already frightened today, not on the errand)
+        | 'boo'
+        | 'booNoCostume'
+        | 'booAlready'
+        | 'booNotOnErrand';
       pumpkinId?: string;
       zoneId?: string;
       count?: number;

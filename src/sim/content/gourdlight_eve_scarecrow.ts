@@ -53,6 +53,7 @@
 //     bought from Hester for five Emberwoven Sheaves, one per daily kill.
 //
 // Everything he pays is cosmetic or event currency: no stat, no gear, no power.
+
 import type { ItemDef, MobTemplate } from '../types';
 import {
   CARVED_PUMPKIN_HEAD_ID,
@@ -61,6 +62,7 @@ import {
   GOURDLIGHT_POUCH_SWEETS,
   GOURDLIGHT_SHEAF_ID,
 } from './gourdlight_eve';
+import { CROW_FEATHER_ID, GOURDLIGHT_DAILY_FEATHERS_QUEST_ID } from './gourdlight_eve_dailies';
 
 export const THATCHGRIN_ID = 'gourdlight_thatchgrin';
 export const GOURDLIGHT_CROW_ID = 'gourdlight_crow';
@@ -297,7 +299,9 @@ export const GOURDLIGHT_SCARECROW_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 12,
     untameable: true,
     blind: { chance: 0.08, miss: 0.2, duration: 4, name: 'Gouging Beak', school: 'physical' },
-    loot: [],
+    // a feather for Hester's bonfire, only for a player on her Feathers for the Fire
+    // daily (content/gourdlight_eve_dailies.ts; the questId gate drops it to nobody else)
+    loot: [{ itemId: CROW_FEATHER_ID, chance: 1, questId: GOURDLIGHT_DAILY_FEATHERS_QUEST_ID }],
     scale: 1,
     color: 0x2b2830,
   },

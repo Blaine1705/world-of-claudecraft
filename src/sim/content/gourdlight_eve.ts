@@ -112,6 +112,25 @@ export const PUMPKIN_HEAD_AURA_ID = 'gourdlight_pumpkin_head';
 
 /** The daily rounds quest the keeper hands out. */
 export const GOURDLIGHT_ROUNDS_QUEST_ID = 'q_gourdlight_rounds';
+/** The rotating dailies (content/gourdlight_eve_dailies.ts holds their records; the ids
+ *  live here so the keeper below can offer them without a circular import). */
+export const GOURDLIGHT_DAILY_PATCH_QUEST_ID = 'q_gourdlight_daily_patch';
+export const GOURDLIGHT_DAILY_BOO_QUEST_ID = 'q_gourdlight_daily_boo';
+export const GOURDLIGHT_DAILY_WICKS_QUEST_ID = 'q_gourdlight_daily_wicks';
+export const GOURDLIGHT_DAILY_TOWNS_QUEST_ID = 'q_gourdlight_daily_towns';
+export const GOURDLIGHT_DAILY_FEATHERS_QUEST_ID = 'q_gourdlight_daily_feathers';
+export const GOURDLIGHT_DAILY_BASKETS_QUEST_ID = 'q_gourdlight_daily_baskets';
+
+/** The rotation, in day order: day N of the realm calendar offers entry N mod length. */
+export const GOURDLIGHT_DAILY_POOL: readonly string[] = Object.freeze([
+  GOURDLIGHT_DAILY_PATCH_QUEST_ID,
+  GOURDLIGHT_DAILY_BOO_QUEST_ID,
+  GOURDLIGHT_DAILY_WICKS_QUEST_ID,
+  GOURDLIGHT_DAILY_TOWNS_QUEST_ID,
+  GOURDLIGHT_DAILY_FEATHERS_QUEST_ID,
+  GOURDLIGHT_DAILY_BASKETS_QUEST_ID,
+]);
+
 /** The quest-event id a trick-or-treat credits (QuestObjective type 'event'). */
 export const TRICK_OR_TREAT_QUEST_EVENT = 'gourdlight_trick_or_treat';
 /** Doors the daily rounds ask for. */
@@ -264,7 +283,9 @@ export const GOURDLIGHT_KEEPER_NPC: NpcDef = {
   pos: { x: -4.2, z: -110.5 },
   facing: -Math.PI / 2,
   color: 0xd9741c,
-  questIds: [GOURDLIGHT_ROUNDS_QUEST_ID],
+  // the rounds, and the rotating dailies (only the day's one is ever open:
+  // seasonal/gourdlight_dailies.ts)
+  questIds: [GOURDLIGHT_ROUNDS_QUEST_ID, ...GOURDLIGHT_DAILY_POOL],
   vendorItems: [...GOURDLIGHT_SHOP_ITEMS],
   dynamic: true,
   seasonalKeeper: true,

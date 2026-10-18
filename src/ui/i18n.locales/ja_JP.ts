@@ -21829,4 +21829,58 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.flash': '幽霊カボチャを発見！{count}/{total}',
   'seasonal.itemSource.pumpkinHead':
     'ボアメドウの先にあるカボチャ畑のオールド・サッチグリンから、初めて戦利品を受け取ったときに手に入る。商人は売っていない。',
+  'entities.items.cursed_candle_stub.name': '呪われたろうそくの燃えさし',
+  'entities.items.gourdlight_crow_feather.name': 'ゴードライトのカラスの羽根',
+  'entities.items.thatchgrin_patch_pumpkin.name': '畑のカボチャ',
+  'entities.quests.q_gourdlight_daily_patch.title': '畑のカボチャ',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'ボアメドウの先にあるオールド・サッチグリンの畑はカボチャで実っていて、半分は藁の囲いの外まで転がり出ているの。気をつければ手が届くわ。五つ持ってきて、{playerName}。あの年寄りのかかし本人には近づかないこと。一つ残らず数えているから。',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    '丸いのが五つ、かじられた跡もなし。谷じゅうのパイになるわ。はい、手間賃よ。',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': '畑のカボチャ',
+  'entities.quests.q_gourdlight_daily_boo.title': 'わっ！',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'この町の誰も、この一年ちゃんと驚かされていないのよ、{playerName}。驚きのないゴードライトの宵なんて、ただの寒い夜。仮装をしてちょうだい。私の薬ならどれでもいいし、手に入れたならあのカボチャ頭でもいいわ。それから町の人三人に忍び寄って、大きな声で「わっ！」と驚かせてきて。',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    '三人も？広場の向こうから料理人が鍋を落とす音が聞こえたわ。よくやったわね。はい、あなたの分よ。',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': '驚かせた町の人',
+  'entities.quests.q_gourdlight_daily_wicks.title': '呪われた灯芯',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    '誰かが街灯の足もとに緑の炎のろうそくを置いていくの。溶けもせずに燃えて、背を向けるとささやくのよ。三つの町のどこでもいいから六本吹き消して、燃えさしを持ってきて、{playerName}。',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    '燃えさしが六本、霜みたいに冷たい。火をつけた誰かさんは、もっと頑張らないとね。これを受け取って、手を洗ってきなさい。',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': '吹き消した呪われたろうそく',
+  'entities.quests.q_gourdlight_daily_towns.title': 'どの町でも一つの戸を',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    '本物のゴードライトの歩き手は、夜が明ける前にすべての町で戸を叩くものだって子どもたちは言うの。それを証明してきて、{playerName}。イーストブルック、フェンブリッジ、ハイウォッチでそれぞれ一つの戸でトリック・オア・トリートを。道のランタンが行く手を照らしてくれるわ。',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    '一晩で三つの町！あなたより、あなたのブーツのほうがこれにふさわしいわね。',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'イーストブルックで叩いた戸',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'フェンブリッジで叩いた戸',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'ハイウォッチで叩いた戸',
+  'entities.quests.q_gourdlight_daily_feathers.title': '焚き火のための羽根',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'オールド・サッチグリンは追い詰められると、藁を叩く者にカラスを呼び寄せるの。その羽根は炉で緑に燃えて、今夜の焚き火に四枚いるのよ。畑で戦いに加わって、{playerName}、カラスから羽根をむしってきて。',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    '月のない畑みたいに真っ黒で、もう煙の匂いがする。焚き火が見ものになるわ。ありがとう。',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'カラスの羽根',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'ご近所へのかご',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'ゴードライトの宵には毎年、町ごとに古い友達へお菓子のかごを詰めるの。でも膝がもう昔ほどじゃなくてね。代わりに届けて、{playerName}。イーストブルックのCook Marlow、フェンブリッジの薬草師Yara、そしてハイウォッチのLoremaster Caddisへ。',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    '三つとも届いたのね。Marlowは泣いたって聞いたわ。あの人はいつも泣くの。はい、あなたにも一かご。',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Cook Marlowに届けたかご',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label': '薬草師Yaraに届けたかご',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label': 'Loremaster Caddisに届けたかご',
+  'seasonal.boo.row': 'わっ！',
+  'seasonal.boo.rowAria': '{name}の前に飛び出して「わっ！」と叫ぶ',
+  'seasonal.boo.needsCostume':
+    'まず仮装をすること：仮装の薬、コウモリかガイコツのいたずら、藁人形のお守り、または彫りカボチャの頭。',
+  'seasonal.boo.frightenedHint': '{name}はさっきの驚きでまだびくびくしている。別の人を探そう。',
+  'seasonal.boo.landed':
+    '{name}の前に飛び出して「わっ！」と叫んだ！悲鳴を上げて、持ち物を落としそうになった。',
+  'seasonal.boo.flash': 'わっ！{name}が驚いた！',
+  'seasonal.boo.noCostume': '仮装なしでは、{name}は笑うだけだ。まず仮装をしよう。',
+  'seasonal.boo.already': '{name}は今日はもう十分に驚かされた。',
+  'seasonal.boo.notOnErrand': '今日はヘスターから誰かを驚かせる頼みを受けていない。',
 };

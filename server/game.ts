@@ -7796,7 +7796,7 @@ export class GameServer {
         break;
       }
       case 'trick_or_treat': // the seasonal knock (src/sim/seasonal/trick_or_treat.ts)
-        if (typeof msg.npcId === 'number') sim.trickOrTreat(msg.npcId, pid);
+        if (typeof msg.npcId === 'number') sim.trickOrTreat(msg.npcId, msg.boo === true, pid);
         break;
       // The Shardpike trial's three no-argument verbs (lance_wire.ts).
       case 'lance_brace':

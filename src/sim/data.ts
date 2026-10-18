@@ -152,6 +152,7 @@ import {
   GOURDLIGHT_EVE_NPCS,
   GOURDLIGHT_EVE_QUESTS,
 } from './content/gourdlight_eve';
+import { GOURDLIGHT_DAILY_ITEMS, GOURDLIGHT_DAILY_QUESTS } from './content/gourdlight_eve_dailies';
 import {
   GOURDLIGHT_SCARECROW_ITEMS,
   GOURDLIGHT_SCARECROW_MOBS,
@@ -477,6 +478,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   QUEST_LEVELING_GEAR_ITEMS,
   GOURDLIGHT_EVE_ITEMS,
   GOURDLIGHT_SCARECROW_ITEMS,
+  GOURDLIGHT_DAILY_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -626,6 +628,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
   ...GOURDLIGHT_EVE_QUESTS,
+  ...GOURDLIGHT_DAILY_QUESTS,
 };
 
 // The choose-one leveling gear rides on the quest records (QuestDef.choiceRewards),
@@ -656,6 +659,7 @@ export const QUEST_ORDER: string[] = [
   ...HUB_PRACTICE_QUEST_ORDER,
   // the seasonal events' quests (open only while their event runs)
   ...Object.keys(GOURDLIGHT_EVE_QUESTS),
+  ...Object.keys(GOURDLIGHT_DAILY_QUESTS),
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported

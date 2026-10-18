@@ -32,7 +32,9 @@ event, e.g. `gourdlight_eve.ts`); this directory holds the rules. Public surface
 | `scarecrow_field_ward.ts` | while Gourdlight Eve runs, idle wild mobs keep out of Old Thatchgrin's field (wander targets pushed onto its rim, crossings skirted). Zero rng, never touches Boar Meadow outside the event |
 | `seasonal_cancel.ts` | right-click cancel of a worn cosmetic (costume, trick, guise, pumpkin head) through the authoritative `cancelAura` (combat/aura_cancel_command.ts); clears the worn-head ledger flag |
 | `scarecrow_puppet.ts` | Thatchbound, Old Thatchgrin's mind control: victim choice (never his tank, never alone), the cast bar and marks, the puppet's walk (the player-movement hook) and its soft swing as HIS damage, the ways out. Rng only on a cast start and per landed swing |
-| `seasonal_dev.ts` | `/dev season [on [event]|off|auto|knocks]` (ALLOW_DEV_COMMANDS only) |
+| `gourdlight_dailies.ts` | the rotating dailies (records: `content/gourdlight_eve_dailies.ts`): the day's errand from `ctx.resetDay` (civil day number mod the pool, never a clock), the off-day errands joining the shared blocked set (`seasonal_quests.ts`), the errands' world pieces (patch pumpkins, cursed candles; reserved negative ids, sites from `src/sim/seasonal_daily_sites.ts`), the per-town knock credit and the costumed BOO (ledger key `boo_<npc>` in the day's knock ledger). Zero rng |
+| `knock_or_boo.ts` | the one townsfolk verb (`IWorldSeasonal.trickOrTreat(npcId, boo?)`): a knock, or the Boo! daily's fright |
+| `seasonal_dev.ts` | `/dev season [on [event]|off|auto|knocks|daily [1-6|id|next|auto|reset]]` (ALLOW_DEV_COMMANDS only) |
 
 Indoor pumpkins (purely decorative, never the hunt) are found inside the walk-in houses
 by `src/sim/seasonal_interior_pumpkins.ts` (on a furniture top that fits, or snug on the

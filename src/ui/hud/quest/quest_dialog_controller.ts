@@ -45,7 +45,7 @@ import { gossipMenuIsEmpty } from './gossip_menu';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
 import { questRewardChoiceHtml, questRewardChoiceModel } from './quest_reward_choice_view';
-import { trickOrTreatRowFor, trickOrTreatRowSig } from './trick_or_treat_row_view';
+import { seasonalTownsfolkRows, seasonalTownsfolkRowsSig } from './trick_or_treat_row_view';
 
 /** One string per offerable-row set, for cheap open-dialog change detection
  *  (the refreshIfChanged staleness signature). */
@@ -299,7 +299,7 @@ export class QuestDialogController {
       gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig ||
       clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !==
         this.lastClueRowSig ||
-      trickOrTreatRowSig(this.trickOrTreatRow(npc)) !== this.lastTrickOrTreatSig ||
+      seasonalTownsfolkRowsSig(this.seasonalRows(npc)) !== this.lastTrickOrTreatSig ||
       (guideDialogView(npc)?.state ?? null) !== this.lastGuideState
     ) {
       this.refresh();
@@ -429,8 +429,11 @@ export class QuestDialogController {
     const clueRow = clueRowRaw?.kind === 'deliver' && !ITEMS[clueRowRaw.itemId] ? null : clueRowRaw;
     // The seasonal knock (trick_or_treat_row_view.ts): offered at an answering
     // townsperson while an event runs, or a hint that today's knock is spent.
-    const trickRow = this.trickOrTreatRow(npc);
-    this.lastTrickOrTreatSig = trickOrTreatRowSig(trickRow);
+    // ...and the Boo! daily's costumed fright, at the same townsfolk.
+    const seasonalRows = this.seasonalRows(npc);
+    const trickRow = seasonalRows.knock;
+    const booRow = seasonalRows.boo;
+    this.lastTrickOrTreatSig = seasonalTownsfolkRowsSig(seasonalRows);
     // The WARFARE quartermaster REPLACES the generic goods row with its sectioned
     // window (gated on the NpcDef flag, never a hard-coded id).
     //
@@ -500,7 +503,7 @@ export class QuestDialogController {
         hasWorldQuestBoard,
         hasClueStep: clueRow !== null,
         hasDungeonGuide: guideView !== null,
-        hasTrickOrTreat: trickRow !== null,
+        hasTrickOrTreat: trickRow !== null || booRow !== null,
       })
     ) {
       this.close();
@@ -594,6 +597,13 @@ export class QuestDialogController {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-trick-or-treat="1" aria-label="${esc(t('seasonal.trickOrTreat.rowAria', { name: npcName }))}"><span class="gold">${svgIcon('questlog')}</span> ${esc(t('seasonal.trickOrTreat.row'))}</button>`;
     } else if (trickRow === 'knocked') {
       html += `<div class="qd-req ui-chip" data-trick-or-treat-done="1">${esc(t('seasonal.trickOrTreat.knockedHint'))}</div>`;
+    }
+    if (booRow === 'offer') {
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-boo="1" aria-label="${esc(t('seasonal.boo.rowAria', { name: npcName }))}"><span class="gold">${svgIcon('questlog')}</span> ${esc(t('seasonal.boo.row'))}</button>`;
+    } else if (booRow === 'needsCostume') {
+      html += `<div class="qd-req ui-chip" data-boo-hint="1">${esc(t('seasonal.boo.needsCostume'))}</div>`;
+    } else if (booRow === 'frightened') {
+      html += `<div class="qd-req ui-chip" data-boo-done="1">${esc(t('seasonal.boo.frightenedHint', { name: npcName }))}</div>`;
     }
     if (hasVendor) {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${currencyIconHtml('coin_gold')} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
@@ -719,6 +729,12 @@ export class QuestDialogController {
       this.deps.world().trickOrTreat(npc.id);
       this.close(true);
     });
+    // The fright rides the same verb with its `boo` flag (the sim re-checks the errand,
+    // the costume, the reach and today's ledger); its `seasonal` event is the feedback.
+    this.deps.element.querySelector('[data-boo]')?.addEventListener('click', () => {
+      this.deps.world().trickOrTreat(npc.id, true);
+      this.close(true);
+    });
     this.deps.element.querySelector('[data-clue-step]')?.addEventListener('click', () => {
       const liveWorld = this.deps.world();
       const talk = clueTalkFor(liveWorld.clueHunt, npc.templateId, liveWorld.inventory ?? []);
@@ -731,9 +747,8 @@ export class QuestDialogController {
     this.showAndFocus();
   }
 
-  private trickOrTreatRow(npc: Entity) {
-    const world = this.deps.world();
-    return trickOrTreatRowFor(world.activeSeasonalEvent, world.trickOrTreatedToday, npc.templateId);
+  private seasonalRows(npc: Entity) {
+    return seasonalTownsfolkRows(this.deps.world(), npc.templateId);
   }
 
   private renderQuestDetail(npc: Entity, questId: string): void {

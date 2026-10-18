@@ -3,8 +3,10 @@
 // repeatBlockedQuestIds, mirrored online through cprof.cadenceBlockedQuests), so
 // an event quest is offered exactly while its event runs, in every world, with no
 // new wire field. A quest already in the log stays finishable (computeQuestState
-// answers 'active'/'ready' before it reads the blocked set).
+// answers 'active'/'ready' before it reads the blocked set). The rotating dailies
+// ride the same set: the pool's errands that are not the day's are blocked too.
 import { QUESTS } from '../data';
+import { offDayDailyQuestIds } from './gourdlight_dailies';
 
 let seasonalQuestIds: readonly { id: string; event: string }[] | null = null;
 
@@ -17,19 +19,27 @@ function seasonalQuests(): readonly { id: string; event: string }[] {
   return seasonalQuestIds;
 }
 
-const blockedMemo = new Map<string | null, readonly string[]>();
+const blockedMemo = new Map<string, readonly string[]>();
 
-/** Every seasonal quest whose event is not the one running now (memoized per
- *  active event: the set only changes when an event opens or closes). */
-export function seasonalBlockedQuestIds(activeEvent: string | null): readonly string[] {
-  let out = blockedMemo.get(activeEvent);
+/** Every seasonal quest whose event is not the one running now, plus the rotating
+ *  dailies that are not the day's (gourdlight_dailies.ts). Memoized per (active event,
+ *  day's errand): the set only changes when an event opens or closes or the day rolls. */
+export function seasonalBlockedQuestIds(
+  activeEvent: string | null,
+  resetDay = '',
+  devDaily: string | null = null,
+): readonly string[] {
+  const offDay = offDayDailyQuestIds(activeEvent, resetDay, devDaily);
+  const key = `${activeEvent ?? ''}|${offDay.join(',')}`;
+  let out = blockedMemo.get(key);
   if (!out) {
-    out = Object.freeze(
-      seasonalQuests()
+    out = Object.freeze([
+      ...seasonalQuests()
         .filter((quest) => quest.event !== activeEvent)
         .map((quest) => quest.id),
-    );
-    blockedMemo.set(activeEvent, out);
+      ...offDay,
+    ]);
+    blockedMemo.set(key, out);
   }
   return out;
 }

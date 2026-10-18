@@ -508,7 +508,9 @@ describe('a stall in each city', () => {
     open(sim);
     for (const p of GOURDLIGHT_KEEPER_POSTS) {
       const npc = sim.entities.get(p.entityId) as Entity;
-      expect(npc.questIds).toEqual([GOURDLIGHT_ROUNDS_QUEST_ID]);
+      // the rounds, then the rotating dailies' pool (only the day's one is open)
+      expect(npc.questIds).toEqual(GOURDLIGHT_KEEPER_NPC.questIds);
+      expect(npc.questIds?.[0]).toBe(GOURDLIGHT_ROUNDS_QUEST_ID);
     }
     expect(GOURDLIGHT_KEEPER_NPC.vendorItems).toEqual([...GOURDLIGHT_SHOP_ITEMS]);
   });

@@ -22237,4 +22237,59 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'seasonal.pumpkins.flash': 'Призрачная тыква найдена! {count}/{total}',
   'seasonal.itemSource.pumpkinHead':
     'Выпадает со Старого Соломозуба на тыквенном поле за Кабаньим Лугом, когда вы впервые забираете его добычу. Торговцы её не продают.',
+  'entities.items.cursed_candle_stub.name': 'Огарок проклятой свечи',
+  'entities.items.gourdlight_crow_feather.name': 'Перо вороны Тыквенных Огней',
+  'entities.items.thatchgrin_patch_pumpkin.name': 'Тыква с грядки',
+  'entities.quests.q_gourdlight_daily_patch.title': 'Тыквы с грядки',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'Грядка Старого Соломозуба за Кабаньим Лугом ломится от тыкв, и половина их выкатилась за его соломенную ограду, где осторожный человек до них дотянется. Принеси мне пять, {playerName}. И держись подальше от самого старого пугала. Он пересчитывает каждую.',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    'Пять круглых, и ни одна не надкушена. Пирогов хватит на всю долину. Держи, за труды.',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': 'Тыквы с грядки',
+  'entities.quests.q_gourdlight_daily_boo.title': 'Бу!',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'В этих городах целый год никто как следует не пугался, {playerName}, а Ночь Тыквенных Огней без испуга это просто холодная ночь. Надень костюм, подойдёт любое из моих зелий или та тыквенная голова, если ты её добыл. Потом подкрадись к трём горожанам и хорошенько крикни им БУ.',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    'Троих? Я с другого конца площади слышала, как повар уронил сковороду. Молодец. Вот твоя доля.',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': 'Напуганные горожане',
+  'entities.quests.q_gourdlight_daily_wicks.title': 'Злые фитили',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    'Кто-то ставит у подножия наших фонарей свечи с зелёным пламенем. Они горят и не тают, а стоит отвернуться, шепчут. Задуй шесть таких, {playerName}, в любом из трёх городов, и принеси мне огарки.',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    'Шесть огарков, холодных как иней. Тому, кто их зажёг, придётся постараться получше. Возьми это и вымой руки.',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': 'Задуто проклятых свечей',
+  'entities.quests.q_gourdlight_daily_towns.title': 'По двери в каждом городе',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    'Дети говорят, что настоящий путник Тыквенных Огней до рассвета стучит в дверь в каждом городе. Докажи, что они правы, {playerName}. Попроси сладостей у одной двери в Истбруке, у одной в Фенбридже и у одной в Хайуотче. Фонари на дорогах осветят тебе путь.',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    'Три города за одну ночь! Твои сапоги заслужили это больше, чем ты.',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'Дверь в Истбруке',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'Дверь в Фенбридже',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'Дверь в Хайуотче',
+  'entities.quests.q_gourdlight_daily_feathers.title': 'Перья для костра',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'Когда Старого Соломозуба прижимают, он насылает ворон на всех, кто колотит его солому. Их перья горят в очаге зелёным, и мне нужно четыре для сегодняшнего костра. Вступи в бой у его грядки, {playerName}, и надёргай перьев с его ворон.',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    'Чёрные, как безлунное поле, и уже пахнут дымом. Костёр будет на загляденье. Спасибо.',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Вороньи перья',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'Корзинки для соседей',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'Каждую Ночь Тыквенных Огней я собираю корзинку сладостей для старого друга в каждом городе, а колени у меня уже не те. Отнеси их за меня, {playerName}: Cook Marlow в Истбрук, травнице Yara в Фенбридж и Loremaster Caddis наверх, в Хайуотч.',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    'Все три доставлены, а Marlow, говорят, расплакался. Он всегда плачет. Вот, корзинка и для тебя.',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Корзинка для Cook Marlow',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label': 'Корзинка для травницы Yara',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label': 'Корзинка для Loremaster Caddis',
+  'seasonal.boo.row': 'Бу!',
+  'seasonal.boo.rowAria': 'Выскочить перед {name} и крикнуть бу',
+  'seasonal.boo.needsCostume':
+    'Сначала наденьте костюм: зелье-костюм, проделку летучей мыши или скелета, Оберег соломенника или Резную тыквенную голову.',
+  'seasonal.boo.frightenedHint':
+    '{name} всё ещё вздрагивает после прошлого испуга. Найдите кого-нибудь другого.',
+  'seasonal.boo.landed':
+    'Вы выскакиваете перед {name} с громким БУ! Тот вскрикивает и чуть не роняет всё из рук.',
+  'seasonal.boo.flash': 'БУ! {name} напуган!',
+  'seasonal.boo.noCostume': 'Без костюма {name} только смеётся над вами. Сначала наденьте костюм.',
+  'seasonal.boo.already': 'С {name} на сегодня испугов достаточно.',
+  'seasonal.boo.notOnErrand': 'Хестер сегодня не просила вас никого пугать.',
 };

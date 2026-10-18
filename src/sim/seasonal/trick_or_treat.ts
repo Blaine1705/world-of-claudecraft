@@ -18,6 +18,7 @@ import {
 import { onQuestEventForQuests } from '../quests/quest_credit';
 import type { SimContext } from '../sim_context';
 import { dist2d } from '../types';
+import { creditTownKnock } from './gourdlight_dailies';
 import { playTrick } from './seasonal_cosmetics';
 import { activeSeasonalEventOf, knockedToday } from './seasonal_state';
 
@@ -81,6 +82,8 @@ export function trickOrTreat(ctx: SimContext, npcId: number, pid?: number): Tric
     pid: meta.entityId,
   });
   onQuestEventForQuests(ctx, meta, TRICK_OR_TREAT_QUEST_EVENT);
+  // ...and for the towns errand, its town's own knock (gourdlight_dailies.ts)
+  creditTownKnock(ctx, meta, npc.templateId);
   meta.wireRev++;
   return outcome;
 }

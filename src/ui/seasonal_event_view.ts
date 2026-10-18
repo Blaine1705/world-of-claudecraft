@@ -98,6 +98,18 @@ export function seasonalEventPresentation(event: SeasonalEvent): SeasonalEventPr
         flashText: t('seasonal.trickOrTreat.trickFlash', { trick }),
       };
     }
+    case 'boo':
+      return {
+        logText: t('seasonal.boo.landed', { name }),
+        flashText: t('seasonal.boo.flash', { name }),
+        sound: 'quest_ready',
+      };
+    case 'booNoCostume':
+      return { logText: t('seasonal.boo.noCostume', { name }) };
+    case 'booAlready':
+      return { logText: t('seasonal.boo.already', { name }) };
+    case 'booNotOnErrand':
+      return { logText: t('seasonal.boo.notOnErrand') };
     default:
       return null;
   }

@@ -206,7 +206,10 @@ describe('his tuning', () => {
       expect(['tool', 'mount']).toContain(item.kind);
       expect((item as { stats?: unknown }).stats).toBeUndefined();
     }
-    expect(MOBS[GOURDLIGHT_CROW_ID].loot).toEqual([]);
+    // only the Feathers for the Fire daily's quest-gated feather (a quest item, no power)
+    expect(MOBS[GOURDLIGHT_CROW_ID].loot.map((l) => l.questId)).toEqual([
+      'q_gourdlight_daily_feathers',
+    ]);
     expect(MOBS[STRAWLING_ID].loot).toEqual([]);
   });
 });

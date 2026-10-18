@@ -8049,6 +8049,20 @@
         "emberwoven_sheaf"
       ],
       "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
+    },
+    {
+      "batchId": "gourdlight-eve-daily-icons-2026-10-18",
+      "source": "Rendered in Blender 5.2 from the deterministic Gourdlight Eve factory (scripts/assets/gourdlight_eve/icons.py with daily_icons.py): a stray patch pumpkin built on the factory's own ribbed gourd with a vine, leaf and straw, a cursed candle stub of grey-green wax with a cold green flame on an iron dish, and a glossy black crow feather with an ember at its tip, each modelled for its icon only. No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "woc-item-icon-v1: centred subject on an opaque dark painted ground, top-left key light",
+      "provenanceRecord": "scripts/assets/gourdlight_eve/daily_icons.py",
+      "itemIds": [
+        "thatchgrin_patch_pumpkin",
+        "cursed_candle_stub",
+        "gourdlight_crow_feather"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: a 512px Eevee render of the modelled subject, then scripts/convert_item_icons_webp.mjs to the 128px WebP."
     }
   ]
 }

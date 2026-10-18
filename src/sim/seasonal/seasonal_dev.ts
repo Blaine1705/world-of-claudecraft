@@ -8,13 +8,54 @@
 //   /dev season on [event]      force an event open (default: Gourdlight Eve)
 //   /dev season off             force every event closed
 //   /dev season auto            follow the host calendar again
-//   /dev season knocks          forget today's trick-or-treat knocks
-import { GOURDLIGHT_EVE_ID } from '../content/gourdlight_eve';
+//   /dev season knocks          forget today's trick-or-treat knocks (and frights)
+//   /dev season daily [pick]    the rotating daily: show today's, or pick one by its
+//                               number (1-6) or id, `next` to step on, `auto` to follow
+//                               the reset day again, `reset` to clear today's turn-ins
+//                               (the rounds and the dailies) so they can be redone
+import { GOURDLIGHT_EVE_ID, GOURDLIGHT_ROUNDS_QUEST_ID } from '../content/gourdlight_eve';
+import { GOURDLIGHT_DAILY_POOL } from '../content/gourdlight_eve_dailies';
+import { weeklyQuestLockoutId } from '../quests/weekly_quest_lock';
 import type { SimContext } from '../sim_context';
+import { gourdlightDailyToday } from './gourdlight_dailies';
 import { activeSeasonalEventOf } from './seasonal_state';
 import { KNOWN_SEASONAL_EVENTS } from './seasonal_tick';
 
-const USAGE = '[dev] Usage: /dev season [on [event]|off|auto|knocks].';
+const USAGE =
+  '[dev] Usage: /dev season [on [event]|off|auto|knocks|daily [1-6|id|next|auto|reset]].';
+
+function handleDailyDev(ctx: SimContext, arg: string, pid: number): void {
+  const log = (text: string) => ctx.emit({ type: 'log', text, pid });
+  const state = ctx.seasonal;
+  const pool = GOURDLIGHT_DAILY_POOL;
+  const today = () => gourdlightDailyToday(ctx.resetDay, state.devDaily);
+  if (arg === 'reset') {
+    const meta = ctx.players.get(pid);
+    if (meta) {
+      for (const id of [GOURDLIGHT_ROUNDS_QUEST_ID, ...pool]) {
+        meta.questsDone.delete(id);
+        meta.raidLockouts.delete(weeklyQuestLockoutId(id));
+      }
+      meta.wireRev++;
+    }
+    log("[dev] Today's Gourdlight turn-ins cleared: the rounds and the dailies can be redone.");
+    return;
+  }
+  if (arg === 'auto') state.devDaily = null;
+  else if (arg === 'next') state.devDaily = pool[(pool.indexOf(today()) + 1) % pool.length];
+  else if (/^[1-9]$/.test(arg) && Number(arg) <= pool.length)
+    state.devDaily = pool[Number(arg) - 1];
+  else if (pool.includes(arg)) state.devDaily = arg;
+  else if (arg !== '') {
+    ctx.error(
+      pid,
+      `[dev] Unknown daily. Pool: ${pool.map((id, i) => `${i + 1} ${id}`).join(', ')}.`,
+    );
+    return;
+  }
+  const source = state.devDaily !== null ? 'dev pick' : `reset day ${ctx.resetDay || 'none'}`;
+  log(`[dev] Gourdlight daily today: ${today()} (${source}).`);
+}
 
 /** True when the line was a /dev season command (handled or refused). */
 export function handleSeasonalDevChat(ctx: SimContext, raw: string, pid: number): boolean {
@@ -49,6 +90,10 @@ export function handleSeasonalDevChat(ctx: SimContext, raw: string, pid: number)
   if (verb === 'auto') {
     state.devOverride = undefined;
     log(`[dev] Seasonal events follow the host calendar again (${state.hostEventId ?? 'none'}).`);
+    return true;
+  }
+  if (verb === 'daily') {
+    handleDailyDev(ctx, (m[2] ?? '').toLowerCase(), pid);
     return true;
   }
   if (verb === 'knocks') {

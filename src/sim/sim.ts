@@ -4671,8 +4671,8 @@ export class Sim {
   get trickOrTreatedToday(): readonly string[] {
     return seasonalMod.knockedTodayView(this.primary, this.resetDay);
   }
-  trickOrTreat(npcId: number, pid?: number): void {
-    seasonalMod.trickOrTreat(this.ctx, npcId, pid);
+  trickOrTreat(npcId: number, boo = false, pid?: number): void {
+    seasonalMod.knockOrBoo(this.ctx, npcId, boo, pid);
   }
   get treasureMap(): Readonly<TreasureMapProgress> | null {
     return this.primary.treasureMap;

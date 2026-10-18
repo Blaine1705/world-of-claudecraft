@@ -168,7 +168,11 @@ export function repeatBlockedQuestIds(
   const weekly =
     meta.raidLockouts.size > 0 ? weeklyLockedQuestIds(meta.raidLockouts, ctx.lockoutNowMs()) : [];
   // Seasonal quests close with their event (seasonal/seasonal_quests.ts).
-  const seasonal = seasonalBlockedQuestIds(activeSeasonalEventOf(ctx.seasonal));
+  const seasonal = seasonalBlockedQuestIds(
+    activeSeasonalEventOf(ctx.seasonal),
+    ctx.resetDay,
+    ctx.seasonal.devDaily,
+  );
   if (cadence.length === 0 && weekly.length === 0 && seasonal.length === 0) return undefined;
   return new Set([...cadence, ...weekly, ...seasonal]);
 }
