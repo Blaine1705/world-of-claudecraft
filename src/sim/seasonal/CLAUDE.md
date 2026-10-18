@@ -30,7 +30,14 @@ event, e.g. `gourdlight_eve.ts`); this directory holds the rules. Public surface
 | `seasonal_items.ts` | item use arms: pumpkin head toggle, Jar of Mischief, the treat pouch |
 | `seasonal_quests.ts` | seasonal quests close with their event through the shared repeat-blocked set |
 | `scarecrow_field_ward.ts` | while Gourdlight Eve runs, idle wild mobs keep out of Old Thatchgrin's field (wander targets pushed onto its rim, crossings skirted). Zero rng, never touches Boar Meadow outside the event |
+| `seasonal_cancel.ts` | right-click cancel of a worn cosmetic (costume, trick, guise, pumpkin head) through the authoritative `cancelAura` (combat/aura_cancel_command.ts); clears the worn-head ledger flag |
+| `scarecrow_puppet.ts` | Thatchbound, Old Thatchgrin's mind control: victim choice (never his tank, never alone), the cast bar and marks, the puppet's walk (the player-movement hook) and its soft swing as HIS damage, the ways out. Rng only on a cast start and per landed swing |
 | `seasonal_dev.ts` | `/dev season [on [event]|off|auto|knocks]` (ALLOW_DEV_COMMANDS only) |
+
+Indoor pumpkins (purely decorative, never the hunt) are found inside the walk-in houses
+by `src/sim/seasonal_interior_pumpkins.ts` (on a furniture top that fits, or snug on the
+floor; walled on four sides; off the door line), pinned by
+`tests/seasonal_interior_pumpkins.test.ts`; the decor view draws them with the street list.
 
 City decorations are presentation: the anchor rules live in
 `src/sim/content/gourdlight_eve_decor.ts`, the placement resolver (anchors to lamps,

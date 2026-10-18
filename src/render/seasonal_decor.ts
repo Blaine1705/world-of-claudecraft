@@ -20,6 +20,9 @@
 // written once per frame for every pumpkin, lantern and worn head together.
 // The light those candles throw (halos, ground light, a couple of budgeted point
 // lights near the player) is seasonal_decor_lights.ts.
+// The indoor pumpkins (a candle-lit jack-o'-lantern on a table or by a wall inside the
+// walk-in houses, src/sim/seasonal_interior_pumpkins.ts) join the street list at build,
+// so they ride the same instancing, glow, halos and budgeted candle light.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { GOURDLIGHT_EVE_ID } from '../sim/content/gourdlight_eve';
@@ -30,6 +33,7 @@ import {
   type SeasonalGarland,
   seasonalDecorLayout,
 } from '../sim/seasonal_decor_layout';
+import { interiorPumpkins } from '../sim/seasonal_interior_pumpkins';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX } from './gfx';
 import type { BudgetPointLightRegistry } from './point_light_budget';
@@ -42,6 +46,7 @@ import { SeasonalDecorLights } from './seasonal_decor_lights';
 import { garlandOrnaments, garlandPolyline } from './seasonal_garland_core';
 import { driveSeasonalGlow } from './seasonal_glow';
 import { seasonalHalos, seasonalLightSites } from './seasonal_glow_sites_core';
+import { SeasonalInteriorWisps } from './seasonal_interior_wisps';
 
 /** A city's dressing draws within this reach of the player (yards, squared below). */
 const DRAW_RANGE = 240;
@@ -79,6 +84,7 @@ export class SeasonalDecor {
   private built = false;
   private ropeMaterial: THREE.Material | null = null;
   private lights: SeasonalDecorLights | null = null;
+  private wisps: SeasonalInteriorWisps | null = null;
 
   constructor(
     private readonly scene: THREE.Object3D,
@@ -114,13 +120,16 @@ export class SeasonalDecor {
       city.group.visible = dx * dx + dz * dz <= DRAW_RANGE_SQ;
     }
     driveSeasonalGlow(night, time);
+    this.wisps?.update(time, false);
     // the gate owns root's visibility: no candle light before the kit is linked
     this.lights?.update(night, time, px, pz, this.root.visible);
   }
 
   private build(assets: GourdlightAssets): void {
     this.built = true;
-    const layout = seasonalDecorLayout(this.seed);
+    const street = seasonalDecorLayout(this.seed);
+    const indoor = interiorPumpkins(this.seed);
+    const layout = { ...street, ground: [...street.ground, ...indoor] };
     const zones = getActiveWorldContent().zones;
     const hubs = GOURDLIGHT_DECOR_CITIES.map((rule) => zones.find((z) => z.id === rule.zoneId)?.hub)
       .filter((hub): hub is NonNullable<typeof hub> => hub !== undefined)
@@ -151,6 +160,12 @@ export class SeasonalDecor {
       const group = this.buildCity(assets, perCity[i], i);
       for (const o of lights.buildCity(seasonalHalos(perCity[i]), seasonalLightSites(perCity[i])))
         group.add(o);
+      // the indoor pumpkins' wisps, in this city's group (gated and ranged with it)
+      this.wisps ??= new SeasonalInteriorWisps();
+      this.wisps.build(
+        group,
+        indoor.filter((p) => nearestHub(p.x, p.z) === i),
+      );
       group.name = `seasonal-decor-city-${i}`;
       this.content.add(group);
       this.cities.push({ group, x: hub.x, z: hub.z });
@@ -226,6 +241,8 @@ export class SeasonalDecor {
     this.ropeMaterial = null;
     this.lights?.dispose();
     this.lights = null;
+    this.wisps?.dispose();
+    this.wisps = null;
     this.cities = [];
   }
 

@@ -852,6 +852,8 @@ const RENDER_PURE_CORES = [
   'src/render/scarecrow_fx_core.ts',
   // Thatchbound's strings, eyes, sigil and shockwave plan (thatchbound_fx.ts).
   'src/render/thatchbound_fx_core.ts',
+  // the indoor pumpkins' wisps: their drift and breath (seasonal_interior_wisps.ts)
+  'src/render/seasonal_interior_wisps_core.ts',
   // where the seasonal dressing's candlelight is: its halos and ground-light sites
   'src/render/seasonal_glow_sites_core.ts',
   'src/render/haunted_pumpkin_core.ts',
