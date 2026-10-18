@@ -28374,7 +28374,7 @@ export const de_DE: EnTranslations = {
       },
       "q_gourdlight_daily_feathers": {
         "title": "Feathers for the Fire",
-        "text": "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need four for tonight's bonfire. Find a fight at his patch, {playerName}, and pluck them from his crows.",
+        "text": "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need three for tonight's bonfire. Find a fight at his patch, {playerName}, and pluck them from his crows.",
         "completion": "Black as a moonless field, and they smell of smoke already. The bonfire will be a sight. Thank you.",
         "objectives": {
           "0": {

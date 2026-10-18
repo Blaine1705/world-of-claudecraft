@@ -3865,7 +3865,8 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
   }, // Gourdlight Eve (content/gourdlight_eve.ts), the autumn seasonal event: a Feat,
   // zero Renown and outside Book completion, because the head drops only from Old
-  // Thatchgrin, who stands only while the event runs (a seasonal window must never gate the completion meta).
+  // Thatchgrin, who stands only while the event runs (a seasonal window must never
+  // gate the completion meta).
   // Cosmetic only; appended at the END.
   feat_gourdlight_guise: {
     id: 'feat_gourdlight_guise',

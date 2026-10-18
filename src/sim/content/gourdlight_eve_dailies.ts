@@ -51,7 +51,9 @@ export const CURSED_CANDLES_PER_TOWN = 5;
 
 /** The crows' feathers (Old Thatchgrin's Crowcall adds drop one each, on the errand). */
 export const CROW_FEATHER_ID = 'gourdlight_crow_feather';
-export const CROW_FEATHERS_WANTED = 4;
+/** Three of the six crows his two Crowcalls bring each pull (at 80% and 40% health), so
+ *  one full fight is always enough even when others kill some of the crows. */
+export const CROW_FEATHERS_WANTED = 3;
 
 /** The quest event a costumed fright credits, and how many different townsfolk. */
 export const GOURDLIGHT_BOO_QUEST_EVENT = 'gourdlight_boo';
@@ -199,7 +201,7 @@ export const GOURDLIGHT_DAILY_QUESTS: Record<string, QuestDef> = {
   [GOURDLIGHT_DAILY_FEATHERS_QUEST_ID]: daily(
     GOURDLIGHT_DAILY_FEATHERS_QUEST_ID,
     'Feathers for the Fire',
-    "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need four for tonight's bonfire. Find a fight at his patch, $N, and pluck them from his crows.",
+    "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need three for tonight's bonfire. Find a fight at his patch, $N, and pluck them from his crows.",
     'Black as a moonless field, and they smell of smoke already. The bonfire will be a sight. Thank you.',
     [
       {

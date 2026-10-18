@@ -22268,7 +22268,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'Дверь в Хайуотче',
   'entities.quests.q_gourdlight_daily_feathers.title': 'Перья для костра',
   'entities.quests.q_gourdlight_daily_feathers.text':
-    'Когда Старого Соломозуба прижимают, он насылает ворон на всех, кто колотит его солому. Их перья горят в очаге зелёным, и мне нужно четыре для сегодняшнего костра. Вступи в бой у его грядки, {playerName}, и надёргай перьев с его ворон.',
+    'Когда Старого Соломозуба прижимают, он насылает ворон на всех, кто колотит его солому. Их перья горят в очаге зелёным, и мне нужно три для сегодняшнего костра. Вступи в бой у его грядки, {playerName}, и надёргай перьев с его ворон.',
   'entities.quests.q_gourdlight_daily_feathers.completion':
     'Чёрные, как безлунное поле, и уже пахнут дымом. Костёр будет на загляденье. Спасибо.',
   'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'Вороньи перья',

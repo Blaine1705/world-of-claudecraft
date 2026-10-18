@@ -21856,7 +21856,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gourdlight_daily_towns.objectives.2.label': '하이워치에서 두드린 문',
   'entities.quests.q_gourdlight_daily_feathers.title': '모닥불을 위한 깃털',
   'entities.quests.q_gourdlight_daily_feathers.text':
-    '올드 대치그린은 궁지에 몰리면 자기 짚을 두들기는 자들에게 까마귀를 불러내요. 그 깃털은 화로에서 초록색으로 타는데, 오늘 밤 모닥불에 네 개가 필요해요. 그의 밭에서 싸움에 끼어서, {playerName}, 까마귀에게서 깃털을 뽑아 와요.',
+    '올드 대치그린은 궁지에 몰리면 자기 짚을 두들기는 자들에게 까마귀를 불러내요. 그 깃털은 화로에서 초록색으로 타는데, 오늘 밤 모닥불에 세 개가 필요해요. 그의 밭에서 싸움에 끼어서, {playerName}, 까마귀에게서 깃털을 뽑아 와요.',
   'entities.quests.q_gourdlight_daily_feathers.completion':
     '달 없는 밭처럼 새까맣고, 벌써 연기 냄새가 나네요. 모닥불이 장관이겠어요. 고마워요.',
   'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': '까마귀 깃털',

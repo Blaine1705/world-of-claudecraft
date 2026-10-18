@@ -20797,7 +20797,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gourdlight_daily_towns.objectives.2.label': '在高望敲过的门',
   'entities.quests.q_gourdlight_daily_feathers.title': '为篝火取羽',
   'entities.quests.q_gourdlight_daily_feathers.text':
-    '老稻草狞笑被逼急了，就会唤来乌鸦扑向敲打他稻草的人。它们的羽毛在炉火里会烧出绿焰，今晚的篝火我需要四根。去他的田里参加一场战斗，{playerName}，从他的乌鸦身上拔下羽毛。',
+    '老稻草狞笑被逼急了，就会唤来乌鸦扑向敲打他稻草的人。它们的羽毛在炉火里会烧出绿焰，今晚的篝火我需要三根。去他的田里参加一场战斗，{playerName}，从他的乌鸦身上拔下羽毛。',
   'entities.quests.q_gourdlight_daily_feathers.completion':
     '黑得像没有月亮的田野，已经带着烟味了。篝火一定很壮观。谢谢你。',
   'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': '乌鸦羽毛',

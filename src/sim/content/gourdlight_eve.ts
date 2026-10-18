@@ -249,8 +249,10 @@ export const GOURDLIGHT_KEEPER_POSTS: readonly GourdlightKeeperPost[] = Object.f
 ]);
 
 /** The keeper's shop: price in sweets per purchase (ItemDef.priceItem). */
-// Daily income is about 20 to 25 sweets (the rounds pouch, the knocks, his sack), so a
-// draught is half a day and a title three to five days of rounds.
+// Daily income is about 25 to 30 sweets (the rounds pouch, the knocks, his sack, and since
+// round 8 the day's rotating errand's pouch, content/gourdlight_eve_dailies.ts), so a
+// draught is a third of a day and a title two to four days: the errands speed the
+// titles up on purpose, a reason to come back every day of the event.
 // The Carved Pumpkin Head is not on the shelf: Old Thatchgrin's first-kill drop is its
 // only source (owner direction 2026-10-18, content/gourdlight_eve_scarecrow.ts loot).
 export const GOURDLIGHT_SHOP_PRICES: Readonly<Record<string, number>> = Object.freeze({

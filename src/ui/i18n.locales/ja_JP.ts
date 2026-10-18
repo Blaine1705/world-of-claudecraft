@@ -21860,7 +21860,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'ハイウォッチで叩いた戸',
   'entities.quests.q_gourdlight_daily_feathers.title': '焚き火のための羽根',
   'entities.quests.q_gourdlight_daily_feathers.text':
-    'オールド・サッチグリンは追い詰められると、藁を叩く者にカラスを呼び寄せるの。その羽根は炉で緑に燃えて、今夜の焚き火に四枚いるのよ。畑で戦いに加わって、{playerName}、カラスから羽根をむしってきて。',
+    'オールド・サッチグリンは追い詰められると、藁を叩く者にカラスを呼び寄せるの。その羽根は炉で緑に燃えて、今夜の焚き火に三枚いるのよ。畑で戦いに加わって、{playerName}、カラスから羽根をむしってきて。',
   'entities.quests.q_gourdlight_daily_feathers.completion':
     '月のない畑みたいに真っ黒で、もう煙の匂いがする。焚き火が見ものになるわ。ありがとう。',
   'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'カラスの羽根',
