@@ -70,6 +70,7 @@ export {
 export {
   MOONREST_BUILDINGS_BY_ID,
   MOONREST_LAYOUT,
+  MOONREST_MOONSPRING_ROAD,
   MOONREST_NPC_PLACEMENTS_BY_ID,
 } from './moonrest';
 export type {
