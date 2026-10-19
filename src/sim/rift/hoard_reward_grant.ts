@@ -2,6 +2,7 @@
 // The online path never draws RNG here, so a retry cannot change its parcel.
 
 import { type TreasureMapRarity, VAULT_GUEST_PAYOUTS_PER_CYCLE } from '../content/treasure_maps';
+import { assertHeroicMarksGrantsFit } from '../heroic_marks';
 import type { SimContext } from '../sim_context';
 import type { HoardReward } from './hoard_reward_roll';
 
@@ -21,6 +22,7 @@ export function grantHoardReward(
     ctx.emit({ type: 'treasureVaultLooted', rarity, capped: true, pid });
     return true;
   }
+  assertHeroicMarksGrantsFit(meta, reward.items);
   if (
     !owner &&
     !reservedAtClear &&

@@ -2,6 +2,7 @@
 
 import { sanitizeBankState, savedBankState } from './bank';
 import type { CharacterState } from './character_state';
+import { absorbLegacyHeroicMarkSlots, sanitizeHeroicMarks } from './heroic_marks';
 import * as vaultMod from './materials_vault';
 import type { PlayerMeta } from './sim';
 import { cloneInvSlot } from './types';
@@ -23,11 +24,15 @@ export function restoreCharacterStorage(
   // whole-record replacement AND its vaultWireRev bump (the rationale sits there).
   vaultMod.restoreVaultStateOnLoad(meta, s.vault, droppedInstanceJunk, playerId);
   meta.weeklyRewards = weeklyMod.sanitizeWeeklyRewards(s.weeklyRewards, false, meta.cls);
+  // Heroic Marks: the saved balance, plus any pre-currency `heroic_mark` stacks
+  // still sitting in the bags or bank (both hydrated above), folded in once.
+  meta.heroicMarks = sanitizeHeroicMarks(s.heroicMarks);
+  absorbLegacyHeroicMarkSlots(meta);
 }
 
 export function savedCharacterStorage(
   meta: PlayerMeta,
-): Pick<CharacterState, 'inventory' | 'bags' | 'bank' | 'vault' | 'weeklyRewards'> {
+): Pick<CharacterState, 'inventory' | 'bags' | 'bank' | 'vault' | 'weeklyRewards' | 'heroicMarks'> {
   return {
     inventory: meta.inventory.map(cloneInvSlot),
     bags: [...meta.bags],
@@ -38,5 +43,20 @@ export function savedCharacterStorage(
     ...(meta.weeklyRewards
       ? { weeklyRewards: weeklyMod.sanitizeWeeklyRewards(meta.weeklyRewards, false, meta.cls) }
       : {}),
+    // Absent at zero, so a character that never earned a mark saves unchanged.
+    ...(meta.heroicMarks > 0 ? { heroicMarks: meta.heroicMarks } : {}),
   };
+}
+
+/** Live storage owned by this load/save boundary. */
+export interface CharacterVaultStorageState {
+  // The per-character Materials Vault: a count per material id with a gold-bought
+  // per-material ceiling. Capacity and move math live in materials_vault.ts.
+  // Persisted (inside the character save, exactly like inventory/bags/bank).
+  weeklyRewards?: weeklyMod.WeeklyRewardState;
+  vault: vaultMod.MaterialsVaultState;
+  // Runtime-only change signals for the owner-only bank/vault wires (bumped by
+  // every write to meta.bank state / vault state respectively); never persisted.
+  bankWireRev: number;
+  vaultWireRev: number;
 }

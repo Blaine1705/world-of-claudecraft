@@ -248,6 +248,35 @@ For off-box safety, sync the directory to S3 occasionally:
   rollback across a cap change needs a restore-from-backup plan for professions
   counters. Details: "Rollback erases newer fields" in
   `docs/design/professions-tuning-packet.md`.
+- **Heroic Marks currency rollback (mixed fleet)**: from the release that made Heroic
+  Marks a currency, the balance rides `characters.state.heroicMarks` and a character's
+  first load folds its old `heroic_mark` bag and bank stacks into it
+  (`src/sim/heroic_marks.ts`). `characters.state` is written whole, so a binary that
+  predates the currency autosaves the blob WITHOUT `heroicMarks` and erases that
+  character's whole balance; its quartermaster also counts only bag stacks, so the
+  player sees zero first. Roll the release out to EVERY realm process in one deploy pass.
+  Before rolling back past it, stop and flush EVERY game, admin, offline and
+  background writer and take a consistent database backup. Inventory every persisted
+  character-state carrier, including any offline snapshots that can later replace
+  `characters.state`, and pending reward/mail carriers. Snapshot validated balances
+  using `bigint`, not `int` (valid balances exceed 2^31):
+  `CREATE TABLE heroic_marks_rollback AS SELECT id, (state->>'heroicMarks')::bigint AS
+  marks FROM characters WHERE state ? 'heroicMarks';`. Validate each value as an
+  integer from 0 through 9007199254740991 BEFORE casting; malformed or out-of-range
+  data must abort the conversion for investigation, never coerce or omit a balance.
+  Test the exact conversion on a disposable restored backup at that full range first.
+  A safe older-format conversion must account for existing legacy bag/bank stacks,
+  every scalar carrier and already-pending parcels without double counting. Write
+  converted carriers AND strip `heroicMarks` in the SAME atomic transaction, with
+  all writers still stopped. Verify aggregate currency conservation and per-character
+  equality before commit; any overflow, inventory/payload/slot bound, missing carrier
+  or mismatch must roll back the entire conversion. A MAX_SAFE_INTEGER balance cannot
+  be expanded into a practical number of 20-unit stacks: never run a per-mark or
+  unbounded stack-expansion loop. If a tested bounded conversion cannot represent
+  every balance losslessly, restore the consistent pre-upgrade backup instead.
+  Keep the fleet stopped until validation succeeds, then start only the chosen
+  version everywhere. Never leave both the scalar and re-injected units: the next
+  roll forward would fold them twice. Merely restarting the old binary is unsupported.
 - **Farming plot deploy order and rollback (mixed fleet)**: `farmPlots` rides
   `characters.state`, which is written whole, so a server binary that predates the
   farming growth-engine release autosaves the blob WITHOUT `farmPlots` and erases
