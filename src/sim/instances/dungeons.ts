@@ -93,6 +93,7 @@ import {
 } from './ignivar_entry';
 import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
+import { INSTANCE_FOOTPRINT_HALF_WIDTH, instanceHalfWidthOf } from './instance_footprint';
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
 import { RAID_REQUIRED_DUNGEON_IDS, resetCooldownApplies } from './reset_cooldown_policy';
 
@@ -255,10 +256,11 @@ export function instanceClaimIdAt(ctx: SimContext, pos: Vec3): number | null {
 }
 
 // The generic instance-footprint HALF-WIDTH (x extent either side of a slot
-// origin). Exported because vault_craft_gate.ts claimWestReach derives its
-// west-reach envelope from this same constant: a bare literal widened here
+// origin) and the per-dungeon widening live in the leaf instance_footprint.ts;
+// re-exported here because vault_craft_gate.ts claimWestReach derives its
+// west-reach envelope from the same symbols: a bare literal widened here
 // would silently under-estimate that gate's reach and fail it open.
-export const INSTANCE_FOOTPRINT_HALF_WIDTH = 120;
+export { INSTANCE_FOOTPRINT_HALF_WIDTH, instanceHalfWidthOf };
 
 // The one dungeon whose claim footprint is WIDER than the generic envelope
 // (the circle arm in instanceClaimContains below). Exported for the same
@@ -268,15 +270,13 @@ export const WIDE_CLAIM_DUNGEON_ID = 'nythraxis_boss_arena';
 
 // The one instance-footprint envelope (shared by occupancy, position lookup,
 // and the kill-lockout sweep): is `pos` inside the slot anchored at `origin`?
-function instanceContains(origin: { x: number; z: number }, pos: Vec3): boolean {
-  return (
-    Math.abs(pos.x - origin.x) < INSTANCE_FOOTPRINT_HALF_WIDTH && Math.abs(pos.z - origin.z) < 250
-  );
+function instanceContains(origin: { x: number; z: number }, pos: Vec3, halfWidth: number): boolean {
+  return Math.abs(pos.x - origin.x) < halfWidth && Math.abs(pos.z - origin.z) < 250;
 }
 
 function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
   const origin = instanceOriginOf(inst);
-  if (instanceContains(origin, pos)) return true;
+  if (instanceContains(origin, pos, instanceHalfWidthOf(inst.dungeonId))) return true;
   if (inst.dungeonId !== WIDE_CLAIM_DUNGEON_ID) return false;
   // Looked up through the SAME constant the guard above compares, never a
   // second hard-coded id: a rename via the constant would otherwise leave

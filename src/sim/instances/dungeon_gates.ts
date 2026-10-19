@@ -79,6 +79,7 @@ import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type DungeonDef, type DungeonGateDef, type Entity, TICK_RATE } from '../types';
 import { setOpenDungeonGates } from './dungeon_gate_state';
+import { instanceHalfWidthOf } from './instance_footprint';
 
 export type DungeonGateState = 'closed' | 'open' | 'sealed';
 
@@ -335,9 +336,10 @@ export function setDungeonGatesDevOpen(inst: InstanceSlot, open: boolean): void 
 
 function announce(ctx: SimContext, inst: InstanceSlot, text: string): void {
   const o = instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
+  const halfWidth = instanceHalfWidthOf(inst.dungeonId);
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
-    if (!e || Math.abs(e.pos.x - o.x) >= 120 || Math.abs(e.pos.z - o.z) >= 250) continue;
+    if (!e || Math.abs(e.pos.x - o.x) >= halfWidth || Math.abs(e.pos.z - o.z) >= 250) continue;
     ctx.emit({ type: 'log', text, color: '#e8c070', pid: meta.entityId });
   }
 }

@@ -637,7 +637,7 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
     (d.gates ?? []).filter((g) => g.sealWhileEngaged).map((g) => [d.id, g.id] as const),
   );
 
-  it('covers the five reworked dungeons', () => {
+  it("covers the five reworked dungeons and the Smith's Heart raid", () => {
     expect(new Set(SEALING.map(([d]) => d))).toEqual(
       new Set([
         'hollow_crypt',
@@ -645,13 +645,21 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
         'drowned_temple',
         'gravewyrm_sanctum',
         'wildheart_basin',
+        'smith_heart',
       ]),
     );
     expect(SEALING.length).toBeGreaterThanOrEqual(17);
   });
 
   function claim(dungeonId: string): { sim: Sim; inst: InstanceSlot } {
-    const sim = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true, world: WORLD });
+    // The Smith's Heart is a dev-only blockout (encounters/smith_heart/entry.ts).
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WORLD,
+      devCommands: dungeonId === 'smith_heart',
+    });
     const pid = sim.addPlayer('warrior', 'Sealwalker');
     sim.setPlayerLevel(20, pid);
     expect(enterDungeon(sim.ctx, dungeonId, pid)).toBe(true);
