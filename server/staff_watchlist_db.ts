@@ -1,5 +1,6 @@
 import { findCharacterReportTargetByName, pool } from './db';
 import type { ModerationWatchlist } from './moderation_service';
+import { createStaffWatchlistCache } from './staff_watchlist_cache';
 
 // The staff watchlist behind the in-game /watch and /unwatch commands
 // (server/moderation_service.ts). One row per watched ACCOUNT, so a watched
@@ -17,6 +18,8 @@ CREATE TABLE IF NOT EXISTS staff_watchlist (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS staff_watchlist_created ON staff_watchlist(created_at DESC);
+CREATE INDEX IF NOT EXISTS staff_watchlist_added_by ON staff_watchlist(added_by_account_id)
+  WHERE added_by_account_id IS NOT NULL;
 `;
 
 // The list form is a chat readout, so it is bounded.
@@ -58,11 +61,13 @@ export async function addStaffWatch(input: {
            created_at = now()`,
     [input.accountId, input.characterName, input.note, input.addedByAccountId],
   );
+  listCache.bust();
 }
 
 // True when a row was removed.
 export async function removeStaffWatch(accountId: number): Promise<boolean> {
   const res = await pool.query('DELETE FROM staff_watchlist WHERE account_id = $1', [accountId]);
+  listCache.bust();
   return (res.rowCount ?? 0) > 0;
 }
 
@@ -78,20 +83,38 @@ export async function staffWatchForAccount(accountId: number): Promise<StaffWatc
   return row ? rowToEntry(row) : null;
 }
 
-export async function listStaffWatches(): Promise<{ entries: StaffWatchEntry[]; total: number }> {
+async function queryStaffWatches(): Promise<{ entries: StaffWatchEntry[]; total: number }> {
   const res = await pool.query(
-    `SELECT w.account_id, w.character_name, w.note, w.created_at, a.username AS added_by,
-            count(*) OVER () AS total
-       FROM staff_watchlist w
+    // The exact count still scans the watchlist once per refresh, O(N).
+    // Limit before joining authors so only the newest 25 need account reads.
+    // One statement keeps the list and exact count on the same MVCC snapshot.
+    `WITH newest AS MATERIALIZED (
+       SELECT account_id, character_name, note, created_at, added_by_account_id
+         FROM staff_watchlist
+        ORDER BY created_at DESC
+        LIMIT $1
+     )
+     SELECT w.account_id, w.character_name, w.note, w.created_at, a.username AS added_by,
+            (SELECT count(*) FROM staff_watchlist) AS total
+       FROM newest w
        LEFT JOIN accounts a ON a.id = w.added_by_account_id
-      ORDER BY w.created_at DESC
-      LIMIT $1`,
+      ORDER BY w.created_at DESC`,
     [STAFF_WATCHLIST_LIST_MAX],
   );
   return {
     entries: res.rows.map(rowToEntry),
     total: res.rows.length > 0 ? Number(res.rows[0].total) : 0,
   };
+}
+
+const listCache = createStaffWatchlistCache(queryStaffWatches);
+
+export function listStaffWatches(): Promise<{ entries: StaffWatchEntry[]; total: number }> {
+  return listCache.read();
+}
+
+export function resetStaffWatchlistCacheForTests(): void {
+  listCache.bust();
 }
 
 // The live adapter ModerationService takes. Names resolve on this realm (names

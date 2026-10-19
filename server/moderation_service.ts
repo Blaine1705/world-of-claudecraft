@@ -536,7 +536,12 @@ export class ModerationService<TSession extends ModerationSession> {
   }
 
   // Bare /watch: the newest entries, one chat line each.
+  // At most one pending readout per staff session, even while the pool waits.
+  private readonly listingWatches = new WeakSet<TSession>();
+
   private listWatches(actor: TSession): void {
+    if (this.listingWatches.has(actor)) return;
+    this.listingWatches.add(actor);
     void this.watchlist
       .list()
       .then(({ entries, total }) => {
@@ -557,7 +562,8 @@ export class ModerationService<TSession extends ModerationSession> {
           this.host.systemNotice(actor, `...and ${total - entries.length} more.`);
         }
       })
-      .catch((err) => logger.error({ err }, 'failed to list in-game watches'));
+      .catch((err) => logger.error({ err }, 'failed to list in-game watches'))
+      .finally(() => this.listingWatches.delete(actor));
   }
 
   // Called by the game after a player joins. Pings every GM online on this

@@ -121,6 +121,7 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
     byPid,
     characters,
     watches,
+    watchlist,
     hiddenPids,
     announcements,
     service,
@@ -639,6 +640,41 @@ describe('ModerationService', () => {
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe('ModerationService GM tools', () => {
+  it('admits one pending list read per staff session and releases admission after settlement', async () => {
+    const actor = admin(1, 11);
+    const other = admin(2, 22);
+    const context = setup({ actor, sessions: [other] });
+    let resolve!: (value: { entries: StaffWatchEntry[]; total: number }) => void;
+    const pending = new Promise<{ entries: StaffWatchEntry[]; total: number }>((done) => {
+      resolve = done;
+    });
+    const list = vi.spyOn(context.watchlist, 'list').mockReturnValue(pending);
+    for (let i = 0; i < 60; i++) context.service.handleChatCommand(actor, '/watch');
+    context.service.handleChatCommand(other, '/watch');
+    expect(list).toHaveBeenCalledTimes(2);
+    resolve({ entries: [], total: 0 });
+    await settle();
+    expect(context.notices).toHaveLength(2);
+    context.service.handleChatCommand(actor, '/watch');
+    await settle();
+    expect(list).toHaveBeenCalledTimes(3);
+    expect(context.notices).toHaveLength(3);
+  });
+
+  it('releases list admission after failure so the same moderator can retry', async () => {
+    const actor = admin(1, 11);
+    const context = setup({ actor });
+    const list = vi
+      .spyOn(context.watchlist, 'list')
+      .mockRejectedValueOnce(new Error('test unavailable'));
+    context.service.handleChatCommand(actor, '/watch');
+    await settle();
+    context.service.handleChatCommand(actor, '/watch');
+    await settle();
+    expect(list).toHaveBeenCalledTimes(2);
+    expect(context.notices).toEqual([{ session: actor, text: 'The watchlist is empty.' }]);
+  });
+
   it('toggles invisibility only after the audit write, against the GM own account', async () => {
     const actor = admin(1, 11);
     const context = setup({ actor });
