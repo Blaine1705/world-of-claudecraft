@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
 import {
   MAJOR_COOLDOWN_MIN_SEC,
-  majorCooldownBaseSec,
   majorCooldownGroup,
   majorCooldownKeyForAura,
   majorCooldownTable,
@@ -97,7 +96,6 @@ describe('major cooldown classifier', () => {
   it('tracks the PvP medallion as its own group, keyed by its trinket cooldown', () => {
     expect(PVP_MEDALLION_COOLDOWN_KEY).toBe('trinket:medallion_of_defiance');
     expect(keysIn('medallion')).toEqual([PVP_MEDALLION_COOLDOWN_KEY]);
-    expect(majorCooldownBaseSec(PVP_MEDALLION_COOLDOWN_KEY)).toBe(120);
   });
 
   it('never admits a cooldown under the minimum, whatever it does', () => {
@@ -153,12 +151,6 @@ describe('major cooldown classifier', () => {
     expect(majorCooldownGroup('barkskin')).toBe('defensive');
     expect(majorCooldownGroup('martyrs_aegis')).toBe('defensive');
     expect(majorCooldownGroup('power_infusion')).toBe('offensive');
-  });
-
-  it('reads the base cooldown for the swipe', () => {
-    expect(majorCooldownBaseSec('barkskin')).toBe(60);
-    expect(majorCooldownBaseSec('recklessness')).toBe(180);
-    expect(majorCooldownBaseSec('not_an_ability')).toBe(0);
   });
 });
 

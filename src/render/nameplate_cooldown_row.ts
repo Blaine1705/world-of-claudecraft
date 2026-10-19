@@ -1,6 +1,6 @@
 // Draws the enemy cooldown row ABOVE a hostile player's name: tile, artwork,
-// group border, the active glow or the recharge swipe, the group badge, and the
-// countdown, one icon per slot. A painter-side drawing helper the canvas surface
+// group border, the active glow or the spent dim, the group badge, and an active
+// buff's countdown, one icon per slot. A painter-side drawing helper the canvas surface
 // calls with its own pen and caches (the nameplate_dot_row.ts shape, whose host
 // interface it borrows), so nameplate_canvas.ts stays a compositor.
 //
@@ -9,8 +9,12 @@
 //
 // Every state carries a cue that is not colour alone, so forced colors (which
 // collapse every fill to the system palette) and colour-blind players lose
-// nothing: the group badge's glyph (shield, up arrow, ring), a thicker border for
-// an active buff, and the swipe for a recharging one.
+// nothing: the group badge's glyph (shield, up arrow, ring), and a thicker border
+// plus a countdown for an active buff against a thin, unnumbered one when spent.
+//
+// A spent cooldown draws NO time of any kind, neither a number nor a swipe: the
+// row tells a player that an enemy has burned a defensive, never how long until
+// it returns (the server does not even send that; server/major_cooldown_wire.ts).
 
 import type { MajorCooldownGroup } from '../sim/major_cooldowns';
 import {
@@ -43,11 +47,9 @@ const BADGE_GLYPH_FILLS: Readonly<Record<MajorCooldownGroup, string>> = {
   offensive: '#ffffff',
 };
 const TILE_FILL = '#0e1118';
-const SWIPE_FILL = 'rgba(4, 6, 10, 0.66)';
-// A spent cooldown reads dimmer than a live buff even where the swipe has
-// cleared, the "not available" cue the mockup's desaturation carried, without a
-// per-icon canvas filter (unsupported on WebKit, and costly per frame).
-const SPENT_WASH = 'rgba(4, 6, 10, 0.22)';
+// A spent cooldown is dimmed evenly, the "not available" cue, without a per-icon
+// canvas filter (unsupported on WebKit, and costly per frame).
+const SPENT_WASH = 'rgba(4, 6, 10, 0.55)';
 const TILE_RADIUS = 2;
 // The one countdown the row draws: an active buff's remaining time. A recharging
 // cooldown carries no number (nameplate_cooldown_resolve.ts leaves its text empty).
@@ -140,28 +142,12 @@ export function drawNameplateCooldownRow(
       ctx.restore();
     }
 
-    // Recharging: dim the art, then darken the part of the cooldown still to
-    // run, clockwise from twelve, so the dark wedge shrinks as it comes back.
-    if (!slot.active) {
-      ctx.save();
+    // Spent: dim the whole icon evenly. No swipe, so nothing hints at when it
+    // comes back.
+    if (!slot.active && !forced) {
       host.roundedRect(ctx, x, topY, size, size, radius);
-      ctx.clip();
-      if (!forced) {
-        // The clip's rounded-rect path is still current: fill it as the wash.
-        ctx.fillStyle = SPENT_WASH;
-        ctx.fill();
-      }
-      if (slot.fraction > 0) {
-        const cx = x + size / 2;
-        const cy = topY + size / 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, size, Math.PI * 1.5 - Math.PI * 2 * slot.fraction, Math.PI * 1.5);
-        ctx.closePath();
-        ctx.fillStyle = forced ? 'Canvas' : SWIPE_FILL;
-        ctx.fill();
-      }
-      ctx.restore();
+      ctx.fillStyle = SPENT_WASH;
+      ctx.fill();
     }
 
     host.roundedRect(ctx, x + 0.5, topY + 0.5, size - 1, size - 1, radius);

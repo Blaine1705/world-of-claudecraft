@@ -23,7 +23,7 @@
 // the row is a visible diff.
 
 import { ABILITIES } from './content/classes';
-import { TRINKET_SPECS, trinketCooldownKey } from './content/trinkets';
+import { trinketCooldownKey } from './content/trinkets';
 import type { AbilityDef } from './types';
 
 export type MajorCooldownGroup = 'medallion' | 'defensive' | 'offensive';
@@ -204,13 +204,4 @@ function resolveAuraKey(auraId: string): string | null {
     if (table.has(id)) return id;
   }
   return null;
-}
-
-/** The full base cooldown of a tracked key in seconds, for the swipe fraction.
- *  Talent reductions are not visible to other players, so a talented cooldown
- *  simply starts its swipe part-way; the countdown itself is always exact. */
-export function majorCooldownBaseSec(key: string): number {
-  if (key === PVP_MEDALLION_COOLDOWN_KEY)
-    return TRINKET_SPECS[PVP_MEDALLION_ITEM_ID]?.cooldown ?? 0;
-  return ABILITIES[key]?.cooldown ?? 0;
 }

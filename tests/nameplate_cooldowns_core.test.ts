@@ -57,7 +57,7 @@ describe('nameplate cooldowns core', () => {
   it('shows a buff that is up as ACTIVE, counting the buff, over its own cooldown', () => {
     const p = plan({ barkskin: 55 }, [{ id: 'barkskin', remaining: 11 }]);
     expect(p.count).toBe(1);
-    expect(p.slots[0]).toMatchObject({ key: 'barkskin', active: true, remaining: 11, fraction: 0 });
+    expect(p.slots[0]).toMatchObject({ key: 'barkskin', active: true, remaining: 11 });
   });
 
   it('keeps the slot in place when the buff falls off and the cooldown takes over', () => {
@@ -70,8 +70,8 @@ describe('nameplate cooldowns core', () => {
     const before = keys(out);
     nameplateCooldownsInto(out, cds, []);
     expect(keys(out)).toEqual(before);
-    expect(out.slots[0]).toMatchObject({ key: 'barkskin', active: false, remaining: 45 });
-    expect(out.slots[0].fraction).toBeCloseTo(45 / 60);
+    // Spent: the slot keeps its place but carries no time forward at all.
+    expect(out.slots[0]).toMatchObject({ key: 'barkskin', active: false, remaining: 0 });
   });
 
   it('shows a buff an ally cast on this entity, with no cooldown of its own', () => {
@@ -115,10 +115,16 @@ describe('nameplate cooldowns core', () => {
     expect(p.count).toBe(10);
   });
 
-  it('reads the recharge swipe against the base cooldown, clamped', () => {
-    expect(plan({ recklessness: 90 }).slots[0].fraction).toBeCloseTo(0.5);
-    expect(plan({ recklessness: 999 }).slots[0].fraction).toBe(1);
-    expect(plan({ [MEDALLION]: 30 }).slots[0].fraction).toBeCloseTo(0.25);
+  it('carries no time for a spent cooldown, whatever the host holds', () => {
+    // The offline Sim's bots hold real remaining times; the online mirror holds
+    // Infinity (time withheld). Either way the plan shows only that it is spent.
+    for (const held of [90, 2.5, Number.POSITIVE_INFINITY]) {
+      expect(plan({ recklessness: held }).slots[0]).toMatchObject({
+        key: 'recklessness',
+        active: false,
+        remaining: 0,
+      });
+    }
   });
 
   it('reads whole minutes from a minute up, seconds below, and tenths under ten', () => {
@@ -207,7 +213,7 @@ describe('nameplate cooldowns resolve (painter side)', () => {
     expect(byKey[MEDALLION].active).toBe(false);
     expect(byKey[MEDALLION].timeText).toBe('');
     expect(byKey.recklessness.timeText).toBe('');
-    expect(byKey.recklessness.fraction).toBeGreaterThan(0);
+    expect(byKey.recklessness.remaining).toBe(0);
     expect(byKey.barkskin.iconUrl).toBe(nameplateCooldownIconUrl('barkskin'));
     expect(byKey.barkskin.iconUrl).toContain('barkskin');
     expect(byKey[MEDALLION].iconUrl).toContain('medallion_of_defiance');

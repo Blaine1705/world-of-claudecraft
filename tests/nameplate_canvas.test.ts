@@ -1681,18 +1681,21 @@ describe('the enemy cooldown row on a plate', () => {
     expect(without - withRow).toBeCloseTo(nameplateCooldownRowHeight(state.cooldowns), 5);
   });
 
-  it('scales the recharge swipe with the row', () => {
+  it('dims a spent cooldown evenly, with no recharge swipe at any scale', () => {
+    // A swipe would show how much of the cooldown is left: the plate never does.
     const surface = new NameplateCanvasSurface(document.createElement('div'));
     const state = plateState();
-    const radii = (scale: number): number[] => {
+    for (const scale of [1, 3]) {
       traces[0].arc.mockClear();
+      traces[0].fillStyles.length = 0;
       state.cooldowns = cooldownPlanWith(['recklessness'], scale);
       surface.beginFrame(640, 360, 1);
       surface.drawBase(state, 320, 260);
-      return traces[0].arc.mock.calls.map((call) => call[2] as number);
-    };
-    expect(radii(1)).toContain(NAMEPLATE_COOLDOWN_SIZE);
-    expect(radii(3)).toContain(NAMEPLATE_COOLDOWN_SIZE * 3);
+      // The only arcs are the small group badge; nothing the size of the icon.
+      const radii = traces[0].arc.mock.calls.map((call) => call[2] as number);
+      for (const r of radii) expect(r).toBeLessThan(NAMEPLATE_COOLDOWN_SIZE * scale * 0.5);
+      expect(traces[0].fillStyles).toContain('rgba(4, 6, 10, 0.55)');
+    }
   });
 
   it('draws nothing and reserves nothing for an empty plan', () => {

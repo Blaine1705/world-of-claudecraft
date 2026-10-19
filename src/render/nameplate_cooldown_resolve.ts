@@ -4,8 +4,8 @@
 // painter (the dot row's resolve lives in nameplate_painter.ts itself) so the
 // coordinator gains one call, not another method bank.
 //
-// Runs for every plate on screen EVERY frame: the countdown and the swipe are the
-// point, so it cannot ride the throttled content pass. The artwork is a Map hit
+// Runs for every plate on screen EVERY frame: an active buff's countdown and a
+// cooldown flipping spent are the point, so it cannot ride the throttled pass. The artwork is a Map hit
 // after the first resolve per key, and the countdown is re-formatted only when
 // the number moves at the precision it is drawn.
 
@@ -84,7 +84,7 @@ export function resolveNameplateCooldowns(
     const slot = plan.slots[i];
     if (!slot.iconUrl) slot.iconUrl = nameplateCooldownIconUrl(slot.key);
     // Only an active buff counts down. A recharging cooldown shows that it is
-    // spent (dimmed art, swipe), never how long until it is ready again.
+    // spent (evenly dimmed art), never how long until it is ready again.
     if (!slot.active) {
       slot.timeText = '';
       slot.timeValue = Number.NaN;

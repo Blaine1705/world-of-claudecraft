@@ -3,9 +3,11 @@
 // ClientWorld fed those exact snapshots mirrors them into the peer entity's
 // cooldown map. Pins the wiring the unit pair (tests/major_cooldown_wire.test.ts)
 // cannot: the game.ts splice, the online.ts decode on the aura channel only, the
-// snapshot-clock aging, and the self skip.
+// held set across lite records, the self skip, and that no remaining time ever
+// leaves the server.
 import { describe, expect, it } from 'vitest';
 import { GameServer } from '../server/game';
+import { SPENT_COOLDOWN_UNKNOWN_REMAINING } from '../src/net/peer_major_cooldown_wire';
 import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
@@ -39,7 +41,7 @@ describe('enemy cooldowns through the broadcast', () => {
     const { subjectEntity, step, recordOf } = setup();
     subjectEntity.cooldowns.set('recklessness', 150);
     const first = recordOf(step());
-    expect(first.mcd).toEqual({ recklessness: expect.any(Number) });
+    expect(first.mcd).toEqual(['recklessness']);
     expect(first.auras).toBeDefined();
 
     // The subject moves every tick: its lite records go out, without the channel.
@@ -59,10 +61,10 @@ describe('enemy cooldowns through the broadcast', () => {
       const record = recordOf(step());
       if (record?.mcd) carried = record;
     }
-    expect(Object.keys(carried.mcd).sort()).toEqual(['die_by_sword', 'recklessness']);
+    expect(carried.mcd).toEqual(['die_by_sword', 'recklessness']);
   });
 
-  it('mirrors the deadlines into the peer, keeps them across lite records, and leaves self alone', () => {
+  it('mirrors the spent keys into the peer with no time, keeps them across lite records, and leaves self alone', () => {
     const { viewer, subject, subjectEntity, server, step } = setup();
     const viewerEntity = server.sim.entities.get(viewer.pid);
     if (!viewerEntity) throw new Error('viewer missing');
@@ -74,21 +76,24 @@ describe('enemy cooldowns through the broadcast', () => {
 
     apply(step());
     const peer = client.entities.get(subject.pid);
-    const first = peer?.cooldowns.get('recklessness') ?? 0;
-    expect(first).toBeGreaterThan(149);
-    expect(first).toBeLessThanOrEqual(150);
+    expect(peer?.cooldowns.get('recklessness')).toBe(SPENT_COOLDOWN_UNKNOWN_REMAINING);
 
     for (let i = 0; i < 20; i++) {
       subjectEntity.pos.x += 0.5;
       apply(step());
     }
-    // Twenty ticks later the countdown has aged on the snapshot clock, not frozen
-    // and not cleared by the lite records that omitted the channel.
-    const later = client.entities.get(subject.pid)?.cooldowns.get('recklessness') ?? 0;
-    expect(later).toBeLessThan(first - 0.5);
-    expect(later).toBeGreaterThan(first - 2);
+    // Still spent, still timeless: the lite records that omitted the channel
+    // neither cleared it nor taught the client anything about when it returns.
+    expect(client.entities.get(subject.pid)?.cooldowns.get('recklessness')).toBe(
+      SPENT_COOLDOWN_UNKNOWN_REMAINING,
+    );
 
-    // The viewer's own map is the self channel's, never a peer deadline.
+    // Once it comes back on the server, the next channel record clears it.
+    subjectEntity.cooldowns.delete('recklessness');
+    for (let i = 0; i < 6; i++) apply(step());
+    expect(client.entities.get(subject.pid)?.cooldowns.has('recklessness')).toBe(false);
+
+    // The viewer's own map is the self channel's, never a peer key.
     const self = client.entities.get(viewer.pid)?.cooldowns.get('recklessness') ?? 0;
     expect(self).toBeLessThanOrEqual(42);
   });
@@ -97,11 +102,11 @@ describe('enemy cooldowns through the broadcast', () => {
     const lockout = setup();
     lockout.subjectEntity.cooldowns.set(MEDALLION, 30); // TRINKET_EQUIP_LOCKOUT on equip
     lockout.subjectEntity.cooldowns.set('recklessness', 150);
-    expect(Object.keys(lockout.recordOf(lockout.step()).mcd)).toEqual(['recklessness']);
+    expect(lockout.recordOf(lockout.step()).mcd).toEqual(['recklessness']);
 
     const used = setup();
     used.subjectEntity.cooldowns.set(MEDALLION, 120);
     const record = used.recordOf(used.step());
-    expect(Object.keys(record.mcd)).toEqual([MEDALLION]);
+    expect(record.mcd).toEqual([MEDALLION]);
   });
 });

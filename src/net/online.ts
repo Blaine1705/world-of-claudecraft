@@ -241,7 +241,7 @@ import {
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
-import { agePeerMajorCooldowns, applyPeerMajorCooldownWire } from './peer_major_cooldown_wire';
+import { applyPeerMajorCooldownWire } from './peer_major_cooldown_wire';
 import { perfectingCommand } from './perfecting_command';
 import {
   perfectingInfoForMirror,
@@ -2576,7 +2576,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
     this.stableTimerTime = rawTime;
     this.refreshStableSelfTimers(rawTime);
-    agePeerMajorCooldowns(this.entities.values(), rawTime, this.playerId); // enemy cooldown row
     return { mode, time: rawTime };
   }
 
@@ -2932,7 +2931,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       const wireAuras = (Array.isArray(w.auras) ? w.auras : []) as ClientWireAura[];
       if (snapshotCarriesAuras(timerWire, w.auras)) {
         e.auras = applyAuraWire(e.auras, wireAuras, timerWire);
-        applyPeerMajorCooldownWire(e, w.mcd, timerWire.time ?? NaN, w.id === this.playerId);
+        applyPeerMajorCooldownWire(e, w.mcd, w.id === this.playerId); // spent enemy cooldowns
       }
       e.loot = w.lootList ?? null;
       return e;

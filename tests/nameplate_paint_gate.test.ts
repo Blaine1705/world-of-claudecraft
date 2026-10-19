@@ -166,7 +166,6 @@ describe('nameplate paint gate core', () => {
               iconUrl: '/ui/skills/druid/barkskin.webp',
               group: 'defensive',
               active: true,
-              fraction: 0,
               unit: 'seconds',
               timeText: '11',
             },
@@ -199,7 +198,6 @@ describe('nameplate paint gate core', () => {
       iconUrl: '/ui/skills/druid/barkskin.webp',
       group: 'defensive',
       active: true,
-      fraction: 0,
       unit: 'seconds',
       timeText: '2',
     };
@@ -207,8 +205,7 @@ describe('nameplate paint gate core', () => {
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(false);
     slot.active = false;
-    slot.fraction = 0.75;
-    slot.timeText = '45';
+    slot.timeText = '';
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
   });
 

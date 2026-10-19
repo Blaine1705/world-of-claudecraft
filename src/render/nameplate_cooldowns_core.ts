@@ -7,8 +7,10 @@
 //
 // Two inputs, both already on the entity in either world:
 //   - its cooldown map: the offline Sim fills it for its bots, and the online
-//     ClientWorld mirrors a peer's tracked deadlines into it
-//     (src/net/peer_major_cooldown_wire.ts). A running entry is "spent".
+//     ClientWorld mirrors which of a peer's tracked cooldowns are spent into it
+//     (src/net/peer_major_cooldown_wire.ts; the server never sends when they come
+//     back). A running entry is "spent", and the plan keeps no time for it: the
+//     row shows THAT a defensive is burned, never how long until it returns.
 //   - its auras: a tracked buff's aura carries the bare ability id that applied
 //     it, whoever cast it. So a buff an ally cast on this entity (a priest's
 //     Martyr's Aegis) shows HERE while it lasts, and its cooldown shows on the
@@ -25,7 +27,6 @@
 import {
   MAJOR_COOLDOWN_GROUP_ORDER,
   type MajorCooldownGroup,
-  majorCooldownBaseSec,
   majorCooldownGroup,
   majorCooldownKeyForAura,
 } from '../sim/major_cooldowns';
@@ -71,18 +72,16 @@ export type NameplateCooldownTimeUnit = 'minutes' | 'seconds' | 'tenths';
 
 /** One resolved icon slot.
  *
- *  The first six fields are written by nameplateCooldownsInto; the last three
+ *  The first five fields are written by nameplateCooldownsInto; the last three
  *  only by the painter, on its own cadence (the NameplateDotSlot contract). */
 export interface NameplateCooldownSlot {
   /** The cooldown key or aura id: an ability id, or the medallion's trinket key. */
   key: string;
   group: MajorCooldownGroup;
-  /** The buff is up right now: glow, full colour, the number is the buff time. */
+  /** The buff is up right now: glow, full colour, the number is the buff time.
+   *  Otherwise the cooldown is spent: dimmed, with no time of any kind. */
   active: boolean;
-  /** Recharging: the part of the cooldown still to run, 0..1, for the dark
-   *  swipe. 0 while active (no swipe). */
-  fraction: number;
-  /** Seconds the number counts: the buff's while active, the cooldown's after. */
+  /** The active buff's seconds left; always 0 for a spent cooldown. */
   remaining: number;
   unit: NameplateCooldownTimeUnit;
   /** PAINTER-WRITTEN: artwork resolved from `key`, '' while unresolved. */
@@ -111,7 +110,6 @@ function newSlot(): NameplateCooldownSlot {
     key: '',
     group: 'defensive',
     active: false,
-    fraction: 0,
     remaining: 0,
     unit: 'seconds',
     iconUrl: '',
@@ -194,7 +192,6 @@ export function nameplateCooldownsInto(
     const slot = slotAt(out, out.count++, key);
     slot.group = group;
     slot.active = true;
-    slot.fraction = 0;
     slot.remaining = aura.remaining;
     slot.unit = nameplateCooldownTimeUnit(aura.remaining);
   }
@@ -205,10 +202,10 @@ export function nameplateCooldownsInto(
     const slot = slotAt(out, out.count++, key);
     slot.group = group;
     slot.active = false;
-    const base = majorCooldownBaseSec(key);
-    slot.fraction = base > 0 ? Math.min(1, remaining / base) : 1;
-    slot.remaining = remaining;
-    slot.unit = nameplateCooldownTimeUnit(remaining);
+    // Spent: no time is carried forward, whatever the host knows (the offline
+    // Sim's bots hold real values; the online mirror holds none).
+    slot.remaining = 0;
+    slot.unit = 'seconds';
   }
   // Insertion sort over the filled prefix: a handful of slots, no allocation.
   const slots = out.slots;
