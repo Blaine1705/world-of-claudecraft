@@ -1927,17 +1927,27 @@ describe('vault_wire module units', () => {
   const withdrawArgs: unknown[][] = [];
   const unitSim = (): VaultSim => ({
     ctx: {
-      resolve: () => ({ meta: { entityId: 9, inventory: [] } }),
+      resolve: () => ({ meta: { entityId: 9, inventory: [], vault: { special: [] } } }),
       error: (_id, text) => void calls.push(`error:${text}`),
     },
-    vaultInfoFor: () => null,
-    vaultDeposit: (slot, count) => void calls.push(`deposit:${slot}:${count}`),
+    vaultInfoWireRevFor: () => null,
+    vaultDeposit: (slot, count) => {
+      calls.push(`deposit:${slot}:${count}`);
+      return undefined;
+    },
     vaultWithdraw: (itemId, count, ...rest: unknown[]) => {
       calls.push(`withdraw:${itemId}:${count}`);
       withdrawArgs.push([itemId, count, ...rest]);
+      return undefined;
     },
-    vaultDepositAll: () => void calls.push('depositAll'),
-    vaultBuyUpgrade: () => void calls.push('buyUpgrade'),
+    vaultDepositAll: () => {
+      calls.push('depositAll');
+      return undefined;
+    },
+    vaultBuyUpgrade: () => {
+      calls.push('buyUpgrade');
+      return undefined;
+    },
   });
   const WHO = { characterId: 11, accountId: 22 };
 

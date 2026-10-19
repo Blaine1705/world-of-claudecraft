@@ -10172,17 +10172,17 @@ export class Sim {
   // The Materials Vault: the per-character material stockpile
   // -------------------------------------------------------------------------
   // Thin delegates; materials_vault.ts owns state, persistence, gates, and revisions.
-  vaultDeposit(...args: vaultMod.VaultDepositArgs): void {
-    vaultMod.vaultDeposit(this.ctx, ...args);
+  vaultDeposit(...args: vaultMod.VaultDepositArgs): vaultMod.VaultMoveFacts | undefined {
+    return vaultMod.vaultDeposit(this.ctx, ...args);
   }
-  vaultDepositAll(pid?: number): void {
-    vaultMod.vaultDepositAll(this.ctx, pid);
+  vaultDepositAll(pid?: number): vaultMod.VaultMoveFacts | undefined {
+    return vaultMod.vaultDepositAll(this.ctx, pid);
   }
-  vaultWithdraw(...args: vaultMod.VaultWithdrawArgs): void {
-    vaultMod.vaultWithdraw(this.ctx, ...args);
+  vaultWithdraw(...args: vaultMod.VaultWithdrawArgs): vaultMod.VaultMoveFacts | undefined {
+    return vaultMod.vaultWithdraw(this.ctx, ...args);
   }
-  vaultBuyUpgrade(pid?: number): void {
-    vaultMod.vaultBuyUpgrade(this.ctx, pid);
+  vaultBuyUpgrade(pid?: number): vaultMod.VaultUpgradeFacts | undefined {
+    return vaultMod.vaultBuyUpgrade(this.ctx, pid);
   }
   vaultInfoFor(pid: number): import('../world_api').VaultInfo | null {
     return vaultMod.vaultInfoFor(this.ctx, pid);

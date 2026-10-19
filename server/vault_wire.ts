@@ -47,12 +47,14 @@ import {
   materialSourceTransferSelectionMatches,
   readMaterialSourceTransferSelection,
 } from '../src/sim/material_source_transfer_selection';
+import type { VaultMoveFacts, VaultUpgradeFacts } from '../src/sim/materials_vault';
 import type { InvSlot } from '../src/sim/types';
-import type { VaultInfo, VaultSpecialRef } from '../src/world_api';
+import type { VaultSpecialRef } from '../src/world_api';
 import { buildVaultLedgerRows, recordVaultOp } from './bank_ledger';
 import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
 import { bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
 import { gameMetricsCounters } from './http/game_signals';
+import { vaultCommandLedgerSnapshots } from './vault_command_facts';
 import {
   VAULT_LEDGER_ROW_BOUND_MAX,
   vaultDepositAllLedgerRowBound,
@@ -66,10 +68,16 @@ import {
  *  vault_ledger_row_bound.ts); the Sim still owns every deposit rule. */
 export interface VaultSim {
   ctx: {
-    resolve(pid?: number): { meta: { entityId: number; inventory: readonly InvSlot[] } } | null;
+    resolve(pid?: number): {
+      meta: {
+        entityId: number;
+        inventory: readonly InvSlot[];
+        vault: { readonly special: readonly InvSlot[] };
+      };
+    } | null;
     error(id: number, text: string): void;
   };
-  vaultInfoFor(pid?: number): VaultInfo | null;
+  vaultInfoWireRevFor(pid: number): number | null;
   vaultDeposit(
     slot: number,
     count?: number,
@@ -77,16 +85,16 @@ export interface VaultSim {
       | number
       | import('../src/sim/material_source_transfer_selection').MaterialSourceTransferSelection,
     pid?: number,
-  ): void;
-  vaultWithdraw(itemId: string, count?: number, pid?: number): void;
+  ): VaultMoveFacts | undefined;
+  vaultWithdraw(itemId: string, count?: number, pid?: number): VaultMoveFacts | undefined;
   vaultWithdraw(
     itemId: string,
     count: number | undefined,
     special: VaultSpecialRef,
     pid: number,
-  ): void;
-  vaultDepositAll(pid?: number): void;
-  vaultBuyUpgrade(pid?: number): void;
+  ): VaultMoveFacts | undefined;
+  vaultDepositAll(pid?: number): VaultMoveFacts | undefined;
+  vaultBuyUpgrade(pid?: number): VaultUpgradeFacts | undefined;
 }
 
 /** Narrow snapshot host: cheap revision/gate probes stay separate from the
@@ -247,19 +255,10 @@ function reserveLedgerRows(
 
 function runReservedSimCall<T>(
   reservation: BankLedgerAdmissionHandle | undefined,
-  readBefore: () => T,
-  mutate: () => void,
+  mutate: () => T,
 ): T {
-  let before: T;
   try {
-    before = readBefore();
-  } catch (err) {
-    reservation?.cancel();
-    throw err;
-  }
-  try {
-    mutate();
-    return before;
+    return mutate();
   } catch (err) {
     reservation?.failAfterMutation(err);
     throw err;
@@ -285,8 +284,8 @@ function finishReservedSimCall<T>(
  *  optional partial `count`; withdraw is keyed by `itemId` because vault
  *  stock has no slots.
  *  The live bank_ledger path reserves bounded outbox capacity before mutation,
- *  then derives the exact command batch by DIFFING vaultInfoFor before and
- *  after. A refused/no-op call diffs empty and cancels its reservation.
+ *  then derives one exact batch from the owning mutation's detached actual
+ *  movement facts. A refused/no-op result cancels its reservation.
  *  Undefined admission preserves the fire-and-forget recorder for isolated
  *  callers until every host supplies a character-owned outbox. */
 export function dispatchVaultCommand(
@@ -318,13 +317,11 @@ export function dispatchVaultCommand(
           vaultDepositLedgerRowBound(slotIndex < 0 ? undefined : carried?.[slotIndex]),
         );
         if (reservation === null) break;
-        const before = runReservedSimCall(
-          reservation,
-          () => sim.vaultInfoFor(pid),
-          () => sim.vaultDeposit(slot, count, selection, pid),
+        const facts = runReservedSimCall(reservation, () =>
+          sim.vaultDeposit(slot, count, selection, pid),
         );
         finishReservedSimCall(reservation, () => {
-          const after = sim.vaultInfoFor(pid);
+          const { before, after } = vaultCommandLedgerSnapshots(facts, 'deposit');
           if (reservation) reservation.commit(buildVaultLedgerRows('deposit', who, before, after));
           else recordVaultOp('deposit', who, before, after);
         });
@@ -345,11 +342,11 @@ export function dispatchVaultCommand(
           })
         )
           break;
-        // The pre-mutation snapshot is read ONCE, ahead of the reservation: it
-        // bounds the rows an identity-row withdrawal can write, then serves
-        // as the diff's before-state. Nothing mutates between the two uses
-        // (this whole dispatch is one synchronous turn).
-        const snapshot = sim.vaultInfoFor(pid);
+        // Borrow only the current authoritative rows for the same exact
+        // selector/identity bound. The banker gate and read happen before
+        // reservation; no whole-book clone or retained preimage is needed.
+        const snapshot =
+          sim.vaultInfoWireRevFor(pid) === null ? null : (sim.ctx.resolve(pid)?.meta.vault ?? null);
         const reservation = reserveLedgerRows(
           admission,
           sim,
@@ -359,19 +356,15 @@ export function dispatchVaultCommand(
           vaultWithdrawLedgerRowBound(snapshot, itemId, special),
         );
         if (reservation === null) break;
-        // readBefore is inert here (the snapshot is already taken), so a
-        // future throwing read must NOT be slipped back into it expecting the
-        // reservation-cancel guard: take it before the reservation as above.
-        const before = runReservedSimCall(
-          reservation,
-          () => snapshot,
-          () => {
-            if (special === undefined) sim.vaultWithdraw(itemId, count, pid);
-            else sim.vaultWithdraw(itemId, count, special, pid);
-          },
+        // All preflight reads precede reservation. A throwing mutation or
+        // facts projection retains the existing quarantine/no-save policy.
+        const facts = runReservedSimCall(reservation, () =>
+          special === undefined
+            ? sim.vaultWithdraw(itemId, count, pid)
+            : sim.vaultWithdraw(itemId, count, special, pid),
         );
         finishReservedSimCall(reservation, () => {
-          const after = sim.vaultInfoFor(pid);
+          const { before, after } = vaultCommandLedgerSnapshots(facts, 'withdraw');
           if (reservation) reservation.commit(buildVaultLedgerRows('withdraw', who, before, after));
           else recordVaultOp('withdraw', who, before, after);
         });
@@ -379,9 +372,9 @@ export function dispatchVaultCommand(
       break;
     case 'vault_deposit_all': {
       // Argument-free (the sweep takes the whole carried inventory), so no
-      // shape guard; the Sim owns every per-slot rule. ONE before/after diff
-      // spans the whole batch, so recordVaultOp writes the sweep's rows (one
-      // per material moved) as ONE batched insert. The row bound is the
+      // shape guard; the Sim owns every per-slot rule. Only successful actual
+      // grants enter one facts batch, grouped by the existing identity differ.
+      // The legacy observer still writes ONE batched insert. The bound is the
       // distinct (material, identity) keys across the whole carried inventory,
       // never below the table's 112-slot floor.
       const reservation = reserveLedgerRows(
@@ -393,13 +386,9 @@ export function dispatchVaultCommand(
         vaultDepositAllLedgerRowBound(sim.ctx.resolve(pid)?.meta.inventory ?? []),
       );
       if (reservation === null) break;
-      const before = runReservedSimCall(
-        reservation,
-        () => sim.vaultInfoFor(pid),
-        () => sim.vaultDepositAll(pid),
-      );
+      const facts = runReservedSimCall(reservation, () => sim.vaultDepositAll(pid));
       finishReservedSimCall(reservation, () => {
-        const after = sim.vaultInfoFor(pid);
+        const { before, after } = vaultCommandLedgerSnapshots(facts, 'deposit');
         if (reservation) reservation.commit(buildVaultLedgerRows('deposit', who, before, after));
         else recordVaultOp('deposit', who, before, after);
       });
@@ -409,13 +398,9 @@ export function dispatchVaultCommand(
       // A rung purchase writes exactly one copper row; the table floor is exact.
       const reservation = reserveLedgerRows(admission, sim, who, pid, 'vault_buy_upgrade', 1);
       if (reservation === null) break;
-      const before = runReservedSimCall(
-        reservation,
-        () => sim.vaultInfoFor(pid),
-        () => sim.vaultBuyUpgrade(pid),
-      );
+      const facts = runReservedSimCall(reservation, () => sim.vaultBuyUpgrade(pid));
       finishReservedSimCall(reservation, () => {
-        const after = sim.vaultInfoFor(pid);
+        const { before, after } = vaultCommandLedgerSnapshots(facts, 'buy_slots');
         if (reservation) reservation.commit(buildVaultLedgerRows('buy_slots', who, before, after));
         else recordVaultOp('buy_slots', who, before, after);
       });
