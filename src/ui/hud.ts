@@ -887,7 +887,7 @@ import {
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
-import { selfPreviewSubject } from './self_preview_subject';
+import { selfPreviewSubject, selfTryOnBody } from './self_preview_subject';
 import { localizeServerText } from './server_i18n';
 import {
   localizeAuthoredYellSpeakerName,
@@ -5575,13 +5575,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#guild-hall-window'),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
     tryOnWeaponSkin: (stage, skinId) =>
-      this.mountCharPreview(
-        stage,
-        this.sim.cfg.playerClass,
-        this.sim.player.skin ?? 0,
-        undefined,
-        skinId,
-      ),
+      this.mountCharPreview(stage, ...selfTryOnBody(this.sim), skinId),
     ...this.windowFocus('#guild-hall-window'),
   });
   // Ashen Coliseum window painter (arena_window_view.ts offline/live model +

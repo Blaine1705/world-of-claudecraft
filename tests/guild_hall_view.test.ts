@@ -11,6 +11,7 @@ import {
   GUILD_QUARTERMASTER_STOCK,
   LANTERN_SEAL_ITEM_ID,
 } from '../src/sim/content/guild_contracts';
+import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import { type GuildContractsView, guildContractsForWeek } from '../src/sim/guild_contracts';
 import type { SimEvent } from '../src/sim/types';
 import {
@@ -74,6 +75,7 @@ function input(over: Partial<GuildShopInput> = {}): GuildShopInput {
     deedsEarned: new Map(),
     ownedMounts: [],
     weaponSkinIds: [],
+    ridingTrained: true,
     ...over,
   };
 }
@@ -99,6 +101,7 @@ function world(
     inventory: seals > 0 ? [{ itemId: LANTERN_SEAL_ITEM_ID, count: seals }] : [],
     deedsEarned: new Map(owned.map((id) => [id, '2026-10-16'])),
     ownedMounts: () => mounts,
+    ridingTrained: () => true,
     accountCosmetics: { weaponSkinIds: skins },
     weeklyQuestResetAtMs: Date.UTC(2026, 9, 20),
     player: { name: 'Wanderer' },
@@ -320,6 +323,32 @@ describe('the guild window view core', () => {
     expect(buildGuildShopView(rich, 'weapon_skin_rimelight_staff').detail?.state).toBe('ready');
   });
 
+  it('keeps the horse from a rider who has not learned to ride, and says why', () => {
+    const shop = buildGuildShopView(
+      input({ seals: 40, ridingTrained: false }),
+      'mount_lantern_hall_destrier',
+    );
+    expect(shop.detail).toMatchObject({
+      state: 'ready',
+      actionEnabled: false,
+      shortText: 'Learn to ride before you buy a mount.',
+    });
+    expect(
+      guildShopTooltip(
+        'mount_lantern_hall_destrier',
+        input({ seals: 40, ridingTrained: false }),
+      )?.lines.at(-1),
+    ).toEqual({ text: 'Learn to ride before you buy a mount.', tone: 'red' });
+    // the gate is the horse's only: an appearance stays buyable, and an owned horse says owned
+    const sword = buildGuildShopView(input({ seals: 40, ridingTrained: false }), SKINS[0].id);
+    expect(sword.detail).toMatchObject({ actionEnabled: true, shortText: null });
+    const owned = buildGuildShopView(
+      input({ ridingTrained: false, ownedMounts: ['lantern_hall_destrier'] }),
+      'mount_lantern_hall_destrier',
+    );
+    expect(owned.detail).toMatchObject({ state: 'owned', shortText: null });
+  });
+
   it('names the weapon each appearance dresses: the guild blade and two swords, two staves', () => {
     const shop = buildGuildShopView(input({ seals: 20, weaponSkinIds: ['rimelight_staff'] }), null);
     const card = (id: string) => {
@@ -327,6 +356,11 @@ describe('the guild window view core', () => {
       if (!found) throw new Error(`no card ${id}`);
       return found;
     };
+    // the counter's copy knows swords and staves only: a new weapon type in the stock must
+    // bring its own kind label first
+    expect(new Set(SKINS.map((o) => WEAPON_SKINS[o.skinId]?.weaponType))).toEqual(
+      new Set(['sword', 'staff']),
+    );
     expect(SKINS.map((o) => card(o.id).kindLabel)).toEqual([
       'Sword appearance',
       'Sword appearance',

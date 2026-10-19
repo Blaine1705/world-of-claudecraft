@@ -549,9 +549,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 18021 by Lantern Hall's guild window, merged over the v0.45.0 integration:
     // the tooltip's weapon-proc effect text moved to weapon_proc_text.ts, paying for the
     // window's wiring. wc -l on the merged tree, exact count.
-    // LOWERED 18021 -> 18003 by the quartermaster's 3D try-on: the self sheet's preview
+    // LOWERED 18021 -> 17997 by the quartermaster's 3D try-on: the self sheet's preview
     // subject moved to self_preview_subject.ts, paying for the try-on's wiring. wc -l, exact.
-    ceiling: 18003,
+    ceiling: 17997,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

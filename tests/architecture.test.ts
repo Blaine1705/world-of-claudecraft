@@ -3035,7 +3035,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/action_bar/action_bar_bind_banner.ts',
   'src/ui/weekly_quests_window.ts',
   'src/ui/hud/guild_hall/guild_hall_window.ts',
-  'src/ui/hud/guild_hall/guild_offer_stage.ts',
+  'src/ui/hud/guild_hall/guild_offer_stage_controller.ts',
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',

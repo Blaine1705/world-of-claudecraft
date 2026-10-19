@@ -10,7 +10,7 @@
 // war horse. A title's preview is the nameplate it draws over your head, split around the name
 // the way the target frame splits it (deed_i18n.ts titledNameDecoration); a weapon appearance
 // is tried on your own character and the horse is shown under you, both on a live 3D stage
-// the painter mounts (guild_offer_stage.ts).
+// the painter mounts (guild_offer_stage_controller.ts).
 
 import { DEEDS } from '../../../sim/content/deeds';
 import {
@@ -116,6 +116,14 @@ export interface GuildShopInput {
   readonly ownedMounts: readonly string[];
   /** The account's weapon appearances (IWorld.accountCosmetics.weaponSkinIds). */
   readonly weaponSkinIds: readonly string[];
+  /** Riding learned (IWorld.ridingTrained): the horse's buy gate, the stable's own. */
+  readonly ridingTrained: boolean;
+}
+
+/** The sim refuses the horse to a rider who has not learned to ride (guild_quartermaster.ts):
+ *  the counter says so up front instead of offering a press that will be refused. */
+function needsRiding(offer: GuildQuartermasterOffer, owned: boolean, input: GuildShopInput) {
+  return offer.kind === 'mount' && !owned && !input.ridingTrained;
 }
 
 /** The catalog mount a reins offer carries ('' when the item is not reins). */
@@ -273,6 +281,7 @@ export function buildGuildShopView(input: GuildShopInput, selected: string | nul
     const price = sealCount(offer.seals);
     const priceValue = whole(offer.seals);
     const action = actionLabel(state, missing);
+    const unridden = needsRiding(offer, owned, input);
     if (offer.id === chosen) {
       detail = {
         id: offer.id,
@@ -289,11 +298,13 @@ export function buildGuildShopView(input: GuildShopInput, selected: string | nul
         haveText: t('hudChrome.guildHall.shop.have', { count: whole(input.seals) }),
         state,
         action,
-        actionEnabled: state === 'ready',
+        actionEnabled: state === 'ready' && !unridden,
         shortText:
           state === 'short'
             ? tPlural('hudChrome.guildHall.shop.short', missing, { count: whole(missing) })
-            : null,
+            : unridden
+              ? t('hudChrome.guildHall.refused.riding')
+              : null,
       };
     }
     return {
@@ -367,6 +378,9 @@ export function guildShopTooltip(
       text: tPlural('hudChrome.guildHall.shop.short', missing, { count: whole(missing) }),
       tone: 'red',
     });
+  }
+  if (needsRiding(offer, owned, input)) {
+    lines.push({ text: t('hudChrome.guildHall.refused.riding'), tone: 'red' });
   }
   return { title: offerTipTitle(offer, name), lines };
 }

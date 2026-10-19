@@ -7,9 +7,27 @@ import { modularLookFor, previewTryOnMainhand } from '../render/characters';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { activeCharacterAppearancePreview } from './character_appearance';
 import { type PreviewSubject, wocPreviewKey } from './preview_subject';
 
 export type SelfPreviewWorld = Pick<IWorld, 'player' | 'equipment' | 'accountCosmetics'>;
+
+/** The body a try-on mounts: the class, the skin index and visual key the character sheet
+ *  resolves (Hud.renderCharPreview, activeCharacterAppearancePreview). A Combat Mech wearer
+ *  tries the appearance on their class body instead: the mech is a whole replacement rig
+ *  whose assets stream lazily, and the try-on is about the weapon in the hand. */
+export function selfTryOnBody(
+  world: Pick<IWorld, 'cfg' | 'player'>,
+): [cls: PlayerClass, skin: number, previewKey: string | undefined] {
+  const cls = world.cfg.playerClass;
+  const preview = activeCharacterAppearancePreview(
+    cls,
+    world.player.skin ?? 0,
+    world.player.skinCatalog ?? 'class',
+  );
+  const mech = preview.visualKey === 'player_mech';
+  return [cls, mech ? 0 : preview.skin, mech ? undefined : preview.visualKey];
+}
 
 /** The self sheet's subject. `tryOnSkinId` dresses that weapon appearance instead of the
  *  worn one, holding a stand-in of its own weapon type when neither hand can show it. */

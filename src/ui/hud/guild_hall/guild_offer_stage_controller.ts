@@ -12,7 +12,9 @@
 //   when the horse is staged and DISPOSED the moment it is not (another card, another tab,
 //   the window closed), so the counter never parks a second session-long context.
 //
-// The two never run together: staging one tears the other down first.
+// The two never draw together: staging one tears the other down first (the shared turntable's
+// session-long context stays alive, parked, beside the horse's while the horse is staged, as it
+// does beside the Machine Stable's).
 import { createMountPreview, type MountPreviewHandle } from '../../../render/mount_preview';
 import type { MountKey } from '../../../sim/content/mounts';
 import type { IWorld } from '../../../world_api';
@@ -51,11 +53,14 @@ export class GuildOfferStage {
     if (this.host && this.host.dataset.ghStageKind !== kind) this.hide();
     const fresh = !this.host;
     const host = this.host ?? this.createHost(kind);
-    host.setAttribute('aria-label', label);
+    if (host.getAttribute('role') === 'img') host.setAttribute('aria-label', label);
     // in the dialog before any rig is built, so a renderer sizes itself to the real track
     slot.replaceWith(host);
     this.host = host;
-    if (!fresh && subject === this.subject) return;
+    // the shared turntable's canvas can have moved to another stage (the character sheet) in
+    // the meantime: the same subject re-mounts it then, rather than leaving an empty frame
+    const held = stage.kind === 'mount' || host.querySelector('canvas') !== null;
+    if (!fresh && subject === this.subject && held) return;
     this.subject = subject;
     if (stage.kind === 'mount') this.stageMount(host, stage.mountKey);
     else this.stageWeapon(host, stage.skinId);
@@ -86,11 +91,12 @@ export class GuildOfferStage {
     }
     const canvas = document.createElement('canvas');
     host.appendChild(canvas);
+    // null when a rig fails to build; the renderer's own constructor THROWS when the device
+    // gives no WebGL context at all (before the rig's guard), so both land on the fallback
     let preview: MountPreviewHandle | null = null;
     try {
       preview = createMountPreview(host, canvas, storePreviewAppearance(this.deps.world()));
     } catch (err) {
-      // no WebGL here (a blocked or lost context): the detail still sells the horse
       console.warn('guild mount stage unavailable:', err);
     }
     if (!preview) {
@@ -113,6 +119,9 @@ export class GuildOfferStage {
   }
 
   private unavailable(host: HTMLElement): void {
+    // no picture to name: the sentence inside is what a screen reader should read
+    host.removeAttribute('role');
+    host.removeAttribute('aria-label');
     host.replaceChildren();
     host.insertAdjacentHTML(
       'beforeend',

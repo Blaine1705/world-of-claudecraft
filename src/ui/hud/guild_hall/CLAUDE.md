@@ -18,7 +18,7 @@ Lantern Hall Destrier's reins.
   by `titledNameDecoration`, or the 3D subject for the horse or an appearance; the summary,
   the price against the bags, the buy action and why it is disabled) and each card's hover
   lines. A title never gets a model or a GL context.
-- `guild_offer_stage.ts` is the live 3D stage for the horse and the appearances. It builds no
+- `guild_offer_stage_controller.ts` is the live 3D stage for the horse and the appearances. It builds no
   renderer: an appearance mounts Hud's ONE shared character turntable through the injected
   `tryOnWeaponSkin` (Hud.mountCharPreview with a try-on skin, the subject built by
   `src/ui/self_preview_subject.ts`), and the horse mounts the mount-skin inspect rig

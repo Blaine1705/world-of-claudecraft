@@ -21584,7 +21584,7 @@
     color: var(--gh-plate-title);
     white-space: pre-wrap;
   }
-  /* The live 3D stage of the horse or a weapon appearance (guild_offer_stage.ts): the same
+  /* The live 3D stage of the horse or a weapon appearance (guild_offer_stage_controller.ts): the same
      dusk frame as the nameplate, with the preview canvas filling it. */
   #guild-hall-window .gh-model-stage {
     align-items: stretch;

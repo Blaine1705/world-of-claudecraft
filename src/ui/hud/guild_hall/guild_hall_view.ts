@@ -35,6 +35,7 @@ export interface GuildHallWorld {
   readonly inventory: readonly InvSlot[];
   readonly deedsEarned: ReadonlyMap<string, string>;
   ownedMounts(): readonly string[];
+  ridingTrained(): boolean;
   readonly accountCosmetics: { readonly weaponSkinIds: readonly string[] };
   readonly weeklyQuestResetAtMs: number;
   readonly player: { readonly name: string };
@@ -159,6 +160,7 @@ export function guildShopInput(world: GuildHallWorld, seals: number): GuildShopI
     deedsEarned: world.deedsEarned,
     ownedMounts: world.ownedMounts(),
     weaponSkinIds: world.accountCosmetics.weaponSkinIds,
+    ridingTrained: world.ridingTrained(),
   };
 }
 

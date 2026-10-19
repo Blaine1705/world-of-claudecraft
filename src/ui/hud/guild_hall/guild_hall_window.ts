@@ -11,7 +11,7 @@
 // portrait (the dungeon finder's prerendered stills, no live scene), the guild's wax seal, the
 // week's counter and the reward. The quartermaster tab is a vendor counter: item cards on the
 // left, the selected card's detail on the right. A title's preview is the nameplate it draws;
-// the war horse and the weapon appearances get a live 3D stage (guild_offer_stage.ts, over the
+// the war horse and the weapon appearances get a live 3D stage (guild_offer_stage_controller.ts, over the
 // preview hosts that already exist: no renderer of this window's own).
 import { audio } from '../../../game/audio';
 import { LANTERN_SEAL_ITEM_ID } from '../../../sim/content/guild_contracts';
@@ -32,7 +32,7 @@ import {
   guildShopInput,
   lanternSeals,
 } from './guild_hall_view';
-import { GuildOfferStage } from './guild_offer_stage';
+import { GuildOfferStage } from './guild_offer_stage_controller';
 import {
   type GuildShopArt,
   type GuildShopDetailView,
@@ -117,6 +117,7 @@ export class GuildHallWindow {
       world.guildContracts,
       seals,
       owned,
+      world.ridingTrained(),
       world.weeklyQuestResetAtMs,
       this.tab,
       this.selectedOffer,
