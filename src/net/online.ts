@@ -230,7 +230,7 @@ import {
 import { inputSignature } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
-import { bankSocketBagPayload, materialStorageTransferPayload } from './material_storage_command';
+import { bagSocketPayload, materialStorageTransferPayload } from './material_storage_command';
 import {
   applyMountRaceEventToMirror,
   decodeMountRaceView,
@@ -2339,6 +2339,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
       this.resetReconWireState();
+      applyBankSelfWire(this, { vault: null });
       if (this.spectateExitPending) {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
@@ -3646,8 +3647,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   equipBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
     // `socket` is the BAG BAR socket, so `slot` stays free for the bag index.
-    if (target === undefined) this.cmd({ cmd: 'equip_bag', item: itemId, socket });
-    else this.cmd({ cmd: 'equip_bag', item: itemId, socket, slot: target.slotIndex });
+    this.cmd({ cmd: 'equip_bag', ...bagSocketPayload(itemId, socket, target) });
   }
   unequipBag(socket: number): void {
     this.cmd({ cmd: 'unequip_bag', socket });
@@ -4643,7 +4643,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'bank_unlock_socket' });
   }
   bankSocketBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
-    this.cmd({ cmd: 'bank_socket_bag', ...bankSocketBagPayload(itemId, socket, target) });
+    this.cmd({ cmd: 'bank_socket_bag', ...bagSocketPayload(itemId, socket, target) });
   }
   bankUnsocketBag(socket: number): void {
     this.cmd({ cmd: 'bank_unsocket_bag', socket });
