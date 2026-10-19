@@ -1,8 +1,9 @@
 // The Gourdlight Eve tricks' bodies (src/sim/seasonal/: a trick-or-treat trick
 // or the Jar of Mischief): for a few seconds the player wears a bat's or a
 // skeleton's body; a costume draught wears a skeleton's, a ghost's or a bat's for ten
-// minutes, and a drink from the Gurglegreen Cauldron the treasure goblin's for 45 s. They ride the polymorph SLOT's look only (its lazy build and
-// its compile gate, form_rig_sync.ts), never its control: the aura is kind
+// minutes, and a drink from the Gurglegreen Cauldron the treasure goblin's for the toy's
+// duration (content/gourdlight_eve.ts). They ride the polymorph SLOT's look only (its lazy
+// build and its compile gate, form_rig_sync.ts), never its control: the aura is kind
 // 'seasonal_cosmetic', which no sim rule reads. Both bodies are the shipped
 // creatures' own rigs and clips, sized to a player.
 import type { VisualDef } from './manifest';

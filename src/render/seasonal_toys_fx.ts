@@ -21,9 +21,11 @@
 //  - GURGLEGREEN CAULDRON (round 10): a squat iron cauldron on three stubby legs set down
 //    where it was used (a ground object any player may drink from, sim:
 //    seasonal/toy_cauldron.ts), its green brew bubbling and popping, steam and green motes
-//    curling up off it, embers under its belly and its bubbling looped at the spot; a
-//    drinker glows green (the rig's own aura-glow tint, through the renderer's seam) with
-//    bubbles rising off them for the brew's length.
+//    curling up off it, embers under its belly and its bubbling looped at the spot (round
+//    11: drawn waist-high, CAULDRON_SCALE). A drinker bursts in green bubbles and smoke and
+//    fizzes green (the rig's own aura-glow tint, through the renderer's seam) for
+//    BREW_FIZZ_SEC while the goblin body takes over (the polymorph slot's look,
+//    form_visual_selection_core.ts), then turns back in a green puff when the look ends.
 // Every look is cosmetic: nothing here is actionable, and a stealthed or dead body never
 // draws one (a glowing toy where an unseen rogue walks would hand out what stealth hides).
 //
