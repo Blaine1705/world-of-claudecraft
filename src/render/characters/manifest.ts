@@ -5260,7 +5260,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // foot speeds at the drawn size.
   bastion_drowned_revenant: {
     url: `${CREATURES}/drowned_revenant.glb`,
-    height: 4.95,
+    // Twice the player: authored against the KayKit-sized player, grown the same
+    // tenth the WOC player body grew (player_warrior).
+    height: 4.95 * 1.1,
     clips: {
       idle: 'Idle',
       combatIdle: 'CombatIdle',
@@ -5289,7 +5291,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // (sunken_bastion/bastion_boathook_fx.ts), the recovery playing out after.
   bastion_skel_watchman: {
     url: `${CREATURES}/drowned_watchman.glb`,
-    height: 4.9,
+    // Twice the player: authored against the KayKit-sized player, grown the same
+    // tenth the WOC player body grew (player_warrior).
+    height: 4.9 * 1.1,
     clips: {
       idle: 'Idle',
       combatIdle: 'CombatIdle',
@@ -5324,7 +5328,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // sunken_bastion/bastion_creature_fx.ts from ARBALEST_MUZZLE.
   bastion_skel_arbalest: {
     url: `${CREATURES}/drowned_arbalest.glb`,
-    height: 5.1,
+    // Twice the player: authored against the KayKit-sized player, grown the same
+    // tenth the WOC player body grew (player_warrior).
+    height: 5.1 * 1.1,
     attackTimeScale: 1,
     clips: {
       idle: 'Idle',
@@ -5693,7 +5699,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // while the aura lasts) until he leaves the world.
   bastion_prisoner: {
     url: `${CREATURES}/drowned_prisoner.glb`,
-    height: 4.6,
+    // Half again the player: the 4.6 he was authored at against the KayKit-sized
+    // player, grown the same tenth the WOC player body grew (player_warrior).
+    height: 4.6 * 1.1,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
