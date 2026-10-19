@@ -238,6 +238,9 @@ export function summonBuddy(ctx: SimContext, pid: number, key: string): boolean 
   if (!def) return false;
   if (e.buddyKey === def.key) {
     e.buddyKey = '';
+    // An explicit dismiss is remembered: clearing `last` keeps the login
+    // re-summon (buddy_drops.ts revealBuddiesOnJoin) from bringing it back.
+    meta.buddies.last = '';
     despawnBuddyEntity(ctx, pid);
     return true;
   }
