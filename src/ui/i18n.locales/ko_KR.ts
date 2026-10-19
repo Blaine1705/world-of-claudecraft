@@ -21925,5 +21925,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.toy.cauldron': '가마솥을 내려놓자, 보글보글 끓기 시작합니다.',
   'seasonal.toy.cauldronDrink': '가마솥의 물약을 마시자, 몸이 보글보글 초록빛으로 빛납니다!',
   'hudChrome.worldBoss.sleepUntilNightfall': '{name}이(가) 해가 질 때까지 잠듭니다.',
-  'hudChrome.auraEffect.slumberNight': '해가 질 때까지 기둥에 생기 없이 매달려 있습니다. 공격할 수 없습니다.',
+  'hudChrome.auraEffect.slumberNight':
+    '해가 질 때까지 기둥에 생기 없이 매달려 있습니다. 공격할 수 없습니다.',
 };
