@@ -283,10 +283,14 @@ export function jungleCoconutPlacements(seed: number): MapPlacement[] {
   return out;
 }
 
+type NaturalSize = { x: number; y: number; z: number };
+
 /** Natural sizes of the authored towns' building GLBs (measured like
  *  MODEL_MAX_DIM above). The Fenbridge set is authored at real yards, its
- *  per-axis fit multipliers come out ~1. */
-const TOWN_BUILDING_NATURAL: Readonly<Record<string, { x: number; y: number; z: number }>> = {
+ *  per-axis fit multipliers come out ~1. A town building whose asset has no
+ *  row here is left out of the Studio conversion, so tests/painted_towns.test.ts
+ *  pins a row for every model of every painted look. */
+export const TOWN_BUILDING_NATURAL: Readonly<Record<string, NaturalSize>> = {
   'biome/hexb_townhall': { x: 1.4351, y: 1.8861, z: 1.5638 },
   'biome/hexb_workshop': { x: 1.6654, y: 1.1537, z: 1.6672 },
   'biome/hexb_tavern': { x: 1.1718, y: 1.3967, z: 1.3324 },
@@ -321,6 +325,11 @@ const TOWN_BUILDING_NATURAL: Readonly<Record<string, { x: number; y: number; z: 
   'tidehold/highwatch/shop_a': { x: 13.004, y: 16.2797, z: 12.2001 },
   'tidehold/highwatch/house_c': { x: 12.7632, y: 19.5804, z: 16.2637 },
   'tidehold/highwatch/smithy': { x: 19.797, y: 12.7809, z: 11.6901 },
+  // The town looks (the town texture library's maps, each building with its
+  // own stained glass): the same models re-baked, so the same sizes.
+  'tidehold/pantile/house_a': { x: 11.7628, y: 12.23, z: 9.8009 },
+  'tidehold/pantile/shop_a': { x: 13.004, y: 16.2797, z: 12.2001 },
+  'tidehold/pantile/tavern': { x: 22.6483, y: 18.7798, z: 16.7997 },
 };
 
 /**

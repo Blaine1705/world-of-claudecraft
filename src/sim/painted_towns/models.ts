@@ -10,8 +10,9 @@
 //
 // A LOOK is the set of shipped files a model is drawn from: the same geometry
 // re-baked with other texture maps (default: Eastbrook's; fenrire: Fenbridge's
-// moss; highwatch: Highwatch's Alpine slate). A look carries only the models
-// that were baked in it.
+// moss; highwatch: Highwatch's Alpine slate; the town looks pantile: the town
+// texture library's colour sets and pattern layouts, each building with its
+// own stained glass). A look carries only the models that were baked in it.
 //
 // Pure data and geometry: no engine imports, no randomness, no clocks.
 
@@ -37,7 +38,7 @@ export type PaintedModel =
   | 'house_b'
   | 'house_c';
 
-export type PaintedLook = 'default' | 'fenrire' | 'highwatch';
+export type PaintedLook = 'default' | 'fenrire' | 'highwatch' | 'pantile';
 
 export interface PaintedModelSpec extends PlacedTownMeasurements {
   /** The model bakes an open doorway onto rooms with authored camera air
@@ -148,6 +149,7 @@ export const PAINTED_LOOK_SETS: Readonly<Record<PaintedLook, string>> = deepFree
   default: '/models/tidehold',
   fenrire: '/models/tidehold/fenrire',
   highwatch: '/models/tidehold/highwatch',
+  pantile: '/models/tidehold/pantile',
 });
 
 /** The models each look was baked for. */
@@ -167,6 +169,7 @@ export const PAINTED_LOOK_MODELS: Readonly<Record<PaintedLook, readonly PaintedM
     ],
     fenrire: ['hall', 'house_a', 'shop_a', 'shop_b', 'tavern'],
     highwatch: ['hall', 'house_c', 'shop_a', 'smithy', 'tavern_b'],
+    pantile: ['house_a', 'shop_a', 'tavern'],
   });
 
 /** A visitor stands this far off the wall face at a door at authored size; the
