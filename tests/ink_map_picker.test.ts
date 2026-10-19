@@ -44,7 +44,7 @@ describe('ink map picker model', () => {
     expect(model.choices).toEqual([
       { rarity: 'rare', read: true, count: 1, next: 'epic', inks: 3, affordable: true },
       { rarity: 'common', read: false, count: 2, next: 'rare', inks: 1, affordable: true },
-      { rarity: 'epic', read: false, count: 1, next: 'legendary', inks: 15, affordable: false },
+      { rarity: 'epic', read: false, count: 1, next: 'legendary', inks: 8, affordable: false },
     ]);
   });
 
