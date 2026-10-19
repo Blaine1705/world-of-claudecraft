@@ -122,13 +122,16 @@ describe('ranged petSpell casters keep the classic caster loop', () => {
 
   it('in spell range but with a world prop in the way, it begins no cast and goes to close instead', () => {
     const { sim, p } = makeSim();
-    // The same pair moved east to (22, -13), where a tree 5 yd east of the player
-    // breaks the line (the prop that stood 5 yd east of the origin is gone since
-    // #4525 moved Eastbrook); its next cast is a tick or two away.
+    // The same pair moved to (-94, -41), where the authored quay watch tower
+    // (zone1 hexWatchtower at (-89, -41)) stands 5 yd east of the player and
+    // breaks the line. The prop 5 yd east of the origin went when #4525 moved
+    // Eastbrook, and the Wolf Run watch tower at (27, -13) the pair used next
+    // went with the genshin artstyle merge (8bff2cec638); its next cast is a
+    // tick or two away.
     const mob = engageMob(sim, p, 'corrupted_priest_malric', 20, 'chase', { swingTimer: 0.1 });
     for (const e of [p, mob]) {
-      e.pos.x += 22;
-      e.pos.z = -13;
+      e.pos.x += -94;
+      e.pos.z = -41;
       e.prevPos = { ...e.pos };
       sim.rebucket?.(e);
     }
@@ -139,6 +142,6 @@ describe('ranged petSpell casters keep the classic caster loop', () => {
     // The cast it was about to begin asked for sight and did not get it.
     expect(mob.aiState).toBe('chase');
     expect(p.hp).toBe(hp);
-    expect(mob.pos.x !== 42 || mob.pos.z !== -13).toBe(true);
+    expect(mob.pos.x !== -74 || mob.pos.z !== -41).toBe(true);
   });
 });
