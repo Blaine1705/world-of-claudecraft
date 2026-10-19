@@ -2959,7 +2959,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '拖动旋转镜头时将鼠标光标保持在窗口内，使其无法到达屏幕边缘或移动到另一台显示器。如果你喜欢自由光标，请关闭此选项。',
   'hudChrome.options.rawMouseInput': '原始鼠标输入',
   'hudChrome.options.keybindHelpRawMouseInput':
-    '拖动旋转镜头时直接读取鼠标设备的移动，跳过系统的指针速度和加速设置，使转动更稳定。关闭后将改用系统鼠标设置。仅在开启“旋转时锁定光标”时生效，且并非所有浏览器都支持。',
+    '拖动旋转镜头时直接读取鼠标设备的移动，跳过系统的指针速度和加速设置，使转动更稳定。关闭后将改用系统鼠标设置。仅在开启“旋转时锁定光标”时生效，且并非所有浏览器或系统都支持。',
   'hudChrome.options.showWalletOnCharacterScreen': '在角色界面显示钱包',
   'hudChrome.options.showPlaytime': '在角色界面显示游戏时长',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片显示钱包',

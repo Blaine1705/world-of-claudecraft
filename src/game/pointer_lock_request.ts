@@ -63,11 +63,12 @@ export class RawPointerLockRequester {
     try {
       result = target.requestPointerLock({ unadjustedMovement: true });
     } catch (err) {
-      // A synchronous throw is not the spec'd failure mode, but treat a
-      // NotSupported one like the async rejection and fall back right away,
-      // still inside the same event handler.
-      if (!isNotSupported(err)) return;
-      this.rawUnsupported = true;
+      // A synchronous throw is not the spec'd failure mode. Fall back to a
+      // plain request right away, still inside the same event handler, so
+      // this drag is never left without a lock. A NotSupported throw, or a
+      // TypeError from an engine that rejects the options argument, also
+      // means raw input is unavailable for the session.
+      if (isNotSupported(err) || err instanceof TypeError) this.rawUnsupported = true;
       this.plain(target);
       return;
     }

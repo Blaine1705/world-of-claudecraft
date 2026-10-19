@@ -2426,6 +2426,49 @@ describe('Input mouse-look jump defenses', () => {
     expect(ctx.canvas.requestPointerLock).toHaveBeenCalledWith();
   });
 
+  it('main.ts applies the Raw Mouse Input setting to Input, at boot and on change', () => {
+    // applySetting is the one path both the startup apply-all loop and the
+    // options toggle take; without this branch the setting would save but
+    // never reach the pointer lock requester.
+    expect(mainSource).toContain(
+      "    if (key === 'rawMouseInput') {\n      input.setRawMouseInput(settings.set('rawMouseInput', !!value));\n      return;\n    }",
+    );
+    expect(mainSource).toContain(
+      'for (const k of Object.keys(saved) as (keyof GameSettings)[]) applySetting(k, saved[k]);',
+    );
+  });
+
+  it('a raw rejection that settles after a newer press does not re-arm that press', async () => {
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => (now += 10));
+    const ctx = makeInput();
+    let rejectFirst: (err: Error) => void = () => {};
+    ctx.canvas.requestPointerLock.mockImplementation(
+      (options?: { unadjustedMovement?: boolean }) => {
+        if (!options?.unadjustedMovement) return Promise.resolve();
+        if (ctx.canvas.requestPointerLock.mock.calls.length === 1) {
+          return new Promise<void>((_, reject) => {
+            rejectFirst = reject;
+          });
+        }
+        return new Promise<void>(() => {});
+      },
+    );
+    startDrag(ctx);
+    ctx.windowListeners.get('mouseup')!({ button: 2, ...CENTER, target: ctx.canvas });
+    startDrag(ctx);
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledTimes(2);
+
+    const err = new Error('raw input unavailable');
+    err.name = 'NotSupportedError';
+    rejectFirst(err);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // The second press still has its own request pending: no duplicate.
+    ctx.windowListeners.get('mousemove')!({ movementX: 4, movementY: 0, ...CENTER });
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledTimes(2);
+  });
+
   it('keeps the synchronous Firefox mousedown request plain', () => {
     const ctx = makeInput(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',

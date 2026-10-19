@@ -578,8 +578,9 @@ const MONOLITHS: MonolithRow[] = [
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
     // LOWERED 2813 -> 2799 when the Key Bindings panel's reset-scope list moved
     // to src/ui/keybind_panel_settings.ts, which also made room for the Raw
-    // Mouse Input row. Exact count, zero slack.
-    ceiling: 2799,
+    // Mouse Input row. Exact count, zero slack (2798 after its reset-handler
+    // comment pointed at that list instead of repeating it).
+    ceiling: 2798,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {

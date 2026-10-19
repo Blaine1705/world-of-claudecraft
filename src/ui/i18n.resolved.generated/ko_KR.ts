@@ -2170,7 +2170,7 @@ export const ko_KR: EnTranslations = {
       "lockCursorOnRotate": "회전 중 커서 고정",
       "keybindHelpLockCursorOnRotate": "드래그하여 카메라를 회전하는 동안 마우스 커서를 창 안에 유지하여 화면 가장자리에 닿거나 다른 모니터로 이동하지 않도록 합니다. 자유로운 커서를 원하면 끄세요.",
       "rawMouseInput": "마우스 원시 입력",
-      "keybindHelpRawMouseInput": "드래그하여 카메라를 회전하는 동안 마우스 이동을 장치에서 직접 읽어 시스템 포인터 속도와 가속을 건너뛰므로 더 안정적으로 회전합니다. 시스템 마우스 설정을 사용하려면 끄세요. \"회전 중 커서 고정\"이 켜져 있을 때만 작동하며 일부 브라우저에서는 지원되지 않습니다.",
+      "keybindHelpRawMouseInput": "드래그하여 카메라를 회전하는 동안 마우스 이동을 장치에서 직접 읽어 시스템 포인터 속도와 가속을 건너뛰므로 더 안정적으로 회전합니다. 시스템 마우스 설정을 사용하려면 끄세요. \"회전 중 커서 고정\"이 켜져 있을 때만 작동하며 일부 브라우저나 시스템에서는 지원되지 않습니다.",
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
       "showPlaytime": "캐릭터 화면에 플레이 시간 표시",

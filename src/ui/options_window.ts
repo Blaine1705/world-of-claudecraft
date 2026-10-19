@@ -2707,10 +2707,9 @@ export class OptionsWindow {
       audio.click();
       this.deps.keybinds().reset();
       this.keyboardWindow.repaint();
-      // The panel also renders seven GameSettings toggles alongside the
-      // rebindable keys (mouse camera, click-to-move and its mouse button,
-      // attack move, left-handed touch, profanity filter); Reset to Defaults
-      // must restore those too, not just the key-code map.
+      // The panel also renders GameSettings toggles alongside the rebindable
+      // keys (KEYBIND_PANEL_SETTING_KEYS); Reset to Defaults must restore
+      // those too, not just the key-code map.
       const hooks = this.deps.options();
       hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);
       for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));

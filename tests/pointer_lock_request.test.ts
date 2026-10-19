@@ -106,8 +106,9 @@ describe('RawPointerLockRequester', () => {
     expect(onRawUnsupported).not.toHaveBeenCalled();
   });
 
-  it('keeps raw input after a synchronous throw that is not NotSupported', () => {
-    const requestPointerLock = vi.fn(() => {
+  it('after any other synchronous throw, still locks plain this drag but keeps raw for later', () => {
+    const requestPointerLock = vi.fn((options?: { unadjustedMovement?: boolean }) => {
+      if (!options?.unadjustedMovement) return;
       const err = new Error('denied');
       err.name = 'NotAllowedError';
       throw err;
@@ -117,9 +118,40 @@ describe('RawPointerLockRequester', () => {
 
     expect(() => requester.request({ requestPointerLock }, onRawUnsupported)).not.toThrow();
 
-    expect(requestPointerLock).toHaveBeenCalledTimes(1);
+    expect(requestPointerLock).toHaveBeenCalledTimes(2);
+    expect(requestPointerLock).toHaveBeenLastCalledWith();
     expect(requester.requestsRaw).toBe(true);
     expect(onRawUnsupported).not.toHaveBeenCalled();
+  });
+
+  it('treats a synchronous TypeError on the options argument as raw unsupported', () => {
+    // An engine whose requestPointerLock rejects the options dictionary.
+    const requestPointerLock = vi.fn((options?: { unadjustedMovement?: boolean }) => {
+      if (options) throw new TypeError('no options accepted');
+    });
+    const requester = new RawPointerLockRequester(true);
+
+    requester.request({ requestPointerLock }, vi.fn());
+
+    expect(requestPointerLock).toHaveBeenCalledTimes(2);
+    expect(requestPointerLock).toHaveBeenLastCalledWith();
+    expect(requester.requestsRaw).toBe(false);
+  });
+
+  it('toggling the setting never forgets that raw input proved unsupported', async () => {
+    const requestPointerLock = vi.fn((options?: { unadjustedMovement?: boolean }) =>
+      options?.unadjustedMovement ? Promise.reject(notSupported()) : Promise.resolve(),
+    );
+    const requester = new RawPointerLockRequester(true);
+    requester.request({ requestPointerLock }, vi.fn());
+    await flush();
+
+    requester.setRawEnabled(false);
+    requester.setRawEnabled(true);
+
+    expect(requester.requestsRaw).toBe(false);
+    requester.request({ requestPointerLock }, vi.fn());
+    expect(requestPointerLock).toHaveBeenLastCalledWith();
   });
 
   it('the Raw Mouse Input setting switches requests between raw and plain', () => {

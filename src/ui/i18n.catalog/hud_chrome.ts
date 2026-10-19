@@ -2507,7 +2507,7 @@ export const hudChromeStrings = {
     // (unadjusted) mouse input. On by default.
     rawMouseInput: 'Raw Mouse Input',
     keybindHelpRawMouseInput:
-      'Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not in every browser.',
+      'Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.',
     showWalletOnCharacterScreen: 'Show Wallet on Character Screen',
     showWalletOnPlayerCard: 'Show Wallet on Player Card',
     // Interface panel twin of the character sheet's privacy eye: the same

@@ -1061,10 +1061,10 @@ describe('options_window: off-menu reset keys are pinned per tab', () => {
 });
 
 // Key Bindings' Reset to Defaults used to reset only the rebindable key-code
-// map (Keybinds.reset()), silently leaving the six GameSettings toggles the
-// same panel renders (mouse camera, click-to-move + its mouse button, attack
-// move, left-handed touch) untouched. The profanity filter moved to Interface >
-// Chat, so it is deliberately NOT in this list any more.
+// map (Keybinds.reset()), silently leaving the GameSettings toggles the same
+// panel renders untouched. Those keys now live in KEYBIND_PANEL_SETTING_KEYS
+// (src/ui/keybind_panel_settings.ts). The profanity filter moved to Interface
+// > Chat, so it is deliberately NOT in this list any more.
 describe('options_window: Key Bindings Reset to Defaults also resets its own toggles', () => {
   it('names the same setting keys the panel renders via settingToggleKeybind/clickMoveMouseButtonRow', () => {
     expect(KEYBIND_PANEL_SETTING_KEYS).toEqual([
@@ -1080,14 +1080,24 @@ describe('options_window: Key Bindings Reset to Defaults also resets its own tog
       "import { KEYBIND_PANEL_SETTING_KEYS } from './keybind_panel_settings';",
     );
     // Every listed toggle has its row (clickToMoveButton is the button row).
+    // Comments are stripped so a commented-out row cannot satisfy the pin.
     const start = painter.indexOf('private renderKeybinds(): void {');
-    const body = painter.slice(start, painter.indexOf('\n  }\n', start));
+    const body = painter
+      .slice(start, painter.indexOf('\n  }\n', start))
+      .replace(/^\s*\/\/.*$/gm, '');
     for (const key of KEYBIND_PANEL_SETTING_KEYS.filter((k) => k !== 'clickToMoveButton')) {
       expect(body).toContain(`'${key}'`);
     }
     expect(body).toContain('this.clickMoveMouseButtonRow(rail);');
     expect(body).toContain("t('hudChrome.options.rawMouseInput')");
     expect(body).toContain("t('hudChrome.options.keybindHelpRawMouseInput')");
+    // Raw Mouse Input sits right under the lock it depends on.
+    const lock = body.indexOf("'lockCursorOnRotate'");
+    const raw = body.indexOf("'rawMouseInput'");
+    const clickToMove = body.indexOf("'clickToMove'");
+    expect(lock).toBeGreaterThan(-1);
+    expect(raw).toBeGreaterThan(lock);
+    expect(clickToMove).toBeGreaterThan(raw);
   });
 
   it("renderKeybinds' reset handler resets the keybind map AND the panel's own settings, then re-applies them", () => {

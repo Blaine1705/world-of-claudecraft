@@ -269,7 +269,8 @@ export class Input {
     !this.needsSyncPointerLockGesture,
   );
   // Discards the bogus single-event deltas a locked pointer can report: the
-  // first one after the lock engages or releases, and isolated spikes.
+  // first one after the lock engages, and a lone spike that the next calm
+  // event shows was not real motion.
   private readonly lookDeltaGuard = new LookDeltaGuard();
   private downX = 0;
   private downY = 0;
@@ -1019,9 +1020,11 @@ export class Input {
 
   private requestDragPointerLock(): void {
     // When raw input turns out to be unsupported, re-arm the one-request-per-
-    // drag flag so the next move of this same drag asks for a plain lock.
+    // drag flag so the next move of this same drag asks for a plain lock. A
+    // rejection that lands after a newer press leaves that press alone.
+    const press = this.downAt;
     this.pointerLockRequester.request(this.canvas, () => {
-      this.pointerLockRequestedForDrag = false;
+      if (this.downAt === press) this.pointerLockRequestedForDrag = false;
     });
   }
 
