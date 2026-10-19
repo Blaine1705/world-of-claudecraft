@@ -292,7 +292,7 @@ import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import { type GuildContractsView, guildContractsView } from './guild_contracts';
-import { buyGuildCosmetic } from './guild_quartermaster';
+import { buyGuildCosmetic, type GuildAccountPort } from './guild_quartermaster';
 import { spawnHealingTrainingGround } from './healing_training';
 import { talkToGuildResident } from './highwatch_guild';
 import { spawnDevHealerPracticeDummy, spawnHubPractice } from './hub_practice';
@@ -8857,8 +8857,8 @@ export class Sim {
   get guildContracts(): GuildContractsView {
     return guildContractsView(this.ctx, this.primary);
   }
-  buyGuildCosmetic(offerId: string, pid?: number): void {
-    buyGuildCosmetic(this.ctx, offerId, pid);
+  buyGuildCosmetic(offerId: string, pid?: number, account?: GuildAccountPort): void {
+    buyGuildCosmetic(this.ctx, offerId, pid, account);
   }
   get weeklyQuest() {
     weeklyQuestMod.resetWeeklyQuestIfNeeded(this.ctx, this.primary);

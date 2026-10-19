@@ -532,14 +532,14 @@ import {
   syncMountTransitionFx,
   syncMountVisual,
 } from './mount_lifecycle';
-import { borrowRiderLocomotion, updateMountPresentation } from './mount_presentation';
+import { borrowRiderLocomotion, mountAudio, updateMountPresentation } from './mount_presentation';
 import {
   mountPrewarmKeysFor,
   stageMountPrewarmVisual,
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
 import { releaseMountFx } from './mount_visual_lifecycle';
-import { mountVisualSpecFor } from './mount_visuals';
+import { mountSummonFx, mountVisualSpecFor } from './mount_visuals';
 import { createNameplateCadenceState, nameplateFullPassDue } from './nameplate_cadence_core';
 import { NameplatePainter } from './nameplate_painter';
 import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_army_portal_fx';
@@ -899,6 +899,7 @@ import {
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
 import { buildWater, setWaterDayNight, setWaterSunDirection, type WaterView } from './water';
 import { advanceWaterfallTime } from './waterfall';
+import { playSkinSwingTrail } from './weapon_skin_trail_core';
 import {
   buildWeaponVfxPrewarmGroup,
   disposeWeaponEmissiveCache,
@@ -7840,26 +7841,13 @@ export class Renderer {
   // The hazard-ring wall, power-up gems and per-entity glow swirl: paint/tick
   // logic lives in fiesta_effects.ts; these stay the per-frame call sites
   // (renderer.ts sync()) and the shared host they read scene/time/vfx through.
-  private updateFiestaRing(dt: number): void {
-    updateFiestaRingEffect(
-      this.fiestaEffects,
-      this.fiestaEffectsHost(),
-      this.sim.arenaInfo?.match,
-      dt,
-    );
-  }
-
-  private updateFiestaPowerups(dt: number): void {
-    updateFiestaPowerupsEffect(
-      this.fiestaEffects,
-      this.fiestaEffectsHost(),
-      this.sim.arenaInfo?.match,
-      dt,
-    );
-  }
-
-  private tickFiestaGlows(dt: number): void {
-    tickFiestaGlowsEffect(this.fiestaEffects, this.fiestaEffectsHost(), dt);
+  /** The fiesta's ring, power-ups and glows, in that order, off one host per frame. */
+  private updateFiesta(dt: number): void {
+    const host = this.fiestaEffectsHost();
+    const match = this.sim.arenaInfo?.match;
+    updateFiestaRingEffect(this.fiestaEffects, host, match, dt);
+    updateFiestaPowerupsEffect(this.fiestaEffects, host, match, dt);
+    tickFiestaGlowsEffect(this.fiestaEffects, host, dt);
   }
 
   private fiestaEffectsHost(): FiestaEffectsHost {
@@ -8702,6 +8690,8 @@ export class Renderer {
     const visual = v ? this.activeVisual(v) : null;
     if (!visual) return 0;
     this.attackTriggerCount++;
+    if (!gestureOnly)
+      playSkinSwingTrail(this.abilityVfxFx, entityId, this.sim.entities.get(entityId), kind);
     if (isSpinAttackAbility(abilityId)) visual.playWhirl(abilityId);
     else return visual.playAttack(abilityId, gestureOnly, kind);
     return 0;
@@ -10823,7 +10813,7 @@ export class Renderer {
           poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
           present: runCharacterPresentation,
           playCallPose: (secs: number) => active.playCallPose(secs),
-          summonGlow: () => this.vfx.mountSummonGlow(e.id),
+          summonGlow: () => this.vfx.mountSummonGlow(e.id, mountSummonFx(mountLook)),
           engineReset: () => this.audioSink?.mountEngineReset(e.id),
           preloadSummon: (key: string) => this.audioSink?.preloadMountSummon(key),
           preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
@@ -11129,7 +11119,7 @@ export class Renderer {
         present: runCharacterPresentation,
         animate,
         vfx: this.vfx,
-        enginePhase: this.audioSink?.mountEnginePhase(e.id) ?? null,
+        audio: mountAudio(this.audioSink, e.id, e.id === this.sim.playerId),
         groundSample: this.groundSample,
         dt,
       });
@@ -11530,9 +11520,7 @@ export class Renderer {
     this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
     this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
-    this.updateFiestaRing(dt);
-    this.updateFiestaPowerups(dt);
-    this.tickFiestaGlows(dt);
+    this.updateFiesta(dt);
     for (const view of this.yumiMazeViews.values())
       view.update(
         this.sim,

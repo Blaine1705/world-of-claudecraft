@@ -7512,6 +7512,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Lantern Hall Destrier"
+      },
+      {
+        "kind": "mount",
         "name": "Grumbol the Lanternback"
       },
       {
@@ -7648,6 +7652,26 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "weapon_skin",
         "name": "Meteorlatch, the Sky's Last Judgment"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Blade of Lantern Hall"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Hearthbrand"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Squallcrest"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Rimelight Staff"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Duskwick Staff"
       }
     ]
   },

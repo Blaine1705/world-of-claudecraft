@@ -1,24 +1,33 @@
 // Pure view core for Lantern Hall's quartermaster counter (Garrick Holt): the stock as item
-// cards (the title's crest, its price in Lantern Seals, owned / affordable / short), the one
-// selected card's detail (the nameplate it gives you, how to wear it, the price against the
-// seals in the bags, the buy action) and each card's hover lines. DOM-free and canvas-free:
-// it names the crest by id (deeds_view.ts deedCrestId) and the painter resolves the art.
+// cards (the offer's art, its price in Lantern Seals, owned / affordable / short), the one
+// selected card's detail (what it gives you, how to use it, the price against the seals in the
+// bags, the buy action, and what its preview stage shows) and each card's hover lines.
+// DOM-free and canvas-free: it NAMES the art (a Book of Deeds crest id, an item id, an Armory
+// skin id) and the stage subject, and the painter resolves the pixels and the 3D.
 //
-// The stock is titles only (content/guild_contracts.ts GUILD_QUARTERMASTER_STOCK, cosmetic
-// Book of Deeds feats), so no card carries a model to preview: the detail's preview is the
-// nameplate the title draws over your head, split around the name the way the target frame
-// splits it (deed_i18n.ts titledNameDecoration).
+// The stock (content/guild_contracts.ts GUILD_QUARTERMASTER_STOCK) holds three kinds of offer,
+// all cosmetic: titles (Book of Deeds feats), account-wide weapon appearances and the guild's
+// war horse. A title's preview is the nameplate it draws over your head, split around the name
+// the way the target frame splits it (deed_i18n.ts titledNameDecoration); a weapon appearance
+// is tried on your own character and the horse is shown under you, both on a live 3D stage
+// the painter mounts (guild_offer_stage.ts).
 
 import { DEEDS } from '../../../sim/content/deeds';
 import {
   GUILD_QUARTERMASTER_STOCK,
   GUILD_QUARTERMASTER_STOCK_BY_ID,
+  type GuildQuartermasterOffer,
   LANTERN_SEAL_ITEM_ID,
 } from '../../../sim/content/guild_contracts';
+import { mountDef } from '../../../sim/content/mounts';
+import { WEAPON_SKINS } from '../../../sim/content/weapon_skins';
+import { ITEMS } from '../../../sim/data';
 import type { InvSlot } from '../../../sim/types';
+import { localizeWeaponSkin } from '../../armory_labels';
 import { deedTitleText, titledDisplayName, titledNameDecoration } from '../../deed_i18n';
 import { deedCrestId } from '../../deeds_view';
 import { formatNumber, t, tPlural } from '../../i18n';
+import { mountDisplayName } from '../../mount_labels';
 
 const whole = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
 
@@ -37,11 +46,25 @@ export function sealCount(count: number): string {
 /** Where a card stands against the bags: bought, buyable now, or short of seals. */
 export type GuildShopItemState = 'owned' | 'ready' | 'short';
 
+/** A card's art, by name: the painter resolves the pixels (iconDataUrl for a crest,
+ *  itemImageUrl for an item, the Armory card for a weapon appearance). */
+export type GuildShopArt =
+  | { kind: 'crest'; id: string }
+  | { kind: 'item'; itemId: string }
+  | { kind: 'skin'; skinId: string };
+
+/** What the detail's preview stage shows: the nameplate a title draws (text only), or a live
+ *  3D subject (the war horse under you; a weapon appearance in your hand). */
+export type GuildShopStage =
+  | { kind: 'plate'; heading: string; pre: string; name: string; post: string }
+  | { kind: 'mount'; heading: string; mountKey: string }
+  | { kind: 'weapon'; heading: string; skinId: string };
+
 export interface GuildShopItemView {
   id: string;
-  /** The crest the Book of Deeds shows for the title's feat (painted, or its category's). */
-  crestId: string;
-  /** The title itself ("Writ-Runner"). */
+  offerKind: GuildQuartermasterOffer['kind'];
+  art: GuildShopArt;
+  /** The reward itself ("Writ-Runner", "Lantern Hall Destrier", "Squallcrest"). */
   name: string;
   kindLabel: string;
   /** The bare price, for the seal-icon price tag. */
@@ -56,16 +79,17 @@ export interface GuildShopItemView {
 
 export interface GuildShopDetailView {
   id: string;
-  crestId: string;
+  offerKind: GuildQuartermasterOffer['kind'];
+  art: GuildShopArt;
   name: string;
   kindLabel: string;
-  plateHeading: string;
-  /** The nameplate preview: the locale's text before the name, the name, the text after. */
-  platePre: string;
-  plateName: string;
-  platePost: string;
+  stage: GuildShopStage;
+  /** What it does in a line (the horse's speed, where an appearance shows); '' for a title,
+   *  whose nameplate says it. */
+  summary: string;
   howTo: string;
-  cosmetic: string;
+  /** "Cosmetic only" for a title; null where the summary already says what it changes. */
+  cosmetic: string | null;
   priceText: string;
   priceValue: string;
   haveText: string;
@@ -88,11 +112,40 @@ export interface GuildShopInput {
   readonly seals: number;
   readonly playerName: string;
   readonly deedsEarned: ReadonlyMap<string, string>;
+  /** The catalog mounts held (IWorld.ownedMounts: owned while the reins are in the bags). */
+  readonly ownedMounts: readonly string[];
+  /** The account's weapon appearances (IWorld.accountCosmetics.weaponSkinIds). */
+  readonly weaponSkinIds: readonly string[];
 }
 
-/** The card a fresh counter opens on: the cheapest title not yet owned, else the first. */
-export function defaultGuildShopSelection(deedsEarned: ReadonlyMap<string, string>): string | null {
-  const next = GUILD_QUARTERMASTER_STOCK.find((offer) => !deedsEarned.has(offer.deedId));
+/** The catalog mount a reins offer carries ('' when the item is not reins). */
+export function guildOfferMountKey(itemId: string): string {
+  const def = ITEMS[itemId];
+  return def?.kind === 'mount' ? def.mount : '';
+}
+
+/** Whether the player already has what an offer grants: the sim's own test
+ *  (src/sim/guild_quartermaster.ts), read through the three ledgers. */
+export function guildOfferOwned(offer: GuildQuartermasterOffer, input: GuildShopInput): boolean {
+  switch (offer.kind) {
+    case 'title':
+      return input.deedsEarned.has(offer.deedId);
+    case 'mount':
+      return input.ownedMounts.includes(guildOfferMountKey(offer.itemId));
+    case 'weaponSkin':
+      return input.weaponSkinIds.includes(offer.skinId);
+  }
+}
+
+/** Every offer's owned flag in stock order, for the window's repaint signature. */
+export function guildShopOwnedFlags(input: GuildShopInput): boolean[] {
+  return GUILD_QUARTERMASTER_STOCK.map((offer) => guildOfferOwned(offer, input));
+}
+
+/** The card a fresh counter opens on: the first offer not yet owned (the titles lead, cheapest
+ *  first), else the first. */
+export function defaultGuildShopSelection(input: GuildShopInput): string | null {
+  const next = GUILD_QUARTERMASTER_STOCK.find((offer) => !guildOfferOwned(offer, input));
   return (next ?? GUILD_QUARTERMASTER_STOCK[0])?.id ?? null;
 }
 
@@ -107,38 +160,130 @@ function actionLabel(state: GuildShopItemState, missing: number): string {
   return t('hudChrome.guildHall.needSeals', { count: whole(missing) });
 }
 
+/** A weapon appearance is a staff's or a sword's: the copy names the weapon it dresses. */
+function isStaffSkin(skinId: string): boolean {
+  return WEAPON_SKINS[skinId]?.weaponType === 'staff';
+}
+
+/** The art, name and kind label every surface (card, detail, hover card) shares. */
+function offerIdentity(offer: GuildQuartermasterOffer): {
+  art: GuildShopArt;
+  name: string;
+  kindLabel: string;
+} {
+  switch (offer.kind) {
+    case 'title':
+      return {
+        art: {
+          kind: 'crest',
+          id: deedCrestId(offer.deedId, DEEDS[offer.deedId]?.category ?? 'feat'),
+        },
+        name: deedTitleText(offer.deedId),
+        kindLabel: t('hudChrome.guildHall.shop.kindTitle'),
+      };
+    case 'mount':
+      return {
+        art: { kind: 'item', itemId: offer.itemId },
+        name: mountDisplayName(guildOfferMountKey(offer.itemId)),
+        kindLabel: t('hudChrome.guildHall.shop.kindMount'),
+      };
+    case 'weaponSkin': {
+      const skin = WEAPON_SKINS[offer.skinId];
+      return {
+        art: { kind: 'skin', skinId: offer.skinId },
+        name: skin ? localizeWeaponSkin(skin).name : '',
+        kindLabel: isStaffSkin(offer.skinId)
+          ? t('hudChrome.guildHall.shop.kindStaff')
+          : t('hudChrome.guildHall.shop.kindSword'),
+      };
+    }
+  }
+}
+
+/** What an offer does, in a line ('' for a title: its nameplate preview says it). */
+function offerSummary(offer: GuildQuartermasterOffer): string {
+  switch (offer.kind) {
+    case 'title':
+      return '';
+    case 'mount': {
+      const pct = Math.round((mountDef(guildOfferMountKey(offer.itemId))?.moveSpeedPct ?? 0) * 100);
+      return t('hudChrome.guildHall.mountPreview', { pct: whole(pct) });
+    }
+    case 'weaponSkin':
+      return isStaffSkin(offer.skinId)
+        ? t('hudChrome.guildHall.staffSkinPreview')
+        : t('hudChrome.guildHall.skinPreview');
+  }
+}
+
+/** How to use it once bought, or where it already is when owned. */
+function offerHowTo(offer: GuildQuartermasterOffer, owned: boolean): string {
+  switch (offer.kind) {
+    case 'title':
+      return owned ? t('hudChrome.guildHall.shop.ownedLong') : t('hudChrome.guildHall.shop.howTo');
+    case 'mount':
+      return owned
+        ? t('hudChrome.guildHall.shop.mountOwned')
+        : t('hudChrome.guildHall.shop.mountHowTo');
+    case 'weaponSkin':
+      return owned
+        ? t('hudChrome.guildHall.shop.skinOwned')
+        : t('hudChrome.guildHall.shop.skinHowTo');
+  }
+}
+
+function offerStage(offer: GuildQuartermasterOffer, playerName: string): GuildShopStage {
+  switch (offer.kind) {
+    case 'title': {
+      const plate = titledNameDecoration(offer.deedId);
+      return {
+        kind: 'plate',
+        heading: t('hudChrome.guildHall.shop.plateHeading'),
+        pre: plate.pre,
+        name: playerName,
+        post: plate.post,
+      };
+    }
+    case 'mount':
+      return {
+        kind: 'mount',
+        heading: t('hudChrome.guildHall.shop.mountHeading'),
+        mountKey: guildOfferMountKey(offer.itemId),
+      };
+    case 'weaponSkin':
+      return {
+        kind: 'weapon',
+        heading: t('hudChrome.guildHall.shop.skinHeading'),
+        skinId: offer.skinId,
+      };
+  }
+}
+
 export function buildGuildShopView(input: GuildShopInput, selected: string | null): GuildShopView {
   const chosen =
     selected && Object.hasOwn(GUILD_QUARTERMASTER_STOCK_BY_ID, selected)
       ? selected
-      : defaultGuildShopSelection(input.deedsEarned);
+      : defaultGuildShopSelection(input);
   let detail: GuildShopDetailView | null = null;
   const items = GUILD_QUARTERMASTER_STOCK.map((offer): GuildShopItemView => {
-    const owned = input.deedsEarned.has(offer.deedId);
+    const owned = guildOfferOwned(offer, input);
     const missing = Math.max(0, offer.seals - input.seals);
     const state = stateOf(owned, missing === 0);
-    const name = deedTitleText(offer.deedId);
-    const crestId = deedCrestId(offer.deedId, DEEDS[offer.deedId]?.category ?? 'feat');
-    const kindLabel = t('hudChrome.guildHall.shop.kindTitle');
+    const { art, name, kindLabel } = offerIdentity(offer);
     const price = sealCount(offer.seals);
     const priceValue = whole(offer.seals);
     const action = actionLabel(state, missing);
     if (offer.id === chosen) {
-      const plate = titledNameDecoration(offer.deedId);
       detail = {
         id: offer.id,
-        crestId,
+        offerKind: offer.kind,
+        art,
         name,
         kindLabel,
-        plateHeading: t('hudChrome.guildHall.shop.plateHeading'),
-        platePre: plate.pre,
-        plateName: input.playerName,
-        platePost: plate.post,
-        howTo:
-          state === 'owned'
-            ? t('hudChrome.guildHall.shop.ownedLong')
-            : t('hudChrome.guildHall.shop.howTo'),
-        cosmetic: t('hudChrome.guildHall.shop.cosmetic'),
+        stage: offerStage(offer, input.playerName),
+        summary: offerSummary(offer),
+        howTo: offerHowTo(offer, owned),
+        cosmetic: offer.kind === 'title' ? t('hudChrome.guildHall.shop.cosmetic') : null,
         priceText: t('hudChrome.guildHall.shop.price', { price }),
         priceValue,
         haveText: t('hudChrome.guildHall.shop.have', { count: whole(input.seals) }),
@@ -153,7 +298,8 @@ export function buildGuildShopView(input: GuildShopInput, selected: string | nul
     }
     return {
       id: offer.id,
-      crestId,
+      offerKind: offer.kind,
+      art,
       name,
       kindLabel,
       priceValue,
@@ -172,37 +318,55 @@ export interface GuildShopTipLine {
   tone: 'sub' | 'desc' | 'green' | 'red';
 }
 
+/** The hover card's title: "Title: Writ-Runner", "Mount: ...", "Sword appearance: ...". */
+function offerTipTitle(offer: GuildQuartermasterOffer, name: string): string {
+  switch (offer.kind) {
+    case 'title':
+      return t('hudChrome.guildHall.titleOffer', { title: name });
+    case 'mount':
+      return t('hudChrome.guildHall.mountOffer', { mount: name });
+    case 'weaponSkin':
+      return isStaffSkin(offer.skinId)
+        ? t('hudChrome.guildHall.staffSkinOffer', { skin: name })
+        : t('hudChrome.guildHall.skinOffer', { skin: name });
+  }
+}
+
 /** A stock card's hover card, written from the live rule (guild_quartermaster.ts): what the
- *  title is, how it shows, how to wear it, that it is cosmetic, its price, and why it cannot be
- *  bought when it cannot. */
+ *  offer is (a title's nameplate, the horse's speed, where an appearance shows), how to use
+ *  it, that a title is cosmetic, its price, and why it cannot be bought when it cannot. */
 export function guildShopTooltip(
   offerId: string,
   input: GuildShopInput,
 ): { title: string; lines: GuildShopTipLine[] } | null {
   if (!Object.hasOwn(GUILD_QUARTERMASTER_STOCK_BY_ID, offerId)) return null;
   const offer = GUILD_QUARTERMASTER_STOCK_BY_ID[offerId];
-  const title = deedTitleText(offer.deedId);
-  const owned = input.deedsEarned.has(offer.deedId);
+  const { name } = offerIdentity(offer);
+  const owned = guildOfferOwned(offer, input);
   const missing = Math.max(0, offer.seals - input.seals);
   const lines: GuildShopTipLine[] = [
     {
-      text: t('hudChrome.guildHall.titlePreview', {
-        preview: titledDisplayName(input.playerName, offer.deedId),
-      }),
+      text:
+        offer.kind === 'title'
+          ? t('hudChrome.guildHall.titlePreview', {
+              preview: titledDisplayName(input.playerName, offer.deedId),
+            })
+          : offerSummary(offer),
       tone: 'sub',
     },
-    {
-      text: owned ? t('hudChrome.guildHall.shop.ownedLong') : t('hudChrome.guildHall.shop.howTo'),
-      tone: 'desc',
-    },
-    { text: t('hudChrome.guildHall.shop.cosmetic'), tone: 'desc' },
-    { text: t('hudChrome.guildHall.shop.price', { price: sealCount(offer.seals) }), tone: 'sub' },
+    { text: offerHowTo(offer, owned), tone: 'desc' },
   ];
+  if (offer.kind === 'title')
+    lines.push({ text: t('hudChrome.guildHall.shop.cosmetic'), tone: 'desc' });
+  lines.push({
+    text: t('hudChrome.guildHall.shop.price', { price: sealCount(offer.seals) }),
+    tone: 'sub',
+  });
   if (!owned && missing > 0) {
     lines.push({
       text: tPlural('hudChrome.guildHall.shop.short', missing, { count: whole(missing) }),
       tone: 'red',
     });
   }
-  return { title: t('hudChrome.guildHall.titleOffer', { title }), lines };
+  return { title: offerTipTitle(offer, name), lines };
 }

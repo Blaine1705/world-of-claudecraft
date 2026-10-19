@@ -2001,6 +2001,8 @@ export const en = {
       heroic_mark: { name: 'Heroic Mark' },
       // Lantern Hall's contract currency (content/guild_contracts.ts).
       lantern_seal: { name: 'Lantern Seal' },
+      // ...and the guild's war horse its quartermaster sells for them.
+      reins_lantern_hall_destrier: { name: 'Reins of the Lantern Hall Destrier' },
       wyrmfall_core: { name: 'Wyrmfall Core' },
       sundered_essence: { name: 'Sundered Essence' },
       makers_ember: { name: "Maker's Ember" },

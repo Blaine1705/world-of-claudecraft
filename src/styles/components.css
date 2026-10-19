@@ -21584,6 +21584,49 @@
     color: var(--gh-plate-title);
     white-space: pre-wrap;
   }
+  /* The live 3D stage of the horse or a weapon appearance (guild_offer_stage.ts): the same
+     dusk frame as the nameplate, with the preview canvas filling it. */
+  #guild-hall-window .gh-model-stage {
+    align-items: stretch;
+    padding: 10px 10px 12px;
+  }
+  #guild-hall-window .gh-model-stage .gh-plate-heading {
+    text-align: center;
+  }
+  #guild-hall-window .gh-stage-slot,
+  #guild-hall-window .gh-stage {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+    border-radius: 3px;
+  }
+  #guild-hall-window .gh-stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #guild-hall-window .gh-stage-empty {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    margin: 0;
+    font-size: 13px;
+    text-align: center;
+    color: var(--gh-muted);
+  }
+  /* The reins and the Armory cards are paintings, not crests: they fill their slot. */
+  #guild-hall-window .gh-slot-item img,
+  #guild-hall-window .gh-slot-skin img {
+    object-fit: cover;
+    border-radius: 3px;
+  }
+  #guild-hall-window .gh-detail-summary {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--gh-amber);
+  }
   #guild-hall-window .gh-detail-text,
   #guild-hall-window .gh-detail-note {
     margin: 0;

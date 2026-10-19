@@ -10,8 +10,9 @@
 // The contracts tab is a notice board: each contract a pinned parchment with its boss's
 // portrait (the dungeon finder's prerendered stills, no live scene), the guild's wax seal, the
 // week's counter and the reward. The quartermaster tab is a vendor counter: item cards on the
-// left, the selected card's detail on the right (the stock is titles, so its preview is the
-// nameplate the title draws; no model, no GL context).
+// left, the selected card's detail on the right. A title's preview is the nameplate it draws;
+// the war horse and the weapon appearances get a live 3D stage (guild_offer_stage.ts, over the
+// preview hosts that already exist: no renderer of this window's own).
 import { audio } from '../../../game/audio';
 import { LANTERN_SEAL_ITEM_ID } from '../../../sim/content/guild_contracts';
 import type { IWorld } from '../../../world_api';
@@ -21,18 +22,22 @@ import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { t } from '../../i18n';
 import { iconDataUrl, itemImageUrl } from '../../icons';
 import { svgIcon } from '../../ui_icons';
+import { armorySkinArt } from '../../woc_store_view';
 import {
   buildGuildHallView,
-  GUILD_OFFER_DEED_IDS,
   type GuildContractCardView,
   type GuildHallTab,
   type GuildHallView,
   guildResetText,
+  guildShopInput,
   lanternSeals,
 } from './guild_hall_view';
+import { GuildOfferStage } from './guild_offer_stage';
 import {
+  type GuildShopArt,
   type GuildShopDetailView,
   type GuildShopItemView,
+  guildShopOwnedFlags,
   guildShopTooltip,
 } from './guild_quartermaster_view';
 
@@ -50,6 +55,9 @@ export interface GuildHallWindowDeps {
   restoreFocus(target: HTMLElement | null): void;
   /** The HUD's shared hover card (Hud.attachTooltip); absent in a bare test mount. */
   attachTooltip?(el: HTMLElement, html: () => string): void;
+  /** Mount Hud's shared character turntable into a stage, holding a weapon appearance
+   *  (Hud.mountCharPreview's try-on); absent in a bare test mount. */
+  tryOnWeaponSkin?(stage: HTMLElement, skinId: string): void;
 }
 
 export class GuildHallWindow {
@@ -60,8 +68,15 @@ export class GuildHallWindow {
   private lastSig = '';
   private lastMinute = -1;
   private openerFocus: HTMLElement | null = null;
+  /** The selected horse's or appearance's live 3D stage (kept across rebuilds). */
+  private readonly stage: GuildOfferStage;
 
-  constructor(private readonly deps: GuildHallWindowDeps) {}
+  constructor(private readonly deps: GuildHallWindowDeps) {
+    this.stage = new GuildOfferStage({
+      world: () => deps.world(),
+      tryOnWeaponSkin: deps.tryOnWeaponSkin,
+    });
+  }
 
   get isOpen(): boolean {
     return this.opened;
@@ -85,20 +100,22 @@ export class GuildHallWindow {
   close(): void {
     if (!this.opened) return;
     this.opened = false;
+    this.stage.hide();
     this.deps.root().style.display = 'none';
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
   }
 
-  // The repaint signature: the board and progress, the seals, the titles owned, the tab and
-  // the selected card; the countdown updates its own text on its minute cadence below, so it
-  // stays out of it.
+  // The repaint signature: the board and progress, the seals, the offers owned (a title, the
+  // horse, an appearance), the tab and the selected card; the countdown updates its own text
+  // on its minute cadence below, so it stays out of it.
   private sig(): string {
     const world = this.deps.world();
-    const owned = GUILD_OFFER_DEED_IDS.map((id) => world.deedsEarned.has(id));
+    const seals = lanternSeals(world.inventory);
+    const owned = guildShopOwnedFlags(guildShopInput(world, seals));
     return JSON.stringify([
       world.guildContracts,
-      lanternSeals(world.inventory),
+      seals,
       owned,
       world.weeklyQuestResetAtMs,
       this.tab,
@@ -190,6 +207,7 @@ export class GuildHallWindow {
       `<p class="gh-intro">${esc(view.intro)}</p>` +
       body +
       `</div>`;
+    this.placeStage(root, view);
     this.wire(root, world, view);
     const target =
       focus === 'open' ? '[data-close]' : focus === 'tab' ? `[data-gh-tab="${this.tab}"]` : keep;
@@ -200,6 +218,22 @@ export class GuildHallWindow {
     if (pressed && twin) twin.dataset.suppressFocusTooltip = 'true';
     // a control the rebuild disabled (a title just bought) hands focus to Close
     restoreFirstEnabled([twin, root.querySelector<HTMLButtonElement>('[data-close]')]);
+  }
+
+  /** Stage the selected horse or appearance in the rebuilt detail's slot, or leave the stage
+   *  (a title, the contracts tab, an empty stock). */
+  private placeStage(root: HTMLElement, view: GuildHallView): void {
+    const detail = this.tab === 'quartermaster' ? view.shop.detail : null;
+    const slot = root.querySelector<HTMLElement>('[data-gh-stage-slot]');
+    if (!detail || detail.stage.kind === 'plate' || !slot) {
+      this.stage.hide();
+      return;
+    }
+    this.stage.show(
+      slot,
+      detail.stage,
+      t('hudChrome.guildHall.shop.stageLabel', { name: detail.name }),
+    );
   }
 
   private wire(root: HTMLElement, world: IWorld, view: GuildHallView): void {
@@ -313,7 +347,7 @@ export class GuildHallWindow {
   private itemHtml(item: GuildShopItemView): string {
     return (
       `<button type="button" class="gh-item gh-item-${item.state}${item.selected ? ' gh-item-selected' : ''}" data-gh-offer="${esc(item.id)}" aria-pressed="${item.selected}">` +
-      `<span class="gh-slot"><img src="${esc(iconDataUrl('crest', item.crestId, CARD_CREST_PX))}" alt=""></span>` +
+      `<span class="gh-slot gh-slot-${item.art.kind}">${this.artHtml(item.art, CARD_CREST_PX)}</span>` +
       `<span class="gh-item-text"><span class="gh-item-kind">${esc(item.kindLabel)}</span>` +
       `<span class="gh-item-name">${esc(item.name)}</span>` +
       `<span class="gh-tag">${this.sealIcon('gh-tag-icon')}<span aria-hidden="true">${esc(item.priceValue)}</span><span class="visually-hidden">${esc(item.price)}</span></span></span>` +
@@ -325,14 +359,12 @@ export class GuildHallWindow {
   private detailHtml(detail: GuildShopDetailView): string {
     return (
       `<section class="gh-detail-pane gh-detail-${detail.state}" aria-labelledby="gh-detail-name">` +
-      `<div class="gh-detail-head"><span class="gh-slot gh-slot-large"><img src="${esc(iconDataUrl('crest', detail.crestId, DETAIL_CREST_PX))}" alt=""></span>` +
+      `<div class="gh-detail-head"><span class="gh-slot gh-slot-large gh-slot-${detail.art.kind}">${this.artHtml(detail.art, DETAIL_CREST_PX)}</span>` +
       `<div><div class="gh-item-kind">${esc(detail.kindLabel)}</div><h3 class="gh-detail-name" id="gh-detail-name">${esc(detail.name)}</h3></div></div>` +
-      `<div class="gh-plate-stage"><div class="gh-plate-heading">${esc(detail.plateHeading)}</div>` +
-      `<div class="gh-plate">${detail.platePre ? `<span class="gh-plate-title">${esc(detail.platePre)}</span>` : ''}` +
-      `<span class="gh-plate-name">${esc(detail.plateName)}</span>` +
-      `${detail.platePost ? `<span class="gh-plate-title">${esc(detail.platePost)}</span>` : ''}</div></div>` +
+      this.stageHtml(detail) +
+      (detail.summary ? `<p class="gh-detail-summary">${esc(detail.summary)}</p>` : '') +
       `<p class="gh-detail-text">${esc(detail.howTo)}</p>` +
-      `<p class="gh-detail-note">${esc(detail.cosmetic)}</p>` +
+      (detail.cosmetic ? `<p class="gh-detail-note">${esc(detail.cosmetic)}</p>` : '') +
       `<div class="gh-buybar"><div class="gh-buy-price"><span class="gh-tag gh-tag-large">${this.sealIcon('gh-tag-icon')}<span aria-hidden="true">${esc(detail.priceValue)}</span></span>` +
       `<span class="visually-hidden">${esc(detail.priceText)}</span><span class="gh-have">${esc(detail.haveText)}</span></div>` +
       `<button type="button" class="gh-btn gh-buy" data-gh-buy="${esc(detail.id)}"${detail.shortText ? ' aria-describedby="gh-short"' : ''}${detail.actionEnabled ? '' : ' disabled'}>${esc(detail.action)}</button></div>` +
@@ -341,14 +373,39 @@ export class GuildHallWindow {
     );
   }
 
+  /** The preview: a title's nameplate in text, or the slot the live 3D stage drops into. */
+  private stageHtml(detail: GuildShopDetailView): string {
+    const stage = detail.stage;
+    if (stage.kind !== 'plate') {
+      return (
+        `<div class="gh-plate-stage gh-model-stage"><div class="gh-plate-heading">${esc(stage.heading)}</div>` +
+        `<div class="gh-stage-slot" data-gh-stage-slot></div></div>`
+      );
+    }
+    return (
+      `<div class="gh-plate-stage"><div class="gh-plate-heading">${esc(stage.heading)}</div>` +
+      `<div class="gh-plate">${stage.pre ? `<span class="gh-plate-title">${esc(stage.pre)}</span>` : ''}` +
+      `<span class="gh-plate-name">${esc(stage.name)}</span>` +
+      `${stage.post ? `<span class="gh-plate-title">${esc(stage.post)}</span>` : ''}</div></div>`
+    );
+  }
+
+  /** A card's art: the title's Book of Deeds crest, the reins' icon, the appearance's
+   *  Armory card (decorative: the name beside it says what it is). */
+  private artHtml(art: GuildShopArt, crestPx: number): string {
+    const url =
+      art.kind === 'crest'
+        ? iconDataUrl('crest', art.id, crestPx)
+        : art.kind === 'item'
+          ? itemImageUrl(art.itemId)
+          : armorySkinArt(art.skinId);
+    return url ? `<img src="${esc(url)}" alt="" decoding="async">` : '';
+  }
+
   /** A stock card's hover card, through the shared tooltip's classes. */
   private offerTipHtml(offerId: string): string {
     const world = this.deps.world();
-    const tip = guildShopTooltip(offerId, {
-      seals: lanternSeals(world.inventory),
-      playerName: world.player.name,
-      deedsEarned: world.deedsEarned,
-    });
+    const tip = guildShopTooltip(offerId, guildShopInput(world, lanternSeals(world.inventory)));
     if (!tip) return '';
     return (
       `<div class="tt-title">${esc(tip.title)}</div>` +

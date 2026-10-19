@@ -62,7 +62,6 @@ import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
-import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
@@ -888,6 +887,7 @@ import {
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
+import { selfPreviewSubject } from './self_preview_subject';
 import { localizeServerText } from './server_i18n';
 import {
   localizeAuthoredYellSpeakerName,
@@ -5574,6 +5574,14 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#guild-hall-window'),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
+    tryOnWeaponSkin: (stage, skinId) =>
+      this.mountCharPreview(
+        stage,
+        this.sim.cfg.playerClass,
+        this.sim.player.skin ?? 0,
+        undefined,
+        skinId,
+      ),
     ...this.windowFocus('#guild-hall-window'),
   });
   // Ashen Coliseum window painter (arena_window_view.ts offline/live model +
@@ -16242,38 +16250,12 @@ export class Hud {
     cls: PlayerClass,
     skin: number,
     previewKey?: string,
+    tryOnSkinId: string | null = null,
   ): void {
-    const mainhand = this.sim.equipment.mainhand ?? null;
-    // The sheet shows the body the WORLD draws, read through the same look
-    // seam the portrait uses: the player's own face, hair and kit, including
-    // the helmet-visibility choice. A Combat Mech is a whole replacement body
-    // and wins over the authored look, matching createCharacterVisual's own
-    // precedence in-world (composing over it hid a purchased cosmetic).
-    const look = previewKey === 'player_mech' ? null : modularLookFor(this.sim.player);
-    const app = this.sim.player.modularAppearance;
-    this.mountSharedPreview(container, {
-      cls,
-      skin,
-      // A WOC body follows the creation pick and wears its head, colours, size; mech stays.
-      previewKey:
-        previewKey === 'player_mech' ? previewKey : (wocPreviewKey(cls, app) ?? previewKey),
-      wocAppearance: previewKey === 'player_mech' ? undefined : app,
-      look,
-      // A WOC body wears what the sheet's own slots hold, helm eye included.
-      wornEquipment: this.sim.equipment,
-      helmHidden: this.sim.player.helmHidden,
-      mainhand,
-      offhand: this.sim.equipment.offhand ?? null,
-      // The paperdoll wears the world's Armory skin: one shared rule (class + hands + loadout).
-      weaponSkinId: resolveActiveWeaponSkin(
-        cls,
-        mainhand,
-        this.sim.accountCosmetics.weaponSkinLoadout,
-        this.sim.player.skinCatalog ?? 'class',
-        this.sim.equipment.offhand ?? null,
-      ),
-      framing: 'sheet',
-    });
+    this.mountSharedPreview(
+      container,
+      selfPreviewSubject(this.sim, cls, skin, previewKey, tryOnSkinId),
+    );
   }
 
   /** Mount the shared turntable into the inspect stage showing the INSPECTED

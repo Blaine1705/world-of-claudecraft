@@ -549,7 +549,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 18021 by Lantern Hall's guild window, merged over the v0.45.0 integration:
     // the tooltip's weapon-proc effect text moved to weapon_proc_text.ts, paying for the
     // window's wiring. wc -l on the merged tree, exact count.
-    ceiling: 18021,
+    // LOWERED 18021 -> 18003 by the quartermaster's 3D try-on: the self sheet's preview
+    // subject moved to self_preview_subject.ts, paying for the try-on's wiring. wc -l, exact.
+    ceiling: 18003,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1045,7 +1047,12 @@ const MONOLITHS: MonolithRow[] = [
     // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
     // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
     // merged tree. Exact count.
-    ceiling: 12405,
+    // LOWERED 12405 -> 12381 at the merge of feature/lantern-hall-steed into
+    // feature/highwatch-adventurers-guild: Lantern Hall's steed and sword folded the three
+    // fiesta wrappers into one per-frame call (one host instead of three), net of the
+    // weapon-skin swing trail's one-line hook (weapon_skin_trail_core.ts). wc -l on the
+    // merged tree. Exact count.
+    ceiling: 12381,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

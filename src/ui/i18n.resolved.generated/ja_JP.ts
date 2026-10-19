@@ -679,17 +679,27 @@ export const ja_JP: EnTranslations = {
       "open": "未達成",
       "lifetime": "達成した契約：{count}",
       "emptyBoard": "掲示板は書き換え中だ。週次リセットの後にまた来てほしい。",
-      "quartermasterIntro": "ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号だ。ここにあなたを強くするものは何もない。",
+      "quartermasterIntro": "ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの武器の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。",
       "titleOffer": "称号：{title}",
       "titlePreview": "表示：{preview}",
+      "mountOffer": "マウント：{mount}",
+      "mountPreview": "地上マウント：騎乗中の移動速度+{pct}%。騎乗訓練が必要。",
+      "skinOffer": "剣の外見：{skin}",
+      "skinPreview": "装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。",
+      "staffSkinOffer": "杖の外見：{skin}",
+      "staffSkinPreview": "装備中の杖の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。",
       "buy": "購入",
       "owned": "所持済み",
       "needSeals": "あと{count}個必要",
       "bought": "称号「{title}」を購入した。功績の書で選択できる。",
+      "boughtMount": "{mount}を購入した。手綱はバッグの中にある。",
+      "boughtSkin": "外見「{skin}」を購入した。コスメティックのウィンドウから適用できる。",
       "refused": {
         "owned": "それはすでに所持している。",
         "seals": "燈火の印章が足りない。",
-        "range": "取引するには補給係のそばに立つこと。"
+        "range": "取引するには補給係のそばに立つこと。",
+        "riding": "マウントを買う前に騎乗を学ぶこと。",
+        "bags": "バッグがいっぱいだ。"
       },
       "board": {
         "noticesLabel": "今週の契約",
@@ -703,7 +713,18 @@ export const ja_JP: EnTranslations = {
       "shop": {
         "stockLabel": "ギャリック・ホルトの品揃え",
         "kindTitle": "称号",
+        "kindMount": "マウント",
+        "kindSword": "剣の外見",
+        "kindStaff": "杖の外見",
         "plateHeading": "あなたのネームプレート",
+        "mountHeading": "鞍にまたがるあなた",
+        "skinHeading": "あなたの手に",
+        "stageLabel": "{name}の3Dプレビュー",
+        "stageUnavailable": "この端末では3Dプレビューを表示できない。",
+        "mountHowTo": "購入すると手綱がバッグに入る。手綱を使えば騎乗でき、手綱を持っている限りこの馬はあなたのものだ。",
+        "mountOwned": "このマウントは所持済みだ。手綱はバッグの中にある。",
+        "skinHowTo": "購入後、外見ウィンドウで適用する。アカウントのすべてのキャラクターで使える。",
+        "skinOwned": "この外見は所持済みだ。外見ウィンドウで適用できる。",
         "howTo": "購入後、功績の書で選ぶと名前と一緒に表示される。",
         "cosmetic": "見た目のみ：能力値は変わらない。",
         "price": "価格：{price}",
@@ -1176,9 +1197,35 @@ export const ja_JP: EnTranslations = {
         "guildmark": "ギルドマーク",
         "emberwrought": "残り火鍛造",
         "hoarfrost": "白霜",
-        "fallen_star": "墜星"
+        "fallen_star": "墜星",
+        "lantern_hall": "燈火の館"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "燈火の館の剣",
+          "look": "樋に灯火の炎を宿した幅広の鋼の刃、金の鍔飾り、鍔に灯る籠入りのランタン、青い革の柄。",
+          "lore": "ギャリック・ホルトはこの剣を見知らぬ者には売らない。週ごとに燈火の館の契約を果たしてきた者にだけ渡し、そのたびに同じ言葉を添える。鍔のランタンは館の炉から灯したもの、どこへ持って行こうと館が共にある、と。樋の炎は見た目にすぎない。大切なのは約束だ。"
+        },
+        "hearthbrand_sword": {
+          "name": "炉火の剣",
+          "look": "鍛冶の熱を帯びた両刃と、両面を枝分かれして走る溶けた継ぎ目を持つ、黒ずんだ鋼の炎形の刃。燃える石を囲む青銅の炎の鍔、牛血色の柄。",
+          "lore": "燈火の館には、館が建って以来一度も消えたことのない炉がある。ギャリック・ホルトは、この刃はその熾火で焼き入れされたと言い張る。これを携える者たちは、どれほど寒い夜番でも柄は温かいままだと言う。刃に沿う炎は見た目にすぎない。"
+        },
+        "squallcrest_sword": {
+          "name": "嵐波の剣",
+          "look": "砕ける波のように輝く刃縁を持つ海青色の長い刃。枝分かれした稲妻を宿す嵐の溝、刃元を越える金の波、片側の刃縁に沿うひれ、嵐の真珠を囲む金の砕け波の鍔。",
+          "lore": "ギルドのために航海したある船長が、帆柱を奪い船を鐘のように鳴り響かせた嵐からこの刃を持ち帰った。ギャリックは印章と引き換えにしか売らず、買う者には必ず、嵐の前にはうなるぞと忠告する。稲妻と海の光は見た目にすぎない。"
+        },
+        "rimelight_staff": {
+          "name": "霧氷灯の杖",
+          "look": "銀で締められ、光る霧氷が巻きつく淡い柄。頂には氷の破片の冠の中で冷たい光の大きな結晶をつかむ銀の爪があり、襟からはつららが垂れる。",
+          "lore": "燈火の館の冬の見張りは、このような杖を携えて高い街道を歩き、雪に迷う旅人のために頂を灯した。ギャリックは印章に余裕のある者のために一本を棚に置いている。霜とその冷たい光は見た目にすぎない。"
+        },
+        "duskwick_staff": {
+          "name": "黄昏灯芯の杖",
+          "look": "鉄で締められた二本のねじれた黒い木の柄。頂には二本の巻いた角の間で紫の黄昏の炎を燃やす吹き抜けの鉄のランタンがあり、その底から鎖が揺れる。",
+          "lore": "館のランタンはどれも明るく燃える、ただ一つを除いて。黄昏の炎は夜の館を守るために灯されたもので、ほかのランタンが光を放つところで影を放つ。ギャリックはその芯を自ら切りそろえる。煙と紫の輝きは見た目にすぎない。"
+        },
         "guildmark_arming_sword": {
           "name": "ギルドマーク・アーミングソード",
           "look": "青焼き鋼の刀身、青銅の魚尾型クロスガード、青緑に染めた革巻きの柄、小さく刻印されたギルドの紋章。",
@@ -2302,6 +2349,7 @@ export const ja_JP: EnTranslations = {
       "name_avian_strider": "ヴィリジアン・ヴェイルストライダー",
       "name_mech_bird": "ゼンマイ・メカバード",
       "name_lanternback_troll": "ランタンバックのグルンボル",
+      "name_lantern_hall_destrier": "燈火の館の軍馬",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
@@ -2321,6 +2369,7 @@ export const ja_JP: EnTranslations = {
       "desc_avian_strider": "巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。",
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
+      "desc_lantern_hall_destrier": "燈火の館の軍馬。ギルドの青の下に樫と鉄の馬鎧をまとい、鞍から揺れる二つの嵐灯が帰り道を照らす。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
     },
@@ -6954,6 +7003,7 @@ export const ja_JP: EnTranslations = {
       "sourceActivityMasterworkCraft": "傑作の製作で入手",
       "sourceActivityRiftFirstClear": "ランク付きリフトの初回クリアを制したパーティーの全員に授与",
       "sourceActivityBuriedHoard": "宝の地図が導く「埋もれた財宝」の報酬の宝箱から手に入る",
+      "sourceActivityLanternHall": "燈火の館の補給係から燈火の印章で購入",
       "cellMissingSourceAria": "{name}、未発見、{source}",
       "cellOwnedClearsAria": "{name}、収蔵済み、初回入手はクリア {count} 回目",
       "searchPlaceholder": "聖遺物を検索",
@@ -23560,6 +23610,9 @@ export const ja_JP: EnTranslations = {
       },
       "lantern_seal": {
         "name": "燈火の印章"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "燈火の館の軍馬の手綱"
       },
       "wyrmfall_core": {
         "name": "竜墜の核"

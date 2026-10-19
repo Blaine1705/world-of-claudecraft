@@ -3,11 +3,11 @@
 // reset countdown; the quartermaster's counter is its sibling core (guild_quartermaster_view.ts).
 // DOM-free; the painter (guild_hall_window.ts) renders exactly what this shapes. Reads the world
 // only through the IWorld members it names (guildContracts, inventory, deedsEarned, the weekly
-// reset, the player's name), so a test drives it with a plain object.
+// reset, the player's name, and for the counter the held mounts and the account's weapon skins),
+// so a test drives it with a plain object.
 
 import {
   GUILD_CONTRACTS_BY_ID,
-  GUILD_QUARTERMASTER_STOCK,
   type GuildContractDef,
   type GuildContractKind,
 } from '../../../sim/content/guild_contracts';
@@ -20,6 +20,7 @@ import { dungeonDisplayName } from '../../entity_i18n';
 import { formatList, formatNumber, t } from '../../i18n';
 import {
   buildGuildShopView,
+  type GuildShopInput,
   type GuildShopView,
   lanternSeals,
   sealCount,
@@ -33,6 +34,8 @@ export interface GuildHallWorld {
   readonly guildContracts: GuildContractsView;
   readonly inventory: readonly InvSlot[];
   readonly deedsEarned: ReadonlyMap<string, string>;
+  ownedMounts(): readonly string[];
+  readonly accountCosmetics: { readonly weaponSkinIds: readonly string[] };
   readonly weeklyQuestResetAtMs: number;
   readonly player: { readonly name: string };
 }
@@ -147,10 +150,17 @@ export function guildContractLabel(contractId: string): string {
   });
 }
 
-/** The deed ids the quartermaster sells, for the window's repaint signature. */
-export const GUILD_OFFER_DEED_IDS: readonly string[] = GUILD_QUARTERMASTER_STOCK.map(
-  (offer) => offer.deedId,
-);
+/** What the quartermaster's counter reads from the world: the seals, the name its nameplate
+ *  preview wears, and the three ledgers its offers can already be owned in. */
+export function guildShopInput(world: GuildHallWorld, seals: number): GuildShopInput {
+  return {
+    seals,
+    playerName: world.player.name,
+    deedsEarned: world.deedsEarned,
+    ownedMounts: world.ownedMounts(),
+    weaponSkinIds: world.accountCosmetics.weaponSkinIds,
+  };
+}
 
 export function buildGuildHallView(
   world: GuildHallWorld,
@@ -191,9 +201,6 @@ export function buildGuildHallView(
       total: whole(contracts.length),
     }),
     weekProgressAria: t('hudChrome.guildHall.board.weekProgressAria'),
-    shop: buildGuildShopView(
-      { seals, playerName: world.player.name, deedsEarned: world.deedsEarned },
-      selectedOffer,
-    ),
+    shop: buildGuildShopView(guildShopInput(world, seals), selectedOffer),
   };
 }

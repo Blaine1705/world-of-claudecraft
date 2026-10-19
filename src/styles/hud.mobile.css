@@ -5638,6 +5638,11 @@
   body.mobile-touch #guild-hall-window .gh-item {
     min-height: 64px;
   }
+  /* the phone's 3D stage: short enough that the buy bar stays in reach under it */
+  body.mobile-touch #guild-hall-window .gh-stage-slot,
+  body.mobile-touch #guild-hall-window .gh-stage {
+    height: 180px;
+  }
   /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
      the viewport so a long board never runs the window past the bottom edge. */
   body.mobile-touch #leaderboard-window,

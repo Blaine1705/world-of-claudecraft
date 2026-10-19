@@ -859,7 +859,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // The restored legacy whistle and charm definitions add 36 item ids.
     // Five referral rewards reuse existing art while their own paintings are pending.
     // +1: Lantern Hall's Lantern Seal (its own generated batch and owner).
-    expect(Object.keys(ITEMS)).toHaveLength(2211);
+    // +1: Lantern Hall's horse reins (its own rendered batch and owner).
+    expect(Object.keys(ITEMS)).toHaveLength(2212);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1085,12 +1086,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // integration: 1,890 owners over 2,043 items.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005, 2169.
     // Buddy provenance contributes 34 additional owners.
-    expect(new Set(currentOwnerIds).size).toBe(2040);
-    expect(shippingIds).toHaveLength(2040);
+    expect(new Set(currentOwnerIds).size).toBe(2041);
+    expect(shippingIds).toHaveLength(2041);
     // The restored legacy whistle and charm definitions add 36 item ids.
     // Five referral rewards reuse existing art while their own paintings are pending.
     // +1: Lantern Hall's Lantern Seal (its own generated batch and owner).
-    expect(Object.keys(ITEMS)).toHaveLength(2211);
+    expect(Object.keys(ITEMS)).toHaveLength(2212);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1348,6 +1349,8 @@ describe('item-art consistency accepted-art provenance', () => {
               'lower-dungeon-blues-icons-2026-10-08',
               // Lantern Hall's guild currency (the Blender-rendered seal).
               'lantern-hall-seal-2026-10-16',
+              // ...and its war horse's reins (the Blender-rendered portrait).
+              'lantern-hall-destrier-reins-2026-10-16',
             ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1527,7 +1530,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // bring it to 51 on the v0.45.0 integration.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57.
     // Buddy whistle and charm provenance add two batches. Lantern Hall's seal adds one.
-    expect(mapping.generatedBatches).toHaveLength(60);
+    expect(mapping.generatedBatches).toHaveLength(61);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1603,16 +1606,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // and referral armour 7: 1345. The Mirefen world-boss branch's 15 batch ids: 1360.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
     // Buddy batches add 34 owner ids to the integration inventory.
-    // Lantern Hall's seal batch adds one: 1510.
-    expect(priorGeneratedIds).toHaveLength(1510);
+    // Lantern Hall's seal batch adds one: 1510. Its horse's reins batch one more: 1511.
+    expect(priorGeneratedIds).toHaveLength(1511);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    expect(allCurrentOwnerIds).toHaveLength(2040);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2040);
+    expect(allCurrentOwnerIds).toHaveLength(2041);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2041);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1633,7 +1636,7 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Mirefen world-boss branch's 15 = 1360.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
       // Plus 34 restored buddy provenance owners.
-      priorGenerated: 1510, // +1 Lantern Hall's seal
+      priorGenerated: 1511, // +1 Lantern Hall's seal, +1 its horse's reins
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1744,6 +1747,7 @@ describe('item-art consistency accepted-art provenance', () => {
                 'lower-dungeon-blues-icons-2026-10-08',
                 // Lantern Hall's guild currency (the Blender-rendered seal).
                 'lantern-hall-seal-2026-10-16',
+                'lantern-hall-destrier-reins-2026-10-16',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1915,9 +1919,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    if (ownerIds.length !== 2040)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2040`);
-    if (fileIds.length !== 2040) violations.push(`shipping WebP count: ${fileIds.length} != 2040`);
+    if (ownerIds.length !== 2041)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2041`);
+    if (fileIds.length !== 2041) violations.push(`shipping WebP count: ${fileIds.length} != 2041`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

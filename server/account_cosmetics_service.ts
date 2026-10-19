@@ -9,6 +9,7 @@
 import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import type { GuildAccountPort } from '../src/sim/guild_quartermaster';
 import type { Entity, SkinCatalog, WeaponSkinLoadout, WeaponSkinType } from '../src/sim/types';
 import type { AccountCosmetics } from '../src/world_api';
 import {
@@ -114,6 +115,44 @@ export class AccountCosmeticsService {
     void grantAccountMechChroma(session.accountId, chromaId)
       .then((cosmetics) => this.updateLive(session.accountId, cosmetics))
       .catch((err) => console.error('failed to save account mech chroma:', err));
+  }
+
+  /** An earned weapon skin (Lantern Hall's quartermaster): owned on the session at once, so a
+   *  second purchase in the same breath is refused as owned, then mirrored into the
+   *  rollback-safe account_weapon_cosmetics row (an additive union the store reconciliation
+   *  never removes from), the same shape as noteMechChroma. */
+  noteWeaponSkin(session: CosmeticsSession, skinId: string): void {
+    const current = session.accountCosmetics;
+    if (!current.weaponSkinIds.includes(skinId)) {
+      this.updateLive(session.accountId, {
+        ...current,
+        weaponSkinIds: [...current.weaponSkinIds, skinId],
+      });
+    }
+    void grantAccountWeaponSkins(session.accountId, [skinId])
+      .then((cosmetics) => {
+        // a grant changes ownership, never the weapon loadout edited meanwhile
+        const live = this.byAccount.get(session.accountId);
+        this.updateLive(
+          session.accountId,
+          live ? { ...cosmetics, weaponSkinLoadout: live.weaponSkinLoadout } : cosmetics,
+        );
+      })
+      .catch((err) => console.error('failed to save earned weapon skin:', err));
+  }
+
+  /** Lantern Hall's quartermaster's view of the acting session's account ledger
+   *  (src/sim/guild_quartermaster.ts GuildAccountPort): ownership read from THIS session's
+   *  cosmetics, never the realm-wide sim mirror, and the grant through noteWeaponSkin. */
+  ledger(session: CosmeticsSession): GuildAccountPort {
+    return {
+      ownsWeaponSkin: (skinId) => session.accountCosmetics.weaponSkinIds.includes(skinId),
+      grantWeaponSkin: (skinId) => {
+        if (!WEAPON_SKINS[skinId]) return false;
+        this.noteWeaponSkin(session, skinId);
+        return true;
+      },
+    };
   }
 
   /**

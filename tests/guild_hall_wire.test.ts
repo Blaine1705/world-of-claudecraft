@@ -22,6 +22,12 @@ describe('the quartermaster purchase on the wire', () => {
       'title_writ_runner',
       'title_hallsworn',
       'title_of_lantern_hall',
+      'weapon_skin_lantern_hall_sword',
+      'weapon_skin_hearthbrand_sword',
+      'weapon_skin_squallcrest_sword',
+      'weapon_skin_rimelight_staff',
+      'weapon_skin_duskwick_staff',
+      'mount_lantern_hall_destrier',
     ]);
     const client = bareClient(7);
     const send = vi.fn();
@@ -33,14 +39,16 @@ describe('the quartermaster purchase on the wire', () => {
     });
     const buy = vi.fn();
     const sim = { buyGuildCosmetic: buy } as unknown as Sim;
-    dispatchWorldQuestWire(sim, send.mock.calls[0][0], 7);
-    expect(buy).toHaveBeenCalledExactlyOnceWith('title_hallsworn', 7);
+    // the server threads the acting session's account port through to the sim
+    const port = { ownsWeaponSkin: () => false, grantWeaponSkin: () => true };
+    dispatchWorldQuestWire(sim, send.mock.calls[0][0], 7, port);
+    expect(buy).toHaveBeenCalledExactlyOnceWith('title_hallsworn', 7, port);
     for (const offer of [undefined, null, 3, {}, ['title_hallsworn'], 'x'.repeat(65)])
       buyGuildCosmeticWire(sim, { cmd: 'guild_buy_cosmetic', offer } as never, 7);
     expect(buy).toHaveBeenCalledTimes(1);
     // the longest id the validator still passes
     buyGuildCosmeticWire(sim, { cmd: 'guild_buy_cosmetic', offer: 'y'.repeat(64) } as never, 7);
-    expect(buy).toHaveBeenLastCalledWith('y'.repeat(64), 7);
+    expect(buy).toHaveBeenLastCalledWith('y'.repeat(64), 7, undefined);
   });
 });
 

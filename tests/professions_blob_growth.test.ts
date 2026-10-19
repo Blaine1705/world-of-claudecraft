@@ -2009,10 +2009,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(state.bank).toEqual(baseline.bank);
     const bytes = Buffer.byteLength(JSON.stringify(state));
     const baselineBytes = Buffer.byteLength(JSON.stringify(baseline));
-    // +251 with Lantern Hall's content in the maximal character (the receipt delta holds).
-    expect(baselineBytes).toBe(258621);
+    // +251 with Lantern Hall's content in the maximal character (the receipt delta holds),
+    // +30 with its horse's reins id in itemsDiscovered.
+    expect(baselineBytes).toBe(258651);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(266905);
+    expect(bytes).toBe(266935);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
