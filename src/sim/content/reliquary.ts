@@ -353,8 +353,9 @@ const MOUNT_SOURCES: Readonly<
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
   drakemaw_raptor: fromBoss('balgath_cyclops'),
-  // Hester sells it for five Emberwoven Sheaves (one per daily Old Thatchgrin kill).
-  emberbristle_broom: fromVendor('gourdlight_keeper'),
+  // Hester sells it for five Emberwoven Sheaves (one per daily Old Thatchgrin kill), and
+  // since round 10 Old Thatchgrin himself rarely drops it on a daily looted kill.
+  emberbristle_broom: [fromVendor('gourdlight_keeper'), fromBoss('gourdlight_thatchgrin')],
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS

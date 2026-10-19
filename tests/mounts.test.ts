@@ -296,14 +296,17 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
       if (REFERRAL_REWARD_MOUNTS.includes(key)) continue; // transactional milestone delivery, referral_rewards.test.ts
       const itemId = mountItemId(key)!;
-      // SEASONAL KEEPSAKE: the Emberbristle Broom rides NO mob table. Hester sells it
-      // for five Emberwoven Sheaves, the token Old Thatchgrin (a world boss: personal
-      // loot, daily lockout) pays once a day to a character who does not keep the
-      // broom, so it takes five days. Event-bound, so it cannot be kept past Gourdlight
-      // Eve, and it is no faster than the horse.
+      // SEASONAL KEEPSAKE: Hester sells the Emberbristle Broom for five Emberwoven
+      // Sheaves, the token Old Thatchgrin (a world boss: personal loot, daily lockout)
+      // pays once a day to a character who does not keep the broom, so it takes five
+      // days; since round 10 HIS table alone also carries it as a rare (3%) personal
+      // draw, never to a keeper (the world-boss shape the Raptor rides above). Event-
+      // bound, so it cannot be kept past Gourdlight Eve, and no faster than the horse.
       if (itemId === 'reins_emberbristle_broom') {
         const holders = Object.values(MOBS).filter((m) => m.loot.some((l) => l.itemId === itemId));
-        expect(holders).toEqual([]);
+        expect(holders.map((m) => m.id)).toEqual(['gourdlight_thatchgrin']);
+        const drop = MOBS.gourdlight_thatchgrin.loot.find((l) => l.itemId === itemId);
+        expect(drop).toEqual({ itemId, chance: 0.03, unlessOwned: true });
         expect(NPCS.gourdlight_keeper.vendorItems).toContain(itemId);
         expect(ITEMS[itemId].priceItem).toEqual({ itemId: 'emberwoven_sheaf', count: 5 });
         const sheaf = MOBS.gourdlight_thatchgrin.loot.find((l) => l.itemId === 'emberwoven_sheaf');

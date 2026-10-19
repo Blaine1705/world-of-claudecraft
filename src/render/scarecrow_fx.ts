@@ -23,17 +23,24 @@
 // the renderer ticks, scans entities for and routes spellfxAt to.
 //
 // GPU work: every falling pumpkin (and the gourd thrown at the sky) is one instance of a
-// pooled InstancedMesh per part of the decor kit's small carved pumpkin, the instanced
-// program variant the decor view already links behind its gate (seasonal_decor.ts), and
-// their fire comets are one more pooled InstancedMesh. The comet, the patch disc, the halo
+// pooled InstancedMesh per part of the decor kit's small carved pumpkin over its own purple
+// clones of the kit's materials (round 10: new program variants, linked by the pool's own
+// gated attach before the first fall), and their fire comets are one more pooled InstancedMesh. The comet, the patch disc, the halo
 // sprites and the shockwave ring are built with this layer's root (on the first sight of
 // him) and attached through the world compile gate (attachSceneGroupGated), each with a
 // hidden twin so its program links before its first use. Every particle rides the pooled
 // point cloud (vfx.ts). A rain reuses the pools (only a chaff patch builds its tiny disc).
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { resolveScarecrowField } from '../sim/seasonal/scarecrow_field';
 import type { SpatialAudioSink } from './audio_sink';
 import { attachSceneGroupGated } from './gated_scene_attach';
+import { pullDecalTowardCamera } from './ground_decal_pull';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import {
+  AWAKEN_HEAD_SEC,
+  AWAKEN_LAND_SEC,
+  AWAKEN_TEAR_SEC,
   bodyLocalToWorld,
   CHAFF_ABILITY,
   chaffFlameCalls,
@@ -47,6 +54,7 @@ import {
   GOURD_ABILITY,
   GOURD_HAND_LOCAL,
   GOURD_RELEASE_SEC,
+  GOURDFALL_PURPLE,
   GOURDFALL_WHISTLE_SFX,
   SUMMON_ABILITY,
   SUMMON_PEAK_SEC,
@@ -58,10 +66,17 @@ import {
   swellPulseInterval,
   swellScale,
   swellThrob,
+  THATCHGRIN_POLE,
   THATCHGRIN_TEMPLATE,
+  thatchgrinPoleAt,
 } from './scarecrow_fx_core';
 import { gourdlightAssets } from './seasonal_decor_assets';
-import { SeasonalToysFx, type ToyEntityLike, type ToyParticles } from './seasonal_toys_fx';
+import {
+  SeasonalToysFx,
+  type ToyBodyTint,
+  type ToyEntityLike,
+  type ToyParticles,
+} from './seasonal_toys_fx';
 import { ThatchboundFx } from './thatchbound_fx';
 
 /** The pooled particle calls this layer uses (vfx.ts). */
@@ -85,6 +100,8 @@ export interface ScarecrowParticles extends ToyParticles {
 
 interface EntityLike extends ToyEntityLike {
   templateId: string;
+  /** In bed (mob/slumber.ts): by day he hangs on his pole. */
+  asleep?: boolean;
   castRemaining?: number;
   castTotal?: number;
   castingAbility?: string | null;
@@ -116,7 +133,9 @@ interface FallSlot {
 }
 
 interface Patch {
+  /** The dark underlay (normal blend) and the violet edge and embers over it (additive). */
   disc: THREE.Mesh;
+  glow: THREE.Mesh;
   x: number;
   y: number;
   z: number;
@@ -126,12 +145,22 @@ interface Patch {
   flameClock: number;
 }
 
-const SHARD_COLORS = [0xff8a1a, 0xffb347, 0xd9561a, 0xfff0a8] as const;
+/** The thrown pumpkins' shards: his witch-fire purple (round 10). */
+const SHARD_COLORS = GOURDFALL_PURPLE.fire;
+/** The Swelling Gourd's own shards stay its orange rind. */
+const SWELL_SHARD_COLORS = [0xff8a1a, 0xffb347, 0xd9561a, 0xfff0a8] as const;
 const PULP_COLORS = [0xfff0b0, 0xffd27a, 0xff9a2e, 0xe0761c] as const;
 const DIRT_COLORS = [0x5a4528, 0x7a6038, 0x3e2e1a] as const;
 const FEATHER_COLORS = [0x15141a, 0x24222b, 0x0a0a0d] as const;
 const STRAW_COLOR = 0xd8b25a;
 const CHAFF_DENSITY = 0.6;
+/** Blast rings at once (a full rain is nine landings) and each one's life. */
+const BLAST_CAP = 10;
+const BLAST_SEC = 0.75;
+const blastTint = new THREE.Color();
+/** How high a scorched patch is laid over the ground (its depth is pulled through the
+ *  stubble toward the eye: ground_decal_pull.ts). */
+const CHAFF_LIFT = 0.08;
 const SMOKE = 0x2a2420;
 /** Falling pumpkins at once (a full rain is nine, plus the gourd thrown up). */
 const FALL_CAP = 12;
@@ -247,11 +276,13 @@ function cometGeometry(): THREE.BufferGeometry {
   };
   // kept well under white: additive over a bright sky, a full-strength comet blows out to
   // a white stalk and the pumpkin inside it stops reading
-  paint(shell, () => [0.62, 0.22, 0.04]);
+  // round 10: his witch-fire, a deep violet comet (GOURDFALL_PURPLE)
+  // kept dim: additive violet over a bright sky blows out to pink very fast
+  paint(shell, () => [0.24, 0.04, 0.42]);
   paint(tail, (y) => {
     const t = Math.max(0, Math.min(1, (y - 0.2) / 7.5));
-    const k = (1 - t) ** 1.8;
-    return [0.7 * k, (0.3 - 0.18 * t) * k, 0.06 * k];
+    const k = (1 - t) ** 2.2;
+    return [(0.22 - 0.06 * t) * k, 0.03 * k, (0.42 - 0.08 * t) * k];
   });
   const merged = mergeTwo(shell, tail);
   shell.dispose();
@@ -278,6 +309,149 @@ function mergeTwo(a: THREE.BufferGeometry, b: THREE.BufferGeometry): THREE.Buffe
   return out;
 }
 
+/** One part of the decor kit's small carved pumpkin, re-dyed for his rain (round 10: the
+ *  pumpkins he throws are a dark witch-fire purple): its rind a deep plum, its carved face
+ *  and the candle inside a hot violet, its stem left as it is. A clone the pool owns, never
+ *  the kit's shared material (the decor's own pumpkins keep their orange). */
+function purpleGourdMaterial(source: THREE.Material): THREE.Material {
+  // the kit's glow parts carry their rim-shaping hook (seasonal_decor_assets.ts shapeGlow):
+  // keep it on the clone, so the purple face still reads as a lit shell
+  const m = cloneMaterialWithHooks(source) as THREE.Material & {
+    color?: THREE.Color;
+    emissive?: THREE.Color;
+    emissiveIntensity?: number;
+    vertexColors?: boolean;
+  };
+  const name = source.name ?? '';
+  if (/stem|leaf|vine/i.test(name)) return m;
+  if (/glow|inner|flesh/i.test(name)) {
+    m.color?.setHex(0x8a3cd6);
+    m.emissive?.setHex(GOURDFALL_PURPLE.glow);
+    if (m.emissiveIntensity !== undefined) m.emissiveIntensity = 1.8;
+  } else {
+    // the rind: the painted vertex orange would muddy any tint, so the plum stands alone
+    m.vertexColors = false;
+    m.color?.setHex(GOURDFALL_PURPLE.rind);
+    m.emissive?.setHex(0x2a0640);
+    if (m.emissiveIntensity !== undefined) m.emissiveIntensity = 0.6;
+  }
+  m.needsUpdate = true;
+  return m;
+}
+
+/** His pole (round 10): a weathered, split post driven into the stubble with a crossbar
+ *  lashed across it behind his shoulders, rope wound round the join, a rag of sackcloth
+ *  knotted to one arm of the bar and straw stuck in the lashings. In his own frame (local
+ *  +Z his forward, +X his left), foot at y = 0; vertex-coloured for one Lambert draw. */
+function poleGeometry(): THREE.BufferGeometry {
+  const P = THATCHGRIN_POLE;
+  const parts: THREE.BufferGeometry[] = [];
+  const paintParts = (
+    geo: THREE.BufferGeometry,
+    fn: (x: number, y: number, z: number) => number[],
+  ) => {
+    const g = geo.index ? geo.toNonIndexed() : geo;
+    g.deleteAttribute('uv');
+    g.computeVertexNormals();
+    const pos = g.getAttribute('position') as THREE.BufferAttribute;
+    const col = new Float32Array(pos.count * 3);
+    for (let i = 0; i < pos.count; i++) {
+      const [r, gg, b] = fn(pos.getX(i), pos.getY(i), pos.getZ(i));
+      col[i * 3] = r;
+      col[i * 3 + 1] = gg;
+      col[i * 3 + 2] = b;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    parts.push(g);
+  };
+  // grey-brown weathered wood, darker in its grain and cracks, lighter where the sun bleached it
+  const wood = (x: number, y: number, z: number) => {
+    const grain = 0.78 + 0.22 * Math.sin(y * 9 + Math.sin(x * 23 + z * 17) * 2);
+    const crack = Math.sin(Math.atan2(x, z) * 5 + y * 0.6) > 0.93 ? 0.55 : 1;
+    const k = grain * crack;
+    return [0.4 * k, 0.27 * k, 0.16 * k];
+  };
+  const post = new THREE.CylinderGeometry(0.26, 0.32, P.postTop + 0.35, 10, 6);
+  const pp = post.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < pp.count; i++) {
+    // a hand-hewn post: not quite straight, its top split and leaning
+    const y = pp.getY(i);
+    pp.setX(i, pp.getX(i) + 0.04 * Math.sin(y * 0.9));
+  }
+  post.translate(0, (P.postTop - 0.35) / 2, -P.postBack);
+  paintParts(post, wood);
+  const bar = new THREE.CylinderGeometry(0.17, 0.2, P.barHalf * 2, 9, 4);
+  const bp = bar.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < bp.count; i++) {
+    const y = bp.getY(i);
+    // it sags a touch either side of the lashing
+    bp.setZ(i, bp.getZ(i) + 0.05 * (y / P.barHalf) ** 2);
+  }
+  bar.rotateZ(Math.PI / 2);
+  bar.translate(0, P.barHeight, -P.barBack);
+  paintParts(bar, wood);
+  // the lashing: rope wound in an X round the join
+  const rope = (x: number, y: number, z: number) => {
+    const k = 0.8 + 0.2 * Math.sin((x + y + z) * 60);
+    return [0.62 * k, 0.5 * k, 0.3 * k];
+  };
+  for (const tilt of [0.6, -0.6]) {
+    const knot = new THREE.TorusGeometry(0.3, 0.045, 6, 18);
+    knot.rotateY(Math.PI / 2);
+    knot.rotateX(tilt);
+    knot.translate(0, P.barHeight, -P.barBack - 0.06);
+    paintParts(knot, rope);
+  }
+  for (const side of [1, -1]) {
+    const band = new THREE.TorusGeometry(0.2, 0.04, 6, 14);
+    band.rotateY(Math.PI / 2);
+    band.translate(side * (P.barHalf - 0.35), P.barHeight, -P.barBack);
+    paintParts(band, rope);
+  }
+  // a rag of sackcloth knotted to his right arm of the bar, hanging and torn
+  const rag = new THREE.PlaneGeometry(0.42, 0.95, 3, 6);
+  const rp = rag.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < rp.count; i++) {
+    const y = rp.getY(i);
+    rp.setZ(i, 0.06 * Math.sin(y * 7 + rp.getX(i) * 5));
+    if (y < -0.3) rp.setY(i, y - 0.08 * Math.abs(Math.sin(rp.getX(i) * 31)));
+  }
+  rag.translate(-(P.barHalf - 0.55), P.barHeight - 0.5, -P.barBack + 0.12);
+  paintParts(rag, (x, y) => {
+    const k = 0.75 + 0.25 * Math.sin(x * 40) * Math.sin(y * 37);
+    return [0.34 * k, 0.26 * k, 0.17 * k];
+  });
+  // straw stuck in the lashings and at the post's foot
+  const straw = (x: number, y: number, z: number) => {
+    const k = 0.8 + 0.2 * Math.sin((x * 3 + z * 7) * 11 + y);
+    return [0.86 * k, 0.68 * k, 0.32 * k];
+  };
+  for (let i = 0; i < 9; i++) {
+    const a = i * 0.7;
+    const stalk = new THREE.CylinderGeometry(0.012, 0.018, 0.55 + 0.1 * (i % 3), 4, 1);
+    stalk.rotateZ(0.9 * Math.sin(a) + (i % 2 ? 0.4 : -0.4));
+    stalk.rotateX(0.4 * Math.cos(a * 1.3));
+    stalk.translate(
+      0.12 * Math.cos(a),
+      P.barHeight + 0.05 * Math.sin(a),
+      -P.barBack + 0.1 * Math.sin(a * 2),
+    );
+    paintParts(stalk, straw);
+  }
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    const stalk = new THREE.CylinderGeometry(0.01, 0.016, 0.5 + 0.12 * (i % 4), 4, 1);
+    stalk.rotateZ(0.5 * Math.cos(a));
+    stalk.rotateX(0.5 * Math.sin(a));
+    stalk.translate(0.22 * Math.cos(a), 0.2, -P.postBack + 0.22 * Math.sin(a));
+    paintParts(stalk, straw);
+  }
+  const out = mergeGeometries(parts, false) ?? new THREE.BufferGeometry();
+  for (const g of parts) g.dispose();
+  out.computeBoundingSphere();
+  return out;
+}
+
 /** An entity's drawn scale: its own, times any body swell a fight layer puts on it (the
  *  rift death zone's bloat, the Swelling Gourd's ripening). The renderer's one call. */
 export function entityDisplayScale(
@@ -291,6 +465,19 @@ export function entityDisplayScale(
 export class ScarecrowFx {
   private root: THREE.Group | null = null;
   private discMaterial: THREE.MeshBasicMaterial | null = null;
+  private discGlowMaterial: THREE.MeshBasicMaterial | null = null;
+  /** His pole (round 10) and where it stands (null until his field is known). */
+  private pole: THREE.Mesh | null = null;
+  private poleSpot: { x: number; y: number; z: number; facing: number } | null = null;
+  /** Whether each boss was asleep last frame (the nightfall wake's edge), and when the
+   *  last wake began on this layer's clock. */
+  private readonly asleepSeen = new Map<number, boolean>();
+  private awakenAt = -1;
+  private awakenFacing = 0;
+  private awakenStep = 0;
+  private readonly awakenAtPos = new THREE.Vector3();
+  /** The pumpkin pool's own purple materials (built over the kit's, owned here). */
+  private pumpkinMats: THREE.Material[] = [];
   private discGeometry: THREE.CircleGeometry | null = null;
   private discTexture: THREE.Texture | null = null;
   private cometMaterial: THREE.MeshBasicMaterial | null = null;
@@ -305,6 +492,9 @@ export class ScarecrowFx {
   private haloTexture: THREE.Texture | null = null;
   private halos: THREE.Sprite[] = [];
   private ringMaterial: THREE.MeshBasicMaterial | null = null;
+  private blastMaterial: THREE.MeshBasicMaterial | null = null;
+  private blastRings: THREE.InstancedMesh | null = null;
+  private readonly blasts: { x: number; y: number; z: number; radius: number; born: number }[] = [];
   private fireballMaterial: THREE.MeshBasicMaterial | null = null;
   private fireball: THREE.Mesh | null = null;
   private ring: THREE.Mesh | null = null;
@@ -326,6 +516,8 @@ export class ScarecrowFx {
   private readonly scratch2 = new THREE.Vector3();
   /** Whether this frame's scan saw him standing (Thatchbound's root and scan key on it). */
   private bossNear = false;
+  /** Whether this frame's scan saw him at all, alive or a corpse (his pole stands with him). */
+  private bossSeen = false;
   /** Thatchbound's eyes, sigils and swirl (his mind control). */
   private readonly thatchbound: ThatchboundFx;
   /** Hester's toys (seasonal_toys_fx.ts): fed by this layer's own entity scan. */
@@ -340,9 +532,14 @@ export class ScarecrowFx {
     private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     /** The spatial audio seam (the renderer's injected sink): this layer's own timed cues. */
     private readonly audio: () => SpatialAudioSink | null = () => null,
+    /** The body-tint seam (CharacterVisual.setAuraGlow): a cauldron drinker's green. */
+    tint: ToyBodyTint = () => {},
+    /** The world seed his field resolves from (the pole's spot before he is ever seen
+     *  asleep on it); null leaves the pole to his first sleep. */
+    private readonly fieldSeed: () => number | null = () => null,
   ) {
     this.thatchbound = new ThatchboundFx(scene, particles, entities, entity, compileGate);
-    this.toys = new SeasonalToysFx(scene, particles, groundY, entity, compileGate, audio);
+    this.toys = new SeasonalToysFx(scene, particles, groundY, entity, compileGate, audio, tint);
     for (let i = 0; i < FALL_CAP; i++) {
       this.falls.push({
         active: false,
@@ -364,22 +561,46 @@ export class ScarecrowFx {
     const root = new THREE.Group();
     root.name = 'scarecrow-fx';
     this.discTexture = emberTexture();
+    // round 10: a dark purple scorch laid on the stubble (normal blend, so it reads in full
+    // daylight) under a violet edge and embers (additive, so the boundary glows at night)
     this.discMaterial = new THREE.MeshBasicMaterial({
-      color: 0xd8480e,
+      color: GOURDFALL_PURPLE.ink,
       transparent: true,
       opacity: 0.85,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
       alphaMap: this.discTexture ?? undefined,
       polygonOffset: true,
       polygonOffsetFactor: -2,
     });
+    this.discGlowMaterial = new THREE.MeshBasicMaterial({
+      color: GOURDFALL_PURPLE.rim,
+      transparent: true,
+      opacity: 0.55,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      alphaMap: this.discTexture ?? undefined,
+      polygonOffset: true,
+      polygonOffsetFactor: -3,
+    });
+    // read through the field's tall stubble, still hugging the ground on screen
+    pullDecalTowardCamera(this.discMaterial, 'scarecrow-chaff-ink');
+    pullDecalTowardCamera(this.discGlowMaterial, 'scarecrow-chaff-glow');
     this.discGeometry = new THREE.CircleGeometry(1, 40);
     this.discGeometry.rotateX(-Math.PI / 2);
-    // one hidden twin so the gate links the disc's program before the first patch
-    const twin = new THREE.Mesh(this.discGeometry, this.discMaterial);
-    twin.scale.setScalar(0.001);
-    root.add(twin);
+    // hidden twins so the gate links both disc programs before the first patch
+    for (const mat of [this.discMaterial, this.discGlowMaterial]) {
+      const twin = new THREE.Mesh(this.discGeometry, mat);
+      twin.scale.setScalar(0.001);
+      root.add(twin);
+    }
+    // his pole (round 10): built with the root, placed on the first sight of his field
+    this.pole = new THREE.Mesh(
+      poleGeometry(),
+      new THREE.MeshLambertMaterial({ vertexColors: true }),
+    );
+    this.pole.name = 'scarecrow-fx-pole';
+    this.pole.visible = false;
+    root.add(this.pole);
     // the fire comets: one pooled instanced draw for every falling pumpkin
     this.cometGeo = cometGeometry();
     this.cometMaterial = new THREE.MeshBasicMaterial({
@@ -427,6 +648,22 @@ export class ScarecrowFx {
     this.ring = new THREE.Mesh(ringGeo, this.ringMaterial);
     this.ring.scale.setScalar(0.001);
     root.add(this.ring);
+    // the landings' blast rings (round 10): one pooled additive draw, violet per instance
+    this.blastMaterial = new THREE.MeshBasicMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+    });
+    pullDecalTowardCamera(this.blastMaterial, 'scarecrow-blast-ring');
+    this.blastRings = new THREE.InstancedMesh(ringGeo, this.blastMaterial, BLAST_CAP);
+    for (let i = 0; i < BLAST_CAP; i++) {
+      this.blastRings.setMatrixAt(i, HIDDEN);
+      this.blastRings.setColorAt(i, blastTint.setHex(GOURDFALL_PURPLE.rim));
+    }
+    this.blastRings.frustumCulled = false;
+    this.blastRings.name = 'scarecrow-fx-blast-rings';
+    root.add(this.blastRings);
     // the burst's fireball: one additive ball, blown out and faded (it shares the ring's clock)
     this.fireballMaterial = new THREE.MeshBasicMaterial({
       color: 0xff6a18,
@@ -447,8 +684,9 @@ export class ScarecrowFx {
   }
 
   /** The pooled pumpkins: one InstancedMesh per part of the decor kit's small carved
-   *  pumpkin, FALL_CAP instances each, over the kit's own geometry and materials (the
-   *  instanced variant the decor view already links). Null until the kit has loaded. */
+   *  pumpkin, FALL_CAP instances each, over the kit's own geometry and this pool's purple
+   *  material clones (purpleGourdMaterial: their programs link through the pool's own
+   *  gate). Null until the kit has loaded. */
   private ensurePumpkins(): THREE.InstancedMesh[] | null {
     const parts = gourdlightAssets()?.decor.pumpkin_small;
     if (this.pumpkins && parts === this.pumpkinParts)
@@ -458,8 +696,10 @@ export class ScarecrowFx {
     if (!parts || !this.root) return null;
     const group = new THREE.Group();
     group.name = 'scarecrow-fx-pumpkins';
-    this.pumpkins = parts.map((part) => {
-      const mesh = new THREE.InstancedMesh(part.geometry, part.material, FALL_CAP);
+    for (const m of this.pumpkinMats) m.dispose();
+    this.pumpkinMats = parts.map((part) => purpleGourdMaterial(part.material));
+    this.pumpkins = parts.map((part, k) => {
+      const mesh = new THREE.InstancedMesh(part.geometry, this.pumpkinMats[k], FALL_CAP);
       for (let i = 0; i < FALL_CAP; i++) mesh.setMatrixAt(i, HIDDEN);
       mesh.frustumCulled = false;
       mesh.visible = false;
@@ -480,13 +720,52 @@ export class ScarecrowFx {
   }
 
   private releasePumpkins(): void {
-    // the geometry and materials are the decor kit's: only the instance buffers go
+    // the geometry is the decor kit's: the instance buffers and our purple materials go
+    for (const m of this.pumpkinMats) m.dispose();
+    this.pumpkinMats = [];
     if (this.pumpkins) for (const m of this.pumpkins) m.dispose();
     this.pumpkinGroup?.removeFromParent();
     this.pumpkins = null;
     this.pumpkinGroup = null;
     this.pumpkinParts = null;
     this.pumpkinsReady = false;
+  }
+
+  /** A landing's blast ring: rolled out to the pumpkin's TRUE radius in 0.35 s (the area
+   *  it hit) and faded, in his witch-fire violet. A small fixed pool. */
+  private addBlastRing(x: number, z: number, radius: number): void {
+    this.ensureRoot();
+    if (this.blasts.length >= BLAST_CAP) this.blasts.shift();
+    this.blasts.push({ x, y: this.groundY(x, z) + CHAFF_LIFT + 0.04, z, radius, born: this.time });
+  }
+
+  private updateBlastRings(): void {
+    const m = this.blastRings;
+    if (!m) return;
+    let used = 0;
+    for (let i = this.blasts.length - 1; i >= 0; i--) {
+      const b = this.blasts[i];
+      const age = this.time - b.born;
+      if (age >= BLAST_SEC) {
+        this.blasts.splice(i, 1);
+        continue;
+      }
+      const k = Math.min(1, age / 0.35);
+      const r = b.radius * (0.35 + 0.65 * (1 - (1 - k) ** 3));
+      scratchMat.compose(
+        this.scratch.set(b.x, b.y, b.z),
+        scratchQuat.identity(),
+        scratchScale.set(r, 1, r),
+      );
+      m.setMatrixAt(used, scratchMat);
+      const fade = (1 - age / BLAST_SEC) ** 1.4;
+      m.setColorAt(used, blastTint.setHex(GOURDFALL_PURPLE.rim).multiplyScalar(fade));
+      used++;
+    }
+    for (let i = used; i < BLAST_CAP; i++) m.setMatrixAt(i, HIDDEN);
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+    m.visible = used > 0 || this.time - this.rootBorn < TWIN_SEC;
   }
 
   private takeSlot(): FallSlot | null {
@@ -509,7 +788,10 @@ export class ScarecrowFx {
     }
     if (ev.ability === GOURD_ABILITY && ev.fx === 'nova') {
       this.pumpkinBurst(ev.x, ev.z, ev.radius ?? 4);
-      return false; // the shared impact flash and blast ring ride on top
+      // claimed (round 10): its own violet blast ring at the true radius replaces the shared
+      // one, which would draw in the fire school's orange
+      this.addBlastRing(ev.x, ev.z, ev.radius ?? 4);
+      return true;
     }
     if (ev.ability === CHAFF_ABILITY) {
       this.addPatch(ev.x, ev.z, ev.radius ?? 2.5, ev.duration ?? 6);
@@ -613,19 +895,20 @@ export class ScarecrowFx {
   private pumpkinBurst(x: number, z: number, radius: number): void {
     const y = this.groundY(x, z);
     const at = this.scratch.set(x, y + 0.8, z);
-    // the fireball: a hard flash, then flame rolling up and out
-    this.particles.burst(at, 'fire', 34, 2.3, 0xffe2a0);
+    // the fireball: a hard flash, then witch-fire rolling up and out (round 10: purple)
+    this.particles.burst(at, 'shadow', 34, 2.3, GOURDFALL_PURPLE.fire[3]);
     this.particles.fireworkBurst(at, SHARD_COLORS, 30, 1.5);
-    this.particles.groundPuff(this.scratch.set(x, y, z), 0.85, 0x6b5638);
+    this.particles.groundPuff(this.scratch.set(x, y, z), 0.85, 0x3a2a44);
     for (let i = 0; i < 3; i++) {
       this.particles.burstLater(
         0.06 + i * 0.1,
         x,
         y + 0.9 + i * 0.6,
         z,
-        'fire',
+        'shadow',
         18,
         1.5 - i * 0.25,
+        GOURDFALL_PURPLE.fire[i % GOURDFALL_PURPLE.fire.length],
       );
     }
     for (let i = 0; i < 6; i++) {
@@ -636,14 +919,22 @@ export class ScarecrowFx {
         x + Math.sin(a) * r,
         y + 0.4,
         z + Math.cos(a) * r,
-        'fire',
+        'shadow',
         6,
         0.7,
+        GOURDFALL_PURPLE.fire[0],
       );
     }
     for (let i = 0; i < 3; i++) {
       const a = (i / 3) * Math.PI * 2;
-      this.particles.fluidSmoke(x + Math.sin(a), y, z + Math.cos(a), SMOKE, 1, 1000);
+      this.particles.fluidSmoke(
+        x + Math.sin(a),
+        y,
+        z + Math.cos(a),
+        GOURDFALL_PURPLE.smoke,
+        1,
+        1000,
+      );
     }
   }
 
@@ -674,7 +965,7 @@ export class ScarecrowFx {
     const y = this.groundY(x, z);
     const at = this.scratch.set(x, y + 2, z);
     this.particles.burst(at, 'fire', 120, 4.2, 0xfff0c0);
-    this.particles.fireworkBurst(at, SHARD_COLORS, 110, 3.4);
+    this.particles.fireworkBurst(at, SWELL_SHARD_COLORS, 110, 3.4);
     this.particles.fireworkBurst(this.scratch.set(x, y + 1.2, z), PULP_COLORS, 60, 2.4);
     this.particles.groundPuff(this.scratch.set(x, y, z), 3, 0x5a4528);
     for (let i = 0; i < 9; i++) {
@@ -698,9 +989,11 @@ export class ScarecrowFx {
       this.particles.fluidSmoke(x + Math.sin(a) * r, y, z + Math.cos(a) * r, SMOKE, 1, 1000);
     }
     if (this.ring && this.ringMaterial) {
+      this.ringMaterial.color.setHex(0xff8a2a);
       this.ringAt.set(x, y + 0.25, z);
       this.ringBorn = this.time;
       this.ring.userData.radius = Math.min(radius, 26);
+      this.ring.userData.wake = false;
     }
   }
 
@@ -721,15 +1014,21 @@ export class ScarecrowFx {
     geometry.rotateX(-Math.PI / 2);
     const y = this.groundY(x, z);
     const pos = geometry.getAttribute('position') as THREE.BufferAttribute;
+    // the field grows tall, and a hazard's boundary hidden in it is a hazard nobody can
+    // read: the patch's material pulls its depth through the stubble (ground_decal_pull.ts)
     for (let i = 0; i < pos.count; i++) {
-      pos.setY(i, this.groundY(x + pos.getX(i), z + pos.getZ(i)) - y + 0.08);
+      pos.setY(i, this.groundY(x + pos.getX(i), z + pos.getZ(i)) - y + CHAFF_LIFT);
     }
     pos.needsUpdate = true;
     const disc = new THREE.Mesh(geometry, this.discMaterial);
     disc.position.set(x, y, z);
     disc.visible = false;
     root.add(disc);
-    this.patches.push({ disc, x, y, z, radius, born: this.time, total, flameClock: 0 });
+    const glow = new THREE.Mesh(geometry, this.discGlowMaterial ?? this.discMaterial);
+    glow.position.set(x, y + 0.01, z);
+    glow.visible = false;
+    root.add(glow);
+    this.patches.push({ disc, glow, x, y, z, radius, born: this.time, total, flameClock: 0 });
   }
 
   /** The Swelling Gourd's drawn size (the renderer folds it into the entity's scale):
@@ -750,12 +1049,17 @@ export class ScarecrowFx {
     this.updateFalls(dt, reducedMotion);
     this.updatePatches(dt);
     this.updateShockwave();
+    this.updateBlastRings();
     this.halosUsed = 0;
     // his collapse into straw, his gourds' glow, his reel
     this.bossNear = false;
     this.toys.begin(dt, reducedMotion);
+    this.bossSeen = false;
     this.entities().forEach(this.watchEntity);
     this.toys.end();
+    // his pole stands only while he does (the event open, his field raised)
+    if (this.pole) this.pole.visible = this.bossSeen && this.poleSpot !== null;
+    this.updateAwaken();
     // his curse: built on the first sight of him, scanned only while he or a puppet is near
     this.thatchbound.update(dt, reducedMotion, this.bossNear);
     const twins = this.time - this.rootBorn < TWIN_SEC;
@@ -825,9 +1129,29 @@ export class ScarecrowFx {
           );
           this.comets.setMatrixAt(i, scratchMat);
           // sparks and smoke shed along the trail
-          this.particles.burst(this.scratch.set(p.x, p.y, p.z), 'fire', 1, 0.18);
-          this.particles.campfireEmber(this.scratch.set(p.x, p.y - 0.5, p.z), dt);
-          if (!f.up) this.particles.fluidSmoke(p.x, p.y, p.z, SMOKE, dt, 4);
+          this.particles.burst(
+            this.scratch.set(p.x, p.y, p.z),
+            'shadow',
+            1,
+            0.18,
+            GOURDFALL_PURPLE.fire[1],
+          );
+          this.particles.toyMote(
+            p.x,
+            p.y - 0.5,
+            p.z,
+            0,
+            0.6,
+            0,
+            GOURDFALL_PURPLE.fire[3],
+            0.12,
+            0.6,
+            -0.2,
+            'spark',
+            40,
+            dt,
+          );
+          if (!f.up) this.particles.fluidSmoke(p.x, p.y, p.z, GOURDFALL_PURPLE.smoke, dt, 4);
         }
       }
       if (!shown) {
@@ -852,6 +1176,7 @@ export class ScarecrowFx {
       const k = chaffStrength(age, patch.total);
       if (age >= patch.total) {
         patch.disc.removeFromParent();
+        patch.glow.removeFromParent();
         patch.disc.geometry.dispose();
         this.patches.splice(i, 1);
         continue;
@@ -859,12 +1184,25 @@ export class ScarecrowFx {
       // the disc is drawn at the TRUE radius for the whole burn: the edge a player reads is
       // the edge that burns (it only shows once the patch has caught)
       patch.disc.visible = k > 0.02;
+      patch.glow.visible = k > 0.02;
       for (let c = 0; c < calls; c++) {
         const a = Math.random() * Math.PI * 2;
         const r = Math.sqrt(Math.random()) * patch.radius * 0.95;
-        this.particles.campfireEmber(
-          this.scratch.set(patch.x + Math.sin(a) * r, patch.y - 0.45, patch.z + Math.cos(a) * r),
-          dt * k,
+        // violet embers lifting off the scorched stubble (his witch-fire, round 10)
+        this.particles.toyMote(
+          patch.x + Math.sin(a) * r,
+          patch.y + 0.1,
+          patch.z + Math.cos(a) * r,
+          0,
+          0.9 + Math.random() * 0.6,
+          0,
+          c % 3 === 2 ? GOURDFALL_PURPLE.fire[1] : GOURDFALL_PURPLE.fire[0],
+          0.09,
+          0.9,
+          -0.3,
+          'spark',
+          14 * k,
+          dt,
         );
       }
       // low tongues of flame licking up off the stubble, a few a second
@@ -875,12 +1213,13 @@ export class ScarecrowFx {
         const r = Math.sqrt(Math.random()) * patch.radius * 0.85;
         this.particles.burst(
           this.scratch.set(patch.x + Math.sin(a) * r, patch.y + 0.15, patch.z + Math.cos(a) * r),
-          'fire',
+          'shadow',
           4,
           0.35,
+          GOURDFALL_PURPLE.fire[1],
         );
       }
-      this.particles.fluidSmoke(patch.x, patch.y, patch.z, SMOKE, dt, 2 * k);
+      this.particles.fluidSmoke(patch.x, patch.y, patch.z, GOURDFALL_PURPLE.smoke, dt, 2 * k);
     }
   }
 
@@ -893,7 +1232,8 @@ export class ScarecrowFx {
       return;
     }
     this.ring.visible = true;
-    this.fireball.visible = true;
+    // the nightfall wake rolls only the ring out (no gourd's fireball at his feet)
+    this.fireball.visible = this.ring.userData.wake !== true;
     const age = this.time - this.ringBorn;
     // the fireball: swells to 7 yd in a third of a second, then rolls up and fades
     const fk = Math.min(1, age / 1.1);
@@ -981,8 +1321,11 @@ export class ScarecrowFx {
     }
     if (e.templateId !== THATCHGRIN_TEMPLATE) return;
     this.ensureRoot();
+    this.bossSeen = true;
+    this.placePole(e);
     if (!e.dead) {
       this.deadSeen.delete(id);
+      this.watchWake(e, id);
       this.watchReel(e);
       return;
     }
@@ -993,6 +1336,145 @@ export class ScarecrowFx {
     this.particles.burstLater(DEATH_HEAP_SEC, x, y + 0.6, z, 'nature', 48, 1.9, STRAW_COLOR);
     this.particles.burstLater(DEATH_HEAP_SEC, x, y + 0.4, z, 'nature', 24, 1.2, 0x8a6a34);
   };
+
+  /** Seat his pole: exactly where he hangs on it while asleep (the sim snaps his bed to his
+   *  spawn and its facing), else his field's own spot and facing. Placed once a spot is
+   *  known; moved only if he is seen asleep somewhere else (a new field). */
+  private placePole(e: EntityLike): void {
+    if (!this.pole) return;
+    let spot = this.poleSpot;
+    if (e.asleep && !e.dead) {
+      const moved =
+        !spot ||
+        Math.abs(spot.x - e.pos.x) > 0.05 ||
+        Math.abs(spot.z - e.pos.z) > 0.05 ||
+        Math.abs(spot.facing - e.facing) > 0.01;
+      if (moved) spot = { x: e.pos.x, y: e.pos.y, z: e.pos.z, facing: e.facing };
+    } else if (!spot) {
+      const seed = this.fieldSeed();
+      const field = seed === null ? null : resolveScarecrowField(seed);
+      if (field) {
+        spot = { x: field.x, y: this.groundY(field.x, field.z), z: field.z, facing: field.facing };
+      }
+    }
+    if (!spot || spot === this.poleSpot) return;
+    this.poleSpot = spot;
+    // the post's foot sits on the ground under it, not under his feet
+    const at = thatchgrinPoleAt(spot.x, spot.z, spot.facing).post;
+    const y = Math.min(spot.y, this.groundY(at.x, at.z));
+    this.pole.position.set(spot.x, y, spot.z);
+    this.pole.rotation.set(0, spot.facing, 0);
+    this.pole.updateMatrixWorld(true);
+  }
+
+  /** The nightfall wake's edge (asleep last frame, awake now): start its VFX timeline. */
+  private watchWake(e: EntityLike, id: number): void {
+    const asleep = e.asleep === true;
+    const was = this.asleepSeen.get(id);
+    this.asleepSeen.set(id, asleep);
+    if (was === true && !asleep) {
+      this.awakenAt = this.time;
+      this.awakenAtPos.set(e.pos.x, e.pos.y, e.pos.z);
+      this.awakenFacing = e.facing;
+      this.awakenStep = 0;
+    }
+  }
+
+  /** The wake's beats, on this layer's clock (scarecrow_clips.py awaken_keys): a violet
+   *  flare in his skull as his head jerks up, splinters and crows bursting off the bar as he
+   *  tears free, the stubble thrown up in a ring of witch-fire as his feet hit it. */
+  private updateAwaken(): void {
+    if (this.awakenAt < 0) return;
+    const t = this.time - this.awakenAt;
+    const { x, y, z } = this.awakenAtPos;
+    const head = y + 6.3;
+    if (this.awakenStep === 0 && t >= 0.05) {
+      this.awakenStep = 1;
+      // a shiver of straw off him as the first twitch runs through
+      this.particles.burst(this.scratch.set(x, y + 3.6, z), 'nature', 18, 0.8, STRAW_COLOR);
+    }
+    if (this.awakenStep === 1 && t >= AWAKEN_HEAD_SEC) {
+      this.awakenStep = 2;
+      this.particles.burst(
+        this.scratch.set(x, head, z),
+        'shadow',
+        46,
+        1.6,
+        GOURDFALL_PURPLE.fire[1],
+      );
+      this.particles.fireworkBurst(this.scratch.set(x, head, z), GOURDFALL_PURPLE.fire, 40, 1.4);
+      this.audio()?.playAt?.(SWELL_PULSE_SFX, x, head, z, { gain: 0.7, cooldown: 0.2 });
+    }
+    if (this.awakenStep === 2 && t >= AWAKEN_TEAR_SEC) {
+      this.awakenStep = 3;
+      const P = THATCHGRIN_POLE;
+      for (const side of [1, -1]) {
+        const end = bodyLocalToWorld(x, z, this.awakenFacing, side * (P.barHalf - 0.4), -P.barBack);
+        this.particles.fireworkBurst(
+          this.scratch.set(end.x, y + P.barHeight, end.z),
+          DIRT_COLORS,
+          26,
+          1.3,
+        );
+        this.particles.burst(
+          this.scratch.set(end.x, y + P.barHeight, end.z),
+          'nature',
+          16,
+          1.0,
+          STRAW_COLOR,
+        );
+      }
+      for (let i = 0; i < 3; i++) {
+        this.particles.burst(this.scratch.set(x, y + 5.4, z), 'shadow', 22, 1.5, FEATHER_COLORS[i]);
+      }
+    }
+    if (this.awakenStep === 3 && t >= AWAKEN_LAND_SEC) {
+      this.awakenStep = 4;
+      this.particles.groundPuff(this.scratch.set(x, y, z), 2.6, 0x4a3c2c);
+      this.particles.fireworkBurst(this.scratch.set(x, y + 0.4, z), GOURDFALL_PURPLE.fire, 70, 2.2);
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        this.particles.burstLater(
+          0.05,
+          x + Math.sin(a) * 2.6,
+          y + 0.3,
+          z + Math.cos(a) * 2.6,
+          'shadow',
+          10,
+          1.0,
+          GOURDFALL_PURPLE.fire[i % GOURDFALL_PURPLE.fire.length],
+        );
+      }
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2;
+        this.particles.fluidSmoke(
+          x + Math.sin(a) * 1.8,
+          y,
+          z + Math.cos(a) * 1.8,
+          GOURDFALL_PURPLE.smoke,
+          1,
+          1000,
+        );
+      }
+      // the shockwave ring rolls out over the stubble in his witch-fire
+      if (this.ring && this.ringMaterial && this.ringBorn < 0) {
+        this.ringMaterial.color.setHex(GOURDFALL_PURPLE.rim);
+        this.ringAt.set(x, y + 0.25, z);
+        this.ringBorn = this.time;
+        this.ring.userData.radius = 9;
+        this.ring.userData.wake = true;
+      }
+    }
+    // the flare in his skull, swelling as his head comes up and holding to his landing
+    if (t < AWAKEN_LAND_SEC + 0.8) {
+      const k = Math.max(0, Math.min(1, (t - AWAKEN_HEAD_SEC + 0.25) / 0.35));
+      const fade = Math.max(0, Math.min(1, (AWAKEN_LAND_SEC + 0.8 - t) / 0.6));
+      const pulse = 0.8 + 0.2 * Math.sin(t * 17);
+      this.placeHalo(x, head - 0.4, z, 3.6 * pulse * k, 0.85 * k * fade, GOURDFALL_PURPLE.glow);
+    } else {
+      this.awakenAt = -1;
+    }
+  }
 
   /** His reel after a gourd breaks: dizzy sparks circling over his hat while he is
    *  Uprooted, an ember glow through the split in his chest while his rind is Split. */
@@ -1057,6 +1539,15 @@ export class ScarecrowFx {
     for (const s of this.halos) (s.material as THREE.SpriteMaterial).dispose();
     this.ringMaterial?.dispose();
     this.ring?.geometry.dispose();
+    this.blastRings?.dispose();
+    this.blastMaterial?.dispose();
+    this.pole?.geometry.dispose();
+    (this.pole?.material as THREE.Material | undefined)?.dispose();
+    this.pole = null;
+    this.poleSpot = null;
+    this.blastRings = null;
+    this.blastMaterial = null;
+    this.blasts.length = 0;
     this.fireballMaterial?.dispose();
     this.fireball?.geometry.dispose();
     this.fireballMaterial = null;

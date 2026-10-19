@@ -1178,6 +1178,13 @@ const THATCHGRIN: ClipMap = {
   },
   hit: ['Hit'],
   death: 'Death',
+  // Round 10: a NIGHT boss (mob/slumber.ts awakeAt 'night'). By day the sleep loop holds
+  // him strung up on his pole (scarecrow_fx.ts draws the post and crossbar behind him),
+  // and the wake one-shot plays once on the asleep-to-awake edge at nightfall: he tears
+  // himself off the bar, drops into the stubble at 1.9 s and rises by 3.0 s, inside the
+  // slumber's 3 s rise hold, so no first step skates the pose.
+  sleep: 'Pole',
+  wake: 'Awaken',
 };
 // A strawling's own clip map: the same gait, hit and death on the boss's rig, but its own
 // two unarmed swings, because it carries no scythe (owner note, 2026-10-18): Claw the

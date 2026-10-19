@@ -30,6 +30,7 @@ import {
   THATCHGRIN_KIT,
   THATCHGRIN_SUMMON_ABILITY,
 } from '../src/sim/content/gourdlight_eve_scarecrow';
+import { MOBS } from '../src/sim/data';
 import { resolveScarecrowField, SCARECROW_FIELD_RADIUS } from '../src/sim/seasonal/scarecrow_field';
 import { SCARECROW_FIELD_RING, seasonalDecorLayout } from '../src/sim/seasonal_decor_layout';
 import { Sim } from '../src/sim/sim';
@@ -58,7 +59,20 @@ const joints = (path: string) => {
   return (j.skins?.[0]?.joints ?? []).map((i) => j.nodes[i].name);
 };
 
-const CLIP_SET = ['Chop', 'Death', 'Hit', 'Idle', 'Run', 'Summon', 'Swipe', 'Throw', 'Walk'];
+// round 10 adds his day on the pole (Pole, the sleep loop) and his nightfall wake (Awaken)
+const CLIP_SET = [
+  'Awaken',
+  'Chop',
+  'Death',
+  'Hit',
+  'Idle',
+  'Pole',
+  'Run',
+  'Summon',
+  'Swipe',
+  'Throw',
+  'Walk',
+];
 // A strawling carries no scythe (owner note 2026-10-18): the boss's gait, hit and death on
 // the shared rig, its own two unarmed swings, no throw and no call.
 const STRAWLING_CLIP_SET = ['Claw', 'Death', 'Hit', 'Idle', 'Lunge', 'Run', 'Walk'];
@@ -160,6 +174,12 @@ describe('the two attacks (owner note 2026-10-17: one clear idea each, at 30 fps
       expect(timing.Death?.seconds).toBeCloseTo(3.2, 2);
       if (path === BOSS_GLB) {
         expect(timing.Throw?.seconds).toBeCloseTo(2.2, 2);
+        // round 10: the pole loop and the nightfall wake, inside the slumber's 3 s rise hold
+        expect(timing.Pole?.seconds).toBeCloseTo(4, 2);
+        expect(timing.Awaken?.seconds).toBeCloseTo(3, 2);
+        expect(MOBS.gourdlight_thatchgrin?.slumber?.riseSeconds).toBeGreaterThanOrEqual(
+          timing.Awaken?.seconds ?? Number.POSITIVE_INFINITY,
+        );
         expect(timing.Summon?.seconds).toBeCloseTo(2, 2);
       }
     });

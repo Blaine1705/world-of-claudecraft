@@ -32,6 +32,12 @@
 #                          arms thrust out (impact 0.5 s), a hop back
 #   Death      3.2 s       sags, the stakes fold, the body slumps into the stubble, the head
 #                          rolls off, the hat falls, the scythe drops; the crows fly off
+#   Pole       4.0 s loop  (boss only, round 10) the day strung up on his pole: arms along
+#                          the crossbar, wrists limp, head slumped, feet dangling, a little
+#                          wind in his legs and coat (manifest.ts `sleep`)
+#   Awaken     3.0 s       (boss only) nightfall: a twitch, the head jerks up, he strains,
+#                          tears his arms off the bar, drops into the stubble (1.9 s) and
+#                          rises with the scythe up (manifest.ts `wake`)
 import math
 
 import bpy
@@ -562,6 +568,114 @@ def lunge_keys():
             (0.92, hop, "inout"), (1.3, base, "auto")]
 
 
+def pole_pose():
+    """Round 10: the day he spends as a scarecrow should, strung up on his pole. Arms out
+    straight along the crossbar (the T his rig rests in), wrists hanging limp off its ends,
+    head slumped forward onto his chest and lolled to one side, his whole weight hung from
+    the bar so the feet dangle clear of the stubble, the stake legs loose and one knee
+    across the other, the coat hanging straight, the scythe hung blade-down from his hand."""
+    p = Pose()
+    p.set("Hips", l=(0, 0, POLE_LIFT))
+    p.set("L_UpperArm", r=(0, 4, 0))
+    p.set("L_Forearm", r=(0, 3, 0))
+    p.set("L_Hand", r=(0, 58, 0))
+    p.set("R_UpperArm", r=(0, -4, 0))
+    p.set("R_Forearm", r=(0, -3, 0))
+    if ARMED[0]:
+        p.set("R_Hand", a=[("Y", 172), ("Z", 8)])
+    else:
+        p.set("R_Hand", r=(0, -58, 0))
+    p.set("Spine", r=(6, 0, 0))
+    p.set("Chest", r=(4, 0, 0))
+    p.set("Neck", r=(22, -6, 0))
+    p.set("Head", r=(30, -16, 8))
+    p.set("Hat", r=(10, -8, 0))
+    p.set("L_Thigh", r=(8, -2, 6))
+    p.set("L_Shin", r=(14, 0, 0))
+    p.set("L_Foot", r=(38, 0, 0))
+    p.set("R_Thigh", r=(4, 4, -8))
+    p.set("R_Shin", r=(20, 0, 0))
+    p.set("R_Foot", r=(42, 0, 0))
+    p.set("Coat_B", r=(2, 0, 0))
+    return p
+
+
+# How high his weight hangs off the crossbar (metres at his size): the feet clear the
+# stubble. The renderer seats the bar at his shoulders (scarecrow_fx_core.ts POLE_*).
+POLE_LIFT = 0.42
+
+
+def pole_keys():
+    """Pole: 4.0 s loop. Hung lifeless on the post through the day: the wind swings his
+    legs and coat a little, the slumped head nods, the crows shuffle on him."""
+    keys = []
+    for k in range(9):
+        t = k * 0.5
+        ph = t / 4.0 * math.tau
+        p = pole_pose()
+        sway = math.sin(ph)
+        p.set("Hips", r=(2 * sway, 0, 1.5 * math.sin(ph + 0.7)))
+        p.set("Head", r=(2.5 * math.sin(ph * 2 + 0.4), 0, 2 * math.sin(ph + 1.1)))
+        p.set("L_Thigh", r=(5 * math.sin(ph + 0.6), 0, 0))
+        p.set("R_Thigh", r=(4 * math.sin(ph + 1.9), 0, 0))
+        p.set("L_Shin", r=(4 * math.sin(ph + 1.2), 0, 0))
+        p.set("R_Shin", r=(4 * math.sin(ph + 2.4), 0, 0))
+        for c, a in (("Coat_B", 0.3), ("Coat_L", 1.5), ("Coat_R", 2.7)):
+            p.set(c, r=(4 * math.sin(ph * 2 + a), 3 * math.sin(ph + a), 0))
+        p.set("L_Hand", r=(0, 4 * math.sin(ph + 0.4), 0))
+        crows(p, t, energy=0.7)
+        keys.append((t, p, "auto"))
+    return keys
+
+
+def awaken_keys():
+    """Awaken: 3.0 s. Nightfall: a twitch runs through him, the head jerks up (the
+    renderer lights the candle in his skull now), he strains against the bar, tears his
+    arms forward off it with the crows bursting up, drops into the stubble in a crouch
+    (impact 1.9 s), and rises to his full height with the scythe swung up."""
+    hang = pole_pose()
+    crows(hang, 0.0, energy=0.7)
+    twitch = hang.copy()
+    twitch.set("Chest", r=(-4, 0, 5)).set("Head", r=(-14, 8, -6)).set("L_Hand", r=(0, -25, 0))
+    twitch.set("L_Thigh", r=(-10, 0, 0)).set("R_Thigh", r=(6, 0, 0))
+    wake = hang.copy()
+    wake.set("Neck", r=(-24, 6, 0)).set("Head", r=(-40, 16, -8)).set("Hat", r=(-12, 8, 0))
+    wake.set("Chest", r=(-10, 0, 0)).set("Spine", r=(-6, 0, 0))
+    wake.set("L_Hand", r=(0, -50, 0))
+    flap(wake, 0.6, 0.25, 0.1)
+    strain = wake.copy()
+    strain.set("Chest", r=(14, 0, 0)).set("Spine", r=(8, 0, 0)).set("Head", r=(-6, 0, 0))
+    strain.set("L_UpperArm", r=(-6, 0, -16)).set("R_UpperArm", r=(-6, 0, 16))
+    strain.set("L_Thigh", r=(-20, 0, 0)).set("R_Thigh", r=(-14, 0, 0)).set("L_Shin", r=(26, 0, 0))
+    flap(strain, -0.8, 0.7, 0.4)
+    tear = strain.copy()
+    tear.set("L_UpperArm", r=(0, 20, -62)).set("L_Forearm", r=(0, 8, -24))
+    tear.set("R_UpperArm", r=(0, -20, 62)).set("R_Forearm", r=(0, -8, 24))
+    tear.set("Chest", r=(14, 0, 0)).set("Hips", l=(0, -0.12, -0.12))
+    if ARMED[0]:
+        tear.set("R_Hand", a=[("Y", 120), ("Z", 30)])
+    flap(tear, 1.0, 1.6, 1.2)
+    drop = rest_pose()
+    drop.set("Hips", r=(14, 0, 0), l=(0, -0.2, -0.42))
+    drop.set("L_Thigh", r=(-48, 0, 0)).set("R_Thigh", r=(-40, 0, 0))
+    drop.set("L_Shin", r=(72, 0, 0)).set("R_Shin", r=(64, 0, 0))
+    drop.set("L_Foot", r=(-20, 0, 0)).set("R_Foot", r=(-18, 0, 0))
+    drop.set("Spine", r=(16, 0, 0)).set("Chest", r=(14, 0, 0)).set("Head", r=(-18, 0, 0))
+    drop.set("L_UpperArm", r=(0, -30, 30)).set("R_UpperArm", r=(0, 30, -30))
+    for c in ("Coat_B", "Coat_L", "Coat_R"):
+        drop.set(c, r=(-24, 0, 0))
+    flap(drop, -0.6, 1.2, 0.8)
+    rise = rest_pose()
+    rise.set("Chest", r=(-12, 0, 0)).set("Head", r=(-16, 0, 0)).set("Hips", l=(0, 0, 0.06))
+    rise.set("L_UpperArm", r=(0, -24, 0)).set("R_UpperArm", r=(0, 26, 0))
+    flap(rise, 0.5, 0.5, 0.2)
+    settled = rest_pose()
+    crows(settled, 0.0)
+    return [(0.0, hang, "inout"), (0.35, twitch, "out"), (0.55, hang, "inout"), (0.95, wake, "backout"),
+            (1.35, strain, "inout"), (1.6, tear, "out"), (1.9, drop, "in"), (2.45, rise, "out"),
+            (3.0, settled, "auto")]
+
+
 # The boss's clip set...
 CLIPS = [
     ("Idle", idle_keys),
@@ -573,6 +687,9 @@ CLIPS = [
     ("Summon", summon_keys),
     ("Hit", hit_keys),
     ("Death", death_keys),
+    # round 10: his day on the pole (the slumber loop) and the nightfall wake off it
+    ("Pole", pole_keys),
+    ("Awaken", awaken_keys),
 ]
 # ...and a strawling's: the same gait, hit and death on the same rig, but its own two
 # unarmed swings (it carries no scythe, owner note 2026-10-18) and no throw or call.

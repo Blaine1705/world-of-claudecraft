@@ -33,6 +33,7 @@ import {
 import { MOBS } from '../data';
 import { createMob } from '../entity';
 import { openWorldMobScale } from '../mob/open_world_tuning';
+import { spawnAsleepIfBedtime } from '../mob/slumber';
 import type { SimContext } from '../sim_context';
 import type { Entity, MobTemplate } from '../types';
 import { scaleWorldBossHp, type WorldBossDef } from '../world_boss';
@@ -77,12 +78,16 @@ export function spawnThatchgrin(ctx: SimContext, st: ScarecrowState): Entity | n
   );
   mob.facing = field.facing;
   mob.prevFacing = field.facing;
+  // his pole stands on this spot, facing his field (mob/slumber.ts snapToBed)
+  mob.bedFacing = field.facing;
   const base = mob.maxHp;
   st.hpScale = {
     base,
     perPlayer: Math.round(base * THATCHGRIN_HP_STEP_RATIO),
     max: Math.round(base * THATCHGRIN_HP_CAP_RATIO),
   };
+  // By day he is raised already hanging on his pole (a night boss, mob/slumber.ts).
+  spawnAsleepIfBedtime(ctx, mob);
   ctx.addEntity(mob);
   st.bossId = mob.id;
   st.kit = null;

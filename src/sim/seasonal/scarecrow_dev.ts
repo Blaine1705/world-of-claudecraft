@@ -14,9 +14,16 @@
 //                             fight first, so there is someone to curse and someone to hit
 //   /dev scarecrow reset      clear him and stand him up fresh at full health
 //   /dev scarecrow lockout    forget your daily spoils lockout, so his corpse pays you again
+//   /dev scarecrow wake       tear him off his pole now, whatever the hour (the nightfall
+//                             wake: its yell, its rise); he stays up until the night comes
+//                             round again, then the normal hours resume
+//   /dev scarecrow sleep      send him back onto his pole now (he must be out of a fight)
+// He is a NIGHT boss (mob/slumber.ts awakeAt 'night'): `/dev servertime night` and
+// `/dev servertime day` move the clock he keeps.
 import { GOURDLIGHT_EVE_ID } from '../content/gourdlight_eve';
 import { THATCHGRIN_ID } from '../content/gourdlight_eve_scarecrow';
 import { displacePlayerForDev } from '../dev/dev_displace';
+import { devSleepSlumber, devWakeSlumber } from '../mob/slumber';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { worldBossLockoutId } from '../world_boss';
@@ -28,7 +35,8 @@ import { startThatchbound } from './scarecrow_puppet';
 import { raiseSwellingGourd } from './scarecrow_swell';
 import { activeSeasonalEventOf } from './seasonal_state';
 
-const USAGE = '[dev] Usage: /dev scarecrow [rain|call|swell|burst|break|puppet|reset|lockout].';
+const USAGE =
+  '[dev] Usage: /dev scarecrow [rain|call|swell|burst|break|puppet|reset|lockout|wake|sleep].';
 
 /** Two sturdy dev bots join his fight beside the caller (so Thatchbound has a crowd). */
 function joinDevFighters(ctx: SimContext, boss: Entity, pid: number): void {
@@ -90,6 +98,11 @@ export function handleScarecrowDevChat(ctx: SimContext, raw: string, pid: number
     log(
       `[dev] Old Thatchgrin stands in his field at ${field.x.toFixed(1)}, ${field.z.toFixed(1)}.`,
     );
+    if (standing?.asleep) {
+      log(
+        '[dev] It is day: he hangs on his pole until nightfall. /dev scarecrow wake to fight now.',
+      );
+    }
     return true;
   }
   const fightVerbs = ['rain', 'gourd', 'call', 'swell', 'burst', 'break', 'puppet'];
@@ -127,6 +140,23 @@ export function handleScarecrowDevChat(ctx: SimContext, raw: string, pid: number
       }
     }
     log(ok ? `[dev] Old Thatchgrin: ${verb} now.` : '[dev] Nothing to do that with.');
+    return true;
+  }
+  if (verb === 'wake' || verb === 'sleep') {
+    if (!boss || boss.dead || boss.templateId !== THATCHGRIN_ID) {
+      ctx.error(pid, '[dev] Old Thatchgrin is not standing: /dev scarecrow first.');
+      return true;
+    }
+    const ok = verb === 'wake' ? devWakeSlumber(ctx, boss) : devSleepSlumber(ctx, boss);
+    log(
+      ok
+        ? verb === 'wake'
+          ? '[dev] Old Thatchgrin tears himself off his pole.'
+          : '[dev] Old Thatchgrin climbs back onto his pole.'
+        : verb === 'wake'
+          ? '[dev] He is already awake.'
+          : '[dev] He is already on his pole, or still in a fight.',
+    );
     return true;
   }
   if (verb === 'lockout') {

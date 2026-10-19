@@ -3330,7 +3330,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // the WOC Store's annual membership tank reward; the one pending-ruling
   // absence resolves to nothing.
   // + Old Thatchgrin, the Emberbristle Broom's one table.
-  horizons_mounts: 15, // plus the referral-card reward activity
+  horizons_mounts: 16, // plus the referral-card reward activity and (round 10) Old Thatchgrin
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster

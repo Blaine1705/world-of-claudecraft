@@ -50,13 +50,15 @@
 //     chaff's burn per second, the owner's "hits soft").
 //   - The charm's drop chance, in the buddy-drop convention (content/buddy_sources.ts:
 //     CALIBRATE). The pumpkin head is guaranteed but never duplicated; the broom is
-//     bought from Hester for five Emberwoven Sheaves, one per daily kill.
+//     bought from Hester for five Emberwoven Sheaves, one per daily kill, or, rarely
+//     (3%, round 10), dropped outright on a daily looted kill.
 //
 // Everything he pays is cosmetic or event currency: no stat, no gear, no power.
 
 import type { ItemDef, MobTemplate } from '../types';
 import {
   CARVED_PUMPKIN_HEAD_ID,
+  GOURDLIGHT_BROOM_DROP_CHANCE,
   GOURDLIGHT_BROOM_ID,
   GOURDLIGHT_EVE_ID,
   GOURDLIGHT_POUCH_SWEETS,
@@ -242,6 +244,24 @@ export const GOURDLIGHT_SCARECROW_MOBS: Record<string, MobTemplate> = {
     untameable: true,
     // He stands guard over his patch while idle instead of wandering out of it.
     idleStationary: true,
+    // A NIGHT boss (owner direction, round 10): by day he hangs lifeless on his pole in
+    // the middle of his field, neutral and unattackable like any sleeper (mob/slumber.ts:
+    // the one isHostileTo rule, no damage branch); at nightfall he wakes, tears himself
+    // off the post and the field is his again; at dawn, once out of combat, he climbs
+    // back onto it. A fight running at dawn is fought to its end. The Foreman's slumber
+    // inverted (awakeAt 'night'), so the sky and his pole agree on when night falls.
+    slumber: {
+      auraName: 'Pole-Bound',
+      sleepYell: 'Sun is up. Back on the post, back to watching.',
+      wakeYell: 'NIGHT falls on the patch! Who walks in MY field?',
+      yellRange: 120,
+      // his pole stands on his spawn point: he hangs on it exactly, facing his field
+      bedRadius: 1.5,
+      snapToBed: true,
+      awakeAt: 'night',
+      // the Awaken clip (scarecrow_clips.py awaken_keys) runs 3.0 s; the hold covers it
+      riseSeconds: 3,
+    },
     // No kiting him into town: past this from his post he evades home.
     hardLeashRadius: 40,
     // The Waking Warden's ladder (header).
@@ -269,12 +289,15 @@ export const GOURDLIGHT_SCARECROW_MOBS: Record<string, MobTemplate> = {
     // when the contributor does not own one (so a first kill always pays it), and one
     // Emberwoven Sheaf, the broom's token (Hester trades five for the Emberbristle
     // Broom), for every contributor who does not keep the broom yet. The broom itself
-    // never drops: it takes five days of kills.
+    // is a rare drop on top (GOURDLIGHT_BROOM_DROP_CHANCE, owner direction round 10):
+    // rolled for every contributor so the draw order stays a function of the roster,
+    // and discarded for one who already keeps it. Five days of sheaves stay the sure way.
     loot: [
       { itemId: THATCHGRIN_SACK_ID, chance: 1 },
       { itemId: STRAWLING_CHARM_ID, chance: STRAWLING_CHARM_CHANCE },
       { itemId: CARVED_PUMPKIN_HEAD_ID, chance: 1, unlessOwned: true },
       { itemId: GOURDLIGHT_SHEAF_ID, chance: 1, unlessOwnedItem: GOURDLIGHT_BROOM_ID },
+      { itemId: GOURDLIGHT_BROOM_ID, chance: GOURDLIGHT_BROOM_DROP_CHANCE, unlessOwned: true },
     ],
     // Falls apart into a heap of straw and lies in the stubble for his corpse window,
     // then settles into it rather than blinking out (mob/boss_corpse_sink.ts).

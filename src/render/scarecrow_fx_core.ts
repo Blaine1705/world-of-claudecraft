@@ -173,3 +173,59 @@ export function swellGlow(p: number, time: number): number {
   const q = Math.max(0, Math.min(1, p));
   return Math.max(0, Math.min(1, 0.3 + 0.6 * q + 0.15 * swellThrob(q, time)));
 }
+
+// Round 10: his NIGHT colours and his pole.
+
+/** The Gourdfall palette (owner direction, round 10: his burning ground and the pumpkins he
+ *  rains are a dark purple, a witch-fire, never the old orange). `ink` is the dark underlay
+ *  a patch lays on the stubble (normal blend: it darkens the ground at any hour), `rim` the
+ *  violet glow along its edge and in its embers (additive: the edge a player reads), `fire`
+ *  the flame and spark tints, `smoke` the smoke off it. */
+export const GOURDFALL_PURPLE = Object.freeze({
+  ink: 0x2a0b42,
+  rim: 0x9b4dff,
+  fire: [0x7b2cd6, 0xb57cff, 0x4b138a, 0xe2c6ff] as readonly number[],
+  smoke: 0x24142f,
+  /** The thrown pumpkin's rind and its carved glow. */
+  rind: 0x3a1452,
+  glow: 0xb050ff,
+});
+
+/** The shared encounter rune circle's rim for one of his abilities (the Gourdfall rings
+ *  wear his witch-fire violet rather than the fire school's orange), or null. */
+export function thatchgrinRuneColor(ability: string | undefined): number | null {
+  return ability === GOURD_ABILITY ? GOURDFALL_PURPLE.rim : null;
+}
+
+/** World yards per metre of his Blender body (THATCHGRIN_HEIGHT 7.4 over its 5.1 m). */
+const POLE_SCALE = 7.4 / 5.1;
+/** His pole, in his own frame at his drawn size (world yards; scarecrow_clips.py pole_pose
+ *  hangs him on it, scarecrow/pole_preview.py renders the two together): the post stands
+ *  `postBack` behind his spine, the crossbar runs across behind his shoulders at
+ *  `barHeight`, `barBack` behind him, `barHalf` to each side, the post rising to `postTop`. */
+export const THATCHGRIN_POLE = Object.freeze({
+  postBack: 0.44 * POLE_SCALE,
+  barBack: 0.3 * POLE_SCALE,
+  barHeight: 3.66 * POLE_SCALE,
+  barHalf: 2.55 * POLE_SCALE,
+  postTop: 4.55 * POLE_SCALE,
+});
+
+/** Where the pole stands for a boss whose bed is at (x, z) facing `facing`: the post's foot
+ *  (`post`) and the crossbar's centre (`bar`, its height `THATCHGRIN_POLE.barHeight`). */
+export function thatchgrinPoleAt(
+  x: number,
+  z: number,
+  facing: number,
+): { post: { x: number; z: number }; bar: { x: number; z: number } } {
+  return {
+    post: bodyLocalToWorld(x, z, facing, 0, -THATCHGRIN_POLE.postBack),
+    bar: bodyLocalToWorld(x, z, facing, 0, -THATCHGRIN_POLE.barBack),
+  };
+}
+
+/** The nightfall wake's beats (scarecrow_clips.py awaken_keys): the head jerks up, his arms
+ *  tear off the bar, his feet hit the stubble. */
+export const AWAKEN_HEAD_SEC = 0.95;
+export const AWAKEN_TEAR_SEC = 1.6;
+export const AWAKEN_LAND_SEC = 1.9;

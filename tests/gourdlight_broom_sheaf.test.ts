@@ -68,11 +68,15 @@ function standAtKeeper(sim: Sim): Entity {
 }
 
 describe('his loot table', () => {
-  it('never carries the broom; it pays one sheaf, stopped by an owned broom', () => {
+  it('carries the broom only as his rare drop; it pays one sheaf, stopped by an owned broom', () => {
     const loot = MOBS[THATCHGRIN_ID].loot;
-    expect(loot.some((l) => l.itemId === GOURDLIGHT_BROOM_ID)).toBe(false);
+    // round 10: a 3% direct drop, never to a keeper (tests/gourdlight_scarecrow_night.test.ts)
+    const broom = loot.filter((l) => l.itemId === GOURDLIGHT_BROOM_ID);
+    expect(broom).toEqual([{ itemId: GOURDLIGHT_BROOM_ID, chance: 0.03, unlessOwned: true }]);
     expect(
-      Object.values(MOBS).some((m) => m.loot.some((l) => l.itemId === GOURDLIGHT_BROOM_ID)),
+      Object.entries(MOBS).some(
+        ([id, m]) => id !== THATCHGRIN_ID && m.loot.some((l) => l.itemId === GOURDLIGHT_BROOM_ID),
+      ),
     ).toBe(false);
     const row = loot.find((l) => l.itemId === GOURDLIGHT_SHEAF_ID);
     expect(row?.chance).toBe(1);

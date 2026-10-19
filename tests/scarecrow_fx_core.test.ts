@@ -6,16 +6,24 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { applyRideGrip, reachArm } from '../src/render/characters/ride_grip_ik';
 import {
+  AWAKEN_HEAD_SEC,
+  AWAKEN_LAND_SEC,
+  AWAKEN_TEAR_SEC,
   FALL_HEIGHT,
   FALL_SEC,
   FALL_SLANT,
   fallOrigin,
   fallPoint,
   fallWindow,
+  GOURD_ABILITY,
+  GOURDFALL_PURPLE,
   SWELL_RISE_SEC,
   swellGlow,
   swellScale,
   swellThrob,
+  THATCHGRIN_POLE,
+  thatchgrinPoleAt,
+  thatchgrinRuneColor,
 } from '../src/render/scarecrow_fx_core';
 
 describe('the rain of pumpkins', () => {
@@ -49,6 +57,45 @@ describe('the rain of pumpkins', () => {
     expect(Math.hypot(o.x - 12, o.z + 40)).toBeCloseTo(FALL_SLANT, 6);
     expect(fallOrigin(12, 3, -40)).toEqual(o);
     expect(fallOrigin(13, 3, -40)).not.toEqual(o);
+  });
+});
+
+describe('his night colours and his pole (round 10)', () => {
+  const hsl = (hex: number) => new THREE.Color(hex).getHSL({ h: 0, s: 0, l: 0 });
+  it('dyes the rain, its scorched ground and its rings a dark witch-fire purple', () => {
+    for (const hex of [GOURDFALL_PURPLE.ink, GOURDFALL_PURPLE.rind, GOURDFALL_PURPLE.rim]) {
+      const c = hsl(hex);
+      // purple: between blue and magenta, never the old orange
+      expect(c.h, hex.toString(16)).toBeGreaterThan(0.7);
+      expect(c.h, hex.toString(16)).toBeLessThan(0.86);
+    }
+    // the underlay and the rind are DARK (they read by day); the rim glows
+    expect(hsl(GOURDFALL_PURPLE.ink).l).toBeLessThan(0.2);
+    expect(hsl(GOURDFALL_PURPLE.rind).l).toBeLessThan(0.25);
+    expect(hsl(GOURDFALL_PURPLE.rim).l).toBeGreaterThan(0.5);
+    expect(thatchgrinRuneColor(GOURD_ABILITY)).toBe(GOURDFALL_PURPLE.rim);
+    expect(thatchgrinRuneColor('mob_thatchgrin_puppet')).toBeNull();
+    expect(thatchgrinRuneColor(undefined)).toBeNull();
+  });
+
+  it('stands his pole behind his back, its bar across his shoulders', () => {
+    // facing +z: the post is BEHIND him (-z), centred on his spine
+    const at = thatchgrinPoleAt(10, 20, 0);
+    expect(at.post.x).toBeCloseTo(10, 6);
+    expect(at.post.z).toBeCloseTo(20 - THATCHGRIN_POLE.postBack, 6);
+    expect(at.bar.z).toBeGreaterThan(at.post.z);
+    // turned to face +x, the post swings round behind him to -x
+    const turned = thatchgrinPoleAt(0, 0, Math.PI / 2);
+    expect(turned.post.x).toBeCloseTo(-THATCHGRIN_POLE.postBack, 6);
+    expect(turned.post.z).toBeCloseTo(0, 6);
+    // the bar at his shoulders (his 7.4-yard body), the post above his head's crown
+    expect(THATCHGRIN_POLE.barHeight).toBeGreaterThan(4.8);
+    expect(THATCHGRIN_POLE.barHeight).toBeLessThan(5.8);
+    expect(THATCHGRIN_POLE.postTop).toBeGreaterThan(THATCHGRIN_POLE.barHeight + 1);
+    // the wake's beats in order, all inside the 3 s rise hold
+    expect(AWAKEN_HEAD_SEC).toBeLessThan(AWAKEN_TEAR_SEC);
+    expect(AWAKEN_TEAR_SEC).toBeLessThan(AWAKEN_LAND_SEC);
+    expect(AWAKEN_LAND_SEC).toBeLessThan(3);
   });
 });
 
