@@ -38,6 +38,7 @@ describe('major cooldown wire (server encode)', () => {
         system_unstuck: 300, // not an ability at all
       }),
       0,
+      0,
     );
     expect(mcdOf(cache)).toEqual(['barkskin', 'recklessness', 'trinket:medallion_of_defiance']);
     // No number of any kind leaks: not a deadline, not a remaining time.
@@ -47,25 +48,25 @@ describe('major cooldown wire (server encode)', () => {
   it('does not change while cooldowns count down, and changes only when one is used or ends', () => {
     const cache = new MajorCooldownWireCache();
     const e = serverPlayer({ recklessness: 180 });
-    const r0 = cache.encode(e, 3).revision;
+    const r0 = cache.encode(e, 3, 0).revision;
     const json0 = cache.json;
     e.cooldowns.set('recklessness', 12.5);
-    expect(cache.encode(e, 3).revision).toBe(r0);
+    expect(cache.encode(e, 3, 0).revision).toBe(r0);
     expect(cache.json).toBe(json0);
     // A changed paired aura revision bumps it: the channel is one version.
-    expect(cache.encode(e, 4).revision).toBe(r0 + 1);
+    expect(cache.encode(e, 4, 0).revision).toBe(r0 + 1);
     // A newly used cooldown bumps it.
     e.cooldowns.set('avatar', 180);
-    expect(cache.encode(e, 4).revision).toBe(r0 + 2);
+    expect(cache.encode(e, 4, 0).revision).toBe(r0 + 2);
     // One coming back bumps it.
     e.cooldowns.delete('recklessness');
-    expect(cache.encode(e, 4).revision).toBe(r0 + 3);
+    expect(cache.encode(e, 4, 0).revision).toBe(r0 + 3);
     expect(mcdOf(cache)).toEqual(['avatar']);
   });
 
   it('splices mcd beside the auras of a record', () => {
     const cache = new MajorCooldownWireCache();
-    cache.encode(serverPlayer({ evasion: 100 }), 0);
+    cache.encode(serverPlayer({ evasion: 100 }), 0, 0);
     expect(JSON.parse(cache.splice('{"x":1,"auras":[]}'))).toEqual({
       x: 1,
       auras: [],
@@ -75,29 +76,64 @@ describe('major cooldown wire (server encode)', () => {
 
   it('ships null for no spent tracked cooldown, and nothing for a mob', () => {
     const cache = new MajorCooldownWireCache();
-    cache.encode(serverPlayer({ mortal_strike: 4 }), 0);
+    cache.encode(serverPlayer({ mortal_strike: 4 }), 0, 0);
     expect(cache.json).toBe('null');
     const mob = serverPlayer({ barkskin: 30 });
     mob.kind = 'mob';
-    cache.encode(mob, 0);
+    cache.encode(mob, 0, 0);
     expect(cache.json).toBe('null');
   });
 
   it('never reads an equip lockout as a used medallion', () => {
     const cache = new MajorCooldownWireCache();
     const e = serverPlayer({ 'trinket:medallion_of_defiance': 30 });
-    cache.encode(e, 0);
+    cache.encode(e, 0, 0);
     expect(cache.json).toBe('null');
     // Once the lockout ran out, a real use (the full 2 min) shows...
     e.cooldowns.delete('trinket:medallion_of_defiance');
-    cache.encode(e, 0);
+    cache.encode(e, 0, 0);
     e.cooldowns.set('trinket:medallion_of_defiance', 120);
-    cache.encode(e, 0);
+    cache.encode(e, 0, 0);
     expect(mcdOf(cache)).toEqual(['trinket:medallion_of_defiance']);
     // ...and keeps showing down to the last seconds of that cooldown.
     e.cooldowns.set('trinket:medallion_of_defiance', 5);
-    cache.encode(e, 0);
+    cache.encode(e, 0, 0);
     expect(mcdOf(cache)).toEqual(['trinket:medallion_of_defiance']);
+  });
+});
+
+describe('major cooldown wire (medallion while unobserved)', () => {
+  const MEDALLION = 'trinket:medallion_of_defiance';
+
+  it('judges a re-armed medallion afresh: an equip lockout after an unseen end stays hidden', () => {
+    const cache = new MajorCooldownWireCache();
+    const e = serverPlayer({ [MEDALLION]: 120 });
+    cache.encode(e, 0, 100); // used while observed: ends at 220
+    expect(mcdOf(cache)).toEqual([MEDALLION]);
+    // Out of everyone's interest: the cooldown ran out, then the trinket was
+    // re-equipped (a 30 s lockout). First seen again at t=400, ending at 430.
+    e.cooldowns.set(MEDALLION, 30);
+    cache.encode(e, 0, 400);
+    expect(cache.json).toBe('null');
+  });
+
+  it('judges a fresh use after an unseen end as a use', () => {
+    const cache = new MajorCooldownWireCache();
+    const e = serverPlayer({ [MEDALLION]: 120 });
+    cache.encode(e, 0, 100);
+    e.cooldowns.set(MEDALLION, 110); // a second use, seen at t=300
+    cache.encode(e, 0, 300);
+    expect(mcdOf(cache)).toEqual([MEDALLION]);
+  });
+
+  it('keeps a judged use shown as it counts down across ticks', () => {
+    const cache = new MajorCooldownWireCache();
+    const e = serverPlayer({ [MEDALLION]: 120 });
+    for (let t = 0; t < 119; t += 0.05) {
+      e.cooldowns.set(MEDALLION, 120 - t);
+      cache.encode(e, 0, t);
+      if (cache.json === 'null') throw new Error(`hidden at t=${t}`);
+    }
   });
 });
 
@@ -120,7 +156,7 @@ describe('major cooldown wire (client decode)', () => {
 
   it('round-trips the server encode through JSON to the client decode', () => {
     const cache = new MajorCooldownWireCache();
-    cache.encode(serverPlayer({ evasion: 120, 'trinket:medallion_of_defiance': 45 }), 0);
+    cache.encode(serverPlayer({ evasion: 120, 'trinket:medallion_of_defiance': 45 }), 0, 0);
     const peer = blankEntity(7);
     applyPeerMajorCooldownWire(peer, JSON.parse(cache.json));
     expect([...peer.cooldowns.keys()].sort()).toEqual(['evasion', 'trinket:medallion_of_defiance']);
@@ -133,8 +169,9 @@ describe('major cooldown wire (client decode)', () => {
     e.cooldowns.set('avatar', 42);
     applyPeerMajorCooldownWire(e, ['avatar', 'evasion'], true);
     expect(Object.fromEntries(e.cooldowns)).toEqual({ avatar: 42 });
-    // The forgotten keys are not cleared later as if they were still held.
-    applyPeerMajorCooldownWire(e, null, true);
+    // The forgotten keys are not cleared later as if they were still held, even
+    // by a peer record (isSelf false) arriving after the rebind.
+    applyPeerMajorCooldownWire(e, null);
     expect(e.cooldowns.get('avatar')).toBe(42);
   });
 

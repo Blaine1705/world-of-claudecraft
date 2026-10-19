@@ -3,8 +3,8 @@
 // ClientWorld fed those exact snapshots mirrors them into the peer entity's
 // cooldown map. Pins the wiring the unit pair (tests/major_cooldown_wire.test.ts)
 // cannot: the game.ts splice, the online.ts decode on the aura channel only, the
-// held set across lite records, the self skip, and that no remaining time ever
-// leaves the server.
+// held set across lite records, the self skip, and that the `mcd` value carries
+// keys only (no remaining time or deadline).
 import { describe, expect, it } from 'vitest';
 import { GameServer } from '../server/game';
 import { SPENT_COOLDOWN_UNKNOWN_REMAINING } from '../src/net/peer_major_cooldown_wire';

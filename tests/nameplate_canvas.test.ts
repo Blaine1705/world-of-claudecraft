@@ -1698,6 +1698,34 @@ describe('the enemy cooldown row on a plate', () => {
     }
   });
 
+  it('veils a spent cooldown under forced colors, so spent never reads as active', () => {
+    const previousMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn(() => ({ matches: true })),
+    });
+    try {
+      const surface = new NameplateCanvasSurface(document.createElement('div'));
+      const state = plateState();
+      const veils = (active: boolean): number => {
+        traces[0].globalAlphas.length = 0;
+        const plan = cooldownPlanWith(['recklessness']);
+        plan.slots[0].active = active;
+        state.cooldowns = plan;
+        surface.beginFrame(640, 360, 1);
+        surface.drawBase(state, 320, 260);
+        return traces[0].globalAlphas.filter((a) => a === 0.6).length;
+      };
+      expect(veils(false)).toBe(veils(true) + 1);
+    } finally {
+      if (previousMatchMedia) {
+        Object.defineProperty(window, 'matchMedia', previousMatchMedia);
+      } else {
+        Reflect.deleteProperty(window, 'matchMedia');
+      }
+    }
+  });
+
   it('draws nothing and reserves nothing for an empty plan', () => {
     const surface = new NameplateCanvasSurface(document.createElement('div'));
     const state = plateState();

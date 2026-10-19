@@ -506,7 +506,7 @@ export const BOOL_SETTINGS = {
   showNameplateDots: { def: true },
   // on by default: a hostile PLAYER's tracked cooldowns (src/sim/major_cooldowns.ts:
   // the PvP medallion once used, then defensives, then offensives) as an icon row
-  // ABOVE their name, active buffs glowing and spent ones counting down. PvP
+  // ABOVE their name, active buffs glowing and spent ones dimmed (never timed). PvP
   // information a player acts on (when to burst, when to save a defensive), so it
   // is never graphics-tier gated.
   showNameplateCooldowns: { def: true },

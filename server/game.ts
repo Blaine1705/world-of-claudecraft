@@ -8259,7 +8259,7 @@ export class GameServer {
       if (stableTimerWire) {
         const aura = cache.auraCache.encode(e.auras, this.sim.time, e.dead);
         // Spent enemy cooldowns (keys only) share the aura channel and its version.
-        const mcd = variant.mcd.encode(e, aura.revision);
+        const mcd = variant.mcd.encode(e, aura.revision, this.sim.time);
         variant.dynJson = cache.baseDynJson;
         variant.dynVer = cache.baseDynVer;
         variant.auraVer = mcd.revision;

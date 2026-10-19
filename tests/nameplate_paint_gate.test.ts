@@ -209,6 +209,24 @@ describe('nameplate paint gate core', () => {
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
   });
 
+  it('repaints on the active flag alone, with every other field unchanged', () => {
+    // A spent slot and a buff whose text has not been resolved yet can share
+    // icon, group, unit and (empty) text: only `active` tells them apart.
+    const gate = new NameplatePaintGate();
+    const slot = {
+      iconUrl: '/ui/skills/druid/barkskin.webp',
+      group: 'defensive',
+      active: false,
+      unit: 'seconds',
+      timeText: '',
+    };
+    const f = fields({ cooldowns: { count: 1, scale: 1, slots: [slot] } });
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(false);
+    slot.active = true;
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+  });
+
   it('treats an omitted badge circular flag as false on still frames', () => {
     const gate = new NameplatePaintGate();
     const f = fields({ badges: [{ url: '/badge.webp', size: 15 }] });

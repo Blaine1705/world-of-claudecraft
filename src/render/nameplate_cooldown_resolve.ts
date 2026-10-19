@@ -4,8 +4,8 @@
 // painter (the dot row's resolve lives in nameplate_painter.ts itself) so the
 // coordinator gains one call, not another method bank.
 //
-// Runs for every plate on screen EVERY frame: an active buff's countdown and a
-// cooldown flipping spent are the point, so it cannot ride the throttled pass. The artwork is a Map hit
+// Runs for every plate on screen EVERY frame: an active buff's countdown is the
+// point, so it cannot ride the throttled content pass. The artwork is a Map hit
 // after the first resolve per key, and the countdown is re-formatted only when
 // the number moves at the precision it is drawn.
 

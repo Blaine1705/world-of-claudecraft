@@ -10,7 +10,8 @@
 // Every state carries a cue that is not colour alone, so forced colors (which
 // collapse every fill to the system palette) and colour-blind players lose
 // nothing: the group badge's glyph (shield, up arrow, ring), and a thicker border
-// plus a countdown for an active buff against a thin, unnumbered one when spent.
+// plus a countdown for an active buff against a thin, unnumbered, veiled one when
+// spent.
 //
 // A spent cooldown draws NO time of any kind, neither a number nor a swipe: the
 // row tells a player that an enemy has burned a defensive, never how long until
@@ -50,6 +51,7 @@ const TILE_FILL = '#0e1118';
 // A spent cooldown is dimmed evenly, the "not available" cue, without a per-icon
 // canvas filter (unsupported on WebKit, and costly per frame).
 const SPENT_WASH = 'rgba(4, 6, 10, 0.55)';
+const SPENT_FORCED_ALPHA = 0.6;
 const TILE_RADIUS = 2;
 // The one countdown the row draws: an active buff's remaining time. A recharging
 // cooldown carries no number (nameplate_cooldown_resolve.ts leaves its text empty).
@@ -142,12 +144,15 @@ export function drawNameplateCooldownRow(
       ctx.restore();
     }
 
-    // Spent: dim the whole icon evenly. No swipe, so nothing hints at when it
-    // comes back.
-    if (!slot.active && !forced) {
+    // Spent: dim the whole icon evenly (half-veiled in the system Canvas colour
+    // under forced colors). No swipe, so nothing hints at when it comes back.
+    if (!slot.active) {
+      ctx.save();
       host.roundedRect(ctx, x, topY, size, size, radius);
-      ctx.fillStyle = SPENT_WASH;
+      ctx.fillStyle = forced ? 'Canvas' : SPENT_WASH;
+      if (forced) ctx.globalAlpha = SPENT_FORCED_ALPHA;
       ctx.fill();
+      ctx.restore();
     }
 
     host.roundedRect(ctx, x + 0.5, topY + 0.5, size - 1, size - 1, radius);
