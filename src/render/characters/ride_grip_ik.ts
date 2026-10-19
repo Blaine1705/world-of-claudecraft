@@ -243,6 +243,47 @@ function setWorldQuat(bone: THREE.Object3D, world: THREE.Quaternion, k: number):
   bone.updateMatrixWorld(true);
 }
 
+/** Below this share of a straight arm the shoulder stays where the clip put it. */
+const SHOULDER_ASSIST_FROM = 0.95;
+/** The most the shoulder rolls in toward the fist (radians, about 26 degrees). */
+const SHOULDER_ASSIST_MAX = 0.45;
+const shC = new THREE.Vector3();
+const shS = new THREE.Vector3();
+const shAxis = new THREE.Vector3();
+const shQ = new THREE.Quaternion();
+
+/**
+ * Roll the shoulder (the upper arm's parent, when it is a clavicle) toward `target` until the
+ * shoulder is `want` from it, capped at SHOULDER_ASSIST_MAX. True when it moved the shoulder.
+ * Rigs without a clavicle (the KayKit bodies hang the arm off the chest) are left alone.
+ */
+function shrugToward(arm: RideArm, target: THREE.Vector3, want: number, k: number): boolean {
+  const clav = arm.upper.parent;
+  if (!clav || !/clavicle/i.test(clav.name)) return false;
+  clav.getWorldPosition(shC);
+  arm.upper.getWorldPosition(shS);
+  const now = shS.distanceTo(target);
+  if (now <= want) return false;
+  const rc = shC.distanceTo(shS);
+  const dct = shC.distanceTo(target);
+  if (rc < 1e-5 || dct < 1e-5) return false;
+  tmpA.subVectors(shS, shC).normalize();
+  tmpB.subVectors(target, shC).normalize();
+  const theta = Math.acos(Math.min(1, Math.max(-1, tmpA.dot(tmpB))));
+  // the angle off the clavicle-to-target line that leaves the shoulder `want` from the target
+  const c = (rc * rc + dct * dct - want * want) / (2 * rc * dct);
+  const thetaWant = c >= 1 ? 0 : Math.acos(Math.max(-1, c));
+  const turn = Math.min(SHOULDER_ASSIST_MAX, theta - thetaWant);
+  if (turn <= 1e-4) return false;
+  shAxis.crossVectors(tmpA, tmpB);
+  if (shAxis.lengthSq() < 1e-10) return false;
+  shAxis.normalize();
+  clav.getWorldQuaternion(qWorld);
+  qWorld.premultiply(shQ.setFromAxisAngle(shAxis, turn * k));
+  setWorldQuat(clav, qWorld, 1);
+  return true;
+}
+
 /** Solve one arm onto the grip point `grip` (world) on a handle running along `dir`.
  *  `outSign` is +1 for the left arm, -1 for the right (the elbow's pole points out to that
  *  side). */
@@ -280,6 +321,13 @@ function solveArm(
       wristWant = qWrist.copy(qWant).multiply(qRel.invert());
       tmpWristAt.copy(slotOffset).applyQuaternion(wristWant).negate().add(grip);
     }
+  }
+  // A body whose arm falls short rolls its shoulder in toward the fist, the way a rider
+  // reaches down a shaft: without it a short arm stretched straight and its fist hung in
+  // the air above the handle, rising and falling with every breath of the seated loop.
+  if (shrugToward(arm, tmpWristAt, (l1 + l2) * SHOULDER_ASSIST_FROM, k)) {
+    upper.getWorldPosition(tmpS);
+    fore.getWorldPosition(tmpE);
   }
   tmpDir.subVectors(tmpWristAt, tmpS);
   const reach = Math.min(tmpDir.length(), (l1 + l2) * 0.999);

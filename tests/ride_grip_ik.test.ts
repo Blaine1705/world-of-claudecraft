@@ -37,6 +37,7 @@ function rider(): { root: THREE.Object3D; arms: RideArms } {
   for (const side of ['l', 'r'] as const) {
     const s = side === 'l' ? 1 : -1;
     const clav = new THREE.Bone();
+    clav.name = `clavicle${side}`;
     clav.position.set(0.02 * s, 0.12, 0.014);
     // T-pose: the arm out to its own side
     clav.quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -s * (Math.PI / 2));
@@ -142,6 +143,18 @@ describe('hands round the broom handle', () => {
         expect(Math.abs(b[i].quat.dot(a[i].quat)), `seed ${seed}`).toBeGreaterThan(0.99999);
         expect(b[i].wrist.distanceTo(a[i].wrist)).toBeLessThan(1e-4);
       }
+    }
+  });
+
+  it('a short arm rolls its shoulder in and still closes on the handle', () => {
+    const { root, arms } = rider();
+    // a handle low enough that the straight arm alone falls a few centimetres short
+    const low = { forward: 0.3, up: 0.74, stagger: 0 };
+    applyRideGrip(root, arms, low, 1);
+    root.updateMatrixWorld(true);
+    for (const arm of [arms.left, arms.right]) {
+      const at = (arm.slot as THREE.Object3D).getWorldPosition(v());
+      expect(Math.abs(at.y - low.up), arm.upper.name).toBeLessThan(0.01);
     }
   });
 
