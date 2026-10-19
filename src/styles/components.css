@@ -1676,7 +1676,14 @@
     position: relative;
     z-index: 1;
   }
+  /* Out of flow, so the drawing buffer can never size the host. CharacterPreview
+     sizes the buffer FROM the host's client box on every resize; an in-flow
+     canvas lets that buffer feed back into the host's height wherever it is only
+     floored (the inspect stage), and Firefox under the #ui zoom then grows the
+     stage without bound. tests/browser/inspect_stage_size.browser.test.ts. */
   .char-model-preview canvas {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100% !important;
     height: 100% !important;
@@ -1684,10 +1691,12 @@
   /* Cold-open stand-in: the class crest (or a cached portrait) covers the still
      empty canvas while the preview's programs link, so the panel is never a
      blank box. Built and removed by src/ui/preview_stand_in.ts, never per
-     frame. */
+     frame. z-index keeps it over the (also positioned) canvas whatever the
+     mount order. */
   .char-model-preview .preview-stand-in {
     position: absolute;
     inset: 0;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
