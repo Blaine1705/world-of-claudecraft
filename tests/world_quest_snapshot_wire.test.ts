@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { QuestSelfMirrors } from '../src/net/quest_snapshot_wire';
 import { applyQuestSelfWire } from '../src/net/quest_snapshot_wire';
 import { interactObjectCreditKey } from '../src/sim/quests/interact_object_credit';
+import { activeWorldQuestsForCycle } from '../src/sim/world_quest_rotation';
 
 function mirrors(): QuestSelfMirrors {
   return {
@@ -156,5 +157,53 @@ describe('world quest snapshot wire', () => {
       state: 'active',
       puzzleVariant: 0,
     });
+  });
+  // Discord report: the rerolled "Load freight into the wagon" completed and paid out,
+  // but the map board kept it open (0/6) because the decode filtered its row against
+  // the shared rotation only, never the character's personal replacement.
+  it("keeps progress rows for a personal replacement quest on today's board", () => {
+    const replacementId = 'wq_eastbrook_bandits';
+    let cycle = '';
+    let replacedId = '';
+    for (let day = 1; day <= 64 && !cycle; day++) {
+      const ids = activeWorldQuestsForCycle(`wq1_${day}`).map((quest) => quest.id);
+      const replaced = ids.find((id) => id.startsWith('wq_eastbrook_') && id !== replacementId);
+      if (replaced && !ids.includes(replacementId)) {
+        cycle = `wq1_${day}`;
+        replacedId = replaced;
+      }
+    }
+    expect(cycle).not.toBe('');
+    const replacement = { questId: replacementId, count: 6, state: 'completed' };
+
+    // Both keys in one snapshot (login or resume).
+    const target = mirrors();
+    applyQuestSelfWire(target, {
+      wqday: cycle,
+      wqrr: cycle,
+      wqrep: { [replacedId]: replacementId },
+      wqlog: [replacement],
+    });
+    expect(target.worldQuestLog.get(replacementId)).toEqual(replacement);
+
+    // The delta gate sends the reroll first, then progress on a later tick.
+    const delta = mirrors();
+    applyQuestSelfWire(delta, {
+      wqday: cycle,
+      wqlog: [],
+      wqrr: cycle,
+      wqrep: { [replacedId]: replacementId },
+    });
+    applyQuestSelfWire(delta, { wqlog: [{ questId: replacementId, count: 3, state: 'active' }] });
+    expect(delta.worldQuestLog.get(replacementId)).toEqual({
+      questId: replacementId,
+      count: 3,
+      state: 'active',
+    });
+
+    // Without a replacement mapping the off-board row is still dropped.
+    const plain = mirrors();
+    applyQuestSelfWire(plain, { wqday: cycle, wqlog: [replacement] });
+    expect(plain.worldQuestLog.has(replacementId)).toBe(false);
   });
 });
