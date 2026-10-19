@@ -36,7 +36,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "es_ES": [
     "hud.pet.assist",
@@ -65,7 +67,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "fr_FR": [
     "hud.pet.assist",
@@ -94,7 +98,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "fr_CA": [
     "hud.pet.assist",
@@ -123,7 +129,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "en_CA": [],
   "it_IT": [
@@ -153,7 +161,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "de_DE": [
     "hud.pet.assist",
@@ -182,7 +192,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "zh_CN": [
     "hudChrome.options.enemyHighlightDistance"
@@ -223,7 +235,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "ru_RU": [
     "hudChrome.options.enemyHighlightDistance"
@@ -255,7 +269,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "nl_NL": [
     "hud.pet.assist",
@@ -284,7 +300,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "pl_PL": [
     "hud.pet.assist",
@@ -313,7 +331,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "id_ID": [
     "hud.pet.assist",
@@ -342,7 +362,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "tr_TR": [
     "hud.pet.assist",
@@ -371,7 +393,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "sv_SE": [
     "hud.pet.assist",
@@ -400,7 +424,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "vi_VN": [
     "hud.pet.assist",
@@ -429,7 +455,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ],
   "da_DK": [
     "hud.pet.assist",
@@ -458,6 +486,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.enemyHighlightNameplate",
     "hudChrome.options.enemyHighlightOverhead",
     "hudChrome.options.enemyHighlightReticle",
-    "hudChrome.options.enemyHighlightStyle"
+    "hudChrome.options.enemyHighlightStyle",
+    "hudChrome.options.nameplateCooldownScale",
+    "hudChrome.options.showNameplateCooldowns"
   ]
 };

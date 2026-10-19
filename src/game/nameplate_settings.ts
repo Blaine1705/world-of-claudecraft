@@ -1,4 +1,6 @@
-// Persist the renderer's nameplate/selection booleans through one settings seam.
+// Apply nameplate row scales and selection preferences through one settings seam.
+import { setNameplateCooldownScale } from '../render/nameplate_cooldown_scale';
+import { setNameplateDotScale } from '../render/nameplate_dot_scale';
 import {
   type TargetHighlightFlags,
   type TargetHighlightSettingKey,
@@ -14,11 +16,21 @@ export interface NameplateSettingsRenderer {
 }
 
 export function applyNameplateSetting(
-  settings: Pick<Settings, 'set'>,
+  settings: Pick<Settings, 'set' | 'nameplateDotRenderScale' | 'nameplateCooldownRenderScale'>,
   renderer: NameplateSettingsRenderer,
   key: string,
   value: number | boolean,
 ): boolean {
+  if (key === 'showNameplateDots' || key === 'showNameplateCooldowns') {
+    settings.set(key, !!value);
+    applyNameplateRowScales(settings);
+    return true;
+  }
+  if (key === 'nameplateDotScale' || key === 'nameplateCooldownScale') {
+    settings.set(key, Number(value));
+    applyNameplateRowScales(settings);
+    return true;
+  }
   if (key === 'showDevBadges' || key === 'showOwnNameplate' || key === 'showPlayerNameplates') {
     renderer[key] = settings.set(key, !!value);
     return true;
@@ -27,4 +39,12 @@ export function applyNameplateSetting(
   if (!flag) return false;
   renderer.targetHighlight[flag] = settings.set(key as TargetHighlightSettingKey, !!value);
   return true;
+}
+
+/** Boot and renderer rebuild consume the same persisted fold as setting changes. */
+export function applyNameplateRowScales(
+  settings: Pick<Settings, 'nameplateDotRenderScale' | 'nameplateCooldownRenderScale'>,
+): void {
+  setNameplateDotScale(settings.nameplateDotRenderScale());
+  setNameplateCooldownScale(settings.nameplateCooldownRenderScale());
 }

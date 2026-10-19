@@ -77,3 +77,14 @@ export const EMOTE_STYLE: TextSpriteStyle = {
   stroke: '#000',
   lineWidth: 1,
 };
+
+/** Configure a surface-owned mutable pen for its current system palette. */
+export function configureNameplateTextStyle(
+  style: TextSpriteStyle,
+  fill: string,
+  forcedColors: boolean,
+): TextSpriteStyle {
+  style.fill = forcedColors ? 'CanvasText' : fill;
+  style.stroke = forcedColors ? 'Canvas' : '#000';
+  return style;
+}

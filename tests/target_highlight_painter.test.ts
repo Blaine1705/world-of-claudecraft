@@ -19,6 +19,8 @@ import {
 } from '../src/render/target_highlight_core';
 import type { Entity } from '../src/sim/types';
 
+import { ensureLocaleLoaded, getLanguage, setLanguage } from '../src/ui/i18n';
+
 interface PainterProbe {
   world: { entities: Map<number, Entity> };
   views: Map<number, unknown>;
@@ -30,6 +32,7 @@ interface PainterProbe {
   tmpV2: THREE.Vector3;
   isHostilePlayer(entity: Entity): boolean;
   nameplateDotScale(): number;
+  nameplateCooldownScale(): number;
   updateDynamicState(
     state: NameplateCanvasState,
     entity: Entity,
@@ -63,6 +66,7 @@ function entity(
     maxHp: 100,
     dead: false,
     auras: [],
+    cooldowns: new Map([['recklessness', 90]]),
     castingAbility: null,
     castRemaining: 0,
     channeling: false,
@@ -88,6 +92,7 @@ function probe(target: Entity) {
   painter.tmpV2 = new THREE.Vector3();
   painter.isHostilePlayer = (e) => e.id === 2;
   painter.nameplateDotScale = () => 0;
+  painter.nameplateCooldownScale = () => 1.5;
   return { painter, player };
 }
 
@@ -115,6 +120,7 @@ describe('target highlight painter hostility', () => {
         comboPips: 0,
       } satisfies NameplatePlan;
       painter.updateDynamicState(state, target, player, plan, false);
+      expect(state.cooldowns.count).toBe(kind === 'player' && expected ? 1 : 0);
       expect(state.emphasis).toBe(expected);
       expect(state.overheadMarker).toBe(expected);
       expect(painter.resolveTargetOverlay(player, 1280, 720, false, false).kind).toBe(
@@ -166,5 +172,35 @@ describe('target highlight painter hostility', () => {
     player.targetId = 3;
     painter.updateDynamicState(state, target, player, plan, false);
     expect([state.emphasis, state.overheadMarker]).toEqual([false, false]);
+  });
+  it('reformats a stable minute cooldown on the same painter pass as a language switch', async () => {
+    const priorLanguage = getLanguage();
+    try {
+      setLanguage('en');
+      const target = entity(2, 'player');
+      target.cooldowns.set('recklessness', 161);
+      const { painter, player } = probe(target);
+      const state = createNameplateCanvasState();
+      const plan = {
+        hidden: false,
+        anchorYOffset: 0,
+        urgent: true,
+        hasOverheadEmote: false,
+        threat: false,
+        comboPips: 0,
+      } satisfies NameplatePlan;
+      painter.updateDynamicState(state, target, player, plan, false);
+      const before = state.cooldowns.slots[0].timeText;
+      expect(before).toMatch(/^3\s?m/);
+      await ensureLocaleLoaded('fr_FR');
+      setLanguage('fr_FR');
+      expect(getLanguage()).toBe('fr_FR');
+      painter.updateDynamicState(state, target, player, plan, true);
+      expect(state.cooldowns.slots[0].timeText).toBe('3min');
+      expect(state.cooldowns.slots[0].timeText).not.toBe(before);
+      expect(state.cooldowns.slots[0].remaining).toBe(161);
+    } finally {
+      setLanguage(priorLanguage);
+    }
   });
 });

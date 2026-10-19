@@ -1,5 +1,6 @@
 import { borderAccent, borderMotifPrimitives } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
+import * as cooldownRow from './nameplate_cooldown_row';
 import {
   drawNameplateDotRow,
   NAMEPLATE_DOT_TIME_STYLE,
@@ -52,6 +53,7 @@ import {
   AI_STYLE,
   CAST_STYLE,
   CHEATER_STYLE,
+  configureNameplateTextStyle,
   EMOTE_STYLE,
   GUILD_STYLE,
   LEVEL_STYLE,
@@ -107,12 +109,13 @@ export interface NameplateCanvasState {
   opacity: number;
   frame: NameplateFrame;
   comboPips: number;
-  /** The local player's OWN debuffs on this entity (nameplateDotsInto), an icon
-   *  row between the name row and the health bar while showNameplateDots is on.
-   *  One plan PER PLATE, never a shared scratch: a recycled slot's artwork is
-   *  invalidated here, which only works when the plan belongs to one entity; the
-   *  slots keep their high-water capacity. Actionable timers: no tier sheds them. */
+  /** The local player's OWN debuffs on this entity (nameplateDotsInto), an icon row between
+   *  the name row and the health bar while showNameplateDots is on. One plan PER PLATE, never
+   *  a shared scratch: a recycled slot's artwork is invalidated here, which only works when the
+   *  plan belongs to one entity. Actionable timers: no tier sheds them. */
   dots: NameplateDotsPlan;
+  /** A hostile player's tracked cooldowns (nameplate_cooldowns_core), the row ABOVE the name. */
+  cooldowns: cooldownRow.NameplateCooldownsPlan;
   aiLabel: string;
   /** The /pvp flag the name row was built with: the painter re-resolves the row
    *  the frame the live flag differs, so the `<PvP>` tag never waits on the tier cadence. */
@@ -165,6 +168,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     frame: '',
     comboPips: 0,
     dots: newNameplateDotsPlan(),
+    cooldowns: cooldownRow.newNameplateCooldownsPlan(),
     aiLabel: '',
     pvpFlag: false,
     bounty: false,
@@ -178,19 +182,17 @@ export function createNameplateCanvasState(): NameplateCanvasState {
 }
 
 export const NAMEPLATE_MARKER_ROW_HEIGHT = 26;
-// The surface's own defensive clamp on the backing-store ratio it is handed. The
-// POLICY lives in the pure knob module under src/game (nameplatePixelRatio) and
-// is applied by nameplate_painter.ts; this file imports nothing from there, as
-// the deed-accent fairness guard (tests/deed_border_accent.test.ts) requires every
-// plate-drawing module to be free of knob and governor reads. Bounds pinned equal
-// in tests/nameplate_paint_gate.test.ts.
+// The surface's own defensive clamp on the backing-store ratio it is handed. The POLICY
+// lives in the pure knob module under src/game (nameplatePixelRatio) and is applied by
+// nameplate_painter.ts; this file imports nothing from there, as the deed-accent fairness
+// guard (tests/deed_border_accent.test.ts) requires every plate-drawing module to be free
+// of knob and governor reads. Bounds pinned equal in tests/nameplate_paint_gate.test.ts.
 export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
 export const NAMEPLATE_MIN_PIXEL_RATIO = 1;
-// Nameplate labels scale their backing stores with DPR. The count remains a
-// secondary guard, while the 16 MiB RGBA budget is the hard memory ceiling.
-// At DPR 2 a representative 126x43 logical label retains about 85 KiB, so the
-// byte budget holds roughly 190 such labels rather than the old 129 MiB worst
-// case from a 1536-entry count alone.
+// Nameplate labels scale their backing stores with DPR. The count remains a secondary
+// guard, while the 16 MiB RGBA budget is the hard memory ceiling. At DPR 2 a representative
+// 126x43 logical label retains about 85 KiB, so the byte budget holds roughly 190 such
+// labels rather than the old 129 MiB worst case from a 1536-entry count alone.
 export const NAMEPLATE_TEXT_SPRITE_LIMIT = 512;
 export const NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES = 16 * 1024 * 1024;
 
@@ -237,10 +239,9 @@ export class NameplateCanvasSurface {
   private width = 0;
   private height = 0;
   private layerHidden = false;
-  // Bumped by anything that changes how an UNCHANGED plate would be drawn: a
-  // late web-font load (which clears the sprite cache) and a forced-colors flip
-  // (which repaints every fill and stroke through the system palette). The
-  // repaint gate folds it in, so those two never leave a stale surface up.
+  // Bumped by anything that changes how an UNCHANGED plate would be drawn: a late web-font
+  // load (which clears the sprite cache) and a forced-colors flip (which repaints every fill and
+  // stroke through the system palette). The repaint gate folds it in, so neither goes stale.
   private styleRev = 0;
   private readonly heraldry = createNameplateHeraldry();
   private readonly heraldryInput: NameplateHeraldryInput = {
@@ -352,10 +353,10 @@ export class NameplateCanvasSurface {
       y -= 7;
       this.drawHealth(state, screenX, y);
     }
-    // Your own dots sit BETWEEN the health bar and the name row (the classic
-    // nameplate-tracker placement): the health bar stays the lowest thing the eye
-    // tracks and the cast bar keeps its anchor, while the plate grows upward.
-    // drawEmote below mirrors this exact step, or the emote bubble drifts.
+    // Your own dots sit BETWEEN the health bar and the name row (the classic nameplate-tracker
+    // placement): the health bar stays the lowest thing the eye tracks and the cast bar keeps
+    // its anchor, while the plate grows upward. drawEmote mirrors this step (and the enemy
+    // cooldown row above the name), or the emote bubble drifts.
     if (state.dots.count > 0) {
       y -= nameplateDotRowHeight(state.dots.count, state.dots.scale);
       this.drawDots(state, screenX, y);
@@ -383,6 +384,7 @@ export class NameplateCanvasSurface {
     const frameWidth = Math.max(NAMEPLATE_BASE_WIDTH, this.heraldryInput.nameRowWidth);
     if (state.emphasis)
       drawTargetPlateFrame(ctx, screenX, y, screenY, frameWidth, this.forcedColorsActive());
+    y -= cooldownRow.drawNameplateCooldownRow(ctx, state.cooldowns, screenX, y, this.dotRowHost);
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.marker) {
       if (state.markerTone === 'loot' || state.markerTone === 'harvest') {
@@ -404,11 +406,10 @@ export class NameplateCanvasSurface {
         const dimmed = state.markerTone === 'cooldown';
         if (dimmed) ctx.globalAlpha = state.opacity * 0.55;
         this.text.draw(ctx, state.marker, screenX, y + 21, style);
-        // Forced colors collapses gold and blue to one CanvasText, so the two
-        // offers would read identically (the failure class the DOM plates'
-        // forced-colors rule closed). Underline the repeat mark as the
-        // redundant non-color cue, dotted for the cooldown mark so the dimmed
-        // not-yet state stays distinguishable too.
+        // Forced colors collapses gold and blue to one CanvasText, so the two offers would
+        // read identically (the failure class the DOM plates' forced-colors rule closed).
+        // Underline the repeat mark as the redundant non-color cue, dotted for the cooldown
+        // mark so the dimmed not-yet state stays distinguishable too.
         if (
           this.forcedColorsActive() &&
           (state.markerTone === 'repeat' || state.markerTone === 'cooldown')
@@ -462,6 +463,7 @@ export class NameplateCanvasSurface {
     if (state.title) y -= NAMEPLATE_HERALDRY_TITLE_STEP;
     y -= this.heraldryLift(state);
     y -= this.nameRowHeight(state);
+    y -= cooldownRow.nameplateCooldownRowHeight(state.cooldowns);
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.comboPips > 0) y -= 9;
     if (state.raidMarkerUrl) y -= 31;
@@ -786,9 +788,7 @@ export class NameplateCanvasSurface {
   }
 
   private configureTextStyle(style: TextSpriteStyle, fill: string): TextSpriteStyle {
-    style.fill = this.forcedColorsActive() ? 'CanvasText' : fill;
-    style.stroke = this.forcedColorsActive() ? 'Canvas' : '#000';
-    return style;
+    return configureNameplateTextStyle(style, fill, this.forcedColorsActive());
   }
 
   private forcedColorsActive(): boolean {
