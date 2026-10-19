@@ -31,6 +31,7 @@ import {
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
+import { gmHiddenFrom } from '../src/sim/gm_presence';
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import { parseItemCopyAnchor } from '../src/sim/item_copy_anchor';
 import { itemInstancePayloadsEqual } from '../src/sim/item_instance_merge';
@@ -281,6 +282,7 @@ import {
 import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
+import { gmToolsHost } from './gm_tools_host';
 import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { handleGuildBankEscrowRefusal as handleEscrowRefusal } from './guild_bank_escrow_refusal';
@@ -465,6 +467,7 @@ import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './s
 import { guildStampRankOf, SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { idleSpectatorBody } from './spectate_body';
+import { pgStaffWatchlist } from './staff_watchlist_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import {
   type StorageAppliedEffectDraft,
@@ -494,15 +497,14 @@ import { recordUnstuckEvent } from './unstuck_records';
 import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
 import { emitVaultSelfKeys } from './vault_wire';
 import {
-  buildWhoRosterEntries,
   canShowInWho,
   normalizeWhoFilter,
-  visibleWhoRows,
   type WhoRosterEntry,
   type WhoRosterRow,
   whoChatLines,
   whoFrame,
 } from './who_roster';
+import { readLiveWhoRows } from './who_roster_host';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { activeWorldBossIdsWireJson } from './world_boss_wire';
@@ -1872,7 +1874,7 @@ export class GameServer {
       error: (message, error) => console.error(message, ...(error === undefined ? [] : [error])),
       nowMs: Date.now,
     });
-    this.moderation = new ModerationService(this.moderationHost(), {
+    this.moderation = new ModerationService(this.moderationHost(), pgStaffWatchlist, {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
       ban: (input) => moderateAccount({ ...input, action: 'ban' }),
@@ -2009,6 +2011,7 @@ export class GameServer {
       jail: (moderator, target, minutes) => this.jailSession(moderator, target, minutes),
       unjail: (moderator, target) => this.unjailSession(moderator, target),
       realmMotd: (actor, command) => this.realmMotd.handle(actor, command),
+      ...gmToolsHost(this.sim, this.clients, (t, c) => this.broadcastSystem(t, c)),
     };
   }
 
@@ -3529,6 +3532,7 @@ export class GameServer {
     // the first guild stamp retro-credits an existing member's soc_guild_joined
     // silently instead of firing the live banner.
     void this.initSocial(session, true);
+    void this.moderation.notifyWatchedLogin(session); // /watch: ping online GMs
     // Stamp the $WOC holder-tier flair (best-effort: a balance read must never
     // affect joining the world).
     void this.refreshHolderTier(session).catch((err) =>
@@ -8094,6 +8098,7 @@ export class GameServer {
   }
 
   private canObserveEntity(viewer: Entity, e: Entity, d2: number): boolean {
+    if (gmHiddenFrom(this.sim.entities, viewer, e)) return false; // /visible off, corpse too
     if (e.kind !== 'player' || !isStealthed(e)) return true;
     if (this.sim.isHostileTo(viewer, e)) return false;
     const party = this.sim.partyOf(viewer.id);
@@ -9682,31 +9687,16 @@ export class GameServer {
     });
   }
 
-  // The realm-wide roster, built and name-sorted at most ONCE per sim tick for
-  // every viewer (the realm-readout memo seam), each entry keeping a live
-  // session handle for the per-viewer visibility rule. Zone + status only:
-  // presenceOf also carries the live x/z, which the Who tab's frame must never
-  // ship realm-wide (positions stay friend/guild-gated on the socialpos frame).
-  private whoRosterEntries(): readonly WhoRosterEntry<ClientSession>[] {
-    return realmReadoutObject(this.whoRosterReadout, this.sim.tickCount, () =>
-      buildWhoRosterEntries(this.clients.values(), (session) => {
-        const e = this.sim.entities.get(session.pid);
-        const meta = this.sim.meta(session.pid);
-        if (!e || !meta) return null;
-        const { zone, status } = this.presenceOf(session);
-        return { name: session.name, cls: meta.cls, level: e.level, guild: e.guild, zone, status };
-      }),
+  // The rows THIS viewer may see (canShowInWho: bidirectional blocks, fail-closed).
+  private whoRosterFor(viewer: ClientSession): WhoRosterRow[] {
+    return readLiveWhoRows(this.sim, this.clients.values(), this.whoRosterReadout, viewer, (s) =>
+      this.presenceOf(s),
     );
   }
 
-  // The rows THIS viewer may see (canShowInWho: bidirectional blocks, fail-closed).
-  private whoRosterFor(viewer: ClientSession): WhoRosterRow[] {
-    return visibleWhoRows(this.whoRosterEntries(), viewer);
-  }
-
-  private broadcastSystem(text: string): void {
+  private broadcastSystem(text: string, color = '#ffd100'): void {
     for (const session of this.clients.values()) {
-      this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100' }] });
+      this.send(session, { t: 'events', list: [{ type: 'log', text, color }] });
     }
   }
 
