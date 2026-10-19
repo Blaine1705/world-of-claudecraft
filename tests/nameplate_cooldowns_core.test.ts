@@ -22,12 +22,16 @@ import type { Aura, Entity } from '../src/sim/types';
 
 const MEDALLION = 'trinket:medallion_of_defiance';
 
+// These formatting fixtures describe known successful uses; real equip/use
+// provenance is covered through Sim in medallion_cooldown_provenance.test.ts.
+function usedCooldowns(cooldowns: Record<string, number>): Map<string, number> {
+  const out = new Map(Object.entries(cooldowns));
+  if (cooldowns[MEDALLION] > 0) out.set('system_medallion_use', cooldowns[MEDALLION]);
+  return out;
+}
+
 function plan(cooldowns: Record<string, number>, auras: { id: string; remaining: number }[] = []) {
-  return nameplateCooldownsInto(
-    newNameplateCooldownsPlan(),
-    new Map(Object.entries(cooldowns)),
-    auras,
-  );
+  return nameplateCooldownsInto(newNameplateCooldownsPlan(), usedCooldowns(cooldowns), auras);
 }
 
 const keys = (p: ReturnType<typeof plan>) => p.slots.slice(0, p.count).map((s) => s.key);
@@ -162,7 +166,7 @@ describe('nameplate cooldowns core', () => {
 function player(cooldowns: Record<string, number>, auras: Partial<Aura>[] = []): Entity {
   const e = blankEntity(9);
   e.kind = 'player';
-  e.cooldowns = new Map(Object.entries(cooldowns));
+  e.cooldowns = usedCooldowns(cooldowns);
   e.auras = auras as Aura[];
   return e;
 }

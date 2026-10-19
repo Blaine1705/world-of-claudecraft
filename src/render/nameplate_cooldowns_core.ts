@@ -8,7 +8,7 @@
 // Two inputs, both already on the entity in either world:
 //   - its cooldown map: the offline Sim fills it for its bots, and the online
 //     ClientWorld mirrors a peer's tracked deadlines into it
-//     (src/net/peer_major_cooldown_wire.ts). A running entry is "spent".
+//     (src/net/peer_major_cooldown_wire.ts). The medallion additionally needs its successful-use provenance timer.
 //   - its auras: a tracked buff's aura carries the bare ability id that applied
 //     it, whoever cast it. So a buff an ally cast on this entity (a priest's
 //     Martyr's Aegis) shows HERE while it lasts, and its cooldown shows on the
@@ -28,6 +28,7 @@ import {
   majorCooldownBaseSec,
   majorCooldownGroup,
   majorCooldownKeyForAura,
+  majorCooldownRemaining,
 } from '../sim/major_cooldowns';
 import {
   NAMEPLATE_DOT_GAP,
@@ -197,7 +198,8 @@ export function nameplateCooldownsInto(
     slot.remaining = aura.remaining;
     slot.unit = nameplateCooldownTimeUnit(aura.remaining);
   }
-  for (const [key, remaining] of cooldowns) {
+  for (const [key, heldRemaining] of cooldowns) {
+    const remaining = majorCooldownRemaining(key, heldRemaining, cooldowns);
     if (!(remaining > 0)) continue;
     const group = majorCooldownGroup(key);
     if (group === null || findSlot(out, key)) continue;

@@ -6,6 +6,7 @@
 // snapshot-clock aging, and the self skip.
 import { describe, expect, it } from 'vitest';
 import { GameServer } from '../server/game';
+import { updateTimers } from '../src/sim/combat/auras';
 import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
@@ -31,7 +32,7 @@ function setup() {
   };
   const recordOf = (snap: Snap) =>
     (snap?.ents ?? []).find((e: { id: number }) => e.id === subject.pid);
-  return { server, viewer, subject, subjectEntity, step, recordOf };
+  return { server, viewer, subject, subjectWs, subjectEntity, step, recordOf };
 }
 
 describe('enemy cooldowns through the broadcast', () => {
@@ -93,15 +94,62 @@ describe('enemy cooldowns through the broadcast', () => {
     expect(self).toBeLessThanOrEqual(42);
   });
 
-  it('never shows the medallion off an equip lockout, and shows it once used', () => {
-    const lockout = setup();
-    lockout.subjectEntity.cooldowns.set(MEDALLION, 30); // TRINKET_EQUIP_LOCKOUT on equip
-    lockout.subjectEntity.cooldowns.set('recklessness', 150);
-    expect(Object.keys(lockout.recordOf(lockout.step()).mcd)).toEqual(['recklessness']);
+  it('never broadcasts an unused medallion inheriting another real trinket use', () => {
+    const { server, subject, subjectEntity, step, recordOf } = setup();
+    server.sim.setPlayerLevel(20, subject.pid);
+    server.sim.addItem('wayfarers_lodestone', 1, subject.pid);
+    server.sim.equipItem('wayfarers_lodestone', subject.pid);
+    for (let i = 0; i < 31 * 20; i++) updateTimers(subjectEntity);
+    server.sim.useItem('wayfarers_lodestone', subject.pid);
+    for (let i = 0; i < 30 * 20; i++) updateTimers(subjectEntity);
+    server.sim.addItem('medallion_of_defiance', 1, subject.pid);
+    server.sim.equipItem('medallion_of_defiance', subject.pid);
+    expect(subjectEntity.cooldowns.get(MEDALLION)).toBeCloseTo(90);
+    expect(recordOf(step()).mcd).toBeNull();
+  });
 
-    const used = setup();
-    used.subjectEntity.cooldowns.set(MEDALLION, 120);
-    const record = used.recordOf(used.step());
-    expect(Object.keys(record.mcd)).toEqual([MEDALLION]);
+  it('ships genuine late first sight below 30 seconds to peer and self, without movement spam', () => {
+    const { server, viewer, subject, subjectWs, subjectEntity, step, recordOf } = setup();
+    server.sim.setPlayerLevel(20, subject.pid);
+    server.sim.addItem('medallion_of_defiance', 1, subject.pid);
+    server.sim.equipItem('medallion_of_defiance', subject.pid);
+    for (let i = 0; i < 31 * 20; i++) updateTimers(subjectEntity);
+    server.sim.useItem('medallion_of_defiance', subject.pid);
+    for (let i = 0; i < 100 * 20; i++) updateTimers(subjectEntity);
+    // No broadcast/cache observation happened during the first 100 seconds.
+    expect(subjectEntity.cooldowns.get(MEDALLION)).toBeCloseTo(20);
+    const first = step();
+    expect(recordOf(first).mcd[MEDALLION]).toBeCloseTo(server.sim.time + 19.95);
+    const peerClient = bareClient(viewer.pid);
+    const selfClient = bareClient(subject.pid);
+    const apply = (client: typeof peerClient, snap: Snap) =>
+      // biome-ignore lint/suspicious/noExplicitAny: exercise the real private snapshot decoder.
+      (client as any).applySnapshot(structuredClone(snap));
+    apply(peerClient, first);
+    apply(selfClient, lastSnap(subjectWs.sent));
+    expect(peerClient.entities.get(subject.pid)?.cooldowns.get('system_medallion_use')).toBeCloseTo(
+      19.95,
+    );
+    expect(selfClient.entities.get(subject.pid)?.cooldowns.get('system_medallion_use')).toBeCloseTo(
+      19.95,
+    );
+    for (let i = 0; i < 12; i++) {
+      subjectEntity.pos.x += 0.5;
+      const snap = step();
+      expect(recordOf(snap)?.mcd).toBeUndefined();
+      apply(peerClient, snap);
+    }
+    expect(
+      peerClient.entities.get(subject.pid)?.cooldowns.get('system_medallion_use'),
+    ).toBeLessThan(19.5);
+    // A fresh client gets the fact from a new whole first-sight record too.
+    const reconnectWs = fakeWs();
+    const reconnect = joinServer(server, reconnectWs, 3, 'Reconnected', 'warrior', STABLE);
+    broadcast(server);
+    const reconnected = bareClient(reconnect.pid);
+    apply(reconnected, lastSnap(reconnectWs.sent));
+    expect(
+      reconnected.entities.get(subject.pid)?.cooldowns.get('system_medallion_use'),
+    ).toBeGreaterThan(19);
   });
 });

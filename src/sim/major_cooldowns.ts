@@ -23,7 +23,7 @@
 // the row is a visible diff.
 
 import { ABILITIES } from './content/classes';
-import { TRINKET_SPECS, trinketCooldownKey } from './content/trinkets';
+import { MEDALLION_USE_COOLDOWN_KEY, TRINKET_SPECS, trinketCooldownKey } from './content/trinkets';
 import type { AbilityDef } from './types';
 
 export type MajorCooldownGroup = 'medallion' | 'defensive' | 'offensive';
@@ -180,21 +180,11 @@ const AURA_ALIASES: Readonly<Record<string, string>> = {
  * buff's real aura id by tests/major_cooldowns.test.ts.
  */
 export function majorCooldownKeyForAura(auraId: string): string | null {
-  // Memoized: the row asks per aura per frame, and the id space is content-bounded.
-  const memo = auraKeyMemo.get(auraId);
-  if (memo !== undefined) return memo;
-  const key = resolveAuraKey(auraId);
-  auraKeyMemo.set(auraId, key);
-  return key;
-}
-
-const auraKeyMemo = new Map<string, string | null>();
-
-function resolveAuraKey(auraId: string): string | null {
+  // Resolve against finite content keys without retaining caller-controlled ids.
+  // Dynamic caster suffixes and unknown/null answers never grow a session memo.
   const table = majorCooldownTable();
   if (table.has(auraId)) return auraId;
-  const alias = AURA_ALIASES[auraId];
-  if (alias !== undefined) return alias;
+  if (Object.hasOwn(AURA_ALIASES, auraId)) return AURA_ALIASES[auraId];
   const colon = auraId.indexOf(':');
   let id = colon >= 0 ? auraId.slice(0, colon) : auraId;
   if (table.has(id)) return id;
@@ -204,6 +194,19 @@ function resolveAuraKey(auraId: string): string | null {
     if (table.has(id)) return id;
   }
   return null;
+}
+
+/** The actual successful-use cooldown, never an equip or inherited lockout.
+ * The factual medallion timer shares the existing cooldown engine/save/reset
+ * lifecycle; a different trinket may extend its gate without extending this fact. */
+export function majorCooldownRemaining(
+  key: string,
+  remaining: number,
+  cooldowns: ReadonlyMap<string, number>,
+): number {
+  return key === PVP_MEDALLION_COOLDOWN_KEY
+    ? (cooldowns.get(MEDALLION_USE_COOLDOWN_KEY) ?? 0)
+    : remaining;
 }
 
 /** The full base cooldown of a tracked key in seconds, for the swipe fraction.

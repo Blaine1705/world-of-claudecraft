@@ -3,7 +3,7 @@
 // which auras a player's own guards keep off them, which saved cooldowns a relog
 // restores, and the dodge, parry or block a mob swing lands on a wearer.
 
-import { isTrinketCooldownKey } from '../content/trinkets';
+import { isTrinketCooldownKey, MEDALLION_USE_COOLDOWN_KEY } from '../content/trinkets';
 import { ABILITIES } from '../data';
 import type { Aura, Entity } from '../types';
 import { isUnstuckSystemCooldown } from '../unstuck_cooldown';
@@ -21,5 +21,10 @@ export function playerAuraGuarded(target: Entity, aura: Aura): boolean {
 /** Whether a saved cooldown id is one a relog restores: an ability's, the unstuck
  *  system's, or a worn trinket's use. */
 export function restorableCooldown(id: string): boolean {
-  return isUnstuckSystemCooldown(id) || ABILITIES[id] !== undefined || isTrinketCooldownKey(id);
+  return (
+    id === MEDALLION_USE_COOLDOWN_KEY ||
+    isUnstuckSystemCooldown(id) ||
+    ABILITIES[id] !== undefined ||
+    isTrinketCooldownKey(id)
+  );
 }

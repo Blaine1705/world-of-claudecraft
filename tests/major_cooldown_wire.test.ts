@@ -29,6 +29,7 @@ describe('major cooldown wire (server encode)', () => {
       serverPlayer({
         barkskin: 40,
         'trinket:medallion_of_defiance': 90,
+        system_medallion_use: 90,
         mortal_strike: 4, // a rotation button: never rides
         system_unstuck: 300, // not an ability at all
       }),
@@ -80,12 +81,27 @@ describe('major cooldown wire (server encode)', () => {
     e.cooldowns.delete('trinket:medallion_of_defiance');
     cache.encode(e, 30, 0);
     e.cooldowns.set('trinket:medallion_of_defiance', 120);
+    e.cooldowns.set('system_medallion_use', 120);
     cache.encode(e, 40, 0);
     expect(mcdOf(cache)).toEqual({ 'trinket:medallion_of_defiance': 160 });
     // ...and keeps showing down to the last seconds of that cooldown.
     e.cooldowns.set('trinket:medallion_of_defiance', 5);
+    e.cooldowns.set('system_medallion_use', 5);
     cache.encode(e, 155, 0);
     expect(mcdOf(cache)).toEqual({ 'trinket:medallion_of_defiance': 160 });
+  });
+
+  it('never infers use from unknown old state, and sends the factual deadline through a longer swap gate', () => {
+    const cache = new MajorCooldownWireCache();
+    const e = serverPlayer({ 'trinket:medallion_of_defiance': 180 });
+    cache.encode(e, 100, 0);
+    expect(cache.json).toBe('null');
+    e.cooldowns.set('system_medallion_use', 20);
+    cache.encode(e, 100, 0);
+    expect(mcdOf(cache)).toEqual({ 'trinket:medallion_of_defiance': 120 });
+    e.cooldowns.delete('system_medallion_use');
+    cache.encode(e, 121, 0);
+    expect(cache.json).toBe('null');
   });
 
   it('projects the hourglass-accelerated deadline, which holds still while it runs', () => {
@@ -138,12 +154,17 @@ describe('major cooldown wire (client decode)', () => {
 
   it('round-trips the server encode through JSON to the client decode', () => {
     const cache = new MajorCooldownWireCache();
-    cache.encode(serverPlayer({ evasion: 120, 'trinket:medallion_of_defiance': 45 }), 2000, 0);
+    cache.encode(
+      serverPlayer({ evasion: 120, 'trinket:medallion_of_defiance': 45, system_medallion_use: 45 }),
+      2000,
+      0,
+    );
     const peer = blankEntity(7);
     applyPeerMajorCooldownWire(peer, JSON.parse(cache.json), 2000);
     expect(Object.fromEntries(peer.cooldowns)).toEqual({
       evasion: 120,
       'trinket:medallion_of_defiance': 45,
+      system_medallion_use: 45,
     });
   });
 
@@ -162,6 +183,32 @@ describe('major cooldown wire (client decode)', () => {
     other.cooldowns.set('avatar', 7);
     agePeerMajorCooldowns([other], 1001, 9);
     expect(other.cooldowns.get('avatar')).toBe(7);
+  });
+
+  it('clears peer provenance on expiry, reset, rewind and self-to-peer ownership change', () => {
+    const e = blankEntity(7);
+    const key = 'trinket:medallion_of_defiance';
+    const fact = 'system_medallion_use';
+    applyPeerMajorCooldownWire(e, { [key]: 1020 }, 1000);
+    expect(e.cooldowns.get(fact)).toBe(20);
+    agePeerMajorCooldowns([e], 1021);
+    expect(e.cooldowns.has(fact)).toBe(false);
+    applyPeerMajorCooldownWire(e, { [key]: 1050 }, 1030);
+    applyPeerMajorCooldownWire(e, null, 1031);
+    expect(e.cooldowns.has(fact)).toBe(false);
+    applyPeerMajorCooldownWire(e, { [key]: 1050 }, 1030);
+    agePeerMajorCooldowns([e], 10);
+    expect(e.cooldowns.has(fact)).toBe(false);
+    // A self/spectated map is authoritative, even while a peer deadline existed.
+    applyPeerMajorCooldownWire(e, { [key]: 1050 }, 1030);
+    e.cooldowns.set(fact, 12);
+    e.cooldowns.set(key, 12);
+    applyPeerMajorCooldownWire(e, null, 1031, true);
+    agePeerMajorCooldowns([e], 1040, e.id);
+    expect(e.cooldowns.get(fact)).toBe(12);
+    // Back to peer: null is the whole truth even without held peer deadlines.
+    applyPeerMajorCooldownWire(e, null, 1041);
+    expect(e.cooldowns.has(fact)).toBe(false);
   });
 
   it('drops malformed rows, an unknown clock, and a deadline a clock reset made impossible', () => {

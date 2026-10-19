@@ -17,17 +17,15 @@
 // Hourglass the cooldown runs faster, and the deadline is the self wire's own
 // projection (cooldownDeadline), which also holds still.
 //
-// The PvP medallion shows only once USED: equipping a trinket arms a lockout of
-// TRINKET_EQUIP_LOCKOUT on its key (src/sim/combat/trinkets.ts), which must not
-// read as a spent medallion. A key first seen above that lockout is a use; one
-// first seen at or under it is the equip lockout and stays off the wire.
+// The PvP medallion shows only its factual successful-use timer, minted by
+// useWornTrinket and aged in the ordinary cooldown Map. Equip/inherited gates
+// never prove use, and a late first observer needs no earlier cache observation.
 //
 // Per tick per observed entity: a walk of the entity's own cooldown map (bounded
 // by the classified roster, a few dozen keys at most) into a reused scratch map,
 // compared entry by entry; the JSON is rebuilt only when a deadline changed.
 
-import { TRINKET_EQUIP_LOCKOUT } from '../src/sim/combat/trinkets';
-import { majorCooldownGroup, PVP_MEDALLION_COOLDOWN_KEY } from '../src/sim/major_cooldowns';
+import { majorCooldownGroup, majorCooldownRemaining } from '../src/sim/major_cooldowns';
 import type { Entity } from '../src/sim/types';
 import { cooldownDeadline, findProtectiveHourglass, jsonWithField } from './snapshot_timer_wire';
 
@@ -46,7 +44,6 @@ export class MajorCooldownWireCache {
   private current = new Map<string, number>();
   private scratch = new Map<string, number>();
   private auraRevision = -1;
-  private medallionUsed = false;
 
   encode(e: Entity, simTime: number, auraRevision: number): this {
     let changed = auraRevision !== this.auraRevision;
@@ -55,19 +52,12 @@ export class MajorCooldownWireCache {
     next.clear();
     if (e.kind === 'player' && e.cooldowns.size > 0) {
       const hourglass = findProtectiveHourglass(e.auras);
-      for (const [key, remaining] of e.cooldowns) {
+      for (const [key, heldRemaining] of e.cooldowns) {
+        const remaining = majorCooldownRemaining(key, heldRemaining, e.cooldowns);
         if (!(remaining > 0) || majorCooldownGroup(key) === null) continue;
-        if (key === PVP_MEDALLION_COOLDOWN_KEY) {
-          if (!this.medallionUsed && remaining <= TRINKET_EQUIP_LOCKOUT) continue;
-          this.medallionUsed = true;
-        }
         const deadline = cooldownDeadline(key, remaining, simTime, hourglass, e.dead);
         next.set(key, Array.isArray(deadline) ? deadline[0] : deadline);
       }
-    }
-    if (!next.has(PVP_MEDALLION_COOLDOWN_KEY)) {
-      this.medallionUsed =
-        (e.cooldowns.get(PVP_MEDALLION_COOLDOWN_KEY) ?? 0) > 0 && this.medallionUsed;
     }
     if (!sameDeadlines(next, this.current)) {
       this.scratch = this.current;

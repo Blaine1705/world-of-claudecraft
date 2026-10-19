@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
 import {
   MAJOR_COOLDOWN_MIN_SEC,
@@ -185,11 +185,42 @@ describe('aura id to cooldown key', () => {
   });
 
   it('leaves untracked auras untracked', () => {
-    for (const id of ['rend', 'berserker_rage', 'sated', 'dash', 'stealth_x', 'evocation']) {
+    for (const id of [
+      'rend',
+      'berserker_rage',
+      'sated',
+      'dash',
+      'stealth_x',
+      'constructor',
+      'toString',
+      '__proto__',
+      'evocation',
+    ]) {
       const key = majorCooldownKeyForAura(id);
       if (id === 'evocation') expect(key).toBe('evocation');
       else expect(key, id).toBeNull();
     }
+  });
+
+  it('never retains dynamic caster ids or unknown negative answers', () => {
+    majorCooldownTable(); // Build the finite content classifier before observing writes.
+    const writes = vi.spyOn(Map.prototype, 'set');
+    let retainedWrites: number;
+    try {
+      for (let i = 0; i < 2000; i++) {
+        if (majorCooldownKeyForAura(`aegis_first_dawn_dr:${i}`) !== 'aegis_first_dawn')
+          throw new Error('dynamic tracked aura changed classification');
+        if (majorCooldownKeyForAura(`unknown_${i}:caster_${i}`) !== null)
+          throw new Error('unknown aura changed classification');
+        if (majorCooldownKeyForAura(`unknown_alias_${i}`) !== null)
+          throw new Error('unknown alias changed classification');
+      }
+      retainedWrites = writes.mock.calls.length;
+    } finally {
+      writes.mockRestore();
+    }
+    expect(retainedWrites).toBe(0);
+    expect(majorCooldownKeyForAura('howling_rage_empower')).toBe('bestial_wrath');
   });
 
   it('agrees with the handler constants it aliases', async () => {

@@ -15,7 +15,8 @@
 // rebinding the player id) has its held deadlines dropped, never aged into the
 // map `cds` now owns.
 
-import { majorCooldownBaseSec } from '../sim/major_cooldowns';
+import { MEDALLION_USE_COOLDOWN_KEY } from '../sim/content/trinkets';
+import { majorCooldownBaseSec, PVP_MEDALLION_COOLDOWN_KEY } from '../sim/major_cooldowns';
 import type { Entity } from '../sim/types';
 
 const held = new WeakMap<Entity, Map<string, number>>();
@@ -29,9 +30,12 @@ function setRemaining(e: Entity, deadlines: Map<string, number>, now: number): v
     const remaining = deadline - now;
     if (remaining > 0 && remaining <= majorCooldownBaseSec(key) * STALE_BASE_MULTIPLE) {
       e.cooldowns.set(key, remaining);
+      if (key === PVP_MEDALLION_COOLDOWN_KEY)
+        e.cooldowns.set(MEDALLION_USE_COOLDOWN_KEY, remaining);
     } else {
       deadlines.delete(key);
       e.cooldowns.delete(key);
+      if (key === PVP_MEDALLION_COOLDOWN_KEY) e.cooldowns.delete(MEDALLION_USE_COOLDOWN_KEY);
     }
   }
 }
@@ -50,6 +54,9 @@ export function applyPeerMajorCooldownWire(
     held.delete(e);
     return;
   }
+  // A peer can previously have been self/spectated: the new whole channel owns
+  // this fact even when no peer deadlines were held for the old self map.
+  e.cooldowns.delete(MEDALLION_USE_COOLDOWN_KEY);
   if (prior) for (const key of prior.keys()) e.cooldowns.delete(key);
   if (raw === null || typeof raw !== 'object' || !Number.isFinite(now)) {
     held.delete(e);
