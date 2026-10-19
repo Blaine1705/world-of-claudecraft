@@ -435,8 +435,10 @@ describe('chapel flows', () => {
 
 // Generic gabled market stand (no assetId) keeps the sloped-canopy physics
 // pinned. The old Fenbridge (-5, 310.5) stand was replaced by the rebuild
-// provision stall GLB, so this suite uses an open-field zone2 stand instead.
-const LEGACY_STALL = { x: -365, z: 359, rot: 0.5 };
+// provision stall GLB, so this suite uses Bridgemere's stand instead, re-pinned
+// 2026-10 to the forecourt where the painted rebuild moved it (the island inn
+// covers its old spot).
+const LEGACY_STALL = { x: -370, z: 349.5, rot: 0.5 };
 // local +Z (eave approach) in the stall yaw convention.
 const LEGACY_STALL_APPROACH = {
   x: Math.sin(LEGACY_STALL.rot),
@@ -512,8 +514,9 @@ describe('dock flows', () => {
 describe('abilities x collision', () => {
   it('Vaulting Charge onto the stall canopy seats on the sampled gable, and off again', () => {
     const sim = makeSim();
-    const approachX = LEGACY_STALL.x + LEGACY_STALL_APPROACH.x * 5.5;
-    const approachZ = LEGACY_STALL.z + LEGACY_STALL_APPROACH.z * 5.5;
+    // 4 yd out: open street (Bridgemere's inn step stands 5.5 yd out this side)
+    const approachX = LEGACY_STALL.x + LEGACY_STALL_APPROACH.x * 4;
+    const approachZ = LEGACY_STALL.z + LEGACY_STALL_APPROACH.z * 4;
     teleport(
       sim,
       approachX,
